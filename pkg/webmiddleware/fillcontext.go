@@ -17,7 +17,7 @@ package webmiddleware
 import (
 	"net/http"
 
-	"go.thethings.network/lorawan-stack/pkg/fillcontext"
+	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 )
 
 // FillContext returns a middleware that fills global context into a call context.

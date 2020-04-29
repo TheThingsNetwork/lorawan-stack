@@ -18,8 +18,8 @@ import (
 	"time"
 
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/errors/web"
-	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 // Log is middleware that logs the request.

@@ -17,7 +17,7 @@ package fetch_test
 import (
 	"fmt"
 
-	"go.thethings.network/lorawan-stack/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 )
 
 func Example() {

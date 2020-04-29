@@ -14,7 +14,7 @@
 
 package shared
 
-import "go.thethings.network/lorawan-stack/pkg/errors"
+import "go.thethings.network/lorawan-stack/v3/pkg/errors"
 
 // Errors returned by component initialization.
 var (

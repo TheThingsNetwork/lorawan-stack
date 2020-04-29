@@ -17,7 +17,7 @@ package crypto
 import (
 	"fmt"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 func errInvalidSize(typeName, typeDescription, expectedSize string) errors.Definition {

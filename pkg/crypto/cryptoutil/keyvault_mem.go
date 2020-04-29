@@ -22,7 +22,7 @@ import (
 	"encoding/pem"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 )
 
 // MemKeyVault is a KeyVault that uses secrets from memory.

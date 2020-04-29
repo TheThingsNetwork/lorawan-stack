@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/loradms/v1/api/objects"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api/objects"
 )
 
 // Tokens is an API client for the Token Management API.

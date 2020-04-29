@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"go.thethings.network/lorawan-stack/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 const (

@@ -22,8 +22,8 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
-	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // UplinkDeduplicator is an implementation of networkserver.UplinkDeduplicator.

@@ -18,5 +18,5 @@ package main
 
 import (
 	// mage:import
-	_ "go.thethings.network/lorawan-stack/.mage"
+	_ "go.thethings.network/lorawan-stack/v3/.mage"
 )

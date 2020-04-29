@@ -19,8 +19,8 @@ import (
 	"encoding/json"
 
 	"github.com/go-redis/redis"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 )
 
 // WrapPubSub wraps an existing PubSub and publishes all events received from Redis to that PubSub.

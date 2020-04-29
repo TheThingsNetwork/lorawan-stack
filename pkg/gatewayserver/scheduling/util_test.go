@@ -17,7 +17,7 @@ package scheduling_test
 import (
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 )
 
 type mockTimeSource struct {

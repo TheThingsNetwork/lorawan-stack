@@ -14,7 +14,7 @@
 
 package band
 
-import "go.thethings.network/lorawan-stack/pkg/errors"
+import "go.thethings.network/lorawan-stack/v3/pkg/errors"
 
 var (
 	errBandNotFound                         = errors.DefineNotFound("band_not_found", "band `{id}` not found")

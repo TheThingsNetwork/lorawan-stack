@@ -16,7 +16,7 @@ package middleware
 
 import (
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/fillcontext"
+	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 )
 
 // FillContext fills the request context by executing the given fillers.

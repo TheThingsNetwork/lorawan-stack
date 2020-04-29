@@ -1,4 +1,4 @@
-module go.thethings.network/lorawan-stack
+module go.thethings.network/lorawan-stack/v3
 
 go 1.14
 

@@ -16,7 +16,7 @@ package redis
 
 import (
 	"github.com/go-redis/redis"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 var (

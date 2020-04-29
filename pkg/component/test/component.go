@@ -17,8 +17,8 @@ package test
 import (
 	"testing"
 
-	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 // NewComponent returns a new Component that can be used for testing.

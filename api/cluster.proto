@@ -19,7 +19,7 @@ import "lorawan-stack/api/enums.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 // PeerInfo
 message PeerInfo {

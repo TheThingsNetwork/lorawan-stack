@@ -15,7 +15,7 @@
 // Package mock provides a test email provider that is used in tests.
 package mock
 
-import "go.thethings.network/lorawan-stack/pkg/email"
+import "go.thethings.network/lorawan-stack/v3/pkg/email"
 
 // Mock implements the email.Sender interface and stores sent emails internally.
 type Mock struct {

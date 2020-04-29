@@ -16,6 +16,6 @@ package ttnpb_test
 
 import (
 	// These imports are needed to make the populators work.
-	_ "go.thethings.network/lorawan-stack/pkg/crypto"
-	_ "go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
+	_ "go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	_ "go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 )

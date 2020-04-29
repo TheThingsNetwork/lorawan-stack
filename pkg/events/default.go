@@ -17,7 +17,7 @@ package events
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 var defaultPubSub = NewPubSub(DefaultBufferSize)

@@ -24,8 +24,8 @@ import (
 	"fmt"
 	"math"
 
-	"go.thethings.network/lorawan-stack/pkg/basicstation"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 var emptyClientCert = []byte{0x00, 0x00, 0x00, 0x00}

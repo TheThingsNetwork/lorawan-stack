@@ -15,9 +15,9 @@
 package shared
 
 import (
-	"go.thethings.network/lorawan-stack/cmd/internal/shared"
-	gs "go.thethings.network/lorawan-stack/cmd/internal/shared/gatewayserver"
-	"go.thethings.network/lorawan-stack/pkg/gatewayconfigurationserver"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
+	gs "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/gatewayserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver"
 )
 
 // DefaultGatewayConfigurationServerConfig is the default configuration for the Gateway Configuration Server.

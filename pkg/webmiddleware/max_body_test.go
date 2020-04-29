@@ -22,8 +22,8 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	"go.thethings.network/lorawan-stack/pkg/webhandlers"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
 func TestMaxBody(t *testing.T) {

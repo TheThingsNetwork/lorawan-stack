@@ -15,7 +15,7 @@
 package test
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 )
 
 const (

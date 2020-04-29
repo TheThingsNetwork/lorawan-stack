@@ -14,7 +14,7 @@
 
 package ttnpb
 
-import "go.thethings.network/lorawan-stack/pkg/types"
+import "go.thethings.network/lorawan-stack/v3/pkg/types"
 
 var PopulatorConfig struct {
 	LoRaWAN struct {
