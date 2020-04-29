@@ -23,8 +23,18 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './columns.styl'
 
 const Column = React.memo(props => {
-  return <EventsHeader.Column {...props} />
+  const { className, ...rest } = props
+
+  return <EventsHeader.Column className={classnames(className, style.column)} {...rest} />
 })
+
+Column.propTypes = {
+  className: PropTypes.string,
+}
+
+Column.defaultProps = {
+  className: undefined,
+}
 
 const IdColumn = ({ className }) => {
   return <Column className={classnames(className, style.id)} content={sharedMessages.entityId} />

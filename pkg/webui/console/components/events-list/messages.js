@@ -12,39 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.icon
-  width: $ls.s
-  color: $c-icon-fill
+import { defineMessages } from 'react-intl'
 
-.time
-  flex-basis: 5%
-  min-width: 4rem
-  display: block
-  color: $tc-subtle-gray
+const m = defineMessages({
+  frmPayload: 'FRMPayload',
+  devAddr: 'DevAddr',
+  fPort: 'FPort',
+})
 
-.id
-  flex-basis: 10%
-  min-width: 6rem
-  display: block
-  text-overflow: ellipsis
-  white-space: nowrap
-  overflow: hidden
-
-.type
-  flex-basis: 25%
-  min-width: 14rem
-  display: block
-  text-overflow: ellipsis
-  white-space: nowrap
-  overflow: hidden
-
-.error-description
-  color: red
-  text-overflow: ellipsis
-  white-space: nowrap
-  overflow: hidden
-
-.data,
-.error-description
-  flex-basis: auto
-  flex-grow: 1
+export default m

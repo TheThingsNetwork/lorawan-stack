@@ -69,7 +69,11 @@ TimeEntry.defaultProps = {
 }
 
 const IdEntry = ({ className, entityId }) => {
-  return <Entry className={classnames(className, style.id)}>{entityId}</Entry>
+  return (
+    <Entry className={classnames(className, style.id)}>
+      <span className={style.truncate}>{entityId}</span>
+    </Entry>
+  )
 }
 
 IdEntry.propTypes = {
@@ -84,7 +88,7 @@ IdEntry.defaultProps = {
 const TypeEntry = ({ className, eventName }) => {
   return (
     <Entry className={classnames(className, style.type)}>
-      <Message firstToUpper content={{ id: `event:${eventName}` }} />
+      <Message className={style.truncate} firstToUpper content={{ id: `event:${eventName}` }} />
     </Entry>
   )
 }
@@ -117,7 +121,7 @@ const ErrorDescriptionEntry = ({ className, errorDetails }) => {
 
   return (
     <Entry className={classnames(className, style.errorDescription)}>
-      <ErrorMessage content={rootCause} />
+      <ErrorMessage className={style.truncate} content={rootCause} />
     </Entry>
   )
 }

@@ -12,19 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.id
-  flex-basis: 10%
-  min-width: 6rem
+import React from 'react'
+import classnames from 'classnames'
 
-.time
-  flex-basis: 5%
-  min-width: 4rem
+import PropTypes from '@ttn-lw/lib/prop-types'
 
-.type
-  flex-basis: 25%
-  min-width: 14rem
+import style from './description-list.styl'
 
-.data
-  flex-basis: auto
-  flex-grow: 1
-  text-align: center
+const DescriptionList = props => {
+  const { className, children } = props
+
+  return <dl className={classnames(className, style.descriptionList)}>{children}</dl>
+}
+
+DescriptionList.propTypes = {
+  className: PropTypes.string,
+}
+
+DescriptionList.defaultProps = {
+  className: undefined,
+}
+
+export default DescriptionList
