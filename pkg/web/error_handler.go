@@ -16,11 +16,12 @@ package web
 
 import (
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/errors/web"
+	"go.thethings.network/lorawan-stack/pkg/webhandlers"
 )
 
-// ErrorHandler is an echo.HTTPErrorHandler.
-func ErrorHandler(err error, c echo.Context) {
-	status, err := web.ProcessError(err)
-	c.JSONPretty(status, err, "  ")
+func errorHandler(err error, c echo.Context) {
+	if err == echo.ErrNotFound {
+		webhandlers.NotFound(c.Response(), c.Request())
+	}
+	webhandlers.Error(c.Response(), c.Request(), err)
 }

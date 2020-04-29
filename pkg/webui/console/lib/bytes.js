@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable import/prefer-default-export */
-
+/**
+ * Converts hex encoded string to base64.
+ *
+ * @param {string} str - Hex encoded string.
+ * @returns {string} - `str` base64 encoded.
+ */
 export const hexToBase64 = str => {
   return btoa(
     String.fromCharCode.apply(
@@ -25,4 +29,20 @@ export const hexToBase64 = str => {
         .split(' '),
     ),
   )
+}
+
+/**
+ * Converts base64 encoded string to hex.
+ *
+ * @param {string} str - Base64 encoded string.
+ * @returns {string} - `str` hex encoded.
+ */
+export const base64ToHex = str => {
+  return Array.from(atob(str.replace(/[ \r\n]+$/, '')))
+    .map(char => {
+      const tmp = char.charCodeAt(0).toString(16)
+
+      return tmp.length > 1 ? tmp : `0${tmp}`
+    })
+    .join('')
 }

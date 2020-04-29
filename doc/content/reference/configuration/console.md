@@ -17,6 +17,7 @@ The Console app uses the [OAuth 2.0 authorization flow](https://en.wikipedia.org
 - `console.oauth.client-id`: The OAuth client ID
 - `console.oauth.client-secret`: The OAuth client secret
 - `console.oauth.token-url`: The OAuth Token Exchange URL
+- `console.oauth.logout-url`: The logout URL of the OAuth server used to perform client initiated logouts
 
 ## Frontend Setup
 
@@ -50,7 +51,7 @@ You can control which CSS and JavaScript files are included into the rendered HT
 
 ### Assets and Custom Branding
 
-You can control the url of the assets folder that the Console frontend will use, e.g. if you plan on using a CDN to serve your assets. The branding base url will enable custom branding for logos, favicons and OpenGraph images. See the [custom branding guide]({{< ref "/guides/branding" >}}) for detailed descriptions on this subject.
+You can control the url of the assets folder that the Console frontend will use, e.g. if you plan on using a CDN to serve your assets. The branding base url will enable custom branding for logos, favicons and OpenGraph images. See the [custom branding guide]({{< ref "/reference/branding" >}}) for detailed descriptions on this subject.
 
 - `console.ui.assets-base-url`: The base URL to the page assets
 - `console.ui.branding-base-url`: The base URL to the branding assets

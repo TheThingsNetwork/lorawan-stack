@@ -129,6 +129,7 @@
   "console.components.location-form.index.updateSuccess": "Location updated",
   "console.components.location-form.index.deleteFailure": "An error occurred and the location could not be deleted",
   "console.components.location-form.index.deleteSuccess": "Location deleted",
+  "console.components.location-form.index.loadingLocation": "Loading location...",
   "console.components.organization-form.index.orgDescPlaceholder": "Description for my new organization",
   "console.components.organization-form.index.orgDescDescription": "Optional organization description; can also be used to save notes about the organization",
   "console.components.organization-form.index.orgIdPlaceholder": "my-new-organization",

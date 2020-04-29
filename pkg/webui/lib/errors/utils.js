@@ -16,7 +16,7 @@ import errorMessages from './error-messages'
 import grpcErrToHttpErr from './grpc-error-map'
 
 /**
- * Tests wether the error is a backend error object.
+ * Tests whether the error is a backend error object.
  *
  * @param {object} error - The error to be tested.
  * @returns {boolean} `true` if `error` is a well known backend error object.
@@ -30,7 +30,7 @@ export const isBackend = error =>
   (error.code || error.grpc_code)
 
 /**
- * Returns wether the error is a frontend defined error object.
+ * Returns whether the error is a frontend defined error object.
  *
  * @param {object} error - The error to be tested.
  * @returns {boolean} `true` if `error` is a well known frontend error object.
@@ -38,7 +38,21 @@ export const isBackend = error =>
 export const isFrontend = error => Boolean(error) && typeof error === 'object' && error.isFrontend
 
 /**
- * Returns wether the error has a shape that is not well-known.
+ * Returns whether `details` is a backend error details object.
+ *
+ * @param {object} details - The object to be tested.
+ * @returns {boolean} `true` if `details` is a well known backend error details object,
+ * `false` otherwise.
+ */
+export const isBackendErrorDetails = details =>
+  Boolean(details) &&
+  Boolean(details.namespace) &&
+  Boolean(details.name) &&
+  Boolean(details.message_format) &&
+  Boolean(details.code)
+
+/**
+ * Returns whether the error has a shape that is not well-known.
  *
  * @param {object} error - The error to be tested.
  * @returns {boolean} `true` if `error` is not of a well known shape.
@@ -158,7 +172,7 @@ export const isUnauthenticatedError = error =>
   grpcStatusCode(error) === 16 || httpStatusCode(error) === 401
 
 /**
- * Returns wether `error` has translation ids.
+ * Returns whether `error` has translation ids.
  *
  * @param {object} error - The error to be tested.
  * @returns {boolean} `true` if `error` has translation ids, `false` otherwise.
@@ -175,12 +189,20 @@ export const isTranslated = error =>
 export const getBackendErrorId = error => error.message.split(' ')[0]
 
 /**
- * Returns boolean which determines if error details should be displayed.
+ * Returns the id of the error details, used as message id.
+ *
+ * @param {object} details - The backend error details object.
+ * @returns {string} The ID.
+ */
+export const getBackendErrorDetailsId = details => `error:${details.namespace}:${details.name}`
+
+/**
+ * Returns error details.
  *
  * @param {object} error - The backend error object.
- * @returns {object} - Display error details or not.
+ * @returns {object} - The details of `error`.
  */
-export const getBackendErrorDetails = error => (error.details[0].cause ? error : undefined)
+export const getBackendErrorDetails = error => error.details[0]
 
 /**
  * Returns the name of the error extracted from the details array.
@@ -200,6 +222,23 @@ export const getBackendErrorName = error =>
  */
 export const getBackendErrorDefaultMessage = error =>
   error.details[0].message_format || error.message.replace(/^.*\s/, '')
+
+/**
+ * Returns the root cause of the error.
+ *
+ * @param {object} error - The backend error object.
+ * @returns {object} - The root cause of `error`.
+ */
+export const getBackendErrorRootCause = error => {
+  const details = getBackendErrorDetails(error)
+
+  let rootCause = details
+  while ('cause' in rootCause) {
+    rootCause = rootCause.cause
+  }
+
+  return rootCause
+}
 
 /**
  * Returns the attributes of the backend error message, if any.
@@ -225,6 +264,14 @@ export const toMessageProps = function(error) {
         defaultMessage: getBackendErrorDefaultMessage(error),
       },
       values: getBackendErrorMessageAttributes(error),
+    }
+  } else if (isBackendErrorDetails(error)) {
+    props = {
+      content: {
+        id: getBackendErrorDetailsId(error),
+        defaultMessage: error.message_format,
+      },
+      values: error.attributes,
     }
   } else if (isFrontend(error)) {
     props = { content: error.errorMessage }

@@ -118,6 +118,79 @@ Link.defaultProps = {
   titleValues: undefined,
 }
 
+const DocLink = function(props) {
+  const {
+    className,
+    name,
+    title,
+    titleValues,
+    id,
+    path,
+    children,
+    showVisited,
+    intl,
+    secondary,
+    primary,
+    disabled,
+    to,
+    onClick,
+    env: {
+      config: { documentationBaseUrl },
+    },
+  } = props
+
+  const classNames = classnames(style.link, className, {
+    [style.linkVisited]: showVisited,
+    [style.primary]: primary,
+    [style.secondary]: secondary,
+  })
+  if (disabled) {
+    return <span className={classnames(classNames, style.disabled)}>{children}</span>
+  }
+  const link = documentationBaseUrl.concat(path)
+  const formattedTitle = formatTitle(title, titleValues, intl.formatMessage)
+
+  return (
+    <a
+      className={classNames}
+      to={to}
+      title={formattedTitle}
+      id={id}
+      href={link}
+      target="blank"
+      name={name}
+      onClick={onClick}
+    >
+      {children}
+    </a>
+  )
+}
+
+DocLink.propTypes = {
+  ...Link.propTypes,
+  env: PropTypes.env.isRequired,
+  name: PropTypes.string,
+  path: PropTypes.string.isRequired,
+  showVisited: PropTypes.bool,
+  to: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({
+      pathname: PropTypes.string,
+      search: PropTypes.string,
+      hash: PropTypes.string,
+      state: PropTypes.object,
+    }),
+  ]),
+}
+
+DocLink.defaultProps = {
+  ...Link.defaultProps,
+  disabled: false,
+  name: undefined,
+  showVisited: false,
+  to: undefined,
+}
+
 const AnchorLink = function(props) {
   const {
     className,
@@ -174,6 +247,7 @@ AnchorLink.defaultProps = {
 }
 
 Link.Anchor = injectIntl(AnchorLink)
+Link.DocLink = withEnv(injectIntl(DocLink))
 
 const BaseAnchorLink = function({ env, href, ...rest }) {
   const { appRoot } = env
@@ -188,5 +262,4 @@ BaseAnchorLink.propTypes = AnchorLink.propTypes
 BaseAnchorLink.defaultProps = AnchorLink.defaultProps
 
 Link.BaseAnchor = withEnv(BaseAnchorLink)
-
 export default injectIntl(Link)

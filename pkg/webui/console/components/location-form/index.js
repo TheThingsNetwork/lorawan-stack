@@ -24,6 +24,8 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import Notification from '@ttn-lw/components/notification'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import toast from '@ttn-lw/components/toast'
+import LocationMap from '@ttn-lw/components/map'
+import Overlay from '@ttn-lw/components/overlay'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -32,6 +34,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { latitude as latitudeRegexp, longitude as longitudeRegexp } from '@console/lib/regexp'
 
+import style from './location-form.styl'
+
 const m = defineMessages({
   deleteWarning: 'Are you sure you want to delete this location entry?',
   deleteLocation: 'Remove location entry',
@@ -39,6 +43,7 @@ const m = defineMessages({
   updateSuccess: 'Location updated',
   deleteFailure: 'An error occurred and the location could not be deleted',
   deleteSuccess: 'Location deleted',
+  loadingLocation: 'Loading location...',
 })
 
 const validationSchema = Yup.object().shape({
@@ -63,6 +68,8 @@ const hasLocationSet = location =>
   typeof location.altitude !== 'undefined' ||
   typeof location.latitude !== 'undefined' ||
   typeof location.longitude !== 'undefined'
+
+const defaultLocation = [0, 0]
 
 class LocationForm extends Component {
   static propTypes = {
@@ -105,10 +112,38 @@ class LocationForm extends Component {
     super(props)
 
     this.form = React.createRef()
+
+    this.state = {
+      latitude: props.initialValues.latitude,
+      longitude: props.initialValues.longitude,
+      error: '',
+      mapCenter: hasLocationSet(props.initialValues)
+        ? [Number(props.initialValues.latitude), Number(props.initialValues.longitude)]
+        : undefined,
+      loading: !hasLocationSet(props.initialValues),
+    }
   }
 
-  state = {
-    error: '',
+  @bind
+  componentDidMount() {
+    const { initialValues } = this.props
+    if (!hasLocationSet(initialValues)) {
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            this.setState({
+              mapCenter: [position.coords.latitude, position.coords.longitude],
+              loading: false,
+            })
+          },
+          error => {
+            this.setState({ mapCenter: defaultLocation, loading: false })
+          },
+        )
+      } else {
+        this.setState({ mapCenter: defaultLocation, loading: false })
+      }
+    }
   }
 
   @bind
@@ -132,12 +167,47 @@ class LocationForm extends Component {
   }
 
   @bind
+  handleClick(event) {
+    const { setValues, state } = this.form.current
+    this.setState({ latitude: event.latlng.lat, longitude: event.latlng.lng })
+    setValues({
+      ...state.values,
+      latitude: event.latlng.lat,
+      longitude: event.latlng.lng,
+      altitude: state.values.altitude ? state.values.altitude : 0,
+    })
+  }
+
+  @bind
+  handleLatitudeChange(event) {
+    const { longitude } = this.state
+    const latitude = event.currentTarget.value
+    if (longitude) {
+      this.setState({ latitude, mapCenter: [Number(latitude), Number(longitude)] })
+    } else {
+      this.setState({ latitude })
+    }
+  }
+
+  @bind
+  handleLongitudeChange(event) {
+    const { latitude } = this.state
+    const longitude = event.currentTarget.value
+    if (latitude) {
+      this.setState({ longitude, mapCenter: [Number(latitude), Number(longitude)] })
+    } else {
+      this.setState({ longitude })
+    }
+  }
+
+  @bind
   async onDelete() {
     const { onDelete, entityId } = this.props
 
     try {
       await onDelete()
       this.form.current.resetForm()
+      this.setState({ latitude: undefined, longitude: undefined })
       toast({
         title: entityId,
         message: m.deleteSuccess,
@@ -157,9 +227,21 @@ class LocationForm extends Component {
       locationFieldsDisabled,
       allowDelete,
     } = this.props
-    const { error } = this.state
+    const { error, latitude, longitude, mapCenter, loading } = this.state
 
     const entryExists = hasLocationSet(initialValues)
+
+    let marker
+    if (latitude && longitude) {
+      marker = [
+        {
+          position: {
+            latitude: Number(latitude),
+            longitude: Number(longitude),
+          },
+        },
+      ]
+    }
 
     return (
       <React.Fragment>
@@ -175,6 +257,24 @@ class LocationForm extends Component {
         >
           <Message component="h4" content={formTitle} />
           {children}
+          <Overlay
+            loading={loading}
+            visible={loading}
+            spinnerClassName={style.front}
+            spinnerMessage={m.loadingLocation}
+            overlayClassName={style.front}
+          >
+            <LocationMap
+              widget
+              leafletConfig={{ zoom: 10, minZoom: 1 }}
+              mapCenter={mapCenter}
+              className={style.map}
+              markers={marker}
+              onClick={this.handleClick}
+              clickable
+              mapRef="map"
+            />
+          </Overlay>
           <Form.Field
             type="number"
             step="any"
@@ -184,6 +284,7 @@ class LocationForm extends Component {
             component={Input}
             required={!locationFieldsDisabled}
             disabled={locationFieldsDisabled}
+            onBlur={this.handleLatitudeChange}
           />
           <Form.Field
             type="number"
@@ -194,6 +295,7 @@ class LocationForm extends Component {
             component={Input}
             required={!locationFieldsDisabled}
             disabled={locationFieldsDisabled}
+            onBlur={this.handleLongitudeChange}
           />
           <Form.Field
             type="number"

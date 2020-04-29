@@ -20,10 +20,13 @@ import { ConnectedRouter } from 'connected-react-router'
 import { IntlProvider } from 'react-intl'
 import createHistory from 'history/createMemoryHistory'
 
+import { EnvProvider } from '@ttn-lw/lib/components/env'
+
 import '../../pkg/webui/styles/main.styl'
 import 'focus-visible/dist/focus-visible'
 import createStore from './store'
 import Center from './center'
+import env from './env'
 
 const history = createHistory()
 const store = createStore(history)
@@ -32,13 +35,15 @@ const load = () => req.keys().forEach(req)
 
 addDecorator(function(story) {
   return (
-    <Provider store={store}>
-      <IntlProvider key="key" messages={{}} locale="en-US">
-        <ConnectedRouter history={history}>
-          <Center>{story()}</Center>
-        </ConnectedRouter>
-      </IntlProvider>
-    </Provider>
+    <EnvProvider env={env}>
+      <Provider store={store}>
+        <IntlProvider key="key" messages={{}} locale="en-US">
+          <ConnectedRouter history={history}>
+            <Center>{story()}</Center>
+          </ConnectedRouter>
+        </IntlProvider>
+      </Provider>
+    </EnvProvider>
   )
 })
 

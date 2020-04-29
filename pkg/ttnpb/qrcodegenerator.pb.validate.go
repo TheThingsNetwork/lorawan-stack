@@ -591,10 +591,10 @@ func (m *GenerateEndDeviceQRCodeRequest_Image) ValidateFields(paths ...string) e
 		switch name {
 		case "image_size":
 
-			if m.GetImageSize() > 1000 {
+			if val := m.GetImageSize(); val < 10 || val > 1000 {
 				return GenerateEndDeviceQRCodeRequest_ImageValidationError{
 					field:  "image_size",
-					reason: "value must be less than or equal to 1000",
+					reason: "value must be inside range [10, 1000]",
 				}
 			}
 

@@ -26,22 +26,18 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func errorHandler(c echo.Context) error {
-	return errors.New("This handler throws an error")
-}
-
-func httpErrorHandler(c echo.Context) error {
-	return echo.NewHTTPError(http.StatusNotImplemented, "Not implemented")
-}
-
 func TestErrorHandler(t *testing.T) {
 	a := assertions.New(t)
 	e := echo.New()
 
-	e.HTTPErrorHandler = ErrorHandler
+	e.HTTPErrorHandler = errorHandler
 
-	e.GET("/error", errorHandler)
-	e.GET("/httperror", httpErrorHandler)
+	e.GET("/error", func(c echo.Context) error {
+		return errors.New("This handler throws an error")
+	})
+	e.GET("/httperror", func(c echo.Context) error {
+		return echo.NewHTTPError(http.StatusNotImplemented, "Not implemented")
+	})
 
 	{
 		req := httptest.NewRequest(echo.GET, "/error", nil)
@@ -65,6 +61,19 @@ func TestErrorHandler(t *testing.T) {
 
 		body, _ := ioutil.ReadAll(resp.Body)
 		a.So(resp.StatusCode, should.Equal, http.StatusNotImplemented)
-		a.So(string(body), should.ContainSubstring, "Not implemented")
+		a.So(string(body), should.ContainSubstring, "Not Implemented")
+	}
+
+	{
+		req := httptest.NewRequest(echo.GET, "/not_found", nil)
+		rec := httptest.NewRecorder()
+
+		e.ServeHTTP(rec, req)
+
+		resp := rec.Result()
+
+		body, _ := ioutil.ReadAll(resp.Body)
+		a.So(resp.StatusCode, should.Equal, http.StatusNotFound)
+		a.So(string(body), should.ContainSubstring, "route `/not_found` not found")
 	}
 }

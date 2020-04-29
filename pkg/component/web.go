@@ -15,19 +15,16 @@
 package component
 
 import (
-	"crypto/subtle"
 	"net"
 	"net/http"
 	"net/http/pprof"
-	"strings"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/heptiolabs/healthcheck"
-	echo "github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
 	"go.thethings.network/lorawan-stack/pkg/web"
+	"go.thethings.network/lorawan-stack/pkg/webmiddleware"
 )
 
 const (
@@ -39,6 +36,7 @@ const (
 func (c *Component) initWeb() error {
 	webOptions := []web.Option{
 		web.WithContextFiller(c.FillContext),
+		web.WithTrustedProxies(c.config.HTTP.TrustedProxies...),
 		web.WithCookieKeys(c.config.HTTP.Cookie.HashKey, c.config.HTTP.Cookie.BlockKey),
 		web.WithStatic(c.config.HTTP.Static.Mount, c.config.HTTP.Static.SearchPath...),
 	}
@@ -113,58 +111,41 @@ func (c *Component) listenWeb() (err error) {
 	}
 
 	if c.config.HTTP.PProf.Enable {
-		var middleware []echo.MiddlewareFunc
+		g := c.web.RootRouter().NewRoute().Subrouter()
 		if c.config.HTTP.PProf.Password != "" {
-			middleware = append(middleware, c.basicAuth(pprofUsername, c.config.HTTP.PProf.Password))
+			g.Use(mux.MiddlewareFunc(webmiddleware.BasicAuth(
+				"pprof",
+				webmiddleware.AuthUser(pprofUsername, c.config.HTTP.PProf.Password),
+			)))
 		}
-		g := c.web.RootGroup("/debug/pprof", middleware...)
-		g.GET("", func(c echo.Context) error { return c.Redirect(http.StatusFound, c.Path()+"/") })
-		g.GET("/*", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
-		g.GET("/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
-		g.GET("/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))
+		g.HandleFunc("/debug/pprof/profile", pprof.Profile)
+		g.HandleFunc("/debug/pprof/trace", pprof.Trace)
+		g.PathPrefix("/debug/pprof/").HandlerFunc(pprof.Index)
+		g.Handle("/debug/pprof", http.RedirectHandler("/debug/pprof/", http.StatusMovedPermanently))
 	}
 
 	if c.config.HTTP.Metrics.Enable {
-		var middleware []echo.MiddlewareFunc
+		g := c.web.RootRouter().NewRoute().Subrouter()
 		if c.config.HTTP.Metrics.Password != "" {
-			middleware = append(middleware, c.basicAuth(metricsUsername, c.config.HTTP.Metrics.Password))
+			g.Use(mux.MiddlewareFunc(webmiddleware.BasicAuth(
+				"metrics",
+				webmiddleware.AuthUser(metricsUsername, c.config.HTTP.Metrics.Password),
+			)))
 		}
-		g := c.web.RootGroup("/metrics", middleware...)
-		g.GET("/", func(c echo.Context) error { return c.Redirect(http.StatusFound, strings.TrimSuffix(c.Path(), "/")) })
-		g.GET("", echo.WrapHandler(metrics.Exporter), func(next echo.HandlerFunc) echo.HandlerFunc {
-			return func(c echo.Context) error {
-				c.Request().Header.Del("Accept-Encoding")
-				return next(c)
-			}
-		})
+		g.Handle("/metrics", metrics.Exporter)
 	}
 
 	if c.config.HTTP.Health.Enable {
-		var middleware []echo.MiddlewareFunc
+		g := c.web.RootRouter().NewRoute().Subrouter()
 		if c.config.HTTP.Health.Password != "" {
-			middleware = append(middleware, c.basicAuth(healthUsername, c.config.HTTP.Health.Password))
+			g.Use(mux.MiddlewareFunc(webmiddleware.BasicAuth(
+				"health",
+				webmiddleware.AuthUser(healthUsername, c.config.HTTP.Health.Password),
+			)))
 		}
-		g := c.web.RootGroup("/healthz", middleware...)
-		g.GET("/live", echo.WrapHandler(http.HandlerFunc(c.healthHandler.LiveEndpoint)))
-		g.GET("/ready", echo.WrapHandler(http.HandlerFunc(c.healthHandler.ReadyEndpoint)))
+		g.HandleFunc("/healthz/live", c.healthHandler.LiveEndpoint)
+		g.HandleFunc("/healthz/ready", c.healthHandler.ReadyEndpoint)
 	}
 
 	return nil
-}
-
-func (c *Component) basicAuth(username, password string) echo.MiddlewareFunc {
-	usernameBytes, passwordBytes := []byte(username), []byte(password)
-	return middleware.BasicAuth(func(username string, password string, ctx echo.Context) (bool, error) {
-		usernameCompare := subtle.ConstantTimeCompare([]byte(username), usernameBytes)
-		passwordCompare := subtle.ConstantTimeCompare([]byte(password), passwordBytes)
-		if usernameCompare != 1 || passwordCompare != 1 {
-			c.Logger().WithFields(log.Fields(
-				"namespace", "web",
-				"url", ctx.Path(),
-				"remote_addr", ctx.RealIP(),
-			)).Warn("Basic auth failed")
-			return false, nil
-		}
-		return true, nil
-	})
 }

@@ -74,6 +74,12 @@ const headers = [
       } else if (status === 'disconnected') {
         indicator = 'bad'
         label = sharedMessages.disconnected
+      } else if (status === 'other-cluster') {
+        indicator = 'unknown'
+        label = sharedMessages.otherCluster
+      } else if (status === 'unknown') {
+        indicator = 'unknown'
+        label = sharedMessages.unknown
       }
 
       return <Status status={indicator} label={label} />
@@ -86,7 +92,11 @@ export default class GatewaysTable extends React.Component {
     super(props)
 
     this.getGatewaysList = params =>
-      getGatewaysList(params, ['name', 'description', 'frequency_plan_id'], { withStatus: true })
+      getGatewaysList(
+        params,
+        ['name', 'description', 'frequency_plan_id', 'gateway_server_address'],
+        { withStatus: true },
+      )
   }
 
   @bind

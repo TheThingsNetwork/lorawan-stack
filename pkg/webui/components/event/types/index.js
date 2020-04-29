@@ -14,6 +14,11 @@
 
 import Event from '..'
 
+const crudRegex = /^([a-z0-9](?:[-_]?[a-z0-9]){2,}\.)+(create|delete|update)$/
+const uplinkRegex = /^(ns|as)\.up(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/
+const downlinkRegex = /^(ns|as)\.down(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/
+const joinRegex = /^(js|ns|as)(\.up|\.down)?\.(join|rejoin)(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/
+
 const getEventActionByName = function(name) {
   const names = name.split('.')
 
@@ -37,19 +42,21 @@ const isErrorEvent = function(data) {
 
 const getEventComponentByName = function(event) {
   const { name, data } = event
-  const action = getEventActionByName(name)
 
   let component = null
   let type = null
   if (isErrorEvent(data)) {
     component = Event.Error
-  } else if (name.includes('.up.')) {
+  } else if (joinRegex.test(name)) {
+    component = Event.Message
+    type = 'join'
+  } else if (uplinkRegex.test(name)) {
     component = Event.Message
     type = 'uplink'
-  } else if (name.includes('.down.')) {
+  } else if (downlinkRegex.test(name)) {
     component = Event.Message
     type = 'downlink'
-  } else if (['create', 'delete', 'update'].includes(action)) {
+  } else if (crudRegex.test(name)) {
     component = Event.CRUD
     type = 'crud'
   } else {

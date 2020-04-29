@@ -61,7 +61,7 @@ func TestTokens(t *testing.T) {
 						a.So(req.Method, should.Equal, "GET")
 						a.So(req.URL, should.Resemble, &url.URL{
 							Scheme: "https",
-							Host:   "dms.loracloud.com",
+							Host:   "das.loracloud.com",
 							Path:   "/api/v1/token/list",
 						})
 					},
@@ -87,7 +87,7 @@ func TestTokens(t *testing.T) {
 						a.So(req.Method, should.Equal, "PUT")
 						a.So(req.URL, should.Resemble, &url.URL{
 							Scheme:   "https",
-							Host:     "dms.loracloud.com",
+							Host:     "das.loracloud.com",
 							Path:     "/api/v1/token/foo/update",
 							RawQuery: "name=bar&renew=",
 						})
@@ -114,7 +114,7 @@ func TestTokens(t *testing.T) {
 						a.So(req.Method, should.Equal, "PUT")
 						a.So(req.URL, should.Resemble, &url.URL{
 							Scheme:   "https",
-							Host:     "dms.loracloud.com",
+							Host:     "das.loracloud.com",
 							Path:     "/api/v1/token/foo/update",
 							RawQuery: "name=bar",
 						})
@@ -141,7 +141,7 @@ func TestTokens(t *testing.T) {
 						a.So(req.Method, should.Equal, "POST")
 						a.So(req.URL, should.Resemble, &url.URL{
 							Scheme: "https",
-							Host:   "dms.loracloud.com",
+							Host:   "das.loracloud.com",
 							Path:   "/api/v1/token/add",
 						})
 					},
@@ -156,7 +156,7 @@ func TestTokens(t *testing.T) {
 						a.So(req.Method, should.Equal, "DELETE")
 						a.So(req.URL, should.Resemble, &url.URL{
 							Scheme: "https",
-							Host:   "dms.loracloud.com",
+							Host:   "das.loracloud.com",
 							Path:   "/api/v1/token/foo",
 						})
 					},
