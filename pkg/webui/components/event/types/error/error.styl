@@ -15,5 +15,17 @@
 .icon
   color: $c-error
 
-.text
+.content
   color: $tc-error
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
+.error-description
+  display: inline
+  margin-left: $cs.xs
+
+  &:before
+    content: '('
+  &:after
+    content: ')'

@@ -6902,6 +6902,33 @@
       "file": "callback.go"
     }
   },
+  "error:pkg/webhandlers:route_not_found": {
+    "translations": {
+      "en": "route `{route}` not found"
+    },
+    "description": {
+      "package": "pkg/webhandlers",
+      "file": "error.go"
+    }
+  },
+  "error:pkg/webmiddleware:http_recovered": {
+    "translations": {
+      "en": "Internal Server Error"
+    },
+    "description": {
+      "package": "pkg/webmiddleware",
+      "file": "recover.go"
+    }
+  },
+  "error:pkg/webmiddleware:request_body_too_large": {
+    "translations": {
+      "en": "request body too large"
+    },
+    "description": {
+      "package": "pkg/webmiddleware",
+      "file": "max_body.go"
+    }
+  },
   "event:application.api-key.create": {
     "translations": {
       "en": "create application API key"

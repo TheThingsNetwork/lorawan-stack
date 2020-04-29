@@ -27,6 +27,7 @@ const env = {
     },
     language: envSelector.selectLanguageConfig(),
     supportLink: envSelector.selectSupportLinkConfig(),
+    documentationBaseUrl: envSelector.selectDocumentationUrlConfig(),
   },
   pageData: envSelector.selectPageData(),
   sentryDsn: envSelector.selectSentryDsnConfig(),

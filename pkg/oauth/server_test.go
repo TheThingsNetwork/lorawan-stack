@@ -138,7 +138,7 @@ func TestOAuthFlow(t *testing.T) {
 	}{
 		{
 			Method:           "GET",
-			Path:             "/oauth",
+			Path:             "/oauth/",
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "/oauth/login",
 		},

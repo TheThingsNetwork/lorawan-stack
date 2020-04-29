@@ -17,18 +17,14 @@ package component
 import (
 	"context"
 	"net"
-	"net/http"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	echo "github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
 	"go.thethings.network/lorawan-stack/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
 
@@ -55,16 +51,6 @@ func (c *Component) setupGRPC() (err error) {
 	for _, sub := range c.grpcSubsystems {
 		sub.RegisterHandlers(c.grpc.ServeMux, c.loopback)
 	}
-	c.web.RootGroup(ttnpb.HTTPAPIPrefix).Any(
-		"/*",
-		echo.WrapHandler(http.StripPrefix(ttnpb.HTTPAPIPrefix, c.grpc)),
-		middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowHeaders:     []string{"Authorization", "Content-Type", "X-CSRF-Token"},
-			AllowCredentials: true,
-			ExposeHeaders:    []string{"Date", "Content-Length", "X-Request-Id", "X-Total-Count", "X-Warning"},
-			MaxAge:           600,
-		}),
-	)
 	return nil
 }
 

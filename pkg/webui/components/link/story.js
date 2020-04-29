@@ -31,6 +31,10 @@ storiesOf('Link', module)
         <span style={titleStyle}>anchor link:</span>
         <Link.Anchor href="/">Show more</Link.Anchor>
       </div>
+      <div>
+        <span style={titleStyle}>doc link:</span>
+        <Link.DocLink path="/">Show more</Link.DocLink>
+      </div>
     </div>
   ))
   .add('As wrapper', () => (
@@ -46,6 +50,12 @@ storiesOf('Link', module)
         <Link.Anchor href="/">
           <div style={divStyle} />
         </Link.Anchor>
+      </div>
+      <div>
+        <span style={titleStyle}>doc linked block element:</span>
+        <Link.DocLink path="/">
+          <div style={divStyle} />
+        </Link.DocLink>
       </div>
     </div>
   ))
@@ -63,6 +73,12 @@ storiesOf('Link', module)
           Show more
         </Link.Anchor>
       </div>
+      <div>
+        <span style={titleStyle}>doc link:</span>
+        <Link.DocLink primary path="/">
+          Show more
+        </Link.DocLink>
+      </div>
     </div>
   ))
   .add('Secondary', () => (
@@ -78,6 +94,12 @@ storiesOf('Link', module)
         <Link.Anchor secondary href="/">
           Show more
         </Link.Anchor>
+      </div>
+      <div>
+        <span style={titleStyle}>doc link:</span>
+        <Link.DocLink secondary path="/">
+          Show more
+        </Link.DocLink>
       </div>
     </div>
   ))
@@ -95,6 +117,13 @@ storiesOf('Link', module)
           Show more
         </Link.Anchor>
       </div>
+
+      <div>
+        <span style={titleStyle}>doc link:</span>
+        <Link.DocLink primary showVisited path="/">
+          Show more
+        </Link.DocLink>
+      </div>
     </div>
   ))
   .add('Disabled', () => (
@@ -110,6 +139,12 @@ storiesOf('Link', module)
         <Link.Anchor primary disabled href="/">
           Show more
         </Link.Anchor>
+      </div>
+      <div>
+        <span style={titleStyle}>doc link:</span>
+        <Link.DocLink primary disabled path="/">
+          Show more
+        </Link.DocLink>
       </div>
     </div>
   ))

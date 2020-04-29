@@ -6,6 +6,12 @@ exports[`Table has clickable rows should match snapshot 1`] = `
 >
   <Overlay
     loading={false}
+    spinnerMessage={
+      Object {
+        "defaultMessage": "Fetching data…",
+        "id": "lib.shared-messages.fetching",
+      }
+    }
     visible={false}
   >
     <Table
@@ -89,6 +95,12 @@ exports[`Table has no data provided should match snapshot 1`] = `
 >
   <Overlay
     loading={false}
+    spinnerMessage={
+      Object {
+        "defaultMessage": "Fetching data…",
+        "id": "lib.shared-messages.fetching",
+      }
+    }
     visible={false}
   >
     <Table
@@ -132,6 +144,12 @@ exports[`Table is paginated should match snapshot 1`] = `
 >
   <Overlay
     loading={false}
+    spinnerMessage={
+      Object {
+        "defaultMessage": "Fetching data…",
+        "id": "lib.shared-messages.fetching",
+      }
+    }
     visible={false}
   >
     <Table
@@ -241,6 +259,12 @@ exports[`Table is sortable should match snapshot 1`] = `
 >
   <Overlay
     loading={false}
+    spinnerMessage={
+      Object {
+        "defaultMessage": "Fetching data…",
+        "id": "lib.shared-messages.fetching",
+      }
+    }
     visible={false}
   >
     <Table

@@ -17,11 +17,10 @@ import PropTypes from 'prop-types'
 
 import Link from '@ttn-lw/components/link'
 
+import LocationMap from '@ttn-lw/components/map'
 import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-
-import Map from '..'
 
 import style from './widget.styl'
 
@@ -46,10 +45,22 @@ export default class MapWidget extends React.Component {
 
     const leafletConfig = {
       zoomControl: false,
+      zoom: 10,
+      minZoom: 1,
     }
+    const mapCenter =
+      Boolean(markers) && markers.length !== 0
+        ? [markers[0].position.latitude, markers[0].position.longitude]
+        : undefined
 
     return markers.length > 0 ? (
-      <Map id={id} markers={markers} leafletConfig={leafletConfig} widget />
+      <LocationMap
+        id={id}
+        mapCenter={mapCenter}
+        markers={markers}
+        leafletConfig={leafletConfig}
+        widget
+      />
     ) : (
       <div className={style.mapDisabled}>
         <Message component="span" content={sharedMessages.noLocation} />

@@ -48,8 +48,9 @@ var DefaultClusterConfig = cluster.Config{}
 
 // DefaultHTTPConfig is the default HTTP config.
 var DefaultHTTPConfig = config.HTTP{
-	Listen:    ":1885",
-	ListenTLS: ":8885",
+	Listen:         ":1885",
+	ListenTLS:      ":8885",
+	TrustedProxies: []string{"10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"},
 	Static: config.HTTPStaticConfig{
 		Mount:      "/assets",
 		SearchPath: []string{"public", "/srv/ttn-lorawan/public"},

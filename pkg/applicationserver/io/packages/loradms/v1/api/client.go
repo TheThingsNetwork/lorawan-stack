@@ -45,7 +45,7 @@ type Client struct {
 }
 
 const (
-	baseURL     = "https://dms.loracloud.com/api/v1"
+	baseURL     = "https://das.loracloud.com/api/v1"
 	contentType = "application/json"
 )
 

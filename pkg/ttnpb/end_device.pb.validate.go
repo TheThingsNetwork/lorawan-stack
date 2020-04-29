@@ -1541,6 +1541,13 @@ func (m *MACState) ValidateFields(paths ...string) error {
 
 		case "rejected_adr_data_rate_indexes":
 
+			if len(m.GetRejectedADRDataRateIndexes()) > 15 {
+				return MACStateValidationError{
+					field:  "rejected_adr_data_rate_indexes",
+					reason: "value must contain no more than 15 item(s)",
+				}
+			}
+
 			for idx, item := range m.GetRejectedADRDataRateIndexes() {
 				_, _ = idx, item
 
@@ -1554,6 +1561,13 @@ func (m *MACState) ValidateFields(paths ...string) error {
 			}
 
 		case "rejected_adr_tx_power_indexes":
+
+			if len(m.GetRejectedADRTxPowerIndexes()) > 15 {
+				return MACStateValidationError{
+					field:  "rejected_adr_tx_power_indexes",
+					reason: "value must contain no more than 15 item(s)",
+				}
+			}
 
 			for idx, item := range m.GetRejectedADRTxPowerIndexes() {
 				_, _ = idx, item

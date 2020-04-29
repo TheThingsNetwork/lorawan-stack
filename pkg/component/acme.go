@@ -15,7 +15,6 @@
 package component
 
 import (
-	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"golang.org/x/crypto/acme"
 	"golang.org/x/crypto/acme/autocert"
@@ -45,6 +44,6 @@ func (c *Component) initACME() error {
 		},
 		Email: c.config.TLS.ACME.Email,
 	}
-	c.web.Any(".well-known/acme-challenge/*", echo.WrapHandler(c.acme.HTTPHandler(nil)))
+	c.web.Prefix("/.well-known/acme-challenge/").Handler(c.acme.HTTPHandler(nil))
 	return nil
 }

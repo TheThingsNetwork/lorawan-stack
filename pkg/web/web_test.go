@@ -27,7 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	"go.thethings.network/lorawan-stack/pkg/web/middleware"
 )
 
 func handler(c echo.Context) error {
@@ -41,30 +40,22 @@ func TestGroup(t *testing.T) {
 		t.Fatal("Could not create a web instance")
 	}
 
-	a.So(s.server, should.NotHaveRoute, "GET", "/")
+	a.So(s.echo, should.NotHaveRoute, "GET", "/")
 	s.GET("/", handler)
-	a.So(s.server, should.HaveRoute, "GET", "/")
+	a.So(s.echo, should.HaveRoute, "GET", "/")
 
-	a.So(s.server, should.NotHaveRoute, "POST", "/bar")
+	a.So(s.echo, should.NotHaveRoute, "POST", "/bar")
 	s.POST("/bar", handler)
-	a.So(s.server, should.NotHaveRoute, "GET", "/bar")
-	a.So(s.server, should.HaveRoute, "POST", "/bar")
+	a.So(s.echo, should.NotHaveRoute, "GET", "/bar")
+	a.So(s.echo, should.HaveRoute, "POST", "/bar")
 
-	{
-		grp := s.Group("/")
-		grp.GET("/baz", handler)
-		a.So(s.server, should.HaveRoute, "GET", "/baz")
-	}
+	grp := s.Group("/group")
+	grp.GET("/g", handler)
+	a.So(s.echo, should.HaveRoute, "GET", "/group/g")
 
-	{
-		grp := s.Group("/group")
-		grp.GET("/g", handler)
-		a.So(s.server, should.HaveRoute, "GET", "/group/g")
-
-		ggrp := grp.Group("/quu")
-		ggrp.GET("/q", handler)
-		a.So(s.server, should.HaveRoute, "GET", "/group/quu/q")
-	}
+	ggrp := grp.Group("/quu")
+	ggrp.GET("/q", handler)
+	a.So(s.echo, should.HaveRoute, "GET", "/group/quu/q")
 }
 
 func TestIsZeros(t *testing.T) {
@@ -100,19 +91,6 @@ func TestServeHTTP(t *testing.T) {
 	}
 }
 
-func TestRootGroup(t *testing.T) {
-	a := assertions.New(t)
-	s, err := New(test.Context())
-	if !a.So(err, should.BeNil) {
-		t.Fatal("Could not create a web instance")
-	}
-
-	s.RootGroup("/sub")
-	a.So(s.server, should.NotHaveRoute, "GET", "/")
-	a.So(s.server, should.NotHaveRoute, "GET", "/sub/another")
-	a.So(s.server, should.HaveRoute, "GET", "/sub")
-}
-
 func TestStatic(t *testing.T) {
 	a := assertions.New(t)
 	s, err := New(test.Context())
@@ -126,7 +104,7 @@ func TestStatic(t *testing.T) {
 		t.Fatal("Could not create resolve testing directory")
 	}
 
-	s.Static("/assets", http.Dir(dir), middleware.Immutable)
+	s.Static("/assets", http.Dir(dir))
 
 	// HTTP server returns 200 on valid file request
 	{
@@ -147,7 +125,7 @@ func TestStatic(t *testing.T) {
 		req := httptest.NewRequest(echo.GET, "/assets/null.txt", nil)
 		rec := httptest.NewRecorder()
 
-		s.Static("/assets", http.Dir(dir+"/teststatic"), middleware.Immutable)
+		s.Static("/assets", http.Dir(dir+"/teststatic"))
 
 		s.ServeHTTP(rec, req)
 

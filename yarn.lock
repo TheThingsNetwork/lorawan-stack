@@ -7073,7 +7073,7 @@ hoist-non-react-statics@^3.1.0:
   dependencies:
     react-is "^16.7.0"
 
-hoist-non-react-statics@^3.3.0:
+hoist-non-react-statics@^3.3.0, hoist-non-react-statics@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz#ece0acaf71d62c2969c2ec59feff42a4b1a85b45"
   integrity sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==
@@ -8731,9 +8731,9 @@ lcid@^2.0.0:
     invert-kv "^2.0.0"
 
 leaflet@^1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.5.1.tgz#9afb9d963d66c870066b1342e7a06f92840f46bf"
-  integrity sha512-ekM9KAeG99tYisNBg0IzEywAlp0hYI5XRipsqRXyRTeuU8jcuntilpp+eFf5gaE0xubc9RuSNIVtByEKwqFV0w==
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.6.0.tgz#aecbb044b949ec29469eeb31c77a88e2f448f308"
+  integrity sha512-CPkhyqWUKZKFJ6K8umN5/D2wrJ2+/8UIpXppY7QDnUZW5bZL5+SEI2J7GBpwh4LIupOKqbNSQXgqmrEJopHVNQ==
 
 leven@^3.1.0:
   version "3.1.0"
@@ -11230,6 +11230,16 @@ react-is@^16.8.6, react-is@^16.9.0:
   version "16.9.0"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.9.0.tgz#21ca9561399aad0ff1a7701c01683e8ca981edcb"
   integrity sha512-tJBzzzIgnnRfEm046qRcURvwQnZVXmuCbscxUO5RWrGTXpon2d4c8mI0D8WE6ydVIm29JiLB6+RslkIvym9Rjw==
+
+react-leaflet@^2.6.3:
+  version "2.6.3"
+  resolved "https://registry.yarnpkg.com/react-leaflet/-/react-leaflet-2.6.3.tgz#a826c20d7f4b530f38a1b71bfa9c51cefb598ce0"
+  integrity sha512-0ynYVkPNVJmjO7ewR+zBBu3sxbWmwJYkxd6SUJkQKG40+JNJEvYGSFPvP8W1BS9d0MntZFDTzEM1OdBiWMrlEA==
+  dependencies:
+    "@babel/runtime" "^7.8.7"
+    fast-deep-equal "^3.1.1"
+    hoist-non-react-statics "^3.3.2"
+    warning "^4.0.3"
 
 react-lifecycles-compat@^3.0.4:
   version "3.0.4"

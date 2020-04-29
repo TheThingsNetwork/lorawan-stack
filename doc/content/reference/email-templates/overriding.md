@@ -45,4 +45,4 @@ Confirmation Token: {{.Token}}
 
 ## Configuring the Location of the Overrides
 
-Once you have written your overrides, you can configure the Identity Server with their location. For details on the configuration options, see the [Identity Server configuration reference]({{< relref "../configuration/identity-server.md#email-options" >}}).
+Once you have written your overrides, you can configure the Identity Server with their location. For details on the configuration options, see the [Identity Server configuration reference]({{< ref "/reference/configuration/identity-server.md#email-options" >}}).
