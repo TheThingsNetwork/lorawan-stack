@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,29 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package middleware
+package webmiddleware
 
 import (
+	"io/ioutil"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	echo "github.com/labstack/echo/v4"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"github.com/smartystreets/assertions/should"
 )
 
-func TestImmutable(t *testing.T) {
+func TestRecover(t *testing.T) {
+	m := Recover()
+
 	a := assertions.New(t)
-	e := echo.New()
-
-	e.GET("/", handler)
-
-	req := httptest.NewRequest("GET", "/", nil)
+	r := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
+	m(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		panic("this panic is expected")
+	})).ServeHTTP(rec, r)
 
-	c := e.NewContext(req, rec)
-	err := Immutable(handler)(c)
+	res := rec.Result()
 
-	a.So(err, should.BeNil)
-	a.So(rec.Header().Get("Cache-Control"), should.Equal, "public; max-age=365000000; immutable")
+	a.So(res.StatusCode, should.Equal, http.StatusInternalServerError)
+
+	body, _ := ioutil.ReadAll(res.Body)
+	a.So(string(body), should.ContainSubstring, "http_recovered")
 }

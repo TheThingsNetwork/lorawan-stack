@@ -46,6 +46,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/envoyproxy/protoc-gen-validate v0.3.0-java
+	github.com/felixge/httpsnoop v1.0.1
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/getsentry/sentry-go v0.5.1
 	github.com/go-redis/redis v6.15.7+incompatible
@@ -56,6 +57,8 @@ require (
 	github.com/golang/gddo v0.0.0-20200310004957-95ce5a452273
 	github.com/golang/protobuf v1.3.5
 	github.com/goreleaser/goreleaser v0.132.0
+	github.com/gorilla/handlers v1.4.2
+	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.1
 	github.com/gotnospirit/makeplural v0.0.0-20180622080156-a5f48d94d976 // indirect

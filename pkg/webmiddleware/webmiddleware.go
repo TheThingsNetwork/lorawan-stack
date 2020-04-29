@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package web
+// Package webmiddleware provides middleware for http Handlers.
+package webmiddleware
 
-import (
-	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/webhandlers"
-)
+import "net/http"
 
-func errorHandler(err error, c echo.Context) {
-	if err == echo.ErrNotFound {
-		webhandlers.NotFound(c.Response(), c.Request())
-	}
-	webhandlers.Error(c.Response(), c.Request(), err)
-}
+// MiddlewareFunc is a function that acts as middleware for http Handlers.
+type MiddlewareFunc func(next http.Handler) http.Handler
