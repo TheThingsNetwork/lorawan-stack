@@ -122,6 +122,7 @@ const DownlinkForm = ({ appId, devId }) => {
         component={Input}
         type="byte"
         required
+        unbounded
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={m.scheduleDownlink} />
