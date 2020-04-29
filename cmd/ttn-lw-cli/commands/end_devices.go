@@ -349,6 +349,8 @@ var (
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, attributesFlags())
 
+			abp, _ := cmd.Flags().GetBool("abp")
+			multicast, _ := cmd.Flags().GetBool("multicast")
 			var device ttnpb.EndDevice
 			if inputDecoder != nil {
 				decodedPaths, err := inputDecoder.Decode(&device)
@@ -356,6 +358,10 @@ var (
 					return err
 				}
 				paths = append(paths, ttnpb.FlattenPaths(decodedPaths, endDeviceFlattenPaths)...)
+
+				if ttnpb.ContainsField("supports_join", paths) {
+					abp = !device.SupportsJoin
+				}
 			}
 
 			setDefaults, _ := cmd.Flags().GetBool("defaults")
@@ -377,8 +383,6 @@ var (
 				}
 			}
 
-			abp, _ := cmd.Flags().GetBool("abp")
-			multicast, _ := cmd.Flags().GetBool("multicast")
 			if abp || multicast {
 				device.SupportsJoin = false
 				if config.NetworkServerEnabled {
