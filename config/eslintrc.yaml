@@ -49,6 +49,7 @@ rules:
       - parent
       - sibling
       - index
+      newlines-between: always
       pathGroups:
       - pattern: "\\@{ttn-lw,console,oauth}/constants"
         group: internal

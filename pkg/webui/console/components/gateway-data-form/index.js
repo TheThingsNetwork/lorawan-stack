@@ -30,6 +30,9 @@ import Message from '@ttn-lw/lib/components/message'
 import { GsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import OwnersSelect from '@console/containers/owners-select'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import {
   id as gatewayIdRegexp,
   address as addressRegexp,
@@ -37,8 +40,6 @@ import {
   emptyDuration as emptyDurationRegexp,
   delay as delayRegexp,
 } from '@console/lib/regexp'
-import PropTypes from '@ttn-lw/lib/prop-types'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const m = defineMessages({
   enforced: 'Enforced',

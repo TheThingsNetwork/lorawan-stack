@@ -26,7 +26,6 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import { withEnv } from '@ttn-lw/lib/components/env'
 import ErrorView from '@ttn-lw/lib/components/error-view'
 import ScrollToTop from '@ttn-lw/lib/components/scroll-to-top'
-
 import WithAuth from '@ttn-lw/lib/components/with-auth'
 
 import Header from '@console/containers/header'
@@ -36,11 +35,11 @@ import Applications from '@console/views/applications'
 import Gateways from '@console/views/gateways'
 import Organizations from '@console/views/organizations'
 import Admin from '@console/views/admin'
-
 import FullViewError, { FullViewErrorInner } from '@console/views/error'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import dev from '@ttn-lw/lib/dev'
+
 import {
   selectUser,
   selectUserFetching,
