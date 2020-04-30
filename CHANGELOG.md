@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - LoRaWAN 2.4 GHz band `ISM2400`.
 - Upgrading guide in docs
 - Unset end device fields using the CLI (see `--unset` option)
+- Option to reset end device payload formatters in the Console.
 
 ### Changed
 
