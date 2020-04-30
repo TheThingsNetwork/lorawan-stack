@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package webhandlers
+package webhandlers_test
 
 import (
 	"io/ioutil"
@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	. "go.thethings.network/lorawan-stack/pkg/webhandlers"
 )
 
 func TestErrorHandler(t *testing.T) {
