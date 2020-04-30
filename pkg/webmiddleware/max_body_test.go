@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package webmiddleware
+package webmiddleware_test
 
 import (
 	"bytes"
@@ -24,6 +24,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/webhandlers"
+	. "go.thethings.network/lorawan-stack/pkg/webmiddleware"
 )
 
 func TestMaxBody(t *testing.T) {
@@ -48,7 +49,7 @@ func TestMaxBody(t *testing.T) {
 		rec := httptest.NewRecorder()
 		m(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			_, err := ioutil.ReadAll(r.Body)
-			a.So(err, should.HaveSameErrorDefinitionAs, errRequestBodyTooLarge)
+			a.So(err, should.HaveSameErrorDefinitionAs, ErrRequestBodyTooLarge)
 			webhandlers.Error(w, r, err)
 		})).ServeHTTP(rec, r)
 		res := rec.Result()
