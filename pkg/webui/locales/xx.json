@@ -106,6 +106,8 @@
   "console.components.payload-formatters-form.index.formatterType": "Xxxxxxxxx xxxx",
   "console.components.payload-formatters-form.index.formatterParameter": "Xxxxxxxxx xxxxxxxxx",
   "console.components.payload-formatters-form.index.grpcFieldDescription": "Xxx xxxxxxx xx xxx xxxxxxx xx xxxxxxx xx",
+  "console.components.payload-formatters-form.index.appFormatter": "Xxx xxxxxxxxxxx xxxxxxx xxxxxxxxx",
+  "console.components.payload-formatters-form.index.appFormatterWarning": "Xxxx xxxxxx xxxx xxxx xxxxxx xxx xxxxxxxx xxxxxxxxxx xx xxxxxxxxxxx xxxxxxxx",
   "console.components.pubsub-form.messages.idPlaceholder": "xx-xxx-xxxxxx",
   "console.components.pubsub-form.messages.messageInfo": "Xxx xxxx xxxxxxx xxxxxxx xxxx, xx xxxxxxxx xxx-xxxxx xxx xx xxxxxxx",
   "console.components.pubsub-form.messages.deletePubsub": "Xxxxxx Xxxxxx",
