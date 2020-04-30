@@ -159,11 +159,11 @@ class PayloadFormattersForm extends React.Component {
   }
 
   render() {
-    const { initialType, initialParameter, linked, uplink } = this.props
-    const { error } = this.state
+    const { initialType, initialParameter, linked, uplink, allowReset } = this.props
+    const { error, type } = this.state
 
     const initialValues = {
-      [FIELD_NAMES.RADIO]: initialType,
+      [FIELD_NAMES.RADIO]: type,
       [FIELD_NAMES.JAVASCRIPT]:
         initialType === TYPES.JAVASCRIPT ? initialParameter : getDefaultJavascriptFormatter(uplink),
       [FIELD_NAMES.GRPC]:
@@ -186,8 +186,8 @@ class PayloadFormattersForm extends React.Component {
             title={m.formatterType}
             component={Radio.Group}
             onChange={this.onTypeChange}
-            description="kek"
           >
+            {allowReset && <Radio label={sharedMessages.default} value={TYPES.DEFAULT} />}
             <Radio label={sharedMessages.none} value={TYPES.NONE} />
             <Radio label="Javascript" value={TYPES.JAVASCRIPT} />
             <Radio label={m.grpc} value={TYPES.GRPC} />
@@ -205,6 +205,7 @@ class PayloadFormattersForm extends React.Component {
 }
 
 PayloadFormattersForm.propTypes = {
+  allowReset: PropTypes.bool,
   initialParameter: PropTypes.string,
   initialType: PropTypes.oneOf(Object.values(TYPES)).isRequired,
   linked: PropTypes.bool.isRequired,
@@ -218,6 +219,7 @@ PayloadFormattersForm.defaultProps = {
   initialParameter: '',
   onSubmitSuccess: () => null,
   onSubmitFailure: () => null,
+  allowReset: false,
 }
 
 export default PayloadFormattersForm
