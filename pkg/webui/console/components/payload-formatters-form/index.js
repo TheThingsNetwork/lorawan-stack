@@ -38,7 +38,7 @@ const m = defineMessages({
   repository: 'Repository',
   formatterType: 'Formatter type',
   formatterParameter: 'Formatter parameter',
-  grpcDescription: 'The address of the service to connect to',
+  grpcFieldDescription: 'The address of the service to connect to',
 })
 
 const FIELD_NAMES = {
@@ -153,7 +153,7 @@ class PayloadFormattersForm extends React.Component {
             name={FIELD_NAMES.GRPC}
             type="text"
             placeholder={sharedMessages.addressPlaceholder}
-            description={m.grpcDescription}
+            description={m.grpcFieldDescription}
           />
         )
       default:
@@ -189,6 +189,7 @@ class PayloadFormattersForm extends React.Component {
             title={m.formatterType}
             component={Radio.Group}
             onChange={this.onTypeChange}
+            description="kek"
           >
             <Radio label={sharedMessages.none} value={TYPES.NONE} />
             <Radio label="Javascript" value={TYPES.JAVASCRIPT} />
