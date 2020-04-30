@@ -456,6 +456,7 @@
   "lib.shared-messages.createdAt": "Xxxxxxx xx",
   "lib.shared-messages.currentCollaborators": "Xxxxxxx xxxxxxxxxxxxx",
   "lib.shared-messages.data": "Xxxx",
+  "lib.shared-messages.default": "Xxxxxxx",
   "lib.shared-messages.defineRights": "Xxxxxx xxxxxx",
   "lib.shared-messages.description": "Xxxxxxxxxxx",
   "lib.shared-messages.devAddr": "Xxxxxx xxxxxxx",
