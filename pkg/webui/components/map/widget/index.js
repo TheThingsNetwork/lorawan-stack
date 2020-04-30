@@ -16,8 +16,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import Link from '@ttn-lw/components/link'
-
 import LocationMap from '@ttn-lw/components/map'
+
 import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'

@@ -1178,6 +1178,15 @@
       "file": "gateways.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:conflicting_paths": {
+    "translations": {
+      "en": "conflicting set and unset field mask paths"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:contact_info_exists": {
     "translations": {
       "en": "contact info already exists"

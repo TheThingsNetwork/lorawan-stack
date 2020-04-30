@@ -20,7 +20,6 @@ import { notify, EVENTS } from '../../api/stream/shared'
 import Marshaler from '../../util/marshaler'
 import combineStreams from '../../util/combine-streams'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
-
 import DownlinkQueue from '../downlink-queue'
 
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'

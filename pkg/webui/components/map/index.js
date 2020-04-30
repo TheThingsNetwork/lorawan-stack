@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-
 import PropTypes from 'prop-types'
 import { Map, Marker, TileLayer } from 'react-leaflet'
 import classnames from 'classnames'
