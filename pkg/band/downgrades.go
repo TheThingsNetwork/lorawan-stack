@@ -38,7 +38,8 @@ func enableTxParamSetupReq(b Band) Band {
 
 func makeSetMaxTxPowerIndexFunc(idx uint8) func(Band) Band {
 	return func(b Band) Band {
-		b.TxOffset = b.TxOffset[:idx+1]
+		n := idx + 1
+		b.TxOffset = append(make([]float32, 0, n), b.TxOffset[:n]...)
 		return b
 	}
 }
@@ -52,7 +53,7 @@ func makeSetBeaconDataRateIndex(idx ttnpb.DataRateIndex) func(Band) Band {
 
 func makeAddTxPowerFunc(offset float32) func(Band) Band {
 	return func(b Band) Band {
-		b.TxOffset = append(b.TxOffset, offset)
+		b.TxOffset = append(append(make([]float32, 0, len(b.TxOffset)+1), b.TxOffset...), offset)
 		return b
 	}
 }

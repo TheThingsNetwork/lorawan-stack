@@ -267,7 +267,7 @@ func (b Band) downgrades() []swapParameters {
 
 // Version returns the band parameters for a given version.
 func (b Band) Version(wantedVersion ttnpb.PHYVersion) (Band, error) {
-	supportedRegionalParameters := []string{}
+	var supportedRegionalParameters []string
 	for _, swapParameter := range b.downgrades() {
 		if swapParameter.downgrade == nil {
 			return b, errUnsupportedLoRaWANRegionalParameters.WithAttributes("supported", strings.Join(supportedRegionalParameters, ", "))
