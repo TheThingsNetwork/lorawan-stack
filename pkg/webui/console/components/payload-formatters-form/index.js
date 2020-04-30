@@ -83,7 +83,7 @@ class PayloadFormattersForm extends React.Component {
 
   @bind
   async handleSubmit(values, { resetForm }) {
-    const { onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
+    const { onSubmit, onSubmitSuccess, onSubmitFailure, uplink } = this.props
 
     this.setState({ error: '' })
 
@@ -97,18 +97,18 @@ class PayloadFormattersForm extends React.Component {
       [FIELD_NAMES.RADIO]: type,
     }
 
-    let parameter = ''
+    let parameter
     switch (type) {
       case TYPES.JAVASCRIPT:
         parameter = javascriptParameter
         resetValues[FIELD_NAMES.JAVASCRIPT] = javascriptParameter
+        resetValues[FIELD_NAMES.GRPC] = getDefaultGrpcServiceFormatter(uplink)
         break
       case TYPES.GRPC:
         parameter = grpcParameter
+        resetValues[FIELD_NAMES.JAVASCRIPT] = getDefaultJavascriptFormatter(uplink)
         resetValues[FIELD_NAMES.GRPC] = grpcParameter
         break
-      default:
-        parameter = undefined
     }
 
     try {
