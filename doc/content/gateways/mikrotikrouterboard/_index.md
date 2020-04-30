@@ -24,7 +24,7 @@ The MikroTik Routerboard wAP LoRa8 kit comes with a PoE adapter. The following i
 
 ## Registration
 
-Create a gateway by following the instructions for the [Console]({{< ref "/guides/getting-started/console#create-gateway" >}}) or the [CLI]({{< ref "/guides/getting-started/cli#create-gateway" >}}). The **EUI** of the gateway can be found on the back panel of the gateway under the field **GW ID**.
+Create a gateway by following the instructions for the [Console]({{< ref "/getting-started/console#create-gateway" >}}) or the [CLI]({{< ref "/getting-started/cli#create-gateway" >}}). The **EUI** of the gateway can be found on the back panel of the gateway under the field **GW ID**.
 
 ## Configuration via Browser
 
@@ -47,7 +47,7 @@ From the top menu, select the **Servers** Tab and press the **Add New** button.
 Edit the server parameters.
 
 1. **Name**: A distinct name 
-2. **Address**: Address of the Gateway Server. If you followed the [Getting Started guide]({{< ref "/guides/getting-started" >}}) this is the same as what you use instead of `thethings.example.com`.
+2. **Address**: Address of the Gateway Server. If you followed the [Getting Started guide]({{< ref "/getting-started" >}}) this is the same as what you use instead of `thethings.example.com`.
 3. **Up port**: UDP upstream port of the Gateway Server, typically `1700`.
 4. **Down port**: UDP downstream port of the Gateway Server, typically `1700`.
 
@@ -61,11 +61,15 @@ From the top menu, select the **Devices Tab**. Click the **Gateway ID** to confi
 
 In the device settings, click the **Network Servers Dropdown** to view available servers. Choose the server you just created.
 
-Click OK to save the parameters.
-
 ![Device parameters](device-parameters.png)
 
 ![Device parameters](device-parameters-selected.png)
+
+Select **Private** for the Network.
+
+![Network private](device-parameters-network.png)
+
+Click OK to save the parameters.
 
 Press the **E** to enable the gateway device. It will become a **D** and the device status will update.
 
@@ -98,7 +102,7 @@ Back in the **LoRa** section, select the **Servers** section. Select the **+** b
 Edit the server parameters.
 
 1. **Name**: A distinct name 
-2. **Address**: Address of the Gateway Server. If you followed the [Getting Started guide]({{< ref "/guides/getting-started" >}}) this is the same as what you use instead of `thethings.example.com`.
+2. **Address**: Address of the Gateway Server. If you followed the [Getting Started guide]({{< ref "/getting-started" >}}) this is the same as what you use instead of `thethings.example.com`.
 3. **Up port**: UDP upstream port of the Gateway Server, typically `1700`.
 4. **Down port**: UDP downstream port of the Gateway Server, typically `1700`.
 
