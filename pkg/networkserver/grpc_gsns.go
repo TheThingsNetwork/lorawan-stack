@@ -993,7 +993,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			stored.MACState.DesiredParameters.ADRDataRateIndex = stored.MACState.CurrentParameters.ADRDataRateIndex
 			stored.MACState.DesiredParameters.ADRTxPowerIndex = stored.MACState.CurrentParameters.ADRTxPowerIndex
 			stored.MACState.DesiredParameters.ADRNbTrans = stored.MACState.CurrentParameters.ADRNbTrans
-			if !pld.FHDR.ADR || !deviceUseADR(stored, ns.defaultMACSettings) {
+			if !pld.FHDR.ADR || !deviceUseADR(stored, ns.defaultMACSettings, matched.phy) {
 				stored.RecentADRUplinks = nil
 				return stored, paths, nil
 			}
