@@ -582,10 +582,16 @@ func MustEncryptUplink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, 
 }
 
 func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, devAddr types.DevAddr, fCtrl ttnpb.FCtrl, fCnt, confFCntDown uint32, fPort uint8, frmPayload, fOpts []byte, dr ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64, chIdx uint8, mds ...*ttnpb.RxMetadata) *ttnpb.UplinkMessage {
-	if len(fOpts) > 0 && fPort == 0 {
-		panic("FOpts must not be set for FPort == 0")
+	if !fCtrl.Ack && confFCntDown > 0 {
+		panic("ConfFCntDown must be zero for uplink frames with ACK bit unset")
 	}
 	devAddr = *devAddr.Copy(&types.DevAddr{})
+	keys := MakeSessionKeys(macVersion, false)
+	if len(frmPayload) > 0 && fPort == 0 {
+		frmPayload = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, false, frmPayload...)
+	} else if len(fOpts) > 0 && macVersion.EncryptFOpts() {
+		fOpts = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, true, fOpts...)
+	}
 	mType := ttnpb.MType_UNCONFIRMED_UP
 	if confirmed {
 		mType = ttnpb.MType_CONFIRMED_UP
@@ -594,33 +600,27 @@ func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, 
 		MType: mType,
 		Major: ttnpb.Major_LORAWAN_R1,
 	}
-	keys := MakeSessionKeys(macVersion, false)
-	if fPort == 0 {
-		frmPayload = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, false, frmPayload...)
-	} else if len(fOpts) > 0 && macVersion.EncryptFOpts() {
-		fOpts = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, true, fOpts...)
-	}
 	fhdr := ttnpb.FHDR{
 		DevAddr: devAddr,
 		FCtrl:   fCtrl,
 		FCnt:    fCnt & 0xffff,
 		FOpts:   fOpts,
 	}
-	phyPayload := append(
-		append(
-			test.Must(lorawan.AppendFHDR(
-				test.Must(lorawan.AppendMHDR(nil, mhdr)).([]byte), fhdr, true),
-			).([]byte),
-			fPort),
-		frmPayload...)
+	phyPayload := test.Must(lorawan.MarshalMessage(ttnpb.Message{
+		MHDR: mhdr,
+		Payload: &ttnpb.Message_MACPayload{
+			MACPayload: &ttnpb.MACPayload{
+				FHDR:       fhdr,
+				FPort:      uint32(fPort),
+				FRMPayload: frmPayload,
+			},
+		},
+	})).([]byte)
 	var mic [4]byte
 	switch {
 	case macVersion.Compare(ttnpb.MAC_V1_1) < 0:
 		mic = test.Must(crypto.ComputeLegacyUplinkMIC(*keys.FNwkSIntKey.Key, devAddr, fCnt, phyPayload)).([4]byte)
 	default:
-		if !fCtrl.Ack {
-			confFCntDown = 0
-		}
 		mic = test.Must(crypto.ComputeUplinkMIC(*keys.SNwkSIntKey.Key, *keys.FNwkSIntKey.Key, confFCntDown, uint8(drIdx), chIdx, devAddr, fCnt, phyPayload)).([4]byte)
 	}
 	phyPayload = append(phyPayload, mic[:]...)
@@ -660,47 +660,45 @@ func MustEncryptDownlink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32
 	return test.Must(crypto.EncryptDownlink(key, devAddr, fCnt, b, isFOpts)).([]byte)
 }
 
-func MakeDataDownlink(macVersion ttnpb.MACVersion, confirmed bool, devAddr types.DevAddr, fCtrl ttnpb.FCtrl, fCnt, confFCntDown uint32, fPort uint8, frmPayload, fOpts []byte, txReq *ttnpb.TxRequest, cids ...string) *ttnpb.DownlinkMessage {
-	if len(fOpts) > 0 && fPort == 0 {
-		panic("FOpts must not be set for FPort == 0")
+func MakeDataDownlink(macVersion ttnpb.MACVersion, confirmed bool, devAddr types.DevAddr, fCtrl ttnpb.FCtrl, fCnt, confFCntUp uint32, fPort uint8, frmPayload, fOpts []byte, txReq *ttnpb.TxRequest, cids ...string) *ttnpb.DownlinkMessage {
+	if !fCtrl.Ack && confFCntUp > 0 {
+		panic("ConfFCntDown must be zero for uplink frames with ACK bit unset")
 	}
 	devAddr = *devAddr.Copy(&types.DevAddr{})
-	mType := ttnpb.MType_UNCONFIRMED_DOWN
-	if confirmed {
-		mType = ttnpb.MType_CONFIRMED_DOWN
-	}
-	mhdr := ttnpb.MHDR{
-		MType: mType,
-		Major: ttnpb.Major_LORAWAN_R1,
-	}
 	keys := MakeSessionKeys(macVersion, false)
-	if fPort == 0 {
+	if len(frmPayload) > 0 && fPort == 0 {
 		frmPayload = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, fCnt, false, frmPayload...)
 	} else if len(fOpts) > 0 && macVersion.EncryptFOpts() {
 		fOpts = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, fCnt, true, fOpts...)
 	}
-	fhdr := ttnpb.FHDR{
-		DevAddr: devAddr,
-		FCtrl:   fCtrl,
-		FCnt:    fCnt & 0xffff,
-		FOpts:   fOpts,
+	mType := ttnpb.MType_UNCONFIRMED_DOWN
+	if confirmed {
+		mType = ttnpb.MType_CONFIRMED_DOWN
 	}
-	phyPayload := append(
-		append(
-			test.Must(lorawan.AppendFHDR(
-				test.Must(lorawan.AppendMHDR(nil, mhdr)).([]byte), fhdr, false),
-			).([]byte),
-			fPort),
-		frmPayload...)
+	phyPayload := test.Must(lorawan.MarshalMessage(ttnpb.Message{
+		MHDR: ttnpb.MHDR{
+			MType: mType,
+			Major: ttnpb.Major_LORAWAN_R1,
+		},
+		Payload: &ttnpb.Message_MACPayload{
+			MACPayload: &ttnpb.MACPayload{
+				FHDR: ttnpb.FHDR{
+					DevAddr: devAddr,
+					FCtrl:   fCtrl,
+					FCnt:    fCnt & 0xffff,
+					FOpts:   fOpts,
+				},
+				FPort:      uint32(fPort),
+				FRMPayload: frmPayload,
+			},
+		},
+	})).([]byte)
 	var mic [4]byte
 	switch {
 	case macVersion.Compare(ttnpb.MAC_V1_1) < 0:
 		mic = test.Must(crypto.ComputeLegacyDownlinkMIC(*keys.FNwkSIntKey.Key, devAddr, fCnt, phyPayload)).([4]byte)
 	default:
-		if !fCtrl.Ack {
-			confFCntDown = 0
-		}
-		mic = test.Must(crypto.ComputeDownlinkMIC(*keys.SNwkSIntKey.Key, devAddr, confFCntDown, fCnt, phyPayload)).([4]byte)
+		mic = test.Must(crypto.ComputeDownlinkMIC(*keys.SNwkSIntKey.Key, devAddr, confFCntUp, fCnt, phyPayload)).([4]byte)
 	}
 	return &ttnpb.DownlinkMessage{
 		CorrelationIDs: append([]string{}, cids...),

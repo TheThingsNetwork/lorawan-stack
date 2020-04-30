@@ -243,6 +243,46 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			},
 		},
 		{
+			"Downlink(Unconfirmed)/no FPort",
+			&ttnpb.Message{
+				MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_DOWN, Major: 0},
+				Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+					FHDR: ttnpb.FHDR{
+						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						FCtrl: ttnpb.FCtrl{
+							ADR:       true,
+							ADRAckReq: false,
+							Ack:       true,
+							ClassB:    false,
+							FPending:  true,
+						},
+						FCnt:  0xff42,
+						FOpts: []byte{0xfe, 0xff},
+					},
+				}},
+				MIC: []byte{0x42, 0xff, 0xff, 0xff},
+			},
+			[]byte{
+				/* MHDR */
+				0x60,
+
+				/* MACPayload */
+
+				/** FHDR **/
+				/*** DevAddr ***/
+				0xff, 0xff, 0xff, 0x42,
+				/*** FCtrl ***/
+				0xb2,
+				/*** FCnt ***/
+				0x42, 0xff,
+				/*** FOpts ***/
+				0xfe, 0xff,
+
+				/* MIC */
+				0x42, 0xff, 0xff, 0xff,
+			},
+		},
+		{
 			"Downlink(Confirmed)",
 			&ttnpb.Message{
 				MHDR: ttnpb.MHDR{MType: ttnpb.MType_CONFIRMED_UP, Major: 0},

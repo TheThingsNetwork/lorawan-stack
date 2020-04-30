@@ -306,7 +306,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	if len(cmdBuf) <= fOptsCapacity {
+	cmdsInFOpts := len(cmdBuf) <= fOptsCapacity
+	if cmdsInFOpts {
 		appDowns := dev.Session.QueuedApplicationDownlinks[:0:0]
 	outer:
 		for i, down := range dev.Session.QueuedApplicationDownlinks {
@@ -442,7 +443,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	if len(cmdBuf) > 0 && (pld.FPort == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
+	if len(cmdBuf) > 0 && (!cmdsInFOpts || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
 		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
 			return nil, genState, errUnknownNwkSEncKey.New()
 		}
@@ -455,15 +456,15 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		if pld.FPort != 0 {
 			fCnt = dev.Session.LastNFCntDown
 		}
-		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, fCnt, cmdBuf, pld.FPort != 0)
+		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, fCnt, cmdBuf, cmdsInFOpts)
 		if err != nil {
 			return nil, genState, errEncryptMAC.WithCause(err)
 		}
 	}
-	if pld.FPort == 0 {
-		pld.FRMPayload = cmdBuf
-	} else {
+	if cmdsInFOpts {
 		pld.FHDR.FOpts = cmdBuf
+	} else {
+		pld.FRMPayload = cmdBuf
 	}
 	if pld.FPort == 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		genState.ifScheduledApplicationUps = append(genState.ifScheduledApplicationUps, &ttnpb.ApplicationUp{

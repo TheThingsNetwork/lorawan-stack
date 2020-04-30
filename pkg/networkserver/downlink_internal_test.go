@@ -2298,15 +2298,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0b1_0_0_1_0000,
+							0b1_0_0_1_0110,
 							/*** FCnt ***/
 							0x25, 0x00,
 						}
 
-						/** FPort **/
-						b = append(b, 0x0)
-
-						/** FRMPayload **/
+						/** FOpts **/
 						b = append(b, test.Must(crypto.EncryptDownlink(
 							nwkSEncKey,
 							devAddr,
@@ -2319,7 +2316,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
-							false,
+							true,
 						)).([]byte)...)
 
 						/* MIC */
@@ -4154,15 +4151,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0b1_0_0_1_0000,
+							0b1_0_0_1_0001,
 							/*** FCnt ***/
 							0x25, 0x00,
 						}
 
-						/** FPort **/
-						b = append(b, 0x0)
-
-						/** FRMPayload **/
+						/** FOpts **/
 						b = append(b, test.Must(crypto.EncryptDownlink(
 							nwkSEncKey,
 							devAddr,
@@ -4171,7 +4165,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
-							false,
+							true,
 						)).([]byte)...)
 
 						/* MIC */
@@ -4567,15 +4561,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0b1_0_0_1_0000,
+							0b1_0_0_1_0001,
 							/*** FCnt ***/
 							0x25, 0x00,
 						}
 
-						/** FPort **/
-						b = append(b, 0x0)
-
-						/** FRMPayload **/
+						/** FOpts **/
 						b = append(b, test.Must(crypto.EncryptDownlink(
 							nwkSEncKey,
 							devAddr,
@@ -4584,7 +4575,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
-							false,
+							true,
 						)).([]byte)...)
 
 						/* MIC */
@@ -5490,7 +5481,7 @@ func TestGenerateDownlink(t *testing.T) {
 		msg = deepcopy.Copy(msg).(*ttnpb.Message)
 		mac := msg.GetMACPayload()
 
-		if len(mac.FRMPayload) > 0 && mac.FPort == 0 {
+		if len(mac.FRMPayload) > 0 && mac.FPort == 0 || len(mac.FOpts) > 0 {
 			var key types.AES128Key
 			switch ver {
 			case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
@@ -5502,9 +5493,13 @@ func TestGenerateDownlink(t *testing.T) {
 			}
 
 			var err error
-			mac.FRMPayload, err = crypto.EncryptDownlink(key, mac.DevAddr, mac.FCnt, mac.FRMPayload, false)
+			if len(mac.FOpts) > 0 {
+				mac.FOpts, err = crypto.EncryptDownlink(key, mac.DevAddr, mac.FCnt, mac.FOpts, true)
+			} else {
+				mac.FRMPayload, err = crypto.EncryptDownlink(key, mac.DevAddr, mac.FCnt, mac.FRMPayload, false)
+			}
 			if err != nil {
-				t.Fatal("Failed to encrypt downlink FRMPayload")
+				t.Fatal("Failed to encrypt downlink MAC buffer")
 			}
 		}
 
@@ -6239,12 +6234,11 @@ func TestGenerateDownlink(t *testing.T) {
 								ADR: true,
 							},
 							FCnt: 42,
+							FOpts: encodeMAC(
+								phy,
+								ttnpb.CID_DEV_STATUS.MACCommand(),
+							),
 						},
-						FPort: 0,
-						FRMPayload: encodeMAC(
-							phy,
-							ttnpb.CID_DEV_STATUS.MACCommand(),
-						),
 					},
 				},
 			}, ttnpb.MAC_V1_1, 0),
@@ -6346,12 +6340,11 @@ func TestGenerateDownlink(t *testing.T) {
 								ADR: true,
 							},
 							FCnt: 42,
+							FOpts: encodeMAC(
+								phy,
+								ttnpb.CID_DEV_STATUS.MACCommand(),
+							),
 						},
-						FPort: 0,
-						FRMPayload: encodeMAC(
-							phy,
-							ttnpb.CID_DEV_STATUS.MACCommand(),
-						),
 					},
 				},
 			}, ttnpb.MAC_V1_1, 0),
