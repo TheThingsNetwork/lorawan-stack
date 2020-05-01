@@ -517,11 +517,11 @@ matchLoop:
 			continue
 		}
 
-		macBuf := pld.FOpts
-		if pld.FPort == 0 {
-			macBuf = pld.FRMPayload
+		cmdBuf := pld.FOpts
+		if pld.FPort == 0 && len(pld.FRMPayload) > 0 {
+			cmdBuf = pld.FRMPayload
 		}
-		if len(macBuf) > 0 && (len(pld.FOpts) == 0 || match.Device.MACState.LoRaWANVersion.EncryptFOpts()) {
+		if len(cmdBuf) > 0 && (len(pld.FOpts) == 0 || match.Device.MACState.LoRaWANVersion.EncryptFOpts()) {
 			if session.NwkSEncKey == nil || len(session.NwkSEncKey.Key) == 0 {
 				logger.Warn("Device missing NwkSEncKey in registry, skip")
 				continue
@@ -531,7 +531,7 @@ matchLoop:
 				logger.WithField("kek_label", session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey, skip")
 				continue
 			}
-			macBuf, err = crypto.DecryptUplink(key, pld.DevAddr, match.FCnt, macBuf, pld.FPort != 0)
+			cmdBuf, err = crypto.DecryptUplink(key, pld.DevAddr, match.FCnt, cmdBuf, len(pld.FOpts) > 0)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to decrypt uplink, skip")
 				continue
@@ -542,7 +542,7 @@ matchLoop:
 			match.Device.MACState.PendingRequests = nil
 		}
 		var cmds []*ttnpb.MACCommand
-		for r := bytes.NewReader(macBuf); r.Len() > 0; {
+		for r := bytes.NewReader(cmdBuf); r.Len() > 0; {
 			cmd := &ttnpb.MACCommand{}
 			if err := lorawan.DefaultMACCommands.ReadUplink(match.phy, r, cmd); err != nil {
 				logger.WithFields(log.Fields(
@@ -863,11 +863,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		"f_port", pld.FPort,
 		"uplink_f_cnt", pld.FCnt,
 	))
-
-	if pld.FPort == 0 && len(pld.FOpts) > 0 {
-		log.FromContext(ctx).Warn("FOpts non-empty for FPort 0 uplink, drop")
-		return errInvalidPayload.New()
-	}
 
 	var addrMatches []contextualEndDevice
 	if err := ns.devices.RangeByAddr(ctx, pld.DevAddr, handleDataUplinkGetPaths[:],

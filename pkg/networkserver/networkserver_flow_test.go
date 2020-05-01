@@ -838,7 +838,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 				a.So(down, should.Resemble, MakeDataDownlink(macVersion, false, joinReq.DevAddr, ttnpb.FCtrl{
 					ADR: true,
 					Ack: true,
-				}, 0x00, 0x00, 0x00, MakeDownlinkMACBuffer(phy, downCmders...), nil, txReq, down.CorrelationIDs...)),
+				}, 0x00, 0x00, 0x00, nil, MakeDownlinkMACBuffer(phy, downCmders...), txReq, down.CorrelationIDs...)),
 			)
 		}, paths,
 		), should.BeTrue) {

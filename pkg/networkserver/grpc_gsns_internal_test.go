@@ -728,13 +728,12 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				},
 			},
 			{
-				FCnt:         0xff00,
-				ADR:          true,
-				ADRAckReq:    true,
-				ConfFCntDown: 0x02,
-				ClassB:       true,
-				FPort:        0x01,
-				FRMPayload:   []byte("test-payload"),
+				FCnt:       0xff00,
+				ADR:        true,
+				ADRAckReq:  true,
+				ClassB:     true,
+				FPort:      0x01,
+				FRMPayload: []byte("test-payload"),
 			}: {
 				{
 					Name: MakeTestCaseName("Current session", "Class A", "LastFCntUp=0xfef0", "NbTrans=1", "Pending application downlink"),
@@ -865,7 +864,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							ADR:       true,
 							ADRAckReq: true,
 							ClassB:    true,
-						}, 0xff00, 0x02, 0x01, []byte("test-payload"), []byte{}, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1)
+						}, 0xff00, 0, 0x01, []byte("test-payload"), []byte{}, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1)
 						up.ReceivedAt = upRecvAt.Add(-time.Nanosecond)
 						dev.MACState.RecentUplinks = appendRecentUplink(dev.MACState.RecentUplinks, up, recentUplinkCount)
 						dev.RecentUplinks = appendRecentUplink(dev.RecentUplinks, up, recentUplinkCount)

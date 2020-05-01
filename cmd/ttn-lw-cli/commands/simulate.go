@@ -29,7 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -373,7 +372,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 			payloadKey = *dev.Session.SessionKeys.GetNwkSEncKey().Key
 		} else {
 			payloadKey = *dev.Session.SessionKeys.GetAppSKey().Key
-			if len(macPayload.FOpts) > 0 && dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+			if len(macPayload.FOpts) > 0 && dev.LoRaWANVersion.EncryptFOpts() {
 				fOpts, err := crypto.DecryptDownlink(*dev.Session.SessionKeys.GetNwkSEncKey().Key, macPayload.DevAddr, dev.Session.LastNFCntDown, macPayload.FOpts, true)
 				if err != nil {
 					return err
@@ -387,7 +386,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		}
 
 		cmdBuf := macPayload.FOpts
-		if macPayload.FPort == 0 {
+		if macPayload.FPort == 0 && len(macPayload.FRMPayload) > 0 {
 			cmdBuf = macPayload.FRMPayload
 		}
 		var cmds []*ttnpb.MACCommand
@@ -495,7 +494,6 @@ var (
 		},
 	}
 
-	errInvalidFOpts           = errors.DefineInvalidArgument("f_opts", "invalid f_opts")
 	simulateDataUplinkCommand = &cobra.Command{
 		Use:   "uplink",
 		Short: "Simulate a data uplink (EXPERIMENTAL)",
@@ -522,9 +520,6 @@ var (
 			return simulate(cmd,
 				func(upMsg *ttnpb.UplinkMessage) error {
 					fOpts := dataUplinkParams.FOpts
-					if len(fOpts) > 0 && dataUplinkParams.FPort == 0 {
-						return errInvalidFOpts
-					}
 					if len(fOpts) > 0 && uplinkParams.LoRaWANVersion.EncryptFOpts() {
 						buf, err := crypto.EncryptUplink(
 							dataUplinkParams.NwkSEncKey,
