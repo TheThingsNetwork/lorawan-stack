@@ -1,17 +1,17 @@
 ---
-title: Export end devices from V2
+title: Export End Devices from V2
 weight: 40
 ---
 
-## Export end devices with ttnctl
+## Export End Devices with ttnctl
 
 We will export the end devices of this application in a JSON format that can then
 be parsed and imported by {{% tts %}}.
 
-For the commands below, we are assuming that an application on The Things Network
-with AppID `v2-application` and AppEUI `0011223300112233`.
+For the commands below, we are using an example application on The Things Network
+with **AppID** `v2-application` and **AppEUI** `0011223300112233`.
 
-Select that AppID and AppEUI with:
+Select that **AppID** and **AppEUI** with:
 
 ```bash
 $ ttnctl applications select

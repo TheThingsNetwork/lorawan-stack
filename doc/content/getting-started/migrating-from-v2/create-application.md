@@ -1,13 +1,13 @@
 ---
-title: Create application
+title: Create Application
 weight: 20
 ---
 
-## Create a new Application on {{% tts %}}
+## Create a New Application on {{% tts %}}
 
-First, create a new application on {{% tts %}} where the end devices will be
-imported. This can be done from the [Console]({{% ref "getting-started/console/create-application" %}})
-or the [CLI]({{% ref "getting-started/cli#create-application" %}}).
+Create a new application on {{% tts %}} where the end devices will be
+imported. This can be done from by following instructions for [Creating an Application in the Console]({{% ref "getting-started/console/create-application" %}})
+or [Creating an Application using the CLI]({{% ref "getting-started/cli#create-application" %}}).
 
 Using the linked instructions, create an application called `imported-application`.
 

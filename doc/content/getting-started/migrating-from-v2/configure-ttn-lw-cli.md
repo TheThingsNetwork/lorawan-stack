@@ -4,10 +4,11 @@ weight: 16
 description: Install and configure CLI tools
 ---
 
-You will also need the latest version of `ttn-lw-cli`, the CLI for {{% tts %}} (v3).
-For more information, see [Command-line Interface]({{< ref "getting-started/cli" >}}).
+You will also need the latest version of `ttn-lw-cli`, the CLI for {{% tts %}}.
 
-Get the latest version of `ttn-lw-cli` as explained on the linked page.
+Get the latest version of `ttn-lw-cli` by following instructions for the [Command-line Interface]({{< ref "getting-started/cli" >}}).
+
+
 
 Configure `ttn-lw-cli` for connecting to {{% tts %}}.
 

@@ -4,8 +4,8 @@ weight: 15
 description: Install and configure CLI tools
 ---
 
-You will need to use the latest version of `ttnctl`, the CLI for the public community network (v2).
-Follow the instructions from [the TTN docs][1]. An overview is given below:
+You will need to use the latest version of `ttnctl`, the CLI for {{% ttnv2 %}}.
+Follow the [instructions from the TTN documentation][1]. An overview is given below:
 
 Download `ttnctl` [for your operating system][2].
 
