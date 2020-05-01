@@ -184,6 +184,14 @@ TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth.js"
 TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
 ```
 
+#### Optional Configuration
+
+Disable [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/)
+
+```bash
+WEBPACK_DISABLE_HMR="true"
+```
+
 ## Code Style
 
 ### Code Formatting
