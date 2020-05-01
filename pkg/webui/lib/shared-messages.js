@@ -101,7 +101,6 @@ export default defineMessages({
   createdAt: 'Created at',
   currentCollaborators: 'Current collaborators',
   data: 'Data',
-  default: 'Default',
   defineRights: 'Define rights',
   description: 'Description',
   devAddr: 'Device address',

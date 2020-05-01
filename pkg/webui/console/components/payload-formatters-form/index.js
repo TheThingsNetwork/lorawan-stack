@@ -194,7 +194,7 @@ class PayloadFormattersForm extends React.Component {
             onChange={this.onTypeChange}
             warning={type === TYPES.DEFAULT ? m.appFormatterWarning : undefined}
           >
-            {allowReset && <Radio label={sharedMessages.default} value={TYPES.DEFAULT} />}
+            {allowReset && <Radio label={m.appFormatter} value={TYPES.DEFAULT} />}
             <Radio label={sharedMessages.none} value={TYPES.NONE} />
             <Radio label="Javascript" value={TYPES.JAVASCRIPT} />
             <Radio label={m.grpc} value={TYPES.GRPC} />
