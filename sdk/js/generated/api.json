@@ -8711,6 +8711,16 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "last_downlink_at",
+              "description": "Time when the last downlink message was scheduled.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

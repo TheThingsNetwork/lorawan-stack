@@ -1393,6 +1393,15 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			} else {
 				dst.RejectedFrequencies = nil
 			}
+		case "last_downlink_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_downlink_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastDownlinkAt = src.LastDownlinkAt
+			} else {
+				dst.LastDownlinkAt = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
