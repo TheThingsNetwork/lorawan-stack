@@ -6,5 +6,3 @@ menu:
   main:
     weight: 3
 ---
-
-This section provides guides for connecting popular gateways to {{% tts %}}.
