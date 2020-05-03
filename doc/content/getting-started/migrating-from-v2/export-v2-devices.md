@@ -1,17 +1,13 @@
 ---
-title: Export End Devices from V2
+title: Export End Devices From V2
 weight: 40
 ---
 
-## Export End Devices with ttnctl
+In this step, the end devices from {{% ttnv2 %}} will be exported in a JSON format that can then be parsed and imported by {{% tts %}}.
 
-We will export the end devices of this application in a JSON format that can then
-be parsed and imported by {{% tts %}}.
+The exported end devices contain the device name, description, location data, activation mode (ABP/OTAA), root keys and the AppEUI. They also contain the session keys, so your OTAA devices can simply keep working with {{% tts %}}.
 
-For the commands below, we are using an example application on The Things Network
-with **AppID** `v2-application` and **AppEUI** `0011223300112233`.
-
-Select that **AppID** and **AppEUI** with:
+To get started, select the **AppID** and **AppEUI** of the application you want to export your end devices from:
 
 ```bash
 $ ttnctl applications select
@@ -23,28 +19,41 @@ After selecting the application, make sure that you can list the available end d
 $ ttnctl devices list
 ```
 
-In order to export a single device, use the following command. The device will
-be saved to `device.json`.
+### Exporting Devices
+
+In order to export a single device, use the following command. The device will be saved to `device.json`.
 
 ```bash
-$ ttnctl devices export "DeviceID" --frequency-plan-id EU_863_870 > device.json
+$ ttnctl devices export "device-id" --frequency-plan-id EU_863_870 > device.json
 ```
 
-Alternatively, you can export all the end devices with a single command and save
-them in `all-devices.json`.
+Alternatively, you can export all the end devices with a single command and save them in `all-devices.json`.
 
 ```bash
-$ ttnctl devices export "DeviceID" --frequency-plan-id EU_863_870 > all-devices.json
+$ ttnctl devices export-all --frequency-plan-id EU_863_870 > all-devices.json
 ```
 
-> **NOTE**: In {{% tts %}}, the MAC settings are configurable per end device. This
-> means that all end devices need a frequency plan. Above, we specify
-> the `EU_863_870` frequency plan, but this needs to be replaced with the
-> frequency plan corresponding to your region. A list of supported frequency plan IDs in
-> [the lorawan-frequency-plans Github repository](https://github.com/TheThingsNetwork/lorawan-frequency-plans/blob/master/frequency-plans.yml).
+> **NOTE**: In the command above we used the `EU_863_870` frequency plan. You will need to change this to the frequency plan corresponding to your region. You can find a list of supported frequency plan IDs in [the lorawan-frequency-plans Github repository](https://github.com/TheThingsNetwork/lorawan-frequency-plans/blob/master/frequency-plans.yml).
 
-> **NOTE**: The exported end devices contain the device name, description, location
-> data, activation mode (ABP/OTAA), root keys and the application AppEUI.
+<!--
+TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/2421
+Add reference to docs after that is merged.
+-->
 
-> **NOTE**: For OTAA end devices, the session keys are not preserved. After importing,
-> the end device will need to send a new join request on the Network Server of {{% tts %}}.
+> **NOTE**: Keep in mind that an end device can only be registered in one Network Server at a time. After importing an end device to {{% tts %}}, you should remove it from {{% ttnv2 %}}. For OTAA devices, it is enough to simply change the AppKey, so the device can no longer join but the existing session is preserved. Next time the device joins, the activation will be handled by {{% tts %}}.
+
+### Disable Exported End Devices on V2
+
+After exporting, make sure to clear the AppKey of your OTAA devices. This can be achieved with the following command:
+
+```bash
+$ ttnctl devices convert-to-abp "device-id" --save-to-attribute "original-app-key"
+```
+
+There is also a convenience command to clear all your devices at once:
+
+```bash
+$ ttnctl devices convert-all-to-abp --save-to-attribute "original-app-key"
+```
+
+> **NOTE**: The AppKey of each device will be printed on the standard output, and stored as a device attribute (with name `original-app-key`). You can retrieve the device attributes with `ttnctl devices info "device-id"`.

@@ -1,11 +1,10 @@
 ---
-title: Configure ttnctl
+title: Configure V2 CLI
 weight: 15
 description: Install and configure CLI tools
 ---
 
-You will need to use the latest version of `ttnctl`, the CLI for {{% ttnv2 %}}.
-Follow the [instructions from the TTN documentation][1]. An overview is given below:
+You will need to use the latest version of `ttnctl`, the CLI for {{% ttnv2 %}}. Follow the [instructions from The Things Network documentation][1]. An overview is given below:
 
 Download `ttnctl` [for your operating system][2].
 
@@ -15,7 +14,7 @@ Update to the latest version:
 $ ttnctl selfupdate
 ```
 
-Go to [https://accounts.thethingsnetwork.com][3] and click [ttnctl access code][4].
+Go to [https://account.thethingsnetwork.org][3] and click [ttnctl access code][4].
 
 Use the returned code to login from the CLI with:
 
@@ -25,8 +24,5 @@ $ ttnctl user login "t9XPTwJl6shYSJSJxQ1QdATbs4u32D4Ib813-fO9Xlk"
 
 [1]: https://www.thethingsnetwork.org/docs/network/cli/quick-start.html
 [2]: https://www.thethingsnetwork.org/docs/network/cli/quick-start.html#installation
-[3]: https://accounts.thethingsnetwork.com
+[3]: https://account.thethingsnetwork.org
 [4]: https://account.thethingsnetwork.org/users/authorize?client_id=ttnctl&redirect_uri=/oauth/callback/ttnctl&response_type=code
-
-> **NOTE**: The commands above assume that ttnctl can be found in your PATH. If that
-> is not the case, you need to specify the path to `ttnctl` instead, e.g. `./ttnctl`.
