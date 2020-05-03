@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgrading guide in docs
 - Unset end device fields using the CLI (see `--unset` option)
 - Join EUI and Dev EUI columns to the end device table in the Console.
+- CLI creates user configuration directory if it does not exist when generating configuration file.
 
 ### Changed
 
