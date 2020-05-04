@@ -1,5 +1,5 @@
 ---
-title: "Installation"
+title: "Installing The Things Stack"
 description: ""
 weight: -1
 ---
