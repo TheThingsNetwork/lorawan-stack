@@ -117,6 +117,8 @@ $ ./mage proto:clean proto:all jsSDK:definitions
 The documentation site for The Things Stack is built from the `doc` folder.
 All content is stored as Markdown files in `doc/content`.
 
+Data for generated documentation like API and glossary is stored in `doc/data`.
+
 In order to build the documentation site with the right theme, you need to run
 `./mage docs:deps` from time to time.
 
