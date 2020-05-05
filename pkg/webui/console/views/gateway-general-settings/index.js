@@ -38,6 +38,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import diff from '@ttn-lw/lib/diff'
 
 import { mayEditBasicGatewayInformation, mayDeleteGateway } from '@console/lib/feature-checks'
+import { mapFormValueToAttributes, mapAttributesToFormValue } from '@console/lib/attributes'
 
 import { attachPromise } from '@console/store/actions/lib'
 import { updateGateway, deleteGateway } from '@console/store/actions/gateways'
@@ -118,8 +119,13 @@ export default class GatewayGeneralSettings extends React.Component {
       changed = entityDiff
     }
 
+    const update =
+      'attributes' in changed
+        ? { ...changed, attributes: mapFormValueToAttributes(values.attributes) }
+        : changed
+
     try {
-      await updateGateway(gtwId, changed)
+      await updateGateway(gtwId, update)
       this.formRef.current.resetForm()
       toast({
         title: gtwId,
@@ -164,6 +170,7 @@ export default class GatewayGeneralSettings extends React.Component {
       auto_update,
       update_channel,
       schedule_anytime_delay,
+      attributes,
     } = gateway
 
     const initialValues = {
@@ -180,6 +187,7 @@ export default class GatewayGeneralSettings extends React.Component {
       auto_update,
       update_channel,
       schedule_anytime_delay,
+      attributes: mapAttributesToFormValue(attributes),
     }
 
     return (
