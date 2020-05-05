@@ -199,7 +199,18 @@ Icons should be used
 
 ### Illustrations
 
-Details to follow…
+Create our product a "face" that you can look and reconize makes us reliable and trustworthy.
+This pattern should be impactful enough, easy to memorize, scalable and adaptable
+
+The console is a technic, easy to use and clean tool.
+The goal here is to reflect those values and picture it in being subtil enough to not steal the star from the tool itself.
+
+<img src="https://user-images.githubusercontent.com/26456318/80980599-1bd57a00-8e29-11ea-9007-244c52ed4246.png" width="882px" />
+
+We created a card pattern that resonates with our logo, which is based on the "stack" representation.
+In addition to this card, an icon is here to represent all the fields of action the console can offer, and tells the potential of our tool.
+
+<img src="https://user-images.githubusercontent.com/26456318/80980623-2728a580-8e29-11ea-9584-ac4a11e917a0.png" width="882px" />
 
 ### Data Visualizations
 
