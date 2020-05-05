@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Network Server will not attempt to schedule MAC-only frames in ping slots or RXC windows.
 - Network Server will only attempt to schedule in a ping slot or RXC window after RX2 has passed.
 - Network Server will schedule all time-bound network-initiated downlinks at most RX1 delay ahead of time.
+- Network Server now uses its own internal clock in `DeviceTimeAns`.
 
 ### Deprecated
 
