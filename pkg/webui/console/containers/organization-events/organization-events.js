@@ -13,57 +13,56 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
 
-import EventsSubscription from '@console/containers/events-subscription'
+import ErrorNotification from '@ttn-lw/components/error-notification'
 
+import OrganizationEventsList from '@console/components/events-list/organization'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { startOrganizationEventsStream } from '@console/store/actions/organizations'
+const OrganizationEvents = props => {
+  const { orgId, events, error, onRestart, widget, onClear } = props
 
-@connect(
-  null,
-  (dispatch, ownProps) => ({
-    onRestart: () => dispatch(startOrganizationEventsStream(ownProps.orgId)),
-  }),
-)
-export default class OrganizationEvents extends React.Component {
-  static propTypes = {
-    errorSelector: PropTypes.func.isRequired,
-    eventsSelector: PropTypes.func.isRequired,
-    onClear: PropTypes.func.isRequired,
-    onRestart: PropTypes.func.isRequired,
-    orgId: PropTypes.string.isRequired,
-    statusSelector: PropTypes.func.isRequired,
-    widget: PropTypes.bool,
-  }
-
-  static defaultProps = {
-    widget: false,
-  }
-
-  render() {
-    const {
-      orgId,
-      widget,
-      onClear,
-      eventsSelector,
-      errorSelector,
-      statusSelector,
-      onRestart,
-    } = this.props
-
+  if (error) {
     return (
-      <EventsSubscription
-        id={orgId}
-        widget={widget}
-        eventsSelector={eventsSelector}
-        statusSelector={statusSelector}
-        errorSelector={errorSelector}
-        onClear={onClear}
-        onRestart={onRestart}
-        toAllUrl={`/organizations/${orgId}/data`}
+      <ErrorNotification
+        small
+        title={sharedMessages.eventsCannotShow}
+        content={error}
+        action={onRestart}
+        actionMessage={sharedMessages.restartStream}
+        buttonIcon="refresh"
       />
     )
   }
+
+  if (widget) {
+    return (
+      <OrganizationEventsList.Widget
+        events={events}
+        toAllUrl={`/organizations/${orgId}/data`}
+        orgId={orgId}
+      />
+    )
+  }
+
+  return <OrganizationEventsList events={events} onClear={onClear} orgId={orgId} />
 }
+
+OrganizationEvents.propTypes = {
+  error: PropTypes.error,
+  events: PropTypes.events,
+  onClear: PropTypes.func.isRequired,
+  onRestart: PropTypes.func.isRequired,
+  orgId: PropTypes.string.isRequired,
+  widget: PropTypes.bool,
+}
+
+OrganizationEvents.defaultProps = {
+  widget: false,
+  events: [],
+  error: undefined,
+}
+
+export default OrganizationEvents

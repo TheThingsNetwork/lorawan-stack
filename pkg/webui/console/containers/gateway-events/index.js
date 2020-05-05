@@ -14,54 +14,79 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import bind from 'autobind-decorator'
 
-import EventsSubscription from '@console/containers/events-subscription'
+import ErrorNotification from '@ttn-lw/components/error-notification'
 
+import GatewayEventsList from '@console/components/events-list/gateway'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { mayViewGatewayEvents } from '@console/lib/feature-checks'
 
 import { clearGatewayEventsStream, startGatewayEventsStream } from '@console/store/actions/gateways'
 
-import {
-  selectGatewayEvents,
-  selectGatewayEventsStatus,
-  selectGatewayEventsError,
-} from '@console/store/selectors/gateways'
+import { selectGatewayEvents, selectGatewayEventsError } from '@console/store/selectors/gateways'
 
-@connect(
-  null,
-  (dispatch, ownProps) => ({
-    onClear: () => dispatch(clearGatewayEventsStream(ownProps.gtwId)),
-    onRestart: () => dispatch(startGatewayEventsStream(ownProps.gtwId)),
-  }),
-)
-@bind
-export default class GatewayEvents extends React.Component {
-  static propTypes = {
-    gtwId: PropTypes.string.isRequired,
-    onClear: PropTypes.func.isRequired,
-    onRestart: PropTypes.func.isRequired,
-    widget: PropTypes.bool,
-  }
+const GatewayEvents = props => {
+  const { gtwId, events, error, onRestart, widget, onClear } = props
 
-  static defaultProps = {
-    widget: false,
-  }
-
-  render() {
-    const { gtwId, widget, onClear, onRestart } = this.props
-
+  if (error) {
     return (
-      <EventsSubscription
-        id={gtwId}
-        widget={widget}
-        eventsSelector={selectGatewayEvents}
-        statusSelector={selectGatewayEventsStatus}
-        errorSelector={selectGatewayEventsError}
-        onRestart={onRestart}
-        onClear={onClear}
-        toAllUrl={`/gateways/${gtwId}/data`}
+      <ErrorNotification
+        small
+        title={sharedMessages.eventsCannotShow}
+        content={error}
+        action={onRestart}
+        actionMessage={sharedMessages.restartStream}
+        buttonIcon="refresh"
       />
     )
   }
+
+  if (widget) {
+    return (
+      <GatewayEventsList.Widget
+        events={events}
+        toAllUrl={`/gateways/${gtwId}/data`}
+        gtwId={gtwId}
+      />
+    )
+  }
+
+  return <GatewayEventsList events={events} onClear={onClear} gtwId={gtwId} />
 }
+
+GatewayEvents.propTypes = {
+  error: PropTypes.error,
+  events: PropTypes.events,
+  gtwId: PropTypes.string.isRequired,
+  onClear: PropTypes.func.isRequired,
+  onRestart: PropTypes.func.isRequired,
+  widget: PropTypes.bool,
+}
+
+GatewayEvents.defaultProps = {
+  widget: false,
+  events: [],
+  error: undefined,
+}
+
+export default withFeatureRequirement(mayViewGatewayEvents)(
+  connect(
+    (state, props) => {
+      const { gtwId } = props
+
+      return {
+        events: selectGatewayEvents(state, gtwId),
+        error: selectGatewayEventsError(state, gtwId),
+      }
+    },
+    (dispatch, ownProps) => ({
+      onClear: () => dispatch(clearGatewayEventsStream(ownProps.gtwId)),
+      onRestart: () => dispatch(startGatewayEventsStream(ownProps.gtwId)),
+    }),
+  )(GatewayEvents),
+)

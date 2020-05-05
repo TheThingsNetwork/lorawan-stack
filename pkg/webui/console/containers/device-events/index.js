@@ -14,65 +14,91 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import bind from 'autobind-decorator'
 
-import EventsSubscription from '@console/containers/events-subscription'
+import ErrorNotification from '@ttn-lw/components/error-notification'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
+import DeviceEventsList from '@console/components/events-list/application/device'
+
 import { getApplicationId, getDeviceId, combineDeviceIds } from '@ttn-lw/lib/selectors/id'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { clearDeviceEventsStream, startDeviceEventsStream } from '@console/store/actions/devices'
 
-import {
-  selectDeviceEvents,
-  selectDeviceEventsStatus,
-  selectDeviceEventsError,
-} from '@console/store/selectors/devices'
+import { selectDeviceEvents, selectDeviceEventsError } from '@console/store/selectors/devices'
 
-@connect(
-  null,
-  (dispatch, ownProps) => ({
-    onClear: () => dispatch(clearDeviceEventsStream(ownProps.devIds)),
-    onRestart: () => dispatch(startDeviceEventsStream(ownProps.devIds)),
-  }),
-)
-@bind
-class DeviceEvents extends React.Component {
-  static propTypes = {
-    devIds: PropTypes.shape({
-      device_id: PropTypes.string,
-      application_ids: PropTypes.shape({
-        application_id: PropTypes.string,
-      }),
-    }).isRequired,
-    onClear: PropTypes.func.isRequired,
-    onRestart: PropTypes.func.isRequired,
-    widget: PropTypes.bool,
-  }
+const DeviceEvents = props => {
+  const { appId, devId, events, error, onRestart, widget, onClear } = props
 
-  static defaultProps = {
-    widget: false,
-  }
-  render() {
-    const { devIds, widget, onClear, onRestart } = this.props
-
-    const devId = getDeviceId(devIds)
-    const appId = getApplicationId(devIds)
-    const combinedDeviceId = combineDeviceIds(appId, devId)
-
+  if (error) {
     return (
-      <EventsSubscription
-        id={combinedDeviceId}
-        widget={widget}
-        eventsSelector={selectDeviceEvents}
-        statusSelector={selectDeviceEventsStatus}
-        errorSelector={selectDeviceEventsError}
-        onClear={onClear}
-        onRestart={onRestart}
-        toAllUrl={`/applications/${appId}/devices/${devId}/data`}
+      <ErrorNotification
+        small
+        title={sharedMessages.eventsCannotShow}
+        content={error}
+        action={onRestart}
+        actionMessage={sharedMessages.restartStream}
+        buttonIcon="refresh"
       />
     )
   }
+
+  if (widget) {
+    return (
+      <DeviceEventsList.Widget
+        events={events}
+        toAllUrl={`/applications/${appId}/devices/${devId}/data`}
+        deviceId={devId}
+      />
+    )
+  }
+
+  return <DeviceEventsList events={events} onClear={onClear} deviceId={devId} />
 }
 
-export default DeviceEvents
+DeviceEvents.propTypes = {
+  appId: PropTypes.string.isRequired,
+  devId: PropTypes.string.isRequired,
+  devIds: PropTypes.shape({
+    device_id: PropTypes.string,
+    application_ids: PropTypes.shape({
+      application_id: PropTypes.string,
+    }),
+  }).isRequired,
+  error: PropTypes.error,
+  events: PropTypes.events,
+  onClear: PropTypes.func.isRequired,
+  onRestart: PropTypes.func.isRequired,
+  widget: PropTypes.bool,
+}
+
+DeviceEvents.defaultProps = {
+  widget: false,
+  events: [],
+  error: undefined,
+}
+
+export default connect(
+  (state, props) => {
+    const { devIds } = props
+
+    const appId = getApplicationId(devIds)
+    const devId = getDeviceId(devIds)
+    const combinedId = combineDeviceIds(appId, devId)
+
+    return {
+      devId,
+      appId,
+      events: selectDeviceEvents(state, combinedId),
+      error: selectDeviceEventsError(state, combinedId),
+    }
+  },
+  (dispatch, ownProps) => {
+    const combinedId = combineDeviceIds(ownProps.appId, ownProps.devId)
+
+    return {
+      onClear: () => dispatch(clearDeviceEventsStream(combinedId)),
+      onRestart: () => dispatch(startDeviceEventsStream(combinedId)),
+    }
+  },
+)(DeviceEvents)
