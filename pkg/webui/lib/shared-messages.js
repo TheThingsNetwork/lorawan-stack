@@ -49,6 +49,10 @@ export default defineMessages({
   attributeDescription:
     'Attributes can be used to set arbitrary information about the application, to be used by scripts, or simply for your own organization',
   attributes: 'Attributes',
+  attributeKeyValidateTooShort:
+    'Attribute keys must have at least 3 characters and contain no special characters',
+  attributesValidateRequired:
+    'All attribute entry values are required. Please remove empty entries.',
   automaticUpdates: 'Automatic updates',
   brand: 'Brand',
   cancel: 'Cancel',
