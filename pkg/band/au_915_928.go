@@ -65,6 +65,8 @@ func init() {
 	au_915_928 = Band{
 		ID: AU_915_928,
 
+		EnableADR: true,
+
 		MaxUplinkChannels: 72,
 		UplinkChannels:    uplinkChannels,
 

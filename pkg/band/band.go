@@ -164,6 +164,9 @@ type Band struct {
 	JoinAcceptDelay2 time.Duration
 	// MaxFCntGap
 	MaxFCntGap uint
+
+	// EnableADR determines whether ADR should be enabled.
+	EnableADR bool
 	// ADRAckLimit
 	ADRAckLimit ttnpb.ADRAckLimitExponent
 	// ADRAckDelay

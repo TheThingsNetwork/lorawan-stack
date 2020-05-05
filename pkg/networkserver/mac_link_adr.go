@@ -31,7 +31,7 @@ var (
 	evtReceiveLinkADRReject  = defineReceiveMACRejectEvent("link_adr", "link ADR")()
 )
 
-func deviceNeedsLinkADRReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
+func deviceNeedsLinkADRReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy band.Band) bool {
 	if dev.MACState == nil {
 		return false
 	}
@@ -49,7 +49,7 @@ func deviceNeedsLinkADRReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) boo
 	if dev.MACState.DesiredParameters.ADRNbTrans != dev.MACState.CurrentParameters.ADRNbTrans {
 		return true
 	}
-	if !deviceUseADR(dev, defaults) {
+	if !deviceUseADR(dev, defaults, phy) {
 		return false
 	}
 	return dev.MACState.DesiredParameters.ADRDataRateIndex != dev.MACState.CurrentParameters.ADRDataRateIndex ||
@@ -62,7 +62,7 @@ const (
 )
 
 func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings, phy band.Band) (macCommandEnqueueState, error) {
-	if !deviceNeedsLinkADRReq(dev, defaults) {
+	if !deviceNeedsLinkADRReq(dev, defaults, phy) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,

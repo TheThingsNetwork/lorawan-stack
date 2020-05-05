@@ -62,7 +62,10 @@ func timePtr(t time.Time) *time.Time {
 	return &t
 }
 
-func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
+func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy band.Band) bool {
+	if !phy.EnableADR {
+		return false
+	}
 	if dev.MACSettings != nil && dev.MACSettings.UseADR != nil {
 		return dev.MACSettings.UseADR.Value
 	}
@@ -180,7 +183,7 @@ func deviceNeedsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, t time.
 		deviceNeedsDevStatusReq(dev, defaults, t),
 		deviceNeedsDLChannelReq(dev),
 		deviceNeedsDutyCycleReq(dev),
-		deviceNeedsLinkADRReq(dev, defaults),
+		deviceNeedsLinkADRReq(dev, defaults, phy),
 		deviceNeedsNewChannelReq(dev),
 		deviceNeedsPingSlotChannelReq(dev),
 		deviceNeedsRejoinParamSetupReq(dev),

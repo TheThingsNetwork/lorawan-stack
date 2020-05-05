@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Network Server now records `LinkADRReq` rejections and will not retry rejected values.
 - Improved `NewChannelReq`, `DLChannelReq` and `LinkADRReq` efficiency.
 - Submit buttons are now always enabled in the Console, regardless of the form's validation state.
+- Disabled ADR for `ISM2400` band.
 
 ### Deprecated
 

@@ -70,6 +70,8 @@ func init() {
 	cn_779_787 = Band{
 		ID: CN_779_787,
 
+		EnableADR: true,
+
 		MaxUplinkChannels: 16,
 		UplinkChannels:    defaultChannels,
 

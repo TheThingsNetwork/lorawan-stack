@@ -296,7 +296,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			DevAddr: dev.Session.DevAddr,
 			FCtrl: ttnpb.FCtrl{
 				Ack: up != nil && up.Payload.MHDR.MType == ttnpb.MType_CONFIRMED_UP,
-				ADR: deviceUseADR(dev, ns.defaultMACSettings),
+				ADR: deviceUseADR(dev, ns.defaultMACSettings, phy),
 			},
 		},
 	}
