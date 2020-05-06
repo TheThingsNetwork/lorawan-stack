@@ -56,6 +56,14 @@ func (m *MessageDescriptor) String() string {
 	return m.id
 }
 
+var pathPrefix = func() string {
+	_, file, _, ok := runtime.Caller(0)
+	if !ok {
+		panic("could not determine location of i18n.go")
+	}
+	return strings.TrimSuffix(file, filepath.Join("pkg", "i18n", "i18n.go"))
+}()
+
 // SetSource sets the source package and file name of the message descriptor.
 // The argument skip is the number of stack frames to ascend, with 0 identifying the caller of SetSource.
 func (m *MessageDescriptor) SetSource(skip uint) {
@@ -63,11 +71,7 @@ func (m *MessageDescriptor) SetSource(skip uint) {
 	if !ok {
 		panic("could not determine source of message")
 	}
-	m.Description.Package = filepath.Dir(file)
-	if strings.Contains(m.Description.Package, "lorawan-stack/") {
-		split := strings.Split(m.Description.Package, "lorawan-stack/")
-		m.Description.Package = split[len(split)-1]
-	}
+	m.Description.Package = strings.TrimPrefix(filepath.Dir(file), pathPrefix)
 	m.Description.File = filepath.Base(file)
 }
 

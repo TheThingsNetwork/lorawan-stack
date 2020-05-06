@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.first-to-lower::first-letter
-  text-transform: lowercase
+.first-to-lower
+  display: block
+  &::first-letter
+    text-transform: lowercase
 
-.first-to-upper::first-letter
-  text-transform: uppercase
+.first-to-upper
+  display: block
+  &::first-letter
+    text-transform: uppercase
 
 .uppercase
   text-transform: uppercase

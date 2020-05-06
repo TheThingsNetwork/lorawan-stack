@@ -88,7 +88,6 @@ export default class OAuth extends React.PureComponent {
       this.setState({
         error: error.response.data,
       })
-    } finally {
       setSubmitting(false)
     }
   }

@@ -664,10 +664,6 @@ matchLoop:
 			case ttnpb.CID_ADR_PARAM_SETUP:
 				evs, err = handleADRParamSetupAns(ctx, match.Device)
 			case ttnpb.CID_DEVICE_TIME:
-				if !deduplicated {
-					match.deferMACHandler(handleDeviceTimeReq)
-					continue macLoop
-				}
 				evs, err = handleDeviceTimeReq(ctx, match.Device, up)
 			case ttnpb.CID_REJOIN_PARAM_SETUP:
 				evs, err = handleRejoinParamSetupAns(ctx, match.Device, cmd.GetRejoinParamSetupAns())
@@ -988,7 +984,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			stored.MACState.DesiredParameters.ADRDataRateIndex = stored.MACState.CurrentParameters.ADRDataRateIndex
 			stored.MACState.DesiredParameters.ADRTxPowerIndex = stored.MACState.CurrentParameters.ADRTxPowerIndex
 			stored.MACState.DesiredParameters.ADRNbTrans = stored.MACState.CurrentParameters.ADRNbTrans
-			if !pld.FHDR.ADR || !deviceUseADR(stored, ns.defaultMACSettings) {
+			if !pld.FHDR.ADR || !deviceUseADR(stored, ns.defaultMACSettings, matched.phy) {
 				stored.RecentADRUplinks = nil
 				return stored, paths, nil
 			}
@@ -1257,7 +1253,11 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	matched = stored
 	ctx = storedCtx
 
+	// TODO: Extract this into a utility function shared with handleRejoinRequest. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
 	downAt := up.ReceivedAt.Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - req.RxDelay.Duration()/2 - nsScheduleWindow())
+	if earliestAt := timeNow().Add(nsScheduleWindow()); downAt.Before(earliestAt) {
+		downAt = earliestAt
+	}
 	logger.WithField("start_at", downAt).Debug("Add downlink task")
 	if err := ns.downlinkTasks.Add(ctx, stored.EndDeviceIdentifiers, downAt, true); err != nil {
 		logger.WithError(err).Error("Failed to add downlink task after join-request")

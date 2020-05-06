@@ -26,8 +26,11 @@
 
   &-visible
     visibility: visible
-    opacity: .8
+    opacity: .85
+    z-index: $zi.overlay
 
   &-wrapper
     position: relative
-    z-index: $zi.slight
+
+  &-spinner
+    z-index: $zi.overlay + 1

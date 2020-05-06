@@ -285,11 +285,11 @@ We follow the [official go guidelines](https://github.com/golang/go/wiki/CodeRev
 | :------------------: | :-----: | :-----------------------------------------------------------: |
 | context              | ctx     | context.Context                                               |
 | mutex                | mu      | sync.Mutex                                                    |
-| configuration        | conf    | go.thethings.network/lorawan-stack/pkg/config.Config          |
-| logger               | logger  | go.thethings.network/lorawan-stack/pkg/log.Logger             |
+| configuration        | conf    | go.thethings.network/lorawan-stack/pkg/v3/config.Config       |
+| logger               | logger  | go.thethings.network/lorawan-stack/pkg/v3/log.Logger          |
 | message              | msg     | go.thethings.network/lorawan-stack/api/gateway.UplinkMessage  |
 | status               | st      | go.thethings.network/lorawan-stack/api/gateway.Status         |
-| server               | srv     | go.thethings.network/lorawan-stack/pkg/network-server.Server  |
+| server               | srv     | go.thethings.network/lorawan-stack/pkg/v3/networkserver.Server|
 | ID                   | id      | string                                                        |
 | unique ID            | uid     | string                                                        |
 | counter              | cnt     | int                                                           |
