@@ -52,7 +52,7 @@ func New(ctx context.Context, io io.Server, registry Registry) (Server, error) {
 		handlers: make(map[string]ApplicationPackageHandler),
 	}
 	for _, p := range registeredPackages {
-		s.handlers[p.Name] = p.new(io, registry)
+		s.handlers[p.Name] = p.create(io, registry)
 	}
 	return s, nil
 }
