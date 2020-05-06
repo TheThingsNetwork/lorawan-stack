@@ -78,20 +78,21 @@ class Button extends React.PureComponent {
   }
 
   render() {
-    const { autoFocus, disabled, name, type, value, title: rawTitle, intl } = this.props
+    const { autoFocus, disabled, name, type, value, title: rawTitle, intl, busy } = this.props
 
     let title = rawTitle
     if (typeof rawTitle === 'object' && rawTitle.id && rawTitle.defaultMessage) {
       title = intl.formatMessage(title)
     }
 
-    const htmlProps = { autoFocus, disabled, name, type, value, title }
+    const htmlProps = { autoFocus, name, type, value, title }
     const buttonClassNames = assembleClassnames(this.props)
     return (
       <button
         className={buttonClassNames}
         onClick={this.handleClick}
         children={buttonChildren(this.props)}
+        disabled={busy || disabled}
         {...htmlProps}
       />
     )

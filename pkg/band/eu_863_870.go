@@ -58,6 +58,8 @@ func init() {
 	eu_863_870 = Band{
 		ID: EU_863_870,
 
+		EnableADR: true,
+
 		MaxUplinkChannels: 16,
 		UplinkChannels:    defaultChannels,
 

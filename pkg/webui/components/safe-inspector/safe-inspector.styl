@@ -51,11 +51,12 @@ $height-small = 2rem
     &:not(.button-swap)
       border-input('left')
 
-    &:hover
-      color: black
+    &:not(:disabled)
+      &:hover
+        color: black
 
-    &:active
-      background-color: $c-backdrop
+      &:active
+        background-color: $c-backdrop
 
   & > span // Byte-order.
     nudge('up', 2px)

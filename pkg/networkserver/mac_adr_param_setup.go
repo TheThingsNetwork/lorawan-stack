@@ -43,7 +43,9 @@ func deviceADRAckDelay(dev *ttnpb.EndDevice, phy band.Band) ttnpb.ADRAckDelayExp
 }
 
 func deviceNeedsADRParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
-	if dev.MACState == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+	if dev.GetMulticast() ||
+		dev.GetMACState() == nil ||
+		dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		return false
 	}
 	return dev.MACState.DesiredParameters.ADRAckLimitExponent != nil &&

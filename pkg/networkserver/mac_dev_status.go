@@ -68,19 +68,19 @@ func deviceNeedsDevStatusReqAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings)
 	return dev.LastDevStatusReceivedAt.Add(tp).UTC(), true
 }
 
-func deviceNeedsDevStatusReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, scheduleAt time.Time) bool {
-	if dev.MACState == nil {
+func deviceNeedsDevStatusReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, transmitAt time.Time) bool {
+	if dev.GetMulticast() || dev.GetMACState() == nil {
 		return false
 	}
 	timedAt, timeBound := deviceNeedsDevStatusReqAt(dev, defaults)
 	cp := deviceStatusCountPeriodicity(dev, defaults)
 	return (cp != 0 || timeBound) && dev.LastDevStatusReceivedAt == nil ||
 		cp != 0 && dev.MACState.LastDevStatusFCntUp+cp <= dev.Session.LastFCntUp ||
-		timeBound && !timedAt.After(scheduleAt)
+		timeBound && !timedAt.After(transmitAt)
 }
 
-func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings, scheduleAt time.Time) macCommandEnqueueState {
-	if !deviceNeedsDevStatusReq(dev, defaults, scheduleAt) {
+func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings, transmitAt time.Time) macCommandEnqueueState {
+	if !deviceNeedsDevStatusReq(dev, defaults, transmitAt) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,

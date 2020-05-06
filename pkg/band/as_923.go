@@ -43,6 +43,8 @@ func init() {
 	as_923 = Band{
 		ID: AS_923,
 
+		EnableADR: true,
+
 		MaxUplinkChannels: 16,
 		UplinkChannels:    defaultChannels,
 

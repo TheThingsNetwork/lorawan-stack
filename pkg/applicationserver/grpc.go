@@ -83,7 +83,6 @@ func (as *ApplicationServer) GetLinkStats(ctx context.Context, ids *ttnpb.Applic
 	if err != nil {
 		return nil, err
 	}
-	<-link.connReady
 
 	stats := &ttnpb.ApplicationLinkStats{}
 	lt := link.GetLinkTime()

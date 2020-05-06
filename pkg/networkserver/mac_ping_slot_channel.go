@@ -29,7 +29,8 @@ var (
 
 func deviceNeedsPingSlotChannelReq(dev *ttnpb.EndDevice) bool {
 	switch {
-	case dev.MACState == nil:
+	case dev.GetMulticast(),
+		dev.GetMACState() == nil:
 		return false
 	case dev.MACState.DesiredParameters.PingSlotFrequency != dev.MACState.CurrentParameters.PingSlotFrequency:
 		return true
