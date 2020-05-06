@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"os"
 
-	_ "go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/commands"
-	_ "go.thethings.network/lorawan-stack/cmd/ttn-lw-stack/commands"
-	"go.thethings.network/lorawan-stack/pkg/i18n"
+	_ "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/commands"
+	_ "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-stack/commands"
+	"go.thethings.network/lorawan-stack/v3/pkg/i18n"
 )
 
 func main() {
