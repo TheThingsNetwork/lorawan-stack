@@ -584,6 +584,58 @@
           ]
         }
       ]
+    },
+    "GetDefaultAssociation": {
+      "file": "lorawan-stack/api/applicationserver_packages.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{ids.application_ids.application_id}/packages/associations/{ids.f_port}",
+          "parameters": [
+            "ids.application_ids.application_id",
+            "ids.f_port"
+          ]
+        }
+      ]
+    },
+    "ListDefaultAssociations": {
+      "file": "lorawan-stack/api/applicationserver_packages.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{ids.application_id}/packages/associations",
+          "parameters": [
+            "ids.application_id"
+          ]
+        }
+      ]
+    },
+    "SetApplicationAssociation": {
+      "file": "lorawan-stack/api/applicationserver_packages.proto",
+      "http": [
+        {
+          "method": "put",
+          "pattern": "/as/applications/{default.ids.application_ids.application_id}/packages/associations/{default.ids.f_port}",
+          "body": "*",
+          "parameters": [
+            "default.ids.application_ids.application_id",
+            "default.ids.f_port"
+          ]
+        }
+      ]
+    },
+    "DeleteDefaultAssociation": {
+      "file": "lorawan-stack/api/applicationserver_packages.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/as/applications/{application_ids.application_id}/packages/associations/{f_port}",
+          "parameters": [
+            "application_ids.application_id",
+            "f_port"
+          ]
+        }
+      ]
     }
   },
   "ApplicationPubSubRegistry": {

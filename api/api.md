@@ -36,10 +36,16 @@
   - [Message `ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation)
   - [Message `ApplicationPackageAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageAssociationIdentifiers)
   - [Message `ApplicationPackageAssociations`](#ttn.lorawan.v3.ApplicationPackageAssociations)
+  - [Message `ApplicationPackageDefaultAssociation`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociation)
+  - [Message `ApplicationPackageDefaultAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociationIdentifiers)
+  - [Message `ApplicationPackageDefaultAssociations`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociations)
   - [Message `ApplicationPackages`](#ttn.lorawan.v3.ApplicationPackages)
   - [Message `GetApplicationPackageAssociationRequest`](#ttn.lorawan.v3.GetApplicationPackageAssociationRequest)
+  - [Message `GetApplicationPackageDefaultAssociationRequest`](#ttn.lorawan.v3.GetApplicationPackageDefaultAssociationRequest)
   - [Message `ListApplicationPackageAssociationRequest`](#ttn.lorawan.v3.ListApplicationPackageAssociationRequest)
+  - [Message `ListApplicationPackageDefaultAssociationRequest`](#ttn.lorawan.v3.ListApplicationPackageDefaultAssociationRequest)
   - [Message `SetApplicationPackageAssociationRequest`](#ttn.lorawan.v3.SetApplicationPackageAssociationRequest)
+  - [Message `SetApplicationPackageDefaultAssociationRequest`](#ttn.lorawan.v3.SetApplicationPackageDefaultAssociationRequest)
   - [Service `ApplicationPackageRegistry`](#ttn.lorawan.v3.ApplicationPackageRegistry)
 - [File `lorawan-stack/api/applicationserver_pubsub.proto`](#lorawan-stack/api/applicationserver_pubsub.proto)
   - [Message `ApplicationPubSub`](#ttn.lorawan.v3.ApplicationPubSub)
@@ -882,6 +888,43 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | ----- | ---- | ----- | ----------- |
 | `associations` | [`ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation) | repeated |  |
 
+### <a name="ttn.lorawan.v3.ApplicationPackageDefaultAssociation">Message `ApplicationPackageDefaultAssociation`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`ApplicationPackageDefaultAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociationIdentifiers) |  |  |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `package_name` | [`string`](#string) |  |  |
+| `data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+| `package_name` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationPackageDefaultAssociationIdentifiers">Message `ApplicationPackageDefaultAssociationIdentifiers`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `f_port` | [`uint32`](#uint32) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+| `f_port` | <p>`uint32.lte`: `255`</p><p>`uint32.gte`: `1`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationPackageDefaultAssociations">Message `ApplicationPackageDefaultAssociations`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `defaults` | [`ApplicationPackageDefaultAssociation`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociation) | repeated |  |
+
 ### <a name="ttn.lorawan.v3.ApplicationPackages">Message `ApplicationPackages`</a>
 
 | Field | Type | Label | Description |
@@ -893,6 +936,19 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `ids` | [`ApplicationPackageAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageAssociationIdentifiers) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GetApplicationPackageDefaultAssociationRequest">Message `GetApplicationPackageDefaultAssociationRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`ApplicationPackageDefaultAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociationIdentifiers) |  |  |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
 
 #### Field Rules
@@ -917,6 +973,22 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `ids` | <p>`message.required`: `true`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
+### <a name="ttn.lorawan.v3.ListApplicationPackageDefaultAssociationRequest">Message `ListApplicationPackageDefaultAssociationRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. Each page is ordered by the FPort. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+
 ### <a name="ttn.lorawan.v3.SetApplicationPackageAssociationRequest">Message `SetApplicationPackageAssociationRequest`</a>
 
 | Field | Type | Label | Description |
@@ -930,15 +1002,32 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | ----- | ----------- |
 | `association` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.SetApplicationPackageDefaultAssociationRequest">Message `SetApplicationPackageDefaultAssociationRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `default` | [`ApplicationPackageDefaultAssociation`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociation) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `default` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.ApplicationPackageRegistry">Service `ApplicationPackageRegistry`</a>
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `List` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`ApplicationPackages`](#ttn.lorawan.v3.ApplicationPackages) | List returns the available packages for the end device. |
-| `GetAssociation` | [`GetApplicationPackageAssociationRequest`](#ttn.lorawan.v3.GetApplicationPackageAssociationRequest) | [`ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation) | Get returns the application package association registered on the FPort of the end device. |
-| `ListAssociations` | [`ListApplicationPackageAssociationRequest`](#ttn.lorawan.v3.ListApplicationPackageAssociationRequest) | [`ApplicationPackageAssociations`](#ttn.lorawan.v3.ApplicationPackageAssociations) | ListAssociations returns all of the application package associations of the end device. |
-| `SetAssociation` | [`SetApplicationPackageAssociationRequest`](#ttn.lorawan.v3.SetApplicationPackageAssociationRequest) | [`ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation) | SetAssociation updates or creates the application package association on the FPort of the end device. |
-| `DeleteAssociation` | [`ApplicationPackageAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageAssociationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | DeleteAssociation removes the application package association on the FPort of the end device. |
+| `GetAssociation` | [`GetApplicationPackageAssociationRequest`](#ttn.lorawan.v3.GetApplicationPackageAssociationRequest) | [`ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation) | GetAssociation returns the association registered on the FPort of the end device. |
+| `ListAssociations` | [`ListApplicationPackageAssociationRequest`](#ttn.lorawan.v3.ListApplicationPackageAssociationRequest) | [`ApplicationPackageAssociations`](#ttn.lorawan.v3.ApplicationPackageAssociations) | ListAssociations returns all of the associations of the end device. |
+| `SetAssociation` | [`SetApplicationPackageAssociationRequest`](#ttn.lorawan.v3.SetApplicationPackageAssociationRequest) | [`ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation) | SetAssociation updates or creates the association on the FPort of the end device. |
+| `DeleteAssociation` | [`ApplicationPackageAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageAssociationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | DeleteAssociation removes the association on the FPort of the end device. |
+| `GetDefaultAssociation` | [`GetApplicationPackageDefaultAssociationRequest`](#ttn.lorawan.v3.GetApplicationPackageDefaultAssociationRequest) | [`ApplicationPackageDefaultAssociation`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociation) | GetDefaultAssociation returns the default association registered on the FPort of the application. |
+| `ListDefaultAssociations` | [`ListApplicationPackageDefaultAssociationRequest`](#ttn.lorawan.v3.ListApplicationPackageDefaultAssociationRequest) | [`ApplicationPackageDefaultAssociations`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociations) | ListDefaultAssociations returns all of the default associations of the application. |
+| `SetDefaultAssociation` | [`SetApplicationPackageDefaultAssociationRequest`](#ttn.lorawan.v3.SetApplicationPackageDefaultAssociationRequest) | [`ApplicationPackageDefaultAssociation`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociation) | SetDefaultAssociation updates or creates the default association on the FPort of the application. |
+| `DeleteDefaultAssociation` | [`ApplicationPackageDefaultAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | DeleteDefaultAssociation removes the default association on the FPort of the application. |
 
 #### HTTP bindings
 
@@ -949,6 +1038,10 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `ListAssociations` | `GET` | `/api/v3/as/applications/{ids.application_ids.application_id}/devices/{ids.device_id}/packages/associations` |  |
 | `SetAssociation` | `PUT` | `/api/v3/as/applications/{association.ids.end_device_ids.application_ids.application_id}/devices/{association.ids.end_device_ids.device_id}/packages/associations/{association.ids.f_port}` | `*` |
 | `DeleteAssociation` | `DELETE` | `/api/v3/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/associations/{f_port}` |  |
+| `GetDefaultAssociation` | `GET` | `/api/v3/as/applications/{ids.application_ids.application_id}/packages/associations/{ids.f_port}` |  |
+| `ListDefaultAssociations` | `GET` | `/api/v3/as/applications/{ids.application_id}/packages/associations` |  |
+| `SetDefaultAssociation` | `PUT` | `/api/v3/as/applications/{default.ids.application_ids.application_id}/packages/associations/{default.ids.f_port}` | `*` |
+| `DeleteDefaultAssociation` | `DELETE` | `/api/v3/as/applications/{application_ids.application_id}/packages/associations/{f_port}` |  |
 
 ## <a name="lorawan-stack/api/applicationserver_pubsub.proto">File `lorawan-stack/api/applicationserver_pubsub.proto`</a>
 
