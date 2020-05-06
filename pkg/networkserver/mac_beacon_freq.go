@@ -29,8 +29,8 @@ var (
 )
 
 func deviceNeedsBeaconFreqReq(dev *ttnpb.EndDevice) bool {
-	return dev.MACState != nil &&
-		dev.MACState.DeviceClass == ttnpb.CLASS_B &&
+	return !dev.GetMulticast() &&
+		dev.GetMACState().GetDeviceClass() == ttnpb.CLASS_B &&
 		dev.MACState.DesiredParameters.BeaconFrequency != dev.MACState.CurrentParameters.BeaconFrequency
 }
 

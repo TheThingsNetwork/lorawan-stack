@@ -277,7 +277,13 @@ func (as *ApplicationServer) getLink(ctx context.Context, ids ttnpb.ApplicationI
 		}
 		return nil, errNotLinked.WithAttributes("application_uid", uid)
 	}
-	return val.(*link), nil
+	link := val.(*link)
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case <-link.connReady:
+		return link, nil
+	}
 }
 
 func (l *link) run() {
@@ -313,7 +319,6 @@ func (as *ApplicationServer) SendUp(ctx context.Context, up *ttnpb.ApplicationUp
 	if err != nil {
 		return err
 	}
-	<-link.connReady
 	return link.sendUp(ctx, up, func() error { return nil })
 }
 

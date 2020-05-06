@@ -144,13 +144,20 @@ export class SafeInspector extends Component {
 
   handleCopyClick(e) {
     const { noCopyPopup } = this.props
+    const { copied } = this.state
+
+    e.stopPropagation()
+
+    if (copied) {
+      return
+    }
+
     this.setState({ copied: true, copyIcon: 'done' })
     if (noCopyPopup) {
       this._timer = setTimeout(() => {
         this.setState({ copied: false, copyIcon: 'file_copy' })
       }, 2000)
     }
-    e.stopPropagation()
   }
 
   handleCopyAnimationEnd() {
@@ -278,6 +285,7 @@ export class SafeInspector extends Component {
               onClick={this.handleCopyClick}
               data-clipboard-text={formattedData}
               ref={this.copyElem}
+              disabled={copied}
             >
               <Icon
                 className={copyButtonStyle}

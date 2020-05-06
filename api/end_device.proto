@@ -357,6 +357,9 @@ message MACState {
 
   // Frequencies rejected by the device.
   repeated uint64 rejected_frequencies = 19 [(validate.rules).repeated.items.uint64.gte = 100000];
+
+  // Time when the last downlink message was scheduled.
+  google.protobuf.Timestamp last_downlink_at = 20 [(gogoproto.stdtime) = true];
 }
 
 // Power state of the device.

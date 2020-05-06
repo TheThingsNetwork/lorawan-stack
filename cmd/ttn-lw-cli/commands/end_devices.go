@@ -86,6 +86,7 @@ func forwardDeprecatedDeviceFlags(flagSet *pflag.FlagSet) {
 }
 
 var (
+	errActivationMode               = errors.DefineInvalidArgument("activation_mode", "invalid activation mode")
 	errConflictingPaths             = errors.DefineInvalidArgument("conflicting_paths", "conflicting set and unset field mask paths")
 	errEndDeviceEUIUpdate           = errors.DefineInvalidArgument("end_device_eui_update", "end device EUIs can not be updated")
 	errEndDeviceKeysWithProvisioner = errors.DefineInvalidArgument("end_device_keys_provisioner", "end device ABP or OTAA keys cannot be set when there is a provisioner")
@@ -349,6 +350,9 @@ var (
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, attributesFlags())
 
+			abp, _ := cmd.Flags().GetBool("abp")
+			multicast, _ := cmd.Flags().GetBool("multicast")
+			abp = abp || multicast
 			var device ttnpb.EndDevice
 			if inputDecoder != nil {
 				decodedPaths, err := inputDecoder.Decode(&device)
@@ -356,6 +360,13 @@ var (
 					return err
 				}
 				paths = append(paths, ttnpb.FlattenPaths(decodedPaths, endDeviceFlattenPaths)...)
+
+				if ttnpb.ContainsField("supports_join", paths) {
+					if abp && device.SupportsJoin {
+						return errActivationMode.New()
+					}
+					abp = !device.SupportsJoin
+				}
 			}
 
 			setDefaults, _ := cmd.Flags().GetBool("defaults")
@@ -377,9 +388,7 @@ var (
 				}
 			}
 
-			abp, _ := cmd.Flags().GetBool("abp")
-			multicast, _ := cmd.Flags().GetBool("multicast")
-			if abp || multicast {
+			if abp {
 				device.SupportsJoin = false
 				if config.NetworkServerEnabled {
 					paths = append(paths, "supports_join")

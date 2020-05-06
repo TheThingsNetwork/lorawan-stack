@@ -449,6 +449,27 @@ var RxMetadata = [...]*ttnpb.RxMetadata{
 	},
 }
 
+var GatewayAntennaIdentifiers = [...]ttnpb.GatewayAntennaIdentifiers{
+	{
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-0"},
+		AntennaIndex:       3,
+	},
+	{
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-1"},
+		AntennaIndex:       1,
+	},
+	{
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-2"},
+	},
+	{
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-3"},
+		AntennaIndex:       2,
+	},
+	{
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-4"},
+	},
+}
+
 func MakeUplinkSettings(dr ttnpb.DataRate, freq uint64) ttnpb.TxSettings {
 	return ttnpb.TxSettings{
 		DataRate:  *deepcopy.Copy(&dr).(*ttnpb.DataRate),
@@ -1888,14 +1909,9 @@ func MakeTestCaseName(parts ...string) string {
 func ForEachBand(t *testing.T, f func(func(...string) string, band.Band, ttnpb.PHYVersion)) {
 	for phyID, phy := range band.All {
 		for _, phyVersion := range phy.Versions() {
-			phy, err := phy.Version(phyVersion)
-			if err != nil {
-				t.Errorf("Failed to convert %s band to %s version", phyID, phyVersion)
-				continue
-			}
 			f(func(parts ...string) string {
 				return MakeTestCaseName(append(parts, fmt.Sprintf("%s/PHY:%s", phyID, phyVersion.String()))...)
-			}, phy, phyVersion)
+			}, Band(phyID, phyVersion), phyVersion)
 		}
 	}
 }
@@ -1944,21 +1960,15 @@ func ForEachClass(f func(func(...string) string, ttnpb.Class)) {
 }
 
 func ForEachFrequencyPlan(t *testing.T, f func(func(...string) string, string, *frequencyplans.FrequencyPlan)) {
-	fps := frequencyplans.NewStore(test.FrequencyPlansFetcher)
-	fpIDs, err := fps.GetAllIDs()
+	fpIDs, err := frequencyplans.NewStore(test.FrequencyPlansFetcher).GetAllIDs()
 	if err != nil {
 		t.Errorf("failed to get frequency plans: %w", err)
 		return
 	}
 	for _, fpID := range fpIDs {
-		fp, err := fps.GetByID(fpID)
-		if err != nil {
-			t.Errorf("failed to get frequency plan `%s`: %w", fpID, err)
-			continue
-		}
 		f(func(parts ...string) string {
 			return MakeTestCaseName(append(parts, fmt.Sprintf("FP:%s", fpID))...)
-		}, fpID, fp)
+		}, fpID, FrequencyPlan(fpID))
 	}
 }
 
@@ -2000,15 +2010,10 @@ func ForEachFrequencyPlanBandMACVersion(t *testing.T, f func(func(...string) str
 			return
 		}
 		for _, phyVersion := range phy.Versions() {
-			phy, err := phy.Version(phyVersion)
-			if err != nil {
-				t.Errorf("Failed to convert band `%s` to version `%s`: %s", fp.BandID, phyVersion, err)
-				continue
-			}
 			ForEachMACVersion(func(makeMACName func(parts ...string) string, macVersion ttnpb.MACVersion) {
 				f(func(parts ...string) string {
 					return makeFPName(makeMACName(append(parts, fmt.Sprintf("PHY:%s", phyVersion))...))
-				}, fpID, fp, phy, phyVersion, macVersion)
+				}, fpID, fp, Band(fp.BandID, phyVersion), phyVersion, macVersion)
 			})
 		}
 	})
