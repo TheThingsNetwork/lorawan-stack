@@ -18,7 +18,6 @@ Gateway:
 
 Gateway ID:
   description: A unique, human-readable identifier for your gateway.
-  link: /reference/
 
 Gateway EUI:
   description: A 64 bit extended unique identifier for your gateway. This is programmed by the manufacturer and should not be changed. In cases where it is not programmed by the manufacturer, it must be programmed with a unique EUI that you own.
@@ -85,7 +84,7 @@ Wide area network:
     - WAN
 
 ISM Radio Bands:
-  description: The Industrial, Scientific, and Medical Frequency Bands, most commonly used for low-power and short range telecommunications, such as WiFi, Bluetooth, Zigbee, wireless telephones, RFID, and NFC.
+  description: The Industrial, Scientific, and Medical Bands, most commonly used for low-power and short range telecommunications, such as WiFi, Bluetooth, Zigbee, wireless telephones, RFID, and NFC.
   link: https://en.wikipedia.org/wiki/ISM_band
 
 Payload:
@@ -212,22 +211,24 @@ Dwell time:
 Dwell time configuration:
   description: The Dwell time restrictions are configurable for each Frequency Plan. In regions where dwell time limitations are optional, they're disabled by default.
 
-Frequency Band:
-  description: For LoRaWAN, a Frequency Band is a range of frequencies divided either in to dynamic channels (i.e. EU868) or fixed channels (i.e. US902, AU915). The LoRaWAN Regional Parameters specify which Frequency Bands are supported by LoRaWAN in a geographical area. Within a Frequency Band, there can be multiple complying Frequency Plans. Devices typically support one or more Frequency Bands in their hardware, and are configured for a particular Frequency Plan as part of activation.
+Band:
+  description: For LoRaWAN, a Band is a range of frequencies divided either in to dynamic channels (i.e. EU868) or fixed channels (i.e. US902, AU915). The LoRaWAN Regional Parameters specify which Bands are supported by LoRaWAN in a geographical area. Within a Band, there can be multiple complying Frequency Plans. Devices typically support one or more Bands in their hardware, and are configured for a particular Frequency Plan as part of activation.
   link: https://lora-alliance.org/sites/default/files/2020-01/rp_2-1.0.0_final_release.pdf
   alt:
-    - Band
+    - Frequency Band
 
 Frequency Plan:
-  description: A Frequency Plan complies with the regulations specified in the LoRaWAN Regional Parameters for a particular Frequency Band. A Frequency Plan can additionally support different data rates within that Frequency Band. Devices support any Frequency Plan within a supported Frequency Band, and are configured for a particular Frequency Plan as part of activation. A complete list of Frequency Plans supported by The Things Stack is available via Github at the link below.
+  description: A Frequency Plan complies with the regulations specified in the LoRaWAN Regional Parameters for a particular Band. A Frequency Plan can additionally support different data rates within that Band. Devices support any Frequency Plan within a supported Band, and are configured for a particular Frequency Plan as part of activation. A complete list of Frequency Plans supported by The Things Stack is available via Github at the link below.
   link: https://github.com/TheThingsNetwork/lorawan-frequency-plans
   abbr:
     - FP
+  alt:
+    - Channel Plan
 
 Dynamic Channel:
-  description: A Frequency Band which uses Dynamic Channels (i.e. EU868) uses a Channel Frequency List (CFList) to communicate channels by frequency.
+  description: A Band which uses Dynamic Channels (i.e. EU868) uses a Channel Frequency List (CFList) to communicate channels by frequency.
   link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=50
 
 Fixed Channel:
-  description: A Frequency Band which uses Fixed Channels (i.e. US902, AU915) uses a Channel Mask (ChMask) to enable and disable channels.
+  description: A Band which uses Fixed Channels (i.e. US902, AU915) uses a Channel Mask (ChMask) to enable and disable channels.
   link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=50
