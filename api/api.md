@@ -2227,6 +2227,7 @@ This is used internally by the Network Server and is read only.
 | `rejected_adr_data_rate_indexes` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) | repeated | ADR Data rate index values rejected by the device. Reset each time `current_parameters.channels` change. Elements are sorted in ascending order. |
 | `rejected_adr_tx_power_indexes` | [`uint32`](#uint32) | repeated | ADR TX output power index values rejected by the device. Elements are sorted in ascending order. |
 | `rejected_frequencies` | [`uint64`](#uint64) | repeated | Frequencies rejected by the device. |
+| `last_downlink_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the last downlink message was scheduled. |
 
 #### Field Rules
 

@@ -1262,7 +1262,11 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	matched = stored
 	ctx = storedCtx
 
+	// TODO: Extract this into a utility function shared with handleRejoinRequest. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
 	downAt := up.ReceivedAt.Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - req.RxDelay.Duration()/2 - nsScheduleWindow())
+	if earliestAt := timeNow().Add(nsScheduleWindow()); downAt.Before(earliestAt) {
+		downAt = earliestAt
+	}
 	logger.WithField("start_at", downAt).Debug("Add downlink task")
 	if err := ns.downlinkTasks.Add(ctx, stored.EndDeviceIdentifiers, downAt, true); err != nil {
 		logger.WithError(err).Error("Failed to add downlink task after join-request")

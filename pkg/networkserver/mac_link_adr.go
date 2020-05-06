@@ -32,7 +32,7 @@ var (
 )
 
 func deviceNeedsLinkADRReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy band.Band) bool {
-	if dev.MACState == nil {
+	if dev.GetMulticast() || dev.GetMACState() == nil {
 		return false
 	}
 	// TODO: Check that a LinkADRReq *can* be scheduled given the rejections received so far. (https://github.com/TheThingsNetwork/lorawan-stack/issues/2192)

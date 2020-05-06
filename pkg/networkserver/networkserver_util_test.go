@@ -449,6 +449,27 @@ var RxMetadata = [...]*ttnpb.RxMetadata{
 	},
 }
 
+var GatewayAntennaIdentifiers = [...]ttnpb.GatewayAntennaIdentifiers{
+	{
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-0"},
+		AntennaIndex:       3,
+	},
+	{
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-1"},
+		AntennaIndex:       1,
+	},
+	{
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-2"},
+	},
+	{
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-3"},
+		AntennaIndex:       2,
+	},
+	{
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-4"},
+	},
+}
+
 func MakeUplinkSettings(dr ttnpb.DataRate, freq uint64) ttnpb.TxSettings {
 	return ttnpb.TxSettings{
 		DataRate:  *deepcopy.Copy(&dr).(*ttnpb.DataRate),
