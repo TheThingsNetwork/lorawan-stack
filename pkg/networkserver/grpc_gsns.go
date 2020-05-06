@@ -664,10 +664,6 @@ matchLoop:
 			case ttnpb.CID_ADR_PARAM_SETUP:
 				evs, err = handleADRParamSetupAns(ctx, match.Device)
 			case ttnpb.CID_DEVICE_TIME:
-				if !deduplicated {
-					match.deferMACHandler(handleDeviceTimeReq)
-					continue macLoop
-				}
 				evs, err = handleDeviceTimeReq(ctx, match.Device, up)
 			case ttnpb.CID_REJOIN_PARAM_SETUP:
 				evs, err = handleRejoinParamSetupAns(ctx, match.Device, cmd.GetRejoinParamSetupAns())
