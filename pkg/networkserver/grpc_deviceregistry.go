@@ -248,16 +248,16 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") && (req.EndDevice.Session == nil || req.EndDevice.Session.DevAddr.IsZero()) {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.dev_addr")
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.f_nwk_s_int_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.GetFNwkSIntKey().GetKey().IsZero()) {
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.f_nwk_s_int_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.FNwkSIntKey.GetKey().IsZero()) {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.keys.f_nwk_s_int_key.key")
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.nwk_s_enc_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.GetNwkSEncKey().GetKey().IsZero()) {
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.nwk_s_enc_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.NwkSEncKey.GetKey().IsZero()) {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.keys.nwk_s_enc_key.key")
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.s_nwk_s_int_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.GetSNwkSIntKey().GetKey().IsZero()) {
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.s_nwk_s_int_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.SNwkSIntKey.GetKey().IsZero()) {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.keys.s_nwk_s_int_key.key")
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.session_key_id") && (req.EndDevice.Session == nil || len(req.EndDevice.Session.GetSessionKeyID()) == 0) {
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.session_key_id") && (req.EndDevice.Session == nil || len(req.EndDevice.Session.SessionKeyID) == 0) {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.keys.session_key_id")
 	}
 
@@ -269,34 +269,12 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		return nil, err
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths,
-		"mac_state.queued_join_accept.keys.f_nwk_s_int_key.encrypted_key",
-		"mac_state.queued_join_accept.keys.f_nwk_s_int_key.kek_label",
 		"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
-		"mac_state.queued_join_accept.keys.nwk_s_enc_key.encrypted_key",
-		"mac_state.queued_join_accept.keys.nwk_s_enc_key.kek_label",
 		"mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
-		"mac_state.queued_join_accept.keys.s_nwk_s_int_key.encrypted_key",
-		"mac_state.queued_join_accept.keys.s_nwk_s_int_key.kek_label",
 		"mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
 		"mac_state.queued_join_accept.keys.session_key_id",
-		"pending_session.keys.f_nwk_s_int_key.encrypted_key",
-		"pending_session.keys.f_nwk_s_int_key.kek_label",
-		"pending_session.keys.f_nwk_s_int_key.key",
-		"pending_session.keys.nwk_s_enc_key.encrypted_key",
-		"pending_session.keys.nwk_s_enc_key.kek_label",
-		"pending_session.keys.nwk_s_enc_key.key",
-		"pending_session.keys.s_nwk_s_int_key.encrypted_key",
-		"pending_session.keys.s_nwk_s_int_key.kek_label",
-		"pending_session.keys.s_nwk_s_int_key.key",
-		"pending_session.keys.session_key_id",
-		"session.keys.f_nwk_s_int_key.encrypted_key",
-		"session.keys.f_nwk_s_int_key.kek_label",
 		"session.keys.f_nwk_s_int_key.key",
-		"session.keys.nwk_s_enc_key.encrypted_key",
-		"session.keys.nwk_s_enc_key.kek_label",
 		"session.keys.nwk_s_enc_key.key",
-		"session.keys.s_nwk_s_int_key.encrypted_key",
-		"session.keys.s_nwk_s_int_key.kek_label",
 		"session.keys.s_nwk_s_int_key.key",
 		"session.keys.session_key_id",
 	) {
@@ -398,7 +376,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 			if ttnpb.HasAnyField(sets, "session.dev_addr") {
 				req.EndDevice.DevAddr = &req.EndDevice.Session.DevAddr
-				sets = append(sets, "ids.dev_addr")
+				sets = ttnpb.AddFields(sets,
+					"ids.dev_addr",
+				)
 			}
 			if ttnpb.HasAnyField(sets,
 				"frequency_plan_id",
@@ -514,18 +494,14 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 		} else {
 			if err := ttnpb.ProhibitFields(sets,
-				"session.keys.nwk_s_enc_key.encrypted_key",
-				"session.keys.nwk_s_enc_key.kek_label",
 				"session.keys.nwk_s_enc_key.key",
-				"session.keys.s_nwk_s_int_key.encrypted_key",
-				"session.keys.s_nwk_s_int_key.kek_label",
 				"session.keys.s_nwk_s_int_key.key",
 			); err != nil {
 				return nil, nil, errInvalidFieldMask.WithCause(err)
 			}
 			req.EndDevice.Session.NwkSEncKey = req.EndDevice.Session.FNwkSIntKey
 			req.EndDevice.Session.SNwkSIntKey = req.EndDevice.Session.FNwkSIntKey
-			sets = append(sets,
+			sets = ttnpb.AddFields(sets,
 				"session.keys.nwk_s_enc_key.encrypted_key",
 				"session.keys.nwk_s_enc_key.kek_label",
 				"session.keys.s_nwk_s_int_key.encrypted_key",
@@ -537,7 +513,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.started_at")
 		} else if !ttnpb.HasAnyField(sets, "session.started_at") {
 			req.EndDevice.Session.StartedAt = timeNow().UTC()
-			sets = append(sets, "session.started_at")
+			sets = ttnpb.AddFields(sets,
+				"session.started_at",
+			)
 		}
 
 		macState, err := newMACState(&req.EndDevice, ns.FrequencyPlans, ns.defaultMACSettings)
