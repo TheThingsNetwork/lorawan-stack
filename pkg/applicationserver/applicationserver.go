@@ -861,7 +861,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 				client := ttnpb.NewAsNsClient(link.conn)
 				res, err := client.DownlinkQueueList(ctx, &ids, link.callOpts...)
 				if err != nil {
-					logger.WithError(err).Warn("Failed to list downlink queue for recalculation; clearing the downlink queue")
+					logger.WithError(err).Warn("Failed to list downlink queue for recalculation; clear the downlink queue")
 					as.resetInvalidDownlinkQueue(ctx, ids, link)
 				} else {
 					previousQueue, _ := ttnpb.PartitionDownlinksBySessionKeyIDEquality(previousSession.SessionKeyID, res.Downlinks...)
