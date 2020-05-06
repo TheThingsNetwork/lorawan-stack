@@ -119,17 +119,14 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") && (req.EndDevice.Session == nil || req.EndDevice.Session.DevAddr.IsZero()) {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.dev_addr")
 	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.AppSKey.GetKey().IsZero()) {
+		return nil, errInvalidFieldValue.WithAttributes("field", "session.keys.app_s_key.key")
+	}
 
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths,
-		"pending_session.keys.app_s_key.encrypted_key",
-		"pending_session.keys.app_s_key.kek_label",
-		"pending_session.keys.app_s_key.key",
-		"pending_session.keys.session_key_id",
-		"session.keys.app_s_key.encrypted_key",
-		"session.keys.app_s_key.kek_label",
 		"session.keys.app_s_key.key",
 		"session.keys.session_key_id",
 	) {
@@ -140,20 +137,16 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 
 	sets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key.key") {
-		if req.EndDevice.Session != nil && !req.EndDevice.Session.GetAppSKey().GetKey().IsZero() {
-			appSKey, err := cryptoutil.WrapAES128Key(ctx, *req.EndDevice.Session.AppSKey.Key, r.kekLabel, r.AS.KeyVault)
-			if err != nil {
-				return nil, err
-			}
-			defer func(ke ttnpb.KeyEnvelope) {
-				if dev != nil {
-					dev.Session.AppSKey = &ke
-				}
-			}(*req.EndDevice.Session.AppSKey)
-			req.EndDevice.Session.AppSKey = &appSKey
-		} else if req.EndDevice.Session != nil {
-			req.EndDevice.Session.AppSKey = nil
+		appSKey, err := cryptoutil.WrapAES128Key(ctx, *req.EndDevice.Session.AppSKey.Key, r.kekLabel, r.AS.KeyVault)
+		if err != nil {
+			return nil, err
 		}
+		defer func(ke ttnpb.KeyEnvelope) {
+			if dev != nil {
+				dev.Session.AppSKey = &ke
+			}
+		}(*req.EndDevice.Session.AppSKey)
+		req.EndDevice.Session.AppSKey = &appSKey
 		sets = ttnpb.AddFields(sets,
 			"session.keys.app_s_key.encrypted_key",
 			"session.keys.app_s_key.kek_label",
@@ -171,7 +164,9 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 			}
 			if ttnpb.HasAnyField(sets, "session.dev_addr") {
 				req.EndDevice.DevAddr = &req.EndDevice.Session.DevAddr
-				sets = append(sets, "ids.dev_addr")
+				sets = ttnpb.AddFields(sets,
+					"ids.dev_addr",
+				)
 			}
 			return &req.EndDevice, sets, nil
 		}
