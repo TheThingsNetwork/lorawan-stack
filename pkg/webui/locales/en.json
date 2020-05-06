@@ -96,6 +96,7 @@
   "console.components.device-import-form.index.targetedComponents": "Targeted components",
   "console.components.downlink-form.index.insertMode": "Insert Mode",
   "console.components.downlink-form.index.insertModeDescription": "Messages can either replace the downlink queue or append to it",
+  "console.components.downlink-form.index.lengthMustBeEven": "Payload must be complete",
   "console.components.downlink-form.index.replace": "Replace",
   "console.components.downlink-form.index.push": "Push",
   "console.components.downlink-form.index.validateFPort": "FPort must be between 1 and 223",
