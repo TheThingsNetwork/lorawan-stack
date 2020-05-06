@@ -15,8 +15,8 @@
 package test_test
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	. "go.thethings.network/lorawan-stack/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	. "go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 var _ ttnpb.ApplicationAccessServer = &MockApplicationAccessServer{}

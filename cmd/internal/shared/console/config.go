@@ -18,11 +18,11 @@ import (
 	"fmt"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/cmd/internal/shared"
-	"go.thethings.network/lorawan-stack/pkg/console"
-	"go.thethings.network/lorawan-stack/pkg/version"
-	"go.thethings.network/lorawan-stack/pkg/web/oauthclient"
-	"go.thethings.network/lorawan-stack/pkg/webui"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/console"
+	"go.thethings.network/lorawan-stack/v3/pkg/version"
+	"go.thethings.network/lorawan-stack/v3/pkg/web/oauthclient"
+	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
 // DefaultConsoleConfig is the default configuration for the Console.

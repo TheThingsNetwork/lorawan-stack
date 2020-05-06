@@ -18,10 +18,10 @@ import (
 	"context"
 	"fmt"
 
-	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/events/cloud"
-	"go.thethings.network/lorawan-stack/pkg/events/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/events/cloud"
+	"go.thethings.network/lorawan-stack/v3/pkg/events/redis"
 	_ "gocloud.dev/pubsub/awssnssqs" // AWS backend for PubSub.
 	_ "gocloud.dev/pubsub/gcppubsub" // GCP backend for PubSub.
 )

@@ -18,8 +18,8 @@ import (
 	"context"
 	"net/url"
 
-	"go.thethings.network/lorawan-stack/pkg/fetch"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // TemplatesConfig defines the configuration for the webhook templates registry.

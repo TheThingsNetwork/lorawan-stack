@@ -40,7 +40,7 @@ const Overlay = ({
       })}
     />
     {visible && loading && (
-      <Spinner center className={classnames(spinnerClassName, style.overlaySpinner)}>
+      <Spinner center className={spinnerClassName}>
         <Message content={spinnerMessage} />
       </Spinner>
     )}

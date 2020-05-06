@@ -18,8 +18,8 @@ import (
 	"strconv"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/provisioning"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/provisioning"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 var (

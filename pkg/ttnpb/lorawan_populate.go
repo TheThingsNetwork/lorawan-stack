@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // NewPopulatedFrequency returns a uint64 in range [100000, 1677721600].

@@ -18,8 +18,8 @@ import (
 	"context"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // Frontend is a mock front-end.

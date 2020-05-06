@@ -19,12 +19,12 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/band"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestNeedsLinkADRReq(t *testing.T) {
@@ -150,7 +150,7 @@ func TestNeedsLinkADRReq(t *testing.T) {
 			a := assertions.New(t)
 
 			dev := CopyEndDevice(tc.InputDevice)
-			res := deviceNeedsLinkADRReq(dev, DefaultConfig.DefaultMACSettings.Parse(), Band(band.EU_863_870, ttnpb.PHY_V1_0_3_REV_A))
+			res := deviceNeedsLinkADRReq(dev, DefaultConfig.DefaultMACSettings.Parse())
 			if tc.Needs {
 				a.So(res, should.BeTrue)
 			} else {

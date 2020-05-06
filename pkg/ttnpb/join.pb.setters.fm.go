@@ -6,7 +6,7 @@ import (
 	fmt "fmt"
 	time "time"
 
-	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
+	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
@@ -53,7 +53,7 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 			if src != nil {
 				dst.DevAddr = src.DevAddr
 			} else {
-				var zero go_thethings_network_lorawan_stack_pkg_types.DevAddr
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.DevAddr
 				dst.DevAddr = zero
 			}
 		case "selected_mac_version":
@@ -73,7 +73,7 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 			if src != nil {
 				dst.NetID = src.NetID
 			} else {
-				var zero go_thethings_network_lorawan_stack_pkg_types.NetID
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.NetID
 				dst.NetID = zero
 			}
 		case "downlink_settings":

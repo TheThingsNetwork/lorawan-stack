@@ -21,7 +21,7 @@ import (
 	"math"
 
 	"github.com/jacobsa/crypto/cmac"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func encryptMessage(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32, payload []byte, isFOpts bool) ([]byte, error) {

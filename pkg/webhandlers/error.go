@@ -20,9 +20,9 @@ import (
 	"net/http"
 
 	"github.com/getsentry/sentry-go"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	sentryerrors "go.thethings.network/lorawan-stack/pkg/errors/sentry"
-	weberrors "go.thethings.network/lorawan-stack/pkg/errors/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	sentryerrors "go.thethings.network/lorawan-stack/v3/pkg/errors/sentry"
+	weberrors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
 )
 
 var errRouteNotFound = errors.DefineNotFound("route_not_found", "route `{route}` not found")

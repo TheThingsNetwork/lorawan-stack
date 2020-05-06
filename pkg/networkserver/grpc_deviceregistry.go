@@ -19,11 +19,11 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 var (
@@ -403,7 +403,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if ttnpb.HasAnyField(sets,
 				"frequency_plan_id",
 				"lorawan_phy_version",
-				"mac_settings.use_adr.value",
 			) {
 				if !ttnpb.HasAnyField(sets, "frequency_plan_id") {
 					req.EndDevice.FrequencyPlanID = dev.FrequencyPlanID
@@ -411,13 +410,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				if !ttnpb.HasAnyField(sets, "lorawan_phy_version") {
 					req.EndDevice.LoRaWANPHYVersion = dev.LoRaWANPHYVersion
 				}
-				_, phy, err := getDeviceBandVersion(&req.EndDevice, ns.FrequencyPlans)
+				_, _, err := getDeviceBandVersion(&req.EndDevice, ns.FrequencyPlans)
 				if err != nil {
 					return nil, nil, err
-				}
-
-				if ttnpb.HasAnyField(sets, "mac_settings.use_adr.value") && req.EndDevice.GetMACSettings().GetUseADR().GetValue() && !phy.EnableADR {
-					return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.use_adr.value")
 				}
 			}
 			return &req.EndDevice, sets, nil
@@ -436,10 +431,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		_, phy, err := getDeviceBandVersion(&req.EndDevice, ns.FrequencyPlans)
 		if err != nil {
 			return nil, nil, err
-		}
-
-		if ttnpb.HasAnyField(sets, "mac_settings.use_adr.value") && req.EndDevice.GetMACSettings().GetUseADR().GetValue() && !phy.EnableADR {
-			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.use_adr.value")
 		}
 
 		if ttnpb.HasAnyField(sets, "supports_class_b") && req.EndDevice.SupportsClassB {

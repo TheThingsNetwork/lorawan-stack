@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
@@ -28,10 +27,10 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/gogoproto"
-	"go.thethings.network/lorawan-stack/pkg/jsonpb"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // Event interface
@@ -74,14 +73,6 @@ type event struct {
 	caller     string
 }
 
-var pathPrefix = func() string {
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
-		panic("could not determine location of events.go")
-	}
-	return strings.TrimSuffix(file, filepath.Join("pkg", "events", "events.go"))
-}()
-
 // IncludeCaller indicates whether the caller of Publish should be included in the event
 var IncludeCaller bool
 
@@ -90,8 +81,12 @@ var IncludeCaller bool
 func (e *event) withCaller() *event {
 	if IncludeCaller && e.caller == "" {
 		if _, file, line, ok := runtime.Caller(2); ok {
+			split := strings.SplitAfter(file, "lorawan-stack/")
+			if len(split) > 1 {
+				file = split[1]
+			}
 			clone := *e
-			clone.caller = fmt.Sprintf("%s:%d", strings.TrimPrefix(file, pathPrefix), line)
+			clone.caller = fmt.Sprintf("%s:%d", file, line)
 			return &clone
 		}
 	}

@@ -19,7 +19,7 @@ import (
 	"context"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
-	"go.thethings.network/lorawan-stack/pkg/fillcontext"
+	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 	"google.golang.org/grpc"
 )
 

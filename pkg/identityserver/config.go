@@ -18,12 +18,12 @@ import (
 	"context"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/email"
-	"go.thethings.network/lorawan-stack/pkg/email/sendgrid"
-	"go.thethings.network/lorawan-stack/pkg/email/smtp"
-	"go.thethings.network/lorawan-stack/pkg/fetch"
-	"go.thethings.network/lorawan-stack/pkg/oauth"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/email"
+	"go.thethings.network/lorawan-stack/v3/pkg/email/sendgrid"
+	"go.thethings.network/lorawan-stack/v3/pkg/email/smtp"
+	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 )
 
 // Config for the Identity Server

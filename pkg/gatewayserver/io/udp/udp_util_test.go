@@ -23,15 +23,15 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	_ "go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
-	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/util/datarate"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	_ "go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	encoding "go.thethings.network/lorawan-stack/v3/pkg/ttnpb/udp"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/datarate"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func durationPtr(d time.Duration) *time.Duration { return &d }

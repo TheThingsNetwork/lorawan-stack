@@ -15,7 +15,7 @@
 package band
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 //revive:disable:var-naming
@@ -52,8 +52,6 @@ func init() {
 
 	ru_864_870 = Band{
 		ID: RU_864_870,
-
-		EnableADR: true,
 
 		MaxUplinkChannels: 16,
 		UplinkChannels:    defaultChannels,

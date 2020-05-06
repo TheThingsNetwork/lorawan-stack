@@ -20,7 +20,7 @@ import (
 	"runtime/trace"
 
 	"github.com/jinzhu/gorm"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetEntitySearch returns an EntitySearch on the given db (or transaction).

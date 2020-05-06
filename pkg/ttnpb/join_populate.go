@@ -17,8 +17,8 @@ package ttnpb
 import (
 	"fmt"
 
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func NewPopulatedJoinRequest(r randyJoin, easy bool) *JoinRequest {

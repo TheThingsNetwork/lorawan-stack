@@ -18,10 +18,10 @@ import (
 	"fmt"
 	"time"
 
-	"go.thethings.network/lorawan-stack/cmd/internal/shared"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
-	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 )
 
 // DefaultApplicationServerConfig is the default configuration for the Application Server.

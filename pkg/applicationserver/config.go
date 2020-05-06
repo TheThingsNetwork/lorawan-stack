@@ -19,15 +19,15 @@ import (
 	"net/http"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
-	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // LinkMode defines how applications are linked to their Network Server.

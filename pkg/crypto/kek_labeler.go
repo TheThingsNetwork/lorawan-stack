@@ -17,7 +17,7 @@ package crypto
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // ComponentKEKLabeler provides KEK labels for components.

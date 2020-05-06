@@ -18,8 +18,8 @@ package main
 import (
 	"os"
 
-	"go.thethings.network/lorawan-stack/cmd/internal/errors"
-	"go.thethings.network/lorawan-stack/cmd/ttn-lw-stack/commands"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/errors"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-stack/commands"
 )
 
 func main() {

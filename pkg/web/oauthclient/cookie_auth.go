@@ -20,7 +20,7 @@ import (
 	"time"
 
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/web/cookie"
+	"go.thethings.network/lorawan-stack/v3/pkg/web/cookie"
 )
 
 func init() {

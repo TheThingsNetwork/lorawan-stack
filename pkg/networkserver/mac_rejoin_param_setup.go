@@ -17,9 +17,9 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 var (
@@ -28,8 +28,7 @@ var (
 )
 
 func deviceNeedsRejoinParamSetupReq(dev *ttnpb.EndDevice) bool {
-	return !dev.GetMulticast() &&
-		dev.GetMACState() != nil &&
+	return dev.MACState != nil &&
 		dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 &&
 		(dev.MACState.DesiredParameters.RejoinTimePeriodicity != dev.MACState.CurrentParameters.RejoinTimePeriodicity ||
 			dev.MACState.DesiredParameters.RejoinCountPeriodicity != dev.MACState.CurrentParameters.RejoinCountPeriodicity)

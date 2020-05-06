@@ -18,8 +18,8 @@ import (
 	"context"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/random"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
 )
 
 // TaskFunc is the task function.

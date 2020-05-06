@@ -17,7 +17,7 @@ package ttnpb
 import (
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 // TopLevelFields returns the unique top level fields of the given paths.

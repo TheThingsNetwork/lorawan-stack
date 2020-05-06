@@ -21,8 +21,8 @@ import (
 	"time"
 
 	"github.com/robertkrimen/otto"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/scripting"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/scripting"
 )
 
 type js struct {

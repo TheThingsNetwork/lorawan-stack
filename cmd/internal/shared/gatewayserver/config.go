@@ -18,10 +18,10 @@ import (
 	"fmt"
 	"time"
 
-	"go.thethings.network/lorawan-stack/cmd/internal/shared"
-	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 )
 
 // DefaultGatewayServerConfig is the default configuration for the GatewayServer.

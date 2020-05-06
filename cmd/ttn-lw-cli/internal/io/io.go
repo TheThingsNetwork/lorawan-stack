@@ -25,7 +25,7 @@ import (
 	"strings"
 	"text/template"
 
-	"go.thethings.network/lorawan-stack/pkg/jsonpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 )
 
 // Write output to Stdout.

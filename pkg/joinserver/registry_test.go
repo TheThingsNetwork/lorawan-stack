@@ -22,13 +22,13 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	. "go.thethings.network/lorawan-stack/pkg/joinserver"
-	"go.thethings.network/lorawan-stack/pkg/joinserver/redis"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	. "go.thethings.network/lorawan-stack/v3/pkg/joinserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/joinserver/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func CopyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {

@@ -21,7 +21,7 @@ import (
 	"strings"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // eirpDelta is the delta between EIRP and ERP.
@@ -164,9 +164,6 @@ type Band struct {
 	JoinAcceptDelay2 time.Duration
 	// MaxFCntGap
 	MaxFCntGap uint
-
-	// EnableADR determines whether ADR should be enabled.
-	EnableADR bool
 	// ADRAckLimit
 	ADRAckLimit ttnpb.ADRAckLimitExponent
 	// ADRAckDelay
@@ -270,7 +267,7 @@ func (b Band) downgrades() []swapParameters {
 
 // Version returns the band parameters for a given version.
 func (b Band) Version(wantedVersion ttnpb.PHYVersion) (Band, error) {
-	var supportedRegionalParameters []string
+	supportedRegionalParameters := []string{}
 	for _, swapParameter := range b.downgrades() {
 		if swapParameter.downgrade == nil {
 			return b, errUnsupportedLoRaWANRegionalParameters.WithAttributes("supported", strings.Join(supportedRegionalParameters, ", "))

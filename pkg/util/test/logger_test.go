@@ -18,8 +18,8 @@ import (
 	"errors"
 	"testing"
 
-	"go.thethings.network/lorawan-stack/pkg/log"
-	. "go.thethings.network/lorawan-stack/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	. "go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 func TestGetLogger(t *testing.T) {

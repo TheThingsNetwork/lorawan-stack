@@ -262,6 +262,7 @@ class LocationForm extends Component {
             visible={loading}
             spinnerClassName={style.front}
             spinnerMessage={m.loadingLocation}
+            overlayClassName={style.front}
           >
             <LocationMap
               widget

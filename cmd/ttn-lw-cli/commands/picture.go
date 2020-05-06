@@ -20,7 +20,7 @@ import (
 	"os"
 
 	"github.com/disintegration/imaging"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 const dimensions = 1024

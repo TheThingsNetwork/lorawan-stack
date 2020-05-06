@@ -17,7 +17,7 @@ package should
 
 import (
 	"github.com/smartystreets/assertions"
-	testassertions "go.thethings.network/lorawan-stack/pkg/util/test/assertions"
+	testassertions "go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions"
 )
 
 var (

@@ -18,7 +18,7 @@ import (
 	"io"
 	"net/http"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 // MaxBody returns a middleware that limits the maximum body of requests.

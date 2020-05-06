@@ -19,7 +19,7 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 // The connection information of an MQTT frontend.
 message MQTTConnectionInfo {

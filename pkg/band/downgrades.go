@@ -14,7 +14,7 @@
 
 package band
 
-import "go.thethings.network/lorawan-stack/pkg/ttnpb"
+import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
 func disableCFList(b Band) Band {
 	b.ImplementsCFList = false
@@ -38,8 +38,7 @@ func enableTxParamSetupReq(b Band) Band {
 
 func makeSetMaxTxPowerIndexFunc(idx uint8) func(Band) Band {
 	return func(b Band) Band {
-		n := idx + 1
-		b.TxOffset = append(make([]float32, 0, n), b.TxOffset[:n]...)
+		b.TxOffset = b.TxOffset[:idx+1]
 		return b
 	}
 }
@@ -53,7 +52,7 @@ func makeSetBeaconDataRateIndex(idx ttnpb.DataRateIndex) func(Band) Band {
 
 func makeAddTxPowerFunc(offset float32) func(Band) Band {
 	return func(b Band) Band {
-		b.TxOffset = append(append(make([]float32, 0, len(b.TxOffset)+1), b.TxOffset...), offset)
+		b.TxOffset = append(b.TxOffset, offset)
 		return b
 	}
 }

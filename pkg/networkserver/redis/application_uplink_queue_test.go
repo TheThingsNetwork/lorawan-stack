@@ -15,8 +15,8 @@
 package redis_test
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/networkserver"
-	. "go.thethings.network/lorawan-stack/pkg/networkserver/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
 )
 
 var _ networkserver.ApplicationUplinkQueue = &ApplicationUplinkQueue{}

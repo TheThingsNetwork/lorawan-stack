@@ -18,8 +18,8 @@ import (
 	"context"
 	"strconv"
 
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/validate"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/validate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

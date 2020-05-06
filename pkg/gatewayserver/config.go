@@ -17,9 +17,9 @@ package gatewayserver
 import (
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // UDPConfig defines the UDP configuration of the Gateway Server.

@@ -15,7 +15,7 @@
 package band
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 //revive:disable:var-naming
@@ -60,8 +60,6 @@ func init() {
 
 	cn_470_510 = Band{
 		ID: CN_470_510,
-
-		EnableADR: true,
 
 		MaxUplinkChannels: 96,
 		UplinkChannels:    uplinkChannels,

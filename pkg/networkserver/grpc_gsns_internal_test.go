@@ -23,13 +23,13 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/band"
-	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestAppendRecentUplink(t *testing.T) {
@@ -206,12 +206,6 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		}
 
 		upRecvAt := time.Unix(0, 42)
-		pingSlotInfoReq := &ttnpb.MACCommand_PingSlotInfoReq{
-			Period: ttnpb.PING_EVERY_2S,
-		}
-		deviceTimeAns := &ttnpb.MACCommand_DeviceTimeAns{
-			Time: upRecvAt,
-		}
 		for upConf, devConfs := range map[*struct {
 			Confirmed         bool
 			Ack               bool
@@ -433,7 +427,9 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				FRMPayload: MakeUplinkMACBuffer(phy,
 					ttnpb.CID_LINK_CHECK,
 					ttnpb.CID_BEACON_TIMING,
-					pingSlotInfoReq,
+					&ttnpb.MACCommand_PingSlotInfoReq{
+						Period: ttnpb.PING_EVERY_2S,
+					},
 					ttnpb.CID_DEVICE_TIME,
 				),
 			}: {
@@ -458,11 +454,10 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						dev.Session.LastFCntUp = 0x22
 						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
-							Value: pingSlotInfoReq.Period,
+							Value: ttnpb.PING_EVERY_2S,
 						}
 						dev.MACState.QueuedResponses = AppendMACCommanders(dev.MACState.QueuedResponses,
 							ttnpb.CID_PING_SLOT_INFO,
-							deviceTimeAns,
 						)
 						dev.MACState.RxWindowsAvailable = true
 						return dev
@@ -471,17 +466,18 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						if deduplicated {
 							return []events.DefinitionDataClosure{
 								evtReceiveLinkCheckRequest.BindData(nil),
-								evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+								evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+									Period: ttnpb.PING_EVERY_2S,
+								}),
 								evtEnqueuePingSlotInfoAnswer.BindData(nil),
 								evtReceiveDeviceTimeRequest.BindData(nil),
-								evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 							}
 						}
 						return []events.DefinitionDataClosure{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+								Period: ttnpb.PING_EVERY_2S,
+							}),
 							evtEnqueuePingSlotInfoAnswer.BindData(nil),
-							evtReceiveDeviceTimeRequest.BindData(nil),
-							evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 						}
 					},
 				},
@@ -515,11 +511,10 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						dev.MACState = MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion)
 						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
-							Value: pingSlotInfoReq.Period,
+							Value: ttnpb.PING_EVERY_2S,
 						}
 						dev.MACState.QueuedResponses = AppendMACCommanders(dev.MACState.QueuedResponses,
 							ttnpb.CID_PING_SLOT_INFO,
-							deviceTimeAns,
 						)
 						dev.MACState.RxWindowsAvailable = true
 						dev.Session = makeSession(0x22, 0x02)
@@ -531,17 +526,18 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						if deduplicated {
 							return []events.DefinitionDataClosure{
 								evtReceiveLinkCheckRequest.BindData(nil),
-								evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+								evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+									Period: ttnpb.PING_EVERY_2S,
+								}),
 								evtEnqueuePingSlotInfoAnswer.BindData(nil),
 								evtReceiveDeviceTimeRequest.BindData(nil),
-								evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 							}
 						}
 						return []events.DefinitionDataClosure{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+								Period: ttnpb.PING_EVERY_2S,
+							}),
 							evtEnqueuePingSlotInfoAnswer.BindData(nil),
-							evtReceiveDeviceTimeRequest.BindData(nil),
-							evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 						}
 					},
 				},
@@ -576,11 +572,10 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						dev.MACState = MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion)
 						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
-							Value: pingSlotInfoReq.Period,
+							Value: ttnpb.PING_EVERY_2S,
 						}
 						dev.MACState.QueuedResponses = AppendMACCommanders(dev.MACState.QueuedResponses,
 							ttnpb.CID_PING_SLOT_INFO,
-							deviceTimeAns,
 						)
 						dev.MACState.RxWindowsAvailable = true
 						dev.Session = makeSession(0x22, 0x02)
@@ -592,17 +587,18 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						if deduplicated {
 							return []events.DefinitionDataClosure{
 								evtReceiveLinkCheckRequest.BindData(nil),
-								evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+								evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+									Period: ttnpb.PING_EVERY_2S,
+								}),
 								evtEnqueuePingSlotInfoAnswer.BindData(nil),
 								evtReceiveDeviceTimeRequest.BindData(nil),
-								evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 							}
 						}
 						return []events.DefinitionDataClosure{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+								Period: ttnpb.PING_EVERY_2S,
+							}),
 							evtEnqueuePingSlotInfoAnswer.BindData(nil),
-							evtReceiveDeviceTimeRequest.BindData(nil),
-							evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 						}
 					},
 				},
@@ -614,7 +610,9 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				FPort:        0x01,
 				FRMPayload:   []byte("test-payload"),
 				FOpts: MakeUplinkMACBuffer(phy,
-					pingSlotInfoReq,
+					&ttnpb.MACCommand_PingSlotInfoReq{
+						Period: ttnpb.PING_EVERY_2S,
+					},
 				),
 			}: {
 				{
@@ -658,7 +656,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						dev.Session.LastFCntUp = 0xff00
 						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
-							Value: pingSlotInfoReq.Period,
+							Value: ttnpb.PING_EVERY_2S,
 						}
 						dev.MACState.QueuedResponses = AppendMACCommanders(dev.MACState.QueuedResponses,
 							ttnpb.CID_PING_SLOT_INFO,
@@ -668,7 +666,9 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					},
 					MakeQueuedEvents: func(bool) []events.DefinitionDataClosure {
 						return []events.DefinitionDataClosure{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+								Period: ttnpb.PING_EVERY_2S,
+							}),
 							evtEnqueuePingSlotInfoAnswer.BindData(nil),
 						}
 					},
@@ -700,7 +700,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						dev.Session.LastFCntUp = 0xff00
 						dev.MACState.PendingApplicationDownlink = nil
 						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
-							Value: pingSlotInfoReq.Period,
+							Value: ttnpb.PING_EVERY_2S,
 						}
 						dev.MACState.QueuedResponses = AppendMACCommanders(dev.MACState.QueuedResponses,
 							ttnpb.CID_PING_SLOT_INFO,
@@ -719,7 +719,9 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					},
 					MakeQueuedEvents: func(bool) []events.DefinitionDataClosure {
 						return []events.DefinitionDataClosure{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+								Period: ttnpb.PING_EVERY_2S,
+							}),
 							evtEnqueuePingSlotInfoAnswer.BindData(nil),
 						}
 					},

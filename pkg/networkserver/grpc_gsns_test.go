@@ -26,18 +26,18 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/band"
-	"go.thethings.network/lorawan-stack/pkg/cluster"
-	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
-	. "go.thethings.network/lorawan-stack/pkg/networkserver"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 )
 
@@ -1645,13 +1645,7 @@ func TestHandleUplink(t *testing.T) {
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, getDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
 									return a.So(AllTrue(
 										ok,
-										func() bool {
-											if len(uplinkMDs) == 0 {
-												// No downlink task should be added if no downlink paths are available.
-												return true
-											}
-											return assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, clock.Now().Add(NSScheduleWindow()), true, ErrTestInternal)
-										}(),
+										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+Rx1Delay.Duration()/2-NSScheduleWindow()), true, ErrTestInternal),
 										assertDataApplicationUp(ctx, env, setCtx, setDevice, decodedMsg, ErrTestInternal),
 										a.So(env.Events, should.ReceiveEventsResembling,
 											events.ApplyDefinitionDataClosures(setCtx, setDevice.EndDeviceIdentifiers, macEvs...),
@@ -1687,7 +1681,7 @@ func TestHandleUplink(t *testing.T) {
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, getDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
 									return a.So(AllTrue(
 										ok,
-										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, clock.Now().Add(NSScheduleWindow()), true, nil),
+										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+Rx1Delay.Duration()/2-NSScheduleWindow()), true, nil),
 										assertDataApplicationUp(ctx, env, setCtx, setDevice, WithMatchedUplinkSettings(decodedMsg, chIdx, drIdx), nil),
 										a.So(env.Events, should.ReceiveEventsResembling,
 											events.ApplyDefinitionDataClosures(setCtx, setDevice.EndDeviceIdentifiers, macEvs...),
@@ -1725,7 +1719,7 @@ func TestHandleUplink(t *testing.T) {
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, rangeDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
 									return a.So(AllTrue(
 										ok,
-										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, clock.Now().Add(NSScheduleWindow()), true, ErrTestInternal),
+										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+Rx1Delay.Duration()/2-NSScheduleWindow()), true, ErrTestInternal),
 										a.So(env.Events, should.ReceiveEventsResembling,
 											events.ApplyDefinitionDataClosures(setCtx, setDevice.EndDeviceIdentifiers, macEvs...),
 											EvtProcessDataUplink(setCtx, setDevice.EndDeviceIdentifiers, decodedMsg),

@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"google.golang.org/grpc/metadata"
 )
 

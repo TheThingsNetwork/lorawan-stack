@@ -17,9 +17,9 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 var (
@@ -29,8 +29,7 @@ var (
 )
 
 func deviceNeedsRxParamSetupReq(dev *ttnpb.EndDevice) bool {
-	return !dev.GetMulticast() &&
-		dev.GetMACState() != nil &&
+	return dev.MACState != nil &&
 		(dev.MACState.DesiredParameters.Rx1DataRateOffset != dev.MACState.CurrentParameters.Rx1DataRateOffset ||
 			dev.MACState.DesiredParameters.Rx2DataRateIndex != dev.MACState.CurrentParameters.Rx2DataRateIndex ||
 			dev.MACState.DesiredParameters.Rx2Frequency != dev.MACState.CurrentParameters.Rx2Frequency)

@@ -19,7 +19,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion {

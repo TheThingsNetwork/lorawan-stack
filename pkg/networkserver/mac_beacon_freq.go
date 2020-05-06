@@ -17,9 +17,9 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 var (
@@ -29,8 +29,8 @@ var (
 )
 
 func deviceNeedsBeaconFreqReq(dev *ttnpb.EndDevice) bool {
-	return !dev.GetMulticast() &&
-		dev.GetMACState().GetDeviceClass() == ttnpb.CLASS_B &&
+	return dev.MACState != nil &&
+		dev.MACState.DeviceClass == ttnpb.CLASS_B &&
 		dev.MACState.DesiredParameters.BeaconFrequency != dev.MACState.CurrentParameters.BeaconFrequency
 }
 

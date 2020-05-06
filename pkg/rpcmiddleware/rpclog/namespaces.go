@@ -18,8 +18,8 @@ import (
 	"context"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"google.golang.org/grpc"
 )
 

@@ -19,8 +19,8 @@ import (
 	"reflect"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // IsZeroer is an interface, which reports whether it represents a zero value.

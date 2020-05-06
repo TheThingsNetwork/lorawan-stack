@@ -27,7 +27,7 @@ import "lorawan-stack/api/mqtt.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 message ApplicationLink {
   // The address of the external Network Server where to link to.

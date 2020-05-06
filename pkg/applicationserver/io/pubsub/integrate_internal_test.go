@@ -17,7 +17,7 @@ package pubsub
 import (
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 func init() {

@@ -15,8 +15,8 @@
 package joinserver
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/joinserver"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/joinserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // DefaultJoinServerConfig is the default configuration for the JoinServer

@@ -21,7 +21,7 @@ for f in "${protos[@]}"; do
     path=${f%".proto"}".pb.gw.go"
     if grep -q 'option go_package' "${f}"; then
       goPackage=$(grep 'option go_package' "${f}" | perl \
-        -pe 's![[:space:]]*option[[:space:]]+go_package[[:space:]]*=[[:space:]]*"go.thethings.network/lorawan-stack/([[:alnum:]_.\-/]+)".*!\1!')
+        -pe 's![[:space:]]*option[[:space:]]+go_package[[:space:]]*=[[:space:]]*"go.thethings.network/lorawan-stack/v3/([[:alnum:]_.\-/]+)".*!\1!')
       path=${goPackage}/$(basename "${path}")
     fi
     genPaths+=( "${path}" )

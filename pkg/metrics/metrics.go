@@ -19,7 +19,7 @@ import (
 	"context"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"go.thethings.network/lorawan-stack/pkg/version"
+	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
 
 // Namespace for metrics.

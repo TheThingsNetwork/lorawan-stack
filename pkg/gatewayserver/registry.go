@@ -17,7 +17,7 @@ package gatewayserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GatewayConnectionStatsRegistry stores, updates and cleans up gateway connection stats.

@@ -19,7 +19,7 @@ import (
 	"regexp"
 
 	"github.com/gotnospirit/messageformat"
-	"go.thethings.network/lorawan-stack/pkg/i18n"
+	"go.thethings.network/lorawan-stack/v3/pkg/i18n"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

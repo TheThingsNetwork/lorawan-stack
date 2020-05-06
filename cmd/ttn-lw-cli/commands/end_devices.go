@@ -29,14 +29,14 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
-	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/io"
-	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/util"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/random"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/io"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 var (
@@ -86,7 +86,6 @@ func forwardDeprecatedDeviceFlags(flagSet *pflag.FlagSet) {
 }
 
 var (
-	errActivationMode               = errors.DefineInvalidArgument("activation_mode", "invalid activation mode")
 	errConflictingPaths             = errors.DefineInvalidArgument("conflicting_paths", "conflicting set and unset field mask paths")
 	errEndDeviceEUIUpdate           = errors.DefineInvalidArgument("end_device_eui_update", "end device EUIs can not be updated")
 	errEndDeviceKeysWithProvisioner = errors.DefineInvalidArgument("end_device_keys_provisioner", "end device ABP or OTAA keys cannot be set when there is a provisioner")
@@ -350,9 +349,6 @@ var (
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, attributesFlags())
 
-			abp, _ := cmd.Flags().GetBool("abp")
-			multicast, _ := cmd.Flags().GetBool("multicast")
-			abp = abp || multicast
 			var device ttnpb.EndDevice
 			if inputDecoder != nil {
 				decodedPaths, err := inputDecoder.Decode(&device)
@@ -360,13 +356,6 @@ var (
 					return err
 				}
 				paths = append(paths, ttnpb.FlattenPaths(decodedPaths, endDeviceFlattenPaths)...)
-
-				if ttnpb.ContainsField("supports_join", paths) {
-					if abp && device.SupportsJoin {
-						return errActivationMode.New()
-					}
-					abp = !device.SupportsJoin
-				}
 			}
 
 			setDefaults, _ := cmd.Flags().GetBool("defaults")
@@ -388,7 +377,9 @@ var (
 				}
 			}
 
-			if abp {
+			abp, _ := cmd.Flags().GetBool("abp")
+			multicast, _ := cmd.Flags().GetBool("multicast")
+			if abp || multicast {
 				device.SupportsJoin = false
 				if config.NetworkServerEnabled {
 					paths = append(paths, "supports_join")

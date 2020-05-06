@@ -20,7 +20,7 @@ import "google/protobuf/struct.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 // Error details that are communicated over gRPC (and HTTP) APIs.
 // The messages (for translation) are stored as "error:<namespace>:<name>".
