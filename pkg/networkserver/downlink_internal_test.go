@@ -104,6 +104,8 @@ func TestAppendRecentDownlink(t *testing.T) {
 }
 
 func TestProcessDownlinkTask(t *testing.T) {
+	// TODO: Refactor. (https://github.com/TheThingsNetwork/lorawan-stack/issues/2475)
+
 	getPaths := []string{
 		"frequency_plan_id",
 		"last_dev_status_received_at",
@@ -141,9 +143,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 		SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 	}
 
+	const rx1Delay = ttnpb.RX_DELAY_1
 	makeEU868macParameters := func(ver ttnpb.PHYVersion) ttnpb.MACParameters {
 		params := MakeDefaultEU868CurrentMACParameters(ver)
-		params.Rx1Delay = ttnpb.RX_DELAY_2 // Due to infrastructureDelay being 1 second, Network Server never schedules Rx1 for devices with RxDelay == 1.
+		params.Rx1Delay = rx1Delay
 		params.Channels = append(params.Channels, &ttnpb.MACParameters_Channel{
 			UplinkFrequency:   430000000,
 			DownlinkFrequency: 431000000,
@@ -153,7 +156,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		return params
 	}
 
-	assertGetRxMetadataGatewayPeers := func(ctx context.Context, getPeerCh <-chan test.ClusterGetPeerRequest, peer124, peer3 cluster.Peer) bool {
+	assertGetGatewayPeers := func(ctx context.Context, getPeerCh <-chan test.ClusterGetPeerRequest, peer124, peer3 cluster.Peer) bool {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 
@@ -204,7 +207,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		)
 	}
 
-	assertScheduleRxMetadataGateways := func(ctx context.Context, authCh <-chan test.ClusterAuthRequest, scheduleDownlink124Ch, scheduleDownlink3Ch <-chan NsGsScheduleDownlinkRequest, payload []byte, makeTxRequest func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest, resps ...NsGsScheduleDownlinkResponse) (*ttnpb.DownlinkMessage, bool) {
+	assertScheduleGateways := func(ctx context.Context, authCh <-chan test.ClusterAuthRequest, scheduleDownlink124Ch, scheduleDownlink3Ch <-chan NsGsScheduleDownlinkRequest, payload []byte, makeTxRequest func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest, fixedPaths bool, resps ...NsGsScheduleDownlinkResponse) (*ttnpb.DownlinkMessage, bool) {
 		if len(resps) < 1 || len(resps) > 3 {
 			panic("invalid response count specified")
 		}
@@ -213,6 +216,34 @@ func TestProcessDownlinkTask(t *testing.T) {
 		t.Helper()
 
 		a := assertions.New(t)
+
+		makePath := func(i int) *ttnpb.DownlinkPath {
+			if fixedPaths {
+				return &ttnpb.DownlinkPath{
+					Path: &ttnpb.DownlinkPath_Fixed{
+						Fixed: &GatewayAntennaIdentifiers[i],
+					},
+				}
+			}
+			return &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: func() *ttnpb.RxMetadata {
+						switch i {
+						case 1:
+							return RxMetadata[0]
+						case 2:
+							return RxMetadata[4]
+						case 3:
+							return RxMetadata[1]
+						case 4:
+							return RxMetadata[5]
+						default:
+							panic(fmt.Sprintf("Invalid index requested: %d", i))
+						}
+					}().UplinkToken,
+				},
+			}
+		}
 
 		var lastDown *ttnpb.DownlinkMessage
 		var correlationIDs []string
@@ -224,16 +255,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RawPayload:     payload,
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: makeTxRequest(
-							&ttnpb.DownlinkPath{
-								Path: &ttnpb.DownlinkPath_UplinkToken{
-									UplinkToken: []byte("token-gtw-1"),
-								},
-							},
-							&ttnpb.DownlinkPath{
-								Path: &ttnpb.DownlinkPath_UplinkToken{
-									UplinkToken: []byte("token-gtw-2"),
-								},
-							},
+							makePath(1),
+							makePath(2),
 						),
 					},
 				}
@@ -255,11 +278,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			RawPayload:     payload,
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: makeTxRequest(
-					&ttnpb.DownlinkPath{
-						Path: &ttnpb.DownlinkPath_UplinkToken{
-							UplinkToken: []byte("token-gtw-3"),
-						},
-					},
+					makePath(3),
 				),
 			},
 		}
@@ -282,11 +301,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			RawPayload:     payload,
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: makeTxRequest(
-					&ttnpb.DownlinkPath{
-						Path: &ttnpb.DownlinkPath_UplinkToken{
-							UplinkToken: []byte("token-gtw-4"),
-						},
-					},
+					makePath(4),
 				),
 			},
 		}
@@ -301,6 +316,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 			return nil, false
 		}
 		return lastDown, true
+	}
+
+	assertScheduleRxMetadataGateways := func(ctx context.Context, authCh <-chan test.ClusterAuthRequest, scheduleDownlink124Ch, scheduleDownlink3Ch <-chan NsGsScheduleDownlinkRequest, payload []byte, makeTxRequest func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest, resps ...NsGsScheduleDownlinkResponse) (*ttnpb.DownlinkMessage, bool) {
+		return assertScheduleGateways(ctx, authCh, scheduleDownlink124Ch, scheduleDownlink3Ch, payload, makeTxRequest, false, resps...)
+	}
+
+	assertScheduleClassBCGateways := func(ctx context.Context, authCh <-chan test.ClusterAuthRequest, scheduleDownlink124Ch, scheduleDownlink3Ch <-chan NsGsScheduleDownlinkRequest, payload []byte, makeTxRequest func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest, resps ...NsGsScheduleDownlinkResponse) (*ttnpb.DownlinkMessage, bool) {
+		return assertScheduleGateways(ctx, authCh, scheduleDownlink124Ch, scheduleDownlink3Ch, payload, makeTxRequest, true, resps...)
 	}
 
 	for _, tc := range []struct {
@@ -740,7 +763,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				setDevice := CopyEndDevice(getDevice)
-				setDevice.MACState.RxWindowsAvailable = false
 
 				select {
 				case <-ctx.Done():
@@ -748,10 +770,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
-						"mac_state.queued_responses",
-						"mac_state.rx_windows_available",
-					})
+					a.So(resp.Paths, should.BeNil)
 					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
 				close(setFuncRespCh)
@@ -979,7 +998,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									},
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
-								ReceivedAt: start.Add(-3 * time.Second),
+								ReceivedAt: start.Add(-2*time.Second - time.Nanosecond),
 								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
@@ -1026,7 +1045,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				setDevice := CopyEndDevice(getDevice)
-				setDevice.MACState.RxWindowsAvailable = false
 
 				select {
 				case <-ctx.Done():
@@ -1034,10 +1052,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
-						"mac_state.queued_responses",
-						"mac_state.rx_windows_available",
-					})
+					a.So(resp.Paths, should.BeNil)
 					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
 				close(setFuncRespCh)
@@ -1716,7 +1731,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return false
 				}
 
@@ -1985,7 +2000,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return false
 				}
 
@@ -2084,6 +2099,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				setDevice := CopyEndDevice(getDevice)
 				setDevice.MACState.LastConfirmedDownlinkAt = &downAt
+				setDevice.MACState.LastDownlinkAt = &downAt
 				setDevice.MACState.PendingRequests = []*ttnpb.MACCommand{
 					{
 						CID: ttnpb.CID_DEV_STATUS,
@@ -2107,6 +2123,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
 						"mac_state.last_confirmed_downlink_at",
+						"mac_state.last_downlink_at",
 						"mac_state.pending_application_downlink",
 						"mac_state.pending_requests",
 						"mac_state.queued_responses",
@@ -2278,7 +2295,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return false
 				}
 
@@ -2367,6 +2384,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				setDevice := CopyEndDevice(getDevice)
+				setDevice.MACState.LastDownlinkAt = &downAt
 				setDevice.MACState.LastConfirmedDownlinkAt = &downAt
 				setDevice.MACState.QueuedResponses = nil
 				setDevice.MACState.PendingRequests = []*ttnpb.MACCommand{
@@ -2391,6 +2409,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
 						"mac_state.last_confirmed_downlink_at",
+						"mac_state.last_downlink_at",
 						"mac_state.pending_application_downlink",
 						"mac_state.pending_requests",
 						"mac_state.queued_responses",
@@ -2562,7 +2581,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return false
 				}
 
@@ -2659,6 +2678,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				setDevice := CopyEndDevice(getDevice)
 				setDevice.MACState.LastConfirmedDownlinkAt = &downAt
+				setDevice.MACState.LastDownlinkAt = &downAt
 				setDevice.MACState.PendingRequests = []*ttnpb.MACCommand{
 					{
 						CID: ttnpb.CID_DEV_STATUS,
@@ -2678,6 +2698,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
 						"mac_state.last_confirmed_downlink_at",
+						"mac_state.last_downlink_at",
 						"mac_state.pending_application_downlink",
 						"mac_state.pending_requests",
 						"mac_state.queued_responses",
@@ -2753,6 +2774,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
+				nextDown := &ttnpb.ApplicationDownlink{
+					CorrelationIDs: []string{"correlation-app-down-3", "correlation-app-down-4"},
+					FCnt:           0x43,
+					FPort:          0x2,
+					FRMPayload:     []byte("nextTestPayload"),
+					Priority:       ttnpb.TxSchedulePriority_HIGH,
+					SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+				}
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -2811,6 +2840,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 							},
+							nextDown,
 						},
 					},
 				}
@@ -2860,7 +2890,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return false
 				}
 
@@ -2880,7 +2910,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0b1_0_0_0_0001,
+							0b1_0_0_1_0001,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -2945,6 +2975,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				setDevice := CopyEndDevice(getDevice)
 				setDevice.MACState.LastConfirmedDownlinkAt = &downAt
+				setDevice.MACState.LastDownlinkAt = &downAt
 				setDevice.MACState.LastNetworkInitiatedDownlinkAt = &downAt
 				setDevice.MACState.PendingApplicationDownlink = setDevice.Session.QueuedApplicationDownlinks[0]
 				setDevice.MACState.PendingRequests = []*ttnpb.MACCommand{
@@ -2954,7 +2985,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 				setDevice.MACState.RecentDownlinks = append(setDevice.MACState.RecentDownlinks, lastDown)
 				setDevice.RecentDownlinks = append(setDevice.RecentDownlinks, lastDown)
-				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
+				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
+					nextDown,
+				}
 				setDevice.Session.LastConfFCntDown = 0x42
 
 				select {
@@ -2965,6 +2998,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
 						"mac_state.last_confirmed_downlink_at",
+						"mac_state.last_downlink_at",
 						"mac_state.last_network_initiated_downlink_at",
 						"mac_state.pending_application_downlink",
 						"mac_state.pending_requests",
@@ -3001,7 +3035,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
 						a.So(ids, should.Resemble, setDevice.EndDeviceIdentifiers) &&
 						a.So(replace, should.BeTrue) &&
-						a.So(startAt, should.Resemble, nextPingSlot.Add(-infrastructureDelay-NSScheduleWindow()))
+						a.So(startAt, should.Resemble, nextPingSlot.Add(-getDevice.MACState.CurrentParameters.Rx1Delay.Duration()-NSScheduleWindow()))
 				},
 					nil,
 				) {
@@ -3160,7 +3194,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return false
 				}
 
@@ -3273,6 +3307,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DesiredParameters:       makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:             ttnpb.CLASS_C,
 						LastConfirmedDownlinkAt: &downAt,
+						LastDownlinkAt:          &downAt,
 						LoRaWANVersion:          ttnpb.MAC_V1_1,
 						PendingRequests: []*ttnpb.MACCommand{
 							{
@@ -3305,6 +3340,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
 						"mac_state.last_confirmed_downlink_at",
+						"mac_state.last_downlink_at",
 						"mac_state.pending_application_downlink",
 						"mac_state.pending_requests",
 						"mac_state.queued_responses",
@@ -3325,18 +3361,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					Device:  CopyEndDevice(setDevice),
 					Context: setCtx,
 				}:
-				}
-
-				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-						a.So(ids, should.Resemble, setDevice.EndDeviceIdentifiers) &&
-						a.So(replace, should.BeTrue) &&
-						a.So(startAt, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(*setDevice.MACSettings.ClassCTimeout-infrastructureDelay-NSScheduleWindow()))
-				},
-					nil,
-				) {
-					t.Error("Downlink task add assertion failed")
-					return false
 				}
 
 				select {
@@ -3360,7 +3384,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2,RXC/EU868",
+			Name: "Class C/windows open/1.1/RX1,RX2 expired/MAC answers/MAC requests/generic application downlink/data+MAC/RXC/EU868",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -3391,6 +3415,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}, start)
 					}()
 				}
+
+				clock.Add(time.Millisecond)
 
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -3427,7 +3453,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									},
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
-								ReceivedAt: time.Now().Add(-500 * time.Millisecond),
+								ReceivedAt: start.Add(-rx1Delay.Duration() - time.Second),
 								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
@@ -3490,94 +3516,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return false
 				}
 
 				downAt := clock.Add(time.Millisecond).Add(time.Second)
-
-				_, ok := assertScheduleRxMetadataGateways(
-					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
-					func() []byte {
-						b := []byte{
-							/* MHDR */
-							0b011_000_00,
-							/* MACPayload */
-							/** FHDR **/
-							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
-							/*** FCtrl ***/
-							0b1_0_0_0_0110,
-							/*** FCnt ***/
-							0x42, 0x00,
-						}
-
-						/** FOpts **/
-						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
-							0x24,
-							[]byte{
-								/* ResetConf */
-								0x01, 0b0000_0001,
-								/* LinkCheckAns */
-								0x02, 0x02, 0x05,
-								/* DevStatusReq */
-								0x06,
-							},
-							true,
-						)).([]byte)...)
-
-						/** FPort **/
-						b = append(b, 0x1)
-
-						/** FRMPayload **/
-						b = append(b, []byte("testPayload")...)
-
-						/* MIC */
-						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
-							0,
-							0x42,
-							b,
-						)).([4]byte)
-						return append(b, mic[:]...)
-					}(),
-					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
-						return &ttnpb.TxRequest{
-							Class:            ttnpb.CLASS_A,
-							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_HIGH,
-							Rx1DataRateIndex: ttnpb.DATA_RATE_0,
-							Rx1Delay:         getDevice.MACState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:     431000000,
-							Rx2DataRateIndex: getDevice.MACState.CurrentParameters.Rx2DataRateIndex,
-							Rx2Frequency:     getDevice.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:  test.EUFrequencyPlanID,
-						}
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-				)
-				if !a.So(ok, should.BeTrue) {
-					t.Error("Scheduling assertion failed")
-					return false
-				}
-
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return false
-				}
 
 				lastDown, ok := assertScheduleRxMetadataGateways(
 					ctx,
@@ -3631,10 +3574,16 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Class:            ttnpb.CLASS_C,
 							DownlinkPaths:    paths,
 							Priority:         ttnpb.TxSchedulePriority_HIGH,
-							Rx2DataRateIndex: ttnpb.DATA_RATE_0,
-							Rx2Frequency:     869525000,
+							Rx2DataRateIndex: getDevice.MACState.CurrentParameters.Rx2DataRateIndex,
+							Rx2Frequency:     getDevice.MACState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanID:  test.EUFrequencyPlanID,
 						}
+					},
+					NsGsScheduleDownlinkResponse{
+						Error: errors.New("test"),
+					},
+					NsGsScheduleDownlinkResponse{
+						Error: errors.New("test"),
 					},
 					NsGsScheduleDownlinkResponse{
 						Response: &ttnpb.ScheduleDownlinkResponse{
@@ -3655,6 +3604,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				setDevice := CopyEndDevice(getDevice)
 				setDevice.MACState.LastConfirmedDownlinkAt = &downAt
+				setDevice.MACState.LastDownlinkAt = &downAt
 				setDevice.MACState.LastNetworkInitiatedDownlinkAt = &downAt
 				setDevice.MACState.PendingRequests = []*ttnpb.MACCommand{
 					{
@@ -3675,6 +3625,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
 						"mac_state.last_confirmed_downlink_at",
+						"mac_state.last_downlink_at",
 						"mac_state.last_network_initiated_downlink_at",
 						"mac_state.pending_application_downlink",
 						"mac_state.pending_requests",
@@ -3696,18 +3647,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					Device:  CopyEndDevice(setDevice),
 					Context: setCtx,
 				}:
-				}
-
-				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-						a.So(ids, should.Resemble, setDevice.EndDeviceIdentifiers) &&
-						a.So(replace, should.BeTrue) &&
-						a.So(startAt, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(*setDevice.MACSettings.ClassCTimeout-infrastructureDelay-NSScheduleWindow()))
-				},
-					nil,
-				) {
-					t.Error("Downlink task add assertion failed")
-					return false
 				}
 
 				select {
@@ -3859,7 +3798,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return false
 				}
 
@@ -3935,6 +3874,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				setDevice := CopyEndDevice(getDevice)
+				setDevice.MACState.LastDownlinkAt = &downAt
 				setDevice.MACState.LastNetworkInitiatedDownlinkAt = &downAt
 				setDevice.MACState.RxWindowsAvailable = false
 				setDevice.MACState.RecentDownlinks = append(setDevice.MACState.RecentDownlinks, lastDown)
@@ -3949,6 +3889,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
 						"mac_state.last_confirmed_downlink_at",
+						"mac_state.last_downlink_at",
 						"mac_state.last_network_initiated_downlink_at",
 						"mac_state.pending_application_downlink",
 						"mac_state.pending_requests",
@@ -3972,18 +3913,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
-				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-						a.So(ids, should.Resemble, setDevice.EndDeviceIdentifiers) &&
-						a.So(replace, should.BeTrue) &&
-						a.So(startAt, should.Resemble, start.Add(*setDevice.MACSettings.StatusTimePeriodicity-infrastructureDelay-NSScheduleWindow()))
-				},
-					nil,
-				) {
-					t.Error("Downlink task add assertion failed")
-					return false
-				}
-
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DownlinkTasks.Pop callback to return")
@@ -4005,7 +3934,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC answers/MAC requests/classBC application downlink/absolute time within window/no forced gateways/MAC/RX1,RX2,RXC/EU868/non-retryable errors",
+			Name: "Class C/windows closed/1.1/no MAC answers/MAC requests/classBC application downlink with absolute time/no forced gateways/MAC/RXC/EU868/non-retryable errors",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -4037,7 +3966,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				absTime := start.Add(3 * time.Second).UTC()
+				absTime := start.Add(rx1Delay.Duration()).UTC()
 
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -4065,7 +3994,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									},
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
-								ReceivedAt: start.Add(-100 * time.Millisecond),
+								ReceivedAt: start.Add(-rx1Delay.Duration()),
 								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
@@ -4073,7 +4002,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 						},
-						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
@@ -4131,108 +4059,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return false
 				}
-
-				now := clock.Add(time.Second)
 
 				lastDown, ok := assertScheduleRxMetadataGateways(
-					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
-					func() []byte {
-						b := []byte{
-							/* MHDR */
-							0b011_000_00,
-							/* MACPayload */
-							/** FHDR **/
-							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
-							/*** FCtrl ***/
-							0b1_0_0_1_0001,
-							/*** FCnt ***/
-							0x25, 0x00,
-						}
-
-						/** FOpts **/
-						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
-							0x25,
-							[]byte{
-								/* DevStatusReq */
-								0x06,
-							},
-							true,
-						)).([]byte)...)
-
-						/* MIC */
-						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
-							0,
-							0x25,
-							b,
-						)).([4]byte)
-						return append(b, mic[:]...)
-					}(),
-					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
-						return &ttnpb.TxRequest{
-							Class:            ttnpb.CLASS_A,
-							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_HIGH,
-							Rx1DataRateIndex: ttnpb.DATA_RATE_0,
-							Rx1Delay:         getDevice.MACState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:     431000000,
-							Rx2DataRateIndex: getDevice.MACState.CurrentParameters.Rx2DataRateIndex,
-							Rx2Frequency:     getDevice.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:  test.EUFrequencyPlanID,
-						}
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test").WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
-							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineAborted(ulid.MustNew(0, test.Randy).String(), "aborted")),
-								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, test.Randy).String(), "resource exhausted")),
-							},
-						}),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test").WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
-							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineFailedPrecondition(ulid.MustNew(0, test.Randy).String(), "failed precondition")),
-							},
-						}),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test").WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
-							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, test.Randy).String(), "resource exhausted")),
-							},
-						}),
-					},
-				)
-				if !a.So(ok, should.BeTrue) {
-					t.Error("Scheduling assertion failed")
-					return false
-				}
-
-				lastUp := lastUplink(getDevice.MACState.RecentUplinks...)
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)) {
-					for _, cid := range lastUp.CorrelationIDs {
-						a.So(lastDown.CorrelationIDs, should.Contain, cid)
-					}
-				}
-
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return false
-				}
-
-				now = clock.Add(time.Second)
-
-				lastDown, ok = assertScheduleRxMetadataGateways(
 					ctx,
 					env.Cluster.Auth,
 					scheduleDownlink124Ch,
@@ -4327,7 +4158,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				setDevice := CopyEndDevice(getDevice)
 				setDevice.MACState.RxWindowsAvailable = false
 				setDevice.MACState.QueuedResponses = nil
-				setDevice.Session.LastNFCntDown = getDevice.Session.LastNFCntDown + 1
 				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
 
 				select {
@@ -4337,13 +4167,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
-						"mac_state.queued_responses",
-						"mac_state.rx_windows_available",
 						"session.queued_application_downlinks",
 					})
 					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
+					close(setFuncRespCh)
 				}
-				close(setFuncRespCh)
 
 				select {
 				case <-ctx.Done():
@@ -4353,22 +4181,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					Device:  CopyEndDevice(setDevice),
 					Context: setCtx,
 				}:
-				}
-
-				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-						a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: appID,
-							DeviceID:               devID,
-							DevAddr:                &devAddr,
-						}) &&
-						a.So(replace, should.BeTrue) &&
-						a.So(startAt, should.Resemble, now.Add(downlinkRetryInterval))
-				},
-					nil,
-				) {
-					t.Error("Downlink task add assertion failed")
-					return false
 				}
 
 				select {
@@ -4398,8 +4210,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-popFuncRespCh:
 					a.So(resp, should.BeNil)
+					close(popFuncRespCh)
 				}
-				close(popFuncRespCh)
 
 				select {
 				case <-ctx.Done():
@@ -4413,7 +4225,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC answers/MAC requests/classBC application downlink/absolute time within window/no forced gateways/MAC/RX1,RX2,RXC/EU868/retryable error",
+			Name: "Class C/windows closed/1.1/no MAC answers/MAC requests/classBC application downlink/forced gateways/MAC/RXC/EU868/retryable error",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -4447,8 +4259,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				now := clock.Add(time.Millisecond)
 
-				absTime := now.Add(3 * infrastructureDelay).UTC()
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -4475,15 +4285,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 									},
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
-								ReceivedAt: start.Add(-100 * time.Millisecond),
-								RxMetadata: RxMetadata[:],
+								ReceivedAt: start.Add(-2 * rx1Delay.Duration()),
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
 								},
 							},
 						},
-						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
@@ -4498,7 +4306,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 								ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-									AbsoluteTime: &absTime,
+									Gateways: GatewayAntennaIdentifiers[:],
 								},
 							},
 						},
@@ -4541,108 +4349,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return false
-				}
-
-				now = clock.Add(time.Second)
-
-				lastDown, ok := assertScheduleRxMetadataGateways(
-					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
-					func() []byte {
-						b := []byte{
-							/* MHDR */
-							0b011_000_00,
-							/* MACPayload */
-							/** FHDR **/
-							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
-							/*** FCtrl ***/
-							0b1_0_0_1_0001,
-							/*** FCnt ***/
-							0x25, 0x00,
-						}
-
-						/** FOpts **/
-						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
-							0x25,
-							[]byte{
-								/* DevStatusReq */
-								0x06,
-							},
-							true,
-						)).([]byte)...)
-
-						/* MIC */
-						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
-							0,
-							0x25,
-							b,
-						)).([4]byte)
-						return append(b, mic[:]...)
-					}(),
-					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
-						return &ttnpb.TxRequest{
-							Class:            ttnpb.CLASS_A,
-							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_HIGH,
-							Rx1DataRateIndex: ttnpb.DATA_RATE_0,
-							Rx1Delay:         getDevice.MACState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:     431000000,
-							Rx2DataRateIndex: getDevice.MACState.CurrentParameters.Rx2DataRateIndex,
-							Rx2Frequency:     getDevice.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:  test.EUFrequencyPlanID,
-						}
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test").WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
-							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineAborted(ulid.MustNew(0, test.Randy).String(), "aborted")),
-								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, test.Randy).String(), "resource exhausted")),
-							},
-						}),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test").WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
-							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineFailedPrecondition(ulid.MustNew(0, test.Randy).String(), "failed precondition")),
-							},
-						}),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test").WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
-							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, test.Randy).String(), "resource exhausted")),
-							},
-						}),
-					},
-				)
-				if !a.So(ok, should.BeTrue) {
-					t.Error("Scheduling assertion failed")
-					return false
-				}
-
-				lastUp := lastUplink(getDevice.MACState.RecentUplinks...)
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)) {
-					for _, cid := range lastUp.CorrelationIDs {
-						a.So(lastDown.CorrelationIDs, should.Contain, cid)
-					}
-				}
-
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return false
 				}
 
 				now = clock.Add(time.Millisecond)
 
-				lastDown, ok = assertScheduleRxMetadataGateways(
+				lastDown, ok := assertScheduleClassBCGateways(
 					ctx,
 					env.Cluster.Auth,
 					scheduleDownlink124Ch,
@@ -4694,7 +4407,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Class:            ttnpb.CLASS_C,
 							DownlinkPaths:    paths,
 							Priority:         ttnpb.TxSchedulePriority_HIGH,
-							AbsoluteTime:     &absTime,
 							Rx2DataRateIndex: getDevice.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:     getDevice.MACState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanID:  test.EUFrequencyPlanID,
@@ -4735,8 +4447,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				setDevice := CopyEndDevice(getDevice)
-				setDevice.MACState.RxWindowsAvailable = false
-				setDevice.MACState.QueuedResponses = nil
 
 				select {
 				case <-ctx.Done():
@@ -4744,10 +4454,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
-						"mac_state.queued_responses",
-						"mac_state.rx_windows_available",
-					})
+					a.So(resp.Paths, should.BeNil)
 					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
 				close(setFuncRespCh)
@@ -4770,7 +4477,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							DevAddr:                &devAddr,
 						}) &&
 						a.So(replace, should.BeTrue) &&
-						a.So(startAt, should.Resemble, now.Add(downlinkRetryInterval))
+						a.So(startAt, should.Resemble, now.Add(downlinkRetryInterval+NSScheduleWindow()))
 				},
 					nil,
 				) {
@@ -4831,7 +4538,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				absTime := time.Now().Add(42 * time.Hour).UTC()
+				absTime := clock.Now().Add(42 * time.Hour).UTC()
 
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -4861,7 +4568,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									},
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
-								ReceivedAt: time.Now().Add(-time.Second),
+								ReceivedAt: clock.Now().Add(-time.Second),
 								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
@@ -4944,7 +4651,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
 						a.So(ids, should.Resemble, setDevice.EndDeviceIdentifiers) &&
 						a.So(replace, should.BeTrue) &&
-						a.So(startAt, should.Resemble, absTime.Add(-infrastructureDelay-NSScheduleWindow()))
+						a.So(startAt, should.Resemble, absTime.Add(-rx1Delay.Duration()-NSScheduleWindow()))
 				},
 					nil,
 				) {
@@ -5109,9 +4816,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
-						"session.queued_application_downlinks",
-					})
+					a.So(resp.Paths, should.BeNil)
 					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
 				close(setFuncRespCh)
@@ -5124,38 +4829,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					Device:  CopyEndDevice(setDevice),
 					Context: setCtx,
 				}:
-				}
-
-				lastUp := lastUplink(getDevice.MACState.RecentUplinks...)
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for ApplicationUplinks.Add to be called")
-
-				case req := <-env.ApplicationUplinks.Add:
-					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
-					a.So(req.Uplinks, should.Resemble, []*ttnpb.ApplicationUp{
-						{
-							EndDeviceIdentifiers: getDevice.EndDeviceIdentifiers,
-							CorrelationIDs:       append(lastUp.CorrelationIDs, getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
-							Up: &ttnpb.ApplicationUp_DownlinkFailed{
-								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-									ApplicationDownlink: *getDevice.Session.QueuedApplicationDownlinks[0],
-									Error:               *ttnpb.ErrorDetailsToProto(errExpiredDownlink),
-								},
-							},
-						},
-						{
-							EndDeviceIdentifiers: getDevice.EndDeviceIdentifiers,
-							CorrelationIDs:       append(lastUp.CorrelationIDs, getDevice.Session.QueuedApplicationDownlinks[1].CorrelationIDs...),
-							Up: &ttnpb.ApplicationUp_DownlinkFailed{
-								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-									ApplicationDownlink: *getDevice.Session.QueuedApplicationDownlinks[1],
-									Error:               *ttnpb.ErrorDetailsToProto(errExpiredDownlink),
-								},
-							},
-						},
-					})
-					close(req.Response)
 				}
 
 				select {
@@ -5311,7 +4984,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return false
 				}
 

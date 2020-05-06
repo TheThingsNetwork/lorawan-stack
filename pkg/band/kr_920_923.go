@@ -56,6 +56,8 @@ func init() {
 	kr_920_923 = Band{
 		ID: KR_920_923,
 
+		EnableADR: true,
+
 		MaxUplinkChannels: 16,
 		UplinkChannels:    defaultChannels,
 

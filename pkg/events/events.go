@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
@@ -73,6 +74,14 @@ type event struct {
 	caller     string
 }
 
+var pathPrefix = func() string {
+	_, file, _, ok := runtime.Caller(0)
+	if !ok {
+		panic("could not determine location of events.go")
+	}
+	return strings.TrimSuffix(file, filepath.Join("pkg", "events", "events.go"))
+}()
+
 // IncludeCaller indicates whether the caller of Publish should be included in the event
 var IncludeCaller bool
 
@@ -81,12 +90,8 @@ var IncludeCaller bool
 func (e *event) withCaller() *event {
 	if IncludeCaller && e.caller == "" {
 		if _, file, line, ok := runtime.Caller(2); ok {
-			split := strings.SplitAfter(file, "lorawan-stack/")
-			if len(split) > 1 {
-				file = split[1]
-			}
 			clone := *e
-			clone.caller = fmt.Sprintf("%s:%d", file, line)
+			clone.caller = fmt.Sprintf("%s:%d", strings.TrimPrefix(file, pathPrefix), line)
 			return &clone
 		}
 	}

@@ -270,22 +270,22 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 		"application_uid", uid,
 	)
 
-	l, err := as.getLink(ctx, ids)
+	link, err := as.getLink(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 	sub := io.NewSubscription(ctx, protocol, &ids)
-	l.subscribeCh <- sub
+	link.subscribeCh <- sub
 	go func() {
 		select {
-		case <-l.ctx.Done():
+		case <-link.ctx.Done():
 			// Disconnect the subscription in order to avoid leaking it,
 			// and skip the unsubscribe channel since it will get closed.
-			sub.Disconnect(l.ctx.Err())
+			sub.Disconnect(link.ctx.Err())
 			return
 		case <-sub.Context().Done():
 		}
-		l.unsubscribeCh <- sub
+		link.unsubscribeCh <- sub
 	}()
 	return sub, nil
 }
@@ -305,7 +305,6 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 	if err != nil {
 		return err
 	}
-	<-link.connReady
 	for _, item := range items {
 		registerReceiveDownlink(ctx, ids, item)
 	}
@@ -427,7 +426,6 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	if err != nil {
 		return nil, err
 	}
-	<-link.connReady
 	client := ttnpb.NewAsNsClient(link.conn)
 	res, err := client.DownlinkQueueList(ctx, &ids, link.callOpts...)
 	if err != nil {

@@ -28,7 +28,8 @@ var (
 )
 
 func deviceNeedsRejoinParamSetupReq(dev *ttnpb.EndDevice) bool {
-	return dev.MACState != nil &&
+	return !dev.GetMulticast() &&
+		dev.GetMACState() != nil &&
 		dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 &&
 		(dev.MACState.DesiredParameters.RejoinTimePeriodicity != dev.MACState.CurrentParameters.RejoinTimePeriodicity ||
 			dev.MACState.DesiredParameters.RejoinCountPeriodicity != dev.MACState.CurrentParameters.RejoinCountPeriodicity)

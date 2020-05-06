@@ -17,6 +17,7 @@ import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 
 import Button from '@ttn-lw/components/button'
+import SafeInspector from '@ttn-lw/components/safe-inspector'
 
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
@@ -47,6 +48,8 @@ import {
   selectDevicesError,
 } from '@console/store/selectors/devices'
 
+import style from './devices-table.styl'
+
 const headers = [
   {
     name: 'ids.device_id',
@@ -60,9 +63,32 @@ const headers = [
     sortable: true,
   },
   {
+    name: 'ids.dev_eui',
+    displayName: sharedMessages.devEUI,
+    sortable: false,
+    render: devEUI =>
+      !Boolean(devEUI) ? (
+        <Message className={style.none} content={sharedMessages.none} firstToLower />
+      ) : (
+        <SafeInspector data={devEUI} noTransform noCopyPopup small hideable={false} />
+      ),
+  },
+  {
+    name: 'ids.join_eui',
+    displayName: sharedMessages.joinEUI,
+    sortable: false,
+    render: joinEUI =>
+      !Boolean(joinEUI) ? (
+        <Message className={style.none} content={sharedMessages.none} lowercase />
+      ) : (
+        <SafeInspector data={joinEUI} noTransform noCopyPopup small hideable={false} />
+      ),
+  },
+  {
     name: 'created_at',
     displayName: sharedMessages.created,
     sortable: true,
+    width: 12,
     render(datetime) {
       return <DateTime.Relative value={datetime} />
     },

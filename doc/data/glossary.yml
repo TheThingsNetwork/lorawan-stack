@@ -1,0 +1,234 @@
+# Glossary of terms
+
+# Formatted as:
+
+# <Term>:
+#  description: <Description>
+#  link: <Link> or <Ref> e.g https://wikipedia.com or /reference/api
+#  abbr:
+#    - <Abbr 1>
+#    - <Abbr 2>
+#  alt:
+#    - <Alt term 1>
+#    - <Alt term 2>
+
+Gateway:
+  description: Gateways form the bridge between devices and Network Servers. Devices use low power networks like LoRaWAN to connect to the Gateway, while the Gateway uses high bandwidth networks like WiFi, Ethernet or Cellular to connect to a Network Server.
+  link: https://www.thethingsnetwork.org/docs/gateways/
+
+Gateway ID:
+  description: A unique, human-readable identifier for your gateway.
+
+Gateway EUI:
+  description: A 64 bit extended unique identifier for your gateway. This is programmed by the manufacturer and should not be changed. In cases where it is not programmed by the manufacturer, it must be programmed with a unique EUI that you own.
+  link: https://www.thethingsnetwork.org/docs/lorawan/addressing.html
+
+Network Server:
+  description: The Network Server is responsible for routing Internet of Things data between devices and applications.
+  link: https://www.thethingsnetwork.org/docs/network/
+  alt:
+    - Backend
+
+Application:
+  description: An Application in The Things Stack allows you to register LoRaWAN devices and manage data and integrations. Applications can be created via the Console or CLI.
+  link: https://www.thethingsnetwork.org/docs/applications/
+
+Integration:
+  description: Integrations connect devices to the world, by triggering events whenever a device communicates. The Application server manages integrations using Webhooks or MQTT. These can be as simple as an IFTTT Maker Applet or a visual flow using Node-RED, or as complex as custom code on a server which processes and acts on device data.
+  link: https://www.thethingsnetwork.org/docs/applications/integrations.html
+
+LoRaWAN:
+  description: LoRaWAN is a media access control (MAC) protocol for wide area networks. It is designed to allow low-powered devices to communicate with Internet-connected applications over long range wireless connections.
+  link: https://lora-alliance.org/about-lorawan
+
+LoRa:
+  description: A modulation technology for long range wireless communication, based on chirp-spread spectrum technology.
+  link: https://en.wikipedia.org/wiki/LoRa
+
+End Device:
+  description: A sensor or actuator with an embedded low power LoRaWAN communication module.
+  link: https://www.thethingsnetwork.org/docs/devices/
+  alt:
+    - Device
+    - Node
+    - Mote
+
+Media Access Control:
+  description: LoRaWAN media access control protocols, downloadable from the LoRa Alliance. The MAC version for your device should be specified in the product documentation as LoRaWAN specification or protocol version.
+  link: https://lora-alliance.org/lorawan-for-developers
+  abbr:
+    - MAC
+
+Regional Parameters:
+  description: LoRaWAN official regional specifications, downloadable from the LoRa Alliance.
+  link: https://lora-alliance.org/sites/default/files/2020-01/rp_2-1.0.0_final_release.pdf
+  abbr:
+    - PHY
+
+Physical Layer:
+  description: Hardware pertaining to LoRaWAN official regional specifications. The PHY version for your device should be specified in the product documentation as Regional Parameter version.
+  link: https://lora-alliance.org/sites/default/files/2020-01/rp_2-1.0.0_final_release.pdf
+  abbr:
+    - PHY
+
+Local area network:
+  description: A network that connects computers within a limited area.
+  link: https://en.wikipedia.org/wiki/Local_area_network
+  abbr:
+    - LAN
+
+Wide area network:
+  description: A network that connects within a wide geographical range, usually to the internet.
+  link: https://en.wikipedia.org/wiki/Wide_area_network
+  abbr:
+    - WAN
+
+ISM Radio Bands:
+  description: The Industrial, Scientific, and Medical Bands, most commonly used for low-power and short range telecommunications, such as WiFi, Bluetooth, Zigbee, wireless telephones, RFID, and NFC.
+  link: https://en.wikipedia.org/wiki/ISM_band
+
+Payload:
+  description: A LoRaWAN packet. Application payloads are decrypted data relevant to the application. Gateway payloads are encrypted and include the application payload plus a frame counter and other LoRaWAN data.
+
+Interval:
+  description: The duration between messages.
+  link: https://www.thethingsnetwork.org/docs/lorawan/duty-cycle.html
+
+Duty Cycle:
+  description: The fraction of time a device is busy. When a single device transmits on a channel for 2 time units every 10 time units, this device has a duty cycle of 20%.
+  link: https://www.thethingsnetwork.org/docs/lorawan/duty-cycle.html
+
+Data Rate:
+  description: A combination of Bandwidth and Spreading Factor which defines how quickly a message is transmitted.
+  link: https://www.thethingsnetwork.org/docs/lorawan/modulation-data-rate.html
+  abbr:
+    - DR
+
+Bandwidth:
+  description: LoRaWAN can use channels with a bandwidth of either 125 kHz, 250 kHz or 500 kHz, depending on the region or the Frequency Plan. Making the bandwidth 2x wider (from BW125 to BW250) allows you to send 2x more bytes in the same time.
+  link: https://www.thethingsnetwork.org/docs/lorawan/modulation-data-rate.html
+
+Spreading Factor:
+  description: The transmission speed or Data Rate of a LoRaWAN message, ranging from SF7 (highest Data Rate) to SF12 (lowest Data Rate). Making the spreading factor 1 step lower (from SF10 to SF9) allows you to roughly send the same amount of data use half the time on air. Lowering the spreading factor makes it more difficult for the gateway to receive a transmission, as it will be more sensitive to noise.
+  link: https://www.thethingsnetwork.org/docs/lorawan/modulation-data-rate.html
+  abbr:
+    - SF
+
+Adaptive Data Rate:
+  description: A mechanism for optimizing data rates, airtime and energy consumption in the network.
+  link: https://www.thethingsnetwork.org/docs/lorawan/adaptive-data-rate.html
+  abbr:
+    - ADR
+
+Signal to noise ratio:
+  description: A measure of signal strength.
+  link: https://en.wikipedia.org/wiki/Signal-to-noise_ratio
+  abbr:
+    - SNR
+
+Classes:
+  description: The LoRaWAN specification defines three device types. All LoRaWAN devices must implement Class A, whereas Class B and Class C are extensions to the specification of Class A devices.
+  link: https://www.thethingsnetwork.org/docs/lorawan/classes.html
+
+Class A:
+  description: Class A devices support bi-directional communication between a device and a gateway. Uplink messages (from the device to the server) can be sent at any time (randomly). The device then opens two receive windows at specified times after an uplink transmission. The first receive window (Rx1) is set to 5 seconds and can be modified. The second receive window (Rx2) always comes 1 second after Rx1.
+  link: https://www.thethingsnetwork.org/docs/lorawan/classes.html
+
+Class B:
+  description: Class B devices extend Class A by adding scheduled receive windows for downlink messages from the server. Using time-synchronized beacons transmitted by the gateway, the devices periodically open receive windows.
+  link: https://www.thethingsnetwork.org/docs/lorawan/classes.html
+
+Class C:
+  description: Class C devices extend Class A by keeping the receive windows open unless they are transmitting. This allows for low-latency communication but is many times more energy consuming than Class A devices.
+  link: https://www.thethingsnetwork.org/docs/lorawan/classes.html
+
+Device ID:
+  description: A unique, human-readable identifier for your device.
+
+Device EUI:
+  description: A 64 bit extended unique identifier for your device. This is programmed by the manufacturer and should not be changed.
+  link: https://www.thethingsnetwork.org/docs/lorawan/addressing.html
+  abbr:
+    - DevEUI
+
+Device Address:
+  description: A 32 bit non-unique identifier, assigned by the Network Server during device activation.
+  link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=33
+  abbr:
+    - DevAddr
+
+Application ID:
+  description:  A unique, human-readable identifier for your application.
+  abbr:
+    - AppID
+
+Join EUI:
+  description: The Join EUI (formerly called Application EUI) is a 64 bit extended unique identifier used to identify the join server during activation. This should be provided by the device manufacturer for pre-provisioned devices, or by the owner of the join server you will use.
+  link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=33
+  alt:
+    - Application EUI
+  abbr:
+    - JoinEUI
+
+Application EUI:
+  description: In LoRaWAN specifications prior to 1.1, Join EUI was called Application EUI. See Join EUI.
+  link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=33
+  abbr:
+    - AppEUI
+
+Application Session Key:
+  description: After activation, this encryption key is used to secure messages which carry a payload.
+  abbr:
+    - AppSKey
+
+Network Session Key:
+  description: After activation, this encryption key is used to secure messages which do not carry a payload.
+  link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=33
+  abbr:
+    - NwkSKey
+
+Application Key:
+  description: A device specific encryption key used during OTAA to generate the AppSKey (in LoRaWAN 1.1x) or both the NwkSKey and AppSKey in LoRaWAN 1.0x. This is usually pre provisioned by the device manufacturer, but can also be created by the user.
+  link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=33
+  abbr:
+    - AppKey
+
+Over the Air Activation:
+  description: The preferred method to join a LoRaWAN network, offering more flexibility, security, and scalability than ABP.
+  link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=34
+  abbr:
+    - OTAA
+
+Activation by Personalisation:
+  description: Manually provisioning device keys to join a LoRaWAN network. Less flexible, less secure, and less scalable than OTAA, but sometimes useful during demos, to avoid waiting for a downlink window to join a network.
+  link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=37
+  abbr:
+    - ABP
+
+Dwell time:
+  description: The time needed to transmit a LoRaWAN message. In some regions a maximum allowed dwell time is configured to limit transmission time, typically 400ms.
+
+Dwell time configuration:
+  description: The Dwell time restrictions are configurable for each Frequency Plan. In regions where dwell time limitations are optional, they're disabled by default.
+
+Band:
+  description: For LoRaWAN, a Band is a range of frequencies divided either in to dynamic channels (i.e. EU868) or fixed channels (i.e. US902, AU915). The LoRaWAN Regional Parameters specify which Bands are supported by LoRaWAN in a geographical area. Within a Band, there can be multiple complying Frequency Plans. Devices typically support one or more Bands in their hardware, and are configured for a particular Frequency Plan as part of activation.
+  link: https://lora-alliance.org/sites/default/files/2020-01/rp_2-1.0.0_final_release.pdf
+  alt:
+    - Frequency Band
+
+Frequency Plan:
+  description: A Frequency Plan complies with the regulations specified in the LoRaWAN Regional Parameters for a particular Band. A Frequency Plan can additionally support different data rates within that Band. Devices support any Frequency Plan within a supported Band, and are configured for a particular Frequency Plan as part of activation. A complete list of Frequency Plans supported by The Things Stack is available via Github at the link below.
+  link: https://github.com/TheThingsNetwork/lorawan-frequency-plans
+  abbr:
+    - FP
+  alt:
+    - Channel Plan
+
+Dynamic Channel:
+  description: A Band which uses Dynamic Channels (i.e. EU868) uses a Channel Frequency List (CFList) to communicate channels by frequency.
+  link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=50
+
+Fixed Channel:
+  description: A Band which uses Fixed Channels (i.e. US902, AU915) uses a Channel Mask (ChMask) to enable and disable channels.
+  link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=50

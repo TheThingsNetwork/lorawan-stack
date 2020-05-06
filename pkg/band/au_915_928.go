@@ -65,6 +65,8 @@ func init() {
 	au_915_928 = Band{
 		ID: AU_915_928,
 
+		EnableADR: true,
+
 		MaxUplinkChannels: 72,
 		UplinkChannels:    uplinkChannels,
 
@@ -161,11 +163,13 @@ func init() {
 		// No LoRaWAN Regional Parameters 1.0
 		regionalParameters1_0_1: bandIdentity,
 		regionalParameters1_0_2RevA: func(b Band) Band {
-			for drIdx := ttnpb.DATA_RATE_0; drIdx < ttnpb.DATA_RATE_4; drIdx++ {
-				b.DataRates[drIdx] = b.DataRates[drIdx+2]
+			dataRates := make(map[ttnpb.DataRateIndex]DataRate, len(b.DataRates)-2)
+			for drIdx := ttnpb.DATA_RATE_0; drIdx <= ttnpb.DATA_RATE_4; drIdx++ {
+				dataRates[drIdx] = b.DataRates[drIdx+2]
 			}
-			delete(b.DataRates, ttnpb.DATA_RATE_5)
-			delete(b.DataRates, ttnpb.DATA_RATE_6)
+			b.DataRates = dataRates
+
+			b.UplinkChannels = append(b.UplinkChannels[:0:0], b.UplinkChannels...)
 			for i := 0; i < 64; i++ {
 				b.UplinkChannels[i].MaxDataRate = ttnpb.DATA_RATE_3
 			}
