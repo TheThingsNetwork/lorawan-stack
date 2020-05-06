@@ -17,12 +17,12 @@ package devicetemplateconverter_test
 import (
 	"testing"
 
-	"go.thethings.network/lorawan-stack/pkg/component"
-	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
-	. "go.thethings.network/lorawan-stack/pkg/devicetemplateconverter"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
+	. "go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 func TestDeviceTemplateConverter(t *testing.T) {

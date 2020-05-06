@@ -17,10 +17,10 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // DeviceRegistry is a registry, containing devices.
@@ -34,9 +34,12 @@ type DeviceRegistry interface {
 func logRegistryRPCError(ctx context.Context, err error, msg string) {
 	logger := log.FromContext(ctx).WithError(err)
 	var printLog func(string)
-	if errors.IsNotFound(err) || errors.IsInvalidArgument(err) {
+	switch {
+	case errors.IsNotFound(err), errors.IsInvalidArgument(err):
 		printLog = logger.Debug
-	} else {
+	case errors.IsFailedPrecondition(err):
+		printLog = logger.Warn
+	default:
 		printLog = logger.Error
 	}
 	printLog(msg)

@@ -14,7 +14,7 @@
 
 package joinserver
 
-import "go.thethings.network/lorawan-stack/pkg/types"
+import "go.thethings.network/lorawan-stack/v3/pkg/types"
 
 // Config represents the JoinServer configuration.
 type Config struct {

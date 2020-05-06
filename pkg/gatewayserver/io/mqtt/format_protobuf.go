@@ -17,8 +17,8 @@ package mqtt
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt/topics"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt/topics"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 type protobuf struct {

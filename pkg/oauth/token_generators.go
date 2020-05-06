@@ -16,7 +16,7 @@ package oauth
 
 import (
 	"github.com/openshift/osin"
-	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 )
 
 func (s *server) GenerateAuthorizeToken(_ *osin.AuthorizeData) (string, error) {

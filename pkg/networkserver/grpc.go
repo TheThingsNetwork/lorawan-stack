@@ -18,7 +18,7 @@ import (
 	"context"
 
 	"github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GenerateDevAddr returns a device address assignment in the device address

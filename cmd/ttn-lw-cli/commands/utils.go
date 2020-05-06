@@ -21,7 +21,7 @@ import (
 	"net/url"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/io"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/io"
 )
 
 func getHost(address string) string {

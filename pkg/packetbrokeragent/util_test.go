@@ -22,9 +22,9 @@ import (
 	"net"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/packetbrokeragent/mock"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent/mock"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {

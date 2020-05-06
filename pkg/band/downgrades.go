@@ -14,7 +14,7 @@
 
 package band
 
-import "go.thethings.network/lorawan-stack/pkg/ttnpb"
+import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
 func disableCFList(b Band) Band {
 	b.ImplementsCFList = false

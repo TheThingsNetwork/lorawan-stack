@@ -31,14 +31,14 @@ import "lorawan-stack/api/metadata.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 message Session {
   reserved 1; // RFU: Session ID
 
   // Device Address, issued by the Network Server or chosen by device manufacturer in case of testing range (beginning with 00-03).
   // Known by Network Server, Application Server and Join Server. Owned by Network Server.
-  bytes dev_addr = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr", (gogoproto.nullable) = false];
+  bytes dev_addr = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr", (gogoproto.nullable) = false];
   SessionKeys keys = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Last uplink frame counter value used. Network Server only. Application Server assumes the Network Server checked it.
   uint32 last_f_cnt_up = 4;
@@ -357,6 +357,9 @@ message MACState {
 
   // Frequencies rejected by the device.
   repeated uint64 rejected_frequencies = 19 [(validate.rules).repeated.items.uint64.gte = 100000];
+
+  // Time when the last downlink message was scheduled.
+  google.protobuf.Timestamp last_downlink_at = 20 [(gogoproto.stdtime) = true];
 }
 
 // Power state of the device.
@@ -467,7 +470,7 @@ message EndDevice {
   RootKeys root_keys = 22;
 
   // Home NetID. Stored in Join Server.
-  bytes net_id = 23 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID", (gogoproto.customname) = "NetID"];
+  bytes net_id = 23 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID", (gogoproto.customname) = "NetID"];
   // Settings for how the Network Server handles MAC layer for this device. Stored in Network Server.
   MACSettings mac_settings = 24 [(gogoproto.customname) = "MACSettings"];
   // MAC state of the device. Stored in Network Server.
@@ -568,8 +571,8 @@ message GetEndDeviceRequest {
 }
 
 message GetEndDeviceIdentifiersForEUIsRequest {
-  bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
-  bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
+  bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+  bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
 }
 
 message ListEndDevicesRequest {

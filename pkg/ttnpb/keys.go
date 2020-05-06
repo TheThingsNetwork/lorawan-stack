@@ -14,7 +14,7 @@
 
 package ttnpb
 
-import "go.thethings.network/lorawan-stack/pkg/types"
+import "go.thethings.network/lorawan-stack/v3/pkg/types"
 
 func (m *KeyEnvelope) GetKey() *types.AES128Key {
 	if m != nil {

@@ -19,7 +19,7 @@ import "google/api/annotations.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 message ListFrequencyPlansRequest {
   // Optional base frequency in MHz for hardware support (433, 470, 868 or 915)

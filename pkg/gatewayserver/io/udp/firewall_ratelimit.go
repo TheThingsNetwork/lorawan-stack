@@ -18,8 +18,8 @@ import (
 	"sync"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	encoding "go.thethings.network/lorawan-stack/v3/pkg/ttnpb/udp"
 )
 
 type rateLimitingFirewall struct {

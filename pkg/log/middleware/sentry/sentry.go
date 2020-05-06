@@ -17,8 +17,8 @@ package sentry
 
 import (
 	"github.com/getsentry/sentry-go"
-	sentryerrors "go.thethings.network/lorawan-stack/pkg/errors/sentry"
-	"go.thethings.network/lorawan-stack/pkg/log"
+	sentryerrors "go.thethings.network/lorawan-stack/v3/pkg/errors/sentry"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 // Sentry is a log.Handler that sends errors to Sentry.

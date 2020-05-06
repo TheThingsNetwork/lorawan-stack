@@ -14,7 +14,7 @@
 
 package joinserver
 
-import "go.thethings.network/lorawan-stack/pkg/errors"
+import "go.thethings.network/lorawan-stack/v3/pkg/errors"
 
 var (
 	errCallerNotAuthorized            = errors.DefinePermissionDenied("caller_not_authorized", "caller `{name}` is not authorized for the entity")

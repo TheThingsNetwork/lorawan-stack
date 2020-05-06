@@ -21,10 +21,10 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	. "go.thethings.network/lorawan-stack/pkg/webhandlers"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	. "go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
 func TestErrorHandler(t *testing.T) {

@@ -18,8 +18,8 @@ import (
 	"context"
 	"fmt"
 
-	"go.thethings.network/lorawan-stack/pkg/i18n"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/i18n"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 const i18nPrefix = "event"

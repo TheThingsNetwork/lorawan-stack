@@ -23,7 +23,7 @@ import (
 
 	"github.com/go-redis/redis"
 	ulid "github.com/oklog/ulid/v2"
-	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
+	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 )
 
 const (

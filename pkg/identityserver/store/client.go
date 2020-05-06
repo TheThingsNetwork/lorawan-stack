@@ -17,7 +17,7 @@ package store
 import (
 	"github.com/gogo/protobuf/types"
 	"github.com/lib/pq"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // Client model.

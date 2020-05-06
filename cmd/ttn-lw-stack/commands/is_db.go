@@ -17,8 +17,8 @@ package commands
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/store/migrations"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store/migrations"
 )
 
 var (

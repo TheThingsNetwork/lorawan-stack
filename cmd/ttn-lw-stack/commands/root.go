@@ -21,14 +21,14 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	"github.com/spf13/cobra"
-	"go.thethings.network/lorawan-stack/cmd/internal/commands"
-	"go.thethings.network/lorawan-stack/cmd/internal/shared"
-	"go.thethings.network/lorawan-stack/cmd/internal/shared/version"
-	conf "go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	logsentry "go.thethings.network/lorawan-stack/pkg/log/middleware/sentry"
-	pkgversion "go.thethings.network/lorawan-stack/pkg/version"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared/version"
+	conf "go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	logsentry "go.thethings.network/lorawan-stack/v3/pkg/log/middleware/sentry"
+	pkgversion "go.thethings.network/lorawan-stack/v3/pkg/version"
 )
 
 var errMissingFlag = errors.DefineInvalidArgument("missing_flag", "missing CLI flag `{flag}`")

@@ -18,7 +18,7 @@ import (
 	"crypto/aes"
 
 	"github.com/jacobsa/crypto/cmac"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 var errInvalidJoinAcceptMessageSize = errInvalidSize("join_accept_message", "join-accept message", "16 or 32")

@@ -18,7 +18,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/basicstation"
+	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 )
 
 // Definition of message types.

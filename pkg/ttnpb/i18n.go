@@ -17,7 +17,7 @@ package ttnpb
 import (
 	"fmt"
 
-	"go.thethings.network/lorawan-stack/pkg/i18n"
+	"go.thethings.network/lorawan-stack/v3/pkg/i18n"
 )
 
 func defineEnum(e fmt.Stringer, message string) {

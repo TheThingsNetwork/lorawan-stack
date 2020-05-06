@@ -22,7 +22,7 @@ import (
 	"net/http/httptest"
 	"path/filepath"
 
-	"go.thethings.network/lorawan-stack/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 var (

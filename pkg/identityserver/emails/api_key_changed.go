@@ -14,7 +14,7 @@
 
 package emails
 
-import "go.thethings.network/lorawan-stack/pkg/ttnpb"
+import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
 // APIKeyChanged is the email that is sent when users updates an API key
 type APIKeyChanged struct {

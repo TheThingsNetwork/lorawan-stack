@@ -17,7 +17,7 @@ package provider
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"gocloud.dev/pubsub"
 )
 

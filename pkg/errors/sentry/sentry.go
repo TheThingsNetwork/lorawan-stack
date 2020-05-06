@@ -16,7 +16,7 @@ package sentry
 
 import (
 	"github.com/getsentry/sentry-go"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 // NewEvent creates a new Sentry event for the given error.

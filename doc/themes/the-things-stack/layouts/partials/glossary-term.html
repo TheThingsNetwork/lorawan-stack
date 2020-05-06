@@ -1,0 +1,25 @@
+<dl>
+	<dt id="{{.term | urlize}}">
+    <span class="term">
+      {{- .term -}}
+    </span>
+  </dt>
+	{{- range .context.abbr -}}
+		<dt id="{{ . | urlize}}">
+      <span class="term-abbr">
+        ( {{- . -}} )
+      </span>
+    </dt>
+	{{- end -}}
+	{{- range .context.alt -}}
+		<dt id="{{ . | urlize}}">
+      <span class="term-alt">
+        ( {{- . -}} )
+      </span>
+    </dt>
+	{{- end -}}
+	<dd>{{ .context.description }}</dd>
+	{{- with .context.link -}}
+		<dd><a href={{ . | relURL }}>{{- . -}}</a></dd>
+	{{- end -}}
+</dl>

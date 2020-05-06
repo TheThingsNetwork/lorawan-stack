@@ -14,7 +14,7 @@
 
 package crypto
 
-import "go.thethings.network/lorawan-stack/pkg/ttnpb"
+import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
 func init() {
 	ttnpb.PopulatorConfig.LoRaWAN.ComputeUplinkMIC = ComputeUplinkMIC

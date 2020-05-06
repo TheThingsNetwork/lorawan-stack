@@ -20,8 +20,8 @@ import (
 	"os"
 	"runtime/debug"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/webhandlers"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
 // errHTTPRecovered is returned when a panic is caught from an HTTP handler.

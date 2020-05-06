@@ -20,11 +20,11 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"go.thethings.network/lorawan-stack/pkg/component"
-	web_errors "go.thethings.network/lorawan-stack/pkg/errors/web"
-	"go.thethings.network/lorawan-stack/pkg/web"
-	"go.thethings.network/lorawan-stack/pkg/web/oauthclient"
-	"go.thethings.network/lorawan-stack/pkg/webui"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	web_errors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/web/oauthclient"
+	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
 // Console is the Console component.

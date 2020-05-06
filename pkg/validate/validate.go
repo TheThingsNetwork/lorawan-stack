@@ -15,7 +15,7 @@
 // Package validate implements validation functions, usually used RPC message validation.
 package validate
 
-import "go.thethings.network/lorawan-stack/pkg/errors"
+import "go.thethings.network/lorawan-stack/v3/pkg/errors"
 
 type validateFn func(v interface{}) error
 

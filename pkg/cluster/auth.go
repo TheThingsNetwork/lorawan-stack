@@ -18,8 +18,8 @@ import (
 	"context"
 	"encoding/hex"
 
-	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
+	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"google.golang.org/grpc"
 )
 

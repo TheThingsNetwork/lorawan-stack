@@ -16,7 +16,7 @@
 package multi
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 // Handler implements log.Handler.

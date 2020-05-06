@@ -15,10 +15,10 @@
 package commands
 
 import (
-	"go.thethings.network/lorawan-stack/cmd/internal/commands"
-	conf "go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/discover"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
+	conf "go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/discover"
 )
 
 var (

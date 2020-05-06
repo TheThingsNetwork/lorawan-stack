@@ -19,8 +19,8 @@ import (
 	"fmt"
 
 	"github.com/lib/pq"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // EUI64 adds methods on a types.EUI64 so that it can be stored in an SQL database.

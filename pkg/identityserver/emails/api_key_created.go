@@ -14,7 +14,7 @@
 
 package emails
 
-import "go.thethings.network/lorawan-stack/pkg/ttnpb"
+import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
 // APIKeyCreated is the email that is sent when users creates a new API key
 type APIKeyCreated struct {

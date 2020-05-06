@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // Implemented as per https://www.loracloud.com/documentation/device_management?url=v1.html#object-formats

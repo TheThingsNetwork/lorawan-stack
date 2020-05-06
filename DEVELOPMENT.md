@@ -117,6 +117,8 @@ $ ./mage proto:clean proto:all jsSDK:definitions
 The documentation site for The Things Stack is built from the `doc` folder.
 All content is stored as Markdown files in `doc/content`.
 
+Data for generated documentation like API and glossary is stored in `doc/data`.
+
 In order to build the documentation site with the right theme, you need to run
 `./mage docs:deps` from time to time.
 
@@ -182,6 +184,14 @@ TTN_LW_CONSOLE_OAUTH_TOKEN_URL="http://localhost:8080/oauth/token"
 TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/oauth"
 TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth.js"
 TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
+```
+
+#### Optional Configuration
+
+Disable [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/)
+
+```bash
+WEBPACK_DISABLE_HMR="true"
 ```
 
 ## Code Style
