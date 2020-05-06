@@ -22,10 +22,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/events/fs"
-	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/events/fs"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"golang.org/x/crypto/acme"
 )
 
@@ -47,6 +47,13 @@ func WithTLSClientAuth(auth tls.ClientAuthType, cas *x509.CertPool, verify func(
 		c.ClientAuth = auth
 		c.ClientCAs = cas
 		c.VerifyPeerCertificate = verify
+	})
+}
+
+// WithTLSCertificates sets TLS certificates.
+func WithTLSCertificates(certificates ...tls.Certificate) TLSConfigOption {
+	return TLSConfigOptionFunc(func(c *tls.Config) {
+		c.Certificates = certificates
 	})
 }
 

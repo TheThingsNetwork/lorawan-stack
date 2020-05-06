@@ -17,9 +17,9 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 var (
@@ -49,7 +49,7 @@ func deviceNeedsNewChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
 }
 
 func deviceNeedsNewChannelReq(dev *ttnpb.EndDevice) bool {
-	if dev.GetMulticast() || dev.GetMACState() == nil {
+	if dev.MACState == nil {
 		return false
 	}
 	if len(dev.MACState.DesiredParameters.Channels) != len(dev.MACState.CurrentParameters.Channels) {

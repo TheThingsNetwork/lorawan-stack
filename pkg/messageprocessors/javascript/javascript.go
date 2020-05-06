@@ -21,12 +21,12 @@ import (
 	"reflect"
 	"runtime/trace"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/gogoproto"
-	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
-	"go.thethings.network/lorawan-stack/pkg/scripting"
-	js "go.thethings.network/lorawan-stack/pkg/scripting/javascript"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
+	"go.thethings.network/lorawan-stack/v3/pkg/scripting"
+	js "go.thethings.network/lorawan-stack/v3/pkg/scripting/javascript"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 type host struct {

@@ -20,8 +20,8 @@ import (
 	"time"
 
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/random"
-	"go.thethings.network/lorawan-stack/pkg/web/cookie"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
+	"go.thethings.network/lorawan-stack/v3/pkg/web/cookie"
 )
 
 // state is the shape of the state for the OAuth flow.

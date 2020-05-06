@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"go.thethings.network/lorawan-stack/pkg/webhandlers"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
 // Authenticator is the interface the Basic Auth middleware uses to authenticate users.

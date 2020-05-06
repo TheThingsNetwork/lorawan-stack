@@ -17,7 +17,7 @@ package shared
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 )
 
 // Initialize global packages.

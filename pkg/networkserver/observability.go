@@ -21,11 +21,10 @@ import (
 	"unicode"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/metrics"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 func defineReceiveMACAcceptEvent(name, desc string) func() events.Definition {
@@ -283,11 +282,8 @@ func registerReceiveUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
 }
 
 func registerMergeMetadata(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	gtws := make(map[string]struct{}, len(msg.RxMetadata))
-	for _, md := range msg.RxMetadata {
-		gtws[unique.ID(ctx, md.GatewayIdentifiers)] = struct{}{}
-	}
-	nsMetrics.uplinkGateways.WithLabelValues(ctx).Observe(float64(len(gtws)))
+	gtwCount, _ := rxMetadataStats(ctx, msg.RxMetadata)
+	nsMetrics.uplinkGateways.WithLabelValues(ctx).Observe(float64(gtwCount))
 }
 
 func registerForwardDataUplink(ctx context.Context, msg *ttnpb.ApplicationUplink) {

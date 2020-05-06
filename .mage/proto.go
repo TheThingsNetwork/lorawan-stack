@@ -72,8 +72,8 @@ func makeProtoc() (func(...string) error, *protocContext, error) {
 			"--rm",
 			"--user", fmt.Sprintf("%s:%s", usr.Uid, usr.Gid),
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/api", filepath.Join(wd, "api"), mountWD),
-			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/go.thethings.network/lorawan-stack/pkg/ttnpb", filepath.Join(wd, "pkg", "ttnpb"), protocOut),
-			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/sdk/js", filepath.Join(wd, "sdk", "js"), mountWD),
+			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/go.thethings.network/lorawan-stack/v3/pkg/ttnpb", filepath.Join(wd, "pkg", "ttnpb"), protocOut),
+			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/v3/sdk/js", filepath.Join(wd, "sdk", "js"), mountWD),
 			"-w", mountWD,
 			fmt.Sprintf("%s:%s", protocName, protocVersion),
 			fmt.Sprintf("-I%s", filepath.Dir(wd)),
@@ -210,7 +210,7 @@ func (p Proto) JsSDK(context.Context) error {
 	}
 	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
-			fmt.Sprintf("--doc_opt=json,api.json --doc_out=%s/sdk/js/generated", pCtx.WorkingDirectory),
+			fmt.Sprintf("--doc_opt=json,api.json --doc_out=%s/v3/sdk/js/generated", pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return xerrors.Errorf("failed to generate protos: %w", err)

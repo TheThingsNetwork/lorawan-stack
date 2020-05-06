@@ -15,30 +15,39 @@
 package errors
 
 import (
+	"path/filepath"
 	"runtime"
 	"strings"
 )
 
-var pkgPrefix = func() string {
-	pc, _, _, ok := runtime.Caller(1)
+// rootPath is the root path of the project (usually go.thethings.network/lorawan-stack).
+var rootPath string
+
+func setRootPath() {
+	pc, _, _, ok := runtime.Caller(0)
 	if !ok {
-		panic("could not determine package of pkg_util.go")
+		panic("could not determine import path of errors package")
 	}
-	p := strings.TrimSuffix(runtime.FuncForPC(pc).Name(), "pkg/errors.init")
-	return p
-}()
+	fun := runtime.FuncForPC(pc).Name()
+	rootPath = filepath.Dir(filepath.Dir(filepath.Join(filepath.Dir(fun), strings.Split(filepath.Base(fun), ".")[0]))) + "/"
+}
 
 // namespace is called when errors are defined.
 // It returns the package path of the caller (skipping the first frames of the call stack)
-// and makes it relative (so for example: pkg/errors).
+// and makes it relative to rootPath (so for example: pkg/errors).
 func namespace(skip int) string {
 	pc, _, _, ok := runtime.Caller(skip)
 	if !ok {
 		panic("could not determine source of error")
 	}
 	fun := runtime.FuncForPC(pc).Name()
-	slashIdx := strings.LastIndexByte(fun, '/')
-	dotIdx := strings.IndexByte(fun[slashIdx:], '.')
-	pkg := fun[:slashIdx+dotIdx]
-	return strings.TrimPrefix(pkg, pkgPrefix)
+	pkg := filepath.Join(filepath.Dir(fun), strings.Split(filepath.Base(fun), ".")[0])
+	if rootPath == "" {
+		setRootPath()
+	}
+	if strings.Contains(pkg, rootPath) {
+		split := strings.Split(pkg, rootPath)
+		pkg = split[len(split)-1]
+	}
+	return pkg
 }

@@ -21,6 +21,14 @@ var RxMetadataFieldPathsNested = []string{
 	"location.latitude",
 	"location.longitude",
 	"location.source",
+	"packet_broker",
+	"packet_broker.forwarder_id",
+	"packet_broker.forwarder_net_id",
+	"packet_broker.forwarder_tenant_id",
+	"packet_broker.home_network_net_id",
+	"packet_broker.home_network_tenant_id",
+	"packet_broker.hops",
+	"packet_broker.message_id",
 	"rssi",
 	"rssi_standard_deviation",
 	"signal_rssi",
@@ -42,6 +50,7 @@ var RxMetadataFieldPathsTopLevel = []string{
 	"frequency_offset",
 	"gateway_ids",
 	"location",
+	"packet_broker",
 	"rssi",
 	"rssi_standard_deviation",
 	"signal_rssi",
@@ -64,4 +73,38 @@ var LocationFieldPathsTopLevel = []string{
 	"latitude",
 	"longitude",
 	"source",
+}
+var PacketBrokerMetadataFieldPathsNested = []string{
+	"forwarder_id",
+	"forwarder_net_id",
+	"forwarder_tenant_id",
+	"home_network_net_id",
+	"home_network_tenant_id",
+	"hops",
+	"message_id",
+}
+
+var PacketBrokerMetadataFieldPathsTopLevel = []string{
+	"forwarder_id",
+	"forwarder_net_id",
+	"forwarder_tenant_id",
+	"home_network_net_id",
+	"home_network_tenant_id",
+	"hops",
+	"message_id",
+}
+var PacketBrokerRouteHopFieldPathsNested = []string{
+	"received_at",
+	"receiver_agent",
+	"receiver_name",
+	"sender_address",
+	"sender_name",
+}
+
+var PacketBrokerRouteHopFieldPathsTopLevel = []string{
+	"received_at",
+	"receiver_agent",
+	"receiver_name",
+	"sender_address",
+	"sender_name",
 }

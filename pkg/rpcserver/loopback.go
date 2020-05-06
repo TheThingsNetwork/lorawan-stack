@@ -19,7 +19,7 @@ import (
 	"net"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/version"
+	"go.thethings.network/lorawan-stack/v3/pkg/version"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )

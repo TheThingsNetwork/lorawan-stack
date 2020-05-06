@@ -20,11 +20,11 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	_ "go.thethings.network/lorawan-stack/pkg/crypto" // Needed to make the populators work.
-	. "go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	_ "go.thethings.network/lorawan-stack/v3/pkg/crypto" // Needed to make the populators work.
+	. "go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 var baseBytes = [...]byte{'t', 'e', 's', 't'}

@@ -1151,6 +1151,15 @@
       "file": "errors.go"
     }
   },
+  "error:cmd/internal/shared:initialize_packet_broker_agent": {
+    "translations": {
+      "en": "could not initialize Packet Broker Agent"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
   "error:cmd/internal/shared:initialize_qr_code_generator": {
     "translations": {
       "en": "could not initialize QR Code Generator"
@@ -1158,15 +1167,6 @@
     "description": {
       "package": "cmd/internal/shared",
       "file": "errors.go"
-    }
-  },
-  "error:cmd/ttn-lw-cli/commands:activation_mode": {
-    "translations": {
-      "en": "invalid activation mode"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-cli/commands",
-      "file": "end_devices.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:antenna_index": {
@@ -1239,15 +1239,6 @@
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
       "file": "end_devices.go"
-    }
-  },
-  "error:cmd/ttn-lw-cli/commands:f_opts": {
-    "translations": {
-      "en": "invalid f_opts"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-cli/commands",
-      "file": "simulate.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:fail_write": {
@@ -3842,6 +3833,15 @@
       "file": "ns.go"
     }
   },
+  "error:pkg/gatewayserver/upstream/packetbroker:packet_broker_agent_not_found": {
+    "translations": {
+      "en": "Packet Broker Agent not found"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/upstream/packetbroker",
+      "file": "packetbroker.go"
+    }
+  },
   "error:pkg/gatewayserver:empty_identifiers": {
     "translations": {
       "en": "empty identifiers"
@@ -6009,6 +6009,195 @@
     "description": {
       "package": "pkg/oauth",
       "file": "server.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:decode_payload": {
+    "translations": {
+      "en": "decode LoRaWAN payload"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:downlink_path": {
+    "translations": {
+      "en": "invalid uplink token downlink path"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:forwarder_disabled": {
+    "translations": {
+      "en": "Forwarder is disabled"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "grpc_gspba.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:home_network_disabled": {
+    "translations": {
+      "en": "Home Network is disabled"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "grpc_nspba.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:invalid_rx1_delay": {
+    "translations": {
+      "en": "invalid Rx1 delay"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:message_identifiers": {
+    "translations": {
+      "en": "invalid message identifiers"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "agent.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:net_id": {
+    "translations": {
+      "en": "invalid NetID `{net_id}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "agent.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:no_downlink_paths": {
+    "translations": {
+      "en": "no downlink paths"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:no_phy_payload": {
+    "translations": {
+      "en": "no PHYPayload in message"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "encryption.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:no_request": {
+    "translations": {
+      "en": "downlink message is not a transmission request"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:no_tls_certificate": {
+    "translations": {
+      "en": "no TLS certificate configured"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "config.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:token_key": {
+    "translations": {
+      "en": "invalid token key"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "agent.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:unknown_band": {
+    "translations": {
+      "en": "unknown band `{band_id}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:unknown_class": {
+    "translations": {
+      "en": "unknown class `{class}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:unknown_data_rate": {
+    "translations": {
+      "en": "unknown data rate in region `{region}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:unknown_priority": {
+    "translations": {
+      "en": "unknown priority `{priority}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:unsupported_lorawan_version": {
+    "translations": {
+      "en": "unsupported LoRaWAN version `{version}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:unsupported_m_type": {
+    "translations": {
+      "en": "unsupported LoRaWAN MType `{m_type}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:unwrap_gateway_uplink_token": {
+    "translations": {
+      "en": "unwrap gateway uplink token"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:wrap_gateway_uplink_token": {
+    "translations": {
+      "en": "wrap gateway uplink token"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:wrap_uplink_tokens": {
+    "translations": {
+      "en": "wrap uplink tokens"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
     }
   },
   "error:pkg/pfconfig/basicstationlns:frequency_plan": {

@@ -17,8 +17,8 @@ package identityserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/auth"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 func generateAPIKey(ctx context.Context, name string, rights ...ttnpb.Right) (key *ttnpb.APIKey, token string, err error) {

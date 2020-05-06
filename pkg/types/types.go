@@ -19,7 +19,7 @@ import (
 	"bytes"
 	"encoding/hex"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 // Interface all types in pkg/types must implement.

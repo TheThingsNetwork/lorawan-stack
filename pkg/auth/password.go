@@ -18,8 +18,8 @@ import (
 	"context"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/auth/pbkdf2"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 // HashValidator is a method to hash and validate a secret.

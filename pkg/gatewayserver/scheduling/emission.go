@@ -17,7 +17,7 @@ package scheduling
 import (
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 )
 
 // ConcentratorTime is the time relative to the concentrator start time (nanoseconds).

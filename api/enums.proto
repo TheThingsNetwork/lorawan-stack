@@ -18,7 +18,7 @@ package ttn.lorawan.v3;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
-option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 enum DownlinkPathConstraint {
   option (gogoproto.goproto_enum_prefix) = false;

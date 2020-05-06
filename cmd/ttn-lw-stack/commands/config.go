@@ -15,25 +15,29 @@
 package commands
 
 import (
-	"go.thethings.network/lorawan-stack/cmd/internal/commands"
-	"go.thethings.network/lorawan-stack/cmd/internal/shared"
-	shared_applicationserver "go.thethings.network/lorawan-stack/cmd/internal/shared/applicationserver"
-	shared_console "go.thethings.network/lorawan-stack/cmd/internal/shared/console"
-	shared_gatewayconfigurationserver "go.thethings.network/lorawan-stack/cmd/internal/shared/gatewayconfigurationserver"
-	shared_gatewayserver "go.thethings.network/lorawan-stack/cmd/internal/shared/gatewayserver"
-	shared_identityserver "go.thethings.network/lorawan-stack/cmd/internal/shared/identityserver"
-	shared_joinserver "go.thethings.network/lorawan-stack/cmd/internal/shared/joinserver"
-	shared_networkserver "go.thethings.network/lorawan-stack/cmd/internal/shared/networkserver"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver"
-	conf "go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/console"
-	"go.thethings.network/lorawan-stack/pkg/devicetemplateconverter"
-	"go.thethings.network/lorawan-stack/pkg/gatewayconfigurationserver"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
-	"go.thethings.network/lorawan-stack/pkg/identityserver"
-	"go.thethings.network/lorawan-stack/pkg/joinserver"
-	"go.thethings.network/lorawan-stack/pkg/networkserver"
-	"go.thethings.network/lorawan-stack/pkg/qrcodegenerator"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
+	shared_applicationserver "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/applicationserver"
+	shared_console "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/console"
+	shared_devicetemplateconverter "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/devicetemplateconverter"
+	shared_gatewayconfigurationserver "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/gatewayconfigurationserver"
+	shared_gatewayserver "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/gatewayserver"
+	shared_identityserver "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/identityserver"
+	shared_joinserver "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/joinserver"
+	shared_networkserver "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/networkserver"
+	shared_packetbrokeragent "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/packetbrokeragent"
+	shared_qrcodegenerator "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/qrcodegenerator"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
+	conf "go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/console"
+	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/joinserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator"
 )
 
 // Config for the ttn-lw-stack binary.
@@ -48,6 +52,7 @@ type Config struct {
 	GCS              gatewayconfigurationserver.Config `name:"gcs"`
 	DTC              devicetemplateconverter.Config    `name:"dtc"`
 	QRG              qrcodegenerator.Config            `name:"qrg"`
+	PBA              packetbrokeragent.Config          `name:"pba"`
 }
 
 // DefaultConfig contains the default config for the ttn-lw-stack binary.
@@ -60,6 +65,9 @@ var DefaultConfig = Config{
 	JS:          shared_joinserver.DefaultJoinServerConfig,
 	Console:     shared_console.DefaultConsoleConfig,
 	GCS:         shared_gatewayconfigurationserver.DefaultGatewayConfigurationServerConfig,
+	DTC:         shared_devicetemplateconverter.DefaultDeviceTemplateConverterConfig,
+	QRG:         shared_qrcodegenerator.DefaultQRCodeGeneratorConfig,
+	PBA:         shared_packetbrokeragent.DefaultPacketBrokerAgentConfig,
 }
 
 func init() {

@@ -20,8 +20,8 @@ import (
 	"strconv"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // EUI is an EUI that can be marshaled to an ID6 string and unmarshaled from a ID6 or hex string.

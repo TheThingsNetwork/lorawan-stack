@@ -19,8 +19,8 @@ import (
 	"regexp"
 	"strconv"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // DR encodes a LoRa data rate or an FSK data rate, and implements marshalling and unmarshalling between JSON.

@@ -18,7 +18,7 @@ import (
 	"context"
 	"sync"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 var errBlacklistedID = errors.DefineInvalidArgument("blacklisted_id", "the ID `{id}` can not be registered")

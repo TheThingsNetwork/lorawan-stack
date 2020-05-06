@@ -1,6 +1,6 @@
 {
   "name": "ttn-lw",
-  "version": "3.7.1",
+  "version": "3.8.0",
   "description": "The Things Stack for LoRaWAN JavaScript SDK",
   "url": "https://github.com/TheThingsNetwork/lorawan-stack/tree/master/sdk/js",
   "main": "dist/index.js",
@@ -32,7 +32,9 @@
   "eslintConfig": {
     "extends": "../../config/eslintrc.yaml",
     "settings": {
-      "import/ignore": ["node_modules"],
+      "import/ignore": [
+        "node_modules"
+      ],
       "import/resolver": {
         "webpack": "../../config/webpack.config.babel.js"
       }

@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/gregjones/httpcache"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 const timeout = 10 * time.Second

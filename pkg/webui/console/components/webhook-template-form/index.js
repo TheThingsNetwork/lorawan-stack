@@ -127,16 +127,13 @@ export default class WebhookTemplateForm extends Component {
         {
           webhook_id: Yup.string()
             .matches(webhookIdRegexp, sharedMessages.validateIdFormat)
-            .min(2, Yup.passValues(sharedMessages.validateTooShort))
-            .max(25, Yup.passValues(sharedMessages.validateTooLong))
+            .min(2, sharedMessages.validateTooShort)
+            .max(25, sharedMessages.validateTooLong)
             .required(sharedMessages.validateRequired),
         },
       ),
     })
-
-    const initialValues = fields.reduce((acc, field) => ({ ...acc, [field.id]: '' }), {
-      webhook_id: '',
-    })
+    const initialValues = fields.reduce((acc, field) => ({ [field.id]: '' }), {})
     return (
       <div>
         <WebhookTemplateInfo webhookTemplate={webhookTemplate} />

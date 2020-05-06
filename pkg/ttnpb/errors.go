@@ -19,8 +19,8 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	proto "github.com/golang/protobuf/proto"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 )
 
 const valueKey = "value"

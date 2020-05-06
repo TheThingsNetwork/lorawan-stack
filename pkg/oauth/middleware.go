@@ -21,7 +21,7 @@ import (
 	"path"
 
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 var errUnauthenticated = errors.DefineUnauthenticated("not_authenticated", "not authenticated")

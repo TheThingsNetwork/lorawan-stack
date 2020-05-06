@@ -19,8 +19,8 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	qrcodegen "github.com/skip2/go-qrcode"
-	"go.thethings.network/lorawan-stack/pkg/qrcode"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcode"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 type endDeviceQRCodeGeneratorServer struct {

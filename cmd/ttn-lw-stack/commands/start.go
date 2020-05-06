@@ -21,35 +21,36 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"go.thethings.network/lorawan-stack/cmd/internal/shared"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver"
-	asioapredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/redis"
-	asiopsredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/redis"
-	asiowebredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
-	asredis "go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
-	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/console"
-	"go.thethings.network/lorawan-stack/pkg/devicetemplateconverter"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	events_grpc "go.thethings.network/lorawan-stack/pkg/events/grpc"
-	"go.thethings.network/lorawan-stack/pkg/gatewayconfigurationserver"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
-	gsredis "go.thethings.network/lorawan-stack/pkg/gatewayserver/redis"
-	"go.thethings.network/lorawan-stack/pkg/identityserver"
-	"go.thethings.network/lorawan-stack/pkg/joinserver"
-	jsredis "go.thethings.network/lorawan-stack/pkg/joinserver/redis"
-	"go.thethings.network/lorawan-stack/pkg/networkserver"
-	nsredis "go.thethings.network/lorawan-stack/pkg/networkserver/redis"
-	"go.thethings.network/lorawan-stack/pkg/qrcodegenerator"
-	"go.thethings.network/lorawan-stack/pkg/redis"
-	"go.thethings.network/lorawan-stack/pkg/web"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
+	asioapredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/redis"
+	asiopsredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/redis"
+	asiowebredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/redis"
+	asredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/console"
+	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	events_grpc "go.thethings.network/lorawan-stack/v3/pkg/events/grpc"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
+	gsredis "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/joinserver"
+	jsredis "go.thethings.network/lorawan-stack/v3/pkg/joinserver/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	nsredis "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator"
+	"go.thethings.network/lorawan-stack/v3/pkg/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/web"
 )
 
 var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unknown component `{component}`")
 
 var startCommand = &cobra.Command{
-	Use:   "start [is|gs|ns|as|js|console|gcs|dtc|qrg|all]... [flags]",
+	Use:   "start [is|gs|ns|as|js|console|gcs|dtc|qrg|pba|all]... [flags]",
 	Short: "Start The Things Stack",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var start struct {
@@ -62,6 +63,7 @@ var startCommand = &cobra.Command{
 			GatewayConfigurationServer bool
 			DeviceTemplateConverter    bool
 			QRCodeGenerator            bool
+			PacketBrokerAgent          bool
 		}
 		startDefault := len(args) == 0
 		for _, arg := range args {
@@ -92,6 +94,8 @@ var startCommand = &cobra.Command{
 				start.DeviceTemplateConverter = true
 			case "qrg":
 				start.QRCodeGenerator = true
+			case "pba":
+				start.PacketBrokerAgent = true
 			case "all":
 				start.IdentityServer = true
 				start.GatewayServer = true
@@ -102,6 +106,7 @@ var startCommand = &cobra.Command{
 				start.GatewayConfigurationServer = true
 				start.DeviceTemplateConverter = true
 				start.QRCodeGenerator = true
+				start.PacketBrokerAgent = true
 			default:
 				return errUnknownComponent.WithAttributes("component", arg)
 			}
@@ -269,6 +274,15 @@ var startCommand = &cobra.Command{
 				return shared.ErrInitializeQRCodeGenerator.WithCause(err)
 			}
 			_ = qrg
+		}
+
+		if start.PacketBrokerAgent || startDefault {
+			logger.Info("Setting up Packet Broker Agent")
+			pba, err := packetbrokeragent.New(c, &config.PBA)
+			if err != nil {
+				return shared.ErrInitializePacketBrokerAgent.WithCause(err)
+			}
+			_ = pba
 		}
 
 		if rootRedirect != nil {

@@ -62,6 +62,18 @@ func (m *RxMetadata) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "packet_broker":
+
+			if v, ok := interface{}(m.GetPacketBroker()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return RxMetadataValidationError{
+						field:  "packet_broker",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "antenna_index":
 			// no validation rules for AntennaIndex
 		case "time":
@@ -323,3 +335,214 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LocationValidationError{}
+
+// ValidateFields checks the field values on PacketBrokerMetadata with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *PacketBrokerMetadata) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerMetadataFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "message_id":
+			// no validation rules for MessageID
+		case "forwarder_net_id":
+			// no validation rules for ForwarderNetID
+		case "forwarder_tenant_id":
+			// no validation rules for ForwarderTenantID
+		case "forwarder_id":
+			// no validation rules for ForwarderID
+		case "home_network_net_id":
+			// no validation rules for HomeNetworkNetID
+		case "home_network_tenant_id":
+			// no validation rules for HomeNetworkTenantID
+		case "hops":
+
+			for idx, item := range m.GetHops() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return PacketBrokerMetadataValidationError{
+							field:  fmt.Sprintf("hops[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return PacketBrokerMetadataValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerMetadataValidationError is the validation error returned by
+// PacketBrokerMetadata.ValidateFields if the designated constraints aren't met.
+type PacketBrokerMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerMetadataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerMetadataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerMetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerMetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerMetadataValidationError) ErrorName() string {
+	return "PacketBrokerMetadataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerMetadataValidationError{}
+
+// ValidateFields checks the field values on PacketBrokerRouteHop with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *PacketBrokerRouteHop) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerRouteHopFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "received_at":
+
+			if v, ok := interface{}(&m.ReceivedAt).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerRouteHopValidationError{
+						field:  "received_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "sender_name":
+			// no validation rules for SenderName
+		case "sender_address":
+			// no validation rules for SenderAddress
+		case "receiver_name":
+			// no validation rules for ReceiverName
+		case "receiver_agent":
+			// no validation rules for ReceiverAgent
+		default:
+			return PacketBrokerRouteHopValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerRouteHopValidationError is the validation error returned by
+// PacketBrokerRouteHop.ValidateFields if the designated constraints aren't met.
+type PacketBrokerRouteHopValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerRouteHopValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerRouteHopValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerRouteHopValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerRouteHopValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerRouteHopValidationError) ErrorName() string {
+	return "PacketBrokerRouteHopValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerRouteHopValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerRouteHop.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerRouteHopValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerRouteHopValidationError{}

@@ -26,18 +26,18 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/band"
-	"go.thethings.network/lorawan-stack/pkg/cluster"
-	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
-	. "go.thethings.network/lorawan-stack/pkg/networkserver"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 )
 
@@ -637,35 +637,6 @@ func TestHandleUplink(t *testing.T) {
 							RxMetadata: uplinkMDs,
 							Settings:   MakeUplinkSettings(dr, ch.Frequency),
 						}), ErrUnsupportedLoRaWANVersion.WithAttributes("version", uint32(1))), should.BeTrue)
-					},
-				},
-				TestCase{
-					Name: makeName("FOpts non-empty for FPort 0 uplink"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
-							RawPayload: []byte{
-								/* MHDR */
-								0b010_000_00,
-								/* MACPayload */
-								/** FHDR **/
-								/*** DevAddr ***/
-								0xff, 0xff, 0xff, 0x42,
-								/*** FCtrl ***/
-								0xb2,
-								/*** FCnt ***/
-								0x42, 0xff,
-								/*** FOpts ***/
-								0xfe, 0xff,
-								/** FPort **/
-								0x0,
-								/** FRMPayload **/
-								0xfe, 0xff,
-								/* MIC */
-								0x03, 0x02, 0x01, 0x00,
-							},
-							RxMetadata: uplinkMDs,
-							Settings:   MakeUplinkSettings(dr, ch.Frequency),
-						}), ErrInvalidPayload), should.BeTrue)
 					},
 				},
 				TestCase{
@@ -1384,7 +1355,7 @@ func TestHandleUplink(t *testing.T) {
 			for _, confirmed := range [2]bool{true, false} {
 				confirmed := confirmed
 				makeDataUplink := func(decodePayload bool, adr bool, frmPayload []byte) *ttnpb.UplinkMessage {
-					return MakeDataUplink(macVersion, decodePayload, confirmed, DevAddr, ttnpb.FCtrl{ADR: adr}, FCnt, 0, FPort, frmPayload, []byte{0x02}, dr, drIdx, ch.Frequency, chIdx, uplinkMDs...)
+					return MakeDataUplink(macVersion, decodePayload, confirmed, DevAddr, ttnpb.FCtrl{ADR: adr}, FCnt, 0, FPort, frmPayload, []byte{byte(ttnpb.CID_LINK_CHECK)}, dr, drIdx, ch.Frequency, chIdx, uplinkMDs...)
 				}
 				dataSetByIDSetPaths := [...]string{
 					"mac_state",
@@ -1674,13 +1645,7 @@ func TestHandleUplink(t *testing.T) {
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, getDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
 									return a.So(AllTrue(
 										ok,
-										func() bool {
-											if len(uplinkMDs) == 0 {
-												// No downlink task should be added if no downlink paths are available.
-												return true
-											}
-											return assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, clock.Now().Add(NSScheduleWindow()), true, ErrTestInternal)
-										}(),
+										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+Rx1Delay.Duration()/2-NSScheduleWindow()), true, ErrTestInternal),
 										assertDataApplicationUp(ctx, env, setCtx, setDevice, decodedMsg, ErrTestInternal),
 										a.So(env.Events, should.ReceiveEventsResembling,
 											events.ApplyDefinitionDataClosures(setCtx, setDevice.EndDeviceIdentifiers, macEvs...),
@@ -1716,7 +1681,7 @@ func TestHandleUplink(t *testing.T) {
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, getDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
 									return a.So(AllTrue(
 										ok,
-										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, clock.Now().Add(NSScheduleWindow()), true, nil),
+										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+Rx1Delay.Duration()/2-NSScheduleWindow()), true, nil),
 										assertDataApplicationUp(ctx, env, setCtx, setDevice, WithMatchedUplinkSettings(decodedMsg, chIdx, drIdx), nil),
 										a.So(env.Events, should.ReceiveEventsResembling,
 											events.ApplyDefinitionDataClosures(setCtx, setDevice.EndDeviceIdentifiers, macEvs...),
@@ -1754,7 +1719,7 @@ func TestHandleUplink(t *testing.T) {
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, rangeDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
 									return a.So(AllTrue(
 										ok,
-										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, clock.Now().Add(NSScheduleWindow()), true, ErrTestInternal),
+										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+Rx1Delay.Duration()/2-NSScheduleWindow()), true, ErrTestInternal),
 										a.So(env.Events, should.ReceiveEventsResembling,
 											events.ApplyDefinitionDataClosures(setCtx, setDevice.EndDeviceIdentifiers, macEvs...),
 											EvtProcessDataUplink(setCtx, setDevice.EndDeviceIdentifiers, decodedMsg),

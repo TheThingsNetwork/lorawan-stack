@@ -19,7 +19,7 @@ import (
 	"runtime"
 
 	"github.com/spf13/cobra"
-	"go.thethings.network/lorawan-stack/pkg/version"
+	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
 
 func print(k, v string) {

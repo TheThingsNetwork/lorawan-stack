@@ -24,23 +24,23 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
-	"go.thethings.network/lorawan-stack/pkg/band"
-	"go.thethings.network/lorawan-stack/pkg/cluster"
-	"go.thethings.network/lorawan-stack/pkg/component"
-	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
-	"go.thethings.network/lorawan-stack/pkg/crypto"
-	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 )
 
@@ -449,27 +449,6 @@ var RxMetadata = [...]*ttnpb.RxMetadata{
 	},
 }
 
-var GatewayAntennaIdentifiers = [...]ttnpb.GatewayAntennaIdentifiers{
-	{
-		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-0"},
-		AntennaIndex:       3,
-	},
-	{
-		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-1"},
-		AntennaIndex:       1,
-	},
-	{
-		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-2"},
-	},
-	{
-		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-3"},
-		AntennaIndex:       2,
-	},
-	{
-		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-4"},
-	},
-}
-
 func MakeUplinkSettings(dr ttnpb.DataRate, freq uint64) ttnpb.TxSettings {
 	return ttnpb.TxSettings{
 		DataRate:  *deepcopy.Copy(&dr).(*ttnpb.DataRate),
@@ -603,10 +582,16 @@ func MustEncryptUplink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, 
 }
 
 func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, devAddr types.DevAddr, fCtrl ttnpb.FCtrl, fCnt, confFCntDown uint32, fPort uint8, frmPayload, fOpts []byte, dr ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64, chIdx uint8, mds ...*ttnpb.RxMetadata) *ttnpb.UplinkMessage {
-	if len(fOpts) > 0 && fPort == 0 {
-		panic("FOpts must not be set for FPort == 0")
+	if !fCtrl.Ack && confFCntDown > 0 {
+		panic("ConfFCntDown must be zero for uplink frames with ACK bit unset")
 	}
 	devAddr = *devAddr.Copy(&types.DevAddr{})
+	keys := MakeSessionKeys(macVersion, false)
+	if len(frmPayload) > 0 && fPort == 0 {
+		frmPayload = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, false, frmPayload...)
+	} else if len(fOpts) > 0 && macVersion.EncryptFOpts() {
+		fOpts = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, true, fOpts...)
+	}
 	mType := ttnpb.MType_UNCONFIRMED_UP
 	if confirmed {
 		mType = ttnpb.MType_CONFIRMED_UP
@@ -615,33 +600,27 @@ func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, 
 		MType: mType,
 		Major: ttnpb.Major_LORAWAN_R1,
 	}
-	keys := MakeSessionKeys(macVersion, false)
-	if fPort == 0 {
-		frmPayload = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, false, frmPayload...)
-	} else if len(fOpts) > 0 && macVersion.EncryptFOpts() {
-		fOpts = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, true, fOpts...)
-	}
 	fhdr := ttnpb.FHDR{
 		DevAddr: devAddr,
 		FCtrl:   fCtrl,
 		FCnt:    fCnt & 0xffff,
 		FOpts:   fOpts,
 	}
-	phyPayload := append(
-		append(
-			test.Must(lorawan.AppendFHDR(
-				test.Must(lorawan.AppendMHDR(nil, mhdr)).([]byte), fhdr, true),
-			).([]byte),
-			fPort),
-		frmPayload...)
+	phyPayload := test.Must(lorawan.MarshalMessage(ttnpb.Message{
+		MHDR: mhdr,
+		Payload: &ttnpb.Message_MACPayload{
+			MACPayload: &ttnpb.MACPayload{
+				FHDR:       fhdr,
+				FPort:      uint32(fPort),
+				FRMPayload: frmPayload,
+			},
+		},
+	})).([]byte)
 	var mic [4]byte
 	switch {
 	case macVersion.Compare(ttnpb.MAC_V1_1) < 0:
 		mic = test.Must(crypto.ComputeLegacyUplinkMIC(*keys.FNwkSIntKey.Key, devAddr, fCnt, phyPayload)).([4]byte)
 	default:
-		if !fCtrl.Ack {
-			confFCntDown = 0
-		}
 		mic = test.Must(crypto.ComputeUplinkMIC(*keys.SNwkSIntKey.Key, *keys.FNwkSIntKey.Key, confFCntDown, uint8(drIdx), chIdx, devAddr, fCnt, phyPayload)).([4]byte)
 	}
 	phyPayload = append(phyPayload, mic[:]...)
@@ -681,47 +660,45 @@ func MustEncryptDownlink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32
 	return test.Must(crypto.EncryptDownlink(key, devAddr, fCnt, b, isFOpts)).([]byte)
 }
 
-func MakeDataDownlink(macVersion ttnpb.MACVersion, confirmed bool, devAddr types.DevAddr, fCtrl ttnpb.FCtrl, fCnt, confFCntDown uint32, fPort uint8, frmPayload, fOpts []byte, txReq *ttnpb.TxRequest, cids ...string) *ttnpb.DownlinkMessage {
-	if len(fOpts) > 0 && fPort == 0 {
-		panic("FOpts must not be set for FPort == 0")
+func MakeDataDownlink(macVersion ttnpb.MACVersion, confirmed bool, devAddr types.DevAddr, fCtrl ttnpb.FCtrl, fCnt, confFCntUp uint32, fPort uint8, frmPayload, fOpts []byte, txReq *ttnpb.TxRequest, cids ...string) *ttnpb.DownlinkMessage {
+	if !fCtrl.Ack && confFCntUp > 0 {
+		panic("ConfFCntDown must be zero for uplink frames with ACK bit unset")
 	}
 	devAddr = *devAddr.Copy(&types.DevAddr{})
-	mType := ttnpb.MType_UNCONFIRMED_DOWN
-	if confirmed {
-		mType = ttnpb.MType_CONFIRMED_DOWN
-	}
-	mhdr := ttnpb.MHDR{
-		MType: mType,
-		Major: ttnpb.Major_LORAWAN_R1,
-	}
 	keys := MakeSessionKeys(macVersion, false)
-	if fPort == 0 {
+	if len(frmPayload) > 0 && fPort == 0 {
 		frmPayload = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, fCnt, false, frmPayload...)
 	} else if len(fOpts) > 0 && macVersion.EncryptFOpts() {
 		fOpts = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, fCnt, true, fOpts...)
 	}
-	fhdr := ttnpb.FHDR{
-		DevAddr: devAddr,
-		FCtrl:   fCtrl,
-		FCnt:    fCnt & 0xffff,
-		FOpts:   fOpts,
+	mType := ttnpb.MType_UNCONFIRMED_DOWN
+	if confirmed {
+		mType = ttnpb.MType_CONFIRMED_DOWN
 	}
-	phyPayload := append(
-		append(
-			test.Must(lorawan.AppendFHDR(
-				test.Must(lorawan.AppendMHDR(nil, mhdr)).([]byte), fhdr, false),
-			).([]byte),
-			fPort),
-		frmPayload...)
+	phyPayload := test.Must(lorawan.MarshalMessage(ttnpb.Message{
+		MHDR: ttnpb.MHDR{
+			MType: mType,
+			Major: ttnpb.Major_LORAWAN_R1,
+		},
+		Payload: &ttnpb.Message_MACPayload{
+			MACPayload: &ttnpb.MACPayload{
+				FHDR: ttnpb.FHDR{
+					DevAddr: devAddr,
+					FCtrl:   fCtrl,
+					FCnt:    fCnt & 0xffff,
+					FOpts:   fOpts,
+				},
+				FPort:      uint32(fPort),
+				FRMPayload: frmPayload,
+			},
+		},
+	})).([]byte)
 	var mic [4]byte
 	switch {
 	case macVersion.Compare(ttnpb.MAC_V1_1) < 0:
 		mic = test.Must(crypto.ComputeLegacyDownlinkMIC(*keys.FNwkSIntKey.Key, devAddr, fCnt, phyPayload)).([4]byte)
 	default:
-		if !fCtrl.Ack {
-			confFCntDown = 0
-		}
-		mic = test.Must(crypto.ComputeDownlinkMIC(*keys.SNwkSIntKey.Key, devAddr, confFCntDown, fCnt, phyPayload)).([4]byte)
+		mic = test.Must(crypto.ComputeDownlinkMIC(*keys.SNwkSIntKey.Key, devAddr, confFCntUp, fCnt, phyPayload)).([4]byte)
 	}
 	return &ttnpb.DownlinkMessage{
 		CorrelationIDs: append([]string{}, cids...),
@@ -1911,9 +1888,14 @@ func MakeTestCaseName(parts ...string) string {
 func ForEachBand(t *testing.T, f func(func(...string) string, band.Band, ttnpb.PHYVersion)) {
 	for phyID, phy := range band.All {
 		for _, phyVersion := range phy.Versions() {
+			phy, err := phy.Version(phyVersion)
+			if err != nil {
+				t.Errorf("Failed to convert %s band to %s version", phyID, phyVersion)
+				continue
+			}
 			f(func(parts ...string) string {
 				return MakeTestCaseName(append(parts, fmt.Sprintf("%s/PHY:%s", phyID, phyVersion.String()))...)
-			}, Band(phyID, phyVersion), phyVersion)
+			}, phy, phyVersion)
 		}
 	}
 }
@@ -1962,15 +1944,21 @@ func ForEachClass(f func(func(...string) string, ttnpb.Class)) {
 }
 
 func ForEachFrequencyPlan(t *testing.T, f func(func(...string) string, string, *frequencyplans.FrequencyPlan)) {
-	fpIDs, err := frequencyplans.NewStore(test.FrequencyPlansFetcher).GetAllIDs()
+	fps := frequencyplans.NewStore(test.FrequencyPlansFetcher)
+	fpIDs, err := fps.GetAllIDs()
 	if err != nil {
 		t.Errorf("failed to get frequency plans: %w", err)
 		return
 	}
 	for _, fpID := range fpIDs {
+		fp, err := fps.GetByID(fpID)
+		if err != nil {
+			t.Errorf("failed to get frequency plan `%s`: %w", fpID, err)
+			continue
+		}
 		f(func(parts ...string) string {
 			return MakeTestCaseName(append(parts, fmt.Sprintf("FP:%s", fpID))...)
-		}, fpID, FrequencyPlan(fpID))
+		}, fpID, fp)
 	}
 }
 
@@ -2012,10 +2000,15 @@ func ForEachFrequencyPlanBandMACVersion(t *testing.T, f func(func(...string) str
 			return
 		}
 		for _, phyVersion := range phy.Versions() {
+			phy, err := phy.Version(phyVersion)
+			if err != nil {
+				t.Errorf("Failed to convert band `%s` to version `%s`: %s", fp.BandID, phyVersion, err)
+				continue
+			}
 			ForEachMACVersion(func(makeMACName func(parts ...string) string, macVersion ttnpb.MACVersion) {
 				f(func(parts ...string) string {
 					return makeFPName(makeMACName(append(parts, fmt.Sprintf("PHY:%s", phyVersion))...))
-				}, fpID, fp, Band(fp.BandID, phyVersion), phyVersion, macVersion)
+				}, fpID, fp, phy, phyVersion, macVersion)
 			})
 		}
 	})

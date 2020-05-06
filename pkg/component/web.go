@@ -22,9 +22,9 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/heptiolabs/healthcheck"
-	"go.thethings.network/lorawan-stack/pkg/metrics"
-	"go.thethings.network/lorawan-stack/pkg/web"
-	"go.thethings.network/lorawan-stack/pkg/webmiddleware"
+	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
+	"go.thethings.network/lorawan-stack/v3/pkg/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 )
 
 const (

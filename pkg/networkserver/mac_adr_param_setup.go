@@ -17,10 +17,10 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/band"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 var (
@@ -43,9 +43,7 @@ func deviceADRAckDelay(dev *ttnpb.EndDevice, phy band.Band) ttnpb.ADRAckDelayExp
 }
 
 func deviceNeedsADRParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
-	if dev.GetMulticast() ||
-		dev.GetMACState() == nil ||
-		dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+	if dev.MACState == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		return false
 	}
 	return dev.MACState.DesiredParameters.ADRAckLimitExponent != nil &&

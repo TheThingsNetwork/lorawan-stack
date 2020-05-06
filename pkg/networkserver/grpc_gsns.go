@@ -23,18 +23,18 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
-	"go.thethings.network/lorawan-stack/pkg/band"
-	"go.thethings.network/lorawan-stack/pkg/crypto"
-	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
-	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/unique"
+	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
+	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 const (
@@ -517,11 +517,11 @@ matchLoop:
 			continue
 		}
 
-		macBuf := pld.FOpts
-		if pld.FPort == 0 {
-			macBuf = pld.FRMPayload
+		cmdBuf := pld.FOpts
+		if pld.FPort == 0 && len(pld.FRMPayload) > 0 {
+			cmdBuf = pld.FRMPayload
 		}
-		if len(macBuf) > 0 && (len(pld.FOpts) == 0 || match.Device.MACState.LoRaWANVersion.EncryptFOpts()) {
+		if len(cmdBuf) > 0 && (len(pld.FOpts) == 0 || match.Device.MACState.LoRaWANVersion.EncryptFOpts()) {
 			if session.NwkSEncKey == nil || len(session.NwkSEncKey.Key) == 0 {
 				logger.Warn("Device missing NwkSEncKey in registry, skip")
 				continue
@@ -531,7 +531,7 @@ matchLoop:
 				logger.WithField("kek_label", session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey, skip")
 				continue
 			}
-			macBuf, err = crypto.DecryptUplink(key, pld.DevAddr, match.FCnt, macBuf, pld.FPort != 0)
+			cmdBuf, err = crypto.DecryptUplink(key, pld.DevAddr, match.FCnt, cmdBuf, len(pld.FOpts) > 0)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to decrypt uplink, skip")
 				continue
@@ -542,7 +542,7 @@ matchLoop:
 			match.Device.MACState.PendingRequests = nil
 		}
 		var cmds []*ttnpb.MACCommand
-		for r := bytes.NewReader(macBuf); r.Len() > 0; {
+		for r := bytes.NewReader(cmdBuf); r.Len() > 0; {
 			cmd := &ttnpb.MACCommand{}
 			if err := lorawan.DefaultMACCommands.ReadUplink(match.phy, r, cmd); err != nil {
 				logger.WithFields(log.Fields(
@@ -664,6 +664,10 @@ matchLoop:
 			case ttnpb.CID_ADR_PARAM_SETUP:
 				evs, err = handleADRParamSetupAns(ctx, match.Device)
 			case ttnpb.CID_DEVICE_TIME:
+				if !deduplicated {
+					match.deferMACHandler(handleDeviceTimeReq)
+					continue macLoop
+				}
 				evs, err = handleDeviceTimeReq(ctx, match.Device, up)
 			case ttnpb.CID_REJOIN_PARAM_SETUP:
 				evs, err = handleRejoinParamSetupAns(ctx, match.Device, cmd.GetRejoinParamSetupAns())
@@ -860,11 +864,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		"uplink_f_cnt", pld.FCnt,
 	))
 
-	if pld.FPort == 0 && len(pld.FOpts) > 0 {
-		log.FromContext(ctx).Warn("FOpts non-empty for FPort 0 uplink, drop")
-		return errInvalidPayload.New()
-	}
-
 	var addrMatches []contextualEndDevice
 	if err := ns.devices.RangeByAddr(ctx, pld.DevAddr, handleDataUplinkGetPaths[:],
 		func(ctx context.Context, dev *ttnpb.EndDevice) bool {
@@ -989,7 +988,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			stored.MACState.DesiredParameters.ADRDataRateIndex = stored.MACState.CurrentParameters.ADRDataRateIndex
 			stored.MACState.DesiredParameters.ADRTxPowerIndex = stored.MACState.CurrentParameters.ADRTxPowerIndex
 			stored.MACState.DesiredParameters.ADRNbTrans = stored.MACState.CurrentParameters.ADRNbTrans
-			if !pld.FHDR.ADR || !deviceUseADR(stored, ns.defaultMACSettings, matched.phy) {
+			if !pld.FHDR.ADR || !deviceUseADR(stored, ns.defaultMACSettings) {
 				stored.RecentADRUplinks = nil
 				return stored, paths, nil
 			}
@@ -1258,11 +1257,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	matched = stored
 	ctx = storedCtx
 
-	// TODO: Extract this into a utility function shared with handleRejoinRequest. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
 	downAt := up.ReceivedAt.Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - req.RxDelay.Duration()/2 - nsScheduleWindow())
-	if earliestAt := timeNow().Add(nsScheduleWindow()); downAt.Before(earliestAt) {
-		downAt = earliestAt
-	}
 	logger.WithField("start_at", downAt).Debug("Add downlink task")
 	if err := ns.downlinkTasks.Add(ctx, stored.EndDeviceIdentifiers, downAt, true); err != nil {
 		logger.WithError(err).Error("Failed to add downlink task after join-request")

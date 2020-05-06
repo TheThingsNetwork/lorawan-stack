@@ -80,12 +80,12 @@ $table-cell-padding: 1.2em 0.75em;
 @import "bulma/sass/elements/other.sass";
 
 // @import "bulma/sass/form/_all";
-// @import "bulma/sass/form/shared.sass";
-// @import "bulma/sass/form/input-textarea.sass";
+@import "bulma/sass/form/shared.sass";
+@import "bulma/sass/form/input-textarea.sass";
 // @import "bulma/sass/form/checkbox-radio.sass";
-// @import "bulma/sass/form/select.sass";
+@import "bulma/sass/form/select.sass";
 // @import "bulma/sass/form/file.sass";
-// @import "bulma/sass/form/tools.sass";
+@import "bulma/sass/form/tools.sass";
 
 // @import "bulma/sass/components/_all";
 // @import "bulma/sass/components/breadcrumb.sass";

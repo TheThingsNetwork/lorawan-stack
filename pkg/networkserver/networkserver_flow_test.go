@@ -24,15 +24,15 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	. "go.thethings.network/lorawan-stack/pkg/networkserver"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 )
 
@@ -214,7 +214,7 @@ func (env FlowTestEnvironment) AssertScheduleDownlink(ctx context.Context, asser
 			if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 				return a.So(AllTrue(
 					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER),
-					a.So(ids, should.Resemble, path.GatewayIdentifiers),
+					a.So(ids, should.Resemble, *path.GatewayIdentifiers),
 				), should.BeTrue)
 			},
 				test.ClusterGetPeerResponse{
@@ -838,7 +838,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 				a.So(down, should.Resemble, MakeDataDownlink(macVersion, false, joinReq.DevAddr, ttnpb.FCtrl{
 					ADR: true,
 					Ack: true,
-				}, 0x00, 0x00, 0x00, MakeDownlinkMACBuffer(phy, downCmders...), nil, txReq, down.CorrelationIDs...)),
+				}, 0x00, 0x00, 0x00, nil, MakeDownlinkMACBuffer(phy, downCmders...), txReq, down.CorrelationIDs...)),
 			)
 		}, paths,
 		), should.BeTrue) {

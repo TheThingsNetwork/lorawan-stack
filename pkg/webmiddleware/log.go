@@ -18,8 +18,8 @@ import (
 	"net/http"
 
 	"github.com/felixge/httpsnoop"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/webhandlers"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
 // Log returns a middleware that logs requests.

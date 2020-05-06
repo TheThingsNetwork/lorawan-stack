@@ -20,8 +20,8 @@ import (
 	"io/ioutil"
 
 	"github.com/golang/protobuf/proto"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/loradms/v1/api/objects"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api/objects"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 const (

@@ -22,12 +22,12 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	. "go.thethings.network/lorawan-stack/pkg/cluster"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	. "go.thethings.network/lorawan-stack/v3/pkg/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 )
@@ -101,6 +101,11 @@ func TestCluster(t *testing.T) {
 	js, err := c.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, nil)
 	a.So(js, should.NotBeNil)
 	a.So(err, should.BeNil)
+
+	// Test Packet Broker Agent override; Packet Broker Agent is not in the cluster.
+	pba, err := c.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, PacketBrokerGatewayID)
+	a.So(pba, should.BeNil)
+	a.So(err, should.NotBeNil)
 
 	a.So(c.Leave(), should.BeNil)
 

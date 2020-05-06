@@ -20,7 +20,7 @@ import (
 	"runtime/debug"
 
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 // ErrHTTPRecovered is returned when a panic is caught from an HTTP handler.

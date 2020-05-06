@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"gopkg.in/yaml.v2"
 )
 

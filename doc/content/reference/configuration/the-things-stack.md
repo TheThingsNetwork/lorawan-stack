@@ -14,7 +14,7 @@ Under normal circumstances, only `info`, `warn` and `error` logs are printed to 
 
 {{% tts %}} serves several endpoints using TLS. TLS certificates can come from different sources.
 
-- `tls.source`: Source of the TLS certificate (file, acme, key-vault)
+- `tls.source`: Source of the TLS certificate (`file`, `acme`, `key-vault`)
 
 If `file` is specified as `tls.source`, the location of the certificate and key need to be configured.
 

@@ -18,7 +18,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 
-	"go.thethings.network/lorawan-stack/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 )
 
 type tlsConfig struct {

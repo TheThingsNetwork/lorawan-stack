@@ -20,14 +20,13 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestHandleDeviceTimeReq(t *testing.T) {
-	recvAt := time.Unix(42, 42).UTC()
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
@@ -44,18 +43,22 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DeviceTimeAns{
-							Time: recvAt,
+							Time: time.Unix(42, 42),
 						}).MACCommand(),
 					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: recvAt,
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						Time: timePtr(time.Unix(42, 42)),
+					},
+				},
 			},
 			Events: []events.DefinitionDataClosure{
 				evtReceiveDeviceTimeRequest.BindData(nil),
 				evtEnqueueDeviceTimeAnswer.BindData(&ttnpb.MACCommand_DeviceTimeAns{
-					Time: recvAt,
+					Time: time.Unix(42, 42),
 				}),
 			},
 		},
@@ -77,18 +80,28 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 						{},
 						{},
 						(&ttnpb.MACCommand_DeviceTimeAns{
-							Time: recvAt,
+							Time: time.Unix(42, 42),
 						}).MACCommand(),
 					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: recvAt,
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						Time: timePtr(time.Unix(42, 41)),
+					},
+					{
+						Time: timePtr(time.Unix(42, 42)),
+					},
+					{
+						Time: timePtr(time.Unix(420, 435353)),
+					},
+				},
 			},
 			Events: []events.DefinitionDataClosure{
 				evtReceiveDeviceTimeRequest.BindData(nil),
 				evtEnqueueDeviceTimeAnswer.BindData(&ttnpb.MACCommand_DeviceTimeAns{
-					Time: recvAt,
+					Time: time.Unix(42, 42),
 				}),
 			},
 		},
@@ -110,18 +123,31 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 						{},
 						{},
 						(&ttnpb.MACCommand_DeviceTimeAns{
-							Time: recvAt,
+							Time: time.Unix(42, 45),
 						}).MACCommand(),
 					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: recvAt,
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						Time: timePtr(time.Unix(42, 44)),
+					},
+					{
+						Time: timePtr(time.Unix(42, 44)),
+					},
+					{
+						Time: timePtr(time.Unix(42, 46)),
+					},
+					{
+						Time: timePtr(time.Unix(42, 47)),
+					},
+				},
 			},
 			Events: []events.DefinitionDataClosure{
 				evtReceiveDeviceTimeRequest.BindData(nil),
 				evtEnqueueDeviceTimeAnswer.BindData(&ttnpb.MACCommand_DeviceTimeAns{
-					Time: recvAt,
+					Time: time.Unix(42, 45),
 				}),
 			},
 		},

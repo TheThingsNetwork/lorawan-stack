@@ -16,7 +16,7 @@ package web
 
 import (
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/webhandlers"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
 func errorHandler(err error, c echo.Context) {

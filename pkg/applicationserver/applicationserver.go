@@ -26,30 +26,30 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
-	iogrpc "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mqtt"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages"
-	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/loradms/v1" // The LoRa Cloud Device Management v1 package implementation
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
-	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/mqtt" // The MQTT integration provider
-	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
-	"go.thethings.network/lorawan-stack/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/crypto"
-	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
-	"go.thethings.network/lorawan-stack/pkg/devicerepository"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/interop"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
-	"go.thethings.network/lorawan-stack/pkg/messageprocessors/cayennelpp"
-	"go.thethings.network/lorawan-stack/pkg/messageprocessors/javascript"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
+	iogrpc "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/grpc"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mqtt"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
+	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1" // The LoRa Cloud Device Management v1 package implementation
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
+	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/mqtt" // The MQTT integration provider
+	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
+	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/interop"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
+	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/cayennelpp"
+	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/javascript"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc"
 )
 
@@ -270,22 +270,22 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 		"application_uid", uid,
 	)
 
-	link, err := as.getLink(ctx, ids)
+	l, err := as.getLink(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 	sub := io.NewSubscription(ctx, protocol, &ids)
-	link.subscribeCh <- sub
+	l.subscribeCh <- sub
 	go func() {
 		select {
-		case <-link.ctx.Done():
+		case <-l.ctx.Done():
 			// Disconnect the subscription in order to avoid leaking it,
 			// and skip the unsubscribe channel since it will get closed.
-			sub.Disconnect(link.ctx.Err())
+			sub.Disconnect(l.ctx.Err())
 			return
 		case <-sub.Context().Done():
 		}
-		link.unsubscribeCh <- sub
+		l.unsubscribeCh <- sub
 	}()
 	return sub, nil
 }
@@ -305,6 +305,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 	if err != nil {
 		return err
 	}
+	<-link.connReady
 	for _, item := range items {
 		registerReceiveDownlink(ctx, ids, item)
 	}
@@ -426,6 +427,7 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	if err != nil {
 		return nil, err
 	}
+	<-link.connReady
 	client := ttnpb.NewAsNsClient(link.conn)
 	res, err := client.DownlinkQueueList(ctx, &ids, link.callOpts...)
 	if err != nil {

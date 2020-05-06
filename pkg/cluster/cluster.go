@@ -22,12 +22,12 @@ import (
 	"os"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/random"
-	"go.thethings.network/lorawan-stack/pkg/rpcclient"
-	"go.thethings.network/lorawan-stack/pkg/rpcserver"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcclient"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials"
@@ -279,9 +279,22 @@ func (c *cluster) GetPeers(ctx context.Context, role ttnpb.ClusterRole) ([]Peer,
 	return matches, nil
 }
 
+// overridePeerRole may change the peer role depending on the identifiers.
+func overridePeerRole(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) ttnpb.ClusterRole {
+	switch role {
+	case ttnpb.ClusterRole_GATEWAY_SERVER:
+		if ids != nil && ids.EntityType() == "gateway" && ids.IDString() == PacketBrokerGatewayID.GatewayID {
+			return ttnpb.ClusterRole_PACKET_BROKER_AGENT
+		}
+	default:
+	}
+	return role
+}
+
 var errPeerUnavailable = errors.DefineUnavailable("peer_unavailable", "{cluster_role} cluster peer unavailable")
 
 func (c *cluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (Peer, error) {
+	role = overridePeerRole(ctx, role, ids)
 	matches, err := c.GetPeers(ctx, role)
 	if err != nil {
 		return nil, err

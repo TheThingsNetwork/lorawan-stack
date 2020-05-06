@@ -14,7 +14,7 @@
 
 package emails
 
-import "go.thethings.network/lorawan-stack/pkg/ttnpb"
+import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
 // CollaboratorChanged is the email that is sent when a collaborator is changed
 type CollaboratorChanged struct {

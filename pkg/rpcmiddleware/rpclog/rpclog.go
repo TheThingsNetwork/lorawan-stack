@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"google.golang.org/grpc/grpclog"
 )
 

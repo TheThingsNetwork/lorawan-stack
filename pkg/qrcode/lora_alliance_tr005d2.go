@@ -21,8 +21,8 @@ import (
 	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // LoRaAllianceTR005Draft2 is the LoRa Alliance defined format in Technical Recommendation TR005 Draft 2.

@@ -26,24 +26,24 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/basicstation"
-	"go.thethings.network/lorawan-stack/pkg/cluster"
-	"go.thethings.network/lorawan-stack/pkg/component"
-	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
-	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
-	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	pfconfig "go.thethings.network/lorawan-stack/pkg/pfconfig/basicstationlns"
-	"go.thethings.network/lorawan-stack/pkg/pfconfig/shared"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/basicstationlns"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/basicstationlns/messages"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/basicstationlns"
+	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 var (
@@ -1367,5 +1367,4 @@ func TestPingPong(t *testing.T) {
 	case <-time.After(timeout):
 		t.Fatalf("Server pong timeout")
 	}
-
 }

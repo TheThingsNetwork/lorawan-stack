@@ -19,9 +19,15 @@ import "lorawan-stack/api/messages.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 // The GsPba service connects a Gateway Server to a Packet Broker Agent.
 service GsPba {
   rpc PublishUplink(GatewayUplinkMessage) returns (google.protobuf.Empty);
+}
+
+// The NsPba service connects a Network Server to a Packet Broker Agent.
+service NsPba {
+  // PublishDownlink instructs the Packet Broker Agent to publish a downlink message to Packet Broker Router.
+  rpc PublishDownlink(DownlinkMessage) returns (google.protobuf.Empty);
 }

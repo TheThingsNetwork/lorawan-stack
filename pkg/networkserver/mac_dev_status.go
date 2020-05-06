@@ -19,9 +19,9 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 var (
@@ -68,19 +68,19 @@ func deviceNeedsDevStatusReqAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings)
 	return dev.LastDevStatusReceivedAt.Add(tp).UTC(), true
 }
 
-func deviceNeedsDevStatusReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, transmitAt time.Time) bool {
-	if dev.GetMulticast() || dev.GetMACState() == nil {
+func deviceNeedsDevStatusReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, scheduleAt time.Time) bool {
+	if dev.MACState == nil {
 		return false
 	}
 	timedAt, timeBound := deviceNeedsDevStatusReqAt(dev, defaults)
 	cp := deviceStatusCountPeriodicity(dev, defaults)
 	return (cp != 0 || timeBound) && dev.LastDevStatusReceivedAt == nil ||
 		cp != 0 && dev.MACState.LastDevStatusFCntUp+cp <= dev.Session.LastFCntUp ||
-		timeBound && !timedAt.After(transmitAt)
+		timeBound && !timedAt.After(scheduleAt)
 }
 
-func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings, transmitAt time.Time) macCommandEnqueueState {
-	if !deviceNeedsDevStatusReq(dev, defaults, transmitAt) {
+func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings, scheduleAt time.Time) macCommandEnqueueState {
+	if !deviceNeedsDevStatusReq(dev, defaults, scheduleAt) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,

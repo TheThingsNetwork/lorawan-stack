@@ -15,7 +15,7 @@
 package objects_test
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/loradms/v1/api/objects"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api/objects"
 )
 
 func Uint8(i uint8) *uint8 {
