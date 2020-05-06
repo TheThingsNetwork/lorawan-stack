@@ -29,7 +29,8 @@ var (
 )
 
 func deviceNeedsRxParamSetupReq(dev *ttnpb.EndDevice) bool {
-	return dev.MACState != nil &&
+	return !dev.GetMulticast() &&
+		dev.GetMACState() != nil &&
 		(dev.MACState.DesiredParameters.Rx1DataRateOffset != dev.MACState.CurrentParameters.Rx1DataRateOffset ||
 			dev.MACState.DesiredParameters.Rx2DataRateIndex != dev.MACState.CurrentParameters.Rx2DataRateIndex ||
 			dev.MACState.DesiredParameters.Rx2Frequency != dev.MACState.CurrentParameters.Rx2Frequency)

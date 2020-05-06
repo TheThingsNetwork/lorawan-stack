@@ -78,6 +78,9 @@ var (
 					if err != nil {
 						return "", err
 					}
+					if err = os.MkdirAll(dir, 0755); err != nil {
+						return "", err
+					}
 					fileName = filepath.Join(dir, base)
 				}
 				_, err := os.Stat(fileName)

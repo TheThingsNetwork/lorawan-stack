@@ -28,7 +28,8 @@ var (
 )
 
 func deviceNeedsRxTimingSetupReq(dev *ttnpb.EndDevice) bool {
-	return dev.MACState != nil &&
+	return !dev.GetMulticast() &&
+		dev.GetMACState() != nil &&
 		dev.MACState.DesiredParameters.Rx1Delay != dev.MACState.CurrentParameters.Rx1Delay
 }
 

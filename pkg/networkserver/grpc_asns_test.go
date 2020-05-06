@@ -280,6 +280,19 @@ func TestDownlinkQueueReplace(t *testing.T) {
 	clock := test.NewMockClock(start)
 	defer SetMockClock(clock)()
 
+	up := &ttnpb.UplinkMessage{
+		Payload: &ttnpb.Message{
+			MHDR: ttnpb.MHDR{
+				MType: ttnpb.MType_UNCONFIRMED_UP,
+			},
+			Payload: &ttnpb.Message_MACPayload{
+				MACPayload: &ttnpb.MACPayload{},
+			},
+		},
+		RxMetadata: RxMetadata[:],
+	}
+	ups := []*ttnpb.UplinkMessage{up}
+
 	for _, tc := range []struct {
 		Name           string
 		ContextFunc    func(context.Context) context.Context
@@ -523,6 +536,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
 						LoRaWANVersion: ttnpb.MAC_V1_1,
+						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -614,6 +628,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
 						LoRaWANVersion: ttnpb.MAC_V1_1,
+						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -727,6 +742,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
 						LoRaWANVersion: ttnpb.MAC_V1_1,
+						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -899,6 +915,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
 						LoRaWANVersion: ttnpb.MAC_V1_1,
+						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -988,6 +1005,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
 						LoRaWANVersion: ttnpb.MAC_V1_1,
+						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -1092,6 +1110,19 @@ func TestDownlinkQueueReplace(t *testing.T) {
 }
 
 func TestDownlinkQueuePush(t *testing.T) {
+	up := &ttnpb.UplinkMessage{
+		Payload: &ttnpb.Message{
+			MHDR: ttnpb.MHDR{
+				MType: ttnpb.MType_UNCONFIRMED_UP,
+			},
+			Payload: &ttnpb.Message_MACPayload{
+				MACPayload: &ttnpb.MACPayload{},
+			},
+		},
+		RxMetadata: RxMetadata[:],
+	}
+	ups := []*ttnpb.UplinkMessage{up}
+
 	for _, tc := range []struct {
 		Name           string
 		ContextFunc    func(context.Context) context.Context
@@ -1336,6 +1367,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
 						LoRaWANVersion: ttnpb.MAC_V1_1,
+						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -1427,6 +1459,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
 						LoRaWANVersion: ttnpb.MAC_V1_1,
+						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -1525,6 +1558,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
 						LoRaWANVersion: ttnpb.MAC_V1_1,
+						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -1606,6 +1640,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
 						LoRaWANVersion: ttnpb.MAC_V1_0_2,
+						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -1682,6 +1717,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
 						LoRaWANVersion: ttnpb.MAC_V1_0_2,
+						RecentUplinks:  ups,
 					},
 				})
 				if !a.So(err, should.BeError) {

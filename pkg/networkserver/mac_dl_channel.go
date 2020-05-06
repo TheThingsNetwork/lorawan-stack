@@ -44,7 +44,9 @@ func deviceNeedsDLChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
 }
 
 func deviceNeedsDLChannelReq(dev *ttnpb.EndDevice) bool {
-	if dev.MACState == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
+	if dev.GetMulticast() ||
+		dev.GetMACState() == nil ||
+		dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
 		return false
 	}
 	for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {

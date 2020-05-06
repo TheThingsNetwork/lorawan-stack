@@ -53,6 +53,8 @@ func init() {
 	ru_864_870 = Band{
 		ID: RU_864_870,
 
+		EnableADR: true,
+
 		MaxUplinkChannels: 16,
 		UplinkChannels:    defaultChannels,
 

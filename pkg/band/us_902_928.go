@@ -63,6 +63,8 @@ func init() {
 	us_902_928 = Band{
 		ID: US_902_928,
 
+		EnableADR: true,
+
 		MaxUplinkChannels: 72,
 		UplinkChannels:    uplinkChannels,
 
