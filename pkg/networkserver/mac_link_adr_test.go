@@ -150,7 +150,7 @@ func TestNeedsLinkADRReq(t *testing.T) {
 			a := assertions.New(t)
 
 			dev := CopyEndDevice(tc.InputDevice)
-			res := deviceNeedsLinkADRReq(dev, DefaultConfig.DefaultMACSettings.Parse())
+			res := deviceNeedsLinkADRReq(dev, DefaultConfig.DefaultMACSettings.Parse(), Band(band.EU_863_870, ttnpb.PHY_V1_0_3_REV_A))
 			if tc.Needs {
 				a.So(res, should.BeTrue)
 			} else {
