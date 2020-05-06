@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.8.0] - 2020-05-06
+
+### Added
+
 - Console logout is now propagated to the OAuth provider.
   - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
   - To set the `logout-redirect-uris` for existing clients, the CLI client can be used, e.g.: `ttn-lw-cli clients update console --logout-redirect-uris "https://localhost:8885/console" --redirect-uris "http://localhost:1885/console"`.
@@ -41,10 +55,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Network Server will schedule all time-bound network-initiated downlinks at most RX1 delay ahead of time.
 - Network Server now uses its own internal clock in `DeviceTimeAns`.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Handling of device unsetting the ADR bit in uplink, after ADR has been started.
@@ -52,8 +62,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Network Server now properly handles FPort 0 data uplinks carrying FOpts.
 - Data rate 4 in version `1.0.2-a` of AU915.
 - Incorrect `TxOffset` values used by Network Server in some bands.
-
-### Security
 
 ## [3.7.2] - 2020-04-22
 
@@ -812,7 +820,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.2...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.0...HEAD
+[3.8.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.2...v3.8.0
 [3.7.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.0...v3.7.2
 [3.7.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.0...v3.7.0
 [3.6.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.2...v3.6.3
