@@ -84,7 +84,7 @@ Wide area network:
     - WAN
 
 ISM Radio Bands:
-  description: The Industrial, Scientific, and Medical frequency Bands, most commonly used for low-power and short range telecommunications, such as WiFi, Bluetooth, Zigbee, wireless telephones, RFID, and NFC.
+  description: The Industrial, Scientific, and Medical Bands, most commonly used for low-power and short range telecommunications, such as WiFi, Bluetooth, Zigbee, wireless telephones, RFID, and NFC.
   link: https://en.wikipedia.org/wiki/ISM_band
 
 Payload:
