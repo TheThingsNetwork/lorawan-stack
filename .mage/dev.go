@@ -42,7 +42,7 @@ func (Dev) Misspell() error {
 	if mg.Verbose() {
 		fmt.Printf("Fixing common spelling mistakes in files\n")
 	}
-	return execGo("run", "github.com/client9/misspell/cmd/misspell", "-w", "-i", "mosquitto",
+	return execGoTool("misspell", "-w", "-i", "mosquitto",
 		".editorconfig",
 		".gitignore",
 		".goreleaser.yml",

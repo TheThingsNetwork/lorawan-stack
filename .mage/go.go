@@ -50,6 +50,14 @@ func execGo(cmd string, args ...string) error {
 	return err
 }
 
+func execGoTool(cmd string, args ...string) error {
+	if goTags != "" {
+		args = append([]string{fmt.Sprintf("-tags=%s", goTags)}, args...)
+	}
+	_, err := sh.Exec(nil, os.Stdout, os.Stderr, fmt.Sprintf("./.bin/%s", cmd), args...)
+	return err
+}
+
 func outputGo(cmd string, args ...string) (string, error) {
 	if goTags != "" {
 		args = append([]string{fmt.Sprintf("-tags=%s", goTags)}, args...)
@@ -140,7 +148,7 @@ func (g Go) Lint() error {
 	if mg.Verbose() {
 		fmt.Printf("Linting %d Go packages\n", len(dirs))
 	}
-	return execGo("run", append([]string{"github.com/mgechev/revive", "-config=.revive.toml", "-formatter=stylish"}, dirs...)...)
+	return execGoTool("revive", append([]string{"-config=.revive.toml", "-formatter=stylish"}, dirs...)...)
 }
 
 // Unconvert removes unnecessary type conversions from Go files.
@@ -155,11 +163,11 @@ func (g Go) Unconvert() error {
 	if mg.Verbose() {
 		fmt.Printf("Removing unnecessary type conversions from %d Go packages\n", len(dirs))
 	}
-	args := []string{"github.com/mdempsky/unconvert", "-safe", "-apply"}
+	args := []string{"-safe", "-apply"}
 	if goTags != "" {
 		args = append(args, "-tags", strings.Join(strings.Split(goTags, ","), " "))
 	}
-	return execGo("run", append(args, dirs...)...)
+	return execGoTool("unconvert", append(args, dirs...)...)
 }
 
 // Quality runs code quality checks on Go files.
@@ -260,7 +268,7 @@ nextLine:
 	if mg.Verbose() {
 		fmt.Println("Sending Go coverage to Coveralls")
 	}
-	return execGo("run", "github.com/mattn/goveralls", "-coverprofile=coveralls_"+goCoverageFile, "-service="+service, "-repotoken="+os.Getenv("COVERALLS_TOKEN"))
+	return execGoTool("goveralls", "-coverprofile=coveralls_"+goCoverageFile, "-service="+service, "-repotoken="+os.Getenv("COVERALLS_TOKEN"))
 }
 
 // Messages builds the file with translatable messages in Go code.

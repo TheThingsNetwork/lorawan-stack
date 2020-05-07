@@ -122,10 +122,10 @@ func (p Proto) Go(context.Context) error {
 	if err != nil {
 		return xerrors.Errorf("failed to construct absolute path to pkg/ttnpb: %w", err)
 	}
-	if err := execGo("run", "golang.org/x/tools/cmd/goimports", "-w", ttnpb); err != nil {
+	if err := execGoTool("goimports", "-w", ttnpb); err != nil {
 		return xerrors.Errorf("failed to run goimports on generated code: %w", err)
 	}
-	if err := execGo("run", "github.com/mdempsky/unconvert", "-apply", ttnpb); err != nil {
+	if err := execGoTool("unconvert", "-apply", ttnpb); err != nil {
 		return xerrors.Errorf("failed to run unconvert on generated code: %w", err)
 	}
 	return sh.RunV("gofmt", "-w", "-s", ttnpb)

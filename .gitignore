@@ -94,6 +94,7 @@ node_modules/
 /pkg/webui/locales/.backend
 
 # Development tooling
+/.bin
 /mage
 
 # Keypair

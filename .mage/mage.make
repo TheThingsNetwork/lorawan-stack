@@ -12,11 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+MAKE ?= make
 MAGE ?= ./mage
+GOBIN = $(PWD)/.bin
+export GOBIN
 
-$(MAGE): magefile.go $(wildcard .mage/*.go)
-	GO111MODULE=on go install github.com/magefile/mage
-	GO111MODULE=on go run github.com/magefile/mage -compile $(MAGE)
+$(GOBIN):
+	@$(MAKE) -C tools
+
+$(MAGE): magefile.go $(wildcard .mage/*.go) $(GOBIN)
+	$(GOBIN)/mage -compile $(MAGE)
 
 .PHONY: init
 init: $(MAGE)
