@@ -607,6 +607,14 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 		case msg := <-conn.Up():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
 			msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
+			if msg.Payload == nil {
+				pld := &ttnpb.Message{}
+				if err := lorawan.UnmarshalMessage(msg.RawPayload, pld); err != nil {
+					log.FromContext(ctx).WithError(err).Debug("Failed to decode message payload")
+				} else {
+					msg.Payload = pld
+				}
+			}
 			val = msg
 			registerReceiveUplink(ctx, gtw, msg.UplinkMessage, protocol)
 		case msg := <-conn.Status():
