@@ -37,7 +37,9 @@ const validationSchema = Yup.object().shape({
   session: Yup.object().shape({
     keys: Yup.object().shape({
       app_s_key: Yup.object().shape({
-        key: Yup.string().emptyOrLength(16 * 2, Yup.passValues(sharedMessages.validateLength)), // A 16 Byte hex.
+        key: Yup.string()
+          .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // A 16 Byte hex.
+          .required(sharedMessages.validateRequired),
       }),
     }),
   }),
@@ -100,6 +102,7 @@ const ApplicationServerForm = React.memo(props => {
     >
       {showResetNotification && <Notification content={messages.keysResetWarning} info small />}
       <Form.Field
+        required
         title={sharedMessages.appSKey}
         name="session.keys.app_s_key.key"
         type="byte"
