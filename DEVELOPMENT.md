@@ -240,7 +240,7 @@ Please respect the following guidelines for content in our documentation site:
 - Use `**Strong**` when referring to buttons in the Console
 - Use fenced code blocks with a language:
   - `bash` for lists of environment variables: `SOME_ENV="value"`.
-  - `bash` for CLI examples. Prefix commands with `$`. Wrap strings with double quotes `""` (except when working with JSON, which already uses double quotes).
+  - `bash` for CLI examples. Prefix commands with `$ `. Wrap strings with double quotes `""` (except when working with JSON, which already uses double quotes).
   - Wrap large CLI output with `<details><summary>Show CLI output</summary> ... output here ... </details>`.
   - `yaml` (not `yml`) for YAML. Wrap strings with single quotes `''` (because of frequent Go templates that use double quotes).
 
@@ -275,24 +275,24 @@ We follow the [official go guidelines](https://github.com/golang/go/wiki/CodeRev
 
 #### Single-word Entities
 
-|    entity     |    name    |                         example type                         |
-| :-----------: | :--------: | :----------------------------------------------------------: |
-|    context    |    ctx     |                       context.Context                        |
-|     mutex     |     mu     |                          sync.Mutex                          |
-| configuration |    conf    |     go.thethings.network/lorawan-stack/pkg/config.Config     |
-|    logger     |   logger   |      go.thethings.network/lorawan-stack/pkg/log.Logger       |
-|    message    |    msg     | go.thethings.network/lorawan-stack/api/gateway.UplinkMessage |
-|    status     |     st     |    go.thethings.network/lorawan-stack/api/gateway.Status     |
-|    server     |    srv     | go.thethings.network/lorawan-stack/pkg/network-server.Server |
-|      ID       |     id     |                            string                            |
-|   unique ID   |    uid     |                            string                            |
-|    counter    |    cnt     |                             int                              |
-|    gateway    |    gtw     |                                                              |
-|  application  |    app     |                                                              |
-|  end device   |    dev     |                                                              |
-|     user      | usr / user |                                                              |
-|   transmit    |  tx / Tx   |                                                              |
-|    receive    |  rx / Rx   |                                                              |
+| entity               | name    | example type                                                  |
+| :------------------: | :-----: | :-----------------------------------------------------------: |
+| context              | ctx     | context.Context                                               |
+| mutex                | mu      | sync.Mutex                                                    |
+| configuration        | conf    | go.thethings.network/lorawan-stack/pkg/config.Config          |
+| logger               | logger  | go.thethings.network/lorawan-stack/pkg/log.Logger             |
+| message              | msg     | go.thethings.network/lorawan-stack/api/gateway.UplinkMessage  |
+| status               | st      | go.thethings.network/lorawan-stack/api/gateway.Status         |
+| server               | srv     | go.thethings.network/lorawan-stack/pkg/network-server.Server  |
+| ID                   | id      | string                                                        |
+| unique ID            | uid     | string                                                        |
+| counter              | cnt     | int                                                           |
+| gateway              | gtw     |                                                               |
+| application          | app     |                                                               |
+| end device           | dev     |                                                               |
+| user                 | usr / user |                                                            |
+| transmit             | tx / Tx |                                                               |
+| receive              | rx / Rx |                                                               |
 
 The EUI naming scheme can be found in the well-known variable names section bellow.
 
@@ -300,14 +300,14 @@ The EUI naming scheme can be found in the well-known variable names section bell
 
 In case both of the words have an implementation-specific meaning, the variable name is the combination of first letter of each word.
 
-|       entity       | name |
-| :----------------: | :--: |
-|     wait group     |  wg  |
-| Application Server |  as  |
-|   Gateway Server   |  gs  |
-|  Identity Server   |  is  |
-|    Join Server     |  js  |
-|   Network Server   |  ns  |
+| entity                                                  | name    |
+| :-----------------------------------------------------: | :-----: |
+| wait group                                              | wg      |
+| Application Server                                      | as      |
+| Gateway Server                                          | gs      |
+| Identity Server                                         | is      |
+| Join Server                                             | js      |
+| Network Server                                          | ns      |
 
 In case one of the words specifies the meaning of the variable in a specific language construct context, the variable name is the combination of abbrevations of the words.
 
@@ -316,16 +316,16 @@ In case one of the words specifies the meaning of the variable in a specific lan
 These are the names of variables that occur often in the code. Be consistent in naming them, even when their
 meaning is obvious from the context.
 
-|     entity      |      name      |
-| :-------------: | :------------: |
-|   gateway ID    |     gtwID      |
-|   gateway EUI   |     gtwEUI     |
-| application ID  |     appID      |
-| application EUI |     appEUI     |
-|    join EUI     |    joinEUI     |
-|    device ID    |     devID      |
-|   device EUI    |     devEUI     |
-|     user ID     | usrID / userID |
+| entity                          | name    |
+| :-----------------------------: | :-----: |
+| gateway ID                      | gtwID   |
+| gateway EUI                     | gtwEUI  |
+| application ID                  | appID   |
+| application EUI                 | appEUI  |
+| join EUI                        | joinEUI |
+| device ID                       | devID   |
+| device EUI                      | devEUI  |
+| user ID                         | usrID / userID |
 
 ### Event Naming
 
@@ -362,7 +362,7 @@ Any `name` defined in the following statements:
 - Logging field key: `logger.WithField("name", "value")`
 - Event name: `events.Define("name", "description")`
 - Error name: `errors.Define("name", "description")`
-- Error attribute: `` errors.Define("example", "description `{name}`") ``
+- Error attribute: ``errors.Define("example", "description `{name}`")``
 - Task identifier: `c.RegisterTask("name", ...)`
 
 Shall be snake case, optionally having an event name prepended with a dotted namespace, see above. The spacer `_` shall be used in LoRaWAN terms: `DevAddr` is `dev_addr`, `AppSKey` is `app_s_key`, etc.
@@ -375,7 +375,7 @@ Every Go package should have a package comment. Every top-level Go type, const, 
 
 Although Go code should typically explain itself, it's sometimes important to add additional comments inside funcs to communicate what a block of code does, how a block of code does that, or why it's implemented that way.
 
-Comments can also be used to indicate steps to take in the future (_TODOs_). Such comments look as follows:
+Comments can also be used to indicate steps to take in the future (*TODOs*). Such comments look as follows:
 
 ```go
 // TODO: Open the pod bay doors (https://github.com/TheThingsNetwork/lorawan-stack/issues/<number>).
@@ -416,18 +416,18 @@ Please make sure that these multi-line comments follow the correct format, espec
  */
 ```
 
-It also makes sense to wrap code bits, variable names and URLs in \`\` quotes, so they can easily be recognized and do not clash with our capitalization rules enforced by eslint, when they are at the beginning of a sentence:
+It also makes sense to wrap code bits, variable names and URLs in \`\`  quotes, so they can easily be recognized and do not clash with our capitalization rules enforced by eslint, when they are at the beginning of a sentence:
 
 ```js
 // Bad. This will get flagged by the linter.
 
 // devAddr is a hex string.
-const devAddr = "270000FF";
+const devAddr = '270000FF'
 
 // Good.
 
 // `devAddr` is a hex string.
-const devAddr = "270000FF";
+const devAddr = '270000FF'
 ```
 
 ### Import Statement Order
@@ -437,28 +437,28 @@ Our `import` statements use the following order, each separated by empty newline
 1. Node "builtin" modules (e.g. `path`)
 2. External modules (e.g. `react`)
 3. Internal modules (e.g. `@ttn-lw/*`, `@console`, etc.)
-4. Constants
-5. API module
-6. Components
-   1. Global presentational components (`@ttn-lw/components/*`)
-   2. Global container components (`@ttn-lw/containers/*`)
-   3. Global utility components (`@ttn-lw/lib/components/*`)
-   4. Local presentational components (`@{console|oauth}/components/*`)
-   5. Local container components (`@{console|oauth}/containers/*`)
-   6. Local utility components (`@{console|oauth}/lib/components/*`)
-   7. View components (`@{console|oauth}/views/*`)
-7. Utilities
-   1. Global utilities (`@ttn-lw/lib/*`)
-   2. Local utilities (`@{console|oauth}/lib/*`)
-8. Store modules
-   1. Actions
-   2. Reducers
-   3. Selectors
-   4. Middleware and logics
-9. Assets and styles
-10. Parent modules (e.g. `../../../module`)
-11. Sibling modules (e.g. `./validation-schema`, `./button.styl`)
-12. Index of the current directory (`.`)
+  1. Constants 
+  2. API module
+  3. Components
+    1. Global presentational components (`@ttn-lw/components/*`)
+    2. Global container components (`@ttn-lw/containers/*`)
+    3. Global utility components (`@ttn-lw/lib/components/*`)
+    4. Local presentational components (`@{console|oauth}/components/*`)
+    5. Local container components (`@{console|oauth}/containers/*`)
+    6. Local utility components (`@{console|oauth}/lib/components/*`)
+    7. View components (`@{console|oauth}/views/*`)
+  4. Utilities
+    1. Global utilities (`@ttn-lw/lib/*`)
+    2. Local utilities (`@{console|oauth}/lib/*`)
+  5. Store modules
+    1. Actions
+    2. Reducers
+    3. Selectors
+    4. Middleware and logics
+  6. Assets and styles
+4. Parent modules (e.g. `../../../module`)
+5. Sibling modules (e.g. `./validation-schema`, `./button.styl`)
+6. Index of the current directory (`.`)
 
 Note that this order is enforced by our linter and will cause a CI fail when not respected. Again, settting up your development environment to integrate linting will assist you greatly here.
 
@@ -473,7 +473,6 @@ Decorators provided an easy syntax to wrap Classes around functions and we have 
 ### React Component Types
 
 We differentiate four different component scopes:
-
 - Presentational Components (global and application level)
 - Container Components (global and application level)
 - View Components
@@ -490,7 +489,6 @@ These are UI elements that primarily serve a presentational purpose. They implem
 Examples for presentational components are simple UI elements such as buttons, input elements, navigations, breadcrumbs. They can also combine and extend functionality of other presentational components by composition to achieve more complex elements, such as forms. We also regard our application specific forms as such components, as long as they don't connect to the store or perform the data fetching themselves.
 
 To decide whether a component is a presentational component, ask yourself:
-
 - Is this component more concerned with how things look, rather than how things work?
 - Does this component use no state or only UI state?
 - Does this component not fetch or send data?
@@ -507,7 +505,6 @@ Container components focus more on state logic, data fetching, store management 
 An example for a container components are our table components, that manage the fetching and preparation of the respective entity and render the result using our `<Table />` component.
 
 To decide whether a component is a container component, ask yourself:
-
 - Is this component more concerned with how things work, rather than how things look?
 - Does this component connect to the store?
 - Does this component fetch or send data?
@@ -533,10 +530,9 @@ View components always represent a single view of the application, represented b
 
 #### Utility components
 
-These components do not render any DOM elements and are hence not _visible_ by themselves. Utility components can be higher order components or similar components, that modify their children or introduce a side effect to the render tree.
+These components do not render any DOM elements and are hence not *visible* by themselves. Utility components can be higher order components or similar components, that modify their children or introduce a side effect to the render tree.
 
 To decide whether a component is a utility component ask yourself:
-
 - Is this component a higher order component?
 - Is this component invisible on its own?
 - Is this component an abstraction layer on top of another component?
@@ -555,15 +551,15 @@ Pull requests for frontend related changes generally follow our overall pull req
 
 It might help you to employ the following checklist before opening the pull request:
 
-- [ ] All visible text is using [i18n messages](#frontend-translations)?
-- [ ] Assets minified or compressed if possible (e.g. SVG assets)?
-- [ ] Screenshot in PR description?
-- [ ] Responsiveness checked?
-- [ ] New components [categorized correctly](#global-or-application-scope) (global/local, container/component)?
-- [ ] Feature flags added (if applicable)?
-- [ ] All views use `<PageTitle />` or `<IntlHelmet />` properly?
-- [ ] Storybook story added / updated?
-- [ ] Prop types / default props added?
+* [ ] All visible text is using [i18n messages](#frontend-translations)?
+* [ ] Assets minified or compressed if possible (e.g. SVG assets)?
+* [ ] Screenshot in PR description?
+* [ ] Responsiveness checked?
+* [ ] New components [categorized correctly](#global-or-application-scope) (global/local, container/component)?
+* [ ] Feature flags added (if applicable)?
+* [ ] All views use  `<PageTitle />` or `<IntlHelmet />` properly?
+* [ ] Storybook story added / updated?
+* [ ] Prop types / default props added?
 
 ## Translations
 
@@ -590,9 +586,7 @@ The frontend uses [`react-intl`](https://github.com/yahoo/react-intl), which hel
 The workflow for defining messages is as follows:
 
 1. Add a `react-intl` message using `intl.defineMessages({…})`
-
-- This can be done either inline, or by adding it to `pkg/webui/lib/shared-messages.js`
-
+  * This can be done either inline, or by adding it to `pkg/webui/lib/shared-messages.js`
 2. Use the message in components (e.g. `sharedMessage.myMessage`)
 
 After adding messages this way, it needs to be added the locales file `pkg/webui/locales/*.js` by using:
@@ -657,96 +651,78 @@ A new version can be released from the `master` branch or a `backport` branch. T
 ### Release From Master
 
 1. Create a `release/${version}` branch off the `master` branch.
-
 ```bash
 $ git checkout master
 $ git checkout -b release/${version}
 ```
-
 2. Update the `CHANGELOG.md` file as explained in the [Changelog Update](#changelog-update) section.
-   Once complete, you can add the file to staging
-
+Once complete, you can add the file to staging
 ```bash
 $ git add CHANGELOG.md
 ```
-
 3. If releasing a new minor version, update the `SECURITY.md` file and stage it for commit.
-
 ```bash
 $ git add SECURITY.md
 ```
-
 4. Bump version as explained in the section [Version Bump](#version-bump).
 5. Create a pull request targeting `master`.
-6. Once this PR is approved and merged, checkout the latest `master` branch locally.
+6. Once this PR is approved and merged, checkout the latest  `master` branch locally.
 7. Create a version tag as explained in the section [Version Tag](#version-tag).
 8. Push the version tag. Once this is done, CI automatically starts building and pushing to package managers. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
-
 ```bash
 $ git push origin ${version}
 ```
-
 9. Edit the release notes on the Github releases page, which is typically copied from `CHANGELOG.md`.
 10. For non RC releases, tag the Docker latest tag as explained in the section [Docker Latest Tag](#docker-latest-tag).
 
 ### Release Backports
 
 1. Create a `release/<version>` branch off the `backport/<minor>` branch.
-
 ```bash
 $ git checkout backport/<minor>
 $ git checkout -b release/${version}
 ```
-
 2. Cherry pick the necessary commits.
-
 ```bash
 $ git cherrypick <commit>
 ```
-
 3. Update the `CHANGELOG.md` file as explained in the section [Changelog Update](#changelog-update). Once complete, you can add the file to staging.
-
 ```bash
 $ git add CHANGELOG.md
 ```
-
 4. Bump version as explained in the section [Version Bump](#version-bump).
 5. Create a pull request targeting `backport/<minor>`.
-6. Once this PR is approved and merged, checkout the latest `backport/<minor>` branch locally.
+6. Once this PR is approved and merged, checkout the latest  `backport/<minor>` branch locally.
 7. Create a version tag as explained in the section [Version Tag](#version-tag).
 8. Push the version tag. Once this is done, CI automatically starts building and pushing to package managers. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
-
 ```bash
 $ git push origin ${version}
 ```
-
 9. Edit the release notes on the Github releases page, which is typically copied from `CHANGELOG.md`.
 
-### Changelog Update
+###  Changelog Update
 
 Updating the `CHANGELOG.md` consists of the following steps:
+  - Change the **Unreleased** section to the new version and add date obtained via `date +%Y-%m-%d` (e.g. `## [3.2.1] - 2019-10-11`)
+  - Check if we didn't forget anything important
+  - Remove empty subsections
+  - Update the list of links in the bottom of the file
+  - Add new **Unreleased** section:
+    ```md
+    ## [Unreleased]
 
-- Change the **Unreleased** section to the new version and add date obtained via `date +%Y-%m-%d` (e.g. `## [3.2.1] - 2019-10-11`)
-- Check if we didn't forget anything important
-- Remove empty subsections
-- Update the list of links in the bottom of the file
-- Add new **Unreleased** section:
+    ### Added
 
-  ```md
-  ## [Unreleased]
+    ### Changed
 
-  ### Added
+    ### Deprecated
 
-  ### Changed
+    ### Removed
 
-  ### Deprecated
+    ### Fixed
 
-  ### Removed
-
-  ### Fixed
-
-  ### Security
-  ```
+    ### Security
+    ```
 
 ### Version Bump
 
@@ -755,7 +731,6 @@ This involves the following three steps
 1. Bump
 
 Our development tooling helps with this process. The `mage` command has the following commands for version bumps:
-
 ```bash
 $ ./mage version:bumpMajor   # bumps a major version (from 3.4.5 -> 4.0.0).
 $ ./mage version:bumpMinor   # bumps a minor version (from 3.4.5 -> 3.5.0).
@@ -763,21 +738,16 @@ $ ./mage version:bumpPatch   # bumps a patch version (from 3.4.5 -> 3.4.6).
 $ ./mage version:bumpRC      # bumps a release candidate version (from 3.4.5-rc1 -> 3.4.5-rc2).
 $ ./mage version:bumpRelease # bumps a pre-release to a release version (from 3.4.5-rc1 -> 3.4.5).
 ```
-
 > Note: These bumps can be combined (i.e. `version:bumpMinor version:bumpRC` bumps 3.4.5 -> 3.5.0-rc1).
-
 2. Write the version files
 
 There are a few files that need to contain the latest version. The new version can be written using
-
 ```bash
 $ ./mage version:files
 ```
-
 3. Commit the version bump
 
 A bump commit can be created by running
-
 ```bash
 $ ./mage version:commitBump
 ```
@@ -787,7 +757,6 @@ $ ./mage version:commitBump
 ### Version Tag
 
 To tag a new version run
-
 ```bash
 $ ./mage version:bumpXXX version:tag
 ```
@@ -812,13 +781,11 @@ $ docker push thethingsnetwork/lorawan-stack:latest
 #### Problem: Assets are not found
 
 The Console will render a blank page and you can see backend logs like e.g.:
-
 ```
 INFO Request handled                          duration=40.596µs error=error:pkg/errors/web:unknown (Not Found) message=Not Found method=GET namespace=web remote_addr=[::1]:50450 request_id=01DZ2CJDWKAFS10QD1NKZ1D56H status=404 url=/assets/console.36fcac90fa2408a19e4b.js
 ```
 
 You might also see error messages in the Console such as:
-
 ```
 Uncaught ReferenceError: libs_472226f4872c9448fc26 is not defined
     at eval (eval at dll-reference libs_472226f4872c9448fc26 (console.js:26130), <anonymous>:1:18)
@@ -834,7 +801,7 @@ The stack has not been restarted after the Console bundle has changed. In produc
 
 ##### Possible solution
 
-1. Restart the The Things Stack
+  1. Restart the The Things Stack
 
 ##### Accidentally deleted bundle files
 
@@ -842,8 +809,8 @@ The bundle files have been deleted. This might happen e.g. when a mage target en
 
 ##### Possible solution
 
-1. Rebuild the Console `./mage js:clean js:build`
-2. Restart the The Things Stack
+  1. Rebuild the Console `./mage js:clean js:build`
+  2. Restart the The Things Stack
 
 ##### Mixing up production and development builds
 
@@ -851,10 +818,10 @@ If you switch between production and development builds of the Console, you migh
 
 ##### Possible solution
 
-1. Double check whether you have set the correct environment: `echo $NODE_ENV`, it should be either `production` or `development`
-2. Double check whether [your The Things Stack config](#development-configuration) is set correctly (especially `TTN_LW_CONSOLE_UI_JS_FILE`, `TTN_LW_CONSOLE_UI_CANONICAL_URL` and similar settings)
-3. Make sure to rebuild the Console `./mage js:clean js:build`
-4. Restart The Things Stack
+  1. Double check whether you have set the correct environment: `echo $NODE_ENV`, it should be either `production` or `development`
+  2. Double check whether [your The Things Stack config](#development-configuration) is set correctly (especially `TTN_LW_CONSOLE_UI_JS_FILE`, `TTN_LW_CONSOLE_UI_CANONICAL_URL` and similar settings)
+  3. Make sure to rebuild the Console `./mage js:clean js:build`
+  4. Restart The Things Stack
 
 #### Problem: Console rendering blank page and showing arbitrary error message in console logs, e.g.:
 
@@ -871,7 +838,6 @@ console.4e67a17c1ce5a74f3f50.js:104 Uncaught TypeError: m.subscribe is not a fun
     at o (console.4e67a17c1ce5a74f3f50.js:1)
     at Object.0 (console.4e67a17c1ce5a74f3f50.js:104)
 ```
-
 #### Possible causes
 
 ##### Bundle using old JS SDK
