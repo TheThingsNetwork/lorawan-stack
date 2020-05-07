@@ -273,5 +273,5 @@ nextLine:
 
 // Messages builds the file with translatable messages in Go code.
 func (g Go) Messages() error {
-	return execGo("run", "./cmd/internal/generate_i18n.go")
+	return execGoTool("generate_i18n")
 }

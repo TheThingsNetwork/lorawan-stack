@@ -26,3 +26,5 @@ deps:
 	$(GO) install github.com/mdempsky/unconvert
 	$(GO) install github.com/mgechev/revive
 	$(GO) install golang.org/x/tools/cmd/goimports
+	$(GO) install ./cmd/generate_allowed_field_mask_paths
+	$(GO) install ./cmd/generate_i18n
