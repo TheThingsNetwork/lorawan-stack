@@ -36,10 +36,11 @@ import style from './authorize.styl'
 
 const m = defineMessages({
   modalTitle: 'Request for permission',
-  modalSubtitle: '{clientName} is requesting permissions to do the following:',
+  modalSubtitle: '{clientName} is requesting to be granted the following rights:',
   loginInfo: 'You are logged in as {userId}.',
   redirectInfo: 'You will be redirected to {redirectUri}',
   authorize: 'Authorize',
+  noDescription: 'This client does not provide a description',
 })
 
 @connect(
@@ -71,7 +72,7 @@ export default class Authorize extends PureComponent {
     }
 
     const redirectUri = redirect_uri || client.redirect_uris[0]
-    const clientName = capitalize(client.ids.client_id)
+    const clientName = client.name || capitalize(client.ids.client_id)
 
     const bottomLine = (
       <div>
@@ -80,7 +81,7 @@ export default class Authorize extends PureComponent {
             className={style.loginInfo}
             content={m.loginInfo}
             values={{ userId: user.ids.user_id }}
-          />
+          />{' '}
           <Message
             content={sharedMessages.logout}
             component="a"
@@ -112,14 +113,20 @@ export default class Authorize extends PureComponent {
                 {client.rights.map(right => (
                   <li key={right}>
                     <Icon icon="check" className={style.icon} />
-                    <Message content={{ id: `enum:${right}` }} />
+                    <Message content={{ id: `enum:${right}` }} firstToUpper />
                   </li>
                 ))}
               </ul>
             </div>
             <div className={style.right}>
-              <h3>{capitalize(client.ids.client_id)}</h3>
-              <p>{client.description}</p>
+              <h3>{clientName}</h3>
+              <p>
+                {client.description ? (
+                  client.description
+                ) : (
+                  <Message className={style.noDescription} content={m.noDescription} />
+                )}
+              </p>
             </div>
           </Fragment>
         </Modal>
