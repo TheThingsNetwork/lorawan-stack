@@ -31,6 +31,7 @@ import { withEnv } from '@ttn-lw/lib/components/env'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import getCookieValue from '@ttn-lw/lib/cookie'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './authorize.styl'
 
@@ -52,6 +53,16 @@ const m = defineMessages({
 @withEnv
 @bind
 export default class Authorize extends PureComponent {
+  static propTypes = {
+    env: PropTypes.env,
+    location: PropTypes.location.isRequired,
+    redirectToLogin: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    env: undefined,
+  }
+
   async handleLogout() {
     const { redirectToLogin } = this.props
     await api.oauth.logout()
@@ -121,7 +132,7 @@ export default class Authorize extends PureComponent {
             <div className={style.right}>
               <h3>{clientName}</h3>
               <p>
-                {client.description ? (
+                {Boolean(client.description) ? (
                   client.description
                 ) : (
                   <Message className={style.noDescription} content={m.noDescription} />
