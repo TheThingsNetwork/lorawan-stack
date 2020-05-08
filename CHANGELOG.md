@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI creates user configuration directory if it does not exist when generating configuration file.
 - Upgrading guide in docs.
 - Glossary.
+- Event details in the Console traffic view.
 
 ### Changed
 
