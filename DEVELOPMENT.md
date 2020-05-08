@@ -59,6 +59,10 @@ Redis is an in-memory data store that we use as a database for "hot" data.
 
 You can use `./mage dev:dbRedisCli` to enter a Redis-CLI shell.
 
+## Starting The Things Stack
+
+You can use `go run ./cmd/ttn-lw-stack start` to start The Things Stack.
+
 ## Project Structure
 
 The folder structure of the project looks as follows:
