@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/pkg/ttnpb"
+	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/v2/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt"
@@ -65,14 +65,14 @@ func TestProtobufV2Downlink(t *testing.T) {
 
 	Expected := &ttnpbv2.DownlinkMessage{
 		Payload: pld,
-		GatewayConfiguration: ttnpbv2.GatewayTxConfiguration{
+		GatewayConfiguration: &ttnpbv2.GatewayTxConfiguration{
 			Frequency:             863000000,
 			Power:                 14,
 			PolarizationInversion: true,
 			Timestamp:             12000,
 		},
-		ProtocolConfiguration: ttnpbv2.ProtocolTxConfiguration{
-			LoRaWAN: &ttnpbv2.LoRaWANTxConfiguration{
+		ProtocolConfiguration: &ttnpbv2.ProtocolTxConfiguration{
+			Lorawan: &ttnpbv2.LoRaWANTxConfiguration{
 				CodingRate: "4/5",
 				DataRate:   "SF12BW125",
 				FCnt:       2,
@@ -94,7 +94,7 @@ func TestProtobufV2Downlink(t *testing.T) {
 
 func TestProtobufV2Uplinks(t *testing.T) {
 	validV2Settings := ttnpbv2.ProtocolRxMetadata{
-		LoRaWAN: &ttnpbv2.LoRaWANMetadata{
+		Lorawan: &ttnpbv2.LoRaWANMetadata{
 			CodingRate:    "4/5",
 			DataRate:      "SF7BW125",
 			FrequencyPlan: 0,
@@ -115,17 +115,17 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		DataRateIndex: 5,
 	}
 	validV2Metadata := ttnpbv2.GatewayRxMetadata{
-		GatewayID: "gateway-id",
-		RSSI:      -2,
-		SNR:       -75,
+		GatewayId: "gateway-id",
+		Rssi:      -2,
+		Snr:       -75,
 		Timestamp: 1000,
 	}
 	validV2RSigMetadata := ttnpbv2.GatewayRxMetadata{
-		GatewayID: validV2Metadata.GatewayID,
+		GatewayId: validV2Metadata.GatewayId,
 		Antennas: []*ttnpbv2.GatewayRxMetadata_Antenna{
 			{
-				RSSI: validV2Metadata.RSSI,
-				SNR:  validV2Metadata.SNR,
+				Rssi: validV2Metadata.Rssi,
+				Snr:  validV2Metadata.Snr,
 			},
 		},
 		Timestamp: validV2Metadata.Timestamp,
@@ -163,8 +163,8 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		{
 			Name: "correct Input",
 			Input: &ttnpbv2.UplinkMessage{
-				GatewayMetadata:  validV2Metadata,
-				ProtocolMetadata: validV2Settings,
+				GatewayMetadata:  &validV2Metadata,
+				ProtocolMetadata: &validV2Settings,
 			},
 			InputPayload: validRawPayload,
 			Expected: &ttnpb.UplinkMessage{
@@ -175,8 +175,8 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		{
 			Name: "correct Input with Rsig",
 			Input: &ttnpbv2.UplinkMessage{
-				GatewayMetadata:  validV2RSigMetadata,
-				ProtocolMetadata: validV2Settings,
+				GatewayMetadata:  &validV2RSigMetadata,
+				ProtocolMetadata: &validV2Settings,
 			},
 			InputPayload: validRawPayload,
 			Expected: &ttnpb.UplinkMessage{
@@ -187,13 +187,13 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		{
 			Name: "incorrect data rate",
 			Input: &ttnpbv2.UplinkMessage{
-				GatewayMetadata: validV2Metadata,
-				ProtocolMetadata: ttnpbv2.ProtocolRxMetadata{
-					LoRaWAN: &ttnpbv2.LoRaWANMetadata{
-						CodingRate:    validV2Settings.LoRaWAN.CodingRate,
+				GatewayMetadata: &validV2Metadata,
+				ProtocolMetadata: &ttnpbv2.ProtocolRxMetadata{
+					Lorawan: &ttnpbv2.LoRaWANMetadata{
+						CodingRate:    validV2Settings.Lorawan.CodingRate,
 						DataRate:      "SF3BW000",
-						FrequencyPlan: validV2Settings.LoRaWAN.FrequencyPlan,
-						Modulation:    validV2Settings.LoRaWAN.Modulation,
+						FrequencyPlan: validV2Settings.Lorawan.FrequencyPlan,
+						Modulation:    validV2Settings.Lorawan.Modulation,
 					},
 				},
 			},
@@ -202,12 +202,12 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		{
 			Name: "incorrect modulation",
 			Input: &ttnpbv2.UplinkMessage{
-				GatewayMetadata: validV2Metadata,
-				ProtocolMetadata: ttnpbv2.ProtocolRxMetadata{
-					LoRaWAN: &ttnpbv2.LoRaWANMetadata{
-						CodingRate:    validV2Settings.LoRaWAN.CodingRate,
-						DataRate:      validV2Settings.LoRaWAN.DataRate,
-						FrequencyPlan: validV2Settings.LoRaWAN.FrequencyPlan,
+				GatewayMetadata: &validV2Metadata,
+				ProtocolMetadata: &ttnpbv2.ProtocolRxMetadata{
+					Lorawan: &ttnpbv2.LoRaWANMetadata{
+						CodingRate:    validV2Settings.Lorawan.CodingRate,
+						DataRate:      validV2Settings.Lorawan.DataRate,
+						FrequencyPlan: validV2Settings.Lorawan.FrequencyPlan,
 						Modulation:    ttnpbv2.Modulation(3252),
 					},
 				},
@@ -275,9 +275,9 @@ func TestProtobufV2Status(t *testing.T) {
 		{
 			Name: "With versions",
 			input: &ttnpbv2.StatusMessage{
-				DSP:  3,
-				HAL:  "v1.1",
-				FPGA: 4,
+				Dsp:  3,
+				Hal:  "v1.1",
+				Fpga: 4,
 			},
 			Expected: &ttnpb.GatewayStatus{
 				BootTime: time.Unix(0, 0),
@@ -302,15 +302,15 @@ func TestProtobufV2Status(t *testing.T) {
 		{
 			Name: "With metrics",
 			input: &ttnpbv2.StatusMessage{
-				OS: &ttnpbv2.StatusMessage_OSMetrics{
-					CPUPercentage:    10.0,
+				Os: &ttnpbv2.StatusMessage_OSMetrics{
+					CpuPercentage:    10.0,
 					Load_1:           30.0,
 					Load_5:           40.0,
 					Load_15:          50.0,
 					MemoryPercentage: 20.0,
 					Temperature:      30.0,
 				},
-				RTT: 3,
+				Rtt: 3,
 			},
 			Expected: &ttnpb.GatewayStatus{
 				BootTime: time.Unix(0, 0),

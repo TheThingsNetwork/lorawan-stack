@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Troubleshooting section of `DEVELOPMENT.md`
+- Change console field labels from `MAC version` and `PHY version` to `LoRaWAN version` and `Regional Parameters version` and add descriptions
+
 ### Deprecated
 
 ### Removed
@@ -20,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Join Server and Application Server device registries now return an error when deleting keys on `SET` operations. The operation was never supported and caused an error on `GET` instead.
+- OAuth authorization page crashing.
 
 ### Security
 

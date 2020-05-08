@@ -13,9 +13,9 @@ builds:
     ldflags:
     - -s
     - -w
-    - -X go.thethings.network/lorawan-stack/pkg/version.BuildDate={{.Date}}
-    - -X go.thethings.network/lorawan-stack/pkg/version.GitCommit={{.ShortCommit}}
-    - -X go.thethings.network/lorawan-stack/pkg/version.TTN={{.Version}}
+    - -X go.thethings.network/lorawan-stack/v3/pkg/version.BuildDate={{.Date}}
+    - -X go.thethings.network/lorawan-stack/v3/pkg/version.GitCommit={{.ShortCommit}}
+    - -X go.thethings.network/lorawan-stack/v3/pkg/version.TTN={{.Version}}
     env:
       - CGO_ENABLED=0
     goos:
@@ -40,9 +40,9 @@ builds:
     ldflags:
     - -s
     - -w
-    - -X go.thethings.network/lorawan-stack/pkg/version.BuildDate={{.Date}}
-    - -X go.thethings.network/lorawan-stack/pkg/version.GitCommit={{.ShortCommit}}
-    - -X go.thethings.network/lorawan-stack/pkg/version.TTN={{.Version}}
+    - -X go.thethings.network/lorawan-stack/v3/pkg/version.BuildDate={{.Date}}
+    - -X go.thethings.network/lorawan-stack/v3/pkg/version.GitCommit={{.ShortCommit}}
+    - -X go.thethings.network/lorawan-stack/v3/pkg/version.TTN={{.Version}}
     env:
       - CGO_ENABLED=0
     goos:

@@ -285,11 +285,11 @@ We follow the [official go guidelines](https://github.com/golang/go/wiki/CodeRev
 | :------------------: | :-----: | :-----------------------------------------------------------: |
 | context              | ctx     | context.Context                                               |
 | mutex                | mu      | sync.Mutex                                                    |
-| configuration        | conf    | go.thethings.network/lorawan-stack/pkg/v3/config.Config       |
-| logger               | logger  | go.thethings.network/lorawan-stack/pkg/v3/log.Logger          |
-| message              | msg     | go.thethings.network/lorawan-stack/api/gateway.UplinkMessage  |
-| status               | st      | go.thethings.network/lorawan-stack/api/gateway.Status         |
-| server               | srv     | go.thethings.network/lorawan-stack/pkg/v3/networkserver.Server|
+| configuration        | conf    | go.thethings.network/lorawan-stack/v3/pkg/config.Config       |
+| logger               | logger  | go.thethings.network/lorawan-stack/v3/pkg/log.Logger          |
+| message              | msg     | go.thethings.network/lorawan-stack/v3/api/gateway.UplinkMessage  |
+| status               | st      | go.thethings.network/lorawan-stack/v3/api/gateway.Status         |
+| server               | srv     | go.thethings.network/lorawan-stack/v3/pkg/networkserver.Server|
 | ID                   | id      | string                                                        |
 | unique ID            | uid     | string                                                        |
 | counter              | cnt     | int                                                           |
@@ -844,6 +844,13 @@ console.4e67a17c1ce5a74f3f50.js:104 Uncaught TypeError: m.subscribe is not a fun
     at o (console.4e67a17c1ce5a74f3f50.js:1)
     at Object.0 (console.4e67a17c1ce5a74f3f50.js:104)
 ```
+
+or
+
+```
+ERROR in ./node_modules/redux-logic/node_modules/rxjs/operators/index.js Module not found: Error: Can't resolve '../internal/operators/audit' in '/lorawan-stack/node_modules/redux-logic/node_modules/rxjs/operators'
+```
+
 #### Possible causes
 
 ##### Bundle using old JS SDK
@@ -858,6 +865,14 @@ The bundle integrates an old version of the JS SDK. This is likely a caching/lin
     - If you have cloned multiple `lorawan-stack` forks in different locations, `yarn link` might associate the JS SDK module with the SDK on another ttn repository
   - Rebuild the Console and (only after the build has finished) restart The Things Stack
 
+##### Broken yarn or npm cache
+
+##### Possible solutions
+
+- Clear yarn cache: `yarn cache clear`
+- Clear npm cache: `npm cache clear`
+- Clean and reinstall dependencies: `./mage js:cleanDeps js:deps`
+
 #### Problem: The build crashes without showing any helpful error message
 
 #### Cause: Not running mage in verbose mode
@@ -867,6 +882,27 @@ The bundle integrates an old version of the JS SDK. This is likely a caching/lin
 #### Solution
 
 Run mage in verbose mode: `./mage -v {target}`
+
+#### Problem: Browser displays error: `Cannot GET /`
+
+##### Cause: No endpoint is exposed at root
+
+##### Solution:
+
+Console is typically exposed at `http://localhost:8080/console`,
+API at `http://localhost:8080/console`,
+OAuth at `http://localhost:8080/oauth`,
+etc
+
+#### Problem: Browser displays error: `Error occurred while trying to proxy to: localhost:8080/console`
+
+##### Cause: Stack is not available or not running
+
+For development, remember to run the stack with `go run`:
+
+```bash
+$ go run ./cmd/ttn-lw-stack start
+```
 
 #### General advice
 

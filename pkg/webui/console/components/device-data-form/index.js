@@ -431,6 +431,7 @@ class DeviceDataForm extends Component {
         <Message component="h4" content={m.lorawanOptions} />
         <Form.Field
           title={sharedMessages.macVersion}
+          description={sharedMessages.macVersionDescription}
           name="lorawan_version"
           component={Select}
           required
@@ -446,6 +447,7 @@ class DeviceDataForm extends Component {
         />
         <Form.Field
           title={sharedMessages.phyVersion}
+          description={sharedMessages.phyVersionDescription}
           name="lorawan_phy_version"
           component={Select}
           required

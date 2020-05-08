@@ -20,7 +20,7 @@ import (
 	"strconv"
 	"time"
 
-	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/pkg/ttnpb"
+	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/v2/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt/topics"
@@ -39,19 +39,19 @@ var (
 		ttnpbv2.LocationMetadata_IP_GEOLOCATION: ttnpb.SOURCE_IP_GEOLOCATION,
 	}
 
-	frequencyPlanToBand = map[uint32]string{
-		0:  "EU_863_870",
-		1:  "US_902_928",
-		2:  "CN_779_787",
-		3:  "EU_433",
-		4:  "AU_915_928",
-		5:  "CN_470_510",
-		6:  "AS_923",
-		7:  "KR_920_923",
-		8:  "IN_865_867",
-		9:  "RU_864_870",
-		61: "AS_923",
-		62: "AS_923",
+	frequencyPlanToBand = map[ttnpbv2.FrequencyPlan]string{
+		ttnpbv2.FrequencyPlan_EU_863_870: "EU_863_870",
+		ttnpbv2.FrequencyPlan_US_902_928: "US_902_928",
+		ttnpbv2.FrequencyPlan_CN_779_787: "CN_779_787",
+		ttnpbv2.FrequencyPlan_EU_433:     "EU_433",
+		ttnpbv2.FrequencyPlan_AU_915_928: "AU_915_928",
+		ttnpbv2.FrequencyPlan_CN_470_510: "CN_470_510",
+		ttnpbv2.FrequencyPlan_AS_923:     "AS_923",
+		ttnpbv2.FrequencyPlan_AS_920_923: "AS_923",
+		ttnpbv2.FrequencyPlan_AS_923_925: "AS_923",
+		ttnpbv2.FrequencyPlan_KR_920_923: "KR_920_923",
+		ttnpbv2.FrequencyPlan_IN_865_867: "IN_865_867",
+		ttnpbv2.FrequencyPlan_RU_864_870: "RU_864_870",
 	}
 
 	errNotScheduled    = errors.DefineInvalidArgument("not_scheduled", "not scheduled")
@@ -89,15 +89,15 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdent
 
 	v2downlink := &ttnpbv2.DownlinkMessage{
 		Payload: down.RawPayload,
-		GatewayConfiguration: ttnpbv2.GatewayTxConfiguration{
+		GatewayConfiguration: &ttnpbv2.GatewayTxConfiguration{
 			Frequency:             settings.Frequency,
 			Power:                 int32(settings.Downlink.TxPower - eirpDelta),
 			PolarizationInversion: true,
 			RfChain:               0,
 			Timestamp:             settings.Timestamp,
 		},
-		ProtocolConfiguration: ttnpbv2.ProtocolTxConfiguration{
-			LoRaWAN: lorawan,
+		ProtocolConfiguration: &ttnpbv2.ProtocolTxConfiguration{
+			Lorawan: lorawan,
 		},
 	}
 	return v2downlink.Marshal()
@@ -110,10 +110,10 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		return nil, err
 	}
 
-	if v2uplink.ProtocolMetadata.LoRaWAN == nil {
+	lorawanMetadata := v2uplink.GetProtocolMetadata().GetLorawan()
+	if lorawanMetadata == nil {
 		return nil, errLoRaWANMetadata.New()
 	}
-	lorawanMetadata := v2uplink.ProtocolMetadata.LoRaWAN
 	gwMetadata := v2uplink.GatewayMetadata
 	uplink := &ttnpb.UplinkMessage{
 		RawPayload: v2uplink.Payload,
@@ -170,11 +170,11 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 			uplink.RxMetadata = append(uplink.RxMetadata, &ttnpb.RxMetadata{
 				GatewayIdentifiers:    ids,
 				AntennaIndex:          antenna.Antenna,
-				ChannelRSSI:           antenna.ChannelRSSI,
+				ChannelRSSI:           antenna.ChannelRssi,
 				FrequencyOffset:       antenna.FrequencyOffset,
-				RSSI:                  antenna.RSSI,
-				RSSIStandardDeviation: antenna.RSSIStandardDeviation,
-				SNR:                   antenna.SNR,
+				RSSI:                  antenna.Rssi,
+				RSSIStandardDeviation: antenna.RssiStandardDeviation,
+				SNR:                   antenna.Snr,
 				Time:                  &mdTime,
 				Timestamp:             gwMetadata.Timestamp,
 			})
@@ -183,8 +183,8 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		uplink.RxMetadata = append(uplink.RxMetadata, &ttnpb.RxMetadata{
 			GatewayIdentifiers: ids,
 			AntennaIndex:       0,
-			RSSI:               gwMetadata.RSSI,
-			SNR:                gwMetadata.SNR,
+			RSSI:               gwMetadata.Rssi,
+			SNR:                gwMetadata.Snr,
 			Time:               &mdTime,
 			Timestamp:          gwMetadata.Timestamp,
 		})
@@ -204,32 +204,32 @@ func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.G
 		"lmnw": float32(v2status.LmNw),
 		"lmst": float32(v2status.LmSt),
 		"lmok": float32(v2status.LmOk),
-		"lpps": float32(v2status.LPPS),
+		"lpps": float32(v2status.LPps),
 		"rxin": float32(v2status.RxIn),
 		"rxok": float32(v2status.RxOk),
 		"txin": float32(v2status.TxIn),
 		"txok": float32(v2status.TxOk),
 	}
-	if os := v2status.OS; os != nil {
-		metrics["cpu_percentage"] = os.CPUPercentage
+	if os := v2status.Os; os != nil {
+		metrics["cpu_percentage"] = os.CpuPercentage
 		metrics["load_1"] = os.Load_1
 		metrics["load_5"] = os.Load_5
 		metrics["load_15"] = os.Load_15
 		metrics["memory_percentage"] = os.MemoryPercentage
 		metrics["temp"] = os.Temperature
 	}
-	if v2status.RTT != 0 {
-		metrics["rtt_ms"] = float32(v2status.RTT)
+	if v2status.Rtt != 0 {
+		metrics["rtt_ms"] = float32(v2status.Rtt)
 	}
 	versions := make(map[string]string)
-	if v2status.DSP > 0 {
-		versions["dsp"] = strconv.Itoa(int(v2status.DSP))
+	if v2status.Dsp > 0 {
+		versions["dsp"] = strconv.Itoa(int(v2status.Dsp))
 	}
-	if v2status.FPGA > 0 {
-		versions["fpga"] = strconv.Itoa(int(v2status.FPGA))
+	if v2status.Fpga > 0 {
+		versions["fpga"] = strconv.Itoa(int(v2status.Fpga))
 	}
-	if v2status.HAL != "" {
-		versions["hal"] = v2status.HAL
+	if v2status.Hal != "" {
+		versions["hal"] = v2status.Hal
 	}
 	var antennasLocation []*ttnpb.Location
 	if loc := v2status.Location; loc.Validate() {
@@ -246,7 +246,7 @@ func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.G
 	return &ttnpb.GatewayStatus{
 		AntennaLocations: antennasLocation,
 		BootTime:         time.Unix(0, v2status.BootTime),
-		IP:               v2status.IP,
+		IP:               v2status.Ip,
 		Metrics:          metrics,
 		Time:             time.Unix(0, v2status.Time),
 		Versions:         versions,
