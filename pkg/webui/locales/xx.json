@@ -96,6 +96,7 @@
   "console.components.device-import-form.index.targetedComponents": "Xxxxxxxx xxxxxxxxxx",
   "console.components.downlink-form.index.insertMode": "Xxxxxx Xxxx",
   "console.components.downlink-form.index.insertModeDescription": "Xxxxxxxx xxx xxxxxx xxxxxxx xxx xxxxxxxx xxxxx xx xxxxxx xx xx",
+  "console.components.downlink-form.index.lengthMustBeEven": "Xxxxxxx xxxx xx xxxxxxxx",
   "console.components.downlink-form.index.replace": "Xxxxxxx",
   "console.components.downlink-form.index.push": "Xxxx",
   "console.components.downlink-form.index.validateFPort": "XXxxx xxxx xx xxxxxxx x xxx xxx",

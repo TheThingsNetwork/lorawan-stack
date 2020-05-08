@@ -32,6 +32,7 @@ import { hexToBase64 } from '../../lib/bytes'
 const m = defineMessages({
   insertMode: 'Insert Mode',
   insertModeDescription: 'Messages can either replace the downlink queue or append to it',
+  lengthMustBeEven: 'Payload must be complete',
   replace: 'Replace',
   push: 'Push',
   validateFPort: 'FPort must be between 1 and 223',
@@ -51,7 +52,11 @@ const validationSchema = Yup.object({
     .max(223, m.validateFPort)
     .required(sharedMessages.validateRequired),
   confirmed: Yup.bool().required(),
-  frm_payload: Yup.string(),
+  frm_payload: Yup.string().test(
+    'len',
+    m.lengthMustBeEven,
+    val => !Boolean(val) || val.length % 2 === 0,
+  ),
 })
 
 const DownlinkForm = ({ appId, devId }) => {
@@ -122,6 +127,7 @@ const DownlinkForm = ({ appId, devId }) => {
         component={Input}
         type="byte"
         required
+        unbounded
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={m.scheduleDownlink} />

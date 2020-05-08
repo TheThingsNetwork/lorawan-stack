@@ -22,7 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+<<<<<<< HEAD
 - OAuth authorization page crashing.
+=======
+- Byte input in scheduling downlink view
+>>>>>>> doc: Update CHANGELOG
 
 ### Security
 
