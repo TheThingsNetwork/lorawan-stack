@@ -34,6 +34,15 @@ $ ./mage dev:initStack
 
 This starts a CockroachDB and Redis database in Docker containers, creates a database, migrates tables and creates a user `admin` with password `admin`.
 
+## Using the CLI with the Development Environment
+
+In order to login, you will need to use the correct OAuth Server Address:
+
+```bash
+$ export TTN_LW_OAUTH_SERVER_ADDRESS=http://localhost:1885/oauth
+$ go run ./cmd/ttn-lw-cli login
+```
+
 ## Managing the Development Databases
 
 You can use the following commands to start, stop and erase databases.
@@ -443,7 +452,7 @@ Our `import` statements use the following order, each separated by empty newline
 1. Node "builtin" modules (e.g. `path`)
 2. External modules (e.g. `react`)
 3. Internal modules (e.g. `@ttn-lw/*`, `@console`, etc.)
-  1. Constants 
+  1. Constants
   2. API module
   3. Components
     1. Global presentational components (`@ttn-lw/components/*`)
