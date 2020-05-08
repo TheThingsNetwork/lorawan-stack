@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- OAuth authorization page crashing.
+
 ### Security
 
 ## [3.8.0] - 2020-05-06
