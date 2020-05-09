@@ -14,13 +14,11 @@
 
 import React from 'react'
 import classnames from 'classnames'
-import bind from 'autobind-decorator'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './list.styl'
 
-@bind
 class SideNavigationList extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
