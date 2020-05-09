@@ -114,6 +114,7 @@ export default class ApplicationCollaboratorEdit extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     collaborator: PropTypes.collaborator.isRequired,
+    collaboratorId: PropTypes.string.isRequired,
     pseudoRights: PropTypes.rights.isRequired,
     redirectToList: PropTypes.func.isRequired,
     rights: PropTypes.rights.isRequired,
