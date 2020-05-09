@@ -39,6 +39,8 @@ class Input extends React.Component {
     component: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     disabled: PropTypes.bool,
     error: PropTypes.bool,
+    forwardedRef: PropTypes.shape({}),
+    horizontal: PropTypes.bool,
     icon: PropTypes.string,
     intl: PropTypes.shape({
       formatMessage: PropTypes.func,
@@ -79,6 +81,8 @@ class Input extends React.Component {
     valid: false,
     value: '',
     warning: false,
+    forwardedRef: null,
+    horizontal: true,
   }
 
   state = {
@@ -238,6 +242,14 @@ const Valid = function(props) {
       <path d="M256 32a224 224 0 1 0 0 448 224 224 0 0 0 0-448zm115 149L232 360c-1 1-3 3-5 3-3 0-4-1-5-3l-79-76-2-1-1-3 1-4 1-1 25-25c1-2 2-3 4-3 3 0 5 2 6 3l45 43 111-143 4-1 3 1 31 24 1 4-1 3z" />
     </svg>
   )
+}
+
+Valid.propTypes = {
+  show: PropTypes.bool,
+}
+
+Valid.defaultProps = {
+  show: false,
 }
 
 Input.Toggled = Toggled
