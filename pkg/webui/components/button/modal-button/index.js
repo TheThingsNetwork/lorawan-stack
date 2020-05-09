@@ -85,7 +85,8 @@ ModalButton.defaultProps = {
 }
 
 ModalButton.propTypes = {
-  modalData: PropTypes.object.isRequired,
+  message: PropTypes.message.isRequired,
+  modalData: PropTypes.shape({ ...PortalledModal.Modal.propTypes }).isRequired,
   onApprove: PropTypes.func,
   onCancel: PropTypes.func,
 }
