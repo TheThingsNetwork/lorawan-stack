@@ -25,8 +25,8 @@ import style from './toggled.styl'
 
 import Input from '.'
 
-@bind
 class Toggled extends Component {
+  @bind
   handleCheckboxChange(event) {
     const enabled = event.target.checked
     const { value } = this.props.value
@@ -34,6 +34,7 @@ class Toggled extends Component {
     this.props.onChange({ value, enabled }, true)
   }
 
+  @bind
   handleInputChange(value) {
     const { enabled } = this.props.value
 
