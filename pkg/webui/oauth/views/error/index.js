@@ -22,6 +22,7 @@ import ErrorMessage from '@ttn-lw/lib/components/error-message'
 import { withEnv } from '@ttn-lw/lib/components/env'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import errorMessages from '@ttn-lw/lib/errors/error-messages'
 import {
@@ -77,6 +78,11 @@ const FullViewError = function({ error, env }) {
       </Container>
     </div>
   )
+}
+
+FullViewError.propTypes = {
+  env: PropTypes.env.isRequired,
+  error: PropTypes.error.isRequired,
 }
 
 export default withEnv(FullViewError)
