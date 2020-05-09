@@ -26,7 +26,6 @@ import Button from '..'
  * action. It can be used as an easy way to get the users explicit confirmation
  * before doing an action, e.g. Deleting a resource.
  */
-@bind
 class ModalButton extends React.Component {
   constructor(props) {
     super(props)
@@ -35,6 +34,8 @@ class ModalButton extends React.Component {
       modalVisible: false,
     }
   }
+
+  @bind
   handleClick() {
     const { modalData } = this.props
 
@@ -47,6 +48,7 @@ class ModalButton extends React.Component {
     this.setState({ modalVisible: true })
   }
 
+  @bind
   handleComplete(confirmed) {
     const { onApprove, onCancel } = this.props
 
