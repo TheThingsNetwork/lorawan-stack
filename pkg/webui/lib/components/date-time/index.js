@@ -14,13 +14,11 @@
 
 import React from 'react'
 import { FormattedDate, FormattedTime } from 'react-intl'
-import bind from 'autobind-decorator'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import RelativeTime from './relative'
 
-@bind
 class DateTime extends React.PureComponent {
   renderDateTime(formattedDate, formattedTime, dateValue) {
     const { className, children, date, time } = this.props
