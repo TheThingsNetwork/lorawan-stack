@@ -54,6 +54,7 @@ class Organization extends React.Component {
     match: PropTypes.match.isRequired,
     orgId: PropTypes.string.isRequired,
     organization: PropTypes.organization.isRequired,
+    rights: PropTypes.rights.isRequired,
     stopStream: PropTypes.func.isRequired,
   }
 
