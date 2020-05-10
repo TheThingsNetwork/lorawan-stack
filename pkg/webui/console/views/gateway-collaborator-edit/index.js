@@ -108,7 +108,6 @@ import {
     />
   )
 })
-@bind
 export default class GatewayCollaboratorEdit extends React.Component {
   static propTypes = {
     collaborator: PropTypes.collaborator.isRequired,
@@ -122,6 +121,7 @@ export default class GatewayCollaboratorEdit extends React.Component {
     error: '',
   }
 
+  @bind
   handleSubmit(updatedCollaborator) {
     const { gtwId } = this.props
 
@@ -135,6 +135,7 @@ export default class GatewayCollaboratorEdit extends React.Component {
     })
   }
 
+  @bind
   async handleDelete(updatedCollaborator) {
     const { gtwId } = this.props
 
