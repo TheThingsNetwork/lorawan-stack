@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
-import bind from 'autobind-decorator'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -83,7 +82,6 @@ const headers = [
 
 const getItemPathPrefix = item => `/${item.ids.pub_sub_id}`
 
-@bind
 export default class PubsubsTable extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
