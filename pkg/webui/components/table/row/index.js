@@ -20,14 +20,15 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './row.styl'
 
-@bind
 class Row extends React.Component {
+  @bind
   onClick() {
     const { id, onClick } = this.props
 
     onClick(id)
   }
 
+  @bind
   onKeyDown(evt) {
     const { id, onClick } = this.props
     if (evt.key === 'Enter') {
