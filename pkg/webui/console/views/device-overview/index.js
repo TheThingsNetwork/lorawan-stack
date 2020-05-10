@@ -16,7 +16,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
-import bind from 'autobind-decorator'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
 
@@ -47,11 +46,11 @@ const m = defineMessages({
 @connect((state, props) => ({
   device: selectSelectedDevice(state),
 }))
-@bind
 class DeviceOverview extends React.Component {
   static propTypes = {
     device: PropTypes.device.isRequired,
   }
+
   get deviceInfo() {
     const {
       ids,

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
@@ -43,7 +42,6 @@ import { mayEditBasicGatewayInformation } from '@console/lib/feature-checks'
 @withFeatureRequirement(mayEditBasicGatewayInformation, {
   redirect: '/',
 })
-@bind
 export default class GatewayOverview extends React.Component {
   static propTypes = {
     apiKeysTotalCount: PropTypes.number,
