@@ -19,12 +19,12 @@ import Form from '@ttn-lw/components/form'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-@bind
 class ApiKeyForm extends React.Component {
   state = {
     error: '',
   }
 
+  @bind
   async handleSubmit(values, { resetForm }) {
     const { onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
 
