@@ -61,7 +61,6 @@ const validationSchema = Yup.object().shape({
     }),
 })
 
-@bind
 class PayloadFormattersForm extends React.Component {
   constructor(props) {
     super(props)
@@ -72,10 +71,12 @@ class PayloadFormattersForm extends React.Component {
     }
   }
 
+  @bind
   onTypeChange(type) {
     this.setState({ type })
   }
 
+  @bind
   async handleSubmit(values, { resetForm }) {
     const { onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
 

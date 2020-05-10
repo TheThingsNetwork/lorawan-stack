@@ -69,6 +69,7 @@ class DevicePayloadFormatters extends React.PureComponent {
     updateDevice: PropTypes.func.isRequired,
   }
 
+  @bind
   async onSubmit(values) {
     const { appId, devId, formatters, updateDevice } = this.props
     return updateDevice(appId, devId, {
