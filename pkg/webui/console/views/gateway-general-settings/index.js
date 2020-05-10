@@ -80,7 +80,6 @@ const m = defineMessages({
     />
   )
 })
-@bind
 export default class GatewayGeneralSettings extends React.Component {
   static propTypes = {
     deleteGateway: PropTypes.func.isRequired,
@@ -100,6 +99,7 @@ export default class GatewayGeneralSettings extends React.Component {
     error: '',
   }
 
+  @bind
   async handleSubmit(values) {
     const { gtwId, gateway, updateGateway } = this.props
 
@@ -132,6 +132,7 @@ export default class GatewayGeneralSettings extends React.Component {
     }
   }
 
+  @bind
   async handleDelete() {
     const { gtwId, deleteGateway, onDeleteSuccess } = this.props
 
