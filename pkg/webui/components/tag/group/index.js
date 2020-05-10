@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -35,7 +34,6 @@ const LEFT_TAG_WIDTH = 40
 // The space between the tags.
 const TAG_SPACE_WIDTH = 3
 
-@bind
 class TagGroup extends React.Component {
   static propTypes = {
     className: PropTypes.string,
