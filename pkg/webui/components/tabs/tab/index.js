@@ -20,7 +20,6 @@ import { NavLink } from 'react-router-dom'
 
 import style from './tab.styl'
 
-@bind
 class Tab extends React.PureComponent {
   static propTypes = {
     /** A flag specifying whether the tab is active. */
@@ -52,6 +51,7 @@ class Tab extends React.PureComponent {
     exact: true,
   }
 
+  @bind
   handleClick() {
     const { onClick, name, disabled } = this.props
 

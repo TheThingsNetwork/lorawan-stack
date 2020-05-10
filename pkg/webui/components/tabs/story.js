@@ -19,7 +19,6 @@ import { withInfo } from '@storybook/addon-info'
 
 import Tabs from '.'
 
-@bind
 class Example extends Component {
   constructor(props) {
     super(props)
@@ -29,6 +28,7 @@ class Example extends Component {
     }
   }
 
+  @bind
   onTabChange(activeTab) {
     this.setState({ activeTab })
   }
