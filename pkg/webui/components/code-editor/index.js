@@ -25,7 +25,6 @@ import './ttn-theme'
 
 import style from './code-editor.styl'
 
-@bind
 class CodeEditor extends React.Component {
   static propTypes = {
     className: PropTypes.string,
@@ -84,6 +83,7 @@ class CodeEditor extends React.Component {
     this.aceRef = React.createRef()
   }
 
+  @bind
   onFocus(evt) {
     const { onFocus } = this.props
 
@@ -94,6 +94,7 @@ class CodeEditor extends React.Component {
     })
   }
 
+  @bind
   onBlur(evt) {
     const { onBlur } = this.props
 
