@@ -56,7 +56,6 @@ import {
   const appId = props.appId
   return <Breadcrumb path={`/applications/${appId}/api-keys/add`} content={sharedMessages.add} />
 })
-@bind
 export default class ApplicationApiKeyAdd extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
@@ -71,6 +70,7 @@ export default class ApplicationApiKeyAdd extends React.Component {
     this.createApplicationKey = key => api.application.apiKeys.create(props.appId, key)
   }
 
+  @bind
   handleApprove() {
     const { navigateToList, appId } = this.props
 

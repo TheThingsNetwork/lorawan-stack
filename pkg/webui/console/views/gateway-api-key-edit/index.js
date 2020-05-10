@@ -80,7 +80,6 @@ import {
 
   return <Breadcrumb path={`/gateways/${gtwId}/api-keys/${keyId}`} content={sharedMessages.edit} />
 })
-@bind
 export default class GatewayApiKeyEdit extends React.Component {
   static propTypes = {
     apiKey: PropTypes.apiKey.isRequired,
@@ -98,6 +97,7 @@ export default class GatewayApiKeyEdit extends React.Component {
     this.editGatewayKey = key => api.gateway.apiKeys.update(props.gtwId, props.keyId, key)
   }
 
+  @bind
   onDeleteSuccess() {
     const { gtwId, deleteSuccess } = this.props
 

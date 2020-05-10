@@ -61,7 +61,6 @@ import {
 
   return <Breadcrumb path={`/gateways/${gtwId}/api-keys/add`} content={sharedMessages.add} />
 })
-@bind
 export default class GatewayApiKeyAdd extends React.Component {
   static propTypes = {
     gtwId: PropTypes.string.isRequired,
@@ -75,6 +74,8 @@ export default class GatewayApiKeyAdd extends React.Component {
 
     this.createGatewayKey = key => api.gateway.apiKeys.create(props.gtwId, key)
   }
+
+  @bind
   handleApprove() {
     const { navigateToList, gtwId } = this.props
 
