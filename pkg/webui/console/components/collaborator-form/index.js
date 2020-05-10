@@ -44,7 +44,6 @@ const validationSchema = Yup.object().shape({
 
 const isUser = collaborator => collaborator.ids && 'user_ids' in collaborator.ids
 
-@bind
 export default class CollaboratorForm extends Component {
   static defaultProps = {
     onSubmitFailure: () => null,
@@ -86,6 +85,7 @@ export default class CollaboratorForm extends Component {
     error: '',
   }
 
+  @bind
   async handleSubmit(values, { resetForm, setSubmitting }) {
     const { collaborator_id, collaborator_type, rights } = values
     const { onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
@@ -114,6 +114,7 @@ export default class CollaboratorForm extends Component {
     }
   }
 
+  @bind
   async handleDelete() {
     const { collaborator, onDelete, onDeleteSuccess, onDeleteFailure } = this.props
     const collaborator_type = isUser(collaborator) ? 'user' : 'organization'
@@ -140,6 +141,7 @@ export default class CollaboratorForm extends Component {
     }
   }
 
+  @bind
   computeInitialValues() {
     const { collaborator, pseudoRights } = this.props
 
