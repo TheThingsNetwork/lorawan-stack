@@ -19,7 +19,6 @@ import { storiesOf } from '@storybook/react'
 
 import Input from '.'
 
-@bind
 class Example extends React.Component {
   constructor(props) {
     super(props)
@@ -29,6 +28,7 @@ class Example extends React.Component {
     }
   }
 
+  @bind
   onChange(value) {
     this.setState({ value })
   }
