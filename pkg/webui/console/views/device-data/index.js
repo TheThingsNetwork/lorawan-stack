@@ -15,7 +15,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
-import bind from 'autobind-decorator'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
@@ -47,7 +46,6 @@ import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/sel
     />
   )
 })
-@bind
 export default class Data extends React.Component {
   static propTypes = {
     device: PropTypes.device.isRequired,
