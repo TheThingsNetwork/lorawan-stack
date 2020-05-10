@@ -22,7 +22,6 @@ import Icon from '@ttn-lw/components/icon'
 
 import style from './pagination.styl'
 
-@bind
 class Pagination extends React.PureComponent {
   static propTypes = {
     className: PropTypes.string,
@@ -65,6 +64,7 @@ class Pagination extends React.PureComponent {
     pageRangeDisplayed: 1,
   }
 
+  @bind
   onPageChange(page) {
     this.props.onPageChange(page.selected + 1)
   }
