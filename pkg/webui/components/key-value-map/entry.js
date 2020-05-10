@@ -27,18 +27,20 @@ const m = defineMessages({
   deleteEntry: 'Delete entry',
 })
 
-@bind
 class Entry extends React.Component {
+  @bind
   handleRemoveButtonClicked(event) {
     const { onRemoveButtonClick, index } = this.props
     onRemoveButtonClick(index, event)
   }
 
+  @bind
   handleKeyChanged(newKey) {
     const { onChange, index } = this.props
     onChange(index, { key: newKey })
   }
 
+  @bind
   handleValueChanged(newValue) {
     const { onChange, index } = this.props
     onChange(index, { value: newValue })
