@@ -23,7 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - OAuth authorization page crashing.
-- Byte input in scheduling downlink view
+- Byte input in scheduling downlink view.
+- OAuth client token exchange and refresh issues when using TLS with a RootCA.
 
 ### Security
 
