@@ -1,9 +1,12 @@
 ---
-title: "Installing the Command-line Interface"
+title: "Installing the CLI"
 description: ""
+weight: 1
 ---
 
-## Installing the Command-line interface
+This section contains instructions for installing the command-line interface.
+
+<!--more-->
 
 ### Package managers (recommended)
 

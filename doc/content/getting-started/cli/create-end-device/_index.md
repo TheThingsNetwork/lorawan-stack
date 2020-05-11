@@ -1,6 +1,7 @@
 ---
 title: "Create End Device"
 description: ""
+weight: 5
 ---
 
 ## Create End Device

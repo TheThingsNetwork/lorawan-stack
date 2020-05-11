@@ -1,9 +1,12 @@
 ---
 title: "Create Gateway"
 description: ""
+weight: 3
 ---
 
-## Create Gateway
+This section contains instructions for creating a Gateway using the command-line interface.
+
+<!--more-->
 
 First, list the available frequency plans:
 
