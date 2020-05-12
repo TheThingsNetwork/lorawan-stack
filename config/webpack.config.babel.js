@@ -14,6 +14,8 @@
 
 /* eslint-env node */
 
+import fs from 'fs'
+
 import path from 'path'
 import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
@@ -39,12 +41,12 @@ const {
   DEFAULT_LOCALE = 'en',
 } = process.env
 
-const DEV_SERVER_BUILD = Boolean(
-  process.env.DEV_SERVER_BUILD && process.env.DEV_SERVER_BUILD === 'true',
-)
-const WEBPACK_DISABLE_HMR = Boolean(
-  process.env.WEBPACK_DISABLE_HMR && process.env.WEBPACK_DISABLE_HMR === 'true',
-)
+const WEBPACK_IS_DEV_SERVER_BUILD = process.env.WEBPACK_IS_DEV_SERVER_BUILD === 'true'
+const WEBPACK_DEV_SERVER_DISABLE_HMR = process.env.WEBPACK_DEV_SERVER_DISABLE_HMR === 'true'
+const WEBPACK_DEV_SERVER_USE_TLS = process.env.WEBPACK_DEV_SERVER_USE_TLS === 'true'
+const TTN_LW_TLS_CERTIFICATE = process.env.TTN_LW_TLS_CERTIFICATE || './cert.pem'
+const TTN_LW_TLS_KEY = process.env.TTN_LW_TLS_KEY || './key.pem'
+
 const ASSETS_ROOT = '/assets'
 
 const context = path.resolve(CONTEXT)
@@ -117,17 +119,26 @@ export default {
   devServer: {
     port: 8080,
     inline: true,
-    hot: !WEBPACK_DISABLE_HMR,
+    hot: !WEBPACK_DEV_SERVER_DISABLE_HMR,
     stats: 'minimal',
     publicPath: `${ASSETS_ROOT}/`,
     proxy: [
       {
         context: ['/console', '/oauth', '/api'],
-        target: 'http://localhost:1885',
+        target: WEBPACK_DEV_SERVER_USE_TLS ? 'https://localhost:8885' : 'http://localhost:1885',
         changeOrigin: true,
+        secure: false,
       },
     ],
     historyApiFallback: true,
+    ...(WEBPACK_DEV_SERVER_USE_TLS
+      ? {
+          https: {
+            cert: fs.readFileSync(TTN_LW_TLS_CERTIFICATE),
+            key: fs.readFileSync(TTN_LW_TLS_KEY),
+          },
+        }
+      : {}),
   },
   entry: {
     console: ['./config/root.js', './pkg/webui/console.js'],
@@ -218,7 +229,7 @@ export default {
       new CleanWebpackPlugin(path.resolve(CONTEXT, PUBLIC_DIR), {
         root: context,
         verbose: false,
-        dry: DEV_SERVER_BUILD,
+        dry: WEBPACK_IS_DEV_SERVER_BUILD,
         exclude: env({
           production: [],
           development: ['libs.bundle.js', 'libs.bundle.js.map'],
