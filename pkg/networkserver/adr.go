@@ -157,6 +157,13 @@ func uplinkMetadata(ups ...*ttnpb.UplinkMessage) []*ttnpb.RxMetadata {
 }
 
 func txPowerStep(phy band.Band, from, to uint8) float32 {
+	max := phy.MaxTxPowerIndex()
+	if from > max {
+		from = max
+	}
+	if to > max {
+		to = max
+	}
 	return phy.TxOffset[from] - phy.TxOffset[to]
 }
 
