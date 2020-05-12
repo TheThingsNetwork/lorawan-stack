@@ -97,6 +97,7 @@ import {
       'update_location_from_status',
       'update_channel',
       'schedule_anytime_delay',
+      'attributes',
     ]),
   ({ fetching, gateway }) => fetching || !Boolean(gateway),
 )

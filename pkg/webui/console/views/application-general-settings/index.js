@@ -40,9 +40,9 @@ import Require from '@console/lib/components/require'
 import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import { id as idRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayEditBasicApplicationInfo, mayDeleteApplication } from '@console/lib/feature-checks'
+import { attributeValidCheck, attributeTooShortCheck } from '@console/lib/attributes'
 
 import { attachPromise } from '@console/store/actions/lib'
 import { updateApplication, deleteApplication } from '@console/store/actions/applications'
@@ -60,23 +60,7 @@ const m = defineMessages({
   modalWarning:
     'Are you sure you want to delete "{appName}"? This action cannot be undone and it will not be possible to reuse the application ID.',
   updateSuccess: 'Application updated',
-  attributesValidateRequired:
-    'All attribute entry values are required. Please remove empty entries.',
-  attributeKeyValidateTooShort:
-    'Attribute keys must have at least 3 characters and contain no special characters',
 })
-
-const attributeValidCheck = attributes =>
-  attributes === undefined ||
-  (attributes instanceof Array &&
-    (attributes.length === 0 ||
-      attributes.every(attribute => attribute.key !== '' && attribute.value !== '')))
-
-const attributeTooShortCheck = attributes =>
-  attributes === undefined ||
-  (attributes instanceof Array &&
-    (attributes.length === 0 ||
-      attributes.every(attribute => RegExp(idRegexp).test(attribute.key))))
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -84,8 +68,16 @@ const validationSchema = Yup.object().shape({
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string().max(150, Yup.passValues(sharedMessages.validateTooLong)),
   attributes: Yup.array()
-    .test('has no empty string values', m.attributesValidateRequired, attributeValidCheck)
-    .test('has key length longer than 2', m.attributeKeyValidateTooShort, attributeTooShortCheck),
+    .test(
+      'has no empty string values',
+      sharedMessages.attributesValidateRequired,
+      attributeValidCheck,
+    )
+    .test(
+      'has key length longer than 2',
+      sharedMessages.attributeKeyValidateTooShort,
+      attributeTooShortCheck,
+    ),
 })
 
 @connect(
