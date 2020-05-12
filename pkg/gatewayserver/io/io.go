@@ -600,6 +600,9 @@ func (c *Connection) Stats() *ttnpb.GatewayConnectionStats {
 			Count:  uint32(count),
 		}
 	}
+	if c.scheduler != nil {
+		stats.SubBands = c.scheduler.SubBandStats()
+	}
 
 	return stats
 }

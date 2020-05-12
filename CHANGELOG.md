@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Gateway Server events for uplink messages now contain end device identifiers.
+- Gateway connection stats now include sub band utilization stats.
 
 ### Changed
 
