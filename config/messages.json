@@ -3095,6 +3095,15 @@
       "file": "messages.go"
     }
   },
+  "error:pkg/encoding/lorawan:no_unmarshaler": {
+    "translations": {
+      "en": "no unmarshaler available for MAC command with CID `{cid}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "mac.go"
+    }
+  },
   "error:pkg/encoding/lorawan:unknown_field": {
     "translations": {
       "en": "unknown `{lorawan_field}`"
