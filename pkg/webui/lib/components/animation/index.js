@@ -21,8 +21,12 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 @bind
 export default class Animation extends Component {
   static propTypes = {
-    animationData: PropTypes.object.isRequired,
-    lottieConfig: PropTypes.object,
+    animationData: PropTypes.shape({}).isRequired,
+    lottieConfig: PropTypes.shape({}),
+  }
+
+  static defaultProps = {
+    lottieConfig: {},
   }
 
   constructor(props) {

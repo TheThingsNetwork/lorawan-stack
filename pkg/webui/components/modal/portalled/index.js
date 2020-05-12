@@ -15,6 +15,8 @@
 import React from 'react'
 import DOM from 'react-dom'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import Modal from '..'
 
 /**
@@ -26,7 +28,7 @@ import Modal from '..'
  *
  * @returns {object} - The modal rendered into a portal.
  */
-const PortalledModal = function({ dispatch, modal, visible, ...rest }) {
+const PortalledModal = function({ modal, visible, ...rest }) {
   if (!modal) {
     return null
   }
@@ -37,6 +39,17 @@ const PortalledModal = function({ dispatch, modal, visible, ...rest }) {
     visible && <Modal {...props} />,
     document.getElementById('modal-container'),
   )
+}
+
+PortalledModal.Modal = Modal
+
+PortalledModal.propTypes = {
+  modal: PropTypes.shape({ ...Modal.propTypes }),
+  visible: PropTypes.bool,
+}
+
+PortalledModal.defaultProps = {
+  visible: false,
 }
 
 export default PortalledModal

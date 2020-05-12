@@ -47,6 +47,7 @@ exports[`SideNavigationItem is flat should match snapshot 1`] = `
   <LinkItem
     depth={0}
     exact={false}
+    onClick={[Function]}
     path="/test-title"
     title="test-title"
   />

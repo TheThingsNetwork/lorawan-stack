@@ -30,12 +30,14 @@ class InfoField extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     className: PropTypes.string,
+    disabled: PropTypes.bool,
     title: PropTypes.message,
   }
 
   static defaultProps = {
     className: undefined,
     title: undefined,
+    disabled: false,
   }
 
   render() {

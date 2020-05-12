@@ -78,10 +78,15 @@ Toggled.propTypes = {
   icon: PropTypes.string,
   label: PropTypes.string,
   loading: PropTypes.bool,
+  onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   readOnly: PropTypes.bool,
+  type: PropTypes.string,
   valid: PropTypes.bool,
-  value: PropTypes.shape({}),
+  value: PropTypes.shape({
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    enabled: PropTypes.bool,
+  }),
   warning: PropTypes.bool,
 }
 
@@ -98,6 +103,7 @@ Toggled.defaultProps = {
   valid: false,
   value: undefined,
   warning: false,
+  type: 'text',
 }
 
 export default Toggled

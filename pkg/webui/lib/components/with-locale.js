@@ -22,6 +22,7 @@ import CancelablePromise from 'cancelable-promise'
 
 import Spinner from '@ttn-lw/components/spinner'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
 import log, { error } from '@ttn-lw/lib/log'
 
 import { withEnv } from './env'
@@ -44,6 +45,18 @@ const dev = '../../dev'
 @withEnv
 @bind
 export default class UserLocale extends React.PureComponent {
+  static propTypes = {
+    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+    env: PropTypes.env,
+    user: PropTypes.shape({
+      language: PropTypes.string,
+    }),
+  }
+
+  static defaultProps = {
+    user: undefined,
+    env: {},
+  }
   /** @private */
   promise = null
 

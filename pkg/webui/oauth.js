@@ -24,7 +24,6 @@ import Init from './lib/components/init'
 import env from './lib/env'
 import { selectApplicationRootPath } from './lib/selectors/env'
 import './lib/yup-extensions'
-
 import createStore from './oauth/store'
 
 const appRoot = selectApplicationRootPath()
@@ -42,7 +41,7 @@ const render = () => {
       <Provider store={store}>
         <WithLocale>
           <Init>
-            <App history={history} />
+            <App history={history} env={env} />
           </Init>
         </WithLocale>
       </Provider>

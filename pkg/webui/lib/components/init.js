@@ -20,6 +20,8 @@ import { defineMessages } from 'react-intl'
 
 import Spinner from '@ttn-lw/components/spinner'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import ErrorMessage from './error-message'
 import Message from './message'
 
@@ -36,13 +38,32 @@ setConfiguration({
   gutterWidth: 28,
 })
 
-@connect(state => ({
-  initialized: state.init.initialized,
-  error: state.init.error,
-}))
+@connect(
+  state => ({
+    initialized: state.init.initialized,
+    error: state.init.error,
+  }),
+  dispatch => ({
+    initialize: () => dispatch({ type: 'INITIALIZE_REQUEST' }),
+  }),
+)
 export default class Init extends React.PureComponent {
+  static propTypes = {
+    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+    error: PropTypes.error,
+    initialize: PropTypes.func.isRequired,
+    initialized: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    initialized: false,
+    error: undefined,
+  }
+
   componentDidMount() {
-    this.props.dispatch({ type: 'INITIALIZE_REQUEST' })
+    const { initialize } = this.props
+
+    initialize()
   }
 
   render() {

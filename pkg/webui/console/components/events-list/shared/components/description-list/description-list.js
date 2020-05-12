@@ -26,6 +26,7 @@ const DescriptionList = props => {
 }
 
 DescriptionList.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
   className: PropTypes.string,
 }
 

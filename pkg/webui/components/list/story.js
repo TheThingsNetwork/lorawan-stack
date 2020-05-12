@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable react/prop-types */
+
 import React from 'react'
 import bind from 'autobind-decorator'
 import { storiesOf } from '@storybook/react'
