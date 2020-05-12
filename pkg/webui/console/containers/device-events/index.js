@@ -94,7 +94,10 @@ export default connect(
     }
   },
   (dispatch, ownProps) => {
-    const combinedId = combineDeviceIds(ownProps.appId, ownProps.devId)
+    const combinedId = combineDeviceIds(
+      getApplicationId(ownProps.devIds),
+      getDeviceId(ownProps.devIds),
+    )
 
     return {
       onClear: () => dispatch(clearDeviceEventsStream(combinedId)),
