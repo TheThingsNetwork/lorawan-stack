@@ -14,7 +14,6 @@
 
 import React from 'react'
 import classnames from 'classnames'
-import bind from 'autobind-decorator'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -25,7 +24,6 @@ import ListItem from './item'
 
 import style from './list.styl'
 
-@bind
 class List extends React.PureComponent {
   static propTypes = {
     bordered: PropTypes.bool,

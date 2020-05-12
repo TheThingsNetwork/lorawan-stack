@@ -1,9 +1,12 @@
 ---
-title: "Login with the Command-line interface"
+title: "Login with the CLI"
 description: ""
+weight: 2
 ---
 
-## Login
+This section explains how to login to {{% tts %}} using the command-line interface.
+
+<!--more-->
 
 The CLI needs to be logged on in order to create gateways, applications, devices and API keys. With {{% tts %}} running, login with the following command:
 

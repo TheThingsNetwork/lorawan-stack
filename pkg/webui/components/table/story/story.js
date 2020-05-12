@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable react/prop-types */
+
 import React from 'react'
 import bind from 'autobind-decorator'
 import { storiesOf } from '@storybook/react'
@@ -23,12 +25,12 @@ import Tabular from '..'
 
 import examples from './storyData'
 
-@bind
 class LoadingExample extends React.Component {
   state = {
     loading: true,
   }
 
+  @bind
   toggleLoading() {
     this.setState(prev => ({
       loading: !prev.loading,
@@ -52,7 +54,6 @@ class LoadingExample extends React.Component {
 
 const PAGE_SIZE = 3
 
-@bind
 class PaginatedExample extends React.Component {
   constructor(props) {
     super(props)
@@ -72,6 +73,7 @@ class PaginatedExample extends React.Component {
     window.clearTimeout(this.timeout)
   }
 
+  @bind
   getDelay(slow) {
     if (!slow) {
       return Math.floor(Math.random() * (450 - 100)) + 100
@@ -80,6 +82,7 @@ class PaginatedExample extends React.Component {
     return Math.floor(Math.random() * (3000 - 1000)) + 1000
   }
 
+  @bind
   requestNextPage(page) {
     action('requestNextPage')(page)
     const offset = (page - 1) * PAGE_SIZE
@@ -95,6 +98,7 @@ class PaginatedExample extends React.Component {
     )
   }
 
+  @bind
   onPageChange(page) {
     this.setState({ loading: true }, () => this.requestNextPage(page))
   }
@@ -120,12 +124,12 @@ class PaginatedExample extends React.Component {
   }
 }
 
-@bind
 class ClickableExample extends React.Component {
   state = {
     clicked: null,
   }
 
+  @bind
   onRowClick(rowIndex) {
     action('onRowClick')({ index: rowIndex, id: this.props.data[rowIndex].appId })
     // Push to history if link functionality required
@@ -146,7 +150,6 @@ class ClickableExample extends React.Component {
   }
 }
 
-@bind
 class SortableExample extends React.Component {
   state = {
     order: undefined,
@@ -167,6 +170,7 @@ class SortableExample extends React.Component {
     return a > b ? 1 : a < b ? -1 : 0
   }
 
+  @bind
   onSort(order, orderBy) {
     // This.setState({ order, orderBy })
     const data = this.props.data
@@ -191,6 +195,7 @@ class SortableExample extends React.Component {
     )
   }
 
+  @bind
   onSortRequest(order, orderBy) {
     this.setState({ loading: true, order, orderBy }, () => this.onSort(order, orderBy))
   }

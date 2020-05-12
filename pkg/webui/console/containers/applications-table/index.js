@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
-import bind from 'autobind-decorator'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -53,7 +52,6 @@ const headers = [
   },
 ]
 
-@bind
 export default class ApplicationsTable extends Component {
   constructor(props) {
     super(props)

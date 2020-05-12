@@ -194,6 +194,7 @@ LinkItem.propTypes = {
 LinkItem.defaultProps = {
   icon: undefined,
   path: undefined,
+  onClick: () => null,
 }
 
 export default withRouter(bind(SideNavigationItem))

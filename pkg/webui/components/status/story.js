@@ -25,12 +25,12 @@ const containerStyle = {
   justifyContent: 'space-between',
 }
 
-@bind
 class Toggle extends React.Component {
   state = {
     status: 'unknown',
   }
 
+  @bind
   toggleStatus() {
     const { status } = this.state
     let nextStatus

@@ -42,7 +42,6 @@ const m = defineMessages({
   deleteSuccess: 'API key deleted',
 })
 
-@bind
 class EditForm extends React.Component {
   static propTypes = {
     /** The API key to be edited. */
@@ -99,6 +98,7 @@ class EditForm extends React.Component {
     pseudoRights: [],
   }
 
+  @bind
   async handleEdit(values) {
     const { name, rights } = values
     const { onEdit } = this.props
@@ -106,6 +106,7 @@ class EditForm extends React.Component {
     return await onEdit({ name, rights })
   }
 
+  @bind
   async handleEditSuccess(key) {
     const { onEditSuccess } = this.props
 
@@ -116,6 +117,7 @@ class EditForm extends React.Component {
     await onEditSuccess(key)
   }
 
+  @bind
   async handleDelete() {
     const { onDelete, apiKey } = this.props
 
@@ -129,6 +131,7 @@ class EditForm extends React.Component {
     }
   }
 
+  @bind
   async handleDeleteSuccess(id) {
     const { onDeleteSuccess } = this.props
 
@@ -139,6 +142,7 @@ class EditForm extends React.Component {
     await onDeleteSuccess(id)
   }
 
+  @bind
   async handleDeleteFailure(error) {
     const { onDeleteFailure } = this.props
 

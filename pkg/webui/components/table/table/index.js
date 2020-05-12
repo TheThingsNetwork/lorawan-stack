@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -48,7 +47,6 @@ Empty.defaultProps = {
   message: undefined,
 }
 
-@bind
 class Table extends React.Component {
   static Head = props => <Section component="thead" {...props} />
   static Body = props => <Section component="tbody" {...props} />

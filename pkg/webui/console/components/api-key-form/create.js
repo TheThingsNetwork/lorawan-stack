@@ -32,7 +32,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
 
-@bind
 class CreateForm extends React.Component {
   static propTypes = {
     /** Called on form submission. Receives the key object as an argument. */
@@ -66,6 +65,7 @@ class CreateForm extends React.Component {
     rights: [],
   }
 
+  @bind
   async handleModalApprove() {
     const { onCreateSuccess } = this.props
     const { key } = this.state
@@ -74,12 +74,14 @@ class CreateForm extends React.Component {
     await onCreateSuccess(key)
   }
 
+  @bind
   async handleCreate(values) {
     const { onCreate } = this.props
 
     return await onCreate(values)
   }
 
+  @bind
   async handleCreateSuccess(key) {
     await this.setState({
       modal: {

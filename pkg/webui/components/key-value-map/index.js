@@ -29,7 +29,6 @@ const m = defineMessages({
   addEntry: 'Add entry',
 })
 
-@bind
 class KeyValueMap extends React.PureComponent {
   static propTypes = {
     addMessage: PropTypes.message,
@@ -50,16 +49,19 @@ class KeyValueMap extends React.PureComponent {
     addMessage: m.addEntry,
   }
 
+  @bind
   handleEntryChange(index, newValues) {
     const { onChange, value } = this.props
     onChange(value.map((kv, i) => (index !== i ? kv : { ...kv, ...newValues })))
   }
 
+  @bind
   removeEntry(index) {
     const { onChange, value } = this.props
     onChange(value.filter((_, i) => i !== index) || [], true)
   }
 
+  @bind
   addEmptyEntry() {
     const { onChange, value } = this.props
     onChange([...value, { key: '', value: '' }])

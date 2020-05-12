@@ -18,7 +18,6 @@ import { Switch, Route } from 'react-router-dom'
 import { ConnectedRouter } from 'connected-react-router'
 import { Helmet } from 'react-helmet'
 
-import withEnv from '@ttn-lw/lib/components/env'
 import ErrorView from '@ttn-lw/lib/components/error-view'
 
 import Landing from '@oauth/views/landing'
@@ -31,12 +30,17 @@ import FullViewError from '@oauth/views/error'
 import Code from '@oauth/views/code'
 import Validate from '@oauth/views/validate'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
 import dev from '@ttn-lw/lib/dev'
 
 const GenericNotFound = () => <FullViewError error={{ statusCode: 404 }} />
 
-@withEnv
 class OAuthApp extends React.PureComponent {
+  static propTypes = {
+    env: PropTypes.env.isRequired,
+    history: PropTypes.history.isRequired,
+  }
+
   render() {
     const {
       env: { siteTitle, pageData, siteName },

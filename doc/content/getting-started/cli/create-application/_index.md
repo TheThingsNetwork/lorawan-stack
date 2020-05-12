@@ -1,9 +1,12 @@
 ---
 title: "Create Application"
 description: ""
+weight: 4
 ---
 
-## Create Application
+This section contains instructions for creating an Application using the command-line interface.
+
+<!--more-->
 
 Create the first application:
 

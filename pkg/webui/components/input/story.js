@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable react/prop-types */
+
 import crypto from 'crypto'
 import React from 'react'
 import bind from 'autobind-decorator'
@@ -19,7 +21,6 @@ import { storiesOf } from '@storybook/react'
 
 import Input from '.'
 
-@bind
 class Example extends React.Component {
   constructor(props) {
     super(props)
@@ -29,6 +30,7 @@ class Example extends React.Component {
     }
   }
 
+  @bind
   onChange(value) {
     this.setState({ value })
   }

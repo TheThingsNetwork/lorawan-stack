@@ -45,19 +45,20 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
     <Breadcrumb path={`/applications/${appId}/integrations/add`} content={sharedMessages.add} />
   )
 })
-@bind
 export default class ApplicationPubsubAdd extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     navigateToList: PropTypes.func.isRequired,
   }
 
+  @bind
   async handleSubmit(pubsub) {
     const { appId } = this.props
 
     await api.application.pubsubs.create(appId, pubsub)
   }
 
+  @bind
   handleSubmitSuccess() {
     const { navigateToList, appId } = this.props
 

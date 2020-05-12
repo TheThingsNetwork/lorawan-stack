@@ -30,6 +30,8 @@ const hardcoded = {
   overview: 'dashboard',
   application: 'web_asset',
   gateway: 'router',
+  gateway_connect: 'flash_on',
+  gateway_disconnect: 'flash_off',
   organization: 'people',
   api_keys: 'vpn_key',
   link: 'link',

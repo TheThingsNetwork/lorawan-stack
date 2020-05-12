@@ -54,7 +54,6 @@ const isValueEmpty = function(value) {
   return false
 }
 
-@bind
 class FormField extends React.Component {
   static contextType = FormContext
 
@@ -113,6 +112,7 @@ class FormField extends React.Component {
     return newValue
   }
 
+  @bind
   handleChange(value, enforceValidation = false) {
     const { name, onChange } = this.props
     const { setFieldValue, setFieldTouched } = this.context
@@ -129,6 +129,7 @@ class FormField extends React.Component {
     onChange(value)
   }
 
+  @bind
   handleBlur(event) {
     const { name } = this.props
     const { validateOnBlur, setFieldTouched } = this.context

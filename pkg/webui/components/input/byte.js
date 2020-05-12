@@ -67,6 +67,7 @@ export default class ByteInput extends React.Component {
     onChange: PropTypes.func.isRequired,
     placeholder: PropTypes.message,
     showPerChar: PropTypes.bool,
+    unbounded: PropTypes.bool,
     value: PropTypes.string.isRequired,
   }
 
@@ -77,6 +78,7 @@ export default class ByteInput extends React.Component {
     placeholder: undefined,
     showPerChar: false,
     onBlur: () => null,
+    unbounded: false,
   }
 
   input = React.createRef()
@@ -97,6 +99,7 @@ export default class ByteInput extends React.Component {
       onChange,
       placeholder,
       showPerChar,
+      unbounded,
       ...rest
     } = this.props
 
@@ -118,7 +121,9 @@ export default class ByteInput extends React.Component {
         onCopy={this.onCopy}
         onCut={this.onCut}
         onBlur={this.onBlur}
-        showMask={!placeholder}
+        onPaste={this.onPaste}
+        showMask={!placeholder && !unbounded}
+        guide={!unbounded}
         {...rest}
       />
     )
@@ -167,6 +172,17 @@ export default class ByteInput extends React.Component {
     )
     evt.clipboardData.setData('text/plain', clean(value))
     evt.preventDefault()
+  }
+
+  @bind
+  onPaste(evt) {
+    const { min, showPerChar, unbounded } = this.props
+    if (unbounded) {
+      evt.preventDefault()
+      this.input.current.inputElement.value = evt.clipboardData.getData('text/plain')
+      mask(min, evt.clipboardData.getData('text/plain').length, showPerChar)
+      this.onChange(evt)
+    }
   }
 
   @bind

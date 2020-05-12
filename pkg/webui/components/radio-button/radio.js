@@ -24,7 +24,6 @@ import { RadioGroupContext } from './group'
 
 import style from './radio-button.styl'
 
-@bind
 class RadioButton extends React.PureComponent {
   static contextType = RadioGroupContext
 
@@ -62,6 +61,7 @@ class RadioButton extends React.PureComponent {
     this.input = React.createRef()
   }
 
+  @bind
   handleChange(event) {
     const { onChange } = this.props
 
@@ -73,12 +73,14 @@ class RadioButton extends React.PureComponent {
     onChange(event)
   }
 
+  @bind
   focus() {
     if (this.input && this.input.current) {
       this.input.current.focus()
     }
   }
 
+  @bind
   blur() {
     if (this.input && this.input.current) {
       this.input.current.blur()

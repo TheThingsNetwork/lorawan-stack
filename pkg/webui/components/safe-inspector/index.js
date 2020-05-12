@@ -55,7 +55,6 @@ const m = defineMessages({
 })
 
 @injectIntl
-@bind
 export class SafeInspector extends Component {
   static propTypes = {
     /** The classname to be applied. */
@@ -119,6 +118,7 @@ export class SafeInspector extends Component {
     this.copyElem = React.createRef()
   }
 
+  @bind
   handleVisibiltyToggle() {
     this.setState(prev => ({
       byteStyle: !prev.hidden ? true : prev.byteStyle,
@@ -126,15 +126,18 @@ export class SafeInspector extends Component {
     }))
   }
 
+  @bind
   async handleTransformToggle() {
     await this.setState(prev => ({ byteStyle: !prev.byteStyle }))
     this.checkTruncateState()
   }
 
+  @bind
   handleSwapToggle() {
     this.setState(prev => ({ msb: !prev.msb }))
   }
 
+  @bind
   handleDataClick(e) {
     if (!this.state.hidden) {
       selectText(this.displayElem.current)
@@ -142,6 +145,7 @@ export class SafeInspector extends Component {
     e.stopPropagation()
   }
 
+  @bind
   handleCopyClick(e) {
     const { noCopyPopup } = this.props
     const { copied } = this.state
@@ -160,6 +164,7 @@ export class SafeInspector extends Component {
     }
   }
 
+  @bind
   handleCopyAnimationEnd() {
     this.setState({ copied: false, copyIcon: 'file_copy' })
   }
@@ -185,6 +190,7 @@ export class SafeInspector extends Component {
     clearTimeout(this._timer)
   }
 
+  @bind
   handleWindowResize() {
     this.checkTruncateState()
   }

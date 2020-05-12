@@ -121,15 +121,17 @@ rules:
   # is resolved.
 
   # Prevent extraneous defaultProps on components.
-  react/default-props-match-prop-types: warn
+  react/default-props-match-prop-types: error
   # Enforce a defaultProps definition for every prop that is not a required prop.
-  react/require-default-props: warn
+  react/require-default-props: error
   # Prevent definitions of unused prop types.
-  react/no-unused-prop-types: warn
+  react/no-unused-prop-types: error
   # Prevent missing props validation in a React component definition.
-  react/prop-types: warn
+  react/prop-types: error
   # Enforce propTypes declarations alphabetical sorting.
   react/sort-prop-types: warn
+  # Forbid using another component's prop types unless they are explicitly imported/exported.
+  react/forbid-foreign-prop-types: off
   # Prevent undefined components.
   react/jsx-no-undef: warn
   # Prevent vague prop types.

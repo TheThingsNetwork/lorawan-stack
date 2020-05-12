@@ -63,7 +63,6 @@ const initialValues = { user_id: '' }
     handleCancel: () => push('/login'),
   },
 )
-@bind
 export default class ForgotPassword extends React.PureComponent {
   static propTypes = {
     handleCancel: PropTypes.func.isRequired,
@@ -75,6 +74,7 @@ export default class ForgotPassword extends React.PureComponent {
     requested: false,
   }
 
+  @bind
   async handleSubmit(values, { setSubmitting }) {
     try {
       await api.users.resetPassword(values.user_id)

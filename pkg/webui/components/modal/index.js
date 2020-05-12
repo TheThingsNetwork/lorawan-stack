@@ -27,7 +27,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './modal.styl'
 
-@bind
 class Modal extends React.PureComponent {
   static propTypes = {
     approval: PropTypes.bool,
@@ -67,14 +66,17 @@ class Modal extends React.PureComponent {
     name: undefined,
   }
 
+  @bind
   handleApprove() {
     this.handleComplete(true)
   }
 
+  @bind
   handleCancel() {
     this.handleComplete(false)
   }
 
+  @bind
   handleComplete(result) {
     const { onComplete } = this.props
 

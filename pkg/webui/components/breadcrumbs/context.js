@@ -19,7 +19,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 const { Provider, Consumer } = React.createContext()
 
-@bind
 class BreadcrumbsProvider extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
@@ -29,6 +28,7 @@ class BreadcrumbsProvider extends React.Component {
     breadcrumbs: [],
   }
 
+  @bind
   add(id, breadcrumb) {
     this.setState(prev => {
       const index = prev.breadcrumbs.findIndex(({ id: breadcrumbId }) => breadcrumbId === id)
@@ -47,6 +47,7 @@ class BreadcrumbsProvider extends React.Component {
     })
   }
 
+  @bind
   remove(id) {
     this.setState(prev => ({
       breadcrumbs: prev.breadcrumbs.filter(b => b.id !== id),

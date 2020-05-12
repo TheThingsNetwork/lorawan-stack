@@ -51,7 +51,6 @@ const m = defineMessages({
   }),
 )
 @withEnv
-@bind
 export default class Authorize extends PureComponent {
   static propTypes = {
     env: PropTypes.env,
@@ -63,6 +62,7 @@ export default class Authorize extends PureComponent {
     env: undefined,
   }
 
+  @bind
   async handleLogout() {
     const { redirectToLogin } = this.props
     await api.oauth.logout()

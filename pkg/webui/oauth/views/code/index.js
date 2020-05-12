@@ -22,11 +22,16 @@ import SafeInspector from '@ttn-lw/components/safe-inspector'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 const m = defineMessages({
   code: 'Your authorization code',
 })
 
 export default class Code extends React.Component {
+  static propTypes = {
+    location: PropTypes.location.isRequired,
+  }
   render() {
     const { location } = this.props
     const { query } = Query.parseUrl(location.search)

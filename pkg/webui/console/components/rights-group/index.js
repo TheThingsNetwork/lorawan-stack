@@ -91,7 +91,6 @@ const computeProps = function(props) {
 
 @withComputedProps(computeProps)
 @injectIntl
-@bind
 class RightsGroup extends React.Component {
   static propTypes = {
     /** The class to be added to the container. */
@@ -159,6 +158,7 @@ class RightsGroup extends React.Component {
     return { individualRightValue }
   }
 
+  @bind
   handleChangeAll(event) {
     const { onChange, outOfOwnScopeIndividualRights, derivedRights } = this.props
     const { checked } = event.target
@@ -176,6 +176,7 @@ class RightsGroup extends React.Component {
     onChange(value)
   }
 
+  @bind
   handleChange(val) {
     const { onChange } = this.props
     const value = Object.keys(val).filter(right => val[right])
@@ -183,6 +184,7 @@ class RightsGroup extends React.Component {
     onChange(value)
   }
 
+  @bind
   handleGrantTypeChange(val) {
     const { onChange, pseudoRight } = this.props
     const { individualRightValue } = this.state

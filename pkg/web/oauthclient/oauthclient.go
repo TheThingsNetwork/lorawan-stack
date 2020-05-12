@@ -17,6 +17,7 @@ package oauthclient
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -49,6 +50,18 @@ func (oc *OAuthClient) getMountPath() string {
 	}
 
 	return path
+}
+
+func (oc *OAuthClient) withTLSClientConfig(ctx context.Context) (context.Context, error) {
+	config, err := oc.component.GetTLSClientConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return context.WithValue(ctx, oauth2.HTTPClient, &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: config,
+		},
+	}), nil
 }
 
 // New returns a new OAuth client instance.

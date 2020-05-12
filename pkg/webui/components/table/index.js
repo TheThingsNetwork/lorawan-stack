@@ -26,12 +26,13 @@ import Table from './table'
 
 import style from './tabular.styl'
 
-@bind
 class Tabular extends React.Component {
+  @bind
   onPageChange(page) {
     this.props.onPageChange(page)
   }
 
+  @bind
   onSortRequest(newOrderBy) {
     const { order, orderBy } = this.props
     const sameColumn = orderBy === newOrderBy
@@ -45,6 +46,7 @@ class Tabular extends React.Component {
     this.props.onSortRequest('asc', newOrderBy)
   }
 
+  @bind
   handlePagination(items) {
     const { pageSize, page, handlesPagination, paginated } = this.props
 

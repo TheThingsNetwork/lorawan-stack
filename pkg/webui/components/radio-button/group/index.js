@@ -36,7 +36,6 @@ function findCheckedRadio(children) {
   return value
 }
 
-@bind
 class RadioGroup extends React.Component {
   constructor(props) {
     super(props)
@@ -66,6 +65,7 @@ class RadioGroup extends React.Component {
     return null
   }
 
+  @bind
   handleRadioChange(event) {
     const { onChange } = this.props
     const { target } = event

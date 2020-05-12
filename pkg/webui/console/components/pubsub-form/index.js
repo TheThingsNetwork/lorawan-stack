@@ -45,7 +45,6 @@ import validationSchema from './validation-schema'
 
 const pathPlaceholder = '/sub-topic'
 
-@bind
 export default class PubsubForm extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
@@ -96,6 +95,7 @@ export default class PubsubForm extends Component {
     }
   }
 
+  @bind
   async handleSubmit(values, { setSubmitting, resetForm }) {
     const { appId, onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
 
@@ -117,6 +117,7 @@ export default class PubsubForm extends Component {
     }
   }
 
+  @bind
   async handleDelete() {
     const { onDelete, onDeleteSuccess, onDeleteFailure } = this.props
     try {
@@ -129,22 +130,27 @@ export default class PubsubForm extends Component {
     }
   }
 
+  @bind
   handleNatsSelect() {
     this.setState({ isMqtt: false })
   }
 
+  @bind
   handleUseCredentialsChangeNats(event) {
     this.setState({ natsUseCredentials: event.target.checked })
   }
 
+  @bind
   handleMqttSelect() {
     this.setState({ isMqtt: true })
   }
 
+  @bind
   handleMqttUseTlsChange(event) {
     this.setState({ mqttSecure: event.target.checked })
   }
 
+  @bind
   handleUseCredentialsChangeMqtt(event) {
     this.setState({ mqttUseCredentials: event.target.checked })
   }

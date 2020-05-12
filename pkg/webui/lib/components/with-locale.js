@@ -22,6 +22,7 @@ import CancelablePromise from 'cancelable-promise'
 
 import Spinner from '@ttn-lw/components/spinner'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
 import log, { error } from '@ttn-lw/lib/log'
 
 import { withEnv } from './env'
@@ -42,8 +43,19 @@ const dev = '../../dev'
   checking: state.user.checking,
 }))
 @withEnv
-@bind
 export default class UserLocale extends React.PureComponent {
+  static propTypes = {
+    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+    env: PropTypes.env,
+    user: PropTypes.shape({
+      language: PropTypes.string,
+    }),
+  }
+
+  static defaultProps = {
+    user: undefined,
+    env: {},
+  }
   /** @private */
   promise = null
 
@@ -53,6 +65,7 @@ export default class UserLocale extends React.PureComponent {
     loaded: false,
   }
 
+  @bind
   toggle() {
     this.setState(state => ({ xx: !state.xx }))
   }
@@ -70,6 +83,7 @@ export default class UserLocale extends React.PureComponent {
     }
   }
 
+  @bind
   check(prev, props) {
     const current = (prev.user && prev.user.language) || prev.env.config.language
     const next = (props.user && props.user.language) || props.env.config.language || defaultLanguage
@@ -79,6 +93,7 @@ export default class UserLocale extends React.PureComponent {
     }
   }
 
+  @bind
   success(p, withLocale) {
     const newState = { loaded: true }
     if (withLocale) {
@@ -91,17 +106,20 @@ export default class UserLocale extends React.PureComponent {
     this.setState(newState)
   }
 
+  @bind
   fail(err) {
     error(err)
     this.setState({ messages: null, loaded: true })
   }
 
+  @bind
   onKeydown(evt) {
     if (evt.altKey && evt.code === 'KeyL') {
       this.toggle()
     }
   }
 
+  @bind
   async load(language) {
     let locale = navigator.language || navigator.browserLanguage || defaultLocale
 

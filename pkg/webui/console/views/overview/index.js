@@ -102,7 +102,6 @@ const overviewFetchingSelector = createFetchingSelector([GET_APPS_LIST_BASE, GET
   return <Breadcrumb path="/" content={sharedMessages.overview} />
 })
 @withEnv
-@bind
 export default class Overview extends React.Component {
   static propTypes = {
     applicationCount: PropTypes.number,
@@ -135,20 +134,24 @@ export default class Overview extends React.Component {
     loadData()
   }
 
+  @bind
   handleAppChooserMouseEnter() {
     this.appAnimationRef.current.instance.setDirection(1)
     this.appAnimationRef.current.instance.goToAndPlay(0)
   }
 
+  @bind
   handleAppChooserMouseLeave() {
     this.appAnimationRef.current.instance.setDirection(-1)
   }
 
+  @bind
   handleGatewayChooserMouseEnter() {
     this.gatewayAnimationRef.current.instance.setDirection(1)
     this.gatewayAnimationRef.current.instance.goToAndPlay(0)
   }
 
+  @bind
   handleGatewayChooserMouseLeave() {
     this.gatewayAnimationRef.current.instance.setDirection(-1)
   }

@@ -14,12 +14,14 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import bind from 'autobind-decorator'
 
-import EventsSubscription from '@console/containers/events-subscription'
+import ErrorNotification from '@ttn-lw/components/error-notification'
+
+import ApplicationEventsList from '@console/components/events-list/application'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { mayViewApplicationEvents } from '@console/lib/feature-checks'
@@ -31,45 +33,66 @@ import {
 
 import {
   selectApplicationEvents,
-  selectApplicationEventsStatus,
   selectApplicationEventsError,
 } from '@console/store/selectors/applications'
 
-@withFeatureRequirement(mayViewApplicationEvents)
-@connect(
-  null,
-  (dispatch, ownProps) => ({
-    onClear: () => dispatch(clearApplicationEventsStream(ownProps.appId)),
-    onRestart: () => dispatch(startApplicationEventsStream(ownProps.appId)),
-  }),
-)
-@bind
-export default class ApplicationEvents extends React.Component {
-  static propTypes = {
-    appId: PropTypes.string.isRequired,
-    onClear: PropTypes.func.isRequired,
-    onRestart: PropTypes.func.isRequired,
-    widget: PropTypes.bool,
-  }
+const ApplicationEvents = props => {
+  const { appId, events, error, onRestart, widget, onClear } = props
 
-  static defaultProps = {
-    widget: false,
-  }
-
-  render() {
-    const { appId, widget, onClear, onRestart } = this.props
-
+  if (error) {
     return (
-      <EventsSubscription
-        id={appId}
-        widget={widget}
-        eventsSelector={selectApplicationEvents}
-        statusSelector={selectApplicationEventsStatus}
-        errorSelector={selectApplicationEventsError}
-        onClear={onClear}
-        onRestart={onRestart}
-        toAllUrl={`/applications/${appId}/data`}
+      <ErrorNotification
+        small
+        title={sharedMessages.eventsCannotShow}
+        content={error}
+        action={onRestart}
+        actionMessage={sharedMessages.restartStream}
+        buttonIcon="refresh"
       />
     )
   }
+
+  if (widget) {
+    return (
+      <ApplicationEventsList.Widget
+        events={events}
+        toAllUrl={`/applications/${appId}/data`}
+        appId={appId}
+      />
+    )
+  }
+
+  return <ApplicationEventsList events={events} onClear={onClear} appId={appId} />
 }
+
+ApplicationEvents.propTypes = {
+  appId: PropTypes.string.isRequired,
+  error: PropTypes.error,
+  events: PropTypes.events,
+  onClear: PropTypes.func.isRequired,
+  onRestart: PropTypes.func.isRequired,
+  widget: PropTypes.bool,
+}
+
+ApplicationEvents.defaultProps = {
+  widget: false,
+  events: [],
+  error: undefined,
+}
+
+export default withFeatureRequirement(mayViewApplicationEvents)(
+  connect(
+    (state, props) => {
+      const { appId } = props
+
+      return {
+        events: selectApplicationEvents(state, appId),
+        error: selectApplicationEventsError(state, appId),
+      }
+    },
+    (dispatch, ownProps) => ({
+      onClear: () => dispatch(clearApplicationEventsStream(ownProps.appId)),
+      onRestart: () => dispatch(startApplicationEventsStream(ownProps.appId)),
+    }),
+  )(ApplicationEvents),
+)

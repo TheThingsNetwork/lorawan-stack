@@ -176,6 +176,7 @@ class JoinEUIPrefixesInput extends React.PureComponent {
 JoinEUIPrefixesInput.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
+  error: PropTypes.error,
   fetching: PropTypes.bool,
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.func,
@@ -197,6 +198,8 @@ JoinEUIPrefixesInput.defaultProps = {
   fetching: false,
   prefixes: [],
   showPrefixes: true,
+  value: undefined,
+  error: undefined,
 }
 
 export default JoinEUIPrefixesInput

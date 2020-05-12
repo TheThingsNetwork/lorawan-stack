@@ -65,7 +65,6 @@ import { selectSelectedCollaborator } from '@console/store/selectors/collaborato
   const gtwId = props.gtwId
   return <Breadcrumb path={`/gateways/${gtwId}/collaborators/add`} content={sharedMessages.add} />
 })
-@bind
 export default class GatewayCollaboratorAdd extends React.Component {
   static propTypes = {
     gtwId: PropTypes.string.isRequired,
@@ -78,6 +77,7 @@ export default class GatewayCollaboratorAdd extends React.Component {
     error: '',
   }
 
+  @bind
   handleSubmit(collaborator) {
     const { gtwId } = this.props
 

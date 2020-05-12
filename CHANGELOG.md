@@ -9,12 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Gateway Server events for uplink messages now contain end device identifiers.
-
 ### Changed
-
-- Troubleshooting section of `DEVELOPMENT.md`
-- Change console field labels from `MAC version` and `PHY version` to `LoRaWAN version` and `Regional Parameters version` and add descriptions
 
 ### Deprecated
 
@@ -22,10 +17,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Security
+
+## [3.8.1] - 2020-05-11
+
+### Added
+
+- Gateway Server events for uplink messages now contain end device identifiers.
+
+### Changed
+
+- Troubleshooting section of `DEVELOPMENT.md`
+- Change console field labels from `MAC version` and `PHY version` to `LoRaWAN version` and `Regional Parameters version` and add descriptions
+
+### Fixed
+
 - Join Server and Application Server device registries now return an error when deleting keys on `SET` operations. The operation was never supported and caused an error on `GET` instead.
 - OAuth authorization page crashing.
-
-### Security
+- Byte input in scheduling downlink view.
+- OAuth client token exchange and refresh issues when using TLS with a RootCA.
+- Join Server and Application Server device registries now return an error when deleting keys on `SET` operations. The operation was never supported and caused an error on `GET` instead.
 
 ## [3.8.0] - 2020-05-06
 
@@ -47,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI creates user configuration directory if it does not exist when generating configuration file.
 - Upgrading guide in docs.
 - Glossary.
+- Event details in the Console traffic view.
 
 ### Changed
 
@@ -828,7 +840,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.0...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.1...HEAD
+[3.8.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.0...v3.8.1
 [3.8.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.2...v3.8.0
 [3.7.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.0...v3.7.2
 [3.7.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.0...v3.7.0

@@ -59,7 +59,11 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 	}
 
 	// Exchange token.
-	token, err := oc.oauth(c).Exchange(c.Request().Context(), code)
+	ctx, err := oc.withTLSClientConfig(c.Request().Context())
+	if err != nil {
+		return err
+	}
+	token, err := oc.oauth(c).Exchange(ctx, code)
 	if err != nil {
 		var retrieveError *oauth2.RetrieveError
 		if stderrors.As(err, &retrieveError) {

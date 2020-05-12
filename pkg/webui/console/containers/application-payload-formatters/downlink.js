@@ -68,7 +68,6 @@ const m = defineMessages({
     />
   )
 })
-@bind
 class ApplicationPayloadFormatters extends React.PureComponent {
   static propTypes = {
     appId: PropTypes.string.isRequired,
@@ -77,6 +76,7 @@ class ApplicationPayloadFormatters extends React.PureComponent {
     updateLinkSuccess: PropTypes.func.isRequired,
   }
 
+  @bind
   async onSubmit(values) {
     const { appId, formatters } = this.props
 
@@ -90,6 +90,7 @@ class ApplicationPayloadFormatters extends React.PureComponent {
     })
   }
 
+  @bind
   onSubmitSuccess(link) {
     const { appId, updateLinkSuccess } = this.props
     toast({

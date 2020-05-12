@@ -31,7 +31,6 @@ const m = defineMessages({
   online: 'The application is back online',
 })
 
-@bind
 export default class OfflineStatus extends Component {
   static propTypes = {
     showOfflineOnly: PropTypes.bool,
@@ -47,10 +46,12 @@ export default class OfflineStatus extends Component {
     online: window.navigator.onLine,
   }
 
+  @bind
   handleOnline() {
     this.setState({ online: true })
   }
 
+  @bind
   handleOffline() {
     this.setState({ online: false })
   }
