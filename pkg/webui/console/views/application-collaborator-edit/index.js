@@ -109,7 +109,6 @@ const isUser = collaborator => collaborator.ids && 'user_ids' in collaborator.id
     />
   )
 })
-@bind
 export default class ApplicationCollaboratorEdit extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
@@ -124,6 +123,7 @@ export default class ApplicationCollaboratorEdit extends React.Component {
     error: '',
   }
 
+  @bind
   async handleSubmit(updatedCollaborator) {
     const { appId } = this.props
 
@@ -137,6 +137,7 @@ export default class ApplicationCollaboratorEdit extends React.Component {
     })
   }
 
+  @bind
   async handleDelete() {
     const { collaborator, collaboratorId, redirectToList, appId } = this.props
     const collaborator_type = isUser(collaborator) ? 'user' : 'organization'

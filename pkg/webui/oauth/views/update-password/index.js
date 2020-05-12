@@ -83,7 +83,6 @@ const initialValues = {
       }),
   },
 )
-@bind
 export default class UpdatePassword extends React.PureComponent {
   static propTypes = {
     fetching: PropTypes.bool.isRequired,
@@ -104,10 +103,12 @@ export default class UpdatePassword extends React.PureComponent {
     revoke_all_access: true,
   }
 
+  @bind
   handleRevokeAllAccess(evt) {
     this.setState({ revoke_all_access: evt.target.checked })
   }
 
+  @bind
   async handleSubmit(values, { resetForm, setSubmitting }) {
     const { user, handlePasswordChanged, handleSessionRevoked } = this.props
     const userParams = queryString.parse(this.props.location.search)

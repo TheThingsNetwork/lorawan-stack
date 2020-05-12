@@ -63,7 +63,6 @@ const filterValidator = function(filters) {
     mayAdd: 'mayAdd' in base ? base.mayAdd : true,
   }
 })
-@bind
 class FetchTable extends Component {
   static propTypes = {
     actionItems: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
@@ -150,6 +149,7 @@ class FetchTable extends Component {
     this.debounceCancel()
   }
 
+  @bind
   fetchItems() {
     const { dispatch, pageSize, searchItemsAction, getItemsAction } = this.props
 
@@ -166,6 +166,7 @@ class FetchTable extends Component {
     }
   }
 
+  @bind
   async onPageChange(page) {
     await this.setState(
       this.props.filterValidator({
@@ -177,6 +178,7 @@ class FetchTable extends Component {
     this.fetchItems()
   }
 
+  @bind
   async requestSearch() {
     await this.setState(
       this.props.filterValidator({
@@ -188,6 +190,7 @@ class FetchTable extends Component {
     this.fetchItems()
   }
 
+  @bind
   async onQueryChange(query) {
     await this.setState(
       this.props.filterValidator({
@@ -199,6 +202,7 @@ class FetchTable extends Component {
     this.debouncedRequestSearch()
   }
 
+  @bind
   async onOrderChange(order, orderBy) {
     const filterOrder = `${order === 'desc' ? '-' : ''}${orderBy}`
 
@@ -212,6 +216,7 @@ class FetchTable extends Component {
     this.fetchItems()
   }
 
+  @bind
   async onTabChange(tab) {
     await this.setState(
       this.props.filterValidator({
@@ -222,6 +227,7 @@ class FetchTable extends Component {
     this.fetchItems()
   }
 
+  @bind
   onItemClick(index) {
     const {
       dispatch,

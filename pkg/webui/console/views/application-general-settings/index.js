@@ -117,7 +117,6 @@ const validationSchema = Yup.object().shape({
     />
   )
 })
-@bind
 export default class ApplicationGeneralSettings extends React.Component {
   static propTypes = {
     application: PropTypes.application.isRequired,
@@ -131,6 +130,7 @@ export default class ApplicationGeneralSettings extends React.Component {
     error: '',
   }
 
+  @bind
   async handleSubmit(values, { resetForm, setSubmitting }) {
     const { application, updateApplication } = this.props
 
@@ -163,6 +163,7 @@ export default class ApplicationGeneralSettings extends React.Component {
     }
   }
 
+  @bind
   async handleDelete() {
     const { deleteApplication, onDeleteSuccess } = this.props
     const { appId } = this.props.match.params

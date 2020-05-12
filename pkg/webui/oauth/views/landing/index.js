@@ -33,7 +33,6 @@ import { logout } from '@oauth/store/actions/user'
     logout,
   },
 )
-@bind
 export default class OAuth extends React.PureComponent {
   static propTypes = {
     logout: PropTypes.func.isRequired,
@@ -41,6 +40,7 @@ export default class OAuth extends React.PureComponent {
     user: PropTypes.user.isRequired,
   }
 
+  @bind
   async handleLogout() {
     const { logout } = this.props
 

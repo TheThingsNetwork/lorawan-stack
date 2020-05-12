@@ -20,8 +20,8 @@ import { storiesOf } from '@storybook/react'
 
 import List from '.'
 
-@bind
 class DefaultList extends React.Component {
+  @bind
   renderItem(item, index) {
     return <List.Item key={index}>{item}</List.Item>
   }

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import React from 'react'
-import classnames from 'classnames'
 import bind from 'autobind-decorator'
+import classnames from 'classnames'
 import PropTypes from 'prop-types'
 
 import from from '@ttn-lw/lib/from'
@@ -23,7 +23,6 @@ import style from './spinner.styl'
 
 const id = () => `grad-${Math.round(Math.random() * 10000)}`
 
-@bind
 export default class Spinner extends React.PureComponent {
   static propTypes = {
     after: PropTypes.number,
@@ -62,6 +61,7 @@ export default class Spinner extends React.PureComponent {
     clearTimeout(this.timer)
   }
 
+  @bind
   show() {
     this.setState({
       visible: true,

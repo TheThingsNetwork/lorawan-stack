@@ -19,7 +19,6 @@ import { action } from '@storybook/addon-actions'
 
 import Button from '.'
 
-@bind
 class Example extends React.Component {
   state = {
     busy: false,
@@ -47,18 +46,21 @@ class Example extends React.Component {
     )
   }
 
+  @bind
   toggle() {
     this.setState(state => ({
       busy: !state.busy,
     }))
   }
 
+  @bind
   disable() {
     this.setState(state => ({
       disabled: !state.disabled,
     }))
   }
 
+  @bind
   error() {
     this.setState({
       error: true,

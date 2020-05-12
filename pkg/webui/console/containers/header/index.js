@@ -15,7 +15,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import bind from 'autobind-decorator'
 
 import HeaderComponent from '@ttn-lw/components/header'
 import NavigationBar from '@ttn-lw/components/navigation/bar'
@@ -53,7 +52,6 @@ import { selectUser } from '@console/store/selectors/user'
   },
   { handleLogout: logout },
 )
-@bind
 class Header extends Component {
   static propTypes = {
     /** A handler for when the user clicks the logout button. */

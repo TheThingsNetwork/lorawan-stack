@@ -83,7 +83,6 @@ import {
     <Breadcrumb path={`/applications/${appId}/api-keys/${keyId}`} content={sharedMessages.edit} />
   )
 })
-@bind
 export default class ApplicationApiKeyEdit extends React.Component {
   static propTypes = {
     apiKey: PropTypes.apiKey.isRequired,
@@ -101,6 +100,7 @@ export default class ApplicationApiKeyEdit extends React.Component {
     this.editApplicationKey = key => api.application.apiKeys.update(props.appId, props.keyId, key)
   }
 
+  @bind
   onDeleteSuccess() {
     const { appId, deleteSuccess } = this.props
 

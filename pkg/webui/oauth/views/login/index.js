@@ -64,7 +64,6 @@ const validationSchema = Yup.object().shape({
     replace,
   },
 )
-@bind
 export default class OAuth extends React.PureComponent {
   static propTypes = {
     location: PropTypes.location.isRequired,
@@ -79,6 +78,7 @@ export default class OAuth extends React.PureComponent {
     }
   }
 
+  @bind
   async handleSubmit(values, { setSubmitting, setErrors }) {
     try {
       await api.oauth.login(values)
@@ -92,6 +92,7 @@ export default class OAuth extends React.PureComponent {
     }
   }
 
+  @bind
   navigateToRegister() {
     const { replace, location } = this.props
     replace('/register', {
@@ -99,6 +100,7 @@ export default class OAuth extends React.PureComponent {
     })
   }
 
+  @bind
   navigateToResetPassword() {
     const { replace, location } = this.props
     replace('/forgot-password', {

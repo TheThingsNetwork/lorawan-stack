@@ -63,7 +63,6 @@ import { selectCollaborators } from '@console/store/selectors/collaborators'
     <Breadcrumb path={`/applications/${appId}/collaborators/add`} content={sharedMessages.add} />
   )
 })
-@bind
 export default class ApplicationCollaboratorAdd extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
@@ -76,6 +75,7 @@ export default class ApplicationCollaboratorAdd extends React.Component {
     error: '',
   }
 
+  @bind
   async handleSubmit(collaborator) {
     const { appId } = this.props
 

@@ -25,7 +25,6 @@ import { CheckboxGroupContext } from './group'
 
 import style from './checkbox.styl'
 
-@bind
 class Checkbox extends React.PureComponent {
   static contextType = CheckboxGroupContext
 
@@ -84,6 +83,7 @@ class Checkbox extends React.PureComponent {
     return null
   }
 
+  @bind
   handleChange(event) {
     const { onChange } = this.props
     const { checked } = event.target
@@ -100,12 +100,14 @@ class Checkbox extends React.PureComponent {
     onChange(event)
   }
 
+  @bind
   focus() {
     if (this.input && this.input.current) {
       this.input.current.focus()
     }
   }
 
+  @bind
   blur() {
     if (this.input && this.input.current) {
       this.input.current.blur()

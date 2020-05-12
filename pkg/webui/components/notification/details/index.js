@@ -27,7 +27,6 @@ const m = defineMessages({
   hideDetails: 'Hide details',
 })
 
-@bind
 export default class Details extends React.PureComponent {
   static propTypes = {
     details: PropTypes.oneOfType([PropTypes.string, PropTypes.error]).isRequired,
@@ -57,6 +56,7 @@ export default class Details extends React.PureComponent {
     })
   }
 
+  @bind
   toggleDropdown() {
     let { expanded } = this.state
     expanded = !expanded

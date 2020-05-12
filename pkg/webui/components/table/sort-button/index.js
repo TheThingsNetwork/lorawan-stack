@@ -24,8 +24,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './sort-button.styl'
 
-@bind
 class SortButton extends React.PureComponent {
+  @bind
   onSort() {
     const { name, onSort } = this.props
 

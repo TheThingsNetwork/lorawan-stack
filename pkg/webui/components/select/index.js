@@ -26,7 +26,6 @@ import style from './select.styl'
 // See: https://github.com/JedWatson/react-select/issues/2841
 const getValue = (opts, val) => opts.find(o => o.value === val)
 
-@bind
 class Select extends React.PureComponent {
   static propTypes = {
     className: PropTypes.string,
@@ -84,6 +83,7 @@ class Select extends React.PureComponent {
     return null
   }
 
+  @bind
   async onChange({ value }) {
     const { onChange } = this.props
 
@@ -94,6 +94,7 @@ class Select extends React.PureComponent {
     onChange(value)
   }
 
+  @bind
   onBlur(event) {
     const { value } = this.state
     const { onBlur, name } = this.props

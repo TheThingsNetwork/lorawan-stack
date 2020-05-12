@@ -18,7 +18,6 @@ import bind from 'autobind-decorator'
 import api from '@console/api'
 
 export default function(Component) {
-  @bind
   class Connect extends React.PureComponent {
     state = {
       devAddr: '',
@@ -26,6 +25,7 @@ export default function(Component) {
       fetching: false,
     }
 
+    @bind
     async generateDevAddr() {
       await this.setState({ error: undefined, fetching: true })
 

@@ -22,7 +22,6 @@ import style from './group.styl'
 
 export const CheckboxGroupContext = React.createContext()
 
-@bind
 class CheckboxGroup extends React.Component {
   static propTypes = {
     children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
@@ -70,6 +69,7 @@ class CheckboxGroup extends React.Component {
     return null
   }
 
+  @bind
   async handleCheckboxChange(event) {
     const { onChange } = this.props
     const { target } = event
@@ -83,6 +83,7 @@ class CheckboxGroup extends React.Component {
     onChange(value)
   }
 
+  @bind
   getCheckboxValue(name) {
     const { value } = this.state
 

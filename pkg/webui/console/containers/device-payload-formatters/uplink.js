@@ -60,7 +60,6 @@ import {
     />
   )
 })
-@bind
 class DevicePayloadFormatters extends React.PureComponent {
   static propTypes = {
     appId: PropTypes.string.isRequired,
@@ -69,6 +68,7 @@ class DevicePayloadFormatters extends React.PureComponent {
     updateDevice: PropTypes.func.isRequired,
   }
 
+  @bind
   async onSubmit(values) {
     const { appId, devId, formatters, updateDevice } = this.props
     return updateDevice(appId, devId, {
@@ -81,6 +81,7 @@ class DevicePayloadFormatters extends React.PureComponent {
     })
   }
 
+  @bind
   async onSubmitSuccess() {
     const { devId } = this.props
     toast({

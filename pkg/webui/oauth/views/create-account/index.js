@@ -99,7 +99,6 @@ const getSuccessMessage = function(state) {
     replace,
   },
 )
-@bind
 export default class CreateAccount extends React.PureComponent {
   static propTypes = {
     fetching: PropTypes.bool.isRequired,
@@ -121,6 +120,7 @@ export default class CreateAccount extends React.PureComponent {
     }
   }
 
+  @bind
   async handleSubmit(values, { setSubmitting, setErrors }) {
     try {
       const { user_id, ...rest } = values
@@ -143,6 +143,7 @@ export default class CreateAccount extends React.PureComponent {
     }
   }
 
+  @bind
   handleCancel() {
     const { replace, location } = this.props
     const state = location.state || {}
