@@ -7457,6 +7457,27 @@
         }
       }
     },
+    "GatewayConnectionStatsSubBand": {
+      "type": "object",
+      "properties": {
+        "min_frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "max_frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "downlink_utilization_limit": {
+          "type": "number",
+          "format": "float"
+        },
+        "downlink_utilization": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
     "GatewayRadioTxConfiguration": {
       "type": "object",
       "properties": {
@@ -10385,6 +10406,13 @@
         },
         "round_trip_times": {
           "$ref": "#/definitions/GatewayConnectionStatsRoundTripTimes"
+        },
+        "sub_bands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GatewayConnectionStatsSubBand"
+          },
+          "description": "Statistics for each sub band."
         }
       },
       "description": "Connection stats as monitored by the Gateway Server."

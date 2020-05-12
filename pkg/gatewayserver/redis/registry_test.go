@@ -170,6 +170,20 @@ func TestRegistry(t *testing.T) {
 		// Update downlink stats, make sure they work
 		stats.DownlinkCount = 10
 		stats.LastDownlinkReceivedAt = &now
+		stats.SubBands = []*ttnpb.GatewayConnectionStats_SubBand{
+			{
+				MinFrequency:             100,
+				MaxFrequency:             200,
+				DownlinkUtilization:      0.25,
+				DownlinkUtilizationLimit: 0.50,
+			},
+			{
+				MinFrequency:             250,
+				MaxFrequency:             300,
+				DownlinkUtilization:      0.50,
+				DownlinkUtilizationLimit: 0.75,
+			},
+		}
 		err = registry.Set(ctx, ids, stats, false, true, false)
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)
@@ -197,6 +211,7 @@ func TestRegistry(t *testing.T) {
 		// Unset downlink
 		stats.LastDownlinkReceivedAt = nil
 		stats.DownlinkCount = 0
+		stats.SubBands = nil
 		err = registry.Set(ctx, ids, nil, false, true, false)
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)

@@ -10355,6 +10355,16 @@
               "fullType": "ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "sub_bands",
+              "description": "Statistics for each sub band.",
+              "label": "repeated",
+              "type": "SubBand",
+              "longType": "GatewayConnectionStats.SubBand",
+              "fullType": "ttn.lorawan.v3.GatewayConnectionStats.SubBand",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -10428,6 +10438,57 @@
               "type": "uint32",
               "longType": "uint32",
               "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "SubBand",
+          "longName": "GatewayConnectionStats.SubBand",
+          "fullName": "ttn.lorawan.v3.GatewayConnectionStats.SubBand",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "min_frequency",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "max_frequency",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_utilization_limit",
+              "description": "",
+              "label": "",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_utilization",
+              "description": "",
+              "label": "",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
               "ismap": false,
               "defaultValue": ""
             }

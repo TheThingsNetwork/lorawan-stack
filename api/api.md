@@ -162,6 +162,7 @@
   - [Message `GatewayBrand`](#ttn.lorawan.v3.GatewayBrand)
   - [Message `GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats)
   - [Message `GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes)
+  - [Message `GatewayConnectionStats.SubBand`](#ttn.lorawan.v3.GatewayConnectionStats.SubBand)
   - [Message `GatewayModel`](#ttn.lorawan.v3.GatewayModel)
   - [Message `GatewayRadio`](#ttn.lorawan.v3.GatewayRadio)
   - [Message `GatewayRadio.TxConfiguration`](#ttn.lorawan.v3.GatewayRadio.TxConfiguration)
@@ -2592,6 +2593,7 @@ Connection stats as monitored by the Gateway Server.
 | `last_downlink_received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `downlink_count` | [`uint64`](#uint64) |  |  |
 | `round_trip_times` | [`GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes) |  |  |
+| `sub_bands` | [`GatewayConnectionStats.SubBand`](#ttn.lorawan.v3.GatewayConnectionStats.SubBand) | repeated | Statistics for each sub band. |
 
 ### <a name="ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes">Message `GatewayConnectionStats.RoundTripTimes`</a>
 
@@ -2609,6 +2611,15 @@ Connection stats as monitored by the Gateway Server.
 | `min` | <p>`duration.required`: `true`</p> |
 | `max` | <p>`duration.required`: `true`</p> |
 | `median` | <p>`duration.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GatewayConnectionStats.SubBand">Message `GatewayConnectionStats.SubBand`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `min_frequency` | [`uint64`](#uint64) |  |  |
+| `max_frequency` | [`uint64`](#uint64) |  |  |
+| `downlink_utilization_limit` | [`float`](#float) |  |  |
+| `downlink_utilization` | [`float`](#float) |  |  |
 
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 

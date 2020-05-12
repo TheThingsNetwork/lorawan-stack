@@ -106,6 +106,7 @@ func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids ttnpb.Gate
 		}
 		result.LastDownlinkReceivedAt = stats.LastDownlinkReceivedAt
 		result.DownlinkCount = stats.DownlinkCount
+		result.SubBands = stats.SubBands
 	}
 
 	// Retrieve gateway status.
