@@ -80,6 +80,10 @@ The HTTP server serves static files for the web UI. If these files are not in th
 - `http.static.mount`: Path on the server where static assets will be served
 - `http.static.search-path`: List of paths for finding the directory to serve static assets from
 
+If {{% tts %}} is deployed behind a reverse proxy that does not use a private network IP address (in `10.0.0.0/8`, `172.16.0.0/12` or `192.168.0.0/16`), its IP address range needs to be configured in order for {{% tts %}} to trust it.
+
+- `http.trusted-proxies`: CIDRs of trusted reverse proxies
+
 ## Interoperability Options
 
 {{% tts %}} supports interoperability according to LoRaWAN Backend Interfaces specification. The following options are used to configure the server for this.
