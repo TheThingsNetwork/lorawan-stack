@@ -596,6 +596,16 @@
             "ids.f_port"
           ]
         }
+      ],
+      "allowedFieldMaskPaths": [
+        "created_at",
+        "data",
+        "ids",
+        "ids.application_ids",
+        "ids.application_ids.application_id",
+        "ids.f_port",
+        "package_name",
+        "updated_at"
       ]
     },
     "ListDefaultAssociations": {
@@ -608,6 +618,16 @@
             "ids.application_id"
           ]
         }
+      ],
+      "allowedFieldMaskPaths": [
+        "created_at",
+        "data",
+        "ids",
+        "ids.application_ids",
+        "ids.application_ids.application_id",
+        "ids.f_port",
+        "package_name",
+        "updated_at"
       ]
     },
     "SetDefaultAssociation": {
@@ -622,6 +642,16 @@
             "default.ids.f_port"
           ]
         }
+      ],
+      "allowedFieldMaskPaths": [
+        "created_at",
+        "data",
+        "ids",
+        "ids.application_ids",
+        "ids.application_ids.application_id",
+        "ids.f_port",
+        "package_name",
+        "updated_at"
       ]
     },
     "DeleteDefaultAssociation": {
