@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -229,6 +230,92 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
 		},
 		{
+			Name: "payload fits/US915 FSB2/MAC:1.0.3,PHY:1.0.3a/ADR/rejected desired data rate and TX power",
+			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_0_3_REV_A)).(band.Band),
+			InputDevice: &ttnpb.EndDevice{
+				FrequencyPlanID: test.USFrequencyPlanID,
+				MACState: func() *ttnpb.MACState {
+					macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A)
+					macState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_3
+					macState.DesiredParameters.ADRTxPowerIndex = 1
+					macState.RejectedADRDataRateIndexes = []ttnpb.DataRateIndex{
+						ttnpb.DATA_RATE_2,
+					}
+					macState.RejectedADRTxPowerIndexes = []uint32{
+						0,
+						1,
+					}
+					return macState
+				}(),
+			},
+			ExpectedDevice: &ttnpb.EndDevice{
+				FrequencyPlanID: test.USFrequencyPlanID,
+				MACState: func() *ttnpb.MACState {
+					macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A)
+					macState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_3
+					macState.DesiredParameters.ADRTxPowerIndex = 1
+					macState.RejectedADRDataRateIndexes = []ttnpb.DataRateIndex{
+						ttnpb.DATA_RATE_2,
+					}
+					macState.RejectedADRTxPowerIndexes = []uint32{
+						0,
+						1,
+					}
+					macState.PendingRequests = []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_LinkADRReq{
+							ChannelMask: []bool{
+								false, false, false, false, false, false, false, false,
+								false, false, false, false, false, false, false, false,
+							},
+							ChannelMaskControl: 7,
+							NbTrans:            1,
+							DataRateIndex:      ttnpb.DATA_RATE_1,
+							TxPowerIndex:       15,
+						}).MACCommand(),
+						(&ttnpb.MACCommand_LinkADRReq{
+							ChannelMask: []bool{
+								false, false, false, false, false, false, false, false,
+								true, true, true, true, true, true, true, true,
+							},
+							NbTrans:       1,
+							DataRateIndex: ttnpb.DATA_RATE_1,
+							TxPowerIndex:  15,
+						}).MACCommand(),
+					}
+					return macState
+				}(),
+			},
+			MaxDownlinkLength: 42,
+			MaxUplinkLength:   24,
+			State: macCommandEnqueueState{
+				MaxDownLen: 32,
+				MaxUpLen:   20,
+				Ok:         true,
+				QueuedEvents: []events.DefinitionDataClosure{
+					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
+						ChannelMask: []bool{
+							false, false, false, false, false, false, false, false,
+							false, false, false, false, false, false, false, false,
+						},
+						ChannelMaskControl: 7,
+						NbTrans:            1,
+						DataRateIndex:      ttnpb.DATA_RATE_1,
+						TxPowerIndex:       15,
+					}),
+					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
+						ChannelMask: []bool{
+							false, false, false, false, false, false, false, false,
+							true, true, true, true, true, true, true, true,
+						},
+						NbTrans:       1,
+						DataRateIndex: ttnpb.DATA_RATE_1,
+						TxPowerIndex:  15,
+					}),
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+		},
+		{
 			Name: "payload fits/US915 FSB2/MAC:1.0.4,PHY:1.0.3a/no data rate change",
 			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_0_3_REV_A)).(band.Band),
 			InputDevice: &ttnpb.EndDevice{
@@ -337,7 +424,7 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 
 			dev := CopyEndDevice(tc.InputDevice)
 
-			st, err := enqueueLinkADRReq(test.Context(), dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, ttnpb.MACSettings{}, tc.Band)
+			st, err := enqueueLinkADRReq(log.NewContext(test.Context(), test.GetLogger(t)), dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, ttnpb.MACSettings{}, tc.Band)
 			if !a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				t.FailNow()
 			}
