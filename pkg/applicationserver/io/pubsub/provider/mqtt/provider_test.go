@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"testing"
 	"time"
 
@@ -322,6 +323,44 @@ func TestOpenConnection(t *testing.T) {
 					})
 				}
 			})
+		})
+	}
+}
+
+func TestAdaptURLScheme(t *testing.T) {
+	for i, tc := range []struct {
+		ProvidedURL string
+		ExpectedURL string
+		ShouldError bool
+	}{
+		{
+			ProvidedURL: "mqtt://localhost:1885",
+			ExpectedURL: "tcp://localhost:1885",
+			ShouldError: false,
+		},
+		{
+			ProvidedURL: "mqtts://localhost:8885",
+			ExpectedURL: "ssl://localhost:8885",
+			ShouldError: false,
+		},
+		{
+			ProvidedURL: "bar!://foo",
+			ShouldError: true,
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+			result, err := adaptURLScheme(tc.ProvidedURL)
+			if err != nil {
+				if !tc.ShouldError {
+					t.Fatal("Unexpected error", err)
+				}
+			} else {
+				if tc.ShouldError {
+					t.Fatal("Expected error but got nil")
+				}
+			}
+			a.So(result, should.Equal, tc.ExpectedURL)
 		})
 	}
 }
