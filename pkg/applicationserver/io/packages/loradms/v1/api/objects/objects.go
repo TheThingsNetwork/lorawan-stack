@@ -405,11 +405,11 @@ type StreamSession struct {
 }
 
 // DeviceUplinks maps device EUIs to LoRaUplink
-type DeviceUplinks map[EUI]LoRaUplink
+type DeviceUplinks map[EUI]*LoRaUplink
 
 // MarshalJSON implements json.Marshaler.
 func (u DeviceUplinks) MarshalJSON() ([]byte, error) {
-	m := make(map[string]LoRaUplink)
+	m := make(map[string]*LoRaUplink)
 	for k, v := range u {
 		m[k.String()] = v
 	}
@@ -418,24 +418,81 @@ func (u DeviceUplinks) MarshalJSON() ([]byte, error) {
 
 // LoRaUplink encapsulates the information of a LoRa message.
 type LoRaUplink struct {
-	FCnt      uint32  `json:"fcnt"`
-	Port      uint8   `json:"port"`
-	Payload   Hex     `json:"payload"`
-	DR        uint8   `json:"dr"`
-	Freq      uint32  `json:"freq"`
-	Timestamp float64 `json:"timestamp"`
+	Type LoRaUplinkType `json:"msgtype"`
+
+	FCnt        *uint32  `json:"fcnt,omitempty"`
+	Port        *uint8   `json:"port,omitempty"`
+	Payload     Hex      `json:"payload,omitempty"`
+	DR          *uint8   `json:"dr,omitempty"`
+	Freq        *uint32  `json:"freq,omitempty"`
+	Timestamp   *float64 `json:"timestamp,omitempty"`
+	DownlinkMTU *uint32  `json:"dn_mtu,omitempty"`
+
+	GNSSCaptureTime         *float64  `json:"gnss_capture_time,omitempty"`
+	GNSSCaptureTimeAccuracy *float64  `json:"gnss_capture_time_accuracy,omitempty"`
+	GNSSAssistPosition      []float64 `json:"gnss_assist_position,omitempty"`
+	GNSSAssistAltitude      *float64  `json:"gnss_assist_altitude,omitempty"`
+	GNSSUse2DSolver         *bool     `json:"gnss_use_2D_solver,omitempty"`
 }
 
-// Fields implements log.Fielder.
-func (u LoRaUplink) Fields() map[string]interface{} {
-	return map[string]interface{}{
-		"f_cnt":     u.FCnt,
-		"port":      u.Port,
-		"payload":   u.Payload,
-		"dr":        u.DR,
-		"frequency": u.Freq,
-		"timestamp": u.Timestamp,
+type LoRaUplinkType uint8
+
+const (
+	// UplinkUplinkType is LoRaWAN Message Type.
+	UplinkUplinkType LoRaUplinkType = iota
+	// ModemUplinkType is DAS Protocol Message Type.
+	ModemUplinkType
+	// JoiningUplinkType is Session Reset Message Type.
+	JoiningUplinkType
+	// GNSSUplinkType is DAS GNSS Message Type.
+	GNSSUplinkType
+)
+
+const (
+	uplinkUplinkType  = "updf"
+	modemUplinkType   = "modem"
+	joiningUplinkType = "joining"
+	gnssUplinkType    = "gnss"
+)
+
+// MarshalJSON implements the json.Marshaler interface.
+func (t LoRaUplinkType) MarshalJSON() ([]byte, error) {
+	var tp string
+	switch t {
+	case UplinkUplinkType:
+		tp = uplinkUplinkType
+	case ModemUplinkType:
+		tp = modemUplinkType
+	case JoiningUplinkType:
+		tp = joiningUplinkType
+	case GNSSUplinkType:
+		tp = gnssUplinkType
+	default:
+		panic(fmt.Sprintf("LoRaUplinkType %v is unsupported", t))
 	}
+	return json.Marshal(tp)
+}
+
+// UnmarshalJSON implements the json.Unarmshaler.
+func (t *LoRaUplinkType) UnmarshalJSON(b []byte) error {
+	var tp string
+	err := json.Unmarshal(b, &tp)
+	if err != nil {
+		return err
+	}
+	switch tp {
+	case uplinkUplinkType:
+		*t = UplinkUplinkType
+	case modemUplinkType:
+		*t = ModemUplinkType
+	case joiningUplinkType:
+		*t = JoiningUplinkType
+	case gnssUplinkType:
+		*t = GNSSUplinkType
+	default:
+		panic(fmt.Sprintf("LoRaUplinkType %v is unsupported", t))
+	}
+	return nil
 }
 
 // LoRaDnlink is a specification for a modem device.

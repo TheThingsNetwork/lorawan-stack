@@ -15,6 +15,7 @@
 package api
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -44,9 +45,15 @@ type Client struct {
 	Uplinks *Uplinks
 }
 
-const contentType = "application/json"
+const (
+	contentType      = "application/json"
+	defaultServerURL = "https://das.loracloud.com/api/v1"
+)
 
-var userAgent = "ttn-lw-application-server/" + version.TTN
+var (
+	userAgent        = "ttn-lw-application-server/" + version.TTN
+	DefaultServerURL *url.URL
+)
 
 type queryParam struct {
 	key, value string
@@ -98,7 +105,8 @@ func WithBaseURL(baseURL *url.URL) Option {
 // New creates a new Client with the given options.
 func New(cl *http.Client, opts ...Option) (*Client, error) {
 	client := &Client{
-		cl: cl,
+		cl:      cl,
+		baseURL: urlutil.CloneURL(DefaultServerURL),
 	}
 	client.Tokens = &Tokens{client}
 	client.Uplinks = &Uplinks{client}
@@ -106,4 +114,12 @@ func New(cl *http.Client, opts ...Option) (*Client, error) {
 		opt.apply(client)
 	}
 	return client, nil
+}
+
+func init() {
+	var err error
+	DefaultServerURL, err = url.Parse(defaultServerURL)
+	if err != nil {
+		panic(fmt.Sprintf("loradms: failed to parse base URL: %v", err))
+	}
 }

@@ -16,9 +16,7 @@ package loraclouddevicemanagementv1
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
@@ -71,34 +69,37 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 
 	switch m := up.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		return p.handleJoinAccept(ctx, data, up.EndDeviceIdentifiers, m.JoinAccept)
+		join := m.JoinAccept
+		loraUp := &objects.LoRaUplink{
+			Type:      objects.JoiningUplinkType,
+			Timestamp: toFloat64(float64(join.ReceivedAt.UTC().Unix())),
+		}
+		return p.sendUplink(ctx, up, loraUp, data)
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		return p.handleUplinkMessage(ctx, data, fPort, up.EndDeviceIdentifiers, m.UplinkMessage)
+		msg := m.UplinkMessage
+		settings := msg.GetSettings()
+		loraUp := &objects.LoRaUplink{
+			Type:      objects.UplinkUplinkType,
+			FCnt:      toUint32(msg.GetFCnt()),
+			Port:      toUint8(uint8(msg.GetFPort())),
+			Payload:   objects.Hex(msg.FRMPayload),
+			DR:        toUint8(uint8(settings.DataRateIndex)),
+			Freq:      toUint32(uint32(settings.Frequency)),
+			Timestamp: toFloat64(float64(msg.ReceivedAt.UTC().Unix())),
+		}
+		if fPort != msg.FPort {
+			log.FromContext(ctx).Debug("Uplink received on unhandled FPort; drop payload")
+			loraUp.Payload = nil
+		}
+		return p.sendUplink(ctx, up, loraUp, data)
 	default:
 		return nil
 	}
 }
 
-func (p *DeviceManagementPackage) handleJoinAccept(ctx context.Context, data *packageData, ids ttnpb.EndDeviceIdentifiers, join *ttnpb.ApplicationJoinAccept) error {
-	return nil
-}
-
-func (p *DeviceManagementPackage) handleUplinkMessage(ctx context.Context, data *packageData, fPort uint32, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink) error {
-	eui := objects.EUI(*ids.DevEUI)
-	uplink := objects.LoRaUplink{
-		FCnt:      up.GetFCnt(),
-		Port:      uint8(up.GetFPort()),
-		Payload:   objects.Hex(up.FRMPayload),
-		DR:        uint8(up.GetSettings().DataRateIndex),
-		Freq:      uint32(up.GetSettings().Frequency),
-		Timestamp: float64(up.ReceivedAt.UTC().Unix()),
-	}
-
+func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.ApplicationUp, loraUp *objects.LoRaUplink, data *packageData) error {
 	logger := log.FromContext(ctx)
-	if fPort != up.FPort {
-		logger.Debug("Uplink received on unhandled FPort; drop payload")
-		uplink.Payload = nil
-	}
+	eui := objects.EUI(*up.DevEUI)
 
 	client, err := api.New(http.DefaultClient, api.WithToken(data.token))
 	if err != nil {
@@ -106,7 +107,7 @@ func (p *DeviceManagementPackage) handleUplinkMessage(ctx context.Context, data 
 		return err
 	}
 	resp, err := client.Uplinks.Send(objects.DeviceUplinks{
-		eui: uplink,
+		eui: loraUp,
 	})
 	if err != nil {
 		logger.WithError(err).Debug("Failed to send uplink upstream")
@@ -116,7 +117,7 @@ func (p *DeviceManagementPackage) handleUplinkMessage(ctx context.Context, data 
 
 	response, ok := resp[eui]
 	if !ok {
-		return errDeviceEUIMissing.WithAttributes("dev_eui", ids.DevEUI)
+		return errDeviceEUIMissing.WithAttributes("dev_eui", up.DevEUI)
 	}
 	if response.Error != "" {
 		return errUplinkRequestFailed.WithCause(errors.New(response.Error))
@@ -131,7 +132,7 @@ func (p *DeviceManagementPackage) handleUplinkMessage(ctx context.Context, data 
 		FPort:      uint32(downlink.Port),
 		FRMPayload: []byte(downlink.Payload),
 	}
-	err = p.server.DownlinkQueuePush(ctx, ids, []*ttnpb.ApplicationDownlink{down})
+	err = p.server.DownlinkQueuePush(ctx, up.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink{down})
 	if err != nil {
 		logger.WithError(err).Debug("Failed to push downlink to device")
 		return err
@@ -140,10 +141,6 @@ func (p *DeviceManagementPackage) handleUplinkMessage(ctx context.Context, data 
 
 	return nil
 }
-
-const defaultServerURL = "https://das.loracloud.com/api/v1"
-
-var parsedDefaultServerURL *url.URL
 
 func (p *DeviceManagementPackage) mergePackageData(def *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation) (*packageData, uint32, error) {
 	var defaultData, associationData packageData
@@ -173,7 +170,7 @@ func (p *DeviceManagementPackage) mergePackageData(def *ttnpb.ApplicationPackage
 		}
 	}
 	if merged.serverURL == nil {
-		merged.serverURL = urlutil.CloneURL(parsedDefaultServerURL)
+		merged.serverURL = urlutil.CloneURL(api.DefaultServerURL)
 	}
 	return &merged, fPort, nil
 }
@@ -187,10 +184,16 @@ func init() {
 			return &DeviceManagementPackage{server, registry}
 		},
 	))
+}
 
-	var err error
-	parsedDefaultServerURL, err = url.Parse(defaultServerURL)
-	if err != nil {
-		panic(fmt.Sprintf("loradms: failed to parse base URL: %v", err))
-	}
+func toUint8(x uint8) *uint8 {
+	return &x
+}
+
+func toUint32(x uint32) *uint32 {
+	return &x
+}
+
+func toFloat64(x float64) *float64 {
+	return &x
 }

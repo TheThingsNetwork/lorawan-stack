@@ -53,13 +53,13 @@ func TestUplinks(t *testing.T) {
 					assert: func(a *assertions.Assertion, u *api.Uplinks) {
 						eui := objects.EUI{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 						resp, err := u.Send(objects.DeviceUplinks{
-							eui: objects.LoRaUplink{
-								FCnt:      42,
-								Port:      200,
+							eui: &objects.LoRaUplink{
+								FCnt:      toUint32(42),
+								Port:      toUint8(200),
 								Payload:   objects.Hex{0x03, 0x04},
-								DR:        4,
-								Freq:      865000000,
-								Timestamp: 100.0,
+								DR:        toUint8(4),
+								Freq:      toUint32(865000000),
+								Timestamp: toFloat64(100.0),
 							},
 						})
 						req := <-reqChan
@@ -95,4 +95,16 @@ func TestUplinks(t *testing.T) {
 				})
 			}
 		})
+}
+
+func toUint8(x uint8) *uint8 {
+	return &x
+}
+
+func toUint32(x uint32) *uint32 {
+	return &x
+}
+
+func toFloat64(x float64) *float64 {
+	return &x
 }

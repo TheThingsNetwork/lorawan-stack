@@ -1709,6 +1709,15 @@
       "file": "data.go"
     }
   },
+  "error:pkg/applicationserver/io/packages/loradms/v1:no_association": {
+    "translations": {
+      "en": "no association available"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1",
+      "file": "package.go"
+    }
+  },
   "error:pkg/applicationserver/io/packages/loradms/v1:uplink_request_failed": {
     "translations": {
       "en": "uplink request failed"
