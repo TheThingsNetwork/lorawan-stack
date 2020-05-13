@@ -343,6 +343,18 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "service_data":
+
+			if v, ok := interface{}(m.GetServiceData()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationPubSubValidationError{
+						field:  "service_data",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "provider":
 			if m.Provider == nil {
 				return ApplicationPubSubValidationError{

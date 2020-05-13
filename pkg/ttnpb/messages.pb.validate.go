@@ -1481,6 +1481,101 @@ var _ interface {
 	ErrorName() string
 } = ApplicationInvalidatedDownlinksValidationError{}
 
+// ValidateFields checks the field values on ApplicationServiceData with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ApplicationServiceData) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationServiceDataFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "service":
+			// no validation rules for Service
+		case "data":
+
+			if v, ok := interface{}(m.GetData()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationServiceDataValidationError{
+						field:  "data",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ApplicationServiceDataValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationServiceDataValidationError is the validation error returned by
+// ApplicationServiceData.ValidateFields if the designated constraints aren't met.
+type ApplicationServiceDataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationServiceDataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationServiceDataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationServiceDataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationServiceDataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationServiceDataValidationError) ErrorName() string {
+	return "ApplicationServiceDataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationServiceDataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationServiceData.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationServiceDataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationServiceDataValidationError{}
+
 // ValidateFields checks the field values on ApplicationUp with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -1543,7 +1638,7 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 			}
 			if len(subs) == 0 {
 				subs = []string{
-					"uplink_message", "join_accept", "downlink_ack", "downlink_nack", "downlink_sent", "downlink_failed", "downlink_queued", "downlink_queue_invalidated", "location_solved",
+					"uplink_message", "join_accept", "downlink_ack", "downlink_nack", "downlink_sent", "downlink_failed", "downlink_queued", "downlink_queue_invalidated", "location_solved", "service_data",
 				}
 			}
 			for name, subs := range _processPaths(subs) {
@@ -1687,6 +1782,22 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 						if err := v.ValidateFields(subs...); err != nil {
 							return ApplicationUpValidationError{
 								field:  "location_solved",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "service_data":
+					w, ok := m.Up.(*ApplicationUp_ServiceData)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetServiceData()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return ApplicationUpValidationError{
+								field:  "service_data",
 								reason: "embedded message failed validation",
 								cause:  err,
 							}
