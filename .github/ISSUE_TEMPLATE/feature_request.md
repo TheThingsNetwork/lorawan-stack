@@ -44,6 +44,14 @@ Paste the output of "ttn-lw-cli version" or "ttn-lw-stack version" if applicable
 
 ...
 
+#### How do you propose to test this?
+<!--
+Please think about how this is verified as implemented.
+For example, you can add what commands need to be run via the CLI/Console to verify that this works.
+-->
+
+...
+
 #### Can you do this yourself and submit a Pull Request?
 <!-- You can also @mention experts if you need help with this. -->
 
