@@ -480,6 +480,9 @@ hardware_versions:
 						LocationSolved: &ttnpb.ApplicationPubSub_Message{
 							Topic: "up.location.solved",
 						},
+						ServiceData: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up.service.data",
+						},
 					},
 					FieldMask: pbtypes.FieldMask{
 						Paths: []string{
@@ -493,6 +496,7 @@ hardware_versions:
 							"downlink_replace",
 							"format",
 							"provider",
+							"service_data",
 							"join_accept",
 							"location_solved",
 							"uplink_message",
@@ -616,6 +620,9 @@ hardware_versions:
 						LocationSolved: &ttnpb.ApplicationPubSub_Message{
 							Topic: "up/location/solved",
 						},
+						ServiceData: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up/service/data",
+						},
 					},
 					FieldMask: pbtypes.FieldMask{
 						Paths: []string{
@@ -629,6 +636,7 @@ hardware_versions:
 							"downlink_replace",
 							"format",
 							"provider",
+							"service_data",
 							"join_accept",
 							"location_solved",
 							"uplink_message",
@@ -737,12 +745,14 @@ hardware_versions:
 						DownlinkSent:                  &ttnpb.ApplicationWebhook_Message{Path: ""},
 						DownlinkFailed:                &ttnpb.ApplicationWebhook_Message{Path: ""},
 						LocationSolved:                &ttnpb.ApplicationWebhook_Message{Path: ""},
+						ServiceData:                   &ttnpb.ApplicationWebhook_Message{Path: ""},
 					},
 					FieldMask: pbtypes.FieldMask{
 						Paths: []string{
 							"base_url",
 							"format",
 							"uplink_message",
+							"service_data",
 							"join_accept",
 							"downlink_ack",
 							"downlink_nack",

@@ -140,6 +140,8 @@ func (i *integration) handleUp(ctx context.Context) {
 				topic = i.conn.Topics.DownlinkQueued
 			case *ttnpb.ApplicationUp_LocationSolved:
 				topic = i.conn.Topics.LocationSolved
+			case *ttnpb.ApplicationUp_ServiceData:
+				topic = i.conn.Topics.ServiceData
 			}
 			if topic == nil {
 				continue

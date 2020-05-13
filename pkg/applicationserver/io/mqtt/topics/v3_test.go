@@ -115,6 +115,10 @@ func TestV3Topics(t *testing.T) {
 			Expected: fmt.Sprintf("v3/%s/devices/%s/location/solved", appUID, devID),
 		},
 		{
+			Fn:       topics.Default.ServiceDataTopic,
+			Expected: fmt.Sprintf("v3/%s/devices/%s/service/data", appUID, devID),
+		},
+		{
 			Fn:       topics.Default.DownlinkPushTopic,
 			Expected: fmt.Sprintf("v3/%s/devices/%s/down/push", appUID, devID),
 		},
