@@ -731,6 +731,8 @@
         "provider.mqtt.username",
         "provider.nats",
         "provider.nats.server_url",
+        "service_data",
+        "service_data.topic",
         "updated_at",
         "uplink_message",
         "uplink_message.topic"
@@ -787,6 +789,8 @@
         "provider.mqtt.username",
         "provider.nats",
         "provider.nats.server_url",
+        "service_data",
+        "service_data.topic",
         "updated_at",
         "uplink_message",
         "uplink_message.topic"
@@ -853,6 +857,8 @@
         "provider.mqtt.username",
         "provider.nats",
         "provider.nats.server_url",
+        "service_data",
+        "service_data.topic",
         "updated_at",
         "uplink_message",
         "uplink_message.topic"
@@ -921,6 +927,8 @@
         "location_solved.path",
         "logo_url",
         "name",
+        "service_data",
+        "service_data.path",
         "uplink_message",
         "uplink_message.path"
       ]
@@ -961,6 +969,8 @@
         "location_solved.path",
         "logo_url",
         "name",
+        "service_data",
+        "service_data.path",
         "uplink_message",
         "uplink_message.path"
       ]
@@ -1001,6 +1011,8 @@
         "join_accept.path",
         "location_solved",
         "location_solved.path",
+        "service_data",
+        "service_data.path",
         "template_fields",
         "template_ids",
         "template_ids.template_id",
@@ -1044,6 +1056,8 @@
         "join_accept.path",
         "location_solved",
         "location_solved.path",
+        "service_data",
+        "service_data.path",
         "template_fields",
         "template_ids",
         "template_ids.template_id",
@@ -1097,6 +1111,8 @@
         "join_accept.path",
         "location_solved",
         "location_solved.path",
+        "service_data",
+        "service_data.path",
         "template_fields",
         "template_ids",
         "template_ids.template_id",

@@ -284,7 +284,7 @@ func TestPubSub(t *testing.T) {
 						ServiceData: &ttnpb.ApplicationServiceData{
 							Data: &types.Struct{
 								Fields: map[string]*types.Value{
-									"battery": &types.Value{
+									"battery": {
 										Kind: &types.Value_NumberValue{
 											NumberValue: 42.0,
 										},
