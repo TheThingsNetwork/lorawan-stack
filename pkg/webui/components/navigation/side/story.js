@@ -53,7 +53,7 @@ storiesOf('Navigation', module)
           <SideNavigationItem title="Integrations" icon="integration">
             <SideNavigationItem title="MQTT" path="/integrations/mqtt" icon="extension" />
             <SideNavigationItem title="Webhooks" path="/integrations/webhooks" icon="extension" />
-            <SideNavigationItem title="Pubsubs" path="/integrations/pubsubs" icon="extension" />
+            <SideNavigationItem title="Pub/Subs" path="/integrations/pubsubs" icon="extension" />
           </SideNavigationItem>
           <SideNavigationItem title="Collaborators" path="/collaborators" icon="organization" />
           <SideNavigationItem title="API keys" path="/api-keys" icon="api_keys" />
