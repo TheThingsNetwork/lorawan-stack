@@ -792,6 +792,9 @@ ApplicationUplink:
        Can be used with app_s_key to encrypt downlink payloads.
     type: uint32
     default: 0
+  - name: confirmed
+    type: bool
+    default: false
 ApplicationWebhook:
   name: ApplicationWebhook
   fields:
@@ -1320,6 +1323,14 @@ Client:
        The allowed redirect URIs against which authorization requests are checked.
        If the authorization request does not pass a redirect URI, the first one
        from this list is taken.
+    repeated:
+      type: string
+    default: []
+  - name: logout_redirect_uris
+    comment: |2
+       The allowed logout redirect URIs against which client initiated logout
+       requests are checked. If the authorization request does not pass a redirect
+       URI, the first one from this list is taken.
     repeated:
       type: string
     default: []
@@ -2286,6 +2297,7 @@ EndDevice:
     comment: |2
        Queued Application downlink messages. Stored in Application Server,
        which sets them on the Network Server.
+       This field is deprecated and is always set equal to session.queued_application_downlinks.
     repeated:
       message:
         name: ApplicationDownlink
@@ -2858,10 +2870,22 @@ Gateway:
     type: string
     default: ""
   - name: frequency_plan_id
+    comment: |2
+       Frequency plan ID of the gateway.
+       This equals the first element of the frequency_plan_ids field.
     type: string
     rules:
       max_len: 64
     default: ""
+  - name: frequency_plan_ids
+    comment: |2
+       Frequency plan IDs of the gateway.
+       The first element equals the frequency_plan_id field.
+    repeated:
+      type: string
+      rules:
+        max_len: 64
+    default: []
   - name: antennas
     repeated:
       message:
@@ -2904,6 +2928,11 @@ Gateway:
       package: google.protobuf
       name: Duration
     default: 0s
+  - name: update_location_from_status
+    comment: |2
+       update the location of this gateway from status messages
+    type: bool
+    default: false
 GatewayAntenna:
   name: GatewayAntenna
   comment: |2
@@ -3194,6 +3223,20 @@ GatewayUp:
     message:
       name: TxAcknowledgment
     default: {}
+GatewayUplinkMessage:
+  name: GatewayUplinkMessage
+  fields:
+  - name: message
+    message:
+      name: UplinkMessage
+    rules:
+      required: true
+    default: {}
+  - name: band_id
+    comment: |2
+       LoRaWAN band ID of the gateway.
+    type: string
+    default: ""
 GatewayVersion:
   name: GatewayVersion
   comment: |2
@@ -4697,6 +4740,7 @@ MACCommand.BeaconFreqReq:
   - name: frequency
     type: uint64
     rules:
+      lte: 0
       gte: 100000
     default: 0
 MACCommand.BeaconTimingAns:
@@ -4897,6 +4941,7 @@ MACCommand.NewChannelReq:
   - name: frequency
     type: uint64
     rules:
+      lte: 0
       gte: 100000
     default: 0
   - name: min_data_rate_index
@@ -4926,6 +4971,7 @@ MACCommand.PingSlotChannelReq:
   - name: frequency
     type: uint64
     rules:
+      lte: 0
       gte: 100000
     default: 0
   - name: data_rate_index
@@ -5639,6 +5685,48 @@ MACState:
       message:
         name: DownlinkMessage
     default: []
+  - name: last_network_initiated_downlink_at
+    comment: |2
+       Time when the last network-initiated downlink message was scheduled.
+    message:
+      package: google.protobuf
+      name: Timestamp
+    default: "0001-01-01T00:00:00Z"
+  - name: rejected_adr_data_rate_indexes
+    comment: |2
+       ADR Data rate index values rejected by the device.
+       Reset each time `current_parameters.channels` change.
+       Elements are sorted in ascending order.
+    repeated:
+      enum:
+        name: DataRateIndex
+      rules:
+        defined_only: true
+    default: []
+  - name: rejected_adr_tx_power_indexes
+    comment: |2
+       ADR TX output power index values rejected by the device.
+       Elements are sorted in ascending order.
+    repeated:
+      type: uint32
+      rules:
+        lte: 15
+    default: []
+  - name: rejected_frequencies
+    comment: |2
+       Frequencies rejected by the device.
+    repeated:
+      type: uint64
+      rules:
+        gte: 100000
+    default: []
+  - name: last_downlink_at
+    comment: |2
+       Time when the last downlink message was scheduled.
+    message:
+      package: google.protobuf
+      name: Timestamp
+    default: "0001-01-01T00:00:00Z"
 MACState.JoinAccept:
   name: MACState.JoinAccept
   fields:
@@ -5666,6 +5754,12 @@ MACState.JoinAccept:
     rules:
       required: true
     default: {}
+  - name: correlation_ids
+    repeated:
+      type: string
+      rules:
+        max_len: 100
+    default: []
 MHDR:
   name: MHDR
   fields:
@@ -5813,6 +5907,11 @@ OAuthAccessToken:
     rules:
       required: true
     default: {}
+  - name: user_session_id
+    type: string
+    rules:
+      max_len: 64
+    default: ""
   - name: client_ids
     message:
       name: ClientIdentifiers
@@ -5878,6 +5977,11 @@ OAuthAuthorizationCode:
     rules:
       required: true
     default: {}
+  - name: user_session_id
+    type: string
+    rules:
+      max_len: 64
+    default: ""
   - name: client_ids
     message:
       name: ClientIdentifiers
@@ -6043,6 +6147,77 @@ Organizations:
       message:
         name: Organization
     default: []
+PacketBrokerMetadata:
+  name: PacketBrokerMetadata
+  fields:
+  - name: message_id
+    comment: |2
+       Message identifier generated by Packet Broker Router.
+    type: string
+    default: ""
+  - name: forwarder_net_id
+    comment: |2
+       LoRa Alliance NetID of the Packet Broker Forwarder Member.
+    type: bytes
+    default: ""
+  - name: forwarder_tenant_id
+    comment: |2
+       Tenant ID managed by the Packet Broker Forwarder Member.
+    type: string
+    default: ""
+  - name: forwarder_id
+    comment: |2
+       Forwarder identifier issued by the Packet Broker Forwarder Member.
+    type: string
+    default: ""
+  - name: home_network_net_id
+    comment: |2
+       LoRa Alliance NetID of the Packet Broker Home Network Member.
+    type: bytes
+    default: ""
+  - name: home_network_tenant_id
+    comment: |2
+       Tenant ID managed by the Packet Broker Home Network Member.
+       This value is empty if it cannot be determined by the Packet Broker Router.
+    type: string
+    default: ""
+  - name: hops
+    comment: |2
+       Hops that the message passed. Each Packet Broker Router service appends an entry.
+    repeated:
+      message:
+        name: PacketBrokerRouteHop
+    default: []
+PacketBrokerRouteHop:
+  name: PacketBrokerRouteHop
+  fields:
+  - name: received_at
+    comment: |2
+       Time when the service received the message.
+    message:
+      package: google.protobuf
+      name: Timestamp
+    default: "0001-01-01T00:00:00Z"
+  - name: sender_name
+    comment: |2
+       Sender of the message, typically the authorized client identifier.
+    type: string
+    default: ""
+  - name: sender_address
+    comment: |2
+       Sender IP address or host name.
+    type: string
+    default: ""
+  - name: receiver_name
+    comment: |2
+       Receiver of the message.
+    type: string
+    default: ""
+  - name: receiver_agent
+    comment: |2
+       Receiver agent.
+    type: string
+    default: ""
 PeerInfo:
   name: PeerInfo
   comment: |2
@@ -6364,6 +6539,10 @@ RxMetadata:
     rules:
       required: true
     default: {}
+  - name: packet_broker
+    message:
+      name: PacketBrokerMetadata
+    default: {}
   - name: antenna_index
     type: uint32
     default: 0
@@ -6651,6 +6830,13 @@ Session:
       package: google.protobuf
       name: Timestamp
     default: "0001-01-01T00:00:00Z"
+  - name: queued_application_downlinks
+    comment: |2
+       Queued Application downlink messages. Stored in Application Server and Network Server.
+    repeated:
+      message:
+        name: ApplicationDownlink
+    default: []
 SessionKeyRequest:
   name: SessionKeyRequest
   fields:
@@ -6963,6 +7149,13 @@ TxRequest:
       package: google.protobuf
       name: Timestamp
     default: "0001-01-01T00:00:00Z"
+  - name: frequency_plan_id
+    comment: |2
+       Frequency plan ID from which the frequencies in this message are retrieved.
+    type: string
+    rules:
+      max_len: 64
+    default: ""
   - name: advanced
     comment: |2
        Advanced metadata fields

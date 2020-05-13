@@ -1164,6 +1164,18 @@ GsNs:
       output:
         package: google.protobuf
         name: Empty
+GsPba:
+  name: GsPba
+  comment: |2
+     The GsPba service connects a Gateway Server to a Packet Broker Agent.
+  methods:
+    PublishUplink:
+      name: PublishUplink
+      input:
+        name: GatewayUplinkMessage
+      output:
+        package: google.protobuf
+        name: Empty
 GtwGs:
   name: GtwGs
   comment: |2
@@ -1412,6 +1424,20 @@ NsJs:
         name: SessionKeyRequest
       output:
         name: NwkSKeysResponse
+NsPba:
+  name: NsPba
+  comment: |2
+     The NsPba service connects a Network Server to a Packet Broker Agent.
+  methods:
+    PublishDownlink:
+      name: PublishDownlink
+      comment: |2
+         PublishDownlink instructs the Packet Broker Agent to publish a downlink message to Packet Broker Router.
+      input:
+        name: DownlinkMessage
+      output:
+        package: google.protobuf
+        name: Empty
 OAuthAuthorizationRegistry:
   name: OAuthAuthorizationRegistry
   methods:
