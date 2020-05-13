@@ -43,7 +43,7 @@ import {
 import { qosOptions } from './qos-options'
 import validationSchema from './validation-schema'
 
-const pathPlaceholder = '/sub-topic'
+const pathPlaceholder = 'sub-topic'
 
 export default class PubsubForm extends Component {
   static propTypes = {

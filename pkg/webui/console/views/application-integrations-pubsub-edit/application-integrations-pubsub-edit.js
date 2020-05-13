@@ -30,9 +30,9 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const m = defineMessages({
-  editPubsub: 'Edit pub-sub',
-  updateSuccess: 'Pub-sub updated',
-  deleteSuccess: 'Pub-sub deleted',
+  editPubsub: 'Edit Pub/Sub',
+  updateSuccess: 'Pub/Sub updated',
+  deleteSuccess: 'Pub/Sub deleted',
 })
 
 @withBreadcrumb('apps.single.integrations.edit', function(props) {
