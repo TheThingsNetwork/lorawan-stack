@@ -37,7 +37,7 @@ export default defineMessages({
   clientId: 'Client ID',
   subscribeQos: 'Subscribe QoS',
   publishQos: 'Publish QoS',
-  tlsCa: 'Server root CA certificate',
+  tlsCa: 'Root CA certificate',
   tlsClientCert: 'Client certificate',
   tlsClientKey: 'Client private key',
   selectPemFile: 'Select .pem file…',
