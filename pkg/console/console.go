@@ -119,8 +119,5 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 
 	group.GET("/login/ttn-stack", console.oc.HandleLogin)
 
-	if console.config.Mount != "" && console.config.Mount != "/" {
-		group.GET("", webui.Template.Handler)
-	}
 	group.GET("/*", webui.Template.Handler)
 }
