@@ -1,0 +1,71 @@
+c/identity server:
+- pkg/identityserver/*
+- pkg/identityserver/**/*
+- pkg/oauth/*
+- pkg/oauth/**/*
+
+c/gateway server:
+- pkg/gatewayserver/*
+- pkg/gatewayserver/**/*
+
+c/gateway conf server:
+- pkg/gatewayconfigurationserver/*
+- pkg/gatewayconfigurationserver/**/*
+
+c/network server:
+- pkg/networkserver/*
+- pkg/networkserver/**/*
+
+c/application server:
+- pkg/applicationserver/*
+- pkg/applicationserver/**/*
+
+c/join server:
+- pkg/joinserver/*
+- pkg/joinserver/**/*
+
+c/console:
+- pkg/console/*
+- pkg/console/**/*
+
+c/packet broker agent:
+- pkg/packetbrokeragent/*
+- pkg/packetbrokeragent/**/*
+
+compat/api:
+- api/*.proto
+
+compat/config:
+- cmd/**/config.go
+- cmd/**/config.*.go
+- pkg/**/config.go
+- pkg/**/config.*.go
+- pkg/config/*.go
+
+compat/db:
+- pkg/identityserver/store/*.go
+- pkg/identityserver/store/**/*.go
+- pkg/**/redis/*.go
+- pkg/**/redis/**/*.go
+
+# NOTE: We're not assigning bump/minor because that is a choice for the maintainer.
+
+dependencies:
+- go.mod
+- go.sum
+- yarn.lock
+- sdk/js/yarn.lock
+
+documentation:
+- '*.md'
+- '**/*.md'
+- doc/content/*
+- doc/content/**/*
+
+ui/cli:
+- cmd/ttn-lw-cli/*
+- cmd/ttn-lw-cli/**/*
+
+ui/web:
+- pkg/webui/*
+- pkg/webui/**/*
