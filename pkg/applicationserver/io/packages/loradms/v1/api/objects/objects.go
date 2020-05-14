@@ -26,6 +26,14 @@ import (
 
 // Implemented as per https://www.loracloud.com/documentation/device_management?url=v1.html#object-formats
 
+type PendingRequests struct {
+	// Upcount is the "upcount" communicated to modem.
+	Upcount uint8 `json:"upcount"`
+	// Updelay is the "updelay" communicated to modem.
+	Updelay  uint8            `json:"updelay"`
+	Requests []PendingRequest `json:"requests"`
+}
+
 // DeviceInfo encapsulates the current state of a modem as known to the server.
 type DeviceInfo struct {
 	// DMPorts contains the ports currently accepted as "dmport".
@@ -35,14 +43,8 @@ type DeviceInfo struct {
 	// UploadSessions contains the current upload sessions.
 	UploadSessions []UploadSession `json:"upload_sessions"`
 	// StreamSessions contains the current streaming sessions.
-	StreamSessions  []StreamSession `json:"stream_sessions"`
-	PendingRequests []struct {
-		// Upcount is the "upcount" communicated to modem.
-		Upcount uint8 `json:"upcount"`
-		// Updelay is the "updelay" communicated to modem.
-		Updelay  uint8            `json:"updelay"`
-		Requests []PendingRequest `json:"requests"`
-	} `json:"pending_requests"`
+	StreamSessions  []StreamSession  `json:"stream_sessions"`
+	PendingRequests *PendingRequests `json:"pending_requests"`
 	// LogMessages contains the from service related to this device.
 	LogMessages []LogMessage `json:"log_messages"`
 	// UploadedFiles contains the history of uploaded files.
@@ -79,14 +81,29 @@ func (d DeviceUplinkResponses) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// PositionSolution is the solution of a position calculation.
+type PositionSolution struct {
+	ECEF           []float64 `json:"ecef"`
+	LLH            []float64 `json:"llh"`
+	CaptureTimeGPS float64   `json:"capture_time_gps"`
+	GDOP           float64   `json:"gdop"`
+	Accuracy       float64   `json:"accuracy"`
+	Timestamp      float64   `json:"timestamp"`
+}
+
 // UplinkResponse contains the state changes and completed items due to an uplink message.
 type UplinkResponse struct {
-	File              *File            `json:"file"`
-	StreamRecords     []Stream         `json:"stream_records"`
-	FullfiledRequests []PendingRequest `json:"fulfilled_requests"`
-	Downlink          *LoRaDnlink      `json:"dnlink"`
-	InfoFields        InfoFields       `json:"info_fields"`
-	LogMessages       []LogMessage     `json:"log_messages"`
+	File                  *File             `json:"file"`
+	StreamRecords         []Stream          `json:"stream_records"`
+	PositionSolution      *PositionSolution `json:"position_solution"`
+	PendingRequests       *PendingRequests  `json:"pending_requests"`
+	FullfiledRequests     []Request         `json:"fulfilled_requests"`
+	Downlink              *LoRaDnlink       `json:"dnlink"`
+	InfoFields            InfoFields        `json:"info_fields"`
+	LogMessages           []LogMessage      `json:"log_messages"`
+	UploadedFiles         []File            `json:"uploaded_files"`
+	UploadedStreamRecords []Stream          `json:"uploaded_stream_records"`
+	LastUplink            *LoRaUplink       `json:"last_uplink"`
 }
 
 // InfoFields contains the value of the various information fields and the timestamp of their last update.
