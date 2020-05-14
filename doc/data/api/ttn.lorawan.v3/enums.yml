@@ -155,6 +155,8 @@ ClusterRole:
     value: 10
   - name: QR_CODE_GENERATOR
     value: 11
+  - name: PACKET_BROKER_AGENT
+    value: 12
 ContactMethod:
   name: ContactMethod
   values:
@@ -376,6 +378,8 @@ MACVersion:
     value: 4
   - name: MAC_V1_0_3
     value: 5
+  - name: MAC_V1_0_4
+    value: 6
 MType:
   name: MType
   values:
