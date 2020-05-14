@@ -72,7 +72,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 		join := m.JoinAccept
 		loraUp := &objects.LoRaUplink{
 			Type:      objects.JoiningUplinkType,
-			Timestamp: toFloat64(float64(join.ReceivedAt.UTC().Unix())),
+			Timestamp: float64Ptr(float64(join.ReceivedAt.UTC().Unix())),
 		}
 		return p.sendUplink(ctx, up, loraUp, data)
 	case *ttnpb.ApplicationUp_UplinkMessage:
@@ -80,15 +80,15 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 		settings := msg.GetSettings()
 		loraUp := &objects.LoRaUplink{
 			Type:      objects.UplinkUplinkType,
-			FCnt:      toUint32(msg.GetFCnt()),
-			Port:      toUint8(uint8(msg.GetFPort())),
+			FCnt:      uint32Ptr(msg.GetFCnt()),
+			Port:      uint8Ptr(uint8(msg.GetFPort())),
 			Payload:   objects.Hex(msg.FRMPayload),
-			DR:        toUint8(uint8(settings.DataRateIndex)),
-			Freq:      toUint32(uint32(settings.Frequency)),
-			Timestamp: toFloat64(float64(msg.ReceivedAt.UTC().Unix())),
+			DR:        uint8Ptr(uint8(settings.DataRateIndex)),
+			Freq:      uint32Ptr(uint32(settings.Frequency)),
+			Timestamp: float64Ptr(float64(msg.ReceivedAt.UTC().Unix())),
 		}
 		if fPort != msg.FPort {
-			log.FromContext(ctx).Debug("Uplink received on unhandled FPort; drop payload")
+			log.FromContext(ctx).Debug("Uplink received on non-associated FPort; mask payload")
 			loraUp.Payload = nil
 		}
 		return p.sendUplink(ctx, up, loraUp, data)
@@ -186,14 +186,14 @@ func init() {
 	))
 }
 
-func toUint8(x uint8) *uint8 {
+func uint8Ptr(x uint8) *uint8 {
 	return &x
 }
 
-func toUint32(x uint32) *uint32 {
+func uint32Ptr(x uint32) *uint32 {
 	return &x
 }
 
-func toFloat64(x float64) *float64 {
+func float64Ptr(x float64) *float64 {
 	return &x
 }

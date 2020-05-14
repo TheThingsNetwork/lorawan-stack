@@ -109,7 +109,7 @@ func (r ApplicationPackagesRegistry) ListAssociations(ctx context.Context, ids t
 		if limit != 0 {
 			total, err := tx.SCard(uidKey).Result()
 			if err != nil {
-				return ttnredis.ConvertError(err)
+				return err
 			}
 			ttnredis.SetPaginationTotal(ctx, total)
 			opts = append(opts, ttnredis.FindProtosWithOffsetAndCount(offset, limit))
@@ -128,7 +128,7 @@ func (r ApplicationPackagesRegistry) ListAssociations(ctx context.Context, ids t
 		})
 	}, uidKey)
 	if err != nil {
-		return nil, err
+		return nil, ttnredis.ConvertError(err)
 	}
 	return pbs, nil
 }
@@ -264,7 +264,7 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 		return nil
 	}, associationkey)
 	if err != nil {
-		return nil, err
+		return nil, ttnredis.ConvertError(err)
 	}
 	return pb, nil
 }
@@ -294,7 +294,7 @@ func (r ApplicationPackagesRegistry) ListDefaultAssociations(ctx context.Context
 		if limit != 0 {
 			total, err := tx.SCard(uidKey).Result()
 			if err != nil {
-				return ttnredis.ConvertError(err)
+				return err
 			}
 			ttnredis.SetPaginationTotal(ctx, total)
 			opts = append(opts, ttnredis.FindProtosWithOffsetAndCount(offset, limit))
@@ -313,7 +313,7 @@ func (r ApplicationPackagesRegistry) ListDefaultAssociations(ctx context.Context
 		})
 	}, uidKey)
 	if err != nil {
-		return nil, err
+		return nil, ttnredis.ConvertError(err)
 	}
 	return pbs, nil
 }
@@ -445,7 +445,7 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 		return nil
 	}, associationkey)
 	if err != nil {
-		return nil, err
+		return nil, ttnredis.ConvertError(err)
 	}
 	return pb, nil
 }
