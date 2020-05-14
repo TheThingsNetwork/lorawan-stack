@@ -108,8 +108,9 @@ func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 			if err != nil {
 				return err
 			}
+		} else {
+			return errNotImplemented.WithAttributes("name", name)
 		}
-		return errNotImplemented.WithAttributes("name", name)
 	}
 	return nil
 }

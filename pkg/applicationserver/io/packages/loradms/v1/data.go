@@ -68,18 +68,17 @@ func (d *packageData) fromStruct(st *types.Struct) (err error) {
 	}
 	d.token = stringValue.StringValue
 	value, ok = fields[serverURLField]
-	if !ok {
-		return errFieldNotFound.WithAttributes("field", serverURLField)
-	}
-	stringValue, ok = value.GetKind().(*types.Value_StringValue)
-	if !ok {
-		return errInvalidFieldType.WithAttributes(
-			"field", serverURLField,
-			"type", fmt.Sprintf("%T", value),
-		)
-	}
-	if d.serverURL, err = url.Parse(stringValue.StringValue); err != nil {
-		return err
+	if ok {
+		stringValue, ok = value.GetKind().(*types.Value_StringValue)
+		if !ok {
+			return errInvalidFieldType.WithAttributes(
+				"field", serverURLField,
+				"type", fmt.Sprintf("%T", value),
+			)
+		}
+		if d.serverURL, err = url.Parse(stringValue.StringValue); err != nil {
+			return err
+		}
 	}
 	return nil
 }
