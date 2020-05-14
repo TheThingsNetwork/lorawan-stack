@@ -89,7 +89,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 			Type:      objects.UplinkUplinkType,
 			FCnt:      uint32Ptr(msg.GetFCnt()),
 			Port:      uint8Ptr(uint8(msg.GetFPort())),
-			Payload:   toHexPtr(objects.Hex(msg.FRMPayload)),
+			Payload:   hexPtr(objects.Hex(msg.FRMPayload)),
 			DR:        uint8Ptr(uint8(settings.DataRateIndex)),
 			Freq:      uint32Ptr(uint32(settings.Frequency)),
 			Timestamp: float64Ptr(float64(msg.ReceivedAt.UTC().Unix())),
@@ -228,7 +228,7 @@ func float64Ptr(x float64) *float64 {
 	return &x
 }
 
-func toHexPtr(x objects.Hex) *objects.Hex {
+func hexPtr(x objects.Hex) *objects.Hex {
 	return &x
 }
 
