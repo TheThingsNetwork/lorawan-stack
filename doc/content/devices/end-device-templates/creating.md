@@ -19,10 +19,10 @@ You can use the `end-device template create` command to create a template from a
 Pipe the output from getting a device to create a template, for example:
 
 ```bash
-$ ttn-lw-cli device get test-app test-dev \
+$ ttn-lw-cli end-devices get test-app test-dev \
   --lorawan-version \
   --lorawan-phy-version \
-  | ttn-lw-cli end-device template create > template.json
+  | ttn-lw-cli end-devices template create > template.json
 ```
 
 Output:
