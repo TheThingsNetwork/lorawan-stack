@@ -610,7 +610,7 @@
         }
       ]
     },
-    "SetApplicationAssociation": {
+    "SetDefaultAssociation": {
       "file": "lorawan-stack/api/applicationserver_packages.proto",
       "http": [
         {
