@@ -27,7 +27,7 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
@@ -179,20 +179,20 @@ func Proto(e Event) (*ttnpb.Event, error) {
 	if evt.data != nil {
 		var err error
 		if protoMessage, ok := evt.data.(proto.Message); ok {
-			pb.Data, err = types.MarshalAny(protoMessage)
+			pb.Data, err = pbtypes.MarshalAny(protoMessage)
 		} else if errData, ok := evt.data.(error); ok {
 			if ttnErrData, ok := errors.From(errData); ok {
-				pb.Data, err = types.MarshalAny(ttnpb.ErrorDetailsToProto(ttnErrData))
+				pb.Data, err = pbtypes.MarshalAny(ttnpb.ErrorDetailsToProto(ttnErrData))
 			} else {
-				pb.Data, err = types.MarshalAny(&types.StringValue{Value: errData.Error()})
+				pb.Data, err = pbtypes.MarshalAny(&pbtypes.StringValue{Value: errData.Error()})
 			}
 		} else {
 			value, err := gogoproto.Value(evt.data)
 			if err != nil {
 				return nil, err
 			}
-			if _, isNull := value.Kind.(*types.Value_NullValue); !isNull {
-				pb.Data, err = types.MarshalAny(value)
+			if _, isNull := value.Kind.(*pbtypes.Value_NullValue); !isNull {
+				pb.Data, err = pbtypes.MarshalAny(value)
 			}
 		}
 		if err != nil {
@@ -208,36 +208,43 @@ func FromProto(pb *ttnpb.Event) (Event, error) {
 	if err != nil {
 		return nil, err
 	}
-	evt := &event{
-		ctx:        ctx,
-		innerEvent: *pb,
-	}
-	if evt.innerEvent.Data != nil {
-		any, err := types.EmptyAny(evt.innerEvent.Data)
+	var data interface{}
+	if pb.Data != nil {
+		any, err := pbtypes.EmptyAny(pb.Data)
 		if err != nil {
 			return nil, err
 		}
-		err = types.UnmarshalAny(evt.innerEvent.Data, any)
-		if err != nil {
+		if err = pbtypes.UnmarshalAny(pb.Data, any); err != nil {
 			return nil, err
 		}
-		evt.data = any
-		if value, ok := evt.data.(*types.Value); ok {
-			evt.data, err = gogoproto.Interface(value)
+		data = any
+		v, ok := any.(*pbtypes.Value)
+		if ok {
+			iface, err := gogoproto.Interface(v)
 			if err != nil {
 				return nil, err
 			}
+			data = iface
 		}
-		evt.innerEvent.Data = nil
 	}
-	return evt, nil
+	return &event{
+		ctx:  ctx,
+		data: data,
+		innerEvent: ttnpb.Event{
+			Name:           pb.Name,
+			Time:           pb.Time,
+			Identifiers:    pb.Identifiers,
+			CorrelationIDs: pb.CorrelationIDs,
+			Origin:         pb.Origin,
+			Visibility:     pb.Visibility,
+		},
+	}, nil
 }
 
 // UnmarshalJSON unmarshals an event as JSON.
 func UnmarshalJSON(data []byte) (Event, error) {
 	e := new(event)
-	err := json.Unmarshal(data, e)
-	if err != nil {
+	if err := json.Unmarshal(data, e); err != nil {
 		return nil, err
 	}
 	return e, nil
