@@ -16,19 +16,26 @@ package loraclouddevicemanagementv1
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api/objects"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 	"google.golang.org/grpc"
 )
+
+const packageName = "lora-cloud-device-management-v1"
 
 // DeviceManagementPackage is the LoRa Cloud Device Management application package.
 type DeviceManagementPackage struct {
@@ -82,14 +89,14 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 			Type:      objects.UplinkUplinkType,
 			FCnt:      uint32Ptr(msg.GetFCnt()),
 			Port:      uint8Ptr(uint8(msg.GetFPort())),
-			Payload:   objects.Hex(msg.FRMPayload),
+			Payload:   hexPtr(objects.Hex(msg.FRMPayload)),
 			DR:        uint8Ptr(uint8(settings.DataRateIndex)),
 			Freq:      uint32Ptr(uint32(settings.Frequency)),
 			Timestamp: float64Ptr(float64(msg.ReceivedAt.UTC().Unix())),
 		}
 		if fPort != msg.FPort {
-			log.FromContext(ctx).Debug("Uplink received on non-associated FPort; mask payload")
-			loraUp.Payload = nil
+			log.FromContext(ctx).Debug("Uplink received on unhandled FPort; drop payload")
+			loraUp.Payload = &objects.Hex{}
 		}
 		return p.sendUplink(ctx, up, loraUp, data)
 	default:
@@ -123,7 +130,30 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 		return errUplinkRequestFailed.WithCause(errors.New(response.Error))
 	}
 
-	downlink := response.Result.Downlink
+	result := response.Result
+	resultStruct, err := toStruct(&result)
+	if err != nil {
+		return err
+	}
+
+	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loradas:%s", events.NewCorrelationID()))...)
+	now := time.Now().UTC()
+	err = p.server.SendUp(ctx, &ttnpb.ApplicationUp{
+		EndDeviceIdentifiers: up.EndDeviceIdentifiers,
+		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+		ReceivedAt:           &now,
+		Up: &ttnpb.ApplicationUp_ServiceData{
+			ServiceData: &ttnpb.ApplicationServiceData{
+				Data:    resultStruct,
+				Service: packageName,
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	downlink := result.Downlink
 	if downlink == nil {
 		logger.Debug("No downlink to be scheduled from the Device Management Service")
 		return nil
@@ -177,7 +207,7 @@ func (p *DeviceManagementPackage) mergePackageData(def *ttnpb.ApplicationPackage
 
 func init() {
 	packages.RegisterPackage(ttnpb.ApplicationPackage{
-		Name:         "lora-cloud-device-management-v1",
+		Name:         packageName,
 		DefaultFPort: 200,
 	}, packages.CreateApplicationPackage(
 		func(server io.Server, registry packages.Registry) packages.ApplicationPackageHandler {
@@ -196,4 +226,21 @@ func uint32Ptr(x uint32) *uint32 {
 
 func float64Ptr(x float64) *float64 {
 	return &x
+}
+
+func hexPtr(x objects.Hex) *objects.Hex {
+	return &x
+}
+
+func toStruct(i interface{}) (*types.Struct, error) {
+	b, err := jsonpb.TTN().Marshal(i)
+	if err != nil {
+		return nil, err
+	}
+	var st types.Struct
+	err = jsonpb.TTN().Unmarshal(b, &st)
+	if err != nil {
+		return nil, err
+	}
+	return &st, nil
 }

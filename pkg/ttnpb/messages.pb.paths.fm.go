@@ -415,6 +415,15 @@ var ApplicationInvalidatedDownlinksFieldPathsTopLevel = []string{
 	"downlinks",
 	"last_f_cnt_down",
 }
+var ApplicationServiceDataFieldPathsNested = []string{
+	"data",
+	"service",
+}
+
+var ApplicationServiceDataFieldPathsTopLevel = []string{
+	"data",
+	"service",
+}
 var ApplicationUpFieldPathsNested = []string{
 	"correlation_ids",
 	"end_device_ids",
@@ -522,6 +531,9 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.location_solved.location.longitude",
 	"up.location_solved.location.source",
 	"up.location_solved.service",
+	"up.service_data",
+	"up.service_data.data",
+	"up.service_data.service",
 	"up.uplink_message",
 	"up.uplink_message.app_s_key",
 	"up.uplink_message.app_s_key.encrypted_key",

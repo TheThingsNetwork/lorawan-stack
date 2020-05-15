@@ -19,6 +19,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/formatters"
 	mock_server "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mock"
@@ -97,6 +98,9 @@ func TestPubSub(t *testing.T) {
 				},
 				LocationSolved: &ttnpb.ApplicationPubSub_Message{
 					Topic: "location.solved",
+				},
+				ServiceData: &ttnpb.ApplicationPubSub_Message{
+					Topic: "service.data",
 				},
 			},
 			[]string{
@@ -271,6 +275,27 @@ func TestPubSub(t *testing.T) {
 					},
 				},
 				Subscription: conn.LocationSolved,
+			},
+			{
+				Name: "ServiceData",
+				Message: &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: registeredDeviceID,
+					Up: &ttnpb.ApplicationUp_ServiceData{
+						ServiceData: &ttnpb.ApplicationServiceData{
+							Data: &types.Struct{
+								Fields: map[string]*types.Value{
+									"battery": {
+										Kind: &types.Value_NumberValue{
+											NumberValue: 42.0,
+										},
+									},
+								},
+							},
+							Service: "test",
+						},
+					},
+				},
+				Subscription: conn.ServiceData,
 			},
 		} {
 			tcok := t.Run(tc.Name, func(t *testing.T) {

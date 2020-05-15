@@ -2787,6 +2787,16 @@
               "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "service_data",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -3577,6 +3587,16 @@
               "fullType": "ttn.lorawan.v3.ApplicationWebhook.Message",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "service_data",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhook.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhook.Message",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -4025,6 +4045,16 @@
             },
             {
               "name": "location_solved",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhookTemplate.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "service_data",
               "description": "",
               "label": "",
               "type": "Message",
@@ -19452,6 +19482,37 @@
           ]
         },
         {
+          "name": "ApplicationServiceData",
+          "longName": "ApplicationServiceData",
+          "fullName": "ttn.lorawan.v3.ApplicationServiceData",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "service",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "data",
+              "description": "",
+              "label": "",
+              "type": "Struct",
+              "longType": "google.protobuf.Struct",
+              "fullType": "google.protobuf.Struct",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ApplicationUp",
           "longName": "ApplicationUp",
           "fullName": "ttn.lorawan.v3.ApplicationUp",
@@ -19593,6 +19654,16 @@
               "type": "ApplicationLocation",
               "longType": "ApplicationLocation",
               "fullType": "ttn.lorawan.v3.ApplicationLocation",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "service_data",
+              "description": "",
+              "label": "",
+              "type": "ApplicationServiceData",
+              "longType": "ApplicationServiceData",
+              "fullType": "ttn.lorawan.v3.ApplicationServiceData",
               "ismap": false,
               "defaultValue": ""
             }

@@ -8851,6 +8851,9 @@
         },
         "location_solved": {
           "$ref": "#/definitions/v3ApplicationPubSubMessage"
+        },
+        "service_data": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage"
         }
       }
     },
@@ -8897,6 +8900,17 @@
         }
       }
     },
+    "v3ApplicationServiceData": {
+      "type": "object",
+      "properties": {
+        "service": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        }
+      }
+    },
     "v3ApplicationUp": {
       "type": "object",
       "properties": {
@@ -8940,6 +8954,9 @@
         },
         "location_solved": {
           "$ref": "#/definitions/v3ApplicationLocation"
+        },
+        "service_data": {
+          "$ref": "#/definitions/v3ApplicationServiceData"
         }
       }
     },
@@ -9065,6 +9082,9 @@
         },
         "location_solved": {
           "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
+        "service_data": {
+          "$ref": "#/definitions/v3ApplicationWebhookMessage"
         }
       }
     },
@@ -9168,6 +9188,9 @@
           "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
         },
         "location_solved": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "service_data": {
           "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
         }
       }

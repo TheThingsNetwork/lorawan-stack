@@ -81,6 +81,7 @@ message ApplicationWebhookTemplate {
   Message downlink_failed = 16;
   Message downlink_queued = 17;
   Message location_solved = 18;
+  Message service_data = 20;
 }
 
 message ApplicationWebhookTemplates {
@@ -121,6 +122,7 @@ message ApplicationWebhook {
   Message downlink_failed = 12;
   Message downlink_queued = 13;
   Message location_solved = 14;
+  Message service_data = 18;
 }
 
 message ApplicationWebhooks {
