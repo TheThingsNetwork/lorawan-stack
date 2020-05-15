@@ -15,6 +15,7 @@
 package ttnpb
 
 import (
+	"bytes"
 	"strconv"
 	"strings"
 )
@@ -79,4 +80,27 @@ func (v *TxAcknowledgment_Result) UnmarshalJSON(b []byte) error {
 	}
 	*v = TxAcknowledgment_Result(i)
 	return nil
+}
+
+// PartitionDownlinks partitions downlinks based on the general predicate p.
+func PartitionDownlinks(p func(down *ApplicationDownlink) bool, downs ...*ApplicationDownlink) (t, f []*ApplicationDownlink) {
+	t, f = downs[:0:0], downs[:0:0]
+	for _, down := range downs {
+		if p(down) {
+			t = append(t, down)
+		} else {
+			f = append(f, down)
+		}
+	}
+	return t, f
+}
+
+// PartitionDownlinksBySessionKeyID partitions the downlinks based on the session key ID predicate p.
+func PartitionDownlinksBySessionKeyID(p func([]byte) bool, downs ...*ApplicationDownlink) (t, f []*ApplicationDownlink) {
+	return PartitionDownlinks(func(down *ApplicationDownlink) bool { return p(down.SessionKeyID) }, downs...)
+}
+
+// PartitionDownlinksBySessionKeyIDEquality partitions the downlinks based on the equality to the given session key ID.
+func PartitionDownlinksBySessionKeyIDEquality(id []byte, downs ...*ApplicationDownlink) (t, f []*ApplicationDownlink) {
+	return PartitionDownlinksBySessionKeyID(func(downID []byte) bool { return bytes.Equal(downID, id) }, downs...)
 }
