@@ -108,7 +108,7 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 	logger := log.FromContext(ctx)
 	eui := objects.EUI(*up.DevEUI)
 
-	client, err := api.New(http.DefaultClient, api.WithToken(data.token))
+	client, err := api.New(http.DefaultClient, api.WithToken(data.token), api.WithBaseURL(data.serverURL))
 	if err != nil {
 		logger.WithError(err).Debug("Failed to create API client")
 		return err
@@ -192,10 +192,10 @@ func (p *DeviceManagementPackage) mergePackageData(def *ttnpb.ApplicationPackage
 		&defaultData,
 		&associationData,
 	} {
-		if merged.serverURL == nil {
+		if data.serverURL != nil {
 			merged.serverURL = urlutil.CloneURL(data.serverURL)
 		}
-		if merged.token == "" {
+		if data.token != "" {
 			merged.token = data.token
 		}
 	}
