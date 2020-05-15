@@ -584,6 +584,88 @@
           ]
         }
       ]
+    },
+    "GetDefaultAssociation": {
+      "file": "lorawan-stack/api/applicationserver_packages.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{ids.application_ids.application_id}/packages/associations/{ids.f_port}",
+          "parameters": [
+            "ids.application_ids.application_id",
+            "ids.f_port"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "created_at",
+        "data",
+        "ids",
+        "ids.application_ids",
+        "ids.application_ids.application_id",
+        "ids.f_port",
+        "package_name",
+        "updated_at"
+      ]
+    },
+    "ListDefaultAssociations": {
+      "file": "lorawan-stack/api/applicationserver_packages.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{ids.application_id}/packages/associations",
+          "parameters": [
+            "ids.application_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "created_at",
+        "data",
+        "ids",
+        "ids.application_ids",
+        "ids.application_ids.application_id",
+        "ids.f_port",
+        "package_name",
+        "updated_at"
+      ]
+    },
+    "SetDefaultAssociation": {
+      "file": "lorawan-stack/api/applicationserver_packages.proto",
+      "http": [
+        {
+          "method": "put",
+          "pattern": "/as/applications/{default.ids.application_ids.application_id}/packages/associations/{default.ids.f_port}",
+          "body": "*",
+          "parameters": [
+            "default.ids.application_ids.application_id",
+            "default.ids.f_port"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "created_at",
+        "data",
+        "ids",
+        "ids.application_ids",
+        "ids.application_ids.application_id",
+        "ids.f_port",
+        "package_name",
+        "updated_at"
+      ]
+    },
+    "DeleteDefaultAssociation": {
+      "file": "lorawan-stack/api/applicationserver_packages.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/as/applications/{application_ids.application_id}/packages/associations/{f_port}",
+          "parameters": [
+            "application_ids.application_id",
+            "f_port"
+          ]
+        }
+      ]
     }
   },
   "ApplicationPubSubRegistry": {
@@ -649,6 +731,8 @@
         "provider.mqtt.username",
         "provider.nats",
         "provider.nats.server_url",
+        "service_data",
+        "service_data.topic",
         "updated_at",
         "uplink_message",
         "uplink_message.topic"
@@ -705,6 +789,8 @@
         "provider.mqtt.username",
         "provider.nats",
         "provider.nats.server_url",
+        "service_data",
+        "service_data.topic",
         "updated_at",
         "uplink_message",
         "uplink_message.topic"
@@ -771,6 +857,8 @@
         "provider.mqtt.username",
         "provider.nats",
         "provider.nats.server_url",
+        "service_data",
+        "service_data.topic",
         "updated_at",
         "uplink_message",
         "uplink_message.topic"
@@ -839,6 +927,8 @@
         "location_solved.path",
         "logo_url",
         "name",
+        "service_data",
+        "service_data.path",
         "uplink_message",
         "uplink_message.path"
       ]
@@ -879,6 +969,8 @@
         "location_solved.path",
         "logo_url",
         "name",
+        "service_data",
+        "service_data.path",
         "uplink_message",
         "uplink_message.path"
       ]
@@ -919,6 +1011,8 @@
         "join_accept.path",
         "location_solved",
         "location_solved.path",
+        "service_data",
+        "service_data.path",
         "template_fields",
         "template_ids",
         "template_ids.template_id",
@@ -962,6 +1056,8 @@
         "join_accept.path",
         "location_solved",
         "location_solved.path",
+        "service_data",
+        "service_data.path",
         "template_fields",
         "template_ids",
         "template_ids.template_id",
@@ -1015,6 +1111,8 @@
         "join_accept.path",
         "location_solved",
         "location_solved.path",
+        "service_data",
+        "service_data.path",
         "template_fields",
         "template_ids",
         "template_ids.template_id",

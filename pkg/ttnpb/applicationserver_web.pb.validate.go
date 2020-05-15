@@ -614,6 +614,18 @@ func (m *ApplicationWebhookTemplate) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "service_data":
+
+			if v, ok := interface{}(m.GetServiceData()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookTemplateValidationError{
+						field:  "service_data",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return ApplicationWebhookTemplateValidationError{
 				field:  name,
@@ -972,6 +984,18 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationWebhookValidationError{
 						field:  "location_solved",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "service_data":
+
+			if v, ok := interface{}(m.GetServiceData()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookValidationError{
+						field:  "service_data",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

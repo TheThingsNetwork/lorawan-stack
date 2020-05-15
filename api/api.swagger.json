@@ -1171,6 +1171,43 @@
         ]
       }
     },
+    "/as/applications/{application_ids.application_id}/packages/associations/{f_port}": {
+      "delete": {
+        "operationId": "ApplicationPackageRegistry_DeleteDefaultAssociation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "f_port",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "ApplicationPackageRegistry"
+        ]
+      }
+    },
     "/as/applications/{application_id}/link": {
       "delete": {
         "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
@@ -1305,6 +1342,51 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v3SetApplicationPackageAssociationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationPackageRegistry"
+        ]
+      }
+    },
+    "/as/applications/{default.ids.application_ids.application_id}/packages/associations/{default.ids.f_port}": {
+      "put": {
+        "operationId": "ApplicationPackageRegistry_SetDefaultAssociation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPackageDefaultAssociation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "default.ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "default.ids.f_port",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetApplicationPackageDefaultAssociationRequest"
             }
           }
         ],
@@ -1674,6 +1756,111 @@
             "required": false,
             "type": "string",
             "format": "byte"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.\nEach page is ordered by the FPort.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ApplicationPackageRegistry"
+        ]
+      }
+    },
+    "/as/applications/{ids.application_ids.application_id}/packages/associations/{ids.f_port}": {
+      "get": {
+        "operationId": "ApplicationPackageRegistry_GetDefaultAssociation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPackageDefaultAssociation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "ids.f_port",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ApplicationPackageRegistry"
+        ]
+      }
+    },
+    "/as/applications/{ids.application_id}/packages/associations": {
+      "get": {
+        "operationId": "ApplicationPackageRegistry_ListDefaultAssociations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPackageDefaultAssociations"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
           },
           {
             "name": "limit",
@@ -8549,6 +8736,51 @@
         }
       }
     },
+    "v3ApplicationPackageDefaultAssociation": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "$ref": "#/definitions/v3ApplicationPackageDefaultAssociationIdentifiers"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "package_name": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        }
+      }
+    },
+    "v3ApplicationPackageDefaultAssociationIdentifiers": {
+      "type": "object",
+      "properties": {
+        "application_ids": {
+          "$ref": "#/definitions/v3ApplicationIdentifiers"
+        },
+        "f_port": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "v3ApplicationPackageDefaultAssociations": {
+      "type": "object",
+      "properties": {
+        "defaults": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ApplicationPackageDefaultAssociation"
+          }
+        }
+      }
+    },
     "v3ApplicationPackages": {
       "type": "object",
       "properties": {
@@ -8619,6 +8851,9 @@
         },
         "location_solved": {
           "$ref": "#/definitions/v3ApplicationPubSubMessage"
+        },
+        "service_data": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage"
         }
       }
     },
@@ -8665,6 +8900,17 @@
         }
       }
     },
+    "v3ApplicationServiceData": {
+      "type": "object",
+      "properties": {
+        "service": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        }
+      }
+    },
     "v3ApplicationUp": {
       "type": "object",
       "properties": {
@@ -8708,6 +8954,9 @@
         },
         "location_solved": {
           "$ref": "#/definitions/v3ApplicationLocation"
+        },
+        "service_data": {
+          "$ref": "#/definitions/v3ApplicationServiceData"
         }
       }
     },
@@ -8833,6 +9082,9 @@
         },
         "location_solved": {
           "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
+        "service_data": {
+          "$ref": "#/definitions/v3ApplicationWebhookMessage"
         }
       }
     },
@@ -8936,6 +9188,9 @@
           "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
         },
         "location_solved": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "service_data": {
           "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
         }
       }
@@ -12250,6 +12505,17 @@
       "properties": {
         "association": {
           "$ref": "#/definitions/v3ApplicationPackageAssociation"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask"
+        }
+      }
+    },
+    "v3SetApplicationPackageDefaultAssociationRequest": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "$ref": "#/definitions/v3ApplicationPackageDefaultAssociation"
         },
         "field_mask": {
           "$ref": "#/definitions/protobufFieldMask"

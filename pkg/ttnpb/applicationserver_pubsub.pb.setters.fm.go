@@ -359,6 +359,31 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 					dst.LocationSolved = nil
 				}
 			}
+		case "service_data":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationPubSub_Message
+				if (src == nil || src.ServiceData == nil) && dst.ServiceData == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ServiceData
+				}
+				if dst.ServiceData != nil {
+					newDst = dst.ServiceData
+				} else {
+					newDst = &ApplicationPubSub_Message{}
+					dst.ServiceData = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ServiceData = src.ServiceData
+				} else {
+					dst.ServiceData = nil
+				}
+			}
 
 		case "provider":
 			if len(subs) == 0 && src == nil {

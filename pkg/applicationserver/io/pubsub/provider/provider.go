@@ -38,6 +38,7 @@ type Target interface {
 	GetDownlinkFailed() *ttnpb.ApplicationPubSub_Message
 	GetDownlinkQueued() *ttnpb.ApplicationPubSub_Message
 	GetLocationSolved() *ttnpb.ApplicationPubSub_Message
+	GetServiceData() *ttnpb.ApplicationPubSub_Message
 }
 
 // Provider represents a PubSub service provider.

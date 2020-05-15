@@ -121,3 +121,81 @@ var SetApplicationPackageAssociationRequestFieldPathsTopLevel = []string{
 	"association",
 	"field_mask",
 }
+var ApplicationPackageDefaultAssociationIdentifiersFieldPathsNested = []string{
+	"application_ids",
+	"application_ids.application_id",
+	"f_port",
+}
+
+var ApplicationPackageDefaultAssociationIdentifiersFieldPathsTopLevel = []string{
+	"application_ids",
+	"f_port",
+}
+var ApplicationPackageDefaultAssociationFieldPathsNested = []string{
+	"created_at",
+	"data",
+	"ids",
+	"ids.application_ids",
+	"ids.application_ids.application_id",
+	"ids.f_port",
+	"package_name",
+	"updated_at",
+}
+
+var ApplicationPackageDefaultAssociationFieldPathsTopLevel = []string{
+	"created_at",
+	"data",
+	"ids",
+	"package_name",
+	"updated_at",
+}
+var ApplicationPackageDefaultAssociationsFieldPathsNested = []string{
+	"defaults",
+}
+
+var ApplicationPackageDefaultAssociationsFieldPathsTopLevel = []string{
+	"defaults",
+}
+var GetApplicationPackageDefaultAssociationRequestFieldPathsNested = []string{
+	"field_mask",
+	"ids",
+	"ids.application_ids",
+	"ids.application_ids.application_id",
+	"ids.f_port",
+}
+
+var GetApplicationPackageDefaultAssociationRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"ids",
+}
+var ListApplicationPackageDefaultAssociationRequestFieldPathsNested = []string{
+	"field_mask",
+	"ids",
+	"ids.application_id",
+	"limit",
+	"page",
+}
+
+var ListApplicationPackageDefaultAssociationRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"ids",
+	"limit",
+	"page",
+}
+var SetApplicationPackageDefaultAssociationRequestFieldPathsNested = []string{
+	"default",
+	"default.created_at",
+	"default.data",
+	"default.ids",
+	"default.ids.application_ids",
+	"default.ids.application_ids.application_id",
+	"default.ids.f_port",
+	"default.package_name",
+	"default.updated_at",
+	"field_mask",
+}
+
+var SetApplicationPackageDefaultAssociationRequestFieldPathsTopLevel = []string{
+	"default",
+	"field_mask",
+}

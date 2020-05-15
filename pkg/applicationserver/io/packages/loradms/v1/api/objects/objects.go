@@ -26,6 +26,14 @@ import (
 
 // Implemented as per https://www.loracloud.com/documentation/device_management?url=v1.html#object-formats
 
+type PendingRequests struct {
+	// Upcount is the "upcount" communicated to modem.
+	Upcount uint8 `json:"upcount"`
+	// Updelay is the "updelay" communicated to modem.
+	Updelay  uint8            `json:"updelay"`
+	Requests []PendingRequest `json:"requests"`
+}
+
 // DeviceInfo encapsulates the current state of a modem as known to the server.
 type DeviceInfo struct {
 	// DMPorts contains the ports currently accepted as "dmport".
@@ -35,14 +43,8 @@ type DeviceInfo struct {
 	// UploadSessions contains the current upload sessions.
 	UploadSessions []UploadSession `json:"upload_sessions"`
 	// StreamSessions contains the current streaming sessions.
-	StreamSessions  []StreamSession `json:"stream_sessions"`
-	PendingRequests []struct {
-		// Upcount is the "upcount" communicated to modem.
-		Upcount uint8 `json:"upcount"`
-		// Updelay is the "updelay" communicated to modem.
-		Updelay  uint8            `json:"updelay"`
-		Requests []PendingRequest `json:"requests"`
-	} `json:"pending_requests"`
+	StreamSessions  []StreamSession  `json:"stream_sessions"`
+	PendingRequests *PendingRequests `json:"pending_requests"`
 	// LogMessages contains the from service related to this device.
 	LogMessages []LogMessage `json:"log_messages"`
 	// UploadedFiles contains the history of uploaded files.
@@ -79,14 +81,29 @@ func (d DeviceUplinkResponses) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// PositionSolution is the solution of a position calculation.
+type PositionSolution struct {
+	ECEF           []float64 `json:"ecef"`
+	LLH            []float64 `json:"llh"`
+	CaptureTimeGPS float64   `json:"capture_time_gps"`
+	GDOP           float64   `json:"gdop"`
+	Accuracy       float64   `json:"accuracy"`
+	Timestamp      float64   `json:"timestamp"`
+}
+
 // UplinkResponse contains the state changes and completed items due to an uplink message.
 type UplinkResponse struct {
-	File              *File            `json:"file"`
-	StreamRecords     []Stream         `json:"stream_records"`
-	FullfiledRequests []PendingRequest `json:"fulfilled_requests"`
-	Downlink          *LoRaDnlink      `json:"dnlink"`
-	InfoFields        InfoFields       `json:"info_fields"`
-	LogMessages       []LogMessage     `json:"log_messages"`
+	File                  *File             `json:"file"`
+	StreamRecords         []Stream          `json:"stream_records"`
+	PositionSolution      *PositionSolution `json:"position_solution"`
+	PendingRequests       *PendingRequests  `json:"pending_requests"`
+	FullfiledRequests     []Request         `json:"fulfilled_requests"`
+	Downlink              *LoRaDnlink       `json:"dnlink"`
+	InfoFields            InfoFields        `json:"info_fields"`
+	LogMessages           []LogMessage      `json:"log_messages"`
+	UploadedFiles         []File            `json:"uploaded_files"`
+	UploadedStreamRecords []Stream          `json:"uploaded_stream_records"`
+	LastUplink            *LoRaUplink       `json:"last_uplink"`
 }
 
 // InfoFields contains the value of the various information fields and the timestamp of their last update.
@@ -405,11 +422,11 @@ type StreamSession struct {
 }
 
 // DeviceUplinks maps device EUIs to LoRaUplink
-type DeviceUplinks map[EUI]LoRaUplink
+type DeviceUplinks map[EUI]*LoRaUplink
 
 // MarshalJSON implements json.Marshaler.
 func (u DeviceUplinks) MarshalJSON() ([]byte, error) {
-	m := make(map[string]LoRaUplink)
+	m := make(map[string]*LoRaUplink)
 	for k, v := range u {
 		m[k.String()] = v
 	}
@@ -418,24 +435,81 @@ func (u DeviceUplinks) MarshalJSON() ([]byte, error) {
 
 // LoRaUplink encapsulates the information of a LoRa message.
 type LoRaUplink struct {
-	FCnt      uint32  `json:"fcnt"`
-	Port      uint8   `json:"port"`
-	Payload   Hex     `json:"payload"`
-	DR        uint8   `json:"dr"`
-	Freq      uint32  `json:"freq"`
-	Timestamp float64 `json:"timestamp"`
+	Type LoRaUplinkType `json:"msgtype"`
+
+	FCnt        *uint32  `json:"fcnt,omitempty"`
+	Port        *uint8   `json:"port,omitempty"`
+	Payload     *Hex     `json:"payload,omitempty"`
+	DR          *uint8   `json:"dr,omitempty"`
+	Freq        *uint32  `json:"freq,omitempty"`
+	Timestamp   *float64 `json:"timestamp,omitempty"`
+	DownlinkMTU *uint32  `json:"dn_mtu,omitempty"`
+
+	GNSSCaptureTime         *float64  `json:"gnss_capture_time,omitempty"`
+	GNSSCaptureTimeAccuracy *float64  `json:"gnss_capture_time_accuracy,omitempty"`
+	GNSSAssistPosition      []float64 `json:"gnss_assist_position,omitempty"`
+	GNSSAssistAltitude      *float64  `json:"gnss_assist_altitude,omitempty"`
+	GNSSUse2DSolver         *bool     `json:"gnss_use_2D_solver,omitempty"`
 }
 
-// Fields implements log.Fielder.
-func (u LoRaUplink) Fields() map[string]interface{} {
-	return map[string]interface{}{
-		"f_cnt":     u.FCnt,
-		"port":      u.Port,
-		"payload":   u.Payload,
-		"dr":        u.DR,
-		"frequency": u.Freq,
-		"timestamp": u.Timestamp,
+type LoRaUplinkType uint8
+
+const (
+	// UplinkUplinkType is LoRaWAN Message Type.
+	UplinkUplinkType LoRaUplinkType = iota
+	// ModemUplinkType is DAS Protocol Message Type.
+	ModemUplinkType
+	// JoiningUplinkType is Session Reset Message Type.
+	JoiningUplinkType
+	// GNSSUplinkType is DAS GNSS Message Type.
+	GNSSUplinkType
+)
+
+const (
+	uplinkUplinkType  = "updf"
+	modemUplinkType   = "modem"
+	joiningUplinkType = "joining"
+	gnssUplinkType    = "gnss"
+)
+
+// MarshalJSON implements the json.Marshaler interface.
+func (t LoRaUplinkType) MarshalJSON() ([]byte, error) {
+	var tp string
+	switch t {
+	case UplinkUplinkType:
+		tp = uplinkUplinkType
+	case ModemUplinkType:
+		tp = modemUplinkType
+	case JoiningUplinkType:
+		tp = joiningUplinkType
+	case GNSSUplinkType:
+		tp = gnssUplinkType
+	default:
+		panic(fmt.Sprintf("LoRaUplinkType %v is unsupported", t))
 	}
+	return json.Marshal(tp)
+}
+
+// UnmarshalJSON implements the json.Unarmshaler.
+func (t *LoRaUplinkType) UnmarshalJSON(b []byte) error {
+	var tp string
+	err := json.Unmarshal(b, &tp)
+	if err != nil {
+		return err
+	}
+	switch tp {
+	case uplinkUplinkType:
+		*t = UplinkUplinkType
+	case modemUplinkType:
+		*t = ModemUplinkType
+	case joiningUplinkType:
+		*t = JoiningUplinkType
+	case gnssUplinkType:
+		*t = GNSSUplinkType
+	default:
+		panic(fmt.Sprintf("LoRaUplinkType %v is unsupported", t))
+	}
+	return nil
 }
 
 // LoRaDnlink is a specification for a modem device.

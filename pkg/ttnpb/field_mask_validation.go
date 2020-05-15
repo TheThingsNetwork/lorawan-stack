@@ -82,9 +82,12 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 	"/ttn.lorawan.v3.ApplicationPubSubRegistry/Set":  ApplicationPubSubFieldPathsNested,
 
 	// Application Packages:
-	"/ttn.lorawan.v3.ApplicationPackageRegistry/GetAssociation":   ApplicationPackageAssociationFieldPathsNested,
-	"/ttn.lorawan.v3.ApplicationPackageRegistry/ListAssociations": ApplicationPackageAssociationFieldPathsNested,
-	"/ttn.lorawan.v3.ApplicationPackageRegistry/SetAssociation":   ApplicationPackageAssociationFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/GetAssociation":          ApplicationPackageAssociationFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/ListAssociations":        ApplicationPackageAssociationFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/SetAssociation":          ApplicationPackageAssociationFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/GetDefaultAssociation":   ApplicationPackageDefaultAssociationFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/ListDefaultAssociations": ApplicationPackageDefaultAssociationFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/SetDefaultAssociation":   ApplicationPackageDefaultAssociationFieldPathsNested,
 
 	// Application Links:
 	"/ttn.lorawan.v3.As/GetLink": ApplicationLinkFieldPathsNested,

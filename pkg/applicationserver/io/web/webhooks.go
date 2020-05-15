@@ -366,6 +366,8 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 		cfg = hook.DownlinkQueued
 	case *ttnpb.ApplicationUp_LocationSolved:
 		cfg = hook.LocationSolved
+	case *ttnpb.ApplicationUp_ServiceData:
+		cfg = hook.ServiceData
 	}
 	if cfg == nil {
 		return nil, nil

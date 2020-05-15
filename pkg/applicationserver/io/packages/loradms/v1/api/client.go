@@ -37,21 +37,22 @@ func (f OptionFunc) apply(c *Client) { f(c) }
 
 // Client is an API client for the LoRa Cloud Device Management v1 service.
 type Client struct {
-	token string
-	cl    *http.Client
+	token   string
+	baseURL *url.URL
+	cl      *http.Client
 
 	Tokens  *Tokens
 	Uplinks *Uplinks
 }
 
 const (
-	baseURL     = "https://das.loracloud.com/api/v1"
-	contentType = "application/json"
+	contentType      = "application/json"
+	defaultServerURL = "https://das.loracloud.com/api/v1"
 )
 
 var (
-	userAgent     = "ttn-lw-application-server/" + version.TTN
-	parsedBaseURL *url.URL
+	userAgent        = "ttn-lw-application-server/" + version.TTN
+	DefaultServerURL *url.URL
 )
 
 type queryParam struct {
@@ -59,7 +60,7 @@ type queryParam struct {
 }
 
 func (c *Client) newRequest(method, category, entity, operation string, body io.Reader, queryParams ...queryParam) (*http.Request, error) {
-	u := urlutil.CloneURL(parsedBaseURL)
+	u := urlutil.CloneURL(c.baseURL)
 	u.Path = path.Join(u.Path, category, entity, operation)
 	q := u.Query()
 	for _, p := range queryParams {
@@ -94,10 +95,18 @@ func WithToken(token string) Option {
 	})
 }
 
+// WithBaseURL uses the given base URL for the requests of the client.
+func WithBaseURL(baseURL *url.URL) Option {
+	return OptionFunc(func(c *Client) {
+		c.baseURL = baseURL
+	})
+}
+
 // New creates a new Client with the given options.
 func New(cl *http.Client, opts ...Option) (*Client, error) {
 	client := &Client{
-		cl: cl,
+		cl:      cl,
+		baseURL: urlutil.CloneURL(DefaultServerURL),
 	}
 	client.Tokens = &Tokens{client}
 	client.Uplinks = &Uplinks{client}
@@ -109,7 +118,7 @@ func New(cl *http.Client, opts ...Option) (*Client, error) {
 
 func init() {
 	var err error
-	parsedBaseURL, err = url.Parse(baseURL)
+	DefaultServerURL, err = url.Parse(defaultServerURL)
 	if err != nil {
 		panic(fmt.Sprintf("loradms: failed to parse base URL: %v", err))
 	}

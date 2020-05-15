@@ -109,7 +109,7 @@ func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifi
 }
 
 type mockPackageHandler struct {
-	HandleUpFunc func(context.Context, *ttnpb.ApplicationPackageAssociation, *ttnpb.ApplicationUp) error
+	HandleUpFunc func(context.Context, *ttnpb.ApplicationPackageDefaultAssociation, *ttnpb.ApplicationPackageAssociation, *ttnpb.ApplicationUp) error
 }
 
 func (h *mockPackageHandler) Roles() []ttnpb.ClusterRole {
@@ -120,11 +120,11 @@ func (h *mockPackageHandler) RegisterServices(s *grpc.Server) {}
 
 func (h *mockPackageHandler) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {}
 
-func (h *mockPackageHandler) HandleUp(ctx context.Context, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) error {
+func (h *mockPackageHandler) HandleUp(ctx context.Context, defaultAssoc *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) error {
 	if h.HandleUpFunc == nil {
 		panic("HandleUp called but HandleUpFunc is nil")
 	}
-	return h.HandleUpFunc(ctx, assoc, up)
+	return h.HandleUpFunc(ctx, defaultAssoc, assoc, up)
 }
 
 type handleUpRequest struct {
@@ -135,7 +135,7 @@ type handleUpRequest struct {
 
 func createMockPackageHandler(ch chan<- *handleUpRequest) *mockPackageHandler {
 	return &mockPackageHandler{
-		HandleUpFunc: func(ctx context.Context, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) error {
+		HandleUpFunc: func(ctx context.Context, defaultAssoc *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) error {
 			ch <- &handleUpRequest{ctx, assoc, up}
 			return nil
 		},
