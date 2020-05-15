@@ -52,6 +52,7 @@ type UplinkTopics struct {
 	DownlinkFailed *pubsub.Topic
 	DownlinkQueued *pubsub.Topic
 	LocationSolved *pubsub.Topic
+	ServiceData    *pubsub.Topic
 }
 
 // Shutdown shutdowns the active topics.
@@ -65,6 +66,7 @@ func (ut *UplinkTopics) Shutdown(ctx context.Context) error {
 		ut.DownlinkFailed,
 		ut.DownlinkQueued,
 		ut.LocationSolved,
+		ut.ServiceData,
 	} {
 		if topic != nil {
 			if err := topic.Shutdown(ctx); err != nil && !errors.IsCanceled(err) {

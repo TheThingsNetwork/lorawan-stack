@@ -56,7 +56,7 @@ func TestUplinks(t *testing.T) {
 							eui: &objects.LoRaUplink{
 								FCnt:      uint32Ptr(42),
 								Port:      uint8Ptr(200),
-								Payload:   objects.Hex{0x03, 0x04},
+								Payload:   hexPtr(objects.Hex{0x03, 0x04}),
 								DR:        uint8Ptr(4),
 								Freq:      uint32Ptr(865000000),
 								Timestamp: float64Ptr(100.0),
@@ -106,5 +106,9 @@ func uint32Ptr(x uint32) *uint32 {
 }
 
 func float64Ptr(x float64) *float64 {
+	return &x
+}
+
+func hexPtr(x objects.Hex) *objects.Hex {
 	return &x
 }

@@ -271,6 +271,11 @@ message ApplicationInvalidatedDownlinks {
   uint32 last_f_cnt_down = 2;
 }
 
+message ApplicationServiceData {
+  string service = 1;
+  google.protobuf.Struct data = 2;
+}
+
 message ApplicationUp {
   EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
@@ -289,6 +294,7 @@ message ApplicationUp {
     ApplicationDownlink downlink_queued = 9;
     ApplicationInvalidatedDownlinks downlink_queue_invalidated = 10;
     ApplicationLocation location_solved = 11;
+    ApplicationServiceData service_data = 13;
   }
 }
 

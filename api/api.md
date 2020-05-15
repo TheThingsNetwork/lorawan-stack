@@ -334,6 +334,7 @@
   - [Message `ApplicationJoinAccept`](#ttn.lorawan.v3.ApplicationJoinAccept)
   - [Message `ApplicationLocation`](#ttn.lorawan.v3.ApplicationLocation)
   - [Message `ApplicationLocation.AttributesEntry`](#ttn.lorawan.v3.ApplicationLocation.AttributesEntry)
+  - [Message `ApplicationServiceData`](#ttn.lorawan.v3.ApplicationServiceData)
   - [Message `ApplicationUp`](#ttn.lorawan.v3.ApplicationUp)
   - [Message `ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink)
   - [Message `DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage)
@@ -1066,6 +1067,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `downlink_failed` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 | `downlink_queued` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 | `location_solved` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
+| `service_data` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 
 #### Field Rules
 
@@ -1251,6 +1253,7 @@ The NATS provider settings.
 | `downlink_failed` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `downlink_queued` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `location_solved` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+| `service_data` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 
 #### Field Rules
 
@@ -1330,6 +1333,7 @@ The NATS provider settings.
 | `downlink_failed` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `downlink_queued` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `location_solved` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
+| `service_data` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 
 #### Field Rules
 
@@ -4808,6 +4812,13 @@ The UplinkMessageProcessor service processes uplink messages.
 | `key` | [`string`](#string) |  |  |
 | `value` | [`string`](#string) |  |  |
 
+### <a name="ttn.lorawan.v3.ApplicationServiceData">Message `ApplicationServiceData`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `service` | [`string`](#string) |  |  |
+| `data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
+
 ### <a name="ttn.lorawan.v3.ApplicationUp">Message `ApplicationUp`</a>
 
 | Field | Type | Label | Description |
@@ -4824,6 +4835,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | `downlink_queued` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
 | `downlink_queue_invalidated` | [`ApplicationInvalidatedDownlinks`](#ttn.lorawan.v3.ApplicationInvalidatedDownlinks) |  |  |
 | `location_solved` | [`ApplicationLocation`](#ttn.lorawan.v3.ApplicationLocation) |  |  |
+| `service_data` | [`ApplicationServiceData`](#ttn.lorawan.v3.ApplicationServiceData) |  |  |
 
 #### Field Rules
 

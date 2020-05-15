@@ -439,7 +439,7 @@ type LoRaUplink struct {
 
 	FCnt        *uint32  `json:"fcnt,omitempty"`
 	Port        *uint8   `json:"port,omitempty"`
-	Payload     Hex      `json:"payload,omitempty"`
+	Payload     *Hex     `json:"payload,omitempty"`
 	DR          *uint8   `json:"dr,omitempty"`
 	Freq        *uint32  `json:"freq,omitempty"`
 	Timestamp   *float64 `json:"timestamp,omitempty"`
