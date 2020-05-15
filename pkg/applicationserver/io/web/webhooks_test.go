@@ -337,6 +337,8 @@ func TestWebhooks(t *testing.T) {
 										},
 									},
 								},
+								OK:  true,
+								URL: fmt.Sprintf("%s/service/data", baseURL),
 							},
 						} {
 							t.Run(tc.Name, func(t *testing.T) {
