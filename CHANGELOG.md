@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clearing end device events list in the Console.
 - Some views not being accessible in the OAuth app (e.g. update password).
 - `LinkADRReq` scheduling.
+- Unsetting NwkKey in Join Server.
 
 ### Security
 
