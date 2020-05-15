@@ -3,7 +3,7 @@ title: Export End Devices From V2
 weight: 40
 ---
 
-In this step, the end devices from **{{% ttnv2 %}}** will be exported in a JSON format that can then be parsed and imported by {{% tts %}}.
+In this step, the end devices from {{% ttnv2 %}} will be exported in a JSON format that can then be parsed and imported by {{% tts %}}.
 
 The exported end devices contain the device name, description, location data, activation mode (ABP/OTAA), root keys and the AppEUI. They also contain the session keys, so your OTAA devices can simply keep working with {{% tts %}}.
 

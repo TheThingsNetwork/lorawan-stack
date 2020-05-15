@@ -4,7 +4,7 @@ weight: 15
 description: Install and configure CLI tools
 ---
 
-You will need to use the latest version of `ttnctl`, the CLI for **{{% ttnv2 %}}**. Follow the [instructions from The Things Network documentation][1]. An overview is given below:
+You will need to use the latest version of `ttnctl`, the CLI for {{% ttnv2 %}}. Follow the [instructions from The Things Network documentation][1]. An overview is given below:
 
 Download `ttnctl` [for your operating system][2].
 
