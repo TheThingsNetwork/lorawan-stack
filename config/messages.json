@@ -1943,15 +1943,6 @@
       "file": "format.go"
     }
   },
-  "error:pkg/applicationserver/io/web:http": {
-    "translations": {
-      "en": "HTTP error: {message}"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/web",
-      "file": "webhooks.go"
-    }
-  },
   "error:pkg/applicationserver/io/web:parse_file": {
     "translations": {
       "en": "could not parse file"
