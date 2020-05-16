@@ -16,7 +16,7 @@ package gatewayconfigurationserver
 
 import (
 	bscups "go.thethings.network/lorawan-stack/v3/pkg/basicstation/cups"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver/gcsv2"
+	gcsv2 "go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver/v2"
 )
 
 // Config contains the Gateway Configuration Server configuration.

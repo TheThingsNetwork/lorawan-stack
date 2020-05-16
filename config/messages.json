@@ -3302,13 +3302,13 @@
       "file": "frequencyplans.go"
     }
   },
-  "error:pkg/gatewayconfigurationserver/gcsv2:unauthenticated": {
+  "error:pkg/gatewayconfigurationserver/v2:unauthenticated": {
     "translations": {
-      "en": "call was not authenticated"
+      "en": "unauthenticated"
     },
     "description": {
-      "package": "pkg/gatewayconfigurationserver/gcsv2",
-      "file": "get_gateway.go"
+      "package": "pkg/gatewayconfigurationserver/v2",
+      "file": "http_gateway.go"
     }
   },
   "error:pkg/gatewayserver/io/basicstationlns/messages:data_rate": {

@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gcsv2
+package gatewayconfigurationserver
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -22,11 +23,12 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/types"
-	echo "github.com/labstack/echo/v4"
+	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
 type antennaLocation struct {
@@ -62,24 +64,25 @@ type gatewayInfoResponse struct {
 	FallbackRouters  []*router        `json:"fallback_routers,omitempty"`
 }
 
-var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
+var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
 
-func (s *Server) handleGetGateway(c echo.Context) error {
-	ctx := c.Request().Context()
-
-	gatewayIDs := ttnpb.GatewayIdentifiers{
-		GatewayID: c.Param("gateway_id"),
+func (s *Server) handleGetGateway(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	id := ttnpb.GatewayIdentifiers{
+		GatewayID: mux.Vars(r)["gateway_id"],
 	}
-	if err := gatewayIDs.ValidateContext(ctx); err != nil {
-		return err
+	if err := id.ValidateContext(ctx); err != nil {
+		webhandlers.Error(w, r, err)
+		return
 	}
 
-	registry, err := s.getRegistry(ctx, &gatewayIDs)
+	registry, err := s.getRegistry(ctx, &id)
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
 	gateway, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIdentifiers: gatewayIDs,
+		GatewayIdentifiers: id,
 		FieldMask: types.FieldMask{Paths: []string{
 			"description",
 			"attributes",
@@ -91,25 +94,28 @@ func (s *Server) handleGetGateway(c echo.Context) error {
 		}},
 	}, s.getAuth(ctx))
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
 
 	md := rpcmetadata.FromIncomingContext(ctx)
 	switch md.AuthType {
 	case "bearer":
-		if err := rights.RequireGateway(ctx, gatewayIDs, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
-			return err
+		if err := rights.RequireGateway(ctx, id, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
+			webhandlers.Error(w, r, err)
+			return
 		}
 	case "key":
 		keyAttr, ok := gateway.Attributes["key"]
 		if !ok || md.AuthValue != keyAttr {
-			return errUnauthenticated.New()
+			webhandlers.Error(w, r, errUnauthenticated.New())
+			return
 		}
 	default:
 		gateway = gateway.PublicSafe()
 	}
 
-	freqPlanURL := s.inferServerAddress(c) + compatAPIPrefix + "/frequency-plans/" + gateway.FrequencyPlanID
+	freqPlanURL := s.inferServerAddress(r) + "/api/v2/frequency-plans/" + gateway.FrequencyPlanID
 
 	var rtr *router
 	if gateway.GatewayServerAddress != "" {
@@ -118,67 +124,63 @@ func (s *Server) handleGetGateway(c echo.Context) error {
 		}
 		rtr.MQTTAddress, err = s.inferMQTTAddress(gateway.GatewayServerAddress)
 		if err != nil {
-			return err
+			webhandlers.Error(w, r, err)
+			return
 		}
 	}
 
-	response := &gatewayInfoResponse{
-		ID:               gateway.GatewayID,
+	res := &gatewayInfoResponse{
 		FrequencyPlan:    gateway.FrequencyPlanID,
 		FrequencyPlanURL: freqPlanURL,
 		AutoUpdate:       gateway.AutoUpdate,
 	}
 
-	if rtr != nil {
-		response.Router = rtr
-		response.FallbackRouters = []*router{rtr}
-	}
-
-	if gateway.Description != "" {
-		response.Attributes = &attributes{
-			Description: gateway.Description,
+	switch r.Header.Get("User-Agent") {
+	case "TTNGateway": // The Things Kickstarter Gateway
+		res.FirmwareURL = s.ttkgFirmwareURL(gateway.UpdateChannel)
+		if rtr != nil {
+			res.Router = &router{
+				MQTTAddress: rtr.MQTTAddress,
+			}
 		}
-	}
-
-	if len(gateway.Antennas) > 0 {
-		response.AntennaLocation = &antennaLocation{
-			Latitude:  gateway.Antennas[0].Location.Latitude,
-			Longitude: gateway.Antennas[0].Location.Longitude,
-			Altitude:  gateway.Antennas[0].Location.Altitude,
+	default:
+		res.ID = gateway.GatewayID
+		if rtr != nil {
+			res.Router = rtr
+			res.FallbackRouters = []*router{rtr}
 		}
-	}
-
-	if c.Request().Header.Get("User-Agent") == "TTNGateway" {
-		s.setTTKGFirmwareURL(response, gateway)
-	}
-
-	if token, ok := gateway.Attributes["token"]; ok {
-		response.Token = &oauth2Token{
-			AccessToken: token,
-			ExpiresIn:   uint32((24 * time.Hour).Seconds()),
+		if gateway.Description != "" {
+			res.Attributes = &attributes{
+				Description: gateway.Description,
+			}
 		}
-		if tokenExpires, ok := gateway.Attributes["token_expires"]; ok {
-			if t, err := time.Parse(time.RFC3339, tokenExpires); err == nil {
-				response.Token.ExpiresIn = uint32(time.Until(t).Seconds())
+		if len(gateway.Antennas) > 0 {
+			loc := gateway.Antennas[0].Location
+			res.AntennaLocation = &antennaLocation{
+				Latitude:  loc.Latitude,
+				Longitude: loc.Longitude,
+				Altitude:  loc.Altitude,
+			}
+		}
+		if token, ok := gateway.Attributes["token"]; ok {
+			res.Token = &oauth2Token{
+				AccessToken: token,
+				ExpiresIn:   uint32((24 * time.Hour).Seconds()),
+			}
+			if tokenExpires, ok := gateway.Attributes["token_expires"]; ok {
+				if t, err := time.Parse(time.RFC3339, tokenExpires); err == nil {
+					res.Token.ExpiresIn = uint32(time.Until(t).Seconds())
+				}
 			}
 		}
 	}
 
-	if c.Request().Header.Get("User-Agent") == "TTNGateway" {
-		// Filter out fields to reduce response size.
-		response.ID = ""
-		response.Attributes = nil
-		response.AntennaLocation = nil
-		response.Token = nil
-		response.FallbackRouters = nil
-		response.Router.ID = ""
-	}
-
-	return c.JSON(http.StatusOK, response)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(res)
 }
 
-func (s *Server) setTTKGFirmwareURL(res *gatewayInfoResponse, gtw *ttnpb.Gateway) {
-	updateChannel := gtw.UpdateChannel
+func (s *Server) ttkgFirmwareURL(updateChannel string) string {
 	if updateChannel == "" {
 		updateChannel = s.ttgConfig.Default.UpdateChannel
 	}
@@ -186,14 +188,13 @@ func (s *Server) setTTKGFirmwareURL(res *gatewayInfoResponse, gtw *ttnpb.Gateway
 		updateChannel = "stable"
 	}
 	if strings.HasPrefix(updateChannel, "http") {
-		res.FirmwareURL = updateChannel
-		return
+		return updateChannel
 	}
 	firmwareBaseURL := s.ttgConfig.Default.FirmwareURL
 	if firmwareBaseURL == "" {
 		firmwareBaseURL = "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1"
 	}
-	res.FirmwareURL = fmt.Sprintf("%s/%s", firmwareBaseURL, updateChannel)
+	return fmt.Sprintf("%s/%s", firmwareBaseURL, updateChannel)
 }
 
 func (s *Server) inferMQTTAddress(address string) (result string, err error) {
@@ -224,13 +225,13 @@ func (s *Server) inferMQTTAddress(address string) (result string, err error) {
 	return fmt.Sprintf("%s:%s", host, port), nil
 }
 
-func (s *Server) inferServerAddress(c echo.Context) string {
-	scheme := c.Scheme()
-	if forwardedProto := c.Request().Header.Get("X-Forwarded-Proto"); forwardedProto != "" {
+func (s *Server) inferServerAddress(r *http.Request) string {
+	scheme := r.URL.Scheme
+	if forwardedProto := r.Header.Get("X-Forwarded-Proto"); forwardedProto != "" {
 		scheme = forwardedProto
 	}
-	hostport := c.Request().Host
-	if forwardedHost := c.Request().Header.Get("X-Forwarded-Host"); forwardedHost != "" {
+	hostport := r.Host
+	if forwardedHost := r.Header.Get("X-Forwarded-Host"); forwardedHost != "" {
 		hostport = forwardedHost
 	}
 	if host, port, err := net.SplitHostPort(hostport); err == nil {
