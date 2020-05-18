@@ -19,10 +19,10 @@ import (
 	"net/url"
 
 	echo "github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	web_errors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/web/middleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/web/oauthclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
@@ -105,10 +105,7 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 		web_errors.ErrorMiddleware(map[string]web_errors.ErrorRenderer{
 			"text/html": webui.Template,
 		}),
-		middleware.CSRFWithConfig(middleware.CSRFConfig{
-			CookieName: "_console_csrf",
-			CookiePath: console.config.Mount,
-		}),
+		middleware.CSRF("_console_csrf", console.config.Mount, console.GetBaseConfig(console.Context()).HTTP.Cookie.HashKey),
 	)
 
 	api := group.Group("/api/auth")
