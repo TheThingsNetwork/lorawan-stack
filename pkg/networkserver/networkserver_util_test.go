@@ -2114,15 +2114,6 @@ func NewRedisUplinkDeduplicator(t testing.TB) (UplinkDeduplicator, func() error)
 		}
 }
 
-func AllTrue(vs ...bool) bool {
-	for _, v := range vs {
-		if !v {
-			return false
-		}
-	}
-	return true
-}
-
 func LogEvents(t *testing.T, ch <-chan test.EventPubSubPublishRequest) {
 	for ev := range ch {
 		t.Logf("Event %s published with data %v", ev.Event.Name(), ev.Event.Data())
