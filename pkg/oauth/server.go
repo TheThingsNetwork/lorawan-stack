@@ -21,13 +21,13 @@ import (
 	"time"
 
 	echo "github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/openshift/osin"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	web_errors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/web/middleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
@@ -199,7 +199,7 @@ func (s *server) output(c echo.Context, resp *osin.Response) error {
 }
 
 func (s *server) RegisterRoutes(server *web.Server) {
-	group := server.Group(
+	root := server.Group(
 		s.config.Mount,
 		func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {
@@ -220,29 +220,23 @@ func (s *server) RegisterRoutes(server *web.Server) {
 		}),
 	)
 
-	api := group.Group("/api", middleware.CSRFWithConfig(middleware.CSRFConfig{
-		CookieName: "_oauth_csrf",
-		CookiePath: s.config.Mount,
-	}))
+	csrfMiddleware := middleware.CSRF("_csrf", s.config.Mount, s.config.CSRFAuthKey)
+
+	api := root.Group("/api", csrfMiddleware)
 	api.POST("/auth/login", s.Login)
 	api.POST("/auth/logout", s.Logout, s.requireLogin)
 	api.GET("/me", s.CurrentUser, s.requireLogin)
 
-	page := group.Group("", middleware.CSRFWithConfig(middleware.CSRFConfig{
-		CookieName:  "_oauth_csrf",
-		CookiePath:  s.config.Mount,
-		TokenLookup: "form:csrf",
-	}))
+	page := root.Group("", csrfMiddleware)
 	page.GET("/login", webui.Template.Handler, s.redirectToNext)
 	page.GET("/logout", s.ClientLogout)
 	page.GET("/authorize", s.Authorize(webui.Template.Handler), s.redirectToLogin)
 	page.POST("/authorize", s.Authorize(webui.Template.Handler), s.redirectToLogin)
+	page.GET("/", webui.Template.Handler, s.redirectToLogin)
+	page.GET("/*", webui.Template.Handler)
 
-	group.GET("/", webui.Template.Handler, s.redirectToLogin)
-	group.GET("/*", webui.Template.Handler)
-
-	group.GET("/local-callback", s.redirectToLocal)
+	root.GET("/local-callback", s.redirectToLocal)
 
 	// No CSRF here:
-	group.POST("/token", s.Token)
+	root.POST("/token", s.Token)
 }
