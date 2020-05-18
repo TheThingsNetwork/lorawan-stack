@@ -102,6 +102,7 @@ type UserSessionStore interface {
 	CreateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error)
 	FindSessions(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.UserSession, error)
 	GetSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) (*ttnpb.UserSession, error)
+	GetSessionByID(ctx context.Context, tokenID string) (*ttnpb.UserSession, error)
 	UpdateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error)
 	DeleteSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) error
 }

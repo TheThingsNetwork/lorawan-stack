@@ -99,6 +99,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		return nil, err
 	}
 
+	is.config.OAuth.CSRFAuthKey = is.GetBaseConfig(is.Context()).HTTP.Cookie.HashKey
 	is.oauth = oauth.NewServer(is.Context(), struct {
 		store.UserStore
 		store.UserSessionStore
