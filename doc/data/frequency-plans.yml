@@ -1,0 +1,105 @@
+- id: EU_863_870
+  name: Europe 863-870 MHz
+  description: Default frequency plan for Europe
+  base-frequency: 868
+  file: EU_863_870.yml
+
+- id: EU_863_870_TTN
+  name: Europe 863-870 MHz (TTN)
+  description: TTN Community Network frequency plan for Europe, using SF9 for Rx2
+  base-frequency: 868
+  base-id: EU_863_870
+  file: EU_863_870_TTN.yml
+
+- id: US_902_928_FSB_1
+  name: United States 902-928 MHz, FSB 1
+  description: Default frequency plan for the United States and Canada, using sub-band 1
+  base-frequency: 915
+  file: US_902_928_FSB_1.yml
+
+- id: US_902_928_FSB_2
+  name: United States 902-928 MHz, FSB 2 (TTN)
+  description: TTN Community Network frequency plan for the United States and Canada, using sub-band 2
+  base-frequency: 915
+  file: US_902_928_FSB_2.yml
+
+- id: AU_915_928_FSB_1
+  name: Australia 915-928 MHz, FSB 1
+  description: Default frequency plan for Australia, using sub-band 1
+  base-frequency: 915
+  file: AU_915_928_FSB_1.yml
+
+- id: AU_915_928_FSB_2
+  name: Australia 915-928 MHz, FSB 2 (TTN)
+  description: TTN Community Network frequency plan for Australia, using sub-band 2
+  base-frequency: 915
+  file: AU_915_928_FSB_2.yml
+
+- id: AU_915_928_FSB_6
+  name: Australia 915-928 MHz, FSB 6
+  description: Frequency plan for Australia, using sub-band 6, which overlaps with Asia 923-925 MHz
+  base-frequency: 915
+  file: AU_915_928_FSB_6.yml
+
+- id: CN_470_510_FSB_11
+  name: China 470-510 MHz, FSB 11
+  description: TTN Community Network frequency plan for China, using sub-band 11
+  base-frequency: 470
+  file: CN_470_510_FSB_11.yml
+
+- id: AS_920_923
+  name: Asia 920-923 MHz
+  description: TTN Community Network frequency plan for Asian countries, using frequencies ≤ 923 MHz
+  base-frequency: 915
+  file: AS_920_923.yml
+
+- id: AS_920_923_LBT
+  name: Asia 920-923 MHz with LBT
+  description: TTN Community Network frequency plan for Asian countries, using frequencies ≤ 923 MHz with listen-before-talk
+  base-frequency: 915
+  base-id: AS_920_923
+  file: lbt_80_over_128.yml
+
+- id: AS_923_925
+  name: Asia 923-925 MHz
+  description: TTN Community Network frequency plan for Asian countries, using frequencies ≥ 923 MHz
+  base-frequency: 915
+  file: AS_923_925.yml
+
+- id: AS_923_925_LBT
+  name: Asia 923-925 MHz with LBT
+  description: TTN Community Network frequency plan for Asian countries, using frequencies ≥ 923 MHz with listen-before-talk
+  base-frequency: 915
+  base-id: AS_923_925
+  file: lbt_80_over_128.yml
+
+- id: AS_923_925_TTN_AU
+  name: Asia 923-925 MHz (TTN Australia)
+  description: TTN Community Network frequency plan for Asia 923-925 MHz in Australia
+  base-frequency: 915
+  base-id: AS_923_925
+  file: AS_923_925_TTN_AU.yml
+
+- id: KR_920_923_TTN
+  name: South Korea 920-923 MHz
+  description: TTN Community Network frequency plan for South Korea
+  base-frequency: 915
+  file: KR_920_923_TTN.yml
+
+- id: IN_865_867
+  name: India 865-867 MHz
+  description: Default frequency plan for India
+  base-frequency: 868
+  file: IN_865_867.yml
+
+- id: RU_864_870_TTN
+  name: Russia 864-870 MHz
+  description: TTN Community Network frequency plan for Russia
+  base-frequency: 868
+  file: RU_864_870_TTN.yml
+
+- id: ISM_2400_3CH_DRAFT2
+  name: LoRa 2.4 GHz with 3 channels draft 2
+  description: LoRa 2.4 GHz plan with 3 channels for global use draft 2
+  base-frequency: 2450
+  file: ISM_2400_3CH_DRAFT2.yml

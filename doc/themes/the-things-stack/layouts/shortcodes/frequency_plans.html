@@ -1,0 +1,15 @@
+{{ $package := or (.Get "package") "frequency-plans" }}{{ $frequency_plan := .Get "frequency-plan" -}}
+{{ $data := index .Site.Data $package}}
+{{- if $frequency_plan -}}
+  {{- with index $data $frequency_plan -}}
+    {{- partial "frequency-plan.html" . -}}
+  {{- else }}
+    {{ errorf "frequency plan %s of package %s not found" $frequency_plan $package }}
+  {{- end }}
+{{- else -}}
+  {{- range $data -}}
+    {{- partial "frequency-plan.html" . -}}
+  {{- else -}}
+    {{ errorf "package %s not found" $package }}
+  {{- end -}}
+{{- end -}}
