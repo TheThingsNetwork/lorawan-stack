@@ -13,7 +13,7 @@ Before getting started, we will discuss major breaking changes between {{% ttnv2
 
 ## LoRaWAN support
 
-{{% tts %}} requires the **LoRaWAN version** and **Regional Parameters** (LoRaWAN PHY version) to be set per end device. These default to LoRaWAN version **1.0.2** and LoRaWAN Regional Parameters version **1.0.2 Rev B** for end devices imported from {{% ttnv2 %}}, because this configuration is the most consistent with the V2.
+{{% tts %}} requires the **LoRaWAN version** and **Regional Parameters** (LoRaWAN PHY version) to be set per end device. These default to LoRaWAN version **1.0.2** and LoRaWAN Regional Parameters version **1.0.2 Rev B** for end devices imported from {{% ttnv2 %}}, because this configuration is the most consistent with V2.
 
 This means that all end devices need a frequency plan. You will have to choose the frequency plan corresponding to your region. A list of supported Frequency Plan IDs is available in [the lorawan-frequency-plans Github repository](https://github.com/TheThingsNetwork/lorawan-frequency-plans/blob/master/frequency-plans.yml).
 
