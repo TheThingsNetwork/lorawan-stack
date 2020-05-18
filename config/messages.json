@@ -3149,6 +3149,15 @@
       "file": "validation.go"
     }
   },
+  "error:pkg/events/grpc:no_identifiers": {
+    "translations": {
+      "en": "no identifiers"
+    },
+    "description": {
+      "package": "pkg/events/grpc",
+      "file": "grpc.go"
+    }
+  },
   "error:pkg/fetch:fetch_file": {
     "translations": {
       "en": "could not fetch file `{filename}`"
@@ -7323,24 +7332,6 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "end_device_registry.go"
-    }
-  },
-  "event:events.stream.start": {
-    "translations": {
-      "en": "start event stream"
-    },
-    "description": {
-      "package": "pkg/events/grpc",
-      "file": "grpc.go"
-    }
-  },
-  "event:events.stream.stop": {
-    "translations": {
-      "en": "stop event stream"
-    },
-    "description": {
-      "package": "pkg/events/grpc",
-      "file": "grpc.go"
     }
   },
   "event:gateway.api-key.create": {
