@@ -13,7 +13,7 @@ Before getting started, we will discuss major breaking changes between {{% ttnv2
 
 ## LoRaWAN support
 
-{{% tts %}} requires the LoRaWAN version and Regional Parameters (LoRaWAN PHY version) to be set per end device. These default to LoRaWAN version 1.0.2 and LoRaWAN Regional Parameters version 1.0.2 Rev B for end devices imported from {{% ttnv2 %}}, because this configuration is the most consistent with the V2.
+{{% tts %}} requires the **LoRaWAN version** and **Regional Parameters** (LoRaWAN PHY version) to be set per end device. These default to LoRaWAN version **1.0.2** and LoRaWAN Regional Parameters version **1.0.2 Rev B** for end devices imported from {{% ttnv2 %}}, because this configuration is the most consistent with V2.
 
 This means that all end devices need a frequency plan. You will have to choose the frequency plan corresponding to your region. A list of supported Frequency Plan IDs is available in [the lorawan-frequency-plans Github repository](https://github.com/TheThingsNetwork/lorawan-frequency-plans/blob/master/frequency-plans.yml).
 
@@ -30,7 +30,7 @@ The Packet Broker enables peering between networks, so traffic received by one n
 
 With Packet Broker enabled on both {{% tts %}} and {{% ttnv2 %}}, you can receive traffic on {{% tts %}} without having to re-configure any of your gateways.
 
-> **NOTE**: Packet Broker is enabled on The Things Network Public Community Network and The Things Industries Cloud Hosted.
+> **NOTE**: Packet Broker is only enabled on The Things Network Public Community Network and The Things Industries Cloud Hosted.
 
 For private {{% tts %}} deployments with Packet Broker disabled, you will need to re-configure your gateways to connect to {{% tts %}}, so that you can start receiving traffic from your end devices.
 
@@ -44,9 +44,9 @@ Also see [Gateways]({{< ref "/gateways" >}}) for instructions on configuring pop
 
 For details on the data format of {{% ttnv2 %}}, see the documentation from [The Things Network](https://www.thethingsnetwork.org/docs/applications/mqtt/api.html).
 
-The data format has changed in {{% tts %}}. It uses a different schema, different names, and has much richer metadata support. Read more about that in [Data Formats]({{% ref "/integrations/data-formats" %}}).
+For details on the data format of {{% tts %}}, see the documentation in [Data Formats]({{% ref "/integrations/data-formats" %}}). It uses a different schema, different names, and has much richer metadata support. 
 
-When migrating to {{% tts %}}, ensure your application can properly handle the new {{% tts %}} data format.
+**When migrating to {{% tts %}}, ensure your application can properly handle the new {{% tts %}} data format.**
 
 ### Payload Formats
 
