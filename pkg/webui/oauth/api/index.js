@@ -21,7 +21,7 @@ const appRoot = selectApplicationRootPath()
 const stackConfig = selectStackConfig()
 const isBaseUrl = stackConfig.is.base_url
 
-const csrf = getCookieValue('_csrf')
+const csrf = getCookieValue('_oauth_csrf')
 const instance = axios.create({
   headers: { 'X-CSRF-Token': csrf },
 })

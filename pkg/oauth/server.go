@@ -221,6 +221,7 @@ func (s *server) RegisterRoutes(server *web.Server) {
 	)
 
 	api := group.Group("/api", middleware.CSRFWithConfig(middleware.CSRFConfig{
+		CookieName: "_oauth_csrf",
 		CookiePath: s.config.Mount,
 	}))
 	api.POST("/auth/login", s.Login)
@@ -228,6 +229,7 @@ func (s *server) RegisterRoutes(server *web.Server) {
 	api.GET("/me", s.CurrentUser, s.requireLogin)
 
 	page := group.Group("", middleware.CSRFWithConfig(middleware.CSRFConfig{
+		CookieName:  "_oauth_csrf",
 		CookiePath:  s.config.Mount,
 		TokenLookup: "form:csrf",
 	}))

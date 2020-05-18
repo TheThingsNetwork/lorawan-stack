@@ -118,7 +118,7 @@ export default class Authorize extends PureComponent {
           logo
         >
           <Fragment>
-            <input type="hidden" name="csrf" value={getCookieValue('_csrf')} />
+            <input type="hidden" name="csrf" value={getCookieValue('_oauth_csrf')} />
             <div className={style.left}>
               <ul>
                 {client.rights.map(right => (
