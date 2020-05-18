@@ -23,6 +23,7 @@ import (
 	grpc_runtime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights/rightsutil"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -80,18 +81,14 @@ type EventsServer struct {
 	filter events.IdentifierFilter
 }
 
-var (
-	evtStreamStart = events.Define("events.stream.start", "start event stream")
-	evtStreamStop  = events.Define("events.stream.stop", "stop event stream")
-)
+var errNoIdentifiers = errors.DefineInvalidArgument("no_identifiers", "no identifiers")
 
 // Stream implements the EventsServer interface.
 func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Events_StreamServer) error {
-	ctx := stream.Context()
-
 	if len(req.Identifiers) == 0 {
-		return nil
+		return errNoIdentifiers
 	}
+	ctx := stream.Context()
 
 	if err := rights.RequireAny(ctx, req.Identifiers...); err != nil {
 		return err
@@ -109,24 +106,6 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	if err := stream.SendHeader(metadata.MD{}); err != nil {
 		return err
 	}
-
-	evtStreamStart := evtStreamStart(ctx, req, req)
-	srv.pubsub.Publish(evtStreamStart)
-
-	evtStreamStartVisible, err := rightsutil.EventIsVisible(ctx, evtStreamStart)
-	if err != nil {
-		return err
-	}
-	if !evtStreamStartVisible {
-		evt, err := events.Proto(evtStreamStart)
-		if err != nil {
-			return err
-		}
-		if err := stream.Send(evt); err != nil {
-			return err
-		}
-	}
-	defer srv.pubsub.Publish(evtStreamStop(ctx, req, req))
 
 	for {
 		select {
