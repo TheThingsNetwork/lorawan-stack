@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttnmage
+// +build mage
 
-import "github.com/magefile/mage/mg"
+package main
 
-var initDeps []interface{}
-
-// Init initializes the tooling.
-func Init() {
-	mg.Deps(initDeps...)
-}
+import (
+	// mage:import
+	_ "go.thethings.network/lorawan-stack/tools/mage"
+)

@@ -8,10 +8,6 @@ replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries
 // Use our fork of otto.
 replace github.com/robertkrimen/otto => github.com/TheThingsIndustries/otto v0.0.0-20200507140236-e2ec6b546eb2
 
-// Dependency of Goreleaser that causes problems with module management.
-// See https://github.com/Azure/go-autorest/issues/414.
-replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v13.3.1+incompatible
-
 // Do not upgrade Echo beyond v4.1.2.
 // See https://github.com/TheThingsNetwork/lorawan-stack/issues/977.
 replace github.com/labstack/echo/v4 => github.com/labstack/echo/v4 v4.1.2
@@ -20,31 +16,15 @@ replace github.com/labstack/echo/v4 => github.com/labstack/echo/v4 v4.1.2
 // See https://github.com/heptiolabs/healthcheck/issues/23.
 replace gopkg.in/DATA-DOG/go-sqlmock.v1 => gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
 
-// Dependency of Hugo that causes problems with module management.
-replace github.com/russross/blackfriday => github.com/russross/blackfriday v1.5.2
-
-// Dependency of Hugo that causes problems with module management.
-replace github.com/nicksnyder/go-i18n => github.com/nicksnyder/go-i18n v1.10.0
-
 require (
-	cloud.google.com/go/bigquery v1.6.0 // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
-	github.com/Azure/azure-pipeline-go v0.2.2 // indirect
-	github.com/Azure/azure-sdk-for-go v42.2.0+incompatible // indirect
-	github.com/Azure/go-autorest/autorest v0.10.1 // indirect
-	github.com/Azure/go-autorest/autorest/adal v0.8.3 // indirect
-	github.com/Azure/go-autorest/autorest/azure/auth v0.4.2 // indirect
-	github.com/Azure/go-autorest/autorest/to v0.3.0 // indirect
-	github.com/Azure/go-autorest/autorest/validation v0.2.0 // indirect
 	github.com/PuerkitoBio/purell v1.1.1
-	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
+	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/TheThingsIndustries/mystique v0.0.0-20200127144137-4aa959111fe7
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
 	github.com/aws/aws-sdk-go v1.31.1
-	github.com/bep/golibsass v0.7.0 // indirect
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/chrj/smtpd v0.1.2
-	github.com/client9/misspell v0.3.4
 	github.com/disintegration/imaging v1.6.2
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/envoyproxy/protoc-gen-validate v0.3.0-java
@@ -52,14 +32,11 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/getsentry/sentry-go v0.6.1
 	github.com/go-redis/redis v6.15.7+incompatible
-	github.com/gobuffalo/envy v1.9.0 // indirect
 	github.com/gobwas/glob v0.2.3
 	github.com/gogo/protobuf v1.3.1
-	github.com/gohugoio/hugo v0.70.0
-	github.com/golang/gddo v0.0.0-20200324184333-3c2cc9a6329d
+	github.com/golang/gddo v0.0.0-20200519224240-a4ebd2f7e574
 	github.com/golang/protobuf v1.3.5
 	github.com/google/wire v0.4.0 // indirect
-	github.com/goreleaser/goreleaser v0.135.0
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/securecookie v1.1.1
@@ -69,8 +46,7 @@ require (
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway v1.14.4
-	github.com/hashicorp/go-retryablehttp v0.6.6 // indirect
+	github.com/grpc-ecosystem/grpc-gateway v1.14.5
 	github.com/heptiolabs/healthcheck v0.0.0-20180807145615-6ff867650f40
 	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c
 	github.com/jacobsa/crypto v0.0.0-20190317225127-9f44e2d11115
@@ -83,44 +59,37 @@ require (
 	github.com/jinzhu/gorm v1.9.12
 	github.com/kr/pretty v0.2.0
 	github.com/kr/text v0.2.0 // indirect
-	github.com/kyokomi/emoji v2.2.2+incompatible // indirect
-	github.com/labstack/echo/v4 v4.1.11
+	github.com/labstack/echo/v4 v4.1.16
 	github.com/labstack/gommon v0.3.0
 	github.com/lib/pq v1.5.2
-	github.com/magefile/mage v1.9.0
-	github.com/markbates/inflect v1.0.4 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
-	github.com/mattn/go-ieproxy v0.0.1 // indirect
 	github.com/mattn/go-isatty v0.0.12
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	github.com/mattn/goveralls v0.0.5
-	github.com/mdempsky/unconvert v0.0.0-20200228143138-95ecdbfc0b5f
-	github.com/mgechev/revive v1.0.2
 	github.com/mitchellh/mapstructure v1.3.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.1.4
 	github.com/nats-io/nats.go v1.9.2
-	github.com/nicksnyder/go-i18n v1.10.1 // indirect
 	github.com/oklog/ulid/v2 v2.0.2
+	github.com/olekukonko/tablewriter v0.0.4 // indirect
 	github.com/openshift/osin v1.0.1
+	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.5.1
-	github.com/prometheus/procfs v0.0.11 // indirect
 	github.com/robertkrimen/otto v0.0.0-20191219234010-c382bd3c16ff
-	github.com/rogpeppe/go-internal v1.6.0 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.5.0+incompatible
-	github.com/skip2/go-qrcode v0.0.0-20191027152451-9434209cb086
+	github.com/skip2/go-qrcode v0.0.0-20200519171959-a3b48390827e
 	github.com/smartystreets/assertions v1.1.0
+	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.0.0
+	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.0
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
-	github.com/tdewolff/minify/v2 v2.7.4 // indirect
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 	go.opencensus.io v0.22.3
 	go.packetbroker.org/api/v3 v3.0.0
@@ -134,11 +103,8 @@ require (
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
 	golang.org/x/sys v0.0.0-20200519105757-fe76b779f299 // indirect
-	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1 // indirect
-	golang.org/x/tools v0.0.0-20200519205726-57a9e4404bf7
-	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
+	golang.org/x/tools v0.0.0-20200519205726-57a9e4404bf7 // indirect
 	google.golang.org/api v0.24.0
-	google.golang.org/appengine v1.6.6 // indirect
 	google.golang.org/genproto v0.0.0-20200507105951-43844f6eee31
 	google.golang.org/grpc v1.29.1
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.0.0-00010101000000-000000000000 // indirect

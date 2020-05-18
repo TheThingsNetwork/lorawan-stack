@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build tools
-
-package tools
+package ttnmage
 
 import (
-	_ "github.com/client9/misspell/cmd/misspell"
-	_ "github.com/gohugoio/hugo"
-	_ "github.com/goreleaser/goreleaser"
-	_ "github.com/magefile/mage"
-	_ "github.com/mattn/goveralls"
-	_ "github.com/mdempsky/unconvert"
-	_ "github.com/mgechev/revive"
-	_ "golang.org/x/tools/cmd/goimports"
+	"github.com/magefile/mage/mg"
 )
+
+var initDeps []interface{}
+
+// Init initializes the tooling.
+func Init() {
+	mg.Deps(initDeps...)
+}

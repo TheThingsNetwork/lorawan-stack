@@ -28,8 +28,8 @@ You may want to run this commands from time to time.
 Now you can initialize the development databases with some defaults.
 
 ```bash
-$ ./mage dev:dbStart   # This requires Docker to be running.
-$ ./mage dev:initStack
+$ tools/bin/mage dev:dbStart   # This requires Docker to be running.
+$ tools/bin/mage dev:initStack
 ```
 
 This starts a CockroachDB and Redis database in Docker containers, creates a database, migrates tables and creates a user `admin` with password `admin`.
@@ -48,25 +48,25 @@ $ go run ./cmd/ttn-lw-cli login
 You can use the following commands to start, stop and erase databases.
 
 ```bash
-$ ./mage dev:dbStart # Starts all databases in a Docker container.
-$ ./mage dev:dbStop  # Stops all databases.
+$ tools/bin/mage dev:dbStart # Starts all databases in a Docker container.
+$ tools/bin/mage dev:dbStop  # Stops all databases.
 
 # The contents of the databases will be saved in .env/data
 
-$ ./mage dev:dbErase # Stops all databases and erase storage.
+$ tools/bin/mage dev:dbErase # Stops all databases and erase storage.
 ```
 
 ### CockroachDB
 
 CockroachDB is a distributed SQL database that we use in the Identity Server.
 
-You can use `./mage dev:dbSQL` to enter an SQL shell.
+You can use `tools/bin/mage dev:dbSQL` to enter an SQL shell.
 
 ### Redis
 
 Redis is an in-memory data store that we use as a database for "hot" data.
 
-You can use `./mage dev:dbRedisCli` to enter a Redis-CLI shell.
+You can use `tools/bin/mage dev:dbRedisCli` to enter a Redis-CLI shell.
 
 ## Starting The Things Stack
 
@@ -122,7 +122,7 @@ Our APIs are defined in `.proto` files in the `api` folder. These files describe
 From the `.proto` files, we generate code using the `protoc` compiler. As we plan to compile to a number of different languages, we decided to put the compiler and its dependencies in a [Docker image](https://github.com/TheThingsIndustries/docker-protobuf). The actual commands for compilation are handled by our tooling, so the only thing you have to execute when updating the API, is:
 
 ```bash
-$ ./mage proto:clean proto:all jsSDK:definitions
+$ tools/bin/mage proto:clean proto:all jsSDK:definitions
 ```
 
 ### Documentation
@@ -133,12 +133,12 @@ All content is stored as Markdown files in `doc/content`.
 Data for generated documentation like API and glossary is stored in `doc/data`.
 
 In order to build the documentation site with the right theme, you need to run
-`./mage docs:deps` from time to time.
+`tools/bin/mage docs:deps` from time to time.
 
 You can start a development server with live reloading by running
-`./mage docs:server`. This command will print the address of the server.
+`tools/bin/mage docs:server`. This command will print the address of the server.
 
-The documentation site can be built by running `./mage docs:build`. This will
+The documentation site can be built by running `tools/bin/mage docs:build`. This will
 output the site to `docs/public`.
 
 For more details on how our documentation site is written, see the [Hugo docs](https://gohugo.io/documentation/).
@@ -172,11 +172,11 @@ The folder structure of the frontend looks as follows:
 ├── template.go       go template module used to render the frontend HTML
 ```
 
-For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize The Things Stack and doing an initial build of the frontend via `./mage js:build`, it can be served using:
+For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize The Things Stack and doing an initial build of the frontend via `tools/bin/mage js:build`, it can be served using:
 
 ```bash
 $ export NODE_ENV=development
-$ ./mage js:serve
+$ tools/bin/mage js:serve
 ```
 
 The development server runs on `http://localhost:8080` and will proxy all api calls to port `1885`. The serve command watches any changes inside `pkg/webui` and refreshes automatically.
@@ -598,7 +598,7 @@ In the API, the enum descriptions, error messages and event descriptions availab
 These messages are then collected in the `config/messages.json` file, which will be processed in the frontend build process, but may also be used by other (native) user interfaces. When you define new enums, errors or events or when you change them, the messages need to be updated into the `config/messages.json` file.
 
 ```bash
-$ ./mage go:messages
+$ tools/bin/mage go:messages
 ```
 
 If you forget to do so, this will cause a CI failure.
@@ -618,17 +618,17 @@ The workflow for defining messages is as follows:
 After adding messages this way, it needs to be added the locales file `pkg/webui/locales/*.js` by using:
 
 ```bash
-$ ./mage js:translations
+$ tools/bin/mage js:translations
 ```
 
-> Note: When using `./mage js:serve`, this command will be run automatically after any change.
+> Note: When using `tools/bin/mage js:serve`, this command will be run automatically after any change.
 
 The message definitions in `pkg/webui/locales` can be used to provide translations in other languages (e.g. `fr.js`). Keep in mind that locale files are checked in and committed, any discrepancy in the locales file with the defined messages will lead to a CI failure.
 
 ## Testing
 
 ```bash
-$ ./mage go:test js:test jsSDK:test
+$ tools/bin/mage go:test js:test jsSDK:test
 ```
 
 ## Building and Running
@@ -648,7 +648,7 @@ The difference of a development build includes:
 The frontend can then be built using:
 
 ```bash
-$ ./mage js:build
+$ tools/bin/mage js:build
 ```
 
 For development/testing purposes we suggest to run the binaries directly via `go run`:
@@ -661,7 +661,7 @@ It is also possible to use `go build`, or release snapshots, as described below.
 
 ## Releasing
 
-You can build a release snapshot with `go run github.com/goreleaser/goreleaser --snapshot`.
+You can build a release snapshot with `cd tools && go run github.com/goreleaser/goreleaser --snapshot`.
 
 > Note: You will at least need to have [`rpm`](http://rpm5.org/) and [`snapcraft`](https://snapcraft.io/) in your `PATH`.
 
@@ -672,7 +672,7 @@ This will compile binaries for all supported platforms, `deb`, `rpm` and Snapcra
 
 A new version can be released from the `master` branch or a `backport` branch. The necessary steps for each are detailed below.
 
-> Note: To get the target version, you can run `version=$(./mage version:bumpXXX version:current)`, where xxx is the type of new release (minor/patch/RC). Check the section [Version Bump](#version-bump) for more information.
+> Note: To get the target version, you can run `version=$(tools/bin/mage version:bumpXXX version:current)`, where xxx is the type of new release (minor/patch/RC). Check the section [Version Bump](#version-bump) for more information.
 
 ### Release From Master
 
@@ -758,33 +758,33 @@ This involves the following three steps
 
 Our development tooling helps with this process. The `mage` command has the following commands for version bumps:
 ```bash
-$ ./mage version:bumpMajor   # bumps a major version (from 3.4.5 -> 4.0.0).
-$ ./mage version:bumpMinor   # bumps a minor version (from 3.4.5 -> 3.5.0).
-$ ./mage version:bumpPatch   # bumps a patch version (from 3.4.5 -> 3.4.6).
-$ ./mage version:bumpRC      # bumps a release candidate version (from 3.4.5-rc1 -> 3.4.5-rc2).
-$ ./mage version:bumpRelease # bumps a pre-release to a release version (from 3.4.5-rc1 -> 3.4.5).
+$ tools/bin/mage version:bumpMajor   # bumps a major version (from 3.4.5 -> 4.0.0).
+$ tools/bin/mage version:bumpMinor   # bumps a minor version (from 3.4.5 -> 3.5.0).
+$ tools/bin/mage version:bumpPatch   # bumps a patch version (from 3.4.5 -> 3.4.6).
+$ tools/bin/mage version:bumpRC      # bumps a release candidate version (from 3.4.5-rc1 -> 3.4.5-rc2).
+$ tools/bin/mage version:bumpRelease # bumps a pre-release to a release version (from 3.4.5-rc1 -> 3.4.5).
 ```
 > Note: These bumps can be combined (i.e. `version:bumpMinor version:bumpRC` bumps 3.4.5 -> 3.5.0-rc1).
 2. Write the version files
 
 There are a few files that need to contain the latest version. The new version can be written using
 ```bash
-$ ./mage version:files
+$ tools/bin/mage version:files
 ```
 3. Commit the version bump
 
 A bump commit can be created by running
 ```bash
-$ ./mage version:commitBump
+$ tools/bin/mage version:commitBump
 ```
 
-> Note: The steps above can be combined to a single command (i.e., `$ ./mage version:bumpPatch version:files version:commitBump`).
+> Note: The steps above can be combined to a single command (i.e., `$ tools/bin/mage version:bumpPatch version:files version:commitBump`).
 
 ### Version Tag
 
 To tag a new version run
 ```bash
-$ ./mage version:bumpXXX version:tag
+$ tools/bin/mage version:bumpXXX version:tag
 ```
 
 For RCs, make sure to use the same bumping combination (ex: `version:bumpXXX version:bumpYYY`) as used in the bump step above.
@@ -835,7 +835,7 @@ The bundle files have been deleted. This might happen e.g. when a mage target en
 
 ##### Possible solution
 
-  1. Rebuild the Console `./mage js:clean js:build`
+  1. Rebuild the Console `tools/bin/mage js:clean js:build`
   2. Restart the The Things Stack
 
 ##### Mixing up production and development builds
@@ -846,7 +846,7 @@ If you switch between production and development builds of the Console, you migh
 
   1. Double check whether you have set the correct environment: `echo $NODE_ENV`, it should be either `production` or `development`
   2. Double check whether [your The Things Stack config](#development-configuration) is set correctly (especially `TTN_LW_CONSOLE_UI_JS_FILE`, `TTN_LW_CONSOLE_UI_CANONICAL_URL` and similar settings)
-  3. Make sure to rebuild the Console `./mage js:clean js:build`
+  3. Make sure to rebuild the Console `tools/bin/mage js:clean js:build`
   4. Restart The Things Stack
 
 #### Problem: Console rendering blank page and showing arbitrary error message in console logs, e.g.:
@@ -880,7 +880,7 @@ The bundle integrates an old version of the JS SDK. This is likely a caching/lin
 ##### Possible solutions
 
 - Re-establish a proper module link between the Console and the JS SDK
-  - Run `./mage js:cleanDeps js:deps`
+  - Run `tools/bin/mage js:cleanDeps js:deps`
   - Check whether the `ttn-lw` symlink exists inside `node_modules` and whether it points to the right destination: `lorawan-stack/sdk/js/dist`
     - If you have cloned multiple `lorawan-stack` forks in different locations, `yarn link` might associate the JS SDK module with the SDK on another ttn repository
   - Rebuild the Console and (only after the build has finished) restart The Things Stack
@@ -891,17 +891,17 @@ The bundle integrates an old version of the JS SDK. This is likely a caching/lin
 
 - Clear yarn cache: `yarn cache clear`
 - Clear npm cache: `npm cache clear`
-- Clean and reinstall dependencies: `./mage js:cleanDeps js:deps`
+- Clean and reinstall dependencies: `tools/bin/mage js:cleanDeps js:deps`
 
 #### Problem: The build crashes without showing any helpful error message
 
 #### Cause: Not running mage in verbose mode
 
-`./mage` runs in silent mode by default. In verbose mode, you might get more helpful error messages
+`tools/bin/mage` runs in silent mode by default. In verbose mode, you might get more helpful error messages
 
 #### Solution
 
-Run mage in verbose mode: `./mage -v {target}`
+Run mage in verbose mode: `tools/bin/mage -v {target}`
 
 #### Problem: Browser displays error: `Cannot GET /`
 
@@ -926,4 +926,4 @@ $ go run ./cmd/ttn-lw-stack start
 
 #### General advice
 
-A lot of problems during build stem from fragmented, incomplete runs of mage targets (due to arbitrary errors happening during a run). Oftentimes, it then helps to build the entire Web UI from scratch: `./mage jsSDK:cleanDeps jsSDK:clean js:cleanDeps js:clean js:build`, and (re-)start The Things Stack after running this.
+A lot of problems during build stem from fragmented, incomplete runs of mage targets (due to arbitrary errors happening during a run). Oftentimes, it then helps to build the entire Web UI from scratch: `tools/bin/mage jsSDK:cleanDeps jsSDK:clean js:cleanDeps js:clean js:build`, and (re-)start The Things Stack after running this.

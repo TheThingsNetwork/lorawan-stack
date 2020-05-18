@@ -114,7 +114,7 @@ func (p Proto) Go(context.Context) error {
 		return err
 	}
 
-	if err := sh.RunV(filepath.Join(".mage", "scripts", "fix-grpc-gateway-names.sh"), "api"); err != nil {
+	if err := sh.RunV(filepath.Join("tools", "mage", "scripts", "fix-grpc-gateway-names.sh"), "api"); err != nil {
 		return xerrors.Errorf("failed to fix gRPC-gateway names: %w", err)
 	}
 
@@ -122,10 +122,10 @@ func (p Proto) Go(context.Context) error {
 	if err != nil {
 		return xerrors.Errorf("failed to construct absolute path to pkg/ttnpb: %w", err)
 	}
-	if err := execGo("run", "golang.org/x/tools/cmd/goimports", "-w", ttnpb); err != nil {
+	if err := runGoTool("golang.org/x/tools/cmd/goimports", "-w", ttnpb); err != nil {
 		return xerrors.Errorf("failed to run goimports on generated code: %w", err)
 	}
-	if err := execGo("run", "github.com/mdempsky/unconvert", "-apply", ttnpb); err != nil {
+	if err := runUnconvert(ttnpb); err != nil {
 		return xerrors.Errorf("failed to run unconvert on generated code: %w", err)
 	}
 	return sh.RunV("gofmt", "-w", "-s", ttnpb)

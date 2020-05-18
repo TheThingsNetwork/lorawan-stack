@@ -261,7 +261,7 @@ func (js Js) Translations() error {
 		if err != nil {
 			return err
 		}
-		return node(".mage/translations.js")
+		return node("tools/mage/translations.js")
 	}
 	return nil
 }
@@ -279,7 +279,7 @@ func (js Js) BackendTranslations() error {
 			return err
 		}
 
-		return node(".mage/translations.js", "--backend-messages", "config/messages.json", "--locales", "pkg/webui/locales/.backend", "--backend-only")
+		return node("tools/mage/translations.js", "--backend-messages", "config/messages.json", "--locales", "pkg/webui/locales/.backend", "--backend-only")
 	}
 	return nil
 }
