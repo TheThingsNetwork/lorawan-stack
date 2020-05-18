@@ -220,12 +220,15 @@ func (s *server) RegisterRoutes(server *web.Server) {
 		}),
 	)
 
-	api := group.Group("/api", middleware.CSRF())
+	api := group.Group("/api", middleware.CSRFWithConfig(middleware.CSRFConfig{
+		CookiePath: s.config.Mount,
+	}))
 	api.POST("/auth/login", s.Login)
 	api.POST("/auth/logout", s.Logout, s.requireLogin)
 	api.GET("/me", s.CurrentUser, s.requireLogin)
 
 	page := group.Group("", middleware.CSRFWithConfig(middleware.CSRFConfig{
+		CookiePath:  s.config.Mount,
 		TokenLookup: "form:csrf",
 	}))
 	page.GET("/login", webui.Template.Handler, s.redirectToNext)
@@ -236,7 +239,8 @@ func (s *server) RegisterRoutes(server *web.Server) {
 	group.GET("/", webui.Template.Handler, s.redirectToLogin)
 	group.GET("/*", webui.Template.Handler)
 
-	// No CSRF here:
 	group.GET("/local-callback", s.redirectToLocal)
+
+	// No CSRF here:
 	group.POST("/token", s.Token)
 }
