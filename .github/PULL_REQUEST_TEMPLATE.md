@@ -17,6 +17,19 @@ Closes #0000, References #0000, etc.
 - ...
 - ...
 
+
+#### Testing
+
+<!-- How did you verify that this change works? -->
+
+...
+
+##### Regressions
+
+<!-- Please indicate features that this change could affect and how that was tested. -->
+
+...
+
 #### Notes for Reviewers
 <!--
 NOTE: This section is optional.
@@ -34,7 +47,6 @@ implementation proposal in the referenced issues.
 
 - [ ] Scope: The referenced issue is addressed, there are no unrelated changes.
 - [ ] Compatibility: The changes are backwards compatible with existing API, storage, configuration and CLI, according to the compatibility commitments in `README.md`. The target branch is set to `master` if the changes are fully compatible with existing API, database, configuration and CLI.
-- [ ] Testing: The changes are covered with unit tests. The changes are tested manually as well.
 - [ ] Documentation: Relevant documentation is added or updated.
 - [ ] Changelog: Significant features, behavior changes, deprecations and fixes are added to `CHANGELOG.md`.
 - [ ] Commits: Commit messages follow guidelines in `CONTRIBUTING.md`, there are no fixup commits left.
