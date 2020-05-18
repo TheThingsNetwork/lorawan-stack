@@ -13087,6 +13087,16 @@
               "defaultValue": ""
             },
             {
+              "name": "user_session",
+              "description": "Warning: A user authorized by session cookie will be granted all\ncurrent and future rights. When using this auth type, the respective\nhandlers need to ensure thorough CSRF and CORS protection using\nappropriate middleware.",
+              "label": "",
+              "type": "UserSession",
+              "longType": "UserSession",
+              "fullType": "ttn.lorawan.v3.UserSession",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "universal_rights",
               "description": "",
               "label": "",
@@ -25580,7 +25590,7 @@
           "name": "User",
           "longName": "User",
           "fullName": "ttn.lorawan.v3.User",
-          "description": "User is the message that defines an user on the network.",
+          "description": "User is the message that defines a user on the network.",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
@@ -25922,6 +25932,16 @@
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
               "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "session_secret",
+              "description": "The session secret is used to compose an authorization key and is never returned.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "defaultValue": ""
             }

@@ -3240,6 +3240,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ---- | ----- | ----------- |
 | `api_key` | [`AuthInfoResponse.APIKeyAccess`](#ttn.lorawan.v3.AuthInfoResponse.APIKeyAccess) |  |  |
 | `oauth_access_token` | [`OAuthAccessToken`](#ttn.lorawan.v3.OAuthAccessToken) |  |  |
+| `user_session` | [`UserSession`](#ttn.lorawan.v3.UserSession) |  | Warning: A user authorized by session cookie will be granted all current and future rights. When using this auth type, the respective handlers need to ensure thorough CSRF and CORS protection using appropriate middleware. |
 | `universal_rights` | [`Rights`](#ttn.lorawan.v3.Rights) |  |  |
 | `is_admin` | [`bool`](#bool) |  |  |
 
@@ -6220,7 +6221,7 @@ This service is not implemented on all deployments.
 
 ### <a name="ttn.lorawan.v3.User">Message `User`</a>
 
-User is the message that defines an user on the network.
+User is the message that defines a user on the network.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -6270,6 +6271,7 @@ User is the message that defines an user on the network.
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `session_secret` | [`string`](#string) |  | The session secret is used to compose an authorization key and is never returned. |
 
 #### Field Rules
 

@@ -9299,6 +9299,10 @@
         "oauth_access_token": {
           "$ref": "#/definitions/v3OAuthAccessToken"
         },
+        "user_session": {
+          "$ref": "#/definitions/v3UserSession",
+          "description": "Warning: A user authorized by session cookie will be granted all\ncurrent and future rights. When using this auth type, the respective\nhandlers need to ensure thorough CSRF and CORS protection using\nappropriate middleware."
+        },
         "universal_rights": {
           "$ref": "#/definitions/v3Rights"
         },
@@ -13019,7 +13023,7 @@
           "$ref": "#/definitions/v3Picture"
         }
       },
-      "description": "User is the message that defines an user on the network."
+      "description": "User is the message that defines a user on the network."
     },
     "v3UserIdentifiers": {
       "type": "object",
@@ -13054,6 +13058,10 @@
         "expires_at": {
           "type": "string",
           "format": "date-time"
+        },
+        "session_secret": {
+          "type": "string",
+          "description": "The session secret is used to compose an authorization key and is never returned."
         }
       }
     },
