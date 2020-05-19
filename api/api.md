@@ -2338,8 +2338,8 @@ This is used internally by the Network Server and is read only.
 | `desired_parameters` | <p>`message.required`: `true`</p> |
 | `device_class` | <p>`enum.defined_only`: `true`</p> |
 | `lorawan_version` | <p>`enum.defined_only`: `true`</p> |
-| `rejected_adr_data_rate_indexes` | <p>`repeated.items.enum.defined_only`: `true`</p> |
-| `rejected_adr_tx_power_indexes` | <p>`repeated.items.uint32.lte`: `15`</p> |
+| `rejected_adr_data_rate_indexes` | <p>`repeated.max_items`: `15`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
+| `rejected_adr_tx_power_indexes` | <p>`repeated.max_items`: `15`</p><p>`repeated.items.uint32.lte`: `15`</p> |
 | `rejected_frequencies` | <p>`repeated.items.uint64.gte`: `100000`</p> |
 
 ### <a name="ttn.lorawan.v3.MACState.JoinAccept">Message `MACState.JoinAccept`</a>
@@ -2632,7 +2632,7 @@ Gateway is the message that defines a gateway on the network.
 | `version_ids` | <p>`message.required`: `true`</p> |
 | `gateway_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
-| `frequency_plan_ids` | <p>`repeated.items.string.max_len`: `64`</p> |
+| `frequency_plan_ids` | <p>`repeated.max_items`: `8`</p><p>`repeated.items.string.max_len`: `64`</p> |
 | `downlink_path_constraint` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.Gateway.AttributesEntry">Message `Gateway.AttributesEntry`</a>
@@ -5639,7 +5639,7 @@ The NsPba service connects a Network Server to a Packet Broker Agent.
 
 | Field | Validations |
 | ----- | ----------- |
-| `image_size` | <p>`uint32.lte`: `1000`</p> |
+| `image_size` | <p>`uint32.lte`: `1000`</p><p>`uint32.gte`: `10`</p> |
 
 ### <a name="ttn.lorawan.v3.GenerateQRCodeResponse">Message `GenerateQRCodeResponse`</a>
 
