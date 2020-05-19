@@ -313,7 +313,9 @@ func (s *Server) Group(prefix string, middleware ...echo.MiddlewareFunc) *echo.G
 	pathWithSlash := path + "/"
 	router := s.getRouter(pathWithSlash)
 	router.PathPrefix(replaceEchoVars(pathWithSlash)).Handler(s.echo)
-	router.Handle(replaceEchoVars(path), http.RedirectHandler(pathWithSlash, http.StatusPermanentRedirect))
+	if path != "/" {
+		router.Handle(replaceEchoVars(path), http.RedirectHandler(pathWithSlash, http.StatusPermanentRedirect))
+	}
 	return s.echo.Group(path, middleware...)
 }
 

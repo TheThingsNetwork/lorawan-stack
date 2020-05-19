@@ -34,6 +34,7 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import { mapFormValueToAttributes } from '@console/lib/attributes'
 import { mayCreateGateways } from '@console/lib/feature-checks'
 
 import { selectUserId } from '@console/store/selectors/user'
@@ -71,12 +72,14 @@ export default class GatewayAdd extends React.Component {
     const { owner_id, ...gateway } = values
     const {
       ids: { gateway_id },
+      attributes,
     } = gateway
 
     await this.setState({ error: '' })
 
+    const gatewayValues = { ...gateway, attributes: mapFormValueToAttributes(attributes) }
     try {
-      await api.gateway.create(owner_id, gateway, userId === owner_id)
+      await api.gateway.create(owner_id, gatewayValues, userId === owner_id)
 
       createSuccess(gateway_id)
     } catch (error) {

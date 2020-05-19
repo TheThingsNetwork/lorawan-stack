@@ -26,9 +26,7 @@ If you use the command "ttn-lw-stack config", you can redact sensitive config.
 -->
 
 #### What do you see now?
-<!--
-Please paste terminal output, upload logs (as .txt) or upload screenshots.
--->
+<!-- Please paste terminal output, upload logs (as .txt) or upload screenshots. -->
 
 ...
 
@@ -47,6 +45,11 @@ Paste the output of "ttn-lw-cli version" or "ttn-lw-stack version" if applicable
 
 #### How do you propose to implement this?
 <!-- Please think about how this could be fixed. -->
+
+...
+
+#### How do you propose to test this?
+<!-- Please think about how this is verified as fixed. -->
 
 ...
 

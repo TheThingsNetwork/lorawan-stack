@@ -62,5 +62,6 @@ You can control the url of the assets folder that the Console frontend will use,
 - `console.ui.site-name`: The site name
 - `console.ui.sub-title`: The page sub-title
 - `console.ui.support-link`: The URI that the support button will point to
+- `console.ui.documentation-base-url`: The base URL for generating documentation links
 - `console.ui.theme-color`: The page theme color
 - `console.ui.title`: The page title

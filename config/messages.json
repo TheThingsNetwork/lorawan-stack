@@ -1952,15 +1952,6 @@
       "file": "format.go"
     }
   },
-  "error:pkg/applicationserver/io/web:http": {
-    "translations": {
-      "en": "HTTP error: {message}"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/web",
-      "file": "webhooks.go"
-    }
-  },
   "error:pkg/applicationserver/io/web:parse_file": {
     "translations": {
       "en": "could not parse file"
@@ -3113,6 +3104,15 @@
       "file": "messages.go"
     }
   },
+  "error:pkg/encoding/lorawan:no_unmarshaler": {
+    "translations": {
+      "en": "no unmarshaler available for MAC command with CID `{cid}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "mac.go"
+    }
+  },
   "error:pkg/encoding/lorawan:unknown_field": {
     "translations": {
       "en": "unknown `{lorawan_field}`"
@@ -3311,13 +3311,13 @@
       "file": "frequencyplans.go"
     }
   },
-  "error:pkg/gatewayconfigurationserver/gcsv2:unauthenticated": {
+  "error:pkg/gatewayconfigurationserver/v2:unauthenticated": {
     "translations": {
-      "en": "call was not authenticated"
+      "en": "unauthenticated"
     },
     "description": {
-      "package": "pkg/gatewayconfigurationserver/gcsv2",
-      "file": "get_gateway.go"
+      "package": "pkg/gatewayconfigurationserver/v2",
+      "file": "http_gateway.go"
     }
   },
   "error:pkg/gatewayserver/io/basicstationlns/messages:data_rate": {

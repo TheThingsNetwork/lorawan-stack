@@ -45,11 +45,14 @@ func (oc *OAuthClient) HandleLogout(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	u, err := url.Parse(oc.config.LogoutURL)
+
+	config := oc.configFromContext(c.Request().Context())
+
+	u, err := url.Parse(config.LogoutURL)
 	if err != nil {
 		return err
 	}
-	logoutURL := oc.config.LogoutURL
+	logoutURL := config.LogoutURL
 
 	// If a logout URL is configured, return a decorated logout URI so the client
 	// can decide to additionally logout of the OAuth server itself.
@@ -58,7 +61,7 @@ func (oc *OAuthClient) HandleLogout(c echo.Context) error {
 		if err != nil {
 			return err
 		}
-		redirectURL := stripCommonRoot(logoutURL, oc.config.RootURL)
+		redirectURL := stripCommonRoot(logoutURL, config.RootURL)
 		query := url.Values{
 			"access_token_id":          []string{tokenID},
 			"post_logout_redirect_uri": []string{redirectURL},

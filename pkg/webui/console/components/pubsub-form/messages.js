@@ -19,7 +19,7 @@ export default defineMessages({
   messageInfo: 'For each enabled message type, an optional sub-topic can be defined',
   deletePubsub: 'Delete Pubsub',
   modalWarning:
-    'Are you sure you want to delete pub-sub "{pubsubId}"? Deleting a pub-sub cannot be undone.',
+    'Are you sure you want to delete Pub/Sub "{pubsubId}"? Deleting a Pub/Sub cannot be undone.',
   headers: 'Headers',
   headersKeyPlaceholder: 'Authorization',
   headersValuePlaceholder: 'Bearer my-auth-token',
@@ -37,7 +37,7 @@ export default defineMessages({
   clientId: 'Client ID',
   subscribeQos: 'Subscribe QoS',
   publishQos: 'Publish QoS',
-  tlsCa: 'Server root CA certificate',
+  tlsCa: 'Root CA certificate',
   tlsClientCert: 'Client certificate',
   tlsClientKey: 'Client private key',
   selectPemFile: 'Select .pem file…',

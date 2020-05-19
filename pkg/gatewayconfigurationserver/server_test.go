@@ -69,7 +69,6 @@ func TestGatewayConfigurationServer(t *testing.T) {
 }
 
 func TestWeb(t *testing.T) {
-	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
 	is, isAddr := startMockIS(ctx)
@@ -79,7 +78,6 @@ func TestWeb(t *testing.T) {
 		GatewayServerAddress: "localhost",
 	}
 
-	httpAddress := "0.0.0.0:8098"
 	fpConf := config.FrequencyPlansConfig{
 		URL: "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master",
 	}
@@ -88,7 +86,7 @@ func TestWeb(t *testing.T) {
 	conf := &component.Config{
 		ServiceBase: config.ServiceBase{
 			HTTP: config.HTTP{
-				Listen: httpAddress,
+				Listen: ":0",
 			},
 			FrequencyPlans: fpConf,
 			Cluster: cluster.Config{
@@ -102,10 +100,7 @@ func TestWeb(t *testing.T) {
 		return ctx
 	})
 
-	gcs, err := New(c, testConfig)
-	a.So(err, should.BeNil)
-	a.So(gcs, should.NotBeNil)
-
+	test.Must(New(c, testConfig))
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 
@@ -162,8 +157,7 @@ func TestWeb(t *testing.T) {
 						tc.ID.GatewayID,
 					)
 					body := bytes.NewReader([]byte(`{"downlinks":[]}`))
-					req := httptest.NewRequest(http.MethodGet, url, body)
-					req = req.WithContext(test.Context())
+					req := httptest.NewRequest(http.MethodGet, url, body).WithContext(test.Context())
 					req.Header.Set("Content-Type", "application/json")
 					req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tc.Key))
 					rec := httptest.NewRecorder()
@@ -174,7 +168,7 @@ func TestWeb(t *testing.T) {
 					}
 					switch res.StatusCode {
 					case http.StatusOK:
-						if !a.So(res.Header.Get("Content-Type"), should.Equal, "application/json; charset=UTF-8") {
+						if !a.So(res.Header.Get("Content-Type"), should.Equal, "application/json") {
 							t.FailNow()
 						}
 						b, err := ioutil.ReadAll(res.Body)
@@ -190,8 +184,7 @@ func TestWeb(t *testing.T) {
 						"/api/v3/gcs/gateways/%s/kerlink-cpf/lorad/lorad.json",
 						tc.ID.GatewayID,
 					)
-					req := httptest.NewRequest(http.MethodGet, url, nil)
-					req = req.WithContext(test.Context())
+					req := httptest.NewRequest(http.MethodGet, url, nil).WithContext(test.Context())
 					req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tc.Key))
 					rec := httptest.NewRecorder()
 					c.ServeHTTP(rec, req)
@@ -201,7 +194,7 @@ func TestWeb(t *testing.T) {
 					}
 					switch res.StatusCode {
 					case http.StatusOK:
-						if !a.So(res.Header.Get("Content-Type"), should.Equal, "application/json; charset=UTF-8") {
+						if !a.So(res.Header.Get("Content-Type"), should.Equal, "application/json") {
 							t.FailNow()
 						}
 						b, err := ioutil.ReadAll(res.Body)
@@ -217,8 +210,7 @@ func TestWeb(t *testing.T) {
 						"/api/v3/gcs/gateways/%s/kerlink-cpf/lorafwd/lorafwd.toml",
 						tc.ID.GatewayID,
 					)
-					req := httptest.NewRequest(http.MethodGet, url, nil)
-					req = req.WithContext(test.Context())
+					req := httptest.NewRequest(http.MethodGet, url, nil).WithContext(test.Context())
 					req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tc.Key))
 					rec := httptest.NewRecorder()
 					c.ServeHTTP(rec, req)
