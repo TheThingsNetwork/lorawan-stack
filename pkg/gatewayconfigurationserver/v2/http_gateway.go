@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/types"
-	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
@@ -68,13 +67,7 @@ var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "unauth
 
 func (s *Server) handleGetGateway(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	id := ttnpb.GatewayIdentifiers{
-		GatewayID: mux.Vars(r)["gateway_id"],
-	}
-	if err := id.ValidateContext(ctx); err != nil {
-		webhandlers.Error(w, r, err)
-		return
-	}
+	id := gatewayIDFromContext(ctx)
 
 	registry, err := s.getRegistry(ctx, &id)
 	if err != nil {

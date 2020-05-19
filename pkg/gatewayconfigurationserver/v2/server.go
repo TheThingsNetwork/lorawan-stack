@@ -85,6 +85,7 @@ func (s *Server) RegisterRoutes(server *web.Server) {
 		mux.MiddlewareFunc(webmiddleware.Namespace("gatewayconfigurationserver/v2")),
 		rewriteAuthorization,
 		mux.MiddlewareFunc(webmiddleware.Metadata("Authorization")),
+		validateAndFillIDs,
 	)
 
 	router.HandleFunc("/gateways/{gateway_id}", s.handleGetGateway).Methods(http.MethodGet)
