@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gcsv2
+package gatewayconfigurationserver
 
 // TheThingsGatewayConfig is the configuration for The Things Gateway.
 type TheThingsGatewayConfig struct {

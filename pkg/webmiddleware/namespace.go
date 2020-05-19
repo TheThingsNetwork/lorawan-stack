@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package webmiddleware provides middleware for http Handlers.
 package webmiddleware
 
-import "net/http"
+import (
+	"net/http"
 
-// MiddlewareFunc is a function that acts as middleware for http Handlers.
-type MiddlewareFunc func(next http.Handler) http.Handler
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+)
 
-// Chain returns a http.Handler that chains the middleware onion-style around the handler.
-func Chain(middlewares []MiddlewareFunc, handler http.Handler) http.Handler {
-	for _, mw := range middlewares {
-		handler = mw(handler)
+// Namespace is middleware that sets the namespace.
+func Namespace(value string) MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			next.ServeHTTP(w, r.WithContext(log.NewContextWithField(r.Context(), "namespace", value)))
+		})
 	}
-	return handler
 }
