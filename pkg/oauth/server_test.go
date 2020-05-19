@@ -501,7 +501,7 @@ func TestOAuthFlow(t *testing.T) {
 
 			for _, c := range jar.Cookies(req.URL) {
 				req.AddCookie(c)
-				if c.Name == "_csrf" {
+				if c.Name == "_oauth_csrf" {
 					csrfToken = c.Value
 					req.Header.Set("X-CSRF-Token", c.Value)
 				}

@@ -38,10 +38,7 @@ const stack = {
 
 const isBaseUrl = stackConfig.is.base_url
 
-const csrf = getCookieValue('_csrf')
-const instance = axios.create({
-  headers: { 'X-CSRF-Token': csrf },
-})
+const instance = axios.create()
 
 instance.interceptors.response.use(
   response => {
