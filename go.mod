@@ -3,7 +3,7 @@ module go.thethings.network/lorawan-stack/v3
 go 1.14
 
 // Use our fork of grpc-gateway.
-replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.14.4-gogo
+replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.14.5-gogo
 
 // Use our fork of otto.
 replace github.com/robertkrimen/otto => github.com/TheThingsIndustries/otto v0.0.0-20200507140236-e2ec6b546eb2
