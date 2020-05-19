@@ -18,17 +18,25 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 )
 
 // rewriteAuthorization rewrites the Authorization header from The Things Network Stack V2 style to The Things Stack.
 // Packet Forwarders designed for The Things Stack Network V2 pass the gateway access key via the Authorization header
-// prepended by `key`, which this function rewrites to `bearer`.
+// prepended by `key`. If the authentication value is a The Things Stack auth token or API key, this function rewrites
+// the authentication type to `bearer`, otherwise, the authentication type stays `key`.
 func rewriteAuthorization(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		value := r.Header.Get("Authorization")
 		parts := strings.SplitN(value, " ", 2)
 		if len(parts) == 2 && strings.ToLower(parts[0]) == "key" {
-			r.Header.Set("Authorization", fmt.Sprintf("bearer %v", parts[1]))
+			authType, authValue := parts[0], parts[1]
+			tokenType, _, _, err := auth.SplitToken(authValue)
+			if err == nil && (tokenType == auth.APIKey || tokenType == auth.AccessToken) {
+				authType = "bearer"
+			}
+			r.Header.Set("Authorization", fmt.Sprintf("%v %v", authType, authValue))
 		}
 		next.ServeHTTP(w, r)
 	})
