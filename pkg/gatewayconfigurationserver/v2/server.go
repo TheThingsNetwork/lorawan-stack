@@ -18,7 +18,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
@@ -80,16 +79,23 @@ func WithTheThingsGatewayConfig(config TheThingsGatewayConfig) Option {
 
 // RegisterRoutes implements the web.Registerer interface.
 func (s *Server) RegisterRoutes(server *web.Server) {
-	router := server.Prefix("/api/v2/").Subrouter()
-	router.Use(
-		mux.MiddlewareFunc(webmiddleware.Namespace("gatewayconfigurationserver/v2")),
-		rewriteAuthorization,
-		mux.MiddlewareFunc(webmiddleware.Metadata("Authorization")),
-		validateAndFillIDs,
-	)
+	router := server.APIRouter()
 
-	router.HandleFunc("/gateways/{gateway_id}", s.handleGetGateway).Methods(http.MethodGet)
-	router.HandleFunc("/frequency-plans/{frequency_plan_id}", s.handleGetFrequencyPlan).Methods(http.MethodGet)
+	middleware := []webmiddleware.MiddlewareFunc{
+		webmiddleware.Namespace("gatewayconfigurationserver/v2"),
+		rewriteAuthorization,
+		webmiddleware.Metadata("Authorization"),
+	}
+
+	router.Handle(
+		"/api/v2/gateways/{gateway_id}",
+		webmiddleware.Chain(append(middleware, validateAndFillIDs), http.HandlerFunc(s.handleGetGateway)),
+	).Methods(http.MethodGet)
+
+	router.Handle(
+		"/api/v2/frequency-plans/{frequency_plan_id}",
+		webmiddleware.Chain(middleware, http.HandlerFunc(s.handleGetFrequencyPlan)),
+	).Methods(http.MethodGet)
 }
 
 // New returns a new v2 GCS on top of the given gateway registry.

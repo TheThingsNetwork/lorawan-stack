@@ -21,7 +21,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gorilla/mux"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -225,9 +224,18 @@ func TestGetFrequencyPlan(t *testing.T) {
 			a := assertions.New(t)
 			ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-			c := componenttest.NewComponent(t, &component.Config{})
+			conf := &component.Config{
+				ServiceBase: config.ServiceBase{
+					HTTP: config.HTTP{
+						Listen: ":0",
+					},
+				},
+			}
+			c := componenttest.NewComponent(t, conf)
 			c.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
-			s := New(c)
+			New(c)
+			componenttest.StartComponent(t, c)
+			defer c.Close()
 
 			req := httptest.NewRequest(http.MethodGet, "/api/v2/frequency-plans/EU_863_870", nil).WithContext(ctx)
 			if tc.SetupRequest != nil {
@@ -235,10 +243,7 @@ func TestGetFrequencyPlan(t *testing.T) {
 			}
 
 			rec := httptest.NewRecorder()
-			router := mux.NewRouter()
-			router.HandleFunc("/api/v2/frequency-plans/{frequency_plan_id}", s.handleGetFrequencyPlan)
-			router.ServeHTTP(rec, req)
-
+			c.ServeHTTP(rec, req)
 			tc.ResponseAssertion(a, rec)
 		})
 	}
