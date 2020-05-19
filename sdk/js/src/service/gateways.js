@@ -96,7 +96,14 @@ class Gateways {
 
   // Update.
 
-  async updateById(id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
+  async updateById(
+    id,
+    patch,
+    mask = Marshaler.fieldMaskFromPatch(
+      patch,
+      this._api.GatewayRegistry.UpdateAllowedFieldMaskPaths,
+    ),
+  ) {
     const response = await this._api.GatewayRegistry.Update(
       {
         routeParams: { 'gateway.ids.gateway_id': id },

@@ -182,9 +182,6 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.app_key.key") && req.EndDevice.GetRootKeys().GetAppKey().GetKey().IsZero() {
 		return nil, errInvalidFieldValue.WithAttributes("field", "root_keys.app_key.key")
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.nwk_key.key") && req.EndDevice.GetRootKeys().GetNwkKey().GetKey().IsZero() {
-		return nil, errInvalidFieldValue.WithAttributes("field", "root_keys.nwk_key.key")
-	}
 
 	if err = rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
@@ -217,16 +214,20 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		)
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.nwk_key.key") {
-		nwkKey, err := cryptoutil.WrapAES128Key(ctx, *req.EndDevice.RootKeys.NwkKey.Key, srv.kekLabel, srv.JS.KeyVault)
-		if err != nil {
-			return nil, err
-		}
-		defer func(ke ttnpb.KeyEnvelope) {
-			if dev != nil {
-				dev.RootKeys.NwkKey = &ke
+		if !req.EndDevice.GetRootKeys().GetNwkKey().GetKey().IsZero() {
+			nwkKey, err := cryptoutil.WrapAES128Key(ctx, *req.EndDevice.RootKeys.NwkKey.Key, srv.kekLabel, srv.JS.KeyVault)
+			if err != nil {
+				return nil, err
 			}
-		}(*req.EndDevice.RootKeys.NwkKey)
-		req.EndDevice.RootKeys.NwkKey = &nwkKey
+			defer func(ke ttnpb.KeyEnvelope) {
+				if dev != nil {
+					dev.RootKeys.NwkKey = &ke
+				}
+			}(*req.EndDevice.RootKeys.NwkKey)
+			req.EndDevice.RootKeys.NwkKey = &nwkKey
+		} else if req.EndDevice.RootKeys != nil {
+			req.EndDevice.RootKeys.NwkKey = nil
+		}
 		sets = ttnpb.AddFields(sets,
 			"root_keys.nwk_key.encrypted_key",
 			"root_keys.nwk_key.kek_label",

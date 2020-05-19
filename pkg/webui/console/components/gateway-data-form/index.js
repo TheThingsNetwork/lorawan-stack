@@ -24,6 +24,7 @@ import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import UnitInput from '@ttn-lw/components/unit-input'
+import KeyValueMap from '@ttn-lw/components/key-value-map'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -33,6 +34,7 @@ import OwnersSelect from '@console/containers/owners-select'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import { attributeValidCheck, attributeTooShortCheck } from '@console/lib/attributes'
 import {
   id as gatewayIdRegexp,
   address as addressRegexp,
@@ -92,6 +94,17 @@ const validationSchema = Yup.object().shape({
   update_location_from_status: Yup.boolean().default(false),
   auto_update: Yup.boolean().default(false),
   schedule_anytime_delay: Yup.string().matches(delayRegexp, sharedMessages.validateDelayFormat),
+  attributes: Yup.array()
+    .test(
+      'has no empty string values',
+      sharedMessages.attributesValidateRequired,
+      attributeValidCheck,
+    )
+    .test(
+      'has key length longer than 2',
+      sharedMessages.attributeKeyValidateTooShort,
+      attributeTooShortCheck,
+    ),
 })
 
 class GatewayDataForm extends React.Component {
@@ -221,6 +234,15 @@ class GatewayDataForm extends React.Component {
           component={Checkbox}
           label={sharedMessages.public}
           description={m.statusDescription}
+        />
+        <Form.Field
+          name="attributes"
+          title={sharedMessages.attributes}
+          keyPlaceholder={sharedMessages.key}
+          valuePlaceholder={sharedMessages.value}
+          addMessage={sharedMessages.addAttributes}
+          component={KeyValueMap}
+          description={sharedMessages.attributeDescription}
         />
         <Message component="h4" content={sharedMessages.lorawanOptions} />
         <GsFrequencyPlansSelect name="frequency_plan_id" menuPlacement="top" required />

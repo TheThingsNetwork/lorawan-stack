@@ -220,12 +220,17 @@ func (s *server) RegisterRoutes(server *web.Server) {
 		}),
 	)
 
-	api := group.Group("/api", middleware.CSRF())
+	api := group.Group("/api", middleware.CSRFWithConfig(middleware.CSRFConfig{
+		CookieName: "_oauth_csrf",
+		CookiePath: s.config.Mount,
+	}))
 	api.POST("/auth/login", s.Login)
 	api.POST("/auth/logout", s.Logout, s.requireLogin)
 	api.GET("/me", s.CurrentUser, s.requireLogin)
 
 	page := group.Group("", middleware.CSRFWithConfig(middleware.CSRFConfig{
+		CookieName:  "_oauth_csrf",
+		CookiePath:  s.config.Mount,
 		TokenLookup: "form:csrf",
 	}))
 	page.GET("/login", webui.Template.Handler, s.redirectToNext)
@@ -233,15 +238,11 @@ func (s *server) RegisterRoutes(server *web.Server) {
 	page.GET("/authorize", s.Authorize(webui.Template.Handler), s.redirectToLogin)
 	page.POST("/authorize", s.Authorize(webui.Template.Handler), s.redirectToLogin)
 
-	if s.config.Mount != "" && s.config.Mount != "/" {
-		group.GET("", webui.Template.Handler, s.redirectToLogin)
-	} else {
-		server.GET(s.config.Mount, webui.Template.Handler, s.redirectToLogin)
-	}
-	group.GET("/*", webui.Template.Handler, s.redirectToLogin)
+	group.GET("/", webui.Template.Handler, s.redirectToLogin)
+	group.GET("/*", webui.Template.Handler)
+
+	group.GET("/local-callback", s.redirectToLocal)
 
 	// No CSRF here:
-	group.GET("/code", webui.Template.Handler)
-	group.GET("/local-callback", s.redirectToLocal)
 	group.POST("/token", s.Token)
 }

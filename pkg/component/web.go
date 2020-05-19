@@ -64,6 +64,44 @@ func (c *Component) initWeb() error {
 	if err != nil {
 		return err
 	}
+
+	if c.config.HTTP.PProf.Enable {
+		g := web.RootRouter().NewRoute().Subrouter()
+		if c.config.HTTP.PProf.Password != "" {
+			g.Use(mux.MiddlewareFunc(webmiddleware.BasicAuth(
+				"pprof",
+				webmiddleware.AuthUser(pprofUsername, c.config.HTTP.PProf.Password),
+			)))
+		}
+		g.HandleFunc("/debug/pprof/profile", pprof.Profile)
+		g.HandleFunc("/debug/pprof/trace", pprof.Trace)
+		g.PathPrefix("/debug/pprof/").HandlerFunc(pprof.Index)
+		g.Handle("/debug/pprof", http.RedirectHandler("/debug/pprof/", http.StatusMovedPermanently))
+	}
+
+	if c.config.HTTP.Metrics.Enable {
+		g := web.RootRouter().NewRoute().Subrouter()
+		if c.config.HTTP.Metrics.Password != "" {
+			g.Use(mux.MiddlewareFunc(webmiddleware.BasicAuth(
+				"metrics",
+				webmiddleware.AuthUser(metricsUsername, c.config.HTTP.Metrics.Password),
+			)))
+		}
+		g.Handle("/metrics", metrics.Exporter)
+	}
+
+	if c.config.HTTP.Health.Enable {
+		g := web.RootRouter().NewRoute().Subrouter()
+		if c.config.HTTP.Health.Password != "" {
+			g.Use(mux.MiddlewareFunc(webmiddleware.BasicAuth(
+				"health",
+				webmiddleware.AuthUser(healthUsername, c.config.HTTP.Health.Password),
+			)))
+		}
+		g.HandleFunc("/healthz/live", c.healthHandler.LiveEndpoint)
+		g.HandleFunc("/healthz/ready", c.healthHandler.ReadyEndpoint)
+	}
+
 	c.web = web
 	return nil
 }
@@ -108,43 +146,6 @@ func (c *Component) listenWeb() (err error) {
 	err = c.serveOnEndpoints(c.webEndpoints(), (*Component).serveWeb, "web")
 	if err != nil {
 		return
-	}
-
-	if c.config.HTTP.PProf.Enable {
-		g := c.web.RootRouter().NewRoute().Subrouter()
-		if c.config.HTTP.PProf.Password != "" {
-			g.Use(mux.MiddlewareFunc(webmiddleware.BasicAuth(
-				"pprof",
-				webmiddleware.AuthUser(pprofUsername, c.config.HTTP.PProf.Password),
-			)))
-		}
-		g.HandleFunc("/debug/pprof/profile", pprof.Profile)
-		g.HandleFunc("/debug/pprof/trace", pprof.Trace)
-		g.PathPrefix("/debug/pprof/").HandlerFunc(pprof.Index)
-		g.Handle("/debug/pprof", http.RedirectHandler("/debug/pprof/", http.StatusMovedPermanently))
-	}
-
-	if c.config.HTTP.Metrics.Enable {
-		g := c.web.RootRouter().NewRoute().Subrouter()
-		if c.config.HTTP.Metrics.Password != "" {
-			g.Use(mux.MiddlewareFunc(webmiddleware.BasicAuth(
-				"metrics",
-				webmiddleware.AuthUser(metricsUsername, c.config.HTTP.Metrics.Password),
-			)))
-		}
-		g.Handle("/metrics", metrics.Exporter)
-	}
-
-	if c.config.HTTP.Health.Enable {
-		g := c.web.RootRouter().NewRoute().Subrouter()
-		if c.config.HTTP.Health.Password != "" {
-			g.Use(mux.MiddlewareFunc(webmiddleware.BasicAuth(
-				"health",
-				webmiddleware.AuthUser(healthUsername, c.config.HTTP.Health.Password),
-			)))
-		}
-		g.HandleFunc("/healthz/live", c.healthHandler.LiveEndpoint)
-		g.HandleFunc("/healthz/ready", c.healthHandler.ReadyEndpoint)
 	}
 
 	return nil

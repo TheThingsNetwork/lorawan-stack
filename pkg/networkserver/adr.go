@@ -63,20 +63,22 @@ var demodulationFloor = map[uint32]map[uint32]float32{
 	},
 }
 
-// safetyMargin is a margin in dB added for ADR parameter calculation if less than 20 uplinks are available.
-const safetyMargin = 2.5
+const (
+	// safetyMargin is a margin in dB added for ADR parameter calculation if less than 20 uplinks are available.
+	safetyMargin = 2.5
 
-// drStep is the difference between 2 consequitive data rates in dB.
-const drStep = 2.5
+	// drStep is the difference between 2 consequitive data rates in dB.
+	drStep = 2.5
 
-// maxNbTrans is the maximum NbTrans parameter used by the algorithm.
-const maxNbTrans = 3
+	// maxNbTrans is the maximum NbTrans parameter used by the algorithm.
+	maxNbTrans = 3
 
-// optimalADRUplinkCount is the amount of uplinks required to ensure optimal results from the ADR algorithm.
-const optimalADRUplinkCount = 20
+	// optimalADRUplinkCount is the amount of uplinks required to ensure optimal results from the ADR algorithm.
+	optimalADRUplinkCount = 20
 
-// DefaultADRMargin is the default ADR margin used if not specified in MACSettings of the device or NS-wide defaults.
-const DefaultADRMargin = 15
+	// DefaultADRMargin is the default ADR margin used if not specified in MACSettings of the device or NS-wide defaults.
+	DefaultADRMargin = 15
+)
 
 func deviceADRMargin(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) float32 {
 	if dev.MACSettings != nil && dev.MACSettings.ADRMargin != nil {
@@ -157,6 +159,13 @@ func uplinkMetadata(ups ...*ttnpb.UplinkMessage) []*ttnpb.RxMetadata {
 }
 
 func txPowerStep(phy band.Band, from, to uint8) float32 {
+	max := phy.MaxTxPowerIndex()
+	if from > max {
+		from = max
+	}
+	if to > max {
+		to = max
+	}
 	return phy.TxOffset[from] - phy.TxOffset[to]
 }
 

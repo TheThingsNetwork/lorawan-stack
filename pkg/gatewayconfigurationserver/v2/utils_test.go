@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gcsv2
+package gatewayconfigurationserver
 
 import (
 	"testing"
@@ -20,7 +20,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -69,9 +68,8 @@ func TestSetTTKGFirmwareURL(t *testing.T) {
 		t.Run(tt.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			s := New(componenttest.NewComponent(t, &component.Config{}), WithTheThingsGatewayConfig(tt.Config))
-			var res gatewayInfoResponse
-			s.setTTKGFirmwareURL(&res, &ttnpb.Gateway{UpdateChannel: tt.UpdateChannel})
-			a.So(res.FirmwareURL, should.Equal, tt.ExpectedURL)
+			url := s.ttkgFirmwareURL(tt.UpdateChannel)
+			a.So(url, should.Equal, tt.ExpectedURL)
 		})
 	}
 }
