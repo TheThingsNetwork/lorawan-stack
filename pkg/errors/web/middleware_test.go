@@ -44,8 +44,13 @@ func TestErrorHandling(t *testing.T) {
   "code": 5,
   "details": [
     {
-      "type_url": "type.googleapis.com/ttn.lorawan.v3.ErrorDetails",
-      "value": "Cg5wa2cvZXJyb3JzL3dlYhoJTm90IEZvdW5kIhgKFgoHbWVzc2FnZRILGglOb3QgRm91bmQ4BQ=="
+      "@type": "type.googleapis.com/ttn.lorawan.v3.ErrorDetails",
+      "attributes": {
+        "message": "Not Found"
+      },
+      "code": 5,
+      "message_format": "Not Found",
+      "namespace": "pkg/errors/web"
     }
   ],
   "message": "error:pkg/errors/web:unknown (Not Found)"
@@ -58,8 +63,11 @@ func TestErrorHandling(t *testing.T) {
   "code": 5,
   "details": [
     {
-      "type_url": "type.googleapis.com/ttn.lorawan.v3.ErrorDetails",
-      "value": "ChNwa2cvZXJyb3JzL3dlYl90ZXN0Eg50ZXN0X25vdF9mb3VuZBoOdGVzdCBub3QgZm91bmQ4BQ=="
+      "@type": "type.googleapis.com/ttn.lorawan.v3.ErrorDetails",
+      "code": 5,
+      "message_format": "test not found",
+      "name": "test_not_found",
+      "namespace": "pkg/errors/web_test"
     }
   ],
   "message": "error:pkg/errors/web_test:test_not_found (test not found)"
@@ -72,8 +80,11 @@ func TestErrorHandling(t *testing.T) {
   "code": 5,
   "details": [
     {
-      "type_url": "type.googleapis.com/ttn.lorawan.v3.ErrorDetails",
-      "value": "ChNwa2cvZXJyb3JzL3dlYl90ZXN0Eg50ZXN0X25vdF9mb3VuZBoOdGVzdCBub3QgZm91bmQ4BQ=="
+      "@type": "type.googleapis.com/ttn.lorawan.v3.ErrorDetails",
+      "code": 5,
+      "message_format": "test not found",
+      "name": "test_not_found",
+      "namespace": "pkg/errors/web_test"
     }
   ],
   "message": "error:pkg/errors/web_test:test_not_found (test not found)"
