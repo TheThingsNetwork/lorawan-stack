@@ -51,8 +51,17 @@ func execGo(stdout, stderr io.Writer, cmd string, args ...string) error {
 	return err
 }
 
+func execGoFrom(dir string, stdout, stderr io.Writer, cmd string, args ...string) error {
+	_, err := sh.ExecFrom(dir, goModuleEnv, stdout, stderr, "go", buildGoArgs(cmd, args...)...)
+	return err
+}
+
 func runGo(args ...string) error {
 	return execGo(os.Stdout, os.Stderr, "run", args...)
+}
+
+func runGoFrom(dir string, args ...string) error {
+	return execGoFrom(dir, os.Stdout, os.Stderr, "run", args...)
 }
 
 func outputGo(cmd string, args ...string) (string, error) {
@@ -63,27 +72,8 @@ func outputGo(cmd string, args ...string) (string, error) {
 	return buf.String(), nil
 }
 
-func pushd(dir string) func() {
-	old, err := os.Getwd()
-	if err != nil {
-		fmt.Printf("Failed to get working directory: %s", err)
-		os.Exit(1)
-	}
-	if err := os.Chdir(dir); err != nil {
-		fmt.Printf("Failed to chdir to `%s`: %s", dir, err)
-		os.Exit(1)
-	}
-	return func() {
-		if err := os.Chdir(old); err != nil {
-			fmt.Printf("Failed to chdir to previous working directory `%s`: %s", old, err)
-			os.Exit(1)
-		}
-	}
-}
-
 func runGoTool(args ...string) error {
-	defer pushd("tools")()
-	return runGo(append([]string{"-exec", "go run exec_from.go -dir .."}, args...)...)
+	return runGoFrom("tools", append([]string{"-exec", "go run exec_from.go -dir .."}, args...)...)
 }
 
 func runUnconvert(pkgs ...string) error {

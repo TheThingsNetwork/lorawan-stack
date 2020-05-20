@@ -14,6 +14,9 @@ replace gopkg.in/DATA-DOG/go-sqlmock.v1 => gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.
 // See https://github.com/Azure/go-autorest/issues/414.
 replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v13.3.1+incompatible
 
+// TODO: Remove once https://github.com/magefile/mage/pull/307 is merged.
+replace github.com/magefile/mage v1.9.1 => github.com/TheThingsIndustries/mage v1.9.1-0.20200520191129-8bccc5d0bd6f
+
 require (
 	github.com/Azure/go-autorest/autorest v0.10.1 // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.8.3 // indirect
@@ -26,7 +29,7 @@ require (
 	github.com/gobuffalo/envy v1.9.0 // indirect
 	github.com/gohugoio/hugo v0.71.0
 	github.com/goreleaser/goreleaser v0.135.0
-	github.com/magefile/mage v1.9.0
+	github.com/magefile/mage v1.9.1
 	github.com/mattn/goveralls v0.0.5
 	github.com/mdempsky/unconvert v0.0.0-20200228143138-95ecdbfc0b5f
 	github.com/mgechev/revive v1.0.2
