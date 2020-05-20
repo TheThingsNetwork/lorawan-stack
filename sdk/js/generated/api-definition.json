@@ -311,6 +311,7 @@
         "default_formatters.up_formatter",
         "default_formatters.up_formatter_parameter",
         "network_server_address",
+        "skip_payload_crypto",
         "tls"
       ]
     },
@@ -334,6 +335,7 @@
         "default_formatters.up_formatter",
         "default_formatters.up_formatter_parameter",
         "network_server_address",
+        "skip_payload_crypto",
         "tls"
       ]
     },
@@ -403,6 +405,7 @@
         "session.keys.session_key_id",
         "session.last_a_f_cnt_down",
         "skip_payload_crypto",
+        "skip_payload_crypto_override",
         "version_ids",
         "version_ids.brand_id",
         "version_ids.firmware_version",
@@ -449,6 +452,7 @@
         "session.keys.session_key_id",
         "session.last_a_f_cnt_down",
         "skip_payload_crypto",
+        "skip_payload_crypto_override",
         "version_ids",
         "version_ids.brand_id",
         "version_ids.firmware_version",
