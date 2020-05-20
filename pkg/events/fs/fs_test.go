@@ -46,7 +46,7 @@ func TestWatcher(t *testing.T) {
 	time.Sleep(test.Delay)
 
 	var i int
-	var expected = []string{
+	expected := []string{
 		"fs.write",
 		"fs.chmod",
 		"fs.remove",

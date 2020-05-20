@@ -61,7 +61,7 @@ func TestEvents(t *testing.T) {
 		newTotal <- totalEvents
 	})
 
-	var eventCh = make(chan events.Event)
+	eventCh := make(chan events.Event)
 	handler := events.HandlerFunc(func(e events.Event) {
 		eventCh <- e
 	})
@@ -146,7 +146,7 @@ func Example() {
 	// Event names are lowercase snake_case and can be dot-separated as component.subsystem.subsystem.event
 	// Event descriptions are short descriptions of what the event means.
 	// Visibility rights are optional. If no rights are supplied, then the _ALL right is assumed.
-	var adrSendEvent = events.Define("ns.mac.adr.send_req", "send ADR request", ttnpb.RIGHT_APPLICATION_TRAFFIC_READ)
+	adrSendEvent := events.Define("ns.mac.adr.send_req", "send ADR request", ttnpb.RIGHT_APPLICATION_TRAFFIC_READ)
 
 	// These variables come from the request or you got them from the db or something.
 	var (
