@@ -27,24 +27,28 @@ import (
 func TestChain(t *testing.T) {
 	a := assertions.New(t)
 
-	var layers []string
+	var trace []string
 	middleware := []MiddlewareFunc{
 		func(next http.Handler) http.Handler {
-			layers = append(layers, "outer")
-			return next
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				trace = append(trace, "outer begin")
+				next.ServeHTTP(w, r)
+				trace = append(trace, "outer end")
+			})
 		},
 		func(next http.Handler) http.Handler {
-			layers = append(layers, "inner")
-			return next
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				trace = append(trace, "inner begin")
+				next.ServeHTTP(w, r)
+				trace = append(trace, "inner end")
+			})
 		},
 	}
 
-	var handlerCalled bool
 	chain := Chain(middleware, http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
-		handlerCalled = true
+		trace = append(trace, "handler")
 	}))
 	chain.ServeHTTP(httptest.NewRecorder(), httptest.NewRequest(http.MethodGet, "/", nil))
 
-	a.So(layers, should.Resemble, []string{"outer", "inner"})
-	a.So(handlerCalled, should.BeTrue)
+	a.So(trace, should.Resemble, []string{"outer begin", "inner begin", "handler", "inner end", "outer end"})
 }
