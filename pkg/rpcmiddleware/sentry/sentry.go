@@ -23,7 +23,6 @@ import (
 	"github.com/getsentry/sentry-go"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-
 	sentryerrors "go.thethings.network/lorawan-stack/v3/pkg/errors/sentry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -49,6 +48,9 @@ func reportError(ctx context.Context, method string, err error) {
 
 	// Request Tags.
 	errEvent.Transaction = method
+	if errEvent.Request == nil {
+		errEvent.Request = &sentry.Request{}
+	}
 	errEvent.Request.URL = method
 	errEvent.Request.Headers = make(map[string]string)
 	errEvent.Tags["grpc.method"] = method

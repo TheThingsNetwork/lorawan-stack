@@ -30,7 +30,7 @@ import (
 
 const (
 	protocName    = "thethingsindustries/protoc"
-	protocVersion = "3.1.22-tts"
+	protocVersion = "3.1.25-tts"
 
 	protocOut = "/out"
 )

@@ -9087,6 +9087,10 @@
               "options": {
                 "validate.rules": [
                   {
+                    "name": "repeated.max_items",
+                    "value": 15
+                  },
+                  {
                     "name": "repeated.items.enum.defined_only",
                     "value": true
                   }
@@ -9104,6 +9108,10 @@
               "defaultValue": "",
               "options": {
                 "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 15
+                  },
                   {
                     "name": "repeated.items.uint32.lte",
                     "value": 15
@@ -10403,6 +10411,10 @@
               "defaultValue": "",
               "options": {
                 "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 8
+                  },
                   {
                     "name": "repeated.items.string.max_len",
                     "value": 64
@@ -23150,6 +23162,10 @@
                   {
                     "name": "uint32.lte",
                     "value": 1000
+                  },
+                  {
+                    "name": "uint32.gte",
+                    "value": 10
                   }
                 ]
               }
