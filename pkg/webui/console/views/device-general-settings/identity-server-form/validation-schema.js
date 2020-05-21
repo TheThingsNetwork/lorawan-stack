@@ -17,14 +17,11 @@ import * as Yup from 'yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
 
-import randomByteString from '@console/lib/random-bytes'
 import { id as deviceIdRegexp, address as addressRegexp } from '@console/lib/regexp'
-
-import { parseLorawanMacVersion } from '../utils'
+import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-utils'
 
 const jsConfig = selectJsConfig()
 
-const random16BytesString = () => randomByteString(32)
 const toUndefined = value => (!Boolean(value) ? undefined : value)
 
 const validationSchema = Yup.object()
@@ -92,7 +89,7 @@ const validationSchema = Yup.object()
                 key: Yup.string()
                   .emptyOrLength(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
                   .transform(toUndefined)
-                  .default(random16BytesString),
+                  .default(generate16BytesKey),
               })
             : Yup.object().strip()
         })
