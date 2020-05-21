@@ -23,8 +23,6 @@ import Select from '@ttn-lw/components/select'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
 
-import m from '@console/components/device-data-form/messages'
-
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import DevAddrInput from '@console/containers/dev-addr-input'
 
@@ -196,7 +194,7 @@ const NetworkServerForm = React.memo(props => {
     >
       <Form.Field
         title={sharedMessages.macVersion}
-        description={m.lorawanVersionDescription}
+        description={sharedMessages.lorawanVersionDescription}
         name="lorawan_version"
         component={Select}
         required
@@ -205,33 +203,37 @@ const NetworkServerForm = React.memo(props => {
       />
       <Form.Field
         title={sharedMessages.phyVersion}
-        description={m.lorawanPhyVersionDescription}
+        description={sharedMessages.lorawanPhyVersionDescription}
         name="lorawan_phy_version"
         component={Select}
         required
         options={lorawanPhyVersions}
       />
       <NsFrequencyPlansSelect name="frequency_plan_id" required />
-      <Form.Field title={m.supportsClassC} name="supports_class_c" component={Checkbox} />
       <Form.Field
-        title={m.activationMode}
+        title={sharedMessages.supportsClassC}
+        name="supports_class_c"
+        component={Checkbox}
+      />
+      <Form.Field
+        title={sharedMessages.activationMode}
         disabled
         required
         name="_activation_mode"
         component={Radio.Group}
         horizontal={false}
       >
-        <Radio label={m.otaa} value={ACTIVATION_MODES.OTAA} />
-        <Radio label={m.abp} value={ACTIVATION_MODES.ABP} />
-        <Radio label={m.multicast} value={ACTIVATION_MODES.MULTICAST} />
+        <Radio label={sharedMessages.otaa} value={ACTIVATION_MODES.OTAA} />
+        <Radio label={sharedMessages.abp} value={ACTIVATION_MODES.ABP} />
+        <Radio label={sharedMessages.multicast} value={ACTIVATION_MODES.MULTICAST} />
       </Form.Field>
       {(isABP || isMulticast || isJoinedOTAA) && (
         <>
           {!isMulticast && !isJoinedOTAA && (
             <Form.Field
-              title={m.resetsFCnt}
+              title={sharedMessages.resetsFCnt}
               onChange={handleResetsFCntChange}
-              warning={resetsFCnt ? m.resetWarning : undefined}
+              warning={resetsFCnt ? sharedMessages.resetWarning : undefined}
               name="mac_settings.resets_f_cnt"
               component={Checkbox}
             />
@@ -240,8 +242,7 @@ const NetworkServerForm = React.memo(props => {
           <DevAddrInput
             title={sharedMessages.devAddr}
             name="session.dev_addr"
-            placeholder={m.leaveBlankPlaceholder}
-            description={m.deviceAddrDescription}
+            description={sharedMessages.deviceAddrDescription}
             disabled={!mayEditKeys}
             required={mayReadKeys && mayEditKeys}
           />
@@ -251,7 +252,11 @@ const NetworkServerForm = React.memo(props => {
             type="byte"
             min={16}
             max={16}
-            description={lorawanVersion >= 110 ? m.fNwkSIntKeyDescription : m.nwkSKeyDescription}
+            description={
+              lorawanVersion >= 110
+                ? sharedMessages.fNwkSIntKeyDescription
+                : sharedMessages.nwkSKeyDescription
+            }
             disabled={!mayEditKeys}
             component={Input.Generate}
             mayGenerateValue={mayEditKeys}
@@ -264,7 +269,7 @@ const NetworkServerForm = React.memo(props => {
               type="byte"
               min={16}
               max={16}
-              description={m.sNwkSIKeyDescription}
+              description={sharedMessages.sNwkSIKeyDescription}
               disabled={!mayEditKeys}
               component={Input.Generate}
               mayGenerateValue={mayEditKeys}
@@ -278,7 +283,7 @@ const NetworkServerForm = React.memo(props => {
               type="byte"
               min={16}
               max={16}
-              description={m.nwkSEncKeyDescription}
+              description={sharedMessages.nwkSEncKeyDescription}
               disabled={!mayEditKeys}
               component={Input.Generate}
               mayGenerateValue={mayEditKeys}
