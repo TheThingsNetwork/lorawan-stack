@@ -30,41 +30,24 @@ import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import randomByteString from '@console/lib/random-bytes'
+import {
+  parseLorawanMacVersion,
+  ACTIVATION_MODES,
+  LORAWAN_VERSIONS,
+  LORAWAN_PHY_VERSIONS,
+  generate16BytesKey,
+} from '@console/lib/device-utils'
 
 import messages from '../messages'
 import {
-  parseLorawanMacVersion,
   isDeviceABP,
   isDeviceMulticast,
-  ACTIVATION_MODES,
   hasExternalJs,
   isDeviceJoined,
   isDeviceOTAA,
 } from '../utils'
 
 import validationSchema from './validation-schema'
-
-const random16BytesString = () => randomByteString(32)
-
-const lorawanVersions = [
-  { value: '1.0.0', label: 'MAC V1.0' },
-  { value: '1.0.1', label: 'MAC V1.0.1' },
-  { value: '1.0.2', label: 'MAC V1.0.2' },
-  { value: '1.0.3', label: 'MAC V1.0.3' },
-  { value: '1.0.4', label: 'MAC V1.0.4' },
-  { value: '1.1.0', label: 'MAC V1.1' },
-]
-
-const lorawanPhyVersions = [
-  { value: '1.0.0', label: 'PHY V1.0' },
-  { value: '1.0.1', label: 'PHY V1.0.1' },
-  { value: '1.0.2-a', label: 'PHY V1.0.2 REV A' },
-  { value: '1.0.2-b', label: 'PHY V1.0.2 REV B' },
-  { value: '1.0.3-a', label: 'PHY V1.0.3 REV A' },
-  { value: '1.1.0-a', label: 'PHY V1.1 REV A' },
-  { value: '1.1.0-b', label: 'PHY V1.1 REV B' },
-]
 
 const NetworkServerForm = React.memo(props => {
   const { device, onSubmit, onSubmitSuccess, mayEditKeys, mayReadKeys } = props
@@ -198,7 +181,7 @@ const NetworkServerForm = React.memo(props => {
         name="lorawan_version"
         component={Select}
         required
-        options={lorawanVersions}
+        options={LORAWAN_VERSIONS}
         onChange={handleVersionChange}
       />
       <Form.Field
@@ -207,7 +190,7 @@ const NetworkServerForm = React.memo(props => {
         name="lorawan_phy_version"
         component={Select}
         required
-        options={lorawanPhyVersions}
+        options={LORAWAN_PHY_VERSIONS}
       />
       <NsFrequencyPlansSelect name="frequency_plan_id" required />
       <Form.Field
@@ -260,7 +243,7 @@ const NetworkServerForm = React.memo(props => {
             disabled={!mayEditKeys}
             component={Input.Generate}
             mayGenerateValue={mayEditKeys}
-            onGenerateValue={random16BytesString}
+            onGenerateValue={generate16BytesKey}
           />
           {lorawanVersion >= 110 && (
             <Form.Field
@@ -273,7 +256,7 @@ const NetworkServerForm = React.memo(props => {
               disabled={!mayEditKeys}
               component={Input.Generate}
               mayGenerateValue={mayEditKeys}
-              onGenerateValue={random16BytesString}
+              onGenerateValue={generate16BytesKey}
             />
           )}
           {lorawanVersion >= 110 && (
@@ -287,7 +270,7 @@ const NetworkServerForm = React.memo(props => {
               disabled={!mayEditKeys}
               component={Input.Generate}
               mayGenerateValue={mayEditKeys}
-              onGenerateValue={random16BytesString}
+              onGenerateValue={generate16BytesKey}
             />
           )}
         </>

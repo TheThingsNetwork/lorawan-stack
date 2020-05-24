@@ -17,9 +17,10 @@ import * as Yup from 'yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { id as deviceIdRegexp, address as addressRegexp } from '@console/lib/regexp'
+import { parseLorawanMacVersion, ACTIVATION_MODES } from '@console/lib/device-utils'
 
-const isABP = mode => mode === 'abp'
-const isOTAA = mode => mode === 'otaa'
+const isABP = mode => mode === ACTIVATION_MODES.ABP
+const isOTAA = mode => mode === ACTIVATION_MODES.OTAA
 
 const validationSchema = Yup.object({
   name: Yup.string()
@@ -51,7 +52,7 @@ const validationSchema = Yup.object({
         .required(sharedMessages.validateRequired),
     })
     .when(['_activation_mode', 'lorawan_version'], (mode, version, schema) => {
-      const isLw104 = Boolean(version) && parseInt(version.replace(/\D/g, '').padEnd(3, 0)) === 104
+      const isLw104 = parseLorawanMacVersion(version) === 104
       const isModeOTAA = isOTAA(mode)
 
       return schema.shape({
@@ -88,7 +89,7 @@ const validationSchema = Yup.object({
     _external_js: Yup.boolean().default(true),
     _may_edit_keys: Yup.boolean().default(false),
     supports_join: Yup.boolean().when('_activation_mode', {
-      is: 'otaa',
+      is: ACTIVATION_MODES.OTAA,
       then: schema => schema.default(true),
       otherwise: schema => schema.default(false),
     }),
@@ -156,8 +157,7 @@ const validationSchema = Yup.object({
     session: Yup.object().when(['_activation_mode', 'lorawan_version'], (mode, version, schema) => {
       if (isABP(mode)) {
         // Check if the version is 1.1.x or higher.
-        const isNewVersion =
-          Boolean(version) && parseInt(version.replace(/\D/g, '').padEnd(3, 0)) >= 110
+        const isNewVersion = parseLorawanMacVersion(version) >= 110
 
         return schema.shape({
           dev_addr: Yup.string()

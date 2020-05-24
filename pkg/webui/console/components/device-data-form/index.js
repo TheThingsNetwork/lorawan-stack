@@ -34,12 +34,16 @@ import { selectNsConfig, selectJsConfig, selectAsConfig } from '@ttn-lw/lib/sele
 import errorMessages from '@ttn-lw/lib/errors/error-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import randomByteString from '@console/lib/random-bytes'
+import {
+  parseLorawanMacVersion,
+  generate16BytesKey,
+  ACTIVATION_MODES,
+  LORAWAN_VERSIONS,
+  LORAWAN_PHY_VERSIONS,
+} from '@console/lib/device-utils'
 
 import m from './messages'
 import validationSchema from './validation-schema'
-
-const random16BytesString = () => randomByteString(32)
 
 class DeviceDataForm extends Component {
   static propTypes = {
@@ -151,9 +155,7 @@ class DeviceDataForm extends Component {
   get ABPSection() {
     const { resets_f_cnt, lorawan_version } = this.state
 
-    const lwVersion = Boolean(lorawan_version)
-      ? parseInt(lorawan_version.replace(/\D/g, '').padEnd(3, 0))
-      : 0
+    const lwVersion = parseLorawanMacVersion(lorawan_version)
 
     return (
       <>
@@ -181,7 +183,7 @@ class DeviceDataForm extends Component {
           max={16}
           description={sharedMessages.nwkSKeyDescription}
           component={Input.Generate}
-          onGenerateValue={random16BytesString}
+          onGenerateValue={generate16BytesKey}
           required
         />
         <Form.Field
@@ -192,7 +194,7 @@ class DeviceDataForm extends Component {
           max={16}
           description={sharedMessages.appSKeyDescription}
           component={Input.Generate}
-          onGenerateValue={random16BytesString}
+          onGenerateValue={generate16BytesKey}
           required
         />
         {lwVersion >= 110 && (
@@ -205,7 +207,7 @@ class DeviceDataForm extends Component {
               max={16}
               description={sharedMessages.sNwkSIKeyDescription}
               component={Input.Generate}
-              onGenerateValue={random16BytesString}
+              onGenerateValue={generate16BytesKey}
               required
             />
             <Form.Field
@@ -216,7 +218,7 @@ class DeviceDataForm extends Component {
               max={16}
               description={sharedMessages.nwkSEncKeyDescription}
               component={Input.Generate}
-              onGenerateValue={random16BytesString}
+              onGenerateValue={generate16BytesKey}
               required
             />
           </>
@@ -281,7 +283,7 @@ class DeviceDataForm extends Component {
               placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
               component={Input.Generate}
               disabled={external_js}
-              onGenerateValue={random16BytesString}
+              onGenerateValue={generate16BytesKey}
               mayGenerateValue={!external_js && mayEditKeys}
             />
             <Form.Field
@@ -294,7 +296,7 @@ class DeviceDataForm extends Component {
               placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
               component={Input.Generate}
               disabled={external_js}
-              onGenerateValue={random16BytesString}
+              onGenerateValue={generate16BytesKey}
               mayGenerateValue={!external_js && mayEditKeys}
             />
           </>
@@ -356,7 +358,7 @@ class DeviceDataForm extends Component {
         join_eui: undefined,
         dev_eui: undefined,
       },
-      _activation_mode: 'otaa',
+      _activation_mode: ACTIVATION_MODES.OTAA,
       lorawan_version: undefined,
       lorawan_phy_version: undefined,
       frequency_plan_id: undefined,
@@ -390,7 +392,7 @@ class DeviceDataForm extends Component {
       network_server_address: nsConfig.enabled ? new URL(nsConfig.base_url).hostname : '',
       application_server_address: asConfig.enabled ? new URL(asConfig.base_url).hostname : '',
       join_server_address: external_js ? undefined : joinServerAddress,
-      _activation_mode: otaa ? 'otaa' : 'abp',
+      _activation_mode: otaa ? ACTIVATION_MODES.OTAA : ACTIVATION_MODES.ABP,
       _external_js: external_js,
       _may_edit_keys: mayEditKeys,
     }
@@ -435,14 +437,7 @@ class DeviceDataForm extends Component {
           component={Select}
           required
           onChange={this.handleLorawanVersionChange}
-          options={[
-            { value: '1.0.0', label: 'MAC V1.0' },
-            { value: '1.0.1', label: 'MAC V1.0.1' },
-            { value: '1.0.2', label: 'MAC V1.0.2' },
-            { value: '1.0.3', label: 'MAC V1.0.3' },
-            { value: '1.0.4', label: 'MAC V1.0.4' },
-            { value: '1.1.0', label: 'MAC V1.1' },
-          ]}
+          options={LORAWAN_VERSIONS}
         />
         <Form.Field
           title={sharedMessages.phyVersion}
@@ -450,15 +445,7 @@ class DeviceDataForm extends Component {
           name="lorawan_phy_version"
           component={Select}
           required
-          options={[
-            { value: '1.0.0', label: 'PHY V1.0' },
-            { value: '1.0.1', label: 'PHY V1.0.1' },
-            { value: '1.0.2-a', label: 'PHY V1.0.2 REV A' },
-            { value: '1.0.2-b', label: 'PHY V1.0.2 REV B' },
-            { value: '1.0.3-a', label: 'PHY V1.0.3 REV A' },
-            { value: '1.1.0-a', label: 'PHY V1.1 REV A' },
-            { value: '1.1.0-b', label: 'PHY V1.1 REV B' },
-          ]}
+          options={LORAWAN_PHY_VERSIONS}
         />
         <NsFrequencyPlansSelect name="frequency_plan_id" required />
         <Form.Field

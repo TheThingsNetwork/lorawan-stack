@@ -25,14 +25,12 @@ import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import randomByteString from '@console/lib/random-bytes'
+import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-utils'
 
 import messages from '../messages'
-import { parseLorawanMacVersion, hasExternalJs } from '../utils'
+import { hasExternalJs } from '../utils'
 
 import validationSchema from './validation-schema'
-
-const random16BytesString = () => randomByteString(32)
 
 // The Join Server can store end device fields while not exposing the root keys.
 // This means that the `root_keys` object is present, same for
@@ -183,7 +181,7 @@ const JoinServerForm = React.memo(props => {
         component={Input.Generate}
         disabled={appKeyHidden || !mayEditKeys}
         mayGenerateValue={mayEditKeys && !appKeyHidden}
-        onGenerateValue={random16BytesString}
+        onGenerateValue={generate16BytesKey}
       />
       {isNewLorawanVersion && (
         <Form.Field
@@ -197,7 +195,7 @@ const JoinServerForm = React.memo(props => {
           component={Input.Generate}
           disabled={nwkKeyHidden || !mayEditKeys}
           mayGenerateValue={mayEditKeys && !nwkKeyHidden}
-          onGenerateValue={random16BytesString}
+          onGenerateValue={generate16BytesKey}
         />
       )}
       <SubmitBar>
