@@ -163,15 +163,14 @@ class DeviceDataForm extends Component {
           type="byte"
           min={8}
           max={8}
-          description={m.deviceEUIDescription}
+          description={sharedMessages.deviceEUIDescription}
           required={lwVersion === 104}
           component={Input}
         />
         <DevAddrInput
           title={sharedMessages.devAddr}
           name="session.dev_addr"
-          placeholder={m.leaveBlankPlaceholder}
-          description={m.deviceAddrDescription}
+          description={sharedMessages.deviceAddrDescription}
           required
         />
         <Form.Field
@@ -180,7 +179,7 @@ class DeviceDataForm extends Component {
           type="byte"
           min={16}
           max={16}
-          description={m.nwkSKeyDescription}
+          description={sharedMessages.nwkSKeyDescription}
           component={Input.Generate}
           onGenerateValue={random16BytesString}
           required
@@ -191,7 +190,7 @@ class DeviceDataForm extends Component {
           type="byte"
           min={16}
           max={16}
-          description={m.appSKeyDescription}
+          description={sharedMessages.appSKeyDescription}
           component={Input.Generate}
           onGenerateValue={random16BytesString}
           required
@@ -204,7 +203,7 @@ class DeviceDataForm extends Component {
               type="byte"
               min={16}
               max={16}
-              description={m.sNwkSIKeyDescription}
+              description={sharedMessages.sNwkSIKeyDescription}
               component={Input.Generate}
               onGenerateValue={random16BytesString}
               required
@@ -215,7 +214,7 @@ class DeviceDataForm extends Component {
               type="byte"
               min={16}
               max={16}
-              description={m.nwkSEncKeyDescription}
+              description={sharedMessages.nwkSEncKeyDescription}
               component={Input.Generate}
               onGenerateValue={random16BytesString}
               required
@@ -223,9 +222,9 @@ class DeviceDataForm extends Component {
           </>
         )}
         <Form.Field
-          title={m.resetsFCnt}
+          title={sharedMessages.resetsFCnt}
           onChange={this.handleResetsFrameCountersChange}
-          warning={resets_f_cnt ? m.resetWarning : undefined}
+          warning={resets_f_cnt ? sharedMessages.resetWarning : undefined}
           name="mac_settings.resets_f_cnt"
           component={Checkbox}
         />
@@ -242,7 +241,7 @@ class DeviceDataForm extends Component {
         <JoinEUIPrefixesInput
           title={sharedMessages.joinEUI}
           name="ids.join_eui"
-          description={m.joinEUIDescription}
+          description={sharedMessages.joinEUIDescription}
           required
           showPrefixes
         />
@@ -252,20 +251,20 @@ class DeviceDataForm extends Component {
           type="byte"
           min={8}
           max={8}
-          description={m.deviceEUIDescription}
+          description={sharedMessages.deviceEUIDescription}
           required
           component={Input}
         />
         <Form.Field
-          title={m.externalJoinServer}
-          description={m.externalJoinServerDescription}
+          title={sharedMessages.externalJoinServer}
+          description={sharedMessages.externalJoinServerDescription}
           name="_external_js"
           onChange={this.handleExternalJoinServerChange}
           component={Checkbox}
         />
         <Form.Field
           title={sharedMessages.joinServerAddress}
-          placeholder={external_js ? m.external : sharedMessages.addressPlaceholder}
+          placeholder={external_js ? sharedMessages.external : sharedMessages.addressPlaceholder}
           name="join_server_address"
           component={Input}
           disabled={external_js}
@@ -278,7 +277,7 @@ class DeviceDataForm extends Component {
               type="byte"
               min={16}
               max={16}
-              description={m.appKeyDescription}
+              description={sharedMessages.appKeyDescription}
               placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
               component={Input.Generate}
               disabled={external_js}
@@ -291,7 +290,7 @@ class DeviceDataForm extends Component {
               type="byte"
               min={16}
               max={16}
-              description={m.nwkKeyDescription}
+              description={sharedMessages.nwkKeyDescription}
               placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
               component={Input.Generate}
               disabled={external_js}
@@ -301,16 +300,16 @@ class DeviceDataForm extends Component {
           </>
         )}
         <Form.Field
-          title={m.resetsJoinNonces}
+          title={sharedMessages.resetsJoinNonces}
           onChange={this.handleResetsJoinNoncesChange}
-          warning={resets_join_nonces ? m.resetWarning : undefined}
+          warning={resets_join_nonces ? sharedMessages.resetWarning : undefined}
           name="resets_join_nonces"
           component={Checkbox}
           disabled={external_js}
         />
         <Form.Field
-          title={m.homeNetID}
-          description={m.homeNetIDDescription}
+          title={sharedMessages.homeNetID}
+          description={sharedMessages.homeNetIDDescription}
           placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
           name="net_id"
           type="byte"
@@ -320,25 +319,25 @@ class DeviceDataForm extends Component {
           disabled={external_js}
         />
         <Form.Field
-          title={m.asServerID}
+          title={sharedMessages.asServerID}
           name="application_server_id"
-          description={m.asServerIDDescription}
+          description={sharedMessages.asServerIDDescription}
           placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
           component={Input}
           disabled={external_js}
         />
         <Form.Field
-          title={m.asServerKekLabel}
+          title={sharedMessages.asServerKekLabel}
           name="application_server_kek_label"
-          description={m.asServerKekLabelDescription}
+          description={sharedMessages.asServerKekLabelDescription}
           placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
           component={Input}
           disabled={external_js}
         />
         <Form.Field
-          title={m.nsServerKekLabel}
+          title={sharedMessages.nsServerKekLabel}
           name="network_server_kek_label"
-          description={m.nsServerKekLabelDescription}
+          description={sharedMessages.nsServerKekLabelDescription}
           placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
           component={Input}
           disabled={external_js}
@@ -409,7 +408,7 @@ class DeviceDataForm extends Component {
         <Form.Field
           title={sharedMessages.devID}
           name="ids.device_id"
-          placeholder={m.deviceIdPlaceholder}
+          placeholder={sharedMessages.deviceIdPlaceholder}
           autoFocus
           required
           component={Input}
@@ -417,15 +416,15 @@ class DeviceDataForm extends Component {
         <Form.Field
           title={sharedMessages.devName}
           name="name"
-          placeholder={m.deviceNamePlaceholder}
+          placeholder={sharedMessages.deviceNamePlaceholder}
           component={Input}
         />
         <Form.Field
           title={sharedMessages.devDesc}
           name="description"
           type="textarea"
-          placeholder={m.deviceDescPlaceholder}
-          description={m.deviceDescDescription}
+          placeholder={sharedMessages.deviceDescPlaceholder}
+          description={sharedMessages.deviceDescDescription}
           component={Input}
         />
         <Message component="h4" content={m.lorawanOptions} />
@@ -462,7 +461,11 @@ class DeviceDataForm extends Component {
           ]}
         />
         <NsFrequencyPlansSelect name="frequency_plan_id" required />
-        <Form.Field title={m.supportsClassC} name="supports_class_c" component={Checkbox} />
+        <Form.Field
+          title={sharedMessages.supportsClassC}
+          name="supports_class_c"
+          component={Checkbox}
+        />
         <Form.Field
           title={sharedMessages.networkServerAddress}
           placeholder={sharedMessages.addressPlaceholder}
@@ -477,13 +480,13 @@ class DeviceDataForm extends Component {
         />
         <Message component="h4" content={m.activationSettings} />
         <Form.Field
-          title={m.activationMode}
+          title={sharedMessages.activationMode}
           name="_activation_mode"
           component={Radio.Group}
           disabled={!mayEditKeys}
         >
-          <Radio label={m.otaa} value="otaa" onChange={this.handleOTAASelect} />
-          <Radio label={m.abp} value="abp" onChange={this.handleABPSelect} />
+          <Radio label={sharedMessages.otaa} value="otaa" onChange={this.handleOTAASelect} />
+          <Radio label={sharedMessages.abp} value="abp" onChange={this.handleABPSelect} />
         </Form.Field>
         {otaa ? this.OTAASection : this.ABPSection}
         <SubmitBar>

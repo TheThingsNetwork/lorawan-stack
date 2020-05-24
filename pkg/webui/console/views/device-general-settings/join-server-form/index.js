@@ -21,8 +21,6 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
 
-import m from '@console/components/device-data-form/messages'
-
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -110,14 +108,14 @@ const JoinServerForm = React.memo(props => {
   if (externalJs) {
     appKeyPlaceholder = sharedMessages.provisionedOnExternalJoinServer
   } else if (appKeyHidden) {
-    appKeyPlaceholder = m.unexposed
+    appKeyPlaceholder = sharedMessages.unexposed
   }
 
   let nwkKeyPlaceholder
   if (externalJs) {
     nwkKeyPlaceholder = sharedMessages.provisionedOnExternalJoinServer
   } else if (nwkKeyHidden) {
-    nwkKeyPlaceholder = m.unexposed
+    nwkKeyPlaceholder = sharedMessages.unexposed
   }
 
   // Notify the user that the root keys might be there, but since there are no
@@ -134,8 +132,8 @@ const JoinServerForm = React.memo(props => {
       enableReinitialize
     >
       <Form.Field
-        title={m.homeNetID}
-        description={m.homeNetIDDescription}
+        title={sharedMessages.homeNetID}
+        description={sharedMessages.homeNetIDDescription}
         name="net_id"
         type="byte"
         min={3}
@@ -143,28 +141,28 @@ const JoinServerForm = React.memo(props => {
         component={Input}
       />
       <Form.Field
-        title={m.asServerID}
+        title={sharedMessages.asServerID}
         name="application_server_id"
-        description={m.asServerIDDescription}
+        description={sharedMessages.asServerIDDescription}
         component={Input}
       />
       <Form.Field
-        title={m.asServerKekLabel}
+        title={sharedMessages.asServerKekLabel}
         name="application_server_kek_label"
-        description={m.asServerKekLabelDescription}
+        description={sharedMessages.asServerKekLabelDescription}
         component={Input}
       />
       <Form.Field
-        title={m.nsServerKekLabel}
+        title={sharedMessages.nsServerKekLabel}
         name="network_server_kek_label"
-        description={m.nsServerKekLabelDescription}
+        description={sharedMessages.nsServerKekLabelDescription}
         component={Input}
       />
       {isNewLorawanVersion && (
         <Form.Field
-          title={m.resetsJoinNonces}
+          title={sharedMessages.resetsJoinNonces}
           onChange={handleResetsJoinNoncesChange}
-          warning={resetsJoinNonces ? m.resetWarning : undefined}
+          warning={resetsJoinNonces ? sharedMessages.resetWarning : undefined}
           name="resets_join_nonces"
           component={Checkbox}
         />
@@ -177,7 +175,11 @@ const JoinServerForm = React.memo(props => {
         min={16}
         max={16}
         placeholder={appKeyPlaceholder}
-        description={isNewLorawanVersion ? m.appKeyNewDescription : m.appKeyDescription}
+        description={
+          isNewLorawanVersion
+            ? sharedMessages.appKeyNewDescription
+            : sharedMessages.appKeyDescription
+        }
         component={Input.Generate}
         disabled={appKeyHidden || !mayEditKeys}
         mayGenerateValue={mayEditKeys && !appKeyHidden}
@@ -191,7 +193,7 @@ const JoinServerForm = React.memo(props => {
           min={16}
           max={16}
           placeholder={nwkKeyPlaceholder}
-          description={m.nwkKeyDescription}
+          description={sharedMessages.nwkKeyDescription}
           component={Input.Generate}
           disabled={nwkKeyHidden || !mayEditKeys}
           mayGenerateValue={mayEditKeys && !nwkKeyHidden}
