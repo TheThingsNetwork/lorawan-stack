@@ -67,7 +67,7 @@ export const parseLorawanMacVersion = strMacVersion => {
   }
 
   const match = lwRegexp.exec(strMacVersion)
-  if (!match.length) {
+  if (match === null || match.length === 0) {
     return 0
   }
 
