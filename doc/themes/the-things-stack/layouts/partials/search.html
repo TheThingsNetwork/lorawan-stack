@@ -1,0 +1,24 @@
+{{- if .Site.Params.search.enabled -}}
+<section class="search-container">
+    <div class="container">
+      <div class="columns is-vcentered">
+        <div class="column">
+          <div class="field has-addons has-addons-centered">
+            <div class="control">
+              <input class="input search-bar" id="search-input" type="text" placeholder="Search" type="text">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+<script type="text/javascript"> docsearch({
+apiKey: {{ .Site.Params.search.apikey }},
+indexName: {{ .Site.Params.search.index }},
+inputSelector: '#search-input',
+debug: false // Set debug to true if you want to inspect the dropdown.
+});
+</script>
+{{- end -}}

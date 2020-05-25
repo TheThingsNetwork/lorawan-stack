@@ -10,6 +10,9 @@
   <link rel="icon" type="image/svg+xml" href="{{ "favicon.svg" | relURL }}">
   {{- $style := resources.Get "css/theme.scss" | resources.ToCSS (dict "includePaths" (slice "node_modules")) | resources.Minify | resources.Fingerprint }}
   <link rel="stylesheet" href="{{ $style.Permalink }}" integrity="{{ $style.Data.Integrity }}">
+  {{- if .Site.Params.search.enabled -}}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
+  {{- end }}
   {{- $scratch := newScratch }}
   {{- $scratch.Set "description" (or .Description (.Param "description")) }}
   {{- $scratch.Set "keywords" (delimit (or .Keywords (.Param "keywords")) ",") }}
