@@ -12,18 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package webmiddleware provides middleware for http Handlers.
-package webmiddleware
+import { parseLorawanMacVersion } from './device-utils'
 
-import "net/http"
-
-// MiddlewareFunc is a function that acts as middleware for http Handlers.
-type MiddlewareFunc func(next http.Handler) http.Handler
-
-// Chain returns a http.Handler that chains the middleware onion-style around the handler.
-func Chain(middlewares []MiddlewareFunc, handler http.Handler) http.Handler {
-	for i := len(middlewares) - 1; i >= 0; i-- {
-		handler = middlewares[i](handler)
-	}
-	return handler
-}
+describe('parseLorawanMacVersion', () => {
+  it.each([
+    ['1.0.0', 100],
+    ['1.0.1', 101],
+    ['1.0.2', 102],
+    ['1.0.3', 103],
+    ['1.0.4', 104],
+    ['1.1.0', 110],
+    ['100', 0],
+    ['101', 0],
+    ['102', 0],
+    ['103', 0],
+    ['104', 0],
+    ['110', 0],
+    [null, 0],
+    [undefined, 0],
+    ['invalid', 0],
+    ['', 0],
+  ])('parseLorawanVersion(%p) = %i', (actual, expected) => {
+    expect(parseLorawanMacVersion(actual)).toBe(expected)
+  })
+})

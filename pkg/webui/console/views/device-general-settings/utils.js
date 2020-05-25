@@ -15,43 +15,6 @@
 import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 
-const lwRegexp = /^[1-9].[0-9].[0-9]$/
-const lwCache = {}
-
-/**
- * Parses string representation of the lorawan mac version to number.
- *
- * @param {string} strMacVersion - Formatted string representation fot the
- * lorawan mac version, e.g. 1.1.0.
- * @returns {number} - Number representation of the lorawan mac version. Returns
- * 0 if provided
- * argument is not a valid string representation of the lorawan mac version.
- * @example
- *  const parsedVersion = parseLorawanMacVersion('1.0.0'); // returns 100
- *  const parsedVersion = parseLorawanMacVersion('1.1.0'); // returns 110
- *  const parsedVersion = parseLorawanMacVersion(''); // returns 0
- *  const parsedVersion = parseLorawanMacVersion('str'); // returns 0
- */
-export const parseLorawanMacVersion = strMacVersion => {
-  if (lwCache[strMacVersion]) {
-    return lwCache[strMacVersion]
-  }
-
-  if (!Boolean(strMacVersion)) {
-    return 0
-  }
-
-  const match = lwRegexp.exec(strMacVersion)
-  if (!match.length) {
-    return 0
-  }
-
-  const parsed = parseInt(match[0].replace(/\D/g, '').padEnd(3, 0))
-  lwCache[strMacVersion] = parsed
-
-  return lwCache[strMacVersion]
-}
-
 /**
  * Returns whether the device is OTAA.
  * Note: device type is mainly derived based on the `supports_join` and
@@ -98,15 +61,15 @@ export const hasExternalJs = device => {
   return !enabled || typeof deviceJs === 'undefined' || deviceJs !== stackJs
 }
 
+/**
+ * Returns whether an end device has joined the network.
+ *
+ * @param {object} device - The device object.
+ * @returns {boolean} `true` if the end device has join thr network, `false` otherwise.
+ */
 export const isDeviceJoined = device =>
   Boolean(device) &&
   Boolean(device.session) &&
   Boolean(device.session.dev_addr) &&
   Boolean(device.session.keys) &&
   Boolean(Object.keys(device.session.keys).length)
-
-export const ACTIVATION_MODES = Object.freeze({
-  OTAA: 'otaa',
-  ABP: 'abp',
-  MULTICAST: 'multicast',
-})
