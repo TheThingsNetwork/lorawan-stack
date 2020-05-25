@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { FormattedNumber, injectIntl } from 'react-intl'
 
 import Icon from '@ttn-lw/components/icon'
 
@@ -44,4 +45,29 @@ KeyValueTag.propTypes = {
   value: PropTypes.node.isRequired,
 }
 
-export default KeyValueTag
+const IconValueTag = ({ icon, value, tooltipMessage, className, iconClassName, intl }) => (
+  <div title={intl.formatMessage(tooltipMessage)} className={className}>
+    <Icon className={iconClassName} icon={icon} nudgeUp />
+    {typeof value === 'number' ? <FormattedNumber value={value} /> : value}
+  </div>
+)
+
+IconValueTag.propTypes = {
+  className: PropTypes.string,
+  icon: PropTypes.string.isRequired,
+  iconClassName: PropTypes.string,
+  intl: PropTypes.shape({
+    formatMessage: PropTypes.func.isRequired,
+  }).isRequired,
+  tooltipMessage: PropTypes.message.isRequired,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+}
+
+IconValueTag.defaultProps = {
+  className: undefined,
+  iconClassName: undefined,
+}
+
+const IntlIconValueTag = injectIntl(IconValueTag)
+
+export { KeyValueTag as default, IntlIconValueTag as IconValueTag }
