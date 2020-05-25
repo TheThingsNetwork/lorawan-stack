@@ -38,6 +38,7 @@ import {
   selectApplicationLinkIndicator,
   selectApplicationLinkFetching,
   selectApplicationDeviceCount,
+  selectApplicationLastSeen,
 } from '@console/store/selectors/applications'
 
 const mapStateToProps = (state, props) => {
@@ -62,6 +63,7 @@ const mapStateToProps = (state, props) => {
   return {
     appId,
     application: selectSelectedApplication(state),
+    applicationLastSeen: selectApplicationLastSeen(state),
     collaboratorsTotalCount,
     apiKeysTotalCount,
     devicesTotalCount,
