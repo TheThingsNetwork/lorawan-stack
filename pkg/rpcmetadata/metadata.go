@@ -37,6 +37,9 @@ type MD struct {
 
 	// URI is the URI the request is directed to.
 	URI string
+
+	// XForwardedFor is set from the X-Forwarded-For header.
+	XForwardedFor string
 }
 
 // RequireTransportSecurity returns true if authentication is configured
@@ -67,6 +70,9 @@ func (m MD) ToMetadata() metadata.MD {
 	}
 	if m.URI != "" {
 		pairs = append(pairs, "uri", m.URI)
+	}
+	if m.XForwardedFor != "" {
+		pairs = append(pairs, "x-forwarded-for", m.XForwardedFor)
 	}
 	return metadata.Pairs(pairs...)
 }
@@ -109,6 +115,9 @@ func FromMetadata(md metadata.MD) (m MD) {
 	}
 	if uri, ok := md["uri"]; ok && len(uri) > 0 {
 		m.URI = uri[len(uri)-1]
+	}
+	if xForwardedFor, ok := md["x-forwarded-for"]; ok && len(xForwardedFor) > 0 {
+		m.XForwardedFor = xForwardedFor[len(xForwardedFor)-1]
 	}
 	return
 }

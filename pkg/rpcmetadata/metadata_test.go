@@ -36,6 +36,7 @@ func TestMD(t *testing.T) {
 		NetAddress:     "localhost",
 		Host:           "hostfoo",
 		URI:            "fooURI",
+		XForwardedFor:  "remote-ip",
 	}
 
 	ctx := md1.ToOutgoingContext(test.Context())
@@ -51,6 +52,7 @@ func TestMD(t *testing.T) {
 	a.So(md2.NetAddress, should.Equal, md1.NetAddress)
 	a.So(md2.Host, should.Equal, md1.Host)
 	a.So(md2.URI, should.Equal, md1.URI)
+	a.So(md2.XForwardedFor, should.Equal, md1.XForwardedFor)
 
 	a.So(md1.RequireTransportSecurity(), should.BeTrue)
 	a.So(md2.RequireTransportSecurity(), should.BeFalse)
