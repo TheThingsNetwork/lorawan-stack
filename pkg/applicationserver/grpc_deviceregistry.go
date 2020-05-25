@@ -109,10 +109,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 
-var (
-	errInvalidFieldMask  = errors.DefineInvalidArgument("field_mask", "invalid field mask")
-	errInvalidFieldValue = errors.DefineInvalidArgument("field_value", "invalid value of field `{field}`")
-)
+var errInvalidFieldMask = errors.DefineInvalidArgument("field_mask", "invalid field mask")
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
 func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
