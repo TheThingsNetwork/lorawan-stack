@@ -36,7 +36,7 @@ const {
   CACHE_DIR = '.cache',
   PUBLIC_DIR = 'public',
   NODE_ENV = 'production',
-  MAGE = './mage',
+  MAGE = 'tools/bin/mage',
   SUPPORT_LOCALES = 'en',
   DEFAULT_LOCALE = 'en',
 } = process.env
