@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Error notification in list views in the Console.
 - Latest "last seen" info and uplink frame counts for end devices in the Console.
 - Latest "last seen" info for applications in the Console.
+- Authentication method, ID and Remote IP in events metadata.
 
 ### Changed
 

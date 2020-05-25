@@ -155,6 +155,7 @@
   - [Message `ErrorDetails`](#ttn.lorawan.v3.ErrorDetails)
 - [File `lorawan-stack/api/events.proto`](#lorawan-stack/api/events.proto)
   - [Message `Event`](#ttn.lorawan.v3.Event)
+  - [Message `Event.Authentication`](#ttn.lorawan.v3.Event.Authentication)
   - [Message `Event.ContextEntry`](#ttn.lorawan.v3.Event.ContextEntry)
   - [Message `StreamEventsRequest`](#ttn.lorawan.v3.StreamEventsRequest)
   - [Service `Events`](#ttn.lorawan.v3.Events)
@@ -2526,6 +2527,7 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 | `origin` | [`string`](#string) |  |  |
 | `context` | [`Event.ContextEntry`](#ttn.lorawan.v3.Event.ContextEntry) | repeated |  |
 | `visibility` | [`Rights`](#ttn.lorawan.v3.Rights) |  | The event will be visible to a caller that has any of these rights. |
+| `authentication` | [`Event.Authentication`](#ttn.lorawan.v3.Event.Authentication) |  |  |
 
 #### Field Rules
 
@@ -2533,6 +2535,15 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 | ----- | ----------- |
 | `time` | <p>`timestamp.required`: `true`</p> |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.Event.Authentication">Message `Event.Authentication`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `type` | [`string`](#string) |  |  |
+| `token_type` | [`string`](#string) |  |  |
+| `token_id` | [`string`](#string) |  |  |
+| `remote_ip` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.Event.ContextEntry">Message `Event.ContextEntry`</a>
 

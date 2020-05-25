@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"sync"
 	"testing"
 
@@ -26,6 +27,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/peer"
 )
 
 type wrappedEvent struct {
@@ -44,6 +47,29 @@ func TestNew(t *testing.T) {
 	evt := events.New(ctx, "as.up.receive", nil, testData{}, ttnpb.RIGHT_ALL)
 	a.So(evt.CorrelationIDs(), should.Resemble, []string{"TestNew"})
 	a.So(evt.Visibility().GetRights(), should.Contain, ttnpb.RIGHT_ALL)
+	a.So(evt.AuthType(), should.Equal, "")
+	a.So(evt.AuthTokenType(), should.Equal, "")
+	a.So(evt.AuthTokenID(), should.Equal, "")
+	a.So(evt.AuthRemoteIP(), should.Equal, "")
+
+	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs(
+		"authorization", "bearer MFRWG.token_id.token_key"))
+	ctx = peer.NewContext(ctx, &peer.Peer{
+		Addr: &net.TCPAddr{IP: net.IP{10, 10, 10, 10}, Port: 10000},
+	})
+	evt = events.New(ctx, "as.up.receive", nil, testData{}, ttnpb.RIGHT_ALL)
+	a.So(evt.AuthType(), should.Equal, "bearer")
+	a.So(evt.AuthTokenType(), should.Equal, "AccessToken")
+	a.So(evt.AuthTokenID(), should.Equal, "token_id")
+	a.So(evt.AuthRemoteIP(), should.Equal, "10.10.10.10")
+
+	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs("x-forwarded-for", "20.20.20.20"))
+	evt = events.New(ctx, "as.up.receive", nil, testData{}, ttnpb.RIGHT_ALL)
+	a.So(evt.AuthRemoteIP(), should.Equal, "20.20.20.20")
+
+	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs("x-forwarded-for", "30.30.30.30, 20.20.20.20"))
+	evt = events.New(ctx, "as.up.receive", nil, testData{}, ttnpb.RIGHT_ALL)
+	a.So(evt.AuthRemoteIP(), should.Equal, "30.30.30.30")
 }
 
 func TestEvents(t *testing.T) {

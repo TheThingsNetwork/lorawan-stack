@@ -9998,6 +9998,67 @@
               "fullType": "ttn.lorawan.v3.Rights",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "authentication",
+              "description": "",
+              "label": "",
+              "type": "Authentication",
+              "longType": "Event.Authentication",
+              "fullType": "ttn.lorawan.v3.Event.Authentication",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Authentication",
+          "longName": "Event.Authentication",
+          "fullName": "ttn.lorawan.v3.Event.Authentication",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "type",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "token_type",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "token_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "remote_ip",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

@@ -7626,6 +7626,23 @@
         }
       }
     },
+    "EventAuthentication": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "token_type": {
+          "type": "string"
+        },
+        "token_id": {
+          "type": "string"
+        },
+        "remote_ip": {
+          "type": "string"
+        }
+      }
+    },
     "GatewayConnectionStatsRoundTripTimes": {
       "type": "object",
       "properties": {
@@ -10427,6 +10444,9 @@
         "visibility": {
           "$ref": "#/definitions/v3Rights",
           "description": "The event will be visible to a caller that has any of these rights."
+        },
+        "authentication": {
+          "$ref": "#/definitions/EventAuthentication"
         }
       }
     },
