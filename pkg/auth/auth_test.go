@@ -32,6 +32,7 @@ func TestAuth(t *testing.T) {
 	tokenType, id, key, err := auth.SplitToken(token)
 	a.So(err, should.BeNil)
 	a.So(tokenType, should.Equal, auth.APIKey)
+	a.So(tokenType.String(), should.Equal, "APIKey")
 
 	a.So(auth.JoinToken(tokenType, id, key), should.Equal, token)
 

@@ -44,6 +44,13 @@ var (
 	RefreshToken = TokenType(enc.EncodeToString([]byte("ref")))
 	// AuthorizationCode is used by OAuth clients to exchange AccessTokens.
 	AuthorizationCode = TokenType(enc.EncodeToString([]byte("aut")))
+
+	tokenTypeDescriptions = map[string]string{
+		"key": "APIKey",
+		"acc": "AccessToken",
+		"ref": "RefreshToken",
+		"aut": "AuthorizationCode",
+	}
 )
 
 // TokenType indicates the type of a token.
@@ -63,6 +70,18 @@ func (t TokenType) Generate(ctx context.Context, id string) (token string, err e
 		return "", err
 	}
 	return JoinToken(t, id, key), nil
+}
+
+// String returns string representation of token type.
+func (t TokenType) String() string {
+	b, err := enc.DecodeString(string(t))
+	if err != nil {
+		return ""
+	}
+	if desc, ok := tokenTypeDescriptions[string(b)]; ok {
+		return desc
+	}
+	return string(b)
 }
 
 var errInvalidToken = errors.DefineInvalidArgument("token", "invalid token")
