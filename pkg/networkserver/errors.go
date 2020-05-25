@@ -27,6 +27,7 @@ var (
 	errConfirmedMulticastDownlink = errors.DefineInvalidArgument("confirmed_multicast_downlink", "confirmed downlink queued for multicast device")
 	errCorruptedMACState          = errors.DefineCorruption("corrupted_mac_state", "MAC state is corrupted")
 	errDataRateNotFound           = errors.DefineNotFound("data_rate_not_found", "data rate not found")
+	errDataRateIndexNotFound      = errors.DefineNotFound("data_rate_index_not_found", "data rate with index `{index}` not found")
 	errDecodePayload              = errors.DefineInvalidArgument("decode_payload", "failed to decode payload")
 	errDeviceNotFound             = errors.DefineNotFound("device_not_found", "device not found")
 	errDuplicate                  = errors.DefineFailedPrecondition("duplicate", "uplink is a duplicate")
