@@ -1,4 +1,4 @@
-# Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+# Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-MAGE ?= ./mage
+MAGE ?= tools/bin/mage
+MAGE_ABSOLUTE = $(abspath $(MAGE))
 
-$(MAGE): magefile.go $(wildcard .mage/*.go)
-	GO111MODULE=on go install github.com/magefile/mage
-	GO111MODULE=on go run github.com/magefile/mage -compile $(MAGE)
+$(MAGE): tools/magefile.go $(wildcard tools/mage/*.go)
+	@cd tools && GO111MODULE=on go run github.com/magefile/mage -compile $(MAGE_ABSOLUTE)
 
 .PHONY: init
 init: $(MAGE)
 	@$(MAGE) init
-	@echo "Run \"./mage -l\" for a list of build targets"
+	@echo "Run \"$(MAGE) -l\" for a list of build targets"
 
 .PHONY: git.pre-commit
 git.pre-commit: $(MAGE) # NOTE: DO NOT CHANGE - will break previously installed git hooks.

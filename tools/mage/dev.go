@@ -34,7 +34,7 @@ func (Dev) Certificates() error {
 			return nil
 		}
 	}
-	return execGo("run", path.Join(runtime.GOROOT(), "src", "crypto", "tls", "generate_cert.go"), "-ca", "-host", "localhost,*.localhost")
+	return runGo(path.Join(runtime.GOROOT(), "src", "crypto", "tls", "generate_cert.go"), "-ca", "-host", "localhost,*.localhost")
 }
 
 // Misspell fixes common spelling mistakes in files.
@@ -42,7 +42,7 @@ func (Dev) Misspell() error {
 	if mg.Verbose() {
 		fmt.Printf("Fixing common spelling mistakes in files\n")
 	}
-	return execGo("run", "github.com/client9/misspell/cmd/misspell", "-w", "-i", "mosquitto",
+	return runGoTool("github.com/client9/misspell/cmd/misspell", "-w", "-i", "mosquitto",
 		".editorconfig",
 		".gitignore",
 		".goreleaser.yml",
@@ -136,17 +136,17 @@ func (Dev) InitStack() error {
 	if mg.Verbose() {
 		fmt.Printf("Initializing the Stack\n")
 	}
-	if err := execGo("run", "./cmd/ttn-lw-stack", "is-db", "init"); err != nil {
+	if err := runGo("./cmd/ttn-lw-stack", "is-db", "init"); err != nil {
 		return err
 	}
-	if err := execGo("run", "./cmd/ttn-lw-stack", "is-db", "create-admin-user",
+	if err := runGo("./cmd/ttn-lw-stack", "is-db", "create-admin-user",
 		"--id", "admin",
 		"--email", "admin@localhost",
 		"--password", "admin",
 	); err != nil {
 		return err
 	}
-	if err := execGo("run", "./cmd/ttn-lw-stack", "is-db", "create-oauth-client",
+	if err := runGo("./cmd/ttn-lw-stack", "is-db", "create-oauth-client",
 		"--id", "cli",
 		"--name", "Command Line Interface",
 		"--owner", "admin",
@@ -156,7 +156,7 @@ func (Dev) InitStack() error {
 	); err != nil {
 		return err
 	}
-	return execGo("run", "./cmd/ttn-lw-stack", "is-db", "create-oauth-client",
+	return runGo("./cmd/ttn-lw-stack", "is-db", "create-oauth-client",
 		"--id", "console",
 		"--name", "Console",
 		"--owner", "admin",

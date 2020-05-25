@@ -18,6 +18,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -45,21 +46,38 @@ func buildGoArgs(cmd string, args ...string) []string {
 	return append([]string{cmd}, args...)
 }
 
-func execGo(cmd string, args ...string) error {
-	_, err := sh.Exec(goModuleEnv, os.Stdout, os.Stderr, "go", buildGoArgs(cmd, args...)...)
+func execGo(stdout, stderr io.Writer, cmd string, args ...string) error {
+	_, err := sh.Exec(goModuleEnv, stdout, stderr, "go", buildGoArgs(cmd, args...)...)
 	return err
 }
 
+func execGoFrom(dir string, stdout, stderr io.Writer, cmd string, args ...string) error {
+	_, err := sh.ExecFrom(dir, goModuleEnv, stdout, stderr, "go", buildGoArgs(cmd, args...)...)
+	return err
+}
+
+func runGo(args ...string) error {
+	return execGo(os.Stdout, os.Stderr, "run", args...)
+}
+
+func runGoFrom(dir string, args ...string) error {
+	return execGoFrom(dir, os.Stdout, os.Stderr, "run", args...)
+}
+
 func outputGo(cmd string, args ...string) (string, error) {
-	if goTags != "" {
-		args = append([]string{fmt.Sprintf("-tags=%s", goTags)}, args...)
-	}
 	var buf bytes.Buffer
-	_, err := sh.Exec(goModuleEnv, &buf, os.Stderr, "go", buildGoArgs(cmd, args...)...)
-	if err != nil {
+	if err := execGo(&buf, os.Stderr, cmd, args...); err != nil {
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+func runGoTool(args ...string) error {
+	return runGoFrom("tools", append([]string{"-exec", "go run exec_from.go -dir .."}, args...)...)
+}
+
+func runUnconvert(pkgs ...string) error {
+	return runGoTool(append([]string{"github.com/mdempsky/unconvert", "-apply", "-safe"}, pkgs...)...)
 }
 
 // CheckVersion checks the installed Go version against the minimum version we support.
@@ -140,7 +158,7 @@ func (g Go) Lint() error {
 	if mg.Verbose() {
 		fmt.Printf("Linting %d Go packages\n", len(dirs))
 	}
-	return execGo("run", append([]string{"github.com/mgechev/revive", "-config=.revive.toml", "-formatter=stylish"}, dirs...)...)
+	return runGoTool(append([]string{"github.com/mgechev/revive", "-config=.revive.toml", "-formatter=stylish"}, dirs...)...)
 }
 
 // Unconvert removes unnecessary type conversions from Go files.
@@ -155,11 +173,11 @@ func (g Go) Unconvert() error {
 	if mg.Verbose() {
 		fmt.Printf("Removing unnecessary type conversions from %d Go packages\n", len(dirs))
 	}
-	args := []string{"github.com/mdempsky/unconvert", "-safe", "-apply"}
+	var args []string
 	if goTags != "" {
 		args = append(args, "-tags", strings.Join(strings.Split(goTags, ","), " "))
 	}
-	return execGo("run", append(args, dirs...)...)
+	return runUnconvert(append(args, dirs...)...)
 }
 
 // Quality runs code quality checks on Go files.
@@ -172,8 +190,8 @@ func init() {
 	preCommitChecks = append(preCommitChecks, Go.Quality)
 }
 
-func execGoTest(args ...string) error {
-	return execGo("test", append([]string{"-timeout=5m", "-failfast"}, args...)...)
+func runGoTest(args ...string) error {
+	return execGo(os.Stdout, os.Stderr, "test", append([]string{"-timeout=5m", "-failfast"}, args...)...)
 }
 
 // Test tests all Go packages.
@@ -181,7 +199,7 @@ func (Go) Test() error {
 	if mg.Verbose() {
 		fmt.Println("Testing all Go packages")
 	}
-	return execGoTest("./...")
+	return runGoTest("./...")
 }
 
 var goBinaries = []string{"./cmd/ttn-lw-cli", "./cmd/ttn-lw-stack"}
@@ -207,7 +225,7 @@ func (Go) Cover() error {
 	if mg.Verbose() {
 		fmt.Println("Testing all Go packages with coverage")
 	}
-	return execGoTest("-cover", "-covermode=atomic", "-coverprofile="+goCoverageFile, "./...")
+	return runGoTest("-cover", "-covermode=atomic", "-coverprofile="+goCoverageFile, "./...")
 }
 
 var coverallsIgnored = []string{
@@ -258,10 +276,10 @@ nextLine:
 	if mg.Verbose() {
 		fmt.Println("Sending Go coverage to Coveralls")
 	}
-	return execGo("run", "github.com/mattn/goveralls", "-coverprofile=coveralls_"+goCoverageFile, "-service="+service, "-repotoken="+os.Getenv("COVERALLS_TOKEN"))
+	return runGoTool("github.com/mattn/goveralls", "-coverprofile=coveralls_"+goCoverageFile, "-service="+service, "-repotoken="+os.Getenv("COVERALLS_TOKEN"))
 }
 
 // Messages builds the file with translatable messages in Go code.
 func (g Go) Messages() error {
-	return execGo("run", "./cmd/internal/generate_i18n.go")
+	return runGoTool("generate_i18n.go")
 }

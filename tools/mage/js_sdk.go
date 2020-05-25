@@ -224,5 +224,5 @@ func (k JsSDK) AllowedFieldMaskPaths() error {
 	if !changed {
 		return nil
 	}
-	return execGo("run", "./cmd/internal/generate_allowed_field_mask_paths.go")
+	return runGoTool("generate_allowed_field_mask_paths.go")
 }

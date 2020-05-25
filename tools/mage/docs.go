@@ -31,7 +31,7 @@ import (
 type Docs mg.Namespace
 
 func execHugo(args ...string) error {
-	return execGo("run", append([]string{"-tags", "extended", "github.com/gohugoio/hugo", "-s", "./doc"}, args...)...)
+	return runGoTool(append([]string{"-tags", "extended", "github.com/gohugoio/hugo", "-s", "./doc"}, args...)...)
 }
 
 func (d Docs) yarn() (func(args ...string) error, error) {

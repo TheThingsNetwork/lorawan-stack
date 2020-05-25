@@ -20,19 +20,19 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v1
     - name: Make Mage
-      run: make mage
+      run: make tools/bin/mage
     - name: Check headers
-      run: ./mage headers:check
+      run: tools/bin/mage headers:check
     - name: Format Go code
-      run: ./mage go:fmt
+      run: tools/bin/mage go:fmt
     - name: Fix common spelling mistakes
-      run: ./mage dev:misspell
+      run: tools/bin/mage dev:misspell
     - name: Remove unnecessary type conversions
-      run: ./mage go:unconvert
+      run: tools/bin/mage go:unconvert
     - name: Generate i18n messages
-      run: ./mage go:messages
+      run: tools/bin/mage go:messages
     - name: Check for diff
-      run: ./mage git:diff
+      run: tools/bin/mage git:diff
 
   test:
     name: Tests
@@ -72,7 +72,7 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v1
     - name: Make Mage
-      run: make mage
+      run: make tools/bin/mage
     - name: mage go:test
       env:
         SQL_DB_ADDRESS: localhost:${{ job.services.postgres.ports['5432'] }}
@@ -80,4 +80,4 @@ jobs:
         REDIS_ADDRESS: localhost:${{ job.services.redis.ports['6379'] }}
         TEST_REDIS: '1'
         TEST_SLOWDOWN: '8'
-      run: ./mage go:test
+      run: tools/bin/mage go:test
