@@ -641,7 +641,7 @@ func TestGatewayServer(t *testing.T) {
 				case <-time.After(timeout):
 				}
 
-				ctx2, cancel2 := context.WithDeadline(ctx, time.Now().Add(2*timeout))
+				ctx2, cancel2 := context.WithDeadline(ctx, time.Now().Add(4*timeout))
 				upCh := make(chan *ttnpb.GatewayUp)
 				downCh := make(chan *ttnpb.GatewayDown)
 				err := ptc.Link(ctx2, t, id, registeredGatewayKey, upCh, downCh)
@@ -652,7 +652,7 @@ func TestGatewayServer(t *testing.T) {
 				select {
 				case <-ctx1.Done():
 					t.Logf("First connection failed when second connected with %v", ctx1.Err())
-				case <-time.After(2 * timeout):
+				case <-time.After(4 * timeout):
 					t.Fatalf("Expected link failure on first connection when second connected")
 				}
 			})
