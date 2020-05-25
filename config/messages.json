@@ -5507,6 +5507,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:data_rate_index_not_found": {
+    "translations": {
+      "en": "data rate with index `{index}` not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:data_rate_not_found": {
     "translations": {
       "en": "data rate not found"
