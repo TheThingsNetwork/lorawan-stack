@@ -102,7 +102,7 @@ func (PBKDF2) Validate(hashed, plain string) (bool, error) {
 	}
 
 	alg := parts[1]
-	algorithm, err := parseAlgorithm(alg)
+	algorithm, err := ParseAlgorithm(alg)
 	if err != nil {
 		return false, err
 	}
