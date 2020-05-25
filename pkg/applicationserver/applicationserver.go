@@ -290,6 +290,13 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 	return sub, nil
 }
 
+func skipPayloadCrypto(link *link, dev *ttnpb.EndDevice) bool {
+	if dev.SkipPayloadCryptoOverride != nil {
+		return dev.SkipPayloadCryptoOverride.Value
+	}
+	return link.SkipPayloadCrypto.GetValue()
+}
+
 var (
 	errDeviceNotFound  = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")
 	errNoDeviceSession = errors.DefineFailedPrecondition("no_device_session", "no device session; check device activation")
@@ -313,7 +320,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			"formatters",
 			"pending_session",
 			"session",
-			"skip_payload_crypto",
+			"skip_payload_crypto_override",
 			"version_ids",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -349,7 +356,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 						Priority:       item.Priority,
 						CorrelationIDs: item.CorrelationIDs,
 					}
-					if !dev.SkipPayloadCrypto {
+					if !skipPayloadCrypto(link, dev) {
 						if err := as.encodeAndEncrypt(ctx, dev, session, encryptedItem, link.DefaultFormatters); err != nil {
 							logger.WithError(err).Warn("Encoding and encryption of downlink message failed; drop item")
 							return nil, nil, err
@@ -459,7 +466,7 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 		return nil, errNoAppSKey.New()
 	}
 	queue, _ = ttnpb.PartitionDownlinksBySessionKeyIDEquality(session.SessionKeyID, res.Downlinks...)
-	if dev.SkipPayloadCrypto {
+	if skipPayloadCrypto(link, dev) {
 		return queue, nil
 	}
 	// TODO: Cache unwrapped keys (https://github.com/TheThingsNetwork/lorawan-stack/issues/36)
@@ -519,13 +526,13 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
 		return as.handleDownlinkQueueInvalidated(ctx, up.EndDeviceIdentifiers, p.DownlinkQueueInvalidated, link)
 	case *ttnpb.ApplicationUp_DownlinkQueued:
-		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkQueued)
+		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkQueued, link)
 	case *ttnpb.ApplicationUp_DownlinkSent:
-		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkSent)
+		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkSent, link)
 	case *ttnpb.ApplicationUp_DownlinkFailed:
-		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, &p.DownlinkFailed.ApplicationDownlink)
+		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, &p.DownlinkFailed.ApplicationDownlink, link)
 	case *ttnpb.ApplicationUp_DownlinkAck:
-		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkAck)
+		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkAck, link)
 	case *ttnpb.ApplicationUp_DownlinkNack:
 		return as.handleDownlinkNack(ctx, up.EndDeviceIdentifiers, p.DownlinkNack, link)
 	default:
@@ -545,7 +552,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 		[]string{
 			"pending_session",
 			"session",
-			"skip_payload_crypto",
+			"skip_payload_crypto_override",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var mask []string
@@ -618,7 +625,7 @@ type downlinkQueueTransaction func(context.Context, *ttnpb.EndDevice) error
 // runDownlinkQueueTransaction runs the provided downlink queue transaction on the device. If the transaction
 // fails, the LastAFCntDown session fields are restored to their previous values and the downlink queue is reset.
 func (as *ApplicationServer) runDownlinkQueueTransaction(ctx context.Context, dev *ttnpb.EndDevice, link *link, t downlinkQueueTransaction) error {
-	if dev.SkipPayloadCrypto {
+	if skipPayloadCrypto(link, dev) {
 		return errPayloadCryptoDisabled.New()
 	}
 	logger := log.FromContext(ctx)
@@ -810,7 +817,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 			"formatters",
 			"pending_session",
 			"session",
-			"skip_payload_crypto",
+			"skip_payload_crypto_override",
 			"version_ids",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -879,7 +886,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	if err != nil {
 		return err
 	}
-	if !dev.SkipPayloadCrypto {
+	if !skipPayloadCrypto(link, dev) {
 		if err := as.decryptAndDecode(ctx, dev, uplink, link.DefaultFormatters); err != nil {
 			return err
 		}
@@ -895,7 +902,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 	_, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
-			"skip_payload_crypto",
+			"skip_payload_crypto_override",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
@@ -927,7 +934,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 		_, err := as.deviceRegistry.Set(ctx, ids,
 			[]string{
 				"session",
-				"skip_payload_crypto",
+				"skip_payload_crypto_override",
 			},
 			func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 				if dev == nil {
@@ -950,18 +957,18 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 		}
 	}
 	// Decrypt the message as it will be sent to upstream after handling it.
-	if err := as.decryptDownlinkMessage(ctx, ids, msg); err != nil {
+	if err := as.decryptDownlinkMessage(ctx, ids, msg, link); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink) error {
+func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *link) error {
 	dev, err := as.deviceRegistry.Get(ctx, ids, []string{"session", "skip_payload_crypto"})
 	if err != nil {
 		return err
 	}
-	if dev.SkipPayloadCrypto {
+	if skipPayloadCrypto(link, dev) {
 		return nil
 	}
 	if dev.Session == nil || !bytes.Equal(dev.Session.SessionKeyID, msg.SessionKeyID) || dev.Session.AppSKey == nil {

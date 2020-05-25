@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -50,7 +51,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		Session: &ttnpb.Session{
 			DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 		},
-		SkipPayloadCrypto: true,
+		SkipPayloadCryptoOverride: &pbtypes.BoolValue{Value: true},
 	}
 
 	ret, err := reg.Get(ctx, pb.EndDeviceIdentifiers, ttnpb.EndDeviceFieldPathsTopLevel)
@@ -68,7 +69,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 			"ids.device_id",
 			"ids.join_eui",
 			"session",
-			"skip_payload_crypto",
+			"skip_payload_crypto_override",
 		},
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if !a.So(stored, should.BeNil) {
@@ -81,7 +82,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 				"ids.join_eui",
 				"pending_session",
 				"session",
-				"skip_payload_crypto",
+				"skip_payload_crypto_override",
 			}, nil
 		},
 	)
