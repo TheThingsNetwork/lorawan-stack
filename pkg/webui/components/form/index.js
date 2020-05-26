@@ -167,7 +167,6 @@ class Form extends React.PureComponent {
     return (
       <Formik
         innerRef={formikRef}
-        render={formRenderer(rest)}
         onSubmit={onSubmit}
         onReset={onReset}
         validateOnMount={validateOnMount}
@@ -176,7 +175,9 @@ class Form extends React.PureComponent {
         validateOnChange={validateOnChange}
         validationSchema={validationSchema}
         enableReinitialize={enableReinitialize}
-      />
+      >
+        {formRenderer(rest)}
+      </Formik>
     )
   }
 }
