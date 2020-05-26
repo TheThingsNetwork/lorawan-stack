@@ -1,15 +1,13 @@
-{{ $package := or (.Get "package") "frequency-plans" }}{{ $frequency_plan := .Get "frequency-plan" -}}
-{{ $data := index .Site.Data $package}}
-{{- if $frequency_plan -}}
-  {{- with index $data $frequency_plan -}}
-    {{- partial "frequency-plan.html" . -}}
-  {{- else }}
-    {{ errorf "frequency plan %s of package %s not found" $frequency_plan $package }}
-  {{- end }}
-{{- else -}}
-  {{- range $data -}}
-    {{- partial "frequency-plan.html" . -}}
-  {{- else -}}
-    {{ errorf "package %s not found" $package }}
+{{- range index .Site.Data "frequency-plans" }}
+<dl class="frequency-plan">
+  <dt id="{{.id | urlize}}">
+    <span class="name">
+      {{- .name -}}
+    </span>
+  </dt>
+  <dd>{{- .description -}}</dd>
+  {{- with index . "base-frequency" -}}
+    <dd>Base Frequency: {{ . }} MHz</dd>
   {{- end -}}
-{{- end -}}
+</dl>
+{{- end }}
