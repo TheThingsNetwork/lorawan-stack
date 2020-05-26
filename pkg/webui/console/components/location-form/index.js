@@ -167,13 +167,13 @@ class LocationForm extends Component {
 
   @bind
   handleClick(event) {
-    const { setValues, state } = this.form.current
+    const { setValues, values } = this.form.current
     this.setState({ latitude: event.latlng.lat, longitude: event.latlng.lng })
     setValues({
-      ...state.values,
+      ...values,
       latitude: event.latlng.lat,
       longitude: event.latlng.lng,
-      altitude: state.values.altitude ? state.values.altitude : 0,
+      altitude: values.altitude ? values.altitude : 0,
     })
   }
 

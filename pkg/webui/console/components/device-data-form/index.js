@@ -99,13 +99,13 @@ class DeviceDataForm extends Component {
     }))
 
     const jsConfig = selectJsConfig()
-    const { setValues, state } = this.formRef.current
+    const { setValues, values } = this.formRef.current
 
     // Reset Join Server related entries if the device is provisined by an
     // external JS.
     if (external_js) {
       setValues({
-        ...state.values,
+        ...values,
         root_keys: {
           nwk_key: {},
           app_key: {},
@@ -115,7 +115,7 @@ class DeviceDataForm extends Component {
         _external_js: external_js,
       })
     } else {
-      let join_server_address = state.join_server_address
+      let join_server_address = values.join_server_address
 
       // Reset `join_server_address` if is present after disabling external JS
       // provisioning.
@@ -124,7 +124,7 @@ class DeviceDataForm extends Component {
       }
 
       setValues({
-        ...state.values,
+        ...values,
         join_server_address,
         _external_js: external_js,
       })

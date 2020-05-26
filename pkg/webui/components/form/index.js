@@ -14,7 +14,7 @@
 
 /* eslint-disable react/sort-prop-types */
 import React from 'react'
-import { Formik, useFormikContext } from 'formik'
+import { Formik } from 'formik'
 import bind from 'autobind-decorator'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import classnames from 'classnames'
@@ -30,8 +30,6 @@ import FormInfoField from './field/info'
 import FormSubmit from './submit'
 
 import style from './form.styl'
-
-console.log(useFormikContext)
 
 class InnerForm extends React.PureComponent {
   static propTypes = {
@@ -168,7 +166,7 @@ class Form extends React.PureComponent {
 
     return (
       <Formik
-        ref={formikRef}
+        innerRef={formikRef}
         render={formRenderer(rest)}
         onSubmit={onSubmit}
         onReset={onReset}
