@@ -15,8 +15,22 @@
 package errors
 
 import (
+	"context"
+	"net"
+
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/status"
+)
+
+var (
+	errContextDeadlineExceeded = DefineDeadlineExceeded("context_deadline_exceeded", "context deadline exceeded")
+	errContextCanceled         = DefineCanceled("context_canceled", "context canceled")
+
+	errNetInvalidAddr    = DefineInvalidArgument("net_invalid_addr", "{message}", "message", "temporary", "timeout")
+	errNetAddr           = DefineUnavailable("net_addr", "{message}", "message", "temporary", "timeout")
+	errNetDNS            = DefineUnavailable("net_dns", "{message}", "message", "temporary", "timeout", "not_found")
+	errNetUnknownNetwork = DefineNotFound("net_unknown_network", "{message}", "message", "temporary", "timeout")
+	errNetOperation      = DefineUnavailable("net_operation", "{message}", "message", "op", "net", "source", "address", "timeout", "temporary")
 )
 
 // From returns an *Error if it can be derived from the given input.
@@ -31,6 +45,13 @@ func From(err error) (out *Error, ok bool) {
 			out = &copy
 		}
 	}()
+	if err == context.Canceled {
+		e := build(errContextCanceled, 0)
+		return &e, true
+	} else if err == context.DeadlineExceeded {
+		e := build(errContextDeadlineExceeded, 0)
+		return &e, true
+	}
 	switch err := err.(type) {
 	case Error:
 		return &err, true
@@ -63,6 +84,40 @@ func From(err error) (out *Error, ok bool) {
 		)
 		if cause := err.Cause(); cause != nil {
 			e = e.WithCause(cause)
+		}
+		return &e, true
+	case *net.DNSError:
+		e := build(errNetDNS, 0).WithAttributes(
+			"not_found", err.IsNotFound,
+		).WithAttributes(
+			netErrorDetails(err)...,
+		)
+		return &e, true
+	case *net.AddrError:
+		e := build(errNetAddr, 0).WithAttributes(netErrorDetails(err)...)
+		return &e, true
+	case net.InvalidAddrError:
+		e := build(errNetInvalidAddr, 0).WithAttributes(netErrorDetails(err)...)
+		return &e, true
+	case net.UnknownNetworkError:
+		e := build(errNetUnknownNetwork, 0).WithAttributes(netErrorDetails(err)...)
+		return &e, true
+	case *net.OpError:
+		// Do not use netErrorDetails(err) as err.Error() will panic if err.Err is nil.
+		e := build(errNetOperation, 0).WithAttributes(
+			"op", err.Op,
+			"net", err.Net,
+			"timeout", err.Timeout(),
+			"temporary", err.Temporary(),
+		)
+		if err.Addr != nil {
+			e = e.WithAttributes("address", err.Addr.String())
+		}
+		if err.Source != nil {
+			e = e.WithAttributes("source", err.Source.String())
+		}
+		if err.Err != nil {
+			e = e.WithAttributes("message", err.Error())
 		}
 		return &e, true
 	}
@@ -110,4 +165,12 @@ func setErrorDetails(err *Error, details ErrorDetails) {
 		err.code = code
 	}
 	err.details = append(err.details, details.Details()...)
+}
+
+func netErrorDetails(err net.Error) []interface{} {
+	return []interface{}{
+		"message", err.Error(),
+		"temporary", err.Temporary(),
+		"timeout", err.Timeout(),
+	}
 }

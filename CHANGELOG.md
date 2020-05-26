@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Setting custom gateway attributes in the console
 - Pub/Sub documentation.
+- Return informative well-known errors for standard network and context errors.
 
 ### Changed
 
