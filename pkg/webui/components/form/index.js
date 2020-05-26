@@ -15,7 +15,6 @@
 /* eslint-disable react/sort-prop-types */
 import React from 'react'
 import { Formik } from 'formik'
-import bind from 'autobind-decorator'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import classnames from 'classnames'
 
@@ -127,7 +126,6 @@ const formRenderer = ({ children, ...rest }) =>
     )
   }
 
-@bind
 class Form extends React.PureComponent {
   static propTypes = {
     enableReinitialize: PropTypes.bool,
@@ -140,6 +138,7 @@ class Form extends React.PureComponent {
     validateOnChange: PropTypes.bool,
     validationSchema: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.func]),
   }
+
   static defaultProps = {
     enableReinitialize: false,
     formikRef: undefined,
@@ -150,6 +149,7 @@ class Form extends React.PureComponent {
     validateOnChange: false,
     validationSchema: undefined,
   }
+
   render() {
     const {
       onSubmit,
