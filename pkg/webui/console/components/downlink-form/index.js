@@ -75,7 +75,7 @@ const DownlinkForm = ({ appId, devId }) => {
         setSubmitting(false)
       } catch (err) {
         setError(err)
-        resetForm()
+        resetForm({ values: vals })
       }
     },
     [appId, devId],

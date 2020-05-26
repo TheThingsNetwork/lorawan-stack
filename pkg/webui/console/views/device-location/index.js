@@ -115,7 +115,7 @@ export default class DeviceGeneralSettings extends React.Component {
     }
     delete patch.locations[registryLocation.key]
 
-    await updateDevice(appId, devId, patch)
+    return updateDevice(appId, devId, patch)
   }
 
   render() {

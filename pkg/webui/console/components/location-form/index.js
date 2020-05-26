@@ -154,7 +154,6 @@ class LocationForm extends Component {
 
     try {
       await onSubmit(validationSchema.cast(values))
-      resetForm()
       toast({
         title: entityId,
         message: m.updateSuccess,
@@ -247,6 +246,7 @@ class LocationForm extends Component {
       <React.Fragment>
         {!entryExists && <Notification content={m.noLocationSet} info small />}
         <Form
+          enableReinitialize
           error={error}
           horizontal
           validateOnChange

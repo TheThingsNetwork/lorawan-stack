@@ -98,7 +98,7 @@ class UserForm extends React.Component {
     try {
       const result = await onSubmit(castedValues)
       onSubmitSuccess(result)
-      resetForm(values)
+      resetForm({ values })
     } catch (error) {
       setSubmitting(false)
       onSubmitFailure(error)

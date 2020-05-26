@@ -29,7 +29,7 @@ import Form from '.'
 
 const handleSubmit = function(data, { resetForm }) {
   action('Submit')(data)
-  setTimeout(() => resetForm(data), 1000)
+  setTimeout(() => resetForm({ values: data }), 1000)
 }
 
 const containerStyles = {

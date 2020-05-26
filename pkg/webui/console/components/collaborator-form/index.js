@@ -105,7 +105,7 @@ export default class CollaboratorForm extends Component {
 
     try {
       await onSubmit(collaborator)
-      resetForm(values)
+      resetForm({ values })
       onSubmitSuccess()
     } catch (error) {
       setSubmitting(false)

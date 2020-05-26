@@ -108,10 +108,10 @@ class PayloadFormattersForm extends React.Component {
 
     try {
       const result = await onSubmit({ type, parameter })
-      resetForm(resetValues)
+      resetForm({ values: resetValues })
       await onSubmitSuccess(result)
     } catch (error) {
-      resetForm(resetValues)
+      resetForm({ values: resetValues })
 
       this.setState({ error })
       await onSubmitFailure(error)
