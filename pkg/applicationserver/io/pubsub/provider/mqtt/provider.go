@@ -17,6 +17,7 @@ package mqtt
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"time"
 
@@ -47,9 +48,15 @@ var errConnectFailed = errors.Define("connect_failed", "connection to MQTT serve
 
 // OpenConnection implements provider.Provider using the mqtt driver.
 func (impl) OpenConnection(ctx context.Context, target provider.Target) (pc *provider.Connection, err error) {
-	settings, ok := target.GetProvider().(*ttnpb.ApplicationPubSub_MQTT)
-	if !ok {
-		panic("wrong provider type provided to OpenConnection")
+	var settings *ttnpb.ApplicationPubSub_MQTT
+	switch s := target.GetProvider().(type) {
+	case *ttnpb.ApplicationPubSub_MQTT:
+		settings = s
+	default:
+		panic(fmt.Sprintf("wrong provider type provided to OpenConnection: %T", s))
+	}
+	if err != nil {
+		return nil, err
 	}
 	serverURL, err := adaptURLScheme(settings.MQTT.ServerURL)
 	if err != nil {
