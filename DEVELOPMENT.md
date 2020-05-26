@@ -86,7 +86,7 @@ The folder structure of the project looks as follows:
 ├── Dockerfile          formula for building Docker images
 ├── LICENSE             the license that explains what you're allowed to do with this code
 ├── Makefile            dev/test/build tooling
-├── .mage               dev/test/build tooling
+├── tools               dev/test/build tooling
 ├── README.md           general information about this project
 │   ...
 ├── api                 contains the protocol buffer definitions for our API
