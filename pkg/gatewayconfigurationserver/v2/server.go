@@ -39,7 +39,16 @@ func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers)
 	if s.registry != nil {
 		return s.registry, nil
 	}
-	cc, err := s.component.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
+	var (
+		cc  *grpc.ClientConn
+		err error
+	)
+	if ids != nil {
+		cc, err = s.component.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
+	} else {
+		// Don't pass a (*ttnpb.GatewayIdentifiers)(nil) to GetPeerConn.
+		cc, err = s.component.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
+	}
 	if err != nil {
 		return nil, err
 	}

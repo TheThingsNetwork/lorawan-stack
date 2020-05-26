@@ -82,7 +82,16 @@ func (gs *GatewayServer) getRegistry(ctx context.Context, ids *ttnpb.GatewayIden
 	if gs.registry != nil {
 		return gs.registry, nil
 	}
-	cc, err := gs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
+	var (
+		cc  *grpc.ClientConn
+		err error
+	)
+	if ids != nil {
+		cc, err = gs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
+	} else {
+		// Don't pass a (*ttnpb.GatewayIdentifiers)(nil) to GetPeerConn.
+		cc, err = gs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
+	}
 	if err != nil {
 		return nil, err
 	}
