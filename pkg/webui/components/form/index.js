@@ -14,7 +14,7 @@
 
 /* eslint-disable react/sort-prop-types */
 import React from 'react'
-import { Formik } from 'formik'
+import { Formik, useFormikContext } from 'formik'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import classnames from 'classnames'
 
@@ -186,4 +186,4 @@ Form.Field = FormField
 Form.InfoField = FormInfoField
 Form.Submit = FormSubmit
 
-export default Form
+export { Form as default, useFormikContext as useFormContext }
