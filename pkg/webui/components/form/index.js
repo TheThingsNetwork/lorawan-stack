@@ -131,9 +131,9 @@ class Form extends React.PureComponent {
     enableReinitialize: PropTypes.bool,
     formikRef: PropTypes.shape({ current: PropTypes.any }),
     initialValues: PropTypes.shape({}),
-    isInitialValid: PropTypes.bool,
     onReset: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
+    validateOnMount: PropTypes.bool,
     validateOnBlur: PropTypes.bool,
     validateOnChange: PropTypes.bool,
     validationSchema: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.func]),
@@ -143,9 +143,9 @@ class Form extends React.PureComponent {
     enableReinitialize: false,
     formikRef: undefined,
     initialValues: undefined,
-    isInitialValid: false,
     onReset: () => null,
     validateOnBlur: true,
+    validateOnMount: false,
     validateOnChange: false,
     validationSchema: undefined,
   }
@@ -155,10 +155,10 @@ class Form extends React.PureComponent {
       onSubmit,
       onReset,
       initialValues,
-      isInitialValid,
       validateOnBlur,
       validateOnChange,
       validationSchema,
+      validateOnMount,
       formikRef,
       enableReinitialize,
       ...rest
@@ -170,8 +170,8 @@ class Form extends React.PureComponent {
         render={formRenderer(rest)}
         onSubmit={onSubmit}
         onReset={onReset}
+        validateOnMount={validateOnMount}
         initialValues={initialValues}
-        isInitialValid={isInitialValid}
         validateOnBlur={validateOnBlur}
         validateOnChange={validateOnChange}
         validationSchema={validationSchema}
