@@ -11,11 +11,9 @@
 /go.mod @johanstokking @htdvisser @rvolosatovs
 /go.sum @johanstokking @htdvisser @rvolosatovs
 
-# Build pipeline
+# Build pipeline and tooling
 /Makefile @htdvisser @rvolosatovs @johanstokking
-/magefile.go @htdvisser @rvolosatovs @johanstokking
-/.make @htdvisser @rvolosatovs @johanstokking
-/.mage @htdvisser @rvolosatovs @johanstokking
+/tools @htdvisser @rvolosatovs @johanstokking
 
 # API, configuration, CLI and storage compatibility
 /api @johanstokking @htdvisser @rvolosatovs
