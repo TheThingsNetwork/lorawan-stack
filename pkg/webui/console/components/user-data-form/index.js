@@ -43,7 +43,9 @@ const validationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   primary_email_address: Yup.string().email(sharedMessages.validateEmail),
-  state: Yup.string().oneOf(approvalStates),
+  state: Yup.string()
+    .oneOf(approvalStates)
+    .required(sharedMessages.validateRequired),
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
 })
 

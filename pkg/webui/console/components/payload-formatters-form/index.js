@@ -48,7 +48,9 @@ const FIELD_NAMES = {
 }
 
 const validationSchema = Yup.object().shape({
-  [FIELD_NAMES.RADIO]: Yup.string().oneOf(Object.values(TYPES)),
+  [FIELD_NAMES.RADIO]: Yup.string()
+    .oneOf(Object.values(TYPES))
+    .required(sharedMessages.validateRequired),
   [FIELD_NAMES.JAVASCRIPT]: Yup.string().when('types-radio', {
     is: TYPES.JAVASCRIPT,
     then: Yup.string().required(sharedMessages.validateRequired),
