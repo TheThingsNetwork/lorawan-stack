@@ -178,6 +178,7 @@
   "console.containers.device-importer.index.errorTitle": "There was an error and the operation could not be completed",
   "console.containers.device-template-format-select.index.title": "Format",
   "console.containers.device-template-format-select.index.warning": "End device template formats unavailable",
+  "console.containers.fetch-table.index.errorMessage": "There was an error and the list of {entity, select, applications {applications} organizations {organizations} keys {API keys} collaborators {collaborators} devices {end devices} gateways {gateways} users {users} webhooks {webhooks} other {entities}} could not be displayed",
   "console.containers.freq-plans-select.index.title": "Frequency plan",
   "console.containers.freq-plans-select.index.warning": "Frequency plans unavailable",
   "console.containers.freq-plans-select.index.description": "The frequency plan used by the end device",

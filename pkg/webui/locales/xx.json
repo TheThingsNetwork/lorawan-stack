@@ -178,6 +178,7 @@
   "console.containers.device-importer.index.errorTitle": "Xxxxx xxx xx xxxxx xxx xxx xxxxxxxxx xxxxx xxx xx xxxxxxxxx",
   "console.containers.device-template-format-select.index.title": "Xxxxxx",
   "console.containers.device-template-format-select.index.warning": "Xxx xxxxxx xxxxxxxx xxxxxxx xxxxxxxxxxx",
+  "console.containers.fetch-table.index.errorMessage": "Xxxxx xxx xx xxxxx xxx xxx xxxx xx {entity, select, =applications {xxxxxxxxxxxx} =organizations {xxxxxxxxxxxxx} =keys {XXX xxxx} =collaborators {xxxxxxxxxxxxx} =devices {xxx xxxxxxx} =gateways {xxxxxxxx} =users {xxxxx} =webhooks {xxxxxxxx} other {xxxxxxxx}} xxxxx xxx xx xxxxxxxxx",
   "console.containers.freq-plans-select.index.title": "Xxxxxxxxx xxxx",
   "console.containers.freq-plans-select.index.warning": "Xxxxxxxxx xxxxx xxxxxxxxxxx",
   "console.containers.freq-plans-select.index.description": "Xxx xxxxxxxxx xxxx xxxx xx xxx xxx xxxxxx",
