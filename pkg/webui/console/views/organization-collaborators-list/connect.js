@@ -21,6 +21,7 @@ import {
   selectCollaborators,
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
+  selectCollaboratorsError,
 } from '@console/store/selectors/collaborators'
 
 export default OrganizationCollaboratorsList =>
@@ -45,6 +46,7 @@ export default OrganizationCollaboratorsList =>
           collaborators: selectCollaborators(state, id),
           totalCount: selectCollaboratorsTotalCount(state, id),
           fetching: selectCollaboratorsFetching(state),
+          error: selectCollaboratorsError(state),
         }
       },
     }),
