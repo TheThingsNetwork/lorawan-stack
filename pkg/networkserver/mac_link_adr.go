@@ -69,7 +69,8 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 			Ok:         true,
 		}, nil
 	}
-	if len(dev.MACState.DesiredParameters.Channels) == 0 ||
+	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MACState.DesiredParameters.Channels...)
+	if !ok ||
 		len(dev.MACState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) ||
 		dev.MACState.DesiredParameters.ADRTxPowerIndex > uint32(phy.MaxTxPowerIndex()) ||
 		dev.MACState.DesiredParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
@@ -77,16 +78,6 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,
 		}, errCorruptedMACState.New()
-	}
-	minDataRateIndex := dev.MACState.DesiredParameters.Channels[0].MinDataRateIndex
-	maxDataRateIndex := dev.MACState.DesiredParameters.Channels[0].MaxDataRateIndex
-	for _, ch := range dev.MACState.DesiredParameters.Channels {
-		if ch.MinDataRateIndex < minDataRateIndex {
-			minDataRateIndex = ch.MinDataRateIndex
-		}
-		if ch.MaxDataRateIndex < maxDataRateIndex {
-			maxDataRateIndex = ch.MaxDataRateIndex
-		}
 	}
 	if dev.MACState.CurrentParameters.ADRDataRateIndex > minDataRateIndex {
 		minDataRateIndex = dev.MACState.CurrentParameters.ADRDataRateIndex
@@ -153,7 +144,11 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 			// Since either data rate or TX power index (or both) were rejected by the device, undo the
 			// desired ADR adjustments step-by-step until possibly fitting index pair is found.
 			if drIdx == minDataRateIndex && txPowerIdx == 0 {
-				log.FromContext(ctx).Warn("Device rejected either all available data rate indexes or all available TX power output indexes and there are channel mask or NbTrans changes desired, avoid enqueueing LinkADRReq")
+				log.FromContext(ctx).WithFields(log.Fields(
+					"current_adr_nb_trans", dev.MACState.CurrentParameters.ADRNbTrans,
+					"desired_adr_nb_trans", dev.MACState.DesiredParameters.ADRNbTrans,
+					"desired_mask_count", len(desiredMasks),
+				)).Warn("Device rejected either all available data rate indexes or all available TX power output indexes and there are channel mask or NbTrans changes desired, avoid enqueueing LinkADRReq")
 				return macCommandEnqueueState{
 					MaxDownLen: maxDownLen,
 					MaxUpLen:   maxUpLen,

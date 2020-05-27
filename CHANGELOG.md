@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Typo in Application Server configuration documentation (webhook downlink).
 - Unset fields via CLI on Join Server, i.e. `--unset root-keys.nwk-key`.
 - Reconnecting UDP gateways that were disconnected by a new gateway connection.
+- ADR in US915-like bands.
 
 ### Security
 
