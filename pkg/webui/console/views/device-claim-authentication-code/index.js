@@ -110,7 +110,7 @@ const DeviceClaimAuthenticationCode = props => {
       try {
         await updateDevice(appId, devId, validationSchema.cast(values))
 
-        resetForm(values)
+        resetForm({ values })
         toast({
           title: devId,
           message: m.updateSuccess,

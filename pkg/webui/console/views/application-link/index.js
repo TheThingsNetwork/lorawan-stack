@@ -165,7 +165,7 @@ class ApplicationLink extends React.Component {
       try {
         const stats = await api.application.link.stats(appId)
         updateLinkSuccess(link, stats)
-        resetForm(values)
+        resetForm({ values })
         toast({
           title: appId,
           message: m.linkSuccess,
@@ -194,9 +194,9 @@ class ApplicationLink extends React.Component {
         message: m.unlinkSuccess,
         type: toast.types.SUCCESS,
       })
-      this.form.current.resetForm({ tls: false })
+      this.form.current.resetForm({ values: { tls: false } })
     } catch (error) {
-      this.form.current.resetForm({ tls: false })
+      this.form.current.resetForm({ values: { tls: false } })
       this.setState({ error })
     }
   }

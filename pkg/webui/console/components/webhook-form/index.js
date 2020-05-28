@@ -122,10 +122,10 @@ export default class WebhookForm extends Component {
     try {
       const result = await onSubmit(webhook)
 
-      resetForm(values)
+      resetForm({ values })
       await onSubmitSuccess(result)
     } catch (error) {
-      resetForm(values)
+      resetForm({ values })
 
       await this.setState({ error })
       await onSubmitFailure(error)

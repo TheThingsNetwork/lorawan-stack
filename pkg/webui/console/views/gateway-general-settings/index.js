@@ -133,7 +133,7 @@ export default class GatewayGeneralSettings extends React.Component {
         type: toast.types.SUCCESS,
       })
     } catch (error) {
-      this.formRef.current.resetForm(values)
+      this.formRef.current.resetForm({ values })
       await this.setState({ error })
     }
   }

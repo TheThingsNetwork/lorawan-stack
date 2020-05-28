@@ -15,9 +15,12 @@
 package errors_test
 
 import (
+	"context"
 	stderrors "errors"
 	"fmt"
+	"net"
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -73,4 +76,155 @@ func TestFields(t *testing.T) {
 		"error_cause":       "error:pkg/errors_test:intermediary (intermediary)",
 		"error_cause_cause": "back",
 	})
+}
+
+func TestContextCanceled(t *testing.T) {
+	a := assertions.New(t)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	err, ok := errors.From(ctx.Err())
+	a.So(ok, should.BeTrue)
+	a.So(errors.IsCanceled(err), should.BeTrue)
+}
+
+func TestContextDeadlineExceeded(t *testing.T) {
+	a := assertions.New(t)
+
+	ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(5*time.Millisecond))
+
+	time.Sleep(10 * time.Millisecond)
+
+	err, ok := errors.From(ctx.Err())
+	if !a.So(ok, should.BeTrue) {
+		t.FailNow()
+	}
+	a.So(errors.IsDeadlineExceeded(err), should.BeTrue)
+}
+
+func TestNetErrors(t *testing.T) {
+	a := assertions.New(t)
+
+	for _, tc := range []struct {
+		Name     string
+		Error    error
+		Validate func(err error, e *errors.Error, a *assertions.Assertion)
+	}{
+		{
+			Name: "DNSError",
+			Error: &net.DNSError{
+				Err:         "SERVFAIL",
+				Name:        "invalid-name",
+				IsNotFound:  true,
+				IsTemporary: false,
+				IsTimeout:   false,
+				Server:      "dns-server",
+			},
+			Validate: func(err error, e *errors.Error, a *assertions.Assertion) {
+				a.So(e.FullName(), should.Equal, "pkg/errors:net_dns")
+				a.So(errors.IsUnavailable(e), should.BeTrue)
+				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
+					"message":   err.Error(),
+					"temporary": false,
+					"timeout":   false,
+					"not_found": true,
+				})
+			},
+		},
+		{
+			Name:  "UnknownNetworkError",
+			Error: net.UnknownNetworkError("1.1.1.1"),
+			Validate: func(err error, e *errors.Error, a *assertions.Assertion) {
+				a.So(e.FullName(), should.Equal, "pkg/errors:net_unknown_network")
+				a.So(errors.IsNotFound(e), should.BeTrue)
+				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
+					"message":   err.Error(),
+					"temporary": false,
+					"timeout":   false,
+				})
+			},
+		},
+		{
+			Name:  "InvalidAddrError",
+			Error: net.InvalidAddrError("1.1.1.1"),
+			Validate: func(err error, e *errors.Error, a *assertions.Assertion) {
+				a.So(e.FullName(), should.Equal, "pkg/errors:net_invalid_addr")
+				a.So(errors.IsInvalidArgument(e), should.BeTrue)
+				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
+					"message":   err.Error(),
+					"temporary": false,
+					"timeout":   false,
+				})
+			},
+		},
+		{
+			Name: "AddrError",
+			Error: &net.AddrError{
+				Addr: "1.1.1.1",
+				Err:  "no route",
+			},
+			Validate: func(err error, e *errors.Error, a *assertions.Assertion) {
+				a.So(e.FullName(), should.Equal, "pkg/errors:net_addr")
+				a.So(errors.IsUnavailable(e), should.BeTrue)
+				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
+					"message":   err.Error(),
+					"temporary": false,
+					"timeout":   false,
+				})
+			},
+		},
+		{
+			Name: "OpErrorWithNil",
+			Error: &net.OpError{
+				Op:     "read",
+				Addr:   &net.IPAddr{IP: net.IP{1, 1, 1, 1}},
+				Source: &net.IPAddr{IP: net.IP{2, 2, 2, 2}},
+				Net:    "0.0.0.0",
+				Err:    nil,
+			},
+			Validate: func(err error, e *errors.Error, a *assertions.Assertion) {
+				a.So(e.FullName(), should.Equal, "pkg/errors:net_operation")
+				a.So(errors.IsUnavailable(e), should.BeTrue)
+				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
+					"temporary": false,
+					"timeout":   false,
+					"address":   "1.1.1.1",
+					"source":    "2.2.2.2",
+					"net":       "0.0.0.0",
+					"op":        "read",
+				})
+			},
+		},
+		{
+			Name: "OpErrorWithErr",
+			Error: &net.OpError{
+				Op:     "read",
+				Addr:   &net.IPAddr{IP: net.IP{1, 1, 1, 1}},
+				Source: &net.IPAddr{IP: net.IP{2, 2, 2, 2}},
+				Net:    "0.0.0.0",
+				Err:    fmt.Errorf("dummy"),
+			},
+			Validate: func(err error, e *errors.Error, a *assertions.Assertion) {
+				a.So(e.FullName(), should.Equal, "pkg/errors:net_operation")
+				a.So(errors.IsUnavailable(e), should.BeTrue)
+				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
+					"message":   err.Error(),
+					"temporary": false,
+					"timeout":   false,
+					"address":   "1.1.1.1",
+					"source":    "2.2.2.2",
+					"net":       "0.0.0.0",
+					"op":        "read",
+				})
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			err, ok := errors.From(tc.Error)
+			a.So(ok, should.BeTrue)
+			tc.Validate(tc.Error, err, a)
+		})
+	}
+
 }

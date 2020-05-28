@@ -884,9 +884,17 @@ func TestFlow(t *testing.T) {
 					NbTrans:       1,
 				},
 			}
+			us915LinkADRReqs := []*ttnpb.MACCommand_LinkADRReq{
+				{
+					ChannelMask:   []bool{false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true},
+					DataRateIndex: ttnpb.DATA_RATE_2,
+					TxPowerIndex:  1,
+					NbTrans:       1,
+				},
+			}
 			for flow, handleFlowTest := range map[string]func(context.Context, FlowTestEnvironment){
 				"Class C/OTAA/MAC:1.0.3/PHY:1.0.3-a/FP:EU868": makeClassCOTAAFlowTest(ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A, test.EUFrequencyPlanID, eu868LinkADRReqs...),
-				"Class C/OTAA/MAC:1.0.4/PHY:1.0.3-a/FP:US915": makeClassCOTAAFlowTest(ttnpb.MAC_V1_0_4, ttnpb.PHY_V1_0_3_REV_A, test.USFrequencyPlanID),
+				"Class C/OTAA/MAC:1.0.4/PHY:1.0.3-a/FP:US915": makeClassCOTAAFlowTest(ttnpb.MAC_V1_0_4, ttnpb.PHY_V1_0_3_REV_A, test.USFrequencyPlanID, us915LinkADRReqs...),
 				"Class C/OTAA/MAC:1.1/PHY:1.1-b/FP:EU868":     makeClassCOTAAFlowTest(ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B, test.EUFrequencyPlanID, eu868LinkADRReqs...),
 			} {
 				t.Run(flow, func(t *testing.T) {

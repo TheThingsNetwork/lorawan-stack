@@ -46,6 +46,7 @@ const WEBPACK_DEV_SERVER_DISABLE_HMR = process.env.WEBPACK_DEV_SERVER_DISABLE_HM
 const WEBPACK_DEV_SERVER_USE_TLS = process.env.WEBPACK_DEV_SERVER_USE_TLS === 'true'
 const TTN_LW_TLS_CERTIFICATE = process.env.TTN_LW_TLS_CERTIFICATE || './cert.pem'
 const TTN_LW_TLS_KEY = process.env.TTN_LW_TLS_KEY || './key.pem'
+const TTN_LW_TLS_ROOT_CA = process.env.TTN_LW_TLS_ROOT_CA || './cert.pem'
 
 const ASSETS_ROOT = '/assets'
 
@@ -136,6 +137,7 @@ export default {
           https: {
             cert: fs.readFileSync(TTN_LW_TLS_CERTIFICATE),
             key: fs.readFileSync(TTN_LW_TLS_KEY),
+            ca: fs.readFileSync(TTN_LW_TLS_ROOT_CA),
           },
         }
       : {}),

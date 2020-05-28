@@ -89,7 +89,7 @@ const JoinServerForm = React.memo(props => {
       setError('')
       try {
         await onSubmit(updatedValues)
-        resetForm(castedValues)
+        resetForm({ values: castedValues })
         onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)

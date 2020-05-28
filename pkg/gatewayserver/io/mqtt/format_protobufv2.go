@@ -231,6 +231,9 @@ func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.G
 	if v2status.Hal != "" {
 		versions["hal"] = v2status.Hal
 	}
+	if v2status.Platform != "" {
+		versions["platform"] = v2status.Platform
+	}
 	var antennasLocation []*ttnpb.Location
 	if loc := v2status.Location; loc.Validate() {
 		antennasLocation = []*ttnpb.Location{
