@@ -102,7 +102,7 @@ const NetworkServerForm = React.memo(props => {
       setError('')
       try {
         await onSubmit(updatedValues)
-        resetForm(castedValues)
+        resetForm({ values: castedValues })
         onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)
@@ -123,8 +123,8 @@ const NetworkServerForm = React.memo(props => {
       const isABP = initialValues._activation_mode === ACTIVATION_MODES.ABP
       const lwVersion = parseLorawanMacVersion(version)
       setLorawanVersion(lwVersion)
-      const { setValues, state: formState } = formRef.current
-      const { session = {} } = formState.values
+      const { setValues, values: formValues } = formRef.current
+      const { session = {} } = formValues
       const { session: initialSession } = initialValues
       if (lwVersion >= 110) {
         const updatedSession = isABP
@@ -139,7 +139,7 @@ const NetworkServerForm = React.memo(props => {
             }
           : session
         setValues({
-          ...formState.values,
+          ...formValues,
           lorawan_version: version,
           session: updatedSession,
         })
@@ -153,7 +153,7 @@ const NetworkServerForm = React.memo(props => {
             }
           : session
         setValues({
-          ...formState.values,
+          ...formValues,
           lorawan_version: version,
           session: updatedSession,
         })

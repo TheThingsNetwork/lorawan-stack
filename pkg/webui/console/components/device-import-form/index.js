@@ -103,12 +103,12 @@ export default class DeviceBulkCreateForm extends Component {
   @bind
   handleComponentChange(value) {
     const { jsSelected } = this.state
-    const { state } = this.formRef.current
+    const { values } = this.formRef.current
     const { js } = value
 
     if (js !== jsSelected) {
       this.setState({ jsSelected: js }, () => {
-        if (state.values.set_claim_auth_code) {
+        if (values.set_claim_auth_code) {
           const { setFieldValue } = this.formRef.current
 
           // `claim_authentication_code` is stored in JS, so if the JS option is

@@ -106,7 +106,7 @@ export default class WebhookTemplateForm extends Component {
     try {
       const webhook = await this.convertTemplateToWebhook(values)
       const result = await onSubmit(webhook)
-      resetForm(values)
+      resetForm({ values })
       onSubmitSuccess(result)
     } catch (error) {
       setSubmitting(false)

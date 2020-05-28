@@ -91,7 +91,7 @@ class GeneralSettings extends React.PureComponent {
     const { orgId, organization } = this.props
 
     if (this.formRef && this.formRef.current) {
-      this.formRef.current.resetForm(organization)
+      this.formRef.current.resetForm({ values: organization })
     }
 
     toast({

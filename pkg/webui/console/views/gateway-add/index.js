@@ -83,7 +83,7 @@ export default class GatewayAdd extends React.Component {
 
       createSuccess(gateway_id)
     } catch (error) {
-      resetForm(values)
+      resetForm({ values })
 
       await this.setState({ error })
     }
