@@ -422,6 +422,11 @@ func (s *srv) gc() {
 				logger := logger.WithField("gateway_eui", k.(types.EUI64))
 				state := v.(*state)
 				select {
+				case <-state.ioWait:
+				default:
+					return true
+				}
+				select {
 				case <-state.io.Context().Done():
 					logger.Debug("Connection context done")
 					s.connections.Delete(k)
@@ -430,13 +435,9 @@ func (s *srv) gc() {
 					if time.Since(lastSeenPull) > s.config.ConnectionExpires {
 						lastSeenPush := time.Unix(0, atomic.LoadInt64(&state.lastSeenPush))
 						if time.Since(lastSeenPush) > s.config.ConnectionExpires {
-							select {
-							case <-state.ioWait:
-								logger.Debug("Connection expired")
-								s.connections.Delete(k)
-								state.io.Disconnect(errConnectionExpired)
-							default:
-							}
+							logger.Debug("Connection expired")
+							s.connections.Delete(k)
+							state.io.Disconnect(errConnectionExpired)
 						}
 					}
 				}
