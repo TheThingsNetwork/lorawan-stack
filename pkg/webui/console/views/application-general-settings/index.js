@@ -143,7 +143,7 @@ export default class ApplicationGeneralSettings extends React.Component {
 
     try {
       await updateApplication(application_id, update)
-      resetForm(values)
+      resetForm({ values })
       toast({
         title: application_id,
         message: m.updateSuccess,

@@ -14,8 +14,7 @@
 
 /* eslint-disable react/sort-prop-types */
 import React from 'react'
-import { Formik } from 'formik'
-import bind from 'autobind-decorator'
+import { Formik, useFormikContext } from 'formik'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import classnames from 'classnames'
 
@@ -127,38 +126,39 @@ const formRenderer = ({ children, ...rest }) =>
     )
   }
 
-@bind
 class Form extends React.PureComponent {
   static propTypes = {
     enableReinitialize: PropTypes.bool,
     formikRef: PropTypes.shape({ current: PropTypes.any }),
     initialValues: PropTypes.shape({}),
-    isInitialValid: PropTypes.bool,
     onReset: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
+    validateOnMount: PropTypes.bool,
     validateOnBlur: PropTypes.bool,
     validateOnChange: PropTypes.bool,
     validationSchema: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.func]),
   }
+
   static defaultProps = {
     enableReinitialize: false,
     formikRef: undefined,
     initialValues: undefined,
-    isInitialValid: false,
     onReset: () => null,
     validateOnBlur: true,
+    validateOnMount: false,
     validateOnChange: false,
     validationSchema: undefined,
   }
+
   render() {
     const {
       onSubmit,
       onReset,
       initialValues,
-      isInitialValid,
       validateOnBlur,
       validateOnChange,
       validationSchema,
+      validateOnMount,
       formikRef,
       enableReinitialize,
       ...rest
@@ -166,17 +166,18 @@ class Form extends React.PureComponent {
 
     return (
       <Formik
-        ref={formikRef}
-        render={formRenderer(rest)}
+        innerRef={formikRef}
         onSubmit={onSubmit}
         onReset={onReset}
+        validateOnMount={validateOnMount}
         initialValues={initialValues}
-        isInitialValid={isInitialValid}
         validateOnBlur={validateOnBlur}
         validateOnChange={validateOnChange}
         validationSchema={validationSchema}
         enableReinitialize={enableReinitialize}
-      />
+      >
+        {formRenderer(rest)}
+      </Formik>
     )
   }
 }
@@ -185,4 +186,4 @@ Form.Field = FormField
 Form.InfoField = FormInfoField
 Form.Submit = FormSubmit
 
-export default Form
+export { Form as default, useFormikContext as useFormContext }

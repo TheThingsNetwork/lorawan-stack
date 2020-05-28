@@ -82,7 +82,7 @@ class OrganizationForm extends React.Component {
       const result = await onSubmit(castedValues)
       onSubmitSuccess(result)
     } catch (error) {
-      resetForm(values)
+      resetForm({ values })
       onSubmitFailure(error)
     }
   }

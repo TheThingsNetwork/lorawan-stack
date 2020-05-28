@@ -92,8 +92,12 @@ export default Yup.object().shape({
         then: Yup.string().matches(mqttPasswordRegexp, sharedMessages.validateMqttPassword),
         otherwise: Yup.string().strip(),
       }),
-      subscribe_qos: Yup.string().oneOf(qosLevels, sharedMessages.validateRequired),
-      publish_qos: Yup.string().oneOf(qosLevels, sharedMessages.validateRequired),
+      subscribe_qos: Yup.string()
+        .oneOf(qosLevels, sharedMessages.validateRequired)
+        .required(sharedMessages.validateRequired),
+      publish_qos: Yup.string()
+        .oneOf(qosLevels, sharedMessages.validateRequired)
+        .required(sharedMessages.validateRequired),
       use_tls: Yup.boolean(),
       tls_ca: Yup.string().when('use_tls', {
         is: true,

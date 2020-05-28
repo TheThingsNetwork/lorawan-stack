@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Setting custom gateway attributes in the console
 - Pub/Sub documentation.
+- Return informative well-known errors for standard network and context errors.
 
 ### Changed
 
@@ -28,6 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unsetting NwkKey in Join Server.
 - CSRF token validation issues preventing login and logout in some circumstances.
 - Typo in Application Server configuration documentation (webhook downlink).
+- Unset fields via CLI on Join Server, i.e. `--unset root-keys.nwk-key`.
+- Reconnecting UDP gateways that were disconnected by a new gateway connection.
+- ADR in US915-like bands.
 
 ### Security
 

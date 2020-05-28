@@ -68,16 +68,11 @@ const IdentityServerForm = React.memo(props => {
 
   const handleExternalJsChange = React.useCallback(evt => {
     const { checked: externalJsChecked } = evt.target
-    const { setValues, state } = formRef.current
+    const { setValues, values } = formRef.current
 
     setExternaljs(externalJsChecked)
 
-    const values = {
-      ...state.values,
-      _external_js: externalJsChecked,
-    }
-
-    setValues(validationSchema.cast(values))
+    setValues(validationSchema.cast({ ...values, _external_js: externalJsChecked }))
   }, [])
 
   const onFormSubmit = React.useCallback(
@@ -92,7 +87,7 @@ const IdentityServerForm = React.memo(props => {
       setError('')
       try {
         await onSubmit(updatedValues)
-        resetForm(castedValues)
+        resetForm({ values: castedValues })
         onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)

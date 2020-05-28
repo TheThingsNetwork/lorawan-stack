@@ -154,8 +154,9 @@ func TestGenerateDevAddr(t *testing.T) {
 			seen := map[types.DevAddrPrefix]int{}
 			for i := 0; i < 100; i++ {
 				devAddr, err := ttnpb.NewNsClient(ns.LoopbackConn()).GenerateDevAddr(ctx, ttnpb.Empty)
-				a.So(err, should.BeNil)
-				a.So(hasOneOfPrefixes(devAddr.DevAddr, seen, tc.DevAddrPrefixes[0], tc.DevAddrPrefixes[1], tc.DevAddrPrefixes[2]), should.BeTrue)
+				if a.So(err, should.BeNil) {
+					a.So(hasOneOfPrefixes(devAddr.DevAddr, seen, tc.DevAddrPrefixes[0], tc.DevAddrPrefixes[1], tc.DevAddrPrefixes[2]), should.BeTrue)
+				}
 			}
 			a.So(seen[tc.DevAddrPrefixes[0]], should.BeGreaterThan, 0)
 			a.So(seen[tc.DevAddrPrefixes[1]], should.BeGreaterThan, 0)

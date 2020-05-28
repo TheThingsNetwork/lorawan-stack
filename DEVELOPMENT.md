@@ -201,18 +201,20 @@ TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
 
 #### Optional Configuration
 
-Disable [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/)
+##### Disable [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/)
 
 ```bash
 WEBPACK_DEV_SERVER_DISABLE_HMR="true"
 ```
 
-Enable TLS in `webpack-dev-server`, using the key and certificate set via `TTN_LW_TLS_KEY` and `TTN_LW_TLS_CERTIFICATE` environment variables. Useful when developing functionalities that rely on TLS.
+##### Enable TLS in `webpack-dev-server`
 
 ```bash
 WEBPACK_DEV_SERVER_USE_TLS="true"
 ```
-Note: To use this option, The Things Stack for LoRaWAN must be properly setup for TLS. You can obtain more information about this in the **Getting Started** section of the The Things Stack for LoRaWAN documentation.
+This option uses the key and certificate set via `TTN_LW_TLS_KEY` and `TTN_LW_TLS_CERTIFICATE` environment variables. Useful when developing functionalities that rely on TLS.
+
+> Note: To use this option, The Things Stack for LoRaWAN must be properly setup for TLS. You can obtain more information about this in the **Getting Started** section of the The Things Stack for LoRaWAN documentation.
 
 ## Code Style
 
@@ -836,7 +838,7 @@ The bundle files have been deleted. This might happen e.g. when a mage target en
 ##### Possible solution
 
   1. Rebuild the Console `tools/bin/mage js:clean js:build`
-  2. Restart the The Things Stack
+  2. Restart The Things Stack
 
 ##### Mixing up production and development builds
 
@@ -865,12 +867,6 @@ console.4e67a17c1ce5a74f3f50.js:104 Uncaught TypeError: m.subscribe is not a fun
     at Object.0 (console.4e67a17c1ce5a74f3f50.js:104)
 ```
 
-or
-
-```
-ERROR in ./node_modules/redux-logic/node_modules/rxjs/operators/index.js Module not found: Error: Can't resolve '../internal/operators/audit' in '/lorawan-stack/node_modules/redux-logic/node_modules/rxjs/operators'
-```
-
 #### Possible causes
 
 ##### Bundle using old JS SDK
@@ -885,12 +881,18 @@ The bundle integrates an old version of the JS SDK. This is likely a caching/lin
     - If you have cloned multiple `lorawan-stack` forks in different locations, `yarn link` might associate the JS SDK module with the SDK on another ttn repository
   - Rebuild the Console and (only after the build has finished) restart The Things Stack
 
-##### Broken yarn or npm cache
+#### Problem: Console rendering blank page and showing `Module not found` message in console logs, e.g.:
 
-##### Possible solutions
+```
+ERROR in ./node_modules/redux-logic/node_modules/rxjs/operators/index.js Module not found: Error: Can't resolve '../internal/operators/audit' in '/lorawan-stack/node_modules/redux-logic/node_modules/rxjs/operators'
+```
 
-- Clear yarn cache: `yarn cache clear`
-- Clear npm cache: `npm cache clear`
+#### Possible cause: Broken yarn or npm cache
+
+#### Possible solution: Clean package manager caches
+
+- Clean yarn cache: `yarn cache clean`
+- Clean npm cache: `npm cache clean`
 - Clean and reinstall dependencies: `tools/bin/mage js:cleanDeps js:deps`
 
 #### Problem: The build crashes without showing any helpful error message
@@ -903,20 +905,22 @@ The bundle integrates an old version of the JS SDK. This is likely a caching/lin
 
 Run mage in verbose mode: `tools/bin/mage -v {target}`
 
-#### Problem: Browser displays error: `Cannot GET /`
+#### Problem: Browser displays error:
+`Cannot GET /`
 
-##### Cause: No endpoint is exposed at root
+#### Cause: No endpoint is exposed at root
 
-##### Solution:
+#### Solution:
 
 Console is typically exposed at `http://localhost:8080/console`,
 API at `http://localhost:8080/console`,
 OAuth at `http://localhost:8080/oauth`,
 etc
 
-#### Problem: Browser displays error: `Error occurred while trying to proxy to: localhost:8080/console`
+#### Problem: Browser displays error:
+`Error occurred while trying to proxy to: localhost:8080/console`
 
-##### Cause: Stack is not available or not running
+#### Cause: Stack is not available or not running
 
 For development, remember to run the stack with `go run`:
 

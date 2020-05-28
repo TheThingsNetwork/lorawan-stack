@@ -21,11 +21,9 @@ import { parseLorawanMacVersion, ACTIVATION_MODES } from '@console/lib/device-ut
 const validationSchema = Yup.object()
   .shape({
     _external_js: Yup.boolean(),
-    _activation_mode: Yup.mixed().oneOf([
-      ACTIVATION_MODES.ABP,
-      ACTIVATION_MODES.OTAA,
-      ACTIVATION_MODES.MULTICAST,
-    ]),
+    _activation_mode: Yup.mixed()
+      .oneOf([ACTIVATION_MODES.ABP, ACTIVATION_MODES.OTAA, ACTIVATION_MODES.MULTICAST])
+      .required(sharedMessages.validateRequired),
     _may_edit_keys: Yup.boolean().default(false),
     _may_read_keys: Yup.boolean().default(false),
     _joined: Yup.boolean().default(false),

@@ -565,7 +565,7 @@ var (
 				return errConflictingPaths.WithAttributes("field_mask_paths", overlapPaths)
 			}
 			var device ttnpb.EndDevice
-			if ttnpb.HasAnyField(paths, setEndDeviceToJS...) {
+			if ttnpb.HasAnyField(paths, setEndDeviceToJS...) || ttnpb.HasAnyField(unsetPaths, setEndDeviceToJS...) {
 				device.SupportsJoin = true
 			}
 			if err = util.SetFields(&device, setEndDeviceFlags); err != nil {

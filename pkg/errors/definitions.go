@@ -150,8 +150,6 @@ nextArg:
 // Errors that are defined in init() funcs will be collected for translation.
 var Definitions = make(map[string]*Definition)
 
-// Canceled - not used for now; should be created by canceling context.
-
 // Define defines a registered error of type Unknown.
 func Define(name, messageFormat string, publicAttributes ...string) Definition {
 	return define(uint32(codes.Unknown), name, messageFormat, publicAttributes...)
@@ -163,7 +161,17 @@ func DefineInvalidArgument(name, messageFormat string, publicAttributes ...strin
 	return def
 }
 
-// DeadlineExceeded - not used for now; should be created by expiring context.
+// DefineDeadlineExceeded defines a registered error of type DeadlineExceeded.
+func DefineDeadlineExceeded(name, messageFormat string, publicAttributes ...string) Definition {
+	def := define(uint32(codes.DeadlineExceeded), name, messageFormat, publicAttributes...)
+	return def
+}
+
+// DefineCanceled defines a registered error of type Canceled.
+func DefineCanceled(name, messageFormat string, publicAttributes ...string) Definition {
+	def := define(uint32(codes.Canceled), name, messageFormat, publicAttributes...)
+	return def
+}
 
 // DefineNotFound defines a registered error of type NotFound.
 func DefineNotFound(name, messageFormat string, publicAttributes ...string) Definition {
