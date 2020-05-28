@@ -188,7 +188,7 @@ JoinEUIPrefixesInput.propTypes = {
   className: PropTypes.string,
   description: PropTypes.message,
   disabled: PropTypes.bool,
-  error: PropTypes.error,
+  error: PropTypes.bool,
   fetching: PropTypes.bool,
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.func,
@@ -211,7 +211,7 @@ JoinEUIPrefixesInput.defaultProps = {
   prefixes: [],
   showPrefixes: true,
   value: undefined,
-  error: undefined,
+  error: false,
   description: undefined,
 }
 
