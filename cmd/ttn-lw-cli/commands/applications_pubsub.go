@@ -35,7 +35,7 @@ var (
 	natsProviderApplicationPubSubFlags = util.FieldFlags(&ttnpb.ApplicationPubSub_NATSProvider{}, "nats")
 	mqttProviderApplicationPubSubFlags = util.FieldFlags(&ttnpb.ApplicationPubSub_MQTTProvider{}, "mqtt")
 
-	selectAllApplicationPubSubFlags = util.SelectAllFlagSet("application pubsub")
+	selectAllApplicationPubSubFlags = util.SelectAllFlagSet("application pub/sub")
 )
 
 func applicationPubSubIDFlags() *pflag.FlagSet {
@@ -66,7 +66,7 @@ func forwardDeprecatedProviderFlags(flagSet *pflag.FlagSet) {
 	util.ForwardFlag(flagSet, "nats_server_url", "nats.server_url")
 }
 
-var errNoPubSubID = errors.DefineInvalidArgument("no_pub_sub_id", "no pubsub ID set")
+var errNoPubSubID = errors.DefineInvalidArgument("no_pub_sub_id", "no pub/sub ID set")
 
 func getApplicationPubSubID(flagSet *pflag.FlagSet, args []string) (*ttnpb.ApplicationPubSubIdentifiers, error) {
 	forwardDeprecatedProviderFlags(flagSet)
@@ -100,7 +100,7 @@ var (
 	applicationsPubSubsCommand = &cobra.Command{
 		Use:     "pubsubs",
 		Aliases: []string{"pubsub", "ps"},
-		Short:   "Application pubsub commands",
+		Short:   "Application pub/sub commands",
 	}
 	applicationsPubSubsGetFormatsCommand = &cobra.Command{
 		Use:     "get-formats",
@@ -122,7 +122,7 @@ var (
 	applicationsPubSubsGetCommand = &cobra.Command{
 		Use:     "get [application-id] [pubsub-id]",
 		Aliases: []string{"info"},
-		Short:   "Get the properties of an application pubsub",
+		Short:   "Get the properties of an application pub/sub",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			forwardDeprecatedProviderFlags(cmd.Flags())
 			pubsubID, err := getApplicationPubSubID(cmd.Flags(), args)
@@ -190,7 +190,7 @@ var (
 	applicationsPubSubsSetCommand = &cobra.Command{
 		Use:     "set [application-id] [pubsub-id]",
 		Aliases: []string{"update"},
-		Short:   "Set the properties of an application pubsub",
+		Short:   "Set the properties of an application pub/sub",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			forwardDeprecatedProviderFlags(cmd.Flags())
 			pubsubID, err := getApplicationPubSubID(cmd.Flags(), args)
@@ -279,7 +279,7 @@ var (
 	}
 	applicationsPubSubsDeleteCommand = &cobra.Command{
 		Use:   "delete [application-id] [pubsub-id]",
-		Short: "Delete an application pubsub",
+		Short: "Delete an application pub/sub",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pubsubID, err := getApplicationPubSubID(cmd.Flags(), args)
 			if err != nil {
