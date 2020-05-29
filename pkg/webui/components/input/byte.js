@@ -149,6 +149,7 @@ export default class ByteInput extends React.Component {
   onChange(evt) {
     this.props.onChange({
       target: {
+        name: evt.target.name,
         value: clean(evt.target.value),
       },
     })
@@ -157,7 +158,9 @@ export default class ByteInput extends React.Component {
   @bind
   onBlur(evt) {
     this.props.onBlur({
+      relatedTarget: evt.relatedTarget,
       target: {
+        name: evt.target.name,
         value: clean(evt.target.value),
       },
     })
