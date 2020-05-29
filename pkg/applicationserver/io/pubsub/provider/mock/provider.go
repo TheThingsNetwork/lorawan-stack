@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package mock implements a mock PubSub provider using the mempubsub driver.
+// Package mock implements a mock pub/sub provider using the mempubsub driver.
 package mock
 
 import (

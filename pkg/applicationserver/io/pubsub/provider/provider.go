@@ -23,7 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// Topics provide a PubSub base topic and optional, per-message sub-topics.
+// Topics provide a pub/sub base topic and optional, per-message sub-topics.
 type Topics interface {
 	GetBaseTopic() string
 	GetUplinkMessage() *ttnpb.ApplicationPubSub_Message
@@ -39,13 +39,13 @@ type Topics interface {
 	GetDownlinkReplace() *ttnpb.ApplicationPubSub_Message
 }
 
-// Target represents settings for a PubSub provider to connect.
+// Target represents settings for a pub/sub provider to connect.
 type Target interface {
 	Topics
 	GetProvider() ttnpb.ApplicationPubSub_Provider
 }
 
-// Provider represents a PubSub service provider.
+// Provider represents a pub/sub service provider.
 type Provider interface {
 	// OpenConnection opens the Connection of a given Target.
 	OpenConnection(ctx context.Context, target Target) (*Connection, error)
@@ -58,7 +58,7 @@ var (
 	providers = map[reflect.Type]Provider{}
 )
 
-// RegisterProvider registers an implementation for a given PubSub provider.
+// RegisterProvider registers an implementation for a given pub/sub provider.
 func RegisterProvider(p ttnpb.ApplicationPubSub_Provider, implementation Provider) {
 	t := reflect.TypeOf(p)
 	if _, ok := providers[t]; ok {

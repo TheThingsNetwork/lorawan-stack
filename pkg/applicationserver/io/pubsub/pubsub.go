@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package pubsub implements the go-cloud PubSub frontend.
+// Package pubsub implements the go-cloud pub/sub frontend.
 package pubsub
 
 import (
@@ -33,7 +33,7 @@ import (
 	"gocloud.dev/pubsub"
 )
 
-// PubSub is an PubSub frontend that exposes ttnpb.ApplicationPubSubRegistryServer.
+// PubSub is an pub/sub frontend that exposes ttnpb.ApplicationPubSubRegistryServer.
 type PubSub struct {
 	ttnpb.ApplicationPubSubRegistryServer
 

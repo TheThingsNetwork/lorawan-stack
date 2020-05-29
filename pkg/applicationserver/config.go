@@ -94,7 +94,7 @@ type WebhooksConfig struct {
 	Downlinks web.DownlinksConfig `name:"downlink" description:"The downlink queue operations configuration"`
 }
 
-// PubSubConfig contains go-cloud PubSub configuration of the Application Server.
+// PubSubConfig contains go-cloud pub/sub configuration of the Application Server.
 type PubSubConfig struct {
 	Registry pubsub.Registry `name:"-"`
 }
