@@ -14,7 +14,8 @@
 
 /* eslint-disable react/sort-prop-types */
 import React from 'react'
-import { Formik, useFormikContext } from 'formik'
+import { Formik, yupToFormErrors, useFormikContext, validateYupSchema } from 'formik'
+import bind from 'autobind-decorator'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import classnames from 'classnames'
 
@@ -137,6 +138,8 @@ class Form extends React.PureComponent {
     validateOnBlur: PropTypes.bool,
     validateOnChange: PropTypes.bool,
     validationSchema: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.func]),
+    validationContext: PropTypes.shape({}),
+    validateSync: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -148,6 +151,48 @@ class Form extends React.PureComponent {
     validateOnMount: false,
     validateOnChange: false,
     validationSchema: undefined,
+    validationContext: {},
+    validateSync: true,
+  }
+
+  @bind
+  validate(values) {
+    const { validationSchema, validationContext, validateSync } = this.props
+
+    if (!validationSchema) {
+      return {}
+    }
+
+    if (validateSync) {
+      try {
+        validateYupSchema(values, validationSchema, validateSync, validationContext)
+
+        return {}
+      } catch (error) {
+        if (error.name === 'ValidationError') {
+          return yupToFormErrors(error)
+        }
+
+        throw error
+      }
+    }
+
+    return new Promise((resolve, reject) => {
+      validateYupSchema(values, validationSchema, validateSync, validationContext).then(
+        () => {
+          resolve({})
+        },
+        error => {
+          // Resolve yup errors, see https://jaredpalmer.com/formik/docs/migrating-v2#validate.
+          if (error.name === 'ValidationError') {
+            resolve(yupToFormErrors(error))
+          } else {
+            // Throw any other errors as it is not related to the validation process.
+            reject(error)
+          }
+        },
+      )
+    })
   }
 
   render() {
@@ -158,6 +203,7 @@ class Form extends React.PureComponent {
       validateOnBlur,
       validateOnChange,
       validationSchema,
+      validationContext,
       validateOnMount,
       formikRef,
       enableReinitialize,
@@ -167,13 +213,13 @@ class Form extends React.PureComponent {
     return (
       <Formik
         innerRef={formikRef}
+        validate={this.validate}
         onSubmit={onSubmit}
         onReset={onReset}
         validateOnMount={validateOnMount}
         initialValues={initialValues}
         validateOnBlur={validateOnBlur}
         validateOnChange={validateOnChange}
-        validationSchema={validationSchema}
         enableReinitialize={enableReinitialize}
       >
         {formRenderer(rest)}
