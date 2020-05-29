@@ -80,7 +80,9 @@ const appHTML = `
     <meta property="og:image:secure_url" content="{{$brandingBaseURL}}/{{.IconPrefix}}og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <link rel="shortcut icon" type="image/x-icon" href="{{$brandingBaseURL}}/{{.IconPrefix}}favicon.ico">
+    <link rel="alternate icon" href="{{$brandingBaseURL}}/{{.IconPrefix}}favicon.ico">
+    <link rel="alternate icon" type="image/png" href="{{$brandingBaseURL}}/{{.IconPrefix}}favicon.png">
+    <link rel="icon" type="image/svg+xml" href="{{$brandingBaseURL}}/{{.IconPrefix}}favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="{{$brandingBaseURL}}/{{.IconPrefix}}touch-icon.png">
     {{range .CSSFiles}}<link href="{{$assetsBaseURL}}/{{.}}" rel="stylesheet">{{end}}
   </head>
