@@ -23,13 +23,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// Target represents settings for a PubSub provider to connect.
-type Target interface {
-	GetProvider() ttnpb.ApplicationPubSub_Provider
-
+// Topics provide a PubSub base topic and optional, per-message sub-topics.
+type Topics interface {
 	GetBaseTopic() string
-	GetDownlinkPush() *ttnpb.ApplicationPubSub_Message
-	GetDownlinkReplace() *ttnpb.ApplicationPubSub_Message
 	GetUplinkMessage() *ttnpb.ApplicationPubSub_Message
 	GetJoinAccept() *ttnpb.ApplicationPubSub_Message
 	GetDownlinkAck() *ttnpb.ApplicationPubSub_Message
@@ -39,6 +35,14 @@ type Target interface {
 	GetDownlinkQueued() *ttnpb.ApplicationPubSub_Message
 	GetLocationSolved() *ttnpb.ApplicationPubSub_Message
 	GetServiceData() *ttnpb.ApplicationPubSub_Message
+	GetDownlinkPush() *ttnpb.ApplicationPubSub_Message
+	GetDownlinkReplace() *ttnpb.ApplicationPubSub_Message
+}
+
+// Target represents settings for a PubSub provider to connect.
+type Target interface {
+	Topics
+	GetProvider() ttnpb.ApplicationPubSub_Provider
 }
 
 // Provider represents a PubSub service provider.
