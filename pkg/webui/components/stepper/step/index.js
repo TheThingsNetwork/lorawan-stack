@@ -84,6 +84,7 @@ Step.defaultProps = {
   transitionFailed: false,
   vertical: false,
   status: 'wait',
+  stepNumber: 1,
 }
 
 Step.propTypes = {
@@ -91,7 +92,7 @@ Step.propTypes = {
   className: PropTypes.string,
   description: PropTypes.message,
   status: PropTypes.oneOf(['success', 'failure', 'current', 'wait']),
-  stepNumber: PropTypes.number.isRequired,
+  stepNumber: PropTypes.number,
   title: PropTypes.message.isRequired,
   transitionFailed: PropTypes.bool,
   vertical: PropTypes.bool,
