@@ -1486,7 +1486,7 @@
   },
   "error:cmd/ttn-lw-cli/commands:no_pub_sub_id": {
     "translations": {
-      "en": "no pubsub ID set"
+      "en": "no pub/sub ID set"
     },
     "description": {
       "package": "cmd/ttn-lw-cli/commands",

@@ -561,7 +561,7 @@ hardware_versions:
 					return ctx.Err()
 				}
 			},
-			SkipCheckDownErr: true, // There is no direct error response in PubSub.
+			SkipCheckDownErr: true, // There is no direct error response in pub/sub.
 		},
 		{
 			Protocol: "pubsub/mqtt",
@@ -703,7 +703,7 @@ hardware_versions:
 					return ctx.Err()
 				}
 			},
-			SkipCheckDownErr: true, // There is no direct error response in PubSub.
+			SkipCheckDownErr: true, // There is no direct error response in pub/sub.
 		},
 		{
 			Protocol: "webhooks",
