@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
+import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import bind from 'autobind-decorator'
@@ -24,6 +25,8 @@ import Tabular from '@ttn-lw/components/table'
 import Input from '@ttn-lw/components/input'
 import Button from '@ttn-lw/components/button'
 import Tabs from '@ttn-lw/components/tabs'
+import Overlay from '@ttn-lw/components/overlay'
+import ErrorNotification from '@ttn-lw/components/error-notification'
 
 import debounce from '@ttn-lw/lib/debounce'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -51,6 +54,20 @@ const filterValidator = function(filters) {
   return filters
 }
 
+const m = defineMessages({
+  errorMessage: `There was an error and the list of {entity, select,
+    applications {applications}
+    organizations {organizations}
+    keys {API keys}
+    collaborators {collaborators}
+    devices {end devices}
+    gateways {gateways}
+    users {users}
+    webhooks {webhooks}
+    other {entities}
+  } could not be displayed`,
+})
+
 @connect(function(state, props) {
   const base = props.baseDataSelector(state, props)
 
@@ -61,6 +78,7 @@ const filterValidator = function(filters) {
     fetchingSearch: base.fetchingSearch,
     pathname: state.router.location.pathname,
     mayAdd: 'mayAdd' in base ? base.mayAdd : true,
+    error: base.error,
   }
 })
 class FetchTable extends Component {
@@ -69,6 +87,7 @@ class FetchTable extends Component {
     addMessage: PropTypes.message,
     dispatch: PropTypes.func.isRequired,
     entity: PropTypes.string.isRequired,
+    error: PropTypes.error,
     fetching: PropTypes.bool,
     fetchingSearch: PropTypes.bool,
     filterValidator: PropTypes.func,
@@ -123,6 +142,7 @@ class FetchTable extends Component {
     tableTitle: undefined,
     tabs: [],
     actionItems: null,
+    error: undefined,
   }
 
   constructor(props) {
@@ -276,6 +296,8 @@ class FetchTable extends Component {
       itemPathPrefix,
       pathname,
       actionItems,
+      entity,
+      error,
     } = this.props
     const { page, query, tab, order } = this.state
     let orderDirection, orderBy
@@ -330,22 +352,30 @@ class FetchTable extends Component {
             )}
           </div>
         </div>
-        <Tabular
-          paginated
-          page={page}
-          totalCount={totalCount}
-          pageSize={pageSize}
-          onRowClick={this.onItemClick}
-          onPageChange={this.onPageChange}
-          loading={fetching}
-          headers={headers}
-          data={items}
-          emptyMessage={sharedMessages.noMatch}
-          handlesPagination={handlesPagination}
-          onSortRequest={this.onOrderChange}
-          order={orderDirection}
-          orderBy={orderBy}
-        />
+        <Overlay visible={Boolean(error)}>
+          {Boolean(error) && (
+            <ErrorNotification
+              className={style.errorMessage}
+              content={{ ...m.errorMessage, values: { entity } }}
+            />
+          )}
+          <Tabular
+            paginated
+            page={page}
+            totalCount={totalCount}
+            pageSize={pageSize}
+            onRowClick={this.onItemClick}
+            onPageChange={this.onPageChange}
+            loading={fetching}
+            headers={headers}
+            data={items}
+            emptyMessage={sharedMessages.noMatch}
+            handlesPagination={handlesPagination}
+            onSortRequest={this.onOrderChange}
+            order={orderDirection}
+            orderBy={orderBy}
+          />
+        </Overlay>
       </div>
     )
   }

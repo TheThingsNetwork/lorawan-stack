@@ -51,3 +51,11 @@
   color: $tc-deep-gray
   +media-query($bp.s)
     padding-left: 0
+
+.error-message
+  z-index: $zi.overlay + 1
+  position: absolute
+  top: 5rem
+  left: 50%
+  transform: translate(-50%, 0)
+  color: $tc-error
