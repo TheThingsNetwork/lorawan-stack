@@ -881,6 +881,60 @@ func (dst *ApplicationPubSub_AWSIoTProvider) SetFields(src *ApplicationPubSub_AW
 				dst.EndpointAddress = zero
 			}
 
+		case "deployment":
+			if len(subs) == 0 && src == nil {
+				dst.Deployment = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Deployment = src.Deployment
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "default":
+					_, srcOk := src.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default)
+					if !srcOk && src.Deployment != nil {
+						return fmt.Errorf("attempt to set oneof 'default', while different oneof is set in source")
+					}
+					_, dstOk := dst.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default)
+					if !dstOk && dst.Deployment != nil {
+						return fmt.Errorf("attempt to set oneof 'default', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ApplicationPubSub_AWSIoTProvider_DefaultIntegration
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default).Default
+						}
+						if dstOk {
+							newDst = dst.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default).Default
+						} else {
+							newDst = &ApplicationPubSub_AWSIoTProvider_DefaultIntegration{}
+							dst.Deployment = &ApplicationPubSub_AWSIoTProvider_Default{Default: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Deployment = src.Deployment
+						} else {
+							dst.Deployment = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
 		}
@@ -981,6 +1035,27 @@ func (dst *ApplicationPubSub_AWSIoTProvider_AssumeRole) SetFields(src *Applicati
 				dst.SessionDuration = src.SessionDuration
 			} else {
 				dst.SessionDuration = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ApplicationPubSub_AWSIoTProvider_DefaultIntegration) SetFields(src *ApplicationPubSub_AWSIoTProvider_DefaultIntegration, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "stack_name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'stack_name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.StackName = src.StackName
+			} else {
+				var zero string
+				dst.StackName = zero
 			}
 
 		default:

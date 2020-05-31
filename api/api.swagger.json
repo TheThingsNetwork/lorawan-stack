@@ -7368,6 +7368,15 @@
         }
       }
     },
+    "AWSIoTProviderDefaultIntegration": {
+      "type": "object",
+      "properties": {
+        "stack_name": {
+          "type": "string",
+          "description": "The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration."
+        }
+      }
+    },
     "ApplicationDownlinkClassBC": {
       "type": "object",
       "properties": {
@@ -7403,6 +7412,10 @@
         "endpoint_address": {
           "type": "string",
           "description": "The endpoint address to connect to. If the endpoint address is left empty,\nthe integration will try to discover it."
+        },
+        "default": {
+          "$ref": "#/definitions/AWSIoTProviderDefaultIntegration",
+          "description": "Enable the default integration. This overrides custom base topic and message topics of the pub/sub integration."
         }
       }
     },

@@ -98,6 +98,16 @@ message ApplicationPubSub {
     // The endpoint address to connect to. If the endpoint address is left empty,
     // the integration will try to discover it.
     string endpoint_address = 4;
+
+    message DefaultIntegration {
+      // The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration.
+      string stack_name = 1 [(validate.rules).string = {pattern: "^[A-Za-z][A-Za-z0-9\\-]*$", max_len: 128}];
+    }
+
+    oneof deployment {
+      // Enable the default integration. This overrides custom base topic and message topics of the pub/sub integration.
+      DefaultIntegration default = 5;
+    }
   }
 
   // The provider for the PubSub.

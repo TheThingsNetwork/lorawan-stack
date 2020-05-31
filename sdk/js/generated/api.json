@@ -2918,6 +2918,16 @@
               "fullType": "string",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "default",
+              "description": "Enable the default integration. This overrides custom base topic and message topics of the pub/sub integration.",
+              "label": "",
+              "type": "DefaultIntegration",
+              "longType": "ApplicationPubSub.AWSIoTProvider.DefaultIntegration",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.DefaultIntegration",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -3000,6 +3010,39 @@
               "fullType": "google.protobuf.Duration",
               "ismap": false,
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DefaultIntegration",
+          "longName": "ApplicationPubSub.AWSIoTProvider.DefaultIntegration",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.DefaultIntegration",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "stack_name",
+              "description": "The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 128
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[A-Za-z][A-Za-z0-9\\-]*$"
+                  }
+                ]
+              }
             }
           ]
         },

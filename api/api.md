@@ -52,6 +52,7 @@
   - [Message `ApplicationPubSub.AWSIoTProvider`](#ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider)
   - [Message `ApplicationPubSub.AWSIoTProvider.AccessKey`](#ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.AccessKey)
   - [Message `ApplicationPubSub.AWSIoTProvider.AssumeRole`](#ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.AssumeRole)
+  - [Message `ApplicationPubSub.AWSIoTProvider.DefaultIntegration`](#ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.DefaultIntegration)
   - [Message `ApplicationPubSub.MQTTProvider`](#ttn.lorawan.v3.ApplicationPubSub.MQTTProvider)
   - [Message `ApplicationPubSub.MQTTProvider.HeadersEntry`](#ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.HeadersEntry)
   - [Message `ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message)
@@ -1102,6 +1103,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `access_key` | [`ApplicationPubSub.AWSIoTProvider.AccessKey`](#ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.AccessKey) |  | If set, the integration will use an AWS access key. |
 | `assume_role` | [`ApplicationPubSub.AWSIoTProvider.AssumeRole`](#ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.AssumeRole) |  | If set, the integration will assume the given role during operation. |
 | `endpoint_address` | [`string`](#string) |  | The endpoint address to connect to. If the endpoint address is left empty, the integration will try to discover it. |
+| `default` | [`ApplicationPubSub.AWSIoTProvider.DefaultIntegration`](#ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.DefaultIntegration) |  | Enable the default integration. This overrides custom base topic and message topics of the pub/sub integration. |
 
 #### Field Rules
 
@@ -1124,6 +1126,18 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `arn` | [`string`](#string) |  |  |
 | `external_id` | [`string`](#string) |  |  |
 | `session_duration` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+
+### <a name="ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.DefaultIntegration">Message `ApplicationPubSub.AWSIoTProvider.DefaultIntegration`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `stack_name` | [`string`](#string) |  | The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `stack_name` | <p>`string.max_len`: `128`</p><p>`string.pattern`: `^[A-Za-z][A-Za-z0-9\-]*$`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSub.MQTTProvider">Message `ApplicationPubSub.MQTTProvider`</a>
 

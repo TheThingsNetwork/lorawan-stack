@@ -48,6 +48,9 @@ var ApplicationPubSubFieldPathsNested = []string{
 	"provider.aws_iot.assume_role.arn",
 	"provider.aws_iot.assume_role.external_id",
 	"provider.aws_iot.assume_role.session_duration",
+	"provider.aws_iot.deployment",
+	"provider.aws_iot.deployment.default",
+	"provider.aws_iot.deployment.default.stack_name",
 	"provider.aws_iot.endpoint_address",
 	"provider.aws_iot.region",
 	"provider.mqtt",
@@ -164,6 +167,9 @@ var SetApplicationPubSubRequestFieldPathsNested = []string{
 	"pubsub.provider.aws_iot.assume_role.arn",
 	"pubsub.provider.aws_iot.assume_role.external_id",
 	"pubsub.provider.aws_iot.assume_role.session_duration",
+	"pubsub.provider.aws_iot.deployment",
+	"pubsub.provider.aws_iot.deployment.default",
+	"pubsub.provider.aws_iot.deployment.default.stack_name",
 	"pubsub.provider.aws_iot.endpoint_address",
 	"pubsub.provider.aws_iot.region",
 	"pubsub.provider.mqtt",
@@ -234,6 +240,9 @@ var ApplicationPubSub_AWSIoTProviderFieldPathsNested = []string{
 	"assume_role.arn",
 	"assume_role.external_id",
 	"assume_role.session_duration",
+	"deployment",
+	"deployment.default",
+	"deployment.default.stack_name",
 	"endpoint_address",
 	"region",
 }
@@ -241,6 +250,7 @@ var ApplicationPubSub_AWSIoTProviderFieldPathsNested = []string{
 var ApplicationPubSub_AWSIoTProviderFieldPathsTopLevel = []string{
 	"access_key",
 	"assume_role",
+	"deployment",
 	"endpoint_address",
 	"region",
 }
@@ -272,4 +282,11 @@ var ApplicationPubSub_AWSIoTProvider_AssumeRoleFieldPathsTopLevel = []string{
 	"arn",
 	"external_id",
 	"session_duration",
+}
+var ApplicationPubSub_AWSIoTProvider_DefaultIntegrationFieldPathsNested = []string{
+	"stack_name",
+}
+
+var ApplicationPubSub_AWSIoTProvider_DefaultIntegrationFieldPathsTopLevel = []string{
+	"stack_name",
 }

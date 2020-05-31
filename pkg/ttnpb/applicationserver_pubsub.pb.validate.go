@@ -1273,6 +1273,33 @@ func (m *ApplicationPubSub_AWSIoTProvider) ValidateFields(paths ...string) error
 
 		case "endpoint_address":
 			// no validation rules for EndpointAddress
+		case "deployment":
+			if len(subs) == 0 {
+				subs = []string{
+					"default",
+				}
+			}
+			for name, subs := range _processPaths(subs) {
+				_ = subs
+				switch name {
+				case "default":
+					w, ok := m.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetDefault()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return ApplicationPubSub_AWSIoTProviderValidationError{
+								field:  "default",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				}
+			}
 		default:
 			return ApplicationPubSub_AWSIoTProviderValidationError{
 				field:  name,
@@ -1638,3 +1665,111 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError{}
+
+// ValidateFields checks the field values on
+// ApplicationPubSub_AWSIoTProvider_DefaultIntegration with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *ApplicationPubSub_AWSIoTProvider_DefaultIntegration) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationPubSub_AWSIoTProvider_DefaultIntegrationFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "stack_name":
+
+			if utf8.RuneCountInString(m.GetStackName()) > 128 {
+				return ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError{
+					field:  "stack_name",
+					reason: "value length must be at most 128 runes",
+				}
+			}
+
+			if !_ApplicationPubSub_AWSIoTProvider_DefaultIntegration_StackName_Pattern.MatchString(m.GetStackName()) {
+				return ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError{
+					field:  "stack_name",
+					reason: "value does not match regex pattern \"^[A-Za-z][A-Za-z0-9\\\\-]*$\"",
+				}
+			}
+
+		default:
+			return ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError is the
+// validation error returned by
+// ApplicationPubSub_AWSIoTProvider_DefaultIntegration.ValidateFields if the
+// designated constraints aren't met.
+type ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError) Cause() error {
+	return e.cause
+}
+
+// Key function returns key value.
+func (e ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError) ErrorName() string {
+	return "ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationPubSub_AWSIoTProvider_DefaultIntegration.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationPubSub_AWSIoTProvider_DefaultIntegrationValidationError{}
+
+var _ApplicationPubSub_AWSIoTProvider_DefaultIntegration_StackName_Pattern = regexp.MustCompile("^[A-Za-z][A-Za-z0-9\\-]*$")
