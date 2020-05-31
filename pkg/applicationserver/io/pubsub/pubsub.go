@@ -243,7 +243,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		server:            ps.server,
 	}
 	if _, loaded := ps.integrations.LoadOrStore(psUID, i); loaded {
-		log.FromContext(ctx).Warn("Integration already started")
+		log.FromContext(ctx).Debug("Integration already started")
 		return errAlreadyConfigured.WithAttributes("application_uid", appUID, "pub_sub_id", pb.PubSubID)
 	}
 	go func() {
