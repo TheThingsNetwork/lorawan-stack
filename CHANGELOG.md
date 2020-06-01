@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Packet Broker Agent cluster ID is used as subscription group.
 - LinkADR handling in 72-channel bands.
 - Data uplink metrics reported by Application Server.
+- Timezones issue in claim auth code form, causing time to reverse on submission
 
 ## [3.8.3] - 2020-06-05
 

@@ -30,6 +30,7 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import toInputDate from '@ttn-lw/lib/to-input-date'
 
 import { updateDevice } from '@console/store/actions/devices'
 import { attachPromise } from '@console/store/actions/lib'
@@ -74,11 +75,8 @@ const DeviceClaimAuthenticationCode = props => {
     if (claim_authentication_code) {
       const { value, valid_from, valid_to } = claim_authentication_code
 
-      // Convert ISO 8601 date time representation to just yyyy-MM-dd required by the
-      // date input. So, we pick only the data part from YYYY-MM-DDTHH:mm:ss.sssZ which is
-      // known to be fixed.
-      const validFrom = valid_from ? new Date(valid_from).toISOString().slice(0, 10) : undefined
-      const validTo = valid_to ? new Date(valid_to).toISOString().slice(0, 10) : undefined
+      const validFrom = toInputDate(new Date(valid_from))
+      const validTo = toInputDate(new Date(valid_to))
 
       return {
         claim_authentication_code: {
