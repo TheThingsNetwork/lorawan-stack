@@ -68,6 +68,22 @@ Redis is an in-memory data store that we use as a database for "hot" data.
 
 You can use `./mage dev:dbRedisCli` to enter a Redis-CLI shell.
 
+#### Codec
+
+Most data is stored as base64-encoded protocol buffers. For debugging purposes it is often useful to inspect or update the stored database models - you can use Redis codec tool located at `./pkg/redis/codec` to decode/encode them to/from JSON.
+
+##### Example
+
+###### Get and decode
+```
+redis-cli get "ttn:v3:ns:devices:uid:test-app:test-dev" | go run ./pkg/redis/codec -type 'ttnpb.EndDevice'
+```
+
+###### Get, decode, modify, encode and set
+```
+redis-cli get "ttn:v3:ns:devices:uid:test-app.test-dev" | go run ./pkg/redis/codec -type 'ttnpb.EndDevice' | jq '.supports_join = false' | go run ./pkg/redis/codec -type 'ttnpb.EndDevice' -encode | redis-cli -x set "ttn:v3:ns:devices:uid:test-app.test-dev"
+```
+
 ## Project Structure
 
 The folder structure of the project looks as follows:
