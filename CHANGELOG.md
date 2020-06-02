@@ -51,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Suppress a few unexpected EOF errors, in order to reduce noise in the logs for health checks.
+- End device creation form with wizard in the Console.
 
 ### Fixed
 
