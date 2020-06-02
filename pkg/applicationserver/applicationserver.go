@@ -542,6 +542,9 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 
 var errFetchAppSKey = errors.Define("app_s_key", "failed to get AppSKey")
 
+// handleJoinAccept handles a join-accept message.
+// If the application or device is not configured to skip application crypto, the InvalidatedDownlinks and the AppSKey
+// in the given join-accept message is reset.
 func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *link) error {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"join_eui", ids.JoinEUI,
@@ -559,17 +562,15 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
-			var appSKey ttnpb.KeyEnvelope
 			if joinAccept.AppSKey != nil {
 				logger.Debug("Received AppSKey from Network Server")
-				appSKey = *joinAccept.AppSKey
 			} else {
 				logger.Debug("Fetch AppSKey from Join Server")
 				key, err := as.fetchAppSKey(ctx, ids, joinAccept.SessionKeyID)
 				if err != nil {
 					return nil, nil, errFetchAppSKey.WithCause(err)
 				}
-				appSKey = key
+				joinAccept.AppSKey = &key
 				logger.Debug("Fetched AppSKey from Join Server")
 			}
 			previousSession := dev.PendingSession
@@ -577,21 +578,25 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				DevAddr: *ids.DevAddr,
 				SessionKeys: ttnpb.SessionKeys{
 					SessionKeyID: joinAccept.SessionKeyID,
-					AppSKey:      &appSKey,
+					AppSKey:      joinAccept.AppSKey,
 				},
 				StartedAt: time.Now().UTC(),
 			}
 			mask = append(mask, "pending_session")
-			if len(joinAccept.InvalidatedDownlinks) > 0 {
-				// The Network Server does not reset the downlink queues as the new security session is established,
-				// but rather when the session is confirmed on the first uplink. The downlink queue of the current
-				// session is passed as part of the join-accept in order to allow the Application Server to compute
-				// the downlink queue of this new pending session.
-				logger := logger.WithField("count", len(joinAccept.InvalidatedDownlinks))
-				logger.Debug("Recalculating downlink queue to restore downlink queue on join")
-				if err := as.recalculatePendingDownlinkQueue(ctx, dev, link, previousSession, joinAccept.InvalidatedDownlinks); err != nil {
-					logger.WithError(err).Warn("Failed to recalculate downlink queue; items lost")
+			if !skipPayloadCrypto(link, dev) {
+				if len(joinAccept.InvalidatedDownlinks) > 0 {
+					// The Network Server does not reset the downlink queues as the new security session is established,
+					// but rather when the session is confirmed on the first uplink. The downlink queue of the current
+					// session is passed as part of the join-accept in order to allow the Application Server to compute
+					// the downlink queue of this new pending session.
+					logger := logger.WithField("count", len(joinAccept.InvalidatedDownlinks))
+					logger.Debug("Recalculating downlink queue to restore downlink queue on join")
+					if err := as.recalculatePendingDownlinkQueue(ctx, dev, link, previousSession, joinAccept.InvalidatedDownlinks); err != nil {
+						logger.WithError(err).Warn("Failed to recalculate downlink queue; items lost")
+					}
+					joinAccept.InvalidatedDownlinks = nil
 				}
+				joinAccept.AppSKey = nil
 			}
 			return dev, mask, nil
 		},
