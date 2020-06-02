@@ -904,6 +904,9 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 }
 
 func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *link) error {
+	if len(invalid.Downlinks) == 0 {
+		return nil
+	}
 	_, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
