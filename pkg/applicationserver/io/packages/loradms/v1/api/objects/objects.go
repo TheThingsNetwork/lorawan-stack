@@ -93,17 +93,14 @@ type PositionSolution struct {
 
 // UplinkResponse contains the state changes and completed items due to an uplink message.
 type UplinkResponse struct {
-	File                  *File             `json:"file"`
-	StreamRecords         []Stream          `json:"stream_records"`
-	PositionSolution      *PositionSolution `json:"position_solution"`
-	PendingRequests       *PendingRequests  `json:"pending_requests"`
-	FullfiledRequests     []Request         `json:"fulfilled_requests"`
-	Downlink              *LoRaDnlink       `json:"dnlink"`
-	InfoFields            InfoFields        `json:"info_fields"`
-	LogMessages           []LogMessage      `json:"log_messages"`
-	UploadedFiles         []File            `json:"uploaded_files"`
-	UploadedStreamRecords []Stream          `json:"uploaded_stream_records"`
-	LastUplink            *LoRaUplink       `json:"last_uplink"`
+	File              *File             `json:"file"`
+	StreamRecords     [][]interface{}   `json:"stream_records"`
+	PositionSolution  *PositionSolution `json:"position_solution"`
+	PendingRequests   *PendingRequests  `json:"pending_requests"`
+	FullfiledRequests []Request         `json:"fulfilled_requests"`
+	Downlink          *LoRaDnlink       `json:"dnlink"`
+	InfoFields        InfoFields        `json:"info_fields"`
+	LogMessages       []LogMessage      `json:"log_messages"`
 }
 
 // InfoFields contains the value of the various information fields and the timestamp of their last update.
