@@ -60,7 +60,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
-		gets = ttnpb.AddFields(gets, "skip_payload_crypto")
+		gets = ttnpb.AddFields(gets, "skip_payload_crypto_override")
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"pending_session.keys.app_s_key.key",
 		) {
@@ -87,7 +87,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	if dev.GetPendingSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
 		"pending_session.keys.app_s_key.key",
 	) {
-		if !dev.SkipPayloadCrypto {
+		if !dev.SkipPayloadCryptoOverride.GetValue() {
 			sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, dev.PendingSession.SessionKeys, "pending_session.keys", req.FieldMask.Paths...)
 			if err != nil {
 				return nil, err
@@ -98,7 +98,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	if dev.GetSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
 		"session.keys.app_s_key.key",
 	) {
-		if !dev.SkipPayloadCrypto {
+		if !dev.SkipPayloadCryptoOverride.GetValue() {
 			sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, dev.Session.SessionKeys, "session.keys", req.FieldMask.Paths...)
 			if err != nil {
 				return nil, err
@@ -109,10 +109,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 
-var (
-	errInvalidFieldMask  = errors.DefineInvalidArgument("field_mask", "invalid field mask")
-	errInvalidFieldValue = errors.DefineInvalidArgument("field_value", "invalid value of field `{field}`")
-)
+var errInvalidFieldMask = errors.DefineInvalidArgument("field_mask", "invalid field mask")
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
 func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {

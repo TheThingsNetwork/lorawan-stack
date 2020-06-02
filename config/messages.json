@@ -2102,7 +2102,7 @@
     },
     "description": {
       "package": "pkg/applicationserver",
-      "file": "grpc_deviceregistry.go"
+      "file": "registry.go"
     }
   },
   "error:pkg/applicationserver:formatter_not_configured": {

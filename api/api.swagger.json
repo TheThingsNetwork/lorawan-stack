@@ -8626,6 +8626,11 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Enable TLS for linking to the external Network Server.\nFor cluster-local Network Servers, the cluster's TLS setting is used."
+        },
+        "skip_payload_crypto": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nLeave empty for the using the Application Server's default setting."
         }
       }
     },
@@ -10194,7 +10199,12 @@
         "skip_payload_crypto": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Skip decryption of uplink payloads and encryption of downlink payloads."
+          "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nThis field is deprecated, use skip_payload_crypto_override instead."
+        },
+        "skip_payload_crypto_override": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nThis field overrides the application-level setting."
         }
       },
       "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."

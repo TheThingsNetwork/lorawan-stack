@@ -51,6 +51,7 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 			"network_server_address",
 			"api_key",
 			"default_formatters",
+			"skip_payload_crypto",
 		})
 		if err != nil {
 			if !errors.IsNotFound(err) {

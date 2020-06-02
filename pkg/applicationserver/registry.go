@@ -17,7 +17,9 @@ package applicationserver
 import (
 	"context"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/internal/registry"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -31,6 +33,88 @@ type DeviceRegistry interface {
 	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
 	// Set creates, updates or deletes the end device by its identifiers.
 	Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+}
+
+type replacedEndDeviceFieldRegistryWrapper struct {
+	fields   []registry.ReplacedEndDeviceField
+	registry DeviceRegistry
+}
+
+func (w replacedEndDeviceFieldRegistryWrapper) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
+	dev, err := w.registry.Get(ctx, ids, paths)
+	if err != nil || dev == nil {
+		return dev, err
+	}
+	for _, d := range replaced {
+		d.GetTransform(dev)
+	}
+	return dev, nil
+}
+
+func (w replacedEndDeviceFieldRegistryWrapper) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
+	dev, err := w.registry.Set(ctx, ids, paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		if dev != nil {
+			for _, d := range replaced {
+				d.GetTransform(dev)
+			}
+		}
+		dev, paths, err := f(dev)
+		if err != nil || dev == nil {
+			return dev, paths, err
+		}
+		for _, d := range replaced {
+			if ttnpb.HasAnyField(paths, d.Old) {
+				paths = ttnpb.AddFields(paths, d.New)
+			}
+			d.SetTransform(dev, d.MatchedOld, d.MatchedNew)
+		}
+		return dev, paths, nil
+	})
+	if err != nil || dev == nil {
+		return dev, err
+	}
+	for _, d := range replaced {
+		d.GetTransform(dev)
+	}
+	return dev, nil
+}
+
+func wrapEndDeviceRegistryWithReplacedFields(r DeviceRegistry, fields ...registry.ReplacedEndDeviceField) DeviceRegistry {
+	return replacedEndDeviceFieldRegistryWrapper{
+		fields:   fields,
+		registry: r,
+	}
+}
+
+var errInvalidFieldValue = errors.DefineInvalidArgument("field_value", "invalid value of field `{field}`")
+
+var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
+	{
+		Old: "skip_payload_crypto",
+		New: "skip_payload_crypto_override",
+		GetTransform: func(dev *ttnpb.EndDevice) {
+			if dev.SkipPayloadCryptoOverride == nil && dev.SkipPayloadCrypto {
+				dev.SkipPayloadCryptoOverride = &pbtypes.BoolValue{Value: true}
+			} else {
+				dev.SkipPayloadCrypto = dev.SkipPayloadCryptoOverride.GetValue()
+			}
+		},
+		SetTransform: func(dev *ttnpb.EndDevice, useOld, useNew bool) error {
+			if useOld {
+				if useNew {
+					if dev.SkipPayloadCrypto != dev.SkipPayloadCryptoOverride.GetValue() {
+						return errInvalidFieldValue.WithAttributes("field", "skip_payload_crypto")
+					}
+				} else {
+					dev.SkipPayloadCryptoOverride = &pbtypes.BoolValue{Value: dev.SkipPayloadCrypto}
+				}
+			}
+			dev.SkipPayloadCrypto = false
+			return nil
+		},
+	},
 }
 
 // LinkRegistry is a store for application links.

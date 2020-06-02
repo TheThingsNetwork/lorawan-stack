@@ -1182,6 +1182,16 @@
               "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "skip_payload_crypto",
+              "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nLeave empty for the using the Application Server's default setting.",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -7205,11 +7215,21 @@
             },
             {
               "name": "skip_payload_crypto",
-              "description": "Skip decryption of uplink payloads and encryption of downlink payloads.",
+              "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nThis field is deprecated, use skip_payload_crypto_override instead.",
               "label": "",
               "type": "bool",
               "longType": "bool",
               "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "skip_payload_crypto_override",
+              "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nThis field overrides the application-level setting.",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
               "ismap": false,
               "defaultValue": ""
             }

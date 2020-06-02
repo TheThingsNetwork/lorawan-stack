@@ -20,6 +20,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 import "lorawan-stack/api/end_device.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
@@ -40,6 +41,9 @@ message ApplicationLink {
   // Enable TLS for linking to the external Network Server.
   // For cluster-local Network Servers, the cluster's TLS setting is used.
   bool tls = 4 [(gogoproto.customname) = "TLS"];
+  // Skip decryption of uplink payloads and encryption of downlink payloads.
+  // Leave empty for the using the Application Server's default setting.
+  google.protobuf.BoolValue skip_payload_crypto = 5;
 }
 
 message GetApplicationLinkRequest {
