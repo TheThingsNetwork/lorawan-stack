@@ -33,6 +33,7 @@ import {
   selectCollaborators,
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
+  selectCollaboratorsError,
 } from '@console/store/selectors/collaborators'
 
 @connect(state => ({
@@ -59,6 +60,7 @@ export default class GatewayCollaborators extends React.Component {
       collaborators: selectCollaborators(state, id),
       fetching: selectCollaboratorsFetching(state),
       totalCount: selectCollaboratorsTotalCount(state, id),
+      error: selectCollaboratorsError(state),
     }
   }
 

@@ -43,7 +43,8 @@ export const extractDeviceIdFromCombinedId = function(combinedId) {
 export const getCombinedDeviceId = function(device = {}) {
   const appId =
     getByPath(device, 'ids.application_ids.application_id') ||
-    getByPath(device, 'application_ids.application_id')
+    getByPath(device, 'application_ids.application_id') ||
+    getByPath(device, 'device_ids.application_ids.application_id')
   const devId = getDeviceId(device)
   return combineDeviceIds(appId, devId)
 }

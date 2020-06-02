@@ -29,6 +29,7 @@ const m = defineMessages({
 const JoinEUIPrefixesField = function({
   name,
   title,
+  description,
   required,
   horizontal,
   autoFocus,
@@ -47,6 +48,7 @@ const JoinEUIPrefixesField = function({
     <Field
       name={name}
       title={title}
+      description={description}
       required={required}
       autoFocus={autoFocus}
       horizontal={horizontal}
@@ -62,6 +64,7 @@ const JoinEUIPrefixesField = function({
 
 JoinEUIPrefixesField.propTypes = {
   autoFocus: PropTypes.bool,
+  description: PropTypes.message,
   disabled: PropTypes.bool,
   error: PropTypes.error,
   fetching: PropTypes.bool.isRequired,
@@ -87,6 +90,7 @@ JoinEUIPrefixesField.defaultProps = {
   prefixes: [],
   error: undefined,
   showPrefixes: true,
+  description: undefined,
 }
 
 export default connect(JoinEUIPrefixesField)
