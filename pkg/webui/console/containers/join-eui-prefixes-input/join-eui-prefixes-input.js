@@ -120,7 +120,17 @@ class JoinEUIPrefixesInput extends React.PureComponent {
   }
 
   render() {
-    const { className, name, disabled, value, error, prefixes, fetching, showPrefixes } = this.props
+    const {
+      className,
+      name,
+      description,
+      disabled,
+      value,
+      error,
+      prefixes,
+      fetching,
+      showPrefixes,
+    } = this.props
     const { prefix } = this.state
 
     let selectComponent = null
@@ -160,6 +170,7 @@ class JoinEUIPrefixesInput extends React.PureComponent {
           value={inputValue}
           defaultValue={inputValue}
           name={name}
+          description={description}
           disabled={disabled}
           min={charsLeft}
           max={charsLeft}
@@ -175,8 +186,9 @@ class JoinEUIPrefixesInput extends React.PureComponent {
 
 JoinEUIPrefixesInput.propTypes = {
   className: PropTypes.string,
+  description: PropTypes.message,
   disabled: PropTypes.bool,
-  error: PropTypes.error,
+  error: PropTypes.bool,
   fetching: PropTypes.bool,
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.func,
@@ -199,7 +211,8 @@ JoinEUIPrefixesInput.defaultProps = {
   prefixes: [],
   showPrefixes: true,
   value: undefined,
-  error: undefined,
+  error: false,
+  description: undefined,
 }
 
 export default JoinEUIPrefixesInput

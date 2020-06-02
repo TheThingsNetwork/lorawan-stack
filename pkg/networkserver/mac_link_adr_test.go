@@ -316,6 +316,51 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
 		},
 		{
+			Name: "payload fits/EU868/MAC:1.0.1,PHY:1.0.1/ADR/rejected all possible data rates",
+			Band: test.Must(test.Must(band.GetByID(band.EU_863_870)).(band.Band).Version(ttnpb.PHY_V1_0_1)).(band.Band),
+			InputDevice: &ttnpb.EndDevice{
+				FrequencyPlanID: test.USFrequencyPlanID,
+				MACState: func() *ttnpb.MACState {
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_1, ttnpb.PHY_V1_0_1)
+					macState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_1
+					macState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_5
+					macState.DesiredParameters.ADRTxPowerIndex = 3
+					macState.RejectedADRDataRateIndexes = []ttnpb.DataRateIndex{
+						ttnpb.DATA_RATE_1,
+						ttnpb.DATA_RATE_2,
+						ttnpb.DATA_RATE_3,
+						ttnpb.DATA_RATE_4,
+						ttnpb.DATA_RATE_5,
+					}
+					return macState
+				}(),
+			},
+			ExpectedDevice: &ttnpb.EndDevice{
+				FrequencyPlanID: test.USFrequencyPlanID,
+				MACState: func() *ttnpb.MACState {
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_1, ttnpb.PHY_V1_0_1)
+					macState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_1
+					macState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_5
+					macState.DesiredParameters.ADRTxPowerIndex = 3
+					macState.RejectedADRDataRateIndexes = []ttnpb.DataRateIndex{
+						ttnpb.DATA_RATE_1,
+						ttnpb.DATA_RATE_2,
+						ttnpb.DATA_RATE_3,
+						ttnpb.DATA_RATE_4,
+						ttnpb.DATA_RATE_5,
+					}
+					return macState
+				}(),
+			},
+			MaxDownlinkLength: 42,
+			MaxUplinkLength:   24,
+			State: macCommandEnqueueState{
+				MaxDownLen: 42,
+				MaxUpLen:   24,
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+		},
+		{
 			Name: "payload fits/US915 FSB2/MAC:1.0.4,PHY:1.0.3a/no data rate change",
 			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_0_3_REV_A)).(band.Band),
 			InputDevice: &ttnpb.EndDevice{

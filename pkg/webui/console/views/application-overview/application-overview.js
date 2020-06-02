@@ -50,6 +50,7 @@ class ApplicationOverview extends React.Component {
     apiKeysTotalCount: PropTypes.number,
     appId: PropTypes.string.isRequired,
     application: PropTypes.application.isRequired,
+    applicationLastSeen: PropTypes.string,
     collaboratorsTotalCount: PropTypes.number,
     devicesTotalCount: PropTypes.number,
     link: PropTypes.bool,
@@ -61,34 +62,54 @@ class ApplicationOverview extends React.Component {
   }
 
   static defaultProps = {
-    collaboratorsTotalCount: undefined,
     apiKeysTotalCount: undefined,
+    applicationLastSeen: undefined,
+    collaboratorsTotalCount: undefined,
     devicesTotalCount: undefined,
     link: undefined,
   }
 
   render() {
     const {
-      appId,
-      collaboratorsTotalCount,
       apiKeysTotalCount,
+      appId,
+      application: { name, description, created_at, updated_at },
+      applicationLastSeen,
+      collaboratorsTotalCount,
       devicesTotalCount,
-      statusBarFetching,
+      link,
       mayViewApplicationApiKeys,
       mayViewApplicationCollaborators,
-      mayViewDevices,
       mayViewApplicationLink,
-      link,
-      application: { name, description, created_at, updated_at },
+      mayViewDevices,
+      statusBarFetching,
     } = this.props
 
     const linkStatus = typeof link === 'boolean' ? (link ? 'good' : 'bad') : 'mediocre'
-    const linkLabel =
-      typeof link === 'boolean'
-        ? link
-          ? sharedMessages.linked
-          : sharedMessages.notLinked
-        : sharedMessages.fetching
+    let linkLabel = sharedMessages.fetching
+    let linkElement
+    if (typeof link === 'boolean') {
+      if (link) {
+        if (applicationLastSeen) {
+          linkElement = (
+            <Status className={style.status} status={linkStatus} flipped>
+              <Message content={sharedMessages.lastSeen} />{' '}
+              <DateTime.Relative value={applicationLastSeen} />
+            </Status>
+          )
+        } else {
+          linkLabel = sharedMessages.linked
+        }
+      } else {
+        linkLabel = sharedMessages.notLinked
+      }
+    }
+
+    if (!linkElement) {
+      linkElement = (
+        <Status className={style.status} label={linkLabel} status={linkStatus} flipped />
+      )
+    }
 
     const sheetData = [
       {
@@ -115,9 +136,7 @@ class ApplicationOverview extends React.Component {
             </Spinner>
           ) : (
             <React.Fragment>
-              {mayViewApplicationLink && (
-                <Status className={style.status} label={linkLabel} status={linkStatus} flipped />
-              )}
+              {mayViewApplicationLink && linkElement}
               {mayViewDevices && (
                 <KeyValueTag
                   icon="devices"

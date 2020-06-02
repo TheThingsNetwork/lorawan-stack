@@ -15,14 +15,23 @@
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 import classnames from 'classnames'
+import { defineMessages } from 'react-intl'
+
+import Status from '@ttn-lw/components/status'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
+
+import { IconValueTag } from '@console/components/key-value-tag'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './entity-title-section.styl'
+
+const m = defineMessages({
+  lastSeenUnavailable: 'Last seen info unavailable',
+})
 
 const EntityTitleSection = ({ entityName, entityId, description, creationDate, children }) => {
   return (
@@ -31,12 +40,6 @@ const EntityTitleSection = ({ entityName, entityId, description, creationDate, c
         <Row>
           <Col md={12} className={style.container}>
             <h1 className={style.title}>{entityName || entityId}</h1>
-            <span className={style.id}>
-              <strong>
-                <Message content={sharedMessages.id} />:
-              </strong>{' '}
-              {entityId}
-            </span>
             {description && <span className={style.description}>{description}</span>}
             <div className={style.bottom}>
               <div className={style.children}>{children}</div>
@@ -68,7 +71,15 @@ EntityTitleSection.defaultProps = {
   description: undefined,
 }
 
-EntityTitleSection.Device = ({ deviceName, deviceId, description, children }) => {
+EntityTitleSection.Device = ({
+  deviceName,
+  deviceId,
+  description,
+  children,
+  lastSeen,
+  downlinkFrameCount,
+  uplinkFrameCount,
+}) => {
   return (
     <Container>
       <Row>
@@ -79,11 +90,37 @@ EntityTitleSection.Device = ({ deviceName, deviceId, description, children }) =>
             })}
           >
             <h1 className={style.title}>{deviceName || deviceId}</h1>
-            <span className={style.id}>
-              <strong>
-                <Message content={sharedMessages.id} />:
-              </strong>{' '}
-              {deviceId}
+            <span className={style.belowTitle}>
+              {Boolean(lastSeen) ? (
+                <Status status="good" flipped>
+                  <Message content={sharedMessages.lastSeen} />{' '}
+                  <DateTime.Relative value={lastSeen} />
+                </Status>
+              ) : (
+                <Status status="mediocre" label={m.lastSeenUnavailable} flipped />
+              )}
+              {Boolean(uplinkFrameCount || downlinkFrameCount) && (
+                <React.Fragment>
+                  <div className={style.messages}>
+                    {uplinkFrameCount && (
+                      <IconValueTag
+                        iconClassName={style.icon}
+                        icon="uplink"
+                        value={uplinkFrameCount}
+                        tooltipMessage={sharedMessages.uplinkFrameCount}
+                      />
+                    )}
+                    {downlinkFrameCount && (
+                      <IconValueTag
+                        iconClassName={style.icon}
+                        icon="downlink"
+                        value={downlinkFrameCount}
+                        tooltipMessage={sharedMessages.downlinkFrameCount}
+                      />
+                    )}
+                  </div>
+                </React.Fragment>
+              )}
             </span>
             {description && <span className={style.description}>{description}</span>}
           </div>
@@ -99,11 +136,17 @@ EntityTitleSection.Device.propTypes = {
   description: PropTypes.string,
   deviceId: PropTypes.string.isRequired,
   deviceName: PropTypes.string,
+  downlinkFrameCount: PropTypes.number,
+  lastSeen: PropTypes.string,
+  uplinkFrameCount: PropTypes.number,
 }
 
 EntityTitleSection.Device.defaultProps = {
   deviceName: undefined,
+  downlinkFrameCount: undefined,
+  uplinkFrameCount: undefined,
   description: undefined,
+  lastSeen: undefined,
 }
 
 export default EntityTitleSection

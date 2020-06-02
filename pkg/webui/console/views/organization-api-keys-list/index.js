@@ -31,6 +31,7 @@ import {
   selectApiKeys,
   selectApiKeysTotalCount,
   selectApiKeysFetching,
+  selectApiKeysError,
 } from '@console/store/selectors/api-keys'
 
 class OrganizationApiKeysList extends React.Component {
@@ -54,6 +55,7 @@ class OrganizationApiKeysList extends React.Component {
       keys: selectApiKeys(state, id),
       totalCount: selectApiKeysTotalCount(state, id),
       fetching: selectApiKeysFetching(state),
+      error: selectApiKeysError(state),
     }
   }
 

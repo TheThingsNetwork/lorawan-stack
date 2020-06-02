@@ -25,10 +25,9 @@
   text-margin-bottom($cs.m)
   font-weight: bold
 
-.id
+.below-title
   one-liner()
-  display: block
-  color: $tc-subtle-gray
+  display: flex
 
 .description
   text-margin-top($ls.s)
@@ -54,3 +53,15 @@
   margin-bottom: $ls.m
   +media-query($bp.s)
     margin-bottom: $ls.s
+
+.messages
+  one-liner()
+  margin-left: $cs.m
+  display: flex
+
+.message-count
+  &:first-child
+    margin-right: $cs.xxs
+
+.icon
+  color: $c-active-blue

@@ -19,6 +19,8 @@ import {
 } from '@console/store/actions/applications'
 import { GET_APP_LINK_BASE } from '@console/store/actions/link'
 
+import { selectDeviceDerivedStore } from '@console/store/selectors/devices'
+
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
@@ -94,4 +96,22 @@ export const selectApplicationIsLinked = function(state) {
   const hasStats = Boolean(stats)
 
   return hasBase && !hasError && isLinked && hasStats
+}
+
+// Composite.
+export const selectApplicationLastSeen = state => {
+  const deviceDerived = selectDeviceDerivedStore(state)
+  const link = selectApplicationLinkStats(state)
+  const appId = selectSelectedApplicationId(state)
+  let lastSeen = link && link.last_up_received_at ? link.last_up_received_at : undefined
+  for (const device in deviceDerived) {
+    if (
+      device.startsWith(appId) &&
+      ((!lastSeen && deviceDerived[device].lastSeen) ||
+        (lastSeen && deviceDerived[device].lastSeen && lastSeen < deviceDerived[device].lastSeen))
+    ) {
+      lastSeen = deviceDerived[device].lastSeen
+    }
+  }
+  return lastSeen
 }

@@ -143,7 +143,7 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		for deviceRejectedADRDataRateIndex(dev, drIdx) || deviceRejectedADRTXPowerIndex(dev, txPowerIdx) {
 			// Since either data rate or TX power index (or both) were rejected by the device, undo the
 			// desired ADR adjustments step-by-step until possibly fitting index pair is found.
-			if drIdx == minDataRateIndex && txPowerIdx == 0 {
+			if drIdx == minDataRateIndex && (deviceRejectedADRDataRateIndex(dev, drIdx) || txPowerIdx == 0) {
 				log.FromContext(ctx).WithFields(log.Fields(
 					"current_adr_nb_trans", dev.MACState.CurrentParameters.ADRNbTrans,
 					"desired_adr_nb_trans", dev.MACState.DesiredParameters.ADRNbTrans,
