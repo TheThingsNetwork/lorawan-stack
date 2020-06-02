@@ -42,7 +42,7 @@ const EventsWidget = props => {
     <aside className={className}>
       <Events events={truncatedEvents} renderEvent={renderEvent} entityId={entityId} widget>
         <Events.Header className={style.header}>
-          <Message content={m.latestEvents} component="b" />
+          <Message content={m.latestEvents} className={style.headerTitle} />
           <Link className={style.seeAllLink} secondary to={toAllUrl}>
             <Message content={m.seeAllActivity} /> →
           </Link>
