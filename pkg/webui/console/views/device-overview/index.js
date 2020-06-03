@@ -30,6 +30,8 @@ import DeviceEvents from '@console/containers/device-events'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import { parseLorawanMacVersion } from '@console/lib/device-utils'
+
 import { selectSelectedDevice } from '@console/store/selectors/devices'
 
 import style from './device-overview.styl'
@@ -59,11 +61,14 @@ class DeviceOverview extends React.Component {
       root_keys = {},
       session = {},
       created_at,
+      lorawan_version,
       supports_join,
     } = this.props.device
 
     // Get session keys.
     const { keys: sessionKeys = {} } = session
+
+    const lorawanVersion = parseLorawanMacVersion(lorawan_version)
 
     const {
       f_nwk_s_int_key = { key: undefined },
@@ -106,8 +111,15 @@ class DeviceOverview extends React.Component {
     }
 
     if (ids.join_eui || ids.dev_eui) {
+      const joinEUI =
+        lorawanVersion < 100
+          ? sharedMessages.appEUIJoinEUI
+          : lorawanVersion >= 104
+          ? sharedMessages.joinEUI
+          : sharedMessages.appEUI
+
       activationInfoData.items.push(
-        { key: sharedMessages.joinEUI, value: ids.join_eui, type: 'byte', sensitive: false },
+        { key: joinEUI, value: ids.join_eui, type: 'byte', sensitive: false },
         { key: sharedMessages.devEUI, value: ids.dev_eui, type: 'byte', sensitive: false },
       )
 
