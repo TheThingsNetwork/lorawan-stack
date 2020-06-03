@@ -48,8 +48,8 @@ type Cookie struct {
 
 // Cookies is a middleware function that makes the handlers capable of handling cookies via
 // methods of this package.
-func Cookies(block, hash []byte) echo.MiddlewareFunc {
-	s := securecookie.New(hash, block)
+func Cookies(hashKey, blockKey []byte) echo.MiddlewareFunc {
+	s := securecookie.New(hashKey, blockKey)
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			c.Set(encoderKey, s)
