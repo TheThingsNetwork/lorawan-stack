@@ -14,23 +14,17 @@ This section describes how to setup a Node-RED server and prepare to connect it 
 
 ## Setup
 
-Run Node-RED by using the following command in the terminal:
-
-```bash
-$ node-red 
-```
-
-With Node-RED running, navigate to `https://localhost:1880` (or the public  address of your Node-RED instance).
-
-In your web browser, you should see something like:
+Run Node-RED and navigate to `http://localhost:1880` (or the public  address of your Node-RED instance). In your web browser, you should see something like:
 
 {{< figure src="nodered_dashboard.png" alt="Node-RED dashboard" >}}
 
-On the left side, you can see various types of nodes that can be used in order to build flows. In this guide, only a few simple built-in nodes are used. All nodes can be found in the [Node-RED library](https://flows.nodered.org/).
+On the left side, you can see various types of nodes that can be used in order to build flows. All nodes can be found in the [Node-RED library](https://flows.nodered.org/).
 
-{{% tts %}} Console provides the connection information needed for completing this integration. In the Console, click **Applications** and choose the application you want to connect to Node-RED.
+{{% tts %}} Console provides the connection information needed for completing this integration. 
 
-Click **Integrations** in the left hand panel of the Console, and the **MQTT** submenu to view the MQTT server info:
+1. In the Console, click **Applications** and choose the application you want to connect to Node-RED. 
+
+2. Click **Integrations** in the left hand panel of the Console, and the **MQTT** submenu to view the MQTT Server info:
 
 {{< figure src="console_info.png" alt="MQTT Server connection information" >}}
 
