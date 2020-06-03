@@ -68,7 +68,7 @@ Redis is an in-memory data store that we use as a database for "hot" data.
 
 You can use `tools/bin/mage dev:dbRedisCli` to enter a Redis-CLI shell.
 
-## Building the frontend
+## Building the Frontend
 
 You can use `tools/bin/mage js:build` to build the frontend.
 
