@@ -76,7 +76,7 @@ Output:
   "updated_at": "2020-05-14T02:04:45.286874524Z",
   "package_name": "lora-cloud-device-management-v1",
   "data": {
-      "server_url": "https://app.example.com/",
+      "server_url": "https://app.example.com",
       "token": "AQEAdqwV67..."
     }
 }
@@ -90,6 +90,6 @@ The package data format is common between both default associations and associat
 | Field | Type | Description | Required | Default value |
 |-------|------|-------------|---------|---------------|
 | `token` | `string` | The acces token to be used by the package to submit uplinks to the LoRa Cloud Device & Application Services | Yes | None. |
-| `server_url` | `URL` | The custom base URL to be used for service communication | No | `https://das.loracloud.com/api/v1`
+| `server_url` | `URL` | The custom base URL to be used for service communication | No | `https://das.loracloud.com`
 
 Fields can be customized on a per device basis, by overriding the field in the package data of the association.
