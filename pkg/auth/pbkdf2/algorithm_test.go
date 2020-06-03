@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package pbkdf2
+package pbkdf2_test
 
 import (
 	"testing"
 
 	. "github.com/smartystreets/assertions"
+	. "go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 )
 
 func TestStringAlgorithm(t *testing.T) {
@@ -31,7 +32,7 @@ func TestParseAlgorithm(t *testing.T) {
 	a := New(t)
 
 	{
-		alg, err := parseAlgorithm("sha256")
+		alg, err := ParseAlgorithm("sha256")
 		a.So(err, ShouldBeNil)
 		a.So(alg, ShouldResemble, Sha256)
 	}
@@ -40,7 +41,7 @@ func TestParseAlgorithm(t *testing.T) {
 func TestParseBadAlgorithm(t *testing.T) {
 	a := New(t)
 
-	_, err := parseAlgorithm("bad")
+	_, err := ParseAlgorithm("bad")
 	a.So(err, ShouldNotBeNil)
 }
 

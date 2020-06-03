@@ -88,6 +88,8 @@ func flowTestEventEqual(x, y events.Event) bool {
 	yp.Data = nil
 	xp.Time = time.Time{}
 	yp.Time = time.Time{}
+	xp.Authentication = nil
+	yp.Authentication = nil
 
 	if !hasProperStringSubset(xp.CorrelationIDs, yp.CorrelationIDs) {
 		return false

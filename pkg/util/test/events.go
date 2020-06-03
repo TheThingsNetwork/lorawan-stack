@@ -125,6 +125,8 @@ func EventEqual(a, b events.Event) bool {
 	}
 	ap.Time = time.Time{}
 	bp.Time = time.Time{}
+	ap.Authentication = nil
+	bp.Authentication = nil
 	return reflect.DeepEqual(ap, bp)
 }
 

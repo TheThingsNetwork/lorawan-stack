@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package pbkdf2
+package pbkdf2_test
 
 import (
 	"testing"
 
 	. "github.com/smartystreets/assertions"
+	. "go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 

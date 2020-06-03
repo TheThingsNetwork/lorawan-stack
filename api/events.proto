@@ -36,6 +36,13 @@ message Event {
   map<string,bytes> context = 7;
   // The event will be visible to a caller that has any of these rights.
   Rights visibility = 8;
+  message Authentication {
+    string type = 1;
+    string token_type = 2;
+    string token_id = 3 [(gogoproto.customname) = "TokenID"];
+    string remote_ip = 4 [(gogoproto.customname) = "RemoteIP"];
+  }
+  Authentication authentication = 9;
 }
 
 message StreamEventsRequest {
