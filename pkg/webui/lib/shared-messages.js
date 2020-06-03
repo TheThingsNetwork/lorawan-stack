@@ -41,6 +41,7 @@ export default defineMessages({
   apiKeyNamePlaceholder: 'My new API key',
   apiKeys: 'API keys',
   appEUI: 'AppEUI',
+  appEUIJoinEUI: 'AppEUI/JoinEUI',
   appEUIDescription:
     'The AppEUI is a global application ID that uniquely identifies the owner of the end ­device. AppEUI is used for end devices with LoRaWAN versions 1.0.0-1.0.3, JoinEUI for 1.0.4+.',
   appId: 'Application ID',
