@@ -26,6 +26,8 @@ Doing this schedules downlink messages to be sent to your end device. This secti
 
 2. Choose **buffer** under **Payload** and enter the payload you wish to send. 
 
+>Note: in this example, a downlink message with hexadecimal payload `00 2A FF 00` is to be sent, so here we define the **Payload** field as a corresponding array of byte values.  
+
 3. Define the period between the automatic injections if you want them, or choose **none** for **Repeat** if you wish to inject messages manually.
 
 {{< figure src="inject_node_properties.png" alt="inject node properties" >}}
@@ -41,7 +43,7 @@ return {
   "payload": {
     "downlinks": [{
       "f_port": 15,
-      "frm_payload": msg.payload.toString('base64'),
+      "frm_payload": msg.payload.toString("base64"),
       "priority": "NORMAL"
     }]
   }
