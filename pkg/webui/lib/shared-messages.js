@@ -113,7 +113,7 @@ export default defineMessages({
     'Device address, issued by the Network Server or chosen by device manufacturer in case of testing range',
   deviceCounted: '{count, plural, one {End device} other {End devices}}',
   deviceDescDescription:
-    'Optional device description; can also be used to save notes about the end device',
+    'Optional end device description; can also be used to save notes about the end device',
   deviceDescPlaceholder: 'Description for my new end device',
   deviceEUIDescription: 'The DevEUI is the unique identifier for this end device',
   deviceIdPlaceholder: 'my-new-device',
