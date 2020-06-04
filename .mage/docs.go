@@ -16,6 +16,8 @@ package ttnmage
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"net/url"
 	"os"
 	"path"
@@ -34,6 +36,25 @@ func execHugo(args ...string) error {
 	return execGo("run", append([]string{"-tags", "extended", "github.com/gohugoio/hugo", "-s", "./doc"}, args...)...)
 }
 
+func downloadFile(targetpath string, url string) (err error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	out, err := os.Create(targetpath)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if closeErr := out.Close(); closeErr != nil && err == nil {
+			err = closeErr
+		}
+	}()
+	_, err = io.Copy(out, resp.Body)
+	return err
+}
+
 func (d Docs) yarn() (func(args ...string) error, error) {
 	if _, err := os.Stat(nodeBin("yarn")); os.IsNotExist(err) {
 		if err = installYarn(); err != nil {
@@ -45,8 +66,21 @@ func (d Docs) yarn() (func(args ...string) error, error) {
 	}, nil
 }
 
+const defaultFrequencyPlanUrl = "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master/frequency-plans.yml"
+
 // Deps installs the documentation dependencies.
-func (d Docs) Deps() error {
+func (d Docs) Deps() (err error) {
+	fileUrl := os.Getenv("FREQUENCY_PLAN_URL")
+	fileTarget := "doc/data/frequency-plans.yml"
+	if fileUrl == "" {
+		fileUrl = defaultFrequencyPlanUrl
+	}
+	if err = downloadFile(fileTarget, fileUrl); err != nil {
+		return err
+	}
+	if mg.Verbose() {
+		fmt.Printf("Downloaded %q to %q\n", fileUrl, fileTarget)
+	}
 	changed, err := target.Path("./doc/themes/the-things-stack/node_modules", "./doc/themes/the-things-stack/package.json", "./doc/themes/the-things-stack/yarn.lock")
 	if os.IsNotExist(err) || (err == nil && changed) {
 		if mg.Verbose() {

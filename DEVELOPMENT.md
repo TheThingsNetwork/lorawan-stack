@@ -131,6 +131,8 @@ Data for generated documentation like API and glossary is stored in `doc/data`.
 In order to build the documentation site with the right theme, you need to run
 `./mage docs:deps` from time to time.
 
+>Note: as a workaround for [this](https://github.com/gohugoio/hugo/issues/7083), `./mage docs:deps` also pulls the latest version of [frequency-plans.yml](https://github.com/TheThingsNetwork/lorawan-frequency-plans/).
+
 You can start a development server with live reloading by running
 `./mage docs:server`. This command will print the address of the server.
 

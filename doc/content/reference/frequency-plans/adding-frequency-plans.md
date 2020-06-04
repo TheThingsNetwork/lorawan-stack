@@ -3,9 +3,9 @@ title: "Adding Frequency Plans"
 description: ""
 ---
 
-{{% tts %}} uses frequency plans from the [lorawan-frequency-plans Github repository.](https://github.com/TheThingsNetwork/lorawan-frequency-plans/)
+{{% tts %}} uses frequency plans from the [`lorawan-frequency-plans` Github repository](https://github.com/TheThingsNetwork/lorawan-frequency-plans/).
 
-To add frequency plans, you may open a pull request on the [lorawan-frequency-plans Github repository](https://github.com/TheThingsNetwork/lorawan-frequency-plans/), which makes the plan available in most deployments.
+To add frequency plans, you may open a pull request on the [`lorawan-frequency-plans` Github repository](https://github.com/TheThingsNetwork/lorawan-frequency-plans/), which makes the plan available in most deployments when the next version is deployed.
 
 You may also fork the repository and reference your fork, with potentially custom plans, or with standard plans left out.
 
