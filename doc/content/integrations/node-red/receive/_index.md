@@ -22,7 +22,7 @@ This section follows the process of setting up a flow which subscribes and liste
 
 {{< figure src="mqtt_in_node_security.png" alt="Configuring MQTT Server credentials" >}}
 
-5. Go back to **Properties** and set the **Topic** value to `#` (to listen to all topics). 
+5. Go back to **Properties** and set the **Topic** value to `#` (to subscribe to all topics). 
 
 >Note: a full list of topics that you can subscribe to is mentioned in [MQTT Server]({{< ref "/integrations/mqtt" >}}) guide. 
 
