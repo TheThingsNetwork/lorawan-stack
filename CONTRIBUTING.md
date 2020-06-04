@@ -10,6 +10,8 @@ Thank you for your interest in building this thing together with us. We're reall
 
 If you'd like to contribute by writing code, you'll find [here](DEVELOPMENT.md) how to set up your development environment.
 
+Style guidelines for contributing code and writing documentation can be found [here](DEVELOPMENT.md#code-style).
+
 ## Compatibility Commitment
 
 The [compatibility commitment](README.md#commitments-and-releases) ensures that users can update confidently and with little hassle to patch releases.
