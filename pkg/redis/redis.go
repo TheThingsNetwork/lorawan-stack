@@ -20,13 +20,14 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
-	"log"
+	stdlog "log"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v7"
 	"github.com/gogo/protobuf/proto"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 const (
@@ -111,7 +112,7 @@ type FailoverConfig struct {
 // newRedisClient returns a Redis client, which connects using correct client type.
 func newRedisClient(conf *Config) *redis.Client {
 	if conf.Failover.Enable {
-		redis.SetLogger(log.New(ioutil.Discard, "", 0))
+		redis.SetLogger(stdlog.New(ioutil.Discard, "", 0))
 		return redis.NewFailoverClient(&redis.FailoverOptions{
 			MasterName:    conf.Failover.MasterName,
 			SentinelAddrs: conf.Failover.Addresses,
@@ -613,6 +614,21 @@ func (q *TaskQueue) Run(ctx context.Context) error {
 	if err := q.Init(); err != nil {
 		return err
 	}
+	defer func() {
+		_, err := q.Redis.Pipelined(func(p redis.Pipeliner) error {
+			p.XGroupDelConsumer(InputTaskKey(q.Key), q.Group, q.ID)
+			p.XGroupDelConsumer(ReadyTaskKey(q.Key), q.Group, q.ID)
+			return nil
+		})
+		if err != nil {
+			log.FromContext(ctx).WithError(err).WithFields(log.Fields(
+				"consumer", q.ID,
+				"group", q.Group,
+				"input_stream", InputTaskKey(q.Key),
+				"ready_stream", ReadyTaskKey(q.Key),
+			)).Error("Failed to delete task queue Redis consumer")
+		}
+	}()
 
 	var hasDeadline bool
 	dl, ok := ctx.Deadline()

@@ -21,6 +21,7 @@ import (
 
 	"github.com/go-redis/redis/v7"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -103,6 +104,15 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 		panic(fmt.Sprintf("duplicate subscription for application %s", uid))
 	}
 	defer q.subscriptions.Delete(uid)
+	defer func() {
+		if err := q.Redis.XGroupDelConsumer(upStream, q.Group, q.ID).Err(); err != nil {
+			log.FromContext(ctx).WithError(err).WithFields(log.Fields(
+				"consumer", q.ID,
+				"group", q.Group,
+				"stream", upStream,
+			)).Error("Failed to delete application uplink queue Redis consumer")
+		}
+	}()
 
 	for {
 		rets, err := q.Redis.XReadGroup(&redis.XReadGroupArgs{
