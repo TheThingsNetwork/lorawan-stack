@@ -19,7 +19,7 @@ import (
 	"runtime/trace"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v7"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -214,7 +214,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				return err
 			}
 		}
-		_, err = tx.Pipelined(pipelined)
+		_, err = tx.TxPipelined(pipelined)
 		if err != nil {
 			return err
 		}
@@ -373,7 +373,7 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 				return err
 			}
 		}
-		_, err = tx.Pipelined(pipelined)
+		_, err = tx.TxPipelined(pipelined)
 		if err != nil {
 			return err
 		}

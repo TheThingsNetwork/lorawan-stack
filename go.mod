@@ -51,7 +51,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.1
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/getsentry/sentry-go v0.5.1
-	github.com/go-redis/redis v6.15.7+incompatible
+	github.com/go-redis/redis/v7 v7.3.0
 	github.com/gobuffalo/envy v1.9.0 // indirect
 	github.com/gobwas/glob v0.2.3
 	github.com/gogo/protobuf v1.3.1

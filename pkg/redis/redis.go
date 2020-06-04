@@ -25,7 +25,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v7"
 	"github.com/gogo/protobuf/proto"
 )
 
@@ -413,8 +413,8 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 	if err != redis.Nil {
 		_, err := r.Pipelined(func(p redis.Pipeliner) error {
 			for i, ret := range rets {
-				toAdd := make([]redis.Z, 0, len(ret.Messages))
-				toAddNX := make([]redis.Z, 0, len(ret.Messages))
+				toAdd := make([]*redis.Z, 0, len(ret.Messages))
+				toAddNX := make([]*redis.Z, 0, len(ret.Messages))
 				toAck := make([]string, 0, len(ret.Messages))
 				for _, msg := range ret.Messages {
 					var score float64
@@ -457,12 +457,12 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 					}
 
 					if replace {
-						toAdd = append(toAdd, redis.Z{
+						toAdd = append(toAdd, &redis.Z{
 							Member: member,
 							Score:  score,
 						})
 					} else {
-						toAddNX = append(toAddNX, redis.Z{
+						toAddNX = append(toAddNX, &redis.Z{
 							Member: member,
 							Score:  score,
 						})
@@ -486,7 +486,7 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 	var min time.Time
 	for _, k := range ks {
 		if err := r.Watch(func(tx *redis.Tx) error {
-			zs, err := tx.ZRangeByScoreWithScores(WaitingTaskKey(k), redis.ZRangeBy{
+			zs, err := tx.ZRangeByScoreWithScores(WaitingTaskKey(k), &redis.ZRangeBy{
 				Min: "-inf",
 				Max: fmt.Sprintf("%d", time.Now().UnixNano()),
 			}).Result()
@@ -495,7 +495,7 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 			}
 
 			var minCmd *redis.ZSliceCmd
-			_, err = tx.Pipelined(func(p redis.Pipeliner) error {
+			_, err = tx.TxPipelined(func(p redis.Pipeliner) error {
 				toDel := make([]interface{}, 0, len(zs))
 				for _, z := range zs {
 					toDel = append(toDel, z.Member)

@@ -15,7 +15,7 @@
 package redis
 
 import (
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v7"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
