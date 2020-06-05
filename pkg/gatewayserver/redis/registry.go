@@ -30,10 +30,13 @@ type GatewayConnectionStatsRegistry struct {
 	Redis *ttnredis.Client
 }
 
+const (
+	downKey   = "down"
+	upKey     = "up"
+	statusKey = "status"
+)
+
 var (
-	down            = "down"
-	up              = "up"
-	status          = "status"
 	errNotFound     = errors.DefineNotFound("stats_not_found", "gateway stats not found")
 	errInvalidStats = errors.DefineCorruption("invalid_stats", "invalid `{type}` stats in store")
 )
@@ -49,20 +52,21 @@ func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.Gate
 	defer trace.StartRegion(ctx, "set gateway connection stats").End()
 
 	_, err := r.Redis.Pipelined(func(p redis.Pipeliner) error {
-		for _, this := range []struct {
+		for _, part := range []struct {
 			key    string
 			update bool
 		}{
-			{r.key(up, uid), updateUp},
-			{r.key(down, uid), updateDown},
-			{r.key(status, uid), updateStatus},
+			{r.key(upKey, uid), updateUp},
+			{r.key(downKey, uid), updateDown},
+			{r.key(statusKey, uid), updateStatus},
 		} {
-			if this.update {
-				if stats == nil {
-					p.Del(this.key)
-				} else {
-					ttnredis.SetProto(p, this.key, stats, 0)
-				}
+			if !part.update {
+				continue
+			}
+			if stats == nil {
+				p.Del(part.key)
+			} else {
+				ttnredis.SetProto(p, part.key, stats, 0)
 			}
 		}
 		return nil
@@ -80,7 +84,7 @@ func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids ttnpb.Gate
 	result := &ttnpb.GatewayConnectionStats{}
 	stats := &ttnpb.GatewayConnectionStats{}
 
-	retrieved, err := r.Redis.MGet(r.key(up, uid), r.key(down, uid), r.key(status, uid)).Result()
+	retrieved, err := r.Redis.MGet(r.key(upKey, uid), r.key(downKey, uid), r.key(statusKey, uid)).Result()
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
@@ -96,7 +100,6 @@ func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids ttnpb.Gate
 		}
 		result.LastUplinkReceivedAt = stats.LastUplinkReceivedAt
 		result.UplinkCount = stats.UplinkCount
-		result.RoundTripTimes = stats.RoundTripTimes
 	}
 
 	// Retrieve downlink stats.
@@ -106,6 +109,7 @@ func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids ttnpb.Gate
 		}
 		result.LastDownlinkReceivedAt = stats.LastDownlinkReceivedAt
 		result.DownlinkCount = stats.DownlinkCount
+		result.RoundTripTimes = stats.RoundTripTimes
 	}
 
 	// Retrieve gateway status.
