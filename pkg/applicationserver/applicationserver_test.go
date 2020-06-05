@@ -2117,16 +2117,34 @@ func TestSkipPayloadCrypto(t *testing.T) {
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
-							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
-								Up: &ttnpb.ApplicationUp_JoinAccept{
-									JoinAccept: &ttnpb.ApplicationJoinAccept{
-										SessionKeyID: []byte{0x22},
+							if effectiveSkip {
+								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+									Up: &ttnpb.ApplicationUp_JoinAccept{
+										JoinAccept: &ttnpb.ApplicationJoinAccept{
+											SessionKeyID: []byte{0x22},
+											AppSKey: &ttnpb.KeyEnvelope{
+												// AppSKey is []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}
+												EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
+												KEKLabel:     "test",
+											},
+										},
 									},
-								},
-								CorrelationIDs: up.CorrelationIDs,
-								ReceivedAt:     up.ReceivedAt,
-							})
+									CorrelationIDs: up.CorrelationIDs,
+									ReceivedAt:     up.ReceivedAt,
+								})
+							} else {
+								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+									Up: &ttnpb.ApplicationUp_JoinAccept{
+										JoinAccept: &ttnpb.ApplicationJoinAccept{
+											SessionKeyID: []byte{0x22},
+										},
+									},
+									CorrelationIDs: up.CorrelationIDs,
+									ReceivedAt:     up.ReceivedAt,
+								})
+							}
 						},
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice) {
 							a := assertions.New(t)
