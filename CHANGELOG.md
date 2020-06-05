@@ -14,11 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Late scheduling algorithm; Gateway Server now takes the 90th percentile of at least the last 5 round-trip times of the last 30 minutes into account to determine whether there's enough time to send the downlink to the gateway. This was the highest round-trip time received while the gateway was connected.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Downlink scheduling to gateways which had one observed round-trip time that was higher than the available time to schedule. In some occassions, this broke downlink at some point while the gateway was connected.
 
 ### Security
 

@@ -493,7 +493,7 @@ func recordRTT(conn *io.Connection, receivedAt time.Time, refTime float64) {
 	sec, nsec := math.Modf(refTime)
 	if sec != 0 {
 		ref := time.Unix(int64(sec), int64(nsec*1e9))
-		conn.RecordRTT(receivedAt.Sub(ref))
+		conn.RecordRTT(receivedAt.Sub(ref), receivedAt)
 	}
 }
 
