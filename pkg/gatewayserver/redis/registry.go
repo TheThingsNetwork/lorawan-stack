@@ -55,10 +55,41 @@ func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.Gate
 		for _, part := range []struct {
 			key    string
 			update bool
+			fields func() *ttnpb.GatewayConnectionStats
 		}{
-			{r.key(upKey, uid), updateUp},
-			{r.key(downKey, uid), updateDown},
-			{r.key(statusKey, uid), updateStatus},
+			{
+				key:    r.key(upKey, uid),
+				update: updateUp,
+				fields: func() *ttnpb.GatewayConnectionStats {
+					return &ttnpb.GatewayConnectionStats{
+						LastUplinkReceivedAt: stats.LastUplinkReceivedAt,
+						UplinkCount:          stats.UplinkCount,
+					}
+				},
+			},
+			{
+				key:    r.key(downKey, uid),
+				update: updateDown,
+				fields: func() *ttnpb.GatewayConnectionStats {
+					return &ttnpb.GatewayConnectionStats{
+						LastDownlinkReceivedAt: stats.LastDownlinkReceivedAt,
+						DownlinkCount:          stats.DownlinkCount,
+						RoundTripTimes:         stats.RoundTripTimes,
+					}
+				},
+			},
+			{
+				key:    r.key(statusKey, uid),
+				update: updateStatus,
+				fields: func() *ttnpb.GatewayConnectionStats {
+					return &ttnpb.GatewayConnectionStats{
+						ConnectedAt:          stats.ConnectedAt,
+						Protocol:             stats.Protocol,
+						LastStatus:           stats.LastStatus,
+						LastStatusReceivedAt: stats.LastStatusReceivedAt,
+					}
+				},
+			},
 		} {
 			if !part.update {
 				continue
@@ -66,7 +97,7 @@ func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.Gate
 			if stats == nil {
 				p.Del(part.key)
 			} else {
-				ttnredis.SetProto(p, part.key, stats, 0)
+				ttnredis.SetProto(p, part.key, part.fields(), 0)
 			}
 		}
 		return nil
