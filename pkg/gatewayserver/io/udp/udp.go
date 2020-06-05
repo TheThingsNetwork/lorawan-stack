@@ -298,7 +298,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 			logger.WithError(err).Warn("Failed to handle Tx acknowledgement")
 		}
 		if rtt != nil {
-			state.io.RecordRTT(*rtt)
+			state.io.RecordRTT(*rtt, packet.ReceivedAt)
 		}
 		// TODO: Send event to NS (https://github.com/TheThingsNetwork/lorawan-stack/issues/76)
 	}

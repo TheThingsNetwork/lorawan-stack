@@ -51,14 +51,16 @@ func (c *mockClock) FromTimestampTime(timestamp uint32) scheduling.ConcentratorT
 type mockRTTs struct {
 	Min,
 	Max,
-	Median time.Duration
+	Median,
+	NPercentile time.Duration
 	Count int
 }
 
-func (r *mockRTTs) Stats() (min, max, median time.Duration, count int) {
+func (r *mockRTTs) Stats(_ int, _ time.Time) (min, max, median, np time.Duration, count int) {
 	min = r.Min
 	max = r.Max
 	median = r.Median
+	np = r.NPercentile
 	count = r.Count
 	return
 }
