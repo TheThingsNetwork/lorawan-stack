@@ -47,7 +47,8 @@ type Client struct {
 
 const (
 	contentType      = "application/json"
-	defaultServerURL = "https://das.loracloud.com/api/v1"
+	defaultServerURL = "https://das.loracloud.com"
+	basePath         = "/api/v1"
 )
 
 var (
@@ -61,7 +62,7 @@ type queryParam struct {
 
 func (c *Client) newRequest(method, category, entity, operation string, body io.Reader, queryParams ...queryParam) (*http.Request, error) {
 	u := urlutil.CloneURL(c.baseURL)
-	u.Path = path.Join(u.Path, category, entity, operation)
+	u.Path = path.Join(basePath, category, entity, operation)
 	q := u.Query()
 	for _, p := range queryParams {
 		q.Add(p.key, p.value)
