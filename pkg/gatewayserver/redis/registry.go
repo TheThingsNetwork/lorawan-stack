@@ -75,6 +75,7 @@ func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.Gate
 						LastDownlinkReceivedAt: stats.LastDownlinkReceivedAt,
 						DownlinkCount:          stats.DownlinkCount,
 						RoundTripTimes:         stats.RoundTripTimes,
+						SubBands:               stats.SubBands,
 					}
 				},
 			},
