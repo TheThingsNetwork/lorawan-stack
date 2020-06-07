@@ -236,14 +236,26 @@ class DeviceDataForm extends Component {
 
   get OTAASection() {
     const { mayEditKeys } = this.props
-    const { resets_join_nonces, external_js } = this.state
+    const { resets_join_nonces, external_js, lorawan_version } = this.state
+
+    const lwVersion = parseLorawanMacVersion(lorawan_version)
+
+    let joinEUITitle = sharedMessages.appEUIJoinEUI
+    let joinEUIDescription
+    if (lwVersion >= 100 && lwVersion < 104) {
+      joinEUITitle = sharedMessages.appEUI
+      joinEUIDescription = sharedMessages.appEUIDescription
+    } else if (lwVersion >= 104) {
+      joinEUITitle = sharedMessages.joinEUI
+      joinEUIDescription = sharedMessages.joinEUIDescription
+    }
 
     return (
       <>
         <JoinEUIPrefixesInput
-          title={sharedMessages.joinEUI}
+          title={joinEUITitle}
           name="ids.join_eui"
-          description={sharedMessages.joinEUIDescription}
+          description={joinEUIDescription}
           required
           showPrefixes
         />

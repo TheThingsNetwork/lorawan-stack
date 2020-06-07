@@ -44,6 +44,14 @@ var (
 	// This time is comprised of a higher network latency and QueueDelay. This delay is used for pseudo-immediate
 	// scheduling, see ScheduleAnytime.
 	ScheduleTimeLong = 500*time.Millisecond + QueueDelay
+
+	// scheduleMinRTTCount is the minimum number of observed round-trip times that are taken into account before using
+	// using their statistics for calculating an absolute time or determining whether scheduling is too late.
+	scheduleMinRTTCount = 5
+
+	// scheduleLateRTTPercentile is the percentile of round-trip times that is considered for determining whether
+	// scheduling is too late.
+	scheduleLateRTTPercentile = 90
 )
 
 // TimeSource is a source for getting a current time.
@@ -62,7 +70,7 @@ var SystemTimeSource = &systemTimeSource{}
 
 // RTTs provides round-trip times.
 type RTTs interface {
-	Stats() (min, max, median time.Duration, count int)
+	Stats(percentile int, ref time.Time) (min, max, median, np time.Duration, count int)
 }
 
 var (
@@ -257,8 +265,8 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 	minScheduleTime := ScheduleTimeShort
 	var medianRTT *time.Duration
 	if rtts != nil {
-		if _, max, median, n := rtts.Stats(); n > 0 {
-			minScheduleTime = max + QueueDelay
+		if _, _, median, np, n := rtts.Stats(scheduleLateRTTPercentile, s.timeSource.Now()); n >= scheduleMinRTTCount {
+			minScheduleTime = np + QueueDelay
 			medianRTT = &median
 		}
 	}
@@ -330,8 +338,8 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	}
 	minScheduleTime := ScheduleTimeShort
 	if rtts != nil {
-		if _, max, _, n := rtts.Stats(); n > 0 {
-			minScheduleTime = max + QueueDelay
+		if _, _, _, np, n := rtts.Stats(scheduleLateRTTPercentile, s.timeSource.Now()); n >= scheduleMinRTTCount {
+			minScheduleTime = np + QueueDelay
 		}
 	}
 	var starts ConcentratorTime

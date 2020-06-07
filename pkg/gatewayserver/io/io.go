@@ -33,7 +33,9 @@ import (
 
 const (
 	bufferSize = 1 << 4
-	maxRTTs    = 1 << 5
+
+	maxRTTs = 20
+	rttTTL  = 30 * time.Minute
 )
 
 // Frontend provides supported features by the gateway frontend.
@@ -146,7 +148,7 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 		bandID:      bandID,
 		fps:         fps,
 		scheduler:   scheduler,
-		rtts:        newRTTs(maxRTTs),
+		rtts:        newRTTs(maxRTTs, rttTTL),
 		upCh:        make(chan *ttnpb.GatewayUplinkMessage, bufferSize),
 		downCh:      make(chan *ttnpb.DownlinkMessage, bufferSize),
 		statusCh:    make(chan *ttnpb.GatewayStatus, bufferSize),
@@ -269,8 +271,8 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
 }
 
 // RecordRTT records the given round-trip time.
-func (c *Connection) RecordRTT(d time.Duration) {
-	c.rtts.Record(d)
+func (c *Connection) RecordRTT(d time.Duration, t time.Time) {
+	c.rtts.Record(d, t)
 	c.notifyStatsChanged()
 }
 
@@ -570,8 +572,8 @@ func (c *Connection) DownStats() (total uint64, t time.Time, ok bool) {
 }
 
 // RTTStats returns the recorded round-trip time statistics.
-func (c *Connection) RTTStats() (min, max, median time.Duration, count int) {
-	return c.rtts.Stats()
+func (c *Connection) RTTStats(percentile int, t time.Time) (min, max, median, np time.Duration, count int) {
+	return c.rtts.Stats(percentile, t)
 }
 
 // Stats collects and returns the gateway connection statistics.
@@ -592,7 +594,7 @@ func (c *Connection) Stats() *ttnpb.GatewayConnectionStats {
 		stats.LastDownlinkReceivedAt = &t
 		stats.DownlinkCount = c
 	}
-	if min, max, median, count := c.RTTStats(); count > 0 {
+	if min, max, median, _, count := c.RTTStats(100, time.Now()); count > 0 {
 		stats.RoundTripTimes = &ttnpb.GatewayConnectionStats_RoundTripTimes{
 			Min:    min,
 			Max:    max,

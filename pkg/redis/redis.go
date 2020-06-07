@@ -245,6 +245,10 @@ func (cmd ProtosWithKeysCmd) Range(f func(string) (proto.Message, func() (bool, 
 		panic(fmt.Sprintf("odd slice length: %d", len(ss)))
 	}
 	for i := 0; i < len(ss); i += 2 {
+		if ss[i+1] == "" {
+			continue
+		}
+
 		pb, cb := f(ss[i])
 		if pb == nil && cb == nil {
 			continue

@@ -268,11 +268,13 @@ We use [`revive`](http://github.com/mgechev/revive) to lint Go code and [`eslint
 
 ### Documentation Site
 
-Please respect the following guidelines for content in our documentation site:
+Please respect the following guidelines for content in our documentation site. A copy and paste template for creating new documentation can be found [here](doc/content/example-template).
 
 - The title of a doc page is already rendered by the build system as a h1, don't add an extra one.
 - Use title case for headings.
 - A documentation page starts with an introduction, and then the first heading. The first paragraph of the introduction is typically a summary of the page. Use a `<!--more-->` to indicate where the summary ends.
+- Divide long documents into separate files, each with its own folder and `_index.md`.
+- Use the `weight`tag in the [Front Matter](https://gohugo.io/content-management/front-matter/) to manually sort sections if necessary. If not, they will be sorted alphabetically.
 - Since the title is a `h1`, everything in the content is at least `h2` (`##`).
 - Paragraphs typically consist of at least two sentences.
 - Use an empty line between all blocks (headings, paragraphs, lists, ...).
@@ -285,7 +287,8 @@ Please respect the following guidelines for content in our documentation site:
 - Taking screenshots is done as follows:
   - In Chrome: activate the **Developer Tools** and toggle the **Device Toolbar**. In the **Device Toolbar**, select **Laptop with HiDPI screen** (add it if not already there), and click **Capture Screenshot** in the menu on the right.
   - In Firefox: enter **Responsive Design Mode**. In the **Device Toolbar**, select "Laptop with HiDPI screen" (add it if not already there) and **Take a screenshot of the viewport**.
-- Use `**Strong**` when referring to buttons in the Console
+- Use `**Strong**` when referring to buttons in the Console.
+- Use `>Note:`to add a note.
 - Use fenced code blocks with a language:
   - `bash` for lists of environment variables: `SOME_ENV="value"`.
   - `bash` for CLI examples. Prefix commands with `$ `. Wrap strings with double quotes `""` (except when working with JSON, which already uses double quotes).
