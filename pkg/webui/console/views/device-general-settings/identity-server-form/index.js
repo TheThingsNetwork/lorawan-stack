@@ -110,8 +110,8 @@ const IdentityServerForm = React.memo(props => {
   const { enabled: asEnabled } = selectAsConfig()
   const { enabled: nsEnabled } = selectNsConfig()
 
+  const lorawanVersion = parseLorawanMacVersion(device.lorawan_version)
   const isOTAA = isDeviceOTAA(device)
-  const isNewLorawanVersion = parseLorawanMacVersion(device.lorawan_version) >= 110
   const hasJoinEUI = Boolean(device.ids.join_eui)
   const hasDevEUI = Boolean(device.ids.dev_eui)
 
@@ -125,6 +125,16 @@ const IdentityServerForm = React.memo(props => {
     joinServerAddressPlaceholder = sharedMessages.external
   } else if (!isOTAA) {
     joinServerAddressPlaceholder = sharedMessages.empty
+  }
+
+  let joinEUITitle = sharedMessages.appEUIJoinEUI
+  let joinEUIDescription
+  if (lorawanVersion >= 100 && lorawanVersion < 104) {
+    joinEUITitle = sharedMessages.appEUI
+    joinEUIDescription = sharedMessages.appEUIDescription
+  } else if (lorawanVersion >= 104) {
+    joinEUITitle = sharedMessages.joinEUI
+    joinEUIDescription = sharedMessages.joinEUIDescription
   }
 
   return (
@@ -147,16 +157,12 @@ const IdentityServerForm = React.memo(props => {
       />
       {hasJoinEUI && (
         <Form.Field
-          title={isNewLorawanVersion ? sharedMessages.joinEUI : sharedMessages.appEUI}
+          title={joinEUITitle}
           name="ids.join_eui"
           type="byte"
           min={8}
           max={8}
-          description={
-            isNewLorawanVersion
-              ? sharedMessages.joinEUIDescription
-              : sharedMessages.appEUIDescription
-          }
+          description={joinEUIDescription}
           required
           disabled
           component={Input}

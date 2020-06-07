@@ -30,10 +30,13 @@ type GatewayConnectionStatsRegistry struct {
 	Redis *ttnredis.Client
 }
 
+const (
+	downKey   = "down"
+	upKey     = "up"
+	statusKey = "status"
+)
+
 var (
-	down            = "down"
-	up              = "up"
-	status          = "status"
 	errNotFound     = errors.DefineNotFound("stats_not_found", "gateway stats not found")
 	errInvalidStats = errors.DefineCorruption("invalid_stats", "invalid `{type}` stats in store")
 )
@@ -49,20 +52,53 @@ func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.Gate
 	defer trace.StartRegion(ctx, "set gateway connection stats").End()
 
 	_, err := r.Redis.Pipelined(func(p redis.Pipeliner) error {
-		for _, this := range []struct {
+		for _, part := range []struct {
 			key    string
 			update bool
+			fields func() *ttnpb.GatewayConnectionStats
 		}{
-			{r.key(up, uid), updateUp},
-			{r.key(down, uid), updateDown},
-			{r.key(status, uid), updateStatus},
+			{
+				key:    r.key(upKey, uid),
+				update: updateUp,
+				fields: func() *ttnpb.GatewayConnectionStats {
+					return &ttnpb.GatewayConnectionStats{
+						LastUplinkReceivedAt: stats.LastUplinkReceivedAt,
+						UplinkCount:          stats.UplinkCount,
+					}
+				},
+			},
+			{
+				key:    r.key(downKey, uid),
+				update: updateDown,
+				fields: func() *ttnpb.GatewayConnectionStats {
+					return &ttnpb.GatewayConnectionStats{
+						LastDownlinkReceivedAt: stats.LastDownlinkReceivedAt,
+						DownlinkCount:          stats.DownlinkCount,
+						RoundTripTimes:         stats.RoundTripTimes,
+						SubBands:               stats.SubBands,
+					}
+				},
+			},
+			{
+				key:    r.key(statusKey, uid),
+				update: updateStatus,
+				fields: func() *ttnpb.GatewayConnectionStats {
+					return &ttnpb.GatewayConnectionStats{
+						ConnectedAt:          stats.ConnectedAt,
+						Protocol:             stats.Protocol,
+						LastStatus:           stats.LastStatus,
+						LastStatusReceivedAt: stats.LastStatusReceivedAt,
+					}
+				},
+			},
 		} {
-			if this.update {
-				if stats == nil {
-					p.Del(this.key)
-				} else {
-					ttnredis.SetProto(p, this.key, stats, 0)
-				}
+			if !part.update {
+				continue
+			}
+			if stats == nil {
+				p.Del(part.key)
+			} else {
+				ttnredis.SetProto(p, part.key, part.fields(), 0)
 			}
 		}
 		return nil
@@ -80,7 +116,7 @@ func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids ttnpb.Gate
 	result := &ttnpb.GatewayConnectionStats{}
 	stats := &ttnpb.GatewayConnectionStats{}
 
-	retrieved, err := r.Redis.MGet(r.key(up, uid), r.key(down, uid), r.key(status, uid)).Result()
+	retrieved, err := r.Redis.MGet(r.key(upKey, uid), r.key(downKey, uid), r.key(statusKey, uid)).Result()
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
@@ -96,7 +132,6 @@ func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids ttnpb.Gate
 		}
 		result.LastUplinkReceivedAt = stats.LastUplinkReceivedAt
 		result.UplinkCount = stats.UplinkCount
-		result.RoundTripTimes = stats.RoundTripTimes
 	}
 
 	// Retrieve downlink stats.
@@ -106,6 +141,7 @@ func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids ttnpb.Gate
 		}
 		result.LastDownlinkReceivedAt = stats.LastDownlinkReceivedAt
 		result.DownlinkCount = stats.DownlinkCount
+		result.RoundTripTimes = stats.RoundTripTimes
 		result.SubBands = stats.SubBands
 	}
 
