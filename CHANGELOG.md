@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Metrics for log messages, counted per level and namespace.
+- Allow suppressing logs on HTTP requests for user-defined paths (see `--http.log-ignore-paths` option).
 
 ### Changed
 

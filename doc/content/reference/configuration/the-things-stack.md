@@ -84,6 +84,10 @@ If {{% tts %}} is deployed behind a reverse proxy that does not use a private ne
 
 - `http.trusted-proxies`: CIDRs of trusted reverse proxies
 
+You can suppress log messages for successful HTTP requests (e.g. to reduce the noise caused by the health checks in a production environment).
+
+- `http.log-ignore-paths`: List of URLs for which to suppress logs of successful requests.
+
 ## Interoperability Options
 
 {{% tts %}} supports interoperability according to LoRaWAN Backend Interfaces specification. The following options are used to configure the server for this.
