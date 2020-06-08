@@ -118,11 +118,20 @@ snapcrafts:
     grade: stable
     confinement: strict
     publish: true
+    extra_files:
+      - source: config/snap/ttn-lw-stack.wrapper
+        destination: ttn-lw-stack.wrapper
+        mode: 0755
+      - source: config/snap/ttn-lw-cli.wrapper
+        destination: ttn-lw-cli.wrapper
+        mode: 0755
     apps:
       ttn-lw-stack:
         plugs: [ home, network, network-bind ]
+        command: ttn-lw-stack.wrapper
       ttn-lw-cli:
         plugs: [ home, network, network-bind ]
+        command: ttn-lw-cli.wrapper
 
 brews:
   - name: ttn-lw-stack
