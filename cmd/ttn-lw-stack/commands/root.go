@@ -27,6 +27,7 @@ import (
 	conf "go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	logobservability "go.thethings.network/lorawan-stack/v3/pkg/log/middleware/observability"
 	logsentry "go.thethings.network/lorawan-stack/v3/pkg/log/middleware/sentry"
 	pkgversion "go.thethings.network/lorawan-stack/v3/pkg/version"
 )
@@ -65,6 +66,7 @@ var (
 				log.WithLevel(config.Base.Log.Level),
 				log.WithHandler(log.NewCLI(os.Stdout)),
 			)
+			logger.Use(logobservability.New())
 
 			if config.Sentry.DSN != "" {
 				opts := sentry.ClientOptions{
