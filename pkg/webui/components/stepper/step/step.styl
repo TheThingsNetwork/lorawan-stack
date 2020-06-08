@@ -149,3 +149,16 @@
     color: $tc-subtle-gray
     margin-bottom: $cs.m
     margin-top: 0
+
++media-query($bp.xxs)
+  .step
+    position: relative
+
+    &:not(:last-child)
+      margin-right: 0
+
+      .tail::after
+        display: block
+
+      .content > .title::after
+        display: none
