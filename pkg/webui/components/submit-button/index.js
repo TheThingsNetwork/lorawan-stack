@@ -32,12 +32,13 @@ class SubmitButton extends React.PureComponent {
     icon: undefined,
   }
   render() {
-    const { message, icon, disabled, isSubmitting, isValidating } = this.props
+    const { message, icon, disabled, isSubmitting, isValidating, ...rest } = this.props
 
     const buttonLoading = isSubmitting || isValidating
 
     return (
       <Button
+        {...rest}
         type="submit"
         icon={icon}
         message={message}

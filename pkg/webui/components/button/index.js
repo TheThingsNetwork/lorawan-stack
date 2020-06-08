@@ -19,11 +19,12 @@ import { injectIntl } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
 import Spinner from '@ttn-lw/components/spinner'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import ButtonIcon from './button-icon'
 
 import style from './button.styl'
 
@@ -56,13 +57,25 @@ function assembleClassnames({
   })
 }
 
-const buttonChildren = ({ icon, busy, message }) => (
-  <div className={style.content}>
-    {icon ? <Icon className={style.icon} nudgeUp icon={icon} /> : null}
-    {busy ? <Spinner className={style.spinner} small after={200} /> : null}
-    {message ? <Message content={message} /> : null}
-  </div>
-)
+const buttonChildren = props => {
+  const { icon, busy, message, children } = props
+
+  const content = Boolean(children) ? (
+    children
+  ) : (
+    <>
+      {icon ? <ButtonIcon icon={icon} type="left" /> : null}
+      {message ? <Message content={message} /> : null}
+    </>
+  )
+
+  return (
+    <div className={style.content}>
+      {busy ? <Spinner className={style.spinner} small after={200} /> : null}
+      {content}
+    </div>
+  )
+}
 
 @injectIntl
 class Button extends React.PureComponent {
@@ -134,6 +147,9 @@ Button.AnchorLink = function(props) {
 }
 Button.AnchorLink.displayName = 'Button.AnchorLink'
 
+Button.Icon = ButtonIcon
+Button.Icon.displayName = 'Button.Icon'
+
 const commonPropTypes = {
   /** The message to be displayed within the button. */
   message: PropTypes.message,
@@ -200,6 +216,7 @@ buttonChildren.propTypes = {
    * Spinner, Icon, and/or Message.
    */
   busy: commonPropTypes.busy,
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   icon: commonPropTypes.icon,
   message: commonPropTypes.message,
 }
@@ -208,6 +225,7 @@ buttonChildren.defaultProps = {
   busy: undefined,
   icon: undefined,
   message: undefined,
+  children: null,
 }
 
 Button.propTypes = {
@@ -228,4 +246,5 @@ Button.AnchorLink.propTypes = {
   ...commonPropTypes,
   ...Link.Anchor.propTypes,
 }
+
 export default Button
