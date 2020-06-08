@@ -24,7 +24,11 @@ import (
 
 // Log returns a middleware that logs requests.
 // If logger is nil, the logger will be extracted from the context.
-func Log(logger log.Interface) MiddlewareFunc {
+func Log(logger log.Interface, ignorePathsArray []string) MiddlewareFunc {
+	ignorePaths := make(map[string]struct{})
+	for _, path := range ignorePathsArray {
+		ignorePaths[path] = struct{}{}
+	}
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			logFields := log.Fields(
@@ -46,6 +50,12 @@ func Log(logger log.Interface) MiddlewareFunc {
 
 			r = r.WithContext(log.NewContext(ctx, requestLogger))
 			metrics := httpsnoop.CaptureMetrics(next, w, r)
+
+			if metrics.Code < 400 {
+				if _, ignore := ignorePaths[r.URL.Path]; ignore {
+					return
+				}
+			}
 
 			logFields = logFields.With(map[string]interface{}{
 				"status":        metrics.Code,
