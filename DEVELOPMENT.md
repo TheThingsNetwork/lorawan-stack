@@ -215,6 +215,8 @@ TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
 
 ##### Disable [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/)
 
+> Note: Webpack-related configuration can be loaded from environment variables only. It cannot be sourced from a config file.
+
 ```bash
 WEBPACK_DEV_SERVER_DISABLE_HMR="true"
 ```
