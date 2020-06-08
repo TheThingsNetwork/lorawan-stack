@@ -12,13 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable import/prefer-default-export */
+import { defineMessages } from 'react-intl'
 
-export const steps = Object.freeze({
-  BASIC_STEP: 1,
-  CONNECTION_STEP: 2,
-  LORAWAN_STEP: 3,
-  NETWORK_STEP: 4,
-  APPLICATION_STEP: 5,
-  JOIN_STEP: 6,
+const messages = defineMessages({
+  basicTitle: 'Basic settings',
+  basicDescription: "General settings of the end device. End device ID's, Name and Description",
+  basicDetails: 'Defines general settings of an end device',
+  networkTitle: 'Network layer settings',
+  networkDescription: 'Frequency plan, regional parameters, end device class and session keys.',
+  appTitle: 'Application layer settings',
+  appDescription: 'Application session key to encrypt/decrypt LoRaWAN payload.',
+  joinTitle: 'Join settings',
+  joinDescription: 'Root keys, net ID and kek labels.',
 })
+
+export default messages

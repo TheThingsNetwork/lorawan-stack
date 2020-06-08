@@ -200,6 +200,7 @@ export default defineMessages({
   multicast: 'Multicast',
   name: 'Name',
   networkServerAddress: 'Network Server address',
+  next: 'Next',
   noDesc: 'This end device has no description',
   noEvents: '{entityId} has not sent any events recently',
   noLocation: 'No location information available',
