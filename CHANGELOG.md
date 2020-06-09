@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Packet Broker Agent cluster ID is used as subscription group.
+- LinkADR handling in 72-channel bands.
 
 ## [3.8.3] - 2020-06-05
 
