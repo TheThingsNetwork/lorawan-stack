@@ -687,9 +687,7 @@ local ok = redis.call('set', KEYS[1], '', 'px', exp, 'nx')
 if #ARGV > 1 then
 	table.remove(ARGV, 1)
 	redis.call('rpush', KEYS[2], unpack(ARGV))
-	if ok then
-		redis.call('pexpire', KEYS[2], exp)
-	end
+	redis.call('pexpire', KEYS[2], exp)
 end
 if ok then
 	return 1
