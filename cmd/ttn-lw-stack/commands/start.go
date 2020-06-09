@@ -130,7 +130,11 @@ var startCommand = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
 		redisConsumerID := redis.Key(host, strconv.Itoa(os.Getpid()))
+		if err := redis.InitMutex(redis.New(&config.Redis)); err != nil {
+			return err
+		}
 
 		if start.IdentityServer || startDefault {
 			logger.Info("Setting up Identity Server")
