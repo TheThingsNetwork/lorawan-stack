@@ -16,11 +16,15 @@ package redis
 
 import (
 	"context"
+	"io"
+	"math/rand"
 	"runtime/trace"
+	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v7"
 	"github.com/gogo/protobuf/proto"
+	ulid "github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -37,7 +41,20 @@ var (
 
 // DeviceRegistry is an implementation of networkserver.DeviceRegistry.
 type DeviceRegistry struct {
-	Redis *ttnredis.Client
+	Redis   *ttnredis.Client
+	LockTTL time.Duration
+
+	entropyMu *sync.Mutex
+	entropy   io.Reader
+}
+
+func (r *DeviceRegistry) Init() error {
+	if err := ttnredis.InitMutex(r.Redis); err != nil {
+		return err
+	}
+	r.entropyMu = &sync.Mutex{}
+	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
+	return nil
 }
 
 func (r *DeviceRegistry) uidKey(uid string) string {
@@ -155,7 +172,14 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	defer trace.StartRegion(ctx, "set end device by id").End()
 
 	var pb *ttnpb.EndDevice
-	err := r.Redis.Watch(func(tx *redis.Tx) error {
+	r.entropyMu.Lock()
+	lockID, err := ulid.New(ulid.Timestamp(time.Now()), r.entropy)
+	r.entropyMu.Unlock()
+	if err != nil {
+		return nil, ctx, err
+	}
+	lockIDStr := lockID.String()
+	if err = ttnredis.LockedWatch(ctx, r.Redis, uk, lockIDStr, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(tx, uk)
 		stored := &ttnpb.EndDevice{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -221,6 +245,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				"updated_at",
 			)
 
+			var preSet []func(redis.Pipeliner)
 			updated := &ttnpb.EndDevice{}
 			if stored == nil {
 				if err := ttnpb.RequireFields(sets,
@@ -239,6 +264,27 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				}
 				if updated.ApplicationIdentifiers != appID || updated.DeviceID != devID {
 					return errInvalidIdentifiers.New()
+				}
+				if updated.JoinEUI != nil && updated.DevEUI != nil {
+					ek := r.euiKey(*updated.JoinEUI, *updated.DevEUI)
+
+					if err := ttnredis.LockMutex(ctx, tx, ek, lockIDStr, r.LockTTL); err != nil {
+						return err
+					}
+					if err := tx.Watch(ek).Err(); err != nil {
+						return err
+					}
+					i, err := tx.Exists(ek).Result()
+					if err != nil {
+						return err
+					}
+					if i != 0 {
+						return errDuplicateIdentifiers.New()
+					}
+					preSet = append(preSet, func(p redis.Pipeliner) {
+						p.Set(ek, uid, 0)
+						ttnredis.UnlockMutex(p, ek, lockIDStr, r.LockTTL)
+					})
 				}
 			} else {
 				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationID != stored.ApplicationID {
@@ -264,30 +310,20 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			if err := updated.ValidateFields(sets...); err != nil {
 				return err
 			}
+			pb, err = ttnpb.FilterGetEndDevice(updated, gets...)
+			if err != nil {
+				return err
+			}
 			pipelined = func(p redis.Pipeliner) error {
-				if stored == nil && updated.JoinEUI != nil && updated.DevEUI != nil {
-					ek := r.euiKey(*updated.JoinEUI, *updated.DevEUI)
-					if err := tx.Watch(ek).Err(); err != nil {
-						return err
-					}
-					i, err := tx.Exists(ek).Result()
-					if err != nil {
-						return err
-					}
-					if i != 0 {
-						return errDuplicateIdentifiers.New()
-					}
-					p.SetNX(ek, uid, 0)
+				for _, f := range preSet {
+					f(p)
 				}
-
 				_, err := ttnredis.SetProto(p, uk, updated, 0)
 				if err != nil {
 					return err
 				}
-
 				storedAddrs := getDevAddrs(stored)
 				updatedAddrs := getDevAddrs(updated)
-
 				if storedAddrs.pending != nil && !equalAddr(storedAddrs.pending, updatedAddrs.pending) && !equalAddr(storedAddrs.pending, updatedAddrs.current) {
 					p.SRem(r.addrKey(*storedAddrs.pending), uid)
 				}
@@ -300,11 +336,6 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				if updatedAddrs.current != nil && !equalAddr(updatedAddrs.current, storedAddrs.pending) && !equalAddr(updatedAddrs.current, storedAddrs.current) {
 					p.SAdd(r.addrKey(*updatedAddrs.current), uid)
 				}
-
-				pb, err = ttnpb.FilterGetEndDevice(updated, gets...)
-				if err != nil {
-					return err
-				}
 				return nil
 			}
 		}
@@ -313,8 +344,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			return err
 		}
 		return nil
-	}, uk)
-	if err != nil {
+	}); err != nil {
 		return nil, ctx, ttnredis.ConvertError(err)
 	}
 	return pb, ctx, nil
