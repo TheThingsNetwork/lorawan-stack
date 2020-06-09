@@ -17,11 +17,15 @@ It is possible to change the logos of the web UI by changing the "branding base 
 
 | **Filename**           | **Size** | **Purpose** |
 | ---------------------- | -------- | ----------- |
-| console-favicon.ico    | multiple | The logo for the console that is shown in browser tabs and bookmarks |
+| console-favicon.svg    | vector   | The SVG logo for the console that is shown in browser tabs and bookmarks |
+| console-favicon.png    | multiple | The fallback favicon logo for the console in `PNG` format; recommended size 32x32 |
+| console-favicon.ico    | multiple | The fallback favicon logo for the console in `ICO` format; recommended size 32x32 |
 | console-og-image.png   | 1200x600 | The logo for the console that is shown when sharing links on social media |
 | console-touch-icon.png | 400x400  | The logo for the console that is shown mobile devices |
 | logo.svg               | vector   | The logo for the console that is shown in the menu bar of the console |
-| oauth-favicon.ico      | multiple | The logo for the login pages that is shown in browser tabs and bookmarks |
+| oauth-favicon.svg      | vector   | The SVG logo for the login pages that is shown in browser tabs and bookmarks |
+| oauth-favicon.png      | multiple | The fallback favicon logo for the login pages in `PNG` format; recommended size 32x32 |
+| oauth-favicon.ico      | multiple | The fallback favicon logo for the login pages in `ICO` format; recommended size 32x32 |
 | oauth-og-image.png     | 1200x600 | The logo for the login pages that is shown when sharing links on social media |
 | oauth-touch-icon.png   | 400x400  | The logo for the login pages that is shown mobile devices |
 

@@ -169,32 +169,54 @@ func txPowerStep(phy band.Band, from, to uint8) float32 {
 	return phy.TxOffset[from] - phy.TxOffset[to]
 }
 
+func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.DataRateIndex, ok bool) {
+	i := 0
+	for {
+		if i >= len(chs) {
+			return 0, 0, false
+		}
+		if chs[i].EnableUplink {
+			break
+		}
+		i++
+	}
+
+	min = chs[i].MinDataRateIndex
+	max = chs[i].MaxDataRateIndex
+	for _, ch := range chs[i+1:] {
+		if !ch.EnableUplink {
+			continue
+		}
+		if ch.MaxDataRateIndex > max {
+			max = ch.MaxDataRateIndex
+		}
+		if ch.MinDataRateIndex < min {
+			min = ch.MinDataRateIndex
+		}
+	}
+	if min > max {
+		return 0, 0, false
+	}
+	return min, max, true
+}
+
 func adaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, defaults ttnpb.MACSettings) error {
 	if len(dev.RecentADRUplinks) == 0 {
 		return nil
 	}
-	if len(dev.MACState.CurrentParameters.Channels) == 0 {
-		return errCorruptedMACState
-	}
 
-	minDataRateIndex := dev.MACState.CurrentParameters.Channels[0].MinDataRateIndex
-	maxDataRateIndex := dev.MACState.CurrentParameters.Channels[0].MaxDataRateIndex
-	for _, ch := range dev.MACState.CurrentParameters.Channels[1:] {
-		if ch.MaxDataRateIndex > maxDataRateIndex {
-			maxDataRateIndex = ch.MaxDataRateIndex
-		}
-		if ch.MinDataRateIndex < minDataRateIndex {
-			minDataRateIndex = ch.MinDataRateIndex
-		}
-	}
-	if maxDataRateIndex > phy.MaxADRDataRateIndex || minDataRateIndex > maxDataRateIndex {
+	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MACState.CurrentParameters.Channels...)
+	if !ok {
 		return errCorruptedMACState
+	}
+	if maxDataRateIndex > phy.MaxADRDataRateIndex {
+		maxDataRateIndex = phy.MaxADRDataRateIndex
 	}
 	rejectedDataRateIndexes := make(map[ttnpb.DataRateIndex]struct{}, len(dev.MACState.RejectedADRDataRateIndexes))
 	for _, idx := range dev.MACState.RejectedADRDataRateIndexes {
 		rejectedDataRateIndexes[idx] = struct{}{}
 	}
-	_, ok := rejectedDataRateIndexes[minDataRateIndex]
+	_, ok = rejectedDataRateIndexes[minDataRateIndex]
 	for ok && minDataRateIndex <= maxDataRateIndex {
 		minDataRateIndex++
 		_, ok = rejectedDataRateIndexes[minDataRateIndex]

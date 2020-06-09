@@ -21,17 +21,13 @@ import Input from '@ttn-lw/components/input'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
 
-import m from '@console/components/device-data-form/messages'
-
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import randomByteString from '@console/lib/random-bytes'
+import { generate16BytesKey } from '@console/lib/device-utils'
 
 import messages from '../messages'
-
-const random16BytesString = () => randomByteString(32)
 
 const validationSchema = Yup.object().shape({
   session: Yup.object().shape({
@@ -77,7 +73,7 @@ const ApplicationServerForm = React.memo(props => {
       setError('')
       try {
         await onSubmit(updatedValues)
-        resetForm(castedValues)
+        resetForm({ values: castedValues })
         onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)
@@ -108,10 +104,10 @@ const ApplicationServerForm = React.memo(props => {
         type="byte"
         min={16}
         max={16}
-        description={m.appSKeyDescription}
+        description={sharedMessages.appSKeyDescription}
         component={Input.Generate}
         mayGenerateValue={mayEditKeys}
-        onGenerateValue={random16BytesString}
+        onGenerateValue={generate16BytesKey}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

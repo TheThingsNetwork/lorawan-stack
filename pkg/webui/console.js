@@ -18,6 +18,8 @@ import { createBrowserHistory } from 'history'
 import { Provider } from 'react-redux'
 import * as Sentry from '@sentry/browser'
 
+import sentryConfig from '@ttn-lw/constants/sentry'
+
 import { BreadcrumbsProvider } from '@ttn-lw/components/breadcrumbs/context'
 
 import { EnvProvider } from '@ttn-lw/lib/components/env'
@@ -32,9 +34,10 @@ import createStore from './console/store'
 
 const appRoot = selectApplicationRootPath()
 const history = createBrowserHistory({ basename: `${appRoot}/` })
+// Initialize sentry before creating store.
+if (env.sentryDsn) Sentry.init(sentryConfig)
 const store = createStore(history)
-// Initialize sentry before rendering root element.
-if (env.sentryDsn) Sentry.init({ dsn: env.sentryDsn })
+
 const rootElement = document.getElementById('app')
 
 const render = () => {

@@ -50,5 +50,5 @@ Application Server supports templates for webhooks that can be loaded from a `di
 
 Application Server supports communicating the paths of the downlink queue operations to the webhook endpoints via headers. The paths are computed from the public address, and the HTTPS endpoint is preferred over the HTTP one.
 
-- `as.webhooks.downlinks.public-address`: Public address of the HTTP webhooks frontend (default "http://localhost:1885/api/v3")
-- `as.webhooks.downlinks.public-tls-address`: Public address of the HTTPS webhooks frontend
+- `as.webhooks.downlink.public-address`: Public address of the HTTP webhooks frontend (default "http://localhost:1885/api/v3")
+- `as.webhooks.downlink.public-tls-address`: Public address of the HTTPS webhooks frontend

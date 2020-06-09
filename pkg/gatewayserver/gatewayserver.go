@@ -82,7 +82,16 @@ func (gs *GatewayServer) getRegistry(ctx context.Context, ids *ttnpb.GatewayIden
 	if gs.registry != nil {
 		return gs.registry, nil
 	}
-	cc, err := gs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
+	var (
+		cc  *grpc.ClientConn
+		err error
+	)
+	if ids != nil {
+		cc, err = gs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
+	} else {
+		// Don't pass a (*ttnpb.GatewayIdentifiers)(nil) to GetPeerConn.
+		cc, err = gs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -670,7 +679,13 @@ func (gs *GatewayServer) updateConnStats(conn connectionEntry) {
 	logger := log.FromContext(ctx)
 
 	// Initial dummy update, so that gateway appears connected
-	if err := gs.UpdateConnectionStats(conn.Connection, false, false, true); err != nil {
+	if err := gs.statsRegistry.Set(
+		ctx,
+		conn.Connection.Gateway().GatewayIdentifiers,
+		&ttnpb.GatewayConnectionStats{
+			ConnectedAt: func(t time.Time) *time.Time { return &t }(conn.Connection.ConnectTime()),
+			Protocol:    conn.Connection.Frontend().Protocol(),
+		}, false, false, true); err != nil {
 		logger.WithError(err).Error("Failed to initialize connection stats")
 	}
 
@@ -878,12 +893,12 @@ func recoverHandler(ctx context.Context) error {
 	return nil
 }
 
-// UpdateConnectionStats updates the connection stats for a gateway
+// UpdateConnectionStats updates the connection stats for a gateway.
 func (gs *GatewayServer) UpdateConnectionStats(conn *io.Connection, up, down, status bool) error {
 	return gs.statsRegistry.Set(conn.Context(), conn.Gateway().GatewayIdentifiers, conn.Stats(), up, down, status)
 }
 
-// ClearConnectionStats clears the connection stats for a gateway
+// ClearConnectionStats clears the connection stats for a gateway.
 func (gs *GatewayServer) ClearConnectionStats(conn *io.Connection, up, down, status bool) error {
 	return gs.statsRegistry.Set(conn.Context(), conn.Gateway().GatewayIdentifiers, nil, up, down, status)
 }

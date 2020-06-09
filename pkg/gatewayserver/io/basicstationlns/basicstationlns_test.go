@@ -530,6 +530,7 @@ func TestVersion(t *testing.T) {
 					"station":  "test-station",
 					"firmware": "1.0.0",
 					"package":  "test-package",
+					"platform": "test-model - Firmware 1.0.0 - Protocol 2",
 				},
 				Advanced: &pbtypes.Struct{
 					Fields: map[string]*pbtypes.Value{
@@ -612,6 +613,7 @@ func TestVersion(t *testing.T) {
 					"station":  "test-station-rc1",
 					"firmware": "1.0.0",
 					"package":  "test-package",
+					"platform": "test-model - Firmware 1.0.0 - Protocol 2",
 				},
 				Advanced: &pbtypes.Struct{
 					Fields: map[string]*pbtypes.Value{
@@ -1229,7 +1231,7 @@ func TestRTT(t *testing.T) {
 
 				if MuxTime > 0 {
 					// Atleast one downlink is needed for the first muxtime.
-					min, max, median, count := gsConn.RTTStats()
+					min, max, median, _, count := gsConn.RTTStats(90, time.Now())
 					if !a.So(count, should.Equal, tc.ExpectedRTTStatsCount) {
 						t.Fatalf("Incorrect Stats entries recorded: %d", count)
 					}

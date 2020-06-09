@@ -12,30 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gcsv2
+package gatewayconfigurationserver
 
 import (
+	"encoding/json"
 	"net/http"
 
-	echo "github.com/labstack/echo/v4"
+	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
-func (s *Server) handleGetFrequencyPlan(c echo.Context) error {
-	frequencyPlanID := c.Param("frequency_plan_id")
+func (s *Server) handleGetFrequencyPlan(w http.ResponseWriter, r *http.Request) {
+	frequencyPlanID := mux.Vars(r)["frequency_plan_id"]
 	plan, err := s.component.FrequencyPlans.GetByID(frequencyPlanID)
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
 	config, err := shared.BuildSX1301Config(plan)
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
-	if c.Request().Header.Get("User-Agent") == "TTNGateway" {
+	if r.Header.Get("User-Agent") == "TTNGateway" {
 		// Filter out fields to reduce response size.
 		config.TxLUTConfigs = nil
 	}
-	return c.JSON(http.StatusOK, struct {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(struct {
 		SX1301Conf *shared.SX1301Config `json:"SX1301_conf"`
 	}{
 		SX1301Conf: config,

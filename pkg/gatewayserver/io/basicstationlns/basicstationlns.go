@@ -389,12 +389,14 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				logger.WithError(err).Warn("Failed to send router configuration")
 				return err
 			}
+			// TODO: Revisit these fields for v3 events (https://github.com/TheThingsNetwork/lorawan-stack/issues/2629)
 			stat := &ttnpb.GatewayStatus{
 				Time: receivedAt,
 				Versions: map[string]string{
 					"station":  version.Station,
 					"firmware": version.Firmware,
 					"package":  version.Package,
+					"platform": fmt.Sprintf("%s - Firmware %s - Protocol %d", version.Model, version.Firmware, version.Protocol),
 				},
 				Advanced: &pbtypes.Struct{
 					Fields: map[string]*pbtypes.Value{
@@ -491,7 +493,7 @@ func recordRTT(conn *io.Connection, receivedAt time.Time, refTime float64) {
 	sec, nsec := math.Modf(refTime)
 	if sec != 0 {
 		ref := time.Unix(int64(sec), int64(nsec*1e9))
-		conn.RecordRTT(receivedAt.Sub(ref))
+		conn.RecordRTT(receivedAt.Sub(ref), receivedAt)
 	}
 }
 

@@ -16,16 +16,14 @@ import * as Yup from 'yup'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { parseLorawanMacVersion, ACTIVATION_MODES } from '../utils'
+import { parseLorawanMacVersion, ACTIVATION_MODES } from '@console/lib/device-utils'
 
 const validationSchema = Yup.object()
   .shape({
     _external_js: Yup.boolean(),
-    _activation_mode: Yup.mixed().oneOf([
-      ACTIVATION_MODES.ABP,
-      ACTIVATION_MODES.OTAA,
-      ACTIVATION_MODES.MULTICAST,
-    ]),
+    _activation_mode: Yup.mixed()
+      .oneOf([ACTIVATION_MODES.ABP, ACTIVATION_MODES.OTAA, ACTIVATION_MODES.MULTICAST])
+      .required(sharedMessages.validateRequired),
     _may_edit_keys: Yup.boolean().default(false),
     _may_read_keys: Yup.boolean().default(false),
     _joined: Yup.boolean().default(false),

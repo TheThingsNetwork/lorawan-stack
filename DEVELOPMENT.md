@@ -68,6 +68,22 @@ Redis is an in-memory data store that we use as a database for "hot" data.
 
 You can use `./mage dev:dbRedisCli` to enter a Redis-CLI shell.
 
+#### Codec
+
+Most data is stored as base64-encoded protocol buffers. For debugging purposes it is often useful to inspect or update the stored database models - you can use Redis codec tool located at `./pkg/redis/codec` to decode/encode them to/from JSON.
+
+##### Example
+
+###### Get and decode
+```
+redis-cli get "ttn:v3:ns:devices:uid:test-app:test-dev" | go run ./pkg/redis/codec -type 'ttnpb.EndDevice'
+```
+
+###### Get, decode, modify, encode and set
+```
+redis-cli get "ttn:v3:ns:devices:uid:test-app.test-dev" | go run ./pkg/redis/codec -type 'ttnpb.EndDevice' | jq '.supports_join = false' | go run ./pkg/redis/codec -type 'ttnpb.EndDevice' -encode | redis-cli -x set "ttn:v3:ns:devices:uid:test-app.test-dev"
+```
+
 ## Project Structure
 
 The folder structure of the project looks as follows:
@@ -199,18 +215,22 @@ TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
 
 #### Optional Configuration
 
-Disable [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/)
+##### Disable [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/)
+
+> Note: Webpack-related configuration can be loaded from environment variables only. It cannot be sourced from a config file.
 
 ```bash
 WEBPACK_DEV_SERVER_DISABLE_HMR="true"
 ```
 
-Enable TLS in `webpack-dev-server`, using the key and certificate set via `TTN_LW_TLS_KEY` and `TTN_LW_TLS_CERTIFICATE` environment variables. Useful when developing functionalities that rely on TLS.
+##### Enable TLS in `webpack-dev-server`
 
 ```bash
 WEBPACK_DEV_SERVER_USE_TLS="true"
 ```
-Note: To use this option, The Things Stack for LoRaWAN must be properly setup for TLS. You can obtain more information about this in the **Getting Started** section of the The Things Stack for LoRaWAN documentation.
+This option uses the key and certificate set via `TTN_LW_TLS_KEY` and `TTN_LW_TLS_CERTIFICATE` environment variables. Useful when developing functionalities that rely on TLS.
+
+> Note: To use this option, The Things Stack for LoRaWAN must be properly setup for TLS. You can obtain more information about this in the **Getting Started** section of the The Things Stack for LoRaWAN documentation.
 
 ## Code Style
 
@@ -244,11 +264,13 @@ We use [`revive`](http://github.com/mgechev/revive) to lint Go code and [`eslint
 
 ### Documentation Site
 
-Please respect the following guidelines for content in our documentation site:
+Please respect the following guidelines for content in our documentation site. A copy and paste template for creating new documentation can be found [here](doc/content/example-template).
 
 - The title of a doc page is already rendered by the build system as a h1, don't add an extra one.
 - Use title case for headings.
 - A documentation page starts with an introduction, and then the first heading. The first paragraph of the introduction is typically a summary of the page. Use a `<!--more-->` to indicate where the summary ends.
+- Divide long documents into separate files, each with its own folder and `_index.md`.
+- Use the `weight`tag in the [Front Matter](https://gohugo.io/content-management/front-matter/) to manually sort sections if necessary. If not, they will be sorted alphabetically.
 - Since the title is a `h1`, everything in the content is at least `h2` (`##`).
 - Paragraphs typically consist of at least two sentences.
 - Use an empty line between all blocks (headings, paragraphs, lists, ...).
@@ -261,7 +283,8 @@ Please respect the following guidelines for content in our documentation site:
 - Taking screenshots is done as follows:
   - In Chrome: activate the **Developer Tools** and toggle the **Device Toolbar**. In the **Device Toolbar**, select **Laptop with HiDPI screen** (add it if not already there), and click **Capture Screenshot** in the menu on the right.
   - In Firefox: enter **Responsive Design Mode**. In the **Device Toolbar**, select "Laptop with HiDPI screen" (add it if not already there) and **Take a screenshot of the viewport**.
-- Use `**Strong**` when referring to buttons in the Console
+- Use `**Strong**` when referring to buttons in the Console.
+- Use `>Note:`to add a note.
 - Use fenced code blocks with a language:
   - `bash` for lists of environment variables: `SOME_ENV="value"`.
   - `bash` for CLI examples. Prefix commands with `$ `. Wrap strings with double quotes `""` (except when working with JSON, which already uses double quotes).
@@ -834,7 +857,7 @@ The bundle files have been deleted. This might happen e.g. when a mage target en
 ##### Possible solution
 
   1. Rebuild the Console `./mage js:clean js:build`
-  2. Restart the The Things Stack
+  2. Restart The Things Stack
 
 ##### Mixing up production and development builds
 
@@ -863,12 +886,6 @@ console.4e67a17c1ce5a74f3f50.js:104 Uncaught TypeError: m.subscribe is not a fun
     at Object.0 (console.4e67a17c1ce5a74f3f50.js:104)
 ```
 
-or
-
-```
-ERROR in ./node_modules/redux-logic/node_modules/rxjs/operators/index.js Module not found: Error: Can't resolve '../internal/operators/audit' in '/lorawan-stack/node_modules/redux-logic/node_modules/rxjs/operators'
-```
-
 #### Possible causes
 
 ##### Bundle using old JS SDK
@@ -883,12 +900,18 @@ The bundle integrates an old version of the JS SDK. This is likely a caching/lin
     - If you have cloned multiple `lorawan-stack` forks in different locations, `yarn link` might associate the JS SDK module with the SDK on another ttn repository
   - Rebuild the Console and (only after the build has finished) restart The Things Stack
 
-##### Broken yarn or npm cache
+#### Problem: Console rendering blank page and showing `Module not found` message in console logs, e.g.:
 
-##### Possible solutions
+```
+ERROR in ./node_modules/redux-logic/node_modules/rxjs/operators/index.js Module not found: Error: Can't resolve '../internal/operators/audit' in '/lorawan-stack/node_modules/redux-logic/node_modules/rxjs/operators'
+```
 
-- Clear yarn cache: `yarn cache clear`
-- Clear npm cache: `npm cache clear`
+#### Possible cause: Broken yarn or npm cache
+
+#### Possible solution: Clean package manager caches
+
+- Clean yarn cache: `yarn cache clean`
+- Clean npm cache: `npm cache clean`
 - Clean and reinstall dependencies: `./mage js:cleanDeps js:deps`
 
 #### Problem: The build crashes without showing any helpful error message
@@ -901,20 +924,22 @@ The bundle integrates an old version of the JS SDK. This is likely a caching/lin
 
 Run mage in verbose mode: `./mage -v {target}`
 
-#### Problem: Browser displays error: `Cannot GET /`
+#### Problem: Browser displays error:
+`Cannot GET /`
 
-##### Cause: No endpoint is exposed at root
+#### Cause: No endpoint is exposed at root
 
-##### Solution:
+#### Solution:
 
 Console is typically exposed at `http://localhost:8080/console`,
 API at `http://localhost:8080/console`,
 OAuth at `http://localhost:8080/oauth`,
 etc
 
-#### Problem: Browser displays error: `Error occurred while trying to proxy to: localhost:8080/console`
+#### Problem: Browser displays error:
+`Error occurred while trying to proxy to: localhost:8080/console`
 
-##### Cause: Stack is not available or not running
+#### Cause: Stack is not available or not running
 
 For development, remember to run the stack with `go run`:
 

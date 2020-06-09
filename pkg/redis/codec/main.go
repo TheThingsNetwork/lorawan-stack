@@ -66,6 +66,7 @@ func main() {
 		if _, err := os.Stdout.Write([]byte(s)); err != nil {
 			log.Fatalf("Failed to write to stdout: %v", err)
 		}
+		return
 	}
 	b, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {

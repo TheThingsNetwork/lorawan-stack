@@ -275,9 +275,10 @@ func TestProtobufV2Status(t *testing.T) {
 		{
 			Name: "With versions",
 			input: &ttnpbv2.StatusMessage{
-				Dsp:  3,
-				Hal:  "v1.1",
-				Fpga: 4,
+				Platform: "The Things Gateway v1 - BL r9-12345678 (2006-01-02T15:04:05Z) - Firmware v1.2.3-12345678 (2006-01-02T15:04:05Z)",
+				Dsp:      3,
+				Hal:      "v1.1",
+				Fpga:     4,
 			},
 			Expected: &ttnpb.GatewayStatus{
 				BootTime: time.Unix(0, 0),
@@ -293,9 +294,10 @@ func TestProtobufV2Status(t *testing.T) {
 					"txok": 0.0,
 				},
 				Versions: map[string]string{
-					"dsp":  "3",
-					"fpga": "4",
-					"hal":  "v1.1",
+					"platform": "The Things Gateway v1 - BL r9-12345678 (2006-01-02T15:04:05Z) - Firmware v1.2.3-12345678 (2006-01-02T15:04:05Z)",
+					"dsp":      "3",
+					"fpga":     "4",
+					"hal":      "v1.1",
 				},
 			},
 		},

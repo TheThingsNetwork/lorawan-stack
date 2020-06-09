@@ -55,7 +55,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		PayloadSize             int
 		Settings                ttnpb.TxSettings
 		Priority                ttnpb.TxSchedulePriority
-		MaxRTT                  *time.Duration
+		NPercentileRTT          *time.Duration
 		MedianRTT               *time.Duration
 		ExpectedToa             time.Duration
 		ExpectedStarts          scheduling.ConcentratorTime
@@ -117,9 +117,9 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  300000,
 			},
-			Priority:    ttnpb.TxSchedulePriority_NORMAL,
-			MaxRTT:      durationPtr(500 * time.Millisecond),
-			ExpectedToa: 41216 * time.Microsecond,
+			Priority:       ttnpb.TxSchedulePriority_NORMAL,
+			NPercentileRTT: durationPtr(500 * time.Millisecond),
+			ExpectedToa:    41216 * time.Microsecond,
 			// Too late for transmission with RTT.
 			ExpectedError: &scheduling.ErrTooLate,
 		},
@@ -139,9 +139,9 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 				Frequency:  869525000,
 				Time:       timePtr(time.Unix(0, int64(300*time.Millisecond))),
 			},
-			Priority:    ttnpb.TxSchedulePriority_NORMAL,
-			MaxRTT:      durationPtr(500 * time.Millisecond),
-			ExpectedToa: 2465792 * time.Microsecond,
+			Priority:       ttnpb.TxSchedulePriority_NORMAL,
+			NPercentileRTT: durationPtr(500 * time.Millisecond),
+			ExpectedToa:    2465792 * time.Microsecond,
 			// Too late for transmission with RTT.
 			ExpectedError: &scheduling.ErrTooLate,
 		},
@@ -315,13 +315,13 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(d, should.Equal, tc.ExpectedToa)
 			rtts := &mockRTTs{}
-			if tc.MaxRTT != nil {
-				rtts.Max = *tc.MaxRTT
-				rtts.Count = 1
+			if tc.NPercentileRTT != nil {
+				rtts.NPercentile = *tc.NPercentileRTT
+				rtts.Count = 10
 			}
 			if tc.MedianRTT != nil {
 				rtts.Median = *tc.MedianRTT
-				rtts.Count = 1
+				rtts.Count = 10
 			}
 			em, err := scheduler.ScheduleAt(ctx, tc.PayloadSize, tc.Settings, rtts, tc.Priority)
 			if tc.ExpectedError != nil {
@@ -630,7 +630,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		a.So(time.Duration(em.Starts()), should.Equal, scheduling.ScheduleTimeShort)
 	}
 
-	// Timestamp; too late (10 ms) with RTT.
+	// Timestamp; too late (10 ms) with too few RTTs (5).
 	{
 		timeSource := &mockTimeSource{
 			Time: time.Now(),
@@ -639,8 +639,25 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		rtts := &mockRTTs{
-			Max:   40 * time.Millisecond,
-			Count: 1,
+			NPercentile: 40 * time.Millisecond,
+			Count:       3,
+		}
+		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 10*1000), rtts, ttnpb.TxSchedulePriority_NORMAL)
+		a.So(err, should.BeNil)
+		a.So(time.Duration(em.Starts()), should.Equal, scheduling.ScheduleTimeShort)
+	}
+
+	// Timestamp; too late (10 ms) with enough RTTs.
+	{
+		timeSource := &mockTimeSource{
+			Time: time.Now(),
+		}
+		scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
+		a.So(err, should.BeNil)
+		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
+		rtts := &mockRTTs{
+			NPercentile: 40 * time.Millisecond,
+			Count:       20,
 		}
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 10*1000), rtts, ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.BeNil)

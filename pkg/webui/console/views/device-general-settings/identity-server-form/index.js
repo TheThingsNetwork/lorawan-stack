@@ -22,14 +22,14 @@ import Form from '@ttn-lw/components/form'
 import Checkbox from '@ttn-lw/components/checkbox'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 
-import m from '@console/components/device-data-form/messages'
-
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
 
-import { parseLorawanMacVersion, hasExternalJs, isDeviceOTAA } from '../utils'
+import { parseLorawanMacVersion } from '@console/lib/device-utils'
+
+import { hasExternalJs, isDeviceOTAA } from '../utils'
 
 import validationSchema from './validation-schema'
 
@@ -68,16 +68,11 @@ const IdentityServerForm = React.memo(props => {
 
   const handleExternalJsChange = React.useCallback(evt => {
     const { checked: externalJsChecked } = evt.target
-    const { setValues, state } = formRef.current
+    const { setValues, values } = formRef.current
 
     setExternaljs(externalJsChecked)
 
-    const values = {
-      ...state.values,
-      _external_js: externalJsChecked,
-    }
-
-    setValues(validationSchema.cast(values))
+    setValues(validationSchema.cast({ ...values, _external_js: externalJsChecked }))
   }, [])
 
   const onFormSubmit = React.useCallback(
@@ -92,7 +87,7 @@ const IdentityServerForm = React.memo(props => {
       setError('')
       try {
         await onSubmit(updatedValues)
-        resetForm(castedValues)
+        resetForm({ values: castedValues })
         onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)
@@ -115,8 +110,8 @@ const IdentityServerForm = React.memo(props => {
   const { enabled: asEnabled } = selectAsConfig()
   const { enabled: nsEnabled } = selectNsConfig()
 
+  const lorawanVersion = parseLorawanMacVersion(device.lorawan_version)
   const isOTAA = isDeviceOTAA(device)
-  const isNewLorawanVersion = parseLorawanMacVersion(device.lorawan_version) >= 110
   const hasJoinEUI = Boolean(device.ids.join_eui)
   const hasDevEUI = Boolean(device.ids.dev_eui)
 
@@ -127,9 +122,19 @@ const IdentityServerForm = React.memo(props => {
 
   let joinServerAddressPlaceholder = sharedMessages.addressPlaceholder
   if (isOTAA && externalJs) {
-    joinServerAddressPlaceholder = m.external
+    joinServerAddressPlaceholder = sharedMessages.external
   } else if (!isOTAA) {
     joinServerAddressPlaceholder = sharedMessages.empty
+  }
+
+  let joinEUITitle = sharedMessages.appEUIJoinEUI
+  let joinEUIDescription
+  if (lorawanVersion >= 100 && lorawanVersion < 104) {
+    joinEUITitle = sharedMessages.appEUI
+    joinEUIDescription = sharedMessages.appEUIDescription
+  } else if (lorawanVersion >= 104) {
+    joinEUITitle = sharedMessages.joinEUI
+    joinEUIDescription = sharedMessages.joinEUIDescription
   }
 
   return (
@@ -144,20 +149,20 @@ const IdentityServerForm = React.memo(props => {
       <Form.Field
         title={sharedMessages.devID}
         name="ids.device_id"
-        placeholder={m.deviceIdPlaceholder}
-        description={m.deviceIdDescription}
+        placeholder={sharedMessages.deviceIdPlaceholder}
+        description={sharedMessages.deviceIdDescription}
         required
         disabled
         component={Input}
       />
       {hasJoinEUI && (
         <Form.Field
-          title={isNewLorawanVersion ? sharedMessages.joinEUI : sharedMessages.appEUI}
+          title={joinEUITitle}
           name="ids.join_eui"
           type="byte"
           min={8}
           max={8}
-          description={isNewLorawanVersion ? m.joinEUIDescription : m.appEUIDescription}
+          description={joinEUIDescription}
           required
           disabled
           component={Input}
@@ -170,7 +175,7 @@ const IdentityServerForm = React.memo(props => {
           type="byte"
           min={8}
           max={8}
-          description={m.deviceEUIDescription}
+          description={sharedMessages.deviceEUIDescription}
           required
           disabled
           component={Input}
@@ -179,15 +184,15 @@ const IdentityServerForm = React.memo(props => {
       <Form.Field
         title={sharedMessages.devName}
         name="name"
-        placeholder={m.deviceNamePlaceholder}
-        description={m.deviceNameDescription}
+        placeholder={sharedMessages.deviceNamePlaceholder}
+        description={sharedMessages.deviceNameDescription}
         component={Input}
       />
       <Form.Field
         title={sharedMessages.devDesc}
         name="description"
         type="textarea"
-        description={m.deviceDescDescription}
+        description={sharedMessages.deviceDescDescription}
         component={Input}
       />
       <Form.Field
@@ -205,8 +210,7 @@ const IdentityServerForm = React.memo(props => {
       {!hideExternalJs && (
         <>
           <Form.Field
-            title={m.externalJoinServer}
-            description={m.externalJoinServerDescription}
+            title={sharedMessages.externalJoinServer}
             name="_external_js"
             onChange={handleExternalJsChange}
             component={Checkbox}

@@ -19,3 +19,11 @@ import "net/http"
 
 // MiddlewareFunc is a function that acts as middleware for http Handlers.
 type MiddlewareFunc func(next http.Handler) http.Handler
+
+// Chain returns a http.Handler that chains the middleware onion-style around the handler.
+func Chain(middlewares []MiddlewareFunc, handler http.Handler) http.Handler {
+	for i := len(middlewares) - 1; i >= 0; i-- {
+		handler = middlewares[i](handler)
+	}
+	return handler
+}

@@ -52,6 +52,8 @@ import {
   selectSelectedDevice,
   selectDeviceFetching,
   selectDeviceError,
+  selectDeviceUplinkFrameCount,
+  selectDeviceLastSeen,
 } from '@console/store/selectors/devices'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
@@ -67,6 +69,8 @@ import style from './device.styl'
       devId,
       appId,
       device,
+      deviceUplinkFrameCount: selectDeviceUplinkFrameCount(state, appId, devId),
+      deviceLastSeen: selectDeviceLastSeen(state, appId, devId),
       mayReadKeys: checkFromState(mayReadApplicationDeviceKeys, state),
       mayScheduleDownlinks: checkFromState(mayScheduleDownlinks, state),
       fetching: selectDeviceFetching(state),
@@ -103,6 +107,8 @@ import style from './device.styl'
       'application_server_kek_label',
       'network_server_kek_label',
       'claim_authentication_code',
+      'recent_uplinks',
+      'recent_downlinks',
     ]
 
     if (mayReadKeys) {
@@ -127,6 +133,8 @@ export default class Device extends React.Component {
   static propTypes = {
     devId: PropTypes.string.isRequired,
     device: PropTypes.device.isRequired,
+    deviceLastSeen: PropTypes.string,
+    deviceUplinkFrameCount: PropTypes.number,
     env: PropTypes.env,
     location: PropTypes.location.isRequired,
     match: PropTypes.match.isRequired,
@@ -135,6 +143,8 @@ export default class Device extends React.Component {
   }
 
   static defaultProps = {
+    deviceLastSeen: undefined,
+    deviceUplinkFrameCount: undefined,
     env: undefined,
   }
 
@@ -159,6 +169,8 @@ export default class Device extends React.Component {
         root_keys,
         application_server_address,
       },
+      deviceUplinkFrameCount,
+      deviceLastSeen,
       env: { siteName },
       mayScheduleDownlinks,
     } = this.props
@@ -213,7 +225,13 @@ export default class Device extends React.Component {
     return (
       <React.Fragment>
         <IntlHelmet titleTemplate={`%s - ${name || devId} - ${siteName}`} />
-        <EntityTitleSection.Device deviceId={devId} deviceName={name} description={description}>
+        <EntityTitleSection.Device
+          deviceId={devId}
+          deviceName={name}
+          description={description}
+          lastSeen={deviceLastSeen}
+          uplinkFrameCount={deviceUplinkFrameCount}
+        >
           <Tabs className={style.tabs} narrow tabs={tabs} />
         </EntityTitleSection.Device>
         <hr className={style.rule} />

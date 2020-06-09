@@ -33,10 +33,10 @@ class ApiKeyForm extends React.Component {
     try {
       const result = await onSubmit(values)
 
-      resetForm(values)
+      resetForm({ values })
       await onSubmitSuccess(result)
     } catch (error) {
-      resetForm(values)
+      resetForm({ values })
 
       await this.setState({ error })
       await onSubmitFailure(error)

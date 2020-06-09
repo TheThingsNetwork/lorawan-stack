@@ -298,7 +298,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 			logger.WithError(err).Warn("Failed to handle Tx acknowledgement")
 		}
 		if rtt != nil {
-			state.io.RecordRTT(*rtt)
+			state.io.RecordRTT(*rtt, packet.ReceivedAt)
 		}
 		// TODO: Send event to NS (https://github.com/TheThingsNetwork/lorawan-stack/issues/76)
 	}
@@ -419,17 +419,25 @@ func (s *srv) gc() {
 			return
 		case <-connectionsTicker.C:
 			s.connections.Range(func(k, v interface{}) bool {
+				logger := logger.WithField("gateway_eui", k.(types.EUI64))
 				state := v.(*state)
-				lastSeenPull := time.Unix(0, atomic.LoadInt64(&state.lastSeenPull))
-				if time.Since(lastSeenPull) > s.config.ConnectionExpires {
-					lastSeenPush := time.Unix(0, atomic.LoadInt64(&state.lastSeenPush))
-					if time.Since(lastSeenPush) > s.config.ConnectionExpires {
-						select {
-						case <-state.ioWait:
-							logger.WithField("gateway_eui", k.(types.EUI64)).Debug("Connection expired")
+				select {
+				case <-state.ioWait:
+				default:
+					return true
+				}
+				select {
+				case <-state.io.Context().Done():
+					logger.Debug("Connection context done")
+					s.connections.Delete(k)
+				default:
+					lastSeenPull := time.Unix(0, atomic.LoadInt64(&state.lastSeenPull))
+					if time.Since(lastSeenPull) > s.config.ConnectionExpires {
+						lastSeenPush := time.Unix(0, atomic.LoadInt64(&state.lastSeenPush))
+						if time.Since(lastSeenPush) > s.config.ConnectionExpires {
+							logger.Debug("Connection expired")
 							s.connections.Delete(k)
 							state.io.Disconnect(errConnectionExpired)
-						default:
 						}
 					}
 				}

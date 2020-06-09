@@ -1337,7 +1337,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			"spreading_factor", dr.LoRa.GetSpreadingFactor(),
 		))
 	default:
-		return nil, errDataRateNotFound
+		return nil, errDataRateNotFound.New()
 	}
 	ctx = log.NewContext(ctx, logger)
 

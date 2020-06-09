@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Setting custom gateway attributes in the console
+- Metrics for log messages, counted per level and namespace.
+- Allow suppressing logs on HTTP requests for user-defined paths (see `--http.log-ignore-paths` option).
+- Redux state and actions reporting to Sentry
+- Serving frontend sourcemaps in production
+- Redux state and actions reporting to Sentry.
+- Serving frontend sourcemaps in production.
 - Frequency plan documentation.
 
 ### Changed
@@ -20,32 +25,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Clearing end device events list in the Console.
-- Some views not being accessible in the OAuth app (e.g. update password).
-- `LinkADRReq` scheduling.
-- Unsetting NwkKey in Join Server.
+- Packet Broker Agent cluster ID is used as subscription group.
 
-### Security
-
-## [3.8.1] - 2020-05-11
+## [3.8.3] - 2020-06-05
 
 ### Added
 
-- Gateway Server events for uplink messages now contain end device identifiers.
+- Favicon to documentation pages.
+- Draft template for documentation.
 
 ### Changed
 
-- Troubleshooting section of `DEVELOPMENT.md`
-- Change console field labels from `MAC version` and `PHY version` to `LoRaWAN version` and `Regional Parameters version` and add descriptions
+- Late scheduling algorithm; Gateway Server now takes the 90th percentile of at least the last 5 round-trip times of the last 30 minutes into account to determine whether there's enough time to send the downlink to the gateway. This was the highest round-trip time received while the gateway was connected.
 
 ### Fixed
 
-- OAuth authorization page crashing.
-- Byte input in scheduling downlink view.
-- OAuth client token exchange and refresh issues when using TLS with a RootCA.
-- Join Server and Application Server device registries now return an error when deleting keys on `SET` operations. The operation was never supported and caused an error on `GET` instead.
+- Downlink scheduling to gateways which had one observed round-trip time that was higher than the available time to schedule. In some occassions, this broke downlink at some point while the gateway was connected.
 
-## [3.8.0] - 2020-05-06
+## [3.8.2] - 2020-06-03
 
 ### Added
 
@@ -66,6 +63,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgrading guide in docs.
 - Glossary.
 - Event details in the Console traffic view.
+- Gateway Server events for uplink messages now contain end device identifiers.
+- Setting custom gateway attributes in the Console.
+- Pub/Sub documentation.
+- Return informative well-known errors for standard network and context errors.
+- Error notification in list views in the Console.
+- Latest "last seen" info and uplink frame counts for end devices in the Console.
+- Latest "last seen" info for applications in the Console.
 
 ### Changed
 
@@ -81,6 +85,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Network Server will only attempt to schedule in a ping slot or RXC window after RX2 has passed.
 - Network Server will schedule all time-bound network-initiated downlinks at most RX1 delay ahead of time.
 - Network Server now uses its own internal clock in `DeviceTimeAns`.
+- Troubleshooting section of `DEVELOPMENT.md`
+- Change console field labels from `MAC version` and `PHY version` to `LoRaWAN version` and `Regional Parameters version` and add descriptions
 
 ### Fixed
 
@@ -89,6 +95,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Network Server now properly handles FPort 0 data uplinks carrying FOpts.
 - Data rate 4 in version `1.0.2-a` of AU915.
 - Incorrect `TxOffset` values used by Network Server in some bands.
+- OAuth authorization page crashing.
+- Byte input in scheduling downlink view.
+- OAuth client token exchange and refresh issues when using TLS with a RootCA.
+- Join Server and Application Server device registries now return an error when deleting keys on `SET` operations. The operation was never supported and caused an error on `GET` instead.
+- Clearing end device events list in the Console.
+- Some views not being accessible in the OAuth app (e.g. update password).
+- `LinkADRReq` scheduling.
+- Unsetting NwkKey in Join Server.
+- CSRF token validation issues preventing login and logout in some circumstances.
+- Typo in Application Server configuration documentation (webhook downlink).
+- Unset fields via CLI on Join Server, i.e. `--unset root-keys.nwk-key`.
+- Reconnecting UDP gateways that were disconnected by a new gateway connection.
+- ADR in US915-like bands.
 
 ## [3.7.2] - 2020-04-22
 
@@ -847,9 +866,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.1...HEAD
-[3.8.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.0...v3.8.1
-[3.8.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.2...v3.8.0
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.3...HEAD
+[3.8.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.2...v3.8.3
+[3.8.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.2...v3.8.2
 [3.7.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.0...v3.7.2
 [3.7.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.0...v3.7.0
 [3.6.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.2...v3.6.3

@@ -209,4 +209,24 @@ storiesOf('Button', module)
       <Button icon="check" busy />
     </div>
   ))
+  .add('Custom content', () => (
+    <div>
+      <Button>
+        Custom content
+        <Button.Icon icon="keyboard_arrow_right" type="right" />
+      </Button>
+      <br />
+      <br />
+      <Button disabled>
+        Custom content
+        <Button.Icon icon="keyboard_arrow_right" type="right" />
+      </Button>
+      <br />
+      <br />
+      <Button busy>
+        Custom content
+        <Button.Icon icon="keyboard_arrow_right" type="right" />
+      </Button>
+    </div>
+  ))
   .add('Toggle', () => <Example />)

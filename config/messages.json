@@ -1943,15 +1943,6 @@
       "file": "format.go"
     }
   },
-  "error:pkg/applicationserver/io/web:http": {
-    "translations": {
-      "en": "HTTP error: {message}"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/web",
-      "file": "webhooks.go"
-    }
-  },
   "error:pkg/applicationserver/io/web:parse_file": {
     "translations": {
       "en": "could not parse file"
@@ -3122,6 +3113,69 @@
       "file": "mac.go"
     }
   },
+  "error:pkg/errors:context_canceled": {
+    "translations": {
+      "en": "context canceled"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "conversion.go"
+    }
+  },
+  "error:pkg/errors:context_deadline_exceeded": {
+    "translations": {
+      "en": "context deadline exceeded"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "conversion.go"
+    }
+  },
+  "error:pkg/errors:net_addr": {
+    "translations": {
+      "en": "{message}"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "conversion.go"
+    }
+  },
+  "error:pkg/errors:net_dns": {
+    "translations": {
+      "en": "{message}"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "conversion.go"
+    }
+  },
+  "error:pkg/errors:net_invalid_addr": {
+    "translations": {
+      "en": "{message}"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "conversion.go"
+    }
+  },
+  "error:pkg/errors:net_operation": {
+    "translations": {
+      "en": "{message}"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "conversion.go"
+    }
+  },
+  "error:pkg/errors:net_unknown_network": {
+    "translations": {
+      "en": "{message}"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "conversion.go"
+    }
+  },
   "error:pkg/errors:odd_kv": {
     "translations": {
       "en": "Odd number of key-value elements"
@@ -3302,13 +3356,13 @@
       "file": "frequencyplans.go"
     }
   },
-  "error:pkg/gatewayconfigurationserver/gcsv2:unauthenticated": {
+  "error:pkg/gatewayconfigurationserver/v2:unauthenticated": {
     "translations": {
-      "en": "call was not authenticated"
+      "en": "unauthenticated"
     },
     "description": {
-      "package": "pkg/gatewayconfigurationserver/gcsv2",
-      "file": "get_gateway.go"
+      "package": "pkg/gatewayconfigurationserver/v2",
+      "file": "http_gateway.go"
     }
   },
   "error:pkg/gatewayserver/io/basicstationlns/messages:data_rate": {
@@ -5510,6 +5564,15 @@
   "error:pkg/networkserver:data_rate": {
     "translations": {
       "en": "invalid data rate"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:data_rate_index_not_found": {
+    "translations": {
+      "en": "data rate with index `{index}` not found"
     },
     "description": {
       "package": "pkg/networkserver",

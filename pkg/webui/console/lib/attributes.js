@@ -37,11 +37,14 @@ export const mapAttributesToFormValue = attributesType =>
     )) ||
   []
 
-export const attributeValidCheck = attributes =>
-  attributes === undefined ||
-  (attributes instanceof Array &&
-    (attributes.length === 0 ||
-      attributes.every(attribute => attribute.key !== '' && attribute.value !== '')))
+export const attributeValidCheck = attributes => {
+  return (
+    attributes === undefined ||
+    (attributes instanceof Array &&
+      (attributes.length === 0 ||
+        attributes.every(attribute => Boolean(attribute.key) && Boolean(attribute.value))))
+  )
+}
 
 export const attributeTooShortCheck = attributes =>
   attributes === undefined ||
