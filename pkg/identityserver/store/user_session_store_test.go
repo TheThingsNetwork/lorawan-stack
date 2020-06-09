@@ -57,11 +57,13 @@ func TestUserSessionStore(t *testing.T) {
 
 		created, err := store.CreateSession(ctx, &ttnpb.UserSession{
 			UserIdentifiers: userIDs,
+			SessionSecret:   "123412341234123412341234",
 		})
 
 		a.So(err, should.BeNil)
 		if a.So(created, should.NotBeNil) {
 			a.So(created.SessionID, should.NotBeEmpty)
+			a.So(created.SessionSecret, should.Equal, "123412341234123412341234")
 			a.So(created.CreatedAt, should.NotBeZeroValue)
 			a.So(created.UpdatedAt, should.NotBeZeroValue)
 			a.So(created.ExpiresAt, should.BeNil)
@@ -74,6 +76,15 @@ func TestUserSessionStore(t *testing.T) {
 		}
 
 		got, err := store.GetSession(ctx, &userIDs, created.SessionID)
+
+		a.So(err, should.BeNil)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
+			a.So(got.ExpiresAt, should.BeNil)
+		}
+
+		got, err = store.GetSessionByID(ctx, created.SessionID)
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -136,6 +147,12 @@ func TestUserSessionStore(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		_, err = store.GetSession(ctx, &userIDs, created.SessionID)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
+
+		_, err = store.GetSessionByID(ctx, created.SessionID)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)

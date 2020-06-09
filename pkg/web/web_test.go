@@ -61,11 +61,11 @@ func TestGroup(t *testing.T) {
 func TestIsZeros(t *testing.T) {
 	a := assertions.New(t)
 	{
-		res := IsZeros([]byte{0, 0, 0, 0, 0})
+		res := isZeros([]byte{0, 0, 0, 0, 0})
 		a.So(res, should.BeTrue)
 	}
 	{
-		res := IsZeros([]byte{0, 0, 0, 1, 0})
+		res := isZeros([]byte{0, 0, 0, 1, 0})
 		a.So(res, should.BeFalse)
 	}
 }
