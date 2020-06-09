@@ -1,0 +1,122 @@
+- id: EU_863_870
+  name: Europe 863-870 MHz (SF12 for RX2)
+  description: Default frequency plan for Europe
+  base-frequency: 868
+  country-codes: [al, ad, ao, at, bh, be, ba, bw, bg, cg, hr, cy, cz, dk, ee, sz, fi, fr, gr, hu, is, ie, it, lv, ls, li, lt, lu, mg, mw, mt, mu, md, me, mz, na, nl, mk, ph, pl, pt, ro, ru, sa, rs, sc, sk, si, za, es, se, ch, tz, tr, ae, gb, va, zm, zw]
+  file: EU_863_870.yml
+
+- id: EU_863_870_TTN
+  name: Europe 863-870 MHz (SF9 for RX2 - recommended)
+  description: TTN Community Network frequency plan for Europe, using SF9 for RX2
+  base-frequency: 868
+  base-id: EU_863_870
+  country-codes: [al, ad, ao, at, bh, be, ba, bw, bg, cg, hr, cy, cz, dk, ee, sz, fi, fr, gr, hu, is, ie, it, lv, ls, li, lt, lu, mg, mw, mt, mu, md, me, mz, na, nl, mk, ph, pl, pt, ro, ru, sa, rs, sc, sk, si, za, es, se, ch, tz, tr, ae, gb, va, zm, zw]
+  file: EU_863_870_TTN.yml
+
+- id: US_902_928_FSB_1
+  name: United States 902-928 MHz, FSB 1
+  description: Default frequency plan for the United States and Canada, using sub-band 1
+  base-frequency: 915
+  country-codes: [bo, ca, co, cr, do, ec, gy, mx, pa, py, pe, pr, sr, us, uy, ve]
+  file: US_902_928_FSB_1.yml
+
+- id: US_902_928_FSB_2
+  name: United States 902-928 MHz, FSB 2 (used by TTN)
+  description: TTN Community Network frequency plan for the United States and Canada, using sub-band 2
+  base-frequency: 915
+  country-codes: [bo, ca, co, cr, do, ec, gy, mx, pa, py, pe, pr, sr, us, uy, ve]
+  file: US_902_928_FSB_2.yml
+
+- id: AU_915_928_FSB_1
+  name: Australia 915-928 MHz, FSB 1
+  description: Default frequency plan for Australia, using sub-band 1
+  base-frequency: 915
+  country-codes: [br, cl, nz, ar, au]
+  file: AU_915_928_FSB_1.yml
+
+- id: AU_915_928_FSB_2
+  name: Australia 915-928 MHz, FSB 2 (used by TTN)
+  description: TTN Community Network frequency plan for Australia, using sub-band 2
+  base-frequency: 915
+  country-codes: [br, cl, nz, ar, au]
+  file: AU_915_928_FSB_2.yml
+
+- id: AU_915_928_FSB_6
+  name: Australia 915-928 MHz, FSB 6
+  description: Frequency plan for Australia, using sub-band 6, which overlaps with Asia 923-925 MHz
+  base-frequency: 915
+  country-codes: [br, cl, nz, ar, au]
+  file: AU_915_928_FSB_6.yml
+
+- id: CN_470_510_FSB_11
+  name: China 470-510 MHz, FSB 11
+  description: TTN Community Network frequency plan for China, using sub-band 11
+  base-frequency: 470
+  country-codes: [cn]
+  file: CN_470_510_FSB_11.yml
+
+- id: AS_920_923
+  name: Asia 920-923 MHz
+  description: TTN Community Network frequency plan for Asian countries, using frequencies ≤ 923 MHz
+  base-frequency: 915
+  country-codes: [my, sg]
+  file: AS_920_923.yml
+
+- id: AS_920_923_LBT
+  name: Asia 920-923 MHz with LBT
+  description: TTN Community Network frequency plan for Asian countries, using frequencies ≤ 923 MHz with listen-before-talk
+  base-frequency: 915
+  base-id: AS_920_923
+  country-codes: [jp, my, sg]
+  file: lbt_80_over_128.yml
+
+- id: AS_923_925
+  name: Asia 923-925 MHz
+  description: TTN Community Network frequency plan for Asian countries, using frequencies ≥ 923 MHz
+  base-frequency: 915
+  country-codes: [bn, kh, hk, id, la, tw, th, vn]
+  file: AS_923_925.yml
+
+- id: AS_923_925_LBT
+  name: Asia 923-925 MHz with LBT
+  description: TTN Community Network frequency plan for Asian countries, using frequencies ≥ 923 MHz with listen-before-talk
+  base-frequency: 915
+  base-id: AS_923_925
+  country-codes: [bn, kh, hk, id, la, tw, th, vn]
+  file: lbt_80_over_128.yml
+
+- id: AS_923_925_TTN_AU
+  name: Asia 923-925 MHz (used by TTN Australia)
+  description: TTN Community Network frequency plan for Asia 923-925 MHz in Australia
+  base-frequency: 915
+  base-id: AS_923_925
+  country-codes: [au]
+  file: AS_923_925_TTN_AU.yml
+
+- id: KR_920_923_TTN
+  name: South Korea 920-923 MHz
+  description: TTN Community Network frequency plan for South Korea
+  base-frequency: 915
+  country-codes: [kr]
+  file: KR_920_923_TTN.yml
+
+- id: IN_865_867
+  name: India 865-867 MHz
+  description: Default frequency plan for India
+  base-frequency: 868
+  country-codes: [in]
+  file: IN_865_867.yml
+
+- id: RU_864_870_TTN
+  name: Russia 864-870 MHz
+  description: TTN Community Network frequency plan for Russia
+  base-frequency: 868
+  country-codes: [ru]
+  file: RU_864_870_TTN.yml
+
+- id: ISM_2400_3CH_DRAFT2
+  name: LoRa 2.4 GHz with 3 channels draft 2
+  description: LoRa 2.4 GHz plan with 3 channels for global use draft 2
+  base-frequency: 2450
+  country-codes: [af, ax, al, dz, as, ad, ao, ai, aq, ag, ar, am, aw, au, at, az, bs, bh, bd, bb, by, be, bz, bj, bm, bt, bo, ba, bw, bv, br, io, bn, bg, bf, bi, kh, cm, ca, cv, ky, cf, td, cl, cn, cx, cc, co, km, cg, cd, ck, cr, ci, hr, cu, cy, cz, dk, dj, dm, do, ec, eg, sv, gq, er, ee, et, fk, fo, fj, fi, fr, gf, pf, tf, ga, gm, ge, de, gh, gi, gr, gl, gd, gp, gu, gt, gg, gn, gw, gy, ht, hm, va, hn, hk, hu, is, in, id, ir, iq, ie, im, il, it, jm, jp, je, jo, kz, ke, ki, kp, kr, kw, kg, la, lv, lb, ls, lr, ly, li, lt, lu, mo, mk, mg, mw, my, mv, ml, mt, mh, mq, mr, mu, yt, mx, fm, md, mc, mn, me, ms, ma, mz, mm, na, nr, np, nl, an, nc, nz, ni, ne, ng, nu, nf, mp, no, om, pk, pw, ps, pa, pg, py, pe, ph, pn, pl, pt, pr, qa, re, ro, ru, rw, bl, sh, kn, lc, mf, pm, vc, ws, sm, st, sa, sn, rs, sc, sl, sg, sk, si, sb, so, za, gs, es, lk, sd, sr, sj, sz, se, ch, sy, tw, tj, tz, th, tl, tg, tk, to, tt, tn, tr, tm, tc, tv, ug, ua, ae, gb, us, um, uy, uz, vu, ve, vn, vg, vi, wf, eh, ye, zm, zw]
+  file: ISM_2400_3CH_DRAFT2.yml
