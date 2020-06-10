@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/gogo/protobuf/types"
+	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -338,4 +339,39 @@ func deleteEndDevice(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) err
 	}
 
 	return nil
+}
+
+func hasUpdateDeviceLocationFlags(flags *pflag.FlagSet) bool {
+	return flags.Changed("location.latitude") ||
+		flags.Changed("location.longitude") ||
+		flags.Changed("location.altitude") ||
+		flags.Changed("location.accuracy")
+}
+
+func updateDeviceLocation(device *ttnpb.EndDevice, flags *pflag.FlagSet) {
+	if device.Locations == nil {
+		device.Locations = make(map[string]*ttnpb.Location)
+	}
+	loc, ok := device.Locations["user"]
+	if !ok {
+		loc = &ttnpb.Location{}
+	}
+	loc.Source = ttnpb.SOURCE_REGISTRY
+	if flags.Changed("location.longitude") {
+		longitude, _ := flags.GetFloat64("location.longitude")
+		loc.Longitude = longitude
+	}
+	if flags.Changed("location.latitude") {
+		latitude, _ := flags.GetFloat64("location.latitude")
+		loc.Latitude = latitude
+	}
+	if flags.Changed("location.altitude") {
+		altitude, _ := flags.GetInt32("location.altitude")
+		loc.Altitude = altitude
+	}
+	if flags.Changed("location.accuracy") {
+		accuracy, _ := flags.GetInt32("location.accuracy")
+		loc.Accuracy = accuracy
+	}
+	device.Locations["user"] = loc
 }
