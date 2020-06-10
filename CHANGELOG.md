@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Admins now receive emails about requested user accounts that need approval.
 - Support for synchronizing gateway clocks via uplink tokens. UDP gateways may not connect to the same Gateway Server instance.
 - Consistent command aliases for CLI commands.
+- Laird gateway documentation.
 
 ### Changed
 
