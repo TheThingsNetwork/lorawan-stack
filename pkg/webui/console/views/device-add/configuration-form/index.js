@@ -177,14 +177,6 @@ const ConfigurationForm = React.memo(props => {
     >
       <Message component="h4" content={messages.preparation} />
       <Form.Field
-        required
-        autoFocus
-        title={sharedMessages.macVersion}
-        name="lorawan_version"
-        component={Select}
-        options={LORAWAN_VERSIONS}
-      />
-      <Form.Field
         title={sharedMessages.activationMode}
         name="_activation_mode"
         component={Radio.Group}

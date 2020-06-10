@@ -174,7 +174,7 @@ const DeviceWizard = React.memo(props => {
 DeviceWizard.propTypes = {
   asConfig: PropTypes.stackComponent.isRequired,
   configuration: PropTypes.shape({
-    lorawan_version: PropTypes.string.isRequired,
+    lorawan_version: PropTypes.string,
     supports_join: PropTypes.bool,
     multicast: PropTypes.bool,
     application_server_address: PropTypes.string,

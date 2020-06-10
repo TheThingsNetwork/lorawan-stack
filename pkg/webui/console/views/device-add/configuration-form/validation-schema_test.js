@@ -104,7 +104,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       let validatedValue = validate(schema)
 
       expect(validatedValue).toBeDefined()
-      expect(validatedValue.network_server_address).toBe(testHost)
+      expect(validatedValue.network_server_address).toBeUndefined()
 
       schema._activation_mode = ACTIVATION_MODES.ABP
 
@@ -156,6 +156,35 @@ describe('<ConfigurationForm /> validation schema', () => {
 
       expect(validatedValue).toBeDefined()
       expect(validatedValue.application_server_address).toBe(testHost)
+    })
+
+    it('should process `lorawan_version`', () => {
+      schema._activation_mode = ACTIVATION_MODES.NONE
+
+      let validatedValue = validate(schema)
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBeUndefined()
+
+      schema._activation_mode = ACTIVATION_MODES.ABP
+
+      validatedValue = validate(schema)
+
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBe(schema.lorawan_version)
+
+      schema._activation_mode = ACTIVATION_MODES.MULTICAST
+
+      validatedValue = validate(schema)
+
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBe(schema.lorawan_version)
+
+      schema._activation_mode = ACTIVATION_MODES.OTAA
+
+      validatedValue = validate(schema)
+
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBe(schema.lorawan_version)
     })
   })
 
@@ -270,6 +299,21 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue).toBeDefined()
       expect(validatedValue.application_server_address).toBe(testHost)
     })
+
+    it('should process `lorawan_version`', () => {
+      schema._activation_mode = ACTIVATION_MODES.NONE
+
+      let validatedValue = validate(schema)
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBeUndefined()
+
+      schema._activation_mode = ACTIVATION_MODES.OTAA
+
+      validatedValue = validate(schema)
+
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBe(schema.lorawan_version)
+    })
   })
 
   describe('has NS and AS (no JS)', () => {
@@ -369,7 +413,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       let validatedValue = validate(schema)
 
       expect(validatedValue).toBeDefined()
-      expect(validatedValue.network_server_address).toBe(testHost)
+      expect(validatedValue.network_server_address).toBeUndefined()
 
       schema._activation_mode = ACTIVATION_MODES.ABP
 
@@ -407,6 +451,28 @@ describe('<ConfigurationForm /> validation schema', () => {
 
       expect(validatedValue).toBeDefined()
       expect(validatedValue.application_server_address).toBe(testHost)
+    })
+
+    it('should process `lorawan_version`', () => {
+      schema._activation_mode = ACTIVATION_MODES.NONE
+
+      let validatedValue = validate(schema)
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBeUndefined()
+
+      schema._activation_mode = ACTIVATION_MODES.ABP
+
+      validatedValue = validate(schema)
+
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBe(schema.lorawan_version)
+
+      schema._activation_mode = ACTIVATION_MODES.MULTICAST
+
+      validatedValue = validate(schema)
+
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBe(schema.lorawan_version)
     })
   })
 
@@ -510,6 +576,14 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue).toBeDefined()
       expect(validatedValue.application_server_address).toBeUndefined()
     })
+
+    it('should strip `lorawan_version`', () => {
+      schema._activation_mode = ACTIVATION_MODES.NONE
+
+      const validatedValue = validate(schema)
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBeUndefined()
+    })
   })
 
   describe('has NS and JS (no AS)', () => {
@@ -604,7 +678,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       let validatedValue = validate(schema)
 
       expect(validatedValue).toBeDefined()
-      expect(validatedValue.network_server_address).toBe(testHost)
+      expect(validatedValue.network_server_address).toBeUndefined()
 
       schema._activation_mode = ACTIVATION_MODES.ABP
 
@@ -642,6 +716,35 @@ describe('<ConfigurationForm /> validation schema', () => {
 
       expect(validatedValue).toBeDefined()
       expect(validatedValue.application_server_address).toBeUndefined()
+    })
+
+    it('should process `lorawan_version`', () => {
+      schema._activation_mode = ACTIVATION_MODES.NONE
+
+      let validatedValue = validate(schema)
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBeUndefined()
+
+      schema._activation_mode = ACTIVATION_MODES.OTAA
+
+      validatedValue = validate(schema)
+
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBe(schema.lorawan_version)
+
+      schema._activation_mode = ACTIVATION_MODES.ABP
+
+      validatedValue = validate(schema)
+
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBe(schema.lorawan_version)
+
+      schema._activation_mode = ACTIVATION_MODES.MULTICAST
+
+      validatedValue = validate(schema)
+
+      expect(validatedValue).toBeDefined()
+      expect(validatedValue.lorawan_version).toBe(schema.lorawan_version)
     })
   })
 

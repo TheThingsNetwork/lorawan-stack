@@ -79,7 +79,13 @@ const validationSchema = Yup.object()
           .default(getHostFromUrl(jsUrl))
       },
     ),
-    lorawan_version: Yup.string().required(sharedMessages.validateRequired),
+    lorawan_version: Yup.string().when(['_activation_mode'], (activationMode, schema) => {
+      if (activationMode === ACTIVATION_MODES.NONE) {
+        return schema.strip()
+      }
+
+      return schema.required(sharedMessages.validateRequired)
+    }),
     supports_join: Yup.boolean()
       .transform(() => undefined)
       .when(['$jsEnabled', '_activation_mode'], (jsEnabled, activationMode, schema) => {
