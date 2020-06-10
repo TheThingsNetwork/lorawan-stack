@@ -37,7 +37,7 @@ const maxEndDevicePictureStoredDimensions = 1024
 var profilePictureDimensions = []int{64, 128, 256, 512}
 var endDevicePictureDimensions = []int{64, 128, 256, 512}
 
-var pictureRand = rand.New(randutil.NewLockedSource(rand.NewSource(time.Now().UnixNano())))
+var pictureRand = randutil.NewLockedRand(rand.NewSource(time.Now().UnixNano()))
 
 func fillGravatar(ctx context.Context, usr *ttnpb.User) (err error) {
 	if usr == nil || usr.ProfilePicture != nil || usr.PrimaryEmailAddress == "" {
