@@ -528,7 +528,7 @@ type File struct {
 	SCtr      uint8   `json:"sctr"`
 	Timestamp float64 `json:"timestamp"`
 	Port      uint8   `json:"port"`
-	Data      Hex     `json:"string"`
+	Data      Hex     `json:"data"`
 	Hash      Hex     `json:"hash"`
 	EncMode   bool    `json:"encmode"`
 	Message   *string `json:"message,omitempty"`
