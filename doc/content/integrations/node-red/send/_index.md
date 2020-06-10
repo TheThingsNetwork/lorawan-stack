@@ -10,25 +10,25 @@ Doing this schedules downlink messages to be sent to your end device. This secti
 
 ## Configure MQTT Out Node
 
-1. Place the **mqtt out** node on the dashboard. 
+Place the **mqtt out** node on the dashboard. 
 
-2. Configure the **Server** options with the same settings as in the [Receive Events and Messages]({{< ref "/integrations/node-red#receive-events-and-messages" >}}) section.
+Configure the **Server** options with the same settings as in the [Receive Events and Messages]({{< ref "/integrations/node-red#receive-events-and-messages" >}}) section.
 
-3. Set **Topic** to `v3/{application_id}/devices/{device_id}/down/push` to schedule downlink messages (as stated in [MQTT Server]({{< ref "/integrations/mqtt" >}}) guide). 
+Set **Topic** to `v3/{application_id}/devices/{device_id}/down/push` to schedule downlink messages (as stated in [MQTT Server]({{< ref "/integrations/mqtt" >}}) guide). 
 
-4. Choose a **QoS** from listed options and state whether you want the MQTT Server to retain messages. 
+Choose a **QoS** from listed options and state whether you want the MQTT Server to retain messages. 
 
 {{< figure src="mqtt_out_node_properties.png" alt="mqtt out node properties" >}}
 
 ## Configure Inject Node
 
-1. Place the **inject** node on the dashboard. Double-click on the node to configure its properties. 
+Place the **inject** node on the dashboard. Double-click on the node to configure its properties. 
 
-2. Choose **buffer** under **Payload** and enter the payload you wish to send. 
+Choose **buffer** under **Payload** and enter the payload you wish to send. 
 
 >Note: in this example, a downlink message with hexadecimal payload `00 2A FF 00` is to be sent, so here we define the **Payload** field as a corresponding array of byte values.  
 
-3. Define the period between the automatic injections if you want them, or choose **none** for **Repeat** if you wish to inject messages manually.
+Define the period between the automatic injections if you want them, or choose **none** for **Repeat** if you wish to inject messages manually.
 
 {{< figure src="inject_node_properties.png" alt="inject node properties" >}}
 
@@ -36,7 +36,7 @@ Doing this schedules downlink messages to be sent to your end device. This secti
 
 Next, you have to configure a **function** node, which converts previously defined payload to a downlink message with Base64 encoded payload.
 
-1. Place the **function** node with the following structure on dashboard:
+Place the **function** node with the following structure on dashboard:
 
 ```bash
 return {
@@ -50,6 +50,6 @@ return {
 }
 ```
 
-2. Connect the nodes and click **Deploy**. If the setup is correct, below the **mqtt out** node **connected** status will be reported and downlink messages will begin sending to your end device.
+Connect the nodes and click **Deploy**. If the setup is correct, below the **mqtt out** node **connected** status will be reported and downlink messages will begin sending to your end device.
 
 {{< figure src="send_downlink_flow.png" alt="send downlink flow" >}}

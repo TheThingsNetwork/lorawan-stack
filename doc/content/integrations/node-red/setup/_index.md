@@ -22,9 +22,7 @@ On the left side, you can see various types of nodes that can be used in order t
 
 {{% tts %}} Console provides the connection information needed for completing this integration. 
 
-1. In the Console, click **Applications** and choose the application you want to connect to Node-RED. 
-
-2. Click **Integrations** in the left hand panel of the Console, and the **MQTT** submenu to view the MQTT Server info:
+In the Console, click **Applications** and choose the application you want to connect to Node-RED. Click **Integrations** in the left hand panel of the Console, and the **MQTT** submenu to view the MQTT Server info:
 
 {{< figure src="console_info.png" alt="MQTT Server connection information" >}}
 
