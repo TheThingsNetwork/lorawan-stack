@@ -41,7 +41,7 @@ const m = defineMessages({
   grpcFieldDescription: 'The address of the service to connect to',
   appFormatter: 'Use application payload formatter',
   appFormatterWarning:
-    'This option sets both uplink and downlink formatters to application defaults',
+    'This option sets both uplink and downlink formatters to application link defaults',
 })
 
 const FIELD_NAMES = {
