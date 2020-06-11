@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Redux state and actions reporting to Sentry.
 - Serving frontend sourcemaps in production.
 - Frequency plan documentation.
+- LoRa Basics Station documentation.
 
 ### Changed
 
