@@ -1,46 +1,29 @@
-{{- if .Site.Params.intercom.enabled -}}
-<div class="feedback has-vertical-space">
-  <label class="label">Was this page helpful?</label>
-  <form name="feedbackForm" class="feedback-container">
-    <div class="item">
-      <label for="0">
-      <input class="radio" type="radio" name="feedbackRadios" id="0" value="0">
+{{- if .Site.Params.feedback.enabled -}}
+<div class='feedback has-vertical-space'>
+  <label class='label'>Was this page helpful?</label>
+  <form name='feedbackForm' class='feedback-container'>
+    <div class='item'>
+      <label for='0'>
+      <input class='radio' type='radio' name='feedbackRadios' id='0' value='0'>
       <span>👍</span>
     </label>
     </div>
-    <div class="item">
-      <label for="1">
-      <input class="radio" type="radio" name="feedbackRadios" id="1" value="1">
+    <div class='item'>
+      <label for='1'>
+      <input class='radio' type='radio' name='feedbackRadios' id='1' value='1'>
       <span>👎</span>
     </label>
     </div>
   </form>
 
-  <div class="field">
-    <div class="control">
-      <input class="input" type="email" placeholder="Email address">
-    </div>
-  </div>
-
-  <div class="field">
-    <div class="control">
-      <textarea class="textarea" placeholder="Leave us a comment"></textarea>
-    </div>
-  </div>
-
-  <div class="field has-addons has-addons-centered">
-    <div class="control">
-      <button class="button is-link">Submit</button>
-    </div>
-  </div>
-
 </div>
 
 <script>
-  var rad = document.feedbackForm.feedbackRadios;
+  var radios = document.feedbackForm.feedbackRadios;
   var prev = null;
-  for (var i = 0; i < rad.length; i++) {
-      rad[i].addEventListener('change', function() {
+  for (var i = 0; i < radios.length; i++) {
+      radios[i].addEventListener('change', function() {
+
           if (this !== prev) {
               prev = this;
           }
@@ -56,14 +39,25 @@
           {{ end }}
 
           {{ if .Site.Params.feedback.enabled }}
-
           var metadata = {
             href: window.location.href,
           };
 
-          const feedback = this.value === "1" ? 'thumbs-down' : 'thumbs-up'
+          const feedback = this.value === '1' ? 'thumbs-down' : 'thumbs-up'
 
-          console.log(feedback)
+          {{ if .Site.Params.analytics.enabled }}
+          gtag('event', feedback, {
+            'event_category' : feedback,
+            'event_label' : window.location.href,
+            'value': this.value,
+          });
+          {{ end }}
+
+          {{ if .Site.Params.feedback.enabled }}
+
+          var metadata = {
+            href: window.location.href,
+          };
 
           Intercom('trackEvent', feedback, metadata);
 

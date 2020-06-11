@@ -30,4 +30,14 @@
   <meta name="twitter:title" content="{{ .Title }}" />
   <meta name="twitter:description" content="{{ $scratch.Get "description" }}" />
   <meta name="twitter:card" content="summary" />
+  {{- if .Site.Params.analytics.enabled -}}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{- .Site.Params.analytics.trackingid -}}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', '{{- .Site.Params.analytics.trackingid -}}');
+  </script>
+  {{- end }}
 </head>
