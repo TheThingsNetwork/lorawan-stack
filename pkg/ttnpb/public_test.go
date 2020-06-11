@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	. "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -26,9 +26,9 @@ import (
 func TestApplicationPublicSafe(t *testing.T) {
 	a := assertions.New(t)
 
-	a.So(((*ttnpb.Application)(nil)).PublicSafe(), should.BeNil)
+	a.So(((*Application)(nil)).PublicSafe(), should.BeNil)
 
-	src := ttnpb.NewPopulatedApplication(test.Randy, true)
+	src := NewPopulatedApplication(test.Randy, true)
 	safe := src.PublicSafe()
 
 	a.So(safe, should.NotResemble, src)
@@ -38,9 +38,9 @@ func TestApplicationPublicSafe(t *testing.T) {
 func TestClientPublicSafe(t *testing.T) {
 	a := assertions.New(t)
 
-	a.So(((*ttnpb.Client)(nil)).PublicSafe(), should.BeNil)
+	a.So(((*Client)(nil)).PublicSafe(), should.BeNil)
 
-	src := ttnpb.NewPopulatedClient(test.Randy, true)
+	src := NewPopulatedClient(test.Randy, true)
 	safe := src.PublicSafe()
 
 	a.So(safe, should.NotResemble, src)
@@ -50,9 +50,9 @@ func TestClientPublicSafe(t *testing.T) {
 func TestGatewayPublicSafe(t *testing.T) {
 	a := assertions.New(t)
 
-	a.So(((*ttnpb.Gateway)(nil)).PublicSafe(), should.BeNil)
+	a.So(((*Gateway)(nil)).PublicSafe(), should.BeNil)
 
-	src := ttnpb.NewPopulatedGateway(test.Randy, true)
+	src := NewPopulatedGateway(test.Randy, true)
 	safe := src.PublicSafe()
 
 	a.So(safe, should.NotResemble, src)
@@ -62,9 +62,9 @@ func TestGatewayPublicSafe(t *testing.T) {
 func TestOrganizationPublicSafe(t *testing.T) {
 	a := assertions.New(t)
 
-	a.So(((*ttnpb.Organization)(nil)).PublicSafe(), should.BeNil)
+	a.So(((*Organization)(nil)).PublicSafe(), should.BeNil)
 
-	src := ttnpb.NewPopulatedOrganization(test.Randy, true)
+	src := NewPopulatedOrganization(test.Randy, true)
 	safe := src.PublicSafe()
 
 	a.So(safe, should.NotResemble, src)
@@ -74,9 +74,9 @@ func TestOrganizationPublicSafe(t *testing.T) {
 func TestUserPublicSafe(t *testing.T) {
 	a := assertions.New(t)
 
-	a.So(((*ttnpb.User)(nil)).PublicSafe(), should.BeNil)
+	a.So(((*User)(nil)).PublicSafe(), should.BeNil)
 
-	src := ttnpb.NewPopulatedUser(test.Randy, true)
+	src := NewPopulatedUser(test.Randy, true)
 	safe := src.PublicSafe()
 
 	a.So(safe, should.NotResemble, src)
