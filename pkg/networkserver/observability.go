@@ -206,19 +206,19 @@ var nsMetrics = &messageMetrics{
 		},
 		[]string{messageType},
 	),
-	uplinkUniqueReceived: metrics.NewContextualCounterVec(
+	uplinkDuplicates: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
-			Name:      "uplink_unique_received_total",
-			Help:      "Total number of received unique uplinks (without duplicates)",
+			Name:      "uplink_duplicates_total",
+			Help:      "Total number of duplicate uplinks",
 		},
 		[]string{messageType},
 	),
-	uplinkForwarded: metrics.NewContextualCounterVec(
+	uplinkProcessed: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
-			Name:      "uplink_forwarded_total",
-			Help:      "Total number of forwarded uplinks",
+			Name:      "uplink_processed_total",
+			Help:      "Total number of processed uplinks",
 		},
 		[]string{messageType},
 	),
@@ -229,6 +229,14 @@ var nsMetrics = &messageMetrics{
 			Help:      "Total number of dropped uplinks",
 		},
 		[]string{messageType, "error"},
+	),
+	uplinkForwarded: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "uplink_forwarded_total",
+			Help:      "Total number of forwarded uplinks",
+		},
+		[]string{messageType},
 	),
 	uplinkGateways: metrics.NewContextualHistogramVec(
 		prometheus.HistogramOpts{
@@ -246,16 +254,18 @@ func init() {
 }
 
 type messageMetrics struct {
-	uplinkReceived       *metrics.ContextualCounterVec
-	uplinkUniqueReceived *metrics.ContextualCounterVec
-	uplinkForwarded      *metrics.ContextualCounterVec
-	uplinkDropped        *metrics.ContextualCounterVec
-	uplinkGateways       *metrics.ContextualHistogramVec
+	uplinkReceived   *metrics.ContextualCounterVec
+	uplinkDuplicates *metrics.ContextualCounterVec
+	uplinkProcessed  *metrics.ContextualCounterVec
+	uplinkForwarded  *metrics.ContextualCounterVec
+	uplinkDropped    *metrics.ContextualCounterVec
+	uplinkGateways   *metrics.ContextualHistogramVec
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.uplinkReceived.Describe(ch)
-	m.uplinkUniqueReceived.Describe(ch)
+	m.uplinkDuplicates.Describe(ch)
+	m.uplinkProcessed.Describe(ch)
 	m.uplinkForwarded.Describe(ch)
 	m.uplinkDropped.Describe(ch)
 	m.uplinkGateways.Describe(ch)
@@ -263,7 +273,8 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.uplinkReceived.Collect(ch)
-	m.uplinkUniqueReceived.Collect(ch)
+	m.uplinkDuplicates.Collect(ch)
+	m.uplinkProcessed.Collect(ch)
 	m.uplinkForwarded.Collect(ch)
 	m.uplinkDropped.Collect(ch)
 	m.uplinkGateways.Collect(ch)
@@ -273,17 +284,16 @@ func uplinkMTypeLabel(mType ttnpb.MType) string {
 	return strings.ToLower(mType.String())
 }
 
-func registerReceiveUniqueUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	nsMetrics.uplinkUniqueReceived.WithLabelValues(ctx, uplinkMTypeLabel(msg.Payload.MType)).Inc()
-}
-
 func registerReceiveUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
 	nsMetrics.uplinkReceived.WithLabelValues(ctx, uplinkMTypeLabel(msg.Payload.MType)).Inc()
 }
 
-func registerMergeMetadata(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	gtwCount, _ := rxMetadataStats(ctx, msg.RxMetadata)
-	nsMetrics.uplinkGateways.WithLabelValues(ctx).Observe(float64(gtwCount))
+func registerReceiveDuplicateUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
+	nsMetrics.uplinkDuplicates.WithLabelValues(ctx, uplinkMTypeLabel(msg.Payload.MType)).Inc()
+}
+
+func registerProcessUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
+	nsMetrics.uplinkProcessed.WithLabelValues(ctx, uplinkMTypeLabel(msg.Payload.MType)).Inc()
 }
 
 func registerForwardDataUplink(ctx context.Context, msg *ttnpb.ApplicationUplink) {
@@ -304,4 +314,9 @@ func registerDropUplink(ctx context.Context, msg *ttnpb.UplinkMessage, err error
 		cause = ttnErr.FullName()
 	}
 	nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg.Payload.MType), cause).Inc()
+}
+
+func registerMergeMetadata(ctx context.Context, msg *ttnpb.UplinkMessage) {
+	gtwCount, _ := rxMetadataStats(ctx, msg.RxMetadata)
+	nsMetrics.uplinkGateways.WithLabelValues(ctx).Observe(float64(gtwCount))
 }
