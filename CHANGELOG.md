@@ -9,22 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+## [3.8.4] - 2020-06-12
+
+### Added
+
 - Metrics for log messages, counted per level and namespace.
 - Allow suppressing logs on HTTP requests for user-defined paths (see `--http.log-ignore-paths` option).
 - Redux state and actions reporting to Sentry
 - Serving frontend sourcemaps in production
-- Redux state and actions reporting to Sentry.
-- Serving frontend sourcemaps in production.
 - Frequency plan documentation.
 - LoRa Basics Station documentation.
 
 ### Changed
 
 - Suppress a few unexpected EOF errors, in order to reduce noise in the logs for health checks.
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 
@@ -871,7 +877,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.3...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.4...HEAD
+[3.8.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.3...v3.8.4
 [3.8.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.2...v3.8.3
 [3.8.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.2...v3.8.2
 [3.7.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.0...v3.7.2
