@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v7"
 	"github.com/gogo/protobuf/proto"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -469,7 +469,6 @@ func TestInitTaskGroup(t *testing.T) {
 			a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 		})
 	}
-
 }
 
 func TestTaskQueue(t *testing.T) {
@@ -697,7 +696,7 @@ func TestProtoDeduplicator(t *testing.T) {
 		}
 	}
 
-	ttl := test.Delay << 12
+	ttl := (1 << 12) * test.Delay
 	key1 := cl.Key("test1")
 	key2 := cl.Key("test2")
 
@@ -737,15 +736,15 @@ func TestProtoDeduplicator(t *testing.T) {
 	}
 	a.So(v, should.BeFalse)
 
-	ss, err := cl.LRange(DeduplicationListKey(key1), 0, -1).Result()
+	ss, err := cl.LRange(ListKey(key1), 0, -1).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	lockTTL, err := cl.PTTL(DeduplicationLockKey(key1)).Result()
+	lockTTL, err := cl.PTTL(LockKey(key1)).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	listTTL, err := cl.PTTL(DeduplicationListKey(key1)).Result()
+	listTTL, err := cl.PTTL(ListKey(key1)).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -755,18 +754,20 @@ func TestProtoDeduplicator(t *testing.T) {
 		Encoding.EncodeToString([]byte("proto2")),
 		Encoding.EncodeToString([]byte("proto3")),
 	})
+	a.So(lockTTL, should.BeGreaterThan, 0)
 	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
+	a.So(listTTL, should.BeGreaterThan, 0)
 	a.So(listTTL, should.BeLessThanOrEqualTo, ttl)
 
-	ss, err = cl.LRange(DeduplicationListKey(key2), 0, -1).Result()
+	ss, err = cl.LRange(ListKey(key2), 0, -1).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	lockTTL, err = cl.PTTL(DeduplicationLockKey(key2)).Result()
+	lockTTL, err = cl.PTTL(LockKey(key2)).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	listTTL, err = cl.PTTL(DeduplicationListKey(key2)).Result()
+	listTTL, err = cl.PTTL(ListKey(key2)).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -774,6 +775,103 @@ func TestProtoDeduplicator(t *testing.T) {
 		Encoding.EncodeToString([]byte("proto1")),
 		Encoding.EncodeToString([]byte("proto2")),
 	})
+	a.So(lockTTL, should.BeGreaterThan, 0)
 	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
+	a.So(listTTL, should.BeGreaterThan, 0)
 	a.So(listTTL, should.BeLessThanOrEqualTo, ttl)
+}
+
+func TestMutexLock(t *testing.T) {
+	a := assertions.New(t)
+
+	ctx := test.ContextWithT(test.Context(), t)
+	ctx = log.NewContext(ctx, test.GetLogger(t))
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second+(1<<6)*test.Delay)
+	defer cancel()
+
+	cl, flush := test.NewRedis(t, "redis_test")
+	defer flush()
+	defer cl.Close()
+
+	ttl := (1 << 6) * test.Delay
+	key := cl.Key("test1")
+
+	err := LockMutex(ctx, cl, key, "test-id-1", ttl)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Failed to lock mutex: %s", err)
+	}
+
+	lockTTL, err := cl.PTTL(LockKey(key)).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(lockTTL, should.BeGreaterThan, 0)
+	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
+
+	blockErrCh := make(chan error, 1)
+	go func() {
+		blockErrCh <- LockMutex(ctx, cl, key, "test-id-2", ttl)
+	}()
+
+	timeoutErrCh := make(chan error, 1)
+	go func() {
+		ctx, cancel := context.WithTimeout(ctx, test.Delay)
+		defer cancel()
+		timeoutErrCh <- LockMutex(ctx, cl, key, "test-id-3", ttl)
+	}()
+
+	select {
+	case <-ctx.Done():
+		t.Fatalf("Timed out while waiting for LockMutex with a deadline to return")
+	case err := <-timeoutErrCh:
+		a.So(err, should.Resemble, context.DeadlineExceeded)
+	}
+	select {
+	case err := <-blockErrCh:
+		t.Fatalf("LockMutex returned before previous caller unlocked: %s", err)
+	default:
+	}
+
+	err = UnlockMutex(cl, key, "test-id-1", ttl)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Failed to unlock mutex: %s", err)
+	}
+
+	select {
+	case <-ctx.Done():
+		t.Fatalf("Timed out while waiting for blocked LockMutex to return")
+	case err := <-blockErrCh:
+		a.So(err, should.BeNil)
+	}
+	lockTTL, err = cl.PTTL(LockKey(key)).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(lockTTL, should.BeGreaterThan, 0)
+	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
+
+	err = UnlockMutex(cl, key, "test-id-2", ttl)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Failed to unlock mutex: %s", err)
+	}
+	lockTTL, err = cl.PTTL(LockKey(key)).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	listTTL, err := cl.PTTL(ListKey(key)).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(lockTTL, should.BeGreaterThan, 0)
+	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
+	a.So(listTTL, should.BeLessThanOrEqualTo, lockTTL)
+
+	err = UnlockMutex(cl, key, "non-existent-id", ttl)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Failed to unlock existent mutex with non-existent ID: %s", err)
+	}
+	err = UnlockMutex(cl, cl.Key("non-existent-key"), "non-existent-id", ttl)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Failed to unlock non-existent mutex: %s", err)
+	}
 }

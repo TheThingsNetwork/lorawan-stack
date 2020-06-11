@@ -76,7 +76,7 @@ func (d *UplinkDeduplicator) AccumulatedMetadata(ctx context.Context, up *ttnpb.
 		return nil, err
 	}
 	var mds []*ttnpb.RxMetadata
-	return mds, ttnredis.ListProtos(ctx, d.Redis, d.Redis.Key(ttnredis.DeduplicationListKey(h))).Range(func() (proto.Message, func() (bool, error)) {
+	return mds, ttnredis.ListProtos(ctx, d.Redis, d.Redis.Key(ttnredis.ListKey(h))).Range(func() (proto.Message, func() (bool, error)) {
 		md := &ttnpb.RxMetadata{}
 		return md, func() (bool, error) {
 			mds = append(mds, md)

@@ -2049,9 +2049,14 @@ func NewRedisApplicationUplinkQueue(t testing.TB) (ApplicationUplinkQueue, func(
 
 func NewRedisDeviceRegistry(t testing.TB) (DeviceRegistry, func() error) {
 	cl, flush := test.NewRedis(t, append(redisNamespace[:], "devices")...)
-	return &redis.DeviceRegistry{
-			Redis: cl,
-		},
+	reg := &redis.DeviceRegistry{
+		Redis:   cl,
+		LockTTL: test.Delay << 10,
+	}
+	if err := reg.Init(); err != nil {
+		t.Fatalf("Failed to initialize Redis device registry: %s", err)
+	}
+	return reg,
 		func() error {
 			flush()
 			return cl.Close()
