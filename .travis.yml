@@ -85,12 +85,6 @@ install:
       $MAGE jsSDK:deps js:deps
       $MAGE docs:deps
     fi
-before_script:
-  - |
-    if [[ "$RUNTYPE" == "go.test" ]]; then
-      set -e
-      $MAGE dev:dbStart
-    fi
 script:
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:swaggerClean proto:swagger; fi
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:markdownClean proto:markdown; fi
@@ -104,20 +98,8 @@ script:
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE docs:build; fi
   - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE headers:check; fi
   - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE proto:goClean proto:go; fi
-  - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:messages; fi
   - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:lint; fi
-  - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:unconvert; fi
-  - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:fmt; fi
   - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE dev:misspell; fi
-  - |
-    if [[ "$RUNTYPE" == "go.test" ]]; then
-      if [[ "$RUN_GOARCH" == "amd64" ]]; then
-        GOARCH=$RUN_GOARCH $MAGE go:coveralls
-      else
-        GOARCH=$RUN_GOARCH $MAGE go:test
-      fi
-    fi
-  - if [[ "$RUNTYPE" == "go.test" ]]; then $MAGE go:testBinaries; fi
   - if [[ "$RUNTYPE" == "release" ]]; then $MAGE version:files; fi
   - $MAGE git:diff
 after_success:

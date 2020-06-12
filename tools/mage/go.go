@@ -271,12 +271,12 @@ nextLine:
 	}
 	service := os.Getenv("COVERALLS_SERVICE")
 	if service == "" {
-		service = "travis-ci"
+		service = "github"
 	}
 	if mg.Verbose() {
 		fmt.Println("Sending Go coverage to Coveralls")
 	}
-	return runGoTool("github.com/mattn/goveralls", "-coverprofile=coveralls_"+goCoverageFile, "-service="+service, "-repotoken="+os.Getenv("COVERALLS_TOKEN"))
+	return runGoTool("github.com/mattn/goveralls", "-coverprofile=coveralls_"+goCoverageFile, "-service="+service)
 }
 
 // Messages builds the file with translatable messages in Go code.
