@@ -39,6 +39,7 @@ func (c *Component) initWeb() error {
 		web.WithTrustedProxies(c.config.HTTP.TrustedProxies...),
 		web.WithCookieKeys(c.config.HTTP.Cookie.HashKey, c.config.HTTP.Cookie.BlockKey),
 		web.WithStatic(c.config.HTTP.Static.Mount, c.config.HTTP.Static.SearchPath...),
+		web.WithLogIgnorePaths(c.config.HTTP.LogIgnorePaths),
 	}
 	if c.config.HTTP.RedirectToHost != "" {
 		webOptions = append(webOptions, web.WithRedirectToHost(c.config.HTTP.RedirectToHost))

@@ -19,6 +19,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
@@ -130,7 +131,11 @@ var startCommand = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
 		redisConsumerID := redis.Key(host, strconv.Itoa(os.Getpid()))
+		if err := redis.InitMutex(redis.New(&config.Redis)); err != nil {
+			return err
+		}
 
 		if start.IdentityServer || startDefault {
 			logger.Info("Setting up Identity Server")
@@ -172,9 +177,14 @@ var startCommand = &cobra.Command{
 				redis.New(config.Redis.WithNamespace("ns", "application-uplinks")),
 				100, redisConsumerGroup, redisConsumerID,
 			)
-			config.NS.Devices = &nsredis.DeviceRegistry{
-				Redis: redis.New(config.Redis.WithNamespace("ns", "devices")),
+			devices := &nsredis.DeviceRegistry{
+				Redis:   redis.New(config.Redis.WithNamespace("ns", "devices")),
+				LockTTL: time.Second,
 			}
+			if err := devices.Init(); err != nil {
+				return shared.ErrInitializeNetworkServer.WithCause(err)
+			}
+			config.NS.Devices = devices
 			config.NS.UplinkDeduplicator = &nsredis.UplinkDeduplicator{
 				Redis: redis.New(config.Cache.Redis.WithNamespace("ns", "uplink-deduplication")),
 			}

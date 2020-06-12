@@ -73,6 +73,8 @@ type options struct {
 
 	redirectToHost  string
 	redirectToHTTPS map[int]int
+
+	logIgnorePaths []string
 }
 
 // Option for the web server
@@ -123,6 +125,13 @@ func WithRedirectToHTTPS(from, to int) Option {
 	}
 }
 
+// WithLogIgnorePaths silences log messages for a list of URLs.
+func WithLogIgnorePaths(paths []string) Option {
+	return func(o *options) {
+		o.logIgnorePaths = paths
+	}
+}
+
 // New builds a new server.
 func New(ctx context.Context, opts ...Option) (*Server, error) {
 	logger := log.FromContext(ctx).WithField("namespace", "web")
@@ -165,7 +174,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		mux.MiddlewareFunc(webmiddleware.ProxyHeaders(proxyConfiguration)),
 		mux.MiddlewareFunc(webmiddleware.MaxBody(1<<24)), // 16 MB.
 		mux.MiddlewareFunc(webmiddleware.SecurityHeaders()),
-		mux.MiddlewareFunc(webmiddleware.Log(logger)),
+		mux.MiddlewareFunc(webmiddleware.Log(logger, options.logIgnorePaths)),
 	)
 
 	var redirectConfig webmiddleware.RedirectConfiguration

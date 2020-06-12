@@ -66,7 +66,6 @@ type Agent struct {
 	tlsConfig         TLSConfig
 	forwarderConfig   ForwarderConfig
 	homeNetworkConfig HomeNetworkConfig
-	subscriptionGroup string
 	devAddrPrefixes   []types.DevAddrPrefix
 
 	tenantContextFillers []TenantContextFiller
@@ -327,6 +326,7 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 		"forwarder_net_id", a.netID,
 		"forwarder_id", a.clusterID,
 		"forwarder_tenant_id", a.tenantID,
+		"group", a.clusterID,
 	))
 
 	conn, err := a.dialContext(ctx, a.tlsConfig, a.dataPlaneAddress)
@@ -341,7 +341,7 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 		ForwarderNetId:    a.netID.MarshalNumber(),
 		ForwarderId:       a.clusterID,
 		ForwarderTenantId: a.tenantID,
-		Group:             a.subscriptionGroup,
+		Group:             a.clusterID,
 	})
 	if err != nil {
 		return err
@@ -493,7 +493,9 @@ func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
 		// Subscribe to any join-request.
 		{
 			Message: &packetbroker.RoutingFilter_JoinRequest_{
-				JoinRequest: &packetbroker.RoutingFilter_JoinRequest{},
+				JoinRequest: &packetbroker.RoutingFilter_JoinRequest{
+					EuiPrefixes: []*packetbroker.RoutingFilter_JoinRequest_EUIPrefixes{{}},
+				},
 			},
 		},
 	}
@@ -522,7 +524,9 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 		"namespace", "packetbrokeragent",
 		"home_network_net_id", a.netID,
 		"home_network_tenant_id", a.tenantID,
+		"group", a.clusterID,
 	))
+	logger := log.FromContext(ctx)
 
 	conn, err := a.dialContext(ctx, a.tlsConfig, a.dataPlaneAddress)
 	if err != nil {
@@ -531,17 +535,73 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	defer conn.Close()
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:conn:up:%s", events.NewCorrelationID()))
 
+	filters := a.getSubscriptionFilters()
+	for i, f := range filters {
+		logger := logger
+		var (
+			forwardersType string
+			forwarderIDs   []*packetbroker.ForwarderIdentifier
+		)
+		switch fwd := f.Forwarders.(type) {
+		case *packetbroker.RoutingFilter_ForwarderBlacklist:
+			forwardersType = "blacklist"
+			forwarderIDs = fwd.ForwarderBlacklist.List
+		case *packetbroker.RoutingFilter_ForwarderWhitelist:
+			forwardersType = "whitelist"
+			forwarderIDs = fwd.ForwarderWhitelist.List
+		}
+		if forwarderIDs != nil {
+			formatted := make([]string, 0, len(forwarderIDs))
+			for _, fwd := range forwarderIDs {
+				if fwd.ForwarderId != "" {
+					formatted = append(formatted, fmt.Sprintf("%s/%s", packetbroker.NetID(fwd.NetId), fwd.ForwarderId))
+				} else {
+					formatted = append(formatted, fmt.Sprintf("%s", packetbroker.NetID(fwd.NetId)))
+				}
+			}
+			logger = logger.WithFields(log.Fields(
+				"forwarders_type", forwardersType,
+				"forwarders", formatted,
+			))
+		}
+		if f.GatewayMetadata != nil {
+			logger = logger.WithField("gateway_metadata", f.GatewayMetadata.Value)
+		}
+		var (
+			messageType string
+			message     interface{}
+		)
+		switch msg := f.Message.(type) {
+		case *packetbroker.RoutingFilter_JoinRequest_:
+			messageType = "join_request"
+			formatted := make([]string, 0, len(msg.JoinRequest.EuiPrefixes))
+			for _, prefixes := range msg.JoinRequest.EuiPrefixes {
+				formatted = append(formatted, fmt.Sprintf("[JoinEUI: %016X/%d DevEUI: %016X/%d]", prefixes.JoinEui, prefixes.JoinEuiLength, prefixes.DevEui, prefixes.DevEuiLength))
+			}
+			message = formatted
+		case *packetbroker.RoutingFilter_Mac:
+			messageType = "mac"
+			message = msg.Mac.DevAddrPrefixes
+		}
+		if messageType != "" {
+			logger = logger.WithFields(log.Fields(
+				"message_type", messageType,
+				"message", message,
+			))
+		}
+		logger.WithField("i", i).Debug("Configured filter")
+	}
+
 	client := packetbroker.NewRouterHomeNetworkDataClient(conn)
 	stream, err := client.Subscribe(ctx, &packetbroker.SubscribeHomeNetworkRequest{
 		HomeNetworkNetId:    a.netID.MarshalNumber(),
 		HomeNetworkTenantId: a.tenantID,
-		Filters:             a.getSubscriptionFilters(),
-		Group:               a.subscriptionGroup,
+		Filters:             filters,
+		Group:               a.clusterID,
 	})
 	if err != nil {
 		return err
 	}
-	logger := log.FromContext(ctx)
 	logger.Info("Subscribed as Home Network")
 
 	uplinkCh := make(chan *packetbroker.RoutedUplinkMessage)

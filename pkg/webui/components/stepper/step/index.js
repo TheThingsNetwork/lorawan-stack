@@ -23,7 +23,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './step.styl'
 
-const Step = React.memo(props => {
+const Step = props => {
   const {
     className,
     title,
@@ -73,9 +73,7 @@ const Step = React.memo(props => {
       </div>
     </li>
   )
-})
-
-Step.displayName = 'Stepper.Step'
+}
 
 Step.defaultProps = {
   active: false,
@@ -84,6 +82,7 @@ Step.defaultProps = {
   transitionFailed: false,
   vertical: false,
   status: 'wait',
+  stepNumber: 1,
 }
 
 Step.propTypes = {
@@ -91,10 +90,13 @@ Step.propTypes = {
   className: PropTypes.string,
   description: PropTypes.message,
   status: PropTypes.oneOf(['success', 'failure', 'current', 'wait']),
-  stepNumber: PropTypes.number.isRequired,
+  stepNumber: PropTypes.number,
   title: PropTypes.message.isRequired,
   transitionFailed: PropTypes.bool,
   vertical: PropTypes.bool,
 }
 
-export default Step
+const MemoizedStep = React.memo(Step)
+MemoizedStep.displayName = 'Stepper.Step'
+
+export default MemoizedStep

@@ -904,9 +904,9 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 	if !ok {
 		queuedEvents = append(queuedEvents, evtDropDataUplink(ctx, matched.Device.EndDeviceIdentifiers, errDuplicate))
+		registerReceiveDuplicateUplink(ctx, up)
 		return nil
 	}
-	registerReceiveUniqueUplink(ctx, up)
 
 	publishEvents(ctx, queuedEvents...)
 	queuedEvents = nil
@@ -1024,6 +1024,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		})
 	}
 	queuedEvents = append(queuedEvents, evtProcessDataUplink(ctx, matched.Device.EndDeviceIdentifiers, up))
+	registerProcessUplink(ctx, up)
 	return nil
 }
 
@@ -1159,9 +1160,9 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 	if !ok {
 		queuedEvents = append(queuedEvents, evtDropJoinRequest(ctx, matched.EndDeviceIdentifiers, errDuplicate))
+		registerReceiveDuplicateUplink(ctx, up)
 		return nil
 	}
-	registerReceiveUniqueUplink(ctx, up)
 
 	devAddr := ns.newDevAddr(ctx, matched)
 	for matched.Session != nil && devAddr.Equal(matched.Session.DevAddr) {
@@ -1281,6 +1282,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		},
 	})
 	queuedEvents = append(queuedEvents, evtProcessJoinRequest(ctx, matched.EndDeviceIdentifiers, up))
+	registerProcessUplink(ctx, up)
 	return nil
 }
 

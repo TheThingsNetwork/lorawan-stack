@@ -20,13 +20,14 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
-	"log"
+	stdlog "log"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v7"
 	"github.com/gogo/protobuf/proto"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 const (
@@ -34,9 +35,7 @@ const (
 	separator = ':'
 )
 
-var (
-	encoding = base64.RawStdEncoding
-)
+var encoding = base64.RawStdEncoding
 
 // WatchCmdable is transactional redis.Cmdable.
 type WatchCmdable interface {
@@ -111,7 +110,7 @@ type FailoverConfig struct {
 // newRedisClient returns a Redis client, which connects using correct client type.
 func newRedisClient(conf *Config) *redis.Client {
 	if conf.Failover.Enable {
-		redis.SetLogger(log.New(ioutil.Discard, "", 0))
+		redis.SetLogger(stdlog.New(ioutil.Discard, "", 0))
 		return redis.NewFailoverClient(&redis.FailoverOptions{
 			MasterName:    conf.Failover.MasterName,
 			SentinelAddrs: conf.Failover.Addresses,
@@ -413,8 +412,8 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 	if err != redis.Nil {
 		_, err := r.Pipelined(func(p redis.Pipeliner) error {
 			for i, ret := range rets {
-				toAdd := make([]redis.Z, 0, len(ret.Messages))
-				toAddNX := make([]redis.Z, 0, len(ret.Messages))
+				toAdd := make([]*redis.Z, 0, len(ret.Messages))
+				toAddNX := make([]*redis.Z, 0, len(ret.Messages))
 				toAck := make([]string, 0, len(ret.Messages))
 				for _, msg := range ret.Messages {
 					var score float64
@@ -457,12 +456,12 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 					}
 
 					if replace {
-						toAdd = append(toAdd, redis.Z{
+						toAdd = append(toAdd, &redis.Z{
 							Member: member,
 							Score:  score,
 						})
 					} else {
-						toAddNX = append(toAddNX, redis.Z{
+						toAddNX = append(toAddNX, &redis.Z{
 							Member: member,
 							Score:  score,
 						})
@@ -486,7 +485,7 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 	var min time.Time
 	for _, k := range ks {
 		if err := r.Watch(func(tx *redis.Tx) error {
-			zs, err := tx.ZRangeByScoreWithScores(WaitingTaskKey(k), redis.ZRangeBy{
+			zs, err := tx.ZRangeByScoreWithScores(WaitingTaskKey(k), &redis.ZRangeBy{
 				Min: "-inf",
 				Max: fmt.Sprintf("%d", time.Now().UnixNano()),
 			}).Result()
@@ -495,7 +494,7 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 			}
 
 			var minCmd *redis.ZSliceCmd
-			_, err = tx.Pipelined(func(p redis.Pipeliner) error {
+			_, err = tx.TxPipelined(func(p redis.Pipeliner) error {
 				toDel := make([]interface{}, 0, len(zs))
 				for _, z := range zs {
 					toDel = append(toDel, z.Member)
@@ -613,6 +612,21 @@ func (q *TaskQueue) Run(ctx context.Context) error {
 	if err := q.Init(); err != nil {
 		return err
 	}
+	defer func() {
+		_, err := q.Redis.Pipelined(func(p redis.Pipeliner) error {
+			p.XGroupDelConsumer(InputTaskKey(q.Key), q.Group, q.ID)
+			p.XGroupDelConsumer(ReadyTaskKey(q.Key), q.Group, q.ID)
+			return nil
+		})
+		if err != nil {
+			log.FromContext(ctx).WithError(err).WithFields(log.Fields(
+				"consumer", q.ID,
+				"group", q.Group,
+				"input_stream", InputTaskKey(q.Key),
+				"ready_stream", ReadyTaskKey(q.Key),
+			)).Error("Failed to delete task queue Redis consumer")
+		}
+	}()
 
 	var hasDeadline bool
 	dl, ok := ctx.Deadline()
@@ -668,14 +682,12 @@ type Scripter interface {
 	ScriptLoad(script string) *redis.StringCmd
 }
 
-var deduplicationScript = redis.NewScript(`local exp = ARGV[1]
+var deduplicateProtosScript = redis.NewScript(`local exp = ARGV[1]
 local ok = redis.call('set', KEYS[1], '', 'px', exp, 'nx')
 if #ARGV > 1 then
 	table.remove(ARGV, 1)
 	redis.call('rpush', KEYS[2], unpack(ARGV))
-	if ok then
-		redis.call('pexpire', KEYS[2], exp)
-	end
+	redis.call('pexpire', KEYS[2], exp)
 end
 if ok then
 	return 1
@@ -683,20 +695,28 @@ else
 	return 0
 end`)
 
-// DeduplicationLockKey returns the key deduplication lock for k is stored under.
-func DeduplicationLockKey(k string) string {
+// LockKey returns the key lock for k is stored under.
+func LockKey(k string) string {
 	return Key(k, "lock")
 }
 
-// DeduplicationLockKey returns the key deduplication list for k is stored under.
-func DeduplicationListKey(k string) string {
+// ListKey returns the key list for k is stored under.
+func ListKey(k string) string {
 	return Key(k, "list")
 }
 
-// DeduplicateProtos deduplicates protos using key k. It stores a lock at DeduplicationLockKey(k) and the list of collected protos at DeduplicationListKey(k).
+func milliseconds(d time.Duration) int64 {
+	ms := d.Milliseconds()
+	if ms == 0 && d > 0 {
+		return 1
+	}
+	return ms
+}
+
+// DeduplicateProtos deduplicates protos using key k. It stores a lock at LockKey(k) and the list of collected protos at ListKey(k).
 func DeduplicateProtos(ctx context.Context, r Scripter, k string, window time.Duration, msgs ...proto.Message) (bool, error) {
 	args := make([]interface{}, 0, 1+len(msgs))
-	args = append(args, window.Milliseconds())
+	args = append(args, milliseconds(window))
 	for _, msg := range msgs {
 		s, err := MarshalProto(msg)
 		if err != nil {
@@ -704,13 +724,141 @@ func DeduplicateProtos(ctx context.Context, r Scripter, k string, window time.Du
 		}
 		args = append(args, s)
 	}
-	v, err := deduplicationScript.Run(r, []string{DeduplicationLockKey(k), DeduplicationListKey(k)}, args...).Result()
+	res, err := deduplicateProtosScript.Run(r, []string{LockKey(k), ListKey(k)}, args...).Int64()
 	if err != nil {
 		return false, ConvertError(err)
 	}
-	res, ok := v.(int64)
-	if !ok {
-		return false, errStore.New()
-	}
 	return res == 1, nil
+}
+
+// NOTE: Time stops in lua scripts and expired keys stay available.
+
+// lockMutexScript attempts to acquire mutex lock.
+// It returns 0 if lock is acquired or active locks TTL otherwise.
+var lockMutexScript = redis.NewScript(`local pttl = redis.call('pttl', KEYS[1])
+if pttl > 0 then
+	return pttl
+else
+	redis.call('del', KEYS[2])
+	redis.call('set', KEYS[1], ARGV[1], 'px', ARGV[2])
+	return 0
+end`)
+
+// takeMutexLockScript attempts to take over the lock from previous caller.
+// It returns 1 if lock is acquired and 0 otherwise
+var takeMutexLockScript = redis.NewScript(`if redis.call('get', KEYS[1]) == ARGV[1] then
+	redis.call('del', KEYS[2])
+	redis.call('set', KEYS[1], ARGV[3], 'px', ARGV[2])
+	return 1
+else
+	return 0
+end`)
+
+// unlockMutexLockScript unlocks the mutex lock.
+var unlockMutexScript = redis.NewScript(`if redis.call('get', KEYS[1]) == ARGV[1] then
+	redis.call('lpush', KEYS[2], ARGV[1])
+	redis.call('pexpire', KEYS[1], ARGV[2])
+	redis.call('pexpire', KEYS[2], ARGV[2])
+end
+return redis.status_reply('OK')`)
+
+// LockMutex locks the value stored at k with a mutex with identifier id.
+// It stores the lock at LockKey(k) and list at ListKey(k).
+func LockMutex(ctx context.Context, r redis.Cmdable, k, id string, expiration time.Duration) error {
+	var hasDeadline bool
+	dl, ok := ctx.Deadline()
+	if ok {
+		hasDeadline = !dl.IsZero()
+	}
+
+	lockKey := LockKey(k)
+	listKey := ListKey(k)
+	expMS := milliseconds(expiration)
+	for {
+		ttlMS, err := lockMutexScript.Run(r, []string{lockKey, listKey}, id, expMS).Int64()
+		if err != nil {
+			return ConvertError(err)
+		}
+		if ttlMS < 0 {
+			panic(fmt.Errorf("negative TTL returned: %d ms", ttlMS))
+		}
+		if ttlMS == 0 {
+			return nil
+		}
+
+		timeout := time.Duration(ttlMS) * time.Millisecond
+		if hasDeadline {
+			until := time.Until(dl)
+			if until < timeout {
+				timeout = until
+			}
+		}
+		if timeout < time.Second {
+			// Necessary until https://github.com/go-redis/redis/issues/1363 is resolved.
+			log.FromContext(ctx).WithField("timeout", timeout).Debug("Truncating BLPop timeout to 1 second")
+			timeout = time.Second
+		}
+		popRes, err := r.BLPop(timeout, listKey).Result()
+		if err != nil && err != redis.Nil {
+			return ConvertError(err)
+		}
+		select {
+		case <-ctx.Done():
+			if err == redis.Nil {
+				return ctx.Err()
+			}
+			// Pass the lock to next caller.
+			if err := unlockMutexScript.Run(r, []string{lockKey, listKey}, popRes[1], expMS).Err(); err != nil {
+				log.FromContext(ctx).WithError(ConvertError(err)).Error("Failed to pass mutex to next caller")
+			}
+			return ctx.Err()
+		default:
+		}
+		if err == redis.Nil {
+			continue
+		}
+
+		// Attempt to take over the lock from previous caller.
+		v, err := takeMutexLockScript.Run(r, []string{lockKey, listKey}, popRes[1], expMS, id).Int64()
+		if err != nil {
+			return ConvertError(err)
+		}
+		if v == 1 {
+			return nil
+		}
+	}
+}
+
+// UnlockMutex unlocks the key k with identifier id.
+func UnlockMutex(r Scripter, k, id string, expiration time.Duration) error {
+	return ConvertError(unlockMutexScript.Run(r, []string{LockKey(k), ListKey(k)}, id, milliseconds(expiration)).Err())
+}
+
+// InitMutex initializes the mutex scripts at r.
+// InitMutex must be called before mutex functionality is used in a transaction or pipeline.
+func InitMutex(r Scripter) error {
+	if err := lockMutexScript.Load(r).Err(); err != nil {
+		return ConvertError(err)
+	}
+	if err := takeMutexLockScript.Load(r).Err(); err != nil {
+		return ConvertError(err)
+	}
+	if err := unlockMutexScript.Load(r).Err(); err != nil {
+		return ConvertError(err)
+	}
+	return nil
+}
+
+// LockedWatch locks the key k with a mutex, watches key k and executes f in a transaction.
+// k is unlocked after f returns.
+func LockedWatch(ctx context.Context, r WatchCmdable, k, id string, expiration time.Duration, f func(*redis.Tx) error) error {
+	if err := LockMutex(ctx, r, k, id, expiration); err != nil {
+		return err
+	}
+	defer func() {
+		if err := UnlockMutex(r, k, id, expiration); err != nil {
+			log.FromContext(ctx).WithField("key", k).WithError(err).Error("Failed to unlock mutex")
+		}
+	}()
+	return ConvertError(r.Watch(f, k))
 }

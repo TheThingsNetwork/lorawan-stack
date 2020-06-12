@@ -18,7 +18,7 @@ package redis
 import (
 	"encoding/json"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v7"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 )

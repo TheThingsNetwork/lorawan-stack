@@ -67,9 +67,9 @@ Before we go into the details of {{% tts %}}'s configuration, we'll take a look 
 
 ### Entrypoint and dependencies.
 
-We tell Docker Compose to use `ttn-lw-stack -c /config/ttn-lw-stack.yml`, as the container entry point so that our configuration file is always loaded (more on the config file below). The default command is `start`, which starts {{ tts }}.
+We tell Docker Compose to use `ttn-lw-stack -c /config/ttn-lw-stack.yml`, as the container entry point so that our configuration file is always loaded (more on the config file below). The default command is `start`, which starts {{% tts %}}.
 
-With the `depends_on` section we tell Docker Compose that {{ tts }} depends on CockroachDB and Redis. With this, Docker Compose will wait for CockroachDB and Redis to come online before starting {{ tts }}.
+With the `depends_on` section we tell Docker Compose that {{% tts %}} depends on CockroachDB and Redis. With this, Docker Compose will wait for CockroachDB and Redis to come online before starting {{% tts %}}.
 
 ### Volumes
 

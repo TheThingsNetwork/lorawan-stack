@@ -40,7 +40,7 @@ import {
 
 @connect(
   function(state) {
-    const formatters = selectSelectedDeviceFormatters(state) || {}
+    const formatters = selectSelectedDeviceFormatters(state)
 
     return {
       appId: selectSelectedApplicationId(state),
@@ -64,20 +64,32 @@ class DevicePayloadFormatters extends React.PureComponent {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     devId: PropTypes.string.isRequired,
-    formatters: PropTypes.formatters.isRequired,
+    formatters: PropTypes.formatters,
     updateDevice: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    formatters: undefined,
   }
 
   @bind
   async onSubmit(values) {
-    const { appId, devId, formatters, updateDevice } = this.props
+    const { appId, devId, formatters: initialFormatters, updateDevice } = this.props
+
+    if (values.type === PAYLOAD_FORMATTER_TYPES.DEFAULT) {
+      return updateDevice(appId, devId, {
+        formatters: null,
+      })
+    }
+
+    const formatters = { ...(initialFormatters || {}) }
 
     await updateDevice(appId, devId, {
       formatters: {
         down_formatter: values.type,
         down_formatter_parameter: values.parameter,
         up_formatter: formatters.up_formatter || PAYLOAD_FORMATTER_TYPES.NONE,
-        up_formatter_parameter: formatters.up_formatter_parameter || '',
+        up_formatter_parameter: formatters.up_formatter_parameter,
       },
     })
 
@@ -91,16 +103,23 @@ class DevicePayloadFormatters extends React.PureComponent {
   render() {
     const { formatters } = this.props
 
+    const formatterType = Boolean(formatters)
+      ? formatters.down_formatter || PAYLOAD_FORMATTER_TYPES.NONE
+      : PAYLOAD_FORMATTER_TYPES.DEFAULT
+    const formatterParameter = Boolean(formatters) ? formatters.down_formatter_parameter : undefined
+
     return (
       <React.Fragment>
         <IntlHelmet title={sharedMessages.payloadFormattersDownlink} />
         <PayloadFormattersForm
           uplink={false}
           linked
+          allowReset
           onSubmit={this.onSubmit}
+          onSubmitSuccess={this.onSubmitSuccess}
           title={sharedMessages.payloadFormattersDownlink}
-          initialType={formatters.down_formatter || PAYLOAD_FORMATTER_TYPES.NONE}
-          initialParameter={formatters.down_formatter_parameter || ''}
+          initialType={formatterType}
+          initialParameter={formatterParameter}
         />
       </React.Fragment>
     )

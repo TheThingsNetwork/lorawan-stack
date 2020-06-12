@@ -19,18 +19,19 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v7"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 type ApplicationUplinkQueue struct {
-	Redis  *ttnredis.Client
-	MaxLen int64
-	Group  string
-	ID     string
+	redis  *ttnredis.Client
+	maxLen int64
+	group  string
+	id     string
 
 	subscriptions sync.Map
 }
@@ -38,15 +39,15 @@ type ApplicationUplinkQueue struct {
 // NewApplicationUplinkQueue returns new application uplink queue.
 func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group, id string) *ApplicationUplinkQueue {
 	return &ApplicationUplinkQueue{
-		Redis:  cl,
-		MaxLen: maxLen,
-		Group:  group,
-		ID:     id,
+		redis:  cl,
+		maxLen: maxLen,
+		group:  group,
+		id:     id,
 	}
 }
 
 func (q *ApplicationUplinkQueue) uidUplinkKey(uid string) string {
-	return q.Redis.Key("uid", uid, "uplinks")
+	return q.redis.Key("uid", uid, "uplinks")
 }
 
 const payloadKey = "payload"
@@ -60,9 +61,9 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 			return err
 		}
 
-		if err = q.Redis.XAdd(&redis.XAddArgs{
+		if err = q.redis.XAdd(&redis.XAddArgs{
 			Stream:       q.uidUplinkKey(uid),
-			MaxLenApprox: q.MaxLen,
+			MaxLenApprox: q.maxLen,
 			Values: map[string]interface{}{
 				payloadKey: s,
 			},
@@ -87,12 +88,12 @@ var (
 )
 
 // Subscribe ranges over q.uidUplinkKey(unique.ID(ctx, appID)) using f until ctx is done.
-// Subscribe assumes that there's at most 1 active consumer in q.Group per stream at all times.
+// Subscribe assumes that there's at most 1 active consumer in q.group per stream at all times.
 func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f func(context.Context, *ttnpb.ApplicationUp) error) error {
 	uid := unique.ID(ctx, appID)
 	upStream := q.uidUplinkKey(uid)
 
-	_, err := q.Redis.XGroupCreateMkStream(upStream, q.Group, "0").Result()
+	_, err := q.redis.XGroupCreateMkStream(upStream, q.group, "0").Result()
 	if err != nil && !ttnredis.IsConsumerGroupExistsErr(err) {
 		return ttnredis.ConvertError(err)
 	}
@@ -103,11 +104,20 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 		panic(fmt.Sprintf("duplicate subscription for application %s", uid))
 	}
 	defer q.subscriptions.Delete(uid)
+	defer func() {
+		if err := q.redis.XGroupDelConsumer(upStream, q.group, q.id).Err(); err != nil {
+			log.FromContext(ctx).WithError(err).WithFields(log.Fields(
+				"consumer", q.id,
+				"group", q.group,
+				"stream", upStream,
+			)).Error("Failed to delete application uplink queue redis consumer")
+		}
+	}()
 
 	for {
-		rets, err := q.Redis.XReadGroup(&redis.XReadGroupArgs{
-			Group:    q.Group,
-			Consumer: q.ID,
+		rets, err := q.redis.XReadGroup(&redis.XReadGroupArgs{
+			Group:    q.group,
+			Consumer: q.id,
 			Streams:  []string{upStream, upStream, "0", ">"},
 		}).Result()
 		if err != nil && err != redis.Nil {
@@ -134,7 +144,7 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 				if err = f(ctx, up); err != nil {
 					return err
 				}
-				if err = q.Redis.XAck(upStream, q.Group, msg.ID).Err(); err != nil {
+				if err = q.redis.XAck(upStream, q.group, msg.ID).Err(); err != nil {
 					return ttnredis.ConvertError(err)
 				}
 			}

@@ -482,6 +482,43 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 }
 
 func TestHandleLinkADRAns(t *testing.T) {
+	recentADRUplinks := []*ttnpb.UplinkMessage{
+		{
+			Payload: &ttnpb.Message{
+				MHDR: ttnpb.MHDR{
+					MType: ttnpb.MType_UNCONFIRMED_UP,
+				},
+				Payload: &ttnpb.Message_MACPayload{
+					MACPayload: &ttnpb.MACPayload{
+						FHDR: ttnpb.FHDR{
+							FCtrl: ttnpb.FCtrl{
+								ADR: true,
+							},
+							FCnt: 42,
+						},
+					},
+				},
+			},
+		},
+		{
+			Payload: &ttnpb.Message{
+				MHDR: ttnpb.MHDR{
+					MType: ttnpb.MType_UNCONFIRMED_UP,
+				},
+				Payload: &ttnpb.Message_MACPayload{
+					MACPayload: &ttnpb.MACPayload{
+						FHDR: ttnpb.FHDR{
+							FCtrl: ttnpb.FCtrl{
+								ADR: true,
+							},
+							FCnt: 43,
+						},
+					},
+				},
+			},
+		},
+	}
+
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
@@ -498,42 +535,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-				RecentADRUplinks: []*ttnpb.UplinkMessage{
-					{
-						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
-								MType: ttnpb.MType_UNCONFIRMED_UP,
-							},
-							Payload: &ttnpb.Message_MACPayload{
-								MACPayload: &ttnpb.MACPayload{
-									FHDR: ttnpb.FHDR{
-										FCtrl: ttnpb.FCtrl{
-											ADR: true,
-										},
-										FCnt: 42,
-									},
-								},
-							},
-						},
-					},
-					{
-						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
-								MType: ttnpb.MType_UNCONFIRMED_UP,
-							},
-							Payload: &ttnpb.Message_MACPayload{
-								MACPayload: &ttnpb.MACPayload{
-									FHDR: ttnpb.FHDR{
-										FCtrl: ttnpb.FCtrl{
-											ADR: true,
-										},
-										FCnt: 43,
-									},
-								},
-							},
-						},
-					},
-				},
+				RecentADRUplinks: recentADRUplinks,
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -541,42 +543,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-				RecentADRUplinks: []*ttnpb.UplinkMessage{
-					{
-						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
-								MType: ttnpb.MType_UNCONFIRMED_UP,
-							},
-							Payload: &ttnpb.Message_MACPayload{
-								MACPayload: &ttnpb.MACPayload{
-									FHDR: ttnpb.FHDR{
-										FCtrl: ttnpb.FCtrl{
-											ADR: true,
-										},
-										FCnt: 42,
-									},
-								},
-							},
-						},
-					},
-					{
-						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
-								MType: ttnpb.MType_UNCONFIRMED_UP,
-							},
-							Payload: &ttnpb.Message_MACPayload{
-								MACPayload: &ttnpb.MACPayload{
-									FHDR: ttnpb.FHDR{
-										FCtrl: ttnpb.FCtrl{
-											ADR: true,
-										},
-										FCnt: 43,
-									},
-								},
-							},
-						},
-					},
-				},
+				RecentADRUplinks: recentADRUplinks,
 			},
 			Error: errNoPayload,
 		},
@@ -588,42 +555,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-				RecentADRUplinks: []*ttnpb.UplinkMessage{
-					{
-						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
-								MType: ttnpb.MType_UNCONFIRMED_UP,
-							},
-							Payload: &ttnpb.Message_MACPayload{
-								MACPayload: &ttnpb.MACPayload{
-									FHDR: ttnpb.FHDR{
-										FCtrl: ttnpb.FCtrl{
-											ADR: true,
-										},
-										FCnt: 42,
-									},
-								},
-							},
-						},
-					},
-					{
-						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
-								MType: ttnpb.MType_UNCONFIRMED_UP,
-							},
-							Payload: &ttnpb.Message_MACPayload{
-								MACPayload: &ttnpb.MACPayload{
-									FHDR: ttnpb.FHDR{
-										FCtrl: ttnpb.FCtrl{
-											ADR: true,
-										},
-										FCnt: 43,
-									},
-								},
-							},
-						},
-					},
-				},
+				RecentADRUplinks: recentADRUplinks,
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -631,42 +563,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-				RecentADRUplinks: []*ttnpb.UplinkMessage{
-					{
-						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
-								MType: ttnpb.MType_UNCONFIRMED_UP,
-							},
-							Payload: &ttnpb.Message_MACPayload{
-								MACPayload: &ttnpb.MACPayload{
-									FHDR: ttnpb.FHDR{
-										FCtrl: ttnpb.FCtrl{
-											ADR: true,
-										},
-										FCnt: 42,
-									},
-								},
-							},
-						},
-					},
-					{
-						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
-								MType: ttnpb.MType_UNCONFIRMED_UP,
-							},
-							Payload: &ttnpb.Message_MACPayload{
-								MACPayload: &ttnpb.MACPayload{
-									FHDR: ttnpb.FHDR{
-										FCtrl: ttnpb.FCtrl{
-											ADR: true,
-										},
-										FCnt: 43,
-									},
-								},
-							},
-						},
-					},
-				},
+				RecentADRUplinks: recentADRUplinks,
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{
 				ChannelMaskAck:   true,
@@ -710,11 +607,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 						}).MACCommand(),
 					},
 				},
-				RecentADRUplinks: []*ttnpb.UplinkMessage{
-					newADRUplink(42, -2, 2, true, ttnpb.TxSettings{}),
-					newADRUplink(43, -2, 2, false, ttnpb.TxSettings{}),
-					newADRUplink(44, -3, 2, false, ttnpb.TxSettings{}),
-				},
+				RecentADRUplinks: recentADRUplinks,
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -802,11 +695,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 						}).MACCommand(),
 					},
 				},
-				RecentADRUplinks: []*ttnpb.UplinkMessage{
-					newADRUplink(42, -2, 2, true, ttnpb.TxSettings{}),
-					newADRUplink(43, -2, 2, false, ttnpb.TxSettings{}),
-					newADRUplink(44, -3, 2, false, ttnpb.TxSettings{}),
-				},
+				RecentADRUplinks: recentADRUplinks,
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -900,11 +789,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 						}).MACCommand(),
 					},
 				},
-				RecentADRUplinks: []*ttnpb.UplinkMessage{
-					newADRUplink(42, -2, 2, true, ttnpb.TxSettings{}),
-					newADRUplink(43, -2, 2, false, ttnpb.TxSettings{}),
-					newADRUplink(44, -3, 2, false, ttnpb.TxSettings{}),
-				},
+				RecentADRUplinks: recentADRUplinks,
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -997,11 +882,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 						}).MACCommand(),
 					},
 				},
-				RecentADRUplinks: []*ttnpb.UplinkMessage{
-					newADRUplink(42, -2, 2, true, ttnpb.TxSettings{}),
-					newADRUplink(43, -2, 2, false, ttnpb.TxSettings{}),
-					newADRUplink(44, -3, 2, false, ttnpb.TxSettings{}),
-				},
+				RecentADRUplinks: recentADRUplinks,
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -1041,6 +922,71 @@ func TestHandleLinkADRAns(t *testing.T) {
 							},
 						}).MACCommand(),
 					},
+				},
+			},
+			Payload: &ttnpb.MACCommand_LinkADRAns{
+				ChannelMaskAck:   true,
+				DataRateIndexAck: true,
+				TxPowerIndexAck:  true,
+			},
+			Events: []events.DefinitionDataClosure{
+				evtReceiveLinkADRAccept.BindData(&ttnpb.MACCommand_LinkADRAns{
+					ChannelMaskAck:   true,
+					DataRateIndexAck: true,
+					TxPowerIndexAck:  true,
+				}),
+			},
+		},
+		{
+			Name: "1.0.2/2 requests/US915 FSB2",
+			Device: &ttnpb.EndDevice{
+				FrequencyPlanID:   test.USFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				MACState: &ttnpb.MACState{
+					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
+					CurrentParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.PHY_V1_0_2_REV_B),
+					DesiredParameters: MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.PHY_V1_0_2_REV_B),
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_LinkADRReq{
+							DataRateIndex:      ttnpb.DATA_RATE_3,
+							TxPowerIndex:       1,
+							ChannelMaskControl: 7,
+							NbTrans:            3,
+							ChannelMask: []bool{
+								false, false, false, false,
+								false, false, false, false,
+								false, false, false, false,
+								false, false, false, false,
+							},
+						}).MACCommand(),
+						(&ttnpb.MACCommand_LinkADRReq{
+							DataRateIndex: ttnpb.DATA_RATE_3,
+							TxPowerIndex:  1,
+							NbTrans:       3,
+							ChannelMask: []bool{
+								false, false, false, false,
+								false, false, false, false,
+								true, true, true, true,
+								true, true, true, true,
+							},
+						}).MACCommand(),
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				FrequencyPlanID:   test.USFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_0_2,
+					CurrentParameters: func() ttnpb.MACParameters {
+						params := MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.PHY_V1_0_2_REV_B)
+						params.ADRDataRateIndex = ttnpb.DATA_RATE_3
+						params.ADRTxPowerIndex = 1
+						params.ADRNbTrans = 3
+						return params
+					}(),
+					DesiredParameters: MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.PHY_V1_0_2_REV_B),
+					PendingRequests:   []*ttnpb.MACCommand{},
 				},
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{

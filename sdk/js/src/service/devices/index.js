@@ -67,6 +67,10 @@ class Devices {
       device.claim_authentication_code = null
     }
 
+    if (paths.includes('formatters') && !Boolean(device.formatters)) {
+      device.formatters = null
+    }
+
     return device
   }
 
