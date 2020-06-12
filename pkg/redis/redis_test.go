@@ -781,19 +781,19 @@ func TestProtoDeduplicator(t *testing.T) {
 	a.So(listTTL, should.BeLessThanOrEqualTo, ttl)
 }
 
-func TestMutexLock(t *testing.T) {
+func TestMutex(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := test.ContextWithT(test.Context(), t)
 	ctx = log.NewContext(ctx, test.GetLogger(t))
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second+(1<<6)*test.Delay)
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second+(1<<8)*test.Delay)
 	defer cancel()
 
 	cl, flush := test.NewRedis(t, "redis_test")
 	defer flush()
 	defer cl.Close()
 
-	ttl := (1 << 6) * test.Delay
+	ttl := (1 << 8) * test.Delay
 	key := cl.Key("test1")
 
 	err := LockMutex(ctx, cl, key, "test-id-1", ttl)
