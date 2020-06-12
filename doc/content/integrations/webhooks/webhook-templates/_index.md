@@ -2,6 +2,7 @@
 title: "Webhook Templates"
 description: ""
 summary: Webhook templates define a webhook integration that is not created (yet). Templates allows for using common values for many webhooks, such as a common base paths.
+weight: 1
 ---
 
 This is the reference for Webhook Templates
