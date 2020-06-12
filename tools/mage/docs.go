@@ -84,7 +84,7 @@ func (d Docs) Deps() (err error) {
 	changed, err := target.Path("./doc/themes/the-things-stack/node_modules", "./doc/themes/the-things-stack/package.json", "./doc/themes/the-things-stack/yarn.lock")
 	if os.IsNotExist(err) || (err == nil && changed) {
 		if mg.Verbose() {
-			fmt.Println("Installing JS SDK dependencies")
+			fmt.Println("Installing documentation dependencies")
 		}
 		yarn, err := d.yarn()
 		if err != nil {
