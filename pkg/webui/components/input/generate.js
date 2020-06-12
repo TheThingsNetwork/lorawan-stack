@@ -31,7 +31,9 @@ const GenerateInput = props => {
 
   const handleGenerateValue = React.useCallback(() => {
     if (mayGenerateValue) {
-      onChange(onGenerateValue())
+      const generatedValue = onGenerateValue()
+
+      onChange(generatedValue, true)
     }
   }, [mayGenerateValue, onChange, onGenerateValue])
 
