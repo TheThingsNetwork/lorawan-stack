@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Packet Broker Agent cluster ID is used as subscription group.
 - LinkADR handling in 72-channel bands.
 - Data uplink metrics reported by Application Server.
+- CLI now only sends relevant end device fields to Identity Server on create.
 
 ## [3.8.3] - 2020-06-05
 
