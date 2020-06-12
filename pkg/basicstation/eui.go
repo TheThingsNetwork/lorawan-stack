@@ -97,5 +97,9 @@ func (eui *EUI) UnmarshalJSON(data []byte) error {
 		}
 		return nil
 	}
+	if v, err := strconv.ParseUint(string(data), 10, 64); err == nil {
+		eui.EUI64.UnmarshalNumber(v)
+		return nil
+	}
 	return errFormat.New()
 }

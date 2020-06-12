@@ -135,6 +135,15 @@ func TestUnmarshalEUI(t *testing.T) {
 			EUI64:  types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 			OK:     true,
 		},
+		{
+			Input: `12302426811387609088`,
+			EUI64: types.EUI64{0xaa, 0xbb, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00},
+			OK:    true,
+		},
+		{
+			Input: `-12302426811387609088`,
+			OK:    false,
+		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)

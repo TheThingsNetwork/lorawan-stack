@@ -50,8 +50,14 @@ export default function mergeDevice(
           // explicitly to achieve a deep merge instead of whole object
           // overrides.
           if (Object.keys(val).length === 0) {
-            // Ignore empty object values, as they might override legitimate
-            // values.
+            const currentValue = traverse(result).get(path)
+
+            // Set empty object values only if value is unset, otherwise they might
+            // override legitimate values.
+            if (typeof currentValue === 'undefined') {
+              traverse(result).set(path, val)
+            }
+
             continue
           }
 

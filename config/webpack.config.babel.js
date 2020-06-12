@@ -202,6 +202,14 @@ export default {
   },
   plugins: env({
     all: [
+      ...(production
+        ? [
+            new webpack.SourceMapDevToolPlugin({
+              filename: '[file].map',
+              exclude: /^(?!(console|oauth).*$).*/,
+            }),
+          ]
+        : []),
       new HashOutput(),
       new webpack.NamedModulesPlugin(),
       new webpack.NamedChunksPlugin(),

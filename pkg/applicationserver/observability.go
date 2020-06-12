@@ -280,6 +280,8 @@ func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp, ns string)
 		events.Publish(evtReceiveJoinAccept(ctx, msg.EndDeviceIdentifiers, nil))
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		events.Publish(evtReceiveDataUp(ctx, msg.EndDeviceIdentifiers, nil))
+	default:
+		return
 	}
 	asMetrics.uplinkReceived.WithLabelValues(ctx, ns).Inc()
 }
@@ -290,6 +292,8 @@ func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 		events.Publish(evtForwardJoinAccept(ctx, msg.EndDeviceIdentifiers, msg))
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		events.Publish(evtForwardDataUp(ctx, msg.EndDeviceIdentifiers, msg))
+	default:
+		return
 	}
 	asMetrics.uplinkForwarded.WithLabelValues(ctx, msg.ApplicationID).Inc()
 }
@@ -300,6 +304,8 @@ func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
 		events.Publish(evtDropJoinAccept(ctx, msg.EndDeviceIdentifiers, err))
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		events.Publish(evtDropDataUp(ctx, msg.EndDeviceIdentifiers, err))
+	default:
+		return
 	}
 	if ttnErr, ok := errors.From(err); ok {
 		asMetrics.uplinkDropped.WithLabelValues(ctx, ttnErr.FullName()).Inc()

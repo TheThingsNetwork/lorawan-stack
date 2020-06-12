@@ -24,7 +24,11 @@ class SubmitButton extends React.PureComponent {
     icon: PropTypes.string,
     isSubmitting: PropTypes.bool.isRequired,
     isValidating: PropTypes.bool.isRequired,
-    message: PropTypes.message.isRequired,
+    message: PropTypes.message,
+  }
+
+  static defaultProps = {
+    message: undefined,
   }
 
   static defaultProps = {
@@ -32,12 +36,13 @@ class SubmitButton extends React.PureComponent {
     icon: undefined,
   }
   render() {
-    const { message, icon, disabled, isSubmitting, isValidating } = this.props
+    const { message, icon, disabled, isSubmitting, isValidating, ...rest } = this.props
 
     const buttonLoading = isSubmitting || isValidating
 
     return (
       <Button
+        {...rest}
         type="submit"
         icon={icon}
         message={message}

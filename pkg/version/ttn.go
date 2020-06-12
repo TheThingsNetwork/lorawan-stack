@@ -3,4 +3,4 @@
 package version
 
 // TTN Version
-var TTN = "3.8.3-dev"
+var TTN = "3.8.4-dev"

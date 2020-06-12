@@ -97,6 +97,7 @@ type HTTP struct {
 	TrustedProxies  []string         `name:"trusted-proxies" description:"CIDRs of trusted reverse proxies"`
 	RedirectToHost  string           `name:"redirect-to-host" description:"Redirect all requests to one host"`
 	RedirectToHTTPS bool             `name:"redirect-to-tls" description:"Redirect HTTP requests to HTTPS"`
+	LogIgnorePaths  []string         `name:"log-ignore-paths" description:"List of paths for which successful requests will not be logged"`
 	Static          HTTPStaticConfig `name:"static"`
 	Cookie          Cookie           `name:"cookie"`
 	PProf           PProf            `name:"pprof"`
