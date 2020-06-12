@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Endless authentication refresh loop in the Console in some rare situations.
+- Logout operation not working properly in the Console in some rare situations.
+
 ## [3.8.4] - 2020-06-12
 
 ### Added
