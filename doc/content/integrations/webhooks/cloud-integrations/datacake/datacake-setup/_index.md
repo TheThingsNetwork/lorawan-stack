@@ -10,13 +10,13 @@ Follow the instructions in this section to prepare Datacake setup for integratio
 
 First, create a **Workspace** on Datacake by navigating to the **Create Workspace** button in the upper left corner. 
 
-{{< figure src="datacake_workspace.png" alt="Add workspace on Datacake" >}}
+{{< figure src="datacake-workspace.png" alt="Add workspace on Datacake" >}}
 
 On the left hand menu, click **Devices**. To add a new device, click on **Add Device** button on the right. 
 
 In the **Add Device** pop-up menu, choose **LoRaWAN** &#8594; **Generic LoRa Device** &#8594; **The Things Industries** adapter.
 
-{{< figure src="datacake_tti_adapter.png" alt="Datacake TTI adapter" >}}
+{{< figure src="datacake-tti-adapter.png" alt="Datacake TTI adapter" >}}
 
 Fill in **Name** and **DevEUI** for your device, then click on **Add Device** to finish.
 

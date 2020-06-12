@@ -16,7 +16,7 @@ Next, you need to add an **Authorization** header, whose value will consist of t
 
 According to the **Webhook Settings** information that can be found in the **Configuration** tab on Datacake, the **Base URL** value needs to be `https://api.datacake.co/integrations/lorawan/tti/`.
 
-{{< figure src="tts_datacake_webhook.png" alt="Datacake webhook" >}}
+{{< figure src="tts-datacake-webhook.png" alt="Datacake webhook" >}}
 
 Check the message types for which you want to enable this webhook.
 
