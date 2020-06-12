@@ -512,8 +512,11 @@ var (
 			if err != nil {
 				return err
 			}
+			var isDevice ttnpb.EndDevice
+			logger.WithField("paths", isPaths).Debug("Create end device on Identity Server")
+			isDevice.SetFields(&device, append(isPaths, "ids")...)
 			isRes, err := ttnpb.NewEndDeviceRegistryClient(is).Create(ctx, &ttnpb.CreateEndDeviceRequest{
-				EndDevice: device,
+				EndDevice: isDevice,
 			})
 			if err != nil {
 				return err
