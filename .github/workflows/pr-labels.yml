@@ -1,6 +1,5 @@
 name: 'Pull Request Labels'
-on:
-- pull_request
+on: pull_request
 
 jobs:
   triage:

@@ -100,15 +100,12 @@ script:
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:backendTranslations; fi
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:test jsSDK:test; fi
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:lint jsSDK:lint; fi
-  - if [[ "$RUNTYPE" == "js" ]]; then $MAGE version:files; fi
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE docs:build; fi
-  - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE headers:check; fi
   - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE proto:goClean proto:go; fi
   - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:messages; fi
   - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:lint; fi
   - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:unconvert; fi
   - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:fmt; fi
-  - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE dev:misspell; fi
   - |
     if [[ "$RUNTYPE" == "go.test" ]]; then
       if [[ "$RUN_GOARCH" == "amd64" ]]; then

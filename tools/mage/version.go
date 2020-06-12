@@ -71,7 +71,7 @@ func (Version) Files() error {
 	if mg.Verbose() {
 		fmt.Println("Writing version files")
 	}
-	mg.Deps(Version.getCurrent)
+	mg.Deps(Version.getCurrent, Js.DevDeps)
 	version := strings.TrimPrefix(currentVersion, "v")
 	err := ioutil.WriteFile(goVersionFilePath, []byte(fmt.Sprintf(goVersionFile, version)), 0644)
 	if err != nil {
