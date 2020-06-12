@@ -1,0 +1,117 @@
+name: JS Code
+
+on:
+  pull_request:
+    paths:
+    - 'config/**'
+    - '!config/stack/ttn-lw-stack.yml'
+    - 'Makefile'
+    - 'package.json'
+    - 'pkg/webui/**'
+    - '!pkg/webui/**.go'
+    - 'sdk/js/**'
+    - 'tools/**'
+    - 'yarn.lock'
+
+jobs:
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Set up Node
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: '~14'
+    - name: Get Yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+    - name: Initialize Yarn module cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '~1.14'
+    - name: Initialize Go module cache
+      uses: actions/cache@v2
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - name: Download Go tool dependencies
+      run: |
+        cd tools
+        go mod download
+    - name: Initialize tool binary cache
+      uses: actions/cache@v2
+      with:
+        path: tools/bin
+        key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
+    - name: Make Mage
+      run: make tools/bin/mage
+    - name: Install JS SDK dependencies
+      run: tools/bin/mage jsSDK:deps
+    - name: Build JS SDK
+      run: tools/bin/mage jsSDK:clean jsSDK:build
+    - name: Generate JS translations
+      run: tools/bin/mage js:translations js:backendTranslations
+    - name: Lint JS SDK code
+      run: tools/bin/mage jsSDK:lint
+    - name: Lint frontend code
+      run: tools/bin/mage js:lint
+    - name: Check for diff
+      run: tools/bin/mage git:diff
+
+  test:
+    name: Tests
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Set up Node
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: '14'
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '~1.14'
+    - name: Initialize Go module cache
+      uses: actions/cache@v2
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - name: Download Go tool dependencies
+      run: |
+        cd tools
+        go mod download
+    - name: Initialize tool binary cache
+      uses: actions/cache@v2
+      with:
+        path: tools/bin
+        key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
+    - name: Make Mage
+      run: make tools/bin/mage
+    - name: Install JS SDK dependencies
+      run: tools/bin/mage jsSDK:deps
+    - name: Build JS SDK
+      run: tools/bin/mage jsSDK:clean jsSDK:build
+    - name: Install JS dependencies
+      run: tools/bin/mage js:deps
+    - name: Build frontend
+      run: tools/bin/mage js:clean js:build
+    - name: Test JS SDK code
+      run: tools/bin/mage jsSDK:test
+    - name: Test frontend code
+      run: tools/bin/mage js:test
+    - name: Check for diff
+      run: tools/bin/mage git:diff
