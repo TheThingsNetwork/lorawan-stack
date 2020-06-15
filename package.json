@@ -58,6 +58,7 @@
     "mini-css-extract-plugin": "^0.4.0",
     "mkdirp": "^1.0.3",
     "nib": "^1.1.2",
+    "pg": "^8.2.1",
     "prettier": "^1.18.2",
     "react-test-renderer": "^16.0.0",
     "snapshot-diff": "^0.5.1",
