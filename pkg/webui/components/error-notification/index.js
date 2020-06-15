@@ -35,6 +35,7 @@ const ErrorNotification = function({ content, ...rest }) {
       content={message.content}
       messageValues={message.values}
       details={details}
+      data-test-id="error-notification"
       {...rest}
     />
   )

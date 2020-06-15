@@ -199,12 +199,14 @@ export default class CreateAccount extends React.PureComponent {
                 title={sharedMessages.userId}
                 name="user_id"
                 autoComplete="username"
+                data-test-id="user_id"
                 autoFocus
               />
               <Form.Field
                 title={sharedMessages.name}
                 name="name"
                 component={Input}
+                data-test-id="user_name"
                 autoComplete="name"
               />
               <Form.Field
@@ -212,6 +214,7 @@ export default class CreateAccount extends React.PureComponent {
                 title={sharedMessages.email}
                 component={Input}
                 name="primary_email_address"
+                data-test-id="email_address"
                 autoComplete="email"
               />
               <Form.Field
@@ -220,6 +223,7 @@ export default class CreateAccount extends React.PureComponent {
                 name="password"
                 type="password"
                 component={Input}
+                data-test-id="password"
                 autoComplete="new-password"
               />
               <Form.Field
@@ -228,6 +232,7 @@ export default class CreateAccount extends React.PureComponent {
                 name="password_confirm"
                 type="password"
                 autoComplete="new-password"
+                data-test-id="password_confirm"
                 component={Input}
               />
               <Form.Submit component={SubmitButton} message={m.register} />
