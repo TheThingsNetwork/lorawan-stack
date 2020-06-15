@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation for `cache` options.
 - Documentation for the Gateway Server MQTT protocol.
 - Add user page in console.
+- Troubleshooting guide.
 
 ### Changed
 
