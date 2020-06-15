@@ -110,5 +110,9 @@ ca-key.pem
 /coverage
 /sdk/js/coverage
 
+# Cypress artifacts
+/cypress/screenshots
+/cypress/videos
+
 # Release files
 /snapcraft.login
