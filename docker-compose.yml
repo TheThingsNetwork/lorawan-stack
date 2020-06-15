@@ -36,7 +36,7 @@ services:
 
   stack:
     image: thethingsnetwork/lorawan-stack
-    entrypoint: ttn-lw-stack -c /config/ttn-lw-stack.yml
+    entrypoint: ttn-lw-stack -c /config/ttn-lw-stack-docker.yml
     command: start
     restart: unless-stopped
     depends_on:
