@@ -116,8 +116,6 @@ The JSON uplink messages use the following format:
       "data_rate_index": 5,                  // LoRaWAN data rate index
       "coding_rate": "4/6",                  // LoRa coding rate
       "frequency": "868300000",              // Frequency (Hz)
-      "timestamp": 2463457000,               // Timestamp of the gateway concentrator when the message has been received
-      "time": "2020-02-12T15:15:45.787Z"     // ISO 8601 UTC timestamp at which the uplink has been received by the gateway
     },
     "received_at": "2020-02-12T15:15..."     // ISO 8601 UTC timestamp at which the uplink has been received by the Network Server
   }
