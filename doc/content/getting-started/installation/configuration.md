@@ -4,7 +4,7 @@ description: ""
 weight: 3
 ---
 
-{{% tts %}} can be started for development without passing any configuration. However, there are a number of things you need to configure for a production deployment. In this guide we will configure {{% tts %}} as a private deployment on `thethings.example.com`. For that purpose, we are going to need two configuration files: `docker-compose.yml`, which defines the Docker services of {{% tts %}} and its dependencies, and `ttn-lw-stack.yml`, which contains configuration specific to our {{% tts %}} deployment.
+{{% tts %}} can be started for development without passing any configuration. However, there are a number of things you need to configure for a production deployment. In this guide we will configure {{% tts %}} as a private deployment on `thethings.example.com`. For that purpose, we are going to need two configuration files: `docker-compose.yml`, which defines the Docker services of {{% tts %}} and its dependencies, and `ttn-lw-stack-docker.yml`, which contains configuration specific to our {{% tts %}} deployment.
 
 Create a new folder where your deployment files will be placed. This guide assumes the following directory hierarchy:
 
@@ -12,10 +12,10 @@ Create a new folder where your deployment files will be placed. This guide assum
 docker-compose.yml          # defines Docker services for running {{% tts %}}
 config/
 └── stack/
-    └── ttn-lw-stack.yml    # configuration file for {{% tts %}}
+    └── ttn-lw-stack-docker.yml    # configuration file for {{% tts %}}
 ```
 
-You can find the example [docker-compose.yml]({{% repo-file-url "raw" "docker-compose.yml" %}}) and [ttn-lw-stack.yml]({{% repo-file-url "raw" "config/stack/ttn-lw-stack.yml" %}}) files [in the Github repository of {{% tts %}}]({{% repo %}}).
+You can find the example [docker-compose.yml]({{% repo-file-url "raw" "docker-compose.yml" %}}) and [ttn-lw-stack-docker.yml]({{% repo-file-url "raw" "config/stack/ttn-lw-stack-docker.yml" %}}) files [in the Github repository of {{% tts %}}]({{% repo %}}).
 
 We will configure these files for a production deployment on `thethings.example.com`.
 
@@ -67,15 +67,15 @@ Before we go into the details of {{% tts %}}'s configuration, we'll take a look 
 
 ### Entrypoint and dependencies.
 
-We tell Docker Compose to use `ttn-lw-stack -c /config/ttn-lw-stack.yml`, as the container entry point so that our configuration file is always loaded (more on the config file below). The default command is `start`, which starts {{% tts %}}.
+We tell Docker Compose to use `ttn-lw-stack -c /config/ttn-lw-stack-docker.yml`, as the container entry point so that our configuration file is always loaded (more on the config file below). The default command is `start`, which starts {{% tts %}}.
 
 With the `depends_on` section we tell Docker Compose that {{% tts %}} depends on CockroachDB and Redis. With this, Docker Compose will wait for CockroachDB and Redis to come online before starting {{% tts %}}.
 
 ### Volumes
 
-Under the `volumes` section, we define volumes for files that need to be persisted on disk. There are stored blob files (such as profile pictures) and certificate files retrieved with ACME (if required). We also mount the local `./config/stack/` directory on the container under `/config`, so that {{% tts %}} can find our configuration file at `/config/ttn-lw-stack.yml`.
+Under the `volumes` section, we define volumes for files that need to be persisted on disk. There are stored blob files (such as profile pictures) and certificate files retrieved with ACME (if required). We also mount the local `./config/stack/` directory on the container under `/config`, so that {{% tts %}} can find our configuration file at `/config/ttn-lw-stack-docker.yml`.
 
-> NOTE: If your `ttn-lw-stack.yml` is in a directory other than `./config/stack`, you will need to change this volume accordingly.
+> NOTE: If your `ttn-lw-stack-docker.yml` is in a directory other than `./config/stack`, you will need to change this volume accordingly.
 
 ### Ports
 
@@ -91,7 +91,7 @@ services:
   # ...
   stack:
     image: 'thethingsnetwork/lorawan-stack:<the tag>'
-    entrypoint: 'ttn-lw-stack -c /config/ttn-lw-stack.yml'
+    entrypoint: 'ttn-lw-stack -c /config/ttn-lw-stack-docker.yml'
     command: 'start'
     restart: 'unless-stopped'
     depends_on:
@@ -135,7 +135,7 @@ services:
 
 ```
 
-Next, we'll have a look at the configuration options for your private deployment. We'll set these options in the `ttn-lw-stack.yml` file.
+Next, we'll have a look at the configuration options for your private deployment. We'll set these options in the `ttn-lw-stack-docker.yml` file.
 
 First is TLS with Let's Encrypt. Since we're deploying {{% tts %}} on
 `thethings.example.com`, we configure it to only request certificates for that
@@ -155,7 +155,7 @@ by the console client (see the `console` section).
 
 For more detailed configuration, refer to [the relevant documentation]({{< ref "/reference/configuration" >}}).
 
-Below is an example `ttn-lw-stack.yml` file:
+Below is an example `ttn-lw-stack-docker.yml` file:
 
 ```yaml
 # file: config/stack/ttn-lw-stack.yaml
