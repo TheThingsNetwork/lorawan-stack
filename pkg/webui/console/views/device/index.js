@@ -109,6 +109,7 @@ import style from './device.styl'
       'claim_authentication_code',
       'recent_uplinks',
       'recent_downlinks',
+      'attributes',
     ]
 
     if (mayReadKeys) {
