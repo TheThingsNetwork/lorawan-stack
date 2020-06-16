@@ -26,6 +26,9 @@ replace github.com/russross/blackfriday => github.com/russross/blackfriday v1.5.
 // Dependency of Hugo that causes problems with module management.
 replace github.com/nicksnyder/go-i18n => github.com/nicksnyder/go-i18n v1.10.0
 
+// Versions higher trigger google/protobuf update past v1.3.5.
+replace gocloud.dev => gocloud.dev v0.19.0
+
 require (
 	cloud.google.com/go/bigquery v1.6.0 // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
@@ -59,7 +62,7 @@ require (
 	github.com/golang/gddo v0.0.0-20200324184333-3c2cc9a6329d
 	github.com/golang/protobuf v1.3.5
 	github.com/google/wire v0.4.0 // indirect
-	github.com/goreleaser/goreleaser v0.133.0
+	github.com/goreleaser/goreleaser v0.138.0
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/securecookie v1.1.1
@@ -82,7 +85,6 @@ require (
 	github.com/jaytaylor/html2text v0.0.0-20200412013138-3577fbdbcff7
 	github.com/jinzhu/gorm v1.9.12
 	github.com/kr/pretty v0.2.0
-	github.com/kr/text v0.2.0 // indirect
 	github.com/kyokomi/emoji v2.2.2+incompatible // indirect
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/labstack/gommon v0.3.0
@@ -103,7 +105,6 @@ require (
 	github.com/nicksnyder/go-i18n v1.10.1 // indirect
 	github.com/oklog/ulid/v2 v2.0.2
 	github.com/openshift/osin v1.0.1
-	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/pelletier/go-toml v1.7.0 // indirect
 	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
 	github.com/pkg/errors v0.9.1
@@ -126,7 +127,7 @@ require (
 	go.opencensus.io v0.22.3
 	go.packetbroker.org/api/v3 v3.0.0
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2
-	gocloud.dev v0.19.0
+	gocloud.dev v0.20.0
 	gocloud.dev/pubsub/natspubsub v0.19.0
 	golang.org/x/crypto v0.0.0-20200429183012-4b2356b1ed79
 	golang.org/x/image v0.0.0-20200430140353-33d19683fad8 // indirect
@@ -145,5 +146,5 @@ require (
 	gopkg.in/ini.v1 v1.55.0 // indirect
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/square/go-jose.v2 v2.5.1
-	gopkg.in/yaml.v2 v2.2.8
+	gopkg.in/yaml.v2 v2.3.0
 )
