@@ -15,6 +15,8 @@
 import { createLogic } from 'redux-logic'
 import * as Sentry from '@sentry/browser'
 
+import { clear as clearAccessToken } from '@console/lib/access-token'
+
 import { error } from '@ttn-lw/lib/log'
 import { isUnauthenticatedError, isInvalidArgumentError, isUnknown } from '@ttn-lw/lib/errors/utils'
 
@@ -80,7 +82,9 @@ const createRequestLogic = function(
 
         if (isUnauthenticatedError(e)) {
           // If there was an unauthenticated error, the access token is not
-          // valid. Reloading will then initiate the auth flow.
+          // valid and we can delete it. Reloading will then initiate the auth
+          // flow.
+          clearAccessToken()
           window.location.reload()
         } else {
           // Otherwise, dispatch the fail action and report it to Sentry.
