@@ -44,9 +44,9 @@
 # If using (self) signed certificates:
 tls:
   source: file
-  root-ca: ./cert.pem
-  certificate: ./cert.pem
-  key: ./key.pem
+  root-ca: /run/secrets/cert.pem
+  certificate: /run/secrets/cert.pem
+  key: /run/secrets/key.pem
 
 # Let's encrypt for "thethings.example.com"
 # tls:
