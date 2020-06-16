@@ -198,7 +198,7 @@
   "console.containers.join-eui-prefixes-input.index.prefixesFetchingFailure": "Prefixes unavailable",
   "console.containers.join-eui-prefixes-input.join-eui-prefixes-input.empty": "No prefix",
   "console.containers.owners-select.owners-select.title": "Owner",
-  "console.containers.owners-select.owners-select.warning": "User oganizations unavailable",
+  "console.containers.owners-select.owners-select.warning": "There was an error and the list of organizations could not be displayed",
   "console.containers.pubsub-formats-select.index.title": "Pub/Sub format",
   "console.containers.pubsub-formats-select.index.warning": "Pub/Sub formats unavailable",
   "console.containers.pubsubs-table.index.format": "Format",
