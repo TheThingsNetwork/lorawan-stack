@@ -33,9 +33,10 @@ If you want to just run a docker image of The Things Stack, then check the [Inst
 
 ### Pre-requisites
 
-1. This section requires [docker](https://www.docker.com/get-started) to be installed.
-2. Make sure that you've run `$ make init` before continuing.
-3. If this is not the first time running the stack, make sure to clear any environment variables that you've been using earlier. You can do check what variables are set currently by using
+1. This section requires that the required tools from [Development Environment](##Development-Environment) are installed.
+2. This repository must be cloned inside the `GOPATH`. Check the [official documentation](https://golang.org/doc/gopath_code.html) on working with `GOPATH`.
+3. Make sure that you've run `$ make init` before continuing.
+4. If this is not the first time running the stack, make sure to clear any environment variables that you've been using earlier. You can do check what variables are set currently by using
 
 ```
 $ printenv | grep "TTN_LW_*"
