@@ -31,19 +31,21 @@ const GenerateInput = props => {
 
   const handleGenerateValue = React.useCallback(() => {
     if (mayGenerateValue) {
-      onChange(onGenerateValue())
+      const generatedValue = onGenerateValue()
+
+      onChange(generatedValue, true)
     }
   }, [mayGenerateValue, onChange, onGenerateValue])
 
   const generateAction = React.useMemo(
     () => ({
-      ...action,
       icon: 'autorenew',
       type: 'button',
       title: generateTitle,
       disabled: !mayGenerateValue,
       onClick: handleGenerateValue,
       raw: true,
+      ...action,
     }),
     [action, generateTitle, handleGenerateValue, mayGenerateValue],
   )
