@@ -67,10 +67,10 @@ export default OrganizationApiKeyEdit =>
       ...stateProps,
       ...dispatchProps,
       ...ownProps,
-      deleteOrganizationApiKeySuccess: keyId =>
-        dispatchProps.deleteOrganizationApiKey(stateProps.orgId, stateProps.keyId),
-      deleteOrganizationApiKey: () =>
+      deleteOrganizationApiKeySuccess: () =>
         dispatchProps.deleteOrganizationApiKeySuccess(stateProps.orgId),
+      deleteOrganizationApiKey: () =>
+        dispatchProps.deleteOrganizationApiKey(stateProps.orgId, stateProps.keyId),
       updateOrganizationApiKey: key =>
         dispatchProps.updateOrganizationApiKey(stateProps.orgId, stateProps.keyId, key),
     }),
