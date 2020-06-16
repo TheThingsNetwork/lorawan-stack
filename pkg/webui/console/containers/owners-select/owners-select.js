@@ -23,7 +23,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
   title: 'Owner',
-  warning: 'User oganizations unavailable',
+  warning: 'There was an error and the list of organizations could not be displayed',
 })
 
 const OwnersSelect = props => {

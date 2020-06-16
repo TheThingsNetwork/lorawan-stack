@@ -23,7 +23,7 @@ const m = defineMessages({
   generate: 'Generate end device address',
 })
 
-const DevAddrInput = function(props) {
+const DevAddrInput = props => {
   const {
     className,
     name,
@@ -31,38 +31,36 @@ const DevAddrInput = function(props) {
     onChange,
     onBlur,
     value,
-    fetching,
     disabled,
     autoFocus,
-    error,
     warning,
-    onDevAddrGenerate,
-    generatedDevAddr,
+    error: fieldError,
+    loading: fieldLoading,
+    onGenerate,
+    generatedError,
+    generatedLoading,
+    generatedValue,
   } = props
 
-  React.useEffect(
-    function() {
-      if (Boolean(generatedDevAddr)) {
-        onChange(generatedDevAddr)
-        onBlur({ target: { value: generatedDevAddr } })
-      }
-    },
-    [generatedDevAddr, onChange, onBlur],
-  )
+  const action = {
+    icon: 'autorenew',
+    title: m.generate,
+    type: 'button',
+    disabled: fieldLoading || disabled || generatedLoading,
+    onClick: onGenerate,
+    raw: true,
+  }
 
-  const action = React.useMemo(
-    function() {
-      return {
-        icon: 'autorenew',
-        title: m.generate,
-        type: 'button',
-        disabled: fetching || disabled,
-        onClick: onDevAddrGenerate,
-        raw: true,
-      }
-    },
-    [disabled, fetching, onDevAddrGenerate],
-  )
+  const showLoading = fieldLoading || generatedLoading
+  const showError = fieldError
+  // Always show field validation error first.
+  const showWarning = fieldError ? false : Boolean(warning) && generatedError
+
+  React.useEffect(() => {
+    if (Boolean(generatedValue)) {
+      onChange(generatedValue, true)
+    }
+  }, [generatedValue, onChange])
 
   return (
     <Input
@@ -76,10 +74,9 @@ const DevAddrInput = function(props) {
       onBlur={onBlur}
       onFocus={onFocus}
       value={value}
-      defaultValue={generatedDevAddr}
-      error={error}
-      warning={warning}
-      loading={fetching}
+      error={showError}
+      warning={showWarning}
+      loading={showLoading}
       disabled={disabled}
       autoFocus={autoFocus}
     />
@@ -91,13 +88,15 @@ DevAddrInput.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
   error: PropTypes.bool,
-  fetching: PropTypes.bool,
-  generatedDevAddr: PropTypes.string,
+  generatedError: PropTypes.bool.isRequired,
+  generatedLoading: PropTypes.bool.isRequired,
+  generatedValue: PropTypes.string.isRequired,
+  loading: PropTypes.bool,
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
-  onDevAddrGenerate: PropTypes.func.isRequired,
   onFocus: PropTypes.func,
+  onGenerate: PropTypes.func.isRequired,
   value: PropTypes.string,
   warning: PropTypes.bool,
 }
@@ -105,13 +104,12 @@ DevAddrInput.propTypes = {
 DevAddrInput.defaultProps = {
   className: undefined,
   onFocus: () => null,
-  fetching: false,
   disabled: false,
   error: false,
   warning: false,
   autoFocus: false,
   value: undefined,
-  generatedDevAddr: undefined,
+  loading: false,
 }
 
 export default DevAddrInput

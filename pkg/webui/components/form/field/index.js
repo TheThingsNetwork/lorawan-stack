@@ -113,14 +113,15 @@ class FormField extends React.Component {
   }
 
   @bind
-  handleChange(value, enforceValidation = false) {
+  async handleChange(value, enforceValidation = false) {
     const { name, onChange } = this.props
     const { setFieldValue, setFieldTouched } = this.context
 
     // Check if the value is react's synthetic event.
     const newValue = this.extractValue(value)
 
-    setFieldValue(name, newValue)
+    // TODO: Remove `await` when https://github.com/jaredpalmer/formik/issues/2457 is resolved.
+    await setFieldValue(name, newValue)
 
     if (enforceValidation) {
       setFieldTouched(name)

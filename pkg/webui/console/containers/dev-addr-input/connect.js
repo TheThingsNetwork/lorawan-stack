@@ -13,53 +13,36 @@
 // limitations under the License.
 
 import React from 'react'
-import bind from 'autobind-decorator'
 
 import api from '@console/api'
 
-export default function(Component) {
-  class Connect extends React.PureComponent {
-    state = {
-      devAddr: '',
-      error: undefined,
-      fetching: false,
+export default Component => props => {
+  const [state, setState] = React.useState({
+    devAddr: '',
+    loading: false,
+    error: undefined,
+  })
+  const { devAddr, loading, error } = state
+
+  const handleGenerateDevAddr = React.useCallback(async () => {
+    setState(prev => ({ ...prev, loading: true }))
+
+    try {
+      const { dev_addr } = await api.ns.generateDevAddress()
+
+      setState({ loading: false, error: undefined, devAddr: dev_addr })
+    } catch (error) {
+      setState(prev => ({ ...prev, loading: false, error }))
     }
+  }, [])
 
-    @bind
-    async generateDevAddr() {
-      await this.setState({ error: undefined, fetching: true })
-
-      try {
-        const { dev_addr } = await api.ns.generateDevAddress()
-
-        await this.setState({
-          error: undefined,
-          fetching: false,
-          devAddr: dev_addr,
-        })
-      } catch (error) {
-        await this.setState({
-          error,
-          fetching: false,
-          devAddr: '',
-        })
-      }
-    }
-
-    render() {
-      const { devAddr, fetching, error } = this.state
-
-      return (
-        <Component
-          {...this.props}
-          fetching={fetching}
-          error={error}
-          generatedDevAddr={devAddr}
-          onDevAddrGenerate={this.generateDevAddr}
-        />
-      )
-    }
-  }
-
-  return Connect
+  return (
+    <Component
+      {...props}
+      onGenerate={handleGenerateDevAddr}
+      generatedValue={devAddr}
+      generatedError={Boolean(error)}
+      generatedLoading={loading}
+    />
+  )
 }

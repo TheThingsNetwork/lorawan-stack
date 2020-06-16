@@ -14,6 +14,8 @@
 
 import api from '@console/api'
 
+import { clear as clearAccessToken } from '@console/lib/access-token'
+
 import * as user from '@console/store/actions/user'
 import * as init from '@console/store/actions/init'
 
@@ -34,6 +36,11 @@ const consoleAppLogic = createRequestLogic({
       rights = info.oauth_access_token.rights
       dispatch(user.getUserRightsSuccess(rights))
     } catch (error) {
+      if (error.code === 16) {
+        // The access token was not found, so we can delete it from local
+        // storage to obtain a new one.
+        clearAccessToken()
+      }
       dispatch(user.getUserRightsFailure())
       info = undefined
     }
