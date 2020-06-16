@@ -93,14 +93,17 @@ func Write(w io.Writer, format string, data interface{}) (err error) {
 	return nil
 }
 
-// IsPipe returns whether the given reader is a pipe that can be read.
-func IsPipe(r io.Reader) bool {
+// BufferedPipe returns a buffered reader if the reader is a pipe that can be read.
+func BufferedPipe(r io.Reader) (*bufio.Reader, bool) {
 	if f, ok := r.(*os.File); ok {
-		if stat, err := f.Stat(); err == nil {
-			return (stat.Mode()&os.ModeCharDevice) == 0 && stat.Size() > 0
+		if stat, err := f.Stat(); err == nil && stat.Mode()&os.ModeCharDevice == 0 {
+			rd := bufio.NewReader(r)
+			if n, err := rd.Peek(1); err == nil && len(n) == 1 {
+				return rd, true
+			}
 		}
 	}
-	return false
+	return nil, false
 }
 
 // Decoder is the interface for the functionality that reads and decodes entities

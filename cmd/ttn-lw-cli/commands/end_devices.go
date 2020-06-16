@@ -15,7 +15,6 @@
 package commands
 
 import (
-	"bufio"
 	"context"
 	"encoding/hex"
 	"io/ioutil"
@@ -868,10 +867,11 @@ values will be stored in the Join Server.`,
 				if joinEUI != nil || devEUI != nil {
 					logger.Warn("Either target JoinEUI or DevEUI specified but need both, not considering any and using scan mode")
 				}
-				if !io.IsPipe(os.Stdin) {
+				rd, ok := io.BufferedPipe(os.Stdin)
+				if !ok {
 					logger.Info("Scan QR code")
 				}
-				qrCode, err := bufio.NewReader(os.Stdin).ReadBytes('\n')
+				qrCode, err := rd.ReadBytes('\n')
 				if err != nil {
 					return err
 				}
