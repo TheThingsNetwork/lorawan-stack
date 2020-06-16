@@ -1,0 +1,51 @@
+name: Documentation
+
+on: pull_request
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Set up Node
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: '~14'
+    - name: Get Yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+    - name: Initialize Yarn module cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '~1.14'
+    - name: Initialize Go module cache
+      uses: actions/cache@v2
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - name: Download Go tool dependencies
+      run: |
+        cd tools
+        go mod download
+    - name: Initialize tool binary cache
+      uses: actions/cache@v2
+      with:
+        path: tools/bin
+        key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
+    - name: Make Mage
+      run: make tools/bin/mage
+    - name: Install documentation dependencies
+      run: tools/bin/mage docs:deps
+    - name: Build documentation
+      run: tools/bin/mage docs:build
