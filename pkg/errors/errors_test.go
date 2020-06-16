@@ -84,6 +84,8 @@ func TestContextCanceled(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
+	<-ctx.Done()
+
 	err, ok := errors.From(ctx.Err())
 	a.So(ok, should.BeTrue)
 	a.So(errors.IsCanceled(err), should.BeTrue)
@@ -94,7 +96,7 @@ func TestContextDeadlineExceeded(t *testing.T) {
 
 	ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(5*time.Millisecond))
 
-	time.Sleep(10 * time.Millisecond)
+	<-ctx.Done()
 
 	err, ok := errors.From(ctx.Err())
 	if !a.So(ok, should.BeTrue) {
