@@ -15,8 +15,8 @@
 package ttnmage
 
 import (
-	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -26,326 +26,293 @@ import (
 	"github.com/magefile/mage/target"
 )
 
-func nodeBin(cmd string) string { return filepath.Join("node_modules", ".bin", cmd) }
-
-// DevDeps installs the javascript development dependencies.
-func devDeps() error {
-	_, err := yarn()
-	if err != nil {
-		return err
-	}
-	mg.Deps(Js.Deps)
-	return nil
-}
-
 // Js namespace.
 type Js mg.Namespace
 
+func yarnWorkingDirectoryArg(elem ...string) string {
+	return fmt.Sprintf("--cwd=%s", filepath.Join(elem...))
+}
+
 func installYarn() error {
-	packageJSONBytes, err := ioutil.ReadFile("package.json")
+	ok, err := target.Path(
+		filepath.Join("node_modules", "yarn"),
+		"package.json",
+	)
 	if err != nil {
-		return err
+		return targetError(err)
 	}
-	var packageJSON struct {
-		DevDependencies map[string]string `json:"devDependencies"`
+	if !ok {
+		return nil
 	}
-	if err = json.Unmarshal(packageJSONBytes, &packageJSON); err != nil {
-		return err
+	if err := sh.RunV("npm", "install", "--no-package-lock", "--no-save", "--production=false", "yarn"); err != nil {
+		return fmt.Errorf("failed to install yarn: %w", err)
 	}
-	yarn, ok := packageJSON.DevDependencies["yarn"]
-	if ok {
-		yarn = "yarn@" + yarn
-	} else {
-		yarn = "yarn"
-	}
-	if mg.Verbose() {
-		fmt.Printf("Installing Yarn %s\n", yarn)
-	}
-	return sh.RunV("npm", "install", "--no-package-lock", "--no-save", "--production=false", yarn)
+	return nil
 }
 
-func yarn() (func(args ...string) error, error) {
-	if _, err := os.Stat(nodeBin("yarn")); os.IsNotExist(err) {
-		if err = installYarn(); err != nil {
-			return nil, err
+func execYarn(stdout, stderr io.Writer, args ...string) error {
+	_, err := sh.Exec(nil, stdout, stderr, "npx", append([]string{"yarn"}, args...)...)
+	return err
+}
+
+func runYarn(args ...string) error {
+	return sh.Run("npx", append([]string{"yarn"}, args...)...)
+}
+
+func runYarnV(args ...string) error {
+	return sh.RunV("npx", append([]string{"yarn"}, args...)...)
+}
+
+func (Js) runYarnCommand(cmd string, args ...string) error {
+	return runYarn(append([]string{"run", cmd}, args...)...)
+}
+
+func (Js) runYarnCommandV(cmd string, args ...string) error {
+	return runYarnV(append([]string{"run", cmd}, args...)...)
+}
+
+func (js Js) runWebpack(config string, args ...string) error {
+	return js.runYarnCommand("webpack", append([]string{fmt.Sprintf("--config=%s", config)}, args...)...)
+}
+
+func (js Js) runEslint(args ...string) error {
+	return js.runYarnCommand("eslint", append([]string{"--color", "--no-ignore"}, args...)...)
+}
+
+func (Js) isProductionMode() bool {
+	switch v := os.Getenv("NODE_ENV"); v {
+	case "", "production":
+		return true
+
+	case "development":
+		return false
+
+	default:
+		if mg.Verbose() {
+			fmt.Printf("Unknown `NODE_ENV` value `%s`, assuming production mode\n", v)
 		}
+		return true
 	}
-	return func(args ...string) error {
-		return sh.RunV(nodeBin("yarn"), args...)
-	}, nil
-}
-
-func (js Js) node() (func(args ...string) error, error) {
-	return func(args ...string) error {
-		return sh.Run("node", args...)
-	}, nil
-}
-
-func (js Js) execFromNodeBin(cmd string, verbose bool) (func(args ...string) error, error) {
-	if _, err := os.Stat(nodeBin(cmd)); os.IsNotExist(err) {
-		if err = js.DevDeps(); err != nil {
-			return nil, err
-		}
-	}
-
-	out := os.Stdout
-	if !mg.Verbose() && !verbose {
-		out = nil
-	}
-	return func(args ...string) error {
-		_, err := sh.Exec(nil, out, os.Stderr, nodeBin(cmd), args...)
-		return err
-	}, nil
-}
-
-func (js Js) webpack() (func(args ...string) error, error) {
-	return js.execFromNodeBin("webpack", false)
-}
-
-func (js Js) webpackServe() (func(args ...string) error, error) {
-	return js.execFromNodeBin("webpack-dev-server", true)
-}
-
-func (js Js) babel() (func(args ...string) error, error) {
-	if _, err := os.Stat(nodeBin("babel")); os.IsNotExist(err) {
-		if err = js.DevDeps(); err != nil {
-			return nil, err
-		}
-	}
-	return func(args ...string) error {
-		_, err := sh.Exec(nil, nil, os.Stderr, nodeBin("babel"), args...)
-		return err
-	}, nil
-}
-
-func (js Js) jest() (func(args ...string) error, error) {
-	return js.execFromNodeBin("jest", false)
-}
-
-func (js Js) prettier() (func(args ...string) error, error) {
-	return js.execFromNodeBin("prettier", false)
-}
-
-func (js Js) eslint() (func(args ...string) error, error) {
-	return js.execFromNodeBin("eslint", false)
-}
-
-func (js Js) stylint() (func(args ...string) error, error) {
-	return js.execFromNodeBin("stylint", false)
-}
-
-func (js Js) storybook() (func(args ...string) error, error) {
-	return js.execFromNodeBin("start-storybook", true)
-}
-
-// DevDeps installs the javascript development dependencies.
-func (js Js) DevDeps() error {
-	return devDeps()
 }
 
 // Deps installs the javascript dependencies.
 func (js Js) Deps() error {
-	files, readErr := ioutil.ReadDir("node_modules")
-	changed, targetErr := target.Path("node_modules", "./package.json", "./yarn.lock")
-	// Check whether package.json/yarn.lock are newer than node_modules
-	// and whether it is not only yarn that is installed via DevDeps()
-	if readErr != nil || os.IsNotExist(targetErr) || (targetErr == nil && changed) || len(files) <= 4 {
-		if mg.Verbose() {
-			fmt.Println("Installing JS dependencies")
-		}
-		yarn, err := yarn()
-		if err != nil {
-			return err
-		}
-		err = yarn("install", "--no-progress", "--production=false")
-		if err != nil {
-			return err
-		}
-		mg.Deps(JsSDK.Link)
-		return nil
-	}
-	return nil
-}
-
-// Build runs all necessary commands to build the console bundles and files.
-func (js Js) Build() {
-	mg.SerialDeps(js.Deps, JsSDK.Build, js.BuildDll, js.BuildMain)
-}
-
-// BuildMain runs the webpack command with the project config.
-func (js Js) BuildMain() error {
-	mg.Deps(js.Translations, js.BackendTranslations, js.BuildDll)
-	if mg.Verbose() {
-		fmt.Println("Running Webpack")
-	}
-	webpack, err := js.webpack()
+	ok, err := target.Dir(
+		"node_modules",
+		"package.json",
+		"yarn.lock",
+	)
 	if err != nil {
-		return err
+		return targetError(err)
 	}
-	return webpack("--config", "config/webpack.config.babel.js")
+	// installYarn updates modtime of node_modules, so we not only need to check that, but also the contents of node_modules.
+	// NOTE: Getting rid of installYarn and installing both yarn and the dependencies here does not work, since JsSDK.Build
+	// depends on yarn being available.
+	if !ok {
+		files, err := ioutil.ReadDir("node_modules")
+		if err != nil {
+			return fmt.Errorf("failed to read node_modules: %w", err)
+		}
+		if len(files) > 2 ||
+			js.isProductionMode() && len(files) > 1 {
+			// Check if it's only yarn and, in development mode, ttn-lw link installed in `node_modules`.
+			// NOTE: There's no link in production mode.
+			return nil
+		}
+	}
+
+	mg.Deps(installYarn, JsSDK.Build)
+	if !js.isProductionMode() {
+		if mg.Verbose() {
+			fmt.Println("Linking ttn-lw package")
+		}
+		if err := runYarn(yarnWorkingDirectoryArg("sdk", "js"), "link"); err != nil {
+			return fmt.Errorf("failed to create JS SDK link: %w", err)
+		}
+		if err := runYarn("link", "ttn-lw"); err != nil {
+			return fmt.Errorf("failed to link JS SDK: %w", err)
+		}
+	}
+	if mg.Verbose() {
+		fmt.Println("Installing JS dependencies")
+	}
+	return runYarn("install", "--no-progress", "--production=false")
 }
 
 // BuildDll runs the webpack command to build the DLL bundle
 func (js Js) BuildDll() error {
-	mg.Deps(js.Deps)
-	if nodeEnv := os.Getenv("NODE_ENV"); nodeEnv == "development" {
-		changed, err := target.Path("./public/libs.bundle.js", "./yarn.lock")
-		if changed || os.IsNotExist(err) {
-			if mg.Verbose() {
-				fmt.Println("Running Webpack for DLL...")
-			}
-			webpack, err := js.webpack()
-			if err != nil {
-				return err
-			}
-			return webpack("--config", "config/webpack.dll.babel.js")
-		}
+	if js.isProductionMode() {
+		fmt.Println("Skipping DLL building (production mode)")
 		return nil
 	}
-	if mg.Verbose() {
-		fmt.Println("Skipping DLL module bundling (production mode)")
-	}
-	return nil
-}
 
-// Serve builds necessary bundles and serves the console for development.
-func (js Js) Serve() {
-	mg.Deps(js.ServeMain)
-}
-
-// ServeMain runs webpack-dev-server
-func (js Js) ServeMain() error {
-	mg.Deps(js.Translations, js.BackendTranslations, js.BuildDll)
-	if mg.Verbose() {
-		fmt.Println("Running Webpack for Main Bundle in watch mode...")
-	}
-	webpackServe, err := js.webpackServe()
+	ok, err := target.Path(
+		filepath.Join("public", "libs.bundle.js"),
+		"yarn.lock",
+	)
 	if err != nil {
-		return err
+		return targetError(err)
+	}
+	if !ok {
+		return nil
+	}
+	mg.Deps(js.Deps)
+	if mg.Verbose() {
+		fmt.Println("Running Webpack for DLL")
+	}
+	return js.runWebpack("config/webpack.dll.babel.js")
+}
+
+// Build runs the webpack command with the project config.
+func (js Js) Build() error {
+	mg.Deps(js.Deps, js.Translations, js.BackendTranslations, js.BuildDll)
+	if mg.Verbose() {
+		fmt.Println("Running Webpack")
+	}
+	return js.runWebpack("config/webpack.config.babel.js")
+}
+
+// Serve runs webpack-dev-server.
+func (js Js) Serve() error {
+	mg.Deps(js.Deps, js.Translations, js.BackendTranslations, js.BuildDll)
+	if mg.Verbose() {
+		fmt.Println("Running Webpack for Main Bundle in watch mode")
 	}
 	os.Setenv("DEV_SERVER_BUILD", "true")
-	return webpackServe("--config", "config/webpack.config.babel.js", "-w")
+	return js.runYarnCommandV("webpack-dev-server",
+		"--config", "config/webpack.config.babel.js",
+		"-w",
+	)
 }
 
 // Messages extracts the frontend messages via babel.
 func (js Js) Messages() error {
-	changed, err := target.Dir("./.cache/messages", "./pkg/webui/console")
-	if os.IsNotExist(err) || (err == nil && changed) {
-		if mg.Verbose() {
-			fmt.Println("Extracting frontend messages...")
-		}
-		babel, err := js.babel()
-		if err != nil {
-			return err
-		}
-		if err = sh.Rm(".cache/messages"); err != nil {
-			return err
-		}
-		if err = os.MkdirAll("pkg/webui/locales", 0755); err != nil {
-			return err
-		}
-		return babel("pkg/webui")
+	mg.Deps(js.Deps)
+	ok, err := target.Dir(
+		filepath.Join(".cache", "messages"),
+		filepath.Join("pkg", "webui", "console"),
+	)
+	if err != nil {
+		return targetError(err)
 	}
-	return nil
+	if !ok {
+		return nil
+	}
+	if mg.Verbose() {
+		fmt.Println("Extracting frontend messages")
+	}
+	if err = sh.Rm(filepath.Join(".cache", "messages")); err != nil {
+		return fmt.Errorf("failed to delete existing messages: %w", err)
+	}
+	if err = os.MkdirAll(filepath.Join("pkg", "webui", "locales"), 0755); err != nil {
+		return fmt.Errorf("failed to create locale directory: %w", err)
+	}
+	return execYarn(nil, os.Stderr, "babel", filepath.Join("pkg", "webui"))
 }
 
 // Translations builds the frontend locale files.
 func (js Js) Translations() error {
-	mg.Deps(js.Messages)
-	changed, err := target.Dir("./pkg/webui/locales/en.json", "./.cache/messages")
-	if os.IsNotExist(err) || (err == nil && changed) {
-		if mg.Verbose() {
-			fmt.Println("Building frontend locale files...")
-		}
-		node, err := js.node()
-		if err != nil {
-			return err
-		}
-		return node("tools/mage/translations.js")
+	mg.Deps(js.Deps, js.Messages)
+	ok, err := target.Dir(
+		filepath.Join("pkg", "webui", "locales", "en.json"),
+		filepath.Join(".cache", "messages"),
+	)
+	if err != nil {
+		return targetError(err)
 	}
-	return nil
+	if !ok {
+		return nil
+	}
+	if mg.Verbose() {
+		fmt.Println("Building frontend locale files")
+	}
+	return sh.Run("node", "tools/mage/translations.js")
 }
 
 // BackendTranslations builds the backend locale files.
 func (js Js) BackendTranslations() error {
-	changed, err := target.Path("./pkg/webui/locales/.backend/en.json", "./config/messages.json")
-	if os.IsNotExist(err) || (err == nil && changed) {
+	mg.Deps(js.Deps)
+	ok, err := target.Path(
+		filepath.Join("pkg", "webui", "locales", ".backend", "en.json"),
+		filepath.Join("config", "messages.json"),
+	)
+	if err != nil {
+		return targetError(err)
+	}
+	if !ok {
+		return nil
+	}
+	if mg.Verbose() {
+		fmt.Println("Building backend locale files")
+	}
+	return sh.Run("node",
+		"tools/mage/translations.js",
+		"--backend-messages", "config/messages.json",
+		"--locales", "pkg/webui/locales/.backend",
+		"--backend-only",
+	)
+}
 
-		if mg.Verbose() {
-			fmt.Println("Building backend locale files...")
+// Clean clears all generated files.
+func (js Js) Clean() error {
+	for _, p := range []string{
+		".cache",
+		"public",
+		filepath.Join("pkg", "webui", "locales", ".backend"),
+	} {
+		if err := sh.Rm(p); err != nil {
+			return fmt.Errorf("failed to delete %s: %w", p, err)
 		}
-		node, err := js.node()
-		if err != nil {
-			return err
-		}
-
-		return node("tools/mage/translations.js", "--backend-messages", "config/messages.json", "--locales", "pkg/webui/locales/.backend", "--backend-only")
 	}
 	return nil
 }
 
-// Clean clears all generated files.
-func (js Js) Clean() {
-	sh.Rm(".cache")
-	sh.Rm("public")
-	sh.Rm(filepath.Join("pkg", "webui", "locales", ".backend"))
-}
-
 // CleanDeps removes all installed node packages (rm -rf node_modules).
-func (js Js) CleanDeps() {
-	sh.Rm("node_modules")
+func (js Js) CleanDeps() error {
+	if err := sh.Rm("node_modules"); err != nil {
+		return fmt.Errorf("failed to delete node_modules: %w", err)
+	}
+	return nil
 }
 
 // Test runs frontend jest tests.
 func (js Js) Test() error {
+	mg.Deps(js.Deps)
 	if mg.Verbose() {
-		fmt.Println("Running Tests")
+		fmt.Println("Running tests")
 	}
-	jest, err := js.jest()
-	if err != nil {
-		return err
-	}
-	return jest("./pkg/webui")
+	return js.runYarnCommand("jest", filepath.Join("pkg", "webui"))
 }
 
 // Fmt formats all js files.
 func (js Js) Fmt() error {
+	mg.Deps(js.Deps)
 	if mg.Verbose() {
 		fmt.Println("Running prettier on .js files")
 	}
-
-	prettier, err := js.prettier()
-	if err != nil {
-		return err
-	}
-
-	return prettier("--config", "./config/.prettierrc.js", "./pkg/webui/**/*.js", "./config/**/*.js", "--write")
+	return js.runYarnCommand("prettier",
+		"--config", "./config/.prettierrc.js",
+		"--write",
+		"./pkg/webui/**/*.js", "./config/**/*.js",
+	)
 }
 
 // Lint runs eslint over frontend js files.
 func (js Js) Lint() error {
+	mg.Deps(js.Deps, Js.BackendTranslations)
 	if mg.Verbose() {
 		fmt.Println("Running eslint on .js files")
 	}
-	eslint, err := js.eslint()
-	if err != nil {
-		return err
-	}
-	// TODO: Remove the `--quiet` flag after all component prop-types are defined
-	// (https://github.com/TheThingsNetwork/lorawan-stack/issues/1086)
-	return eslint("./pkg/webui/**/*.js", "./config/**/*.js", "--no-ignore", "--color", "--quiet")
+	return js.runEslint("./pkg/webui/**/*.js", "./config/**/*.js")
 }
 
 // LintSnap runs eslint over frontend snap files.
 func (js Js) LintSnap() error {
+	mg.Deps(js.Deps)
 	if mg.Verbose() {
 		fmt.Println("Running eslint on .snap files")
 	}
-	eslint, err := js.eslint()
-	if err != nil {
-		return err
-	}
-	return eslint("./pkg/webui/**/*.snap", "--no-ignore", "--color")
+	return js.runEslint("./pkg/webui/**/*.snap")
 }
 
 // LintAll runs linters over js and snap files.
@@ -355,25 +322,22 @@ func (js Js) LintAll() {
 
 // Storybook runs a local server with storybook.
 func (js Js) Storybook() error {
+	mg.Deps(js.Deps)
 	if mg.Verbose() {
-		fmt.Println("Serving storybook...")
+		fmt.Println("Serving storybook")
 	}
-	storybook, err := js.storybook()
-	if err != nil {
-		return err
-	}
-
-	return storybook("--config-dir", "./config/storybook", "--static-dir", "public", "--port", "9001")
+	return js.runYarnCommandV("start-storybook",
+		"--config-dir", "./config/storybook",
+		"--static-dir", "public",
+		"--port", "9001",
+	)
 }
 
 // Vulnerabilities runs yarn audit to check for vulnerable node packages.
 func (js Js) Vulnerabilities() error {
+	mg.Deps(installYarn)
 	if mg.Verbose() {
 		fmt.Println("Checking for vulnerabilities")
 	}
-	yarn, err := yarn()
-	if err != nil {
-		return err
-	}
-	return yarn("audit")
+	return runYarn("audit")
 }

@@ -16,40 +16,20 @@ package ttnmage
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 )
 
 // Styl namespace.
 type Styl mg.Namespace
-
-func (styl Styl) stylint() (func(args ...string) (string, error), error) {
-	if _, err := os.Stat(nodeBin("stylint")); os.IsNotExist(err) {
-		if err = devDeps(); err != nil {
-			return nil, err
-		}
-	}
-	return func(args ...string) (string, error) {
-		return sh.Output(nodeBin("stylint"), args...)
-	}, nil
-}
 
 // Lint runs stylint over frontend styl files.
 func (styl Styl) Lint() error {
 	if mg.Verbose() {
 		fmt.Println("Running stylint")
 	}
-	stylint, err := styl.stylint()
-	if err != nil {
-		return err
-	}
-	res, err := stylint("./pkg/webui", "--config", "config/stylintrc.json")
-
-	if res != "" {
-		fmt.Println(res)
-	}
-
-	return err
+	return runYarnV("stylint",
+		"--config", "config/stylintrc.json",
+		"./pkg/webui",
+	)
 }

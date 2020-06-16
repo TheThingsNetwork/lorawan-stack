@@ -33,10 +33,8 @@ require (
 	github.com/mattn/goveralls v0.0.5
 	github.com/mdempsky/unconvert v0.0.0-20200228143138-95ecdbfc0b5f
 	github.com/mgechev/revive v1.0.2
-	github.com/pkg/errors v0.9.1
 	go.thethings.network/lorawan-stack/v3 v3.0.0-00010101000000-000000000000
 	golang.org/x/tools v0.0.0-20200519205726-57a9e4404bf7
-	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v2 v2.3.0
 )

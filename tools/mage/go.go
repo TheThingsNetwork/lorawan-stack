@@ -46,14 +46,13 @@ func buildGoArgs(cmd string, args ...string) []string {
 	return append([]string{cmd}, args...)
 }
 
-func execGo(stdout, stderr io.Writer, cmd string, args ...string) error {
-	_, err := sh.Exec(goModuleEnv, stdout, stderr, "go", buildGoArgs(cmd, args...)...)
-	return err
-}
-
 func execGoFrom(dir string, stdout, stderr io.Writer, cmd string, args ...string) error {
 	_, err := sh.ExecFrom(dir, goModuleEnv, stdout, stderr, "go", buildGoArgs(cmd, args...)...)
 	return err
+}
+
+func execGo(stdout, stderr io.Writer, cmd string, args ...string) error {
+	return execGoFrom("", stdout, stderr, cmd, args...)
 }
 
 func runGo(args ...string) error {
@@ -236,8 +235,8 @@ var coverallsIgnored = []string{
 }
 
 // Coveralls sends the test coverage to Coveralls.
-func (Go) Coveralls() error {
-	mg.Deps(Go.Cover)
+func (g Go) Coveralls() error {
+	mg.Deps(g.Cover)
 	if mg.Verbose() {
 		fmt.Println("Filtering Go coverage output")
 	}

@@ -16,6 +16,7 @@ package ttnmage
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -24,7 +25,6 @@ import (
 	"github.com/TheThingsIndustries/magepkg/git"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"golang.org/x/xerrors"
 )
 
 // Git namespace.
@@ -140,7 +140,7 @@ func (Git) commitMsg(messageFile string) error {
 	commitMsg := s.Text()
 
 	if commitMsg == "" {
-		return xerrors.New("commit message must not be empty")
+		return errors.New("commit message must not be empty")
 	}
 
 	if strings.HasPrefix(commitMsg, "fixup! ") || strings.HasPrefix(commitMsg, "Merge ") {
@@ -150,7 +150,7 @@ func (Git) commitMsg(messageFile string) error {
 	// Check length:
 	switch {
 	case len(commitMsg) > 72:
-		return xerrors.New("commit message must be shorter than 72 characters")
+		return errors.New("commit message must be shorter than 72 characters")
 	case len(commitMsg) > 50:
 		// TODO: Warn.
 	}
