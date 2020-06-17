@@ -21,9 +21,11 @@ import (
 	"net"
 	"strings"
 
+	stderrors "errors"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 var errAddress = errors.DefineInvalidArgument("address", "invalid address")
@@ -68,6 +70,28 @@ var HTTPScheme = map[bool]string{
 	true:  "https",
 }
 
+var clusterRoleServices = map[ttnpb.ClusterRole]string{
+	ttnpb.ClusterRole_ENTITY_REGISTRY:              "is",
+	ttnpb.ClusterRole_ACCESS:                       "is",
+	ttnpb.ClusterRole_GATEWAY_SERVER:               "gs",
+	ttnpb.ClusterRole_NETWORK_SERVER:               "ns",
+	ttnpb.ClusterRole_APPLICATION_SERVER:           "as",
+	ttnpb.ClusterRole_JOIN_SERVER:                  "js",
+	ttnpb.ClusterRole_DEVICE_TEMPLATE_CONVERTER:    "dtc",
+	ttnpb.ClusterRole_DEVICE_CLAIMING_SERVER:       "dcs",
+	ttnpb.ClusterRole_GATEWAY_CONFIGURATION_SERVER: "gcs",
+	ttnpb.ClusterRole_QR_CODE_GENERATOR:            "qrg",
+}
+
+// ServiceName returns the service name of the given role. This service name is typically used in SRV records.
+func ServiceName(role ttnpb.ClusterRole) (string, bool) {
+	service, ok := clusterRoleServices[role]
+	if !ok {
+		return "", false
+	}
+	return fmt.Sprintf("ttn-v3-%s-grpc", service), true
+}
+
 // DefaultURL appends protocol and port if target does not already have one.
 func DefaultURL(target string, port int, tls bool) (string, error) {
 	target, err := DefaultPort(target, port)
@@ -77,64 +101,110 @@ func DefaultURL(target string, port int, tls bool) (string, error) {
 	return fmt.Sprintf("%s://%s", HTTPScheme[tls], target), nil
 }
 
-func resolver(tls bool) func(ctx context.Context, target string) (net.Conn, error) {
-	return func(ctx context.Context, target string) (net.Conn, error) {
-		// TODO: If no port is specified, discover through SRV records (https://github.com/TheThingsNetwork/lorawan-stack/issues/138)
-		target, err := DefaultPort(target, DefaultPorts[tls])
-		if err != nil {
-			return nil, err
+// DNSResolver provides DNS lookup for discovery.
+type DNSResolver interface {
+	LookupSRV(ctx context.Context, service, proto, name string) (cname string, addrs []*net.SRV, err error)
+}
+
+type options struct {
+	insecureFallback bool
+	dnsResolver      DNSResolver
+	dialer           func(context.Context, string) (net.Conn, error)
+}
+
+// Option configures the discovery dialing.
+type Option interface {
+	apply(*options)
+}
+
+type optionFunc func(*options)
+
+func (f optionFunc) apply(opts *options) {
+	f(opts)
+}
+
+// WithInsecureFallback configures the dialer to use the default insecure port when discovery fails.
+// Use this option with gRPC's WithInsecure dial option.
+func WithInsecureFallback() Option {
+	return optionFunc(func(opts *options) {
+		opts.insecureFallback = true
+	})
+}
+
+// WithDNSResolver configures the dialer with a custom DNS resolver.
+func WithDNSResolver(resolver DNSResolver) Option {
+	return optionFunc(func(opts *options) {
+		opts.dnsResolver = resolver
+	})
+}
+
+// WithAddressDialer configures the discovery dialer with a custom address dialer.
+// This dialer is called for each discovered address until a nil error is returned.
+func WithAddressDialer(dialer func(context.Context, string) (net.Conn, error)) Option {
+	return optionFunc(func(opts *options) {
+		opts.dialer = dialer
+	})
+}
+
+// WithDialer returns a gRPC dialer that uses service discovery.
+//
+// Service discovery performs a DNS SRV lookup on the given target if it does not contain a port and the given role is
+// discoverable.
+//
+// If the given role does not support discovery or if the DNS SRV lookup fails, this function falls back to the default port.
+func WithDialer(role ttnpb.ClusterRole, opts ...Option) grpc.DialOption {
+	options := &options{
+		insecureFallback: false,
+		dnsResolver:      net.DefaultResolver,
+		dialer: func(ctx context.Context, address string) (net.Conn, error) {
+			return new(net.Dialer).DialContext(ctx, "tcp", address)
+		},
+	}
+	for _, opt := range opts {
+		opt.apply(options)
+	}
+
+	return grpc.WithContextDialer(func(ctx context.Context, target string) (net.Conn, error) {
+		var addresses []string
+		if _, _, err := net.SplitHostPort(target); err == nil {
+			addresses = []string{target}
+		} else {
+			if service, ok := ServiceName(role); ok {
+				_, addrs, err := options.dnsResolver.LookupSRV(ctx, service, "tcp", target)
+				var dnsErr *net.DNSError
+				if err != nil && stderrors.As(err, &dnsErr) && !dnsErr.IsNotFound {
+					return nil, err
+				}
+				if err == nil {
+					addresses = make([]string, len(addrs))
+					for i, addr := range addrs {
+						addresses[i] = fmt.Sprintf("%s:%d", strings.TrimSuffix(addr.Target, "."), addr.Port)
+					}
+				}
+			}
+			if len(addresses) == 0 {
+				target, err := DefaultPort(target, DefaultPorts[!options.insecureFallback])
+				if err != nil {
+					return nil, err
+				}
+				addresses = []string{target}
+			}
 		}
-		return new(net.Dialer).DialContext(ctx, "tcp", target)
-	}
-}
 
-// WithTransportCredentials returns gRPC dial options which configures connection level security credentials (e.g.,
-// TLS/SSL) and discover the TLS/SSL listen port if not specified in the dial target.
-func WithTransportCredentials(creds credentials.TransportCredentials) []grpc.DialOption {
-	return []grpc.DialOption{
-		grpc.WithTransportCredentials(creds),
-		grpc.WithContextDialer(resolver(true)),
-	}
-}
-
-// WithInsecure returns gRPC dial options which disable transport security and discover the default insecure listen
-// port if not specified in the dial target.
-func WithInsecure() []grpc.DialOption {
-	return []grpc.DialOption{
-		grpc.WithInsecure(),
-		grpc.WithContextDialer(resolver(false)),
-	}
-}
-
-type tlsFallbackKeyType struct{}
-
-var tlsFallbackKey tlsFallbackKeyType
-
-// WithTLSFallback returns a derived context which is configured to fall back to the given TLS setting if discovery
-// fails.
-func WithTLSFallback(parent context.Context, tls bool) context.Context {
-	return context.WithValue(parent, tlsFallbackKey, tls)
-}
-
-// DialOptions discovers gRPC dial options based on the given target. This includes whether or not transport level
-// security is enabled and service port discovery.
-func DialOptions(ctx context.Context, target string, creds credentials.TransportCredentials) ([]grpc.DialOption, error) {
-	// TODO: Discover through SRV records and cache result (https://github.com/TheThingsNetwork/lorawan-stack/issues/138)
-	if val, ok := ctx.Value(tlsFallbackKey).(bool); ok && !val {
-		return WithInsecure(), nil
-	}
-	return WithTransportCredentials(creds), nil
-}
-
-// DialContext creates a client connection to the given target. It uses DialOptions to discover gRPC dial options for
-// the target.
-func DialContext(ctx context.Context, target string, creds credentials.TransportCredentials, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-	discoveredOpts, err := DialOptions(ctx, target, creds)
-	if err != nil {
+		var err error
+		var conn net.Conn
+		for _, address := range addresses {
+			conn, err = options.dialer(ctx, address)
+			if err == nil {
+				return conn, nil
+			}
+		}
 		return nil, err
-	}
-	allOpts := make([]grpc.DialOption, 0, len(discoveredOpts)+len(opts))
-	allOpts = append(allOpts, discoveredOpts...)
-	allOpts = append(allOpts, opts...)
-	return grpc.DialContext(ctx, target, allOpts...)
+	})
+}
+
+// DialContext creates a client connection to the given host using service discovery. See WithDialer for more information.
+// To configure a DNS resolver, an address dialer or fallback to the default insecure port, use WithDialer with options.
+func DialContext(ctx context.Context, role ttnpb.ClusterRole, target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+	return grpc.DialContext(ctx, target, append(opts, WithDialer(role))...)
 }

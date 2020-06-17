@@ -115,12 +115,24 @@ func (as *ApplicationServer) connectLink(ctx context.Context, link *link) error 
 	var allowInsecure bool
 	if link.NetworkServerAddress != "" {
 		allowInsecure = as.AllowInsecureForCredentials()
-		tlsConfig, err := as.GetTLSClientConfig(ctx)
-		if err != nil {
-			return err
+		var dialOpt grpc.DialOption
+		discoverOpts := make([]discover.Option, 0, 1)
+		if link.TLS {
+			tlsConfig, err := as.GetTLSClientConfig(ctx)
+			if err != nil {
+				return err
+			}
+			dialOpt = grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig))
+		} else {
+			dialOpt = grpc.WithInsecure()
+			discoverOpts = append(discoverOpts, discover.WithInsecureFallback())
 		}
-		ctx = discover.WithTLSFallback(ctx, link.TLS)
-		conn, err := discover.DialContext(ctx, link.NetworkServerAddress, credentials.NewTLS(tlsConfig), rpcclient.DefaultDialOptions(ctx)...)
+		conn, err := grpc.DialContext(ctx, link.NetworkServerAddress,
+			append(rpcclient.DefaultDialOptions(ctx),
+				dialOpt,
+				discover.WithDialer(ttnpb.ClusterRole_NETWORK_SERVER, discoverOpts...),
+			)...,
+		)
 		if err != nil {
 			return err
 		}
