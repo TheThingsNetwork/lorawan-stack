@@ -9,6 +9,12 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 charset = utf-8
 
+[*.js]
+# Allow C-style doc comments
+block_comment_start = /*
+block_comment = *
+block_comment_end = */
+
 [*.go]
 indent_style = tab
 
