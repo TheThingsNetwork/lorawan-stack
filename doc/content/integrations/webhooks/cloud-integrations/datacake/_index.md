@@ -10,4 +10,4 @@ weight:
 
 ## Requirements
 
-1. You need to have a user account on Datacake.
+1. A user account on Datacake.
