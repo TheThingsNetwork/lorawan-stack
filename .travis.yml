@@ -22,9 +22,6 @@ env:
 matrix:
   include:
     - env: RUNTYPE=js
-    - env: RUNTYPE=go.test RUN_GOARCH=amd64
-    - env: RUNTYPE=go.test RUN_GOARCH=386
-    - env: RUNTYPE=go.lint
     - env: RUNTYPE=release
       if: tag IS present OR (type != pull_request AND branch = master)
 services:
@@ -53,14 +50,6 @@ before_install:
                           -d
     fi
   - |
-    if [[ "$RUNTYPE" == "go.test" ]]; then
-      set -e
-      sudo rm /usr/local/bin/docker-compose
-      curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m) > docker-compose
-      chmod +x docker-compose
-      sudo mv docker-compose /usr/local/bin
-    fi
-  - |
     if [[ "$RUNTYPE" == "release" ]]; then
       echo "$SNAPCRAFT_LOGIN_ENCRYPTION_PASS" | gpg --passphrase-fd 0 snapcraft.login.gpg
       nvm install 10.16.0
@@ -85,15 +74,11 @@ install:
       $MAGE docs:deps
     fi
 script:
-  - if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:swaggerClean proto:swagger; fi
-  - if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:markdownClean proto:markdown; fi
-  - if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:jsSDKClean proto:jsSDK; fi
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE jsSDK:clean jsSDK:build; fi
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:translations; fi
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:backendTranslations; fi
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:test jsSDK:test; fi
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:lint jsSDK:lint; fi
-  - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE proto:goClean proto:go; fi
   - if [[ "$RUNTYPE" == "release" ]]; then $MAGE version:files; fi
   - $MAGE git:diff
 after_success:
