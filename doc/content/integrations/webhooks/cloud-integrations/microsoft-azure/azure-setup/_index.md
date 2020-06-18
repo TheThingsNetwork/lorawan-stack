@@ -22,7 +22,7 @@ Next, you have to provide a globally unique **Function App name**. After deployi
 
 Choose **Code** for **Publish** to publish your code files (the alternative would be publishing a Docker container). 
 
-Since you can use different programming languages for your function, you have to choose an apropriate **Runtime stack**. In this guide, we use a **C#** function, therefore we choose **.NET Core** runtime stack. Also, you need to choose the **Version** of the installed runtime, considering that it will probably be automatically suggested to you.  
+Since you can use different programming languages for your function, you have to choose an appropriate **Runtime stack**. In this guide, we use a **C#** function, therefore we choose **.NET Core** runtime stack. Also, you need to choose the **Version** of the installed runtime, considering that it will probably be automatically suggested to you.  
 
 Choose a **Region** nearest to you, or near other services that your functions access. 
 
