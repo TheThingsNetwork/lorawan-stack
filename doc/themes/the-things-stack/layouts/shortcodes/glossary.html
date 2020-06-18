@@ -1,16 +1,27 @@
-{{ $package := or (.Get "package") "glossary" }}{{ $term := .Get "term" -}}
-<div class = "glossary">
-{{- if $term -}}
-  {{- with index .Site.Data $package $term -}}
-    {{- partial "glossary-term.html" (dict "context" . "term" $term) -}}
-  {{- else }}
-    {{ errorf "term %s of package %s not found" $term $package }}
-  {{- end }}
-{{- else -}}
-  {{- range $key, $elem := index .Site.Data $package -}}
-    {{- partial "glossary-term.html" (dict "context" . "term" $key) -}}
-  {{- else -}}
-    {{ errorf "package %s not found" $package }}
+{{- range sort (index .Site.Data "glossary") "term" }}
+<dl class="glossary">
+  <dt id="{{.term | urlize}}">
+    <span class="term">
+      {{- .term -}}
+    </span>
+  </dt>
+  {{- range .abbr -}}
+    <dt id="{{ . | urlize}}">
+      <span class="term-abbr">
+        ( {{- . -}} )
+      </span>
+    </dt>
   {{- end -}}
-{{- end -}}
-</div>
+  {{- range .alt -}}
+    <dt id="{{ . | urlize}}">
+      <span class="term-alt">
+        ( {{- . -}} )
+      </span>
+    </dt>
+  {{- end -}}
+  <dd>{{ .description | markdownify  }}</dd>
+  {{- with .link -}}
+    <dd><a href={{ . | relURL }}>{{- . -}}</a></dd>
+  {{- end -}}
+</dl>
+{{- end }}

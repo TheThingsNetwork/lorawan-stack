@@ -158,22 +158,20 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 	if err != nil {
 		return nil, err
 	}
-	if key == nil {
+	if key == nil { // API key was deleted.
+		events.Publish(evtDeleteUserAPIKey(ctx, req.UserIdentifiers, nil))
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	if len(req.Rights) > 0 {
-		events.Publish(evtUpdateUserAPIKey(ctx, req.UserIdentifiers, nil))
-		err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
-			data.SetEntity(req.EntityIdentifiers())
-			return &emails.APIKeyChanged{Data: data, Identifier: key.PrettyName(), Rights: key.Rights}
-		})
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Could not send API key update notification email")
-		}
-	} else {
-		events.Publish(evtDeleteUserAPIKey(ctx, req.UserIdentifiers, nil))
+	events.Publish(evtUpdateUserAPIKey(ctx, req.UserIdentifiers, nil))
+	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
+		data.SetEntity(req.EntityIdentifiers())
+		return &emails.APIKeyChanged{Data: data, Identifier: key.PrettyName(), Rights: key.Rights}
+	})
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Error("Could not send API key update notification email")
 	}
+
 	return key, nil
 }
 

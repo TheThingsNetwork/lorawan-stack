@@ -170,22 +170,20 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 	if err != nil {
 		return nil, err
 	}
-	if key == nil {
+	if key == nil { // API key was deleted.
+		events.Publish(evtDeleteApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	if len(req.Rights) > 0 {
-		events.Publish(evtUpdateApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
-		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-			data.SetEntity(req.EntityIdentifiers())
-			return &emails.APIKeyChanged{Data: data, Identifier: key.PrettyName(), Rights: key.Rights}
-		})
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Could not send API key update notification email")
-		}
-	} else {
-		events.Publish(evtDeleteApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
+	events.Publish(evtUpdateApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
+	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
+		data.SetEntity(req.EntityIdentifiers())
+		return &emails.APIKeyChanged{Data: data, Identifier: key.PrettyName(), Rights: key.Rights}
+	})
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Error("Could not send API key update notification email")
 	}
+
 	return key, nil
 }
 

@@ -25,14 +25,72 @@ $ make init
 
 You may want to run this commands from time to time.
 
-Now you can initialize the development databases with some defaults.
+## Running a development build of The Things Stack
+
+This section explains how to get a bare-bones version of The Things Stack running on your local machine. This will build whatever code is present in your local repository (along with local changes) and run in it using the default ports.
+
+If you want to just run a docker image of The Things Stack, then check the [Installation](https://thethingsstack.io/latest/getting-started/installation/) section of the documentation.
+
+### Pre-requisites
+
+1. This section requires that the required tools from [Development Environment](##Development-Environment) are installed.
+2. This repository must be cloned inside the `GOPATH`. Check the [official documentation](https://golang.org/doc/gopath_code.html) on working with `GOPATH`.
+3. Make sure that you've run `$ make init` before continuing.
+4. If this is not the first time running the stack, make sure to clear any environment variables that you've been using earlier. You can do check what variables are set currently by using
+
+```
+$ printenv | grep "TTN_LW_*"
+```
+
+### Steps
+
+1. Build the frontend assets
 
 ```bash
-$ tools/bin/mage dev:dbStart   # This requires Docker to be running.
+$ tools/bin/mage js:build
+```
+
+This will build the frontend assets and place it in the `public` folder.
+
+2. Start the databases
+
+```bash
+$ tools/bin/mage dev:dbStart # This requires Docker to be running.
+```
+
+This will start one instance each of `CockroachDB` and `Redis` as Docker containers. To verify this, you can run
+
+```bash
+$ docker ps
+```
+
+3. Initialize the database with defaults.
+
+```bash
 $ tools/bin/mage dev:initStack
 ```
 
-This starts a CockroachDB and Redis database in Docker containers, creates a database, migrates tables and creates a user `admin` with password `admin`.
+This creates a database, migrates tables and creates a user `admin` with password `admin`.
+
+4. Start an development instance of The Things Stack
+
+```bash
+$ go run ./cmd/ttn-lw-stack -c ./config/stack/ttn-lw-stack.yml start
+```
+
+5. Login to The Things Stack via the Console
+
+In a web browser, navigate to `http://localhost:1885/` and login using credentials from step 3.
+
+6. Customizing configuration
+
+To customize the configuration, copy the configuration file `/config/stack/ttn-lw-stack.yml` to a different location (ex: the `.env` folder in your repo). The configuration is documented in the [Configuration Reference](https://thethingsstack.io/latest/reference/configuration/).
+
+You can now use the modified configuration with
+
+```bash
+$ go run ./cmd/ttn-lw-stack -c <custom-location>/ttn-lw-stack.yml start
+```
 
 ## Using the CLI with the Development Environment
 
@@ -155,7 +213,7 @@ Data for generated documentation like API and glossary is stored in `doc/data`.
 In order to build the documentation site with the right theme, you need to run
 `tools/bin/mage docs:deps` from time to time.
 
->Note: as a workaround for [this](https://github.com/gohugoio/hugo/issues/7083), `./mage docs:deps` also pulls the latest version of [frequency-plans.yml](https://github.com/TheThingsNetwork/lorawan-frequency-plans/).
+>Note: as a workaround for [this](https://github.com/gohugoio/hugo/issues/7083), `tools/bin/mage docs:deps` also pulls the latest version of [frequency-plans.yml](https://github.com/TheThingsNetwork/lorawan-frequency-plans/).
 
 You can start a development server with live reloading by running
 `tools/bin/mage docs:server`. This command will print the address of the server.

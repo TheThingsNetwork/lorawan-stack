@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Event stream start and stop events are not published anymore.
+- JSON uplink message doc edited for clarity.
 
 ### Deprecated
 
@@ -27,6 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+
+- Endless authentication refresh loop in the Console in some rare situations.
+- Logout operation not working properly in the Console in some rare situations.
+- Handling API key deletion event for applications, gateways, organizations and users.
+- Organization API key deletion in the Console.
+- CLI now only sends relevant end device fields to Identity Server on create.
 
 ## [3.8.4] - 2020-06-12
 
@@ -48,7 +55,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Packet Broker Agent cluster ID is used as subscription group.
 - LinkADR handling in 72-channel bands.
 - Data uplink metrics reported by Application Server.
-- CLI now only sends relevant end device fields to Identity Server on create.
 
 ## [3.8.3] - 2020-06-05
 

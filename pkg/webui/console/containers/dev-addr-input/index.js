@@ -26,21 +26,21 @@ const m = defineMessages({
   devAddrFetchingFailure: 'There was an error and the end device address could not be generated',
 })
 
-const DevAddrField = function(props) {
+const DevAddrField = props => {
   const {
     className,
     title,
     description,
     placeholder,
     name,
-    fetching,
     disabled,
     required,
     autoFocus,
     horizontal,
-    error,
-    onDevAddrGenerate,
-    generatedDevAddr,
+    onGenerate,
+    generatedValue,
+    generatedError,
+    generatedLoading,
   } = props
 
   return (
@@ -50,15 +50,16 @@ const DevAddrField = function(props) {
       description={description}
       placeholder={placeholder}
       name={name}
-      fetching={fetching}
       disabled={disabled}
       required={required}
       autoFocus={autoFocus}
       horizontal={horizontal}
-      warning={Boolean(error) ? m.devAddrFetchingFailure : undefined}
+      warning={generatedError ? m.devAddrFetchingFailure : undefined}
       component={DevAddrInput}
-      onDevAddrGenerate={onDevAddrGenerate}
-      generatedDevAddr={generatedDevAddr}
+      onGenerate={onGenerate}
+      generatedError={generatedError}
+      generatedLoading={generatedLoading}
+      generatedValue={generatedValue}
     />
   )
 }
@@ -68,12 +69,12 @@ DevAddrField.propTypes = {
   className: PropTypes.string,
   description: PropTypes.message,
   disabled: PropTypes.bool,
-  error: PropTypes.error,
-  fetching: PropTypes.bool.isRequired,
-  generatedDevAddr: PropTypes.string.isRequired,
+  generatedError: PropTypes.bool,
+  generatedLoading: PropTypes.bool,
+  generatedValue: PropTypes.string,
   horizontal: PropTypes.bool,
   name: PropTypes.string.isRequired,
-  onDevAddrGenerate: PropTypes.func.isRequired,
+  onGenerate: PropTypes.func.isRequired,
   placeholder: PropTypes.message,
   required: PropTypes.bool,
   title: PropTypes.message.isRequired,
@@ -82,12 +83,14 @@ DevAddrField.propTypes = {
 DevAddrField.defaultProps = {
   className: undefined,
   description: undefined,
-  error: undefined,
   placeholder: undefined,
   disabled: false,
   required: false,
   autoFocus: false,
   horizontal: false,
+  generatedValue: '',
+  generatedError: false,
+  generatedLoading: false,
 }
 
 export default connect(DevAddrField)
