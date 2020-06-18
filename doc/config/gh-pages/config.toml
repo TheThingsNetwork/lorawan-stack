@@ -1,0 +1,5 @@
+[params]
+  [params.search]
+    enabled = false
+    apikey = ""
+    index = ""

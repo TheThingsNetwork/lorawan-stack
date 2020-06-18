@@ -60,7 +60,7 @@ func (Version) Current() error {
 
 const (
 	goVersionFilePath          = "pkg/version/ttn.go"
-	docVersionFilePath         = "doc/config.toml"
+	docVersionFilePath         = "doc/config/_default/config.toml"
 	docVersionTemplateFilePath = docVersionFilePath + ".tmpl"
 )
 
