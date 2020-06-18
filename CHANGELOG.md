@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Serving frontend sourcemaps in production
 - Frequency plan documentation.
 - LoRa Basics Station documentation.
+- CLI support for setting and unsetting end device location (see `--location.latitude`, `--location.longitude`, `--location.altitude` and `--location.accuracy` options).
 
 ### Changed
 
