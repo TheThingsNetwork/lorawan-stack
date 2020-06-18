@@ -72,6 +72,7 @@ const Header = function({
             <ProfileDropdown
               className={style.profileDropdown}
               userName={user.name || user.ids.user_id}
+              data-test-id="profile-dropdown"
             >
               {dropdownItems}
             </ProfileDropdown>

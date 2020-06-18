@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const configSelector = () => window
+export const configSelector = () => window.__ttn_config__
 
 export const selectApplicationRootPath = () => configSelector().APP_ROOT
 

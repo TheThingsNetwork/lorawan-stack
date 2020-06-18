@@ -178,16 +178,24 @@ class FormField extends React.Component {
     const showWarning = !hasError && hasWarning
     const showDescription = !showError && !showWarning && hasDescription
 
+    const describedBy = showError
+      ? `${name}-field-error`
+      : showWarning
+      ? `${name}-field-warning`
+      : showDescription
+      ? `${name}-field-description`
+      : undefined
+
     const fieldMessage = showError ? (
       <div className={style.messages}>
-        <Err content={fieldError} title={title} />
+        <Err content={fieldError} title={title} error id={describedBy} />
       </div>
     ) : showWarning ? (
       <div className={style.messages}>
-        <Err content={warning} title={title} warning />
+        <Err content={warning} title={title} warning id={describedBy} />
       </div>
     ) : showDescription ? (
-      <Message className={style.description} content={description} />
+      <Message className={style.description} content={description} id={describedBy} />
     ) : null
 
     const fieldComponentProps = {
@@ -220,6 +228,8 @@ class FormField extends React.Component {
         </label>
         <div className={style.componentArea}>
           <Component
+            aria-invalid={showError}
+            aria-describedby={describedBy}
             {...fieldComponentProps}
             {...getPassThroughProps(this.props, FormField.propTypes)}
           />
@@ -230,7 +240,7 @@ class FormField extends React.Component {
   }
 }
 
-const Err = ({ content, error, warning, title, className }) => {
+const Err = ({ content, error, warning, title, className, id }) => {
   const icon = error ? 'error' : 'warning'
   const contentValues = content.values || {}
   const classname = classnames(style.message, className, {
@@ -245,7 +255,7 @@ const Err = ({ content, error, warning, title, className }) => {
   }
 
   return (
-    <div className={classname}>
+    <div className={classname} id={id}>
       <Icon icon={icon} className={style.icon} />
       <Message content={content.message || content} values={contentValues} />
     </div>
@@ -262,6 +272,7 @@ Err.propTypes = {
     }),
   ]).isRequired,
   error: PropTypes.bool,
+  id: PropTypes.string.isRequired,
   title: PropTypes.message,
   warning: PropTypes.bool,
 }
@@ -270,7 +281,7 @@ Err.defaultProps = {
   className: undefined,
   title: undefined,
   warning: false,
-  error: true,
+  error: false,
 }
 
 export default FormField

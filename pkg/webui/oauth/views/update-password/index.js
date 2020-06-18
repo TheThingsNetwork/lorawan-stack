@@ -168,7 +168,7 @@ export default class UpdatePassword extends React.PureComponent {
           title={m.oldPassword}
           name="old_password"
           type="password"
-          autoComplete="old-password"
+          autoComplete="current-password"
           autoFocus
         />
       )
