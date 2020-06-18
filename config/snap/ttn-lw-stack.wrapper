@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ -z "$XDG_CONFIG_HOME" ]; then
+    /usr/bin/env XDG_CONFIG_HOME="$SNAP_USER_COMMON" "$SNAP/ttn-lw-stack" "$@"
+else
+    "$SNAP/ttn-lw-stack" "$@"
+fi
