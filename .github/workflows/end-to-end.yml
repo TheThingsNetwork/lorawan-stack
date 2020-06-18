@@ -1,0 +1,110 @@
+name: End-to-end Tests
+on:
+  pull_request:
+    paths:
+      - '*.go'
+      - '.revive.toml'
+      - 'cmd/**'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - 'pkg/**'
+      - 'tools/**'
+      - 'config/**'
+      - '!config/stack/ttn-lw-stack.yml'
+      - 'package.json'
+      - 'pkg/webui/**'
+      - 'sdk/js/**'
+      - 'yarn.lock'
+
+jobs:
+  end-to-end:
+    name: Frontend based (cypress)
+    runs-on: ubuntu-18.04
+    env:
+      should_cache: true # Might be useful for debugging.
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(npx yarn cache dir)"
+        if: env.should_cache
+      - name: Apply yarn cache
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-cache-
+        if: env.should_cache
+      - name: Apply npm cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+        if: env.should_cache
+      - name: Apply go modules cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+        if: env.should_cache
+      - name: Apply database dump cache
+        uses: actions/cache@v2
+        with:
+          path: .cache/sqldump.sql
+          key: ${{ runner.os }}-sql-dump-cache-${{ hashFiles('pkg/identityserver/store/**/*.go') }}
+        if: env.should_cache
+      - name: Apply messages and locales cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            .cache/babel
+            .cache/messages
+            pkg/webui/console/locales/.backend
+          key: ${{ runner.os }}-messages-cache-${{ hashFiles('pkg/webui/**/*.js') }}-${{ hashFiles('config/messages.json')}}
+        if: env.should_cache
+      - name: Apply public folder cache
+        uses: actions/cache@v2
+        with:
+          path: public
+          key: ${{ runner.os }}-public-cache-${{ hashFiles('pkg/webui/**') }}-${{ hashFiles('sdk/js/**/*.js') }}-${{ hashFiles('config/webpack.config.babel.js') }}-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('pkg/ttnpb/field_mask_validation.go') }}
+        if: env.should_cache
+      - name: Apply JS SDK cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            sdk/js/dist
+            sdk/js/generated/allowed-field-mask-paths.json
+          key: ${{ runner.os }}-js-sdk-cache-${{ hashFiles('sdk/js/src/**/*.js') }}-${{ hashFiles('pkg/ttnpb/field_mask_validation.go') }}
+        if: env.should_cache
+      - name: Make Mage
+        run: make tools/bin/mage
+      - name: Set up Go 1.14
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.14'
+      - name: Initialize stack environment
+        run: tools/bin/mage init
+      - name: Run test preparations
+        run: tools/bin/mage endToEnd:prepare
+      - name: Run frontend end-to-end tests
+        run: tools/bin/mage endToEnd:startTestStack & tools/bin/mage -v endToEnd:runFrontend
+      - name: Upload screenshots if failed
+        uses: actions/upload-artifact@v2
+        with:
+          name: Frontend test screenshots
+          path: cypress/screenshots
+        if: ${{ failure() }}
+      - name: Upload videos if failed
+        uses: actions/upload-artifact@v2
+        with:
+          name: Frontend test videos
+          path: cypress/videos
+        if: ${{ failure() }}
