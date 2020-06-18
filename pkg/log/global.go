@@ -15,7 +15,7 @@
 package log
 
 // Default is the default logger used for the package global logging functions
-var Default, _ = NewLogger()
+var Default = NewLogger()
 
 // Debug calls Default.Debug
 func Debug(msg string) {

@@ -26,16 +26,14 @@ var defaultOptions = []Option{
 }
 
 // NewLogger creates a new logger with the default options.
-func NewLogger(opts ...Option) (*Logger, error) {
+func NewLogger(opts ...Option) *Logger {
 	logger := &Logger{}
 
 	for _, opt := range append(defaultOptions, opts...) {
-		if err := opt(logger); err != nil {
-			return nil, err
-		}
+		opt(logger)
 	}
 
-	return logger, nil
+	return logger
 }
 
 // Logger implements Stack.
