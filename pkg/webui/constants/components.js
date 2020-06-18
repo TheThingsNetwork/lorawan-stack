@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 export const dict = {
-  is: 'Identity Server',
-  as: 'Application Server',
-  ns: 'Network Server',
-  gs: 'Gateway Server',
-  js: 'Join Server',
-  edtc: 'End Device Template Converter',
-  qrg: 'QR Code Generator',
+  is: sharedMessages.componentIs,
+  as: sharedMessages.componentAs,
+  ns: sharedMessages.componentNs,
+  gs: sharedMessages.componentGs,
+  js: sharedMessages.componentJs,
+  edtc: sharedMessages.componentEdtc,
+  qrg: sharedMessages.componentQrg,
 }
 export const components = Object.keys(dict)
