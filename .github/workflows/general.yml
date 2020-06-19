@@ -50,8 +50,8 @@ jobs:
       # TODO: Fix EditorConfig errors and remove
       # https://github.com/TheThingsNetwork/lorawan-stack/issues/2723
       continue-on-error: true
-    - name: Install JS development dependencies
-      run: tools/bin/mage js:devDeps
+    - name: Install JS dependencies
+      run: tools/bin/mage js:deps
     - name: Check headers
       run: tools/bin/mage headers:check
     - name: Fix common spelling mistakes

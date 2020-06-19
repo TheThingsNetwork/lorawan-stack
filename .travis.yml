@@ -62,7 +62,7 @@ install:
   - make init
   - |
     if [[ "$RUNTYPE" == "js" ]]; then
-      $MAGE js:devDeps js:deps jsSDK:deps
+      $MAGE js:deps jsSDK:deps
     fi
   - |
     if [[ "$RUNTYPE" == "release" ]]; then

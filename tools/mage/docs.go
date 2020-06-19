@@ -25,14 +25,13 @@ import (
 	"text/template"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
 )
 
 // Docs namespace
 type Docs mg.Namespace
 
-func execHugo(args ...string) error {
+func runHugo(args ...string) error {
 	return runGoTool(append([]string{"-tags", "extended", "github.com/gohugoio/hugo", "-s", "./doc"}, args...)...)
 }
 
@@ -55,55 +54,60 @@ func downloadFile(targetpath string, url string) (err error) {
 	return err
 }
 
-func (d Docs) yarn() (func(args ...string) error, error) {
-	if _, err := os.Stat(nodeBin("yarn")); os.IsNotExist(err) {
-		if err = installYarn(); err != nil {
-			return nil, err
-		}
-	}
-	return func(args ...string) error {
-		return sh.Run(nodeBin("yarn"), append([]string{fmt.Sprintf("--cwd=%s", filepath.Join("doc", "themes", "the-things-stack"))}, args...)...)
-	}, nil
-}
-
 const defaultFrequencyPlanUrl = "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master/frequency-plans.yml"
 
 // Deps installs the documentation dependencies.
 func (d Docs) Deps() (err error) {
 	fileUrl := os.Getenv("FREQUENCY_PLAN_URL")
-	fileTarget := "doc/data/frequency-plans.yml"
-	if fileUrl == "" {
-		fileUrl = defaultFrequencyPlanUrl
+	fileTarget := filepath.Join("doc", "data", "frequency-plans.yml")
+	ok, err := target.Path(fileTarget)
+	if err != nil {
+		return targetError(err)
 	}
-	if err = downloadFile(fileTarget, fileUrl); err != nil {
-		return err
-	}
-	if mg.Verbose() {
-		fmt.Printf("Downloaded %q to %q\n", fileUrl, fileTarget)
-	}
-	changed, err := target.Path("./doc/themes/the-things-stack/node_modules", "./doc/themes/the-things-stack/package.json", "./doc/themes/the-things-stack/yarn.lock")
-	if os.IsNotExist(err) || (err == nil && changed) {
-		if mg.Verbose() {
-			fmt.Println("Installing documentation dependencies")
+	if ok {
+		if fileUrl == "" {
+			fileUrl = defaultFrequencyPlanUrl
 		}
-		yarn, err := d.yarn()
-		if err != nil {
+		if err = downloadFile(fileTarget, fileUrl); err != nil {
 			return err
 		}
-		return yarn("install", "--no-progress", "--production=false")
+		if mg.Verbose() {
+			fmt.Printf("Downloaded %q to %q\n", fileUrl, fileTarget)
+		}
 	}
-	return nil
+	ok, err = target.Dir(
+		filepath.Join("doc", "themes", "the-things-stack", "node_modules"),
+		filepath.Join("doc", "themes", "the-things-stack", "package.json"),
+		filepath.Join("doc", "themes", "the-things-stack", "yarn.lock"),
+	)
+	if err != nil {
+		return targetError(err)
+	}
+	if !ok {
+		return nil
+	}
+	if mg.Verbose() {
+		fmt.Println("Installing documentation dependencies")
+	}
+	mg.Deps(installYarn)
+	return runYarnV(
+		yarnWorkingDirectoryArg("doc", "themes", "the-things-stack"),
+		"install",
+		"--no-progress",
+		"--production=false",
+	)
 }
 
-const (
-	docRedirectTemplateFilePath = "doc/redirect.html.tmpl"
-	docRedirectFilePath         = "doc/public/index.html"
+var (
+	docRedirectTemplateFilePath = filepath.Join("doc", "redirect.html.tmpl")
+	docRedirectFilePath         = filepath.Join("doc", "public", "index.html")
 )
 
 // Build builds a static website from the documentation into public/doc.
 // If the HUGO_BASE_URL environment variable is set, it also builds a public website into doc/public.
 func (d Docs) Build() (err error) {
-	if err = execHugo("-b", "/assets/doc", "-d", "../public/doc"); err != nil {
+	mg.Deps(d.Deps)
+	if err = runHugo("-b", "/assets/doc", "-d", "../public/doc"); err != nil {
 		return err
 	}
 	baseURL := os.Getenv("HUGO_BASE_URL")
@@ -123,7 +127,7 @@ func (d Docs) Build() (err error) {
 			err = genErr
 		}
 	}()
-	return execHugo("-b", url.String(), "-d", destination)
+	return runHugo("-b", url.String(), "-d", destination)
 }
 
 func (Docs) generateRedirect() error {
@@ -145,5 +149,5 @@ func (Docs) generateRedirect() error {
 
 // Server starts a documentation server.
 func (Docs) Server() error {
-	return execHugo("server")
+	return runHugo("server")
 }
