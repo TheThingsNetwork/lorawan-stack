@@ -525,7 +525,6 @@
   "lib.shared-messages.lorawanInformation": "LoRaWAN information",
   "lib.shared-messages.lorawanOptions": "LoRaWAN options",
   "lib.shared-messages.lorawanPhyVersionDescription": "The LoRaWAN PHY version of the end device",
-  "lib.shared-messages.lorawanVersionDescription": "The LoRaWAN MAC version of the end device",
   "lib.shared-messages.macVersion": "LoRaWAN version",
   "lib.shared-messages.macVersionDescription": "The LoRaWAN version (MAC), as provided by the device manufacturer",
   "lib.shared-messages.messages": "Messages",

@@ -190,7 +190,6 @@ export default defineMessages({
   lorawanInformation: 'LoRaWAN information',
   lorawanOptions: 'LoRaWAN options',
   lorawanPhyVersionDescription: 'The LoRaWAN PHY version of the end device',
-  lorawanVersionDescription: 'The LoRaWAN MAC version of the end device',
   macVersion: 'LoRaWAN version',
   macVersionDescription: 'The LoRaWAN version (MAC), as provided by the device manufacturer',
   messages: 'Messages',

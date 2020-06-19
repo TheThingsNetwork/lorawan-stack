@@ -525,7 +525,6 @@
   "lib.shared-messages.lorawanInformation": "XxXxXXX xxxxxxxxxxx",
   "lib.shared-messages.lorawanOptions": "XxXxXXX xxxxxxx",
   "lib.shared-messages.lorawanPhyVersionDescription": "Xxx XxXxXXX XXX xxxxxxx xx xxx xxx xxxxxx",
-  "lib.shared-messages.lorawanVersionDescription": "Xxx XxXxXXX XXX xxxxxxx xx xxx xxx xxxxxx",
   "lib.shared-messages.macVersion": "XxXxXXX xxxxxxx",
   "lib.shared-messages.macVersionDescription": "Xxx XxXxXXX xxxxxxx (XXX), xx xxxxxxxx xx xxx xxxxxx xxxxxxxxxxxx",
   "lib.shared-messages.messages": "Xxxxxxxx",
