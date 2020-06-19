@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import axios from 'axios'
-
 import TTN from 'ttn-lw'
 
 import toast from '@ttn-lw/components/toast'

@@ -58,7 +58,7 @@ Overlay.propTypes = {
   overlayClassName: PropTypes.string,
   spinnerClassName: PropTypes.string,
   spinnerMessage: PropTypes.message,
-  /** A flag specifying whether the overlay is visible or not */
+  /** A flag specifying whether the overlay is visible or not. */
   visible: PropTypes.bool.isRequired,
 }
 
