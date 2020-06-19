@@ -78,11 +78,6 @@ jobs:
       run: tools/bin/mage docs:build
       env:
         HUGO_BASE_URL: https://thethingsstack.io/
-    - name: Upload documentation
-      uses: actions/upload-artifact@v2
-      with:
-        name: documentation
-        path: doc/public/
 
   release:
     name: Release
