@@ -35,7 +35,7 @@ import (
 var ctx context.Context
 
 func init() {
-	logger, _ := log.NewLogger(
+	logger := log.NewLogger(
 		log.WithLevel(log.DebugLevel),
 		log.WithHandler(log.NewCLI(os.Stdout)),
 	)
