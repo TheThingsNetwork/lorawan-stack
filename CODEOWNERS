@@ -14,6 +14,7 @@
 # Build pipeline and tooling
 /Makefile @htdvisser @rvolosatovs @johanstokking
 /tools @htdvisser @rvolosatovs @johanstokking
+/.github/workflows @htdvisser @rvolosatovs @johanstokking
 
 # API, configuration, CLI and storage compatibility
 /api @johanstokking @htdvisser @rvolosatovs
