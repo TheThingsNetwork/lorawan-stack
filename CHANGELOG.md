@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Organization API key deletion in the Console.
 - CLI now only sends relevant end device fields to Identity Server on create.
 - Maximum ADR data rate index used in 1.0.2a and earlier versions of AU915 band.
+- End device events stream restart in the Console.
 
 ## [3.8.4] - 2020-06-12
 
