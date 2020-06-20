@@ -14,6 +14,7 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import { useIntl } from 'react-intl'
 
 import Icon from '@ttn-lw/components/icon'
 
@@ -25,7 +26,8 @@ import style from './overview.styl'
 
 const EventOverview = props => {
   const { className, children } = props
-  const { isOpen, onDetailsOpen, expandable, widget } = React.useContext(eventContext)
+  const { isOpen, onDetailsOpen, expandable, widget, event } = React.useContext(eventContext)
+  const { formatMessage } = useIntl()
 
   const canExpand = expandable && !widget
 
@@ -48,7 +50,11 @@ const EventOverview = props => {
   })
 
   return (
-    <div className={containerCls} {...expandableProps}>
+    <div
+      {...expandableProps}
+      className={containerCls}
+      title={formatMessage({ id: `event:${event.name}` })}
+    >
       <div className={overviewCls}>
         {children}
         {canExpand && (
