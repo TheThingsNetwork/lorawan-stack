@@ -400,7 +400,7 @@
   "lib.shared-messages.asServerIDDescription": "The AS-ID of the Application Server to use",
   "lib.shared-messages.asServerKekLabel": "Application Server KEK label",
   "lib.shared-messages.asServerKekLabelDescription": "The KEK label of the Application Server to use for wrapping the application session key",
-  "lib.shared-messages.attributeDescription": "Attributes can be used to set arbitrary information about the application, to be used by scripts, or simply for your own organization",
+  "lib.shared-messages.attributeDescription": "Attributes can be used to set arbitrary information about the entity, to be used by scripts, or simply for your own organization",
   "lib.shared-messages.attributeKeyValidateTooShort": "Attribute keys must have at least 3 characters and contain no special characters",
   "lib.shared-messages.attributes": "Attributes",
   "lib.shared-messages.attributesValidateRequired": "All attribute entry values are required. Please remove empty entries.",

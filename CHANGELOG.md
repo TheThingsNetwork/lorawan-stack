@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Option to reset end device payload formatters in the Console.
 - Service discovery using DNS SRV records for external Application Server linking.
+- Functionality to set end device attributes in the Console.
 
 ### Changed
 

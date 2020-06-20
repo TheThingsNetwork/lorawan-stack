@@ -62,7 +62,7 @@ export default defineMessages({
   asServerKekLabelDescription:
     'The KEK label of the Application Server to use for wrapping the application session key',
   attributeDescription:
-    'Attributes can be used to set arbitrary information about the application, to be used by scripts, or simply for your own organization',
+    'Attributes can be used to set arbitrary information about the entity, to be used by scripts, or simply for your own organization',
   attributeKeyValidateTooShort:
     'Attribute keys must have at least 3 characters and contain no special characters',
   attributes: 'Attributes',

@@ -400,7 +400,7 @@
   "lib.shared-messages.asServerIDDescription": "Xxx XX-XX xx xxx Xxxxxxxxxxx Xxxxxx xx xxx",
   "lib.shared-messages.asServerKekLabel": "Xxxxxxxxxxx Xxxxxx XXX xxxxx",
   "lib.shared-messages.asServerKekLabelDescription": "Xxx XXX xxxxx xx xxx Xxxxxxxxxxx Xxxxxx xx xxx xxx xxxxxxxx xxx xxxxxxxxxxx xxxxxxx xxx",
-  "lib.shared-messages.attributeDescription": "Xxxxxxxxxx xxx xx xxxx xx xxx xxxxxxxxx xxxxxxxxxxx xxxxx xxx xxxxxxxxxxx, xx xx xxxx xx xxxxxxx, xx xxxxxx xxx xxxx xxx xxxxxxxxxxxx",
+  "lib.shared-messages.attributeDescription": "Xxxxxxxxxx xxx xx xxxx xx xxx xxxxxxxxx xxxxxxxxxxx xxxxx xxx xxxxxx, xx xx xxxx xx xxxxxxx, xx xxxxxx xxx xxxx xxx xxxxxxxxxxxx",
   "lib.shared-messages.attributeKeyValidateTooShort": "Xxxxxxxxx xxxx xxxx xxxx xx xxxxx x xxxxxxxxxx xxx xxxxxxx xx xxxxxxx xxxxxxxxxx",
   "lib.shared-messages.attributes": "Xxxxxxxxxx",
   "lib.shared-messages.attributesValidateRequired": "Xxx xxxxxxxxx xxxxx xxxxxx xxx xxxxxxxx. Xxxxxx xxxxxx xxxxx xxxxxxx.",
