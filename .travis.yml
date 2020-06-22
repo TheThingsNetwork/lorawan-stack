@@ -21,7 +21,6 @@ env:
     - DOCKER_IMAGE_DEV=thethingsnetwork/lorawan-stack-dev
 matrix:
   include:
-    - env: RUNTYPE=js
     - env: RUNTYPE=release
       if: tag IS present OR (type != pull_request AND branch = master)
 services:
@@ -54,16 +53,8 @@ before_install:
       echo "$SNAPCRAFT_LOGIN_ENCRYPTION_PASS" | gpg --passphrase-fd 0 snapcraft.login.gpg
       nvm install 10.16.0
     fi
-  - |
-    if [[ "$RUNTYPE" == "js" ]]; then
-      nvm install 10.16.0
-    fi
 install:
   - make init
-  - |
-    if [[ "$RUNTYPE" == "js" ]]; then
-      $MAGE js:deps jsSDK:deps
-    fi
   - |
     if [[ "$RUNTYPE" == "release" ]]; then
       set -e
@@ -74,11 +65,6 @@ install:
       $MAGE docs:deps
     fi
 script:
-  - if [[ "$RUNTYPE" == "js" ]]; then $MAGE jsSDK:clean jsSDK:build; fi
-  - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:translations; fi
-  - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:backendTranslations; fi
-  - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:test jsSDK:test; fi
-  - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:lint jsSDK:lint; fi
   - if [[ "$RUNTYPE" == "release" ]]; then $MAGE version:files; fi
   - $MAGE git:diff
 after_success:
