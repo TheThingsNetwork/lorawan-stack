@@ -123,7 +123,7 @@ func (d Docs) Build() (err error) {
 			err = genErr
 		}
 	}()
-	return execHugo("-b", url.String(), "-d", destination)
+	return execHugo("-b", url.String(), "-d", destination, "--environment", "gh-pages")
 }
 
 func (Docs) generateRedirect() error {
@@ -145,5 +145,5 @@ func (Docs) generateRedirect() error {
 
 // Server starts a documentation server.
 func (Docs) Server() error {
-	return execHugo("server")
+	return execHugo("server", "--environment", "gh-pages")
 }
