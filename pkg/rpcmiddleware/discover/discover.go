@@ -20,12 +20,15 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"sync"
+	"time"
 
 	stderrors "errors"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"google.golang.org/grpc"
+	"google.golang.org/grpc/attributes"
+	"google.golang.org/grpc/resolver"
 )
 
 var errAddress = errors.DefineInvalidArgument("address", "invalid address")
@@ -52,10 +55,43 @@ func DefaultPort(target string, port int) (string, error) {
 	return target, nil
 }
 
+var clusterRoleServices = map[ttnpb.ClusterRole]string{
+	ttnpb.ClusterRole_ENTITY_REGISTRY:              "is",
+	ttnpb.ClusterRole_ACCESS:                       "is",
+	ttnpb.ClusterRole_GATEWAY_SERVER:               "gs",
+	ttnpb.ClusterRole_NETWORK_SERVER:               "ns",
+	ttnpb.ClusterRole_APPLICATION_SERVER:           "as",
+	ttnpb.ClusterRole_JOIN_SERVER:                  "js",
+	ttnpb.ClusterRole_DEVICE_TEMPLATE_CONVERTER:    "dtc",
+	ttnpb.ClusterRole_DEVICE_CLAIMING_SERVER:       "dcs",
+	ttnpb.ClusterRole_GATEWAY_CONFIGURATION_SERVER: "gcs",
+	ttnpb.ClusterRole_QR_CODE_GENERATOR:            "qrg",
+}
+
 // DefaultPorts is a map of the default gRPC ports, with/without TLS.
 var DefaultPorts = map[bool]int{
 	false: 1884,
 	true:  8884,
+}
+
+var errRole = errors.DefineFailedPrecondition("role", "service role `{role}` not discoverable")
+
+// Scheme returns the gRPC scheme for service discovery.
+func Scheme(role ttnpb.ClusterRole) (string, error) {
+	svc, ok := clusterRoleServices[role]
+	if !ok {
+		return "", errRole.WithAttributes("role", strings.Title(strings.Replace(role.String(), "_", " ", -1)))
+	}
+	return fmt.Sprintf("ttn-v3-%s", svc), nil
+}
+
+// Address returns the host with service discovery gRPC scheme for the given role.
+func Address(role ttnpb.ClusterRole, host string) (string, error) {
+	scheme, err := Scheme(role)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s:///%s", scheme, host), nil
 }
 
 // DefaultHTTPPorts is a map of the default HTTP ports, with/without TLS.
@@ -70,28 +106,6 @@ var HTTPScheme = map[bool]string{
 	true:  "https",
 }
 
-var clusterRoleServices = map[ttnpb.ClusterRole]string{
-	ttnpb.ClusterRole_ENTITY_REGISTRY:              "is",
-	ttnpb.ClusterRole_ACCESS:                       "is",
-	ttnpb.ClusterRole_GATEWAY_SERVER:               "gs",
-	ttnpb.ClusterRole_NETWORK_SERVER:               "ns",
-	ttnpb.ClusterRole_APPLICATION_SERVER:           "as",
-	ttnpb.ClusterRole_JOIN_SERVER:                  "js",
-	ttnpb.ClusterRole_DEVICE_TEMPLATE_CONVERTER:    "dtc",
-	ttnpb.ClusterRole_DEVICE_CLAIMING_SERVER:       "dcs",
-	ttnpb.ClusterRole_GATEWAY_CONFIGURATION_SERVER: "gcs",
-	ttnpb.ClusterRole_QR_CODE_GENERATOR:            "qrg",
-}
-
-// ServiceName returns the service name of the given role. This service name is typically used in SRV records.
-func ServiceName(role ttnpb.ClusterRole) (string, bool) {
-	service, ok := clusterRoleServices[role]
-	if !ok {
-		return "", false
-	}
-	return fmt.Sprintf("ttn-v3-%s-grpc", service), true
-}
-
 // DefaultURL appends protocol and port if target does not already have one.
 func DefaultURL(target string, port int, tls bool) (string, error) {
 	target, err := DefaultPort(target, port)
@@ -101,15 +115,13 @@ func DefaultURL(target string, port int, tls bool) (string, error) {
 	return fmt.Sprintf("%s://%s", HTTPScheme[tls], target), nil
 }
 
-// DNSResolver provides DNS lookup for discovery.
-type DNSResolver interface {
+// DNS provides DNS lookup functionality for service discovery.
+type DNS interface {
 	LookupSRV(ctx context.Context, service, proto, name string) (cname string, addrs []*net.SRV, err error)
 }
 
 type options struct {
-	insecureFallback bool
-	dnsResolver      DNSResolver
-	dialer           func(context.Context, string) (net.Conn, error)
+	dns DNS
 }
 
 // Option configures the discovery dialing.
@@ -123,88 +135,155 @@ func (f optionFunc) apply(opts *options) {
 	f(opts)
 }
 
-// WithInsecureFallback configures the dialer to use the default insecure port when discovery fails.
-// Use this option with gRPC's WithInsecure dial option.
-func WithInsecureFallback() Option {
+// WithDNS configures the resolver with a custom DNS resolver.
+func WithDNS(dns DNS) Option {
 	return optionFunc(func(opts *options) {
-		opts.insecureFallback = true
+		opts.dns = dns
 	})
 }
 
-// WithDNSResolver configures the dialer with a custom DNS resolver.
-func WithDNSResolver(resolver DNSResolver) Option {
-	return optionFunc(func(opts *options) {
-		opts.dnsResolver = resolver
-	})
-}
-
-// WithAddressDialer configures the discovery dialer with a custom address dialer.
-// This dialer is called for each discovered address until a nil error is returned.
-func WithAddressDialer(dialer func(context.Context, string) (net.Conn, error)) Option {
-	return optionFunc(func(opts *options) {
-		opts.dialer = dialer
-	})
-}
-
-// WithDialer returns a gRPC dialer that uses service discovery.
-//
-// Service discovery performs a DNS SRV lookup on the given target if it does not contain a port and the given role is
-// discoverable.
-//
-// If the given role does not support discovery or if the DNS SRV lookup fails, this function falls back to the default port.
-func WithDialer(role ttnpb.ClusterRole, opts ...Option) grpc.DialOption {
-	options := &options{
-		insecureFallback: false,
-		dnsResolver:      net.DefaultResolver,
-		dialer: func(ctx context.Context, address string) (net.Conn, error) {
-			return new(net.Dialer).DialContext(ctx, "tcp", address)
-		},
+// NewBuilder returns a new resolver builder for service discovery.
+func NewBuilder(scheme string, opts ...Option) resolver.Builder {
+	options := options{
+		dns: net.DefaultResolver,
 	}
 	for _, opt := range opts {
-		opt.apply(options)
+		opt.apply(&options)
 	}
 
-	return grpc.WithContextDialer(func(ctx context.Context, target string) (net.Conn, error) {
-		var addresses []string
-		if _, _, err := net.SplitHostPort(target); err == nil {
-			addresses = []string{target}
-		} else {
-			if service, ok := ServiceName(role); ok {
-				_, addrs, err := options.dnsResolver.LookupSRV(ctx, service, "tcp", target)
-				var dnsErr *net.DNSError
-				if err != nil && stderrors.As(err, &dnsErr) && !dnsErr.IsNotFound {
-					return nil, err
-				}
-				if err == nil {
-					addresses = make([]string, len(addrs))
-					for i, addr := range addrs {
-						addresses[i] = fmt.Sprintf("%s:%d", strings.TrimSuffix(addr.Target, "."), addr.Port)
-					}
-				}
-			}
-			if len(addresses) == 0 {
-				target, err := DefaultPort(target, DefaultPorts[!options.insecureFallback])
-				if err != nil {
-					return nil, err
-				}
-				addresses = []string{target}
-			}
-		}
-
-		var err error
-		var conn net.Conn
-		for _, address := range addresses {
-			conn, err = options.dialer(ctx, address)
-			if err == nil {
-				return conn, nil
-			}
-		}
-		return nil, err
-	})
+	return &clusterBuilder{
+		scheme:  scheme,
+		options: options,
+	}
 }
 
-// DialContext creates a client connection to the given host using service discovery. See WithDialer for more information.
-// To configure a DNS resolver, an address dialer or fallback to the default insecure port, use WithDialer with options.
-func DialContext(ctx context.Context, role ttnpb.ClusterRole, target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-	return grpc.DialContext(ctx, target, append(opts, WithDialer(role))...)
+type clusterBuilder struct {
+	scheme  string
+	options options
+}
+
+func (r *clusterBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
+	// Use passthrough when the endpoint is an address.
+	if _, _, err := net.SplitHostPort(target.Endpoint); err == nil {
+		return resolver.Get("passthrough").Build(target, cc, opts)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	service := target.Scheme + "-grpc"
+	res := &clusterResolver{
+		ctx:     ctx,
+		cancel:  cancel,
+		dns:     r.options.dns,
+		service: service,
+		name:    target.Endpoint,
+		cc:      cc,
+		rn:      make(chan struct{}, 1),
+	}
+	res.wg.Add(1)
+	go res.watch()
+	res.ResolveNow(resolver.ResolveNowOptions{})
+	return res, nil
+}
+
+func (r *clusterBuilder) Scheme() string {
+	return r.scheme
+}
+
+type clusterResolver struct {
+	ctx    context.Context
+	cancel context.CancelFunc
+	dns    DNS
+	service,
+	name string
+	cc resolver.ClientConn
+	rn chan struct{}
+	wg sync.WaitGroup
+}
+
+func (r *clusterResolver) ResolveNow(opts resolver.ResolveNowOptions) {
+	select {
+	case r.rn <- struct{}{}:
+	default:
+	}
+}
+
+func (r *clusterResolver) Close() {
+	r.cancel()
+	r.wg.Wait()
+}
+
+func (r *clusterResolver) watch() {
+	defer r.wg.Done()
+	for {
+		select {
+		case <-r.ctx.Done():
+			return
+		case <-r.rn:
+		}
+
+		state, err := r.lookup()
+		if err != nil {
+			r.cc.ReportError(err)
+		} else {
+			r.cc.UpdateState(*state)
+		}
+
+		debounceTimer := time.NewTimer(30 * time.Second)
+		select {
+		case <-r.ctx.Done():
+			debounceTimer.Stop()
+			return
+		case <-debounceTimer.C:
+		}
+	}
+}
+
+func (r *clusterResolver) lookup() (*resolver.State, error) {
+	_, addrs, err := r.dns.LookupSRV(r.ctx, r.service, "tcp", r.name)
+	var dnsErr *net.DNSError
+	if err != nil && stderrors.As(err, &dnsErr) && !dnsErr.IsNotFound {
+		return nil, err
+	}
+	state := new(resolver.State)
+	if len(addrs) == 0 {
+		addr, err := DefaultPort(r.name, DefaultPorts[true])
+		if err != nil {
+			return nil, err
+		}
+		state.Addresses = []resolver.Address{
+			{
+				Addr:       addr,
+				ServerName: r.name,
+			},
+		}
+	} else {
+		state.Addresses = make([]resolver.Address, len(addrs))
+		for i, addr := range addrs {
+			name := strings.TrimSuffix(addr.Target, ".")
+			state.Addresses[i] = resolver.Address{
+				Addr:       fmt.Sprintf("%s:%d", name, addr.Port),
+				ServerName: name,
+				Attributes: attributes.New(
+					"priority", int(addr.Priority),
+					"weight", int(addr.Weight),
+				),
+			}
+		}
+	}
+	return state, nil
+}
+
+func init() {
+	m := make(map[string]struct{}, len(clusterRoleServices))
+	for role := range clusterRoleServices {
+		scheme, err := Scheme(role)
+		if err != nil {
+			panic(err)
+		}
+		if _, ok := m[scheme]; ok {
+			continue
+		}
+		resolver.Register(NewBuilder(scheme))
+		m[scheme] = struct{}{}
+	}
 }
