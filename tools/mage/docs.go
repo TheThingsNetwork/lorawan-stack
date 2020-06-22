@@ -20,9 +20,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path"
 	"path/filepath"
-	"text/template"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/target"
@@ -98,11 +96,6 @@ func (d Docs) Deps() (err error) {
 	)
 }
 
-var (
-	docRedirectTemplateFilePath = filepath.Join("doc", "redirect.html.tmpl")
-	docRedirectFilePath         = filepath.Join("doc", "public", "index.html")
-)
-
 // Build builds a static website from the documentation into public/doc.
 // If the HUGO_BASE_URL environment variable is set, it also builds a public website into doc/public.
 func (d Docs) Build() (err error) {
@@ -119,32 +112,7 @@ func (d Docs) Build() (err error) {
 	if err != nil {
 		return err
 	}
-	url.Path = path.Join(url.Path, currentVersion)
-	destination := path.Join("public", currentVersion)
-	defer func() {
-		genErr := d.generateRedirect()
-		if err == nil {
-			err = genErr
-		}
-	}()
-	return runHugo("-b", url.String(), "-d", destination, "--environment", "gh-pages")
-}
-
-func (Docs) generateRedirect() error {
-	docTmpl, err := template.New(filepath.Base(docRedirectTemplateFilePath)).ParseFiles(docRedirectTemplateFilePath)
-	if err != nil {
-		return err
-	}
-	target, err := os.OpenFile(docRedirectFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
-	if err != nil {
-		return nil
-	}
-	defer target.Close()
-	return docTmpl.Execute(target, struct {
-		CurrentVersion string
-	}{
-		CurrentVersion: currentVersion,
-	})
+	return runHugo("-b", url.String(), "-d", "public", "--environment", "gh-pages")
 }
 
 // Server starts a documentation server.
