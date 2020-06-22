@@ -163,7 +163,7 @@ $table-cell-padding: 1.2em 0.75em;
     font-family: $title-family;
     color: $title-color;
   }
-  figure {
+  figure > img {
     box-shadow: $card-shadow;
   }
 }
