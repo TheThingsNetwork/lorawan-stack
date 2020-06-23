@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- Requirement to specify `frequency_plan_id` when creating gateways in the Console.
+
 ### Fixed
 
 - Endless authentication refresh loop in the Console in some rare situations.
