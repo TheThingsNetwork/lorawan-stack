@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - JSON uplink message doc edited for clarity.
 - The CLI snap version uses the `$SNAP_USER_COMMON` directory for config by default, so that it is preserved between revisions.
 - Defer events subscriptions until there is actual interest for events.
+- End device creation form with wizard in the Console.
 
 ### Deprecated
 
@@ -37,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Maximum ADR data rate index used in 1.0.2a and earlier versions of AU915 band.
 - End device events stream restart in the Console.
 - CLI was unable to read input from pipes.
+- Timezones issue in claim authentication code form, causing time to reverse on submission.
 
 ## [3.8.4] - 2020-06-12
 
@@ -52,14 +54,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Suppress a few unexpected EOF errors, in order to reduce noise in the logs for health checks.
-- End device creation form with wizard in the Console.
 
 ### Fixed
 
 - Packet Broker Agent cluster ID is used as subscription group.
 - LinkADR handling in 72-channel bands.
 - Data uplink metrics reported by Application Server.
-- Timezones issue in claim auth code form, causing time to reverse on submission
 
 ## [3.8.3] - 2020-06-05
 
