@@ -118,7 +118,7 @@ export default class GatewayOverview extends React.Component {
         items: [
           {
             key: sharedMessages.frequencyPlan,
-            value: <Tag content={frequency_plan_id} />,
+            value: frequency_plan_id ? <Tag content={frequency_plan_id} /> : undefined,
           },
         ],
       },
