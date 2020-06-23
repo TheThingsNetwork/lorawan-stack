@@ -120,7 +120,12 @@ class FormField extends React.Component {
     // Check if the value is react's synthetic event.
     const newValue = this.extractValue(value)
 
-    // TODO: Remove `await` when https://github.com/jaredpalmer/formik/issues/2457 is resolved.
+    // TODO: Remove `await` and event persist when https://github.com/jaredpalmer/formik/issues/2457
+    // is resolved.
+    if (typeof value !== 'undefined' && typeof value.persist === 'function') {
+      value.persist()
+    }
+
     await setFieldValue(name, newValue)
 
     if (enforceValidation) {
