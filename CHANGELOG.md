@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - JSON uplink message doc edited for clarity.
 - The CLI snap version uses the `$SNAP_USER_COMMON` directory for config by default, so that it is preserved between revisions.
+- Defer events subscriptions until there is actual interest for events.
 
 ### Deprecated
 
