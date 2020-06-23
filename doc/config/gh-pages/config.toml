@@ -3,3 +3,11 @@
     enabled = false
     apikey = ""
     index = ""
+  [params.intercom]
+    enabled = false
+    appid = ""
+  [params.feedback]
+    enabled = false
+  [params.analytics]
+    enabled = false
+    trackingid = ""
