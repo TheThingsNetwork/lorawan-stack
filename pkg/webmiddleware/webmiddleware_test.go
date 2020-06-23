@@ -52,3 +52,34 @@ func TestChain(t *testing.T) {
 
 	a.So(trace, should.Resemble, []string{"outer begin", "inner begin", "handler", "inner end", "outer end"})
 }
+
+func TestConditional(t *testing.T) {
+	a := assertions.New(t)
+
+	flag := false
+	middleware := Conditional(
+		func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				flag = true
+				next.ServeHTTP(w, r)
+			})
+		},
+		func(r *http.Request) bool {
+			return r.Header.Get("X-Condition") == "foo"
+		},
+	)
+	r := httptest.NewRequest(http.MethodGet, "/", nil)
+	r.Header.Set("X-Condition", "bar")
+	rec := httptest.NewRecorder()
+	middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		a.So(flag, should.Equal, false)
+	})).ServeHTTP(rec, r)
+
+	r = httptest.NewRequest(http.MethodGet, "/", nil)
+	r.Header.Set("X-Condition", "foo")
+	rec = httptest.NewRecorder()
+	middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		a.So(flag, should.Equal, true)
+	})).ServeHTTP(rec, r)
+
+}
