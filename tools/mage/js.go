@@ -63,20 +63,20 @@ func runYarnV(args ...string) error {
 	return sh.RunV("npx", append([]string{"yarn"}, args...)...)
 }
 
-func (Js) runYarnCommand(cmd string, args ...string) error {
+func runYarnCommand(cmd string, args ...string) error {
 	return runYarn(append([]string{"run", cmd}, args...)...)
 }
 
-func (Js) runYarnCommandV(cmd string, args ...string) error {
+func runYarnCommandV(cmd string, args ...string) error {
 	return runYarnV(append([]string{"run", cmd}, args...)...)
 }
 
-func (js Js) runWebpack(config string, args ...string) error {
-	return js.runYarnCommand("webpack", append([]string{fmt.Sprintf("--config=%s", config)}, args...)...)
+func (Js) runWebpack(config string, args ...string) error {
+	return runYarnCommand("webpack", append([]string{fmt.Sprintf("--config=%s", config)}, args...)...)
 }
 
-func (js Js) runEslint(args ...string) error {
-	return js.runYarnCommandV("eslint", append([]string{"--color", "--no-ignore"}, args...)...)
+func (Js) runEslint(args ...string) error {
+	return runYarnCommand("eslint", append([]string{"--color", "--no-ignore"}, args...)...)
 }
 
 func (Js) isProductionMode() bool {
@@ -186,7 +186,7 @@ func (js Js) Serve() error {
 		fmt.Println("Running Webpack for Main Bundle in watch mode")
 	}
 	os.Setenv("DEV_SERVER_BUILD", "true")
-	return js.runYarnCommandV("webpack-dev-server",
+	return runYarnCommandV("webpack-dev-server",
 		"--config", "config/webpack.config.babel.js",
 		"-w",
 	)
@@ -290,7 +290,7 @@ func (js Js) Test() error {
 	if mg.Verbose() {
 		fmt.Println("Running tests")
 	}
-	return js.runYarnCommand("jest", filepath.Join("pkg", "webui"))
+	return runYarnCommand("jest", filepath.Join("pkg", "webui"))
 }
 
 // Fmt formats all js files.
@@ -299,7 +299,7 @@ func (js Js) Fmt() error {
 	if mg.Verbose() {
 		fmt.Println("Running prettier on .js files")
 	}
-	return js.runYarnCommand("prettier",
+	return runYarnCommand("prettier",
 		"--config", "./config/.prettierrc.js",
 		"--write",
 		"./pkg/webui/**/*.js", "./config/**/*.js",
@@ -335,7 +335,7 @@ func (js Js) Storybook() error {
 	if mg.Verbose() {
 		fmt.Println("Serving storybook")
 	}
-	return js.runYarnCommandV("start-storybook",
+	return runYarnCommandV("start-storybook",
 		"--config-dir", "./config/storybook",
 		"--static-dir", "public",
 		"--port", "9001",
