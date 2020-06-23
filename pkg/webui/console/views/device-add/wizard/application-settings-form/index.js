@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 
 import Checkbox from '@ttn-lw/components/checkbox'
 import Input from '@ttn-lw/components/input'
@@ -28,12 +27,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { generate16BytesKey } from '@console/lib/device-utils'
 
 import validationSchema from './validation-schema'
-
-const messages = defineMessages({
-  skipCryptoTitle: 'Skip payload encryption and decryption',
-  skipCryptoDescription: 'Skip decryption of uplink payloads and encryption of downlink payloads',
-  skipCryptoPlaceholder: 'Encryption/decryption disabled',
-})
 
 const defaultFormValues = {
   skip_payload_crypto: false,
@@ -56,15 +49,14 @@ const ApplicationSettingsForm = React.memo(props => {
   const [skipCrypto, setSkipCrypto] = React.useState(false)
   const handleSkipCryptoChange = React.useCallback(
     evt => {
-      const { checked } = evt.target
       const { setValues, values } = formRef.current
 
-      setSkipCrypto(checked)
+      setSkipCrypto(evt.target.checked)
       setValues(
         validationSchema.cast(
           {
             ...values,
-            skip_payload_crypto: checked,
+            skip_payload_crypto: evt.target.checked,
             session: {
               keys: {
                 app_s_key: {
@@ -90,9 +82,9 @@ const ApplicationSettingsForm = React.memo(props => {
     >
       <Form.Field
         autoFocus
-        title={messages.skipCryptoTitle}
+        title={sharedMessages.skipCryptoTitle}
         name="skip_payload_crypto"
-        description={messages.skipCryptoDescription}
+        description={sharedMessages.skipCryptoDescription}
         component={Checkbox}
         onChange={handleSkipCryptoChange}
       />
@@ -104,7 +96,7 @@ const ApplicationSettingsForm = React.memo(props => {
           type="byte"
           min={16}
           max={16}
-          placeholder={skipCrypto ? messages.skipCryptoPlaceholder : undefined}
+          placeholder={skipCrypto ? sharedMessages.skipCryptoPlaceholder : undefined}
           disabled={skipCrypto}
           description={sharedMessages.appSKeyDescription}
           component={Input.Generate}

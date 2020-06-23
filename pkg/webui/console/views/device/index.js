@@ -110,6 +110,7 @@ import style from './device.styl'
       'recent_uplinks',
       'recent_downlinks',
       'attributes',
+      'skip_payload_crypto',
     ]
 
     if (mayReadKeys) {
