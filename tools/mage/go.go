@@ -71,6 +71,10 @@ func outputGo(cmd string, args ...string) (string, error) {
 	return buf.String(), nil
 }
 
+func runGoMute(args ...string) error {
+	return execGo(nil, os.Stderr, "run", args...)
+}
+
 func runGoTool(args ...string) error {
 	return runGoFrom("tools", append([]string{"-exec", "go run exec_from.go -dir .."}, args...)...)
 }

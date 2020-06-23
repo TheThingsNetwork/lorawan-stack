@@ -101,6 +101,8 @@ func (js Js) Deps() error {
 		"node_modules",
 		"package.json",
 		"yarn.lock",
+		filepath.Join("sdk", "js", "src"),
+		filepath.Join("sdk", "js", "generated"),
 	)
 	if err != nil {
 		return targetError(err)
