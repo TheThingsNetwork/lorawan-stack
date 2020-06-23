@@ -33,6 +33,7 @@ export default defineMessages({
   addWebhook: 'Add webhook',
   admin: 'Admin',
   all: 'All',
+  allAdmin: 'All (Admin)',
   altitude: 'Altitude',
   altitudeDesc: 'The altitude in meters, where 0 means sea level',
   antennas: 'Antennas',

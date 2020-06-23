@@ -21,6 +21,14 @@
 
   &.top-rule
     border-normal('bottom')
+    padding-bottom: 0
+
+    .filters-left
+      padding-bottom: 0
+
+      +media-query($bp.xs)
+        padding-bottom: $cs.s
+        flex-basis: 100%
 
   &-left
     flex-basis: auto
@@ -32,8 +40,14 @@
     justify-content: flex-end
     align-items: center
     max-width: 32rem
-    +media-query($bp.s)
+
+    +media-query($bp.xs)
+      justify-content: flex-start
       max-width: none
+      flex-basis: 100%
+
+      .search-bar
+        width: 100%
 
 .search-bar
   min-width: 5rem
@@ -49,7 +63,9 @@
 .table-title
   padding-left: $cs.m
   color: $tc-deep-gray
-  +media-query($bp.s)
+
+  +media-query($bp.xs)
+    padding-bottom: $cs.s
     padding-left: 0
 
 .error-message
@@ -59,3 +75,5 @@
   left: 50%
   transform: translate(-50%, 0)
   color: $tc-error
+
+
