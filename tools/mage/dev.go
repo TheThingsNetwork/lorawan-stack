@@ -16,8 +16,10 @@ package ttnmage
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"runtime"
 
 	"github.com/magefile/mage/mg"
@@ -67,11 +69,14 @@ func (Dev) Misspell() error {
 }
 
 var (
-	devDatabases          = []string{"cockroach", "redis"}
+	sqlDatabase           = "cockroach"
+	redisDatabase         = "redis"
 	devDataDir            = ".env/data"
 	devDatabaseName       = "ttn_lorawan_dev"
 	devDockerComposeFlags = []string{"-p", "lorawan-stack-dev"}
 )
+
+var devDatabases = []string{sqlDatabase, redisDatabase}
 
 func dockerComposeFlags(args ...string) []string {
 	return append(devDockerComposeFlags, args...)
@@ -80,6 +85,73 @@ func dockerComposeFlags(args ...string) []string {
 func execDockerCompose(args ...string) error {
 	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "docker-compose", dockerComposeFlags(args...)...)
 	return err
+}
+
+func execDockerComposeWithOutput(filepath string, args ...string) error {
+	output, err := sh.Output("docker-compose", dockerComposeFlags(args...)...)
+	if err != nil {
+		return err
+	}
+	message := []byte(output)
+	err = ioutil.WriteFile(filepath, message, 0644)
+	return err
+}
+
+// SQLStart starts the SQL database of the development environment.
+func (Dev) SQLStart() error {
+	if mg.Verbose() {
+		fmt.Printf("Starting SQL databases\n")
+	}
+	if err := execDockerCompose(append([]string{"up", "-d"}, sqlDatabase)...); err != nil {
+		return err
+	}
+	return execDockerCompose("ps")
+}
+
+// SQLStop stops the SQL database of the development environment.
+func (Dev) SQLStop() error {
+	if mg.Verbose() {
+		fmt.Printf("Stopping SQL databases\n")
+	}
+	return execDockerCompose(append([]string{"stop"}, sqlDatabase)...)
+}
+
+// SQLMakeSnapshot stores the current cockroach data folder for later restores.
+func (Dev) SQLMakeSnapshot() error {
+	if mg.Verbose() {
+		fmt.Printf("Making DB snapshot")
+	}
+	os.RemoveAll(devDataDir + "/cockroach-snap")
+	return sh.RunV("cp", "-R", devDataDir+"/cockroach", devDataDir+"/cockroach-snap")
+}
+
+// SQLRestoreSnapshot restores the previously taken snapshot, thus restoring all
+// previously snapshoted databases.
+func (Dev) SQLRestoreSnapshot() {
+	mg.Deps(Dev.SQLStop)
+	if mg.Verbose() {
+		fmt.Printf("Restoring DB snapshot")
+	}
+	os.RemoveAll(devDataDir + "/cockroach")
+	sh.RunV("cp", "-R", devDataDir+"/cockroach-snap", devDataDir+"/cockroach")
+	mg.Deps(Dev.SQLStart)
+}
+
+// SQLDump performs an SQL database dump of the dev database to the .cache
+// folder.
+func (Dev) SQLDump() error {
+	if mg.Verbose() {
+		fmt.Printf("Execute database dump\n")
+	}
+	return execDockerComposeWithOutput(filepath.Join(".cache", "sqldump.sql"), "exec", "-T", "cockroach", "./cockroach", "dump", devDatabaseName, "--insecure")
+}
+
+// SQLRestore restores the dev database using a previously generated dump.
+func (Dev) SQLRestore() error {
+	if mg.Verbose() {
+		fmt.Printf("Restore database from dump")
+	}
+	return sh.Run("node", "./tools/mage/scripts/restore-db-dump.js", "--db", devDatabaseName)
 }
 
 // DBStart starts the databases of the development environment.
