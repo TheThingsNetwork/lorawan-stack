@@ -16,7 +16,6 @@ package ttnmage
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/magefile/mage/mg"
 )
@@ -33,12 +32,4 @@ func targetError(err error) error {
 		return fmt.Errorf("failed checking modtime: %w", err)
 	}
 	return nil
-}
-
-func pathExists(filename string) bool {
-	_, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return true
 }

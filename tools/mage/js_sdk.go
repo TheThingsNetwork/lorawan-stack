@@ -17,7 +17,6 @@ package ttnmage
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/magefile/mage/mg"
@@ -65,9 +64,7 @@ func (k JsSDK) Build() error {
 	if err != nil {
 		return targetError(err)
 	}
-	isCI := os.Getenv("CI") == "true"
-	distExists := pathExists(filepath.Join("sdk", "js", "dist"))
-	if !ok || (isCI && distExists) {
+	if !ok {
 		return nil
 	}
 	mg.Deps(k.Deps, k.Definitions)
