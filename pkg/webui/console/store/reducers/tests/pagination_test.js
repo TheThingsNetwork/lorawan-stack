@@ -56,7 +56,10 @@ describe('pagination reducers', function() {
     })
 
     describe('receives the `success` action', function() {
-      const entities = [{ id: '1', name: 'name1' }, { id: '2', name: 'name2' }]
+      const entities = [
+        { id: '1', name: 'name1' },
+        { id: '2', name: 'name2' },
+      ]
       const totalCount = entities.length
       const action = success({ entities, totalCount })
 
@@ -134,7 +137,10 @@ describe('pagination reducers', function() {
     })
 
     describe('receives the `success` action', function() {
-      const entities = [{ id: '1', name: 'name1' }, { id: '2', name: 'name2' }]
+      const entities = [
+        { id: '1', name: 'name1' },
+        { id: '2', name: 'name2' },
+      ]
       const totalCount = entities.length
       const action = success({ id: entityId, entities, totalCount })
 

@@ -36,12 +36,9 @@ const m = defineMessages({
   goToLogin: 'Go to login',
 })
 
-@connect(
-  null,
-  {
-    goToLogin: () => push('/login'),
-  },
-)
+@connect(null, {
+  goToLogin: () => push('/login'),
+})
 export default class Validate extends React.PureComponent {
   static propTypes = {
     goToLogin: PropTypes.func.isRequired,
