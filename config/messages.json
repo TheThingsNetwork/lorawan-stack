@@ -6452,6 +6452,15 @@
       "file": "discover.go"
     }
   },
+  "error:pkg/rpcmiddleware/discover:role": {
+    "translations": {
+      "en": "service role `{role}` not discoverable"
+    },
+    "description": {
+      "package": "pkg/rpcmiddleware/discover",
+      "file": "discover.go"
+    }
+  },
   "error:pkg/rpcmiddleware/validator:field_mask_paths": {
     "translations": {
       "en": "forbidden path(s) in field mask"

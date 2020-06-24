@@ -24,13 +24,13 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/discover"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
-	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/resolver"
 )
 
 type mockResolver struct {
@@ -166,7 +166,7 @@ func TestDialContext(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
-			resolver := &mockResolver{
+			dns := &mockResolver{
 				LookupSRVFunc: func(ctx context.Context, service, proto, name string) (cname string, addrs []*net.SRV, err error) {
 					if tc.LookupError != nil {
 						return "", nil, tc.LookupError
@@ -180,6 +180,8 @@ func TestDialContext(t *testing.T) {
 					return "test", tc.LookupResult, nil
 				},
 			}
+			resolver.UnregisterForTesting("ttn-v3-gs")
+			resolver.Register(discover.NewBuilder("ttn-v3-gs", discover.WithDNS(dns)))
 
 			clientTLSConfig := &tls.Config{
 				RootCAs: x509.NewCertPool(),
@@ -190,26 +192,23 @@ func TestDialContext(t *testing.T) {
 			var dialAddresses []string
 			conn, err := grpc.DialContext(
 				ctx,
-				"localhost",
+				"ttn-v3-gs:///localhost",
 				grpc.WithTransportCredentials(credentials.NewTLS(clientTLSConfig)),
 				grpc.WithBlock(),
 				grpc.FailOnNonTempDialError(true),
 				grpc.WithTimeout(test.Delay<<10),
-				discover.WithDialer(ttnpb.ClusterRole_GATEWAY_SERVER,
-					discover.WithDNSResolver(resolver),
-					discover.WithAddressDialer(func(ctx context.Context, address string) (net.Conn, error) {
-						t.Logf("Dialing %s", address)
-						dialAddresses = append(dialAddresses, address)
-						if host, _, err := net.SplitHostPort(address); err == nil && host == "localhost" {
-							return new(net.Dialer).DialContext(ctx, "tcp", address)
-						}
-						return nil, &net.DNSError{
-							Err:         "not found",
-							IsTemporary: false,
-							IsNotFound:  true,
-						}
-					}),
-				),
+				grpc.WithContextDialer(func(ctx context.Context, address string) (net.Conn, error) {
+					t.Logf("Dialing %s", address)
+					dialAddresses = append(dialAddresses, address)
+					if host, _, err := net.SplitHostPort(address); err == nil && host == "localhost" {
+						return new(net.Dialer).DialContext(ctx, "tcp", address)
+					}
+					return nil, &net.DNSError{
+						Err:         "not found",
+						IsTemporary: false,
+						IsNotFound:  true,
+					}
+				}),
 			)
 
 			if err != nil {
