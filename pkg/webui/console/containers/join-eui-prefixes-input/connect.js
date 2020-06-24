@@ -32,8 +32,4 @@ const mapDispatchToProps = dispatch => ({
   getPrefixes: () => dispatch(getJoinEUIPrefixes()),
 })
 
-export default Component =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(Component)
+export default Component => connect(mapStateToProps, mapDispatchToProps)(Component)

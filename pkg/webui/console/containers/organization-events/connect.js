@@ -38,8 +38,4 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   onClear: () => dispatch(clearOrganizationEventsStream(ownProps.orgId)),
 })
 
-export default Events =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(Events)
+export default Events => connect(mapStateToProps, mapDispatchToProps)(Events)

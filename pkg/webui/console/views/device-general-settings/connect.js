@@ -65,8 +65,4 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
 })
 
 export default DeviceGeneralSettings =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-    mergeProps,
-  )(DeviceGeneralSettings)
+  connect(mapStateToProps, mapDispatchToProps, mergeProps)(DeviceGeneralSettings)

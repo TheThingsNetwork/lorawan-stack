@@ -38,7 +38,10 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayEditBasicGatewayInformation } from '@console/lib/feature-checks'
 
-@withRequest(({ gtwId, loadData }) => loadData(gtwId), () => false)
+@withRequest(
+  ({ gtwId, loadData }) => loadData(gtwId),
+  () => false,
+)
 @withFeatureRequirement(mayEditBasicGatewayInformation, {
   redirect: '/',
 })

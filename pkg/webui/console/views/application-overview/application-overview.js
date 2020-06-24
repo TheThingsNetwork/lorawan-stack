@@ -41,7 +41,10 @@ import { mayViewApplicationInfo } from '@console/lib/feature-checks'
 
 import style from './application-overview.styl'
 
-@withRequest(({ appId, loadData }) => loadData(appId), () => false)
+@withRequest(
+  ({ appId, loadData }) => loadData(appId),
+  () => false,
+)
 @withFeatureRequirement(mayViewApplicationInfo, {
   redirect: '/',
 })
