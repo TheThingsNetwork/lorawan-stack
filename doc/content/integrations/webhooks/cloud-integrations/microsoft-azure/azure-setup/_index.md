@@ -22,7 +22,7 @@ Next, you have to provide a globally unique **Function App name**. After deployi
 
 Choose **Code** for **Publish** to publish your code files (the alternative would be publishing a Docker container). 
 
-Since you can use different programming languages for your function, you have to choose an appropriate **Runtime stack**. In this guide, we use a **C#** function, therefore we choose **.NET Core** runtime stack. Also, you need to choose the **Version** of the installed runtime, considering that it will probably be automatically suggested to you.  
+Since you can use different programming languages for your function, you have to choose an appropriate **Runtime stack**. In this guide, we use a **C#** function, therefore we choose **.NET Core** runtime stack. Also, you need to choose the **Version** of the installed runtime. The most recent version will automatically be suggested to you.
 
 Choose a **Region** nearest to you, or near other services that your functions access. 
 
@@ -38,7 +38,7 @@ In the next step, you will be creating a function inside your function app. From
 
 In the **New Function** pop-up menu, select **HTTP trigger**. Give your function a recognizable name and choose **Function** for **Authorization level**. 
 
->Note: **Authorization level** defines whether the function requires an API key and if so, what kind (function or master key). Depending on this, an API key will be (or not) a part of the webhook URL. 
+>Note: **Authorization level** defines whether the function requires an API key and if so, what kind (function or master key). Depending on this, an API key may be a part of the webhook URL. 
 
 Select **Create Function** to finish. 
 
@@ -46,7 +46,7 @@ Select **Create Function** to finish.
 
 After creating a function, click on it and select **Code + Test** in the **Developer** menu on the left. Modify the function code as shown below in order to show incoming messages in JSON format. 
 
-Also make sure to copy the function URL, because you will need it when creating a Webhook integration on the {{% tts %}}. 
+Also make sure to copy the **function URL**, because you will need it when creating a Webhook integration on {{% tts %}}. 
 
 {{< figure src="http-trigger-function-code.png" alt="HTTP trigger function code" >}}
 

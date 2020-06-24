@@ -4,7 +4,7 @@ description: ""
 weight: 2
 ---
 
-After finishing the setup in Azure, this section can help you to make a proper Webhook integration on {{% tts %}}.
+After finishing the setup in Azure, this section shows you how to create the Webhook integration on {{% tts %}}.
 
 <!--more-->
 
@@ -18,4 +18,4 @@ Check the message types for which you wish to enable this webhook and finish cre
 
 {{< figure src="azure-webhook-creation.png" alt="Azure webhook" >}}
 
-The only thing left is to navigate to the logs console in Azure and see the incoming messages printed in JSON format.
+After creating the integration, navigate to the logs console in Azure to see the incoming messages printed in JSON format.
