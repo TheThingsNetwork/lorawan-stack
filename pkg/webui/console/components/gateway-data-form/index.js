@@ -86,7 +86,7 @@ const validationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-  frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
+  frequency_plan_id: Yup.string(),
   gateway_server_address: Yup.string().matches(addressRegexp, sharedMessages.validateAddressFormat),
   location_public: Yup.boolean().default(false),
   status_public: Yup.boolean().default(false),
@@ -245,7 +245,7 @@ class GatewayDataForm extends React.Component {
           description={sharedMessages.attributeDescription}
         />
         <Message component="h4" content={sharedMessages.lorawanOptions} />
-        <GsFrequencyPlansSelect name="frequency_plan_id" menuPlacement="top" required />
+        <GsFrequencyPlansSelect name="frequency_plan_id" menuPlacement="top" />
         <Form.Field
           title={sharedMessages.gatewayScheduleDownlinkLate}
           name="schedule_downlink_late"
