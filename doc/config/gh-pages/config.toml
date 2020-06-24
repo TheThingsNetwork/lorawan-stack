@@ -1,3 +1,5 @@
+googleAnalytics = ""
+
 [params]
   [params.search]
     enabled = false
@@ -8,6 +10,4 @@
     appid = ""
   [params.feedback]
     enabled = false
-  [params.analytics]
-    enabled = false
-    trackingid = ""
+    campaign = ""

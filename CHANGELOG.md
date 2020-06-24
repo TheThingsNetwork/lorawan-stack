@@ -10,14 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Option to reset end device payload formatters in the Console.
-<<<<<<< HEAD
 - Service discovery using DNS SRV records for external Application Server linking.
 - Functionality to set end device attributes in the Console.
 - Event description tooltip to events in the Console.
 - CLI support for setting and unsetting end device location (see `--location.latitude`, `--location.longitude`, `--location.altitude` and `--location.accuracy` options).
 - Functionality to allow admin users to list all applications and gateways in the Console.
 - Ursalink UG8X gateway documentation.
-- Intercom and Google Analytics feedback in documentation.
+- Intercom, Google Analytics, and Emojicom feedback in documentation.
 
 ### Changed
 

@@ -1,71 +1,10 @@
 {{- if .Site.Params.feedback.enabled -}}
-<div class='feedback has-vertical-space'>
-  <label class='label'>Was this page helpful?</label>
-  <form name='feedbackForm' class='feedback-container'>
-    <div class='item'>
-      <label for='0'>
-      <input class='radio' type='radio' name='feedbackRadios' id='0' value='0'>
-      <span>👍</span>
-    </label>
-    </div>
-    <div class='item'>
-      <label for='1'>
-      <input class='radio' type='radio' name='feedbackRadios' id='1' value='1'>
-      <span>👎</span>
-    </label>
-    </div>
-  </form>
 
+<script>window.emojicom_widget = { campaign: {{ .Site.Params.feedback.campaign }} };</script>
+<script src="https://cdn.emojicom.io/embed/widget.js" async></script>
+
+<div class='feedback has-vertical-space'>
+  <div id="emojicom-widget-inline"></div>
 </div>
 
-<script>
-  var radios = document.feedbackForm.feedbackRadios;
-  var prev = null;
-  for (var i = 0; i < radios.length; i++) {
-      radios[i].addEventListener('change', function() {
-
-          if (this !== prev) {
-              prev = this;
-          }
-
-          const feedback = this.value === '1' ? 'thumbs-down' : 'thumbs-up';
-
-          {{ if .Site.Params.analytics.enabled }}
-          gtag('event', feedback, {
-            'event_category' : feedback,
-            'event_label' : window.location.href,
-            'value': this.value,
-          });
-          {{ end }}
-
-          {{ if .Site.Params.feedback.enabled }}
-          var metadata = {
-            href: window.location.href,
-          };
-
-          const feedback = this.value === '1' ? 'thumbs-down' : 'thumbs-up'
-
-          {{ if .Site.Params.analytics.enabled }}
-          gtag('event', feedback, {
-            'event_category' : feedback,
-            'event_label' : window.location.href,
-            'value': this.value,
-          });
-          {{ end }}
-
-          {{ if .Site.Params.feedback.enabled }}
-
-          var metadata = {
-            href: window.location.href,
-          };
-
-          Intercom('trackEvent', feedback, metadata);
-
-          if(feedback === 'thumbs-down'){
-            Intercom('showNewMessage', 'Sorry to hear that. Thanks for letting us know. If you have additional feedback, please send us a message here:');
-          }
-          {{ end }}
-      });
-  }
-</script>
 {{- end -}}
