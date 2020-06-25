@@ -17,10 +17,11 @@ import { defineSmokeTest } from '../utils'
 
 const applicationCreate = defineSmokeTest('succeeds creating application', () => {
   const user = {
-    user_id: 'app-create-test-user',
-    password: '123456QWERTY!',
+    ids: { user_id: 'app-create-test-user' },
+    primary_email_address: 'test-user@example.com',
+    password: 'ABCDefg123!',
+    password_confirm: 'ABCDefg123!',
     email: 'app-create-test-user@example.com',
-    name: 'Test App',
   }
   cy.augmentStackConfig(disableApplicationServer)
   cy.createUser(user)

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import registrationTests from './registration'
 import applicationTests from './applications'
 
-export default [...applicationTests]
+export default [...registrationTests, ...applicationTests]

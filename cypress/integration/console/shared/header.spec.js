@@ -15,14 +15,16 @@
 describe('Header', () => {
   describe('Console logout', () => {
     const logout = userName => {
-      cy.findByTestId('profile-dropdown')
-        .should('contain', userName)
-        .as('profileDropdown')
+      cy.get('header').within(() => {
+        cy.findByTestId('profile-dropdown')
+          .should('contain', userName)
+          .as('profileDropdown')
 
-      cy.get('@profileDropdown').click()
-      cy.get('@profileDropdown')
-        .findByText('Logout')
-        .click()
+        cy.get('@profileDropdown').click()
+        cy.get('@profileDropdown')
+          .findByText('Logout')
+          .click()
+      })
     }
 
     it('succeeds when logged in properly', () => {
