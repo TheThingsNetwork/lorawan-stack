@@ -60,6 +60,8 @@ jobs:
       run: tools/bin/mage jsSDK:deps
     - name: Build JS SDK
       run: tools/bin/mage jsSDK:clean jsSDK:build
+    - name: Install JS dependencies
+      run: tools/bin/mage js:deps
     - name: Generate JS translations
       run: tools/bin/mage js:translations js:backendTranslations
     - name: Lint JS SDK code
