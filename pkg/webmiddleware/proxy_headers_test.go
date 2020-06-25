@@ -35,7 +35,7 @@ func TestProxyHeaders(t *testing.T) {
 	t.Run("Trusted X-Forwarded-For", func(t *testing.T) {
 		a := assertions.New(t)
 		r := httptest.NewRequest(http.MethodGet, "/path", nil)
-		r.Header.Set(headerXForwardedFor, "12.34.56.78")
+		r.Header.Set(headerXForwardedFor, "12.34.56.78, 10.100.0.1")
 		r.Header.Set(headerXForwardedHost, "thethings.network")
 		r.Header.Set(headerXForwardedProto, schemeHTTPS)
 		r.Header.Set(headerXRealIP, "12.34.56.78")
@@ -43,7 +43,7 @@ func TestProxyHeaders(t *testing.T) {
 		r.RemoteAddr = "192.0.2.1:1234"
 		rec := httptest.NewRecorder()
 		m(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			a.So(r.Header.Get(headerXForwardedFor), should.Equal, "12.34.56.78")
+			a.So(r.Header.Get(headerXForwardedFor), should.Equal, "12.34.56.78, 10.100.0.1")
 			a.So(r.Header.Get(headerXForwardedHost), should.Equal, "thethings.network")
 			a.So(r.Header.Get(headerXForwardedProto), should.Equal, schemeHTTPS)
 			a.So(r.Header.Get(headerXRealIP), should.Equal, "12.34.56.78")
@@ -55,14 +55,14 @@ func TestProxyHeaders(t *testing.T) {
 	t.Run("Trusted Forwarded", func(t *testing.T) {
 		a := assertions.New(t)
 		r := httptest.NewRequest(http.MethodGet, "/path", nil)
-		r.Header.Set(headerForwarded, "for=12.34.56.78;host=thethings.network;proto=https")
+		r.Header.Set(headerForwarded, "for=12.34.56.78, for=10.100.0.1;host=thethings.network;proto=https")
 		r.Header.Set(headerXRealIP, "12.34.56.78")
 		r.Header.Set(headerXForwardedTLSClientCert, "MIIDEDCC...")
 		r.Header.Set(headerXForwardedTLSClientCertInfo, "Subject=\"...\"")
 		r.RemoteAddr = "192.0.2.1:1234"
 		rec := httptest.NewRecorder()
 		m(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			a.So(r.Header.Get(headerForwarded), should.Equal, "for=12.34.56.78;host=thethings.network;proto=https")
+			a.So(r.Header.Get(headerForwarded), should.Equal, "for=12.34.56.78, for=10.100.0.1;host=thethings.network;proto=https")
 			a.So(r.Header.Get(headerXRealIP), should.Equal, "12.34.56.78")
 			a.So(r.Header.Get(headerXForwardedTLSClientCert), should.Equal, "MIIDEDCC...")
 			a.So(r.Header.Get(headerXForwardedTLSClientCertInfo), should.Equal, "Subject=\"...\"")
