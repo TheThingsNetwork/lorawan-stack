@@ -64,9 +64,9 @@ const Status = function({
   let translatedTitle
 
   if (title) {
-    translatedTitle = intl.formatMessage(title)
+    translatedTitle = typeof title === 'string' ? title : intl.formatMessage(title)
   } else if (label) {
-    translatedTitle = intl.formatMessage(label)
+    translatedTitle = typeof label === 'string' ? label : intl.formatMessage(label)
   } else {
     translatedTitle = intl.formatMessage(m[status])
   }

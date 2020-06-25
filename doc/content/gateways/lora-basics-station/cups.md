@@ -1,5 +1,5 @@
 ---
-title: "Configuration and Update Server Protocol"
+title: "Configuration and Update Server (CUPS)"
 description: ""
 weight: -1
 ---
@@ -26,7 +26,17 @@ If you have not already created one, follow instructions for [Creating a Gateway
 
 ## Configure Gateway
 
-In your gateway configuration, set the following fields:
+On your gateway, set the following configuration fields.
+
+The `<server-address>` is the address of {{% tts %}}. If you followed the [Getting Started guide]({{< ref "/getting-started" >}}) this is the same as what you use instead of `thethings.example.com`.
+
+The `<gateway-api-key>` is the API Key you created above. Copy your gateway API Key in to a `gateway-api.key` file (the filename is not important) as an HTTP header in the following format:
+
+```
+Authorization: <gateway-api-key>
+```
+
+If using Let's Encrypt to secure your domain, you may download the Let's Encrypt DST X3 Trust file [here](https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem.txt).
 
 CUPS URI: `https://<server-address>:443`
 

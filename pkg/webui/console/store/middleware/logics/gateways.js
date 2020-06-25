@@ -75,7 +75,7 @@ const getGatewaysLogic = createRequestLogic({
     } = action.payload
     const { selectors, options } = action.meta
 
-    const data = query
+    const data = options.isSearch
       ? await api.gateways.search(
           {
             page,

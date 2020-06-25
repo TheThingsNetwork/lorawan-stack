@@ -20,6 +20,7 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 import Input from '@ttn-lw/components/input'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
+import Checkbox from '@ttn-lw/components/checkbox'
 
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -29,25 +30,38 @@ import { generate16BytesKey } from '@console/lib/device-utils'
 
 import messages from '../messages'
 
-const validationSchema = Yup.object().shape({
-  session: Yup.object().shape({
-    keys: Yup.object().shape({
-      app_s_key: Yup.object().shape({
-        key: Yup.string()
-          .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // A 16 Byte hex.
-          .required(sharedMessages.validateRequired),
-      }),
-    }),
-  }),
-})
+const validationSchema = Yup.object()
+  .shape({
+    skip_payload_crypto: Yup.boolean().default(false),
+    session: Yup.object().when(
+      ['skip_payload_crypto', '$mayEditKeys'],
+      (skipPayloadCrypto, mayEditKeys, schema) => {
+        if (skipPayloadCrypto || !mayEditKeys) {
+          return schema.strip()
+        }
+
+        return schema.shape({
+          keys: Yup.object().shape({
+            app_s_key: Yup.object().shape({
+              key: Yup.string()
+                .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // A 16 Byte hex.
+                .required(sharedMessages.validateRequired),
+            }),
+          }),
+        })
+      },
+    ),
+  })
+  .noUnknown()
 
 const ApplicationServerForm = React.memo(props => {
   const { device, onSubmit, onSubmitSuccess, mayEditKeys, mayReadKeys } = props
 
   const [error, setError] = React.useState('')
 
+  const validationContext = React.useMemo(() => ({ mayEditKeys }), [mayEditKeys])
   const initialValues = React.useMemo(() => {
-    const { session = {} } = device
+    const { session = {}, skip_payload_crypto } = device
     const {
       keys = {
         app_s_key: {
@@ -56,18 +70,66 @@ const ApplicationServerForm = React.memo(props => {
       },
     } = session
 
-    return {
-      session: {
-        keys: {
-          app_s_key: keys.app_s_key,
+    return validationSchema.cast(
+      {
+        skip_payload_crypto,
+        session: {
+          keys: {
+            app_s_key: keys.app_s_key,
+          },
         },
       },
-    }
-  }, [device])
+      { context: validationContext },
+    )
+  }, [device, validationContext])
+
+  const formRef = React.useRef(null)
+  const sessionRef = React.useRef(device.session)
+
+  const [skipCrypto, setSkipCrypto] = React.useState(device.skip_payload_crypto || false)
+  const handleSkipCryptoChange = React.useCallback(
+    evt => {
+      const { checked } = evt.target
+      const { setValues, values } = formRef.current
+
+      setSkipCrypto(checked)
+      if (checked) {
+        setValues(
+          validationSchema.cast(
+            {
+              ...values,
+              skip_payload_crypto: checked,
+              session: {
+                keys: {
+                  app_s_key: {
+                    key: '',
+                  },
+                },
+              },
+            },
+            { context: validationContext },
+          ),
+        )
+      } else {
+        setValues(
+          validationSchema.cast(
+            {
+              ...values,
+              skip_payload_crypto: checked,
+              // Reset initial app_s_key value.
+              session: sessionRef.current || '',
+            },
+            { context: validationContext },
+          ),
+        )
+      }
+    },
+    [validationContext],
+  )
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
-      const castedValues = validationSchema.cast(values)
+      const castedValues = validationSchema.cast(values, { context: validationContext })
       const updatedValues = diff(initialValues, castedValues)
 
       setError('')
@@ -80,7 +142,7 @@ const ApplicationServerForm = React.memo(props => {
         setError(err)
       }
     },
-    [initialValues, onSubmit, onSubmitSuccess],
+    [initialValues, onSubmit, onSubmitSuccess, validationContext],
   )
 
   // Notify the user that the session keys might be there, but since there are
@@ -90,13 +152,22 @@ const ApplicationServerForm = React.memo(props => {
   return (
     <Form
       validationSchema={validationSchema}
+      validationContext={validationContext}
       initialValues={initialValues}
       onSubmit={onFormSubmit}
       error={error}
       enableReinitialize
-      disabled={!mayEditKeys}
+      formikRef={formRef}
     >
       {showResetNotification && <Notification content={messages.keysResetWarning} info small />}
+      <Form.Field
+        autoFocus
+        title={sharedMessages.skipCryptoTitle}
+        name="skip_payload_crypto"
+        description={sharedMessages.skipCryptoDescription}
+        component={Checkbox}
+        onChange={handleSkipCryptoChange}
+      />
       <Form.Field
         required
         title={sharedMessages.appSKey}
@@ -104,9 +175,11 @@ const ApplicationServerForm = React.memo(props => {
         type="byte"
         min={16}
         max={16}
+        disabled={!mayEditKeys || skipCrypto}
         description={sharedMessages.appSKeyDescription}
+        placeholder={skipCrypto ? sharedMessages.skipCryptoPlaceholder : undefined}
         component={Input.Generate}
-        mayGenerateValue={mayEditKeys}
+        mayGenerateValue={mayEditKeys && !skipCrypto}
         onGenerateValue={generate16BytesKey}
       />
       <SubmitBar>

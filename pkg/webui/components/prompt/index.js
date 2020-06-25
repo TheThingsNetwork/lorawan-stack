@@ -37,23 +37,19 @@ const Prompt = props => {
   const handleModalShow = React.useCallback(nextLocation => {
     setState(prev => ({ ...prev, showModal: true, nextLocation }))
   }, [])
+
   const handleModalHide = React.useCallback(() => {
     setState(prev => ({ ...prev, showModal: false }))
   }, [])
+
   const handleModalComplete = React.useCallback(
     approved => {
       setState(prev => ({ ...prev, confirmedLocationChange: approved }))
-
-      if (approved) {
-        onApprove(nextLocation)
-      } else {
-        onCancel(nextLocation)
-      }
-
       handleModalHide()
     },
-    [handleModalHide, nextLocation, onApprove, onCancel],
+    [handleModalHide],
   )
+
   const handlePromptTrigger = React.useCallback(
     location => {
       if (!confirmedLocationChange && shouldBlockNavigation(location)) {
@@ -66,6 +62,14 @@ const Prompt = props => {
     },
     [handleModalShow, shouldBlockNavigation, confirmedLocationChange],
   )
+
+  React.useEffect(() => {
+    if (confirmedLocationChange) {
+      onApprove(nextLocation)
+    } else {
+      onCancel(nextLocation)
+    }
+  }, [confirmedLocationChange, nextLocation, onApprove, onCancel])
 
   return (
     <>

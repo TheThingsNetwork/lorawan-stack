@@ -14,7 +14,7 @@
 
 .stepper
   list-style: none
-  padding: $cs.s 0
+  padding: $cs.m 0
   margin: 0
   display: flex
   justify-content: space-between
@@ -24,6 +24,9 @@
 
   li
     flex: 1
+
+    &:last-child
+      flex: none
 
 +media-query($bp.xxs)
   .stepper

@@ -35,14 +35,8 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import style from './fetch-table.styl'
 
 const DEFAULT_PAGE = 1
-const DEFAULT_TAB = 'all'
-const ALLOWED_TABS = ['all']
 
-const filterValidator = function(filters) {
-  if (!ALLOWED_TABS.includes(filters.tab)) {
-    filters.tab = DEFAULT_TAB
-  }
-
+const filterValidator = filters => {
   if (typeof filters.order === 'string' && filters.order.match(/-?[a-z0-9]/) === null) {
     filters.order = undefined
   }
@@ -68,7 +62,7 @@ const m = defineMessages({
   } could not be displayed`,
 })
 
-@connect(function(state, props) {
+@connect((state, props) => {
   const base = props.baseDataSelector(state, props)
 
   return {
@@ -148,10 +142,12 @@ class FetchTable extends Component {
   constructor(props) {
     super(props)
 
+    const { tabs } = props
+
     this.state = {
       query: '',
       page: 1,
-      tab: 'all',
+      tab: tabs.length > 0 ? tabs[0].name : undefined,
       order: undefined,
     }
 
@@ -241,6 +237,8 @@ class FetchTable extends Component {
     await this.setState(
       this.props.filterValidator({
         ...this.state,
+        query: '',
+        page: 1,
         tab,
       }),
     )
@@ -308,26 +306,27 @@ class FetchTable extends Component {
       orderBy = typeof order === 'string' && order[0] === '-' ? order.substr(1) : order
     }
 
-    const buttonClassNames = classnames(style.filters, {
-      [style.topRule]: Boolean(tabs || tableTitle),
+    const filtersCls = classnames(style.filters, {
+      [style.topRule]: tabs.length > 0,
     })
 
     return (
       <div>
-        <div className={buttonClassNames}>
+        <div className={filtersCls}>
           <div className={style.filtersLeft}>
-            {tabs && (
+            {tabs.length > 0 ? (
               <Tabs
                 active={tab}
                 className={style.tabs}
                 tabs={tabs}
                 onTabChange={this.onTabChange}
               />
-            )}
-            {tableTitle && (
-              <div className={style.tableTitle}>
-                {tableTitle} ({totalCount})
-              </div>
+            ) : (
+              tableTitle && (
+                <div className={style.tableTitle}>
+                  {tableTitle} ({totalCount})
+                </div>
+              )
             )}
           </div>
           <div className={style.filtersRight}>

@@ -21,12 +21,14 @@ import Input from '@ttn-lw/components/input'
 import Form from '@ttn-lw/components/form'
 import Checkbox from '@ttn-lw/components/checkbox'
 import ModalButton from '@ttn-lw/components/button/modal-button'
+import KeyValueMap from '@ttn-lw/components/key-value-map'
 
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
 
+import { mapFormValueToAttributes, mapAttributesToFormValue } from '@console/lib/attributes'
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
 import { hasExternalJs, isDeviceOTAA } from '../utils'
@@ -61,6 +63,7 @@ const IdentityServerForm = React.memo(props => {
       _external_js: hasExternalJs(device) && mayReadKeys,
       _lorawan_version: device.lorawan_version,
       _supports_join: device.supports_join,
+      attributes: mapAttributesToFormValue(device.attributes),
     }
 
     return validationSchema.cast(initialValues)
@@ -84,9 +87,14 @@ const IdentityServerForm = React.memo(props => {
         '_supports_join',
       ])
 
+      const update =
+        'attributes' in updatedValues
+          ? { ...updatedValues, attributes: mapFormValueToAttributes(values.attributes) }
+          : updatedValues
+
       setError('')
       try {
-        await onSubmit(updatedValues)
+        await onSubmit(update)
         resetForm({ values: castedValues })
         onSubmitSuccess()
       } catch (err) {
@@ -224,6 +232,15 @@ const IdentityServerForm = React.memo(props => {
           />
         </>
       )}
+      <Form.Field
+        name="attributes"
+        title={sharedMessages.attributes}
+        keyPlaceholder={sharedMessages.key}
+        valuePlaceholder={sharedMessages.value}
+        addMessage={sharedMessages.addAttributes}
+        component={KeyValueMap}
+        description={sharedMessages.attributeDescription}
+      />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
         <ModalButton

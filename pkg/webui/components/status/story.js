@@ -19,7 +19,7 @@ import { storiesOf } from '@storybook/react'
 import Status from '.'
 
 const containerStyle = {
-  width: '100px',
+  width: '120px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -87,18 +87,34 @@ storiesOf('Status', module)
   ))
   .add('With label', () => (
     <div>
-      <Status label="Network Status" status="good" />
-      <Status label="Network Status" status="bad" />
-      <Status label="Network Status" status="mediocre" />
-      <Status label="Network Status" status="unknown" />
+      <div style={containerStyle}>
+        <Status label="Network Status" status="good" />
+      </div>
+      <div style={containerStyle}>
+        <Status label="Network Status" status="bad" />
+      </div>
+      <div style={containerStyle}>
+        <Status label="Network Status" status="mediocre" />
+      </div>
+      <div style={containerStyle}>
+        <Status label="Network Status" status="unknown" />
+      </div>
     </div>
   ))
   .add('Without Pulse', () => (
     <div>
-      <Status label="No Pulse" status="good" pulse={false} />
-      <Status label="No Pulse" status="bad" pulse={false} />
-      <Status label="No Pulse" status="mediocre" pulse={false} />
-      <Status label="No Pulse" status="unknown" pulse={false} />
+      <div style={containerStyle}>
+        <Status label="No Pulse" status="good" pulse={false} />
+      </div>
+      <div style={containerStyle}>
+        <Status label="No Pulse" status="bad" pulse={false} />
+      </div>
+      <div style={containerStyle}>
+        <Status label="No Pulse" status="mediocre" pulse={false} />
+      </div>
+      <div style={containerStyle}>
+        <Status label="No Pulse" status="unknown" pulse={false} />
+      </div>
     </div>
   ))
   .add('Toggle', () => <Toggle />)

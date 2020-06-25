@@ -177,6 +177,8 @@ func init() {
 				b.UplinkChannels[64+i].MinDataRate = ttnpb.DATA_RATE_4
 				b.UplinkChannels[64+i].MaxDataRate = ttnpb.DATA_RATE_4
 			}
+
+			b.MaxADRDataRateIndex = ttnpb.DATA_RATE_3
 			return b
 		},
 		regionalParameters1_0_2RevB: composeSwaps(

@@ -32,7 +32,7 @@ class DefaultList extends React.Component {
   }
 }
 
-const simpleItems = [...new Array(100).keys()].map(i => `List item nr. ${i}`)
+const simpleItems = Array.from(Array(100), (x, index) => `List item number ${index}`)
 
 storiesOf('List', module)
   .add('Default', function() {

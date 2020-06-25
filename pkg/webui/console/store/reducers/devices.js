@@ -59,6 +59,10 @@ const devices = function(state = defaultState, { type, payload, event }) {
         if (source === payload && key === 'locations') {
           return source.locations
         }
+
+        if (source === payload && key === 'attributes') {
+          return source.attributes
+        }
       })
 
       updatedState.entities = {
