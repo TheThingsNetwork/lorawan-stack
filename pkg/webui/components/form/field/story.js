@@ -590,6 +590,7 @@ storiesOf('Fields/Input', module)
     <FieldsWrapperExample
       initialValues={{
         default: 'something...',
+        required: 'something...',
         description: 'something...',
         warning: 'something...',
         error: 'something...',
@@ -597,6 +598,7 @@ storiesOf('Fields/Input', module)
       }}
     >
       <Form.Field name="default" title="Default" component={Input} />
+      <Form.Field name="required" title="Required" component={Input} required />
       <Form.Field
         name="description"
         title="With Description"
@@ -612,6 +614,7 @@ storiesOf('Fields/Input', module)
     <FieldsWrapperExample
       initialValues={{
         default: 'something...',
+        required: 'something...',
         description: 'something...',
         warning: 'something...',
         error: 'something...',
@@ -620,6 +623,7 @@ storiesOf('Fields/Input', module)
       horizontal={false}
     >
       <Form.Field name="default" title="Default" component={Input} />
+      <Form.Field name="required" title="Required" component={Input} required />
       <Form.Field
         name="description"
         title="With Description"
