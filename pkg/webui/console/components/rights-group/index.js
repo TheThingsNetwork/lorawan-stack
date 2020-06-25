@@ -122,6 +122,8 @@ class RightsGroup extends React.Component {
     intl: PropTypes.shape({
       formatMessage: PropTypes.func.isRequired,
     }).isRequired,
+    /** The name attribute passed down to the rights group. */
+    name: PropTypes.isRequired,
     /** The Blur event hook. */
     onBlur: PropTypes.func,
     /** The Change event hook. */
@@ -208,6 +210,7 @@ class RightsGroup extends React.Component {
       grantType,
       derivedPseudoRight,
       derivedRights,
+      name,
     } = this.props
     const { individualRightValue } = this.state
 
