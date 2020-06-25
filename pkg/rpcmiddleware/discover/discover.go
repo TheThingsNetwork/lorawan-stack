@@ -20,10 +20,15 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"sync"
+	"time"
+
+	stderrors "errors"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/grpc/attributes"
+	"google.golang.org/grpc/resolver"
 )
 
 var errAddress = errors.DefineInvalidArgument("address", "invalid address")
@@ -50,10 +55,43 @@ func DefaultPort(target string, port int) (string, error) {
 	return target, nil
 }
 
+var clusterRoleServices = map[ttnpb.ClusterRole]string{
+	ttnpb.ClusterRole_ENTITY_REGISTRY:              "is",
+	ttnpb.ClusterRole_ACCESS:                       "is",
+	ttnpb.ClusterRole_GATEWAY_SERVER:               "gs",
+	ttnpb.ClusterRole_NETWORK_SERVER:               "ns",
+	ttnpb.ClusterRole_APPLICATION_SERVER:           "as",
+	ttnpb.ClusterRole_JOIN_SERVER:                  "js",
+	ttnpb.ClusterRole_DEVICE_TEMPLATE_CONVERTER:    "dtc",
+	ttnpb.ClusterRole_DEVICE_CLAIMING_SERVER:       "dcs",
+	ttnpb.ClusterRole_GATEWAY_CONFIGURATION_SERVER: "gcs",
+	ttnpb.ClusterRole_QR_CODE_GENERATOR:            "qrg",
+}
+
 // DefaultPorts is a map of the default gRPC ports, with/without TLS.
 var DefaultPorts = map[bool]int{
 	false: 1884,
 	true:  8884,
+}
+
+var errRole = errors.DefineFailedPrecondition("role", "service role `{role}` not discoverable")
+
+// Scheme returns the gRPC scheme for service discovery.
+func Scheme(role ttnpb.ClusterRole) (string, error) {
+	svc, ok := clusterRoleServices[role]
+	if !ok {
+		return "", errRole.WithAttributes("role", strings.Title(strings.Replace(role.String(), "_", " ", -1)))
+	}
+	return fmt.Sprintf("ttn-v3-%s", svc), nil
+}
+
+// Address returns the host with service discovery gRPC scheme for the given role.
+func Address(role ttnpb.ClusterRole, host string) (string, error) {
+	scheme, err := Scheme(role)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s:///%s", scheme, host), nil
 }
 
 // DefaultHTTPPorts is a map of the default HTTP ports, with/without TLS.
@@ -77,64 +115,175 @@ func DefaultURL(target string, port int, tls bool) (string, error) {
 	return fmt.Sprintf("%s://%s", HTTPScheme[tls], target), nil
 }
 
-func resolver(tls bool) func(ctx context.Context, target string) (net.Conn, error) {
-	return func(ctx context.Context, target string) (net.Conn, error) {
-		// TODO: If no port is specified, discover through SRV records (https://github.com/TheThingsNetwork/lorawan-stack/issues/138)
-		target, err := DefaultPort(target, DefaultPorts[tls])
+// DNS provides DNS lookup functionality for service discovery.
+type DNS interface {
+	LookupSRV(ctx context.Context, service, proto, name string) (cname string, addrs []*net.SRV, err error)
+}
+
+type options struct {
+	dns DNS
+}
+
+// Option configures the discovery dialing.
+type Option interface {
+	apply(*options)
+}
+
+type optionFunc func(*options)
+
+func (f optionFunc) apply(opts *options) {
+	f(opts)
+}
+
+// WithDNS configures the resolver with a custom DNS resolver.
+func WithDNS(dns DNS) Option {
+	return optionFunc(func(opts *options) {
+		opts.dns = dns
+	})
+}
+
+// NewBuilder returns a new resolver builder for service discovery.
+func NewBuilder(scheme string, opts ...Option) resolver.Builder {
+	options := options{
+		dns: net.DefaultResolver,
+	}
+	for _, opt := range opts {
+		opt.apply(&options)
+	}
+
+	return &clusterBuilder{
+		scheme:  scheme,
+		options: options,
+	}
+}
+
+type clusterBuilder struct {
+	scheme  string
+	options options
+}
+
+func (r *clusterBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
+	// Use passthrough when the endpoint is an address.
+	if _, _, err := net.SplitHostPort(target.Endpoint); err == nil {
+		return resolver.Get("passthrough").Build(target, cc, opts)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	service := target.Scheme + "-grpc"
+	res := &clusterResolver{
+		ctx:     ctx,
+		cancel:  cancel,
+		dns:     r.options.dns,
+		service: service,
+		name:    target.Endpoint,
+		cc:      cc,
+		rn:      make(chan struct{}, 1),
+	}
+	res.wg.Add(1)
+	go res.watch()
+	res.ResolveNow(resolver.ResolveNowOptions{})
+	return res, nil
+}
+
+func (r *clusterBuilder) Scheme() string {
+	return r.scheme
+}
+
+type clusterResolver struct {
+	ctx    context.Context
+	cancel context.CancelFunc
+	dns    DNS
+	service,
+	name string
+	cc resolver.ClientConn
+	rn chan struct{}
+	wg sync.WaitGroup
+}
+
+func (r *clusterResolver) ResolveNow(opts resolver.ResolveNowOptions) {
+	select {
+	case r.rn <- struct{}{}:
+	default:
+	}
+}
+
+func (r *clusterResolver) Close() {
+	r.cancel()
+	r.wg.Wait()
+}
+
+func (r *clusterResolver) watch() {
+	defer r.wg.Done()
+	for {
+		select {
+		case <-r.ctx.Done():
+			return
+		case <-r.rn:
+		}
+
+		state, err := r.lookup()
+		if err != nil {
+			r.cc.ReportError(err)
+		} else {
+			r.cc.UpdateState(*state)
+		}
+
+		debounceTimer := time.NewTimer(30 * time.Second)
+		select {
+		case <-r.ctx.Done():
+			debounceTimer.Stop()
+			return
+		case <-debounceTimer.C:
+		}
+	}
+}
+
+func (r *clusterResolver) lookup() (*resolver.State, error) {
+	_, addrs, err := r.dns.LookupSRV(r.ctx, r.service, "tcp", r.name)
+	var dnsErr *net.DNSError
+	if err != nil && stderrors.As(err, &dnsErr) && !dnsErr.IsNotFound {
+		return nil, err
+	}
+	state := new(resolver.State)
+	if len(addrs) == 0 {
+		addr, err := DefaultPort(r.name, DefaultPorts[true])
 		if err != nil {
 			return nil, err
 		}
-		return new(net.Dialer).DialContext(ctx, "tcp", target)
+		state.Addresses = []resolver.Address{
+			{
+				Addr:       addr,
+				ServerName: r.name,
+			},
+		}
+	} else {
+		state.Addresses = make([]resolver.Address, len(addrs))
+		for i, addr := range addrs {
+			name := strings.TrimSuffix(addr.Target, ".")
+			state.Addresses[i] = resolver.Address{
+				Addr:       fmt.Sprintf("%s:%d", name, addr.Port),
+				ServerName: name,
+				Attributes: attributes.New(
+					"priority", int(addr.Priority),
+					"weight", int(addr.Weight),
+				),
+			}
+		}
 	}
+	return state, nil
 }
 
-// WithTransportCredentials returns gRPC dial options which configures connection level security credentials (e.g.,
-// TLS/SSL) and discover the TLS/SSL listen port if not specified in the dial target.
-func WithTransportCredentials(creds credentials.TransportCredentials) []grpc.DialOption {
-	return []grpc.DialOption{
-		grpc.WithTransportCredentials(creds),
-		grpc.WithContextDialer(resolver(true)),
+func init() {
+	m := make(map[string]struct{}, len(clusterRoleServices))
+	for role := range clusterRoleServices {
+		scheme, err := Scheme(role)
+		if err != nil {
+			panic(err)
+		}
+		if _, ok := m[scheme]; ok {
+			continue
+		}
+		resolver.Register(NewBuilder(scheme))
+		m[scheme] = struct{}{}
 	}
-}
-
-// WithInsecure returns gRPC dial options which disable transport security and discover the default insecure listen
-// port if not specified in the dial target.
-func WithInsecure() []grpc.DialOption {
-	return []grpc.DialOption{
-		grpc.WithInsecure(),
-		grpc.WithContextDialer(resolver(false)),
-	}
-}
-
-type tlsFallbackKeyType struct{}
-
-var tlsFallbackKey tlsFallbackKeyType
-
-// WithTLSFallback returns a derived context which is configured to fall back to the given TLS setting if discovery
-// fails.
-func WithTLSFallback(parent context.Context, tls bool) context.Context {
-	return context.WithValue(parent, tlsFallbackKey, tls)
-}
-
-// DialOptions discovers gRPC dial options based on the given target. This includes whether or not transport level
-// security is enabled and service port discovery.
-func DialOptions(ctx context.Context, target string, creds credentials.TransportCredentials) ([]grpc.DialOption, error) {
-	// TODO: Discover through SRV records and cache result (https://github.com/TheThingsNetwork/lorawan-stack/issues/138)
-	if val, ok := ctx.Value(tlsFallbackKey).(bool); ok && !val {
-		return WithInsecure(), nil
-	}
-	return WithTransportCredentials(creds), nil
-}
-
-// DialContext creates a client connection to the given target. It uses DialOptions to discover gRPC dial options for
-// the target.
-func DialContext(ctx context.Context, target string, creds credentials.TransportCredentials, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-	discoveredOpts, err := DialOptions(ctx, target, creds)
-	if err != nil {
-		return nil, err
-	}
-	allOpts := make([]grpc.DialOption, 0, len(discoveredOpts)+len(opts))
-	allOpts = append(allOpts, discoveredOpts...)
-	allOpts = append(allOpts, opts...)
-	return grpc.DialContext(ctx, target, allOpts...)
 }

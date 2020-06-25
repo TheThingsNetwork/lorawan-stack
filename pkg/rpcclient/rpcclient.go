@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware"
+	_ "go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/discover" // Register service discovery resolvers
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/version"

@@ -34,7 +34,7 @@ class List extends React.PureComponent {
     emptyMessageValues: PropTypes.shape({}),
     footer: PropTypes.node,
     header: PropTypes.node,
-    items: PropTypes.arrayOf(PropTypes.shape({})),
+    items: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.shape({}), PropTypes.string])),
     listClassName: PropTypes.string,
     renderItem: PropTypes.func,
     rowKey: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),

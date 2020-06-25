@@ -19,6 +19,7 @@ package grpc
 import (
 	"context"
 	"runtime"
+	"sync"
 
 	grpc_runtime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -41,12 +42,10 @@ func NewEventsServer(ctx context.Context, pubsub events.PubSub) *EventsServer {
 		events: make(events.Channel, 256),
 		filter: events.NewIdentifierFilter(),
 	}
+	srv.handler = events.ContextHandler(ctx, srv.events)
 
-	hander := events.ContextHandler(ctx, srv.events)
-	pubsub.Subscribe("**", hander)
 	go func() {
-		<-ctx.Done()
-		pubsub.Unsubscribe("**", hander)
+		<-srv.ctx.Done()
 		close(srv.events)
 	}()
 
@@ -75,10 +74,22 @@ type marshaledEvent struct {
 
 // EventsServer streams events from a PubSub over gRPC.
 type EventsServer struct {
-	ctx    context.Context
-	pubsub events.PubSub
-	events events.Channel
-	filter events.IdentifierFilter
+	ctx     context.Context
+	pubsub  events.PubSub
+	subOnce sync.Once
+	events  events.Channel
+	handler events.Handler
+	filter  events.IdentifierFilter
+}
+
+func (srv *EventsServer) subscribe() {
+	srv.subOnce.Do(func() {
+		srv.pubsub.Subscribe("**", srv.handler)
+		go func() {
+			<-srv.ctx.Done()
+			srv.pubsub.Unsubscribe("**", srv.handler)
+		}()
+	})
 }
 
 var errNoIdentifiers = errors.DefineInvalidArgument("no_identifiers", "no identifiers")
@@ -93,6 +104,8 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	if err := rights.RequireAny(ctx, req.Identifiers...); err != nil {
 		return err
 	}
+
+	srv.subscribe()
 
 	ch := make(events.Channel, 8)
 	handler := events.ContextHandler(ctx, ch)

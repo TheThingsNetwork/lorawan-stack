@@ -26,8 +26,7 @@ func TestContext(t *testing.T) {
 	a := assertions.New(t)
 	ctx := context.Background()
 
-	logger, err := NewLogger()
-	a.So(err, should.BeNil)
+	logger := NewLogger()
 
 	a.So(FromContext(ctx), should.NotBeNil)
 	a.So(FromContext(ctx), should.Equal, Noop)

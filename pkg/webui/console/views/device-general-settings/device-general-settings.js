@@ -72,8 +72,9 @@ export default class DeviceGeneralSettings extends React.Component {
     } = device
 
     const changed = diff(device, updatedDevice, ['updated_at', 'created_at'])
-
-    return updateDevice(appId, deviceId, changed)
+    const update =
+      'attributes' in changed ? { ...changed, attributes: updatedDevice.attributes } : changed
+    return updateDevice(appId, deviceId, update)
   }
 
   @bind

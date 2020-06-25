@@ -163,7 +163,7 @@ $table-cell-padding: 1.2em 0.75em;
     font-family: $title-family;
     color: $title-color;
   }
-  figure {
+  figure > img {
     box-shadow: $card-shadow;
   }
 }
@@ -246,6 +246,27 @@ details + blockquote {
   dd {
     margin: 0.5em 0 0.5em 0;
   }
+}
+
+.search-container {
+  background-image: url(../img/search_bg.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-bar {
+  background-color: white;
+  width: 55vw;
+  padding: 20px;
+  border-radius: 5px;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.2));
+  font-size: 16px;
+  left: -1px; // Hack for left-justified dropdown
 }
 
 @import "highlight.scss";

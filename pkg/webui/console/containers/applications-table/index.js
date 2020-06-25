@@ -13,23 +13,31 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import FetchTable from '@console/containers/fetch-table'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { checkFromState, mayCreateApplications } from '@console/lib/feature-checks'
 
 import { getApplicationsList } from '@console/store/actions/applications'
 
+import { selectUserIsAdmin } from '@console/store/selectors/user'
 import {
   selectApplications,
   selectApplicationsTotalCount,
   selectApplicationsFetching,
   selectApplicationsError,
 } from '@console/store/selectors/applications'
+
+const m = defineMessages({
+  ownedTabTitle: 'Owned applications',
+})
 
 const headers = [
   {
@@ -52,11 +60,34 @@ const headers = [
   },
 ]
 
-export default class ApplicationsTable extends Component {
+const OWNED_TAB = 'owned'
+const ALL_TAB = 'all'
+const tabs = [
+  {
+    title: m.ownedTabTitle,
+    name: OWNED_TAB,
+  },
+  {
+    title: sharedMessages.allAdmin,
+    name: ALL_TAB,
+  },
+]
+
+class ApplicationsTable extends Component {
   constructor(props) {
     super(props)
 
-    this.getApplicationsList = params => getApplicationsList(params, ['name', 'description'])
+    this.getApplicationsList = params => {
+      const { tab, query } = params
+
+      return getApplicationsList(params, ['name', 'description'], {
+        isSearch: tab === ALL_TAB || query.length > 0,
+      })
+    }
+  }
+
+  static propTypes = {
+    isAdmin: PropTypes.bool.isRequired,
   }
 
   baseDataSelector(state) {
@@ -70,6 +101,7 @@ export default class ApplicationsTable extends Component {
   }
 
   render() {
+    const { isAdmin, ...rest } = this.props
     return (
       <FetchTable
         entity="applications"
@@ -79,8 +111,13 @@ export default class ApplicationsTable extends Component {
         getItemsAction={this.getApplicationsList}
         baseDataSelector={this.baseDataSelector}
         searchable
-        {...this.props}
+        tabs={isAdmin ? tabs : []}
+        {...rest}
       />
     )
   }
 }
+
+export default connect(state => ({
+  isAdmin: selectUserIsAdmin(state),
+}))(ApplicationsTable)

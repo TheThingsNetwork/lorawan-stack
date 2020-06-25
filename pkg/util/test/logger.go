@@ -62,13 +62,10 @@ func GetLogger(t testing.TB) log.Stack {
 	if testing.Verbose() {
 		level = log.DebugLevel
 	}
-	logger, err := log.NewLogger(
+	logger := log.NewLogger(
 		log.WithLevel(level),
 		log.WithHandler(log.NewCLI(os.Stdout, log.UseColor(colorTerm))),
 	)
-	if err != nil {
-		t.Fatalf("Could not get logger: %v", err)
-	}
 	return &testLogger{
 		stack:     logger,
 		Interface: logger.WithField("test_name", t.Name()),

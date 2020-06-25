@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import React from 'react'
-import bind from 'autobind-decorator'
+import { defineMessages } from 'react-intl'
+import { connect } from 'react-redux'
 
 import Status from '@ttn-lw/components/status'
 
@@ -22,17 +23,23 @@ import Message from '@ttn-lw/lib/components/message'
 import FetchTable from '@console/containers/fetch-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { checkFromState, mayCreateGateways } from '@console/lib/feature-checks'
 
 import { getGatewaysList } from '@console/store/actions/gateways'
 
+import { selectUserIsAdmin } from '@console/store/selectors/user'
 import {
   selectGateways,
   selectGatewaysTotalCount,
   selectGatewaysFetching,
   selectGatewaysError,
 } from '@console/store/selectors/gateways'
+
+const m = defineMessages({
+  ownedTabTitle: 'Owned gateways',
+})
 
 const headers = [
   {
@@ -87,19 +94,38 @@ const headers = [
   },
 ]
 
-export default class GatewaysTable extends React.Component {
+const OWNED_TAB = 'owned'
+const ALL_TAB = 'all'
+const tabs = [
+  {
+    title: m.ownedTabTitle,
+    name: OWNED_TAB,
+  },
+  {
+    title: sharedMessages.allAdmin,
+    name: ALL_TAB,
+  },
+]
+
+class GatewaysTable extends React.Component {
   constructor(props) {
     super(props)
 
-    this.getGatewaysList = params =>
-      getGatewaysList(
+    this.getGatewaysList = params => {
+      const { tab, query } = params
+
+      return getGatewaysList(
         params,
         ['name', 'description', 'frequency_plan_id', 'gateway_server_address'],
-        { withStatus: true },
+        { withStatus: true, isSearch: tab === ALL_TAB || query.length > 0 },
       )
+    }
   }
 
-  @bind
+  static propTypes = {
+    isAdmin: PropTypes.bool.isRequired,
+  }
+
   baseDataSelector(state) {
     return {
       gateways: selectGateways(state),
@@ -111,6 +137,7 @@ export default class GatewaysTable extends React.Component {
   }
 
   render() {
+    const { isAdmin, ...rest } = this.props
     return (
       <FetchTable
         entity="gateways"
@@ -120,8 +147,13 @@ export default class GatewaysTable extends React.Component {
         baseDataSelector={this.baseDataSelector}
         tableTitle={<Message content={sharedMessages.gateways} />}
         searchable
-        {...this.props}
+        tabs={isAdmin ? tabs : []}
+        {...rest}
       />
     )
   }
 }
+
+export default connect(state => ({
+  isAdmin: selectUserIsAdmin(state),
+}))(GatewaysTable)

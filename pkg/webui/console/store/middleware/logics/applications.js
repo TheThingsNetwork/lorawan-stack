@@ -64,9 +64,9 @@ const getApplicationsLogic = createRequestLogic({
     const {
       params: { page, limit, query, order },
     } = action.payload
-    const { selectors } = action.meta
+    const { selectors, options } = action.meta
 
-    const data = query
+    const data = options.isSearch
       ? await api.applications.search(
           {
             page,

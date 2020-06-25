@@ -47,7 +47,7 @@ var jsMetrics = &messageMetrics{
 			Name:      "join_accepted_total",
 			Help:      "Total number of accepted joins",
 		},
-		[]string{"application_id"},
+		[]string{"net_id"},
 	),
 	joinRejected: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -80,7 +80,7 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 
 func registerAcceptJoin(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.JoinRequest) {
 	events.Publish(evtAcceptJoin(ctx, dev.EndDeviceIdentifiers, nil))
-	jsMetrics.joinAccepted.WithLabelValues(ctx, dev.ApplicationID).Inc()
+	jsMetrics.joinAccepted.WithLabelValues(ctx, msg.NetID.String()).Inc()
 }
 
 func registerRejectJoin(ctx context.Context, req *ttnpb.JoinRequest, err error) {

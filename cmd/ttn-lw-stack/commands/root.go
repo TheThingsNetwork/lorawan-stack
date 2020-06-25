@@ -62,10 +62,11 @@ var (
 			}
 
 			// create logger
-			logger, err = log.NewLogger(
+			logger = log.NewLogger(
 				log.WithLevel(config.Base.Log.Level),
 				log.WithHandler(log.NewCLI(os.Stdout)),
 			)
+
 			logger.Use(logobservability.New())
 
 			if config.Sentry.DSN != "" {

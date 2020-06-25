@@ -26,7 +26,7 @@ func ExampleMiddleware() {
 		return nil
 	})
 
-	logger, _ := NewLogger(WithHandler(handler), WithLevel(InfoLevel))
+	logger := NewLogger(WithHandler(handler), WithLevel(InfoLevel))
 
 	// printer is a middleware that prints the strings be
 	printer := MiddlewareFunc(func(next Handler) Handler {

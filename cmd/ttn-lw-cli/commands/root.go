@@ -83,8 +83,8 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		}
 
 		// create input decoder on Stdin
-		if io.IsPipe(os.Stdin) {
-			inputDecoder, err = getInputDecoder(os.Stdin)
+		if rd, ok := io.BufferedPipe(os.Stdin); ok {
+			inputDecoder, err = getInputDecoder(rd)
 			if err != nil {
 				return err
 			}
@@ -98,13 +98,11 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		cache = cache.ForID(config.CredentialsID)
 
 		// create logger
-		logger, err = log.NewLogger(
+		logger = log.NewLogger(
 			log.WithLevel(config.Log.Level),
 			log.WithHandler(log.NewCLI(os.Stderr)),
 		)
-		if err != nil {
-			return err
-		}
+
 		ctx = log.NewContext(ctx, logger)
 
 		// prepare the API

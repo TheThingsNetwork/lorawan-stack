@@ -30,7 +30,16 @@ const WizardStepper = props => {
 
   return (
     <Stepper {...rest} currentStep={currentStep}>
-      {children}
+      {React.Children.map(children, (child, index) => {
+        if (child !== null && child.type.displayName === 'Stepper.Step') {
+          return React.cloneElement(child, {
+            ...child.props,
+            stepNumber: index + 1,
+          })
+        }
+
+        return child
+      })}
     </Stepper>
   )
 }

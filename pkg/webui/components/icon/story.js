@@ -44,6 +44,15 @@ display value of the wrapping \`<span />\`in your local scoped css. The
 positioning will differ slightly, so the nudge props can be used to fine-tune
 the appearance.`
 
+const iconElement = icons.map(icon => {
+  return (
+    <div className={style.wrapper} key={icon}>
+      <Icon icon={icon} />
+      {icon}
+    </div>
+  )
+})
+
 storiesOf('Icon', module)
   .addDecorator((story, context) =>
     withInfo({
@@ -53,16 +62,7 @@ storiesOf('Icon', module)
       text: doc,
     })(story)(context),
   )
-  .add('Icons', () =>
-    icons.map(function(icon) {
-      return (
-        <div className={style.wrapper} key={icon}>
-          <Icon icon={icon} />
-          {icon}
-        </div>
-      )
-    }),
-  )
+  .add('Icons', () => <div>{iconElement}</div>)
   .add('Usage', () => (
     <div className={style.wrapper}>
       <div className={style.block}>

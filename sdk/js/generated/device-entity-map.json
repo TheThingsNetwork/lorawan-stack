@@ -425,6 +425,7 @@
   "supports_class_c": ["ns", "ns"],
   "supports_join": ["ns", "ns"],
   "claim_authentication_code": ["js", "js"],
+  "skip_payload_crypto": ["as", "as"],
   "last_dev_nonce": ["js", "js"],
   "last_join_nonce": ["js", "js"],
   "last_rj_count_0": ["js", "js"],

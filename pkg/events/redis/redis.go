@@ -17,6 +17,7 @@ package redis
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/go-redis/redis/v7"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -32,19 +33,6 @@ func WrapPubSub(wrapped events.PubSub, conf ttnredis.Config) (ps *PubSub) {
 		eventChannel: ttnRedisClient.Key("events"),
 		closeWait:    make(chan struct{}),
 	}
-	ps.sub = ps.client.Subscribe(ps.eventChannel)
-	go func() {
-		defer close(ps.closeWait)
-		for {
-			msg, err := ps.sub.ReceiveMessage()
-			if err != nil {
-				return
-			}
-			if evt, err := events.UnmarshalJSON([]byte(msg.Payload)); err == nil {
-				ps.PubSub.Publish(evt)
-			}
-		}
-	}()
 	return
 }
 
@@ -59,13 +47,37 @@ type PubSub struct {
 
 	eventChannel string
 	client       *redis.Client
+	subOnce      sync.Once
 	sub          *redis.PubSub
 	closeWait    chan struct{}
 }
 
+// Subscribe implements the events.Subscriber interface.
+func (ps *PubSub) Subscribe(name string, hdl events.Handler) error {
+	ps.subOnce.Do(func() {
+		ps.sub = ps.client.Subscribe(ps.eventChannel)
+		go func() {
+			defer close(ps.closeWait)
+			for {
+				msg, err := ps.sub.ReceiveMessage()
+				if err != nil {
+					return
+				}
+				if evt, err := events.UnmarshalJSON([]byte(msg.Payload)); err == nil {
+					ps.PubSub.Publish(evt)
+				}
+			}
+		}()
+	})
+	return ps.PubSub.Subscribe(name, hdl)
+}
+
 // Close the Redis publisher.
 func (ps *PubSub) Close() error {
-	unsubErr := ps.sub.Unsubscribe(ps.eventChannel)
+	var unsubErr error
+	if ps.sub != nil {
+		unsubErr = ps.sub.Unsubscribe(ps.eventChannel)
+	}
 	closeErr := ps.client.Close()
 	<-ps.closeWait
 	if unsubErr != nil {

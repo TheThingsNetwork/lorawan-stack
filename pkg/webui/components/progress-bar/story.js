@@ -17,7 +17,7 @@ import { storiesOf } from '@storybook/react'
 
 import ProgressBar from '.'
 
-export default class Helper extends React.Component {
+class Helper extends React.Component {
   state = {
     percentage: 0,
   }

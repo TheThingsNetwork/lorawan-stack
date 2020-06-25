@@ -67,11 +67,11 @@ const m = defineMessages({
 })
 
 const componentMap = {
-  is: sharedMessages.componentIdentityServer,
-  gs: sharedMessages.componentGatewayServer,
-  ns: sharedMessages.componentNetworkServer,
-  as: sharedMessages.componentApplicationServer,
-  js: sharedMessages.componentJoinServer,
+  is: sharedMessages.componentIs,
+  gs: sharedMessages.componentGs,
+  ns: sharedMessages.componentNs,
+  as: sharedMessages.componentAs,
+  js: sharedMessages.componentJs,
 }
 
 const overviewFetchingSelector = createFetchingSelector([GET_APPS_LIST_BASE, GET_GTWS_LIST_BASE])

@@ -15,17 +15,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Application package application-wide associations support.
 - LoRaCloud DAS application package server URL overrides support.
 - Option to reset end device payload formatters in the Console.
+- Service discovery using DNS SRV records for external Application Server linking.
+- Functionality to set end device attributes in the Console.
+- Event description tooltip to events in the Console.
+- CLI support for setting and unsetting end device location (see `--location.latitude`, `--location.longitude`, `--location.altitude` and `--location.accuracy` options).
+- Functionality to allow admin users to list all applications and gateways in the Console.
+- Ursalink UG8X gateway documentation.
 
 ### Changed
 
 - Event stream start and stop events are not published anymore.
 - JSON uplink message doc edited for clarity.
+- The CLI snap version uses the `$SNAP_USER_COMMON` directory for config by default, so that it is preserved between revisions.
+- Defer events subscriptions until there is actual interest for events.
+- End device creation form with wizard in the Console.
 
 ### Deprecated
 
 - End device `skip_payload_crypto` field: it gets replaced by `skip_payload_crypto_override`.
 
 ### Removed
+
+- Requirement to specify `frequency_plan_id` when creating gateways in the Console.
 
 ### Fixed
 
@@ -34,6 +45,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Handling API key deletion event for applications, gateways, organizations and users.
 - Organization API key deletion in the Console.
 - CLI now only sends relevant end device fields to Identity Server on create.
+- Maximum ADR data rate index used in 1.0.2a and earlier versions of AU915 band.
+- End device events stream restart in the Console.
+- CLI was unable to read input from pipes.
+- Timezones issue in claim authentication code form, causing time to reverse on submission.
 
 ## [3.8.4] - 2020-06-12
 
