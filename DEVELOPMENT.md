@@ -714,9 +714,77 @@ The message definitions in `pkg/webui/locales` can be used to provide translatio
 
 ## Testing
 
+### Unit Tests
+
+To run unit tests, observe the following mage targets:
+
 ```bash
 $ tools/bin/mage go:test js:test jsSDK:test
 ```
+
+### End-to-end Tests
+
+To run end-to-end tests, observe the following mage target:
+
+```bash
+$ ./mage endToEnd:run
+```
+
+We use ['cypress'](https://cypress.io) for running frontend-based end-to-end tests. The tests specifications are located at `/cypress/integration`.
+
+#### Interactive Mode
+
+It is possible to run the tests in interactive mode, which is a helpful tool during development. To run the tests in interactive mode, you need to run the following command to prepare the environment:
+
+```bash
+$ ./mage endToEnd:prepare
+```
+This will build assets and set up the testing database. Then, you can run the stack in testing configuration via
+
+```bash
+$ ./mage endToEnd:startTestStack
+```
+
+> Note: This command will suppress the output of executed The Things Stack for LoRaWAN)
+
+> Also note: make sure that you don't have an instance of the The Things Stack for LoRaWAN already running
+
+Now, you can run the test in interactive mode via
+
+```bash
+$ ./mage endToEnd:runOpen
+```
+
+#### Writing End-to-End Tests
+
+##### Cypress Documentation
+
+Cypress has an [excellent documentation](https://docs.cypress.io/guides/overview/why-cypress.html), it is a recommended read before starting to write tests.
+
+##### Guding Principle
+
+We follow the [guiding principle of Kent C. Dodds](https://twitter.com/kentcdodds/status/977018512689455106) ([@kentcdodds](https://twitter.com/kentcdodds)) for writing useful tests:
+
+> The more your tests resemble the way your software is used, the more confidence they can give you.
+
+This means that when writing tests, we always consider the real-life equivalent of the test scenario to design the test setup. This means:
+
+- Select DOM elements using text captions and labels
+  - E.g. selecting an input field by its label instead of using `data-test-id` attributes
+- Write assertions that resemble the assertions of actual users
+  - E.g. asserting certain text as part of the page after logging in, instead of just a route change
+
+This will increase confidence in our tests as well as keeping them as decoupled as possible from implementation details.
+
+For this purpose, we have also included the [`Testing Library`](https://testing-library.com/) for cypress, which provides additional selectors for the same purpose.
+
+##### Selecting elements
+
+In line with this principle, `Testing Library` has a good guide for [how to select elements](https://testing-library.com/docs/guide-which-query). We try to follow this guide for our end-to-end tests.
+
+##### Test ID Data Attribute
+
+It can be necessary to select DOM elements using a special selection data attribute. We decided to use `data-test-id` for this purpose. Use this attributes to select DOM elements when more realistic (see section above) means of selection are not sufficient. Use meaningful but concise ID values, such as `error-notification`.
 
 ## Building and Running
 
