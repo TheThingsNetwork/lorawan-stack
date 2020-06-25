@@ -229,7 +229,6 @@ const IdentityServerForm = React.memo(props => {
             title={sharedMessages.joinServerAddress}
             placeholder={joinServerAddressPlaceholder}
             name="join_server_address"
-            component={Input}
             disabled={!isOTAA || externalJs}
             autoComplete="on"
           />

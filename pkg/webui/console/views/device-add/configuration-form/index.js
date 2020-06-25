@@ -262,7 +262,7 @@ const ConfigurationForm = React.memo(props => {
                 />
               )}
               <Form.Field
-                title={sharedMessages.joinServerHost}
+                title={sharedMessages.joinServerAddress}
                 placeholder={
                   externalJs ? sharedMessages.external : sharedMessages.addressPlaceholder
                 }
@@ -273,10 +273,9 @@ const ConfigurationForm = React.memo(props => {
             </>
           )}
           <Form.Field
-            title={sharedMessages.joinServerAddress}
+            title={sharedMessages.joinServerHost}
             placeholder={externalJs ? sharedMessages.external : sharedMessages.addressPlaceholder}
             name="join_server_address"
-            component={Input}
             disabled={externalJs}
             autoComplete="on"
           />
