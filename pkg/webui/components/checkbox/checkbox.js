@@ -135,12 +135,14 @@ class Checkbox extends React.PureComponent {
       checkboxProps.onFocus = this.context.onFocus
       checkboxProps.disabled = disabled || this.context.disabled
       checkboxProps.checked = this.context.getValue(name)
+      checkboxProps.id = `${this.context.name}-${name}`
       groupCls = this.context.className
     } else {
       checkboxProps.onBlur = onBlur
       checkboxProps.onFocus = onFocus
       checkboxProps.disabled = disabled
       checkboxProps.checked = checked
+      checkboxProps.id = name
     }
 
     const cls = classnames(className, style.wrapper, groupCls, {
@@ -149,7 +151,7 @@ class Checkbox extends React.PureComponent {
     })
 
     return (
-      <label className={cls}>
+      <label className={cls} htmlFor={checkboxProps.id}>
         <span className={style.checkbox}>
           <input
             type="checkbox"

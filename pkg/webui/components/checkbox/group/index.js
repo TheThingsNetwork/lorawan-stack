@@ -33,6 +33,7 @@ class CheckboxGroup extends React.Component {
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
     value: PropTypes.shape({}),
+    name: PropTypes.string.isRequired,
   }
 
   static defaultProps = {
@@ -91,7 +92,7 @@ class CheckboxGroup extends React.Component {
   }
 
   render() {
-    const { className, disabled, onFocus, onBlur, horizontal, children } = this.props
+    const { className, name, disabled, onFocus, onBlur, horizontal, children } = this.props
 
     const ctx = {
       className: style.groupCheckbox,
@@ -100,6 +101,7 @@ class CheckboxGroup extends React.Component {
       onBlur,
       onFocus,
       disabled,
+      name,
     }
 
     const cls = classnames(className, style.group, {
