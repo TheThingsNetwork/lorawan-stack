@@ -224,7 +224,7 @@ const ConfigurationForm = React.memo(props => {
             autoComplete="on"
           />
           <Form.Field
-            title={sharedMessages.applicationServerAddress}
+            title={sharedMessages.applicationServerHost}
             placeholder={sharedMessages.addressPlaceholder}
             name="application_server_address"
             component={Input}
@@ -234,14 +234,43 @@ const ConfigurationForm = React.memo(props => {
       )}
       {activationMode === ACTIVATION_MODES.OTAA && (
         <>
-          {showExternalJs && (
-            <Form.Field
-              title={sharedMessages.externalJoinServer}
-              description={sharedMessages.externalJoinServerDescription}
-              name="_external_js"
-              onChange={handleExternalJsChange}
-              component={Checkbox}
-            />
+          {activationMode !== ACTIVATION_MODES.NONE && (
+            <>
+              <Form.Field
+                title={sharedMessages.networkServerHost}
+                placeholder={sharedMessages.addressPlaceholder}
+                name="network_server_address"
+                component={Input}
+              />
+              <Form.Field
+                title={sharedMessages.applicationServerAddress}
+                placeholder={sharedMessages.addressPlaceholder}
+                name="application_server_address"
+                component={Input}
+              />
+            </>
+          )}
+          {activationMode === ACTIVATION_MODES.OTAA && (
+            <>
+              {showExternalJs && (
+                <Form.Field
+                  title={sharedMessages.externalJoinServer}
+                  description={sharedMessages.externalJoinServerDescription}
+                  name="_external_js"
+                  onChange={handleExternalJsChange}
+                  component={Checkbox}
+                />
+              )}
+              <Form.Field
+                title={sharedMessages.joinServerHost}
+                placeholder={
+                  externalJs ? sharedMessages.external : sharedMessages.addressPlaceholder
+                }
+                name="join_server_address"
+                disabled={externalJs}
+                component={Input}
+              />
+            </>
           )}
           <Form.Field
             title={sharedMessages.joinServerAddress}
