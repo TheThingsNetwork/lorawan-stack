@@ -19,6 +19,7 @@ import classnames from 'classnames'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import stringToHash from '@ttn-lw/lib/string-to-hash'
 
 import { RadioGroupContext } from './group'
 
@@ -107,12 +108,14 @@ class RadioButton extends React.PureComponent {
       radioProps.name = this.context.name
       radioProps.disabled = disabled || this.context.disabled
       radioProps.checked = value === this.context.value
+      radioProps.id = `${this.context.name}-${stringToHash(value)}`
       groupCls = this.context.className
     } else {
       radioProps.name = name
       radioProps.disabled = disabled
       radioProps.checked = checked
       radioProps.value = value
+      radioProps.id = `${name}-${stringToHash(value)}`
     }
 
     const cls = classnames(className, style.wrapper, groupCls, {
@@ -120,7 +123,7 @@ class RadioButton extends React.PureComponent {
     })
 
     return (
-      <label className={cls}>
+      <label className={cls} htmlFor={radioProps.id}>
         <span className={style.radio}>
           <input
             type="radio"
