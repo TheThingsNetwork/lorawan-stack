@@ -190,6 +190,7 @@ class FormField extends React.Component {
       error: showError,
       warning: showWarning,
       name,
+      id: name,
       horizontal,
       disabled: fieldDisabled,
       onChange: this.handleChange,
@@ -210,9 +211,8 @@ class FormField extends React.Component {
 
     return (
       <div className={cls} data-needs-focus={showError}>
-        <label className={style.label}>
+        <label className={style.label} htmlFor={fieldComponentProps.id}>
           <Message content={title} className={style.title} />
-          <span className={style.reqicon}>&middot;</span>
         </label>
         <div className={style.componentArea}>
           <Component
