@@ -20,8 +20,6 @@ import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 import { address as addressRegexp } from '@console/lib/regexp'
 import { ACTIVATION_MODES } from '@console/lib/device-utils'
 
-const toUndefined = value => (!Boolean(value) ? undefined : value)
-
 const validationSchema = Yup.object()
   .shape({
     application_server_address: Yup.string().when(

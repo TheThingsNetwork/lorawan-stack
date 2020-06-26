@@ -18,7 +18,6 @@ import { merge } from 'lodash'
 
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
-import Input from '@ttn-lw/components/input'
 import Select from '@ttn-lw/components/select'
 import Radio from '@ttn-lw/components/radio-button'
 import Form from '@ttn-lw/components/form'
