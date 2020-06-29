@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	stdlog "log"
+	"net"
 	"strconv"
 	"strings"
 	"time"
@@ -49,6 +50,7 @@ func MarshalProto(pb proto.Message) (string, error) {
 	if err != nil {
 		return "", errEncode.WithCause(err)
 	}
+	protosMarshaled.Inc()
 	return encoding.EncodeToString(b), nil
 }
 
@@ -61,6 +63,7 @@ func UnmarshalProto(s string, pb proto.Message) error {
 	if err = proto.Unmarshal(b, pb); err != nil {
 		return errDecode.WithCause(err)
 	}
+	protosUnmarshaled.Inc()
 	return nil
 }
 
@@ -107,11 +110,25 @@ type FailoverConfig struct {
 	MasterName string   `name:"master-name" description:"Redis Sentinel master name"`
 }
 
+func dial(ctx context.Context, network, addr string) (net.Conn, error) {
+	var timeout time.Duration
+	deadline, ok := ctx.Deadline()
+	if ok {
+		timeout = time.Until(deadline)
+	}
+	conn, err := net.DialTimeout(network, addr, timeout)
+	if err != nil {
+		return nil, err
+	}
+	return &observableConn{addr: addr, Conn: conn}, nil
+}
+
 // newRedisClient returns a Redis client, which connects using correct client type.
 func newRedisClient(conf *Config) *redis.Client {
 	if conf.Failover.Enable {
 		redis.SetLogger(stdlog.New(ioutil.Discard, "", 0))
 		return redis.NewFailoverClient(&redis.FailoverOptions{
+			Dialer:        dial,
 			MasterName:    conf.Failover.MasterName,
 			SentinelAddrs: conf.Failover.Addresses,
 			Password:      conf.Password,
@@ -120,6 +137,7 @@ func newRedisClient(conf *Config) *redis.Client {
 		})
 	}
 	return redis.NewClient(&redis.Options{
+		Dialer:   dial,
 		Addr:     conf.Address,
 		Password: conf.Password,
 		DB:       conf.Database,
