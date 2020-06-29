@@ -274,7 +274,15 @@ var nsMetrics = &messageMetrics{
 			Help:      "Number of gateways that forwarded the uplink (within the deduplication window)",
 			Buckets:   []float64{1, 2, 3, 4, 5, 10, 20, 30, 40, 50},
 		},
-		[]string{},
+		nil,
+	),
+	micMismatches: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "mic_mismatch_total",
+			Help:      "Total number of MIC mismatches",
+		},
+		nil,
 	),
 
 	downlinkAttempted: metrics.NewContextualCounterVec(
@@ -306,6 +314,7 @@ type messageMetrics struct {
 	uplinkForwarded  *metrics.ContextualCounterVec
 	uplinkDropped    *metrics.ContextualCounterVec
 	uplinkGateways   *metrics.ContextualHistogramVec
+	micMismatches    *metrics.ContextualCounterVec
 
 	downlinkAttempted *metrics.ContextualCounterVec
 	downlinkForwarded *metrics.ContextualCounterVec
@@ -318,6 +327,7 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.uplinkForwarded.Describe(ch)
 	m.uplinkDropped.Describe(ch)
 	m.uplinkGateways.Describe(ch)
+	m.micMismatches.Describe(ch)
 
 	m.downlinkAttempted.Describe(ch)
 	m.downlinkForwarded.Describe(ch)
@@ -330,6 +340,7 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.uplinkForwarded.Collect(ch)
 	m.uplinkDropped.Collect(ch)
 	m.uplinkGateways.Collect(ch)
+	m.micMismatches.Collect(ch)
 
 	m.downlinkAttempted.Collect(ch)
 	m.downlinkForwarded.Collect(ch)
@@ -374,6 +385,10 @@ func registerDropUplink(ctx context.Context, msg *ttnpb.UplinkMessage, err error
 func registerMergeMetadata(ctx context.Context, msg *ttnpb.UplinkMessage) {
 	gtwCount, _ := rxMetadataStats(ctx, msg.RxMetadata)
 	nsMetrics.uplinkGateways.WithLabelValues(ctx).Observe(float64(gtwCount))
+}
+
+func registerMICMismatch(ctx context.Context) {
+	nsMetrics.micMismatches.WithLabelValues(ctx).Inc()
 }
 
 var (
