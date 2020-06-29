@@ -7,6 +7,10 @@
 <div class="content">{{ .Content }}</div>
 {{ end }}
 
+{{ if not (and .Pages (not (eq .Parent .FirstSection))) }}
+{{ partial "feedback" . }}
+{{ end }}
+
 {{ partial "prev-next-in-section.html" . }}
 
 {{ if and .Pages (not (eq .Parent .FirstSection)) }}

@@ -1,5 +1,13 @@
+googleAnalytics = ""
+
 [params]
   [params.search]
     enabled = false
     apikey = ""
     index = ""
+  [params.intercom]
+    enabled = false
+    appid = ""
+  [params.feedback]
+    enabled = false
+    campaign = ""

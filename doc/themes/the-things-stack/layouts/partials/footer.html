@@ -36,3 +36,5 @@
 
 {{- $script := resources.Get "js/theme.js" | resources.Minify | resources.Fingerprint }}
 <script src="{{ $script.Permalink }}" integrity="{{ $script.Data.Integrity }}"></script>
+
+{{- partial "intercom.html" . -}}
