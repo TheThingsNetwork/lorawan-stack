@@ -19,7 +19,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -149,14 +148,6 @@ var startCommand = &cobra.Command{
 		}
 
 		redisConsumerID := redis.Key(host, strconv.Itoa(os.Getpid()))
-		initRedisMutex := func() error {
-			var once sync.Once
-			return func() error {
-				var err error
-				once.Do(func() { err = redis.InitMutex(redis.New(&config.Redis)) })
-				return err
-			}()
-		}
 
 		if start.IdentityServer || startDefault {
 			logger.Info("Setting up Identity Server")
@@ -197,9 +188,6 @@ var startCommand = &cobra.Command{
 			redisConsumerGroup := "ns"
 
 			logger.Info("Setting up Network Server")
-			if err := initRedisMutex(); err != nil {
-				return shared.ErrInitializeNetworkServer.WithCause(err)
-			}
 			config.NS.ApplicationUplinks = nsredis.NewApplicationUplinkQueue(
 				redis.New(config.Redis.WithNamespace("ns", "application-uplinks")),
 				100, redisConsumerGroup, redisConsumerID,
