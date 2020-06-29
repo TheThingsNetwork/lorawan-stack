@@ -15,7 +15,7 @@ jobs:
         node-version: '~14'
     - name: Get Yarn cache directory path
       id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
+      run: echo "::set-output name=dir::$(npx yarn cache dir)"
     - name: Initialize Yarn module cache
       uses: actions/cache@v2
       with:

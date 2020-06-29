@@ -76,7 +76,7 @@ func (js Js) runWebpack(config string, args ...string) error {
 }
 
 func (js Js) runEslint(args ...string) error {
-	return js.runYarnCommand("eslint", append([]string{"--color", "--no-ignore"}, args...)...)
+	return js.runYarnCommandV("eslint", append([]string{"--color", "--no-ignore"}, args...)...)
 }
 
 func (Js) isProductionMode() bool {
