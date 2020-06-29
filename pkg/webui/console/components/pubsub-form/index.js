@@ -188,6 +188,7 @@ export default class PubsubForm extends Component {
           title={sharedMessages.address}
           placeholder={m.natsAddressPlaceholder}
           component={Input}
+          autoComplete="on"
           required
         />
         <Form.Field
@@ -195,6 +196,7 @@ export default class PubsubForm extends Component {
           title={sharedMessages.port}
           placeholder={m.natsPortPlaceholder}
           component={Input}
+          autoComplete="on"
           required
         />
       </React.Fragment>
