@@ -16,6 +16,7 @@ package networkserver
 
 import (
 	"context"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -25,11 +26,22 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
+type UplinkMatch interface {
+	ApplicationIdentifiers() ttnpb.ApplicationIdentifiers
+	DeviceID() string
+	LoRaWANVersion() ttnpb.MACVersion
+	FNwkSIntKey() *ttnpb.KeyEnvelope
+	FCnt() uint32
+	LastFCnt() uint32
+	IsPending() bool
+	ResetsFCnt() *pbtypes.BoolValue
+}
+
 // DeviceRegistry is a registry, containing devices.
 type DeviceRegistry interface {
 	GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, context.Context, error)
 	GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
-	RangeByAddr(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error
+	RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, cacheTTL time.Duration, f func(context.Context, UplinkMatch) bool) error
 	SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 }
 
@@ -66,13 +78,13 @@ func logRegistryRPCError(ctx context.Context, err error, msg string) {
 }
 
 type replacedEndDeviceFieldRegistryWrapper struct {
-	fields   []registry.ReplacedEndDeviceField
-	registry DeviceRegistry
+	DeviceRegistry
+	fields []registry.ReplacedEndDeviceField
 }
 
 func (w replacedEndDeviceFieldRegistryWrapper) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
-	dev, ctx, err := w.registry.GetByEUI(ctx, joinEUI, devEUI, paths)
+	dev, ctx, err := w.DeviceRegistry.GetByEUI(ctx, joinEUI, devEUI, paths)
 	if err != nil || dev == nil {
 		return dev, ctx, err
 	}
@@ -84,7 +96,7 @@ func (w replacedEndDeviceFieldRegistryWrapper) GetByEUI(ctx context.Context, joi
 
 func (w replacedEndDeviceFieldRegistryWrapper) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
-	dev, ctx, err := w.registry.GetByID(ctx, appID, devID, paths)
+	dev, ctx, err := w.DeviceRegistry.GetByID(ctx, appID, devID, paths)
 	if err != nil || dev == nil {
 		return dev, ctx, err
 	}
@@ -94,21 +106,9 @@ func (w replacedEndDeviceFieldRegistryWrapper) GetByID(ctx context.Context, appI
 	return dev, ctx, nil
 }
 
-func (w replacedEndDeviceFieldRegistryWrapper) RangeByAddr(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error {
-	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
-	return w.registry.RangeByAddr(ctx, devAddr, paths, func(ctx context.Context, dev *ttnpb.EndDevice) bool {
-		if dev != nil {
-			for _, d := range replaced {
-				d.GetTransform(dev)
-			}
-		}
-		return f(ctx, dev)
-	})
-}
-
 func (w replacedEndDeviceFieldRegistryWrapper) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
-	dev, ctx, err := w.registry.SetByID(ctx, appID, devID, paths, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	dev, ctx, err := w.DeviceRegistry.SetByID(ctx, appID, devID, paths, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
 			for _, d := range replaced {
 				d.GetTransform(dev)
@@ -137,8 +137,8 @@ func (w replacedEndDeviceFieldRegistryWrapper) SetByID(ctx context.Context, appI
 
 func wrapEndDeviceRegistryWithReplacedFields(r DeviceRegistry, fields ...registry.ReplacedEndDeviceField) DeviceRegistry {
 	return replacedEndDeviceFieldRegistryWrapper{
-		fields:   fields,
-		registry: r,
+		DeviceRegistry: r,
+		fields:         fields,
 	}
 }
 
