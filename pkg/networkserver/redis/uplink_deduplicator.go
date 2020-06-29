@@ -16,8 +16,6 @@ package redis
 
 import (
 	"context"
-	"encoding/base64"
-	"hash/fnv"
 	"strconv"
 	"time"
 
@@ -38,18 +36,14 @@ func NewUplinkDeduplicator(cl *ttnredis.Client) *UplinkDeduplicator {
 	}
 }
 
-var keyEncoding = base64.RawStdEncoding
-
 func uplinkHash(ctx context.Context, up *ttnpb.UplinkMessage) (string, error) {
 	drBytes := make([]byte, up.Settings.DataRate.Modulation.Size())
 	_, err := up.Settings.DataRate.Modulation.MarshalTo(drBytes)
 	if err != nil {
 		return "", err
 	}
-	h := fnv.New64a()
-	_, _ = h.Write(up.RawPayload)
 	return ttnredis.Key(
-		keyEncoding.EncodeToString(h.Sum(nil)),
+		uplinkPayloadHash(up.RawPayload),
 		// NOTE: Data rate and frequency are included in the key to support retransmissions.
 		strconv.FormatUint(up.Settings.Frequency, 32),
 		keyEncoding.EncodeToString(drBytes),
