@@ -15,6 +15,7 @@
 package webmiddleware
 
 import (
+	"net"
 	"net/http"
 
 	"github.com/felixge/httpsnoop"
@@ -31,15 +32,19 @@ func Log(logger log.Interface, ignorePathsArray []string) MiddlewareFunc {
 	}
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			remoteAddr, _, err := net.SplitHostPort(r.RemoteAddr)
+			if err != nil {
+				remoteAddr = r.RemoteAddr
+			}
+			if xRealIP := r.Header.Get("X-Real-Ip"); xRealIP != "" {
+				remoteAddr = xRealIP
+			}
 			logFields := log.Fields(
 				"method", r.Method,
 				"url", r.URL.String(),
-				"remote_addr", r.RemoteAddr,
+				"remote_addr", remoteAddr,
 				"request_id", r.Header.Get(requestIDHeader),
 			)
-			if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
-				logFields = logFields.WithField("forwarded_for", xff)
-			}
 
 			ctx, getError := webhandlers.NewContextWithErrorValue(r.Context())
 			requestLogger := logger

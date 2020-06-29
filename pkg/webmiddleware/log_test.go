@@ -86,6 +86,7 @@ func TestLog(t *testing.T) {
 	for _, tc := range []struct {
 		name     string
 		path     string
+		setReq   func(r *http.Request)
 		validate func(t *testing.T)
 		handler  func(w http.ResponseWriter, r *http.Request)
 	}{
@@ -96,7 +97,26 @@ func TestLog(t *testing.T) {
 			},
 			path: "/",
 			validate: func(t *testing.T) {
-				ch.Expect(t, verifySuccess)
+				ch.Expect(t, func(t *testing.T, e log.Entry) {
+					verifySuccess(t, e)
+					assertions.New(t).So(e.Fields().Fields()["remote_addr"], should.Equal, "192.0.2.1")
+				})
+			},
+		},
+		{
+			name: "RealIP",
+			setReq: func(r *http.Request) {
+				r.Header.Set("X-Real-Ip", "12.34.56.78")
+			},
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+			},
+			path: "/",
+			validate: func(t *testing.T) {
+				ch.Expect(t, func(t *testing.T, e log.Entry) {
+					verifySuccess(t, e)
+					assertions.New(t).So(e.Fields().Fields()["remote_addr"], should.Equal, "12.34.56.78")
+				})
 			},
 		},
 		{
@@ -172,6 +192,9 @@ func TestLog(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			r := httptest.NewRequest(http.MethodGet, tc.path, nil)
+			if tc.setReq != nil {
+				tc.setReq(r)
+			}
 			rec := httptest.NewRecorder()
 			m(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				a.So(log.FromContext(r.Context()), should.NotEqual, log.Noop)

@@ -90,7 +90,7 @@ func ProxyHeaders(config ProxyConfiguration) MiddlewareFunc {
 				// We trust the proxy, so we parse the headers if present.
 				forwardedFor, forwardedScheme, forwardedHost := parseForwardedHeaders(r.Header)
 				if forwardedFor != "" {
-					r.Header.Set(headerXRealIP, forwardedFor)
+					r.Header.Set(headerXRealIP, strings.TrimSpace(strings.Split(forwardedFor, ",")[0]))
 				}
 				if forwardedScheme != "" {
 					r.URL.Scheme = forwardedScheme
@@ -111,6 +111,9 @@ func ProxyHeaders(config ProxyConfiguration) MiddlewareFunc {
 }
 
 func parseForwardedHeaders(h http.Header) (forwardedFor, forwardedScheme, forwardedHost string) {
+	if xForwardedFor := h.Get(headerXForwardedFor); xForwardedFor != "" {
+		forwardedFor = xForwardedFor
+	}
 	if xForwardedProto := h.Get(headerXForwardedProto); xForwardedProto != "" {
 		forwardedScheme = xForwardedProto
 	}
