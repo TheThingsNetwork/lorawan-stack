@@ -88,6 +88,10 @@ The profile pictures that users upload for their accounts are stored in a blob b
 - `is.profile-picture.bucket`: Bucket used for storing profile pictures
 - `is.profile-picture.bucket-url`: Base URL for public bucket access
 
+It is also possible to disable uploads:
+
+- `is.profile-picture.disable-upload`: Disable profile picture uploads
+
 It is also possible to use [Gravatar](https://gravatar.com) for profile pictures.
 
 - `is.profile-picture.use-gravatar`: Use Gravatar fallback for users without profile picture
@@ -98,6 +102,10 @@ Similar to profile pictures, end devices can have pictures associated with them.
 
 - `is.end-device-picture.bucket`: Bucket used for storing end device pictures
 - `is.end-device-picture.bucket-url`: Base URL for public bucket access
+
+It is also possible to disable uploads:
+
+- `is.end-device-picture.disable-upload`: Disable end device picture uploads
 
 ## User Registration Options
 

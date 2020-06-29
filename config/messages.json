@@ -4436,6 +4436,15 @@
       "file": "end_device_registry.go"
     }
   },
+  "error:pkg/identityserver:end_device_picture_uploads_disabled": {
+    "translations": {
+      "en": "end device picture uploads are disabled"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "picture.go"
+    }
+  },
   "error:pkg/identityserver:gateway_eui_taken": {
     "translations": {
       "en": "a gateway with EUI `{gateway_eui}` is already registered as `{gateway_id}`"
@@ -4587,6 +4596,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "entity_access.go"
+    }
+  },
+  "error:pkg/identityserver:profile_picture_uploads_disabled": {
+    "translations": {
+      "en": "profile picture uploads are disabled"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "picture.go"
     }
   },
   "error:pkg/identityserver:search_forbidden": {
