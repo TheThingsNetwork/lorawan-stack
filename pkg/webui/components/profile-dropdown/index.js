@@ -64,7 +64,7 @@ export default class ProfileDropdown extends React.PureComponent {
   }
 
   render() {
-    const { userId, className, children, ...rest } = this.props
+    const { userName, className, children, ...rest } = this.props
 
     return (
       <div
@@ -76,7 +76,7 @@ export default class ProfileDropdown extends React.PureComponent {
         role="button"
         {...rest}
       >
-        <span className={styles.id}>{userId}</span>
+        <span className={styles.id}>{userName}</span>
         <Icon icon="arrow_drop_down" />
         {this.state.expanded && <Dropdown className={styles.dropdown}>{children}</Dropdown>}
       </div>
@@ -91,8 +91,8 @@ ProfileDropdown.propTypes = {
    */
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
-  /** The id of the current user. */
-  userId: PropTypes.string.isRequired,
+  /** The name/id of the current user. */
+  userName: PropTypes.string.isRequired,
 }
 
 ProfileDropdown.defaultProps = {

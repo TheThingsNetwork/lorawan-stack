@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ursalink UG8X gateway documentation.
 - Intercom, Google Analytics, and Emojicom feedback in documentation.
 - LORIX One gateway documentation.
+- Display own user name instead of ID in Console if possible.
 
 ### Changed
 
