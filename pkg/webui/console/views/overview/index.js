@@ -49,7 +49,7 @@ import { getGatewaysList, GET_GTWS_LIST_BASE } from '@console/store/actions/gate
 import { selectApplicationsTotalCount } from '@console/store/selectors/applications'
 import { selectGatewaysTotalCount } from '@console/store/selectors/gateways'
 import { createFetchingSelector } from '@console/store/selectors/fetching'
-import { selectUserId, selectUserRights } from '@console/store/selectors/user'
+import { selectUserNameOrId, selectUserRights } from '@console/store/selectors/user'
 
 import style from './overview.styl'
 
@@ -59,7 +59,7 @@ const m = defineMessages({
   gotoApplications: 'Go to applications',
   gotoGateways: 'Go to gateways',
   welcome: 'Welcome to the Console!',
-  welcomeBack: 'Welcome back, {userId}! 👋',
+  welcomeBack: 'Welcome back, {userName}! 👋',
   getStarted: 'Get started right away by creating an application or registering a gateway',
   continueWorking: 'Walk right through to your applications and/or gateways',
   componentStatus: 'Component status',
@@ -84,7 +84,7 @@ const overviewFetchingSelector = createFetchingSelector([GET_APPS_LIST_BASE, GET
       applicationCount: selectApplicationsTotalCount(state),
       gatewayCount: selectGatewaysTotalCount(state),
       fetching: overviewFetchingSelector(state),
-      userId: selectUserId(state),
+      userName: selectUserNameOrId(state),
       mayCreateApplications: mayCreateApplications.check(rights),
       mayViewApplications: mayViewApplications.check(rights),
       mayViewGateways: mayViewGateways.check(rights),
@@ -113,7 +113,7 @@ export default class Overview extends React.Component {
     mayCreateGateways: PropTypes.bool.isRequired,
     mayViewApplications: PropTypes.bool.isRequired,
     mayViewGateways: PropTypes.bool.isRequired,
-    userId: PropTypes.string.isRequired,
+    userName: PropTypes.string.isRequired,
   }
 
   static defaultProps = {
@@ -210,7 +210,7 @@ export default class Overview extends React.Component {
       fetching,
       applicationCount,
       gatewayCount,
-      userId,
+      userName,
       mayCreateApplications,
       mayCreateGateways,
       mayViewApplications,
@@ -237,7 +237,7 @@ export default class Overview extends React.Component {
               <Message
                 className={style.welcome}
                 content={hasEntities ? m.welcomeBack : m.welcome}
-                values={{ userId }}
+                values={{ userName }}
                 component="h1"
               />
               {!mayNotViewEntities && (
