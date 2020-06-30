@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`GatewayConnectionReactor should match snapshot 1`] = `
+exports[`<GatewayConnectionReactor /> matches snapshot 1`] = `
 <ConnectionReactor
   componentProp="prop"
   latestEvent={

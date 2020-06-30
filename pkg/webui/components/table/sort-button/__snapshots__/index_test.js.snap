@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SortButton is active is in ascending direction should match snapshot 1`] = `
+exports[`<SortButton /> when it is active is in ascending direction matches snapshot 1`] = `
 <button
   className="button buttonActive"
   onClick={[Function]}
@@ -25,7 +25,7 @@ exports[`SortButton is active is in ascending direction should match snapshot 1`
 </button>
 `;
 
-exports[`SortButton is active is in descending direction should match snapshot 1`] = `
+exports[`<SortButton /> when it is active when it is in descending direction matches snapshot 1`] = `
 <button
   className="button buttonActive buttonDesc"
   onClick={[Function]}
@@ -50,7 +50,7 @@ exports[`SortButton is active is in descending direction should match snapshot 1
 </button>
 `;
 
-exports[`SortButton is not active should match snapshot 1`] = `
+exports[`<SortButton /> when it is not active matches snapshot 1`] = `
 <button
   className="button"
   onClick={[Function]}
