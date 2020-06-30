@@ -18,7 +18,7 @@ import Dropdown from '../dropdown'
 
 import getProfileDropdownDriver from './index_driver'
 
-const userId = 'kschiffer'
+const userName = 'kschiffer'
 const nullAction = function() {
   return null
 }
@@ -38,7 +38,7 @@ describe('Profile Dropdown', function() {
 
   describe('is in initial state', function() {
     beforeEach(function() {
-      driver.when.created({ userId, children })
+      driver.when.created({ userName, children })
     })
     it('should match snapshot', function() {
       expect(driver.component).toMatchSnapshot()
