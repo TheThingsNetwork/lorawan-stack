@@ -22,6 +22,7 @@ import Select from '@ttn-lw/components/select'
 import Radio from '@ttn-lw/components/radio-button'
 import Form from '@ttn-lw/components/form'
 import Checkbox from '@ttn-lw/components/checkbox'
+import Input from '@ttn-lw/components/input'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -98,6 +99,36 @@ const ConfigurationForm = React.memo(props => {
     [validationContext],
   )
 
+  const initialUseDefaultAddresses =
+    initialActivationMode === ACTIVATION_MODES.OTAA
+      ? nsEnabled && jsEnabled
+      : initialActivationMode === ACTIVATION_MODES.ABP ||
+        initialActivationMode === ACTIVATION_MODES.MULTICAST
+      ? nsEnabled && asEnabled
+      : false
+
+  const [useDefaultAddresses, setUseDefaultAddresses] = React.useState(initialUseDefaultAddresses)
+  const handleDefaultAddressesChange = React.useCallback(
+    evt => {
+      const { checked } = evt.target
+      const { setValues, values } = formRef.current
+
+      setUseDefaultAddresses(checked)
+      setValues(
+        validationSchema.cast(
+          {
+            ...values,
+            _default_addresses: checked,
+          },
+          {
+            context: validationContext,
+          },
+        ),
+      )
+    },
+    [validationContext],
+  )
+
   const [externalJs, setExternalJs] = React.useState(!jsEnabled)
   const handleExternalJsChange = React.useCallback(
     evt => {
@@ -128,6 +159,7 @@ const ConfigurationForm = React.memo(props => {
         {
           _external_js: !jsEnabled,
           _activation_mode: initialActivationMode,
+          _default_addresses: initialUseDefaultAddresses,
           application_server_address: undefined,
           network_server_address: undefined,
           join_server_address: undefined,
@@ -139,11 +171,16 @@ const ConfigurationForm = React.memo(props => {
         context: validationContext,
       },
     )
-  }, [initialActivationMode, initialValues, validationContext])
+  }, [initialActivationMode, initialUseDefaultAddresses, initialValues, validationContext])
 
   const onFormSubmit = React.useCallback(
     (values, formikBag) => {
-      const { _activation_mode, _external_js, ...configuration } = validationSchema.cast(values, {
+      const {
+        _activation_mode,
+        _external_js,
+        _default_addresses,
+        ...configuration
+      } = validationSchema.cast(values, {
         context: validationContext,
       })
 
@@ -216,22 +253,14 @@ const ConfigurationForm = React.memo(props => {
             options={LORAWAN_VERSIONS}
           />
           <Form.Field
-            title={sharedMessages.networkServerHost}
-            placeholder={sharedMessages.addressPlaceholder}
-            name="network_server_address"
-            component={Input}
-            autoComplete="on"
-          />
-          <Form.Field
-            title={sharedMessages.applicationServerHost}
-            placeholder={sharedMessages.addressPlaceholder}
-            name="application_server_address"
-            component={Input}
-            autoComplete="on"
+            component={Checkbox}
+            name="_default_addresses"
+            title={sharedMessages.useDefaultAddresses}
+            onChange={handleDefaultAddressesChange}
           />
         </>
       )}
-      {activationMode === ACTIVATION_MODES.OTAA && (
+      {!useDefaultAddresses && (
         <>
           {activationMode !== ACTIVATION_MODES.NONE && (
             <>
@@ -271,13 +300,6 @@ const ConfigurationForm = React.memo(props => {
               />
             </>
           )}
-          <Form.Field
-            title={sharedMessages.joinServerHost}
-            placeholder={externalJs ? sharedMessages.external : sharedMessages.addressPlaceholder}
-            name="join_server_address"
-            disabled={externalJs}
-            autoComplete="on"
-          />
         </>
       )}
       <SubmitBar>

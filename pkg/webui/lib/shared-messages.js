@@ -292,6 +292,8 @@ export default defineMessages({
   uplinksReceived: 'Uplinks received',
   unexposed: 'Unexposed',
   user: 'User',
+  useDefault: 'Use default',
+  useDefaultAddresses: 'Use default component addresses',
   userDelete: 'Delete user',
   userEdit: 'Edit user',
   userId: 'User ID',

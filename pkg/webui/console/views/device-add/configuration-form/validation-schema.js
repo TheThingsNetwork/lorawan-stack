@@ -23,8 +23,8 @@ import { ACTIVATION_MODES } from '@console/lib/device-utils'
 const validationSchema = Yup.object()
   .shape({
     application_server_address: Yup.string().when(
-      ['$asUrl', '$asEnabled', '_activation_mode'],
-      (asUrl, asEnabled, activationMode, schema) => {
+      ['$asUrl', '$asEnabled', '_activation_mode', '_default_addresses'],
+      (asUrl, asEnabled, activationMode, useDefaultAddresses, schema) => {
         if (activationMode === ACTIVATION_MODES.NONE) {
           return schema.strip()
         }
@@ -35,12 +35,13 @@ const validationSchema = Yup.object()
 
         return schema
           .matches(addressRegexp, sharedMessages.validateAddressFormat)
+          .transform(value => (useDefaultAddresses ? undefined : value))
           .default(getHostFromUrl(asUrl))
       },
     ),
     network_server_address: Yup.string().when(
-      ['$nsUrl', '$nsEnabled', '$mayEditKeys', '_activation_mode'],
-      (nsUrl, nsEnabled, mayEditKeys, activationMode, schema) => {
+      ['$nsUrl', '$nsEnabled', '$mayEditKeys', '_activation_mode', '_default_addresses'],
+      (nsUrl, nsEnabled, mayEditKeys, activationMode, useDefaultAddresses, schema) => {
         if (activationMode === ACTIVATION_MODES.NONE) {
           return schema.strip()
         }
@@ -53,6 +54,7 @@ const validationSchema = Yup.object()
           if (activationMode === ACTIVATION_MODES.OTAA) {
             return schema
               .matches(addressRegexp, sharedMessages.validateAddressFormat)
+              .transform(value => (useDefaultAddresses ? undefined : value))
               .default(getHostFromUrl(nsUrl))
           }
 
@@ -61,19 +63,20 @@ const validationSchema = Yup.object()
 
         return schema
           .matches(addressRegexp, sharedMessages.validateAddressFormat)
+          .transform(value => (useDefaultAddresses ? undefined : value))
           .default(getHostFromUrl(nsUrl))
       },
     ),
     join_server_address: Yup.string().when(
-      ['_activation_mode', '$jsUrl', '$jsEnabled', '_external_js'],
-      (activationMode, jsUrl, jsEnabled, externalJs, schema) => {
+      ['_activation_mode', '$jsUrl', '$jsEnabled', '_external_js', '_default_addresses'],
+      (activationMode, jsUrl, jsEnabled, externalJs, useDefaultAddresses, schema) => {
         if (externalJs || activationMode !== ACTIVATION_MODES.OTAA || !jsEnabled) {
           return schema.strip()
         }
 
         return schema
           .matches(addressRegexp, sharedMessages.validateAddressFormat)
-          .transform(toUndefined)
+          .transform(value => (useDefaultAddresses ? undefined : value))
           .default(getHostFromUrl(jsUrl))
       },
     ),
@@ -121,6 +124,7 @@ const validationSchema = Yup.object()
 
         return schema
       }),
+    _default_addresses: Yup.boolean(),
     _external_js: Yup.boolean(),
     _activation_mode: Yup.mixed().when(
       ['$nsEnabled', '$jsEnabled', '$mayEditKeys'],
