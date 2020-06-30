@@ -59,14 +59,14 @@ describe('Applications', function() {
     applications = new Applications(new Api(), { defaultUserId: 'testuser' })
   })
 
-  describe('Proxied results', function() {
-    test('instance initializes correctly', function() {
+  describe('when using proxied results', function() {
+    it('initializes correctly', function() {
       jest.resetModules()
 
       expect(applications._api).toBeDefined()
     })
 
-    test('instance returns an application instance on getById()', async function() {
+    it('returns an application instance on getById()', async function() {
       jest.resetModules()
 
       const app = await applications.getById('test')
@@ -74,7 +74,7 @@ describe('Applications', function() {
       expect(app.ids.application_id).toBe('test')
     })
 
-    test('instance returns an application list on getAll()', async function() {
+    it('returns an application list on getAll()', async function() {
       jest.resetModules()
 
       const result = await applications.getAll()

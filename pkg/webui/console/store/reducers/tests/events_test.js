@@ -15,13 +15,13 @@
 import createReducer from '../events'
 import { getEventMessageSuccess } from '../../actions/events'
 
-describe('events reducer', () => {
+describe('Events reducer', () => {
   const testId = 'test'
   const reducer = createReducer(testId)
   const successActionCreator = getEventMessageSuccess(testId)
 
-  describe('adds new events', () => {
-    it('should keep events sorted by `time`', () => {
+  describe('when adding new events', () => {
+    it('keeps events sorted by `time`', () => {
       const testId = 'test'
       const testTime = '2019-03-28T13:18:13.376022Z'
       const testDate = new Date(testTime)
