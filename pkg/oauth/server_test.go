@@ -113,7 +113,8 @@ func TestOAuthFlow(t *testing.T) {
 		},
 	})
 	s := oauth.NewServer(ctx, store, oauth.Config{
-		Mount: "/oauth",
+		Mount:       "/oauth",
+		CSRFAuthKey: []byte("12345678123456781234567812345678"),
 		UI: oauth.UIConfig{
 			TemplateData: webui.TemplateData{
 				SiteName:     "The Things Network",
@@ -124,6 +125,24 @@ func TestOAuthFlow(t *testing.T) {
 	})
 	c.RegisterWeb(s)
 	componenttest.StartComponent(t, c)
+
+	var csrfToken string
+	var r *http.Request
+
+	// Obtain CSRF token.
+	r = httptest.NewRequest("GET", "/oauth/login", nil)
+	r.URL.Scheme, r.URL.Host = "http", r.Host
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+	c.ServeHTTP(rr, r)
+	csrfToken = rr.Header().Get("X-CSRF-Token")
+
+	if cookies := rr.Result().Cookies(); len(cookies) > 0 {
+		jar.SetCookies(r.URL, cookies)
+	}
 
 	for _, tt := range []struct {
 		Name             string
@@ -495,16 +514,12 @@ func TestOAuthFlow(t *testing.T) {
 			req := httptest.NewRequest(tt.Method, tt.Path, nil)
 			req.URL.Scheme, req.URL.Host = "http", req.Host
 
-			var csrfToken string
-
 			var body *bytes.Buffer
+
+			req.Header.Set("X-CSRF-Token", csrfToken)
 
 			for _, c := range jar.Cookies(req.URL) {
 				req.AddCookie(c)
-				if c.Name == "_oauth_csrf" {
-					csrfToken = c.Value
-					req.Header.Set("X-CSRF-Token", c.Value)
-				}
 			}
 
 			var contentType string

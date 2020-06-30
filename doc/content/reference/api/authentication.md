@@ -4,13 +4,14 @@ description: ""
 weight: -1
 ---
 
-API calls can be authorized either by providing an **API key** or an **OAuth access token**.
+API calls can be authorized either by providing an **API key**, **OAuth access token** or a **Session cookie**.
 
 - Usage with HTTP `Authorization` Header: `Bearer XXXXX`
+- Usage with HTTP `_session` Cookie, containing a session secret `XXXXX`
 - Usage with gRPC [call credentials](https://grpc.io/docs/guides/auth.html#authentication-api) (in the `authorization` header): `Bearer XXXXX`
 - Usage with MQTT: Password: `XXXXX`
 
-Here, `XXXXX` is either a valid **API key** or a valid **OAuth access token**.
+Here, `XXXXX` is either a valid **API key**, a valid **OAuth access token** or a valid **session secret**.
 
 ## API keys
 
@@ -20,6 +21,10 @@ API keys are the simplest way of authorization. API keys do not expire, are revo
 - Application API keys
 - Gateway API keys
 - Organization API keys
+
+## Session cookies
+
+Session cookies provide a way to authorize API usage using the session cookie obtained during authentication with the OAuth provider (`/oauth/login`). Since cookies are domain-scoped, this will only work for requests originating from the same domain as the API. Session cookies authorize full access to all owned resources of the user associated with the session. Any other means of authorization will take precedence if present in the request (e.g. a session cookie will be disregarded if an `Authorization` header is already present in the request).
 
 ## OAuth access tokens
 

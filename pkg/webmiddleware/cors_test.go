@@ -27,14 +27,16 @@ import (
 func TestCORS(t *testing.T) {
 	a := assertions.New(t)
 
-	m := CORS(CORSConfig{
+	config := CORSConfig{
 		AllowedHeaders:   []string{"X-Allowed-Header"},
 		AllowedMethods:   []string{http.MethodPost, http.MethodPut, http.MethodDelete},
 		AllowedOrigins:   []string{"http://localhost"},
 		ExposedHeaders:   []string{"X-Exposed-Header"},
 		MaxAge:           600,
 		AllowCredentials: true,
-	})
+	}
+
+	m := CORS(config)
 
 	t.Run("Cross Origin Request", func(t *testing.T) {
 		r := httptest.NewRequest(http.MethodPut, "/", nil)

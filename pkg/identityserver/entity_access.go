@@ -37,8 +37,8 @@ var (
 	errUnsupportedAuthorization = errors.DefineUnauthenticated("unsupported_authorization", "unsupported authorization method")
 	errAPIKeyNotFound           = errors.DefineUnauthenticated("api_key_not_found", "API key not found")
 	errInvalidAuthorization     = errors.DefineUnauthenticated("invalid_authorization", "invalid authorization")
-	errTokenNotFound            = errors.DefineUnauthenticated("token_not_found", "access token not found")
-	errTokenExpired             = errors.DefineUnauthenticated("token_expired", "access token expired")
+	errTokenNotFound            = errors.DefineUnauthenticated("token_not_found", "token not found")
+	errTokenExpired             = errors.DefineUnauthenticated("token_expired", "token expired")
 	errUserRejected             = errors.DefinePermissionDenied("user_rejected", "user account was rejected")
 	errUserRequested            = errors.DefinePermissionDenied("user_requested", "user account approval is pending")
 	errUserSuspended            = errors.DefinePermissionDenied("user_suspended", "user account was suspended")
@@ -197,6 +197,46 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			userRights = ttnpb.RightsFrom(accessToken.Rights...)
 			return nil
 		}
+	case auth.SessionToken:
+		fetch = func(db *gorm.DB) error {
+			session, err := store.GetUserSessionStore(db).GetSessionByID(ctx, tokenID)
+			if err != nil {
+				if errors.IsNotFound(err) {
+					return errTokenNotFound.WithCause(err)
+				}
+				return err
+			}
+			region := trace.StartRegion(ctx, "validate session token")
+			valid, err := auth.Validate(session.GetSessionSecret(), tokenKey)
+			region.End()
+			if err != nil {
+				return errInvalidAuthorization.WithCause(err)
+			}
+			if !valid {
+				return errInvalidAuthorization.New()
+			}
+			if session.ExpiresAt != nil && session.ExpiresAt.Before(time.Now()) {
+				return errTokenExpired.New()
+			}
+			session.SessionSecret = ""
+			res.AccessMethod = &ttnpb.AuthInfoResponse_UserSession{
+				UserSession: session,
+			}
+			user, err = store.GetUserStore(db).GetUser(ctx, &session.UserIdentifiers, userFieldMask)
+			if err != nil {
+				if errors.IsNotFound(err) {
+					return errTokenNotFound.WithCause(err)
+				}
+				return err
+			}
+
+			// Warning: A user authorized by session cookie will be granted all
+			// current and future rights. When using this auth type, the respective
+			// handlers need to ensure thorough CSRF and CORS protection using
+			// appropriate middleware.
+			userRights = ttnpb.RightsFrom(ttnpb.RIGHT_ALL).Implied()
+			return nil
+		}
 	default:
 		return nil, errUnsupportedAuthorization.New()
 	}
@@ -281,6 +321,8 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 	if apiKey := authInfo.GetAPIKey(); apiKey != nil {
 		return nil
 	} else if accessToken := authInfo.GetOAuthAccessToken(); accessToken != nil {
+		return nil
+	} else if userSession := authInfo.GetUserSession(); userSession != nil {
 		return nil
 	}
 	if len(authInfo.UniversalRights.GetRights()) > 0 {

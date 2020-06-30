@@ -124,6 +124,39 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 							dst.AccessMethod = nil
 						}
 					}
+				case "user_session":
+					_, srcOk := src.AccessMethod.(*AuthInfoResponse_UserSession)
+					if !srcOk && src.AccessMethod != nil {
+						return fmt.Errorf("attempt to set oneof 'user_session', while different oneof is set in source")
+					}
+					_, dstOk := dst.AccessMethod.(*AuthInfoResponse_UserSession)
+					if !dstOk && dst.AccessMethod != nil {
+						return fmt.Errorf("attempt to set oneof 'user_session', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *UserSession
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.AccessMethod.(*AuthInfoResponse_UserSession).UserSession
+						}
+						if dstOk {
+							newDst = dst.AccessMethod.(*AuthInfoResponse_UserSession).UserSession
+						} else {
+							newDst = &UserSession{}
+							dst.AccessMethod = &AuthInfoResponse_UserSession{UserSession: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.AccessMethod = src.AccessMethod
+						} else {
+							dst.AccessMethod = nil
+						}
+					}
 
 				default:
 					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)

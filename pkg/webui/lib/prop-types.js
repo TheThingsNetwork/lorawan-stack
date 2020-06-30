@@ -154,10 +154,13 @@ PropTypes.env = PropTypes.shape({
   siteName: PropTypes.string.isRequired,
   siteTitle: PropTypes.string.isRequired,
   siteSubTitle: PropTypes.string,
+  csrfToken: PropTypes.string.isRequired,
+  sentryDsn: PropTypes.string,
   pageData: PropTypes.shape({}),
   config: PropTypes.shape({
     language: PropTypes.string,
     supportLink: PropTypes.string,
+    documentationBaseUrl: PropTypes.string,
     stack: PropTypes.shape({
       is: PropTypes.stackComponent,
       as: PropTypes.stackComponent,

@@ -17,8 +17,11 @@ import TTN from 'ttn-lw'
 
 import toast from '@ttn-lw/components/toast'
 
-import getCookieValue from '@ttn-lw/lib/cookie'
-import { selectStackConfig, selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
+import {
+  selectStackConfig,
+  selectApplicationRootPath,
+  selectCSRFToken,
+} from '@ttn-lw/lib/selectors/env'
 
 import tokenCreator from '@console/lib/access-token'
 
@@ -37,6 +40,7 @@ const stack = {
 
 const isBaseUrl = stackConfig.is.base_url
 
+const csrf = selectCSRFToken()
 const instance = axios.create()
 
 instance.interceptors.response.use(
@@ -75,24 +79,31 @@ export default {
       return instance.get(`${appRoot}/api/auth/token`)
     },
     async logout() {
-      let csrf = getCookieValue('_console_csrf')
-
-      if (!csrf) {
-        // If the csrf token has been deleted, we likely have some outside
-        // manipulation of the cookies. We can try to regain the cookie by
-        // making an AJAX request to the current location.
-        await axios.get(window.location)
-        csrf = getCookieValue('_console_csrf')
-
-        if (!csrf) {
-          // If we still could not retrieve the cookie, throw an error.
-          throw new Error('Could not retrieve the csrf token')
-        }
-      }
-
-      return instance.post(`${appRoot}/api/auth/logout`, undefined, {
-        headers: { 'X-CSRF-Token': csrf },
+      const headers = token => ({
+        headers: { 'X-CSRF-Token': token },
       })
+      try {
+        return await axios.post(`${appRoot}/api/auth/logout`, undefined, headers(csrf))
+      } catch (error) {
+        if (
+          error.response &&
+          error.response.status === 403 &&
+          typeof error.response.data === 'string' &&
+          error.response.data.includes('CSRF')
+        ) {
+          // If the CSRF token is invalid, it likely means that the CSRF cookie
+          // has been deleted or became outdated. Making a new request to the
+          // current path can then retrieve a fresh CSRF cookie, with which
+          // the logout can be retried.
+          const csrfResult = await axios.get(window.location)
+          const freshCsrf = csrfResult.headers['x-csrf-token']
+          if (freshCsrf) {
+            return axios.post(`${appRoot}/api/auth/logout`, undefined, headers(freshCsrf))
+          }
+        }
+
+        throw error
+      }
     },
   },
   clients: {

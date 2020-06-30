@@ -2330,6 +2330,8 @@ func (m *UserSession) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "session_secret":
+			// no validation rules for SessionSecret
 		default:
 			return UserSessionValidationError{
 				field:  name,

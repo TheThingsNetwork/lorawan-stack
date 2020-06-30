@@ -4582,7 +4582,7 @@
   },
   "error:pkg/identityserver:token_expired": {
     "translations": {
-      "en": "access token expired"
+      "en": "token expired"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -4591,7 +4591,7 @@
   },
   "error:pkg/identityserver:token_not_found": {
     "translations": {
-      "en": "access token not found"
+      "en": "token not found"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -7044,6 +7044,15 @@
     "description": {
       "package": "pkg/webmiddleware",
       "file": "max_body.go"
+    }
+  },
+  "error:pkg/webmiddleware:secure_cookie_invalid_context": {
+    "translations": {
+      "en": "No secure cookie value in this context"
+    },
+    "description": {
+      "package": "pkg/webmiddleware",
+      "file": "cookie.go"
     }
   },
   "event:application.api-key.create": {

@@ -67,7 +67,7 @@ func (m *AuthInfoResponse) ValidateFields(paths ...string) error {
 		case "access_method":
 			if len(subs) == 0 {
 				subs = []string{
-					"api_key", "oauth_access_token",
+					"api_key", "oauth_access_token", "user_session",
 				}
 			}
 			for name, subs := range _processPaths(subs) {
@@ -99,6 +99,22 @@ func (m *AuthInfoResponse) ValidateFields(paths ...string) error {
 						if err := v.ValidateFields(subs...); err != nil {
 							return AuthInfoResponseValidationError{
 								field:  "oauth_access_token",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "user_session":
+					w, ok := m.AccessMethod.(*AuthInfoResponse_UserSession)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetUserSession()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return AuthInfoResponseValidationError{
+								field:  "user_session",
 								reason: "embedded message failed validation",
 								cause:  err,
 							}

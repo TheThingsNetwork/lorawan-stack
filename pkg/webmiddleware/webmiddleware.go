@@ -27,3 +27,18 @@ func Chain(middlewares []MiddlewareFunc, handler http.Handler) http.Handler {
 	}
 	return handler
 }
+
+// Conditional is a middleware that only executes middleware if the condition
+// returns true for the request. If the condition returns false, the middleware
+// is skipped, and request handling moves on to the next handler in the chain.
+func Conditional(middleware MiddlewareFunc, condition func(r *http.Request) bool) MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			handler := next
+			if condition(r) {
+				handler = middleware(next)
+			}
+			handler.ServeHTTP(w, r)
+		})
+	}
+}
