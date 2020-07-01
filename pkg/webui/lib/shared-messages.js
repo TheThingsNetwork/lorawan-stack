@@ -196,6 +196,7 @@ export default defineMessages({
   messages: 'Messages',
   messageTypes: 'Message types',
   model: 'Model',
+  moreInformation: 'More information',
   mqtt: 'MQTT',
   multicast: 'Multicast',
   name: 'Name',

@@ -550,6 +550,7 @@
   "lib.shared-messages.messages": "Messages",
   "lib.shared-messages.messageTypes": "Message types",
   "lib.shared-messages.model": "Model",
+  "lib.shared-messages.moreInformation": "More information",
   "lib.shared-messages.mqtt": "MQTT",
   "lib.shared-messages.multicast": "Multicast",
   "lib.shared-messages.name": "Name",

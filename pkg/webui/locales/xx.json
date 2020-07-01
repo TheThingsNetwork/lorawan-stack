@@ -550,6 +550,7 @@
   "lib.shared-messages.messages": "Xxxxxxxx",
   "lib.shared-messages.messageTypes": "Xxxxxxx xxxxx",
   "lib.shared-messages.model": "Xxxxx",
+  "lib.shared-messages.moreInformation": "Xxxx xxxxxxxxxxx",
   "lib.shared-messages.mqtt": "XXXX",
   "lib.shared-messages.multicast": "Xxxxxxxxx",
   "lib.shared-messages.name": "Xxxx",
