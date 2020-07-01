@@ -157,6 +157,7 @@ class PayloadFormattersForm extends React.Component {
             type="text"
             placeholder={sharedMessages.addressPlaceholder}
             description={m.grpcFieldDescription}
+            autoComplete="on"
           />
         )
       default:

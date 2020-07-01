@@ -187,6 +187,7 @@ export default class WebhookForm extends Component {
             title={sharedMessages.webhookBaseUrl}
             placeholder="https://example.com/webhooks"
             component={Input}
+            autoComplete="url"
             required
           />
           <Form.Field
