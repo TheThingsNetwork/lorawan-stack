@@ -220,7 +220,7 @@ const IdentityServerForm = React.memo(props => {
       {!hideExternalJs && (
         <>
           <Form.Field
-            title={sharedMessages.externalJoinServer}
+            title={sharedMessages.useExternalJoinServer}
             name="_external_js"
             onChange={handleExternalJsChange}
             component={Checkbox}
@@ -231,6 +231,7 @@ const IdentityServerForm = React.memo(props => {
             name="join_server_address"
             disabled={!isOTAA || externalJs}
             autoComplete="on"
+            component={Input}
           />
         </>
       )}

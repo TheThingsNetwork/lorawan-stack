@@ -282,7 +282,7 @@ const ConfigurationForm = React.memo(props => {
             <>
               {showExternalJs && (
                 <Form.Field
-                  title={sharedMessages.externalJoinServer}
+                  title={sharedMessages.useExternalJoinServer}
                   description={sharedMessages.externalJoinServerDescription}
                   name="_external_js"
                   onChange={handleExternalJsChange}
