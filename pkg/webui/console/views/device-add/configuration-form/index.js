@@ -217,7 +217,7 @@ const ConfigurationForm = React.memo(props => {
             options={LORAWAN_VERSIONS}
           />
           <Form.Field
-            title={sharedMessages.networkServerAddress}
+            title={sharedMessages.networkServerHost}
             placeholder={sharedMessages.addressPlaceholder}
             name="network_server_address"
             component={Input}
@@ -237,7 +237,7 @@ const ConfigurationForm = React.memo(props => {
           {activationMode !== ACTIVATION_MODES.NONE && (
             <>
               <Form.Field
-                title={sharedMessages.networkServerHost}
+                title={sharedMessages.networkServerAddress}
                 placeholder={sharedMessages.addressPlaceholder}
                 name="network_server_address"
                 component={Input}

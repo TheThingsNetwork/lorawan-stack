@@ -172,7 +172,7 @@ export default class Add extends React.Component {
           component={Input}
           description={sharedMessages.nsEmptyDefault}
           name="network_server_address"
-          title={sharedMessages.nsAddress}
+          title={sharedMessages.networkServerAddress}
           disabled={!link}
         />
       </React.Fragment>

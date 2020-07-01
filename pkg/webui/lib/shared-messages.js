@@ -208,7 +208,6 @@ export default defineMessages({
   notAvailable: 'n/a',
   notLinked: 'Not linked',
   notSet: 'Not set',
-  nsAddress: 'Network Server address',
   nsEmptyDefault: 'Leave empty to link to the Network Server in the same cluster',
   nsServerKekLabel: 'Network Server KEK label',
   nsServerKekLabelDescription:

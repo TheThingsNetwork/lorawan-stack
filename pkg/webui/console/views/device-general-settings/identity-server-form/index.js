@@ -115,7 +115,7 @@ const IdentityServerForm = React.memo(props => {
   }, [onDelete, onDeleteFailure, onDeleteSuccess])
 
   const { enabled: jsEnabled } = selectJsConfig()
-  const { enabled: asEnabled, base_url: asUrl } = selectAsConfig()
+  const { enabled: asEnabled } = selectAsConfig()
   const { enabled: nsEnabled } = selectNsConfig()
 
   const lorawanVersion = parseLorawanMacVersion(device.lorawan_version)
