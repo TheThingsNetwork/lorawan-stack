@@ -109,7 +109,7 @@
   "console.components.payload-formatters-form.index.appFormatterWarning": "This option sets both uplink and downlink formatters to application link defaults",
   "console.components.pubsub-form.messages.idPlaceholder": "my-new-pubsub",
   "console.components.pubsub-form.messages.messageInfo": "For each enabled message type, an optional sub-topic can be defined",
-  "console.components.pubsub-form.messages.deletePubsub": "Delete Pubsub",
+  "console.components.pubsub-form.messages.deletePubsub": "Delete Pub/Sub",
   "console.components.pubsub-form.messages.modalWarning": "Are you sure you want to delete Pub/Sub \"{pubsubId}\"? Deleting a Pub/Sub cannot be undone.",
   "console.components.pubsub-form.messages.headers": "Headers",
   "console.components.pubsub-form.messages.headersKeyPlaceholder": "Authorization",

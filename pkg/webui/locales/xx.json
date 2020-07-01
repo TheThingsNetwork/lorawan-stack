@@ -109,7 +109,7 @@
   "console.components.payload-formatters-form.index.appFormatterWarning": "Xxxx xxxxxx xxxx xxxx xxxxxx xxx xxxxxxxx xxxxxxxxxx xx xxxxxxxxxxx xxxx xxxxxxxx",
   "console.components.pubsub-form.messages.idPlaceholder": "xx-xxx-xxxxxx",
   "console.components.pubsub-form.messages.messageInfo": "Xxx xxxx xxxxxxx xxxxxxx xxxx, xx xxxxxxxx xxx-xxxxx xxx xx xxxxxxx",
-  "console.components.pubsub-form.messages.deletePubsub": "Xxxxxx Xxxxxx",
+  "console.components.pubsub-form.messages.deletePubsub": "Xxxxxx Xxx/Xxx",
   "console.components.pubsub-form.messages.modalWarning": "Xxx xxx xxxx xxx xxxx xx xxxxxx Xxx/Xxx \"{pubsubId}\"? Xxxxxxxx x Xxx/Xxx xxxxxx xx xxxxxx.",
   "console.components.pubsub-form.messages.headers": "Xxxxxxx",
   "console.components.pubsub-form.messages.headersKeyPlaceholder": "Xxxxxxxxxxxxx",
