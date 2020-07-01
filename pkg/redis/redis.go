@@ -17,6 +17,7 @@ package redis
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
@@ -28,6 +29,7 @@ import (
 
 	"github.com/go-redis/redis/v7"
 	"github.com/gogo/protobuf/proto"
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
@@ -86,7 +88,11 @@ type Config struct {
 	RootNamespace []string       `name:"namespace" description:"Namespace for Redis keys"`
 	PoolSize      int            `name:"pool-size" description:"The maximum number of database connections"`
 	Failover      FailoverConfig `name:"failover" description:"Redis failover configuration"`
-	namespace     []string
+	TLS           struct {
+		Require          bool `name:"require" description:"Require TLS"`
+		tlsconfig.Client `name:",squash"`
+	} `name:"tls"`
+	namespace []string
 }
 
 func (c Config) WithNamespace(namespace ...string) *Config {
@@ -110,17 +116,44 @@ type FailoverConfig struct {
 	MasterName string   `name:"master-name" description:"Redis Sentinel master name"`
 }
 
-func dial(ctx context.Context, network, addr string) (net.Conn, error) {
-	var timeout time.Duration
-	deadline, ok := ctx.Deadline()
-	if ok {
-		timeout = time.Until(deadline)
+func (c Config) makeDialer() func(ctx context.Context, network, addr string) (net.Conn, error) {
+	var (
+		tlsConfig    *tls.Config
+		tlsConfigErr error
+	)
+	if c.TLS.Require {
+		tlsConfig = &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		}
+		tlsConfigErr = c.TLS.Client.ApplyTo(tlsConfig)
 	}
-	conn, err := net.DialTimeout(network, addr, timeout)
-	if err != nil {
-		return nil, err
+	return func(ctx context.Context, network, addr string) (net.Conn, error) {
+		var timeout time.Duration
+		deadline, ok := ctx.Deadline()
+		if ok {
+			timeout = time.Until(deadline)
+		}
+		var (
+			conn net.Conn
+			err  error
+		)
+		dialer := &net.Dialer{Timeout: timeout}
+		if c.TLS.Require {
+			if tlsConfigErr != nil {
+				return nil, tlsConfigErr
+			}
+			conn, err = tls.DialWithDialer(dialer, network, addr, tlsConfig)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			conn, err = dialer.Dial(network, addr)
+			if err != nil {
+				return nil, err
+			}
+		}
+		return &observableConn{addr: addr, Conn: conn}, nil
 	}
-	return &observableConn{addr: addr, Conn: conn}, nil
 }
 
 // newRedisClient returns a Redis client, which connects using correct client type.
@@ -128,7 +161,7 @@ func newRedisClient(conf *Config) *redis.Client {
 	if conf.Failover.Enable {
 		redis.SetLogger(stdlog.New(ioutil.Discard, "", 0))
 		return redis.NewFailoverClient(&redis.FailoverOptions{
-			Dialer:        dial,
+			Dialer:        conf.makeDialer(),
 			MasterName:    conf.Failover.MasterName,
 			SentinelAddrs: conf.Failover.Addresses,
 			Password:      conf.Password,
@@ -137,7 +170,7 @@ func newRedisClient(conf *Config) *redis.Client {
 		})
 	}
 	return redis.NewClient(&redis.Options{
-		Dialer:   dial,
+		Dialer:   conf.makeDialer(),
 		Addr:     conf.Address,
 		Password: conf.Password,
 		DB:       conf.Database,

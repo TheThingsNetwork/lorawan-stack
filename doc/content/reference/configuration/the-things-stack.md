@@ -136,6 +136,14 @@ Or you can enable failover using [Redis Sentinel](https://redis.io/topics/sentin
 - `redis.failover.addresses`: List of addresses of the Redis Sentinel instances (required)
 - `redis.failover.master-name`: Redis Sentinel master name (required)
 
+If your Redis server uses TLS, use the following options:
+
+- `redis.tls.require`: Require TLS when connecting to Redis
+- `redis.tls.root-ca`: Location of TLS root CA certificate
+- `redis.tls.insecure-skip-verify`: Skip verification of certificate chains (insecure)
+
+Mutual TLS is not supported yet.
+
 ## Blob Options
 
 The `blob` options configure how {{% tts %}} reads or writes files such as pictures, the frequency plans repository or files required for Backend Interfaces interoperability. The `provider` field selects the provider that is used, and which other options are read.
@@ -170,6 +178,14 @@ When using the `redis` backend, the global [Redis configuration]({{< ref "#redis
 - `events.redis.database`: Redis database to use
 - `events.redis.namespace`: Namespace for Redis keys
 - `events.redis.pool-size`: The maximum size of the connection pool
+
+If your Redis server uses TLS, use the following options:
+
+- `events.redis.tls.require`: Require TLS when connecting to Redis
+- `events.redis.tls.root-ca`: Location of TLS root CA certificate
+- `events.redis.tls.insecure-skip-verify`: Skip verification of certificate chains (insecure)
+
+Mutual TLS is not supported yet.
 
 With the `cloud` backend, the configured publish and subscribe URLs are passed to [the Go CDK](https://gocloud.dev/howto/pubsub/).
 
