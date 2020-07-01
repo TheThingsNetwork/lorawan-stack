@@ -26,6 +26,7 @@ import (
 	packetbroker "go.packetbroker.org/api/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -63,7 +64,7 @@ type Agent struct {
 	netID            types.NetID
 	tenantID,
 	clusterID string
-	tlsConfig         TLSConfig
+	tlsConfig         tlsconfig.ClientAuth
 	forwarderConfig   ForwarderConfig
 	homeNetworkConfig HomeNetworkConfig
 	devAddrPrefixes   []types.DevAddrPrefix
@@ -205,13 +206,15 @@ func (a *Agent) RegisterServices(s *grpc.Server) {
 func (a *Agent) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 }
 
-func (a *Agent) dialContext(ctx context.Context, config TLSConfig, target string) (*grpc.ClientConn, error) {
-	cert, err := config.loadCertificate(ctx, a.KeyVault)
+func (a *Agent) dialContext(ctx context.Context, config tlsconfig.ClientAuth, target string) (*grpc.ClientConn, error) {
+	tlsConfig, err := a.GetTLSClientConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
-	tlsConfig, err := a.GetTLSClientConfig(ctx, component.WithTLSCertificates(cert))
-	if err != nil {
+	if config.Source == "key-vault" {
+		config.KeyVault.KeyVault = a.KeyVault
+	}
+	if err = config.ApplyTo(tlsConfig); err != nil {
 		return nil, err
 	}
 	opts := append(rpcclient.DefaultDialOptions(ctx),

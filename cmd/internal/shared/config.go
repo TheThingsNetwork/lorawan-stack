@@ -19,6 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"golang.org/x/crypto/acme"
@@ -35,11 +36,13 @@ var DefaultLogConfig = config.Log{
 }
 
 // DefaultTLSConfig is the default TLS config.
-var DefaultTLSConfig = config.TLS{
-	Certificate: "cert.pem",
-	Key:         "key.pem",
-	ACME: config.ACME{
-		Endpoint: acme.LetsEncryptURL,
+var DefaultTLSConfig = tlsconfig.Config{
+	ServerAuth: tlsconfig.ServerAuth{
+		Certificate: "cert.pem",
+		Key:         "key.pem",
+		ACME: tlsconfig.ACME{
+			Endpoint: acme.LetsEncryptURL,
+		},
 	},
 }
 

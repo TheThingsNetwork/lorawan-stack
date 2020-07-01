@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent"
 	"go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent/mock"
@@ -65,8 +66,10 @@ func TestForwarder(t *testing.T) {
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
-			TLS: config.TLS{
-				RootCA: "testdata/serverca.pem",
+			TLS: tlsconfig.Config{
+				Client: tlsconfig.Client{
+					RootCA: "testdata/serverca.pem",
+				},
 			},
 		},
 	})
@@ -83,7 +86,7 @@ func TestForwarder(t *testing.T) {
 		NetID:            types.NetID{0x0, 0x0, 0x13},
 		TenantID:         "test",
 		ClusterID:        "test",
-		TLS: TLSConfig{
+		TLS: tlsconfig.ClientAuth{
 			Source:      "file",
 			Certificate: "testdata/clientcert.pem",
 			Key:         "testdata/clientkey.pem",
@@ -389,8 +392,10 @@ func TestHomeNetwork(t *testing.T) {
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
-			TLS: config.TLS{
-				RootCA: "testdata/serverca.pem",
+			TLS: tlsconfig.Config{
+				Client: tlsconfig.Client{
+					RootCA: "testdata/serverca.pem",
+				},
 			},
 		},
 	})
@@ -402,7 +407,7 @@ func TestHomeNetwork(t *testing.T) {
 		NetID:            types.NetID{0x0, 0x0, 0x13},
 		TenantID:         "test",
 		ClusterID:        "test",
-		TLS: TLSConfig{
+		TLS: tlsconfig.ClientAuth{
 			Source:      "file",
 			Certificate: "testdata/clientcert.pem",
 			Key:         "testdata/clientkey.pem",
