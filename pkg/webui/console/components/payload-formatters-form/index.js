@@ -109,6 +109,10 @@ class PayloadFormattersForm extends React.Component {
         resetValues[FIELD_NAMES.JAVASCRIPT] = getDefaultJavascriptFormatter(uplink)
         resetValues[FIELD_NAMES.GRPC] = grpcParameter
         break
+      default:
+        resetValues[FIELD_NAMES.GRPC] = getDefaultGrpcServiceFormatter(uplink)
+        resetValues[FIELD_NAMES.JAVASCRIPT] = getDefaultJavascriptFormatter(uplink)
+        break
     }
 
     try {
