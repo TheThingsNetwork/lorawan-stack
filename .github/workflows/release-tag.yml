@@ -103,6 +103,11 @@ jobs:
       run: tools/bin/mage docs:build
       env:
         HUGO_BASE_URL: https://thethingsstack.io/
+        HUGO_GOOGLEANALYTICS: ${{ secrets.HUGO_GOOGLEANALYTICS }}
+        HUGO_PARAMS_FEEDBACK_CAMPAIGN: ${{ HUGO_PARAMS_FEEDBACK_CAMPAIGN }}
+        HUGO_PARAMS_FEEDBACK_ENABLED: true
+        HUGO_PARAMS_INTERCOM_APPID: ${{ secrets.HUGO_PARAMS_INTERCOM_APPID }}
+        HUGO_PARAMS_INTERCOM_ENABLED: true
         HUGO_PARAMS_SEARCH_APIKEY: ${{ secrets.HUGO_PARAMS_SEARCH_APIKEY }}
         HUGO_PARAMS_SEARCH_ENABLED: true
         HUGO_PARAMS_SEARCH_INDEX: thethingsstack
