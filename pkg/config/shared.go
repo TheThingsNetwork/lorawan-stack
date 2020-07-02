@@ -131,23 +131,33 @@ type Rights struct {
 	TTL time.Duration `name:"ttl" description:"Validity of Identity Server responses"`
 }
 
+// KeyVaultCache represents the configuration for key vault caching.
+type KeyVaultCache struct {
+	Size int           `name:"size" description:"Cache size"`
+	TTL  time.Duration `name:"ttl" description:"Cache elements time to live"`
+}
+
 // KeyVault represents configuration for key vaults.
 type KeyVault struct {
 	Provider string            `name:"provider" description:"Provider (static)"`
+	Cache    KeyVaultCache     `name:"cache"`
 	Static   map[string][]byte `name:"static"`
 }
 
 // KeyVault returns an initialized crypto.KeyVault based on the configuration.
 func (v KeyVault) KeyVault() (crypto.KeyVault, error) {
+	vault := cryptoutil.EmptyKeyVault
 	switch v.Provider {
 	case "static":
 		kv := cryptoutil.NewMemKeyVault(v.Static)
 		kv.Separator = ":"
 		kv.ReplaceOldNew = []string{":", "_"}
-		return kv, nil
-	default:
-		return cryptoutil.EmptyKeyVault, nil
+		vault = kv
 	}
+	if v.Cache.Size > 0 {
+		vault = cryptoutil.NewCacheKeyVault(vault, v.Cache.TTL, v.Cache.Size)
+	}
+	return vault, nil
 }
 
 var (
