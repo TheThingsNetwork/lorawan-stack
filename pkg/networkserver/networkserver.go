@@ -136,10 +136,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		return nil, errInvalidConfiguration.WithCause(errors.New("DeduplicationWindow must be greater than 0"))
 	case conf.CooldownWindow == 0:
 		return nil, errInvalidConfiguration.WithCause(errors.New("CooldownWindow must be greater than 0"))
+	case conf.Devices == nil:
+		panic(errInvalidConfiguration.WithCause(errors.New("Devices is not specified")))
 	case conf.DownlinkTasks == nil:
-		return nil, errInvalidConfiguration.WithCause(errors.New("DownlinkTasks is not specified"))
+		panic(errInvalidConfiguration.WithCause(errors.New("DownlinkTasks is not specified")))
 	case conf.UplinkDeduplicator == nil:
-		return nil, errInvalidConfiguration.WithCause(errors.New("UplinkDeduplicator is not specified"))
+		panic(errInvalidConfiguration.WithCause(errors.New("UplinkDeduplicator is not specified")))
 	}
 
 	devAddrPrefixes := conf.DevAddrPrefixes
