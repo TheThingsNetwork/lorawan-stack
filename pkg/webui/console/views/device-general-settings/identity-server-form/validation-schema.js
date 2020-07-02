@@ -14,14 +14,17 @@
 
 import * as Yup from 'yup'
 
+import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
+import { selectJsConfig, selectNsConfig, selectAsConfig } from '@ttn-lw/lib/selectors/env'
 
 import { attributeValidCheck, attributeTooShortCheck } from '@console/lib/attributes'
 import { id as deviceIdRegexp, address as addressRegexp } from '@console/lib/regexp'
 import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-utils'
 
 const jsConfig = selectJsConfig()
+const asConfig = selectAsConfig()
+const nsConfig = selectNsConfig()
 
 const toUndefined = value => (!Boolean(value) ? undefined : value)
 
@@ -38,20 +41,31 @@ const validationSchema = Yup.object()
       .min(2, Yup.passValues(sharedMessages.validateTooShort))
       .max(50, Yup.passValues(sharedMessages.validateTooLong)),
     description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-    network_server_address: Yup.string().matches(
-      addressRegexp,
-      sharedMessages.validateAddressFormat,
-    ),
-    application_server_address: Yup.string().matches(
-      addressRegexp,
-      sharedMessages.validateAddressFormat,
-    ),
+    network_server_address: Yup.string()
+      .matches(addressRegexp, sharedMessages.validateAddressFormat)
+      .when(['_default_addresses'], {
+        is: true,
+        then: schema =>
+          schema
+            .transform(value => (nsConfig.enabled ? undefined : value))
+            .default(getHostnameFromUrl(nsConfig.base_url)),
+      }),
+    application_server_address: Yup.string()
+      .matches(addressRegexp, sharedMessages.validateAddressFormat)
+      .when(['_default_addresses'], {
+        is: true,
+        then: schema =>
+          schema
+            .transform(value => (asConfig.enabled ? undefined : value))
+            .default(getHostnameFromUrl(asConfig.base_url)),
+      }),
     _external_js: Yup.boolean(),
     _supports_join: Yup.boolean(),
     _lorawan_version: Yup.string(),
+    _default_addresses: Yup.boolean(),
     join_server_address: Yup.string().when(
-      ['_supports_join', ' _external_js'],
-      (supportsJoin, externalJs, schema) => {
+      ['_supports_join', ' _external_js', '_default_addresses'],
+      (supportsJoin, externalJs, useDefaultAddresses, schema) => {
         if (!supportsJoin) {
           return schema.strip()
         }
@@ -62,8 +76,8 @@ const validationSchema = Yup.object()
 
         return schema
           .matches(addressRegexp, sharedMessages.validateAddressFormat)
-          .transform(toUndefined)
-          .default(new URL(jsConfig.base_url).hostname)
+          .transform(value => (useDefaultAddresses && jsConfig.enabled ? undefined : value))
+          .default(getHostnameFromUrl(jsConfig.base_url))
       },
     ),
     resets_join_nonces: Yup.bool().when(

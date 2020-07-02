@@ -31,7 +31,12 @@ import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/sele
 import { mapFormValueToAttributes, mapAttributesToFormValue } from '@console/lib/attributes'
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
-import { hasExternalJs, isDeviceOTAA } from '../utils'
+import {
+  hasExternalJs,
+  isDeviceOTAA,
+  usesDefaultComponentAddresses,
+  canUseDefaultComponentAddresses,
+} from '../utils'
 
 import validationSchema from './validation-schema'
 
@@ -53,9 +58,13 @@ const IdentityServerForm = React.memo(props => {
   } = props
   const { name, ids } = device
 
+  const jsConfig = selectJsConfig()
+  const asConfig = selectAsConfig()
+  const nsConfig = selectNsConfig()
+
   const formRef = React.useRef(null)
   const [error, setError] = React.useState('')
-  const [externalJs, setExternaljs] = React.useState(hasExternalJs(device) && mayReadKeys)
+  const [externalJs, setExternalJs] = React.useState(hasExternalJs(device) && mayReadKeys)
 
   const initialValues = React.useMemo(() => {
     const initialValues = {
@@ -63,19 +72,38 @@ const IdentityServerForm = React.memo(props => {
       _external_js: hasExternalJs(device) && mayReadKeys,
       _lorawan_version: device.lorawan_version,
       _supports_join: device.supports_join,
+      _default_addresses: usesDefaultComponentAddresses(device, asConfig, nsConfig, jsConfig),
       attributes: mapAttributesToFormValue(device.attributes),
     }
 
     return validationSchema.cast(initialValues)
-  }, [device, mayReadKeys])
+  }, [asConfig, device, jsConfig, mayReadKeys, nsConfig])
 
   const handleExternalJsChange = React.useCallback(evt => {
     const { checked: externalJsChecked } = evt.target
     const { setValues, values } = formRef.current
 
-    setExternaljs(externalJsChecked)
+    setExternalJs(externalJsChecked)
 
     setValues(validationSchema.cast({ ...values, _external_js: externalJsChecked }))
+  }, [])
+
+  const [useDefaultAddresses, setUseDefaultAddresses] = React.useState(
+    usesDefaultComponentAddresses(device, asConfig, nsConfig, jsConfig),
+  )
+  const handleDefaultAddressesChange = React.useCallback(evt => {
+    const { checked } = evt.target
+    const { setValues, values } = formRef.current
+
+    setUseDefaultAddresses(checked)
+    setExternalJs(checked ? false : values._external_js)
+    setValues(
+      validationSchema.cast({
+        ...values,
+        _external_js: checked ? false : values._external_js,
+        _default_addresses: checked,
+      }),
+    )
   }, [])
 
   const onFormSubmit = React.useCallback(
@@ -85,6 +113,7 @@ const IdentityServerForm = React.memo(props => {
         '_external_js',
         '_lorawan_version',
         '_supports_join',
+        '_default_addresses',
       ])
 
       const update =
@@ -122,6 +151,12 @@ const IdentityServerForm = React.memo(props => {
   const isOTAA = isDeviceOTAA(device)
   const hasJoinEUI = Boolean(device.ids.join_eui)
   const hasDevEUI = Boolean(device.ids.dev_eui)
+  const enableDefaultAddresses = canUseDefaultComponentAddresses(
+    device,
+    asConfig,
+    nsConfig,
+    jsConfig,
+  )
 
   // We do not want to show the external JS option if the user is on JS only
   // deployment.
@@ -204,35 +239,48 @@ const IdentityServerForm = React.memo(props => {
         component={Input}
       />
       <Form.Field
-        title={sharedMessages.networkServerAddress}
-        placeholder={sharedMessages.addressPlaceholder}
-        name="network_server_address"
-        component={Input}
-        autoComplete="on"
+        component={Checkbox}
+        name="_default_addresses"
+        title={sharedMessages.useDefaultAddresses}
+        onChange={handleDefaultAddressesChange}
+        disable={!enableDefaultAddresses}
       />
-      <Form.Field
-        title={sharedMessages.applicationServerAddress}
-        placeholder={sharedMessages.addressPlaceholder}
-        name="application_server_address"
-        component={Input}
-        autoComplete="on"
-      />
-      {!hideExternalJs && (
+      {!useDefaultAddresses && (
         <>
           <Form.Field
-            title={sharedMessages.useExternalJoinServer}
-            name="_external_js"
-            onChange={handleExternalJsChange}
-            component={Checkbox}
+            title={sharedMessages.networkServerAddress}
+            placeholder={sharedMessages.addressPlaceholder}
+            name="network_server_address"
+            component={Input}
+            autoComplete="on"
           />
           <Form.Field
-            title={sharedMessages.joinServerAddress}
-            placeholder={joinServerAddressPlaceholder}
-            name="join_server_address"
-            disabled={!isOTAA || externalJs}
-            autoComplete="on"
+            title={sharedMessages.applicationServerAddress}
+            placeholder={sharedMessages.addressPlaceholder}
+            name="application_server_address"
             component={Input}
+            autoComplete="on"
           />
+          {isOTAA && (
+            <>
+              {!hideExternalJs && (
+                <Form.Field
+                  title={sharedMessages.useExternalJoinServer}
+                  name="_external_js"
+                  onChange={handleExternalJsChange}
+                  component={Checkbox}
+                />
+              )}
+              <Form.Field
+                title={sharedMessages.joinServerAddress}
+                placeholder={joinServerAddressPlaceholder}
+                name="join_server_address"
+                disabled={!isOTAA || externalJs}
+                autoComplete="on"
+                component={Input}
+              />
+            </>
+          )}
         </>
       )}
       <Form.Field
