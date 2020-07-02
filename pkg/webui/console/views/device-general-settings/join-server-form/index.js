@@ -42,6 +42,10 @@ const isNwkKeyHidden = ({ root_keys }) =>
 const isAppKeyHidden = ({ root_keys }) =>
   Boolean(root_keys) && Boolean(root_keys.app_key) && !Boolean(root_keys.app_key.key)
 
+// The `net_id` value can be null as empty value, which needs to be
+// transformed to an empty string for the byte input to accept it.
+const netIdDecoder = value => (value === null ? '' : value)
+
 const JoinServerForm = React.memo(props => {
   const { device, onSubmit, onSubmitSuccess, mayReadKeys, mayEditKeys } = props
 
@@ -134,6 +138,7 @@ const JoinServerForm = React.memo(props => {
         min={3}
         max={3}
         component={Input}
+        decode={netIdDecoder}
       />
       <Form.Field
         title={sharedMessages.asServerID}
