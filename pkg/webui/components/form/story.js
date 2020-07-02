@@ -113,14 +113,17 @@ storiesOf('Form', module)
           checkboxes: Yup.object().test('checkboxes', 'Cannot be empty', values =>
             Object.values(values).reduce((acc, curr) => acc || curr, false),
           ),
+          about: Yup.string().max(2000),
         })}
         initialValues={{
           name: '',
           description: '',
           radio: 'radio1',
           checkboxes: {},
+          about: '',
         }}
       >
+        <Form.SubTitle title="General information" />
         <Form.Field
           component={Input}
           type="text"
@@ -128,13 +131,6 @@ storiesOf('Form', module)
           placeholder="Name"
           title="Name"
           required
-        />
-        <Form.Field
-          component={Input}
-          type="text"
-          name="description"
-          placeholder="Description"
-          title="Description"
         />
         <Form.Field
           component={Checkbox.Group}
@@ -152,6 +148,15 @@ storiesOf('Form', module)
           <Radio label="Radio 2" value="radio2" />
           <Radio label="Radio 3" value="radio3" />
         </Form.Field>
+        <Form.CollapseSection title="Optional information" id="optional-section">
+          <Form.Field
+            component={Input}
+            type="textarea"
+            name="about"
+            title="About"
+            description="Tell us about yourself"
+          />
+        </Form.CollapseSection>
         <SubmitBar>
           <Form.Submit message="Submit" component={SubmitButton} />
         </SubmitBar>

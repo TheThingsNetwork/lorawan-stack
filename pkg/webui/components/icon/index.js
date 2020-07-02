@@ -52,6 +52,8 @@ const hardcoded = {
   import_devices: 'playlist_add',
   collaborators: 'people',
   logout: 'power_settings_new',
+  expand_down: 'keyboard_arrow_down',
+  expand_up: 'keyboard_arrow_up',
 }
 
 const Icon = function({ icon, className, nudgeUp, nudgeDown, small, large, ...rest }) {
