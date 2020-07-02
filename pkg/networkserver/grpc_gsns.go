@@ -923,7 +923,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, *fNwkSIntKeyEnvelope, ns.KeyVault)
 			if err != nil {
 				log.FromContext(ctx).WithError(err).WithField("kek_label", fNwkSIntKeyEnvelope.KEKLabel).Warn("Failed to unwrap FNwkSIntKey, skip")
-				return true
+				return false
 			}
 			fCnt := match.FCnt()
 			macVersion := match.LoRaWANVersion()
@@ -934,19 +934,19 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 					},
 				}, ns.defaultMACSettings,
 				) {
-					return true
+					return false
 				}
 				// FCnt reset
 				fCnt = pld.FCnt
 				if !matchCmacf(ctx, fNwkSIntKey, macVersion, fCnt, up) {
-					return true
+					return false
 				}
 			}
 
 			dev, ctx, err := ns.devices.GetByID(ctx, appID, devID, handleDataUplinkGetPaths[:])
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Warn("Failed to get device after cmacf matching")
-				return true
+				return false
 			}
 
 			// TODO: Reuse CMACF and decoded values.
@@ -957,7 +957,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			})
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Debug("Failed to match device")
-				return true
+				return false
 			}
 			ctx = matched.Context
 			pld.FullFCnt = matched.FCnt
@@ -968,7 +968,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				"device_channel_index", up.DeviceChannelIndex,
 				"device_uid", unique.ID(ctx, matched.Device.EndDeviceIdentifiers),
 			))
-			return false
+			return true
 		}); err != nil {
 		logRegistryRPCError(ctx, err, "Failed to find devices in registry by DevAddr")
 		return err
