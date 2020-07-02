@@ -19,11 +19,11 @@ import (
 
 	ptypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 )
 
@@ -165,6 +165,21 @@ func TestGatewaysCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(ids, should.NotBeNil) {
 			a.So(ids.GatewayID, should.Equal, created.GatewayID)
+		}
+
+		_, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+			Gateway: ttnpb.Gateway{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: "bar",
+					EUI:       &eui,
+				},
+				Name: "Bar Gateway",
+			},
+			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(err, should.HaveSameErrorDefinitionAs, errGatewayEUITaken)
 		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
