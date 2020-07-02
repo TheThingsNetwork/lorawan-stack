@@ -73,3 +73,57 @@ export const isDeviceJoined = device =>
   Boolean(device.session.dev_addr) &&
   Boolean(device.session.keys) &&
   Boolean(Object.keys(device.session.keys).length)
+
+/**
+ * Checks whether component addresses of the end device are configured in the local cluster.
+ * For `ABP` and `multicast` devices both `application_server_address` and `network_server_address`
+ * must point to NS and AS in the current cluster. For `OTAA` `application_server_address`,
+ * `network_server_server` and `join_server_address` must point to NS, AS and JS in the current cluster.
+ *
+ * @param {object} device - The device object.
+ * @param {object} asConfig - The application server configuration.
+ * @param {object} nsConfig - The network server configuration.
+ * @param {object} jsConfig - The join server configuration.
+ *
+ * @returns {boolean} - `true` if the end device has all required component addresses configured
+ * within the local cluster, `false` otherwise.
+ */
+export const usesDefaultComponentAddresses = (device, asConfig, nsConfig, jsConfig) => {
+  const { application_server_address, network_server_address, join_server_address } = device
+
+  if (isDeviceOTAA(device)) {
+    return (
+      canUseDefaultComponentAddresses(device, asConfig, nsConfig, jsConfig) &&
+      getHostnameFromUrl(asConfig.base_url) === application_server_address &&
+      getHostnameFromUrl(nsConfig.base_url) === network_server_address &&
+      getHostnameFromUrl(jsConfig.base_url) === join_server_address
+    )
+  }
+
+  return (
+    canUseDefaultComponentAddresses(device, asConfig, nsConfig, jsConfig) &&
+    getHostnameFromUrl(asConfig.base_url) === application_server_address &&
+    getHostnameFromUrl(nsConfig.base_url) === network_server_address
+  )
+}
+
+/**
+ * Checks whether the end device can be configured in all requred stack components within the local
+ * cluster. For `ABP` and `multicast` device NS and AS must be in the cluster. For `OTAA` devices NS,
+ * AS and JS must be in the local cluster.
+ *
+ * @param {object} device - The device object.
+ * @param {object} asConfig - The application server configuration.
+ * @param {object} nsConfig - The network server configuration.
+ * @param {object} jsConfig - The join server configuration.
+ *
+ * @returns {boolean} - `true` if the end device can be configured in all required stack components
+ * in the current cluster, `false` otherwise.
+ */
+export const canUseDefaultComponentAddresses = (device, asConfig, nsConfig, jsConfig) => {
+  if (isDeviceOTAA(device)) {
+    return asConfig.enabled && nsConfig.enabled && jsConfig.enabled
+  }
+
+  return asConfig.enabled && nsConfig.enabled
+}
