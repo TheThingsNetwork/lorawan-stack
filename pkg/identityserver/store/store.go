@@ -88,11 +88,15 @@ func (s *store) deleteEntity(ctx context.Context, entityID ttnpb.Identifiers) er
 
 var (
 	errDatabase      = errors.DefineInternal("database", "database error")
-	errAlreadyExists = errors.DefineAlreadyExists("already_exists", "entity already exists", "field", "value")
-	errIDTaken       = errors.DefineAlreadyExists("id_taken", "ID already taken")
+	errAlreadyExists = errors.DefineAlreadyExists("already_exists", "entity already exists")
+
+	// ErrIDTaken is returned when an entity can not be created because the ID is already taken.
+	ErrIDTaken = errors.DefineAlreadyExists("id_taken", "ID already taken")
+	// ErrEUITaken is returned when an entity can not be created because the EUI is already taken.
+	ErrEUITaken = errors.DefineAlreadyExists("eui_taken", "EUI already taken")
 )
 
-var uniqueViolationRegex = regexp.MustCompile(`duplicate key value \(([^)]+)\)=\(([^)]+)\)`)
+var uniqueViolationRegex = regexp.MustCompile(`duplicate key value( .+)? violates unique constraint "([a-z_]+)"`)
 
 func convertError(err error) error {
 	switch err {
@@ -106,10 +110,14 @@ func convertError(err error) error {
 		switch pqErr.Code.Name() {
 		case "unique_violation":
 			if match := uniqueViolationRegex.FindStringSubmatch(pqErr.Message); match != nil {
-				if strings.HasSuffix(match[1], "_id") {
-					return errIDTaken.WithCause(err)
+				switch {
+				case strings.HasSuffix(match[2], "_id_index"):
+					return ErrIDTaken.WithCause(err)
+				case strings.HasSuffix(match[2], "_eui_index"):
+					return ErrEUITaken.WithCause(err)
+				default:
+					return errAlreadyExists.WithCause(err).WithAttributes("index", match[2])
 				}
-				return errAlreadyExists.WithCause(err).WithAttributes("field", match[1], "value", match[2])
 			}
 			return errAlreadyExists.WithCause(err)
 		default:
