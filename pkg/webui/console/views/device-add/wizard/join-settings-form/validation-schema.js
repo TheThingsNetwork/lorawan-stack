@@ -31,10 +31,9 @@ const validationSchema = Yup.object()
         const keySchema = Yup.lazy(() => {
           return mayEditKeys
             ? Yup.object().shape({
-                key: Yup.string().emptyOrLength(
-                  16 * 2,
-                  Yup.passValues(sharedMessages.validateLength),
-                ), // 16 Byte hex.
+                key: Yup.string()
+                  .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
+                  .required(sharedMessages.validateRequired),
               })
             : Yup.object().strip()
         })

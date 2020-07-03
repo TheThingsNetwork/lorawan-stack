@@ -65,6 +65,18 @@ describe('<JoinSettingsForm /> validation schema', () => {
           },
         })
 
+      it('should require `app_key`', done => {
+        try {
+          validate(schema)
+          done.fail('should fail')
+        } catch (error) {
+          expect(error).toBeDefined()
+          expect(error.name).toBe('ValidationError')
+          expect(error.path).toBe('root_keys.app_key.key')
+          done()
+        }
+      })
+
       it('should handle `app_key`', () => {
         const appKey = '1'.repeat(32)
 
@@ -108,22 +120,35 @@ describe('<JoinSettingsForm /> validation schema', () => {
           },
         })
 
-      it('should handle `app_key`', () => {
+      it('should require `app_key`', done => {
+        try {
+          validate(schema)
+          done.fail('should fail')
+        } catch (error) {
+          expect(error).toBeDefined()
+          expect(error.name).toBe('ValidationError')
+          expect(error.path).toBe('root_keys.app_key.key')
+          done()
+        }
+      })
+
+      it('should require `nwk_key`', done => {
         const appKey = '1'.repeat(32)
 
         schema.root_keys.app_key = { key: appKey }
 
-        const validatedValue = validate(schema)
-
-        expect(validatedValue).toBeDefined()
-        expect(validatedValue.root_keys).toBeDefined()
-
-        const { root_keys } = validatedValue
-        expect(root_keys.app_key).toBeDefined()
-        expect(root_keys.app_key.key).toBe(appKey)
+        try {
+          validate(schema)
+          done.fail('should fail')
+        } catch (error) {
+          expect(error).toBeDefined()
+          expect(error.name).toBe('ValidationError')
+          expect(error.path).toBe('root_keys.nwk_key.key')
+          done()
+        }
       })
 
-      it('should handle `nwk_key`', () => {
+      it('should handle `root_keys`', () => {
         const appKey = '1'.repeat(32)
         const nwkKey = '2'.repeat(32)
 
