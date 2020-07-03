@@ -23,6 +23,7 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 
+import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -56,8 +57,17 @@ const IdentityServerForm = React.memo(props => {
   const { name, ids } = device
 
   const formRef = React.useRef(null)
-  const [error, setError] = React.useState('')
+  // Store default join server address that is used to fill the `join_server_address` field when
+  // `_external_js` checkbox is unchecked.
+  const jsAddressRef = React.useRef(
+    device.join_server_address
+      ? device.join_server_address
+      : jsConfig.enabled
+      ? getHostnameFromUrl(jsConfig.base_url)
+      : '',
+  )
 
+  const [error, setError] = React.useState('')
   const [externalJs, setExternaljs] = React.useState(hasExternalJs(device) && mayReadKeys)
 
   const validationContext = React.useMemo(
@@ -84,10 +94,13 @@ const IdentityServerForm = React.memo(props => {
       const { setValues, values } = formRef.current
 
       setExternaljs(externalJsChecked)
-
       setValues(
         validationSchema.cast(
-          { ...values, _external_js: externalJsChecked },
+          {
+            ...values,
+            _external_js: externalJsChecked,
+            join_server_address: externalJsChecked ? undefined : jsAddressRef.current,
+          },
           { context: validationContext },
         ),
       )
