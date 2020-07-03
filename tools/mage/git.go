@@ -116,7 +116,7 @@ var gitCommitPrefixes = []string{
 	"is",
 	"js",
 	"ns",
-	"oauth",
+	"account",
 	"pba",
 	"qrg",
 	"util",
