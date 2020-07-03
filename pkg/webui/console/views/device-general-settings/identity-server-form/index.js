@@ -57,37 +57,48 @@ const IdentityServerForm = React.memo(props => {
 
   const formRef = React.useRef(null)
   const [error, setError] = React.useState('')
+
   const [externalJs, setExternaljs] = React.useState(hasExternalJs(device) && mayReadKeys)
+
+  const validationContext = React.useMemo(
+    () => ({
+      lorawanVersion: device.lorawan_version,
+      supportsJoin: device.supports_join,
+    }),
+    [device.lorawan_version, device.supports_join],
+  )
 
   const initialValues = React.useMemo(() => {
     const initialValues = {
       ...device,
       _external_js: hasExternalJs(device) && mayReadKeys,
-      _lorawan_version: device.lorawan_version,
-      _supports_join: device.supports_join,
       attributes: mapAttributesToFormValue(device.attributes),
     }
 
-    return validationSchema.cast(initialValues)
-  }, [device, mayReadKeys])
+    return validationSchema.cast(initialValues, { context: validationContext })
+  }, [device, mayReadKeys, validationContext])
 
-  const handleExternalJsChange = React.useCallback(evt => {
-    const { checked: externalJsChecked } = evt.target
-    const { setValues, values } = formRef.current
+  const handleExternalJsChange = React.useCallback(
+    evt => {
+      const { checked: externalJsChecked } = evt.target
+      const { setValues, values } = formRef.current
 
-    setExternaljs(externalJsChecked)
+      setExternaljs(externalJsChecked)
 
-    setValues(validationSchema.cast({ ...values, _external_js: externalJsChecked }))
-  }, [])
+      setValues(
+        validationSchema.cast(
+          { ...values, _external_js: externalJsChecked },
+          { context: validationContext },
+        ),
+      )
+    },
+    [validationContext],
+  )
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
-      const castedValues = validationSchema.cast(values)
-      const updatedValues = diff(initialValues, castedValues, [
-        '_external_js',
-        '_lorawan_version',
-        '_supports_join',
-      ])
+      const castedValues = validationSchema.cast(values, { context: validationContext })
+      const updatedValues = diff(initialValues, castedValues, ['_external_js'])
 
       const update =
         'attributes' in updatedValues
@@ -104,7 +115,7 @@ const IdentityServerForm = React.memo(props => {
         setError(err)
       }
     },
-    [initialValues, onSubmit, onSubmitSuccess],
+    [initialValues, onSubmit, onSubmitSuccess, validationContext],
   )
 
   const onDeviceDelete = React.useCallback(async () => {
@@ -150,6 +161,7 @@ const IdentityServerForm = React.memo(props => {
   return (
     <Form
       validationSchema={validationSchema}
+      validationContext={validationContext}
       initialValues={initialValues}
       onSubmit={onFormSubmit}
       error={error}
