@@ -210,6 +210,8 @@ export default class DeviceGeneralSettings extends React.Component {
                 onDeleteSuccess={this.handleDeleteSuccess}
                 onDeleteFailure={this.handleDeleteFailure}
                 jsConfig={jsConfig}
+                nsConfig={nsConfig}
+                asConfig={asConfig}
                 mayReadKeys={mayReadKeys}
               />
             </Collapse>

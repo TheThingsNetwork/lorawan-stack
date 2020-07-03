@@ -26,7 +26,6 @@ import KeyValueMap from '@ttn-lw/components/key-value-map'
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
 
 import { mapFormValueToAttributes, mapAttributesToFormValue } from '@console/lib/attributes'
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
@@ -50,6 +49,9 @@ const IdentityServerForm = React.memo(props => {
     onDeleteSuccess,
     onDeleteFailure,
     mayReadKeys,
+    jsConfig,
+    nsConfig,
+    asConfig,
   } = props
   const { name, ids } = device
 
@@ -114,9 +116,9 @@ const IdentityServerForm = React.memo(props => {
     }
   }, [onDelete, onDeleteFailure, onDeleteSuccess])
 
-  const { enabled: jsEnabled } = selectJsConfig()
-  const { enabled: asEnabled } = selectAsConfig()
-  const { enabled: nsEnabled } = selectNsConfig()
+  const { enabled: jsEnabled } = jsConfig
+  const { enabled: asEnabled } = asConfig
+  const { enabled: nsEnabled } = nsConfig
 
   const lorawanVersion = parseLorawanMacVersion(device.lorawan_version)
   const isOTAA = isDeviceOTAA(device)
@@ -263,8 +265,11 @@ const IdentityServerForm = React.memo(props => {
 })
 
 IdentityServerForm.propTypes = {
+  asConfig: PropTypes.stackComponent.isRequired,
   device: PropTypes.device.isRequired,
+  jsConfig: PropTypes.stackComponent.isRequired,
   mayReadKeys: PropTypes.bool.isRequired,
+  nsConfig: PropTypes.stackComponent.isRequired,
   onDelete: PropTypes.func.isRequired,
   onDeleteFailure: PropTypes.func.isRequired,
   onDeleteSuccess: PropTypes.func.isRequired,
