@@ -79,4 +79,4 @@ It is possible to combine memberships and API keys, so you can for instance crea
 
 ## OAuth
 
-The Identity Server is an OAuth 2.0 server. Users can authorize OAuth clients to access their data, manage authorizations, and even manage individual access tokens.
+The Identity Server is an OAuth 2.0 server. Users can authorize OAuth clients to access their data, manage authorizations, and even manage individual access tokens. The OAuth mechanisms are handled by the Account application of the Identity Server.

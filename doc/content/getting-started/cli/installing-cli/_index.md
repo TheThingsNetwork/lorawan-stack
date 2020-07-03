@@ -58,7 +58,7 @@ If the deployment is using a CA that is not already trusted by your system, use 
 Alternatively, you can create a file named `.ttn-lw-cli.yml` and paste the following contents:
 
 ```yaml
-oauth-server-address: 'https://thethings.example.com/oauth'
+oauth-server-address: 'https://thethings.example.com/account'
 
 identity-server-grpc-address: 'thethings.example.com:8884'
 gateway-server-grpc-address: 'thethings.example.com:8884'

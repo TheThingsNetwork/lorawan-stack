@@ -76,7 +76,7 @@ The topic is typically a few characters long and should always be present. Accep
 - `is`: The Identity Server component
 - `js`: The Join Server component
 - `ns`: The Network Server component
-- `oauth`: The OAuth part of the Identity Server or its UI
+- `account`: The Account application of the Identity Server or its UI
 - `qrg`: The QR Code Generator component
 - `util`: utilities
 

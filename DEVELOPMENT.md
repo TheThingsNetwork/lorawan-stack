@@ -97,7 +97,7 @@ $ go run ./cmd/ttn-lw-stack -c <custom-location>/ttn-lw-stack.yml start
 In order to login, you will need to use the correct OAuth Server Address:
 
 ```bash
-$ export TTN_LW_OAUTH_SERVER_ADDRESS=http://localhost:1885/oauth
+$ export TTN_LW_OAUTH_SERVER_ADDRESS=http://localhost:1885/account
 $ go run ./cmd/ttn-lw-cli login
 ```
 
@@ -185,7 +185,7 @@ The folder structure of the project looks as follows:
 │   ├── metrics         package for metrics collection
 │   ├── ttnpb           contains generated code from our protocol buffer definitions and some helper functions
 │   ├── types           contains primitive types
-│   ├── webui           contains js code for the console and oauth provider
+│   ├── webui           contains js code for the Console and Account application
 │   └── ...
 ├── public              frontend code will be compiled to this folder - not added to git
 ├── release             binaries will be compiled to this folder - not added to git
@@ -225,7 +225,7 @@ For more details on how our documentation site is written, see the [Hugo docs](h
 
 ### Web UI
 
-The Things Stack for LoRaWAN includes two frontend applications: the **Console** and **OAuth Provider**. Both applications use [React](https://reactjs.org/) as frontend framework. The `console` and `oauth` packages of the backend expose their respective web servers and handle all logic that cannot be done in the browser. Otherwise both applications are single page applications (SPA) that run entirely in the browser.
+The Things Stack for LoRaWAN includes two frontend applications: the **Console** and **Account Application**. Both applications use [React](https://reactjs.org/) as frontend framework. The `console` and `accountapp` packages of the backend expose their respective web servers and handle all logic that cannot be done in the browser. Otherwise both applications are single page applications (SPA) that run entirely in the browser.
 
 The folder structure of the frontend looks as follows:
 
@@ -242,13 +242,13 @@ The folder structure of the frontend looks as follows:
 ├── containers        global react container components
 ├── lib               global utility classes and functions
 ├── locales           frontend and backend locale jsons used for i18n
-├── oauth             root of the oauth application
+├── account           root of the Account application
 │   ├── api           api definitions to communicate with The Things Stack
 │   ├── store         redux actions, reducers and logic middlewares
-│   ├── views         whole view components of the oauth provider (~pages)
+│   ├── views         whole view components of the Account app (~pages)
 ├── styles            global stylus (~css) styles and mixins
-├── console.js        entry point of the console app
-├── oauth.js          entry point of the oauth app
+├── console.js        entry point of the Console app
+├── account.js          entry point of the Account app
 ├── template.go       go template module used to render the frontend HTML
 ```
 
@@ -268,14 +268,14 @@ In order to set up The Things Stack to support running the frontend via `webpack
 ```bash
 NODE_ENV="development"
 TTN_LW_LOG_LEVEL="debug"
-TTN_LW_IS_OAUTH_UI_JS_FILE="libs.bundle.js oauth.js"
+TTN_LW_IS_OAUTH_UI_JS_FILE="libs.bundle.js account.js"
 TTN_LW_CONSOLE_UI_JS_FILE="libs.bundle.js console.js"
 TTN_LW_CONSOLE_UI_CANONICAL_URL="http://localhost:8080/console"
-TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL="http://localhost:8080/oauth/authorize"
-TTN_LW_CONSOLE_OAUTH_LOGOUT_URL="http://localhost:8080/oauth/logout"
-TTN_LW_CONSOLE_OAUTH_TOKEN_URL="http://localhost:8080/oauth/token"
-TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/oauth"
-TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth.js"
+TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL="http://localhost:8080/account/authorize"
+TTN_LW_CONSOLE_OAUTH_LOGOUT_URL="http://localhost:8080/account/logout"
+TTN_LW_CONSOLE_OAUTH_TOKEN_URL="http://localhost:8080/account/token"
+TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/account"
+TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/account"
 TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
 ```
 
@@ -556,13 +556,13 @@ Our `import` statements use the following order, each separated by empty newline
     1. Global presentational components (`@ttn-lw/components/*`)
     2. Global container components (`@ttn-lw/containers/*`)
     3. Global utility components (`@ttn-lw/lib/components/*`)
-    4. Local presentational components (`@{console|oauth}/components/*`)
-    5. Local container components (`@{console|oauth}/containers/*`)
-    6. Local utility components (`@{console|oauth}/lib/components/*`)
-    7. View components (`@{console|oauth}/views/*`)
+    4. Local presentational components (`@{console|account}/components/*`)
+    5. Local container components (`@{console|account}/containers/*`)
+    6. Local utility components (`@{console|account}/lib/components/*`)
+    7. View components (`@{console|account}/views/*`)
   4. Utilities
     1. Global utilities (`@ttn-lw/lib/*`)
-    2. Local utilities (`@{console|oauth}/lib/*`)
+    2. Local utilities (`@{console|account}/lib/*`)
   5. Store modules
     1. Actions
     2. Reducers
@@ -654,7 +654,7 @@ If you can answer at least one of those questions with yes, then you likely have
 
 #### Global or Application Scope?
 
-Components can be categorized as either local (e.g. `pkg/webui/{console|oauth}/{components|containers}`) or global (e.g. `pkg/webui/{components|containers}`). The distinction should come naturally: Global components are ones that can be used universally in every application. Local components are tied to a specific use case inside the respective application.
+Components can be categorized as either local (e.g. `pkg/webui/{console|account}/{components|containers}`) or global (e.g. `pkg/webui/{components|containers}`). The distinction should come naturally: Global components are ones that can be used universally in every application. Local components are tied to a specific use case inside the respective application.
 
 Sometimes, you might find that during implementing an application specific component that it can actually be generalized without much refactoring and hence be a useful addition to our global component library.
 
@@ -999,7 +999,7 @@ Run mage in verbose mode: `tools/bin/mage -v {target}`
 
 Console is typically exposed at `http://localhost:8080/console`,
 API at `http://localhost:8080/console`,
-OAuth at `http://localhost:8080/oauth`,
+Account application at `http://localhost:8080/account`,
 etc
 
 #### Problem: Browser displays error:

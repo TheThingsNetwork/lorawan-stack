@@ -171,12 +171,12 @@ is:
     network:
       name: 'The Things Stack'
       console-url: 'https://thethings.example.com/console'
-      identity-server-url: 'https://thethings.example.com/oauth'
+      identity-server-url: 'https://thethings.example.com/account'
 
   # Web UI configuration for "thethings.example.com":
-  oauth:
+  accountapp:
     ui:
-      canonical-url: 'https://thethings.example.com/oauth'
+      canonical-url: 'https://thethings.example.com/account'
       is:
         base-url: 'https://thethings.example.com/api/v3'
 
@@ -246,9 +246,9 @@ console:
       base-url: 'https://thethings.example.com/api/v3'
 
   oauth:
-    authorize-url: 'https://thethings.example.com/oauth/authorize'
-    logout-url: 'https://thethings.example.com/oauth/logout'
-    token-url: 'https://thethings.example.com/oauth/token'
+    authorize-url: 'https://thethings.example.com/account/authorize'
+    logout-url: 'https://thethings.example.com/account/logout'
+    token-url: 'https://thethings.example.com/account/token'
     client-id: 'console'
     client-secret: 'console'          # choose or generate a secret (*)
 ```

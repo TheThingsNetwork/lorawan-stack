@@ -50,36 +50,36 @@ If your custom templates rely on other files, such as headers or footers, those 
 
 - `is.email.templates.includes`: The email templates that will be preloaded on startup
 
-## OAuth UI Options
+## Account application UI Options
 
-The OAuth user interface needs to be configured with at least the canonical URL and the base URL of the Identity Server's HTTP API. The canonical URL needs to be the full URL of the UI, and looks like `https://thethings.example.com/oauth`. The base URL of the Identity Server's HTTP API looks like `https://thethings.example.com/api/v3`.
+The Account application user interface needs to be configured with at least the canonical URL and the base URL of the Identity Server's HTTP API. The canonical URL needs to be the full URL of the UI, and looks like `https://thethings.example.com/account`. The base URL of the Identity Server's HTTP API looks like `https://thethings.example.com/api/v3`.
 
-- `is.oauth.ui.canonical-url`: The page canonical URL
-- `is.oauth.ui.is.base-url`: Base URL to the HTTP API
+- `is.accountapp.ui.canonical-url`: The page canonical URL
+- `is.accountapp.ui.is.base-url`: Base URL to the HTTP API
 
-If you do not want to serve the OAuth user interface on `/oauth`, you may customize the mount path.
+If you do not want to serve the Account app user interface on `/account`, you may customize the mount path.
 
-- `is.oauth.mount`: Path on the server where the OAuth server will be served
+- `is.accountapp.mount`: Path on the server where the Account application server will be served
 
-If page assets for the OAuth UI are served from a CDN or on a different path on the server, the base URL needs to be customized as well. If you want to [customize the branding]({{< ref "/reference/branding" >}}) of the OAuth UI, you can set the base URL for where your branding assets are located.
+If page assets for the Account application UI are served from a CDN or on a different path on the server, the base URL needs to be customized as well. If you want to [customize the branding]({{< ref "/reference/branding" >}}) of the Account application UI, you can set the base URL for where your branding assets are located.
 
-- `is.oauth.ui.assets-base-url`: The base URL to the page assets
-- `is.oauth.ui.branding-base-url`: The base URL to the branding assets
+- `is.accountapp.ui.assets-base-url`: The base URL to the page assets
+- `is.accountapp.ui.branding-base-url`: The base URL to the branding assets
 
 The appearance of {{% tts %}} can optionally be customized.
 
-- `is.oauth.ui.site-name`: The site name
-- `is.oauth.ui.title`: The page title
-- `is.oauth.ui.sub-title`: The page sub-title
-- `is.oauth.ui.descriptions`: The page description
-- `is.oauth.ui.language`: The page language
-- `is.oauth.ui.theme-color`: The page theme color
+- `is.accountapp.ui.site-name`: The site name
+- `is.accountapp.ui.title`: The page title
+- `is.accountapp.ui.sub-title`: The page sub-title
+- `is.accountapp.ui.descriptions`: The page description
+- `is.accountapp.ui.language`: The page language
+- `is.accountapp.ui.theme-color`: The page theme color
 
 Further customization of the CSS files, JS files and icons is also possible:
 
-- `is.oauth.ui.css-file`: The names of the CSS files
-- `is.oauth.ui.js-file`: The names of the JS files
-- `is.oauth.ui.icon-prefix`: The prefix to put before the page icons (favicon.ico, touch-icon.png, og-image.png)
+- `is.accountapp.ui.css-file`: The names of the CSS files
+- `is.accountapp.ui.js-file`: The names of the JS files
+- `is.accountapp.ui.icon-prefix`: The prefix to put before the page icons (favicon.ico, touch-icon.png, og-image.png)
 
 ## Profile Picture Storage Options
 

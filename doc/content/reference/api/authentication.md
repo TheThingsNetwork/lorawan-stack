@@ -11,7 +11,7 @@ API calls can be authorized either by providing an **API key**, **OAuth access t
 - Usage with gRPC [call credentials](https://grpc.io/docs/guides/auth.html#authentication-api) (in the `authorization` header): `Bearer XXXXX`
 - Usage with MQTT: Password: `XXXXX`
 
-Here, `XXXXX` is either a valid **API key**, a valid **OAuth access token** or a valid **session secret**.
+Here, `XXXXX` is either a valid **API key**, a valid **OAuth access token** or a valid **session secret**. The Things Stack for LoRaWAN handles the OAuth flow via its Account application, which is part of the Identity Server.
 
 ## API keys
 
@@ -24,7 +24,7 @@ API keys are the simplest way of authorization. API keys do not expire, are revo
 
 ## Session cookies
 
-Session cookies provide a way to authorize API usage using the session cookie obtained during authentication with the OAuth provider (`/oauth/login`). Since cookies are domain-scoped, this will only work for requests originating from the same domain as the API. Session cookies authorize full access to all owned resources of the user associated with the session. Any other means of authorization will take precedence if present in the request (e.g. a session cookie will be disregarded if an `Authorization` header is already present in the request).
+Session cookies provide a way to authorize API usage using the session cookie obtained during authentication with the OAuth provider (`/account/login`). Since cookies are domain-scoped, this will only work for requests originating from the same domain as the API. Session cookies authorize full access to all owned resources of the user associated with the session. Any other means of authorization will take precedence if present in the request (e.g. a session cookie will be disregarded if an `Authorization` header is already present in the request).
 
 ## OAuth access tokens
 
@@ -41,7 +41,7 @@ To use this method, you first need an **OAuth client registration**:
 After your OAuth client Registration is accepted, you can **request authorization** by sending the user to the **authorization URL**:
 
 ```
-https://<HOSTNAME>/oauth/authorize?client_id=<CLIENT-ID>&redirect_uri=<REDIRECT-URI>&state=<STATE>&response_type=code
+https://<HOSTNAME>/account/authorize?client_id=<CLIENT-ID>&redirect_uri=<REDIRECT-URI>&state=<STATE>&response_type=code
 ```
 
 - The `HOSTNAME` is the hostname of the Identity Server.
@@ -61,7 +61,7 @@ https://<REDIRECT-URI>/?code=<AUTHORIZATION-CODE>
 Your OAuth client can exchange this **authorization code** for an **OAuth access token** by making a `POST` request to the **token URL**:
 
 ```
-https://<HOSTNAME>/oauth/token
+https://<HOSTNAME>/account/token
 ```
 
 The request must use **Basic Auth** ([RFC7617](https://tools.ietf.org/html/rfc7617)) with the **client ID** as username and the **client secret** as password.
@@ -91,7 +91,7 @@ You can now use the **OAuth access token** until it expires.
 If you have a **refresh token**, you can exchange this for a new **OAuth access token** after the old one expires by making another `POST` request to the **token URL**, similar to the exchange of the **authorization code** you did before:
 
 ```
-https://<HOSTNAME>/oauth/token
+https://<HOSTNAME>/account/token
 ```
 
 The request must use **Basic Auth** ([RFC7617](https://tools.ietf.org/html/rfc7617)) with the **client ID** as username and the **client secret** as password.
