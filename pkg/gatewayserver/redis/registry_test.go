@@ -68,13 +68,6 @@ func TestRegistry(t *testing.T) {
 		LastStatus:             nil,
 	}
 
-	emptyStats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt:          &now,
-		Protocol:             "dummy",
-		LastStatusReceivedAt: nil,
-		LastStatus:           nil,
-	}
-
 	t.Run("GetNonExisting", func(t *testing.T) {
 		stats, err := registry.Get(ctx, ids)
 		a.So(stats, should.BeNil)
@@ -82,7 +75,7 @@ func TestRegistry(t *testing.T) {
 	})
 
 	t.Run("EmptyStats", func(t *testing.T) {
-		err := registry.Set(ctx, ids3, emptyStats, false, false, false)
+		err := registry.Set(ctx, ids3, nil)
 		a.So(err, should.BeNil)
 		retrieved, err := registry.Get(ctx, ids3)
 		a.So(retrieved, should.BeNil)
@@ -90,7 +83,7 @@ func TestRegistry(t *testing.T) {
 	})
 
 	t.Run("SetAndClear", func(t *testing.T) {
-		err := registry.Set(ctx, ids, initialStats, true, true, true)
+		err := registry.Set(ctx, ids, initialStats)
 		a.So(err, should.BeNil)
 		retrieved, err := registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
@@ -102,7 +95,7 @@ func TestRegistry(t *testing.T) {
 		a.So(errors.IsNotFound(err), should.BeTrue)
 
 		// Unset
-		err = registry.Set(ctx, ids, nil, true, true, true)
+		err = registry.Set(ctx, ids, nil)
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(errors.IsNotFound(err), should.BeTrue)
@@ -110,8 +103,8 @@ func TestRegistry(t *testing.T) {
 	})
 
 	t.Run("ClearManyTimes", func(t *testing.T) {
-		a.So(registry.Set(ctx, ids, nil, true, true, true), should.BeNil)
-		a.So(registry.Set(ctx, ids, nil, true, true, true), should.BeNil)
+		a.So(registry.Set(ctx, ids, nil), should.BeNil)
+		a.So(registry.Set(ctx, ids, nil), should.BeNil)
 	})
 
 	t.Run("UpdateUplink", func(t *testing.T) {
@@ -121,26 +114,15 @@ func TestRegistry(t *testing.T) {
 		// Update uplink stats, make sure they work
 		stats.UplinkCount = 10
 		stats.LastUplinkReceivedAt = &now
-		err := registry.Set(ctx, ids, stats, true, true, true)
+		err := registry.Set(ctx, ids, stats)
 		a.So(err, should.BeNil)
 		retrieved, err := registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
 		a.So(retrieved, should.Resemble, stats)
 
-		// Keep a copy of the uplink stats
-		correct := deepcopy.Copy(stats)
-
-		// Update downlink stats as well, expect no change
-		stats.DownlinkCount += 100
-		err = registry.Set(ctx, ids, stats, true, false, false)
-		a.So(err, should.BeNil)
-		retrieved, err = registry.Get(ctx, ids)
-		a.So(err, should.BeNil)
-		a.So(retrieved, should.Resemble, correct)
-
 		// Now update downlink also
 		stats.LastDownlinkReceivedAt = &now
-		err = registry.Set(ctx, ids, stats, true, true, false)
+		err = registry.Set(ctx, ids, stats)
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
@@ -149,101 +131,7 @@ func TestRegistry(t *testing.T) {
 		// Unset uplink
 		stats.LastUplinkReceivedAt = nil
 		stats.UplinkCount = 0
-		err = registry.Set(ctx, ids, nil, true, false, false)
-		a.So(err, should.BeNil)
-		retrieved, err = registry.Get(ctx, ids)
-		a.So(err, should.BeNil)
-		a.So(retrieved, should.Resemble, stats)
-	})
-
-	t.Run("UpdateDownlink", func(t *testing.T) {
-		now := time.Now().UTC().Add(2 * time.Minute)
-		stats := deepcopy.Copy(initialStats).(*ttnpb.GatewayConnectionStats)
-
-		// Reset stats from previous test
-		a.So(registry.Set(ctx, ids, nil, true, true, true), should.BeNil)
-		a.So(registry.Set(ctx, ids, stats, true, true, true), should.BeNil)
-		retrieved, err := registry.Get(ctx, ids)
-		a.So(err, should.BeNil)
-		a.So(retrieved, should.Resemble, stats)
-
-		// Update downlink stats, make sure they work
-		stats.DownlinkCount = 10
-		stats.LastDownlinkReceivedAt = &now
-		err = registry.Set(ctx, ids, stats, false, true, false)
-		a.So(err, should.BeNil)
-		retrieved, err = registry.Get(ctx, ids)
-		a.So(err, should.BeNil)
-		a.So(retrieved, should.Resemble, stats)
-
-		// Keep a copy of the dowlink stats
-		correct := deepcopy.Copy(stats)
-
-		// Update uplink stats as well, expect no change
-		stats.UplinkCount += 100
-		err = registry.Set(ctx, ids, stats, false, true, false)
-		a.So(err, should.BeNil)
-		retrieved, err = registry.Get(ctx, ids)
-		a.So(err, should.BeNil)
-		a.So(retrieved, should.Resemble, correct)
-
-		// Now update uplink also
-		err = registry.Set(ctx, ids, stats, true, true, false)
-		a.So(err, should.BeNil)
-		retrieved, err = registry.Get(ctx, ids)
-		a.So(err, should.BeNil)
-		a.So(retrieved, should.Resemble, stats)
-
-		// Unset downlink
-		stats.LastDownlinkReceivedAt = nil
-		stats.DownlinkCount = 0
-		err = registry.Set(ctx, ids, nil, false, true, false)
-		a.So(err, should.BeNil)
-		retrieved, err = registry.Get(ctx, ids)
-		a.So(err, should.BeNil)
-		a.So(retrieved, should.Resemble, stats)
-	})
-
-	t.Run("UpdateStats", func(t *testing.T) {
-		now := time.Now().UTC().Add(3 * time.Minute)
-		stats := deepcopy.Copy(initialStats).(*ttnpb.GatewayConnectionStats)
-
-		// Reset stats from previous test
-		a.So(registry.Set(ctx, ids, nil, true, true, true), should.BeNil)
-		a.So(registry.Set(ctx, ids, stats, true, true, true), should.BeNil)
-		retrieved, err := registry.Get(ctx, ids)
-		a.So(err, should.BeNil)
-		a.So(retrieved, should.Resemble, stats)
-
-		// Update status
-		stats.LastStatusReceivedAt = &now
-		stats.LastStatus = &ttnpb.GatewayStatus{
-			IP:   []string{"10.10.10.10"},
-			Time: now,
-			Metrics: map[string]float32{
-				"a": 3.22,
-				"b": 3.42,
-			},
-		}
-
-		// Keep correct stats
-		correct := deepcopy.Copy(stats).(*ttnpb.GatewayConnectionStats)
-
-		// Mess with the uplink and downlink stats
-		stats.UplinkCount += 100
-		stats.DownlinkCount += 1000
-
-		// Update gateway status only
-		err = registry.Set(ctx, ids, stats, false, false, true)
-		a.So(err, should.BeNil)
-		retrieved, err = registry.Get(ctx, ids)
-		a.So(err, should.BeNil)
-		a.So(retrieved, should.Resemble, correct)
-
-		// Now update uplink and downlink
-		stats.LastUplinkReceivedAt = &now
-		stats.LastDownlinkReceivedAt = &now
-		err = registry.Set(ctx, ids, stats, true, true, true)
+		err = registry.Set(ctx, ids, stats)
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
