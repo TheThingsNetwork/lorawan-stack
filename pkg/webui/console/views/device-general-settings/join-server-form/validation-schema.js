@@ -24,8 +24,8 @@ const validationSchema = Yup.object()
       .emptyOrLength(3 * 2, Yup.passValues(sharedMessages.validateLength)) // 3 Byte hex.
       .default(''),
     root_keys: Yup.object().when(
-      ['_external_js', '_lorawan_version', '_may_edit_keys', '_may_read_keys'],
-      (externalJs, version, mayEditKeys, mayReadKeys, schema) => {
+      ['$externalJs', '$lorawanVersion', '$mayEditKeys', '$mayEditkeys'],
+      (externalJs, lorawanVersion, mayEditKeys, mayReadKeys, schema) => {
         const strippedSchema = Yup.object().strip()
         const keySchema = Yup.lazy(value => {
           return !externalJs && Boolean(value) && Boolean(value.key)
@@ -49,7 +49,7 @@ const validationSchema = Yup.object()
           })
         }
 
-        if (parseLorawanMacVersion(version) < 110) {
+        if (parseLorawanMacVersion(lorawanVersion) < 110) {
           return schema.shape({
             nwk_key: strippedSchema,
             app_key: keySchema,
@@ -62,7 +62,7 @@ const validationSchema = Yup.object()
         })
       },
     ),
-    resets_join_nonces: Yup.boolean().when('_lorawan_version', {
+    resets_join_nonces: Yup.boolean().when('$lorawanVersion', {
       // Verify if lorawan version is 1.1.0 or higher.
       is: version => parseLorawanMacVersion(version) >= 110,
       then: schema => schema,
@@ -77,10 +77,6 @@ const validationSchema = Yup.object()
     network_server_kek_label: Yup.string()
       .max(2048, Yup.passValues(sharedMessages.validateTooLong))
       .default(''),
-    _external_js: Yup.boolean().default(false),
-    _lorawan_version: Yup.string().default('1.1.0'),
-    _may_edit_keys: Yup.boolean().default(false),
-    _may_read_keys: Yup.boolean().default(false),
   })
   .noUnknown()
 
