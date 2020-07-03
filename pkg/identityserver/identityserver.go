@@ -20,6 +20,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres database driver.
+	"go.thethings.network/lorawan-stack/v3/pkg/accountapp"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -27,7 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
@@ -46,7 +46,7 @@ type IdentityServer struct {
 	db             *gorm.DB
 	redis          *redis.Client
 	emailTemplates *email.TemplateRegistry
-	oauth          oauth.Server
+	accountapp     accountapp.Server
 }
 
 // Context returns the context of the Identity Server.
@@ -99,8 +99,8 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		return nil, err
 	}
 
-	is.config.OAuth.CSRFAuthKey = is.GetBaseConfig(is.Context()).HTTP.Cookie.HashKey
-	is.oauth = oauth.NewServer(is.Context(), struct {
+	is.config.AccountApp.CSRFAuthKey = is.GetBaseConfig(is.Context()).HTTP.Cookie.HashKey
+	is.accountapp = accountapp.NewServer(is.Context(), struct {
 		store.UserStore
 		store.UserSessionStore
 		store.ClientStore
@@ -110,7 +110,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		UserSessionStore: store.GetUserSessionStore(is.db),
 		ClientStore:      store.GetClientStore(is.db),
 		OAuthStore:       store.GetOAuthStore(is.db),
-	}, is.config.OAuth)
+	}, is.config.AccountApp)
 
 	c.AddContextFiller(func(ctx context.Context) context.Context {
 		ctx = is.withRequestAccessCache(ctx)
@@ -143,7 +143,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.OAuthAuthorizationRegistry", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("identityserver"))
 
 	c.RegisterGRPC(is)
-	c.RegisterWeb(is.oauth)
+	c.RegisterWeb(is.accountapp)
 
 	return is, nil
 }

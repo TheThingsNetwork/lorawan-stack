@@ -28,9 +28,9 @@ import (
 // DefaultConsoleConfig is the default configuration for the Console.
 var DefaultConsoleConfig = console.Config{
 	OAuth: oauthclient.Config{
-		AuthorizeURL: shared.DefaultOAuthPublicURL + "/authorize",
-		LogoutURL:    shared.DefaultOAuthPublicURL + "/logout",
-		TokenURL:     shared.DefaultOAuthPublicURL + "/token",
+		AuthorizeURL: shared.DefaultAccountAppPublicURL + "/authorize",
+		LogoutURL:    shared.DefaultAccountAppPublicURL + "/logout",
+		TokenURL:     shared.DefaultAccountAppPublicURL + "/token",
 		ClientID:     "console",
 		ClientSecret: "console",
 	},

@@ -160,8 +160,8 @@ var startCommand = &cobra.Command{
 
 		if start.IdentityServer || startDefault {
 			logger.Info("Setting up Identity Server")
-			if config.IS.OAuth.UI.TemplateData.SentryDSN == "" {
-				config.IS.OAuth.UI.TemplateData.SentryDSN = config.Sentry.DSN
+			if config.IS.AccountApp.UI.TemplateData.SentryDSN == "" {
+				config.IS.AccountApp.UI.TemplateData.SentryDSN = config.Sentry.DSN
 			}
 			is, err := identityserver.New(c, &config.IS)
 			if err != nil {
@@ -170,11 +170,11 @@ var startCommand = &cobra.Command{
 			if config.Cache.Service == "redis" {
 				is.SetRedisCache(redis.New(config.Cache.Redis.WithNamespace("is", "cache")))
 			}
-			if oauthMount := config.IS.OAuth.UI.MountPath(); oauthMount != "/" {
-				if !strings.HasSuffix(oauthMount, "/") {
-					oauthMount += "/"
+			if accountAppMount := config.IS.AccountApp.UI.MountPath(); accountAppMount != "/" {
+				if !strings.HasSuffix(accountAppMount, "/") {
+					accountAppMount += "/"
 				}
-				rootRedirect = web.Redirect("/", http.StatusFound, oauthMount)
+				rootRedirect = web.Redirect("/", http.StatusFound, accountAppMount)
 			}
 		}
 

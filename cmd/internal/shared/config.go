@@ -141,8 +141,9 @@ var DefaultPublicURL = "http://" + DefaultPublicHost + ":1885"
 // DefaultAssetsBaseURL is the default public URL where the assets are served.
 var DefaultAssetsBaseURL = DefaultHTTPConfig.Static.Mount
 
-// DefaultOAuthPublicURL is the default public URL where OAuth is served.
-var DefaultOAuthPublicURL = DefaultPublicURL + "/oauth"
+// DefaultAccountAppPublicURL is the default public URL where Account app and
+// OAuth provider are served.
+var DefaultAccountAppPublicURL = DefaultPublicURL + "/account"
 
 // DefaultConsolePublicURL is the default public URL where the Console is served.
 var DefaultConsolePublicURL = DefaultPublicURL + "/console"

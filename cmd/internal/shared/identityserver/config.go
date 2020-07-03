@@ -19,27 +19,28 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/accountapp"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver"
-	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
 // DefaultIdentityServerConfig is the default configuration for the Identity Server.
 var DefaultIdentityServerConfig = identityserver.Config{
 	DatabaseURI: "postgresql://root@localhost:26257/ttn_lorawan_dev?sslmode=disable",
-	OAuth: oauth.Config{
-		UI: oauth.UIConfig{
+	AccountApp: accountapp.Config{
+		UI: accountapp.UIConfig{
 			TemplateData: webui.TemplateData{
 				SiteName:      "The Things Stack for LoRaWAN",
+				Title:         "Account",
 				Language:      "en",
-				CanonicalURL:  shared.DefaultOAuthPublicURL,
+				CanonicalURL:  shared.DefaultAccountAppPublicURL,
 				AssetsBaseURL: shared.DefaultAssetsBaseURL,
-				IconPrefix:    "oauth-",
-				CSSFiles:      []string{"oauth.css"},
-				JSFiles:       []string{"oauth.js"},
+				IconPrefix:    "account-",
+				CSSFiles:      []string{"account.css"},
+				JSFiles:       []string{"account.js"},
 			},
-			FrontendConfig: oauth.FrontendConfig{
-				StackConfig: oauth.StackConfig{
+			FrontendConfig: accountapp.FrontendConfig{
+				StackConfig: accountapp.StackConfig{
 					IS: webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
 				},
 			},
@@ -54,8 +55,8 @@ func init() {
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MaxLength = 1000
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinUppercase = 1
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinDigits = 1
-	DefaultIdentityServerConfig.Email.Network.Name = DefaultIdentityServerConfig.OAuth.UI.SiteName
-	DefaultIdentityServerConfig.Email.Network.IdentityServerURL = shared.DefaultOAuthPublicURL
+	DefaultIdentityServerConfig.Email.Network.Name = DefaultIdentityServerConfig.AccountApp.UI.SiteName
+	DefaultIdentityServerConfig.Email.Network.IdentityServerURL = shared.DefaultAccountAppPublicURL
 	DefaultIdentityServerConfig.Email.Network.ConsoleURL = shared.DefaultConsolePublicURL
 	DefaultIdentityServerConfig.ProfilePicture.Bucket = "profile_pictures"
 	DefaultIdentityServerConfig.ProfilePicture.BucketURL = path.Join(shared.DefaultAssetsBaseURL, "blob", "profile_pictures")

@@ -18,12 +18,12 @@ import (
 	"context"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/accountapp"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/sendgrid"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/smtp"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
-	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 )
 
 // Config for the Identity Server
@@ -51,7 +51,7 @@ type Config struct {
 	AuthCache struct {
 		MembershipTTL time.Duration `name:"membership-ttl" description:"TTL of membership caches"`
 	} `name:"auth-cache"`
-	OAuth          oauth.Config `name:"oauth"`
+	AccountApp     accountapp.Config `name:"accountapp"`
 	ProfilePicture struct {
 		UseGravatar bool   `name:"use-gravatar" description:"Use Gravatar fallback for users without profile picture"`
 		Bucket      string `name:"bucket" description:"Bucket used for storing profile pictures"`
