@@ -71,7 +71,7 @@ const NetworkServerForm = React.memo(props => {
       mayEditKeys,
       mayReadKeys,
       isJoined: isDeviceOTAA(device) && isDeviceJoined(device),
-      externalJs: hasExternalJs(device) && mayReadKeys,
+      externalJs: hasExternalJs(device),
     }),
     [device, mayEditKeys, mayReadKeys],
   )

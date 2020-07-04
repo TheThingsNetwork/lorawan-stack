@@ -47,7 +47,7 @@ const JoinServerForm = React.memo(props => {
 
   // Fallback to 1.1.0 in case NS is not available and lorawan version is not set present.
   const isNewLorawanVersion = parseLorawanMacVersion(device.lorawan_version || '1.1.0') >= 110
-  const externalJs = hasExternalJs(device) && mayReadKeys
+  const externalJs = hasExternalJs(device)
 
   const formRef = React.useRef(null)
   const [error, setError] = React.useState('')
