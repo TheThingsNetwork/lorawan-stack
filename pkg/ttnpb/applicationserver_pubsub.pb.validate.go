@@ -1243,7 +1243,7 @@ func (m *ApplicationPubSub_AWSIoTProvider) ValidateFields(paths ...string) error
 			if _, ok := _ApplicationPubSub_AWSIoTProvider_Region_InLookup[m.GetRegion()]; !ok {
 				return ApplicationPubSub_AWSIoTProviderValidationError{
 					field:  "region",
-					reason: "value must be in list [ap-east-1 ap-northeast-1 ap-northeast-2 ap-south-1 ap-southeast-1 ap-southeast-2 ca-central-1 eu-central-1 eu-north-1 eu-west-1 eu-west-2 eu-west-3 me-south-1 sa-east-1 us-east-1 us-east-2 us-west-1 us-west-2]",
+					reason: "value must be in list [af-south-1 ap-east-1 ap-northeast-1 ap-northeast-2 ap-south-1 ap-southeast-1 ap-southeast-2 ca-central-1 eu-central-1 eu-north-1 eu-south-1 eu-west-1 eu-west-2 eu-west-3 me-south-1 sa-east-1 us-east-1 us-east-2 us-west-1 us-west-2]",
 				}
 			}
 
@@ -1272,7 +1272,21 @@ func (m *ApplicationPubSub_AWSIoTProvider) ValidateFields(paths ...string) error
 			}
 
 		case "endpoint_address":
-			// no validation rules for EndpointAddress
+
+			if utf8.RuneCountInString(m.GetEndpointAddress()) > 128 {
+				return ApplicationPubSub_AWSIoTProviderValidationError{
+					field:  "endpoint_address",
+					reason: "value length must be at most 128 runes",
+				}
+			}
+
+			if !_ApplicationPubSub_AWSIoTProvider_EndpointAddress_Pattern.MatchString(m.GetEndpointAddress()) {
+				return ApplicationPubSub_AWSIoTProviderValidationError{
+					field:  "endpoint_address",
+					reason: "value does not match regex pattern \"^((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])|)$\"",
+				}
+			}
+
 		case "deployment":
 			if len(subs) == 0 {
 				subs = []string{
@@ -1368,6 +1382,7 @@ var _ interface {
 } = ApplicationPubSub_AWSIoTProviderValidationError{}
 
 var _ApplicationPubSub_AWSIoTProvider_Region_InLookup = map[string]struct{}{
+	"af-south-1":     {},
 	"ap-east-1":      {},
 	"ap-northeast-1": {},
 	"ap-northeast-2": {},
@@ -1377,6 +1392,7 @@ var _ApplicationPubSub_AWSIoTProvider_Region_InLookup = map[string]struct{}{
 	"ca-central-1":   {},
 	"eu-central-1":   {},
 	"eu-north-1":     {},
+	"eu-south-1":     {},
 	"eu-west-1":      {},
 	"eu-west-2":      {},
 	"eu-west-3":      {},
@@ -1387,6 +1403,8 @@ var _ApplicationPubSub_AWSIoTProvider_Region_InLookup = map[string]struct{}{
 	"us-west-1":      {},
 	"us-west-2":      {},
 }
+
+var _ApplicationPubSub_AWSIoTProvider_EndpointAddress_Pattern = regexp.MustCompile("^((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])|)$")
 
 // ValidateFields checks the field values on ApplicationPubSub_Message with the
 // rules defined in the proto definition for this message. If any rules are
@@ -1495,11 +1513,39 @@ func (m *ApplicationPubSub_AWSIoTProvider_AccessKey) ValidateFields(paths ...str
 		_ = subs
 		switch name {
 		case "access_key_id":
-			// no validation rules for AccessKeyID
+
+			if l := utf8.RuneCountInString(m.GetAccessKeyID()); l < 16 || l > 128 {
+				return ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError{
+					field:  "access_key_id",
+					reason: "value length must be between 16 and 128 runes, inclusive",
+				}
+			}
+
+			if !_ApplicationPubSub_AWSIoTProvider_AccessKey_AccessKeyID_Pattern.MatchString(m.GetAccessKeyID()) {
+				return ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError{
+					field:  "access_key_id",
+					reason: "value does not match regex pattern \"^[\\\\w]*$\"",
+				}
+			}
+
 		case "secret_access_key":
-			// no validation rules for SecretAccessKey
+
+			if utf8.RuneCountInString(m.GetSecretAccessKey()) > 40 {
+				return ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError{
+					field:  "secret_access_key",
+					reason: "value length must be at most 40 runes",
+				}
+			}
+
 		case "session_token":
-			// no validation rules for SessionToken
+
+			if utf8.RuneCountInString(m.GetSessionToken()) > 256 {
+				return ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError{
+					field:  "session_token",
+					reason: "value length must be at most 256 runes",
+				}
+			}
+
 		default:
 			return ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError{
 				field:  name,
@@ -1567,6 +1613,8 @@ var _ interface {
 	ErrorName() string
 } = ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError{}
 
+var _ApplicationPubSub_AWSIoTProvider_AccessKey_AccessKeyID_Pattern = regexp.MustCompile("^[\\w]*$")
+
 // ValidateFields checks the field values on
 // ApplicationPubSub_AWSIoTProvider_AssumeRole with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
@@ -1583,9 +1631,30 @@ func (m *ApplicationPubSub_AWSIoTProvider_AssumeRole) ValidateFields(paths ...st
 		_ = subs
 		switch name {
 		case "arn":
-			// no validation rules for ARN
+
+			if !_ApplicationPubSub_AWSIoTProvider_AssumeRole_ARN_Pattern.MatchString(m.GetARN()) {
+				return ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError{
+					field:  "arn",
+					reason: "value does not match regex pattern \"^arn:aws:iam::[0-9]{12}:role\\\\/[A-Za-z0-9_+=,.@-]+$\"",
+				}
+			}
+
 		case "external_id":
-			// no validation rules for ExternalID
+
+			if utf8.RuneCountInString(m.GetExternalID()) > 1224 {
+				return ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError{
+					field:  "external_id",
+					reason: "value length must be at most 1224 runes",
+				}
+			}
+
+			if !_ApplicationPubSub_AWSIoTProvider_AssumeRole_ExternalID_Pattern.MatchString(m.GetExternalID()) {
+				return ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError{
+					field:  "external_id",
+					reason: "value does not match regex pattern \"^[\\\\w+=,.@:\\\\/-]*$\"",
+				}
+			}
+
 		case "session_duration":
 
 			if v, ok := interface{}(m.GetSessionDuration()).(interface{ ValidateFields(...string) error }); ok {
@@ -1665,6 +1734,10 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError{}
+
+var _ApplicationPubSub_AWSIoTProvider_AssumeRole_ARN_Pattern = regexp.MustCompile("^arn:aws:iam::[0-9]{12}:role\\/[A-Za-z0-9_+=,.@-]+$")
+
+var _ApplicationPubSub_AWSIoTProvider_AssumeRole_ExternalID_Pattern = regexp.MustCompile("^[\\w+=,.@:\\/-]*$")
 
 // ValidateFields checks the field values on
 // ApplicationPubSub_AWSIoTProvider_DefaultIntegration with the rules defined

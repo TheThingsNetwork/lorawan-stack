@@ -2866,6 +2866,7 @@
                   {
                     "name": "string.in",
                     "value": [
+                      "af-south-1",
                       "ap-east-1",
                       "ap-northeast-1",
                       "ap-northeast-2",
@@ -2875,6 +2876,7 @@
                       "ca-central-1",
                       "eu-central-1",
                       "eu-north-1",
+                      "eu-south-1",
                       "eu-west-1",
                       "eu-west-2",
                       "eu-west-3",
@@ -2917,7 +2919,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 128
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])|)$"
+                  }
+                ]
+              }
             },
             {
               "name": "default",
@@ -2948,7 +2962,23 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.min_len",
+                    "value": 16
+                  },
+                  {
+                    "name": "string.max_len",
+                    "value": 128
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[\\w]*$"
+                  }
+                ]
+              }
             },
             {
               "name": "secret_access_key",
@@ -2958,7 +2988,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 40
+                  }
+                ]
+              }
             },
             {
               "name": "session_token",
@@ -2968,7 +3006,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 256
+                  }
+                ]
+              }
             }
           ]
         },
@@ -2989,7 +3035,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^arn:aws:iam::[0-9]{12}:role\\/[A-Za-z0-9_+=,.@-]+$"
+                  }
+                ]
+              }
             },
             {
               "name": "external_id",
@@ -2999,7 +3053,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 1224
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[\\w+=,.@:\\/-]*$"
+                  }
+                ]
+              }
             },
             {
               "name": "session_duration",

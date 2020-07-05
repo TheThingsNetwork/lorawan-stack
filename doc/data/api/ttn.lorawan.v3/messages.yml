@@ -619,6 +619,7 @@ ApplicationPubSub.AWSIoTProvider:
     type: string
     rules:
       in:
+      - af-south-1
       - ap-east-1
       - ap-northeast-1
       - ap-northeast-2
@@ -628,6 +629,7 @@ ApplicationPubSub.AWSIoTProvider:
       - ca-central-1
       - eu-central-1
       - eu-north-1
+      - eu-south-1
       - eu-west-1
       - eu-west-2
       - eu-west-3
@@ -653,33 +655,68 @@ ApplicationPubSub.AWSIoTProvider:
       The endpoint address to connect to. If the endpoint address is left empty,
       the integration will try to discover it.
     type: string
+    rules:
+      max_len: 128
+      pattern: ^((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])|)$
     default: ""
+  - name: default
+    comment: Enable the default integration. This overrides custom base topic and message topics of the pub/sub integration.
+    message:
+      name: ApplicationPubSub.AWSIoTProvider.DefaultIntegration
+    default: {}
+  oneofs:
+  - name: deployment
+    field_names:
+    - default
 ApplicationPubSub.AWSIoTProvider.AccessKey:
   name: ApplicationPubSub.AWSIoTProvider.AccessKey
   fields:
   - name: access_key_id
     type: string
+    rules:
+      min_len: 16
+      max_len: 128
+      pattern: ^[\w]*$
     default: ""
   - name: secret_access_key
     type: string
+    rules:
+      max_len: 40
     default: ""
   - name: session_token
     type: string
+    rules:
+      max_len: 256
     default: ""
 ApplicationPubSub.AWSIoTProvider.AssumeRole:
   name: ApplicationPubSub.AWSIoTProvider.AssumeRole
   fields:
   - name: arn
     type: string
+    rules:
+      pattern: ^arn:aws:iam::[0-9]{12}:role\/[A-Za-z0-9_+=,.@-]+$
     default: ""
   - name: external_id
     type: string
+    rules:
+      max_len: 1224
+      pattern: ^[\w+=,.@:\/-]*$
     default: ""
   - name: session_duration
     message:
       package: google.protobuf
       name: Duration
     default: 0s
+ApplicationPubSub.AWSIoTProvider.DefaultIntegration:
+  name: ApplicationPubSub.AWSIoTProvider.DefaultIntegration
+  fields:
+  - name: stack_name
+    comment: The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration.
+    type: string
+    rules:
+      max_len: 128
+      pattern: ^[A-Za-z][A-Za-z0-9\-]*$
+    default: ""
 ApplicationPubSub.MQTTProvider:
   name: ApplicationPubSub.MQTTProvider
   comment: The MQTT provider settings.

@@ -75,20 +75,20 @@ message ApplicationPubSub {
 
   message AWSIoTProvider {
     // The AWS region.
-    string region = 1 [(validate.rules).string = { in: ["ap-east-1", "ap-northeast-1", "ap-northeast-2", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ca-central-1", "eu-central-1", "eu-north-1", "eu-west-1", "eu-west-2", "eu-west-3", "me-south-1", "sa-east-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2"] }];
+    string region = 1 [(validate.rules).string = { in: ["af-south-1", "ap-east-1", "ap-northeast-1", "ap-northeast-2", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ca-central-1", "eu-central-1", "eu-north-1", "eu-south-1", "eu-west-1", "eu-west-2", "eu-west-3", "me-south-1", "sa-east-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2"] }];
 
     message AccessKey {
-      string access_key_id = 1 [(gogoproto.customname) = "AccessKeyID"];
-      string secret_access_key = 2;
-      string session_token = 3;
+      string access_key_id = 1 [(gogoproto.customname) = "AccessKeyID", (validate.rules).string = {pattern: "^[\\w]*$", min_len: 16, max_len: 128}];
+      string secret_access_key = 2 [(validate.rules).string.max_len = 40];
+      string session_token = 3 [(validate.rules).string.max_len = 256];
     }
 
     // If set, the integration will use an AWS access key.
     AccessKey access_key = 2;
 
     message AssumeRole {
-      string arn = 1 [(gogoproto.customname) = "ARN"];
-      string external_id = 2 [(gogoproto.customname) = "ExternalID"];
+      string arn = 1 [(gogoproto.customname) = "ARN", (validate.rules).string = {pattern: "^arn:aws:iam::[0-9]{12}:role\\/[A-Za-z0-9_+=,.@-]+$"}];
+      string external_id = 2 [(gogoproto.customname) = "ExternalID", (validate.rules).string = {pattern: "^[\\w+=,.@:\\/-]*$", max_len: 1224}];
       google.protobuf.Duration session_duration = 3 [(gogoproto.stdduration) = true];
     }
 
@@ -97,7 +97,7 @@ message ApplicationPubSub {
 
     // The endpoint address to connect to. If the endpoint address is left empty,
     // the integration will try to discover it.
-    string endpoint_address = 4;
+    string endpoint_address = 4 [(validate.rules).string = {pattern: "^((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])|)$", max_len: 128}];
 
     message DefaultIntegration {
       // The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration.
