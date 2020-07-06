@@ -74,7 +74,7 @@
   },
   "dependencies": {
     "@formatjs/intl-relativetimeformat": "^2.8.2",
-    "@sentry/browser": "^5.15.0",
+    "@sentry/browser": "^5.19.0",
     "autobind-decorator": "^2.1.0",
     "axios": "^0.19.0",
     "cancelable-promise": "^2.4.0",
