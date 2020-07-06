@@ -26,8 +26,6 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import Notification from '@ttn-lw/components/notification'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import PubsubFormatSelector from '@console/containers/pubsub-formats-select'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -154,7 +152,7 @@ export default class PubsubForm extends Component {
     const { natsUseCredentials } = this.state
     return (
       <React.Fragment>
-        <Message component="h4" content={m.natsConfig} />
+        <Form.SubTitle title={m.natsConfig} />
         <Form.Field name="nats.secure" title={sharedMessages.secure} component={Checkbox} />
         <Form.Field
           name="nats.use_credentials"
@@ -203,7 +201,7 @@ export default class PubsubForm extends Component {
 
     return (
       <React.Fragment>
-        <Message component="h4" content={m.mqttConfig} />
+        <Form.SubTitle title={m.mqttConfig} />
         <Form.Field
           name="mqtt.use_tls"
           title={sharedMessages.secure}
@@ -297,7 +295,7 @@ export default class PubsubForm extends Component {
   get messageTypesSection() {
     return (
       <React.Fragment>
-        <Message component="h4" content={sharedMessages.messageTypes} />
+        <Form.SubTitle title={sharedMessages.messageTypes} />
         <PubsubFormatSelector horizontal name="format" required />
         <Form.Field
           name="base_topic"
@@ -397,7 +395,7 @@ export default class PubsubForm extends Component {
         error={error}
         formikRef={this.form}
       >
-        <Message component="h4" content={sharedMessages.generalInformation} />
+        <Form.SubTitle title={sharedMessages.generalInformation} />
         <Form.Field
           name="pub_sub_id"
           title={sharedMessages.pubsubId}
