@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Service data messages published by integrations. Can be consumed using the bundled MQTT server, Webhooks or Pub/Sub integrations.
 - Application package application-wide associations support.
 - LoRaCloud DAS application package server URL overrides support.
+- Key vault caching mechanism (see `--key-vault.cache.size` and `--key-vault.cache.ttl` options).
 
 ### Changed
 
