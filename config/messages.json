@@ -2825,6 +2825,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/crypto:malformed_cipher_text": {
+    "translations": {
+      "en": "malformed cipher text"
+    },
+    "description": {
+      "package": "pkg/crypto",
+      "file": "encryption.go"
+    }
+  },
   "error:pkg/crypto:ping_period": {
     "translations": {
       "en": "ping period must be a power of 2 between 32 and 4096, got '{value}'"
