@@ -93,7 +93,11 @@ var (
 			if link.APIKey == "" {
 				return errNoApplicationLinkAPIKey
 			}
-
+			newPaths, err := parsePayloadFormatterParameterFlags("default-formatters", link.DefaultFormatters, cmd.Flags())
+			if err != nil {
+				return err
+			}
+			paths = append(paths, newPaths...)
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
 				return err
@@ -140,6 +144,7 @@ func init() {
 	applicationsLinkCommand.AddCommand(applicationsLinkGetCommand)
 	applicationsLinkSetCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsLinkSetCommand.Flags().AddFlagSet(setApplicationLinkFlags)
+	applicationsLinkSetCommand.Flags().AddFlagSet(payloadFormatterParameterFlags("default-formatters"))
 	applicationsLinkCommand.AddCommand(applicationsLinkSetCommand)
 	applicationsLinkDeleteCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsLinkCommand.AddCommand(applicationsLinkDeleteCommand)

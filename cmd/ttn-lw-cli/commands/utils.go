@@ -17,11 +17,16 @@ package commands
 import (
 	"fmt"
 	stdio "io"
+	"io/ioutil"
 	"net"
 	"net/url"
 	"strings"
 
+	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/io"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 func getHost(address string) string {
@@ -59,4 +64,50 @@ func getInputDecoder(reader stdio.Reader) (io.Decoder, error) {
 	default:
 		return nil, fmt.Errorf("unknown input format: %s", config.InputFormat)
 	}
+}
+
+func payloadFormatterParameterFlags(prefix string) *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.AddFlagSet(dataFlags(prefix+".down-formatter-parameter", ""))
+	flagSet.AddFlagSet(dataFlags(prefix+".up-formatter-parameter", ""))
+	return flagSet
+}
+
+// parsePayloadFormatterParameterFlags parses formatter-parameter-local-file arguments,
+// updates formatters with the file contents and returns the extra field mask paths.
+func parsePayloadFormatterParameterFlags(prefix string, formatters *ttnpb.MessagePayloadFormatters, flags *pflag.FlagSet) ([]string, error) {
+	if formatters == nil {
+		return nil, nil
+	}
+	paths := []string{}
+	r, err := getDataReader(prefix+".up-formatter-parameter", flags)
+	switch err {
+	case nil:
+		b, err := ioutil.ReadAll(r)
+		if err != nil {
+			return nil, err
+		}
+		formatters.UpFormatterParameter = string(b)
+		paths = append(paths, prefix+".up-formatter-parameter")
+	default:
+		if !errors.IsInvalidArgument(err) {
+			return nil, err
+		}
+	}
+
+	r, err = getDataReader(prefix+".down-formatter-parameter", flags)
+	switch err {
+	case nil:
+		b, err := ioutil.ReadAll(r)
+		if err != nil {
+			return nil, err
+		}
+		formatters.DownFormatterParameter = string(b)
+		paths = append(paths, prefix+".down-formatter-parameter")
+	default:
+		if !errors.IsInvalidArgument(err) {
+			return nil, err
+		}
+	}
+	return util.NormalizePaths(paths), nil
 }
