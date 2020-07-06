@@ -3,13 +3,15 @@ title: "MQTT Server"
 description: ""
 ---
 
-The Application Server exposes a MQTT server to work with streaming events. In order to use the MQTT server you need to create a new API key to authenticate.
+{{% tts %}} exposes an MQTT server to work with streaming events. This section explains how to connect an MQTT client and subscribe to uplinks or publish downlinks.
+
+>{{% tts %}} supports the [MQTT Standard Version 3.1.1](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.pdf).
 
 <!--more-->
 
 ## Creating an API Key
 
-The Console provides the required connection information and can be used to create an API key for authentication. In your application select the **MQTT** submenu from the **Integrations** side menu.
+ In order to use the MQTT server you need to create a new API key to authenticate. The Console provides the required connection information and can be used to create an API key for authentication. In your application select the **MQTT** submenu from the **Integrations** side menu.
 
 {{< figure src="mqtt-integration.png" alt="MQTT connection information" >}}
 
