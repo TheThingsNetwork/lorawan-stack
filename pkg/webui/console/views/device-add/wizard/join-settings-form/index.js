@@ -67,6 +67,7 @@ const JoinSettingsForm = React.memo(props => {
     >
       {mayEditKeys && (
         <>
+          <Form.SubTitle title={sharedMessages.rootKeys} />
           <Form.Field
             required
             autoFocus={mayEditKeys}
@@ -101,43 +102,49 @@ const JoinSettingsForm = React.memo(props => {
           )}
         </>
       )}
-      {lwVersion >= 110 && (
+      <Form.CollapseSection
+        id="advanced-settings"
+        title={sharedMessages.advancedSettings}
+        initiallyCollapsed={mayEditKeys}
+      >
+        {lwVersion >= 110 && (
+          <Form.Field
+            title={sharedMessages.resetsJoinNonces}
+            onChange={handleResetsJoinNoncesChange}
+            warning={resetsJoinNonces ? sharedMessages.resetWarning : undefined}
+            name="resets_join_nonces"
+            component={Checkbox}
+          />
+        )}
         <Form.Field
-          title={sharedMessages.resetsJoinNonces}
-          onChange={handleResetsJoinNoncesChange}
-          warning={resetsJoinNonces ? sharedMessages.resetWarning : undefined}
-          name="resets_join_nonces"
-          component={Checkbox}
+          autoFocus={!mayEditKeys}
+          title={sharedMessages.homeNetID}
+          description={sharedMessages.homeNetIDDescription}
+          name="net_id"
+          type="byte"
+          min={3}
+          max={3}
+          component={Input}
         />
-      )}
-      <Form.Field
-        autoFocus={!mayEditKeys}
-        title={sharedMessages.homeNetID}
-        description={sharedMessages.homeNetIDDescription}
-        name="net_id"
-        type="byte"
-        min={3}
-        max={3}
-        component={Input}
-      />
-      <Form.Field
-        title={sharedMessages.asServerID}
-        name="application_server_id"
-        description={sharedMessages.asServerIDDescription}
-        component={Input}
-      />
-      <Form.Field
-        title={sharedMessages.asServerKekLabel}
-        name="application_server_kek_label"
-        description={sharedMessages.asServerKekLabelDescription}
-        component={Input}
-      />
-      <Form.Field
-        title={sharedMessages.nsServerKekLabel}
-        name="network_server_kek_label"
-        description={sharedMessages.nsServerKekLabelDescription}
-        component={Input}
-      />
+        <Form.Field
+          title={sharedMessages.asServerID}
+          name="application_server_id"
+          description={sharedMessages.asServerIDDescription}
+          component={Input}
+        />
+        <Form.Field
+          title={sharedMessages.asServerKekLabel}
+          name="application_server_kek_label"
+          description={sharedMessages.asServerKekLabelDescription}
+          component={Input}
+        />
+        <Form.Field
+          title={sharedMessages.nsServerKekLabel}
+          name="network_server_kek_label"
+          description={sharedMessages.nsServerKekLabelDescription}
+          component={Input}
+        />
+      </Form.CollapseSection>
     </Wizard.Form>
   )
 })

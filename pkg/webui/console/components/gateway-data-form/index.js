@@ -301,6 +301,7 @@ class GatewayDataForm extends React.Component {
           placeholder={sharedMessages.stable}
           name="update_channel"
           component={Input}
+          autoComplete="on"
         />
         <SubmitBar>{children}</SubmitBar>
       </Form>

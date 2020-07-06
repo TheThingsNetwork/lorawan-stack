@@ -17,6 +17,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Service data messages published by integrations. Can be consumed using the bundled MQTT server, Webhooks or Pub/Sub integrations.
 - Application package application-wide associations support.
 - LoRaCloud DAS application package server URL overrides support.
+
+### Changed
+
+### Deprecated
+
+- End device `skip_payload_crypto` field: it gets replaced by `skip_payload_crypto_override`.
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.8.5] - 2020-07-06
+
+### Added
+
 - Option to reset end device payload formatters in the Console.
 - Service discovery using DNS SRV records for external Application Server linking.
 - Functionality to set end device attributes in the Console.
@@ -24,6 +41,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI support for setting and unsetting end device location (see `--location.latitude`, `--location.longitude`, `--location.altitude` and `--location.accuracy` options).
 - Functionality to allow admin users to list all applications and gateways in the Console.
 - Ursalink UG8X gateway documentation.
+- Intercom, Google Analytics, and Emojicom feedback in documentation.
+- LORIX One gateway documentation.
+- Display own user name instead of ID in Console if possible.
+- Option to hide rarely used fields in the Join Settings step (end device wizard) in the Console.
 
 ### Changed
 
@@ -32,10 +53,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The CLI snap version uses the `$SNAP_USER_COMMON` directory for config by default, so that it is preserved between revisions.
 - Defer events subscriptions until there is actual interest for events.
 - End device creation form with wizard in the Console.
-
-### Deprecated
-
-- End device `skip_payload_crypto` field: it gets replaced by `skip_payload_crypto_override`.
 
 ### Removed
 
@@ -913,7 +930,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.4...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.5...HEAD
+[3.8.5]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.4...v3.8.5
 [3.8.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.3...v3.8.4
 [3.8.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.2...v3.8.3
 [3.8.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.2...v3.8.2

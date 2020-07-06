@@ -231,7 +231,6 @@ details + blockquote {
     padding: 0.25rem;
     font-weight: bold;
   }
-
   dd {
     margin: 0.5em 0 0.5em 0;
   }
@@ -267,6 +266,13 @@ details + blockquote {
   filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.2));
   font-size: 16px;
   left: -1px; // Hack for left-justified dropdown
+}
+
+.feedback {
+  text-align: center;
+  background-color: $white-ter;
+  border-radius: 8px;
+  padding: 12px;
 }
 
 @import "highlight.scss";

@@ -118,6 +118,7 @@ export default class ForgotPassword extends React.PureComponent {
                 title={sharedMessages.userId}
                 name="user_id"
                 component={Input}
+                autoComplete="username"
                 autoFocus
                 required
               />
