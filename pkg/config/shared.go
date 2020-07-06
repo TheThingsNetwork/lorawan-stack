@@ -133,8 +133,8 @@ type Rights struct {
 
 // KeyVaultCache represents the configuration for key vault caching.
 type KeyVaultCache struct {
-	Size int           `name:"size" description:"Cache size"`
-	TTL  time.Duration `name:"ttl" description:"Cache elements time to live"`
+	Size int           `name:"size" description:"Cache size. Caching is disabled if size is 0"`
+	TTL  time.Duration `name:"ttl" description:"Cache elements time to live. No expiration mechanism is used if TTL is 0"`
 }
 
 // KeyVault represents configuration for key vaults.

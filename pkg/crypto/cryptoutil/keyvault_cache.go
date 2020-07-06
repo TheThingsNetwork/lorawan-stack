@@ -20,52 +20,8 @@ import (
 	"time"
 
 	"github.com/bluele/gcache"
-	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
-	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 )
-
-type cryptoMetrics struct {
-	cacheHit  *metrics.ContextualCounterVec
-	cacheMiss *metrics.ContextualCounterVec
-}
-
-func (m cryptoMetrics) Describe(ch chan<- *prometheus.Desc) {
-	m.cacheHit.Describe(ch)
-	m.cacheMiss.Describe(ch)
-}
-
-func (m cryptoMetrics) Collect(ch chan<- prometheus.Metric) {
-	m.cacheHit.Collect(ch)
-	m.cacheMiss.Collect(ch)
-}
-
-const (
-	subsystem = "cryptoutil"
-)
-
-var cMetrics = &cryptoMetrics{
-	cacheHit: metrics.NewContextualCounterVec(
-		prometheus.CounterOpts{
-			Subsystem: subsystem,
-			Name:      "cache_hit",
-			Help:      "Number of cache hits",
-		},
-		[]string{"cache"},
-	),
-	cacheMiss: metrics.NewContextualCounterVec(
-		prometheus.CounterOpts{
-			Subsystem: subsystem,
-			Name:      "cache_miss",
-			Help:      "Number of cache misses",
-		},
-		[]string{"cache"},
-	),
-}
-
-func init() {
-	metrics.MustRegister(cMetrics)
-}
 
 type unwrapEntry struct {
 	value []byte
@@ -78,9 +34,13 @@ type cachedVault struct {
 }
 
 func NewCacheKeyVault(main crypto.KeyVault, ttl time.Duration, size int) crypto.KeyVault {
+	builder := gcache.New(size).ARC()
+	if ttl != 0 {
+		builder = builder.Expiration(ttl)
+	}
 	return &cachedVault{
 		KeyVault:    main,
-		unwrapCache: gcache.New(size).Expiration(ttl).ARC().Build(),
+		unwrapCache: builder.Build(),
 	}
 }
 
@@ -91,13 +51,13 @@ func unwrapCacheKey(ciphertext []byte, kekLabel string) string {
 func (c *cachedVault) Unwrap(ctx context.Context, ciphertext []byte, kekLabel string) ([]byte, error) {
 	id := unwrapCacheKey(ciphertext, kekLabel)
 	if val, err := c.unwrapCache.Get(id); err == nil {
-		cMetrics.cacheHit.WithLabelValues(ctx, "unwrap").Inc()
+		crypto.RegisterCacheHit(ctx, "unwrap")
 		v := val.(*unwrapEntry)
 		return v.value, v.err
 	}
 	v := &unwrapEntry{}
 	c.unwrapCache.Set(id, v)
-	cMetrics.cacheMiss.WithLabelValues(ctx, "unwrap").Inc()
+	crypto.RegisterCacheMiss(ctx, "unwrap")
 	v.value, v.err = c.KeyVault.Unwrap(ctx, ciphertext, kekLabel)
 	return v.value, v.err
 }

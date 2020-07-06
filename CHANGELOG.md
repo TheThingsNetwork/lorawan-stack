@@ -42,6 +42,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI support for setting and unsetting end device location (see `--location.latitude`, `--location.longitude`, `--location.altitude` and `--location.accuracy` options).
 - Functionality to allow admin users to list all applications and gateways in the Console.
 - Ursalink UG8X gateway documentation.
+- Intercom, Google Analytics, and Emojicom feedback in documentation.
+- LORIX One gateway documentation.
+- Display own user name instead of ID in Console if possible.
+- Option to hide rarely used fields in the Join Settings step (end device wizard) in the Console.
 
 ### Changed
 
