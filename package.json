@@ -61,7 +61,7 @@
     "prettier": "^1.18.2",
     "react-test-renderer": "^16.0.0",
     "snapshot-diff": "^0.5.1",
-    "stylint": "^1.5.9",
+    "stylint": "^2.0.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "webpack": "^4.25.1",
