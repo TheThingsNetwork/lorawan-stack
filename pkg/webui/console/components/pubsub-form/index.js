@@ -155,7 +155,7 @@ export default class PubsubForm extends Component {
         <Form.SubTitle title={m.natsConfig} />
         <Form.Field name="nats.secure" title={sharedMessages.secure} component={Checkbox} />
         <Form.Field
-          name="nats.use_credentials"
+          name="nats._use_credentials"
           title={m.useCredentials}
           component={Checkbox}
           onChange={this.handleUseCredentialsChangeNats}
@@ -254,7 +254,7 @@ export default class PubsubForm extends Component {
           required
         />
         <Form.Field
-          name="mqtt.use_credentials"
+          name="mqtt._use_credentials"
           title={m.useCredentials}
           component={Checkbox}
           onChange={this.handleUseCredentialsChangeMqtt}

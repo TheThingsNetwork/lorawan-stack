@@ -24,7 +24,7 @@ const natsBlankValues = {
   address: '',
   port: '',
   secure: false,
-  use_credentials: true,
+  _use_credentials: true,
 }
 
 const mqttBlankValues = {
@@ -38,7 +38,7 @@ const mqttBlankValues = {
   tls_ca: '',
   tls_client_cert: '',
   tls_client_key: '',
-  use_credentials: true,
+  _use_credentials: true,
 }
 
 export const mapNatsFormValues = function(nats) {
@@ -50,7 +50,7 @@ export const mapNatsFormValues = function(nats) {
       password: res[7],
       address: res[8],
       port: res[10],
-      use_credentials: Boolean(res[5] || res[7]),
+      _use_credentials: Boolean(res[5] || res[7]),
     }
   } catch {
     return {}
@@ -58,7 +58,7 @@ export const mapNatsFormValues = function(nats) {
 }
 
 export const mapMqttFormValues = function(mqtt) {
-  return merge({ use_credentials: Boolean(mqtt.username || mqtt.password) }, mqtt, mqttBlankValues)
+  return merge({ _use_credentials: Boolean(mqtt.username || mqtt.password) }, mqtt, mqttBlankValues)
 }
 
 const mapPubsubMessageTypeToFormValue = messageType =>
@@ -101,10 +101,10 @@ const mapNatsConfigFormValueToNatsServerUrl = function({
   address,
   port,
   secure,
-  use_credentials,
+  _use_credentials,
 }) {
   return `${secure ? 'tls' : 'nats'}://${
-    use_credentials ? `${username}:${password}@` : ''
+    _use_credentials ? `${username}:${password}@` : ''
   }${address}:${port}`
 }
 
@@ -140,7 +140,7 @@ export const mapFormValuesToPubsub = function(values, appId) {
   }
   if (values._provider === providers.MQTT) {
     result.mqtt = values.mqtt
-    delete result.mqtt.use_credentials
+    delete result.mqtt._use_credentials
   }
 
   return result
