@@ -141,6 +141,7 @@ export default class OAuth extends React.PureComponent {
                 title={sharedMessages.userId}
                 name="user_id"
                 component={Input}
+                autoComplete="username"
                 autoFocus
                 required
               />
@@ -149,6 +150,7 @@ export default class OAuth extends React.PureComponent {
                 component={Input}
                 name="password"
                 type="password"
+                autoComplete="current-password"
                 required
               />
               <Form.Submit component={SubmitButton} message={sharedMessages.login} />

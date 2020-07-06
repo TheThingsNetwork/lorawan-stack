@@ -4238,6 +4238,15 @@
       "file": "store.go"
     }
   },
+  "error:pkg/identityserver/store:eui_taken": {
+    "translations": {
+      "en": "EUI already taken"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
   "error:pkg/identityserver/store:gateway_not_found": {
     "translations": {
       "en": "gateway `{gateway_id}` not found"
@@ -4407,6 +4416,24 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "identityserver.go"
+    }
+  },
+  "error:pkg/identityserver:end_device_euis_taken": {
+    "translations": {
+      "en": "an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "end_device_registry.go"
+    }
+  },
+  "error:pkg/identityserver:gateway_eui_taken": {
+    "translations": {
+      "en": "a gateway with EUI `{gateway_eui}` is already registered as `{gateway_id}`"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
     }
   },
   "error:pkg/identityserver:invalid_authorization": {

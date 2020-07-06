@@ -20,11 +20,11 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 )
 
@@ -172,6 +172,22 @@ func TestEndDevicesCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(ids, should.NotBeNil) {
 			a.So(*ids, should.Resemble, created.EndDeviceIdentifiers)
+		}
+
+		_, err = reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
+			EndDevice: ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "other-test-device-id",
+					ApplicationIdentifiers: app.ApplicationIdentifiers,
+					JoinEUI:                &joinEUI,
+					DevEUI:                 &devEUI,
+				},
+				Name: "test-device-name",
+			},
+		}, creds)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(err, should.HaveSameErrorDefinitionAs, errEndDeviceEUIsTaken)
 		}
 
 		list, err := reg.List(ctx, &ttnpb.ListEndDevicesRequest{

@@ -172,6 +172,15 @@ export const isUnauthenticatedError = error =>
   grpcStatusCode(error) === 16 || httpStatusCode(error) === 401
 
 /**
+ * Returns whether the grpc error represents a conflict with the current state on the server.
+ *
+ * @param {object} error - The error to be tested.
+ * @returns {boolean} `true` if `error` represents a `Conflict` error, `false` otherwise.
+ */
+export const isConflictError = error =>
+  grpcStatusCode(error) === 10 || httpStatusCode(error) === 409
+
+/**
  * Returns whether `error` has translation ids.
  *
  * @param {object} error - The error to be tested.

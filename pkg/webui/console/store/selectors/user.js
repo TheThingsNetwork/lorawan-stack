@@ -33,6 +33,18 @@ export const selectUserId = function(state) {
   return user.ids.user_id
 }
 
+export const selectUserName = state => {
+  const user = selectUser(state)
+
+  return user ? user.name : undefined
+}
+
+export const selectUserNameOrId = state => {
+  const user = selectUser(state)
+
+  return user ? user.name || user.ids.user_id : undefined
+}
+
 export const selectUserIsAdmin = function(state) {
   const user = selectUser(state)
 

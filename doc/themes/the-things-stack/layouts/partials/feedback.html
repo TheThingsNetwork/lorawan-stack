@@ -1,0 +1,10 @@
+{{- if .Site.Params.feedback.enabled -}}
+
+<script>window.emojicom_widget = { campaign: {{ .Site.Params.feedback.campaign }} };</script>
+<script src="https://cdn.emojicom.io/embed/widget.js" async></script>
+
+<div class='feedback has-vertical-space'>
+  <div id="emojicom-widget-inline"></div>
+</div>
+
+{{- end -}}

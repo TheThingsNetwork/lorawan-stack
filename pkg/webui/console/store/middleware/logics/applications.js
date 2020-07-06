@@ -14,7 +14,7 @@
 
 import api from '@console/api'
 
-import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
+import { isNotFoundError, isConflictError } from '@ttn-lw/lib/errors/utils'
 
 import * as applications from '@console/store/actions/applications'
 import * as link from '@console/store/actions/link'
@@ -117,9 +117,15 @@ const getApplicationLinkLogic = createRequestLogic({
 
       return { link: linkResult, stats: statsResult, linked: true }
     } catch (error) {
-      // Consider errors that are not 404, since not found means that the
-      // application is not linked.
-      if (isNotFoundError(error)) {
+      // Ignore 404 error. It means that the application is not linked, but the response can
+      // still hold link data that we have to display to the user.
+      if (isNotFoundError(error) && typeof linkResult !== 'undefined') {
+        return { link: linkResult, stats: statsResult, linked: false }
+      }
+
+      // Ignore 409 error. It means that the application link cannot be established, but
+      // the response can still hold link data that we have to displat to the user.
+      if (isConflictError(error) && typeof linkResult !== 'undefined') {
         return { link: linkResult, stats: statsResult, linked: false }
       }
 

@@ -21,6 +21,7 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
@@ -40,6 +41,11 @@ var (
 		"end_device.delete", "delete end device",
 		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 	)
+)
+
+var errEndDeviceEUIsTaken = errors.DefineAlreadyExists(
+	"end_device_euis_taken",
+	"an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`",
 )
 
 func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.CreateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
@@ -65,6 +71,19 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 		return nil
 	})
 	if err != nil {
+		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
+			if ids, err := is.getEndDeviceIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
+				JoinEUI: *req.JoinEUI,
+				DevEUI:  *req.DevEUI,
+			}); err == nil {
+				return nil, errEndDeviceEUIsTaken.WithAttributes(
+					"join_eui", req.JoinEUI.String(),
+					"dev_eui", req.DevEUI.String(),
+					"device_id", ids.GetDeviceID(),
+					"application_id", ids.GetApplicationID(),
+				)
+			}
+		}
 		return nil, err
 	}
 	events.Publish(evtCreateEndDevice(ctx, req.EndDeviceIdentifiers, nil))

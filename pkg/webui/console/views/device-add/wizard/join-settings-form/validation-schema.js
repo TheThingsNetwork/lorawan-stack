@@ -31,10 +31,9 @@ const validationSchema = Yup.object()
         const keySchema = Yup.lazy(() => {
           return mayEditKeys
             ? Yup.object().shape({
-                key: Yup.string().emptyOrLength(
-                  16 * 2,
-                  Yup.passValues(sharedMessages.validateLength),
-                ), // 16 Byte hex.
+                key: Yup.string()
+                  .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
+                  .required(sharedMessages.validateRequired),
               })
             : Yup.object().strip()
         })
@@ -55,9 +54,8 @@ const validationSchema = Yup.object()
     net_id: Yup.nullableString().emptyOrLength(
       3 * 2,
       Yup.passValues(sharedMessages.validateLength),
-    ), // 3 Byte hex.
-    resets_join_nonces: Yup.boolean().when('$lorawanVersion', {
-      // Verify if lorawan version is 1.1.0 or higher.
+    ),
+    resets_join_nonces: Yup.boolean().when(['$lorawanVersion'], {
       is: version => parseLorawanMacVersion(version) >= 110,
       then: schema => schema.default(false),
       otherwise: schema => schema.strip(),

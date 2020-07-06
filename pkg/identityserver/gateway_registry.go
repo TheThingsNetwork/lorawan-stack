@@ -20,6 +20,7 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
@@ -40,6 +41,8 @@ var (
 		ttnpb.RIGHT_GATEWAY_INFO,
 	)
 )
+
+var errGatewayEUITaken = errors.DefineAlreadyExists("gateway_eui_taken", "a gateway with EUI `{gateway_eui}` is already registered as `{gateway_id}`")
 
 func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
 	if err = blacklist.Check(ctx, req.GatewayID); err != nil {
@@ -84,6 +87,16 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		return nil
 	})
 	if err != nil {
+		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
+			if ids, err := is.getGatewayIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+				EUI: *req.EUI,
+			}); err == nil {
+				return nil, errGatewayEUITaken.WithAttributes(
+					"gateway_eui", req.EUI.String(),
+					"gateway_id", ids.GetGatewayID(),
+				)
+			}
+		}
 		return nil, err
 	}
 	events.Publish(evtCreateGateway(ctx, req.GatewayIdentifiers, nil))

@@ -221,12 +221,14 @@ const ConfigurationForm = React.memo(props => {
             placeholder={sharedMessages.addressPlaceholder}
             name="network_server_address"
             component={Input}
+            autoComplete="on"
           />
           <Form.Field
             title={sharedMessages.applicationServerAddress}
             placeholder={sharedMessages.addressPlaceholder}
             name="application_server_address"
             component={Input}
+            autoComplete="on"
           />
         </>
       )}
@@ -247,6 +249,7 @@ const ConfigurationForm = React.memo(props => {
             name="join_server_address"
             component={Input}
             disabled={externalJs}
+            autoComplete="on"
           />
         </>
       )}

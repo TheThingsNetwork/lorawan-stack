@@ -41,7 +41,7 @@ export default [
         if (isUnauthenticatedError(err)) {
           // If there was an Unauthenticated Error, it either means that the
           // console client or the OAuth app session is no longer valid.
-          // In this situation, it's best try to initializing the OAuth
+          // In this situation, it's best to try initializing the OAuth
           // roundtrip again. This might provide a new console session cookie
           // with which the propagated logout can be retried. If not, it can
           // be assumed that both console and OAuth app sessions are already

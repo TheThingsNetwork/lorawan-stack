@@ -36,12 +36,12 @@ const getLinkSuccess = function(state, { payload }) {
   }
 }
 
-const getLinkFailure = function(state) {
+const getLinkFailure = function(state, { payload }) {
   return {
     ...state,
-    link: {},
-    stats: undefined,
-    linked: false,
+    link: payload.link || {},
+    stats: payload.stats || undefined,
+    linked: payload.linked || false,
   }
 }
 
