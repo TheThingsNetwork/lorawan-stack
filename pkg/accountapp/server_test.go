@@ -29,12 +29,12 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/accountapp"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
-	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
@@ -112,14 +112,14 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 	})
-	s := oauth.NewServer(ctx, store, oauth.Config{
-		Mount:       "/oauth",
+	s := accountapp.NewServer(ctx, store, accountapp.Config{
+		Mount:       "/account",
 		CSRFAuthKey: []byte("12345678123456781234567812345678"),
-		UI: oauth.UIConfig{
+		UI: accountapp.UIConfig{
 			TemplateData: webui.TemplateData{
 				SiteName:     "The Things Network",
-				Title:        "OAuth",
-				CanonicalURL: "https://example.com/oauth",
+				Title:        "Account",
+				CanonicalURL: "https://example.com/account",
 			},
 		},
 	})
@@ -130,7 +130,7 @@ func TestOAuthFlow(t *testing.T) {
 	var r *http.Request
 
 	// Obtain CSRF token.
-	r = httptest.NewRequest("GET", "/oauth/login", nil)
+	r = httptest.NewRequest("GET", "/account/sign-in", nil)
 	r.URL.Scheme, r.URL.Host = "http", r.Host
 	if err != nil {
 		t.Fatal(err)
@@ -157,32 +157,32 @@ func TestOAuthFlow(t *testing.T) {
 	}{
 		{
 			Method:           "GET",
-			Path:             "/oauth/",
+			Path:             "/account/",
 			ExpectedCode:     http.StatusFound,
-			ExpectedRedirect: "/oauth/login",
+			ExpectedRedirect: "/account/sign-in",
 		},
 		{
 			Method:           "GET",
-			Path:             "/oauth/authorize",
+			Path:             "/account/authorize",
 			ExpectedCode:     http.StatusFound,
-			ExpectedRedirect: "/oauth/login",
+			ExpectedRedirect: "/account/sign-in",
 		},
 		{
 			Method:       "GET",
-			Path:         "/oauth/login",
+			Path:         "/account/sign-in",
 			ExpectedCode: http.StatusOK,
-			ExpectedBody: "The Things Network OAuth",
+			ExpectedBody: "The Things Network Account",
 		},
 		{
 			Name:         "GET me without auth",
 			Method:       "GET",
-			Path:         "/oauth/api/me",
+			Path:         "/account/api/me",
 			ExpectedCode: http.StatusUnauthorized,
 		},
 		{
 			Name:         "logout without auth",
 			Method:       "POST",
-			Path:         "/oauth/api/auth/logout",
+			Path:         "/account/api/auth/logout",
 			ExpectedCode: http.StatusUnauthorized,
 		},
 		{
@@ -190,7 +190,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.err.getUser = mockErrUnauthenticated
 			},
 			Method:       "POST",
-			Path:         "/oauth/api/auth/login",
+			Path:         "/account/api/auth/login",
 			Body:         loginFormData{"json", "user", "pass"},
 			ExpectedCode: http.StatusUnauthorized,
 			StoreCheck: func(t *testing.T, s *mockStore) {
@@ -207,7 +207,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.err.getUser = mockErrUnauthenticated
 			},
 			Method:       "POST",
-			Path:         "/oauth/api/auth/login",
+			Path:         "/account/api/auth/login",
 			Body:         loginFormData{"form", "user", "pass"},
 			ExpectedCode: http.StatusUnauthorized,
 			StoreCheck: func(t *testing.T, s *mockStore) {
@@ -224,7 +224,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.user = mockUser
 			},
 			Method:       "POST",
-			Path:         "/oauth/api/auth/login",
+			Path:         "/account/api/auth/login",
 			Body:         loginFormData{"json", "user", "wrong_pass"},
 			ExpectedCode: http.StatusBadRequest,
 		},
@@ -235,7 +235,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.session = mockSession
 			},
 			Method:       "POST",
-			Path:         "/oauth/api/auth/login",
+			Path:         "/account/api/auth/login",
 			Body:         loginFormData{"json", "user", "pass"},
 			ExpectedCode: http.StatusNoContent,
 		},
@@ -246,7 +246,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.user = mockUser
 			},
 			Method:       "GET",
-			Path:         "/oauth/api/me",
+			Path:         "/account/api/me",
 			ExpectedCode: http.StatusOK,
 			ExpectedBody: `"user_id":"user"`,
 			StoreCheck: func(t *testing.T, s *mockStore) {
@@ -263,9 +263,9 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.user = mockUser
 			},
 			Method:           "GET",
-			Path:             "/oauth/login",
+			Path:             "/account/sign-in",
 			ExpectedCode:     http.StatusFound,
-			ExpectedRedirect: "/oauth",
+			ExpectedRedirect: "/account",
 		},
 		{
 			Name: "authorization page",
@@ -276,7 +276,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.err.getAuthorization = mockErrNotFound
 			},
 			Method:       "GET",
-			Path:         "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			Path:         "/account/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
 			ExpectedCode: http.StatusOK,
 			ExpectedBody: `"client":{"ids":{"client_id":"client"}`,
 			StoreCheck: func(t *testing.T, s *mockStore) {
@@ -295,7 +295,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.err.getClient = mockErrNotFound
 			},
 			Method:       "GET",
-			Path:         "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			Path:         "/account/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
 			ExpectedCode: http.StatusNotFound,
 			ExpectedBody: `NotFound`,
 		},
@@ -313,7 +313,7 @@ func TestOAuthFlow(t *testing.T) {
 				}
 			},
 			Method:       "GET",
-			Path:         "/oauth/authorize?client_id=client&redirect_uri=http://other-uri/callback&response_type=code&state=foo",
+			Path:         "/account/authorize?client_id=client&redirect_uri=http://other-uri/callback&response_type=code&state=foo",
 			ExpectedCode: http.StatusForbidden,
 			ExpectedBody: `redirect URI`,
 		},
@@ -331,7 +331,7 @@ func TestOAuthFlow(t *testing.T) {
 				}
 			},
 			Method:           "GET",
-			Path:             "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			Path:             "/account/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "http://uri/callback?error=invalid_client",
 		},
@@ -349,7 +349,7 @@ func TestOAuthFlow(t *testing.T) {
 				}
 			},
 			Method:           "GET",
-			Path:             "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			Path:             "/account/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "http://uri/callback?error=invalid_client",
 		},
@@ -367,7 +367,7 @@ func TestOAuthFlow(t *testing.T) {
 				}
 			},
 			Method:           "GET",
-			Path:             "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			Path:             "/account/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "http://uri/callback?error=invalid_client",
 		},
@@ -385,7 +385,7 @@ func TestOAuthFlow(t *testing.T) {
 				}
 			},
 			Method:           "GET",
-			Path:             "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			Path:             "/account/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "http://uri/callback?error=invalid_grant",
 		},
@@ -398,7 +398,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.err.getAuthorization = mockErrNotFound
 			},
 			Method:           "POST",
-			Path:             "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			Path:             "/account/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
 			Body:             authorizeFormData{encoding: "form", Authorize: true},
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "http://uri/callback?code=",
@@ -424,7 +424,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.user = mockUser
 			},
 			Method:       "POST",
-			Path:         "/oauth/api/auth/logout",
+			Path:         "/account/api/auth/logout",
 			ExpectedCode: http.StatusNoContent,
 			StoreCheck: func(t *testing.T, s *mockStore) {
 				a := assertions.New(t)
@@ -441,7 +441,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.accessToken = mockAccessToken
 			},
 			Method:           "GET",
-			Path:             "/oauth/logout?access_token_id=access-token-id&post_logout_redirect_uri=http://uri/alternative-logout-callback",
+			Path:             "/account/sign-out?access_token_id=access-token-id&post_logout_redirect_uri=http://uri/alternative-logout-callback",
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "/alternative-logout-callback",
 			StoreCheck: func(t *testing.T, s *mockStore) {
@@ -460,7 +460,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.accessToken = mockAccessToken
 			},
 			Method:           "GET",
-			Path:             "/oauth/logout?access_token_id=access-token-id",
+			Path:             "/account/sign-out?access_token_id=access-token-id",
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "/logout-callback",
 			StoreCheck: func(t *testing.T, s *mockStore) {
@@ -479,7 +479,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.accessToken = mockAccessToken
 			},
 			Method:       "GET",
-			Path:         "/oauth/logout?access_token_id=access-token-id&post_logout_redirect_uri=http://uri/false-callback",
+			Path:         "/account/sign-out?access_token_id=access-token-id&post_logout_redirect_uri=http://uri/false-callback",
 			ExpectedCode: http.StatusBadRequest,
 			StoreCheck: func(t *testing.T, s *mockStore) {
 				a := assertions.New(t)
@@ -497,7 +497,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.accessToken = mockAccessToken
 			},
 			Method:       "GET",
-			Path:         "/oauth/logout",
+			Path:         "/account/sign-out",
 			ExpectedCode: http.StatusForbidden,
 		},
 	} {
@@ -599,12 +599,12 @@ func TestTokenExchange(t *testing.T) {
 			},
 		},
 	})
-	s := oauth.NewServer(ctx, store, oauth.Config{
-		Mount: "/oauth",
-		UI: oauth.UIConfig{
+	s := accountapp.NewServer(ctx, store, accountapp.Config{
+		Mount: "/account",
+		UI: accountapp.UIConfig{
 			TemplateData: webui.TemplateData{
 				SiteName: "The Things Network",
-				Title:    "OAuth",
+				Title:    "Account",
 			},
 		},
 	})
@@ -638,7 +638,7 @@ func TestTokenExchange(t *testing.T) {
 				}
 			},
 			Method: "POST",
-			Path:   "/oauth/token",
+			Path:   "/account/token",
 			Body: map[string]string{
 				"grant_type":    "authorization_code",
 				"code":          "the code",
@@ -678,7 +678,7 @@ func TestTokenExchange(t *testing.T) {
 				}
 			},
 			Method: "POST",
-			Path:   "/oauth/token",
+			Path:   "/account/token",
 			Body: map[string]string{
 				"grant_type":    "refresh_token",
 				"refresh_token": "OJSWM.IBTFXELDVVT64Y26IZZFFNSL7GWZY2Y3ALQQI3A.GCPIASDUP7UZJ6YL5OP2ESZB7CKRFV4JJQYTMDOSDIOE7O75IAMQ",
