@@ -1637,6 +1637,222 @@
       "file": "start.go"
     }
   },
+  "error:pkg/accountapp:access_denied": {
+    "translations": {
+      "en": "access denied"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "server.go"
+    }
+  },
+  "error:pkg/accountapp:auth_cookie": {
+    "translations": {
+      "en": "could not get auth cookie"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "user.go"
+    }
+  },
+  "error:pkg/accountapp:client_missing_grant": {
+    "translations": {
+      "en": "OAuth client does not have {grant} grant"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "oauth.go"
+    }
+  },
+  "error:pkg/accountapp:client_not_approved": {
+    "translations": {
+      "en": "OAuth client was not approved"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "oauth.go"
+    }
+  },
+  "error:pkg/accountapp:client_rejected": {
+    "translations": {
+      "en": "OAuth client was rejected"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "oauth.go"
+    }
+  },
+  "error:pkg/accountapp:client_suspended": {
+    "translations": {
+      "en": "OAuth client was suspended"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "oauth.go"
+    }
+  },
+  "error:pkg/accountapp:internal": {
+    "translations": {
+      "en": "internal error {id}"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "server.go"
+    }
+  },
+  "error:pkg/accountapp:invalid client": {
+    "translations": {
+      "en": "invalid or unauthenticated client"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "server.go"
+    }
+  },
+  "error:pkg/accountapp:invalid_grant": {
+    "translations": {
+      "en": "invalid, expired or revoked authorization code"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "server.go"
+    }
+  },
+  "error:pkg/accountapp:invalid_logout_redirect_uri": {
+    "translations": {
+      "en": "the redirect URI did not match the one(s) defined in the client"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "user.go"
+    }
+  },
+  "error:pkg/accountapp:invalid_redirect_uri": {
+    "translations": {
+      "en": "invalid redirect URI"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "server.go"
+    }
+  },
+  "error:pkg/accountapp:invalid_request": {
+    "translations": {
+      "en": "invalid or missing request parameter"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "server.go"
+    }
+  },
+  "error:pkg/accountapp:invalid_scope": {
+    "translations": {
+      "en": "invalid scope"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "server.go"
+    }
+  },
+  "error:pkg/accountapp:missing_param_access_token_id": {
+    "translations": {
+      "en": "access token ID was not provided"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "user.go"
+    }
+  },
+  "error:pkg/accountapp:no_access_token": {
+    "translations": {
+      "en": "the provided token is not an access token`"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "storage.go"
+    }
+  },
+  "error:pkg/accountapp:no_refresh_token": {
+    "translations": {
+      "en": "the provided token is not a refresh token`"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "storage.go"
+    }
+  },
+  "error:pkg/accountapp:no_user_id_password_match": {
+    "translations": {
+      "en": "incorrect password or user ID"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "user.go"
+    }
+  },
+  "error:pkg/accountapp:not_authenticated": {
+    "translations": {
+      "en": "not authenticated"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "middleware.go"
+    }
+  },
+  "error:pkg/accountapp:session_expired": {
+    "translations": {
+      "en": "session expired"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "user.go"
+    }
+  },
+  "error:pkg/accountapp:token": {
+    "translations": {
+      "en": "invalid token"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "storage.go"
+    }
+  },
+  "error:pkg/accountapp:token_mismatch": {
+    "translations": {
+      "en": "refresh token ID `{refresh_token_id}` does not match access token ID `{access_token_id}`"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "storage.go"
+    }
+  },
+  "error:pkg/accountapp:unauthorized_client": {
+    "translations": {
+      "en": "client is not authorized to request a token using this method"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "server.go"
+    }
+  },
+  "error:pkg/accountapp:unsupported_grant_type": {
+    "translations": {
+      "en": "unsupported grant type"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "server.go"
+    }
+  },
+  "error:pkg/accountapp:unsupported_response_type": {
+    "translations": {
+      "en": "unsupported response type"
+    },
+    "description": {
+      "package": "pkg/accountapp",
+      "file": "server.go"
+    }
+  },
   "error:pkg/applicationserver/io/grpc:connect": {
     "translations": {
       "en": "failed to connect application `{application_uid}`"
@@ -5930,222 +6146,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/oauth:access_denied": {
-    "translations": {
-      "en": "access denied"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "server.go"
-    }
-  },
-  "error:pkg/oauth:auth_cookie": {
-    "translations": {
-      "en": "could not get auth cookie"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "user.go"
-    }
-  },
-  "error:pkg/oauth:client_missing_grant": {
-    "translations": {
-      "en": "OAuth client does not have {grant} grant"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "oauth.go"
-    }
-  },
-  "error:pkg/oauth:client_not_approved": {
-    "translations": {
-      "en": "OAuth client was not approved"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "oauth.go"
-    }
-  },
-  "error:pkg/oauth:client_rejected": {
-    "translations": {
-      "en": "OAuth client was rejected"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "oauth.go"
-    }
-  },
-  "error:pkg/oauth:client_suspended": {
-    "translations": {
-      "en": "OAuth client was suspended"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "oauth.go"
-    }
-  },
-  "error:pkg/oauth:internal": {
-    "translations": {
-      "en": "internal error {id}"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "server.go"
-    }
-  },
-  "error:pkg/oauth:invalid client": {
-    "translations": {
-      "en": "invalid or unauthenticated client"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "server.go"
-    }
-  },
-  "error:pkg/oauth:invalid_grant": {
-    "translations": {
-      "en": "invalid, expired or revoked authorization code"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "server.go"
-    }
-  },
-  "error:pkg/oauth:invalid_logout_redirect_uri": {
-    "translations": {
-      "en": "the redirect URI did not match the one(s) defined in the client"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "user.go"
-    }
-  },
-  "error:pkg/oauth:invalid_redirect_uri": {
-    "translations": {
-      "en": "invalid redirect URI"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "server.go"
-    }
-  },
-  "error:pkg/oauth:invalid_request": {
-    "translations": {
-      "en": "invalid or missing request parameter"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "server.go"
-    }
-  },
-  "error:pkg/oauth:invalid_scope": {
-    "translations": {
-      "en": "invalid scope"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "server.go"
-    }
-  },
-  "error:pkg/oauth:missing_param_access_token_id": {
-    "translations": {
-      "en": "access token ID was not provided"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "user.go"
-    }
-  },
-  "error:pkg/oauth:no_access_token": {
-    "translations": {
-      "en": "the provided token is not an access token`"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "storage.go"
-    }
-  },
-  "error:pkg/oauth:no_refresh_token": {
-    "translations": {
-      "en": "the provided token is not a refresh token`"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "storage.go"
-    }
-  },
-  "error:pkg/oauth:no_user_id_password_match": {
-    "translations": {
-      "en": "incorrect password or user ID"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "user.go"
-    }
-  },
-  "error:pkg/oauth:not_authenticated": {
-    "translations": {
-      "en": "not authenticated"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "middleware.go"
-    }
-  },
-  "error:pkg/oauth:session_expired": {
-    "translations": {
-      "en": "session expired"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "user.go"
-    }
-  },
-  "error:pkg/oauth:token": {
-    "translations": {
-      "en": "invalid token"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "storage.go"
-    }
-  },
-  "error:pkg/oauth:token_mismatch": {
-    "translations": {
-      "en": "refresh token ID `{refresh_token_id}` does not match access token ID `{access_token_id}`"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "storage.go"
-    }
-  },
-  "error:pkg/oauth:unauthorized_client": {
-    "translations": {
-      "en": "client is not authorized to request a token using this method"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "server.go"
-    }
-  },
-  "error:pkg/oauth:unsupported_grant_type": {
-    "translations": {
-      "en": "unsupported grant type"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "server.go"
-    }
-  },
-  "error:pkg/oauth:unsupported_response_type": {
-    "translations": {
-      "en": "unsupported response type"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "server.go"
-    }
-  },
   "error:pkg/packetbrokeragent:decode_payload": {
     "translations": {
       "en": "decode LoRaWAN payload"
@@ -8338,7 +8338,7 @@
       "en": "authorize OAuth client"
     },
     "description": {
-      "package": "pkg/oauth",
+      "package": "pkg/accountapp",
       "file": "observability.go"
     }
   },
@@ -8347,7 +8347,7 @@
       "en": "exchange OAuth access token"
     },
     "description": {
-      "package": "pkg/oauth",
+      "package": "pkg/accountapp",
       "file": "observability.go"
     }
   },
@@ -8356,7 +8356,7 @@
       "en": "login user successful"
     },
     "description": {
-      "package": "pkg/oauth",
+      "package": "pkg/accountapp",
       "file": "observability.go"
     }
   },
@@ -8365,7 +8365,7 @@
       "en": "login user failure"
     },
     "description": {
-      "package": "pkg/oauth",
+      "package": "pkg/accountapp",
       "file": "observability.go"
     }
   },
@@ -8374,7 +8374,7 @@
       "en": "logout user"
     },
     "description": {
-      "package": "pkg/oauth",
+      "package": "pkg/accountapp",
       "file": "observability.go"
     }
   },
