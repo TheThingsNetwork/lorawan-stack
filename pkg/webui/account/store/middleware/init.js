@@ -19,14 +19,14 @@ import api from '@account/api'
 import * as init from '@account/store/actions/init'
 import * as user from '@account/store/actions/user'
 
-const oauthInitLogic = createLogic({
+const accountAppInitLogic = createLogic({
   type: init.INITIALIZE,
   async process({ getState, action }, dispatch, done) {
     dispatch(user.getUserMe())
 
     try {
       try {
-        const result = await api.oauth.me()
+        const result = await api.account.me()
 
         dispatch(user.getUserMeSuccess(result.data.user))
       } catch (error) {
@@ -37,7 +37,7 @@ const oauthInitLogic = createLogic({
       dispatch(init.initializeSuccess())
 
       // eslint-disable-next-line no-console
-      console.log('Oauth initialization successful!')
+      console.log('Account app initialization successful!')
     } catch (error) {
       const initError = error.data ? error.data : error
       dispatch(init.initializeFailure(initError))
@@ -47,4 +47,4 @@ const oauthInitLogic = createLogic({
   },
 })
 
-export default oauthInitLogic
+export default accountAppInitLogic
