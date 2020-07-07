@@ -22,11 +22,11 @@ const userLogic = createLogic({
   async process({ getState, action }, dispatch, done) {
     try {
       try {
-        await api.oauth.me()
+        await api.account.me()
       } catch (error) {
         dispatch(user.getUserMeFailure())
       }
-      await api.oauth.logout()
+      await api.account.logout()
       dispatch(user.logoutSuccess())
     } catch (error) {
       dispatch(user.logoutFailure(error))
