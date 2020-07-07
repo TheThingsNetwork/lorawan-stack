@@ -68,7 +68,7 @@ Footer.propTypes = {
   /** The classname to be applied to the footer. */
   className: PropTypes.string,
   /** A flag specifying whether the application is connected to the internet. */
-  isOnline: PropTypes.bool.isRequired,
+  isOnline: PropTypes.bool,
   /**
    * A list of links to be displayed in the footer component.
    *
@@ -89,6 +89,7 @@ Footer.defaultProps = {
   className: undefined,
   links: [],
   supportLink: undefined,
+  isOnline: true,
 }
 
 export default Footer

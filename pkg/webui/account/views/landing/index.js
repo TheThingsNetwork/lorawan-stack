@@ -14,8 +14,8 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
 import bind from 'autobind-decorator'
-import { push } from 'connected-react-router'
 
 import Button from '@ttn-lw/components/button'
 
@@ -24,19 +24,19 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { logout } from '@account/store/actions/user'
 
+import { selectUser } from '@account/store/selectors/user'
+
 @connect(
   state => ({
-    user: state.user.user,
+    user: selectUser(state),
   }),
   {
-    redirectToLogin: () => push('/login'),
     logout,
   },
 )
 export default class Landing extends React.PureComponent {
   static propTypes = {
     logout: PropTypes.func.isRequired,
-    redirectToLogin: PropTypes.func.isRequired,
     user: PropTypes.user,
   }
 
@@ -45,32 +45,23 @@ export default class Landing extends React.PureComponent {
   }
 
   @bind
-  async handleLogout() {
+  handleLogout() {
     const { logout } = this.props
 
     logout()
-  }
-
-  async componentDidUpdate() {
-    const { user, redirectToLogin } = this.props
-
-    if (!Boolean(user)) {
-      redirectToLogin()
-    }
   }
 
   render() {
     const { user } = this.props
 
     if (!Boolean(user)) {
-      return null
+      return <Redirect to="/login" />
     }
 
     return (
       <div>
         You are logged in as {user.ids.user_id}.{' '}
         <Button message={sharedMessages.logout} onClick={this.handleLogout} />
-        <Button.Link message={sharedMessages.changePassword} to="/update-password" />
       </div>
     )
   }

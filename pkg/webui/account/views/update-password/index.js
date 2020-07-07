@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { Redirect } from 'react-router-dom'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
@@ -28,25 +27,26 @@ import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import Checkbox from '@ttn-lw/components/checkbox'
-import Spinner from '@ttn-lw/components/spinner'
 
 import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
-import style from '@account/views/create-account/create-account.styl'
+import style from '@account/views/front/front.styl'
 
 import Yup from '@ttn-lw/lib/yup'
+import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
+  updatePassword: 'Update password',
   newPassword: 'New password',
   oldPassword: 'Old password',
   passwordChanged: 'Password changed',
   revokeAccess: 'Revoke access',
-  logoutAllDevices: 'Log out from all end devices',
-  revokeWarning: 'This will revoke access from all logged in devices',
-  sessionRevoked: 'Session revoked',
+  logoutAllDevices: 'Sign out from all devices',
+  revokeWarning: 'This will revoke access from all signed in devices',
+  sessionRevoked: 'Your password was changed and all active sessions were revoked',
 })
 
 const validationSchema = Yup.object().shape({
@@ -59,6 +59,8 @@ const validationSchema = Yup.object().shape({
     .required(sharedMessages.validateRequired),
 })
 
+const siteName = selectApplicationSiteName()
+
 const initialValues = {
   password: '',
   confirm: '',
@@ -67,10 +69,7 @@ const initialValues = {
 }
 
 @connect(
-  state => ({
-    fetching: state.user.fetching,
-    user: state.user.user,
-  }),
+  undefined,
   {
     handleCancelUpdate: () => push('/'),
     handlePasswordChanged: () =>
@@ -85,16 +84,10 @@ const initialValues = {
 )
 export default class UpdatePassword extends React.PureComponent {
   static propTypes = {
-    fetching: PropTypes.bool.isRequired,
     handleCancelUpdate: PropTypes.func.isRequired,
     handlePasswordChanged: PropTypes.func.isRequired,
     handleSessionRevoked: PropTypes.func.isRequired,
     location: PropTypes.location.isRequired,
-    user: PropTypes.user,
-  }
-
-  static defaultProps = {
-    user: undefined,
   }
 
   state = {
@@ -110,19 +103,17 @@ export default class UpdatePassword extends React.PureComponent {
 
   @bind
   async handleSubmit(values, { resetForm, setSubmitting }) {
-    const { user, handlePasswordChanged, handleSessionRevoked } = this.props
+    const { handlePasswordChanged, handleSessionRevoked } = this.props
     const userParams = queryString.parse(this.props.location.search)
     const oldPassword = values.old_password ? values.old_password : userParams.current
-    const userId = Boolean(user) ? user.ids.user_id : userParams.user
+    const userId = userParams.user
 
     try {
-      if (Boolean(user)) {
-        try {
-          await api.account.me()
-        } catch (error) {
-          handleSessionRevoked()
-          return
-        }
+      try {
+        await api.account.me()
+      } catch (error) {
+        handleSessionRevoked()
+        return
       }
       await api.users.updatePassword(userId, {
         user_ids: { user_id: userId },
@@ -142,93 +133,61 @@ export default class UpdatePassword extends React.PureComponent {
   }
 
   render() {
-    const { user, fetching, location, handleCancelUpdate } = this.props
+    const { location, handleCancelUpdate } = this.props
 
     const { error, info, revoke_all_access } = this.state
 
-    if (fetching) {
-      return (
-        <Spinner center>
-          <Message content={sharedMessages.fetching} />
-        </Spinner>
-      )
-    }
-
     const { user: userParam, current: currentParam } = queryString.parse(location.search)
-    if (!Boolean(user) && (!Boolean(userParam) || !Boolean(currentParam))) {
+    if (!Boolean(userParam) || !Boolean(currentParam)) {
       return <Redirect to={{ pathname: '/' }} />
     }
 
-    let oldPasswordField
-    if (Boolean(user)) {
-      oldPasswordField = (
-        <Form.Field
-          component={Input}
-          required
-          title={m.oldPassword}
-          name="old_password"
-          type="password"
-          autoComplete="current-password"
-          autoFocus
-        />
-      )
-    }
-
     return (
-      <Container className={style.fullHeight}>
-        <Row justify="center" align="center" className={style.fullHeight}>
-          <Col sm={12} md={8} lg={5}>
-            <IntlHelmet title={sharedMessages.changePassword} />
-            <Message
-              content={sharedMessages.changePassword}
-              component="h1"
-              className={style.title}
-            />
-            <Form
-              onSubmit={this.handleSubmit}
-              initialValues={initialValues}
-              error={error}
-              info={info}
-              validationSchema={validationSchema}
-              horizontal={false}
-            >
-              {oldPasswordField}
-              <Form.Field
-                component={Input}
-                required
-                title={m.newPassword}
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                autoFocus={!Boolean(user)}
-              />
-              <Form.Field
-                component={Input}
-                required
-                title={sharedMessages.confirmPassword}
-                name="confirm"
-                type="password"
-                autoComplete="new-password"
-              />
-              <Form.Field
-                onChange={this.handleRevokeAllAccess}
-                warning={revoke_all_access ? m.revokeWarning : undefined}
-                title={m.revokeAccess}
-                name="revoke_all_access"
-                label={m.logoutAllDevices}
-                component={Checkbox}
-              />
-              <Form.Submit component={SubmitButton} message={sharedMessages.changePassword} />
-              <Button
-                naked
-                secondary
-                message={sharedMessages.cancel}
-                onClick={handleCancelUpdate}
-              />
-            </Form>
-          </Col>
-        </Row>
-      </Container>
+      <div className={style.form}>
+        <IntlHelmet title={m.forgotPassword} />
+        <h1 className={style.title}>
+          {siteName}
+          <br />
+          <Message component="strong" content={m.updatePassword} />
+        </h1>
+        <hr className={style.hRule} />
+        <Form
+          onSubmit={this.handleSubmit}
+          initialValues={initialValues}
+          error={error}
+          info={info}
+          validationSchema={validationSchema}
+          horizontal={false}
+        >
+          <Form.Field
+            component={Input}
+            required
+            title={m.newPassword}
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            autoFocus
+          />
+          <Form.Field
+            component={Input}
+            required
+            title={sharedMessages.confirmPassword}
+            name="confirm"
+            type="password"
+            autoComplete="new-password"
+          />
+          <Form.Field
+            onChange={this.handleRevokeAllAccess}
+            warning={revoke_all_access ? m.revokeWarning : undefined}
+            title={m.revokeAccess}
+            name="revoke_all_access"
+            label={m.logoutAllDevices}
+            component={Checkbox}
+          />
+          <Form.Submit component={SubmitButton} message={sharedMessages.changePassword} />
+          <Button naked secondary message={sharedMessages.cancel} onClick={handleCancelUpdate} />
+        </Form>
+      </div>
     )
   }
 }

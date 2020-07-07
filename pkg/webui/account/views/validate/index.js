@@ -21,27 +21,29 @@ import api from '@account/api'
 import Spinner from '@ttn-lw/components/spinner'
 import ErrorNotification from '@ttn-lw/components/error-notification'
 import Notification from '@ttn-lw/components/notification'
-import Link from '@ttn-lw/components/link'
+import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
-import Logo from '@console/containers/logo'
+import style from '@account/views/front/front.styl'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { isNotFoundError, createFrontendError } from '@ttn-lw/lib/errors/utils'
-
-import style from './validate.styl'
+import { selectApplicationSiteName, selectApplicationSiteTitle } from '@ttn-lw/lib/selectors/env'
 
 const m = defineMessages({
-  validateSuccess: 'Contact info validated',
+  contactInfoValidation: 'Contact info validation',
+  validateSuccess: 'Validation successful',
   validateFail: 'There was an error and the contact info could not be validated',
-  goToLogin: 'Go to login',
+  validatingAccount: 'Validating account…',
   tokenNotFoundTitle: 'Token not found',
   tokenNotFoundMessage:
     'The validation token was not found. This could mean that the contact info has already been validated. Otherwise, please contact an administrator.',
-  contactInfoValidation: 'Contact info validation',
 })
+
+const siteName = selectApplicationSiteName()
+const siteTitle = selectApplicationSiteTitle()
 
 export default class Validate extends React.PureComponent {
   static propTypes = {
@@ -71,12 +73,8 @@ export default class Validate extends React.PureComponent {
       })
       this.handleSuccess()
     } catch (error) {
-      if (error.response && error.response.data) {
-        if (isNotFoundError(error.response.data)) {
-          this.handleError(createFrontendError(m.tokenNotFoundTitle, m.tokenNotFoundMessage))
-        } else {
-          this.handleError(error.response.data)
-        }
+      if (isNotFoundError(error)) {
+        this.handleError(createFrontendError(m.tokenNotFoundTitle, m.tokenNotFoundMessage))
       } else {
         this.handleError(error)
       }
@@ -86,31 +84,30 @@ export default class Validate extends React.PureComponent {
   render() {
     const { fetching, error, success } = this.state
 
-    if (fetching) {
-      return (
-        <Spinner center>
-          <Message content={sharedMessages.fetching} />
-        </Spinner>
-      )
-    }
-
     return (
-      <div className={style.center}>
-        <Logo className={style.logo} />
-        <Message component="h3" content={m.contactInfoValidation} className={style.heading} />
-        {error && <ErrorNotification content={error} buttonIcon={'error'} small />}
-        {success && (
-          <Notification
-            large
-            success
-            content={success}
-            title={m.validateSuccess}
-            buttonIcon={'check_circle'}
-          />
+      <div className={style.form}>
+        <IntlHelmet title={m.contactInfoValidation} />
+        <h1 className={style.title}>
+          {siteName}
+          <br />
+          <Message component="strong" content={m.contactInfoValidation} />
+        </h1>
+        <hr className={style.hRule} />
+        {fetching ? (
+          <Spinner after={0} faded className={style.spinner}>
+            <Message content={m.validatingAccount} />
+          </Spinner>
+        ) : (
+          <>
+            {error && <ErrorNotification small content={error} title={m.validateFail} />}
+            {success && <Notification small success content={success} title={m.validateSuccess} />}
+          </>
         )}
-        <Link secondary to="/login">
-          <Message className={style.goToLogin} content={m.goToLogin} />
-        </Link>
+        <Button.Link
+          to="/"
+          icon="keyboard_arrow_left"
+          message={{ ...m.backToAccount, values: { siteTitle } }}
+        />
       </div>
     )
   }

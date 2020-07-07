@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
@@ -29,22 +28,22 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import Message from '@ttn-lw/lib/components/message'
 
+import style from '@account/views/front/front.styl'
+
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { id as userRegexp } from '@ttn-lw/lib/regexp'
-
-import style from './forgot-password.styl'
+import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 
 const m = defineMessages({
-  loginPage: 'Login page',
   forgotPassword: 'Forgot password',
-  passwordRequested: 'You will receive an email with reset instructions shortly',
+  passwordRequested:
+    'An email with reset instruction was sent to the email address associated with your username. Please check your spam folder as well.',
   goToLogin: 'Go to login',
   send: 'Send',
-  resetPasswordDescription:
-    'Please enter your username to receive an email with reset instructions',
   requestTempPassword: 'Reset password',
+  resetPasswordDescription: 'Please enter your User ID to receive an email with reset instructions',
 })
 
 const validationSchema = Yup.object().shape({
@@ -56,6 +55,8 @@ const validationSchema = Yup.object().shape({
 })
 
 const initialValues = { user_id: '' }
+
+const siteName = selectApplicationSiteName()
 
 @connect(
   undefined,
@@ -85,7 +86,7 @@ export default class ForgotPassword extends React.PureComponent {
       })
     } catch (error) {
       this.setState({
-        error: error.response.data,
+        error,
         info: '',
       })
     } finally {
@@ -99,38 +100,39 @@ export default class ForgotPassword extends React.PureComponent {
     const cancelButtonText = requested ? m.goToLogin : sharedMessages.cancel
 
     return (
-      <Container className={style.fullHeight}>
-        <Row justify="center" align="center" className={style.fullHeight}>
-          <Col sm={12} md={8} lg={5}>
-            <IntlHelmet title={m.forgotPassword} />
-            <Message content={m.requestTempPassword} component="h1" className={style.title} />
-            <Message
-              content={m.resetPasswordDescription}
-              component="h4"
-              className={style.description}
-            />
-            <Form
-              onSubmit={this.handleSubmit}
-              initialValues={initialValues}
-              error={error}
-              info={info}
-              validationSchema={validationSchema}
-              horizontal={false}
-            >
-              <Form.Field
-                title={sharedMessages.userId}
-                name="user_id"
-                component={Input}
-                autoComplete="username"
-                autoFocus
-                required
-              />
-              <Form.Submit component={SubmitButton} message={m.send} />
-              <Button naked secondary message={cancelButtonText} onClick={handleCancel} />
-            </Form>
-          </Col>
-        </Row>
-      </Container>
+      <div className={style.form}>
+        <IntlHelmet title={m.forgotPassword} />
+        <h1 className={style.title}>
+          {siteName}
+          <br />
+          <Message component="strong" content={m.requestTempPassword} />
+        </h1>
+        <hr className={style.hRule} />
+        <Message content={m.resetPasswordDescription} component="p" className={style.description} />
+        <Form
+          onSubmit={this.handleSubmit}
+          initialValues={initialValues}
+          error={error}
+          info={info}
+          validationSchema={validationSchema}
+          horizontal={false}
+        >
+          <Form.Field
+            title={sharedMessages.userId}
+            name="user_id"
+            component={Input}
+            autoFocus
+            required
+          />
+          <Form.Submit
+            component={SubmitButton}
+            message={m.send}
+            className={style.submitButton}
+            alwaysEnabled
+          />
+          <Button naked secondary message={cancelButtonText} onClick={handleCancel} />
+        </Form>
+      </div>
     )
   }
 }

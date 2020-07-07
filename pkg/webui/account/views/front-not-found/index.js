@@ -13,11 +13,8 @@
 // limitations under the License.
 
 import React from 'react'
-import Query from 'query-string'
-import { Redirect } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 
-import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -26,53 +23,35 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import style from '@account/views/front/front.styl'
 
 import { selectApplicationSiteName, selectApplicationSiteTitle } from '@ttn-lw/lib/selectors/env'
-import PropTypes from '@ttn-lw/lib/prop-types'
+import errorMessages from '@ttn-lw/lib/errors/error-messages'
+import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
 
 const m = defineMessages({
-  code: 'Authorization code',
-  codeDescription: 'Your authorization code is:',
   backToAccount: 'Back to {siteTitle}',
 })
 
 const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
 
-export default class Code extends React.Component {
-  static propTypes = {
-    location: PropTypes.location.isRequired,
-  }
+export default class FrontNotFound extends React.Component {
   render() {
-    const { location } = this.props
-    const { query } = Query.parseUrl(location.search)
-
-    if (!query.code) {
-      return <Redirect to="/" />
-    }
-
     return (
       <React.Fragment>
         <div className={style.form}>
-          <IntlHelmet title={m.createANewAccount} />
+          <IntlHelmet title={statusCodeMessages['404']} />
           <h1 className={style.title}>
             {siteName}
             <br />
-            <Message content={m.code} component="strong" />
+            <Message content={statusCodeMessages['404']} component="strong" />
           </h1>
           <hr className={style.hRule} />
           <Message
-            content={m.codeDescription}
-            component="label"
-            className={style.codeDescription}
-          />
-          <SafeInspector
-            data={query.code}
-            initiallyVisible
-            hideable={false}
-            isBytes={false}
-            className={style.code}
+            content={errorMessages.genericNotFound}
+            component="p"
+            className={style.errorDescription}
           />
           <Button.Link
-            to="/"
+            to="/login"
             icon="keyboard_arrow_left"
             message={{ ...m.backToAccount, values: { siteTitle } }}
           />

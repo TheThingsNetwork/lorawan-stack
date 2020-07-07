@@ -12,12 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.full-height
-  height: 100%
-  +media-query($bp.s)
-    height: auto
+import React from 'react'
 
-.title
-  h1()
-  margin-bottom: $ls.m
-  line-height: 1
+import LogoComponent from '@ttn-lw/components/logo'
+
+import {
+  selectAssetsRootPath,
+  selectBrandingRootPath,
+  selectApplicationSiteName,
+} from '@ttn-lw/lib/selectors/env'
+
+const logo = {
+  src: `${selectAssetsRootPath()}/account.svg`,
+  alt: `${selectApplicationSiteName()} Logo`,
+}
+const hasCustomBranding = selectBrandingRootPath() !== selectAssetsRootPath()
+const brandLogo = hasCustomBranding
+  ? {
+      src: `${selectBrandingRootPath()}/logo.svg`,
+      alt: 'Logo',
+    }
+  : undefined
+
+const Logo = props => <LogoComponent logo={logo} brandLogo={brandLogo} {...props} />
+
+export default Logo

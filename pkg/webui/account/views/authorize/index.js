@@ -29,6 +29,8 @@ import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import { withEnv } from '@ttn-lw/lib/components/env'
 
+import Logo from '@account/containers/logo'
+
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -39,8 +41,10 @@ const m = defineMessages({
   modalSubtitle: '{clientName} is requesting to be granted the following rights:',
   loginInfo: 'You are logged in as {userId}.',
   redirectInfo: 'You will be redirected to {redirectUri}',
-  authorize: 'Authorize',
+  authorize: 'Authorize {clientName}',
   noDescription: 'This client does not provide a description',
+  allRights:
+    'This client is requesting <b>all possible current and future rights</b>. This includes reading, writing and deletion of gateways, end devices and applications, as well as their network traffic.',
 })
 
 @connect(
@@ -91,7 +95,7 @@ export default class Authorize extends PureComponent {
           <Message
             className={style.loginInfo}
             content={m.loginInfo}
-            values={{ userId: user.ids.user_id }}
+            values={{ userId: user.name || user.ids.user_id }}
           />{' '}
           <Message
             content={sharedMessages.logout}
@@ -105,8 +109,8 @@ export default class Authorize extends PureComponent {
     )
 
     return (
-      <Fragment>
-        <IntlHelmet title={m.authorize} />
+      <div className={style.container}>
+        <IntlHelmet title={m.authorize} values={{ clientName }} />
         <Modal
           title={m.modalTitle}
           subtitle={{ ...m.modalSubtitle, values: { clientName } }}
@@ -115,7 +119,7 @@ export default class Authorize extends PureComponent {
           method="POST"
           formName="authorize"
           approval
-          logo
+          logo={<Logo />}
         >
           <Fragment>
             <input type="hidden" name="_csrf" value={csrfToken} />
@@ -127,6 +131,13 @@ export default class Authorize extends PureComponent {
                     <Message content={{ id: `enum:${right}` }} firstToUpper />
                   </li>
                 ))}
+                {client.rights.length === 1 && client.rights[0] === 'RIGHT_ALL' && (
+                  <Message
+                    className={style.noteText}
+                    values={{ b: str => <b>{str}</b> }}
+                    content={m.allRights}
+                  />
+                )}
               </ul>
             </div>
             <div className={style.right}>
@@ -135,13 +146,13 @@ export default class Authorize extends PureComponent {
                 {Boolean(client.description) ? (
                   client.description
                 ) : (
-                  <Message className={style.noDescription} content={m.noDescription} />
+                  <Message className={style.noteText} content={m.noDescription} />
                 )}
               </p>
             </div>
           </Fragment>
         </Modal>
-      </Fragment>
+      </div>
     )
   }
 }
