@@ -30,7 +30,7 @@ const StoryLogo = props => <Logo logo={{ src: LogoSVG, alt: 'Test' }} />
 const bottomLine = (
   <div>
     <span className={style.loginInfo}>
-      You are logged in as John Doe. <a href="#">Logout</a>
+      You are signed in as John Doe. <a href="#">Sign out</a>
     </span>
     <span className={style.redirectInfo}>
       You will be redirected to <span>/test/test</span>

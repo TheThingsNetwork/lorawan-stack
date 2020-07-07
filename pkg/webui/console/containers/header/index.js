@@ -52,14 +52,14 @@ import Logo from '../logo'
     }
     return { user }
   },
-  { handleLogout: logout },
+  { handleSignOut: logout },
 )
 class Header extends Component {
   static propTypes = {
-    /** A handler for when the user clicks the logout button. */
-    handleLogout: PropTypes.func.isRequired,
     /** A handler for when the user used the search input. */
     handleSearchRequest: PropTypes.func,
+    /** A handler for when the user clicks the sign out button. */
+    handleSignOut: PropTypes.func.isRequired,
     mayManageUsers: PropTypes.bool,
     mayViewApplications: PropTypes.bool,
     mayViewGateways: PropTypes.bool,
@@ -87,7 +87,7 @@ class Header extends Component {
     const {
       user,
       handleSearchRequest,
-      handleLogout,
+      handleSignOut,
       searchable,
       mayViewApplications,
       mayViewGateways,
@@ -140,7 +140,7 @@ class Header extends Component {
             path="/admin/user-management"
           />
         )}
-        <Dropdown.Item title={sharedMessages.logout} icon="logout" action={handleLogout} />
+        <Dropdown.Item title={sharedMessages.signOut} icon="signOut" action={handleSignOut} />
       </React.Fragment>
     )
 
@@ -170,7 +170,7 @@ class Header extends Component {
         navigationEntries={navigationEntries}
         searchable={searchable}
         onSearchRequest={handleSearchRequest}
-        onLogout={handleLogout}
+        onSignOut={handleSignOut}
         logo={<Logo />}
       />
     )

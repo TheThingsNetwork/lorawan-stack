@@ -49,7 +49,7 @@ storiesOf('Form', module)
       propTables: [Form],
     })(story)(context),
   )
-  .add('Login', () => (
+  .add('Sign In', () => (
     <div style={containerStyles}>
       <Form
         onSubmit={handleSubmit}
@@ -61,7 +61,7 @@ storiesOf('Form', module)
         <Form.Field title="Username or Email" name="user_id" type="text" component={Input} />
         <Form.Field title="Password" name="password" type="password" component={Input} />
         <SubmitBar>
-          <Form.Submit message="Login" component={SubmitButton} />
+          <Form.Submit message="Sign In" component={SubmitButton} />
         </SubmitBar>
         <Button naked message="Create an account" />
       </Form>
