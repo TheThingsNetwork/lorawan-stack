@@ -44,3 +44,29 @@ $ ttn-lw-cli end-devices create app1 dev1-with-formatter \
 ```
 
 To create a [CayenneLPP]({{< relref "cayenne" >}}) or [Device Repository]({{< relref "device-repo" >}}) device payload formatter, use the `FORMATTER_CAYENNELPP` or `FORMATTER_DEVICEREPO` constants. No `formatter-parameter-local-file` parameter is needed.
+
+## Edit a Device Specific Payload Formatter
+
+To change the payload formatter for an existing device, use the `end-devices update` command:
+
+```bash
+$ ttn-lw-cli end-devices update app1 dev1-with-formatter \
+  --formatters.down-formatter FORMATTER_JAVASCRIPT \
+  --formatters.down-formatter-parameter-local-file "encoder.js" \
+  --formatters.up-formatter FORMATTER_JAVASCRIPT \
+  --formatters.up-formatter-parameter-local-file "decoder.js"
+```
+
+To unset the payload formatters, use the `--unset` flag. The command below will unset all device specific payload formatters:
+
+```bash
+$ ttn-lw-cli end-devices update app1 dev1-with-formatter \
+  --unset "formatters"
+```
+
+It is also possible to unset the uplink or downlink formatters separately:
+
+```bash
+$ ttn-lw-cli end-devices update app1 dev1-with-formatter \
+  --unset "formatters.up-formatter,formatters.up-formatter-parameter"
+```
