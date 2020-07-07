@@ -26,7 +26,7 @@ type UserSession struct {
 
 	User          *User
 	UserID        string `gorm:"type:UUID;index:user_session_user_index;not null"`
-	SessionSecret string `gorm:"type:VARCHAR;not null"`
+	SessionSecret string `gorm:"type:VARCHAR"`
 
 	ExpiresAt *time.Time
 }
