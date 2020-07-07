@@ -1,0 +1,134 @@
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.container
+  +media-query-min($bp.s)
+    full-screen()
+    horizontalize()
+
+.content
+  height: 100%
+  width: 50%
+  position: relative
+  display: flex
+  flex-direction: column
+
+  &:after
+    content: ''
+    display:block
+    height: $footer-height
+
+.main
+  display: flex
+  flex-direction: column
+  flex: 1 0
+  overflow: auto
+  align-items: center
+  padding: $ls.s
+
+.visual
+  height: 100%
+  width: 50%
+  position: relative
+  background-image: url('../../../assets/img/layout/bg/login-visual.jpg')
+  background-size: cover
+  background-position: left
+  box-shadow: inset 60px 0 60px rgba(0,0,0,0.08)
+
++media-query($bp.l)
+  .visual
+    width: 40%
+
+  .content
+    width: 60%
+
++media-query($bp.s)
+  .visual
+    display: none
+
+  .content
+    width: 100%
+
+.form
+  +media-query($bp.s)
+    margin-top: $header-height-mobile
+    padding-bottom: 0
+  padding-bottom: $ls.s
+  box-sizing: border-box
+  min-width: 28rem
+  max-width: 30rem
+  margin: auto 0
+
+  +media-query($bp.s)
+    min-width: auto
+    max-width: none
+    width: 100%
+
+.h-rule
+  margin: $ls.s 0
+
+.title
+  color: $c-active-blue
+  margin-top: 0
+  background: linear-gradient(right, 0% $c-active-blue, $c-active-blue-active);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 200
+  font-size: $fs.xl3
+  +media-query($bp.s)
+    font-size: $fs.xl
+
+.sub-title
+  font-size: 3rem
+  font-weight: 800
+  +media-query($bp.s)
+    font-size: $fs.xl3
+
+.submit-button
+  min-width: 8rem
+
+.code, .spinner
+  margin-bottom: $cs.m
+
+.buttons
+  display: flex
+  flex-direction: column
+  +media-query-min($bp.s)
+    flex-direction: row
+  +media-query($bp.s)
+    button, a
+      margin-bottom: $cs.s !important
+      margin-right: 0 !important
+
+.footer
+  position: fixed
+  bottom: 0
+  left: 0
+  right: 0
+  z-index: $zi.nav
+  +media-query-min($bp.s)
+    background-color: transparent
+    border: 0
+
+  div:last-child
+    +media-query-min($bp.s)
+      color: white
+
+.button-break
+  +media-query-min($bp.s)
+    display: static
+
+.code-description, .error-description
+  text-margin-bottom($cs.xl)
+  display: block

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { withRouter, Redirect } from 'react-router-dom'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
@@ -32,20 +31,22 @@ import Spinner from '@ttn-lw/components/spinner'
 import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
+import style from '@account/views/front/front.styl'
+
 import Yup from '@ttn-lw/lib/yup'
 import { selectApplicationSiteName, selectEnableUserRegistration } from '@ttn-lw/lib/selectors/env'
 import { id as userRegexp } from '@ttn-lw/lib/regexp'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import style from './create-account.styl'
+import { selectUser } from '@account/store/selectors/user'
 
 const m = defineMessages({
-  createAccount: 'Create a new {siteName} account',
-  register: 'Register',
   registrationApproved: 'You have successfully registered and can login now',
+  createAccount: 'Create account',
+  createANewAccount: 'Create a new account',
   registrationPending:
-    'You have successfully sent the registration request. Please wait until an admin approves it.',
+    'You have successfully sent the registration request. You will receive a confirmation once the account has been approved.',
 })
 
 const validationSchema = Yup.object().shape({
@@ -76,9 +77,12 @@ const initialValues = {
   password_confirm: '',
 }
 
+const siteName = selectApplicationSiteName()
+
 const getSuccessMessage = state => {
   switch (state) {
-    case 'STATE_REQUESTED':
+    case undefined:
+      // Zero value is swallowed by the backend, but means STATE_REQUESTED
       return m.registrationPending
     case 'STATE_APPROVED':
       return m.registrationApproved
@@ -92,8 +96,7 @@ const getSuccessMessage = state => {
   state => ({
     enableUserRegistration: selectEnableUserRegistration(),
     fetching: state.user.fetching,
-    user: state.user.user,
-    siteName: selectApplicationSiteName(),
+    user: selectUser(state),
   }),
   {
     push,
@@ -104,10 +107,7 @@ export default class CreateAccount extends React.PureComponent {
   static propTypes = {
     enableUserRegistration: PropTypes.bool.isRequired,
     fetching: PropTypes.bool.isRequired,
-    location: PropTypes.location.isRequired,
     push: PropTypes.func.isRequired,
-    replace: PropTypes.func.isRequired,
-    siteName: PropTypes.string.isRequired,
     user: PropTypes.user,
   }
 
@@ -145,16 +145,6 @@ export default class CreateAccount extends React.PureComponent {
     }
   }
 
-  @bind
-  handleCancel() {
-    const { replace, location } = this.props
-    const state = location.state || {}
-
-    const back = state.back || '/login'
-
-    replace(back)
-  }
-
   render() {
     const { error } = this.state
     const { user, fetching, siteName, enableUserRegistration } = this.props
@@ -178,65 +168,71 @@ export default class CreateAccount extends React.PureComponent {
     }
 
     return (
-      <Container className={style.fullHeight}>
-        <Row justify="center" align="center" className={style.fullHeight}>
-          <Col sm={12} md={8} lg={5}>
-            <IntlHelmet title={m.register} />
-            <Message
-              content={m.createAccount}
-              values={{ siteName }}
-              component="h1"
-              className={style.title}
+      <React.Fragment>
+        <div className={style.form}>
+          <IntlHelmet title={m.createANewAccount} />
+          <h1 className={style.title}>
+            {siteName}
+            <br />
+            <Message content={m.createANewAccount} component="strong" />
+          </h1>
+          <hr className={style.hRule} />
+          <Form
+            onSubmit={this.handleSubmit}
+            initialValues={initialValues}
+            error={error}
+            validationSchema={validationSchema}
+            horizontal={false}
+          >
+            <Form.Field
+              component={Input}
+              required
+              title={sharedMessages.userId}
+              name="user_id"
+              autoComplete="username"
+              autoFocus
             />
-            <Form
-              onSubmit={this.handleSubmit}
-              initialValues={initialValues}
-              error={error}
-              validationSchema={validationSchema}
-            >
-              <Form.Field
-                component={Input}
-                required
-                title={sharedMessages.userId}
-                name="user_id"
-                autoComplete="username"
-                autoFocus
+            <Form.Field
+              title={sharedMessages.name}
+              name="name"
+              component={Input}
+              autoComplete="name"
+            />
+            <Form.Field
+              required
+              title={sharedMessages.email}
+              component={Input}
+              name="primary_email_address"
+              autoComplete="email"
+            />
+            <Form.Field
+              required
+              title={sharedMessages.password}
+              name="password"
+              type="password"
+              component={Input}
+              autoComplete="new-password"
+            />
+            <Form.Field
+              required
+              title={sharedMessages.confirmPassword}
+              name="password_confirm"
+              type="password"
+              autoComplete="new-password"
+              component={Input}
+            />
+            <div className={style.buttons}>
+              <Form.Submit
+                component={SubmitButton}
+                message={m.createAccount}
+                className={style.submitButton}
+                alwaysEnabled
               />
-              <Form.Field
-                title={sharedMessages.name}
-                name="name"
-                component={Input}
-                autoComplete="name"
-              />
-              <Form.Field
-                required
-                title={sharedMessages.email}
-                component={Input}
-                name="primary_email_address"
-                autoComplete="email"
-              />
-              <Form.Field
-                required
-                title={sharedMessages.password}
-                name="password"
-                type="password"
-                component={Input}
-                autoComplete="new-password"
-              />
-              <Form.Field
-                required
-                title={sharedMessages.confirmPassword}
-                name="password_confirm"
-                type="password"
-                autoComplete="new-password"
-                component={Input}
-              />
-              <Form.Submit component={SubmitButton} message={m.register} />
-              <Button naked secondary message={sharedMessages.cancel} onClick={this.handleCancel} />
-            </Form>
-          </Col>
-        </Row>
-      </Container>
+              <Button.Link to="/login" naked secondary message={sharedMessages.login} />
+            </div>
+          </Form>
+        </div>
+      </React.Fragment>
     )
   }
 }
