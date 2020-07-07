@@ -29,7 +29,7 @@ import { logout } from '@account/store/actions/user'
     user: state.user.user,
   }),
   {
-    redirectToLogin: () => push('/login'),
+    redirectToLogin: () => push('/sign-in'),
     logout,
   },
 )
@@ -57,8 +57,8 @@ export default class Account extends React.PureComponent {
 
     return (
       <div>
-        You are logged in as {user.ids.user_id}.{' '}
-        <Button message={sharedMessages.logout} onClick={this.handleLogout} />
+        You are signed in as {user.ids.user_id}.{' '}
+        <Button message={sharedMessages.signOut} onClick={this.handleLogout} />
         <Button.Link message={sharedMessages.changePassword} to="/update-password" />
       </div>
     )

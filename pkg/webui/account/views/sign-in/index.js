@@ -38,12 +38,12 @@ import { selectApplicationRootPath, selectApplicationSiteName } from '@ttn-lw/li
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { id as userRegexp } from '@ttn-lw/lib/regexp'
 
-import style from './login.styl'
+import style from './sign-in.styl'
 
 const m = defineMessages({
   createAccount: 'Create an account',
   forgotPassword: 'Forgot password?',
-  loginToContinue: 'Please login to continue',
+  signInToContinue: 'Please sign in to continue',
 })
 
 const validationSchema = Yup.object().shape({
@@ -119,12 +119,12 @@ export default class Account extends React.PureComponent {
 
     return (
       <div className={style.fullHeightCenter}>
-        <IntlHelmet title={sharedMessages.login} />
+        <IntlHelmet title={sharedMessages.signIn} />
         <div>
           <div className={style.left}>
             <div>
               <Logo vertical className={style.logo} />
-              <Message content={m.loginToContinue} />
+              <Message content={m.signInToContinue} />
             </div>
           </div>
           <div className={style.right}>
@@ -153,7 +153,7 @@ export default class Account extends React.PureComponent {
                 autoComplete="current-password"
                 required
               />
-              <Form.Submit component={SubmitButton} message={sharedMessages.login} />
+              <Form.Submit component={SubmitButton} message={sharedMessages.signIn} />
               <Button naked message={m.createAccount} onClick={this.navigateToRegister} />
               <Button naked message={m.forgotPassword} onClick={this.navigateToResetPassword} />
             </Form>

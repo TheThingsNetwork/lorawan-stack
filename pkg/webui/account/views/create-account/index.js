@@ -43,7 +43,7 @@ import style from './create-account.styl'
 const m = defineMessages({
   createAccount: 'Create a new {siteName} account',
   register: 'Register',
-  registrationApproved: 'You have successfully registered and can login now',
+  registrationApproved: 'You have successfully registered and can sign in now',
   registrationPending:
     'You have successfully sent the registration request. Please wait until an admin approves it.',
 })
@@ -131,7 +131,7 @@ export default class CreateAccount extends React.PureComponent {
         invitation_token,
       })
 
-      push('/login', {
+      push('/sign-in', {
         info: getSuccessMessage(result.data.state),
       })
     } catch (error) {
@@ -148,7 +148,7 @@ export default class CreateAccount extends React.PureComponent {
     const { replace, location } = this.props
     const state = location.state || {}
 
-    const back = state.back || '/login'
+    const back = state.back || '/sign-in'
 
     replace(back)
   }

@@ -228,8 +228,8 @@ func (s *server) RegisterRoutes(server *web.Server) {
 	api.GET("/me", s.CurrentUser, s.requireLogin)
 
 	page := root.Group("", csrfMiddleware)
-	page.GET("/login", webui.Template.Handler, s.redirectToNext)
-	page.GET("/logout", s.ClientLogout)
+	page.GET("/sign-in", webui.Template.Handler, s.redirectToNext)
+	page.GET("/sign-out", s.ClientLogout)
 	page.GET("/authorize", s.Authorize(webui.Template.Handler), s.redirectToLogin)
 	page.POST("/authorize", s.Authorize(webui.Template.Handler), s.redirectToLogin)
 	page.GET("/", webui.Template.Handler, s.redirectToLogin)

@@ -21,7 +21,7 @@ import { Helmet } from 'react-helmet'
 import ErrorView from '@ttn-lw/lib/components/error-view'
 
 import Landing from '@account/views/landing'
-import Login from '@account/views/login'
+import SignIn from '@account/views/sign-in'
 import Authorize from '@account/views/authorize'
 import CreateAccount from '@account/views/create-account'
 import ForgotPassword from '@account/views/forgot-password'
@@ -65,7 +65,7 @@ class AccountApp extends React.PureComponent {
             />
             <Switch>
               <Route path="/" exact component={Landing} />
-              <Route path="/login" component={Login} />
+              <Route path="/sign-in" component={SignIn} />
               <Route path="/authorize" component={Authorize} />
               <Route path="/register" component={CreateAccount} />
               <Route path="/forgot-password" component={ForgotPassword} />

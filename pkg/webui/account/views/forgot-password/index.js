@@ -37,10 +37,8 @@ import { id as userRegexp } from '@ttn-lw/lib/regexp'
 import style from './forgot-password.styl'
 
 const m = defineMessages({
-  loginPage: 'Login page',
   forgotPassword: 'Forgot password',
   passwordRequested: 'You will receive an email with reset instructions shortly',
-  goToLogin: 'Go to login',
   send: 'Send',
   resetPasswordDescription:
     'Please enter your username to receive an email with reset instructions',
@@ -60,7 +58,7 @@ const initialValues = { user_id: '' }
 @connect(
   null,
   {
-    handleCancel: () => push('/login'),
+    handleCancel: () => push('/sign-in'),
   },
 )
 export default class ForgotPassword extends React.PureComponent {
@@ -96,7 +94,7 @@ export default class ForgotPassword extends React.PureComponent {
   render() {
     const { error, info, requested } = this.state
     const { handleCancel } = this.props
-    const cancelButtonText = requested ? m.goToLogin : sharedMessages.cancel
+    const cancelButtonText = requested ? sharedMessages.signIn : sharedMessages.cancel
 
     return (
       <Container className={style.fullHeight}>

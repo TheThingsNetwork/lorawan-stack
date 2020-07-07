@@ -44,7 +44,7 @@ func (s *server) redirectToLogin(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			values := make(url.Values)
 			values.Set(nextKey, fmt.Sprintf("%s?%s", c.Request().URL.Path, c.QueryParams().Encode()))
-			return c.Redirect(http.StatusFound, fmt.Sprintf("%s?%s", path.Join(s.config.UI.MountPath(), "login"), values.Encode()))
+			return c.Redirect(http.StatusFound, fmt.Sprintf("%s?%s", path.Join(s.config.UI.MountPath(), "sign-in"), values.Encode()))
 		}
 		return next(c)
 	}

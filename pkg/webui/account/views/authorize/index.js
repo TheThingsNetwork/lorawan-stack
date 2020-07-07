@@ -37,7 +37,7 @@ import style from './authorize.styl'
 const m = defineMessages({
   modalTitle: 'Request for permission',
   modalSubtitle: '{clientName} is requesting to be granted the following rights:',
-  loginInfo: 'You are logged in as {userId}.',
+  signInInfo: 'You are signed in as {userId}.',
   redirectInfo: 'You will be redirected to {redirectUri}',
   authorize: 'Authorize',
   noDescription: 'This client does not provide a description',
@@ -46,7 +46,7 @@ const m = defineMessages({
 @connect(
   undefined,
   dispatch => ({
-    redirectToLogin: () => dispatch(replace('/login')),
+    redirectToLogin: () => dispatch(replace('/sign-in')),
   }),
 )
 @withEnv
@@ -94,7 +94,7 @@ export default class Authorize extends PureComponent {
             values={{ userId: user.ids.user_id }}
           />{' '}
           <Message
-            content={sharedMessages.logout}
+            content={sharedMessages.signOut}
             component="a"
             href="#"
             onClick={this.handleLogout}

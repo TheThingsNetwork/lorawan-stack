@@ -33,13 +33,12 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 const m = defineMessages({
   validateSuccess: 'Contact info validated',
   validateFail: 'There was an error and the contact info could not be validated',
-  goToLogin: 'Go to login',
 })
 
 @connect(
   null,
   {
-    goToLogin: () => push('/login'),
+    goToLogin: () => push('/sign-in'),
   },
 )
 export default class Validate extends React.PureComponent {
@@ -96,7 +95,7 @@ export default class Validate extends React.PureComponent {
                 content={error}
                 title={m.validateFail}
                 action={goToLogin}
-                actionMessage={m.goToLogin}
+                actionMessage={sharedMessages.signIn}
                 buttonIcon={'error'}
               />
             )}
@@ -107,7 +106,7 @@ export default class Validate extends React.PureComponent {
                 content={success}
                 title={m.validateSuccess}
                 action={goToLogin}
-                actionMessage={m.goToLogin}
+                actionMessage={sharedMessages.signIn}
                 buttonIcon={'check_circle'}
               />
             )}
