@@ -55,12 +55,9 @@ const validationSchema = Yup.object().shape({
 
 const initialValues = { user_id: '' }
 
-@connect(
-  null,
-  {
-    handleCancel: () => push('/sign-in'),
-  },
-)
+@connect(null, {
+  handleCancel: () => push('/sign-in'),
+})
 export default class ForgotPassword extends React.PureComponent {
   static propTypes = {
     handleCancel: PropTypes.func.isRequired,

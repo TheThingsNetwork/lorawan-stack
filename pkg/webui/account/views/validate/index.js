@@ -35,12 +35,9 @@ const m = defineMessages({
   validateFail: 'There was an error and the contact info could not be validated',
 })
 
-@connect(
-  null,
-  {
-    goToLogin: () => push('/sign-in'),
-  },
-)
+@connect(null, {
+  goToLogin: () => push('/sign-in'),
+})
 export default class Validate extends React.PureComponent {
   static propTypes = {
     goToLogin: PropTypes.func.isRequired,

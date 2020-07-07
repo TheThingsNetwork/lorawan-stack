@@ -43,12 +43,9 @@ const m = defineMessages({
   noDescription: 'This client does not provide a description',
 })
 
-@connect(
-  undefined,
-  dispatch => ({
-    redirectToLogin: () => dispatch(replace('/sign-in')),
-  }),
-)
+@connect(undefined, dispatch => ({
+  redirectToLogin: () => dispatch(replace('/sign-in')),
+}))
 @withEnv
 export default class Authorize extends PureComponent {
   static propTypes = {
