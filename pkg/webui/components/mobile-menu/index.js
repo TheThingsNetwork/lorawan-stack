@@ -28,14 +28,14 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './mobile-menu.styl'
 
 const m = defineMessages({
-  loggedInAs: 'Logged in as <b>{userId}</b>',
+  signedInAs: 'Signed in as <b>{userId}</b>',
 })
 
-const MobileMenu = ({ className, children, user, onItemsClick, onLogout }) => {
-  const handleLogoutClick = useCallback(() => {
+const MobileMenu = ({ className, children, user, onItemsClick, onSignOut }) => {
+  const handleSignOutClick = useCallback(() => {
     onItemsClick()
-    onLogout()
-  }, [onItemsClick, onLogout])
+    onSignOut()
+  }, [onItemsClick, onSignOut])
 
   return (
     <div className={classnames(className, style.container)}>
@@ -53,15 +53,15 @@ const MobileMenu = ({ className, children, user, onItemsClick, onLogout }) => {
             <Icon className={style.userIcon} icon="person" nudgeUp />
             <Message
               className={style.userMessage}
-              content={m.loggedInAs}
+              content={m.signedInAs}
               values={{ userId: user.ids.user_id, b: (...chunks) => <b key="1"> {chunks}</b> }}
             />
           </div>
           <div>
             <Button
-              message={sharedMessages.logout}
+              message={sharedMessages.signOut}
               icon="logout"
-              onClick={handleLogoutClick}
+              onClick={handleSignOutClick}
               naked
             />
           </div>
@@ -75,7 +75,7 @@ MobileMenu.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   onItemsClick: PropTypes.func.isRequired,
-  onLogout: PropTypes.func.isRequired,
+  onSignOut: PropTypes.func.isRequired,
   user: PropTypes.user.isRequired,
 }
 

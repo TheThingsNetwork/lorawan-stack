@@ -36,7 +36,7 @@ const Header = function({
   searchable,
   logo,
   mobileDropdownItems,
-  onLogout,
+  onSignOut,
   onSearchRequest,
   ...rest
 }) {
@@ -83,7 +83,7 @@ const Header = function({
         )}
       </div>
       {mobileMenuOpen && (
-        <MobileMenu onItemsClick={handleMobileMenuItemsClick} onLogout={onLogout} user={user}>
+        <MobileMenu onItemsClick={handleMobileMenuItemsClick} onSignOut={onSignOut} user={user}>
           {mobileDropdownItems}
         </MobileMenu>
       )}
@@ -102,10 +102,10 @@ Header.propTypes = {
   mobileDropdownItems: PropTypes.node.isRequired,
   /** The Child node of the navigation bar. */
   navigationEntries: NavigationBar.propTypes.children,
-  /** A handler for when the user used the search input. */
-  onLogout: PropTypes.func.isRequired,
   /** Handler of the search function. */
   onSearchRequest: PropTypes.func,
+  /** A handler for when the user used the search input. */
+  onSignOut: PropTypes.func.isRequired,
   /* A flag indicating whether the header has a search input. */
   searchable: PropTypes.bool,
   /**
