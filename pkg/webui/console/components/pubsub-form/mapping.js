@@ -133,16 +133,17 @@ export const mapFormValuesToPubsub = function(values, appId) {
     uplink_message: mapMessageTypeFormValueToPubsubMessageType(values.uplink_message),
   }
 
-  if (values._provider === providers.NATS) {
-    result.nats = {
-      server_url: mapNatsConfigFormValueToNatsServerUrl(values.nats),
-    }
+  switch (values._provider) {
+    case providers.NATS:
+      result.nats = {
+        server_url: mapNatsConfigFormValueToNatsServerUrl(values.nats),
+      }
+      break
+    case providers.MQTT:
+      result.mqtt = values.mqtt
+      delete result.mqtt._use_credentials
+      break
   }
-  if (values._provider === providers.MQTT) {
-    result.mqtt = values.mqtt
-    delete result.mqtt._use_credentials
-  }
-
   return result
 }
 

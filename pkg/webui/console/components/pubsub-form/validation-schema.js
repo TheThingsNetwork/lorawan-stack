@@ -25,6 +25,7 @@ import {
 } from '@console/lib/regexp'
 
 import { qosLevels } from './qos-options'
+import providers from './providers'
 
 export default Yup.object().shape({
   pub_sub_id: Yup.string()
@@ -35,7 +36,7 @@ export default Yup.object().shape({
   format: Yup.string().required(sharedMessages.validateRequired),
   base_topic: Yup.string().required(sharedMessages.validateRequired),
   nats: Yup.object().when('_provider', {
-    is: 'nats',
+    is: providers.NATS,
     then: Yup.object().shape({
       _use_credentials: Yup.boolean(),
       username: Yup.string().when('_use_credentials', {
@@ -67,7 +68,7 @@ export default Yup.object().shape({
     otherwise: Yup.object().strip(),
   }),
   mqtt: Yup.object().when('_provider', {
-    is: 'mqtt',
+    is: providers.MQTT,
     then: Yup.object().shape({
       _use_credentials: Yup.boolean(),
       server_url: Yup.string()
