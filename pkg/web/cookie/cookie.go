@@ -131,4 +131,15 @@ func (d *Cookie) Remove(c echo.Context) {
 		Expires:  time.Unix(1, 0),
 		MaxAge:   0,
 	})
+
+	// Additionally, explicitly remove the cookie also from the current path.
+	// This can be necessary to also remove old cookies when the cookie paths
+	// have been changed.
+	http.SetCookie(c.Response().Writer, &http.Cookie{
+		Name:     d.Name,
+		HttpOnly: d.HTTPOnly,
+		Value:    tombstone,
+		Expires:  time.Unix(1, 0),
+		MaxAge:   0,
+	})
 }
