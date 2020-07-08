@@ -40,10 +40,10 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
-  newPassword: 'New Password',
-  oldPassword: 'Old Password',
+  newPassword: 'New password',
+  oldPassword: 'Old password',
   passwordChanged: 'Password changed',
-  revokeAccess: 'Revoke Access',
+  revokeAccess: 'Revoke access',
   logoutAllDevices: 'Log out from all end devices',
   revokeWarning: 'This will revoke access from all logged in devices',
   sessionRevoked: 'Session revoked',
