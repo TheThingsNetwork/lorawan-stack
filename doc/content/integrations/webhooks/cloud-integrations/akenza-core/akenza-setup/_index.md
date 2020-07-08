@@ -8,26 +8,26 @@ This section shows how to prepare Akenza Core setup before creating a Webhook in
 
 <!--more-->
 
-By logging in to your Akenza Core user account and navigating to **QUICK START** tab in the **Environment**, you can see the order of steps to be taken to connect a device and manipulate the data coming from it. 
+Log in to Akenza Core and navigate to **Quick Start** tab in the **Environment** to see the steps to be taken to connect a device and manipulate the data coming from it. 
 
 {{< figure src="quick-start.png" alt="Steps to connect a device" >}}
 
-First step is setting up a domain, which can be done by selecting the **ADD DOMAIN** button in **Domains** submenu. 
+Set up a domain by selecting the **Add Domain** button in **Domains** submenu. 
 
-Give a **Name** to your domain and choose **HTTP** for **Technology** in order to implement a Webhook integration. **Domain Secret** is auto-generated, while **Uplink Function** and **Downlink Function** may retain **Passthrough** value. 
+Give a **Name** to your domain and choose **HTTP** for **Technology** in order to implement a Webhook integration. The **Domain Secret** is auto-generated, while **Uplink Function** and **Downlink Function** may retain a **Passthrough** value. 
 
-Select **SAVE** to finish.
+Select **Save** to finish.
 
 {{< figure src="creating-domain.png" alt="Creating a new domain" >}}
 
-In a similar manner, you need to create a new device type in **Device Types** submenu, where you just need to select **ADD DEVICE TYPE** button, provide a **Name** and click **SAVE**.
+Next, create a new device type in the **Device Types** submenu. Select the **Add Device Type** button, provide a **Name** and click **Save**.
 
 {{< figure src="creating-device-type.png" alt="Creating a device type" >}}
 
-When you have defined a domain and a device type, you can create a new device by selecting **ADD DEVICE** button in **Inventory** submenu. 
+When you have defined a domain and a device type, you can create a new device by selecting **Add Device** button in the **Inventory** submenu. 
 
-Provide a **Name** for your device, select previously created device type and domain, and do not forget to generate **Device ID**.
+Provide a **Name** for your device, select the previously created device type and domain, and do not forget to generate a **Device ID**.
 
 {{< figure src="creating-device.png" alt="Creating a new device" >}}
 
-Once the device is created, select it in **Inventory** and scroll down to the bottom of the page. Under **Endpoints** you can find and copy **HTTP Uplink URL** that you need for the Webhook integration.
+Once the device is created, select it in **Inventory** and scroll down to the bottom of the page. Under **Endpoints**, you will find the **HTTP Uplink URL** that you need for the Webhook integration.
