@@ -16,6 +16,8 @@ On the left, give a **Name** to your function, select the **POST** method and ch
 
 In this example, we will use the following Python function, which receives a JSON payload from {{% tts %}}, extracts the `decoded_payload`, and posts received data to Ubidots.
 
+>Note: to find your **Token**, click on your avatar in the upper right corner and select **API Credentials**. Be sure to use your **Token** and not your **API Key**.
+
 ```
 import requests
 import json
@@ -86,9 +88,6 @@ def create_request(url, headers, attempts, request_type, data=None):
         print(e)
         return None
 ```
-Since this function needs your token to be entered on the sixth line, you can find and copy it from **Tokens** if you click on your avatar in the upper right corner and select **API Credentials**. 
-
->Note: for the purpose of integrating only **Tokens** can be used, while **API Key** is used exclusively for deriving tokens.
 
 After modifying the function code with your token, click the **Make it live** button. 
 
