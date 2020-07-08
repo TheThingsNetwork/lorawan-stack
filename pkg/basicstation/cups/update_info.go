@@ -50,8 +50,6 @@ const (
 	cupsStationAttribute       = "cups-station"
 	cupsModelAttribute         = "cups-model"
 	cupsPackageAttribute       = "cups-package"
-	lnsCredentialsIDAttribute  = "lns-credentials-id"
-	lnsCredentialsAttribute    = "lns-credentials"
 )
 
 var (
@@ -120,15 +118,40 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 		return nil, err
 	}
 	logger.WithField("api_key_id", lnsKey.ID).Info("Created gateway API key for LNS")
+
+	logger.Debug("Store gateway API key as secret for LNS")
+	_, err = registry.StoreGatewaySecret(ctx, &ttnpb.StoreGatewaySecretRequest{
+		GatewayIdentifiers: gtw.GatewayIdentifiers,
+		PlainText: ttnpb.GatewaySecretPlainText{
+			Value: lnsKey.Key,
+		},
+	}, auth)
+	if err != nil {
+		return nil, err
+	}
+
 	gtw.Attributes = map[string]string{
 		cupsAttribute:              "true",
 		cupsAuthHeaderAttribute:    getAuthHeader(ctx),
 		cupsCredentialsIDAttribute: cupsKey.ID,
 		cupsCredentialsAttribute:   fmt.Sprintf("Bearer %s", cupsKey.Key),
-		lnsCredentialsIDAttribute:  lnsKey.ID,
-		lnsCredentialsAttribute:    fmt.Sprintf("Bearer %s", lnsKey.Key),
 	}
 	return gtw, nil
+}
+
+// getLNSToken gets LNS Token from the registry.
+func (s *Server) getLNSToken(ctx context.Context, gtwIDs ttnpb.GatewayIdentifiers, gatewayAuth grpc.CallOption) (string, error) {
+	registry, err := s.getRegistry(ctx, &gtwIDs)
+	if err != nil {
+		return "", err
+	}
+	plaintext, err := registry.RetrieveGatewaySecret(ctx, &ttnpb.RetrieveGatewaySecretRequest{
+		GatewayIdentifiers: gtwIDs,
+	}, gatewayAuth)
+	if err != nil {
+		return "", err
+	}
+	return plaintext.Value, nil
 }
 
 var getGatewayMask = pbtypes.FieldMask{Paths: []string{
@@ -187,6 +210,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	if rights.RequireGateway(ctx, gtw.GatewayIdentifiers,
 		ttnpb.RIGHT_GATEWAY_INFO,
 		ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
+		ttnpb.RIGHT_GATEWAY_READ_SECRET,
 	) == nil {
 		logger.Debug("Authorized with The Things Stack token")
 		gatewayAuth, err = rpcmetadata.WithForwardedAuth(ctx, s.component.AllowInsecureForCredentials())
@@ -262,14 +286,18 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	if credentials := gtw.Attributes[lnsCredentialsAttribute]; credentials != "" {
-		lnsCredentials, err := TokenCredentials(lnsTrust, credentials)
-		if err != nil {
-			return err
-		}
-		if crc32.ChecksumIEEE(lnsCredentials) != req.LNSCredentialsCRC {
-			res.LNSCredentials = lnsCredentials
-		}
+	logger.WithField("lns_uri", res.LNSURI).Debug("Get gateway secret as LNS Token")
+	lnsToken, err := s.getLNSToken(ctx, gtw.GatewayIdentifiers, gatewayAuth)
+	if err != nil {
+		return err
+	}
+
+	lnsCredentials, err := TokenCredentials(lnsTrust, lnsToken)
+	if err != nil {
+		return err
+	}
+	if crc32.ChecksumIEEE(lnsCredentials) != req.LNSCredentialsCRC {
+		res.LNSCredentials = lnsCredentials
 	}
 
 	if gtw.AutoUpdate {
