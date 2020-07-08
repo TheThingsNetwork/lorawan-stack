@@ -19,7 +19,6 @@ import Query from 'query-string'
 import { defineMessages } from 'react-intl'
 import { replace } from 'connected-react-router'
 import { connect } from 'react-redux'
-import * as Yup from 'yup'
 
 import api from '@oauth/api'
 
@@ -33,6 +32,7 @@ import Logo from '@ttn-lw/containers/logo'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import Message from '@ttn-lw/lib/components/message'
 
+import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { selectApplicationRootPath, selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'

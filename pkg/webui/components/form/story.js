@@ -16,7 +16,6 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 import { withInfo } from '@storybook/addon-info'
-import * as Yup from 'yup'
 
 import Button from '@ttn-lw/components/button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -24,6 +23,8 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Radio from '@ttn-lw/components/radio-button'
+
+import Yup from '@ttn-lw/lib/yup'
 
 import Form from '.'
 

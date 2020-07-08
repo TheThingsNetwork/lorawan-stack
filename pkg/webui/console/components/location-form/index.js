@@ -15,7 +15,6 @@
 import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
-import * as Yup from 'yup'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -29,6 +28,7 @@ import Overlay from '@ttn-lw/components/overlay'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 

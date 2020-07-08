@@ -15,7 +15,6 @@
 /* eslint-disable react/prop-types */
 
 import React from 'react'
-import * as Yup from 'yup'
 import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 import { withInfo } from '@storybook/addon-info'
@@ -26,6 +25,8 @@ import Radio from '@ttn-lw/components/radio-button'
 import Select from '@ttn-lw/components/select'
 import FileInput from '@ttn-lw/components/file-input'
 import UnitInput from '@ttn-lw/components/unit-input'
+
+import Yup from '@ttn-lw/lib/yup'
 
 import { unit as unitRegexp } from '@console/lib/regexp'
 
