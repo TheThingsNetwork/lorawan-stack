@@ -29,6 +29,7 @@ const (
 	enforceDutyCycleField               = "enforce_duty_cycle"
 	firmwareVersionField                = "version_ids.firmware_version"
 	frequencyPlanIDsField               = "frequency_plan_ids"
+	gatewaySecretField                  = "secret"
 	gatewayServerAddressField           = "gateway_server_address"
 	grantsField                         = "grants"
 	hardwareVersionField                = "version_ids.hardware_version"

@@ -62,6 +62,8 @@ type Gateway struct {
 
 	UpdateLocationFromStatus bool `gorm:"default:false not null"`
 
+	Secret []byte `gorm:"type:BYTEA"`
+
 	Antennas []GatewayAntenna
 }
 
@@ -87,6 +89,7 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	modelIDField:              func(pb *ttnpb.Gateway, gtw *Gateway) { pb.ModelID = gtw.ModelID },
 	hardwareVersionField:      func(pb *ttnpb.Gateway, gtw *Gateway) { pb.HardwareVersion = gtw.HardwareVersion },
 	firmwareVersionField:      func(pb *ttnpb.Gateway, gtw *Gateway) { pb.FirmwareVersion = gtw.FirmwareVersion },
+	gatewaySecretField:        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Secret = gtw.Secret },
 	gatewayServerAddressField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.GatewayServerAddress = gtw.GatewayServerAddress },
 	autoUpdateField:           func(pb *ttnpb.Gateway, gtw *Gateway) { pb.AutoUpdate = gtw.AutoUpdate },
 	updateChannelField:        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.UpdateChannel = gtw.UpdateChannel },
@@ -136,6 +139,7 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	modelIDField:              func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ModelID = pb.ModelID },
 	hardwareVersionField:      func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.HardwareVersion = pb.HardwareVersion },
 	firmwareVersionField:      func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.FirmwareVersion = pb.FirmwareVersion },
+	gatewaySecretField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Secret = pb.Secret },
 	gatewayServerAddressField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayServerAddress = pb.GatewayServerAddress },
 	autoUpdateField:           func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.AutoUpdate = pb.AutoUpdate },
 	updateChannelField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.UpdateChannel = pb.UpdateChannel },
@@ -193,6 +197,7 @@ var gatewayColumnNames = map[string][]string{
 	enforceDutyCycleField:         {enforceDutyCycleField},
 	firmwareVersionField:          {"firmware_version"},
 	frequencyPlanIDsField:         {"frequency_plan_id"},
+	gatewaySecretField:            {gatewaySecretField},
 	gatewayServerAddressField:     {gatewayServerAddressField},
 	hardwareVersionField:          {"hardware_version"},
 	locationPublicField:           {locationPublicField},
