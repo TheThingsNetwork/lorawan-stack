@@ -16,6 +16,7 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import * as Sentry from '@sentry/browser'
 
+import { getBackendErrorId } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 @withRouter
@@ -39,8 +40,14 @@ class ErrorView extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     Sentry.withScope(scope => {
-      scope.setExtras(errorInfo)
-      Sentry.captureException(error)
+      scope.setExtras(error)
+      if (error.message) {
+        const errorId = getBackendErrorId(error)
+        scope.setFingerprint([errorId])
+        Sentry.captureException(new Error(errorId))
+      } else {
+        Sentry.captureException(error)
+      }
       this.setState({
         hasCaught: true,
         error,
