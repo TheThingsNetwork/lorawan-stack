@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Payload formatter documentation.
+- CLI support for setting message payload formatters from a local file. (see `--formatters.down-formatter-parameter-local-file` and `--formatters.up-formatter-parameter-local-file` options).
+
 ### Changed
 
 ### Deprecated
@@ -34,7 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - LORIX One gateway documentation.
 - Display own user name instead of ID in Console if possible.
 - Option to hide rarely used fields in the Join Settings step (end device wizard) in the Console.
-- Payload formatter documentation.
 
 ### Changed
 
