@@ -15,21 +15,23 @@
 package rpclog
 
 import (
-	"github.com/grpc-ecosystem/go-grpc-middleware/logging"
+	grpc_logging "github.com/grpc-ecosystem/go-grpc-middleware/logging"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"google.golang.org/grpc/codes"
 )
 
 var (
 	defaultOptions = &options{
-		levelFunc: DefaultCodeToLevel,
-		codeFunc:  grpc_logging.DefaultErrorToCode,
+		levelFunc:     DefaultCodeToLevel,
+		codeFunc:      grpc_logging.DefaultErrorToCode,
+		ignoreMethods: make(map[string]struct{}),
 	}
 )
 
 type options struct {
-	levelFunc CodeToLevel
-	codeFunc  grpc_logging.ErrorToCode
+	levelFunc     CodeToLevel
+	codeFunc      grpc_logging.ErrorToCode
+	ignoreMethods map[string]struct{}
 }
 
 func evaluateServerOpt(opts []Option) *options {
@@ -69,6 +71,15 @@ func WithLevels(f CodeToLevel) Option {
 func WithCodes(f grpc_logging.ErrorToCode) Option {
 	return func(o *options) {
 		o.codeFunc = f
+	}
+}
+
+// WithIgnoreMethods sets a list of methods for which no log messages are printed on success.
+func WithIgnoreMethods(methods []string) Option {
+	return func(o *options) {
+		for _, m := range methods {
+			o.ignoreMethods[m] = struct{}{}
+		}
 	}
 }
 
