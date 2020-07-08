@@ -61,6 +61,14 @@ func (m *mockKeyVault) Unwrap(ctx context.Context, ciphertext []byte, kekLabel s
 	return m.results.key, m.results.err
 }
 
+func (*mockKeyVault) Encrypt(ctx context.Context, plaintext []byte, id string) ([]byte, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (m *mockKeyVault) Decrypt(ctx context.Context, ciphertext []byte, id string) ([]byte, error) {
+	return nil, errors.New("not implemented")
+}
+
 func (*mockKeyVault) GetCertificate(ctx context.Context, id string) (*x509.Certificate, error) {
 	return nil, errors.New("not implemented")
 }

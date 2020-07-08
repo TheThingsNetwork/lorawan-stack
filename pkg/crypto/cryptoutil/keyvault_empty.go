@@ -41,7 +41,7 @@ func (emptyKeyVault) Encrypt(ctx context.Context, plaintext []byte, id string) (
 	return nil, errKeyNotFound.WithAttributes("id", id)
 }
 
-func (emptyKeyVault) Decrypt(ctx context.Context, plaintext []byte, id string) ([]byte, error) {
+func (emptyKeyVault) Decrypt(ctx context.Context, ciphertext []byte, id string) ([]byte, error) {
 	return nil, errKeyNotFound.WithAttributes("id", id)
 }
 
