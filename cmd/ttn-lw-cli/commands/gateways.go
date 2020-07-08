@@ -18,6 +18,7 @@ import (
 	"os"
 
 	"github.com/gogo/protobuf/types"
+	"github.com/howeyc/gopass"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
@@ -402,6 +403,62 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
+	gatewaysStoreSecretCommand = &cobra.Command{
+		Use:   "store-secret [gateway-id]",
+		Short: "Send a Plaintext value to be encrypted and stored",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			gtwID, err := getGatewayID(cmd.Flags(), firstArgs(1, args...), true)
+			if err != nil {
+				return err
+			}
+			plainTextValue, err := gopass.GetPasswdPrompt("Please enter the Plaintext value:", true, os.Stdin, os.Stderr)
+			if err != nil {
+				return err
+			}
+			if len(plainTextValue) == 0 {
+				return errNoPlainTextValue
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+
+			_, err = ttnpb.NewGatewayRegistryClient(is).StoreGatewaySecret(ctx, &ttnpb.StoreGatewaySecretRequest{
+				GatewayIdentifiers: *gtwID,
+				PlainText: ttnpb.GatewaySecretPlainText{
+					Value: string(plainTextValue),
+				},
+			})
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+	gatewaysRetrieveSecretCommand = &cobra.Command{
+		Use:   "retrieve-secret [gateway-id]",
+		Short: "Retrive the decrypted Plaintext value",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+
+			plainText, err := ttnpb.NewGatewayRegistryClient(is).RetrieveGatewaySecret(ctx, &ttnpb.RetrieveGatewaySecretRequest{
+				GatewayIdentifiers: *gtwID,
+			})
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, plainText)
+		},
+	}
 	gatewaysContactInfoCommand = contactInfoCommands("gateway", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		gtwID, err := getGatewayID(cmd.Flags(), args, true)
 		if err != nil {
@@ -449,6 +506,10 @@ func init() {
 	gatewaysCommand.AddCommand(gatewaysConnectionStats)
 	gatewaysContactInfoCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysContactInfoCommand)
+	gatewaysStoreSecretCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())
+	gatewaysCommand.AddCommand(gatewaysStoreSecretCommand)
+	gatewaysRetrieveSecretCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())
+	gatewaysCommand.AddCommand(gatewaysRetrieveSecretCommand)
 	Root.AddCommand(gatewaysCommand)
 }
 

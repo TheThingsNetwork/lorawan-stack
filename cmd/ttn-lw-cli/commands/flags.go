@@ -112,8 +112,9 @@ func getRights(flagSet *pflag.FlagSet) (rights []ttnpb.Right) {
 }
 
 var (
-	errNoAPIKeyID     = errors.DefineInvalidArgument("no_api_key_id", "no API key ID set")
-	errNoAPIKeyRights = errors.DefineInvalidArgument("no_api_key_rights", "no API key rights set")
+	errNoAPIKeyID       = errors.DefineInvalidArgument("no_api_key_id", "no API key ID set")
+	errNoAPIKeyRights   = errors.DefineInvalidArgument("no_api_key_rights", "no API key rights set")
+	errNoPlainTextValue = errors.DefineInvalidArgument("no_plain_text_value", "no plain text value provided")
 )
 
 func getAPIKeyID(flagSet *pflag.FlagSet, args []string, i int) string {
@@ -127,6 +128,19 @@ func getAPIKeyID(flagSet *pflag.FlagSet, args []string, i int) string {
 		apiKeyID, _ = flagSet.GetString("api-key-id")
 	}
 	return apiKeyID
+}
+
+func getPlainTextValue(flagSet *pflag.FlagSet, args []string, i int) string {
+	var plainTextValue string
+	if len(args) > 0+i {
+		if len(args) > 1+i {
+			logger.Warn("Multiple plain text values found in arguments, considering only the first")
+		}
+		plainTextValue = args[0+i]
+	} else {
+		plainTextValue, _ = flagSet.GetString("plain-text-value")
+	}
+	return plainTextValue
 }
 
 func searchFlags() *pflag.FlagSet {
