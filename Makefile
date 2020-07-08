@@ -17,4 +17,4 @@ default: init
 
 SHELL = bash
 
-include .mage/mage.make
+include tools/mage/mage.make

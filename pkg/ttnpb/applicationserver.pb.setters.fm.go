@@ -66,6 +66,15 @@ func (dst *ApplicationLink) SetFields(src *ApplicationLink, paths ...string) err
 				var zero bool
 				dst.TLS = zero
 			}
+		case "skip_payload_crypto":
+			if len(subs) > 0 {
+				return fmt.Errorf("'skip_payload_crypto' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SkipPayloadCrypto = src.SkipPayloadCrypto
+			} else {
+				dst.SkipPayloadCrypto = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

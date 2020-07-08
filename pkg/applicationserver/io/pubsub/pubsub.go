@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package pubsub implements the go-cloud PubSub frontend.
+// Package pubsub implements the go-cloud pub/sub frontend.
 package pubsub
 
 import (
@@ -33,7 +33,7 @@ import (
 	"gocloud.dev/pubsub"
 )
 
-// PubSub is an PubSub frontend that exposes ttnpb.ApplicationPubSubRegistryServer.
+// PubSub is an pub/sub frontend that exposes ttnpb.ApplicationPubSubRegistryServer.
 type PubSub struct {
 	ttnpb.ApplicationPubSubRegistryServer
 
@@ -140,6 +140,8 @@ func (i *integration) handleUp(ctx context.Context) {
 				topic = i.conn.Topics.DownlinkQueued
 			case *ttnpb.ApplicationUp_LocationSolved:
 				topic = i.conn.Topics.LocationSolved
+			case *ttnpb.ApplicationUp_ServiceData:
+				topic = i.conn.Topics.ServiceData
 			}
 			if topic == nil {
 				continue
@@ -241,7 +243,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		server:            ps.server,
 	}
 	if _, loaded := ps.integrations.LoadOrStore(psUID, i); loaded {
-		log.FromContext(ctx).Warn("Integration already started")
+		log.FromContext(ctx).Debug("Integration already started")
 		return errAlreadyConfigured.WithAttributes("application_uid", appUID, "pub_sub_id", pb.PubSubID)
 	}
 	go func() {

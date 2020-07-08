@@ -94,7 +94,7 @@ node_modules/
 /pkg/webui/locales/.backend
 
 # Development tooling
-/mage
+/tools/bin/mage
 
 # Keypair
 cert.pem

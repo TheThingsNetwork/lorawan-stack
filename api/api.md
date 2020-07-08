@@ -36,10 +36,16 @@
   - [Message `ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation)
   - [Message `ApplicationPackageAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageAssociationIdentifiers)
   - [Message `ApplicationPackageAssociations`](#ttn.lorawan.v3.ApplicationPackageAssociations)
+  - [Message `ApplicationPackageDefaultAssociation`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociation)
+  - [Message `ApplicationPackageDefaultAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociationIdentifiers)
+  - [Message `ApplicationPackageDefaultAssociations`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociations)
   - [Message `ApplicationPackages`](#ttn.lorawan.v3.ApplicationPackages)
   - [Message `GetApplicationPackageAssociationRequest`](#ttn.lorawan.v3.GetApplicationPackageAssociationRequest)
+  - [Message `GetApplicationPackageDefaultAssociationRequest`](#ttn.lorawan.v3.GetApplicationPackageDefaultAssociationRequest)
   - [Message `ListApplicationPackageAssociationRequest`](#ttn.lorawan.v3.ListApplicationPackageAssociationRequest)
+  - [Message `ListApplicationPackageDefaultAssociationRequest`](#ttn.lorawan.v3.ListApplicationPackageDefaultAssociationRequest)
   - [Message `SetApplicationPackageAssociationRequest`](#ttn.lorawan.v3.SetApplicationPackageAssociationRequest)
+  - [Message `SetApplicationPackageDefaultAssociationRequest`](#ttn.lorawan.v3.SetApplicationPackageDefaultAssociationRequest)
   - [Service `ApplicationPackageRegistry`](#ttn.lorawan.v3.ApplicationPackageRegistry)
 - [File `lorawan-stack/api/applicationserver_pubsub.proto`](#lorawan-stack/api/applicationserver_pubsub.proto)
   - [Message `ApplicationPubSub`](#ttn.lorawan.v3.ApplicationPubSub)
@@ -149,6 +155,7 @@
   - [Message `ErrorDetails`](#ttn.lorawan.v3.ErrorDetails)
 - [File `lorawan-stack/api/events.proto`](#lorawan-stack/api/events.proto)
   - [Message `Event`](#ttn.lorawan.v3.Event)
+  - [Message `Event.Authentication`](#ttn.lorawan.v3.Event.Authentication)
   - [Message `Event.ContextEntry`](#ttn.lorawan.v3.Event.ContextEntry)
   - [Message `StreamEventsRequest`](#ttn.lorawan.v3.StreamEventsRequest)
   - [Service `Events`](#ttn.lorawan.v3.Events)
@@ -162,6 +169,7 @@
   - [Message `GatewayBrand`](#ttn.lorawan.v3.GatewayBrand)
   - [Message `GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats)
   - [Message `GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes)
+  - [Message `GatewayConnectionStats.SubBand`](#ttn.lorawan.v3.GatewayConnectionStats.SubBand)
   - [Message `GatewayModel`](#ttn.lorawan.v3.GatewayModel)
   - [Message `GatewayRadio`](#ttn.lorawan.v3.GatewayRadio)
   - [Message `GatewayRadio.TxConfiguration`](#ttn.lorawan.v3.GatewayRadio.TxConfiguration)
@@ -327,6 +335,7 @@
   - [Message `ApplicationJoinAccept`](#ttn.lorawan.v3.ApplicationJoinAccept)
   - [Message `ApplicationLocation`](#ttn.lorawan.v3.ApplicationLocation)
   - [Message `ApplicationLocation.AttributesEntry`](#ttn.lorawan.v3.ApplicationLocation.AttributesEntry)
+  - [Message `ApplicationServiceData`](#ttn.lorawan.v3.ApplicationServiceData)
   - [Message `ApplicationUp`](#ttn.lorawan.v3.ApplicationUp)
   - [Message `ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink)
   - [Message `DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage)
@@ -713,6 +722,7 @@ where the user or organization is collaborator on.
 | `api_key` | [`string`](#string) |  |  |
 | `default_formatters` | [`MessagePayloadFormatters`](#ttn.lorawan.v3.MessagePayloadFormatters) |  |  |
 | `tls` | [`bool`](#bool) |  | Enable TLS for linking to the external Network Server. For cluster-local Network Servers, the cluster's TLS setting is used. |
+| `skip_payload_crypto` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Skip decryption of uplink payloads and encryption of downlink payloads. Leave empty for the using the Application Server's default setting. |
 
 #### Field Rules
 
@@ -881,6 +891,43 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | ----- | ---- | ----- | ----------- |
 | `associations` | [`ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation) | repeated |  |
 
+### <a name="ttn.lorawan.v3.ApplicationPackageDefaultAssociation">Message `ApplicationPackageDefaultAssociation`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`ApplicationPackageDefaultAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociationIdentifiers) |  |  |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `package_name` | [`string`](#string) |  |  |
+| `data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+| `package_name` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationPackageDefaultAssociationIdentifiers">Message `ApplicationPackageDefaultAssociationIdentifiers`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `f_port` | [`uint32`](#uint32) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+| `f_port` | <p>`uint32.lte`: `255`</p><p>`uint32.gte`: `1`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationPackageDefaultAssociations">Message `ApplicationPackageDefaultAssociations`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `defaults` | [`ApplicationPackageDefaultAssociation`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociation) | repeated |  |
+
 ### <a name="ttn.lorawan.v3.ApplicationPackages">Message `ApplicationPackages`</a>
 
 | Field | Type | Label | Description |
@@ -892,6 +939,19 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `ids` | [`ApplicationPackageAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageAssociationIdentifiers) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GetApplicationPackageDefaultAssociationRequest">Message `GetApplicationPackageDefaultAssociationRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`ApplicationPackageDefaultAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociationIdentifiers) |  |  |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
 
 #### Field Rules
@@ -916,6 +976,22 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `ids` | <p>`message.required`: `true`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
+### <a name="ttn.lorawan.v3.ListApplicationPackageDefaultAssociationRequest">Message `ListApplicationPackageDefaultAssociationRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. Each page is ordered by the FPort. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+
 ### <a name="ttn.lorawan.v3.SetApplicationPackageAssociationRequest">Message `SetApplicationPackageAssociationRequest`</a>
 
 | Field | Type | Label | Description |
@@ -929,15 +1005,32 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | ----- | ----------- |
 | `association` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.SetApplicationPackageDefaultAssociationRequest">Message `SetApplicationPackageDefaultAssociationRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `default` | [`ApplicationPackageDefaultAssociation`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociation) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `default` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.ApplicationPackageRegistry">Service `ApplicationPackageRegistry`</a>
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `List` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`ApplicationPackages`](#ttn.lorawan.v3.ApplicationPackages) | List returns the available packages for the end device. |
-| `GetAssociation` | [`GetApplicationPackageAssociationRequest`](#ttn.lorawan.v3.GetApplicationPackageAssociationRequest) | [`ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation) | Get returns the application package association registered on the FPort of the end device. |
-| `ListAssociations` | [`ListApplicationPackageAssociationRequest`](#ttn.lorawan.v3.ListApplicationPackageAssociationRequest) | [`ApplicationPackageAssociations`](#ttn.lorawan.v3.ApplicationPackageAssociations) | ListAssociations returns all of the application package associations of the end device. |
-| `SetAssociation` | [`SetApplicationPackageAssociationRequest`](#ttn.lorawan.v3.SetApplicationPackageAssociationRequest) | [`ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation) | SetAssociation updates or creates the application package association on the FPort of the end device. |
-| `DeleteAssociation` | [`ApplicationPackageAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageAssociationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | DeleteAssociation removes the application package association on the FPort of the end device. |
+| `GetAssociation` | [`GetApplicationPackageAssociationRequest`](#ttn.lorawan.v3.GetApplicationPackageAssociationRequest) | [`ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation) | GetAssociation returns the association registered on the FPort of the end device. |
+| `ListAssociations` | [`ListApplicationPackageAssociationRequest`](#ttn.lorawan.v3.ListApplicationPackageAssociationRequest) | [`ApplicationPackageAssociations`](#ttn.lorawan.v3.ApplicationPackageAssociations) | ListAssociations returns all of the associations of the end device. |
+| `SetAssociation` | [`SetApplicationPackageAssociationRequest`](#ttn.lorawan.v3.SetApplicationPackageAssociationRequest) | [`ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation) | SetAssociation updates or creates the association on the FPort of the end device. |
+| `DeleteAssociation` | [`ApplicationPackageAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageAssociationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | DeleteAssociation removes the association on the FPort of the end device. |
+| `GetDefaultAssociation` | [`GetApplicationPackageDefaultAssociationRequest`](#ttn.lorawan.v3.GetApplicationPackageDefaultAssociationRequest) | [`ApplicationPackageDefaultAssociation`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociation) | GetDefaultAssociation returns the default association registered on the FPort of the application. |
+| `ListDefaultAssociations` | [`ListApplicationPackageDefaultAssociationRequest`](#ttn.lorawan.v3.ListApplicationPackageDefaultAssociationRequest) | [`ApplicationPackageDefaultAssociations`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociations) | ListDefaultAssociations returns all of the default associations of the application. |
+| `SetDefaultAssociation` | [`SetApplicationPackageDefaultAssociationRequest`](#ttn.lorawan.v3.SetApplicationPackageDefaultAssociationRequest) | [`ApplicationPackageDefaultAssociation`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociation) | SetDefaultAssociation updates or creates the default association on the FPort of the application. |
+| `DeleteDefaultAssociation` | [`ApplicationPackageDefaultAssociationIdentifiers`](#ttn.lorawan.v3.ApplicationPackageDefaultAssociationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | DeleteDefaultAssociation removes the default association on the FPort of the application. |
 
 #### HTTP bindings
 
@@ -948,6 +1041,10 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `ListAssociations` | `GET` | `/api/v3/as/applications/{ids.application_ids.application_id}/devices/{ids.device_id}/packages/associations` |  |
 | `SetAssociation` | `PUT` | `/api/v3/as/applications/{association.ids.end_device_ids.application_ids.application_id}/devices/{association.ids.end_device_ids.device_id}/packages/associations/{association.ids.f_port}` | `*` |
 | `DeleteAssociation` | `DELETE` | `/api/v3/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/associations/{f_port}` |  |
+| `GetDefaultAssociation` | `GET` | `/api/v3/as/applications/{ids.application_ids.application_id}/packages/associations/{ids.f_port}` |  |
+| `ListDefaultAssociations` | `GET` | `/api/v3/as/applications/{ids.application_id}/packages/associations` |  |
+| `SetDefaultAssociation` | `PUT` | `/api/v3/as/applications/{default.ids.application_ids.application_id}/packages/associations/{default.ids.f_port}` | `*` |
+| `DeleteDefaultAssociation` | `DELETE` | `/api/v3/as/applications/{application_ids.application_id}/packages/associations/{f_port}` |  |
 
 ## <a name="lorawan-stack/api/applicationserver_pubsub.proto">File `lorawan-stack/api/applicationserver_pubsub.proto`</a>
 
@@ -972,6 +1069,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `downlink_failed` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 | `downlink_queued` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 | `location_solved` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
+| `service_data` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 
 #### Field Rules
 
@@ -1157,6 +1255,7 @@ The NATS provider settings.
 | `downlink_failed` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `downlink_queued` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `location_solved` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+| `service_data` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 
 #### Field Rules
 
@@ -1236,6 +1335,7 @@ The NATS provider settings.
 | `downlink_failed` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `downlink_queued` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `location_solved` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
+| `service_data` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 
 #### Field Rules
 
@@ -1870,7 +1970,8 @@ SDKs are responsible for combining (if desired) the three.
 | `provisioning_data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Vendor-specific provisioning data. Stored in Join Server. |
 | `multicast` | [`bool`](#bool) |  | Indicates whether this device represents a multicast group. |
 | `claim_authentication_code` | [`EndDeviceAuthenticationCode`](#ttn.lorawan.v3.EndDeviceAuthenticationCode) |  | Authentication code to claim ownership of the end device. Stored in Join Server. |
-| `skip_payload_crypto` | [`bool`](#bool) |  | Skip decryption of uplink payloads and encryption of downlink payloads. |
+| `skip_payload_crypto` | [`bool`](#bool) |  | Skip decryption of uplink payloads and encryption of downlink payloads. This field is deprecated, use skip_payload_crypto_override instead. |
+| `skip_payload_crypto_override` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Skip decryption of uplink payloads and encryption of downlink payloads. This field overrides the application-level setting. |
 
 #### Field Rules
 
@@ -2240,8 +2341,8 @@ This is used internally by the Network Server and is read only.
 | `desired_parameters` | <p>`message.required`: `true`</p> |
 | `device_class` | <p>`enum.defined_only`: `true`</p> |
 | `lorawan_version` | <p>`enum.defined_only`: `true`</p> |
-| `rejected_adr_data_rate_indexes` | <p>`repeated.items.enum.defined_only`: `true`</p> |
-| `rejected_adr_tx_power_indexes` | <p>`repeated.items.uint32.lte`: `15`</p> |
+| `rejected_adr_data_rate_indexes` | <p>`repeated.max_items`: `15`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
+| `rejected_adr_tx_power_indexes` | <p>`repeated.max_items`: `15`</p><p>`repeated.items.uint32.lte`: `15`</p> |
 | `rejected_frequencies` | <p>`repeated.items.uint64.gte`: `100000`</p> |
 
 ### <a name="ttn.lorawan.v3.MACState.JoinAccept">Message `MACState.JoinAccept`</a>
@@ -2426,6 +2527,7 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 | `origin` | [`string`](#string) |  |  |
 | `context` | [`Event.ContextEntry`](#ttn.lorawan.v3.Event.ContextEntry) | repeated |  |
 | `visibility` | [`Rights`](#ttn.lorawan.v3.Rights) |  | The event will be visible to a caller that has any of these rights. |
+| `authentication` | [`Event.Authentication`](#ttn.lorawan.v3.Event.Authentication) |  |  |
 
 #### Field Rules
 
@@ -2433,6 +2535,15 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 | ----- | ----------- |
 | `time` | <p>`timestamp.required`: `true`</p> |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.Event.Authentication">Message `Event.Authentication`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `type` | [`string`](#string) |  |  |
+| `token_type` | [`string`](#string) |  |  |
+| `token_id` | [`string`](#string) |  |  |
+| `remote_ip` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.Event.ContextEntry">Message `Event.ContextEntry`</a>
 
@@ -2534,7 +2645,7 @@ Gateway is the message that defines a gateway on the network.
 | `version_ids` | <p>`message.required`: `true`</p> |
 | `gateway_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
-| `frequency_plan_ids` | <p>`repeated.items.string.max_len`: `64`</p> |
+| `frequency_plan_ids` | <p>`repeated.max_items`: `8`</p><p>`repeated.items.string.max_len`: `64`</p> |
 | `downlink_path_constraint` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.Gateway.AttributesEntry">Message `Gateway.AttributesEntry`</a>
@@ -2592,6 +2703,7 @@ Connection stats as monitored by the Gateway Server.
 | `last_downlink_received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `downlink_count` | [`uint64`](#uint64) |  |  |
 | `round_trip_times` | [`GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes) |  |  |
+| `sub_bands` | [`GatewayConnectionStats.SubBand`](#ttn.lorawan.v3.GatewayConnectionStats.SubBand) | repeated | Statistics for each sub band. |
 
 ### <a name="ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes">Message `GatewayConnectionStats.RoundTripTimes`</a>
 
@@ -2609,6 +2721,15 @@ Connection stats as monitored by the Gateway Server.
 | `min` | <p>`duration.required`: `true`</p> |
 | `max` | <p>`duration.required`: `true`</p> |
 | `median` | <p>`duration.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GatewayConnectionStats.SubBand">Message `GatewayConnectionStats.SubBand`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `min_frequency` | [`uint64`](#uint64) |  |  |
+| `max_frequency` | [`uint64`](#uint64) |  |  |
+| `downlink_utilization_limit` | [`float`](#float) |  |  |
+| `downlink_utilization` | [`float`](#float) |  |  |
 
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 
@@ -3119,6 +3240,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ---- | ----- | ----------- |
 | `api_key` | [`AuthInfoResponse.APIKeyAccess`](#ttn.lorawan.v3.AuthInfoResponse.APIKeyAccess) |  |  |
 | `oauth_access_token` | [`OAuthAccessToken`](#ttn.lorawan.v3.OAuthAccessToken) |  |  |
+| `user_session` | [`UserSession`](#ttn.lorawan.v3.UserSession) |  | Warning: A user authorized by session cookie will be granted all current and future rights. When using this auth type, the respective handlers need to ensure thorough CSRF and CORS protection using appropriate middleware. |
 | `universal_rights` | [`Rights`](#ttn.lorawan.v3.Rights) |  |  |
 | `is_admin` | [`bool`](#bool) |  |  |
 
@@ -4704,6 +4826,13 @@ The UplinkMessageProcessor service processes uplink messages.
 | `key` | [`string`](#string) |  |  |
 | `value` | [`string`](#string) |  |  |
 
+### <a name="ttn.lorawan.v3.ApplicationServiceData">Message `ApplicationServiceData`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `service` | [`string`](#string) |  |  |
+| `data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
+
 ### <a name="ttn.lorawan.v3.ApplicationUp">Message `ApplicationUp`</a>
 
 | Field | Type | Label | Description |
@@ -4720,6 +4849,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | `downlink_queued` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
 | `downlink_queue_invalidated` | [`ApplicationInvalidatedDownlinks`](#ttn.lorawan.v3.ApplicationInvalidatedDownlinks) |  |  |
 | `location_solved` | [`ApplicationLocation`](#ttn.lorawan.v3.ApplicationLocation) |  |  |
+| `service_data` | [`ApplicationServiceData`](#ttn.lorawan.v3.ApplicationServiceData) |  |  |
 
 #### Field Rules
 
@@ -5523,7 +5653,7 @@ The NsPba service connects a Network Server to a Packet Broker Agent.
 
 | Field | Validations |
 | ----- | ----------- |
-| `image_size` | <p>`uint32.lte`: `1000`</p> |
+| `image_size` | <p>`uint32.lte`: `1000`</p><p>`uint32.gte`: `10`</p> |
 
 ### <a name="ttn.lorawan.v3.GenerateQRCodeResponse">Message `GenerateQRCodeResponse`</a>
 
@@ -6091,7 +6221,7 @@ This service is not implemented on all deployments.
 
 ### <a name="ttn.lorawan.v3.User">Message `User`</a>
 
-User is the message that defines an user on the network.
+User is the message that defines a user on the network.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -6141,6 +6271,7 @@ User is the message that defines an user on the network.
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `session_secret` | [`string`](#string) |  | The session secret is used to compose an authorization key and is never returned. |
 
 #### Field Rules
 

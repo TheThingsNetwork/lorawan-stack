@@ -31,6 +31,7 @@ const env = {
   },
   pageData: envSelector.selectPageData(),
   sentryDsn: envSelector.selectSentryDsnConfig(),
+  csrfToken: envSelector.selectCSRFToken(),
   siteName: envSelector.selectApplicationSiteName(),
   siteTitle: envSelector.selectApplicationSiteTitle(),
   siteSubTitle: envSelector.selectApplicationSiteSubTitle(),

@@ -93,6 +93,16 @@ func TestLinkApplication(t *testing.T) {
 				LocationSolved: &ttnpb.ApplicationLocation{},
 			},
 		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID1,
+				DeviceID:               "test-dev3",
+			},
+			CorrelationIDs: []string{"correlation-id-5", "correlation-id-6"},
+			Up: &ttnpb.ApplicationUp_ServiceData{
+				ServiceData: &ttnpb.ApplicationServiceData{},
+			},
+		},
 	} {
 		t.Run(fmt.Sprintf("uplink %d", i), func(t *testing.T) {
 			a := assertions.New(t)
@@ -2164,6 +2174,16 @@ func handleApplicationUplinkQueueTest(t *testing.T, q ApplicationUplinkQueue) {
 			CorrelationIDs: []string{"correlation-id-9", "correlation-id-10"},
 			Up: &ttnpb.ApplicationUp_DownlinkAck{
 				DownlinkAck: &ttnpb.ApplicationDownlink{},
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID1,
+				DeviceID:               "test-dev",
+			},
+			CorrelationIDs: []string{"correlation-id-11", "correlation-id-12"},
+			Up: &ttnpb.ApplicationUp_ServiceData{
+				ServiceData: &ttnpb.ApplicationServiceData{},
 			},
 		},
 	}

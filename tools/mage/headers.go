@@ -103,7 +103,7 @@ var (
 func init() {
 	headerFile = os.Getenv("HEADER_FILE")
 	if headerFile == "" {
-		headerFile = ".mage/header.yml"
+		headerFile = "tools/mage/header.yml"
 	}
 }
 

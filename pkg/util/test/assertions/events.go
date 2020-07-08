@@ -55,6 +55,8 @@ func ShouldResembleEvent(actual interface{}, expected ...interface{}) string {
 	}
 	ap.Time = time.Time{}
 	ep.Time = time.Time{}
+	ap.Authentication = nil
+	ep.Authentication = nil
 	return ShouldResemble(ap, ep)
 }
 

@@ -455,3 +455,19 @@ func (s *Scheduler) TimeFromTimestampTime(t uint32) (ConcentratorTime, bool) {
 	}
 	return s.clock.FromTimestampTime(t), true
 }
+
+// SubBandStats returns a map with the usage stats of each sub band.
+func (s *Scheduler) SubBandStats() []*ttnpb.GatewayConnectionStats_SubBand {
+	var res []*ttnpb.GatewayConnectionStats_SubBand
+
+	for _, sb := range s.subBands {
+		res = append(res, &ttnpb.GatewayConnectionStats_SubBand{
+			MaxFrequency:             sb.MaxFrequency,
+			MinFrequency:             sb.MinFrequency,
+			DownlinkUtilizationLimit: sb.DutyCycle,
+			DownlinkUtilization:      sb.DutyCycleUtilization(),
+		})
+	}
+
+	return res
+}

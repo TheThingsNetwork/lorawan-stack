@@ -963,6 +963,16 @@ func (dst *UserSession) SetFields(src *UserSession, paths ...string) error {
 			} else {
 				dst.ExpiresAt = nil
 			}
+		case "session_secret":
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_secret' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SessionSecret = src.SessionSecret
+			} else {
+				var zero string
+				dst.SessionSecret = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

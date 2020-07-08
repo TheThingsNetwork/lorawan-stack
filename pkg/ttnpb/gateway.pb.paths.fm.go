@@ -407,6 +407,7 @@ var GatewayConnectionStatsFieldPathsNested = []string{
 	"round_trip_times.max",
 	"round_trip_times.median",
 	"round_trip_times.min",
+	"sub_bands",
 	"uplink_count",
 }
 
@@ -419,6 +420,7 @@ var GatewayConnectionStatsFieldPathsTopLevel = []string{
 	"last_uplink_received_at",
 	"protocol",
 	"round_trip_times",
+	"sub_bands",
 	"uplink_count",
 }
 var GatewayRadio_TxConfigurationFieldPathsNested = []string{
@@ -444,4 +446,17 @@ var GatewayConnectionStats_RoundTripTimesFieldPathsTopLevel = []string{
 	"max",
 	"median",
 	"min",
+}
+var GatewayConnectionStats_SubBandFieldPathsNested = []string{
+	"downlink_utilization",
+	"downlink_utilization_limit",
+	"max_frequency",
+	"min_frequency",
+}
+
+var GatewayConnectionStats_SubBandFieldPathsTopLevel = []string{
+	"downlink_utilization",
+	"downlink_utilization_limit",
+	"max_frequency",
+	"min_frequency",
 }

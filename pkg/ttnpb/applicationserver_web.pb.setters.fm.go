@@ -449,6 +449,31 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 					dst.LocationSolved = nil
 				}
 			}
+		case "service_data":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationWebhookTemplate_Message
+				if (src == nil || src.ServiceData == nil) && dst.ServiceData == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ServiceData
+				}
+				if dst.ServiceData != nil {
+					newDst = dst.ServiceData
+				} else {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.ServiceData = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ServiceData = src.ServiceData
+				} else {
+					dst.ServiceData = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -789,6 +814,31 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 					dst.LocationSolved = src.LocationSolved
 				} else {
 					dst.LocationSolved = nil
+				}
+			}
+		case "service_data":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationWebhook_Message
+				if (src == nil || src.ServiceData == nil) && dst.ServiceData == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ServiceData
+				}
+				if dst.ServiceData != nil {
+					newDst = dst.ServiceData
+				} else {
+					newDst = &ApplicationWebhook_Message{}
+					dst.ServiceData = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ServiceData = src.ServiceData
+				} else {
+					dst.ServiceData = nil
 				}
 			}
 

@@ -78,7 +78,7 @@ func TestCookie(t *testing.T) {
 	blockKey := random.Bytes(32)
 	hashKey := random.Bytes(64)
 
-	e.Use(Cookies(blockKey, hashKey))
+	e.Use(Cookies(hashKey, blockKey))
 
 	e.GET("/set", testSetCookie(t, "test_value"))
 	e.GET("/get", testGetCookie(t, "test_value", true))

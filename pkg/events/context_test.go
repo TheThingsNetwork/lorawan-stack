@@ -52,6 +52,7 @@ func TestContextMarshaler(t *testing.T) {
 
 	unmarshaled, err := events.UnmarshalJSON(b)
 	a.So(err, should.BeNil)
+	a.So(unmarshaled, should.Resemble, evt)
 
 	val, ok := unmarshaled.Context().Value("ctx-test").(string)
 	if a.So(ok, should.BeTrue) {

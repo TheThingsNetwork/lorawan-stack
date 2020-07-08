@@ -30,7 +30,6 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import { withEnv } from '@ttn-lw/lib/components/env'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import getCookieValue from '@ttn-lw/lib/cookie'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './authorize.styl'
@@ -73,6 +72,7 @@ export default class Authorize extends PureComponent {
     const {
       env: {
         pageData: { client, user, error },
+        csrfToken,
       },
       location,
     } = this.props
@@ -118,7 +118,7 @@ export default class Authorize extends PureComponent {
           logo
         >
           <Fragment>
-            <input type="hidden" name="csrf" value={getCookieValue('_oauth_csrf')} />
+            <input type="hidden" name="_csrf" value={csrfToken} />
             <div className={style.left}>
               <ul>
                 {client.rights.map(right => (

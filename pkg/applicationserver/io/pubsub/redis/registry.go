@@ -50,7 +50,7 @@ func applyPubSubFieldMask(dst, src *ttnpb.ApplicationPubSub, paths ...string) (*
 	return dst, dst.SetFields(src, paths...)
 }
 
-// PubSubRegistry is a Redis PubSub registry.
+// PubSubRegistry is a Redis pub/sub registry.
 type PubSubRegistry struct {
 	Redis *ttnredis.Client
 }

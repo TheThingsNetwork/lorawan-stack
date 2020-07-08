@@ -28,7 +28,7 @@ import (
 type ApplicationPackageHandler interface {
 	RegisterServices(s *grpc.Server)
 	RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn)
-	HandleUp(context.Context, *ttnpb.ApplicationPackageAssociation, *ttnpb.ApplicationUp) error
+	HandleUp(context.Context, *ttnpb.ApplicationPackageDefaultAssociation, *ttnpb.ApplicationPackageAssociation, *ttnpb.ApplicationUp) error
 }
 
 // CreateApplicationPackage is a function that creates a traffic handler for a given package.
@@ -36,7 +36,7 @@ type CreateApplicationPackage func(io.Server, Registry) ApplicationPackageHandle
 
 type registeredPackage struct {
 	ttnpb.ApplicationPackage
-	new CreateApplicationPackage
+	create CreateApplicationPackage
 }
 
 var (
@@ -47,13 +47,13 @@ var (
 )
 
 // RegisterPackage registers the given package on the application packages frontend.
-func RegisterPackage(p ttnpb.ApplicationPackage, new CreateApplicationPackage) error {
+func RegisterPackage(p ttnpb.ApplicationPackage, create CreateApplicationPackage) error {
 	if _, ok := registeredPackages[p.Name]; ok {
 		return errAlreadyRegistered.WithAttributes("name", p.Name)
 	}
 	registeredPackages[p.Name] = &registeredPackage{
 		ApplicationPackage: p,
-		new:                new,
+		create:             create,
 	}
 	return nil
 }

@@ -1171,6 +1171,43 @@
         ]
       }
     },
+    "/as/applications/{application_ids.application_id}/packages/associations/{f_port}": {
+      "delete": {
+        "operationId": "ApplicationPackageRegistry_DeleteDefaultAssociation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "f_port",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "ApplicationPackageRegistry"
+        ]
+      }
+    },
     "/as/applications/{application_id}/link": {
       "delete": {
         "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
@@ -1305,6 +1342,51 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v3SetApplicationPackageAssociationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationPackageRegistry"
+        ]
+      }
+    },
+    "/as/applications/{default.ids.application_ids.application_id}/packages/associations/{default.ids.f_port}": {
+      "put": {
+        "operationId": "ApplicationPackageRegistry_SetDefaultAssociation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPackageDefaultAssociation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "default.ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "default.ids.f_port",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetApplicationPackageDefaultAssociationRequest"
             }
           }
         ],
@@ -1674,6 +1756,111 @@
             "required": false,
             "type": "string",
             "format": "byte"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.\nEach page is ordered by the FPort.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ApplicationPackageRegistry"
+        ]
+      }
+    },
+    "/as/applications/{ids.application_ids.application_id}/packages/associations/{ids.f_port}": {
+      "get": {
+        "operationId": "ApplicationPackageRegistry_GetDefaultAssociation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPackageDefaultAssociation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "ids.f_port",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ApplicationPackageRegistry"
+        ]
+      }
+    },
+    "/as/applications/{ids.application_id}/packages/associations": {
+      "get": {
+        "operationId": "ApplicationPackageRegistry_ListDefaultAssociations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPackageDefaultAssociations"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
           },
           {
             "name": "limit",
@@ -7439,6 +7626,23 @@
         }
       }
     },
+    "EventAuthentication": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "token_type": {
+          "type": "string"
+        },
+        "token_id": {
+          "type": "string"
+        },
+        "remote_ip": {
+          "type": "string"
+        }
+      }
+    },
     "GatewayConnectionStatsRoundTripTimes": {
       "type": "object",
       "properties": {
@@ -7454,6 +7658,27 @@
         "count": {
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "GatewayConnectionStatsSubBand": {
+      "type": "object",
+      "properties": {
+        "min_frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "max_frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "downlink_utilization_limit": {
+          "type": "number",
+          "format": "float"
+        },
+        "downlink_utilization": {
+          "type": "number",
+          "format": "float"
         }
       }
     },
@@ -8418,6 +8643,11 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Enable TLS for linking to the external Network Server.\nFor cluster-local Network Servers, the cluster's TLS setting is used."
+        },
+        "skip_payload_crypto": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nLeave empty for the using the Application Server's default setting."
         }
       }
     },
@@ -8528,6 +8758,51 @@
         }
       }
     },
+    "v3ApplicationPackageDefaultAssociation": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "$ref": "#/definitions/v3ApplicationPackageDefaultAssociationIdentifiers"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "package_name": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        }
+      }
+    },
+    "v3ApplicationPackageDefaultAssociationIdentifiers": {
+      "type": "object",
+      "properties": {
+        "application_ids": {
+          "$ref": "#/definitions/v3ApplicationIdentifiers"
+        },
+        "f_port": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "v3ApplicationPackageDefaultAssociations": {
+      "type": "object",
+      "properties": {
+        "defaults": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ApplicationPackageDefaultAssociation"
+          }
+        }
+      }
+    },
     "v3ApplicationPackages": {
       "type": "object",
       "properties": {
@@ -8598,6 +8873,9 @@
         },
         "location_solved": {
           "$ref": "#/definitions/v3ApplicationPubSubMessage"
+        },
+        "service_data": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage"
         }
       }
     },
@@ -8644,6 +8922,17 @@
         }
       }
     },
+    "v3ApplicationServiceData": {
+      "type": "object",
+      "properties": {
+        "service": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        }
+      }
+    },
     "v3ApplicationUp": {
       "type": "object",
       "properties": {
@@ -8687,6 +8976,9 @@
         },
         "location_solved": {
           "$ref": "#/definitions/v3ApplicationLocation"
+        },
+        "service_data": {
+          "$ref": "#/definitions/v3ApplicationServiceData"
         }
       }
     },
@@ -8812,6 +9104,9 @@
         },
         "location_solved": {
           "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
+        "service_data": {
+          "$ref": "#/definitions/v3ApplicationWebhookMessage"
         }
       }
     },
@@ -8916,6 +9211,9 @@
         },
         "location_solved": {
           "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "service_data": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
         }
       }
     },
@@ -9000,6 +9298,10 @@
         },
         "oauth_access_token": {
           "$ref": "#/definitions/v3OAuthAccessToken"
+        },
+        "user_session": {
+          "$ref": "#/definitions/v3UserSession",
+          "description": "Warning: A user authorized by session cookie will be granted all\ncurrent and future rights. When using this auth type, the respective\nhandlers need to ensure thorough CSRF and CORS protection using\nappropriate middleware."
         },
         "universal_rights": {
           "$ref": "#/definitions/v3Rights"
@@ -9918,7 +10220,12 @@
         "skip_payload_crypto": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Skip decryption of uplink payloads and encryption of downlink payloads."
+          "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nThis field is deprecated, use skip_payload_crypto_override instead."
+        },
+        "skip_payload_crypto_override": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nThis field overrides the application-level setting."
         }
       },
       "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -10141,6 +10448,9 @@
         "visibility": {
           "$ref": "#/definitions/v3Rights",
           "description": "The event will be visible to a caller that has any of these rights."
+        },
+        "authentication": {
+          "$ref": "#/definitions/EventAuthentication"
         }
       }
     },
@@ -10385,6 +10695,13 @@
         },
         "round_trip_times": {
           "$ref": "#/definitions/GatewayConnectionStatsRoundTripTimes"
+        },
+        "sub_bands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GatewayConnectionStatsSubBand"
+          },
+          "description": "Statistics for each sub band."
         }
       },
       "description": "Connection stats as monitored by the Gateway Server."
@@ -12228,6 +12545,17 @@
         }
       }
     },
+    "v3SetApplicationPackageDefaultAssociationRequest": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "$ref": "#/definitions/v3ApplicationPackageDefaultAssociation"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask"
+        }
+      }
+    },
     "v3SetApplicationPubSubRequest": {
       "type": "object",
       "properties": {
@@ -12695,7 +13023,7 @@
           "$ref": "#/definitions/v3Picture"
         }
       },
-      "description": "User is the message that defines an user on the network."
+      "description": "User is the message that defines a user on the network."
     },
     "v3UserIdentifiers": {
       "type": "object",
@@ -12730,6 +13058,10 @@
         "expires_at": {
           "type": "string",
           "format": "date-time"
+        },
+        "session_secret": {
+          "type": "string",
+          "description": "The session secret is used to compose an authorization key and is never returned."
         }
       }
     },

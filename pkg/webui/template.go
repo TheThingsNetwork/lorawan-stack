@@ -47,6 +47,7 @@ type TemplateData struct {
 	CSSFiles        []string `name:"css-file" description:"The names of the CSS files"`
 	JSFiles         []string `name:"js-file" description:"The names of the JS files"`
 	SentryDSN       string   `name:"sentry-dsn" description:"The Sentry DSN"`
+	CSRFToken       string   `name:-`
 }
 
 // MountPath derives the mount path from the canonical URL of the config.
@@ -97,6 +98,7 @@ const appHTML = `
       window.SITE_TITLE={{.Title}};
 			window.SITE_SUB_TITLE={{.SubTitle}};
 			window.SENTRY_DSN={{.SentryDSN}};
+			{{with .CSRFToken}}window.CSRF_TOKEN={{.}};{{end}}
       {{with .PageData}}window.PAGE_DATA={{.}};{{end}}
     </script>
     {{range .JSFiles}}<script type="text/javascript" src="{{$assetsBaseURL}}/{{.}}"></script>{{end}}

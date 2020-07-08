@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttnmage
+package auth
 
-import "github.com/magefile/mage/mg"
-
-var initDeps []interface{}
-
-// Init initializes the tooling.
-func Init() {
-	mg.Deps(initDeps...)
+// CookieShape is the shape of the auth cookie.
+type CookieShape struct {
+	UserID        string `json:"user_id"`
+	SessionID     string `json:"session_id"`
+	SessionSecret string `json:"token_key"`
 }

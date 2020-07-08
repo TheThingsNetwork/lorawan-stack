@@ -15,10 +15,10 @@
 import { createLogic } from 'redux-logic'
 import * as Sentry from '@sentry/browser'
 
-import { clear as clearAccessToken } from '@console/lib/access-token'
-
 import { error } from '@ttn-lw/lib/log'
 import { isUnauthenticatedError, isInvalidArgumentError, isUnknown } from '@ttn-lw/lib/errors/utils'
+
+import { clear as clearAccessToken } from '@console/lib/access-token'
 
 const getResultActionFromType = function(typeString, status) {
   if (typeString instanceof Array) {

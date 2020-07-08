@@ -231,6 +231,7 @@ type webhookTemplatePaths struct {
 	DownlinkFailed *string `yaml:"downlink-failed,omitempty"`
 	DownlinkQueued *string `yaml:"downlink-queued,omitempty"`
 	LocationSolved *string `yaml:"location-solved,omitempty"`
+	ServiceData    *string `yaml:"service-data,omitempty"`
 }
 
 type webhookTemplate struct {
@@ -288,5 +289,6 @@ func (t webhookTemplate) toPB() *ttnpb.ApplicationWebhookTemplate {
 		DownlinkFailed:       t.pathToMessage(t.Paths.DownlinkFailed),
 		DownlinkQueued:       t.pathToMessage(t.Paths.DownlinkQueued),
 		LocationSolved:       t.pathToMessage(t.Paths.LocationSolved),
+		ServiceData:          t.pathToMessage(t.Paths.ServiceData),
 	}
 }

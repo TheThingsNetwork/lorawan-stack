@@ -30,6 +30,8 @@ export const selectApplicationSiteSubTitle = () => configSelector().SITE_SUB_TIT
 
 export const selectSentryDsnConfig = () => configSelector().SENTRY_DSN
 
+export const selectCSRFToken = () => configSelector().CSRF_TOKEN
+
 export const selectStackConfig = () => selectApplicationConfig().stack_config
 
 export const selectGsConfig = () => selectStackConfig().gs

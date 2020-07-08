@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package mock implements a mock PubSub provider using the mempubsub driver.
+// Package mock implements a mock pub/sub provider using the mempubsub driver.
 package mock
 
 import (
@@ -54,6 +54,7 @@ type Connection struct {
 	DownlinkFailed *pubsub.Subscription
 	DownlinkQueued *pubsub.Subscription
 	LocationSolved *pubsub.Subscription
+	ServiceData    *pubsub.Subscription
 }
 
 func (c *Connection) ApplicationPubSubIdentifiers() *ttnpb.ApplicationPubSubIdentifiers {
@@ -83,6 +84,7 @@ func (c *Connection) Shutdown(ctx context.Context) (err error) {
 		c.DownlinkFailed,
 		c.DownlinkQueued,
 		c.LocationSolved,
+		c.ServiceData,
 	} {
 		if topic != nil {
 			if err = topic.Shutdown(ctx); err != nil && !errors.IsCanceled(err) {
@@ -152,6 +154,10 @@ func (i *Impl) OpenConnection(ctx context.Context, target provider.Target) (pc *
 		{
 			topic:        &pc.Topics.LocationSolved,
 			subscription: &conn.LocationSolved,
+		},
+		{
+			topic:        &pc.Topics.ServiceData,
+			subscription: &conn.ServiceData,
 		},
 	} {
 		*t.topic = mempubsub.NewTopic()

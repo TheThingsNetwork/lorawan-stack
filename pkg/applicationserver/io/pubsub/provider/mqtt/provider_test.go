@@ -99,6 +99,9 @@ func TestOpenConnection(t *testing.T) {
 		LocationSolved: &ttnpb.ApplicationPubSub_Message{
 			Topic: "location/solved",
 		},
+		ServiceData: &ttnpb.ApplicationPubSub_Message{
+			Topic: "service/data",
+		},
 	}
 
 	impl, err := provider.GetProvider(&ttnpb.ApplicationPubSub{
@@ -288,6 +291,11 @@ func TestOpenConnection(t *testing.T) {
 						name:      "ValidLocationSolved",
 						topicName: "app1/ps1/location/solved",
 						topic:     conn.Topics.LocationSolved,
+					},
+					{
+						name:      "ValidServiceData",
+						topicName: "app1/ps1/service/data",
+						topic:     conn.Topics.ServiceData,
 					},
 				} {
 					t.Run(tc.name, func(t *testing.T) {

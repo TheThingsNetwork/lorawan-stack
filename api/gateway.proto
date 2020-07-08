@@ -275,4 +275,13 @@ message GatewayConnectionStats {
     uint32 count = 4;
   }
   RoundTripTimes round_trip_times = 9;
+
+  message SubBand {
+    uint64 min_frequency = 1;
+    uint64 max_frequency = 2;
+    float downlink_utilization_limit = 3;
+    float downlink_utilization = 4;
+  }
+  // Statistics for each sub band.
+  repeated SubBand sub_bands = 10;
 }

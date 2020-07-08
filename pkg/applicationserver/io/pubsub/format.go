@@ -19,7 +19,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
-// Format is a format to use for PubSub integrations.
+// Format is a format to use for pub/sub integrations.
 type Format struct {
 	formatters.Formatter
 	Name string

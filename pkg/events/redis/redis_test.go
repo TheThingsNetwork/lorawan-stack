@@ -66,7 +66,7 @@ func TestRedisPubSub(t *testing.T) {
 
 	events.IncludeCaller = true
 
-	var eventCh = make(chan events.Event)
+	eventCh := make(chan events.Event)
 	handler := events.HandlerFunc(func(e events.Event) {
 		t.Logf("Received event %v", e)
 		a.So(e.Time().IsZero(), should.BeFalse)

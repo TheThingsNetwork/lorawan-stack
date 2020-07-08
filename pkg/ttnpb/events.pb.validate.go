@@ -113,6 +113,18 @@ func (m *Event) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "authentication":
+
+			if v, ok := interface{}(m.GetAuthentication()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return EventValidationError{
+						field:  "authentication",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return EventValidationError{
 				field:  name,
@@ -288,3 +300,92 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = StreamEventsRequestValidationError{}
+
+// ValidateFields checks the field values on Event_Authentication with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *Event_Authentication) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = Event_AuthenticationFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "type":
+			// no validation rules for Type
+		case "token_type":
+			// no validation rules for TokenType
+		case "token_id":
+			// no validation rules for TokenID
+		case "remote_ip":
+			// no validation rules for RemoteIP
+		default:
+			return Event_AuthenticationValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// Event_AuthenticationValidationError is the validation error returned by
+// Event_Authentication.ValidateFields if the designated constraints aren't met.
+type Event_AuthenticationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Event_AuthenticationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Event_AuthenticationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Event_AuthenticationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Event_AuthenticationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Event_AuthenticationValidationError) ErrorName() string {
+	return "Event_AuthenticationValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e Event_AuthenticationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEvent_Authentication.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Event_AuthenticationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Event_AuthenticationValidationError{}

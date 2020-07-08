@@ -547,9 +547,13 @@ message EndDevice {
   EndDeviceAuthenticationCode claim_authentication_code = 46;
 
   // Skip decryption of uplink payloads and encryption of downlink payloads.
+  // This field is deprecated, use skip_payload_crypto_override instead.
   bool skip_payload_crypto = 51;
+  // Skip decryption of uplink payloads and encryption of downlink payloads.
+  // This field overrides the application-level setting.
+  google.protobuf.BoolValue skip_payload_crypto_override = 52;
 
-  // next: 52;
+  // next: 53;
 }
 
 message EndDevices {

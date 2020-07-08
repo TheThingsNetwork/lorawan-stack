@@ -2109,6 +2109,15 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 				var zero bool
 				dst.SkipPayloadCrypto = zero
 			}
+		case "skip_payload_crypto_override":
+			if len(subs) > 0 {
+				return fmt.Errorf("'skip_payload_crypto_override' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SkipPayloadCryptoOverride = src.SkipPayloadCryptoOverride
+			} else {
+				dst.SkipPayloadCryptoOverride = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

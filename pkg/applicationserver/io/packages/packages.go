@@ -19,7 +19,6 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -52,34 +51,66 @@ func New(ctx context.Context, io io.Server, registry Registry) (Server, error) {
 		handlers: make(map[string]ApplicationPackageHandler),
 	}
 	for _, p := range registeredPackages {
-		s.handlers[p.Name] = p.new(io, registry)
+		s.handlers[p.Name] = p.create(io, registry)
 	}
 	return s, nil
 }
 
+type associationsPair struct {
+	defaultAssociation *ttnpb.ApplicationPackageDefaultAssociation
+	association        *ttnpb.ApplicationPackageAssociation
+}
+
+type associationsMap map[string]*associationsPair
+
+func (s *server) findAssociations(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (associationsMap, error) {
+	paths := []string{
+		"data",
+		"ids",
+		"package_name",
+	}
+	associations, err := s.registry.ListAssociations(ctx, ids, paths)
+	if err != nil {
+		return nil, err
+	}
+	defaults, err := s.registry.ListDefaultAssociations(ctx, ids.ApplicationIdentifiers, paths)
+	if err != nil {
+		return nil, err
+	}
+	m := make(associationsMap)
+	for _, association := range associations {
+		m[association.PackageName] = &associationsPair{
+			association: association,
+		}
+	}
+	for _, defaultAssociation := range defaults {
+		if pair, ok := m[defaultAssociation.PackageName]; ok {
+			pair.defaultAssociation = defaultAssociation
+		} else {
+			m[defaultAssociation.PackageName] = &associationsPair{
+				defaultAssociation: defaultAssociation,
+			}
+		}
+	}
+	return m, nil
+}
+
 func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, msg.EndDeviceIdentifiers))
-	switch up := msg.Up.(type) {
-	case *ttnpb.ApplicationUp_UplinkMessage:
-		association, err := s.registry.Get(ctx, ttnpb.ApplicationPackageAssociationIdentifiers{
-			EndDeviceIdentifiers: msg.EndDeviceIdentifiers,
-			FPort:                up.UplinkMessage.FPort,
-		}, []string{
-			"data",
-			"ids.end_device_ids",
-			"ids.f_port",
-			"package_name",
-		})
-		if errors.IsNotFound(err) {
-			return nil
-		} else if err != nil {
-			return err
+	associations, err := s.findAssociations(ctx, msg.EndDeviceIdentifiers)
+	if err != nil {
+		return err
+	}
+	for name, pair := range associations {
+		if handler, ok := s.handlers[name]; ok {
+			ctx := log.NewContextWithField(ctx, "package", name)
+			err := handler.HandleUp(ctx, pair.defaultAssociation, pair.association, msg)
+			if err != nil {
+				return err
+			}
+		} else {
+			return errNotImplemented.WithAttributes("name", name)
 		}
-		if handler, ok := s.handlers[association.PackageName]; ok {
-			ctx := log.NewContextWithField(ctx, "package", association.PackageName)
-			return handler.HandleUp(ctx, association, msg)
-		}
-		return errNotImplemented.WithAttributes("name", association.PackageName)
 	}
 	return nil
 }

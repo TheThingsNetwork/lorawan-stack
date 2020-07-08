@@ -82,6 +82,18 @@ func (m *ApplicationLink) ValidateFields(paths ...string) error {
 
 		case "tls":
 			// no validation rules for TLS
+		case "skip_payload_crypto":
+
+			if v, ok := interface{}(m.GetSkipPayloadCrypto()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationLinkValidationError{
+						field:  "skip_payload_crypto",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return ApplicationLinkValidationError{
 				field:  name,

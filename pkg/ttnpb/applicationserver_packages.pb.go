@@ -462,6 +462,332 @@ func (m *SetApplicationPackageAssociationRequest) GetFieldMask() types.FieldMask
 	return types.FieldMask{}
 }
 
+type ApplicationPackageDefaultAssociationIdentifiers struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
+	FPort                  uint32   `protobuf:"varint,2,opt,name=f_port,json=fPort,proto3" json:"f_port,omitempty"`
+	XXX_NoUnkeyedLiteral   struct{} `json:"-"`
+	XXX_sizecache          int32    `json:"-"`
+}
+
+func (m *ApplicationPackageDefaultAssociationIdentifiers) Reset() {
+	*m = ApplicationPackageDefaultAssociationIdentifiers{}
+}
+func (*ApplicationPackageDefaultAssociationIdentifiers) ProtoMessage() {}
+func (*ApplicationPackageDefaultAssociationIdentifiers) Descriptor() ([]byte, []int) {
+	return fileDescriptor_aa4ce58e965b6ca0, []int{8}
+}
+func (m *ApplicationPackageDefaultAssociationIdentifiers) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ApplicationPackageDefaultAssociationIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ApplicationPackageDefaultAssociationIdentifiers.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ApplicationPackageDefaultAssociationIdentifiers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplicationPackageDefaultAssociationIdentifiers.Merge(m, src)
+}
+func (m *ApplicationPackageDefaultAssociationIdentifiers) XXX_Size() int {
+	return m.Size()
+}
+func (m *ApplicationPackageDefaultAssociationIdentifiers) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplicationPackageDefaultAssociationIdentifiers.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplicationPackageDefaultAssociationIdentifiers proto.InternalMessageInfo
+
+func (m *ApplicationPackageDefaultAssociationIdentifiers) GetFPort() uint32 {
+	if m != nil {
+		return m.FPort
+	}
+	return 0
+}
+
+type ApplicationPackageDefaultAssociation struct {
+	ApplicationPackageDefaultAssociationIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	CreatedAt                                       time.Time     `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt                                       time.Time     `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
+	PackageName                                     string        `protobuf:"bytes,4,opt,name=package_name,json=packageName,proto3" json:"package_name,omitempty"`
+	Data                                            *types.Struct `protobuf:"bytes,5,opt,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral                            struct{}      `json:"-"`
+	XXX_sizecache                                   int32         `json:"-"`
+}
+
+func (m *ApplicationPackageDefaultAssociation) Reset()      { *m = ApplicationPackageDefaultAssociation{} }
+func (*ApplicationPackageDefaultAssociation) ProtoMessage() {}
+func (*ApplicationPackageDefaultAssociation) Descriptor() ([]byte, []int) {
+	return fileDescriptor_aa4ce58e965b6ca0, []int{9}
+}
+func (m *ApplicationPackageDefaultAssociation) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ApplicationPackageDefaultAssociation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ApplicationPackageDefaultAssociation.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ApplicationPackageDefaultAssociation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplicationPackageDefaultAssociation.Merge(m, src)
+}
+func (m *ApplicationPackageDefaultAssociation) XXX_Size() int {
+	return m.Size()
+}
+func (m *ApplicationPackageDefaultAssociation) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplicationPackageDefaultAssociation.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplicationPackageDefaultAssociation proto.InternalMessageInfo
+
+func (m *ApplicationPackageDefaultAssociation) GetCreatedAt() time.Time {
+	if m != nil {
+		return m.CreatedAt
+	}
+	return time.Time{}
+}
+
+func (m *ApplicationPackageDefaultAssociation) GetUpdatedAt() time.Time {
+	if m != nil {
+		return m.UpdatedAt
+	}
+	return time.Time{}
+}
+
+func (m *ApplicationPackageDefaultAssociation) GetPackageName() string {
+	if m != nil {
+		return m.PackageName
+	}
+	return ""
+}
+
+func (m *ApplicationPackageDefaultAssociation) GetData() *types.Struct {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+type ApplicationPackageDefaultAssociations struct {
+	Defaults             []*ApplicationPackageDefaultAssociation `protobuf:"bytes,1,rep,name=defaults,proto3" json:"defaults,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                                `json:"-"`
+	XXX_sizecache        int32                                   `json:"-"`
+}
+
+func (m *ApplicationPackageDefaultAssociations) Reset()      { *m = ApplicationPackageDefaultAssociations{} }
+func (*ApplicationPackageDefaultAssociations) ProtoMessage() {}
+func (*ApplicationPackageDefaultAssociations) Descriptor() ([]byte, []int) {
+	return fileDescriptor_aa4ce58e965b6ca0, []int{10}
+}
+func (m *ApplicationPackageDefaultAssociations) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ApplicationPackageDefaultAssociations) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ApplicationPackageDefaultAssociations.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ApplicationPackageDefaultAssociations) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplicationPackageDefaultAssociations.Merge(m, src)
+}
+func (m *ApplicationPackageDefaultAssociations) XXX_Size() int {
+	return m.Size()
+}
+func (m *ApplicationPackageDefaultAssociations) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplicationPackageDefaultAssociations.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplicationPackageDefaultAssociations proto.InternalMessageInfo
+
+func (m *ApplicationPackageDefaultAssociations) GetDefaults() []*ApplicationPackageDefaultAssociation {
+	if m != nil {
+		return m.Defaults
+	}
+	return nil
+}
+
+type GetApplicationPackageDefaultAssociationRequest struct {
+	ApplicationPackageDefaultAssociationIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	FieldMask                                       types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
+	XXX_NoUnkeyedLiteral                            struct{}        `json:"-"`
+	XXX_sizecache                                   int32           `json:"-"`
+}
+
+func (m *GetApplicationPackageDefaultAssociationRequest) Reset() {
+	*m = GetApplicationPackageDefaultAssociationRequest{}
+}
+func (*GetApplicationPackageDefaultAssociationRequest) ProtoMessage() {}
+func (*GetApplicationPackageDefaultAssociationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_aa4ce58e965b6ca0, []int{11}
+}
+func (m *GetApplicationPackageDefaultAssociationRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GetApplicationPackageDefaultAssociationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GetApplicationPackageDefaultAssociationRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GetApplicationPackageDefaultAssociationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetApplicationPackageDefaultAssociationRequest.Merge(m, src)
+}
+func (m *GetApplicationPackageDefaultAssociationRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *GetApplicationPackageDefaultAssociationRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetApplicationPackageDefaultAssociationRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetApplicationPackageDefaultAssociationRequest proto.InternalMessageInfo
+
+func (m *GetApplicationPackageDefaultAssociationRequest) GetFieldMask() types.FieldMask {
+	if m != nil {
+		return m.FieldMask
+	}
+	return types.FieldMask{}
+}
+
+type ListApplicationPackageDefaultAssociationRequest struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	// Limit the number of results per page.
+	// Each page is ordered by the FPort.
+	Limit uint32 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	// Page number for pagination. 0 is interpreted as 1.
+	Page                 uint32          `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
+	FieldMask            types.FieldMask `protobuf:"bytes,4,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
+}
+
+func (m *ListApplicationPackageDefaultAssociationRequest) Reset() {
+	*m = ListApplicationPackageDefaultAssociationRequest{}
+}
+func (*ListApplicationPackageDefaultAssociationRequest) ProtoMessage() {}
+func (*ListApplicationPackageDefaultAssociationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_aa4ce58e965b6ca0, []int{12}
+}
+func (m *ListApplicationPackageDefaultAssociationRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListApplicationPackageDefaultAssociationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListApplicationPackageDefaultAssociationRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ListApplicationPackageDefaultAssociationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListApplicationPackageDefaultAssociationRequest.Merge(m, src)
+}
+func (m *ListApplicationPackageDefaultAssociationRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *ListApplicationPackageDefaultAssociationRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListApplicationPackageDefaultAssociationRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListApplicationPackageDefaultAssociationRequest proto.InternalMessageInfo
+
+func (m *ListApplicationPackageDefaultAssociationRequest) GetLimit() uint32 {
+	if m != nil {
+		return m.Limit
+	}
+	return 0
+}
+
+func (m *ListApplicationPackageDefaultAssociationRequest) GetPage() uint32 {
+	if m != nil {
+		return m.Page
+	}
+	return 0
+}
+
+func (m *ListApplicationPackageDefaultAssociationRequest) GetFieldMask() types.FieldMask {
+	if m != nil {
+		return m.FieldMask
+	}
+	return types.FieldMask{}
+}
+
+type SetApplicationPackageDefaultAssociationRequest struct {
+	ApplicationPackageDefaultAssociation `protobuf:"bytes,1,opt,name=default,proto3,embedded=default" json:"default"`
+	FieldMask                            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
+	XXX_NoUnkeyedLiteral                 struct{}        `json:"-"`
+	XXX_sizecache                        int32           `json:"-"`
+}
+
+func (m *SetApplicationPackageDefaultAssociationRequest) Reset() {
+	*m = SetApplicationPackageDefaultAssociationRequest{}
+}
+func (*SetApplicationPackageDefaultAssociationRequest) ProtoMessage() {}
+func (*SetApplicationPackageDefaultAssociationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_aa4ce58e965b6ca0, []int{13}
+}
+func (m *SetApplicationPackageDefaultAssociationRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *SetApplicationPackageDefaultAssociationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_SetApplicationPackageDefaultAssociationRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *SetApplicationPackageDefaultAssociationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SetApplicationPackageDefaultAssociationRequest.Merge(m, src)
+}
+func (m *SetApplicationPackageDefaultAssociationRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *SetApplicationPackageDefaultAssociationRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_SetApplicationPackageDefaultAssociationRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SetApplicationPackageDefaultAssociationRequest proto.InternalMessageInfo
+
+func (m *SetApplicationPackageDefaultAssociationRequest) GetFieldMask() types.FieldMask {
+	if m != nil {
+		return m.FieldMask
+	}
+	return types.FieldMask{}
+}
+
 func init() {
 	proto.RegisterType((*ApplicationPackage)(nil), "ttn.lorawan.v3.ApplicationPackage")
 	golang_proto.RegisterType((*ApplicationPackage)(nil), "ttn.lorawan.v3.ApplicationPackage")
@@ -479,6 +805,18 @@ func init() {
 	golang_proto.RegisterType((*ListApplicationPackageAssociationRequest)(nil), "ttn.lorawan.v3.ListApplicationPackageAssociationRequest")
 	proto.RegisterType((*SetApplicationPackageAssociationRequest)(nil), "ttn.lorawan.v3.SetApplicationPackageAssociationRequest")
 	golang_proto.RegisterType((*SetApplicationPackageAssociationRequest)(nil), "ttn.lorawan.v3.SetApplicationPackageAssociationRequest")
+	proto.RegisterType((*ApplicationPackageDefaultAssociationIdentifiers)(nil), "ttn.lorawan.v3.ApplicationPackageDefaultAssociationIdentifiers")
+	golang_proto.RegisterType((*ApplicationPackageDefaultAssociationIdentifiers)(nil), "ttn.lorawan.v3.ApplicationPackageDefaultAssociationIdentifiers")
+	proto.RegisterType((*ApplicationPackageDefaultAssociation)(nil), "ttn.lorawan.v3.ApplicationPackageDefaultAssociation")
+	golang_proto.RegisterType((*ApplicationPackageDefaultAssociation)(nil), "ttn.lorawan.v3.ApplicationPackageDefaultAssociation")
+	proto.RegisterType((*ApplicationPackageDefaultAssociations)(nil), "ttn.lorawan.v3.ApplicationPackageDefaultAssociations")
+	golang_proto.RegisterType((*ApplicationPackageDefaultAssociations)(nil), "ttn.lorawan.v3.ApplicationPackageDefaultAssociations")
+	proto.RegisterType((*GetApplicationPackageDefaultAssociationRequest)(nil), "ttn.lorawan.v3.GetApplicationPackageDefaultAssociationRequest")
+	golang_proto.RegisterType((*GetApplicationPackageDefaultAssociationRequest)(nil), "ttn.lorawan.v3.GetApplicationPackageDefaultAssociationRequest")
+	proto.RegisterType((*ListApplicationPackageDefaultAssociationRequest)(nil), "ttn.lorawan.v3.ListApplicationPackageDefaultAssociationRequest")
+	golang_proto.RegisterType((*ListApplicationPackageDefaultAssociationRequest)(nil), "ttn.lorawan.v3.ListApplicationPackageDefaultAssociationRequest")
+	proto.RegisterType((*SetApplicationPackageDefaultAssociationRequest)(nil), "ttn.lorawan.v3.SetApplicationPackageDefaultAssociationRequest")
+	golang_proto.RegisterType((*SetApplicationPackageDefaultAssociationRequest)(nil), "ttn.lorawan.v3.SetApplicationPackageDefaultAssociationRequest")
 }
 
 func init() {
@@ -489,76 +827,93 @@ func init() {
 }
 
 var fileDescriptor_aa4ce58e965b6ca0 = []byte{
-	// 1100 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0x4d, 0x6c, 0x1b, 0x45,
-	0x14, 0xde, 0x49, 0xec, 0x36, 0x99, 0xa4, 0x51, 0x18, 0x24, 0xb0, 0x0c, 0x4c, 0xc2, 0x36, 0x52,
-	0x4c, 0xc0, 0xbb, 0x95, 0x73, 0x00, 0x8a, 0x44, 0x14, 0xd3, 0x96, 0x1f, 0x41, 0x15, 0x36, 0xc0,
-	0x81, 0xb6, 0x58, 0x93, 0xdd, 0xf1, 0x66, 0x65, 0x7b, 0x77, 0xd9, 0x19, 0xbb, 0x84, 0x28, 0x52,
-	0x54, 0x84, 0x54, 0x21, 0x84, 0x8a, 0x7a, 0xe9, 0x91, 0x0b, 0x52, 0x11, 0x97, 0x8a, 0x53, 0xc4,
-	0x85, 0x1e, 0x73, 0x41, 0x8a, 0xc4, 0xa5, 0xa7, 0x52, 0xaf, 0x39, 0xa4, 0xb7, 0x1e, 0x38, 0x54,
-	0x39, 0x40, 0xb5, 0xb3, 0xeb, 0x64, 0xfd, 0xd3, 0xd8, 0x4e, 0xd5, 0xdb, 0xce, 0xce, 0xfb, 0xde,
-	0xbe, 0xef, 0x7b, 0xdf, 0xbc, 0x59, 0x98, 0x2b, 0x3b, 0x1e, 0xb9, 0x4c, 0xec, 0x2c, 0xe3, 0x44,
-	0x2f, 0xa9, 0xc4, 0xb5, 0x54, 0xe2, 0xba, 0x65, 0x4b, 0x27, 0xdc, 0x72, 0x6c, 0x46, 0xbd, 0x1a,
-	0xf5, 0x0a, 0x2e, 0xd1, 0x4b, 0xc4, 0xa4, 0x4c, 0x71, 0x3d, 0x87, 0x3b, 0x68, 0x82, 0x73, 0x5b,
-	0x89, 0x70, 0x4a, 0x6d, 0x3e, 0xbd, 0x68, 0x5a, 0x7c, 0xb5, 0xba, 0xa2, 0xe8, 0x4e, 0x45, 0xa5,
-	0x76, 0xcd, 0x59, 0x73, 0x3d, 0xe7, 0xab, 0x35, 0x55, 0x04, 0xeb, 0x59, 0x93, 0xda, 0xd9, 0x1a,
-	0x29, 0x5b, 0x06, 0xe1, 0x54, 0xed, 0x78, 0x08, 0x53, 0xa6, 0xb3, 0xb1, 0x14, 0xa6, 0x63, 0x3a,
-	0x21, 0x78, 0xa5, 0x5a, 0x14, 0x2b, 0xb1, 0x10, 0x4f, 0x51, 0xf8, 0x8b, 0xa6, 0xe3, 0x98, 0x65,
-	0x1a, 0x96, 0x6b, 0xdb, 0x0e, 0x0f, 0xab, 0x8d, 0x76, 0x5f, 0x88, 0x76, 0xf7, 0x73, 0xd0, 0x8a,
-	0xcb, 0xd7, 0xa2, 0xcd, 0xe9, 0xf6, 0xcd, 0xa2, 0x45, 0xcb, 0x46, 0xa1, 0x42, 0x58, 0x29, 0x8a,
-	0x98, 0x6a, 0x8f, 0xe0, 0x56, 0x85, 0x32, 0x4e, 0x2a, 0x6e, 0xdb, 0xd7, 0xf7, 0x03, 0x18, 0xf7,
-	0xaa, 0x3a, 0x8f, 0x76, 0x4f, 0x76, 0x2a, 0x6a, 0x19, 0xd4, 0xe6, 0x56, 0xd1, 0xa2, 0x5e, 0x54,
-	0xa2, 0xfc, 0x0d, 0x80, 0x68, 0xf1, 0x40, 0xe7, 0xa5, 0x50, 0x60, 0xf4, 0x16, 0x4c, 0xd8, 0xa4,
-	0x42, 0x53, 0x60, 0x1a, 0x64, 0x46, 0xf3, 0xb3, 0x7b, 0xf9, 0x19, 0x4f, 0x4e, 0xcd, 0xe4, 0xf0,
-	0x17, 0x17, 0x48, 0xf6, 0xeb, 0x53, 0xd9, 0x37, 0x2f, 0x65, 0x16, 0x4e, 0x5f, 0xc8, 0x5e, 0x5a,
-	0x68, 0x2e, 0x5f, 0x59, 0xcf, 0xbd, 0xb6, 0x31, 0xa3, 0x09, 0x10, 0x3a, 0x05, 0x27, 0x0c, 0x5a,
-	0x24, 0xd5, 0x32, 0x2f, 0x14, 0x0b, 0xae, 0xe3, 0xf1, 0xd4, 0xd0, 0x34, 0xc8, 0x9c, 0xc8, 0xc3,
-	0xbd, 0xfc, 0xf1, 0xb9, 0x64, 0xea, 0x7f, 0x90, 0x01, 0xda, 0x78, 0x14, 0x71, 0x6e, 0xc9, 0xf1,
-	0xb8, 0xfc, 0x29, 0x7c, 0xb6, 0xb3, 0x08, 0x86, 0xde, 0x86, 0x23, 0xcd, 0x8e, 0xa7, 0xc0, 0xf4,
-	0x70, 0x66, 0x2c, 0x27, 0x2b, 0xad, 0x2d, 0x57, 0x3a, 0x61, 0xda, 0x3e, 0x46, 0xfe, 0x15, 0xc0,
-	0x4c, 0x67, 0xc0, 0x22, 0x63, 0x8e, 0x6e, 0x89, 0x37, 0xef, 0x1f, 0xe8, 0x81, 0x2e, 0xc2, 0x09,
-	0x6a, 0x1b, 0x05, 0x83, 0xd6, 0x2c, 0x9d, 0x16, 0x2c, 0x83, 0x09, 0xf2, 0x63, 0xb9, 0x99, 0xf6,
-	0x4f, 0x9e, 0xb5, 0x8d, 0x33, 0x22, 0x28, 0x86, 0xce, 0x4f, 0xee, 0xe5, 0x93, 0xdf, 0x81, 0xa1,
-	0x49, 0xb0, 0x7d, 0x77, 0x4a, 0xda, 0xb9, 0x3b, 0x05, 0xb4, 0x71, 0x7a, 0x10, 0xc7, 0xd0, 0xcb,
-	0xf0, 0xd8, 0x63, 0xb5, 0x48, 0x16, 0x85, 0x08, 0x9b, 0xc3, 0xf0, 0xa5, 0x43, 0xab, 0x45, 0x17,
-	0xe1, 0xf0, 0x41, 0x5d, 0x6f, 0xf4, 0x96, 0xa2, 0x3b, 0xd3, 0x2e, 0xb5, 0x06, 0x69, 0xd1, 0x3b,
-	0x10, 0xea, 0x1e, 0x25, 0x9c, 0x1a, 0x05, 0x12, 0x96, 0x39, 0x96, 0x4b, 0x2b, 0xa1, 0xc5, 0x94,
-	0xa6, 0xc5, 0x94, 0x4f, 0x9a, 0x1e, 0xcc, 0x8f, 0x04, 0xf0, 0x6b, 0x7f, 0x4f, 0x01, 0x6d, 0x34,
-	0xc2, 0x2d, 0xf2, 0x20, 0x49, 0xd5, 0x35, 0x9a, 0x49, 0x86, 0x07, 0x49, 0x12, 0xe1, 0x16, 0x39,
-	0xfa, 0x00, 0x8e, 0x47, 0x3d, 0x2c, 0x08, 0x17, 0x26, 0x06, 0x73, 0xe1, 0x58, 0x04, 0x3e, 0x1f,
-	0x98, 0xf1, 0x55, 0x98, 0x30, 0x08, 0x27, 0xa9, 0xa4, 0x28, 0xe5, 0xf9, 0x8e, 0x52, 0x96, 0xc5,
-	0x91, 0xd1, 0x44, 0x90, 0xcc, 0x20, 0x3e, 0x54, 0x45, 0x86, 0x3e, 0x86, 0xe3, 0x24, 0xb6, 0x8e,
-	0x6c, 0x99, 0x1d, 0xa8, 0x17, 0x5a, 0x4b, 0x0a, 0x79, 0x1b, 0xc0, 0xd9, 0x77, 0x29, 0x3f, 0x1c,
-	0x42, 0xbf, 0xac, 0x52, 0xc6, 0x9f, 0xb2, 0x03, 0x16, 0x20, 0x3c, 0x18, 0x42, 0x8f, 0x75, 0xc0,
-	0xb9, 0x20, 0xe4, 0x23, 0xc2, 0x4a, 0xf9, 0x44, 0x00, 0xd7, 0x46, 0x8b, 0xcd, 0x17, 0xf2, 0x7d,
-	0x00, 0x33, 0x1f, 0x5a, 0xac, 0x3f, 0x2e, 0xef, 0xc5, 0xb9, 0x1c, 0xf5, 0x94, 0x89, 0xba, 0x31,
-	0x4c, 0x96, 0xad, 0x8a, 0xd5, 0x3c, 0x5b, 0x23, 0x7b, 0xf9, 0xe4, 0xdc, 0x70, 0x6a, 0xf7, 0xb8,
-	0x16, 0xbe, 0x46, 0x08, 0x26, 0x5c, 0x62, 0x52, 0x61, 0xc7, 0x13, 0x9a, 0x78, 0x6e, 0xe3, 0x9a,
-	0x18, 0x9c, 0xeb, 0x9f, 0x00, 0xce, 0x2e, 0xf7, 0xd9, 0x36, 0x02, 0xc7, 0x62, 0x2d, 0x8f, 0x28,
-	0x0f, 0x66, 0x9a, 0x2e, 0xdc, 0xe3, 0x39, 0x9f, 0xb8, 0x77, 0xb9, 0xff, 0x46, 0x61, 0xba, 0xcb,
-	0x34, 0xa5, 0xa6, 0xc5, 0xb8, 0xb7, 0x86, 0x7e, 0x01, 0x30, 0x11, 0xb4, 0x16, 0xf5, 0xd5, 0xa9,
-	0xf4, 0xc9, 0xde, 0xe4, 0x98, 0xfc, 0xd9, 0x95, 0xbf, 0xfe, 0xb9, 0x3e, 0xb4, 0x84, 0xce, 0xab,
-	0x84, 0xb5, 0xdc, 0xf6, 0xea, 0x7a, 0x6c, 0x15, 0xcc, 0x62, 0xa5, 0x75, 0xbd, 0xa1, 0x86, 0x63,
-	0x9a, 0xa9, 0xeb, 0xfb, 0xf3, 0x7a, 0x43, 0x6d, 0xce, 0x7d, 0x74, 0x7d, 0x08, 0x4e, 0x04, 0x27,
-	0x2a, 0x26, 0xcf, 0xeb, 0xed, 0xf5, 0xf4, 0x79, 0xe2, 0xd2, 0x83, 0x75, 0x49, 0xbe, 0x01, 0x04,
-	0xa7, 0x1f, 0x01, 0xfa, 0x01, 0x74, 0xb2, 0x0a, 0x98, 0xb4, 0x5e, 0x32, 0x4a, 0xdf, 0x44, 0xbb,
-	0x60, 0xbb, 0x70, 0x57, 0xe3, 0xa3, 0x25, 0x04, 0x85, 0xf7, 0xce, 0x06, 0xba, 0x0f, 0xe0, 0xa4,
-	0x38, 0x9c, 0xf1, 0x79, 0xd6, 0x31, 0x43, 0xfa, 0x3d, 0xbe, 0x69, 0x65, 0x20, 0x61, 0x98, 0x5c,
-	0x12, 0xc2, 0x50, 0xa4, 0x77, 0x97, 0x65, 0x20, 0x1d, 0x7a, 0x11, 0x47, 0xbf, 0x0f, 0xc1, 0x89,
-	0xe5, 0x1e, 0x0e, 0x58, 0x7e, 0x3a, 0x0e, 0xf8, 0x23, 0x74, 0xc0, 0x16, 0x48, 0xff, 0xd6, 0xc5,
-	0x01, 0xb1, 0x2a, 0x95, 0x27, 0x71, 0x43, 0x8f, 0x3c, 0xbd, 0x9d, 0xd1, 0x9e, 0x20, 0x72, 0xc9,
-	0x69, 0x30, 0x87, 0xfe, 0x05, 0xf0, 0x99, 0x33, 0xb4, 0x4c, 0x79, 0xcb, 0xcf, 0xc7, 0x91, 0x6f,
-	0x9b, 0xf4, 0x73, 0x1d, 0x63, 0xe8, 0x6c, 0xf0, 0x1f, 0x2c, 0x7f, 0x1f, 0x2a, 0xf5, 0x2d, 0x98,
-	0xbb, 0xd2, 0x45, 0xa9, 0xa3, 0x2a, 0x33, 0xb0, 0x12, 0x11, 0xf3, 0xfc, 0xcf, 0x60, 0xbb, 0x8e,
-	0xc1, 0x4e, 0x1d, 0x83, 0x3b, 0x75, 0x2c, 0xdd, 0xab, 0x63, 0x69, 0xb7, 0x8e, 0xa5, 0x07, 0x75,
-	0x2c, 0x3d, 0xac, 0x63, 0xb0, 0xe9, 0x63, 0x70, 0xd5, 0xc7, 0xd2, 0x4d, 0x1f, 0x83, 0x5b, 0x3e,
-	0x96, 0xb6, 0x7c, 0x2c, 0xdd, 0xf6, 0xb1, 0xb4, 0xed, 0x63, 0xb0, 0xe3, 0x63, 0x70, 0xc7, 0xc7,
-	0xd2, 0x3d, 0x1f, 0x83, 0x5d, 0x1f, 0x4b, 0x0f, 0x7c, 0x0c, 0x1e, 0xfa, 0x58, 0xda, 0x6c, 0x60,
-	0xe9, 0x6a, 0x03, 0x83, 0x6b, 0x0d, 0x2c, 0xdd, 0x68, 0x60, 0xf0, 0x53, 0x03, 0x4b, 0x37, 0x1b,
-	0x58, 0xba, 0xd5, 0xc0, 0x60, 0xab, 0x81, 0xc1, 0xed, 0x06, 0x06, 0x9f, 0xab, 0xa6, 0xa3, 0xf0,
-	0x55, 0xca, 0x57, 0x2d, 0xdb, 0x64, 0x8a, 0x4d, 0xf9, 0x65, 0xc7, 0x2b, 0xa9, 0xad, 0xff, 0xee,
-	0xb5, 0x79, 0xd5, 0x2d, 0x99, 0x2a, 0xe7, 0xb6, 0xbb, 0xb2, 0x72, 0x4c, 0xc8, 0x38, 0xff, 0x28,
-	0x00, 0x00, 0xff, 0xff, 0x36, 0x02, 0x98, 0xa8, 0x32, 0x0d, 0x00, 0x00,
+	// 1363 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x58, 0x4f, 0x6c, 0x1b, 0xc5,
+	0x17, 0xde, 0x49, 0x9c, 0x36, 0x9d, 0xa4, 0xf9, 0xb5, 0xf3, 0x53, 0xa9, 0x65, 0x60, 0x12, 0xb6,
+	0x81, 0x9a, 0x80, 0x77, 0x2b, 0x17, 0x04, 0xb4, 0xa2, 0x51, 0xdc, 0x7f, 0x50, 0x41, 0x15, 0x6c,
+	0x40, 0x55, 0xff, 0xe0, 0x4e, 0xec, 0xb1, 0xb3, 0xb2, 0xbd, 0xbb, 0xec, 0x4c, 0x52, 0x42, 0x15,
+	0xa9, 0x2a, 0x42, 0xaa, 0x10, 0xaa, 0x8a, 0x7a, 0xe9, 0x09, 0x71, 0x41, 0x2a, 0xe2, 0x52, 0x71,
+	0xa1, 0xe2, 0x42, 0x8f, 0xb9, 0x54, 0xaa, 0x54, 0xa9, 0xea, 0xa9, 0xd4, 0x6b, 0x0e, 0xed, 0x89,
+	0x0a, 0x71, 0xa8, 0x72, 0x01, 0x79, 0x76, 0x9d, 0xac, 0xed, 0xb5, 0xbd, 0xb6, 0xd5, 0x72, 0xe1,
+	0xb6, 0xbb, 0xf3, 0xde, 0xcb, 0xfb, 0xbe, 0xf7, 0xbd, 0x37, 0xcf, 0x81, 0xf1, 0xa2, 0x61, 0x91,
+	0x33, 0x44, 0x8f, 0x31, 0x4e, 0x32, 0x05, 0x95, 0x98, 0x9a, 0x4a, 0x4c, 0xb3, 0xa8, 0x65, 0x08,
+	0xd7, 0x0c, 0x9d, 0x51, 0x6b, 0x91, 0x5a, 0x69, 0x93, 0x64, 0x0a, 0x24, 0x4f, 0x99, 0x62, 0x5a,
+	0x06, 0x37, 0xd0, 0x18, 0xe7, 0xba, 0xe2, 0xfa, 0x29, 0x8b, 0xbb, 0x23, 0x33, 0x79, 0x8d, 0xcf,
+	0x2f, 0xcc, 0x29, 0x19, 0xa3, 0xa4, 0x52, 0x7d, 0xd1, 0x58, 0x32, 0x2d, 0xe3, 0xb3, 0x25, 0x55,
+	0x18, 0x67, 0x62, 0x79, 0xaa, 0xc7, 0x16, 0x49, 0x51, 0xcb, 0x12, 0x4e, 0xd5, 0xa6, 0x07, 0x27,
+	0x64, 0x24, 0xe6, 0x09, 0x91, 0x37, 0xf2, 0x86, 0xe3, 0x3c, 0xb7, 0x90, 0x13, 0x6f, 0xe2, 0x45,
+	0x3c, 0xb9, 0xe6, 0xcf, 0xe5, 0x0d, 0x23, 0x5f, 0xa4, 0x4e, 0xba, 0xba, 0x6e, 0x70, 0x27, 0x5b,
+	0xf7, 0xf4, 0x59, 0xf7, 0x74, 0x2d, 0x06, 0x2d, 0x99, 0x7c, 0xc9, 0x3d, 0x9c, 0x68, 0x3c, 0xcc,
+	0x69, 0xb4, 0x98, 0x4d, 0x97, 0x08, 0x2b, 0xb8, 0x16, 0xe3, 0x8d, 0x16, 0x5c, 0x2b, 0x51, 0xc6,
+	0x49, 0xc9, 0x6c, 0xf8, 0xeb, 0x6b, 0x06, 0x8c, 0x5b, 0x0b, 0x19, 0xee, 0x9e, 0xee, 0x68, 0x66,
+	0x54, 0xcb, 0x52, 0x9d, 0x6b, 0x39, 0x8d, 0x5a, 0x6e, 0x8a, 0xf2, 0x17, 0x00, 0xa2, 0x99, 0x75,
+	0x9e, 0x67, 0x1d, 0x82, 0xd1, 0x5e, 0x18, 0xd2, 0x49, 0x89, 0x86, 0xc1, 0x04, 0x88, 0x6e, 0x4a,
+	0xec, 0x5c, 0x4d, 0x4c, 0x5a, 0x72, 0x78, 0x32, 0x8e, 0x3f, 0x39, 0x41, 0x62, 0x9f, 0xef, 0x8a,
+	0xbd, 0x75, 0x2a, 0x3a, 0xbd, 0xe7, 0x44, 0xec, 0xd4, 0x74, 0xed, 0xf5, 0xe5, 0xb3, 0xf1, 0x57,
+	0x97, 0x27, 0x93, 0xc2, 0x09, 0xed, 0x82, 0x63, 0x59, 0x9a, 0x23, 0x0b, 0x45, 0x9e, 0xce, 0xa5,
+	0x4d, 0xc3, 0xe2, 0xe1, 0x81, 0x09, 0x10, 0xdd, 0x9c, 0x80, 0xab, 0x89, 0x8d, 0x53, 0x43, 0xe1,
+	0xbf, 0x41, 0x14, 0x24, 0x47, 0x5d, 0x8b, 0x43, 0xb3, 0x86, 0xc5, 0xe5, 0x8f, 0xe0, 0xff, 0x9b,
+	0x93, 0x60, 0x68, 0x1f, 0x1c, 0xae, 0x55, 0x3c, 0x0c, 0x26, 0x06, 0xa3, 0x23, 0x71, 0x59, 0xa9,
+	0x2f, 0xb9, 0xd2, 0xec, 0x96, 0x5c, 0xf3, 0x91, 0x7f, 0x04, 0x30, 0xda, 0x6c, 0x30, 0xc3, 0x98,
+	0x91, 0xd1, 0xc4, 0x97, 0x77, 0xd7, 0xf9, 0x40, 0x27, 0xe1, 0x18, 0xd5, 0xb3, 0xe9, 0x2c, 0x5d,
+	0xd4, 0x32, 0x34, 0xad, 0x65, 0x99, 0x00, 0x3f, 0x12, 0x9f, 0x6c, 0xfc, 0x93, 0x07, 0xf5, 0xec,
+	0x01, 0x61, 0xe4, 0xf1, 0x4e, 0x6c, 0x59, 0x4d, 0x0c, 0x7d, 0x05, 0x06, 0xb6, 0x80, 0x95, 0x7b,
+	0xe3, 0xd2, 0xad, 0x7b, 0xe3, 0x20, 0x39, 0x4a, 0xd7, 0xed, 0x18, 0x7a, 0x01, 0x6e, 0x68, 0xc9,
+	0xc5, 0x50, 0x4e, 0x90, 0x70, 0x6e, 0x10, 0x3e, 0xdf, 0x36, 0x5b, 0x74, 0x12, 0x0e, 0xae, 0xe7,
+	0xf5, 0x66, 0x67, 0x2a, 0xfc, 0x91, 0xfa, 0xe4, 0x5a, 0x0d, 0x8b, 0xf6, 0x43, 0x98, 0xb1, 0x28,
+	0xe1, 0x34, 0x9b, 0x26, 0x4e, 0x9a, 0x23, 0xf1, 0x88, 0xe2, 0x48, 0x4c, 0xa9, 0x49, 0x4c, 0xf9,
+	0xb0, 0xa6, 0xc1, 0xc4, 0x70, 0xd5, 0xfd, 0xd2, 0x6f, 0xe3, 0x20, 0xb9, 0xc9, 0xf5, 0x9b, 0xe1,
+	0xd5, 0x20, 0x0b, 0x66, 0xb6, 0x16, 0x64, 0xb0, 0x9b, 0x20, 0xae, 0xdf, 0x0c, 0x47, 0x47, 0xe0,
+	0xa8, 0x5b, 0xc3, 0xb4, 0x50, 0x61, 0xa8, 0x3b, 0x15, 0x8e, 0xb8, 0xce, 0x47, 0xab, 0x62, 0x7c,
+	0x05, 0x86, 0xb2, 0x84, 0x93, 0xf0, 0x90, 0x48, 0x65, 0x7b, 0x53, 0x2a, 0x29, 0xd1, 0x32, 0x49,
+	0x61, 0x24, 0x33, 0x88, 0xdb, 0xb2, 0xc8, 0xd0, 0x07, 0x70, 0x94, 0x78, 0xde, 0x5d, 0x59, 0xc6,
+	0xba, 0xaa, 0x45, 0xb2, 0x2e, 0x84, 0xbc, 0x02, 0xe0, 0xce, 0xc3, 0x94, 0xb7, 0x77, 0xa1, 0x9f,
+	0x2e, 0x50, 0xc6, 0x9f, 0xb0, 0x02, 0xa6, 0x21, 0x5c, 0x1f, 0x42, 0x2d, 0x15, 0x70, 0xa8, 0x6a,
+	0xf2, 0x3e, 0x61, 0x85, 0x44, 0xa8, 0xea, 0x9e, 0xdc, 0x94, 0xab, 0x7d, 0x90, 0x1f, 0x02, 0x18,
+	0x7d, 0x4f, 0x63, 0xc1, 0xb0, 0xbc, 0xe3, 0xc5, 0xd2, 0x6b, 0x97, 0x89, 0xbc, 0x31, 0x1c, 0x2a,
+	0x6a, 0x25, 0xad, 0xd6, 0x5b, 0xc3, 0xab, 0x89, 0xa1, 0xa9, 0xc1, 0xf0, 0x83, 0x8d, 0x49, 0xe7,
+	0x33, 0x42, 0x30, 0x64, 0x92, 0x3c, 0x15, 0x72, 0xdc, 0x9c, 0x14, 0xcf, 0x0d, 0x58, 0x43, 0xdd,
+	0x63, 0xbd, 0x09, 0xe0, 0xce, 0x54, 0xc0, 0xb2, 0x11, 0x38, 0xe2, 0x29, 0xb9, 0x0b, 0xb9, 0x3b,
+	0xd1, 0xf8, 0x60, 0xf7, 0xc6, 0xec, 0xbf, 0x76, 0x3f, 0x03, 0xa8, 0x36, 0x67, 0x70, 0xc0, 0x19,
+	0xd3, 0x2d, 0x66, 0x26, 0x81, 0xff, 0xf3, 0x5c, 0xd2, 0x9e, 0xa1, 0xf9, 0x52, 0x1b, 0x6c, 0xed,
+	0x0b, 0x3a, 0x46, 0xbc, 0x96, 0x81, 0x06, 0xe7, 0xc5, 0x41, 0x38, 0x19, 0x24, 0x73, 0x94, 0xf1,
+	0x2a, 0x6e, 0xba, 0x33, 0xfd, 0x6d, 0xc1, 0xff, 0x37, 0x46, 0x5b, 0x8e, 0xd1, 0x25, 0xf8, 0x62,
+	0x10, 0x32, 0x19, 0x9a, 0x85, 0xc3, 0xee, 0x1e, 0x50, 0x9b, 0xa4, 0xaf, 0xf5, 0x52, 0x95, 0xe4,
+	0x5a, 0x14, 0xf9, 0x0e, 0x80, 0x8a, 0xef, 0x30, 0xf5, 0xf1, 0x72, 0x9b, 0xf3, 0xa9, 0xa8, 0xa2,
+	0xef, 0xf6, 0xfc, 0x13, 0x40, 0xd5, 0x7f, 0xb4, 0xb6, 0x46, 0x76, 0xc4, 0x8b, 0xac, 0xf7, 0x96,
+	0xfc, 0xf7, 0x66, 0xec, 0x6d, 0x00, 0x95, 0x54, 0x77, 0xd5, 0x3c, 0x0d, 0x37, 0xba, 0x62, 0x70,
+	0x71, 0xf7, 0xa4, 0x28, 0x1f, 0x16, 0x6a, 0x61, 0xfb, 0x2e, 0x65, 0xfc, 0xdb, 0xad, 0x30, 0xe2,
+	0xb3, 0xb7, 0xd2, 0xbc, 0xc6, 0xb8, 0xb5, 0x84, 0x7e, 0x00, 0x30, 0x54, 0xad, 0x34, 0x0a, 0x74,
+	0x27, 0x46, 0x76, 0x74, 0xc6, 0xc7, 0xe4, 0x8f, 0xcf, 0xdf, 0xfe, 0xfd, 0xf2, 0xc0, 0x2c, 0x3a,
+	0xaa, 0x12, 0x56, 0xf7, 0xbb, 0x4a, 0x3d, 0xdb, 0x30, 0xc0, 0x95, 0xfa, 0xf7, 0x65, 0xd5, 0x59,
+	0x88, 0x99, 0x7a, 0x76, 0x6d, 0x33, 0x5e, 0x56, 0x6b, 0x1b, 0x36, 0xba, 0x3c, 0x00, 0xc7, 0xaa,
+	0xed, 0xe6, 0x19, 0xb2, 0x6f, 0x34, 0xe6, 0x13, 0x70, 0xb7, 0x89, 0x74, 0x77, 0x1f, 0xca, 0x57,
+	0x80, 0xc0, 0xf4, 0x0d, 0x40, 0x17, 0x41, 0x33, 0xaa, 0x2a, 0x92, 0xfa, 0x75, 0x5e, 0x09, 0x0c,
+	0xd4, 0xc7, 0xd7, 0x07, 0xbb, 0xea, 0x5d, 0xe2, 0x1c, 0x27, 0xe7, 0xa2, 0x5a, 0x46, 0x0f, 0x01,
+	0xdc, 0x22, 0x7a, 0xd5, 0x3b, 0xeb, 0x9a, 0xb6, 0xb5, 0xa0, 0x8b, 0x52, 0x44, 0xe9, 0x8a, 0x18,
+	0x26, 0x17, 0x04, 0x31, 0x14, 0x65, 0xfc, 0x69, 0xe9, 0x8a, 0x87, 0x4e, 0xc0, 0xd1, 0x2f, 0x03,
+	0x70, 0x2c, 0xd5, 0x41, 0x01, 0xa9, 0x27, 0xa3, 0x80, 0x5f, 0x1d, 0x05, 0x5c, 0x07, 0x91, 0x9f,
+	0x7c, 0x14, 0xe0, 0xc9, 0x52, 0xe9, 0x47, 0x0d, 0x1d, 0xe2, 0x74, 0x56, 0x46, 0x63, 0x00, 0x57,
+	0x25, 0x7b, 0xc0, 0x14, 0xfa, 0x0b, 0xc0, 0xad, 0x07, 0x68, 0x91, 0xf2, 0xba, 0x9f, 0x79, 0x3d,
+	0xef, 0xf5, 0x91, 0x67, 0x9a, 0xc6, 0xd0, 0xc1, 0x92, 0xc9, 0x97, 0xe4, 0xaf, 0x1d, 0xa6, 0xbe,
+	0x04, 0x53, 0xe7, 0x7d, 0x98, 0xea, 0x95, 0x99, 0xae, 0x99, 0xa8, 0xf5, 0xc7, 0x1f, 0x00, 0x6e,
+	0x3b, 0x4c, 0xb9, 0xcf, 0x86, 0xb6, 0x2f, 0xd0, 0xf0, 0x68, 0x39, 0xfd, 0x23, 0x3d, 0x0d, 0x7b,
+	0xf9, 0xb4, 0x60, 0xe7, 0x38, 0x3a, 0xd6, 0x5b, 0xc3, 0x04, 0x98, 0x08, 0x77, 0x00, 0xdc, 0x5e,
+	0xed, 0x77, 0xbf, 0x25, 0x68, 0x3a, 0xd8, 0x60, 0x68, 0x0d, 0xfa, 0xf5, 0x5e, 0x40, 0x33, 0x79,
+	0xbf, 0x40, 0xfd, 0x36, 0xda, 0x1b, 0x04, 0x75, 0xab, 0xf6, 0x3f, 0x3f, 0x00, 0xb7, 0xa5, 0x82,
+	0x95, 0x32, 0xf5, 0x34, 0x4a, 0xc9, 0x04, 0xa8, 0x52, 0x64, 0xbe, 0x19, 0x94, 0x7b, 0x7f, 0x2b,
+	0x7d, 0x94, 0xd4, 0x1b, 0xc2, 0xd3, 0xc6, 0x37, 0x01, 0x0c, 0x3b, 0x6d, 0xec, 0xc3, 0x43, 0xbf,
+	0x1b, 0x65, 0xcb, 0xa6, 0x3e, 0x26, 0xa0, 0x26, 0xa7, 0x66, 0xbb, 0xbf, 0xd3, 0xdb, 0xf7, 0x67,
+	0xe2, 0x7b, 0xb0, 0x52, 0xc6, 0xe0, 0x56, 0x19, 0x83, 0xbb, 0x65, 0x2c, 0xdd, 0x2f, 0x63, 0xe9,
+	0x41, 0x19, 0x4b, 0x8f, 0xca, 0x58, 0x7a, 0x5c, 0xc6, 0xe0, 0x9c, 0x8d, 0xc1, 0x05, 0x1b, 0x4b,
+	0x57, 0x6d, 0x0c, 0xae, 0xd9, 0x58, 0xba, 0x6e, 0x63, 0xe9, 0x86, 0x8d, 0xa5, 0x15, 0x1b, 0x83,
+	0x5b, 0x36, 0x06, 0x77, 0x6d, 0x2c, 0xdd, 0xb7, 0x31, 0x78, 0x60, 0x63, 0xe9, 0x91, 0x8d, 0xc1,
+	0x63, 0x1b, 0x4b, 0xe7, 0x2a, 0x58, 0xba, 0x50, 0xc1, 0xe0, 0x52, 0x05, 0x4b, 0x57, 0x2a, 0x18,
+	0x7c, 0x57, 0xc1, 0xd2, 0xd5, 0x0a, 0x96, 0xae, 0x55, 0x30, 0xb8, 0x5e, 0xc1, 0xe0, 0x46, 0x05,
+	0x83, 0xe3, 0x6a, 0xde, 0x50, 0xf8, 0x3c, 0xe5, 0xf3, 0x9a, 0x9e, 0x67, 0x8a, 0x4e, 0xf9, 0x19,
+	0xc3, 0x2a, 0xa8, 0xf5, 0xff, 0xc5, 0x5c, 0xdc, 0xad, 0x9a, 0x85, 0xbc, 0xca, 0xb9, 0x6e, 0xce,
+	0xcd, 0x6d, 0x10, 0x8c, 0xec, 0xfe, 0x27, 0x00, 0x00, 0xff, 0xff, 0x24, 0x11, 0xaa, 0xb7, 0x3c,
+	0x16, 0x00, 0x00,
 }
 
 func (this *ApplicationPackage) Equal(that interface{}) bool {
@@ -796,6 +1151,185 @@ func (this *SetApplicationPackageAssociationRequest) Equal(that interface{}) boo
 	}
 	return true
 }
+func (this *ApplicationPackageDefaultAssociationIdentifiers) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ApplicationPackageDefaultAssociationIdentifiers)
+	if !ok {
+		that2, ok := that.(ApplicationPackageDefaultAssociationIdentifiers)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.ApplicationIdentifiers.Equal(&that1.ApplicationIdentifiers) {
+		return false
+	}
+	if this.FPort != that1.FPort {
+		return false
+	}
+	return true
+}
+func (this *ApplicationPackageDefaultAssociation) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ApplicationPackageDefaultAssociation)
+	if !ok {
+		that2, ok := that.(ApplicationPackageDefaultAssociation)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.ApplicationPackageDefaultAssociationIdentifiers.Equal(&that1.ApplicationPackageDefaultAssociationIdentifiers) {
+		return false
+	}
+	if !this.CreatedAt.Equal(that1.CreatedAt) {
+		return false
+	}
+	if !this.UpdatedAt.Equal(that1.UpdatedAt) {
+		return false
+	}
+	if this.PackageName != that1.PackageName {
+		return false
+	}
+	if !this.Data.Equal(that1.Data) {
+		return false
+	}
+	return true
+}
+func (this *ApplicationPackageDefaultAssociations) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ApplicationPackageDefaultAssociations)
+	if !ok {
+		that2, ok := that.(ApplicationPackageDefaultAssociations)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if len(this.Defaults) != len(that1.Defaults) {
+		return false
+	}
+	for i := range this.Defaults {
+		if !this.Defaults[i].Equal(that1.Defaults[i]) {
+			return false
+		}
+	}
+	return true
+}
+func (this *GetApplicationPackageDefaultAssociationRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*GetApplicationPackageDefaultAssociationRequest)
+	if !ok {
+		that2, ok := that.(GetApplicationPackageDefaultAssociationRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.ApplicationPackageDefaultAssociationIdentifiers.Equal(&that1.ApplicationPackageDefaultAssociationIdentifiers) {
+		return false
+	}
+	if !this.FieldMask.Equal(&that1.FieldMask) {
+		return false
+	}
+	return true
+}
+func (this *ListApplicationPackageDefaultAssociationRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ListApplicationPackageDefaultAssociationRequest)
+	if !ok {
+		that2, ok := that.(ListApplicationPackageDefaultAssociationRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.ApplicationIdentifiers.Equal(&that1.ApplicationIdentifiers) {
+		return false
+	}
+	if this.Limit != that1.Limit {
+		return false
+	}
+	if this.Page != that1.Page {
+		return false
+	}
+	if !this.FieldMask.Equal(&that1.FieldMask) {
+		return false
+	}
+	return true
+}
+func (this *SetApplicationPackageDefaultAssociationRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*SetApplicationPackageDefaultAssociationRequest)
+	if !ok {
+		that2, ok := that.(SetApplicationPackageDefaultAssociationRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.ApplicationPackageDefaultAssociation.Equal(&that1.ApplicationPackageDefaultAssociation) {
+		return false
+	}
+	if !this.FieldMask.Equal(&that1.FieldMask) {
+		return false
+	}
+	return true
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -811,14 +1345,22 @@ const _ = grpc.SupportPackageIsVersion4
 type ApplicationPackageRegistryClient interface {
 	// List returns the available packages for the end device.
 	List(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*ApplicationPackages, error)
-	// Get returns the application package association registered on the FPort of the end device.
+	// GetAssociation returns the association registered on the FPort of the end device.
 	GetAssociation(ctx context.Context, in *GetApplicationPackageAssociationRequest, opts ...grpc.CallOption) (*ApplicationPackageAssociation, error)
-	// ListAssociations returns all of the application package associations of the end device.
+	// ListAssociations returns all of the associations of the end device.
 	ListAssociations(ctx context.Context, in *ListApplicationPackageAssociationRequest, opts ...grpc.CallOption) (*ApplicationPackageAssociations, error)
-	// SetAssociation updates or creates the application package association on the FPort of the end device.
+	// SetAssociation updates or creates the association on the FPort of the end device.
 	SetAssociation(ctx context.Context, in *SetApplicationPackageAssociationRequest, opts ...grpc.CallOption) (*ApplicationPackageAssociation, error)
-	// DeleteAssociation removes the application package association on the FPort of the end device.
+	// DeleteAssociation removes the association on the FPort of the end device.
 	DeleteAssociation(ctx context.Context, in *ApplicationPackageAssociationIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
+	// GetDefaultAssociation returns the default association registered on the FPort of the application.
+	GetDefaultAssociation(ctx context.Context, in *GetApplicationPackageDefaultAssociationRequest, opts ...grpc.CallOption) (*ApplicationPackageDefaultAssociation, error)
+	// ListDefaultAssociations returns all of the default associations of the application.
+	ListDefaultAssociations(ctx context.Context, in *ListApplicationPackageDefaultAssociationRequest, opts ...grpc.CallOption) (*ApplicationPackageDefaultAssociations, error)
+	// SetDefaultAssociation updates or creates the default association on the FPort of the application.
+	SetDefaultAssociation(ctx context.Context, in *SetApplicationPackageDefaultAssociationRequest, opts ...grpc.CallOption) (*ApplicationPackageDefaultAssociation, error)
+	// DeleteDefaultAssociation removes the default association on the FPort of the application.
+	DeleteDefaultAssociation(ctx context.Context, in *ApplicationPackageDefaultAssociationIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
 type applicationPackageRegistryClient struct {
@@ -874,18 +1416,62 @@ func (c *applicationPackageRegistryClient) DeleteAssociation(ctx context.Context
 	return out, nil
 }
 
+func (c *applicationPackageRegistryClient) GetDefaultAssociation(ctx context.Context, in *GetApplicationPackageDefaultAssociationRequest, opts ...grpc.CallOption) (*ApplicationPackageDefaultAssociation, error) {
+	out := new(ApplicationPackageDefaultAssociation)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.ApplicationPackageRegistry/GetDefaultAssociation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationPackageRegistryClient) ListDefaultAssociations(ctx context.Context, in *ListApplicationPackageDefaultAssociationRequest, opts ...grpc.CallOption) (*ApplicationPackageDefaultAssociations, error) {
+	out := new(ApplicationPackageDefaultAssociations)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.ApplicationPackageRegistry/ListDefaultAssociations", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationPackageRegistryClient) SetDefaultAssociation(ctx context.Context, in *SetApplicationPackageDefaultAssociationRequest, opts ...grpc.CallOption) (*ApplicationPackageDefaultAssociation, error) {
+	out := new(ApplicationPackageDefaultAssociation)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.ApplicationPackageRegistry/SetDefaultAssociation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationPackageRegistryClient) DeleteDefaultAssociation(ctx context.Context, in *ApplicationPackageDefaultAssociationIdentifiers, opts ...grpc.CallOption) (*types.Empty, error) {
+	out := new(types.Empty)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.ApplicationPackageRegistry/DeleteDefaultAssociation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApplicationPackageRegistryServer is the server API for ApplicationPackageRegistry service.
 type ApplicationPackageRegistryServer interface {
 	// List returns the available packages for the end device.
 	List(context.Context, *EndDeviceIdentifiers) (*ApplicationPackages, error)
-	// Get returns the application package association registered on the FPort of the end device.
+	// GetAssociation returns the association registered on the FPort of the end device.
 	GetAssociation(context.Context, *GetApplicationPackageAssociationRequest) (*ApplicationPackageAssociation, error)
-	// ListAssociations returns all of the application package associations of the end device.
+	// ListAssociations returns all of the associations of the end device.
 	ListAssociations(context.Context, *ListApplicationPackageAssociationRequest) (*ApplicationPackageAssociations, error)
-	// SetAssociation updates or creates the application package association on the FPort of the end device.
+	// SetAssociation updates or creates the association on the FPort of the end device.
 	SetAssociation(context.Context, *SetApplicationPackageAssociationRequest) (*ApplicationPackageAssociation, error)
-	// DeleteAssociation removes the application package association on the FPort of the end device.
+	// DeleteAssociation removes the association on the FPort of the end device.
 	DeleteAssociation(context.Context, *ApplicationPackageAssociationIdentifiers) (*types.Empty, error)
+	// GetDefaultAssociation returns the default association registered on the FPort of the application.
+	GetDefaultAssociation(context.Context, *GetApplicationPackageDefaultAssociationRequest) (*ApplicationPackageDefaultAssociation, error)
+	// ListDefaultAssociations returns all of the default associations of the application.
+	ListDefaultAssociations(context.Context, *ListApplicationPackageDefaultAssociationRequest) (*ApplicationPackageDefaultAssociations, error)
+	// SetDefaultAssociation updates or creates the default association on the FPort of the application.
+	SetDefaultAssociation(context.Context, *SetApplicationPackageDefaultAssociationRequest) (*ApplicationPackageDefaultAssociation, error)
+	// DeleteDefaultAssociation removes the default association on the FPort of the application.
+	DeleteDefaultAssociation(context.Context, *ApplicationPackageDefaultAssociationIdentifiers) (*types.Empty, error)
 }
 
 // UnimplementedApplicationPackageRegistryServer can be embedded to have forward compatible implementations.
@@ -906,6 +1492,18 @@ func (*UnimplementedApplicationPackageRegistryServer) SetAssociation(ctx context
 }
 func (*UnimplementedApplicationPackageRegistryServer) DeleteAssociation(ctx context.Context, req *ApplicationPackageAssociationIdentifiers) (*types.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAssociation not implemented")
+}
+func (*UnimplementedApplicationPackageRegistryServer) GetDefaultAssociation(ctx context.Context, req *GetApplicationPackageDefaultAssociationRequest) (*ApplicationPackageDefaultAssociation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDefaultAssociation not implemented")
+}
+func (*UnimplementedApplicationPackageRegistryServer) ListDefaultAssociations(ctx context.Context, req *ListApplicationPackageDefaultAssociationRequest) (*ApplicationPackageDefaultAssociations, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListDefaultAssociations not implemented")
+}
+func (*UnimplementedApplicationPackageRegistryServer) SetDefaultAssociation(ctx context.Context, req *SetApplicationPackageDefaultAssociationRequest) (*ApplicationPackageDefaultAssociation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetDefaultAssociation not implemented")
+}
+func (*UnimplementedApplicationPackageRegistryServer) DeleteDefaultAssociation(ctx context.Context, req *ApplicationPackageDefaultAssociationIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteDefaultAssociation not implemented")
 }
 
 func RegisterApplicationPackageRegistryServer(s *grpc.Server, srv ApplicationPackageRegistryServer) {
@@ -1002,6 +1600,78 @@ func _ApplicationPackageRegistry_DeleteAssociation_Handler(srv interface{}, ctx 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ApplicationPackageRegistry_GetDefaultAssociation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetApplicationPackageDefaultAssociationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationPackageRegistryServer).GetDefaultAssociation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.ApplicationPackageRegistry/GetDefaultAssociation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationPackageRegistryServer).GetDefaultAssociation(ctx, req.(*GetApplicationPackageDefaultAssociationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationPackageRegistry_ListDefaultAssociations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListApplicationPackageDefaultAssociationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationPackageRegistryServer).ListDefaultAssociations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.ApplicationPackageRegistry/ListDefaultAssociations",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationPackageRegistryServer).ListDefaultAssociations(ctx, req.(*ListApplicationPackageDefaultAssociationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationPackageRegistry_SetDefaultAssociation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetApplicationPackageDefaultAssociationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationPackageRegistryServer).SetDefaultAssociation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.ApplicationPackageRegistry/SetDefaultAssociation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationPackageRegistryServer).SetDefaultAssociation(ctx, req.(*SetApplicationPackageDefaultAssociationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationPackageRegistry_DeleteDefaultAssociation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationPackageDefaultAssociationIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationPackageRegistryServer).DeleteDefaultAssociation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.ApplicationPackageRegistry/DeleteDefaultAssociation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationPackageRegistryServer).DeleteDefaultAssociation(ctx, req.(*ApplicationPackageDefaultAssociationIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _ApplicationPackageRegistry_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ttn.lorawan.v3.ApplicationPackageRegistry",
 	HandlerType: (*ApplicationPackageRegistryServer)(nil),
@@ -1025,6 +1695,22 @@ var _ApplicationPackageRegistry_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteAssociation",
 			Handler:    _ApplicationPackageRegistry_DeleteAssociation_Handler,
+		},
+		{
+			MethodName: "GetDefaultAssociation",
+			Handler:    _ApplicationPackageRegistry_GetDefaultAssociation_Handler,
+		},
+		{
+			MethodName: "ListDefaultAssociations",
+			Handler:    _ApplicationPackageRegistry_ListDefaultAssociations_Handler,
+		},
+		{
+			MethodName: "SetDefaultAssociation",
+			Handler:    _ApplicationPackageRegistry_SetDefaultAssociation_Handler,
+		},
+		{
+			MethodName: "DeleteDefaultAssociation",
+			Handler:    _ApplicationPackageRegistry_DeleteDefaultAssociation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1385,6 +2071,288 @@ func (m *SetApplicationPackageAssociationRequest) MarshalToSizedBuffer(dAtA []by
 	return len(dAtA) - i, nil
 }
 
+func (m *ApplicationPackageDefaultAssociationIdentifiers) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ApplicationPackageDefaultAssociationIdentifiers) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationPackageDefaultAssociationIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.FPort != 0 {
+		i = encodeVarintApplicationserverPackages(dAtA, i, uint64(m.FPort))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPackages(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *ApplicationPackageDefaultAssociation) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ApplicationPackageDefaultAssociation) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationPackageDefaultAssociation) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Data != nil {
+		{
+			size, err := m.Data.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverPackages(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.PackageName) > 0 {
+		i -= len(m.PackageName)
+		copy(dAtA[i:], m.PackageName)
+		i = encodeVarintApplicationserverPackages(dAtA, i, uint64(len(m.PackageName)))
+		i--
+		dAtA[i] = 0x22
+	}
+	n14, err14 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt):])
+	if err14 != nil {
+		return 0, err14
+	}
+	i -= n14
+	i = encodeVarintApplicationserverPackages(dAtA, i, uint64(n14))
+	i--
+	dAtA[i] = 0x1a
+	n15, err15 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
+	if err15 != nil {
+		return 0, err15
+	}
+	i -= n15
+	i = encodeVarintApplicationserverPackages(dAtA, i, uint64(n15))
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.ApplicationPackageDefaultAssociationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPackages(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *ApplicationPackageDefaultAssociations) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ApplicationPackageDefaultAssociations) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationPackageDefaultAssociations) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Defaults) > 0 {
+		for iNdEx := len(m.Defaults) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Defaults[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintApplicationserverPackages(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *GetApplicationPackageDefaultAssociationRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetApplicationPackageDefaultAssociationRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetApplicationPackageDefaultAssociationRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPackages(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.ApplicationPackageDefaultAssociationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPackages(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *ListApplicationPackageDefaultAssociationRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListApplicationPackageDefaultAssociationRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListApplicationPackageDefaultAssociationRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPackages(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x22
+	if m.Page != 0 {
+		i = encodeVarintApplicationserverPackages(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.Limit != 0 {
+		i = encodeVarintApplicationserverPackages(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPackages(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *SetApplicationPackageDefaultAssociationRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SetApplicationPackageDefaultAssociationRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SetApplicationPackageDefaultAssociationRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPackages(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.ApplicationPackageDefaultAssociation.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPackages(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintApplicationserverPackages(dAtA []byte, offset int, v uint64) int {
 	offset -= sovApplicationserverPackages(v)
 	base := offset
@@ -1495,6 +2463,82 @@ func NewPopulatedSetApplicationPackageAssociationRequest(r randyApplicationserve
 	return this
 }
 
+func NewPopulatedApplicationPackageDefaultAssociationIdentifiers(r randyApplicationserverPackages, easy bool) *ApplicationPackageDefaultAssociationIdentifiers {
+	this := &ApplicationPackageDefaultAssociationIdentifiers{}
+	v13 := NewPopulatedApplicationIdentifiers(r, easy)
+	this.ApplicationIdentifiers = *v13
+	this.FPort = r.Uint32()
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedApplicationPackageDefaultAssociation(r randyApplicationserverPackages, easy bool) *ApplicationPackageDefaultAssociation {
+	this := &ApplicationPackageDefaultAssociation{}
+	v14 := NewPopulatedApplicationPackageDefaultAssociationIdentifiers(r, easy)
+	this.ApplicationPackageDefaultAssociationIdentifiers = *v14
+	v15 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.CreatedAt = *v15
+	v16 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.UpdatedAt = *v16
+	this.PackageName = randStringApplicationserverPackages(r)
+	if r.Intn(5) != 0 {
+		this.Data = types.NewPopulatedStruct(r, easy)
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedApplicationPackageDefaultAssociations(r randyApplicationserverPackages, easy bool) *ApplicationPackageDefaultAssociations {
+	this := &ApplicationPackageDefaultAssociations{}
+	if r.Intn(5) != 0 {
+		v17 := r.Intn(5)
+		this.Defaults = make([]*ApplicationPackageDefaultAssociation, v17)
+		for i := 0; i < v17; i++ {
+			this.Defaults[i] = NewPopulatedApplicationPackageDefaultAssociation(r, easy)
+		}
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedGetApplicationPackageDefaultAssociationRequest(r randyApplicationserverPackages, easy bool) *GetApplicationPackageDefaultAssociationRequest {
+	this := &GetApplicationPackageDefaultAssociationRequest{}
+	v18 := NewPopulatedApplicationPackageDefaultAssociationIdentifiers(r, easy)
+	this.ApplicationPackageDefaultAssociationIdentifiers = *v18
+	v19 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v19
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedListApplicationPackageDefaultAssociationRequest(r randyApplicationserverPackages, easy bool) *ListApplicationPackageDefaultAssociationRequest {
+	this := &ListApplicationPackageDefaultAssociationRequest{}
+	v20 := NewPopulatedApplicationIdentifiers(r, easy)
+	this.ApplicationIdentifiers = *v20
+	this.Limit = r.Uint32()
+	this.Page = r.Uint32()
+	v21 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v21
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedSetApplicationPackageDefaultAssociationRequest(r randyApplicationserverPackages, easy bool) *SetApplicationPackageDefaultAssociationRequest {
+	this := &SetApplicationPackageDefaultAssociationRequest{}
+	v22 := NewPopulatedApplicationPackageDefaultAssociation(r, easy)
+	this.ApplicationPackageDefaultAssociation = *v22
+	v23 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v23
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 type randyApplicationserverPackages interface {
 	Float32() float32
 	Float64() float64
@@ -1514,9 +2558,9 @@ func randUTF8RuneApplicationserverPackages(r randyApplicationserverPackages) run
 	return rune(ru + 61)
 }
 func randStringApplicationserverPackages(r randyApplicationserverPackages) string {
-	v13 := r.Intn(100)
-	tmps := make([]rune, v13)
-	for i := 0; i < v13; i++ {
+	v24 := r.Intn(100)
+	tmps := make([]rune, v24)
+	for i := 0; i < v24; i++ {
 		tmps[i] = randUTF8RuneApplicationserverPackages(r)
 	}
 	return string(tmps)
@@ -1538,11 +2582,11 @@ func randFieldApplicationserverPackages(dAtA []byte, r randyApplicationserverPac
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateApplicationserverPackages(dAtA, uint64(key))
-		v14 := r.Int63()
+		v25 := r.Int63()
 		if r.Intn(2) == 0 {
-			v14 *= -1
+			v25 *= -1
 		}
-		dAtA = encodeVarintPopulateApplicationserverPackages(dAtA, uint64(v14))
+		dAtA = encodeVarintPopulateApplicationserverPackages(dAtA, uint64(v25))
 	case 1:
 		dAtA = encodeVarintPopulateApplicationserverPackages(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -1695,6 +2739,103 @@ func (m *SetApplicationPackageAssociationRequest) Size() (n int) {
 	return n
 }
 
+func (m *ApplicationPackageDefaultAssociationIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.ApplicationIdentifiers.Size()
+	n += 1 + l + sovApplicationserverPackages(uint64(l))
+	if m.FPort != 0 {
+		n += 1 + sovApplicationserverPackages(uint64(m.FPort))
+	}
+	return n
+}
+
+func (m *ApplicationPackageDefaultAssociation) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.ApplicationPackageDefaultAssociationIdentifiers.Size()
+	n += 1 + l + sovApplicationserverPackages(uint64(l))
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
+	n += 1 + l + sovApplicationserverPackages(uint64(l))
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
+	n += 1 + l + sovApplicationserverPackages(uint64(l))
+	l = len(m.PackageName)
+	if l > 0 {
+		n += 1 + l + sovApplicationserverPackages(uint64(l))
+	}
+	if m.Data != nil {
+		l = m.Data.Size()
+		n += 1 + l + sovApplicationserverPackages(uint64(l))
+	}
+	return n
+}
+
+func (m *ApplicationPackageDefaultAssociations) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Defaults) > 0 {
+		for _, e := range m.Defaults {
+			l = e.Size()
+			n += 1 + l + sovApplicationserverPackages(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *GetApplicationPackageDefaultAssociationRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.ApplicationPackageDefaultAssociationIdentifiers.Size()
+	n += 1 + l + sovApplicationserverPackages(uint64(l))
+	l = m.FieldMask.Size()
+	n += 1 + l + sovApplicationserverPackages(uint64(l))
+	return n
+}
+
+func (m *ListApplicationPackageDefaultAssociationRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.ApplicationIdentifiers.Size()
+	n += 1 + l + sovApplicationserverPackages(uint64(l))
+	if m.Limit != 0 {
+		n += 1 + sovApplicationserverPackages(uint64(m.Limit))
+	}
+	if m.Page != 0 {
+		n += 1 + sovApplicationserverPackages(uint64(m.Page))
+	}
+	l = m.FieldMask.Size()
+	n += 1 + l + sovApplicationserverPackages(uint64(l))
+	return n
+}
+
+func (m *SetApplicationPackageDefaultAssociationRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.ApplicationPackageDefaultAssociation.Size()
+	n += 1 + l + sovApplicationserverPackages(uint64(l))
+	l = m.FieldMask.Size()
+	n += 1 + l + sovApplicationserverPackages(uint64(l))
+	return n
+}
+
 func sovApplicationserverPackages(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
@@ -1797,6 +2938,81 @@ func (this *SetApplicationPackageAssociationRequest) String() string {
 	}
 	s := strings.Join([]string{`&SetApplicationPackageAssociationRequest{`,
 		`ApplicationPackageAssociation:` + strings.Replace(strings.Replace(this.ApplicationPackageAssociation.String(), "ApplicationPackageAssociation", "ApplicationPackageAssociation", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ApplicationPackageDefaultAssociationIdentifiers) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ApplicationPackageDefaultAssociationIdentifiers{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ApplicationIdentifiers), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FPort:` + fmt.Sprintf("%v", this.FPort) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ApplicationPackageDefaultAssociation) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ApplicationPackageDefaultAssociation{`,
+		`ApplicationPackageDefaultAssociationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationPackageDefaultAssociationIdentifiers.String(), "ApplicationPackageDefaultAssociationIdentifiers", "ApplicationPackageDefaultAssociationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`PackageName:` + fmt.Sprintf("%v", this.PackageName) + `,`,
+		`Data:` + strings.Replace(fmt.Sprintf("%v", this.Data), "Struct", "types.Struct", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ApplicationPackageDefaultAssociations) String() string {
+	if this == nil {
+		return "nil"
+	}
+	repeatedStringForDefaults := "[]*ApplicationPackageDefaultAssociation{"
+	for _, f := range this.Defaults {
+		repeatedStringForDefaults += strings.Replace(f.String(), "ApplicationPackageDefaultAssociation", "ApplicationPackageDefaultAssociation", 1) + ","
+	}
+	repeatedStringForDefaults += "}"
+	s := strings.Join([]string{`&ApplicationPackageDefaultAssociations{`,
+		`Defaults:` + repeatedStringForDefaults + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *GetApplicationPackageDefaultAssociationRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GetApplicationPackageDefaultAssociationRequest{`,
+		`ApplicationPackageDefaultAssociationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationPackageDefaultAssociationIdentifiers.String(), "ApplicationPackageDefaultAssociationIdentifiers", "ApplicationPackageDefaultAssociationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListApplicationPackageDefaultAssociationRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListApplicationPackageDefaultAssociationRequest{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ApplicationIdentifiers), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
+		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *SetApplicationPackageDefaultAssociationRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&SetApplicationPackageDefaultAssociationRequest{`,
+		`ApplicationPackageDefaultAssociation:` + strings.Replace(strings.Replace(this.ApplicationPackageDefaultAssociation.String(), "ApplicationPackageDefaultAssociation", "ApplicationPackageDefaultAssociation", 1), `&`, ``, 1) + `,`,
 		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
@@ -2748,6 +3964,813 @@ func (m *SetApplicationPackageAssociationRequest) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.ApplicationPackageAssociation.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserverPackages(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ApplicationPackageDefaultAssociationIdentifiers) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserverPackages
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ApplicationPackageDefaultAssociationIdentifiers: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ApplicationPackageDefaultAssociationIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FPort", wireType)
+			}
+			m.FPort = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.FPort |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserverPackages(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ApplicationPackageDefaultAssociation) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserverPackages
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ApplicationPackageDefaultAssociation: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ApplicationPackageDefaultAssociation: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationPackageDefaultAssociationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationPackageDefaultAssociationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PackageName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PackageName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Data == nil {
+				m.Data = &types.Struct{}
+			}
+			if err := m.Data.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserverPackages(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ApplicationPackageDefaultAssociations) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserverPackages
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ApplicationPackageDefaultAssociations: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ApplicationPackageDefaultAssociations: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Defaults", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Defaults = append(m.Defaults, &ApplicationPackageDefaultAssociation{})
+			if err := m.Defaults[len(m.Defaults)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserverPackages(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetApplicationPackageDefaultAssociationRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserverPackages
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetApplicationPackageDefaultAssociationRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetApplicationPackageDefaultAssociationRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationPackageDefaultAssociationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationPackageDefaultAssociationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserverPackages(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListApplicationPackageDefaultAssociationRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserverPackages
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListApplicationPackageDefaultAssociationRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListApplicationPackageDefaultAssociationRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Limit", wireType)
+			}
+			m.Limit = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Limit |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Page", wireType)
+			}
+			m.Page = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Page |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserverPackages(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SetApplicationPackageDefaultAssociationRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserverPackages
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SetApplicationPackageDefaultAssociationRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SetApplicationPackageDefaultAssociationRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationPackageDefaultAssociation", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPackages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPackages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationPackageDefaultAssociation.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

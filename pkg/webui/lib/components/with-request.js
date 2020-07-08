@@ -22,10 +22,10 @@ import Message from './message'
 
 /**
  * `withRequest` is a HOC that handles:
- *   * Requesting data on initial mount using the `loadData` prop.
- *   * Showing the loading spinner while the request in is progress using the
- *     `isFetchingTest` predicate.
- *   * Throwing an error received as the `error` prop.
+ * * Requesting data on initial mount using the `loadData` prop.
+ * * Showing the loading spinner while the request in is progress using the
+ * `isFetchingTest` predicate.
+ * * Throwing an error received as the `error` prop.
  *
  * @param {Function} mapPropsToRequest - Selects the `request` given the wrapped
  * component props.

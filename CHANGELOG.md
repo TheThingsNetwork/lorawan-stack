@@ -9,14 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- API Authentication and authorization via session cookie.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added and modified columns.
+  - This changes the `AuthInfo` API response.
+- Skipping payload crypto on application-level via application link's `skip_payload_crypto` field.
+- Authentication method, ID and Remote IP in events metadata.
+- Service data messages published by integrations. Can be consumed using the bundled MQTT server, Webhooks or Pub/Sub integrations.
+- Application package application-wide associations support.
+- LoRaCloud DAS application package server URL overrides support.
+- Key vault caching mechanism (see `--key-vault.cache.size` and `--key-vault.cache.ttl` options).
 - Payload formatter documentation.
 - CLI support for setting message payload formatters from a local file. (see `--formatters.down-formatter-parameter-local-file` and `--formatters.up-formatter-parameter-local-file` options).
 
 ### Changed
 
+- Event stream start and stop events are not published anymore.
+- Remove version from hosted documentation paths.
 - Gateway connection stats are now stored in a single key.
 
 ### Deprecated
+
+- End device `skip_payload_crypto` field: it gets replaced by `skip_payload_crypto_override`.
 
 ### Removed
 

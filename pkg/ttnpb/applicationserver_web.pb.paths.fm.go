@@ -61,6 +61,8 @@ var ApplicationWebhookTemplateFieldPathsNested = []string{
 	"location_solved.path",
 	"logo_url",
 	"name",
+	"service_data",
+	"service_data.path",
 	"uplink_message",
 	"uplink_message.path",
 }
@@ -84,6 +86,7 @@ var ApplicationWebhookTemplateFieldPathsTopLevel = []string{
 	"location_solved",
 	"logo_url",
 	"name",
+	"service_data",
 	"uplink_message",
 }
 var ApplicationWebhookTemplatesFieldPathsNested = []string{
@@ -117,6 +120,8 @@ var ApplicationWebhookFieldPathsNested = []string{
 	"join_accept.path",
 	"location_solved",
 	"location_solved.path",
+	"service_data",
+	"service_data.path",
 	"template_fields",
 	"template_ids",
 	"template_ids.template_id",
@@ -139,6 +144,7 @@ var ApplicationWebhookFieldPathsTopLevel = []string{
 	"ids",
 	"join_accept",
 	"location_solved",
+	"service_data",
 	"template_fields",
 	"template_ids",
 	"updated_at",
@@ -206,6 +212,8 @@ var SetApplicationWebhookRequestFieldPathsNested = []string{
 	"webhook.join_accept.path",
 	"webhook.location_solved",
 	"webhook.location_solved.path",
+	"webhook.service_data",
+	"webhook.service_data.path",
 	"webhook.template_fields",
 	"webhook.template_ids",
 	"webhook.template_ids.template_id",

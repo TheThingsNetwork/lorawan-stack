@@ -14,14 +14,17 @@
 
 import axios from 'axios'
 
-import getCookieValue from '@ttn-lw/lib/cookie'
-import { selectApplicationRootPath, selectStackConfig } from '@ttn-lw/lib/selectors/env'
+import {
+  selectApplicationRootPath,
+  selectStackConfig,
+  selectCSRFToken,
+} from '@ttn-lw/lib/selectors/env'
 
 const appRoot = selectApplicationRootPath()
 const stackConfig = selectStackConfig()
 const isBaseUrl = stackConfig.is.base_url
 
-const csrf = getCookieValue('_oauth_csrf')
+const csrf = selectCSRFToken()
 const instance = axios.create({
   headers: { 'X-CSRF-Token': csrf },
 })

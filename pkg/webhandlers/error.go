@@ -51,7 +51,7 @@ func Error(w http.ResponseWriter, r *http.Request, err error) {
 	code, err := weberrors.ProcessError(err)
 	if code >= 500 {
 		errEvent := sentryerrors.NewEvent(err)
-		errEvent.Request = errEvent.Request.FromHTTPRequest(r)
+		errEvent.Request = sentry.NewRequest(r)
 		sentry.CaptureEvent(errEvent)
 	}
 	if errPtr, ok := r.Context().Value(errorContextValue).(*error); ok && errPtr != nil {

@@ -323,3 +323,267 @@ func (dst *SetApplicationPackageAssociationRequest) SetFields(src *SetApplicatio
 	}
 	return nil
 }
+
+func (dst *ApplicationPackageDefaultAssociationIdentifiers) SetFields(src *ApplicationPackageDefaultAssociationIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "application_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationIdentifiers
+				}
+				newDst = &dst.ApplicationIdentifiers
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+				} else {
+					var zero ApplicationIdentifiers
+					dst.ApplicationIdentifiers = zero
+				}
+			}
+		case "f_port":
+			if len(subs) > 0 {
+				return fmt.Errorf("'f_port' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FPort = src.FPort
+			} else {
+				var zero uint32
+				dst.FPort = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ApplicationPackageDefaultAssociation) SetFields(src *ApplicationPackageDefaultAssociation, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationPackageDefaultAssociationIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationPackageDefaultAssociationIdentifiers
+				}
+				newDst = &dst.ApplicationPackageDefaultAssociationIdentifiers
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationPackageDefaultAssociationIdentifiers = src.ApplicationPackageDefaultAssociationIdentifiers
+				} else {
+					var zero ApplicationPackageDefaultAssociationIdentifiers
+					dst.ApplicationPackageDefaultAssociationIdentifiers = zero
+				}
+			}
+		case "created_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'created_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreatedAt = src.CreatedAt
+			} else {
+				var zero time.Time
+				dst.CreatedAt = zero
+			}
+		case "updated_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'updated_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UpdatedAt = src.UpdatedAt
+			} else {
+				var zero time.Time
+				dst.UpdatedAt = zero
+			}
+		case "package_name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'package_name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PackageName = src.PackageName
+			} else {
+				var zero string
+				dst.PackageName = zero
+			}
+		case "data":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Data = src.Data
+			} else {
+				dst.Data = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ApplicationPackageDefaultAssociations) SetFields(src *ApplicationPackageDefaultAssociations, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "defaults":
+			if len(subs) > 0 {
+				return fmt.Errorf("'defaults' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Defaults = src.Defaults
+			} else {
+				dst.Defaults = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetApplicationPackageDefaultAssociationRequest) SetFields(src *GetApplicationPackageDefaultAssociationRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationPackageDefaultAssociationIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationPackageDefaultAssociationIdentifiers
+				}
+				newDst = &dst.ApplicationPackageDefaultAssociationIdentifiers
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationPackageDefaultAssociationIdentifiers = src.ApplicationPackageDefaultAssociationIdentifiers
+				} else {
+					var zero ApplicationPackageDefaultAssociationIdentifiers
+					dst.ApplicationPackageDefaultAssociationIdentifiers = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero types.FieldMask
+				dst.FieldMask = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ListApplicationPackageDefaultAssociationRequest) SetFields(src *ListApplicationPackageDefaultAssociationRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationIdentifiers
+				}
+				newDst = &dst.ApplicationIdentifiers
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+				} else {
+					var zero ApplicationIdentifiers
+					dst.ApplicationIdentifiers = zero
+				}
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero types.FieldMask
+				dst.FieldMask = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *SetApplicationPackageDefaultAssociationRequest) SetFields(src *SetApplicationPackageDefaultAssociationRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "default":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationPackageDefaultAssociation
+				if src != nil {
+					newSrc = &src.ApplicationPackageDefaultAssociation
+				}
+				newDst = &dst.ApplicationPackageDefaultAssociation
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationPackageDefaultAssociation = src.ApplicationPackageDefaultAssociation
+				} else {
+					var zero ApplicationPackageDefaultAssociation
+					dst.ApplicationPackageDefaultAssociation = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero types.FieldMask
+				dst.FieldMask = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

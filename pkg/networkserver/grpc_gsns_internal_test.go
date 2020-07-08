@@ -1086,7 +1086,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							return a.So(matched, should.BeNil)
 						}
 
-						if !a.So(AllTrue(
+						if !a.So(test.AllTrue(
 							a.So(matched, should.NotBeNil),
 							a.So(matched.Context.Value(ctxKey), should.Equal, ctxValue),
 							a.So(matched.phy, should.HaveEmptyDiff, phy),
@@ -1095,7 +1095,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						}
 						matched.Context = nil     // Comparing context with should.Resemble results in infinite recursion.
 						matched.phy = band.Band{} // band.Band cannot be compared with neither should.Resemble, nor should.Equal.
-						if !a.So(AllTrue(
+						if !a.So(test.AllTrue(
 							a.So(matched.SetPaths, should.HaveSameElementsDeep, devConf.SetPaths),
 							a.So(matched.QueuedEventClosures, should.ResembleEventDefinitionDataClosures, devConf.MakeQueuedEvents(deduplicated)),
 							a.So(matched, should.Resemble, &matchedDevice{
@@ -1126,7 +1126,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							}
 							queuedEvents = append(queuedEvents, evs...)
 						}
-						return AllTrue(
+						return test.AllTrue(
 							a.So(queuedEvents, should.HaveSameElementsFunc, test.EventDefinitionDataClosureEqual, devConf.MakeQueuedEvents(true)),
 							a.So(matched.Device, should.Resemble, devConf.ApplyDeviceDiff(true, CopyEndDevice(devConf.Device))),
 						)
