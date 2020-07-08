@@ -964,9 +964,9 @@ The bundle integrates an old version of the JS SDK. This is likely a caching/lin
 ERROR in ./node_modules/redux-logic/node_modules/rxjs/operators/index.js Module not found: Error: Can't resolve '../internal/operators/audit' in '/lorawan-stack/node_modules/redux-logic/node_modules/rxjs/operators'
 ```
 
-#### Possible cause: Broken yarn or npm cache
+##### Possible cause: Broken yarn or npm cache
 
-#### Possible solution: Clean package manager caches
+##### Possible solution: Clean package manager caches
 
 - Clean yarn cache: `yarn cache clean`
 - Clean npm cache: `npm cache clean`
@@ -974,20 +974,20 @@ ERROR in ./node_modules/redux-logic/node_modules/rxjs/operators/index.js Module 
 
 #### Problem: The build crashes without showing any helpful error message
 
-#### Cause: Not running mage in verbose mode
+##### Cause: Not running mage in verbose mode
 
 `./mage` runs in silent mode by default. In verbose mode, you might get more helpful error messages
 
-#### Solution
+##### Solution
 
 Run mage in verbose mode: `./mage -v {target}`
 
 #### Problem: Browser displays error:
 `Cannot GET /`
 
-#### Cause: No endpoint is exposed at root
+##### Cause: No endpoint is exposed at root
 
-#### Solution:
+##### Solution:
 
 Console is typically exposed at `http://localhost:8080/console`,
 API at `http://localhost:8080/console`,
@@ -997,7 +997,9 @@ etc
 #### Problem: Browser displays error:
 `Error occurred while trying to proxy to: localhost:8080/console`
 
-#### Cause: Stack is not available or not running
+##### Cause: Stack is not available or not running
+
+##### Solution:
 
 For development, remember to run the stack with `go run`:
 
