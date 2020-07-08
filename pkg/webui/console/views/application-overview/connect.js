@@ -110,4 +110,8 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
 })
 
 export default ApplicationOverview =>
-  connect(mapStateToProps, mapDispatchToProps, mergeProps)(ApplicationOverview)
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+    mergeProps,
+  )(ApplicationOverview)

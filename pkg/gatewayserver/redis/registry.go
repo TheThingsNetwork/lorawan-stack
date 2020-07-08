@@ -18,8 +18,6 @@ import (
 	"context"
 	"runtime/trace"
 
-	"github.com/go-redis/redis/v7"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -30,79 +28,22 @@ type GatewayConnectionStatsRegistry struct {
 	Redis *ttnredis.Client
 }
 
-const (
-	downKey   = "down"
-	upKey     = "up"
-	statusKey = "status"
-)
-
-var (
-	errNotFound     = errors.DefineNotFound("stats_not_found", "gateway stats not found")
-	errInvalidStats = errors.DefineCorruption("invalid_stats", "invalid `{type}` stats in store")
-)
-
-func (r *GatewayConnectionStatsRegistry) key(which string, uid string) string {
-	return r.Redis.Key(which, "uid", uid)
+func (r *GatewayConnectionStatsRegistry) key(uid string) string {
+	return r.Redis.Key("uid", uid)
 }
 
 // Set sets or clears the connection stats for a gateway.
-func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats, updateUp bool, updateDown bool, updateStatus bool) error {
+func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats) error {
 	uid := unique.ID(ctx, ids)
 
 	defer trace.StartRegion(ctx, "set gateway connection stats").End()
 
-	_, err := r.Redis.Pipelined(func(p redis.Pipeliner) error {
-		for _, part := range []struct {
-			key    string
-			update bool
-			fields func() *ttnpb.GatewayConnectionStats
-		}{
-			{
-				key:    r.key(upKey, uid),
-				update: updateUp,
-				fields: func() *ttnpb.GatewayConnectionStats {
-					return &ttnpb.GatewayConnectionStats{
-						LastUplinkReceivedAt: stats.LastUplinkReceivedAt,
-						UplinkCount:          stats.UplinkCount,
-					}
-				},
-			},
-			{
-				key:    r.key(downKey, uid),
-				update: updateDown,
-				fields: func() *ttnpb.GatewayConnectionStats {
-					return &ttnpb.GatewayConnectionStats{
-						LastDownlinkReceivedAt: stats.LastDownlinkReceivedAt,
-						DownlinkCount:          stats.DownlinkCount,
-						RoundTripTimes:         stats.RoundTripTimes,
-						SubBands:               stats.SubBands,
-					}
-				},
-			},
-			{
-				key:    r.key(statusKey, uid),
-				update: updateStatus,
-				fields: func() *ttnpb.GatewayConnectionStats {
-					return &ttnpb.GatewayConnectionStats{
-						ConnectedAt:          stats.ConnectedAt,
-						Protocol:             stats.Protocol,
-						LastStatus:           stats.LastStatus,
-						LastStatusReceivedAt: stats.LastStatusReceivedAt,
-					}
-				},
-			},
-		} {
-			if !part.update {
-				continue
-			}
-			if stats == nil {
-				p.Del(part.key)
-			} else {
-				ttnredis.SetProto(p, part.key, part.fields(), 0)
-			}
-		}
-		return nil
-	})
+	var err error
+	if stats == nil {
+		err = r.Redis.Del(r.key(uid)).Err()
+	} else {
+		_, err = ttnredis.SetProto(r.Redis, r.key(uid), stats, 0)
+	}
 
 	if err != nil {
 		return ttnredis.ConvertError(err)
@@ -114,47 +55,8 @@ func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.Gate
 func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*ttnpb.GatewayConnectionStats, error) {
 	uid := unique.ID(ctx, ids)
 	result := &ttnpb.GatewayConnectionStats{}
-	stats := &ttnpb.GatewayConnectionStats{}
-
-	retrieved, err := r.Redis.MGet(r.key(upKey, uid), r.key(downKey, uid), r.key(statusKey, uid)).Result()
-	if err != nil {
+	if err := ttnredis.GetProto(r.Redis, r.key(uid)).ScanProto(result); err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
-
-	if retrieved[0] == nil && retrieved[1] == nil && retrieved[2] == nil {
-		return nil, errNotFound
-	}
-
-	// Retrieve uplink stats.
-	if retrieved[0] != nil {
-		if err = ttnredis.UnmarshalProto(retrieved[0].(string), stats); err != nil {
-			return nil, errInvalidStats.WithAttributes("type", "uplink").WithCause(err)
-		}
-		result.LastUplinkReceivedAt = stats.LastUplinkReceivedAt
-		result.UplinkCount = stats.UplinkCount
-	}
-
-	// Retrieve downlink stats.
-	if retrieved[1] != nil {
-		if err = ttnredis.UnmarshalProto(retrieved[1].(string), stats); err != nil {
-			return nil, errInvalidStats.WithAttributes("type", "downlink").WithCause(err)
-		}
-		result.LastDownlinkReceivedAt = stats.LastDownlinkReceivedAt
-		result.DownlinkCount = stats.DownlinkCount
-		result.RoundTripTimes = stats.RoundTripTimes
-		result.SubBands = stats.SubBands
-	}
-
-	// Retrieve gateway status.
-	if retrieved[2] != nil {
-		if err = ttnredis.UnmarshalProto(retrieved[2].(string), stats); err != nil {
-			return nil, errInvalidStats.WithAttributes("type", "status").WithCause(err)
-		}
-		result.ConnectedAt = stats.ConnectedAt
-		result.Protocol = stats.Protocol
-		result.LastStatus = stats.LastStatus
-		result.LastStatusReceivedAt = stats.LastStatusReceivedAt
-	}
-
 	return result, nil
 }

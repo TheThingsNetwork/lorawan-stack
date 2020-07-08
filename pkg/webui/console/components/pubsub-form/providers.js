@@ -12,28 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { connect } from 'react-redux'
-
-import { getJoinEUIPrefixes } from '@console/store/actions/join-server'
-
-import {
-  selectJoinEUIPrefixes,
-  selectJoinEUIPrefixesError,
-  selectJoinEUIPrefixesFetching,
-} from '@console/store/selectors/join-server'
-
-const mapStateToProps = state => ({
-  fetching: selectJoinEUIPrefixesFetching(state),
-  error: selectJoinEUIPrefixesError(state),
-  prefixes: selectJoinEUIPrefixes(state),
+export default Object.freeze({
+  NATS: 'NATS',
+  MQTT: 'MQTT',
 })
-
-const mapDispatchToProps = dispatch => ({
-  getPrefixes: () => dispatch(getJoinEUIPrefixes()),
-})
-
-export default Component =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(Component)

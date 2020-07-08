@@ -45,30 +45,31 @@ const isAppKeyHidden = ({ root_keys }) =>
 const JoinServerForm = React.memo(props => {
   const { device, onSubmit, onSubmitSuccess, mayReadKeys, mayEditKeys } = props
 
-  // Fallback to 1.1.0 in case NS is not available and lorawan version is not
-  // set present.
+  // Fallback to 1.1.0 in case NS is not available and lorawan version is not set present.
   const isNewLorawanVersion = parseLorawanMacVersion(device.lorawan_version || '1.1.0') >= 110
-  const externalJs = hasExternalJs(device) && mayReadKeys
+  const externalJs = hasExternalJs(device)
 
   const formRef = React.useRef(null)
   const [error, setError] = React.useState('')
   const [resetsJoinNonces, setResetsJoinNonces] = React.useState(device.resets_join_nonces)
 
+  const validationContext = React.useMemo(
+    () => ({
+      lorawanVersion: device.lorawanVersion,
+      mayEditKeys,
+      mayReadKeys,
+      externalJs,
+    }),
+    [device.lorawanVersion, externalJs, mayEditKeys, mayReadKeys],
+  )
+
   // Setup and memoize initial form state.
-  const initialValues = React.useMemo(() => {
-    const values = {
-      ...device,
-      _external_js: hasExternalJs(device) && mayReadKeys,
-      _lorawan_version: device.lorawan_version,
-      _may_edit_keys: mayEditKeys,
-      _may_read_keys: mayReadKeys,
-    }
+  const initialValues = React.useMemo(
+    () => validationSchema.cast(device, { context: validationContext }),
+    [device, validationContext],
+  )
 
-    return validationSchema.cast(values)
-  }, [device, mayEditKeys, mayReadKeys])
-
-  // Setup and memoize callbacks for changes to `resets_join_nonces` for
-  // displaying the field warning.
+  // Setup and memoize callbacks for changes to `resets_join_nonces` for displaying the field warning.
   const handleResetsJoinNoncesChange = React.useCallback(
     evt => {
       setResetsJoinNonces(evt.target.checked)
@@ -78,13 +79,8 @@ const JoinServerForm = React.memo(props => {
 
   const onFormSubmit = React.useCallback(
     async (values, { setSubmitting, resetForm }) => {
-      const castedValues = validationSchema.cast(values)
-      const updatedValues = diff(initialValues, castedValues, [
-        '_external_js',
-        '_lorawan_version',
-        '_may_edit_keys',
-        '_may_read_keys',
-      ])
+      const castedValues = validationSchema.cast(values, { context: validationContext })
+      const updatedValues = diff(initialValues, castedValues)
 
       setError('')
       try {
@@ -96,7 +92,7 @@ const JoinServerForm = React.memo(props => {
         setError(err)
       }
     },
-    [initialValues, onSubmit, onSubmitSuccess],
+    [initialValues, onSubmit, onSubmitSuccess, validationContext],
   )
 
   const nwkKeyHidden = isNwkKeyHidden(device)
@@ -116,13 +112,14 @@ const JoinServerForm = React.memo(props => {
     nwkKeyPlaceholder = sharedMessages.unexposed
   }
 
-  // Notify the user that the root keys might be there, but since there are no
-  // rights to read the keys we cannot display them.
+  // Notify the user that the root keys might be there, but since there are no rights to read
+  // the keys we cannot display them.
   const showResetNotification = !mayReadKeys && mayEditKeys && !Boolean(device.root_keys)
 
   return (
     <Form
       validationSchema={validationSchema}
+      validationContext={validationContext}
       initialValues={initialValues}
       onSubmit={onFormSubmit}
       formikRef={formRef}

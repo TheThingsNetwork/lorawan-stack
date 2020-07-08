@@ -28,4 +28,8 @@ const mapDispatchToProps = {
   updateGateway: attachPromise(updateGateway),
 }
 
-export default Component => connect(mapStateToProps, mapDispatchToProps)(Component)
+export default Component =>
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+  )(Component)

@@ -12,6 +12,23 @@
 #    - <Alt term 1>
 #    - <Alt term 2>
 
+- term: Packet Forwarder
+  description: A Packet Forwarder is a program running on a Gateway that receives and transmits LoRa packets, and forwards these packets to and from a Network Server.
+
+- term: Semtech UDP Packet Forwarder
+  description: The Semtech UDP Packet Forwarder is the first packet forwarder, connecting to servers through the Semtech UDP protocol. Although this protocol has several drawbacks, many gateways include a pre-compiled version of the packet forwarder, which makes it easy to test a gateway with this protocol.
+  alt:
+    - UDP Packet Forwarder
+
+- term: LoRa Basics™ Station
+  description: "The LoRa Basics™ Station protocol simplifies management of large scale LoRaWAN networks. LoRa Basics™ Station is the preferred way of connecting Gateways to The Things Stack. Some of the advantages of LoRa Basics™ Station over the legacy UDP Packet Forwarder are: Centralized Update and Configuration Management, TLS and Token-based Authentication, Centralized Channel-Plan Management, and No Dependency on Local Time Keeping."
+  abbr:
+    - LBS
+  alt:
+    - Basic Station
+    - Station
+  link: https://lora-developers.semtech.com/resources/tools/basic-station/welcome-basic-station/
+
 - term: Activation Mode
   description: "**Over-the-Air Activation (OTAA)** is the preferred and most secure way to connect a device. Devices perform a join-procedure with the network, during which a dynamic Device Address is assigned and security keys are negotiated with the device. **Activation by Personalization (ABP)** requires hardcoding the Device Address as well as the security keys in the device. This strategy might seem simpler, because you skip the join procedure, but it has downsides related to security. ABP also has the downside that devices can not switch network providers without manually changing keys in the device. **Multicast** is a virtual group of ABP devices which allows all devices to receive the same downlinks. Multicast groups do not support uplinks."
 

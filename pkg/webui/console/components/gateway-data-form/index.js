@@ -63,8 +63,6 @@ const m = defineMessages({
     'Configure gateway delay (minimum: {minimumValue}ms, default: {defaultValue}ms)',
   miliseconds: 'miliseconds',
   seconds: 'seconds',
-  minutes: 'minutes',
-  hours: 'hours',
   delayWarning:
     'Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.',
 })
@@ -271,10 +269,10 @@ class GatewayDataForm extends React.Component {
             },
           }}
           units={[
-            { label: m.miliseconds, value: 'ms' },
-            { label: m.seconds, value: 's' },
-            { label: m.minutes, value: 'm' },
-            { label: m.hours, value: 'h' },
+            { label: sharedMessages.miliseconds, value: 'ms' },
+            { label: sharedMessages.seconds, value: 's' },
+            { label: sharedMessages.minutes, value: 'm' },
+            { label: sharedMessages.hours, value: 'h' },
           ]}
           onChange={this.onScheduleAnytimeDelayChange}
           decode={this.decodeDelayValue}

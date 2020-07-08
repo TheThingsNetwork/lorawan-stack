@@ -40,4 +40,8 @@ const mapDispatchToProps = dispatch => ({
   deleteOrganizationSuccess: () => dispatch(replace(`/organizations`)),
 })
 
-export default GeneralSettings => connect(mapStateToProps, mapDispatchToProps)(GeneralSettings)
+export default GeneralSettings =>
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+  )(GeneralSettings)
