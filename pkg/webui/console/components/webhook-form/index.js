@@ -173,7 +173,6 @@ export default class WebhookForm extends Component {
             autoFocus
             disabled={update}
           />
-          <WebhookFormatSelector horizontal name="format" required />
           <Form.Field
             name="headers"
             title={m.headers}
@@ -183,14 +182,6 @@ export default class WebhookForm extends Component {
             component={KeyValueMap}
           />
           <Form.Field
-            name="base_url"
-            title={sharedMessages.webhookBaseUrl}
-            placeholder="https://example.com/webhooks"
-            component={Input}
-            autoComplete="url"
-            required
-          />
-          <Form.Field
             name="downlink_api_key"
             title={m.downlinkAPIKey}
             component={Input}
@@ -198,6 +189,15 @@ export default class WebhookForm extends Component {
             code
           />
           <Message component="h4" content={sharedMessages.messageTypes} />
+          <WebhookFormatSelector horizontal name="format" required />
+          <Form.Field
+            name="base_url"
+            title={sharedMessages.webhookBaseUrl}
+            placeholder="https://example.com/webhooks"
+            component={Input}
+            autoComplete="url"
+            required
+          />
           <Notification info content={m.messageInfo} small />
           <Form.Field
             name="uplink_message"

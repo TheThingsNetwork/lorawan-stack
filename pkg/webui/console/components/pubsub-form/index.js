@@ -26,8 +26,6 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import Notification from '@ttn-lw/components/notification'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import PubsubFormatSelector from '@console/containers/pubsub-formats-select'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -38,9 +36,10 @@ import {
   mapPubsubToFormValues,
   mapFormValuesToPubsub,
   blankValues,
-  mapNatsServerUrlToFormValue,
+  mapNatsFormValues,
 } from './mapping'
 import { qosOptions } from './qos-options'
+import providers from './providers'
 import validationSchema from './validation-schema'
 
 const pathPlaceholder = 'sub-topic'
@@ -74,24 +73,23 @@ export default class PubsubForm extends Component {
 
     const { initialPubsubValue, update } = this.props
 
-    const initialIsMqtt = update && 'mqtt' in initialPubsubValue
-    const initialMqttSecure = initialIsMqtt ? initialPubsubValue.mqtt.use_tls : false
-    const initialUseCredentialsMqtt = initialIsMqtt
-      ? Boolean(initialPubsubValue.mqtt.username || initialPubsubValue.mqtt.password)
-      : true
-
-    const initialIsNats = update && 'nats' in initialPubsubValue
-    const { password, username } = initialIsNats
-      ? mapNatsServerUrlToFormValue(initialPubsubValue.nats.server_url)
-      : { password: undefined, username: undefined }
-    const initialUseCredentialsNats = initialIsNats ? Boolean(password || username) : true
-
     this.state = {
       error: '',
-      isMqtt: initialIsMqtt,
-      mqttSecure: initialMqttSecure,
-      mqttUseCredentials: initialUseCredentialsMqtt,
-      natsUseCredentials: initialUseCredentialsNats,
+      provider: blankValues._provider,
+      mqttUseCredentials: true,
+      natsUseCredentials: true,
+    }
+
+    if (update && 'nats' in initialPubsubValue) {
+      const { password, username } = mapNatsFormValues(initialPubsubValue.nats)
+      this.state.provider = providers.NATS
+      this.state.natsUseCredentials = Boolean(password || username)
+    } else if (update && 'mqtt' in initialPubsubValue) {
+      this.state.provider = providers.MQTT
+      this.state.mqttSecure = initialPubsubValue.mqtt.use_tls
+      this.state.mqttUseCredentials = Boolean(
+        initialPubsubValue.mqtt.username || initialPubsubValue.mqtt.password,
+      )
     }
   }
 
@@ -131,18 +129,13 @@ export default class PubsubForm extends Component {
   }
 
   @bind
-  handleNatsSelect() {
-    this.setState({ isMqtt: false })
+  handleProviderSelect(event) {
+    this.setState({ provider: event.target.value })
   }
 
   @bind
   handleUseCredentialsChangeNats(event) {
     this.setState({ natsUseCredentials: event.target.checked })
-  }
-
-  @bind
-  handleMqttSelect() {
-    this.setState({ isMqtt: true })
   }
 
   @bind
@@ -159,10 +152,10 @@ export default class PubsubForm extends Component {
     const { natsUseCredentials } = this.state
     return (
       <React.Fragment>
-        <Message component="h4" content={m.natsConfig} />
+        <Form.SubTitle title={m.natsConfig} />
         <Form.Field name="nats.secure" title={sharedMessages.secure} component={Checkbox} />
         <Form.Field
-          name="nats.use_credentials"
+          name="nats._use_credentials"
           title={m.useCredentials}
           component={Checkbox}
           onChange={this.handleUseCredentialsChangeNats}
@@ -208,7 +201,7 @@ export default class PubsubForm extends Component {
 
     return (
       <React.Fragment>
-        <Message component="h4" content={m.mqttConfig} />
+        <Form.SubTitle title={m.mqttConfig} />
         <Form.Field
           name="mqtt.use_tls"
           title={sharedMessages.secure}
@@ -261,7 +254,7 @@ export default class PubsubForm extends Component {
           required
         />
         <Form.Field
-          name="mqtt.use_credentials"
+          name="mqtt._use_credentials"
           title={m.useCredentials}
           component={Checkbox}
           onChange={this.handleUseCredentialsChangeMqtt}
@@ -299,32 +292,10 @@ export default class PubsubForm extends Component {
     )
   }
 
-  render() {
-    const { update, initialPubsubValue } = this.props
-    const { error, isMqtt } = this.state
-    let initialValues = blankValues
-    if (update && initialPubsubValue) {
-      initialValues = mapPubsubToFormValues(initialPubsubValue)
-    }
-
+  get messageTypesSection() {
     return (
-      <Form
-        onSubmit={this.handleSubmit}
-        validationSchema={validationSchema}
-        initialValues={initialValues}
-        error={error}
-        formikRef={this.form}
-      >
-        <Message component="h4" content={sharedMessages.generalInformation} />
-        <Form.Field
-          name="pub_sub_id"
-          title={sharedMessages.pubsubId}
-          placeholder={m.idPlaceholder}
-          component={Input}
-          required
-          autoFocus
-          disabled={update}
-        />
+      <React.Fragment>
+        <Form.SubTitle title={sharedMessages.messageTypes} />
         <PubsubFormatSelector horizontal name="format" required />
         <Form.Field
           name="base_topic"
@@ -333,12 +304,6 @@ export default class PubsubForm extends Component {
           component={Input}
           required
         />
-        <Form.Field title={sharedMessages.provider} name="_provider" component={Radio.Group}>
-          <Radio label="NATS" value="nats" onChange={this.handleNatsSelect} />
-          <Radio label="MQTT" value="mqtt" onChange={this.handleMqttSelect} />
-        </Form.Field>
-        {isMqtt ? this.mqttSection : this.natsSection}
-        <Message component="h4" content={sharedMessages.messageTypes} />
         <Notification content={m.messageInfo} info small />
         <Form.Field
           name="uplink_message"
@@ -410,6 +375,43 @@ export default class PubsubForm extends Component {
           placeholder={pathPlaceholder}
           component={Input.Toggled}
         />
+      </React.Fragment>
+    )
+  }
+
+  render() {
+    const { update, initialPubsubValue } = this.props
+    const { error, provider } = this.state
+    let initialValues = blankValues
+    if (update && initialPubsubValue) {
+      initialValues = mapPubsubToFormValues(initialPubsubValue)
+    }
+
+    return (
+      <Form
+        onSubmit={this.handleSubmit}
+        validationSchema={validationSchema}
+        initialValues={initialValues}
+        error={error}
+        formikRef={this.form}
+      >
+        <Form.SubTitle title={sharedMessages.generalInformation} />
+        <Form.Field
+          name="pub_sub_id"
+          title={sharedMessages.pubsubId}
+          placeholder={m.idPlaceholder}
+          component={Input}
+          required
+          autoFocus
+          disabled={update}
+        />
+        <Form.Field title={sharedMessages.provider} name="_provider" component={Radio.Group}>
+          <Radio label="NATS" value={providers.NATS} onChange={this.handleProviderSelect} />
+          <Radio label="MQTT" value={providers.MQTT} onChange={this.handleProviderSelect} />
+        </Form.Field>
+        {provider === providers.NATS && this.natsSection}
+        {provider === providers.MQTT && this.mqttSection}
+        {this.messageTypesSection}
         <SubmitBar>
           <Form.Submit
             component={SubmitButton}
