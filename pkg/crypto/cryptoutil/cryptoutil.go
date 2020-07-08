@@ -26,7 +26,7 @@ import (
 
 var (
 	errKEKNotFound         = errors.DefineNotFound("kek_not_found", "KEK with label `{label}` not found")
-	errKeyNotFound         = errors.DefineNotFound("key_not_found", "Key with ID `{id}` not found")
+	errKeyNotFound         = errors.DefineNotFound("key_not_found", "key with ID `{id}` not found")
 	errCertificateNotFound = errors.DefineNotFound("certificate_not_found", "certificate with ID `{id}` not found")
 )
 

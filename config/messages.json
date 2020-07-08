@@ -2782,7 +2782,7 @@
   },
   "error:pkg/crypto/cryptoutil:key_not_found": {
     "translations": {
-      "en": "Key with ID `{id}` not found"
+      "en": "key with ID `{id}` not found"
     },
     "description": {
       "package": "pkg/crypto/cryptoutil",
