@@ -10,11 +10,11 @@ This section contains the instructions for defining an uplink payload formatter 
 
 ## Defining an Uplink Payload Formatter
 
-To make the previously deployed Ubidots function be able to interpret the payload coming from {{% tts %}}, payload needs to be decoded and stored into `decoded_payload` object of the `uplink_message` object. This is achieved by using an uplink payload formatter.
+To allow our Ubidots function to interpret the payload coming from {{% tts %}}, the payload needs to be decoded. To do this, we use an uplink payload formatter which decodes the payload and stores the results in a `decoded_payload` field of the `uplink_message` object. 
 
-You can define an upload payload formatter per application or per device. 
+For more information on message payload formatters, see [Payload Formatters]({{< ref "/integrations/payload-formatters" >}}).
 
-In this guide, Javascript payload formatter type with the following parameter is being used:
+For this guide, we will use the following example JavaScript payload formatter, which converts a byte encoded temperature and humidity to human readable fields.
 
 ```
 function Decoder(bytes, fport) {
@@ -30,7 +30,7 @@ function Decoder(bytes, fport) {
 }
 ```
 
-but you need to adjust it according to the payload that your device is sending.
+You should adjust the decoded based on the payload that your device is sending.
 
 ## Creating a Webhook Integration
 
@@ -48,4 +48,4 @@ Check the uplink message type and select **Add Webhook** to finish creating an i
 
 Once you have created the integration, navigate to **Devices** tab in Ubidots dashboard and select **Devices**. 
 
-In the list of devices, you will be able to find your device, since it is being automatically added. Click on the device and you will see automatically added variables with their latest values.
+You should see your device listed, as it is automatically added when an uplink is received. Click the device to see variables and their latest values.

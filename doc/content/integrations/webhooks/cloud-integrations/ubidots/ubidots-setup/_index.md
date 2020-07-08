@@ -8,13 +8,13 @@ Create a function by following these instructions to prepare Ubidots setup for t
 
 <!--more-->
 
-Log in to your Ubidots account and find **Devices** tab in the upper part of your dashboard. In its drop-down list, choose **Functions**.
+Log in to your Ubidots account and find the **Devices** tab in the upper part of your dashboard. In its drop-down list, choose **Functions**.
 
-When redirected to **UbiFunctions** page, create a new function with **Create Function** button.
+When redirected to the **UbiFunctions** page, create a new function with the **Create Function** button.
 
-On the left, give a **Name** to your function, select **POST** method and choose **Python 3.6** for **Runtime**.
+On the left, give a **Name** to your function, select the **POST** method and choose **Python 3.6** for **Runtime**.
 
-In function window, paste this code:
+In this example, we will use the following Python function, which receives a JSON payload from {{% tts %}}, extracts the `decoded_payload`, and posts received data to Ubidots.
 
 ```
 import requests
@@ -90,10 +90,10 @@ Since this function needs your token to be entered on the sixth line, you can fi
 
 >Note: for the purpose of integrating only **Tokens** can be used, while **API Key** is used exclusively for deriving tokens.
 
-After modifying the function code with your token, click on **Make it live** button. 
+After modifying the function code with your token, click the **Make it live** button. 
 
-Once you do so, you can see that your function is assigned with an **HTTPS Endpoint URL**. Copy this URL in order to use it later as a part of setup on {{% tts %}}. 
+Your function will be assigned an **HTTPS Endpoint URL**. Copy this URL in order to use it later as a part of setup on {{% tts %}}. 
 
 {{< figure src="creating-function.png" alt="Creating a UbiFunction" >}}
 
-When the function is created, it is ready to process the incoming messages from {{% tts %}}.
+Your function is now ready to process the incoming messages from {{% tts %}}.
