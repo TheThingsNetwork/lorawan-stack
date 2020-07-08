@@ -173,6 +173,7 @@
   - [Message `GatewayModel`](#ttn.lorawan.v3.GatewayModel)
   - [Message `GatewayRadio`](#ttn.lorawan.v3.GatewayRadio)
   - [Message `GatewayRadio.TxConfiguration`](#ttn.lorawan.v3.GatewayRadio.TxConfiguration)
+  - [Message `GatewaySecretPlainText`](#ttn.lorawan.v3.GatewaySecretPlainText)
   - [Message `GatewayStatus`](#ttn.lorawan.v3.GatewayStatus)
   - [Message `GatewayStatus.MetricsEntry`](#ttn.lorawan.v3.GatewayStatus.MetricsEntry)
   - [Message `GatewayStatus.VersionsEntry`](#ttn.lorawan.v3.GatewayStatus.VersionsEntry)
@@ -186,7 +187,9 @@
   - [Message `ListGatewayAPIKeysRequest`](#ttn.lorawan.v3.ListGatewayAPIKeysRequest)
   - [Message `ListGatewayCollaboratorsRequest`](#ttn.lorawan.v3.ListGatewayCollaboratorsRequest)
   - [Message `ListGatewaysRequest`](#ttn.lorawan.v3.ListGatewaysRequest)
+  - [Message `RetrieveGatewaySecretRequest`](#ttn.lorawan.v3.RetrieveGatewaySecretRequest)
   - [Message `SetGatewayCollaboratorRequest`](#ttn.lorawan.v3.SetGatewayCollaboratorRequest)
+  - [Message `StoreGatewaySecretRequest`](#ttn.lorawan.v3.StoreGatewaySecretRequest)
   - [Message `UpdateGatewayAPIKeyRequest`](#ttn.lorawan.v3.UpdateGatewayAPIKeyRequest)
   - [Message `UpdateGatewayRequest`](#ttn.lorawan.v3.UpdateGatewayRequest)
 - [File `lorawan-stack/api/gateway_services.proto`](#lorawan-stack/api/gateway_services.proto)
@@ -2635,6 +2638,7 @@ Gateway is the message that defines a gateway on the network.
 | `downlink_path_constraint` | [`DownlinkPathConstraint`](#ttn.lorawan.v3.DownlinkPathConstraint) |  |  |
 | `schedule_anytime_delay` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite. |
 | `update_location_from_status` | [`bool`](#bool) |  | update the location of this gateway from status messages |
+| `secret` | [`bytes`](#bytes) |  | An encypted secret value for this gateway. When set, this is currently sent as the lnsKey parameter in the Basic Station CUPS response. This can also be extended to store other values such as client TLS private key. This value cannot be set/retrieved in Gateway API calls. Use the StoreGatewaySecret, RetrieveGatewaySecret requests. It can however be deleted by DeleteGateway since it's part of the entity. |
 
 #### Field Rules
 
@@ -2765,6 +2769,14 @@ Connection stats as monitored by the Gateway Server.
 | `min_frequency` | [`uint64`](#uint64) |  |  |
 | `max_frequency` | [`uint64`](#uint64) |  |  |
 | `notch_frequency` | [`uint64`](#uint64) |  |  |
+
+### <a name="ttn.lorawan.v3.GatewaySecretPlainText">Message `GatewaySecretPlainText`</a>
+
+The plain text value of the gateway secret.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `value` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.GatewayStatus">Message `GatewayStatus`</a>
 
@@ -2938,6 +2950,19 @@ where the user or organization is collaborator on.
 | `order` | <p>`string.in`: `[ gateway_id -gateway_id gateway_eui -gateway_eui name -name created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
+### <a name="ttn.lorawan.v3.RetrieveGatewaySecretRequest">Message `RetrieveGatewaySecretRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `plain_text` | [`GatewaySecretPlainText`](#ttn.lorawan.v3.GatewaySecretPlainText) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.SetGatewayCollaboratorRequest">Message `SetGatewayCollaboratorRequest`</a>
 
 | Field | Type | Label | Description |
@@ -2951,6 +2976,19 @@ where the user or organization is collaborator on.
 | ----- | ----------- |
 | `gateway_ids` | <p>`message.required`: `true`</p> |
 | `collaborator` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.StoreGatewaySecretRequest">Message `StoreGatewaySecretRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `plain_text` | [`GatewaySecretPlainText`](#ttn.lorawan.v3.GatewaySecretPlainText) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.UpdateGatewayAPIKeyRequest">Message `UpdateGatewayAPIKeyRequest`</a>
 
@@ -3032,6 +3070,8 @@ where the user or organization is collaborator on.
 | `List` | [`ListGatewaysRequest`](#ttn.lorawan.v3.ListGatewaysRequest) | [`Gateways`](#ttn.lorawan.v3.Gateways) | List gateways. See request message for details. |
 | `Update` | [`UpdateGatewayRequest`](#ttn.lorawan.v3.UpdateGatewayRequest) | [`Gateway`](#ttn.lorawan.v3.Gateway) |  |
 | `Delete` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+| `StoreGatewaySecret` | [`StoreGatewaySecretRequest`](#ttn.lorawan.v3.StoreGatewaySecretRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | SetGatewayLBSSecret is used to encrypt a plaintext value and store it along with the gateway. Requires the RIGHT_GATEWAY_WRITE_SECRET right. |
+| `RetrieveGatewaySecret` | [`RetrieveGatewaySecretRequest`](#ttn.lorawan.v3.RetrieveGatewaySecretRequest) | [`GatewaySecretPlainText`](#ttn.lorawan.v3.GatewaySecretPlainText) | RetrieveGatewaySecret is used to retrieve and decrypt the secret value. Requires the RIGHT_GATEWAY_READ_SECRET right. |
 
 #### HTTP bindings
 
@@ -3045,6 +3085,8 @@ where the user or organization is collaborator on.
 | `List` | `GET` | `/api/v3/organizations/{collaborator.organization_ids.organization_id}/gateways` |  |
 | `Update` | `PUT` | `/api/v3/gateways/{gateway.ids.gateway_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/gateways/{gateway_id}` |  |
+| `StoreGatewaySecret` | `PATCH` | `/api/v3/gateways/{gateway_ids.gateway_id}/secret` | `*` |
+| `RetrieveGatewaySecret` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/secret` |  |
 
 ## <a name="lorawan-stack/api/gatewayserver.proto">File `lorawan-stack/api/gatewayserver.proto`</a>
 
@@ -5884,6 +5926,8 @@ Right is the enum that defines all the different rights to do something in the n
 | `RIGHT_GATEWAY_LINK` | 37 | The right to link as Gateway to a Gateway Server for traffic exchange, i.e. write uplink and read downlink (API keys only) This right is typically only given to a gateway. This right implies RIGHT_GATEWAY_INFO. |
 | `RIGHT_GATEWAY_STATUS_READ` | 38 | The right to view gateway status. |
 | `RIGHT_GATEWAY_LOCATION_READ` | 39 | The right to view view gateway location. |
+| `RIGHT_GATEWAY_WRITE_SECRET` | 57 | The right to encrypt and store the a secret value associated with this gateway. |
+| `RIGHT_GATEWAY_READ_SECRET` | 58 | The right to decrypt and retrieve the LBS secret value. |
 | `RIGHT_GATEWAY_ALL` | 40 | The pseudo-right for all (current and future) gateway rights. |
 | `RIGHT_ORGANIZATION_INFO` | 41 | The right to view organization information. |
 | `RIGHT_ORGANIZATION_SETTINGS_BASIC` | 42 | The right to edit basic organization settings. |

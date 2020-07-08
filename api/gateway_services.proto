@@ -76,6 +76,23 @@ service GatewayRegistry {
       delete: "/gateways/{gateway_id}"
     };
   };
+
+  // SetGatewayLBSSecret is used to encrypt a plaintext value and store it along with the gateway.
+  // Requires the RIGHT_GATEWAY_WRITE_SECRET right.
+  rpc StoreGatewaySecret(StoreGatewaySecretRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      patch: "/gateways/{gateway_ids.gateway_id}/secret"
+      body: "*"
+    };
+  };
+
+  // RetrieveGatewaySecret is used to retrieve and decrypt the secret value.
+  // Requires the RIGHT_GATEWAY_READ_SECRET right.
+  rpc RetrieveGatewaySecret(RetrieveGatewaySecretRequest) returns (GatewaySecretPlainText) {
+    option (google.api.http) = {
+      get: "/gateways/{gateway_ids.gateway_id}/secret"
+    };
+  };
 }
 
 service GatewayAccess {

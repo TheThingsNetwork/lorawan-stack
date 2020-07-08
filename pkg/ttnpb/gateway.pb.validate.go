@@ -783,6 +783,8 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "update_location_from_status":
 			// no validation rules for UpdateLocationFromStatus
+		case "secret":
+			// no validation rules for Secret
 		default:
 			return GatewayValidationError{
 				field:  name,
@@ -2687,6 +2689,301 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GatewayConnectionStatsValidationError{}
+
+// ValidateFields checks the field values on GatewaySecretPlainText with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GatewaySecretPlainText) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GatewaySecretPlainTextFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+			// no validation rules for Value
+		default:
+			return GatewaySecretPlainTextValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GatewaySecretPlainTextValidationError is the validation error returned by
+// GatewaySecretPlainText.ValidateFields if the designated constraints aren't met.
+type GatewaySecretPlainTextValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GatewaySecretPlainTextValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GatewaySecretPlainTextValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GatewaySecretPlainTextValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GatewaySecretPlainTextValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GatewaySecretPlainTextValidationError) ErrorName() string {
+	return "GatewaySecretPlainTextValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GatewaySecretPlainTextValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGatewaySecretPlainText.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GatewaySecretPlainTextValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GatewaySecretPlainTextValidationError{}
+
+// ValidateFields checks the field values on StoreGatewaySecretRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *StoreGatewaySecretRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = StoreGatewaySecretRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway_ids":
+
+			if v, ok := interface{}(&m.GatewayIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return StoreGatewaySecretRequestValidationError{
+						field:  "gateway_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "plain_text":
+
+			if v, ok := interface{}(&m.PlainText).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return StoreGatewaySecretRequestValidationError{
+						field:  "plain_text",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return StoreGatewaySecretRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// StoreGatewaySecretRequestValidationError is the validation error returned by
+// StoreGatewaySecretRequest.ValidateFields if the designated constraints
+// aren't met.
+type StoreGatewaySecretRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StoreGatewaySecretRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StoreGatewaySecretRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StoreGatewaySecretRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StoreGatewaySecretRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StoreGatewaySecretRequestValidationError) ErrorName() string {
+	return "StoreGatewaySecretRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StoreGatewaySecretRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStoreGatewaySecretRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StoreGatewaySecretRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StoreGatewaySecretRequestValidationError{}
+
+// ValidateFields checks the field values on RetrieveGatewaySecretRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *RetrieveGatewaySecretRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = RetrieveGatewaySecretRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway_ids":
+
+			if v, ok := interface{}(&m.GatewayIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return RetrieveGatewaySecretRequestValidationError{
+						field:  "gateway_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "plain_text":
+
+			if v, ok := interface{}(m.GetPlainText()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return RetrieveGatewaySecretRequestValidationError{
+						field:  "plain_text",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return RetrieveGatewaySecretRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// RetrieveGatewaySecretRequestValidationError is the validation error returned
+// by RetrieveGatewaySecretRequest.ValidateFields if the designated
+// constraints aren't met.
+type RetrieveGatewaySecretRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RetrieveGatewaySecretRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RetrieveGatewaySecretRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RetrieveGatewaySecretRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RetrieveGatewaySecretRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RetrieveGatewaySecretRequestValidationError) ErrorName() string {
+	return "RetrieveGatewaySecretRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RetrieveGatewaySecretRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRetrieveGatewaySecretRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RetrieveGatewaySecretRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RetrieveGatewaySecretRequestValidationError{}
 
 // ValidateFields checks the field values on GatewayRadio_TxConfiguration with
 // the rules defined in the proto definition for this message. If any rules

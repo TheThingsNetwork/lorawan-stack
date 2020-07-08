@@ -127,8 +127,13 @@ message Gateway {
   google.protobuf.Duration schedule_anytime_delay = 19 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
   // update the location of this gateway from status messages
   bool update_location_from_status = 21;
+  // An encypted secret value for this gateway.
+  // When set, this is currently sent as the lnsKey parameter in the Basic Station CUPS response. This can also be extended to store other values such as client TLS private key.
+  // This value cannot be set/retrieved in Gateway API calls. Use the StoreGatewaySecret, RetrieveGatewaySecret requests.
+  // It can however be deleted by DeleteGateway since it's part of the entity.
+  bytes secret = 22;
 
-  // next: 22
+  // next: 23
 }
 
 message Gateways {
@@ -284,4 +289,19 @@ message GatewayConnectionStats {
   }
   // Statistics for each sub band.
   repeated SubBand sub_bands = 10;
+}
+
+// The plain text value of the gateway secret.
+message GatewaySecretPlainText{
+  string value = 1;
+}
+
+message StoreGatewaySecretRequest{
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewaySecretPlainText plain_text = 2  [(gogoproto.nullable) = false];
+}
+
+message RetrieveGatewaySecretRequest{
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewaySecretPlainText plain_text = 2;
 }

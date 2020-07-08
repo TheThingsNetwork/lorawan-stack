@@ -10613,6 +10613,16 @@
               "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "secret",
+              "description": "An encypted secret value for this gateway.\nWhen set, this is currently sent as the lnsKey parameter in the Basic Station CUPS response. This can also be extended to store other values such as client TLS private key.\nThis value cannot be set/retrieved in Gateway API calls. Use the StoreGatewaySecret, RetrieveGatewaySecret requests.\nIt can however be deleted by DeleteGateway since it's part of the entity.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -11189,6 +11199,27 @@
               "type": "uint64",
               "longType": "uint64",
               "fullType": "uint64",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GatewaySecretPlainText",
+          "longName": "GatewaySecretPlainText",
+          "fullName": "ttn.lorawan.v3.GatewaySecretPlainText",
+          "description": "The plain text value of the gateway secret.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "defaultValue": ""
             }
@@ -11872,6 +11903,45 @@
           ]
         },
         {
+          "name": "RetrieveGatewaySecretRequest",
+          "longName": "RetrieveGatewaySecretRequest",
+          "fullName": "ttn.lorawan.v3.RetrieveGatewaySecretRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "plain_text",
+              "description": "",
+              "label": "",
+              "type": "GatewaySecretPlainText",
+              "longType": "GatewaySecretPlainText",
+              "fullType": "ttn.lorawan.v3.GatewaySecretPlainText",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "SetGatewayCollaboratorRequest",
           "longName": "SetGatewayCollaboratorRequest",
           "fullName": "ttn.lorawan.v3.SetGatewayCollaboratorRequest",
@@ -11915,6 +11985,45 @@
                   }
                 ]
               }
+            }
+          ]
+        },
+        {
+          "name": "StoreGatewaySecretRequest",
+          "longName": "StoreGatewaySecretRequest",
+          "fullName": "ttn.lorawan.v3.StoreGatewaySecretRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "plain_text",
+              "description": "",
+              "label": "",
+              "type": "GatewaySecretPlainText",
+              "longType": "GatewaySecretPlainText",
+              "fullType": "ttn.lorawan.v3.GatewaySecretPlainText",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -12404,6 +12513,51 @@
                     {
                       "method": "DELETE",
                       "pattern": "/gateways/{gateway_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "StoreGatewaySecret",
+              "description": "SetGatewayLBSSecret is used to encrypt a plaintext value and store it along with the gateway.\nRequires the RIGHT_GATEWAY_WRITE_SECRET right.",
+              "requestType": "StoreGatewaySecretRequest",
+              "requestLongType": "StoreGatewaySecretRequest",
+              "requestFullType": "ttn.lorawan.v3.StoreGatewaySecretRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PATCH",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/secret",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "RetrieveGatewaySecret",
+              "description": "RetrieveGatewaySecret is used to retrieve and decrypt the secret value.\nRequires the RIGHT_GATEWAY_READ_SECRET right.",
+              "requestType": "RetrieveGatewaySecretRequest",
+              "requestLongType": "RetrieveGatewaySecretRequest",
+              "requestFullType": "ttn.lorawan.v3.RetrieveGatewaySecretRequest",
+              "requestStreaming": false,
+              "responseType": "GatewaySecretPlainText",
+              "responseLongType": "GatewaySecretPlainText",
+              "responseFullType": "ttn.lorawan.v3.GatewaySecretPlainText",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/secret"
                     }
                   ]
                 }
@@ -24048,6 +24202,16 @@
               "name": "RIGHT_GATEWAY_LOCATION_READ",
               "number": "39",
               "description": "The right to view view gateway location."
+            },
+            {
+              "name": "RIGHT_GATEWAY_WRITE_SECRET",
+              "number": "57",
+              "description": "The right to encrypt and store the a secret value associated with this gateway."
+            },
+            {
+              "name": "RIGHT_GATEWAY_READ_SECRET",
+              "number": "58",
+              "description": "The right to decrypt and retrieve the LBS secret value."
             },
             {
               "name": "RIGHT_GATEWAY_ALL",

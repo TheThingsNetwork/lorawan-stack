@@ -509,6 +509,15 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 				var zero bool
 				dst.UpdateLocationFromStatus = zero
 			}
+		case "secret":
+			if len(subs) > 0 {
+				return fmt.Errorf("'secret' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Secret = src.Secret
+			} else {
+				dst.Secret = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -1336,6 +1345,128 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 				dst.SubBands = src.SubBands
 			} else {
 				dst.SubBands = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GatewaySecretPlainText) SetFields(src *GatewaySecretPlainText, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				var zero string
+				dst.Value = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *StoreGatewaySecretRequest) SetFields(src *StoreGatewaySecretRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *GatewayIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayIdentifiers
+				}
+				newDst = &dst.GatewayIdentifiers
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIdentifiers = src.GatewayIdentifiers
+				} else {
+					var zero GatewayIdentifiers
+					dst.GatewayIdentifiers = zero
+				}
+			}
+		case "plain_text":
+			if len(subs) > 0 {
+				var newDst, newSrc *GatewaySecretPlainText
+				if src != nil {
+					newSrc = &src.PlainText
+				}
+				newDst = &dst.PlainText
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.PlainText = src.PlainText
+				} else {
+					var zero GatewaySecretPlainText
+					dst.PlainText = zero
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *RetrieveGatewaySecretRequest) SetFields(src *RetrieveGatewaySecretRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *GatewayIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayIdentifiers
+				}
+				newDst = &dst.GatewayIdentifiers
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIdentifiers = src.GatewayIdentifiers
+				} else {
+					var zero GatewayIdentifiers
+					dst.GatewayIdentifiers = zero
+				}
+			}
+		case "plain_text":
+			if len(subs) > 0 {
+				var newDst, newSrc *GatewaySecretPlainText
+				if (src == nil || src.PlainText == nil) && dst.PlainText == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.PlainText
+				}
+				if dst.PlainText != nil {
+					newDst = dst.PlainText
+				} else {
+					newDst = &GatewaySecretPlainText{}
+					dst.PlainText = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.PlainText = src.PlainText
+				} else {
+					dst.PlainText = nil
+				}
 			}
 
 		default:
