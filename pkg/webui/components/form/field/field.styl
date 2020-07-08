@@ -42,21 +42,20 @@
   .label
     font-weight: 600
 
+    &::after
+      display: none
+
+  &.required
+    .label::after
+      content: '·'
+      display: inline
+      margin-left: $cs.xxs
+      color: $c-active-blue
+      font-weight: 800
+
   &.horizontal
-    .title
+    .title, .info-area, .label::after
       padding-top: $cs.xxs
-
-    .info-area
-      padding-top: $cs.xxs
-
-.reqicon
-  display: none
-  margin-left: $cs.xxs
-  color: $c-active-blue
-  font-weight: 800
-
-  .required &
-    display: inline
 
 .label
   display: block

@@ -17,7 +17,7 @@ import { defineMessages } from 'react-intl'
 export default defineMessages({
   idPlaceholder: 'my-new-pubsub',
   messageInfo: 'For each enabled message type, an optional sub-topic can be defined',
-  deletePubsub: 'Delete Pubsub',
+  deletePubsub: 'Delete Pub/Sub',
   modalWarning:
     'Are you sure you want to delete Pub/Sub "{pubsubId}"? Deleting a Pub/Sub cannot be undone.',
   headers: 'Headers',

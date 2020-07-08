@@ -497,6 +497,11 @@ var (
 					device.DevEUI = devID.DevEUI
 				}
 			}
+			newPaths, err := parsePayloadFormatterParameterFlags("formatters", device.Formatters, cmd.Flags())
+			if err != nil {
+				return err
+			}
+			paths = append(paths, newPaths...)
 
 			if device.ApplicationID == "" {
 				return errNoApplicationID
@@ -582,6 +587,11 @@ var (
 			if err = util.SetFields(&device, setEndDeviceFlags); err != nil {
 				return err
 			}
+			newPaths, err := parsePayloadFormatterParameterFlags("formatters", device.Formatters, cmd.Flags())
+			if err != nil {
+				return err
+			}
+			paths = append(paths, newPaths...)
 			device.Attributes = mergeAttributes(device.Attributes, cmd.Flags())
 			device.EndDeviceIdentifiers = *devID
 
@@ -1160,6 +1170,7 @@ func init() {
 	endDevicesCreateCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesCreateCommand.Flags().AddFlagSet(setEndDeviceFlags)
 	endDevicesCreateCommand.Flags().AddFlagSet(attributesFlags())
+	endDevicesCreateCommand.Flags().AddFlagSet(payloadFormatterParameterFlags("formatters"))
 	endDevicesCreateCommand.Flags().Bool("defaults", true, "configure end device with defaults")
 	endDevicesCreateCommand.Flags().Bool("with-root-keys", false, "generate OTAA root keys")
 	endDevicesCreateCommand.Flags().Bool("abp", false, "configure end device as ABP")
@@ -1171,6 +1182,7 @@ func init() {
 	endDevicesUpdateCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesUpdateCommand.Flags().AddFlagSet(setEndDeviceFlags)
 	endDevicesUpdateCommand.Flags().AddFlagSet(attributesFlags())
+	endDevicesUpdateCommand.Flags().AddFlagSet(payloadFormatterParameterFlags("formatters"))
 	endDevicesUpdateCommand.Flags().Bool("touch", false, "set in all registries even if no fields are specified")
 	endDevicesUpdateCommand.Flags().AddFlagSet(endDevicePictureFlags)
 	endDevicesUpdateCommand.Flags().AddFlagSet(endDeviceLocationFlags)

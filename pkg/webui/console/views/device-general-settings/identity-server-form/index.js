@@ -23,10 +23,10 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 
+import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
 
 import { mapFormValueToAttributes, mapAttributesToFormValue } from '@console/lib/attributes'
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
@@ -49,43 +49,68 @@ const IdentityServerForm = React.memo(props => {
     onDelete,
     onDeleteSuccess,
     onDeleteFailure,
-    mayReadKeys,
+    jsConfig,
+    nsConfig,
+    asConfig,
   } = props
   const { name, ids } = device
 
   const formRef = React.useRef(null)
+  // Store default join server address that is used to fill the `join_server_address` field when
+  // `_external_js` checkbox is unchecked.
+  const jsAddressRef = React.useRef(
+    device.join_server_address
+      ? device.join_server_address
+      : jsConfig.enabled
+      ? getHostnameFromUrl(jsConfig.base_url)
+      : '',
+  )
+
   const [error, setError] = React.useState('')
-  const [externalJs, setExternaljs] = React.useState(hasExternalJs(device) && mayReadKeys)
+  const [externalJs, setExternaljs] = React.useState(hasExternalJs(device))
+
+  const validationContext = React.useMemo(
+    () => ({
+      lorawanVersion: device.lorawan_version,
+      supportsJoin: device.supports_join,
+    }),
+    [device.lorawan_version, device.supports_join],
+  )
 
   const initialValues = React.useMemo(() => {
     const initialValues = {
       ...device,
-      _external_js: hasExternalJs(device) && mayReadKeys,
-      _lorawan_version: device.lorawan_version,
-      _supports_join: device.supports_join,
+      _external_js: hasExternalJs(device),
       attributes: mapAttributesToFormValue(device.attributes),
     }
 
-    return validationSchema.cast(initialValues)
-  }, [device, mayReadKeys])
+    return validationSchema.cast(initialValues, { context: validationContext })
+  }, [device, validationContext])
 
-  const handleExternalJsChange = React.useCallback(evt => {
-    const { checked: externalJsChecked } = evt.target
-    const { setValues, values } = formRef.current
+  const handleExternalJsChange = React.useCallback(
+    evt => {
+      const { checked: externalJsChecked } = evt.target
+      const { setValues, values } = formRef.current
 
-    setExternaljs(externalJsChecked)
-
-    setValues(validationSchema.cast({ ...values, _external_js: externalJsChecked }))
-  }, [])
+      setExternaljs(externalJsChecked)
+      setValues(
+        validationSchema.cast(
+          {
+            ...values,
+            _external_js: externalJsChecked,
+            join_server_address: externalJsChecked ? undefined : jsAddressRef.current,
+          },
+          { context: validationContext },
+        ),
+      )
+    },
+    [validationContext],
+  )
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
-      const castedValues = validationSchema.cast(values)
-      const updatedValues = diff(initialValues, castedValues, [
-        '_external_js',
-        '_lorawan_version',
-        '_supports_join',
-      ])
+      const castedValues = validationSchema.cast(values, { context: validationContext })
+      const updatedValues = diff(initialValues, castedValues, ['_external_js'])
 
       const update =
         'attributes' in updatedValues
@@ -102,7 +127,7 @@ const IdentityServerForm = React.memo(props => {
         setError(err)
       }
     },
-    [initialValues, onSubmit, onSubmitSuccess],
+    [initialValues, onSubmit, onSubmitSuccess, validationContext],
   )
 
   const onDeviceDelete = React.useCallback(async () => {
@@ -114,9 +139,9 @@ const IdentityServerForm = React.memo(props => {
     }
   }, [onDelete, onDeleteFailure, onDeleteSuccess])
 
-  const { enabled: jsEnabled } = selectJsConfig()
-  const { enabled: asEnabled } = selectAsConfig()
-  const { enabled: nsEnabled } = selectNsConfig()
+  const { enabled: jsEnabled } = jsConfig
+  const { enabled: asEnabled } = asConfig
+  const { enabled: nsEnabled } = nsConfig
 
   const lorawanVersion = parseLorawanMacVersion(device.lorawan_version)
   const isOTAA = isDeviceOTAA(device)
@@ -148,6 +173,7 @@ const IdentityServerForm = React.memo(props => {
   return (
     <Form
       validationSchema={validationSchema}
+      validationContext={validationContext}
       initialValues={initialValues}
       onSubmit={onFormSubmit}
       error={error}
@@ -263,8 +289,10 @@ const IdentityServerForm = React.memo(props => {
 })
 
 IdentityServerForm.propTypes = {
+  asConfig: PropTypes.stackComponent.isRequired,
   device: PropTypes.device.isRequired,
-  mayReadKeys: PropTypes.bool.isRequired,
+  jsConfig: PropTypes.stackComponent.isRequired,
+  nsConfig: PropTypes.stackComponent.isRequired,
   onDelete: PropTypes.func.isRequired,
   onDeleteFailure: PropTypes.func.isRequired,
   onDeleteSuccess: PropTypes.func.isRequired,

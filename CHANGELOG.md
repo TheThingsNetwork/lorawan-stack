@@ -18,10 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Application package application-wide associations support.
 - LoRaCloud DAS application package server URL overrides support.
 - Key vault caching mechanism (see `--key-vault.cache.size` and `--key-vault.cache.ttl` options).
+- Payload formatter documentation.
+- CLI support for setting message payload formatters from a local file. (see `--formatters.down-formatter-parameter-local-file` and `--formatters.up-formatter-parameter-local-file` options).
 
 ### Changed
 
 - Remove version from hosted documentation paths.
+- Gateway connection stats are now stored in a single key.
 
 ### Deprecated
 

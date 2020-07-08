@@ -20,19 +20,15 @@ import { parseLorawanMacVersion, ACTIVATION_MODES } from '@console/lib/device-ut
 
 const validationSchema = Yup.object()
   .shape({
-    _external_js: Yup.boolean(),
     _activation_mode: Yup.mixed()
       .oneOf([ACTIVATION_MODES.ABP, ACTIVATION_MODES.OTAA, ACTIVATION_MODES.MULTICAST])
       .required(sharedMessages.validateRequired),
-    _may_edit_keys: Yup.boolean().default(false),
-    _may_read_keys: Yup.boolean().default(false),
-    _joined: Yup.boolean().default(false),
     lorawan_version: Yup.string().required(sharedMessages.validateRequired),
     lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
     frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
     supports_class_c: Yup.boolean().default(false),
     session: Yup.object().when(
-      ['_activation_mode', 'lorawan_version', '_joined', '_may_edit_keys', '_may_read_keys'],
+      ['_activation_mode', 'lorawan_version', '$isJoined', '$mayEditKeys', '$mayReadKeys'],
       (mode, version, isJoined, mayEditKeys, mayReadKeys, schema) => {
         if (mode === ACTIVATION_MODES.ABP || mode === ACTIVATION_MODES.MULTICAST || isJoined) {
           const isNewVersion = parseLorawanMacVersion(version) >= 110

@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { omit } from 'lodash'
+import { merge } from 'lodash'
 
 import { natsUrl as natsUrlRegexp } from '@console/lib/regexp'
+
+import providers from './providers'
 
 const natsBlankValues = {
   username: '',
@@ -22,7 +24,7 @@ const natsBlankValues = {
   address: '',
   port: '',
   secure: false,
-  use_credentials: true,
+  _use_credentials: true,
 }
 
 const mqttBlankValues = {
@@ -36,27 +38,27 @@ const mqttBlankValues = {
   tls_ca: '',
   tls_client_cert: '',
   tls_client_key: '',
-  use_credentials: true,
+  _use_credentials: true,
 }
 
-const omitCredentials = function(result) {
-  return omit(result, 'mqtt.use_credentials')
-}
-
-export const mapNatsServerUrlToFormValue = function(server_url) {
+export const mapNatsFormValues = function(nats) {
   try {
-    const res = server_url.match(natsUrlRegexp)
+    const res = nats.server_url.match(natsUrlRegexp)
     return {
       secure: res[2] === 'tls',
       username: res[5],
       password: res[7],
       address: res[8],
       port: res[10],
-      use_credentials: Boolean(res[5] || res[7]),
+      _use_credentials: Boolean(res[5] || res[7]),
     }
   } catch {
     return {}
   }
+}
+
+export const mapMqttFormValues = function(mqtt) {
+  return merge({ _use_credentials: Boolean(mqtt.username || mqtt.password) }, mqtt, mqttBlankValues)
 }
 
 const mapPubsubMessageTypeToFormValue = messageType =>
@@ -65,13 +67,19 @@ const mapPubsubMessageTypeToFormValue = messageType =>
 export const mapPubsubToFormValues = function(pubsub) {
   const isNats = 'nats' in pubsub
   const isMqtt = 'mqtt' in pubsub
+  let provider = blankValues._provider
+  if (isNats) {
+    provider = providers.NATS
+  } else if (isMqtt) {
+    provider = providers.MQTT
+  }
   const result = {
     pub_sub_id: pubsub.ids.pub_sub_id,
     base_topic: pubsub.base_topic,
     format: pubsub.format,
-    _provider: isMqtt ? 'mqtt' : 'nats',
-    nats: isNats ? mapNatsServerUrlToFormValue(pubsub.nats.server_url) : natsBlankValues,
-    mqtt: isMqtt ? pubsub.mqtt : mqttBlankValues,
+    _provider: provider,
+    nats: isNats ? mapNatsFormValues(pubsub.nats) : natsBlankValues,
+    mqtt: isMqtt ? mapMqttFormValues(pubsub.mqtt) : mqttBlankValues,
     downlink_ack: mapPubsubMessageTypeToFormValue(pubsub.downlink_ack),
     downlink_failed: mapPubsubMessageTypeToFormValue(pubsub.downlink_failed),
     downlink_nack: mapPubsubMessageTypeToFormValue(pubsub.downlink_nack),
@@ -84,25 +92,6 @@ export const mapPubsubToFormValues = function(pubsub) {
     uplink_message: mapPubsubMessageTypeToFormValue(pubsub.uplink_message),
   }
 
-  if (!result.mqtt.tls_ca) {
-    result.mqtt.tls_ca = ''
-  }
-  if (!result.mqtt.tls_client_cert) {
-    result.mqtt.tls_client_cert = ''
-  }
-  if (!result.mqtt.tls_client_key) {
-    result.mqtt.tls_client_key = ''
-  }
-  if (!result.mqtt.username) {
-    result.mqtt.username = ''
-  }
-  if (!result.mqtt.password) {
-    result.mqtt.password = ''
-  }
-  if (isMqtt) {
-    result.mqtt.use_credentials = Boolean(result.mqtt.username || result.mqtt.password)
-  }
-
   return result
 }
 
@@ -112,10 +101,10 @@ const mapNatsConfigFormValueToNatsServerUrl = function({
   address,
   port,
   secure,
-  use_credentials,
+  _use_credentials,
 }) {
   return `${secure ? 'tls' : 'nats'}://${
-    use_credentials ? `${username}:${password}@` : ''
+    _use_credentials ? `${username}:${password}@` : ''
   }${address}:${port}`
 }
 
@@ -144,15 +133,17 @@ export const mapFormValuesToPubsub = function(values, appId) {
     uplink_message: mapMessageTypeFormValueToPubsubMessageType(values.uplink_message),
   }
 
-  if (values._provider === 'nats') {
-    result.nats = {
-      server_url: mapNatsConfigFormValueToNatsServerUrl(values.nats),
-    }
-  } else if (values._provider === 'mqtt') {
-    result.mqtt = values.mqtt
-    return omitCredentials(result)
+  switch (values._provider) {
+    case providers.NATS:
+      result.nats = {
+        server_url: mapNatsConfigFormValueToNatsServerUrl(values.nats),
+      }
+      break
+    case providers.MQTT:
+      result.mqtt = values.mqtt
+      delete result.mqtt._use_credentials
+      break
   }
-
   return result
 }
 
@@ -160,7 +151,7 @@ export const blankValues = {
   pub_sub_id: '',
   base_topic: '',
   format: '',
-  _provider: 'nats',
+  _provider: providers.NATS,
   nats: natsBlankValues,
   mqtt: mqttBlankValues,
   downlink_ack: { enabled: false, value: '' },

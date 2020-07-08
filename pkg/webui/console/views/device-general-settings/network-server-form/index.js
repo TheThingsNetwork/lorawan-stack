@@ -66,6 +66,16 @@ const NetworkServerForm = React.memo(props => {
     parseLorawanMacVersion(device.lorawan_version),
   )
 
+  const validationContext = React.useMemo(
+    () => ({
+      mayEditKeys,
+      mayReadKeys,
+      isJoined: isDeviceOTAA(device) && isDeviceJoined(device),
+      externalJs: hasExternalJs(device),
+    }),
+    [device, mayEditKeys, mayReadKeys],
+  )
+
   const initialValues = React.useMemo(() => {
     const { multicast = false, supports_join = false } = device
 
@@ -79,25 +89,15 @@ const NetworkServerForm = React.memo(props => {
     const values = {
       ...device,
       _activation_mode,
-      _external_js: hasExternalJs(device) && mayReadKeys,
-      _joined: isDeviceOTAA(device) && isDeviceJoined(device),
-      _may_edit_keys: mayEditKeys,
-      _may_read_keys: mayReadKeys,
     }
 
-    return validationSchema.cast(values)
-  }, [device, mayEditKeys, mayReadKeys])
+    return validationSchema.cast(values, { context: validationContext })
+  }, [device, validationContext])
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
-      const castedValues = validationSchema.cast(values)
-      const updatedValues = diff(initialValues, castedValues, [
-        '_activation_mode',
-        '_external_js',
-        '_joined',
-        '_may_edit_keys',
-        '_may_read_keys',
-      ])
+      const castedValues = validationSchema.cast(values, { context: validationContext })
+      const updatedValues = diff(initialValues, castedValues, ['_activation_mode'])
 
       setError('')
       try {
@@ -109,7 +109,7 @@ const NetworkServerForm = React.memo(props => {
         setError(err)
       }
     },
-    [initialValues, onSubmit, onSubmitSuccess],
+    [initialValues, onSubmit, onSubmitSuccess, validationContext],
   )
 
   const handleResetsFCntChange = React.useCallback(evt => {
@@ -169,6 +169,7 @@ const NetworkServerForm = React.memo(props => {
   return (
     <Form
       validationSchema={validationSchema}
+      validationContext={validationContext}
       initialValues={initialValues}
       onSubmit={onFormSubmit}
       error={error}

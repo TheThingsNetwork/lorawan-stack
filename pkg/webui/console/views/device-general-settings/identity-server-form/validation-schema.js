@@ -15,13 +15,10 @@
 import * as Yup from 'yup'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
 
 import { attributeValidCheck, attributeTooShortCheck } from '@console/lib/attributes'
 import { id as deviceIdRegexp, address as addressRegexp } from '@console/lib/regexp'
 import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-utils'
-
-const jsConfig = selectJsConfig()
 
 const toUndefined = value => (!Boolean(value) ? undefined : value)
 
@@ -47,27 +44,15 @@ const validationSchema = Yup.object()
       sharedMessages.validateAddressFormat,
     ),
     _external_js: Yup.boolean(),
-    _supports_join: Yup.boolean(),
-    _lorawan_version: Yup.string(),
-    join_server_address: Yup.string().when(
-      ['_supports_join', ' _external_js'],
-      (supportsJoin, externalJs, schema) => {
-        if (!supportsJoin) {
-          return schema.strip()
-        }
+    join_server_address: Yup.string().when(['$supportsJoin'], (supportsJoin, schema) => {
+      if (!supportsJoin) {
+        return schema.strip()
+      }
 
-        if (externalJs) {
-          return schema.transform(() => '')
-        }
-
-        return schema
-          .matches(addressRegexp, sharedMessages.validateAddressFormat)
-          .transform(toUndefined)
-          .default(new URL(jsConfig.base_url).hostname)
-      },
-    ),
+      return schema.matches(addressRegexp, sharedMessages.validateAddressFormat).default('')
+    }),
     resets_join_nonces: Yup.bool().when(
-      ['_supports_join', '_lorawan_version', '_external_js'],
+      ['$supportsJoin', '$lorawanVersion', '_external_js'],
       (supportsJoin, lorawanVersion, externalJs, schema) => {
         if (!supportsJoin || parseLorawanMacVersion(lorawanVersion) < 110) {
           return schema.strip()
@@ -81,9 +66,12 @@ const validationSchema = Yup.object()
       },
     ),
     root_keys: Yup.object().when(
-      ['_external_js', '_lorawan_version'],
-      (externalJs, version, schema) => {
-        const strippedSchema = Yup.object().strip()
+      ['_external_js', '$lorawanVersion', '$supportsJoin'],
+      (externalJs, version, supportsJoin, schema) => {
+        if (!supportsJoin) {
+          return schema.strip()
+        }
+
         const keySchema = Yup.lazy(() => {
           return !externalJs
             ? Yup.object().shape({
@@ -97,14 +85,14 @@ const validationSchema = Yup.object()
 
         if (externalJs) {
           return schema.shape({
-            nwk_key: strippedSchema,
-            app_key: strippedSchema,
+            nwk_key: Yup.object().strip(),
+            app_key: Yup.object().strip(),
           })
         }
 
         if (parseLorawanMacVersion(version) < 110) {
           return schema.shape({
-            nwk_key: strippedSchema,
+            nwk_key: Yup.object().strip(),
             app_key: keySchema,
           })
         }
