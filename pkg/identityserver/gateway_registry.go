@@ -40,6 +40,14 @@ var (
 		"gateway.delete", "delete gateway",
 		ttnpb.RIGHT_GATEWAY_INFO,
 	)
+	evtStoreSecret = events.Define(
+		"gateway.secret.store", "store gateway secret",
+		ttnpb.RIGHT_GATEWAY_INFO,
+	)
+	evtRetrieveSecret = events.Define(
+		"gateway.secret.retrieve", "retrieve gateway secret",
+		ttnpb.RIGHT_GATEWAY_INFO,
+	)
 )
 
 var (
@@ -69,6 +77,9 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	if len(req.FrequencyPlanIDs) == 0 && req.FrequencyPlanID != "" {
 		req.FrequencyPlanIDs = []string{req.FrequencyPlanID}
 	}
+
+	// Don't allow setting the secret field while creating the gateway.
+	req.Gateway.Secret = nil
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtw, err = store.GetGatewayStore(db).CreateGateway(ctx, &req.Gateway)
@@ -121,6 +132,9 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 		}
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, []string{"frequency_plan_id"})
+
+	// Don't allow getting the secret field.
+	req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "secret")
 
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
 		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicGatewayFields...) {
@@ -182,6 +196,9 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		}
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, []string{"frequency_plan_id"})
+
+	// Don't allow listing the secret field.
+	req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "secret")
 
 	var includeIndirect bool
 	if req.Collaborator == nil {
@@ -257,6 +274,9 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		return nil, err
 	}
 
+	// Don't allow updating the secret field.
+	req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "secret")
+
 	// Backwards compatibility for frequency_plan_id field.
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_id") {
 		if !ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_ids") {
@@ -311,6 +331,58 @@ func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayI
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) storeGatewaySecret(ctx context.Context, req *ttnpb.StoreGatewaySecretRequest) (*types.Empty, error) {
+	// Require that caller has rights to encrypt and store the Secret.
+	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_WRITE_SECRET); err != nil {
+		return nil, err
+	}
+	encrypted, err := is.KeyVault.Encrypt(ctx, []byte(req.PlainText.Value), is.config.GatewaySecretKeyID)
+	if err != nil {
+		return nil, err
+	}
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
+		_, err = store.GetGatewayStore(db).UpdateGateway(ctx, &ttnpb.Gateway{
+			GatewayIdentifiers: req.GatewayIdentifiers,
+			Secret:             encrypted,
+		}, &types.FieldMask{Paths: []string{"secret"}})
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtStoreSecret(ctx, req.GatewayIdentifiers, nil))
+	return &types.Empty{}, nil
+}
+
+func (is *IdentityServer) retrieveGatewaySecret(ctx context.Context, req *ttnpb.RetrieveGatewaySecretRequest) (*ttnpb.GatewaySecretPlainText, error) {
+	// Require that caller has rights to retrive and decrypt the Secret.
+	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRET); err != nil {
+		return nil, err
+	}
+	var gtw *ttnpb.Gateway
+	err := is.withReadDatabase(ctx, func(db *gorm.DB) (err error) {
+		gtw, err = store.GetGatewayStore(db).GetGateway(ctx, &req.GatewayIdentifiers, &types.FieldMask{Paths: []string{"secret"}})
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	var decrypted []byte
+	if len(gtw.Secret) != 0 {
+		var err error
+		decrypted, err = is.KeyVault.Decrypt(ctx, gtw.Secret, is.config.GatewaySecretKeyID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &ttnpb.GatewaySecretPlainText{
+		Value: string(decrypted),
+	}, nil
+}
+
 type gatewayRegistry struct {
 	*IdentityServer
 }
@@ -337,4 +409,12 @@ func (gr *gatewayRegistry) Update(ctx context.Context, req *ttnpb.UpdateGatewayR
 
 func (gr *gatewayRegistry) Delete(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
 	return gr.deleteGateway(ctx, req)
+}
+
+func (gr *gatewayRegistry) StoreGatewaySecret(ctx context.Context, req *ttnpb.StoreGatewaySecretRequest) (*types.Empty, error) {
+	return gr.storeGatewaySecret(ctx, req)
+}
+
+func (gr *gatewayRegistry) RetrieveGatewaySecret(ctx context.Context, req *ttnpb.RetrieveGatewaySecretRequest) (*ttnpb.GatewaySecretPlainText, error) {
+	return gr.retrieveGatewaySecret(ctx, req)
 }
