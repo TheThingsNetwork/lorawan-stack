@@ -29,4 +29,8 @@ const mapDispatchToProps = dispatch => ({
   createOrganizationSuccess: id => dispatch(push(`/organizations/${id}`)),
 })
 
-export default Add => connect(null, mapDispatchToProps)(Add)
+export default Add =>
+  connect(
+    null,
+    mapDispatchToProps,
+  )(Add)
