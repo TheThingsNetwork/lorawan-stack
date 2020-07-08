@@ -268,6 +268,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					"formatters",
 					"session",
 					"skip_payload_crypto",
+					"skip_payload_crypto_override",
 				})
 				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
 			},

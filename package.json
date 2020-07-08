@@ -70,7 +70,7 @@
     "webpack-plugin-hash-output": "^3.1.0",
     "webpack-shell-plugin": "https://github.com/cdeutsch/webpack-shell-plugin.git#bee537d",
     "yargs": "^12.0.1",
-    "yarn": "1.22.0"
+    "yarn": "^1.22.0"
   },
   "dependencies": {
     "@formatjs/intl-relativetimeformat": "^2.8.2",

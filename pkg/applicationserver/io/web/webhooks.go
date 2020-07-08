@@ -221,8 +221,8 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	hooks, err := w.registry.List(ctx, msg.ApplicationIdentifiers,
 		[]string{
 			"base_url",
-			"downlink_api_key",
 			"downlink_ack",
+			"downlink_api_key",
 			"downlink_failed",
 			"downlink_nack",
 			"downlink_queued",
@@ -231,6 +231,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 			"headers",
 			"join_accept",
 			"location_solved",
+			"service_data",
 			"uplink_message",
 		},
 	)
@@ -281,6 +282,8 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 		cfg = hook.DownlinkQueued
 	case *ttnpb.ApplicationUp_LocationSolved:
 		cfg = hook.LocationSolved
+	case *ttnpb.ApplicationUp_ServiceData:
+		cfg = hook.ServiceData
 	}
 	if cfg == nil {
 		return nil, nil

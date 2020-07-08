@@ -176,7 +176,7 @@ func TestHandleUplink(t *testing.T) {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		errCh := handle(ctx, up)
-		return assertions.New(t).So(AllTrue(
+		return assertions.New(t).So(test.AllTrue(
 			f(),
 			assertHandleUplinkResponse(ctx, errCh, expectedErr),
 		), should.BeTrue)
@@ -186,7 +186,7 @@ func TestHandleUplink(t *testing.T) {
 		t.Helper()
 		a := assertions.New(t)
 		return AssertDeduplicateUplink(ctx, env.UplinkDeduplicator.DeduplicateUplink, func(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration) bool {
-			return AllTrue(
+			return test.AllTrue(
 				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
 				a.So(up, should.Resemble, expectedUp),
 				a.So(window, should.Resemble, CollectionWindow),
@@ -203,7 +203,7 @@ func TestHandleUplink(t *testing.T) {
 		t.Helper()
 		a := assertions.New(t)
 		return AssertAccumulatedMetadata(ctx, env.UplinkDeduplicator.AccumulatedMetadata, func(ctx context.Context, up *ttnpb.UplinkMessage) bool {
-			return AllTrue(
+			return test.AllTrue(
 				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
 				a.So(up, should.Resemble, expectedUp),
 			)
@@ -219,7 +219,7 @@ func TestHandleUplink(t *testing.T) {
 		t.Helper()
 		a := assertions.New(t)
 		return AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-			return AllTrue(
+			return test.AllTrue(
 				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
 				a.So(ids, should.Resemble, expectedIDs),
 				a.So(startAt, should.Resemble, expectedStartAt),
@@ -236,7 +236,7 @@ func TestHandleUplink(t *testing.T) {
 		return AssertInteropClientHandleJoinRequestRequest(ctx, env.InteropClient.HandleJoinRequest,
 			func(ctx context.Context, id types.NetID, req *ttnpb.JoinRequest) bool {
 				joinReq.DevAddr = req.DevAddr
-				return AllTrue(
+				return test.AllTrue(
 					a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
 					a.So(id, should.Equal, NetID),
 					a.So(req, should.NotBeNil),
@@ -258,14 +258,14 @@ func TestHandleUplink(t *testing.T) {
 		a := assertions.New(t)
 		return AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
 			func(ctx context.Context, ids ttnpb.Identifiers) bool {
-				return AllTrue(
+				return test.AllTrue(
 					a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
 					a.So(ids, should.Resemble, expectedIDs),
 				)
 			},
 			func(ctx context.Context, req *ttnpb.JoinRequest) bool {
 				joinReq.DevAddr = req.DevAddr
-				return AllTrue(
+				return test.AllTrue(
 					a.So(req, should.NotBeNil),
 					a.So(req.DevAddr, should.NotBeEmpty),
 					a.So(req.DevAddr.NwkID(), should.Resemble, NetID.ID()),
@@ -291,7 +291,7 @@ func TestHandleUplink(t *testing.T) {
 			for _, id := range upCIDs {
 				a.So(ctxCIDs, should.Contain, id)
 			}
-			return AllTrue(
+			return test.AllTrue(
 				a.So(ctxCIDs, should.HaveLength, 2+len(upCIDs)),
 				a.So(joinEUI, should.Resemble, JoinEUI),
 				a.So(devEUI, should.Resemble, DevEUI),
@@ -322,7 +322,7 @@ func TestHandleUplink(t *testing.T) {
 			if setDevice != nil {
 				expectedSetPaths = joinSetByIDSetPaths[:]
 			}
-			return AllTrue(
+			return test.AllTrue(
 				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
 				a.So(appID, should.Resemble, AppID),
 				a.So(devID, should.Resemble, DevID),
@@ -356,7 +356,7 @@ func TestHandleUplink(t *testing.T) {
 			if setDevice.Session != nil {
 				queue = setDevice.Session.QueuedApplicationDownlinks
 			}
-			return AllTrue(
+			return test.AllTrue(
 				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
 				a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
 					{
@@ -398,7 +398,7 @@ func TestHandleUplink(t *testing.T) {
 			return nil, false
 		}
 		return getCtx, test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-			return AllTrue(
+			return test.AllTrue(
 				a.So(ctx, should.HaveParentContextOrEqual, getCtx),
 				a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER),
 				a.So(ids, should.Resemble, dev.EndDeviceIdentifiers),
@@ -451,7 +451,7 @@ func TestHandleUplink(t *testing.T) {
 			for _, id := range upCIDs {
 				a.So(ctxCIDs, should.Contain, id)
 			}
-			if !a.So(AllTrue(
+			if !a.So(test.AllTrue(
 				a.So(ctxCIDs, should.HaveLength, 2+len(upCIDs)),
 				a.So(devAddr, should.Resemble, DevAddr),
 				a.So(paths, should.HaveSameElementsDeep, dataRangeByAddrPaths[:]),
@@ -494,7 +494,7 @@ func TestHandleUplink(t *testing.T) {
 		return setCtx, AssertDeviceRegistrySetByID(ctx, env.DeviceRegistry.SetByID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) bool {
 			setCtx = ctx
 			dev, sets, err := f(ctx, CopyEndDevice(getDevice))
-			return AllTrue(
+			return test.AllTrue(
 				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
 				a.So(appID, should.Resemble, AppID),
 				a.So(devID, should.Resemble, DevID),
@@ -522,7 +522,7 @@ func TestHandleUplink(t *testing.T) {
 		a := assertions.New(t)
 		macPayload := msg.Payload.GetMACPayload()
 		return AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-			return AllTrue(
+			return test.AllTrue(
 				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
 				a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
 					{
@@ -566,7 +566,7 @@ func TestHandleUplink(t *testing.T) {
 			Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
-				return a.So(AllTrue(
+				return a.So(test.AllTrue(
 					assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{}), invalidUplinkSettingsErr),
 					assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
 						RawPayload: []byte("testpayload"),
@@ -761,7 +761,7 @@ func TestHandleUplink(t *testing.T) {
 							getCtx, ok := assertJoinGetByEUI(ctx, env, msg.CorrelationIDs, getDevice, nil)
 							decodedMsg.ReceivedAt = clock.Now()
 							decodedMsg.CorrelationIDs = events.CorrelationIDsFromContext(getCtx)
-							return a.So(AllTrue(
+							return a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventsResembling,
 									EvtReceiveJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, decodedMsg),
@@ -781,7 +781,7 @@ func TestHandleUplink(t *testing.T) {
 						getDevice := makeJoinDevice(clock)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinDeduplicateSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, getDevice, false, ErrTestInternal)
-							return a.So(AllTrue(
+							return a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventsResembling,
 									EvtReceiveJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, decodedMsg),
@@ -801,7 +801,7 @@ func TestHandleUplink(t *testing.T) {
 						getDevice := makeJoinDevice(clock)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinDeduplicateSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, getDevice, false, nil)
-							return a.So(AllTrue(
+							return a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventsResembling,
 									EvtReceiveJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, decodedMsg),
@@ -822,7 +822,7 @@ func TestHandleUplink(t *testing.T) {
 						joinReq := makeNsJsJoinRequest(nil)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinClusterLocalSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, getDevice, joinReq, nil, ErrTestInternal)
-							return a.So(AllTrue(
+							return a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventsResembling,
 									EvtReceiveJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, decodedMsg),
@@ -847,7 +847,7 @@ func TestHandleUplink(t *testing.T) {
 						joinReq := makeNsJsJoinRequest(nil)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinInteropSequence(ctx, env, clock, true, decodedMsg, chIdx, drIdx, getDevice, joinReq, nil, ErrTestInternal)
-							return a.So(AllTrue(
+							return a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventsResembling,
 									EvtReceiveJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, decodedMsg),
@@ -880,7 +880,7 @@ func TestHandleUplink(t *testing.T) {
 						joinReq := makeNsJsJoinRequest(nil)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinInteropSequence(ctx, env, clock, false, decodedMsg, chIdx, drIdx, getDevice, joinReq, joinResp, nil)
-							return a.So(AllTrue(
+							return a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventsResembling,
 									EvtReceiveJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, decodedMsg),
@@ -893,7 +893,7 @@ func TestHandleUplink(t *testing.T) {
 								),
 								assertAccumulatedMetadata(ctx, env, getCtx, decodedMsg, nil, ErrTestInternal),
 								AssertDeviceRegistrySetByID(ctx, env.DeviceRegistry.SetByID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) bool {
-									return AllTrue(
+									return test.AllTrue(
 										a.So(ctx, should.HaveParentContextOrEqual, getCtx),
 										a.So(appID, should.Resemble, AppID),
 										a.So(devID, should.Resemble, DevID),
@@ -932,7 +932,7 @@ func TestHandleUplink(t *testing.T) {
 						registryErr := ErrTestInternal.WithCause(innerErr)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinInteropSequence(ctx, env, clock, false, decodedMsg, chIdx, drIdx, getDevice, joinReq, joinResp, nil)
-							if !a.So(AllTrue(
+							if !a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventsResembling,
 									EvtReceiveJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, decodedMsg),
@@ -948,7 +948,7 @@ func TestHandleUplink(t *testing.T) {
 								return false
 							}
 							_, ok = assertJoinSetByID(ctx, env, getCtx, nil, nil, innerErr, registryErr)
-							return a.So(AllTrue(
+							return a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventResembling,
 									EvtDropJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, registryErr),
@@ -976,7 +976,7 @@ func TestHandleUplink(t *testing.T) {
 						joinReq := makeNsJsJoinRequest(nil)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinInteropSequence(ctx, env, clock, false, decodedMsg, chIdx, drIdx, getDevice, joinReq, joinResp, nil)
-							if !a.So(AllTrue(
+							if !a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventsResembling,
 									EvtReceiveJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, decodedMsg),
@@ -992,7 +992,7 @@ func TestHandleUplink(t *testing.T) {
 								return false
 							}
 							_, ok = assertJoinSetByID(ctx, env, getCtx, getDevice, makeJoinSetDevice(getDevice, decodedMsg, joinReq, joinResp), nil, ErrTestInternal)
-							return a.So(AllTrue(
+							return a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventResembling,
 									EvtDropJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
@@ -1020,7 +1020,7 @@ func TestHandleUplink(t *testing.T) {
 						joinReq := makeNsJsJoinRequest(nil)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinInteropSequence(ctx, env, clock, false, decodedMsg, chIdx, drIdx, getDevice, joinReq, joinResp, nil)
-							if !a.So(AllTrue(
+							if !a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventsResembling,
 									EvtReceiveJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, decodedMsg),
@@ -1039,7 +1039,7 @@ func TestHandleUplink(t *testing.T) {
 							clock.Add(time.Nanosecond)
 							setDevice := makeJoinSetDevice(getDevice, decodedMsg, joinReq, joinResp)
 							setCtx, ok := assertJoinSetByID(ctx, env, getCtx, getDevice, setDevice, nil, nil)
-							return AllTrue(
+							return test.AllTrue(
 								ok,
 								assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+phy.JoinAcceptDelay1-joinReq.RxDelay.Duration()/2-NSScheduleWindow()), true, nil),
 								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinResp, joinRespRecvAt, nil),
@@ -1068,7 +1068,7 @@ func TestHandleUplink(t *testing.T) {
 						joinReq := makeNsJsJoinRequest(nil)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinClusterLocalSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, getDevice, joinReq, joinResp, nil)
-							if !a.So(AllTrue(
+							if !a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventsResembling,
 									EvtReceiveJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, decodedMsg),
@@ -1084,7 +1084,7 @@ func TestHandleUplink(t *testing.T) {
 							decodedMsg.RxMetadata = RxMetadata[:]
 							setDevice := makeJoinSetDevice(getDevice, decodedMsg, joinReq, joinResp)
 							setCtx, ok := assertJoinSetByID(ctx, env, getCtx, getDevice, setDevice, nil, nil)
-							return a.So(AllTrue(
+							return a.So(test.AllTrue(
 								ok,
 								assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+phy.JoinAcceptDelay1-joinReq.RxDelay.Duration()/2-NSScheduleWindow()), true, ErrTestInternal),
 								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinResp, joinRespRecvAt, ErrTestInternal),
@@ -1122,7 +1122,7 @@ func TestHandleUplink(t *testing.T) {
 						joinReq := makeNsJsJoinRequest(nil)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinClusterLocalSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, getDevice, joinReq, joinResp, nil)
-							if !a.So(AllTrue(
+							if !a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventsResembling,
 									EvtReceiveJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, decodedMsg),
@@ -1138,7 +1138,7 @@ func TestHandleUplink(t *testing.T) {
 							decodedMsg.RxMetadata = RxMetadata[:]
 							setDevice := makeJoinSetDevice(getDevice, decodedMsg, joinReq, joinResp)
 							setCtx, ok := assertJoinSetByID(ctx, env, getCtx, getDevice, setDevice, nil, nil)
-							return a.So(AllTrue(
+							return a.So(test.AllTrue(
 								ok,
 								assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+phy.JoinAcceptDelay1-joinReq.RxDelay.Duration()/2-NSScheduleWindow()), true, nil),
 								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinResp, joinRespRecvAt, ErrTestInternal),
@@ -1161,7 +1161,7 @@ func TestHandleUplink(t *testing.T) {
 						joinReq := makeNsJsJoinRequest(nil)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinClusterLocalSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, getDevice, joinReq, joinResp, nil)
-							if !a.So(AllTrue(
+							if !a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventsResembling,
 									EvtReceiveJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, decodedMsg),
@@ -1175,7 +1175,7 @@ func TestHandleUplink(t *testing.T) {
 							decodedMsg.RxMetadata = RxMetadata[:]
 							setDevice := makeJoinSetDevice(getDevice, decodedMsg, joinReq, joinResp)
 							_, ok = assertJoinSetByID(ctx, env, getCtx, getDevice, setDevice, nil, ErrTestInternal)
-							return a.So(AllTrue(
+							return a.So(test.AllTrue(
 								ok,
 								a.So(env.Events, should.ReceiveEventResembling,
 									EvtDropJoinRequest(getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
@@ -1488,7 +1488,7 @@ func TestHandleUplink(t *testing.T) {
 								rangeDevices := makeDataRangeDevices(clock, true, true)
 								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, rangeDevices, matchIdx, false, ErrTestInternal)
-									return a.So(AllTrue(
+									return a.So(test.AllTrue(
 										ok,
 										a.So(env.Events, should.ReceiveEventsResembling,
 											EvtReceiveDataUplink(rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, decodedMsg),
@@ -1508,7 +1508,7 @@ func TestHandleUplink(t *testing.T) {
 								rangeDevices := makeDataRangeDevices(clock, true, true)
 								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, rangeDevices, matchIdx, false, nil)
-									return a.So(AllTrue(
+									return a.So(test.AllTrue(
 										ok,
 										a.So(env.Events, should.ReceiveEventsResembling,
 											EvtReceiveDataUplink(rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, decodedMsg),
@@ -1528,14 +1528,14 @@ func TestHandleUplink(t *testing.T) {
 								rangeDevices := makeDataRangeDevices(clock, true, true)
 								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, rangeDevices, matchIdx, true, nil)
-									return a.So(AllTrue(
+									return a.So(test.AllTrue(
 										ok,
 										a.So(env.Events, should.ReceiveEventResembling,
 											EvtReceiveDataUplink(rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, decodedMsg),
 										),
 										assertAccumulatedMetadata(ctx, env, rangeCtx, decodedMsg, nil, ErrTestInternal),
 										AssertDeviceRegistrySetByID(ctx, env.DeviceRegistry.SetByID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) bool {
-											return AllTrue(
+											return test.AllTrue(
 												a.So(ctx, should.HaveParentContextOrEqual, rangeCtx),
 												a.So(appID, should.Resemble, AppID),
 												a.So(devID, should.Resemble, DevID),
@@ -1565,7 +1565,7 @@ func TestHandleUplink(t *testing.T) {
 								registryErr := ErrTestInternal.WithCause(innerErr)
 								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, rangeDevices, matchIdx, true, nil)
-									if !a.So(AllTrue(
+									if !a.So(test.AllTrue(
 										ok,
 										a.So(env.Events, should.ReceiveEventResembling,
 											EvtReceiveDataUplink(rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, decodedMsg),
@@ -1576,7 +1576,7 @@ func TestHandleUplink(t *testing.T) {
 									}
 									decodedMsg.RxMetadata = RxMetadata[:]
 									_, ok = assertDataSetByID(ctx, env, rangeCtx, nil, nil, nil, innerErr, registryErr)
-									return a.So(AllTrue(
+									return a.So(test.AllTrue(
 										ok,
 										a.So(env.Events, should.ReceiveEventResembling,
 											EvtDropDataUplink(rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, registryErr),
@@ -1597,7 +1597,7 @@ func TestHandleUplink(t *testing.T) {
 								registryErr := ErrTestInternal.WithCause(innerErr)
 								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, rangeDevices, matchIdx, true, nil)
-									if !a.So(AllTrue(
+									if !a.So(test.AllTrue(
 										ok,
 										a.So(env.Events, should.ReceiveEventResembling,
 											EvtReceiveDataUplink(rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, decodedMsg),
@@ -1612,7 +1612,7 @@ func TestHandleUplink(t *testing.T) {
 									getDevice.MACState = nil
 									getDevice.Session = nil
 									_, ok = assertDataSetByID(ctx, env, rangeCtx, getDevice, nil, nil, innerErr, registryErr)
-									return a.So(AllTrue(
+									return a.So(test.AllTrue(
 										ok,
 										a.So(env.Events, should.ReceiveEventResembling,
 											EvtDropDataUplink(rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, registryErr),
@@ -1631,7 +1631,7 @@ func TestHandleUplink(t *testing.T) {
 								rangeDevices := makeDataRangeDevices(clock, true, true)
 								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, rangeDevices, matchIdx, true, nil)
-									if !a.So(AllTrue(
+									if !a.So(test.AllTrue(
 										ok,
 										a.So(env.Events, should.ReceiveEventResembling,
 											EvtReceiveDataUplink(rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, decodedMsg),
@@ -1643,7 +1643,7 @@ func TestHandleUplink(t *testing.T) {
 									getDevice := CopyEndDevice(rangeDevices[matchIdx])
 									setDevice, macEvs := makeDataSetDevice(ctx, getDevice, decodedMsg)
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, getDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
-									return a.So(AllTrue(
+									return a.So(test.AllTrue(
 										ok,
 										func() bool {
 											if len(uplinkMDs) == 0 {
@@ -1671,7 +1671,7 @@ func TestHandleUplink(t *testing.T) {
 								rangeDevices := makeDataRangeDevices(clock, true, true)
 								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, rangeDevices, matchIdx, true, nil)
-									if !a.So(AllTrue(
+									if !a.So(test.AllTrue(
 										ok,
 										a.So(env.Events, should.ReceiveEventResembling,
 											EvtReceiveDataUplink(rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, decodedMsg),
@@ -1685,7 +1685,7 @@ func TestHandleUplink(t *testing.T) {
 									getDevice.UpdatedAt = clock.Now()
 									setDevice, macEvs := makeDataSetDevice(ctx, getDevice, decodedMsg)
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, getDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
-									return a.So(AllTrue(
+									return a.So(test.AllTrue(
 										ok,
 										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, clock.Now().Add(NSScheduleWindow()), true, nil),
 										assertDataApplicationUp(ctx, env, setCtx, setDevice, WithMatchedUplinkSettings(decodedMsg, chIdx, drIdx), nil),
@@ -1711,7 +1711,7 @@ func TestHandleUplink(t *testing.T) {
 								rangeDevices[matchIdx] = rangeDevice
 								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, rangeDevices, matchIdx, true, nil)
-									if !a.So(AllTrue(
+									if !a.So(test.AllTrue(
 										ok,
 										a.So(env.Events, should.ReceiveEventResembling,
 											EvtReceiveDataUplink(rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, decodedMsg),
@@ -1723,7 +1723,7 @@ func TestHandleUplink(t *testing.T) {
 									decodedMsg.RxMetadata = RxMetadata[:]
 									setDevice, macEvs := makeDataSetDevice(ctx, rangeDevice, decodedMsg)
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, rangeDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
-									return a.So(AllTrue(
+									return a.So(test.AllTrue(
 										ok,
 										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, clock.Now().Add(NSScheduleWindow()), true, ErrTestInternal),
 										a.So(env.Events, should.ReceiveEventsResembling,

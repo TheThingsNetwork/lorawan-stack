@@ -919,3 +919,702 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SetApplicationPackageAssociationRequestValidationError{}
+
+// ValidateFields checks the field values on
+// ApplicationPackageDefaultAssociationIdentifiers with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *ApplicationPackageDefaultAssociationIdentifiers) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationPackageDefaultAssociationIdentifiersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationPackageDefaultAssociationIdentifiersValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "f_port":
+
+			if val := m.GetFPort(); val < 1 || val > 255 {
+				return ApplicationPackageDefaultAssociationIdentifiersValidationError{
+					field:  "f_port",
+					reason: "value must be inside range [1, 255]",
+				}
+			}
+
+		default:
+			return ApplicationPackageDefaultAssociationIdentifiersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationPackageDefaultAssociationIdentifiersValidationError is the
+// validation error returned by
+// ApplicationPackageDefaultAssociationIdentifiers.ValidateFields if the
+// designated constraints aren't met.
+type ApplicationPackageDefaultAssociationIdentifiersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationPackageDefaultAssociationIdentifiersValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e ApplicationPackageDefaultAssociationIdentifiersValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e ApplicationPackageDefaultAssociationIdentifiersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationPackageDefaultAssociationIdentifiersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationPackageDefaultAssociationIdentifiersValidationError) ErrorName() string {
+	return "ApplicationPackageDefaultAssociationIdentifiersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationPackageDefaultAssociationIdentifiersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationPackageDefaultAssociationIdentifiers.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationPackageDefaultAssociationIdentifiersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationPackageDefaultAssociationIdentifiersValidationError{}
+
+// ValidateFields checks the field values on
+// ApplicationPackageDefaultAssociation with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *ApplicationPackageDefaultAssociation) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationPackageDefaultAssociationFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "ids":
+
+			if v, ok := interface{}(&m.ApplicationPackageDefaultAssociationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationPackageDefaultAssociationValidationError{
+						field:  "ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "created_at":
+
+			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationPackageDefaultAssociationValidationError{
+						field:  "created_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "updated_at":
+
+			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationPackageDefaultAssociationValidationError{
+						field:  "updated_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "package_name":
+
+			if utf8.RuneCountInString(m.GetPackageName()) > 36 {
+				return ApplicationPackageDefaultAssociationValidationError{
+					field:  "package_name",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_ApplicationPackageDefaultAssociation_PackageName_Pattern.MatchString(m.GetPackageName()) {
+				return ApplicationPackageDefaultAssociationValidationError{
+					field:  "package_name",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
+		case "data":
+
+			if v, ok := interface{}(m.GetData()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationPackageDefaultAssociationValidationError{
+						field:  "data",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ApplicationPackageDefaultAssociationValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationPackageDefaultAssociationValidationError is the validation error
+// returned by ApplicationPackageDefaultAssociation.ValidateFields if the
+// designated constraints aren't met.
+type ApplicationPackageDefaultAssociationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationPackageDefaultAssociationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationPackageDefaultAssociationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationPackageDefaultAssociationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationPackageDefaultAssociationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationPackageDefaultAssociationValidationError) ErrorName() string {
+	return "ApplicationPackageDefaultAssociationValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationPackageDefaultAssociationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationPackageDefaultAssociation.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationPackageDefaultAssociationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationPackageDefaultAssociationValidationError{}
+
+var _ApplicationPackageDefaultAssociation_PackageName_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+// ValidateFields checks the field values on
+// ApplicationPackageDefaultAssociations with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *ApplicationPackageDefaultAssociations) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationPackageDefaultAssociationsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "defaults":
+
+			for idx, item := range m.GetDefaults() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ApplicationPackageDefaultAssociationsValidationError{
+							field:  fmt.Sprintf("defaults[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return ApplicationPackageDefaultAssociationsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationPackageDefaultAssociationsValidationError is the validation error
+// returned by ApplicationPackageDefaultAssociations.ValidateFields if the
+// designated constraints aren't met.
+type ApplicationPackageDefaultAssociationsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationPackageDefaultAssociationsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationPackageDefaultAssociationsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationPackageDefaultAssociationsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationPackageDefaultAssociationsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationPackageDefaultAssociationsValidationError) ErrorName() string {
+	return "ApplicationPackageDefaultAssociationsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationPackageDefaultAssociationsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationPackageDefaultAssociations.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationPackageDefaultAssociationsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationPackageDefaultAssociationsValidationError{}
+
+// ValidateFields checks the field values on
+// GetApplicationPackageDefaultAssociationRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *GetApplicationPackageDefaultAssociationRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetApplicationPackageDefaultAssociationRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "ids":
+
+			if v, ok := interface{}(&m.ApplicationPackageDefaultAssociationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetApplicationPackageDefaultAssociationRequestValidationError{
+						field:  "ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetApplicationPackageDefaultAssociationRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return GetApplicationPackageDefaultAssociationRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetApplicationPackageDefaultAssociationRequestValidationError is the
+// validation error returned by
+// GetApplicationPackageDefaultAssociationRequest.ValidateFields if the
+// designated constraints aren't met.
+type GetApplicationPackageDefaultAssociationRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetApplicationPackageDefaultAssociationRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetApplicationPackageDefaultAssociationRequestValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e GetApplicationPackageDefaultAssociationRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetApplicationPackageDefaultAssociationRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetApplicationPackageDefaultAssociationRequestValidationError) ErrorName() string {
+	return "GetApplicationPackageDefaultAssociationRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetApplicationPackageDefaultAssociationRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetApplicationPackageDefaultAssociationRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetApplicationPackageDefaultAssociationRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetApplicationPackageDefaultAssociationRequestValidationError{}
+
+// ValidateFields checks the field values on
+// ListApplicationPackageDefaultAssociationRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *ListApplicationPackageDefaultAssociationRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListApplicationPackageDefaultAssociationRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "ids":
+
+			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListApplicationPackageDefaultAssociationRequestValidationError{
+						field:  "ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "limit":
+
+			if m.GetLimit() > 1000 {
+				return ListApplicationPackageDefaultAssociationRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
+		case "page":
+			// no validation rules for Page
+		case "field_mask":
+
+			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListApplicationPackageDefaultAssociationRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ListApplicationPackageDefaultAssociationRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListApplicationPackageDefaultAssociationRequestValidationError is the
+// validation error returned by
+// ListApplicationPackageDefaultAssociationRequest.ValidateFields if the
+// designated constraints aren't met.
+type ListApplicationPackageDefaultAssociationRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListApplicationPackageDefaultAssociationRequestValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e ListApplicationPackageDefaultAssociationRequestValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e ListApplicationPackageDefaultAssociationRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListApplicationPackageDefaultAssociationRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListApplicationPackageDefaultAssociationRequestValidationError) ErrorName() string {
+	return "ListApplicationPackageDefaultAssociationRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListApplicationPackageDefaultAssociationRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListApplicationPackageDefaultAssociationRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListApplicationPackageDefaultAssociationRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListApplicationPackageDefaultAssociationRequestValidationError{}
+
+// ValidateFields checks the field values on
+// SetApplicationPackageDefaultAssociationRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *SetApplicationPackageDefaultAssociationRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = SetApplicationPackageDefaultAssociationRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "default":
+
+			if v, ok := interface{}(&m.ApplicationPackageDefaultAssociation).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return SetApplicationPackageDefaultAssociationRequestValidationError{
+						field:  "default",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return SetApplicationPackageDefaultAssociationRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return SetApplicationPackageDefaultAssociationRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// SetApplicationPackageDefaultAssociationRequestValidationError is the
+// validation error returned by
+// SetApplicationPackageDefaultAssociationRequest.ValidateFields if the
+// designated constraints aren't met.
+type SetApplicationPackageDefaultAssociationRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetApplicationPackageDefaultAssociationRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetApplicationPackageDefaultAssociationRequestValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e SetApplicationPackageDefaultAssociationRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetApplicationPackageDefaultAssociationRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetApplicationPackageDefaultAssociationRequestValidationError) ErrorName() string {
+	return "SetApplicationPackageDefaultAssociationRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetApplicationPackageDefaultAssociationRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetApplicationPackageDefaultAssociationRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetApplicationPackageDefaultAssociationRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetApplicationPackageDefaultAssociationRequestValidationError{}

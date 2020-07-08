@@ -49,7 +49,7 @@ func (s *server) GetAssociation(ctx context.Context, req *ttnpb.GetApplicationPa
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
-	return s.registry.Get(ctx, req.ApplicationPackageAssociationIdentifiers, appendImplicitAssociationsGetPaths(req.FieldMask.Paths...))
+	return s.registry.GetAssociation(ctx, req.ApplicationPackageAssociationIdentifiers, appendImplicitAssociationsGetPaths(req.FieldMask.Paths...))
 }
 
 // ListAssociations implements tnpb.ApplicationPackageRegistryServer.
@@ -64,7 +64,7 @@ func (s *server) ListAssociations(ctx context.Context, req *ttnpb.ListApplicatio
 			setTotalHeader(ctx, total)
 		}
 	}()
-	associations, err := s.registry.List(ctx, req.EndDeviceIdentifiers, appendImplicitAssociationsGetPaths(req.FieldMask.Paths...))
+	associations, err := s.registry.ListAssociations(ctx, req.EndDeviceIdentifiers, appendImplicitAssociationsGetPaths(req.FieldMask.Paths...))
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (s *server) SetAssociation(ctx context.Context, req *ttnpb.SetApplicationPa
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
-	return s.registry.Set(ctx, req.ApplicationPackageAssociationIdentifiers, appendImplicitAssociationsGetPaths(req.FieldMask.Paths...),
+	return s.registry.SetAssociation(ctx, req.ApplicationPackageAssociationIdentifiers, appendImplicitAssociationsGetPaths(req.FieldMask.Paths...),
 		func(assoc *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
 			if assoc != nil {
 				return &req.ApplicationPackageAssociation, req.FieldMask.Paths, nil
@@ -96,8 +96,71 @@ func (s *server) DeleteAssociation(ctx context.Context, ids *ttnpb.ApplicationPa
 	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
-	_, err := s.registry.Set(ctx, *ids, nil,
+	_, err := s.registry.SetAssociation(ctx, *ids, nil,
 		func(assoc *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
+			return nil, nil, nil
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return ttnpb.Empty, nil
+}
+
+// GetDefaultAssociation implements ttnpb.ApplicationPackageRegistryServer.
+func (s *server) GetDefaultAssociation(ctx context.Context, req *ttnpb.GetApplicationPackageDefaultAssociationRequest) (*ttnpb.ApplicationPackageDefaultAssociation, error) {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+		return nil, err
+	}
+	return s.registry.GetDefaultAssociation(ctx, req.ApplicationPackageDefaultAssociationIdentifiers, appendImplicitAssociationsGetPaths(req.FieldMask.Paths...))
+}
+
+// ListDefaultAssociations implements ttnpb.ApplicationPackageRegistryServer.
+func (s *server) ListDefaultAssociations(ctx context.Context, req *ttnpb.ListApplicationPackageDefaultAssociationRequest) (assoc *ttnpb.ApplicationPackageDefaultAssociations, err error) {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+		return nil, err
+	}
+	var total int64
+	ctx = s.registry.WithPagination(ctx, req.Limit, req.Page, &total)
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, total)
+		}
+	}()
+	defaults, err := s.registry.ListDefaultAssociations(ctx, req.ApplicationIdentifiers, appendImplicitAssociationsGetPaths(req.FieldMask.Paths...))
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.ApplicationPackageDefaultAssociations{
+		Defaults: defaults,
+	}, nil
+}
+
+// SetDefaultAssociation implements ttnpb.ApplicationPackageRegistryServer.
+func (s *server) SetDefaultAssociation(ctx context.Context, req *ttnpb.SetApplicationPackageDefaultAssociationRequest) (*ttnpb.ApplicationPackageDefaultAssociation, error) {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+		return nil, err
+	}
+	return s.registry.SetDefaultAssociation(ctx, req.ApplicationPackageDefaultAssociationIdentifiers, appendImplicitAssociationsGetPaths(req.FieldMask.Paths...),
+		func(assoc *ttnpb.ApplicationPackageDefaultAssociation) (*ttnpb.ApplicationPackageDefaultAssociation, []string, error) {
+			if assoc != nil {
+				return &req.ApplicationPackageDefaultAssociation, req.FieldMask.Paths, nil
+			}
+			return &req.ApplicationPackageDefaultAssociation, append(req.FieldMask.Paths,
+				"ids.application_ids",
+				"ids.f_port",
+			), nil
+		},
+	)
+}
+
+// DeleteDefaultAssociation implements ttnpb.ApplicationPackageRegistryServer.
+func (s *server) DeleteDefaultAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageDefaultAssociationIdentifiers) (*pbtypes.Empty, error) {
+	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+		return nil, err
+	}
+	_, err := s.registry.SetDefaultAssociation(ctx, *ids, nil,
+		func(assoc *ttnpb.ApplicationPackageDefaultAssociation) (*ttnpb.ApplicationPackageDefaultAssociation, []string, error) {
 			return nil, nil, nil
 		},
 	)

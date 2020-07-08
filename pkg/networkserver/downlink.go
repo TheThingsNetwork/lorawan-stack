@@ -342,7 +342,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 
 			case down.FCnt <= dev.Session.LastNFCntDown && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0:
 				logger.WithField("last_f_cnt_down", dev.Session.LastNFCntDown).Debug("Drop application downlink with too low FCnt")
-				invalid, rest := partitionDownlinksBySessionKeyIDEquality(dev.Session.SessionKeyID, dev.Session.QueuedApplicationDownlinks[i:]...)
+				invalid, rest := ttnpb.PartitionDownlinksBySessionKeyIDEquality(dev.Session.SessionKeyID, dev.Session.QueuedApplicationDownlinks[i:]...)
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 					CorrelationIDs:       events.CorrelationIDsFromContext(ctx),

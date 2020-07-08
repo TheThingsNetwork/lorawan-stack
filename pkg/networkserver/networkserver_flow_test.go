@@ -59,7 +59,7 @@ func flowTestEventEqual(x, y events.Event) bool {
 		}
 		xUp = CopyUplinkMessage(xUp)
 		yUp = CopyUplinkMessage(yUp)
-		if !AllTrue(
+		if !test.AllTrue(
 			hasProperStringSubset(xUp.CorrelationIDs, yUp.CorrelationIDs),
 			test.SameElements(reflect.DeepEqual, xUp.RxMetadata, yUp.RxMetadata),
 		) {
@@ -88,6 +88,8 @@ func flowTestEventEqual(x, y events.Event) bool {
 	yp.Data = nil
 	xp.Time = time.Time{}
 	yp.Time = time.Time{}
+	xp.Authentication = nil
+	yp.Authentication = nil
 
 	if !hasProperStringSubset(xp.CorrelationIDs, yp.CorrelationIDs) {
 		return false
@@ -212,7 +214,7 @@ func (env FlowTestEnvironment) AssertScheduleDownlink(ctx context.Context, asser
 		})
 		for _, path := range paths {
 			if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-				return a.So(AllTrue(
+				return a.So(test.AllTrue(
 					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER),
 					a.So(ids, should.Resemble, *path.GatewayIdentifiers),
 				), should.BeTrue)
@@ -405,7 +407,7 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 					a.So(events.CorrelationIDsFromContext(ctx), should.Contain, cid)
 				}
 				getPeerCtx = ctx
-				return AllTrue(
+				return test.AllTrue(
 					a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER),
 					a.So(peerIDs, should.Resemble, ids),
 				)
@@ -424,7 +426,7 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 		}
 		if !a.So(AssertAuthNsJsHandleJoinRequest(ctx, env.Cluster.Auth, handleJoinCh, func(ctx context.Context, req *ttnpb.JoinRequest) bool {
 			joinReq.DevAddr = req.DevAddr
-			return AllTrue(
+			return test.AllTrue(
 				a.So(req.DevAddr, should.NotBeEmpty),
 				a.So(req.DevAddr.NwkID(), should.Resemble, env.Config.NetID.ID()),
 				a.So(req.DevAddr.NetIDType(), should.Equal, env.Config.NetID.Type()),
@@ -473,7 +475,7 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 			expectedEvs = append(expectedEvs, EvtForwardJoinAccept(linkCtx, up.EndDeviceIdentifiers, up))
 
 			a := assertions.New(t)
-			return a.So(AllTrue(
+			return a.So(test.AllTrue(
 				a.So(up.CorrelationIDs, should.HaveSameElementsDeep, joinCIDs),
 				a.So([]time.Time{start, up.GetJoinAccept().GetReceivedAt(), time.Now()}, should.BeChronological),
 				a.So(up, should.Resemble, &ttnpb.ApplicationUp{
@@ -516,7 +518,7 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 			FrequencyPlanID:  fpID,
 		}
 		if !a.So(env.AssertScheduleDownlink(ctx, func(ctx context.Context, down *ttnpb.DownlinkMessage) bool {
-			return AllTrue(
+			return test.AllTrue(
 				a.So(events.CorrelationIDsFromContext(ctx), should.NotBeEmpty),
 				a.So(down.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, joinCIDs),
 				a.So(down, should.Resemble, &ttnpb.DownlinkMessage{
@@ -786,7 +788,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 			expectedEvs = append(expectedEvs, EvtForwardDataUplink(linkCtx, up.EndDeviceIdentifiers, up))
 
 			a := assertions.New(t)
-			return a.So(AllTrue(
+			return a.So(test.AllTrue(
 				a.So(up.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, DataUplinkCorrelationIDs),
 				a.So(up.GetUplinkMessage().GetRxMetadata(), should.HaveSameElementsDeep, expectedUp.RxMetadata),
 				a.So([]time.Time{start, up.GetUplinkMessage().GetReceivedAt(), time.Now()}, should.BeChronological),
@@ -832,7 +834,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 			FrequencyPlanID:  fpID,
 		}
 		if !a.So(env.AssertScheduleDownlink(ctx, func(ctx context.Context, down *ttnpb.DownlinkMessage) bool {
-			return AllTrue(
+			return test.AllTrue(
 				a.So(events.CorrelationIDsFromContext(ctx), should.NotBeEmpty),
 				a.So(down.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, expectedUp.CorrelationIDs),
 				a.So(down, should.Resemble, MakeDataDownlink(macVersion, false, joinReq.DevAddr, ttnpb.FCtrl{

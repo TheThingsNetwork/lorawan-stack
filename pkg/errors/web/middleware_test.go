@@ -32,48 +32,82 @@ func TestErrorHandling(t *testing.T) {
 
 	ttnNotFound := errors.DefineNotFound("test_not_found", "test not found")
 
-	for _, tt := range []struct {
-		Name    string
-		Handler echo.HandlerFunc
-		Assert  func(a *assertions.Assertion, res *http.Response)
+	for _, tc := range []struct {
+		Name  string
+		Error error
+		JSON  string
 	}{
 		{
-			Name:    "Echo404",
-			Handler: func(c echo.Context) error { return echo.ErrNotFound },
-			Assert: func(a *assertions.Assertion, res *http.Response) {
-				a.So(res.StatusCode, should.Equal, http.StatusNotFound)
-				b, _ := ioutil.ReadAll(res.Body)
-				a.So(string(b), should.ContainSubstring, `"namespace":"pkg/errors/web"`)
-			},
+			Name:  "Echo404",
+			Error: echo.ErrNotFound,
+			JSON: `{
+  "code": 5,
+  "details": [
+    {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.ErrorDetails",
+      "attributes": {
+        "message": "Not Found"
+      },
+      "code": 5,
+      "message_format": "Not Found",
+      "namespace": "pkg/errors/web"
+    }
+  ],
+  "message": "error:pkg/errors/web:unknown (Not Found)"
+}`,
 		},
 		{
-			Name:    "TTN404",
-			Handler: func(c echo.Context) error { return ttnNotFound },
-			Assert: func(a *assertions.Assertion, res *http.Response) {
-				a.So(res.StatusCode, should.Equal, http.StatusNotFound)
-				b, _ := ioutil.ReadAll(res.Body)
-				a.So(string(b), should.ContainSubstring, `"name":"test_not_found"`)
-			},
+			Name:  "TTN404",
+			Error: ttnNotFound,
+			JSON: `{
+  "code": 5,
+  "details": [
+    {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.ErrorDetails",
+      "code": 5,
+      "message_format": "test not found",
+      "name": "test_not_found",
+      "namespace": "pkg/errors/web_test"
+    }
+  ],
+  "message": "error:pkg/errors/web_test:test_not_found (test not found)"
+}`,
 		},
 		{
-			Name: "TTN404InsideEcho",
-			Handler: func(c echo.Context) error {
-				return &echo.HTTPError{Internal: ttnNotFound}
-			},
-			Assert: func(a *assertions.Assertion, res *http.Response) {
-				a.So(res.StatusCode, should.Equal, http.StatusNotFound)
-				b, _ := ioutil.ReadAll(res.Body)
-				a.So(string(b), should.ContainSubstring, `"name":"test_not_found"`)
-			},
+			Name:  "TTN404InsideEcho",
+			Error: &echo.HTTPError{Internal: ttnNotFound},
+			JSON: `{
+  "code": 5,
+  "details": [
+    {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.ErrorDetails",
+      "code": 5,
+      "message_format": "test not found",
+      "name": "test_not_found",
+      "namespace": "pkg/errors/web_test"
+    }
+  ],
+  "message": "error:pkg/errors/web_test:test_not_found (test not found)"
+}`,
 		},
 	} {
-		t.Run(tt.Name, func(t *testing.T) {
+		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
+
 			req, rec := httptest.NewRequest(http.MethodGet, "/", nil), httptest.NewRecorder()
-			c := e.NewContext(req, rec)
-			h := web.ErrorMiddleware(nil)(tt.Handler)
-			a.So(h(c), should.Equal, nil)
-			tt.Assert(a, rec.Result())
+			if !a.So(web.ErrorMiddleware(nil)(func(echo.Context) error {
+				return tc.Error
+			})(e.NewContext(req, rec)), should.BeNil) {
+				t.FailNow()
+			}
+
+			res := rec.Result()
+			b, err := ioutil.ReadAll(res.Body)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			a.So(res.StatusCode, should.Equal, http.StatusNotFound)
+			a.So(string(b), should.EqualJSON, tc.JSON)
 		})
 	}
 

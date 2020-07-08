@@ -316,9 +316,9 @@ func TestAssociations(t *testing.T) {
 				valid: true,
 			},
 			{
-				name:  "Wrong FPort",
+				name:  "Different FPort",
 				up:    &registeredApplicationUp2,
-				valid: false,
+				valid: true,
 			},
 			{
 				name:  "Wrong application",

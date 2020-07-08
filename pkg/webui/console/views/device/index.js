@@ -181,7 +181,8 @@ export default class Device extends React.Component {
     const hasJs =
       jsConfig.enabled &&
       join_server_address === getHostnameFromUrl(jsConfig.base_url) &&
-      (supports_join && Boolean(root_keys))
+      supports_join &&
+      Boolean(root_keys)
 
     const asConfig = selectAsConfig()
     const hasAs =

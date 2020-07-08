@@ -82,9 +82,12 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 	"/ttn.lorawan.v3.ApplicationPubSubRegistry/Set":  ApplicationPubSubFieldPathsNested,
 
 	// Application Packages:
-	"/ttn.lorawan.v3.ApplicationPackageRegistry/GetAssociation":   ApplicationPackageAssociationFieldPathsNested,
-	"/ttn.lorawan.v3.ApplicationPackageRegistry/ListAssociations": ApplicationPackageAssociationFieldPathsNested,
-	"/ttn.lorawan.v3.ApplicationPackageRegistry/SetAssociation":   ApplicationPackageAssociationFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/GetAssociation":          ApplicationPackageAssociationFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/ListAssociations":        ApplicationPackageAssociationFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/SetAssociation":          ApplicationPackageAssociationFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/GetDefaultAssociation":   ApplicationPackageDefaultAssociationFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/ListDefaultAssociations": ApplicationPackageDefaultAssociationFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/SetDefaultAssociation":   ApplicationPackageDefaultAssociationFieldPathsNested,
 
 	// Application Links:
 	"/ttn.lorawan.v3.As/GetLink": ApplicationLinkFieldPathsNested,
@@ -125,6 +128,7 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 		"session.keys.session_key_id",
 		"session.last_a_f_cnt_down",
 		"skip_payload_crypto",
+		"skip_payload_crypto_override",
 		"version_ids",
 		"version_ids.brand_id",
 		"version_ids.firmware_version",
@@ -149,6 +153,7 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 		"session.keys.session_key_id",
 		"session.last_a_f_cnt_down",
 		"skip_payload_crypto",
+		"skip_payload_crypto_override",
 		"version_ids",
 		"version_ids.brand_id",
 		"version_ids.firmware_version",

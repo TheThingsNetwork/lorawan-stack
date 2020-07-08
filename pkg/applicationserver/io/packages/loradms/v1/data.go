@@ -16,23 +16,33 @@ package loraclouddevicemanagementv1
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 type packageData struct {
-	token string
+	token     string
+	serverURL *url.URL
 }
 
-const tokenField = "token"
+const (
+	tokenField     = "token"
+	serverURLField = "server_url"
+)
 
-func (d packageData) toStruct() *types.Struct {
+func (d *packageData) toStruct() *types.Struct {
 	var st types.Struct
 	st.Fields = make(map[string]*types.Value)
 	st.Fields[tokenField] = &types.Value{
 		Kind: &types.Value_StringValue{
 			StringValue: d.token,
+		},
+	}
+	st.Fields[serverURLField] = &types.Value{
+		Kind: &types.Value_StringValue{
+			StringValue: d.serverURL.String(),
 		},
 	}
 	return &st
@@ -43,7 +53,7 @@ var (
 	errInvalidFieldType = errors.DefineCorruption("invalid_field_type", "field `{field}` has the wrong type `{type}`")
 )
 
-func (d *packageData) fromStruct(st *types.Struct) error {
+func (d *packageData) fromStruct(st *types.Struct) (err error) {
 	fields := st.GetFields()
 	value, ok := fields[tokenField]
 	if !ok {
@@ -57,5 +67,18 @@ func (d *packageData) fromStruct(st *types.Struct) error {
 		)
 	}
 	d.token = stringValue.StringValue
+	value, ok = fields[serverURLField]
+	if ok {
+		stringValue, ok = value.GetKind().(*types.Value_StringValue)
+		if !ok {
+			return errInvalidFieldType.WithAttributes(
+				"field", serverURLField,
+				"type", fmt.Sprintf("%T", value),
+			)
+		}
+		if d.serverURL, err = url.Parse(stringValue.StringValue); err != nil {
+			return err
+		}
+	}
 	return nil
 }

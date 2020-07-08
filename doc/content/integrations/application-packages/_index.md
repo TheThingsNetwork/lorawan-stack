@@ -30,24 +30,29 @@ This gives the result in the JSON format:
 }
 ```
 
+## Associations and Default Associations
+
+The link between an application or a device and an application package is achieved through associations.
+
+Associations link a device and a FPort to a specific application package. Since you may want to link all of the devices of an application without manually creating an association for each one of them, you may consider a default association, which links the application and a FPort to a specific application package.
+
+All of the commands for managing associations and default associations are symmetric, and may be switched one with another. For the rest of this reference we will consider default associations.
+
 ## Creating and Updating an Association
 
-In order to associate a given application package to a FPort of a device, you can use the `association set` command:
+In order to associate a given application package to a FPort of an application, you can use the `default-associations set` command:
 
 ```bash
-$ ttn-lw-cli applications packages associations set app1 dev1 25 --package-name test-package
+$ ttn-lw-cli applications packages default-associations set app1 25 --package-name test-package
 ```
 
-This will associate FPort `25` of device `dev1` of application `app1` with the application package `test-package`, as shown by the command output:
+This will associate FPort `25` of application `app1` with the application package `test-package`, as shown by the command output:
 
 ```json
 {
   "ids": {
-    "end_device_ids": {
-      "device_id": "dev1",
-      "application_ids": {
-        "application_id": "app1"
-      }
+    "application_ids": {
+      "application_id": "app1"
     },
     "f_port": 25
   },
@@ -63,7 +68,7 @@ Some application packages are stateful, and as such their state can be updated u
 # Create a JSON formatted file containing package data
 $ echo '{ "api_key": "AQEA8+q0v..." }' > package-data.json
 # Update the association with the new package data
-$ ttn-lw-cli applications packages associations set app1 dev1 25 --data-local-file package-data.json
+$ ttn-lw-cli applications packages default-associations set app1 25 --data-local-file package-data.json
 ```
 
 This will update the association to use the given `api_key`:
@@ -71,11 +76,8 @@ This will update the association to use the given `api_key`:
 ```json
 {
   "ids": {
-    "end_device_ids": {
-      "device_id": "dev1",
-      "application_ids": {
-        "application_id": "app1"
-      }
+    "application_ids": {
+      "application_id": "app1"
     },
     "f_port": 25
   },
@@ -90,10 +92,10 @@ This will update the association to use the given `api_key`:
 
 ## Listing the Associations
 
-The package associations of a given device can be listed using the `association list` command:
+The package associations of a given device can be listed using the `default-associations list` command:
 
 ```bash
-$ ttn-lw-cli applications packages associations list app1 dev1
+$ ttn-lw-cli applications packages default-associations list app1
 ```
 
 Output:
@@ -103,11 +105,8 @@ Output:
   "associations": [
     {
       "ids": {
-        "end_device_ids": {
-          "device_id": "dev1",
-          "application_ids": {
-            "application_id": "app1"
-          }
+        "application_ids": {
+          "application_id": "app1"
         },
         "f_port": 25
       },
@@ -121,10 +120,10 @@ Output:
 
 ## Retrieving an Association
 
-The associations can be retrieved using the `association get` command:
+The associations can be retrieved using the `default-associations get` command:
 
 ```bash
-$ ttn-lw-cli applications packages associations get app1 dev1 25 --data
+$ ttn-lw-cli applications packages default-associations get app1 25 --data
 ```
 
 Output:
@@ -132,11 +131,8 @@ Output:
 ```json
 {
   "ids": {
-    "end_device_ids": {
-      "device_id": "dev1",
-      "application_ids": {
-        "application_id": "app1"
-      }
+    "application_ids": {
+      "application_id": "app1"
     },
     "f_port": 25
   },
@@ -151,8 +147,8 @@ Output:
 
 ## Deleting an Association
 
-The associations can be deleted using the `association delete` command:
+The associations can be deleted using the `default-associations delete` command:
 
 ```bash
-$ ttn-lw-cli applications packages associations delete app1 dev1 25
+$ ttn-lw-cli applications packages associations delete app1 25
 ```

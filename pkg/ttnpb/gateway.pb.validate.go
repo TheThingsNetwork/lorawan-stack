@@ -2605,6 +2605,23 @@ func (m *GatewayConnectionStats) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "sub_bands":
+
+			for idx, item := range m.GetSubBands() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return GatewayConnectionStatsValidationError{
+							field:  fmt.Sprintf("sub_bands[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
 		default:
 			return GatewayConnectionStatsValidationError{
 				field:  name,
@@ -2848,3 +2865,93 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GatewayConnectionStats_RoundTripTimesValidationError{}
+
+// ValidateFields checks the field values on GatewayConnectionStats_SubBand
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *GatewayConnectionStats_SubBand) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GatewayConnectionStats_SubBandFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "min_frequency":
+			// no validation rules for MinFrequency
+		case "max_frequency":
+			// no validation rules for MaxFrequency
+		case "downlink_utilization_limit":
+			// no validation rules for DownlinkUtilizationLimit
+		case "downlink_utilization":
+			// no validation rules for DownlinkUtilization
+		default:
+			return GatewayConnectionStats_SubBandValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GatewayConnectionStats_SubBandValidationError is the validation error
+// returned by GatewayConnectionStats_SubBand.ValidateFields if the designated
+// constraints aren't met.
+type GatewayConnectionStats_SubBandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GatewayConnectionStats_SubBandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GatewayConnectionStats_SubBandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GatewayConnectionStats_SubBandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GatewayConnectionStats_SubBandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GatewayConnectionStats_SubBandValidationError) ErrorName() string {
+	return "GatewayConnectionStats_SubBandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GatewayConnectionStats_SubBandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGatewayConnectionStats_SubBand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GatewayConnectionStats_SubBandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GatewayConnectionStats_SubBandValidationError{}

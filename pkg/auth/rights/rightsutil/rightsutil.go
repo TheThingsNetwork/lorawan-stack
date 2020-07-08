@@ -22,16 +22,13 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// EventIsVisible returns whether evt is visible given rights in the context.
-func EventIsVisible(ctx context.Context, evt events.Event) (bool, error) {
-	visibility := evt.Visibility().Union(ttnpb.RightsFrom(
-		ttnpb.RIGHT_APPLICATION_ALL,
-		ttnpb.RIGHT_CLIENT_ALL,
-		ttnpb.RIGHT_GATEWAY_ALL,
-		ttnpb.RIGHT_ORGANIZATION_ALL,
-		ttnpb.RIGHT_USER_ALL,
-	))
-	for _, entityIDs := range evt.Identifiers() {
+// EventIsVisible returns whether ev is visible given rights in the context.
+func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
+	visibility := ev.Visibility()
+	if len(visibility.Rights) == 0 {
+		return true, nil
+	}
+	for _, entityIDs := range ev.Identifiers() {
 		switch ids := entityIDs.Identifiers().(type) {
 		case *ttnpb.ApplicationIdentifiers:
 			rights, err := rights.ListApplication(ctx, *ids)

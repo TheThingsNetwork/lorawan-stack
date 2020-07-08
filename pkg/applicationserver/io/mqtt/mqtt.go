@@ -155,6 +155,8 @@ func (c *connection) setup(ctx context.Context) error {
 					topicParts = c.format.DownlinkQueuedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
 				case *ttnpb.ApplicationUp_LocationSolved:
 					topicParts = c.format.LocationSolvedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
+				case *ttnpb.ApplicationUp_ServiceData:
+					topicParts = c.format.ServiceDataTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
 				}
 				if topicParts == nil {
 					continue
@@ -266,6 +268,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 			c.format.DownlinkFailedTopic(uid, topic.PartWildcard),
 			c.format.DownlinkQueuedTopic(uid, topic.PartWildcard),
 			c.format.LocationSolvedTopic(uid, topic.PartWildcard),
+			c.format.ServiceDataTopic(uid, topic.PartWildcard),
 		)
 	}
 	if err := rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE); err == nil {

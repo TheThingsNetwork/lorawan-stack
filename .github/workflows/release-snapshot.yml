@@ -1,0 +1,103 @@
+name: Snapshot release
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+    tags:
+      - 'v3.[0-9]+.[0-9]+*'
+      - '!v3.[0-9]+.[0-9]+'
+
+env:
+  NODE_ENV: production
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Login to Docker
+      uses: azure/docker-login@v1
+      with:
+        username: '${{ secrets.DOCKER_USERNAME  }}'
+        password: '${{ secrets.DOCKER_PASSWORD  }}'
+    - name: Install Snapcraft
+      run: sudo apt-get -yq --no-install-suggests --no-install-recommends install snapcraft
+    - name: Set up Node
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: '~14'
+    - name: Get Yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(npx yarn cache dir)"
+    - name: Initialize Yarn module cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '~1.14'
+    - name: Initialize Go module cache
+      uses: actions/cache@v2
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - name: Download Go dependencies
+      run: go mod download
+    - name: Download Go tool dependencies
+      run: |
+        cd tools
+        go mod download
+    - name: Initialize tool binary cache
+      uses: actions/cache@v2
+      with:
+        path: tools/bin
+        key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
+    - name: Make Mage
+      run: make tools/bin/mage
+    - name: Install JS SDK dependencies
+      run: tools/bin/mage jsSDK:deps
+    - name: Build JS SDK
+      run: tools/bin/mage jsSDK:clean jsSDK:build
+    - name: Install JS dependencies
+      run: tools/bin/mage js:deps
+    - name: Build frontend
+      run: tools/bin/mage js:clean js:build
+    - name: Install documentation dependencies
+      run: tools/bin/mage docs:deps
+    - name: Build documentation
+      run: tools/bin/mage docs:build
+      env:
+        HUGO_BASE_URL: https://thethingsstack.io/
+        HUGO_PARAMS_SEARCH_APIKEY: ${{ secrets.HUGO_PARAMS_SEARCH_APIKEY }}
+        HUGO_PARAMS_SEARCH_ENABLED: true
+        HUGO_PARAMS_SEARCH_INDEX: thethingsstack
+    - name: File versioning
+      run: tools/bin/mage version:files
+    - name: Check for diff
+      run: tools/bin/mage git:diff
+    - name: Determine Goreleaser version
+      id: goreleaser_version
+      run: echo "::set-output name=value::$(cat tools/go.mod | grep 'github.com/goreleaser/goreleaser v' | cut -d ' ' -f 2)"
+    - name: Run Goreleaser
+      uses: goreleaser/goreleaser-action@v2
+      env:
+        DOCKER_IMAGE: thethingsnetwork/lorawan-stack
+        DOCKER_IMAGE_DEV: thethingsnetwork/lorawan-stack-dev
+      with:
+        version: ${{ steps.goreleaser_version.outputs.value }}
+        args: release --snapshot
+    - name: Push Docker image
+      run: |
+        docker push thethingsnetwork/lorawan-stack-dev:${{ github.sha }}

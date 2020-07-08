@@ -1328,6 +1328,15 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 					dst.RoundTripTimes = nil
 				}
 			}
+		case "sub_bands":
+			if len(subs) > 0 {
+				return fmt.Errorf("'sub_bands' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SubBands = src.SubBands
+			} else {
+				dst.SubBands = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -1419,6 +1428,57 @@ func (dst *GatewayConnectionStats_RoundTripTimes) SetFields(src *GatewayConnecti
 			} else {
 				var zero uint32
 				dst.Count = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GatewayConnectionStats_SubBand) SetFields(src *GatewayConnectionStats_SubBand, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "min_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinFrequency = src.MinFrequency
+			} else {
+				var zero uint64
+				dst.MinFrequency = zero
+			}
+		case "max_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxFrequency = src.MaxFrequency
+			} else {
+				var zero uint64
+				dst.MaxFrequency = zero
+			}
+		case "downlink_utilization_limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlink_utilization_limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DownlinkUtilizationLimit = src.DownlinkUtilizationLimit
+			} else {
+				var zero float32
+				dst.DownlinkUtilizationLimit = zero
+			}
+		case "downlink_utilization":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlink_utilization' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DownlinkUtilization = src.DownlinkUtilization
+			} else {
+				var zero float32
+				dst.DownlinkUtilization = zero
 			}
 
 		default:

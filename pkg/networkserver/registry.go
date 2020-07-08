@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/internal/registry"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -45,75 +46,40 @@ func logRegistryRPCError(ctx context.Context, err error, msg string) {
 	printLog(msg)
 }
 
-type deprecatedDeviceField struct {
-	Old          string
-	New          string
-	GetTransform func(dev *ttnpb.EndDevice)
-	SetTransform func(dev *ttnpb.EndDevice, useOld, useNew bool) error
-}
-
-type deprecatedDeviceFieldMatch struct {
-	deprecatedDeviceField
-	MatchedOld bool
-	MatchedNew bool
-}
-
-type deprecatedDeviceFieldRegistryWrapper struct {
-	fields   []deprecatedDeviceField
+type replacedEndDeviceFieldRegistryWrapper struct {
+	fields   []registry.ReplacedEndDeviceField
 	registry DeviceRegistry
 }
 
-func matchDeprecatedDeviceFields(paths []string, deprecated []deprecatedDeviceField) ([]string, []deprecatedDeviceFieldMatch) {
-	var matched []deprecatedDeviceFieldMatch
-	for _, f := range deprecated {
-		hasOld, hasNew := ttnpb.HasAnyField(paths, f.Old), ttnpb.HasAnyField(paths, f.New)
-		switch {
-		case !hasOld && !hasNew:
-			continue
-		case hasOld && hasNew:
-		case hasOld:
-			paths = ttnpb.AddFields(paths, f.New)
-		case hasNew:
-			paths = ttnpb.AddFields(paths, f.Old)
-		}
-		matched = append(matched, deprecatedDeviceFieldMatch{
-			deprecatedDeviceField: f,
-			MatchedOld:            hasOld,
-			MatchedNew:            hasNew,
-		})
-	}
-	return paths, matched
-}
-
-func (w deprecatedDeviceFieldRegistryWrapper) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, context.Context, error) {
-	paths, deprecated := matchDeprecatedDeviceFields(paths, w.fields)
+func (w replacedEndDeviceFieldRegistryWrapper) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, context.Context, error) {
+	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
 	dev, ctx, err := w.registry.GetByEUI(ctx, joinEUI, devEUI, paths)
 	if err != nil || dev == nil {
 		return dev, ctx, err
 	}
-	for _, d := range deprecated {
+	for _, d := range replaced {
 		d.GetTransform(dev)
 	}
 	return dev, ctx, nil
 }
 
-func (w deprecatedDeviceFieldRegistryWrapper) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
-	paths, deprecated := matchDeprecatedDeviceFields(paths, w.fields)
+func (w replacedEndDeviceFieldRegistryWrapper) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
+	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
 	dev, ctx, err := w.registry.GetByID(ctx, appID, devID, paths)
 	if err != nil || dev == nil {
 		return dev, ctx, err
 	}
-	for _, d := range deprecated {
+	for _, d := range replaced {
 		d.GetTransform(dev)
 	}
 	return dev, ctx, nil
 }
 
-func (w deprecatedDeviceFieldRegistryWrapper) RangeByAddr(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error {
-	paths, deprecated := matchDeprecatedDeviceFields(paths, w.fields)
+func (w replacedEndDeviceFieldRegistryWrapper) RangeByAddr(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error {
+	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
 	return w.registry.RangeByAddr(ctx, devAddr, paths, func(ctx context.Context, dev *ttnpb.EndDevice) bool {
 		if dev != nil {
-			for _, d := range deprecated {
+			for _, d := range replaced {
 				d.GetTransform(dev)
 			}
 		}
@@ -121,11 +87,11 @@ func (w deprecatedDeviceFieldRegistryWrapper) RangeByAddr(ctx context.Context, d
 	})
 }
 
-func (w deprecatedDeviceFieldRegistryWrapper) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-	paths, deprecated := matchDeprecatedDeviceFields(paths, w.fields)
+func (w replacedEndDeviceFieldRegistryWrapper) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
 	dev, ctx, err := w.registry.SetByID(ctx, appID, devID, paths, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
-			for _, d := range deprecated {
+			for _, d := range replaced {
 				d.GetTransform(dev)
 			}
 		}
@@ -133,7 +99,10 @@ func (w deprecatedDeviceFieldRegistryWrapper) SetByID(ctx context.Context, appID
 		if err != nil || dev == nil {
 			return dev, paths, err
 		}
-		for _, d := range deprecated {
+		for _, d := range replaced {
+			if ttnpb.HasAnyField(paths, d.Old) {
+				paths = ttnpb.AddFields(paths, d.New)
+			}
 			d.SetTransform(dev, d.MatchedOld, d.MatchedNew)
 		}
 		return dev, paths, nil
@@ -141,20 +110,20 @@ func (w deprecatedDeviceFieldRegistryWrapper) SetByID(ctx context.Context, appID
 	if err != nil || dev == nil {
 		return dev, ctx, err
 	}
-	for _, d := range deprecated {
+	for _, d := range replaced {
 		d.GetTransform(dev)
 	}
 	return dev, ctx, nil
 }
 
-func wrapDeviceRegistryWithDeprecatedFields(r DeviceRegistry, fields ...deprecatedDeviceField) DeviceRegistry {
-	return deprecatedDeviceFieldRegistryWrapper{
+func wrapEndDeviceRegistryWithReplacedFields(r DeviceRegistry, fields ...registry.ReplacedEndDeviceField) DeviceRegistry {
+	return replacedEndDeviceFieldRegistryWrapper{
 		fields:   fields,
 		registry: r,
 	}
 }
 
-var deprecatedDeviceFields = []deprecatedDeviceField{
+var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 	{
 		Old: "mac_state.current_parameters.adr_ack_delay",
 		New: "mac_state.current_parameters.adr_ack_delay_exponent",

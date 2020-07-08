@@ -627,6 +627,7 @@ var GenerateEndDeviceQRCodeRequestFieldPathsNested = []string{
 	"end_device.session.queued_application_downlinks",
 	"end_device.session.started_at",
 	"end_device.skip_payload_crypto",
+	"end_device.skip_payload_crypto_override",
 	"end_device.supports_class_b",
 	"end_device.supports_class_c",
 	"end_device.supports_join",

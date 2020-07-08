@@ -18,6 +18,16 @@ Use a requirements subheading to list requirements/prerequisites.
 1. Requirement 1
 2. Requirement 2
 
+## New Features {{< new-in-version "3.8.5">}}
+
+Use the `{{< new-in-version "3.8.5" >}}` shortcode to tag documentation for features added in a particular version of {{% tts %}}. For documentation that targets `master`, that's the next patch bump, e.g `3.8.x`. For documentation targeting `develop` that's the next minor bump, e.g `3.x.0`. Check `tools/bin/mage version:current` for the current version.
+
+#### This Is A New Feature Heading {{< new-in-version "3.8.5">}}
+
+This is new feature text {{< new-in-version "3.8.5">}}
+
+- This is a new feature bullet {{< new-in-version "3.8.5">}}
+
 ## Sections
 
 When possible, divide long documents into separate files, each with its own folder and `_index.md`. Use the `weight` tag in the [Front Matter](https://gohugo.io/content-management/front-matter/) to manually sort sections if necessary. If not, they will be sorted alphabetically.

@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"sync"
 	"testing"
 
@@ -26,6 +27,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/peer"
 )
 
 type wrappedEvent struct {
@@ -44,6 +47,29 @@ func TestNew(t *testing.T) {
 	evt := events.New(ctx, "as.up.receive", nil, testData{}, ttnpb.RIGHT_ALL)
 	a.So(evt.CorrelationIDs(), should.Resemble, []string{"TestNew"})
 	a.So(evt.Visibility().GetRights(), should.Contain, ttnpb.RIGHT_ALL)
+	a.So(evt.AuthType(), should.Equal, "")
+	a.So(evt.AuthTokenType(), should.Equal, "")
+	a.So(evt.AuthTokenID(), should.Equal, "")
+	a.So(evt.AuthRemoteIP(), should.Equal, "")
+
+	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs(
+		"authorization", "bearer MFRWG.token_id.token_key"))
+	ctx = peer.NewContext(ctx, &peer.Peer{
+		Addr: &net.TCPAddr{IP: net.IP{10, 10, 10, 10}, Port: 10000},
+	})
+	evt = events.New(ctx, "as.up.receive", nil, testData{}, ttnpb.RIGHT_ALL)
+	a.So(evt.AuthType(), should.Equal, "bearer")
+	a.So(evt.AuthTokenType(), should.Equal, "AccessToken")
+	a.So(evt.AuthTokenID(), should.Equal, "token_id")
+	a.So(evt.AuthRemoteIP(), should.Equal, "10.10.10.10")
+
+	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs("x-forwarded-for", "20.20.20.20"))
+	evt = events.New(ctx, "as.up.receive", nil, testData{}, ttnpb.RIGHT_ALL)
+	a.So(evt.AuthRemoteIP(), should.Equal, "20.20.20.20")
+
+	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs("x-forwarded-for", "30.30.30.30, 20.20.20.20"))
+	evt = events.New(ctx, "as.up.receive", nil, testData{}, ttnpb.RIGHT_ALL)
+	a.So(evt.AuthRemoteIP(), should.Equal, "30.30.30.30")
 }
 
 func TestEvents(t *testing.T) {
@@ -61,7 +87,7 @@ func TestEvents(t *testing.T) {
 		newTotal <- totalEvents
 	})
 
-	var eventCh = make(chan events.Event)
+	eventCh := make(chan events.Event)
 	handler := events.HandlerFunc(func(e events.Event) {
 		eventCh <- e
 	})
@@ -146,7 +172,7 @@ func Example() {
 	// Event names are lowercase snake_case and can be dot-separated as component.subsystem.subsystem.event
 	// Event descriptions are short descriptions of what the event means.
 	// Visibility rights are optional. If no rights are supplied, then the _ALL right is assumed.
-	var adrSendEvent = events.Define("ns.mac.adr.send_req", "send ADR request", ttnpb.RIGHT_APPLICATION_TRAFFIC_READ)
+	adrSendEvent := events.Define("ns.mac.adr.send_req", "send ADR request", ttnpb.RIGHT_APPLICATION_TRAFFIC_READ)
 
 	// These variables come from the request or you got them from the db or something.
 	var (

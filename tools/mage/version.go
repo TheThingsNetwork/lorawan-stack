@@ -26,7 +26,6 @@ import (
 	"github.com/TheThingsIndustries/magepkg/git"
 	"github.com/blang/semver"
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 )
 
 // Version namespace.
@@ -71,20 +70,18 @@ func (Version) Files() error {
 	if mg.Verbose() {
 		fmt.Println("Writing version files")
 	}
-	mg.Deps(Version.getCurrent)
+	mg.Deps(Version.getCurrent, Js.Deps)
 	version := strings.TrimPrefix(currentVersion, "v")
 	err := ioutil.WriteFile(goVersionFilePath, []byte(fmt.Sprintf(goVersionFile, version)), 0644)
 	if err != nil {
 		return err
 	}
 	for _, packageJSONFile := range packageJSONFilePaths {
-		err = sh.Run(
-			nodeBin("json"),
+		if err = runYarn("run", "json",
 			"-f", packageJSONFile,
 			"-I",
 			"-e", fmt.Sprintf(`this.version="%s"`, version),
-		)
-		if err != nil {
+		); err != nil {
 			return err
 		}
 	}

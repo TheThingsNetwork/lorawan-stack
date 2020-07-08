@@ -32,6 +32,7 @@ $title-family: "Manrope", $family-sans-serif;
 $blue: #2380ff;
 $white-bis: #fbfbfb;
 $white-ter : #ececec;
+$red: #f9595a;
 
 $code: $blue;
 $link-hover: darken($blue, 20%);
@@ -273,6 +274,15 @@ details + blockquote {
   background-color: $white-ter;
   border-radius: 8px;
   padding: 12px;
+}
+
+.new-in-version {
+  vertical-align: super;
+  font-size: 60%;
+  color: $red;
+  line-height: 0;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
 }
 
 @import "highlight.scss";

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,5 +24,7 @@ import (
 	_ "github.com/mattn/goveralls"
 	_ "github.com/mdempsky/unconvert"
 	_ "github.com/mgechev/revive"
+	_ "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/commands"
+	_ "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-stack/commands"
 	_ "golang.org/x/tools/cmd/goimports"
 )

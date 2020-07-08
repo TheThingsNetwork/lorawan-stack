@@ -42,6 +42,7 @@ The Application Server publishes on the following topics:
 - `v3/{application id}/devices/{device id}/down/ack`
 - `v3/{application id}/devices/{device id}/down/nack`
 - `v3/{application id}/devices/{device id}/down/failed`
+- `v3/{application id}/devices/{device id}/service/data`
 
 While you could subscribe to separate topics, for the tutorial subscribe to `#` to subscribe to all messages.
 

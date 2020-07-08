@@ -2280,6 +2280,18 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "skip_payload_crypto":
 			// no validation rules for SkipPayloadCrypto
+		case "skip_payload_crypto_override":
+
+			if v, ok := interface{}(m.GetSkipPayloadCryptoOverride()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return EndDeviceValidationError{
+						field:  "skip_payload_crypto_override",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return EndDeviceValidationError{
 				field:  name,

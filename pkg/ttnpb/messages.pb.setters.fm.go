@@ -821,6 +821,36 @@ func (dst *ApplicationInvalidatedDownlinks) SetFields(src *ApplicationInvalidate
 	return nil
 }
 
+func (dst *ApplicationServiceData) SetFields(src *ApplicationServiceData, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "service":
+			if len(subs) > 0 {
+				return fmt.Errorf("'service' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Service = src.Service
+			} else {
+				var zero string
+				dst.Service = zero
+			}
+		case "data":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Data = src.Data
+			} else {
+				dst.Data = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -1162,6 +1192,39 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						} else {
 							newDst = &ApplicationLocation{}
 							dst.Up = &ApplicationUp_LocationSolved{LocationSolved: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Up = src.Up
+						} else {
+							dst.Up = nil
+						}
+					}
+				case "service_data":
+					_, srcOk := src.Up.(*ApplicationUp_ServiceData)
+					if !srcOk && src.Up != nil {
+						return fmt.Errorf("attempt to set oneof 'service_data', while different oneof is set in source")
+					}
+					_, dstOk := dst.Up.(*ApplicationUp_ServiceData)
+					if !dstOk && dst.Up != nil {
+						return fmt.Errorf("attempt to set oneof 'service_data', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ApplicationServiceData
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.Up.(*ApplicationUp_ServiceData).ServiceData
+						}
+						if dstOk {
+							newDst = dst.Up.(*ApplicationUp_ServiceData).ServiceData
+						} else {
+							newDst = &ApplicationServiceData{}
+							dst.Up = &ApplicationUp_ServiceData{ServiceData: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err

@@ -16,40 +16,20 @@ package ttnmage
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 )
 
-// Styl namespace.
-type Styl mg.Namespace
+var initDeps []interface{}
 
-func (styl Styl) stylint() (func(args ...string) (string, error), error) {
-	if _, err := os.Stat(nodeBin("stylint")); os.IsNotExist(err) {
-		if err = devDeps(); err != nil {
-			return nil, err
-		}
-	}
-	return func(args ...string) (string, error) {
-		return sh.Output(nodeBin("stylint"), args...)
-	}, nil
+// Init initializes the tooling.
+func Init() {
+	mg.Deps(initDeps...)
 }
 
-// Lint runs stylint over frontend styl files.
-func (styl Styl) Lint() error {
-	if mg.Verbose() {
-		fmt.Println("Running stylint")
-	}
-	stylint, err := styl.stylint()
+func targetError(err error) error {
 	if err != nil {
-		return err
+		return fmt.Errorf("failed checking modtime: %w", err)
 	}
-	res, err := stylint("./pkg/webui", "--config", "config/stylintrc.json")
-
-	if res != "" {
-		fmt.Println(res)
-	}
-
-	return err
+	return nil
 }

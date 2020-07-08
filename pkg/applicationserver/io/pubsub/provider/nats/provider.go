@@ -89,6 +89,10 @@ func (impl) OpenConnection(ctx context.Context, target provider.Target) (pc *pro
 			topic:   &pc.Topics.LocationSolved,
 			message: target.GetLocationSolved(),
 		},
+		{
+			topic:   &pc.Topics.ServiceData,
+			message: target.GetServiceData(),
+		},
 	} {
 		if t.message == nil {
 			continue
