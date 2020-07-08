@@ -332,6 +332,7 @@ We use [`revive`](http://github.com/mgechev/revive) to lint Go code and [`eslint
 
 Please respect the following guidelines for content in our documentation site. A copy and paste template for creating new documentation can be found [here](doc/content/example-template).
 
+- Use the `{{< new-in-version "3.8.5" >}}` shortcode to tag documentation for features added in a particular version. For documentation that targets `master`, that's the next patch bump, e.g `3.8.x`. For documentation targeting `develop` that's the next minor bump, e.g `3.x.0`.
 - The title of a doc page is already rendered by the build system as a h1, don't add an extra one.
 - Use title case for headings.
 - A documentation page starts with an introduction, and then the first heading. The first paragraph of the introduction is typically a summary of the page. Use a `<!--more-->` to indicate where the summary ends.

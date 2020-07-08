@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Remove version from hosted documentation paths.
+
 ### Deprecated
 
 - End device `skip_payload_crypto` field: it gets replaced by `skip_payload_crypto_override`.
