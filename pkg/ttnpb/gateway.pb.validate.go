@@ -783,8 +783,18 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "update_location_from_status":
 			// no validation rules for UpdateLocationFromStatus
-		case "secret":
-			// no validation rules for Secret
+		case "secrets":
+
+			if v, ok := interface{}(m.GetSecrets()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewayValidationError{
+						field:  "secrets",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return GatewayValidationError{
 				field:  name,
@@ -2705,8 +2715,28 @@ func (m *GatewaySecretPlainText) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "value":
-			// no validation rules for Value
+		case "values":
+
+			for key, val := range m.GetValues() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
+					return GatewaySecretPlainTextValidationError{
+						field:  fmt.Sprintf("values[%v]", key),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_GatewaySecretPlainText_Values_Pattern.MatchString(key) {
+					return GatewaySecretPlainTextValidationError{
+						field:  fmt.Sprintf("values[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				// no validation rules for Values[key]
+			}
+
 		default:
 			return GatewaySecretPlainTextValidationError{
 				field:  name,
@@ -2772,6 +2802,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GatewaySecretPlainTextValidationError{}
+
+var _GatewaySecretPlainText_Values_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on StoreGatewaySecretRequest with the
 // rules defined in the proto definition for this message. If any rules are

@@ -122,9 +122,9 @@ const (
 	RIGHT_GATEWAY_STATUS_READ Right = 38
 	// The right to view view gateway location.
 	RIGHT_GATEWAY_LOCATION_READ Right = 39
-	//The right to encrypt and store the a secret value associated with this gateway.
+	// The right to encrypt and store the secret associated with this gateway.
 	RIGHT_GATEWAY_WRITE_SECRET Right = 57
-	//The right to decrypt and retrieve the LBS secret value.
+	// The right to decrypt and retrieve the secret associated with this gateway.
 	RIGHT_GATEWAY_READ_SECRET Right = 58
 	// The pseudo-right for all (current and future) gateway rights.
 	RIGHT_GATEWAY_ALL Right = 40

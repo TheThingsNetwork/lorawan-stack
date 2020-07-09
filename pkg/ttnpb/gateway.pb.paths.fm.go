@@ -93,7 +93,9 @@ var GatewayFieldPathsNested = []string{
 	"name",
 	"schedule_anytime_delay",
 	"schedule_downlink_late",
-	"secret",
+	"secrets",
+	"secrets.key_id",
+	"secrets.values",
 	"status_public",
 	"update_channel",
 	"update_location_from_status",
@@ -122,7 +124,7 @@ var GatewayFieldPathsTopLevel = []string{
 	"name",
 	"schedule_anytime_delay",
 	"schedule_downlink_late",
-	"secret",
+	"secrets",
 	"status_public",
 	"update_channel",
 	"update_location_from_status",
@@ -202,7 +204,9 @@ var CreateGatewayRequestFieldPathsNested = []string{
 	"gateway.name",
 	"gateway.schedule_anytime_delay",
 	"gateway.schedule_downlink_late",
-	"gateway.secret",
+	"gateway.secrets",
+	"gateway.secrets.key_id",
+	"gateway.secrets.values",
 	"gateway.status_public",
 	"gateway.update_channel",
 	"gateway.update_location_from_status",
@@ -239,7 +243,9 @@ var UpdateGatewayRequestFieldPathsNested = []string{
 	"gateway.name",
 	"gateway.schedule_anytime_delay",
 	"gateway.schedule_downlink_late",
-	"gateway.secret",
+	"gateway.secrets",
+	"gateway.secrets.key_id",
+	"gateway.secrets.values",
 	"gateway.status_public",
 	"gateway.update_channel",
 	"gateway.update_location_from_status",
@@ -428,18 +434,18 @@ var GatewayConnectionStatsFieldPathsTopLevel = []string{
 	"uplink_count",
 }
 var GatewaySecretPlainTextFieldPathsNested = []string{
-	"value",
+	"values",
 }
 
 var GatewaySecretPlainTextFieldPathsTopLevel = []string{
-	"value",
+	"values",
 }
 var StoreGatewaySecretRequestFieldPathsNested = []string{
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
 	"plain_text",
-	"plain_text.value",
+	"plain_text.values",
 }
 
 var StoreGatewaySecretRequestFieldPathsTopLevel = []string{
@@ -451,7 +457,7 @@ var RetrieveGatewaySecretRequestFieldPathsNested = []string{
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
 	"plain_text",
-	"plain_text.value",
+	"plain_text.values",
 }
 
 var RetrieveGatewaySecretRequestFieldPathsTopLevel = []string{

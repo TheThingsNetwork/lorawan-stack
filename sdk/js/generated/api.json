@@ -10615,12 +10615,12 @@
               "defaultValue": ""
             },
             {
-              "name": "secret",
-              "description": "An encypted secret value for this gateway.\nWhen set, this is currently sent as the lnsKey parameter in the Basic Station CUPS response. This can also be extended to store other values such as client TLS private key.\nThis value cannot be set/retrieved in Gateway API calls. Use the StoreGatewaySecret, RetrieveGatewaySecret requests.\nIt can however be deleted by DeleteGateway since it's part of the entity.",
+              "name": "secrets",
+              "description": "Encrypted Gateway Secrets.\nThis value cannot be set/retrieved in Gateway API calls. Use the StoreGatewaySecret, RetrieveGatewaySecret requests.\nIt can however be deleted by DeleteGateway since it's part of the entity.",
               "label": "",
-              "type": "bytes",
-              "longType": "bytes",
-              "fullType": "bytes",
+              "type": "Secrets",
+              "longType": "Secrets",
+              "fullType": "ttn.lorawan.v3.Secrets",
               "ismap": false,
               "defaultValue": ""
             }
@@ -11214,12 +11214,55 @@
           "extensions": [],
           "fields": [
             {
-              "name": "value",
+              "name": "values",
+              "description": "",
+              "label": "repeated",
+              "type": "ValuesEntry",
+              "longType": "GatewaySecretPlainText.ValuesEntry",
+              "fullType": "ttn.lorawan.v3.GatewaySecretPlainText.ValuesEntry",
+              "ismap": true,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ValuesEntry",
+          "longName": "GatewaySecretPlainText.ValuesEntry",
+          "fullName": "ttn.lorawan.v3.GatewaySecretPlainText.ValuesEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
               "description": "",
               "label": "",
               "type": "string",
               "longType": "string",
               "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
               "ismap": false,
               "defaultValue": ""
             }
@@ -24206,12 +24249,12 @@
             {
               "name": "RIGHT_GATEWAY_WRITE_SECRET",
               "number": "57",
-              "description": "The right to encrypt and store the a secret value associated with this gateway."
+              "description": "The right to encrypt and store the secret associated with this gateway."
             },
             {
               "name": "RIGHT_GATEWAY_READ_SECRET",
               "number": "58",
-              "description": "The right to decrypt and retrieve the LBS secret value."
+              "description": "The right to decrypt and retrieve the secret associated with this gateway."
             },
             {
               "name": "RIGHT_GATEWAY_ALL",
@@ -25011,6 +25054,94 @@
           ]
         }
       ]
+    },
+    {
+      "name": "lorawan-stack/api/secrets.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "Secrets",
+          "longName": "Secrets",
+          "fullName": "ttn.lorawan.v3.Secrets",
+          "description": "Secrets contains key-value pairs of secret values as well as the ID of the encryption key.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "values",
+              "description": "",
+              "label": "repeated",
+              "type": "ValuesEntry",
+              "longType": "Secrets.ValuesEntry",
+              "fullType": "ttn.lorawan.v3.Secrets.ValuesEntry",
+              "ismap": true,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key_id",
+              "description": "ID of the Key used to encrypt the secret.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ValuesEntry",
+          "longName": "Secrets.ValuesEntry",
+          "fullName": "ttn.lorawan.v3.Secrets.ValuesEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
     },
     {
       "name": "lorawan-stack/api/user.proto",

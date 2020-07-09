@@ -174,6 +174,7 @@
   - [Message `GatewayRadio`](#ttn.lorawan.v3.GatewayRadio)
   - [Message `GatewayRadio.TxConfiguration`](#ttn.lorawan.v3.GatewayRadio.TxConfiguration)
   - [Message `GatewaySecretPlainText`](#ttn.lorawan.v3.GatewaySecretPlainText)
+  - [Message `GatewaySecretPlainText.ValuesEntry`](#ttn.lorawan.v3.GatewaySecretPlainText.ValuesEntry)
   - [Message `GatewayStatus`](#ttn.lorawan.v3.GatewayStatus)
   - [Message `GatewayStatus.MetricsEntry`](#ttn.lorawan.v3.GatewayStatus.MetricsEntry)
   - [Message `GatewayStatus.VersionsEntry`](#ttn.lorawan.v3.GatewayStatus.VersionsEntry)
@@ -430,6 +431,9 @@
   - [Message `SearchEntitiesRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchEntitiesRequest.AttributesContainEntry)
   - [Service `EndDeviceRegistrySearch`](#ttn.lorawan.v3.EndDeviceRegistrySearch)
   - [Service `EntityRegistrySearch`](#ttn.lorawan.v3.EntityRegistrySearch)
+- [File `lorawan-stack/api/secrets.proto`](#lorawan-stack/api/secrets.proto)
+  - [Message `Secrets`](#ttn.lorawan.v3.Secrets)
+  - [Message `Secrets.ValuesEntry`](#ttn.lorawan.v3.Secrets.ValuesEntry)
 - [File `lorawan-stack/api/user.proto`](#lorawan-stack/api/user.proto)
   - [Message `CreateTemporaryPasswordRequest`](#ttn.lorawan.v3.CreateTemporaryPasswordRequest)
   - [Message `CreateUserAPIKeyRequest`](#ttn.lorawan.v3.CreateUserAPIKeyRequest)
@@ -2638,7 +2642,7 @@ Gateway is the message that defines a gateway on the network.
 | `downlink_path_constraint` | [`DownlinkPathConstraint`](#ttn.lorawan.v3.DownlinkPathConstraint) |  |  |
 | `schedule_anytime_delay` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite. |
 | `update_location_from_status` | [`bool`](#bool) |  | update the location of this gateway from status messages |
-| `secret` | [`bytes`](#bytes) |  | An encypted secret value for this gateway. When set, this is currently sent as the lnsKey parameter in the Basic Station CUPS response. This can also be extended to store other values such as client TLS private key. This value cannot be set/retrieved in Gateway API calls. Use the StoreGatewaySecret, RetrieveGatewaySecret requests. It can however be deleted by DeleteGateway since it's part of the entity. |
+| `secrets` | [`Secrets`](#ttn.lorawan.v3.Secrets) |  | Encrypted Gateway Secrets. This value cannot be set/retrieved in Gateway API calls. Use the StoreGatewaySecret, RetrieveGatewaySecret requests. It can however be deleted by DeleteGateway since it's part of the entity. |
 
 #### Field Rules
 
@@ -2776,7 +2780,20 @@ The plain text value of the gateway secret.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `value` | [`string`](#string) |  |  |
+| `values` | [`GatewaySecretPlainText.ValuesEntry`](#ttn.lorawan.v3.GatewaySecretPlainText.ValuesEntry) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `values` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.GatewaySecretPlainText.ValuesEntry">Message `GatewaySecretPlainText.ValuesEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`bytes`](#bytes) |  |  |
 
 ### <a name="ttn.lorawan.v3.GatewayStatus">Message `GatewayStatus`</a>
 
@@ -5926,8 +5943,8 @@ Right is the enum that defines all the different rights to do something in the n
 | `RIGHT_GATEWAY_LINK` | 37 | The right to link as Gateway to a Gateway Server for traffic exchange, i.e. write uplink and read downlink (API keys only) This right is typically only given to a gateway. This right implies RIGHT_GATEWAY_INFO. |
 | `RIGHT_GATEWAY_STATUS_READ` | 38 | The right to view gateway status. |
 | `RIGHT_GATEWAY_LOCATION_READ` | 39 | The right to view view gateway location. |
-| `RIGHT_GATEWAY_WRITE_SECRET` | 57 | The right to encrypt and store the a secret value associated with this gateway. |
-| `RIGHT_GATEWAY_READ_SECRET` | 58 | The right to decrypt and retrieve the LBS secret value. |
+| `RIGHT_GATEWAY_WRITE_SECRET` | 57 | The right to encrypt and store the secret associated with this gateway. |
+| `RIGHT_GATEWAY_READ_SECRET` | 58 | The right to decrypt and retrieve the secret associated with this gateway. |
 | `RIGHT_GATEWAY_ALL` | 40 | The pseudo-right for all (current and future) gateway rights. |
 | `RIGHT_ORGANIZATION_INFO` | 41 | The right to view organization information. |
 | `RIGHT_ORGANIZATION_SETTINGS_BASIC` | 42 | The right to edit basic organization settings. |
@@ -6047,6 +6064,30 @@ This service is not implemented on all deployments.
 | `SearchGateways` | `GET` | `/api/v3/search/gateways` |  |
 | `SearchOrganizations` | `GET` | `/api/v3/search/organizations` |  |
 | `SearchUsers` | `GET` | `/api/v3/search/users` |  |
+
+## <a name="lorawan-stack/api/secrets.proto">File `lorawan-stack/api/secrets.proto`</a>
+
+### <a name="ttn.lorawan.v3.Secrets">Message `Secrets`</a>
+
+Secrets contains key-value pairs of secret values as well as the ID of the encryption key.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `values` | [`Secrets.ValuesEntry`](#ttn.lorawan.v3.Secrets.ValuesEntry) | repeated |  |
+| `key_id` | [`string`](#string) |  | ID of the Key used to encrypt the secret. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `values` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.Secrets.ValuesEntry">Message `Secrets.ValuesEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`bytes`](#bytes) |  |  |
 
 ## <a name="lorawan-stack/api/user.proto">File `lorawan-stack/api/user.proto`</a>
 

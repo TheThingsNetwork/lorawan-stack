@@ -509,14 +509,30 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 				var zero bool
 				dst.UpdateLocationFromStatus = zero
 			}
-		case "secret":
+		case "secrets":
 			if len(subs) > 0 {
-				return fmt.Errorf("'secret' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Secret = src.Secret
+				var newDst, newSrc *Secrets
+				if (src == nil || src.Secrets == nil) && dst.Secrets == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Secrets
+				}
+				if dst.Secrets != nil {
+					newDst = dst.Secrets
+				} else {
+					newDst = &Secrets{}
+					dst.Secrets = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
 			} else {
-				dst.Secret = nil
+				if src != nil {
+					dst.Secrets = src.Secrets
+				} else {
+					dst.Secrets = nil
+				}
 			}
 
 		default:
@@ -1357,15 +1373,14 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 func (dst *GatewaySecretPlainText) SetFields(src *GatewaySecretPlainText, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "value":
+		case "values":
 			if len(subs) > 0 {
-				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'values' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.Value = src.Value
+				dst.Values = src.Values
 			} else {
-				var zero string
-				dst.Value = zero
+				dst.Values = nil
 			}
 
 		default:

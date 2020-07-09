@@ -25,6 +25,7 @@ import "lorawan-stack/api/enums.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/metadata.proto";
 import "lorawan-stack/api/rights.proto";
+import "lorawan-stack/api/secrets.proto";
 
 package ttn.lorawan.v3;
 
@@ -127,11 +128,10 @@ message Gateway {
   google.protobuf.Duration schedule_anytime_delay = 19 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
   // update the location of this gateway from status messages
   bool update_location_from_status = 21;
-  // An encypted secret value for this gateway.
-  // When set, this is currently sent as the lnsKey parameter in the Basic Station CUPS response. This can also be extended to store other values such as client TLS private key.
+  // Encrypted Gateway Secrets.
   // This value cannot be set/retrieved in Gateway API calls. Use the StoreGatewaySecret, RetrieveGatewaySecret requests.
   // It can however be deleted by DeleteGateway since it's part of the entity.
-  bytes secret = 22;
+  Secrets secrets = 22;
 
   // next: 23
 }
@@ -293,7 +293,7 @@ message GatewayConnectionStats {
 
 // The plain text value of the gateway secret.
 message GatewaySecretPlainText{
-  string value = 1;
+  map<string,bytes> values = 1 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 }
 
 message StoreGatewaySecretRequest{
