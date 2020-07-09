@@ -2781,8 +2781,8 @@ Connection stats as monitored by the Gateway Server.
 | Field | Validations |
 | ----- | ----------- |
 | `time` | <p>`timestamp.required`: `true`</p> |
-| `versions` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
-| `metrics` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `versions` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p> |
+| `metrics` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.GatewayStatus.MetricsEntry">Message `GatewayStatus.MetricsEntry`</a>
 
