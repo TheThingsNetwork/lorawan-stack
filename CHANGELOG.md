@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Key vault caching mechanism (see `--key-vault.cache.size` and `--key-vault.cache.ttl` options).
 - Payload formatter documentation.
 - CLI support for setting message payload formatters from a local file. (see `--formatters.down-formatter-parameter-local-file` and `--formatters.up-formatter-parameter-local-file` options).
+- Generic encryption/decryption to KeyVault.
 
 ### Changed
 

@@ -24,8 +24,19 @@ import (
 type KeyVault interface {
 	ComponentKEKLabeler
 
+	// Wrap implements the RFC 3394 AES Key Wrap algorithm. Only keys of 16, 24 or 32 bytes are accepted.
+	// Keys are referenced using the KEK labels.
 	Wrap(ctx context.Context, plaintext []byte, kekLabel string) ([]byte, error)
+	// UnwrapKey implements the RFC 3394 AES Key Unwrap algorithm. Only keys of 16, 24 or 32 bytes are accepted.
+	// Keys are referenced using the KEK labels.
 	Unwrap(ctx context.Context, ciphertext []byte, kekLabel string) ([]byte, error)
+
+	// Encrypt encrypts messages of variable length using AES 128 GCM.
+	// The encryption key is referenced using the ID.
+	Encrypt(ctx context.Context, plaintext []byte, id string) ([]byte, error)
+	// Decrypt decrypts messages of variable length using AES 128 GCM.
+	// The encryption key is referenced using the ID.
+	Decrypt(ctx context.Context, ciphertext []byte, id string) ([]byte, error)
 
 	// GetCertificate gets the X.509 certificate of the given identifier.
 	GetCertificate(ctx context.Context, id string) (*x509.Certificate, error)
