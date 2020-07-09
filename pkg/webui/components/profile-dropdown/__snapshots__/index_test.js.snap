@@ -14,7 +14,7 @@ exports[`Profile Dropdown is in initial state has dropdown open should match sna
     kschiffer
   </span>
   <Icon
-    icon="arrow_drop_down"
+    icon="arrow_drop_up"
     large={false}
     nudgeDown={false}
     nudgeUp={false}

@@ -77,7 +77,7 @@ export default class ProfileDropdown extends React.PureComponent {
         {...rest}
       >
         <span className={styles.id}>{userName}</span>
-        <Icon icon="arrow_drop_down" />
+        <Icon icon={this.state.expanded ? 'arrow_drop_up' : 'arrow_drop_down'} />
         {this.state.expanded && <Dropdown className={styles.dropdown}>{children}</Dropdown>}
       </div>
     )
