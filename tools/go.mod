@@ -29,6 +29,7 @@ require (
 	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/client9/misspell v0.3.4
+	github.com/cloudflare/cfssl v1.4.1
 	github.com/gobuffalo/envy v1.9.0 // indirect
 	github.com/gohugoio/hugo v0.71.0
 	github.com/goreleaser/goreleaser v0.138.0
