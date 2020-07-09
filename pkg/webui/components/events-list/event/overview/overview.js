@@ -58,7 +58,7 @@ const EventOverview = props => {
       <div className={overviewCls}>
         {children}
         {canExpand && (
-          <Icon className={style.icon} icon={isOpen ? 'arrow_drop_down' : 'arrow_drop_up'} />
+          <Icon className={style.icon} icon={isOpen ? 'arrow_drop_up' : 'arrow_drop_down'} />
         )}
       </div>
     </div>
