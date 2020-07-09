@@ -34,6 +34,7 @@ func (c *Component) initGRPC() {
 	c.grpc = rpcserver.New(
 		c.ctx,
 		rpcserver.WithContextFiller(c.FillContext),
+		rpcserver.WithLogIgnoreMethods(c.config.GRPC.LogIgnoreMethods),
 	)
 }
 

@@ -31,6 +31,11 @@ func UnaryServerInterceptor(ctx context.Context, opts ...Option) grpc.UnaryServe
 		newCtx := newLoggerForCall(ctx, logger, info.FullMethod)
 		startTime := time.Now()
 		resp, err := handler(newCtx, req)
+		if err == nil {
+			if _, ok := o.ignoreMethods[info.FullMethod]; ok {
+				return resp, err
+			}
+		}
 		logFields := []interface{}{
 			"duration", time.Since(startTime),
 		}
