@@ -50,6 +50,7 @@ const (
 	cupsStationAttribute       = "cups-station"
 	cupsModelAttribute         = "cups-model"
 	cupsPackageAttribute       = "cups-package"
+	lnsTokenMapKey             = "lbs-lns-token-key"
 )
 
 var (
@@ -123,7 +124,9 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	_, err = registry.StoreGatewaySecret(ctx, &ttnpb.StoreGatewaySecretRequest{
 		GatewayIdentifiers: gtw.GatewayIdentifiers,
 		PlainText: ttnpb.GatewaySecretPlainText{
-			Value: lnsKey.Key,
+			Values: map[string][]byte{
+				lnsTokenMapKey: []byte(lnsKey.Key),
+			},
 		},
 	}, auth)
 	if err != nil {
@@ -151,7 +154,8 @@ func (s *Server) getLNSToken(ctx context.Context, gtwIDs ttnpb.GatewayIdentifier
 	if err != nil {
 		return "", err
 	}
-	return plaintext.Value, nil
+	// TODO: Does this require empty value validation?
+	return string(plaintext.Values[lnsTokenMapKey]), nil
 }
 
 var getGatewayMask = pbtypes.FieldMask{Paths: []string{
