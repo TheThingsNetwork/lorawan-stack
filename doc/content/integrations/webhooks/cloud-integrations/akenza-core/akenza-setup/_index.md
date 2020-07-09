@@ -8,7 +8,7 @@ This section shows how to prepare Akenza Core setup before creating a Webhook in
 
 <!--more-->
 
-Log in to Akenza Core and navigate to **Quick Start** tab in the **Environment** to see the steps to be taken to connect a device and manipulate the data coming from it. 
+Log in to Akenza Core and navigate to the **Quick Start** tab in the **Environment** to see the steps to be taken to connect a device and manipulate the data coming from it. 
 
 {{< figure src="quick-start.png" alt="Steps to connect a device" >}}
 
