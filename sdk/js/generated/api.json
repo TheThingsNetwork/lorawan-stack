@@ -18224,6 +18224,16 @@
               "fullType": "google.protobuf.Struct",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "full_f_cnt",
+              "description": "Full 32-bit FCnt value. Used internally by Network Server.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

@@ -66,6 +66,7 @@ var GatewayDownFieldPathsNested = []string{
 	"downlink_message.payload.Payload.mac_payload.f_hdr.f_opts",
 	"downlink_message.payload.Payload.mac_payload.f_port",
 	"downlink_message.payload.Payload.mac_payload.frm_payload",
+	"downlink_message.payload.Payload.mac_payload.full_f_cnt",
 	"downlink_message.payload.Payload.rejoin_request_payload",
 	"downlink_message.payload.Payload.rejoin_request_payload.dev_eui",
 	"downlink_message.payload.Payload.rejoin_request_payload.join_eui",

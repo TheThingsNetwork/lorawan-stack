@@ -11400,6 +11400,11 @@
         },
         "decoded_payload": {
           "type": "object"
+        },
+        "full_f_cnt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Full 32-bit FCnt value. Used internally by Network Server."
         }
       }
     },
