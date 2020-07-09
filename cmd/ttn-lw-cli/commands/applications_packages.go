@@ -351,6 +351,9 @@ var (
 		Short:   "List application package default associations",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
+			if appID == nil {
+				return errNoApplicationID
+			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationPackageDefaultAssociationsFlags)
 			if len(paths) == 0 {
 				logger.Warn("No fields selected, will select everything")
