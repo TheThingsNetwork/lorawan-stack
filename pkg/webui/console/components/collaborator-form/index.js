@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
-import * as Yup from 'yup'
 import bind from 'autobind-decorator'
 
 import Form from '@ttn-lw/components/form'
@@ -28,6 +27,7 @@ import Message from '@ttn-lw/lib/components/message'
 
 import RightsGroup from '@console/components/rights-group'
 
+import Yup from '@ttn-lw/lib/yup'
 import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'

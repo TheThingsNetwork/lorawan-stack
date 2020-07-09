@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Inconsistent error message responses when retrieving connection stats from GS if the gateway is not connected.
+- Empty form validation in the Console.
 
 ### Security
 

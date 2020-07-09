@@ -15,7 +15,6 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
-import * as Yup from 'yup'
 
 import delay from '@console/constants/delays'
 
@@ -31,6 +30,7 @@ import Message from '@ttn-lw/lib/components/message'
 import { GsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import OwnersSelect from '@console/containers/owners-select'
 
+import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 

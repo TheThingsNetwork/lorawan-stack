@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
-import * as Yup from 'yup'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 import urlTemplate from 'url-template'
@@ -29,6 +28,7 @@ import Message from '@ttn-lw/lib/components/message'
 
 import WebhookTemplateInfo from '@console/components/webhook-template-info'
 
+import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 

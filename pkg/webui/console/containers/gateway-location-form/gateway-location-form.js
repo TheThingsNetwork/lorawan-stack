@@ -14,13 +14,13 @@
 
 import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
-import * as Yup from 'yup'
 
 import Checkbox from '@ttn-lw/components/checkbox'
 import Form from '@ttn-lw/components/form'
 
 import LocationForm from '@console/components/location-form'
 
+import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 

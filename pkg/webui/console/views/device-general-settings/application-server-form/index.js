@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import * as Yup from 'yup'
 
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -22,6 +21,7 @@ import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
 import Checkbox from '@ttn-lw/components/checkbox'
 
+import Yup from '@ttn-lw/lib/yup'
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'

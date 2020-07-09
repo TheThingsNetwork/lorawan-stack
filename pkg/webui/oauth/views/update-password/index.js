@@ -19,7 +19,6 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
 import { connect } from 'react-redux'
-import * as Yup from 'yup'
 import queryString from 'query-string'
 
 import api from '@oauth/api'
@@ -36,6 +35,7 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import style from '@oauth/views/create-account/create-account.styl'
 
+import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 

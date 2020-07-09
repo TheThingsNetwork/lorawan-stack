@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
-import * as Yup from 'yup'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
@@ -34,6 +33,7 @@ import OwnersSelect from '@console/containers/owners-select'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
+import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getApplicationId } from '@ttn-lw/lib/selectors/id'

@@ -116,7 +116,7 @@
     "ttn-lw": "file:sdk/js",
     "url-polyfill": "^1.1.5",
     "url-template": "^2.0.8",
-    "yup": "^0.26.6"
+    "yup": "^0.29.1"
   },
   "babel": {
     "extends": "./config/.babelrc"
