@@ -94,10 +94,11 @@ $ go run ./cmd/ttn-lw-stack -c <custom-location>/ttn-lw-stack.yml start
 
 ## Using the CLI with the Development Environment
 
-In order to login, you will need to use the correct OAuth Server Address:
+In order to login, you will need to use the correct OAuth Server Address. `make init` uses CFSSL to generate a `ca.pem` CA certificate to support https:
 
 ```bash
-$ export TTN_LW_OAUTH_SERVER_ADDRESS=http://localhost:1885/oauth
+$ export TTN_LW_CA=./ca.pem
+$ export TTN_LW_OAUTH_SERVER_ADDRESS=https://localhost:8885/oauth
 $ go run ./cmd/ttn-lw-cli login
 ```
 
