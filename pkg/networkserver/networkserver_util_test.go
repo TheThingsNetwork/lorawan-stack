@@ -663,6 +663,7 @@ func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, 
 					FHDR:       fhdr,
 					FPort:      uint32(fPort),
 					FRMPayload: frmPayload,
+					FullFCnt:   fCnt,
 				},
 			},
 		}
