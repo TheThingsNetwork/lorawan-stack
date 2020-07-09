@@ -27,27 +27,27 @@ import (
 
 var (
 	evtSetPubSub = events.Define(
-		"as.pubsub.set", "set pubsub",
+		"as.pubsub.set", "set pub/sub",
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 	)
 	evtDeletePubSub = events.Define(
-		"as.pubsub.delete", "delete pubsub",
+		"as.pubsub.delete", "delete pub/sub",
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 	)
 	evtPubSubStart = events.Define(
-		"as.pubsub.start", "start pubsub",
+		"as.pubsub.start", "start pub/sub",
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 	)
 	evtPubSubStop = events.Define(
-		"as.pubsub.stop", "stop pubsub",
+		"as.pubsub.stop", "stop pub/sub",
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 	)
 	evtPubSubFail = events.Define(
-		"as.pubsub.fail", "fail pubsub",
+		"as.pubsub.fail", "fail pub/sub",
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
@@ -119,13 +119,14 @@ func registerIntegrationStop(ctx context.Context, i *integration) {
 	pubsubMetrics.integrationsStopped.WithLabelValues(ctx, i.ApplicationID).Inc()
 }
 
-var errIntegrationFailed = errors.DefineAborted("integration_failed", "integration {pub_sub_id} failed")
+var errIntegrationFailed = errors.DefineAborted("integration_failed", "integration `{pub_sub_id}` failed")
 
 func registerIntegrationFail(ctx context.Context, i *integration, err error) {
 	err = errIntegrationFailed.
 		WithAttributes(
 			"application_uid", unique.ID(ctx, i.ApplicationIdentifiers),
-			"pub_sub_id", i.PubSubID).
+			"pub_sub_id", i.PubSubID,
+		).
 		WithCause(err)
 	events.Publish(evtPubSubFail(ctx, i.ApplicationIdentifiers, err))
 	pubsubMetrics.integrationsFailed.WithLabelValues(ctx, i.ApplicationID).Inc()
