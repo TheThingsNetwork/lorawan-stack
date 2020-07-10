@@ -25,8 +25,6 @@ import {
 
 import { clear as clearAccessToken } from '@console/lib/access-token'
 
-import { clear as clearAccessToken } from '@console/lib/access-token'
-
 const getResultActionFromType = function(typeString, status) {
   if (typeString instanceof Array) {
     if (typeString.length === 1) {
