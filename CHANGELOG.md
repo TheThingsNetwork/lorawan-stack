@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Uplink frame counters being limited to 16 bits in Network Server.
+
 ### Security
 
 ## [3.8.5] - 2020-07-06
