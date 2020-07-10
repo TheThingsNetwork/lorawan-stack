@@ -362,6 +362,8 @@ func (m *MACPayload) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "full_f_cnt":
+			// no validation rules for FullFCnt
 		default:
 			return MACPayloadValidationError{
 				field:  name,
