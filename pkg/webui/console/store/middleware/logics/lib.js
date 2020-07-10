@@ -19,8 +19,8 @@ import { error } from '@ttn-lw/lib/log'
 import {
   isUnauthenticatedError,
   isInvalidArgumentError,
-  isUnknown,
   getBackendErrorId,
+  isUnknown,
 } from '@ttn-lw/lib/errors/utils'
 
 import { clear as clearAccessToken } from '@console/lib/access-token'
@@ -95,20 +95,17 @@ const createRequestLogic = function(
           window.location.reload()
         } else {
           // Otherwise, dispatch the fail action and report it to Sentry.
-          if (isUnknown(e) || isInvalidArgumentError(e)) {
+          if (isInvalidArgumentError(e)) {
             Sentry.withScope(scope => {
               scope.setExtras(e)
-              if (e.message) {
-                scope.setFingerprint(getBackendErrorId(e))
-                Sentry.captureException(new Error(getBackendErrorId(e)))
-              } else if (e.payload && e.payload.message) {
-                scope.setFingerprint(getBackendErrorId(e.payload))
-                Sentry.captureException(new Error(getBackendErrorId(e.payload)))
-              } else if (isInvalidArgumentError(e)) {
-                Sentry.captureException(new Error('Invalid argument error'))
-              } else {
-                Sentry.captureException(new Error('Unknown error'))
-              }
+              const fingerprint = getBackendErrorId(e)
+              scope.setFingerprint(fingerprint)
+              Sentry.captureException(new Error(fingerprint))
+            })
+          } else if (isUnknown(e)) {
+            Sentry.withScope(scope => {
+              scope.setExtras(e)
+              Sentry.captureException(e)
             })
           }
           dispatch(failAction(e))
