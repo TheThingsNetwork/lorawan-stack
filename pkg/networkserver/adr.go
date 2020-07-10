@@ -95,8 +95,8 @@ func lossRate(nbTrans uint32, ups ...*ttnpb.UplinkMessage) float32 {
 		return 0
 	}
 
-	min := ups[0].Payload.GetMACPayload().FHDR.FCnt
-	max := lastUplink(ups...).Payload.GetMACPayload().FHDR.FCnt
+	min := ups[0].Payload.GetMACPayload().FullFCnt
+	max := lastUplink(ups...).Payload.GetMACPayload().FullFCnt
 
 	fCnt := min + 1
 	var fCntTrans uint32
@@ -105,7 +105,7 @@ func lossRate(nbTrans uint32, ups ...*ttnpb.UplinkMessage) float32 {
 
 loop:
 	for i := 0; i < len(ups); i++ {
-		switch v := ups[i].Payload.GetMACPayload().FHDR.FCnt; v {
+		switch v := ups[i].Payload.GetMACPayload().FullFCnt; v {
 		case min:
 			continue
 

@@ -57,8 +57,9 @@ func newADRUplink(fCnt uint32, maxSNR float32, gtwCount uint, confirmed bool, tx
 						FCtrl: ttnpb.FCtrl{
 							ADR: true,
 						},
-						FCnt: fCnt,
+						FCnt: fCnt & 0xffff,
 					},
+					FullFCnt: fCnt,
 				},
 			},
 		},

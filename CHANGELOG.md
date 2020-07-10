@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.8.6] - 2020-07-10
+
+### Added
+
 - Payload formatter documentation.
 - CLI support for setting message payload formatters from a local file. (see `--formatters.down-formatter-parameter-local-file` and `--formatters.up-formatter-parameter-local-file` options).
 
@@ -16,11 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Gateway connection stats are now stored in a single key.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
+
+- Uplink frame counters being limited to 16 bits in Network Server.
 
 ### Security
 
@@ -923,7 +935,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.5...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.6...HEAD
+[3.8.6]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.5...v3.8.6
 [3.8.5]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.4...v3.8.5
 [3.8.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.3...v3.8.4
 [3.8.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.2...v3.8.3
