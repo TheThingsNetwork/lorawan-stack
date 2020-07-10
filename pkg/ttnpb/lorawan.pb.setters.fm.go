@@ -280,6 +280,16 @@ func (dst *MACPayload) SetFields(src *MACPayload, paths ...string) error {
 			} else {
 				dst.DecodedPayload = nil
 			}
+		case "full_f_cnt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'full_f_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FullFCnt = src.FullFCnt
+			} else {
+				var zero uint32
+				dst.FullFCnt = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
