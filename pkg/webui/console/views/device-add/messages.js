@@ -16,7 +16,7 @@ import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
   basicTitle: 'Basic settings',
-  basicDescription: "General settings of the end device. End device ID's, Name and Description",
+  basicDescription: "End device ID's, Name and Description",
   basicDetails: 'Defines general settings of an end device',
   networkTitle: 'Network layer settings',
   networkDescription: 'Frequency plan, regional parameters, end device class and session keys.',
