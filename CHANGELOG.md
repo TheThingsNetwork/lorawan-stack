@@ -93,6 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - End device events stream restart in the Console.
 - CLI was unable to read input from pipes.
 - Timezones issue in claim authentication code form, causing time to reverse on submission.
+- Errors during submit of the join settings for end devices in the Console.
 
 ## [3.8.4] - 2020-06-12
 

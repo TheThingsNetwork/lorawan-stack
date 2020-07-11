@@ -30,12 +30,16 @@ import validationSchema from './validation-schema'
 
 const defaultInitialValues = {
   root_keys: {},
-  net_id: undefined,
+  net_id: null,
   resets_join_nonces: false,
   application_server_id: undefined,
   application_server_kek_label: undefined,
   network_server_kek_label: undefined,
 }
+
+// The `net_id` value can be null as empty value, which needs to be
+// transformed to an empty string for the byte input to accept it.
+const netIdDecoder = value => (value === null ? '' : value)
 
 const JoinSettingsForm = React.memo(props => {
   const { lorawanVersion, mayEditKeys, error } = props
@@ -125,6 +129,7 @@ const JoinSettingsForm = React.memo(props => {
           min={3}
           max={3}
           component={Input}
+          decode={netIdDecoder}
         />
         <Form.Field
           title={sharedMessages.asServerID}
