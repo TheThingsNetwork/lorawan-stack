@@ -70,6 +70,12 @@ device-template-converter-grpc-address: 'thethings.example.com:8884'
 qr-code-generator-grpc-address: 'thethings.example.com:8884'
 ```
 
+If your deployment uses a custom certificate authority, you'll need to add:
+
+```yaml
+ca: /path/to/ca.pem
+```
+
 For advanced options, see the [Configuration Reference]({{< ref "/reference/configuration/cli" >}}).
 
 ## Auto Completion

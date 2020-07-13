@@ -17,8 +17,6 @@ package ttnmage
 import (
 	"fmt"
 	"os"
-	"path"
-	"runtime"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -26,16 +24,6 @@ import (
 
 // Dev namespace.
 type Dev mg.Namespace
-
-// Certificates generates certificates for development.
-func (Dev) Certificates() error {
-	if _, err := os.Stat("key.pem"); err == nil {
-		if _, err := os.Stat("cert.pem"); err == nil {
-			return nil
-		}
-	}
-	return runGo(path.Join(runtime.GOROOT(), "src", "crypto", "tls", "generate_cert.go"), "-ca", "-host", "localhost,*.localhost")
-}
 
 // Misspell fixes common spelling mistakes in files.
 func (Dev) Misspell() error {

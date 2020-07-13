@@ -41,10 +41,10 @@
 #   pprof:
 #     password: 'pprof'                 # choose a password
 
-# If using (self) signed certificates:
+# If using custom certificates:
 tls:
   source: file
-  root-ca: ./cert.pem
+  root-ca: ./ca.pem
   certificate: ./cert.pem
   key: ./key.pem
 
