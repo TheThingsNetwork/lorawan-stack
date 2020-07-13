@@ -194,7 +194,8 @@ func TestHandleJoin(t *testing.T) {
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
-					0x20},
+					0x20,
+				},
 					mustEncryptJoinAccept(nwkKey, []byte{
 						/* JoinNonce */
 						0x01, 0x00, 0x00,
@@ -298,7 +299,8 @@ func TestHandleJoin(t *testing.T) {
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
-					0x20},
+					0x20,
+				},
 					mustEncryptJoinAccept(nwkKey, []byte{
 						/* JoinNonce */
 						0x01, 0x00, 0x00,
@@ -424,7 +426,8 @@ func TestHandleJoin(t *testing.T) {
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
-					0x20},
+					0x20,
+				},
 					mustEncryptJoinAccept(nwkKey, []byte{
 						/* JoinNonce */
 						0x01, 0x00, 0x00,
@@ -545,7 +548,8 @@ func TestHandleJoin(t *testing.T) {
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
-					0x20},
+					0x20,
+				},
 					mustEncryptJoinAccept(nwkKey, []byte{
 						/* JoinNonce */
 						0x01, 0x00, 0x00,
@@ -647,7 +651,8 @@ func TestHandleJoin(t *testing.T) {
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
-					0x20},
+					0x20,
+				},
 					mustEncryptJoinAccept(nwkKey, []byte{
 						/* JoinNonce */
 						0xfe, 0xff, 0x42,
@@ -797,7 +802,8 @@ func TestHandleJoin(t *testing.T) {
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
-					0x20},
+					0x20,
+				},
 					mustEncryptJoinAccept(appKey, []byte{
 						/* JoinNonce */
 						0x01, 0x00, 0x00,
@@ -880,7 +886,8 @@ func TestHandleJoin(t *testing.T) {
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
-					0x20},
+					0x20,
+				},
 					mustEncryptJoinAccept(appKey, []byte{
 						/* JoinNonce */
 						0x01, 0x00, 0x00,
@@ -963,7 +970,8 @@ func TestHandleJoin(t *testing.T) {
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
-					0x20},
+					0x20,
+				},
 					mustEncryptJoinAccept(appKey, []byte{
 						/* JoinNonce */
 						0x01, 0x00, 0x00,
@@ -1046,7 +1054,8 @@ func TestHandleJoin(t *testing.T) {
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
-					0x20},
+					0x20,
+				},
 					mustEncryptJoinAccept(appKey, []byte{
 						/* JoinNonce */
 						0x01, 0x00, 0x00,
@@ -1131,7 +1140,8 @@ func TestHandleJoin(t *testing.T) {
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
-					0x20},
+					0x20,
+				},
 					mustEncryptJoinAccept(appKey, []byte{
 						/* JoinNonce */
 						0xfe, 0xff, 0x42,
@@ -1217,7 +1227,8 @@ func TestHandleJoin(t *testing.T) {
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
-					0x20},
+					0x20,
+				},
 					mustEncryptJoinAccept(appKey, []byte{
 						/* JoinNonce */
 						0xfe, 0xff, 0x42,
@@ -1305,7 +1316,8 @@ func TestHandleJoin(t *testing.T) {
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
 					/* MHDR */
-					0x20},
+					0x20,
+				},
 					mustEncryptJoinAccept(appKey, []byte{
 						/* JoinNonce */
 						0x01, 0x00, 0x00,
@@ -2110,7 +2122,7 @@ func TestGetNwkSKeys(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			ctx := test.ContextWithT(tc.ContextFunc(ctx), t)
+			ctx := test.ContextWithTB(tc.ContextFunc(ctx), t)
 
 			c := componenttest.NewComponent(t, &component.Config{})
 			js := test.Must(New(
@@ -2391,7 +2403,7 @@ func TestGetAppSKey(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			ctx := test.ContextWithT(tc.ContextFunc(ctx), t)
+			ctx := test.ContextWithTB(tc.ContextFunc(ctx), t)
 
 			js := test.Must(New(
 				componenttest.NewComponent(t, &component.Config{}),
@@ -2481,7 +2493,7 @@ func TestGetHomeNetID(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			ctx := test.ContextWithT(tc.ContextFunc(ctx), t)
+			ctx := test.ContextWithTB(tc.ContextFunc(ctx), t)
 
 			js := test.Must(New(
 				componenttest.NewComponent(t, &component.Config{}),
