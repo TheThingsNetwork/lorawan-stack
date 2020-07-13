@@ -320,7 +320,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return ctx
 			})
 			as.AddContextFiller(func(ctx context.Context) context.Context {
-				return test.ContextWithT(ctx, t)
+				return test.ContextWithTB(ctx, t)
 			})
 			componenttest.StartComponent(t, as.Component)
 			defer as.Close()
@@ -549,7 +549,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return ctx
 			})
 			as.AddContextFiller(func(ctx context.Context) context.Context {
-				return test.ContextWithT(ctx, t)
+				return test.ContextWithTB(ctx, t)
 			})
 			componenttest.StartComponent(t, as.Component)
 			defer as.Close()
@@ -707,7 +707,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				return ctx
 			})
 			as.AddContextFiller(func(ctx context.Context) context.Context {
-				return test.ContextWithT(ctx, t)
+				return test.ContextWithTB(ctx, t)
 			})
 			componenttest.StartComponent(t, as.Component)
 			defer as.Close()

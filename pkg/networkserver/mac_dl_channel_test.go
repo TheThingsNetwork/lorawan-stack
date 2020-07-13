@@ -342,7 +342,7 @@ func TestEnqueueDLChannelReq(t *testing.T) {
 							expectedEvs = append(expectedEvs, evtEnqueueDLChannelRequest.BindData(req))
 						}
 
-						st := enqueueDLChannelReq(test.ContextWithT(log.NewContext(test.Context(), test.GetLogger(t)), t), dev, conf.MaxDownlinkLength, conf.MaxUplinkLength)
+						st := enqueueDLChannelReq(test.ContextWithTB(log.NewContext(test.Context(), test.GetLogger(t)), t), dev, conf.MaxDownlinkLength, conf.MaxUplinkLength)
 						a.So(dev, should.Resemble, expectedDev)
 						a.So(st.QueuedEvents, should.ResembleEventDefinitionDataClosures, expectedEvs)
 						a.So(st, should.Resemble, macCommandEnqueueState{
@@ -605,7 +605,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 
 			dev := CopyEndDevice(tc.InputDevice)
 
-			evs, err := handleDLChannelAns(test.ContextWithT(log.NewContext(test.Context(), test.GetLogger(t)), t), dev, tc.Payload)
+			evs, err := handleDLChannelAns(test.ContextWithTB(log.NewContext(test.Context(), test.GetLogger(t)), t), dev, tc.Payload)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()

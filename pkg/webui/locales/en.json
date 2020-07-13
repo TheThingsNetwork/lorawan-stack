@@ -269,7 +269,7 @@
   "console.views.device-add.configuration-form.index.preparation": "Preparation",
   "console.views.device-add.index.title": "Add new end device",
   "console.views.device-add.messages.basicTitle": "Basic settings",
-  "console.views.device-add.messages.basicDescription": "General settings of the end device. End device ID's, Name and Description",
+  "console.views.device-add.messages.basicDescription": "End device ID's, Name and Description",
   "console.views.device-add.messages.basicDetails": "Defines general settings of an end device",
   "console.views.device-add.messages.networkTitle": "Network layer settings",
   "console.views.device-add.messages.networkDescription": "Frequency plan, regional parameters, end device class and session keys.",

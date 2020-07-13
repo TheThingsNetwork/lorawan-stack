@@ -19,23 +19,41 @@ import (
 	"testing"
 )
 
-type tKey struct{}
+type tbKey struct{}
 
-// ContextWithT saves the testing.T in the context.
-func ContextWithT(ctx context.Context, t *testing.T) context.Context {
-	return context.WithValue(ctx, tKey{}, t)
+// ContextWithTB saves the testing.TB in the context.
+func ContextWithTB(ctx context.Context, tb testing.TB) context.Context {
+	return context.WithValue(ctx, tbKey{}, tb)
 }
 
-// TFromContext returns the testing.T saved using ContextWithT from the context.
+// TBFromContext returns the testing.TB saved using ContextWithTB from the context.
+func TBFromContext(ctx context.Context) (testing.TB, bool) {
+	tb, ok := ctx.Value(tbKey{}).(testing.TB)
+	if !ok {
+		return nil, false
+	}
+	return tb, true
+}
+
+// MustTBFromContext returns the testing.TB from the context, and panics if it was not saved in the context.
+func MustTBFromContext(ctx context.Context) testing.TB {
+	tb, ok := TBFromContext(ctx)
+	if !ok {
+		panic("testing.TB not present in the context")
+	}
+	return tb
+}
+
+// TFromContext returns the *testing.T saved using ContextWithTB from the context.
 func TFromContext(ctx context.Context) (*testing.T, bool) {
-	t, ok := ctx.Value(tKey{}).(*testing.T)
+	t, ok := ctx.Value(tbKey{}).(*testing.T)
 	if !ok {
 		return nil, false
 	}
 	return t, true
 }
 
-// MustTFromContext returns the test state from the context, and panics if it was not saved in the context.
+// MustTFromContext returns the *testing.T from the context, and panics if it was not saved in the context.
 func MustTFromContext(ctx context.Context) *testing.T {
 	t, ok := TFromContext(ctx)
 	if !ok {

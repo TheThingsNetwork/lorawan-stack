@@ -21,7 +21,7 @@ const validationSchema = Yup.object()
   .shape({
     net_id: Yup.nullableString()
       .emptyOrLength(3 * 2, Yup.passValues(sharedMessages.validateLength)) // 3 Byte hex.
-      .default(''),
+      .default(null),
     root_keys: Yup.object().when(
       ['$externalJs', '$lorawanVersion', '$mayEditKeys', '$mayEditkeys'],
       (externalJs, lorawanVersion, mayEditKeys, mayReadKeys, schema) => {

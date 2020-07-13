@@ -18,9 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Application package application-wide associations support.
 - LoRaCloud DAS application package server URL overrides support.
 - Key vault caching mechanism (see `--key-vault.cache.size` and `--key-vault.cache.ttl` options).
-- Payload formatter documentation.
-- CLI support for setting message payload formatters from a local file. (see `--formatters.down-formatter-parameter-local-file` and `--formatters.up-formatter-parameter-local-file` options).
 - Generic encryption/decryption to KeyVault.
+- Option to ignore log messages for selected gRPC method on success (see `grpc.log-ignore-methods` option).
+- CLI auto-completion support (see `ttn-lw-cli complete` command).
 
 ### Changed
 
@@ -42,6 +42,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI crash when listing application package default associations without providing an application ID.
 
 ### Security
+
+## [3.8.6] - 2020-07-10
+
+### Added
+
+- Payload formatter documentation.
+- CLI support for setting message payload formatters from a local file. (see `--formatters.down-formatter-parameter-local-file` and `--formatters.up-formatter-parameter-local-file` options).
+
+### Changed
+
+- Gateway connection stats are now stored in a single key.
+
+### Fixed
+
+- Uplink frame counters being limited to 16 bits in Network Server.
 
 ## [3.8.5] - 2020-07-06
 
@@ -81,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - End device events stream restart in the Console.
 - CLI was unable to read input from pipes.
 - Timezones issue in claim authentication code form, causing time to reverse on submission.
+- Errors during submit of the join settings for end devices in the Console.
 
 ## [3.8.4] - 2020-06-12
 
@@ -942,7 +958,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.5...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.6...HEAD
+[3.8.6]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.5...v3.8.6
 [3.8.5]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.4...v3.8.5
 [3.8.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.3...v3.8.4
 [3.8.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.2...v3.8.3

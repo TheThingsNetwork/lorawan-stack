@@ -4193,6 +4193,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | `f_port` | [`uint32`](#uint32) |  |  |
 | `frm_payload` | [`bytes`](#bytes) |  |  |
 | `decoded_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
+| `full_f_cnt` | [`uint32`](#uint32) |  | Full 32-bit FCnt value. Used internally by Network Server. |
 
 #### Field Rules
 

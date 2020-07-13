@@ -1070,6 +1070,15 @@
       "file": "i18n.go"
     }
   },
+  "error:cmd/internal/commands:invalid_shell": {
+    "translations": {
+      "en": "invalid shell"
+    },
+    "description": {
+      "package": "cmd/internal/commands",
+      "file": "complete.go"
+    }
+  },
   "error:cmd/internal/shared:initialize_application_server": {
     "translations": {
       "en": "could not initialize Application Server"

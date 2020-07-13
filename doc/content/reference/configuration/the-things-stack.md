@@ -49,6 +49,12 @@ When running a cluster in a trusted network, you can allow sending credentials o
 
 - `grpc.allow-insecure-for-credentials`: Allow transmission of credentials over insecure transport
 
+You can suppress log messages for successful gRPC method calls (e.g. to reduce the noise caused by the health checks in a production environment).
+
+- `grpc.log-ignore-methods`: List of gRPC methods for which to suppress logs of successful requests.
+
+> NOTE: If you are seeing a lot of logs with `grpc_service=/ttn.v3.lorawan.ServiceName` and `grpc_method=MethodName`, use `/ttn.v3.lorawan.ServiceName/MethodName` for this option.
+
 ## HTTP Options
 
 The `http` options configure how {{% tts %}} listens for HTTP connections. The format is `host:port`. When listening on TLS ports, it uses the global [TLS configuration]({{< ref "#tls-options" >}}).

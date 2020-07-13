@@ -55,6 +55,8 @@ type GRPC struct {
 
 	Listen    string `name:"listen" description:"Address for the TCP gRPC server to listen on"`
 	ListenTLS string `name:"listen-tls" description:"Address for the TLS gRPC server to listen on"`
+
+	LogIgnoreMethods []string `name:"log-ignore-methods" description:"List of paths for which successful requests will not be logged"`
 }
 
 // Cookie represents cookie configuration.
