@@ -6072,7 +6072,7 @@ func TestGenerateDownlink(t *testing.T) {
 
 			logger := test.GetLogger(t)
 
-			ctx := test.ContextWithT(test.Context(), t)
+			ctx := test.ContextWithTB(test.Context(), t)
 			ctx = log.NewContext(ctx, logger)
 			ctx, cancel := context.WithTimeout(ctx, (1<<7)*test.Delay)
 			defer cancel()

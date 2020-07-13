@@ -1102,7 +1102,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				return ctx
 			})
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
-				return test.ContextWithT(ctx, t)
+				return test.ContextWithTB(ctx, t)
 			})
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.DownlinkQueueRequest)
@@ -1794,7 +1794,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				return ctx
 			})
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
-				return test.ContextWithT(ctx, t)
+				return test.ContextWithTB(ctx, t)
 			})
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.DownlinkQueueRequest)
@@ -2093,7 +2093,7 @@ func TestDownlinkQueueList(t *testing.T) {
 				return ctx
 			})
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
-				return test.ContextWithT(ctx, t)
+				return test.ContextWithTB(ctx, t)
 			})
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)
@@ -2113,7 +2113,7 @@ func TestDownlinkQueueList(t *testing.T) {
 func handleApplicationUplinkQueueTest(t *testing.T, q ApplicationUplinkQueue) {
 	a := assertions.New(t)
 
-	ctx := test.ContextWithT(test.Context(), t)
+	ctx := test.ContextWithTB(test.Context(), t)
 	ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
 	defer cancel()
 

@@ -679,7 +679,7 @@ func TestTaskQueue(t *testing.T) {
 func TestProtoDeduplicator(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := test.ContextWithT(test.Context(), t)
+	ctx := test.ContextWithTB(test.Context(), t)
 	ctx = log.NewContext(ctx, test.GetLogger(t))
 
 	cl, flush := test.NewRedis(t, "redis_test")
@@ -784,7 +784,7 @@ func TestProtoDeduplicator(t *testing.T) {
 func TestMutex(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := test.ContextWithT(test.Context(), t)
+	ctx := test.ContextWithTB(test.Context(), t)
 	ctx = log.NewContext(ctx, test.GetLogger(t))
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Second+(1<<8)*test.Delay)
 	defer cancel()

@@ -471,7 +471,7 @@ func TestAdaptDataRate(t *testing.T) {
 			dev := CopyEndDevice(tc.Device)
 			fp := FrequencyPlan(dev.FrequencyPlanID)
 			err := adaptDataRate(
-				log.NewContext(test.ContextWithT(test.Context(), t), test.GetLogger(t)),
+				log.NewContext(test.ContextWithTB(test.Context(), t), test.GetLogger(t)),
 				dev,
 				Band(fp.BandID, dev.LoRaWANPHYVersion), ttnpb.MACSettings{},
 			)
