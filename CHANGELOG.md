@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Inconsistent error message responses when retrieving connection stats from GS if the gateway is not connected.
 - Empty form validation in the Console.
 - CLI crash when listing application package default associations without providing an application ID.
+- Decoding of uplinks with frame counters exceeding 16 bits in Application Server.
 
 ### Security
 
