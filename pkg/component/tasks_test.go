@@ -16,6 +16,7 @@ package component
 
 import (
 	"context"
+	"os"
 	"sync"
 	"testing"
 	"time"
@@ -33,6 +34,7 @@ func init() {
 		3 * test.Delay,
 		4 * test.Delay,
 	}
+	backoffResetTime = 2 * test.Delay
 }
 
 func TestTasks(t *testing.T) {
@@ -80,4 +82,53 @@ func TestTasks(t *testing.T) {
 	oneOffWg.Wait()
 	restartingWg.Wait()
 	failingWg.Wait()
+}
+
+func TestTaskBackoffReset(t *testing.T) {
+	if enabled := os.Getenv("TEST_TIMING"); enabled == "" {
+		t.Skip("Timing sensitive tests are disabled")
+	}
+
+	a := assertions.New(t)
+	ctx := test.Context()
+
+	c, err := New(test.GetLogger(t), &Config{})
+	a.So(err, should.BeNil)
+
+	var wg sync.WaitGroup
+	wg.Add(4)
+	calls := 0
+	lastCallTime := time.Time{}
+	c.RegisterTask(ctx, "failing_but_recovering", func(_ context.Context) error {
+		defer wg.Done()
+		calls++
+		backoff := time.Now().Sub(lastCallTime)
+		switch calls {
+		case 1:
+			// Nothing to expect in the initial call
+		case 2:
+			// Expect the first backoff interval
+			a.So(backoff, should.BeBetweenOrEqual, timeMult(test.Delay, 0.9), timeMult(test.Delay, 1.1))
+		case 3:
+			// Same jitter requirement, but now act as if we are 'working'
+			a.So(backoff, should.BeBetweenOrEqual, timeMult(2*test.Delay, 0.9), timeMult(2*test.Delay, 1.1))
+			time.Sleep(3 * test.Delay)
+		case 4:
+			// Expect the backoff to have been reset
+			a.So(backoff, should.BeBetweenOrEqual, timeMult(test.Delay, 0.9), timeMult(test.Delay, 1.1))
+		}
+		lastCallTime = time.Now()
+		return nil
+	}, TaskRestartAlways)
+
+	// Wait for all invocations.
+	test.Must(nil, c.Start())
+	defer c.Close()
+	wg.Wait()
+}
+
+func timeMult(t time.Duration, c float64) time.Duration {
+	ft := float64(t)
+	ft = ft * c
+	return time.Duration(ft)
 }

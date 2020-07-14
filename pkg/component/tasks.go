@@ -44,6 +44,8 @@ var defaultTaskBackoff = [...]time.Duration{
 	1 * time.Second,
 }
 
+var backoffResetTime = time.Minute
+
 // TaskBackoffDial is a backoff to use for tasks that are dialing services.
 var TaskBackoffDial = []time.Duration{100 * time.Millisecond, 1 * time.Second, 10 * time.Second}
 
@@ -76,7 +78,9 @@ func (c *Component) StartTask(ctx context.Context, id string, fn TaskFunc, resta
 		invocation := 0
 		for {
 			invocation++
+			startTime := time.Now()
 			err := fn(ctx)
+			executionTime := time.Now().Sub(startTime)
 			if err != nil && err != context.Canceled {
 				logger.WithField("invocation", invocation).WithError(err).Warn("Task failed")
 			}
@@ -97,6 +101,9 @@ func (c *Component) StartTask(ctx context.Context, id string, fn TaskFunc, resta
 			bi := invocation - 1
 			if bi >= len(backoff) {
 				bi = len(backoff) - 1
+			}
+			if executionTime > backoffResetTime {
+				bi = 0
 			}
 			s := backoff[bi]
 			if jitter != 0 {
