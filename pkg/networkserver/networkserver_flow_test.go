@@ -934,8 +934,8 @@ func TestFlow(t *testing.T) {
 					}
 
 					conf := DefaultConfig
+					conf.ApplicationUplinkQueue.Queue = uq
 					conf.NetID = test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
-					conf.ApplicationUplinks = uq
 					conf.Devices = dr
 					conf.DownlinkTasks = tq
 					conf.UplinkDeduplicator = ud
