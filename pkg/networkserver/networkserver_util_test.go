@@ -1814,9 +1814,9 @@ func StartTest(t *testing.T, cmpConf component.Config, nsConf Config, timeout ti
 	closeFuncs = append(closeFuncs, test.SetDefaultEventsPubSub(&test.MockEventPubSub{
 		PublishFunc: test.MakeEventPubSubPublishChFunc(eventsPublishCh),
 	}))
-	if nsConf.ApplicationUplinks == nil {
+	if nsConf.ApplicationUplinkQueue.Queue == nil {
 		m, mEnv, closeM := newMockApplicationUplinkQueue(t)
-		nsConf.ApplicationUplinks = m
+		nsConf.ApplicationUplinkQueue.Queue = m
 		env.ApplicationUplinks = &mEnv
 		closeFuncs = append(closeFuncs, closeM)
 	}

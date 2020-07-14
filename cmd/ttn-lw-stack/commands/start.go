@@ -15,6 +15,7 @@
 package commands
 
 import (
+	"math"
 	"net/http"
 	"os"
 	"strconv"
@@ -185,9 +186,14 @@ var startCommand = &cobra.Command{
 			if err := initRedisMutex(); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
-			config.NS.ApplicationUplinks = nsredis.NewApplicationUplinkQueue(
+
+			uplinkQueueSize := config.NS.ApplicationUplinkQueue.BufferSize
+			if config.NS.ApplicationUplinkQueue.BufferSize > math.MaxInt64 {
+				uplinkQueueSize = math.MaxInt64
+			}
+			config.NS.ApplicationUplinkQueue.Queue = nsredis.NewApplicationUplinkQueue(
 				redis.New(config.Redis.WithNamespace("ns", "application-uplinks")),
-				100, redisConsumerGroup, redisConsumerID,
+				int64(uplinkQueueSize), redisConsumerGroup, redisConsumerID,
 			)
 			devices := &nsredis.DeviceRegistry{
 				Redis:   redis.New(config.Redis.WithNamespace("ns", "devices")),
