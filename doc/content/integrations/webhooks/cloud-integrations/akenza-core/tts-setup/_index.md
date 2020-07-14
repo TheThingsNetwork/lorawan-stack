@@ -4,7 +4,7 @@ description: ""
 weight: 2
 ---
 
-Once you have prepared the setup in Akenza Core, follow this section to create the Webhook integration.
+Once you completed the setup in Akenza Core, follow this section to create the Webhook integration.
 
 <!--more-->
 
@@ -18,4 +18,4 @@ To send uplink messages to Akenza Core, check the **Enabled** box next to the **
 
 {{< figure src="creating-webhook.png" alt="Akenza Core webhook" >}}
 
-After creating the integration, you will be able to see uplink messages in JSON format in Akenza Core if you navigate to the **Data** tab of the created device (which can be found in the **Inventory**).
+After creating the integration, you are able to see uplink messages in JSON format in Akenza Core in the **Data** tab of the created device (which can be found in the **Inventory**).

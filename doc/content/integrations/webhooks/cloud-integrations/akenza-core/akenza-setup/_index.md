@@ -24,7 +24,7 @@ Next, create a new device type in the **Device Types** submenu. Select the **Add
 
 {{< figure src="creating-device-type.png" alt="Creating a device type" >}}
 
-When you have defined a domain and a device type, you can create a new device by selecting **Add Device** button in the **Inventory** submenu. 
+After defining a domain and a device type, you can create a new device by selecting **Add Device** button in the **Inventory** submenu. 
 
 Provide a **Name** for your device, select the previously created device type and domain, and do not forget to generate a **Device ID**.
 
