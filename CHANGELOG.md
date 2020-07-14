@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Empty form validation in the Console.
 - CLI crash when listing application package default associations without providing an application ID.
 - Decoding of uplinks with frame counters exceeding 16 bits in Application Server.
+- Validation of keys for gateway metrics and version fields.
 
 ### Security
 
