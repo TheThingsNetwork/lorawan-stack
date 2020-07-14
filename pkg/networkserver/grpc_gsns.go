@@ -1012,7 +1012,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			Up: &ttnpb.ApplicationUp_UplinkMessage{
 				UplinkMessage: &ttnpb.ApplicationUplink{
 					Confirmed:    up.Payload.MType == ttnpb.MType_CONFIRMED_UP,
-					FCnt:         pld.FCnt,
+					FCnt:         pld.FullFCnt,
 					FPort:        pld.FPort,
 					FRMPayload:   pld.FRMPayload,
 					RxMetadata:   up.RxMetadata,
