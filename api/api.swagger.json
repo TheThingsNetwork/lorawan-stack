@@ -1703,6 +1703,50 @@
         ]
       }
     },
+    "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/simulate": {
+      "post": {
+        "operationId": "AppAs_SimulateUplink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationUp"
+            }
+          }
+        ],
+        "tags": [
+          "AppAs"
+        ]
+      }
+    },
     "/as/applications/{ids.application_ids.application_id}/devices/{ids.device_id}/packages/associations": {
       "get": {
         "operationId": "ApplicationPackageRegistry_ListAssociations",
