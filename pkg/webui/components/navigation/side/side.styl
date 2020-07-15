@@ -12,13 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+$minimize-button-height = 5rem
+
 // This style is to be applied to the portalled container.
 .container
   border-normal(right)
-  left: 0
+  display: flex
+  flex-direction: column
   background-color: white
   z-index: $zi.nav
   +media-query-min($bp.s)
+    left: 0
     top: 0
     position: absolute
     height: 100%
@@ -30,17 +34,42 @@
     +media-query-height(500px)
       position: static
 
+  .minimize-button
+    reset-button()
+    transition-color()
+    border-normal(top)
+    box-sizing: border-box
+    color: $tc-subtle-gray
+    background-color: white
+    position: sticky
+    top: "calc(100vh - %s)" % $minimize-button-height
+    width: 100%
+    height: $minimize-button-height
+    margin-bottom: 1px
+    flex-shrink: 0
+    &:not(.minimize-button-minimized)
+      padding-left: $cs.l
+      text-align: left
+    &-minimized
+      padding-left: 0
+      text-align: center
+    +media-query-min($bp.s)
+      display: block
+    +media-query($bp.s)
+      display: none
+    &:hover
+      color: $tc-deep-gray
+
+
 .navigation
   sidebar-transition(width)
   position: sticky
-  background-color: white
   top: 0
-  display: flex
-  flex-direction: column
-  justify-content: space-between
+  background-color: white
   box-sizing: border-box
   max-height: 100%
   +media-query-min($bp.s)
+    padding-bottom: $minimize-button-height
     width: $sidebar-width
     overflow-y: auto
     overflow-x: hidden
@@ -49,6 +78,9 @@
     width: 100%
 
   &-minimized
+    display: flex
+    flex-direction: column
+    justify-content: space-between
     +media-query-min($bp.s)
       width: $sidebar-width-minimized
       display: inline-flex
@@ -69,6 +101,8 @@
 .header
   border-normal(bottom)
   sidebar-transition(padding)
+  height: 6rem
+  color: $tc-deep-gray
   box-sizing: border-box
   display: flex
   align-items: center
@@ -88,9 +122,6 @@
     margin-right: $cs.s
     font-size: 2rem
     color: $tc-subtle-gray
-
-.body
-  height: 100%
 
 .drawer
   background-color: white

@@ -191,48 +191,49 @@ export class SideNavigation extends Component {
     const navigationClassNames = classnames(className, style.navigation, {
       [style.navigationMinimized]: isMinimized,
     })
-    const headerClassNames = classnames(style.header, {
-      [style.headerMinimized]: isMinimized,
+    const minimizeButtonClassNames = classnames(style.minimizeButton, {
+      [style.minimizeButtonMinimized]: isMinimized,
     })
 
     const drawerClassNames = classnames(style.drawer, { [style.drawerOpen]: isDrawerOpen })
 
     return (
-      <nav className={navigationClassNames} ref={this.ref}>
-        <div className={style.mobileHeader} onClick={this.onDrawerExpandClick}>
-          <Icon className={style.expandIcon} icon="more_vert" />
-          <Icon className={style.icon} icon={header.icon} />
-          <Message className={style.message} content={header.title} />
-        </div>
-        <div className={style.body}>
-          <div className={drawerClassNames}>
-            <div className={headerClassNames}>
-              <Icon className={style.icon} icon={header.icon} />
-              <Message className={style.message} content={header.title} />
-            </div>
-            <SideNavigationContext.Provider
-              value={{ isMinimized, onLeafItemClick: this.onLeafItemClick }}
-            >
-              <SideNavigationList
-                onListClick={this.onDrawerExpandClick}
-                isMinimized={isMinimized}
-                className={style.navigationList}
-              >
-                {children}
-              </SideNavigationList>
-            </SideNavigationContext.Provider>
+      <>
+        <nav className={navigationClassNames} ref={this.ref}>
+          <div className={style.mobileHeader} onClick={this.onDrawerExpandClick}>
+            <Icon className={style.expandIcon} icon="more_vert" />
+            <Icon className={style.icon} icon={header.icon} />
+            <Message className={style.message} content={header.title} />
           </div>
-          <Button
-            naked
-            secondary
-            className={style.minimizeButton}
-            icon={isMinimized ? 'keyboard_arrow_right' : 'keyboard_arrow_left'}
-            message={isMinimized ? null : m.hideSidebar}
-            onClick={this.onToggle}
-            data-hook="side-nav-hide-button"
-          />
-        </div>
-      </nav>
+          <div>
+            <div className={drawerClassNames}>
+              <div className={style.header}>
+                <Icon className={style.icon} icon={header.icon} />
+                <Message className={style.message} content={header.title} />
+              </div>
+              <SideNavigationContext.Provider
+                value={{ isMinimized, onLeafItemClick: this.onLeafItemClick }}
+              >
+                <SideNavigationList
+                  onListClick={this.onDrawerExpandClick}
+                  isMinimized={isMinimized}
+                  className={style.navigationList}
+                >
+                  {children}
+                </SideNavigationList>
+              </SideNavigationContext.Provider>
+            </div>
+          </div>
+        </nav>
+        <Button
+          unstyled
+          className={minimizeButtonClassNames}
+          icon={isMinimized ? 'keyboard_arrow_right' : 'keyboard_arrow_left'}
+          message={isMinimized ? null : m.hideSidebar}
+          onClick={this.onToggle}
+          data-hook="side-nav-hide-button"
+        />
+      </>
     )
   }
 }
