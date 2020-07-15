@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI auto-completion support (see `ttn-lw-cli complete` command).
 - Options to disable profile picture and end device picture uploads (`is.profile-picture.disable-upload` and `is.end-device-picture.disable-upload`).
 - Options to allow/deny non-admin users to create applications, gateways, etc. (the the `is.user-rights.*` options).
+- Admins now receive emails about requested user accounts that need approval.
 
 ### Changed
 
