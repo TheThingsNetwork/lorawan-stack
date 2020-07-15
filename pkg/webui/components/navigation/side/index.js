@@ -22,6 +22,7 @@ import LAYOUT from '@ttn-lw/constants/layout'
 
 import Button from '@ttn-lw/components/button'
 import Icon from '@ttn-lw/components/icon'
+import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -46,8 +47,9 @@ export class SideNavigation extends Component {
     className: PropTypes.string,
     /** The header for the side navigation. */
     header: PropTypes.shape({
-      title: PropTypes.string,
-      icon: PropTypes.string,
+      title: PropTypes.string.isRequired,
+      icon: PropTypes.string.isRequired,
+      to: PropTypes.string.isRequired,
     }).isRequired,
     modifyAppContainerClasses: PropTypes.bool,
   }
@@ -207,10 +209,12 @@ export class SideNavigation extends Component {
           </div>
           <div>
             <div className={drawerClassNames}>
-              <div className={style.header}>
-                <Icon className={style.icon} icon={header.icon} />
-                <Message className={style.message} content={header.title} />
-              </div>
+              <Link to={header.to}>
+                <div className={style.header}>
+                  <Icon className={style.icon} icon={header.icon} />
+                  <Message className={style.message} content={header.title} />
+                </div>
+              </Link>
               <SideNavigationContext.Provider
                 value={{ isMinimized, onLeafItemClick: this.onLeafItemClick }}
               >

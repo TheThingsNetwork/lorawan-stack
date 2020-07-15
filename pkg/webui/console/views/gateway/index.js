@@ -144,7 +144,7 @@ export default class Gateway extends React.Component {
       <React.Fragment>
         <Breadcrumbs />
         <IntlHelmet titleTemplate={`%s - ${gateway.name || gtwId} - ${env.siteName}`} />
-        <SideNavigation header={{ icon: 'gateway', title: gateway.name || gtwId }}>
+        <SideNavigation header={{ icon: 'gateway', title: gateway.name || gtwId, to: matchedUrl }}>
           {mayViewGatewayInfo.check(rights) && (
             <SideNavigation.Item
               title={sharedMessages.overview}

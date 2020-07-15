@@ -33,6 +33,7 @@ storiesOf('Navigation', module)
     const header = {
       title: 'test-application',
       icon: 'application',
+      to: '/',
     }
 
     return (

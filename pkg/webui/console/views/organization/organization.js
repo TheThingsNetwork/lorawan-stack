@@ -77,7 +77,9 @@ class Organization extends React.Component {
       <React.Fragment>
         <Breadcrumbs />
         <IntlHelmet titleTemplate={`%s - ${organization.name || orgId} - ${env.siteName}`} />
-        <SideNavigation header={{ title: organization.name || orgId, icon: 'organization' }}>
+        <SideNavigation
+          header={{ title: organization.name || orgId, icon: 'organization', to: matchedUrl }}
+        >
           {mayViewOrganizationInformation.check(rights) && (
             <SideNavigation.Item
               title={sharedMessages.overview}
