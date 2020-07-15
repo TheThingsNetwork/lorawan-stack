@@ -830,12 +830,7 @@ storiesOf('Fields/FileInput', module)
         component={FileInput}
       />
       <Form.Field name="withValue" title="With initially attached file" component={FileInput} />
-      <Form.Field
-        name="error"
-        title="With error"
-        component={FileInput}
-        error="There was an error."
-      />
+      <Form.Field name="error" title="With error" component={FileInput} />
       <Form.Field
         name="warning"
         title="With warning"
@@ -862,12 +857,7 @@ storiesOf('Fields/FileInput', module)
         component={FileInput}
       />
       <Form.Field name="withValue" title="With initially attached file" component={FileInput} />
-      <Form.Field
-        name="error"
-        title="With error"
-        component={FileInput}
-        error="There was an error."
-      />
+      <Form.Field name="error" title="With error" component={FileInput} />
       <Form.Field
         name="warning"
         title="With warning"
@@ -935,7 +925,6 @@ storiesOf('Fields/UnitInput', module)
           { label: 'hours', value: 'h' },
         ]}
         component={UnitInput}
-        error="There was an error"
       />
     </FieldsWrapperExample>
   ))
@@ -995,7 +984,6 @@ storiesOf('Fields/UnitInput', module)
           { label: 'hours', value: 'h' },
         ]}
         component={UnitInput}
-        error="There was an error"
       />
     </FieldsWrapperExample>
   ))

@@ -167,7 +167,7 @@ class FormField extends React.Component {
 
     const fieldValue = decode(getIn(this.context.values, name))
     const fieldError = getIn(this.context.errors, name)
-    const fieldTouched = getIn(this.context.touched, name)
+    const fieldTouched = getIn(this.context.touched, name) || false
     const fieldDisabled = disabled || formDisabled
 
     const hasError = Boolean(fieldError)
