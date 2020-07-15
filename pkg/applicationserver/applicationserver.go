@@ -518,6 +518,9 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 
 func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *link) error {
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIdentifiers))
+	if io.IsSimulatedTraffic(ctx) {
+		return as.handleSimulatedUp(ctx, up, link)
+	}
 	switch p := up.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
 		return as.handleJoinAccept(ctx, up.EndDeviceIdentifiers, p.JoinAccept, link)
@@ -535,6 +538,15 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkAck, link)
 	case *ttnpb.ApplicationUp_DownlinkNack:
 		return as.handleDownlinkNack(ctx, up.EndDeviceIdentifiers, p.DownlinkNack, link)
+	default:
+		return nil
+	}
+}
+
+func (as *ApplicationServer) handleSimulatedUp(ctx context.Context, up *ttnpb.ApplicationUp, link *link) error {
+	switch p := up.Up.(type) {
+	case *ttnpb.ApplicationUp_UplinkMessage:
+		return as.handleSimulatedUplink(ctx, up.EndDeviceIdentifiers, p.UplinkMessage, link)
 	default:
 		return nil
 	}
@@ -901,6 +913,20 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	}
 	// TODO: Run uplink messages through location solvers async (https://github.com/TheThingsNetwork/lorawan-stack/issues/37)
 	return nil
+}
+
+func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *link) error {
+	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyID)
+	dev, err := as.deviceRegistry.Get(ctx, ids,
+		[]string{
+			"formatters",
+			"version_ids",
+		},
+	)
+	if err != nil {
+		return err
+	}
+	return as.decode(ctx, dev, uplink, link.DefaultFormatters)
 }
 
 func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *link) error {
