@@ -12,32 +12,64 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.navigation
+// This style is to be applied to the portalled container.
+.container
   border-normal(right)
+  left: 0
   background-color: white
-  max-width: 18rem
-  min-width: 16rem
-  height: 100%
+  z-index: $zi.nav
+  +media-query-min($bp.s)
+    top: 0
+    position: absolute
+    height: 100%
+  +media-query($bp.s)
+    height: auto
+    position: sticky
+    top: $header-height-mobile
+    z-index: $zi.nav
+    +media-query-height(500px)
+      position: static
+
+.navigation
+  position: sticky
+  background-color: white
+  top: 0
   display: flex
   flex-direction: column
   justify-content: space-between
   box-sizing: border-box
+  max-height: 100%
+  +media-query-min($bp.s)
+    width: $sidebar-width
+    overflow-y: auto
   +media-query($bp.s)
-    max-width: none
+    height: 4rem
     width: 100%
 
-  &-minimized
-    min-width: auto
-    display: inline-flex
-
   .minimize-button
-    align-self: center
+    width: 100%
+    height: auto
+    text-align: left
+    padding: $cs.m $cs.m $cs.m $cs.l
+    margin-top: $cs.l
+    color: $tc-deep-gray
+    +media-query-min($bp.s)
+      display: block
     +media-query($bp.s)
       display: none
 
+  &-minimized
+    +media-query-min($bp.s)
+      width: $sidebar-width-minimized
+      display: inline-flex
+
+    .minimize-button
+      padding-left: $cs.m
+
 .mobile-header
-  display: none
   align-items: center
+  +media-query-min($bp.s)
+    display: none
   +media-query($bp.s)
     border-normal(bottom)
     display: flex
@@ -51,6 +83,7 @@
 
 .header
   border-normal(bottom)
+  box-sizing: border-box
   display: flex
   align-items: center
   padding: $cs.xl $cs.l
@@ -58,8 +91,11 @@
 
   +media-query-min($bp.s)
     &-minimized
-      padding: $cs.l $cs.m
-      display: inline-block
+      padding: 0
+      width: 100%
+      display: flex
+      height: $breadcrumbs-bar-height
+      justify-content: center
 
       .message
         display: none
@@ -69,16 +105,12 @@
 
 .body
   height: 100%
-  display: flex
-  flex-direction: column
-  justify-content: space-between
 
 .drawer
   background-color: white
   z-index: $zi.nav
   overflow: auto
   +media-query($bp.s)
-    display: block
     position: fixed
     top: $header-height-mobile
     left: -60vw

@@ -13,39 +13,48 @@
 // limitations under the License.
 
 .app
-  display: flex
-  flex-direction: column
   height: 100%
+  width: 100%
 
 .main
-  display: flex
-  flex: 1 1 auto
   position: relative
+  display: flex
+  flex-direction: column
+  +media-query-min($bp.s)
+    min-height: "calc(100vh - %s - %s)" % ($header-height $footer-height)
   +media-query($bp.s)
-    flex-direction: column
+    min-height: "calc(100vh - %s - %s)" % ($header-height-mobile $footer-height)
+
+:global(.with-sidebar) .main
+  +media-query-min($bp.s)
+    padding-left: $sidebar-width
+  +media-query-between($bp.s, $bp.m)
+    padding-left: $sidebar-width-minimized
+
+:global(.sidebar-minimized) .main
+  +media-query-min($bp.s)
+    padding-left: $sidebar-width-minimized
+
+:global(.sidebar-transitioned) .main
+  +media-query-min($bp.s)
+    sidebar-transition(padding-left)
 
 .content
+  position: relative
   overflow: auto
   flex: 1
-  position: relative
 
 .stage
   padding-bottom: $ls.xxs
 
 .mobile-breadcrumbs
-  display: none
+  +media-query-min($bp.s)
+    display: none
   +media-query($bp.s)
     display: block
 
 .desktop-breadcrumbs
-  display: block
+  +media-query-min($bp.s)
+    display: block
   +media-query($bp.s)
     display: none
-
-.sidebar
-  +media-query($bp.s)
-    position: sticky
-    top: $header-height-mobile
-    z-index: $zi.nav
-    +media-query-height(500px)
-      position: static
