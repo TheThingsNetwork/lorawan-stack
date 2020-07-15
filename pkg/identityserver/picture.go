@@ -25,6 +25,7 @@ import (
 	"time"
 
 	ulid "github.com/oklog/ulid/v2"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/picture"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -53,7 +54,16 @@ func fillGravatar(ctx context.Context, usr *ttnpb.User) (err error) {
 	return nil
 }
 
+var errProfilePictureUploadDisabled = errors.DefineFailedPrecondition(
+	"profile_picture_uploads_disabled",
+	"profile picture uploads are disabled",
+)
+
 func (is *IdentityServer) processUserProfilePicture(ctx context.Context, usr *ttnpb.User) (err error) {
+	config := is.configFromContext(ctx)
+	if config.ProfilePicture.DisableUpload {
+		return errProfilePictureUploadDisabled.New()
+	}
 	// External pictures, consider only largest.
 	if usr.ProfilePicture.Sizes != nil {
 		original := usr.ProfilePicture.Sizes[0]
@@ -84,7 +94,7 @@ func (is *IdentityServer) processUserProfilePicture(ctx context.Context, usr *tt
 	}
 
 	// Store picture to bucket.
-	bucket, err := is.Component.GetBaseConfig(ctx).Blob.Bucket(ctx, is.configFromContext(ctx).ProfilePicture.Bucket)
+	bucket, err := is.Component.GetBaseConfig(ctx).Blob.Bucket(ctx, config.ProfilePicture.Bucket)
 	if err != nil {
 		return err
 	}
@@ -100,7 +110,16 @@ func (is *IdentityServer) processUserProfilePicture(ctx context.Context, usr *tt
 	return
 }
 
+var errEndDevicePictureUploadDisabled = errors.DefineFailedPrecondition(
+	"end_device_picture_uploads_disabled",
+	"end device picture uploads are disabled",
+)
+
 func (is *IdentityServer) processEndDevicePicture(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
+	config := is.configFromContext(ctx)
+	if config.EndDevicePicture.DisableUpload {
+		return errEndDevicePictureUploadDisabled.New()
+	}
 	// External pictures, consider only largest.
 	if dev.Picture.Sizes != nil {
 		original := dev.Picture.Sizes[0]
@@ -131,7 +150,7 @@ func (is *IdentityServer) processEndDevicePicture(ctx context.Context, dev *ttnp
 	}
 
 	// Store picture to bucket.
-	bucket, err := is.Component.GetBaseConfig(ctx).Blob.Bucket(ctx, is.configFromContext(ctx).EndDevicePicture.Bucket)
+	bucket, err := is.Component.GetBaseConfig(ctx).Blob.Bucket(ctx, config.EndDevicePicture.Bucket)
 	if err != nil {
 		return err
 	}

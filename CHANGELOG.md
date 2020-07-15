@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Generic encryption/decryption to KeyVault.
 - Option to ignore log messages for selected gRPC method on success (see `grpc.log-ignore-methods` option).
 - CLI auto-completion support (see `ttn-lw-cli complete` command).
+- Options to disable profile picture and end device picture uploads (`is.profile-picture.disable-upload` and `is.end-device-picture.disable-upload`).
 
 ### Changed
 
