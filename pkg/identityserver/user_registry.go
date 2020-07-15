@@ -200,6 +200,18 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		return nil, err
 	}
 
+	if usr.State == ttnpb.STATE_REQUESTED {
+		err = is.SendAdminsEmail(ctx, func(data emails.Data) email.MessageData {
+			data.Entity.Type, data.Entity.ID = "user", usr.UserID
+			return &emails.UserRequested{
+				Data: data,
+			}
+		})
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Error("Could not send user requested email")
+		}
+	}
+
 	// TODO: Send welcome email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 
 	if _, err := is.requestContactInfoValidation(ctx, req.UserIdentifiers.EntityIdentifiers()); err != nil {
