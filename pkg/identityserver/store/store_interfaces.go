@@ -90,6 +90,7 @@ type OrganizationStore interface {
 type UserStore interface {
 	CreateUser(ctx context.Context, usr *ttnpb.User) (*ttnpb.User, error)
 	FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.User, error)
+	ListAdmins(ctx context.Context, fieldMask *types.FieldMask) ([]*ttnpb.User, error)
 	GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask *types.FieldMask) (*ttnpb.User, error)
 	UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *types.FieldMask) (*ttnpb.User, error)
 	DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) error

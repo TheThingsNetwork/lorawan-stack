@@ -35,6 +35,11 @@ func TestUserStore(t *testing.T) {
 		prepareTest(db, &Account{}, &User{}, &Attribute{}, &Picture{})
 		store := GetUserStore(db)
 
+		list, err := store.ListAdmins(ctx, &types.FieldMask{Paths: []string{"name"}})
+
+		a.So(err, should.BeNil)
+		a.So(list, should.BeEmpty)
+
 		created, err := store.CreateUser(ctx, &ttnpb.User{
 			UserIdentifiers: ttnpb.UserIdentifiers{UserID: "foo"},
 			Name:            "Foo User",
@@ -97,7 +102,8 @@ func TestUserStore(t *testing.T) {
 			ProfilePicture: &ttnpb.Picture{
 				Sizes: map[uint32]string{0: "https://example.com/profile_picture.jpg"},
 			},
-		}, &types.FieldMask{Paths: []string{"description", "attributes", "profile_picture"}})
+			Admin: true,
+		}, &types.FieldMask{Paths: []string{"description", "attributes", "profile_picture", "admin"}})
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
@@ -122,7 +128,14 @@ func TestUserStore(t *testing.T) {
 			a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
 		}
 
-		list, err := store.FindUsers(ctx, nil, &types.FieldMask{Paths: []string{"name"}})
+		list, err = store.FindUsers(ctx, nil, &types.FieldMask{Paths: []string{"name"}})
+
+		a.So(err, should.BeNil)
+		if a.So(list, should.HaveLength, 1) {
+			a.So(list[0].Name, should.EndWith, got.Name)
+		}
+
+		list, err = store.ListAdmins(ctx, &types.FieldMask{Paths: []string{"name"}})
 
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
