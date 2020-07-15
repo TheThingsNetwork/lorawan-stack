@@ -275,7 +275,6 @@ class GatewayDataForm extends React.Component {
             { label: sharedMessages.hours, value: 'h' },
           ]}
           onChange={this.onScheduleAnytimeDelayChange}
-          decode={this.decodeDelayValue}
           warning={
             shouldDisplayWarning
               ? {

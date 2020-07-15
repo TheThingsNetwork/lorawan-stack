@@ -28,22 +28,11 @@ import UnitInput from '@ttn-lw/components/unit-input'
 
 import Yup from '@ttn-lw/lib/yup'
 
-import { unit as unitRegexp } from '@console/lib/regexp'
-
 import Form from '..'
 
 const handleSubmit = function(data, { resetForm }) {
   action('Submit')(data)
   setTimeout(() => resetForm({ values: data }), 1000)
-}
-
-const decode = function(value) {
-  const duration = value.split(unitRegexp)[0]
-  const unit = value.split(duration)[1]
-  return {
-    duration: duration ? Number(duration) : undefined,
-    unit,
-  }
 }
 
 const info = {
@@ -904,7 +893,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="default"
         title="Default"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -916,7 +904,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="description"
         title="Description"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -929,7 +916,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="warning"
         title="Warning"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -942,7 +928,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="error"
         title="Error"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -968,7 +953,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="default"
         title="Default"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -980,7 +964,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="description"
         title="Description"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -993,7 +976,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="warning"
         title="Warning"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -1006,7 +988,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="error"
         title="Error"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
