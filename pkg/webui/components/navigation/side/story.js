@@ -37,7 +37,7 @@ storiesOf('Navigation', module)
 
     return (
       <div style={{ width: '300px', height: '700px' }}>
-        <SideNavigation header={header}>
+        <SideNavigation modifyAppContainerClasses={false} header={header}>
           <SideNavigationItem title="Overview" path="/" icon="overview" exact />
           <SideNavigationItem title="Devices" path="/devices" icon="devices" />
           <SideNavigationItem title="Data" path="/data" icon="data" />

@@ -35,11 +35,8 @@ const m = defineMessages({
   hideSidebar: 'Hide sidebar',
 })
 export class SideNavigation extends Component {
-  static defaultProps = {
-    className: undefined,
-  }
-
   static propTypes = {
+    appContainerId: PropTypes.string,
     children: PropTypes.node.isRequired,
     className: PropTypes.string,
     /** The header for the side navigation. */
@@ -47,6 +44,13 @@ export class SideNavigation extends Component {
       title: PropTypes.string,
       icon: PropTypes.string,
     }).isRequired,
+    modifyAppContainerClasses: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    appContainerId: 'app',
+    modifyAppContainerClasses: true,
+    className: undefined,
   }
 
   state = {
@@ -59,10 +63,45 @@ export class SideNavigation extends Component {
   }
 
   @bind
-  onToggle() {
-    this.setState(function(prev) {
+  updateAppContainerClasses() {
+    const { modifyAppContainerClasses, appContainerId } = this.props
+    if (!modifyAppContainerClasses) {
+      return
+    }
+    const { isMinimized } = this.state
+    const containerClasses = document.getElementById(appContainerId).classList
+    containerClasses.add('with-sidebar')
+    if (isMinimized) {
+      containerClasses.add('sidebar-minimized')
+    } else {
+      containerClasses.remove('sidebar-minimized')
+    }
+  }
+
+  @bind
+  removeAppContainerClasses() {
+    const { modifyAppContainerClasses, appContainerId } = this.props
+    if (!modifyAppContainerClasses) {
+      return
+    }
+    document.getElementById(appContainerId).classList.remove('with-sidebar', 'sidebar-minimized')
+  }
+
+  componentDidMount() {
+    this.updateAppContainerClasses()
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.setMinimizedState)
+    this.removeAppContainerClasses()
+  }
+
+  @bind
+  async onToggle() {
+    await this.setState(function(prev) {
       return { isMinimized: !prev.isMinimized }
     })
+    this.updateAppContainerClasses()
   }
 
   @bind
