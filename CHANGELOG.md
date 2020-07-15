@@ -11,17 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Increase Network Server application uplink buffer queue size.
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
-- Decoding of uplinks with frame counters exceeding 16 bits in Application Server.
-
 ### Security
+
+## [3.8.7] - 2020-07-15
+
+### Changed
+
+- Increase Network Server application uplink buffer queue size.
+
+### Fixed
+
+- Decoding of uplinks with frame counters exceeding 16 bits in Application Server.
 
 ## [3.8.6] - 2020-07-10
 
@@ -939,7 +945,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.6...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.7...HEAD
+[3.8.7]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.6...v3.8.7
 [3.8.6]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.5...v3.8.6
 [3.8.5]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.4...v3.8.5
 [3.8.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.3...v3.8.4
