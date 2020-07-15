@@ -42,11 +42,16 @@ var (
 	)
 )
 
+var errAdminsCreateApplications = errors.DefinePermissionDenied("admins_create_applications", "applications may only be created by admins, or in organizations")
+
 func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (app *ttnpb.Application, err error) {
 	if err = blacklist.Check(ctx, req.ApplicationID); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
+		if !is.IsAdmin(ctx) && !is.configFromContext(ctx).UserRights.CreateApplications {
+			return nil, errAdminsCreateApplications
+		}
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_APPLICATIONS_CREATE); err != nil {
 			return nil, err
 		}

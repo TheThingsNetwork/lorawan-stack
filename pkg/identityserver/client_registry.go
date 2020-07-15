@@ -47,12 +47,17 @@ var (
 	)
 )
 
+var errAdminsCreateClients = errors.DefinePermissionDenied("admins_create_clients", "OAuth clients may only be created by admins, or in organizations")
+
 func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateClientRequest) (cli *ttnpb.Client, err error) {
 	createdByAdmin := is.IsAdmin(ctx)
 	if err = blacklist.Check(ctx, req.ClientID); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
+		if !createdByAdmin && !is.configFromContext(ctx).UserRights.CreateClients {
+			return nil, errAdminsCreateClients
+		}
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_CLIENTS_CREATE); err != nil {
 			return nil, err
 		}

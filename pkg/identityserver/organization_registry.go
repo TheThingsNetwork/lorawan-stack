@@ -42,13 +42,19 @@ var (
 	)
 )
 
-var errNestedOrganizations = errors.DefineInvalidArgument("nested_organizations", "organizations can not be nested")
+var (
+	errNestedOrganizations       = errors.DefineInvalidArgument("nested_organizations", "organizations can not be nested")
+	errAdminsCreateOrganizations = errors.DefinePermissionDenied("admins_create_organizations", "organizations may only be created by admins")
+)
 
 func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.CreateOrganizationRequest) (org *ttnpb.Organization, err error) {
 	if err = blacklist.Check(ctx, req.OrganizationID); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
+		if !is.IsAdmin(ctx) && !is.configFromContext(ctx).UserRights.CreateOrganizations {
+			return nil, errAdminsCreateOrganizations
+		}
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_ORGANIZATIONS_CREATE); err != nil {
 			return nil, err
 		}

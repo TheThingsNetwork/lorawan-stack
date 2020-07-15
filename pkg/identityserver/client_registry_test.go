@@ -126,6 +126,22 @@ func TestClientsCRUD(t *testing.T) {
 		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
 		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
+		is.config.UserRights.CreateClients = false
+
+		_, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
+			Client: ttnpb.Client{
+				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "foo"},
+				Name:              "Foo Client",
+			},
+			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		is.config.UserRights.CreateClients = true
+
 		created, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
 			Client: ttnpb.Client{
 				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "foo"},
