@@ -25,6 +25,7 @@
   +media-query($bp.s)
     min-height: "calc(100vh - %s - %s)" % ($header-height-mobile $footer-height)
 
+// Global classes attached by the sidebar component.
 :global(.with-sidebar) .main
   +media-query-min($bp.s)
     padding-left: $sidebar-width

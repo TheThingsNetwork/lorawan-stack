@@ -31,6 +31,7 @@
       position: static
 
 .navigation
+  sidebar-transition(width)
   position: sticky
   background-color: white
   top: 0
@@ -42,29 +43,37 @@
   +media-query-min($bp.s)
     width: $sidebar-width
     overflow-y: auto
+    overflow-x: hidden
   +media-query($bp.s)
     height: 4rem
     width: 100%
-
-  .minimize-button
-    width: 100%
-    height: auto
-    text-align: left
-    padding: $cs.m $cs.m $cs.m $cs.l
-    margin-top: $cs.l
-    color: $tc-deep-gray
-    +media-query-min($bp.s)
-      display: block
-    +media-query($bp.s)
-      display: none
 
   &-minimized
     +media-query-min($bp.s)
       width: $sidebar-width-minimized
       display: inline-flex
 
-    .minimize-button
-      padding-left: $cs.m
+      .header
+        padding: 0
+        width: 100%
+        display: flex
+        height: $breadcrumbs-bar-height
+        justify-content: center
+
+        .message
+          display: none
+
+        .icon
+          margin-right: 0
+
+.header
+  border-normal(bottom)
+  sidebar-transition(padding)
+  box-sizing: border-box
+  display: flex
+  align-items: center
+  padding: $cs.xl $cs.l
+  font-weight: $fw.bold
 
 .mobile-header
   align-items: center
@@ -80,29 +89,6 @@
     font-size: 2rem
     color: $tc-subtle-gray
 
-
-.header
-  border-normal(bottom)
-  box-sizing: border-box
-  display: flex
-  align-items: center
-  padding: $cs.xl $cs.l
-  font-weight: $fw.bold
-
-  +media-query-min($bp.s)
-    &-minimized
-      padding: 0
-      width: 100%
-      display: flex
-      height: $breadcrumbs-bar-height
-      justify-content: center
-
-      .message
-        display: none
-
-      .icon
-        margin-right: 0
-
 .body
   height: 100%
 
@@ -111,13 +97,13 @@
   z-index: $zi.nav
   overflow: auto
   +media-query($bp.s)
+    sidebar-transition(left, box-shadow)
     position: fixed
     top: $header-height-mobile
     left: -60vw
     bottom: 0
     width: 60vw
     max-width: 20rem
-    transition: left 330ms cubic-bezier(.18,.71,.3,.99), box-shadow 330ms cubic-bezier(.18,.71,.3,.99)
 
     &-open
       box-shadow: 0 0 13rem 2rem rgba(0,0,0,.4)

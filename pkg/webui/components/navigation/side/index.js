@@ -18,6 +18,8 @@ import bind from 'autobind-decorator'
 import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 
+import LAYOUT from '@ttn-lw/constants/layout'
+
 import Button from '@ttn-lw/components/button'
 import Icon from '@ttn-lw/components/icon'
 
@@ -30,6 +32,9 @@ import SideNavigationItem from './item'
 import SideNavigationContext from './context'
 
 import style from './side.styl'
+
+const getViewportWidth = () =>
+  Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
 
 const m = defineMessages({
   hideSidebar: 'Hide sidebar',
@@ -55,15 +60,18 @@ export class SideNavigation extends Component {
 
   state = {
     /** A flag specifying whether the side navigation is minimized or not. */
-    isMinimized: false,
+    isMinimized: getViewportWidth() <= LAYOUT.BREAKPOINTS.M,
     /** A flag specifying whether the drawer is currently open (in mobile
      * screensizes).
      */
     isDrawerOpen: false,
+    /** A flag indicating whether the user has last toggled the sidebar to
+     * minimized state. */
+    preferMinimized: false,
   }
 
   @bind
-  updateAppContainerClasses() {
+  updateAppContainerClasses(initial = false) {
     const { modifyAppContainerClasses, appContainerId } = this.props
     if (!modifyAppContainerClasses) {
       return
@@ -71,6 +79,11 @@ export class SideNavigation extends Component {
     const { isMinimized } = this.state
     const containerClasses = document.getElementById(appContainerId).classList
     containerClasses.add('with-sidebar')
+    if (!initial) {
+      // The transitioned class is necessary to prevent unwanted width
+      // transitions during route changes.
+      containerClasses.add('sidebar-transitioned')
+    }
     if (isMinimized) {
       containerClasses.add('sidebar-minimized')
     } else {
@@ -84,11 +97,14 @@ export class SideNavigation extends Component {
     if (!modifyAppContainerClasses) {
       return
     }
-    document.getElementById(appContainerId).classList.remove('with-sidebar', 'sidebar-minimized')
+    document
+      .getElementById(appContainerId)
+      .classList.remove('with-sidebar', 'sidebar-minimized', 'sidebar-transitioned')
   }
 
   componentDidMount() {
-    this.updateAppContainerClasses()
+    window.addEventListener('resize', this.setMinimizedState)
+    this.updateAppContainerClasses(true)
   }
 
   componentWillUnmount() {
@@ -97,9 +113,23 @@ export class SideNavigation extends Component {
   }
 
   @bind
+  setMinimizedState() {
+    const { isMinimized, preferMinimized } = this.state
+
+    const viewportWidth = getViewportWidth()
+    if (
+      (!isMinimized && viewportWidth <= LAYOUT.BREAKPOINTS.M) ||
+      (isMinimized && viewportWidth > LAYOUT.BREAKPOINTS.M)
+    ) {
+      this.setState({ isMinimized: getViewportWidth() <= LAYOUT.BREAKPOINTS.M || preferMinimized })
+      this.updateAppContainerClasses()
+    }
+  }
+
+  @bind
   async onToggle() {
     await this.setState(function(prev) {
-      return { isMinimized: !prev.isMinimized }
+      return { isMinimized: !prev.isMinimized, preferMinimized: !prev.isMinimized }
     })
     this.updateAppContainerClasses()
   }
