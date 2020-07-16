@@ -154,7 +154,7 @@ func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pb
 	if err := rights.RequireApplication(ctx, up.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_UP_WRITE); err != nil {
 		return nil, err
 	}
-	ctx = io.WithSimulatedTraffic(ctx, true)
+	up.Simulated = true
 	if err := s.server.SendUp(ctx, up); err != nil {
 		return nil, err
 	}

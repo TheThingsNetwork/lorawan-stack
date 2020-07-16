@@ -127,18 +127,3 @@ func CleanDownlinks(items []*ttnpb.ApplicationDownlink) []*ttnpb.ApplicationDown
 	}
 	return res
 }
-
-type simulatedTrafficKeyType struct{}
-
-var simulatedTrafficKey simulatedTrafficKeyType
-
-// WithSimulatedTraffic marks the context as following simulated traffic.
-func WithSimulatedTraffic(ctx context.Context, simulated bool) context.Context {
-	return context.WithValue(ctx, simulatedTrafficKey, simulated)
-}
-
-// IsSimulatedTraffic checks if the context is attached to a simulated traffic source.
-func IsSimulatedTraffic(ctx context.Context) bool {
-	v, _ := ctx.Value(simulatedTrafficKey).(bool)
-	return v
-}
