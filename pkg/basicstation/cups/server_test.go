@@ -23,6 +23,7 @@ import (
 	"strings"
 	"testing"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	echo "github.com/labstack/echo/v4"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -56,44 +57,54 @@ func TestGetTrust(t *testing.T) {
 
 type mockGatewayClientData struct {
 	ctx struct {
-		GetIdentifiersForEUI context.Context
-		Create               context.Context
-		Get                  context.Context
-		Update               context.Context
-		CreateAPIKey         context.Context
-		UpdateAPIKey         context.Context
+		GetIdentifiersForEUI  context.Context
+		Create                context.Context
+		Get                   context.Context
+		Update                context.Context
+		CreateAPIKey          context.Context
+		UpdateAPIKey          context.Context
+		StoreGatewaySecret    context.Context
+		RetrieveGatewaySecret context.Context
 	}
 	req struct {
-		GetIdentifiersForEUI *ttnpb.GetGatewayIdentifiersForEUIRequest
-		Create               *ttnpb.CreateGatewayRequest
-		Get                  *ttnpb.GetGatewayRequest
-		Update               *ttnpb.UpdateGatewayRequest
-		CreateAPIKey         *ttnpb.CreateGatewayAPIKeyRequest
-		UpdateAPIKey         *ttnpb.UpdateGatewayAPIKeyRequest
+		GetIdentifiersForEUI  *ttnpb.GetGatewayIdentifiersForEUIRequest
+		Create                *ttnpb.CreateGatewayRequest
+		Get                   *ttnpb.GetGatewayRequest
+		Update                *ttnpb.UpdateGatewayRequest
+		CreateAPIKey          *ttnpb.CreateGatewayAPIKeyRequest
+		UpdateAPIKey          *ttnpb.UpdateGatewayAPIKeyRequest
+		StoreGatewaySecret    *ttnpb.StoreGatewaySecretRequest
+		RetrieveGatewaySecret *ttnpb.RetrieveGatewaySecretRequest
 	}
 	opts struct {
-		GetIdentifiersForEUI []grpc.CallOption
-		Create               []grpc.CallOption
-		Get                  []grpc.CallOption
-		Update               []grpc.CallOption
-		CreateAPIKey         []grpc.CallOption
-		UpdateAPIKey         []grpc.CallOption
+		GetIdentifiersForEUI  []grpc.CallOption
+		Create                []grpc.CallOption
+		Get                   []grpc.CallOption
+		Update                []grpc.CallOption
+		CreateAPIKey          []grpc.CallOption
+		UpdateAPIKey          []grpc.CallOption
+		StoreGatewaySecret    []grpc.CallOption
+		RetrieveGatewaySecret []grpc.CallOption
 	}
 	res struct {
-		GetIdentifiersForEUI *ttnpb.GatewayIdentifiers
-		Create               *ttnpb.Gateway
-		Get                  *ttnpb.Gateway
-		Update               *ttnpb.Gateway
-		CreateAPIKey         *ttnpb.APIKey
-		UpdateAPIKey         *ttnpb.APIKey
+		GetIdentifiersForEUI  *ttnpb.GatewayIdentifiers
+		Create                *ttnpb.Gateway
+		Get                   *ttnpb.Gateway
+		Update                *ttnpb.Gateway
+		CreateAPIKey          *ttnpb.APIKey
+		UpdateAPIKey          *ttnpb.APIKey
+		StoreGatewaySecret    *pbtypes.Empty
+		RetrieveGatewaySecret *ttnpb.GatewaySecretPlainText
 	}
 	err struct {
-		GetIdentifiersForEUI error
-		Create               error
-		Get                  error
-		Update               error
-		CreateAPIKey         error
-		UpdateAPIKey         error
+		GetIdentifiersForEUI  error
+		Create                error
+		Get                   error
+		Update                error
+		CreateAPIKey          error
+		UpdateAPIKey          error
+		StoreGatewaySecret    error
+		RetrieveGatewaySecret error
 	}
 }
 
@@ -137,6 +148,16 @@ func (m *mockGatewayClient) UpdateAPIKey(ctx context.Context, in *ttnpb.UpdateGa
 	return m.res.UpdateAPIKey, m.err.UpdateAPIKey
 }
 
+func (m *mockGatewayClient) StoreGatewaySecret(ctx context.Context, req *ttnpb.StoreGatewaySecretRequest, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
+	m.ctx.StoreGatewaySecret, m.req.StoreGatewaySecret, m.opts.UpdateAPIKey = ctx, req, opts
+	return m.res.StoreGatewaySecret, m.err.StoreGatewaySecret
+}
+
+func (m *mockGatewayClient) RetrieveGatewaySecret(ctx context.Context, req *ttnpb.RetrieveGatewaySecretRequest, opts ...grpc.CallOption) (*ttnpb.GatewaySecretPlainText, error) {
+	m.ctx.RetrieveGatewaySecret, m.req.RetrieveGatewaySecret, m.opts.UpdateAPIKey = ctx, req, opts
+	return m.res.RetrieveGatewaySecret, m.err.RetrieveGatewaySecret
+}
+
 const updateInfoRequest = `{
   "router": "58a0:cbff:fe80:19",
   "cupsUri": "https://thethingsnetwork.org:443",
@@ -161,7 +182,7 @@ var (
 	mockRightsFetcher = rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
 		md := rpcmetadata.FromIncomingContext(ctx)
 		if md.AuthType == "Bearer" {
-			return ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC), nil
+			return ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC, ttnpb.RIGHT_GATEWAY_READ_SECRET), nil
 		}
 		return nil, rights.ErrNoGatewayRights
 	})
@@ -188,8 +209,6 @@ func TestServer(t *testing.T) {
 				cupsStationAttribute:       "2.0.0(minihub/debug) 2018-12-06 09:30:35",
 				cupsModelAttribute:         "minihub",
 				cupsPackageAttribute:       "2.0.0",
-				lnsCredentialsIDAttribute:  "KEYID",
-				lnsCredentialsAttribute:    "Bearer KEYCONTENTS",
 			},
 			GatewayServerAddress: lnsURI,
 		}
@@ -241,6 +260,11 @@ func TestServer(t *testing.T) {
 					ID:  "KEYID",
 					Key: "KEYCONTENTS",
 				}
+				c.res.RetrieveGatewaySecret = &ttnpb.GatewaySecretPlainText{
+					Values: map[string][]byte{
+						lnsTokenMapKey: []byte("LNS KEY"),
+					},
+				}
 			},
 			Options: []Option{
 				WithRegisterUnknown(&ttnpb.OrganizationOrUserIdentifiers{}, mockAuthFunc),
@@ -255,6 +279,7 @@ func TestServer(t *testing.T) {
 				a.So(res.LNSURI, should.Equal, lnsURI)
 				a.So(res.CUPSCredentials, should.NotBeEmpty)
 				a.So(res.LNSCredentials, should.NotBeEmpty)
+				a.So(string(res.LNSCredentials), should.ContainSubstring, "Authorization: LNS KEY")
 				a.So(res.SignatureKeyCRC, should.BeZeroValue)
 				a.So(res.Signature, should.BeEmpty)
 				a.So(res.UpdateData, should.BeEmpty)
@@ -274,8 +299,6 @@ func TestServer(t *testing.T) {
 						cupsStationAttribute,
 						cupsModelAttribute,
 						cupsPackageAttribute,
-						lnsCredentialsIDAttribute,
-						lnsCredentialsAttribute,
 					} {
 						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
 					}
@@ -298,6 +321,11 @@ func TestServer(t *testing.T) {
 			StoreSetup: func(c *mockGatewayClient) {
 				c.res.Get = mockGateway()
 				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+				c.res.RetrieveGatewaySecret = &ttnpb.GatewaySecretPlainText{
+					Values: map[string][]byte{
+						lnsTokenMapKey: []byte("LNS KEY"),
+					},
+				}
 			},
 			Options: []Option{
 				WithAllowCUPSURIUpdate(true),
@@ -314,6 +342,7 @@ func TestServer(t *testing.T) {
 				a.So(res.LNSURI, should.Equal, lnsURI)
 				a.So(res.CUPSCredentials, should.NotBeEmpty)
 				a.So(res.LNSCredentials, should.NotBeEmpty)
+				a.So(string(res.LNSCredentials), should.ContainSubstring, "Authorization: LNS KEY")
 				a.So(res.SignatureKeyCRC, should.BeZeroValue)
 				a.So(res.Signature, should.BeEmpty)
 				a.So(res.UpdateData, should.BeEmpty)
@@ -330,8 +359,6 @@ func TestServer(t *testing.T) {
 						cupsStationAttribute,
 						cupsModelAttribute,
 						cupsPackageAttribute,
-						lnsCredentialsIDAttribute,
-						lnsCredentialsAttribute,
 					} {
 						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
 					}
