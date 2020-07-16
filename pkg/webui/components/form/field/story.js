@@ -28,22 +28,11 @@ import UnitInput from '@ttn-lw/components/unit-input'
 
 import Yup from '@ttn-lw/lib/yup'
 
-import { unit as unitRegexp } from '@console/lib/regexp'
-
 import Form from '..'
 
 const handleSubmit = function(data, { resetForm }) {
   action('Submit')(data)
   setTimeout(() => resetForm({ values: data }), 1000)
-}
-
-const decode = function(value) {
-  const duration = value.split(unitRegexp)[0]
-  const unit = value.split(duration)[1]
-  return {
-    duration: duration ? Number(duration) : undefined,
-    unit,
-  }
 }
 
 const info = {
@@ -841,12 +830,7 @@ storiesOf('Fields/FileInput', module)
         component={FileInput}
       />
       <Form.Field name="withValue" title="With initially attached file" component={FileInput} />
-      <Form.Field
-        name="error"
-        title="With error"
-        component={FileInput}
-        error="There was an error."
-      />
+      <Form.Field name="error" title="With error" component={FileInput} />
       <Form.Field
         name="warning"
         title="With warning"
@@ -873,12 +857,7 @@ storiesOf('Fields/FileInput', module)
         component={FileInput}
       />
       <Form.Field name="withValue" title="With initially attached file" component={FileInput} />
-      <Form.Field
-        name="error"
-        title="With error"
-        component={FileInput}
-        error="There was an error."
-      />
+      <Form.Field name="error" title="With error" component={FileInput} />
       <Form.Field
         name="warning"
         title="With warning"
@@ -904,7 +883,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="default"
         title="Default"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -916,7 +894,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="description"
         title="Description"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -929,7 +906,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="warning"
         title="Warning"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -942,7 +918,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="error"
         title="Error"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -950,7 +925,6 @@ storiesOf('Fields/UnitInput', module)
           { label: 'hours', value: 'h' },
         ]}
         component={UnitInput}
-        error="There was an error"
       />
     </FieldsWrapperExample>
   ))
@@ -968,7 +942,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="default"
         title="Default"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -980,7 +953,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="description"
         title="Description"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -993,7 +965,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="warning"
         title="Warning"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -1006,7 +977,6 @@ storiesOf('Fields/UnitInput', module)
       <Form.Field
         name="error"
         title="Error"
-        decode={decode}
         units={[
           { label: 'miliseconds', value: 'ms' },
           { label: 'seconds', value: 's' },
@@ -1014,7 +984,6 @@ storiesOf('Fields/UnitInput', module)
           { label: 'hours', value: 'h' },
         ]}
         component={UnitInput}
-        error="There was an error"
       />
     </FieldsWrapperExample>
   ))

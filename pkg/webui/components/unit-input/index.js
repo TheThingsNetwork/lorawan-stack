@@ -27,15 +27,9 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './unit-input.styl'
 
-@withComputedProps(props => ({
-  ...props,
-  value: props.decode(props.value),
-}))
 class UnitInput extends React.PureComponent {
   static propTypes = {
     className: PropTypes.string,
-    // eslint-disable-next-line react/no-unused-prop-types
-    decode: PropTypes.func,
     disabled: PropTypes.bool,
     encode: PropTypes.func,
     error: PropTypes.bool,
@@ -58,14 +52,6 @@ class UnitInput extends React.PureComponent {
   static defaultProps = {
     className: undefined,
     encode: (duration, unit) => (duration ? `${duration}${unit}` : unit),
-    decode: value => {
-      const duration = value.split(unitRegexp)[0]
-      const unit = value.split(duration)[1]
-      return {
-        duration: duration ? Number(duration) : undefined,
-        unit,
-      }
-    },
     disabled: false,
     required: false,
     value: undefined,
@@ -130,4 +116,24 @@ class UnitInput extends React.PureComponent {
   }
 }
 
-export default UnitInput
+const WrappedUnitInput = withComputedProps(props => ({
+  ...props,
+  value: props.decode(props.value),
+}))(UnitInput)
+
+WrappedUnitInput.propTypes = {
+  decode: PropTypes.func,
+}
+
+WrappedUnitInput.defaultProps = {
+  decode: value => {
+    const duration = value.split(unitRegexp)[0]
+    const unit = value.split(duration)[1]
+    return {
+      duration: duration ? Number(duration) : undefined,
+      unit,
+    }
+  },
+}
+
+export default WrappedUnitInput
