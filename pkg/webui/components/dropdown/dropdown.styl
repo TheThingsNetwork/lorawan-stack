@@ -40,15 +40,14 @@ ul.dropdown
       reset-button()
 
     & > a, & > button
+      box-sizing: border-box
       line-height: 1
       display: block
-      color: $tc-deep-gray
       text-decoration: none
       padding: $cs.m
       width: 100%
-
-      span:last-child
-        nudge('down')
+      &:not(.active)
+        color: $tc-deep-gray
 
     .icon
       margin-right: $cs.xs
@@ -67,6 +66,4 @@ ul.dropdown
 
 .active
   border-left: $c-active-blue 5px solid
-  box-sizing: border-box
-  span
-    color: $c-active-blue
+  color: $c-active-blue
