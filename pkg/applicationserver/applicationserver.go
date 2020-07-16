@@ -519,7 +519,10 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *link) error {
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIdentifiers))
 	if io.IsSimulatedTraffic(ctx) {
+		up.Simulated = true
 		return as.handleSimulatedUp(ctx, up, link)
+	} else {
+		up.Simulated = false
 	}
 	switch p := up.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
