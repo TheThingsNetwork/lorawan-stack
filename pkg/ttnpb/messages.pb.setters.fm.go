@@ -890,6 +890,16 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 			} else {
 				dst.ReceivedAt = nil
 			}
+		case "simulated":
+			if len(subs) > 0 {
+				return fmt.Errorf("'simulated' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Simulated = src.Simulated
+			} else {
+				var zero bool
+				dst.Simulated = zero
+			}
 
 		case "up":
 			if len(subs) == 0 && src == nil {

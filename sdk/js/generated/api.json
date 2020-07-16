@@ -19792,6 +19792,16 @@
               "fullType": "ttn.lorawan.v3.ApplicationServiceData",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "simulated",
+              "description": "Signals if the message is coming from the Network Server or is simulated.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

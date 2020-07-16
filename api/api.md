@@ -4852,6 +4852,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | `downlink_queue_invalidated` | [`ApplicationInvalidatedDownlinks`](#ttn.lorawan.v3.ApplicationInvalidatedDownlinks) |  |  |
 | `location_solved` | [`ApplicationLocation`](#ttn.lorawan.v3.ApplicationLocation) |  |  |
 | `service_data` | [`ApplicationServiceData`](#ttn.lorawan.v3.ApplicationServiceData) |  |  |
+| `simulated` | [`bool`](#bool) |  | Signals if the message is coming from the Network Server or is simulated. |
 
 #### Field Rules
 

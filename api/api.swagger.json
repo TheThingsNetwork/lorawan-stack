@@ -9023,6 +9023,11 @@
         },
         "service_data": {
           "$ref": "#/definitions/v3ApplicationServiceData"
+        },
+        "simulated": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Signals if the message is coming from the Network Server or is simulated."
         }
       }
     },

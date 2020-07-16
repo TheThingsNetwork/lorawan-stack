@@ -296,6 +296,9 @@ message ApplicationUp {
     ApplicationLocation location_solved = 11;
     ApplicationServiceData service_data = 13;
   }
+
+  // Signals if the message is coming from the Network Server or is simulated.
+  bool simulated = 14;
 }
 
 enum PayloadFormatter {
