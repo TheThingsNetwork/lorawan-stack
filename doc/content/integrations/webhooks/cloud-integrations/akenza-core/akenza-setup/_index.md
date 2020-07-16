@@ -12,9 +12,9 @@ Log in to Akenza Core and navigate to the **Quick Start** tab in the **Environme
 
 {{< figure src="quick-start.png" alt="Steps to connect a device" >}}
 
-Set up a domain by selecting the **Add Domain** button in **Domains** submenu. 
+Set up a domain by selecting the **Add Domain** button in the **Domains** submenu. 
 
-Give a **Name** to your domain and choose **HTTP** for **Technology** in order to implement a Webhook integration. The **Domain Secret** is auto-generated, while **Uplink Function** and **Downlink Function** may retain a **Passthrough** value. 
+Give a **Name** to your domain and choose **HTTP** for **Technology** to create a Webhook integration. The **Domain Secret** is auto-generated, while **Uplink Function** and **Downlink Function** may retain a **Passthrough** value. 
 
 Select **Save** to finish.
 
