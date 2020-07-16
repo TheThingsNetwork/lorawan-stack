@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI crash when listing application package default associations without providing an application ID.
 - Decoding of uplinks with frame counters exceeding 16 bits in Application Server.
 - Validation of keys for gateway metrics and version fields.
+- Read only access for the gateway overview page in the Console.
 
 ### Security
 
