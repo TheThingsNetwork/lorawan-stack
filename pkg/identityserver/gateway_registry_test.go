@@ -129,6 +129,21 @@ func TestGatewaysCRUD(t *testing.T) {
 
 		eui := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 
+		is.config.UserRights.CreateGateways = false
+
+		_, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+			Gateway: ttnpb.Gateway{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: "foo",
+					EUI:       &eui,
+				},
+				Name: "Foo Gateway",
+			},
+			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		is.config.UserRights.CreateGateways = true
+
 		created, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{

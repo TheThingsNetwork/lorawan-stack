@@ -63,6 +63,12 @@ type Config struct {
 		Bucket        string `name:"bucket" description:"Bucket used for storing end device pictures"`
 		BucketURL     string `name:"bucket-url" description:"Base URL for public bucket access"`
 	} `name:"end-device-picture"`
+	UserRights struct {
+		CreateApplications  bool `name:"create-applications" description:"Allow non-admin users to create applications in their user account"`
+		CreateClients       bool `name:"create-clients" description:"Allow non-admin users to create OAuth clients in their user account"`
+		CreateGateways      bool `name:"create-gateways" description:"Allow non-admin users to create gateways in their user account"`
+		CreateOrganizations bool `name:"create-organizations" description:"Allow non-admin users to create organizations in their user account"`
+	} `name:"user-rights"`
 	Email struct {
 		email.Config `name:",squash"`
 		SendGrid     sendgrid.Config      `name:"sendgrid"`

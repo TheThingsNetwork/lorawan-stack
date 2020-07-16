@@ -4391,6 +4391,42 @@
       "file": "oauth_registry.go"
     }
   },
+  "error:pkg/identityserver:admins_create_applications": {
+    "translations": {
+      "en": "applications may only be created by admins, or in organizations"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
+    }
+  },
+  "error:pkg/identityserver:admins_create_clients": {
+    "translations": {
+      "en": "OAuth clients may only be created by admins, or in organizations"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "client_registry.go"
+    }
+  },
+  "error:pkg/identityserver:admins_create_gateways": {
+    "translations": {
+      "en": "gateways may only be created by admins, or in organizations"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
+  "error:pkg/identityserver:admins_create_organizations": {
+    "translations": {
+      "en": "organizations may only be created by admins"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_registry.go"
+    }
+  },
   "error:pkg/identityserver:api_key_not_found": {
     "translations": {
       "en": "API key not found"
