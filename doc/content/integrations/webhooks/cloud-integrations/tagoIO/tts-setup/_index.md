@@ -22,4 +22,4 @@ Tick the box besides the message types which you want to enable this webhook for
 
 {{< figure src="creating-a-webhook.png" alt="TagoIO webhook" >}}
 
-After following these steps, you can go back to the **Live Inspector** tab in TagoIO to check the messages in JSON format being received. To parse these messages use **Payload Parser** (check the [official TagoIO documentation](https://docs.tago.io/en/categories/36-payload-parser)).
+After following these steps, you will see messages arrive in the **Live Inspector** tab in TagoIO.

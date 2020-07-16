@@ -22,8 +22,8 @@ Fill in the **Device name** field and click the **Create device** button to fini
 
 Select the created device in **Devices** to access its features.
 
-On the **General Information** tab, find **Token & Serial Number** section, where you can generate and copy a token needed in the next section of this guide.
+On the **General Information** tab, find the **Token & Serial Number** section, where you can generate and copy a token needed in the next section of this guide.
 
 {{< figure src="device-features.png" alt="Device features and token" >}}
 
-Navigating to the **Live Inspector tab** and pressing a **Start** button will make your setup ready for the incoming messages from {{% tts %}}.
+Navigate to the **Live Inspector tab** and press the **Start** button to prepare the integration for the incoming messages from {{% tts %}}.
