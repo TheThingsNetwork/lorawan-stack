@@ -119,6 +119,7 @@ The JSON uplink messages use the following format:
     },
     "received_at": "2020-02-12T15:15..."     // ISO 8601 UTC timestamp at which the uplink has been received by the Network Server
   }
+  "simulated": true,                         // Signals if the message is coming from the Network Server or is simulated.
 }
 ```
 

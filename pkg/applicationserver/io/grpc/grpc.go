@@ -149,3 +149,14 @@ func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.Application
 		Username:         unique.ID(ctx, *ids),
 	}, nil
 }
+
+func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pbtypes.Empty, error) {
+	if err := rights.RequireApplication(ctx, up.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_UP_WRITE); err != nil {
+		return nil, err
+	}
+	up.Simulated = true
+	if err := s.server.SendUp(ctx, up); err != nil {
+		return nil, err
+	}
+	return ttnpb.Empty, nil
+}

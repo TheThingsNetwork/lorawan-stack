@@ -131,6 +131,12 @@ service AppAs {
       get: "/as/applications/{application_id}/mqtt-connection-info"
     };
   };
+  rpc SimulateUplink(ApplicationUp) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/simulate",
+      body: "*"
+    };
+  };
 }
 
 // The AsEndDeviceRegistry service allows clients to manage their end devices on the Application Server.

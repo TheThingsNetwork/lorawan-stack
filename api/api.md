@@ -789,6 +789,7 @@ The AppAs service connects an application or integration to an Application Serve
 | `DownlinkQueueReplace` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
 | `DownlinkQueueList` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`ApplicationDownlinks`](#ttn.lorawan.v3.ApplicationDownlinks) |  |
 | `GetMQTTConnectionInfo` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) |  |
+| `SimulateUplink` | [`ApplicationUp`](#ttn.lorawan.v3.ApplicationUp) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
 
 #### HTTP bindings
 
@@ -798,6 +799,7 @@ The AppAs service connects an application or integration to an Application Serve
 | `DownlinkQueueReplace` | `POST` | `/api/v3/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/replace` | `*` |
 | `DownlinkQueueList` | `GET` | `/api/v3/as/applications/{application_ids.application_id}/devices/{device_id}/down` |  |
 | `GetMQTTConnectionInfo` | `GET` | `/api/v3/as/applications/{application_id}/mqtt-connection-info` |  |
+| `SimulateUplink` | `POST` | `/api/v3/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/simulate` | `*` |
 
 ### <a name="ttn.lorawan.v3.As">Service `As`</a>
 
@@ -4851,6 +4853,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | `downlink_queue_invalidated` | [`ApplicationInvalidatedDownlinks`](#ttn.lorawan.v3.ApplicationInvalidatedDownlinks) |  |  |
 | `location_solved` | [`ApplicationLocation`](#ttn.lorawan.v3.ApplicationLocation) |  |  |
 | `service_data` | [`ApplicationServiceData`](#ttn.lorawan.v3.ApplicationServiceData) |  |  |
+| `simulated` | [`bool`](#bool) |  | Signals if the message is coming from the Network Server or is simulated. |
 
 #### Field Rules
 

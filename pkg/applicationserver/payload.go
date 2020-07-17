@@ -63,6 +63,13 @@ func (as *ApplicationServer) encodeAndEncrypt(ctx context.Context, dev *ttnpb.En
 }
 
 func (as *ApplicationServer) decryptAndDecode(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
+	if err := as.decrypt(ctx, dev, uplink); err != nil {
+		return err
+	}
+	return as.decode(ctx, dev, uplink, defaultFormatters)
+}
+
+func (as *ApplicationServer) decrypt(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink) error {
 	if dev.Session == nil || dev.Session.AppSKey == nil {
 		return errNoAppSKey.New()
 	}
@@ -75,6 +82,10 @@ func (as *ApplicationServer) decryptAndDecode(ctx context.Context, dev *ttnpb.En
 		return err
 	}
 	uplink.FRMPayload = frmPayload
+	return nil
+}
+
+func (as *ApplicationServer) decode(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
 	var formatter ttnpb.PayloadFormatter
 	var parameter string
 	if dev.Formatters != nil {

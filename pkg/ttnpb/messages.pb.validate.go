@@ -1629,6 +1629,8 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "simulated":
+			// no validation rules for Simulated
 		case "up":
 			if m.Up == nil {
 				return ApplicationUpValidationError{

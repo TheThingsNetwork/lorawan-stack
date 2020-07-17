@@ -289,6 +289,20 @@
           ]
         }
       ]
+    },
+    "SimulateUplink": {
+      "file": "lorawan-stack/api/applicationserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/simulate",
+          "body": "*",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id"
+          ]
+        }
+      ]
     }
   },
   "As": {

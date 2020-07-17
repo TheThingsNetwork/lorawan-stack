@@ -1479,6 +1479,29 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "SimulateUplink",
+              "description": "",
+              "requestType": "ApplicationUp",
+              "requestLongType": "ApplicationUp",
+              "requestFullType": "ttn.lorawan.v3.ApplicationUp",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/simulate",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
             }
           ]
         },
@@ -19777,6 +19800,16 @@
               "type": "ApplicationServiceData",
               "longType": "ApplicationServiceData",
               "fullType": "ttn.lorawan.v3.ApplicationServiceData",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "simulated",
+              "description": "Signals if the message is coming from the Network Server or is simulated.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
             }
