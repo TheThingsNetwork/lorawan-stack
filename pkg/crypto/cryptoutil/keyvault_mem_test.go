@@ -33,6 +33,9 @@ func TestMemKeyVault(t *testing.T) {
 	kek, _ := hex.DecodeString("000102030405060708090A0B0C0D0E0F")
 	ciphertext, _ := hex.DecodeString("1FA68B0A8112B447AEF34BD8FB5A7B829D3E862371D2CFE5")
 
+	genericPlainText := []byte("thisisabigsecret")
+	key, _ := hex.DecodeString("00112233445566778899AABBCCDDEEFF")
+
 	v := cryptoutil.NewMemKeyVault(map[string][]byte{
 		"kek1": kek,
 		"cert1": []byte(`-----BEGIN CERTIFICATE-----
@@ -51,6 +54,7 @@ AwEHoUQDQgAEjf3zZPXlc/sseTt7YzF0o61feXvk98JFyy+s/j0gzMzUjEka7+Wz
 TPERi9uMQjERns1qXG/9DJLe/Qxi0r84hA==
 -----END EC PRIVATE KEY-----
 `),
+		"key1": key,
 	})
 
 	// Existing KEK.
@@ -72,6 +76,28 @@ TPERi9uMQjERns1qXG/9DJLe/Qxi0r84hA==
 	}
 	{
 		_, err := v.Unwrap(test.Context(), ciphertext, "kek2")
+		a.So(errors.IsNotFound(err), should.BeTrue)
+	}
+
+	// Existing Key.
+	{
+		encrypted, err := v.Encrypt(test.Context(), genericPlainText, "key1")
+		a.So(err, should.BeNil)
+
+		expectedCiphertextLen := len(genericPlainText) + 12 + 16
+		a.So(len(encrypted), should.Equal, expectedCiphertextLen)
+
+		actual, err := v.Decrypt(test.Context(), encrypted, "key1")
+		a.So(err, should.BeNil)
+		a.So(actual, should.Resemble, genericPlainText)
+	}
+
+	// Non-existing Key.
+	{
+		_, err := v.Encrypt(test.Context(), genericPlainText, "key2")
+		a.So(errors.IsNotFound(err), should.BeTrue)
+
+		_, err = v.Decrypt(test.Context(), []uint8{}, "key2")
 		a.So(errors.IsNotFound(err), should.BeTrue)
 	}
 

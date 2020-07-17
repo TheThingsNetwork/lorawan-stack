@@ -15,11 +15,11 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
-import * as Yup from 'yup'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 
+import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 

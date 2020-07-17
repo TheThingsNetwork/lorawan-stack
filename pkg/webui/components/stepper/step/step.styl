@@ -57,7 +57,7 @@
 .active
   .status,
   .content > .title
-    font-weight: 600
+    font-weight: $fw.bold
 
 .current
   .status
@@ -130,6 +130,7 @@
 
   .title
     nudge('down', 2.5px)
+    white-space: nowrap
     color: $tc-deep-gray
     padding-right: $cs.l
 
@@ -151,7 +152,7 @@
     margin-top: 0
     max-width: $ls.xxl
 
-+media-query($bp.xxs)
++media-query($bp.xs)
   .step
     position: relative
 

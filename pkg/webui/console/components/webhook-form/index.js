@@ -14,7 +14,6 @@
 
 import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
-import * as Yup from 'yup'
 import bind from 'autobind-decorator'
 
 import Form from '@ttn-lw/components/form'
@@ -31,6 +30,7 @@ import WebhookTemplateInfo from '@console/components/webhook-template-info'
 
 import WebhookFormatSelector from '@console/containers/webhook-formats-select'
 
+import Yup from '@ttn-lw/lib/yup'
 import { url as urlRegexp } from '@ttn-lw/lib/regexp'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'

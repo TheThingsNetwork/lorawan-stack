@@ -161,6 +161,18 @@ func TestOrganizationsCRUD(t *testing.T) {
 		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
 		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
+		is.config.UserRights.CreateOrganizations = false
+
+		_, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
+			Organization: ttnpb.Organization{
+				OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "foo"},
+				Name:                    "Foo Organization",
+			},
+			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		is.config.UserRights.CreateOrganizations = true
+
 		created, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
 			Organization: ttnpb.Organization{
 				OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "foo"},

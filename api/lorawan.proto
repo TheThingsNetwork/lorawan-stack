@@ -123,6 +123,8 @@ message MACPayload {
   uint32 f_port = 2 [(validate.rules).uint32.lte = 255];
   bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
   google.protobuf.Struct decoded_payload = 4;
+  // Full 32-bit FCnt value. Used internally by Network Server.
+  uint32 full_f_cnt = 5;
 }
 
 message FHDR {

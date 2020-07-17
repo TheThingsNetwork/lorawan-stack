@@ -221,6 +221,7 @@ var (
 	genManPagesCommand = commands.GenManPages(Root)
 	genMDDocCommand    = commands.GenMDDoc(Root)
 	ganYAMLDocCommand  = commands.GenYAMLDoc(Root)
+	completeCommand    = commands.Complete()
 )
 
 func init() {
@@ -234,4 +235,6 @@ func init() {
 	Root.AddCommand(genMDDocCommand)
 	ganYAMLDocCommand.PersistentPreRunE = preRun()
 	Root.AddCommand(ganYAMLDocCommand)
+	completeCommand.PersistentPreRunE = preRun()
+	Root.AddCommand(completeCommand)
 }

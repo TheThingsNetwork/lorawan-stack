@@ -17,7 +17,6 @@ import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
-import * as Yup from 'yup'
 
 import api from '@console/api'
 
@@ -40,6 +39,7 @@ import Message from '@ttn-lw/lib/components/message'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
+import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 

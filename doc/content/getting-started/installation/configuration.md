@@ -121,13 +121,16 @@ services:
       TTN_LW_REDIS_ADDRESS: 'redis:6379'
       TTN_LW_IS_DATABASE_URI: 'postgres://root@cockroach:26257/ttn_lorawan?sslmode=disable'
 
-    # If using (self) signed certificates
+    # If using custom certificates
     # secrets:
+    #   - ca.pem
     #   - cert.pem
     #   - key.pem
 
-# If using (self) signed certificates
+# If using custom certificates
 # secrets:
+#   ca.pem:
+#     file: ./ca.pem
 #   cert.pem:
 #     file: ./cert.pem
 #   key.pem:
@@ -192,10 +195,10 @@ http:
   pprof:
     password: 'pprof'                 # choose a password
 
-# If using (self) signed certificates:
+# If using custom certificates:
 # tls:
 #   source: file
-#   root-ca: /run/secrets/cert.pem
+#   root-ca: /run/secrets/ca.pem
 #   certificate: /run/secrets/cert.pem
 #   key: /run/secrets/key.pem
 

@@ -2384,7 +2384,7 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 				if !_GatewayStatus_Versions_Pattern.MatchString(key) {
 					return GatewayStatusValidationError{
 						field:  fmt.Sprintf("versions[%v]", key),
-						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[_-]?[a-z0-9]){2,}$\"",
 					}
 				}
 
@@ -2425,7 +2425,7 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 				if !_GatewayStatus_Metrics_Pattern.MatchString(key) {
 					return GatewayStatusValidationError{
 						field:  fmt.Sprintf("metrics[%v]", key),
-						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[_-]?[a-z0-9]){2,}$\"",
 					}
 				}
 
@@ -2508,9 +2508,9 @@ var _ interface {
 	ErrorName() string
 } = GatewayStatusValidationError{}
 
-var _GatewayStatus_Versions_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _GatewayStatus_Versions_Pattern = regexp.MustCompile("^[a-z0-9](?:[_-]?[a-z0-9]){2,}$")
 
-var _GatewayStatus_Metrics_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _GatewayStatus_Metrics_Pattern = regexp.MustCompile("^[a-z0-9](?:[_-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on GatewayConnectionStats with the
 // rules defined in the proto definition for this message. If any rules are

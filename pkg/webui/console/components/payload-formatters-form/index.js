@@ -15,7 +15,6 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
-import * as Yup from 'yup'
 
 import TYPES from '@console/constants/formatter-types'
 
@@ -26,6 +25,7 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 import Input from '@ttn-lw/components/input'
 import CodeEditor from '@ttn-lw/components/code-editor'
 
+import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 

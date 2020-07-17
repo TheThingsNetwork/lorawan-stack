@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import * as Yup from 'yup'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
@@ -28,6 +27,7 @@ import toast from '@ttn-lw/components/toast'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
+import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import toInputDate from '@ttn-lw/lib/to-input-date'

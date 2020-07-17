@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import '@ttn-lw/lib/yup-extensions'
+import '@ttn-lw/lib/yup'
 
 import { ACTIVATION_MODES } from '@console/lib/device-utils'
 

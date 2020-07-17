@@ -145,17 +145,22 @@ full-screen($padding = 0)
 h1()
   font-size: $fs.xxl
   line-height: $lh.xxl
-  font-weight: 600
+  font-weight: $fwh.bold
 
 h2()
   font-size: $fs.xl
   line-height: $lh.xl
-  font-weight: bold
+  font-weight: $fwh.bolder
 
 h3()
   font-size: $fs.l
   line-height: $lh.l
-  font-weight: 400
+  font-weight: $fwh.bold
+
+h4()
+  font-size: $fs.m
+  line-height: $lh.m
+  font-weight: $fwh.bold
 
 // One liner, sets line-height to 1, makes components spacing a lot easier.
 // Only suitable for texts that will not wrap at all. Otherwise use

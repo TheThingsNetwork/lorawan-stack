@@ -663,6 +663,7 @@ func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, 
 					FHDR:       fhdr,
 					FPort:      uint32(fPort),
 					FRMPayload: frmPayload,
+					FullFCnt:   fCnt,
 				},
 			},
 		}
@@ -1813,9 +1814,9 @@ func StartTest(t *testing.T, cmpConf component.Config, nsConf Config, timeout ti
 	closeFuncs = append(closeFuncs, test.SetDefaultEventsPubSub(&test.MockEventPubSub{
 		PublishFunc: test.MakeEventPubSubPublishChFunc(eventsPublishCh),
 	}))
-	if nsConf.ApplicationUplinks == nil {
+	if nsConf.ApplicationUplinkQueue.Queue == nil {
 		m, mEnv, closeM := newMockApplicationUplinkQueue(t)
-		nsConf.ApplicationUplinks = m
+		nsConf.ApplicationUplinkQueue.Queue = m
 		env.ApplicationUplinks = &mEnv
 		closeFuncs = append(closeFuncs, closeM)
 	}
@@ -1873,7 +1874,7 @@ func StartTest(t *testing.T, cmpConf component.Config, nsConf Config, timeout ti
 
 	componenttest.StartComponent(t, ns.Component)
 
-	ctx := test.ContextWithT(test.Context(), t)
+	ctx := test.ContextWithTB(test.Context(), t)
 	ctx = log.NewContext(ctx, ns.Logger())
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	return ns, ctx, env, func() {

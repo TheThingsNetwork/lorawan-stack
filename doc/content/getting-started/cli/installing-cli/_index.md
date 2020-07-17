@@ -70,4 +70,32 @@ device-template-converter-grpc-address: 'thethings.example.com:8884'
 qr-code-generator-grpc-address: 'thethings.example.com:8884'
 ```
 
+If your deployment uses a custom certificate authority, you'll need to add:
+
+```yaml
+ca: /path/to/ca.pem
+```
+
 For advanced options, see the [Configuration Reference]({{< ref "/reference/configuration/cli" >}}).
+
+## Auto Completion
+
+Use `ttn-lw-cli complete` to generate an auto-completion script for the `ttn-lw-cli` command. `bash`, `zsh`, `fish` and `powershell` shells are supported:
+
+```bash
+$ ttn-lw-cli complete --shell bash --executable ttn-lw-cli > ttn-lw-cli-autocomplete
+```
+
+Source the file to enable auto-completion:
+
+```bash
+$ . ./ttn-lw-cli-autocomplete
+```
+
+Alternatively, put in a default directory so that it is loaded automatically (This directory depends on your Operating System and your shell).
+
+For `bash`, this directory is typically `/etc/bash_completion.d/`:
+
+```bash
+$ sudo cp ./ttn-lw-cli-autocomplete /etc/bash_completion.d/
+```

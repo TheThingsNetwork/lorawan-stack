@@ -16,7 +16,12 @@ import { createLogic } from 'redux-logic'
 import * as Sentry from '@sentry/browser'
 
 import { error } from '@ttn-lw/lib/log'
-import { isUnauthenticatedError, isInvalidArgumentError, isUnknown } from '@ttn-lw/lib/errors/utils'
+import {
+  isUnauthenticatedError,
+  isInvalidArgumentError,
+  getBackendErrorId,
+  isUnknown,
+} from '@ttn-lw/lib/errors/utils'
 
 import { clear as clearAccessToken } from '@console/lib/access-token'
 
@@ -88,8 +93,18 @@ const createRequestLogic = function(
           window.location.reload()
         } else {
           // Otherwise, dispatch the fail action and report it to Sentry.
-          if (isUnknown(e) || isInvalidArgumentError(e)) {
-            Sentry.captureException(failAction(e))
+          if (isInvalidArgumentError(e)) {
+            Sentry.withScope(scope => {
+              scope.setExtras(e)
+              const fingerprint = getBackendErrorId(e)
+              scope.setFingerprint(fingerprint)
+              Sentry.captureException(new Error(fingerprint))
+            })
+          } else if (isUnknown(e)) {
+            Sentry.withScope(scope => {
+              scope.setExtras(e)
+              Sentry.captureException(e)
+            })
           }
           dispatch(failAction(e))
         }

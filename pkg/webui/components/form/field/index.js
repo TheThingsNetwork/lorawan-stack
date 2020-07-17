@@ -66,8 +66,10 @@ class FormField extends React.Component {
         render: PropTypes.func.isRequired,
       }),
     ]).isRequired,
+    decode: PropTypes.func,
     description: PropTypes.message,
     disabled: PropTypes.bool,
+    encode: PropTypes.func,
     name: PropTypes.string.isRequired,
     onChange: PropTypes.func,
     readOnly: PropTypes.bool,
@@ -79,6 +81,8 @@ class FormField extends React.Component {
   static defaultProps = {
     className: undefined,
     disabled: false,
+    encode: value => value,
+    decode: value => value,
     onChange: () => null,
     warning: '',
     description: '',
@@ -114,7 +118,7 @@ class FormField extends React.Component {
 
   @bind
   async handleChange(value, enforceValidation = false) {
-    const { name, onChange } = this.props
+    const { name, onChange, encode } = this.props
     const { setFieldValue, setFieldTouched } = this.context
 
     // Check if the value is react's synthetic event.
@@ -132,7 +136,7 @@ class FormField extends React.Component {
       setFieldTouched(name)
     }
 
-    onChange(value)
+    onChange(encode(value))
   }
 
   @bind
@@ -149,6 +153,7 @@ class FormField extends React.Component {
   render() {
     const {
       className,
+      decode,
       name,
       title,
       warning,
@@ -160,9 +165,9 @@ class FormField extends React.Component {
     } = this.props
     const { horizontal, disabled: formDisabled } = this.context
 
-    const fieldValue = getIn(this.context.values, name)
+    const fieldValue = decode(getIn(this.context.values, name))
     const fieldError = getIn(this.context.errors, name)
-    const fieldTouched = getIn(this.context.touched, name)
+    const fieldTouched = getIn(this.context.touched, name) || false
     const fieldDisabled = disabled || formDisabled
 
     const hasError = Boolean(fieldError)

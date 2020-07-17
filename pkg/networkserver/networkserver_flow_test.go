@@ -166,7 +166,7 @@ func (env FlowTestEnvironment) AssertApplicationUp(ctx context.Context, link ttn
 	return test.MustTFromContext(ctx).Run("Application uplink", func(t *testing.T) {
 		a := assertions.New(t)
 
-		ctx := test.ContextWithT(ctx, t)
+		ctx := test.ContextWithTB(ctx, t)
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
@@ -204,7 +204,7 @@ func (env FlowTestEnvironment) AssertScheduleDownlink(ctx context.Context, asser
 	return test.MustTFromContext(ctx).Run("Schedule downlink", func(t *testing.T) {
 		a := assertions.New(t)
 
-		ctx := test.ContextWithT(ctx, t)
+		ctx := test.ContextWithTB(ctx, t)
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
@@ -358,7 +358,7 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 	if !t.Run("Join-request", func(t *testing.T) {
 		a := assertions.New(t)
 
-		ctx := test.ContextWithT(ctx, t)
+		ctx := test.ContextWithTB(ctx, t)
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
@@ -501,7 +501,7 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 	return joinReq, t.Run("Join-accept", func(t *testing.T) {
 		a := assertions.New(t)
 
-		ctx := test.ContextWithT(ctx, t)
+		ctx := test.ContextWithTB(ctx, t)
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
@@ -546,7 +546,7 @@ func (env FlowTestEnvironment) AssertSendDataUplink(ctx context.Context, link tt
 	return test.MustTFromContext(ctx).Run("Data uplink", func(t *testing.T) {
 		a := assertions.New(t)
 
-		ctx := test.ContextWithT(ctx, t)
+		ctx := test.ContextWithTB(ctx, t)
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
@@ -934,8 +934,8 @@ func TestFlow(t *testing.T) {
 					}
 
 					conf := DefaultConfig
+					conf.ApplicationUplinkQueue.Queue = uq
 					conf.NetID = test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
-					conf.ApplicationUplinks = uq
 					conf.Devices = dr
 					conf.DownlinkTasks = tq
 					conf.UplinkDeduplicator = ud

@@ -41,9 +41,9 @@ class NullableStringSchemaType extends StringSchema {
   }
 }
 
-Yup.nullableString = () => new NullableStringSchemaType()
+const nullableString = () => new NullableStringSchemaType()
 
-Yup.passValues = message => values => ({
+const passValues = message => values => ({
   message,
   values,
 })
@@ -57,4 +57,8 @@ Yup.addMethod(Yup.string, 'emptyOrLength', function(length, message) {
   return this.test('empty-or-length', m, value => !Boolean(value) || value.length === length)
 })
 
-export default Yup
+export default {
+  ...Yup,
+  nullableString,
+  passValues,
+}

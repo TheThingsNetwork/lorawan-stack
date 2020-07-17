@@ -15,12 +15,13 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
-import * as Yup from 'yup'
 
 import Wizard, { WizardContext } from '@ttn-lw/components/wizard'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import Select from '@ttn-lw/components/select'
+
+import Yup from '@ttn-lw/lib/yup'
 
 const Debug = () => (
   <div>

@@ -76,13 +76,16 @@ services:
       - "8887:8887"
       - "1700:1700/udp"
 
-    # If using (self) signed certificates:
+    # If using custom certificates:
     secrets:
+      - ca.pem
       - cert.pem
       - key.pem
 
-# If using (self) signed certificates:
+# If using custom certificates:
 secrets:
+  ca.pem:
+    file: ./ca.pem
   cert.pem:
     file: ./cert.pem
   key.pem:

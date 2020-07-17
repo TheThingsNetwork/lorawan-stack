@@ -37,6 +37,14 @@ func (emptyKeyVault) Unwrap(ctx context.Context, ciphertext []byte, kekLabel str
 	return nil, errKEKNotFound.WithAttributes("label", kekLabel)
 }
 
+func (emptyKeyVault) Encrypt(ctx context.Context, plaintext []byte, id string) ([]byte, error) {
+	return nil, errKeyNotFound.WithAttributes("id", id)
+}
+
+func (emptyKeyVault) Decrypt(ctx context.Context, ciphertext []byte, id string) ([]byte, error) {
+	return nil, errKeyNotFound.WithAttributes("id", id)
+}
+
 func (emptyKeyVault) GetCertificate(ctx context.Context, id string) (*x509.Certificate, error) {
 	return nil, errCertificateNotFound.WithAttributes("id", id)
 }

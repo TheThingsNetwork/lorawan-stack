@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
@@ -28,16 +29,19 @@ func (gs *GatewayServer) GetGatewayConnectionStats(ctx context.Context, ids *ttn
 		return nil, err
 	}
 
+	uid := unique.ID(ctx, ids)
 	if gs.statsRegistry != nil {
 		stats, err := gs.statsRegistry.Get(ctx, *ids)
 		if err != nil || stats == nil {
+			if errors.IsNotFound(err) {
+				return nil, errNotConnected.WithAttributes("gateway_uid", uid).WithCause(err)
+			}
 			return nil, err
 		}
 
 		return stats, nil
 	}
 
-	uid := unique.ID(ctx, ids)
 	val, ok := gs.connections.Load(uid)
 	if !ok {
 		return nil, errNotConnected.WithAttributes("gateway_uid", uid)

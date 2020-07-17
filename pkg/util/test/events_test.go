@@ -29,7 +29,7 @@ import (
 func TestSetDefaultEventPubSub(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := ContextWithT(Context(), t)
+	ctx := ContextWithTB(Context(), t)
 	ctx, cancel := context.WithTimeout(ctx, (1<<5)*Delay)
 	defer cancel()
 

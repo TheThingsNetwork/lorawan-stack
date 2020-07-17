@@ -1070,6 +1070,15 @@
       "file": "i18n.go"
     }
   },
+  "error:cmd/internal/commands:invalid_shell": {
+    "translations": {
+      "en": "invalid shell"
+    },
+    "description": {
+      "package": "cmd/internal/commands",
+      "file": "complete.go"
+    }
+  },
   "error:cmd/internal/shared:initialize_application_server": {
     "translations": {
       "en": "could not initialize Application Server"
@@ -1900,7 +1909,7 @@
   },
   "error:pkg/applicationserver/io/pubsub:integration_failed": {
     "translations": {
-      "en": "integration {pub_sub_id} failed"
+      "en": "integration `{pub_sub_id}` failed"
     },
     "description": {
       "package": "pkg/applicationserver/io/pubsub",
@@ -2780,6 +2789,15 @@
       "file": "cryptoutil.go"
     }
   },
+  "error:pkg/crypto/cryptoutil:key_not_found": {
+    "translations": {
+      "en": "key with ID `{id}` not found"
+    },
+    "description": {
+      "package": "pkg/crypto/cryptoutil",
+      "file": "cryptoutil.go"
+    }
+  },
   "error:pkg/crypto:corrupt_key": {
     "translations": {
       "en": "corrupt key data"
@@ -2823,6 +2841,15 @@
     "description": {
       "package": "pkg/crypto",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/crypto:malformed_cipher_text": {
+    "translations": {
+      "en": "malformed cipher text"
+    },
+    "description": {
+      "package": "pkg/crypto",
+      "file": "encryption.go"
     }
   },
   "error:pkg/crypto:ping_period": {
@@ -4364,6 +4391,42 @@
       "file": "oauth_registry.go"
     }
   },
+  "error:pkg/identityserver:admins_create_applications": {
+    "translations": {
+      "en": "applications may only be created by admins, or in organizations"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
+    }
+  },
+  "error:pkg/identityserver:admins_create_clients": {
+    "translations": {
+      "en": "OAuth clients may only be created by admins, or in organizations"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "client_registry.go"
+    }
+  },
+  "error:pkg/identityserver:admins_create_gateways": {
+    "translations": {
+      "en": "gateways may only be created by admins, or in organizations"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
+  "error:pkg/identityserver:admins_create_organizations": {
+    "translations": {
+      "en": "organizations may only be created by admins"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_registry.go"
+    }
+  },
   "error:pkg/identityserver:api_key_not_found": {
     "translations": {
       "en": "API key not found"
@@ -4407,6 +4470,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "end_device_registry.go"
+    }
+  },
+  "error:pkg/identityserver:end_device_picture_uploads_disabled": {
+    "translations": {
+      "en": "end device picture uploads are disabled"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "picture.go"
     }
   },
   "error:pkg/identityserver:gateway_eui_taken": {
@@ -4560,6 +4632,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "entity_access.go"
+    }
+  },
+  "error:pkg/identityserver:profile_picture_uploads_disabled": {
+    "translations": {
+      "en": "profile picture uploads are disabled"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "picture.go"
     }
   },
   "error:pkg/identityserver:search_forbidden": {
@@ -7255,7 +7336,7 @@
   },
   "event:as.pubsub.delete": {
     "translations": {
-      "en": "delete pubsub"
+      "en": "delete pub/sub"
     },
     "description": {
       "package": "pkg/applicationserver/io/pubsub",
@@ -7264,7 +7345,7 @@
   },
   "event:as.pubsub.fail": {
     "translations": {
-      "en": "fail pubsub"
+      "en": "fail pub/sub"
     },
     "description": {
       "package": "pkg/applicationserver/io/pubsub",
@@ -7273,7 +7354,7 @@
   },
   "event:as.pubsub.set": {
     "translations": {
-      "en": "set pubsub"
+      "en": "set pub/sub"
     },
     "description": {
       "package": "pkg/applicationserver/io/pubsub",
@@ -7282,7 +7363,7 @@
   },
   "event:as.pubsub.start": {
     "translations": {
-      "en": "start pubsub"
+      "en": "start pub/sub"
     },
     "description": {
       "package": "pkg/applicationserver/io/pubsub",
@@ -7291,7 +7372,7 @@
   },
   "event:as.pubsub.stop": {
     "translations": {
-      "en": "stop pubsub"
+      "en": "stop pub/sub"
     },
     "description": {
       "package": "pkg/applicationserver/io/pubsub",

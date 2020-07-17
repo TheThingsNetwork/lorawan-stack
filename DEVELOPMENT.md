@@ -94,10 +94,11 @@ $ go run ./cmd/ttn-lw-stack -c <custom-location>/ttn-lw-stack.yml start
 
 ## Using the CLI with the Development Environment
 
-In order to login, you will need to use the correct OAuth Server Address:
+In order to login, you will need to use the correct OAuth Server Address. `make init` uses CFSSL to generate a `ca.pem` CA certificate to support https:
 
 ```bash
-$ export TTN_LW_OAUTH_SERVER_ADDRESS=http://localhost:1885/oauth
+$ export TTN_LW_CA=./ca.pem
+$ export TTN_LW_OAUTH_SERVER_ADDRESS=https://localhost:8885/oauth
 $ go run ./cmd/ttn-lw-cli login
 ```
 
@@ -764,129 +765,11 @@ A new version can be released from the `master` branch or a `backport` branch. T
 
 ### Release From Master
 
-1. Create a `release/${version}` branch off the `master` branch.
-```bash
-$ git checkout master
-$ git checkout -b release/${version}
-```
-2. Update the `CHANGELOG.md` file as explained in the [Changelog Update](#changelog-update) section.
-Once complete, you can add the file to staging
-```bash
-$ git add CHANGELOG.md
-```
-3. If releasing a new minor version, update the `SECURITY.md` file and stage it for commit.
-```bash
-$ git add SECURITY.md
-```
-4. Bump version as explained in the section [Version Bump](#version-bump).
-5. Create a pull request targeting `master`.
-6. Once this PR is approved and merged, checkout the latest  `master` branch locally.
-7. Create a version tag as explained in the section [Version Tag](#version-tag).
-8. Push the version tag. Once this is done, CI automatically starts building and pushing to package managers. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
-```bash
-$ git push origin ${version}
-```
-9. Edit the release notes on the Github releases page, which is typically copied from `CHANGELOG.md`.
-10. For non RC releases, tag the Docker latest tag as explained in the section [Docker Latest Tag](#docker-latest-tag).
+Create a `Release` issue in this repository and follow the steps.
 
 ### Release Backports
 
-1. Create a `release/<version>` branch off the `backport/<minor>` branch.
-```bash
-$ git checkout backport/<minor>
-$ git checkout -b release/${version}
-```
-2. Cherry pick the necessary commits.
-```bash
-$ git cherrypick <commit>
-```
-3. Update the `CHANGELOG.md` file as explained in the section [Changelog Update](#changelog-update). Once complete, you can add the file to staging.
-```bash
-$ git add CHANGELOG.md
-```
-4. Bump version as explained in the section [Version Bump](#version-bump).
-5. Create a pull request targeting `backport/<minor>`.
-6. Once this PR is approved and merged, checkout the latest  `backport/<minor>` branch locally.
-7. Create a version tag as explained in the section [Version Tag](#version-tag).
-8. Push the version tag. Once this is done, CI automatically starts building and pushing to package managers. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
-```bash
-$ git push origin ${version}
-```
-9. Edit the release notes on the Github releases page, which is typically copied from `CHANGELOG.md`.
-
-###  Changelog Update
-
-Updating the `CHANGELOG.md` consists of the following steps:
-  - Change the **Unreleased** section to the new version and add date obtained via `date +%Y-%m-%d` (e.g. `## [3.2.1] - 2019-10-11`)
-  - Check if we didn't forget anything important
-  - Remove empty subsections
-  - Update the list of links in the bottom of the file
-  - Add new **Unreleased** section:
-    ```md
-    ## [Unreleased]
-
-    ### Added
-
-    ### Changed
-
-    ### Deprecated
-
-    ### Removed
-
-    ### Fixed
-
-    ### Security
-    ```
-
-### Version Bump
-
-This involves the following three steps
-
-1. Bump
-
-Our development tooling helps with this process. The `mage` command has the following commands for version bumps:
-```bash
-$ tools/bin/mage version:bumpMajor   # bumps a major version (from 3.4.5 -> 4.0.0).
-$ tools/bin/mage version:bumpMinor   # bumps a minor version (from 3.4.5 -> 3.5.0).
-$ tools/bin/mage version:bumpPatch   # bumps a patch version (from 3.4.5 -> 3.4.6).
-$ tools/bin/mage version:bumpRC      # bumps a release candidate version (from 3.4.5-rc1 -> 3.4.5-rc2).
-$ tools/bin/mage version:bumpRelease # bumps a pre-release to a release version (from 3.4.5-rc1 -> 3.4.5).
-```
-> Note: These bumps can be combined (i.e. `version:bumpMinor version:bumpRC` bumps 3.4.5 -> 3.5.0-rc1).
-2. Write the version files
-
-There are a few files that need to contain the latest version. The new version can be written using
-```bash
-$ tools/bin/mage version:files
-```
-3. Commit the version bump
-
-A bump commit can be created by running
-```bash
-$ tools/bin/mage version:commitBump
-```
-
-> Note: The steps above can be combined to a single command (i.e., `$ tools/bin/mage version:bumpPatch version:files version:commitBump`).
-
-### Version Tag
-
-To tag a new version run
-```bash
-$ tools/bin/mage version:bumpXXX version:tag
-```
-
-For RCs, make sure to use the same bumping combination (ex: `version:bumpXXX version:bumpYYY`) as used in the bump step above.
-
-### Docker Latest Tag
-
-When the CI system pushed the Docker image, it gets tagged as the current minor and patch version. If this release is not a backport but a latest stable one, you should manually tag and push `latest`:
-
-```bash
-$ versionDockerTag=${version#"v"} # v3.6.1 -> 3.6.1
-$ docker pull thethingsnetwork/lorawan-stack:${versionDockerTag}
-$ docker tag thethingsnetwork/lorawan-stack:{versionDockerTag} thethingsnetwork/lorawan-stack:latest
-$ docker push thethingsnetwork/lorawan-stack:latest
-```
+Create a `Backport Release` issue in this repository and follow the steps.
 
 ## Troubleshooting
 
@@ -973,9 +856,9 @@ The bundle integrates an old version of the JS SDK. This is likely a caching/lin
 ERROR in ./node_modules/redux-logic/node_modules/rxjs/operators/index.js Module not found: Error: Can't resolve '../internal/operators/audit' in '/lorawan-stack/node_modules/redux-logic/node_modules/rxjs/operators'
 ```
 
-#### Possible cause: Broken yarn or npm cache
+##### Possible cause: Broken yarn or npm cache
 
-#### Possible solution: Clean package manager caches
+##### Possible solution: Clean package manager caches
 
 - Clean yarn cache: `yarn cache clean`
 - Clean npm cache: `npm cache clean`
@@ -983,20 +866,20 @@ ERROR in ./node_modules/redux-logic/node_modules/rxjs/operators/index.js Module 
 
 #### Problem: The build crashes without showing any helpful error message
 
-#### Cause: Not running mage in verbose mode
+##### Cause: Not running mage in verbose mode
 
 `tools/bin/mage` runs in silent mode by default. In verbose mode, you might get more helpful error messages
 
-#### Solution
+##### Solution
 
 Run mage in verbose mode: `tools/bin/mage -v {target}`
 
 #### Problem: Browser displays error:
 `Cannot GET /`
 
-#### Cause: No endpoint is exposed at root
+##### Cause: No endpoint is exposed at root
 
-#### Solution:
+##### Solution:
 
 Console is typically exposed at `http://localhost:8080/console`,
 API at `http://localhost:8080/console`,
@@ -1006,7 +889,9 @@ etc
 #### Problem: Browser displays error:
 `Error occurred while trying to proxy to: localhost:8080/console`
 
-#### Cause: Stack is not available or not running
+##### Cause: Stack is not available or not running
+
+##### Solution:
 
 For development, remember to run the stack with `go run`:
 

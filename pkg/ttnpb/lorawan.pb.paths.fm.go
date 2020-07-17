@@ -36,6 +36,7 @@ var MessageFieldPathsNested = []string{
 	"Payload.mac_payload.f_hdr.f_opts",
 	"Payload.mac_payload.f_port",
 	"Payload.mac_payload.frm_payload",
+	"Payload.mac_payload.full_f_cnt",
 	"Payload.rejoin_request_payload",
 	"Payload.rejoin_request_payload.dev_eui",
 	"Payload.rejoin_request_payload.join_eui",
@@ -76,6 +77,7 @@ var MACPayloadFieldPathsNested = []string{
 	"f_hdr.f_opts",
 	"f_port",
 	"frm_payload",
+	"full_f_cnt",
 }
 
 var MACPayloadFieldPathsTopLevel = []string{
@@ -83,6 +85,7 @@ var MACPayloadFieldPathsTopLevel = []string{
 	"f_hdr",
 	"f_port",
 	"frm_payload",
+	"full_f_cnt",
 }
 var FHDRFieldPathsNested = []string{
 	"dev_addr",

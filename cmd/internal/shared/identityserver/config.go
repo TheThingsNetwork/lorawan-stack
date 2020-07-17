@@ -62,4 +62,8 @@ func init() {
 	DefaultIdentityServerConfig.ProfilePicture.UseGravatar = true
 	DefaultIdentityServerConfig.EndDevicePicture.Bucket = "end_device_pictures"
 	DefaultIdentityServerConfig.EndDevicePicture.BucketURL = path.Join(shared.DefaultAssetsBaseURL, "blob", "end_device_pictures")
+	DefaultIdentityServerConfig.UserRights.CreateApplications = true
+	DefaultIdentityServerConfig.UserRights.CreateClients = true
+	DefaultIdentityServerConfig.UserRights.CreateGateways = true
+	DefaultIdentityServerConfig.UserRights.CreateOrganizations = true
 }

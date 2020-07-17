@@ -15,7 +15,6 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
-import * as Yup from 'yup'
 
 import delay from '@console/constants/delays'
 
@@ -31,6 +30,7 @@ import Message from '@ttn-lw/lib/components/message'
 import { GsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import OwnersSelect from '@console/containers/owners-select'
 
+import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -61,8 +61,6 @@ const m = defineMessages({
   scheduleAnyTimeDelay: 'Schedule any time delay',
   scheduleAnyTimeDescription:
     'Configure gateway delay (minimum: {minimumValue}ms, default: {defaultValue}ms)',
-  miliseconds: 'miliseconds',
-  seconds: 'seconds',
   delayWarning:
     'Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.',
 })
@@ -269,13 +267,12 @@ class GatewayDataForm extends React.Component {
             },
           }}
           units={[
-            { label: sharedMessages.miliseconds, value: 'ms' },
+            { label: sharedMessages.milliseconds, value: 'ms' },
             { label: sharedMessages.seconds, value: 's' },
             { label: sharedMessages.minutes, value: 'm' },
             { label: sharedMessages.hours, value: 'h' },
           ]}
           onChange={this.onScheduleAnytimeDelayChange}
-          decode={this.decodeDelayValue}
           warning={
             shouldDisplayWarning
               ? {

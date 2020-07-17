@@ -36,10 +36,10 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { mayEditBasicGatewayInformation } from '@console/lib/feature-checks'
+import { mayViewGatewayInfo } from '@console/lib/feature-checks'
 
 @withRequest(({ gtwId, loadData }) => loadData(gtwId), () => false)
-@withFeatureRequirement(mayEditBasicGatewayInformation, {
+@withFeatureRequirement(mayViewGatewayInfo, {
   redirect: '/',
 })
 export default class GatewayOverview extends React.Component {

@@ -28,7 +28,6 @@ import WithLocale from '@ttn-lw/lib/components/with-locale'
 
 import env from '@ttn-lw/lib/env'
 import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
-import '@ttn-lw/lib/yup-extensions'
 
 import createStore from './console/store'
 

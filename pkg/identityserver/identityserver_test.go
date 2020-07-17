@@ -316,6 +316,10 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 		"overridden.html":        []byte("Overridden HTML {{.User.Name}} {{.User.Email}}"),
 		"overridden.txt":         []byte("Overridden text {{.User.Name}} {{.User.Email}}"),
 	}
+	conf.UserRights.CreateApplications = true
+	conf.UserRights.CreateClients = true
+	conf.UserRights.CreateGateways = true
+	conf.UserRights.CreateOrganizations = true
 	is, err := New(c, conf)
 	if err != nil {
 		t.Fatal(err)

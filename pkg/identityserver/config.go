@@ -53,14 +53,22 @@ type Config struct {
 	} `name:"auth-cache"`
 	OAuth          oauth.Config `name:"oauth"`
 	ProfilePicture struct {
-		UseGravatar bool   `name:"use-gravatar" description:"Use Gravatar fallback for users without profile picture"`
-		Bucket      string `name:"bucket" description:"Bucket used for storing profile pictures"`
-		BucketURL   string `name:"bucket-url" description:"Base URL for public bucket access"`
+		DisableUpload bool   `name:"disable-upload" description:"Disable uploading profile pictures"`
+		UseGravatar   bool   `name:"use-gravatar" description:"Use Gravatar fallback for users without profile picture"`
+		Bucket        string `name:"bucket" description:"Bucket used for storing profile pictures"`
+		BucketURL     string `name:"bucket-url" description:"Base URL for public bucket access"`
 	} `name:"profile-picture"`
 	EndDevicePicture struct {
-		Bucket    string `name:"bucket" description:"Bucket used for storing end device pictures"`
-		BucketURL string `name:"bucket-url" description:"Base URL for public bucket access"`
+		DisableUpload bool   `name:"disable-upload" description:"Disable uploading end device pictures"`
+		Bucket        string `name:"bucket" description:"Bucket used for storing end device pictures"`
+		BucketURL     string `name:"bucket-url" description:"Base URL for public bucket access"`
 	} `name:"end-device-picture"`
+	UserRights struct {
+		CreateApplications  bool `name:"create-applications" description:"Allow non-admin users to create applications in their user account"`
+		CreateClients       bool `name:"create-clients" description:"Allow non-admin users to create OAuth clients in their user account"`
+		CreateGateways      bool `name:"create-gateways" description:"Allow non-admin users to create gateways in their user account"`
+		CreateOrganizations bool `name:"create-organizations" description:"Allow non-admin users to create organizations in their user account"`
+	} `name:"user-rights"`
 	Email struct {
 		email.Config `name:",squash"`
 		SendGrid     sendgrid.Config      `name:"sendgrid"`

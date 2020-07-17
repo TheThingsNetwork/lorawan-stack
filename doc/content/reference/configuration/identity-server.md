@@ -88,6 +88,10 @@ The profile pictures that users upload for their accounts are stored in a blob b
 - `is.profile-picture.bucket`: Bucket used for storing profile pictures
 - `is.profile-picture.bucket-url`: Base URL for public bucket access
 
+It is also possible to disable uploads:
+
+- `is.profile-picture.disable-upload`: Disable profile picture uploads
+
 It is also possible to use [Gravatar](https://gravatar.com) for profile pictures.
 
 - `is.profile-picture.use-gravatar`: Use Gravatar fallback for users without profile picture
@@ -98,6 +102,10 @@ Similar to profile pictures, end devices can have pictures associated with them.
 
 - `is.end-device-picture.bucket`: Bucket used for storing end device pictures
 - `is.end-device-picture.bucket-url`: Base URL for public bucket access
+
+It is also possible to disable uploads:
+
+- `is.end-device-picture.disable-upload`: Disable end device picture uploads
 
 ## User Registration Options
 
@@ -115,3 +123,12 @@ There are several options to customize the requirements for user passwords.
 - `is.user-registration.password-requirements.min-length`: Minimum password length
 - `is.user-registration.password-requirements.min-special`: Minimum number of special characters
 - `is.user-registration.password-requirements.min-uppercase`: Minimum number of uppercase letters
+
+## User Rights Options
+
+By default users can create applications, gateways, organizations and OAuth clients. With the following configuration options it is possible to restrict this, in which case only admin users are allowed to create these entities. By adding users to organizations, and assigning the appropriate rights, they can still create these entities in the organization.
+
+- `is.user-rights.create-applications`: Allow non-admin users to create applications in their user account
+- `is.user-rights.create-clients`: Allow non-admin users to create OAuth clients in their user account
+- `is.user-rights.create-gateways`: Allow non-admin users to create gateways in their user account
+- `is.user-rights.create-organizations`: Allow non-admin users to create organizations in their user account

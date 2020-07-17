@@ -11225,7 +11225,7 @@
                   },
                   {
                     "name": "map.keys.string.pattern",
-                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                    "value": "^[a-z0-9](?:[_-]?[a-z0-9]){2,}$"
                   }
                 ]
               }
@@ -11267,7 +11267,7 @@
                   },
                   {
                     "name": "map.keys.string.pattern",
-                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                    "value": "^[a-z0-9](?:[_-]?[a-z0-9]){2,}$"
                   }
                 ]
               }
@@ -18222,6 +18222,16 @@
               "type": "Struct",
               "longType": "google.protobuf.Struct",
               "fullType": "google.protobuf.Struct",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "full_f_cnt",
+              "description": "Full 32-bit FCnt value. Used internally by Network Server.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
             }

@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as Yup from 'yup'
-
+import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
@@ -22,7 +21,7 @@ const validationSchema = Yup.object()
   .shape({
     net_id: Yup.nullableString()
       .emptyOrLength(3 * 2, Yup.passValues(sharedMessages.validateLength)) // 3 Byte hex.
-      .default(''),
+      .default(null),
     root_keys: Yup.object().when(
       ['$externalJs', '$lorawanVersion', '$mayEditKeys', '$mayEditkeys'],
       (externalJs, lorawanVersion, mayEditKeys, mayReadKeys, schema) => {

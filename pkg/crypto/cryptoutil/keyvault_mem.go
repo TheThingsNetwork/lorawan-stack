@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // MemKeyVault is a KeyVault that uses secrets from memory.
@@ -56,6 +57,32 @@ func (v MemKeyVault) Unwrap(ctx context.Context, ciphertext []byte, kekLabel str
 		return nil, errKEKNotFound.WithAttributes("label", kekLabel)
 	}
 	return crypto.UnwrapKey(ciphertext, kek)
+}
+
+// Encrypt implements KeyVault.
+func (v MemKeyVault) Encrypt(ctx context.Context, plaintext []byte, id string) ([]byte, error) {
+	rawKey, ok := v.m[id]
+	if !ok {
+		return nil, errKeyNotFound.WithAttributes("id", id)
+	}
+	var key types.AES128Key
+	if err := key.UnmarshalBinary(rawKey); err != nil {
+		return nil, err
+	}
+	return crypto.Encrypt(key, plaintext)
+}
+
+// Decrypt implements KeyVault.
+func (v MemKeyVault) Decrypt(ctx context.Context, ciphertext []byte, id string) ([]byte, error) {
+	rawKey, ok := v.m[id]
+	if !ok {
+		return nil, errKeyNotFound.WithAttributes("id", id)
+	}
+	var key types.AES128Key
+	if err := key.UnmarshalBinary(rawKey); err != nil {
+		return nil, err
+	}
+	return crypto.Decrypt(key, ciphertext)
 }
 
 // GetCertificate implements KeyVault.

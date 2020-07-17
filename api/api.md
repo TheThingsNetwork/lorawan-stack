@@ -2781,8 +2781,8 @@ Connection stats as monitored by the Gateway Server.
 | Field | Validations |
 | ----- | ----------- |
 | `time` | <p>`timestamp.required`: `true`</p> |
-| `versions` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
-| `metrics` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `versions` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p> |
+| `metrics` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.GatewayStatus.MetricsEntry">Message `GatewayStatus.MetricsEntry`</a>
 
@@ -4193,6 +4193,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | `f_port` | [`uint32`](#uint32) |  |  |
 | `frm_payload` | [`bytes`](#bytes) |  |  |
 | `decoded_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
+| `full_f_cnt` | [`uint32`](#uint32) |  | Full 32-bit FCnt value. Used internally by Network Server. |
 
 #### Field Rules
 

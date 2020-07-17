@@ -13,21 +13,25 @@
 // limitations under the License.
 
 import React, { useState, useCallback } from 'react'
-import * as Yup from 'yup'
 import { defineMessages } from 'react-intl'
 
-import SubmitButton from '../../../components/submit-button'
-import RadioButton from '../../../components/radio-button'
-import Checkbox from '../../../components/checkbox'
-import Input from '../../../components/input'
-import SubmitBar from '../../../components/submit-bar'
-import toast from '../../../components/toast'
-import Form from '../../../components/form'
-import Message from '../../../lib/components/message'
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import api from '../../api'
-import { hexToBase64 } from '../../lib/bytes'
+import api from '@console/api'
+
+import SubmitButton from '@ttn-lw/components/submit-button'
+import RadioButton from '@ttn-lw/components/radio-button'
+import Checkbox from '@ttn-lw/components/checkbox'
+import Input from '@ttn-lw/components/input'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import toast from '@ttn-lw/components/toast'
+import Form from '@ttn-lw/components/form'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import Yup from '@ttn-lw/lib/yup'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { hexToBase64 } from '@console/lib/bytes'
 
 const m = defineMessages({
   insertMode: 'Insert Mode',
