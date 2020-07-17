@@ -56,72 +56,81 @@ func TestPubSub(t *testing.T) {
 		PubSubID:               registeredPubSubID,
 	}
 
-	_, err := registry.Set(ctx, ids, nil, func(_ *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
-		return &ttnpb.ApplicationPubSub{
-				ApplicationPubSubIdentifiers: ttnpb.ApplicationPubSubIdentifiers{
-					ApplicationIdentifiers: registeredApplicationID,
-					PubSubID:               registeredPubSubID,
-				},
-				Provider: &ttnpb.ApplicationPubSub_NATS{
-					NATS: &ttnpb.ApplicationPubSub_NATSProvider{
-						ServerURL: "nats://localhost",
-					},
-				},
-				Format:    "json",
-				BaseTopic: "app1.ps1",
-				DownlinkPush: &ttnpb.ApplicationPubSub_Message{
-					Topic: "downlink.push",
-				},
-				DownlinkReplace: &ttnpb.ApplicationPubSub_Message{
-					Topic: "downlink.replace",
-				},
-				UplinkMessage: &ttnpb.ApplicationPubSub_Message{
-					Topic: "uplink.message",
-				},
-				JoinAccept: &ttnpb.ApplicationPubSub_Message{
-					Topic: "join.accept",
-				},
-				DownlinkAck: &ttnpb.ApplicationPubSub_Message{
-					Topic: "downlink.ack",
-				},
-				DownlinkNack: &ttnpb.ApplicationPubSub_Message{
-					Topic: "downlink.nack",
-				},
-				DownlinkSent: &ttnpb.ApplicationPubSub_Message{
-					Topic: "downlink.sent",
-				},
-				DownlinkFailed: &ttnpb.ApplicationPubSub_Message{
-					Topic: "downlnk.failed",
-				},
-				DownlinkQueued: &ttnpb.ApplicationPubSub_Message{
-					Topic: "downlink.queued",
-				},
-				LocationSolved: &ttnpb.ApplicationPubSub_Message{
-					Topic: "location.solved",
-				},
-				ServiceData: &ttnpb.ApplicationPubSub_Message{
-					Topic: "service.data",
-				},
+	ps := &ttnpb.ApplicationPubSub{
+		ApplicationPubSubIdentifiers: ttnpb.ApplicationPubSubIdentifiers{
+			ApplicationIdentifiers: registeredApplicationID,
+			PubSubID:               registeredPubSubID,
+		},
+		Provider: &ttnpb.ApplicationPubSub_NATS{
+			NATS: &ttnpb.ApplicationPubSub_NATSProvider{
+				ServerURL: "nats://localhost",
 			},
-			[]string{
-				"base_topic",
-				"downlink_ack",
-				"downlink_failed",
-				"downlink_nack",
-				"downlink_queued",
-				"downlink_sent",
-				"downlink_push",
-				"downlink_replace",
-				"format",
-				"ids",
-				"provider",
-				"join_accept",
-				"location_solved",
-				"uplink_message",
-			}, nil
+		},
+		Format:    "json",
+		BaseTopic: "app1.ps1",
+		DownlinkPush: &ttnpb.ApplicationPubSub_Message{
+			Topic: "downlink.push",
+		},
+		DownlinkReplace: &ttnpb.ApplicationPubSub_Message{
+			Topic: "downlink.replace",
+		},
+		UplinkMessage: &ttnpb.ApplicationPubSub_Message{
+			Topic: "uplink.message",
+		},
+		JoinAccept: &ttnpb.ApplicationPubSub_Message{
+			Topic: "join.accept",
+		},
+		DownlinkAck: &ttnpb.ApplicationPubSub_Message{
+			Topic: "downlink.ack",
+		},
+		DownlinkNack: &ttnpb.ApplicationPubSub_Message{
+			Topic: "downlink.nack",
+		},
+		DownlinkSent: &ttnpb.ApplicationPubSub_Message{
+			Topic: "downlink.sent",
+		},
+		DownlinkFailed: &ttnpb.ApplicationPubSub_Message{
+			Topic: "downlnk.failed",
+		},
+		DownlinkQueued: &ttnpb.ApplicationPubSub_Message{
+			Topic: "downlink.queued",
+		},
+		LocationSolved: &ttnpb.ApplicationPubSub_Message{
+			Topic: "location.solved",
+		},
+		ServiceData: &ttnpb.ApplicationPubSub_Message{
+			Topic: "service.data",
+		},
+	}
+	paths := []string{
+		"base_topic",
+		"downlink_ack",
+		"downlink_failed",
+		"downlink_nack",
+		"downlink_queued",
+		"downlink_sent",
+		"downlink_push",
+		"downlink_replace",
+		"format",
+		"ids",
+		"provider",
+		"join_accept",
+		"location_solved",
+		"uplink_message",
+		"service_data",
+	}
+
+	_, err := registry.Set(ctx, ids, nil, func(_ *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
+		return ps, paths, nil
 	})
 	if err != nil {
 		t.Fatalf("Failed to set pubsub in registry: %s", err)
+	}
+
+	result, err := registry.List(ctx, ids.ApplicationIdentifiers, paths)
+	a.So(err, should.BeNil)
+	if a.So(len(result), should.Equal, 1) {
+		a.So(result[0], should.Resemble, ps)
 	}
 
 	mockProvider, err := provider.GetProvider(&ttnpb.ApplicationPubSub{
