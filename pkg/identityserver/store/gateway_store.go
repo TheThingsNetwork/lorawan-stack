@@ -39,7 +39,7 @@ type gatewayStore struct {
 // selectGatewayFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
-		return query.Preload("Attributes").Preload("Antennas")
+		return query.Preload("Attributes").Preload("Antennas").Preload("Secrets")
 	}
 	var gatewayColumns []string
 	var notFoundPaths []string
@@ -51,6 +51,9 @@ func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *types.F
 			query = query.Preload("Attributes")
 		case antennasField:
 			query = query.Preload("Antennas")
+		case gatewaySecretsField:
+			gatewayColumns = append(gatewayColumns, "secrets_id")
+			query = query.Preload("Secrets")
 		default:
 			if columns, ok := gatewayColumnNames[path]; ok {
 				gatewayColumns = append(gatewayColumns, columns...)
@@ -140,8 +143,23 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
-	oldAttributes, oldAntennas := gtwModel.Attributes, gtwModel.Antennas
+	oldAttributes, oldAntennas, oldSecrets := gtwModel.Attributes, gtwModel.Antennas, gtwModel.Secrets
 	columns := gtwModel.fromPB(gtw, fieldMask)
+	newSecrets := gtwModel.Secrets
+	if newSecrets != oldSecrets {
+		if oldSecrets != nil {
+			if err = s.query(ctx, Picture{}).Delete(oldSecrets).Error; err != nil {
+				return nil, err
+			}
+		}
+		if newSecrets != nil {
+			if err = s.createEntity(ctx, &newSecrets); err != nil {
+				return nil, err
+			}
+			gtwModel.SecretsID, gtwModel.Secrets = &newSecrets.ID, nil
+			columns = append(columns, "profile_picture_id")
+		}
+	}
 	if err = s.updateEntity(ctx, &gtwModel, columns...); err != nil {
 		return nil, err
 	}
@@ -155,6 +173,7 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 			return nil, err
 		}
 	}
+	gtwModel.Secrets = newSecrets
 	updated = &ttnpb.Gateway{}
 	gtwModel.toPB(updated, fieldMask)
 	return updated, nil

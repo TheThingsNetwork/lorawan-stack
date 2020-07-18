@@ -62,9 +62,8 @@ type Gateway struct {
 
 	UpdateLocationFromStatus bool `gorm:"default:false not null"`
 
-	SecretValues []SecretValue
-
-	SecretKeyID string `gorm:"type:VARCHAR"`
+	Secrets   *Secrets
+	SecretsID *string `gorm:"type:UUID;index:gateway_secrets_index"`
 
 	Antennas []GatewayAntenna
 }
@@ -91,10 +90,11 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	modelIDField:         func(pb *ttnpb.Gateway, gtw *Gateway) { pb.ModelID = gtw.ModelID },
 	hardwareVersionField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.HardwareVersion = gtw.HardwareVersion },
 	firmwareVersionField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.FirmwareVersion = gtw.FirmwareVersion },
-	gatewaySecretField: func(pb *ttnpb.Gateway, gtw *Gateway) {
-		pb.Secrets = &ttnpb.Secrets{
-			Values: secretValues(gtw.SecretValues).toMap(),
-			KeyID:  gtw.SecretKeyID,
+	gatewaySecretsField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		if gtw.Secrets == nil {
+			pb.Secrets = nil
+		} else {
+			pb.Secrets = gtw.Secrets.toPB()
 		}
 	},
 	gatewayServerAddressField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.GatewayServerAddress = gtw.GatewayServerAddress },
@@ -146,9 +146,12 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	modelIDField:         func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ModelID = pb.ModelID },
 	hardwareVersionField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.HardwareVersion = pb.HardwareVersion },
 	firmwareVersionField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.FirmwareVersion = pb.FirmwareVersion },
-	gatewaySecretField: func(gtw *Gateway, pb *ttnpb.Gateway) {
-		gtw.SecretValues = secretValues(gtw.SecretValues).updateFromMap(pb.Secrets.Values)
-		gtw.SecretKeyID = pb.Secrets.KeyID
+	gatewaySecretsField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.SecretsID, gtw.Secrets = nil, nil
+		if pb.Secrets != nil {
+			gtw.Secrets = &Secrets{}
+			gtw.Secrets.fromPB(pb.Secrets)
+		}
 	},
 	gatewayServerAddressField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayServerAddress = pb.GatewayServerAddress },
 	autoUpdateField:           func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.AutoUpdate = pb.AutoUpdate },
@@ -207,7 +210,7 @@ var gatewayColumnNames = map[string][]string{
 	enforceDutyCycleField:         {enforceDutyCycleField},
 	firmwareVersionField:          {"firmware_version"},
 	frequencyPlanIDsField:         {"frequency_plan_id"},
-	gatewaySecretField:            {gatewaySecretField},
+	gatewaySecretsField:           {gatewaySecretsField},
 	gatewayServerAddressField:     {gatewayServerAddressField},
 	hardwareVersionField:          {"hardware_version"},
 	locationPublicField:           {locationPublicField},
