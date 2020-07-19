@@ -305,6 +305,12 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 				Level: log.DebugLevel,
 			},
 		},
+		KeyVault: config.KeyVault{
+			Provider: "static",
+			Static: map[string][]byte{
+				"lns-token-enc-key": []byte{0xac, 0x56, 0x59, 0x04, 0xdf, 0x37, 0xb7, 0xb0, 0xfb, 0xb0, 0x65, 0xe7, 0x24, 0xf8, 0x17, 0xbe},
+			},
+		},
 	}})
 	conf := &Config{
 		DatabaseURI: dbConnString,

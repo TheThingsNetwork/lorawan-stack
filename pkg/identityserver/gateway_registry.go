@@ -381,9 +381,10 @@ func (is *IdentityServer) retrieveGatewaySecret(ctx context.Context, req *ttnpb.
 	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRET); err != nil {
 		return nil, err
 	}
+
 	var gtw *ttnpb.Gateway
 	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		gtw, err = store.GetGatewayStore(db).GetGateway(ctx, &req.GatewayIdentifiers, &types.FieldMask{Paths: []string{"secret"}})
+		gtw, err = store.GetGatewayStore(db).GetGateway(ctx, &req.GatewayIdentifiers, &types.FieldMask{Paths: []string{"secrets"}})
 		if err != nil {
 			return err
 		}
