@@ -14,7 +14,7 @@
 
 package errors
 
-// Resemble returns true iff the given errors resemble, meaning that the Code,
+// Resemble returns true iff the given errors resemble, meaning that the
 // Namespace and Name of the errors are equal. A nil error only resembles nil.
 // Invalid errors or definitions (including typed nil) never resemble anything.
 func Resemble(a, b error) bool {
@@ -29,7 +29,6 @@ func Resemble(a, b error) bool {
 	if !ok {
 		return false
 	}
-	return ttnA.Code() == ttnB.Code() &&
-		ttnA.Namespace() == ttnB.Namespace() &&
+	return ttnA.Namespace() == ttnB.Namespace() &&
 		ttnA.Name() == ttnB.Name()
 }
