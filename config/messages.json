@@ -1484,6 +1484,15 @@
       "file": "flags.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:no_of_arguments": {
+    "translations": {
+      "en": "invalid number of arguments"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "flags.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_organization_id": {
     "translations": {
       "en": "no organization ID set"
@@ -4533,6 +4542,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "entity_access.go"
+    }
+  },
+  "error:pkg/identityserver:invalid_fieldmask": {
+    "translations": {
+      "en": "invalid fieldmask"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
     }
   },
   "error:pkg/identityserver:invitation_token_expired": {
@@ -7598,6 +7616,24 @@
   "event:gateway.delete": {
     "translations": {
       "en": "delete gateway"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
+  "event:gateway.secrets.retrieve": {
+    "translations": {
+      "en": "retrieve gateway secrets"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
+  "event:gateway.secrets.store": {
+    "translations": {
+      "en": "store gateway secrets"
     },
     "description": {
       "package": "pkg/identityserver",

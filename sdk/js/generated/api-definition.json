@@ -1781,6 +1781,9 @@
         "name",
         "schedule_anytime_delay",
         "schedule_downlink_late",
+        "secrets",
+        "secrets.key_id",
+        "secrets.values",
         "status_public",
         "update_channel",
         "update_location_from_status",
@@ -1838,6 +1841,9 @@
         "name",
         "schedule_anytime_delay",
         "schedule_downlink_late",
+        "secrets",
+        "secrets.key_id",
+        "secrets.values",
         "status_public",
         "update_channel",
         "update_location_from_status",
@@ -1880,6 +1886,9 @@
         "name",
         "schedule_anytime_delay",
         "schedule_downlink_late",
+        "secrets",
+        "secrets.key_id",
+        "secrets.values",
         "status_public",
         "update_channel",
         "update_location_from_status",
@@ -1899,6 +1908,31 @@
           "pattern": "/gateways/{gateway_id}",
           "parameters": [
             "gateway_id"
+          ]
+        }
+      ]
+    },
+    "StoreGatewaySecret": {
+      "file": "lorawan-stack/api/gateway_services.proto",
+      "http": [
+        {
+          "method": "patch",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/secret",
+          "body": "*",
+          "parameters": [
+            "gateway_ids.gateway_id"
+          ]
+        }
+      ]
+    },
+    "RetrieveGatewaySecret": {
+      "file": "lorawan-stack/api/gateway_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/secret",
+          "parameters": [
+            "gateway_ids.gateway_id"
           ]
         }
       ]
@@ -3300,6 +3334,9 @@
         "name",
         "schedule_anytime_delay",
         "schedule_downlink_late",
+        "secrets",
+        "secrets.key_id",
+        "secrets.values",
         "status_public",
         "update_channel",
         "update_location_from_status",
