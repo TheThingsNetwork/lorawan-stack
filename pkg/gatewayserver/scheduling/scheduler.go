@@ -269,7 +269,11 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, err
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	if !s.clock.IsSynced() {
-		return Emission{}, errNoClockSync.New()
+		if token := opts.UplinkToken; token != nil && !token.ServerTime.IsZero() {
+			s.clock.Sync(token.Timestamp, token.ServerTime)
+		} else {
+			return Emission{}, errNoClockSync.New()
+		}
 	}
 	minScheduleTime := ScheduleTimeShort
 	var medianRTT *time.Duration
