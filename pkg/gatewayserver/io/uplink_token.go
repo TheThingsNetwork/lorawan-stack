@@ -14,21 +14,26 @@
 
 package io
 
-import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+import (
+	"time"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+)
 
 // UplinkToken returns an uplink token from the given downlink path.
-func UplinkToken(ids ttnpb.GatewayAntennaIdentifiers, timestamp uint32) ([]byte, error) {
+func UplinkToken(ids ttnpb.GatewayAntennaIdentifiers, timestamp uint32, serverTime time.Time) ([]byte, error) {
 	token := ttnpb.UplinkToken{
 		GatewayAntennaIdentifiers: ids,
 		Timestamp:                 timestamp,
+		ServerTime:                serverTime,
 	}
 	return token.Marshal()
 }
 
 // MustUplinkToken returns an uplink token from the given downlink path.
 // This function panics if an error occurs. Use UplinkToken to handle errors.
-func MustUplinkToken(ids ttnpb.GatewayAntennaIdentifiers, timestamp uint32) []byte {
-	token, err := UplinkToken(ids, timestamp)
+func MustUplinkToken(ids ttnpb.GatewayAntennaIdentifiers, timestamp uint32, serverTime time.Time) []byte {
+	token, err := UplinkToken(ids, timestamp, serverTime)
 	if err != nil {
 		panic(err)
 	}
