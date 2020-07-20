@@ -36,12 +36,10 @@ func MustUplinkToken(ids ttnpb.GatewayAntennaIdentifiers, timestamp uint32) []by
 }
 
 // ParseUplinkToken returns the downlink path from the given uplink token.
-func ParseUplinkToken(buf []byte) (ids ttnpb.GatewayAntennaIdentifiers, timestamp uint32, err error) {
+func ParseUplinkToken(buf []byte) (*ttnpb.UplinkToken, error) {
 	var token ttnpb.UplinkToken
-	if err = token.Unmarshal(buf); err != nil {
-		return
+	if err := token.Unmarshal(buf); err != nil {
+		return nil, err
 	}
-	ids = token.GatewayAntennaIdentifiers
-	timestamp = token.Timestamp
-	return
+	return &token, nil
 }
