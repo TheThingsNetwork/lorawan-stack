@@ -35,9 +35,9 @@ import 'web-streams-polyfill/dist/polyfill'
  *
  *    // Add listeners to the stream.
  *    stream
- *      .on('start', () => console.log('conn opened'));
- *      .on('chunk', chunk => console.log('received chunk', chunk));
- *      .on('error', error => console.log(error));
+ *      .on('start', () => console.log('conn opened'))
+ *      .on('chunk', chunk => console.log('received chunk', chunk))
+ *      .on('error', error => console.log(error))
  *      .on('close', () => console.log('conn closed'))
  *
  *    // Close the stream after 20 s.
@@ -65,6 +65,7 @@ export default async function(payload, url) {
     signal: abortController.signal,
     headers: {
       Authorization,
+      Accept: 'text/event-stream',
     },
   })
 
@@ -74,6 +75,7 @@ export default async function(payload, url) {
     throw 'error' in err ? err.error : err
   }
 
+  let buffer = ''
   const reader = response.body.getReader()
   reader
     .read()
@@ -90,10 +92,11 @@ export default async function(payload, url) {
       }
 
       const parsed = ArrayBufferToString(value)
-
-      for (const line of parsed.trim().split('\n')) {
-        const result = JSON.parse(line).result
-        notify(listeners[EVENTS.CHUNK], result)
+      buffer += parsed
+      const lines = buffer.split(/\n\n/)
+      buffer = lines.pop()
+      for (const line of lines) {
+        notify(listeners[EVENTS.CHUNK], JSON.parse(line).result)
       }
 
       return reader.read().then(onChunk)
