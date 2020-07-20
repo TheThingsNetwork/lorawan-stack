@@ -50,7 +50,7 @@ const (
 	cupsStationAttribute       = "cups-station"
 	cupsModelAttribute         = "cups-model"
 	cupsPackageAttribute       = "cups-package"
-	lnsTokenMapKey             = "lbs-lns-token-key"
+	lnsTokenMapKey             = "lbs-lns-token"
 )
 
 var (

@@ -84,7 +84,9 @@ func TokenCredentials(trust *x509.Certificate, authorization string) ([]byte, er
 	out = append(out, trust.Raw...)
 	// TODO: Refactor when client side TLS is supported https://github.com/TheThingsNetwork/lorawan-stack/issues/137
 	out = append(out, emptyClientCert...)
-	out = append(out, []byte(fmt.Sprintf("%s%s%s", "Authorization: ", authorization, "\r\n"))...)
+	if authorization != "" {
+		out = append(out, []byte(fmt.Sprintf("%s%s%s", "Authorization: ", authorization, "\r\n"))...)
+	}
 	return out, nil
 }
 
