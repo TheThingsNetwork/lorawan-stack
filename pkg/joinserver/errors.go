@@ -54,7 +54,7 @@ var (
 	errProvisionerDecode              = errors.Define("provisioner_decode", "failed to decode provisioning data")
 	errProvisionerNotFound            = errors.DefineNotFound("provisioner_not_found", "provisioner `{id}` not found")
 	errProvisioning                   = errors.DefineAborted("provisioning", "provisioning failed")
-	errRegistryOperation              = errors.DefineInternal("registry_operation", "registry operation failed")
+	errRegistryOperation              = errors.Define("registry_operation", "registry operation failed")
 	errReuseDevNonce                  = errors.DefineInvalidArgument("reuse_dev_nonce", "DevNonce has already been used")
 	errUnauthenticated                = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
 	errUnknownJoinEUI                 = errors.Define("unknown_join_eui", "JoinEUI specified is not known")
