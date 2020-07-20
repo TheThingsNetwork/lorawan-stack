@@ -15,7 +15,9 @@
 package commands
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/howeyc/gopass"
@@ -404,30 +406,35 @@ var (
 		},
 	}
 	gatewaysStoreSecretCommand = &cobra.Command{
-		Use:   "store-secret [gateway-id]",
-		Short: "Send a Plaintext value to be encrypted and stored",
+		Use:   "store-secret [gateway-id] key1,key2,...",
+		Short: "Send plaintext values to be encrypted and stored.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			gtwID, err := getGatewayID(cmd.Flags(), firstArgs(1, args...), true)
 			if err != nil {
 				return err
 			}
-			plainTextValue, err := gopass.GetPasswdPrompt("Please enter the Plaintext value:", true, os.Stdin, os.Stderr)
-			if err != nil {
-				return err
+			if len(args) != 2 {
+				return errNoOfArguments
 			}
-			if len(plainTextValue) == 0 {
-				return errNoPlainTextValue
+			keys := strings.Split(args[1], ",")
+			plainTextValues := make(map[string][]byte, len(keys))
+			for i := 0; i < len(keys); i++ {
+				var err error
+				prompt := fmt.Sprintf("Please enter the plaintext value for key %s:", keys[i])
+				plainTextValues[keys[i]], err = gopass.GetPasswdPrompt(prompt, true, os.Stdin, os.Stderr)
+				if err != nil {
+					return err
+				}
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
-
 			_, err = ttnpb.NewGatewayRegistryClient(is).StoreGatewaySecret(ctx, &ttnpb.StoreGatewaySecretRequest{
 				GatewayIdentifiers: *gtwID,
 				PlainText: ttnpb.GatewaySecretPlainText{
-					Value: string(plainTextValue),
+					Values: plainTextValues,
 				},
 			})
 			if err != nil {
@@ -438,7 +445,7 @@ var (
 	}
 	gatewaysRetrieveSecretCommand = &cobra.Command{
 		Use:   "retrieve-secret [gateway-id]",
-		Short: "Retrive the decrypted Plaintext value",
+		Short: "Retrive the decrypted Plaintext values. Secrets are printed in base64.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			gtwID, err := getGatewayID(cmd.Flags(), args, true)
 			if err != nil {

@@ -112,9 +112,9 @@ func getRights(flagSet *pflag.FlagSet) (rights []ttnpb.Right) {
 }
 
 var (
-	errNoAPIKeyID       = errors.DefineInvalidArgument("no_api_key_id", "no API key ID set")
-	errNoAPIKeyRights   = errors.DefineInvalidArgument("no_api_key_rights", "no API key rights set")
-	errNoPlainTextValue = errors.DefineInvalidArgument("no_plain_text_value", "no plain text value provided")
+	errNoAPIKeyID     = errors.DefineInvalidArgument("no_api_key_id", "no API key ID set")
+	errNoAPIKeyRights = errors.DefineInvalidArgument("no_api_key_rights", "no API key rights set")
+	errNoOfArguments  = errors.DefineInvalidArgument("no_of_arguments", "invalid number of arguments")
 )
 
 func getAPIKeyID(flagSet *pflag.FlagSet, args []string, i int) string {
