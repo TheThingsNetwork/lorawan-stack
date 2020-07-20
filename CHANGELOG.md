@@ -47,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Validation of keys for gateway metrics and version fields.
 - Read only access for the gateway overview page in the Console.
 - Fix an issue that frequently caused event data views crashing in the Console.
+- Application Server contacting Join Server via interop for fetching the AppSKey.
 
 ### Security
 
