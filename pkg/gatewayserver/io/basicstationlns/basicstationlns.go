@@ -54,7 +54,8 @@ var (
 		"listener",
 		"failed to serve Basic Station frontend listener",
 	)
-	errGatewayID = errors.DefineInvalidArgument("invalid_gateway_id", "invalid gateway id `{id}`")
+	errGatewayID       = errors.DefineInvalidArgument("invalid_gateway_id", "invalid gateway id `{id}`")
+	errAuthNotProvided = errors.DefineNotFound("auth_not_provided", "no auth provided for gateway id `{id}`")
 )
 
 type srv struct {
@@ -65,13 +66,21 @@ type srv struct {
 	tokens               io.DownlinkTokens
 	useTrafficTLSAddress bool
 	wsPingInterval       time.Duration
+	opts                 Options
+}
+
+// Options are Basic Station server options
+type Options struct {
+	UseTrafficTLSAddress bool
+	AllowUnauthenticated bool
+	WSPingInterval       time.Duration
 }
 
 func (*srv) Protocol() string            { return "basicstation" }
 func (*srv) SupportsDownlinkClaim() bool { return false }
 
 // New creates the Basic Station front end.
-func New(ctx context.Context, server io.Server, useTrafficTLSAddress bool, wsPingInterval time.Duration) *echo.Echo {
+func New(ctx context.Context, server io.Server, opts Options) *echo.Echo {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
 
 	webServer := echo.New()
@@ -85,12 +94,11 @@ func New(ctx context.Context, server io.Server, useTrafficTLSAddress bool, wsPin
 	)
 
 	s := &srv{
-		ctx:                  ctx,
-		server:               server,
-		upgrader:             &websocket.Upgrader{},
-		webServer:            webServer,
-		useTrafficTLSAddress: useTrafficTLSAddress,
-		wsPingInterval:       wsPingInterval,
+		ctx:       ctx,
+		server:    server,
+		upgrader:  &websocket.Upgrader{},
+		webServer: webServer,
+		opts:      opts,
 	}
 
 	webServer.GET("/router-info", s.handleDiscover)
@@ -146,7 +154,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	ctx = filledCtx
 
 	scheme := "ws"
-	if c.IsTLS() || s.useTrafficTLSAddress {
+	if c.IsTLS() || s.opts.UseTrafficTLSAddress {
 		scheme = "wss"
 	}
 
@@ -206,6 +214,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 
 	var md metadata.MD
+
 	if auth != "" {
 		if !strings.HasPrefix(auth, "Bearer ") {
 			auth = fmt.Sprintf("Bearer %s", auth)
@@ -225,15 +234,20 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		ctx = frequencyplans.WithFallbackID(ctx, fallback)
 	}
 
-	// For gateways with valid EUIs and no auth, we provide the link rights ourselves as in the udp frontend.
 	if auth == "" {
-		ctx = rights.NewContext(ctx, rights.Rights{
-			GatewayRights: map[string]*ttnpb.Rights{
-				uid: {
-					Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_LINK},
+		// If the server allows unauthenticated connections (for local testing), we provide the link rights ourselves as in the udp frontend.
+		if s.opts.AllowUnauthenticated {
+			ctx = rights.NewContext(ctx, rights.Rights{
+				GatewayRights: map[string]*ttnpb.Rights{
+					uid: {
+						Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_LINK},
+					},
 				},
-			},
-		})
+			})
+		} else {
+			// We error here directly as there is no need make an RPC call to the IS to get a failed rights check due to no Auth.
+			return errAuthNotProvided
+		}
 	}
 
 	conn, err := s.server.Connect(ctx, s, ids)
@@ -259,7 +273,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	fps := conn.FrequencyPlans()
 	bandID := conn.BandID()
 
-	pingTicker := time.NewTicker(s.wsPingInterval)
+	pingTicker := time.NewTicker(s.opts.WSPingInterval)
 	defer pingTicker.Stop()
 
 	ws.SetPingHandler(func(data string) error {

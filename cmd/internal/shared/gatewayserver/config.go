@@ -51,8 +51,9 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 	},
 	UpdateConnectionStatsDebounceTime: 3 * time.Second,
 	BasicStation: gatewayserver.BasicStationConfig{
-		Listen:         ":1887",
-		ListenTLS:      ":8887",
-		WSPingInterval: 30 * time.Second,
+		Listen:               ":1887",
+		ListenTLS:            ":8887",
+		WSPingInterval:       30 * time.Second,
+		AllowUnauthenticated: true,
 	},
 }

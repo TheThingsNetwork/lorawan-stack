@@ -35,6 +35,7 @@ type BasicStationConfig struct {
 	ListenTLS               string        `name:"listen-tls" description:"Address for the Basic Station frontend to listen on (with TLS)"`
 	UseTrafficTLSAddress    bool          `name:"use-traffic-tls-address" description:"Use WSS for the traffic address regardless of the TLS setting"`
 	WSPingInterval          time.Duration `name:"ws-ping-interval" description:"Interval to send WS ping messages"`
+	AllowUnauthenticated    bool          `name:"allow-unauthenticated" description:"Allow unauthenticated connections"`
 }
 
 // Config represents the Gateway Server configuration.

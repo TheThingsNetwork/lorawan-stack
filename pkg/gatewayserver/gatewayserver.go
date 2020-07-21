@@ -246,7 +246,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	if conf.BasicStation.FallbackFrequencyPlanID != "" {
 		bsCtx = frequencyplans.WithFallbackID(bsCtx, conf.BasicStation.FallbackFrequencyPlanID)
 	}
-	bsWebServer := basicstationlns.New(bsCtx, gs, conf.BasicStation.UseTrafficTLSAddress, conf.BasicStation.WSPingInterval)
+	bsWebServer := basicstationlns.New(bsCtx, gs, basicstationlns.Options{
+		UseTrafficTLSAddress: conf.BasicStation.UseTrafficTLSAddress,
+		WSPingInterval:       conf.BasicStation.WSPingInterval,
+		AllowUnauthenticated: conf.BasicStation.AllowUnauthenticated,
+	})
 	for _, endpoint := range []component.Endpoint{
 		component.NewTCPEndpoint(conf.BasicStation.Listen, "Basic Station"),
 		component.NewTLSEndpoint(conf.BasicStation.ListenTLS, "Basic Station", component.WithNextProtos("h2", "http/1.1")),
