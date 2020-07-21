@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Options to allow/deny non-admin users to create applications, gateways, etc. (the the `is.user-rights.*` options).
 - Admins now receive emails about requested user accounts that need approval.
 - Support for synchronizing gateway clocks via uplink tokens. UDP gateways may not connect to the same Gateway Server instance.
+- Option to allow unauthenticated Basic Station connections. Unset `gs.basic-station.allow-authenticated` to enforce auth check for production clusters.
 
 ### Changed
 
@@ -50,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Read only access for the gateway overview page in the Console.
 - Fix an issue that frequently caused event data views crashing in the Console.
 - Application Server contacting Join Server via interop for fetching the AppSKey.
+- Basic Station always allows unauthenticated connections when API Key is defined.
 
 ### Security
 

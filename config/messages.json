@@ -3482,6 +3482,15 @@
       "file": "upstream.go"
     }
   },
+  "error:pkg/gatewayserver/io/basicstationlns:auth_not_provided": {
+    "translations": {
+      "en": "no auth provided for gateway id `{id}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns",
+      "file": "basicstationlns.go"
+    }
+  },
   "error:pkg/gatewayserver/io/basicstationlns:empty_gateway_eui": {
     "translations": {
       "en": "empty gateway EUI"
