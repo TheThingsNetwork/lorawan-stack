@@ -816,7 +816,7 @@ If you switch between production and development builds of the Console, you migh
 ##### Possible solution
 
   1. Double check whether you have set the correct environment: `echo $NODE_ENV`, it should be either `production` or `development`
-  2. Double check whether [your The Things Stack config](#development-configuration) is set correctly (especially `TTN_LW_CONSOLE_UI_JS_FILE`, `TTN_LW_CONSOLE_UI_CANONICAL_URL` and similar settings)
+  2. Double check whether [your The Things Stack config](#development-configuration) is set correctly (especially `TTN_LW_CONSOLE_UI_JS_FILE`, `TTN_LW_CONSOLE_UI_CANONICAL_URL` and similar settings). Run `ttn-lw-stack config --env` to see all environment variables
   3. Make sure to rebuild the Console `tools/bin/mage js:clean js:build`
   4. Restart The Things Stack
 

@@ -268,11 +268,13 @@ var UplinkTokenFieldPathsNested = []string{
 	"ids.gateway_ids",
 	"ids.gateway_ids.eui",
 	"ids.gateway_ids.gateway_id",
+	"server_time",
 	"timestamp",
 }
 
 var UplinkTokenFieldPathsTopLevel = []string{
 	"ids",
+	"server_time",
 	"timestamp",
 }
 var DownlinkPathFieldPathsNested = []string{

@@ -56,12 +56,12 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		case *ttnpb.DownlinkPath_Fixed:
 			ids = p.Fixed.GatewayIdentifiers
 		case *ttnpb.DownlinkPath_UplinkToken:
-			antennaIDs, _, err := io.ParseUplinkToken(p.UplinkToken)
+			token, err := io.ParseUplinkToken(p.UplinkToken)
 			if err != nil {
-				pathErrs = append(pathErrs, errUplinkToken) // Hide the cause as uplink tokens are opaque to the Network Server.
+				pathErrs = append(pathErrs, errUplinkToken.New()) // Hide the cause as uplink tokens are opaque to the Network Server.
 				continue
 			}
-			ids = antennaIDs.GatewayIdentifiers
+			ids = token.GatewayIdentifiers
 		default:
 			panic(fmt.Sprintf("proto: unexpected type %T in oneof", path.Path))
 		}

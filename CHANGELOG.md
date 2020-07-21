@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI auto-completion support (see `ttn-lw-cli complete` command).
 - Options to disable profile picture and end device picture uploads (`is.profile-picture.disable-upload` and `is.end-device-picture.disable-upload`).
 - Options to allow/deny non-admin users to create applications, gateways, etc. (the the `is.user-rights.*` options).
+- Admins now receive emails about requested user accounts that need approval.
+- Support for synchronizing gateway clocks via uplink tokens. UDP gateways may not connect to the same Gateway Server instance.
 
 ### Changed
 
@@ -46,6 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Decoding of uplinks with frame counters exceeding 16 bits in Application Server.
 - Validation of keys for gateway metrics and version fields.
 - Read only access for the gateway overview page in the Console.
+- Fix an issue that frequently caused event data views crashing in the Console.
+- Application Server contacting Join Server via interop for fetching the AppSKey.
 
 ### Security
 

@@ -1985,7 +1985,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				if !a.So(err, should.EqualErrorOrDefinition, ErrRegistryOperation.WithCause(errTest)) {
 					t.FailNow()
 				}
-				return a.So(errors.IsInternal(err), should.BeTrue)
+				return a.So(errors.IsUnknown(err), should.BeTrue)
 			},
 		},
 		{
@@ -2152,7 +2152,7 @@ func TestGetNwkSKeys(t *testing.T) {
 func TestGetAppSKey(t *testing.T) {
 	ctx := test.Context()
 
-	errTest := errors.New("test")
+	errNotFound := errors.DefineNotFound("test_not_found", "not found")
 
 	for _, tc := range []struct {
 		Name        string
@@ -2176,7 +2176,7 @@ func TestGetAppSKey(t *testing.T) {
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"app_s_key",
 				})
-				return nil, errTest.New()
+				return nil, errNotFound.New()
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEUI:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -2186,10 +2186,10 @@ func TestGetAppSKey(t *testing.T) {
 			KeyResponse: nil,
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
-				if !a.So(err, should.EqualErrorOrDefinition, ErrRegistryOperation.WithCause(errTest)) {
+				if !a.So(err, should.EqualErrorOrDefinition, ErrRegistryOperation.WithCause(errNotFound)) {
 					t.FailNow()
 				}
-				return a.So(errors.IsInternal(err), should.BeTrue)
+				return a.So(errors.IsNotFound(err), should.BeTrue)
 			},
 		},
 		{
@@ -2464,7 +2464,7 @@ func TestGetHomeNetID(t *testing.T) {
 				if !a.So(err, should.EqualErrorOrDefinition, ErrRegistryOperation.WithCause(errTest)) {
 					t.FailNow()
 				}
-				return a.So(errors.IsInternal(err), should.BeTrue)
+				return a.So(errors.IsUnknown(err), should.BeTrue)
 			},
 		},
 		{

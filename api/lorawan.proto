@@ -289,6 +289,8 @@ message GatewayAntennaIdentifiers {
 message UplinkToken {
   GatewayAntennaIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   uint32 timestamp = 2;
+  // Absolute time observed by the server when the uplink message has been received.
+  google.protobuf.Timestamp server_time = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 message DownlinkPath {

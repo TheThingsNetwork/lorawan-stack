@@ -18866,6 +18866,16 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "server_time",
+              "description": "Absolute time observed by the server when the uplink message has been received.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         }
