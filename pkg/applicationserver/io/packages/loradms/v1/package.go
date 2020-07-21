@@ -208,7 +208,7 @@ func (p *DeviceManagementPackage) mergePackageData(def *ttnpb.ApplicationPackage
 func init() {
 	packages.RegisterPackage(ttnpb.ApplicationPackage{
 		Name:         packageName,
-		DefaultFPort: 200,
+		DefaultFPort: 199,
 	}, packages.CreateApplicationPackage(
 		func(server io.Server, registry packages.Registry) packages.ApplicationPackageHandler {
 			return &DeviceManagementPackage{server, registry}
