@@ -27,10 +27,10 @@ The package can now be enabled using the `default-associations set` command:
 # Create a JSON formatted file containing the uplink token
 $ echo '{ "token": "AQEAdqwV67..." }' > package-data.json
 # Create the association
-$ ttn-lw-cli applications packages default-associations set app1 200 --package-name lora-cloud-device-management-v1 --data-local-file package-data.json
+$ ttn-lw-cli applications packages default-associations set app1 199 --package-name lora-cloud-device-management-v1 --data-local-file package-data.json
 ```
 
-This will enable the package on FPort `200` of all of the devices of application `app1`. You can now use the LoRa Cloud Device & Application Services in order to manage your device !
+This will enable the package on FPort `199` of all of the devices of application `app1`. You can now use the LoRa Cloud Device & Application Services in order to manage your device !
 
 ```json
 {
@@ -38,7 +38,7 @@ This will enable the package on FPort `200` of all of the devices of application
     "application_ids": {
       "application_id": "app1"
     },
-    "f_port": 200
+    "f_port": 199
   },
   "created_at": "2019-12-18T10:35:15.565807113Z",
   "updated_at": "2019-12-18T22:06:21.693359719Z",
@@ -59,7 +59,7 @@ The package may be configured to use a custom server URL using the package data:
 # Create a JSON formatted file containing the uplink token and the server URL
 $ echo '{ "token": "AQEAdqwV67...", "server_url": "https://app.example.com/" }' > package-data.json
 # Create or update the default association
-$ ttn-lw-cli applications packages default-associations set app1 200 --package-name lora-cloud-device-management-v1 --data-local-file package-data.json
+$ ttn-lw-cli applications packages default-associations set app1 199 --package-name lora-cloud-device-management-v1 --data-local-file package-data.json
 ```
 
 Output:
@@ -70,7 +70,7 @@ Output:
     "application_ids": {
       "application_id": "app1"
     },
-    "f_port": 200
+    "f_port": 199
   },
   "created_at": "2020-05-14T02:04:45.286874524Z",
   "updated_at": "2020-05-14T02:04:45.286874524Z",

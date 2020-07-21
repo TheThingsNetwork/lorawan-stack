@@ -55,7 +55,7 @@ func TestUplinks(t *testing.T) {
 						resp, err := u.Send(objects.DeviceUplinks{
 							eui: &objects.LoRaUplink{
 								FCnt:      uint32Ptr(42),
-								Port:      uint8Ptr(200),
+								Port:      uint8Ptr(199),
 								Payload:   hexPtr(objects.Hex{0x03, 0x04}),
 								DR:        uint8Ptr(4),
 								Freq:      uint32Ptr(865000000),
