@@ -113,6 +113,31 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 	return userProtos, nil
 }
 
+func (s *userStore) ListAdmins(ctx context.Context, fieldMask *types.FieldMask) ([]*ttnpb.User, error) {
+	defer trace.StartRegion(ctx, "list admins").End()
+
+	query := s.query(ctx, User{}, withUserID()).Where(&User{Admin: true})
+	query = selectUserFields(ctx, query, fieldMask)
+	query = query.Order(orderFromContext(ctx, "users", `"accounts"."uid"`, "ASC"))
+	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
+		countTotal(ctx, query.Model(User{}))
+		query = query.Limit(limit).Offset(offset)
+	}
+	var userModels []User
+	query = query.Preload("Account").Find(&userModels)
+	setTotal(ctx, uint64(len(userModels)))
+	if query.Error != nil {
+		return nil, query.Error
+	}
+	userProtos := make([]*ttnpb.User, len(userModels))
+	for i, userModel := range userModels {
+		userProto := &ttnpb.User{}
+		userModel.toPB(userProto, fieldMask)
+		userProtos[i] = userProto
+	}
+	return userProtos, nil
+}
+
 func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask *types.FieldMask) (*ttnpb.User, error) {
 	defer trace.StartRegion(ctx, "get user").End()
 	query := s.query(ctx, User{}, withUserID(id.GetUserID()))

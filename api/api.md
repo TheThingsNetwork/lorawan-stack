@@ -4347,6 +4347,7 @@ Transmission settings for downlink.
 | ----- | ---- | ----- | ----------- |
 | `ids` | [`GatewayAntennaIdentifiers`](#ttn.lorawan.v3.GatewayAntennaIdentifiers) |  |  |
 | `timestamp` | [`uint32`](#uint32) |  |  |
+| `server_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Absolute time observed by the server when the uplink message has been received. |
 
 #### Field Rules
 

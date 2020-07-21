@@ -86,11 +86,11 @@ func TestFlow(t *testing.T) {
 		}
 		select {
 		case up := <-conn.Up():
-			tokenIDs, timestamp, err := io.ParseUplinkToken(up.RxMetadata[0].UplinkToken)
+			token, err := io.ParseUplinkToken(up.RxMetadata[0].UplinkToken)
 			a.So(err, should.BeNil)
-			a.So(tokenIDs.GatewayIdentifiers, should.Resemble, ids)
-			a.So(tokenIDs.AntennaIndex, should.Equal, 0)
-			a.So(timestamp, should.Equal, 100)
+			a.So(token.GatewayIdentifiers, should.Resemble, ids)
+			a.So(token.AntennaIndex, should.Equal, 0)
+			a.So(token.Timestamp, should.Equal, 100)
 		case <-time.After(timeout):
 			t.Fatalf("Expected uplink message time-out")
 		}
@@ -137,7 +137,11 @@ func TestFlow(t *testing.T) {
 			Name: "NoRequest",
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
-					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100),
+					UplinkToken: io.MustUplinkToken(
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						100,
+						time.Unix(0, 100*1000),
+					),
 				},
 			},
 			Message: &ttnpb.DownlinkMessage{
@@ -154,7 +158,11 @@ func TestFlow(t *testing.T) {
 			Name: "ValidClassA",
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
-					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100),
+					UplinkToken: io.MustUplinkToken(
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						100,
+						time.Unix(0, 100*1000),
+					),
 				},
 			},
 			Message: &ttnpb.DownlinkMessage{
@@ -175,7 +183,11 @@ func TestFlow(t *testing.T) {
 			Name: "ConflictClassA",
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
-					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100), // Same as previous.
+					UplinkToken: io.MustUplinkToken(
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						100,
+						time.Unix(0, 100*1000),
+					), // Same as previous.
 				},
 			},
 			Message: &ttnpb.DownlinkMessage{
@@ -226,7 +238,11 @@ func TestFlow(t *testing.T) {
 			Name: "NoRx1DelayClassA",
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
-					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100),
+					UplinkToken: io.MustUplinkToken(
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						100,
+						time.Unix(0, 100*1000),
+					),
 				},
 			},
 			Message: &ttnpb.DownlinkMessage{
@@ -247,7 +263,11 @@ func TestFlow(t *testing.T) {
 			Name: "ValidClassC/UplinkToken",
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
-					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100),
+					UplinkToken: io.MustUplinkToken(
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						100,
+						time.Unix(0, 100*1000),
+					),
 				},
 			},
 			Message: &ttnpb.DownlinkMessage{
@@ -337,7 +357,11 @@ func TestFlow(t *testing.T) {
 			Name: "InvalidDataRate",
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
-					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100),
+					UplinkToken: io.MustUplinkToken(
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						100,
+						time.Unix(0, 100*1000),
+					),
 				},
 			},
 			Message: &ttnpb.DownlinkMessage{
@@ -358,7 +382,11 @@ func TestFlow(t *testing.T) {
 			Name: "TooLong",
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
-					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100),
+					UplinkToken: io.MustUplinkToken(
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						100,
+						time.Unix(0, 100*1000),
+					),
 				},
 			},
 			Message: &ttnpb.DownlinkMessage{
@@ -464,11 +492,11 @@ func TestSubBandEIRPOverride(t *testing.T) {
 		}
 		select {
 		case up := <-conn.Up():
-			tokenIDs, timestamp, err := io.ParseUplinkToken(up.RxMetadata[0].UplinkToken)
+			token, err := io.ParseUplinkToken(up.RxMetadata[0].UplinkToken)
 			a.So(err, should.BeNil)
-			a.So(tokenIDs.GatewayIdentifiers, should.Resemble, ids)
-			a.So(tokenIDs.AntennaIndex, should.Equal, 0)
-			a.So(timestamp, should.Equal, 100)
+			a.So(token.GatewayIdentifiers, should.Resemble, ids)
+			a.So(token.AntennaIndex, should.Equal, 0)
+			a.So(token.Timestamp, should.Equal, 100)
 		case <-time.After(timeout):
 			t.Fatalf("Expected uplink message time-out")
 		}
@@ -489,7 +517,11 @@ func TestSubBandEIRPOverride(t *testing.T) {
 			Name: "ValidClassA",
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
-					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "bar-gateway"}}, 100),
+					UplinkToken: io.MustUplinkToken(
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "bar-gateway"}},
+						100,
+						time.Unix(0, 100*1000),
+					),
 				},
 			},
 			Message: &ttnpb.DownlinkMessage{

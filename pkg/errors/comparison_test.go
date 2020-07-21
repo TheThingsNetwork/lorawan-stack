@@ -54,4 +54,8 @@ func TestResembles(t *testing.T) {
 
 	a.So(errors.Resemble(defInvalidArgument, defPermissionDenied), should.BeFalse)
 
+	defWrapper := errors.Define("wrapper", "something went wrong")
+
+	a.So(errors.Resemble(defWrapper.WithCause(defPermissionDenied), defWrapper), should.BeTrue)
+	a.So(errors.Resemble(defWrapper.WithCause(defPermissionDenied), defWrapper.WithCause(defInvalidArgument)), should.BeTrue)
 }

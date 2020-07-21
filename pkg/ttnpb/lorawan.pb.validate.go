@@ -1674,6 +1674,18 @@ func (m *UplinkToken) ValidateFields(paths ...string) error {
 
 		case "timestamp":
 			// no validation rules for Timestamp
+		case "server_time":
+
+			if v, ok := interface{}(&m.ServerTime).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UplinkTokenValidationError{
+						field:  "server_time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return UplinkTokenValidationError{
 				field:  name,
