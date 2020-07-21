@@ -1153,7 +1153,7 @@ func (m *MACSettings) GetDesiredBeaconFrequency() *types.UInt64Value {
 
 // MACState represents the state of MAC layer of the device.
 // MACState is reset on each join for OTAA or ResetInd for ABP devices.
-// This is used internally by the Network Server and is read only.
+// This is used internally by the Network Server.
 type MACState struct {
 	// Current LoRaWAN MAC parameters.
 	CurrentParameters MACParameters `protobuf:"bytes,1,opt,name=current_parameters,json=currentParameters,proto3" json:"current_parameters"`

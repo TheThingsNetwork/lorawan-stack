@@ -11,7 +11,9 @@ This section provides guidelines for configuring MAC settings for end devices fr
 
 ### MAC Settings and MAC State
 
-`mac-settings` on {{% tts %}} are configurable per end device. To configure persistent MAC settings, make changes to `mac-settings.desired_<parameter>`. Updates to `mac-settings.desired_<parameter>` take effect on device creation, after OTAA join or ABP FCnt reset, ResetInd, or after MAC state reset.
+MAC settings on {{% tts %}} are configurable per end device. To configure persistent MAC settings, make changes to `mac-settings.desired_<parameter>`. Updates to `mac-settings.desired_<parameter>` take effect on device creation, after OTAA join or ABP FCnt reset, ResetInd, or after MAC state reset.
+
+`mac-settings.<parameter>` represents what the Network Server believes is configured on the end device, and should not be changed, unless the device does not conform to spec. It may however be necessary to set `mac-settings.RX1_delay` for ABP devices where this is not configured as part of activation.
 
 `mac-state` can be used to test MAC settings in the current session. To update settings for testing in the current session, make changes to the `mac-state.desired_parameters.<parameter>`. Updates to the `mac-state.desired_parameters.<parameter>` are applied on the next uplink, and lost on reset.
 
@@ -21,7 +23,7 @@ The expected procedure for testing and updating settings is:
 2. Test that everything works as expected
 3. Modify `mac-settings.desired_<parameter>` to make the change permanent
 
-If no settings are provided on device creation or unset, defaults are taken from [Network Server Configuration]({{< ref src="/reference/configuration/network-server" >}}).
+If no settings are provided on device creation or unset, defaults are first taken from the device Frequency Plan if available, and finally from [Network Server Configuration]({{< ref src="/reference/configuration/network-server" >}}).
 
 ### Available MAC settings
 

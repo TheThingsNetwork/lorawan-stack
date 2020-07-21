@@ -2310,7 +2310,7 @@ This is used internally by the Network Server.
 
 MACState represents the state of MAC layer of the device.
 MACState is reset on each join for OTAA or ResetInd for ABP devices.
-This is used internally by the Network Server and is read only.
+This is used internally by the Network Server.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
