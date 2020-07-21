@@ -78,4 +78,15 @@ const getUsersLogic = createRequestLogic({
   },
 })
 
-export default [getUserLogic, getUsersLogic, updateUserLogic, deleteUserLogic]
+const createUserLogic = createRequestLogic({
+  type: users.CREATE_USER,
+  process({ action }, dispatch) {
+    const {
+      payload: { user },
+    } = action
+
+    return api.users.create(user)
+  },
+})
+
+export default [getUserLogic, getUsersLogic, updateUserLogic, deleteUserLogic, createUserLogic]

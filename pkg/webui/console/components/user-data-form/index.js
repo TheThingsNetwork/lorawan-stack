@@ -28,6 +28,8 @@ import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import { id as userIdRegexp } from '@console/lib/regexp'
+
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 
 const approvalStates = [
@@ -39,6 +41,13 @@ const approvalStates = [
 ]
 
 const validationSchema = Yup.object().shape({
+  ids: Yup.object().shape({
+    user_id: Yup.string()
+      .matches(userIdRegexp, sharedMessages.validateIdFormat)
+      .min(2, Yup.passValues(sharedMessages.validateTooShort))
+      .max(25, Yup.passValues(sharedMessages.validateTooLong))
+      .required(sharedMessages.validateRequired),
+  }),
   name: Yup.string()
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
@@ -46,10 +55,19 @@ const validationSchema = Yup.object().shape({
     .email(sharedMessages.validateEmail)
     .required(sharedMessages.validateRequired),
   state: Yup.string()
-    .oneOf(approvalStates)
+    .oneOf(approvalStates, sharedMessages.validateRequired)
     .required(sharedMessages.validateRequired),
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
 })
+
+const passwordValidationSchema = validationSchema.concat(
+  Yup.object().shape({
+    password: Yup.string().required(sharedMessages.validateRequired),
+    confirmPassword: Yup.string()
+      .required(sharedMessages.validateRequired)
+      .oneOf([Yup.ref('password'), null], sharedMessages.validatePasswordMatch),
+  }),
+)
 
 const m = defineMessages({
   adminLabel: 'Administrator',
@@ -66,6 +84,15 @@ const m = defineMessages({
 
 @injectIntl
 class UserForm extends React.Component {
+  constructor(props) {
+    super(props)
+    const { update } = props
+    this.validationSchema = update ? validationSchema : passwordValidationSchema
+    this.state = {
+      error: '',
+    }
+  }
+
   static propTypes = {
     error: PropTypes.error,
     initialValues: PropTypes.shape({
@@ -74,22 +101,34 @@ class UserForm extends React.Component {
       }).isRequired,
       name: PropTypes.string,
       description: PropTypes.string,
-    }).isRequired,
+    }),
     intl: PropTypes.shape({
       formatMessage: PropTypes.func.isRequired,
     }).isRequired,
-    onDelete: PropTypes.func.isRequired,
+    onDelete: PropTypes.func,
     onDeleteFailure: PropTypes.func,
     onDeleteSuccess: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
     onSubmitFailure: PropTypes.func,
     onSubmitSuccess: PropTypes.func,
+    update: PropTypes.bool,
   }
 
   static defaultProps = {
+    update: false,
     error: '',
+    initialValues: {
+      ids: { user_id: '' },
+      name: '',
+      primary_email_address: '',
+      state: '',
+      description: '',
+      password: '',
+      confirmPassword: '',
+    },
     onSubmitFailure: () => null,
     onSubmitSuccess: () => null,
+    onDelete: () => null,
     onDeleteFailure: () => null,
     onDeleteSuccess: () => null,
   }
@@ -98,13 +137,14 @@ class UserForm extends React.Component {
   async handleSubmit(values, { resetForm, setSubmitting }) {
     const { onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
     const castedValues = validationSchema.cast(values)
-
+    await this.setState({ error: '' })
     try {
       const result = await onSubmit(castedValues)
-      onSubmitSuccess(result)
       resetForm({ values })
+      onSubmitSuccess(result)
     } catch (error) {
       setSubmitting(false)
+      this.setState({ error })
       onSubmitFailure(error)
     }
   }
@@ -123,7 +163,8 @@ class UserForm extends React.Component {
 
   render() {
     const {
-      error,
+      update,
+      error: passedError,
       initialValues: values,
       intl: { formatMessage },
     } = this.props
@@ -138,18 +179,23 @@ class UserForm extends React.Component {
       ...values,
     }
 
+    const { error: submitError } = this.state
+
+    const error = passedError || submitError
+
     return (
       <Form
         error={error}
         onSubmit={this.handleSubmit}
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        validationSchema={this.validationSchema}
       >
         <Form.Field
           title={sharedMessages.userId}
           name="ids.user_id"
           component={Input}
-          disabled
+          disabled={update}
+          autoFocus={!update}
           required
         />
         <Form.Field
@@ -179,6 +225,7 @@ class UserForm extends React.Component {
           name="state"
           component={Select}
           options={approvalStateOptions}
+          required
         />
         <Form.Field
           title={sharedMessages.admin}
@@ -186,22 +233,47 @@ class UserForm extends React.Component {
           component={Checkbox}
           label={m.adminLabel}
         />
-        <SubmitBar>
-          <Form.Submit message={sharedMessages.saveChanges} component={SubmitButton} />
-          <ModalButton
-            type="button"
-            icon="delete"
-            danger
-            naked
-            message={sharedMessages.userDelete}
-            modalData={{
-              message: {
-                values: { userId: initialValues.name || initialValues.ids.user_id },
-                ...m.modalWarning,
-              },
-            }}
-            onApprove={this.handleDelete}
+        {!update && (
+          <Form.Field
+            title={sharedMessages.password}
+            component={Input}
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            required
           />
+        )}
+        {!update && (
+          <Form.Field
+            title={sharedMessages.confirmPassword}
+            component={Input}
+            name="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            required
+          />
+        )}
+        <SubmitBar>
+          <Form.Submit
+            message={update ? sharedMessages.saveChanges : sharedMessages.userAdd}
+            component={SubmitButton}
+          />
+          {update && (
+            <ModalButton
+              type="button"
+              icon="delete"
+              danger
+              naked
+              message={sharedMessages.userDelete}
+              modalData={{
+                message: {
+                  values: { userId: initialValues.name || initialValues.ids.user_id },
+                  ...m.modalWarning,
+                },
+              }}
+              onApprove={this.handleDelete}
+            />
+          )}
         </SubmitBar>
       </Form>
     )

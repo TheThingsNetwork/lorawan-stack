@@ -24,6 +24,7 @@ import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
+import UserAdd from '@console/views/admin-user-management-add'
 import UserEdit from '@console/views/admin-user-management-edit'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -49,6 +50,7 @@ export default class UserManagementRouter extends Component {
         <IntlHelmet title={sharedMessages.userManagement} />
         <Switch>
           <Route exact path={`${match.path}`} component={UserManagement} />
+          <Route path={`${match.path}/add`} component={UserAdd} />
           <Route path={`${match.path}/:userId`} component={UserEdit} />
           <NotFoundRoute />
         </Switch>

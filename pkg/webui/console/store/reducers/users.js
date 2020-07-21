@@ -20,6 +20,7 @@ import {
   UPDATE_USER_SUCCESS,
   GET_USER,
   DELETE_USER_SUCCESS,
+  CREATE_USER_SUCCESS,
 } from '@console/store/actions/users'
 
 const initialState = {
@@ -41,6 +42,7 @@ const users = function(state = initialState, { type, payload, meta }) {
         ...state,
         selectedUser: payload.id,
       }
+    case CREATE_USER_SUCCESS:
     case UPDATE_USER_SUCCESS:
     case GET_USER_SUCCESS:
       const id = getUserId(payload)

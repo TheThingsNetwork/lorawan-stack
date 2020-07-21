@@ -31,6 +31,7 @@ import UserDataForm from '@console/components/user-data-form'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import diff from '@ttn-lw/lib/diff'
+import { getUserId } from '@ttn-lw/lib/selectors/id'
 
 import { getUser, updateUser, deleteUser } from '@console/store/actions/users'
 import { attachPromise } from '@console/store/actions/lib'
@@ -39,8 +40,6 @@ import { selectSelectedUser } from '@console/store/selectors/users'
 
 const m = defineMessages({
   updateSuccess: 'User updated',
-  updateFailure: 'There was an error and the user could not be updated',
-  deleteFailure: 'There was an error and the user could not be deleted',
   deleteSuccess: 'User deleted',
 })
 
@@ -80,23 +79,12 @@ export default class UserManagementEdit extends Component {
     return updateUser(userId, patch)
   }
 
-  @bind
-  onSubmitSuccess() {
-    const { userId } = this.props
+  onSubmitSuccess(response) {
+    const userId = getUserId(response)
     toast({
       title: userId,
       message: m.updateSuccess,
       type: toast.types.SUCCESS,
-    })
-  }
-
-  @bind
-  onSubmitFailure() {
-    const { userId } = this.props
-    toast({
-      title: userId,
-      message: m.updateFailure,
-      type: toast.types.ERROR,
     })
   }
 
@@ -120,17 +108,6 @@ export default class UserManagementEdit extends Component {
     navigateToList()
   }
 
-  @bind
-  onDeleteFailure() {
-    const { userId } = this.props
-
-    toast({
-      title: userId,
-      message: m.deleteFailure,
-      type: toast.types.ERROR,
-    })
-  }
-
   render() {
     const { user } = this.props
     return (
@@ -139,14 +116,12 @@ export default class UserManagementEdit extends Component {
         <Row>
           <Col lg={8} md={12}>
             <UserDataForm
+              update
               initialValues={user}
-              error={null}
               onSubmit={this.onSubmit}
               onSubmitSuccess={this.onSubmitSuccess}
-              onSubmitFailure={this.onSubmitFailure}
               onDelete={this.onDelete}
               onDeleteSuccess={this.onDeleteSuccess}
-              onDeleteFailure={this.onDeleteFailure}
             />
           </Col>
         </Row>

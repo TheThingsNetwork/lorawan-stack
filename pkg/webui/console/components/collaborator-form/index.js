@@ -45,17 +45,6 @@ const validationSchema = Yup.object().shape({
 const isUser = collaborator => collaborator.ids && 'user_ids' in collaborator.ids
 
 export default class CollaboratorForm extends Component {
-  static defaultProps = {
-    onSubmitFailure: () => null,
-    onDelete: () => null,
-    onDeleteSuccess: () => null,
-    onDeleteFailure: () => null,
-    pseudoRights: [],
-    error: '',
-    collaborator: undefined,
-    update: false,
-  }
-
   static propTypes = {
     collaborator: PropTypes.collaborator,
     error: PropTypes.error,
