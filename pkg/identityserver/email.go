@@ -99,6 +99,33 @@ func (is *IdentityServer) SendUserEmail(ctx context.Context, userIDs *ttnpb.User
 	return nil
 }
 
+// SendAdminsEmail sends an email to the admins of the network.
+func (is *IdentityServer) SendAdminsEmail(ctx context.Context, makeMessage func(emails.Data) email.MessageData) error {
+	var users []*ttnpb.User
+	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		users, err = store.GetUserStore(db).ListAdmins(ctx, &types.FieldMask{
+			Paths: []string{"name", "primary_email_address"},
+		})
+		if err != nil {
+			return err
+		}
+		return err
+	})
+	if err != nil {
+		return err
+	}
+	for _, usr := range users {
+		err = is.SendEmail(ctx, func(data emails.Data) email.MessageData {
+			data.SetUser(usr)
+			return makeMessage(data)
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // SendContactsEmail sends an email to the contacts of the given entity.
 func (is *IdentityServer) SendContactsEmail(ctx context.Context, ids *ttnpb.EntityIdentifiers, makeMessage func(emails.Data) email.MessageData) error {
 	var contacts []*ttnpb.ContactInfo
