@@ -24,6 +24,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 )
 
+// DefaultWebhookTemplatesConfig is the default configuration for the Webhook templates.
+var DefaultWebhookTemplatesConfig = web.TemplatesConfig{
+	URL: "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-webhook-templates/master",
+}
+
 // DefaultApplicationServerConfig is the default configuration for the Application Server.
 var DefaultApplicationServerConfig = applicationserver.Config{
 	LinkMode: "all",
@@ -34,6 +39,7 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		PublicTLSAddress: fmt.Sprintf("%s:8883", shared.DefaultPublicHost),
 	},
 	Webhooks: applicationserver.WebhooksConfig{
+		Templates: DefaultWebhookTemplatesConfig,
 		Target:    "direct",
 		Timeout:   5 * time.Second,
 		QueueSize: 16,
