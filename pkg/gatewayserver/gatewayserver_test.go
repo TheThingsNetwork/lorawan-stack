@@ -108,8 +108,9 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		BasicStation: gatewayserver.BasicStationConfig{
-			Listen:         ":1887",
-			WSPingInterval: wsPingInterval,
+			Listen:               ":1887",
+			WSPingInterval:       wsPingInterval,
+			AllowUnauthenticated: true,
 		},
 		UpdateConnectionStatsDebounceTime: 0,
 	}
