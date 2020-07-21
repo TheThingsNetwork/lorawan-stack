@@ -24,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -155,18 +154,6 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 
 	timestamp := uint32(req.RadioMetaData.UpInfo.XTime & 0xFFFFFFFF)
 
-	ulToken := ttnpb.UplinkToken{
-		GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
-			GatewayIdentifiers: ids,
-			AntennaIndex:       uint32(req.RadioMetaData.UpInfo.RCtx),
-		},
-		Timestamp: timestamp,
-	}
-	ulTokenBytes, err := ulToken.Marshal()
-	if err != nil {
-		return nil, err
-	}
-
 	var rxTime *time.Time
 	sec, nsec := math.Modf(req.RadioMetaData.UpInfo.RxTime)
 	if sec != 0 {
@@ -181,7 +168,7 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		RSSI:               req.RadioMetaData.UpInfo.RSSI,
 		ChannelRSSI:        req.RadioMetaData.UpInfo.RSSI,
 		SNR:                req.RadioMetaData.UpInfo.SNR,
-		UplinkToken:        ulTokenBytes,
+		AntennaIndex:       uint32(req.RadioMetaData.UpInfo.RCtx),
 	}
 	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
@@ -238,21 +225,19 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	if err != nil {
 		return err
 	}
+
 	rxMetadata := up.RxMetadata[0]
-	antennaIDs, _, err := io.ParseUplinkToken(rxMetadata.UplinkToken)
-	if err != nil {
-		return err
-	}
 
 	var rxTime float64
 	if rxMetadata.Time != nil {
 		rxTime = float64(rxMetadata.Time.Unix()) + float64(rxMetadata.Time.Nanosecond())/(1e9)
 	}
+
 	req.RadioMetaData = RadioMetaData{
 		DataRate:  dr,
 		Frequency: up.Settings.GetFrequency(),
 		UpInfo: UpInfo{
-			RCtx:   int64(antennaIDs.AntennaIndex),
+			RCtx:   int64(rxMetadata.AntennaIndex),
 			XTime:  int64(rxMetadata.Timestamp),
 			RSSI:   rxMetadata.RSSI,
 			SNR:    rxMetadata.SNR,
@@ -327,18 +312,6 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 
 	timestamp := uint32(updf.RadioMetaData.UpInfo.XTime & 0xFFFFFFFF)
 
-	ulToken := ttnpb.UplinkToken{
-		GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
-			GatewayIdentifiers: ids,
-			AntennaIndex:       uint32(updf.RadioMetaData.UpInfo.RCtx),
-		},
-		Timestamp: timestamp,
-	}
-	ulTokenBytes, err := ulToken.Marshal()
-	if err != nil {
-		return nil, errJoinRequestMessage.WithCause(err)
-	}
-
 	var rxTime *time.Time
 	sec, nsec := math.Modf(updf.RadioMetaData.UpInfo.RxTime)
 	if sec != 0 {
@@ -353,7 +326,7 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		RSSI:               updf.RadioMetaData.UpInfo.RSSI,
 		ChannelRSSI:        updf.RadioMetaData.UpInfo.RSSI,
 		SNR:                updf.RadioMetaData.UpInfo.SNR,
-		UplinkToken:        ulTokenBytes,
+		AntennaIndex:       uint32(updf.RadioMetaData.UpInfo.RCtx),
 	}
 	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
@@ -407,10 +380,6 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 	}
 
 	rxMetadata := up.RxMetadata[0]
-	antennaIDs, _, err := io.ParseUplinkToken(rxMetadata.UplinkToken)
-	if err != nil {
-		return err
-	}
 
 	var rxTime float64
 	if rxMetadata.Time != nil {
@@ -421,7 +390,7 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 		DataRate:  dr,
 		Frequency: up.Settings.GetFrequency(),
 		UpInfo: UpInfo{
-			RCtx:   int64(antennaIDs.AntennaIndex),
+			RCtx:   int64(rxMetadata.AntennaIndex),
 			XTime:  int64(rxMetadata.Timestamp),
 			RSSI:   rxMetadata.RSSI,
 			SNR:    rxMetadata.SNR,

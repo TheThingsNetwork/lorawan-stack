@@ -202,7 +202,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 		buf, err := UplinkToken(ttnpb.GatewayAntennaIdentifiers{
 			GatewayIdentifiers: c.gateway.GatewayIdentifiers,
 			AntennaIndex:       md.AntennaIndex,
-		}, md.Timestamp)
+		}, md.Timestamp, up.ReceivedAt)
 		if err != nil {
 			return err
 		}
@@ -291,21 +291,27 @@ var (
 	errTxSchedule       = errors.DefineAborted("tx_schedule", "failed to schedule")
 )
 
-func getDownlinkPath(path *ttnpb.DownlinkPath, class ttnpb.Class) (ids ttnpb.GatewayAntennaIdentifiers, uplinkTimestamp uint32, err error) {
-	buf := path.GetUplinkToken()
-	if buf == nil && class == ttnpb.CLASS_A {
-		err = errNoUplinkToken
-		return
-	}
-	if buf != nil {
-		return ParseUplinkToken(buf)
+// getDownlinkPath returns the downlink path.
+// If the path contains an uplink token, the gateway antenna identifiers are taken from the uplink token, and the uplink token is returned.
+// If the path is fixed, the gateway antenna identifiers are taken from the fixed path.
+// Class A downlink requires the path to provide an uplink token, while class B and C downlink may use a fixed downlink path.
+func getDownlinkPath(path *ttnpb.DownlinkPath, class ttnpb.Class) (ttnpb.GatewayAntennaIdentifiers, *ttnpb.UplinkToken, error) {
+	if buf := path.GetUplinkToken(); len(buf) == 0 {
+		if class == ttnpb.CLASS_A {
+			return ttnpb.GatewayAntennaIdentifiers{}, nil, errNoUplinkToken.New()
+		}
+	} else {
+		token, err := ParseUplinkToken(buf)
+		if err != nil {
+			return ttnpb.GatewayAntennaIdentifiers{}, nil, err
+		}
+		return token.GatewayAntennaIdentifiers, token, err
 	}
 	fixed := path.GetFixed()
 	if fixed == nil {
-		err = errDownlinkPath
-		return
+		return ttnpb.GatewayAntennaIdentifiers{}, nil, errDownlinkPath.New()
 	}
-	return *fixed, 0, nil
+	return *fixed, nil, nil
 }
 
 // SendDown sends the downlink message directly on the downlink channel.
@@ -343,7 +349,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 
 	logger := log.FromContext(c.ctx).WithField("class", request.Class)
 	logger.Debug("Attempt to schedule downlink on gateway")
-	ids, uplinkTimestamp, err := getDownlinkPath(path, request.Class)
+	ids, uplinkToken, err := getDownlinkPath(path, request.Class)
 	if err != nil {
 		return 0, err
 	}
@@ -442,14 +448,14 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			settings.CodingRate = phy.LoRaCodingRate
 			settings.Downlink.InvertPolarization = true
 		}
-		var f func(context.Context, int, ttnpb.TxSettings, scheduling.RTTs, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
+		var f func(context.Context, scheduling.Options) (scheduling.Emission, error)
 		switch request.Class {
 		case ttnpb.CLASS_A:
 			f = c.scheduler.ScheduleAt
 			if request.Rx1Delay == ttnpb.RX_DELAY_0 {
 				return 0, errNoRxDelay.New()
 			}
-			settings.Timestamp = uplinkTimestamp + uint32((time.Duration(request.Rx1Delay)*time.Second+rx.delay)/time.Microsecond)
+			settings.Timestamp = uplinkToken.Timestamp + uint32((time.Duration(request.Rx1Delay)*time.Second+rx.delay)/time.Microsecond)
 		case ttnpb.CLASS_B:
 			if request.AbsoluteTime == nil {
 				return 0, errNoAbsoluteTime.New()
@@ -470,7 +476,13 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		default:
 			panic(fmt.Sprintf("proto: unexpected class %v in oneof", request.Class))
 		}
-		em, err := f(c.ctx, len(msg.RawPayload), settings, c.rtts, request.Priority)
+		em, err := f(c.ctx, scheduling.Options{
+			PayloadSize: len(msg.RawPayload),
+			TxSettings:  settings,
+			RTTs:        c.rtts,
+			Priority:    request.Priority,
+			UplinkToken: uplinkToken, // uplinkToken is always present with class A downlink, but may be nil otherwise.
+		})
 		if err != nil {
 			logger.WithError(err).Debug("Failed to schedule downlink in Rx window")
 			rxErrs = append(rxErrs, errRxWindowSchedule.WithCause(err).WithAttributes("window", i+1))

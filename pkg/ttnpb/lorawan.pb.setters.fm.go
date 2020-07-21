@@ -1035,6 +1035,16 @@ func (dst *UplinkToken) SetFields(src *UplinkToken, paths ...string) error {
 				var zero uint32
 				dst.Timestamp = zero
 			}
+		case "server_time":
+			if len(subs) > 0 {
+				return fmt.Errorf("'server_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ServerTime = src.ServerTime
+			} else {
+				var zero time.Time
+				dst.ServerTime = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
