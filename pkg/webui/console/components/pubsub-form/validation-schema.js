@@ -33,7 +33,7 @@ export default Yup.object().shape({
     .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
   format: Yup.string().required(sharedMessages.validateRequired),
-  base_topic: Yup.string().required(sharedMessages.validateRequired),
+  base_topic: Yup.string(),
   nats: Yup.object().when('_provider', {
     is: providers.NATS,
     then: Yup.object().shape({

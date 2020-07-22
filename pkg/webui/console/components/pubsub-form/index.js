@@ -302,7 +302,6 @@ export default class PubsubForm extends Component {
           title={sharedMessages.pubsubBaseTopic}
           placeholder="base-topic"
           component={Input}
-          required
         />
         <Notification content={m.messageInfo} info small />
         <Form.Field
