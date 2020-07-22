@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Gateway connection stats are now stored in a single key.
 - The example configuration for deployments with custom certificates now also uses a CA certificate.
 - Increase Network Server application uplink buffer queue size.
+- `ttn-lw-cli use` command no longer adds default HTTP ports (80/443) to the OAuth Server address.
 
 ### Deprecated
 

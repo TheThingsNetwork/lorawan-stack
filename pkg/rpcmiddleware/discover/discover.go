@@ -108,9 +108,12 @@ var HTTPScheme = map[bool]string{
 
 // DefaultURL appends protocol and port if target does not already have one.
 func DefaultURL(target string, port int, tls bool) (string, error) {
-	target, err := DefaultPort(target, port)
-	if err != nil {
-		return "", nil
+	if port != DefaultHTTPPorts[tls] {
+		var err error
+		target, err = DefaultPort(target, port)
+		if err != nil {
+			return "", nil
+		}
 	}
 	return fmt.Sprintf("%s://%s", HTTPScheme[tls], target), nil
 }
