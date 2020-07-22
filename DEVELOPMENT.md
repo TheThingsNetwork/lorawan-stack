@@ -333,7 +333,7 @@ We use [`revive`](http://github.com/mgechev/revive) to lint Go code and [`eslint
 
 Please respect the following guidelines for content in our documentation site. A copy and paste template for creating new documentation can be found [here](doc/content/example-template).
 
-- Use the `{{< new-in-version "3.8.5" >}}` shortcode to tag documentation for features added in a particular version. For documentation that targets `master`, that's the next patch bump, e.g `3.8.x`. For documentation targeting `develop` that's the next minor bump, e.g `3.x.0`.
+- Use the `{{< new-in-version "3.8.5" >}}` shortcode to tag documentation for features added in a particular version. For documentation that targets `v3.n`, that's the next patch bump, e.g `3.8.x`. For documentation targeting `v3.n+1` that's the next minor bump, e.g `3.9.0`.
 - The title of a doc page is already rendered by the build system as a h1, don't add an extra one.
 - Use title case for headings.
 - A documentation page starts with an introduction, and then the first heading. The first paragraph of the introduction is typically a summary of the page. Use a `<!--more-->` to indicate where the summary ends.
@@ -759,7 +759,7 @@ This will compile binaries for all supported platforms, `deb`, `rpm` and Snapcra
 > Note: The operating system and architecture represent the name of the directory in `dist` in which the binaries are placed.
 > For example, the binaries for Darwin x64 (macOS) will be located at `dist/darwin_amd64`.
 
-A new version can be released from the `master` branch or a `backport` branch. The necessary steps for each are detailed below.
+A new version is released from the `v3.n` branch. The necessary steps for each are detailed below.
 
 > Note: To get the target version, you can run `version=$(tools/bin/mage version:bumpXXX version:current)`, where xxx is the type of new release (minor/patch/RC). Check the section [Version Bump](#version-bump) for more information.
 

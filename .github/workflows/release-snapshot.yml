@@ -3,8 +3,7 @@ name: Snapshot release
 on:
   push:
     branches:
-      - master
-      - develop
+      - 'v3.*'
     tags:
       - 'v3.[0-9]+.[0-9]+*'
       - '!v3.[0-9]+.[0-9]+'
