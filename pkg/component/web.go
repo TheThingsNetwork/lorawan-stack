@@ -15,6 +15,8 @@
 package component
 
 import (
+	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"net/http/pprof"
@@ -127,6 +129,7 @@ func (c *Component) serveWeb(lis net.Listener) error {
 		Handler:           c,
 		ReadTimeout:       120 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
+		ErrorLog:          log.New(ioutil.Discard, "", 0),
 	}
 	go func() {
 		<-c.Context().Done()

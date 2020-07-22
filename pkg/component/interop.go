@@ -17,6 +17,8 @@ package component
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"io/ioutil"
+	stdlog "log"
 	"net"
 	"net/http"
 	"time"
@@ -34,6 +36,7 @@ func (c *Component) serveInterop(lis net.Listener) error {
 		Handler:           c.interop,
 		ReadTimeout:       120 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
+		ErrorLog:          stdlog.New(ioutil.Discard, "", 0),
 	}
 	go func() {
 		<-c.Context().Done()
