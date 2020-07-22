@@ -54,8 +54,8 @@ var (
 		"listener",
 		"failed to serve Basic Station frontend listener",
 	)
-	errGatewayID       = errors.DefineInvalidArgument("invalid_gateway_id", "invalid gateway id `{id}`")
-	errAuthNotProvided = errors.DefineNotFound("auth_not_provided", "no auth provided for gateway id `{id}`")
+	errGatewayID      = errors.DefineInvalidArgument("invalid_gateway_id", "invalid gateway id `{id}`")
+	errNoAuthProvided = errors.DefineUnauthenticated("no_auth_provided", "no auth provided for gateway id `{id}`")
 )
 
 type srv struct {
@@ -228,7 +228,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	}
 
 	if auth == "" {
-		// If the server allows unauthenticated connections (for local testing), we provide the link rights ourselves as in the udp frontend.
+		// If the server allows unauthenticated connections (for local testing), we provide the link rights ourselves.
 		if s.cfg.AllowUnauthenticated {
 			ctx = rights.NewContext(ctx, rights.Rights{
 				GatewayRights: map[string]*ttnpb.Rights{
@@ -239,7 +239,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			})
 		} else {
 			// We error here directly as there is no need make an RPC call to the IS to get a failed rights check due to no Auth.
-			return errAuthNotProvided
+			return errNoAuthProvided
 		}
 	}
 

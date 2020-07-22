@@ -27,5 +27,5 @@ type Config struct {
 var DefaultConfig = Config{
 	UseTrafficTLSAddress: false,
 	WSPingInterval:       30 * time.Second,
-	AllowUnauthenticated: true,
+	AllowUnauthenticated: false,
 }
