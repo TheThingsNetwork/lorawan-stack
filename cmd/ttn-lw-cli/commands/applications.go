@@ -185,10 +185,10 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		}),
 	}
-	applicationsUpdateCommand = &cobra.Command{
-		Use:     "update [application-id]",
-		Aliases: []string{"set"},
-		Short:   "Update an application",
+	applicationsSetCommand = &cobra.Command{
+		Use:     "set [application-id]",
+		Aliases: []string{"update"},
+		Short:   "Set properties of an application",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
@@ -223,8 +223,9 @@ var (
 		},
 	}
 	applicationsDeleteCommand = &cobra.Command{
-		Use:   "delete [application-id]",
-		Short: "Delete an application",
+		Use:     "delete [application-id]",
+		Aliases: []string{"del", "remove", "rm"},
+		Short:   "Delete an application",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
@@ -272,10 +273,10 @@ func init() {
 	applicationsCreateCommand.Flags().AddFlagSet(setApplicationFlags)
 	applicationsCreateCommand.Flags().AddFlagSet(attributesFlags())
 	applicationsCommand.AddCommand(applicationsCreateCommand)
-	applicationsUpdateCommand.Flags().AddFlagSet(applicationIDFlags())
-	applicationsUpdateCommand.Flags().AddFlagSet(setApplicationFlags)
-	applicationsUpdateCommand.Flags().AddFlagSet(attributesFlags())
-	applicationsCommand.AddCommand(applicationsUpdateCommand)
+	applicationsSetCommand.Flags().AddFlagSet(applicationIDFlags())
+	applicationsSetCommand.Flags().AddFlagSet(setApplicationFlags)
+	applicationsSetCommand.Flags().AddFlagSet(attributesFlags())
+	applicationsCommand.AddCommand(applicationsSetCommand)
 	applicationsDeleteCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsCommand.AddCommand(applicationsDeleteCommand)
 	applicationsContactInfoCommand.PersistentFlags().AddFlagSet(applicationIDFlags())

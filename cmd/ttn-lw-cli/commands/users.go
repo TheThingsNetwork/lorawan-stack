@@ -210,10 +210,10 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		}),
 	}
-	usersUpdateCommand = &cobra.Command{
-		Use:     "update [user-id]",
-		Aliases: []string{"set"},
-		Short:   "Update a user",
+	usersSetCommand = &cobra.Command{
+		Use:     "set [user-id]",
+		Aliases: []string{"update"},
+		Short:   "Set properties of a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
@@ -328,8 +328,9 @@ var (
 		},
 	}
 	usersDeleteCommand = &cobra.Command{
-		Use:   "delete [user-id]",
-		Short: "Delete a user",
+		Use:     "delete [user-id]",
+		Aliases: []string{"del", "remove", "rm"},
+		Short:   "Delete a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
@@ -380,11 +381,11 @@ func init() {
 	usersCreateCommand.Flags().Lookup("state").DefValue = ttnpb.STATE_APPROVED.String()
 	usersCreateCommand.Flags().String("invitation-token", "", "")
 	usersCommand.AddCommand(usersCreateCommand)
-	usersUpdateCommand.Flags().AddFlagSet(userIDFlags())
-	usersUpdateCommand.Flags().AddFlagSet(setUserFlags)
-	usersUpdateCommand.Flags().AddFlagSet(attributesFlags())
-	usersUpdateCommand.Flags().AddFlagSet(profilePictureFlags)
-	usersCommand.AddCommand(usersUpdateCommand)
+	usersSetCommand.Flags().AddFlagSet(userIDFlags())
+	usersSetCommand.Flags().AddFlagSet(setUserFlags)
+	usersSetCommand.Flags().AddFlagSet(attributesFlags())
+	usersSetCommand.Flags().AddFlagSet(profilePictureFlags)
+	usersCommand.AddCommand(usersSetCommand)
 	usersForgotPasswordCommand.Flags().AddFlagSet(userIDFlags())
 	usersForgotPasswordCommand.Flags().String("email", "", "")
 	usersCommand.AddCommand(usersForgotPasswordCommand)

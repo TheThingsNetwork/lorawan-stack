@@ -40,6 +40,7 @@ var (
 	errFailWrite  = errors.DefinePermissionDenied("fail_write", "failed to write `{file}`")
 	useCommand    = &cobra.Command{
 		Use:               "use [host]",
+		Aliases:           []string{"generate-configuration", "generate-cfg"},
 		Short:             "Use",
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {

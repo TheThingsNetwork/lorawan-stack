@@ -179,6 +179,7 @@ var (
 	}
 	endDevicesListFrequencyPlans = &cobra.Command{
 		Use:               "list-frequency-plans",
+		Aliases:           []string{"get-frequency-plans", "frequency-plans", "fps"},
 		Short:             "List available frequency plans for end devices",
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -553,10 +554,10 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, &device)
 		}),
 	}
-	endDevicesUpdateCommand = &cobra.Command{
-		Use:     "update [application-id] [device-id]",
-		Aliases: []string{"set"},
-		Short:   "Update an end device",
+	endDevicesSetCommand = &cobra.Command{
+		Use:     "set [application-id] [device-id]",
+		Aliases: []string{"update"},
+		Short:   "Set properties of an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			forwardDeprecatedDeviceFlags(cmd.Flags())
 
@@ -769,8 +770,9 @@ var (
 		},
 	}
 	endDevicesDeleteCommand = &cobra.Command{
-		Use:   "delete [application-id] [device-id]",
-		Short: "Delete an end device",
+		Use:     "delete [application-id] [device-id]",
+		Aliases: []string{"del", "remove", "rm"},
+		Short:   "Delete an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			devID, err := getEndDeviceID(cmd.Flags(), args, true)
 			if err != nil {
@@ -923,7 +925,7 @@ values will be stored in the Join Server.`,
 	}
 	endDevicesListQRCodeFormatsCommand = &cobra.Command{
 		Use:     "list-qr-formats",
-		Aliases: []string{"ls-qr-formats", "listqrformats", "lsqrformats", "lsqrfmts", "lsqrfmt"},
+		Aliases: []string{"ls-qr-formats", "listqrformats", "lsqrformats", "lsqrfmts", "lsqrfmt", "qr-formats"},
 		Short:   "List QR code formats (EXPERIMENTAL)",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			qrg, err := api.Dial(ctx, config.QRCodeGeneratorGRPCAddress)
@@ -1179,15 +1181,15 @@ func init() {
 	endDevicesCreateCommand.Flags().AddFlagSet(endDevicePictureFlags)
 	endDevicesCreateCommand.Flags().AddFlagSet(endDeviceLocationFlags)
 	endDevicesCommand.AddCommand(endDevicesCreateCommand)
-	endDevicesUpdateCommand.Flags().AddFlagSet(endDeviceIDFlags())
-	endDevicesUpdateCommand.Flags().AddFlagSet(setEndDeviceFlags)
-	endDevicesUpdateCommand.Flags().AddFlagSet(attributesFlags())
-	endDevicesUpdateCommand.Flags().AddFlagSet(payloadFormatterParameterFlags("formatters"))
-	endDevicesUpdateCommand.Flags().Bool("touch", false, "set in all registries even if no fields are specified")
-	endDevicesUpdateCommand.Flags().AddFlagSet(endDevicePictureFlags)
-	endDevicesUpdateCommand.Flags().AddFlagSet(endDeviceLocationFlags)
-	endDevicesUpdateCommand.Flags().AddFlagSet(util.UnsetFlagSet())
-	endDevicesCommand.AddCommand(endDevicesUpdateCommand)
+	endDevicesSetCommand.Flags().AddFlagSet(endDeviceIDFlags())
+	endDevicesSetCommand.Flags().AddFlagSet(setEndDeviceFlags)
+	endDevicesSetCommand.Flags().AddFlagSet(attributesFlags())
+	endDevicesSetCommand.Flags().AddFlagSet(payloadFormatterParameterFlags("formatters"))
+	endDevicesSetCommand.Flags().Bool("touch", false, "set in all registries even if no fields are specified")
+	endDevicesSetCommand.Flags().AddFlagSet(endDevicePictureFlags)
+	endDevicesSetCommand.Flags().AddFlagSet(endDeviceLocationFlags)
+	endDevicesSetCommand.Flags().AddFlagSet(util.UnsetFlagSet())
+	endDevicesCommand.AddCommand(endDevicesSetCommand)
 	endDevicesProvisionCommand.Flags().AddFlagSet(applicationIDFlags())
 	endDevicesProvisionCommand.Flags().AddFlagSet(dataFlags("", ""))
 	endDevicesProvisionCommand.Flags().String("provisioner-id", "", "provisioner service")

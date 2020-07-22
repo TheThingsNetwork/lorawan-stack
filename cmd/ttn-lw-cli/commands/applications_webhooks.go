@@ -85,7 +85,7 @@ var (
 	}
 	applicationsWebhooksGetFormatsCommand = &cobra.Command{
 		Use:     "get-formats",
-		Aliases: []string{"formats"},
+		Aliases: []string{"formats", "list-formats"},
 		Short:   "Get the available formats for application webhooks",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
@@ -201,8 +201,9 @@ var (
 		},
 	}
 	applicationsWebhooksDeleteCommand = &cobra.Command{
-		Use:   "delete [application-id] [webhook-id]",
-		Short: "Delete an application webhook",
+		Use:     "delete [application-id] [webhook-id]",
+		Aliases: []string{"del", "remove", "rm"},
+		Short:   "Delete an application webhook",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			webhookID, err := getApplicationWebhookID(cmd.Flags(), args)
 			if err != nil {

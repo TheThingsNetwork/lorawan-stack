@@ -287,7 +287,7 @@ var (
 	}
 	applicationsPackageAssociationDeleteCommand = &cobra.Command{
 		Use:     "delete [application-id] [device-id] [f-port]",
-		Aliases: []string{"delete"},
+		Aliases: []string{"del", "remove", "rm"},
 		Short:   "Delete an application package association",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			assocID, err := getApplicationPackageAssociationID(cmd.Flags(), args)
@@ -430,7 +430,7 @@ var (
 	}
 	applicationsPackageDefaultAssociationDeleteCommand = &cobra.Command{
 		Use:     "delete [application-id] [f-port]",
-		Aliases: []string{"delete"},
+		Aliases: []string{"del", "remove", "rm"},
 		Short:   "Delete an application package default association",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			assocID, err := getApplicationPackageDefaultAssociationID(cmd.Flags(), args)

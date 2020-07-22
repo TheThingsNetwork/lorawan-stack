@@ -185,10 +185,10 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		}),
 	}
-	organizationsUpdateCommand = &cobra.Command{
-		Use:     "update [organization-id]",
+	organizationsSetCommand = &cobra.Command{
+		Use:     "set [organization-id]",
 		Aliases: []string{"set"},
-		Short:   "Update an organization",
+		Short:   "Set properties of an organization",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
 			if orgID == nil {
@@ -223,8 +223,9 @@ var (
 		},
 	}
 	organizationsDeleteCommand = &cobra.Command{
-		Use:   "delete [organization-id]",
-		Short: "Delete an organization",
+		Use:     "delete [organization-id]",
+		Aliases: []string{"del", "remove", "rm"},
+		Short:   "Delete an organization",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
 			if orgID == nil {
@@ -272,10 +273,10 @@ func init() {
 	organizationsCreateCommand.Flags().AddFlagSet(setOrganizationFlags)
 	organizationsCreateCommand.Flags().AddFlagSet(attributesFlags())
 	organizationsCommand.AddCommand(organizationsCreateCommand)
-	organizationsUpdateCommand.Flags().AddFlagSet(organizationIDFlags())
-	organizationsUpdateCommand.Flags().AddFlagSet(setOrganizationFlags)
-	organizationsUpdateCommand.Flags().AddFlagSet(attributesFlags())
-	organizationsCommand.AddCommand(organizationsUpdateCommand)
+	organizationsSetCommand.Flags().AddFlagSet(organizationIDFlags())
+	organizationsSetCommand.Flags().AddFlagSet(setOrganizationFlags)
+	organizationsSetCommand.Flags().AddFlagSet(attributesFlags())
+	organizationsCommand.AddCommand(organizationsSetCommand)
 	organizationsDeleteCommand.Flags().AddFlagSet(organizationIDFlags())
 	organizationsCommand.AddCommand(organizationsDeleteCommand)
 	organizationsContactInfoCommand.PersistentFlags().AddFlagSet(organizationIDFlags())

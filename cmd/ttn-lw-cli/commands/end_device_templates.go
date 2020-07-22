@@ -101,8 +101,9 @@ var (
 		}),
 	}
 	endDeviceTemplatesCreateCommand = &cobra.Command{
-		Use:   "create [flags]",
-		Short: "Create an end device template from an existing device (EXPERIMENTAL)",
+		Use:     "create [flags]",
+		Aliases: []string{"add", "register"},
+		Short:   "Create an end device template from an existing device (EXPERIMENTAL)",
 		Long: `Create an end device template from an existing device (EXPERIMENTAL)
 
 By default, this command strips the device's application ID, device ID, JoinEUI,

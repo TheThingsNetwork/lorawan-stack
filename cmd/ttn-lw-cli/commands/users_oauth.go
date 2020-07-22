@@ -89,8 +89,9 @@ var (
 		},
 	}
 	oauthAuthorizationsDeleteCommand = &cobra.Command{
-		Use:   "delete [user-id] [client-id]",
-		Short: "Delete an OAuth authorization and all access tokens",
+		Use:     "delete [user-id] [client-id]",
+		Aliases: []string{"del", "remove", "rm"},
+		Short:   "Delete an OAuth authorization and all access tokens",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID, cliID := getUserAndClientID(cmd.Flags(), args)
 			if usrID == nil {
@@ -167,8 +168,9 @@ var (
 		},
 	}
 	oauthAccessTokensDeleteCommand = &cobra.Command{
-		Use:   "delete [user-id] [client-id]",
-		Short: "Delete an OAuth access token",
+		Use:     "delete [user-id] [client-id]",
+		Aliases: []string{"del", "remove", "rm"},
+		Short:   "Delete an OAuth access token",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID, cliID := getUserAndClientID(cmd.Flags(), args)
 			if usrID == nil {

@@ -78,8 +78,9 @@ var (
 		},
 	}
 	organizationCollaboratorsSet = &cobra.Command{
-		Use:   "set",
-		Short: "Set an organization collaborator",
+		Use:     "set",
+		Aliases: []string{"update"},
+		Short:   "Set an organization collaborator",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), nil)
 			if orgID == nil {
@@ -114,7 +115,7 @@ var (
 	}
 	organizationCollaboratorsDelete = &cobra.Command{
 		Use:     "delete",
-		Aliases: []string{"remove"},
+		Aliases: []string{"del", "remove", "rm"},
 		Short:   "Delete an organization collaborator",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), nil)
