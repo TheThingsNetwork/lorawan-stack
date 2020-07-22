@@ -66,21 +66,14 @@ type srv struct {
 	tokens               io.DownlinkTokens
 	useTrafficTLSAddress bool
 	wsPingInterval       time.Duration
-	opts                 Options
-}
-
-// Options are Basic Station server options
-type Options struct {
-	UseTrafficTLSAddress bool
-	AllowUnauthenticated bool
-	WSPingInterval       time.Duration
+	cfg                  Config
 }
 
 func (*srv) Protocol() string            { return "basicstation" }
 func (*srv) SupportsDownlinkClaim() bool { return false }
 
 // New creates the Basic Station front end.
-func New(ctx context.Context, server io.Server, opts Options) *echo.Echo {
+func New(ctx context.Context, server io.Server, cfg Config) *echo.Echo {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
 
 	webServer := echo.New()
@@ -98,7 +91,7 @@ func New(ctx context.Context, server io.Server, opts Options) *echo.Echo {
 		server:    server,
 		upgrader:  &websocket.Upgrader{},
 		webServer: webServer,
-		opts:      opts,
+		cfg:       cfg,
 	}
 
 	webServer.GET("/router-info", s.handleDiscover)
@@ -154,7 +147,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	ctx = filledCtx
 
 	scheme := "ws"
-	if c.IsTLS() || s.opts.UseTrafficTLSAddress {
+	if c.IsTLS() || s.cfg.UseTrafficTLSAddress {
 		scheme = "wss"
 	}
 
@@ -236,7 +229,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 
 	if auth == "" {
 		// If the server allows unauthenticated connections (for local testing), we provide the link rights ourselves as in the udp frontend.
-		if s.opts.AllowUnauthenticated {
+		if s.cfg.AllowUnauthenticated {
 			ctx = rights.NewContext(ctx, rights.Rights{
 				GatewayRights: map[string]*ttnpb.Rights{
 					uid: {
@@ -273,7 +266,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	fps := conn.FrequencyPlans()
 	bandID := conn.BandID()
 
-	pingTicker := time.NewTicker(s.opts.WSPingInterval)
+	pingTicker := time.NewTicker(s.cfg.WSPingInterval)
 	defer pingTicker.Stop()
 
 	ws.SetPingHandler(func(data string) error {
