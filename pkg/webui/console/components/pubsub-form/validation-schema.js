@@ -28,7 +28,7 @@ import providers from './providers'
 
 export default Yup.object().shape({
   pub_sub_id: Yup.string()
-    .matches(idRegexp, sharedMessages.validateIdFormat)
+    .matches(idRegexp, Yup.passValues(sharedMessages.validateIdFormat))
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
@@ -41,7 +41,7 @@ export default Yup.object().shape({
       username: Yup.string().when('_use_credentials', {
         is: true,
         then: Yup.string()
-          .matches(idRegexp, sharedMessages.validateIdFormat)
+          .matches(idRegexp, Yup.passValues(sharedMessages.validateIdFormat))
           .min(2, Yup.passValues(sharedMessages.validateTooShort))
           .max(100, Yup.passValues(sharedMessages.validateTooLong))
           .required(sharedMessages.validateRequired),
@@ -56,7 +56,7 @@ export default Yup.object().shape({
         otherwise: Yup.string().strip(),
       }),
       address: Yup.string()
-        .matches(addressRegexp, sharedMessages.validateAddressFormat)
+        .matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
         .required(sharedMessages.validateRequired),
       port: Yup.number()
         .integer(sharedMessages.validateInt32)
@@ -71,17 +71,17 @@ export default Yup.object().shape({
     then: Yup.object().shape({
       _use_credentials: Yup.boolean(),
       server_url: Yup.string()
-        .matches(mqttUrlRegexp, sharedMessages.validateUrl)
+        .matches(mqttUrlRegexp, Yup.passValues(sharedMessages.validateUrl))
         .required(sharedMessages.validateRequired),
       client_id: Yup.string()
-        .matches(noSpacesRegexp, sharedMessages.validateNoSpaces)
+        .matches(noSpacesRegexp, Yup.passValues(sharedMessages.validateNoSpaces))
         .min(2, Yup.passValues(sharedMessages.validateTooShort))
         .max(23, Yup.passValues(sharedMessages.validateTooLong))
         .required(sharedMessages.validateRequired),
       username: Yup.string().when('_use_credentials', {
         is: true,
         then: Yup.string()
-          .matches(noSpacesRegexp, sharedMessages.validateNoSpaces)
+          .matches(noSpacesRegexp, Yup.passValues(sharedMessages.validateNoSpaces))
           .min(2, Yup.passValues(sharedMessages.validateTooShort))
           .max(100, Yup.passValues(sharedMessages.validateTooLong))
           .required(sharedMessages.validateRequired),
@@ -89,7 +89,10 @@ export default Yup.object().shape({
       }),
       password: Yup.string().when('_use_credentials', {
         is: true,
-        then: Yup.string().matches(mqttPasswordRegexp, sharedMessages.validateMqttPassword),
+        then: Yup.string().matches(
+          mqttPasswordRegexp,
+          Yup.passValues(sharedMessages.validateMqttPassword),
+        ),
         otherwise: Yup.string().strip(),
       }),
       subscribe_qos: Yup.string()
