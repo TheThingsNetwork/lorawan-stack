@@ -11,7 +11,7 @@ You can convert data in various formats to device templates using formats suppor
 Start with listing the supported formats:
 
 ```bash
-$ ttn-lw-cli end-device template list-formats
+$ ttn-lw-cli end-devices template list-formats
 ```
 
 This gives the supported formats. For example:
@@ -34,7 +34,7 @@ Given input data, you can use the `end-device template from-data` command to get
 >This example uses a **Microchip ATECC608A-MAHTN-T Manifest File**. This file contains provisioning data for The Things Industries Join Server. You can [download the example file](../microchip-atecc608a-mahtn-t-example.json).
 
 ```bash
-$ ttn-lw-cli end-device template from-data microchip-atecc608a-mahtn-t --local-file example.json
+$ ttn-lw-cli end-devices template from-data microchip-atecc608a-mahtn-t --local-file example.json
 ```
 
 Output:

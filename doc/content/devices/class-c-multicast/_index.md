@@ -16,7 +16,7 @@ In order to send Class C downlink messages to a single device, enable Class C su
 For example, when enabling Class C for an existing device:
 
 ```bash
-$ ttn-lw-cli end-devices update app1 dev1 --supports-class-c
+$ ttn-lw-cli end-devices set app1 dev1 --supports-class-c
 ```
 
 This will enable the Class C downlink scheduling of the device. That's it! Downlink messages are now scheduled as soon as possible.

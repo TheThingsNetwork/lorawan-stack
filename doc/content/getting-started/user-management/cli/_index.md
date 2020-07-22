@@ -133,7 +133,7 @@ $ ttn-lw-cli users invitations delete colleague@thethings.network
 To update users with the CLI, use the `users update` command. The following command updates the state of user `new-user` to "approved" and makes them admin of the network:
 
 ```bash
-$ ttn-lw-cli users update new-user --state APPROVED --admin true
+$ ttn-lw-cli users set new-user --state APPROVED --admin true
 ```
 
 Output:
