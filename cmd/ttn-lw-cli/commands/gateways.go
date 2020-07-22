@@ -268,8 +268,8 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		}),
 	}
-	errAntennaIndex       = errors.DefineInvalidArgument("antenna_index", "index of antenna to update out of bounds")
-	gatewaysUpdateCommand = &cobra.Command{
+	errAntennaIndex    = errors.DefineInvalidArgument("antenna_index", "index of antenna to update out of bounds")
+	gatewaysSetCommand = &cobra.Command{
 		Use:     "set [gateway-id]",
 		Aliases: []string{"update"},
 		Short:   "Set properties of a gateway",
@@ -435,14 +435,14 @@ func init() {
 	gatewaysCreateCommand.Flags().AddFlagSet(attributesFlags())
 	gatewaysCreateCommand.Flags().Bool("defaults", true, "configure gateway with defaults")
 	gatewaysCommand.AddCommand(gatewaysCreateCommand)
-	gatewaysUpdateCommand.Flags().AddFlagSet(gatewayIDFlags())
-	gatewaysUpdateCommand.Flags().AddFlagSet(setGatewayFlags)
-	gatewaysUpdateCommand.Flags().Int("antenna.index", 0, "index of the antenna to update or remove")
-	gatewaysUpdateCommand.Flags().Bool("antenna.add", false, "add an extra antenna")
-	gatewaysUpdateCommand.Flags().Bool("antenna.remove", false, "remove an antenna")
-	gatewaysUpdateCommand.Flags().AddFlagSet(setGatewayAntennaFlags)
-	gatewaysUpdateCommand.Flags().AddFlagSet(attributesFlags())
-	gatewaysCommand.AddCommand(gatewaysUpdateCommand)
+	gatewaysSetCommand.Flags().AddFlagSet(gatewayIDFlags())
+	gatewaysSetCommand.Flags().AddFlagSet(setGatewayFlags)
+	gatewaysSetCommand.Flags().Int("antenna.index", 0, "index of the antenna to update or remove")
+	gatewaysSetCommand.Flags().Bool("antenna.add", false, "add an extra antenna")
+	gatewaysSetCommand.Flags().Bool("antenna.remove", false, "remove an antenna")
+	gatewaysSetCommand.Flags().AddFlagSet(setGatewayAntennaFlags)
+	gatewaysSetCommand.Flags().AddFlagSet(attributesFlags())
+	gatewaysCommand.AddCommand(gatewaysSetCommand)
 	gatewaysDeleteCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysDeleteCommand)
 	gatewaysConnectionStats.Flags().AddFlagSet(gatewayIDFlags())

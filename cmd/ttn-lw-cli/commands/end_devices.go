@@ -554,7 +554,7 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, &device)
 		}),
 	}
-	endDevicesUpdateCommand = &cobra.Command{
+	endDevicesSetCommand = &cobra.Command{
 		Use:     "set [application-id] [device-id]",
 		Aliases: []string{"update"},
 		Short:   "Set properties of an end device",
@@ -1181,15 +1181,15 @@ func init() {
 	endDevicesCreateCommand.Flags().AddFlagSet(endDevicePictureFlags)
 	endDevicesCreateCommand.Flags().AddFlagSet(endDeviceLocationFlags)
 	endDevicesCommand.AddCommand(endDevicesCreateCommand)
-	endDevicesUpdateCommand.Flags().AddFlagSet(endDeviceIDFlags())
-	endDevicesUpdateCommand.Flags().AddFlagSet(setEndDeviceFlags)
-	endDevicesUpdateCommand.Flags().AddFlagSet(attributesFlags())
-	endDevicesUpdateCommand.Flags().AddFlagSet(payloadFormatterParameterFlags("formatters"))
-	endDevicesUpdateCommand.Flags().Bool("touch", false, "set in all registries even if no fields are specified")
-	endDevicesUpdateCommand.Flags().AddFlagSet(endDevicePictureFlags)
-	endDevicesUpdateCommand.Flags().AddFlagSet(endDeviceLocationFlags)
-	endDevicesUpdateCommand.Flags().AddFlagSet(util.UnsetFlagSet())
-	endDevicesCommand.AddCommand(endDevicesUpdateCommand)
+	endDevicesSetCommand.Flags().AddFlagSet(endDeviceIDFlags())
+	endDevicesSetCommand.Flags().AddFlagSet(setEndDeviceFlags)
+	endDevicesSetCommand.Flags().AddFlagSet(attributesFlags())
+	endDevicesSetCommand.Flags().AddFlagSet(payloadFormatterParameterFlags("formatters"))
+	endDevicesSetCommand.Flags().Bool("touch", false, "set in all registries even if no fields are specified")
+	endDevicesSetCommand.Flags().AddFlagSet(endDevicePictureFlags)
+	endDevicesSetCommand.Flags().AddFlagSet(endDeviceLocationFlags)
+	endDevicesSetCommand.Flags().AddFlagSet(util.UnsetFlagSet())
+	endDevicesCommand.AddCommand(endDevicesSetCommand)
 	endDevicesProvisionCommand.Flags().AddFlagSet(applicationIDFlags())
 	endDevicesProvisionCommand.Flags().AddFlagSet(dataFlags("", ""))
 	endDevicesProvisionCommand.Flags().String("provisioner-id", "", "provisioner service")

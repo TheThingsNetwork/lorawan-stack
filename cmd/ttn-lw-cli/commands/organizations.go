@@ -185,7 +185,7 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		}),
 	}
-	organizationsUpdateCommand = &cobra.Command{
+	organizationsSetCommand = &cobra.Command{
 		Use:     "set [organization-id]",
 		Aliases: []string{"set"},
 		Short:   "Set properties of an organization",
@@ -273,10 +273,10 @@ func init() {
 	organizationsCreateCommand.Flags().AddFlagSet(setOrganizationFlags)
 	organizationsCreateCommand.Flags().AddFlagSet(attributesFlags())
 	organizationsCommand.AddCommand(organizationsCreateCommand)
-	organizationsUpdateCommand.Flags().AddFlagSet(organizationIDFlags())
-	organizationsUpdateCommand.Flags().AddFlagSet(setOrganizationFlags)
-	organizationsUpdateCommand.Flags().AddFlagSet(attributesFlags())
-	organizationsCommand.AddCommand(organizationsUpdateCommand)
+	organizationsSetCommand.Flags().AddFlagSet(organizationIDFlags())
+	organizationsSetCommand.Flags().AddFlagSet(setOrganizationFlags)
+	organizationsSetCommand.Flags().AddFlagSet(attributesFlags())
+	organizationsCommand.AddCommand(organizationsSetCommand)
 	organizationsDeleteCommand.Flags().AddFlagSet(organizationIDFlags())
 	organizationsCommand.AddCommand(organizationsDeleteCommand)
 	organizationsContactInfoCommand.PersistentFlags().AddFlagSet(organizationIDFlags())

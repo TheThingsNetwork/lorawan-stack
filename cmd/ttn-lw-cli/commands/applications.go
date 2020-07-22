@@ -185,7 +185,7 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		}),
 	}
-	applicationsUpdateCommand = &cobra.Command{
+	applicationsSetCommand = &cobra.Command{
 		Use:     "set [application-id]",
 		Aliases: []string{"update"},
 		Short:   "Set properties of an application",
@@ -273,10 +273,10 @@ func init() {
 	applicationsCreateCommand.Flags().AddFlagSet(setApplicationFlags)
 	applicationsCreateCommand.Flags().AddFlagSet(attributesFlags())
 	applicationsCommand.AddCommand(applicationsCreateCommand)
-	applicationsUpdateCommand.Flags().AddFlagSet(applicationIDFlags())
-	applicationsUpdateCommand.Flags().AddFlagSet(setApplicationFlags)
-	applicationsUpdateCommand.Flags().AddFlagSet(attributesFlags())
-	applicationsCommand.AddCommand(applicationsUpdateCommand)
+	applicationsSetCommand.Flags().AddFlagSet(applicationIDFlags())
+	applicationsSetCommand.Flags().AddFlagSet(setApplicationFlags)
+	applicationsSetCommand.Flags().AddFlagSet(attributesFlags())
+	applicationsCommand.AddCommand(applicationsSetCommand)
 	applicationsDeleteCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsCommand.AddCommand(applicationsDeleteCommand)
 	applicationsContactInfoCommand.PersistentFlags().AddFlagSet(applicationIDFlags())

@@ -193,7 +193,7 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		}),
 	}
-	clientsUpdateCommand = &cobra.Command{
+	clientsSetCommand = &cobra.Command{
 		Use:     "set [client-id]",
 		Aliases: []string{"update"},
 		Short:   "Set properties of a client",
@@ -283,10 +283,10 @@ func init() {
 	clientsCreateCommand.Flags().Lookup("state").DefValue = ttnpb.STATE_APPROVED.String()
 	clientsCreateCommand.Flags().Lookup("grants").DefValue = ttnpb.GRANT_AUTHORIZATION_CODE.String()
 	clientsCommand.AddCommand(clientsCreateCommand)
-	clientsUpdateCommand.Flags().AddFlagSet(clientIDFlags())
-	clientsUpdateCommand.Flags().AddFlagSet(setClientFlags)
-	clientsUpdateCommand.Flags().AddFlagSet(attributesFlags())
-	clientsCommand.AddCommand(clientsUpdateCommand)
+	clientsSetCommand.Flags().AddFlagSet(clientIDFlags())
+	clientsSetCommand.Flags().AddFlagSet(setClientFlags)
+	clientsSetCommand.Flags().AddFlagSet(attributesFlags())
+	clientsCommand.AddCommand(clientsSetCommand)
 	clientsDeleteCommand.Flags().AddFlagSet(clientIDFlags())
 	clientsCommand.AddCommand(clientsDeleteCommand)
 	clientsContactInfoCommand.PersistentFlags().AddFlagSet(clientIDFlags())

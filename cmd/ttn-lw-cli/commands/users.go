@@ -210,7 +210,7 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		}),
 	}
-	usersUpdateCommand = &cobra.Command{
+	usersSetCommand = &cobra.Command{
 		Use:     "set [user-id]",
 		Aliases: []string{"update"},
 		Short:   "Set properties of a user",
@@ -381,11 +381,11 @@ func init() {
 	usersCreateCommand.Flags().Lookup("state").DefValue = ttnpb.STATE_APPROVED.String()
 	usersCreateCommand.Flags().String("invitation-token", "", "")
 	usersCommand.AddCommand(usersCreateCommand)
-	usersUpdateCommand.Flags().AddFlagSet(userIDFlags())
-	usersUpdateCommand.Flags().AddFlagSet(setUserFlags)
-	usersUpdateCommand.Flags().AddFlagSet(attributesFlags())
-	usersUpdateCommand.Flags().AddFlagSet(profilePictureFlags)
-	usersCommand.AddCommand(usersUpdateCommand)
+	usersSetCommand.Flags().AddFlagSet(userIDFlags())
+	usersSetCommand.Flags().AddFlagSet(setUserFlags)
+	usersSetCommand.Flags().AddFlagSet(attributesFlags())
+	usersSetCommand.Flags().AddFlagSet(profilePictureFlags)
+	usersCommand.AddCommand(usersSetCommand)
 	usersForgotPasswordCommand.Flags().AddFlagSet(userIDFlags())
 	usersForgotPasswordCommand.Flags().String("email", "", "")
 	usersCommand.AddCommand(usersForgotPasswordCommand)
