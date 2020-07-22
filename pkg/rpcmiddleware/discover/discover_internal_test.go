@@ -58,7 +58,13 @@ func TestDefaultURL(t *testing.T) {
 			target:   "localhost",
 			port:     80,
 			tls:      false,
-			expected: "http://localhost:80",
+			expected: "http://localhost",
+		},
+		{
+			target:   "localhost",
+			port:     8080,
+			tls:      false,
+			expected: "http://localhost:8080",
 		},
 		{
 			target:   "host.with.port:http",
@@ -71,6 +77,12 @@ func TestDefaultURL(t *testing.T) {
 			port:     4000,
 			tls:      true,
 			expected: "https://hostname:433",
+		},
+		{
+			target:   "hostname",
+			port:     443,
+			tls:      true,
+			expected: "https://hostname",
 		},
 		{
 			target:   "hostname",
