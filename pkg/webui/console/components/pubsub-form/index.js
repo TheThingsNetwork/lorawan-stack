@@ -105,10 +105,10 @@ export default class PubsubForm extends Component {
     try {
       const result = await onSubmit(pubsub)
 
-      resetForm({ values: castedValues })
+      resetForm({ values })
       await onSubmitSuccess(result)
     } catch (error) {
-      resetForm({ values: castedValues })
+      resetForm({ values })
 
       await this.setState({ error })
       await onSubmitFailure(error)
