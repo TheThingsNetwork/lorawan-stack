@@ -22,7 +22,7 @@ This example shows creating a generic device profile that is mapped with provisi
 First, create a mapping file with a device profile:
 
 ```bash
-$ ttn-lw-cli end-device template extend \
+$ ttn-lw-cli end-devices template extend \
   --frequency-plan-id EU_863_870 \
   --lorawan-version 1.0.3 \
   --lorawan-phy-version 1.0.3-a \
@@ -75,14 +75,14 @@ Second, convert the provisioning data to a device templates file to `provisionin
 >This example uses a **Microchip ATECC608A-MAHTN-T Manifest File**. This file contains provisioning data for The Things Industries Join Server. You can [download the example file](../microchip-atecc608a-mahtn-t-example.json).
 
 ```bash
-$ ttn-lw-cli end-device template from-data microchip-atecc608a-mahtn-t --local-file example.json > provisioningdata.json
+$ ttn-lw-cli end-devices template from-data microchip-atecc608a-mahtn-t --local-file example.json > provisioningdata.json
 ```
 
 Third, map the two files to `templates.json`:
 
 ```bash
 $ cat provisioningdata.json \
-  | ttn-lw-cli end-device template map --mapping-local-file profile.json > templates.json
+  | ttn-lw-cli end-devices template map --mapping-local-file profile.json > templates.json
 ```
 
 This returns the device templates with provisioning data and device profile combined.
@@ -203,7 +203,7 @@ Fourth, you can personalize these devices by assigning the `JoinEUI` and `DevEUI
 
 ```bash
 $ cat templates.json \
-  | ttn-lw-cli end-device template assign-euis 70b3d57ed0000000 70b3d57ed0000001 > devices.json
+  | ttn-lw-cli end-devices template assign-euis 70b3d57ed0000000 70b3d57ed0000001 > devices.json
 ```
 
 <details><summary>Show output</summary>
@@ -334,6 +334,6 @@ Finally, you can create these devices in your {{% tts %}} application `test-app`
 
 ```bash
 $ cat devices.json \
-  | ttn-lw-cli end-device template execute \
-  | ttn-lw-cli device create --application-id test-app
+  | ttn-lw-cli end-devices template execute \
+  | ttn-lw-cli end-devices create --application-id test-app
 ```

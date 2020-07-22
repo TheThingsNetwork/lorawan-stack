@@ -22,7 +22,7 @@ $ ttn-lw-cli events subscribe --gateway-id gtw1 --application-id app1
 You can get streaming events with `curl`. For this, you need an API key for the entities you want to watch, for example:
 
 ```bash
-$ ttn-lw-cli user api-key create \
+$ ttn-lw-cli users api-key create \
   --user-id admin \
   --right-application-all \
   --right-gateway-all

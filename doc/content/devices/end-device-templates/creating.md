@@ -55,7 +55,7 @@ Use the `end-device template extend` command to extend a template:
 
 ```bash
 $ cat template.json \
-  | ttn-lw-cli end-device template extend \
+  | ttn-lw-cli end-devices template extend \
   --frequency-plan-id EU_863_870
 ```
 
@@ -87,7 +87,7 @@ Output:
 }
 ```
 
-See `$ ttn-lw-cli end-device template extend --help` for all the fields that can be set.
+See `$ ttn-lw-cli end-devices template extend --help` for all the fields that can be set.
 
 ## Create from scratch
 
@@ -96,7 +96,7 @@ The `end-device template extend` can also be used to create a new template from 
 For example, create a new template from scratch:
 
 ```bash
-$ ttn-lw-cli end-device template extend \
+$ ttn-lw-cli end-devices template extend \
   --lorawan-version 1.0.3 \
   --lorawan-phy-version 1.0.3-a \
   --frequency-plan-id EU_863_870

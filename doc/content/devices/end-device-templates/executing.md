@@ -10,7 +10,7 @@ Once you created or converted a template, you can execute the template with the 
 
 ```bash
 # The examples use a template that has been created as follows:
-$ ttn-lw-cli end-device template extend \
+$ ttn-lw-cli end-devices template extend \
   --lorawan-version 1.0.3 \
   --lorawan-phy-version 1.0.3-a \
   --frequency-plan-id US_902_928 > example.json
@@ -19,7 +19,7 @@ $ ttn-lw-cli end-device template extend \
 You can execute an end device as follows:
 
 ```bash
-$ cat example.json | ttn-lw-cli end-device template execute
+$ cat example.json | ttn-lw-cli end-devices template execute
 ```
 
 Output:
@@ -43,9 +43,9 @@ The `end-device template execute` command **does not create** the end device. Yo
 
 ```bash
 $ cat example.json \
-  | ttn-lw-cli end-device template assign-euis 70b3d57ed0000000 70b3d57ed0000001 \
-  | ttn-lw-cli end-device template execute \
-  | ttn-lw-cli device create --application-id test-app
+  | ttn-lw-cli end-devices template assign-euis 70b3d57ed0000000 70b3d57ed0000001 \
+  | ttn-lw-cli end-devices template execute \
+  | ttn-lw-cli end-devices create --application-id test-app
 ```
 
 Output:

@@ -24,7 +24,7 @@ This example illustrates creating a device profile template, assigning 5 `DevEUI
 First, create a mapping file with a device profile in `profile.json`:
 
 ```bash
-$ ttn-lw-cli end-device template extend \
+$ ttn-lw-cli end-devices template extend \
   --frequency-plan-id EU_863_870 \
   --lorawan-version 1.0.3 \
   --lorawan-phy-version 1.0.3-a \
@@ -35,7 +35,7 @@ Second, assign the EUIs. The first argument is the `JoinEUI`, the second argumen
 
 ```bash
 $ cat profile.json \
-  | ttn-lw-cli end-device template assign-euis 70b3d57ed0000000 70b3d57ed0000001 --count 5 > devices.json
+  | ttn-lw-cli end-devices template assign-euis 70b3d57ed0000000 70b3d57ed0000001 --count 5 > devices.json
 ```
 
 <details><summary>Show output</summary>
@@ -203,6 +203,6 @@ Finally, you can create these devices in your {{% tts %}} application `test-app`
 
 ```bash
 $ cat devices.json \
-  | ttn-lw-cli end-device template execute \
-  | ttn-lw-cli device create --application-id test-app
+  | ttn-lw-cli end-devices template execute \
+  | ttn-lw-cli end-devices create --application-id test-app
 ```
