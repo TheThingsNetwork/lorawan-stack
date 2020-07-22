@@ -115,8 +115,9 @@ var (
 		},
 	}
 	applicationsLinkDeleteCommand = &cobra.Command{
-		Use:   "delete [application-id]",
-		Short: "Delete an application link",
+		Use:     "delete [application-id]",
+		Aliases: []string{"del", "remove", "rm"},
+		Short:   "Delete an application link",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {

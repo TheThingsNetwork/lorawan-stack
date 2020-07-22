@@ -79,7 +79,7 @@ var (
 	}
 	userAPIKeysCreate = &cobra.Command{
 		Use:     "create [user-id]",
-		Aliases: []string{"add", "generate"},
+		Aliases: []string{"add", "generate", "register"},
 		Short:   "Create a user API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
@@ -115,9 +115,9 @@ var (
 		},
 	}
 	userAPIKeysUpdate = &cobra.Command{
-		Use:     "update [user-id] [api-key-id]",
-		Aliases: []string{"set"},
-		Short:   "Update a user API key",
+		Use:     "set [user-id] [api-key-id]",
+		Aliases: []string{"update"},
+		Short:   "Set properties of a user API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), firstArgs(1, args...))
 			if usrID == nil {
@@ -155,7 +155,7 @@ var (
 	}
 	userAPIKeysDelete = &cobra.Command{
 		Use:     "delete [user-id] [api-key-id]",
-		Aliases: []string{"remove"},
+		Aliases: []string{"del", "remove", "rm"},
 		Short:   "Delete a user API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), firstArgs(1, args...))

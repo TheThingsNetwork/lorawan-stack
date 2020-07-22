@@ -211,9 +211,9 @@ var (
 		}),
 	}
 	usersUpdateCommand = &cobra.Command{
-		Use:     "update [user-id]",
-		Aliases: []string{"set"},
-		Short:   "Update a user",
+		Use:     "set [user-id]",
+		Aliases: []string{"update"},
+		Short:   "Set properties of a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
@@ -328,8 +328,9 @@ var (
 		},
 	}
 	usersDeleteCommand = &cobra.Command{
-		Use:   "delete [user-id]",
-		Short: "Delete a user",
+		Use:     "delete [user-id]",
+		Aliases: []string{"del", "remove", "rm"},
+		Short:   "Delete a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {

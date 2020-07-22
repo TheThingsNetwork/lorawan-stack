@@ -194,9 +194,9 @@ var (
 		}),
 	}
 	clientsUpdateCommand = &cobra.Command{
-		Use:     "update [client-id]",
-		Aliases: []string{"set"},
-		Short:   "Update a client",
+		Use:     "set [client-id]",
+		Aliases: []string{"update"},
+		Short:   "Set properties of a client",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
 			if cliID == nil {
@@ -231,8 +231,9 @@ var (
 		},
 	}
 	clientsDeleteCommand = &cobra.Command{
-		Use:   "delete [client-id]",
-		Short: "Delete a client",
+		Use:     "delete [client-id]",
+		Aliases: []string{"del", "remove", "rm"},
+		Short:   "Delete a client",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
 			if cliID == nil {

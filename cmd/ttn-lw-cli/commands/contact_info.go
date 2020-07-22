@@ -161,7 +161,8 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 		},
 	}
 	add := &cobra.Command{
-		Use: fmt.Sprintf("add [%s-id]", entity),
+		Use:     fmt.Sprintf("create [%s-id]", entity),
+		Aliases: []string{"add", "register"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			id, err := getID(cmd, args)
 			if err != nil {
@@ -186,7 +187,8 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 		},
 	}
 	remove := &cobra.Command{
-		Use: fmt.Sprintf("remove [%s-id]", entity),
+		Use:     fmt.Sprintf("delete [%s-id]", entity),
+		Aliases: []string{"del", "remove", "rm"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			id, err := getID(cmd, args)
 			if err != nil {

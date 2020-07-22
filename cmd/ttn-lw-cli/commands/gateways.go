@@ -83,6 +83,7 @@ var (
 	}
 	gatewaysListFrequencyPlans = &cobra.Command{
 		Use:               "list-frequency-plans",
+		Aliases:           []string{"get-frequency-plans", "frequency-plans", "fps"},
 		Short:             "List available frequency plans for gateways",
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -269,9 +270,9 @@ var (
 	}
 	errAntennaIndex       = errors.DefineInvalidArgument("antenna_index", "index of antenna to update out of bounds")
 	gatewaysUpdateCommand = &cobra.Command{
-		Use:     "update [gateway-id]",
-		Aliases: []string{"set"},
-		Short:   "Update a gateway",
+		Use:     "set [gateway-id]",
+		Aliases: []string{"update"},
+		Short:   "Set properties of a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			gtwID, err := getGatewayID(cmd.Flags(), args, true)
 			if err != nil {
@@ -340,8 +341,9 @@ var (
 		},
 	}
 	gatewaysDeleteCommand = &cobra.Command{
-		Use:   "delete [gateway-id]",
-		Short: "Delete a gateway",
+		Use:     "delete [gateway-id]",
+		Aliases: []string{"del", "remove", "rm"},
+		Short:   "Delete a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			gtwID, err := getGatewayID(cmd.Flags(), args, true)
 			if err != nil {
@@ -361,8 +363,9 @@ var (
 		},
 	}
 	gatewaysConnectionStats = &cobra.Command{
-		Use:   "connection-stats [gateway-id]",
-		Short: "Get connection stats for a gateway",
+		Use:     "get-connection-stats [gateway-id]",
+		Aliases: []string{"connection-stats", "cnx-stats", "stats"},
+		Short:   "Get connection stats for a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			gtwID, err := getGatewayID(cmd.Flags(), args, true)
 			if err != nil {

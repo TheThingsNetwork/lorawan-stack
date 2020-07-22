@@ -104,7 +104,7 @@ var (
 	}
 	applicationsPubSubsGetFormatsCommand = &cobra.Command{
 		Use:     "get-formats",
-		Aliases: []string{"formats"},
+		Aliases: []string{"formats", "list-formats"},
 		Short:   "Get the available formats for application pubsubs",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
@@ -278,8 +278,9 @@ var (
 		},
 	}
 	applicationsPubSubsDeleteCommand = &cobra.Command{
-		Use:   "delete [application-id] [pubsub-id]",
-		Short: "Delete an application pub/sub",
+		Use:     "delete [application-id] [pubsub-id]",
+		Aliases: []string{"del", "remove", "rm"},
+		Short:   "Delete an application pub/sub",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pubsubID, err := getApplicationPubSubID(cmd.Flags(), args)
 			if err != nil {

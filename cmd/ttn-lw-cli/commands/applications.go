@@ -186,9 +186,9 @@ var (
 		}),
 	}
 	applicationsUpdateCommand = &cobra.Command{
-		Use:     "update [application-id]",
-		Aliases: []string{"set"},
-		Short:   "Update an application",
+		Use:     "set [application-id]",
+		Aliases: []string{"update"},
+		Short:   "Set properties of an application",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
@@ -223,8 +223,9 @@ var (
 		},
 	}
 	applicationsDeleteCommand = &cobra.Command{
-		Use:   "delete [application-id]",
-		Short: "Delete an application",
+		Use:     "delete [application-id]",
+		Aliases: []string{"del", "remove", "rm"},
+		Short:   "Delete an application",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
