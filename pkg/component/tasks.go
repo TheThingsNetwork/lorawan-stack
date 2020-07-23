@@ -68,8 +68,18 @@ func (c *Component) RegisterTask(ctx context.Context, id string, fn TaskFunc, re
 	})
 }
 
-// StartTask starts the specified task function, optionally with restart policy and backoff.
-func (c *Component) StartTask(ctx context.Context, id string, fn TaskFunc, restart TaskRestart, jitter float64, backoff ...time.Duration) {
+type TaskStarter interface {
+	// StartTask starts the specified task function, optionally with restart policy and backoff.
+	StartTask(context.Context, string, TaskFunc, TaskRestart, float64, ...time.Duration)
+}
+
+type StartTaskFunc func(context.Context, string, TaskFunc, TaskRestart, float64, ...time.Duration)
+
+func (f StartTaskFunc) StartTask(ctx context.Context, id string, fn TaskFunc, restart TaskRestart, jitter float64, backoff ...time.Duration) {
+	f(ctx, id, fn, restart, jitter, backoff...)
+}
+
+func DefaultStartTask(ctx context.Context, id string, fn TaskFunc, restart TaskRestart, jitter float64, backoff ...time.Duration) {
 	logger := log.FromContext(ctx).WithField("task_id", id)
 	if len(backoff) == 0 {
 		backoff = defaultTaskBackoff[:]
@@ -114,8 +124,12 @@ func (c *Component) StartTask(ctx context.Context, id string, fn TaskFunc, resta
 	}()
 }
 
+func (c *Component) StartTask(ctx context.Context, id string, fn TaskFunc, restart TaskRestart, jitter float64, backoff ...time.Duration) {
+	c.taskStarter.StartTask(ctx, id, fn, restart, jitter, backoff...)
+}
+
 func (c *Component) startTasks() {
 	for _, t := range c.tasks {
-		c.StartTask(t.ctx, t.id, t.fn, t.restart, 0.1, t.backoff...)
+		c.taskStarter.StartTask(t.ctx, t.id, t.fn, t.restart, 0.1, t.backoff...)
 	}
 }
