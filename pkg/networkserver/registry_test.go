@@ -29,12 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-// DeleteDevice deletes device identified by appID, devID from r.
-func DeleteDevice(ctx context.Context, r DeviceRegistry, appID ttnpb.ApplicationIdentifiers, devID string) error {
-	_, _, err := r.SetByID(ctx, appID, devID, nil, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) { return nil, nil, nil })
-	return err
-}
-
 // handleRegistryTest runs a test suite on reg.
 func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a := assertions.New(t)
