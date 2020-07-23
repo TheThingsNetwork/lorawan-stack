@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -28,14 +27,12 @@ func TestNewDevAddr(t *testing.T) {
 	t.Run("From NetID", func(t *testing.T) {
 		ns, ctx, _, stop := StartTest(
 			t,
-			component.Config{},
-			Config{
-				NetID: types.NetID{0x00, 0x00, 0x13},
-				DownlinkTasks: MockDownlinkTaskQueue{
-					PopFunc: DownlinkTaskPopBlockFunc,
+			TestConfig{
+				NetworkServer: Config{
+					NetID: types.NetID{0x00, 0x00, 0x13},
 				},
+				Timeout: (1 << 3) * test.Delay,
 			},
-			(1<<3)*test.Delay,
 		)
 		defer stop()
 
@@ -62,15 +59,13 @@ func TestNewDevAddr(t *testing.T) {
 		}
 		ns, ctx, _, stop := StartTest(
 			t,
-			component.Config{},
-			Config{
-				NetID: types.NetID{0x00, 0x00, 0x13},
-				DownlinkTasks: MockDownlinkTaskQueue{
-					PopFunc: DownlinkTaskPopBlockFunc,
+			TestConfig{
+				NetworkServer: Config{
+					NetID:           types.NetID{0x00, 0x00, 0x13},
+					DevAddrPrefixes: ps,
 				},
-				DevAddrPrefixes: ps,
+				Timeout: (1 << 3) * test.Delay,
 			},
-			(1<<3)*test.Delay,
 		)
 		defer stop()
 
