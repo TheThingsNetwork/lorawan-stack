@@ -237,7 +237,6 @@ export default class Device extends React.Component {
         >
           <Tabs className={style.tabs} narrow tabs={tabs} />
         </EntityTitleSection.Device>
-        <hr className={style.rule} />
         <Switch>
           <Route exact path={basePath} component={DeviceOverview} />
           <Route exact path={`${basePath}/data`} component={DeviceData} />

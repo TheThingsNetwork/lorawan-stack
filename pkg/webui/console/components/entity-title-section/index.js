@@ -81,53 +81,55 @@ EntityTitleSection.Device = ({
   uplinkFrameCount,
 }) => {
   return (
-    <Container>
-      <Row>
-        <Col>
-          <div
-            className={classnames(style.containerDevice, {
-              [style.hasDescription]: Boolean(description),
-            })}
-          >
-            <h1 className={style.title}>{deviceName || deviceId}</h1>
-            <span className={style.belowTitle}>
-              {Boolean(lastSeen) ? (
-                <Status status="good" flipped>
-                  <Message content={sharedMessages.lastSeen} />{' '}
-                  <DateTime.Relative value={lastSeen} />
-                </Status>
-              ) : (
-                <Status status="mediocre" label={m.lastSeenUnavailable} flipped />
-              )}
-              {Boolean(uplinkFrameCount || downlinkFrameCount) && (
-                <React.Fragment>
-                  <div className={style.messages}>
-                    {uplinkFrameCount && (
-                      <IconValueTag
-                        iconClassName={style.icon}
-                        icon="uplink"
-                        value={uplinkFrameCount}
-                        tooltipMessage={sharedMessages.uplinkFrameCount}
-                      />
-                    )}
-                    {downlinkFrameCount && (
-                      <IconValueTag
-                        iconClassName={style.icon}
-                        icon="downlink"
-                        value={downlinkFrameCount}
-                        tooltipMessage={sharedMessages.downlinkFrameCount}
-                      />
-                    )}
-                  </div>
-                </React.Fragment>
-              )}
-            </span>
-            {description && <span className={style.description}>{description}</span>}
-          </div>
-          {children}
-        </Col>
-      </Row>
-    </Container>
+    <div className={style.containerDevice}>
+      <Container>
+        <Row>
+          <Col>
+            <div
+              className={classnames(style.containerDeviceInner, {
+                [style.hasDescription]: Boolean(description),
+              })}
+            >
+              <h1 className={style.title}>{deviceName || deviceId}</h1>
+              <span className={style.belowTitle}>
+                {Boolean(lastSeen) ? (
+                  <Status status="good" flipped>
+                    <Message content={sharedMessages.lastSeen} />{' '}
+                    <DateTime.Relative value={lastSeen} />
+                  </Status>
+                ) : (
+                  <Status status="mediocre" label={m.lastSeenUnavailable} flipped />
+                )}
+                {Boolean(uplinkFrameCount || downlinkFrameCount) && (
+                  <React.Fragment>
+                    <div className={style.messages}>
+                      {uplinkFrameCount && (
+                        <IconValueTag
+                          iconClassName={style.icon}
+                          icon="uplink"
+                          value={uplinkFrameCount}
+                          tooltipMessage={sharedMessages.uplinkFrameCount}
+                        />
+                      )}
+                      {downlinkFrameCount && (
+                        <IconValueTag
+                          iconClassName={style.icon}
+                          icon="downlink"
+                          value={downlinkFrameCount}
+                          tooltipMessage={sharedMessages.downlinkFrameCount}
+                        />
+                      )}
+                    </div>
+                  </React.Fragment>
+                )}
+              </span>
+              {description && <span className={style.description}>{description}</span>}
+            </div>
+            {children}
+          </Col>
+        </Row>
+      </Container>
+    </div>
   )
 }
 

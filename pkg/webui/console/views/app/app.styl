@@ -42,11 +42,18 @@
 
 .content
   position: relative
-  overflow: auto
   flex: 1
+  display: flex
+  flex-direction: column
 
 .stage
-  padding-bottom: $ls.xxs
+  flex: 1
+  &:not(.stage-flex)
+    padding-bottom: $ls.xxs
+  &-flex
+    display:flex
+    flex-direction: column
+    overflow-y: auto
 
 .mobile-breadcrumbs
   +media-query-min($bp.s)

@@ -132,7 +132,7 @@ class ConsoleApp extends React.PureComponent {
                   <div id="sidebar" className={sidebarStyle.container} />
                   <div className={style.content}>
                     <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
-                    <div className={style.stage}>
+                    <div className={style.stage} id="stage">
                       <Switch>
                         <Route exact path="/" component={Overview} />
                         <Route path="/applications" component={Applications} />

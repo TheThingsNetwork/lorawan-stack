@@ -13,12 +13,14 @@
 // limitations under the License.
 
 .container-device
-  padding-bottom: $ls.xs
-  &.has-description
-    padding-bottom: 0
+  border-bottom: 1px solid $c-divider
+  margin-bottom: $ls.xs
+  &-inner
+    &.has-description
+      padding-bottom: 0
 
-    .description
-      text-margin-bottom($ls.xs)
+      .description
+        text-margin-bottom($ls.xs)
 
 .title
   text-margin-top($ls.m)
