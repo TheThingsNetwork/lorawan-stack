@@ -206,7 +206,7 @@ export default defineMessages({
   networkServerAddress: 'Network Server address',
   next: 'Next',
   noDesc: 'This end device has no description',
-  noEvents: '{entityId} has not sent any events recently',
+  noEvents: 'There are no events to show for {entityId}',
   noLocation: 'No location information available',
   noMatch: 'No items found',
   none: 'None',

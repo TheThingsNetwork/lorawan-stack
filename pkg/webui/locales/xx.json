@@ -556,7 +556,7 @@
   "lib.shared-messages.networkServerAddress": "Xxxxxxx Xxxxxx xxxxxxx",
   "lib.shared-messages.next": "Xxxx",
   "lib.shared-messages.noDesc": "Xxxx xxx xxxxxx xxx xx xxxxxxxxxxx",
-  "lib.shared-messages.noEvents": "{entityId} xxx xxx xxxx xxx xxxxxx xxxxxxxx",
+  "lib.shared-messages.noEvents": "Xxxxx xxx xx xxxxxx xx xxxx xxx {entityId}",
   "lib.shared-messages.noLocation": "Xx xxxxxxxx xxxxxxxxxxx xxxxxxxxx",
   "lib.shared-messages.noMatch": "Xx xxxxx xxxxx",
   "lib.shared-messages.none": "Xxxx",
