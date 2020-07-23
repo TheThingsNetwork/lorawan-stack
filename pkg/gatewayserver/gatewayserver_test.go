@@ -39,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/basicstationlns"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	gsredis "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/redis"
@@ -108,8 +109,11 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		BasicStation: gatewayserver.BasicStationConfig{
-			Listen:         ":1887",
-			WSPingInterval: wsPingInterval,
+			Listen: ":1887",
+			Config: basicstationlns.Config{
+				WSPingInterval:       wsPingInterval,
+				AllowUnauthenticated: true,
+			},
 		},
 		UpdateConnectionStatsDebounceTime: 0,
 	}

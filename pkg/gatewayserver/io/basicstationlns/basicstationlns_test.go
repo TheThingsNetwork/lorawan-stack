@@ -58,8 +58,12 @@ var (
 
 	testTrafficEndPoint = "/traffic/eui-0101010101010101"
 
-	timeout               = (1 << 5) * test.Delay
-	defaultWSPingInterval = (1 << 3) * test.Delay
+	timeout       = (1 << 5) * test.Delay
+	defaultConfig = Config{
+		WSPingInterval:       (1 << 3) * test.Delay,
+		AllowUnauthenticated: true,
+		UseTrafficTLSAddress: false,
+	}
 )
 
 func eui64Ptr(eui types.EUI64) *types.EUI64 { return &eui }
@@ -90,77 +94,104 @@ func TestClientTokenAuth(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, false, defaultWSPingInterval)
-	lis, err := net.Listen("tcp", serverAddress)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	defer lis.Close()
-	go func() error {
-		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			bsWebServer.ServeHTTP(w, r)
-		}))
-	}()
-	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
-
-	for _, tc := range []struct {
-		Name           string
-		GatewayID      string
-		AuthToken      string
-		TokenPrefix    string
-		ErrorAssertion func(err error) bool
+	for _, ttc := range []struct {
+		Name                 string
+		AllowUnauthenticated bool
 	}{
 		{
-			Name:           "RegisteredGatewayAndValidKey",
-			GatewayID:      registeredGatewayID.GatewayID,
-			AuthToken:      registeredGatewayToken,
-			ErrorAssertion: nil,
+			Name:                 "ServerAllowUnauthenticated",
+			AllowUnauthenticated: true,
 		},
 		{
-			Name:           "RegisteredGatewayAndValidKey",
-			GatewayID:      registeredGatewayID.GatewayID,
-			AuthToken:      registeredGatewayToken,
-			TokenPrefix:    "Bearer ",
-			ErrorAssertion: nil,
-		},
-		{
-			Name:      "RegisteredGatewayAndInValidKey",
-			GatewayID: registeredGatewayID.GatewayID,
-			AuthToken: "invalidToken",
-			ErrorAssertion: func(err error) bool {
-				return err == websocket.ErrBadHandshake
-			},
-		},
-		{
-			Name:           "RegisteredGatewayAndNoKey",
-			GatewayID:      registeredGatewayID.GatewayID,
-			ErrorAssertion: nil,
-		},
-		{
-			Name:      "UnregisteredGateway",
-			GatewayID: "eui-1122334455667788",
-			AuthToken: registeredGatewayToken,
-			ErrorAssertion: func(err error) bool {
-				return err == websocket.ErrBadHandshake
-			},
+			Name:                 "ServerDontAllowUnauthenticated",
+			AllowUnauthenticated: false,
 		},
 	} {
-		t.Run(fmt.Sprintf("%s", tc.Name), func(t *testing.T) {
-			a := assertions.New(t)
-			h := http.Header{}
-			h.Set("Authorization", fmt.Sprintf("%s%s", tc.TokenPrefix, tc.AuthToken))
-			conn, _, err := websocket.DefaultDialer.Dial(servAddr+connectionRootEndPoint+tc.GatewayID, h)
-			if err != nil {
-				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
-					t.Fatalf("Unexpected error: %v", err)
+		cfg := defaultConfig
+		cfg.AllowUnauthenticated = ttc.AllowUnauthenticated
+		bsWebServer := New(ctx, gs, cfg)
+		lis, err := net.Listen("tcp", serverAddress)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		defer lis.Close()
+		go func() error {
+			return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				bsWebServer.ServeHTTP(w, r)
+			}))
+		}()
+		servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
+
+		for _, tc := range []struct {
+			Name           string
+			GatewayID      string
+			AuthToken      string
+			TokenPrefix    string
+			ErrorAssertion func(err error) bool
+		}{
+			{
+				Name:           "RegisteredGatewayAndValidKey",
+				GatewayID:      registeredGatewayID.GatewayID,
+				AuthToken:      registeredGatewayToken,
+				ErrorAssertion: nil,
+			},
+			{
+				Name:           "RegisteredGatewayAndValidKey",
+				GatewayID:      registeredGatewayID.GatewayID,
+				AuthToken:      registeredGatewayToken,
+				TokenPrefix:    "Bearer ",
+				ErrorAssertion: nil,
+			},
+			{
+				Name:      "RegisteredGatewayAndInValidKey",
+				GatewayID: registeredGatewayID.GatewayID,
+				AuthToken: "invalidToken",
+				ErrorAssertion: func(err error) bool {
+					if err == nil {
+						return false
+					}
+					return err == websocket.ErrBadHandshake
+				},
+			},
+			{
+				Name:      "RegisteredGatewayAndNoKey",
+				GatewayID: registeredGatewayID.GatewayID,
+				ErrorAssertion: func(err error) bool {
+					if ttc.AllowUnauthenticated && err == nil {
+						return true
+					}
+					return err == websocket.ErrBadHandshake
+				},
+			},
+			{
+				Name:      "UnregisteredGateway",
+				GatewayID: "eui-1122334455667788",
+				AuthToken: registeredGatewayToken,
+				ErrorAssertion: func(err error) bool {
+					if err == nil {
+						return false
+					}
+					return err == websocket.ErrBadHandshake
+				},
+			},
+		} {
+			t.Run(fmt.Sprintf("%s/%s", ttc.Name, tc.Name), func(t *testing.T) {
+				a := assertions.New(t)
+				h := http.Header{}
+				h.Set("Authorization", fmt.Sprintf("%s%s", tc.TokenPrefix, tc.AuthToken))
+				conn, _, err := websocket.DefaultDialer.Dial(servAddr+connectionRootEndPoint+tc.GatewayID, h)
+				if err != nil {
+					if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
+						t.Fatalf("Unexpected error: %v", err)
+					}
+				} else if tc.ErrorAssertion != nil {
+					a.So(tc.ErrorAssertion(err), should.BeTrue)
 				}
-			} else if tc.ErrorAssertion != nil {
-				t.Fatalf("Expected error")
-			}
-			if conn != nil {
-				conn.Close()
-			}
-		})
+				if conn != nil {
+					conn.Close()
+				}
+			})
+		}
 	}
 }
 
@@ -194,7 +225,7 @@ func TestDiscover(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, false, defaultWSPingInterval)
+	bsWebServer := New(ctx, gs, defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -432,7 +463,7 @@ func TestVersion(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, false, defaultWSPingInterval)
+	bsWebServer := New(ctx, gs, defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -695,7 +726,7 @@ func TestTraffic(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, false, defaultWSPingInterval)
+	bsWebServer := New(ctx, gs, defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -1031,7 +1062,7 @@ func TestRTT(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, false, defaultWSPingInterval)
+	bsWebServer := New(ctx, gs, defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -1312,7 +1343,7 @@ func TestPingPong(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, false, defaultWSPingInterval)
+	bsWebServer := New(ctx, gs, defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
