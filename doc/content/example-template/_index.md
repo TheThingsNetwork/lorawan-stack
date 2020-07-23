@@ -5,7 +5,7 @@ weight:
 draft: true
 ---
 
-Guidelines here are taken from [DEVELOPMENT.md](https://github.com/TheThingsNetwork/lorawan-stack/blob/master/DEVELOPMENT.md), which you should read. This template exists as a copy and paste starting point for new documentation. Remove the `draft`key in the Front Matter to generate the page (otherwise hugo will skip it).
+Guidelines here are taken from [DEVELOPMENT.md](https://github.com/TheThingsNetwork/lorawan-stack/blob/default/DEVELOPMENT.md), which you should read. This template exists as a copy and paste starting point for new documentation. Remove the `draft`key in the Front Matter to generate the page (otherwise hugo will skip it).
 
 A documentation page starts with an introduction, and then the first heading. The first paragraph of the introduction is typically a summary of the page. Use a <!--more--> to indicate where the summary ends.
 
@@ -20,7 +20,7 @@ Use a requirements subheading to list requirements/prerequisites.
 
 ## New Features {{< new-in-version "3.8.5">}}
 
-Use the `{{< new-in-version "3.8.5" >}}` shortcode to tag documentation for features added in a particular version of {{% tts %}}. For documentation that targets `master`, that's the next patch bump, e.g `3.8.x`. For documentation targeting `develop` that's the next minor bump, e.g `3.x.0`. Check `tools/bin/mage version:current` for the current version.
+Use the `{{< new-in-version "3.8.5" >}}` shortcode to tag documentation for features added in a particular version. For documentation that targets `v3.n`, that's the next patch bump, e.g `3.8.x`. For documentation targeting `v3.n+1` that's the next minor bump, e.g `3.9.0`. Check `tools/bin/mage version:current` for the current version.
 
 #### This Is A New Feature Heading {{< new-in-version "3.8.5">}}
 

@@ -14,10 +14,10 @@ This is a checklist for releases. This is filled in by both the releaser and the
 
 #### Preparation
 
-- [ ] Create a `release/${version}` branch off the `master` branch.
+- [ ] Create a `release/v3.${minor}.${patch}` branch off the `v3.${minor}` branch.
   ```bash
-  $ git checkout master
-  $ git checkout -b release/${version}
+  $ git checkout v3.${minor}
+  $ git checkout -b release/v3.${minor}.${patch}
   ```
 
 - [ ] Update the `CHANGELOG.md` file
@@ -74,7 +74,7 @@ This is a checklist for releases. This is filled in by both the releaser and the
     $ tools/bin/mage version:commitBump
     ```
 
-- [ ] Create a pull request targeting `master`.
+- [ ] Create a pull request targeting `v3.${minor}`.
 
 #### Check 1 (for reviewers)
 
@@ -84,7 +84,7 @@ This is a checklist for releases. This is filled in by both the releaser and the
 
 #### Release
 
-- [ ] Once this PR is approved and merged, checkout the latest  `master` branch locally.
+- [ ] Once this PR is approved and merged, checkout the latest `v3.${minor}` branch locally.
 - [ ] Create a version tag
   ```bash
   $ tools/bin/mage version:bumpXXX version:tag

@@ -46,7 +46,7 @@ implementation proposal in the referenced issues.
 <!-- Make sure that this pull request is complete. -->
 
 - [ ] Scope: The referenced issue is addressed, there are no unrelated changes.
-- [ ] Compatibility: The changes are backwards compatible with existing API, storage, configuration and CLI, according to the compatibility commitments in `README.md`. The target branch is set to `master` if the changes are fully compatible with existing API, database, configuration and CLI.
+- [ ] Compatibility: The changes are backwards compatible with existing API, storage, configuration and CLI, according to the compatibility commitments in `README.md` for the chosen target branch.
 - [ ] Documentation: Relevant documentation is added or updated.
 - [ ] Changelog: Significant features, behavior changes, deprecations and fixes are added to `CHANGELOG.md`.
 - [ ] Commits: Commit messages follow guidelines in `CONTRIBUTING.md`, there are no fixup commits left.

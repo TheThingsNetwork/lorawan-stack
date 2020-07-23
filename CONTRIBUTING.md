@@ -6,7 +6,7 @@ Thank you for your interest in building this thing together with us. We're reall
 - **Requesting a new feature**: If you have a great idea or think some functionality is missing, we want to know! The only thing you have to do for that is to [create an issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) if it doesn't exist yet. Please use the issue template and fill out all sections.
 - **Reporting an issue**: If you notice that a component of The Things Stack is not behaving as it should, there may be a bug in our systems. In this case you should [create an issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) if it doesn't exist yet. Please use the issue template and fill out all sections. For sensitive (security) issues, you can [contact us directly](#security-issues).
 - **Implementing a new feature or fixing a bug**: If you see an [open issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) that you would like to work on, let the other contributors know by commenting in the issue.
-- **Writing documentation**: If you see that our documentation is lacking or incorrect, it would be great if you could help us improve it. This will help users and fellow contributors understand how to better work with our stack. Better documentation helps prevent making mistakes and introducing new bugs. Our documentation is spread across a number of places. Code documentation obviously lives together with the code, and is therefore probably in this repository. User documentation for The Things Stack that is published on [thethingsstack.io](https://thethingsstack.io), is built from the source files in the [`doc` folder](https://github.com/TheThingsNetwork/lorawan-stack/tree/master/doc/content) of this repository. More general documentation can be found on [The Things Network's official documentation pages](https://www.thethingsnetwork.org/docs). The source files for that documentation can be found in [the `docs` repository](https://github.com/TheThingsNetwork/docs).
+- **Writing documentation**: If you see that our documentation is lacking or incorrect, it would be great if you could help us improve it. This will help users and fellow contributors understand how to better work with our stack. Better documentation helps prevent making mistakes and introducing new bugs. Our documentation is spread across a number of places. Code documentation obviously lives together with the code, and is therefore probably in this repository. User documentation for The Things Stack that is published on [thethingsstack.io](https://thethingsstack.io), is built from the source files in the `doc` folder of this repository. More general documentation can be found on [The Things Network's official documentation pages](https://www.thethingsnetwork.org/docs). The source files for that documentation can be found in [the `docs` repository](https://github.com/TheThingsNetwork/docs).
 
 If you'd like to contribute by writing code, you'll find [here](DEVELOPMENT.md) how to set up your development environment.
 
@@ -16,7 +16,7 @@ Style guidelines for contributing code and writing documentation can be found [h
 
 The [compatibility commitment](README.md#commitments-and-releases) ensures that users can update confidently and with little hassle to patch releases.
 
-If, according to the compatibility commitment, we need to bump the minor version, a pull request should target the `develop` branch. Only if the changes in a pull request are fully compatible in terms of API, storage, command-line and configuration, the target can be set to `master`.
+If, according to the compatibility commitment, we need to bump the minor version, a pull request should target the `v3.n+1` branch (where `n` is the current minor version). Only if the changes in a pull request are fully compatible in terms of API, storage, command-line and configuration, the target can be set to `v3.n` (where `n` is the current minor version).
 
 We use [`CODEOWNERS`](CODEOWNERS) to enforce the compatibility commitment. This requires configuration structure to be defined in `config.go` files, i.e. `/pkg/<subsystem>/config.go`.
 
@@ -28,10 +28,11 @@ When contributing code or documentation to this repository, we follow a number o
 
 All branches shall have one of these names.
 
-- `master`: the default branch. This is a clean branch where reviewed, approved and CI passed pull requests are merged into. Merging to this branch is restricted to project maintainers.
+- `v3.n`: the default branch for the current minor version `n`. This is a clean branch where reviewed, approved and CI passed pull requests are merged into. Merging to this branch is restricted to project maintainers.
+- `v3.n+1`: the default branch for the next minor version `n` + 1. As with `v3.n`, this is a clean branch where reviewed, approved and CI passed pull requests are merged into. Merging to this branch is restricted to project maintainers. The difference with the `v3.n` branch is that this branch may contain "breaking" features that need to go to a different minor version according to our compatibility commitment.
 - `fix/#-short-name` or `fix/short-name`: refers to a fix, preferably with issue number. The short name describes the bug or issue.
 - `feature/#-short-name` or `feature/short-name`: (main) feature branch, preferably with issue number. The short name describes the feature.
-  - `feature/#-short-name-part`: a sub scope of the feature in a separate branch, that is intended to merge into the main feature branch before the main feature branch is merged into `master`.
+  - `feature/#-short-name-part`: a sub scope of the feature in a separate branch, that is intended to merge into the main feature branch before the main feature branch is merged into a `v3.*` branch.
 - `issue/#-short-name`: anything else that refers to an issue but is not clearly a fix nor a feature.
 
 ### Scope

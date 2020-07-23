@@ -26,7 +26,7 @@ pygmentsUseClasses = true
   description = "The Things Stack for LoRaWAN"
   keywords = []
   github_repository = "https://github.com/TheThingsNetwork/lorawan-stack"
-  github_repository_edit = "https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content"
+  github_repository_edit = "https://github.com/TheThingsNetwork/lorawan-stack/blob/default/doc/content"
   version = "v3.8.5"
 
 [markup]
