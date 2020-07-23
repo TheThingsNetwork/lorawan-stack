@@ -129,6 +129,8 @@ type Option func(ns *NetworkServer)
 
 var DefaultOptions []Option
 
+const downlinkProcessTaskName = "process_downlink"
+
 // New returns new NetworkServer.
 func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, error) {
 	switch {
@@ -212,7 +214,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Ns", cluster.HookName, c.ClusterAuthUnaryHook())
 
-	ns.RegisterTask(ns.Context(), "process_downlink", func(ctx context.Context) error {
+	ns.RegisterTask(ns.Context(), downlinkProcessTaskName, func(ctx context.Context) error {
 		for {
 			select {
 			case <-ctx.Done():
