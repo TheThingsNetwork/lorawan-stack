@@ -14,7 +14,7 @@
 
 .column
   &:first-of-type
-    margin-left: 'calc(%s + %s)' % ($cs.l $cs.xs) // Account for the icon in the events list.
+    margin-left: 'calc(%s + %s)' % ($ls.xxs $cs.s) // Account for the icon in the events list.
 
 .id
   flex-basis: 10%
@@ -23,11 +23,12 @@
 .time
   flex-basis: 5%
   min-width: 4rem
+  max-width: 6rem
 
 .type
-  flex-basis: 25%
+  flex-basis: 20%
   min-width: 14rem
+  max-width: 20rem
 
 .data
   flex-basis: auto
-  text-align: center

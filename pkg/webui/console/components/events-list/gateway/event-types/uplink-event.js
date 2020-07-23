@@ -68,7 +68,7 @@ const DefaultDataEntry = React.memo(({ event }) => {
     )
   }
 
-  return null
+  return <Entry.Data />
 })
 
 DefaultDataEntry.propTypes = {

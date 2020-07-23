@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+$event-container-height = 2.1rem
+
 .container
   position: relative
-  padding-right: $cs.l
+  min-height: $event-container-height
+  overflow: hidden
 
 .overview
   display: flex
@@ -22,9 +25,11 @@
   justify-content: flex-start
   font-family: $font-family-mono
   font-size: $fs.s
-  overflow-x: auto
   padding: $cs.xxs 0 $cs.xxs $cs.xs
-  min-height: 2rem
+  min-height: $event-container-height
+
+  &, & .icon
+    transition: background-color $ad.s linear
 
   &-widget
     min-height: 1rem
@@ -33,13 +38,21 @@
   &-expandable
     cursor: pointer
 
+  &:not(.overview-widget)
+    &:hover, &:hover .icon
+      background-color: $c-backdrop
+
+  &:not(:hover) .icon
+    background-color: $c-backdrop-lighter
+
   .icon
-    padding-right: $cs.xs
     color: $c-subtle-fill
-    right: 0
-    top: 50%
-    transform: translateY(-50%)
-    position: absolute
+    display: flex
+    justify-content: center
+    min-height: $event-container-height
+    width: $event-container-height
+    flex-shrink: 0
+
 
     &-error
       color: $c-error

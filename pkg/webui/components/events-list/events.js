@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import classnames from 'classnames'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -29,6 +30,10 @@ const Events = props => {
     onPause(!paused)
   }, [onPause, setPaused, paused])
 
+  const className = classnames(style.eventsContainer, {
+    [style.widget]: widget,
+  })
+
   return (
     <eventsContext.Provider
       value={{
@@ -41,7 +46,7 @@ const Events = props => {
         entityId,
       }}
     >
-      <div className={style.eventsContainer}>{children}</div>
+      <div className={className}>{children}</div>
     </eventsContext.Provider>
   )
 }

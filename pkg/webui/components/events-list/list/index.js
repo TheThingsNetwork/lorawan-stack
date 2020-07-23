@@ -41,14 +41,13 @@ const ListContainer = React.memo(
 
     const listCls = classnames({
       [style.list]: !widget,
-      [style.listWidget]: widget,
     })
 
     return (
       <List
         className={cls}
         listClassName={listCls}
-        bordered
+        bordered={widget}
         size={widget ? 'small' : 'none'}
         items={items}
         rowKey={getEventKey}
@@ -101,7 +100,7 @@ const EventsList = props => {
   const renderItem = React.useCallback(
     event => {
       return (
-        <List.Item className={widget ? undefined : style.listItem}>
+        <List.Item>
           <EventErrorBoundary event={event} widget={widget}>
             {renderEvent(event)}
           </EventErrorBoundary>

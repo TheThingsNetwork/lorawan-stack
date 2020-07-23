@@ -36,6 +36,7 @@ const GatewayDownlinkEvent = props => {
         <Entry.Icon className={style.icon} iconName="downlink" />
         <Entry.Time time={time} />
         <Entry.Type eventName={name} />
+        <Entry.Data />
       </Overview>
       {showData && <Details />}
     </Event>

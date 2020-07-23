@@ -107,11 +107,12 @@ const DataEntry = ({ className, children }) => {
 }
 
 DataEntry.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   className: PropTypes.string,
 }
 
 DataEntry.defaultProps = {
+  children: null,
   className: undefined,
 }
 

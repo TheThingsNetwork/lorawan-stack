@@ -35,6 +35,7 @@ const DefaultEvent = props => {
         <Entry.Time time={time} />
         {Boolean(entityId) && <Entry.ID entityId={entityId} />}
         <Entry.Type eventName={name} />
+        <Entry.Data />
       </Overview>
       {showData && <Details />}
     </Event>
