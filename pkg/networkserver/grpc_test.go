@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -60,17 +59,18 @@ func TestGenerateDevAddr(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			ns, ctx, _, stop := StartTest(t, component.Config{}, Config{
-				NetID: tc.NetID,
-				DownlinkTasks: &MockDownlinkTaskQueue{
-					PopFunc: DownlinkTaskPopBlockFunc,
+			ns, ctx, _, stop := StartTest(t, TestConfig{
+				NetworkServer: Config{
+					NetID: tc.NetID,
 				},
-			}, (1<<5)*test.Delay)
+				Timeout: (1 << 5) * test.Delay,
+			})
 			defer stop()
 
 			devAddr, err := ttnpb.NewNsClient(ns.LoopbackConn()).GenerateDevAddr(ctx, ttnpb.Empty)
-			a.So(err, should.BeNil)
-			a.So(devAddr.DevAddr.HasPrefix(tc.DevAddrPrefix), should.BeTrue)
+			if a.So(err, should.BeNil) {
+				a.So(devAddr.DevAddr.HasPrefix(tc.DevAddrPrefix), should.BeTrue)
+			}
 		})
 	}
 	for _, tc := range []struct {
@@ -132,13 +132,13 @@ func TestGenerateDevAddr(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			ns, ctx, _, stop := StartTest(t, component.Config{}, Config{
-				NetID:           types.NetID{0x00, 0x00, 0x13},
-				DevAddrPrefixes: tc.DevAddrPrefixes,
-				DownlinkTasks: &MockDownlinkTaskQueue{
-					PopFunc: DownlinkTaskPopBlockFunc,
+			ns, ctx, _, stop := StartTest(t, TestConfig{
+				NetworkServer: Config{
+					NetID:           types.NetID{0x00, 0x00, 0x13},
+					DevAddrPrefixes: tc.DevAddrPrefixes,
 				},
-			}, (1<<7)*test.Delay)
+				Timeout: (1 << 7) * test.Delay,
+			})
 			defer stop()
 
 			hasOneOfPrefixes := func(devAddr *types.DevAddr, seen map[types.DevAddrPrefix]int, prefixes ...types.DevAddrPrefix) bool {

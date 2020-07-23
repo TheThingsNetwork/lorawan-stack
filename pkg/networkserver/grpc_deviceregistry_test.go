@@ -346,29 +346,29 @@ func TestDeviceRegistryGet(t *testing.T) {
 
 			var getByIDCalls uint64
 
-			ns, ctx, env, stop := StartTest(
+			ns, ctx, _, stop := StartTest(
 				t,
-				component.Config{
-					ServiceBase: config.ServiceBase{
-						KeyVault: config.KeyVault{
-							Provider: "static",
-							Static:   tc.KeyVault,
+				TestConfig{
+					Component: component.Config{
+						ServiceBase: config.ServiceBase{
+							KeyVault: config.KeyVault{
+								Provider: "static",
+								Static:   tc.KeyVault,
+							},
 						},
 					},
-				},
-				Config{
-					Devices: &MockDeviceRegistry{
-						GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
-							atomic.AddUint64(&getByIDCalls, 1)
-							return tc.GetByIDFunc(ctx, appID, devID, gets)
+					NetworkServer: Config{
+						Devices: &MockDeviceRegistry{
+							GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
+								atomic.AddUint64(&getByIDCalls, 1)
+								return tc.GetByIDFunc(ctx, appID, devID, gets)
+							},
 						},
 					},
+					Timeout: (1 << 9) * test.Delay,
 				},
-				(1<<9)*test.Delay,
 			)
 			defer stop()
-
-			<-env.DownlinkTasks.Pop
 
 			ns.AddContextFiller(tc.ContextFunc)
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
@@ -1498,23 +1498,24 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 			ns, ctx, env, stop := StartTest(
 				t,
-				component.Config{},
-				Config{
-					Devices: &MockDeviceRegistry{
-						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-							atomic.AddUint64(&setByIDCalls, 1)
-							return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+				TestConfig{
+					NetworkServer: Config{
+						Devices: &MockDeviceRegistry{
+							SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+								atomic.AddUint64(&setByIDCalls, 1)
+								return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+							},
+						},
+						DownlinkTasks: &MockDownlinkTaskQueue{
+							AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
+								atomic.AddUint64(&addCalls, 1)
+								return tc.AddFunc(ctx, ids, at, replace)
+							},
+							PopFunc: DownlinkTaskPopBlockFunc,
 						},
 					},
-					DownlinkTasks: &MockDownlinkTaskQueue{
-						AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-							atomic.AddUint64(&addCalls, 1)
-							return tc.AddFunc(ctx, ids, at, replace)
-						},
-						PopFunc: DownlinkTaskPopBlockFunc,
-					},
+					Timeout: (1 << 9) * test.Delay,
 				},
-				(1<<9)*test.Delay,
 			)
 			defer stop()
 
@@ -1665,19 +1666,21 @@ func TestDeviceRegistryDelete(t *testing.T) {
 
 			ns, ctx, env, stop := StartTest(
 				t,
-				component.Config{},
-				Config{
-					Devices: &MockDeviceRegistry{
-						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-							atomic.AddUint64(&setByIDCalls, 1)
-							return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+				TestConfig{
+					Component: component.Config{},
+					NetworkServer: Config{
+						Devices: &MockDeviceRegistry{
+							SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+								atomic.AddUint64(&setByIDCalls, 1)
+								return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+							},
+						},
+						DownlinkTasks: &MockDownlinkTaskQueue{
+							PopFunc: DownlinkTaskPopBlockFunc,
 						},
 					},
-					DownlinkTasks: &MockDownlinkTaskQueue{
-						PopFunc: DownlinkTaskPopBlockFunc,
-					},
+					Timeout: (1 << 9) * test.Delay,
 				},
-				(1<<9)*test.Delay,
 			)
 			defer stop()
 

@@ -348,7 +348,7 @@ func TestRegistries(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name string
-		New  func(t testing.TB) (reg DeviceRegistry, closeFn func() error)
+		New  func(t testing.TB) (reg DeviceRegistry, closeFn func())
 		N    uint16
 	}{
 		{
@@ -362,11 +362,7 @@ func TestRegistries(t *testing.T) {
 				t.Parallel()
 				reg, closeFn := tc.New(t)
 				if closeFn != nil {
-					defer func() {
-						if err := closeFn(); err != nil {
-							t.Errorf("Failed to close registry: %s", err)
-						}
-					}()
+					defer closeFn()
 				}
 				t.Run("1st run", func(t *testing.T) { handleRegistryTest(t, reg) })
 				if t.Failed() {

@@ -28,7 +28,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -42,6 +41,14 @@ import (
 )
 
 func TestHandleUplink(t *testing.T) {
+	type LegacyTestEnvironment struct {
+		TestEnvironment
+		ApplicationUplinks ApplicationUplinkQueueEnvironment
+		DeviceRegistry     DeviceRegistryEnvironment
+		DownlinkTasks      DownlinkTaskQueueEnvironment
+		UplinkDeduplicator UplinkDeduplicatorEnvironment
+	}
+
 	joinGetByEUIPaths := [...]string{
 		"frequency_plan_id",
 		"lorawan_phy_version",
@@ -183,7 +190,7 @@ func TestHandleUplink(t *testing.T) {
 			assertHandleUplinkResponse(ctx, errCh, expectedErr),
 		), should.BeTrue)
 	}
-	assertDeduplicateUplink := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedUp *ttnpb.UplinkMessage, ok bool, err error) bool {
+	assertDeduplicateUplink := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, expectedUp *ttnpb.UplinkMessage, ok bool, err error) bool {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -200,7 +207,7 @@ func TestHandleUplink(t *testing.T) {
 			},
 		)
 	}
-	assertAccumulatedMetadata := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedUp *ttnpb.UplinkMessage, mds []*ttnpb.RxMetadata, err error) bool {
+	assertAccumulatedMetadata := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, expectedUp *ttnpb.UplinkMessage, mds []*ttnpb.RxMetadata, err error) bool {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -216,7 +223,7 @@ func TestHandleUplink(t *testing.T) {
 			},
 		)
 	}
-	assertDownlinkTaskAdd := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers, expectedStartAt time.Time, replace bool, err error) bool {
+	assertDownlinkTaskAdd := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers, expectedStartAt time.Time, replace bool, err error) bool {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -231,7 +238,7 @@ func TestHandleUplink(t *testing.T) {
 			err,
 		)
 	}
-	assertInteropJoin := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) bool {
+	assertInteropJoin := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) bool {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -254,7 +261,7 @@ func TestHandleUplink(t *testing.T) {
 			},
 		)
 	}
-	assertClusterLocalJoin := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) bool {
+	assertClusterLocalJoin := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) bool {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -282,7 +289,7 @@ func TestHandleUplink(t *testing.T) {
 			},
 		)
 	}
-	assertJoinGetByEUI := func(ctx context.Context, env TestEnvironment, upCIDs []string, getDevice *ttnpb.EndDevice, err error) (context.Context, bool) {
+	assertJoinGetByEUI := func(ctx context.Context, env LegacyTestEnvironment, upCIDs []string, getDevice *ttnpb.EndDevice, err error) (context.Context, bool) {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -312,7 +319,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 			})
 	}
-	assertJoinSetByID := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, getDevice, setDevice *ttnpb.EndDevice, expectedErr error, err error) (context.Context, bool) {
+	assertJoinSetByID := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, getDevice, setDevice *ttnpb.EndDevice, expectedErr error, err error) (context.Context, bool) {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -346,7 +353,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 			})
 	}
-	assertJoinApplicationUp := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, setDevice *ttnpb.EndDevice, joinResp *ttnpb.JoinResponse, recvAt time.Time, err error) bool {
+	assertJoinApplicationUp := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, setDevice *ttnpb.EndDevice, joinResp *ttnpb.JoinResponse, recvAt time.Time, err error) bool {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -377,7 +384,7 @@ func TestHandleUplink(t *testing.T) {
 			)
 		}, err)
 	}
-	assertJoinDeduplicateSequence := func(ctx context.Context, env TestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, dev *ttnpb.EndDevice, ok bool, err error) (context.Context, bool) {
+	assertJoinDeduplicateSequence := func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, dev *ttnpb.EndDevice, ok bool, err error) (context.Context, bool) {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -391,7 +398,7 @@ func TestHandleUplink(t *testing.T) {
 		clock.Set(msg.ReceivedAt.Add(DeduplicationWindow))
 		return getCtx, assertDeduplicateUplink(ctx, env, getCtx, msg, ok, err)
 	}
-	assertJoinGetPeerSequence := func(ctx context.Context, env TestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, dev *ttnpb.EndDevice, peer cluster.Peer, err error) (context.Context, bool) {
+	assertJoinGetPeerSequence := func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, dev *ttnpb.EndDevice, peer cluster.Peer, err error) (context.Context, bool) {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -412,7 +419,7 @@ func TestHandleUplink(t *testing.T) {
 			},
 		)
 	}
-	assertJoinClusterLocalSequence := func(ctx context.Context, env TestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, dev *ttnpb.EndDevice, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) (context.Context, bool) {
+	assertJoinClusterLocalSequence := func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, dev *ttnpb.EndDevice, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) (context.Context, bool) {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -423,7 +430,7 @@ func TestHandleUplink(t *testing.T) {
 		joinReq.CorrelationIDs = msg.CorrelationIDs
 		return getCtx, assertClusterLocalJoin(ctx, env, getCtx, dev.EndDeviceIdentifiers, joinReq, joinResp, err)
 	}
-	assertJoinInteropSequence := func(ctx context.Context, env TestEnvironment, clock *test.MockClock, peerNotFound bool, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, dev *ttnpb.EndDevice, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) (context.Context, bool) {
+	assertJoinInteropSequence := func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, peerNotFound bool, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, dev *ttnpb.EndDevice, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) (context.Context, bool) {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -441,7 +448,7 @@ func TestHandleUplink(t *testing.T) {
 		return getCtx, assertInteropJoin(ctx, env, getCtx, joinReq, joinResp, err)
 	}
 
-	assertDataRangeByAddr := func(ctx context.Context, env TestEnvironment, upCIDs []string, err error, getDevices ...*ttnpb.EndDevice) ([]context.Context, bool) {
+	assertDataRangeByAddr := func(ctx context.Context, env LegacyTestEnvironment, upCIDs []string, err error, getDevices ...*ttnpb.EndDevice) ([]context.Context, bool) {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -473,7 +480,7 @@ func TestHandleUplink(t *testing.T) {
 			err,
 		)
 	}
-	assertDataDeduplicateSequence := func(ctx context.Context, env TestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, devs []*ttnpb.EndDevice, idx int, ok bool, err error) (context.Context, bool) {
+	assertDataDeduplicateSequence := func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, devs []*ttnpb.EndDevice, idx int, ok bool, err error) (context.Context, bool) {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -488,7 +495,7 @@ func TestHandleUplink(t *testing.T) {
 		clock.Set(msg.ReceivedAt.Add(DeduplicationWindow))
 		return rangeCtx, assertDeduplicateUplink(ctx, env, rangeCtx, msg, ok, err)
 	}
-	assertDataSetByID := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, getDevice, setDevice *ttnpb.EndDevice, expectedSets []string, expectedErr error, err error) (context.Context, bool) {
+	assertDataSetByID := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, getDevice, setDevice *ttnpb.EndDevice, expectedSets []string, expectedErr error, err error) (context.Context, bool) {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -518,7 +525,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 			})
 	}
-	assertDataApplicationUp := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, setDevice *ttnpb.EndDevice, msg *ttnpb.UplinkMessage, err error) bool {
+	assertDataApplicationUp := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, setDevice *ttnpb.EndDevice, msg *ttnpb.UplinkMessage, err error) bool {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -560,12 +567,12 @@ func TestHandleUplink(t *testing.T) {
 
 	type TestCase struct {
 		Name    string
-		Handler func(context.Context, TestEnvironment, *test.MockClock, func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool
+		Handler func(context.Context, LegacyTestEnvironment, *test.MockClock, func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool
 	}
 	tcs := []TestCase{
 		{
 			Name: "No settings",
-			Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				return a.So(test.AllTrue(
@@ -602,7 +609,7 @@ func TestHandleUplink(t *testing.T) {
 			tcs = append(tcs,
 				TestCase{
 					Name: makeName("No payload"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
 							RxMetadata: uplinkMDs,
 							Settings:   MakeUplinkSettings(dr, ch.Frequency),
@@ -611,7 +618,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeName("Unknown Major"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
 							RawPayload: []byte{
 								/* MHDR */
@@ -633,7 +640,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeName("Invalid MType"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
 							RawPayload: bytes.Repeat([]byte{0x20}, 33),
 							RxMetadata: uplinkMDs,
@@ -643,7 +650,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeName("Proprietary MType"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						phyPayload := []byte{
 							/* MHDR */
 							0b111_000_00,
@@ -703,7 +710,7 @@ func TestHandleUplink(t *testing.T) {
 			tcs = append(tcs,
 				TestCase{
 					Name: makeJoinName("Get fail"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
@@ -718,7 +725,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeJoinName("Get ABP device"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
@@ -741,7 +748,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeJoinName("Get OTAA device", "Deduplication fail"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
@@ -761,7 +768,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeJoinName("Get OTAA device", "Duplicate uplink"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
@@ -781,7 +788,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS fail"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
@@ -806,7 +813,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS not found", "Interop JS fail"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
@@ -831,7 +838,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Current downlink queue", "Set fail on read"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
@@ -881,7 +888,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Current downlink queue", "Device deleted during handling"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
@@ -927,7 +934,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Current downlink queue", "Set fail on write"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
@@ -971,7 +978,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Current downlink queue", "Set success", "Downlink add success", "AppSKey present", "Application uplink add success"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
@@ -1020,7 +1027,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS accept", "Metadata merge success", "Pending downlink queue", "Set success", "Downlink add fail", "No AppSKey", "Application uplink add fail"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
@@ -1065,7 +1072,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS accept", "Metadata merge success", "Both downlink queues", "Set success", "Downlink add fail", "No AppSKey", "Application uplink add success"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
@@ -1119,7 +1126,7 @@ func TestHandleUplink(t *testing.T) {
 				},
 				TestCase{
 					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS accept", "Metadata merge success", "No downlink queue", "Set fail on write"),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
@@ -1237,7 +1244,7 @@ func TestHandleUplink(t *testing.T) {
 
 				tcs = append(tcs, TestCase{
 					Name: makeMDName(makeChDRName(chIdx, drIdx, makeLoopName(fmt.Sprintf("Rejoin-request Type %d", typ)))),
-					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, makeRejoinRequest(false)), ErrRejoinRequest), should.BeTrue)
 					},
 				})
@@ -1312,7 +1319,22 @@ func TestHandleUplink(t *testing.T) {
 			for _, confirmed := range [2]bool{true, false} {
 				confirmed := confirmed
 				makeDataUplink := func(decodePayload bool, adr bool, frmPayload []byte) *ttnpb.UplinkMessage {
-					return MakeDataUplink(macVersion, decodePayload, confirmed, DevAddr, ttnpb.FCtrl{ADR: adr}, FCnt, 0, FPort, frmPayload, []byte{byte(ttnpb.CID_LINK_CHECK)}, dr, drIdx, ch.Frequency, chIdx, uplinkMDs...)
+					return MakeDataUplink(DataUplinkConfig{
+						MACVersion:    macVersion,
+						DecodePayload: decodePayload,
+						Confirmed:     confirmed,
+						DevAddr:       DevAddr,
+						FCtrl:         ttnpb.FCtrl{ADR: adr},
+						FCnt:          FCnt,
+						FPort:         FPort,
+						FRMPayload:    frmPayload,
+						FOpts:         []byte{byte(ttnpb.CID_LINK_CHECK)},
+						DataRate:      dr,
+						DataRateIndex: drIdx,
+						Frequency:     ch.Frequency,
+						ChannelIndex:  chIdx,
+						RxMetadata:    uplinkMDs,
+					})
 				}
 				dataSetByIDSetPaths := [...]string{
 					"mac_state",
@@ -1392,7 +1414,7 @@ func TestHandleUplink(t *testing.T) {
 					tcs = append(tcs,
 						TestCase{
 							Name: conf.MakeName("Range fail"),
-							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+							Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 								t := test.MustTFromContext(ctx)
 								a := assertions.New(t)
 								msg := conf.MakeDataUplink(false)
@@ -1407,7 +1429,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 						TestCase{
 							Name: conf.MakeName("Range success", "No devices"),
-							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+							Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 								t := test.MustTFromContext(ctx)
 								a := assertions.New(t)
 								msg := conf.MakeDataUplink(false)
@@ -1422,7 +1444,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 						TestCase{
 							Name: conf.MakeName("Range success", "No match"),
-							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+							Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 								t := test.MustTFromContext(ctx)
 								a := assertions.New(t)
 								msg := conf.MakeDataUplink(false)
@@ -1437,7 +1459,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 						TestCase{
 							Name: conf.MakeName("Range success", "Deduplication fail"),
-							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+							Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 								t := test.MustTFromContext(ctx)
 								a := assertions.New(t)
 								msg := conf.MakeDataUplink(false)
@@ -1457,7 +1479,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 						TestCase{
 							Name: conf.MakeName("Range success", "Duplicate uplink"),
-							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+							Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 								t := test.MustTFromContext(ctx)
 								a := assertions.New(t)
 								msg := conf.MakeDataUplink(false)
@@ -1477,7 +1499,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 						TestCase{
 							Name: conf.MakeName("Range success", "First uplink", "Metadata merge fail", "Set fail on read"),
-							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+							Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 								t := test.MustTFromContext(ctx)
 								a := assertions.New(t)
 								msg := conf.MakeDataUplink(false)
@@ -1512,7 +1534,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 						TestCase{
 							Name: conf.MakeName("Range success", "First uplink", "Metadata merge success", "Device deleted during handling"),
-							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+							Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 								t := test.MustTFromContext(ctx)
 								a := assertions.New(t)
 								msg := conf.MakeDataUplink(false)
@@ -1544,7 +1566,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 						TestCase{
 							Name: conf.MakeName("Range success", "First uplink", "Metadata merge success", "Rematch fail"),
-							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+							Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 								t := test.MustTFromContext(ctx)
 								a := assertions.New(t)
 								msg := conf.MakeDataUplink(false)
@@ -1580,7 +1602,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 						TestCase{
 							Name: conf.MakeName("Range success", "First uplink", "Metadata merge fail", "No rematch", "Set success", "NbTrans=1", "Downlink add fail", "Application uplink add fail"),
-							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+							Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 								t := test.MustTFromContext(ctx)
 								a := assertions.New(t)
 								msg := conf.MakeDataUplink(false)
@@ -1620,7 +1642,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 						TestCase{
 							Name: conf.MakeName("Range success", "First uplink", "Metadata merge success", "Rematch success", "Set success", "NbTrans=1", "Downlink add success", "Application uplink add success"),
-							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+							Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 								t := test.MustTFromContext(ctx)
 								a := assertions.New(t)
 								msg := conf.MakeDataUplink(false)
@@ -1656,7 +1678,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 						TestCase{
 							Name: conf.MakeName("Range success", "First uplink", "Metadata merge success", "No rematch", "Set success", "NbTrans=2", "Downlink add success"),
-							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+							Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 								t := test.MustTFromContext(ctx)
 								a := assertions.New(t)
 								msg := conf.MakeDataUplink(false)
@@ -1699,25 +1721,51 @@ func TestHandleUplink(t *testing.T) {
 
 	for _, tc := range tcs {
 		t.Run(tc.Name, func(t *testing.T) {
+			dtq, dtqEnv, dtqClose := newMockDownlinkTaskQueue(t)
+			defer dtqClose()
+
+			dr, drEnv, drClose := newMockDeviceRegistry(t)
+			defer drClose()
+
+			ud, udEnv, udClose := newMockUplinkDeduplicator(t)
+			defer udClose()
+
+			auq, auqEnv, auqClose := newMockApplicationUplinkQueue(t)
+			defer auqClose()
+
 			ns, ctx, env, stop := StartTest(
 				t,
-				component.Config{},
-				Config{
-					NetID:               *NetID.Copy(&types.NetID{}),
-					DefaultMACSettings:  MACSettingConfig{},
-					DeduplicationWindow: DeduplicationWindow,
-					CooldownWindow:      CooldownWindow,
+				TestConfig{
+					NetworkServer: Config{
+						NetID:               *NetID.Copy(&types.NetID{}),
+						DeduplicationWindow: DeduplicationWindow,
+						CooldownWindow:      CooldownWindow,
+
+						DownlinkTasks:      dtq,
+						Devices:            dr,
+						UplinkDeduplicator: ud,
+						ApplicationUplinkQueue: ApplicationUplinkQueueConfig{
+							Queue: auq,
+						},
+					},
+					Timeout: (1 << 10) * test.Delay,
 				},
-				(1<<10)*test.Delay,
 			)
 			defer stop()
 
-			<-env.DownlinkTasks.Pop
+			<-dtqEnv.Pop
 
 			clock := test.NewMockClock(time.Now().UTC())
 			defer SetMockClock(clock)()
 
-			if !tc.Handler(ctx, env, clock, func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan error {
+			if !tc.Handler(ctx, LegacyTestEnvironment{
+				TestEnvironment: env,
+
+				DownlinkTasks:      dtqEnv,
+				DeviceRegistry:     drEnv,
+				UplinkDeduplicator: udEnv,
+				ApplicationUplinks: auqEnv,
+			}, clock, func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan error {
 				ch := make(chan error)
 				go func() {
 					_, err := ttnpb.NewGsNsClient(ns.LoopbackConn()).HandleUplink(ctx, CopyUplinkMessage(msg))

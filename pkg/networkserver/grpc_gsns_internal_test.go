@@ -23,7 +23,6 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -295,7 +294,15 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							Session:              makeSession(0x00, 0x00),
 						}
 						dev.MACState.PendingRequests = []*ttnpb.MACCommand{ttnpb.CID_DEV_STATUS.MACCommand()}
-						up := MakeDataUplink(macVersion, true, false, DevAddr, ttnpb.FCtrl{}, 0x00, 0x00, 0x00, nil, nil, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1)
+						up := MakeDataUplink(DataUplinkConfig{
+							MACVersion:    macVersion,
+							DecodePayload: true,
+							DevAddr:       DevAddr,
+							DataRate:      dr,
+							DataRateIndex: drIdx,
+							Frequency:     phy.UplinkChannels[chIdx-1].Frequency,
+							ChannelIndex:  chIdx - 1,
+						})
 						up.ReceivedAt = upRecvAt.Add(-time.Nanosecond)
 						dev.MACState.RecentUplinks = appendRecentUplink(dev.MACState.RecentUplinks, up, recentUplinkCount)
 						dev.RecentUplinks = appendRecentUplink(dev.RecentUplinks, up, recentUplinkCount)
@@ -316,7 +323,15 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						}
 						dev.MACState.CurrentParameters.ADRNbTrans = 2
 						dev.MACState.PendingRequests = []*ttnpb.MACCommand{ttnpb.CID_DEV_STATUS.MACCommand()}
-						up := MakeDataUplink(macVersion, true, false, DevAddr, ttnpb.FCtrl{}, 0x00, 0x00, 0x00, nil, nil, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1)
+						up := MakeDataUplink(DataUplinkConfig{
+							MACVersion:    macVersion,
+							DecodePayload: true,
+							DevAddr:       DevAddr,
+							DataRate:      dr,
+							DataRateIndex: drIdx,
+							Frequency:     phy.UplinkChannels[chIdx-1].Frequency,
+							ChannelIndex:  chIdx - 1,
+						})
 						up.ReceivedAt = upRecvAt.Add(-time.Nanosecond)
 						dev.MACState.RecentUplinks = appendRecentUplink(dev.MACState.RecentUplinks, up, recentUplinkCount)
 						dev.RecentUplinks = appendRecentUplink(dev.RecentUplinks, up, recentUplinkCount)
@@ -855,11 +870,23 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						}
 						dev.MACState.CurrentParameters.ADRNbTrans = 3
 						dev.MACState.PendingRequests = []*ttnpb.MACCommand{{}, {}}
-						up := MakeDataUplink(macVersion, true, false, DevAddr, ttnpb.FCtrl{
-							ADR:       true,
-							ADRAckReq: true,
-							ClassB:    true,
-						}, 0xff00, 0, 0x01, []byte("test-payload"), []byte{}, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1)
+						up := MakeDataUplink(DataUplinkConfig{
+							MACVersion:    macVersion,
+							DecodePayload: true,
+							DevAddr:       DevAddr,
+							FCtrl: ttnpb.FCtrl{
+								ADR:       true,
+								ADRAckReq: true,
+								ClassB:    true,
+							},
+							FCnt:          0xff00,
+							FPort:         0x01,
+							FRMPayload:    []byte("test-payload"),
+							DataRate:      dr,
+							DataRateIndex: drIdx,
+							Frequency:     phy.UplinkChannels[chIdx-1].Frequency,
+							ChannelIndex:  chIdx - 1,
+						})
 						up.ReceivedAt = upRecvAt.Add(-time.Nanosecond)
 						dev.MACState.RecentUplinks = appendRecentUplink(dev.MACState.RecentUplinks, up, recentUplinkCount)
 						dev.RecentUplinks = appendRecentUplink(dev.RecentUplinks, up, recentUplinkCount)
@@ -958,12 +985,27 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		} {
 			upName := makeName(fmt.Sprintf("confirmed:%v,ack:%v,adr:%v,adr_ack_req:%v,class_b:%v,f_cnt:0x%x,conf_f_cnt_down:0x%x,f_port:%v,frm_payload:%v,fOpts:%v",
 				upConf.Confirmed, upConf.Ack, upConf.ADR, upConf.ADRAckReq, upConf.ClassB, upConf.FCnt, upConf.ConfFCntDown, upConf.FPort, hex.EncodeToString(upConf.FRMPayload), hex.EncodeToString(upConf.FOpts)))
-			up := MakeDataUplink(macVersion, true, upConf.Confirmed, DevAddr, ttnpb.FCtrl{
-				Ack:       upConf.Ack,
-				ADR:       upConf.ADR,
-				ADRAckReq: upConf.ADRAckReq,
-				ClassB:    upConf.ClassB,
-			}, upConf.FCnt, upConf.ConfFCntDown, upConf.FPort, upConf.FRMPayload, upConf.FOpts, dr, drIdx, ch.Frequency, chIdx)
+			up := MakeDataUplink(DataUplinkConfig{
+				MACVersion:    macVersion,
+				DecodePayload: true,
+				Confirmed:     upConf.Confirmed,
+				DevAddr:       DevAddr,
+				FCtrl: ttnpb.FCtrl{
+					Ack:       upConf.Ack,
+					ADR:       upConf.ADR,
+					ADRAckReq: upConf.ADRAckReq,
+					ClassB:    upConf.ClassB,
+				},
+				FCnt:          upConf.FCnt,
+				ConfFCntDown:  upConf.ConfFCntDown,
+				FPort:         upConf.FPort,
+				FRMPayload:    upConf.FRMPayload,
+				FOpts:         upConf.FOpts,
+				DataRate:      dr,
+				DataRateIndex: drIdx,
+				Frequency:     ch.Frequency,
+				ChannelIndex:  chIdx,
+			})
 			up.ReceivedAt = upRecvAt
 			for _, deduplicated := range [2]bool{
 				true,
@@ -1176,12 +1218,13 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			ns, ctx, env, stop := StartTest(t, component.Config{}, Config{
-				NetID: NetID,
-			}, (1<<5)*test.Delay)
+			ns, ctx, _, stop := StartTest(t, TestConfig{
+				NetworkServer: Config{
+					NetID: NetID,
+				},
+				Timeout: (1 << 5) * test.Delay,
+			})
 			defer stop()
-
-			<-env.DownlinkTasks.Pop
 
 			dev, err := ns.matchAndHandleDataUplink(CopyUplinkMessage(tc.Uplink), tc.Deduplicated, tc.MakeDevices(ctx)...)
 			if a.So(err, should.EqualErrorOrDefinition, tc.Error) {
