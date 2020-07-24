@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for synchronizing gateway clocks via uplink tokens. UDP gateways may not connect to the same Gateway Server instance.
 - Consistent command aliases for CLI commands.
 - Laird gateway documentation.
+- Option to allow unauthenticated Basic Station connections. Unset `gs.basic-station.allow-unauthenticated` to enforce auth check for production clusters. Please note that unauthenticated connections in existing connections will not be allowed unless this is set.
 
 ### Changed
 
