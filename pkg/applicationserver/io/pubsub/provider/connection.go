@@ -16,8 +16,11 @@ package provider
 
 import (
 	"context"
+	"reflect"
 
+	"github.com/golang/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"gocloud.dev/pubsub"
 )
 
@@ -29,17 +32,10 @@ type DownlinkSubscriptions struct {
 
 // Shutdown shutdowns the active subscriptions.
 func (ds *DownlinkSubscriptions) Shutdown(ctx context.Context) error {
-	for _, sub := range []*pubsub.Subscription{
+	return shutdown(ctx,
 		ds.Push,
 		ds.Replace,
-	} {
-		if sub != nil {
-			if err := sub.Shutdown(ctx); err != nil && !errors.IsCanceled(err) {
-				return err
-			}
-		}
-	}
-	return nil
+	)
 }
 
 // UplinkTopics contains the topics for the uplink messages.
@@ -57,7 +53,7 @@ type UplinkTopics struct {
 
 // Shutdown shutdowns the active topics.
 func (ut *UplinkTopics) Shutdown(ctx context.Context) error {
-	for _, topic := range []*pubsub.Topic{
+	return shutdown(ctx,
 		ut.UplinkMessage,
 		ut.JoinAccept,
 		ut.DownlinkAck,
@@ -67,14 +63,7 @@ func (ut *UplinkTopics) Shutdown(ctx context.Context) error {
 		ut.DownlinkQueued,
 		ut.LocationSolved,
 		ut.ServiceData,
-	} {
-		if topic != nil {
-			if err := topic.Shutdown(ctx); err != nil && !errors.IsCanceled(err) {
-				return err
-			}
-		}
-	}
-	return nil
+	)
 }
 
 // Shutdowner is an interface that contains a contextual shutdown method.
@@ -96,14 +85,41 @@ type Connection struct {
 
 // Shutdown shuts down the topics, subscriptions and the connections if required.
 func (c *Connection) Shutdown(ctx context.Context) error {
-	for _, s := range []Shutdowner{
+	return shutdown(ctx,
 		&c.Topics,
 		&c.Subscriptions,
 		c.ProviderConnection,
-	} {
+	)
+}
+
+var errShutdownFailed = errors.DefineInternal("shutdown_failed", "failed to shutdown")
+
+func shutdown(ctx context.Context, shutdowners ...Shutdowner) error {
+	details := make([]errors.ErrorDetails, 0, len(shutdowners))
+	for _, s := range shutdowners {
+		if isNil(s) {
+			continue
+		}
 		if err := s.Shutdown(ctx); err != nil {
-			return err
+			details = append(details, errShutdownFailed.WithCause(err))
 		}
 	}
+	if len(details) > 0 {
+		protoDetails := make([]proto.Message, 0, len(details))
+		for _, detail := range details {
+			protoDetails = append(protoDetails, ttnpb.ErrorDetailsToProto(detail))
+		}
+		return errShutdownFailed.WithDetails(protoDetails...)
+	}
 	return nil
+}
+
+func isNil(c interface{}) bool {
+	if c == nil {
+		return true
+	}
+	if val := reflect.ValueOf(c); val.Kind() == reflect.Ptr {
+		return val.IsNil()
+	}
+	return false
 }
