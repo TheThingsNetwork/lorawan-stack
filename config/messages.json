@@ -2663,40 +2663,58 @@
       "file": "listeners.go"
     }
   },
-  "error:pkg/component:missing_acme_dir": {
+  "error:pkg/config/tlsconfig:acme_already_initialized": {
+    "translations": {
+      "en": "ACME already initialized"
+    },
+    "description": {
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
+    }
+  },
+  "error:pkg/config/tlsconfig:missing_acme_dir": {
     "translations": {
       "en": "missing ACME storage directory"
     },
     "description": {
-      "package": "pkg/component",
-      "file": "acme.go"
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
     }
   },
-  "error:pkg/component:missing_acme_endpoint": {
+  "error:pkg/config/tlsconfig:missing_acme_endpoint": {
     "translations": {
       "en": "missing ACME endpoint"
     },
     "description": {
-      "package": "pkg/component",
-      "file": "acme.go"
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
     }
   },
-  "error:pkg/component:tls_config_empty": {
+  "error:pkg/config/tlsconfig:tls_config_source_invalid": {
     "translations": {
-      "en": "empty TLS configuration"
+      "en": "invalid TLS configuration source `{source}`"
     },
     "description": {
-      "package": "pkg/component",
-      "file": "tls.go"
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
     }
   },
-  "error:pkg/component:tls_key_vault_id": {
+  "error:pkg/config/tlsconfig:tls_key_vault_id": {
     "translations": {
       "en": "invalid TLS key vault ID"
     },
     "description": {
-      "package": "pkg/component",
-      "file": "tls.go"
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
+    }
+  },
+  "error:pkg/config/tlsconfig:tls_source_empty": {
+    "translations": {
+      "en": "empty TLS source"
+    },
+    "description": {
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
     }
   },
   "error:pkg/config:format": {
@@ -3482,15 +3500,6 @@
       "file": "upstream.go"
     }
   },
-  "error:pkg/gatewayserver/io/basicstationlns:auth_not_provided": {
-    "translations": {
-      "en": "no auth provided for gateway id `{id}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns",
-      "file": "basicstationlns.go"
-    }
-  },
   "error:pkg/gatewayserver/io/basicstationlns:empty_gateway_eui": {
     "translations": {
       "en": "empty gateway EUI"
@@ -3512,6 +3521,15 @@
   "error:pkg/gatewayserver/io/basicstationlns:listener": {
     "translations": {
       "en": "failed to serve Basic Station frontend listener"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns",
+      "file": "basicstationlns.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns:no_auth_provided": {
+    "translations": {
+      "en": "no auth provided for gateway id `{id}`"
     },
     "description": {
       "package": "pkg/gatewayserver/io/basicstationlns",
@@ -6306,15 +6324,6 @@
     "description": {
       "package": "pkg/packetbrokeragent",
       "file": "translation.go"
-    }
-  },
-  "error:pkg/packetbrokeragent:no_tls_certificate": {
-    "translations": {
-      "en": "no TLS certificate configured"
-    },
-    "description": {
-      "package": "pkg/packetbrokeragent",
-      "file": "config.go"
     }
   },
   "error:pkg/packetbrokeragent:token_key": {

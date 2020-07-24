@@ -15,25 +15,20 @@
 package packetbrokeragent
 
 import (
-	"context"
-	"crypto/tls"
-
-	"go.thethings.network/lorawan-stack/v3/pkg/config"
-	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"gopkg.in/square/go-jose.v2"
 )
 
 // Config configures Packet Broker clients.
 type Config struct {
-	DataPlaneAddress string            `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
-	NetID            types.NetID       `name:"net-id" description:"LoRa Alliance NetID"`
-	TenantID         string            `name:"tenant-id" description:"Tenant ID within the NetID"`
-	ClusterID        string            `name:"cluster-id" description:"Cluster ID uniquely identifying this cluster within a NetID and tenant"`
-	TLS              TLSConfig         `name:"tls"`
-	Forwarder        ForwarderConfig   `name:"forwarder" description:"Forwarder configuration for publishing uplink messages and subscribing to downlink messages"`
-	HomeNetwork      HomeNetworkConfig `name:"home-network" description:"Home Network configuration for subscribing to uplink and publishing downlink messages"`
+	DataPlaneAddress string               `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
+	NetID            types.NetID          `name:"net-id" description:"LoRa Alliance NetID"`
+	TenantID         string               `name:"tenant-id" description:"Tenant ID within the NetID"`
+	ClusterID        string               `name:"cluster-id" description:"Cluster ID uniquely identifying this cluster within a NetID and tenant"`
+	TLS              tlsconfig.ClientAuth `name:"tls"`
+	Forwarder        ForwarderConfig      `name:"forwarder" description:"Forwarder configuration for publishing uplink messages and subscribing to downlink messages"`
+	HomeNetwork      HomeNetworkConfig    `name:"home-network" description:"Home Network configuration for subscribing to uplink and publishing downlink messages"`
 }
 
 // ForwarderConfig defines configuration of the Forwarder role.
@@ -55,29 +50,4 @@ type HomeNetworkConfig struct {
 // WorkerPoolConfig contains the worker pool configuration for a Packet Broker role.
 type WorkerPoolConfig struct {
 	Limit int `name:"limit" description:"Limit of active workers"`
-}
-
-// TLSConfig contains TLS configuration for connecting to Packet Broker.
-type TLSConfig struct {
-	Source      string             `name:"source" description:"Source of the TLS certificate (file, key-vault)"`
-	Certificate string             `name:"certificate" description:"Location of TLS certificate"`
-	Key         string             `name:"key" description:"Location of TLS private key"`
-	KeyVault    config.TLSKeyVault `name:"key-vault"`
-}
-
-var errNoTLSCertificate = errors.DefineFailedPrecondition("no_tls_certificate", "no TLS certificate configured")
-
-func (c TLSConfig) loadCertificate(ctx context.Context, keyVault crypto.KeyVault) (tls.Certificate, error) {
-	switch c.Source {
-	case "file":
-		return tls.LoadX509KeyPair(c.Certificate, c.Key)
-	case "key-vault":
-		cert, err := keyVault.ExportCertificate(ctx, c.KeyVault.ID)
-		if err != nil {
-			return tls.Certificate{}, err
-		}
-		return *cert, nil
-	default:
-		return tls.Certificate{}, errNoTLSCertificate.New()
-	}
 }

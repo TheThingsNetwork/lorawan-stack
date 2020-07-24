@@ -24,6 +24,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	ttnblob "go.thethings.network/lorawan-stack/v3/pkg/blob"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -425,7 +426,7 @@ type ServiceBase struct {
 	GRPC             GRPC                   `name:"grpc"`
 	HTTP             HTTP                   `name:"http"`
 	Interop          InteropServer          `name:"interop"`
-	TLS              TLS                    `name:"tls"`
+	TLS              tlsconfig.Config       `name:"tls"`
 	Sentry           Sentry                 `name:"sentry"`
 	Blob             BlobConfig             `name:"blob"`
 	FrequencyPlans   FrequencyPlansConfig   `name:"frequency-plans" description:"Source of the frequency plans"`

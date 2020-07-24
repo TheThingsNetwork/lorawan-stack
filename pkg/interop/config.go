@@ -16,8 +16,9 @@ package interop
 
 import (
 	"crypto/tls"
-	"crypto/x509"
+	"fmt"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 )
 
@@ -31,39 +32,37 @@ func (conf tlsConfig) IsZero() bool {
 	return conf == (tlsConfig{})
 }
 
-func (conf tlsConfig) TLSConfig(fetcher fetch.Interface) (*tls.Config, error) {
-	var rootCAs *x509.CertPool
-	if conf.RootCA != "" {
-		caPEM, err := fetcher.File(conf.RootCA)
-		if err != nil {
-			return nil, err
-		}
-		rootCAs = x509.NewCertPool()
-		rootCAs.AppendCertsFromPEM(caPEM)
-	}
+type fetcherFileReader struct {
+	fetcher fetch.Interface
+}
 
-	var getCert func(*tls.CertificateRequestInfo) (*tls.Certificate, error)
-	if conf.Certificate != "" || conf.Key != "" {
-		getCert = func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
-			certPEM, err := fetcher.File(conf.Certificate)
-			if err != nil {
-				return nil, err
-			}
-			keyPEM, err := fetcher.File(conf.Key)
-			if err != nil {
-				return nil, err
-			}
-			cert, err := tls.X509KeyPair(certPEM, keyPEM)
-			if err != nil {
-				return nil, err
-			}
-			return &cert, nil
-		}
+func (r fetcherFileReader) ReadFile(name string) ([]byte, error) {
+	b, err := r.fetcher.File(name)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to fetch %q: %w", name, err)
 	}
-	return &tls.Config{
-		RootCAs:              rootCAs,
-		GetClientCertificate: getCert,
-	}, nil
+	return b, nil
+}
+
+func (conf tlsConfig) TLSConfig(fetcher fetch.Interface) (*tls.Config, error) {
+	res := &tls.Config{
+		MinVersion: tls.VersionTLS12,
+	}
+	if err := (&tlsconfig.Client{
+		FileReader: fetcherFileReader{fetcher: fetcher},
+		RootCA:     conf.RootCA,
+	}).ApplyTo(res); err != nil {
+		return nil, err
+	}
+	if err := (&tlsconfig.ClientAuth{
+		Source:      "file",
+		FileReader:  fetcherFileReader{fetcher: fetcher},
+		Certificate: conf.Certificate,
+		Key:         conf.Key,
+	}).ApplyTo(res); err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 // InteropClientConfigurationName represents the filename of interop client configuration.
