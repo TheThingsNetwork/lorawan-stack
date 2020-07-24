@@ -1853,9 +1853,9 @@
       "file": "provider.go"
     }
   },
-  "error:pkg/applicationserver/io/pubsub/provider:shutdown_failed": {
+  "error:pkg/applicationserver/io/pubsub/provider:shutdown": {
     "translations": {
-      "en": "failed to shutdown"
+      "en": "shutdown"
     },
     "description": {
       "package": "pkg/applicationserver/io/pubsub/provider",

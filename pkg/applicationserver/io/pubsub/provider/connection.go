@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"gocloud.dev/pubsub"
+	"google.golang.org/grpc/codes"
 )
 
 // DownlinkSubscriptions contains the subscriptions for the push and replace queue operations.
@@ -92,26 +93,32 @@ func (c *Connection) Shutdown(ctx context.Context) error {
 	)
 }
 
-var errShutdownFailed = errors.DefineInternal("shutdown_failed", "failed to shutdown")
+var errShutdown = errors.DefineInternal("shutdown", "shutdown")
 
 func shutdown(ctx context.Context, shutdowners ...Shutdowner) error {
-	details := make([]errors.ErrorDetails, 0, len(shutdowners))
+	details := make([]proto.Message, 0, len(shutdowners))
 	for _, s := range shutdowners {
 		if isNil(s) {
 			continue
 		}
 		if err := s.Shutdown(ctx); err != nil {
-			details = append(details, errShutdownFailed.WithCause(err))
+			details = append(details, toProtoMessage(err))
 		}
 	}
 	if len(details) > 0 {
-		protoDetails := make([]proto.Message, 0, len(details))
-		for _, detail := range details {
-			protoDetails = append(protoDetails, ttnpb.ErrorDetailsToProto(detail))
-		}
-		return errShutdownFailed.WithDetails(protoDetails...)
+		return errShutdown.WithDetails(details...)
 	}
 	return nil
+}
+
+func toProtoMessage(err error) proto.Message {
+	if ttnErr, ok := errors.From(err); ok {
+		return ttnpb.ErrorDetailsToProto(ttnErr)
+	}
+	return &ttnpb.ErrorDetails{
+		Code:          uint32(codes.Unknown),
+		MessageFormat: err.Error(),
+	}
 }
 
 func isNil(c interface{}) bool {
