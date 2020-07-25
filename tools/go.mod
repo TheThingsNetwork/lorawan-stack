@@ -32,13 +32,13 @@ require (
 	github.com/cloudflare/cfssl v1.4.1
 	github.com/gobuffalo/envy v1.9.0 // indirect
 	github.com/gohugoio/hugo v0.71.0
-	github.com/goreleaser/goreleaser v0.138.0
+	github.com/goreleaser/goreleaser v0.140.1
 	github.com/magefile/mage v1.9.1
 	github.com/mattn/goveralls v0.0.5
 	github.com/mdempsky/unconvert v0.0.0-20200228143138-95ecdbfc0b5f
 	github.com/mgechev/revive v1.0.2
 	go.thethings.network/lorawan-stack/v3 v3.0.0-00010101000000-000000000000
-	golang.org/x/tools v0.0.0-20200608174601-1b747fd94509
+	golang.org/x/tools v0.0.0-20200710042808-f1c4188a97a1
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v2 v2.3.0
 )
