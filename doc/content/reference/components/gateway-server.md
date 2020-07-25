@@ -9,7 +9,7 @@ The Gateway Server maintains connections with gateways supporting the Basic Stat
 
 ## Connectivity
 
-Gateways can connect to Gateway Servers over multiple protocols.
+Gateways can connect to Gateway Servers over multiple protocols. See [Networking]({{< ref "/reference/networking" >}}).
 
 ### Basic Station Protocol
 
@@ -25,7 +25,7 @@ Older versions of packet forwarders implementing the UDP protocol do not impleme
 
 ### MQTT Protocol
 
-Gateways can connect to a Gateway Server by exchanging [protocol buffers](https://developers.google.com/protocol-buffers) over MQTT. MQTT is available over TLS, providing confidentiality of messages exchanged between the gateway and the network. The encoding with protocol buffers reduces bandwidth usage compared to the UDP protocol, which uses JSON encoding.
+Gateways can connect to a Gateway Server by exchanging [Protocol Buffers](https://developers.google.com/protocol-buffers) over MQTT. MQTT is available over TLS, providing confidentiality of messages exchanged between the gateway and the network. The encoding with protocol buffers reduces bandwidth usage compared to the UDP protocol, which uses JSON encoding. See [Gateway Server MQTT Protocol]({{< ref "/reference/api/gateway_server_mqtt" >}}) for technical details.
 
 Packet forwarders implementing the MQTT protocols are specific for {{% tts %}}.
 
