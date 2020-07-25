@@ -71,6 +71,7 @@ archives:
       - LICENSE
       - README.md
       - public/**/*
+      - config/completion/*/*
     wrap_in_directory: true
     format_overrides:
       - goos: windows
@@ -83,6 +84,7 @@ archives:
     files:
       - LICENSE
       - README.md
+      - config/completion/*/*ttn-lw-cli*
     wrap_in_directory: true
     format_overrides:
       - goos: windows
@@ -106,6 +108,9 @@ nfpms:
       - cockroach
     files:
       "public/**/*": "/srv/ttn-lorawan/public"
+      "config/completion/bash/*": "/usr/share/bash-completion/completions"
+      "config/completion/fish/*": "/usr/share/fish/vendor_completions.d"
+      "config/completion/zsh/*": "/usr/share/zsh/vendor-completions"
 
 snapcrafts:
   - id: stack
@@ -129,9 +134,11 @@ snapcrafts:
       ttn-lw-stack:
         plugs: [ home, network, network-bind ]
         command: ttn-lw-stack.wrapper
+        completer: config/completion/bash/ttn-lw-stack
       ttn-lw-cli:
         plugs: [ home, network, network-bind ]
         command: ttn-lw-cli.wrapper
+        completer: config/completion/bash/ttn-lw-cli-snap
 
 brews:
   - name: ttn-lw-stack
@@ -155,6 +162,12 @@ brews:
           :TTN_LW_HTTP_STATIC_SEARCH_PATH => libexec/"public"
       }
       (bin/"ttn-lw-stack").write_env_script libexec/"ttn-lw-stack", env
+      bash_completion.install "config/completion/bash/ttn-lw-cli"
+      zsh_completion.install "config/completion/zsh/_ttn-lw-cli"
+      fish_completion.install "config/completion/fish/ttn-lw-cli.fish"
+      bash_completion.install "config/completion/bash/ttn-lw-stack"
+      zsh_completion.install "config/completion/zsh/_ttn-lw-stack"
+      fish_completion.install "config/completion/fish/ttn-lw-stack.fish"
 
   - name: ttn-lw-cli
     ids:
@@ -172,6 +185,9 @@ brews:
     skip_upload: auto
     install: |
       bin.install "ttn-lw-cli"
+      bash_completion.install "config/completion/bash/ttn-lw-cli"
+      zsh_completion.install "config/completion/zsh/_ttn-lw-cli"
+      fish_completion.install "config/completion/fish/ttn-lw-cli.fish"
 
 blobs:
   - provider: s3
