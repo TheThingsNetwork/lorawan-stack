@@ -18,6 +18,8 @@ package gatewayserver
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	stdlog "log"
 	"math"
 	"net"
 	"net/http"
@@ -278,6 +280,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 					Handler:           bsWebServer,
 					ReadTimeout:       120 * time.Second,
 					ReadHeaderTimeout: 5 * time.Second,
+					ErrorLog:          stdlog.New(ioutil.Discard, "", 0),
 				}
 				go func() {
 					<-ctx.Done()
