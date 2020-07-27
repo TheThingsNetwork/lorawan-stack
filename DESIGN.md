@@ -119,13 +119,19 @@ The Things Stack for LoRaWAN employs a set of design tokens that ensure a stream
 
 We use a sober and subtle color scheme that revolves around our brand colors as well as some grayscale tones to ensure proper contrast. We want to keep the console as clean as possible to also facilitate custom branding and alternative color schemes (like a dark mode) in the future. Our non-grayscale colors are used sparingly to focus attention.
 
+#### Brand colors
+
 For gradients, brand related colors and arbitrary coloring according to our brand, you can use our brand color scheme:
+
 ![Brand Colors](https://user-images.githubusercontent.com/26456318/78355503-14168180-75ae-11ea-982d-368c022e96d3.png)
 
-In our Web UIs, we use the following colors:
-![WebUI Colors](https://user-images.githubusercontent.com/5710611/79414964-02d66780-7fe7-11ea-97ee-525bbd8e92ba.png)
+#### Web UI Colors
 
-#### Shading
+In our Web UIs, we use the following colors:
+
+![Web UI Colors](https://user-images.githubusercontent.com/5710611/88513232-dd63eb80-d022-11ea-958d-e04c9df6f3ad.png)
+
+##### Shading
 
 All fill colors may be shaded in both directions two times in discrete steps. This should only be done to improve an otherwise poor contrast situation or to produce `:hover` and `:active` color values
 
