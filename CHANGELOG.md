@@ -59,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Read only access for the gateway overview page in the Console.
 - Fix an issue that frequently caused event data views crashing in the Console.
 - Application Server contacting Join Server via interop for fetching the AppSKey.
+- Low color contrast situations in the Console.
 
 ### Security
 
