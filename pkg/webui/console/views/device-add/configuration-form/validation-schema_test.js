@@ -343,8 +343,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       schema._activation_mode = ACTIVATION_MODES.OTAA
 
       try {
-        const res = validate(schema)
-        console.log(res)
+        validate(schema)
         done.fail('should fail')
       } catch (error) {
         expect(error).toBeDefined()
