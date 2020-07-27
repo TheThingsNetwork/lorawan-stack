@@ -229,3 +229,17 @@ The cluster keys are 128 bit, hex-encoded keys that cluster components use to au
 It is possible to configure the cluster to use TLS or not. We recommend to enable TLS for production deployments.
 
 - `cluster.tls`: Do cluster gRPC over TLS
+
+## Cache Options
+
+{{% tts %}} can optionally be configured to use a cache.
+
+- `cache.service`: Configure the backing store that will be used for the cache. Currently, only `redis` is supported
+
+When using the `redis` backend, the global [Redis configuration]({{< ref "#redis-options" >}}) is used. Alternatively, you may customize the Redis configuration that is used for the cache.
+
+- `cache.redis.address`: Address of the Redis server
+- `cache.redis.password`: Password of the Redis server
+- `cache.redis.database`: Redis database to use
+- `cache.redis.namespace`: Namespace for Redis keys
+- `cache.redis.pool-size`: The maximum size of the connection pool
