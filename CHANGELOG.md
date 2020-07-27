@@ -42,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic collapse and expand of the sidebar navigation in the Console based on screen width.
 - The header of the sidebar is now clickable in the Console.
 - Overall layout and behavior of the sidebar in the Console improved.
+- Improved layout and screen space utilization of event data views in the Console.
 
 ### Deprecated
 
