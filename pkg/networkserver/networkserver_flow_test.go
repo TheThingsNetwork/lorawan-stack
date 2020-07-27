@@ -372,67 +372,42 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 func TestFlow(t *testing.T) {
 	t.Parallel()
 
-	for _, tc := range []struct {
-		Name                      string
-		NewDeviceRegistry         func(t testing.TB) (dr DeviceRegistry, closeFn func())
-		NewApplicationUplinkQueue func(t testing.TB) (uq ApplicationUplinkQueue, closeFn func())
-		NewDownlinkTaskQueue      func(t testing.TB) (tq DownlinkTaskQueue, closeFn func())
-		NewUplinkDeduplicator     func(t testing.TB) (ud UplinkDeduplicator, closeFn func())
-	}{
+	eu868LinkADRReqs := []*ttnpb.MACCommand_LinkADRReq{
 		{
-			Name:                      "Redis application uplink queue/Redis registry/Redis downlink task queue/Redis uplink deduplicator",
-			NewApplicationUplinkQueue: NewRedisApplicationUplinkQueue,
-			NewDeviceRegistry:         NewRedisDeviceRegistry,
-			NewDownlinkTaskQueue:      NewRedisDownlinkTaskQueue,
-			NewUplinkDeduplicator:     NewRedisUplinkDeduplicator,
+			ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
+			DataRateIndex: ttnpb.DATA_RATE_4,
+			TxPowerIndex:  1,
+			NbTrans:       1,
 		},
+	}
+	us915LinkADRReqs := []*ttnpb.MACCommand_LinkADRReq{
+		{
+			ChannelMask:   []bool{false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true},
+			DataRateIndex: ttnpb.DATA_RATE_2,
+			TxPowerIndex:  1,
+			NbTrans:       1,
+		},
+	}
+	for flowName, handleFlowTest := range map[string]func(context.Context, TestEnvironment){
+		"Class C/OTAA/MAC:1.0.3/PHY:1.0.3-a/FP:EU868": makeClassCOTAAFlowTest(ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A, test.EUFrequencyPlanID, eu868LinkADRReqs...),
+		"Class C/OTAA/MAC:1.0.4/PHY:1.0.3-a/FP:US915": makeClassCOTAAFlowTest(ttnpb.MAC_V1_0_4, ttnpb.PHY_V1_0_3_REV_A, test.USFrequencyPlanID, us915LinkADRReqs...),
+		"Class C/OTAA/MAC:1.1/PHY:1.1-b/FP:EU868":     makeClassCOTAAFlowTest(ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B, test.EUFrequencyPlanID, eu868LinkADRReqs...),
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
+		t.Run(flowName, func(t *testing.T) {
 			t.Parallel()
 
-			eu868LinkADRReqs := []*ttnpb.MACCommand_LinkADRReq{
-				{
-					ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
-					DataRateIndex: ttnpb.DATA_RATE_4,
-					TxPowerIndex:  1,
-					NbTrans:       1,
-				},
-			}
-			us915LinkADRReqs := []*ttnpb.MACCommand_LinkADRReq{
-				{
-					ChannelMask:   []bool{false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true},
-					DataRateIndex: ttnpb.DATA_RATE_2,
-					TxPowerIndex:  1,
-					NbTrans:       1,
-				},
-			}
-			for flowName, handleFlowTest := range map[string]func(context.Context, TestEnvironment){
-				"Class C/OTAA/MAC:1.0.3/PHY:1.0.3-a/FP:EU868": makeClassCOTAAFlowTest(ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A, test.EUFrequencyPlanID, eu868LinkADRReqs...),
-				"Class C/OTAA/MAC:1.0.4/PHY:1.0.3-a/FP:US915": makeClassCOTAAFlowTest(ttnpb.MAC_V1_0_4, ttnpb.PHY_V1_0_3_REV_A, test.USFrequencyPlanID, us915LinkADRReqs...),
-				"Class C/OTAA/MAC:1.1/PHY:1.1-b/FP:EU868":     makeClassCOTAAFlowTest(ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B, test.EUFrequencyPlanID, eu868LinkADRReqs...),
-			} {
-				t.Run(flowName, func(t *testing.T) {
-					t.Parallel()
+			nsConf := DefaultConfig
+			nsConf.NetID = test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
+			nsConf.DeduplicationWindow = (1 << 4) * test.Delay
+			nsConf.CooldownWindow = (1 << 9) * test.Delay
 
-					nsConf := DefaultConfig
-					nsConf.NetID = test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
-					nsConf.DeduplicationWindow = (1 << 4) * test.Delay
-					nsConf.CooldownWindow = (1 << 9) * test.Delay
+			_, ctx, env, stop := StartTest(t, TestConfig{
+				NetworkServer: nsConf,
+				Timeout:       (1 << 13) * test.Delay,
+			})
+			defer stop()
 
-					_, ctx, env, stop := StartTest(t, TestConfig{
-						NetworkServer: nsConf,
-						Timeout:       (1 << 13) * test.Delay,
-
-						NewApplicationUplinkQueue: tc.NewApplicationUplinkQueue,
-						NewDeviceRegistry:         tc.NewDeviceRegistry,
-						NewDownlinkTaskQueue:      tc.NewDownlinkTaskQueue,
-						NewUplinkDeduplicator:     tc.NewUplinkDeduplicator,
-					})
-					defer stop()
-
-					handleFlowTest(ctx, env)
-				})
-			}
+			handleFlowTest(ctx, env)
 		})
 	}
 }

@@ -27,6 +27,13 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
+func init() {
+	NewApplicationUplinkQueue = NewRedisApplicationUplinkQueue
+	NewDeviceRegistry = NewRedisDeviceRegistry
+	NewDownlinkTaskQueue = NewRedisDownlinkTaskQueue
+	NewUplinkDeduplicator = NewRedisUplinkDeduplicator
+}
+
 var redisNamespace = [...]string{
 	"networkserver_test",
 }

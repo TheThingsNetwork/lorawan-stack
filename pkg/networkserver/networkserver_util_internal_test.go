@@ -159,6 +159,11 @@ var (
 	AppID = ttnpb.ApplicationIdentifiers{ApplicationID: AppIDString}
 
 	NetID = test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
+
+	NewDeviceRegistry         func(t testing.TB) (DeviceRegistry, func())
+	NewApplicationUplinkQueue func(t testing.TB) (ApplicationUplinkQueue, func())
+	NewDownlinkTaskQueue      func(t testing.TB) (DownlinkTaskQueue, func())
+	NewUplinkDeduplicator     func(t testing.TB) (UplinkDeduplicator, func())
 )
 
 type DownlinkPath = downlinkPath
@@ -1748,11 +1753,6 @@ type TestConfig struct {
 	Component            component.Config
 	TaskStarter          component.TaskStarter
 	Timeout              time.Duration
-
-	NewDeviceRegistry         func(t testing.TB) (DeviceRegistry, func())
-	NewApplicationUplinkQueue func(t testing.TB) (ApplicationUplinkQueue, func())
-	NewDownlinkTaskQueue      func(t testing.TB) (DownlinkTaskQueue, func())
-	NewUplinkDeduplicator     func(t testing.TB) (UplinkDeduplicator, func())
 }
 
 func StartTest(t *testing.T, conf TestConfig) (*NetworkServer, context.Context, TestEnvironment, func()) {
@@ -1790,28 +1790,28 @@ func StartTest(t *testing.T, conf TestConfig) (*NetworkServer, context.Context, 
 	}
 
 	if conf.NetworkServer.Devices == nil {
-		v, closeFn := conf.NewDeviceRegistry(t)
+		v, closeFn := NewDeviceRegistry(t)
 		if closeFn != nil {
 			closeFuncs = append(closeFuncs, closeFn)
 		}
 		conf.NetworkServer.Devices = v
 	}
 	if conf.NetworkServer.ApplicationUplinkQueue.Queue == nil {
-		v, closeFn := conf.NewApplicationUplinkQueue(t)
+		v, closeFn := NewApplicationUplinkQueue(t)
 		if closeFn != nil {
 			closeFuncs = append(closeFuncs, closeFn)
 		}
 		conf.NetworkServer.ApplicationUplinkQueue.Queue = v
 	}
 	if conf.NetworkServer.DownlinkTasks == nil {
-		v, closeFn := conf.NewDownlinkTaskQueue(t)
+		v, closeFn := NewDownlinkTaskQueue(t)
 		if closeFn != nil {
 			closeFuncs = append(closeFuncs, closeFn)
 		}
 		conf.NetworkServer.DownlinkTasks = v
 	}
 	if conf.NetworkServer.UplinkDeduplicator == nil {
-		v, closeFn := conf.NewUplinkDeduplicator(t)
+		v, closeFn := NewUplinkDeduplicator(t)
 		if closeFn != nil {
 			closeFuncs = append(closeFuncs, closeFn)
 		}
