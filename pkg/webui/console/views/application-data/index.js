@@ -15,15 +15,18 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
-import { Container, Col, Row } from 'react-grid-system'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
+import WithRootClass from '@ttn-lw/lib/components/with-root-class'
+
 import ApplicationEvents from '@console/containers/application-events'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import style from '@console/views/app/app.styl'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -31,8 +34,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { mayViewApplicationEvents } from '@console/lib/feature-checks'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
-
-import style from './application-data.styl'
 
 const m = defineMessages({
   appData: 'Application data',
@@ -54,14 +55,10 @@ export default class Data extends React.Component {
     const { appId } = this.props
 
     return (
-      <Container>
+      <WithRootClass className={style.stageFlex} id="stage">
         <PageTitle hideHeading title={m.appData} />
-        <Row>
-          <Col className={style.wrapper}>
-            <ApplicationEvents appId={appId} />
-          </Col>
-        </Row>
-      </Container>
+        <ApplicationEvents appId={appId} />
+      </WithRootClass>
     )
   }
 }

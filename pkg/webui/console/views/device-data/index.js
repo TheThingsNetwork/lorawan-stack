@@ -14,17 +14,21 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Col, Row, Container } from 'react-grid-system'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
+import WithRootClass from '@ttn-lw/lib/components/with-root-class'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import DeviceEvents from '@console/containers/device-events'
 
+import appStyle from '@console/views/app/app.styl'
+
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import style from './device-data.styl'
 
 import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
 
@@ -57,14 +61,12 @@ export default class Data extends React.Component {
     } = this.props
 
     return (
-      <Container>
-        <IntlHelmet hideHeading title={sharedMessages.data} />
-        <Row>
-          <Col>
-            <DeviceEvents devIds={ids} />
-          </Col>
-        </Row>
-      </Container>
+      <WithRootClass className={appStyle.stageFlex} id="stage">
+        <div className={style.overflowContainer}>
+          <IntlHelmet hideHeading title={sharedMessages.data} />
+          <DeviceEvents devIds={ids} />
+        </div>
+      </WithRootClass>
     )
   }
 }

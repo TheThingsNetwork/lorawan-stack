@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,5 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.wrapper
-  margin-bottom: $ls.xxs
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import useRootClass from '../hooks/use-root-class'
+
+const WithRootClass = ({ children, className, id }) => {
+  useRootClass(className, id)
+
+  return children
+}
+
+WithRootClass.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+  id: PropTypes.string,
+}
+
+WithRootClass.defaultProps = {
+  className: undefined,
+  id: 'app',
+}
+
+export default WithRootClass

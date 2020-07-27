@@ -24,14 +24,15 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './page-title.styl'
 
 const PageTitle = ({ title, values, tall, className, hideHeading, children }) => {
-  const containerClass = classnames(className, style.container, {
-    [style.hideHeading]: hideHeading,
-  })
   const titleClass = classnames(style.title, { [style.tall]: tall })
-  return (
-    <Row className={containerClass}>
+  const pageTitle = <IntlHelmet title={title} values={values} />
+
+  return hideHeading ? (
+    pageTitle
+  ) : (
+    <Row>
       <Col>
-        <IntlHelmet title={title} values={values} />
+        {pageTitle}
         {!hideHeading && (
           <Message component="h1" className={titleClass} content={title} values={values} />
         )}

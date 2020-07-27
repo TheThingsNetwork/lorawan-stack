@@ -556,7 +556,7 @@
   "lib.shared-messages.networkServerAddress": "Network Server address",
   "lib.shared-messages.next": "Next",
   "lib.shared-messages.noDesc": "This end device has no description",
-  "lib.shared-messages.noEvents": "{entityId} has not sent any events recently",
+  "lib.shared-messages.noEvents": "There are no events to show for {entityId}",
   "lib.shared-messages.noLocation": "No location information available",
   "lib.shared-messages.noMatch": "No items found",
   "lib.shared-messages.none": "None",

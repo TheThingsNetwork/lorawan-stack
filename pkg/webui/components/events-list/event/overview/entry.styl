@@ -15,8 +15,15 @@
 .entry
   white-space: nowrap
   flex-shrink: 0
-  padding-right: $cs.s
+
+  &:not(:first-of-type)
+    padding-right: $cs.s
+
+  &:first-of-type
+    padding-right: $cs.xxs
 
   &:last-of-type
     padding-right: 0
     flex-grow: 1
+    flex-shrink: 1
+    overflow-y: auto

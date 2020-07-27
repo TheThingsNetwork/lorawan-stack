@@ -13,28 +13,11 @@
 // limitations under the License.
 
 .list-container
-  min-width: 60rem
   box-sizing: border-box
+  flex: 1
 
 .list-container-widget
   box-sizing: border-box
   min-width: 15rem
-
-.list
-  min-height: 20rem
-  height: 70vh
-  overflow-y: auto
-
-  +media-query($bp.m)
-    min-height: 20rem
-    height: 54vh
-
-  &-item
-    transition: background-color $ad.s linear
-
-    &:hover
-      background-color: $c-backdrop
-
-.list-widget
-  min-height: 10rem
+  height: 12rem
   overflow: hidden

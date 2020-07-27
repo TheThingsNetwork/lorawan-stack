@@ -13,12 +13,29 @@
 // limitations under the License.
 
 .header
-  display: flex
-  align-items: center
-  padding: $cs.xs
+  background-color: white
+  height: 3rem
+  z-index: $zi.slight
+  box-sizing: border-box
 
-.actions
-  flex-grow: 1
-  text-align: right
+  &:not(.widget)
+    border-normal('bottom')
+    .header-cells
+      padding: $cs.xxs 0 $cs.xxs $cs.xs
+
+  &-cells
+    display: flex
+    align-items: center
+    flex: 1
+    justify-content: space-between
+
+.sticky-container
+  flex: 1
+  right: $cs.s
   display: flex
   justify-content: flex-end
+  +media-query-min($bp.xs)
+    position: sticky
+
+  .actions
+    background-color: white

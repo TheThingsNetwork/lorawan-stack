@@ -14,13 +14,16 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
-import { Container, Col, Row } from 'react-grid-system'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
+import WithRootClass from '@ttn-lw/lib/components/with-root-class'
+
 import OrganizationEvents from '@console/containers/organization-events'
+
+import style from '@console/views/app/app.styl'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -41,14 +44,10 @@ export default class Data extends React.Component {
     const { orgId } = this.props
 
     return (
-      <Container>
+      <WithRootClass className={style.stageFlex} id="stage">
         <PageTitle hideHeading title={m.orgData} />
-        <Row>
-          <Col>
-            <OrganizationEvents orgId={orgId} />
-          </Col>
-        </Row>
-      </Container>
+        <OrganizationEvents orgId={orgId} />
+      </WithRootClass>
     )
   }
 }

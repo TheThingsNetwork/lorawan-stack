@@ -47,6 +47,7 @@ const GatewayConnectionEvent = props => {
         <Entry.Icon iconName={iconName} />
         <Entry.Time time={time} />
         <Entry.Type eventName={name} />
+        <Entry.Data />
       </Overview>
     </Event>
   )

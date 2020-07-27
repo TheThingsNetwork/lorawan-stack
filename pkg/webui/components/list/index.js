@@ -103,40 +103,52 @@ class List extends React.PureComponent {
   }
 
   renderItems() {
-    const { items, emptyMessage, emptyMessageValues, children } = this.props
+    const {
+      component: Component,
+      items,
+      emptyMessage,
+      emptyMessageValues,
+      children,
+      listClassName,
+    } = this.props
+
+    const listCls = classnames(style.list, listClassName)
+    const emptyListCls = classnames(style.listEmpty, listClassName)
 
     if (children) {
-      return children
+      return <Component className={listCls}>{children}</Component>
     }
 
     if (!items.length) {
       return (
-        <Message
-          className={style.listEmptyMessage}
-          content={emptyMessage}
-          values={emptyMessageValues}
-        />
+        <div className={emptyListCls}>
+          <Message
+            className={style.listEmptyMessage}
+            content={emptyMessage}
+            values={emptyMessageValues}
+          />
+        </div>
       )
     }
 
-    return items.map((item, idx) => this.renderItem(item, idx))
+    return (
+      <Component className={listCls}>
+        {items.map((item, idx) => this.renderItem(item, idx))}
+      </Component>
+    )
   }
 
   render() {
-    const { className, component: Component, bordered, items, listClassName } = this.props
+    const { className, bordered } = this.props
 
     const cls = classnames(className, style.wrapper, {
       [style.listBordered]: bordered,
     })
 
-    const listCls = classnames(style.list, listClassName, {
-      [style.listEmpty]: !items.length,
-    })
-
     return (
       <div className={cls}>
         {this.header}
-        <Component className={listCls}>{this.renderItems()}</Component>
+        {this.renderItems()}
         {this.footer}
       </div>
     )

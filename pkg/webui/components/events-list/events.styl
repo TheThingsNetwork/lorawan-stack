@@ -13,5 +13,14 @@
 // limitations under the License.
 
 .events-container
-  overflow: auto
+  background-color: $c-backdrop-lighter
   box-sizing: border-box
+  display: flex
+  flex: 1
+  flex-direction: column
+
+  &:not(.widget)
+    min-width: 60rem
+    display: flex
+    flex: 1
+

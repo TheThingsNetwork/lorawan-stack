@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.column
-  &-id
-    min-width: 6rem
+import { useEffect } from 'react'
 
-  &-time
-    min-width: 4rem
-
-  &-type
-    min-width: 14rem
-
-  &-data
-    flex-grow: 1
-    text-align: center
+export default (className, id = 'app') => {
+  useEffect(() => {
+    const containerClasses = document.getElementById(id).classList
+    const classNamesList = className.split(' ')
+    for (const cls of classNamesList) {
+      containerClasses.add(cls)
+    }
+    return function cleanup() {
+      for (const cls of classNamesList) {
+        containerClasses.remove(cls)
+      }
+    }
+  })
+}

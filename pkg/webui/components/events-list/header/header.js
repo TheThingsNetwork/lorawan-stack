@@ -29,20 +29,30 @@ const EventsHeader = props => {
   const { onPause, onClear, widget, paused } = React.useContext(eventsContext)
 
   return (
-    <div className={classnames(className, style.header)}>
-      {children}
-      {!widget && (
-        <div className={style.actions}>
-          <Button
-            onClick={onPause}
-            message={paused ? sharedMessages.resume : sharedMessages.pause}
-            naked
-            secondary
-            icon={paused ? 'play_arrow' : 'pause'}
-          />
-          <Button onClick={onClear} message={sharedMessages.clear} naked secondary icon="delete" />
-        </div>
-      )}
+    <div className={classnames(className, style.header, { [style.widget]: widget })}>
+      <div className={style.headerCells}>
+        {children}
+        {!widget && (
+          <div className={style.stickyContainer}>
+            <div className={style.actions}>
+              <Button
+                onClick={onPause}
+                message={paused ? sharedMessages.resume : sharedMessages.pause}
+                naked
+                secondary
+                icon={paused ? 'play_arrow' : 'pause'}
+              />
+              <Button
+                onClick={onClear}
+                message={sharedMessages.clear}
+                naked
+                secondary
+                icon="delete"
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
