@@ -290,6 +290,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 			}, component.TaskRestartOnFailure)
 	}
 
+	if gs.statsRegistry != nil {
+		go func() {
+			<-gs.Context().Done()
+			gs.statsRegistry.ClearAll()
+		}()
+	}
 	return gs, nil
 }
 

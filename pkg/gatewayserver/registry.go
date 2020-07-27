@@ -26,4 +26,6 @@ type GatewayConnectionStatsRegistry interface {
 	Get(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*ttnpb.GatewayConnectionStats, error)
 	// Set sets or clears the connection stats for a gateway.
 	Set(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats) error
+	// ClearAll clears the connection stats of all gateways set by this instance.
+	ClearAll() error
 }

@@ -137,4 +137,21 @@ func TestRegistry(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(retrieved, should.Resemble, stats)
 	})
+
+	t.Run("TestDeleteMany", func(t *testing.T) {
+		a.So(registry.Set(ctx, ids, initialStats), should.BeNil)
+		a.So(registry.Set(ctx, ids2, initialStats), should.BeNil)
+
+		_, err := registry.Get(ctx, ids)
+		a.So(err, should.BeNil)
+		_, err = registry.Get(ctx, ids2)
+		a.So(err, should.BeNil)
+
+		a.So(registry.ClearAll(), should.BeNil)
+
+		_, err = registry.Get(ctx, ids)
+		a.So(errors.IsNotFound(err), should.BeTrue)
+		_, err = registry.Get(ctx, ids2)
+		a.So(errors.IsNotFound(err), should.BeTrue)
+	})
 }

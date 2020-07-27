@@ -17,6 +17,7 @@ package redis
 import (
 	"context"
 	"runtime/trace"
+	"sync"
 
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -25,7 +26,8 @@ import (
 
 // GatewayConnectionStatsRegistry implements the GatewayConnectionStatsRegistry interface.
 type GatewayConnectionStatsRegistry struct {
-	Redis *ttnredis.Client
+	Redis   *ttnredis.Client
+	allKeys sync.Map // string to struct{}
 }
 
 func (r *GatewayConnectionStatsRegistry) key(uid string) string {
@@ -34,15 +36,16 @@ func (r *GatewayConnectionStatsRegistry) key(uid string) string {
 
 // Set sets or clears the connection stats for a gateway.
 func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats) error {
-	uid := unique.ID(ctx, ids)
-
+	key := r.key(unique.ID(ctx, ids))
 	defer trace.StartRegion(ctx, "set gateway connection stats").End()
 
 	var err error
 	if stats == nil {
-		err = r.Redis.Del(r.key(uid)).Err()
+		err = r.Redis.Del(key).Err()
+		r.allKeys.Delete(key)
 	} else {
-		_, err = ttnredis.SetProto(r.Redis, r.key(uid), stats, 0)
+		_, err = ttnredis.SetProto(r.Redis, key, stats, 0)
+		r.allKeys.Store(key, struct{}{})
 	}
 
 	if err != nil {
@@ -59,4 +62,19 @@ func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids ttnpb.Gate
 		return nil, ttnredis.ConvertError(err)
 	}
 	return result, nil
+}
+
+// ClearAll deletes connection stats for all gateways set from this registry instance.
+func (r *GatewayConnectionStatsRegistry) ClearAll() error {
+	keys := []string{}
+	r.allKeys.Range(func(_key, _ interface{}) bool {
+		if key, ok := _key.(string); ok {
+			keys = append(keys, key)
+		}
+		return true
+	})
+	if err := r.Redis.Del(keys...).Err(); err != nil {
+		return ttnredis.ConvertError(err)
+	}
+	return nil
 }
