@@ -19,7 +19,6 @@ $button($color)
   justify-content: center
   align-items: center
   text-align: center
-  background: $color
   border-radius: $br.s
   padding: 0 $cs.s
   height: 2.3rem
@@ -42,6 +41,8 @@ $button($color)
     margin-right: $cs.s
 
   &:not(.naked)
+    background: $color
+
     &:hover
       background-color: hoverize($color)
 
@@ -65,7 +66,8 @@ $button($color)
     color: $c-icon-fill
 
   &.naked
-    background: transparent
+    transition: background-color $ad.s
+    background-color: transparent
     font-weight: $fw.normal
     border: 1px solid transparent
 
@@ -74,10 +76,9 @@ $button($color)
 
     &:not(.busy):not(:active):not(:disabled)
       &:hover
-        color: darken($color, 15)
+        background-color: $c-backdrop
       +focus-visible()
-        color: darken($color, 15)
-        border: 1px solid $color
+        background-color: $c-backdrop
 
   &.busy:not(.naked),
   &.busy:disabled
@@ -108,10 +109,16 @@ $button($color)
     $button($c-error)
 
   &.warning
-    $button($c-warning)
+    &:not(.naked)
+      $button($c-warning)
+    &.naked
+      $button($tc-warning)
 
   &.secondary
-    $button($c-subtle-fill)
+    &:not(.naked)
+      $button($c-subtle-fill)
+    &.naked
+      $button($tc-subtle-gray)
 
   &.raw
     $button(white)

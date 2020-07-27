@@ -27,11 +27,7 @@
   position: relative
   cursor: pointer
   user-select: none
-  color: $tc-subtle-gray
   transition: color $ad.xs
-
-  &:not(.tab-item-active):hover
-    color: $tc-deep-gray
 
   &-narrow
     padding: $cs.s $cs.m
@@ -45,4 +41,4 @@
 
   &-active
     pseudo-border(3px, $c-active-blue)
-    color: $c-active-blue
+    color: $tc-active
