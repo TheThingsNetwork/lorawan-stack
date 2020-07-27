@@ -21,6 +21,7 @@ import classnames from 'classnames'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
 import Footer from '@ttn-lw/components/footer'
+import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import { withEnv } from '@ttn-lw/lib/components/env'
@@ -128,7 +129,7 @@ class ConsoleApp extends React.PureComponent {
                   isAdmin={isAdmin}
                 >
                   <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
-                  <div className={style.sidebar} id="sidebar" />
+                  <div id="sidebar" className={sidebarStyle.container} />
                   <div className={style.content}>
                     <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
                     <div className={style.stage}>

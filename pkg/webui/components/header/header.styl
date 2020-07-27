@@ -16,16 +16,18 @@
   background-color: white
   z-index: $zi.nav
   width: 100%
-  +media-query($bp.m)
+  +media-query($bp.s)
     z-index: $zi.mobile-menu
     position: fixed
-    height: 0vh
+    top: 0
     & + main
-        margin-top: $header-height
+        padding-top: $header-height
         +media-query($bp.s)
-          margin-top: $header-height-mobile
+          padding-top: $header-height-mobile
 
+  +media-query($bp.m)
     &.mobile-menu-open
+      position: fixed
       z-index: $zi.mobile-menu
       top: 0
       left: 0
@@ -39,6 +41,7 @@
   border-normal('bottom')
   background: linear-gradient(bottom left, 0% #F8F8F8, 60% white) // @stylint ignore
   height: $header-height
+  box-sizing: border-box
   position: relative
   display: flex
   padding: 0 $ls.s

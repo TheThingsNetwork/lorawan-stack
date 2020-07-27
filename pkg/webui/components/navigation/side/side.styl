@@ -12,32 +12,107 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.navigation
+$minimize-button-height = 5rem
+
+// This style is to be applied to the portalled container.
+.container
   border-normal(right)
-  background-color: white
-  max-width: 18rem
-  min-width: 16rem
-  height: 100%
   display: flex
   flex-direction: column
-  justify-content: space-between
-  box-sizing: border-box
+  background-color: white
+  z-index: $zi.nav
+  +media-query-min($bp.s)
+    left: 0
+    top: 0
+    position: absolute
+    height: 100%
   +media-query($bp.s)
-    max-width: none
+    height: auto
+    position: sticky
+    top: $header-height-mobile
+    z-index: $zi.nav
+    +media-query-height(500px)
+      position: static
+
+  .minimize-button
+    reset-button()
+    transition-color()
+    border-normal(top)
+    box-sizing: border-box
+    color: $tc-subtle-gray
+    background-color: white
+    position: sticky
+    top: "calc(100vh - %s)" % $minimize-button-height
+    width: 100%
+    height: $minimize-button-height
+    margin-bottom: 1px
+    flex-shrink: 0
+    &:not(.minimize-button-minimized)
+      padding-left: $cs.l
+      text-align: left
+    &-minimized
+      padding-left: 0
+      text-align: center
+    +media-query-min($bp.s)
+      display: block
+    +media-query($bp.s)
+      display: none
+    &:hover
+      color: $tc-deep-gray
+
+
+.navigation
+  sidebar-transition(width)
+  position: sticky
+  top: 0
+  background-color: white
+  box-sizing: border-box
+  max-height: 100%
+  +media-query-min($bp.s)
+    padding-bottom: $minimize-button-height
+    width: $sidebar-width
+    overflow-y: auto
+    overflow-x: hidden
+  +media-query($bp.s)
+    height: 4rem
     width: 100%
 
   &-minimized
-    min-width: auto
-    display: inline-flex
+    display: flex
+    flex-direction: column
+    justify-content: space-between
+    +media-query-min($bp.s)
+      width: $sidebar-width-minimized
+      display: inline-flex
 
-  .minimize-button
-    align-self: center
-    +media-query($bp.s)
-      display: none
+      .header
+        padding: 0
+        width: 100%
+        display: flex
+        height: $breadcrumbs-bar-height
+        justify-content: center
+
+        .message
+          display: none
+
+        .icon
+          margin-right: 0
+
+.header
+  border-normal(bottom)
+  sidebar-transition(padding)
+  height: 6rem
+  color: $tc-deep-gray
+  box-sizing: border-box
+  display: flex
+  align-items: center
+  padding: $cs.xl $cs.l
+  font-weight: $fw.bold
 
 .mobile-header
-  display: none
   align-items: center
+  +media-query-min($bp.s)
+    display: none
   +media-query($bp.s)
     border-normal(bottom)
     display: flex
@@ -48,44 +123,18 @@
     font-size: 2rem
     color: $tc-subtle-gray
 
-
-.header
-  border-normal(bottom)
-  display: flex
-  align-items: center
-  padding: $cs.xl $cs.l
-  font-weight: $fw.bold
-
-  +media-query-min($bp.s)
-    &-minimized
-      padding: $cs.l $cs.m
-      display: inline-block
-
-      .message
-        display: none
-
-      .icon
-        margin-right: 0
-
-.body
-  height: 100%
-  display: flex
-  flex-direction: column
-  justify-content: space-between
-
 .drawer
   background-color: white
   z-index: $zi.nav
   overflow: auto
   +media-query($bp.s)
-    display: block
+    sidebar-transition(left, box-shadow)
     position: fixed
     top: $header-height-mobile
     left: -60vw
     bottom: 0
     width: 60vw
     max-width: 20rem
-    transition: left 330ms cubic-bezier(.18,.71,.3,.99), box-shadow 330ms cubic-bezier(.18,.71,.3,.99)
 
     &-open
       box-shadow: 0 0 13rem 2rem rgba(0,0,0,.4)

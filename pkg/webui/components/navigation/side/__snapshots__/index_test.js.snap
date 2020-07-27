@@ -1,228 +1,234 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SideNavigation is flat should match snapshot 1`] = `
-<nav
-  className="navigation"
->
-  <div
-    className="mobileHeader"
-    onClick={[Function]}
-  >
-    <Icon
-      className="expandIcon"
-      icon="more_vert"
-      large={false}
-      nudgeDown={false}
-      nudgeUp={false}
-      small={false}
-    />
-    <Icon
-      className="icon"
-      icon="application"
-      large={false}
-      nudgeDown={false}
-      nudgeUp={false}
-      small={false}
-    />
-    <Message
-      capitalize={false}
-      className="message"
-      content="test-header-title"
-      firstToLower={false}
-      firstToUpper={false}
-      lowercase={false}
-      uppercase={false}
-    />
-  </div>
-  <div
-    className="body"
+<Fragment>
+  <nav
+    className="navigation"
   >
     <div
-      className="drawer"
-    >
-      <div
-        className="header"
-      >
-        <Icon
-          className="icon"
-          icon="application"
-          large={false}
-          nudgeDown={false}
-          nudgeUp={false}
-          small={false}
-        />
-        <Message
-          capitalize={false}
-          className="message"
-          content="test-header-title"
-          firstToLower={false}
-          firstToUpper={false}
-          lowercase={false}
-          uppercase={false}
-        />
-      </div>
-      <ContextProvider
-        value={
-          Object {
-            "isMinimized": false,
-            "onLeafItemClick": [Function],
-          }
-        }
-      >
-        <SideNavigationList
-          className="navigationList"
-          depth={0}
-          isExpanded={false}
-          isMinimized={false}
-          onListClick={[Function]}
-        >
-          <withRouter(SideNavigationItem)
-            path="/test-path"
-            title="test-tile"
-          />
-          <withRouter(SideNavigationItem)
-            path="/test-path2"
-            title="test-tile2"
-          />
-        </SideNavigationList>
-      </ContextProvider>
-    </div>
-    <injectIntl(Button)
-      className="minimizeButton"
-      data-hook="side-nav-hide-button"
-      icon="keyboard_arrow_left"
-      message={
-        Object {
-          "defaultMessage": "Hide sidebar",
-          "id": "components.navigation.side.index.hideSidebar",
-        }
-      }
-      naked={true}
+      className="mobileHeader"
       onClick={[Function]}
-      secondary={true}
-    />
-  </div>
-</nav>
+    >
+      <Icon
+        className="expandIcon"
+        icon="more_vert"
+        large={false}
+        nudgeDown={false}
+        nudgeUp={false}
+        small={false}
+      />
+      <Icon
+        className="icon"
+        icon="application"
+        large={false}
+        nudgeDown={false}
+        nudgeUp={false}
+        small={false}
+      />
+      <Message
+        capitalize={false}
+        className="message"
+        content="test-header-title"
+        firstToLower={false}
+        firstToUpper={false}
+        lowercase={false}
+        uppercase={false}
+      />
+    </div>
+    <div>
+      <div
+        className="drawer"
+      >
+        <injectIntl(Link)
+          to="/"
+        >
+          <div
+            className="header"
+          >
+            <Icon
+              className="icon"
+              icon="application"
+              large={false}
+              nudgeDown={false}
+              nudgeUp={false}
+              small={false}
+            />
+            <Message
+              capitalize={false}
+              className="message"
+              content="test-header-title"
+              firstToLower={false}
+              firstToUpper={false}
+              lowercase={false}
+              uppercase={false}
+            />
+          </div>
+        </injectIntl(Link)>
+        <ContextProvider
+          value={
+            Object {
+              "isMinimized": false,
+              "onLeafItemClick": [Function],
+            }
+          }
+        >
+          <SideNavigationList
+            className="navigationList"
+            depth={0}
+            isExpanded={false}
+            isMinimized={false}
+            onListClick={[Function]}
+          >
+            <withRouter(SideNavigationItem)
+              path="/test-path"
+              title="test-tile"
+            />
+            <withRouter(SideNavigationItem)
+              path="/test-path2"
+              title="test-tile2"
+            />
+          </SideNavigationList>
+        </ContextProvider>
+      </div>
+    </div>
+  </nav>
+  <injectIntl(Button)
+    className="minimizeButton"
+    data-hook="side-nav-hide-button"
+    icon="keyboard_arrow_left"
+    message={
+      Object {
+        "defaultMessage": "Hide sidebar",
+        "id": "components.navigation.side.index.hideSidebar",
+      }
+    }
+    onClick={[Function]}
+    unstyled={true}
+  />
+</Fragment>
 `;
 
 exports[`SideNavigation is nested should match snapshot 1`] = `
-<nav
-  className="navigation"
->
-  <div
-    className="mobileHeader"
-    onClick={[Function]}
-  >
-    <Icon
-      className="expandIcon"
-      icon="more_vert"
-      large={false}
-      nudgeDown={false}
-      nudgeUp={false}
-      small={false}
-    />
-    <Icon
-      className="icon"
-      icon="application"
-      large={false}
-      nudgeDown={false}
-      nudgeUp={false}
-      small={false}
-    />
-    <Message
-      capitalize={false}
-      className="message"
-      content="test-header-title"
-      firstToLower={false}
-      firstToUpper={false}
-      lowercase={false}
-      uppercase={false}
-    />
-  </div>
-  <div
-    className="body"
+<Fragment>
+  <nav
+    className="navigation"
   >
     <div
-      className="drawer"
-    >
-      <div
-        className="header"
-      >
-        <Icon
-          className="icon"
-          icon="application"
-          large={false}
-          nudgeDown={false}
-          nudgeUp={false}
-          small={false}
-        />
-        <Message
-          capitalize={false}
-          className="message"
-          content="test-header-title"
-          firstToLower={false}
-          firstToUpper={false}
-          lowercase={false}
-          uppercase={false}
-        />
-      </div>
-      <ContextProvider
-        value={
-          Object {
-            "isMinimized": false,
-            "onLeafItemClick": [Function],
-          }
-        }
-      >
-        <SideNavigationList
-          className="navigationList"
-          depth={0}
-          isExpanded={false}
-          isMinimized={false}
-          onListClick={[Function]}
-        >
-          <withRouter(SideNavigationItem)
-            path="/test-path"
-            title="test-title"
-          >
-            <withRouter(SideNavigationItem)
-              path="/nested-test-title"
-              title="nested-test-tile"
-            />
-          </withRouter(SideNavigationItem)>
-          <withRouter(SideNavigationItem)
-            title="test-title2"
-          >
-            <withRouter(SideNavigationItem)
-              path="/nested-test-title2"
-              title="nested-test-tile2"
-            />
-            <withRouter(SideNavigationItem)
-              path="/nested-test-title3"
-              title="nested-test-tile3"
-            />
-          </withRouter(SideNavigationItem)>
-          <withRouter(SideNavigationItem)
-            path="/test-title3"
-            title="test-title3"
-          />
-        </SideNavigationList>
-      </ContextProvider>
-    </div>
-    <injectIntl(Button)
-      className="minimizeButton"
-      data-hook="side-nav-hide-button"
-      icon="keyboard_arrow_left"
-      message={
-        Object {
-          "defaultMessage": "Hide sidebar",
-          "id": "components.navigation.side.index.hideSidebar",
-        }
-      }
-      naked={true}
+      className="mobileHeader"
       onClick={[Function]}
-      secondary={true}
-    />
-  </div>
-</nav>
+    >
+      <Icon
+        className="expandIcon"
+        icon="more_vert"
+        large={false}
+        nudgeDown={false}
+        nudgeUp={false}
+        small={false}
+      />
+      <Icon
+        className="icon"
+        icon="application"
+        large={false}
+        nudgeDown={false}
+        nudgeUp={false}
+        small={false}
+      />
+      <Message
+        capitalize={false}
+        className="message"
+        content="test-header-title"
+        firstToLower={false}
+        firstToUpper={false}
+        lowercase={false}
+        uppercase={false}
+      />
+    </div>
+    <div>
+      <div
+        className="drawer"
+      >
+        <injectIntl(Link)
+          to="/"
+        >
+          <div
+            className="header"
+          >
+            <Icon
+              className="icon"
+              icon="application"
+              large={false}
+              nudgeDown={false}
+              nudgeUp={false}
+              small={false}
+            />
+            <Message
+              capitalize={false}
+              className="message"
+              content="test-header-title"
+              firstToLower={false}
+              firstToUpper={false}
+              lowercase={false}
+              uppercase={false}
+            />
+          </div>
+        </injectIntl(Link)>
+        <ContextProvider
+          value={
+            Object {
+              "isMinimized": false,
+              "onLeafItemClick": [Function],
+            }
+          }
+        >
+          <SideNavigationList
+            className="navigationList"
+            depth={0}
+            isExpanded={false}
+            isMinimized={false}
+            onListClick={[Function]}
+          >
+            <withRouter(SideNavigationItem)
+              path="/test-path"
+              title="test-title"
+            >
+              <withRouter(SideNavigationItem)
+                path="/nested-test-title"
+                title="nested-test-tile"
+              />
+            </withRouter(SideNavigationItem)>
+            <withRouter(SideNavigationItem)
+              title="test-title2"
+            >
+              <withRouter(SideNavigationItem)
+                path="/nested-test-title2"
+                title="nested-test-tile2"
+              />
+              <withRouter(SideNavigationItem)
+                path="/nested-test-title3"
+                title="nested-test-tile3"
+              />
+            </withRouter(SideNavigationItem)>
+            <withRouter(SideNavigationItem)
+              path="/test-title3"
+              title="test-title3"
+            />
+          </SideNavigationList>
+        </ContextProvider>
+      </div>
+    </div>
+  </nav>
+  <injectIntl(Button)
+    className="minimizeButton"
+    data-hook="side-nav-hide-button"
+    icon="keyboard_arrow_left"
+    message={
+      Object {
+        "defaultMessage": "Hide sidebar",
+        "id": "components.navigation.side.index.hideSidebar",
+      }
+    }
+    onClick={[Function]}
+    unstyled={true}
+  />
+</Fragment>
 `;

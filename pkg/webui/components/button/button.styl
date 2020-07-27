@@ -72,9 +72,11 @@ $button($color)
     &:not(.busy)
       color: $color
 
-    &:not(.busy):not(:active)
+    &:not(.busy):not(:active):not(:disabled)
+      &:hover
+        color: darken($color, 15)
       +focus-visible()
-        color: darken($color, 8)
+        color: darken($color, 15)
         border: 1px solid $color
 
   &.busy:not(.naked),
@@ -117,7 +119,7 @@ $button($color)
   &.error
     animation: shake .15s 4 linear
 
-  &.withIcon
+  &.with-icon
     padding-left: $cs.xs
 
     span:first-child
@@ -126,10 +128,10 @@ $button($color)
     &.large
       padding-left: $cs.s
 
-      span:first-child
-        margin-right: $cs.xs
+    span:first-child
+      margin-right: $cs.xs
 
-  &.onlyIcon
+  &.only-icon
     padding-left: $cs.xs
     padding-right: $cs.xs
 

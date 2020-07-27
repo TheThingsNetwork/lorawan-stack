@@ -317,3 +317,8 @@ reset-button()
 
 transition-color()
   transition: color $ad.xs
+
+sidebar-transition($properties)
+  transition-timing-function: cubic-bezier(.18,.71,.3,.99)
+  transition-duration: 330ms
+  transition-property: $properties

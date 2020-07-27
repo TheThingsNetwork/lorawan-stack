@@ -18,6 +18,9 @@ import getSideNavigationDriver from './index_driver'
 
 import SideNavigation from '.'
 
+// Mock the window inner width to ensure initial render in expanded state.
+global.window.innerWidth = 1440
+
 describe('SideNavigation', function() {
   let driver = null
 
@@ -27,9 +30,11 @@ describe('SideNavigation', function() {
 
   describe('is flat', function() {
     const props = {
+      modifyAppContainerClasses: false,
       header: {
         title: 'test-header-title',
         icon: 'application',
+        to: '/',
       },
       children: (
         <React.Fragment>
@@ -77,9 +82,11 @@ describe('SideNavigation', function() {
 
   describe('is nested', function() {
     const props = {
+      modifyAppContainerClasses: false,
       header: {
         title: 'test-header-title',
         icon: 'application',
+        to: '/',
       },
       children: (
         <React.Fragment>

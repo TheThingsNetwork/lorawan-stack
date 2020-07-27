@@ -130,7 +130,9 @@ export default class Application extends React.Component {
       <React.Fragment>
         <Breadcrumbs />
         <IntlHelmet titleTemplate={`%s - ${application.name || appId} - ${env.siteName}`} />
-        <SideNavigation header={{ icon: 'application', title: application.name || appId }}>
+        <SideNavigation
+          header={{ icon: 'application', title: application.name || appId, to: matchedUrl }}
+        >
           {mayViewApplicationInfo.check(rights) && (
             <SideNavigation.Item
               title={sharedMessages.overview}

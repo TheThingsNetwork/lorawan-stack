@@ -18,6 +18,8 @@ import 'focus-visible/dist/focus-visible'
 import { setConfiguration } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
+import LAYOUT from '@ttn-lw/constants/layout'
+
 import Spinner from '@ttn-lw/components/spinner'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -31,11 +33,20 @@ const m = defineMessages({
   initializing: 'Initializing…',
 })
 
-// React grid configuration. Keep these in line with `styles/variables.less`.
 setConfiguration({
-  breakpoints: [480, 768, 1080, 1280],
-  containerWidths: [768, 1000, 1140, 1140],
-  gutterWidth: 28,
+  breakpoints: [
+    LAYOUT.BREAKPOINTS.XXS,
+    LAYOUT.BREAKPOINTS.S,
+    LAYOUT.BREAKPOINTS.M,
+    LAYOUT.BREAKPOINTS.L,
+  ],
+  containerWidths: [
+    LAYOUT.CONTAINER_WIDTHS.XS,
+    LAYOUT.CONTAINER_WIDTHS.S,
+    LAYOUT.CONTAINER_WIDTHS.M,
+    LAYOUT.CONTAINER_WIDTHS.L,
+  ],
+  gutterWidth: LAYOUT.GUTTER_WIDTH,
 })
 
 @connect(

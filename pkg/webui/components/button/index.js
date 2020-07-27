@@ -34,6 +34,7 @@ function assembleClassnames({
   warning,
   secondary,
   naked,
+  unstyled,
   icon,
   busy,
   large,
@@ -42,6 +43,9 @@ function assembleClassnames({
   raw,
   disabled,
 }) {
+  if (unstyled) {
+    return className
+  }
   return classnames(style.button, className, {
     [style.danger]: danger,
     [style.warning]: warning,
@@ -202,6 +206,10 @@ const commonPropTypes = {
   name: PropTypes.string,
   /** The html `type` prop passed to the <button /> element. */
   type: PropTypes.string,
+  /** A flag specifying whether no additional styles should be
+   * attached to the button. This can helpful to achieve individual stylings.
+   */
+  unstyled: PropTypes.bool,
   /** The html `value` prop passed to the <button /> element. */
   value: PropTypes.string,
   /** The html `autofocus` prop passed to the <button /> element. */
