@@ -90,7 +90,7 @@ func DefaultStartTask(ctx context.Context, id string, fn TaskFunc, restart TaskR
 			invocation++
 			startTime := time.Now()
 			err := fn(ctx)
-			executionTime := time.Now().Sub(startTime)
+			executionTime := time.Since(startTime)
 			if err != nil && err != context.Canceled {
 				logger.WithField("invocation", invocation).WithError(err).Warn("Task failed")
 			}
