@@ -66,13 +66,9 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 		return nil
 	}
 	h.cluster.ClaimIDs(ctx, ids)
-	select {
-	case <-ctx.Done():
-		h.cluster.UnclaimIDs(ctx, ids)
-		return ctx.Err()
-	default:
-		return nil
-	}
+	defer h.cluster.UnclaimIDs(ctx, ids)
+	<-ctx.Done()
+	return ctx.Err()
 }
 
 var errNetworkServerNotFound = errors.DefineNotFound("network_server_not_found", "Network Server not found")
