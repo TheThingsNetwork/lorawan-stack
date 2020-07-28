@@ -16,6 +16,8 @@ package pubsub
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -57,7 +59,7 @@ var (
 const (
 	subsystem     = "as_pubsub"
 	unknown       = "unknown"
-	applicationID = "application_id"
+	providerLabel = "provider"
 )
 
 var pubsubMetrics = &integrationsMetrics{
@@ -67,7 +69,7 @@ var pubsubMetrics = &integrationsMetrics{
 			Name:      "integrations_started_total",
 			Help:      "Number of integrations started",
 		},
-		[]string{applicationID},
+		[]string{providerLabel},
 	),
 	integrationsStopped: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -75,7 +77,7 @@ var pubsubMetrics = &integrationsMetrics{
 			Name:      "integrations_stopped_total",
 			Help:      "Number of integrations stopped",
 		},
-		[]string{applicationID},
+		[]string{providerLabel},
 	),
 	integrationsFailed: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -83,7 +85,7 @@ var pubsubMetrics = &integrationsMetrics{
 			Name:      "integrations_failed_total",
 			Help:      "Number of integrations failed",
 		},
-		[]string{applicationID},
+		[]string{providerLabel},
 	),
 }
 
@@ -109,14 +111,22 @@ func (m integrationsMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.integrationsFailed.Collect(ch)
 }
 
+var psTypeName = fmt.Sprintf("%T", &ttnpb.ApplicationPubSub{})
+
+func providerLabelValue(i *integration) string {
+	return strings.ToLower(strings.TrimPrefix(fmt.Sprintf("%T", i.ApplicationPubSub.GetProvider()), psTypeName+"_"))
+}
+
 func registerIntegrationStart(ctx context.Context, i *integration) {
 	events.Publish(evtPubSubStart(ctx, i.ApplicationIdentifiers, i.ApplicationPubSubIdentifiers))
-	pubsubMetrics.integrationsStarted.WithLabelValues(ctx, i.ApplicationID).Inc()
+	labelValue := providerLabelValue(i)
+	pubsubMetrics.integrationsStarted.WithLabelValues(ctx, labelValue).Inc()
+	pubsubMetrics.integrationsStopped.WithLabelValues(ctx, labelValue) // Initialize the "stopped" counter.
 }
 
 func registerIntegrationStop(ctx context.Context, i *integration) {
 	events.Publish(evtPubSubStop(ctx, i.ApplicationIdentifiers, i.ApplicationPubSubIdentifiers))
-	pubsubMetrics.integrationsStopped.WithLabelValues(ctx, i.ApplicationID).Inc()
+	pubsubMetrics.integrationsStopped.WithLabelValues(ctx, providerLabelValue(i)).Inc()
 }
 
 var errIntegrationFailed = errors.DefineAborted("integration_failed", "integration `{pub_sub_id}` failed")
@@ -129,5 +139,5 @@ func registerIntegrationFail(ctx context.Context, i *integration, err error) {
 		).
 		WithCause(err)
 	events.Publish(evtPubSubFail(ctx, i.ApplicationIdentifiers, err))
-	pubsubMetrics.integrationsFailed.WithLabelValues(ctx, i.ApplicationID).Inc()
+	pubsubMetrics.integrationsFailed.WithLabelValues(ctx, providerLabelValue(i)).Inc()
 }
