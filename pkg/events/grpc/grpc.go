@@ -18,8 +18,10 @@ package grpc
 
 import (
 	"context"
+	"os"
 	"runtime"
 	"sync"
+	"time"
 
 	grpc_runtime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -117,6 +119,20 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	}
 
 	if err := stream.SendHeader(metadata.MD{}); err != nil {
+		return err
+	}
+
+	hostname, err := os.Hostname()
+	if err != nil {
+		return err
+	}
+	if err := stream.Send(&ttnpb.Event{
+		Name:           "events.stream.start",
+		Time:           time.Now().UTC(),
+		Identifiers:    req.Identifiers,
+		Origin:         hostname,
+		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+	}); err != nil {
 		return err
 	}
 

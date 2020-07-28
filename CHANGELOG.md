@@ -33,7 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Event stream start and stop events are not published anymore.
 - Remove version from hosted documentation paths.
 - Gateway connection stats are now stored in a single key.
 - The example configuration for deployments with custom certificates now also uses a CA certificate.
