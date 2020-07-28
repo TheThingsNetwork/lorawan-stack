@@ -115,17 +115,19 @@ func TestInteropTLS(t *testing.T) {
 	certContent, err := ioutil.ReadFile("testdata/serverca.pem")
 	a.So(err, should.BeNil)
 	certPool.AppendCertsFromPEM(certContent)
-	client := http.Client{Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{
-			RootCAs: certPool,
-			GetClientCertificate: func(info *tls.CertificateRequestInfo) (*tls.Certificate, error) {
-				cert, err := tls.LoadX509KeyPair("testdata/clientcert.pem", "testdata/clientkey.pem")
-				if err != nil {
-					return nil, err
-				}
-				return &cert, nil
+	client := http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: certPool,
+				GetClientCertificate: func(info *tls.CertificateRequestInfo) (*tls.Certificate, error) {
+					cert, err := tls.LoadX509KeyPair("testdata/clientcert.pem", "testdata/clientkey.pem")
+					if err != nil {
+						return nil, err
+					}
+					return &cert, nil
+				},
 			},
-		}},
+		},
 	}
 
 	// Correct SenderID.

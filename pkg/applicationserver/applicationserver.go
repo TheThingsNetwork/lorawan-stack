@@ -177,8 +177,10 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			if endpoint.Address() == "" {
 				continue
 			}
-			as.RegisterTask(as.Context(), fmt.Sprintf("serve_mqtt/%s", endpoint.Address()),
-				func(ctx context.Context) error {
+			as.RegisterTask(&component.TaskConfig{
+				Context: as.Context(),
+				ID:      fmt.Sprintf("serve_mqtt/%s", endpoint.Address()),
+				Func: func(ctx context.Context) error {
 					l, err := as.ListenTCP(endpoint.Address())
 					var lis net.Listener
 					if err == nil {
@@ -192,7 +194,10 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 					}
 					defer lis.Close()
 					return mqtt.Serve(ctx, retryIO, lis, version.Format, endpoint.Protocol())
-				}, component.TaskRestartOnFailure)
+				},
+				Restart: component.TaskRestartOnFailure,
+				Backoff: component.DefaultTaskBackoffConfig,
+			})
 		}
 	}
 
@@ -221,7 +226,13 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 
 	c.RegisterGRPC(as)
 	if as.linkMode == LinkAll {
-		c.RegisterTask(as.Context(), "link_all", as.linkAll, component.TaskRestartOnFailure)
+		c.RegisterTask(&component.TaskConfig{
+			Context: as.Context(),
+			ID:      "link_all",
+			Func:    as.linkAll,
+			Restart: component.TaskRestartOnFailure,
+			Backoff: component.DefaultTaskBackoffConfig,
+		})
 	}
 	return as, nil
 }

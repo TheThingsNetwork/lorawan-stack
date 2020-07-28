@@ -171,12 +171,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	}
 
 	if a.forwarderConfig.Enable {
-		c.RegisterTask(c.Context(), "pb_publish_uplink", a.publishUplink, component.TaskRestartOnFailure, component.TaskBackoffDial...)
-		c.RegisterTask(c.Context(), "pb_subscribe_downlink", a.subscribeDownlink, component.TaskRestartOnFailure, component.TaskBackoffDial...)
+		c.RegisterTask(c.NewTaskConfig("pb_publish_uplink", a.publishUplink, component.TaskRestartOnFailure, component.DialTaskBackoffConfig))
+		c.RegisterTask(c.NewTaskConfig("pb_subscribe_downlink", a.subscribeDownlink, component.TaskRestartOnFailure, component.DialTaskBackoffConfig))
 	}
 	if a.homeNetworkConfig.Enable {
-		c.RegisterTask(c.Context(), "pb_subscribe_uplink", a.subscribeUplink, component.TaskRestartOnFailure, component.TaskBackoffDial...)
-		c.RegisterTask(c.Context(), "pb_publish_downlink", a.publishDownlink, component.TaskRestartOnFailure, component.TaskBackoffDial...)
+		c.RegisterTask(c.NewTaskConfig("pb_subscribe_uplink", a.subscribeUplink, component.TaskRestartOnFailure, component.DialTaskBackoffConfig))
+		c.RegisterTask(c.NewTaskConfig("pb_publish_downlink", a.publishDownlink, component.TaskRestartOnFailure, component.DialTaskBackoffConfig))
 	}
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GsPba", cluster.HookName, c.ClusterAuthUnaryHook())

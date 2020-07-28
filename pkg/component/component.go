@@ -87,7 +87,7 @@ type Component struct {
 	rightsFetcher rights.Fetcher
 
 	taskStarter TaskStarter
-	tasks       []task
+	taskConfigs []*TaskConfig
 }
 
 // Option allows extending the component when it is instantiated with New.
