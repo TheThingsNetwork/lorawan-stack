@@ -30,6 +30,8 @@ jobs:
         go mod download
     - name: Make Mage
       run: make tools/bin/mage
+    - name: Auto-completion scripts
+      run: tools/bin/mage cli:autocomplete
     - name: Install JS SDK dependencies
       run: tools/bin/mage jsSDK:deps
     - name: Build JS SDK

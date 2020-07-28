@@ -15,7 +15,10 @@
 package commands
 
 import (
+	"bytes"
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -39,7 +42,14 @@ func Complete() *cobra.Command {
 			case "zsh":
 				return cmd.Root().GenZshCompletion(os.Stdout)
 			case "fish":
-				return cmd.Root().GenFishCompletion(os.Stdout, false)
+				// Fish does not accept `-` in variable names
+				buf := new(bytes.Buffer)
+				if err := cmd.Root().GenFishCompletion(buf, true); err != nil {
+					return err
+				}
+				script := strings.Replace(buf.String(), "__ttn-lw-", "__ttn_lw_", -1)
+				_, err := fmt.Print(script)
+				return err
 			case "powershell":
 				return cmd.Root().GenPowerShellCompletion(os.Stdout)
 			default:
