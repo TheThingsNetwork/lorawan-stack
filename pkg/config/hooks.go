@@ -18,11 +18,13 @@ import (
 	"encoding/hex"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 var errFormat = errors.DefineInvalidArgument("format", "invalid format `{input}`")
@@ -242,4 +244,96 @@ func stringToByteArrayHook(f reflect.Type, t reflect.Type, data interface{}) (in
 		rv.Index(i).SetUint(uint64(v))
 	}
 	return rv.Interface(), nil
+}
+
+func stringToTimeDurationPointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if f != nil && f.Kind() != reflect.String {
+		return data, nil
+	}
+	if s, ok := data.(string); ok {
+		d := time.Duration(1)
+		if t == reflect.TypeOf(&d) {
+			if s == "" {
+				return nil, nil
+			}
+			return time.ParseDuration(s)
+		}
+	}
+	return data, nil
+}
+
+func stringToRxDelayPointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if f != nil && f.Kind() != reflect.String {
+		return data, nil
+	}
+	if s, ok := data.(string); ok {
+		var enum ttnpb.RxDelay
+		if t == reflect.TypeOf(&enum) {
+			if s == "" {
+				return nil, nil
+			}
+			if err := enum.UnmarshalText([]byte(s)); err != nil {
+				return strconv.ParseInt(s, 10, 32)
+			}
+			return enum, nil
+		}
+	}
+	return data, nil
+}
+
+func stringToADRAckDelayExponentPointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if f != nil && f.Kind() != reflect.String {
+		return data, nil
+	}
+	if s, ok := data.(string); ok {
+		var enum ttnpb.ADRAckDelayExponent
+		if t == reflect.TypeOf(&enum) {
+			if s == "" {
+				return nil, nil
+			}
+			if err := enum.UnmarshalText([]byte(s)); err != nil {
+				return strconv.ParseInt(s, 10, 32)
+			}
+			return enum, nil
+		}
+	}
+	return data, nil
+}
+
+func stringToADRAckLimitExponentPointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if f != nil && f.Kind() != reflect.String {
+		return data, nil
+	}
+	if s, ok := data.(string); ok {
+		var enum ttnpb.ADRAckLimitExponent
+		if t == reflect.TypeOf(&enum) {
+			if s == "" {
+				return nil, nil
+			}
+			if err := enum.UnmarshalText([]byte(s)); err != nil {
+				return strconv.ParseInt(s, 10, 32)
+			}
+			return enum, nil
+		}
+	}
+	return data, nil
+}
+
+func stringToAggregatedDutyCyclePointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if f != nil && f.Kind() != reflect.String {
+		return data, nil
+	}
+	if s, ok := data.(string); ok {
+		var enum ttnpb.AggregatedDutyCycle
+		if t == reflect.TypeOf(&enum) {
+			if s == "" {
+				return nil, nil
+			}
+			if err := enum.UnmarshalText([]byte(s)); err != nil {
+				return strconv.ParseInt(s, 10, 32)
+			}
+			return enum, nil
+		}
+	}
+	return data, nil
 }
