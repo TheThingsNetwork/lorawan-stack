@@ -1,11 +1,36 @@
 ---
 title: "Organization Management"
 description: ""
+aliases: [/getting-started/user-management/cli/org, /getting-started/user-management/console/org]
 ---
 
-This section contains instructions for managing organizations with the CLI.
+This section contains instructions for managing organizations.
 
 <!--more-->
+
+{{< tabs/container "Console" "CLI" >}}
+
+{{< tabs/tab "Console" >}}
+
+## Managing Organizations using the Console
+
+To manage organizations, click the **Organizations** tab in the top menu.
+
+{{< figure src="orgs.png" alt="Organizations" >}}
+
+To add an organization, click **Add organization**.
+
+{{< figure src="add-org.png" alt="Add organization" >}}
+
+Choose the rights you would like to grant the organization, and click the **Add organization** button to save your choices.
+
+>Note: When a user is a member of an organization which is a collaborator for an entity, the user's rights are the intersection of the user's rights in the organization and the organization's rights on the entity.
+
+{{< /tabs/tab >}}
+
+{{< tabs/tab "CLI" >}}
+
+## Managing Organizations using the CLI
 
 ## Creating Organizations
 
@@ -103,3 +128,7 @@ $ ttn-lw-cli organizations delete --organization-id org1
 ```
 
 > **NOTE:** When deleting organizations, their IDs stay reserved in the system. For security reasons, it is not possible to create a new organization with the same ID.
+
+{{< /tabs/tab >}}
+
+{{< /tabs/container >}}

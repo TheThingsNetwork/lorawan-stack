@@ -14,7 +14,7 @@ weight: -1
 
 ## Create a Gateway
 
-Follow instructions for [Adding Gateways in the Console]({{< ref "/getting-started/console/create-gateway" >}}) or [Adding Gateways Using the Command-line interface]({{< ref "/getting-started/cli/create-gateway" >}}).
+Follow instructions for [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}).
 
 ## Create an API Key
 
@@ -22,7 +22,7 @@ CUPS requires an API Key with the following rights:
 - View gateway information
 - Edit basic gateway settings
 
-If you have not already created one, follow instructions for [Creating a Gateway API Key in the Console]({{< ref "/getting-started/console/create-gateway#create-gateway-api-key" >}}) or [Creating a Gateway API Key Using the Command-line interface]({{< ref "/getting-started/cli/create-gateway#create-gateway-api-key" >}}).
+If you have not already created one, follow instructions for creating a Gateway API Key in [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}).
 
 ## Configure Gateway
 

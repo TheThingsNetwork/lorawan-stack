@@ -14,7 +14,7 @@ Kerlink Wirnet Station is a LoRaWAN gateway, whose technical specifications can 
 
 ## Registration
 
-Create a gateway by following the instructions for the [Console]({{< ref "/getting-started/console/create-gateway" >}}) or the [CLI]({{< ref "/getting-started/cli/create-gateway" >}}). Choose a **Gateway ID** and set **EUI** equal to the one on the gateway.
+Create a gateway by following the instructions for [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}). Choose a **Gateway ID** and set **EUI** equal to the one on the gateway.
 
 Create an API Key with Gateway Info rights for this gateway using the same instructions. Copy the key and save it for later use.
 

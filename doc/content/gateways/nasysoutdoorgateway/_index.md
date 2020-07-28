@@ -12,7 +12,7 @@ NASys LoRaWAN Outdoor Gateway is an 8 Channel LoRaWAN gateway, whose technical s
 
 ## Registration
 
-Create a gateway by following the instructions for the [Console]({{< ref "/getting-started/console/create-gateway" >}}) or the [CLI]({{< ref "/getting-started/cli/create-gateway" >}}). Typically, the **EUI** field for your gateway should exist on the sticker at the bottom. Make note of the Gateway ID you choose, because it will be needed later.
+Create a gateway by following the instructions for [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}). Typically, the **EUI** field for your gateway should exist on the sticker at the bottom. Make note of the Gateway ID you choose, because it will be needed later.
 
 ## Configuration using a Terminal
 
@@ -28,7 +28,7 @@ Your gateway should come with a slightly modified version of the [Lora-net UDP p
 
 The Gateway Configuration Server can be used to retrieve a proper `global_conf.json` configuration file for your gateway.
 
-You will need a Gateway API key with the `View gateway information` right enabled. Instructions can be found in the relevant sections of the [Console]({{< ref "/getting-started/console/create-gateway" >}}) or the [CLI]({{< ref "/getting-started/cli/create-gateway" >}}) getting started guides.
+You will need a Gateway API key with the `View gateway information` right enabled. Instructions can be found in the relevant sections of the [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}) guides.
 
 Make sure to replace `thethings.example.com` with your server:
 

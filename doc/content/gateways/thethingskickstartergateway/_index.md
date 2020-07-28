@@ -12,7 +12,7 @@ The Things Kickstarter Gateway is a LoRaWAN gateway, whose technical specificati
 
 ## Registration
 
-Create a gateway by following the instructions for the [Console]({{< ref "/getting-started/console/create-gateway" >}}) or the [CLI]({{< ref "/getting-started/cli/create-gateway" >}}). Choose a **Gateway ID**. An **EUI** is not necessary.
+Create a gateway by following the instructions for [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}). Choose a **Gateway ID**. An **EUI** is not necessary.
 
 Create an API Key with Gateway Link rights for this gateway using the same instructions. Copy the key and save it for later use.
 

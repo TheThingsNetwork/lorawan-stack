@@ -14,14 +14,14 @@ This page contains information about connecting your gateway to {{% tts %}} usin
 
 ## Create a Gateway
 
-Follow instructions for [Adding Gateways in the Console]({{< ref "/getting-started/console/create-gateway" >}}) or [Adding Gateways Using the Command-line interface]({{< ref "/getting-started/cli/create-gateway" >}}).
+Create a gateway by following the instructions for [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}).
 
 ## Create an API Key
 
 LNS requires an API Key with the following rights:
 - Link as Gateway to a Gateway Server for traffic exchange, i.e. write uplink and read downlink
 
-If you have not already created one, follow instructions for [Creating a Gateway API Key in the Console]({{< ref "/getting-started/console/create-gateway#create-gateway-api-key" >}}) or [Creating a Gateway API Key Using the Command-line interface]({{< ref "/getting-started/cli/create-gateway#create-gateway-api-key" >}}).
+If you have not already created one, follow instructions for creating a Gateway API Key in [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}).
 
 ## Configure Gateway
 

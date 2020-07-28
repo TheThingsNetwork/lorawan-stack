@@ -34,7 +34,7 @@ With Packet Broker enabled on both {{% tts %}} and {{% ttnv2 %}}, you can receiv
 
 For private {{% tts %}} deployments with Packet Broker disabled, you will need to re-configure your gateways to connect to {{% tts %}}, so that you can start receiving traffic from your end devices.
 
-In order to connect a gateway to {{% tts %}}, follow instructions for [Adding a Gateway in the Console]({{< ref "/getting-started/console/create-gateway" >}}) or [Adding a Gateway using the CLI]({{< ref "/getting-started/cli#create-gateway" >}}). Then, reconfigure the gateway to connect to {{% tts %}}, and regenerate its API key (if required).
+In order to connect a gateway to {{% tts %}}, follow instructions for [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}). Then, reconfigure the gateway to connect to {{% tts %}}, and regenerate its API key (if required).
 
 Also see [Gateways]({{< ref "/gateways" >}}) for instructions on configuring popular LoRaWAN gateways with {{% tts %}}.
 

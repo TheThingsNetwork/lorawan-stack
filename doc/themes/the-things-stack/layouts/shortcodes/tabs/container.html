@@ -1,0 +1,14 @@
+<div class="tabs is-boxed" id="tabs">
+  <ul>
+    {{ range .Params }}
+    <li class="is-active" data-tab="{{ . | urlize }}">
+      <a>
+        <span>{{ . }}</span>
+      </a>
+    </li>
+    {{ end }}
+  </ul>
+</div>
+<div id="tab-content" class="content">
+  {{ .Inner | markdownify }}
+</div>

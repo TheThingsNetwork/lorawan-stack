@@ -1,15 +1,19 @@
 ---
-title: "Create Application"
+title: "Adding Applications"
 description: ""
-weight: 3
-aliases: [/guides/getting-started/console/create-application]
+weight: -1
+aliases: [/getting-started/cli/create-application, /getting-started/console/create-application, /guides/getting-started/console/create-application]
 ---
 
-Learn how to register an application using the Console.
+This section contains instructions for creating an Application.
 
 <!--more-->
 
-## Step by step
+{{< tabs/container "Console" "CLI" >}}
+
+{{< tabs/tab "Console" >}}
+
+## Adding Applications using the Console
 
 Go to **Applications** in the top menu, and click **+ Add Application** to reach the application registration page. Fill the application ID. The other fields are optional. Click **Create Application** to create the application.
 
@@ -42,3 +46,44 @@ Now go to **Link** in the left menu of the application and enter the API key you
 You can now see the status of the linking process appear in the right part of your screen. This also shows the statistics of the link between the Application Server and the Network Server.  You can now see the status of the linking process appear in the right part of your screen. This also shows the statistics of the link between the Application Server and the Network Server.
 
 Your application is now linked. You can now use the builtin MQTT server and webhooks to receive uplink traffic and send downlink traffic.
+
+{{< /tabs/tab >}}
+
+{{< tabs/tab "CLI" >}}
+
+## Adding Applications using the CLI
+
+Create the first application:
+
+```bash
+$ ttn-lw-cli applications create app1 --user-id admin
+```
+
+This creates an application `app1` with the `admin` user as collaborator.
+
+Devices are created within applications.
+
+### Link Application
+
+In order to send uplinks and receive downlinks from your device, you must link the Application Server to the Network Server. In order to do this, create an API key for the Application Server:
+
+```bash
+$ ttn-lw-cli applications api-keys create \
+  --name link \
+  --application-id app1 \
+  --right-application-link
+```
+
+The CLI will return an API key such as `NNSXS.VEEBURF3KR77ZR...`. This API key has only link rights and can therefore only be used for linking this application. Make sure to copy the key and save it in a safe place. You will not be able to see this key again in the future, and if you lose it, you can create a new one to replace it in the gateway configuration.
+
+You can now link the Application Server to the Network Server:
+
+```bash
+$ ttn-lw-cli applications link set app1 --api-key NNSXS.VEEBURF3KR77ZR..
+```
+
+Your application is now linked. You can now use the builtin MQTT server and webhooks to receive uplink traffic and send downlink traffic.
+
+{{< /tabs/tab >}}
+
+{{< /tabs/container >}}
