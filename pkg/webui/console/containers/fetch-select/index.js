@@ -47,6 +47,7 @@ export default function({
   class FetchSelect extends React.PureComponent {
     static propTypes = {
       autoFocus: PropTypes.bool,
+      defaultWarning: PropTypes.message,
       description: PropTypes.message,
       error: PropTypes.error,
       fetchOptions: PropTypes.func.isRequired,
@@ -72,7 +73,8 @@ export default function({
       options: [],
       required: false,
       title: defaultTitle,
-      warning: defaultWarning,
+      warning: undefined,
+      defaultWarning,
     }
 
     componentDidMount() {
@@ -97,10 +99,13 @@ export default function({
         fetching,
         menuPlacement,
         warning,
+        defaultWarning,
         title,
         options,
         description,
       } = this.props
+
+      const fieldWarning = Boolean(error) ? defaultWarning : warning
 
       return (
         <Field
@@ -113,7 +118,7 @@ export default function({
           description={description}
           autoFocus={autoFocus}
           isLoading={fetching}
-          warning={Boolean(error) ? warning : undefined}
+          warning={fieldWarning}
           menuPlacement={menuPlacement}
           onChange={this.handleChange}
         />

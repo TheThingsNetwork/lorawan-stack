@@ -63,6 +63,8 @@ const m = defineMessages({
     'Configure gateway delay (minimum: {minimumValue}ms, default: {defaultValue}ms)',
   delayWarning:
     'Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.',
+  frequencyPlanWarning:
+    'Without choosing a frequency plan, packets from the gateway will not be correctly processed',
 })
 
 const validationSchema = Yup.object().shape({
@@ -126,13 +128,14 @@ class GatewayDataForm extends React.Component {
     super(props)
 
     this.state = {
-      shouldDisplayWarning: this.isNotValidDuration(props.initialValues.schedule_anytime_delay),
+      showDelayWarning: this.isNotValidDuration(props.initialValues.schedule_anytime_delay),
+      showFrequencyPlanWarning: !Boolean(props.initialValues.frequency_plan_id),
     }
   }
 
   @bind
   onScheduleAnytimeDelayChange(value) {
-    this.setState({ shouldDisplayWarning: this.isNotValidDuration(value) })
+    this.setState({ showDelayWarning: this.isNotValidDuration(value) })
   }
 
   @bind
@@ -141,6 +144,11 @@ class GatewayDataForm extends React.Component {
     const castedValues = validationSchema.cast(values)
 
     onSubmit(castedValues, helpers)
+  }
+
+  @bind
+  handleFrequencyPlanChange(freqPlan) {
+    this.setState({ showFrequencyPlanWarning: !Boolean(freqPlan.value) })
   }
 
   decodeDelayValue(value) {
@@ -174,7 +182,7 @@ class GatewayDataForm extends React.Component {
 
   render() {
     const { update, error, initialValues, formRef, children } = this.props
-    const { shouldDisplayWarning } = this.state
+    const { showDelayWarning, showFrequencyPlanWarning } = this.state
 
     return (
       <Form
@@ -241,7 +249,12 @@ class GatewayDataForm extends React.Component {
           description={sharedMessages.attributeDescription}
         />
         <Message component="h4" content={sharedMessages.lorawanOptions} />
-        <GsFrequencyPlansSelect name="frequency_plan_id" menuPlacement="top" />
+        <GsFrequencyPlansSelect
+          name="frequency_plan_id"
+          menuPlacement="top"
+          onChange={this.handleFrequencyPlanChange}
+          warning={showFrequencyPlanWarning ? m.frequencyPlanWarning : undefined}
+        />
         <Form.Field
           title={sharedMessages.gatewayScheduleDownlinkLate}
           name="schedule_downlink_late"
@@ -274,7 +287,7 @@ class GatewayDataForm extends React.Component {
           ]}
           onChange={this.onScheduleAnytimeDelayChange}
           warning={
-            shouldDisplayWarning
+            showDelayWarning
               ? {
                   ...m.delayWarning,
                   values: { minimumValue: delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY },
