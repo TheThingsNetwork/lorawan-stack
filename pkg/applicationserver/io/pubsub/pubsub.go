@@ -42,8 +42,7 @@ type PubSub struct {
 	server   io.Server
 	registry Registry
 
-	integrations      sync.Map
-	integrationErrors sync.Map
+	integrations sync.Map
 }
 
 // New creates a new pusub frontend.
@@ -220,10 +219,13 @@ var errAlreadyConfigured = errors.DefineAlreadyExists("already_configured", "alr
 func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err error) {
 	appUID := unique.ID(ctx, pb.ApplicationIdentifiers)
 	psUID := PubSubUID(appUID, pb.PubSubID)
+
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"application_uid", appUID,
 		"pub_sub_id", pb.PubSubID,
+		"provider", fmt.Sprintf("%T", pb.Provider),
 	))
+	logger := log.FromContext(ctx)
 	ctx = rights.NewContext(ctx, rights.Rights{
 		ApplicationRights: map[string]*ttnpb.Rights{
 			appUID: {
@@ -235,6 +237,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	defer func() {
 		cancel(err)
 	}()
+
 	i := &integration{
 		ApplicationPubSub: *pb,
 		ctx:               ctx,
@@ -242,20 +245,23 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		closed:            make(chan struct{}),
 		server:            ps.server,
 	}
+	defer close(i.closed)
 	if _, loaded := ps.integrations.LoadOrStore(psUID, i); loaded {
-		log.FromContext(ctx).Debug("Integration already started")
+		logger.Debug("Pub/sub already started")
 		return errAlreadyConfigured.WithAttributes("application_uid", appUID, "pub_sub_id", pb.PubSubID)
 	}
-	go func() {
-		<-ctx.Done()
-		ps.integrationErrors.Store(psUID, ctx.Err())
-		ps.integrations.Delete(psUID)
-		if err := ctx.Err(); err != nil && !errors.IsCanceled(err) {
-			log.FromContext(ctx).WithError(err).Warn("Integration failed")
+	defer ps.integrations.Delete(psUID)
+
+	defer func() {
+		if err != nil && !errors.IsCanceled(err) {
+			logger.WithError(err).Warn("Pub/sub failed")
 			registerIntegrationFail(ctx, i, err)
+		} else {
+			logger.Info("Pub/sub canceled")
+			registerIntegrationStop(ctx, i)
 		}
-		close(i.closed)
 	}()
+
 	provider, err := provider.GetProvider(pb)
 	if err != nil {
 		return err
@@ -264,8 +270,13 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	if err != nil {
 		return err
 	}
-	ctx = log.NewContextWithField(ctx, "provider", fmt.Sprintf("%T", pb.Provider))
-	logger := log.FromContext(ctx)
+	defer func() {
+		if err := i.conn.Shutdown(ctx); err != nil {
+			logger.WithError(err).Warn("Failed to shutdown pub/sub connection")
+		} else {
+			logger.Debug("Shutdown pub/sub connection success")
+		}
+	}()
 	i.sub, err = ps.server.Subscribe(ctx, "pubsub", pb.ApplicationIdentifiers)
 	if err != nil {
 		return err
@@ -279,22 +290,18 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		case <-ctx.Done():
 		}
 	}()
-	format, ok := formats[pb.Format]
-	if !ok {
+	var ok bool
+	if i.format, ok = formats[pb.Format]; !ok {
 		return errFormatNotFound.WithAttributes("format", pb.Format)
 	}
-	i.format = format
+
 	go i.handleUp(ctx)
 	i.startHandleDown(ctx)
-	logger.Info("Started")
+	logger.Info("Pub/sub started")
 	registerIntegrationStart(ctx, i)
+
 	<-ctx.Done()
-	if err := ctx.Err(); errors.IsCanceled(err) {
-		logger.Info("Integration canceled")
-		i.conn.Shutdown(ctx)
-		registerIntegrationStop(ctx, i)
-	}
-	return
+	return ctx.Err()
 }
 
 func (ps *PubSub) stop(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) error {
@@ -302,14 +309,12 @@ func (ps *PubSub) stop(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifie
 	psUID := PubSubUID(appUID, ids.PubSubID)
 	if val, ok := ps.integrations.Load(psUID); ok {
 		i := val.(*integration)
-		log.FromContext(ctx).WithFields(log.Fields(
-			"application_uid", appUID,
-			"pub_sub_id", ids.PubSubID,
-		)).Debug("Integration canceled")
 		i.cancel(context.Canceled)
-		<-i.closed
-	} else {
-		ps.integrationErrors.Delete(psUID)
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-i.closed:
+		}
 	}
 	return nil
 }

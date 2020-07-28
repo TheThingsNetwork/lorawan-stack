@@ -96,7 +96,7 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 		log.FromContext(ctx).WithFields(log.Fields(
 			"application_uid", unique.ID(ctx, req.ApplicationIdentifiers),
 			"pub_sub_id", req.PubSubID,
-		)).WithError(err).Warn("Failed to cancel integration")
+		)).WithError(err).Warn("Failed to cancel pub/sub")
 	}
 	ps.startTask(ps.ctx, req.ApplicationPubSubIdentifiers)
 	events.Publish(evtSetPubSub(ctx, req.ApplicationIdentifiers, req.ApplicationPubSubIdentifiers))
@@ -116,7 +116,7 @@ func (ps *PubSub) Delete(ctx context.Context, ids *ttnpb.ApplicationPubSubIdenti
 		log.FromContext(ctx).WithFields(log.Fields(
 			"application_uid", unique.ID(ctx, ids.ApplicationIdentifiers),
 			"pub_sub_id", ids.PubSubID,
-		)).WithError(err).Warn("Failed to cancel integration")
+		)).WithError(err).Warn("Failed to cancel pub/sub")
 	}
 	_, err := ps.registry.Set(ctx, *ids, nil,
 		func(pubsub *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
