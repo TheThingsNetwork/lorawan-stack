@@ -136,7 +136,13 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchE
 	if err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	// Backwards compatibility for frequency_plan_id field.
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_id") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_ids") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "frequency_plan_ids")
+		}
+	}
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, []string{"frequency_plan_id"})
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -170,6 +176,12 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchE
 	})
 	if err != nil {
 		return nil, err
+	}
+	for _, gtw := range res.Gateways {
+		// Backwards compatibility for frequency_plan_id field.
+		if len(gtw.FrequencyPlanIDs) > 0 {
+			gtw.FrequencyPlanID = gtw.FrequencyPlanIDs[0]
+		}
 	}
 	return res, nil
 }
