@@ -38,7 +38,18 @@ export default {
       return axios.post(`${isBaseUrl}/users/${user_id}/temporary_password`)
     },
     async updatePassword(user_id, passwordData) {
-      return axios.put(`${isBaseUrl}/users/${user_id}/password`, passwordData)
+      const response = await fetch(`${isBaseUrl}/users/${user_id}/password`, {
+        method: 'PUT',
+        body: JSON.stringify(passwordData),
+        credentials: 'omit', // Do not include auth cookies with the request.
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw { response: { data } }
+      }
+
+      return response.json()
     },
     async validate(validationData) {
       return axios.patch(`${isBaseUrl}/contact_info/validation`, validationData)
