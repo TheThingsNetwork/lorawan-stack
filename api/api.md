@@ -164,17 +164,18 @@
   - [Message `CreateGatewayRequest`](#ttn.lorawan.v3.CreateGatewayRequest)
   - [Message `Gateway`](#ttn.lorawan.v3.Gateway)
   - [Message `Gateway.AttributesEntry`](#ttn.lorawan.v3.Gateway.AttributesEntry)
+  - [Message `Gateway.SecretsEntry`](#ttn.lorawan.v3.Gateway.SecretsEntry)
   - [Message `GatewayAntenna`](#ttn.lorawan.v3.GatewayAntenna)
   - [Message `GatewayAntenna.AttributesEntry`](#ttn.lorawan.v3.GatewayAntenna.AttributesEntry)
   - [Message `GatewayBrand`](#ttn.lorawan.v3.GatewayBrand)
   - [Message `GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats)
   - [Message `GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes)
   - [Message `GatewayConnectionStats.SubBand`](#ttn.lorawan.v3.GatewayConnectionStats.SubBand)
+  - [Message `GatewayLBSLNSSecretPlainText`](#ttn.lorawan.v3.GatewayLBSLNSSecretPlainText)
   - [Message `GatewayModel`](#ttn.lorawan.v3.GatewayModel)
   - [Message `GatewayRadio`](#ttn.lorawan.v3.GatewayRadio)
   - [Message `GatewayRadio.TxConfiguration`](#ttn.lorawan.v3.GatewayRadio.TxConfiguration)
-  - [Message `GatewaySecretPlainText`](#ttn.lorawan.v3.GatewaySecretPlainText)
-  - [Message `GatewaySecretPlainText.ValuesEntry`](#ttn.lorawan.v3.GatewaySecretPlainText.ValuesEntry)
+  - [Message `GatewaySecrets`](#ttn.lorawan.v3.GatewaySecrets)
   - [Message `GatewayStatus`](#ttn.lorawan.v3.GatewayStatus)
   - [Message `GatewayStatus.MetricsEntry`](#ttn.lorawan.v3.GatewayStatus.MetricsEntry)
   - [Message `GatewayStatus.VersionsEntry`](#ttn.lorawan.v3.GatewayStatus.VersionsEntry)
@@ -432,8 +433,7 @@
   - [Service `EndDeviceRegistrySearch`](#ttn.lorawan.v3.EndDeviceRegistrySearch)
   - [Service `EntityRegistrySearch`](#ttn.lorawan.v3.EntityRegistrySearch)
 - [File `lorawan-stack/api/secrets.proto`](#lorawan-stack/api/secrets.proto)
-  - [Message `Secrets`](#ttn.lorawan.v3.Secrets)
-  - [Message `Secrets.ValuesEntry`](#ttn.lorawan.v3.Secrets.ValuesEntry)
+  - [Message `Secret`](#ttn.lorawan.v3.Secret)
 - [File `lorawan-stack/api/user.proto`](#lorawan-stack/api/user.proto)
   - [Message `CreateTemporaryPasswordRequest`](#ttn.lorawan.v3.CreateTemporaryPasswordRequest)
   - [Message `CreateUserAPIKeyRequest`](#ttn.lorawan.v3.CreateUserAPIKeyRequest)
@@ -2642,7 +2642,7 @@ Gateway is the message that defines a gateway on the network.
 | `downlink_path_constraint` | [`DownlinkPathConstraint`](#ttn.lorawan.v3.DownlinkPathConstraint) |  |  |
 | `schedule_anytime_delay` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite. |
 | `update_location_from_status` | [`bool`](#bool) |  | update the location of this gateway from status messages |
-| `secrets` | [`Secrets`](#ttn.lorawan.v3.Secrets) |  | Encrypted Gateway Secrets. This value cannot be set/retrieved in Gateway API calls. Use the StoreGatewaySecret, RetrieveGatewaySecret requests. It can however be deleted by DeleteGateway since it's part of the entity. |
+| `secrets` | [`Gateway.SecretsEntry`](#ttn.lorawan.v3.Gateway.SecretsEntry) | repeated | Encrypted Gateway Secrets. This value cannot be set/retrieved in Gateway API calls. Use the StoreGatewaySecret, RetrieveGatewaySecret requests. It can however be deleted by DeleteGateway since it's part of the entity. |
 
 #### Field Rules
 
@@ -2657,6 +2657,7 @@ Gateway is the message that defines a gateway on the network.
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
 | `frequency_plan_ids` | <p>`repeated.max_items`: `8`</p><p>`repeated.items.string.max_len`: `64`</p> |
 | `downlink_path_constraint` | <p>`enum.defined_only`: `true`</p> |
+| `secrets` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.Gateway.AttributesEntry">Message `Gateway.AttributesEntry`</a>
 
@@ -2664,6 +2665,13 @@ Gateway is the message that defines a gateway on the network.
 | ----- | ---- | ----- | ----------- |
 | `key` | [`string`](#string) |  |  |
 | `value` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.Gateway.SecretsEntry">Message `Gateway.SecretsEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`Secret`](#ttn.lorawan.v3.Secret) |  |  |
 
 ### <a name="ttn.lorawan.v3.GatewayAntenna">Message `GatewayAntenna`</a>
 
@@ -2741,6 +2749,14 @@ Connection stats as monitored by the Gateway Server.
 | `downlink_utilization_limit` | [`float`](#float) |  |  |
 | `downlink_utilization` | [`float`](#float) |  |  |
 
+### <a name="ttn.lorawan.v3.GatewayLBSLNSSecretPlainText">Message `GatewayLBSLNSSecretPlainText`</a>
+
+The plain text value of the Basic Station LNS gateway secret.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `token_key` | [`string`](#string) |  |  |
+
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 
 | Field | Type | Label | Description |
@@ -2774,26 +2790,13 @@ Connection stats as monitored by the Gateway Server.
 | `max_frequency` | [`uint64`](#uint64) |  |  |
 | `notch_frequency` | [`uint64`](#uint64) |  |  |
 
-### <a name="ttn.lorawan.v3.GatewaySecretPlainText">Message `GatewaySecretPlainText`</a>
+### <a name="ttn.lorawan.v3.GatewaySecrets">Message `GatewaySecrets`</a>
 
-The plain text value of the gateway secret.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `values` | [`GatewaySecretPlainText.ValuesEntry`](#ttn.lorawan.v3.GatewaySecretPlainText.ValuesEntry) | repeated |  |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `values` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
-
-### <a name="ttn.lorawan.v3.GatewaySecretPlainText.ValuesEntry">Message `GatewaySecretPlainText.ValuesEntry`</a>
+The collective secret message use in RPC calls.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `key` | [`string`](#string) |  |  |
-| `value` | [`bytes`](#bytes) |  |  |
+| `lbs_lns_plain_text` | [`GatewayLBSLNSSecretPlainText`](#ttn.lorawan.v3.GatewayLBSLNSSecretPlainText) |  |  |
 
 ### <a name="ttn.lorawan.v3.GatewayStatus">Message `GatewayStatus`</a>
 
@@ -2972,7 +2975,7 @@ where the user or organization is collaborator on.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
-| `plain_text` | [`GatewaySecretPlainText`](#ttn.lorawan.v3.GatewaySecretPlainText) |  |  |
+| `secrets` | [`GatewaySecrets`](#ttn.lorawan.v3.GatewaySecrets) |  |  |
 
 #### Field Rules
 
@@ -2999,7 +3002,7 @@ where the user or organization is collaborator on.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
-| `plain_text` | [`GatewaySecretPlainText`](#ttn.lorawan.v3.GatewaySecretPlainText) |  |  |
+| `secrets` | [`GatewaySecrets`](#ttn.lorawan.v3.GatewaySecrets) |  |  |
 
 #### Field Rules
 
@@ -3088,7 +3091,7 @@ where the user or organization is collaborator on.
 | `Update` | [`UpdateGatewayRequest`](#ttn.lorawan.v3.UpdateGatewayRequest) | [`Gateway`](#ttn.lorawan.v3.Gateway) |  |
 | `Delete` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
 | `StoreGatewaySecret` | [`StoreGatewaySecretRequest`](#ttn.lorawan.v3.StoreGatewaySecretRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | SetGatewayLBSSecret is used to encrypt a plaintext value and store it along with the gateway. Requires the RIGHT_GATEWAY_WRITE_SECRET right. |
-| `RetrieveGatewaySecret` | [`RetrieveGatewaySecretRequest`](#ttn.lorawan.v3.RetrieveGatewaySecretRequest) | [`GatewaySecretPlainText`](#ttn.lorawan.v3.GatewaySecretPlainText) | RetrieveGatewaySecret is used to retrieve and decrypt the secret value. Requires the RIGHT_GATEWAY_READ_SECRET right. |
+| `RetrieveGatewaySecret` | [`RetrieveGatewaySecretRequest`](#ttn.lorawan.v3.RetrieveGatewaySecretRequest) | [`GatewaySecrets`](#ttn.lorawan.v3.GatewaySecrets) | RetrieveGatewaySecret is used to retrieve and decrypt the secret value. Requires the RIGHT_GATEWAY_READ_SECRET right. |
 
 #### HTTP bindings
 
@@ -6067,27 +6070,15 @@ This service is not implemented on all deployments.
 
 ## <a name="lorawan-stack/api/secrets.proto">File `lorawan-stack/api/secrets.proto`</a>
 
-### <a name="ttn.lorawan.v3.Secrets">Message `Secrets`</a>
+### <a name="ttn.lorawan.v3.Secret">Message `Secret`</a>
 
-Secrets contains key-value pairs of secret values as well as the ID of the encryption key.
+Secret contains a secret blob as well as the ID of the encryption key.
+The blob is typically a marshalled proto message.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `values` | [`Secrets.ValuesEntry`](#ttn.lorawan.v3.Secrets.ValuesEntry) | repeated |  |
+| `blob` | [`bytes`](#bytes) |  |  |
 | `key_id` | [`string`](#string) |  | ID of the Key used to encrypt the secret. |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `values` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
-
-### <a name="ttn.lorawan.v3.Secrets.ValuesEntry">Message `Secrets.ValuesEntry`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `key` | [`string`](#string) |  |  |
-| `value` | [`bytes`](#bytes) |  |  |
 
 ## <a name="lorawan-stack/api/user.proto">File `lorawan-stack/api/user.proto`</a>
 

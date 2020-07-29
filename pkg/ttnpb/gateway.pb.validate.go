@@ -785,14 +785,33 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 			// no validation rules for UpdateLocationFromStatus
 		case "secrets":
 
-			if v, ok := interface{}(m.GetSecrets()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
+			for key, val := range m.GetSecrets() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
 					return GatewayValidationError{
-						field:  "secrets",
-						reason: "embedded message failed validation",
-						cause:  err,
+						field:  fmt.Sprintf("secrets[%v]", key),
+						reason: "value length must be at most 36 runes",
 					}
 				}
+
+				if !_Gateway_Secrets_Pattern.MatchString(key) {
+					return GatewayValidationError{
+						field:  fmt.Sprintf("secrets[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				if v, ok := interface{}(val).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return GatewayValidationError{
+							field:  fmt.Sprintf("secrets[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
 			}
 
 		default:
@@ -862,6 +881,8 @@ var _ interface {
 var _Gateway_Attributes_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 var _Gateway_GatewayServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
+
+var _Gateway_Secrets_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on Gateways with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -2700,45 +2721,25 @@ var _ interface {
 	ErrorName() string
 } = GatewayConnectionStatsValidationError{}
 
-// ValidateFields checks the field values on GatewaySecretPlainText with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *GatewaySecretPlainText) ValidateFields(paths ...string) error {
+// ValidateFields checks the field values on GatewayLBSLNSSecretPlainText with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *GatewayLBSLNSSecretPlainText) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = GatewaySecretPlainTextFieldPathsNested
+		paths = GatewayLBSLNSSecretPlainTextFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "values":
-
-			for key, val := range m.GetValues() {
-				_ = val
-
-				if utf8.RuneCountInString(key) > 36 {
-					return GatewaySecretPlainTextValidationError{
-						field:  fmt.Sprintf("values[%v]", key),
-						reason: "value length must be at most 36 runes",
-					}
-				}
-
-				if !_GatewaySecretPlainText_Values_Pattern.MatchString(key) {
-					return GatewaySecretPlainTextValidationError{
-						field:  fmt.Sprintf("values[%v]", key),
-						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
-					}
-				}
-
-				// no validation rules for Values[key]
-			}
-
+		case "token_key":
+			// no validation rules for TokenKey
 		default:
-			return GatewaySecretPlainTextValidationError{
+			return GatewayLBSLNSSecretPlainTextValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -2747,9 +2748,10 @@ func (m *GatewaySecretPlainText) ValidateFields(paths ...string) error {
 	return nil
 }
 
-// GatewaySecretPlainTextValidationError is the validation error returned by
-// GatewaySecretPlainText.ValidateFields if the designated constraints aren't met.
-type GatewaySecretPlainTextValidationError struct {
+// GatewayLBSLNSSecretPlainTextValidationError is the validation error returned
+// by GatewayLBSLNSSecretPlainText.ValidateFields if the designated
+// constraints aren't met.
+type GatewayLBSLNSSecretPlainTextValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2757,24 +2759,24 @@ type GatewaySecretPlainTextValidationError struct {
 }
 
 // Field function returns field value.
-func (e GatewaySecretPlainTextValidationError) Field() string { return e.field }
+func (e GatewayLBSLNSSecretPlainTextValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GatewaySecretPlainTextValidationError) Reason() string { return e.reason }
+func (e GatewayLBSLNSSecretPlainTextValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GatewaySecretPlainTextValidationError) Cause() error { return e.cause }
+func (e GatewayLBSLNSSecretPlainTextValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GatewaySecretPlainTextValidationError) Key() bool { return e.key }
+func (e GatewayLBSLNSSecretPlainTextValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GatewaySecretPlainTextValidationError) ErrorName() string {
-	return "GatewaySecretPlainTextValidationError"
+func (e GatewayLBSLNSSecretPlainTextValidationError) ErrorName() string {
+	return "GatewayLBSLNSSecretPlainTextValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e GatewaySecretPlainTextValidationError) Error() string {
+func (e GatewayLBSLNSSecretPlainTextValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2786,14 +2788,14 @@ func (e GatewaySecretPlainTextValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGatewaySecretPlainText.%s: %s%s",
+		"invalid %sGatewayLBSLNSSecretPlainText.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GatewaySecretPlainTextValidationError{}
+var _ error = GatewayLBSLNSSecretPlainTextValidationError{}
 
 var _ interface {
 	Field() string
@@ -2801,9 +2803,98 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GatewaySecretPlainTextValidationError{}
+} = GatewayLBSLNSSecretPlainTextValidationError{}
 
-var _GatewaySecretPlainText_Values_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+// ValidateFields checks the field values on GatewaySecrets with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GatewaySecrets) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GatewaySecretsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "lbs_lns_plain_text":
+
+			if v, ok := interface{}(m.GetLBSLNSPlainText()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewaySecretsValidationError{
+						field:  "lbs_lns_plain_text",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return GatewaySecretsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GatewaySecretsValidationError is the validation error returned by
+// GatewaySecrets.ValidateFields if the designated constraints aren't met.
+type GatewaySecretsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GatewaySecretsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GatewaySecretsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GatewaySecretsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GatewaySecretsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GatewaySecretsValidationError) ErrorName() string { return "GatewaySecretsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GatewaySecretsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGatewaySecrets.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GatewaySecretsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GatewaySecretsValidationError{}
 
 // ValidateFields checks the field values on StoreGatewaySecretRequest with the
 // rules defined in the proto definition for this message. If any rules are
@@ -2832,12 +2923,12 @@ func (m *StoreGatewaySecretRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "plain_text":
+		case "secrets":
 
-			if v, ok := interface{}(&m.PlainText).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetSecrets()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return StoreGatewaySecretRequestValidationError{
-						field:  "plain_text",
+						field:  "secrets",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
@@ -2938,12 +3029,12 @@ func (m *RetrieveGatewaySecretRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "plain_text":
+		case "secrets":
 
-			if v, ok := interface{}(m.GetPlainText()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetSecrets()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return RetrieveGatewaySecretRequestValidationError{
-						field:  "plain_text",
+						field:  "secrets",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

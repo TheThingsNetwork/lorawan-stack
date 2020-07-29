@@ -94,8 +94,6 @@ var GatewayFieldPathsNested = []string{
 	"schedule_anytime_delay",
 	"schedule_downlink_late",
 	"secrets",
-	"secrets.key_id",
-	"secrets.values",
 	"status_public",
 	"update_channel",
 	"update_location_from_status",
@@ -205,8 +203,6 @@ var CreateGatewayRequestFieldPathsNested = []string{
 	"gateway.schedule_anytime_delay",
 	"gateway.schedule_downlink_late",
 	"gateway.secrets",
-	"gateway.secrets.key_id",
-	"gateway.secrets.values",
 	"gateway.status_public",
 	"gateway.update_channel",
 	"gateway.update_location_from_status",
@@ -244,8 +240,6 @@ var UpdateGatewayRequestFieldPathsNested = []string{
 	"gateway.schedule_anytime_delay",
 	"gateway.schedule_downlink_late",
 	"gateway.secrets",
-	"gateway.secrets.key_id",
-	"gateway.secrets.values",
 	"gateway.status_public",
 	"gateway.update_channel",
 	"gateway.update_location_from_status",
@@ -433,36 +427,46 @@ var GatewayConnectionStatsFieldPathsTopLevel = []string{
 	"sub_bands",
 	"uplink_count",
 }
-var GatewaySecretPlainTextFieldPathsNested = []string{
-	"values",
+var GatewayLBSLNSSecretPlainTextFieldPathsNested = []string{
+	"token_key",
 }
 
-var GatewaySecretPlainTextFieldPathsTopLevel = []string{
-	"values",
+var GatewayLBSLNSSecretPlainTextFieldPathsTopLevel = []string{
+	"token_key",
+}
+var GatewaySecretsFieldPathsNested = []string{
+	"lbs_lns_plain_text",
+	"lbs_lns_plain_text.token_key",
+}
+
+var GatewaySecretsFieldPathsTopLevel = []string{
+	"lbs_lns_plain_text",
 }
 var StoreGatewaySecretRequestFieldPathsNested = []string{
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
-	"plain_text",
-	"plain_text.values",
+	"secrets",
+	"secrets.lbs_lns_plain_text",
+	"secrets.lbs_lns_plain_text.token_key",
 }
 
 var StoreGatewaySecretRequestFieldPathsTopLevel = []string{
 	"gateway_ids",
-	"plain_text",
+	"secrets",
 }
 var RetrieveGatewaySecretRequestFieldPathsNested = []string{
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
-	"plain_text",
-	"plain_text.values",
+	"secrets",
+	"secrets.lbs_lns_plain_text",
+	"secrets.lbs_lns_plain_text.token_key",
 }
 
 var RetrieveGatewaySecretRequestFieldPathsTopLevel = []string{
 	"gateway_ids",
-	"plain_text",
+	"secrets",
 }
 var GatewayRadio_TxConfigurationFieldPathsNested = []string{
 	"max_frequency",

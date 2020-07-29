@@ -35,47 +35,27 @@ var (
 // define the regex for a UUID once up-front
 var _secrets_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 
-// ValidateFields checks the field values on Secrets with the rules defined in
+// ValidateFields checks the field values on Secret with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
-func (m *Secrets) ValidateFields(paths ...string) error {
+func (m *Secret) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = SecretsFieldPathsNested
+		paths = SecretFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "values":
-
-			for key, val := range m.GetValues() {
-				_ = val
-
-				if utf8.RuneCountInString(key) > 36 {
-					return SecretsValidationError{
-						field:  fmt.Sprintf("values[%v]", key),
-						reason: "value length must be at most 36 runes",
-					}
-				}
-
-				if !_Secrets_Values_Pattern.MatchString(key) {
-					return SecretsValidationError{
-						field:  fmt.Sprintf("values[%v]", key),
-						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
-					}
-				}
-
-				// no validation rules for Values[key]
-			}
-
+		case "blob":
+			// no validation rules for Blob
 		case "key_id":
 			// no validation rules for KeyID
 		default:
-			return SecretsValidationError{
+			return SecretValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -84,9 +64,9 @@ func (m *Secrets) ValidateFields(paths ...string) error {
 	return nil
 }
 
-// SecretsValidationError is the validation error returned by
-// Secrets.ValidateFields if the designated constraints aren't met.
-type SecretsValidationError struct {
+// SecretValidationError is the validation error returned by
+// Secret.ValidateFields if the designated constraints aren't met.
+type SecretValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -94,22 +74,22 @@ type SecretsValidationError struct {
 }
 
 // Field function returns field value.
-func (e SecretsValidationError) Field() string { return e.field }
+func (e SecretValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e SecretsValidationError) Reason() string { return e.reason }
+func (e SecretValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e SecretsValidationError) Cause() error { return e.cause }
+func (e SecretValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e SecretsValidationError) Key() bool { return e.key }
+func (e SecretValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e SecretsValidationError) ErrorName() string { return "SecretsValidationError" }
+func (e SecretValidationError) ErrorName() string { return "SecretValidationError" }
 
 // Error satisfies the builtin error interface
-func (e SecretsValidationError) Error() string {
+func (e SecretValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -121,14 +101,14 @@ func (e SecretsValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sSecrets.%s: %s%s",
+		"invalid %sSecret.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = SecretsValidationError{}
+var _ error = SecretValidationError{}
 
 var _ interface {
 	Field() string
@@ -136,6 +116,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = SecretsValidationError{}
-
-var _Secrets_Values_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+} = SecretValidationError{}

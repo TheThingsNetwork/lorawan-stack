@@ -2,12 +2,12 @@
 
 package ttnpb
 
-var SecretsFieldPathsNested = []string{
+var SecretFieldPathsNested = []string{
+	"blob",
 	"key_id",
-	"values",
 }
 
-var SecretsFieldPathsTopLevel = []string{
+var SecretFieldPathsTopLevel = []string{
+	"blob",
 	"key_id",
-	"values",
 }

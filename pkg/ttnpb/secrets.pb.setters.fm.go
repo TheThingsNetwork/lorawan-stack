@@ -4,17 +4,17 @@ package ttnpb
 
 import fmt "fmt"
 
-func (dst *Secrets) SetFields(src *Secrets, paths ...string) error {
+func (dst *Secret) SetFields(src *Secret, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "values":
+		case "blob":
 			if len(subs) > 0 {
-				return fmt.Errorf("'values' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'blob' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.Values = src.Values
+				dst.Blob = src.Blob
 			} else {
-				dst.Values = nil
+				dst.Blob = nil
 			}
 		case "key_id":
 			if len(subs) > 0 {

@@ -3922,7 +3922,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v3GatewaySecretPlainText"
+              "$ref": "#/definitions/v3GatewaySecrets"
             }
           },
           "default": {
@@ -3946,6 +3946,12 @@
             "required": false,
             "type": "string",
             "format": "byte"
+          },
+          {
+            "name": "secrets.lbs_lns_plain_text.token_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -10748,7 +10754,10 @@
           "title": "update the location of this gateway from status messages"
         },
         "secrets": {
-          "$ref": "#/definitions/v3Secrets",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v3Secret"
+          },
           "description": "Encrypted Gateway Secrets.\nThis value cannot be set/retrieved in Gateway API calls. Use the StoreGatewaySecret, RetrieveGatewaySecret requests.\nIt can however be deleted by DeleteGateway since it's part of the entity."
         }
       },
@@ -10856,6 +10865,15 @@
         }
       }
     },
+    "v3GatewayLBSLNSSecretPlainText": {
+      "type": "object",
+      "properties": {
+        "token_key": {
+          "type": "string"
+        }
+      },
+      "description": "The plain text value of the Basic Station LNS gateway secret."
+    },
     "v3GatewayRadio": {
       "type": "object",
       "properties": {
@@ -10879,18 +10897,14 @@
         }
       }
     },
-    "v3GatewaySecretPlainText": {
+    "v3GatewaySecrets": {
       "type": "object",
       "properties": {
-        "values": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string",
-            "format": "byte"
-          }
+        "lbs_lns_plain_text": {
+          "$ref": "#/definitions/v3GatewayLBSLNSSecretPlainText"
         }
       },
-      "description": "The plain text value of the gateway secret."
+      "description": "The collective secret message use in RPC calls."
     },
     "v3GatewayStatus": {
       "type": "object",
@@ -12576,22 +12590,19 @@
         }
       }
     },
-    "v3Secrets": {
+    "v3Secret": {
       "type": "object",
       "properties": {
-        "values": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string",
-            "format": "byte"
-          }
+        "blob": {
+          "type": "string",
+          "format": "byte"
         },
         "key_id": {
           "type": "string",
           "description": "ID of the Key used to encrypt the secret."
         }
       },
-      "description": "Secrets contains key-value pairs of secret values as well as the ID of the encryption key."
+      "description": "Secret contains a secret blob as well as the ID of the encryption key.\nThe blob is typically a marshalled proto message."
     },
     "v3SendInvitationRequest": {
       "type": "object",
@@ -12804,8 +12815,8 @@
         "gateway_ids": {
           "$ref": "#/definitions/v3GatewayIdentifiers"
         },
-        "plain_text": {
-          "$ref": "#/definitions/v3GatewaySecretPlainText"
+        "secrets": {
+          "$ref": "#/definitions/v3GatewaySecrets"
         }
       }
     },

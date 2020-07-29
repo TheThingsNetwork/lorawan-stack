@@ -511,28 +511,12 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 			}
 		case "secrets":
 			if len(subs) > 0 {
-				var newDst, newSrc *Secrets
-				if (src == nil || src.Secrets == nil) && dst.Secrets == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.Secrets
-				}
-				if dst.Secrets != nil {
-					newDst = dst.Secrets
-				} else {
-					newDst = &Secrets{}
-					dst.Secrets = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
+				return fmt.Errorf("'secrets' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Secrets = src.Secrets
 			} else {
-				if src != nil {
-					dst.Secrets = src.Secrets
-				} else {
-					dst.Secrets = nil
-				}
+				dst.Secrets = nil
 			}
 
 		default:
@@ -1370,17 +1354,54 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 	return nil
 }
 
-func (dst *GatewaySecretPlainText) SetFields(src *GatewaySecretPlainText, paths ...string) error {
+func (dst *GatewayLBSLNSSecretPlainText) SetFields(src *GatewayLBSLNSSecretPlainText, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "values":
+		case "token_key":
 			if len(subs) > 0 {
-				return fmt.Errorf("'values' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'token_key' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.Values = src.Values
+				dst.TokenKey = src.TokenKey
 			} else {
-				dst.Values = nil
+				var zero string
+				dst.TokenKey = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GatewaySecrets) SetFields(src *GatewaySecrets, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "lbs_lns_plain_text":
+			if len(subs) > 0 {
+				var newDst, newSrc *GatewayLBSLNSSecretPlainText
+				if (src == nil || src.LBSLNSPlainText == nil) && dst.LBSLNSPlainText == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.LBSLNSPlainText
+				}
+				if dst.LBSLNSPlainText != nil {
+					newDst = dst.LBSLNSPlainText
+				} else {
+					newDst = &GatewayLBSLNSSecretPlainText{}
+					dst.LBSLNSPlainText = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.LBSLNSPlainText = src.LBSLNSPlainText
+				} else {
+					dst.LBSLNSPlainText = nil
+				}
 			}
 
 		default:
@@ -1411,22 +1432,29 @@ func (dst *StoreGatewaySecretRequest) SetFields(src *StoreGatewaySecretRequest, 
 					dst.GatewayIdentifiers = zero
 				}
 			}
-		case "plain_text":
+		case "secrets":
 			if len(subs) > 0 {
-				var newDst, newSrc *GatewaySecretPlainText
-				if src != nil {
-					newSrc = &src.PlainText
+				var newDst, newSrc *GatewaySecrets
+				if (src == nil || src.Secrets == nil) && dst.Secrets == nil {
+					continue
 				}
-				newDst = &dst.PlainText
+				if src != nil {
+					newSrc = src.Secrets
+				}
+				if dst.Secrets != nil {
+					newDst = dst.Secrets
+				} else {
+					newDst = &GatewaySecrets{}
+					dst.Secrets = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.PlainText = src.PlainText
+					dst.Secrets = src.Secrets
 				} else {
-					var zero GatewaySecretPlainText
-					dst.PlainText = zero
+					dst.Secrets = nil
 				}
 			}
 
@@ -1458,29 +1486,29 @@ func (dst *RetrieveGatewaySecretRequest) SetFields(src *RetrieveGatewaySecretReq
 					dst.GatewayIdentifiers = zero
 				}
 			}
-		case "plain_text":
+		case "secrets":
 			if len(subs) > 0 {
-				var newDst, newSrc *GatewaySecretPlainText
-				if (src == nil || src.PlainText == nil) && dst.PlainText == nil {
+				var newDst, newSrc *GatewaySecrets
+				if (src == nil || src.Secrets == nil) && dst.Secrets == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.PlainText
+					newSrc = src.Secrets
 				}
-				if dst.PlainText != nil {
-					newDst = dst.PlainText
+				if dst.Secrets != nil {
+					newDst = dst.Secrets
 				} else {
-					newDst = &GatewaySecretPlainText{}
-					dst.PlainText = newDst
+					newDst = &GatewaySecrets{}
+					dst.Secrets = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.PlainText = src.PlainText
+					dst.Secrets = src.Secrets
 				} else {
-					dst.PlainText = nil
+					dst.Secrets = nil
 				}
 			}
 

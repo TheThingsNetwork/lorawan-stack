@@ -88,7 +88,7 @@ service GatewayRegistry {
 
   // RetrieveGatewaySecret is used to retrieve and decrypt the secret value.
   // Requires the RIGHT_GATEWAY_READ_SECRET right.
-  rpc RetrieveGatewaySecret(RetrieveGatewaySecretRequest) returns (GatewaySecretPlainText) {
+  rpc RetrieveGatewaySecret(RetrieveGatewaySecretRequest) returns (GatewaySecrets) {
     option (google.api.http) = {
       get: "/gateways/{gateway_ids.gateway_id}/secret"
     };
