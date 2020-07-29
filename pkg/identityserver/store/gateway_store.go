@@ -145,21 +145,6 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 	}
 	oldAttributes, oldAntennas, oldSecrets := gtwModel.Attributes, gtwModel.Antennas, gtwModel.Secrets
 	columns := gtwModel.fromPB(gtw, fieldMask)
-	newSecrets := gtwModel.Secrets
-	if newSecrets != oldSecrets {
-		if oldSecrets != nil {
-			if err = s.query(ctx, Picture{}).Delete(oldSecrets).Error; err != nil {
-				return nil, err
-			}
-		}
-		if newSecrets != nil {
-			if err = s.createEntity(ctx, &newSecrets); err != nil {
-				return nil, err
-			}
-			gtwModel.SecretsID, gtwModel.Secrets = &newSecrets.ID, nil
-			columns = append(columns, "profile_picture_id")
-		}
-	}
 	if err = s.updateEntity(ctx, &gtwModel, columns...); err != nil {
 		return nil, err
 	}
@@ -173,7 +158,11 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 			return nil, err
 		}
 	}
-	gtwModel.Secrets = newSecrets
+	if !reflect.DeepEqual(oldSecrets, gtwModel.Secrets) {
+		if err = s.replaceSecrets(ctx, "gateway", gtwModel.ID, oldSecrets, gtwModel.Secrets); err != nil {
+			return nil, err
+		}
+	}
 	updated = &ttnpb.Gateway{}
 	gtwModel.toPB(updated, fieldMask)
 	return updated, nil

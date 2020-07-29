@@ -54,6 +54,7 @@ var (
 	errAdminsCreateGateways = errors.DefinePermissionDenied("admins_create_gateways", "gateways may only be created by admins, or in organizations")
 	errGatewayEUITaken      = errors.DefineAlreadyExists("gateway_eui_taken", "a gateway with EUI `{gateway_eui}` is already registered as `{gateway_id}`")
 	errInvalidFieldmask     = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
+	errNoSecrets            = errors.DefineNotFound("no_secrets_found", "no secrets found")
 )
 
 func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
@@ -349,24 +350,31 @@ func (is *IdentityServer) storeGatewaySecret(ctx context.Context, req *ttnpb.Sto
 	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_WRITE_SECRET); err != nil {
 		return nil, err
 	}
+	gtw := ttnpb.Gateway{
+		GatewayIdentifiers: req.GatewayIdentifiers,
+	}
+	if req.Secrets == nil {
+		return nil, errNoSecrets
+	}
 
-	m := make(map[string][]byte, len(req.PlainText.Values))
-	for k, v := range req.PlainText.Values {
-		encrypted, err := is.KeyVault.Encrypt(ctx, v, is.config.GatewaySecretKeyID)
+	if req.Secrets.LBSLNSPlainText != nil {
+		marshaled, err := req.Secrets.LBSLNSPlainText.Marshal()
 		if err != nil {
 			return nil, err
 		}
-		m[k] = encrypted
+		encrypted, err := is.KeyVault.Encrypt(ctx, marshaled, is.config.GatewaySecretKeyID)
+		if err != nil {
+			return nil, err
+		}
+		gtw.Secrets["lbs-lns"] = &ttnpb.Secret{
+			// TODO: Use a more scoped key ex: GatewayLBSLNSSecretKeyID.
+			KeyID: is.config.GatewaySecretKeyID,
+			Blob:  encrypted,
+		}
 	}
 
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		_, err := store.GetGatewayStore(db).UpdateGateway(ctx, &ttnpb.Gateway{
-			GatewayIdentifiers: req.GatewayIdentifiers,
-			Secrets: &ttnpb.Secrets{
-				Values: m,
-				KeyID:  is.config.GatewaySecretKeyID,
-			},
-		}, &types.FieldMask{Paths: []string{"secrets"}})
+		_, err := store.GetGatewayStore(db).UpdateGateway(ctx, &gtw, &types.FieldMask{Paths: []string{"secrets"}})
 		return err
 	})
 	if err != nil {
@@ -376,7 +384,7 @@ func (is *IdentityServer) storeGatewaySecret(ctx context.Context, req *ttnpb.Sto
 	return &types.Empty{}, nil
 }
 
-func (is *IdentityServer) retrieveGatewaySecret(ctx context.Context, req *ttnpb.RetrieveGatewaySecretRequest) (*ttnpb.GatewaySecretPlainText, error) {
+func (is *IdentityServer) retrieveGatewaySecret(ctx context.Context, req *ttnpb.RetrieveGatewaySecretRequest) (*ttnpb.GatewaySecrets, error) {
 	// Require that caller has rights to retrive and decrypt the Secret.
 	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRET); err != nil {
 		return nil, err
@@ -394,20 +402,21 @@ func (is *IdentityServer) retrieveGatewaySecret(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 
-	m := make(map[string][]byte)
-	if gtw.Secrets != nil {
-		for k, v := range gtw.Secrets.Values {
-			var err error
-			decrypted, err := is.KeyVault.Decrypt(ctx, v, gtw.Secrets.KeyID)
-			if err != nil {
-				return nil, err
-			}
-			m[k] = decrypted
+	if gtw.Secrets == nil {
+		return nil, errNoSecrets
+	}
+	secrets := ttnpb.GatewaySecrets{}
+	if lbslnsSecret, ok := gtw.Secrets["lbs-lns"]; ok {
+		decrypted, err := is.KeyVault.Decrypt(ctx, lbslnsSecret.Blob, lbslnsSecret.KeyID)
+		if err != nil {
+			return nil, err
+		}
+		err = secrets.LBSLNSPlainText.Unmarshal(decrypted)
+		if err != nil {
+			return nil, err
 		}
 	}
-	return &ttnpb.GatewaySecretPlainText{
-		Values: m,
-	}, nil
+	return &secrets, nil
 }
 
 type gatewayRegistry struct {
@@ -442,6 +451,6 @@ func (gr *gatewayRegistry) StoreGatewaySecret(ctx context.Context, req *ttnpb.St
 	return gr.storeGatewaySecret(ctx, req)
 }
 
-func (gr *gatewayRegistry) RetrieveGatewaySecret(ctx context.Context, req *ttnpb.RetrieveGatewaySecretRequest) (*ttnpb.GatewaySecretPlainText, error) {
+func (gr *gatewayRegistry) RetrieveGatewaySecret(ctx context.Context, req *ttnpb.RetrieveGatewaySecretRequest) (*ttnpb.GatewaySecrets, error) {
 	return gr.retrieveGatewaySecret(ctx, req)
 }
