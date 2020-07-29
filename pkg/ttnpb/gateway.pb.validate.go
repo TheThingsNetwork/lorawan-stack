@@ -2737,7 +2737,14 @@ func (m *GatewayLBSLNSSecretPlainText) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "token_key":
-			// no validation rules for TokenKey
+
+			if utf8.RuneCountInString(m.GetTokenKey()) > 128 {
+				return GatewayLBSLNSSecretPlainTextValidationError{
+					field:  "token_key",
+					reason: "value length must be at most 128 runes",
+				}
+			}
+
 		default:
 			return GatewayLBSLNSSecretPlainTextValidationError{
 				field:  name,

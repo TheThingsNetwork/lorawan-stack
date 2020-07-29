@@ -123,9 +123,9 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	logger.Debug("Store gateway API key as secret for LNS")
 	_, err = registry.StoreGatewaySecret(ctx, &ttnpb.StoreGatewaySecretRequest{
 		GatewayIdentifiers: gtw.GatewayIdentifiers,
-		PlainText: ttnpb.GatewaySecretPlainText{
-			Values: map[string][]byte{
-				lnsTokenMapKey: []byte(lnsKey.Key),
+		Secrets: &ttnpb.GatewaySecrets{
+			LBSLNSPlainText: &ttnpb.GatewayLBSLNSSecretPlainText{
+				TokenKey: lnsKey.Key,
 			},
 		},
 	}, auth)
@@ -154,8 +154,10 @@ func (s *Server) getLNSToken(ctx context.Context, gtwIDs ttnpb.GatewayIdentifier
 	if err != nil {
 		return "", err
 	}
-	// TODO: Does this require empty value validation?
-	return string(plaintext.Values[lnsTokenMapKey]), nil
+	if plaintext.LBSLNSPlainText != nil {
+		return string(plaintext.LBSLNSPlainText.TokenKey), nil
+	}
+	return "", nil
 }
 
 var getGatewayMask = pbtypes.FieldMask{Paths: []string{

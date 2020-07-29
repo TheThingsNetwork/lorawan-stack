@@ -2757,6 +2757,12 @@ The plain text value of the Basic Station LNS gateway secret.
 | ----- | ---- | ----- | ----------- |
 | `token_key` | [`string`](#string) |  |  |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `token_key` | <p>`string.max_len`: `128`</p> |
+
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 
 | Field | Type | Label | Description |
