@@ -11,24 +11,26 @@ Migrate devices without the need for a rejoin.
 ## Create a devices.json file
 
 Required fields when importing devices
-- device_id
-- application_id
-- dev_eui
-- [join_eui]({{< ref "http://localhost:1313/reference/glossary#joineui" >}}) (also referred to as AppEUI)
+- [device_id]({{< ref "reference/glossary#device-id" >}}) 
+- [application_id]({{< ref "reference/glossary#application-id" >}}) 
+- [dev_eui]({{< ref "reference/glossary#deveui" >}}) 
+- [join_eui]({{< ref "reference/glossary#joineui" >}}) (also referred to as AppEUI)
 - name (optional)
-- [lorawan_version]({{< ref "http://localhost:1313/reference/glossary#lorawan-version" >}}) 
+- [lorawan_version]({{< ref "reference/glossary#lorawan-version" >}}) 
 - [lorawan_phy_version]({{< ref "reference/glossary#regional-parameters" >}}) (or regional parameters)
 - [frequency_plan_id]({{< ref "reference/glossary#frequency-plan" >}})
 - supports_join (boolean `true` for OTAA, `false` for ABP devices)
 - [app_key]({{< ref "reference/glossary#application-key" >}})
 - nwk_key (only for LoRaWAN version 1.1+)
-- rx1_delay (optional). Choose between `RX_DELAY_1` or `RX_DELAY_5` for an RX2 delay of 5 seconds (default)
-- supports_32_bit_f_cnt (boolean `true` for 32 bit frame counters, `false` for 16 bit counters)
-- dev_addr
-- app_s_key
-- f_nwk_s_int_key (referred to as Network Session Key)
-- last_f_cnt_up (optional, frame counter uplinks)
-- last_n_f_cnt_down (optional, frame counter downlinks)
+- [rx1_delay]({{< ref "reference/api/end_device#message:MACSettings" >}}) (optional). Choose between `RX_DELAY_1` or `RX_DELAY_5` for an RX1 delay of 1 or 5 seconds
+- [supports_32_bit_f_cnt]({{< ref "reference/api/end_device#message:MACSettings" >}}) (boolean `true` for 32 bit frame counters, `false` for non-32 bit counters)
+- [dev_addr]({{< ref "reference/glossary#devaddr" >}})
+- [app_s_key]({{< ref "reference/glossary#application-session-key" >}})
+- [f_nwk_s_int_key]({{< ref "reference/api/end_device#message:SessionKeys" >}}) (also referred to as Network Session Key)
+- [last_f_cnt_up]({{< ref "reference/api/end_device#message:MACSettings" >}}) (optional, frame counter uplinks)
+- [last_n_f_cnt_down]({{< ref "reference/api/end_device#message:MACSettings" >}}) (optional, frame counter downlinks)
+
+
 
 
 Example of `devices.json` file:
