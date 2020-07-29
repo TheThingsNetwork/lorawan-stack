@@ -8,17 +8,17 @@ Follow the instructions in this section to prepare InfluxDB Cloud 2.0 setup for 
 
 <!--more-->
 
-Log in to your InfluxDB Cloud 2.0 account and select **Data** on the left hand menu. 
+Log in to your InfluxDB Cloud 2.0 account and select the **Data** on the left hand menu. 
 
 {{< figure src="influxdb-data-dashboard.png" alt="InfluxDB Data dashboard" >}}
 
-On **Buckets** tab, click the **Create Bucket** button to create a new bucket.
+On the **Buckets** tab, click the **Create Bucket** button to create a new bucket.
 
-Give your bucket a name, choose how long the data will remain in the database and finish by selecting the **Create** button.
+Give your bucket a name, choose how long the data will remain in the database and finish by clicking **Create**.
 
 {{< figure src="creating-a-bucket.png" alt="Creating a bucket" >}}
 
-Next, on **Tokens** tab, select **Generate** to generate a new **Read/Write Token**.
+Next, on the **Tokens** tab, select **Generate** to generate a new **Read/Write Token**.
 
 Enter the **Description** and select the bucket you wish to enable reading and writing for.
 

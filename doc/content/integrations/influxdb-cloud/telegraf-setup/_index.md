@@ -4,11 +4,11 @@ description: ""
 weight: 1
 ---
 
-This section shows you how to configure Telegraf agent for connecting to {{% tts %}} in-built MQTT server and sending data to InfluxDB Cloud 2.0.
+This section contains instructions to configure the Telegraf agent for connecting to {{% tts %}} MQTT server and sending data to InfluxDB Cloud 2.0.
 
 <!--more-->
 
-{{% tts %}} MQTT server info needed to properly configure Telegraf can be found on the **MQTT** tab in {{% tts %}} **Integrations** menu.
+The information needed to configure Telegraf can be found on the **MQTT** tab in {{% tts %}} **Integrations** menu.
 
 {{< figure src="tts-mqtt-info.png" alt="The Things Stack MQTT server info" >}}
 
@@ -17,26 +17,26 @@ Update the previously downloaded Telegraf configuration with the following lines
 ```bash
 [[inputs.mqtt_consumer]]
 #
-# MQTT broker URLs to be used. The format should be scheme://host:port, schema can be tcp, ssl, or ws.
+# MQTT broker URLs to be used. The format is scheme://host:port, schema can be tcp, ssl, or ws.
   servers = ["tcp://127.0.0.1:1883"]
 #
-# Topics that will be subscribed to.
+# Topics to subscribe to.
   topics = [
       "#"
       ]
 #
-# Username and password to connect MQTT server.
+# Username and password.
   username = "app-example"
   password = "NNSXS.JNSBLIV34VXYXS7D4ZWV2IKPTGJM3DFRGO6TYDA.OHBQWSVL7Y.........."
 #
-# Line needed only if your payload type is string, since Telegraf does not forward data of this type by default.
+# Needed only if your payload type is string, since Telegraf does not forward data of this type by default.
   json_string_fields = ["uplink_message_frm_payload"]
 #
-# Defining the message format.
+# Define the message format.
   data_format = "json"
 ```
 
-Copy the previously generated token from **Tokens** tab and export it to an environmental variable by using the following command in your terminal:
+Copy the previously generated token from the **Tokens** tab and export it to an environmental variable by using the following command in your terminal:
 
 ```bash
 export INFLUX_TOKEN="paste your token here"
