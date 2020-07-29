@@ -116,7 +116,7 @@ class GatewaysTable extends React.Component {
 
       return getGatewaysList(
         params,
-        ['name', 'description', 'frequency_plan_id', 'gateway_server_address'],
+        ['name', 'description', 'frequency_plan_ids', 'gateway_server_address'],
         { withStatus: true, isSearch: tab === ALL_TAB || query.length > 0 },
       )
     }
