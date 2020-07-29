@@ -1,7 +1,7 @@
 ---
 title: "Migrating devices from third party LoRaWAN networks"
 description: ""
-weight: -1
+weight: 10
 ---
 
 This guide documents the process of migrating end devices from third party LoRAWAN networks to {{% tts %}}.

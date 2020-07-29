@@ -1,6 +1,6 @@
 ---
 title: Import End Devices in The Things Stack
-weight: 50
+weight: 20
 ---
 
 {{< cli-only >}}
