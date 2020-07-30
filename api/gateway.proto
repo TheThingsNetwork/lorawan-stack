@@ -291,22 +291,25 @@ message GatewayConnectionStats {
   repeated SubBand sub_bands = 10;
 }
 
-// The plain text value of the Basic Station LNS gateway secret.
-message GatewayLBSLNSSecretPlainText {
+// The plain text value of the Basic Station LNS secret.
+message LBSLNSSecret {
   string token_key = 1 [(validate.rules).string.max_len = 128];
 }
 
-// The collective secret message use in RPC calls.
-message GatewaySecrets {
-  GatewayLBSLNSSecretPlainText lbs_lns_plain_text = 1 [(gogoproto.customname) = "LBSLNSPlainText"];
+// The gateway secret message use in RPC calls.
+message GatewaySecret {
+  oneof secret {
+    option (validate.required) = true;
+    LBSLNSSecret lbs_lns = 1 [(gogoproto.customname) = "LBSLNS"];
+  };
 }
 
 message StoreGatewaySecretRequest {
   GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  GatewaySecrets secrets = 2;
+  GatewaySecret secret = 2;
 }
 
 message RetrieveGatewaySecretRequest {
   GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  GatewaySecrets secrets = 2;
+  GatewaySecret secret = 2;
 }

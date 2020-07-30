@@ -1354,7 +1354,7 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 	return nil
 }
 
-func (dst *GatewayLBSLNSSecretPlainText) SetFields(src *GatewayLBSLNSSecretPlainText, paths ...string) error {
+func (dst *LBSLNSSecret) SetFields(src *LBSLNSSecret, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "token_key":
@@ -1375,32 +1375,61 @@ func (dst *GatewayLBSLNSSecretPlainText) SetFields(src *GatewayLBSLNSSecretPlain
 	return nil
 }
 
-func (dst *GatewaySecrets) SetFields(src *GatewaySecrets, paths ...string) error {
+func (dst *GatewaySecret) SetFields(src *GatewaySecret, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "lbs_lns_plain_text":
-			if len(subs) > 0 {
-				var newDst, newSrc *GatewayLBSLNSSecretPlainText
-				if (src == nil || src.LBSLNSPlainText == nil) && dst.LBSLNSPlainText == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.LBSLNSPlainText
-				}
-				if dst.LBSLNSPlainText != nil {
-					newDst = dst.LBSLNSPlainText
-				} else {
-					newDst = &GatewayLBSLNSSecretPlainText{}
-					dst.LBSLNSPlainText = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.LBSLNSPlainText = src.LBSLNSPlainText
-				} else {
-					dst.LBSLNSPlainText = nil
+
+		case "secret":
+			if len(subs) == 0 && src == nil {
+				dst.Secret = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Secret = src.Secret
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "lbs_lns":
+					_, srcOk := src.Secret.(*GatewaySecret_LBSLNS)
+					if !srcOk && src.Secret != nil {
+						return fmt.Errorf("attempt to set oneof 'lbs_lns', while different oneof is set in source")
+					}
+					_, dstOk := dst.Secret.(*GatewaySecret_LBSLNS)
+					if !dstOk && dst.Secret != nil {
+						return fmt.Errorf("attempt to set oneof 'lbs_lns', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *LBSLNSSecret
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.Secret.(*GatewaySecret_LBSLNS).LBSLNS
+						}
+						if dstOk {
+							newDst = dst.Secret.(*GatewaySecret_LBSLNS).LBSLNS
+						} else {
+							newDst = &LBSLNSSecret{}
+							dst.Secret = &GatewaySecret_LBSLNS{LBSLNS: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Secret = src.Secret
+						} else {
+							dst.Secret = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
 				}
 			}
 
@@ -1432,29 +1461,29 @@ func (dst *StoreGatewaySecretRequest) SetFields(src *StoreGatewaySecretRequest, 
 					dst.GatewayIdentifiers = zero
 				}
 			}
-		case "secrets":
+		case "secret":
 			if len(subs) > 0 {
-				var newDst, newSrc *GatewaySecrets
-				if (src == nil || src.Secrets == nil) && dst.Secrets == nil {
+				var newDst, newSrc *GatewaySecret
+				if (src == nil || src.Secret == nil) && dst.Secret == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.Secrets
+					newSrc = src.Secret
 				}
-				if dst.Secrets != nil {
-					newDst = dst.Secrets
+				if dst.Secret != nil {
+					newDst = dst.Secret
 				} else {
-					newDst = &GatewaySecrets{}
-					dst.Secrets = newDst
+					newDst = &GatewaySecret{}
+					dst.Secret = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.Secrets = src.Secrets
+					dst.Secret = src.Secret
 				} else {
-					dst.Secrets = nil
+					dst.Secret = nil
 				}
 			}
 
@@ -1486,29 +1515,29 @@ func (dst *RetrieveGatewaySecretRequest) SetFields(src *RetrieveGatewaySecretReq
 					dst.GatewayIdentifiers = zero
 				}
 			}
-		case "secrets":
+		case "secret":
 			if len(subs) > 0 {
-				var newDst, newSrc *GatewaySecrets
-				if (src == nil || src.Secrets == nil) && dst.Secrets == nil {
+				var newDst, newSrc *GatewaySecret
+				if (src == nil || src.Secret == nil) && dst.Secret == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.Secrets
+					newSrc = src.Secret
 				}
-				if dst.Secrets != nil {
-					newDst = dst.Secrets
+				if dst.Secret != nil {
+					newDst = dst.Secret
 				} else {
-					newDst = &GatewaySecrets{}
-					dst.Secrets = newDst
+					newDst = &GatewaySecret{}
+					dst.Secret = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.Secrets = src.Secrets
+					dst.Secret = src.Secret
 				} else {
-					dst.Secrets = nil
+					dst.Secret = nil
 				}
 			}
 

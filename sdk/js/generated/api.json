@@ -11081,35 +11081,6 @@
           ]
         },
         {
-          "name": "GatewayLBSLNSSecretPlainText",
-          "longName": "GatewayLBSLNSSecretPlainText",
-          "fullName": "ttn.lorawan.v3.GatewayLBSLNSSecretPlainText",
-          "description": "The plain text value of the Basic Station LNS gateway secret.",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "token_key",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "string.max_len",
-                    "value": 128
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
           "name": "GatewayModel",
           "longName": "GatewayModel",
           "fullName": "ttn.lorawan.v3.GatewayModel",
@@ -11277,21 +11248,21 @@
           ]
         },
         {
-          "name": "GatewaySecrets",
-          "longName": "GatewaySecrets",
-          "fullName": "ttn.lorawan.v3.GatewaySecrets",
-          "description": "The collective secret message use in RPC calls.",
+          "name": "GatewaySecret",
+          "longName": "GatewaySecret",
+          "fullName": "ttn.lorawan.v3.GatewaySecret",
+          "description": "The gateway secret message use in RPC calls.",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
           "fields": [
             {
-              "name": "lbs_lns_plain_text",
+              "name": "lbs_lns",
               "description": "",
               "label": "",
-              "type": "GatewayLBSLNSSecretPlainText",
-              "longType": "GatewayLBSLNSSecretPlainText",
-              "fullType": "ttn.lorawan.v3.GatewayLBSLNSSecretPlainText",
+              "type": "LBSLNSSecret",
+              "longType": "LBSLNSSecret",
+              "fullType": "ttn.lorawan.v3.LBSLNSSecret",
               "ismap": false,
               "defaultValue": ""
             }
@@ -11774,6 +11745,35 @@
           ]
         },
         {
+          "name": "LBSLNSSecret",
+          "longName": "LBSLNSSecret",
+          "fullName": "ttn.lorawan.v3.LBSLNSSecret",
+          "description": "The plain text value of the Basic Station LNS secret.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "token_key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 128
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "ListGatewayAPIKeysRequest",
           "longName": "ListGatewayAPIKeysRequest",
           "fullName": "ttn.lorawan.v3.ListGatewayAPIKeysRequest",
@@ -12002,12 +12002,12 @@
               }
             },
             {
-              "name": "secrets",
+              "name": "secret",
               "description": "",
               "label": "",
-              "type": "GatewaySecrets",
-              "longType": "GatewaySecrets",
-              "fullType": "ttn.lorawan.v3.GatewaySecrets",
+              "type": "GatewaySecret",
+              "longType": "GatewaySecret",
+              "fullType": "ttn.lorawan.v3.GatewaySecret",
               "ismap": false,
               "defaultValue": ""
             }
@@ -12088,12 +12088,12 @@
               }
             },
             {
-              "name": "secrets",
+              "name": "secret",
               "description": "",
               "label": "",
-              "type": "GatewaySecrets",
-              "longType": "GatewaySecrets",
-              "fullType": "ttn.lorawan.v3.GatewaySecrets",
+              "type": "GatewaySecret",
+              "longType": "GatewaySecret",
+              "fullType": "ttn.lorawan.v3.GatewaySecret",
               "ismap": false,
               "defaultValue": ""
             }
@@ -12620,9 +12620,9 @@
               "requestLongType": "RetrieveGatewaySecretRequest",
               "requestFullType": "ttn.lorawan.v3.RetrieveGatewaySecretRequest",
               "requestStreaming": false,
-              "responseType": "GatewaySecrets",
-              "responseLongType": "GatewaySecrets",
-              "responseFullType": "ttn.lorawan.v3.GatewaySecrets",
+              "responseType": "GatewaySecret",
+              "responseLongType": "GatewaySecret",
+              "responseFullType": "ttn.lorawan.v3.GatewaySecret",
               "responseStreaming": false,
               "options": {
                 "google.api.http": {

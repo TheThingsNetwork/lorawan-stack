@@ -427,46 +427,49 @@ var GatewayConnectionStatsFieldPathsTopLevel = []string{
 	"sub_bands",
 	"uplink_count",
 }
-var GatewayLBSLNSSecretPlainTextFieldPathsNested = []string{
+var LBSLNSSecretFieldPathsNested = []string{
 	"token_key",
 }
 
-var GatewayLBSLNSSecretPlainTextFieldPathsTopLevel = []string{
+var LBSLNSSecretFieldPathsTopLevel = []string{
 	"token_key",
 }
-var GatewaySecretsFieldPathsNested = []string{
-	"lbs_lns_plain_text",
-	"lbs_lns_plain_text.token_key",
+var GatewaySecretFieldPathsNested = []string{
+	"secret",
+	"secret.lbs_lns",
+	"secret.lbs_lns.token_key",
 }
 
-var GatewaySecretsFieldPathsTopLevel = []string{
-	"lbs_lns_plain_text",
+var GatewaySecretFieldPathsTopLevel = []string{
+	"secret",
 }
 var StoreGatewaySecretRequestFieldPathsNested = []string{
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
-	"secrets",
-	"secrets.lbs_lns_plain_text",
-	"secrets.lbs_lns_plain_text.token_key",
+	"secret",
+	"secret.secret",
+	"secret.secret.lbs_lns",
+	"secret.secret.lbs_lns.token_key",
 }
 
 var StoreGatewaySecretRequestFieldPathsTopLevel = []string{
 	"gateway_ids",
-	"secrets",
+	"secret",
 }
 var RetrieveGatewaySecretRequestFieldPathsNested = []string{
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
-	"secrets",
-	"secrets.lbs_lns_plain_text",
-	"secrets.lbs_lns_plain_text.token_key",
+	"secret",
+	"secret.secret",
+	"secret.secret.lbs_lns",
+	"secret.secret.lbs_lns.token_key",
 }
 
 var RetrieveGatewaySecretRequestFieldPathsTopLevel = []string{
 	"gateway_ids",
-	"secrets",
+	"secret",
 }
 var GatewayRadio_TxConfigurationFieldPathsNested = []string{
 	"max_frequency",

@@ -171,11 +171,10 @@
   - [Message `GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats)
   - [Message `GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes)
   - [Message `GatewayConnectionStats.SubBand`](#ttn.lorawan.v3.GatewayConnectionStats.SubBand)
-  - [Message `GatewayLBSLNSSecretPlainText`](#ttn.lorawan.v3.GatewayLBSLNSSecretPlainText)
   - [Message `GatewayModel`](#ttn.lorawan.v3.GatewayModel)
   - [Message `GatewayRadio`](#ttn.lorawan.v3.GatewayRadio)
   - [Message `GatewayRadio.TxConfiguration`](#ttn.lorawan.v3.GatewayRadio.TxConfiguration)
-  - [Message `GatewaySecrets`](#ttn.lorawan.v3.GatewaySecrets)
+  - [Message `GatewaySecret`](#ttn.lorawan.v3.GatewaySecret)
   - [Message `GatewayStatus`](#ttn.lorawan.v3.GatewayStatus)
   - [Message `GatewayStatus.MetricsEntry`](#ttn.lorawan.v3.GatewayStatus.MetricsEntry)
   - [Message `GatewayStatus.VersionsEntry`](#ttn.lorawan.v3.GatewayStatus.VersionsEntry)
@@ -186,6 +185,7 @@
   - [Message `GetGatewayCollaboratorRequest`](#ttn.lorawan.v3.GetGatewayCollaboratorRequest)
   - [Message `GetGatewayIdentifiersForEUIRequest`](#ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest)
   - [Message `GetGatewayRequest`](#ttn.lorawan.v3.GetGatewayRequest)
+  - [Message `LBSLNSSecret`](#ttn.lorawan.v3.LBSLNSSecret)
   - [Message `ListGatewayAPIKeysRequest`](#ttn.lorawan.v3.ListGatewayAPIKeysRequest)
   - [Message `ListGatewayCollaboratorsRequest`](#ttn.lorawan.v3.ListGatewayCollaboratorsRequest)
   - [Message `ListGatewaysRequest`](#ttn.lorawan.v3.ListGatewaysRequest)
@@ -2749,20 +2749,6 @@ Connection stats as monitored by the Gateway Server.
 | `downlink_utilization_limit` | [`float`](#float) |  |  |
 | `downlink_utilization` | [`float`](#float) |  |  |
 
-### <a name="ttn.lorawan.v3.GatewayLBSLNSSecretPlainText">Message `GatewayLBSLNSSecretPlainText`</a>
-
-The plain text value of the Basic Station LNS gateway secret.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `token_key` | [`string`](#string) |  |  |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `token_key` | <p>`string.max_len`: `128`</p> |
-
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 
 | Field | Type | Label | Description |
@@ -2796,13 +2782,13 @@ The plain text value of the Basic Station LNS gateway secret.
 | `max_frequency` | [`uint64`](#uint64) |  |  |
 | `notch_frequency` | [`uint64`](#uint64) |  |  |
 
-### <a name="ttn.lorawan.v3.GatewaySecrets">Message `GatewaySecrets`</a>
+### <a name="ttn.lorawan.v3.GatewaySecret">Message `GatewaySecret`</a>
 
-The collective secret message use in RPC calls.
+The gateway secret message use in RPC calls.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `lbs_lns_plain_text` | [`GatewayLBSLNSSecretPlainText`](#ttn.lorawan.v3.GatewayLBSLNSSecretPlainText) |  |  |
+| `lbs_lns` | [`LBSLNSSecret`](#ttn.lorawan.v3.LBSLNSSecret) |  |  |
 
 ### <a name="ttn.lorawan.v3.GatewayStatus">Message `GatewayStatus`</a>
 
@@ -2925,6 +2911,20 @@ Identifies an end device model with version information.
 | ----- | ----------- |
 | `gateway_ids` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.LBSLNSSecret">Message `LBSLNSSecret`</a>
+
+The plain text value of the Basic Station LNS secret.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `token_key` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `token_key` | <p>`string.max_len`: `128`</p> |
+
 ### <a name="ttn.lorawan.v3.ListGatewayAPIKeysRequest">Message `ListGatewayAPIKeysRequest`</a>
 
 | Field | Type | Label | Description |
@@ -2981,7 +2981,7 @@ where the user or organization is collaborator on.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
-| `secrets` | [`GatewaySecrets`](#ttn.lorawan.v3.GatewaySecrets) |  |  |
+| `secret` | [`GatewaySecret`](#ttn.lorawan.v3.GatewaySecret) |  |  |
 
 #### Field Rules
 
@@ -3008,7 +3008,7 @@ where the user or organization is collaborator on.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
-| `secrets` | [`GatewaySecrets`](#ttn.lorawan.v3.GatewaySecrets) |  |  |
+| `secret` | [`GatewaySecret`](#ttn.lorawan.v3.GatewaySecret) |  |  |
 
 #### Field Rules
 
@@ -3097,7 +3097,7 @@ where the user or organization is collaborator on.
 | `Update` | [`UpdateGatewayRequest`](#ttn.lorawan.v3.UpdateGatewayRequest) | [`Gateway`](#ttn.lorawan.v3.Gateway) |  |
 | `Delete` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
 | `StoreGatewaySecret` | [`StoreGatewaySecretRequest`](#ttn.lorawan.v3.StoreGatewaySecretRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | SetGatewayLBSSecret is used to encrypt a plaintext value and store it along with the gateway. Requires the RIGHT_GATEWAY_WRITE_SECRET right. |
-| `RetrieveGatewaySecret` | [`RetrieveGatewaySecretRequest`](#ttn.lorawan.v3.RetrieveGatewaySecretRequest) | [`GatewaySecrets`](#ttn.lorawan.v3.GatewaySecrets) | RetrieveGatewaySecret is used to retrieve and decrypt the secret value. Requires the RIGHT_GATEWAY_READ_SECRET right. |
+| `RetrieveGatewaySecret` | [`RetrieveGatewaySecretRequest`](#ttn.lorawan.v3.RetrieveGatewaySecretRequest) | [`GatewaySecret`](#ttn.lorawan.v3.GatewaySecret) | RetrieveGatewaySecret is used to retrieve and decrypt the secret value. Requires the RIGHT_GATEWAY_READ_SECRET right. |
 
 #### HTTP bindings
 

@@ -2721,16 +2721,16 @@ var _ interface {
 	ErrorName() string
 } = GatewayConnectionStatsValidationError{}
 
-// ValidateFields checks the field values on GatewayLBSLNSSecretPlainText with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, an error is returned.
-func (m *GatewayLBSLNSSecretPlainText) ValidateFields(paths ...string) error {
+// ValidateFields checks the field values on LBSLNSSecret with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *LBSLNSSecret) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = GatewayLBSLNSSecretPlainTextFieldPathsNested
+		paths = LBSLNSSecretFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
@@ -2739,14 +2739,14 @@ func (m *GatewayLBSLNSSecretPlainText) ValidateFields(paths ...string) error {
 		case "token_key":
 
 			if utf8.RuneCountInString(m.GetTokenKey()) > 128 {
-				return GatewayLBSLNSSecretPlainTextValidationError{
+				return LBSLNSSecretValidationError{
 					field:  "token_key",
 					reason: "value length must be at most 128 runes",
 				}
 			}
 
 		default:
-			return GatewayLBSLNSSecretPlainTextValidationError{
+			return LBSLNSSecretValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -2755,10 +2755,9 @@ func (m *GatewayLBSLNSSecretPlainText) ValidateFields(paths ...string) error {
 	return nil
 }
 
-// GatewayLBSLNSSecretPlainTextValidationError is the validation error returned
-// by GatewayLBSLNSSecretPlainText.ValidateFields if the designated
-// constraints aren't met.
-type GatewayLBSLNSSecretPlainTextValidationError struct {
+// LBSLNSSecretValidationError is the validation error returned by
+// LBSLNSSecret.ValidateFields if the designated constraints aren't met.
+type LBSLNSSecretValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2766,24 +2765,22 @@ type GatewayLBSLNSSecretPlainTextValidationError struct {
 }
 
 // Field function returns field value.
-func (e GatewayLBSLNSSecretPlainTextValidationError) Field() string { return e.field }
+func (e LBSLNSSecretValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GatewayLBSLNSSecretPlainTextValidationError) Reason() string { return e.reason }
+func (e LBSLNSSecretValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GatewayLBSLNSSecretPlainTextValidationError) Cause() error { return e.cause }
+func (e LBSLNSSecretValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GatewayLBSLNSSecretPlainTextValidationError) Key() bool { return e.key }
+func (e LBSLNSSecretValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GatewayLBSLNSSecretPlainTextValidationError) ErrorName() string {
-	return "GatewayLBSLNSSecretPlainTextValidationError"
-}
+func (e LBSLNSSecretValidationError) ErrorName() string { return "LBSLNSSecretValidationError" }
 
 // Error satisfies the builtin error interface
-func (e GatewayLBSLNSSecretPlainTextValidationError) Error() string {
+func (e LBSLNSSecretValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2795,14 +2792,14 @@ func (e GatewayLBSLNSSecretPlainTextValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGatewayLBSLNSSecretPlainText.%s: %s%s",
+		"invalid %sLBSLNSSecret.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GatewayLBSLNSSecretPlainTextValidationError{}
+var _ error = LBSLNSSecretValidationError{}
 
 var _ interface {
 	Field() string
@@ -2810,37 +2807,58 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GatewayLBSLNSSecretPlainTextValidationError{}
+} = LBSLNSSecretValidationError{}
 
-// ValidateFields checks the field values on GatewaySecrets with the rules
+// ValidateFields checks the field values on GatewaySecret with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *GatewaySecrets) ValidateFields(paths ...string) error {
+func (m *GatewaySecret) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = GatewaySecretsFieldPathsNested
+		paths = GatewaySecretFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "lbs_lns_plain_text":
-
-			if v, ok := interface{}(m.GetLBSLNSPlainText()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return GatewaySecretsValidationError{
-						field:  "lbs_lns_plain_text",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		case "secret":
+			if m.Secret == nil {
+				return GatewaySecretValidationError{
+					field:  "secret",
+					reason: "value is required",
 				}
 			}
+			if len(subs) == 0 {
+				subs = []string{
+					"lbs_lns",
+				}
+			}
+			for name, subs := range _processPaths(subs) {
+				_ = subs
+				switch name {
+				case "lbs_lns":
+					w, ok := m.Secret.(*GatewaySecret_LBSLNS)
+					if !ok || w == nil {
+						continue
+					}
 
+					if v, ok := interface{}(m.GetLBSLNS()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return GatewaySecretValidationError{
+								field:  "lbs_lns",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				}
+			}
 		default:
-			return GatewaySecretsValidationError{
+			return GatewaySecretValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -2849,9 +2867,9 @@ func (m *GatewaySecrets) ValidateFields(paths ...string) error {
 	return nil
 }
 
-// GatewaySecretsValidationError is the validation error returned by
-// GatewaySecrets.ValidateFields if the designated constraints aren't met.
-type GatewaySecretsValidationError struct {
+// GatewaySecretValidationError is the validation error returned by
+// GatewaySecret.ValidateFields if the designated constraints aren't met.
+type GatewaySecretValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2859,22 +2877,22 @@ type GatewaySecretsValidationError struct {
 }
 
 // Field function returns field value.
-func (e GatewaySecretsValidationError) Field() string { return e.field }
+func (e GatewaySecretValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GatewaySecretsValidationError) Reason() string { return e.reason }
+func (e GatewaySecretValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GatewaySecretsValidationError) Cause() error { return e.cause }
+func (e GatewaySecretValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GatewaySecretsValidationError) Key() bool { return e.key }
+func (e GatewaySecretValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GatewaySecretsValidationError) ErrorName() string { return "GatewaySecretsValidationError" }
+func (e GatewaySecretValidationError) ErrorName() string { return "GatewaySecretValidationError" }
 
 // Error satisfies the builtin error interface
-func (e GatewaySecretsValidationError) Error() string {
+func (e GatewaySecretValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2886,14 +2904,14 @@ func (e GatewaySecretsValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGatewaySecrets.%s: %s%s",
+		"invalid %sGatewaySecret.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GatewaySecretsValidationError{}
+var _ error = GatewaySecretValidationError{}
 
 var _ interface {
 	Field() string
@@ -2901,7 +2919,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GatewaySecretsValidationError{}
+} = GatewaySecretValidationError{}
 
 // ValidateFields checks the field values on StoreGatewaySecretRequest with the
 // rules defined in the proto definition for this message. If any rules are
@@ -2930,12 +2948,12 @@ func (m *StoreGatewaySecretRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "secrets":
+		case "secret":
 
-			if v, ok := interface{}(m.GetSecrets()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetSecret()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return StoreGatewaySecretRequestValidationError{
-						field:  "secrets",
+						field:  "secret",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
@@ -3036,12 +3054,12 @@ func (m *RetrieveGatewaySecretRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "secrets":
+		case "secret":
 
-			if v, ok := interface{}(m.GetSecrets()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetSecret()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return RetrieveGatewaySecretRequestValidationError{
-						field:  "secrets",
+						field:  "secret",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

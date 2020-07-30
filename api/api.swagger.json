@@ -3922,7 +3922,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v3GatewaySecrets"
+              "$ref": "#/definitions/v3GatewaySecret"
             }
           },
           "default": {
@@ -3948,7 +3948,7 @@
             "format": "byte"
           },
           {
-            "name": "secrets.lbs_lns_plain_text.token_key",
+            "name": "secret.lbs_lns.token_key",
             "in": "query",
             "required": false,
             "type": "string"
@@ -10865,15 +10865,6 @@
         }
       }
     },
-    "v3GatewayLBSLNSSecretPlainText": {
-      "type": "object",
-      "properties": {
-        "token_key": {
-          "type": "string"
-        }
-      },
-      "description": "The plain text value of the Basic Station LNS gateway secret."
-    },
     "v3GatewayRadio": {
       "type": "object",
       "properties": {
@@ -10897,14 +10888,14 @@
         }
       }
     },
-    "v3GatewaySecrets": {
+    "v3GatewaySecret": {
       "type": "object",
       "properties": {
-        "lbs_lns_plain_text": {
-          "$ref": "#/definitions/v3GatewayLBSLNSSecretPlainText"
+        "lbs_lns": {
+          "$ref": "#/definitions/v3LBSLNSSecret"
         }
       },
-      "description": "The collective secret message use in RPC calls."
+      "description": "The gateway secret message use in RPC calls."
     },
     "v3GatewayStatus": {
       "type": "object",
@@ -11231,6 +11222,15 @@
           "format": "byte"
         }
       }
+    },
+    "v3LBSLNSSecret": {
+      "type": "object",
+      "properties": {
+        "token_key": {
+          "type": "string"
+        }
+      },
+      "description": "The plain text value of the Basic Station LNS secret."
     },
     "v3ListFrequencyPlansResponse": {
       "type": "object",
@@ -12815,8 +12815,8 @@
         "gateway_ids": {
           "$ref": "#/definitions/v3GatewayIdentifiers"
         },
-        "secrets": {
-          "$ref": "#/definitions/v3GatewaySecrets"
+        "secret": {
+          "$ref": "#/definitions/v3GatewaySecret"
         }
       }
     },
