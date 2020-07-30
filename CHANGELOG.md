@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The header of the sidebar is now clickable in the Console.
 - Overall layout and behavior of the sidebar in the Console improved.
 - Improved layout and screen space utilization of event data views in the Console.
+- Allow setting all default MAC settings of the Network Server. Support setting enum values using strings where applicable.
 
 ### Deprecated
 

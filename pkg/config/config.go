@@ -16,6 +16,7 @@
 package config
 
 import (
+	"crypto/tls"
 	"fmt"
 	"io"
 	"os"
@@ -220,6 +221,11 @@ func (m *Manager) Unmarshal(result interface{}) error {
 			configurableInterfaceSliceHook,
 			stringToByteSliceHook,
 			stringToByteArrayHook,
+			stringToTimeDurationPointerHook,
+			stringToADRAckDelayExponentPointerHook,
+			stringToADRAckLimitExponentPointerHook,
+			stringToAggregatedDutyCyclePointerHook,
+			stringToRxDelayPointerHook,
 		),
 	})
 	if err != nil {
@@ -354,8 +360,9 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 
 		if configValue.Field(i).CanInterface() {
 			fieldKind := field.Type.Kind()
+			fieldValue := configValue.Field(i)
 
-			face := configValue.Field(i).Interface()
+			face := fieldValue.Interface()
 
 			// if it's only for in the file, skip the rest
 			if fileOnly == "true" {
@@ -404,38 +411,77 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				continue
 			}
 
-			if fieldKind == reflect.Interface || fieldKind == reflect.Ptr {
-				if configValue.Field(i).IsNil() {
-					continue
-				}
-				elem := configValue.Field(i).Elem()
-				fieldKind = elem.Type().Kind()
-				face = elem.Interface()
-			}
-
 			switch val := face.(type) {
 			case bool:
 				m.viper.SetDefault(name, val)
 				flags.BoolP(name, shorthand, val, description)
 
-			case int, int8, int16, int32, int64:
-				fieldValue := reflect.Indirect(configValue.Field(i)).Int()
-				m.viper.SetDefault(name, int(fieldValue))
-				flags.IntP(name, shorthand, int(fieldValue), description)
+			case int:
+				m.viper.SetDefault(name, val)
+				flags.IntP(name, shorthand, val, description)
+			case int8:
+				m.viper.SetDefault(name, val)
+				flags.IntP(name, shorthand, int(val), description)
+			case int16:
+				m.viper.SetDefault(name, val)
+				flags.IntP(name, shorthand, int(val), description)
+			case int32:
+				m.viper.SetDefault(name, val)
+				flags.IntP(name, shorthand, int(val), description)
+			case int64:
+				m.viper.SetDefault(name, val)
+				flags.IntP(name, shorthand, int(val), description)
 
-			case uint, uint8, uint16, uint32, uint64:
-				fieldValue := reflect.Indirect(configValue.Field(i)).Uint()
-				m.viper.SetDefault(name, uint(fieldValue))
-				flags.UintP(name, shorthand, uint(fieldValue), description)
+			case uint:
+				m.viper.SetDefault(name, val)
+				flags.UintP(name, shorthand, val, description)
+			case uint8:
+				m.viper.SetDefault(name, val)
+				flags.UintP(name, shorthand, uint(val), description)
+			case uint16:
+				m.viper.SetDefault(name, val)
+				flags.UintP(name, shorthand, uint(val), description)
+			case uint32:
+				m.viper.SetDefault(name, val)
+				flags.UintP(name, shorthand, uint(val), description)
+			case uint64:
+				m.viper.SetDefault(name, val)
+				flags.UintP(name, shorthand, uint(val), description)
 
-			case float32, float64:
-				fieldValue := reflect.Indirect(configValue.Field(i)).Float()
-				m.viper.SetDefault(name, fieldValue)
-				flags.Float64P(name, shorthand, fieldValue, description)
+			case float32:
+				m.viper.SetDefault(name, val)
+				flags.Float64P(name, shorthand, float64(val), description)
+
+			case float64:
+				m.viper.SetDefault(name, val)
+				flags.Float64P(name, shorthand, val, description)
+
+			case *uint32:
+				var def string
+				if val != nil {
+					def = fmt.Sprintf("%v", *val)
+					m.viper.SetDefault(name, *val)
+				}
+				flags.StringP(name, shorthand, def, description)
+
+			case *float32:
+				var def string
+				if val != nil {
+					def = fmt.Sprintf("%v", *val)
+					m.viper.SetDefault(name, *val)
+				}
+				flags.StringP(name, shorthand, def, description)
 
 			case string:
 				m.viper.SetDefault(name, val)
 				flags.StringP(name, shorthand, val, description)
+
+			case *string:
+				var def string
+				if val != nil {
+					m.viper.SetDefault(name, *val)
+				}
+				flags.StringP(name, shorthand, def, description)
 
 			case time.Time:
 				m.viper.SetDefault(name, val)
@@ -448,6 +494,16 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 			case time.Duration:
 				m.viper.SetDefault(name, val)
 				flags.DurationP(name, shorthand, val, description)
+
+			case *time.Duration:
+				var def string
+				if val != nil {
+					def = fmt.Sprintf("%v", *val)
+					m.viper.SetDefault(name, def)
+				}
+				flags.StringP(name, shorthand, def, description)
+
+			case *tls.Config:
 
 			case map[string]string:
 				defs := make([]string, 0, len(val))
@@ -497,15 +553,52 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				m.viper.SetDefault(name, int32(val))
 				flags.Int32P(name, shorthand, int32(val), description)
 
+			case *ttnpb.RxDelay:
+				var def string
+				if val != nil {
+					def = fmt.Sprintf("%v", int32(*val))
+					m.viper.SetDefault(name, *val)
+				}
+				flags.StringP(name, shorthand, def, description)
+
+			case *ttnpb.ADRAckDelayExponent:
+				var def string
+				if val != nil {
+					def = fmt.Sprintf("%v", int32(*val))
+					m.viper.SetDefault(name, def)
+				}
+				flags.StringP(name, shorthand, def, description)
+
+			case *ttnpb.ADRAckLimitExponent:
+				var def string
+				if val != nil {
+					def = fmt.Sprintf("%v", int32(*val))
+					m.viper.SetDefault(name, def)
+				}
+				flags.StringP(name, shorthand, def, description)
+
+			case *ttnpb.AggregatedDutyCycle:
+				var def string
+				if val != nil {
+					def = fmt.Sprintf("%v", int32(*val))
+					m.viper.SetDefault(name, def)
+				}
+				flags.StringP(name, shorthand, def, description)
+
 			default:
-				switch fieldKind {
+				fieldValue = reflect.Indirect(fieldValue)
+				switch fieldValue.Kind() {
 				case reflect.Struct:
 					if field.Anonymous {
 						name = prefix
 					}
-					m.setDefaults(name, flags, configValue.Field(i).Interface())
+					m.setDefaults(name, flags, fieldValue.Interface())
+				case reflect.Invalid:
+					// TODO: Remove setDefaults, traverse reflect.Type instead of values directly.
+					fmt.Fprintf(os.Stderr, `config: skip "%v" in configuration at name "%s"`+"\n", field.Type, name)
+					m.viper.SetDefault(name, nil)
 				default:
-					panic(fmt.Errorf("config: cannot work with \"%v\" in configuration at name \"%s\"", field.Type, name))
+					panic(fmt.Errorf(`config: cannot work with "%v" in configuration at name "%s"`, field.Type, name))
 				}
 			}
 		}

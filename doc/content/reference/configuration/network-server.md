@@ -28,9 +28,13 @@ The `ns.default-mac-settings` options configure default device MAC configuration
 - `ns.default-mac-settings.adr-margin`: The default margin Network Server should add in ADR requests
 - `ns.default-mac-settings.class-b-timeout`: Deadline for a device in class B mode to respond to requests from the Network Server
 - `ns.default-mac-settings.class-c-timeout`: Deadline for a device in class C mode to respond to requests from the Network Server
-- `ns.default-mac-settings.desired-rx1-delay`: Desired Rx1Delay value Network Server should use
+- `ns.default-mac-settings.desired-adr-ack-delay-exponent`: The desired ADR ACK delay exponent (`ADR_ACK_DELAY_<X>`). Not set by default
+- `ns.default-mac-settings.desired-adr-ack-limit-exponent`: The desired ADR ACK limit exponent (`ADR_ACK_LIMIT_<X>`). Not set by default
+- `ns.default-mac-settings.desired-max-duty-cycle`: The desired maximum Duty Cycle, (`DUTY_CYCLE_<X>`). Not set by default
+- `ns.default-mac-settings.desired-rx1-delay`: Desired Rx1Delay value Network Server should use (`RX_DELAY_<X>`)
 - `ns.default-mac-settings.status-count-periodicity`: Number of uplink messages after which a DevStatusReq MACCommand shall be sent by Network Server
 - `ns.default-mac-settings.status-time-periodicity`: The interval after which a DevStatusReq MACCommand shall be sent by Network Server
+
 
 ## Interoperability
 
