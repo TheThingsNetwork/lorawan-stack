@@ -1,5 +1,5 @@
 ---
-title: "Migrating devices from third party networks"
+title: "Migrating from Third Party Networks"
 description: ""
 weight: -1
 ---

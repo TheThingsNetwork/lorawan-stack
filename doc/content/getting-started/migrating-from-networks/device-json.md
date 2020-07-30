@@ -1,16 +1,13 @@
 ---
-title: "Migrating devices from third party LoRaWAN networks"
+title: "Create Device.json"
 description: ""
 weight: 10
 ---
 
-This guide documents the process of migrating end devices from third party LoRAWAN networks to {{% tts %}}.
+{{% tts %}} allows you to import devices from other networks using a JSON file describing those devices. Devices imoported this way can be migrated without the need for a rejoin.
 
-Migrate devices without the need for a rejoin.
+## Required Fields in `devices.json`
 
-## Create a devices.json file
-
-Required fields when importing devices
 - [device_id]({{< ref "reference/glossary#device-id" >}}) 
 - [application_id]({{< ref "reference/glossary#application-id" >}}) 
 - [dev_eui]({{< ref "reference/glossary#deveui" >}}) 
@@ -30,10 +27,9 @@ Required fields when importing devices
 - [last_f_cnt_up]({{< ref "reference/api/end_device#message:MACSettings" >}}) (optional, frame counter uplinks)
 - [last_n_f_cnt_down]({{< ref "reference/api/end_device#message:MACSettings" >}}) (optional, frame counter downlinks)
 
+## Example `devices.json`
 
-
-
-Example of `devices.json` file:
+Below is an example `devices.json` file. The file may contain multiple devices, stored as an array of the following JSON object.
 
 ```json
 {
@@ -77,5 +73,4 @@ Example of `devices.json` file:
 }
 ```
 
-
-For more informatino on configurating MAC settings, see [Fine-tuning MAC Settings]({{< ref "getting-started/migrating-to-ttes/configure-mac-settings" >}}).
+For more information on configuring MAC settings, see [Fine-tuning MAC Settings]({{< ref "getting-started/migrating-from-v2/configure-mac-settings" >}}).
