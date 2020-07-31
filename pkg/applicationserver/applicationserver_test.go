@@ -1530,6 +1530,25 @@ hardware_versions:
 						},
 					},
 					{
+						Name: "RegisteredDevice/DownlinkQueueInvalidated/KnownSession/NoDownlinks",
+						IDs:  registeredDevice.EndDeviceIdentifiers,
+						Message: &ttnpb.ApplicationUp{
+							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
+							Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+								DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
+									Downlinks:    nil,
+									LastFCntDown: 46,
+								},
+							},
+						},
+						ResetQueue: make([]*ttnpb.ApplicationDownlink, 0),
+						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
+							a := assertions.New(t)
+							a.So(dev.Session.LastAFCntDown, should.Equal, 46)
+							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink(nil))
+						},
+					},
+					{
 						Name: "RegisteredDevice/DownlinkQueueInvalidated/UnknownSession",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{

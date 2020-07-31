@@ -745,9 +745,9 @@ func (as *ApplicationServer) recalculatePendingDownlinkQueue(ctx context.Context
 // The pending downlink queue of the end device is discarded.
 // This method uses the downlink queue transaction mechanism, so any errors that occur during recomputation will
 // result in an downlink queue reset attempt.
-func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *ttnpb.EndDevice, link *link, previousSession *ttnpb.Session, downlinks []*ttnpb.ApplicationDownlink, nextAFCntDown uint32) error {
+func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *ttnpb.EndDevice, link *link, previousSession *ttnpb.Session, previousDownlinks []*ttnpb.ApplicationDownlink, nextAFCntDown uint32, skipEmptyReplace bool) error {
 	return as.runDownlinkQueueTransaction(ctx, dev, link, func(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-		downlinks, unmatched := ttnpb.PartitionDownlinksBySessionKeyIDEquality(previousSession.SessionKeyID, downlinks...)
+		downlinks, unmatched := ttnpb.PartitionDownlinksBySessionKeyIDEquality(previousSession.SessionKeyID, previousDownlinks...)
 		for _, item := range unmatched {
 			log.FromContext(ctx).WithFields(log.Fields(
 				"f_port", item.FPort,
@@ -760,6 +760,10 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 		newQueue, err = as.migrateDownlinkQueue(ctx, dev.EndDeviceIdentifiers, downlinks, previousSession, dev.Session, nextAFCntDown)
 		if err != nil {
 			return err
+		}
+
+		if skipEmptyReplace && len(previousDownlinks) == 0 {
+			return nil
 		}
 
 		client := ttnpb.NewAsNsClient(link.conn)
@@ -888,8 +892,8 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 					logger.WithError(err).Warn("Failed to list downlink queue for recalculation; clear the downlink queue")
 					as.resetInvalidDownlinkQueue(ctx, ids, link)
 				} else {
-					previousQueue, _ := ttnpb.PartitionDownlinksBySessionKeyIDEquality(previousSession.SessionKeyID, res.Downlinks...)
-					if err := as.recalculateDownlinkQueue(ctx, dev, link, previousSession, previousQueue, 1); err != nil {
+					previousQueue, unmatched := ttnpb.PartitionDownlinksBySessionKeyIDEquality(previousSession.SessionKeyID, res.Downlinks...)
+					if err := as.recalculateDownlinkQueue(ctx, dev, link, previousSession, previousQueue, 1, len(unmatched) == 0); err != nil {
 						logger.WithError(err).Warn("Failed to recalculate downlink queue; items lost")
 					}
 				}
@@ -930,9 +934,6 @@ func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnp
 }
 
 func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *link) error {
-	if len(invalid.Downlinks) == 0 {
-		return nil
-	}
 	_, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
@@ -945,7 +946,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 			if dev.Session == nil {
 				return nil, nil, errNoDeviceSession.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
-			if err := as.recalculateDownlinkQueue(ctx, dev, link, dev.Session, invalid.Downlinks, invalid.LastFCntDown+1); err != nil {
+			if err := as.recalculateDownlinkQueue(ctx, dev, link, dev.Session, invalid.Downlinks, invalid.LastFCntDown+1, true); err != nil {
 				return nil, nil, err
 			}
 			return dev, []string{"session"}, nil
@@ -979,7 +980,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 				}
 				queue, _ := ttnpb.PartitionDownlinksBySessionKeyIDEquality(dev.Session.SessionKeyID, res.Downlinks...)
 				queue = append([]*ttnpb.ApplicationDownlink{msg}, queue...)
-				if err := as.recalculateDownlinkQueue(ctx, dev, link, dev.Session, queue, msg.FCnt+1); err != nil {
+				if err := as.recalculateDownlinkQueue(ctx, dev, link, dev.Session, queue, msg.FCnt+1, false); err != nil {
 					return nil, nil, err
 				}
 				return dev, []string{"session"}, nil
