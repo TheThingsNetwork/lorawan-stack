@@ -22,13 +22,15 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/mohae/deepcopy"
 	"github.com/oklog/ulid/v2"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -272,16 +274,19 @@ func TestProcessDownlinkTask(t *testing.T) {
 		SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 	}
 
-	const rx1Delay = ttnpb.RX_DELAY_1
+	customCh := &ttnpb.MACParameters_Channel{
+		UplinkFrequency:   430000000,
+		DownlinkFrequency: 431000000,
+		MinDataRateIndex:  ttnpb.DATA_RATE_0,
+		MaxDataRateIndex:  ttnpb.DATA_RATE_6,
+	}
+	const customChIdx = 3
 	makeEU868macParameters := func(ver ttnpb.PHYVersion) ttnpb.MACParameters {
 		params := MakeDefaultEU868CurrentMACParameters(ver)
-		params.Rx1Delay = rx1Delay
-		params.Channels = append(params.Channels, &ttnpb.MACParameters_Channel{
-			UplinkFrequency:   430000000,
-			DownlinkFrequency: 431000000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_3,
-		})
+		if len(params.Channels) != customChIdx {
+			panic(fmt.Sprintf("invalid EU868 default channel count, expected %d, got %d", customChIdx, len(params.Channels)))
+		}
+		params.Channels = append(params.Channels, deepcopy.Copy(customCh).(*ttnpb.MACParameters_Channel))
 		return params
 	}
 
@@ -297,36 +302,31 @@ func TestProcessDownlinkTask(t *testing.T) {
 				{Peer: peer124},
 			},
 			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-				return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
+				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-0",
 					})
 			},
 			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-				return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
+				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-1",
 					})
 			},
 			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-				return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
+				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-2",
 					})
 			},
 			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-				return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
+				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-3",
 					})
 			},
 			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-				return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
+				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-4",
 					})
@@ -450,20 +450,102 @@ func TestProcessDownlinkTask(t *testing.T) {
 		return assertScheduleGateways(ctx, authCh, scheduleDownlink124Ch, scheduleDownlink3Ch, payload, makeTxRequest, true, resps...)
 	}
 
-	start := gpstime.Parse(10000 * BeaconPeriod).Add(time.Second + 200*time.Millisecond)
-	clock := test.NewMockClock(start)
+	makeFailEventEqual := func(t *testing.T) func(x, y events.Event) bool {
+		t.Helper()
+		a := assertions.New(t)
+		return func(x, y events.Event) bool {
+			xProto := test.Must(events.Proto(x)).(*ttnpb.Event)
+			yProto := test.Must(events.Proto(y)).(*ttnpb.Event)
+			xProto.Time = time.Time{}
+			yProto.Time = time.Time{}
+			xProto.Data = nil
+			yProto.Data = nil
+			return test.AllTrue(
+				a.So(x.Data(), should.BeError) && a.So(y.Data(), should.BeError) && a.So(x.Data(), should.HaveSameErrorDefinitionAs, y.Data()),
+				a.So(xProto, should.Resemble, yProto),
+			)
+		}
+	}
+
+	makeAssertReceiveScheduleFailAttemptEvents := func(attempt, fail events.Builder) func(context.Context, TestEnvironment, *ttnpb.DownlinkMessage, ttnpb.EndDeviceIdentifiers, error, uint) bool {
+		return func(ctx context.Context, env TestEnvironment, down *ttnpb.DownlinkMessage, ids ttnpb.EndDeviceIdentifiers, err error, n uint) bool {
+			_, a := test.MustNewTFromContext(ctx)
+			ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIDs...)
+			evIDOpt := events.WithIdentifiers(ids)
+			for i := uint(0); i < n; i++ {
+				if !test.AllTrue(
+					a.So(env.Events, should.ReceiveEventResembling,
+						attempt.With(events.WithData(down)).New(ctx, evIDOpt)),
+					a.So(env.Events, should.ReceiveEventFunc, makeFailEventEqual(t),
+						fail.With(events.WithData(err)).New(ctx, evIDOpt)),
+				) {
+					return false
+				}
+			}
+			return true
+		}
+	}
+	makeAssertReceiveScheduleSuccessAttemptEvents := func(attempt, success events.Builder) func(context.Context, TestEnvironment, *ttnpb.DownlinkMessage, ttnpb.EndDeviceIdentifiers, *ttnpb.ScheduleDownlinkResponse, ...events.Builder) bool {
+		return func(ctx context.Context, env TestEnvironment, down *ttnpb.DownlinkMessage, ids ttnpb.EndDeviceIdentifiers, resp *ttnpb.ScheduleDownlinkResponse, evs ...events.Builder) bool {
+			_, a := test.MustNewTFromContext(ctx)
+			return a.So(env.Events, should.ReceiveEventsResembling, events.Builders(append([]events.Builder{
+				attempt.With(events.WithData(down)),
+				success.With(events.WithData(resp)),
+			}, evs...)).New(
+				events.ContextWithCorrelationID(ctx, down.CorrelationIDs...),
+				events.WithIdentifiers(ids),
+			))
+		}
+	}
+
+	assertReceiveScheduleDataFailAttemptEvents := makeAssertReceiveScheduleFailAttemptEvents(
+		EvtScheduleDataDownlinkAttempt,
+		EvtScheduleDataDownlinkFail,
+	)
+	assertReceiveScheduleJoinFailAttemptEvents := makeAssertReceiveScheduleFailAttemptEvents(
+		EvtScheduleJoinAcceptAttempt,
+		EvtScheduleJoinAcceptFail,
+	)
+	assertReceiveScheduleDataSuccessAttemptEvents := makeAssertReceiveScheduleSuccessAttemptEvents(
+		EvtScheduleDataDownlinkAttempt,
+		EvtScheduleDataDownlinkSuccess,
+	)
+	assertReceiveScheduleJoinSuccessAttemptEvents := makeAssertReceiveScheduleSuccessAttemptEvents(
+		EvtScheduleJoinAcceptAttempt,
+		EvtScheduleJoinAcceptSuccess,
+	)
+
+	pingSlotPeriodicity := &ttnpb.PingSlotPeriodValue{
+		Value: ttnpb.PING_EVERY_8S,
+	}
+
+	_, ctx := test.New(t)
+	pingAt, ok := NextPingSlotAt(ctx, &ttnpb.EndDevice{
+		Session: &ttnpb.Session{
+			DevAddr: devAddr,
+		},
+		MACState: &ttnpb.MACState{
+			PingSlotPeriodicity: pingSlotPeriodicity,
+		},
+	}, time.Now())
+	if !ok {
+		t.Fatal("Failed to compute ping slot")
+	}
+	now := pingAt.Add(-DefaultEU868RX1Delay.Duration()/2 - 2*NSScheduleWindow())
+	clock := test.NewMockClock(now)
 	defer SetMockClock(clock)()
 
 	type DeviceDiffFunc func(ctx context.Context, expected, created, updated *ttnpb.EndDevice, down *ttnpb.DownlinkMessage, downAt time.Time) bool
 	makeRemoveDownlinksDiff := func(n uint) DeviceDiffFunc {
 		return func(ctx context.Context, expected, _, _ *ttnpb.EndDevice, _ *ttnpb.DownlinkMessage, _ time.Time) bool {
-			t := test.MustTFromContext(ctx)
-			t.Helper()
-			a := assertions.New(t)
-			if !a.So(expected.Session.QueuedApplicationDownlinks, should.BeGreaterThanOrEqualTo, n) {
+			_, a := test.MustNewTFromContext(ctx)
+			if !a.So(len(expected.Session.QueuedApplicationDownlinks), should.BeGreaterThanOrEqualTo, n) {
 				return false
 			}
-			expected.Session.QueuedApplicationDownlinks = expected.Session.QueuedApplicationDownlinks[:uint(len(expected.Session.QueuedApplicationDownlinks))-n]
+			expected.Session.QueuedApplicationDownlinks = expected.Session.QueuedApplicationDownlinks[n:]
+			if len(expected.Session.QueuedApplicationDownlinks) == 0 {
+				expected.Session.QueuedApplicationDownlinks = nil
+			}
 			return true
 		}
 	}
@@ -510,16 +592,26 @@ func TestProcessDownlinkTask(t *testing.T) {
 		return true
 	})
 	setPendingApplicationDownlinkDiff := DeviceDiffFunc(func(_ context.Context, expected, created, _ *ttnpb.EndDevice, _ *ttnpb.DownlinkMessage, downAt time.Time) bool {
-		expected.MACState.PendingApplicationDownlink = created.QueuedApplicationDownlinks[len(created.QueuedApplicationDownlinks)-1]
+		expected.MACState.PendingApplicationDownlink = created.Session.QueuedApplicationDownlinks[0]
 		return true
 	})
+
+	testErr := errors.New("test")
+	testErrScheduleResponse := NsGsScheduleDownlinkResponse{
+		Error: testErr,
+	}
+	oneSecondScheduleResponse := NsGsScheduleDownlinkResponse{
+		Response: &ttnpb.ScheduleDownlinkResponse{
+			Delay: time.Second,
+		},
+	}
 
 	for _, tc := range []struct {
 		Name                        string
 		CreateDevice                SetDeviceRequest
 		DeviceDiffs                 []DeviceDiffFunc
 		ApplicationUplinkAssertions []func(context.Context, *ttnpb.EndDevice, *ttnpb.ApplicationUp) bool
-		DownlinkAssertion           func(context.Context, TestClusterEnvironment, *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool)
+		DownlinkAssertion           func(context.Context, TestEnvironment, *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool)
 		ErrorAssertion              func(*testing.T, error) bool
 	}{
 		{
@@ -569,22 +661,19 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: time.Now().Add(-time.Second),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								Confirmed:     true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								DataRateIndex: customCh.MinDataRateIndex,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
 						},
 					},
 					Session: &ttnpb.Session{
@@ -654,22 +743,19 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-time.Second),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								Confirmed:     true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								DataRateIndex: customCh.MinDataRateIndex,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
 						},
 					},
 				},
@@ -700,22 +786,19 @@ func TestProcessDownlinkTask(t *testing.T) {
 						LoRaWANVersion:     ttnpb.MAC_V1_1,
 						RxWindowsAvailable: true,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-2*time.Second - time.Nanosecond),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								Confirmed:     true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								DataRateIndex: customCh.MinDataRateIndex,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second - time.Nanosecond),
+							}),
 						},
 					},
 					MACSettings: &ttnpb.MACSettings{
@@ -756,22 +839,18 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-100 * time.Millisecond),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								DataRateIndex: customCh.MinDataRateIndex,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
 						},
 						RxWindowsAvailable: true,
 					},
@@ -813,22 +892,18 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_0_3,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_0_3,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_0_3_REV_A].DataRates[customCh.MinDataRateIndex].Rate,
+								DataRateIndex: customCh.MinDataRateIndex,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
 						},
 						RxWindowsAvailable: true,
 					},
@@ -870,7 +945,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 			},
 			DeviceDiffs: []DeviceDiffFunc{
-				makeRemoveDownlinksDiff(1),
+				makeRemoveDownlinksDiff(2),
 			},
 			ApplicationUplinkAssertions: []func(context.Context, *ttnpb.EndDevice, *ttnpb.ApplicationUp) bool{
 				func(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.ApplicationUp) bool {
@@ -887,6 +962,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 			},
 		},
+
 		{
 			Name: "Class A/windows open/1.0.3/RX1,RX2 available/no MAC/generic application downlink/application downlink exceeds length limit",
 			CreateDevice: SetDeviceRequest{
@@ -904,22 +980,18 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_0_3,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_0_3,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_0_3_REV_A].DataRates[customCh.MinDataRateIndex].Rate,
+								DataRateIndex: customCh.MinDataRateIndex,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
 						},
 						RxWindowsAvailable: true,
 					},
@@ -997,22 +1069,18 @@ func TestProcessDownlinkTask(t *testing.T) {
 							}).MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-time.Millisecond),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								DataRateIndex: customCh.MinDataRateIndex,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
 						},
 						RxWindowsAvailable: true,
 					},
@@ -1040,7 +1108,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"session",
 				},
 			},
-			DownlinkAssertion: func(ctx context.Context, env TestClusterEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
+			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
 				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
@@ -1053,13 +1121,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetGatewayPeers(ctx, env.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return nil, time.Time{}, false
 				}
 
+				lastUp := LastUplink(dev.MACState.RecentUplinks...)
 				lastDown, ok := assertScheduleRxMetadataGateways(
 					ctx,
-					env.Auth,
+					env.Cluster.Auth,
 					scheduleDownlink124Ch,
 					scheduleDownlink3Ch,
 					func() []byte {
@@ -1112,36 +1181,33 @@ func TestProcessDownlinkTask(t *testing.T) {
 						return &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,
 							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_HIGH,
-							Rx1DataRateIndex: ttnpb.DATA_RATE_0,
+							Priority:         ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
 							Rx1Delay:         dev.MACState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:     431000000,
+							Rx1Frequency:     dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex: dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanID:  dev.FrequencyPlanID,
 						}
 					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
+					testErrScheduleResponse,
+					testErrScheduleResponse,
+					testErrScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
 					t.Error("Scheduling assertion failed")
 					return nil, time.Time{}, false
 				}
-				return lastDown, start.Add(time.Second), a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-					append(LastUplink(dev.MACState.RecentUplinks...).CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
+				return nil, time.Time{}, test.AllTrue(
+					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						append(lastUp.CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
+					),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 3),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
-				removeMACQueueDiff,
 				setRxWindowsUnavailableDiff,
+				removeMACQueueDiff,
 			},
 		},
 
@@ -1171,22 +1237,18 @@ func TestProcessDownlinkTask(t *testing.T) {
 							}).MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								DataRateIndex: customCh.MinDataRateIndex,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
 						},
 						RxWindowsAvailable: true,
 					},
@@ -1214,7 +1276,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"session",
 				},
 			},
-			DownlinkAssertion: func(ctx context.Context, env TestClusterEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
+			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
 				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
@@ -1227,13 +1289,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetGatewayPeers(ctx, env.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return nil, time.Time{}, false
 				}
 
+				lastUp := LastUplink(dev.MACState.RecentUplinks...)
 				lastDown, ok := assertScheduleRxMetadataGateways(
 					ctx,
-					env.Auth,
+					env.Cluster.Auth,
 					scheduleDownlink124Ch,
 					scheduleDownlink3Ch,
 					func() []byte {
@@ -1286,33 +1349,31 @@ func TestProcessDownlinkTask(t *testing.T) {
 						return &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,
 							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_HIGH,
-							Rx1DataRateIndex: ttnpb.DATA_RATE_0,
+							Priority:         ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
 							Rx1Delay:         dev.MACState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:     431000000,
+							Rx1Frequency:     dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex: dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanID:  dev.FrequencyPlanID,
 						}
 					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Response: &ttnpb.ScheduleDownlinkResponse{
-							Delay: time.Second,
-						},
-					},
+					testErrScheduleResponse,
+					testErrScheduleResponse,
+					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
 					t.Error("Scheduling assertion failed")
 					return nil, time.Time{}, false
 				}
-				return lastDown, start.Add(time.Second), a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-					append(LastUplink(dev.MACState.RecentUplinks...).CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
+				return lastDown, now.Add(time.Second), test.AllTrue(
+					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						append(lastUp.CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
+					),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
+						EvtEnqueueDevStatusRequest,
+					),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
@@ -1320,11 +1381,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				makePendingMACCommandsDiff(
 					ttnpb.CID_DEV_STATUS.MACCommand(),
 				),
-				makeRemoveDownlinksDiff(1),
 				setLastConfirmedDownlinkAtDiff,
 				setLastDownlinkAtDiff,
-				removeMACQueueDiff,
 				setRxWindowsUnavailableDiff,
+				removeMACQueueDiff,
+				makeRemoveDownlinksDiff(1),
 			},
 		},
 
@@ -1355,22 +1416,18 @@ func TestProcessDownlinkTask(t *testing.T) {
 							}).MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								DataRateIndex: customCh.MinDataRateIndex,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
 						},
 						RxWindowsAvailable: true,
 					},
@@ -1398,7 +1455,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"session",
 				},
 			},
-			DownlinkAssertion: func(ctx context.Context, env TestClusterEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
+			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
 				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
@@ -1411,13 +1468,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetGatewayPeers(ctx, env.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return nil, time.Time{}, false
 				}
 
+				lastUp := LastUplink(dev.MACState.RecentUplinks...)
 				lastDown, ok := assertScheduleRxMetadataGateways(
 					ctx,
-					env.Auth,
+					env.Cluster.Auth,
 					scheduleDownlink124Ch,
 					scheduleDownlink3Ch,
 					func() []byte {
@@ -1464,33 +1522,31 @@ func TestProcessDownlinkTask(t *testing.T) {
 						return &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,
 							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_HIGH,
-							Rx1DataRateIndex: ttnpb.DATA_RATE_0,
+							Priority:         ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
 							Rx1Delay:         dev.MACState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:     431000000,
+							Rx1Frequency:     dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex: dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanID:  dev.FrequencyPlanID,
 						}
 					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Response: &ttnpb.ScheduleDownlinkResponse{
-							Delay: time.Second,
-						},
-					},
+					testErrScheduleResponse,
+					testErrScheduleResponse,
+					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
 					t.Error("Scheduling assertion failed")
 					return nil, time.Time{}, false
 				}
-				return lastDown, start.Add(time.Second), a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-					LastUplink(dev.MACState.RecentUplinks...).CorrelationIDs,
+				return lastDown, now.Add(time.Second), test.AllTrue(
+					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						lastUp.CorrelationIDs,
+					),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
+						EvtEnqueueDevStatusRequest,
+					),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
@@ -1498,18 +1554,17 @@ func TestProcessDownlinkTask(t *testing.T) {
 				makePendingMACCommandsDiff(
 					ttnpb.CID_DEV_STATUS.MACCommand(),
 				),
-				makeRemoveDownlinksDiff(1),
 				makeSetLastNFCntDownDiff(0x25),
 				setLastConfirmedDownlinkAtDiff,
 				setLastDownlinkAtDiff,
-				removeMACQueueDiff,
 				setRxWindowsUnavailableDiff,
+				removeMACQueueDiff,
 			},
 		},
 
 		// Adapted from https://github.com/TheThingsNetwork/lorawan-stack/issues/866#issue-461484955.
 		{
-			Name: "Class A/windows open/1.0.2/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX2 does not fit/RX1/EU868",
+			Name: "Class A/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX2 does not fit/RX1/EU868",
 			CreateDevice: SetDeviceRequest{
 				EndDevice: &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1534,22 +1589,18 @@ func TestProcessDownlinkTask(t *testing.T) {
 							}).MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_6,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[ttnpb.DATA_RATE_6].Rate,
+								DataRateIndex: ttnpb.DATA_RATE_6,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
 						},
 						RxWindowsAvailable: true,
 					},
@@ -1577,7 +1628,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"session",
 				},
 			},
-			DownlinkAssertion: func(ctx context.Context, env TestClusterEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
+			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
 				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
@@ -1590,13 +1641,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetGatewayPeers(ctx, env.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return nil, time.Time{}, false
 				}
 
+				lastUp := LastUplink(dev.MACState.RecentUplinks...)
 				lastDown, ok := assertScheduleRxMetadataGateways(
 					ctx,
-					env.Auth,
+					env.Cluster.Auth,
 					scheduleDownlink124Ch,
 					scheduleDownlink3Ch,
 					func() []byte {
@@ -1649,42 +1701,40 @@ func TestProcessDownlinkTask(t *testing.T) {
 						return &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,
 							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_HIGH,
-							Rx1DataRateIndex: ttnpb.DATA_RATE_6,
+							Priority:         ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
 							Rx1Delay:         dev.MACState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:     431000000,
+							Rx1Frequency:     dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							FrequencyPlanID:  dev.FrequencyPlanID,
 						}
 					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Response: &ttnpb.ScheduleDownlinkResponse{
-							Delay: time.Second,
-						},
-					},
+					testErrScheduleResponse,
+					testErrScheduleResponse,
+					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
 					t.Error("Scheduling assertion failed")
 					return nil, time.Time{}, false
 				}
-				return lastDown, start.Add(time.Second), a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-					append(LastUplink(dev.MACState.RecentUplinks...).CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
+				return lastDown, now.Add(time.Second), test.AllTrue(
+					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						append(lastUp.CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
+					),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
+						EvtEnqueueDevStatusRequest,
+					),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
+				appendRecentMACStateDownlinkDiff,
 				makePendingMACCommandsDiff(
 					ttnpb.CID_DEV_STATUS.MACCommand(),
 				),
-				setRxWindowsUnavailableDiff,
-				removeMACQueueDiff,
 				setLastDownlinkAtDiff,
 				setLastConfirmedDownlinkAtDiff,
-				appendRecentMACStateDownlinkDiff,
+				setRxWindowsUnavailableDiff,
+				removeMACQueueDiff,
 				makeRemoveDownlinksDiff(1),
 			},
 		},
@@ -1704,36 +1754,26 @@ func TestProcessDownlinkTask(t *testing.T) {
 						ClassBTimeout: DurationPtr(42 * time.Second),
 					},
 					MACState: &ttnpb.MACState{
-						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
-						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
-						DeviceClass:       ttnpb.CLASS_B,
-						LoRaWANVersion:    ttnpb.MAC_V1_1,
-						PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{
-							Value: ttnpb.PING_EVERY_8S,
-						},
+						CurrentParameters:   makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters:   makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DeviceClass:         ttnpb.CLASS_B,
+						LoRaWANVersion:      ttnpb.MAC_V1_1,
+						PingSlotPeriodicity: pingSlotPeriodicity,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
-										FHDR: ttnpb.FHDR{
-											FCtrl: ttnpb.FCtrl{
-												ClassB: true,
-											},
-										},
-									}},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second),
+								FCtrl: ttnpb.FCtrl{
+									ClassB: true,
 								},
-								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							}),
 						},
 					},
 					Session: &ttnpb.Session{
@@ -1750,7 +1790,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 							},
-							&ttnpb.ApplicationDownlink{
+							{
 								CorrelationIDs: []string{"correlation-app-down-3", "correlation-app-down-4"},
 								FCnt:           0x43,
 								FPort:          0x2,
@@ -1770,18 +1810,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"session",
 				},
 			},
-
-			DownlinkAssertion: func(ctx context.Context, env TestClusterEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
+			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
-
-				delay := dev.MACState.DesiredParameters.Rx1Delay.Duration() / 2
-
-				pingAt, ok := NextPingSlotAt(ctx, dev, start.Add(delay))
-				if !ok {
-					t.Errorf("Failed to determine ping slot time")
-					return nil, time.Time{}, false
-				}
-				clock.Set(pingAt.Add(-NSScheduleWindow() - delay))
 
 				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
 				peer124 := NewGSPeer(ctx, &MockNsGsServer{
@@ -1793,13 +1823,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetGatewayPeers(ctx, env.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return nil, time.Time{}, false
 				}
 
 				lastDown, ok := assertScheduleRxMetadataGateways(
 					ctx,
-					env.Auth,
+					env.Cluster.Auth,
 					scheduleDownlink124Ch,
 					scheduleDownlink3Ch,
 					func() []byte {
@@ -1811,22 +1841,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0b1_0_0_1_0001,
+							0b1_0_0_1_0000,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
-
-						/** FOpts **/
-						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
-							0x24,
-							[]byte{
-								/* DevStatusReq */
-								0x06,
-							},
-							true,
-						)).([]byte)...)
 
 						/** FPort **/
 						b = append(b, 0x1)
@@ -1850,35 +1868,32 @@ func TestProcessDownlinkTask(t *testing.T) {
 							DownlinkPaths:    paths,
 							Priority:         ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRateIndex: ttnpb.DATA_RATE_3,
-							Rx2Frequency:     869525000,
-							AbsoluteTime:     TimePtr(pingAt.UTC()),
+							Rx2Frequency:     DefaultEU868RX2Frequency,
+							AbsoluteTime:     TimePtr(pingAt),
 							FrequencyPlanID:  dev.FrequencyPlanID,
 						}
 					},
-					NsGsScheduleDownlinkResponse{
-						Response: &ttnpb.ScheduleDownlinkResponse{
-							Delay: time.Second,
-						},
-					},
+					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
 					t.Error("Scheduling assertion failed")
 					return nil, time.Time{}, false
 				}
-				return lastDown, start.Add(time.Second), a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-					dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+				return lastDown, now.Add(time.Second), test.AllTrue(
+					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+					),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
+				appendRecentMACStateDownlinkDiff,
 				setPendingApplicationDownlinkDiff,
 				setLastNetworkInitiatedDownlinkAtDiff,
-				makePendingMACCommandsDiff(
-					ttnpb.CID_DEV_STATUS.MACCommand(),
-				),
 				setLastDownlinkAtDiff,
 				setLastConfirmedDownlinkAtDiff,
-				appendRecentMACStateDownlinkDiff,
 				makeSetLastConfFCntDownDiff(0x42),
+				makeRemoveDownlinksDiff(1),
 			},
 		},
 
@@ -1911,22 +1926,17 @@ func TestProcessDownlinkTask(t *testing.T) {
 							}).MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
 						},
 						RxWindowsAvailable: true,
 					},
@@ -1955,8 +1965,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"session",
 				},
 			},
-
-			DownlinkAssertion: func(ctx context.Context, env TestClusterEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
+			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
 				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
@@ -1969,13 +1978,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetGatewayPeers(ctx, env.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return nil, time.Time{}, false
 				}
 
+				lastUp := LastUplink(dev.MACState.RecentUplinks...)
 				lastDown, ok := assertScheduleRxMetadataGateways(
 					ctx,
-					env.Auth,
+					env.Cluster.Auth,
 					scheduleDownlink124Ch,
 					scheduleDownlink3Ch,
 					func() []byte {
@@ -2028,45 +2038,44 @@ func TestProcessDownlinkTask(t *testing.T) {
 						return &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,
 							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_HIGH,
-							Rx1DataRateIndex: ttnpb.DATA_RATE_0,
+							Priority:         ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
 							Rx1Delay:         dev.MACState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:     431000000,
+							Rx1Frequency:     dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex: dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanID:  dev.FrequencyPlanID,
 						}
 					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Response: &ttnpb.ScheduleDownlinkResponse{
-							Delay: time.Second,
-						},
-					},
+					testErrScheduleResponse,
+					testErrScheduleResponse,
+					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
 					t.Error("Scheduling assertion failed")
 					return nil, time.Time{}, false
 				}
-
-				return lastDown, start.Add(time.Second), a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-					append(LastUplink(dev.MACState.RecentUplinks...).CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
+				return lastDown, now.Add(time.Second), test.AllTrue(
+					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						append(lastUp.CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
+					),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
+						EvtEnqueueDevStatusRequest,
+					),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
+				appendRecentMACStateDownlinkDiff,
 				makePendingMACCommandsDiff(
 					ttnpb.CID_DEV_STATUS.MACCommand(),
 				),
-				setLastDownlinkAtDiff,
 				makeSetLastNFCntDownDiff(0x24),
-				makeRemoveDownlinksDiff(1),
+				setLastDownlinkAtDiff,
 				setLastConfirmedDownlinkAtDiff,
-				appendRecentMACStateDownlinkDiff,
+				setRxWindowsUnavailableDiff,
+				removeMACQueueDiff,
+				makeRemoveDownlinksDiff(1),
 			},
 		},
 
@@ -2099,22 +2108,17 @@ func TestProcessDownlinkTask(t *testing.T) {
 							}).MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-rx1Delay.Duration() - time.Second),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second - time.Nanosecond),
+							}),
 						},
 						RxWindowsAvailable: true,
 					},
@@ -2143,8 +2147,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"session",
 				},
 			},
-
-			DownlinkAssertion: func(ctx context.Context, env TestClusterEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
+			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
 				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
@@ -2157,192 +2160,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetGatewayPeers(ctx, env.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return nil, time.Time{}, false
 				}
 
 				lastDown, ok := assertScheduleRxMetadataGateways(
 					ctx,
-					env.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
-					func() []byte {
-						b := []byte{
-							/* MHDR */
-							0b011_000_00,
-							/* MACPayload */
-							/** FHDR **/
-							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
-							/*** FCtrl ***/
-							0b1_0_0_0_0001,
-							/*** FCnt ***/
-							0x42, 0x00,
-						}
-
-						/** FOpts **/
-						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
-							0x24,
-							[]byte{
-								/* DevStatusReq */
-								0x06,
-							},
-							true,
-						)).([]byte)...)
-
-						/** FPort **/
-						b = append(b, 0x1)
-
-						/** FRMPayload **/
-						b = append(b, []byte("testPayload")...)
-
-						/* MIC */
-						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
-							0,
-							0x42,
-							b,
-						)).([4]byte)
-						return append(b, mic[:]...)
-					}(),
-					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
-						return &ttnpb.TxRequest{
-							Class:            ttnpb.CLASS_C,
-							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_HIGH,
-							Rx2DataRateIndex: dev.MACState.CurrentParameters.Rx2DataRateIndex,
-							Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:  dev.FrequencyPlanID,
-						}
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Response: &ttnpb.ScheduleDownlinkResponse{
-							Delay: time.Second,
-						},
-					},
-				)
-				if !a.So(ok, should.BeTrue) {
-					t.Error("Scheduling assertion failed")
-					return nil, time.Time{}, false
-				}
-				return lastDown, start.Add(time.Second), a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-					dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
-				)
-			},
-			DeviceDiffs: []DeviceDiffFunc{
-				setLastNetworkInitiatedDownlinkAtDiff,
-				makePendingMACCommandsDiff(
-					ttnpb.CID_DEV_STATUS.MACCommand(),
-				),
-				setRxWindowsUnavailableDiff,
-				removeMACQueueDiff,
-				setLastDownlinkAtDiff,
-				makeRemoveDownlinksDiff(1),
-				setLastConfirmedDownlinkAtDiff,
-				appendRecentMACStateDownlinkDiff,
-			},
-		},
-
-		{
-			Name: "Class C/windows open/1.1/RX1,RX2 expired/no MAC answers/MAC requests/classBC application downlink/absolute time within window/no forced gateways/data+MAC/RXC/EU868",
-			CreateDevice: SetDeviceRequest{
-				EndDevice: &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
-						DevAddr:                &devAddr,
-					},
-					FrequencyPlanID:         test.EUFrequencyPlanID,
-					LastDevStatusReceivedAt: TimePtr(start),
-					LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
-					MACSettings: &ttnpb.MACSettings{
-						ClassCTimeout:         DurationPtr(42 * time.Second),
-						StatusTimePeriodicity: DurationPtr(time.Hour),
-					},
-					MACState: &ttnpb.MACState{
-						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
-						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
-						DeviceClass:       ttnpb.CLASS_C,
-						LoRaWANVersion:    ttnpb.MAC_V1_1,
-						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-2 * time.Second),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
-						},
-						RxWindowsAvailable: true,
-					},
-					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
-						LastNFCntDown: 0x24,
-						SessionKeys:   *sessionKeys,
-						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{
-								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-								FCnt:           0x42,
-								FPort:          0x1,
-								FRMPayload:     []byte("testPayload"),
-								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-								ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-									AbsoluteTime: TimePtr(start.Add(InfrastructureDelay)),
-								},
-							},
-						},
-					},
-				},
-				Paths: []string{
-					"frequency_plan_id",
-					"ids",
-					"last_dev_status_received_at",
-					"lorawan_phy_version",
-					"mac_settings",
-					"mac_state",
-					"session",
-				},
-			},
-
-			DownlinkAssertion: func(ctx context.Context, env TestClusterEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
-				a := assertions.New(test.MustTFromContext(ctx))
-
-				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer124 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
-				})
-
-				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer3 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
-				})
-
-				if !a.So(assertGetGatewayPeers(ctx, env.GetPeer, peer124, peer3), should.BeTrue) {
-					return nil, time.Time{}, false
-				}
-
-				lastDown, ok := assertScheduleRxMetadataGateways(
-					ctx,
-					env.Auth,
+					env.Cluster.Auth,
 					scheduleDownlink124Ch,
 					scheduleDownlink3Ch,
 					func() []byte {
@@ -2379,39 +2203,187 @@ func TestProcessDownlinkTask(t *testing.T) {
 						return &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_C,
 							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_NORMAL,
-							Rx2DataRateIndex: ttnpb.DATA_RATE_0,
-							Rx2Frequency:     869525000,
-							AbsoluteTime:     TimePtr(start.Add(InfrastructureDelay)),
+							Priority:         ttnpb.TxSchedulePriority_HIGH,
+							Rx2DataRateIndex: dev.MACState.CurrentParameters.Rx2DataRateIndex,
+							Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanID:  dev.FrequencyPlanID,
 						}
 					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Response: &ttnpb.ScheduleDownlinkResponse{
-							Delay: time.Second,
-						},
-					},
+					testErrScheduleResponse,
+					testErrScheduleResponse,
+					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
 					t.Error("Scheduling assertion failed")
 					return nil, time.Time{}, false
 				}
-				return lastDown, start.Add(time.Second), a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-					dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+				return lastDown, now.Add(time.Second), test.AllTrue(
+					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+					),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
+				appendRecentMACStateDownlinkDiff,
+				setLastDownlinkAtDiff,
 				setLastNetworkInitiatedDownlinkAtDiff,
 				setRxWindowsUnavailableDiff,
-				setLastDownlinkAtDiff,
 				makeRemoveDownlinksDiff(1),
+			},
+		},
+
+		{
+			Name: "Class C/windows open/1.1/RX1,RX2 expired/no MAC answers/MAC requests/classBC application downlink/absolute time within window/no forced gateways/data+MAC/RXC/EU868",
+			CreateDevice: SetDeviceRequest{
+				EndDevice: &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
+					},
+					FrequencyPlanID:         test.EUFrequencyPlanID,
+					LastDevStatusReceivedAt: TimePtr(now),
+					LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
+					MACSettings: &ttnpb.MACSettings{
+						ClassCTimeout:         DurationPtr(42 * time.Second),
+						StatusTimePeriodicity: DurationPtr(time.Hour),
+					},
+					MACState: &ttnpb.MACState{
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DeviceClass:       ttnpb.CLASS_C,
+						LoRaWANVersion:    ttnpb.MAC_V1_1,
+						RecentUplinks: []*ttnpb.UplinkMessage{
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second),
+							}),
+						},
+						RxWindowsAvailable: true,
+					},
+					Session: &ttnpb.Session{
+						DevAddr:       devAddr,
+						LastNFCntDown: 0x24,
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+								ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
+									AbsoluteTime: TimePtr(now.Add(InfrastructureDelay)),
+								},
+							},
+						},
+					},
+				},
+				Paths: []string{
+					"frequency_plan_id",
+					"ids",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
+					"mac_state",
+					"session",
+				},
+			},
+			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
+				a := assertions.New(test.MustTFromContext(ctx))
+
+				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
+				peer124 := NewGSPeer(ctx, &MockNsGsServer{
+					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
+				})
+
+				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
+				peer3 := NewGSPeer(ctx, &MockNsGsServer{
+					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
+				})
+
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+					return nil, time.Time{}, false
+				}
+
+				lastDown, ok := assertScheduleRxMetadataGateways(
+					ctx,
+					env.Cluster.Auth,
+					scheduleDownlink124Ch,
+					scheduleDownlink3Ch,
+					func() []byte {
+						b := []byte{
+							/* MHDR */
+							0b011_000_00,
+							/* MACPayload */
+							/** FHDR **/
+							/*** DevAddr ***/
+							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+							/*** FCtrl ***/
+							0b1_0_0_0_0000,
+							/*** FCnt ***/
+							0x42, 0x00,
+						}
+
+						/** FPort **/
+						b = append(b, 0x1)
+
+						/** FRMPayload **/
+						b = append(b, []byte("testPayload")...)
+
+						/* MIC */
+						mic := test.Must(crypto.ComputeDownlinkMIC(
+							sNwkSIntKey,
+							devAddr,
+							0,
+							0x42,
+							b,
+						)).([4]byte)
+						return append(b, mic[:]...)
+					}(),
+					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
+						return &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_C,
+							DownlinkPaths:    paths,
+							Priority:         ttnpb.TxSchedulePriority_HIGH,
+							Rx2DataRateIndex: ttnpb.DATA_RATE_0,
+							Rx2Frequency:     DefaultEU868RX2Frequency,
+							AbsoluteTime:     TimePtr(now.Add(InfrastructureDelay)),
+							FrequencyPlanID:  dev.FrequencyPlanID,
+						}
+					},
+					testErrScheduleResponse,
+					testErrScheduleResponse,
+					oneSecondScheduleResponse,
+				)
+				if !a.So(ok, should.BeTrue) {
+					t.Error("Scheduling assertion failed")
+					return nil, time.Time{}, false
+				}
+				return lastDown, now.Add(time.Second), test.AllTrue(
+					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+					),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response),
+				)
+			},
+			DeviceDiffs: []DeviceDiffFunc{
 				appendRecentMACStateDownlinkDiff,
+				setLastNetworkInitiatedDownlinkAtDiff,
+				setLastDownlinkAtDiff,
+				setRxWindowsUnavailableDiff,
+				makeRemoveDownlinksDiff(1),
 			},
 		},
 
@@ -2435,22 +2407,17 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-rx1Delay.Duration()),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration()),
+							}),
 						},
 					},
 					Session: &ttnpb.Session{
@@ -2466,7 +2433,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 								ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-									AbsoluteTime: TimePtr(start.Add(rx1Delay.Duration()).UTC()),
+									AbsoluteTime: TimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
 								},
 							},
 						},
@@ -2481,8 +2448,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"session",
 				},
 			},
-
-			DownlinkAssertion: func(ctx context.Context, env TestClusterEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
+			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
 				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
@@ -2495,13 +2461,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetGatewayPeers(ctx, env.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return nil, time.Time{}, false
 				}
 
 				lastDown, ok := assertScheduleRxMetadataGateways(
 					ctx,
-					env.Auth,
+					env.Cluster.Auth,
 					scheduleDownlink124Ch,
 					scheduleDownlink3Ch,
 					func() []byte {
@@ -2513,22 +2479,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0b1_0_0_0_0001,
+							0b1_0_0_0_0000,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
-
-						/** FOpts **/
-						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
-							0x24,
-							[]byte{
-								/* DevStatusReq */
-								0x06,
-							},
-							true,
-						)).([]byte)...)
 
 						/** FPort **/
 						b = append(b, 0x1)
@@ -2551,14 +2505,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Class:            ttnpb.CLASS_C,
 							DownlinkPaths:    paths,
 							Priority:         ttnpb.TxSchedulePriority_HIGH,
-							AbsoluteTime:     TimePtr(start.Add(rx1Delay.Duration()).UTC()),
+							AbsoluteTime:     TimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
 							Rx2DataRateIndex: dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanID:  dev.FrequencyPlanID,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test").WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
+						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
 							PathErrors: []*ttnpb.ErrorDetails{
 								ttnpb.ErrorDetailsToProto(errors.DefineAborted(ulid.MustNew(0, test.Randy).String(), "aborted")),
 								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, test.Randy).String(), "resource exhausted")),
@@ -2566,14 +2520,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test").WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
+						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
 							PathErrors: []*ttnpb.ErrorDetails{
 								ttnpb.ErrorDetailsToProto(errors.DefineFailedPrecondition(ulid.MustNew(0, test.Randy).String(), "failed precondition")),
 							},
 						}),
 					},
 					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test").WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
+						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
 							PathErrors: []*ttnpb.ErrorDetails{
 								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, test.Randy).String(), "resource exhausted")),
 							},
@@ -2584,8 +2538,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Scheduling assertion failed")
 					return nil, time.Time{}, false
 				}
-				return lastDown, start.Add(time.Second), a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-					dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+				return nil, time.Time{}, test.AllTrue(
+					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+					),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 3),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
@@ -2629,21 +2586,17 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-2 * rx1Delay.Duration()),
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second),
+							}),
 						},
 					},
 					Session: &ttnpb.Session{
@@ -2674,8 +2627,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"session",
 				},
 			},
-
-			DownlinkAssertion: func(ctx context.Context, env TestClusterEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
+			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
 				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
@@ -2688,13 +2640,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetGatewayPeers(ctx, env.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return nil, time.Time{}, false
 				}
 
 				lastDown, ok := assertScheduleClassBCGateways(
 					ctx,
-					env.Auth,
+					env.Cluster.Auth,
 					scheduleDownlink124Ch,
 					scheduleDownlink3Ch,
 					func() []byte {
@@ -2706,22 +2658,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0b1_0_0_0_0001,
+							0b1_0_0_0_0000,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
-
-						/** FOpts **/
-						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
-							0x24,
-							[]byte{
-								/* DevStatusReq */
-								0x06,
-							},
-							true,
-						)).([]byte)...)
 
 						/** FPort **/
 						b = append(b, 0x1)
@@ -2750,7 +2690,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}
 					},
 					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test").WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
+						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
 							PathErrors: []*ttnpb.ErrorDetails{
 								ttnpb.ErrorDetailsToProto(errors.DefineAborted(ulid.MustNew(0, test.Randy).String(), "aborted")),
 								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, test.Randy).String(), "resource exhausted")),
@@ -2758,14 +2698,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test").WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
+						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
 							PathErrors: []*ttnpb.ErrorDetails{
 								ttnpb.ErrorDetailsToProto(errors.DefineCorruption(ulid.MustNew(0, test.Randy).String(), "corruption")), // retryable
 							},
 						}),
 					},
 					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test").WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
+						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
 							PathErrors: []*ttnpb.ErrorDetails{
 								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, test.Randy).String(), "resource exhausted")),
 							},
@@ -2776,8 +2716,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Scheduling assertion failed")
 					return nil, time.Time{}, false
 				}
-				return nil, time.Time{}, a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-					dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+				return nil, time.Time{}, test.AllTrue(
+					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+					),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 3),
 				)
 			},
 		},
@@ -2804,22 +2747,17 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: clock.Now().Add(-time.Second),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-time.Second),
+							}),
 						},
 						RxWindowsAvailable: true,
 					},
@@ -2836,7 +2774,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 								ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-									AbsoluteTime: TimePtr(clock.Now().Add(42 * time.Hour).UTC()),
+									AbsoluteTime: TimePtr(now.Add(42 * time.Hour)),
 								},
 							},
 						},
@@ -2875,22 +2813,17 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							{
-								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-								DeviceChannelIndex: 3,
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_UNCONFIRMED_UP,
-									},
-									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-								},
-								ReceivedAt: start.Add(-time.Second),
-								RxMetadata: RxMetadata[:],
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_0,
-									Frequency:     430000000,
-								},
-							},
+							MakeDataUplink(DataUplinkConfig{
+								DecodePayload: true,
+								Matched:       true,
+								MACVersion:    ttnpb.MAC_V1_1,
+								DevAddr:       devAddr,
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								Frequency:     customCh.UplinkFrequency,
+								ChannelIndex:  customChIdx,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-time.Second),
+							}),
 						},
 						RxWindowsAvailable: true,
 					},
@@ -2907,7 +2840,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 								ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-									AbsoluteTime: TimePtr(start.Add(-2).UTC()),
+									AbsoluteTime: TimePtr(now.Add(-2)),
 								},
 							},
 							{
@@ -2918,7 +2851,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 								ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-									AbsoluteTime: TimePtr(start.Add(-1).UTC()),
+									AbsoluteTime: TimePtr(now.Add(-1)),
 								},
 							},
 						},
@@ -2932,9 +2865,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"mac_settings",
 					"session",
 				},
-			},
-			DeviceDiffs: []DeviceDiffFunc{
-				makeRemoveDownlinksDiff(1),
 			},
 		},
 
@@ -2960,32 +2890,19 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Keys:    *sessionKeys,
 							Payload: bytes.Repeat([]byte{0x42}, 33),
 							Request: ttnpb.JoinRequest{
-								DevAddr: devAddr,
+								RawPayload: bytes.Repeat([]byte{0x42}, 23),
+								DevAddr:    devAddr,
 							},
 						},
 						RxWindowsAvailable: true,
 					},
 					RecentUplinks: []*ttnpb.UplinkMessage{
-						{
-							CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-							DeviceChannelIndex: 3,
-							Payload: &ttnpb.Message{
-								MHDR: ttnpb.MHDR{
-									MType: ttnpb.MType_JOIN_REQUEST,
-								},
-								Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
-									JoinEUI:  types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-									DevEUI:   types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-									DevNonce: types.DevNonce{0x00, 0x42},
-								}},
-							},
-							ReceivedAt: start.Add(-time.Second),
-							RxMetadata: RxMetadata[:],
-							Settings: ttnpb.TxSettings{
-								DataRateIndex: ttnpb.DATA_RATE_0,
-								Frequency:     430000000,
-							},
-						},
+						MakeJoinRequest(
+							true,
+							LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DefaultEU868Channels[0].UplinkFrequency,
+							RxMetadata[:]...,
+						),
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
@@ -3014,7 +2931,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"supports_join",
 				},
 			},
-			DownlinkAssertion: func(ctx context.Context, env TestClusterEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
+			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
 				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
@@ -3027,13 +2944,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
 				})
 
-				if !a.So(assertGetGatewayPeers(ctx, env.GetPeer, peer124, peer3), should.BeTrue) {
+				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return nil, time.Time{}, false
 				}
 
+				lastUp := LastUplink(dev.RecentUplinks...)
 				lastDown, ok := assertScheduleRxMetadataGateways(
 					ctx,
-					env.Auth,
+					env.Cluster.Auth,
 					scheduleDownlink124Ch,
 					scheduleDownlink3Ch,
 					bytes.Repeat([]byte{0x42}, 33),
@@ -3042,47 +2960,39 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Class:            ttnpb.CLASS_A,
 							DownlinkPaths:    paths,
 							Priority:         ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRateIndex: ttnpb.DATA_RATE_0,
-							Rx1Delay:         ttnpb.RX_DELAY_5,
-							Rx1Frequency:     431000000,
+							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
+							Rx1Delay:         DefaultEU868JoinAcceptDelay,
+							Rx1Frequency:     dev.PendingMACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex: dev.PendingMACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:     dev.PendingMACState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanID:  dev.FrequencyPlanID,
 						}
 					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Error: errors.New("test"),
-					},
-					NsGsScheduleDownlinkResponse{
-						Response: &ttnpb.ScheduleDownlinkResponse{
-							Delay: time.Second,
-						},
-					},
+					testErrScheduleResponse,
+					testErrScheduleResponse,
+					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
 					t.Error("Scheduling assertion failed")
 					return nil, time.Time{}, false
 				}
-
-				return lastDown, start.Add(time.Second), a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-					LastUplink(dev.MACState.RecentUplinks...).CorrelationIDs,
+				return lastDown, now.Add(time.Second), test.AllTrue(
+					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						lastUp.CorrelationIDs,
+					),
+					assertReceiveScheduleJoinFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
+					assertReceiveScheduleJoinSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
-				makeRemoveDownlinksDiff(1),
 				func(ctx context.Context, expected, created, updated *ttnpb.EndDevice, down *ttnpb.DownlinkMessage, downAt time.Time) bool {
-					expected.PendingMACState.QueuedJoinAccept = nil
-					expected.PendingMACState.PendingJoinRequest = &ttnpb.JoinRequest{
-						DevAddr: devAddr,
-					}
 					expected.PendingMACState.RxWindowsAvailable = false
+					expected.PendingMACState.PendingJoinRequest = &created.PendingMACState.QueuedJoinAccept.Request
 					expected.PendingSession = &ttnpb.Session{
-						DevAddr:     devAddr,
-						SessionKeys: *sessionKeys,
+						DevAddr:     created.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+						SessionKeys: created.PendingMACState.QueuedJoinAccept.Keys,
 					}
+					expected.PendingMACState.QueuedJoinAccept = nil
 					return true
 				},
 			},
@@ -3093,24 +3003,19 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 			errCh := make(chan error, 1)
 			_, ctx, env, stop := StartTest(t, TestConfig{
-				TaskStarter: component.StartTaskFunc(func(ctx context.Context, id string, fn component.TaskFunc, restart component.TaskRestart, jitter float64, backoff ...time.Duration) {
-					if id != DownlinkProcessTaskName {
-						component.DefaultStartTask(ctx, id, fn, restart, jitter, backoff...)
+				NetworkServer: DefaultConfig,
+				TaskStarter: component.StartTaskFunc(func(conf *component.TaskConfig) {
+					if conf.ID != DownlinkProcessTaskName {
+						component.DefaultStartTask(conf)
 						return
 					}
 					go func() {
-						errCh <- fn(ctx)
-						select {
-						case <-ctx.Done():
-							return
-						default:
-						}
+						errCh <- conf.Func(conf.Context)
 					}()
 				}),
 				Timeout: (1 << 10) * test.Delay,
 			})
 			defer stop()
-			go LogEvents(t, env.Events)
 
 			var created *ttnpb.EndDevice
 			if tc.CreateDevice.EndDevice != nil {
@@ -3121,23 +3026,27 @@ func TestProcessDownlinkTask(t *testing.T) {
 				DeviceID:               devID,
 			}, time.Now(), true))
 
-			select {
-			case <-ctx.Done():
-				t.Error("Timed out while waiting for processDownlinkTask to return")
-
-			case err := <-errCh:
-				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
-			}
-
 			var (
 				down   *ttnpb.DownlinkMessage
 				downAt time.Time
 			)
 			if tc.DownlinkAssertion != nil {
 				var ok bool
-				down, downAt, ok = tc.DownlinkAssertion(ctx, env.Cluster, created)
+				down, downAt, ok = tc.DownlinkAssertion(ctx, env, created)
 				if !a.So(ok, should.BeTrue) {
 					t.FailNow()
+				}
+			}
+
+			select {
+			case <-ctx.Done():
+				t.Fatal("Timed out while waiting for processDownlinkTask to return")
+
+			case err := <-errCh:
+				if tc.ErrorAssertion == nil {
+					a.So(err, should.BeNil)
+				} else {
+					a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 				}
 			}
 
@@ -3166,7 +3075,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					expected.RecentDownlinks = AppendRecentDownlink(expected.RecentDownlinks, down, RecentDownlinkCount)
 				}
 				for _, diff := range tc.DeviceDiffs {
-					if !a.So(diff(ctx, created, updated, expected, down, downAt), should.BeTrue) {
+					if !a.So(diff(ctx, expected, created, updated, down, downAt), should.BeTrue) {
 						t.FailNow()
 					}
 				}
@@ -3179,14 +3088,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 			}
 
 			a.So(env.AssertWithApplicationLink(ctx, appID, func(ctx context.Context, link ttnpb.AsNs_LinkApplicationClient) bool {
-				return a.So(AssertReceiveApplicationUplinks(ctx, link, func() []func(context.Context, *ttnpb.ApplicationUp, error) bool {
-					var upAsserts []func(context.Context, *ttnpb.ApplicationUp, error) bool
+				return a.So(AssertProcessApplicationUps(ctx, link, func() []func(context.Context, *ttnpb.ApplicationUp) bool {
+					var upAsserts []func(context.Context, *ttnpb.ApplicationUp) bool
 					for _, assert := range tc.ApplicationUplinkAssertions {
-						upAsserts = append(upAsserts, func(ctx context.Context, up *ttnpb.ApplicationUp, err error) bool {
-							return test.AllTrue(
-								a.So(err, should.BeNil),
-								a.So(assert(ctx, updated, up), should.BeTrue),
-							)
+						upAsserts = append(upAsserts, func(ctx context.Context, up *ttnpb.ApplicationUp) bool {
+							_, a := test.MustNewTFromContext(ctx)
+							return a.So(assert(ctx, created, up), should.BeTrue)
 						})
 					}
 					return upAsserts
