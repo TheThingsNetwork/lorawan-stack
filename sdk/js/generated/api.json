@@ -13187,6 +13187,376 @@
               }
             }
           ]
+        },
+        {
+          "name": "GetIsConfigurationRequest",
+          "longName": "GetIsConfigurationRequest",
+          "fullName": "ttn.lorawan.v3.GetIsConfigurationRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "GetIsConfigurationResponse",
+          "longName": "GetIsConfigurationResponse",
+          "fullName": "ttn.lorawan.v3.GetIsConfigurationResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "configuration",
+              "description": "",
+              "label": "",
+              "type": "IsConfiguration",
+              "longType": "IsConfiguration",
+              "fullType": "ttn.lorawan.v3.IsConfiguration",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "IsConfiguration",
+          "longName": "IsConfiguration",
+          "fullName": "ttn.lorawan.v3.IsConfiguration",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "user_registration",
+              "description": "",
+              "label": "",
+              "type": "UserRegistration",
+              "longType": "IsConfiguration.UserRegistration",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.UserRegistration",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "profile_picture",
+              "description": "",
+              "label": "",
+              "type": "ProfilePicture",
+              "longType": "IsConfiguration.ProfilePicture",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.ProfilePicture",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "end_device_picture",
+              "description": "",
+              "label": "",
+              "type": "EndDevicePicture",
+              "longType": "IsConfiguration.EndDevicePicture",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.EndDevicePicture",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "user_rights",
+              "description": "",
+              "label": "",
+              "type": "UserRights",
+              "longType": "IsConfiguration.UserRights",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.UserRights",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EndDevicePicture",
+          "longName": "IsConfiguration.EndDevicePicture",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.EndDevicePicture",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "disable_upload",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ProfilePicture",
+          "longName": "IsConfiguration.ProfilePicture",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.ProfilePicture",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "disable_upload",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "use_gravatar",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UserRegistration",
+          "longName": "IsConfiguration.UserRegistration",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.UserRegistration",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "invitation",
+              "description": "",
+              "label": "",
+              "type": "Invitation",
+              "longType": "IsConfiguration.UserRegistration.Invitation",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.UserRegistration.Invitation",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "contact_info_validation",
+              "description": "",
+              "label": "",
+              "type": "ContactInfoValidation",
+              "longType": "IsConfiguration.UserRegistration.ContactInfoValidation",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.UserRegistration.ContactInfoValidation",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "admin_approval",
+              "description": "",
+              "label": "",
+              "type": "AdminApproval",
+              "longType": "IsConfiguration.UserRegistration.AdminApproval",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.UserRegistration.AdminApproval",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "password_requirements",
+              "description": "",
+              "label": "",
+              "type": "PasswordRequirements",
+              "longType": "IsConfiguration.UserRegistration.PasswordRequirements",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.UserRegistration.PasswordRequirements",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AdminApproval",
+          "longName": "IsConfiguration.UserRegistration.AdminApproval",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.UserRegistration.AdminApproval",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "required",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ContactInfoValidation",
+          "longName": "IsConfiguration.UserRegistration.ContactInfoValidation",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.UserRegistration.ContactInfoValidation",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "required",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Invitation",
+          "longName": "IsConfiguration.UserRegistration.Invitation",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.UserRegistration.Invitation",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "required",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "token_ttl",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PasswordRequirements",
+          "longName": "IsConfiguration.UserRegistration.PasswordRequirements",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.UserRegistration.PasswordRequirements",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "min_length",
+              "description": "",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "max_length",
+              "description": "",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "min_uppercase",
+              "description": "",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "min_digits",
+              "description": "",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "min_special",
+              "description": "",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UserRights",
+          "longName": "IsConfiguration.UserRights",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.UserRights",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "create_applications",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "create_clients",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "create_gateways",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "create_organizations",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
         }
       ],
       "services": [
@@ -13213,6 +13583,36 @@
                     {
                       "method": "GET",
                       "pattern": "/auth_info"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Is",
+          "longName": "Is",
+          "fullName": "ttn.lorawan.v3.Is",
+          "description": "",
+          "methods": [
+            {
+              "name": "GetConfiguration",
+              "description": "",
+              "requestType": "GetIsConfigurationRequest",
+              "requestLongType": "GetIsConfigurationRequest",
+              "requestFullType": "ttn.lorawan.v3.GetIsConfigurationRequest",
+              "requestStreaming": false,
+              "responseType": "GetIsConfigurationResponse",
+              "responseLongType": "GetIsConfigurationResponse",
+              "responseFullType": "ttn.lorawan.v3.GetIsConfigurationResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/is/configuration"
                     }
                   ]
                 }

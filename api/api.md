@@ -215,7 +215,19 @@
 - [File `lorawan-stack/api/identityserver.proto`](#lorawan-stack/api/identityserver.proto)
   - [Message `AuthInfoResponse`](#ttn.lorawan.v3.AuthInfoResponse)
   - [Message `AuthInfoResponse.APIKeyAccess`](#ttn.lorawan.v3.AuthInfoResponse.APIKeyAccess)
+  - [Message `GetIsConfigurationRequest`](#ttn.lorawan.v3.GetIsConfigurationRequest)
+  - [Message `GetIsConfigurationResponse`](#ttn.lorawan.v3.GetIsConfigurationResponse)
+  - [Message `IsConfiguration`](#ttn.lorawan.v3.IsConfiguration)
+  - [Message `IsConfiguration.EndDevicePicture`](#ttn.lorawan.v3.IsConfiguration.EndDevicePicture)
+  - [Message `IsConfiguration.ProfilePicture`](#ttn.lorawan.v3.IsConfiguration.ProfilePicture)
+  - [Message `IsConfiguration.UserRegistration`](#ttn.lorawan.v3.IsConfiguration.UserRegistration)
+  - [Message `IsConfiguration.UserRegistration.AdminApproval`](#ttn.lorawan.v3.IsConfiguration.UserRegistration.AdminApproval)
+  - [Message `IsConfiguration.UserRegistration.ContactInfoValidation`](#ttn.lorawan.v3.IsConfiguration.UserRegistration.ContactInfoValidation)
+  - [Message `IsConfiguration.UserRegistration.Invitation`](#ttn.lorawan.v3.IsConfiguration.UserRegistration.Invitation)
+  - [Message `IsConfiguration.UserRegistration.PasswordRequirements`](#ttn.lorawan.v3.IsConfiguration.UserRegistration.PasswordRequirements)
+  - [Message `IsConfiguration.UserRights`](#ttn.lorawan.v3.IsConfiguration.UserRights)
   - [Service `EntityAccess`](#ttn.lorawan.v3.EntityAccess)
+  - [Service `Is`](#ttn.lorawan.v3.Is)
 - [File `lorawan-stack/api/join.proto`](#lorawan-stack/api/join.proto)
   - [Message `JoinRequest`](#ttn.lorawan.v3.JoinRequest)
   - [Message `JoinResponse`](#ttn.lorawan.v3.JoinResponse)
@@ -3260,6 +3272,83 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `api_key` | <p>`message.required`: `true`</p> |
 | `entity_ids` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.GetIsConfigurationRequest">Message `GetIsConfigurationRequest`</a>
+
+### <a name="ttn.lorawan.v3.GetIsConfigurationResponse">Message `GetIsConfigurationResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `configuration` | [`IsConfiguration`](#ttn.lorawan.v3.IsConfiguration) |  |  |
+
+### <a name="ttn.lorawan.v3.IsConfiguration">Message `IsConfiguration`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_registration` | [`IsConfiguration.UserRegistration`](#ttn.lorawan.v3.IsConfiguration.UserRegistration) |  |  |
+| `profile_picture` | [`IsConfiguration.ProfilePicture`](#ttn.lorawan.v3.IsConfiguration.ProfilePicture) |  |  |
+| `end_device_picture` | [`IsConfiguration.EndDevicePicture`](#ttn.lorawan.v3.IsConfiguration.EndDevicePicture) |  |  |
+| `user_rights` | [`IsConfiguration.UserRights`](#ttn.lorawan.v3.IsConfiguration.UserRights) |  |  |
+
+### <a name="ttn.lorawan.v3.IsConfiguration.EndDevicePicture">Message `IsConfiguration.EndDevicePicture`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `disable_upload` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+
+### <a name="ttn.lorawan.v3.IsConfiguration.ProfilePicture">Message `IsConfiguration.ProfilePicture`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `disable_upload` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+| `use_gravatar` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+
+### <a name="ttn.lorawan.v3.IsConfiguration.UserRegistration">Message `IsConfiguration.UserRegistration`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `invitation` | [`IsConfiguration.UserRegistration.Invitation`](#ttn.lorawan.v3.IsConfiguration.UserRegistration.Invitation) |  |  |
+| `contact_info_validation` | [`IsConfiguration.UserRegistration.ContactInfoValidation`](#ttn.lorawan.v3.IsConfiguration.UserRegistration.ContactInfoValidation) |  |  |
+| `admin_approval` | [`IsConfiguration.UserRegistration.AdminApproval`](#ttn.lorawan.v3.IsConfiguration.UserRegistration.AdminApproval) |  |  |
+| `password_requirements` | [`IsConfiguration.UserRegistration.PasswordRequirements`](#ttn.lorawan.v3.IsConfiguration.UserRegistration.PasswordRequirements) |  |  |
+
+### <a name="ttn.lorawan.v3.IsConfiguration.UserRegistration.AdminApproval">Message `IsConfiguration.UserRegistration.AdminApproval`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `required` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+
+### <a name="ttn.lorawan.v3.IsConfiguration.UserRegistration.ContactInfoValidation">Message `IsConfiguration.UserRegistration.ContactInfoValidation`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `required` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+
+### <a name="ttn.lorawan.v3.IsConfiguration.UserRegistration.Invitation">Message `IsConfiguration.UserRegistration.Invitation`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `required` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+| `token_ttl` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+
+### <a name="ttn.lorawan.v3.IsConfiguration.UserRegistration.PasswordRequirements">Message `IsConfiguration.UserRegistration.PasswordRequirements`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `min_length` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  |  |
+| `max_length` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  |  |
+| `min_uppercase` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  |  |
+| `min_digits` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  |  |
+| `min_special` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  |  |
+
+### <a name="ttn.lorawan.v3.IsConfiguration.UserRights">Message `IsConfiguration.UserRights`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `create_applications` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+| `create_clients` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+| `create_gateways` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+| `create_organizations` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+
 ### <a name="ttn.lorawan.v3.EntityAccess">Service `EntityAccess`</a>
 
 | Method Name | Request Type | Response Type | Description |
@@ -3271,6 +3360,18 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `AuthInfo` | `GET` | `/api/v3/auth_info` |  |
+
+### <a name="ttn.lorawan.v3.Is">Service `Is`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `GetConfiguration` | [`GetIsConfigurationRequest`](#ttn.lorawan.v3.GetIsConfigurationRequest) | [`GetIsConfigurationResponse`](#ttn.lorawan.v3.GetIsConfigurationResponse) |  |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `GetConfiguration` | `GET` | `/api/v3/is/configuration` |  |
 
 ## <a name="lorawan-stack/api/join.proto">File `lorawan-stack/api/join.proto`</a>
 
