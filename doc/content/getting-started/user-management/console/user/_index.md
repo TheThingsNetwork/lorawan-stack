@@ -21,9 +21,17 @@ The list of users is shown immediately after going to **User Management** in the
 
 You can search for users by ID using the search field above the list of users. It is currently not possible to search for users by other fields than the user ID using the Console, but you can [do this with the CLI]({{< relref "../../cli/user#searching-for-users" >}}).
 
-## Creating Users
+## Creating Users {{% new-in-version "3.9" %}}
 
-It is currently not possible to create users in the Console, but users can register themselves, or you can [create them with the CLI]({{< relref "../../cli/user#creating-users" >}}).
+To create a user, click the **Add user** button in the top right of the user management page.
+
+{{< figure src="users-list.png" alt="User List" >}}
+
+You'll be taken to a page where you can enter the new user's information.
+
+{{< figure src="users-add.png" alt="User Add" >}}
+
+After entering all of the user information, click **Add user** at the bottom to create the new user.
 
 ## Inviting Users
 

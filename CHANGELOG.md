@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Option to require TLS on connections to Redis servers (see `redis.tls.require` and related options).
 - Documentation for `cache` options.
 - Documentation for the Gateway Server MQTT protocol.
+- Add user page in console.
 
 ### Changed
 
