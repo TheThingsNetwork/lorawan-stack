@@ -199,33 +199,27 @@ func openDriverSubscription(client mqtt.Client, topicName string, timeout time.D
 }
 
 // ReceiveBatch implements driver.Subscription.
+// We always return one message at a time, since the underlying MQTT client does not batch receives.
 func (s *subscription) ReceiveBatch(ctx context.Context, maxMessages int) ([]*driver.Message, error) {
 	if s == nil || s.client == nil {
 		return nil, errNilClient.New()
 	}
-	var messages []*driver.Message
-outer:
-	for i := 0; i < maxMessages; i++ {
-		select {
-		case <-ctx.Done():
-			break outer
-		case msg, ok := <-s.subCh:
-			if !ok {
-				break outer
-			}
-			dm, err := decodeMessage(msg)
-			if err != nil {
-				return nil, err
-			}
-			messages = append(messages, dm)
-		// We cannot delay the messages for too long for the sake of
-		// having bigger batches. Avoid busy waiting, but don't wait
-		// for too long.
-		case <-time.After(1 * time.Millisecond):
-			break outer
-		}
+	if maxMessages <= 0 {
+		return nil, nil
 	}
-	return messages, ctx.Err()
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case msg, ok := <-s.subCh:
+		if !ok {
+			return nil, nil
+		}
+		dm, err := decodeMessage(msg)
+		if err != nil {
+			return nil, err
+		}
+		return []*driver.Message{dm}, nil
+	}
 }
 
 // SendAcks implements driver.Subscription.
