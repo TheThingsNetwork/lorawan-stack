@@ -24,6 +24,8 @@ import FetchTable from '@console/containers/fetch-table'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import { checkFromState, mayManageUsers } from '@console/lib/feature-checks'
+
 import { getUsersList } from '@console/store/actions/users'
 
 import {
@@ -121,7 +123,7 @@ export default class UsersTable extends Component {
       totalCount: selectUsersTotalCount(state),
       fetching: selectUsersFetching(state),
       error: selectUsersError(state),
-      mayAdd: false,
+      mayAdd: checkFromState(mayManageUsers, state),
     }
   }
 
@@ -132,7 +134,7 @@ export default class UsersTable extends Component {
       <FetchTable
         entity="users"
         headers={headers}
-        addMessage={sharedMessages.addOrganization}
+        addMessage={sharedMessages.userAdd}
         tableTitle={<Message content={sharedMessages.users} />}
         getItemsAction={this.getUsersList}
         searchItemsAction={this.getUsersList}

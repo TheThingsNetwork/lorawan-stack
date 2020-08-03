@@ -29,6 +29,12 @@ export const [
   { request: getUsersList, success: getUsersSuccess, failure: getUsersFailure },
 ] = createPaginationRequestActions(SHARED_NAME)
 
+export const CREATE_USER_BASE = 'CREATE_USER'
+export const [
+  { request: CREATE_USER, success: CREATE_USER_SUCCESS, failure: CREATE_USER_FAILURE },
+  { request: createUser, success: createUserSuccess, failure: createUserFailure },
+] = createRequestActions(CREATE_USER_BASE, user => ({ user }))
+
 export const UPDATE_USER_BASE = 'UPDATE_USER'
 export const [
   { request: UPDATE_USER, success: UPDATE_USER_SUCCESS, failure: UPDATE_USER_FAILURE },

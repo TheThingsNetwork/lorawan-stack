@@ -113,6 +113,7 @@ export default {
     },
   },
   users: {
+    create: ttnClient.Users.create.bind(ttnClient.Users),
     get: ttnClient.Users.getById.bind(ttnClient.Users),
     list: ttnClient.Users.getAll.bind(ttnClient.Users),
     update: ttnClient.Users.updateById.bind(ttnClient.Users),

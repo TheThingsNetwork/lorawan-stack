@@ -300,6 +300,7 @@ export default defineMessages({
   uplinksReceived: 'Uplinks received',
   unexposed: 'Unexposed',
   user: 'User',
+  userAdd: 'Add user',
   userDelete: 'Delete user',
   userEdit: 'Edit user',
   userId: 'User ID',
