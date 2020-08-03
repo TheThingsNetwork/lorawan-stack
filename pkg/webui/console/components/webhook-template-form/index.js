@@ -61,7 +61,7 @@ export default class WebhookTemplateForm extends Component {
     const { webhookTemplate: template, appId } = this.props
     const { webhook_id, ...fields } = values
 
-    const headers = Object.keys(template.headers).reduce((acc, key) => {
+    const headers = Object.keys(template.headers || {}).reduce((acc, key) => {
       const val = template.headers[key]
       acc[key] = val.replace(/{([a-z0-9_-]+)}/i, (_, field) => values[field])
       return acc
