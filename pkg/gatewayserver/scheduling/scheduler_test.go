@@ -118,7 +118,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 				Timestamp:  300000,
 			},
 			Priority:       ttnpb.TxSchedulePriority_NORMAL,
-			NPercentileRTT: durationPtr(100 * time.Millisecond),
+			NPercentileRTT: durationPtr(550 * time.Millisecond),
 			ExpectedToa:    41216 * time.Microsecond,
 			// Too late for transmission with RTT.
 			ExpectedError: &scheduling.ErrTooLate,
