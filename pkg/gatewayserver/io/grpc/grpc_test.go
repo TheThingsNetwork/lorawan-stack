@@ -384,6 +384,7 @@ func TestTraffic(t *testing.T) {
 						UplinkToken: io.MustUplinkToken(
 							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
 							100,
+							100000,
 							time.Unix(0, 100*1000),
 						),
 					},
@@ -410,6 +411,7 @@ func TestTraffic(t *testing.T) {
 						UplinkToken: io.MustUplinkToken(
 							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
 							100,
+							100000,
 							time.Unix(0, 100*1000),
 						),
 					},
@@ -439,6 +441,7 @@ func TestTraffic(t *testing.T) {
 						UplinkToken: io.MustUplinkToken(
 							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
 							100,
+							100000,
 							time.Unix(0, 100*1000),
 						),
 					},

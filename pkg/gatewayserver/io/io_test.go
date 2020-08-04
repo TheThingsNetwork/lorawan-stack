@@ -140,6 +140,7 @@ func TestFlow(t *testing.T) {
 					UplinkToken: io.MustUplinkToken(
 						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
 						100,
+						100000,
 						time.Unix(0, 100*1000),
 					),
 				},
@@ -161,6 +162,7 @@ func TestFlow(t *testing.T) {
 					UplinkToken: io.MustUplinkToken(
 						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
 						100,
+						100000,
 						time.Unix(0, 100*1000),
 					),
 				},
@@ -186,6 +188,7 @@ func TestFlow(t *testing.T) {
 					UplinkToken: io.MustUplinkToken(
 						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
 						100,
+						100000,
 						time.Unix(0, 100*1000),
 					), // Same as previous.
 				},
@@ -241,6 +244,7 @@ func TestFlow(t *testing.T) {
 					UplinkToken: io.MustUplinkToken(
 						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
 						100,
+						100000,
 						time.Unix(0, 100*1000),
 					),
 				},
@@ -266,6 +270,7 @@ func TestFlow(t *testing.T) {
 					UplinkToken: io.MustUplinkToken(
 						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
 						100,
+						100000,
 						time.Unix(0, 100*1000),
 					),
 				},
@@ -360,6 +365,7 @@ func TestFlow(t *testing.T) {
 					UplinkToken: io.MustUplinkToken(
 						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
 						100,
+						100000,
 						time.Unix(0, 100*1000),
 					),
 				},
@@ -385,6 +391,7 @@ func TestFlow(t *testing.T) {
 					UplinkToken: io.MustUplinkToken(
 						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
 						100,
+						100000,
 						time.Unix(0, 100*1000),
 					),
 				},
@@ -520,6 +527,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 					UplinkToken: io.MustUplinkToken(
 						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "bar-gateway"}},
 						100,
+						100000,
 						time.Unix(0, 100*1000),
 					),
 				},

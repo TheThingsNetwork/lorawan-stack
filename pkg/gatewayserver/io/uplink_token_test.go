@@ -20,6 +20,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -34,9 +35,10 @@ func TestUplinkToken(t *testing.T) {
 		AntennaIndex: 0,
 	}
 	timestamp := uint32(12345678)
+	concentratorTime := scheduling.ConcentratorTime(12345678000)
 	serverTime := time.Now()
 
-	uplinkToken, err := io.UplinkToken(ids, timestamp, serverTime)
+	uplinkToken, err := io.UplinkToken(ids, timestamp, concentratorTime, serverTime)
 	a.So(err, should.BeNil)
 
 	token, err := io.ParseUplinkToken(uplinkToken)

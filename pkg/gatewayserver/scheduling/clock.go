@@ -23,6 +23,9 @@ import (
 type Clock interface {
 	// IsSynced returns whether the clock is synchronized.
 	IsSynced() bool
+	// SyncTime returns the server time of the last sync.
+	// This method returns false if the clock is not synchronized.
+	SyncTime() (time.Time, bool)
 	// FromServerTime returns an indication of the concentrator time at the given server time.
 	FromServerTime(time.Time) (ConcentratorTime, bool)
 	// ToServerTime returns an indication of the server time at the given concentrator time.
@@ -45,8 +48,16 @@ type RolloverClock struct {
 // IsSynced implements Clock.
 func (c *RolloverClock) IsSynced() bool { return c.synced }
 
+// SyncTime implements Clock.
+func (c *RolloverClock) SyncTime() (time.Time, bool) {
+	if !c.synced {
+		return time.Time{}, false
+	}
+	return *c.server, true
+}
+
 // Sync synchronizes the clock with the given concentrator timestamp and the server time.
-func (c *RolloverClock) Sync(timestamp uint32, server time.Time) {
+func (c *RolloverClock) Sync(timestamp uint32, server time.Time) ConcentratorTime {
 	rollovers := int64(c.absolute/ConcentratorTime(time.Microsecond)) >> 32
 	if passed := int64(timestamp) - int64(c.relative); passed < 0 {
 		rollovers++
@@ -59,23 +70,26 @@ func (c *RolloverClock) Sync(timestamp uint32, server time.Time) {
 	c.server = &server
 	c.gateway = nil
 	c.synced = true
+	return c.absolute
 }
 
 // SyncWithGatewayAbsolute synchronizes the clock with the given concentrator timestamp, the server time and the
 // absolute gateway time that corresponds to the given timestamp.
-func (c *RolloverClock) SyncWithGatewayAbsolute(timestamp uint32, server, gateway time.Time) {
-	c.Sync(timestamp, server)
+func (c *RolloverClock) SyncWithGatewayAbsolute(timestamp uint32, server, gateway time.Time) ConcentratorTime {
+	ct := c.Sync(timestamp, server)
 	c.gateway = &gateway
+	return ct
 }
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.
-func (c *RolloverClock) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, concentrator ConcentratorTime) {
+func (c *RolloverClock) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, concentrator ConcentratorTime) ConcentratorTime {
 	c.absolute = concentrator
 	c.relative = timestamp
 	c.server = &server
 	c.gateway = nil
 	c.synced = true
+	return c.absolute
 }
 
 // FromServerTime implements Clock.

@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	encoding "go.thethings.network/lorawan-stack/v3/pkg/ttnpb/udp"
@@ -369,6 +370,7 @@ func TestTraffic(t *testing.T) {
 						UplinkToken: io.MustUplinkToken(
 							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
 							uint32(300*test.Delay/time.Microsecond),
+							scheduling.ConcentratorTime(300*test.Delay),
 							time.Unix(0, int64(300*test.Delay)),
 						),
 					},
@@ -402,6 +404,7 @@ func TestTraffic(t *testing.T) {
 						UplinkToken: io.MustUplinkToken(
 							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
 							uint32(600*test.Delay/time.Microsecond),
+							scheduling.ConcentratorTime(600*test.Delay),
 							time.Unix(0, int64(600*test.Delay)),
 						),
 					},
@@ -435,6 +438,7 @@ func TestTraffic(t *testing.T) {
 						UplinkToken: io.MustUplinkToken(
 							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
 							uint32((15*time.Second+300*test.Delay)/time.Microsecond),
+							scheduling.ConcentratorTime(15*time.Second+300*test.Delay),
 							time.Unix(0, int64((15*time.Second+300*test.Delay))),
 						),
 					},

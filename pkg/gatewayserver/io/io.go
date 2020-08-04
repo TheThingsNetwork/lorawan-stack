@@ -178,15 +178,16 @@ var errBufferFull = errors.DefineInternal("buffer_full", "buffer is full")
 
 // HandleUp updates the uplink stats and sends the message to the upstream channel.
 func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
+	var ct scheduling.ConcentratorTime
 	if up.Settings.Time != nil {
-		c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
+		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
 			"server_time", up.ReceivedAt,
 			"gateway_time", *up.Settings.Time,
 		)).Debug("Synchronized server and gateway absolute time")
 	} else {
-		c.scheduler.Sync(up.Settings.Timestamp, up.ReceivedAt)
+		ct = c.scheduler.Sync(up.Settings.Timestamp, up.ReceivedAt)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
 			"server_time", up.ReceivedAt,
@@ -202,7 +203,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 		buf, err := UplinkToken(ttnpb.GatewayAntennaIdentifiers{
 			GatewayIdentifiers: c.gateway.GatewayIdentifiers,
 			AntennaIndex:       md.AntennaIndex,
-		}, md.Timestamp, up.ReceivedAt)
+		}, md.Timestamp, ct, up.ReceivedAt)
 		if err != nil {
 			return err
 		}
