@@ -178,20 +178,20 @@ func TestOpenConnection(t *testing.T) {
 			},
 		},
 	} {
-		client := utc.createClient(t, a)
-		defer client.Disconnect(uint(timeout / time.Millisecond))
-
-		unsubscribe := func(t *testing.T, topic string) {
-			token := client.Unsubscribe(topic)
-			if !token.WaitTimeout(timeout) {
-				t.Fatal("Unsubscribe timeout")
-			}
-			if !a.So(token.Error(), should.BeNil) {
-				t.FailNow()
-			}
-		}
-
 		t.Run(utc.name, func(t *testing.T) {
+			client := utc.createClient(t, a)
+			defer client.Disconnect(uint(timeout / time.Millisecond))
+
+			unsubscribe := func(t *testing.T, topic string) {
+				token := client.Unsubscribe(topic)
+				if !token.WaitTimeout(timeout) {
+					t.Fatal("Unsubscribe timeout")
+				}
+				if !a.So(token.Error(), should.BeNil) {
+					t.FailNow()
+				}
+			}
+
 			pb.Provider = utc.provider
 
 			conn, err := impl.OpenConnection(ctx, pb)
