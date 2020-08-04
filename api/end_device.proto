@@ -392,7 +392,8 @@ message EndDevice {
   string name = 4 [(validate.rules).string.max_len = 50];
   // Description of the device. Stored in Entity Registry.
   string description = 5 [(validate.rules).string.max_len = 2000];
-  // Attributes of the device. Stored in Entity Registry.
+
+  // Key-value attributes for this end device. Typically used for organizing end devices or for storing integration-specific data. Stored in Entity Registry.
   map<string,string> attributes = 6 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 
   // Version Identifiers. Stored in Entity Registry, Network Server and Application Server.
@@ -566,11 +567,15 @@ message CreateEndDeviceRequest {
 
 message UpdateEndDeviceRequest {
   EndDevice end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the end device fields that should be updated.
+  // See the API reference for which fields can be set on the different services.
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message GetEndDeviceRequest {
   EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the end device fields that should be returned.
+  // See the API reference for which fields can be returned by the different services.
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
@@ -581,6 +586,8 @@ message GetEndDeviceIdentifiersForEUIsRequest {
 
 message ListEndDevicesRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the end device fields that should be returned.
+  // See the API reference for which fields can be returned by the different services.
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
@@ -595,6 +602,8 @@ message ListEndDevicesRequest {
 
 message SetEndDeviceRequest {
   EndDevice end_device = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the end device fields that should be updated.
+  // See the API reference for which fields can be set on the different services.
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 

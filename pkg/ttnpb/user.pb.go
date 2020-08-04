@@ -37,17 +37,22 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // User is the message that defines a user on the network.
 type User struct {
 	UserIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
-	CreatedAt       time.Time         `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
-	UpdatedAt       time.Time         `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
-	Name            string            `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Description     string            `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	Attributes      map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	ContactInfo     []*ContactInfo    `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
+	CreatedAt       time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt       time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
+	Name            string    `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Description     string    `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	// Key-value attributes for this users. Typically used for storing integration-specific data.
+	Attributes map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user.
+	ContactInfo []*ContactInfo `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
 	// Primary email address that can be used for logging in.
 	// This address is not public, use contact_info for that.
-	PrimaryEmailAddress            string     `protobuf:"bytes,8,opt,name=primary_email_address,json=primaryEmailAddress,proto3" json:"primary_email_address,omitempty"`
+	PrimaryEmailAddress string `protobuf:"bytes,8,opt,name=primary_email_address,json=primaryEmailAddress,proto3" json:"primary_email_address,omitempty"`
+	// When the primary email address was validated. Note that email address validation is not required on all networks.
 	PrimaryEmailAddressValidatedAt *time.Time `protobuf:"bytes,9,opt,name=primary_email_address_validated_at,json=primaryEmailAddressValidatedAt,proto3,stdtime" json:"primary_email_address_validated_at,omitempty"`
-	// Only used on create; never returned on API calls.
+	// The password field is only considered when creating a user.
+	// It is not returned on API calls, and can not be updated by updating the User.
+	// See the UpdatePassword method of the UserRegistry service for more information.
 	Password              string     `protobuf:"bytes,10,opt,name=password,proto3" json:"password,omitempty"`
 	PasswordUpdatedAt     *time.Time `protobuf:"bytes,11,opt,name=password_updated_at,json=passwordUpdatedAt,proto3,stdtime" json:"password_updated_at,omitempty"`
 	RequirePasswordUpdate bool       `protobuf:"varint,12,opt,name=require_password_update,json=requirePasswordUpdate,proto3" json:"require_password_update,omitempty"`
@@ -58,6 +63,8 @@ type User struct {
 	// This field can only be modified by other admins.
 	Admin bool `protobuf:"varint,14,opt,name=admin,proto3" json:"admin,omitempty"`
 	// The temporary password can only be used to update a user's password; never returned on API calls.
+	// It is not returned on API calls, and can not be updated by updating the User.
+	// See the CreateTemporaryPassword method of the UserRegistry service for more information.
 	TemporaryPassword          string     `protobuf:"bytes,15,opt,name=temporary_password,json=temporaryPassword,proto3" json:"temporary_password,omitempty"`
 	TemporaryPasswordCreatedAt *time.Time `protobuf:"bytes,16,opt,name=temporary_password_created_at,json=temporaryPasswordCreatedAt,proto3,stdtime" json:"temporary_password_created_at,omitempty"`
 	TemporaryPasswordExpiresAt *time.Time `protobuf:"bytes,17,opt,name=temporary_password_expires_at,json=temporaryPasswordExpiresAt,proto3,stdtime" json:"temporary_password_expires_at,omitempty"`
@@ -263,7 +270,8 @@ func (m *Users) GetUsers() []*User {
 }
 
 type GetUserRequest struct {
-	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
+	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
+	// The names of the user fields that should be returned.
 	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -309,6 +317,7 @@ func (m *GetUserRequest) GetFieldMask() types.FieldMask {
 }
 
 type ListUsersRequest struct {
+	// The names of the user fields that should be returned.
 	FieldMask types.FieldMask `protobuf:"bytes,1,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	// Order the results by this field path (must be present in the field mask).
 	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
@@ -382,7 +391,8 @@ func (m *ListUsersRequest) GetPage() uint32 {
 }
 
 type CreateUserRequest struct {
-	User                 `protobuf:"bytes,1,opt,name=user,proto3,embedded=user" json:"user"`
+	User `protobuf:"bytes,1,opt,name=user,proto3,embedded=user" json:"user"`
+	// The invitation token that was sent to the user (some networks require an invitation in order to register new users).
 	InvitationToken      string   `protobuf:"bytes,2,opt,name=invitation_token,json=invitationToken,proto3" json:"invitation_token,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -428,7 +438,8 @@ func (m *CreateUserRequest) GetInvitationToken() string {
 }
 
 type UpdateUserRequest struct {
-	User                 `protobuf:"bytes,1,opt,name=user,proto3,embedded=user" json:"user"`
+	User `protobuf:"bytes,1,opt,name=user,proto3,embedded=user" json:"user"`
+	// The names of the user fields that should be updated.
 	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`

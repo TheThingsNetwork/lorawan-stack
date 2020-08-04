@@ -25,6 +25,8 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 service EndDeviceRegistry {
   // Create a new end device within an application.
+  // After creating a device in the EndDeviceRegistry (Identity Server), it still
+  // needs to be created in the NsEndDeviceRegistry, AsEndDeviceRegistry and JsEndDeviceRegistry.
   rpc Create(CreateEndDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       post: "/applications/{end_device.ids.application_ids.application_id}/devices"
@@ -32,23 +34,28 @@ service EndDeviceRegistry {
     };
   };
 
-  // Get the end device with the given identifiers, selecting the fields given
-  // by the field mask.
+  // Get the end device with the given identifiers, selecting the fields specified
+  // in the field mask.
+  // More or less fields may be returned, depending on the rights of the caller.
   rpc Get(GetEndDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       get: "/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}"
     };
   };
 
+  // Get the identifiers of the end device that has the given EUIs registered.
   rpc GetIdentifiersForEUIs(GetEndDeviceIdentifiersForEUIsRequest) returns (EndDeviceIdentifiers);
 
-  // List applications. See request message for details.
+  // List end devices in the given application.
+  // Similar to Get, this selects the fields given by the field mask.
+  // More or less fields may be returned, depending on the rights of the caller.
   rpc List(ListEndDevicesRequest) returns (EndDevices) {
     option (google.api.http) = {
       get: "/applications/{application_ids.application_id}/devices"
     };
   };
 
+  // Update the OAuth client, changing the fields specified by the field mask to the provided values.
   rpc Update(UpdateEndDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       put: "/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}"
@@ -56,6 +63,10 @@ service EndDeviceRegistry {
     };
   };
 
+  // Delete the end device with the given IDs.
+  // Before deleting an end device from the EndDeviceRegistry (the Identity Server),
+  // the device needs to be deleted from the JsEndDeviceRegistry, AsEndDeviceRegistry and NsEndDeviceRegistry.
+  // This is NOT done automatically.
   rpc Delete(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/applications/{application_ids.application_id}/devices/{device_id}"

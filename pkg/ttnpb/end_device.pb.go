@@ -1530,7 +1530,7 @@ type EndDevice struct {
 	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	// Description of the device. Stored in Entity Registry.
 	Description string `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	// Attributes of the device. Stored in Entity Registry.
+	// Key-value attributes for this end device. Typically used for organizing end devices or for storing integration-specific data. Stored in Entity Registry.
 	Attributes map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Version Identifiers. Stored in Entity Registry, Network Server and Application Server.
 	VersionIDs *EndDeviceVersionIdentifiers `protobuf:"bytes,7,opt,name=version_ids,json=versionIds,proto3" json:"version_ids,omitempty"`
@@ -2144,7 +2144,9 @@ func (m *CreateEndDeviceRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_CreateEndDeviceRequest proto.InternalMessageInfo
 
 type UpdateEndDeviceRequest struct {
-	EndDevice            `protobuf:"bytes,1,opt,name=end_device,json=endDevice,proto3,embedded=end_device" json:"end_device"`
+	EndDevice `protobuf:"bytes,1,opt,name=end_device,json=endDevice,proto3,embedded=end_device" json:"end_device"`
+	// The names of the end device fields that should be updated.
+	// See the API reference for which fields can be set on the different services.
 	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -2191,6 +2193,8 @@ func (m *UpdateEndDeviceRequest) GetFieldMask() types.FieldMask {
 
 type GetEndDeviceRequest struct {
 	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=end_device_ids,json=endDeviceIds,proto3,embedded=end_device_ids" json:"end_device_ids"`
+	// The names of the end device fields that should be returned.
+	// See the API reference for which fields can be returned by the different services.
 	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -2276,7 +2280,9 @@ var xxx_messageInfo_GetEndDeviceIdentifiersForEUIsRequest proto.InternalMessageI
 
 type ListEndDevicesRequest struct {
 	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
-	FieldMask              types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
+	// The names of the end device fields that should be returned.
+	// See the API reference for which fields can be returned by the different services.
+	FieldMask types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	// Order the results by this field path (must be present in the field mask).
 	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
 	Order string `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
@@ -2349,7 +2355,9 @@ func (m *ListEndDevicesRequest) GetPage() uint32 {
 }
 
 type SetEndDeviceRequest struct {
-	EndDevice            EndDevice       `protobuf:"bytes,1,opt,name=end_device,json=endDevice,proto3" json:"end_device"`
+	EndDevice EndDevice `protobuf:"bytes,1,opt,name=end_device,json=endDevice,proto3" json:"end_device"`
+	// The names of the end device fields that should be updated.
+	// See the API reference for which fields can be set on the different services.
 	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`

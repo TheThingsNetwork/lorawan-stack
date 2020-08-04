@@ -72,36 +72,52 @@ AggregatedDutyCycle:
   name: AggregatedDutyCycle
   values:
   - name: DUTY_CYCLE_1
+    comment: 100%.
     value: 0
   - name: DUTY_CYCLE_2
+    comment: 50%.
     value: 1
   - name: DUTY_CYCLE_4
+    comment: 25%.
     value: 2
   - name: DUTY_CYCLE_8
+    comment: 12.5%.
     value: 3
   - name: DUTY_CYCLE_16
+    comment: 6.25%.
     value: 4
   - name: DUTY_CYCLE_32
+    comment: 3.125%.
     value: 5
   - name: DUTY_CYCLE_64
+    comment: 1.5625%.
     value: 6
   - name: DUTY_CYCLE_128
+    comment: Roughly 0.781%.
     value: 7
   - name: DUTY_CYCLE_256
+    comment: Roughly 0.390%.
     value: 8
   - name: DUTY_CYCLE_512
+    comment: Roughly 0.195%.
     value: 9
   - name: DUTY_CYCLE_1024
+    comment: Roughly 0.098%.
     value: 10
   - name: DUTY_CYCLE_2048
+    comment: Roughly 0.049%.
     value: 11
   - name: DUTY_CYCLE_4096
+    comment: Roughly 0.024%.
     value: 12
   - name: DUTY_CYCLE_8192
+    comment: Roughly 0.012%.
     value: 13
   - name: DUTY_CYCLE_16384
+    comment: Roughly 0.006%.
     value: 14
   - name: DUTY_CYCLE_32768
+    comment: Roughly 0.003%.
     value: 15
 ApplicationPubSub.MQTTProvider.QoS:
   name: ApplicationPubSub.MQTTProvider.QoS
@@ -216,107 +232,107 @@ DeviceEIRP:
   name: DeviceEIRP
   values:
   - name: DEVICE_EIRP_8
+    comment: 8 dBm.
     value: 0
   - name: DEVICE_EIRP_10
+    comment: 10 dBm.
     value: 1
   - name: DEVICE_EIRP_12
+    comment: 12 dBm.
     value: 2
   - name: DEVICE_EIRP_13
+    comment: 13 dBm.
     value: 3
   - name: DEVICE_EIRP_14
+    comment: 14 dBm.
     value: 4
   - name: DEVICE_EIRP_16
+    comment: 16 dBm.
     value: 5
   - name: DEVICE_EIRP_18
+    comment: 18 dBm.
     value: 6
   - name: DEVICE_EIRP_20
+    comment: 20 dBm.
     value: 7
   - name: DEVICE_EIRP_21
+    comment: 21 dBm.
     value: 8
   - name: DEVICE_EIRP_24
+    comment: 24 dBm.
     value: 9
   - name: DEVICE_EIRP_26
+    comment: 26 dBm.
     value: 10
   - name: DEVICE_EIRP_27
+    comment: 27 dBm.
     value: 11
   - name: DEVICE_EIRP_29
+    comment: 29 dBm.
     value: 12
   - name: DEVICE_EIRP_30
+    comment: 30 dBm.
     value: 13
   - name: DEVICE_EIRP_33
+    comment: 33 dBm.
     value: 14
   - name: DEVICE_EIRP_36
+    comment: 36 dBm.
     value: 15
 DownlinkPathConstraint:
   name: DownlinkPathConstraint
   values:
   - name: DOWNLINK_PATH_CONSTRAINT_NONE
-    comment: |2
-       Indicates that the gateway can be selected for downlink without constraints by the Network Server.
+    comment: Indicates that the gateway can be selected for downlink without constraints by the Network Server.
     value: 0
   - name: DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER
-    comment: |2
-       Indicates that the gateway can be selected for downlink only if no other or better gateway can be selected.
+    comment: Indicates that the gateway can be selected for downlink only if no other or better gateway can be selected.
     value: 1
   - name: DOWNLINK_PATH_CONSTRAINT_NEVER
-    comment: |2
-       Indicates that this gateway will never be selected for downlink, even if that results in no available downlink path.
+    comment: Indicates that this gateway will never be selected for downlink, even if that results in no available downlink path.
     value: 2
 GrantType:
   name: GrantType
-  comment: |2
-     The OAuth2 flows an OAuth client can use to get an access token.
+  comment: The OAuth2 flows an OAuth client can use to get an access token.
   values:
   - name: GRANT_AUTHORIZATION_CODE
-    comment: |2
-       Grant type used to exchange an authorization code for an access token.
+    comment: Grant type used to exchange an authorization code for an access token.
     value: 0
   - name: GRANT_PASSWORD
-    comment: |2
-       Grant type used to exchange a user ID and password for an access token.
+    comment: Grant type used to exchange a user ID and password for an access token.
     value: 1
   - name: GRANT_REFRESH_TOKEN
-    comment: |2
-       Grant type used to exchange a refresh token for an access token.
+    comment: Grant type used to exchange a refresh token for an access token.
     value: 2
 LocationSource:
   name: LocationSource
   values:
   - name: SOURCE_UNKNOWN
-    comment: |2
-       The source of the location is not known or not set.
+    comment: The source of the location is not known or not set.
     value: 0
   - name: SOURCE_GPS
-    comment: |2
-       The location is determined by GPS.
+    comment: The location is determined by GPS.
     value: 1
   - name: SOURCE_REGISTRY
-    comment: |2
-       The location is set in and updated from a registry.
+    comment: The location is set in and updated from a registry.
     value: 3
   - name: SOURCE_IP_GEOLOCATION
-    comment: |2
-       The location is estimated with IP geolocation.
+    comment: The location is estimated with IP geolocation.
     value: 4
   - name: SOURCE_WIFI_RSSI_GEOLOCATION
-    comment: |2
-       The location is estimated with WiFi RSSI geolocation.
+    comment: The location is estimated with WiFi RSSI geolocation.
     value: 5
   - name: SOURCE_BT_RSSI_GEOLOCATION
-    comment: |2
-       The location is estimated with BT/BLE RSSI geolocation.
+    comment: The location is estimated with BT/BLE RSSI geolocation.
     value: 6
   - name: SOURCE_LORA_RSSI_GEOLOCATION
-    comment: |2
-       The location is estimated with LoRa RSSI geolocation.
+    comment: The location is estimated with LoRa RSSI geolocation.
     value: 7
   - name: SOURCE_LORA_TDOA_GEOLOCATION
-    comment: |2
-       The location is estimated with LoRa TDOA geolocation.
+    comment: The location is estimated with LoRa TDOA geolocation.
     value: 8
   - name: SOURCE_COMBINED_GEOLOCATION
-    comment: |2
-       The location is estimated by a combination of geolocation sources.
+    comment: The location is estimated by a combination of geolocation sources.
     value: 9
 MACCommandIdentifier:
   name: MACCommandIdentifier
@@ -358,6 +374,7 @@ MACCommandIdentifier:
   - name: CID_PING_SLOT_CHANNEL
     value: 17
   - name: CID_BEACON_TIMING
+    comment: Deprecated
     value: 18
   - name: CID_BEACON_FREQ
     value: 19
@@ -462,48 +479,50 @@ PayloadFormatter:
   name: PayloadFormatter
   values:
   - name: FORMATTER_NONE
-    comment: |2
-       No payload formatter to work with raw payload only.
+    comment: No payload formatter to work with raw payload only.
     value: 0
   - name: FORMATTER_REPOSITORY
-    comment: |2
-       Use payload formatter for the end device type from a repository.
+    comment: Use payload formatter for the end device type from a repository.
     value: 1
   - name: FORMATTER_GRPC_SERVICE
-    comment: |2
-       gRPC service payload formatter. The parameter is the host:port of the service.
+    comment: gRPC service payload formatter. The parameter is the host:port of the service.
     value: 2
   - name: FORMATTER_JAVASCRIPT
-    comment: |2
-       Custom payload formatter that executes Javascript code. The parameter is a JavaScript filename.
+    comment: Custom payload formatter that executes Javascript code. The parameter is a JavaScript filename.
     value: 3
   - name: FORMATTER_CAYENNELPP
-    comment: |2
-       CayenneLPP payload formatter.
+    comment: CayenneLPP payload formatter.
     value: 4
 PingSlotPeriod:
   name: PingSlotPeriod
   values:
   - name: PING_EVERY_1S
+    comment: Every second.
     value: 0
   - name: PING_EVERY_2S
+    comment: Every 2 seconds.
     value: 1
   - name: PING_EVERY_4S
+    comment: Every 4 seconds.
     value: 2
   - name: PING_EVERY_8S
+    comment: Every 8 seconds.
     value: 3
   - name: PING_EVERY_16S
+    comment: Every 16 seconds.
     value: 4
   - name: PING_EVERY_32S
+    comment: Every 32 seconds.
     value: 5
   - name: PING_EVERY_64S
+    comment: Every 64 seconds.
     value: 6
   - name: PING_EVERY_128S
+    comment: Every 128 seconds.
     value: 7
 PowerState:
   name: PowerState
-  comment: |2
-     Power state of the device.
+  comment: Power state of the device.
   values:
   - name: POWER_UNKNOWN
     value: 0
@@ -550,363 +569,347 @@ RejoinPeriodExponent:
   name: RejoinPeriodExponent
   values:
   - name: REJOIN_PERIOD_0
+    comment: Every 32 to 64 seconds.
     value: 0
   - name: REJOIN_PERIOD_1
+    comment: Every 64 to 96 seconds.
     value: 1
   - name: REJOIN_PERIOD_2
+    comment: Every 128 to 160 seconds.
     value: 2
   - name: REJOIN_PERIOD_3
+    comment: Every 256 to 288 seconds.
     value: 3
   - name: REJOIN_PERIOD_4
+    comment: Every 512 to 544 seconds.
     value: 4
   - name: REJOIN_PERIOD_5
+    comment: Every 1024 to 1056 seconds.
     value: 5
   - name: REJOIN_PERIOD_6
+    comment: Every 2048 to 2080 seconds.
     value: 6
   - name: REJOIN_PERIOD_7
+    comment: Every 4096 to 4128 seconds.
     value: 7
 RejoinTimeExponent:
   name: RejoinTimeExponent
   values:
   - name: REJOIN_TIME_0
+    comment: Every ~17.1 minutes.
     value: 0
   - name: REJOIN_TIME_1
+    comment: Every ~34.1 minutes.
     value: 1
   - name: REJOIN_TIME_2
+    comment: Every ~1.1 hours.
     value: 2
   - name: REJOIN_TIME_3
+    comment: Every ~2.3 hours.
     value: 3
   - name: REJOIN_TIME_4
+    comment: Every ~4.6 hours.
     value: 4
   - name: REJOIN_TIME_5
+    comment: Every ~9.1 hours.
     value: 5
   - name: REJOIN_TIME_6
+    comment: Every ~18.2 hours.
     value: 6
   - name: REJOIN_TIME_7
+    comment: Every ~1.5 days.
     value: 7
   - name: REJOIN_TIME_8
+    comment: Every ~3.0 days.
     value: 8
   - name: REJOIN_TIME_9
+    comment: Every ~6.1 days.
     value: 9
   - name: REJOIN_TIME_10
+    comment: Every ~12.1 days.
     value: 10
   - name: REJOIN_TIME_11
+    comment: Every ~3.5 weeks.
     value: 11
   - name: REJOIN_TIME_12
+    comment: Every ~1.6 months.
     value: 12
   - name: REJOIN_TIME_13
+    comment: Every ~3.2 months.
     value: 13
   - name: REJOIN_TIME_14
+    comment: Every ~6.4 months.
     value: 14
   - name: REJOIN_TIME_15
+    comment: Every ~1.1 year.
     value: 15
 RejoinType:
   name: RejoinType
   values:
   - name: CONTEXT
+    comment: Resets DevAddr, Session Keys, Frame Counters, Radio Parameters.
     value: 0
   - name: SESSION
+    comment: Equivalent to the initial JoinRequest.
     value: 1
   - name: KEYS
+    comment: Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters.
     value: 2
 Right:
   name: Right
-  comment: |2
-     Right is the enum that defines all the different rights to do something in the network.
+  comment: Right is the enum that defines all the different rights to do something in the network.
   values:
   - name: right_invalid
     value: 0
   - name: RIGHT_USER_INFO
-    comment: |2
-       The right to view user information.
+    comment: The right to view user information.
     value: 1
   - name: RIGHT_USER_SETTINGS_BASIC
-    comment: |2
-       The right to edit basic user settings.
+    comment: The right to edit basic user settings.
     value: 2
   - name: RIGHT_USER_SETTINGS_API_KEYS
-    comment: |2
-       The right to view and edit user API keys.
+    comment: The right to view and edit user API keys.
     value: 3
   - name: RIGHT_USER_DELETE
-    comment: |2
-       The right to delete user account.
+    comment: The right to delete user account.
     value: 4
   - name: RIGHT_USER_AUTHORIZED_CLIENTS
-    comment: |2
-       The right to view and edit authorized OAuth clients of the user.
+    comment: The right to view and edit authorized OAuth clients of the user.
     value: 5
   - name: RIGHT_USER_APPLICATIONS_LIST
-    comment: |2
-       The right to list applications the user is a collaborator of.
+    comment: The right to list applications the user is a collaborator of.
     value: 6
   - name: RIGHT_USER_APPLICATIONS_CREATE
-    comment: |2
-       The right to create an application under the user account.
+    comment: The right to create an application under the user account.
     value: 7
   - name: RIGHT_USER_GATEWAYS_LIST
-    comment: |2
-       The right to list gateways the user is a collaborator of.
+    comment: The right to list gateways the user is a collaborator of.
     value: 8
   - name: RIGHT_USER_GATEWAYS_CREATE
-    comment: |2
-       The right to create a gateway under the account of the user.
+    comment: The right to create a gateway under the account of the user.
     value: 9
   - name: RIGHT_USER_CLIENTS_LIST
-    comment: |2
-       The right to list OAuth clients the user is a collaborator of.
+    comment: The right to list OAuth clients the user is a collaborator of.
     value: 10
   - name: RIGHT_USER_CLIENTS_CREATE
-    comment: |2
-       The right to create an OAuth client under the account of the user.
+    comment: The right to create an OAuth client under the account of the user.
     value: 11
   - name: RIGHT_USER_ORGANIZATIONS_LIST
-    comment: |2
-       The right to list organizations the user is a member of.
+    comment: The right to list organizations the user is a member of.
     value: 12
   - name: RIGHT_USER_ORGANIZATIONS_CREATE
-    comment: |2
-       The right to create an organization under the user account.
+    comment: The right to create an organization under the user account.
     value: 13
   - name: RIGHT_USER_ALL
-    comment: |2
-       The pseudo-right for all (current and future) user rights.
+    comment: The pseudo-right for all (current and future) user rights.
     value: 14
   - name: RIGHT_APPLICATION_INFO
-    comment: |2
-       The right to view application information.
+    comment: The right to view application information.
     value: 15
   - name: RIGHT_APPLICATION_SETTINGS_BASIC
-    comment: |2
-       The right to edit basic application settings.
+    comment: The right to edit basic application settings.
     value: 16
   - name: RIGHT_APPLICATION_SETTINGS_API_KEYS
-    comment: |2
-       The right to view and edit application API keys.
+    comment: The right to view and edit application API keys.
     value: 17
   - name: RIGHT_APPLICATION_SETTINGS_COLLABORATORS
-    comment: |2
-       The right to view and edit application collaborators.
+    comment: The right to view and edit application collaborators.
     value: 18
   - name: RIGHT_APPLICATION_SETTINGS_PACKAGES
-    comment: |2
-       The right to view and edit application packages and associations.
+    comment: The right to view and edit application packages and associations.
     value: 56
   - name: RIGHT_APPLICATION_DELETE
-    comment: |2
-       The right to delete application.
+    comment: The right to delete application.
     value: 19
   - name: RIGHT_APPLICATION_DEVICES_READ
-    comment: |2
-       The right to view devices in application.
+    comment: The right to view devices in application.
     value: 20
   - name: RIGHT_APPLICATION_DEVICES_WRITE
-    comment: |2
-       The right to create devices in application.
+    comment: The right to create devices in application.
     value: 21
   - name: RIGHT_APPLICATION_DEVICES_READ_KEYS
-    comment: |2
-       The right to view device keys in application.
-       Note that keys may not be stored in a way that supports viewing them.
+    comment: |-
+      The right to view device keys in application.
+      Note that keys may not be stored in a way that supports viewing them.
     value: 22
   - name: RIGHT_APPLICATION_DEVICES_WRITE_KEYS
-    comment: |2
-       The right to edit device keys in application.
+    comment: The right to edit device keys in application.
     value: 23
   - name: RIGHT_APPLICATION_TRAFFIC_READ
-    comment: |2
-       The right to read application traffic (uplink and downlink).
+    comment: The right to read application traffic (uplink and downlink).
     value: 24
   - name: RIGHT_APPLICATION_TRAFFIC_UP_WRITE
-    comment: |2
-       The right to write uplink application traffic.
+    comment: The right to write uplink application traffic.
     value: 25
   - name: RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE
-    comment: |2
-       The right to write downlink application traffic.
+    comment: The right to write downlink application traffic.
     value: 26
   - name: RIGHT_APPLICATION_LINK
-    comment: |2
-       The right to link as Application to a Network Server for traffic exchange,
-       i.e. read uplink and write downlink (API keys only).
-       This right is typically only given to an Application Server.
-       This right implies RIGHT_APPLICATION_INFO.
+    comment: |-
+      The right to link as Application to a Network Server for traffic exchange,
+      i.e. read uplink and write downlink (API keys only).
+      This right is typically only given to an Application Server.
+      This right implies RIGHT_APPLICATION_INFO.
     value: 27
   - name: RIGHT_APPLICATION_ALL
-    comment: |2
-       The pseudo-right for all (current and future) application rights.
+    comment: The pseudo-right for all (current and future) application rights.
     value: 28
   - name: RIGHT_CLIENT_ALL
-    comment: |2
-       The pseudo-right for all (current and future) OAuth client rights.
+    comment: The pseudo-right for all (current and future) OAuth client rights.
     value: 29
   - name: RIGHT_GATEWAY_INFO
-    comment: |2
-       The right to view gateway information.
+    comment: The right to view gateway information.
     value: 30
   - name: RIGHT_GATEWAY_SETTINGS_BASIC
-    comment: |2
-       The right to edit basic gateway settings.
+    comment: The right to edit basic gateway settings.
     value: 31
   - name: RIGHT_GATEWAY_SETTINGS_API_KEYS
-    comment: |2
-       The right to view and edit gateway API keys.
+    comment: The right to view and edit gateway API keys.
     value: 32
   - name: RIGHT_GATEWAY_SETTINGS_COLLABORATORS
-    comment: |2
-       The right to view and edit gateway collaborators.
+    comment: The right to view and edit gateway collaborators.
     value: 33
   - name: RIGHT_GATEWAY_DELETE
-    comment: |2
-       The right to delete gateway.
+    comment: The right to delete gateway.
     value: 34
   - name: RIGHT_GATEWAY_TRAFFIC_READ
-    comment: |2
-       The right to read gateway traffic.
+    comment: The right to read gateway traffic.
     value: 35
   - name: RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE
-    comment: |2
-       The right to write downlink gateway traffic.
+    comment: The right to write downlink gateway traffic.
     value: 36
   - name: RIGHT_GATEWAY_LINK
-    comment: |2
-       The right to link as Gateway to a Gateway Server for traffic exchange,
-       i.e. write uplink and read downlink (API keys only)
-       This right is typically only given to a gateway.
-       This right implies RIGHT_GATEWAY_INFO.
+    comment: |-
+      The right to link as Gateway to a Gateway Server for traffic exchange,
+      i.e. write uplink and read downlink (API keys only)
+      This right is typically only given to a gateway.
+      This right implies RIGHT_GATEWAY_INFO.
     value: 37
   - name: RIGHT_GATEWAY_STATUS_READ
-    comment: |2
-       The right to view gateway status.
+    comment: The right to view gateway status.
     value: 38
   - name: RIGHT_GATEWAY_LOCATION_READ
-    comment: |2
-       The right to view view gateway location.
+    comment: The right to view view gateway location.
     value: 39
   - name: RIGHT_GATEWAY_ALL
-    comment: |2
-       The pseudo-right for all (current and future) gateway rights.
+    comment: The pseudo-right for all (current and future) gateway rights.
     value: 40
   - name: RIGHT_ORGANIZATION_INFO
-    comment: |2
-       The right to view organization information.
+    comment: The right to view organization information.
     value: 41
   - name: RIGHT_ORGANIZATION_SETTINGS_BASIC
-    comment: |2
-       The right to edit basic organization settings.
+    comment: The right to edit basic organization settings.
     value: 42
   - name: RIGHT_ORGANIZATION_SETTINGS_API_KEYS
-    comment: |2
-       The right to view and edit organization API keys.
+    comment: The right to view and edit organization API keys.
     value: 43
   - name: RIGHT_ORGANIZATION_SETTINGS_MEMBERS
-    comment: |2
-       The right to view and edit organization members.
+    comment: The right to view and edit organization members.
     value: 44
   - name: RIGHT_ORGANIZATION_DELETE
-    comment: |2
-       The right to delete organization.
+    comment: The right to delete organization.
     value: 45
   - name: RIGHT_ORGANIZATION_APPLICATIONS_LIST
-    comment: |2
-       The right to list the applications the organization is a collaborator of.
+    comment: The right to list the applications the organization is a collaborator of.
     value: 46
   - name: RIGHT_ORGANIZATION_APPLICATIONS_CREATE
-    comment: |2
-       The right to create an application under the organization.
+    comment: The right to create an application under the organization.
     value: 47
   - name: RIGHT_ORGANIZATION_GATEWAYS_LIST
-    comment: |2
-       The right to list the gateways the organization is a collaborator of.
+    comment: The right to list the gateways the organization is a collaborator of.
     value: 48
   - name: RIGHT_ORGANIZATION_GATEWAYS_CREATE
-    comment: |2
-       The right to create a gateway under the organization.
+    comment: The right to create a gateway under the organization.
     value: 49
   - name: RIGHT_ORGANIZATION_CLIENTS_LIST
-    comment: |2
-       The right to list the OAuth clients the organization is a collaborator of.
+    comment: The right to list the OAuth clients the organization is a collaborator of.
     value: 50
   - name: RIGHT_ORGANIZATION_CLIENTS_CREATE
-    comment: |2
-       The right to create an OAuth client under the organization.
+    comment: The right to create an OAuth client under the organization.
     value: 51
   - name: RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR
-    comment: |2
-       The right to add the organization as a collaborator on an existing entity.
+    comment: The right to add the organization as a collaborator on an existing entity.
     value: 52
   - name: RIGHT_ORGANIZATION_ALL
-    comment: |2
-       The pseudo-right for all (current and future) organization rights.
+    comment: The pseudo-right for all (current and future) organization rights.
     value: 53
   - name: RIGHT_SEND_INVITES
-    comment: |2
-       The right to send invites to new users.
-       Note that this is not prefixed with "USER_"; it is not a right on the user entity.
+    comment: |-
+      The right to send invites to new users.
+      Note that this is not prefixed with "USER_"; it is not a right on the user entity.
     value: 54
   - name: RIGHT_ALL
-    comment: |2
-       The pseudo-right for all (current and future) possible rights.
+    comment: The pseudo-right for all (current and future) possible rights.
     value: 55
 RxDelay:
   name: RxDelay
   values:
   - name: RX_DELAY_0
+    comment: 1 second.
     value: 0
   - name: RX_DELAY_1
+    comment: 1 second.
     value: 1
   - name: RX_DELAY_2
+    comment: 2 seconds.
     value: 2
   - name: RX_DELAY_3
+    comment: 3 seconds.
     value: 3
   - name: RX_DELAY_4
+    comment: 4 seconds.
     value: 4
   - name: RX_DELAY_5
+    comment: 5 seconds.
     value: 5
   - name: RX_DELAY_6
+    comment: 6 seconds.
     value: 6
   - name: RX_DELAY_7
+    comment: 7 seconds.
     value: 7
   - name: RX_DELAY_8
+    comment: 8 seconds.
     value: 8
   - name: RX_DELAY_9
+    comment: 9 seconds.
     value: 9
   - name: RX_DELAY_10
+    comment: 10 seconds.
     value: 10
   - name: RX_DELAY_11
+    comment: 11 seconds.
     value: 11
   - name: RX_DELAY_12
+    comment: 12 seconds.
     value: 12
   - name: RX_DELAY_13
+    comment: 13 seconds.
     value: 13
   - name: RX_DELAY_14
+    comment: 14 seconds.
     value: 14
   - name: RX_DELAY_15
+    comment: 15 seconds.
     value: 15
 State:
   name: State
-  comment: |2
-     State enum defines states that an entity can be in.
+  comment: State enum defines states that an entity can be in.
   values:
   - name: STATE_REQUESTED
-    comment: |2
-       Denotes that the entity has been requested and is pending review by an admin.
+    comment: Denotes that the entity has been requested and is pending review by an admin.
     value: 0
   - name: STATE_APPROVED
-    comment: |2
-       Denotes that the entity has been reviewed and approved by an admin.
+    comment: Denotes that the entity has been reviewed and approved by an admin.
     value: 1
   - name: STATE_REJECTED
-    comment: |2
-       Denotes that the entity has been reviewed and rejected by an admin.
+    comment: Denotes that the entity has been reviewed and rejected by an admin.
     value: 2
   - name: STATE_FLAGGED
-    comment: |2
-       Denotes that the entity has been flagged and is pending review by an admin.
+    comment: Denotes that the entity has been flagged and is pending review by an admin.
     value: 3
   - name: STATE_SUSPENDED
-    comment: |2
-       Denotes that the entity has been reviewed and suspended by an admin.
+    comment: Denotes that the entity has been reviewed and suspended by an admin.
     value: 4
 TxAcknowledgment.Result:
   name: TxAcknowledgment.Result

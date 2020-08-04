@@ -36,14 +36,16 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type Organization struct {
 	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
-	CreatedAt               time.Time         `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
-	UpdatedAt               time.Time         `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
-	Name                    string            `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Description             string            `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	Attributes              map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	ContactInfo             []*ContactInfo    `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
-	XXX_NoUnkeyedLiteral    struct{}          `json:"-"`
-	XXX_sizecache           int32             `json:"-"`
+	CreatedAt               time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt               time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
+	Name                    string    `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Description             string    `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	// Key-value attributes for this organization. Typically used for organizing organizations or for storing integration-specific data.
+	Attributes map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization.
+	ContactInfo          []*ContactInfo `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *Organization) Reset()      { *m = Organization{} }
@@ -167,9 +169,10 @@ func (m *Organizations) GetOrganizations() []*Organization {
 
 type GetOrganizationRequest struct {
 	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,proto3,embedded=organization_ids" json:"organization_ids"`
-	FieldMask               types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
-	XXX_NoUnkeyedLiteral    struct{}        `json:"-"`
-	XXX_sizecache           int32           `json:"-"`
+	// The names of the organization fields that should be returned.
+	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
 func (m *GetOrganizationRequest) Reset()      { *m = GetOrganizationRequest{} }
@@ -212,10 +215,14 @@ func (m *GetOrganizationRequest) GetFieldMask() types.FieldMask {
 }
 
 type ListOrganizationsRequest struct {
+	// By default we list all organizations the caller has rights on.
+	// Set the user to instead list the organizations
+	// where the user or organization is collaborator on.
 	// NOTE: It is currently not possible to have organizations collaborating on
 	// other organizations.
 	Collaborator *OrganizationOrUserIdentifiers `protobuf:"bytes,1,opt,name=collaborator,proto3" json:"collaborator,omitempty"`
-	FieldMask    types.FieldMask                `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
+	// The names of the organization fields that should be returned.
+	FieldMask types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	// Order the results by this field path (must be present in the field mask).
 	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
 	Order string `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
@@ -344,7 +351,8 @@ func (m *CreateOrganizationRequest) GetCollaborator() OrganizationOrUserIdentifi
 }
 
 type UpdateOrganizationRequest struct {
-	Organization         `protobuf:"bytes,1,opt,name=organization,proto3,embedded=organization" json:"organization"`
+	Organization `protobuf:"bytes,1,opt,name=organization,proto3,embedded=organization" json:"organization"`
+	// The names of the organization fields that should be updated.
 	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`

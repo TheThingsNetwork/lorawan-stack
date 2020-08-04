@@ -34,7 +34,11 @@ message Application {
 
   string name = 4 [(validate.rules).string.max_len = 50];
   string description = 5 [(validate.rules).string.max_len = 2000];
+
+  // Key-value attributes for this application. Typically used for organizing applications or for storing integration-specific data.
   map<string,string> attributes = 6 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
+
+  // Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.
   repeated ContactInfo contact_info = 7;
 }
 
@@ -44,6 +48,7 @@ message Applications {
 
 message GetApplicationRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the application fields that should be returned.
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
@@ -51,8 +56,8 @@ message ListApplicationsRequest {
   // By default we list all applications the caller has rights on.
   // Set the user or the organization (not both) to instead list the applications
   // where the user or organization is collaborator on.
-
   OrganizationOrUserIdentifiers collaborator = 1;
+  // The names of the application fields that should be returned.
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
@@ -73,6 +78,7 @@ message CreateApplicationRequest {
 
 message UpdateApplicationRequest {
   Application application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the application fields that should be updated.
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 

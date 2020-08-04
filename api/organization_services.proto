@@ -34,16 +34,20 @@ service OrganizationRegistry {
     };
   };
 
-  // Get the organization with the given identifiers, selecting the fields given
-  // by the field mask. The method may return more or less fields, depending on
-  // the rights of the caller.
+  // Get the organization with the given identifiers, selecting the fields specified
+  // in the field mask.
+  // More or less fields may be returned, depending on the rights of the caller.
   rpc Get(GetOrganizationRequest) returns (Organization) {
     option (google.api.http) = {
       get: "/organizations/{organization_ids.organization_id}"
     };
   };
 
-  // List organizations. See request message for details.
+  // List organizations where the given user or organization is a direct collaborator.
+  // If no user or organization is given, this returns the organizations the caller
+  // has access to.
+  // Similar to Get, this selects the fields given by the field mask.
+  // More or less fields may be returned, depending on the rights of the caller.
   rpc List(ListOrganizationsRequest) returns (Organizations) {
     option (google.api.http) = {
       get: "/organizations"
@@ -53,6 +57,7 @@ service OrganizationRegistry {
     };
   };
 
+  // Update the organization, changing the fields specified by the field mask to the provided values.
   rpc Update(UpdateOrganizationRequest) returns (Organization) {
     option (google.api.http) = {
       put: "/organizations/{organization.ids.organization_id}"
@@ -60,6 +65,7 @@ service OrganizationRegistry {
     };
   };
 
+  // Delete the organization. This may not release the organization ID for reuse.
   rpc Delete(OrganizationIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/organizations/{organization_id}"
@@ -68,12 +74,16 @@ service OrganizationRegistry {
 }
 
 service OrganizationAccess {
+  // List the rights the caller has on this organization.
   rpc ListRights(OrganizationIdentifiers) returns (Rights) {
     option (google.api.http) = {
       get: "/organizations/{organization_id}/rights"
     };
   };
 
+  // Create an API key scoped to this organization.
+  // Organization API keys can give access to the organization itself, as well as
+  // any application, gateway and OAuth client this organization is a collaborator of.
   rpc CreateAPIKey(CreateOrganizationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       post: "/organizations/{organization_ids.organization_id}/api-keys"
@@ -81,21 +91,23 @@ service OrganizationAccess {
     };
   };
 
+  // List the API keys for this organization.
   rpc ListAPIKeys(ListOrganizationAPIKeysRequest) returns (APIKeys) {
     option (google.api.http) = {
       get: "/organizations/{organization_ids.organization_id}/api-keys"
     };
   };
 
+  // Get a single API key of this organization.
   rpc GetAPIKey(GetOrganizationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       get: "/organizations/{organization_ids.organization_id}/api-keys/{key_id}"
     };
   };
 
-  // Update the rights of an existing organization API key. To generate an API key,
-  // the CreateAPIKey should be used. To delete an API key, update it
-  // with zero rights. It is required for the caller to have all assigned or/and removed rights.
+  // Update the rights of an API key of the organization.
+  // This method can also be used to delete the API key, by giving it no rights.
+  // The caller is required to have all assigned or/and removed rights.
   rpc UpdateAPIKey(UpdateOrganizationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       put: "/organizations/{organization_ids.organization_id}/api-keys/{api_key.id}"
@@ -107,17 +119,17 @@ service OrganizationAccess {
   // Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
   rpc GetCollaborator(GetOrganizationCollaboratorRequest) returns (GetCollaboratorResponse) {
     option (google.api.http) = {
-      get: "/organizations/{organization_ids.organization_id}/collaborator"
       additional_bindings {
         get: "/organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}"
       }
     };
   }
 
-  // Set the rights of a collaborator (member) on the organization. It is required for the caller to
-  // have all assigned or/and removed rights.
-  // Setting a collaborator without rights, removes them.
-  // Note that only users can collaborate (be member of) an organization.
+  // Set the rights of a collaborator (member) on the organization.
+  // Organization collaborators can get access to the organization itself, as well as
+  // any application, gateway and OAuth client this organization is a collaborator of.
+  // This method can also be used to delete the collaborator, by giving them no rights.
+  // The caller is required to have all assigned or/and removed rights.
   rpc SetCollaborator(SetOrganizationCollaboratorRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/organizations/{organization_ids.organization_id}/collaborators"
@@ -125,6 +137,7 @@ service OrganizationAccess {
     };
   };
 
+  // List the collaborators on this organization.
   rpc ListCollaborators(ListOrganizationCollaboratorsRequest) returns (Collaborators) {
     option (google.api.http) = {
       get: "/organizations/{organization_ids.organization_id}/collaborators"
