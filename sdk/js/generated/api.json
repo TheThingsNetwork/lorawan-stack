@@ -18876,6 +18876,16 @@
               "fullType": "google.protobuf.Timestamp",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "concentrator_time",
+              "description": "Absolute concentrator time as observed by the Gateway Server, accounting for rollovers.",
+              "label": "",
+              "type": "int64",
+              "longType": "int64",
+              "fullType": "int64",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         }
