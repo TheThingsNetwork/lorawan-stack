@@ -117,6 +117,7 @@ func CleanDownlinks(items []*ttnpb.ApplicationDownlink) []*ttnpb.ApplicationDown
 	for _, item := range items {
 		res = append(res, &ttnpb.ApplicationDownlink{
 			FPort:          item.FPort,
+			FCnt:           item.FCnt, // FCnt must be set when skipping application payload crypto.
 			FRMPayload:     item.FRMPayload,
 			DecodedPayload: item.DecodedPayload,
 			ClassBC:        item.ClassBC,

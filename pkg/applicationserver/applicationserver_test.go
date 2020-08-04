@@ -2333,10 +2333,12 @@ func TestSkipPayloadCrypto(t *testing.T) {
 						{
 							{
 								FPort:      11,
+								FCnt:       1,
 								FRMPayload: []byte{0x1, 0x1, 0x1},
 							},
 							{
 								FPort:      22,
+								FCnt:       2,
 								FRMPayload: []byte{0x2, 0x2, 0x2},
 							},
 						},

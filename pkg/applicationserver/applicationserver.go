@@ -345,10 +345,14 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			var encryptedItems []*ttnpb.ApplicationDownlink
 			for _, session := range sessions {
 				for _, item := range items {
+					fCnt := session.LastAFCntDown + 1
+					if skipPayloadCrypto(link, dev) {
+						fCnt = item.FCnt
+					}
 					encryptedItem := &ttnpb.ApplicationDownlink{
 						SessionKeyID:   session.SessionKeyID,
 						FPort:          item.FPort,
-						FCnt:           session.LastAFCntDown + 1,
+						FCnt:           fCnt,
 						FRMPayload:     item.FRMPayload,
 						DecodedPayload: item.DecodedPayload,
 						Confirmed:      item.Confirmed,
