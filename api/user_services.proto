@@ -42,12 +42,15 @@ service UserRegistry {
     };
   };
 
+  // List users of the network. This method is typically restricted to admins only.
   rpc List(ListUsersRequest) returns (Users) {
     option (google.api.http) = {
       get: "/users"
     };
   };
 
+  // Update the user, changing the fields specified by the field mask to the provided values.
+  // This method can not be used to change the password, see the UpdatePassword method for that.
   rpc Update(UpdateUserRequest) returns (User) {
     option (google.api.http) = {
       put: "/users/{user.ids.user_id}"
@@ -63,6 +66,7 @@ service UserRegistry {
     };
   }
 
+  // Update the password of the user.
   rpc UpdatePassword(UpdateUserPasswordRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/{user_ids.user_id}/password"
@@ -70,6 +74,7 @@ service UserRegistry {
     };
   }
 
+  // Delete the user. This may not release the user ID for reuse.
   rpc Delete(UserIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/users/{user_id}"
@@ -78,12 +83,16 @@ service UserRegistry {
 }
 
 service UserAccess {
+  // List the rights the caller has on this user.
   rpc ListRights(UserIdentifiers) returns (Rights) {
     option (google.api.http) = {
       get: "/users/{user_id}/rights"
     };
   };
 
+  // Create an API key scoped to this user.
+  // User API keys can give access to the user itself, as well as
+  // any organization, application, gateway and OAuth client this user is a collaborator of.
   rpc CreateAPIKey(CreateUserAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       post: "/users/{user_ids.user_id}/api-keys"
@@ -91,21 +100,23 @@ service UserAccess {
     };
   };
 
+  // List the API keys for this user.
   rpc ListAPIKeys(ListUserAPIKeysRequest) returns (APIKeys) {
     option (google.api.http) = {
       get: "/users/{user_ids.user_id}/api-keys"
     };
   };
 
+  // Get a single API key of this user.
   rpc GetAPIKey(GetUserAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       get: "/users/{user_ids.user_id}/api-keys/{key_id}"
     };
   };
 
-  // Update the rights of an existing user API key. To generate an API key,
-  // the CreateAPIKey should be used. To delete an API key, update it
-  // with zero rights. It is required for the caller to have all assigned or/and removed rights.
+  // Update the rights of an API key of the user.
+  // This method can also be used to delete the API key, by giving it no rights.
+  // The caller is required to have all assigned or/and removed rights.
   rpc UpdateAPIKey(UpdateUserAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       put: "/users/{user_ids.user_id}/api-keys/{api_key.id}"
@@ -115,6 +126,7 @@ service UserAccess {
 }
 
 service UserInvitationRegistry {
+  // Invite a user to join the network.
   rpc Send(SendInvitationRequest) returns (Invitation) {
     option (google.api.http) = {
       post: "/invitations"
@@ -122,12 +134,14 @@ service UserInvitationRegistry {
     };
   };
 
+  // List the invitations the caller has sent.
   rpc List(ListInvitationsRequest) returns (Invitations) {
     option (google.api.http) = {
       get: "/invitations"
     };
   };
 
+  // Delete (revoke) a user invitation.
   rpc Delete(DeleteInvitationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/invitations"
@@ -136,11 +150,13 @@ service UserInvitationRegistry {
 }
 
 service UserSessionRegistry {
+  // List the active sessions for the given user.
   rpc List(ListUserSessionsRequest) returns (UserSessions) {
     option (google.api.http) = {
       get: "/users/{user_ids.user_id}/sessions"
     };
   };
+  // Delete (revoke) the given user session.
   rpc Delete(UserSessionIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/users/{user_ids.user_id}/sessions/{session_id}"

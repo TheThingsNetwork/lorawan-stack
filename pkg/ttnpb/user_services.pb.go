@@ -113,12 +113,17 @@ type UserRegistryClient interface {
 	// field mask. The method may return more or less fields, depending on the rights
 	// of the caller.
 	Get(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
+	// List users of the network. This method is typically restricted to admins only.
 	List(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*Users, error)
+	// Update the user, changing the fields specified by the field mask to the provided values.
+	// This method can not be used to change the password, see the UpdatePassword method for that.
 	Update(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*User, error)
 	// Create a temporary password that can be used for updating a forgotten password.
 	// The generated password is sent to the user's email address.
 	CreateTemporaryPassword(ctx context.Context, in *CreateTemporaryPasswordRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	// Update the password of the user.
 	UpdatePassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	// Delete the user. This may not release the user ID for reuse.
 	Delete(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
@@ -201,12 +206,17 @@ type UserRegistryServer interface {
 	// field mask. The method may return more or less fields, depending on the rights
 	// of the caller.
 	Get(context.Context, *GetUserRequest) (*User, error)
+	// List users of the network. This method is typically restricted to admins only.
 	List(context.Context, *ListUsersRequest) (*Users, error)
+	// Update the user, changing the fields specified by the field mask to the provided values.
+	// This method can not be used to change the password, see the UpdatePassword method for that.
 	Update(context.Context, *UpdateUserRequest) (*User, error)
 	// Create a temporary password that can be used for updating a forgotten password.
 	// The generated password is sent to the user's email address.
 	CreateTemporaryPassword(context.Context, *CreateTemporaryPasswordRequest) (*types.Empty, error)
+	// Update the password of the user.
 	UpdatePassword(context.Context, *UpdateUserPasswordRequest) (*types.Empty, error)
+	// Delete the user. This may not release the user ID for reuse.
 	Delete(context.Context, *UserIdentifiers) (*types.Empty, error)
 }
 
@@ -407,13 +417,19 @@ var _UserRegistry_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type UserAccessClient interface {
+	// List the rights the caller has on this user.
 	ListRights(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*Rights, error)
+	// Create an API key scoped to this user.
+	// User API keys can give access to the user itself, as well as
+	// any organization, application, gateway and OAuth client this user is a collaborator of.
 	CreateAPIKey(ctx context.Context, in *CreateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
+	// List the API keys for this user.
 	ListAPIKeys(ctx context.Context, in *ListUserAPIKeysRequest, opts ...grpc.CallOption) (*APIKeys, error)
+	// Get a single API key of this user.
 	GetAPIKey(ctx context.Context, in *GetUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
-	// Update the rights of an existing user API key. To generate an API key,
-	// the CreateAPIKey should be used. To delete an API key, update it
-	// with zero rights. It is required for the caller to have all assigned or/and removed rights.
+	// Update the rights of an API key of the user.
+	// This method can also be used to delete the API key, by giving it no rights.
+	// The caller is required to have all assigned or/and removed rights.
 	UpdateAPIKey(ctx context.Context, in *UpdateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 }
 
@@ -472,13 +488,19 @@ func (c *userAccessClient) UpdateAPIKey(ctx context.Context, in *UpdateUserAPIKe
 
 // UserAccessServer is the server API for UserAccess service.
 type UserAccessServer interface {
+	// List the rights the caller has on this user.
 	ListRights(context.Context, *UserIdentifiers) (*Rights, error)
+	// Create an API key scoped to this user.
+	// User API keys can give access to the user itself, as well as
+	// any organization, application, gateway and OAuth client this user is a collaborator of.
 	CreateAPIKey(context.Context, *CreateUserAPIKeyRequest) (*APIKey, error)
+	// List the API keys for this user.
 	ListAPIKeys(context.Context, *ListUserAPIKeysRequest) (*APIKeys, error)
+	// Get a single API key of this user.
 	GetAPIKey(context.Context, *GetUserAPIKeyRequest) (*APIKey, error)
-	// Update the rights of an existing user API key. To generate an API key,
-	// the CreateAPIKey should be used. To delete an API key, update it
-	// with zero rights. It is required for the caller to have all assigned or/and removed rights.
+	// Update the rights of an API key of the user.
+	// This method can also be used to delete the API key, by giving it no rights.
+	// The caller is required to have all assigned or/and removed rights.
 	UpdateAPIKey(context.Context, *UpdateUserAPIKeyRequest) (*APIKey, error)
 }
 
@@ -629,8 +651,11 @@ var _UserAccess_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type UserInvitationRegistryClient interface {
+	// Invite a user to join the network.
 	Send(ctx context.Context, in *SendInvitationRequest, opts ...grpc.CallOption) (*Invitation, error)
+	// List the invitations the caller has sent.
 	List(ctx context.Context, in *ListInvitationsRequest, opts ...grpc.CallOption) (*Invitations, error)
+	// Delete (revoke) a user invitation.
 	Delete(ctx context.Context, in *DeleteInvitationRequest, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
@@ -671,8 +696,11 @@ func (c *userInvitationRegistryClient) Delete(ctx context.Context, in *DeleteInv
 
 // UserInvitationRegistryServer is the server API for UserInvitationRegistry service.
 type UserInvitationRegistryServer interface {
+	// Invite a user to join the network.
 	Send(context.Context, *SendInvitationRequest) (*Invitation, error)
+	// List the invitations the caller has sent.
 	List(context.Context, *ListInvitationsRequest) (*Invitations, error)
+	// Delete (revoke) a user invitation.
 	Delete(context.Context, *DeleteInvitationRequest) (*types.Empty, error)
 }
 
@@ -773,7 +801,9 @@ var _UserInvitationRegistry_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type UserSessionRegistryClient interface {
+	// List the active sessions for the given user.
 	List(ctx context.Context, in *ListUserSessionsRequest, opts ...grpc.CallOption) (*UserSessions, error)
+	// Delete (revoke) the given user session.
 	Delete(ctx context.Context, in *UserSessionIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
@@ -805,7 +835,9 @@ func (c *userSessionRegistryClient) Delete(ctx context.Context, in *UserSessionI
 
 // UserSessionRegistryServer is the server API for UserSessionRegistry service.
 type UserSessionRegistryServer interface {
+	// List the active sessions for the given user.
 	List(context.Context, *ListUserSessionsRequest) (*UserSessions, error)
+	// Delete (revoke) the given user session.
 	Delete(context.Context, *UserSessionIdentifiers) (*types.Empty, error)
 }
 
