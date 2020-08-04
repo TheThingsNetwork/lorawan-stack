@@ -276,7 +276,7 @@ type Options struct {
 }
 
 // ScheduleAt attempts to schedule the given Tx settings with the given priority.
-// If there are round-trip times available, the maximum value will be used instead of ScheduleTimeShort.
+// If there are round-trip times available, the nth percentile (n = scheduleLateRTTPercentile) value will be used instead of ScheduleTimeShort.
 func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, error) {
 	defer trace.StartRegion(ctx, "schedule transmission").End()
 
@@ -292,7 +292,7 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, err
 	var medianRTT *time.Duration
 	if opts.RTTs != nil {
 		if _, _, median, np, n := opts.RTTs.Stats(scheduleLateRTTPercentile, s.timeSource.Now()); n >= scheduleMinRTTCount {
-			minScheduleTime = np + QueueDelay
+			minScheduleTime = np/2 + QueueDelay
 			medianRTT = &median
 		}
 	}
