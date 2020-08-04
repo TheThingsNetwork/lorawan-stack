@@ -25,6 +25,19 @@ headers:
 
 If the user has filled in the value of `token` with `Zpdc7jWMvYzVTeNQ`, then the resulting webhook will contain a header named `Authorization` with the value `Bearer Zpdc7jWMvYzVTeNQ`.
 
+Keep in mind that if you need to use a field directly as header value, you should wrap it with hyphens as follows:
+
+```yaml
+headers:
+- Authorization: "{token}"
+```
+
+If the webhook template is to be defined without header entries, define the `headers` field as follows:
+
+```yaml
+headers: {}
+```
+
 ## Instantiation of URLs and Paths
 
 The fields are replaced inside the URLs and the paths according to the [RFC6570](https://tools.ietf.org/html/rfc6570) format. Consider the following fragment of a webhook template, describing the available template fields and the paths of the endpoint.
