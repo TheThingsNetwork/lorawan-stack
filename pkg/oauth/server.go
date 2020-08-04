@@ -220,7 +220,7 @@ func (s *server) RegisterRoutes(server *web.Server) {
 		}),
 	)
 
-	csrfMiddleware := middleware.CSRF("_csrf", s.config.Mount, s.config.CSRFAuthKey)
+	csrfMiddleware := middleware.CSRF("_csrf", "/", s.config.CSRFAuthKey)
 
 	api := root.Group("/api", csrfMiddleware)
 	api.POST("/auth/login", s.Login)

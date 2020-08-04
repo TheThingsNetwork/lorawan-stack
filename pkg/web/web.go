@@ -226,7 +226,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 	apiRouter.Use(
 		mux.MiddlewareFunc(webmiddleware.CookieAuth("_session")),
 		mux.MiddlewareFunc(webmiddleware.Conditional(
-			webmiddleware.CSRF(hashKey, csrf.CookieName("_csrf"), csrf.Path("/api"), csrf.SameSite(csrf.SameSiteStrictMode)),
+			webmiddleware.CSRF(hashKey, csrf.CookieName("_csrf"), csrf.Path("/"), csrf.SameSite(csrf.SameSiteStrictMode)),
 			csrfSkip,
 		)),
 		mux.MiddlewareFunc(

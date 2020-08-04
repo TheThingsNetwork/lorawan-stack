@@ -32,16 +32,16 @@ const instance = axios.create({
 export default {
   users: {
     async register(userData) {
-      return axios.post(`${isBaseUrl}/users`, userData)
+      return instance.post(`${isBaseUrl}/users`, userData)
     },
     async resetPassword(user_id) {
-      return axios.post(`${isBaseUrl}/users/${user_id}/temporary_password`)
+      return instance.post(`${isBaseUrl}/users/${user_id}/temporary_password`)
     },
     async updatePassword(user_id, passwordData) {
-      return axios.put(`${isBaseUrl}/users/${user_id}/password`, passwordData)
+      return instance.put(`${isBaseUrl}/users/${user_id}/password`, passwordData)
     },
     async validate(validationData) {
-      return axios.patch(`${isBaseUrl}/contact_info/validation`, validationData)
+      return instance.patch(`${isBaseUrl}/contact_info/validation`, validationData)
     },
   },
   oauth: {
