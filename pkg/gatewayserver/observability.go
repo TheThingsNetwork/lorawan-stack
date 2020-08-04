@@ -27,57 +27,61 @@ import (
 var (
 	evtGatewayConnect = events.Define(
 		"gs.gateway.connect", "connect gateway",
-		ttnpb.RIGHT_GATEWAY_LINK,
-		ttnpb.RIGHT_GATEWAY_STATUS_READ,
+		events.WithVisibility(
+			ttnpb.RIGHT_GATEWAY_LINK,
+			ttnpb.RIGHT_GATEWAY_STATUS_READ,
+		),
 	)
 	evtGatewayDisconnect = events.Define(
 		"gs.gateway.disconnect", "disconnect gateway",
-		ttnpb.RIGHT_GATEWAY_LINK,
-		ttnpb.RIGHT_GATEWAY_STATUS_READ,
+		events.WithVisibility(
+			ttnpb.RIGHT_GATEWAY_LINK,
+			ttnpb.RIGHT_GATEWAY_STATUS_READ,
+		),
 	)
 	evtReceiveStatus = events.Define(
 		"gs.status.receive", "receive gateway status",
-		ttnpb.RIGHT_GATEWAY_STATUS_READ,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
 	)
 	evtForwardStatus = events.Define(
 		"gs.status.forward", "forward gateway status",
-		ttnpb.RIGHT_GATEWAY_STATUS_READ,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
 	)
 	evtDropStatus = events.Define(
 		"gs.status.drop", "drop gateway status",
-		ttnpb.RIGHT_GATEWAY_STATUS_READ,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
 	)
 	evtFailStatus = events.Define(
 		"gs.status.fail", "fail to handle gateway status",
-		ttnpb.RIGHT_GATEWAY_STATUS_READ,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
 	)
 	evtReceiveUp = events.Define(
 		"gs.up.receive", "receive uplink message",
-		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
 	)
 	evtDropUp = events.Define(
 		"gs.up.drop", "drop uplink message",
-		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
 	)
 	evtForwardUp = events.Define(
 		"gs.up.forward", "forward uplink message",
-		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
 	)
 	evtFailUp = events.Define(
 		"gs.up.fail", "fail to handle uplink message",
-		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
 	)
 	evtSendDown = events.Define(
 		"gs.down.send", "send downlink message",
-		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
 	)
 	evtTxSuccessDown = events.Define(
 		"gs.down.tx.success", "transmit downlink message successful",
-		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
 	)
 	evtTxFailureDown = events.Define(
 		"gs.down.tx.fail", "transmit downlink message failure",
-		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
 	)
 )
 
@@ -249,12 +253,12 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 }
 
 func registerGatewayConnect(ctx context.Context, ids ttnpb.GatewayIdentifiers, protocol string) {
-	events.Publish(evtGatewayConnect(ctx, ids, nil))
+	events.Publish(evtGatewayConnect.NewWithIdentifiersAndData(ctx, ids, nil))
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Inc()
 }
 
 func registerGatewayDisconnect(ctx context.Context, ids ttnpb.GatewayIdentifiers, protocol string) {
-	events.Publish(evtGatewayDisconnect(ctx, ids, nil))
+	events.Publish(evtGatewayDisconnect.NewWithIdentifiersAndData(ctx, ids, nil))
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Dec()
 }
 
@@ -267,17 +271,17 @@ func registerUpstreamHandlerStop(ctx context.Context, host string) {
 }
 
 func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, protocol string) {
-	events.Publish(evtReceiveStatus(ctx, gtw, status))
+	events.Publish(evtReceiveStatus.NewWithIdentifiersAndData(ctx, gtw, status))
 	gsMetrics.statusReceived.WithLabelValues(ctx, protocol).Inc()
 }
 
 func registerForwardStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, host string) {
-	events.Publish(evtForwardStatus(ctx, gtw, status))
+	events.Publish(evtForwardStatus.NewWithIdentifiersAndData(ctx, gtw, status))
 	gsMetrics.statusForwarded.WithLabelValues(ctx, host).Inc()
 }
 
 func registerDropStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, host string, err error) {
-	events.Publish(evtDropStatus(ctx, gtw, err))
+	events.Publish(evtDropStatus.NewWithIdentifiersAndData(ctx, gtw, err))
 	if ttnErr, ok := errors.From(err); ok {
 		gsMetrics.statusDropped.WithLabelValues(ctx, host, ttnErr.FullName()).Inc()
 	} else {
@@ -286,22 +290,22 @@ func registerDropStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.G
 }
 
 func registerFailStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, host string) {
-	events.Publish(evtFailStatus(ctx, gtw, status))
+	events.Publish(evtFailStatus.NewWithIdentifiersAndData(ctx, gtw, status))
 	gsMetrics.statusFailed.WithLabelValues(ctx, host).Inc()
 }
 
 func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, protocol string) {
-	events.Publish(evtReceiveUp(ctx, gtw, msg))
+	events.Publish(evtReceiveUp.NewWithIdentifiersAndData(ctx, gtw, msg))
 	gsMetrics.uplinkReceived.WithLabelValues(ctx, protocol).Inc()
 }
 
 func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, host string) {
-	events.Publish(evtForwardUp(ctx, gtw, nil))
+	events.Publish(evtForwardUp.NewWithIdentifiersAndData(ctx, gtw, nil))
 	gsMetrics.uplinkForwarded.WithLabelValues(ctx, host).Inc()
 }
 
 func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, host string, err error) {
-	events.Publish(evtDropUp(ctx, gtw, err))
+	events.Publish(evtDropUp.NewWithIdentifiersAndData(ctx, gtw, err))
 	if ttnErr, ok := errors.From(err); ok {
 		gsMetrics.uplinkDropped.WithLabelValues(ctx, host, ttnErr.FullName()).Inc()
 	} else {
@@ -310,21 +314,21 @@ func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.Upli
 }
 
 func registerFailUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, host string) {
-	events.Publish(evtFailUp(ctx, gtw, nil))
+	events.Publish(evtFailUp.NewWithIdentifiersAndData(ctx, gtw, nil))
 	gsMetrics.uplinkFailed.WithLabelValues(ctx, host).Inc()
 }
 
 func registerSendDownlink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.DownlinkMessage, protocol string) {
-	events.Publish(evtSendDown(ctx, gtw, msg))
+	events.Publish(evtSendDown.NewWithIdentifiersAndData(ctx, gtw, msg))
 	gsMetrics.downlinkSent.WithLabelValues(ctx, protocol).Inc()
 }
 
 func registerSuccessDownlink(ctx context.Context, gtw *ttnpb.Gateway, protocol string) {
-	events.Publish(evtTxSuccessDown(ctx, gtw, nil))
+	events.Publish(evtTxSuccessDown.NewWithIdentifiersAndData(ctx, gtw, nil))
 	gsMetrics.downlinkSent.WithLabelValues(ctx, protocol).Inc()
 }
 
 func registerFailDownlink(ctx context.Context, gtw *ttnpb.Gateway, ack *ttnpb.TxAcknowledgment, protocol string) {
-	events.Publish(evtTxFailureDown(ctx, gtw, ack.Result))
+	events.Publish(evtTxFailureDown.NewWithIdentifiersAndData(ctx, gtw, ack.Result))
 	gsMetrics.downlinkTxFailed.WithLabelValues(ctx, protocol).Inc()
 }

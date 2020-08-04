@@ -27,13 +27,13 @@ var (
 	evtEnqueueRekeyConfirmation = defineEnqueueMACConfirmationEvent("rekey", "device rekey")()
 )
 
-func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RekeyInd, devAddr types.DevAddr) ([]events.DefinitionDataClosure, error) {
+func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RekeyInd, devAddr types.DevAddr) (events.Builders, error) {
 	if pld == nil {
 		return nil, errNoPayload.New()
 	}
 
-	evs := []events.DefinitionDataClosure{
-		evtReceiveRekeyIndication.BindData(pld),
+	evs := events.Builders{
+		evtReceiveRekeyIndication.With(events.WithData(pld)),
 	}
 	if !dev.SupportsJoin {
 		return evs, nil
@@ -52,6 +52,6 @@ func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, conf.MACCommand())
 	return append(evs,
-		evtEnqueueRekeyConfirmation.BindData(conf),
+		evtEnqueueRekeyConfirmation.With(events.WithData(conf)),
 	), nil
 }

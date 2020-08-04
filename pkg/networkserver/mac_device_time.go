@@ -26,13 +26,13 @@ var (
 	evtEnqueueDeviceTimeAnswer  = defineEnqueueMACAnswerEvent("device_time", "device time")()
 )
 
-func handleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) ([]events.DefinitionDataClosure, error) {
+func handleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) (events.Builders, error) {
 	ans := &ttnpb.MACCommand_DeviceTimeAns{
 		Time: msg.ReceivedAt,
 	}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ans.MACCommand())
-	return []events.DefinitionDataClosure{
-		evtReceiveDeviceTimeRequest.BindData(nil),
-		evtEnqueueDeviceTimeAnswer.BindData(ans),
+	return events.Builders{
+		evtReceiveDeviceTimeRequest,
+		evtEnqueueDeviceTimeAnswer.With(events.WithData(ans)),
 	}, nil
 }

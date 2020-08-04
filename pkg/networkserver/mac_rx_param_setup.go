@@ -46,7 +46,7 @@ func enqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 	}
 
 	var st macCommandEnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_RX_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_RX_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
@@ -64,15 +64,15 @@ func enqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 				req.MACCommand(),
 			},
 			1,
-			[]events.DefinitionDataClosure{
-				evtEnqueueRxParamSetupRequest.BindData(req),
+			events.Builders{
+				evtEnqueueRxParamSetupRequest.With(events.WithData(req)),
 			},
 			true
 	}, dev.MACState.PendingRequests...)
 	return st
 }
 
-func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RxParamSetupAns) ([]events.DefinitionDataClosure, error) {
+func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RxParamSetupAns) (events.Builders, error) {
 	if pld == nil {
 		return nil, errNoPayload.New()
 	}
@@ -94,7 +94,7 @@ func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 	if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
 		evt = evtReceiveRxParamSetupReject
 	}
-	return []events.DefinitionDataClosure{
-		evt.BindData(pld),
+	return events.Builders{
+		evt.With(events.WithData(pld)),
 	}, err
 }

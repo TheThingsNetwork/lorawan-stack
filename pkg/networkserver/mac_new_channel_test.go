@@ -527,15 +527,15 @@ func TestEnqueueNewChannelReq(t *testing.T) {
 						}
 						reqs := tc.ExpectedRequests[:conf.ExpectedCount]
 						expectedDev := CopyEndDevice(dev)
-						var expectedEvs []events.DefinitionDataClosure
+						var expectedEvs events.Builders
 						for _, req := range reqs {
 							expectedDev.MACState.PendingRequests = append(expectedDev.MACState.PendingRequests, req.MACCommand())
-							expectedEvs = append(expectedEvs, evtEnqueueNewChannelRequest.BindData(req))
+							expectedEvs = append(expectedEvs, evtEnqueueNewChannelRequest.With(events.WithData(req)))
 						}
 
 						st := enqueueNewChannelReq(test.Context(), dev, conf.MaxDownlinkLength, conf.MaxUplinkLength)
 						a.So(dev, should.Resemble, expectedDev)
-						a.So(st.QueuedEvents, should.ResembleEventDefinitionDataClosures, expectedEvs)
+						a.So(st.QueuedEvents, should.ResembleEventBuilders, expectedEvs)
 						a.So(st, should.Resemble, macCommandEnqueueState{
 							MaxDownLen:   conf.MaxDownlinkLength - uint16(conf.ExpectedCount)*downlinkLength,
 							MaxUpLen:     conf.MaxUplinkLength - uint16(conf.ExpectedCount)*uplinkLength,
@@ -554,7 +554,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_NewChannelAns
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -580,11 +580,11 @@ func TestHandleNewChannelAns(t *testing.T) {
 				FrequencyAck: true,
 				DataRateAck:  true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveNewChannelAccept.BindData(&ttnpb.MACCommand_NewChannelAns{
+			Events: events.Builders{
+				evtReceiveNewChannelAccept.With(events.WithData(&ttnpb.MACCommand_NewChannelAns{
 					FrequencyAck: true,
 					DataRateAck:  true,
-				}),
+				})),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -611,10 +611,10 @@ func TestHandleNewChannelAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_NewChannelAns{
 				DataRateAck: true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveNewChannelReject.BindData(&ttnpb.MACCommand_NewChannelAns{
+			Events: events.Builders{
+				evtReceiveNewChannelReject.With(events.WithData(&ttnpb.MACCommand_NewChannelAns{
 					DataRateAck: true,
-				}),
+				})),
 			},
 		},
 		{
@@ -639,8 +639,8 @@ func TestHandleNewChannelAns(t *testing.T) {
 				},
 			},
 			Payload: &ttnpb.MACCommand_NewChannelAns{},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveNewChannelReject.BindData(&ttnpb.MACCommand_NewChannelAns{}),
+			Events: events.Builders{
+				evtReceiveNewChannelReject.With(events.WithData(&ttnpb.MACCommand_NewChannelAns{})),
 			},
 		},
 		{
@@ -681,11 +681,11 @@ func TestHandleNewChannelAns(t *testing.T) {
 				FrequencyAck: true,
 				DataRateAck:  true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveNewChannelAccept.BindData(&ttnpb.MACCommand_NewChannelAns{
+			Events: events.Builders{
+				evtReceiveNewChannelAccept.With(events.WithData(&ttnpb.MACCommand_NewChannelAns{
 					FrequencyAck: true,
 					DataRateAck:  true,
-				}),
+				})),
 			},
 		},
 	} {
@@ -700,7 +700,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

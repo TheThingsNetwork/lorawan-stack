@@ -22,22 +22,22 @@ import (
 var (
 	evtUserLogin = events.Define(
 		"oauth.user.login", "login user successful",
-		ttnpb.RIGHT_USER_ALL,
+		events.WithVisibility(ttnpb.RIGHT_USER_ALL),
 	)
 	evtUserLoginFailed = events.Define(
 		"oauth.user.login_failed", "login user failure",
-		ttnpb.RIGHT_USER_ALL,
+		events.WithVisibility(ttnpb.RIGHT_USER_ALL),
 	)
 	evtUserLogout = events.Define(
 		"oauth.user.logout", "logout user",
-		ttnpb.RIGHT_USER_ALL,
+		events.WithVisibility(ttnpb.RIGHT_USER_ALL),
 	)
 	evtAuthorize = events.Define(
 		"oauth.authorize", "authorize OAuth client",
-		ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS,
+		events.WithVisibility(ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS),
 	)
 	evtTokenExchange = events.Define(
 		"oauth.token.exchange", "exchange OAuth access token",
-		ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS,
+		events.WithVisibility(ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS),
 	)
 )

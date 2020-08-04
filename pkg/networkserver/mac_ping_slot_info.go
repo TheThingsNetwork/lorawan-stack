@@ -27,13 +27,13 @@ var (
 	evtReceivePingSlotInfoRequest = defineReceiveMACRequestEvent("ping_slot_info", "ping slot info")()
 )
 
-func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotInfoReq) ([]events.DefinitionDataClosure, error) {
+func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotInfoReq) (events.Builders, error) {
 	if pld == nil {
 		return nil, errNoPayload.New()
 	}
 
-	evs := []events.DefinitionDataClosure{
-		evtReceivePingSlotInfoRequest.BindData(pld),
+	evs := events.Builders{
+		evtReceivePingSlotInfoRequest.With(events.WithData(pld)),
 	}
 	if dev.MACState.DeviceClass != ttnpb.CLASS_A {
 		log.FromContext(ctx).Debug("Ignore PingSlotInfoReq from device not in class A mode")
@@ -43,6 +43,6 @@ func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 	dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{Value: pld.Period}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ttnpb.CID_PING_SLOT_INFO.MACCommand())
 	return append(evs,
-		evtEnqueuePingSlotInfoAnswer.BindData(nil),
+		evtEnqueuePingSlotInfoAnswer,
 	), nil
 }

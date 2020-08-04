@@ -67,9 +67,9 @@ func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 	}
 
 	var st macCommandEnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DL_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DL_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		var cmds []*ttnpb.MACCommand
-		var evs []events.DefinitionDataClosure
+		var evs events.Builders
 		for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {
 			if !deviceNeedsDLChannelReqAtIndex(dev, i) {
 				continue
@@ -85,7 +85,7 @@ func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 				Frequency:    dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency,
 			}
 			cmds = append(cmds, req.MACCommand())
-			evs = append(evs, evtEnqueueDLChannelRequest.BindData(req))
+			evs = append(evs, evtEnqueueDLChannelRequest.With(events.WithData(req)))
 			log.FromContext(ctx).WithFields(log.Fields(
 				"channel_index", req.ChannelIndex,
 				"frequency", req.Frequency,
@@ -96,7 +96,7 @@ func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 	return st
 }
 
-func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DLChannelAns) ([]events.DefinitionDataClosure, error) {
+func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DLChannelAns) (events.Builders, error) {
 	if pld == nil {
 		return nil, errNoPayload.New()
 	}
@@ -129,7 +129,7 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 	if !pld.ChannelIndexAck || !pld.FrequencyAck {
 		evt = evtReceiveDLChannelReject
 	}
-	return []events.DefinitionDataClosure{
-		evt.BindData(pld),
+	return events.Builders{
+		evt.With(events.WithData(pld)),
 	}, err
 }

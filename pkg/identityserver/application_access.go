@@ -32,25 +32,29 @@ import (
 var (
 	evtCreateApplicationAPIKey = events.Define(
 		"application.api-key.create", "create application API key",
-		ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS),
 	)
 	evtUpdateApplicationAPIKey = events.Define(
 		"application.api-key.update", "update application API key",
-		ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS),
 	)
 	evtDeleteApplicationAPIKey = events.Define(
 		"application.api-key.delete", "delete application API key",
-		ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS),
 	)
 	evtUpdateApplicationCollaborator = events.Define(
 		"application.collaborator.update", "update application collaborator",
-		ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
-		ttnpb.RIGHT_USER_APPLICATIONS_LIST,
+		events.WithVisibility(
+			ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
+			ttnpb.RIGHT_USER_APPLICATIONS_LIST,
+		),
 	)
 	evtDeleteApplicationCollaborator = events.Define(
 		"application.collaborator.delete", "delete application collaborator",
-		ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
-		ttnpb.RIGHT_USER_APPLICATIONS_LIST,
+		events.WithVisibility(
+			ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
+			ttnpb.RIGHT_USER_APPLICATIONS_LIST,
+		),
 	)
 )
 
@@ -82,7 +86,7 @@ func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnp
 		return nil, err
 	}
 	key.Key = token
-	events.Publish(evtCreateApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
+	events.Publish(evtCreateApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, nil))
 	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 		data.SetEntity(req.EntityIdentifiers())
 		return &emails.APIKeyCreated{Data: data, Identifier: key.PrettyName(), Rights: key.Rights}
@@ -171,11 +175,11 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 		return nil, err
 	}
 	if key == nil { // API key was deleted.
-		events.Publish(evtDeleteApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
+		events.Publish(evtDeleteApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, nil))
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	events.Publish(evtUpdateApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
+	events.Publish(evtUpdateApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, nil))
 	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 		data.SetEntity(req.EntityIdentifiers())
 		return &emails.APIKeyChanged{Data: data, Identifier: key.PrettyName(), Rights: key.Rights}
@@ -253,7 +257,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 		return nil, err
 	}
 	if len(req.Collaborator.Rights) > 0 {
-		events.Publish(evtUpdateApplicationCollaborator(ctx, ttnpb.CombineIdentifiers(req.ApplicationIdentifiers, req.Collaborator), nil))
+		events.Publish(evtUpdateApplicationCollaborator.NewWithIdentifiersAndData(ctx, ttnpb.CombineIdentifiers(req.ApplicationIdentifiers, req.Collaborator), nil))
 		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 			data.SetEntity(req.EntityIdentifiers())
 			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
@@ -262,7 +266,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteApplicationCollaborator(ctx, ttnpb.CombineIdentifiers(req.ApplicationIdentifiers, req.Collaborator), nil))
+		events.Publish(evtDeleteApplicationCollaborator.NewWithIdentifiersAndData(ctx, ttnpb.CombineIdentifiers(req.ApplicationIdentifiers, req.Collaborator), nil))
 	}
 	return ttnpb.Empty, nil
 }

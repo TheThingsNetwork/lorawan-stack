@@ -30,15 +30,15 @@ import (
 var (
 	evtCreateOrganization = events.Define(
 		"organization.create", "create organization",
-		ttnpb.RIGHT_ORGANIZATION_INFO,
+		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
 	)
 	evtUpdateOrganization = events.Define(
 		"organization.update", "update organization",
-		ttnpb.RIGHT_ORGANIZATION_INFO,
+		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
 	)
 	evtDeleteOrganization = events.Define(
 		"organization.delete", "delete organization",
-		ttnpb.RIGHT_ORGANIZATION_INFO,
+		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
 	)
 )
 
@@ -89,7 +89,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtCreateOrganization(ctx, req.OrganizationIdentifiers, nil))
+	events.Publish(evtCreateOrganization.NewWithIdentifiersAndData(ctx, req.OrganizationIdentifiers, nil))
 	return org, nil
 }
 
@@ -218,7 +218,7 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateOrganization(ctx, req.OrganizationIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateOrganization.NewWithIdentifiersAndData(ctx, req.OrganizationIdentifiers, req.FieldMask.Paths))
 	return org, nil
 }
 
@@ -232,7 +232,7 @@ func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.Org
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtDeleteOrganization(ctx, ids, nil))
+	events.Publish(evtDeleteOrganization.NewWithIdentifiersAndData(ctx, ids, nil))
 	return ttnpb.Empty, nil
 }
 

@@ -82,7 +82,7 @@ func TestHandleDutyCycleAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -93,8 +93,8 @@ func TestHandleDutyCycleAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDutyCycleAnswer.BindData(nil),
+			Events: events.Builders{
+				evtReceiveDutyCycleAnswer,
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -117,8 +117,8 @@ func TestHandleDutyCycleAns(t *testing.T) {
 					},
 				},
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDutyCycleAnswer.BindData(nil),
+			Events: events.Builders{
+				evtReceiveDutyCycleAnswer,
 			},
 		},
 	} {
@@ -133,7 +133,7 @@ func TestHandleDutyCycleAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

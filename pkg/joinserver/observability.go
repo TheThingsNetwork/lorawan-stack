@@ -27,11 +27,11 @@ import (
 var (
 	evtRejectJoin = events.Define(
 		"js.join.reject", "reject join-request",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtAcceptJoin = events.Define(
 		"js.join.accept", "accept join-request",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 )
 
@@ -79,12 +79,12 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 }
 
 func registerAcceptJoin(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.JoinRequest) {
-	events.Publish(evtAcceptJoin(ctx, dev.EndDeviceIdentifiers, nil))
+	events.Publish(evtAcceptJoin.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, nil))
 	jsMetrics.joinAccepted.WithLabelValues(ctx, msg.NetID.String()).Inc()
 }
 
 func registerRejectJoin(ctx context.Context, req *ttnpb.JoinRequest, err error) {
-	events.Publish(evtRejectJoin(ctx, nil, err))
+	events.Publish(evtRejectJoin.NewWithIdentifiersAndData(ctx, nil, err))
 	if ttnErr, ok := errors.From(err); ok {
 		jsMetrics.joinRejected.WithLabelValues(ctx, ttnErr.FullName()).Inc()
 	} else {

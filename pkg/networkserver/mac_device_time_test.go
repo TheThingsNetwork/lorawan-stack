@@ -32,7 +32,7 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Message          *ttnpb.UplinkMessage
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -52,11 +52,11 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 			Message: &ttnpb.UplinkMessage{
 				ReceivedAt: recvAt,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDeviceTimeRequest.BindData(nil),
-				evtEnqueueDeviceTimeAnswer.BindData(&ttnpb.MACCommand_DeviceTimeAns{
+			Events: events.Builders{
+				evtReceiveDeviceTimeRequest,
+				evtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
 					Time: recvAt,
-				}),
+				})),
 			},
 		},
 		{
@@ -85,11 +85,11 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 			Message: &ttnpb.UplinkMessage{
 				ReceivedAt: recvAt,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDeviceTimeRequest.BindData(nil),
-				evtEnqueueDeviceTimeAnswer.BindData(&ttnpb.MACCommand_DeviceTimeAns{
+			Events: events.Builders{
+				evtReceiveDeviceTimeRequest,
+				evtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
 					Time: recvAt,
-				}),
+				})),
 			},
 		},
 		{
@@ -118,11 +118,11 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 			Message: &ttnpb.UplinkMessage{
 				ReceivedAt: recvAt,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDeviceTimeRequest.BindData(nil),
-				evtEnqueueDeviceTimeAnswer.BindData(&ttnpb.MACCommand_DeviceTimeAns{
+			Events: events.Builders{
+				evtReceiveDeviceTimeRequest,
+				evtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
 					Time: recvAt,
-				}),
+				})),
 			},
 		},
 	} {
@@ -137,7 +137,7 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

@@ -30,29 +30,35 @@ import (
 var (
 	evtSetPubSub = events.Define(
 		"as.pubsub.set", "set pub/sub",
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC),
 	)
 	evtDeletePubSub = events.Define(
 		"as.pubsub.delete", "delete pub/sub",
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC),
 	)
 	evtPubSubStart = events.Define(
 		"as.pubsub.start", "start pub/sub",
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+		events.WithVisibility(
+			ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
+			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+			ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+		),
 	)
 	evtPubSubStop = events.Define(
 		"as.pubsub.stop", "stop pub/sub",
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+		events.WithVisibility(
+			ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
+			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+			ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+		),
 	)
 	evtPubSubFail = events.Define(
 		"as.pubsub.fail", "fail pub/sub",
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+		events.WithVisibility(
+			ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
+			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+			ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+		),
 	)
 )
 
@@ -118,14 +124,14 @@ func providerLabelValue(i *integration) string {
 }
 
 func registerIntegrationStart(ctx context.Context, i *integration) {
-	events.Publish(evtPubSubStart(ctx, i.ApplicationIdentifiers, i.ApplicationPubSubIdentifiers))
+	events.Publish(evtPubSubStart.NewWithIdentifiersAndData(ctx, i.ApplicationIdentifiers, i.ApplicationPubSubIdentifiers))
 	labelValue := providerLabelValue(i)
 	pubsubMetrics.integrationsStarted.WithLabelValues(ctx, labelValue).Inc()
 	pubsubMetrics.integrationsStopped.WithLabelValues(ctx, labelValue) // Initialize the "stopped" counter.
 }
 
 func registerIntegrationStop(ctx context.Context, i *integration) {
-	events.Publish(evtPubSubStop(ctx, i.ApplicationIdentifiers, i.ApplicationPubSubIdentifiers))
+	events.Publish(evtPubSubStop.NewWithIdentifiersAndData(ctx, i.ApplicationIdentifiers, i.ApplicationPubSubIdentifiers))
 	pubsubMetrics.integrationsStopped.WithLabelValues(ctx, providerLabelValue(i)).Inc()
 }
 
@@ -138,6 +144,6 @@ func registerIntegrationFail(ctx context.Context, i *integration, err error) {
 			"pub_sub_id", i.PubSubID,
 		).
 		WithCause(err)
-	events.Publish(evtPubSubFail(ctx, i.ApplicationIdentifiers, err))
+	events.Publish(evtPubSubFail.NewWithIdentifiersAndData(ctx, i.ApplicationIdentifiers, err))
 	pubsubMetrics.integrationsFailed.WithLabelValues(ctx, providerLabelValue(i)).Inc()
 }

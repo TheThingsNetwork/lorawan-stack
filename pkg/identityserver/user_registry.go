@@ -40,19 +40,19 @@ import (
 var (
 	evtCreateUser = events.Define(
 		"user.create", "create user",
-		ttnpb.RIGHT_USER_INFO,
+		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
 	)
 	evtUpdateUser = events.Define(
 		"user.update", "update user",
-		ttnpb.RIGHT_USER_INFO,
+		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
 	)
 	evtDeleteUser = events.Define(
 		"user.delete", "delete user",
-		ttnpb.RIGHT_USER_INFO,
+		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
 	)
 	evtUpdateUserIncorrectPassword = events.Define(
 		"user.update.incorrect_password", "update user failure: incorrect password",
-		ttnpb.RIGHT_USER_INFO,
+		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
 	)
 )
 
@@ -219,7 +219,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	}
 
 	usr.Password = "" // Create doesn't have a FieldMask, so we need to manually remove the password.
-	events.Publish(evtCreateUser(ctx, req.UserIdentifiers, nil))
+	events.Publish(evtCreateUser.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
 	return usr, nil
 }
 
@@ -421,7 +421,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateUser(ctx, req.UserIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, req.FieldMask.Paths))
 
 	// TODO: Send emails (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 	// - If primary email address changed
@@ -483,7 +483,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			// }
 		} else {
 			if usr.TemporaryPassword == "" {
-				events.Publish(evtUpdateUserIncorrectPassword(ctx, req.UserIdentifiers, nil))
+				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
 				return errIncorrectPassword.New()
 			}
 			region := trace.StartRegion(ctx, "validate temporary password")
@@ -493,10 +493,10 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			case err != nil:
 				return err
 			case !valid:
-				events.Publish(evtUpdateUserIncorrectPassword(ctx, req.UserIdentifiers, nil))
+				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
 				return errIncorrectPassword.New()
 			case usr.TemporaryPasswordExpiresAt.Before(time.Now()):
-				events.Publish(evtUpdateUserIncorrectPassword(ctx, req.UserIdentifiers, nil))
+				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
 				return errTemporaryPasswordExpired.New()
 			}
 			usr.TemporaryPassword, usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = "", nil, nil
@@ -540,7 +540,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateUser(ctx, req.UserIdentifiers, updateMask))
+	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, updateMask))
 	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
 		return &emails.PasswordChanged{Data: data}
 	})
@@ -583,7 +583,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		"user_uid", unique.ID(ctx, req.UserIdentifiers),
 		"temporary_password", temporaryPassword,
 	)).Info("Created temporary password")
-	events.Publish(evtUpdateUser(ctx, req.UserIdentifiers, updateTemporaryPasswordFieldMask))
+	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, updateTemporaryPasswordFieldMask))
 	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
 		return &emails.TemporaryPassword{
 			Data:              data,
@@ -606,7 +606,7 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtDeleteUser(ctx, ids, nil))
+	events.Publish(evtDeleteUser.NewWithIdentifiersAndData(ctx, ids, nil))
 	return ttnpb.Empty, nil
 }
 

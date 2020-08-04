@@ -21,15 +21,14 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 const (
-	needEventAssertionCompatible             = "This assertion requires a func(events.Event) bool-compatible comparison type (you provided %T)."
-	needEventCompatible                      = "This assertion requires a Event-compatible comparison type (you provided %T)."
-	needEventDefinitionDataClosureCompatible = "This assertion requires an EventDefinitionDataClosure-compatible comparison type (you provided %T)."
-	needEventChannelCompatible               = "This assertion requires a events.Channel-compatible or <-chan test.EventPubSubPublishRequest-compatible comparison type (you provided %T)."
+	needEventAssertionCompatible = "This assertion requires a func(events.Event) bool-compatible comparison type (you provided %T)."
+	needEventCompatible          = "This assertion requires a Event-compatible comparison type (you provided %T)."
+	needEventBuilderCompatible   = "This assertion requires an EventBuilder-compatible comparison type (you provided %T)."
+	needEventChannelCompatible   = "This assertion requires a events.Channel-compatible or <-chan test.EventPubSubPublishRequest-compatible comparison type (you provided %T)."
 )
 
 // ShouldResembleEvent is used to assert that an events.Event resembles another events.Event.
@@ -60,54 +59,42 @@ func ShouldResembleEvent(actual interface{}, expected ...interface{}) string {
 	return ShouldResemble(ap, ep)
 }
 
-// ShouldResembleEventDefinitionDataClosure is used to assert that an events.DefinitionDataClosure resembles another events.DefinitionDataClosure.
-func ShouldResembleEventDefinitionDataClosure(actual interface{}, expected ...interface{}) string {
+// ShouldResembleEventBuilder is used to assert that an events.Builder resembles another events.Builder.
+func ShouldResembleEventBuilder(actual interface{}, expected ...interface{}) string {
 	if len(expected) != 1 {
 		return fmt.Sprintf(needExactValues, 1, len(expected))
 	}
-	ed, ok := expected[0].(events.DefinitionDataClosure)
+	ed, ok := expected[0].(events.Builder)
 	if !ok {
-		return fmt.Sprintf(needEventDefinitionDataClosureCompatible, expected[0])
+		return fmt.Sprintf(needEventBuilderCompatible, expected[0])
 	}
-	ad, ok := actual.(events.DefinitionDataClosure)
+	ad, ok := actual.(events.Builder)
 	if !ok {
-		return fmt.Sprintf(needEventDefinitionDataClosureCompatible, actual)
+		return fmt.Sprintf(needEventBuilderCompatible, actual)
 	}
 	ctx := context.Background()
-	ids := &ttnpb.EndDeviceIdentifiers{
-		DeviceID: "test-dev",
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-			ApplicationID: "test-app",
-		},
-	}
-	return ShouldResembleEvent(ad(ctx, ids), ed(ctx, ids))
+	return ShouldResembleEvent(ad.New(ctx), ed.New(ctx))
 }
 
-// ShouldResembleEventDefinitionDataClosures is like ShouldResembleEventDefinitionDataClosure, but for []events.DefinitionDataClosure
-func ShouldResembleEventDefinitionDataClosures(actual interface{}, expected ...interface{}) string {
+// ShouldResembleEventBuilders is like ShouldResembleEventBuilders, but for events.Builders
+func ShouldResembleEventBuilders(actual interface{}, expected ...interface{}) string {
 	if len(expected) != 1 {
 		return fmt.Sprintf(needExactValues, 1, len(expected))
 	}
-	eds, ok := expected[0].([]events.DefinitionDataClosure)
+	eds, ok := expected[0].(events.Builders)
 	if !ok {
-		return fmt.Sprintf(needEventDefinitionDataClosureCompatible, expected[0])
+		return fmt.Sprintf(needEventBuilderCompatible, expected[0])
 	}
-	ads, ok := actual.([]events.DefinitionDataClosure)
+	ads, ok := actual.(events.Builders)
 	if !ok {
-		return fmt.Sprintf(needEventDefinitionDataClosureCompatible, actual)
+		return fmt.Sprintf(needEventBuilderCompatible, actual)
 	}
 	ctx := context.Background()
-	ids := &ttnpb.EndDeviceIdentifiers{
-		DeviceID: "test-dev",
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-			ApplicationID: "test-app",
-		},
-	}
 	if s := assertions.ShouldHaveLength(ads, len(eds)); s != success {
 		return s
 	}
 	for i, ad := range ads {
-		if s := ShouldResembleEvent(ad(ctx, ids), eds[i](ctx, ids)); s != success {
+		if s := ShouldResembleEvent(ad.New(ctx), eds[i].New(ctx)); s != success {
 			return fmt.Sprintf("Mismatch in event definition %d: %s", i, s)
 		}
 	}

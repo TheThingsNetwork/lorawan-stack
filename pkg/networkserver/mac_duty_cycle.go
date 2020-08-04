@@ -43,7 +43,7 @@ func enqueueDutyCycleReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 	}
 
 	var st macCommandEnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DUTY_CYCLE, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DUTY_CYCLE, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
@@ -57,15 +57,15 @@ func enqueueDutyCycleReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 				req.MACCommand(),
 			},
 			1,
-			[]events.DefinitionDataClosure{
-				evtEnqueueDutyCycleRequest.BindData(req),
+			events.Builders{
+				evtEnqueueDutyCycleRequest.With(events.WithData(req)),
 			},
 			true
 	}, dev.MACState.PendingRequests...)
 	return st
 }
 
-func handleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {
+func handleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) (events.Builders, error) {
 	var err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DUTY_CYCLE, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetDutyCycleReq()
@@ -73,7 +73,7 @@ func handleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) ([]events.Def
 		dev.MACState.CurrentParameters.MaxDutyCycle = req.MaxDutyCycle
 		return nil
 	}, dev.MACState.PendingRequests...)
-	return []events.DefinitionDataClosure{
-		evtReceiveDutyCycleAnswer.BindData(nil),
+	return events.Builders{
+		evtReceiveDutyCycleAnswer,
 	}, err
 }

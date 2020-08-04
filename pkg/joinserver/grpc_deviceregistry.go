@@ -30,15 +30,15 @@ import (
 var (
 	evtCreateEndDevice = events.Define(
 		"js.end_device.create", "create end device",
-		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
 	)
 	evtUpdateEndDevice = events.Define(
 		"js.end_device.update", "update end device",
-		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
 	)
 	evtDeleteEndDevice = events.Define(
 		"js.end_device.delete", "delete end device",
-		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
 	)
 )
 
@@ -237,7 +237,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 	var evt events.Event
 	dev, err = srv.JS.devices.SetByID(ctx, req.EndDevice.ApplicationIdentifiers, req.EndDevice.DeviceID, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
-			evt = evtUpdateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
+			evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
 			if err := ttnpb.ProhibitFields(sets,
 				"ids.dev_addr",
 			); err != nil {
@@ -246,7 +246,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 			return &req.EndDevice, sets, nil
 		}
 
-		evt = evtCreateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, nil)
+		evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.EndDeviceIdentifiers, nil)
 		if req.EndDevice.DevAddr != nil && !req.EndDevice.DevAddr.IsZero() {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 		}
@@ -285,7 +285,7 @@ func (srv jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndD
 		if dev == nil {
 			return nil, nil, errDeviceNotFound.New()
 		}
-		evt = evtDeleteEndDevice(ctx, ids, nil)
+		evt = evtDeleteEndDevice.NewWithIdentifiersAndData(ctx, ids, nil)
 		return nil, nil, nil
 	})
 	if err != nil {

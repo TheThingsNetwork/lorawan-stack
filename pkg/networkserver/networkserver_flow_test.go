@@ -387,8 +387,8 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 				firstUp = makeUplink(true, upMD...)
 			} else {
 				preSendEvs = append(preSendEvs,
-					EvtReceiveJoinRequest(ctx, ids, makeUplink(true, upMD...)),
-					EvtDropJoinRequest(ctx, ids, ErrDuplicate),
+					EvtReceiveJoinRequest.NewWithIdentifiersAndData(ctx, ids, makeUplink(true, upMD...)),
+					EvtDropJoinRequest.NewWithIdentifiersAndData(ctx, ids, ErrDuplicate),
 				)
 			}
 		}
@@ -444,11 +444,11 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 		joinCIDs = append(events.CorrelationIDsFromContext(getPeerCtx), joinResp.CorrelationIDs...)
 
 		a.So(env.Events, should.ReceiveEventFunc, makeAssertFlowTestEventEqual(t),
-			EvtReceiveJoinRequest(events.ContextWithCorrelationID(test.Context(), ups[0].CorrelationIDs...), ids, firstUp),
+			EvtReceiveJoinRequest.NewWithIdentifiersAndData(events.ContextWithCorrelationID(test.Context(), ups[0].CorrelationIDs...), ids, firstUp),
 		)
 		a.So(env.Events, should.ReceiveEventsResembling,
-			EvtClusterJoinAttempt(getPeerCtx, ids, joinReq),
-			EvtClusterJoinSuccess(getPeerCtx, ids, &ttnpb.JoinResponse{
+			EvtClusterJoinAttempt.NewWithIdentifiersAndData(getPeerCtx, ids, joinReq),
+			EvtClusterJoinSuccess.NewWithIdentifiersAndData(getPeerCtx, ids, &ttnpb.JoinResponse{
 				RawPayload: joinResp.RawPayload,
 				SessionKeys: ttnpb.SessionKeys{
 					SessionKeyID: joinResp.SessionKeys.SessionKeyID,
@@ -458,7 +458,7 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 			}),
 		)
 		a.So(env.Events, should.ReceiveEventFunc, makeAssertFlowTestEventEqual(t),
-			EvtProcessJoinRequest(getPeerCtx, ids, makeUplink(true, RxMetadata[:]...)),
+			EvtProcessJoinRequest.NewWithIdentifiersAndData(getPeerCtx, ids, makeUplink(true, RxMetadata[:]...)),
 		)
 		select {
 		case <-ctx.Done():
@@ -472,7 +472,7 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 		}
 
 		if !a.So(env.AssertApplicationUp(ctx, link, func(t *testing.T, up *ttnpb.ApplicationUp) bool {
-			expectedEvs = append(expectedEvs, EvtForwardJoinAccept(linkCtx, up.EndDeviceIdentifiers, up))
+			expectedEvs = append(expectedEvs, EvtForwardJoinAccept.NewWithIdentifiersAndData(linkCtx, up.EndDeviceIdentifiers, up))
 
 			a := assertions.New(t)
 			return a.So(test.AllTrue(
@@ -535,8 +535,8 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 		}
 		a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, 2+len(expectedEvs), func(evs ...events.Event) bool {
 			return a.So(evs, should.HaveSameElementsFunc, flowTestEventEqual, append(expectedEvs,
-				EvtScheduleJoinAcceptAttempt(ctx, ids, txReq),
-				EvtScheduleJoinAcceptSuccess(ctx, ids, &ttnpb.ScheduleDownlinkResponse{}),
+				EvtScheduleJoinAcceptAttempt.NewWithIdentifiersAndData(ctx, ids, txReq),
+				EvtScheduleJoinAcceptSuccess.NewWithIdentifiersAndData(ctx, ids, &ttnpb.ScheduleDownlinkResponse{}),
 			))
 		}), should.BeTrue)
 	})
@@ -558,9 +558,9 @@ func (env FlowTestEnvironment) AssertSendDataUplink(ctx context.Context, link tt
 			RxMetadata[:3],
 		} {
 			ups = append(ups, makeUplink(false, upMD...))
-			expectedEvs = append(expectedEvs, EvtReceiveDataUplink(ctx, ids, makeUplink(true, upMD...)))
+			expectedEvs = append(expectedEvs, EvtReceiveDataUplink.NewWithIdentifiersAndData(ctx, ids, makeUplink(true, upMD...)))
 			if i > 0 {
-				expectedEvs = append(expectedEvs, EvtDropDataUplink(ctx, ids, ErrDuplicate))
+				expectedEvs = append(expectedEvs, EvtDropDataUplink.NewWithIdentifiersAndData(ctx, ids, ErrDuplicate))
 			}
 		}
 
@@ -642,7 +642,7 @@ func (env FlowTestEnvironment) AssertSetDevice(ctx context.Context, create bool,
 	if !create {
 		ev = EvtUpdateEndDevice.BindData(nil)
 	}
-	if !a.So(env.Events, should.ReceiveEventResembling, ev(events.ContextWithCorrelationID(test.Context(), reqCIDs...), req.EndDevice.EndDeviceIdentifiers)) {
+	if !a.So(env.Events, should.ReceiveEventResembling, ev.New(events.ContextWithCorrelationID(test.Context(), reqCIDs...), events.WithIdentifiers(req.EndDevice.EndDeviceIdentifiers))) {
 		if create {
 			t.Error("Failed to assert end device create event")
 		} else {
@@ -754,11 +754,11 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 				Class: ttnpb.CLASS_C,
 			}
 			expectedUpEvs = append(expectedUpEvs,
-				EvtReceiveRekeyIndication(ctx, ids, rekeyInd),
-				EvtEnqueueRekeyConfirmation(ctx, ids, rekeyConf),
-				EvtReceiveDeviceModeIndication(ctx, ids, deviceModeInd),
-				EvtClassCSwitch(ctx, ids, ttnpb.CLASS_A),
-				EvtEnqueueDeviceModeConfirmation(ctx, ids, deviceModeConf),
+				EvtReceiveRekeyIndication.NewWithIdentifiersAndData(ctx, ids, rekeyInd),
+				EvtEnqueueRekeyConfirmation.NewWithIdentifiersAndData(ctx, ids, rekeyConf),
+				EvtReceiveDeviceModeIndication.NewWithIdentifiersAndData(ctx, ids, deviceModeInd),
+				EvtClassCSwitch.NewWithIdentifiersAndData(ctx, ids, ttnpb.CLASS_A),
+				EvtEnqueueDeviceModeConfirmation.NewWithIdentifiersAndData(ctx, ids, deviceModeConf),
 			)
 			downCmders = append(downCmders,
 				rekeyConf,
@@ -777,7 +777,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 		expectedUp := makeUplink(true, RxMetadata[:]...)
 		start = time.Now()
 		if !a.So(env.AssertSendDataUplink(ctx, link, linkCtx, ids, makeUplink, append(expectedUpEvs,
-			EvtProcessDataUplink(ctx, ids, expectedUp),
+			EvtProcessDataUplink.NewWithIdentifiersAndData(ctx, ids, expectedUp),
 		)...), should.BeTrue) {
 			t.Error("Failed to process data uplink")
 			return
@@ -785,7 +785,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 
 		var expectedEvs []events.Event
 		if !a.So(env.AssertApplicationUp(ctx, link, func(t *testing.T, up *ttnpb.ApplicationUp) bool {
-			expectedEvs = append(expectedEvs, EvtForwardDataUplink(linkCtx, up.EndDeviceIdentifiers, up))
+			expectedEvs = append(expectedEvs, EvtForwardDataUplink.NewWithIdentifiersAndData(linkCtx, up.EndDeviceIdentifiers, up))
 
 			a := assertions.New(t)
 			return a.So(test.AllTrue(
@@ -814,11 +814,11 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 		}
 
 		downCmders = append(downCmders, ttnpb.CID_DEV_STATUS)
-		expectedEvs = append(expectedEvs, EvtEnqueueDevStatusRequest(ctx, ids, nil))
+		expectedEvs = append(expectedEvs, EvtEnqueueDevStatusRequest.NewWithIdentifiersAndData(ctx, ids, nil))
 		for _, cmd := range linkADRReqs {
 			cmd := cmd
 			downCmders = append(downCmders, cmd)
-			expectedEvs = append(expectedEvs, EvtEnqueueLinkADRRequest(ctx, ids, cmd))
+			expectedEvs = append(expectedEvs, EvtEnqueueLinkADRRequest.NewWithIdentifiersAndData(ctx, ids, cmd))
 		}
 
 		paths := DownlinkPathsFromMetadata(RxMetadata[:]...)
@@ -850,8 +850,8 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 		a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, 2+len(expectedEvs), func(evs ...events.Event) bool {
 			return a.So(evs, should.HaveSameElementsFunc, flowTestEventEqual, append(
 				expectedEvs,
-				EvtScheduleDataDownlinkAttempt(ctx, ids, txReq),
-				EvtScheduleDataDownlinkSuccess(ctx, ids, &ttnpb.ScheduleDownlinkResponse{}),
+				EvtScheduleDataDownlinkAttempt.NewWithIdentifiersAndData(ctx, ids, txReq),
+				EvtScheduleDataDownlinkSuccess.NewWithIdentifiersAndData(ctx, ids, &ttnpb.ScheduleDownlinkResponse{}),
 			))
 		}), should.BeTrue)
 	}

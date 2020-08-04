@@ -32,25 +32,29 @@ import (
 var (
 	evtCreateOrganizationAPIKey = events.Define(
 		"organization.api-key.create", "create organization API key",
-		ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
+		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS),
 	)
 	evtUpdateOrganizationAPIKey = events.Define(
 		"organization.api-key.update", "update organization API key",
-		ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
+		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS),
 	)
 	evtDeleteOrganizationAPIKey = events.Define(
 		"organization.api-key.delete", "delete organization API key",
-		ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
+		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS),
 	)
 	evtUpdateOrganizationCollaborator = events.Define(
 		"organization.collaborator.update", "update organization collaborator",
-		ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS,
-		ttnpb.RIGHT_USER_ORGANIZATIONS_LIST,
+		events.WithVisibility(
+			ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS,
+			ttnpb.RIGHT_USER_ORGANIZATIONS_LIST,
+		),
 	)
 	evtDeleteOrganizationCollaborator = events.Define(
 		"organization.collaborator.delete", "delete organization collaborator",
-		ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS,
-		ttnpb.RIGHT_USER_ORGANIZATIONS_LIST,
+		events.WithVisibility(
+			ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS,
+			ttnpb.RIGHT_USER_ORGANIZATIONS_LIST,
+		),
 	)
 )
 
@@ -82,7 +86,7 @@ func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttn
 		return nil, err
 	}
 	key.Key = token
-	events.Publish(evtCreateOrganizationAPIKey(ctx, req.OrganizationIdentifiers, nil))
+	events.Publish(evtCreateOrganizationAPIKey.NewWithIdentifiersAndData(ctx, req.OrganizationIdentifiers, nil))
 	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 		data.SetEntity(req.EntityIdentifiers())
 		return &emails.APIKeyCreated{Data: data, Identifier: key.PrettyName(), Rights: key.Rights}
@@ -171,11 +175,11 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 		return nil, err
 	}
 	if key == nil { // API key was deleted.
-		events.Publish(evtDeleteOrganizationAPIKey(ctx, req.OrganizationIdentifiers, nil))
+		events.Publish(evtDeleteOrganizationAPIKey.NewWithIdentifiersAndData(ctx, req.OrganizationIdentifiers, nil))
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	events.Publish(evtUpdateOrganizationAPIKey(ctx, req.OrganizationIdentifiers, nil))
+	events.Publish(evtUpdateOrganizationAPIKey.NewWithIdentifiersAndData(ctx, req.OrganizationIdentifiers, nil))
 	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 		data.SetEntity(req.EntityIdentifiers())
 		return &emails.APIKeyChanged{Data: data, Identifier: key.PrettyName(), Rights: key.Rights}
@@ -253,7 +257,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 		return nil, err
 	}
 	if len(req.Collaborator.Rights) > 0 {
-		events.Publish(evtUpdateOrganizationCollaborator(ctx, ttnpb.CombineIdentifiers(req.OrganizationIdentifiers, req.Collaborator), nil))
+		events.Publish(evtUpdateOrganizationCollaborator.NewWithIdentifiersAndData(ctx, ttnpb.CombineIdentifiers(req.OrganizationIdentifiers, req.Collaborator), nil))
 		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 			data.SetEntity(req.EntityIdentifiers())
 			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
@@ -262,7 +266,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteOrganizationCollaborator(ctx, ttnpb.CombineIdentifiers(req.OrganizationIdentifiers, req.Collaborator), nil))
+		events.Publish(evtDeleteOrganizationCollaborator.NewWithIdentifiersAndData(ctx, ttnpb.CombineIdentifiers(req.OrganizationIdentifiers, req.Collaborator), nil))
 	}
 	return ttnpb.Empty, nil
 }

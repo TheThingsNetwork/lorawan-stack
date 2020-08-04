@@ -22,7 +22,7 @@ import (
 
 type macCommandEnqueueState struct {
 	MaxDownLen, MaxUpLen uint16
-	QueuedEvents         []events.DefinitionDataClosure
+	QueuedEvents         events.Builders
 	Ok                   bool
 }
 
@@ -30,7 +30,7 @@ type macCommandEnqueueState struct {
 // Arguments to f represent the amount of downlink and uplink messages respectively with CID cid which fit in byte limits maxDownLen and maxUpLen.
 // f returns a slice downlink commands to append to cmds, amount of uplinks to expect and bool indicating whether all commands fit.
 // enqueueMACCommand returns the resulting downlink MAC command slice, new value for maxDownLen, maxUpLen and bool indicating whether all commands fit.
-func enqueueMACCommand(cid ttnpb.MACCommandIdentifier, maxDownLen, maxUpLen uint16, f func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool), cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, macCommandEnqueueState) {
+func enqueueMACCommand(cid ttnpb.MACCommandIdentifier, maxDownLen, maxUpLen uint16, f func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool), cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, macCommandEnqueueState) {
 	desc := lorawan.DefaultMACCommands[cid]
 	maxDown := maxDownLen / (1 + desc.DownlinkLength)
 	maxUp := maxUpLen / (1 + desc.UplinkLength)

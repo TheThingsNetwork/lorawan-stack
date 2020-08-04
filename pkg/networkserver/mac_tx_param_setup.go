@@ -63,7 +63,7 @@ func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 	}
 
 	var st macCommandEnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_TX_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_TX_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
@@ -81,15 +81,15 @@ func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 				req.MACCommand(),
 			},
 			1,
-			[]events.DefinitionDataClosure{
-				evtEnqueueTxParamSetupRequest.BindData(req),
+			events.Builders{
+				evtEnqueueTxParamSetupRequest.With(events.WithData(req)),
 			},
 			true
 	}, dev.MACState.PendingRequests...)
 	return st
 }
 
-func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {
+func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (events.Builders, error) {
 	var err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_TX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetTxParamSetupReq()
@@ -103,7 +103,7 @@ func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) ([]events.
 		}
 		return nil
 	}, dev.MACState.PendingRequests...)
-	return []events.DefinitionDataClosure{
-		evtReceiveTxParamSetupAnswer.BindData(nil),
+	return events.Builders{
+		evtReceiveTxParamSetupAnswer,
 	}, err
 }

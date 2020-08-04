@@ -128,7 +128,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_RxParamSetupAns
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -154,12 +154,12 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				Rx2DataRateIndexAck:  true,
 				Rx2FrequencyAck:      true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveRxParamSetupAccept.BindData(&ttnpb.MACCommand_RxParamSetupAns{
+			Events: events.Builders{
+				evtReceiveRxParamSetupAccept.With(events.WithData(&ttnpb.MACCommand_RxParamSetupAns{
 					Rx1DataRateOffsetAck: true,
 					Rx2DataRateIndexAck:  true,
 					Rx2FrequencyAck:      true,
-				}),
+				})),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -195,12 +195,12 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				Rx2DataRateIndexAck:  true,
 				Rx2FrequencyAck:      true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveRxParamSetupAccept.BindData(&ttnpb.MACCommand_RxParamSetupAns{
+			Events: events.Builders{
+				evtReceiveRxParamSetupAccept.With(events.WithData(&ttnpb.MACCommand_RxParamSetupAns{
 					Rx1DataRateOffsetAck: true,
 					Rx2DataRateIndexAck:  true,
 					Rx2FrequencyAck:      true,
-				}),
+				})),
 			},
 		},
 		{
@@ -233,11 +233,11 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				Rx1DataRateOffsetAck: true,
 				Rx2DataRateIndexAck:  true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveRxParamSetupReject.BindData(&ttnpb.MACCommand_RxParamSetupAns{
+			Events: events.Builders{
+				evtReceiveRxParamSetupReject.With(events.WithData(&ttnpb.MACCommand_RxParamSetupAns{
 					Rx1DataRateOffsetAck: true,
 					Rx2DataRateIndexAck:  true,
-				}),
+				})),
 			},
 		},
 	} {
@@ -252,7 +252,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

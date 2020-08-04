@@ -95,19 +95,19 @@ func NewWatcher(pubsub events.PubSub) (Watcher, error) {
 					return
 				}
 				if event.Op&fsnotify.Create == fsnotify.Create {
-					pubsub.Publish(events.New(context.Background(), "fs.create", nil, event.Name))
+					pubsub.Publish(events.New(context.Background(), "fs.create", "create file", events.WithData(event.Name)))
 				}
 				if event.Op&fsnotify.Write == fsnotify.Write {
-					pubsub.Publish(events.New(context.Background(), "fs.write", nil, event.Name))
+					pubsub.Publish(events.New(context.Background(), "fs.write", "write file", events.WithData(event.Name)))
 				}
 				if event.Op&fsnotify.Remove == fsnotify.Remove {
-					pubsub.Publish(events.New(context.Background(), "fs.remove", nil, event.Name))
+					pubsub.Publish(events.New(context.Background(), "fs.remove", "remove file", events.WithData(event.Name)))
 				}
 				if event.Op&fsnotify.Rename == fsnotify.Rename {
-					pubsub.Publish(events.New(context.Background(), "fs.rename", nil, event.Name))
+					pubsub.Publish(events.New(context.Background(), "fs.rename", "rename file", events.WithData(event.Name)))
 				}
 				if event.Op&fsnotify.Chmod == fsnotify.Chmod {
-					pubsub.Publish(events.New(context.Background(), "fs.chmod", nil, event.Name))
+					pubsub.Publish(events.New(context.Background(), "fs.chmod", "chmod file", events.WithData(event.Name)))
 				}
 			case err := <-w.Errors:
 				log.WithError(err).Warn("Error in file watcher")

@@ -30,7 +30,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_DeviceModeInd
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -63,13 +63,13 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
 				Class: ttnpb.CLASS_C,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDeviceModeIndication.BindData(&ttnpb.MACCommand_DeviceModeInd{
+			Events: events.Builders{
+				evtReceiveDeviceModeIndication.With(events.WithData(&ttnpb.MACCommand_DeviceModeInd{
 					Class: ttnpb.CLASS_C,
-				}),
-				evtEnqueueDeviceModeConfirmation.BindData(&ttnpb.MACCommand_DeviceModeConf{
+				})),
+				evtEnqueueDeviceModeConfirmation.With(events.WithData(&ttnpb.MACCommand_DeviceModeConf{
 					Class: ttnpb.CLASS_A,
-				}),
+				})),
 			},
 		},
 		{
@@ -94,14 +94,14 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
 				Class: ttnpb.CLASS_C,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDeviceModeIndication.BindData(&ttnpb.MACCommand_DeviceModeInd{
+			Events: events.Builders{
+				evtReceiveDeviceModeIndication.With(events.WithData(&ttnpb.MACCommand_DeviceModeInd{
 					Class: ttnpb.CLASS_C,
-				}),
-				evtClassCSwitch.BindData(ttnpb.CLASS_A),
-				evtEnqueueDeviceModeConfirmation.BindData(&ttnpb.MACCommand_DeviceModeConf{
+				})),
+				evtClassCSwitch.With(events.WithData(ttnpb.CLASS_A)),
+				evtEnqueueDeviceModeConfirmation.With(events.WithData(&ttnpb.MACCommand_DeviceModeConf{
 					Class: ttnpb.CLASS_C,
-				}),
+				})),
 			},
 		},
 		{
@@ -134,14 +134,14 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
 				Class: ttnpb.CLASS_A,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDeviceModeIndication.BindData(&ttnpb.MACCommand_DeviceModeInd{
+			Events: events.Builders{
+				evtReceiveDeviceModeIndication.With(events.WithData(&ttnpb.MACCommand_DeviceModeInd{
 					Class: ttnpb.CLASS_A,
-				}),
-				evtClassASwitch.BindData(ttnpb.CLASS_C),
-				evtEnqueueDeviceModeConfirmation.BindData(&ttnpb.MACCommand_DeviceModeConf{
+				})),
+				evtClassASwitch.With(events.WithData(ttnpb.CLASS_C)),
+				evtEnqueueDeviceModeConfirmation.With(events.WithData(&ttnpb.MACCommand_DeviceModeConf{
 					Class: ttnpb.CLASS_A,
-				}),
+				})),
 			},
 		},
 	} {
@@ -156,7 +156,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

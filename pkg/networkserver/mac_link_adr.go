@@ -174,7 +174,7 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 	}
 
 	var st macCommandEnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_LINK_ADR, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_LINK_ADR, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if int(nDown) < len(desiredMasks) {
 			return nil, 0, nil, false
 		}
@@ -186,7 +186,7 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		if nUp < uplinksNeeded {
 			return nil, 0, nil, false
 		}
-		evs := make([]events.DefinitionDataClosure, 0, len(desiredMasks))
+		evs := make(events.Builders, 0, len(desiredMasks))
 		cmds := make([]*ttnpb.MACCommand, 0, len(desiredMasks))
 		for i, m := range desiredMasks {
 			req := &ttnpb.MACCommand_LinkADRReq{
@@ -197,7 +197,7 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 				ChannelMask:        desiredMasks[i].Mask[:],
 			}
 			cmds = append(cmds, req.MACCommand())
-			evs = append(evs, evtEnqueueLinkADRRequest.BindData(req))
+			evs = append(evs, evtEnqueueLinkADRRequest.With(events.WithData(req)))
 			log.FromContext(ctx).WithFields(log.Fields(
 				"data_rate_index", req.DataRateIndex,
 				"nb_trans", req.NbTrans,
@@ -211,7 +211,7 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 	return st, nil
 }
 
-func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, dupCount uint, fps *frequencyplans.Store) ([]events.DefinitionDataClosure, error) {
+func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, dupCount uint, fps *frequencyplans.Store) (events.Builders, error) {
 	if pld == nil {
 		return nil, errNoPayload.New()
 	}
@@ -228,7 +228,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 			log.FromContext(ctx).Warn("Either Network Server sent a channel mask, which enables a yet undefined channel or requires all channels to be disabled, or device is malfunctioning.")
 		}
 	}
-	evs := []events.DefinitionDataClosure{evt.BindData(pld)}
+	evs := events.Builders{evt.With(events.WithData(pld))}
 
 	_, phy, err := getDeviceBandVersion(dev, fps)
 	if err != nil {

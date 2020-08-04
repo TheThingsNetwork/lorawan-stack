@@ -145,7 +145,7 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 		if ar.Authorized {
-			events.Publish(evtAuthorize(req.Context(), ttnpb.CombineIdentifiers(session.UserIdentifiers, client.ClientIdentifiers), nil))
+			events.Publish(evtAuthorize.NewWithIdentifiersAndData(req.Context(), ttnpb.CombineIdentifiers(session.UserIdentifiers, client.ClientIdentifiers), nil))
 		}
 		oauth2.FinishAuthorizeRequest(resp, req, ar)
 		return s.output(c, resp)
@@ -216,7 +216,7 @@ func (s *server) Token(c echo.Context) error {
 		}
 	}
 	if ar.Authorized {
-		events.Publish(evtTokenExchange(req.Context(), ttnpb.CombineIdentifiers(userIDs, client.ClientIdentifiers), nil))
+		events.Publish(evtTokenExchange.NewWithIdentifiersAndData(req.Context(), ttnpb.CombineIdentifiers(userIDs, client.ClientIdentifiers), nil))
 	}
 	oauth2.FinishAccessRequest(resp, req, ar)
 	delete(resp.Output, "scope")

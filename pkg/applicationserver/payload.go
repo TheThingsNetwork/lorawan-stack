@@ -96,7 +96,7 @@ func (as *ApplicationServer) decode(ctx context.Context, dev *ttnpb.EndDevice, u
 	if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
 		if err := as.formatter.Decode(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, uplink, formatter, parameter); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Payload decoding failed")
-			events.Publish(evtDecodeFailDataUp(ctx, dev.EndDeviceIdentifiers, err))
+			events.Publish(evtDecodeFailDataUp.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, err))
 		}
 	}
 	return nil

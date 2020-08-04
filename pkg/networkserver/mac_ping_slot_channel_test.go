@@ -103,7 +103,7 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_PingSlotChannelAns
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -128,11 +128,11 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 				FrequencyAck:     true,
 				DataRateIndexAck: true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceivePingSlotChannelAnswer.BindData(&ttnpb.MACCommand_PingSlotChannelAns{
+			Events: events.Builders{
+				evtReceivePingSlotChannelAnswer.With(events.WithData(&ttnpb.MACCommand_PingSlotChannelAns{
 					FrequencyAck:     true,
 					DataRateIndexAck: true,
-				}),
+				})),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -161,11 +161,11 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 				FrequencyAck:     true,
 				DataRateIndexAck: true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceivePingSlotChannelAnswer.BindData(&ttnpb.MACCommand_PingSlotChannelAns{
+			Events: events.Builders{
+				evtReceivePingSlotChannelAnswer.With(events.WithData(&ttnpb.MACCommand_PingSlotChannelAns{
 					FrequencyAck:     true,
 					DataRateIndexAck: true,
-				}),
+				})),
 			},
 		},
 	} {
@@ -180,7 +180,7 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

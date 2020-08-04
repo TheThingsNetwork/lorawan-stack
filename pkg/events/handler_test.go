@@ -66,9 +66,9 @@ func TestChannelReceive(t *testing.T) {
 	a := assertions.New(t)
 
 	eventChan := make(events.Channel, 2)
-	eventChan.Notify(events.New(test.Context(), "evt", nil, nil))
-	eventChan.Notify(events.New(test.Context(), "evt", nil, nil))
-	eventChan.Notify(events.New(test.Context(), "overflow", nil, nil))
+	eventChan.Notify(events.New(test.Context(), "evt", "event"))
+	eventChan.Notify(events.New(test.Context(), "evt", "event"))
+	eventChan.Notify(events.New(test.Context(), "overflow", "this overflows the channel"))
 
 	runtime.Gosched()
 

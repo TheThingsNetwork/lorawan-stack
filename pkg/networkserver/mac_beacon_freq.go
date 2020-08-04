@@ -44,7 +44,7 @@ func enqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 	}
 
 	var st macCommandEnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_BEACON_FREQ, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_BEACON_FREQ, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
@@ -59,15 +59,15 @@ func enqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 				req.MACCommand(),
 			},
 			1,
-			[]events.DefinitionDataClosure{
-				evtEnqueueBeaconFreqRequest.BindData(req),
+			events.Builders{
+				evtEnqueueBeaconFreqRequest.With(events.WithData(req)),
 			},
 			true
 	}, dev.MACState.PendingRequests...)
 	return st
 }
 
-func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_BeaconFreqAns) ([]events.DefinitionDataClosure, error) {
+func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_BeaconFreqAns) (events.Builders, error) {
 	if pld == nil {
 		return nil, errNoPayload.New()
 	}
@@ -87,7 +87,7 @@ func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		dev.MACState.CurrentParameters.BeaconFrequency = req.Frequency
 		return nil
 	}, dev.MACState.PendingRequests...)
-	return []events.DefinitionDataClosure{
-		evt.BindData(pld),
+	return events.Builders{
+		evt.With(events.WithData(pld)),
 	}, err
 }

@@ -24,55 +24,69 @@ import (
 
 const i18nPrefix = "event"
 
-// Definition of a registered event.
-type Definition func(ctx context.Context, ids CombinedIdentifiers, data interface{}) Event
-
-// BindData partially-applies Definition by binding data argument.
-func (d Definition) BindData(data interface{}) DefinitionDataClosure {
-	return func(ctx context.Context, ids CombinedIdentifiers) Event {
-		return d(ctx, ids, data)
-	}
+type definition struct {
+	name        string
+	description string
 }
 
-// DefinitionDataClosure is partially-applied Definition with data argument bound.
-type DefinitionDataClosure func(ctx context.Context, ids CombinedIdentifiers) Event
-
-// ApplyDefinitionDataClosures applies ...DefinitionDataClosure using context.Context and CombinedIdentifiers passed.
-func ApplyDefinitionDataClosures(ctx context.Context, ids CombinedIdentifiers, closures ...DefinitionDataClosure) []Event {
-	evts := make([]Event, 0, len(closures))
-	for _, f := range closures {
-		evts = append(evts, f(ctx, ids))
+func (d *definition) With(options ...Option) Builder {
+	extended := &builder{
+		definition: d,
 	}
-	return evts
+	extended.options = append(extended.options, options...)
+	return extended
+}
+
+var defaultOptions = []Option{
+	WithVisibility(ttnpb.RIGHT_ALL),
+}
+
+func (d *definition) New(ctx context.Context, opts ...Option) Event {
+	return d.With(defaultOptions...).New(ctx, opts...)
+}
+
+func (d *definition) NewWithIdentifiersAndData(ctx context.Context, ids CombinedIdentifiers, data interface{}) Event {
+	return d.With(defaultOptions...).NewWithIdentifiersAndData(ctx, ids, data)
+}
+
+func (d *definition) BindData(data interface{}) Builder {
+	return d.With(defaultOptions...).BindData(data)
 }
 
 // Definitions of registered events.
-// Events that are defined in init() funcs will be collected for translation.
-var Definitions = make(map[string]string)
+var definitions = make(map[string]*definition)
 
 // defineSkip registers an event and returns its definition.
 // The argument skip is the number of stack frames to ascend, with 0 identifying the caller of defineSkip.
-func defineSkip(name, description string, skip uint, visibility ...ttnpb.Right) Definition {
-	if Definitions[name] != "" {
-		panic(fmt.Errorf("Event %s already defined", name))
+func defineSkip(name, description string, skip uint, opts ...Option) Builder {
+	if definitions[name] != nil {
+		panic(fmt.Errorf("Event %q already defined", name))
 	}
+	def := &definition{
+		name:        name,
+		description: description,
+	}
+	definitions[name] = def
+
 	i18n.Define(fmt.Sprintf("%s:%s", i18nPrefix, name), description).SetSource(1 + skip)
-	Definitions[name] = description
 	initMetrics(name)
-	return func(ctx context.Context, identifiers CombinedIdentifiers, data interface{}) Event {
-		return New(ctx, name, identifiers, data, visibility...)
+
+	var b Builder = def
+	if len(opts) > 0 {
+		b = b.With(opts...)
 	}
+	return b
 }
 
 // Define a registered event.
-func Define(name, description string, visibility ...ttnpb.Right) Definition {
-	return defineSkip(name, description, 1, visibility...)
+func Define(name, description string, opts ...Option) Builder {
+	return defineSkip(name, description, 1, opts...)
 }
 
 // DefineFunc generates a function, which returns a Definition with specified name and description.
 // Most callers should be using Define - this function is only useful for helper functions.
-func DefineFunc(name, description string, visibility ...ttnpb.Right) func() Definition {
-	return func() Definition {
-		return defineSkip(name, description, 1, visibility...)
+func DefineFunc(name, description string, opts ...Option) func() Builder {
+	return func() Builder {
+		return defineSkip(name, description, 1, opts...)
 	}
 }

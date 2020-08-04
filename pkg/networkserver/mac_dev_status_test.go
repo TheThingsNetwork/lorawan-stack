@@ -187,7 +187,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 		Payload          *ttnpb.MACCommand_DevStatusAns
 		FCntUp           uint32
 		ReceivedAt       time.Time
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -214,11 +214,11 @@ func TestHandleDevStatusAns(t *testing.T) {
 				Margin:  4,
 			},
 			ReceivedAt: time.Unix(42, 0),
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDevStatusAnswer.BindData(&ttnpb.MACCommand_DevStatusAns{
+			Events: events.Builders{
+				evtReceiveDevStatusAnswer.With(events.WithData(&ttnpb.MACCommand_DevStatusAns{
 					Battery: 42,
 					Margin:  4,
-				}),
+				})),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -250,11 +250,11 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 			FCntUp:     43,
 			ReceivedAt: time.Unix(42, 0),
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDevStatusAnswer.BindData(&ttnpb.MACCommand_DevStatusAns{
+			Events: events.Builders{
+				evtReceiveDevStatusAnswer.With(events.WithData(&ttnpb.MACCommand_DevStatusAns{
 					Battery: 42,
 					Margin:  4,
-				}),
+				})),
 			},
 		},
 		{
@@ -284,10 +284,10 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 			FCntUp:     43,
 			ReceivedAt: time.Unix(42, 0),
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDevStatusAnswer.BindData(&ttnpb.MACCommand_DevStatusAns{
+			Events: events.Builders{
+				evtReceiveDevStatusAnswer.With(events.WithData(&ttnpb.MACCommand_DevStatusAns{
 					Margin: 20,
-				}),
+				})),
 			},
 		},
 		{
@@ -317,11 +317,11 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 			FCntUp:     43,
 			ReceivedAt: time.Unix(42, 0),
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDevStatusAnswer.BindData(&ttnpb.MACCommand_DevStatusAns{
+			Events: events.Builders{
+				evtReceiveDevStatusAnswer.With(events.WithData(&ttnpb.MACCommand_DevStatusAns{
 					Battery: 255,
 					Margin:  -5,
-				}),
+				})),
 			},
 		},
 	} {
@@ -336,7 +336,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

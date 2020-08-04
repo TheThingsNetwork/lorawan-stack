@@ -32,29 +32,29 @@ func TestIdentifierFilter(t *testing.T) {
 
 	filter := events.NewIdentifierFilter()
 
-	evtAppFoo := events.New(test.Context(), "test", ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}, "hello foo")
-	evtAppBar := events.New(test.Context(), "test", ttnpb.ApplicationIdentifiers{ApplicationID: "bar"}, "hello bar")
+	evtAppFoo := events.New(test.Context(), "test", "test", events.WithIdentifiers(ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}))
+	evtAppBar := events.New(test.Context(), "test", "test", events.WithIdentifiers(ttnpb.ApplicationIdentifiers{ApplicationID: "bar"}))
 
-	evtCliFoo := events.New(test.Context(), "test", ttnpb.ClientIdentifiers{ClientID: "foo"}, "hello foo")
-	evtCliBar := events.New(test.Context(), "test", ttnpb.ClientIdentifiers{ClientID: "bar"}, "hello bar")
+	evtCliFoo := events.New(test.Context(), "test", "test", events.WithIdentifiers(ttnpb.ClientIdentifiers{ClientID: "foo"}))
+	evtCliBar := events.New(test.Context(), "test", "test", events.WithIdentifiers(ttnpb.ClientIdentifiers{ClientID: "bar"}))
 
-	evtDevFoo := events.New(test.Context(), "test", ttnpb.EndDeviceIdentifiers{
+	evtDevFoo := events.New(test.Context(), "test", "test", events.WithIdentifiers(ttnpb.EndDeviceIdentifiers{
 		DeviceID:               "foo",
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
-	}, "hello foo")
-	evtDevBar := events.New(test.Context(), "test", ttnpb.EndDeviceIdentifiers{
+	}))
+	evtDevBar := events.New(test.Context(), "test", "test", events.WithIdentifiers(ttnpb.EndDeviceIdentifiers{
 		DeviceID:               "bar",
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "bar"},
-	}, "hello bar")
+	}))
 
-	evtGtwFoo := events.New(test.Context(), "test", ttnpb.GatewayIdentifiers{GatewayID: "foo"}, "hello foo")
-	evtGtwBar := events.New(test.Context(), "test", ttnpb.GatewayIdentifiers{GatewayID: "bar"}, "hello bar")
+	evtGtwFoo := events.New(test.Context(), "test", "test", events.WithIdentifiers(ttnpb.GatewayIdentifiers{GatewayID: "foo"}))
+	evtGtwBar := events.New(test.Context(), "test", "test", events.WithIdentifiers(ttnpb.GatewayIdentifiers{GatewayID: "bar"}))
 
-	evtOrgFoo := events.New(test.Context(), "test", ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}, "hello foo")
-	evtOrgBar := events.New(test.Context(), "test", ttnpb.OrganizationIdentifiers{OrganizationID: "bar"}, "hello bar")
+	evtOrgFoo := events.New(test.Context(), "test", "test", events.WithIdentifiers(ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}))
+	evtOrgBar := events.New(test.Context(), "test", "test", events.WithIdentifiers(ttnpb.OrganizationIdentifiers{OrganizationID: "bar"}))
 
-	evtUsrFoo := events.New(test.Context(), "test", ttnpb.UserIdentifiers{UserID: "foo"}, "hello foo")
-	evtUsrBar := events.New(test.Context(), "test", ttnpb.UserIdentifiers{UserID: "bar"}, "hello bar")
+	evtUsrFoo := events.New(test.Context(), "test", "test", events.WithIdentifiers(ttnpb.UserIdentifiers{UserID: "foo"}))
+	evtUsrBar := events.New(test.Context(), "test", "test", events.WithIdentifiers(ttnpb.UserIdentifiers{UserID: "bar"}))
 
 	fooIDs := &ttnpb.CombinedIdentifiers{
 		EntityIdentifiers: []*ttnpb.EntityIdentifiers{

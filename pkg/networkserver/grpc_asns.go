@@ -103,7 +103,7 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 	defer ns.applicationServers.Delete(uid)
 
 	logger.Debug("Linked application")
-	events.Publish(evtBeginApplicationLink(ctx, ids, nil))
+	events.Publish(evtBeginApplicationLink.NewWithIdentifiersAndData(ctx, ids, nil))
 	err := ns.applicationUplinks.Subscribe(ctx, ids, func(ctx context.Context, up *ttnpb.ApplicationUp) error {
 		if err := link.Send(up); err != nil {
 			return err
@@ -114,9 +114,9 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 		switch pld := up.Up.(type) {
 		case *ttnpb.ApplicationUp_UplinkMessage:
 			registerForwardDataUplink(ctx, pld.UplinkMessage)
-			events.Publish(evtForwardDataUplink(ctx, up.EndDeviceIdentifiers, up))
+			events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, up))
 		case *ttnpb.ApplicationUp_JoinAccept:
-			events.Publish(evtForwardJoinAccept(ctx, up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
+			events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: up.EndDeviceIdentifiers,
 				CorrelationIDs:       up.CorrelationIDs,
 				Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -127,7 +127,7 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 		return nil
 	})
 	logger.WithError(err).Debug("Close application link")
-	events.Publish(evtEndApplicationLink(ctx, ids, err))
+	events.Publish(evtEndApplicationLink.NewWithIdentifiersAndData(ctx, ids, err))
 	return err
 }
 

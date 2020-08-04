@@ -30,15 +30,15 @@ import (
 var (
 	evtCreateGateway = events.Define(
 		"gateway.create", "create gateway",
-		ttnpb.RIGHT_GATEWAY_INFO,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
 	)
 	evtUpdateGateway = events.Define(
 		"gateway.update", "update gateway",
-		ttnpb.RIGHT_GATEWAY_INFO,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
 	)
 	evtDeleteGateway = events.Define(
 		"gateway.delete", "delete gateway",
-		ttnpb.RIGHT_GATEWAY_INFO,
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
 	)
 )
 
@@ -105,7 +105,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		}
 		return nil, err
 	}
-	events.Publish(evtCreateGateway(ctx, req.GatewayIdentifiers, nil))
+	events.Publish(evtCreateGateway.NewWithIdentifiersAndData(ctx, req.GatewayIdentifiers, nil))
 	return gtw, nil
 }
 
@@ -293,7 +293,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateGateway(ctx, req.GatewayIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateGateway.NewWithIdentifiersAndData(ctx, req.GatewayIdentifiers, req.FieldMask.Paths))
 	return gtw, nil
 }
 
@@ -307,7 +307,7 @@ func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayI
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtDeleteGateway(ctx, ids, nil))
+	events.Publish(evtDeleteGateway.NewWithIdentifiersAndData(ctx, ids, nil))
 	return ttnpb.Empty, nil
 }
 

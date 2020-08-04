@@ -28,71 +28,71 @@ import (
 var (
 	evtLinkStart = events.Define(
 		"as.link.start", "start link",
-		ttnpb.RIGHT_APPLICATION_LINK,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_LINK),
 	)
 	evtLinkStop = events.Define(
 		"as.link.stop", "stop link",
-		ttnpb.RIGHT_APPLICATION_LINK,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_LINK),
 	)
 	evtLinkFail = events.Define(
 		"as.link.fail", "fail link",
-		ttnpb.RIGHT_APPLICATION_LINK,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_LINK),
 	)
 	evtApplicationSubscribe = events.Define(
 		"as.application.subscribe", "subscribe application",
-		ttnpb.RIGHT_APPLICATION_LINK,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_LINK),
 	)
 	evtApplicationUnsubscribe = events.Define(
 		"as.application.unsubscribe", "unsubscribe application",
-		ttnpb.RIGHT_APPLICATION_LINK,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_LINK),
 	)
 	evtReceiveDataUp = events.Define(
 		"as.up.data.receive", "receive uplink data message",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtDropDataUp = events.Define(
 		"as.up.data.drop", "drop uplink data message",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtForwardDataUp = events.Define(
 		"as.up.data.forward", "forward uplink data message",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtDecodeFailDataUp = events.Define(
 		"as.up.data.decode.fail", "decode uplink data message failure",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtReceiveJoinAccept = events.Define(
 		"as.up.join.receive", "receive join-accept message",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtDropJoinAccept = events.Define(
 		"as.up.join.drop", "drop join-accept message",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtForwardJoinAccept = events.Define(
 		"as.up.join.forward", "forward join-accept message",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtReceiveDataDown = events.Define(
 		"as.down.data.receive", "receive downlink data message",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtDropDataDown = events.Define(
 		"as.down.data.drop", "drop downlink data message",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtForwardDataDown = events.Define(
 		"as.down.data.forward", "forward downlink data message",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtLostQueueDataDown = events.Define(
 		"as.down.data.queue.lost", "lose downlink data queue",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtInvalidQueueDataDown = events.Define(
 		"as.down.data.queue.invalid", "invalid downlink data queue",
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 )
 
@@ -242,17 +242,17 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 }
 
 func registerLinkStart(ctx context.Context, link *link) {
-	events.Publish(evtLinkStart(ctx, link.ApplicationIdentifiers, nil))
+	events.Publish(evtLinkStart.NewWithIdentifiersAndData(ctx, link.ApplicationIdentifiers, nil))
 	asMetrics.linksStarted.WithLabelValues(ctx, link.NetworkServerAddress).Inc()
 }
 
 func registerLinkStop(ctx context.Context, link *link) {
-	events.Publish(evtLinkStop(ctx, link.ApplicationIdentifiers, nil))
+	events.Publish(evtLinkStop.NewWithIdentifiersAndData(ctx, link.ApplicationIdentifiers, nil))
 	asMetrics.linksStopped.WithLabelValues(ctx, link.NetworkServerAddress).Inc()
 }
 
 func registerLinkFail(ctx context.Context, link *link, err error) {
-	events.Publish(evtLinkFail(ctx, link.ApplicationIdentifiers, err))
+	events.Publish(evtLinkFail.NewWithIdentifiersAndData(ctx, link.ApplicationIdentifiers, err))
 	asMetrics.linksFailed.WithLabelValues(ctx, link.NetworkServerAddress).Inc()
 }
 
@@ -261,7 +261,7 @@ func registerSubscribe(ctx context.Context, sub *io.Subscription) {
 	if appIDs := sub.ApplicationIDs(); appIDs != nil {
 		ids = appIDs
 	}
-	events.Publish(evtApplicationSubscribe(ctx, ids, nil))
+	events.Publish(evtApplicationSubscribe.NewWithIdentifiersAndData(ctx, ids, nil))
 	asMetrics.subscriptionsStarted.WithLabelValues(ctx, sub.Protocol()).Inc()
 }
 
@@ -270,16 +270,16 @@ func registerUnsubscribe(ctx context.Context, sub *io.Subscription) {
 	if appIDs := sub.ApplicationIDs(); appIDs != nil {
 		ids = appIDs
 	}
-	events.Publish(evtApplicationUnsubscribe(ctx, ids, nil))
+	events.Publish(evtApplicationUnsubscribe.NewWithIdentifiersAndData(ctx, ids, nil))
 	asMetrics.subscriptionsStopped.WithLabelValues(ctx, sub.Protocol()).Inc()
 }
 
 func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp, ns string) {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		events.Publish(evtReceiveJoinAccept(ctx, msg.EndDeviceIdentifiers, nil))
+		events.Publish(evtReceiveJoinAccept.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, nil))
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		events.Publish(evtReceiveDataUp(ctx, msg.EndDeviceIdentifiers, nil))
+		events.Publish(evtReceiveDataUp.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, nil))
 	default:
 		return
 	}
@@ -289,9 +289,9 @@ func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp, ns string)
 func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		events.Publish(evtForwardJoinAccept(ctx, msg.EndDeviceIdentifiers, msg))
+		events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, msg))
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		events.Publish(evtForwardDataUp(ctx, msg.EndDeviceIdentifiers, msg))
+		events.Publish(evtForwardDataUp.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, msg))
 	default:
 		return
 	}
@@ -301,9 +301,9 @@ func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		events.Publish(evtDropJoinAccept(ctx, msg.EndDeviceIdentifiers, err))
+		events.Publish(evtDropJoinAccept.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, err))
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		events.Publish(evtDropDataUp(ctx, msg.EndDeviceIdentifiers, err))
+		events.Publish(evtDropDataUp.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, err))
 	default:
 		return
 	}
@@ -315,17 +315,17 @@ func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
 }
 
 func registerReceiveDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink) {
-	events.Publish(evtReceiveDataDown(ctx, ids, msg))
+	events.Publish(evtReceiveDataDown.NewWithIdentifiersAndData(ctx, ids, msg))
 	asMetrics.downlinkReceived.WithLabelValues(ctx, ids.ApplicationID).Inc()
 }
 
 func registerForwardDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, ns string) {
-	events.Publish(evtForwardDataDown(ctx, ids, msg))
+	events.Publish(evtForwardDataDown.NewWithIdentifiersAndData(ctx, ids, msg))
 	asMetrics.downlinkForwarded.WithLabelValues(ctx, ns).Inc()
 }
 
 func registerDropDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, err error) {
-	events.Publish(evtDropDataDown(ctx, ids, err))
+	events.Publish(evtDropDataDown.NewWithIdentifiersAndData(ctx, ids, err))
 	if ttnErr, ok := errors.From(err); ok {
 		asMetrics.downlinkDropped.WithLabelValues(ctx, ttnErr.FullName()).Inc()
 	} else {
