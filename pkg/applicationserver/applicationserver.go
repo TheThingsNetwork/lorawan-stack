@@ -345,10 +345,14 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			var encryptedItems []*ttnpb.ApplicationDownlink
 			for _, session := range sessions {
 				for _, item := range items {
+					fCnt := session.LastAFCntDown + 1
+					if skipPayloadCrypto(link, dev) {
+						fCnt = item.FCnt
+					}
 					encryptedItem := &ttnpb.ApplicationDownlink{
 						SessionKeyID:   session.SessionKeyID,
 						FPort:          item.FPort,
-						FCnt:           session.LastAFCntDown + 1,
+						FCnt:           fCnt,
 						FRMPayload:     item.FRMPayload,
 						DecodedPayload: item.DecodedPayload,
 						Confirmed:      item.Confirmed,
@@ -516,30 +520,30 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 	return ttnpb.KeyEnvelope{}, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEUI)
 }
 
-func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *link) error {
+func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *link) (pass bool, err error) {
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIdentifiers))
 	if up.Simulated {
-		return as.handleSimulatedUp(ctx, up, link)
+		return true, as.handleSimulatedUp(ctx, up, link)
 	}
 	switch p := up.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		return as.handleJoinAccept(ctx, up.EndDeviceIdentifiers, p.JoinAccept, link)
+		return true, as.handleJoinAccept(ctx, up.EndDeviceIdentifiers, p.JoinAccept, link)
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		return as.handleUplink(ctx, up.EndDeviceIdentifiers, p.UplinkMessage, link)
+		return true, as.handleUplink(ctx, up.EndDeviceIdentifiers, p.UplinkMessage, link)
 	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
 		return as.handleDownlinkQueueInvalidated(ctx, up.EndDeviceIdentifiers, p.DownlinkQueueInvalidated, link)
 	case *ttnpb.ApplicationUp_DownlinkQueued:
-		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkQueued, link)
+		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkQueued, link)
 	case *ttnpb.ApplicationUp_DownlinkSent:
-		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkSent, link)
+		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkSent, link)
 	case *ttnpb.ApplicationUp_DownlinkFailed:
-		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, &p.DownlinkFailed.ApplicationDownlink, link)
+		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, &p.DownlinkFailed.ApplicationDownlink, link)
 	case *ttnpb.ApplicationUp_DownlinkAck:
-		return as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkAck, link)
+		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkAck, link)
 	case *ttnpb.ApplicationUp_DownlinkNack:
-		return as.handleDownlinkNack(ctx, up.EndDeviceIdentifiers, p.DownlinkNack, link)
+		return true, as.handleDownlinkNack(ctx, up.EndDeviceIdentifiers, p.DownlinkNack, link)
 	default:
-		return nil
+		return false, nil
 	}
 }
 
@@ -933,8 +937,8 @@ func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnp
 	return as.decode(ctx, dev, uplink, link.DefaultFormatters)
 }
 
-func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *link) error {
-	_, err := as.deviceRegistry.Set(ctx, ids,
+func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *link) (pass bool, err error) {
+	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
 			"skip_payload_crypto_override",
@@ -946,16 +950,19 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 			if dev.Session == nil {
 				return nil, nil, errNoDeviceSession.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
+			if skipPayloadCrypto(link, dev) {
+				// When skipping application payload crypto, the upstream application is responsible for recalculating the
+				// downlink queue. No error is returned here to pass the downlink queue invalidation message upstream.
+				pass = true
+				return dev, nil, nil
+			}
 			if err := as.recalculateDownlinkQueue(ctx, dev, link, dev.Session, invalid.Downlinks, invalid.LastFCntDown+1, true); err != nil {
 				return nil, nil, err
 			}
 			return dev, []string{"session"}, nil
 		},
 	)
-	if err != nil {
-		return err
-	}
-	return nil
+	return
 }
 
 func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *link) error {
@@ -998,22 +1005,35 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 	return nil
 }
 
+// decryptDownlinkMessage decrypts the downlink message.
+// If application payload crypto is skipped, this method returns nil.
 func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *link) error {
-	dev, err := as.deviceRegistry.Get(ctx, ids, []string{"session", "skip_payload_crypto"})
+	dev, err := as.deviceRegistry.Get(ctx, ids, []string{
+		"pending_session",
+		"session",
+		"skip_payload_crypto_override",
+	})
 	if err != nil {
 		return err
 	}
 	if skipPayloadCrypto(link, dev) {
 		return nil
 	}
-	if dev.Session == nil || !bytes.Equal(dev.Session.SessionKeyID, msg.SessionKeyID) || dev.Session.AppSKey == nil {
+	var session *ttnpb.Session
+	switch {
+	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyID, msg.SessionKeyID):
+		session = dev.Session
+	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, msg.SessionKeyID):
+		session = dev.PendingSession
+	}
+	if session.GetAppSKey() == nil {
 		return errNoAppSKey.New()
 	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, *dev.Session.AppSKey, as.KeyVault)
+	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, *session.AppSKey, as.KeyVault)
 	if err != nil {
 		return err
 	}
-	msg.FRMPayload, err = crypto.DecryptDownlink(appSKey, dev.Session.DevAddr, msg.FCnt, msg.FRMPayload, false)
+	msg.FRMPayload, err = crypto.DecryptDownlink(appSKey, session.DevAddr, msg.FCnt, msg.FRMPayload, false)
 	if err != nil {
 		return err
 	}

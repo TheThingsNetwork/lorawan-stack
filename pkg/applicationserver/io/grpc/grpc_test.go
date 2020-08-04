@@ -258,7 +258,6 @@ func TestTraffic(t *testing.T) {
 					{
 						SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44}, // This gets discarded.
 						FPort:          1,
-						FCnt:           100, // This gets discarded.
 						FRMPayload:     []byte{0x01, 0x01, 0x01},
 						Confirmed:      true,
 						CorrelationIDs: []string{"test"},
@@ -326,7 +325,6 @@ func TestTraffic(t *testing.T) {
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      4,
-						FCnt:       100, // This gets discarded.
 						FRMPayload: []byte{0x04, 0x04, 0x04},
 						Confirmed:  true,
 					},

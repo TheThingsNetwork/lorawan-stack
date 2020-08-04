@@ -111,9 +111,8 @@ func (s *server) DownlinkQueueReplace(ctx context.Context, ids ttnpb.EndDeviceId
 // DownlinkQueueList implements io.Server.
 func (s *server) DownlinkQueueList(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error) {
 	s.downlinkQueueMu.RLock()
-	queue := s.downlinkQueue[unique.ID(ctx, ids)]
-	s.downlinkQueueMu.RUnlock()
-	return queue, nil
+	defer s.downlinkQueueMu.RUnlock()
+	return s.downlinkQueue[unique.ID(ctx, ids)], nil
 }
 
 func (s *server) SetSubscribeError(err error) {

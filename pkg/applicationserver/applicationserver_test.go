@@ -2232,6 +2232,48 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							}
 						},
 					},
+					{
+						Name: "DownlinkQueueInvalidation",
+						Message: &ttnpb.ApplicationUp{
+							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+							Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+								DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
+									Downlinks: []*ttnpb.ApplicationDownlink{
+										{
+											SessionKeyID: []byte{0x22},
+											FPort:        22,
+											FCnt:         22,
+											FRMPayload:   []byte{0x01},
+										},
+									},
+								},
+							},
+						},
+						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
+							a := assertions.New(t)
+							if effectiveSkip {
+								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+									Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+										DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
+											Downlinks: []*ttnpb.ApplicationDownlink{
+												{
+													SessionKeyID: []byte{0x22},
+													FPort:        22,
+													FCnt:         22,
+													FRMPayload:   []byte{0x01},
+												},
+											},
+										},
+									},
+									CorrelationIDs: up.CorrelationIDs,
+									ReceivedAt:     up.ReceivedAt,
+								})
+							} else {
+								a.So(up, should.BeNil)
+							}
+						},
+					},
 				} {
 					stepok := t.Run(step.Name, func(t *testing.T) {
 						ns.upCh <- step.Message
@@ -2243,7 +2285,11 @@ func TestSkipPayloadCrypto(t *testing.T) {
 								t.Fatalf("Expected no upstream message but got %v", msg)
 							}
 						case <-time.After(Timeout):
-							t.Fatal("Expected upstream timeout")
+							if step.AssertUp != nil {
+								step.AssertUp(t, nil)
+							} else {
+								t.Fatal("Expected upstream timeout")
+							}
 						}
 						if step.AssertDevice != nil {
 							dev, err := deviceRegistry.Get(ctx, step.Message.EndDeviceIdentifiers, []string{"session", "pending_session"})
@@ -2287,10 +2333,12 @@ func TestSkipPayloadCrypto(t *testing.T) {
 						{
 							{
 								FPort:      11,
+								FCnt:       1,
 								FRMPayload: []byte{0x1, 0x1, 0x1},
 							},
 							{
 								FPort:      22,
+								FCnt:       2,
 								FRMPayload: []byte{0x2, 0x2, 0x2},
 							},
 						},
