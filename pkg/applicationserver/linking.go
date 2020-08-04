@@ -77,7 +77,7 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 	}, component.TaskRestartOnFailure, 0.1, component.TaskBackoffDial...)
 }
 
-type upstreamTrafficHandler func(context.Context, *ttnpb.ApplicationUp, *link) error
+type upstreamTrafficHandler func(context.Context, *ttnpb.ApplicationUp, *link) (pass bool, err error)
 
 type link struct {
 	// Align for sync/atomic.
@@ -345,13 +345,11 @@ func (l *link) sendUp(ctx context.Context, up *ttnpb.ApplicationUp, ack func() e
 	now := time.Now().UTC()
 	up.ReceivedAt = &now
 
-	handleUpErr := l.handleUp(ctx, up, l)
+	pass, handleUpErr := l.handleUp(ctx, up, l)
 	if err := ack(); err != nil {
 		return err
 	}
-
-	switch up.Up.(type) {
-	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
+	if !pass {
 		return nil
 	}
 
