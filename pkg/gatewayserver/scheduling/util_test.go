@@ -35,6 +35,9 @@ type mockClock struct {
 func (c *mockClock) IsSynced() bool {
 	return c.t > 0
 }
+func (c *mockClock) SyncTime() (time.Time, bool) {
+	return time.Unix(0, 0).Add(time.Duration(c.t)), true
+}
 func (c *mockClock) FromServerTime(_ time.Time) (scheduling.ConcentratorTime, bool) {
 	return c.t, true
 }

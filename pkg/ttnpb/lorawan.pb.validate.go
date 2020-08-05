@@ -1686,6 +1686,8 @@ func (m *UplinkToken) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "concentrator_time":
+			// no validation rules for ConcentratorTime
 		default:
 			return UplinkTokenValidationError{
 				field:  name,

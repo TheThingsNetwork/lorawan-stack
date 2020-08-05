@@ -1045,6 +1045,16 @@ func (dst *UplinkToken) SetFields(src *UplinkToken, paths ...string) error {
 				var zero time.Time
 				dst.ServerTime = zero
 			}
+		case "concentrator_time":
+			if len(subs) > 0 {
+				return fmt.Errorf("'concentrator_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ConcentratorTime = src.ConcentratorTime
+			} else {
+				var zero int64
+				dst.ConcentratorTime = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
