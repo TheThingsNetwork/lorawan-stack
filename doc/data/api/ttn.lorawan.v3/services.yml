@@ -1,7 +1,6 @@
 AppAs:
   name: AppAs
-  comment: |2
-     The AppAs service connects an application or integration to an Application Server.
+  comment: The AppAs service connects an application or integration to an Application Server.
   methods:
     Subscribe:
       name: Subscribe
@@ -48,11 +47,22 @@ AppAs:
       http:
       - method: GET
         path: /as/applications/{application_id}/mqtt-connection-info
+    SimulateUplink:
+      name: SimulateUplink
+      input:
+        name: ApplicationUp
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: POST
+        path: /as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/simulate
 ApplicationAccess:
   name: ApplicationAccess
   methods:
     ListRights:
       name: ListRights
+      comment: List the rights the caller has on this application.
       input:
         name: ApplicationIdentifiers
       output:
@@ -62,6 +72,7 @@ ApplicationAccess:
         path: /applications/{application_id}/rights
     CreateAPIKey:
       name: CreateAPIKey
+      comment: Create an API key scoped to this application.
       input:
         name: CreateApplicationAPIKeyRequest
       output:
@@ -71,6 +82,7 @@ ApplicationAccess:
         path: /applications/{application_ids.application_id}/api-keys
     ListAPIKeys:
       name: ListAPIKeys
+      comment: List the API keys for this application.
       input:
         name: ListApplicationAPIKeysRequest
       output:
@@ -80,6 +92,7 @@ ApplicationAccess:
         path: /applications/{application_ids.application_id}/api-keys
     GetAPIKey:
       name: GetAPIKey
+      comment: Get a single API key of this application.
       input:
         name: GetApplicationAPIKeyRequest
       output:
@@ -89,10 +102,10 @@ ApplicationAccess:
         path: /applications/{application_ids.application_id}/api-keys/{key_id}
     UpdateAPIKey:
       name: UpdateAPIKey
-      comment: |2
-         Update the rights of an existing application API key. To generate an API key,
-         the CreateAPIKey should be used. To delete an API key, update it
-         with zero rights. It is required for the caller to have all assigned or/and removed rights.
+      comment: |-
+        Update the rights of an API key of the application.
+        This method can also be used to delete the API key, by giving it no rights.
+        The caller is required to have all assigned or/and removed rights.
       input:
         name: UpdateApplicationAPIKeyRequest
       output:
@@ -102,26 +115,26 @@ ApplicationAccess:
         path: /applications/{application_ids.application_id}/api-keys/{api_key.id}
     GetCollaborator:
       name: GetCollaborator
-      comment: |2
-         Get the rights of a collaborator (member) of the application.
-         Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
+      comment: |-
+        Get the rights of a collaborator (member) of the application.
+        Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
       input:
         name: GetApplicationCollaboratorRequest
       output:
         name: GetCollaboratorResponse
       http:
-      - method: GET
-        path: /applications/{application_ids.application_id}/collaborator
+      - method: ""
+        path: ""
       - method: GET
         path: /applications/{application_ids.application_id}/collaborator/user/{collaborator.user_ids.user_id}
       - method: GET
         path: /applications/{application_ids.application_id}/collaborator/organization/{collaborator.organization_ids.organization_id}
     SetCollaborator:
       name: SetCollaborator
-      comment: |2
-         Set the rights of a collaborator (member) on the application. It is required for the caller to
-         have all assigned or/and removed rights.
-         Setting a collaborator without rights, removes them.
+      comment: |-
+        Set the rights of a collaborator (member) on the application.
+        This method can also be used to delete the collaborator, by giving them no rights.
+        The caller is required to have all assigned or/and removed rights.
       input:
         name: SetApplicationCollaboratorRequest
       output:
@@ -132,6 +145,7 @@ ApplicationAccess:
         path: /applications/{application_ids.application_id}/collaborators
     ListCollaborators:
       name: ListCollaborators
+      comment: List the collaborators on this application.
       input:
         name: ListApplicationCollaboratorsRequest
       output:
@@ -141,8 +155,7 @@ ApplicationAccess:
         path: /applications/{application_ids.application_id}/collaborators
 ApplicationCryptoService:
   name: ApplicationCryptoService
-  comment: |2
-     Service for application layer cryptographic operations.
+  comment: Service for application layer cryptographic operations.
   methods:
     DeriveAppSKey:
       name: DeriveAppSKey
@@ -152,8 +165,7 @@ ApplicationCryptoService:
         name: AppSKeyResponse
     GetAppKey:
       name: GetAppKey
-      comment: |2
-         Get the AppKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
+      comment: Get the AppKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
       input:
         name: GetRootKeysRequest
       output:
@@ -163,8 +175,7 @@ ApplicationPackageRegistry:
   methods:
     List:
       name: List
-      comment: |2
-         List returns the available packages for the end device.
+      comment: List returns the available packages for the end device.
       input:
         name: EndDeviceIdentifiers
       output:
@@ -174,8 +185,7 @@ ApplicationPackageRegistry:
         path: /as/applications/{application_ids.application_id}/devices/{device_id}/packages
     GetAssociation:
       name: GetAssociation
-      comment: |2
-         Get returns the application package association registered on the FPort of the end device.
+      comment: GetAssociation returns the association registered on the FPort of the end device.
       input:
         name: GetApplicationPackageAssociationRequest
       output:
@@ -185,8 +195,7 @@ ApplicationPackageRegistry:
         path: /as/applications/{ids.end_device_ids.application_ids.application_id}/devices/{ids.end_device_ids.device_id}/packages/associations/{ids.f_port}
     ListAssociations:
       name: ListAssociations
-      comment: |2
-         ListAssociations returns all of the application package associations of the end device.
+      comment: ListAssociations returns all of the associations of the end device.
       input:
         name: ListApplicationPackageAssociationRequest
       output:
@@ -196,8 +205,7 @@ ApplicationPackageRegistry:
         path: /as/applications/{ids.application_ids.application_id}/devices/{ids.device_id}/packages/associations
     SetAssociation:
       name: SetAssociation
-      comment: |2
-         SetAssociation updates or creates the application package association on the FPort of the end device.
+      comment: SetAssociation updates or creates the association on the FPort of the end device.
       input:
         name: SetApplicationPackageAssociationRequest
       output:
@@ -207,8 +215,7 @@ ApplicationPackageRegistry:
         path: /as/applications/{association.ids.end_device_ids.application_ids.application_id}/devices/{association.ids.end_device_ids.device_id}/packages/associations/{association.ids.f_port}
     DeleteAssociation:
       name: DeleteAssociation
-      comment: |2
-         DeleteAssociation removes the application package association on the FPort of the end device.
+      comment: DeleteAssociation removes the association on the FPort of the end device.
       input:
         name: ApplicationPackageAssociationIdentifiers
       output:
@@ -217,6 +224,47 @@ ApplicationPackageRegistry:
       http:
       - method: DELETE
         path: /as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/associations/{f_port}
+    GetDefaultAssociation:
+      name: GetDefaultAssociation
+      comment: GetDefaultAssociation returns the default association registered on the FPort of the application.
+      input:
+        name: GetApplicationPackageDefaultAssociationRequest
+      output:
+        name: ApplicationPackageDefaultAssociation
+      http:
+      - method: GET
+        path: /as/applications/{ids.application_ids.application_id}/packages/associations/{ids.f_port}
+    ListDefaultAssociations:
+      name: ListDefaultAssociations
+      comment: ListDefaultAssociations returns all of the default associations of the application.
+      input:
+        name: ListApplicationPackageDefaultAssociationRequest
+      output:
+        name: ApplicationPackageDefaultAssociations
+      http:
+      - method: GET
+        path: /as/applications/{ids.application_id}/packages/associations
+    SetDefaultAssociation:
+      name: SetDefaultAssociation
+      comment: SetDefaultAssociation updates or creates the default association on the FPort of the application.
+      input:
+        name: SetApplicationPackageDefaultAssociationRequest
+      output:
+        name: ApplicationPackageDefaultAssociation
+      http:
+      - method: PUT
+        path: /as/applications/{default.ids.application_ids.application_id}/packages/associations/{default.ids.f_port}
+    DeleteDefaultAssociation:
+      name: DeleteDefaultAssociation
+      comment: DeleteDefaultAssociation removes the default association on the FPort of the application.
+      input:
+        name: ApplicationPackageDefaultAssociationIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /as/applications/{application_ids.application_id}/packages/associations/{f_port}
 ApplicationPubSubRegistry:
   name: ApplicationPubSubRegistry
   methods:
@@ -274,9 +322,9 @@ ApplicationRegistry:
   methods:
     Create:
       name: Create
-      comment: |2
-         Create a new application. This also sets the given organization or user as
-         first collaborator with all possible rights.
+      comment: |-
+        Create a new application. This also sets the given organization or user as
+        first collaborator with all possible rights.
       input:
         name: CreateApplicationRequest
       output:
@@ -288,10 +336,10 @@ ApplicationRegistry:
         path: /organizations/{collaborator.organization_ids.organization_id}/applications
     Get:
       name: Get
-      comment: |2
-         Get the application with the given identifiers, selecting the fields given
-         by the field mask. The method may return more or less fields, depending on
-         the rights of the caller.
+      comment: |-
+        Get the application with the given identifiers, selecting the fields specified
+        in the field mask.
+        More or less fields may be returned, depending on the rights of the caller.
       input:
         name: GetApplicationRequest
       output:
@@ -301,8 +349,12 @@ ApplicationRegistry:
         path: /applications/{application_ids.application_id}
     List:
       name: List
-      comment: |2
-         List applications. See request message for details.
+      comment: |-
+        List applications where the given user or organization is a direct collaborator.
+        If no user or organization is given, this returns the applications the caller
+        has access to.
+        Similar to Get, this selects the fields given by the field mask.
+        More or less fields may be returned, depending on the rights of the caller.
       input:
         name: ListApplicationsRequest
       output:
@@ -316,6 +368,7 @@ ApplicationRegistry:
         path: /organizations/{collaborator.organization_ids.organization_id}/applications
     Update:
       name: Update
+      comment: Update the application, changing the fields specified by the field mask to the provided values.
       input:
         name: UpdateApplicationRequest
       output:
@@ -325,6 +378,9 @@ ApplicationRegistry:
         path: /applications/{application.ids.application_id}
     Delete:
       name: Delete
+      comment: |-
+        Delete the application. This may not release the application ID for reuse.
+        All end devices must be deleted from the application before it can be deleted.
       input:
         name: ApplicationIdentifiers
       output:
@@ -405,8 +461,7 @@ ApplicationWebhookRegistry:
         path: /as/webhooks/{application_ids.application_id}/{webhook_id}
 As:
   name: As
-  comment: |2
-     The As service manages the Application Server.
+  comment: The As service manages the Application Server.
   methods:
     GetLink:
       name: GetLink
@@ -419,10 +474,10 @@ As:
         path: /as/applications/{application_ids.application_id}/link
     SetLink:
       name: SetLink
-      comment: |2
-         Set a link configuration from the Application Server a Network Server.
-         This call returns immediately after setting the link configuration; it does not wait for a link to establish.
-         To get link statistics or errors, use the `GetLinkStats` call.
+      comment: |-
+        Set a link configuration from the Application Server a Network Server.
+        This call returns immediately after setting the link configuration; it does not wait for a link to establish.
+        To get link statistics or errors, use the `GetLinkStats` call.
       input:
         name: SetApplicationLinkRequest
       output:
@@ -442,10 +497,10 @@ As:
         path: /as/applications/{application_id}/link
     GetLinkStats:
       name: GetLinkStats
-      comment: |2
-         GetLinkStats returns the link statistics.
-         This call returns a NotFound error code if there is no link for the given application identifiers.
-         This call returns the error code of the link error if linking to a Network Server failed.
+      comment: |-
+        GetLinkStats returns the link statistics.
+        This call returns a NotFound error code if there is no link for the given application identifiers.
+        This call returns the error code of the link error if linking to a Network Server failed.
       input:
         name: ApplicationIdentifiers
       output:
@@ -455,14 +510,13 @@ As:
         path: /as/applications/{application_id}/link/stats
 AsEndDeviceRegistry:
   name: AsEndDeviceRegistry
-  comment: |2
-     The AsEndDeviceRegistry service allows clients to manage their end devices on the Application Server.
+  comment: The AsEndDeviceRegistry service allows clients to manage their end devices on the Application Server.
   methods:
     Get:
       name: Get
-      comment: |2
-         Get returns the device that matches the given identifiers.
-         If there are multiple matches, an error will be returned.
+      comment: |-
+        Get returns the device that matches the given identifiers.
+        If there are multiple matches, an error will be returned.
       input:
         name: GetEndDeviceRequest
       output:
@@ -472,8 +526,7 @@ AsEndDeviceRegistry:
         path: /as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}
     Set:
       name: Set
-      comment: |2
-         Set creates or updates the device.
+      comment: Set creates or updates the device.
       input:
         name: SetEndDeviceRequest
       output:
@@ -485,9 +538,9 @@ AsEndDeviceRegistry:
         path: /as/applications/{end_device.ids.application_ids.application_id}/devices
     Delete:
       name: Delete
-      comment: |2
-         Delete deletes the device that matches the given identifiers.
-         If there are multiple matches, an error will be returned.
+      comment: |-
+        Delete deletes the device that matches the given identifiers.
+        If there are multiple matches, an error will be returned.
       input:
         name: EndDeviceIdentifiers
       output:
@@ -498,8 +551,7 @@ AsEndDeviceRegistry:
         path: /as/applications/{application_ids.application_id}/devices/{device_id}
 AsJs:
   name: AsJs
-  comment: |2
-     The AsJs service connects an Application Server to a Join Server.
+  comment: The AsJs service connects an Application Server to a Join Server.
   methods:
     GetAppSKey:
       name: GetAppSKey
@@ -509,8 +561,7 @@ AsJs:
         name: AppSKeyResponse
 AsNs:
   name: AsNs
-  comment: |2
-     The AsNs service connects an Application Server to a Network Server.
+  comment: The AsNs service connects an Application Server to a Network Server.
   methods:
     LinkApplication:
       name: LinkApplication
@@ -546,6 +597,7 @@ ClientAccess:
   methods:
     ListRights:
       name: ListRights
+      comment: List the rights the caller has on this application.
       input:
         name: ClientIdentifiers
       output:
@@ -555,26 +607,26 @@ ClientAccess:
         path: /clients/{client_id}/rights
     GetCollaborator:
       name: GetCollaborator
-      comment: |2
-         Get the rights of a collaborator (member) of the client.
-         Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
+      comment: |-
+        Get the rights of a collaborator (member) of the client.
+        Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
       input:
         name: GetClientCollaboratorRequest
       output:
         name: GetCollaboratorResponse
       http:
-      - method: GET
-        path: /clients/{client_ids.client_id}/collaborator
+      - method: ""
+        path: ""
       - method: GET
         path: /clients/{client_ids.client_id}/collaborator/user/{collaborator.user_ids.user_id}
       - method: GET
         path: /clients/{client_ids.client_id}/collaborator/organization/{collaborator.organization_ids.organization_id}
     SetCollaborator:
       name: SetCollaborator
-      comment: |2
-         Set the rights of a collaborator (member) on the client. It is required for the caller to
-         have all assigned or/and removed rights.
-         Setting a collaborator without rights, removes them.
+      comment: |-
+        Set the rights of a collaborator (member) on the OAuth client.
+        This method can also be used to delete the collaborator, by giving them no rights.
+        The caller is required to have all assigned or/and removed rights.
       input:
         name: SetClientCollaboratorRequest
       output:
@@ -585,6 +637,7 @@ ClientAccess:
         path: /clients/{client_ids.client_id}/collaborators
     ListCollaborators:
       name: ListCollaborators
+      comment: List the collaborators on this OAuth client.
       input:
         name: ListClientCollaboratorsRequest
       output:
@@ -597,9 +650,9 @@ ClientRegistry:
   methods:
     Create:
       name: Create
-      comment: |2
-         Create a new OAuth client. This also sets the given organization or user as
-         first collaborator with all possible rights.
+      comment: |-
+        Create a new OAuth client. This also sets the given organization or user as
+        first collaborator with all possible rights.
       input:
         name: CreateClientRequest
       output:
@@ -611,10 +664,10 @@ ClientRegistry:
         path: /organizations/{collaborator.organization_ids.organization_id}/clients
     Get:
       name: Get
-      comment: |2
-         Get the OAuth client with the given identifiers, selecting the fields given
-         by the field mask. The method may return more or less fields, depending on
-         the rights of the caller.
+      comment: |-
+        Get the OAuth client with the given identifiers, selecting the fields specified
+        in the field mask.
+        More or less fields may be returned, depending on the rights of the caller.
       input:
         name: GetClientRequest
       output:
@@ -624,8 +677,12 @@ ClientRegistry:
         path: /clients/{client_ids.client_id}
     List:
       name: List
-      comment: |2
-         List OAuth clients. See request message for details.
+      comment: |-
+        List OAuth clients where the given user or organization is a direct collaborator.
+        If no user or organization is given, this returns the OAuth clients the caller
+        has access to.
+        Similar to Get, this selects the fields sepcified in the field mask.
+        More or less fields may be returned, depending on the rights of the caller.
       input:
         name: ListClientsRequest
       output:
@@ -639,6 +696,7 @@ ClientRegistry:
         path: /organizations/{collaborator.organization_ids.organization_id}/clients
     Update:
       name: Update
+      comment: Update the OAuth client, changing the fields specified by the field mask to the provided values.
       input:
         name: UpdateClientRequest
       output:
@@ -648,6 +706,7 @@ ClientRegistry:
         path: /clients/{client.ids.client_id}
     Delete:
       name: Delete
+      comment: Delete the OAuth client. This may not release the client ID for reuse.
       input:
         name: ClientIdentifiers
       output:
@@ -673,8 +732,7 @@ ContactInfoRegistry:
   methods:
     RequestValidation:
       name: RequestValidation
-      comment: |2
-         Request validation for the non-validated contact info for the given entity.
+      comment: Request validation for the non-validated contact info for the given entity.
       input:
         name: EntityIdentifiers
       output:
@@ -684,8 +742,7 @@ ContactInfoRegistry:
         path: /contact_info/validation
     Validate:
       name: Validate
-      comment: |2
-         Validate confirms a contact info validation.
+      comment: Validate confirms a contact info validation.
       input:
         name: ContactInfoValidation
       output:
@@ -696,8 +753,7 @@ ContactInfoRegistry:
         path: /contact_info/validation
 DownlinkMessageProcessor:
   name: DownlinkMessageProcessor
-  comment: |2
-     The DownlinkMessageProcessor service processes downlink messages.
+  comment: The DownlinkMessageProcessor service processes downlink messages.
   methods:
     Process:
       name: Process
@@ -710,8 +766,7 @@ EndDeviceClaimingServer:
   methods:
     Claim:
       name: Claim
-      comment: |2
-         Claims the end device by claim authentication code or QR code and transfers the device to the target application.
+      comment: Claims the end device by claim authentication code or QR code and transfers the device to the target application.
       input:
         name: ClaimEndDeviceRequest
       output:
@@ -744,8 +799,7 @@ EndDeviceQRCodeGenerator:
   methods:
     GetFormat:
       name: GetFormat
-      comment: |2
-         Return the QR code format.
+      comment: Return the QR code format.
       input:
         name: GetQRCodeFormatRequest
       output:
@@ -755,8 +809,7 @@ EndDeviceQRCodeGenerator:
         path: /qr-codes/end-devices/formats/{format_id}
     ListFormats:
       name: ListFormats
-      comment: |2
-         Returns the supported formats.
+      comment: Returns the supported formats.
       input:
         package: google.protobuf
         name: Empty
@@ -767,8 +820,7 @@ EndDeviceQRCodeGenerator:
         path: /qr-codes/end-devices/formats
     Generate:
       name: Generate
-      comment: |2
-         Generates a QR code.
+      comment: Generates a QR code.
       input:
         name: GenerateEndDeviceQRCodeRequest
       output:
@@ -781,8 +833,10 @@ EndDeviceRegistry:
   methods:
     Create:
       name: Create
-      comment: |2
-         Create a new end device within an application.
+      comment: |-
+        Create a new end device within an application.
+        After creating a device in the EndDeviceRegistry (Identity Server), it still
+        needs to be created in the NsEndDeviceRegistry, AsEndDeviceRegistry and JsEndDeviceRegistry.
       input:
         name: CreateEndDeviceRequest
       output:
@@ -792,9 +846,10 @@ EndDeviceRegistry:
         path: /applications/{end_device.ids.application_ids.application_id}/devices
     Get:
       name: Get
-      comment: |2
-         Get the end device with the given identifiers, selecting the fields given
-         by the field mask.
+      comment: |-
+        Get the end device with the given identifiers, selecting the fields specified
+        in the field mask.
+        More or less fields may be returned, depending on the rights of the caller.
       input:
         name: GetEndDeviceRequest
       output:
@@ -804,14 +859,17 @@ EndDeviceRegistry:
         path: /applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}
     GetIdentifiersForEUIs:
       name: GetIdentifiersForEUIs
+      comment: Get the identifiers of the end device that has the given EUIs registered.
       input:
         name: GetEndDeviceIdentifiersForEUIsRequest
       output:
         name: EndDeviceIdentifiers
     List:
       name: List
-      comment: |2
-         List applications. See request message for details.
+      comment: |-
+        List end devices in the given application.
+        Similar to Get, this selects the fields given by the field mask.
+        More or less fields may be returned, depending on the rights of the caller.
       input:
         name: ListEndDevicesRequest
       output:
@@ -821,6 +879,7 @@ EndDeviceRegistry:
         path: /applications/{application_ids.application_id}/devices
     Update:
       name: Update
+      comment: Update the OAuth client, changing the fields specified by the field mask to the provided values.
       input:
         name: UpdateEndDeviceRequest
       output:
@@ -830,6 +889,11 @@ EndDeviceRegistry:
         path: /applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}
     Delete:
       name: Delete
+      comment: |-
+        Delete the end device with the given IDs.
+        Before deleting an end device from the EndDeviceRegistry (the Identity Server),
+        the device needs to be deleted from the JsEndDeviceRegistry, AsEndDeviceRegistry and NsEndDeviceRegistry.
+        This is NOT done automatically.
       input:
         name: EndDeviceIdentifiers
       output:
@@ -840,10 +904,10 @@ EndDeviceRegistry:
         path: /applications/{application_ids.application_id}/devices/{device_id}
 EndDeviceRegistrySearch:
   name: EndDeviceRegistrySearch
-  comment: |2
-     The EndDeviceRegistrySearch service indexes devices in the EndDeviceRegistry
-     and enables searching for them.
-     This service is not implemented on all deployments.
+  comment: |-
+    The EndDeviceRegistrySearch service indexes devices in the EndDeviceRegistry
+    and enables searching for them.
+    This service is not implemented on all deployments.
   methods:
     SearchEndDevices:
       name: SearchEndDevices
@@ -859,8 +923,7 @@ EndDeviceTemplateConverter:
   methods:
     ListFormats:
       name: ListFormats
-      comment: |2
-         Returns the configured formats to convert from.
+      comment: Returns the configured formats to convert from.
       input:
         package: google.protobuf
         name: Empty
@@ -871,8 +934,7 @@ EndDeviceTemplateConverter:
         path: /edtc/formats
     Convert:
       name: Convert
-      comment: |2
-         Converts the binary data to a stream of end device templates.
+      comment: Converts the binary data to a stream of end device templates.
       input:
         name: ConvertEndDeviceTemplateRequest
       output:
@@ -886,8 +948,7 @@ EntityAccess:
   methods:
     AuthInfo:
       name: AuthInfo
-      comment: |2
-         AuthInfo returns information about the authentication that is used on the request.
+      comment: AuthInfo returns information about the authentication that is used on the request.
       input:
         package: google.protobuf
         name: Empty
@@ -898,10 +959,10 @@ EntityAccess:
         path: /auth_info
 EntityRegistrySearch:
   name: EntityRegistrySearch
-  comment: |2
-     The EntityRegistrySearch service indexes entities in the various registries
-     and enables searching for them.
-     This service is not implemented on all deployments.
+  comment: |-
+    The EntityRegistrySearch service indexes entities in the various registries
+    and enables searching for them.
+    This service is not implemented on all deployments.
   methods:
     SearchApplications:
       name: SearchApplications
@@ -950,14 +1011,13 @@ EntityRegistrySearch:
         path: /search/users
 Events:
   name: Events
-  comment: |2
-     The Events service serves events from the cluster.
+  comment: The Events service serves events from the cluster.
   methods:
     Stream:
       name: Stream
-      comment: |2
-         Stream live events, optionally with a tail of historical events (depending on server support and retention policy).
-         Events may arrive out-of-order.
+      comment: |-
+        Stream live events, optionally with a tail of historical events (depending on server support and retention policy).
+        Events may arrive out-of-order.
       input:
         name: StreamEventsRequest
       output:
@@ -971,6 +1031,7 @@ GatewayAccess:
   methods:
     ListRights:
       name: ListRights
+      comment: List the rights the caller has on this gateway.
       input:
         name: GatewayIdentifiers
       output:
@@ -980,6 +1041,7 @@ GatewayAccess:
         path: /gateways/{gateway_id}/rights
     CreateAPIKey:
       name: CreateAPIKey
+      comment: Create an API key scoped to this gateway.
       input:
         name: CreateGatewayAPIKeyRequest
       output:
@@ -989,6 +1051,7 @@ GatewayAccess:
         path: /gateways/{gateway_ids.gateway_id}/api-keys
     ListAPIKeys:
       name: ListAPIKeys
+      comment: List the API keys for this gateway.
       input:
         name: ListGatewayAPIKeysRequest
       output:
@@ -998,6 +1061,7 @@ GatewayAccess:
         path: /gateways/{gateway_ids.gateway_id}/api-keys
     GetAPIKey:
       name: GetAPIKey
+      comment: Get a single API key of this gateway.
       input:
         name: GetGatewayAPIKeyRequest
       output:
@@ -1007,10 +1071,10 @@ GatewayAccess:
         path: /gateways/{gateway_ids.gateway_id}/api-keys/{key_id}
     UpdateAPIKey:
       name: UpdateAPIKey
-      comment: |2
-         Update the rights of an existing gateway API key. To generate an API key,
-         the CreateAPIKey should be used. To delete an API key, update it
-         with zero rights. It is required for the caller to have all assigned or/and removed rights.
+      comment: |-
+        Update the rights of an API key of the gateway.
+        This method can also be used to delete the API key, by giving it no rights.
+        The caller is required to have all assigned or/and removed rights.
       input:
         name: UpdateGatewayAPIKeyRequest
       output:
@@ -1020,26 +1084,26 @@ GatewayAccess:
         path: /gateways/{gateway_ids.gateway_id}/api-keys/{api_key.id}
     GetCollaborator:
       name: GetCollaborator
-      comment: |2
-         Get the rights of a collaborator (member) of the gateway.
-         Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
+      comment: |-
+        Get the rights of a collaborator (member) of the gateway.
+        Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
       input:
         name: GetGatewayCollaboratorRequest
       output:
         name: GetCollaboratorResponse
       http:
-      - method: GET
-        path: /gateways/{gateway_ids.gateway_id}/collaborator
+      - method: ""
+        path: ""
       - method: GET
         path: /gateways/{gateway_ids.gateway_id}/collaborator/user/{collaborator.user_ids.user_id}
       - method: GET
         path: /gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}
     SetCollaborator:
       name: SetCollaborator
-      comment: |2
-         Set the rights of a collaborator (member) on the gateway. It is required for the caller to
-         have all assigned or/and removed rights.
-         Setting a collaborator without rights, removes them.
+      comment: |-
+        Set the rights of a collaborator (member) on the gateway.
+        This method can also be used to delete the collaborator, by giving them no rights.
+        The caller is required to have all assigned or/and removed rights.
       input:
         name: SetGatewayCollaboratorRequest
       output:
@@ -1050,6 +1114,7 @@ GatewayAccess:
         path: /gateways/{gateway_ids.gateway_id}/collaborators
     ListCollaborators:
       name: ListCollaborators
+      comment: List the collaborators on this gateway.
       input:
         name: ListGatewayCollaboratorsRequest
       output:
@@ -1072,9 +1137,9 @@ GatewayRegistry:
   methods:
     Create:
       name: Create
-      comment: |2
-         Create a new gateway. This also sets the given organization or user as
-         first collaborator with all possible rights.
+      comment: |-
+        Create a new gateway. This also sets the given organization or user as
+        first collaborator with all possible rights.
       input:
         name: CreateGatewayRequest
       output:
@@ -1086,10 +1151,10 @@ GatewayRegistry:
         path: /organizations/{collaborator.organization_ids.organization_id}/gateways
     Get:
       name: Get
-      comment: |2
-         Get the gateway with the given identifiers, selecting the fields given
-         by the field mask. The method may return more or less fields, depending on
-         the rights of the caller.
+      comment: |-
+        Get the gateway with the given identifiers, selecting the fields specified
+        in the field mask.
+        More or less fields may be returned, depending on the rights of the caller.
       input:
         name: GetGatewayRequest
       output:
@@ -1099,14 +1164,19 @@ GatewayRegistry:
         path: /gateways/{gateway_ids.gateway_id}
     GetIdentifiersForEUI:
       name: GetIdentifiersForEUI
+      comment: Get the identifiers of the gateway that has the given EUI registered.
       input:
         name: GetGatewayIdentifiersForEUIRequest
       output:
         name: GatewayIdentifiers
     List:
       name: List
-      comment: |2
-         List gateways. See request message for details.
+      comment: |-
+        List gateways where the given user or organization is a direct collaborator.
+        If no user or organization is given, this returns the gateways the caller
+        has access to.
+        Similar to Get, this selects the fields given by the field mask.
+        More or less fields may be returned, depending on the rights of the caller.
       input:
         name: ListGatewaysRequest
       output:
@@ -1120,6 +1190,7 @@ GatewayRegistry:
         path: /organizations/{collaborator.organization_ids.organization_id}/gateways
     Update:
       name: Update
+      comment: Update the gateway, changing the fields specified by the field mask to the provided values.
       input:
         name: UpdateGatewayRequest
       output:
@@ -1129,6 +1200,7 @@ GatewayRegistry:
         path: /gateways/{gateway.ids.gateway_id}
     Delete:
       name: Delete
+      comment: Delete the gateway. This may not release the gateway ID for reuse, but it does release the EUI.
       input:
         name: GatewayIdentifiers
       output:
@@ -1142,9 +1214,9 @@ Gs:
   methods:
     GetGatewayConnectionStats:
       name: GetGatewayConnectionStats
-      comment: |2
-         Get statistics about the current gateway connection to the Gateway Server.
-         This is not persisted between reconnects.
+      comment: |-
+        Get statistics about the current gateway connection to the Gateway Server.
+        This is not persisted between reconnects.
       input:
         name: GatewayIdentifiers
       output:
@@ -1154,8 +1226,7 @@ Gs:
         path: /gs/gateways/{gateway_id}/connection/stats
 GsNs:
   name: GsNs
-  comment: |2
-     The GsNs service connects a Gateway Server to a Network Server.
+  comment: The GsNs service connects a Gateway Server to a Network Server.
   methods:
     HandleUplink:
       name: HandleUplink
@@ -1166,8 +1237,7 @@ GsNs:
         name: Empty
 GsPba:
   name: GsPba
-  comment: |2
-     The GsPba service connects a Gateway Server to a Packet Broker Agent.
+  comment: The GsPba service connects a Gateway Server to a Packet Broker Agent.
   methods:
     PublishUplink:
       name: PublishUplink
@@ -1178,13 +1248,11 @@ GsPba:
         name: Empty
 GtwGs:
   name: GtwGs
-  comment: |2
-     The GtwGs service connects a gateway to a Gateway Server.
+  comment: The GtwGs service connects a gateway to a Gateway Server.
   methods:
     LinkGateway:
       name: LinkGateway
-      comment: |2
-         Link the gateway to the Gateway Server.
+      comment: Link the gateway to the Gateway Server.
       input:
         name: GatewayUp
         stream: true
@@ -1193,8 +1261,7 @@ GtwGs:
         stream: true
     GetConcentratorConfig:
       name: GetConcentratorConfig
-      comment: |2
-         GetConcentratorConfig associated to the gateway.
+      comment: GetConcentratorConfig associated to the gateway.
       input:
         package: google.protobuf
         name: Empty
@@ -1202,8 +1269,7 @@ GtwGs:
         name: ConcentratorConfig
     GetMQTTConnectionInfo:
       name: GetMQTTConnectionInfo
-      comment: |2
-         Get the MQTT server address and the username for the gateway.
+      comment: Get the MQTT server address and the username for the gateway.
       input:
         name: GatewayIdentifiers
       output:
@@ -1213,8 +1279,7 @@ GtwGs:
         path: /gs/gateways/{gateway_id}/mqtt-connection-info
     GetMQTTV2ConnectionInfo:
       name: GetMQTTV2ConnectionInfo
-      comment: |2
-         Get the MQTTV2 server address and the username for the gateway.
+      comment: Get the MQTTV2 server address and the username for the gateway.
       input:
         name: GatewayIdentifiers
       output:
@@ -1237,14 +1302,13 @@ Js:
         path: /js/join_eui_prefixes
 JsEndDeviceRegistry:
   name: JsEndDeviceRegistry
-  comment: |2
-     The JsEndDeviceRegistry service allows clients to manage their end devices on the Join Server.
+  comment: The JsEndDeviceRegistry service allows clients to manage their end devices on the Join Server.
   methods:
     Get:
       name: Get
-      comment: |2
-         Get returns the device that matches the given identifiers.
-         If there are multiple matches, an error will be returned.
+      comment: |-
+        Get returns the device that matches the given identifiers.
+        If there are multiple matches, an error will be returned.
       input:
         name: GetEndDeviceRequest
       output:
@@ -1254,8 +1318,7 @@ JsEndDeviceRegistry:
         path: /js/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}
     Set:
       name: Set
-      comment: |2
-         Set creates or updates the device.
+      comment: Set creates or updates the device.
       input:
         name: SetEndDeviceRequest
       output:
@@ -1267,9 +1330,9 @@ JsEndDeviceRegistry:
         path: /js/applications/{end_device.ids.application_ids.application_id}/devices
     Provision:
       name: Provision
-      comment: |2
-         This rpc is deprecated; use EndDeviceTemplateConverter service instead.
-         TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/999)
+      comment: |-
+        This rpc is deprecated; use EndDeviceTemplateConverter service instead.
+        TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/999)
       input:
         name: ProvisionEndDevicesRequest
       output:
@@ -1280,9 +1343,9 @@ JsEndDeviceRegistry:
         path: /js/applications/{application_ids.application_id}/provision-devices
     Delete:
       name: Delete
-      comment: |2
-         Delete deletes the device that matches the given identifiers.
-         If there are multiple matches, an error will be returned.
+      comment: |-
+        Delete deletes the device that matches the given identifiers.
+        If there are multiple matches, an error will be returned.
       input:
         name: EndDeviceIdentifiers
       output:
@@ -1293,8 +1356,7 @@ JsEndDeviceRegistry:
         path: /js/applications/{application_ids.application_id}/devices/{device_id}
 NetworkCryptoService:
   name: NetworkCryptoService
-  comment: |2
-     Service for network layer cryptographic operations.
+  comment: Service for network layer cryptographic operations.
   methods:
     JoinRequestMIC:
       name: JoinRequestMIC
@@ -1328,8 +1390,7 @@ NetworkCryptoService:
         name: NwkSKeysResponse
     GetNwkKey:
       name: GetNwkKey
-      comment: |2
-         Get the NwkKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
+      comment: Get the NwkKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
       input:
         name: GetRootKeysRequest
       output:
@@ -1339,8 +1400,7 @@ Ns:
   methods:
     GenerateDevAddr:
       name: GenerateDevAddr
-      comment: |2
-         GenerateDevAddr requests a device address assignment from the Network Server.
+      comment: GenerateDevAddr requests a device address assignment from the Network Server.
       input:
         package: google.protobuf
         name: Empty
@@ -1351,14 +1411,13 @@ Ns:
         path: /ns/dev_addr
 NsEndDeviceRegistry:
   name: NsEndDeviceRegistry
-  comment: |2
-     The NsEndDeviceRegistry service allows clients to manage their end devices on the Network Server.
+  comment: The NsEndDeviceRegistry service allows clients to manage their end devices on the Network Server.
   methods:
     Get:
       name: Get
-      comment: |2
-         Get returns the device that matches the given identifiers.
-         If there are multiple matches, an error will be returned.
+      comment: |-
+        Get returns the device that matches the given identifiers.
+        If there are multiple matches, an error will be returned.
       input:
         name: GetEndDeviceRequest
       output:
@@ -1368,8 +1427,7 @@ NsEndDeviceRegistry:
         path: /ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}
     Set:
       name: Set
-      comment: |2
-         Set creates or updates the device.
+      comment: Set creates or updates the device.
       input:
         name: SetEndDeviceRequest
       output:
@@ -1381,9 +1439,9 @@ NsEndDeviceRegistry:
         path: /ns/applications/{end_device.ids.application_ids.application_id}/devices
     Delete:
       name: Delete
-      comment: |2
-         Delete deletes the device that matches the given identifiers.
-         If there are multiple matches, an error will be returned.
+      comment: |-
+        Delete deletes the device that matches the given identifiers.
+        If there are multiple matches, an error will be returned.
       input:
         name: EndDeviceIdentifiers
       output:
@@ -1394,23 +1452,21 @@ NsEndDeviceRegistry:
         path: /ns/applications/{application_ids.application_id}/devices/{device_id}
 NsGs:
   name: NsGs
-  comment: |2
-     The NsGs service connects a Network Server to a Gateway Server.
+  comment: The NsGs service connects a Network Server to a Gateway Server.
   methods:
     ScheduleDownlink:
       name: ScheduleDownlink
-      comment: |2
-         ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
-         The Gateway Server may refuse if there are any conflicts in the schedule or
-         if a duty cycle prevents the gateway from transmitting.
+      comment: |-
+        ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
+        The Gateway Server may refuse if there are any conflicts in the schedule or
+        if a duty cycle prevents the gateway from transmitting.
       input:
         name: DownlinkMessage
       output:
         name: ScheduleDownlinkResponse
 NsJs:
   name: NsJs
-  comment: |2
-     The NsJs service connects a Network Server to a Join Server.
+  comment: The NsJs service connects a Network Server to a Join Server.
   methods:
     HandleJoin:
       name: HandleJoin
@@ -1426,13 +1482,11 @@ NsJs:
         name: NwkSKeysResponse
 NsPba:
   name: NsPba
-  comment: |2
-     The NsPba service connects a Network Server to a Packet Broker Agent.
+  comment: The NsPba service connects a Network Server to a Packet Broker Agent.
   methods:
     PublishDownlink:
       name: PublishDownlink
-      comment: |2
-         PublishDownlink instructs the Packet Broker Agent to publish a downlink message to Packet Broker Router.
+      comment: PublishDownlink instructs the Packet Broker Agent to publish a downlink message to Packet Broker Router.
       input:
         name: DownlinkMessage
       output:
@@ -1484,6 +1538,7 @@ OrganizationAccess:
   methods:
     ListRights:
       name: ListRights
+      comment: List the rights the caller has on this organization.
       input:
         name: OrganizationIdentifiers
       output:
@@ -1493,6 +1548,10 @@ OrganizationAccess:
         path: /organizations/{organization_id}/rights
     CreateAPIKey:
       name: CreateAPIKey
+      comment: |-
+        Create an API key scoped to this organization.
+        Organization API keys can give access to the organization itself, as well as
+        any application, gateway and OAuth client this organization is a collaborator of.
       input:
         name: CreateOrganizationAPIKeyRequest
       output:
@@ -1502,6 +1561,7 @@ OrganizationAccess:
         path: /organizations/{organization_ids.organization_id}/api-keys
     ListAPIKeys:
       name: ListAPIKeys
+      comment: List the API keys for this organization.
       input:
         name: ListOrganizationAPIKeysRequest
       output:
@@ -1511,6 +1571,7 @@ OrganizationAccess:
         path: /organizations/{organization_ids.organization_id}/api-keys
     GetAPIKey:
       name: GetAPIKey
+      comment: Get a single API key of this organization.
       input:
         name: GetOrganizationAPIKeyRequest
       output:
@@ -1520,10 +1581,10 @@ OrganizationAccess:
         path: /organizations/{organization_ids.organization_id}/api-keys/{key_id}
     UpdateAPIKey:
       name: UpdateAPIKey
-      comment: |2
-         Update the rights of an existing organization API key. To generate an API key,
-         the CreateAPIKey should be used. To delete an API key, update it
-         with zero rights. It is required for the caller to have all assigned or/and removed rights.
+      comment: |-
+        Update the rights of an API key of the organization.
+        This method can also be used to delete the API key, by giving it no rights.
+        The caller is required to have all assigned or/and removed rights.
       input:
         name: UpdateOrganizationAPIKeyRequest
       output:
@@ -1533,25 +1594,26 @@ OrganizationAccess:
         path: /organizations/{organization_ids.organization_id}/api-keys/{api_key.id}
     GetCollaborator:
       name: GetCollaborator
-      comment: |2
-         Get the rights of a collaborator (member) of the organization.
-         Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
+      comment: |-
+        Get the rights of a collaborator (member) of the organization.
+        Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
       input:
         name: GetOrganizationCollaboratorRequest
       output:
         name: GetCollaboratorResponse
       http:
-      - method: GET
-        path: /organizations/{organization_ids.organization_id}/collaborator
+      - method: ""
+        path: ""
       - method: GET
         path: /organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}
     SetCollaborator:
       name: SetCollaborator
-      comment: |2
-         Set the rights of a collaborator (member) on the organization. It is required for the caller to
-         have all assigned or/and removed rights.
-         Setting a collaborator without rights, removes them.
-         Note that only users can collaborate (be member of) an organization.
+      comment: |-
+        Set the rights of a collaborator (member) on the organization.
+        Organization collaborators can get access to the organization itself, as well as
+        any application, gateway and OAuth client this organization is a collaborator of.
+        This method can also be used to delete the collaborator, by giving them no rights.
+        The caller is required to have all assigned or/and removed rights.
       input:
         name: SetOrganizationCollaboratorRequest
       output:
@@ -1562,6 +1624,7 @@ OrganizationAccess:
         path: /organizations/{organization_ids.organization_id}/collaborators
     ListCollaborators:
       name: ListCollaborators
+      comment: List the collaborators on this organization.
       input:
         name: ListOrganizationCollaboratorsRequest
       output:
@@ -1574,9 +1637,9 @@ OrganizationRegistry:
   methods:
     Create:
       name: Create
-      comment: |2
-         Create a new organization. This also sets the given user as
-         first collaborator with all possible rights.
+      comment: |-
+        Create a new organization. This also sets the given user as
+        first collaborator with all possible rights.
       input:
         name: CreateOrganizationRequest
       output:
@@ -1586,10 +1649,10 @@ OrganizationRegistry:
         path: /users/{collaborator.user_ids.user_id}/organizations
     Get:
       name: Get
-      comment: |2
-         Get the organization with the given identifiers, selecting the fields given
-         by the field mask. The method may return more or less fields, depending on
-         the rights of the caller.
+      comment: |-
+        Get the organization with the given identifiers, selecting the fields specified
+        in the field mask.
+        More or less fields may be returned, depending on the rights of the caller.
       input:
         name: GetOrganizationRequest
       output:
@@ -1599,8 +1662,12 @@ OrganizationRegistry:
         path: /organizations/{organization_ids.organization_id}
     List:
       name: List
-      comment: |2
-         List organizations. See request message for details.
+      comment: |-
+        List organizations where the given user or organization is a direct collaborator.
+        If no user or organization is given, this returns the organizations the caller
+        has access to.
+        Similar to Get, this selects the fields given by the field mask.
+        More or less fields may be returned, depending on the rights of the caller.
       input:
         name: ListOrganizationsRequest
       output:
@@ -1612,6 +1679,7 @@ OrganizationRegistry:
         path: /users/{collaborator.user_ids.user_id}/organizations
     Update:
       name: Update
+      comment: Update the organization, changing the fields specified by the field mask to the provided values.
       input:
         name: UpdateOrganizationRequest
       output:
@@ -1621,6 +1689,7 @@ OrganizationRegistry:
         path: /organizations/{organization.ids.organization_id}
     Delete:
       name: Delete
+      comment: Delete the organization. This may not release the organization ID for reuse.
       input:
         name: OrganizationIdentifiers
       output:
@@ -1631,8 +1700,7 @@ OrganizationRegistry:
         path: /organizations/{organization_id}
 UplinkMessageProcessor:
   name: UplinkMessageProcessor
-  comment: |2
-     The UplinkMessageProcessor service processes uplink messages.
+  comment: The UplinkMessageProcessor service processes uplink messages.
   methods:
     Process:
       name: Process
@@ -1645,6 +1713,7 @@ UserAccess:
   methods:
     ListRights:
       name: ListRights
+      comment: List the rights the caller has on this user.
       input:
         name: UserIdentifiers
       output:
@@ -1654,6 +1723,10 @@ UserAccess:
         path: /users/{user_id}/rights
     CreateAPIKey:
       name: CreateAPIKey
+      comment: |-
+        Create an API key scoped to this user.
+        User API keys can give access to the user itself, as well as
+        any organization, application, gateway and OAuth client this user is a collaborator of.
       input:
         name: CreateUserAPIKeyRequest
       output:
@@ -1663,6 +1736,7 @@ UserAccess:
         path: /users/{user_ids.user_id}/api-keys
     ListAPIKeys:
       name: ListAPIKeys
+      comment: List the API keys for this user.
       input:
         name: ListUserAPIKeysRequest
       output:
@@ -1672,6 +1746,7 @@ UserAccess:
         path: /users/{user_ids.user_id}/api-keys
     GetAPIKey:
       name: GetAPIKey
+      comment: Get a single API key of this user.
       input:
         name: GetUserAPIKeyRequest
       output:
@@ -1681,10 +1756,10 @@ UserAccess:
         path: /users/{user_ids.user_id}/api-keys/{key_id}
     UpdateAPIKey:
       name: UpdateAPIKey
-      comment: |2
-         Update the rights of an existing user API key. To generate an API key,
-         the CreateAPIKey should be used. To delete an API key, update it
-         with zero rights. It is required for the caller to have all assigned or/and removed rights.
+      comment: |-
+        Update the rights of an API key of the user.
+        This method can also be used to delete the API key, by giving it no rights.
+        The caller is required to have all assigned or/and removed rights.
       input:
         name: UpdateUserAPIKeyRequest
       output:
@@ -1697,6 +1772,7 @@ UserInvitationRegistry:
   methods:
     Send:
       name: Send
+      comment: Invite a user to join the network.
       input:
         name: SendInvitationRequest
       output:
@@ -1706,6 +1782,7 @@ UserInvitationRegistry:
         path: /invitations
     List:
       name: List
+      comment: List the invitations the caller has sent.
       input:
         name: ListInvitationsRequest
       output:
@@ -1715,6 +1792,7 @@ UserInvitationRegistry:
         path: /invitations
     Delete:
       name: Delete
+      comment: Delete (revoke) a user invitation.
       input:
         name: DeleteInvitationRequest
       output:
@@ -1728,8 +1806,7 @@ UserRegistry:
   methods:
     Create:
       name: Create
-      comment: |2
-         Register a new user. This method may be restricted by network settings.
+      comment: Register a new user. This method may be restricted by network settings.
       input:
         name: CreateUserRequest
       output:
@@ -1739,10 +1816,10 @@ UserRegistry:
         path: /users
     Get:
       name: Get
-      comment: |2
-         Get the user with the given identifiers, selecting the fields given by the
-         field mask. The method may return more or less fields, depending on the rights
-         of the caller.
+      comment: |-
+        Get the user with the given identifiers, selecting the fields given by the
+        field mask. The method may return more or less fields, depending on the rights
+        of the caller.
       input:
         name: GetUserRequest
       output:
@@ -1752,6 +1829,7 @@ UserRegistry:
         path: /users/{user_ids.user_id}
     List:
       name: List
+      comment: List users of the network. This method is typically restricted to admins only.
       input:
         name: ListUsersRequest
       output:
@@ -1761,6 +1839,9 @@ UserRegistry:
         path: /users
     Update:
       name: Update
+      comment: |-
+        Update the user, changing the fields specified by the field mask to the provided values.
+        This method can not be used to change the password, see the UpdatePassword method for that.
       input:
         name: UpdateUserRequest
       output:
@@ -1770,9 +1851,9 @@ UserRegistry:
         path: /users/{user.ids.user_id}
     CreateTemporaryPassword:
       name: CreateTemporaryPassword
-      comment: |2
-         Create a temporary password that can be used for updating a forgotten password.
-         The generated password is sent to the user's email address.
+      comment: |-
+        Create a temporary password that can be used for updating a forgotten password.
+        The generated password is sent to the user's email address.
       input:
         name: CreateTemporaryPasswordRequest
       output:
@@ -1783,6 +1864,7 @@ UserRegistry:
         path: /users/{user_ids.user_id}/temporary_password
     UpdatePassword:
       name: UpdatePassword
+      comment: Update the password of the user.
       input:
         name: UpdateUserPasswordRequest
       output:
@@ -1793,6 +1875,7 @@ UserRegistry:
         path: /users/{user_ids.user_id}/password
     Delete:
       name: Delete
+      comment: Delete the user. This may not release the user ID for reuse.
       input:
         name: UserIdentifiers
       output:
@@ -1806,6 +1889,7 @@ UserSessionRegistry:
   methods:
     List:
       name: List
+      comment: List the active sessions for the given user.
       input:
         name: ListUserSessionsRequest
       output:
@@ -1815,6 +1899,7 @@ UserSessionRegistry:
         path: /users/{user_ids.user_id}/sessions
     Delete:
       name: Delete
+      comment: Delete (revoke) the given user session.
       input:
         name: UserSessionIdentifiers
       output:

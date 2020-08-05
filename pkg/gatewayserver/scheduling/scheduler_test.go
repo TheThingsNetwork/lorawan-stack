@@ -118,7 +118,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 				Timestamp:  300000,
 			},
 			Priority:       ttnpb.TxSchedulePriority_NORMAL,
-			NPercentileRTT: durationPtr(500 * time.Millisecond),
+			NPercentileRTT: durationPtr(550 * time.Millisecond),
 			ExpectedToa:    41216 * time.Microsecond,
 			// Too late for transmission with RTT.
 			ExpectedError: &scheduling.ErrTooLate,
@@ -1177,8 +1177,9 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 				Timestamp:  6000000,
 			},
 			UplinkToken: &ttnpb.UplinkToken{
-				ServerTime: time.Unix(10, 0),
-				Timestamp:  5000000,
+				ServerTime:       time.Unix(10, 0),
+				Timestamp:        5000000,
+				ConcentratorTime: 5000000000,
 			},
 			Priority: ttnpb.TxSchedulePriority_NORMAL,
 		})
@@ -1208,8 +1209,9 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 				Timestamp:  7000000,
 			},
 			UplinkToken: &ttnpb.UplinkToken{
-				ServerTime: time.Unix(10, 0),
-				Timestamp:  5000000,
+				ServerTime:       time.Unix(10, 0),
+				Timestamp:        5000000,
+				ConcentratorTime: 5000000000,
 			},
 			Priority: ttnpb.TxSchedulePriority_NORMAL,
 		})

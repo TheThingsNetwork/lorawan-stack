@@ -109,7 +109,7 @@
             },
             {
               "name": "attributes",
-              "description": "",
+              "description": "Key-value attributes for this application. Typically used for organizing applications or for storing integration-specific data.",
               "label": "repeated",
               "type": "AttributesEntry",
               "longType": "Application.AttributesEntry",
@@ -131,7 +131,7 @@
             },
             {
               "name": "contact_info",
-              "description": "",
+              "description": "Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.",
               "label": "repeated",
               "type": "ContactInfo",
               "longType": "ContactInfo",
@@ -420,7 +420,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the application fields that should be returned.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -548,14 +548,14 @@
           "name": "ListApplicationsRequest",
           "longName": "ListApplicationsRequest",
           "fullName": "ttn.lorawan.v3.ListApplicationsRequest",
-          "description": "By default we list all applications the caller has rights on.\nSet the user or the organization (not both) to instead list the applications\nwhere the user or organization is collaborator on.",
+          "description": "",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
           "fields": [
             {
               "name": "collaborator",
-              "description": "",
+              "description": "By default we list all applications the caller has rights on.\nSet the user or the organization (not both) to instead list the applications\nwhere the user or organization is collaborator on.",
               "label": "",
               "type": "OrganizationOrUserIdentifiers",
               "longType": "OrganizationOrUserIdentifiers",
@@ -565,7 +565,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the application fields that should be returned.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -752,7 +752,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the application fields that should be updated.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -785,7 +785,7 @@
           "methods": [
             {
               "name": "ListRights",
-              "description": "",
+              "description": "List the rights the caller has on this application.",
               "requestType": "ApplicationIdentifiers",
               "requestLongType": "ApplicationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
@@ -807,7 +807,7 @@
             },
             {
               "name": "CreateAPIKey",
-              "description": "",
+              "description": "Create an API key scoped to this application.",
               "requestType": "CreateApplicationAPIKeyRequest",
               "requestLongType": "CreateApplicationAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.CreateApplicationAPIKeyRequest",
@@ -830,7 +830,7 @@
             },
             {
               "name": "ListAPIKeys",
-              "description": "",
+              "description": "List the API keys for this application.",
               "requestType": "ListApplicationAPIKeysRequest",
               "requestLongType": "ListApplicationAPIKeysRequest",
               "requestFullType": "ttn.lorawan.v3.ListApplicationAPIKeysRequest",
@@ -852,7 +852,7 @@
             },
             {
               "name": "GetAPIKey",
-              "description": "",
+              "description": "Get a single API key of this application.",
               "requestType": "GetApplicationAPIKeyRequest",
               "requestLongType": "GetApplicationAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.GetApplicationAPIKeyRequest",
@@ -874,7 +874,7 @@
             },
             {
               "name": "UpdateAPIKey",
-              "description": "Update the rights of an existing application API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights. It is required for the caller to have all assigned or/and removed rights.",
+              "description": "Update the rights of an API key of the application.\nThis method can also be used to delete the API key, by giving it no rights.\nThe caller is required to have all assigned or/and removed rights.",
               "requestType": "UpdateApplicationAPIKeyRequest",
               "requestLongType": "UpdateApplicationAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateApplicationAPIKeyRequest",
@@ -910,8 +910,8 @@
                 "google.api.http": {
                   "rules": [
                     {
-                      "method": "GET",
-                      "pattern": "/applications/{application_ids.application_id}/collaborator"
+                      "method": "",
+                      "pattern": ""
                     },
                     {
                       "method": "GET",
@@ -927,7 +927,7 @@
             },
             {
               "name": "SetCollaborator",
-              "description": "Set the rights of a collaborator (member) on the application. It is required for the caller to\nhave all assigned or/and removed rights.\nSetting a collaborator without rights, removes them.",
+              "description": "Set the rights of a collaborator (member) on the application.\nThis method can also be used to delete the collaborator, by giving them no rights.\nThe caller is required to have all assigned or/and removed rights.",
               "requestType": "SetApplicationCollaboratorRequest",
               "requestLongType": "SetApplicationCollaboratorRequest",
               "requestFullType": "ttn.lorawan.v3.SetApplicationCollaboratorRequest",
@@ -950,7 +950,7 @@
             },
             {
               "name": "ListCollaborators",
-              "description": "",
+              "description": "List the collaborators on this application.",
               "requestType": "ListApplicationCollaboratorsRequest",
               "requestLongType": "ListApplicationCollaboratorsRequest",
               "requestFullType": "ttn.lorawan.v3.ListApplicationCollaboratorsRequest",
@@ -1008,7 +1008,7 @@
             },
             {
               "name": "Get",
-              "description": "Get the application with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
+              "description": "Get the application with the given identifiers, selecting the fields specified\nin the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
               "requestType": "GetApplicationRequest",
               "requestLongType": "GetApplicationRequest",
               "requestFullType": "ttn.lorawan.v3.GetApplicationRequest",
@@ -1030,7 +1030,7 @@
             },
             {
               "name": "List",
-              "description": "List applications. See request message for details.",
+              "description": "List applications where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the applications the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
               "requestType": "ListApplicationsRequest",
               "requestLongType": "ListApplicationsRequest",
               "requestFullType": "ttn.lorawan.v3.ListApplicationsRequest",
@@ -1060,7 +1060,7 @@
             },
             {
               "name": "Update",
-              "description": "",
+              "description": "Update the application, changing the fields specified by the field mask to the provided values.",
               "requestType": "UpdateApplicationRequest",
               "requestLongType": "UpdateApplicationRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateApplicationRequest",
@@ -1083,7 +1083,7 @@
             },
             {
               "name": "Delete",
-              "description": "",
+              "description": "Delete the application. This may not release the application ID for reuse.\nAll end devices must be deleted from the application before it can be deleted.",
               "requestType": "ApplicationIdentifiers",
               "requestLongType": "ApplicationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
@@ -4791,7 +4791,7 @@
             },
             {
               "name": "attributes",
-              "description": "",
+              "description": "Key-value attributes for this client. Typically used for organizing clients or for storing integration-specific data.",
               "label": "repeated",
               "type": "AttributesEntry",
               "longType": "Client.AttributesEntry",
@@ -4813,7 +4813,7 @@
             },
             {
               "name": "contact_info",
-              "description": "",
+              "description": "Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application.",
               "label": "repeated",
               "type": "ContactInfo",
               "longType": "ContactInfo",
@@ -5102,7 +5102,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the client fields that should be returned.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -5173,14 +5173,14 @@
           "name": "ListClientsRequest",
           "longName": "ListClientsRequest",
           "fullName": "ttn.lorawan.v3.ListClientsRequest",
-          "description": "By default we list all OAuth clients the caller has rights on.\nSet the user or the organization (not both) to instead list the OAuth clients\nwhere the user or organization is collaborator on.",
+          "description": "",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
           "fields": [
             {
               "name": "collaborator",
-              "description": "",
+              "description": "By default we list all OAuth clients the caller has rights on.\nSet the user or the organization (not both) to instead list the OAuth clients\nwhere the user or organization is collaborator on.",
               "label": "",
               "type": "OrganizationOrUserIdentifiers",
               "longType": "OrganizationOrUserIdentifiers",
@@ -5190,7 +5190,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the client fields that should be returned.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -5330,7 +5330,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the client fields that should be updated.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -5363,7 +5363,7 @@
           "methods": [
             {
               "name": "ListRights",
-              "description": "",
+              "description": "List the rights the caller has on this application.",
               "requestType": "ClientIdentifiers",
               "requestLongType": "ClientIdentifiers",
               "requestFullType": "ttn.lorawan.v3.ClientIdentifiers",
@@ -5398,8 +5398,8 @@
                 "google.api.http": {
                   "rules": [
                     {
-                      "method": "GET",
-                      "pattern": "/clients/{client_ids.client_id}/collaborator"
+                      "method": "",
+                      "pattern": ""
                     },
                     {
                       "method": "GET",
@@ -5415,7 +5415,7 @@
             },
             {
               "name": "SetCollaborator",
-              "description": "Set the rights of a collaborator (member) on the client. It is required for the caller to\nhave all assigned or/and removed rights.\nSetting a collaborator without rights, removes them.",
+              "description": "Set the rights of a collaborator (member) on the OAuth client.\nThis method can also be used to delete the collaborator, by giving them no rights.\nThe caller is required to have all assigned or/and removed rights.",
               "requestType": "SetClientCollaboratorRequest",
               "requestLongType": "SetClientCollaboratorRequest",
               "requestFullType": "ttn.lorawan.v3.SetClientCollaboratorRequest",
@@ -5438,7 +5438,7 @@
             },
             {
               "name": "ListCollaborators",
-              "description": "",
+              "description": "List the collaborators on this OAuth client.",
               "requestType": "ListClientCollaboratorsRequest",
               "requestLongType": "ListClientCollaboratorsRequest",
               "requestFullType": "ttn.lorawan.v3.ListClientCollaboratorsRequest",
@@ -5496,7 +5496,7 @@
             },
             {
               "name": "Get",
-              "description": "Get the OAuth client with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
+              "description": "Get the OAuth client with the given identifiers, selecting the fields specified\nin the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
               "requestType": "GetClientRequest",
               "requestLongType": "GetClientRequest",
               "requestFullType": "ttn.lorawan.v3.GetClientRequest",
@@ -5518,7 +5518,7 @@
             },
             {
               "name": "List",
-              "description": "List OAuth clients. See request message for details.",
+              "description": "List OAuth clients where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the OAuth clients the caller\nhas access to.\nSimilar to Get, this selects the fields sepcified in the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
               "requestType": "ListClientsRequest",
               "requestLongType": "ListClientsRequest",
               "requestFullType": "ttn.lorawan.v3.ListClientsRequest",
@@ -5548,7 +5548,7 @@
             },
             {
               "name": "Update",
-              "description": "",
+              "description": "Update the OAuth client, changing the fields specified by the field mask to the provided values.",
               "requestType": "UpdateClientRequest",
               "requestLongType": "UpdateClientRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateClientRequest",
@@ -5571,7 +5571,7 @@
             },
             {
               "name": "Delete",
-              "description": "",
+              "description": "Delete the OAuth client. This may not release the client ID for reuse.",
               "requestType": "ClientIdentifiers",
               "requestLongType": "ClientIdentifiers",
               "requestFullType": "ttn.lorawan.v3.ClientIdentifiers",
@@ -6652,7 +6652,7 @@
             },
             {
               "name": "attributes",
-              "description": "Attributes of the device. Stored in Entity Registry.",
+              "description": "Key-value attributes for this end device. Typically used for organizing end devices or for storing integration-specific data. Stored in Entity Registry.",
               "label": "repeated",
               "type": "AttributesEntry",
               "longType": "EndDevice.AttributesEntry",
@@ -8016,7 +8016,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the end device fields that should be returned.\nSee the API reference for which fields can be returned by the different services.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -8055,7 +8055,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the end device fields that should be returned.\nSee the API reference for which fields can be returned by the different services.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -9407,7 +9407,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the end device fields that should be updated.\nSee the API reference for which fields can be set on the different services.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -9446,7 +9446,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the end device fields that should be updated.\nSee the API reference for which fields can be set on the different services.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -9479,7 +9479,7 @@
           "methods": [
             {
               "name": "Create",
-              "description": "Create a new end device within an application.",
+              "description": "Create a new end device within an application.\nAfter creating a device in the EndDeviceRegistry (Identity Server), it still\nneeds to be created in the NsEndDeviceRegistry, AsEndDeviceRegistry and JsEndDeviceRegistry.",
               "requestType": "CreateEndDeviceRequest",
               "requestLongType": "CreateEndDeviceRequest",
               "requestFullType": "ttn.lorawan.v3.CreateEndDeviceRequest",
@@ -9502,7 +9502,7 @@
             },
             {
               "name": "Get",
-              "description": "Get the end device with the given identifiers, selecting the fields given\nby the field mask.",
+              "description": "Get the end device with the given identifiers, selecting the fields specified\nin the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
               "requestType": "GetEndDeviceRequest",
               "requestLongType": "GetEndDeviceRequest",
               "requestFullType": "ttn.lorawan.v3.GetEndDeviceRequest",
@@ -9524,7 +9524,7 @@
             },
             {
               "name": "GetIdentifiersForEUIs",
-              "description": "",
+              "description": "Get the identifiers of the end device that has the given EUIs registered.",
               "requestType": "GetEndDeviceIdentifiersForEUIsRequest",
               "requestLongType": "GetEndDeviceIdentifiersForEUIsRequest",
               "requestFullType": "ttn.lorawan.v3.GetEndDeviceIdentifiersForEUIsRequest",
@@ -9536,7 +9536,7 @@
             },
             {
               "name": "List",
-              "description": "List applications. See request message for details.",
+              "description": "List end devices in the given application.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
               "requestType": "ListEndDevicesRequest",
               "requestLongType": "ListEndDevicesRequest",
               "requestFullType": "ttn.lorawan.v3.ListEndDevicesRequest",
@@ -9558,7 +9558,7 @@
             },
             {
               "name": "Update",
-              "description": "",
+              "description": "Update the OAuth client, changing the fields specified by the field mask to the provided values.",
               "requestType": "UpdateEndDeviceRequest",
               "requestLongType": "UpdateEndDeviceRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateEndDeviceRequest",
@@ -9581,7 +9581,7 @@
             },
             {
               "name": "Delete",
-              "description": "",
+              "description": "Delete the end device with the given IDs.\nBefore deleting an end device from the EndDeviceRegistry (the Identity Server),\nthe device needs to be deleted from the JsEndDeviceRegistry, AsEndDeviceRegistry and NsEndDeviceRegistry.\nThis is NOT done automatically.",
               "requestType": "EndDeviceIdentifiers",
               "requestLongType": "EndDeviceIdentifiers",
               "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
@@ -10400,7 +10400,7 @@
             },
             {
               "name": "attributes",
-              "description": "",
+              "description": "Key-value attributes for this gateway. Typically used for organizing gateways or for storing integration-specific data.",
               "label": "repeated",
               "type": "AttributesEntry",
               "longType": "Gateway.AttributesEntry",
@@ -10422,7 +10422,7 @@
             },
             {
               "name": "contact_info",
-              "description": "",
+              "description": "Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.",
               "label": "repeated",
               "type": "ContactInfo",
               "longType": "ContactInfo",
@@ -11660,7 +11660,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the gateway fields that should be returned.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -11788,14 +11788,14 @@
           "name": "ListGatewaysRequest",
           "longName": "ListGatewaysRequest",
           "fullName": "ttn.lorawan.v3.ListGatewaysRequest",
-          "description": "By default we list all gateways the caller has rights on.\nSet the user or the organization (not both) to instead list the gateways\nwhere the user or organization is collaborator on.",
+          "description": "",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
           "fields": [
             {
               "name": "collaborator",
-              "description": "",
+              "description": "By default we list all gateways the caller has rights on.\nSet the user or the organization (not both) to instead list the gateways\nwhere the user or organization is collaborator on.",
               "label": "",
               "type": "OrganizationOrUserIdentifiers",
               "longType": "OrganizationOrUserIdentifiers",
@@ -11805,7 +11805,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the gateway fields that should be returned.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -11994,7 +11994,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the gateway fields that should be updated.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -12059,7 +12059,7 @@
           "methods": [
             {
               "name": "ListRights",
-              "description": "",
+              "description": "List the rights the caller has on this gateway.",
               "requestType": "GatewayIdentifiers",
               "requestLongType": "GatewayIdentifiers",
               "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
@@ -12081,7 +12081,7 @@
             },
             {
               "name": "CreateAPIKey",
-              "description": "",
+              "description": "Create an API key scoped to this gateway.",
               "requestType": "CreateGatewayAPIKeyRequest",
               "requestLongType": "CreateGatewayAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.CreateGatewayAPIKeyRequest",
@@ -12104,7 +12104,7 @@
             },
             {
               "name": "ListAPIKeys",
-              "description": "",
+              "description": "List the API keys for this gateway.",
               "requestType": "ListGatewayAPIKeysRequest",
               "requestLongType": "ListGatewayAPIKeysRequest",
               "requestFullType": "ttn.lorawan.v3.ListGatewayAPIKeysRequest",
@@ -12126,7 +12126,7 @@
             },
             {
               "name": "GetAPIKey",
-              "description": "",
+              "description": "Get a single API key of this gateway.",
               "requestType": "GetGatewayAPIKeyRequest",
               "requestLongType": "GetGatewayAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.GetGatewayAPIKeyRequest",
@@ -12148,7 +12148,7 @@
             },
             {
               "name": "UpdateAPIKey",
-              "description": "Update the rights of an existing gateway API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights. It is required for the caller to have all assigned or/and removed rights.",
+              "description": "Update the rights of an API key of the gateway.\nThis method can also be used to delete the API key, by giving it no rights.\nThe caller is required to have all assigned or/and removed rights.",
               "requestType": "UpdateGatewayAPIKeyRequest",
               "requestLongType": "UpdateGatewayAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateGatewayAPIKeyRequest",
@@ -12184,8 +12184,8 @@
                 "google.api.http": {
                   "rules": [
                     {
-                      "method": "GET",
-                      "pattern": "/gateways/{gateway_ids.gateway_id}/collaborator"
+                      "method": "",
+                      "pattern": ""
                     },
                     {
                       "method": "GET",
@@ -12201,7 +12201,7 @@
             },
             {
               "name": "SetCollaborator",
-              "description": "Set the rights of a collaborator (member) on the gateway. It is required for the caller to\nhave all assigned or/and removed rights.\nSetting a collaborator without rights, removes them.",
+              "description": "Set the rights of a collaborator (member) on the gateway.\nThis method can also be used to delete the collaborator, by giving them no rights.\nThe caller is required to have all assigned or/and removed rights.",
               "requestType": "SetGatewayCollaboratorRequest",
               "requestLongType": "SetGatewayCollaboratorRequest",
               "requestFullType": "ttn.lorawan.v3.SetGatewayCollaboratorRequest",
@@ -12224,7 +12224,7 @@
             },
             {
               "name": "ListCollaborators",
-              "description": "",
+              "description": "List the collaborators on this gateway.",
               "requestType": "ListGatewayCollaboratorsRequest",
               "requestLongType": "ListGatewayCollaboratorsRequest",
               "requestFullType": "ttn.lorawan.v3.ListGatewayCollaboratorsRequest",
@@ -12302,7 +12302,7 @@
             },
             {
               "name": "Get",
-              "description": "Get the gateway with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
+              "description": "Get the gateway with the given identifiers, selecting the fields specified\nin the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
               "requestType": "GetGatewayRequest",
               "requestLongType": "GetGatewayRequest",
               "requestFullType": "ttn.lorawan.v3.GetGatewayRequest",
@@ -12324,7 +12324,7 @@
             },
             {
               "name": "GetIdentifiersForEUI",
-              "description": "",
+              "description": "Get the identifiers of the gateway that has the given EUI registered.",
               "requestType": "GetGatewayIdentifiersForEUIRequest",
               "requestLongType": "GetGatewayIdentifiersForEUIRequest",
               "requestFullType": "ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest",
@@ -12336,7 +12336,7 @@
             },
             {
               "name": "List",
-              "description": "List gateways. See request message for details.",
+              "description": "List gateways where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the gateways the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
               "requestType": "ListGatewaysRequest",
               "requestLongType": "ListGatewaysRequest",
               "requestFullType": "ttn.lorawan.v3.ListGatewaysRequest",
@@ -12366,7 +12366,7 @@
             },
             {
               "name": "Update",
-              "description": "",
+              "description": "Update the gateway, changing the fields specified by the field mask to the provided values.",
               "requestType": "UpdateGatewayRequest",
               "requestLongType": "UpdateGatewayRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateGatewayRequest",
@@ -12389,7 +12389,7 @@
             },
             {
               "name": "Delete",
-              "description": "",
+              "description": "Delete the gateway. This may not release the gateway ID for reuse, but it does release the EUI.",
               "requestType": "GatewayIdentifiers",
               "requestLongType": "GatewayIdentifiers",
               "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
@@ -13187,6 +13187,376 @@
               }
             }
           ]
+        },
+        {
+          "name": "GetIsConfigurationRequest",
+          "longName": "GetIsConfigurationRequest",
+          "fullName": "ttn.lorawan.v3.GetIsConfigurationRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "GetIsConfigurationResponse",
+          "longName": "GetIsConfigurationResponse",
+          "fullName": "ttn.lorawan.v3.GetIsConfigurationResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "configuration",
+              "description": "",
+              "label": "",
+              "type": "IsConfiguration",
+              "longType": "IsConfiguration",
+              "fullType": "ttn.lorawan.v3.IsConfiguration",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "IsConfiguration",
+          "longName": "IsConfiguration",
+          "fullName": "ttn.lorawan.v3.IsConfiguration",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "user_registration",
+              "description": "",
+              "label": "",
+              "type": "UserRegistration",
+              "longType": "IsConfiguration.UserRegistration",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.UserRegistration",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "profile_picture",
+              "description": "",
+              "label": "",
+              "type": "ProfilePicture",
+              "longType": "IsConfiguration.ProfilePicture",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.ProfilePicture",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "end_device_picture",
+              "description": "",
+              "label": "",
+              "type": "EndDevicePicture",
+              "longType": "IsConfiguration.EndDevicePicture",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.EndDevicePicture",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "user_rights",
+              "description": "",
+              "label": "",
+              "type": "UserRights",
+              "longType": "IsConfiguration.UserRights",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.UserRights",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EndDevicePicture",
+          "longName": "IsConfiguration.EndDevicePicture",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.EndDevicePicture",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "disable_upload",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ProfilePicture",
+          "longName": "IsConfiguration.ProfilePicture",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.ProfilePicture",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "disable_upload",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "use_gravatar",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UserRegistration",
+          "longName": "IsConfiguration.UserRegistration",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.UserRegistration",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "invitation",
+              "description": "",
+              "label": "",
+              "type": "Invitation",
+              "longType": "IsConfiguration.UserRegistration.Invitation",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.UserRegistration.Invitation",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "contact_info_validation",
+              "description": "",
+              "label": "",
+              "type": "ContactInfoValidation",
+              "longType": "IsConfiguration.UserRegistration.ContactInfoValidation",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.UserRegistration.ContactInfoValidation",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "admin_approval",
+              "description": "",
+              "label": "",
+              "type": "AdminApproval",
+              "longType": "IsConfiguration.UserRegistration.AdminApproval",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.UserRegistration.AdminApproval",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "password_requirements",
+              "description": "",
+              "label": "",
+              "type": "PasswordRequirements",
+              "longType": "IsConfiguration.UserRegistration.PasswordRequirements",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.UserRegistration.PasswordRequirements",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AdminApproval",
+          "longName": "IsConfiguration.UserRegistration.AdminApproval",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.UserRegistration.AdminApproval",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "required",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ContactInfoValidation",
+          "longName": "IsConfiguration.UserRegistration.ContactInfoValidation",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.UserRegistration.ContactInfoValidation",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "required",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Invitation",
+          "longName": "IsConfiguration.UserRegistration.Invitation",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.UserRegistration.Invitation",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "required",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "token_ttl",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PasswordRequirements",
+          "longName": "IsConfiguration.UserRegistration.PasswordRequirements",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.UserRegistration.PasswordRequirements",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "min_length",
+              "description": "",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "max_length",
+              "description": "",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "min_uppercase",
+              "description": "",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "min_digits",
+              "description": "",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "min_special",
+              "description": "",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UserRights",
+          "longName": "IsConfiguration.UserRights",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.UserRights",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "create_applications",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "create_clients",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "create_gateways",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "create_organizations",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
         }
       ],
       "services": [
@@ -13213,6 +13583,36 @@
                     {
                       "method": "GET",
                       "pattern": "/auth_info"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Is",
+          "longName": "Is",
+          "fullName": "ttn.lorawan.v3.Is",
+          "description": "",
+          "methods": [
+            {
+              "name": "GetConfiguration",
+              "description": "",
+              "requestType": "GetIsConfigurationRequest",
+              "requestLongType": "GetIsConfigurationRequest",
+              "requestFullType": "ttn.lorawan.v3.GetIsConfigurationRequest",
+              "requestStreaming": false,
+              "responseType": "GetIsConfigurationResponse",
+              "responseLongType": "GetIsConfigurationResponse",
+              "responseFullType": "ttn.lorawan.v3.GetIsConfigurationResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/is/configuration"
                     }
                   ]
                 }
@@ -18876,6 +19276,16 @@
               "fullType": "google.protobuf.Timestamp",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "concentrator_time",
+              "description": "Absolute concentrator time as observed by the Gateway Server, accounting for rollovers.",
+              "label": "",
+              "type": "int64",
+              "longType": "int64",
+              "fullType": "int64",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         }
@@ -22199,7 +22609,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the organization fields that should be returned.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -22327,14 +22737,14 @@
           "name": "ListOrganizationsRequest",
           "longName": "ListOrganizationsRequest",
           "fullName": "ttn.lorawan.v3.ListOrganizationsRequest",
-          "description": "By default we list all organizations the caller has rights on.\nSet the user to instead list the organizations\nwhere the user or organization is collaborator on.",
+          "description": "",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
           "fields": [
             {
               "name": "collaborator",
-              "description": "NOTE: It is currently not possible to have organizations collaborating on\nother organizations.",
+              "description": "By default we list all organizations the caller has rights on.\nSet the user to instead list the organizations\nwhere the user or organization is collaborator on.\nNOTE: It is currently not possible to have organizations collaborating on\nother organizations.",
               "label": "",
               "type": "OrganizationOrUserIdentifiers",
               "longType": "OrganizationOrUserIdentifiers",
@@ -22344,7 +22754,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the organization fields that should be returned.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -22493,7 +22903,7 @@
             },
             {
               "name": "attributes",
-              "description": "",
+              "description": "Key-value attributes for this organization. Typically used for organizing organizations or for storing integration-specific data.",
               "label": "repeated",
               "type": "AttributesEntry",
               "longType": "Organization.AttributesEntry",
@@ -22515,7 +22925,7 @@
             },
             {
               "name": "contact_info",
-              "description": "",
+              "description": "Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization.",
               "label": "repeated",
               "type": "ContactInfo",
               "longType": "ContactInfo",
@@ -22700,7 +23110,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the organization fields that should be updated.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -22733,7 +23143,7 @@
           "methods": [
             {
               "name": "ListRights",
-              "description": "",
+              "description": "List the rights the caller has on this organization.",
               "requestType": "OrganizationIdentifiers",
               "requestLongType": "OrganizationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.OrganizationIdentifiers",
@@ -22755,7 +23165,7 @@
             },
             {
               "name": "CreateAPIKey",
-              "description": "",
+              "description": "Create an API key scoped to this organization.\nOrganization API keys can give access to the organization itself, as well as\nany application, gateway and OAuth client this organization is a collaborator of.",
               "requestType": "CreateOrganizationAPIKeyRequest",
               "requestLongType": "CreateOrganizationAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.CreateOrganizationAPIKeyRequest",
@@ -22778,7 +23188,7 @@
             },
             {
               "name": "ListAPIKeys",
-              "description": "",
+              "description": "List the API keys for this organization.",
               "requestType": "ListOrganizationAPIKeysRequest",
               "requestLongType": "ListOrganizationAPIKeysRequest",
               "requestFullType": "ttn.lorawan.v3.ListOrganizationAPIKeysRequest",
@@ -22800,7 +23210,7 @@
             },
             {
               "name": "GetAPIKey",
-              "description": "",
+              "description": "Get a single API key of this organization.",
               "requestType": "GetOrganizationAPIKeyRequest",
               "requestLongType": "GetOrganizationAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.GetOrganizationAPIKeyRequest",
@@ -22822,7 +23232,7 @@
             },
             {
               "name": "UpdateAPIKey",
-              "description": "Update the rights of an existing organization API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights. It is required for the caller to have all assigned or/and removed rights.",
+              "description": "Update the rights of an API key of the organization.\nThis method can also be used to delete the API key, by giving it no rights.\nThe caller is required to have all assigned or/and removed rights.",
               "requestType": "UpdateOrganizationAPIKeyRequest",
               "requestLongType": "UpdateOrganizationAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest",
@@ -22858,8 +23268,8 @@
                 "google.api.http": {
                   "rules": [
                     {
-                      "method": "GET",
-                      "pattern": "/organizations/{organization_ids.organization_id}/collaborator"
+                      "method": "",
+                      "pattern": ""
                     },
                     {
                       "method": "GET",
@@ -22871,7 +23281,7 @@
             },
             {
               "name": "SetCollaborator",
-              "description": "Set the rights of a collaborator (member) on the organization. It is required for the caller to\nhave all assigned or/and removed rights.\nSetting a collaborator without rights, removes them.\nNote that only users can collaborate (be member of) an organization.",
+              "description": "Set the rights of a collaborator (member) on the organization.\nOrganization collaborators can get access to the organization itself, as well as\nany application, gateway and OAuth client this organization is a collaborator of.\nThis method can also be used to delete the collaborator, by giving them no rights.\nThe caller is required to have all assigned or/and removed rights.",
               "requestType": "SetOrganizationCollaboratorRequest",
               "requestLongType": "SetOrganizationCollaboratorRequest",
               "requestFullType": "ttn.lorawan.v3.SetOrganizationCollaboratorRequest",
@@ -22894,7 +23304,7 @@
             },
             {
               "name": "ListCollaborators",
-              "description": "",
+              "description": "List the collaborators on this organization.",
               "requestType": "ListOrganizationCollaboratorsRequest",
               "requestLongType": "ListOrganizationCollaboratorsRequest",
               "requestFullType": "ttn.lorawan.v3.ListOrganizationCollaboratorsRequest",
@@ -22947,7 +23357,7 @@
             },
             {
               "name": "Get",
-              "description": "Get the organization with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
+              "description": "Get the organization with the given identifiers, selecting the fields specified\nin the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
               "requestType": "GetOrganizationRequest",
               "requestLongType": "GetOrganizationRequest",
               "requestFullType": "ttn.lorawan.v3.GetOrganizationRequest",
@@ -22969,7 +23379,7 @@
             },
             {
               "name": "List",
-              "description": "List organizations. See request message for details.",
+              "description": "List organizations where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the organizations the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
               "requestType": "ListOrganizationsRequest",
               "requestLongType": "ListOrganizationsRequest",
               "requestFullType": "ttn.lorawan.v3.ListOrganizationsRequest",
@@ -22995,7 +23405,7 @@
             },
             {
               "name": "Update",
-              "description": "",
+              "description": "Update the organization, changing the fields specified by the field mask to the provided values.",
               "requestType": "UpdateOrganizationRequest",
               "requestLongType": "UpdateOrganizationRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateOrganizationRequest",
@@ -23018,7 +23428,7 @@
             },
             {
               "name": "Delete",
-              "description": "",
+              "description": "Delete the organization. This may not release the organization ID for reuse.",
               "requestType": "OrganizationIdentifiers",
               "requestLongType": "OrganizationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.OrganizationIdentifiers",
@@ -24982,7 +25392,7 @@
             },
             {
               "name": "invitation_token",
-              "description": "",
+              "description": "The invitation token that was sent to the user (some networks require an invitation in order to register new users).",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -25089,7 +25499,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the user fields that should be returned.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -25395,7 +25805,7 @@
           "fields": [
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the user fields that should be returned.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -25629,7 +26039,7 @@
             },
             {
               "name": "field_mask",
-              "description": "",
+              "description": "The names of the user fields that should be updated.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
@@ -25724,7 +26134,7 @@
             },
             {
               "name": "attributes",
-              "description": "",
+              "description": "Key-value attributes for this users. Typically used for storing integration-specific data.",
               "label": "repeated",
               "type": "AttributesEntry",
               "longType": "User.AttributesEntry",
@@ -25746,7 +26156,7 @@
             },
             {
               "name": "contact_info",
-              "description": "",
+              "description": "Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user.",
               "label": "repeated",
               "type": "ContactInfo",
               "longType": "ContactInfo",
@@ -25774,7 +26184,7 @@
             },
             {
               "name": "primary_email_address_validated_at",
-              "description": "",
+              "description": "When the primary email address was validated. Note that email address validation is not required on all networks.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -25784,7 +26194,7 @@
             },
             {
               "name": "password",
-              "description": "Only used on create; never returned on API calls.",
+              "description": "The password field is only considered when creating a user.\nIt is not returned on API calls, and can not be updated by updating the User.\nSee the UpdatePassword method of the UserRegistry service for more information.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -25842,7 +26252,7 @@
             },
             {
               "name": "temporary_password",
-              "description": "The temporary password can only be used to update a user's password; never returned on API calls.",
+              "description": "The temporary password can only be used to update a user's password; never returned on API calls.\nIt is not returned on API calls, and can not be updated by updating the User.\nSee the CreateTemporaryPassword method of the UserRegistry service for more information.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -26112,7 +26522,7 @@
           "methods": [
             {
               "name": "ListRights",
-              "description": "",
+              "description": "List the rights the caller has on this user.",
               "requestType": "UserIdentifiers",
               "requestLongType": "UserIdentifiers",
               "requestFullType": "ttn.lorawan.v3.UserIdentifiers",
@@ -26134,7 +26544,7 @@
             },
             {
               "name": "CreateAPIKey",
-              "description": "",
+              "description": "Create an API key scoped to this user.\nUser API keys can give access to the user itself, as well as\nany organization, application, gateway and OAuth client this user is a collaborator of.",
               "requestType": "CreateUserAPIKeyRequest",
               "requestLongType": "CreateUserAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.CreateUserAPIKeyRequest",
@@ -26157,7 +26567,7 @@
             },
             {
               "name": "ListAPIKeys",
-              "description": "",
+              "description": "List the API keys for this user.",
               "requestType": "ListUserAPIKeysRequest",
               "requestLongType": "ListUserAPIKeysRequest",
               "requestFullType": "ttn.lorawan.v3.ListUserAPIKeysRequest",
@@ -26179,7 +26589,7 @@
             },
             {
               "name": "GetAPIKey",
-              "description": "",
+              "description": "Get a single API key of this user.",
               "requestType": "GetUserAPIKeyRequest",
               "requestLongType": "GetUserAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.GetUserAPIKeyRequest",
@@ -26201,7 +26611,7 @@
             },
             {
               "name": "UpdateAPIKey",
-              "description": "Update the rights of an existing user API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights. It is required for the caller to have all assigned or/and removed rights.",
+              "description": "Update the rights of an API key of the user.\nThis method can also be used to delete the API key, by giving it no rights.\nThe caller is required to have all assigned or/and removed rights.",
               "requestType": "UpdateUserAPIKeyRequest",
               "requestLongType": "UpdateUserAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateUserAPIKeyRequest",
@@ -26232,7 +26642,7 @@
           "methods": [
             {
               "name": "Send",
-              "description": "",
+              "description": "Invite a user to join the network.",
               "requestType": "SendInvitationRequest",
               "requestLongType": "SendInvitationRequest",
               "requestFullType": "ttn.lorawan.v3.SendInvitationRequest",
@@ -26255,7 +26665,7 @@
             },
             {
               "name": "List",
-              "description": "",
+              "description": "List the invitations the caller has sent.",
               "requestType": "ListInvitationsRequest",
               "requestLongType": "ListInvitationsRequest",
               "requestFullType": "ttn.lorawan.v3.ListInvitationsRequest",
@@ -26277,7 +26687,7 @@
             },
             {
               "name": "Delete",
-              "description": "",
+              "description": "Delete (revoke) a user invitation.",
               "requestType": "DeleteInvitationRequest",
               "requestLongType": "DeleteInvitationRequest",
               "requestFullType": "ttn.lorawan.v3.DeleteInvitationRequest",
@@ -26352,7 +26762,7 @@
             },
             {
               "name": "List",
-              "description": "",
+              "description": "List users of the network. This method is typically restricted to admins only.",
               "requestType": "ListUsersRequest",
               "requestLongType": "ListUsersRequest",
               "requestFullType": "ttn.lorawan.v3.ListUsersRequest",
@@ -26374,7 +26784,7 @@
             },
             {
               "name": "Update",
-              "description": "",
+              "description": "Update the user, changing the fields specified by the field mask to the provided values.\nThis method can not be used to change the password, see the UpdatePassword method for that.",
               "requestType": "UpdateUserRequest",
               "requestLongType": "UpdateUserRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateUserRequest",
@@ -26419,7 +26829,7 @@
             },
             {
               "name": "UpdatePassword",
-              "description": "",
+              "description": "Update the password of the user.",
               "requestType": "UpdateUserPasswordRequest",
               "requestLongType": "UpdateUserPasswordRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateUserPasswordRequest",
@@ -26442,7 +26852,7 @@
             },
             {
               "name": "Delete",
-              "description": "",
+              "description": "Delete the user. This may not release the user ID for reuse.",
               "requestType": "UserIdentifiers",
               "requestLongType": "UserIdentifiers",
               "requestFullType": "ttn.lorawan.v3.UserIdentifiers",
@@ -26472,7 +26882,7 @@
           "methods": [
             {
               "name": "List",
-              "description": "",
+              "description": "List the active sessions for the given user.",
               "requestType": "ListUserSessionsRequest",
               "requestLongType": "ListUserSessionsRequest",
               "requestFullType": "ttn.lorawan.v3.ListUserSessionsRequest",
@@ -26494,7 +26904,7 @@
             },
             {
               "name": "Delete",
-              "description": "",
+              "description": "Delete (revoke) the given user session.",
               "requestType": "UserSessionIdentifiers",
               "requestLongType": "UserSessionIdentifiers",
               "requestFullType": "ttn.lorawan.v3.UserSessionIdentifiers",

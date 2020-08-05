@@ -170,6 +170,163 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 	return nil
 }
 
+func (dst *GetIsConfigurationRequest) SetFields(src *GetIsConfigurationRequest, paths ...string) error {
+	if len(paths) != 0 {
+		return fmt.Errorf("message GetIsConfigurationRequest has no fields, but paths %s were specified", paths)
+	}
+	if src != nil {
+		*dst = *src
+	}
+	return nil
+}
+
+func (dst *IsConfiguration) SetFields(src *IsConfiguration, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "user_registration":
+			if len(subs) > 0 {
+				var newDst, newSrc *IsConfiguration_UserRegistration
+				if (src == nil || src.UserRegistration == nil) && dst.UserRegistration == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UserRegistration
+				}
+				if dst.UserRegistration != nil {
+					newDst = dst.UserRegistration
+				} else {
+					newDst = &IsConfiguration_UserRegistration{}
+					dst.UserRegistration = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserRegistration = src.UserRegistration
+				} else {
+					dst.UserRegistration = nil
+				}
+			}
+		case "profile_picture":
+			if len(subs) > 0 {
+				var newDst, newSrc *IsConfiguration_ProfilePicture
+				if (src == nil || src.ProfilePicture == nil) && dst.ProfilePicture == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ProfilePicture
+				}
+				if dst.ProfilePicture != nil {
+					newDst = dst.ProfilePicture
+				} else {
+					newDst = &IsConfiguration_ProfilePicture{}
+					dst.ProfilePicture = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ProfilePicture = src.ProfilePicture
+				} else {
+					dst.ProfilePicture = nil
+				}
+			}
+		case "end_device_picture":
+			if len(subs) > 0 {
+				var newDst, newSrc *IsConfiguration_EndDevicePicture
+				if (src == nil || src.EndDevicePicture == nil) && dst.EndDevicePicture == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EndDevicePicture
+				}
+				if dst.EndDevicePicture != nil {
+					newDst = dst.EndDevicePicture
+				} else {
+					newDst = &IsConfiguration_EndDevicePicture{}
+					dst.EndDevicePicture = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDevicePicture = src.EndDevicePicture
+				} else {
+					dst.EndDevicePicture = nil
+				}
+			}
+		case "user_rights":
+			if len(subs) > 0 {
+				var newDst, newSrc *IsConfiguration_UserRights
+				if (src == nil || src.UserRights == nil) && dst.UserRights == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UserRights
+				}
+				if dst.UserRights != nil {
+					newDst = dst.UserRights
+				} else {
+					newDst = &IsConfiguration_UserRights{}
+					dst.UserRights = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserRights = src.UserRights
+				} else {
+					dst.UserRights = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetIsConfigurationResponse) SetFields(src *GetIsConfigurationResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "configuration":
+			if len(subs) > 0 {
+				var newDst, newSrc *IsConfiguration
+				if (src == nil || src.Configuration == nil) && dst.Configuration == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Configuration
+				}
+				if dst.Configuration != nil {
+					newDst = dst.Configuration
+				} else {
+					newDst = &IsConfiguration{}
+					dst.Configuration = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Configuration = src.Configuration
+				} else {
+					dst.Configuration = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *AuthInfoResponse_APIKeyAccess) SetFields(src *AuthInfoResponse_APIKeyAccess, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -208,6 +365,338 @@ func (dst *AuthInfoResponse_APIKeyAccess) SetFields(src *AuthInfoResponse_APIKey
 					var zero EntityIdentifiers
 					dst.EntityIDs = zero
 				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *IsConfiguration_UserRegistration) SetFields(src *IsConfiguration_UserRegistration, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "invitation":
+			if len(subs) > 0 {
+				var newDst, newSrc *IsConfiguration_UserRegistration_Invitation
+				if (src == nil || src.Invitation == nil) && dst.Invitation == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Invitation
+				}
+				if dst.Invitation != nil {
+					newDst = dst.Invitation
+				} else {
+					newDst = &IsConfiguration_UserRegistration_Invitation{}
+					dst.Invitation = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Invitation = src.Invitation
+				} else {
+					dst.Invitation = nil
+				}
+			}
+		case "contact_info_validation":
+			if len(subs) > 0 {
+				var newDst, newSrc *IsConfiguration_UserRegistration_ContactInfoValidation
+				if (src == nil || src.ContactInfoValidation == nil) && dst.ContactInfoValidation == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ContactInfoValidation
+				}
+				if dst.ContactInfoValidation != nil {
+					newDst = dst.ContactInfoValidation
+				} else {
+					newDst = &IsConfiguration_UserRegistration_ContactInfoValidation{}
+					dst.ContactInfoValidation = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ContactInfoValidation = src.ContactInfoValidation
+				} else {
+					dst.ContactInfoValidation = nil
+				}
+			}
+		case "admin_approval":
+			if len(subs) > 0 {
+				var newDst, newSrc *IsConfiguration_UserRegistration_AdminApproval
+				if (src == nil || src.AdminApproval == nil) && dst.AdminApproval == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.AdminApproval
+				}
+				if dst.AdminApproval != nil {
+					newDst = dst.AdminApproval
+				} else {
+					newDst = &IsConfiguration_UserRegistration_AdminApproval{}
+					dst.AdminApproval = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.AdminApproval = src.AdminApproval
+				} else {
+					dst.AdminApproval = nil
+				}
+			}
+		case "password_requirements":
+			if len(subs) > 0 {
+				var newDst, newSrc *IsConfiguration_UserRegistration_PasswordRequirements
+				if (src == nil || src.PasswordRequirements == nil) && dst.PasswordRequirements == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.PasswordRequirements
+				}
+				if dst.PasswordRequirements != nil {
+					newDst = dst.PasswordRequirements
+				} else {
+					newDst = &IsConfiguration_UserRegistration_PasswordRequirements{}
+					dst.PasswordRequirements = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.PasswordRequirements = src.PasswordRequirements
+				} else {
+					dst.PasswordRequirements = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *IsConfiguration_ProfilePicture) SetFields(src *IsConfiguration_ProfilePicture, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "disable_upload":
+			if len(subs) > 0 {
+				return fmt.Errorf("'disable_upload' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DisableUpload = src.DisableUpload
+			} else {
+				dst.DisableUpload = nil
+			}
+		case "use_gravatar":
+			if len(subs) > 0 {
+				return fmt.Errorf("'use_gravatar' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UseGravatar = src.UseGravatar
+			} else {
+				dst.UseGravatar = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *IsConfiguration_EndDevicePicture) SetFields(src *IsConfiguration_EndDevicePicture, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "disable_upload":
+			if len(subs) > 0 {
+				return fmt.Errorf("'disable_upload' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DisableUpload = src.DisableUpload
+			} else {
+				dst.DisableUpload = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *IsConfiguration_UserRights) SetFields(src *IsConfiguration_UserRights, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "create_applications":
+			if len(subs) > 0 {
+				return fmt.Errorf("'create_applications' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreateApplications = src.CreateApplications
+			} else {
+				dst.CreateApplications = nil
+			}
+		case "create_clients":
+			if len(subs) > 0 {
+				return fmt.Errorf("'create_clients' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreateClients = src.CreateClients
+			} else {
+				dst.CreateClients = nil
+			}
+		case "create_gateways":
+			if len(subs) > 0 {
+				return fmt.Errorf("'create_gateways' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreateGateways = src.CreateGateways
+			} else {
+				dst.CreateGateways = nil
+			}
+		case "create_organizations":
+			if len(subs) > 0 {
+				return fmt.Errorf("'create_organizations' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreateOrganizations = src.CreateOrganizations
+			} else {
+				dst.CreateOrganizations = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *IsConfiguration_UserRegistration_Invitation) SetFields(src *IsConfiguration_UserRegistration_Invitation, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "required":
+			if len(subs) > 0 {
+				return fmt.Errorf("'required' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Required = src.Required
+			} else {
+				dst.Required = nil
+			}
+		case "token_ttl":
+			if len(subs) > 0 {
+				return fmt.Errorf("'token_ttl' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TokenTTL = src.TokenTTL
+			} else {
+				dst.TokenTTL = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *IsConfiguration_UserRegistration_ContactInfoValidation) SetFields(src *IsConfiguration_UserRegistration_ContactInfoValidation, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "required":
+			if len(subs) > 0 {
+				return fmt.Errorf("'required' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Required = src.Required
+			} else {
+				dst.Required = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *IsConfiguration_UserRegistration_AdminApproval) SetFields(src *IsConfiguration_UserRegistration_AdminApproval, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "required":
+			if len(subs) > 0 {
+				return fmt.Errorf("'required' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Required = src.Required
+			} else {
+				dst.Required = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *IsConfiguration_UserRegistration_PasswordRequirements) SetFields(src *IsConfiguration_UserRegistration_PasswordRequirements, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "min_length":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_length' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinLength = src.MinLength
+			} else {
+				dst.MinLength = nil
+			}
+		case "max_length":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_length' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxLength = src.MaxLength
+			} else {
+				dst.MaxLength = nil
+			}
+		case "min_uppercase":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_uppercase' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinUppercase = src.MinUppercase
+			} else {
+				dst.MinUppercase = nil
+			}
+		case "min_digits":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_digits' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinDigits = src.MinDigits
+			} else {
+				dst.MinDigits = nil
+			}
+		case "min_special":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_special' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinSpecial = src.MinSpecial
+			} else {
+				dst.MinSpecial = nil
 			}
 
 		default:

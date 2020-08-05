@@ -244,6 +244,20 @@ func (s *Scheduler) SubBandCount() int {
 	return len(s.subBands)
 }
 
+// syncWithUplinkToken synchronizes the clock using the given token.
+// If the given token does not provide enough information or if the latest clock sync is more recent, this method returns false.
+// This method assumes that the mutex is held.
+func (s *Scheduler) syncWithUplinkToken(token *ttnpb.UplinkToken) bool {
+	if token.GetServerTime().IsZero() || token.GetConcentratorTime() == 0 {
+		return false
+	}
+	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(token.ServerTime) {
+		return false
+	}
+	s.clock.SyncWithGatewayConcentrator(token.Timestamp, token.ServerTime, ConcentratorTime(token.ConcentratorTime))
+	return true
+}
+
 var (
 	errConflict              = errors.DefineResourceExhausted("conflict", "scheduling conflict")
 	errTooLate               = errors.DefineFailedPrecondition("too_late", "too late to transmission scheduled time (delta is `{delta}`)")
@@ -262,24 +276,23 @@ type Options struct {
 }
 
 // ScheduleAt attempts to schedule the given Tx settings with the given priority.
-// If there are round-trip times available, the maximum value will be used instead of ScheduleTimeShort.
+// If there are round-trip times available, the nth percentile (n = scheduleLateRTTPercentile) value will be used instead of ScheduleTimeShort.
 func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, error) {
 	defer trace.StartRegion(ctx, "schedule transmission").End()
 
 	s.mu.RLock()
 	defer s.mu.RUnlock()
+	if opts.UplinkToken != nil {
+		s.syncWithUplinkToken(opts.UplinkToken)
+	}
 	if !s.clock.IsSynced() {
-		if token := opts.UplinkToken; token != nil && !token.ServerTime.IsZero() {
-			s.clock.Sync(token.Timestamp, token.ServerTime)
-		} else {
-			return Emission{}, errNoClockSync.New()
-		}
+		return Emission{}, errNoClockSync.New()
 	}
 	minScheduleTime := ScheduleTimeShort
 	var medianRTT *time.Duration
 	if opts.RTTs != nil {
 		if _, _, median, np, n := opts.RTTs.Stats(scheduleLateRTTPercentile, s.timeSource.Now()); n >= scheduleMinRTTCount {
-			minScheduleTime = np + QueueDelay
+			minScheduleTime = np/2 + QueueDelay
 			medianRTT = &median
 		}
 	}
@@ -346,6 +359,9 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, opts Options) (Emission
 
 	s.mu.RLock()
 	defer s.mu.RUnlock()
+	if opts.UplinkToken != nil {
+		s.syncWithUplinkToken(opts.UplinkToken)
+	}
 	if !s.clock.IsSynced() {
 		return Emission{}, errNoClockSync.New()
 	}
@@ -417,26 +433,26 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, opts Options) (Emission
 }
 
 // Sync synchronizes the clock with the given concentrator time v and the server time.
-func (s *Scheduler) Sync(v uint32, server time.Time) {
+func (s *Scheduler) Sync(v uint32, server time.Time) ConcentratorTime {
 	s.mu.Lock()
-	s.clock.Sync(v, server)
-	s.mu.Unlock()
+	defer s.mu.Unlock()
+	return s.clock.Sync(v, server)
 }
 
 // SyncWithGatewayAbsolute synchronizes the clock with the given concentrator timestamp, the server time and the
 // absolute gateway time that corresponds to the given timestamp.
-func (s *Scheduler) SyncWithGatewayAbsolute(timestamp uint32, server, gateway time.Time) {
+func (s *Scheduler) SyncWithGatewayAbsolute(timestamp uint32, server, gateway time.Time) ConcentratorTime {
 	s.mu.Lock()
-	s.clock.SyncWithGatewayAbsolute(timestamp, server, gateway)
-	s.mu.Unlock()
+	defer s.mu.Unlock()
+	return s.clock.SyncWithGatewayAbsolute(timestamp, server, gateway)
 }
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.
-func (s *Scheduler) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, concentrator ConcentratorTime) {
+func (s *Scheduler) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, concentrator ConcentratorTime) ConcentratorTime {
 	s.mu.Lock()
-	s.clock.SyncWithGatewayConcentrator(timestamp, server, concentrator)
-	s.mu.Unlock()
+	defer s.mu.Unlock()
+	return s.clock.SyncWithGatewayConcentrator(timestamp, server, concentrator)
 }
 
 // IsGatewayTimeSynced reports whether scheduler clock is synchronized with gateway time.

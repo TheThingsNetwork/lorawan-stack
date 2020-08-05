@@ -94,14 +94,25 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EndDeviceRegistryClient interface {
 	// Create a new end device within an application.
+	// After creating a device in the EndDeviceRegistry (Identity Server), it still
+	// needs to be created in the NsEndDeviceRegistry, AsEndDeviceRegistry and JsEndDeviceRegistry.
 	Create(ctx context.Context, in *CreateEndDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
-	// Get the end device with the given identifiers, selecting the fields given
-	// by the field mask.
+	// Get the end device with the given identifiers, selecting the fields specified
+	// in the field mask.
+	// More or less fields may be returned, depending on the rights of the caller.
 	Get(ctx context.Context, in *GetEndDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
+	// Get the identifiers of the end device that has the given EUIs registered.
 	GetIdentifiersForEUIs(ctx context.Context, in *GetEndDeviceIdentifiersForEUIsRequest, opts ...grpc.CallOption) (*EndDeviceIdentifiers, error)
-	// List applications. See request message for details.
+	// List end devices in the given application.
+	// Similar to Get, this selects the fields given by the field mask.
+	// More or less fields may be returned, depending on the rights of the caller.
 	List(ctx context.Context, in *ListEndDevicesRequest, opts ...grpc.CallOption) (*EndDevices, error)
+	// Update the OAuth client, changing the fields specified by the field mask to the provided values.
 	Update(ctx context.Context, in *UpdateEndDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
+	// Delete the end device with the given IDs.
+	// Before deleting an end device from the EndDeviceRegistry (the Identity Server),
+	// the device needs to be deleted from the JsEndDeviceRegistry, AsEndDeviceRegistry and NsEndDeviceRegistry.
+	// This is NOT done automatically.
 	Delete(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
@@ -170,14 +181,25 @@ func (c *endDeviceRegistryClient) Delete(ctx context.Context, in *EndDeviceIdent
 // EndDeviceRegistryServer is the server API for EndDeviceRegistry service.
 type EndDeviceRegistryServer interface {
 	// Create a new end device within an application.
+	// After creating a device in the EndDeviceRegistry (Identity Server), it still
+	// needs to be created in the NsEndDeviceRegistry, AsEndDeviceRegistry and JsEndDeviceRegistry.
 	Create(context.Context, *CreateEndDeviceRequest) (*EndDevice, error)
-	// Get the end device with the given identifiers, selecting the fields given
-	// by the field mask.
+	// Get the end device with the given identifiers, selecting the fields specified
+	// in the field mask.
+	// More or less fields may be returned, depending on the rights of the caller.
 	Get(context.Context, *GetEndDeviceRequest) (*EndDevice, error)
+	// Get the identifiers of the end device that has the given EUIs registered.
 	GetIdentifiersForEUIs(context.Context, *GetEndDeviceIdentifiersForEUIsRequest) (*EndDeviceIdentifiers, error)
-	// List applications. See request message for details.
+	// List end devices in the given application.
+	// Similar to Get, this selects the fields given by the field mask.
+	// More or less fields may be returned, depending on the rights of the caller.
 	List(context.Context, *ListEndDevicesRequest) (*EndDevices, error)
+	// Update the OAuth client, changing the fields specified by the field mask to the provided values.
 	Update(context.Context, *UpdateEndDeviceRequest) (*EndDevice, error)
+	// Delete the end device with the given IDs.
+	// Before deleting an end device from the EndDeviceRegistry (the Identity Server),
+	// the device needs to be deleted from the JsEndDeviceRegistry, AsEndDeviceRegistry and NsEndDeviceRegistry.
+	// This is NOT done automatically.
 	Delete(context.Context, *EndDeviceIdentifiers) (*types.Empty, error)
 }
 

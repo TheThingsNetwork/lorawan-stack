@@ -179,6 +179,19 @@ func TestOpenConnection(t *testing.T) {
 		},
 	} {
 		t.Run(utc.name, func(t *testing.T) {
+			client := utc.createClient(t, a)
+			defer client.Disconnect(uint(timeout / time.Millisecond))
+
+			unsubscribe := func(t *testing.T, topic string) {
+				token := client.Unsubscribe(topic)
+				if !token.WaitTimeout(timeout) {
+					t.Fatal("Unsubscribe timeout")
+				}
+				if !a.So(token.Error(), should.BeNil) {
+					t.FailNow()
+				}
+			}
+
 			pb.Provider = utc.provider
 
 			conn, err := impl.OpenConnection(ctx, pb)
@@ -222,11 +235,6 @@ func TestOpenConnection(t *testing.T) {
 				} {
 					t.Run(tc.name, func(t *testing.T) {
 						a := assertions.New(t)
-						ctx, cancel := context.WithTimeout(ctx, timeout)
-						defer cancel()
-
-						client := utc.createClient(t, a)
-						defer client.Disconnect(uint(timeout / time.Millisecond))
 
 						token := client.Publish(tc.topicName, 2, false, "foobar")
 						if !token.WaitTimeout(timeout) {
@@ -236,12 +244,16 @@ func TestOpenConnection(t *testing.T) {
 							t.FailNow()
 						}
 
+						ctx, cancel := context.WithTimeout(ctx, timeout)
+						defer cancel()
+
 						msg, err := tc.subscription.Receive(ctx)
 						if tc.expectMessage {
 							a.So(err, should.BeNil)
-							a.So(msg, should.NotBeNil)
 
-							a.So(msg.Body, should.Resemble, []byte("foobar"))
+							if a.So(msg, should.NotBeNil) {
+								a.So(msg.Body, should.Resemble, []byte("foobar"))
+							}
 						} else if err == nil {
 							t.Fatal("Unexpected message received")
 						}
@@ -301,9 +313,6 @@ func TestOpenConnection(t *testing.T) {
 					t.Run(tc.name, func(t *testing.T) {
 						a := assertions.New(t)
 
-						client := utc.createClient(t, a)
-						defer client.Disconnect(uint(timeout / time.Millisecond))
-
 						upCh := make(chan paho_mqtt.Message, 10)
 						defer close(upCh)
 						token := client.Subscribe(tc.topicName, 2, func(_ paho_mqtt.Client, msg paho_mqtt.Message) {
@@ -315,6 +324,10 @@ func TestOpenConnection(t *testing.T) {
 						if !a.So(token.Error(), should.BeNil) {
 							t.FailNow()
 						}
+						defer unsubscribe(t, tc.topicName)
+
+						ctx, cancel := context.WithTimeout(ctx, timeout)
+						defer cancel()
 
 						err = tc.topic.Send(ctx, &pubsub.Message{
 							Body: []byte("foobar"),
@@ -325,8 +338,9 @@ func TestOpenConnection(t *testing.T) {
 						case <-time.After(timeout):
 							t.Fatal("Expected message never arrived")
 						case msg := <-upCh:
-							a.So(msg, should.NotBeNil)
-							a.So(msg.Payload(), should.Resemble, []byte("foobar"))
+							if a.So(msg, should.NotBeNil) {
+								a.So(msg.Payload(), should.Resemble, []byte("foobar"))
+							}
 						}
 					})
 				}

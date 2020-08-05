@@ -13,7 +13,7 @@
   "paths": {
     "/applications": {
       "get": {
-        "summary": "List applications. See request message for details.",
+        "summary": "List applications where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the applications the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "ApplicationRegistry_List",
         "responses": {
           "200": {
@@ -93,6 +93,7 @@
     },
     "/applications/{application.ids.application_id}": {
       "put": {
+        "summary": "Update the application, changing the fields specified by the field mask to the provided values.",
         "operationId": "ApplicationRegistry_Update",
         "responses": {
           "200": {
@@ -131,7 +132,7 @@
     },
     "/applications/{application_ids.application_id}": {
       "get": {
-        "summary": "Get the application with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
+        "summary": "Get the application with the given identifiers, selecting the fields specified\nin the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "ApplicationRegistry_Get",
         "responses": {
           "200": {
@@ -173,6 +174,7 @@
     },
     "/applications/{application_ids.application_id}/api-keys": {
       "get": {
+        "summary": "List the API keys for this application.",
         "operationId": "ApplicationAccess_ListAPIKeys",
         "responses": {
           "200": {
@@ -217,6 +219,7 @@
         ]
       },
       "post": {
+        "summary": "Create an API key scoped to this application.",
         "operationId": "ApplicationAccess_CreateAPIKey",
         "responses": {
           "200": {
@@ -255,7 +258,7 @@
     },
     "/applications/{application_ids.application_id}/api-keys/{api_key.id}": {
       "put": {
-        "summary": "Update the rights of an existing application API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights. It is required for the caller to have all assigned or/and removed rights.",
+        "summary": "Update the rights of an API key of the application.\nThis method can also be used to delete the API key, by giving it no rights.\nThe caller is required to have all assigned or/and removed rights.",
         "operationId": "ApplicationAccess_UpdateAPIKey",
         "responses": {
           "200": {
@@ -301,6 +304,7 @@
     },
     "/applications/{application_ids.application_id}/api-keys/{key_id}": {
       "get": {
+        "summary": "Get a single API key of this application.",
         "operationId": "ApplicationAccess_GetAPIKey",
         "responses": {
           "200": {
@@ -336,62 +340,10 @@
         ]
       }
     },
-    "/applications/{application_ids.application_id}/collaborator": {
-      "get": {
-        "summary": "Get the rights of a collaborator (member) of the application.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
-        "operationId": "ApplicationAccess_GetCollaborator",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3GetCollaboratorResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "application_ids.application_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "collaborator.organization_ids.organization_id",
-            "description": "This ID shares namespace with user IDs.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "collaborator.user_ids.user_id",
-            "description": "This ID shares namespace with organization IDs.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "collaborator.user_ids.email",
-            "description": "Secondary identifier, which can only be used in specific requests.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ApplicationAccess"
-        ]
-      }
-    },
     "/applications/{application_ids.application_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
       "get": {
         "summary": "Get the rights of a collaborator (member) of the application.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
-        "operationId": "ApplicationAccess_GetCollaborator3",
+        "operationId": "ApplicationAccess_GetCollaborator2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -443,7 +395,7 @@
     "/applications/{application_ids.application_id}/collaborator/user/{collaborator.user_ids.user_id}": {
       "get": {
         "summary": "Get the rights of a collaborator (member) of the application.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
-        "operationId": "ApplicationAccess_GetCollaborator2",
+        "operationId": "ApplicationAccess_GetCollaborator",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -494,6 +446,7 @@
     },
     "/applications/{application_ids.application_id}/collaborators": {
       "get": {
+        "summary": "List the collaborators on this application.",
         "operationId": "ApplicationAccess_ListCollaborators",
         "responses": {
           "200": {
@@ -538,7 +491,7 @@
         ]
       },
       "put": {
-        "summary": "Set the rights of a collaborator (member) on the application. It is required for the caller to\nhave all assigned or/and removed rights.\nSetting a collaborator without rights, removes them.",
+        "summary": "Set the rights of a collaborator (member) on the application.\nThis method can also be used to delete the collaborator, by giving them no rights.\nThe caller is required to have all assigned or/and removed rights.",
         "operationId": "ApplicationAccess_SetCollaborator",
         "responses": {
           "200": {
@@ -701,6 +654,7 @@
     },
     "/applications/{application_id}": {
       "delete": {
+        "summary": "Delete the application. This may not release the application ID for reuse.\nAll end devices must be deleted from the application before it can be deleted.",
         "operationId": "ApplicationRegistry_Delete",
         "responses": {
           "200": {
@@ -731,6 +685,7 @@
     },
     "/applications/{application_id}/rights": {
       "get": {
+        "summary": "List the rights the caller has on this application.",
         "operationId": "ApplicationAccess_ListRights",
         "responses": {
           "200": {
@@ -2729,60 +2684,9 @@
         ]
       }
     },
-    "/clients/{client_ids.client_id}/collaborator": {
-      "get": {
-        "operationId": "ClientAccess_GetCollaborator",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3GetCollaboratorResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "client_ids.client_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "collaborator.organization_ids.organization_id",
-            "description": "This ID shares namespace with user IDs.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "collaborator.user_ids.user_id",
-            "description": "This ID shares namespace with organization IDs.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "collaborator.user_ids.email",
-            "description": "Secondary identifier, which can only be used in specific requests.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ClientAccess"
-        ]
-      }
-    },
     "/clients/{client_ids.client_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
       "get": {
-        "operationId": "ClientAccess_GetCollaborator3",
+        "operationId": "ClientAccess_GetCollaborator2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2833,7 +2737,7 @@
     },
     "/clients/{client_ids.client_id}/collaborator/user/{collaborator.user_ids.user_id}": {
       "get": {
-        "operationId": "ClientAccess_GetCollaborator2",
+        "operationId": "ClientAccess_GetCollaborator",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3063,7 +2967,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v3ContactInfoValidation"
+              "$ref": "#/definitions/lorawanv3ContactInfoValidation"
             }
           },
           "default": {
@@ -3648,68 +3552,9 @@
         ]
       }
     },
-    "/gateways/{gateway_ids.gateway_id}/collaborator": {
-      "get": {
-        "operationId": "GatewayAccess_GetCollaborator",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3GetCollaboratorResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "gateway_ids.gateway_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "gateway_ids.eui",
-            "description": "Secondary identifier, which can only be used in specific requests.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "byte"
-          },
-          {
-            "name": "collaborator.organization_ids.organization_id",
-            "description": "This ID shares namespace with user IDs.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "collaborator.user_ids.user_id",
-            "description": "This ID shares namespace with organization IDs.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "collaborator.user_ids.email",
-            "description": "Secondary identifier, which can only be used in specific requests.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "GatewayAccess"
-        ]
-      }
-    },
     "/gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
       "get": {
-        "operationId": "GatewayAccess_GetCollaborator3",
+        "operationId": "GatewayAccess_GetCollaborator2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3768,7 +3613,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/collaborator/user/{collaborator.user_ids.user_id}": {
       "get": {
-        "operationId": "GatewayAccess_GetCollaborator2",
+        "operationId": "GatewayAccess_GetCollaborator",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4178,7 +4023,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v3Invitation"
+              "$ref": "#/definitions/lorawanv3Invitation"
             }
           },
           "default": {
@@ -4200,6 +4045,28 @@
         ],
         "tags": [
           "UserInvitationRegistry"
+        ]
+      }
+    },
+    "/is/configuration": {
+      "get": {
+        "operationId": "Is_GetConfiguration",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetIsConfigurationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "Is"
         ]
       }
     },
@@ -4801,7 +4668,7 @@
     },
     "/organizations/{collaborator.organization_ids.organization_id}/applications": {
       "get": {
-        "summary": "List applications. See request message for details.",
+        "summary": "List applications where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the applications the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "ApplicationRegistry_List3",
         "responses": {
           "200": {
@@ -5398,54 +5265,9 @@
         ]
       }
     },
-    "/organizations/{organization_ids.organization_id}/collaborator": {
-      "get": {
-        "operationId": "OrganizationAccess_GetCollaborator",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3GetCollaboratorResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "organization_ids.organization_id",
-            "description": "This ID shares namespace with user IDs.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "collaborator.user_ids.user_id",
-            "description": "This ID shares namespace with organization IDs.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "collaborator.user_ids.email",
-            "description": "Secondary identifier, which can only be used in specific requests.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "OrganizationAccess"
-        ]
-      }
-    },
     "/organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}": {
       "get": {
-        "operationId": "OrganizationAccess_GetCollaborator2",
+        "operationId": "OrganizationAccess_GetCollaborator",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6309,7 +6131,7 @@
     },
     "/users/{collaborator.user_ids.user_id}/applications": {
       "get": {
-        "summary": "List applications. See request message for details.",
+        "summary": "List applications where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the applications the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "ApplicationRegistry_List2",
         "responses": {
           "200": {
@@ -7752,6 +7574,87 @@
         }
       }
     },
+    "IsConfigurationEndDevicePicture": {
+      "type": "object",
+      "properties": {
+        "disable_upload": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "IsConfigurationProfilePicture": {
+      "type": "object",
+      "properties": {
+        "disable_upload": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "use_gravatar": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "IsConfigurationUserRegistration": {
+      "type": "object",
+      "properties": {
+        "invitation": {
+          "$ref": "#/definitions/IsConfigurationUserRegistrationInvitation"
+        },
+        "contact_info_validation": {
+          "$ref": "#/definitions/IsConfigurationUserRegistrationContactInfoValidation"
+        },
+        "admin_approval": {
+          "$ref": "#/definitions/UserRegistrationAdminApproval"
+        },
+        "password_requirements": {
+          "$ref": "#/definitions/UserRegistrationPasswordRequirements"
+        }
+      }
+    },
+    "IsConfigurationUserRegistrationContactInfoValidation": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "IsConfigurationUserRegistrationInvitation": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "token_ttl": {
+          "type": "string"
+        }
+      }
+    },
+    "IsConfigurationUserRights": {
+      "type": "object",
+      "properties": {
+        "create_applications": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "create_clients": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "create_gateways": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "create_organizations": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
     "MACCommandADRParamSetupReq": {
       "type": "object",
       "properties": {
@@ -8245,6 +8148,98 @@
       },
       "description": "Transmission settings for downlink."
     },
+    "UserRegistrationAdminApproval": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "UserRegistrationPasswordRequirements": {
+      "type": "object",
+      "properties": {
+        "min_length": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "max_length": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "min_uppercase": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "min_digits": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "min_special": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "lorawanv3ContactInfoValidation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "entity": {
+          "$ref": "#/definitions/v3EntityIdentifiers"
+        },
+        "contact_info": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ContactInfo"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "lorawanv3Invitation": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "accepted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "accepted_by": {
+          "$ref": "#/definitions/v3UserIdentifiers"
+        }
+      }
+    },
     "lorawanv3Location": {
       "type": "object",
       "properties": {
@@ -8539,13 +8534,15 @@
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "description": "Key-value attributes for this application. Typically used for organizing applications or for storing integration-specific data."
         },
         "contact_info": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3ContactInfo"
-          }
+          },
+          "description": "Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application."
         }
       },
       "description": "Application is the message that defines an Application in the network."
@@ -9487,13 +9484,15 @@
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "description": "Key-value attributes for this client. Typically used for organizing clients or for storing integration-specific data."
         },
         "contact_info": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3ContactInfo"
-          }
+          },
+          "description": "Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application."
         },
         "secret": {
           "type": "string",
@@ -9652,34 +9651,6 @@
           "format": "boolean"
         },
         "validated_at": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "v3ContactInfoValidation": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        },
-        "entity": {
-          "$ref": "#/definitions/v3EntityIdentifiers"
-        },
-        "contact_info": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v3ContactInfo"
-          }
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "expires_at": {
           "type": "string",
           "format": "date-time"
         }
@@ -9849,7 +9820,8 @@
           "$ref": "#/definitions/v3User"
         },
         "invitation_token": {
-          "type": "string"
+          "type": "string",
+          "description": "The invitation token that was sent to the user (some networks require an invitation in order to register new users)."
         }
       }
     },
@@ -10054,7 +10026,7 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Attributes of the device. Stored in Entity Registry."
+          "description": "Key-value attributes for this end device. Typically used for organizing end devices or for storing integration-specific data. Stored in Entity Registry."
         },
         "version_ids": {
           "$ref": "#/definitions/v3EndDeviceVersionIdentifiers",
@@ -10602,13 +10574,15 @@
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "description": "Key-value attributes for this gateway. Typically used for organizing gateways or for storing integration-specific data."
         },
         "contact_info": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3ContactInfo"
-          }
+          },
+          "description": "Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway."
         },
         "version_ids": {
           "$ref": "#/definitions/v3GatewayVersionIdentifiers"
@@ -10927,6 +10901,14 @@
         }
       }
     },
+    "v3GetIsConfigurationResponse": {
+      "type": "object",
+      "properties": {
+        "configuration": {
+          "$ref": "#/definitions/v3IsConfiguration"
+        }
+      }
+    },
     "v3GrantType": {
       "type": "string",
       "enum": [
@@ -10937,44 +10919,31 @@
       "default": "GRANT_AUTHORIZATION_CODE",
       "description": "The OAuth2 flows an OAuth client can use to get an access token.\n\n - GRANT_AUTHORIZATION_CODE: Grant type used to exchange an authorization code for an access token.\n - GRANT_PASSWORD: Grant type used to exchange a user ID and password for an access token.\n - GRANT_REFRESH_TOKEN: Grant type used to exchange a refresh token for an access token."
     },
-    "v3Invitation": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        },
-        "expires_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "accepted_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "accepted_by": {
-          "$ref": "#/definitions/v3UserIdentifiers"
-        }
-      }
-    },
     "v3Invitations": {
       "type": "object",
       "properties": {
         "invitations": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v3Invitation"
+            "$ref": "#/definitions/lorawanv3Invitation"
           }
+        }
+      }
+    },
+    "v3IsConfiguration": {
+      "type": "object",
+      "properties": {
+        "user_registration": {
+          "$ref": "#/definitions/IsConfigurationUserRegistration"
+        },
+        "profile_picture": {
+          "$ref": "#/definitions/IsConfigurationProfilePicture"
+        },
+        "end_device_picture": {
+          "$ref": "#/definitions/IsConfigurationEndDevicePicture"
+        },
+        "user_rights": {
+          "$ref": "#/definitions/IsConfigurationUserRights"
         }
       }
     },
@@ -11936,13 +11905,15 @@
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "description": "Key-value attributes for this organization. Typically used for organizing organizations or for storing integration-specific data."
         },
         "contact_info": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3ContactInfo"
-          }
+          },
+          "description": "Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization."
         }
       }
     },
@@ -12650,7 +12621,8 @@
           "$ref": "#/definitions/v3EndDevice"
         },
         "field_mask": {
-          "$ref": "#/definitions/protobufFieldMask"
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the end device fields that should be updated.\nSee the API reference for which fields can be set on the different services."
         }
       }
     },
@@ -12851,7 +12823,8 @@
           "$ref": "#/definitions/v3Application"
         },
         "field_mask": {
-          "$ref": "#/definitions/protobufFieldMask"
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the application fields that should be updated."
         }
       }
     },
@@ -12862,7 +12835,8 @@
           "$ref": "#/definitions/v3Client"
         },
         "field_mask": {
-          "$ref": "#/definitions/protobufFieldMask"
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the client fields that should be updated."
         }
       }
     },
@@ -12873,7 +12847,8 @@
           "$ref": "#/definitions/v3EndDevice"
         },
         "field_mask": {
-          "$ref": "#/definitions/protobufFieldMask"
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the end device fields that should be updated.\nSee the API reference for which fields can be set on the different services."
         }
       }
     },
@@ -12895,7 +12870,8 @@
           "$ref": "#/definitions/v3Gateway"
         },
         "field_mask": {
-          "$ref": "#/definitions/protobufFieldMask"
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the gateway fields that should be updated."
         }
       }
     },
@@ -12917,7 +12893,8 @@
           "$ref": "#/definitions/v3Organization"
         },
         "field_mask": {
-          "$ref": "#/definitions/protobufFieldMask"
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the organization fields that should be updated."
         }
       }
     },
@@ -12958,7 +12935,8 @@
           "$ref": "#/definitions/v3User"
         },
         "field_mask": {
-          "$ref": "#/definitions/protobufFieldMask"
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the user fields that should be updated."
         }
       }
     },
@@ -13024,13 +13002,15 @@
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "description": "Key-value attributes for this users. Typically used for storing integration-specific data."
         },
         "contact_info": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3ContactInfo"
-          }
+          },
+          "description": "Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user."
         },
         "primary_email_address": {
           "type": "string",
@@ -13038,11 +13018,12 @@
         },
         "primary_email_address_validated_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the primary email address was validated. Note that email address validation is not required on all networks."
         },
         "password": {
           "type": "string",
-          "description": "Only used on create; never returned on API calls."
+          "description": "The password field is only considered when creating a user.\nIt is not returned on API calls, and can not be updated by updating the User.\nSee the UpdatePassword method of the UserRegistry service for more information."
         },
         "password_updated_at": {
           "type": "string",
@@ -13063,7 +13044,7 @@
         },
         "temporary_password": {
           "type": "string",
-          "description": "The temporary password can only be used to update a user's password; never returned on API calls."
+          "description": "The temporary password can only be used to update a user's password; never returned on API calls.\nIt is not returned on API calls, and can not be updated by updating the User.\nSee the CreateTemporaryPassword method of the UserRegistry service for more information."
         },
         "temporary_password_created_at": {
           "type": "string",

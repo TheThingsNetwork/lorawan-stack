@@ -38,16 +38,20 @@ service ClientRegistry {
     };
   };
 
-  // Get the OAuth client with the given identifiers, selecting the fields given
-  // by the field mask. The method may return more or less fields, depending on
-  // the rights of the caller.
+  // Get the OAuth client with the given identifiers, selecting the fields specified
+  // in the field mask.
+  // More or less fields may be returned, depending on the rights of the caller.
   rpc Get(GetClientRequest) returns (Client) {
     option (google.api.http) = {
       get: "/clients/{client_ids.client_id}"
     };
   };
 
-  // List OAuth clients. See request message for details.
+  // List OAuth clients where the given user or organization is a direct collaborator.
+  // If no user or organization is given, this returns the OAuth clients the caller
+  // has access to.
+  // Similar to Get, this selects the fields sepcified in the field mask.
+  // More or less fields may be returned, depending on the rights of the caller.
   rpc List(ListClientsRequest) returns (Clients) {
     option (google.api.http) = {
       get: "/clients"
@@ -60,6 +64,7 @@ service ClientRegistry {
     };
   };
 
+  // Update the OAuth client, changing the fields specified by the field mask to the provided values.
   rpc Update(UpdateClientRequest) returns (Client) {
     option (google.api.http) = {
       put: "/clients/{client.ids.client_id}"
@@ -67,6 +72,7 @@ service ClientRegistry {
     };
   };
 
+  // Delete the OAuth client. This may not release the client ID for reuse.
   rpc Delete(ClientIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/clients/{client_id}"
@@ -75,6 +81,7 @@ service ClientRegistry {
 }
 
 service ClientAccess {
+  // List the rights the caller has on this application.
   rpc ListRights(ClientIdentifiers) returns (Rights) {
     option (google.api.http) = {
       get: "/clients/{client_id}/rights"
@@ -85,7 +92,6 @@ service ClientAccess {
   // Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
   rpc GetCollaborator(GetClientCollaboratorRequest) returns (GetCollaboratorResponse) {
     option (google.api.http) = {
-      get: "/clients/{client_ids.client_id}/collaborator"
       additional_bindings {
         get: "/clients/{client_ids.client_id}/collaborator/user/{collaborator.user_ids.user_id}"
       }
@@ -95,9 +101,9 @@ service ClientAccess {
     };
   }
 
-  // Set the rights of a collaborator (member) on the client. It is required for the caller to
-  // have all assigned or/and removed rights.
-  // Setting a collaborator without rights, removes them.
+  // Set the rights of a collaborator (member) on the OAuth client.
+  // This method can also be used to delete the collaborator, by giving them no rights.
+  // The caller is required to have all assigned or/and removed rights.
   rpc SetCollaborator(SetClientCollaboratorRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/clients/{client_ids.client_id}/collaborators"
@@ -105,6 +111,7 @@ service ClientAccess {
     };
   };
 
+  // List the collaborators on this OAuth client.
   rpc ListCollaborators(ListClientCollaboratorsRequest) returns (Collaborators) {
     option (google.api.http) = {
       get: "/clients/{client_ids.client_id}/collaborators"

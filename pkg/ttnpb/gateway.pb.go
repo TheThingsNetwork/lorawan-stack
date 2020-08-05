@@ -442,13 +442,15 @@ func (m *GatewayVersion) GetClockSource() uint32 {
 
 // Gateway is the message that defines a gateway on the network.
 type Gateway struct {
-	GatewayIdentifiers        `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
-	CreatedAt                 time.Time         `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
-	UpdatedAt                 time.Time         `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
-	Name                      string            `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Description               string            `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	Attributes                map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	ContactInfo               []*ContactInfo    `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	CreatedAt          time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt          time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
+	Name               string    `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Description        string    `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	// Key-value attributes for this gateway. Typically used for organizing gateways or for storing integration-specific data.
+	Attributes map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.
+	ContactInfo               []*ContactInfo `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
 	GatewayVersionIdentifiers `protobuf:"bytes,8,opt,name=version_ids,json=versionIds,proto3,embedded=version_ids" json:"version_ids"`
 	// The address of the Gateway Server to connect to.
 	// The typical format of the address is "host:port". If the port is omitted,
@@ -697,7 +699,8 @@ func (m *Gateways) GetGateways() []*Gateway {
 }
 
 type GetGatewayRequest struct {
-	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,proto3,embedded=gateway_ids" json:"gateway_ids"`
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,proto3,embedded=gateway_ids" json:"gateway_ids"`
+	// The names of the gateway fields that should be returned.
 	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -781,8 +784,12 @@ func (m *GetGatewayIdentifiersForEUIRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_GetGatewayIdentifiersForEUIRequest proto.InternalMessageInfo
 
 type ListGatewaysRequest struct {
+	// By default we list all gateways the caller has rights on.
+	// Set the user or the organization (not both) to instead list the gateways
+	// where the user or organization is collaborator on.
 	Collaborator *OrganizationOrUserIdentifiers `protobuf:"bytes,1,opt,name=collaborator,proto3" json:"collaborator,omitempty"`
-	FieldMask    types.FieldMask                `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
+	// The names of the gateway fields that should be returned.
+	FieldMask types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	// Order the results by this field path (must be present in the field mask).
 	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
 	Order string `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
@@ -909,7 +916,8 @@ func (m *CreateGatewayRequest) GetCollaborator() OrganizationOrUserIdentifiers {
 }
 
 type UpdateGatewayRequest struct {
-	Gateway              `protobuf:"bytes,1,opt,name=gateway,proto3,embedded=gateway" json:"gateway"`
+	Gateway `protobuf:"bytes,1,opt,name=gateway,proto3,embedded=gateway" json:"gateway"`
+	// The names of the gateway fields that should be updated.
 	FieldMask            types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`

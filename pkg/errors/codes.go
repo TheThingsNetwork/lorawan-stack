@@ -105,6 +105,9 @@ func IsFailedPrecondition(err error) bool { return HasCode(err, uint32(codes.Fai
 // IsAborted returns whether the given error is of type Aborted.
 func IsAborted(err error) bool { return HasCode(err, uint32(codes.Aborted)) }
 
+// IsUnimplemented returns whether the given error is of type Unimplemented.
+func IsUnimplemented(err error) bool { return HasCode(err, uint32(codes.Unimplemented)) }
+
 // IsInternal returns whether the given error is of type Internal.
 func IsInternal(err error) bool { return HasCode(err, uint32(codes.Internal)) }
 

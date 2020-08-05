@@ -187,6 +187,294 @@ var _ interface {
 	ErrorName() string
 } = AuthInfoResponseValidationError{}
 
+// ValidateFields checks the field values on GetIsConfigurationRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetIsConfigurationRequest) ValidateFields(paths ...string) error {
+	if len(paths) > 0 {
+		return fmt.Errorf("message GetIsConfigurationRequest has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
+// GetIsConfigurationRequestValidationError is the validation error returned by
+// GetIsConfigurationRequest.ValidateFields if the designated constraints
+// aren't met.
+type GetIsConfigurationRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetIsConfigurationRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetIsConfigurationRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetIsConfigurationRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetIsConfigurationRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetIsConfigurationRequestValidationError) ErrorName() string {
+	return "GetIsConfigurationRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetIsConfigurationRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetIsConfigurationRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetIsConfigurationRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetIsConfigurationRequestValidationError{}
+
+// ValidateFields checks the field values on IsConfiguration with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *IsConfiguration) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = IsConfigurationFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "user_registration":
+
+			if v, ok := interface{}(m.GetUserRegistration()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfigurationValidationError{
+						field:  "user_registration",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "profile_picture":
+
+			if v, ok := interface{}(m.GetProfilePicture()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfigurationValidationError{
+						field:  "profile_picture",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "end_device_picture":
+
+			if v, ok := interface{}(m.GetEndDevicePicture()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfigurationValidationError{
+						field:  "end_device_picture",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "user_rights":
+
+			if v, ok := interface{}(m.GetUserRights()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfigurationValidationError{
+						field:  "user_rights",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return IsConfigurationValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// IsConfigurationValidationError is the validation error returned by
+// IsConfiguration.ValidateFields if the designated constraints aren't met.
+type IsConfigurationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IsConfigurationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IsConfigurationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IsConfigurationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IsConfigurationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IsConfigurationValidationError) ErrorName() string { return "IsConfigurationValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IsConfigurationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIsConfiguration.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IsConfigurationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IsConfigurationValidationError{}
+
+// ValidateFields checks the field values on GetIsConfigurationResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *GetIsConfigurationResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetIsConfigurationResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "configuration":
+
+			if v, ok := interface{}(m.GetConfiguration()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetIsConfigurationResponseValidationError{
+						field:  "configuration",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return GetIsConfigurationResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetIsConfigurationResponseValidationError is the validation error returned
+// by GetIsConfigurationResponse.ValidateFields if the designated constraints
+// aren't met.
+type GetIsConfigurationResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetIsConfigurationResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetIsConfigurationResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetIsConfigurationResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetIsConfigurationResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetIsConfigurationResponseValidationError) ErrorName() string {
+	return "GetIsConfigurationResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetIsConfigurationResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetIsConfigurationResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetIsConfigurationResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetIsConfigurationResponseValidationError{}
+
 // ValidateFields checks the field values on AuthInfoResponse_APIKeyAccess with
 // the rules defined in the proto definition for this message. If any rules
 // are violated, an error is returned.
@@ -292,3 +580,924 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AuthInfoResponse_APIKeyAccessValidationError{}
+
+// ValidateFields checks the field values on IsConfiguration_UserRegistration
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *IsConfiguration_UserRegistration) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = IsConfiguration_UserRegistrationFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "invitation":
+
+			if v, ok := interface{}(m.GetInvitation()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistrationValidationError{
+						field:  "invitation",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "contact_info_validation":
+
+			if v, ok := interface{}(m.GetContactInfoValidation()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistrationValidationError{
+						field:  "contact_info_validation",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "admin_approval":
+
+			if v, ok := interface{}(m.GetAdminApproval()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistrationValidationError{
+						field:  "admin_approval",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "password_requirements":
+
+			if v, ok := interface{}(m.GetPasswordRequirements()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistrationValidationError{
+						field:  "password_requirements",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return IsConfiguration_UserRegistrationValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// IsConfiguration_UserRegistrationValidationError is the validation error
+// returned by IsConfiguration_UserRegistration.ValidateFields if the
+// designated constraints aren't met.
+type IsConfiguration_UserRegistrationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IsConfiguration_UserRegistrationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IsConfiguration_UserRegistrationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IsConfiguration_UserRegistrationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IsConfiguration_UserRegistrationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IsConfiguration_UserRegistrationValidationError) ErrorName() string {
+	return "IsConfiguration_UserRegistrationValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IsConfiguration_UserRegistrationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIsConfiguration_UserRegistration.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IsConfiguration_UserRegistrationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IsConfiguration_UserRegistrationValidationError{}
+
+// ValidateFields checks the field values on IsConfiguration_ProfilePicture
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *IsConfiguration_ProfilePicture) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = IsConfiguration_ProfilePictureFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "disable_upload":
+
+			if v, ok := interface{}(m.GetDisableUpload()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_ProfilePictureValidationError{
+						field:  "disable_upload",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "use_gravatar":
+
+			if v, ok := interface{}(m.GetUseGravatar()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_ProfilePictureValidationError{
+						field:  "use_gravatar",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return IsConfiguration_ProfilePictureValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// IsConfiguration_ProfilePictureValidationError is the validation error
+// returned by IsConfiguration_ProfilePicture.ValidateFields if the designated
+// constraints aren't met.
+type IsConfiguration_ProfilePictureValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IsConfiguration_ProfilePictureValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IsConfiguration_ProfilePictureValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IsConfiguration_ProfilePictureValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IsConfiguration_ProfilePictureValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IsConfiguration_ProfilePictureValidationError) ErrorName() string {
+	return "IsConfiguration_ProfilePictureValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IsConfiguration_ProfilePictureValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIsConfiguration_ProfilePicture.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IsConfiguration_ProfilePictureValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IsConfiguration_ProfilePictureValidationError{}
+
+// ValidateFields checks the field values on IsConfiguration_EndDevicePicture
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *IsConfiguration_EndDevicePicture) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = IsConfiguration_EndDevicePictureFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "disable_upload":
+
+			if v, ok := interface{}(m.GetDisableUpload()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_EndDevicePictureValidationError{
+						field:  "disable_upload",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return IsConfiguration_EndDevicePictureValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// IsConfiguration_EndDevicePictureValidationError is the validation error
+// returned by IsConfiguration_EndDevicePicture.ValidateFields if the
+// designated constraints aren't met.
+type IsConfiguration_EndDevicePictureValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IsConfiguration_EndDevicePictureValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IsConfiguration_EndDevicePictureValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IsConfiguration_EndDevicePictureValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IsConfiguration_EndDevicePictureValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IsConfiguration_EndDevicePictureValidationError) ErrorName() string {
+	return "IsConfiguration_EndDevicePictureValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IsConfiguration_EndDevicePictureValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIsConfiguration_EndDevicePicture.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IsConfiguration_EndDevicePictureValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IsConfiguration_EndDevicePictureValidationError{}
+
+// ValidateFields checks the field values on IsConfiguration_UserRights with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *IsConfiguration_UserRights) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = IsConfiguration_UserRightsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "create_applications":
+
+			if v, ok := interface{}(m.GetCreateApplications()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRightsValidationError{
+						field:  "create_applications",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "create_clients":
+
+			if v, ok := interface{}(m.GetCreateClients()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRightsValidationError{
+						field:  "create_clients",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "create_gateways":
+
+			if v, ok := interface{}(m.GetCreateGateways()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRightsValidationError{
+						field:  "create_gateways",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "create_organizations":
+
+			if v, ok := interface{}(m.GetCreateOrganizations()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRightsValidationError{
+						field:  "create_organizations",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return IsConfiguration_UserRightsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// IsConfiguration_UserRightsValidationError is the validation error returned
+// by IsConfiguration_UserRights.ValidateFields if the designated constraints
+// aren't met.
+type IsConfiguration_UserRightsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IsConfiguration_UserRightsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IsConfiguration_UserRightsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IsConfiguration_UserRightsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IsConfiguration_UserRightsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IsConfiguration_UserRightsValidationError) ErrorName() string {
+	return "IsConfiguration_UserRightsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IsConfiguration_UserRightsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIsConfiguration_UserRights.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IsConfiguration_UserRightsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IsConfiguration_UserRightsValidationError{}
+
+// ValidateFields checks the field values on
+// IsConfiguration_UserRegistration_Invitation with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *IsConfiguration_UserRegistration_Invitation) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = IsConfiguration_UserRegistration_InvitationFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "required":
+
+			if v, ok := interface{}(m.GetRequired()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistration_InvitationValidationError{
+						field:  "required",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "token_ttl":
+
+			if v, ok := interface{}(m.GetTokenTTL()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistration_InvitationValidationError{
+						field:  "token_ttl",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return IsConfiguration_UserRegistration_InvitationValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// IsConfiguration_UserRegistration_InvitationValidationError is the validation
+// error returned by
+// IsConfiguration_UserRegistration_Invitation.ValidateFields if the
+// designated constraints aren't met.
+type IsConfiguration_UserRegistration_InvitationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IsConfiguration_UserRegistration_InvitationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IsConfiguration_UserRegistration_InvitationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IsConfiguration_UserRegistration_InvitationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IsConfiguration_UserRegistration_InvitationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IsConfiguration_UserRegistration_InvitationValidationError) ErrorName() string {
+	return "IsConfiguration_UserRegistration_InvitationValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IsConfiguration_UserRegistration_InvitationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIsConfiguration_UserRegistration_Invitation.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IsConfiguration_UserRegistration_InvitationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IsConfiguration_UserRegistration_InvitationValidationError{}
+
+// ValidateFields checks the field values on
+// IsConfiguration_UserRegistration_ContactInfoValidation with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *IsConfiguration_UserRegistration_ContactInfoValidation) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = IsConfiguration_UserRegistration_ContactInfoValidationFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "required":
+
+			if v, ok := interface{}(m.GetRequired()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistration_ContactInfoValidationValidationError{
+						field:  "required",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return IsConfiguration_UserRegistration_ContactInfoValidationValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// IsConfiguration_UserRegistration_ContactInfoValidationValidationError is the
+// validation error returned by
+// IsConfiguration_UserRegistration_ContactInfoValidation.ValidateFields if
+// the designated constraints aren't met.
+type IsConfiguration_UserRegistration_ContactInfoValidationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IsConfiguration_UserRegistration_ContactInfoValidationValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e IsConfiguration_UserRegistration_ContactInfoValidationValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e IsConfiguration_UserRegistration_ContactInfoValidationValidationError) Cause() error {
+	return e.cause
+}
+
+// Key function returns key value.
+func (e IsConfiguration_UserRegistration_ContactInfoValidationValidationError) Key() bool {
+	return e.key
+}
+
+// ErrorName returns error name.
+func (e IsConfiguration_UserRegistration_ContactInfoValidationValidationError) ErrorName() string {
+	return "IsConfiguration_UserRegistration_ContactInfoValidationValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IsConfiguration_UserRegistration_ContactInfoValidationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIsConfiguration_UserRegistration_ContactInfoValidation.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IsConfiguration_UserRegistration_ContactInfoValidationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IsConfiguration_UserRegistration_ContactInfoValidationValidationError{}
+
+// ValidateFields checks the field values on
+// IsConfiguration_UserRegistration_AdminApproval with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *IsConfiguration_UserRegistration_AdminApproval) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = IsConfiguration_UserRegistration_AdminApprovalFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "required":
+
+			if v, ok := interface{}(m.GetRequired()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistration_AdminApprovalValidationError{
+						field:  "required",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return IsConfiguration_UserRegistration_AdminApprovalValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// IsConfiguration_UserRegistration_AdminApprovalValidationError is the
+// validation error returned by
+// IsConfiguration_UserRegistration_AdminApproval.ValidateFields if the
+// designated constraints aren't met.
+type IsConfiguration_UserRegistration_AdminApprovalValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IsConfiguration_UserRegistration_AdminApprovalValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IsConfiguration_UserRegistration_AdminApprovalValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e IsConfiguration_UserRegistration_AdminApprovalValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IsConfiguration_UserRegistration_AdminApprovalValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IsConfiguration_UserRegistration_AdminApprovalValidationError) ErrorName() string {
+	return "IsConfiguration_UserRegistration_AdminApprovalValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IsConfiguration_UserRegistration_AdminApprovalValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIsConfiguration_UserRegistration_AdminApproval.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IsConfiguration_UserRegistration_AdminApprovalValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IsConfiguration_UserRegistration_AdminApprovalValidationError{}
+
+// ValidateFields checks the field values on
+// IsConfiguration_UserRegistration_PasswordRequirements with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *IsConfiguration_UserRegistration_PasswordRequirements) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = IsConfiguration_UserRegistration_PasswordRequirementsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "min_length":
+
+			if v, ok := interface{}(m.GetMinLength()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistration_PasswordRequirementsValidationError{
+						field:  "min_length",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "max_length":
+
+			if v, ok := interface{}(m.GetMaxLength()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistration_PasswordRequirementsValidationError{
+						field:  "max_length",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "min_uppercase":
+
+			if v, ok := interface{}(m.GetMinUppercase()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistration_PasswordRequirementsValidationError{
+						field:  "min_uppercase",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "min_digits":
+
+			if v, ok := interface{}(m.GetMinDigits()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistration_PasswordRequirementsValidationError{
+						field:  "min_digits",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "min_special":
+
+			if v, ok := interface{}(m.GetMinSpecial()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistration_PasswordRequirementsValidationError{
+						field:  "min_special",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return IsConfiguration_UserRegistration_PasswordRequirementsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// IsConfiguration_UserRegistration_PasswordRequirementsValidationError is the
+// validation error returned by
+// IsConfiguration_UserRegistration_PasswordRequirements.ValidateFields if the
+// designated constraints aren't met.
+type IsConfiguration_UserRegistration_PasswordRequirementsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IsConfiguration_UserRegistration_PasswordRequirementsValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e IsConfiguration_UserRegistration_PasswordRequirementsValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e IsConfiguration_UserRegistration_PasswordRequirementsValidationError) Cause() error {
+	return e.cause
+}
+
+// Key function returns key value.
+func (e IsConfiguration_UserRegistration_PasswordRequirementsValidationError) Key() bool {
+	return e.key
+}
+
+// ErrorName returns error name.
+func (e IsConfiguration_UserRegistration_PasswordRequirementsValidationError) ErrorName() string {
+	return "IsConfiguration_UserRegistration_PasswordRequirementsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IsConfiguration_UserRegistration_PasswordRequirementsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIsConfiguration_UserRegistration_PasswordRequirements.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IsConfiguration_UserRegistration_PasswordRequirementsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IsConfiguration_UserRegistration_PasswordRequirementsValidationError{}

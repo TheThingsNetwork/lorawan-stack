@@ -263,6 +263,7 @@ var GatewayAntennaIdentifiersFieldPathsTopLevel = []string{
 	"gateway_ids",
 }
 var UplinkTokenFieldPathsNested = []string{
+	"concentrator_time",
 	"ids",
 	"ids.antenna_index",
 	"ids.gateway_ids",
@@ -273,6 +274,7 @@ var UplinkTokenFieldPathsNested = []string{
 }
 
 var UplinkTokenFieldPathsTopLevel = []string{
+	"concentrator_time",
 	"ids",
 	"server_time",
 	"timestamp",

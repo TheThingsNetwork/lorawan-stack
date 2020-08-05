@@ -38,16 +38,20 @@ service ApplicationRegistry {
     };
   };
 
-  // Get the application with the given identifiers, selecting the fields given
-  // by the field mask. The method may return more or less fields, depending on
-  // the rights of the caller.
+  // Get the application with the given identifiers, selecting the fields specified
+  // in the field mask.
+  // More or less fields may be returned, depending on the rights of the caller.
   rpc Get(GetApplicationRequest) returns (Application) {
     option (google.api.http) = {
       get: "/applications/{application_ids.application_id}"
     };
   };
 
-  // List applications. See request message for details.
+  // List applications where the given user or organization is a direct collaborator.
+  // If no user or organization is given, this returns the applications the caller
+  // has access to.
+  // Similar to Get, this selects the fields given by the field mask.
+  // More or less fields may be returned, depending on the rights of the caller.
   rpc List(ListApplicationsRequest) returns (Applications) {
     option (google.api.http) = {
       get: "/applications"
@@ -60,6 +64,7 @@ service ApplicationRegistry {
     };
   };
 
+  // Update the application, changing the fields specified by the field mask to the provided values.
   rpc Update(UpdateApplicationRequest) returns (Application) {
     option (google.api.http) = {
       put: "/applications/{application.ids.application_id}"
@@ -67,6 +72,8 @@ service ApplicationRegistry {
     };
   };
 
+  // Delete the application. This may not release the application ID for reuse.
+  // All end devices must be deleted from the application before it can be deleted.
   rpc Delete(ApplicationIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/applications/{application_id}"
@@ -75,12 +82,14 @@ service ApplicationRegistry {
 }
 
 service ApplicationAccess {
+  // List the rights the caller has on this application.
   rpc ListRights(ApplicationIdentifiers) returns (Rights) {
     option (google.api.http) = {
       get: "/applications/{application_id}/rights"
     };
   };
 
+  // Create an API key scoped to this application.
   rpc CreateAPIKey(CreateApplicationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       post: "/applications/{application_ids.application_id}/api-keys"
@@ -88,21 +97,23 @@ service ApplicationAccess {
     };
   };
 
+  // List the API keys for this application.
   rpc ListAPIKeys(ListApplicationAPIKeysRequest) returns (APIKeys) {
     option (google.api.http) = {
       get: "/applications/{application_ids.application_id}/api-keys"
     };
   };
 
+  // Get a single API key of this application.
   rpc GetAPIKey(GetApplicationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       get: "/applications/{application_ids.application_id}/api-keys/{key_id}"
     };
   };
 
-  // Update the rights of an existing application API key. To generate an API key,
-  // the CreateAPIKey should be used. To delete an API key, update it
-  // with zero rights. It is required for the caller to have all assigned or/and removed rights.
+  // Update the rights of an API key of the application.
+  // This method can also be used to delete the API key, by giving it no rights.
+  // The caller is required to have all assigned or/and removed rights.
   rpc UpdateAPIKey(UpdateApplicationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       put: "/applications/{application_ids.application_id}/api-keys/{api_key.id}"
@@ -114,7 +125,6 @@ service ApplicationAccess {
   // Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
   rpc GetCollaborator(GetApplicationCollaboratorRequest) returns (GetCollaboratorResponse) {
     option (google.api.http) = {
-      get: "/applications/{application_ids.application_id}/collaborator"
       additional_bindings {
         get: "/applications/{application_ids.application_id}/collaborator/user/{collaborator.user_ids.user_id}"
       }
@@ -124,9 +134,9 @@ service ApplicationAccess {
     };
   }
 
-  // Set the rights of a collaborator (member) on the application. It is required for the caller to
-  // have all assigned or/and removed rights.
-  // Setting a collaborator without rights, removes them.
+  // Set the rights of a collaborator (member) on the application.
+  // This method can also be used to delete the collaborator, by giving them no rights.
+  // The caller is required to have all assigned or/and removed rights.
   rpc SetCollaborator(SetApplicationCollaboratorRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/applications/{application_ids.application_id}/collaborators"
@@ -134,6 +144,7 @@ service ApplicationAccess {
     };
   };
 
+  // List the collaborators on this application.
   rpc ListCollaborators(ListApplicationCollaboratorsRequest) returns (Collaborators) {
     option (google.api.http) = {
       get: "/applications/{application_ids.application_id}/collaborators"
