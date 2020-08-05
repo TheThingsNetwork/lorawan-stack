@@ -244,6 +244,7 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 func registerLinkStart(ctx context.Context, link *link) {
 	events.Publish(evtLinkStart(ctx, link.ApplicationIdentifiers, nil))
 	asMetrics.linksStarted.WithLabelValues(ctx, link.NetworkServerAddress).Inc()
+	asMetrics.linksStopped.WithLabelValues(ctx, link.NetworkServerAddress) // Initialize the "stopped" counter.
 }
 
 func registerLinkStop(ctx context.Context, link *link) {
@@ -263,6 +264,7 @@ func registerSubscribe(ctx context.Context, sub *io.Subscription) {
 	}
 	events.Publish(evtApplicationSubscribe(ctx, ids, nil))
 	asMetrics.subscriptionsStarted.WithLabelValues(ctx, sub.Protocol()).Inc()
+	asMetrics.subscriptionsStopped.WithLabelValues(ctx, sub.Protocol()) // Initialize the "stopped" counter.
 }
 
 func registerUnsubscribe(ctx context.Context, sub *io.Subscription) {
