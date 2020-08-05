@@ -84,7 +84,7 @@ func TestCloudPubSub(t *testing.T) {
 
 	cloud.SetContentType(pubsub, "application/json")
 
-	pubsub.Publish(events.New(ctx, "cloud.test.evt0", &appID, nil))
+	pubsub.Publish(events.New(ctx, "cloud.test.evt0", "cloud test event 0", events.WithIdentifiers(appID)))
 	select {
 	case e := <-eventCh:
 		a.So(e.Name(), should.Equal, "cloud.test.evt0")
@@ -98,7 +98,7 @@ func TestCloudPubSub(t *testing.T) {
 
 	cloud.SetContentType(pubsub, "application/protobuf")
 
-	pubsub.Publish(events.New(ctx, "cloud.test.evt1", ttnpb.CombineIdentifiers(&devID, &gtwID), nil))
+	pubsub.Publish(events.New(ctx, "cloud.test.evt1", "cloud test event 1", events.WithIdentifiers(&devID, &gtwID)))
 	select {
 	case e := <-eventCh:
 		a.So(e.Name(), should.Equal, "cloud.test.evt1")

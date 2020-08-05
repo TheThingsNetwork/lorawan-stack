@@ -19,23 +19,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net"
 	"os"
 	"path/filepath"
 	"runtime"
-	"sort"
 	"strings"
 	"time"
 
 	"github.com/gogo/protobuf/proto"
 	pbtypes "github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"google.golang.org/grpc/peer"
 )
 
 // Event interface
@@ -144,18 +139,21 @@ func (e event) AuthType() string {
 	}
 	return e.innerEvent.Authentication.Type
 }
+
 func (e event) AuthTokenType() string {
 	if e.innerEvent.Authentication == nil {
 		return ""
 	}
 	return e.innerEvent.Authentication.TokenType
 }
+
 func (e event) AuthTokenID() string {
 	if e.innerEvent.Authentication == nil {
 		return ""
 	}
 	return e.innerEvent.Authentication.TokenID
 }
+
 func (e event) AuthRemoteIP() string {
 	if e.innerEvent.Authentication == nil {
 		return ""
@@ -170,57 +168,10 @@ func init() {
 }
 
 // New returns a new Event.
-// Event names are dot-separated for namespacing.
-// Event identifiers identify the entities that are related to the event.
-// System events have nil identifiers.
-// Event data will in most cases be marshaled to JSON, but ideally is a proto message.
-func New(ctx context.Context, name string, identifiers CombinedIdentifiers, data interface{}, requiredRights ...ttnpb.Right) Event {
-	evt := &event{
-		ctx: ctx,
-		innerEvent: ttnpb.Event{
-			Name:           name,
-			Time:           time.Now().UTC(),
-			Origin:         hostname,
-			CorrelationIDs: CorrelationIDsFromContext(ctx),
-			Visibility:     ttnpb.RightsFrom(requiredRights...),
-		},
-		data: data,
-	}
-	if data, ok := data.(interface{ GetCorrelationIDs() []string }); ok {
-		if cids := data.GetCorrelationIDs(); len(cids) > 0 {
-			cids = append(cids[:0:0], cids...)
-			sort.Strings(cids)
-			evt.innerEvent.CorrelationIDs = mergeStrings(evt.innerEvent.CorrelationIDs, cids)
-		}
-	}
-	if identifiers != nil {
-		evt.innerEvent.Identifiers = identifiers.CombinedIdentifiers().GetEntityIdentifiers()
-	}
-	authentication := &ttnpb.Event_Authentication{}
-	if p, ok := peer.FromContext(ctx); ok && p.Addr != nil && p.Addr.String() != "pipe" {
-		if host, _, err := net.SplitHostPort(p.Addr.String()); err == nil {
-			authentication.RemoteIP = host
-		}
-	}
-	md := rpcmetadata.FromIncomingContext(ctx)
-	if md.AuthType != "" {
-		authentication.Type = md.AuthType
-	}
-	if md.AuthValue != "" {
-		if tokenType, tokenID, _, err := auth.SplitToken(md.AuthValue); err == nil {
-			authentication.TokenType = tokenType.String()
-			authentication.TokenID = tokenID
-		}
-	}
-	if md.XForwardedFor != "" {
-		xff := strings.Split(md.XForwardedFor, ",")
-		authentication.RemoteIP = strings.Trim(xff[0], " ")
-	}
-	if authentication.RemoteIP != "" || authentication.TokenID != "" ||
-		authentication.TokenType != "" || authentication.Type != "" {
-		evt.innerEvent.Authentication = authentication
-	}
-	return evt
+// Instead of using New, most implementations should first define an event,
+// and then create a new event from that definition.
+func New(ctx context.Context, name, description string, opts ...Option) Event {
+	return (&definition{name: name, description: description}).New(ctx, opts...)
 }
 
 // Proto returns the protobuf representation of the event.

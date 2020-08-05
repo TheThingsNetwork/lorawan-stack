@@ -83,7 +83,7 @@ func TestRedisPubSub(t *testing.T) {
 
 	appID := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
 
-	pubsub.Publish(events.New(ctx, "redis.test.evt0", appID, nil))
+	pubsub.Publish(events.New(ctx, "redis.test.evt0", "redis test event 0", events.WithIdentifiers(appID)))
 	select {
 	case e := <-eventCh:
 		a.So(e.Name(), should.Equal, "redis.test.evt0")

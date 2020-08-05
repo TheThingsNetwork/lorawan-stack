@@ -32,7 +32,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Message          *ttnpb.UplinkMessage
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -55,8 +55,8 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveLinkCheckRequest.BindData(nil),
+			Events: events.Builders{
+				evtReceiveLinkCheckRequest,
 			},
 			Error: errInvalidDataRate,
 		},
@@ -80,8 +80,8 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveLinkCheckRequest.BindData(nil),
+			Events: events.Builders{
+				evtReceiveLinkCheckRequest,
 			},
 		},
 		{
@@ -119,12 +119,12 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveLinkCheckRequest.BindData(nil),
-				evtEnqueueLinkCheckAnswer.BindData(&ttnpb.MACCommand_LinkCheckAns{
+			Events: events.Builders{
+				evtReceiveLinkCheckRequest,
+				evtEnqueueLinkCheckAnswer.With(events.WithData(&ttnpb.MACCommand_LinkCheckAns{
 					Margin:       42,
 					GatewayCount: 1,
-				}),
+				})),
 			},
 		},
 		{
@@ -171,12 +171,12 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveLinkCheckRequest.BindData(nil),
-				evtEnqueueLinkCheckAnswer.BindData(&ttnpb.MACCommand_LinkCheckAns{
+			Events: events.Builders{
+				evtReceiveLinkCheckRequest,
+				evtEnqueueLinkCheckAnswer.With(events.WithData(&ttnpb.MACCommand_LinkCheckAns{
 					Margin:       42,
 					GatewayCount: 1,
-				}),
+				})),
 			},
 		},
 		{
@@ -235,12 +235,12 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveLinkCheckRequest.BindData(nil),
-				evtEnqueueLinkCheckAnswer.BindData(&ttnpb.MACCommand_LinkCheckAns{
+			Events: events.Builders{
+				evtReceiveLinkCheckRequest,
+				evtEnqueueLinkCheckAnswer.With(events.WithData(&ttnpb.MACCommand_LinkCheckAns{
 					Margin:       42,
 					GatewayCount: 3,
-				}),
+				})),
 			},
 		},
 		{
@@ -308,12 +308,12 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveLinkCheckRequest.BindData(nil),
-				evtEnqueueLinkCheckAnswer.BindData(&ttnpb.MACCommand_LinkCheckAns{
+			Events: events.Builders{
+				evtReceiveLinkCheckRequest,
+				evtEnqueueLinkCheckAnswer.With(events.WithData(&ttnpb.MACCommand_LinkCheckAns{
 					Margin:       43,
 					GatewayCount: 4,
-				}),
+				})),
 			},
 		},
 	} {
@@ -328,7 +328,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

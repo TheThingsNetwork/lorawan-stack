@@ -61,7 +61,7 @@ func (is *IdentityServer) sendInvitation(ctx context.Context, in *ttnpb.SendInvi
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtCreateInvitation(ctx, nil, invitation))
+	events.Publish(evtCreateInvitation.NewWithIdentifiersAndData(ctx, nil, invitation))
 	err = is.SendEmail(ctx, func(data emails.Data) email.MessageData {
 		data.User.Email = in.Email
 		return &emails.Invitation{

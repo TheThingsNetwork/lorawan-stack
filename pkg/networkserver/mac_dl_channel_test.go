@@ -336,15 +336,15 @@ func TestEnqueueDLChannelReq(t *testing.T) {
 						}
 						reqs := tc.ExpectedRequests[:conf.ExpectedCount]
 						expectedDev := CopyEndDevice(dev)
-						var expectedEvs []events.DefinitionDataClosure
+						var expectedEvs events.Builders
 						for _, req := range reqs {
 							expectedDev.MACState.PendingRequests = append(expectedDev.MACState.PendingRequests, req.MACCommand())
-							expectedEvs = append(expectedEvs, evtEnqueueDLChannelRequest.BindData(req))
+							expectedEvs = append(expectedEvs, evtEnqueueDLChannelRequest.With(events.WithData(req)))
 						}
 
 						st := enqueueDLChannelReq(test.ContextWithTB(log.NewContext(test.Context(), test.GetLogger(t)), t), dev, conf.MaxDownlinkLength, conf.MaxUplinkLength)
 						a.So(dev, should.Resemble, expectedDev)
-						a.So(st.QueuedEvents, should.ResembleEventDefinitionDataClosures, expectedEvs)
+						a.So(st.QueuedEvents, should.ResembleEventBuilders, expectedEvs)
 						a.So(st, should.Resemble, macCommandEnqueueState{
 							MaxDownLen:   conf.MaxDownlinkLength - uint16(conf.ExpectedCount)*downlinkLength,
 							MaxUpLen:     conf.MaxUplinkLength - uint16(conf.ExpectedCount)*uplinkLength,
@@ -364,7 +364,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 		InputDevice, ExpectedDevice *ttnpb.EndDevice
 		Payload                     *ttnpb.MACCommand_DLChannelAns
 		Error                       error
-		Events                      []events.DefinitionDataClosure
+		Events                      events.Builders
 	}{
 		{
 			Name: "nil payload",
@@ -388,11 +388,11 @@ func TestHandleDLChannelAns(t *testing.T) {
 				FrequencyAck:    true,
 				ChannelIndexAck: true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDLChannelAccept.BindData(&ttnpb.MACCommand_DLChannelAns{
+			Events: events.Builders{
+				evtReceiveDLChannelAccept.With(events.WithData(&ttnpb.MACCommand_DLChannelAns{
 					FrequencyAck:    true,
 					ChannelIndexAck: true,
-				}),
+				})),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -407,10 +407,10 @@ func TestHandleDLChannelAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_DLChannelAns{
 				ChannelIndexAck: true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDLChannelReject.BindData(&ttnpb.MACCommand_DLChannelAns{
+			Events: events.Builders{
+				evtReceiveDLChannelReject.With(events.WithData(&ttnpb.MACCommand_DLChannelAns{
 					ChannelIndexAck: true,
-				}),
+				})),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -457,8 +457,8 @@ func TestHandleDLChannelAns(t *testing.T) {
 				},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDLChannelReject.BindData(&ttnpb.MACCommand_DLChannelAns{}),
+			Events: events.Builders{
+				evtReceiveDLChannelReject.With(events.WithData(&ttnpb.MACCommand_DLChannelAns{})),
 			},
 		},
 		{
@@ -507,10 +507,10 @@ func TestHandleDLChannelAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_DLChannelAns{
 				ChannelIndexAck: true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDLChannelReject.BindData(&ttnpb.MACCommand_DLChannelAns{
+			Events: events.Builders{
+				evtReceiveDLChannelReject.With(events.WithData(&ttnpb.MACCommand_DLChannelAns{
 					ChannelIndexAck: true,
-				}),
+				})),
 			},
 		},
 		{
@@ -539,11 +539,11 @@ func TestHandleDLChannelAns(t *testing.T) {
 				FrequencyAck:    true,
 				ChannelIndexAck: true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDLChannelAccept.BindData(&ttnpb.MACCommand_DLChannelAns{
+			Events: events.Builders{
+				evtReceiveDLChannelAccept.With(events.WithData(&ttnpb.MACCommand_DLChannelAns{
 					FrequencyAck:    true,
 					ChannelIndexAck: true,
-				}),
+				})),
 			},
 			Error: errCorruptedMACState.WithCause(errUnknownChannel),
 		},
@@ -592,11 +592,11 @@ func TestHandleDLChannelAns(t *testing.T) {
 				FrequencyAck:    true,
 				ChannelIndexAck: true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveDLChannelAccept.BindData(&ttnpb.MACCommand_DLChannelAns{
+			Events: events.Builders{
+				evtReceiveDLChannelAccept.With(events.WithData(&ttnpb.MACCommand_DLChannelAns{
 					FrequencyAck:    true,
 					ChannelIndexAck: true,
-				}),
+				})),
 			},
 		},
 	} {
@@ -611,7 +611,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.ExpectedDevice)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

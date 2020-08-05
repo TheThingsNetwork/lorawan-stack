@@ -26,9 +26,9 @@ var (
 	evtEnqueueLinkCheckAnswer  = defineEnqueueMACAnswerEvent("link_check", "link check")()
 )
 
-func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) ([]events.DefinitionDataClosure, error) {
-	evs := []events.DefinitionDataClosure{
-		evtReceiveLinkCheckRequest.BindData(nil),
+func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) (events.Builders, error) {
+	evs := events.Builders{
+		evtReceiveLinkCheckRequest,
 	}
 
 	var floor float32
@@ -49,6 +49,6 @@ func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.Up
 	}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ans.MACCommand())
 	return append(evs,
-		evtEnqueueLinkCheckAnswer.BindData(ans),
+		evtEnqueueLinkCheckAnswer.With(events.WithData(ans)),
 	), nil
 }

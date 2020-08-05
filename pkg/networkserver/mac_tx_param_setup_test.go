@@ -204,12 +204,12 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 				MaxDownLen: 40,
 				MaxUpLen:   23,
 				Ok:         true,
-				QueuedEvents: []events.DefinitionDataClosure{
-					evtEnqueueTxParamSetupRequest.BindData(&ttnpb.MACCommand_TxParamSetupReq{
+				QueuedEvents: events.Builders{
+					evtEnqueueTxParamSetupRequest.With(events.WithData(&ttnpb.MACCommand_TxParamSetupReq{
 						MaxEIRPIndex:      ttnpb.DEVICE_EIRP_26,
 						DownlinkDwellTime: true,
 						UplinkDwellTime:   true,
-					}),
+					})),
 				},
 			},
 		},
@@ -321,7 +321,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 
 			st := enqueueTxParamSetupReq(test.Context(), dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, test.Must(test.Must(band.GetByID(band.AS_923)).(band.Band).Version(ttnpb.PHY_V1_1_REV_B)).(band.Band))
 			a.So(dev, should.Resemble, tc.ExpectedDevice)
-			a.So(st.QueuedEvents, should.ResembleEventDefinitionDataClosures, tc.State.QueuedEvents)
+			a.So(st.QueuedEvents, should.ResembleEventBuilders, tc.State.QueuedEvents)
 			st.QueuedEvents = tc.State.QueuedEvents
 			a.So(st, should.Resemble, tc.State)
 		})
@@ -332,7 +332,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name                        string
 		InputDevice, ExpectedDevice *ttnpb.EndDevice
-		Events                      []events.DefinitionDataClosure
+		Events                      events.Builders
 		Error                       error
 	}{
 		{
@@ -343,8 +343,8 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveTxParamSetupAnswer.BindData(nil),
+			Events: events.Builders{
+				evtReceiveTxParamSetupAnswer,
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -371,8 +371,8 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 					PendingRequests: []*ttnpb.MACCommand{},
 				},
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveTxParamSetupAnswer.BindData(nil),
+			Events: events.Builders{
+				evtReceiveTxParamSetupAnswer,
 			},
 		},
 	} {
@@ -387,7 +387,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.ExpectedDevice)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

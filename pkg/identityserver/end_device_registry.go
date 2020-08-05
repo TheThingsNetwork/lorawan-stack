@@ -31,15 +31,15 @@ import (
 var (
 	evtCreateEndDevice = events.Define(
 		"end_device.create", "create end device",
-		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
 	)
 	evtUpdateEndDevice = events.Define(
 		"end_device.update", "update end device",
-		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
 	)
 	evtDeleteEndDevice = events.Define(
 		"end_device.delete", "delete end device",
-		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
 	)
 )
 
@@ -86,7 +86,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 		}
 		return nil, err
 	}
-	events.Publish(evtCreateEndDevice(ctx, req.EndDeviceIdentifiers, nil))
+	events.Publish(evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDeviceIdentifiers, nil))
 	return dev, nil
 }
 
@@ -201,7 +201,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateEndDevice(ctx, req.EndDeviceIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDeviceIdentifiers, req.FieldMask.Paths))
 	return dev, nil
 }
 
@@ -215,7 +215,7 @@ func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDev
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtDeleteEndDevice(ctx, ids, nil))
+	events.Publish(evtDeleteEndDevice.NewWithIdentifiersAndData(ctx, ids, nil))
 	return ttnpb.Empty, nil
 }
 

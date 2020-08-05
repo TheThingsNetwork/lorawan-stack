@@ -27,13 +27,13 @@ var (
 	evtEnqueueResetConfirmation = defineEnqueueMACConfirmationEvent("reset", "device reset")()
 )
 
-func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store, defaults ttnpb.MACSettings) ([]events.DefinitionDataClosure, error) {
+func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store, defaults ttnpb.MACSettings) (events.Builders, error) {
 	if pld == nil {
 		return nil, errNoPayload.New()
 	}
 
-	evs := []events.DefinitionDataClosure{
-		evtReceiveResetIndication.BindData(pld),
+	evs := events.Builders{
+		evtReceiveResetIndication.With(events.WithData(pld)),
 	}
 	if dev.SupportsJoin {
 		return evs, nil
@@ -51,6 +51,6 @@ func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, conf.MACCommand())
 	return append(evs,
-		evtEnqueueResetConfirmation.BindData(conf),
+		evtEnqueueResetConfirmation.With(events.WithData(conf)),
 	), nil
 }

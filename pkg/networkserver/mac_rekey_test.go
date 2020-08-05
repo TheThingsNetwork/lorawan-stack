@@ -31,7 +31,7 @@ func TestHandleRekeyInd(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_RekeyInd
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -81,13 +81,13 @@ func TestHandleRekeyInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: 1,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveRekeyIndication.BindData(&ttnpb.MACCommand_RekeyInd{
+			Events: events.Builders{
+				evtReceiveRekeyIndication.With(events.WithData(&ttnpb.MACCommand_RekeyInd{
 					MinorVersion: 1,
-				}),
-				evtEnqueueRekeyConfirmation.BindData(&ttnpb.MACCommand_RekeyConf{
+				})),
+				evtEnqueueRekeyConfirmation.With(events.WithData(&ttnpb.MACCommand_RekeyConf{
 					MinorVersion: 1,
-				}),
+				})),
 			},
 		},
 		{
@@ -135,13 +135,13 @@ func TestHandleRekeyInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: 1,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveRekeyIndication.BindData(&ttnpb.MACCommand_RekeyInd{
+			Events: events.Builders{
+				evtReceiveRekeyIndication.With(events.WithData(&ttnpb.MACCommand_RekeyInd{
 					MinorVersion: 1,
-				}),
-				evtEnqueueRekeyConfirmation.BindData(&ttnpb.MACCommand_RekeyConf{
+				})),
+				evtEnqueueRekeyConfirmation.With(events.WithData(&ttnpb.MACCommand_RekeyConf{
 					MinorVersion: 1,
-				}),
+				})),
 			},
 		},
 		{
@@ -180,13 +180,13 @@ func TestHandleRekeyInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: 1,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveRekeyIndication.BindData(&ttnpb.MACCommand_RekeyInd{
+			Events: events.Builders{
+				evtReceiveRekeyIndication.With(events.WithData(&ttnpb.MACCommand_RekeyInd{
 					MinorVersion: 1,
-				}),
-				evtEnqueueRekeyConfirmation.BindData(&ttnpb.MACCommand_RekeyConf{
+				})),
+				evtEnqueueRekeyConfirmation.With(events.WithData(&ttnpb.MACCommand_RekeyConf{
 					MinorVersion: 1,
-				}),
+				})),
 			},
 		},
 		{
@@ -233,13 +233,13 @@ func TestHandleRekeyInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: 1,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveRekeyIndication.BindData(&ttnpb.MACCommand_RekeyInd{
+			Events: events.Builders{
+				evtReceiveRekeyIndication.With(events.WithData(&ttnpb.MACCommand_RekeyInd{
 					MinorVersion: 1,
-				}),
-				evtEnqueueRekeyConfirmation.BindData(&ttnpb.MACCommand_RekeyConf{
+				})),
+				evtEnqueueRekeyConfirmation.With(events.WithData(&ttnpb.MACCommand_RekeyConf{
 					MinorVersion: 1,
-				}),
+				})),
 			},
 		},
 	} {
@@ -254,7 +254,7 @@ func TestHandleRekeyInd(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

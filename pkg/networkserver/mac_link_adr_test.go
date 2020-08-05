@@ -209,22 +209,22 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 				MaxDownLen: 32,
 				MaxUpLen:   20,
 				Ok:         true,
-				QueuedEvents: []events.DefinitionDataClosure{
-					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
+				QueuedEvents: events.Builders{
+					evtEnqueueLinkADRRequest.With(events.WithData(&ttnpb.MACCommand_LinkADRReq{
 						ChannelMask: []bool{
 							false, false, false, false, false, false, false, false,
 							false, false, false, false, false, false, false, false,
 						},
 						ChannelMaskControl: 7,
 						NbTrans:            1,
-					}),
-					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
+					})),
+					evtEnqueueLinkADRRequest.With(events.WithData(&ttnpb.MACCommand_LinkADRReq{
 						ChannelMask: []bool{
 							false, false, false, false, false, false, false, false,
 							true, true, true, true, true, true, true, true,
 						},
 						NbTrans: 1,
-					}),
+					})),
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
@@ -291,8 +291,8 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 				MaxDownLen: 32,
 				MaxUpLen:   20,
 				Ok:         true,
-				QueuedEvents: []events.DefinitionDataClosure{
-					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
+				QueuedEvents: events.Builders{
+					evtEnqueueLinkADRRequest.With(events.WithData(&ttnpb.MACCommand_LinkADRReq{
 						ChannelMask: []bool{
 							false, false, false, false, false, false, false, false,
 							false, false, false, false, false, false, false, false,
@@ -301,8 +301,8 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 						NbTrans:            1,
 						DataRateIndex:      ttnpb.DATA_RATE_1,
 						TxPowerIndex:       15,
-					}),
-					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
+					})),
+					evtEnqueueLinkADRRequest.With(events.WithData(&ttnpb.MACCommand_LinkADRReq{
 						ChannelMask: []bool{
 							false, false, false, false, false, false, false, false,
 							true, true, true, true, true, true, true, true,
@@ -310,7 +310,7 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 						NbTrans:       1,
 						DataRateIndex: ttnpb.DATA_RATE_1,
 						TxPowerIndex:  15,
-					}),
+					})),
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
@@ -401,8 +401,8 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 				MaxDownLen: 32,
 				MaxUpLen:   20,
 				Ok:         true,
-				QueuedEvents: []events.DefinitionDataClosure{
-					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
+				QueuedEvents: events.Builders{
+					evtEnqueueLinkADRRequest.With(events.WithData(&ttnpb.MACCommand_LinkADRReq{
 						ChannelMask: []bool{
 							false, false, false, false, false, false, false, false,
 							false, false, false, false, false, false, false, false,
@@ -411,8 +411,8 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 						NbTrans:            1,
 						DataRateIndex:      ttnpb.DATA_RATE_15,
 						TxPowerIndex:       15,
-					}),
-					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
+					})),
+					evtEnqueueLinkADRRequest.With(events.WithData(&ttnpb.MACCommand_LinkADRReq{
 						ChannelMask: []bool{
 							false, false, false, false, false, false, false, false,
 							true, true, true, true, true, true, true, true,
@@ -420,7 +420,7 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 						NbTrans:       1,
 						DataRateIndex: ttnpb.DATA_RATE_15,
 						TxPowerIndex:  15,
-					}),
+					})),
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
@@ -474,7 +474,7 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.ExpectedDevice)
-			a.So(st.QueuedEvents, should.ResembleEventDefinitionDataClosures, tc.State.QueuedEvents)
+			a.So(st.QueuedEvents, should.ResembleEventBuilders, tc.State.QueuedEvents)
 			st.QueuedEvents = tc.State.QueuedEvents
 			a.So(st, should.Resemble, tc.State)
 		})
@@ -524,7 +524,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_LinkADRAns
 		DupCount         uint
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -570,12 +570,12 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveLinkADRAccept.BindData(&ttnpb.MACCommand_LinkADRAns{
+			Events: events.Builders{
+				evtReceiveLinkADRAccept.With(events.WithData(&ttnpb.MACCommand_LinkADRAns{
 					ChannelMaskAck:   true,
 					DataRateIndexAck: true,
 					TxPowerIndexAck:  true,
-				}),
+				})),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -638,12 +638,12 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveLinkADRAccept.BindData(&ttnpb.MACCommand_LinkADRAns{
+			Events: events.Builders{
+				evtReceiveLinkADRAccept.With(events.WithData(&ttnpb.MACCommand_LinkADRAns{
 					ChannelMaskAck:   true,
 					DataRateIndexAck: true,
 					TxPowerIndexAck:  true,
-				}),
+				})),
 			},
 		},
 		{
@@ -731,12 +731,12 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveLinkADRAccept.BindData(&ttnpb.MACCommand_LinkADRAns{
+			Events: events.Builders{
+				evtReceiveLinkADRAccept.With(events.WithData(&ttnpb.MACCommand_LinkADRAns{
 					ChannelMaskAck:   true,
 					DataRateIndexAck: true,
 					TxPowerIndexAck:  true,
-				}),
+				})),
 			},
 		},
 		{
@@ -825,12 +825,12 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveLinkADRAccept.BindData(&ttnpb.MACCommand_LinkADRAns{
+			Events: events.Builders{
+				evtReceiveLinkADRAccept.With(events.WithData(&ttnpb.MACCommand_LinkADRAns{
 					ChannelMaskAck:   true,
 					DataRateIndexAck: true,
 					TxPowerIndexAck:  true,
-				}),
+				})),
 			},
 		},
 		{
@@ -929,12 +929,12 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveLinkADRAccept.BindData(&ttnpb.MACCommand_LinkADRAns{
+			Events: events.Builders{
+				evtReceiveLinkADRAccept.With(events.WithData(&ttnpb.MACCommand_LinkADRAns{
 					ChannelMaskAck:   true,
 					DataRateIndexAck: true,
 					TxPowerIndexAck:  true,
-				}),
+				})),
 			},
 		},
 		{
@@ -994,12 +994,12 @@ func TestHandleLinkADRAns(t *testing.T) {
 				DataRateIndexAck: true,
 				TxPowerIndexAck:  true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveLinkADRAccept.BindData(&ttnpb.MACCommand_LinkADRAns{
+			Events: events.Builders{
+				evtReceiveLinkADRAccept.With(events.WithData(&ttnpb.MACCommand_LinkADRAns{
 					ChannelMaskAck:   true,
 					DataRateIndexAck: true,
 					TxPowerIndexAck:  true,
-				}),
+				})),
 			},
 		},
 	} {
@@ -1014,7 +1014,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

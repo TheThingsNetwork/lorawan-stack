@@ -35,15 +35,15 @@ import (
 var (
 	evtCreateClient = events.Define(
 		"client.create", "create OAuth client",
-		ttnpb.RIGHT_CLIENT_ALL,
+		events.WithVisibility(ttnpb.RIGHT_CLIENT_ALL),
 	)
 	evtUpdateClient = events.Define(
 		"client.update", "update OAuth client",
-		ttnpb.RIGHT_CLIENT_ALL,
+		events.WithVisibility(ttnpb.RIGHT_CLIENT_ALL),
 	)
 	evtDeleteClient = events.Define(
 		"client.delete", "delete OAuth client",
-		ttnpb.RIGHT_CLIENT_ALL,
+		events.WithVisibility(ttnpb.RIGHT_CLIENT_ALL),
 	)
 )
 
@@ -118,7 +118,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 
 	cli.Secret = secret // Return the unhashed secret, in case it was generated.
 
-	events.Publish(evtCreateClient(ctx, req.ClientIdentifiers, nil))
+	events.Publish(evtCreateClient.NewWithIdentifiersAndData(ctx, req.ClientIdentifiers, nil))
 	return cli, nil
 }
 
@@ -262,7 +262,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateClient(ctx, req.ClientIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateClient.NewWithIdentifiersAndData(ctx, req.ClientIdentifiers, req.FieldMask.Paths))
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
 		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 			data.SetEntity(req.EntityIdentifiers())
@@ -285,7 +285,7 @@ func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIde
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtDeleteClient(ctx, ids, nil))
+	events.Publish(evtDeleteClient.NewWithIdentifiersAndData(ctx, ids, nil))
 	return ttnpb.Empty, nil
 }
 

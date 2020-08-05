@@ -45,7 +45,7 @@ func enqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDo
 	}
 
 	var st macCommandEnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_REJOIN_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_REJOIN_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
@@ -62,15 +62,15 @@ func enqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDo
 				req.MACCommand(),
 			},
 			1,
-			[]events.DefinitionDataClosure{
-				evtEnqueueRejoinParamSetupRequest.BindData(req),
+			events.Builders{
+				evtEnqueueRejoinParamSetupRequest.With(events.WithData(req)),
 			},
 			true
 	}, dev.MACState.PendingRequests...)
 	return st
 }
 
-func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RejoinParamSetupAns) ([]events.DefinitionDataClosure, error) {
+func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RejoinParamSetupAns) (events.Builders, error) {
 	if pld == nil {
 		return nil, errNoPayload.New()
 	}
@@ -85,7 +85,7 @@ func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *t
 		}
 		return nil
 	}, dev.MACState.PendingRequests...)
-	return []events.DefinitionDataClosure{
-		evtReceiveRejoinParamSetupAnswer.BindData(pld),
+	return events.Builders{
+		evtReceiveRejoinParamSetupAnswer.With(events.WithData(pld)),
 	}, err
 }

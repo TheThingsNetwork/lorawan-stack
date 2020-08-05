@@ -43,7 +43,7 @@ func enqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 	}
 
 	var st macCommandEnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_RX_TIMING_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_RX_TIMING_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
@@ -57,15 +57,15 @@ func enqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 				req.MACCommand(),
 			},
 			1,
-			[]events.DefinitionDataClosure{
-				evtEnqueueRxTimingSetupRequest.BindData(req),
+			events.Builders{
+				evtEnqueueRxTimingSetupRequest.With(events.WithData(req)),
 			},
 			true
 	}, dev.MACState.PendingRequests...)
 	return st
 }
 
-func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {
+func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (events.Builders, error) {
 	var err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_TIMING_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetRxTimingSetupReq()
@@ -73,7 +73,7 @@ func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) ([]events
 		dev.MACState.CurrentParameters.Rx1Delay = req.Delay
 		return nil
 	}, dev.MACState.PendingRequests...)
-	return []events.DefinitionDataClosure{
-		evtReceiveRxTimingSetupAnswer.BindData(nil),
+	return events.Builders{
+		evtReceiveRxTimingSetupAnswer,
 	}, err
 }

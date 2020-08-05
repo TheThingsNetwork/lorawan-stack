@@ -188,10 +188,10 @@ var (
 
 	// ResembleEvent receives exactly two events.Event and does a resemblance check.
 	ResembleEvent = testassertions.ShouldResembleEvent
-	// ResembleEventDefinitionDataClosure receives exactly two events.DefinitionDataClosure and does a resemblance check.
-	ResembleEventDefinitionDataClosure = testassertions.ShouldResembleEventDefinitionDataClosure
-	// ResembleEventDefinitionDataClosures receives exactly two []events.DefinitionDataClosure and does a resemblance check.
-	ResembleEventDefinitionDataClosures = testassertions.ShouldResembleEventDefinitionDataClosures
+	// ResembleEventBuilder receives exactly two events.Builder and does a resemblance check.
+	ResembleEventBuilder = testassertions.ShouldResembleEventBuilder
+	// ResembleEventBuilders receives exactly two events.Builders and does a resemblance check.
+	ResembleEventBuilders = testassertions.ShouldResembleEventBuilders
 
 	// ResembleFields receives at least two SetFielder parameters and optional variadic field paths and does a deep equal check (see reflect.DeepEqual) on selected fields. If field paths are empty, it checks all fields similar to Resemble.
 	ResembleFields = testassertions.ShouldResembleFields

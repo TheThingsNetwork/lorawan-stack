@@ -30,15 +30,15 @@ import (
 var (
 	evtCreateApplication = events.Define(
 		"application.create", "create application",
-		ttnpb.RIGHT_APPLICATION_INFO,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_INFO),
 	)
 	evtUpdateApplication = events.Define(
 		"application.update", "update application",
-		ttnpb.RIGHT_APPLICATION_INFO,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_INFO),
 	)
 	evtDeleteApplication = events.Define(
 		"application.delete", "delete application",
-		ttnpb.RIGHT_APPLICATION_INFO,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_INFO),
 	)
 )
 
@@ -88,7 +88,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtCreateApplication(ctx, req.ApplicationIdentifiers, nil))
+	events.Publish(evtCreateApplication.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, nil))
 	return app, nil
 }
 
@@ -219,7 +219,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateApplication(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateApplication.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths))
 	return app, nil
 }
 
@@ -242,7 +242,7 @@ func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.Appl
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtDeleteApplication(ctx, ids, nil))
+	events.Publish(evtDeleteApplication.NewWithIdentifiersAndData(ctx, ids, nil))
 	return ttnpb.Empty, nil
 }
 

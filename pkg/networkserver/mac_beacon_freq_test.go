@@ -102,7 +102,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_BeaconFreqAns
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -126,10 +126,10 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{
 				FrequencyAck: true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveBeaconFreqAccept.BindData(&ttnpb.MACCommand_BeaconFreqAns{
+			Events: events.Builders{
+				evtReceiveBeaconFreqAccept.With(events.WithData(&ttnpb.MACCommand_BeaconFreqAns{
 					FrequencyAck: true,
-				}),
+				})),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -142,8 +142,8 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 				MACState: &ttnpb.MACState{},
 			},
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveBeaconFreqReject.BindData(&ttnpb.MACCommand_BeaconFreqAns{}),
+			Events: events.Builders{
+				evtReceiveBeaconFreqReject.With(events.WithData(&ttnpb.MACCommand_BeaconFreqAns{})),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -169,10 +169,10 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{
 				FrequencyAck: true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveBeaconFreqAccept.BindData(&ttnpb.MACCommand_BeaconFreqAns{
+			Events: events.Builders{
+				evtReceiveBeaconFreqAccept.With(events.WithData(&ttnpb.MACCommand_BeaconFreqAns{
 					FrequencyAck: true,
-				}),
+				})),
 			},
 		},
 		{
@@ -192,8 +192,8 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 				},
 			},
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveBeaconFreqReject.BindData(&ttnpb.MACCommand_BeaconFreqAns{}),
+			Events: events.Builders{
+				evtReceiveBeaconFreqReject.With(events.WithData(&ttnpb.MACCommand_BeaconFreqAns{})),
 			},
 		},
 	} {
@@ -209,7 +209,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

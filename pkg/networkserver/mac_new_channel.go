@@ -73,7 +73,7 @@ func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 	}
 
 	var st macCommandEnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_NEW_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_NEW_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		var reqs []*ttnpb.MACCommand_NewChannelReq
 		for i := 0; i < len(dev.MACState.DesiredParameters.Channels) || i < len(dev.MACState.CurrentParameters.Channels); i++ {
 			if i >= len(dev.MACState.DesiredParameters.Channels) {
@@ -97,7 +97,7 @@ func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 		}
 
 		var cmds []*ttnpb.MACCommand
-		var evs []events.DefinitionDataClosure
+		var evs events.Builders
 		for _, req := range reqs {
 			if nDown < 1 || nUp < 1 {
 				return cmds, uint16(len(cmds)), evs, false
@@ -111,14 +111,14 @@ func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 				"min_data_rate_index", req.MinDataRateIndex,
 			)).Debug("Enqueued NewChannelReq")
 			cmds = append(cmds, req.MACCommand())
-			evs = append(evs, evtEnqueueNewChannelRequest.BindData(req))
+			evs = append(evs, evtEnqueueNewChannelRequest.With(events.WithData(req)))
 		}
 		return cmds, uint16(len(cmds)), evs, true
 	}, dev.MACState.PendingRequests...)
 	return st
 }
 
-func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_NewChannelAns) ([]events.DefinitionDataClosure, error) {
+func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_NewChannelAns) (events.Builders, error) {
 	if pld == nil {
 		return nil, errNoPayload.New()
 	}
@@ -158,7 +158,7 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 	if !pld.DataRateAck || !pld.FrequencyAck {
 		evt = evtReceiveNewChannelReject
 	}
-	return []events.DefinitionDataClosure{
-		evt.BindData(pld),
+	return events.Builders{
+		evt.With(events.WithData(pld)),
 	}, err
 }

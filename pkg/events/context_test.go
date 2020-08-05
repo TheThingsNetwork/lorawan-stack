@@ -45,7 +45,7 @@ func TestContextMarshaler(t *testing.T) {
 
 	ctx := context.WithValue(context.Background(), "ctx-test", "foo")
 
-	evt := events.New(ctx, "test", nil, nil)
+	evt := events.New(ctx, "test", "test")
 
 	b, err := json.Marshal(evt)
 	a.So(err, should.BeNil)

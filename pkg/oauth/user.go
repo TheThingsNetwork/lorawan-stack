@@ -171,7 +171,7 @@ func (s *server) doLogin(ctx context.Context, userID, password string) error {
 	ok, err := auth.Validate(user.Password, password)
 	region.End()
 	if err != nil || !ok {
-		events.Publish(evtUserLoginFailed(ctx, user.UserIdentifiers, nil))
+		events.Publish(evtUserLoginFailed.NewWithIdentifiersAndData(ctx, user.UserIdentifiers, nil))
 		return errIncorrectPasswordOrUserID.New()
 	}
 	return nil
@@ -202,7 +202,7 @@ func (s *server) Login(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	events.Publish(evtUserLogin(ctx, userIDs, nil))
+	events.Publish(evtUserLogin.NewWithIdentifiersAndData(ctx, userIDs, nil))
 	err = s.updateAuthCookie(c, func(cookie *auth.CookieShape) error {
 		cookie.UserID = session.UserIdentifiers.UserID
 		cookie.SessionID = session.SessionID
@@ -245,7 +245,7 @@ func (s *server) ClientLogout(c echo.Context) error {
 		if err = s.store.DeleteAccessToken(ctx, accessTokenID); err != nil {
 			return err
 		}
-		events.Publish(evtUserLogout(ctx, at.UserIDs, nil))
+		events.Publish(evtUserLogout.NewWithIdentifiersAndData(ctx, at.UserIDs, nil))
 		err = s.store.DeleteSession(ctx, &at.UserIDs, at.UserSessionID)
 		if err != nil && !errors.IsNotFound(err) {
 			return err
@@ -271,7 +271,7 @@ func (s *server) ClientLogout(c echo.Context) error {
 		return err
 	}
 	if session != nil {
-		events.Publish(evtUserLogout(ctx, session.UserIdentifiers, nil))
+		events.Publish(evtUserLogout.NewWithIdentifiersAndData(ctx, session.UserIdentifiers, nil))
 		if err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionID); err != nil {
 			return err
 		}
@@ -290,7 +290,7 @@ func (s *server) Logout(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	events.Publish(evtUserLogout(ctx, session.UserIdentifiers, nil))
+	events.Publish(evtUserLogout.NewWithIdentifiersAndData(ctx, session.UserIdentifiers, nil))
 	if err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionID); err != nil {
 		return err
 	}

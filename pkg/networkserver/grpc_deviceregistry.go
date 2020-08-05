@@ -29,15 +29,15 @@ import (
 var (
 	evtCreateEndDevice = events.Define(
 		"ns.end_device.create", "create end device",
-		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
 	)
 	evtUpdateEndDevice = events.Define(
 		"ns.end_device.update", "update end device",
-		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
 	)
 	evtDeleteEndDevice = events.Define(
 		"ns.end_device.delete", "delete end device",
-		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
 	)
 )
 
@@ -366,7 +366,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 
 		if dev != nil {
-			evt = evtUpdateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
+			evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
 			if err := ttnpb.ProhibitFields(sets,
 				"ids.dev_addr",
 				"multicast",
@@ -403,7 +403,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return &req.EndDevice, sets, nil
 		}
 
-		evt = evtCreateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, nil)
+		evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.EndDeviceIdentifiers, nil)
 		if err := ttnpb.RequireFields(sets,
 			"frequency_plan_id",
 			"lorawan_phy_version",
@@ -555,7 +555,7 @@ func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentif
 		if dev == nil {
 			return nil, nil, errDeviceNotFound.New()
 		}
-		evt = evtDeleteEndDevice(ctx, req, nil)
+		evt = evtDeleteEndDevice.NewWithIdentifiersAndData(ctx, req, nil)
 		return nil, nil, nil
 	})
 	if err != nil {

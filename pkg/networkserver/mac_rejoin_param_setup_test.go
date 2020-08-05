@@ -118,7 +118,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_RejoinParamSetupAns
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -142,10 +142,10 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RejoinParamSetupAns{
 				MaxTimeExponentAck: true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveRejoinParamSetupAnswer.BindData(&ttnpb.MACCommand_RejoinParamSetupAns{
+			Events: events.Builders{
+				evtReceiveRejoinParamSetupAnswer.With(events.WithData(&ttnpb.MACCommand_RejoinParamSetupAns{
 					MaxTimeExponentAck: true,
-				}),
+				})),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -173,10 +173,10 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RejoinParamSetupAns{
 				MaxTimeExponentAck: true,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveRejoinParamSetupAnswer.BindData(&ttnpb.MACCommand_RejoinParamSetupAns{
+			Events: events.Builders{
+				evtReceiveRejoinParamSetupAnswer.With(events.WithData(&ttnpb.MACCommand_RejoinParamSetupAns{
 					MaxTimeExponentAck: true,
-				}),
+				})),
 			},
 		},
 		{
@@ -206,8 +206,8 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RejoinParamSetupAns{
 				MaxTimeExponentAck: false,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveRejoinParamSetupAnswer.BindData(&ttnpb.MACCommand_RejoinParamSetupAns{}),
+			Events: events.Builders{
+				evtReceiveRejoinParamSetupAnswer.With(events.WithData(&ttnpb.MACCommand_RejoinParamSetupAns{})),
 			},
 		},
 	} {
@@ -222,7 +222,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

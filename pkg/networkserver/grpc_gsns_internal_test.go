@@ -164,7 +164,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 			}
 		}
 		makeIdentifiers := func() ttnpb.EndDeviceIdentifiers { return *MakeABPIdentifiers(macVersion.RequireDevEUIForABP()) }
-		makeNilEvents := func(bool) []events.DefinitionDataClosure { return nil }
+		makeNilEvents := func(bool) events.Builders { return nil }
 
 		type devConfig struct {
 			Name   string
@@ -176,7 +176,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 			NbTrans                  uint32
 			Pending                  bool
 			ApplyDeviceDiff          func(deduplicated bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice
-			MakeQueuedEvents         func(deduplicated bool) []events.DefinitionDataClosure
+			MakeQueuedEvents         func(deduplicated bool) events.Builders
 			QueuedApplicationUplinks []*ttnpb.ApplicationUp
 			SetPaths                 []string
 		}
@@ -467,9 +467,9 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						dev.MACState.RxWindowsAvailable = true
 						return dev
 					},
-					MakeQueuedEvents: func(deduplicated bool) []events.DefinitionDataClosure {
+					MakeQueuedEvents: func(deduplicated bool) events.Builders {
 						if deduplicated {
-							return []events.DefinitionDataClosure{
+							return events.Builders{
 								evtReceiveLinkCheckRequest.BindData(nil),
 								evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
 								evtEnqueuePingSlotInfoAnswer.BindData(nil),
@@ -477,7 +477,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 								evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 							}
 						}
-						return []events.DefinitionDataClosure{
+						return events.Builders{
 							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
 							evtEnqueuePingSlotInfoAnswer.BindData(nil),
 							evtReceiveDeviceTimeRequest.BindData(nil),
@@ -527,9 +527,9 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						dev.Session.StartedAt = upRecvAt
 						return dev
 					},
-					MakeQueuedEvents: func(deduplicated bool) []events.DefinitionDataClosure {
+					MakeQueuedEvents: func(deduplicated bool) events.Builders {
 						if deduplicated {
-							return []events.DefinitionDataClosure{
+							return events.Builders{
 								evtReceiveLinkCheckRequest.BindData(nil),
 								evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
 								evtEnqueuePingSlotInfoAnswer.BindData(nil),
@@ -537,7 +537,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 								evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 							}
 						}
-						return []events.DefinitionDataClosure{
+						return events.Builders{
 							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
 							evtEnqueuePingSlotInfoAnswer.BindData(nil),
 							evtReceiveDeviceTimeRequest.BindData(nil),
@@ -588,9 +588,9 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						dev.Session.StartedAt = upRecvAt
 						return dev
 					},
-					MakeQueuedEvents: func(deduplicated bool) []events.DefinitionDataClosure {
+					MakeQueuedEvents: func(deduplicated bool) events.Builders {
 						if deduplicated {
-							return []events.DefinitionDataClosure{
+							return events.Builders{
 								evtReceiveLinkCheckRequest.BindData(nil),
 								evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
 								evtEnqueuePingSlotInfoAnswer.BindData(nil),
@@ -598,7 +598,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 								evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 							}
 						}
-						return []events.DefinitionDataClosure{
+						return events.Builders{
 							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
 							evtEnqueuePingSlotInfoAnswer.BindData(nil),
 							evtReceiveDeviceTimeRequest.BindData(nil),
@@ -666,8 +666,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						dev.MACState.RxWindowsAvailable = true
 						return dev
 					},
-					MakeQueuedEvents: func(bool) []events.DefinitionDataClosure {
-						return []events.DefinitionDataClosure{
+					MakeQueuedEvents: func(bool) events.Builders {
+						return events.Builders{
 							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
 							evtEnqueuePingSlotInfoAnswer.BindData(nil),
 						}
@@ -717,8 +717,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							},
 						},
 					},
-					MakeQueuedEvents: func(bool) []events.DefinitionDataClosure {
-						return []events.DefinitionDataClosure{
+					MakeQueuedEvents: func(bool) events.Builders {
+						return events.Builders{
 							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
 							evtEnqueuePingSlotInfoAnswer.BindData(nil),
 						}
@@ -835,8 +835,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						dev.MACState.RxWindowsAvailable = true
 						return dev
 					},
-					MakeQueuedEvents: func(bool) []events.DefinitionDataClosure {
-						return []events.DefinitionDataClosure{
+					MakeQueuedEvents: func(bool) events.Builders {
+						return events.Builders{
 							evtClassBSwitch.BindData(ttnpb.CLASS_A),
 						}
 					},
@@ -1097,7 +1097,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						matched.phy = band.Band{} // band.Band cannot be compared with neither should.Resemble, nor should.Equal.
 						if !a.So(test.AllTrue(
 							a.So(matched.SetPaths, should.HaveSameElementsDeep, devConf.SetPaths),
-							a.So(matched.QueuedEventClosures, should.ResembleEventDefinitionDataClosures, devConf.MakeQueuedEvents(deduplicated)),
+							a.So(matched.QueuedEventBuilders, should.ResembleEventBuilders, devConf.MakeQueuedEvents(deduplicated)),
 							a.So(matched, should.Resemble, &matchedDevice{
 								ChannelIndex:             chIdx,
 								DataRateIndex:            drIdx,
@@ -1108,7 +1108,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 								NbTrans:                  devConf.NbTrans,
 								Pending:                  devConf.Pending,
 								QueuedApplicationUplinks: devConf.QueuedApplicationUplinks,
-								QueuedEventClosures:      matched.QueuedEventClosures,
+								QueuedEventBuilders:      matched.QueuedEventBuilders,
 								SetPaths:                 matched.SetPaths,
 							}),
 						), should.BeTrue) {
@@ -1118,7 +1118,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						if deduplicated || len(matched.DeferredMACHandlers) == 0 {
 							return true
 						}
-						queuedEvents := matched.QueuedEventClosures
+						queuedEvents := matched.QueuedEventBuilders
 						for _, f := range matched.DeferredMACHandlers {
 							evs, err := f(matched.Context, matched.Device, CopyUplinkMessage(up))
 							if !a.So(err, should.BeNil) {
@@ -1127,7 +1127,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							queuedEvents = append(queuedEvents, evs...)
 						}
 						return test.AllTrue(
-							a.So(queuedEvents, should.HaveSameElementsFunc, test.EventDefinitionDataClosureEqual, devConf.MakeQueuedEvents(true)),
+							a.So(queuedEvents, should.HaveSameElementsFunc, test.EventBuilderEqual, devConf.MakeQueuedEvents(true)),
 							a.So(matched.Device, should.Resemble, devConf.ApplyDeviceDiff(true, CopyEndDevice(devConf.Device))),
 						)
 					}

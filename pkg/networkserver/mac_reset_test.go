@@ -32,7 +32,7 @@ func TestHandleResetInd(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_ResetInd
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -87,13 +87,13 @@ func TestHandleResetInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_ResetInd{
 				MinorVersion: 1,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveResetIndication.BindData(&ttnpb.MACCommand_ResetInd{
+			Events: events.Builders{
+				evtReceiveResetIndication.With(events.WithData(&ttnpb.MACCommand_ResetInd{
 					MinorVersion: 1,
-				}),
-				evtEnqueueResetConfirmation.BindData(&ttnpb.MACCommand_ResetConf{
+				})),
+				evtEnqueueResetConfirmation.With(events.WithData(&ttnpb.MACCommand_ResetConf{
 					MinorVersion: 1,
-				}),
+				})),
 			},
 		},
 		{
@@ -136,13 +136,13 @@ func TestHandleResetInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_ResetInd{
 				MinorVersion: 1,
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveResetIndication.BindData(&ttnpb.MACCommand_ResetInd{
+			Events: events.Builders{
+				evtReceiveResetIndication.With(events.WithData(&ttnpb.MACCommand_ResetInd{
 					MinorVersion: 1,
-				}),
-				evtEnqueueResetConfirmation.BindData(&ttnpb.MACCommand_ResetConf{
+				})),
+				evtEnqueueResetConfirmation.With(events.WithData(&ttnpb.MACCommand_ResetConf{
 					MinorVersion: 1,
-				}),
+				})),
 			},
 		},
 	} {
@@ -157,7 +157,7 @@ func TestHandleResetInd(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

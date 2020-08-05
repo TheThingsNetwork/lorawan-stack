@@ -1583,7 +1583,7 @@ func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh
 
 	if !a.So(test.AssertEventPubSubPublishRequests(ctx, eventsPublishCh, 1+len(replaceEvents), func(evs ...events.Event) bool {
 		return a.So(evs, should.HaveSameElementsEvent, append(
-			[]events.Event{EvtBeginApplicationLink(events.ContextWithCorrelationID(test.Context(), reqCIDs...), appID, nil)},
+			[]events.Event{EvtBeginApplicationLink.NewWithIdentifiersAndData(events.ContextWithCorrelationID(test.Context(), reqCIDs...), appID, nil)},
 			replaceEvents...,
 		))
 	}), should.BeTrue) {
@@ -1596,7 +1596,7 @@ func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh
 		return nil, nil, false
 	}
 	return link, func(err error) events.Event {
-		return EvtEndApplicationLink(events.ContextWithCorrelationID(test.Context(), reqCIDs...), appID, err)
+		return EvtEndApplicationLink.NewWithIdentifiersAndData(events.ContextWithCorrelationID(test.Context(), reqCIDs...), appID, err)
 	}, a.So(err, should.BeNil)
 }
 

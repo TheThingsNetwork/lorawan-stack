@@ -262,7 +262,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			maxUpLen = st.MaxUpLen
 			fPending = fPending || !st.Ok
 			for _, ev := range st.QueuedEvents {
-				genState.Events = append(genState.Events, ev(ctx, dev.EndDeviceIdentifiers))
+				genState.Events = append(genState.Events, ev.New(ctx, events.WithIdentifiers(dev.EndDeviceIdentifiers)))
 			}
 		}
 
@@ -695,9 +695,9 @@ type scheduleRequest struct {
 	*ttnpb.TxRequest
 	ttnpb.EndDeviceIdentifiers
 	PHYPayload   []byte
-	AttemptEvent events.Definition
-	SuccessEvent events.Definition
-	FailEvent    events.Definition
+	AttemptEvent events.Builder
+	SuccessEvent events.Builder
+	FailEvent    events.Builder
 }
 
 func newDataDownlinkScheduleRequest(req *ttnpb.TxRequest, ids ttnpb.EndDeviceIdentifiers, b []byte) *scheduleRequest {
@@ -827,11 +827,11 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 				Request: req.TxRequest,
 			},
 		}
-		queuedEvents = append(queuedEvents, req.AttemptEvent(ctx, req.EndDeviceIdentifiers, down))
+		queuedEvents = append(queuedEvents, req.AttemptEvent.NewWithIdentifiersAndData(ctx, req.EndDeviceIdentifiers, down))
 		logger.WithField("path_count", len(req.DownlinkPaths)).Debug("Schedule downlink")
 		delay, err := a.Schedule(ctx, down, ns.WithClusterAuth())
 		if err != nil {
-			queuedEvents = append(queuedEvents, req.FailEvent(ctx, req.EndDeviceIdentifiers, err))
+			queuedEvents = append(queuedEvents, req.FailEvent.NewWithIdentifiersAndData(ctx, req.EndDeviceIdentifiers, err))
 			errs = append(errs, err)
 			continue
 		}
@@ -840,7 +840,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 			"transmission_delay", delay,
 			"transmit_at", transmitAt,
 		)).Debug("Scheduled downlink")
-		queuedEvents = append(queuedEvents, req.SuccessEvent(ctx, req.EndDeviceIdentifiers, &ttnpb.ScheduleDownlinkResponse{
+		queuedEvents = append(queuedEvents, req.SuccessEvent.NewWithIdentifiersAndData(ctx, req.EndDeviceIdentifiers, &ttnpb.ScheduleDownlinkResponse{
 			Delay: delay,
 		}))
 		return &scheduledDownlink{

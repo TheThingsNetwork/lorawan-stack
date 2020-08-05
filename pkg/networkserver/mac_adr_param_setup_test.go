@@ -184,7 +184,7 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
-		Events           []events.DefinitionDataClosure
+		Events           events.Builders
 		Error            error
 	}{
 		{
@@ -195,8 +195,8 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveADRParamSetupAnswer.BindData(nil),
+			Events: events.Builders{
+				evtReceiveADRParamSetupAnswer,
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -221,8 +221,8 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 					PendingRequests: []*ttnpb.MACCommand{},
 				},
 			},
-			Events: []events.DefinitionDataClosure{
-				evtReceiveADRParamSetupAnswer.BindData(nil),
+			Events: events.Builders{
+				evtReceiveADRParamSetupAnswer,
 			},
 		},
 	} {
@@ -237,7 +237,7 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
+			a.So(evs, should.ResembleEventBuilders, tc.Events)
 		})
 	}
 }

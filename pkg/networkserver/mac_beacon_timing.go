@@ -28,7 +28,7 @@ func deviceNeedsBeaconTimingReq(dev *ttnpb.EndDevice) bool {
 	return !dev.GetMulticast() && dev.GetMACState().GetDeviceClass() == ttnpb.CLASS_B && false
 }
 
-func handleBeaconTimingReq(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {
+func handleBeaconTimingReq(ctx context.Context, dev *ttnpb.EndDevice) (events.Builders, error) {
 	_ = deviceNeedsBeaconTimingReq(dev)
 	// TODO: Support BeaconTimingReq. (https://github.com/TheThingsNetwork/lorawan-stack/issues/2431)
 	return nil, nil
