@@ -1287,6 +1287,18 @@ GtwGs:
       http:
       - method: GET
         path: /gs/gateways/{gateway_id}/mqttv2-connection-info
+Is:
+  name: Is
+  methods:
+    GetConfiguration:
+      name: GetConfiguration
+      input:
+        name: GetIsConfigurationRequest
+      output:
+        name: GetIsConfigurationResponse
+      http:
+      - method: GET
+        path: /is/configuration
 Js:
   name: Js
   methods:
