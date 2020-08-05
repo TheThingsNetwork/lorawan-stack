@@ -21,7 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/basicstationlns"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 )
 
@@ -52,7 +52,7 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 	},
 	UpdateConnectionStatsDebounceTime: 3 * time.Second,
 	BasicStation: gatewayserver.BasicStationConfig{
-		Config:    basicstationlns.DefaultConfig,
+		Config:    ws.DefaultConfig,
 		Listen:    ":1887",
 		ListenTLS: ":8887",
 	},
