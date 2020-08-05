@@ -25,6 +25,7 @@ const hardcoded = {
   settings: 'tune',
   integration: 'call_merge',
   data: 'poll',
+  sort_order: 'unfold_more',
   sort_order_asc: 'arrow_drop_down',
   sort_order_desc: 'arrow_drop_up',
   overview: 'dashboard',
