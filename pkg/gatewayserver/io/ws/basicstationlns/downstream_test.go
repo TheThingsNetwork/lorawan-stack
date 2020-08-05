@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package messages
+package basicstationlns
 
 import (
 	"testing"
@@ -96,8 +96,13 @@ func TestFromDownlinkMessage(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			dnmsg := FromDownlinkMessage(tc.GatewayIDs, tc.DownlinkMessage.GetRawPayload(), tc.DownlinkMessage.GetScheduled(), 0, time.Unix(1554300787, 123456000), 0x00)
-			dnmsg.XTime = 0
+			var bsFormat basicstationFormat
+			raw, err := bsFormat.FromDownlink(tc.GatewayIDs, tc.DownlinkMessage.GetRawPayload(), tc.DownlinkMessage.GetScheduled(), 0, time.Unix(1554300787, 123456000), 0x00)
+			a.So(err, should.BeNil)
+			var dnmsg DownlinkMessage
+			err = dnmsg.unmarshalJSON(raw)
+			a.So(err, should.BeNil)
+			dnmsg.XTime = tc.ExpectedDownlinkMessage.XTime
 			if !a.So(dnmsg, should.Resemble, tc.ExpectedDownlinkMessage) {
 				t.Fatalf("Invalid DownlinkMessage: %v", dnmsg)
 			}

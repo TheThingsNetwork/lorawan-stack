@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package messages
+package basicstationlns
 
 import (
 	"encoding/hex"
@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -40,20 +41,25 @@ type DownlinkMessage struct {
 	MuxTime     float64 `json:"MuxTime"`
 }
 
-// MarshalJSON implements json.Marshaler.
-func (dnmsg DownlinkMessage) MarshalJSON() ([]byte, error) {
+// marshalJSON implements json.Marshaler.
+func (dnmsg DownlinkMessage) marshalJSON() ([]byte, error) {
 	type Alias DownlinkMessage
 	return json.Marshal(struct {
 		Type string `json:"msgtype"`
 		Alias
 	}{
-		Type:  TypeDownstreamDownlinkMessage,
+		Type:  ws.TypeDownstreamDownlinkMessage,
 		Alias: Alias(dnmsg),
 	})
 }
 
-// FromDownlinkMessage translates the ttnpb.DownlinkMessage to LNS DownlinkMessage "dnmsg".
-func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, rawPayload []byte, scheduledMsg *ttnpb.TxSettings, dlToken int64, dlTime time.Time, xTime int64) DownlinkMessage {
+// marshalJSON implements json.Marshaler.
+func (dnmsg *DownlinkMessage) unmarshalJSON(data []byte) error {
+	return json.Unmarshal(data, dnmsg)
+}
+
+// FromDownlink translates the ttnpb.DownlinkMessage to LNS DownlinkMessage "dnmsg".
+func (basicstationFormat) FromDownlink(ids ttnpb.GatewayIdentifiers, rawPayload []byte, scheduledMsg *ttnpb.TxSettings, dlToken int64, dlTime time.Time, xTime int64) ([]byte, error) {
 	var dnmsg DownlinkMessage
 	dnmsg.Pdu = hex.EncodeToString(rawPayload)
 	dnmsg.RCtx = int64(scheduledMsg.Downlink.AntennaIndex)
@@ -79,7 +85,7 @@ func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, rawPayload []byte, schedu
 	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay). The calculated offset is in microseconds.
 	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*int(time.Second/time.Microsecond))
 
-	return dnmsg
+	return dnmsg.marshalJSON()
 }
 
 // ToDownlinkMessage translates the LNS DownlinkMessage "dnmsg" to ttnpb.DownlinkMessage.

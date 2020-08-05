@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstationlns_test
+package ws_test
 
 import (
 	"context"
@@ -34,9 +34,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
-	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/basicstationlns"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
+	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/basicstationlns"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/basicstationlns"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
@@ -71,7 +71,6 @@ func eui64Ptr(eui types.EUI64) *types.EUI64 { return &eui }
 func TestClientTokenAuth(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
@@ -109,7 +108,7 @@ func TestClientTokenAuth(t *testing.T) {
 	} {
 		cfg := defaultConfig
 		cfg.AllowUnauthenticated = ttc.AllowUnauthenticated
-		bsWebServer := New(ctx, gs, cfg)
+		bsWebServer := New(ctx, gs, basicstationlns.NewFormat(), cfg)
 		lis, err := net.Listen("tcp", serverAddress)
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
@@ -202,7 +201,6 @@ func TestClientSideTLS(t *testing.T) {
 func TestDiscover(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
@@ -225,7 +223,7 @@ func TestDiscover(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, defaultConfig)
+	bsWebServer := New(ctx, gs, basicstationlns.NewFormat(), defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -265,24 +263,24 @@ func TestDiscover(t *testing.T) {
 	for _, tc := range []struct {
 		Name     string
 		Query    interface{}
-		Response messages.DiscoverResponse
+		Response DiscoverResponse
 	}{
 		{
 			Name:     "EmptyEUI",
-			Query:    messages.DiscoverQuery{},
-			Response: messages.DiscoverResponse{Error: "Empty router EUI provided"},
+			Query:    DiscoverQuery{},
+			Response: DiscoverResponse{Error: "Empty router EUI provided"},
 		},
 		{
 			Name:     "EmptyStruct",
 			Query:    struct{}{},
-			Response: messages.DiscoverResponse{Error: "Empty router EUI provided"},
+			Response: DiscoverResponse{Error: "Empty router EUI provided"},
 		},
 		{
 			Name: "InvalidJSONKey",
 			Query: struct {
 				EUI string `json:"route"`
 			}{EUI: `"01-02-03-04-05-06-07-08"`},
-			Response: messages.DiscoverResponse{Error: "Empty router EUI provided"},
+			Response: DiscoverResponse{Error: "Empty router EUI provided"},
 		},
 	} {
 		t.Run(fmt.Sprintf("InvalidQuery/%s", tc.Name), func(t *testing.T) {
@@ -314,7 +312,7 @@ func TestDiscover(t *testing.T) {
 			}()
 			select {
 			case res := <-resCh:
-				var response messages.DiscoverResponse
+				var response DiscoverResponse
 				if err := json.Unmarshal(res, &response); err != nil {
 					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 				}
@@ -381,7 +379,7 @@ func TestDiscover(t *testing.T) {
 		{
 			EndPointEUI: "1111111111111111",
 			EUI:         types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
-			Query: messages.DiscoverQuery{
+			Query: DiscoverQuery{
 				EUI: basicstation.EUI{
 					Prefix: "router",
 					EUI64:  types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
@@ -418,11 +416,11 @@ func TestDiscover(t *testing.T) {
 			}()
 			select {
 			case res := <-resCh:
-				var response messages.DiscoverResponse
+				var response DiscoverResponse
 				if err := json.Unmarshal(res, &response); err != nil {
 					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 				}
-				a.So(response, should.Resemble, messages.DiscoverResponse{
+				a.So(response, should.Resemble, DiscoverResponse{
 					EUI: basicstation.EUI{Prefix: "router", EUI64: tc.EUI},
 					Muxs: basicstation.EUI{
 						Prefix: "muxs",
@@ -440,7 +438,6 @@ func TestDiscover(t *testing.T) {
 func TestVersion(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
@@ -463,7 +460,7 @@ func TestVersion(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, defaultConfig)
+	bsWebServer := New(ctx, gs, basicstationlns.NewFormat(), defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -497,7 +494,7 @@ func TestVersion(t *testing.T) {
 	}{
 		{
 			Name: "VersionProd",
-			VersionQuery: messages.Version{
+			VersionQuery: basicstationlns.Version{
 				Station:  "test-station",
 				Firmware: "1.0.0",
 				Package:  "test-package",
@@ -577,7 +574,7 @@ func TestVersion(t *testing.T) {
 		},
 		{
 			Name: "VersionDebug",
-			VersionQuery: messages.Version{
+			VersionQuery: basicstationlns.Version{
 				Station:  "test-station-rc1",
 				Firmware: "1.0.0",
 				Package:  "test-package",
@@ -703,7 +700,6 @@ func TestVersion(t *testing.T) {
 func TestTraffic(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
@@ -726,7 +722,7 @@ func TestTraffic(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, defaultConfig)
+	bsWebServer := New(ctx, gs, basicstationlns.NewFormat(), defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -762,16 +758,16 @@ func TestTraffic(t *testing.T) {
 	}{
 		{
 			Name: "JoinRequest",
-			InputBSUpstream: messages.JoinRequest{
+			InputBSUpstream: basicstationlns.JoinRequest{
 				MHdr:     0,
 				DevEUI:   basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
 				JoinEUI:  basicstation.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
 				DevNonce: 18000,
 				MIC:      12345678,
-				RadioMetaData: messages.RadioMetaData{
+				RadioMetaData: basicstationlns.RadioMetaData{
 					DataRate:  1,
 					Frequency: 868300000,
-					UpInfo: messages.UpInfo{
+					UpInfo: basicstationlns.UpInfo{
 						RxTime: 1548059982,
 						XTime:  12666373963464220,
 						RSSI:   89,
@@ -814,7 +810,7 @@ func TestTraffic(t *testing.T) {
 		},
 		{
 			Name: "UplinkFrame",
-			InputBSUpstream: messages.UplinkDataFrame{
+			InputBSUpstream: basicstationlns.UplinkDataFrame{
 				MHdr:       0x40,
 				DevAddr:    0x11223344,
 				FCtrl:      0x30,
@@ -823,10 +819,10 @@ func TestTraffic(t *testing.T) {
 				FOpts:      "FD",
 				FRMPayload: "5fcc",
 				MIC:        12345678,
-				RadioMetaData: messages.RadioMetaData{
+				RadioMetaData: basicstationlns.RadioMetaData{
 					DataRate:  1,
 					Frequency: 868300000,
-					UpInfo: messages.UpInfo{
+					UpInfo: basicstationlns.UpInfo{
 						RxTime: 1548059982,
 						XTime:  12666373963464220,
 						RSSI:   89,
@@ -904,11 +900,11 @@ func TestTraffic(t *testing.T) {
 						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
 						1553759666,
 						1553759666000,
-						time.Unix(0, 1553759666000),
+						time.Unix(0, 1553759666*1000),
 					),
 				},
 			},
-			ExpectedBSDownstream: messages.DownlinkMessage{
+			ExpectedBSDownstream: basicstationlns.DownlinkMessage{
 				DevEUI:      "00-00-00-00-00-00-00-00",
 				DeviceClass: 0,
 				Pdu:         "596d7868616d74686332356b4a334d3d3d",
@@ -923,7 +919,7 @@ func TestTraffic(t *testing.T) {
 		},
 		{
 			Name: "FollowUpTxAck",
-			InputBSUpstream: messages.TxConfirmation{
+			InputBSUpstream: basicstationlns.TxConfirmation{
 				Diid:  1,
 				XTime: 1548059982,
 			},
@@ -934,7 +930,7 @@ func TestTraffic(t *testing.T) {
 		},
 		{
 			Name: "RepeatedTxAck",
-			InputBSUpstream: messages.TxConfirmation{
+			InputBSUpstream: basicstationlns.TxConfirmation{
 				Diid:  1,
 				XTime: 1548059982,
 			},
@@ -945,18 +941,18 @@ func TestTraffic(t *testing.T) {
 		},
 		{
 			Name: "RandomTxAck",
-			InputBSUpstream: messages.TxConfirmation{
+			InputBSUpstream: basicstationlns.TxConfirmation{
 				Diid:  2,
 				XTime: 1548059982,
 			},
-			ExpectedNetworkUpstream: nil,
+			ExpectedNetworkUpstream: ttnpb.TxAcknowledgment{},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			if tc.InputBSUpstream != nil {
 				switch v := tc.InputBSUpstream.(type) {
-				case messages.TxConfirmation:
+				case basicstationlns.TxConfirmation:
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -975,7 +971,7 @@ func TestTraffic(t *testing.T) {
 						}
 					}
 
-				case messages.UplinkDataFrame, messages.JoinRequest:
+				case basicstationlns.UplinkDataFrame, basicstationlns.JoinRequest:
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -1018,14 +1014,14 @@ func TestTraffic(t *testing.T) {
 				select {
 				case res := <-resCh:
 					switch tc.ExpectedBSDownstream.(type) {
-					case messages.DownlinkMessage:
-						var msg messages.DownlinkMessage
+					case basicstationlns.DownlinkMessage:
+						var msg basicstationlns.DownlinkMessage
 						if err := json.Unmarshal(res, &msg); err != nil {
 							t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 						}
-						msg.XTime = tc.ExpectedBSDownstream.(messages.DownlinkMessage).XTime
-						msg.MuxTime = tc.ExpectedBSDownstream.(messages.DownlinkMessage).MuxTime
-						if !a.So(msg, should.Resemble, tc.ExpectedBSDownstream.(messages.DownlinkMessage)) {
+						msg.XTime = tc.ExpectedBSDownstream.(basicstationlns.DownlinkMessage).XTime
+						msg.MuxTime = tc.ExpectedBSDownstream.(basicstationlns.DownlinkMessage).MuxTime
+						if !a.So(msg, should.Resemble, tc.ExpectedBSDownstream.(basicstationlns.DownlinkMessage)) {
 							t.Fatalf("Incorrect Downlink received: %s", string(res))
 						}
 					}
@@ -1040,7 +1036,6 @@ func TestTraffic(t *testing.T) {
 func TestRTT(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
@@ -1063,7 +1058,7 @@ func TestRTT(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, defaultConfig)
+	bsWebServer := New(ctx, gs, basicstationlns.NewFormat(), defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -1100,16 +1095,16 @@ func TestRTT(t *testing.T) {
 	}{
 		{
 			Name: "JoinRequest",
-			InputBSUpstream: messages.JoinRequest{
+			InputBSUpstream: basicstationlns.JoinRequest{
 				MHdr:     0,
 				DevEUI:   basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
 				JoinEUI:  basicstation.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
 				DevNonce: 18000,
 				MIC:      12345678,
-				RadioMetaData: messages.RadioMetaData{
+				RadioMetaData: basicstationlns.RadioMetaData{
 					DataRate:  1,
 					Frequency: 868300000,
-					UpInfo: messages.UpInfo{
+					UpInfo: basicstationlns.UpInfo{
 						RxTime: 1548059982,
 						XTime:  12666373963464220,
 						RSSI:   89,
@@ -1146,14 +1141,14 @@ func TestRTT(t *testing.T) {
 						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
 						1553759666,
 						1553759666000,
-						time.Unix(0, 1553759666000),
+						time.Unix(0, 1553759666*1000),
 					),
 				},
 			},
 		},
 		{
 			Name: "FollowUpTxAck",
-			InputBSUpstream: messages.TxConfirmation{
+			InputBSUpstream: basicstationlns.TxConfirmation{
 				Diid:  1,
 				XTime: 1548059982,
 			},
@@ -1162,7 +1157,7 @@ func TestRTT(t *testing.T) {
 		},
 		{
 			Name: "RepeatedTxAck",
-			InputBSUpstream: messages.TxConfirmation{
+			InputBSUpstream: basicstationlns.TxConfirmation{
 				Diid:  1,
 				XTime: 1548059982,
 			},
@@ -1171,7 +1166,7 @@ func TestRTT(t *testing.T) {
 		},
 		{
 			Name: "UplinkFrame",
-			InputBSUpstream: messages.UplinkDataFrame{
+			InputBSUpstream: basicstationlns.UplinkDataFrame{
 				MHdr:       0x40,
 				DevAddr:    0x11223344,
 				FCtrl:      0x30,
@@ -1180,10 +1175,10 @@ func TestRTT(t *testing.T) {
 				FOpts:      "FD",
 				FRMPayload: "5fcc",
 				MIC:        12345678,
-				RadioMetaData: messages.RadioMetaData{
+				RadioMetaData: basicstationlns.RadioMetaData{
 					DataRate:  1,
 					Frequency: 868300000,
-					UpInfo: messages.UpInfo{
+					UpInfo: basicstationlns.UpInfo{
 						RxTime: 1548059982,
 						XTime:  12666373963464220,
 						RSSI:   89,
@@ -1199,7 +1194,7 @@ func TestRTT(t *testing.T) {
 			a := assertions.New(t)
 			if tc.InputBSUpstream != nil {
 				switch v := tc.InputBSUpstream.(type) {
-				case messages.TxConfirmation:
+				case basicstationlns.TxConfirmation:
 					if MuxTime != 0 {
 						time.Sleep(tc.WaitTime)
 						now := float64(time.Now().UnixNano()) / float64(time.Second)
@@ -1221,7 +1216,7 @@ func TestRTT(t *testing.T) {
 						t.Fatalf("Read message timeout")
 					}
 
-				case messages.UplinkDataFrame:
+				case basicstationlns.UplinkDataFrame:
 					if MuxTime != 0 {
 						time.Sleep(tc.WaitTime)
 						now := float64(time.Now().UnixNano()) / float64(time.Second)
@@ -1245,7 +1240,7 @@ func TestRTT(t *testing.T) {
 						t.Fatalf("Read message timeout")
 					}
 
-				case messages.JoinRequest:
+				case basicstationlns.JoinRequest:
 					if MuxTime != 0 {
 						time.Sleep(tc.WaitTime)
 						now := float64(time.Now().Unix()) + float64(time.Now().Nanosecond())/(1e9)
@@ -1305,7 +1300,7 @@ func TestRTT(t *testing.T) {
 				}()
 				select {
 				case res := <-resCh:
-					var msg messages.DownlinkMessage
+					var msg basicstationlns.DownlinkMessage
 					if err := json.Unmarshal(res, &msg); err != nil {
 						t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 					}
@@ -1322,7 +1317,6 @@ func TestRTT(t *testing.T) {
 func TestPingPong(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
@@ -1345,7 +1339,7 @@ func TestPingPong(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, defaultConfig)
+	bsWebServer := New(ctx, gs, basicstationlns.NewFormat(), defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()

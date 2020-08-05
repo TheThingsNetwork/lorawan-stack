@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package messages
+package basicstationlns
 
 import (
 	"encoding/json"
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -35,9 +36,9 @@ func TestType(t *testing.T) {
 	data, err := json.Marshal(msg)
 	a.So(err, should.BeNil)
 
-	mt, err := Type(data)
+	mt, err := ws.Type(data)
 	a.So(err, should.BeNil)
-	a.So(mt, should.Equal, TypeUpstreamVersion)
+	a.So(mt, should.Equal, ws.TypeUpstreamVersion)
 }
 
 func TestIsProduction(t *testing.T) {

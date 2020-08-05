@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package messages
+package basicstationlns
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -22,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -250,7 +252,7 @@ func TestJoinRequest(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			msg, err := tc.JoinRequest.ToUplinkMessage(tc.GatewayIDs, tc.BandID, time.Time{})
+			msg, err := tc.JoinRequest.toUplinkMessage(tc.GatewayIDs, tc.BandID, time.Time{})
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -427,7 +429,7 @@ func TestUplinkDataFrame(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			msg, err := tc.UplinkDataFrame.ToUplinkMessage(tc.GatewayIDs, tc.FrequencyPlanID, time.Time{})
+			msg, err := tc.UplinkDataFrame.toUplinkMessage(tc.GatewayIDs, tc.FrequencyPlanID, time.Time{})
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -643,13 +645,24 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 
 func TestTxAck(t *testing.T) {
 	a := assertions.New(t)
+	txConf := TxConfirmation{
+		Diid:    1,
+		RefTime: 0,
+	}
+	raw, err := txConf.MarshalJSON()
+	a.So(err, should.BeNil)
 	correlationIDs := []string{"i3N84kvunPAS8wOmiEKbhsP62wNMRdmn", "deK3h59wUZhR0xb17eumTkauGQxoB5xn"}
-	res := ToTxAcknowledgment(correlationIDs)
-
-	if !a.So(res, should.Resemble, ttnpb.TxAcknowledgment{
+	var tokens io.DownlinkTokens
+	now := time.Now()
+	tokens.Next(correlationIDs, time.Unix(int64(0), 0))
+	var bsFormat basicstationFormat
+	txAck, parsedTime, err := bsFormat.ToTxAck(context.Background(), raw, tokens, now)
+	a.So(err, should.BeNil)
+	a.So(parsedTime.RefTime, should.Equal, txConf.RefTime)
+	if !a.So(txAck, should.Resemble, &ttnpb.TxAcknowledgment{
 		CorrelationIDs: correlationIDs,
 		Result:         ttnpb.TxAcknowledgment_SUCCESS,
 	}) {
-		t.Fatalf("Unexpected TxAck: %v", res)
+		t.Fatalf("Unexpected TxAck: %v", txAck)
 	}
 }

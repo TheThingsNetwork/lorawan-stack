@@ -12,36 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstationlns_test
+package ws_test
 
 import (
 	"context"
 	"time"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
-	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
-
-func newContextWithRightsFetcher(ctx context.Context) context.Context {
-	return rights.NewContextWithFetcher(
-		ctx,
-		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (set *ttnpb.Rights, err error) {
-			uid := unique.ID(ctx, ids)
-			if uid != registeredGatewayUID {
-				return
-			}
-			md := rpcmetadata.FromIncomingContext(ctx)
-			if md.AuthType != "Bearer" || md.AuthValue != registeredGatewayToken {
-				return
-			}
-			set = ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LINK)
-			return
-		}),
-	)
-}
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
 	for i := 0; i < 20; i++ {

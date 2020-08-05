@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package messages
+package util
 
 import (
 	"fmt"
@@ -27,15 +27,15 @@ import (
 func TestGetUint32IntegerAsByteSlice(t *testing.T) {
 	a := assertions.New(t)
 
-	b, err := getInt32AsByteSlice(0x12)
+	b, err := GetInt32AsByteSlice(0x12)
 	a.So(err, should.BeNil)
 	a.So(b, should.Resemble, []byte{0x12, 0, 0, 0})
 
-	b, err = getInt32AsByteSlice(0x12345678)
+	b, err = GetInt32AsByteSlice(0x12345678)
 	a.So(err, should.BeNil)
 	a.So(b, should.Resemble, []byte{0x78, 0x56, 0x34, 0x12})
 
-	b, err = getInt32AsByteSlice(0x7FFFFFFF)
+	b, err = GetInt32AsByteSlice(0x7FFFFFFF)
 	a.So(err, should.BeNil)
 	a.So(b, should.Resemble, []byte{0xFF, 0xFF, 0xFF, 0x7F})
 }
@@ -79,7 +79,7 @@ func TestGetDataRateFromDataRateIndex(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			dr, isLora, err := getDataRateFromIndex(tc.BandID, tc.DataRateIndex)
+			dr, isLora, err := GetDataRateFromIndex(tc.BandID, tc.DataRateIndex)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -142,7 +142,7 @@ func TestGetDataRateIndexFromDataRate(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			drIndex, err := getDataRateIndexFromDataRate(tc.BandID, tc.DataRate)
+			drIndex, err := GetDataRateIndexFromDataRate(tc.BandID, tc.DataRate)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -207,7 +207,7 @@ func TestGetFCtrlAsUint(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			a := assertions.New(t)
-			fCtrl := getFCtrlAsUint(ttnpb.FCtrl{
+			fCtrl := GetFCtrlAsUint(ttnpb.FCtrl{
 				ADR:       tc.ADR,
 				ADRAckReq: tc.ADRAckReq,
 				Ack:       tc.Ack,
