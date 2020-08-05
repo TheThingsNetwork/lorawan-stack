@@ -70,6 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Console webhook templates empty headers error.
 - Console MQTT URL validation.
 - AFCntDown from the application-layer is respected when skipping application payload crypto.
+- RTT usage for calculating downlink delta.
 
 ### Security
 
