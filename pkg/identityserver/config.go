@@ -18,12 +18,14 @@ import (
 	"context"
 	"time"
 
+	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/sendgrid"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/smtp"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // Config for the Identity Server
@@ -119,4 +121,48 @@ func (c emailTemplatesConfig) Fetcher(ctx context.Context, blobConf config.BlobC
 	default:
 		return nil, nil
 	}
+}
+
+func (c Config) toProto() *ttnpb.IsConfiguration {
+	return &ttnpb.IsConfiguration{
+		UserRegistration: &ttnpb.IsConfiguration_UserRegistration{
+			Invitation: &ttnpb.IsConfiguration_UserRegistration_Invitation{
+				Required: &types.BoolValue{Value: c.UserRegistration.Invitation.Required},
+				TokenTTL: &c.UserRegistration.Invitation.TokenTTL,
+			},
+			ContactInfoValidation: &ttnpb.IsConfiguration_UserRegistration_ContactInfoValidation{
+				Required: &types.BoolValue{Value: c.UserRegistration.ContactInfoValidation.Required},
+			},
+			AdminApproval: &ttnpb.IsConfiguration_UserRegistration_AdminApproval{
+				Required: &types.BoolValue{Value: c.UserRegistration.AdminApproval.Required},
+			},
+			PasswordRequirements: &ttnpb.IsConfiguration_UserRegistration_PasswordRequirements{
+				MinLength:    &types.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MinLength)},
+				MaxLength:    &types.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MaxLength)},
+				MinUppercase: &types.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MinUppercase)},
+				MinDigits:    &types.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MinDigits)},
+				MinSpecial:   &types.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MinSpecial)},
+			},
+		},
+		ProfilePicture: &ttnpb.IsConfiguration_ProfilePicture{
+			DisableUpload: &types.BoolValue{Value: c.ProfilePicture.DisableUpload},
+			UseGravatar:   &types.BoolValue{Value: c.ProfilePicture.UseGravatar},
+		},
+		EndDevicePicture: &ttnpb.IsConfiguration_EndDevicePicture{
+			DisableUpload: &types.BoolValue{Value: c.ProfilePicture.DisableUpload},
+		},
+		UserRights: &ttnpb.IsConfiguration_UserRights{
+			CreateApplications:  &types.BoolValue{Value: c.UserRights.CreateApplications},
+			CreateClients:       &types.BoolValue{Value: c.UserRights.CreateClients},
+			CreateGateways:      &types.BoolValue{Value: c.UserRights.CreateGateways},
+			CreateOrganizations: &types.BoolValue{Value: c.UserRights.CreateOrganizations},
+		},
+	}
+}
+
+// GetConfiguration implements the RPC that returns the configuration of the Identity Server.
+func (is *IdentityServer) GetConfiguration(ctx context.Context, _ *ttnpb.GetIsConfigurationRequest) (*ttnpb.GetIsConfigurationResponse, error) {
+	return &ttnpb.GetIsConfigurationResponse{
+		Configuration: is.configFromContext(ctx).toProto(),
+	}, nil
 }

@@ -17,7 +17,9 @@ syntax = "proto3";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/user.proto";
 import "lorawan-stack/api/oauth.proto";
@@ -52,4 +54,69 @@ service EntityAccess {
       get: "/auth_info"
     };
   };
+}
+
+message GetIsConfigurationRequest {
+
+}
+
+message IsConfiguration {
+  message UserRegistration {
+    message Invitation {
+      google.protobuf.BoolValue required = 1;
+      google.protobuf.Duration token_ttl = 2 [(gogoproto.customname) = "TokenTTL", (gogoproto.stdduration) = true];
+    }
+    Invitation invitation = 1;
+
+    message ContactInfoValidation {
+      google.protobuf.BoolValue required = 1;
+    }
+    ContactInfoValidation contact_info_validation = 2;
+
+    message AdminApproval {
+      google.protobuf.BoolValue required = 1;
+    }
+    AdminApproval admin_approval = 3;
+
+    message PasswordRequirements {
+      google.protobuf.UInt32Value min_length = 1;
+      google.protobuf.UInt32Value max_length = 2;
+      google.protobuf.UInt32Value min_uppercase = 3;
+      google.protobuf.UInt32Value min_digits = 4;
+      google.protobuf.UInt32Value min_special = 5;
+    }
+    PasswordRequirements password_requirements = 4;
+  }
+  UserRegistration user_registration = 3;
+
+  message ProfilePicture {
+    google.protobuf.BoolValue disable_upload = 1;
+    google.protobuf.BoolValue use_gravatar = 2;
+  }
+  ProfilePicture profile_picture = 4;
+
+  message EndDevicePicture {
+    google.protobuf.BoolValue disable_upload = 1;
+  }
+  EndDevicePicture end_device_picture = 5;
+
+  message UserRights {
+    google.protobuf.BoolValue create_applications = 1;
+    google.protobuf.BoolValue create_clients = 2;
+    google.protobuf.BoolValue create_gateways = 3;
+    google.protobuf.BoolValue create_organizations = 4;
+  }
+  UserRights user_rights = 6;
+}
+
+message GetIsConfigurationResponse {
+  IsConfiguration configuration = 1;
+}
+
+service Is {
+  rpc GetConfiguration(GetIsConfigurationRequest) returns (GetIsConfigurationResponse) {
+    option (google.api.http) = {
+      get: "/is/configuration"
+    };
+  }
 }

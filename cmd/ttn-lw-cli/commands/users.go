@@ -60,6 +60,28 @@ func getUserID(flagSet *pflag.FlagSet, args []string) *ttnpb.UserIdentifiers {
 	return &ttnpb.UserIdentifiers{UserID: userID}
 }
 
+func printPasswordRequirements(msg *ttnpb.IsConfiguration_UserRegistration_PasswordRequirements) {
+	if msg == nil {
+		return
+	}
+	logger.Info("Password Requirements:")
+	if v := msg.GetMinLength().GetValue(); v > 0 {
+		logger.Infof("Minimum length: %d", v)
+	}
+	if v := msg.GetMaxLength().GetValue(); v > 0 {
+		logger.Infof("Maximum length: %d", v)
+	}
+	if v := msg.GetMinUppercase().GetValue(); v > 0 {
+		logger.Infof("Minimum uppercase: %d", v)
+	}
+	if v := msg.GetMinDigits().GetValue(); v > 0 {
+		logger.Infof("Minimum digits: %d", v)
+	}
+	if v := msg.GetMinSpecial().GetValue(); v > 0 {
+		logger.Infof("Minimum special characters: %d", v)
+	}
+}
+
 var errPasswordMismatch = errors.DefineInvalidArgument("password_mismatch", "password did not match")
 
 var (
@@ -171,7 +193,23 @@ var (
 				return errNoUserID
 			}
 
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+
+			isConfig, err := ttnpb.NewIsClient(is).GetConfiguration(ctx, &ttnpb.GetIsConfigurationRequest{})
+			if err != nil {
+				if errors.IsUnimplemented(err) {
+					logger.Warn("Could not get user registration configuration from the server, but we can continue without it")
+				} else {
+					return err
+				}
+			}
+			registrationConfig := isConfig.GetConfiguration().GetUserRegistration()
+
 			if user.Password == "" {
+				printPasswordRequirements(registrationConfig.GetPasswordRequirements())
 				pw, err := gopass.GetPasswdPrompt("Please enter password:", true, os.Stdin, os.Stderr)
 				if err != nil {
 					return err
@@ -186,19 +224,17 @@ var (
 				}
 			}
 
-			if profilePicture, err := cmd.Flags().GetString("profile_picture"); err == nil && profilePicture != "" {
-				user.ProfilePicture, err = readPicture(profilePicture)
-				if err != nil {
-					return err
+			if !isConfig.GetConfiguration().GetProfilePicture().GetDisableUpload().GetValue() {
+				if profilePicture, err := cmd.Flags().GetString("profile_picture"); err == nil && profilePicture != "" {
+					user.ProfilePicture, err = readPicture(profilePicture)
+					if err != nil {
+						return err
+					}
 				}
 			}
 
 			invitationToken, _ := cmd.Flags().GetString("invitation-token")
 
-			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
-			if err != nil {
-				return err
-			}
 			res, err := ttnpb.NewUserRegistryClient(is).Create(ctx, &ttnpb.CreateUserRequest{
 				User:            user,
 				InvitationToken: invitationToken,
@@ -207,7 +243,18 @@ var (
 				return err
 			}
 
-			return io.Write(os.Stdout, config.OutputFormat, res)
+			if err = io.Write(os.Stdout, config.OutputFormat, res); err != nil {
+				return err
+			}
+
+			if registrationConfig.GetContactInfoValidation().GetRequired().GetValue() {
+				logger.Warn("You need to confirm your email address before you can use your user account")
+			}
+			if registrationConfig.GetAdminApproval().GetRequired().GetValue() {
+				logger.Warn("Your user account needs to be approved by an admin before you can use it")
+			}
+
+			return nil
 		}),
 	}
 	usersSetCommand = &cobra.Command{
@@ -291,6 +338,20 @@ var (
 				return errNoUserID
 			}
 
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+
+			isConfig, err := ttnpb.NewIsClient(is).GetConfiguration(ctx, &ttnpb.GetIsConfigurationRequest{})
+			if err != nil {
+				if errors.IsUnimplemented(err) {
+					logger.Warn("Could not get password requirements from the server, but we can continue without knowing those")
+				} else {
+					return err
+				}
+			}
+
 			old, _ := cmd.Flags().GetString("old")
 			if old == "" {
 				pw, err := gopass.GetPasswdPrompt("Please enter old password:", true, os.Stdin, os.Stderr)
@@ -302,6 +363,7 @@ var (
 
 			new, _ := cmd.Flags().GetString("new")
 			if new == "" {
+				printPasswordRequirements(isConfig.GetConfiguration().GetUserRegistration().GetPasswordRequirements())
 				pw, err := gopass.GetPasswdPrompt("Please enter new password:", true, os.Stdin, os.Stderr)
 				if err != nil {
 					return err
@@ -310,10 +372,7 @@ var (
 			}
 
 			revokeAllAccess, _ := cmd.Flags().GetBool("revoke-all-access")
-			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
-			if err != nil {
-				return err
-			}
+
 			res, err := ttnpb.NewUserRegistryClient(is).UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
 				UserIdentifiers: *usrID,
 				Old:             old,

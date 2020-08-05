@@ -63,6 +63,72 @@ var AuthInfoResponseFieldPathsTopLevel = []string{
 	"is_admin",
 	"universal_rights",
 }
+var GetIsConfigurationRequestFieldPathsNested []string
+var GetIsConfigurationRequestFieldPathsTopLevel []string
+var IsConfigurationFieldPathsNested = []string{
+	"end_device_picture",
+	"end_device_picture.disable_upload",
+	"profile_picture",
+	"profile_picture.disable_upload",
+	"profile_picture.use_gravatar",
+	"user_registration",
+	"user_registration.admin_approval",
+	"user_registration.admin_approval.required",
+	"user_registration.contact_info_validation",
+	"user_registration.contact_info_validation.required",
+	"user_registration.invitation",
+	"user_registration.invitation.required",
+	"user_registration.invitation.token_ttl",
+	"user_registration.password_requirements",
+	"user_registration.password_requirements.max_length",
+	"user_registration.password_requirements.min_digits",
+	"user_registration.password_requirements.min_length",
+	"user_registration.password_requirements.min_special",
+	"user_registration.password_requirements.min_uppercase",
+	"user_rights",
+	"user_rights.create_applications",
+	"user_rights.create_clients",
+	"user_rights.create_gateways",
+	"user_rights.create_organizations",
+}
+
+var IsConfigurationFieldPathsTopLevel = []string{
+	"end_device_picture",
+	"profile_picture",
+	"user_registration",
+	"user_rights",
+}
+var GetIsConfigurationResponseFieldPathsNested = []string{
+	"configuration",
+	"configuration.end_device_picture",
+	"configuration.end_device_picture.disable_upload",
+	"configuration.profile_picture",
+	"configuration.profile_picture.disable_upload",
+	"configuration.profile_picture.use_gravatar",
+	"configuration.user_registration",
+	"configuration.user_registration.admin_approval",
+	"configuration.user_registration.admin_approval.required",
+	"configuration.user_registration.contact_info_validation",
+	"configuration.user_registration.contact_info_validation.required",
+	"configuration.user_registration.invitation",
+	"configuration.user_registration.invitation.required",
+	"configuration.user_registration.invitation.token_ttl",
+	"configuration.user_registration.password_requirements",
+	"configuration.user_registration.password_requirements.max_length",
+	"configuration.user_registration.password_requirements.min_digits",
+	"configuration.user_registration.password_requirements.min_length",
+	"configuration.user_registration.password_requirements.min_special",
+	"configuration.user_registration.password_requirements.min_uppercase",
+	"configuration.user_rights",
+	"configuration.user_rights.create_applications",
+	"configuration.user_rights.create_clients",
+	"configuration.user_rights.create_gateways",
+	"configuration.user_rights.create_organizations",
+}
+
+var GetIsConfigurationResponseFieldPathsTopLevel = []string{
+	"configuration",
+}
 var AuthInfoResponse_APIKeyAccessFieldPathsNested = []string{
 	"api_key",
 	"api_key.id",
@@ -95,4 +161,93 @@ var AuthInfoResponse_APIKeyAccessFieldPathsNested = []string{
 var AuthInfoResponse_APIKeyAccessFieldPathsTopLevel = []string{
 	"api_key",
 	"entity_ids",
+}
+var IsConfiguration_UserRegistrationFieldPathsNested = []string{
+	"admin_approval",
+	"admin_approval.required",
+	"contact_info_validation",
+	"contact_info_validation.required",
+	"invitation",
+	"invitation.required",
+	"invitation.token_ttl",
+	"password_requirements",
+	"password_requirements.max_length",
+	"password_requirements.min_digits",
+	"password_requirements.min_length",
+	"password_requirements.min_special",
+	"password_requirements.min_uppercase",
+}
+
+var IsConfiguration_UserRegistrationFieldPathsTopLevel = []string{
+	"admin_approval",
+	"contact_info_validation",
+	"invitation",
+	"password_requirements",
+}
+var IsConfiguration_ProfilePictureFieldPathsNested = []string{
+	"disable_upload",
+	"use_gravatar",
+}
+
+var IsConfiguration_ProfilePictureFieldPathsTopLevel = []string{
+	"disable_upload",
+	"use_gravatar",
+}
+var IsConfiguration_EndDevicePictureFieldPathsNested = []string{
+	"disable_upload",
+}
+
+var IsConfiguration_EndDevicePictureFieldPathsTopLevel = []string{
+	"disable_upload",
+}
+var IsConfiguration_UserRightsFieldPathsNested = []string{
+	"create_applications",
+	"create_clients",
+	"create_gateways",
+	"create_organizations",
+}
+
+var IsConfiguration_UserRightsFieldPathsTopLevel = []string{
+	"create_applications",
+	"create_clients",
+	"create_gateways",
+	"create_organizations",
+}
+var IsConfiguration_UserRegistration_InvitationFieldPathsNested = []string{
+	"required",
+	"token_ttl",
+}
+
+var IsConfiguration_UserRegistration_InvitationFieldPathsTopLevel = []string{
+	"required",
+	"token_ttl",
+}
+var IsConfiguration_UserRegistration_ContactInfoValidationFieldPathsNested = []string{
+	"required",
+}
+
+var IsConfiguration_UserRegistration_ContactInfoValidationFieldPathsTopLevel = []string{
+	"required",
+}
+var IsConfiguration_UserRegistration_AdminApprovalFieldPathsNested = []string{
+	"required",
+}
+
+var IsConfiguration_UserRegistration_AdminApprovalFieldPathsTopLevel = []string{
+	"required",
+}
+var IsConfiguration_UserRegistration_PasswordRequirementsFieldPathsNested = []string{
+	"max_length",
+	"min_digits",
+	"min_length",
+	"min_special",
+	"min_uppercase",
+}
+
+var IsConfiguration_UserRegistration_PasswordRequirementsFieldPathsTopLevel = []string{
+	"max_length",
+	"min_digits",
+	"min_length",
+	"min_special",
+	"min_uppercase",
 }

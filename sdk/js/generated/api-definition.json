@@ -1964,6 +1964,18 @@
       ]
     }
   },
+  "Is": {
+    "GetConfiguration": {
+      "file": "lorawan-stack/api/identityserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/is/configuration",
+          "parameters": []
+        }
+      ]
+    }
+  },
   "ApplicationCryptoService": {
     "DeriveAppSKey": {
       "file": "lorawan-stack/api/joinserver.proto",

@@ -126,6 +126,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("identityserver")},
 		{cluster.HookName, c.ClusterAuthUnaryHook()},
 	} {
+		hooks.RegisterUnaryHook("/ttn.lorawan.v3.Is", hook.name, hook.middleware)
 		hooks.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationRegistry", hook.name, hook.middleware)
 		hooks.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationAccess", hook.name, hook.middleware)
 		hooks.RegisterUnaryHook("/ttn.lorawan.v3.ClientRegistry", hook.name, hook.middleware)
@@ -154,6 +155,7 @@ func (is *IdentityServer) withDatabase(ctx context.Context, f func(*gorm.DB) err
 
 // RegisterServices registers services provided by is at s.
 func (is *IdentityServer) RegisterServices(s *grpc.Server) {
+	ttnpb.RegisterIsServer(s, is)
 	ttnpb.RegisterEntityAccessServer(s, &entityAccess{IdentityServer: is})
 	ttnpb.RegisterApplicationRegistryServer(s, &applicationRegistry{IdentityServer: is})
 	ttnpb.RegisterApplicationAccessServer(s, &applicationAccess{IdentityServer: is})
