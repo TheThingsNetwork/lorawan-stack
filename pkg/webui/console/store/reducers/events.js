@@ -27,6 +27,11 @@ import {
 import CONNECTION_STATUS from '../../constants/connection-status'
 
 const addEvent = (state, event) => {
+  // See https://github.com/TheThingsNetwork/lorawan-stack/pull/2989
+  if (event.name === 'events.stream.start' || event.name === 'events.stream.stop') {
+    return state
+  }
+
   const currentEvents = state.events
   const eventTime = new Date(event.time).getTime()
 
