@@ -45,7 +45,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/basicstationlns"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/ns"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/packetbroker"
@@ -263,12 +263,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	}
 	for _, version := range []struct {
 		Name           string
-		Format         ws.Format
+		Formatter      ws.Formatter
 		listenerConfig listenerConfig
 	}{
 		{
-			Name:   "basicstation",
-			Format: basicstationlns.NewFormat(),
+			Name:      "basicstation",
+			Formatter: lbslns.NewFormatter(),
 			listenerConfig: listenerConfig{
 				fallbackFreqPlanID: conf.BasicStation.FallbackFrequencyPlanID,
 				listen:             conf.BasicStation.Listen,
@@ -285,7 +285,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		if version.listenerConfig.fallbackFreqPlanID != "" {
 			ctx = frequencyplans.WithFallbackID(ctx, version.listenerConfig.fallbackFreqPlanID)
 		}
-		webServer := ws.New(ctx, gs, version.Format, version.listenerConfig.frontend)
+		webServer := ws.New(ctx, gs, version.Formatter, version.listenerConfig.frontend)
 		for _, endpoint := range []component.Endpoint{
 			component.NewTCPEndpoint(version.listenerConfig.listen, version.Name),
 			component.NewTLSEndpoint(version.listenerConfig.listenTLS, version.Name, component.WithNextProtos("h2", "http/1.1")),

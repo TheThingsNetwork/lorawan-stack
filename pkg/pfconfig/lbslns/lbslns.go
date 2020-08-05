@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package basicstationlns implements the JSON configuration for the Basic Station `router_config` message.
-package basicstationlns
+// Package lbslns implements the JSON configuration for the LoRa Basics Station `router_config` message.
+package lbslns
 
 import (
 	"encoding/json"

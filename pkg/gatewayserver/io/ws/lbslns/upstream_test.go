@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstationlns
+package lbslns
 
 import (
 	"context"
@@ -655,7 +655,7 @@ func TestTxAck(t *testing.T) {
 	var tokens io.DownlinkTokens
 	now := time.Now()
 	tokens.Next(correlationIDs, time.Unix(int64(0), 0))
-	var bsFormat basicstationFormat
+	var bsFormat lbsLNS
 	txAck, parsedTime, err := bsFormat.ToTxAck(context.Background(), raw, tokens, now)
 	a.So(err, should.BeNil)
 	a.So(parsedTime.RefTime, should.Equal, txConf.RefTime)

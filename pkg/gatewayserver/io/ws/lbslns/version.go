@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstationlns
+package lbslns
 
 import (
 	"context"
@@ -25,7 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/basicstationlns"
+	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -65,7 +65,7 @@ func (v Version) IsProduction() bool {
 }
 
 // GetRouterConfig gets router config for the particular version message.
-func (basicstationFormat) GetRouterConfig(ctx context.Context, msg []byte, bandID string, fps map[string]*frequencyplans.FrequencyPlan, receivedAt time.Time) (context.Context, []byte, *ttnpb.GatewayStatus, error) {
+func (lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string, fps map[string]*frequencyplans.FrequencyPlan, receivedAt time.Time) (context.Context, []byte, *ttnpb.GatewayStatus, error) {
 	var version Version
 	if err := json.Unmarshal(msg, &version); err != nil {
 		return nil, nil, nil, err
@@ -111,6 +111,6 @@ func (basicstationFormat) GetRouterConfig(ctx context.Context, msg []byte, bandI
 }
 
 // ToStatus implements Format.
-func (basicstationFormat) ToStatus(ctx context.Context, message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb.GatewayStatus, error) {
+func (lbsLNS) ToStatus(ctx context.Context, message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb.GatewayStatus, error) {
 	return nil, nil
 }

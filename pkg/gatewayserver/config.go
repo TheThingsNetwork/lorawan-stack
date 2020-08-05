@@ -29,7 +29,7 @@ type UDPConfig struct {
 	Listeners  map[string]string `name:"listeners" description:"Listen addresses with (optional) fallback frequency plan ID for non-registered gateways"`
 }
 
-// BasicStationConfig defines the Basic Station configuration of the Gateway Server.
+// BasicStationConfig defines the LoRa Basics Station configuration of the Gateway Server.
 type BasicStationConfig struct {
 	ws.Config               `name:",squash"`
 	FallbackFrequencyPlanID string `name:"fallback-frequency-plan-id" description:"Fallback frequency plan ID for non-registered gateways"`

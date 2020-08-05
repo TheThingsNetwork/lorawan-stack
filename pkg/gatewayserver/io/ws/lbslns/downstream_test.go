@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstationlns
+package lbslns
 
 import (
 	"testing"
@@ -96,7 +96,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			var bsFormat basicstationFormat
+			var bsFormat lbsLNS
 			raw, err := bsFormat.FromDownlink(tc.GatewayIDs, tc.DownlinkMessage.GetRawPayload(), tc.DownlinkMessage.GetScheduled(), 0, time.Unix(1554300787, 123456000), 0x00)
 			a.So(err, should.BeNil)
 			var dnmsg DownlinkMessage

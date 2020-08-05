@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstationlns
+package lbslns
 
 import (
 	"encoding/hex"
@@ -26,7 +26,7 @@ import (
 
 var errDownlinkMessage = errors.Define("downlink_message", "could not translate downlink message")
 
-// DownlinkMessage is the LoRaWAN downlink message sent to the basic station.
+// DownlinkMessage is the LoRaWAN downlink message sent to the LoRa Basics Station.
 type DownlinkMessage struct {
 	DevEUI      string  `json:"DevEui"`
 	DeviceClass uint    `json:"dC"`
@@ -41,7 +41,7 @@ type DownlinkMessage struct {
 	MuxTime     float64 `json:"MuxTime"`
 }
 
-// marshalJSON implements json.Marshaler.
+// marshalJSON marshals dnmsg to a JSON byte array.
 func (dnmsg DownlinkMessage) marshalJSON() ([]byte, error) {
 	type Alias DownlinkMessage
 	return json.Marshal(struct {
@@ -53,13 +53,13 @@ func (dnmsg DownlinkMessage) marshalJSON() ([]byte, error) {
 	})
 }
 
-// marshalJSON implements json.Marshaler.
+// unmarshalJSON unmarshals dnmsg from a JSON byte array.
 func (dnmsg *DownlinkMessage) unmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, dnmsg)
 }
 
-// FromDownlink translates the ttnpb.DownlinkMessage to LNS DownlinkMessage "dnmsg".
-func (basicstationFormat) FromDownlink(ids ttnpb.GatewayIdentifiers, rawPayload []byte, scheduledMsg *ttnpb.TxSettings, dlToken int64, dlTime time.Time, xTime int64) ([]byte, error) {
+// FromDownlink implements Formatter.
+func (lbsLNS) FromDownlink(ids ttnpb.GatewayIdentifiers, rawPayload []byte, scheduledMsg *ttnpb.TxSettings, dlToken int64, dlTime time.Time, xTime int64) ([]byte, error) {
 	var dnmsg DownlinkMessage
 	dnmsg.Pdu = hex.EncodeToString(rawPayload)
 	dnmsg.RCtx = int64(scheduledMsg.Downlink.AntennaIndex)

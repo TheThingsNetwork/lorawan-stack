@@ -29,17 +29,17 @@ type ParsedTime struct {
 	RefTime float64
 }
 
-// Format abstracts messages to/from websocket based gateways.
-type Format interface {
+// Formatter abstracts messages to/from websocket based gateways.
+type Formatter interface {
 	// GetRouterConfig parses version messages, generates router config (for downstream) and a status message (for upstream).
 	GetRouterConfig(ctx context.Context, message []byte, bandID string, fps map[string]*frequencyplans.FrequencyPlan, receivedAt time.Time) (context.Context, []byte, *ttnpb.GatewayStatus, error)
 
 	// FromDownlink generates a downlink byte stream that can be sent over the WS connection.
 	FromDownlink(dids ttnpb.GatewayIdentifiers, rawPayload []byte, scheduledMsg *ttnpb.TxSettings, dlToken int64, dlTime time.Time, xTime int64) ([]byte, error)
 
-	// ToUplink parses Uplink ("updf")/Join Request ("jreq") messages into ttnpb.UplinkMessage.
+	// ToUplink parses Uplink/JoinRequest messages into ttnpb.UplinkMessage.
 	ToUplink(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time, msgType string) (*ttnpb.UplinkMessage, ParsedTime, error)
 
-	// ToTxAck extracts fields from the TxConfirmation ("dntxed") message and converts it to  ttnpb.TxAcknowledgment message.
+	// ToTxAck parses fields from the TxConfirmation message and converts it to  ttnpb.TxAcknowledgment message.
 	ToTxAck(ctx context.Context, message []byte, tokens io.DownlinkTokens, receivedAt time.Time) (*ttnpb.TxAcknowledgment, ParsedTime, error)
 }

@@ -64,14 +64,14 @@ type srv struct {
 	useTrafficTLSAddress bool
 	wsPingInterval       time.Duration
 	cfg                  Config
-	format               Format
+	formatter             Formatter
 }
 
 func (*srv) Protocol() string            { return "basicstation" }
 func (*srv) SupportsDownlinkClaim() bool { return false }
 
-// New creates the Basic Station front end.
-func New(ctx context.Context, server io.Server, format Format, cfg Config) *echo.Echo {
+// New creates the LoRa Basics Station front end.
+func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config) *echo.Echo {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
 
 	webServer := echo.New()
@@ -89,7 +89,7 @@ func New(ctx context.Context, server io.Server, format Format, cfg Config) *echo
 		server:    server,
 		upgrader:  &websocket.Upgrader{},
 		webServer: webServer,
-		format:    format,
+		formatter:    formatter,
 		cfg:       cfg,
 	}
 
@@ -313,7 +313,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					continue
 				}
 				xTime := int64(sID)<<48 | (int64(concentratorTime) / int64(time.Microsecond) & 0xFFFFFFFFFF)
-				dnmsg, err := s.format.FromDownlink(ids, down.GetRawPayload(), scheduledMsg, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime, xTime)
+				dnmsg, err := s.formatter.FromDownlink(ids, down.GetRawPayload(), scheduledMsg, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime, xTime)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
@@ -367,7 +367,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 
 		switch typ {
 		case TypeUpstreamVersion:
-			ctx, msg, stat, err := s.format.GetRouterConfig(ctx, data, bandID, fps, time.Now())
+			ctx, msg, stat, err := s.formatter.GetRouterConfig(ctx, data, bandID, fps, time.Now())
 			if err != nil {
 				logger.WithError(err).Warn("Failed to generate router configuration")
 				return err
@@ -385,7 +385,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			}
 
 		case TypeUpstreamJoinRequest, TypeUpstreamUplinkDataFrame:
-			up, parsedTime, err := s.format.ToUplink(ctx, data, ids, bandID, receivedAt, typ)
+			up, parsedTime, err := s.formatter.ToUplink(ctx, data, ids, bandID, receivedAt, typ)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse upstream message")
 				return err
@@ -401,7 +401,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			recordTime(parsedTime, receivedAt)
 
 		case TypeUpstreamTxConfirmation:
-			txAck, parsedTime, err := s.format.ToTxAck(ctx, data, s.tokens, receivedAt)
+			txAck, parsedTime, err := s.formatter.ToTxAck(ctx, data, s.tokens, receivedAt)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse tx confirmation frame")
 				return err

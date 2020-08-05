@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstationlns
+package lbslns
 
 import (
 	"context"
@@ -56,7 +56,7 @@ type RadioMetaData struct {
 	UpInfo    UpInfo `json:"upinfo"`
 }
 
-// JoinRequest is the LoRaWAN Join Request message from the BasicStation.
+// JoinRequest is the LoRaWAN Join Request message from LoRa Basics Station protocol.
 type JoinRequest struct {
 	MHdr     uint             `json:"MHdr"`
 	JoinEUI  basicstation.EUI `json:"JoinEui"`
@@ -79,7 +79,7 @@ func (req JoinRequest) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// UplinkDataFrame is the LoRaWAN Uplink message from the BasicStation.
+// UplinkDataFrame is the LoRaWAN Uplink message of the LoRa Basics Station protocol.
 type UplinkDataFrame struct {
 	MHdr       uint    `json:"MHdr"`
 	DevAddr    int32   `json:"DevAddr"`
@@ -128,7 +128,7 @@ func (conf TxConfirmation) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// toUplinkMessage extracts fields from the basic station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
+// toUplinkMessage extracts fields from the Basics Station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
 func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
 	up.ReceivedAt = receivedAt
@@ -198,7 +198,7 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	return &up, nil
 }
 
-// FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the Basic Station Join Request Frame.
+// FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the LoRa Basics Station Join Request Frame.
 func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string) error {
 	var payload ttnpb.Message
 	err := lorawan.UnmarshalMessage(up.RawPayload, &payload)
@@ -252,7 +252,7 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	return nil
 }
 
-// toUplinkMessage extracts fields from the basic station Uplink Data Frame "updf" message and converts them into an UplinkMessage for the network server.
+// toUplinkMessage extracts fields from the LoRa Basics Station Uplink Data Frame "updf" message and converts them into an UplinkMessage for the network server.
 func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
 	up.ReceivedAt = receivedAt
@@ -355,7 +355,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	return &up, nil
 }
 
-// FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the Basic Station UplinkDataFrame.
+// FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the LoRa Basics Station UplinkDataFrame.
 func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string) error {
 	var payload ttnpb.Message
 	err := lorawan.UnmarshalMessage(up.RawPayload, &payload)
@@ -406,7 +406,7 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 }
 
 // ToTxAck implements Format.
-func (basicstationFormat) ToTxAck(ctx context.Context, raw []byte, tokens io.DownlinkTokens, receivedAt time.Time) (*ttnpb.TxAcknowledgment, ws.ParsedTime, error) {
+func (lbsLNS) ToTxAck(ctx context.Context, raw []byte, tokens io.DownlinkTokens, receivedAt time.Time) (*ttnpb.TxAcknowledgment, ws.ParsedTime, error) {
 	var (
 		txConf TxConfirmation
 		txAck  ttnpb.TxAcknowledgment
@@ -428,7 +428,7 @@ func (basicstationFormat) ToTxAck(ctx context.Context, raw []byte, tokens io.Dow
 }
 
 // ToUplink implements Format.
-func (basicstationFormat) ToUplink(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time, msgType string) (*ttnpb.UplinkMessage, ws.ParsedTime, error) {
+func (lbsLNS) ToUplink(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time, msgType string) (*ttnpb.UplinkMessage, ws.ParsedTime, error) {
 	var (
 		up         *ttnpb.UplinkMessage
 		parsedTime ws.ParsedTime

@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstationlns
+package lbslns
 
 import "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 
-type basicstationFormat struct {
+type lbsLNS struct {
 }
 
-// NewFormat returns a new Basic Station LNS format.
-func NewFormat() ws.Format {
-	return basicstationFormat{}
+// NewFormatter returns a new LoRa Basic Station LNS formatter.
+func NewFormatter() ws.Formatter {
+	return lbsLNS{}
 }
