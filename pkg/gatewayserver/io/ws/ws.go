@@ -64,7 +64,7 @@ type srv struct {
 	useTrafficTLSAddress bool
 	wsPingInterval       time.Duration
 	cfg                  Config
-	formatter             Formatter
+	formatter            Formatter
 }
 
 func (*srv) Protocol() string            { return "basicstation" }
@@ -89,7 +89,7 @@ func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config)
 		server:    server,
 		upgrader:  &websocket.Upgrader{},
 		webServer: webServer,
-		formatter:    formatter,
+		formatter: formatter,
 		cfg:       cfg,
 	}
 

@@ -235,10 +235,13 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 				ID:      fmt.Sprintf("serve_mqtt/%s", endpoint.Address()),
 				Func: func(ctx context.Context) error {
 					l, err := gs.ListenTCP(endpoint.Address())
-					var lis net.Listener
-					if err == nil {
-						lis, err = endpoint.Listen(l)
+					if err != nil {
+						return errListenFrontend.WithCause(err).WithAttributes(
+							"address", endpoint.Address(),
+							"protocol", endpoint.Protocol(),
+						)
 					}
+					lis, err := endpoint.Listen(l)
 					if err != nil {
 						return errListenFrontend.WithCause(err).WithAttributes(
 							"address", endpoint.Address(),
@@ -299,10 +302,13 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 				ID:      fmt.Sprintf("serve_%s/%s", version.Name, endpoint.Address()),
 				Func: func(ctx context.Context) error {
 					l, err := gs.ListenTCP(endpoint.Address())
-					var lis net.Listener
-					if err == nil {
-						lis, err = endpoint.Listen(l)
+					if err != nil {
+						return errListenFrontend.WithCause(err).WithAttributes(
+							"address", endpoint.Address(),
+							"protocol", endpoint.Protocol(),
+						)
 					}
+					lis, err := endpoint.Listen(l)
 					if err != nil {
 						return errListenFrontend.WithCause(err).WithAttributes(
 							"address", endpoint.Address(),

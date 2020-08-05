@@ -21,8 +21,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 )
 
 // DefaultGatewayServerConfig is the default configuration for the GatewayServer.
