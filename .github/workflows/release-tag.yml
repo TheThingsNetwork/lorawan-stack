@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v3.[0-9]+.[0-9]+'
+      - 'v3.[0-9]+.[0-9]+-rc[0-9]'
 
 env:
   NODE_ENV: production
@@ -48,6 +49,11 @@ jobs:
       run: tools/bin/mage docs:build
       env:
         HUGO_BASE_URL: https://thethingsstack.io/
+        HUGO_GOOGLEANALYTICS: ${{ secrets.HUGO_GOOGLEANALYTICS }}
+        HUGO_PARAMS_FEEDBACK_CAMPAIGN: ${{ secrets.HUGO_PARAMS_FEEDBACK_CAMPAIGN }}
+        HUGO_PARAMS_FEEDBACK_ENABLED: true
+        HUGO_PARAMS_INTERCOM_APPID: ${{ secrets.HUGO_PARAMS_INTERCOM_APPID }}
+        HUGO_PARAMS_INTERCOM_ENABLED: true
         HUGO_PARAMS_SEARCH_APIKEY: ${{ secrets.HUGO_PARAMS_SEARCH_APIKEY }}
         HUGO_PARAMS_SEARCH_ENABLED: true
         HUGO_PARAMS_SEARCH_INDEX: thethingsstack
@@ -103,16 +109,6 @@ jobs:
       run: tools/bin/mage docs:deps
     - name: Build documentation
       run: tools/bin/mage docs:build
-      env:
-        HUGO_BASE_URL: https://thethingsstack.io/
-        HUGO_GOOGLEANALYTICS: ${{ secrets.HUGO_GOOGLEANALYTICS }}
-        HUGO_PARAMS_FEEDBACK_CAMPAIGN: ${{ HUGO_PARAMS_FEEDBACK_CAMPAIGN }}
-        HUGO_PARAMS_FEEDBACK_ENABLED: true
-        HUGO_PARAMS_INTERCOM_APPID: ${{ secrets.HUGO_PARAMS_INTERCOM_APPID }}
-        HUGO_PARAMS_INTERCOM_ENABLED: true
-        HUGO_PARAMS_SEARCH_APIKEY: ${{ secrets.HUGO_PARAMS_SEARCH_APIKEY }}
-        HUGO_PARAMS_SEARCH_ENABLED: true
-        HUGO_PARAMS_SEARCH_INDEX: thethingsstack
     - name: File versioning
       run: tools/bin/mage version:files
     - name: Check for diff
