@@ -630,6 +630,7 @@ go.opencensus.io v0.22.3 h1:8sGtKOrtQqkN1bp2AtX+misvLIlOmsEsNd+9NIcPEm8=
 go.opencensus.io v0.22.3/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=
 go.packetbroker.org/api/v3 v3.0.0 h1:RwpVsmLP9jRILTDBJ6ylo+g9szKxM/zWJle9XqN48bg=
 go.packetbroker.org/api/v3 v3.0.0/go.mod h1:pmw0HryGn2ElU9H+98RQb7jFUvq7feKwPGdmTPPkC2w=
+go.thethings.network/lorawan-stack v3.0.0-pre+incompatible h1:5I4+DbEyYFuWpR0jkF5NDh1HENTUFtNmhu++T4aQBHw=
 go.thethings.network/lorawan-stack-legacy/v2 v2.0.2 h1:AXv7hAtYj0dPocFF6rhWwW5WvOVSm/YNk3yihgNYcXE=
 go.thethings.network/lorawan-stack-legacy/v2 v2.0.2/go.mod h1:6ytuRb3k6/f/lJFvJpOaPS4abTDp2mdcE9EIZZV1v9U=
 go.uber.org/atomic v1.4.0/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=
