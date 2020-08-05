@@ -18,8 +18,8 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/basicstationlns"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
@@ -31,7 +31,7 @@ type UDPConfig struct {
 
 // BasicStationConfig defines the Basic Station configuration of the Gateway Server.
 type BasicStationConfig struct {
-	basicstationlns.Config  `name:",squash"`
+	ws.Config               `name:",squash"`
 	FallbackFrequencyPlanID string `name:"fallback-frequency-plan-id" description:"Fallback frequency plan ID for non-registered gateways"`
 	Listen                  string `name:"listen" description:"Address for the Basic Station frontend to listen on"`
 	ListenTLS               string `name:"listen-tls" description:"Address for the Basic Station frontend to listen on (with TLS)"`
