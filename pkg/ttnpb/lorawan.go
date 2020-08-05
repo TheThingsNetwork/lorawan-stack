@@ -686,6 +686,8 @@ func init() {
 	for i := range MACVersion_name {
 		MACVersion_value[MACVersion(i).String()] = i
 	}
+	MACVersion_value["1.0"] = int32(MAC_V1_0) // 1.0 is the official version number
+	MACVersion_value["1.1"] = int32(MAC_V1_1) // 1.1 is the official version number
 }
 
 // Compare compares MACVersions v to o:
@@ -797,6 +799,10 @@ func init() {
 	for i := range PHYVersion_name {
 		PHYVersion_value[PHYVersion(i).String()] = i
 	}
+	PHYVersion_value["1.0"] = int32(PHY_V1_0)           // 1.0 is the official version number
+	PHYVersion_value["1.0.2"] = int32(PHY_V1_0_2_REV_A) // Revisions were added from 1.0.2-b
+	PHYVersion_value["1.1-a"] = int32(PHY_V1_1_REV_A)   // 1.1 is the official version number
+	PHYVersion_value["1.1-b"] = int32(PHY_V1_1_REV_B)   // 1.1 is the official version number
 }
 
 // String implements fmt.Stringer.
