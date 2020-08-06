@@ -89,6 +89,7 @@ import style from './device.styl'
       'frequency_plan_id',
       'mac_settings.resets_f_cnt',
       'resets_join_nonces',
+      'supports_class_b',
       'supports_class_c',
       'supports_join',
       'lorawan_version',
