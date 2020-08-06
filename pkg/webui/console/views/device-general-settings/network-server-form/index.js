@@ -199,6 +199,11 @@ const NetworkServerForm = React.memo(props => {
       />
       <NsFrequencyPlansSelect name="frequency_plan_id" required />
       <Form.Field
+        title={sharedMessages.supportsClassB}
+        name="supports_class_b"
+        component={Checkbox}
+      />
+      <Form.Field
         title={sharedMessages.supportsClassC}
         name="supports_class_c"
         component={Checkbox}
