@@ -40,6 +40,12 @@ export const LORAWAN_PHY_VERSIONS = Object.freeze([
   { value: '1.1.0-b', label: 'PHY V1.1 REV B' },
 ])
 
+export const DEVICE_CLASSES = Object.freeze({
+  CLASS_A: 'a',
+  CLASS_B: 'b',
+  CLASS_C: 'c',
+})
+
 const lwRegexp = /^[1-9].[0-9].[0-9]$/
 const lwCache = {}
 

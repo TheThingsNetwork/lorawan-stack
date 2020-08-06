@@ -68,6 +68,7 @@ const defaultFormValues = {
   lorawan_phy_version: '',
   frequency_plan_id: '',
   supports_class_c: false,
+  supports_class_b: false,
   mac_settings: {
     resets_f_cnt: false,
   },
@@ -142,6 +143,12 @@ const NetworkSettingsForm = props => {
         name="lorawan_phy_version"
         component={Select}
         options={lorawanPhyVersionOptions}
+      />
+      <Form.Field
+        title={sharedMessages.supportsClassB}
+        name="supports_class_b"
+        component={Checkbox}
+        onChange={handleDeviceClassChange}
       />
       <Form.Field
         title={sharedMessages.supportsClassC}

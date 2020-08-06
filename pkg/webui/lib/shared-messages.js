@@ -292,6 +292,7 @@ export default defineMessages({
   status: 'Status',
   statusUnknown: 'Status unknown',
   success: 'Success',
+  supportsClassB: 'Supports class B',
   supportsClassC: 'Supports class C',
   takeMeBack: 'Take me back',
   termsAndCondition: 'Terms and conditions',
