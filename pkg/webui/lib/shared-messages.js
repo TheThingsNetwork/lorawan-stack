@@ -189,6 +189,7 @@ export default defineMessages({
   logout: 'Logout',
   longitude: 'Longitude',
   longitudeDesc: 'The east-west position in degrees, where 0 is the prime meridian (Greenwich)',
+  loraCloud: 'LoRa Cloud',
   lorawanInformation: 'LoRaWAN information',
   lorawanOptions: 'LoRaWAN options',
   lorawanPhyVersionDescription: 'The LoRaWAN PHY version of the end device',
