@@ -191,7 +191,7 @@ func (s *server) Login(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	hashedSecret, err := auth.Hash(ctx, tokenSecret)
+	hashedSecret, err := auth.Hash(auth.NewContextWithHashValidator(ctx, tokenHashSettings), tokenSecret)
 	if err != nil {
 		return err
 	}
