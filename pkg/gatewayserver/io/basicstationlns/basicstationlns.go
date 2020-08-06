@@ -334,20 +334,16 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		}
 	}()
 
-	var syncedConcentratorTime bool
 	recordXTime := func(timestamp int64, server time.Time) {
 		// The session is the 16 MSB.
 		atomic.StoreInt32(&sessionID, int32(timestamp>>48))
-		if !syncedConcentratorTime {
-			conn.SyncWithGatewayConcentrator(
-				// The concentrator timestamp is the 32 LSB.
-				uint32(timestamp&0xFFFFFFFF),
-				server,
-				// The Basic Station epoch is the 48 LSB.
-				scheduling.ConcentratorTime(time.Duration(timestamp&0xFFFFFFFFFF)*time.Microsecond),
-			)
-			syncedConcentratorTime = true
-		}
+		conn.SyncWithGatewayConcentrator(
+			// The concentrator timestamp is the 32 LSB.
+			uint32(timestamp&0xFFFFFFFF),
+			server,
+			// The Basic Station epoch is the 48 LSB.
+			scheduling.ConcentratorTime(time.Duration(timestamp&0xFFFFFFFFFF)*time.Microsecond),
+		)
 	}
 
 	for {
