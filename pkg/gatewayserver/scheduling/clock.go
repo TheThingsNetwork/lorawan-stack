@@ -59,10 +59,13 @@ func (c *RolloverClock) SyncTime() (time.Time, bool) {
 // Sync synchronizes the clock with the given concentrator timestamp and the server time.
 func (c *RolloverClock) Sync(timestamp uint32, server time.Time) ConcentratorTime {
 	rollovers := int64(c.absolute/ConcentratorTime(time.Microsecond)) >> 32
-	if passed := int64(timestamp) - int64(c.relative); passed < 0 {
+	// If the new timestamp is lower, it is considered a roll over if it advanced more than 25%.
+	// Otherwise, this is considered an out-of-order arrival.
+	if passed := int64(timestamp) - int64(c.relative); passed < -0x40000000 {
 		rollovers++
 	}
-	if c.server != nil {
+	// If there are full roll over windows between the last and the current server time, take these into account.
+	if c.server != nil && server.After(*c.server) {
 		rollovers += int64(server.Sub(*c.server)/time.Microsecond) >> 32
 	}
 	c.absolute = (ConcentratorTime(rollovers<<32) + ConcentratorTime(timestamp)) * ConcentratorTime(time.Microsecond)

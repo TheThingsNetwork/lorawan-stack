@@ -33,8 +33,8 @@ func TestRolloverClock(t *testing.T) {
 		Relative uint32
 	}{
 		{
-			Absolute: ConcentratorTime(10 * time.Second),
-			Relative: uint32(10000000),
+			Absolute: ConcentratorTime(20 * time.Minute),
+			Relative: uint32(20 * time.Minute / time.Microsecond),
 		},
 		{
 			// 1 rollover.
@@ -43,8 +43,8 @@ func TestRolloverClock(t *testing.T) {
 		},
 		{
 			// 3 rollovers (1 existing + 2 server time rollovers).
-			Absolute: ConcentratorTime(3<<32*time.Microsecond) + ConcentratorTime(10*time.Second),
-			Relative: uint32(10000000),
+			Absolute: ConcentratorTime(3<<32*time.Microsecond) + ConcentratorTime(30*time.Minute),
+			Relative: uint32(30 * time.Minute / time.Microsecond),
 		},
 		{
 			// 5 rollovers (3 existing + 1 concentrator timestamp rollover + 1 server time rollover).
@@ -120,4 +120,62 @@ func TestSyncWithGatewayConcentrator(t *testing.T) {
 	clock.SyncWithGatewayConcentrator(0x496054D6, time.Now(), ConcentratorTime(0xAA496054D6)*ConcentratorTime(time.Microsecond))
 	v := int64(clock.FromTimestampTime(0x499D5DD6)) / int64(time.Microsecond)
 	a.So(v, should.Equal, int64(0xAA499D5DD6))
+}
+
+// TestIssue2581 is a test case for resolving https://github.com/TheThingsNetwork/lorawan-stack/issues/2581.
+func TestIssue2581(t *testing.T) {
+	a := assertions.New(t)
+
+	clock := &RolloverClock{}
+
+	timestamps := []int64{
+		63331869818403100,
+		63331869827372300,
+		63331869837372200,
+		63331869847372000,
+		63331869857377000,
+		63331869867371600,
+		63331869877371600,
+		63331869878424700,
+		// snip
+		63331870307366100,
+		63331870317365900,
+		63331870327365900,
+		63331870337365800,
+		63331870337361700, // Before the previous one
+		63331870347365700,
+		63331870357365600,
+		63331870367365500,
+	}
+	var (
+		prev      *int64
+		sessionID int64
+	)
+	for i, xtimeIn := range timestamps {
+		xtimeIn := xtimeIn
+		diff := int64(0)
+		if prev != nil {
+			diff = xtimeIn - *prev
+		}
+		prev = &xtimeIn
+
+		// timestamp can go back, but serverTime is always increasing
+		timestamp := uint32(xtimeIn & 0xFFFFFFFF)
+		serverTime := time.Now()
+
+		if i == 0 {
+			t.Log("Synchronizing gateway concentrator")
+			sessionID = xtimeIn >> 48
+			clock.SyncWithGatewayConcentrator(timestamp, serverTime, ConcentratorTime(time.Duration(xtimeIn&0xFFFFFFFFFFFF)*time.Microsecond))
+		}
+		rx := clock.Sync(timestamp, serverTime)
+		tx := clock.FromTimestampTime(timestamp)
+
+		t.Logf("xtimeIn=%016X tmst=%08X concentrator=%016X received=%v diff=%d", xtimeIn, timestamp, tx/1000, serverTime, diff)
+
+		a.So(tx-rx, should.BeZeroValue)
+
+		xtimeOut := sessionID<<48 | (int64(tx) / int64(time.Microsecond) & 0xFFFFFFFFFF)
+		a.So(time.Duration(xtimeOut-xtimeIn)*time.Microsecond, should.BeZeroValue)
+	}
 }
