@@ -28,15 +28,12 @@ import PropTypes from '../../../lib/prop-types'
 })
 export default class Require extends Component {
   static propTypes = {
-    otherwise: PropTypes.shape({
-      redirect: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.func,
-      ]),
-      render: PropTypes.func,
-    }),
     children: PropTypes.node.isRequired,
     condition: PropTypes.bool.isRequired,
+    otherwise: PropTypes.shape({
+      redirect: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+      render: PropTypes.func,
+    }),
   }
   static defaultProps = {
     otherwise: undefined,
