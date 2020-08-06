@@ -317,6 +317,7 @@ export default defineMessages({
   statusDescription: 'The status of this gateway may be publicly displayed',
   statusUnknown: 'Status unknown',
   success: 'Success',
+  supportsClassB: 'Supports class B',
   supportsClassC: 'Supports class C',
   takeMeBack: 'Take me back',
   termsAndCondition: 'Terms and conditions',

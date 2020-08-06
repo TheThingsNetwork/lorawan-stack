@@ -21,6 +21,12 @@ export const ACTIVATION_MODES = Object.freeze({
   NONE: 'none',
 })
 
+export const DEVICE_CLASSES = Object.freeze({
+  CLASS_A: 'a',
+  CLASS_B: 'b',
+  CLASS_C: 'c',
+})
+
 export const PHY_V1_0 = { value: '1.0.0', label: 'PHY V1.0' }
 export const PHY_V1_0_1 = { value: '1.0.1', label: 'PHY V1.0.1' }
 export const PHY_V1_0_2_REV_A = { value: '1.0.2-a', label: 'PHY V1.0.2 REV A' }
