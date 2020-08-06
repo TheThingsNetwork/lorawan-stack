@@ -38,12 +38,12 @@ type organizationStore struct {
 
 // selectOrganizationFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
-	query = query.Preload("Account")
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
-		return query.Preload("Attributes")
+		return query.Preload("Attributes").Select([]string{"accounts.uid", "organizations.*"})
 	}
 	var organizationColumns []string
 	var notFoundPaths []string
+	organizationColumns = append(organizationColumns, "accounts.uid")
 	for _, column := range modelColumns {
 		organizationColumns = append(organizationColumns, "organizations."+column)
 	}
@@ -94,8 +94,8 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 		countTotal(ctx, query.Model(Organization{}))
 		query = query.Limit(limit).Offset(offset)
 	}
-	var orgModels []Organization
-	query = query.Preload("Account").Find(&orgModels)
+	var orgModels []organizationWithUID
+	query = query.Find(&orgModels)
 	setTotal(ctx, uint64(len(orgModels)))
 	if query.Error != nil {
 		return nil, query.Error
@@ -113,8 +113,8 @@ func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.Organ
 	defer trace.StartRegion(ctx, "get organization").End()
 	query := s.query(ctx, Organization{}, withOrganizationID(id.GetOrganizationID()))
 	query = selectOrganizationFields(ctx, query, fieldMask)
-	var orgModel Organization
-	if err := query.Preload("Account").First(&orgModel).Error; err != nil {
+	var orgModel organizationWithUID
+	if err := query.First(&orgModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(id)
 		}
@@ -129,8 +129,8 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 	defer trace.StartRegion(ctx, "update organization").End()
 	query := s.query(ctx, Organization{}, withOrganizationID(org.GetOrganizationID()))
 	query = selectOrganizationFields(ctx, query, fieldMask)
-	var orgModel Organization
-	if err = query.Preload("Account").First(&orgModel).Error; err != nil {
+	var orgModel organizationWithUID
+	if err = query.First(&orgModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(org.OrganizationIdentifiers)
 		}
@@ -141,7 +141,7 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 	}
 	oldAttributes := orgModel.Attributes
 	columns := orgModel.fromPB(org, fieldMask)
-	if err = s.updateEntity(ctx, &orgModel, columns...); err != nil {
+	if err = s.updateEntity(ctx, &orgModel.Organization, columns...); err != nil {
 		return nil, err
 	}
 	if !reflect.DeepEqual(oldAttributes, orgModel.Attributes) {
