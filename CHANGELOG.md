@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Troubleshooting guide.
 - API to get configuration from the Identity Server (including user registration options and password requirements).
 - Synchronize gateway time by uplink token on downstream in case the Gateway Server instance is not handling the upstream gateway connection.
+- Work-around for Basic Station gateways sending uplink frames with no `xtime`.
 
 ### Changed
 
@@ -84,6 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Console MQTT URL validation.
 - AFCntDown from the application-layer is respected when skipping application payload crypto.
 - RTT usage for calculating downlink delta.
+- Synchronize concentrator timestamp when uplink messages arrive out-of-order.
 
 ## [3.8.6] - 2020-07-10
 
