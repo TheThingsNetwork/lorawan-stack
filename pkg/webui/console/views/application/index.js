@@ -36,6 +36,7 @@ import ApplicationPayloadFormatters from '@console/views/application-payload-for
 import ApplicationIntegrationsWebhooks from '@console/views/application-integrations-webhooks'
 import ApplicationIntegrationsPubsubs from '@console/views/application-integrations-pubsubs'
 import ApplicationIntegrationsMqtt from '@console/views/application-integrations-mqtt'
+import ApplicationIntegrationsLoRaCloud from '@console/views/application-integrations-lora-cloud'
 import Devices from '@console/views/devices'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -50,6 +51,7 @@ import {
   mayEditBasicApplicationInfo,
   mayViewOrEditApplicationApiKeys,
   mayViewOrEditApplicationCollaborators,
+  mayViewOrEditApplicationPackages,
 } from '@console/lib/feature-checks'
 
 import {
@@ -193,6 +195,13 @@ export default class Application extends React.Component {
                 path={`${matchedUrl}/integrations/pubsubs`}
                 icon="extension"
               />
+              {mayViewOrEditApplicationPackages.check(rights) && (
+                <SideNavigation.Item
+                  title={sharedMessages.loraCloud}
+                  path={`${matchedUrl}/integrations/lora-cloud`}
+                  icon="extension"
+                />
+              )}
             </SideNavigation.Item>
           )}
           {mayViewOrEditApplicationCollaborators.check(rights) && (
@@ -232,6 +241,10 @@ export default class Application extends React.Component {
             component={ApplicationIntegrationsWebhooks}
           />
           <Route path={`${path}/integrations/pubsubs`} component={ApplicationIntegrationsPubsubs} />
+          <Route
+            path={`${path}/integrations/lora-cloud`}
+            component={ApplicationIntegrationsLoRaCloud}
+          />
           <NotFoundRoute />
         </Switch>
       </React.Fragment>
