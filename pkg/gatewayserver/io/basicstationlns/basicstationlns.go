@@ -431,6 +431,11 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				logger.WithError(err).Debug("Failed to parse join-request message")
 				return err
 			}
+			// TODO: Remove (https://github.com/lorabasics/basicstation/issues/74)
+			if jreq.UpInfo.XTime == 0 {
+				logger.Warn("Received join-request without xtime, drop message")
+				break
+			}
 			recordXTime(jreq.UpInfo.XTime, up.ReceivedAt)
 			if err := conn.HandleUp(up); err != nil {
 				logger.WithError(err).Warn("Failed to handle uplink message")
@@ -447,6 +452,11 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse uplink data frame")
 				return err
+			}
+			// TODO: Remove (https://github.com/lorabasics/basicstation/issues/74)
+			if updf.UpInfo.XTime == 0 {
+				logger.Warn("Received uplink data frame without xtime, drop message")
+				break
 			}
 			recordXTime(updf.UpInfo.XTime, up.ReceivedAt)
 			if err := conn.HandleUp(up); err != nil {
