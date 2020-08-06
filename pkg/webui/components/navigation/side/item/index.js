@@ -72,7 +72,10 @@ export class SideNavigationItem extends React.PureComponent {
     // on initial render, if applicable
     const { location, children } = this.props
     if (Boolean(children)) {
-      const paths = React.Children.map(children, child => child.props.path)
+      const paths = React.Children.toArray(children).reduce(
+        (paths, child) => [...paths, ...(Boolean(child) ? child.props.path : [])],
+        [],
+      )
       for (const path of paths) {
         if (location.pathname.startsWith(path)) {
           this.setState({ isExpanded: true })
