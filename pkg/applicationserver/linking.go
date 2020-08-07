@@ -301,8 +301,23 @@ func (as *ApplicationServer) getLink(ctx context.Context, ids ttnpb.ApplicationI
 	}
 }
 
+func (l *link) observeSubscribe(correlationID string, sub *io.Subscription) {
+	registerSubscribe(events.ContextWithCorrelationID(l.ctx, correlationID), sub)
+	log.FromContext(sub.Context()).Debug("Subscribed")
+}
+
+func (l *link) observeUnsubscribe(correlationID string, sub *io.Subscription) {
+	registerUnsubscribe(events.ContextWithCorrelationID(l.ctx, correlationID), sub)
+	log.FromContext(sub.Context()).Debug("Unsubscribed")
+}
+
 func (l *link) run() {
 	subscribers := make(map[*io.Subscription]string)
+	defer func() {
+		for sub, correlationID := range subscribers {
+			l.observeUnsubscribe(correlationID, sub)
+		}
+	}()
 	for {
 		select {
 		case <-l.ctx.Done():
@@ -310,13 +325,11 @@ func (l *link) run() {
 		case sub := <-l.subscribeCh:
 			correlationID := fmt.Sprintf("as:subscriber:%s", events.NewCorrelationID())
 			subscribers[sub] = correlationID
-			registerSubscribe(events.ContextWithCorrelationID(l.ctx, correlationID), sub)
-			log.FromContext(sub.Context()).Debug("Subscribed")
+			l.observeSubscribe(correlationID, sub)
 		case sub := <-l.unsubscribeCh:
 			if correlationID, ok := subscribers[sub]; ok {
 				delete(subscribers, sub)
-				registerUnsubscribe(events.ContextWithCorrelationID(l.ctx, correlationID), sub)
-				log.FromContext(sub.Context()).Debug("Unsubscribed")
+				l.observeUnsubscribe(correlationID, sub)
 			}
 		case up := <-l.upCh:
 			for sub := range subscribers {
