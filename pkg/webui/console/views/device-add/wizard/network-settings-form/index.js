@@ -38,6 +38,32 @@ import {
 
 import validationSchema from './validation-schema'
 
+const lorawanPhyMap = {
+  100: [{ value: '1.0.0', label: 'PHY V1.0' }],
+  101: [{ value: '1.0.1', label: 'PHY V1.0.1' }],
+  102: [
+    { value: '1.0.2-a', label: 'PHY V1.0.2 REV A' },
+    { value: '1.0.2-b', label: 'PHY V1.0.2 REV B' },
+  ],
+  103: [{ value: '1.0.3-a', label: 'PHY V1.0.3 REV A' }],
+  104: [{ value: '1.0.0', label: 'PHY V1.0' }, { value: '1.0.1', label: 'PHY V1.0.1' }],
+  110: [
+    { value: '1.1.0-a', label: 'PHY V1.1 REV A' },
+    { value: '1.1.0-b', label: 'PHY V1.1 REV B' },
+  ],
+  0: LORAWAN_PHY_VERSIONS,
+}
+
+/**
+ * Filters available lorawan phy versions by lorawan version.
+ *
+ * @param {number} version - Lorawan version.
+ * @returns {Array} - A list of matching lorawan phy version options based on `version`.
+ */
+const getLorawanPhyByVersion = version => {
+  return lorawanPhyMap[version] || LORAWAN_PHY_VERSIONS
+}
+
 const defaultFormValues = {
   lorawan_phy_version: '',
   frequency_plan_id: '',
@@ -60,13 +86,6 @@ const defaultFormValues = {
 const NetworkSettingsForm = props => {
   const { activationMode, lorawanVersion, error } = props
 
-  const validationContext = React.useMemo(
-    () => ({
-      activationMode,
-    }),
-    [activationMode],
-  )
-
   const [resetsFCnt, setResetsFCnt] = React.useState(false)
   const handleResetsFCntChange = React.useCallback(evt => {
     const { checked } = evt.target
@@ -78,9 +97,32 @@ const NetworkSettingsForm = props => {
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
   const lwVersion = parseLorawanMacVersion(lorawanVersion)
 
+  const lorawanPhyVersionOptions = React.useMemo(() => getLorawanPhyByVersion(lwVersion), [
+    lwVersion,
+  ])
+
+  const validationContext = React.useMemo(
+    () => ({
+      activationMode,
+    }),
+    [activationMode],
+  )
+  const initialFormValues = React.useMemo(
+    () =>
+      validationSchema.cast(
+        {
+          ...defaultFormValues,
+          lorawan_phy_version:
+            lorawanPhyVersionOptions.length > 1 ? '' : lorawanPhyVersionOptions[0].value,
+        },
+        { context: validationContext },
+      ),
+    [lorawanPhyVersionOptions, validationContext],
+  )
+
   return (
     <Wizard.Form
-      initialValues={defaultFormValues}
+      initialValues={initialFormValues}
       validationSchema={validationSchema}
       validationContext={validationContext}
       error={error}
@@ -99,7 +141,7 @@ const NetworkSettingsForm = props => {
         title={sharedMessages.phyVersion}
         name="lorawan_phy_version"
         component={Select}
-        options={LORAWAN_PHY_VERSIONS}
+        options={lorawanPhyVersionOptions}
       />
       <Form.Field
         title={sharedMessages.supportsClassC}
