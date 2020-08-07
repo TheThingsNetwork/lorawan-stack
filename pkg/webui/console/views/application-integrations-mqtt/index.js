@@ -25,6 +25,7 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import DataSheet from '@ttn-lw/components/data-sheet'
 import Button from '@ttn-lw/components/button'
+import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorView from '@ttn-lw/lib/components/error-view'
@@ -46,7 +47,7 @@ const m = defineMessages({
   publicAddress: 'Public address',
   publicTlsAddress: 'Public TLS address',
   generateApiKey: 'Generate new API key',
-  viewApiKeys: 'View API keys',
+  goToApiKeys: 'Go to API keys',
   mqttInfoText:
     'The Application Server exposes an MQTT server to work with streaming events. In order to use the MQTT server you need to create a new API key, which will function as connection password. You can also use an existing API key, as long as it has the necessary rights granted. Use the connection information below to connect.',
   connectionCredentials: 'Connection credentials',
@@ -157,7 +158,9 @@ export default class ApplicationMqtt extends React.Component {
               message={m.generateApiKey}
               onClick={this.handleGeneratePasswordClick}
             />
-            <Button.Link to={`/applications/${appId}/api-keys`} message={m.viewApiKeys} secondary />
+            <Link to={`/applications/${appId}/api-keys`} secondary>
+              <Message content={m.goToApiKeys} />
+            </Link>
           </React.Fragment>
         ),
       })
