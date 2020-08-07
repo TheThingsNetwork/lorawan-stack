@@ -163,8 +163,8 @@ const DocLink = function(props) {
       name={name}
       onClick={onClick}
     >
+      <Icon className={style.docIcon} icon="book" />
       {children}
-      <Icon className={style.icon} icon="launch" />
     </a>
   )
 }

@@ -33,7 +33,7 @@ storiesOf('Link', module)
       </div>
       <div>
         <span style={titleStyle}>doc link:</span>
-        <Link.DocLink path="/">Show more</Link.DocLink>
+        <Link.DocLink path="/getting-started">Getting Started</Link.DocLink>
       </div>
     </div>
   ))
@@ -50,12 +50,6 @@ storiesOf('Link', module)
         <Link.Anchor href="/">
           <div style={divStyle} />
         </Link.Anchor>
-      </div>
-      <div>
-        <span style={titleStyle}>doc linked block element:</span>
-        <Link.DocLink path="/">
-          <div style={divStyle} />
-        </Link.DocLink>
       </div>
     </div>
   ))
