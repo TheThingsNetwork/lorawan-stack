@@ -165,6 +165,7 @@ const DocLink = function(props) {
     >
       <Icon className={style.docIcon} icon="book" />
       {children}
+      <Icon className={style.icon} icon="launch" />
     </a>
   )
 }
