@@ -31,7 +31,7 @@ require (
 	github.com/chrj/smtpd v0.1.2
 	github.com/disintegration/imaging v1.6.2
 	github.com/eclipse/paho.mqtt.golang v1.2.0
-	github.com/envoyproxy/protoc-gen-validate v0.3.0-java
+	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/felixge/httpsnoop v1.0.1
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/getsentry/sentry-go v0.6.1
@@ -112,7 +112,6 @@ require (
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
 	golang.org/x/sys v0.0.0-20200519105757-fe76b779f299 // indirect
-	golang.org/x/tools v0.0.0-20200519205726-57a9e4404bf7 // indirect
 	google.golang.org/api v0.24.0
 	google.golang.org/genproto v0.0.0-20200507105951-43844f6eee31
 	google.golang.org/grpc v1.29.1
