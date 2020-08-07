@@ -257,7 +257,6 @@ export default defineMessages({
   pubsubs: 'Pub/Subs',
   redirecting: 'Redirecting…',
   refresh: 'Refresh',
-  refreshPage: 'Refresh page',
   removeCollaborator: 'Remove collaborator',
   resetsFCnt: 'Resets frame counters',
   resetsJoinNonces: 'Resets join nonces',
