@@ -15,7 +15,6 @@
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 
-import Button from '@ttn-lw/components/button'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -25,11 +24,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { isBackend, isNotFoundError, httpStatusCode } from '@ttn-lw/lib/errors/utils'
 import errorMessages from '@ttn-lw/lib/errors/error-messages'
 import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './sub-view.styl'
-
-const reload = () => location.reload()
 
 const SubViewError = function({ error }) {
   const isNotFound = isNotFoundError(error)
@@ -61,14 +57,6 @@ const SubViewError = function({ error }) {
               <hr />
               <ErrorMessage content={error} />
             </React.Fragment>
-          )}
-          {!isNotFoundError(error) && (
-            <Button
-              className={style.button}
-              icon="refresh"
-              message={sharedMessages.refreshPage}
-              onClick={reload}
-            />
           )}
         </Col>
       </Row>

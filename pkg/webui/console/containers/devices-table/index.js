@@ -148,6 +148,7 @@ class DevicesTable extends React.Component {
           message={sharedMessages.importDevices}
           icon="import_devices"
           to={`/applications/${appId}/devices/import`}
+          secondary
         />
       )
     )
