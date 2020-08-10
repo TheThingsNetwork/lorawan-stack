@@ -707,5 +707,8 @@
   "oauth.views.update-password.index.sessionRevoked": "Session revoked",
   "oauth.views.validate.index.validateSuccess": "Contact info validated",
   "oauth.views.validate.index.validateFail": "There was an error and the contact info could not be validated",
-  "oauth.views.validate.index.goToLogin": "Go to login"
+  "oauth.views.validate.index.goToLogin": "Go to login",
+  "oauth.views.validate.index.tokenNotFoundTitle": "Token not found",
+  "oauth.views.validate.index.tokenNotFoundMessage": "The validation token was not found. This could mean that the contact info has already been validated. Otherwise, please contact an administrator.",
+  "oauth.views.validate.index.contactInfoValidation": "Contact info validation"
 }

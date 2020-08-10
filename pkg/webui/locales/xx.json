@@ -707,5 +707,8 @@
   "oauth.views.update-password.index.sessionRevoked": "Xxxxxxx xxxxxxx",
   "oauth.views.validate.index.validateSuccess": "Xxxxxxx xxxx xxxxxxxxx",
   "oauth.views.validate.index.validateFail": "Xxxxx xxx xx xxxxx xxx xxx xxxxxxx xxxx xxxxx xxx xx xxxxxxxxx",
-  "oauth.views.validate.index.goToLogin": "Xx xx xxxxx"
+  "oauth.views.validate.index.goToLogin": "Xx xx xxxxx",
+  "oauth.views.validate.index.tokenNotFoundTitle": "Xxxxx xxx xxxxx",
+  "oauth.views.validate.index.tokenNotFoundMessage": "Xxx xxxxxxxxxx xxxxx xxx xxx xxxxx. Xxxx xxxxx xxxx xxxx xxx xxxxxxx xxxx xxx xxxxxxx xxxx xxxxxxxxx. Xxxxxxxxx, xxxxxx xxxxxxx xx xxxxxxxxxxxxx.",
+  "oauth.views.validate.index.contactInfoValidation": "Xxxxxxx xxxx xxxxxxxxxx"
 }
