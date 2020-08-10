@@ -16,6 +16,8 @@ import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 
+import LORA_CLOUD_DAS from '@console/constants/lora-cloud-das'
+
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -74,8 +76,8 @@ const LoRaCloudForm = () => {
     async values => {
       try {
         const result = await dispatch(
-          attachPromise(setAppPkgDefaultAssoc)(appId, 199, {
-            package_name: 'lora-cloud-device-management-v1',
+          attachPromise(setAppPkgDefaultAssoc)(appId, LORA_CLOUD_DAS.DEFAULT_PORT, {
+            package_name: LORA_CLOUD_DAS.DEFAULT_PACKAGE_NAME,
             ...values,
           }),
         )
@@ -97,7 +99,9 @@ const LoRaCloudForm = () => {
   ])
 
   return (
-    <RequireRequest requestAction={getAppPkgDefaultAssoc(appId, 199, selector)}>
+    <RequireRequest
+      requestAction={getAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, selector)}
+    >
       <Form
         error={error}
         validationSchema={validationSchema}
