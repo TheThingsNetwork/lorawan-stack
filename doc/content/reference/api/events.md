@@ -28,3 +28,7 @@ description: ""
 {{< proto/message message="Event.Authentication" >}}
 
 {{< proto/message message="StreamEventsRequest" >}}
+
+## Events
+
+{{< events >}}
