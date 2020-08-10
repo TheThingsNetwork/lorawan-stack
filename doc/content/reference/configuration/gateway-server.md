@@ -27,7 +27,7 @@ The Gateway Server can be configured to update the location of gateway antennas 
 ## Security Options
 
 - `gs.require-registered-gateways`: Require the gateways to be registered in the Identity Server
-- `gs.basic-station.allow-unauthenticated`: Allow unauthenticated Basic Station connections. This is set to `true` by default.  Unset to enforce auth check for production clusters.
+- `gs.basic-station.allow-unauthenticated`: Allow unauthenticated Basic Station connections. This is set to `false` by default. Set to disable auth check for testing.
 
 ## Basic Station Options
 
