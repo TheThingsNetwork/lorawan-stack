@@ -138,16 +138,6 @@ func DefaultStartTask(conf *TaskConfig) {
 	}()
 }
 
-func (c *Component) NewTaskConfig(id string, fn TaskFunc, restart TaskRestart, backoff *TaskBackoffConfig) *TaskConfig {
-	return &TaskConfig{
-		Context: c.Context(),
-		ID:      id,
-		Func:    fn,
-		Restart: restart,
-		Backoff: backoff,
-	}
-}
-
 func (c *Component) StartTask(conf *TaskConfig) {
 	c.taskStarter.StartTask(conf)
 }
