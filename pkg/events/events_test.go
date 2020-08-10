@@ -70,6 +70,15 @@ func TestNew(t *testing.T) {
 	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs("x-forwarded-for", "30.30.30.30, 20.20.20.20"))
 	evt = events.New(ctx, "test.evt", "test event", events.WithAuthFromContext())
 	a.So(evt.AuthRemoteIP(), should.Equal, "30.30.30.30")
+
+	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs("user-agent", "agent/0.1"))
+	evt = events.New(ctx, "test.evt", "test event", events.WithAuthFromContext())
+	a.So(evt.UserAgent(), should.Equal, "agent/0.1")
+
+	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs("grpcgateway-user-agent", "agent-from-grpcgateway-header/0.2"))
+	evt = events.New(ctx, "test.evt", "test event", events.WithAuthFromContext())
+	a.So(evt.UserAgent(), should.Equal, "agent-from-grpcgateway-header/0.2")
+
 }
 
 func TestEvents(t *testing.T) {

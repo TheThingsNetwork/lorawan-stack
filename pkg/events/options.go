@@ -93,3 +93,12 @@ func WithAuthFromContext() Option {
 		}
 	})
 }
+
+// WithUserAgentFromContext returns an option that extracts the UserAgent from the request context.
+func WithUserAgentFromContext() Option {
+	return optionFunc(func(e *event) {
+		if md := rpcmetadata.FromIncomingContext(e.ctx); md.UserAgent != "" {
+			e.innerEvent.UserAgent = md.UserAgent
+		}
+	})
+}

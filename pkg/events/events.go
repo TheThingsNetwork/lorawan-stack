@@ -48,6 +48,7 @@ type Event interface {
 	AuthTokenID() string
 	AuthTokenType() string
 	AuthRemoteIP() string
+	UserAgent() string
 }
 
 func local(evt Event) *event {
@@ -133,6 +134,7 @@ func (e event) CorrelationIDs() []string                { return e.innerEvent.Co
 func (e event) Origin() string                          { return e.innerEvent.Origin }
 func (e event) Caller() string                          { return e.caller }
 func (e event) Visibility() *ttnpb.Rights               { return e.innerEvent.Visibility }
+func (e event) UserAgent() string                       { return e.innerEvent.UserAgent }
 func (e event) AuthType() string {
 	if e.innerEvent.Authentication == nil {
 		return ""

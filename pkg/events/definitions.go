@@ -39,6 +39,7 @@ func (d *definition) With(options ...Option) Builder {
 
 var defaultOptions = []Option{
 	WithVisibility(ttnpb.RIGHT_ALL),
+	WithUserAgentFromContext(),
 }
 
 func (d *definition) New(ctx context.Context, opts ...Option) Event {
