@@ -29,7 +29,7 @@ You may want to run this commands from time to time.
 
 This section explains how to get a bare-bones version of The Things Stack running on your local machine. This will build whatever code is present in your local repository (along with local changes) and run in it using the default ports.
 
-If you want to just run a docker image of The Things Stack, then check the [Installation](https://thethingsstack.io/latest/getting-started/installation/) section of the documentation.
+If you want to just run a docker image of The Things Stack, then check the [Installation](https://thethingsstack.io/getting-started/installation/) section of the documentation.
 
 ### Pre-requisites
 
@@ -84,7 +84,7 @@ In a web browser, navigate to `http://localhost:1885/` and login using credentia
 
 6. Customizing configuration
 
-To customize the configuration, copy the configuration file `/config/stack/ttn-lw-stack.yml` to a different location (ex: the `.env` folder in your repo). The configuration is documented in the [Configuration Reference](https://thethingsstack.io/latest/reference/configuration/).
+To customize the configuration, copy the configuration file `/config/stack/ttn-lw-stack.yml` to a different location (ex: the `.env` folder in your repo). The configuration is documented in the [Configuration Reference](https://thethingsstack.io/reference/configuration/).
 
 You can now use the modified configuration with
 
