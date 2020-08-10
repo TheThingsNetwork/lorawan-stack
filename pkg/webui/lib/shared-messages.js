@@ -345,6 +345,8 @@ export default defineMessages({
   validateDelayFormat: '{field} must be a positive, whole number',
   validateEmail: 'An email address must use exactly one "@" and use no special characters',
   validateHexLength: '{field} must be a complete hex value',
+  validateFreqNumberic: 'All frequency values must be positive integers',
+  validateFreqRequired: 'All frequency values are required. Please remove empty entries.',
   validateIdFormat: '{field} must contain only lowercase letters, numbers and dashes (-)',
   validateInt32: '{field} must be a whole number, negative or positive',
   validateLatitude: 'Latitude must be a whole or decimal number between -90 and 90',

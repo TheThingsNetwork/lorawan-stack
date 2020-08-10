@@ -15,7 +15,21 @@
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { ACTIVATION_MODES, parseLorawanMacVersion } from '@console/lib/device-utils'
+import { ACTIVATION_MODES, parseLorawanMacVersion, DEVICE_CLASSES } from '@console/lib/device-utils'
+
+const factoryPresetFreqNumericTest = frequencies => {
+  return frequencies.every(freq => {
+    if (typeof freq !== 'undefined') {
+      return !isNaN(parseInt(freq))
+    }
+
+    return true
+  })
+}
+
+const factoryPresetFreqRequiredTest = frequencies => {
+  return frequencies.every(freq => typeof freq !== 'undefined' && freq !== '')
+}
 
 const validationSchema = Yup.object({
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
@@ -43,7 +57,7 @@ const validationSchema = Yup.object({
       })
     }),
     rx1_data_rate_offset: Yup.number().when('$activationMode', {
-      is: mode => mode === ACTIVATION_MODES.ABP || mode === ACTIVATION_MODES.OTAA,
+      is: ACTIVATION_MODES.ABP,
       then: schema =>
         schema
           .min(0, Yup.passValues(sharedMessages.validateNumberGte))
@@ -75,11 +89,36 @@ const validationSchema = Yup.object({
       return Yup.object().when('$isClassB', {
         is: true,
         then: schema =>
-          schema.shape({
-            value: Yup.string(),
-          }),
+          schema
+            .shape({
+              value: Yup.string(),
+            })
+            .required(sharedMessages.validateRequired),
         otherwise: schema => schema.strip(),
       })
+    }),
+    ping_slot_frequency: Yup.number().when('$isClassB', {
+      is: true,
+      then: schema => schema.min(100000, Yup.passValues(sharedMessages.validateNumberGte)),
+      otherwise: schema => schema.strip(),
+    }),
+    factory_preset_frequencies: Yup.lazy(frequencies => {
+      if (!Boolean(frequencies)) {
+        return Yup.array().strip()
+      }
+
+      return Yup.array()
+        .default([])
+        .test(
+          'is-valid-frequency',
+          sharedMessages.validateFreqNumberic,
+          factoryPresetFreqNumericTest,
+        )
+        .test(
+          'is-empty-frequency',
+          sharedMessages.validateFreqRequired,
+          factoryPresetFreqRequiredTest,
+        )
     }),
     supports_32_bit_f_cnt: Yup.boolean().default(true),
   }),
@@ -124,6 +163,21 @@ const validationSchema = Yup.object({
       })
     },
   ),
+  _device_class: Yup.mixed().when(['$activationMode'], (mode, schema) => {
+    const isMulticast = mode === ACTIVATION_MODES.MULTICAST
+
+    if (isMulticast) {
+      return schema
+        .oneOf([DEVICE_CLASSES.CLASS_B, DEVICE_CLASSES.CLASS_C])
+        .default(DEVICE_CLASSES.CLASS_B)
+        .required(sharedMessages.validateRequired)
+    }
+
+    return schema
+      .oneOf(Object.values(DEVICE_CLASSES))
+      .default(DEVICE_CLASSES.CLASS_A)
+      .required(sharedMessages.validateRequired)
+  }),
 }).noUnknown()
 
 export default validationSchema
