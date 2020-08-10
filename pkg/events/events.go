@@ -170,6 +170,31 @@ func New(ctx context.Context, name, description string, opts ...Option) Event {
 	return (&definition{name: name, description: description}).New(ctx, opts...)
 }
 
+func marshalData(data interface{}) (*pbtypes.Any, error) {
+	var (
+		any *pbtypes.Any
+		err error
+	)
+	if protoMessage, ok := data.(proto.Message); ok {
+		any, err = pbtypes.MarshalAny(protoMessage)
+	} else if errData, ok := data.(error); ok {
+		if ttnErrData, ok := errors.From(errData); ok {
+			any, err = pbtypes.MarshalAny(ttnpb.ErrorDetailsToProto(ttnErrData))
+		} else {
+			any, err = pbtypes.MarshalAny(&pbtypes.StringValue{Value: errData.Error()})
+		}
+	} else {
+		value, err := gogoproto.Value(data)
+		if err != nil {
+			return nil, err
+		}
+		if _, isNull := value.Kind.(*pbtypes.Value_NullValue); !isNull {
+			any, err = pbtypes.MarshalAny(value)
+		}
+	}
+	return any, err
+}
+
 // Proto returns the protobuf representation of the event.
 func Proto(e Event) (*ttnpb.Event, error) {
 	evt := local(e)
@@ -181,23 +206,7 @@ func Proto(e Event) (*ttnpb.Event, error) {
 	pb.Context = ctx
 	if evt.data != nil {
 		var err error
-		if protoMessage, ok := evt.data.(proto.Message); ok {
-			pb.Data, err = pbtypes.MarshalAny(protoMessage)
-		} else if errData, ok := evt.data.(error); ok {
-			if ttnErrData, ok := errors.From(errData); ok {
-				pb.Data, err = pbtypes.MarshalAny(ttnpb.ErrorDetailsToProto(ttnErrData))
-			} else {
-				pb.Data, err = pbtypes.MarshalAny(&pbtypes.StringValue{Value: errData.Error()})
-			}
-		} else {
-			value, err := gogoproto.Value(evt.data)
-			if err != nil {
-				return nil, err
-			}
-			if _, isNull := value.Kind.(*pbtypes.Value_NullValue); !isNull {
-				pb.Data, err = pbtypes.MarshalAny(value)
-			}
-		}
+		pb.Data, err = marshalData(e.Data())
 		if err != nil {
 			return nil, err
 		}
