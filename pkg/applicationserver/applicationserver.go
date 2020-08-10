@@ -1025,6 +1025,8 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 		session = dev.Session
 	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, msg.SessionKeyID):
 		session = dev.PendingSession
+	default:
+		return errUnknownSession.New()
 	}
 	if session.GetAppSKey() == nil {
 		return errNoAppSKey.New()
