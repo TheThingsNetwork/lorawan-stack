@@ -67,7 +67,6 @@ const Notification = function({
             <Message content={content} values={messageValues} />
             {action && (
               <Button
-                naked
                 secondary
                 icon={buttonIcon}
                 onClick={action}
