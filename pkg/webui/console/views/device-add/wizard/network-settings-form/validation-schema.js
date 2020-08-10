@@ -25,16 +25,63 @@ const validationSchema = Yup.object({
   supports_class_c: Yup.boolean().default(false),
   supports_join: Yup.boolean().default(false),
   multicast: Yup.boolean().default(false),
-  mac_settings: Yup.object().when(['$activationMode'], (mode, schema) => {
-    if (mode === ACTIVATION_MODES.ABP) {
-      return schema.shape({
-        resets_f_cnt: Yup.boolean().default(true),
-        supports_32_bit_f_cnt: Yup.boolean().default(true),
+  mac_settings: Yup.object({
+    rx1_delay: Yup.lazy(delay => {
+      if (!Boolean(delay) || typeof delay.value === 'undefined') {
+        return Yup.object().strip()
+      }
+
+      return Yup.object().when('$activationMode', {
+        is: ACTIVATION_MODES.ABP,
+        then: schema =>
+          schema.shape({
+            value: Yup.number()
+              .min(1, Yup.passValues(sharedMessages.validateNumberGte))
+              .max(15, Yup.passValues(sharedMessages.validateNumberLte)),
+          }),
+        otherwise: schema => schema.strip(),
       })
-    }
-    return schema.shape({
-      supports_32_bit_f_cnt: Yup.boolean().default(true),
-    })
+    }),
+    rx1_data_rate_offset: Yup.number().when('$activationMode', {
+      is: mode => mode === ACTIVATION_MODES.ABP || mode === ACTIVATION_MODES.OTAA,
+      then: schema =>
+        schema
+          .min(0, Yup.passValues(sharedMessages.validateNumberGte))
+          .max(7, Yup.passValues(sharedMessages.validateNumberLte)),
+      otherwise: schema => schema.strip(),
+    }),
+    resets_f_cnt: Yup.boolean().when('$activationMode', {
+      is: ACTIVATION_MODES.ABP,
+      then: schema => schema.default(false),
+      otherwise: schema => schema.strip(),
+    }),
+    rx2_data_rate_index: Yup.lazy(dataRate => {
+      if (!Boolean(dataRate) || typeof dataRate.value === 'undefined') {
+        return Yup.object().strip()
+      }
+
+      return Yup.object({
+        value: Yup.number()
+          .min(0, Yup.passValues(sharedMessages.validateNumberGte))
+          .max(15, Yup.passValues(sharedMessages.validateNumberLte)),
+      })
+    }),
+    rx2_frequency: Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte)),
+    ping_slot_periodicity: Yup.lazy(periodicity => {
+      if (!Boolean(periodicity) || typeof periodicity.value === 'undefined') {
+        return Yup.object().strip()
+      }
+
+      return Yup.object().when('$isClassB', {
+        is: true,
+        then: schema =>
+          schema.shape({
+            value: Yup.string(),
+          }),
+        otherwise: schema => schema.strip(),
+      })
+    }),
+    supports_32_bit_f_cnt: Yup.boolean().default(true),
   }),
   session: Yup.object().when(
     ['lorawan_version', '$activationMode'],
