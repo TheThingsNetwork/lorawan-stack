@@ -2704,9 +2704,11 @@ Event:
   name: Event
   fields:
   - name: name
+    comment: Name of the event. This can be used to find the (localized) event description.
     type: string
     default: ""
   - name: time
+    comment: Time at which the event was triggered.
     message:
       package: google.protobuf
       name: Timestamp
@@ -2714,25 +2716,30 @@ Event:
       required: true
     default: "0001-01-01T00:00:00Z"
   - name: identifiers
+    comment: Identifiers of the entity (or entities) involved.
     repeated:
       message:
         name: EntityIdentifiers
     default: []
   - name: data
+    comment: Optional data attached to the event.
     message:
       package: google.protobuf
       name: Any
     default: null
   - name: correlation_ids
+    comment: Correlation IDs can be used to find related events and actions such as API calls.
     repeated:
       type: string
       rules:
         max_len: 100
     default: []
   - name: origin
+    comment: The origin of the event. Typically the hostname of the server that created it.
     type: string
     default: ""
   - name: context
+    comment: Event context, internal use only.
     map_key:
       type: string
     map_value:
@@ -2744,25 +2751,31 @@ Event:
       name: Rights
     default: {}
   - name: authentication
+    comment: Details on the authentication provided by the caller that triggered this event.
     message:
       name: Event.Authentication
     default: {}
   - name: remote_ip
+    comment: The IP address of the caller that triggered this event.
     type: string
     default: ""
   - name: user_agent
+    comment: The IP address of the caller that triggered this event.
     type: string
     default: ""
 Event.Authentication:
   name: Event.Authentication
   fields:
   - name: type
+    comment: The type of authentication that was used. This is typically a bearer token.
     type: string
     default: ""
   - name: token_type
+    comment: The type of token that was used. Common types are APIKey, AccessToken and SessionToken.
     type: string
     default: ""
   - name: token_id
+    comment: The ID of the token that was used.
     type: string
     default: ""
 FCtrl:

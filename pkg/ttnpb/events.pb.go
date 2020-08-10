@@ -41,20 +41,30 @@ var _ = time.Kitchen
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type Event struct {
-	Name           string               `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Time           time.Time            `protobuf:"bytes,2,opt,name=time,proto3,stdtime" json:"time"`
-	Identifiers    []*EntityIdentifiers `protobuf:"bytes,3,rep,name=identifiers,proto3" json:"identifiers,omitempty"`
-	Data           *types.Any           `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
-	CorrelationIDs []string             `protobuf:"bytes,5,rep,name=correlation_ids,json=correlationIds,proto3" json:"correlation_ids,omitempty"`
-	Origin         string               `protobuf:"bytes,6,opt,name=origin,proto3" json:"origin,omitempty"`
-	Context        map[string][]byte    `protobuf:"bytes,7,rep,name=context,proto3" json:"context,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Name of the event. This can be used to find the (localized) event description.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Time at which the event was triggered.
+	Time time.Time `protobuf:"bytes,2,opt,name=time,proto3,stdtime" json:"time"`
+	// Identifiers of the entity (or entities) involved.
+	Identifiers []*EntityIdentifiers `protobuf:"bytes,3,rep,name=identifiers,proto3" json:"identifiers,omitempty"`
+	// Optional data attached to the event.
+	Data *types.Any `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
+	// Correlation IDs can be used to find related events and actions such as API calls.
+	CorrelationIDs []string `protobuf:"bytes,5,rep,name=correlation_ids,json=correlationIds,proto3" json:"correlation_ids,omitempty"`
+	// The origin of the event. Typically the hostname of the server that created it.
+	Origin string `protobuf:"bytes,6,opt,name=origin,proto3" json:"origin,omitempty"`
+	// Event context, internal use only.
+	Context map[string][]byte `protobuf:"bytes,7,rep,name=context,proto3" json:"context,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// The event will be visible to a caller that has any of these rights.
-	Visibility           *Rights               `protobuf:"bytes,8,opt,name=visibility,proto3" json:"visibility,omitempty"`
-	Authentication       *Event_Authentication `protobuf:"bytes,9,opt,name=authentication,proto3" json:"authentication,omitempty"`
-	RemoteIP             string                `protobuf:"bytes,10,opt,name=remote_ip,json=remoteIp,proto3" json:"remote_ip,omitempty"`
-	UserAgent            string                `protobuf:"bytes,11,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	Visibility *Rights `protobuf:"bytes,8,opt,name=visibility,proto3" json:"visibility,omitempty"`
+	// Details on the authentication provided by the caller that triggered this event.
+	Authentication *Event_Authentication `protobuf:"bytes,9,opt,name=authentication,proto3" json:"authentication,omitempty"`
+	// The IP address of the caller that triggered this event.
+	RemoteIP string `protobuf:"bytes,10,opt,name=remote_ip,json=remoteIp,proto3" json:"remote_ip,omitempty"`
+	// The IP address of the caller that triggered this event.
+	UserAgent            string   `protobuf:"bytes,11,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Event) Reset()      { *m = Event{} }
@@ -167,8 +177,11 @@ func (m *Event) GetUserAgent() string {
 }
 
 type Event_Authentication struct {
-	Type                 string   `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	TokenType            string   `protobuf:"bytes,2,opt,name=token_type,json=tokenType,proto3" json:"token_type,omitempty"`
+	// The type of authentication that was used. This is typically a bearer token.
+	Type string `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	// The type of token that was used. Common types are APIKey, AccessToken and SessionToken.
+	TokenType string `protobuf:"bytes,2,opt,name=token_type,json=tokenType,proto3" json:"token_type,omitempty"`
+	// The ID of the token that was used.
 	TokenID              string   `protobuf:"bytes,3,opt,name=token_id,json=tokenId,proto3" json:"token_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
