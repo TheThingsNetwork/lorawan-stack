@@ -30,7 +30,7 @@ On your gateway, set the following configuration fields.
 
 The `<server-address>` is the address of {{% tts %}}. If you followed the [Getting Started guide]({{< ref "/getting-started" >}}) this is the same as what you use instead of `thethings.example.com`.
 
-The `<gateway-api-key>` is the API Key you created above. Copy your gateway API Key in to a `gateway-api.key` file (the filename is not important) as an HTTP header in the following format:
+The `<gateway-api-key>` is the API Key you created above. Create a file named `gateway-api.key` and copy your gateway API Key in as an HTTP header in the following format:
 
 ```
 Authorization: <gateway-api-key>
