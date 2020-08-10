@@ -10472,6 +10472,9 @@
         },
         "authentication": {
           "$ref": "#/definitions/EventAuthentication"
+        },
+        "user_agent": {
+          "type": "string"
         }
       }
     },

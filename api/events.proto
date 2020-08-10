@@ -43,6 +43,7 @@ message Event {
     string remote_ip = 4 [(gogoproto.customname) = "RemoteIP"];
   }
   Authentication authentication = 9;
+  string user_agent = 10;
 }
 
 message StreamEventsRequest {

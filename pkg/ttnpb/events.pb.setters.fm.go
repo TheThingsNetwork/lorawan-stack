@@ -126,6 +126,16 @@ func (dst *Event) SetFields(src *Event, paths ...string) error {
 					dst.Authentication = nil
 				}
 			}
+		case "user_agent":
+			if len(subs) > 0 {
+				return fmt.Errorf("'user_agent' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UserAgent = src.UserAgent
+			} else {
+				var zero string
+				dst.UserAgent = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

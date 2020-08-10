@@ -15,6 +15,7 @@ var EventFieldPathsNested = []string{
 	"name",
 	"origin",
 	"time",
+	"user_agent",
 	"visibility",
 	"visibility.rights",
 }
@@ -28,6 +29,7 @@ var EventFieldPathsTopLevel = []string{
 	"name",
 	"origin",
 	"time",
+	"user_agent",
 	"visibility",
 }
 var StreamEventsRequestFieldPathsNested = []string{

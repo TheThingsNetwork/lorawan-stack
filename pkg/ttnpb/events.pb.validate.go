@@ -125,6 +125,8 @@ func (m *Event) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "user_agent":
+			// no validation rules for UserAgent
 		default:
 			return EventValidationError{
 				field:  name,

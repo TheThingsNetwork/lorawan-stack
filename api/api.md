@@ -2534,6 +2534,7 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 | `context` | [`Event.ContextEntry`](#ttn.lorawan.v3.Event.ContextEntry) | repeated |  |
 | `visibility` | [`Rights`](#ttn.lorawan.v3.Rights) |  | The event will be visible to a caller that has any of these rights. |
 | `authentication` | [`Event.Authentication`](#ttn.lorawan.v3.Event.Authentication) |  |  |
+| `user_agent` | [`string`](#string) |  |  |
 
 #### Field Rules
 
