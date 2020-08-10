@@ -47,6 +47,7 @@ var (
 	evtUpdateUser = events.Define(
 		"user.update", "update user",
 		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithUpdatedFieldsDataType(),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)

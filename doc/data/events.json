@@ -29,7 +29,8 @@
   },
   "application.update": {
     "name": "application.update",
-    "description": "update application"
+    "description": "update application",
+    "data": {"@type":"type.googleapis.com/google.protobuf.Value","value":["list.of","updated.fields"]}
   },
   "as.application.subscribe": {
     "name": "as.application.subscribe",
@@ -69,7 +70,8 @@
   },
   "as.end_device.update": {
     "name": "as.end_device.update",
-    "description": "update end device"
+    "description": "update end device",
+    "data": {"@type":"type.googleapis.com/google.protobuf.Value","value":["list.of","updated.fields"]}
   },
   "as.link.fail": {
     "name": "as.link.fail",
@@ -149,7 +151,8 @@
   },
   "client.update": {
     "name": "client.update",
-    "description": "update OAuth client"
+    "description": "update OAuth client",
+    "data": {"@type":"type.googleapis.com/google.protobuf.Value","value":["list.of","updated.fields"]}
   },
   "end_device.create": {
     "name": "end_device.create",
@@ -161,7 +164,8 @@
   },
   "end_device.update": {
     "name": "end_device.update",
-    "description": "update end device"
+    "description": "update end device",
+    "data": {"@type":"type.googleapis.com/google.protobuf.Value","value":["list.of","updated.fields"]}
   },
   "gateway.api-key.create": {
     "name": "gateway.api-key.create",
@@ -193,7 +197,8 @@
   },
   "gateway.update": {
     "name": "gateway.update",
-    "description": "update gateway"
+    "description": "update gateway",
+    "data": {"@type":"type.googleapis.com/google.protobuf.Value","value":["list.of","updated.fields"]}
   },
   "gs.down.send": {
     "name": "gs.down.send",
@@ -261,7 +266,8 @@
   },
   "js.end_device.update": {
     "name": "js.end_device.update",
-    "description": "update end device"
+    "description": "update end device",
+    "data": {"@type":"type.googleapis.com/google.protobuf.Value","value":["list.of","updated.fields"]}
   },
   "js.join.accept": {
     "name": "js.join.accept",
@@ -325,7 +331,8 @@
   },
   "ns.end_device.update": {
     "name": "ns.end_device.update",
-    "description": "update end device"
+    "description": "update end device",
+    "data": {"@type":"type.googleapis.com/google.protobuf.Value","value":["list.of","updated.fields"]}
   },
   "ns.mac.adr_param_setup.answer": {
     "name": "ns.mac.adr_param_setup.answer",
@@ -605,7 +612,8 @@
   },
   "organization.update": {
     "name": "organization.update",
-    "description": "update organization"
+    "description": "update organization",
+    "data": {"@type":"type.googleapis.com/google.protobuf.Value","value":["list.of","updated.fields"]}
   },
   "user.api-key.create": {
     "name": "user.api-key.create",
@@ -629,7 +637,8 @@
   },
   "user.update": {
     "name": "user.update",
-    "description": "update user"
+    "description": "update user",
+    "data": {"@type":"type.googleapis.com/google.protobuf.Value","value":["list.of","updated.fields"]}
   },
   "user.update.incorrect_password": {
     "name": "user.update.incorrect_password",

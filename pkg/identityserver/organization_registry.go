@@ -37,6 +37,7 @@ var (
 	evtUpdateOrganization = events.Define(
 		"organization.update", "update organization",
 		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
+		events.WithUpdatedFieldsDataType(),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)

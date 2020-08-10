@@ -37,6 +37,7 @@ var (
 	evtUpdateGateway = events.Define(
 		"gateway.update", "update gateway",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
+		events.WithUpdatedFieldsDataType(),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)

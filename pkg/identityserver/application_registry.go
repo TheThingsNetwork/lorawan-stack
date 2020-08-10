@@ -37,6 +37,7 @@ var (
 	evtUpdateApplication = events.Define(
 		"application.update", "update application",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_INFO),
+		events.WithUpdatedFieldsDataType(),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
