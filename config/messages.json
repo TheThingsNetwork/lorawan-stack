@@ -5750,6 +5750,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:device_exists": {
+    "translations": {
+      "en": "device already exists"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/networkserver:device_not_found": {
     "translations": {
       "en": "device not found"

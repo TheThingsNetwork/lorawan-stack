@@ -1664,7 +1664,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		return nil
 	})
 	if err != nil && !setErr && !addErr {
-		log.FromContext(ctx).WithError(err).Error("Failed to pop device from downlink schedule")
+		log.FromContext(ctx).WithError(err).Error("Failed to pop entry from downlink task queue")
 	}
 	return err
 }
