@@ -46,35 +46,41 @@ func (as *ApplicationServer) linkAll(ctx context.Context) error {
 
 func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.ApplicationIdentifiers) {
 	ctx = log.NewContextWithField(ctx, "application_uid", unique.ID(ctx, ids))
-	as.StartTask(ctx, "link", func(ctx context.Context) error {
-		target, err := as.linkRegistry.Get(ctx, ids, []string{
-			"network_server_address",
-			"api_key",
-			"default_formatters",
-			"skip_payload_crypto",
-		})
-		if err != nil {
-			if !errors.IsNotFound(err) {
-				log.FromContext(ctx).WithError(err).Error("Failed to get link")
+	as.StartTask(&component.TaskConfig{
+		Context: ctx,
+		ID:      "link",
+		Func: func(ctx context.Context) error {
+			target, err := as.linkRegistry.Get(ctx, ids, []string{
+				"network_server_address",
+				"api_key",
+				"default_formatters",
+				"skip_payload_crypto",
+			})
+			if err != nil {
+				if !errors.IsNotFound(err) {
+					log.FromContext(ctx).WithError(err).Error("Failed to get link")
+				}
+				return nil
 			}
-			return nil
-		}
 
-		err = as.link(ctx, ids, target)
-		switch {
-		case errors.IsFailedPrecondition(err),
-			errors.IsUnauthenticated(err),
-			errors.IsPermissionDenied(err),
-			errors.IsInvalidArgument(err):
-			log.FromContext(ctx).WithError(err).Warn("Failed to link")
-			return nil
-		case errors.IsCanceled(err),
-			errors.IsAlreadyExists(err):
-			return nil
-		default:
-			return err
-		}
-	}, component.TaskRestartOnFailure, 0.1, component.TaskBackoffDial...)
+			err = as.link(ctx, ids, target)
+			switch {
+			case errors.IsFailedPrecondition(err),
+				errors.IsUnauthenticated(err),
+				errors.IsPermissionDenied(err),
+				errors.IsInvalidArgument(err):
+				log.FromContext(ctx).WithError(err).Warn("Failed to link")
+				return nil
+			case errors.IsCanceled(err),
+				errors.IsAlreadyExists(err):
+				return nil
+			default:
+				return err
+			}
+		},
+		Restart: component.TaskRestartOnFailure,
+		Backoff: component.DialTaskBackoffConfig,
+	})
 }
 
 type upstreamTrafficHandler func(context.Context, *ttnpb.ApplicationUp, *link) (pass bool, err error)

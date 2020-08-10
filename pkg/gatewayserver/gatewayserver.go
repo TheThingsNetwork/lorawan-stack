@@ -182,8 +182,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	for addr, fallbackFrequencyPlanID := range conf.UDP.Listeners {
 		addr := addr
 		fallbackFrequencyPlanID := fallbackFrequencyPlanID
-		gs.RegisterTask(gs.Context(), fmt.Sprintf("serve_udp/%s", addr),
-			func(ctx context.Context) error {
+		gs.RegisterTask(&component.TaskConfig{
+			Context: gs.Context(),
+			ID:      fmt.Sprintf("serve_udp/%s", addr),
+			Func: func(ctx context.Context) error {
 				var conn *net.UDPConn
 				conn, err = gs.ListenUDP(addr)
 				if err != nil {
@@ -198,7 +200,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 					lisCtx = frequencyplans.WithFallbackID(ctx, fallbackFrequencyPlanID)
 				}
 				return udp.Serve(lisCtx, gs, conn, conf.UDP.Config)
-			}, component.TaskRestartOnFailure)
+			},
+			Restart: component.TaskRestartOnFailure,
+			Backoff: component.DefaultTaskBackoffConfig,
+		})
 	}
 
 	// Start MQTT listeners.
@@ -224,8 +229,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 			if endpoint.Address() == "" {
 				continue
 			}
-			gs.RegisterTask(gs.Context(), fmt.Sprintf("serve_mqtt/%s", endpoint.Address()),
-				func(ctx context.Context) error {
+			gs.RegisterTask(&component.TaskConfig{
+				Context: gs.Context(),
+				ID:      fmt.Sprintf("serve_mqtt/%s", endpoint.Address()),
+				Func: func(ctx context.Context) error {
 					l, err := gs.ListenTCP(endpoint.Address())
 					var lis net.Listener
 					if err == nil {
@@ -239,7 +246,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 					}
 					defer lis.Close()
 					return mqtt.Serve(ctx, gs, lis, version.Format, endpoint.Protocol())
-				}, component.TaskRestartOnFailure)
+				},
+				Restart: component.TaskRestartOnFailure,
+				Backoff: component.DefaultTaskBackoffConfig,
+			})
 		}
 	}
 
@@ -261,8 +271,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		if endpoint.Address() == "" {
 			continue
 		}
-		gs.RegisterTask(gs.Context(), fmt.Sprintf("serve_basicstation/%s", endpoint.Address()),
-			func(ctx context.Context) error {
+		gs.RegisterTask(&component.TaskConfig{
+			Context: gs.Context(),
+			ID:      fmt.Sprintf("serve_basicstation/%s", endpoint.Address()),
+			Func: func(ctx context.Context) error {
 				l, err := gs.ListenTCP(endpoint.Address())
 				var lis net.Listener
 				if err == nil {
@@ -287,7 +299,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 					srv.Close()
 				}()
 				return srv.Serve(lis)
-			}, component.TaskRestartOnFailure)
+			},
+			Restart: component.TaskRestartOnFailure,
+			Backoff: component.DefaultTaskBackoffConfig,
+		})
 	}
 
 	return gs, nil
@@ -479,12 +494,15 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 
 	for name, handler := range gs.upstreamHandlers {
 		handler := handler
-		gs.StartTask(conn.Context(), fmt.Sprintf("%s_connect_gateway_%s", name, ids.GatewayID),
-			func(ctx context.Context) error {
+		gs.StartTask(&component.TaskConfig{
+			Context: conn.Context(),
+			ID:      fmt.Sprintf("%s_connect_gateway_%s", name, ids.GatewayID),
+			Func: func(ctx context.Context) error {
 				return handler.ConnectGateway(ctx, ids, conn)
 			},
-			component.TaskRestartOnFailure, 0.1, component.TaskBackoffDial...,
-		)
+			Restart: component.TaskRestartOnFailure,
+			Backoff: component.DialTaskBackoffConfig,
+		})
 	}
 	return conn, nil
 }
