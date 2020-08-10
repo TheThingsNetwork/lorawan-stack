@@ -23,21 +23,26 @@ var (
 	evtUserLogin = events.Define(
 		"oauth.user.login", "login user successful",
 		events.WithVisibility(ttnpb.RIGHT_USER_ALL),
+		events.WithAuthFromContext(),
 	)
 	evtUserLoginFailed = events.Define(
 		"oauth.user.login_failed", "login user failure",
 		events.WithVisibility(ttnpb.RIGHT_USER_ALL),
+		events.WithAuthFromContext(),
 	)
 	evtUserLogout = events.Define(
 		"oauth.user.logout", "logout user",
 		events.WithVisibility(ttnpb.RIGHT_USER_ALL),
+		events.WithAuthFromContext(),
 	)
 	evtAuthorize = events.Define(
 		"oauth.authorize", "authorize OAuth client",
 		events.WithVisibility(ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS),
+		events.WithAuthFromContext(),
 	)
 	evtTokenExchange = events.Define(
 		"oauth.token.exchange", "exchange OAuth access token",
 		events.WithVisibility(ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS),
+		events.WithAuthFromContext(),
 	)
 )

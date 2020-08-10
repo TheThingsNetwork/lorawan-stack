@@ -31,14 +31,17 @@ var (
 	evtCreateApplication = events.Define(
 		"application.create", "create application",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_INFO),
+		events.WithAuthFromContext(),
 	)
 	evtUpdateApplication = events.Define(
 		"application.update", "update application",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_INFO),
+		events.WithAuthFromContext(),
 	)
 	evtDeleteApplication = events.Define(
 		"application.delete", "delete application",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_INFO),
+		events.WithAuthFromContext(),
 	)
 )
 
