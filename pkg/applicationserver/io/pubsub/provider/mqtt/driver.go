@@ -165,8 +165,8 @@ type subscription struct {
 const subscriptionQueueSize = 16
 
 // OpenSubscription returns a *pubsub.Subscription that subscribes to the given topic name with the given MQTT client.
-func OpenSubscription(client mqtt.Client, topicName string, timeout time.Duration, qos byte) (*pubsub.Subscription, error) {
-	ds, err := openDriverSubscription(client, topicName, timeout, qos)
+func OpenSubscription(ctx context.Context, client mqtt.Client, topicName string, timeout time.Duration, qos byte) (*pubsub.Subscription, error) {
+	ds, err := openDriverSubscription(ctx, client, topicName, timeout, qos)
 	if err != nil {
 		return nil, err
 	}
@@ -175,13 +175,17 @@ func OpenSubscription(client mqtt.Client, topicName string, timeout time.Duratio
 
 var errSubscribeFailed = errors.Define("subscribe_failed", "subscribe to MQTT topic failed")
 
-func openDriverSubscription(client mqtt.Client, topicName string, timeout time.Duration, qos byte) (driver.Subscription, error) {
+func openDriverSubscription(ctx context.Context, client mqtt.Client, topicName string, timeout time.Duration, qos byte) (driver.Subscription, error) {
 	if client == nil {
 		return nil, errNilClient.New()
 	}
 	subCh := make(chan mqtt.Message, subscriptionQueueSize)
 	handler := func(_ mqtt.Client, msg mqtt.Message) {
-		subCh <- msg
+		select {
+		case <-ctx.Done():
+			return
+		case subCh <- msg:
+		}
 	}
 	token := client.Subscribe(topicName, qos, handler)
 	if !token.WaitTimeout(timeout) {

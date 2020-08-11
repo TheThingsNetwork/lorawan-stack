@@ -46,7 +46,7 @@ func (h *harness) MakeNonexistentTopic(ctx context.Context) (driver.Topic, error
 }
 
 func (h *harness) CreateSubscription(ctx context.Context, t driver.Topic, testName string) (ds driver.Subscription, cleanup func(), err error) {
-	dt, err := openDriverSubscription(h.client, fmt.Sprintf("test/%s", testName), timeout, 1)
+	dt, err := openDriverSubscription(ctx, h.client, fmt.Sprintf("test/%s", testName), timeout, 1)
 	if err != nil {
 		return nil, func() {}, err
 	}
