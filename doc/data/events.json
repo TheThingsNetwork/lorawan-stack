@@ -42,23 +42,28 @@
   },
   "as.down.data.drop": {
     "name": "as.down.data.drop",
-    "description": "drop downlink data message"
+    "description": "drop downlink data message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "as.down.data.forward": {
     "name": "as.down.data.forward",
-    "description": "forward downlink data message"
+    "description": "forward downlink data message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ApplicationDownlink"}
   },
   "as.down.data.queue.invalid": {
     "name": "as.down.data.queue.invalid",
-    "description": "invalid downlink data queue"
+    "description": "invalid downlink data queue",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "as.down.data.queue.lost": {
     "name": "as.down.data.queue.lost",
-    "description": "lose downlink data queue"
+    "description": "lose downlink data queue",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "as.down.data.receive": {
     "name": "as.down.data.receive",
-    "description": "receive downlink data message"
+    "description": "receive downlink data message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ApplicationDownlink"}
   },
   "as.end_device.create": {
     "name": "as.end_device.create",
@@ -75,7 +80,8 @@
   },
   "as.link.fail": {
     "name": "as.link.fail",
-    "description": "fail link"
+    "description": "fail link",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "as.link.start": {
     "name": "as.link.start",
@@ -87,35 +93,43 @@
   },
   "as.pubsub.delete": {
     "name": "as.pubsub.delete",
-    "description": "delete pub/sub"
+    "description": "delete pub/sub",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ApplicationPubSubIdentifiers","application_ids":{"application_id":"application-id"},"pub_sub_id":"pubsub-id"}
   },
   "as.pubsub.fail": {
     "name": "as.pubsub.fail",
-    "description": "fail pub/sub"
+    "description": "fail pub/sub",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "as.pubsub.set": {
     "name": "as.pubsub.set",
-    "description": "set pub/sub"
+    "description": "set pub/sub",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ApplicationPubSubIdentifiers","application_ids":{"application_id":"application-id"},"pub_sub_id":"pubsub-id"}
   },
   "as.pubsub.start": {
     "name": "as.pubsub.start",
-    "description": "start pub/sub"
+    "description": "start pub/sub",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ApplicationPubSubIdentifiers","application_ids":{"application_id":"application-id"},"pub_sub_id":"pubsub-id"}
   },
   "as.pubsub.stop": {
     "name": "as.pubsub.stop",
-    "description": "stop pub/sub"
+    "description": "stop pub/sub",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ApplicationPubSubIdentifiers","application_ids":{"application_id":"application-id"},"pub_sub_id":"pubsub-id"}
   },
   "as.up.data.decode.fail": {
     "name": "as.up.data.decode.fail",
-    "description": "decode uplink data message failure"
+    "description": "decode uplink data message failure",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "as.up.data.drop": {
     "name": "as.up.data.drop",
-    "description": "drop uplink data message"
+    "description": "drop uplink data message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "as.up.data.forward": {
     "name": "as.up.data.forward",
-    "description": "forward uplink data message"
+    "description": "forward uplink data message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ApplicationUp","end_device_ids":{"application_ids":{}}}
   },
   "as.up.data.receive": {
     "name": "as.up.data.receive",
@@ -123,11 +137,13 @@
   },
   "as.up.join.drop": {
     "name": "as.up.join.drop",
-    "description": "drop join-accept message"
+    "description": "drop join-accept message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "as.up.join.forward": {
     "name": "as.up.join.forward",
-    "description": "forward join-accept message"
+    "description": "forward join-accept message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ApplicationUp","end_device_ids":{"application_ids":{}}}
   },
   "as.up.join.receive": {
     "name": "as.up.join.receive",
@@ -202,11 +218,13 @@
   },
   "gs.down.send": {
     "name": "gs.down.send",
-    "description": "send downlink message"
+    "description": "send downlink message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.DownlinkMessage"}
   },
   "gs.down.tx.fail": {
     "name": "gs.down.tx.fail",
-    "description": "transmit downlink message failure"
+    "description": "transmit downlink message failure",
+    "data": {"@type":"type.googleapis.com/google.protobuf.Value","value":4}
   },
   "gs.down.tx.success": {
     "name": "gs.down.tx.success",
@@ -222,27 +240,33 @@
   },
   "gs.status.drop": {
     "name": "gs.status.drop",
-    "description": "drop gateway status"
+    "description": "drop gateway status",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "gs.status.fail": {
     "name": "gs.status.fail",
-    "description": "fail to handle gateway status"
+    "description": "fail to handle gateway status",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "gs.status.forward": {
     "name": "gs.status.forward",
-    "description": "forward gateway status"
+    "description": "forward gateway status",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.GatewayStatus","time":"0001-01-01T00:00:00Z","boot_time":"0001-01-01T00:00:00Z"}
   },
   "gs.status.receive": {
     "name": "gs.status.receive",
-    "description": "receive gateway status"
+    "description": "receive gateway status",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.GatewayStatus","time":"0001-01-01T00:00:00Z","boot_time":"0001-01-01T00:00:00Z"}
   },
   "gs.up.drop": {
     "name": "gs.up.drop",
-    "description": "drop uplink message"
+    "description": "drop uplink message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "gs.up.fail": {
     "name": "gs.up.fail",
-    "description": "fail to handle uplink message"
+    "description": "fail to handle uplink message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "gs.up.forward": {
     "name": "gs.up.forward",
@@ -250,7 +274,8 @@
   },
   "gs.up.receive": {
     "name": "gs.up.receive",
-    "description": "receive uplink message"
+    "description": "receive uplink message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.UplinkMessage","settings":{"data_rate":{}},"received_at":"0001-01-01T00:00:00Z"}
   },
   "invitation.create": {
     "name": "invitation.create",
@@ -275,7 +300,8 @@
   },
   "js.join.reject": {
     "name": "js.join.reject",
-    "description": "reject join-request"
+    "description": "reject join-request",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "ns.application.link.begin": {
     "name": "ns.application.link.begin",
@@ -303,7 +329,8 @@
   },
   "ns.down.data.schedule.fail": {
     "name": "ns.down.data.schedule.fail",
-    "description": "failed to schedule data downlink for transmission on Gateway Server"
+    "description": "failed to schedule data downlink for transmission on Gateway Server",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "ns.down.data.schedule.success": {
     "name": "ns.down.data.schedule.success",
@@ -315,7 +342,8 @@
   },
   "ns.down.join.schedule.fail": {
     "name": "ns.down.join.schedule.fail",
-    "description": "failed to schedule join-accept for transmission on Gateway Server"
+    "description": "failed to schedule join-accept for transmission on Gateway Server",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "ns.down.join.schedule.success": {
     "name": "ns.down.join.schedule.success",
@@ -508,7 +536,8 @@
   },
   "ns.up.data.drop": {
     "name": "ns.up.data.drop",
-    "description": "drop data message"
+    "description": "drop data message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "ns.up.data.forward": {
     "name": "ns.up.data.forward",
@@ -532,7 +561,8 @@
   },
   "ns.up.join.cluster.fail": {
     "name": "ns.up.join.cluster.fail",
-    "description": "join-request to cluster-local Join Server failed"
+    "description": "join-request to cluster-local Join Server failed",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "ns.up.join.cluster.success": {
     "name": "ns.up.join.cluster.success",
@@ -540,7 +570,8 @@
   },
   "ns.up.join.drop": {
     "name": "ns.up.join.drop",
-    "description": "drop join-request"
+    "description": "drop join-request",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "ns.up.join.interop.attempt": {
     "name": "ns.up.join.interop.attempt",
@@ -548,7 +579,8 @@
   },
   "ns.up.join.interop.fail": {
     "name": "ns.up.join.interop.fail",
-    "description": "join-request to interoperability Join Server failed"
+    "description": "join-request to interoperability Join Server failed",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "ns.up.join.interop.success": {
     "name": "ns.up.join.interop.success",

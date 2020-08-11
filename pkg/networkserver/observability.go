@@ -106,6 +106,7 @@ var (
 	evtDropDataUplink = events.Define(
 		"ns.up.data.drop", "drop data message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtProcessDataUplink = events.Define(
 		"ns.up.data.process", "successfully processed data message",
@@ -126,6 +127,7 @@ var (
 	evtScheduleDataDownlinkFail = events.Define(
 		"ns.down.data.schedule.fail", "failed to schedule data downlink for transmission on Gateway Server",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtReceiveJoinRequest = events.Define(
 		"ns.up.join.receive", "receive join-request",
@@ -134,6 +136,7 @@ var (
 	evtDropJoinRequest = events.Define(
 		"ns.up.join.drop", "drop join-request",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtProcessJoinRequest = events.Define(
 		"ns.up.join.process", "successfully processed join-request",
@@ -150,6 +153,7 @@ var (
 	evtClusterJoinFail = events.Define(
 		"ns.up.join.cluster.fail", "join-request to cluster-local Join Server failed",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtInteropJoinAttempt = events.Define(
 		"ns.up.join.interop.attempt", "forward join-request to interoperability Join Server",
@@ -162,6 +166,7 @@ var (
 	evtInteropJoinFail = events.Define(
 		"ns.up.join.interop.fail", "join-request to interoperability Join Server failed",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtForwardJoinAccept = events.Define(
 		"ns.up.join.accept.forward", "forward join-accept to Application Server",
@@ -178,6 +183,7 @@ var (
 	evtScheduleJoinAcceptFail = events.Define(
 		"ns.down.join.schedule.fail", "failed to schedule join-accept for transmission on Gateway Server",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtEnqueueProprietaryMACAnswer  = defineEnqueueMACAnswerEvent("proprietary", "proprietary MAC command")
 	evtEnqueueProprietaryMACRequest = defineEnqueueMACRequestEvent("proprietary", "proprietary MAC command")
