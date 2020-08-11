@@ -124,14 +124,18 @@ func (c *connection) setup(ctx context.Context) (err error) {
 				if err != stdio.EOF {
 					logger.WithError(err).Warn("Error when reading packet")
 				}
-				errCh <- err
+				select {
+				case <-ctx.Done():
+					return
+				case errCh <- err:
+				}
 				return
 			}
 			if pkt != nil {
 				logger.Debugf("Schedule %s packet", packet.Name[pkt.PacketType()])
 				select {
 				case <-ctx.Done():
-					return ctx.Err()
+					return
 				case controlCh <- pkt:
 				}
 			}

@@ -93,13 +93,14 @@ var errBufferFull = errors.DefineResourceExhausted("buffer_full", "buffer is ful
 // SendUp sends an upstream message.
 // This method returns immediately, returning nil if the message is buffered, or with an error when the buffer is full.
 func (s *Subscription) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+	ctxUp := &ContextualApplicationUp{
+		Context:       ctx,
+		ApplicationUp: up,
+	}
 	select {
 	case <-s.ctx.Done():
 		return s.ctx.Err()
-	case s.upCh <- &ContextualApplicationUp{
-		Context:       ctx,
-		ApplicationUp: up,
-	}:
+	case s.upCh <- ctxUp:
 	default:
 		return errBufferFull.New()
 	}

@@ -275,7 +275,11 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 		return nil, err
 	}
 	sub := io.NewSubscription(ctx, protocol, &ids)
-	link.subscribeCh <- sub
+	select {
+	case <-link.ctx.Done():
+		return nil, link.ctx.Err()
+	case link.subscribeCh <- sub:
+	}
 	go func() {
 		select {
 		case <-link.ctx.Done():
@@ -285,7 +289,11 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 			return
 		case <-sub.Context().Done():
 		}
-		link.unsubscribeCh <- sub
+		select {
+		case <-link.ctx.Done():
+			return
+		case link.unsubscribeCh <- sub:
+		}
 	}()
 	return sub, nil
 }
@@ -389,7 +397,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			errorDetails = *ttnpb.ErrorDetailsToProto(ttnErr)
 		}
 		for _, item := range items {
-			link.upCh <- &io.ContextualApplicationUp{
+			ctxUp := &io.ContextualApplicationUp{
 				Context: ctx,
 				ApplicationUp: &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: ids,
@@ -402,6 +410,11 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 					},
 				},
 			}
+			select {
+			case <-link.ctx.Done():
+				return link.ctx.Err()
+			case link.upCh <- ctxUp:
+			}
 			registerDropDownlink(ctx, ids, item, err)
 		}
 		return err
@@ -409,7 +422,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 	atomic.AddUint64(&link.downlinks, uint64(len(items)))
 	atomic.StoreInt64(&link.lastDownlinkTime, time.Now().UnixNano())
 	for _, item := range items {
-		link.upCh <- &io.ContextualApplicationUp{
+		ctxUp := &io.ContextualApplicationUp{
 			Context: ctx,
 			ApplicationUp: &ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: ids,
@@ -418,6 +431,11 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 					DownlinkQueued: item,
 				},
 			},
+		}
+		select {
+		case <-link.ctx.Done():
+			return link.ctx.Err()
+		case link.upCh <- ctxUp:
 		}
 		registerForwardDownlink(ctx, ids, item, link.connName)
 	}
