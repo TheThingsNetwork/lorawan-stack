@@ -26,5 +26,6 @@ type Config struct {
 	JoinServer        string   `name:"join-server" description:"Address for the Join Server"`
 	CryptoServer      string   `name:"crypto-server" description:"Address for the Crypto Server"`
 	TLS               bool     `name:"tls" description:"Do cluster gRPC over TLS"`
+	TLSServerName     string   `name:"tls-server-name" description:"Server name to use in TLS handshake to cluster peers"`
 	Keys              []string `name:"keys" description:"Keys used to communicate between components of the cluster. The first one will be used by the cluster to identify itself"`
 }
