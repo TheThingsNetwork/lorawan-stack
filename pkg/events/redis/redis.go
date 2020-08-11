@@ -16,6 +16,7 @@
 package redis
 
 import (
+	"context"
 	"encoding/json"
 	"sync"
 
@@ -73,13 +74,17 @@ func (ps *PubSub) Subscribe(name string, hdl events.Handler) error {
 }
 
 // Close the Redis publisher.
-func (ps *PubSub) Close() error {
+func (ps *PubSub) Close(ctx context.Context) error {
 	var unsubErr error
 	if ps.sub != nil {
 		unsubErr = ps.sub.Unsubscribe(ps.eventChannel)
 	}
 	closeErr := ps.client.Close()
-	<-ps.closeWait
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-ps.closeWait:
+	}
 	if unsubErr != nil {
 		return unsubErr
 	}
