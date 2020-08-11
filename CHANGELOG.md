@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - LoRaCloud DAS integration page in the Console.
 - User Agent metadata on published events (when available).
 - Option to override server name used in TLS handshake with cluster peers (`cluster.tls-server-name`).
+- Add `the-things-stack` device template converter, enabled by default. Effectively, this allows importing end devices from the Console.
 
 ### Changed
 
