@@ -4108,10 +4108,10 @@ can-use-dom@^0.1.0:
   resolved "https://registry.yarnpkg.com/can-use-dom/-/can-use-dom-0.1.0.tgz#22cc4a34a0abc43950f42c6411024a3f6366b45a"
   integrity sha1-IsxKNKCrxDlQ9CxkEQJKP2NmtFo=
 
-cancelable-promise@^2.4.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/cancelable-promise/-/cancelable-promise-2.5.0.tgz#a9fe7acbdf2a5e2ee6e68d11c561ab69e2dd6c2e"
-  integrity sha512-3CdXq0SsjHMt9rfCfJLl5EG/zJQM2EaH5DrISRqFVF8C9e4wj7U2YABaM5c8Pv+/PECsm/oUEb+kC6YBZ0o2uA==
+cancelable-promise@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/cancelable-promise/-/cancelable-promise-3.1.2.tgz#6736183d9e5edfa5edaba17ba03d31df49c0a0e6"
+  integrity sha512-6wy3hrGTXTgQBqpvTCB2aKtRB3uY39FS33A5NgK/DZKNoS104kU2n5JnbRzR92jkWR8zTNJoeRBZcy7RTEVtGw==
 
 caniuse-lite@^1.0.30000989, caniuse-lite@^1.0.30001038, caniuse-lite@^1.0.30001039:
   version "1.0.30001039"
@@ -13266,7 +13266,7 @@ tslib@^1.9.3:
   integrity sha512-i/6DQjL8Xf3be4K/E6Wgpekn5Qasl1usyw++dAA35Ue5orEn65VIxOA+YvNNl9HV3qv70T7CNwjODHZrLwvd1Q==
 
 "ttn-lw@file:sdk/js":
-  version "3.8.5"
+  version "3.9.0"
   dependencies:
     arraybuffer-to-string "^1.0.2"
     axios "^0.19.0"

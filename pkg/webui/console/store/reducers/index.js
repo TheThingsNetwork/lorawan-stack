@@ -52,6 +52,7 @@ import webhookFormats from './webhook-formats'
 import webhookTemplates from './webhook-templates'
 import pubsubs from './pubsubs'
 import pubsubFormats from './pubsub-formats'
+import applicationPackages from './application-packages'
 import deviceTemplateFormats from './device-template-formats'
 import organizations from './organizations'
 import { createNamedPaginationReducer } from './pagination'
@@ -73,6 +74,7 @@ export default history =>
     deviceTemplateFormats,
     pubsubs,
     pubsubFormats,
+    applicationPackages,
     configuration,
     organizations,
     apiKeys,

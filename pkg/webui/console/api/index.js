@@ -185,6 +185,14 @@ export default {
       delete: ttnClient.Applications.PubSubs.deleteById.bind(ttnClient.Applications.PubSubs),
       getFormats: ttnClient.Applications.PubSubs.getFormats.bind(ttnClient.Applications.PubSubs),
     },
+    packages: {
+      getDefaultAssociation: ttnClient.Applications.Packages.getDefaultAssociation.bind(
+        ttnClient.Applications.Packages,
+      ),
+      setDefaultAssociation: ttnClient.Applications.Packages.setDefaultAssociation.bind(
+        ttnClient.Applications.Packages,
+      ),
+    },
   },
   devices: {
     list: ttnClient.Applications.Devices.getAll.bind(ttnClient.Applications.Devices),

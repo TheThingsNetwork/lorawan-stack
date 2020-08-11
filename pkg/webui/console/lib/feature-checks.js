@@ -114,6 +114,11 @@ export const mayScheduleDownlinks = {
   check: rights => rights.includes('RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE') && asEnabled,
 }
 
+export const mayViewOrEditApplicationPackages = {
+  rightsSelector: selectApplicationRights,
+  check: rights => rights.includes('RIGHT_APPLICATION_SETTINGS_PACKAGES') && asEnabled,
+}
+
 // Gateway related feature checks.
 export const mayViewGatewayInfo = {
   rightsSelector: selectGatewayRights,

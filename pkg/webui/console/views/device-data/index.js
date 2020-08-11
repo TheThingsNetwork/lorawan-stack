@@ -28,9 +28,9 @@ import appStyle from '@console/views/app/app.styl'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './device-data.styl'
-
 import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
+
+import style from './device-data.styl'
 
 @connect(function(state, props) {
   const device = selectSelectedDevice(state)
