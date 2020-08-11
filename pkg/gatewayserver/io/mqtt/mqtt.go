@@ -28,6 +28,7 @@ import (
 	"github.com/TheThingsIndustries/mystique/pkg/packet"
 	"github.com/TheThingsIndustries/mystique/pkg/session"
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
+	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -99,6 +100,7 @@ func (*connection) SupportsDownlinkClaim() bool { return false }
 
 func (c *connection) setup(ctx context.Context) (err error) {
 	ctx = auth.NewContextWithInterface(ctx, c)
+	ctx, cancel := errorcontext.New(ctx)
 	defer func() {
 		retrievedErr := recoverMQTTFrontend(ctx)
 		if retrievedErr != nil {
@@ -107,12 +109,12 @@ func (c *connection) setup(ctx context.Context) (err error) {
 	}()
 	c.session = session.New(ctx, c.mqtt, c.deliver)
 	if err := c.session.ReadConnect(); err != nil {
+		cancel(err)
 		return err
 	}
 	ctx = c.io.Context()
 
 	logger := log.FromContext(ctx)
-	errCh := make(chan error)
 	controlCh := make(chan packet.ControlPacket)
 
 	// Read control packets
@@ -124,11 +126,7 @@ func (c *connection) setup(ctx context.Context) (err error) {
 				if err != stdio.EOF {
 					logger.WithError(err).Warn("Error when reading packet")
 				}
-				select {
-				case <-ctx.Done():
-					return
-				case errCh <- err:
-				}
+				cancel(err)
 				return
 			}
 			if pkt != nil {
@@ -148,9 +146,9 @@ func (c *connection) setup(ctx context.Context) (err error) {
 		for {
 			select {
 			case <-c.io.Context().Done():
-				logger.WithError(c.io.Context().Err()).Debug("Done sending downlink")
-				c.session.Close()
-				c.mqtt.Close()
+				err := c.io.Context().Err()
+				cancel(err)
+				logger.WithError(err).Debug("Done sending downlink")
 				return
 			case down := <-c.io.Down():
 				buf, err := c.format.FromDownlink(down, c.io.Gateway().GatewayIdentifiers)
@@ -176,7 +174,8 @@ func (c *connection) setup(ctx context.Context) (err error) {
 		for {
 			var err error
 			select {
-			case err = <-errCh:
+			case <-ctx.Done():
+				return
 			case pkt, ok := <-controlCh:
 				if !ok {
 					controlCh = nil
@@ -196,11 +195,18 @@ func (c *connection) setup(ctx context.Context) (err error) {
 				} else {
 					logger.Info("Disconnected")
 				}
-				c.io.Disconnect(err)
-				c.session.Close()
-				c.mqtt.Close()
+				cancel(err)
 				return
 			}
+		}
+	}()
+
+	// Close connection on context closure
+	go func() {
+		select {
+		case <-ctx.Done():
+			c.session.Close()
+			c.mqtt.Close()
 		}
 	}()
 
