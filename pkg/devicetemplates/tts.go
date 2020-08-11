@@ -29,7 +29,7 @@ type tts struct{}
 func (t *tts) Format() *ttnpb.EndDeviceTemplateFormat {
 	return &ttnpb.EndDeviceTemplateFormat{
 		Name:           "The Things Stack JSON",
-		Description:    "JSON file containing end devices exported in the v3 JSON format.",
+		Description:    "File containing end devices in The Things Stack JSON format.",
 		FileExtensions: []string{".json"},
 	}
 }
