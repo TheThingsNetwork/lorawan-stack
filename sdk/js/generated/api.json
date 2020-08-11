@@ -10033,6 +10033,16 @@
               "defaultValue": ""
             },
             {
+              "name": "remote_ip",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "user_agent",
               "description": "",
               "label": "",
@@ -10075,16 +10085,6 @@
             },
             {
               "name": "token_id",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
-              "name": "remote_ip",
               "description": "",
               "label": "",
               "type": "string",

@@ -40,10 +40,10 @@ message Event {
     string type = 1;
     string token_type = 2;
     string token_id = 3 [(gogoproto.customname) = "TokenID"];
-    string remote_ip = 4 [(gogoproto.customname) = "RemoteIP"];
   }
   Authentication authentication = 9;
-  string user_agent = 10;
+  string remote_ip = 10 [(gogoproto.customname) = "RemoteIP"];
+  string user_agent = 11;
 }
 
 message StreamEventsRequest {

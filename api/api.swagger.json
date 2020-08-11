@@ -7503,9 +7503,6 @@
         },
         "token_id": {
           "type": "string"
-        },
-        "remote_ip": {
-          "type": "string"
         }
       }
     },
@@ -10472,6 +10469,9 @@
         },
         "authentication": {
           "$ref": "#/definitions/EventAuthentication"
+        },
+        "remote_ip": {
+          "type": "string"
         },
         "user_agent": {
           "type": "string"
