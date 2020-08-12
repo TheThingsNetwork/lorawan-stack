@@ -31,14 +31,17 @@ var (
 	evtCreateEndDevice = events.Define(
 		"js.end_device.create", "create end device",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
+		events.WithAuthFromContext(),
 	)
 	evtUpdateEndDevice = events.Define(
 		"js.end_device.update", "update end device",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
+		events.WithAuthFromContext(),
 	)
 	evtDeleteEndDevice = events.Define(
 		"js.end_device.delete", "delete end device",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
+		events.WithAuthFromContext(),
 	)
 )
 

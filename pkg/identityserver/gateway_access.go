@@ -33,14 +33,17 @@ var (
 	evtCreateGatewayAPIKey = events.Define(
 		"gateway.api-key.create", "create gateway API key",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS),
+		events.WithAuthFromContext(),
 	)
 	evtUpdateGatewayAPIKey = events.Define(
 		"gateway.api-key.update", "update gateway API key",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS),
+		events.WithAuthFromContext(),
 	)
 	evtDeleteGatewayAPIKey = events.Define(
 		"gateway.api-key.delete", "delete gateway API key",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS),
+		events.WithAuthFromContext(),
 	)
 	evtUpdateGatewayCollaborator = events.Define(
 		"gateway.collaborator.update", "update gateway collaborator",
@@ -48,6 +51,7 @@ var (
 			ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS,
 			ttnpb.RIGHT_USER_GATEWAYS_LIST,
 		),
+		events.WithAuthFromContext(),
 	)
 	evtDeleteGatewayCollaborator = events.Define(
 		"gateway.collaborator.delete", "delete gateway collaborator",
@@ -55,6 +59,7 @@ var (
 			ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS,
 			ttnpb.RIGHT_USER_GATEWAYS_LIST,
 		),
+		events.WithAuthFromContext(),
 	)
 )
 

@@ -31,14 +31,17 @@ var (
 	evtCreateUserAPIKey = events.Define(
 		"user.api-key.create", "create user API key",
 		events.WithVisibility(ttnpb.RIGHT_USER_SETTINGS_API_KEYS),
+		events.WithAuthFromContext(),
 	)
 	evtUpdateUserAPIKey = events.Define(
 		"user.api-key.update", "update user API key",
 		events.WithVisibility(ttnpb.RIGHT_USER_SETTINGS_API_KEYS),
+		events.WithAuthFromContext(),
 	)
 	evtDeleteUserAPIKey = events.Define(
 		"user.api-key.delete", "delete user API key",
 		events.WithVisibility(ttnpb.RIGHT_USER_SETTINGS_API_KEYS),
+		events.WithAuthFromContext(),
 	)
 )
 

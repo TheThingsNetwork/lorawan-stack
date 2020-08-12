@@ -36,14 +36,17 @@ var (
 	evtCreateClient = events.Define(
 		"client.create", "create OAuth client",
 		events.WithVisibility(ttnpb.RIGHT_CLIENT_ALL),
+		events.WithAuthFromContext(),
 	)
 	evtUpdateClient = events.Define(
 		"client.update", "update OAuth client",
 		events.WithVisibility(ttnpb.RIGHT_CLIENT_ALL),
+		events.WithAuthFromContext(),
 	)
 	evtDeleteClient = events.Define(
 		"client.delete", "delete OAuth client",
 		events.WithVisibility(ttnpb.RIGHT_CLIENT_ALL),
+		events.WithAuthFromContext(),
 	)
 )
 

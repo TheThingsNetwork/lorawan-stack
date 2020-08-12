@@ -31,14 +31,17 @@ var (
 	evtCreateGateway = events.Define(
 		"gateway.create", "create gateway",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
+		events.WithAuthFromContext(),
 	)
 	evtUpdateGateway = events.Define(
 		"gateway.update", "update gateway",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
+		events.WithAuthFromContext(),
 	)
 	evtDeleteGateway = events.Define(
 		"gateway.delete", "delete gateway",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
+		events.WithAuthFromContext(),
 	)
 )
 

@@ -41,18 +41,22 @@ var (
 	evtCreateUser = events.Define(
 		"user.create", "create user",
 		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithAuthFromContext(),
 	)
 	evtUpdateUser = events.Define(
 		"user.update", "update user",
 		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithAuthFromContext(),
 	)
 	evtDeleteUser = events.Define(
 		"user.delete", "delete user",
 		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithAuthFromContext(),
 	)
 	evtUpdateUserIncorrectPassword = events.Define(
 		"user.update.incorrect_password", "update user failure: incorrect password",
 		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithAuthFromContext(),
 	)
 )
 
