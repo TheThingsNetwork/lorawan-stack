@@ -26,7 +26,8 @@
         Request type
       </th>
       <td>
-        {{ if not .input.package }}<a href="#message:{{ .input.name }}">{{ end }}<code>{{ with .input.package }}{{ . }}.{{end}}{{ .input.name }}</code>{{ if not .input.package }}</a>{{ end }}
+        {{ if .input.stream }}Stream of {{ end }}{{ if not .input.package }}<a href="#message:{{ .input.name }}">{{ end }}<code>{{ with .input.package }}{{ . }}.{{end}}{{ .input.name }}</code>{{ if not .input.package }}</a>{{ end }}
+        {{ if and .http .input.stream }}<br>The HTTP API uses <code>Content-Type: text/event-stream</code><br>and a request body of newline-delimited JSON.{{ end }}
       </td>
     </tr>
     <tr>
@@ -34,7 +35,8 @@
         Response type
       </th>
       <td>
-        {{ if not .output.package }}<a href="#message:{{ .output.name }}">{{ end }}<code>{{ with .output.package }}{{ . }}.{{end}}{{ .output.name }}</code>{{ if not .output.package }}</a>{{ end }}
+        {{ if .output.stream }}Stream of {{ end }}{{ if not .output.package }}<a href="#message:{{ .output.name }}">{{ end }}<code>{{ with .output.package }}{{ . }}.{{end}}{{ .output.name }}</code>{{ if not .output.package }}</a>{{ end }}
+        {{ if and .http .output.stream }}<br>The HTTP API uses <code>Content-Type: text/event-stream</code><br>and a response body of newline-delimited JSON.<br>Make sure to send <code>Accept: text/event-stream</code> in the request.{{ end }}
       </td>
     </tr>
     <tr>
