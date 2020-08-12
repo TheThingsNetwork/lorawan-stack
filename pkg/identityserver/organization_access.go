@@ -34,16 +34,19 @@ var (
 		"organization.api-key.create", "create organization API key",
 		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtUpdateOrganizationAPIKey = events.Define(
 		"organization.api-key.update", "update organization API key",
 		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtDeleteOrganizationAPIKey = events.Define(
 		"organization.api-key.delete", "delete organization API key",
 		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtUpdateOrganizationCollaborator = events.Define(
 		"organization.collaborator.update", "update organization collaborator",
@@ -52,6 +55,7 @@ var (
 			ttnpb.RIGHT_USER_ORGANIZATIONS_LIST,
 		),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtDeleteOrganizationCollaborator = events.Define(
 		"organization.collaborator.delete", "delete organization collaborator",
@@ -60,6 +64,7 @@ var (
 			ttnpb.RIGHT_USER_ORGANIZATIONS_LIST,
 		),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 )
 

@@ -32,11 +32,13 @@ var (
 		"as.pubsub.set", "set pub/sub",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtDeletePubSub = events.Define(
 		"as.pubsub.delete", "delete pub/sub",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtPubSubStart = events.Define(
 		"as.pubsub.start", "start pub/sub",

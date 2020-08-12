@@ -34,16 +34,19 @@ var (
 		"application.api-key.create", "create application API key",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtUpdateApplicationAPIKey = events.Define(
 		"application.api-key.update", "update application API key",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtDeleteApplicationAPIKey = events.Define(
 		"application.api-key.delete", "delete application API key",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtUpdateApplicationCollaborator = events.Define(
 		"application.collaborator.update", "update application collaborator",
@@ -52,6 +55,7 @@ var (
 			ttnpb.RIGHT_USER_APPLICATIONS_LIST,
 		),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtDeleteApplicationCollaborator = events.Define(
 		"application.collaborator.delete", "delete application collaborator",
@@ -60,6 +64,7 @@ var (
 			ttnpb.RIGHT_USER_APPLICATIONS_LIST,
 		),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 )
 

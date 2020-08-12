@@ -78,6 +78,7 @@ var (
 		"as.down.data.receive", "receive downlink data message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtDropDataDown = events.Define(
 		"as.down.data.drop", "drop downlink data message",
@@ -87,6 +88,7 @@ var (
 		"as.down.data.forward", "forward downlink data message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtLostQueueDataDown = events.Define(
 		"as.down.data.queue.lost", "lose downlink data queue",

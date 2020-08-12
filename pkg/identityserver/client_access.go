@@ -37,6 +37,7 @@ var (
 			ttnpb.RIGHT_USER_CLIENTS_LIST,
 		),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtDeleteClientCollaborator = events.Define(
 		"client.collaborator.delete", "delete client collaborator",
@@ -45,6 +46,7 @@ var (
 			ttnpb.RIGHT_USER_CLIENTS_LIST,
 		),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 )
 
