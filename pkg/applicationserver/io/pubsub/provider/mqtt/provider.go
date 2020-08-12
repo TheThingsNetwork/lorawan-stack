@@ -155,6 +155,7 @@ func OpenConnection(ctx context.Context, settings *ttnpb.ApplicationPubSub_MQTT,
 			continue
 		}
 		if *s.subscription, err = OpenSubscription(
+			ctx,
 			client,
 			mqtt_topic.Join(append(mqtt_topic.Split(topics.GetBaseTopic()), mqtt_topic.Split(s.message.GetTopic())...)),
 			timeout,

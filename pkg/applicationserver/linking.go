@@ -235,7 +235,11 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	go l.run()
 	for _, sub := range as.defaultSubscribers {
 		sub := sub
-		l.subscribeCh <- sub
+		select {
+		case <-l.ctx.Done():
+			return
+		case l.subscribeCh <- sub:
+		}
 		go func() {
 			select {
 			case <-l.ctx.Done():
@@ -245,7 +249,11 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 				return
 			case <-sub.Context().Done():
 			}
-			l.unsubscribeCh <- sub
+			select {
+			case <-l.ctx.Done():
+				return
+			case l.unsubscribeCh <- sub:
+			}
 		}()
 	}
 	for {
@@ -279,7 +287,11 @@ func (as *ApplicationServer) cancelLink(ctx context.Context, ids ttnpb.Applicati
 		l := val.(*link)
 		log.FromContext(ctx).WithField("application_uid", uid).Debug("Unlink")
 		l.cancel(context.Canceled)
-		<-l.closed
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-l.closed:
+		}
 	} else {
 		as.linkErrors.Delete(uid)
 	}
@@ -377,10 +389,14 @@ func (l *link) sendUp(ctx context.Context, up *ttnpb.ApplicationUp, ack func() e
 		registerDropUp(ctx, up, handleUpErr)
 		return nil
 	}
-
-	l.upCh <- &io.ContextualApplicationUp{
+	ctxUp := &io.ContextualApplicationUp{
 		Context:       ctx,
 		ApplicationUp: up,
+	}
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case l.upCh <- ctxUp:
 	}
 	registerForwardUp(ctx, up)
 	return nil

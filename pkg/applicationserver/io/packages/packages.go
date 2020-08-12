@@ -142,7 +142,7 @@ func (s *server) NewSubscription() *io.Subscription {
 	go func() {
 		for {
 			select {
-			case <-s.ctx.Done():
+			case <-sub.Context().Done():
 				return
 			case up := <-sub.Up():
 				if err := s.handleUp(up.Context, up.ApplicationUp); err != nil {
