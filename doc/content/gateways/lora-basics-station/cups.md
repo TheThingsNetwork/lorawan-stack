@@ -30,7 +30,7 @@ On your gateway, set the following configuration fields.
 
 The `<server-address>` is the address of {{% tts %}}. If you followed the [Getting Started guide]({{< ref "/getting-started" >}}) this is the same as what you use instead of `thethings.example.com`.
 
-The `<gateway-api-key>` is the API Key you created above. Create a file named `gateway-api.key` and copy your gateway API Key in as an HTTP header in the following format:
+The `<gateway-api-key>` is the API Key you created above. Create a file named `cups.key` and copy your gateway API Key in as an HTTP header in the following format:
 
 ```
 Authorization: Bearer <gateway-api-key>
@@ -40,6 +40,6 @@ If using Let's Encrypt to secure your domain, you may download the Let's Encrypt
 
 CUPS URI: `https://<server-address>:443`
 
-CUPS Key: `<gateway-api-key>`
+CUPS Key: `cups.key`
 
 CUPS Trust: Use the CA certificate of your trust provider
