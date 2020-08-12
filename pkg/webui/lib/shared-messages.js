@@ -183,6 +183,7 @@ export default defineMessages({
   latitudeDesc: 'The north-south position in degrees, where 0 is the equator',
   link: 'Link',
   linked: 'Linked',
+  liveData: 'Live data',
   location: 'Location',
   locationSolved: 'Location solved',
   login: 'Login',

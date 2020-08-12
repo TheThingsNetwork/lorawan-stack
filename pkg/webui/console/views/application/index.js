@@ -152,7 +152,7 @@ export default class Application extends React.Component {
           )}
           {mayViewApplicationEvents.check(rights) && (
             <SideNavigation.Item
-              title={sharedMessages.data}
+              title={sharedMessages.liveData}
               path={`${matchedUrl}/data`}
               icon="data"
             />

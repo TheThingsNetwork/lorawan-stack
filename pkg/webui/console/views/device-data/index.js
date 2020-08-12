@@ -46,7 +46,7 @@ import style from './device-data.styl'
   return (
     <Breadcrumb
       path={`/applications/${appId}/devices/${devId}/data`}
-      content={sharedMessages.data}
+      content={sharedMessages.liveData}
     />
   )
 })
@@ -63,7 +63,7 @@ export default class Data extends React.Component {
     return (
       <WithRootClass className={appStyle.stageFlex} id="stage">
         <div className={style.overflowContainer}>
-          <IntlHelmet hideHeading title={sharedMessages.data} />
+          <IntlHelmet hideHeading title={sharedMessages.liveData} />
           <DeviceEvents devIds={ids} />
         </div>
       </WithRootClass>

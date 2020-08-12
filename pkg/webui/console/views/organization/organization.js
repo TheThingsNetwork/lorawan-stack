@@ -89,7 +89,7 @@ class Organization extends React.Component {
             />
           )}
           <SideNavigation.Item
-            title={sharedMessages.data}
+            title={sharedMessages.liveData}
             icon="data"
             path={`${matchedUrl}/data`}
           />
