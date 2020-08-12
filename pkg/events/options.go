@@ -67,16 +67,7 @@ func WithVisibility(rights ...ttnpb.Right) Option {
 // WithAuthFromContext returns an option that extracts auth information from the context when the event is created.
 func WithAuthFromContext() Option {
 	return optionFunc(func(e *event) {
-		if p, ok := peer.FromContext(e.ctx); ok && p.Addr != nil && p.Addr.String() != "pipe" {
-			if host, _, err := net.SplitHostPort(p.Addr.String()); err == nil {
-				e.innerEvent.RemoteIP = host
-			}
-		}
 		md := rpcmetadata.FromIncomingContext(e.ctx)
-		if md.XForwardedFor != "" {
-			xff := strings.Split(md.XForwardedFor, ",")
-			e.innerEvent.RemoteIP = strings.Trim(xff[0], " ")
-		}
 		authentication := &ttnpb.Event_Authentication{}
 		if md.AuthType != "" {
 			authentication.Type = md.AuthType
@@ -87,16 +78,25 @@ func WithAuthFromContext() Option {
 				authentication.TokenID = tokenID
 			}
 		}
-		if authentication.TokenID != "" ||
-			authentication.TokenType != "" || authentication.Type != "" {
+		if authentication.TokenID != "" || authentication.TokenType != "" || authentication.Type != "" {
 			e.innerEvent.Authentication = authentication
 		}
 	})
 }
 
-// WithUserAgentFromContext returns an option that extracts the UserAgent from the request context.
-func WithUserAgentFromContext() Option {
+// WithClientInfoFromContext returns an option that extracts the UserAgent and the RemoteIP from the request context.
+func WithClientInfoFromContext() Option {
 	return optionFunc(func(e *event) {
+		if p, ok := peer.FromContext(e.ctx); ok && p.Addr != nil && p.Addr.String() != "pipe" {
+			if host, _, err := net.SplitHostPort(p.Addr.String()); err == nil {
+				e.innerEvent.RemoteIP = host
+			}
+		}
+		md := rpcmetadata.FromIncomingContext(e.ctx)
+		if md.XForwardedFor != "" {
+			xff := strings.Split(md.XForwardedFor, ",")
+			e.innerEvent.RemoteIP = strings.Trim(xff[0], " ")
+		}
 		if md := rpcmetadata.FromIncomingContext(e.ctx); md.UserAgent != "" {
 			e.innerEvent.UserAgent = md.UserAgent
 		}
