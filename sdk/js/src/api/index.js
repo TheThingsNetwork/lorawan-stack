@@ -25,6 +25,7 @@ import Http from './http'
 class Api {
   constructor(connectionType = 'http', stackConfig, axiosConfig, token) {
     this.connectionType = connectionType
+    this._token = token
 
     if (this.connectionType !== 'http') {
       throw new Error('Only http connection type is supported')

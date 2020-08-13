@@ -101,6 +101,8 @@ export default defineMessages({
   confirmPassword: 'Confirm password',
   connected: 'Connected',
   connecting: 'Connecting',
+  copyClipboard: 'Copy to clipboard',
+  copied: 'Copied to clipboard!',
   createApiKey: 'Create API key',
   created: 'Created',
   createdAt: 'Created at',

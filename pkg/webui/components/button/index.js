@@ -116,6 +116,7 @@ class Button extends React.PureComponent {
     const buttonClassNames = assembleClassnames(this.props)
     return (
       <button
+        ref={ref}
         className={buttonClassNames}
         onClick={this.handleClick}
         children={buttonChildren(this.props)}

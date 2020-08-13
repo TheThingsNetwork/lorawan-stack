@@ -37,6 +37,7 @@ const stack = {
   js: stackConfig.js.enabled ? stackConfig.js.base_url : undefined,
   edtc: stackConfig.edtc.enabled ? stackConfig.edtc.base_url : undefined,
   qrg: stackConfig.qrg.enabled ? stackConfig.qrg.base_url : undefined,
+  gcs: stackConfig.gcs.enabled ? stackConfig.gcs.base_url : undefined,
 }
 
 const isBaseUrl = stackConfig.is.base_url
@@ -229,6 +230,7 @@ export default {
   },
   gateway: {
     get: ttnClient.Gateways.getById.bind(ttnClient.Gateways),
+    getGlobalConf: ttnClient.Gateways.getGlobalConf.bind(ttnClient.Gateways),
     delete: ttnClient.Gateways.deleteById.bind(ttnClient.Gateways),
     create: ttnClient.Gateways.create.bind(ttnClient.Gateways),
     update: ttnClient.Gateways.updateById.bind(ttnClient.Gateways),

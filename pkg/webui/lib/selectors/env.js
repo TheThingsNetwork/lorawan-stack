@@ -44,6 +44,8 @@ export const selectJsConfig = () => selectStackConfig().js
 
 export const selectAsConfig = () => selectStackConfig().as
 
+export const SelectGcsConfig = () => selectStackConfig().gcs
+
 export const selectLanguageConfig = () => selectApplicationConfig().language
 
 export const selectSupportLinkConfig = () => selectApplicationConfig().support_link

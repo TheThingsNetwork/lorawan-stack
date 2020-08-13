@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import axios from 'axios'
+
 import Marshaler from '../util/marshaler'
 import combineStreams from '../util/combine-streams'
 
@@ -183,6 +185,41 @@ class Gateways {
 
     // Combine all stream sources to one subscription generator.
     return combineStreams(streams)
+  }
+
+  // Gateway Configuration Server.
+
+  async getGlobalConf(gatewayId) {
+
+    const token = this._api._token
+
+    let Authorization = null
+    if (typeof token === 'string') {
+      Authorization = `Bearer ${token}`
+    }
+    else if (typeof token === 'function') {
+      const tkn = (await token()).access_token
+      Authorization = `Bearer ${tkn}`
+    }
+
+    const baseURL = this._stackConfig.getComponentUrlByName('gcs')
+
+    if (!baseURL) {
+      throw new Error('Cannot run retrieve "global_conf.json" with disabled component: "gcs"')
+    }
+
+    // Endpoint hardcoded because it is not part of the gRPC API.
+    const url = `${baseURL}/gcs/gateways/${gatewayId}/semtechudp/global_conf.json`
+
+    const response = await axios.get(url, {
+      baseURL: baseURL,
+      headers: {
+        Authorization
+        },
+      }
+    )
+
+    return Marshaler.payloadSingleResponse(response)
   }
 }
 

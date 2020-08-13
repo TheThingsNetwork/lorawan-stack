@@ -41,6 +41,8 @@ The Console needs to know how the individual {{% tts %}} components are configur
 - `console.ui.ns.enabled`: Enable Network Server related functionality in the Console
 - `console.ui.qrg.base-url`: Base URL to the HTTP API
 - `console.ui.qrg.enabled`: Enable QR Code Generator related functionality in the Console
+- `console.ui.gcs.base-url`: Base URL to the HTTP API
+- `console.ui.gcs.enabled`: Enable download of configuration files from Gateway Configuration Server in the Console
 
 ### File Includes
 
