@@ -223,18 +223,9 @@ bash-3.2# cp /tools/pkt_forwarder /etc/pktfwd/pkt_forwarder
 ```
 
 **Retrieve configuration from the Gateway Configuration Server**
-The Gateway Configuration Server can be used to retrieve a proper `global_conf.json` configuration file for your gateway.
+The Gateway Configuration Server can be used to retrieve a proper `global_conf.json` configuration file for your gateway. Follow instructions [here]({{< relref src="../semtech-udp-packet-forwarder" >}}).
 
-You will need a Gateway API key with the `View gateway information` right enabled. Instructions can be found in the relevant sections of the [Console]({{< ref "/getting-started/console#create-gateway" >}}) or the [CLI]({{< ref "/getting-started/cli#create-gateway" >}}) getting started guides.
-
-
-Make sure to replace `thethings.example.com`, `GATEWAY_ID` and `GTW_API_KEY` with your **server address**, **Gateway ID** and **Gateway API Key ID** which can be found using your Console or CLI.
-
-```
-bash-3.2# curl -k XGET "https://thethings.example.com/api/v3/gcs/gateways/GATEWAY_ID/semtechudp/global_conf.json" -H "Authorization: Bearer GTW_API_KEY" > ~/config.json
-```
-
-Copy the configuration template as **config.json** to **/etc/pktfwd** 
+Copy the downloaded `global_conf.json` configuration template as **config.json** to **/etc/pktfwd** 
 
 ```bash
 bash-3.2# cp config.json /etc/pktfwd/config.json

@@ -26,25 +26,13 @@ The default username is **root**, and the default password can be also found in 
 
 Your gateway should come with a slightly modified version of the [Lora-net UDP packet forwarder](https://github.com/Lora-net/packet_forwarder) pre-installed at `/opt/nas-lgw`. There are two configuration files `global_conf.json` and `local_conf.json`, both located in `/opt/nas_lgw`.
 
-The Gateway Configuration Server can be used to retrieve a proper `global_conf.json` configuration file for your gateway.
+The Gateway Configuration Server can be used to retrieve a proper `global_conf.json` configuration file for your gateway. Follow instructions [here]({{< relref src="../semtech-udp-packet-forwarder" >}}).
 
-You will need a Gateway API key with the `View gateway information` right enabled. Instructions can be found in the relevant sections of the [Console]({{< ref "/getting-started/console/create-gateway" >}}) or the [CLI]({{< ref "/getting-started/cli/create-gateway" >}}) getting started guides.
-
-Make sure to replace `thethings.example.com` with your server:
-
-```bash
-$ export GATEWAY_ID="<ID_OF_YOUR_GATEWAY_ON_TTS>"
-$ export GTW_API_KEY="NNSXS.AAAAAAAAAAAAA.BBBBBBBBBBBBBBBBB"
-$ curl -XGET \
-    "https://thethings.example.com/api/v3/gcs/gateways/${GATEWAY_ID}/semtechudp/global_conf.json" \
-    -H "Authorization: Bearer ${GTW_API_KEY}" > ~/global_conf.json
-```
-
-Then, update the configuration files and restart the packet forwarder:
+Update the configuration files on the gateway with your downloaded `global_conf.json` and restart the packet forwarder:
 
 ```bash
 $ mv /opt/nas-lgw/local_conf.json /opt/nas-lgw/local_conf.json.old
-$ cp ~/global_conf.json /opt/nas-lgw/global_conf.json
+$ cp global_conf.json /opt/nas-lgw/global_conf.json
 
 $ systemctl restart nas_lgw
 ```
