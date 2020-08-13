@@ -160,6 +160,8 @@ See the [EndDevice message](#message:EndDevice) and its sub-messages for additio
 
 ## Enums
 
+{{< proto/enum enum="AggregatedDutyCycle" >}}
+
 {{< proto/enum enum="MACVersion" >}}
 
 {{< proto/enum enum="PHYVersion" >}}
