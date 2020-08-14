@@ -44,7 +44,7 @@ const m = defineMessages({
   redirect: ({ gtwId }) => `/gateways/${gtwId}`,
 })
 @withBreadcrumb('gateways.single.data', ({ gtwId }) => (
-  <Breadcrumb path={`/gateways/${gtwId}/data`} content={sharedMessages.data} />
+  <Breadcrumb path={`/gateways/${gtwId}/data`} content={sharedMessages.liveData} />
 ))
 export default class Data extends React.Component {
   static propTypes = {
