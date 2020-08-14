@@ -32,6 +32,7 @@ var (
 			ttnpb.RIGHT_GATEWAY_STATUS_READ,
 		),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtGatewayDisconnect = events.Define(
 		"gs.gateway.disconnect", "disconnect gateway",

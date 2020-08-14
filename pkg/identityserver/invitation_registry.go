@@ -33,6 +33,7 @@ import (
 var evtCreateInvitation = events.Define(
 	"invitation.create", "create invitation",
 	events.WithAuthFromContext(),
+	events.WithClientInfoFromContext(),
 )
 
 var errNoInviteRights = errors.DefinePermissionDenied(

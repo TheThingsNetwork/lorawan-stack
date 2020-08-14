@@ -10,10 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - LoRaCloud DAS integration page in the Console.
+- User Agent metadata on published events (when available).
 
 ### Changed
 
 - Network Server now only publishes payload-related downlink events if scheduling succeeds.
+- Moved remote IP event metadata outside authentication.
 
 ### Deprecated
 

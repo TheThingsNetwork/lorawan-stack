@@ -126,6 +126,26 @@ func (dst *Event) SetFields(src *Event, paths ...string) error {
 					dst.Authentication = nil
 				}
 			}
+		case "remote_ip":
+			if len(subs) > 0 {
+				return fmt.Errorf("'remote_ip' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RemoteIP = src.RemoteIP
+			} else {
+				var zero string
+				dst.RemoteIP = zero
+			}
+		case "user_agent":
+			if len(subs) > 0 {
+				return fmt.Errorf("'user_agent' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UserAgent = src.UserAgent
+			} else {
+				var zero string
+				dst.UserAgent = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -205,16 +225,6 @@ func (dst *Event_Authentication) SetFields(src *Event_Authentication, paths ...s
 			} else {
 				var zero string
 				dst.TokenID = zero
-			}
-		case "remote_ip":
-			if len(subs) > 0 {
-				return fmt.Errorf("'remote_ip' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.RemoteIP = src.RemoteIP
-			} else {
-				var zero string
-				dst.RemoteIP = zero
 			}
 
 		default:

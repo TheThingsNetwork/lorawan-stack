@@ -42,21 +42,25 @@ var (
 		"user.create", "create user",
 		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtUpdateUser = events.Define(
 		"user.update", "update user",
 		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtDeleteUser = events.Define(
 		"user.delete", "delete user",
 		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtUpdateUserIncorrectPassword = events.Define(
 		"user.update.incorrect_password", "update user failure: incorrect password",
 		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
 		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 )
 
