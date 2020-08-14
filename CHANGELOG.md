@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Authentication metadata missing from published events.
+- Under some circumstances, CLI would mistakenly import ABP devices as OTAA.
 
 ### Security
 
