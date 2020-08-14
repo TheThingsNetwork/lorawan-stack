@@ -56,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - API to get configuration from the Identity Server (including user registration options and password requirements).
 - Synchronize gateway time by uplink token on downstream in case the Gateway Server instance is not handling the upstream gateway connection.
 - Work-around for Basic Station gateways sending uplink frames with no `xtime`.
+- Document Network Server API Key requirement for Basic Station.
 
 ### Changed
 
