@@ -73,6 +73,7 @@ func makeProtoc() (func(...string) error, *protocContext, error) {
 			"--user", fmt.Sprintf("%s:%s", usr.Uid, usr.Gid),
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/api", filepath.Join(wd, "api"), mountWD),
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/go.thethings.network/lorawan-stack/v3/pkg/ttnpb", filepath.Join(wd, "pkg", "ttnpb"), protocOut),
+			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/doc", filepath.Join(wd, "doc"), mountWD),
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/v3/sdk/js", filepath.Join(wd, "sdk", "js"), mountWD),
 			"-w", mountWD,
 			fmt.Sprintf("%s:%s", protocName, protocVersion),
@@ -205,6 +206,37 @@ func (p Proto) MarkdownClean(context.Context) error {
 	return sh.Rm(filepath.Join("api", "api.md"))
 }
 
+// HugoData generates Hugo data files.
+func (p Proto) HugoData(context.Context) error {
+	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
+		if err := protoc(
+			fmt.Sprintf("--hugodata_out=output_path=%[1]s:%[1]s", filepath.Join(pCtx.WorkingDirectory, "doc", "data")),
+			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+		); err != nil {
+			return fmt.Errorf("failed to generate protos: %w", err)
+		}
+		return nil
+	})
+}
+
+// HugoDataClean removes generated Hugo data files.
+func (p Proto) HugoDataClean(context.Context) error {
+	return filepath.Walk(filepath.Join("doc", "data", "api", "ttn.lorawan.v3"), func(path string, _ os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		for _, ext := range []string{"enums.yml", "messages.yml", "services.yml"} {
+			if strings.HasSuffix(path, ext) {
+				if err := sh.Rm(path); err != nil {
+					return err
+				}
+				return nil
+			}
+		}
+		return nil
+	})
+}
+
 // JsSDK generates javascript SDK protos.
 func (p Proto) JsSDK(context.Context) error {
 	ok, err := target.Glob(
@@ -235,10 +267,10 @@ func (p Proto) JsSDKClean(context.Context) error {
 
 // All generates protos.
 func (p Proto) All(ctx context.Context) {
-	mg.CtxDeps(ctx, Proto.Go, Proto.Swagger, Proto.Markdown, Proto.JsSDK)
+	mg.CtxDeps(ctx, Proto.Go, Proto.Swagger, Proto.Markdown, Proto.HugoData, Proto.JsSDK)
 }
 
 // Clean removes generated protos.
 func (p Proto) Clean(ctx context.Context) {
-	mg.CtxDeps(ctx, Proto.GoClean, Proto.SwaggerClean, Proto.MarkdownClean, Proto.JsSDKClean)
+	mg.CtxDeps(ctx, Proto.GoClean, Proto.SwaggerClean, Proto.MarkdownClean, Proto.HugoDataClean, Proto.JsSDKClean)
 }

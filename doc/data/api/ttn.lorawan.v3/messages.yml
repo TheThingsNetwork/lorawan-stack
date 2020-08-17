@@ -3617,6 +3617,15 @@ GetGatewayRequest:
       package: google.protobuf
       name: FieldMask
     default: {}
+GetIsConfigurationRequest:
+  name: GetIsConfigurationRequest
+GetIsConfigurationResponse:
+  name: GetIsConfigurationResponse
+  fields:
+  - name: configuration
+    message:
+      name: IsConfiguration
+    default: {}
 GetOrganizationAPIKeyRequest:
   name: GetOrganizationAPIKeyRequest
   fields:
@@ -3763,6 +3772,145 @@ Invitations:
       message:
         name: Invitation
     default: []
+IsConfiguration:
+  name: IsConfiguration
+  fields:
+  - name: user_registration
+    message:
+      name: IsConfiguration.UserRegistration
+    default: {}
+  - name: profile_picture
+    message:
+      name: IsConfiguration.ProfilePicture
+    default: {}
+  - name: end_device_picture
+    message:
+      name: IsConfiguration.EndDevicePicture
+    default: {}
+  - name: user_rights
+    message:
+      name: IsConfiguration.UserRights
+    default: {}
+IsConfiguration.EndDevicePicture:
+  name: IsConfiguration.EndDevicePicture
+  fields:
+  - name: disable_upload
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+IsConfiguration.ProfilePicture:
+  name: IsConfiguration.ProfilePicture
+  fields:
+  - name: disable_upload
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+  - name: use_gravatar
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+IsConfiguration.UserRegistration:
+  name: IsConfiguration.UserRegistration
+  fields:
+  - name: invitation
+    message:
+      name: IsConfiguration.UserRegistration.Invitation
+    default: {}
+  - name: contact_info_validation
+    message:
+      name: IsConfiguration.UserRegistration.ContactInfoValidation
+    default: {}
+  - name: admin_approval
+    message:
+      name: IsConfiguration.UserRegistration.AdminApproval
+    default: {}
+  - name: password_requirements
+    message:
+      name: IsConfiguration.UserRegistration.PasswordRequirements
+    default: {}
+IsConfiguration.UserRegistration.AdminApproval:
+  name: IsConfiguration.UserRegistration.AdminApproval
+  fields:
+  - name: required
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+IsConfiguration.UserRegistration.ContactInfoValidation:
+  name: IsConfiguration.UserRegistration.ContactInfoValidation
+  fields:
+  - name: required
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+IsConfiguration.UserRegistration.Invitation:
+  name: IsConfiguration.UserRegistration.Invitation
+  fields:
+  - name: required
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+  - name: token_ttl
+    message:
+      package: google.protobuf
+      name: Duration
+    default: 0s
+IsConfiguration.UserRegistration.PasswordRequirements:
+  name: IsConfiguration.UserRegistration.PasswordRequirements
+  fields:
+  - name: min_length
+    message:
+      package: google.protobuf
+      name: UInt32Value
+    default: null
+  - name: max_length
+    message:
+      package: google.protobuf
+      name: UInt32Value
+    default: null
+  - name: min_uppercase
+    message:
+      package: google.protobuf
+      name: UInt32Value
+    default: null
+  - name: min_digits
+    message:
+      package: google.protobuf
+      name: UInt32Value
+    default: null
+  - name: min_special
+    message:
+      package: google.protobuf
+      name: UInt32Value
+    default: null
+IsConfiguration.UserRights:
+  name: IsConfiguration.UserRights
+  fields:
+  - name: create_applications
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+  - name: create_clients
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+  - name: create_gateways
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+  - name: create_organizations
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
 JoinAcceptMICRequest:
   name: JoinAcceptMICRequest
   fields:
@@ -7429,6 +7577,10 @@ UplinkToken:
       package: google.protobuf
       name: Timestamp
     default: "0001-01-01T00:00:00Z"
+  - name: concentrator_time
+    comment: Absolute concentrator time as observed by the Gateway Server, accounting for rollovers.
+    type: int64
+    default: 0
 User:
   name: User
   comment: User is the message that defines a user on the network.
