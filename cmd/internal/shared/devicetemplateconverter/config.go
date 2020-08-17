@@ -19,6 +19,4 @@ import (
 )
 
 // DefaultDeviceTemplateConverterConfig is the default configuration for the Device Template Converter.
-var DefaultDeviceTemplateConverterConfig = devicetemplateconverter.Config{
-	Enabled: []string{"the-things-stack"},
-}
+var DefaultDeviceTemplateConverterConfig = devicetemplateconverter.Config{}

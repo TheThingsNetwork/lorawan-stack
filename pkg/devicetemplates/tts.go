@@ -23,6 +23,9 @@ import (
 	ttnio "go.thethings.network/lorawan-stack/v3/pkg/util/io"
 )
 
+// TTS is the device template converter id.
+const TTS = "the-things-stack"
+
 type tts struct{}
 
 // Format implements the devicetemplates.Converter interface.
@@ -39,7 +42,6 @@ func (t *tts) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDevi
 	defer close(ch)
 
 	dec := ttnio.NewJSONDecoder(r)
-
 	for {
 		dev := ttnpb.EndDevice{}
 		paths, err := dec.Decode(&dev)
@@ -66,5 +68,5 @@ func (t *tts) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDevi
 }
 
 func init() {
-	RegisterConverter("the-things-stack", &tts{})
+	RegisterConverter(TTS, &tts{})
 }
