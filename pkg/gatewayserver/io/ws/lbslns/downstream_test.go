@@ -26,6 +26,7 @@ import (
 func timePtr(time time.Time) *time.Time { return &time }
 
 func TestFromDownlinkMessage(t *testing.T) {
+	var lbsLNS lbsLNS
 	for _, tc := range []struct {
 		Name                    string
 		DownlinkMessage         ttnpb.DownlinkMessage
@@ -49,11 +50,13 @@ func TestFromDownlinkMessage(t *testing.T) {
 						Timestamp: 1553300787,
 					},
 				},
+				CorrelationIDs: []string{"correlation1"},
 			},
 			GatewayIDs: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			ExpectedDownlinkMessage: DownlinkMessage{
 				DevEUI:      "00-00-00-00-00-00-00-00",
 				DeviceClass: 0,
+				Diid:        1,
 				Pdu:         "596d7868616d74686332356b4a334d3d3d",
 				RxDelay:     1,
 				Rx1DR:       2,
@@ -79,11 +82,13 @@ func TestFromDownlinkMessage(t *testing.T) {
 						},
 					},
 				},
+				CorrelationIDs: []string{"correlation2"},
 			},
 			GatewayIDs: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			ExpectedDownlinkMessage: DownlinkMessage{
 				DevEUI:      "00-00-00-00-00-00-00-00",
 				DeviceClass: 0,
+				Diid:        2,
 				Pdu:         "596d7868616d74686332356b4a334d3d3d",
 				RxDelay:     1,
 				Rx1DR:       2,
@@ -96,8 +101,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			var bsFormat lbsLNS
-			raw, err := bsFormat.FromDownlink(tc.GatewayIDs, tc.DownlinkMessage.GetRawPayload(), tc.DownlinkMessage.GetScheduled(), 0, time.Unix(1554300787, 123456000), 0x00)
+			raw, err := lbsLNS.FromDownlink(tc.GatewayIDs, tc.DownlinkMessage, time.Unix(1554300787, 123456000), 0x00)
 			a.So(err, should.BeNil)
 			var dnmsg DownlinkMessage
 			err = dnmsg.unmarshalJSON(raw)

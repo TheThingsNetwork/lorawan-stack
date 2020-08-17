@@ -59,11 +59,12 @@ func (dnmsg *DownlinkMessage) unmarshalJSON(data []byte) error {
 }
 
 // FromDownlink implements Formatter.
-func (lbsLNS) FromDownlink(ids ttnpb.GatewayIdentifiers, rawPayload []byte, scheduledMsg *ttnpb.TxSettings, dlToken int64, dlTime time.Time, xTime int64) ([]byte, error) {
+func (lbsLNS *lbsLNS) FromDownlink(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlTime time.Time, xTime int64) ([]byte, error) {
 	var dnmsg DownlinkMessage
-	dnmsg.Pdu = hex.EncodeToString(rawPayload)
-	dnmsg.RCtx = int64(scheduledMsg.Downlink.AntennaIndex)
-	dnmsg.Diid = dlToken
+	settings := down.GetScheduled()
+	dnmsg.Pdu = hex.EncodeToString(down.GetRawPayload())
+	dnmsg.RCtx = int64(settings.Downlink.AntennaIndex)
+	dnmsg.Diid = int64(lbsLNS.tokens.Next(down.CorrelationIDs, dlTime))
 
 	// This field is not used but needs to be defined for the station to parse the json.
 	dnmsg.DevEUI = "00-00-00-00-00-00-00-00"
@@ -73,8 +74,8 @@ func (lbsLNS) FromDownlink(ids ttnpb.GatewayIdentifiers, rawPayload []byte, sche
 	dnmsg.RxDelay = 1
 
 	// Fix the Tx Parameters since we don't use the gateway scheduler.
-	dnmsg.Rx1DR = int(scheduledMsg.DataRateIndex)
-	dnmsg.Rx1Freq = int(scheduledMsg.Frequency)
+	dnmsg.Rx1DR = int(settings.DataRateIndex)
+	dnmsg.Rx1Freq = int(settings.Frequency)
 
 	// Add the MuxTime for RTT measurement
 	dnmsg.MuxTime = float64(dlTime.UnixNano()) / float64(time.Second)

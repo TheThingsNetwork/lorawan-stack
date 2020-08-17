@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -35,11 +34,11 @@ type Formatter interface {
 	GetRouterConfig(ctx context.Context, message []byte, bandID string, fps map[string]*frequencyplans.FrequencyPlan, receivedAt time.Time) (context.Context, []byte, *ttnpb.GatewayStatus, error)
 
 	// FromDownlink generates a downlink byte stream that can be sent over the WS connection.
-	FromDownlink(dids ttnpb.GatewayIdentifiers, rawPayload []byte, scheduledMsg *ttnpb.TxSettings, dlToken int64, dlTime time.Time, xTime int64) ([]byte, error)
+	FromDownlink(dids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlTime time.Time, xTime int64) ([]byte, error)
 
 	// ToUplink parses Uplink/JoinRequest messages into ttnpb.UplinkMessage.
 	ToUplink(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time, msgType string) (*ttnpb.UplinkMessage, ParsedTime, error)
 
 	// ToTxAck parses fields from the TxConfirmation message and converts it to  ttnpb.TxAcknowledgment message.
-	ToTxAck(ctx context.Context, message []byte, tokens io.DownlinkTokens, receivedAt time.Time) (*ttnpb.TxAcknowledgment, ParsedTime, error)
+	ToTxAck(ctx context.Context, message []byte, receivedAt time.Time) (*ttnpb.TxAcknowledgment, ParsedTime, error)
 }

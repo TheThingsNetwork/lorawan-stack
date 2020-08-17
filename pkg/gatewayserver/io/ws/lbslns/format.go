@@ -14,12 +14,19 @@
 
 package lbslns
 
-import "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+import (
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+)
 
 type lbsLNS struct {
+	tokens   io.DownlinkTokens
+	sessions ws.Sessions
 }
 
 // NewFormatter returns a new LoRa Basic Station LNS formatter.
 func NewFormatter() ws.Formatter {
-	return lbsLNS{}
+	var lbsLNS lbsLNS
+	lbsLNS.sessions.Init()
+	return &lbsLNS
 }

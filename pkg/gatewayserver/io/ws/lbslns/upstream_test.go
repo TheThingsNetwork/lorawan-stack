@@ -23,7 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -652,11 +651,10 @@ func TestTxAck(t *testing.T) {
 	raw, err := txConf.MarshalJSON()
 	a.So(err, should.BeNil)
 	correlationIDs := []string{"i3N84kvunPAS8wOmiEKbhsP62wNMRdmn", "deK3h59wUZhR0xb17eumTkauGQxoB5xn"}
-	var tokens io.DownlinkTokens
+	var lnsLNS lbsLNS
 	now := time.Now()
-	tokens.Next(correlationIDs, time.Unix(int64(0), 0))
-	var bsFormat lbsLNS
-	txAck, parsedTime, err := bsFormat.ToTxAck(context.Background(), raw, tokens, now)
+	lnsLNS.tokens.Next(correlationIDs, time.Unix(int64(0), 0))
+	txAck, parsedTime, err := lnsLNS.ToTxAck(context.Background(), raw, now)
 	a.So(err, should.BeNil)
 	a.So(parsedTime.RefTime, should.Equal, txConf.RefTime)
 	if !a.So(txAck, should.Resemble, &ttnpb.TxAcknowledgment{

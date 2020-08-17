@@ -60,7 +60,6 @@ type srv struct {
 	server               io.Server
 	webServer            *echo.Echo
 	upgrader             *websocket.Upgrader
-	tokens               io.DownlinkTokens
 	useTrafficTLSAddress bool
 	wsPingInterval       time.Duration
 	cfg                  Config
@@ -313,7 +312,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					continue
 				}
 				xTime := int64(sID)<<48 | (int64(concentratorTime) / int64(time.Microsecond) & 0xFFFFFFFFFF)
-				dnmsg, err := s.formatter.FromDownlink(ids, down.GetRawPayload(), scheduledMsg, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime, xTime)
+				dnmsg, err := s.formatter.FromDownlink(ids, *down, dlTime, xTime)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
@@ -401,7 +400,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			recordTime(parsedTime, receivedAt)
 
 		case TypeUpstreamTxConfirmation:
-			txAck, parsedTime, err := s.formatter.ToTxAck(ctx, data, s.tokens, receivedAt)
+			txAck, parsedTime, err := s.formatter.ToTxAck(ctx, data, receivedAt)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse tx confirmation frame")
 				return err

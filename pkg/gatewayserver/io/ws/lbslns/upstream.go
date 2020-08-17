@@ -25,7 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -406,7 +405,7 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 }
 
 // ToTxAck implements Format.
-func (lbsLNS) ToTxAck(ctx context.Context, raw []byte, tokens io.DownlinkTokens, receivedAt time.Time) (*ttnpb.TxAcknowledgment, ws.ParsedTime, error) {
+func (lbsLNS *lbsLNS) ToTxAck(ctx context.Context, raw []byte, receivedAt time.Time) (*ttnpb.TxAcknowledgment, ws.ParsedTime, error) {
 	var (
 		txConf TxConfirmation
 		txAck  ttnpb.TxAcknowledgment
@@ -414,7 +413,7 @@ func (lbsLNS) ToTxAck(ctx context.Context, raw []byte, tokens io.DownlinkTokens,
 	if err := json.Unmarshal(raw, &txConf); err != nil {
 		return nil, ws.ParsedTime{}, err
 	}
-	if cids, _, ok := tokens.Get(uint16(txConf.Diid), receivedAt); ok {
+	if cids, _, ok := lbsLNS.tokens.Get(uint16(txConf.Diid), receivedAt); ok {
 		txAck.CorrelationIDs = cids
 		txAck.Result = ttnpb.TxAcknowledgment_SUCCESS
 	} else {
