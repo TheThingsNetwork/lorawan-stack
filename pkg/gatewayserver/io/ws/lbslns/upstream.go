@@ -427,7 +427,7 @@ func (lbsLNS *lbsLNS) ToTxAck(ctx context.Context, raw []byte, receivedAt time.T
 }
 
 // ToUplink implements Format.
-func (lbsLNS) ToUplink(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time, msgType string) (*ttnpb.UplinkMessage, ws.ParsedTime, error) {
+func (lbsLNS *lbsLNS) ToUplink(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time, msgType string) (*ttnpb.UplinkMessage, ws.ParsedTime, error) {
 	var (
 		up         *ttnpb.UplinkMessage
 		parsedTime ws.ParsedTime

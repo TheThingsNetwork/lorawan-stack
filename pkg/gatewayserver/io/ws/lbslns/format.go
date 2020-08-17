@@ -29,9 +29,7 @@ type lbsLNS struct {
 
 // NewFormatter returns a new LoRa Basic Station LNS formatter.
 func NewFormatter() ws.Formatter {
-	var lbsLNS lbsLNS
-	lbsLNS.sessions.Init()
-	return &lbsLNS
+	return &lbsLNS{}
 }
 
 func (lbsLNS *lbsLNS) Connect(ctx context.Context, uid string) error {

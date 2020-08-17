@@ -65,7 +65,7 @@ func (v Version) IsProduction() bool {
 }
 
 // GetRouterConfig gets router config for the particular version message.
-func (lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string, fps map[string]*frequencyplans.FrequencyPlan, receivedAt time.Time) (context.Context, []byte, *ttnpb.GatewayStatus, error) {
+func (lbsLNS *lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string, fps map[string]*frequencyplans.FrequencyPlan, receivedAt time.Time) (context.Context, []byte, *ttnpb.GatewayStatus, error) {
 	var version Version
 	if err := json.Unmarshal(msg, &version); err != nil {
 		return nil, nil, nil, err
@@ -108,9 +108,4 @@ func (lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string, fp
 		"firmware", version.Firmware,
 		"model", version.Model,
 	)), routerCfg, stat, nil
-}
-
-// ToStatus implements Format.
-func (lbsLNS) ToStatus(ctx context.Context, message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb.GatewayStatus, error) {
-	return nil, nil
 }

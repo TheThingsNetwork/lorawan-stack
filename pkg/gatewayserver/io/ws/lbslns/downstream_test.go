@@ -15,11 +15,13 @@
 package lbslns
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -27,10 +29,12 @@ func timePtr(time time.Time) *time.Time { return &time }
 
 func TestFromDownlinkMessage(t *testing.T) {
 	var lbsLNS lbsLNS
+	ctx := context.Background()
+	uid := unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"})
+	lbsLNS.sessions.NewSession(ctx, uid)
 	for _, tc := range []struct {
 		Name                    string
 		DownlinkMessage         ttnpb.DownlinkMessage
-		GatewayIDs              ttnpb.GatewayIdentifiers
 		ExpectedDownlinkMessage DownlinkMessage
 	}{
 		{
@@ -52,7 +56,6 @@ func TestFromDownlinkMessage(t *testing.T) {
 				},
 				CorrelationIDs: []string{"correlation1"},
 			},
-			GatewayIDs: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			ExpectedDownlinkMessage: DownlinkMessage{
 				DevEUI:      "00-00-00-00-00-00-00-00",
 				DeviceClass: 0,
@@ -84,7 +87,6 @@ func TestFromDownlinkMessage(t *testing.T) {
 				},
 				CorrelationIDs: []string{"correlation2"},
 			},
-			GatewayIDs: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			ExpectedDownlinkMessage: DownlinkMessage{
 				DevEUI:      "00-00-00-00-00-00-00-00",
 				DeviceClass: 0,
@@ -101,7 +103,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			raw, err := lbsLNS.FromDownlink(tc.GatewayIDs, tc.DownlinkMessage, time.Unix(1554300787, 123456000), 0x00)
+			raw, err := lbsLNS.FromDownlink(uid, tc.DownlinkMessage, 1554300787, time.Unix(1554300787, 123456000))
 			a.So(err, should.BeNil)
 			var dnmsg DownlinkMessage
 			err = dnmsg.unmarshalJSON(raw)
