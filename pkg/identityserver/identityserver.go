@@ -177,6 +177,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 
 // RegisterHandlers registers gRPC handlers.
 func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
+	ttnpb.RegisterIsHandler(is.Context(), s, conn)
 	ttnpb.RegisterEntityAccessHandler(is.Context(), s, conn)
 	ttnpb.RegisterApplicationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterApplicationAccessHandler(is.Context(), s, conn)
