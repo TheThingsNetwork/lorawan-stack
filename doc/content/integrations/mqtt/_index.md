@@ -1,6 +1,7 @@
 ---
 title: "MQTT Server"
 description: ""
+aliases: [/guides/getting-started/mqtt]
 ---
 
 {{% tts %}} exposes an MQTT server to work with streaming events. This section explains how to connect an MQTT client and subscribe to uplinks or publish downlinks.

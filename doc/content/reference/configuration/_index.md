@@ -1,6 +1,7 @@
 ---
 title: "Configuration"
 description: ""
+aliases: [/guides/getting-started/configuration]
 ---
 
 {{% tts %}} binary can be configured with many different options. Those options can be provided as command-line flags, environment variables or using a configuration file.

@@ -2,6 +2,7 @@
 title: "Create Application"
 description: ""
 weight: 3
+aliases: [/guides/getting-started/console/create-application]
 ---
 
 Learn how to register an application using the Console.

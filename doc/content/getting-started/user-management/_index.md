@@ -1,6 +1,7 @@
 ---
 title: "Users and Organizations"
 description: ""
+aliases: [/user-management]
 ---
 
 {{% tts %}} allows allows network administrators to manage the users that have access to the network. Administrators may add and remove users, and perform any actions on Gateways, End Devices, and Applications.
