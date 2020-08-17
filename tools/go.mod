@@ -1,6 +1,6 @@
 module go.thethings.network/lorawan-stack/tools
 
-go 1.14
+go 1.15
 
 replace go.thethings.network/lorawan-stack/v3 => ../
 
