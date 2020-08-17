@@ -1,16 +1,16 @@
 ---
-title: "Telegraf Setup"
+title: "Telegraf Setup for MQTT Integration"
 description: ""
 weight: 1
 ---
 
-This section contains instructions to configure the Telegraf agent for connecting to {{% tts %}} MQTT server and sending data to InfluxDB Cloud 2.0.
+This section contains instructions to configure the Telegraf agent to use [MQTT Consumer](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/mqtt_consumer) plugin for connecting to {{% tts %}} MQTT server and to send data to InfluxDB Cloud 2.0.
 
 <!--more-->
 
 The information needed to configure Telegraf can be found on the **MQTT** tab in {{% tts %}} **Integrations** menu.
 
-{{< figure src="tts-mqtt-info.png" alt="The Things Stack MQTT server info" >}}
+{{< figure src="../tts-mqtt-info.png" alt="The Things Stack MQTT server info" >}}
 
 Update the previously downloaded Telegraf configuration with the following lines and modify them according to your MQTT server info:
 
@@ -46,4 +46,4 @@ Run the Telegraf agent with this configuration file.
 
 Click the **Explore** tab on the left. Select your bucket in the **FROM** window in the bottom. In the **Filter** window, select **_measurement** on the drop-down menu and tick the **mqtt_consumer** box. 
 
-At this point you will be able to choose which topic and which parameter you want to monitor, and you can start manipulating the incoming data in various ways.
+At this point you will be able to choose which topic and which parameter you want to monitor, and you can start manipulating the incoming data.
