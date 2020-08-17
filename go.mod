@@ -5,9 +5,6 @@ go 1.14
 // Use our fork of grpc-gateway.
 replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.14.5-gogo
 
-// Use our fork of otto.
-replace github.com/robertkrimen/otto => github.com/TheThingsIndustries/otto v0.0.0-20200507140236-e2ec6b546eb2
-
 // Do not upgrade Echo beyond v4.1.2.
 // See https://github.com/TheThingsNetwork/lorawan-stack/issues/977.
 replace github.com/labstack/echo/v4 => github.com/labstack/echo/v4 v4.1.2
@@ -85,7 +82,6 @@ require (
 	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.5.1
-	github.com/robertkrimen/otto v0.0.0-20191219234010-c382bd3c16ff
 	github.com/satori/go.uuid v1.2.0
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.5.0+incompatible

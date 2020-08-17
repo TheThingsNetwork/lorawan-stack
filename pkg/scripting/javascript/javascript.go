@@ -20,7 +20,6 @@ import (
 	"runtime/trace"
 	"time"
 
-	"github.com/robertkrimen/otto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/scripting"
 )
@@ -50,40 +49,11 @@ func (j *js) Run(ctx context.Context, script string, env map[string]interface{})
 		}
 	}()
 
-	vm := otto.New()
-	vm.SetStackDepthLimit(j.options.StackDepthLimit)
+	// TODO: Initialize sandbox
+	// TODO: Set environment
+	// TODO: Set timeout
+	// TODO: Set memory and stack size limit
+	// TODO: Return output
 
-	err = vm.Set("env", env)
-	if err != nil {
-		return
-	}
-
-	defer func() {
-		if caught := recover(); caught != nil {
-			switch val := caught.(type) {
-			case error:
-				err = errRuntime.WithCause(val)
-			default:
-				err = errRuntime
-			}
-			return
-		}
-	}()
-
-	vm.Interrupt = make(chan func(), 1)
-	ctx, cancel := context.WithTimeout(ctx, j.options.Timeout)
-	defer cancel()
-	go func() {
-		<-ctx.Done()
-		vm.Interrupt <- func() {
-			panic(context.DeadlineExceeded)
-		}
-	}()
-
-	output, err := vm.Run(script)
-	if err != nil {
-		return nil, errRuntime.WithCause(err)
-	}
-
-	return output.Export()
+	return nil, errRuntime.New()
 }
