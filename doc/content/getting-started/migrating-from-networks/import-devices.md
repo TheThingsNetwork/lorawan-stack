@@ -19,4 +19,4 @@ If the import is successful, your devices are added to the list of end devices i
 
 {{< figure src="../successful-import.png" alt="successful-import" >}}
 
-You can now start using your devices with {{% tts %}}!
+If the import was successful, your devices are added to the list of end-devices in your application.
