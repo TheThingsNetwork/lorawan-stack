@@ -42,9 +42,10 @@ func (s *server) redirectToLogin(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		_, err := s.getSession(c)
 		if err != nil {
+			config := s.configFromEchoContext(c)
 			values := make(url.Values)
 			values.Set(nextKey, fmt.Sprintf("%s?%s", c.Request().URL.Path, c.QueryParams().Encode()))
-			return c.Redirect(http.StatusFound, fmt.Sprintf("%s?%s", path.Join(s.config.UI.MountPath(), "login"), values.Encode()))
+			return c.Redirect(http.StatusFound, fmt.Sprintf("%s?%s", path.Join(config.UI.MountPath(), "login"), values.Encode()))
 		}
 		return next(c)
 	}
@@ -56,7 +57,8 @@ func (s *server) redirectToNext(next echo.HandlerFunc) echo.HandlerFunc {
 		if err == nil {
 			next := c.QueryParam(nextKey)
 			if next == "" {
-				next = s.config.UI.MountPath()
+				config := s.configFromEchoContext(c)
+				next = config.UI.MountPath()
 			}
 			url, err := url.Parse(next)
 			if err != nil {

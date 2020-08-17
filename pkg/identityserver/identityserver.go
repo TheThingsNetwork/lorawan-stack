@@ -100,7 +100,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	}
 
 	is.config.OAuth.CSRFAuthKey = is.GetBaseConfig(is.Context()).HTTP.Cookie.HashKey
-	is.oauth = oauth.NewServer(is.Context(), struct {
+	is.oauth, err = oauth.NewServer(c, struct {
 		store.UserStore
 		store.UserSessionStore
 		store.ClientStore
@@ -110,7 +110,10 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		UserSessionStore: store.GetUserSessionStore(is.db),
 		ClientStore:      store.GetClientStore(is.db),
 		OAuthStore:       store.GetOAuthStore(is.db),
-	}, is.config.OAuth)
+	}, oauth.StaticConfigProvider(is.config.OAuth))
+	if err != nil {
+		return nil, err
+	}
 
 	c.AddContextFiller(func(ctx context.Context) context.Context {
 		ctx = is.withRequestAccessCache(ctx)

@@ -186,7 +186,14 @@ func (s *server) Login(c echo.Context) error {
 	if err := s.doLogin(ctx, req.UserID, req.Password); err != nil {
 		return err
 	}
-	userIDs := ttnpb.UserIdentifiers{UserID: req.UserID}
+	if err := s.CreateUserSession(c, ttnpb.UserIdentifiers{UserID: req.UserID}); err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
+func (s *server) CreateUserSession(c echo.Context, userIDs ttnpb.UserIdentifiers) error {
+	ctx := c.Request().Context()
 	tokenSecret, err := auth.GenerateKey(ctx)
 	if err != nil {
 		return err
@@ -203,16 +210,12 @@ func (s *server) Login(c echo.Context) error {
 		return err
 	}
 	events.Publish(evtUserLogin.NewWithIdentifiersAndData(ctx, userIDs, nil))
-	err = s.updateAuthCookie(c, func(cookie *auth.CookieShape) error {
+	return s.updateAuthCookie(c, func(cookie *auth.CookieShape) error {
 		cookie.UserID = session.UserIdentifiers.UserID
 		cookie.SessionID = session.SessionID
 		cookie.SessionSecret = tokenSecret
 		return nil
 	})
-	if err != nil {
-		return err
-	}
-	return c.NoContent(http.StatusNoContent)
 }
 
 var (
@@ -255,7 +258,8 @@ func (s *server) ClientLogout(c echo.Context) error {
 			if len(client.LogoutRedirectURIs) != 0 {
 				redirectURI = client.LogoutRedirectURIs[0]
 			} else {
-				redirectURI = s.config.UI.MountPath()
+				config := s.configFromContext(ctx)
+				redirectURI = config.UI.MountPath()
 			}
 		} else {
 			for _, uri := range client.LogoutRedirectURIs {
