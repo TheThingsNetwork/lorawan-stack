@@ -1,6 +1,7 @@
 ---
 title: "Packet Broker Agent"
 description: ""
+aliases: [/components/packet-broker-agent]
 ---
 
 The Packet Broker Agent connects Packet Broker for exchanging traffic with other networks.
