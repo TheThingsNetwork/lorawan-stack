@@ -24,7 +24,6 @@ import (
 	"regexp"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -174,7 +173,6 @@ func (s *srv) handleDiscover(c echo.Context) error {
 var euiHexPattern = regexp.MustCompile("^eui-([a-f0-9A-F]{16})$")
 
 func (s *srv) handleTraffic(c echo.Context) (err error) {
-	var sessionID int32
 	id := c.Param("id")
 	auth := c.Request().Header.Get(echo.HeaderAuthorization)
 	ctx := c.Request().Context()
@@ -247,10 +245,18 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		return err
 	}
 
+	// Handle session state
+	err = s.formatter.Connect(ctx, uid)
+	if err != nil {
+		logger.WithError(err).Warn("Failed to handle session")
+		return err
+	}
+
 	ws, err := s.upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to upgrade request to websocket connection")
 		conn.Disconnect(err)
+		s.formatter.Disconnect(ctx, uid)
 		return err
 	}
 	defer ws.Close()
@@ -258,6 +264,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 
 	defer func() {
 		conn.Disconnect(err)
+		s.formatter.Disconnect(ctx, uid)
 		err = nil // Errors are sent over the websocket connection that is established by this point.
 	}()
 
@@ -297,22 +304,19 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				if err != nil {
 					logger.WithError(err).Warn("Failed to send ping message")
 					conn.Disconnect(err)
+					s.formatter.Disconnect(ctx, uid)
 					ws.Close()
 					return
 				}
 			case down := <-conn.Down():
 				dlTime := time.Now()
-				scheduledMsg := down.GetScheduled()
 
-				// The first 16 bits of XTime gets the session ID from the upstream latestXTime and the other 48 bits are concentrator timestamp accounted for rollover.
-				sID := atomic.LoadInt32(&sessionID)
-				concentratorTime, ok := conn.TimeFromTimestampTime(scheduledMsg.Timestamp)
+				concentratorTime, ok := conn.TimeFromTimestampTime(down.GetScheduled().Timestamp)
 				if !ok {
 					logger.Warn("No clock synchronization")
 					continue
 				}
-				xTime := int64(sID)<<48 | (int64(concentratorTime) / int64(time.Microsecond) & 0xFFFFFFFFFF)
-				dnmsg, err := s.formatter.FromDownlink(ids, *down, dlTime, xTime)
+				dnmsg, err := s.formatter.FromDownlink(uid, *down, concentratorTime, dlTime)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
@@ -325,14 +329,18 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				if err != nil {
 					logger.WithError(err).Warn("Failed to send downlink message")
 					conn.Disconnect(err)
+					s.formatter.Disconnect(ctx, uid)
 					return
 				}
 			}
 		}
 	}()
 	recordTime := func(parsedTime ParsedTime, server time.Time) {
-		// The session is the 16 MSB.
-		atomic.StoreInt32(&sessionID, int32(parsedTime.XTime>>48))
+		sec, nsec := math.Modf(parsedTime.RefTime)
+		if sec != 0 {
+			ref := time.Unix(int64(sec), int64(nsec*1e9))
+			conn.RecordRTT(server.Sub(ref), server)
+		}
 		conn.SyncWithGatewayConcentrator(
 			// The concentrator timestamp is the 32 LSB.
 			uint32(parsedTime.XTime&0xFFFFFFFF),
@@ -340,11 +348,6 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			// The Basic Station epoch is the 48 LSB.
 			scheduling.ConcentratorTime(time.Duration(parsedTime.XTime&0xFFFFFFFFFF)*time.Microsecond),
 		)
-		sec, nsec := math.Modf(parsedTime.RefTime)
-		if sec != 0 {
-			ref := time.Unix(int64(sec), int64(nsec*1e9))
-			conn.RecordRTT(server.Sub(ref), server)
-		}
 	}
 
 	for {
@@ -397,6 +400,9 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			if err := conn.HandleUp(up); err != nil {
 				logger.WithError(err).Warn("Failed to handle upstream message")
 			}
+			s.formatter.UpdateState(ctx, uid, Session{
+				ID: int32(parsedTime.XTime >> 48),
+			})
 			recordTime(parsedTime, receivedAt)
 
 		case TypeUpstreamTxConfirmation:
@@ -408,6 +414,9 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			if err := conn.HandleTxAck(txAck); err != nil {
 				logger.WithError(err).Warn("Failed to handle tx ack message")
 			}
+			s.formatter.UpdateState(ctx, uid, Session{
+				ID: int32(parsedTime.XTime >> 48),
+			})
 			recordTime(parsedTime, receivedAt)
 
 		case TypeUpstreamProprietaryDataFrame, TypeUpstreamRemoteShell, TypeUpstreamTimeSync:

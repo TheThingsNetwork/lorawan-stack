@@ -21,10 +21,14 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var errDownlinkMessage = errors.Define("downlink_message", "could not translate downlink message")
+var (
+	errDownlinkMessage = errors.Define("downlink_message", "could not translate downlink message")
+	errNoClockSync     = errors.DefineUnavailable("no_clock_sync", "no clock sync")
+)
 
 // DownlinkMessage is the LoRaWAN downlink message sent to the LoRa Basics Station.
 type DownlinkMessage struct {
@@ -59,12 +63,22 @@ func (dnmsg *DownlinkMessage) unmarshalJSON(data []byte) error {
 }
 
 // FromDownlink implements Formatter.
-func (lbsLNS *lbsLNS) FromDownlink(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlTime time.Time, xTime int64) ([]byte, error) {
+func (lbsLNS *lbsLNS) FromDownlink(uid string, down ttnpb.DownlinkMessage, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
 	var dnmsg DownlinkMessage
 	settings := down.GetScheduled()
 	dnmsg.Pdu = hex.EncodeToString(down.GetRawPayload())
 	dnmsg.RCtx = int64(settings.Downlink.AntennaIndex)
 	dnmsg.Diid = int64(lbsLNS.tokens.Next(down.CorrelationIDs, dlTime))
+
+	// The first 16 bits of XTime gets the session ID from the upstream latestXTime and the other 48 bits are concentrator timestamp accounted for rollover.
+	session, err := lbsLNS.sessions.GetSession(uid)
+	if err != nil {
+		return nil, err
+	}
+	xTime := int64(session.ID)<<48 | (int64(concentratorTime) / int64(time.Microsecond) & 0xFFFFFFFFFF)
+
+	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay). The calculated offset is in microseconds.
+	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*int(time.Second/time.Microsecond))
 
 	// This field is not used but needs to be defined for the station to parse the json.
 	dnmsg.DevEUI = "00-00-00-00-00-00-00-00"
@@ -82,9 +96,6 @@ func (lbsLNS *lbsLNS) FromDownlink(ids ttnpb.GatewayIdentifiers, down ttnpb.Down
 
 	// The GS controls the scheduling and hence for the gateway, its always Class A.
 	dnmsg.DeviceClass = uint(ttnpb.CLASS_A)
-
-	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay). The calculated offset is in microseconds.
-	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*int(time.Second/time.Microsecond))
 
 	return dnmsg.marshalJSON()
 }

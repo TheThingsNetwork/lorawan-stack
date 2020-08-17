@@ -15,8 +15,11 @@
 package lbslns
 
 import (
+	"context"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 type lbsLNS struct {
@@ -29,4 +32,20 @@ func NewFormatter() ws.Formatter {
 	var lbsLNS lbsLNS
 	lbsLNS.sessions.Init()
 	return &lbsLNS
+}
+
+func (lbsLNS *lbsLNS) Connect(ctx context.Context, uid string) error {
+	return lbsLNS.sessions.NewSession(ctx, uid)
+}
+
+func (lbsLNS *lbsLNS) Disconnect(ctx context.Context, uid string) {
+	err := lbsLNS.sessions.DeleteSession(uid)
+	if err != nil {
+		logger := log.FromContext(ctx)
+		logger.WithError(err).Warn("Failed to disconnect")
+	}
+}
+
+func (lbsLNS *lbsLNS) UpdateState(ctx context.Context, uid string, session ws.Session) error {
+	return lbsLNS.sessions.UpdateSession(uid, session)
 }
