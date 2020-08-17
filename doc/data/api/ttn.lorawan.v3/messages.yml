@@ -2747,6 +2747,12 @@ Event:
     message:
       name: Event.Authentication
     default: {}
+  - name: remote_ip
+    type: string
+    default: ""
+  - name: user_agent
+    type: string
+    default: ""
 Event.Authentication:
   name: Event.Authentication
   fields:
@@ -2757,9 +2763,6 @@ Event.Authentication:
     type: string
     default: ""
   - name: token_id
-    type: string
-    default: ""
-  - name: remote_ip
     type: string
     default: ""
 FCtrl:
@@ -5752,7 +5755,7 @@ MACState:
   comment: |-
     MACState represents the state of MAC layer of the device.
     MACState is reset on each join for OTAA or ResetInd for ABP devices.
-    This is used internally by the Network Server and is read only.
+    This is used internally by the Network Server.
   fields:
   - name: current_parameters
     comment: Current LoRaWAN MAC parameters.
