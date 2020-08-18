@@ -38,8 +38,8 @@ func (s *server) List(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*tt
 		return nil, err
 	}
 	var packages ttnpb.ApplicationPackages
-	for _, p := range registeredPackages {
-		packages.Packages = append(packages.Packages, &p.ApplicationPackage)
+	for _, h := range s.handlers {
+		packages.Packages = append(packages.Packages, h.Package())
 	}
 	return &packages, nil
 }

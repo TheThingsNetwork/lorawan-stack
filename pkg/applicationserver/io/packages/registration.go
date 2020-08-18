@@ -18,7 +18,6 @@ import (
 	"context"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -26,34 +25,12 @@ import (
 
 // ApplicationPackageHandler handles upstream traffic from the Application Server.
 type ApplicationPackageHandler interface {
+	Package() *ttnpb.ApplicationPackage
 	RegisterServices(s *grpc.Server)
 	RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn)
 	HandleUp(context.Context, *ttnpb.ApplicationPackageDefaultAssociation, *ttnpb.ApplicationPackageAssociation, *ttnpb.ApplicationUp) error
 }
 
-// CreateApplicationPackage is a function that creates a traffic handler for a given package.
-type CreateApplicationPackage func(io.Server, Registry) ApplicationPackageHandler
-
-type registeredPackage struct {
-	ttnpb.ApplicationPackage
-	create CreateApplicationPackage
-}
-
 var (
-	errNotImplemented    = errors.DefineUnimplemented("package_not_implemented", "package `{name}` is not implemented")
-	errAlreadyRegistered = errors.DefineAlreadyExists("package_already_registered", "package `{name}` already registered")
-
-	registeredPackages = map[string]*registeredPackage{}
+	errNotImplemented = errors.DefineUnimplemented("package_not_implemented", "package `{name}` is not implemented")
 )
-
-// RegisterPackage registers the given package on the application packages frontend.
-func RegisterPackage(p ttnpb.ApplicationPackage, create CreateApplicationPackage) error {
-	if _, ok := registeredPackages[p.Name]; ok {
-		return errAlreadyRegistered.WithAttributes("name", p.Name)
-	}
-	registeredPackages[p.Name] = &registeredPackage{
-		ApplicationPackage: p,
-		create:             create,
-	}
-	return nil
-}

@@ -22,7 +22,6 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/redis"
@@ -100,7 +99,7 @@ func TestAuthentication(t *testing.T) {
 	defer flush()
 	defer redisClient.Close()
 	apRegistry := &redis.ApplicationPackagesRegistry{Redis: redisClient}
-	srv, err := packages.New(ctx, as, apRegistry)
+	srv, err := packages.New(ctx, as, apRegistry, map[string]packages.ApplicationPackageHandler{})
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -181,15 +180,11 @@ func TestAssociations(t *testing.T) {
 	apRegistry := &redis.ApplicationPackagesRegistry{Redis: redisClient}
 
 	handleUpCh := make(chan *handleUpRequest, 4)
-	applicationPackageFactory = packages.CreateApplicationPackage(
-		func(server io.Server, registry packages.Registry) packages.ApplicationPackageHandler {
-			a.So(server, should.Equal, as)
-			a.So(registry, should.Equal, apRegistry)
-			return createMockPackageHandler(handleUpCh)
-		},
-	)
-
-	srv, err := packages.New(ctx, as, apRegistry)
+	mockHandler := createMockPackageHandler(handleUpCh)
+	handlers := map[string]packages.ApplicationPackageHandler{
+		mockHandler.Package().Name: mockHandler,
+	}
+	srv, err := packages.New(ctx, as, apRegistry, handlers)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -471,20 +466,4 @@ func TestAssociations(t *testing.T) {
 				})
 		}
 	})
-}
-
-var applicationPackageFactory = func(io.Server, packages.Registry) packages.ApplicationPackageHandler {
-	return &mockPackageHandler{}
-}
-
-func init() {
-	p := ttnpb.ApplicationPackage{
-		Name:         "test-package",
-		DefaultFPort: 123,
-	}
-	packages.RegisterPackage(p, packages.CreateApplicationPackage(
-		func(server io.Server, registry packages.Registry) packages.ApplicationPackageHandler {
-			return applicationPackageFactory(server, registry)
-		},
-	))
 }
