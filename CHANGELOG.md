@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Network Server now only publishes payload-related downlink events if scheduling succeeds.
 - Moved remote IP event metadata outside authentication.
+- Admins can now set the expiration time of temporary passwords of users.
 
 ### Deprecated
 
