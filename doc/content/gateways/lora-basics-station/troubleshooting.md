@@ -46,3 +46,12 @@ CUPS requires an API Key with the following rights:
 LNS does not require an API Key. If you wish to use Token Authentication, create an API Key with the following rights:
 - Link as Gateway to a Gateway Server for traffic exchange, i.e. write uplink and read downlink
 
+## My gateway won't connect using a `.key` file
+
+Some gateways require that `.key` files are terminated with a Carriage Return Line Feed (`0x0D0A`) character. To easily add a CRLF character and save the file, use the following command:
+
+```bash
+echo "Authorization: Bearer <gateway-api-key>" | perl -p -e 's/\r\n|\n|\r/\r\n/g'  > file.key
+```
+
+See the [{{< lbs >}} documentation](https://doc.sm.tc/station/authmodes.html#tls-server-authentication-and-client-token) for more information.
