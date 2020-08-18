@@ -28,10 +28,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var errEmptyGatewayEUI = errors.Define("empty_gateway_eui", "empty gateway EUI")
+var errEmptyGatewayEUI = errors.DefineFailedPrecondition("empty_gateway_eui", "empty gateway EUI")
 
 // HandleDiscover implements Formatter.
-func (lbsLNS *lbsLNS) HandleDiscover(ctx context.Context, raw []byte, server io.Server, ep ws.EndPoint, receivedAt time.Time) []byte {
+func (f *lbsLNS) HandleDiscover(ctx context.Context, raw []byte, server io.Server, ep ws.EndPoint, receivedAt time.Time) []byte {
 	var req DiscoverQuery
 
 	if err := json.Unmarshal(raw, &req); err != nil {

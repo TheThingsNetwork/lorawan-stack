@@ -421,7 +421,7 @@ func (conf TxConfirmation) ToTxAck(ctx context.Context, tokens io.DownlinkTokens
 }
 
 // ToUplink implements Format.
-func (lbsLNS *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time) ([]byte, error) {
+func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time) ([]byte, error) {
 	logger := log.FromContext(ctx)
 	typ, err := Type(raw)
 	if err != nil {
@@ -450,7 +450,7 @@ func (lbsLNS *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.Gatewa
 
 	switch typ {
 	case TypeUpstreamVersion:
-		ctx, msg, stat, err := lbsLNS.GetRouterConfig(ctx, raw, conn.BandID(), conn.FrequencyPlans(), receivedAt)
+		ctx, msg, stat, err := f.GetRouterConfig(ctx, raw, conn.BandID(), conn.FrequencyPlans(), receivedAt)
 		logger = log.FromContext(ctx)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to generate router configuration")
@@ -481,7 +481,7 @@ func (lbsLNS *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.Gatewa
 			logger.WithError(err).Warn("Failed to handle upstream message")
 			return nil, err
 		}
-		lbsLNS.sessions.UpdateSession(uid, ws.Session{
+		f.sessions.UpdateSession(uid, ws.Session{
 			ID: int32(jreq.UpInfo.XTime >> 48),
 		})
 		recordTime(jreq.RefTime, jreq.UpInfo.XTime, receivedAt)
@@ -505,7 +505,7 @@ func (lbsLNS *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.Gatewa
 			logger.WithError(err).Warn("Failed to handle upstream message")
 			return nil, err
 		}
-		lbsLNS.sessions.UpdateSession(uid, ws.Session{
+		f.sessions.UpdateSession(uid, ws.Session{
 			ID: int32(updf.UpInfo.XTime >> 48),
 		})
 		recordTime(updf.RefTime, updf.UpInfo.XTime, receivedAt)
@@ -515,7 +515,7 @@ func (lbsLNS *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.Gatewa
 		if err := json.Unmarshal(raw, &txConf); err != nil {
 			return nil, err
 		}
-		txAck := txConf.ToTxAck(ctx, lbsLNS.tokens, receivedAt)
+		txAck := txConf.ToTxAck(ctx, f.tokens, receivedAt)
 		if txAck == nil {
 			break
 		}
@@ -523,7 +523,7 @@ func (lbsLNS *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.Gatewa
 			logger.WithError(err).Warn("Failed to handle tx ack message")
 			return nil, err
 		}
-		lbsLNS.sessions.UpdateSession(uid, ws.Session{
+		f.sessions.UpdateSession(uid, ws.Session{
 			ID: int32(txConf.XTime >> 48),
 		})
 		recordTime(txConf.RefTime, txConf.XTime, receivedAt)

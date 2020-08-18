@@ -27,8 +27,8 @@ type Session struct {
 }
 
 var (
-	errSessionNotFound      = errors.DefineNotFound("session_not_found", "session for uid `{uid}` not found")
-	errSessionAlreadyExists = errors.DefineAlreadyExists("session_already_exists", "matching contact info not found")
+	errSessionNotFound      = errors.DefineNotFound("session_not_found", "session not found")
+	errSessionAlreadyExists = errors.DefineAlreadyExists("session_already_exists", "session already exists")
 )
 
 // Sessions holds state of the WS sessions.
@@ -40,7 +40,7 @@ type Sessions struct {
 // If errSessionAlreadyExists is returned, it indicates a corrupted state or improper session termination.
 func (s *Sessions) NewSession(ctx context.Context, uid string) error {
 	if _, ok := s.items.Load(uid); ok {
-		return errSessionAlreadyExists.WithAttributes("uid", uid)
+		return errSessionAlreadyExists
 	}
 	s.items.Store(uid, Session{})
 	return nil
@@ -50,7 +50,7 @@ func (s *Sessions) NewSession(ctx context.Context, uid string) error {
 func (s *Sessions) GetSession(uid string) (Session, error) {
 	val, ok := s.items.Load(uid)
 	if !ok {
-		return Session{}, errSessionNotFound.WithAttributes("uid", uid)
+		return Session{}, errSessionNotFound
 	}
 	return val.(Session), nil
 }
@@ -60,7 +60,7 @@ func (s *Sessions) GetSession(uid string) (Session, error) {
 func (s *Sessions) UpdateSession(uid string, session Session) error {
 	_, ok := s.items.Load(uid)
 	if !ok {
-		return errSessionNotFound.WithAttributes("uid", uid)
+		return errSessionNotFound
 	}
 	s.items.Store(uid, session)
 	return nil
@@ -72,7 +72,7 @@ func (s *Sessions) UpdateSession(uid string, session Session) error {
 func (s *Sessions) DeleteSession(uid string) error {
 	_, ok := s.items.Load(uid)
 	if !ok {
-		return errSessionNotFound.WithAttributes("uid", uid)
+		return errSessionNotFound
 	}
 	s.items.Delete(uid)
 	return nil

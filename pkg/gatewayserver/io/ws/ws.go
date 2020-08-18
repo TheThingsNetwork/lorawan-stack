@@ -63,7 +63,7 @@ type srv struct {
 func (*srv) Protocol() string            { return "basicstation" }
 func (*srv) SupportsDownlinkClaim() bool { return false }
 
-// New creates the LoRa Basics Station front end.
+// New creates a new WebSocket frontend.
 func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config) *echo.Echo {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
 
@@ -305,14 +305,14 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			logger.WithError(err).Debug("Failed to read message")
 			return err
 		}
-		downMsg, err := s.formatter.HandleUp(ctx, data, ids, conn, time.Now())
+		downstream, err := s.formatter.HandleUp(ctx, data, ids, conn, time.Now())
 		if err != nil {
 			return err
 		}
-		if downMsg != nil {
-			logger.Info("Send message downstream")
+		if downstream != nil {
+			logger.Info("Send downstream message")
 			wsWriteMu.Lock()
-			err = ws.WriteMessage(websocket.TextMessage, downMsg)
+			err = ws.WriteMessage(websocket.TextMessage, downstream)
 			wsWriteMu.Unlock()
 			if err != nil {
 				logger.WithError(err).Warn("Failed to send message downstream")

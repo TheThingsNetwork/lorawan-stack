@@ -24,10 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var (
-	errDownlinkMessage = errors.Define("downlink_message", "could not translate downlink message")
-	errNoClockSync     = errors.DefineUnavailable("no_clock_sync", "no clock sync")
-)
+var errNoClockSync = errors.DefineUnavailable("no_clock_sync", "no clock sync")
 
 // DownlinkMessage is the LoRaWAN downlink message sent to the LoRa Basics Station.
 type DownlinkMessage struct {
@@ -62,15 +59,15 @@ func (dnmsg *DownlinkMessage) unmarshalJSON(data []byte) error {
 }
 
 // FromDownlink implements Formatter.
-func (lbsLNS *lbsLNS) FromDownlink(uid string, down ttnpb.DownlinkMessage, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
+func (f *lbsLNS) FromDownlink(uid string, down ttnpb.DownlinkMessage, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
 	var dnmsg DownlinkMessage
 	settings := down.GetScheduled()
 	dnmsg.Pdu = hex.EncodeToString(down.GetRawPayload())
 	dnmsg.RCtx = int64(settings.Downlink.AntennaIndex)
-	dnmsg.Diid = int64(lbsLNS.tokens.Next(down.CorrelationIDs, dlTime))
+	dnmsg.Diid = int64(f.tokens.Next(down.CorrelationIDs, dlTime))
 
 	// The first 16 bits of XTime gets the session ID from the upstream latestXTime and the other 48 bits are concentrator timestamp accounted for rollover.
-	session, err := lbsLNS.sessions.GetSession(uid)
+	session, err := f.sessions.GetSession(uid)
 	if err != nil {
 		return nil, err
 	}

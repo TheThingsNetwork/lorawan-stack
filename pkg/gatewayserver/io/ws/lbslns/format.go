@@ -32,12 +32,12 @@ func NewFormatter() ws.Formatter {
 	return &lbsLNS{}
 }
 
-func (lbsLNS *lbsLNS) Connect(ctx context.Context, uid string) error {
-	return lbsLNS.sessions.NewSession(ctx, uid)
+func (f *lbsLNS) Connect(ctx context.Context, uid string) error {
+	return f.sessions.NewSession(ctx, uid)
 }
 
-func (lbsLNS *lbsLNS) Disconnect(ctx context.Context, uid string) {
-	err := lbsLNS.sessions.DeleteSession(uid)
+func (f *lbsLNS) Disconnect(ctx context.Context, uid string) {
+	err := f.sessions.DeleteSession(uid)
 	if err != nil {
 		logger := log.FromContext(ctx)
 		logger.WithError(err).Warn("Failed to disconnect")
