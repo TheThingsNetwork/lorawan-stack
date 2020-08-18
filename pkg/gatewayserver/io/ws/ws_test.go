@@ -263,24 +263,24 @@ func TestDiscover(t *testing.T) {
 	for _, tc := range []struct {
 		Name     string
 		Query    interface{}
-		Response DiscoverResponse
+		Response lbslns.DiscoverResponse
 	}{
 		{
 			Name:     "EmptyEUI",
-			Query:    DiscoverQuery{},
-			Response: DiscoverResponse{Error: "Empty router EUI provided"},
+			Query:    lbslns.DiscoverQuery{},
+			Response: lbslns.DiscoverResponse{Error: "Empty router EUI provided"},
 		},
 		{
 			Name:     "EmptyStruct",
 			Query:    struct{}{},
-			Response: DiscoverResponse{Error: "Empty router EUI provided"},
+			Response: lbslns.DiscoverResponse{Error: "Empty router EUI provided"},
 		},
 		{
 			Name: "InvalidJSONKey",
 			Query: struct {
 				EUI string `json:"route"`
 			}{EUI: `"01-02-03-04-05-06-07-08"`},
-			Response: DiscoverResponse{Error: "Empty router EUI provided"},
+			Response: lbslns.DiscoverResponse{Error: "Empty router EUI provided"},
 		},
 	} {
 		t.Run(fmt.Sprintf("InvalidQuery/%s", tc.Name), func(t *testing.T) {
@@ -312,7 +312,7 @@ func TestDiscover(t *testing.T) {
 			}()
 			select {
 			case res := <-resCh:
-				var response DiscoverResponse
+				var response lbslns.DiscoverResponse
 				if err := json.Unmarshal(res, &response); err != nil {
 					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 				}
@@ -379,7 +379,7 @@ func TestDiscover(t *testing.T) {
 		{
 			EndPointEUI: "1111111111111111",
 			EUI:         types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
-			Query: DiscoverQuery{
+			Query: lbslns.DiscoverQuery{
 				EUI: basicstation.EUI{
 					Prefix: "router",
 					EUI64:  types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
@@ -416,11 +416,11 @@ func TestDiscover(t *testing.T) {
 			}()
 			select {
 			case res := <-resCh:
-				var response DiscoverResponse
+				var response lbslns.DiscoverResponse
 				if err := json.Unmarshal(res, &response); err != nil {
 					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 				}
-				a.So(response, should.Resemble, DiscoverResponse{
+				a.So(response, should.Resemble, lbslns.DiscoverResponse{
 					EUI: basicstation.EUI{Prefix: "router", EUI64: tc.EUI},
 					Muxs: basicstation.EUI{
 						Prefix: "muxs",

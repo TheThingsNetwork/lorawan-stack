@@ -23,7 +23,6 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -47,7 +46,7 @@ func (v Version) MarshalJSON() ([]byte, error) {
 		Type string `json:"msgtype"`
 		Alias
 	}{
-		Type:  ws.TypeUpstreamVersion,
+		Type:  TypeUpstreamVersion,
 		Alias: Alias(v),
 	})
 }

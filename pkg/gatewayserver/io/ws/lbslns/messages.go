@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ws
+package lbslns
 
 import (
 	"encoding/json"
@@ -24,7 +24,7 @@ import (
 // MessageType is the type of the message.
 type MessageType string
 
-// Definition of message types.
+// Definition of LoRa Basic Station message types.
 const (
 	// Upstream types for messages from the Gateway.
 	TypeUpstreamVersion              = "version"

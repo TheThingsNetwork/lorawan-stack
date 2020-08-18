@@ -648,15 +648,11 @@ func TestTxAck(t *testing.T) {
 		Diid:    1,
 		RefTime: 0,
 	}
-	raw, err := txConf.MarshalJSON()
-	a.So(err, should.BeNil)
 	correlationIDs := []string{"i3N84kvunPAS8wOmiEKbhsP62wNMRdmn", "deK3h59wUZhR0xb17eumTkauGQxoB5xn"}
 	var lnsLNS lbsLNS
 	now := time.Now()
 	lnsLNS.tokens.Next(correlationIDs, time.Unix(int64(0), 0))
-	txAck, parsedTime, err := lnsLNS.ToTxAck(context.Background(), raw, now)
-	a.So(err, should.BeNil)
-	a.So(parsedTime.RefTime, should.Equal, txConf.RefTime)
+	txAck := txConf.ToTxAck(context.Background(), lnsLNS.tokens, now)
 	if !a.So(txAck, should.Resemble, &ttnpb.TxAcknowledgment{
 		CorrelationIDs: correlationIDs,
 		Result:         ttnpb.TxAcknowledgment_SUCCESS,

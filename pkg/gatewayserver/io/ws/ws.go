@@ -17,9 +17,7 @@ package ws
 import (
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
-	"math"
 	"net/http"
 	"regexp"
 	"strings"
@@ -30,11 +28,9 @@ import (
 	echo "github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -45,8 +41,7 @@ import (
 )
 
 var (
-	errEmptyGatewayEUI = errors.Define("empty_gateway_eui", "empty gateway EUI")
-	errListener        = errors.DefineFailedPrecondition(
+	errListener = errors.DefineFailedPrecondition(
 		"listener",
 		"failed to serve Basic Station frontend listener",
 	)
@@ -120,49 +115,20 @@ func (s *srv) handleDiscover(c echo.Context) error {
 		logger.WithError(err).Debug("Failed to read message")
 		return err
 	}
-	var req DiscoverQuery
-	if err := json.Unmarshal(data, &req); err != nil {
-		logger.WithError(err).Debug("Failed to parse discover query message")
-		return err
-	}
-
-	if req.EUI.IsZero() {
-		writeDiscoverError(ctx, ws, "Empty router EUI provided")
-		return errEmptyGatewayEUI.New()
-	}
-
-	ids := ttnpb.GatewayIdentifiers{
-		EUI: &req.EUI.EUI64,
-	}
-	filledCtx, ids, err := s.server.FillGatewayContext(ctx, ids)
-	if err != nil {
-		logger.WithError(err).Warn("Failed to fetch gateway")
-		writeDiscoverError(ctx, ws, fmt.Sprintf("Failed to fetch gateway: %s", err.Error()))
-		return err
-	}
-
-	ctx = filledCtx
 
 	scheme := "ws"
 	if c.IsTLS() || s.cfg.UseTrafficTLSAddress {
 		scheme = "wss"
 	}
 
-	euiWithPrefix := fmt.Sprintf("eui-%s", ids.EUI.String())
-	res := DiscoverResponse{
-		EUI: req.EUI,
-		Muxs: basicstation.EUI{
-			Prefix: "muxs",
-		},
-		URI: fmt.Sprintf("%s://%s%s", scheme, c.Request().Host, c.Echo().URI(s.handleTraffic, euiWithPrefix)),
+	ep := EndPoint{
+		Scheme:  scheme,
+		Address: c.Request().Host,
+		Prefix:  "/traffic",
 	}
-	data, err = json.Marshal(res)
-	if err != nil {
-		logger.WithError(err).Warn("Failed to marshal response message")
-		writeDiscoverError(ctx, ws, "Router not provisioned")
-		return err
-	}
-	if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
+
+	resp := s.formatter.HandleDiscover(ctx, data, s.server, ep, time.Now())
+	if err := ws.WriteMessage(websocket.TextMessage, resp); err != nil {
 		logger.WithError(err).Warn("Failed to write discover response message")
 		return err
 	}
@@ -268,9 +234,6 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		err = nil // Errors are sent over the websocket connection that is established by this point.
 	}()
 
-	fps := conn.FrequencyPlans()
-	bandID := conn.BandID()
-
 	pingTicker := time.NewTicker(s.cfg.WSPingInterval)
 	defer pingTicker.Stop()
 
@@ -335,20 +298,6 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			}
 		}
 	}()
-	recordTime := func(parsedTime ParsedTime, server time.Time) {
-		sec, nsec := math.Modf(parsedTime.RefTime)
-		if sec != 0 {
-			ref := time.Unix(int64(sec), int64(nsec*1e9))
-			conn.RecordRTT(server.Sub(ref), server)
-		}
-		conn.SyncWithGatewayConcentrator(
-			// The concentrator timestamp is the 32 LSB.
-			uint32(parsedTime.XTime&0xFFFFFFFF),
-			server,
-			// The Basic Station epoch is the 48 LSB.
-			scheduling.ConcentratorTime(time.Duration(parsedTime.XTime&0xFFFFFFFFFF)*time.Microsecond),
-		)
-	}
 
 	for {
 		_, data, err := ws.ReadMessage()
@@ -356,88 +305,22 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			logger.WithError(err).Debug("Failed to read message")
 			return err
 		}
-
-		typ, err := Type(data)
+		downMsg, err := s.formatter.HandleUp(ctx, data, ids, conn, time.Now())
 		if err != nil {
-			logger.WithError(err).Debug("Failed to parse message type")
-			continue
+			return err
 		}
-		logger := logger.WithFields(log.Fields(
-			"upstream_type", typ,
-		))
-		receivedAt := time.Now()
-
-		switch typ {
-		case TypeUpstreamVersion:
-			ctx, msg, stat, err := s.formatter.GetRouterConfig(ctx, data, bandID, fps, time.Now())
-			if err != nil {
-				logger.WithError(err).Warn("Failed to generate router configuration")
-				return err
-			}
-			logger := log.FromContext(ctx)
+		if downMsg != nil {
+			logger.Info("Send message downstream")
 			wsWriteMu.Lock()
-			err = ws.WriteMessage(websocket.TextMessage, msg)
+			err = ws.WriteMessage(websocket.TextMessage, downMsg)
 			wsWriteMu.Unlock()
 			if err != nil {
-				logger.WithError(err).Warn("Failed to send router configuration")
+				logger.WithError(err).Warn("Failed to send message downstream")
+				conn.Disconnect(err)
+				s.formatter.Disconnect(ctx, uid)
 				return err
 			}
-			if err := conn.HandleStatus(stat); err != nil {
-				logger.WithError(err).Warn("Failed to send version response message")
-			}
-
-		case TypeUpstreamJoinRequest, TypeUpstreamUplinkDataFrame:
-			up, parsedTime, err := s.formatter.ToUplink(ctx, data, ids, bandID, receivedAt, typ)
-			if err != nil {
-				logger.WithError(err).Debug("Failed to parse upstream message")
-				return err
-			}
-			// TODO: Remove (https://github.com/lorabasics/basicstation/issues/74)
-			if parsedTime.XTime == 0 {
-				logger.Warn("Received join-request without xtime, drop message")
-				break
-			}
-			if err := conn.HandleUp(up); err != nil {
-				logger.WithError(err).Warn("Failed to handle upstream message")
-			}
-			s.formatter.UpdateState(ctx, uid, Session{
-				ID: int32(parsedTime.XTime >> 48),
-			})
-			recordTime(parsedTime, receivedAt)
-
-		case TypeUpstreamTxConfirmation:
-			txAck, parsedTime, err := s.formatter.ToTxAck(ctx, data, receivedAt)
-			if err != nil {
-				logger.WithError(err).Debug("Failed to parse tx confirmation frame")
-				return err
-			}
-			if err := conn.HandleTxAck(txAck); err != nil {
-				logger.WithError(err).Warn("Failed to handle tx ack message")
-			}
-			s.formatter.UpdateState(ctx, uid, Session{
-				ID: int32(parsedTime.XTime >> 48),
-			})
-			recordTime(parsedTime, receivedAt)
-
-		case TypeUpstreamProprietaryDataFrame, TypeUpstreamRemoteShell, TypeUpstreamTimeSync:
-			logger.WithField("message_type", typ).Debug("Message type not implemented")
-
-		default:
-			logger.WithField("message_type", typ).Debug("Unknown message type")
 		}
-	}
-}
-
-// writeDiscoverError sends the error messages during the discovery on the WS connection to the station.
-func writeDiscoverError(ctx context.Context, ws *websocket.Conn, msg string) {
-	logger := log.FromContext(ctx)
-	errMsg, err := json.Marshal(DiscoverResponse{Error: msg})
-	if err != nil {
-		logger.WithError(err).Warn("Failed to marshal error message")
-		return
-	}
-	if err := ws.WriteMessage(websocket.TextMessage, errMsg); err != nil {
-		logger.WithError(err).Warn("Failed to write error response message")
 	}
 }
 

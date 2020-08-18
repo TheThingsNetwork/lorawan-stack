@@ -18,32 +18,31 @@ import (
 	"context"
 	"time"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// ParsedTime abstracts time values parsed from messages.
-type ParsedTime struct {
-	XTime   int64
-	RefTime float64
+// EndPoint contains information on the WebSocket endpoint.
+type EndPoint struct {
+	Scheme  string
+	Address string
+	Prefix  string
 }
 
 // Formatter abstracts messages to/from websocket based gateways.
 type Formatter interface {
 	// Connect creates necessary session state for a gateway.
 	Connect(ctx context.Context, uid string) error
-	// UpdateState updates the session state for a gateway.
-	UpdateState(ctx context.Context, uid string, session Session) error
 	// Disconnect removes the session state for a gateway.
 	Disconnect(ctx context.Context, uid string)
 
-	// GetRouterConfig parses version messages, generates router config (for downstream) and a status message (for upstream).
-	GetRouterConfig(ctx context.Context, message []byte, bandID string, fps map[string]*frequencyplans.FrequencyPlan, receivedAt time.Time) (context.Context, []byte, *ttnpb.GatewayStatus, error)
+	// HandleDiscover handles discovery messages from web socket based gateways.
+	// This function returns a byte stream to be sent as response to the discovery message.
+	HandleDiscover(ctx context.Context, raw []byte, server io.Server, endPoint EndPoint, receivedAt time.Time) []byte
+	// HandleUp handles upstream messages from web socket based gateways.
+	// This function optionally returns a byte stream to be sent as response to the upstream message.
+	HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time) ([]byte, error)
 	// FromDownlink generates a downlink byte stream that can be sent over the WS connection.
 	FromDownlink(uid string, down ttnpb.DownlinkMessage, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error)
-	// ToUplink parses Uplink/JoinRequest messages into ttnpb.UplinkMessage.
-	ToUplink(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time, msgType string) (*ttnpb.UplinkMessage, ParsedTime, error)
-	// ToTxAck parses fields from the TxConfirmation message and converts it to  ttnpb.TxAcknowledgment message.
-	ToTxAck(ctx context.Context, message []byte, receivedAt time.Time) (*ttnpb.TxAcknowledgment, ParsedTime, error)
 }

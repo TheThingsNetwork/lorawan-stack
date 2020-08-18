@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -36,9 +35,9 @@ func TestType(t *testing.T) {
 	data, err := json.Marshal(msg)
 	a.So(err, should.BeNil)
 
-	mt, err := ws.Type(data)
+	mt, err := Type(data)
 	a.So(err, should.BeNil)
-	a.So(mt, should.Equal, ws.TypeUpstreamVersion)
+	a.So(mt, should.Equal, TypeUpstreamVersion)
 }
 
 func TestIsProduction(t *testing.T) {

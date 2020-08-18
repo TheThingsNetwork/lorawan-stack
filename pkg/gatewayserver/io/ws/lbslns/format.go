@@ -43,7 +43,3 @@ func (lbsLNS *lbsLNS) Disconnect(ctx context.Context, uid string) {
 		logger.WithError(err).Warn("Failed to disconnect")
 	}
 }
-
-func (lbsLNS *lbsLNS) UpdateState(ctx context.Context, uid string, session ws.Session) error {
-	return lbsLNS.sessions.UpdateSession(uid, session)
-}

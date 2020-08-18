@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -52,7 +51,7 @@ func (dnmsg DownlinkMessage) marshalJSON() ([]byte, error) {
 		Type string `json:"msgtype"`
 		Alias
 	}{
-		Type:  ws.TypeDownstreamDownlinkMessage,
+		Type:  TypeDownstreamDownlinkMessage,
 		Alias: Alias(dnmsg),
 	})
 }

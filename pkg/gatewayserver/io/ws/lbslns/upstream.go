@@ -25,11 +25,14 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/util"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 var (
@@ -73,7 +76,7 @@ func (req JoinRequest) MarshalJSON() ([]byte, error) {
 		Type string `json:"msgtype"`
 		Alias
 	}{
-		Type:  ws.TypeUpstreamJoinRequest,
+		Type:  TypeUpstreamJoinRequest,
 		Alias: Alias(req),
 	})
 }
@@ -99,7 +102,7 @@ func (updf UplinkDataFrame) MarshalJSON() ([]byte, error) {
 		Type string `json:"msgtype"`
 		Alias
 	}{
-		Type:  ws.TypeUpstreamUplinkDataFrame,
+		Type:  TypeUpstreamUplinkDataFrame,
 		Alias: Alias(updf),
 	})
 }
@@ -122,7 +125,7 @@ func (conf TxConfirmation) MarshalJSON() ([]byte, error) {
 		Type string `json:"msgtype"`
 		Alias
 	}{
-		Type:  ws.TypeUpstreamTxConfirmation,
+		Type:  TypeUpstreamTxConfirmation,
 		Alias: Alias(conf),
 	})
 }
@@ -404,56 +407,134 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 	return nil
 }
 
-// ToTxAck implements Format.
-func (lbsLNS *lbsLNS) ToTxAck(ctx context.Context, raw []byte, receivedAt time.Time) (*ttnpb.TxAcknowledgment, ws.ParsedTime, error) {
-	var (
-		txConf TxConfirmation
-		txAck  ttnpb.TxAcknowledgment
-	)
-	if err := json.Unmarshal(raw, &txConf); err != nil {
-		return nil, ws.ParsedTime{}, err
-	}
-	if cids, _, ok := lbsLNS.tokens.Get(uint16(txConf.Diid), receivedAt); ok {
+// ToTxAck converts the LoRa Basics Station TxConfirmation message to ttnpb.TxAcknowledgment
+func (conf TxConfirmation) ToTxAck(ctx context.Context, tokens io.DownlinkTokens, receivedAt time.Time) *ttnpb.TxAcknowledgment {
+	var txAck ttnpb.TxAcknowledgment
+	if cids, _, ok := tokens.Get(uint16(conf.Diid), receivedAt); ok {
 		txAck.CorrelationIDs = cids
 		txAck.Result = ttnpb.TxAcknowledgment_SUCCESS
 	} else {
 		logger := log.FromContext(ctx)
-		logger.WithField("diid", txConf.Diid).Debug("Tx acknowledgement either does not correspond to a downlink message or arrived too late")
+		logger.WithField("diid", conf.Diid).Debug("Tx acknowledgement either does not correspond to a downlink message or arrived too late")
 	}
-	return &txAck, ws.ParsedTime{
-		XTime:   txConf.XTime,
-		RefTime: txConf.RefTime,
-	}, nil
+	return &txAck
 }
 
 // ToUplink implements Format.
-func (lbsLNS *lbsLNS) ToUplink(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time, msgType string) (*ttnpb.UplinkMessage, ws.ParsedTime, error) {
-	var (
-		up         *ttnpb.UplinkMessage
-		parsedTime ws.ParsedTime
-		err        error
-	)
-	switch msgType {
-	case ws.TypeUpstreamJoinRequest:
-		var jreq JoinRequest
-		if jsonErr := json.Unmarshal(raw, &jreq); jsonErr != nil {
-			err = jsonErr
-			break
-		}
-		up, err = jreq.toUplinkMessage(ids, bandID, receivedAt)
-		parsedTime.RefTime = jreq.RefTime
-		parsedTime.XTime = jreq.UpInfo.XTime
-	case ws.TypeUpstreamUplinkDataFrame:
-		var updf UplinkDataFrame
-		if jsonErr := json.Unmarshal(raw, &updf); jsonErr != nil {
-			err = jsonErr
-			break
-		}
-		up, err = updf.toUplinkMessage(ids, bandID, receivedAt)
-		parsedTime.RefTime = updf.RefTime
-		parsedTime.XTime = updf.UpInfo.XTime
-	default:
-		// Do nothing; this condition will not be reached as the message type is checked in the ws loop.
+func (lbsLNS *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time) ([]byte, error) {
+	logger := log.FromContext(ctx)
+	typ, err := Type(raw)
+	if err != nil {
+		logger.WithError(err).Debug("Failed to parse message type")
+		return nil, err
 	}
-	return up, parsedTime, err
+	logger = logger.WithFields(log.Fields(
+		"upstream_type", typ,
+	))
+
+	uid := unique.ID(ctx, ids)
+	recordTime := func(refTime float64, xTime int64, server time.Time) {
+		sec, nsec := math.Modf(refTime)
+		if sec != 0 {
+			ref := time.Unix(int64(sec), int64(nsec*1e9))
+			conn.RecordRTT(server.Sub(ref), server)
+		}
+		conn.SyncWithGatewayConcentrator(
+			// The concentrator timestamp is the 32 LSB.
+			uint32(xTime&0xFFFFFFFF),
+			server,
+			// The Basic Station epoch is the 48 LSB.
+			scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFF)*time.Microsecond),
+		)
+	}
+
+	switch typ {
+	case TypeUpstreamVersion:
+		ctx, msg, stat, err := lbsLNS.GetRouterConfig(ctx, raw, conn.BandID(), conn.FrequencyPlans(), receivedAt)
+		logger = log.FromContext(ctx)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to generate router configuration")
+			return nil, err
+		}
+		if err := conn.HandleStatus(stat); err != nil {
+			logger.WithError(err).Warn("Failed to handle status message")
+			return nil, err
+		}
+		return msg, nil
+
+	case TypeUpstreamJoinRequest:
+		var jreq JoinRequest
+		if err := json.Unmarshal(raw, &jreq); err != nil {
+			return nil, err
+		}
+		// TODO: Remove (https://github.com/lorabasics/basicstation/issues/74)
+		if jreq.UpInfo.XTime == 0 {
+			logger.Warn("Received join-request without xtime, drop message")
+			break
+		}
+		up, err := jreq.toUplinkMessage(ids, conn.BandID(), receivedAt)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to parse join request")
+			return nil, err
+		}
+		if err := conn.HandleUp(up); err != nil {
+			logger.WithError(err).Warn("Failed to handle upstream message")
+			return nil, err
+		}
+		lbsLNS.sessions.UpdateSession(uid, ws.Session{
+			ID: int32(jreq.UpInfo.XTime >> 48),
+		})
+		recordTime(jreq.RefTime, jreq.UpInfo.XTime, receivedAt)
+
+	case TypeUpstreamUplinkDataFrame:
+		var updf UplinkDataFrame
+		if err := json.Unmarshal(raw, &updf); err != nil {
+			return nil, err
+		}
+		// TODO: Remove (https://github.com/lorabasics/basicstation/issues/74)
+		if updf.UpInfo.XTime == 0 {
+			logger.Warn("Received uplink without xtime, drop message")
+			return nil, nil
+		}
+		up, err := updf.toUplinkMessage(ids, conn.BandID(), receivedAt)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to parse uplink message")
+			return nil, err
+		}
+		if err := conn.HandleUp(up); err != nil {
+			logger.WithError(err).Warn("Failed to handle upstream message")
+			return nil, err
+		}
+		lbsLNS.sessions.UpdateSession(uid, ws.Session{
+			ID: int32(updf.UpInfo.XTime >> 48),
+		})
+		recordTime(updf.RefTime, updf.UpInfo.XTime, receivedAt)
+
+	case TypeUpstreamTxConfirmation:
+		var txConf TxConfirmation
+		if err := json.Unmarshal(raw, &txConf); err != nil {
+			return nil, err
+		}
+		txAck := txConf.ToTxAck(ctx, lbsLNS.tokens, receivedAt)
+		if txAck == nil {
+			break
+		}
+		if err := conn.HandleTxAck(txAck); err != nil {
+			logger.WithError(err).Warn("Failed to handle tx ack message")
+			return nil, err
+		}
+		lbsLNS.sessions.UpdateSession(uid, ws.Session{
+			ID: int32(txConf.XTime >> 48),
+		})
+		recordTime(txConf.RefTime, txConf.XTime, receivedAt)
+		return nil, err
+
+	case TypeUpstreamProprietaryDataFrame, TypeUpstreamRemoteShell, TypeUpstreamTimeSync:
+		logger.WithField("message_type", typ).Debug("Message type not implemented")
+		break
+	default:
+		logger.WithField("message_type", typ).Debug("Unknown message type")
+		break
+	}
+	return nil, nil
 }
