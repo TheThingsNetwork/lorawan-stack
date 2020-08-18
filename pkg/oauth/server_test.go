@@ -96,7 +96,6 @@ func init() {
 }
 
 func TestOAuthFlow(t *testing.T) {
-	ctx := test.Context()
 	store := &mockStore{}
 	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 	if err != nil {
@@ -112,7 +111,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 	})
-	s := oauth.NewServer(ctx, store, oauth.Config{
+	s, err := oauth.NewServer(c, store, oauth.StaticConfigProvider(oauth.Config{
 		Mount:       "/oauth",
 		CSRFAuthKey: []byte("12345678123456781234567812345678"),
 		UI: oauth.UIConfig{
@@ -122,7 +121,10 @@ func TestOAuthFlow(t *testing.T) {
 				CanonicalURL: "https://example.com/oauth",
 			},
 		},
-	})
+	}))
+	if err != nil {
+		panic(err)
+	}
 	c.RegisterWeb(s)
 	componenttest.StartComponent(t, c)
 
@@ -587,7 +589,6 @@ func TestOAuthFlow(t *testing.T) {
 }
 
 func TestTokenExchange(t *testing.T) {
-	ctx := test.Context()
 	store := &mockStore{}
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -599,7 +600,7 @@ func TestTokenExchange(t *testing.T) {
 			},
 		},
 	})
-	s := oauth.NewServer(ctx, store, oauth.Config{
+	s, err := oauth.NewServer(c, store, oauth.StaticConfigProvider(oauth.Config{
 		Mount: "/oauth",
 		UI: oauth.UIConfig{
 			TemplateData: webui.TemplateData{
@@ -607,7 +608,10 @@ func TestTokenExchange(t *testing.T) {
 				Title:    "OAuth",
 			},
 		},
-	})
+	}))
+	if err != nil {
+		panic(err)
+	}
 	c.RegisterWeb(s)
 	componenttest.StartComponent(t, c)
 

@@ -26,4 +26,6 @@ type Config struct {
 
 	StateCookieName string `name:"-"`
 	AuthCookieName  string `name:"-"`
+
+	customProvider bool
 }
