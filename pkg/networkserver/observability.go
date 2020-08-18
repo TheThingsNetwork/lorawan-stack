@@ -247,6 +247,23 @@ var nsMetrics = &messageMetrics{
 		},
 		[]string{},
 	),
+
+	downlinkAttempted: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "downlink_attempted_total",
+			Help:      "Total number of attempted downlinks",
+		},
+		[]string{messageType},
+	),
+	downlinkForwarded: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "downlink_forwarded_total",
+			Help:      "Total number of forwarded downlinks",
+		},
+		[]string{messageType},
+	),
 }
 
 func init() {
@@ -260,6 +277,9 @@ type messageMetrics struct {
 	uplinkForwarded  *metrics.ContextualCounterVec
 	uplinkDropped    *metrics.ContextualCounterVec
 	uplinkGateways   *metrics.ContextualHistogramVec
+
+	downlinkAttempted *metrics.ContextualCounterVec
+	downlinkForwarded *metrics.ContextualCounterVec
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -269,6 +289,9 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.uplinkForwarded.Describe(ch)
 	m.uplinkDropped.Describe(ch)
 	m.uplinkGateways.Describe(ch)
+
+	m.downlinkAttempted.Describe(ch)
+	m.downlinkForwarded.Describe(ch)
 }
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
@@ -278,22 +301,25 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.uplinkForwarded.Collect(ch)
 	m.uplinkDropped.Collect(ch)
 	m.uplinkGateways.Collect(ch)
+
+	m.downlinkAttempted.Collect(ch)
+	m.downlinkForwarded.Collect(ch)
 }
 
-func uplinkMTypeLabel(mType ttnpb.MType) string {
+func mTypeLabel(mType ttnpb.MType) string {
 	return strings.ToLower(mType.String())
 }
 
 func registerReceiveUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	nsMetrics.uplinkReceived.WithLabelValues(ctx, uplinkMTypeLabel(msg.Payload.MType)).Inc()
+	nsMetrics.uplinkReceived.WithLabelValues(ctx, mTypeLabel(msg.Payload.MType)).Inc()
 }
 
 func registerReceiveDuplicateUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	nsMetrics.uplinkDuplicates.WithLabelValues(ctx, uplinkMTypeLabel(msg.Payload.MType)).Inc()
+	nsMetrics.uplinkDuplicates.WithLabelValues(ctx, mTypeLabel(msg.Payload.MType)).Inc()
 }
 
 func registerProcessUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	nsMetrics.uplinkProcessed.WithLabelValues(ctx, uplinkMTypeLabel(msg.Payload.MType)).Inc()
+	nsMetrics.uplinkProcessed.WithLabelValues(ctx, mTypeLabel(msg.Payload.MType)).Inc()
 }
 
 func registerForwardDataUplink(ctx context.Context, msg *ttnpb.ApplicationUplink) {
@@ -301,11 +327,11 @@ func registerForwardDataUplink(ctx context.Context, msg *ttnpb.ApplicationUplink
 	if msg.Confirmed {
 		mType = ttnpb.MType_CONFIRMED_UP
 	}
-	nsMetrics.uplinkForwarded.WithLabelValues(ctx, uplinkMTypeLabel(mType)).Inc()
+	nsMetrics.uplinkForwarded.WithLabelValues(ctx, mTypeLabel(mType)).Inc()
 }
 
 func registerForwardJoinRequest(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	nsMetrics.uplinkForwarded.WithLabelValues(ctx, uplinkMTypeLabel(msg.Payload.MType)).Inc()
+	nsMetrics.uplinkForwarded.WithLabelValues(ctx, mTypeLabel(msg.Payload.MType)).Inc()
 }
 
 func registerDropUplink(ctx context.Context, msg *ttnpb.UplinkMessage, err error) {
@@ -313,10 +339,40 @@ func registerDropUplink(ctx context.Context, msg *ttnpb.UplinkMessage, err error
 	if ttnErr, ok := errors.From(err); ok {
 		cause = ttnErr.FullName()
 	}
-	nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg.Payload.MType), cause).Inc()
+	nsMetrics.uplinkDropped.WithLabelValues(ctx, mTypeLabel(msg.Payload.MType), cause).Inc()
 }
 
 func registerMergeMetadata(ctx context.Context, msg *ttnpb.UplinkMessage) {
 	gtwCount, _ := rxMetadataStats(ctx, msg.RxMetadata)
 	nsMetrics.uplinkGateways.WithLabelValues(ctx).Observe(float64(gtwCount))
+}
+
+var (
+	unconfirmedDownlinkMTypeLabel = mTypeLabel(ttnpb.MType_UNCONFIRMED_DOWN)
+	confirmedDownlinkMTypeLabel   = mTypeLabel(ttnpb.MType_CONFIRMED_DOWN)
+	joinAcceptDownlinkMTypeLabel  = mTypeLabel(ttnpb.MType_JOIN_ACCEPT)
+)
+
+func registerAttemptUnconfirmedDataDownlink(ctx context.Context) {
+	nsMetrics.downlinkAttempted.WithLabelValues(ctx, unconfirmedDownlinkMTypeLabel).Inc()
+}
+
+func registerAttemptConfirmedDataDownlink(ctx context.Context) {
+	nsMetrics.downlinkAttempted.WithLabelValues(ctx, confirmedDownlinkMTypeLabel).Inc()
+}
+
+func registerAttemptJoinAcceptDownlink(ctx context.Context) {
+	nsMetrics.downlinkAttempted.WithLabelValues(ctx, joinAcceptDownlinkMTypeLabel).Inc()
+}
+
+func registerForwardUnconfirmedDataDownlink(ctx context.Context) {
+	nsMetrics.downlinkForwarded.WithLabelValues(ctx, unconfirmedDownlinkMTypeLabel).Inc()
+}
+
+func registerForwardConfirmedDataDownlink(ctx context.Context) {
+	nsMetrics.downlinkForwarded.WithLabelValues(ctx, confirmedDownlinkMTypeLabel).Inc()
+}
+
+func registerForwardJoinAcceptDownlink(ctx context.Context) {
+	nsMetrics.downlinkForwarded.WithLabelValues(ctx, joinAcceptDownlinkMTypeLabel).Inc()
 }

@@ -75,10 +75,11 @@ func loggerWithApplicationDownlinkFields(logger log.Interface, down *ttnpb.Appli
 var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 
 type generatedDownlink struct {
-	Payload  []byte
-	FCnt     uint32
-	NeedsAck bool
-	Priority ttnpb.TxSchedulePriority
+	Payload        []byte
+	FCnt           uint32
+	Priority       ttnpb.TxSchedulePriority
+	Confirmed      bool
+	NeedsMACAnswer bool
 }
 
 type generateDownlinkState struct {
@@ -491,8 +492,9 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	logger = logger.WithField("f_pending", pld.FHDR.FCtrl.FPending)
 	ctx = log.NewContext(ctx, logger)
 
-	needsAck := mType == ttnpb.MType_CONFIRMED_DOWN || len(dev.MACState.PendingRequests) > 0
-	if needsAck && class != ttnpb.CLASS_A {
+	confirmed := mType == ttnpb.MType_CONFIRMED_DOWN
+	needsMACAnswer := len(dev.MACState.PendingRequests) > 0
+	if (confirmed || needsMACAnswer) && class != ttnpb.CLASS_A {
 		confirmedAt, ok := nextConfirmedNetworkInitiatedDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
 		if !ok {
 			return nil, genState, errCorruptedMACState.New()
@@ -569,10 +571,11 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		"priority", priority,
 	)).Debug("Generated downlink")
 	return &generatedDownlink{
-		Payload:  b,
-		FCnt:     pld.FHDR.FCnt,
-		NeedsAck: needsAck,
-		Priority: priority,
+		Payload:        b,
+		FCnt:           pld.FHDR.FCnt,
+		Priority:       priority,
+		Confirmed:      confirmed,
+		NeedsMACAnswer: needsMACAnswer,
 	}, genState, nil
 }
 
@@ -700,9 +703,18 @@ type scheduleRequest struct {
 
 	// DownlinkEvents are the event builders associated with particular downlink. Only published on success.
 	DownlinkEvents events.Builders
+
+	RegisterAttempt func(context.Context)
+	RegisterSuccess func(context.Context)
 }
 
-func newDataDownlinkScheduleRequest(req *ttnpb.TxRequest, ids ttnpb.EndDeviceIdentifiers, b []byte, downlinkEvents ...events.Builder) *scheduleRequest {
+func newDataDownlinkScheduleRequest(req *ttnpb.TxRequest, ids ttnpb.EndDeviceIdentifiers, b []byte, confirmed bool, downlinkEvents ...events.Builder) *scheduleRequest {
+	registerAttempt := registerAttemptUnconfirmedDataDownlink
+	registerForward := registerForwardUnconfirmedDataDownlink
+	if confirmed {
+		registerAttempt = registerAttemptConfirmedDataDownlink
+		registerForward = registerForwardConfirmedDataDownlink
+	}
 	return &scheduleRequest{
 		TxRequest:            req,
 		EndDeviceIdentifiers: ids,
@@ -711,6 +723,8 @@ func newDataDownlinkScheduleRequest(req *ttnpb.TxRequest, ids ttnpb.EndDeviceIde
 		SuccessEvent:         evtScheduleDataDownlinkSuccess,
 		FailEvent:            evtScheduleDataDownlinkFail,
 		DownlinkEvents:       downlinkEvents,
+		RegisterAttempt:      registerAttempt,
+		RegisterSuccess:      registerForward,
 	}
 }
 
@@ -832,6 +846,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 			},
 		}
 		queuedEvents = append(queuedEvents, req.AttemptEvent.New(ctx, eventIDOpt, events.WithData(down)))
+		req.RegisterAttempt(ctx)
 		logger.WithField("path_count", len(req.DownlinkPaths)).Debug("Schedule downlink")
 		delay, err := a.Schedule(ctx, down, ns.WithClusterAuth())
 		if err != nil {
@@ -851,6 +866,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 				}),
 			),
 		}, []events.Builder(req.DownlinkEvents)...)).New(ctx, eventIDOpt)...)
+		req.RegisterSuccess(ctx)
 		return &scheduledDownlink{
 			Message:    down,
 			TransmitAt: transmitAt,
@@ -959,7 +975,7 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genDown *generatedDownlink, genSta
 		dev.Session.LastNFCntDown = genDown.FCnt
 	}
 	dev.MACState.LastDownlinkAt = timePtr(down.TransmitAt)
-	if genDown.NeedsAck {
+	if genDown.NeedsMACAnswer || genDown.Confirmed {
 		dev.MACState.LastConfirmedDownlinkAt = timePtr(down.TransmitAt)
 	}
 	if class := down.Message.GetRequest().GetClass(); class == ttnpb.CLASS_B || class == ttnpb.CLASS_C {
@@ -1143,7 +1159,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 	down, queuedEvents, err := ns.scheduleDownlinkByPaths(
 		log.NewContext(ctx, loggerWithTxRequestFields(logger, req, attemptRX1, attemptRX2).WithField("rx1_delay", req.Rx1Delay)),
-		newDataDownlinkScheduleRequest(req, dev.EndDeviceIdentifiers, genDown.Payload, genState.EventBuilders...),
+		newDataDownlinkScheduleRequest(req, dev.EndDeviceIdentifiers, genDown.Payload, genDown.Confirmed, genState.EventBuilders...),
 		paths...,
 	)
 	if err != nil {
@@ -1301,7 +1317,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	logger := log.FromContext(ctx)
 	down, queuedEvents, err := ns.scheduleDownlinkByPaths(
 		log.NewContext(ctx, loggerWithTxRequestFields(logger, req, false, true)),
-		newDataDownlinkScheduleRequest(req, dev.EndDeviceIdentifiers, genDown.Payload),
+		newDataDownlinkScheduleRequest(req, dev.EndDeviceIdentifiers, genDown.Payload, genDown.Confirmed),
 		paths...,
 	)
 	if err != nil {
@@ -1532,6 +1548,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							AttemptEvent:         evtScheduleJoinAcceptAttempt,
 							SuccessEvent:         evtScheduleJoinAcceptSuccess,
 							FailEvent:            evtScheduleJoinAcceptFail,
+							RegisterAttempt:      registerAttemptJoinAcceptDownlink,
+							RegisterSuccess:      registerForwardJoinAcceptDownlink,
 						},
 						paths...,
 					)
