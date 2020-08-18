@@ -53,6 +53,22 @@ func (t *tts) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDevi
 		}
 		paths = append(paths, "supports_join")
 
+		// dev_addr must be set as `session.dev_addr`.
+		dev.DevAddr = nil
+		for idx, path := range paths {
+			if path == "dev_addr" {
+				switch idx {
+				case 0:
+					paths = paths[1:]
+				case len(paths) - 1:
+					paths = paths[:len(paths)-1]
+				default:
+					paths = append(paths[:idx], paths[idx+1:]...)
+				}
+				break
+			}
+		}
+
 		tmpl := &ttnpb.EndDeviceTemplate{
 			EndDevice: dev,
 			FieldMask: pbtypes.FieldMask{
