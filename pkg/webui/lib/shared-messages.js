@@ -71,6 +71,7 @@ export default defineMessages({
   attributesValidateRequired:
     'All attribute entry values are required. Please remove empty entries.',
   automaticUpdates: 'Automatic updates',
+  backToOverview: 'Back to overview',
   brand: 'Brand',
   cancel: 'Cancel',
   changeLocation: 'Change location settings',

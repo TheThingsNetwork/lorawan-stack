@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
-import { defineMessages } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
 import Footer from '@ttn-lw/components/footer'
@@ -27,6 +26,7 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import Header from '@console/containers/header'
 
 import errorMessages from '@ttn-lw/lib/errors/error-messages'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import {
   httpStatusCode,
   isUnknown as isUnknownError,
@@ -37,10 +37,6 @@ import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './error.styl'
-
-const m = defineMessages({
-  backToOverview: 'Back to the overview',
-})
 
 const FullViewErrorInner = function({ error, env }) {
   const isUnknown = isUnknownError(error)
@@ -69,7 +65,7 @@ const FullViewErrorInner = function({ error, env }) {
   if (isNotFound) {
     action = (
       <Link.Anchor icon="keyboard_arrow_left" href={env.appRoot} primary>
-        <Message content={m.backToOverview} />
+        <Message content={sharedMessages.backToOverview} />
       </Link.Anchor>
     )
   }
