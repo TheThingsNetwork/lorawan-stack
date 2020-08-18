@@ -36,6 +36,12 @@ The `<gateway-api-key>` is the API Key you created above. Create a file named `c
 Authorization: Bearer <gateway-api-key>
 ```
 
+Some gateways require that the `cups.key` file is terminated with a Carriage Return Line Feed (`0x0D0A`) character. To easily add a CRLF character and save the file, use the following command:
+
+```bash
+echo "Authorization: Bearer <gateway-api-key>" | perl -p -e 's/\r\n|\n|\r/\r\n/g'  > cups.key
+```
+
 If using Let's Encrypt to secure your domain, you may download the Let's Encrypt DST X3 Trust file [here](https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem.txt).
 
 CUPS URI: `https://<server-address>:443`
