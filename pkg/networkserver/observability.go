@@ -27,59 +27,63 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-func defineReceiveMACAcceptEvent(name, desc string) func() events.Builder {
+func macEventOptions(extraOpts ...events.Option) []events.Option {
+	return append([]events.Option{events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ)}, extraOpts...)
+}
+
+func defineReceiveMACAcceptEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.answer.accept", name), fmt.Sprintf("%s accept received", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineReceiveMACAnswerEvent(name, desc string) func() events.Builder {
+func defineReceiveMACAnswerEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer received", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineReceiveMACIndicationEvent(name, desc string) func() events.Builder {
+func defineReceiveMACIndicationEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.indication", name), fmt.Sprintf("%s indication received", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineReceiveMACRejectEvent(name, desc string) func() events.Builder {
+func defineReceiveMACRejectEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.answer.reject", name), fmt.Sprintf("%s rejection received", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineReceiveMACRequestEvent(name, desc string) func() events.Builder {
+func defineReceiveMACRequestEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request received", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineEnqueueMACAnswerEvent(name, desc string) func() events.Builder {
+func defineEnqueueMACAnswerEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer enqueued", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineEnqueueMACConfirmationEvent(name, desc string) func() events.Builder {
+func defineEnqueueMACConfirmationEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.confirmation", name), fmt.Sprintf("%s confirmation enqueued", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineEnqueueMACRequestEvent(name, desc string) func() events.Builder {
+func defineEnqueueMACRequestEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request enqueued", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 

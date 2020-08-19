@@ -23,8 +23,14 @@ import (
 )
 
 var (
-	evtReceiveRekeyIndication   = defineReceiveMACIndicationEvent("rekey", "device rekey")()
-	evtEnqueueRekeyConfirmation = defineEnqueueMACConfirmationEvent("rekey", "device rekey")()
+	evtReceiveRekeyIndication = defineReceiveMACIndicationEvent(
+		"rekey", "device rekey",
+		events.WithDataType(&ttnpb.MACCommand_RekeyInd{}),
+	)()
+	evtEnqueueRekeyConfirmation = defineEnqueueMACConfirmationEvent(
+		"rekey", "device rekey",
+		events.WithDataType(&ttnpb.MACCommand_RekeyConf{}),
+	)()
 )
 
 func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RekeyInd, devAddr types.DevAddr) (events.Builders, error) {

@@ -23,8 +23,14 @@ import (
 )
 
 var (
-	evtReceiveResetIndication   = defineReceiveMACIndicationEvent("reset", "device reset")()
-	evtEnqueueResetConfirmation = defineEnqueueMACConfirmationEvent("reset", "device reset")()
+	evtReceiveResetIndication = defineReceiveMACIndicationEvent(
+		"reset", "device reset",
+		events.WithDataType(&ttnpb.MACCommand_ResetInd{}),
+	)()
+	evtEnqueueResetConfirmation = defineEnqueueMACConfirmationEvent(
+		"reset", "device reset",
+		events.WithDataType(&ttnpb.MACCommand_ResetConf{}),
+	)()
 )
 
 func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store, defaults ttnpb.MACSettings) (events.Builders, error) {

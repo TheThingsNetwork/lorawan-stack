@@ -23,8 +23,14 @@ import (
 )
 
 var (
-	evtEnqueueRejoinParamSetupRequest = defineEnqueueMACRequestEvent("rejoin_param_setup", "rejoin parameter setup")()
-	evtReceiveRejoinParamSetupAnswer  = defineReceiveMACAnswerEvent("rejoin_param_setup", "rejoin parameter setup")()
+	evtEnqueueRejoinParamSetupRequest = defineEnqueueMACRequestEvent(
+		"rejoin_param_setup", "rejoin parameter setup",
+		events.WithDataType(&ttnpb.MACCommand_RejoinParamSetupReq{}),
+	)()
+	evtReceiveRejoinParamSetupAnswer = defineReceiveMACAnswerEvent(
+		"rejoin_param_setup", "rejoin parameter setup",
+		events.WithDataType(&ttnpb.MACCommand_RejoinParamSetupAns{}),
+	)()
 )
 
 func deviceNeedsRejoinParamSetupReq(dev *ttnpb.EndDevice) bool {

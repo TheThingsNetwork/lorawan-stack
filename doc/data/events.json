@@ -373,23 +373,28 @@
   },
   "ns.mac.adr_param_setup.request": {
     "name": "ns.mac.adr_param_setup.request",
-    "description": "ADR parameter setup request enqueued"
+    "description": "ADR parameter setup request enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.ADRParamSetupReq"}
   },
   "ns.mac.beacon_freq.answer.accept": {
     "name": "ns.mac.beacon_freq.answer.accept",
-    "description": "beacon frequency change accept received"
+    "description": "beacon frequency change accept received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.BeaconFreqAns"}
   },
   "ns.mac.beacon_freq.answer.reject": {
     "name": "ns.mac.beacon_freq.answer.reject",
-    "description": "beacon frequency change rejection received"
+    "description": "beacon frequency change rejection received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.BeaconFreqAns"}
   },
   "ns.mac.beacon_freq.request": {
     "name": "ns.mac.beacon_freq.request",
-    "description": "beacon frequency change request enqueued"
+    "description": "beacon frequency change request enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.BeaconFreqReq"}
   },
   "ns.mac.dev_status.answer": {
     "name": "ns.mac.dev_status.answer",
-    "description": "device status answer received"
+    "description": "device status answer received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.DevStatusAns"}
   },
   "ns.mac.dev_status.request": {
     "name": "ns.mac.dev_status.request",
@@ -397,11 +402,13 @@
   },
   "ns.mac.device_mode.confirmation": {
     "name": "ns.mac.device_mode.confirmation",
-    "description": "device mode confirmation enqueued"
+    "description": "device mode confirmation enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.DeviceModeConf"}
   },
   "ns.mac.device_mode.indication": {
     "name": "ns.mac.device_mode.indication",
-    "description": "device mode indication received"
+    "description": "device mode indication received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.DeviceModeInd"}
   },
   "ns.mac.device_time.answer": {
     "name": "ns.mac.device_time.answer",
@@ -413,15 +420,18 @@
   },
   "ns.mac.dl_channel.answer.accept": {
     "name": "ns.mac.dl_channel.answer.accept",
-    "description": "downlink Rx1 channel frequency modification accept received"
+    "description": "downlink Rx1 channel frequency modification accept received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.DLChannelAns"}
   },
   "ns.mac.dl_channel.answer.reject": {
     "name": "ns.mac.dl_channel.answer.reject",
-    "description": "downlink Rx1 channel frequency modification rejection received"
+    "description": "downlink Rx1 channel frequency modification rejection received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.DLChannelAns"}
   },
   "ns.mac.dl_channel.request": {
     "name": "ns.mac.dl_channel.request",
-    "description": "downlink Rx1 channel frequency modification request enqueued"
+    "description": "downlink Rx1 channel frequency modification request enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.DLChannelReq"}
   },
   "ns.mac.duty_cycle.answer": {
     "name": "ns.mac.duty_cycle.answer",
@@ -429,7 +439,8 @@
   },
   "ns.mac.duty_cycle.request": {
     "name": "ns.mac.duty_cycle.request",
-    "description": "maximum aggregated transmit duty-cycle change request enqueued"
+    "description": "maximum aggregated transmit duty-cycle change request enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.DutyCycleReq"}
   },
   "ns.mac.force_rejoin.request": {
     "name": "ns.mac.force_rejoin.request",
@@ -437,19 +448,23 @@
   },
   "ns.mac.link_adr.answer.accept": {
     "name": "ns.mac.link_adr.answer.accept",
-    "description": "link ADR accept received"
+    "description": "link ADR accept received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.LinkADRAns"}
   },
   "ns.mac.link_adr.answer.reject": {
     "name": "ns.mac.link_adr.answer.reject",
-    "description": "link ADR rejection received"
+    "description": "link ADR rejection received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.LinkADRAns"}
   },
   "ns.mac.link_adr.request": {
     "name": "ns.mac.link_adr.request",
-    "description": "link ADR request enqueued"
+    "description": "link ADR request enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.LinkADRReq"}
   },
   "ns.mac.link_check.answer": {
     "name": "ns.mac.link_check.answer",
-    "description": "link check answer enqueued"
+    "description": "link check answer enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.LinkCheckAns"}
   },
   "ns.mac.link_check.request": {
     "name": "ns.mac.link_check.request",
@@ -457,23 +472,28 @@
   },
   "ns.mac.new_channel.answer.accept": {
     "name": "ns.mac.new_channel.answer.accept",
-    "description": "new channel accept received"
+    "description": "new channel accept received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.NewChannelAns"}
   },
   "ns.mac.new_channel.answer.reject": {
     "name": "ns.mac.new_channel.answer.reject",
-    "description": "new channel rejection received"
+    "description": "new channel rejection received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.NewChannelAns"}
   },
   "ns.mac.new_channel.request": {
     "name": "ns.mac.new_channel.request",
-    "description": "new channel request enqueued"
+    "description": "new channel request enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.NewChannelReq"}
   },
   "ns.mac.ping_slot_channel.answer.accept": {
     "name": "ns.mac.ping_slot_channel.answer.accept",
-    "description": "ping slot channel accept received"
+    "description": "ping slot channel accept received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.PingSlotChannelAns"}
   },
   "ns.mac.ping_slot_channel.request": {
     "name": "ns.mac.ping_slot_channel.request",
-    "description": "ping slot channel request enqueued"
+    "description": "ping slot channel request enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.PingSlotChannelReq"}
   },
   "ns.mac.ping_slot_info.answer": {
     "name": "ns.mac.ping_slot_info.answer",
@@ -481,7 +501,8 @@
   },
   "ns.mac.ping_slot_info.request": {
     "name": "ns.mac.ping_slot_info.request",
-    "description": "ping slot info request received"
+    "description": "ping slot info request received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.PingSlotInfoReq"}
   },
   "ns.mac.proprietary.receive": {
     "name": "ns.mac.proprietary.receive",
@@ -489,39 +510,48 @@
   },
   "ns.mac.rejoin_param_setup.answer": {
     "name": "ns.mac.rejoin_param_setup.answer",
-    "description": "rejoin parameter setup answer received"
+    "description": "rejoin parameter setup answer received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.RejoinParamSetupAns"}
   },
   "ns.mac.rejoin_param_setup.request": {
     "name": "ns.mac.rejoin_param_setup.request",
-    "description": "rejoin parameter setup request enqueued"
+    "description": "rejoin parameter setup request enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.RejoinParamSetupReq"}
   },
   "ns.mac.rekey.confirmation": {
     "name": "ns.mac.rekey.confirmation",
-    "description": "device rekey confirmation enqueued"
+    "description": "device rekey confirmation enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.RekeyConf"}
   },
   "ns.mac.rekey.indication": {
     "name": "ns.mac.rekey.indication",
-    "description": "device rekey indication received"
+    "description": "device rekey indication received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.RekeyInd"}
   },
   "ns.mac.reset.confirmation": {
     "name": "ns.mac.reset.confirmation",
-    "description": "device reset confirmation enqueued"
+    "description": "device reset confirmation enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.ResetConf"}
   },
   "ns.mac.reset.indication": {
     "name": "ns.mac.reset.indication",
-    "description": "device reset indication received"
+    "description": "device reset indication received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.ResetInd"}
   },
   "ns.mac.rx_param_setup.answer.accept": {
     "name": "ns.mac.rx_param_setup.answer.accept",
-    "description": "Rx parameter setup accept received"
+    "description": "Rx parameter setup accept received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.RxParamSetupAns"}
   },
   "ns.mac.rx_param_setup.answer.reject": {
     "name": "ns.mac.rx_param_setup.answer.reject",
-    "description": "Rx parameter setup rejection received"
+    "description": "Rx parameter setup rejection received",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.RxParamSetupAns"}
   },
   "ns.mac.rx_param_setup.request": {
     "name": "ns.mac.rx_param_setup.request",
-    "description": "Rx parameter setup request enqueued"
+    "description": "Rx parameter setup request enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.RxParamSetupReq"}
   },
   "ns.mac.rx_timing_setup.answer": {
     "name": "ns.mac.rx_timing_setup.answer",
@@ -529,7 +559,8 @@
   },
   "ns.mac.rx_timing_setup.request": {
     "name": "ns.mac.rx_timing_setup.request",
-    "description": "Rx timing setup request enqueued"
+    "description": "Rx timing setup request enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.RxTimingSetupReq"}
   },
   "ns.mac.tx_param_setup.answer": {
     "name": "ns.mac.tx_param_setup.answer",
@@ -537,7 +568,8 @@
   },
   "ns.mac.tx_param_setup.request": {
     "name": "ns.mac.tx_param_setup.request",
-    "description": "Tx parameter setup request enqueued"
+    "description": "Tx parameter setup request enqueued",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.MACCommand.TxParamSetupReq"}
   },
   "ns.up.data.drop": {
     "name": "ns.up.data.drop",

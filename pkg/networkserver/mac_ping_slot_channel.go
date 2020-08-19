@@ -23,8 +23,14 @@ import (
 )
 
 var (
-	evtEnqueuePingSlotChannelRequest = defineEnqueueMACRequestEvent("ping_slot_channel", "ping slot channel")()
-	evtReceivePingSlotChannelAnswer  = defineReceiveMACAcceptEvent("ping_slot_channel", "ping slot channel")()
+	evtEnqueuePingSlotChannelRequest = defineEnqueueMACRequestEvent(
+		"ping_slot_channel", "ping slot channel",
+		events.WithDataType(&ttnpb.MACCommand_PingSlotChannelReq{}),
+	)()
+	evtReceivePingSlotChannelAnswer = defineReceiveMACAcceptEvent(
+		"ping_slot_channel", "ping slot channel",
+		events.WithDataType(&ttnpb.MACCommand_PingSlotChannelAns{}),
+	)()
 )
 
 func deviceNeedsPingSlotChannelReq(dev *ttnpb.EndDevice) bool {

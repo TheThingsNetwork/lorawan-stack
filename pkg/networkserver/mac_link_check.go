@@ -22,8 +22,13 @@ import (
 )
 
 var (
-	evtReceiveLinkCheckRequest = defineReceiveMACRequestEvent("link_check", "link check")()
-	evtEnqueueLinkCheckAnswer  = defineEnqueueMACAnswerEvent("link_check", "link check")()
+	evtReceiveLinkCheckRequest = defineReceiveMACRequestEvent(
+		"link_check", "link check",
+	)()
+	evtEnqueueLinkCheckAnswer = defineEnqueueMACAnswerEvent(
+		"link_check", "link check",
+		events.WithDataType(&ttnpb.MACCommand_LinkCheckAns{}),
+	)()
 )
 
 func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) (events.Builders, error) {
