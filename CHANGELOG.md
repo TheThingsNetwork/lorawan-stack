@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.9.1] - 2020-08-19
+
+### Added
+
 - LoRaCloud DAS integration page in the Console.
 - User Agent metadata on published events (when available).
 - Option to override server name used in TLS handshake with cluster peers (`cluster.tls-server-name`).
@@ -19,17 +33,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved remote IP event metadata outside authentication.
 - Admins can now set the expiration time of temporary passwords of users.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Authentication metadata missing from published events.
 - Under some circumstances, CLI would mistakenly import ABP devices as OTAA.
 - Gateway Server could include the gateway antenna location on messages forwarded to the Network Server even if the gateway location was not public.
-
-### Security
 
 ## [3.9.0] - 2020-08-06
 
@@ -1015,7 +1023,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.0...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.1...HEAD
+[3.9.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.0...v3.9.1
 [3.9.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.6...v3.9.0
 [3.8.6]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.5...v3.8.6
 [3.8.5]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.4...v3.8.5
