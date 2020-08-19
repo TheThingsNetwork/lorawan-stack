@@ -309,7 +309,8 @@
   },
   "ns.application.link.end": {
     "name": "ns.application.link.end",
-    "description": "end application link"
+    "description": "end application link",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "ns.class.switch.a": {
     "name": "ns.class.switch.a",
@@ -325,7 +326,8 @@
   },
   "ns.down.data.schedule.attempt": {
     "name": "ns.down.data.schedule.attempt",
-    "description": "schedule data downlink for transmission on Gateway Server"
+    "description": "schedule data downlink for transmission on Gateway Server",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.DownlinkMessage"}
   },
   "ns.down.data.schedule.fail": {
     "name": "ns.down.data.schedule.fail",
@@ -334,11 +336,13 @@
   },
   "ns.down.data.schedule.success": {
     "name": "ns.down.data.schedule.success",
-    "description": "successfully scheduled data downlink for transmission on Gateway Server"
+    "description": "successfully scheduled data downlink for transmission on Gateway Server",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ScheduleDownlinkResponse"}
   },
   "ns.down.join.schedule.attempt": {
     "name": "ns.down.join.schedule.attempt",
-    "description": "schedule join-accept for transmission on Gateway Server"
+    "description": "schedule join-accept for transmission on Gateway Server",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.DownlinkMessage"}
   },
   "ns.down.join.schedule.fail": {
     "name": "ns.down.join.schedule.fail",
@@ -347,7 +351,8 @@
   },
   "ns.down.join.schedule.success": {
     "name": "ns.down.join.schedule.success",
-    "description": "successfully scheduled join-accept for transmission on Gateway Server"
+    "description": "successfully scheduled join-accept for transmission on Gateway Server",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ScheduleDownlinkResponse"}
   },
   "ns.end_device.create": {
     "name": "ns.end_device.create",
@@ -541,23 +546,28 @@
   },
   "ns.up.data.forward": {
     "name": "ns.up.data.forward",
-    "description": "forward data message to Application Server"
+    "description": "forward data message to Application Server",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ApplicationUp","end_device_ids":{"application_ids":{}},"uplink_message":{"settings":{"data_rate":{}},"received_at":"0001-01-01T00:00:00Z"}}
   },
   "ns.up.data.process": {
     "name": "ns.up.data.process",
-    "description": "successfully processed data message"
+    "description": "successfully processed data message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.UplinkMessage","settings":{"data_rate":{}},"received_at":"0001-01-01T00:00:00Z"}
   },
   "ns.up.data.receive": {
     "name": "ns.up.data.receive",
-    "description": "receive data message"
+    "description": "receive data message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.UplinkMessage","settings":{"data_rate":{}},"received_at":"0001-01-01T00:00:00Z"}
   },
   "ns.up.join.accept.forward": {
     "name": "ns.up.join.accept.forward",
-    "description": "forward join-accept to Application Server"
+    "description": "forward join-accept to Application Server",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ApplicationUp","end_device_ids":{"application_ids":{}},"join_accept":{"received_at":"0001-01-01T00:00:00Z"}}
   },
   "ns.up.join.cluster.attempt": {
     "name": "ns.up.join.cluster.attempt",
-    "description": "send join-request to cluster-local Join Server"
+    "description": "send join-request to cluster-local Join Server",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.JoinRequest","dev_addr":"00000000","net_id":"000000","downlink_settings":{}}
   },
   "ns.up.join.cluster.fail": {
     "name": "ns.up.join.cluster.fail",
@@ -566,7 +576,8 @@
   },
   "ns.up.join.cluster.success": {
     "name": "ns.up.join.cluster.success",
-    "description": "join-request to cluster-local Join Server succeeded"
+    "description": "join-request to cluster-local Join Server succeeded",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.JoinResponse","session_keys":{}}
   },
   "ns.up.join.drop": {
     "name": "ns.up.join.drop",
@@ -575,7 +586,8 @@
   },
   "ns.up.join.interop.attempt": {
     "name": "ns.up.join.interop.attempt",
-    "description": "forward join-request to interoperability Join Server"
+    "description": "forward join-request to interoperability Join Server",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.JoinRequest","dev_addr":"00000000","net_id":"000000","downlink_settings":{}}
   },
   "ns.up.join.interop.fail": {
     "name": "ns.up.join.interop.fail",
@@ -584,15 +596,18 @@
   },
   "ns.up.join.interop.success": {
     "name": "ns.up.join.interop.success",
-    "description": "join-request to interoperability Join Server succeeded"
+    "description": "join-request to interoperability Join Server succeeded",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.JoinResponse","session_keys":{}}
   },
   "ns.up.join.process": {
     "name": "ns.up.join.process",
-    "description": "successfully processed join-request"
+    "description": "successfully processed join-request",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.UplinkMessage","settings":{"data_rate":{}},"received_at":"0001-01-01T00:00:00Z"}
   },
   "ns.up.join.receive": {
     "name": "ns.up.join.receive",
-    "description": "receive join-request"
+    "description": "receive join-request",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.UplinkMessage","settings":{"data_rate":{}},"received_at":"0001-01-01T00:00:00Z"}
   },
   "oauth.authorize": {
     "name": "oauth.authorize",
