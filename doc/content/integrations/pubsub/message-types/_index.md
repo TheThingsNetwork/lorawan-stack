@@ -18,7 +18,7 @@ The Application Server can be configured to **subscribe** to messages to schedul
 - Downlink queue push
 - Downlink queue replace
 
- Enabling event messaging also allows you to manually configure a **Sub topic** for that event. If no Sub topic is specified, events will be published to the configured **Base topic**.
+Enabling event messaging also allows you to manually configure a **Sub topic** for that event. If no Sub topic is specified, events will be published to the configured **Base topic**.
 
 <!--more-->
 

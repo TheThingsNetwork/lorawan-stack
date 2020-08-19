@@ -70,8 +70,8 @@ The **authorization code** is sent in the request payload:
 
 ```json
 {
-	"code": "<AUTHORIZATION-CODE>", 
-	"grant_type": "authorization_code"
+  "code": "<AUTHORIZATION-CODE>", 
+  "grant_type": "authorization_code"
 }
 ```
 
@@ -79,10 +79,10 @@ The response contains the **OAuth access token** and an indication of when it ex
 
 ```json
 {
-	"access_token": "XXXXX", 
-	"token_type": "bearer", 
-	"expires_in": "3600",
-	"refresh_token": "YYYYY"
+  "access_token": "XXXXX", 
+  "token_type": "bearer", 
+  "expires_in": "3600",
+  "refresh_token": "YYYYY"
 }
 ```
 
@@ -100,8 +100,8 @@ The **refresh token** is sent in the request payload:
 
 ```json
 {
-	"code": "<REFRESH-TOKEN>", 
-	"grant_type": "refresh_token"
+  "code": "<REFRESH-TOKEN>", 
+  "grant_type": "refresh_token"
 }
 ```
 
@@ -109,9 +109,9 @@ The response again contains the **OAuth access token** and an indication of when
 
 ```json
 {
-	"access_token": "XXXXX", 
-	"token_type": "bearer", 
-	"expires_in": "3600",
-	"refresh_token": "YYYYY"
+  "access_token": "XXXXX", 
+  "token_type": "bearer", 
+  "expires_in": "3600",
+  "refresh_token": "YYYYY"
 }
 ```

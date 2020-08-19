@@ -45,4 +45,3 @@ message ErrorDetails {
   // The details of the error.
   repeated google.protobuf.Any details = 8;
 }
-

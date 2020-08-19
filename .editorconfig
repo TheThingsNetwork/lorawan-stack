@@ -1,24 +1,44 @@
 root = true
 
 [*]
-max_line_length = 300
-indent_style = space
-indent_size = 2
+charset = utf-8
 end_of_line = lf
+indent_size = 2
+indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
-charset = utf-8
 
-[*.go]
-indent_style = tab
-
-[*.md]
+[{*.enc,*.go,*.gpg,*.md,*.svg}]
 trim_trailing_whitespace = false
 
-[Makefile]
-indent_style = tab
-indent_size = 2
+[{*.enc,*.gpg,*.json,*.svg,LICENSE}]
+insert_final_newline = unset
 
-[*.make]
+[{*.enc,*.gpg,*.svg}]
+end_of_line = unset
+
+[{*.enc,*.go,*.gpg,*.svg,*.html,LICENSE}]
+indent_size = unset
+indent_style = unset
+
+[{*.enc,*.gpg,*.json,*.svg,LICENSE}]
+max_line_length = unset
+
+[*.{go,js}]
+# Allow C-style doc comments
+block_comment_start = /*
+block_comment = *
+block_comment_end = */
+
+[{*.make,go.mod,go.sum,Makefile}]
 indent_style = tab
-indent_size = 2
+
+[doc/themes/the-things-stack/layouts/shortcodes/*.html]
+indent_size = unset
+indent_style = unset
+insert_final_newline = false
+
+[.gitkeep]
+indent_size = 0
+insert_final_newline = false
+max_line_length = 0
