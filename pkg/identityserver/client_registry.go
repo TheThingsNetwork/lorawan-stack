@@ -42,6 +42,7 @@ var (
 	evtUpdateClient = events.Define(
 		"client.update", "update OAuth client",
 		events.WithVisibility(ttnpb.RIGHT_CLIENT_ALL),
+		events.WithUpdatedFieldsDataType(),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)

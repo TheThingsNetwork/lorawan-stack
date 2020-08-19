@@ -27,16 +27,25 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
+var withIdentifiersOption = events.WithDataType(&ttnpb.ApplicationPubSubIdentifiers{
+	ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+		ApplicationID: "application-id",
+	},
+	PubSubID: "pubsub-id",
+})
+
 var (
 	evtSetPubSub = events.Define(
 		"as.pubsub.set", "set pub/sub",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC),
+		withIdentifiersOption,
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtDeletePubSub = events.Define(
 		"as.pubsub.delete", "delete pub/sub",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC),
+		withIdentifiersOption,
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
@@ -47,6 +56,7 @@ var (
 			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 			ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 		),
+		withIdentifiersOption,
 	)
 	evtPubSubStop = events.Define(
 		"as.pubsub.stop", "stop pub/sub",
@@ -55,6 +65,7 @@ var (
 			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 			ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 		),
+		withIdentifiersOption,
 	)
 	evtPubSubFail = events.Define(
 		"as.pubsub.fail", "fail pub/sub",
@@ -63,6 +74,7 @@ var (
 			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 			ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 		),
+		events.WithErrorDataType(),
 	)
 )
 

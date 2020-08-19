@@ -38,6 +38,7 @@ var (
 	evtUpdateEndDevice = events.Define(
 		"end_device.update", "update end device",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
+		events.WithUpdatedFieldsDataType(),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)

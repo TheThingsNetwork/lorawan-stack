@@ -1,0 +1,13 @@
+{{- with index .Site.Data "events" }}
+{{- range . }}
+<h3 class="event-name" id="event:{{ .name }}">Event <code>{{ .name }}</code></h3>
+<p class="event-description">{{ .description }}</p>
+{{- with .data }}
+<details><summary>Show example of <code>data</code> field</summary>
+  <pre class="event-example"><code>{{ . | jsonify (dict "indent" "  ") }}</code></pre>
+</details>
+{{- end }}
+{{- end }}
+{{- else }}
+{{ errorf "Missing events data" }}
+{{- end }}

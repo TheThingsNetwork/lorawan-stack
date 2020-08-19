@@ -714,6 +714,16 @@ $ tools/bin/mage js:translations
 
 The message definitions in `pkg/webui/locales` can be used to provide translations in other languages (e.g. `fr.js`). Keep in mind that locale files are checked in and committed, any discrepancy in the locales file with the defined messages will lead to a CI failure.
 
+## Events
+
+In addition to the previously described translation file that we generate, we also generate a data file that contains all event definitions. This file is then loaded by the documentation system so that we can generate documentation for our events.
+
+After adding or changing events, regenerate this file with:
+
+```bash
+$ tools/bin/mage go:eventData
+```
+
 ## Testing
 
 ```bash

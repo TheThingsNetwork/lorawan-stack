@@ -19,9 +19,11 @@ import (
 	"sort"
 	"strings"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/peer"
 )
 
@@ -100,5 +102,58 @@ func WithClientInfoFromContext() Option {
 		if md := rpcmetadata.FromIncomingContext(e.ctx); md.UserAgent != "" {
 			e.innerEvent.UserAgent = md.UserAgent
 		}
+	})
+}
+
+// DefinitionOption is like Option, but applies to the definition instead.
+type DefinitionOption interface {
+	Option
+	applyToDefinition(*definition)
+}
+
+type definitionOptionFunc func(d *definition)
+
+func (definitionOptionFunc) applyTo(*event) {}
+
+func (f definitionOptionFunc) applyToDefinition(d *definition) { f(d) }
+
+// WithDataType returns an option that sets the data type of the event (for documentation).
+func WithDataType(t interface{}) DefinitionOption {
+	msg, err := marshalData(t)
+	if err != nil {
+		panic(err)
+	}
+	return definitionOptionFunc(func(d *definition) {
+		d.dataType = msg
+	})
+}
+
+var errorDataType, _ = marshalData(&ttnpb.ErrorDetails{
+	Namespace:     "pkg/example",
+	Name:          "example",
+	MessageFormat: "example error for `{attr_name}`",
+	Attributes: &pbtypes.Struct{
+		Fields: map[string]*pbtypes.Value{
+			"attr_name": {Kind: &pbtypes.Value_StringValue{
+				StringValue: "attr_value",
+			}},
+		},
+	},
+	Code: uint32(codes.Unknown),
+})
+
+// WithErrorDataType is a convenience function that sets the data type of the event to an error.
+func WithErrorDataType() DefinitionOption {
+	return definitionOptionFunc(func(d *definition) {
+		d.dataType = errorDataType
+	})
+}
+
+var updatedFieldsDataType, _ = marshalData([]string{"list.of", "updated.fields"})
+
+// WithUpdatedFieldsDataType is a convenience function that sets the data type of the event to a slice of updated fields.
+func WithUpdatedFieldsDataType() DefinitionOption {
+	return definitionOptionFunc(func(d *definition) {
+		d.dataType = updatedFieldsDataType
 	})
 }

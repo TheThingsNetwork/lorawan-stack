@@ -2525,17 +2525,17 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `name` | [`string`](#string) |  |  |
-| `time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `identifiers` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) | repeated |  |
-| `data` | [`google.protobuf.Any`](#google.protobuf.Any) |  |  |
-| `correlation_ids` | [`string`](#string) | repeated |  |
-| `origin` | [`string`](#string) |  |  |
-| `context` | [`Event.ContextEntry`](#ttn.lorawan.v3.Event.ContextEntry) | repeated |  |
+| `name` | [`string`](#string) |  | Name of the event. This can be used to find the (localized) event description. |
+| `time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time at which the event was triggered. |
+| `identifiers` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) | repeated | Identifiers of the entity (or entities) involved. |
+| `data` | [`google.protobuf.Any`](#google.protobuf.Any) |  | Optional data attached to the event. |
+| `correlation_ids` | [`string`](#string) | repeated | Correlation IDs can be used to find related events and actions such as API calls. |
+| `origin` | [`string`](#string) |  | The origin of the event. Typically the hostname of the server that created it. |
+| `context` | [`Event.ContextEntry`](#ttn.lorawan.v3.Event.ContextEntry) | repeated | Event context, internal use only. |
 | `visibility` | [`Rights`](#ttn.lorawan.v3.Rights) |  | The event will be visible to a caller that has any of these rights. |
-| `authentication` | [`Event.Authentication`](#ttn.lorawan.v3.Event.Authentication) |  |  |
-| `remote_ip` | [`string`](#string) |  |  |
-| `user_agent` | [`string`](#string) |  |  |
+| `authentication` | [`Event.Authentication`](#ttn.lorawan.v3.Event.Authentication) |  | Details on the authentication provided by the caller that triggered this event. |
+| `remote_ip` | [`string`](#string) |  | The IP address of the caller that triggered this event. |
+| `user_agent` | [`string`](#string) |  | The IP address of the caller that triggered this event. |
 
 #### Field Rules
 
@@ -2548,9 +2548,9 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `type` | [`string`](#string) |  |  |
-| `token_type` | [`string`](#string) |  |  |
-| `token_id` | [`string`](#string) |  |  |
+| `type` | [`string`](#string) |  | The type of authentication that was used. This is typically a bearer token. |
+| `token_type` | [`string`](#string) |  | The type of token that was used. Common types are APIKey, AccessToken and SessionToken. |
+| `token_id` | [`string`](#string) |  | The ID of the token that was used. |
 
 ### <a name="ttn.lorawan.v3.Event.ContextEntry">Message `Event.ContextEntry`</a>
 

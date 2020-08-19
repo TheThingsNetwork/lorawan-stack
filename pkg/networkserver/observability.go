@@ -27,59 +27,63 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-func defineReceiveMACAcceptEvent(name, desc string) func() events.Builder {
+func macEventOptions(extraOpts ...events.Option) []events.Option {
+	return append([]events.Option{events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ)}, extraOpts...)
+}
+
+func defineReceiveMACAcceptEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.answer.accept", name), fmt.Sprintf("%s accept received", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineReceiveMACAnswerEvent(name, desc string) func() events.Builder {
+func defineReceiveMACAnswerEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer received", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineReceiveMACIndicationEvent(name, desc string) func() events.Builder {
+func defineReceiveMACIndicationEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.indication", name), fmt.Sprintf("%s indication received", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineReceiveMACRejectEvent(name, desc string) func() events.Builder {
+func defineReceiveMACRejectEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.answer.reject", name), fmt.Sprintf("%s rejection received", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineReceiveMACRequestEvent(name, desc string) func() events.Builder {
+func defineReceiveMACRequestEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request received", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineEnqueueMACAnswerEvent(name, desc string) func() events.Builder {
+func defineEnqueueMACAnswerEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer enqueued", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineEnqueueMACConfirmationEvent(name, desc string) func() events.Builder {
+func defineEnqueueMACConfirmationEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.confirmation", name), fmt.Sprintf("%s confirmation enqueued", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
-func defineEnqueueMACRequestEvent(name, desc string) func() events.Builder {
+func defineEnqueueMACRequestEvent(name, desc string, opts ...events.Option) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request enqueued", desc),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		macEventOptions(opts...)...,
 	)
 }
 
@@ -98,86 +102,111 @@ var (
 	evtEndApplicationLink = events.Define(
 		"ns.application.link.end", "end application link",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_LINK),
+		events.WithErrorDataType(),
 	)
 	evtReceiveDataUplink = events.Define(
 		"ns.up.data.receive", "receive data message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.UplinkMessage{}),
 	)
 	evtDropDataUplink = events.Define(
 		"ns.up.data.drop", "drop data message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtProcessDataUplink = events.Define(
 		"ns.up.data.process", "successfully processed data message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.UplinkMessage{}),
 	)
 	evtForwardDataUplink = events.Define(
 		"ns.up.data.forward", "forward data message to Application Server",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{
+			Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{}},
+		}),
 	)
 	evtScheduleDataDownlinkAttempt = events.Define(
 		"ns.down.data.schedule.attempt", "schedule data downlink for transmission on Gateway Server",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.DownlinkMessage{}),
 	)
 	evtScheduleDataDownlinkSuccess = events.Define(
 		"ns.down.data.schedule.success", "successfully scheduled data downlink for transmission on Gateway Server",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ScheduleDownlinkResponse{}),
 	)
 	evtScheduleDataDownlinkFail = events.Define(
 		"ns.down.data.schedule.fail", "failed to schedule data downlink for transmission on Gateway Server",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtReceiveJoinRequest = events.Define(
 		"ns.up.join.receive", "receive join-request",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.UplinkMessage{}),
 	)
 	evtDropJoinRequest = events.Define(
 		"ns.up.join.drop", "drop join-request",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtProcessJoinRequest = events.Define(
 		"ns.up.join.process", "successfully processed join-request",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.UplinkMessage{}),
 	)
 	evtClusterJoinAttempt = events.Define(
 		"ns.up.join.cluster.attempt", "send join-request to cluster-local Join Server",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.JoinRequest{}),
 	)
 	evtClusterJoinSuccess = events.Define(
 		"ns.up.join.cluster.success", "join-request to cluster-local Join Server succeeded",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.JoinResponse{}),
 	)
 	evtClusterJoinFail = events.Define(
 		"ns.up.join.cluster.fail", "join-request to cluster-local Join Server failed",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtInteropJoinAttempt = events.Define(
 		"ns.up.join.interop.attempt", "forward join-request to interoperability Join Server",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.JoinRequest{}),
 	)
 	evtInteropJoinSuccess = events.Define(
 		"ns.up.join.interop.success", "join-request to interoperability Join Server succeeded",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.JoinResponse{}),
 	)
 	evtInteropJoinFail = events.Define(
 		"ns.up.join.interop.fail", "join-request to interoperability Join Server failed",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtForwardJoinAccept = events.Define(
 		"ns.up.join.accept.forward", "forward join-accept to Application Server",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{
+			Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{}},
+		}),
 	)
 	evtScheduleJoinAcceptAttempt = events.Define(
 		"ns.down.join.schedule.attempt", "schedule join-accept for transmission on Gateway Server",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.DownlinkMessage{}),
 	)
 	evtScheduleJoinAcceptSuccess = events.Define(
 		"ns.down.join.schedule.success", "successfully scheduled join-accept for transmission on Gateway Server",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ScheduleDownlinkResponse{}),
 	)
 	evtScheduleJoinAcceptFail = events.Define(
 		"ns.down.join.schedule.fail", "failed to schedule join-accept for transmission on Gateway Server",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtEnqueueProprietaryMACAnswer  = defineEnqueueMACAnswerEvent("proprietary", "proprietary MAC command")
 	evtEnqueueProprietaryMACRequest = defineEnqueueMACRequestEvent("proprietary", "proprietary MAC command")

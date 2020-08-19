@@ -24,8 +24,13 @@ import (
 )
 
 var (
-	evtEnqueueADRParamSetupRequest = defineEnqueueMACRequestEvent("adr_param_setup", "ADR parameter setup")()
-	evtReceiveADRParamSetupAnswer  = defineReceiveMACAnswerEvent("adr_param_setup", "ADR parameter setup")()
+	evtEnqueueADRParamSetupRequest = defineEnqueueMACRequestEvent(
+		"adr_param_setup", "ADR parameter setup",
+		events.WithDataType(&ttnpb.MACCommand_ADRParamSetupReq{}),
+	)()
+	evtReceiveADRParamSetupAnswer = defineReceiveMACAnswerEvent(
+		"adr_param_setup", "ADR parameter setup",
+	)()
 )
 
 func deviceADRAckLimit(dev *ttnpb.EndDevice, phy band.Band) ttnpb.ADRAckLimitExponent {

@@ -23,9 +23,18 @@ import (
 )
 
 var (
-	evtEnqueueRxParamSetupRequest = defineEnqueueMACRequestEvent("rx_param_setup", "Rx parameter setup")()
-	evtReceiveRxParamSetupAccept  = defineReceiveMACAcceptEvent("rx_param_setup", "Rx parameter setup")()
-	evtReceiveRxParamSetupReject  = defineReceiveMACRejectEvent("rx_param_setup", "Rx parameter setup")()
+	evtEnqueueRxParamSetupRequest = defineEnqueueMACRequestEvent(
+		"rx_param_setup", "Rx parameter setup",
+		events.WithDataType(&ttnpb.MACCommand_RxParamSetupReq{}),
+	)()
+	evtReceiveRxParamSetupAccept = defineReceiveMACAcceptEvent(
+		"rx_param_setup", "Rx parameter setup",
+		events.WithDataType(&ttnpb.MACCommand_RxParamSetupAns{}),
+	)()
+	evtReceiveRxParamSetupReject = defineReceiveMACRejectEvent(
+		"rx_param_setup", "Rx parameter setup",
+		events.WithDataType(&ttnpb.MACCommand_RxParamSetupAns{}),
+	)()
 )
 
 func deviceNeedsRxParamSetupReq(dev *ttnpb.EndDevice) bool {

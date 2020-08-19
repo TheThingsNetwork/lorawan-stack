@@ -23,9 +23,18 @@ import (
 )
 
 var (
-	evtEnqueueDLChannelRequest = defineEnqueueMACRequestEvent("dl_channel", "downlink Rx1 channel frequency modification")()
-	evtReceiveDLChannelAccept  = defineReceiveMACAcceptEvent("dl_channel", "downlink Rx1 channel frequency modification")()
-	evtReceiveDLChannelReject  = defineReceiveMACRejectEvent("dl_channel", "downlink Rx1 channel frequency modification")()
+	evtEnqueueDLChannelRequest = defineEnqueueMACRequestEvent(
+		"dl_channel", "downlink Rx1 channel frequency modification",
+		events.WithDataType(&ttnpb.MACCommand_DLChannelReq{}),
+	)()
+	evtReceiveDLChannelAccept = defineReceiveMACAcceptEvent(
+		"dl_channel", "downlink Rx1 channel frequency modification",
+		events.WithDataType(&ttnpb.MACCommand_DLChannelAns{}),
+	)()
+	evtReceiveDLChannelReject = defineReceiveMACRejectEvent(
+		"dl_channel", "downlink Rx1 channel frequency modification",
+		events.WithDataType(&ttnpb.MACCommand_DLChannelAns{}),
+	)()
 )
 
 func deviceNeedsDLChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {

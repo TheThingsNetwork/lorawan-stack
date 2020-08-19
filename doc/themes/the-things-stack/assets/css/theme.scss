@@ -226,6 +226,10 @@ details + blockquote {
   margin-top: 1em;
 }
 
+.event-description:first-letter {
+  text-transform: uppercase;
+}
+
 .glossary {
   .term, .term-abbr, .term-alt{
     background-color: #ececec;

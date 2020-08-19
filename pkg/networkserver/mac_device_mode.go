@@ -22,8 +22,14 @@ import (
 )
 
 var (
-	evtReceiveDeviceModeIndication   = defineReceiveMACIndicationEvent("device_mode", "device mode")()
-	evtEnqueueDeviceModeConfirmation = defineEnqueueMACConfirmationEvent("device_mode", "device mode")()
+	evtReceiveDeviceModeIndication = defineReceiveMACIndicationEvent(
+		"device_mode", "device mode",
+		events.WithDataType(&ttnpb.MACCommand_DeviceModeInd{}),
+	)()
+	evtEnqueueDeviceModeConfirmation = defineEnqueueMACConfirmationEvent(
+		"device_mode", "device mode",
+		events.WithDataType(&ttnpb.MACCommand_DeviceModeConf{}),
+	)()
 )
 
 func handleDeviceModeInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DeviceModeInd) (events.Builders, error) {
