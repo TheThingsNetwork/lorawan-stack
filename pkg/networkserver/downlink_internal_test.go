@@ -2910,22 +2910,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0b1_0_0_1_0001,
+							0b1_0_0_1_0000,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
-
-						/** FOpts **/
-						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
-							0x24,
-							[]byte{
-								/* DevStatusReq */
-								0x06,
-							},
-							true,
-						)).([]byte)...)
 
 						/** FPort **/
 						b = append(b, 0x1)
@@ -2947,7 +2935,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						return &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_B,
 							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_HIGH,
+							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx2DataRateIndex: ttnpb.DATA_RATE_3,
 							Rx2Frequency:     869525000,
 							AbsoluteTime:     TimePtr(pingAt.UTC()),
@@ -2978,11 +2966,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				setDevice.MACState.LastDownlinkAt = &downAt
 				setDevice.MACState.LastNetworkInitiatedDownlinkAt = &downAt
 				setDevice.MACState.PendingApplicationDownlink = setDevice.Session.QueuedApplicationDownlinks[0]
-				setDevice.MACState.PendingRequests = []*ttnpb.MACCommand{
-					{
-						CID: ttnpb.CID_DEV_STATUS,
-					},
-				}
 				setDevice.MACState.RecentDownlinks = append(setDevice.MACState.RecentDownlinks, lastDown)
 				setDevice.RecentDownlinks = append(setDevice.RecentDownlinks, lastDown)
 				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
@@ -3024,10 +3007,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				clock.Add(time.Second)
 
-				if timeout, interval := *setDevice.MACSettings.ClassBTimeout, networkInitiatedDownlinkInterval; timeout < interval {
-					panic(fmt.Sprintf("class B timeout less than networkInitiatedDownlinkInterval (%v < %v)", timeout, interval))
-				}
-				nextPingSlot, ok := nextPingSlotAt(ctx, setDevice, downAt.Add(*setDevice.MACSettings.ClassBTimeout))
+				nextPingSlot, ok := nextPingSlotAt(ctx, setDevice, downAt.Add(networkInitiatedDownlinkInterval))
 				if !a.So(ok, should.BeTrue) {
 					t.Error("Failed to compute next ping slot")
 				}
@@ -3536,22 +3516,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0b1_0_0_0_0001,
+							0b1_0_0_0_0000,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
-
-						/** FOpts **/
-						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
-							0x24,
-							[]byte{
-								/* DevStatusReq */
-								0x06,
-							},
-							true,
-						)).([]byte)...)
 
 						/** FPort **/
 						b = append(b, 0x1)
@@ -3573,7 +3541,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						return &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_C,
 							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_HIGH,
+							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx2DataRateIndex: getDevice.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:     getDevice.MACState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanID:  test.EUFrequencyPlanID,
@@ -3603,14 +3571,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				setDevice := CopyEndDevice(getDevice)
-				setDevice.MACState.LastConfirmedDownlinkAt = &downAt
 				setDevice.MACState.LastDownlinkAt = &downAt
 				setDevice.MACState.LastNetworkInitiatedDownlinkAt = &downAt
-				setDevice.MACState.PendingRequests = []*ttnpb.MACCommand{
-					{
-						CID: ttnpb.CID_DEV_STATUS,
-					},
-				}
 				setDevice.MACState.QueuedResponses = nil
 				setDevice.MACState.RecentDownlinks = append(setDevice.MACState.RecentDownlinks, lastDown)
 				setDevice.MACState.RxWindowsAvailable = false
@@ -4077,22 +4039,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0b1_0_0_0_0001,
+							0b1_0_0_0_0000,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
-
-						/** FOpts **/
-						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
-							0x24,
-							[]byte{
-								/* DevStatusReq */
-								0x06,
-							},
-							true,
-						)).([]byte)...)
 
 						/** FPort **/
 						b = append(b, 0x1)
@@ -4114,7 +4064,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						return &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_C,
 							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_HIGH,
+							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							AbsoluteTime:     &absTime,
 							Rx2DataRateIndex: getDevice.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:     getDevice.MACState.CurrentParameters.Rx2Frequency,
@@ -4369,22 +4319,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0b1_0_0_0_0001,
+							0b1_0_0_0_0000,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
-
-						/** FOpts **/
-						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
-							0x24,
-							[]byte{
-								/* DevStatusReq */
-								0x06,
-							},
-							true,
-						)).([]byte)...)
 
 						/** FPort **/
 						b = append(b, 0x1)
@@ -4406,7 +4344,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						return &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_C,
 							DownlinkPaths:    paths,
-							Priority:         ttnpb.TxSchedulePriority_HIGH,
+							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							Rx2DataRateIndex: getDevice.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:     getDevice.MACState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanID:  test.EUFrequencyPlanID,
