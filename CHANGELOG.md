@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- MAC commands (both requests and responses) are now only scheduled in class A downlink slots in accordance to latest revisions to LoRaWAN specification.
+
 ### Deprecated
 
 ### Removed

@@ -171,35 +171,42 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	}
 	maxDownLen, maxUpLen = maxDownLen-8, maxUpLen-8
 
-	var fPending bool
-	spec := lorawan.DefaultMACCommands
-	cmds := make([]*ttnpb.MACCommand, 0, len(dev.MACState.QueuedResponses)+len(dev.MACState.PendingRequests))
-	var lostResps []*ttnpb.MACCommand
+	var (
+		fPending bool
+		genState generateDownlinkState
+		cmdBuf   []byte
+	)
 	if class == ttnpb.CLASS_A {
-		for i, cmd := range dev.MACState.QueuedResponses {
-			desc := spec[cmd.CID]
-			if desc == nil {
-				lostResps = append(lostResps, dev.MACState.QueuedResponses[i:]...)
-				maxDownLen = 0
-				fPending = true
-				break
-			}
-			if desc.DownlinkLength > maxDownLen {
-				lostResps = append(lostResps, dev.MACState.QueuedResponses[i:]...)
-				maxDownLen = 0
-				fPending = true
-				break
-			}
-			cmds = append(cmds, cmd)
-			maxDownLen -= 1 + desc.DownlinkLength
-		}
-	}
-	dev.MACState.QueuedResponses = nil
-	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
+		spec := lorawan.DefaultMACCommands
+		cmds := make([]*ttnpb.MACCommand, 0, len(dev.MACState.QueuedResponses)+len(dev.MACState.PendingRequests))
 
-	var genState generateDownlinkState
-	cmdBuf := make([]byte, 0, maxDownLen)
-	if !dev.Multicast && len(lostResps) == 0 {
+		for _, cmd := range dev.MACState.QueuedResponses {
+			logger := logger.WithField("cid", cmd.CID)
+			desc, ok := spec[cmd.CID]
+			switch {
+			case !ok:
+				logger.Error("Unknown MAC command response enqueued, set FPending")
+				maxDownLen = 0
+				fPending = true
+			case desc.DownlinkLength >= maxDownLen:
+				logger.WithFields(log.Fields(
+					"command_length", 1+desc.DownlinkLength,
+					"remaining_downlink_length", maxDownLen,
+				)).Warn("MAC command response does not fit in buffer, set FPending")
+				maxDownLen = 0
+				fPending = true
+			default:
+				cmds = append(cmds, cmd)
+				maxDownLen -= 1 + desc.DownlinkLength
+			}
+			if !ok || desc.DownlinkLength > maxDownLen {
+				break
+			}
+		}
+		dev.MACState.QueuedResponses = nil
+		dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
+
+		cmdBuf = make([]byte, 0, maxDownLen)
 		enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) macCommandEnqueueState, 0, 13)
 		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0) >= 0 {
 			enqueuers = append(enqueuers,
@@ -276,12 +283,12 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				return nil, generateDownlinkState{}, errEncodeMAC.WithCause(err)
 			}
 		}
+		logger = logger.WithFields(log.Fields(
+			"mac_count", len(cmds),
+			"mac_length", len(cmdBuf),
+		))
+		ctx = log.NewContext(ctx, logger)
 	}
-	logger = logger.WithFields(log.Fields(
-		"mac_count", len(cmds),
-		"mac_len", len(cmdBuf),
-	))
-	ctx = log.NewContext(ctx, logger)
 
 	var needsDownlink bool
 	var up *ttnpb.UplinkMessage
@@ -493,8 +500,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	logger = logger.WithField("f_pending", pld.FHDR.FCtrl.FPending)
 	ctx = log.NewContext(ctx, logger)
 
-	needsAck := mType == ttnpb.MType_CONFIRMED_DOWN || len(dev.MACState.PendingRequests) > 0
-	if needsAck && class != ttnpb.CLASS_A {
+	if mType == ttnpb.MType_CONFIRMED_DOWN && class != ttnpb.CLASS_A {
 		confirmedAt, ok := nextConfirmedNetworkInitiatedDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
 		if !ok {
 			return nil, genState, errCorruptedMACState.New()
@@ -571,9 +577,10 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		"priority", priority,
 	)).Debug("Generated downlink")
 	return &generatedDownlink{
-		Payload:  b,
-		FCnt:     pld.FHDR.FCnt,
-		NeedsAck: needsAck,
+		Payload: b,
+		FCnt:    pld.FHDR.FCnt,
+		NeedsAck: mType == ttnpb.MType_CONFIRMED_DOWN ||
+			class == ttnpb.CLASS_A && len(dev.MACState.PendingRequests) > 0,
 		Priority: priority,
 	}, genState, nil
 }
