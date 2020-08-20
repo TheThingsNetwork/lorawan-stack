@@ -3608,6 +3608,15 @@
       "file": "messages.go"
     }
   },
+  "error:pkg/gatewayserver/io/ws/lbslns:session_state_not_found": {
+    "translations": {
+      "en": "session state not found"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/lbslns",
+      "file": "format.go"
+    }
+  },
   "error:pkg/gatewayserver/io/ws/lbslns:uplink_data_Frame": {
     "translations": {
       "en": "invalid uplink data frame received"
@@ -3678,24 +3687,6 @@
     "description": {
       "package": "pkg/gatewayserver/io/ws",
       "file": "ws.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/ws:session_already_exists": {
-    "translations": {
-      "en": "session already exists"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/ws",
-      "file": "sessions.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/ws:session_not_found": {
-    "translations": {
-      "en": "session not found"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/ws",
-      "file": "sessions.go"
     }
   },
   "error:pkg/gatewayserver/io:buffer_full": {

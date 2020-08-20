@@ -32,11 +32,6 @@ type EndPoint struct {
 
 // Formatter abstracts messages to/from websocket based gateways.
 type Formatter interface {
-	// Connect creates necessary session state for a gateway.
-	Connect(ctx context.Context, uid string) error
-	// Disconnect removes the session state for a gateway.
-	Disconnect(ctx context.Context, uid string)
-
 	// HandleDiscover handles discovery messages from web socket based gateways.
 	// This function returns a byte stream to be sent as response to the discovery message.
 	HandleDiscover(ctx context.Context, raw []byte, server io.Server, endPoint EndPoint, receivedAt time.Time) []byte
@@ -44,5 +39,5 @@ type Formatter interface {
 	// This function optionally returns a byte stream to be sent as response to the upstream message.
 	HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time) ([]byte, error)
 	// FromDownlink generates a downlink byte stream that can be sent over the WS connection.
-	FromDownlink(uid string, down ttnpb.DownlinkMessage, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error)
+	FromDownlink(ctx context.Context, uid string, down ttnpb.DownlinkMessage, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error)
 }

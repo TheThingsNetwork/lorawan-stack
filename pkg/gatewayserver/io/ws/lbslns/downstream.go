@@ -15,11 +15,13 @@
 package lbslns
 
 import (
+	"context"
 	"encoding/hex"
 	"encoding/json"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -59,7 +61,7 @@ func (dnmsg *DownlinkMessage) unmarshalJSON(data []byte) error {
 }
 
 // FromDownlink implements Formatter.
-func (f *lbsLNS) FromDownlink(uid string, down ttnpb.DownlinkMessage, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
+func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.DownlinkMessage, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
 	var dnmsg DownlinkMessage
 	settings := down.GetScheduled()
 	dnmsg.Pdu = hex.EncodeToString(down.GetRawPayload())
@@ -67,11 +69,14 @@ func (f *lbsLNS) FromDownlink(uid string, down ttnpb.DownlinkMessage, concentrat
 	dnmsg.Diid = int64(f.tokens.Next(down.CorrelationIDs, dlTime))
 
 	// The first 16 bits of XTime gets the session ID from the upstream latestXTime and the other 48 bits are concentrator timestamp accounted for rollover.
-	session, err := f.sessions.GetSession(uid)
-	if err != nil {
-		return nil, err
+	var (
+		state State
+		ok    bool
+	)
+	if state, ok = ws.SessionFromContext(ctx).State.Load().(State); !ok {
+		return nil, errSessionStateNotFound
 	}
-	xTime := int64(session.ID)<<48 | (int64(concentratorTime) / int64(time.Microsecond) & 0xFFFFFFFFFF)
+	xTime := int64(state.ID)<<48 | (int64(concentratorTime) / int64(time.Microsecond) & 0xFFFFFFFFFF)
 
 	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay). The calculated offset is in microseconds.
 	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*int(time.Second/time.Microsecond))

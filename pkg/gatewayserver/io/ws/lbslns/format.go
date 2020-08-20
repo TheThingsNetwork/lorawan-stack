@@ -15,31 +15,23 @@
 package lbslns
 
 import (
-	"context"
-
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
+var errSessionStateNotFound = errors.DefineUnavailable("session_state_not_found", "session state not found")
+
+// State represents the LBS Session state.
+type State struct {
+	ID int32
+}
+
 type lbsLNS struct {
-	tokens   io.DownlinkTokens
-	sessions ws.Sessions
+	tokens io.DownlinkTokens
 }
 
 // NewFormatter returns a new LoRa Basic Station LNS formatter.
 func NewFormatter() ws.Formatter {
 	return &lbsLNS{}
-}
-
-func (f *lbsLNS) Connect(ctx context.Context, uid string) error {
-	return f.sessions.NewSession(ctx, uid)
-}
-
-func (f *lbsLNS) Disconnect(ctx context.Context, uid string) {
-	err := f.sessions.DeleteSession(uid)
-	if err != nil {
-		logger := log.FromContext(ctx)
-		logger.WithError(err).Warn("Failed to disconnect")
-	}
 }

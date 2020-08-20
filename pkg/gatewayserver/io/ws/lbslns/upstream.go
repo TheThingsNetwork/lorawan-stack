@@ -22,6 +22,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -32,7 +33,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 var (
@@ -432,7 +432,6 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 		"upstream_type", typ,
 	))
 
-	uid := unique.ID(ctx, ids)
 	recordTime := func(refTime float64, xTime int64, server time.Time) {
 		sec, nsec := math.Modf(refTime)
 		if sec != 0 {
@@ -481,9 +480,11 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			logger.WithError(err).Warn("Failed to handle upstream message")
 			return nil, err
 		}
-		f.sessions.UpdateSession(uid, ws.Session{
+		session := ws.SessionFromContext(ctx)
+		lbsState := State{
 			ID: int32(jreq.UpInfo.XTime >> 48),
-		})
+		}
+		session.State.Store(deepcopy.Copy(lbsState))
 		recordTime(jreq.RefTime, jreq.UpInfo.XTime, receivedAt)
 
 	case TypeUpstreamUplinkDataFrame:
@@ -505,9 +506,11 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			logger.WithError(err).Warn("Failed to handle upstream message")
 			return nil, err
 		}
-		f.sessions.UpdateSession(uid, ws.Session{
+		session := ws.SessionFromContext(ctx)
+		lbsState := State{
 			ID: int32(updf.UpInfo.XTime >> 48),
-		})
+		}
+		session.State.Store(deepcopy.Copy(lbsState))
 		recordTime(updf.RefTime, updf.UpInfo.XTime, receivedAt)
 
 	case TypeUpstreamTxConfirmation:
@@ -523,9 +526,11 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			logger.WithError(err).Warn("Failed to handle tx ack message")
 			return nil, err
 		}
-		f.sessions.UpdateSession(uid, ws.Session{
+		session := ws.SessionFromContext(ctx)
+		lbsState := State{
 			ID: int32(txConf.XTime >> 48),
-		})
+		}
+		session.State.Store(deepcopy.Copy(lbsState))
 		recordTime(txConf.RefTime, txConf.XTime, receivedAt)
 		return nil, err
 

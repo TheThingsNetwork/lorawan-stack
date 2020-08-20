@@ -139,6 +139,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 var euiHexPattern = regexp.MustCompile("^eui-([a-f0-9A-F]{16})$")
 
 func (s *srv) handleTraffic(c echo.Context) (err error) {
+	var session Session
 	id := c.Param("id")
 	auth := c.Request().Header.Get(echo.HeaderAuthorization)
 	ctx := c.Request().Context()
@@ -211,18 +212,10 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		return err
 	}
 
-	// Handle session state
-	err = s.formatter.Connect(ctx, uid)
-	if err != nil {
-		logger.WithError(err).Warn("Failed to handle session")
-		return err
-	}
-
 	ws, err := s.upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to upgrade request to websocket connection")
 		conn.Disconnect(err)
-		s.formatter.Disconnect(ctx, uid)
 		return err
 	}
 	defer ws.Close()
@@ -230,7 +223,6 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 
 	defer func() {
 		conn.Disconnect(err)
-		s.formatter.Disconnect(ctx, uid)
 		err = nil // Errors are sent over the websocket connection that is established by this point.
 	}()
 
@@ -267,7 +259,6 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				if err != nil {
 					logger.WithError(err).Warn("Failed to send ping message")
 					conn.Disconnect(err)
-					s.formatter.Disconnect(ctx, uid)
 					ws.Close()
 					return
 				}
@@ -279,10 +270,10 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					logger.Warn("No clock synchronization")
 					continue
 				}
-				dnmsg, err := s.formatter.FromDownlink(uid, *down, concentratorTime, dlTime)
+				sessionCtx := NewContextWithSession(ctx, &session)
+				dnmsg, err := s.formatter.FromDownlink(sessionCtx, uid, *down, concentratorTime, dlTime)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
-					continue
 				}
 
 				logger.Info("Send downlink message")
@@ -292,7 +283,6 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				if err != nil {
 					logger.WithError(err).Warn("Failed to send downlink message")
 					conn.Disconnect(err)
-					s.formatter.Disconnect(ctx, uid)
 					return
 				}
 			}
@@ -305,7 +295,8 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			logger.WithError(err).Debug("Failed to read message")
 			return err
 		}
-		downstream, err := s.formatter.HandleUp(ctx, data, ids, conn, time.Now())
+		sessionCtx := NewContextWithSession(ctx, &session)
+		downstream, err := s.formatter.HandleUp(sessionCtx, data, ids, conn, time.Now())
 		if err != nil {
 			return err
 		}
@@ -317,7 +308,6 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			if err != nil {
 				logger.WithError(err).Warn("Failed to send message downstream")
 				conn.Disconnect(err)
-				s.formatter.Disconnect(ctx, uid)
 				return err
 			}
 		}

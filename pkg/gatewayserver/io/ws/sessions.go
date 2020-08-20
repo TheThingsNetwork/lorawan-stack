@@ -16,64 +16,28 @@ package ws
 
 import (
 	"context"
-	"sync"
-
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"sync/atomic"
 )
+
+type sessionKeyType struct{}
+
+var sessionKey sessionKeyType
 
 // Session contains the session state for a single gateway.
 type Session struct {
-	ID int32
+	State atomic.Value
 }
 
-var (
-	errSessionNotFound      = errors.DefineNotFound("session_not_found", "session not found")
-	errSessionAlreadyExists = errors.DefineAlreadyExists("session_already_exists", "session already exists")
-)
-
-// Sessions holds state of the WS sessions.
-type Sessions struct {
-	items sync.Map
+// NewContextWithSession returns a new context with the session.
+func NewContextWithSession(ctx context.Context, session *Session) context.Context {
+	return context.WithValue(ctx, sessionKey, session)
 }
 
-// NewSession creates a new session for the given UID.
-// If errSessionAlreadyExists is returned, it indicates a corrupted state or improper session termination.
-func (s *Sessions) NewSession(ctx context.Context, uid string) error {
-	if _, ok := s.items.Load(uid); ok {
-		return errSessionAlreadyExists
+// SessionFromContext returns a new session from the context.
+// The session value can be modified by the caller.
+func SessionFromContext(ctx context.Context) *Session {
+	if session, ok := ctx.Value(sessionKey).(*Session); ok {
+		return session
 	}
-	s.items.Store(uid, Session{})
-	return nil
-}
-
-// GetSession retrieves the session for the given UID.
-func (s *Sessions) GetSession(uid string) (Session, error) {
-	val, ok := s.items.Load(uid)
-	if !ok {
-		return Session{}, errSessionNotFound
-	}
-	return val.(Session), nil
-}
-
-// UpdateSession updates the session state for the given UID.
-// If errSessionNotFound is returned, it indicates a corrupted state or improper session termination.
-func (s *Sessions) UpdateSession(uid string, session Session) error {
-	_, ok := s.items.Load(uid)
-	if !ok {
-		return errSessionNotFound
-	}
-	s.items.Store(uid, session)
-	return nil
-}
-
-// DeleteSession session removes the session for the UID.
-// This function must be called at termination of a gateway connection.
-// If errSessionNotFound is returned, it indicates a corrupted state or improper session termination.
-func (s *Sessions) DeleteSession(uid string) error {
-	_, ok := s.items.Load(uid)
-	if !ok {
-		return errSessionNotFound
-	}
-	s.items.Delete(uid)
 	return nil
 }

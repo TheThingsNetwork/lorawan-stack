@@ -19,6 +19,9 @@ import (
 	"testing"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -31,7 +34,11 @@ func TestFromDownlinkMessage(t *testing.T) {
 	var lbsLNS lbsLNS
 	ctx := context.Background()
 	uid := unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"})
-	lbsLNS.sessions.NewSession(ctx, uid)
+	var session ws.Session
+	state := State{
+		ID: 0x11,
+	}
+	session.State.Store(deepcopy.Copy(state))
 	for _, tc := range []struct {
 		Name                    string
 		DownlinkMessage         ttnpb.DownlinkMessage
@@ -103,7 +110,9 @@ func TestFromDownlinkMessage(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			raw, err := lbsLNS.FromDownlink(uid, tc.DownlinkMessage, 1554300787, time.Unix(1554300787, 123456000))
+			ctx := context.Background()
+			sessionCtx := ws.NewContextWithSession(ctx, &session)
+			raw, err := lbsLNS.FromDownlink(sessionCtx, uid, tc.DownlinkMessage, 1554300787, time.Unix(1554300787, 123456000))
 			a.So(err, should.BeNil)
 			var dnmsg DownlinkMessage
 			err = dnmsg.unmarshalJSON(raw)
