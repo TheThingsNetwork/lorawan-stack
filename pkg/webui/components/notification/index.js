@@ -40,6 +40,7 @@ const Notification = function({
   action,
   actionMessage,
   buttonIcon,
+  ...rest
 }) {
   const classname = classnames(style.notification, className, {
     [style.error]: error,
@@ -58,7 +59,7 @@ const Notification = function({
   }
 
   return (
-    <div className={classname}>
+    <div className={classname} data-test-id="notification" {...rest}>
       <div className={style.container}>
         <Icon className={style.icon} icon={icon} large={!small} />
         <div className={style.content}>

@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path/filepath"
 
@@ -28,6 +29,11 @@ import (
 
 // Js namespace.
 type Js mg.Namespace
+
+var (
+	devPort  = 8080
+	prodPort = 1885
+)
 
 func yarnWorkingDirectoryArg(elem ...string) string {
 	return fmt.Sprintf("--cwd=%s", filepath.Join(elem...))
@@ -76,7 +82,35 @@ func (js Js) runWebpack(config string, args ...string) error {
 }
 
 func (js Js) runEslint(args ...string) error {
-	return js.runYarnCommandV("eslint", append([]string{"--color", "--no-ignore"}, args...)...)
+	return js.runYarnCommand("eslint", append([]string{"--color", "--no-ignore"}, args...)...)
+}
+
+func (js Js) waitOn() error {
+	u, err := url.Parse(js.frontendURL())
+	if err != nil {
+		return err
+	}
+	return js.runYarnCommand("wait-on", []string{
+		fmt.Sprintf("--timeout=%d", 120000),
+		fmt.Sprintf("--interval=%d", 1000),
+		fmt.Sprintf("http-get://%s/oauth", u.Host),
+	}...)
+}
+
+func (js Js) runCypress(command string, args ...string) error {
+	mg.Deps(js.waitOn)
+	return js.runYarnCommand("cypress", append([]string{
+		command,
+		"--config-file", filepath.Join("config", "cypress.json"),
+		"--config", fmt.Sprintf("baseUrl=%s", js.frontendURL())},
+		args...)...)
+}
+
+func (js Js) frontendURL() string {
+	if js.isProductionMode() {
+		return fmt.Sprintf("http://localhost:%d", prodPort)
+	}
+	return fmt.Sprintf("http://localhost:%d", devPort)
 }
 
 func (Js) isProductionMode() bool {
@@ -101,6 +135,8 @@ func (js Js) Deps() error {
 		"node_modules",
 		"package.json",
 		"yarn.lock",
+		filepath.Join("sdk", "js", "src"),
+		filepath.Join("sdk", "js", "generated"),
 	)
 	if err != nil {
 		return targetError(err)
@@ -340,4 +376,22 @@ func (js Js) Vulnerabilities() error {
 		fmt.Println("Checking for vulnerabilities")
 	}
 	return runYarn("audit")
+}
+
+// CypressHeadless runs the Cypress end-to-end tests in the headless mode.
+func (js Js) CypressHeadless() error {
+	mg.Deps(Js.Deps)
+	if mg.Verbose() {
+		fmt.Println("Running Cypress E2E tests in headless mode")
+	}
+	return js.runCypress("run")
+}
+
+// CypressInteractive runs the Cypress end-to-end tests in interactive mode.
+func (js Js) CypressInteractive() error {
+	mg.Deps(Js.Deps)
+	if mg.Verbose() {
+		fmt.Println("Running Cypress E2E tests in interactive mode")
+	}
+	return js.runCypress("open")
 }

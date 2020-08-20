@@ -71,7 +71,7 @@ const FullViewErrorInner = function({ error, env }) {
   }
 
   return (
-    <div className={style.fullViewError}>
+    <div className={style.fullViewError} data-test-id="full-error-view">
       <Container>
         <Row>
           <Col md={6} sm={12}>

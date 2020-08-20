@@ -3,6 +3,7 @@ extends:
   - plugin:jest/recommended
   - plugin:jsdoc/recommended
   - plugin:import/recommended
+  - plugin:cypress/recommended
   - prettier
   - prettier/react
 
@@ -12,6 +13,7 @@ plugins:
   - jsdoc
   - prettier
   - import
+  - cypress
 
 settings:
   import/ignore:
@@ -158,3 +160,13 @@ rules:
   jsdoc/require-hyphen-before-param-description: warn
   jsdoc/check-indentation: warn
   jsdoc/require-description-complete-sentence: warn
+
+# Overwrite jest's expect rules for cypress test files, which uses a different
+# assertion syntax.
+overrides:
+  - files: '*.spec.js'
+    rules:
+      jest/valid-expect: off
+  - files: 'cypress/plugins/**/*.js'
+    rules:
+      import/no-commonjs: off

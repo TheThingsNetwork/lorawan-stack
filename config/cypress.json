@@ -1,0 +1,12 @@
+{
+  "viewportHeight": 900,
+  "viewportWidth": 1440,
+  "consoleRootPath": "/console",
+  "oauthRootPath": "/oauth",
+  "assetsRootPath": "/assets",
+  "siteName": "The Things Stack for LoRaWAN",
+  "siteTitle": "Console",
+  "siteSubTitle": "Management platform for The Things Stack for LoRaWAN",
+  "defaultCommandTimeout": 10000,
+  "ignoreTestFiles": "!*.spec.js"
+}
