@@ -127,7 +127,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 		Prefix:  "/traffic",
 	}
 
-	resp := s.formatter.HandleDiscover(ctx, data, s.server, ep, time.Now())
+	resp := s.formatter.HandleConnectionInfo(ctx, data, s.server, ep, time.Now())
 	if err := ws.WriteMessage(websocket.TextMessage, resp); err != nil {
 		logger.WithError(err).Warn("Failed to write discover response message")
 		return err

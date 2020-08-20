@@ -70,7 +70,7 @@ func TestDiscover(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			msg, err := json.Marshal(tc.Query)
 			a.So(err, should.BeNil)
-			resp := lbsLNS.HandleDiscover(ctx, msg, mockServer, endPoint, time.Now())
+			resp := lbsLNS.HandleConnectionInfo(ctx, msg, mockServer, endPoint, time.Now())
 			expected, _ := json.Marshal(tc.ExpectedResponse)
 			a.So(string(resp), should.Equal, string(expected))
 		})

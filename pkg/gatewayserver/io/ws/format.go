@@ -32,9 +32,9 @@ type EndPoint struct {
 
 // Formatter abstracts messages to/from websocket based gateways.
 type Formatter interface {
-	// HandleDiscover handles discovery messages from web socket based gateways.
-	// This function returns a byte stream to be sent as response to the discovery message.
-	HandleDiscover(ctx context.Context, raw []byte, server io.Server, endPoint EndPoint, receivedAt time.Time) []byte
+	// HandleConnectionInfo handles connection information requests from web socket based protocols.
+	// This function returns a byte stream that contains connection information (ex: scheme, host, port etc) or an error if applicable.
+	HandleConnectionInfo(ctx context.Context, raw []byte, server io.Server, endPoint EndPoint, receivedAt time.Time) []byte
 	// HandleUp handles upstream messages from web socket based gateways.
 	// This function optionally returns a byte stream to be sent as response to the upstream message.
 	HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time) ([]byte, error)

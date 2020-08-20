@@ -30,8 +30,8 @@ import (
 
 var errEmptyGatewayEUI = errors.DefineFailedPrecondition("empty_gateway_eui", "empty gateway EUI")
 
-// HandleDiscover implements Formatter.
-func (f *lbsLNS) HandleDiscover(ctx context.Context, raw []byte, server io.Server, ep ws.EndPoint, receivedAt time.Time) []byte {
+// HandleConnectionInfo implements Formatter.
+func (f *lbsLNS) HandleConnectionInfo(ctx context.Context, raw []byte, server io.Server, ep ws.EndPoint, receivedAt time.Time) []byte {
 	var req DiscoverQuery
 
 	if err := json.Unmarshal(raw, &req); err != nil {
