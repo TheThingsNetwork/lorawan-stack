@@ -264,6 +264,9 @@ func (s *server) ClientLogout(c echo.Context) error {
 		} else {
 			for _, uri := range client.LogoutRedirectURIs {
 				redirectURI, err = osin.ValidateUri(uri, redirectParam)
+				if err == nil {
+					break
+				}
 			}
 			if err != nil {
 				return errInvalidLogoutRedirectURI.WithCause(err)
