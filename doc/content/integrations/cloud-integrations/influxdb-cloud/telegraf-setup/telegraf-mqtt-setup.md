@@ -4,7 +4,7 @@ description: ""
 weight: 1
 ---
 
-This section contains instructions to configure the Telegraf agent to use [MQTT Consumer](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/mqtt_consumer) plugin for connecting to {{% tts %}} MQTT server and to send data to InfluxDB Cloud 2.0.
+This section contains instructions to configure the Telegraf agent to use [MQTT Consumer](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/mqtt_consumer) plugin for connecting to {{% tts %}} [MQTT Server]({{< ref "/integrations/mqtt" >}}) and to send data to InfluxDB Cloud 2.0.
 
 <!--more-->
 
