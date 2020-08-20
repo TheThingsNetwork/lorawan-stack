@@ -39,9 +39,13 @@ const (
 
 var backoffResetTime = time.Minute
 
+// DynamicIntervalFunc is a function that decides the backoff interval based on the attempt history.
+type DynamicIntervalFunc func(ctx context.Context, executionTime time.Duration, invocation int, err error) time.Duration
+
 type TaskBackoffConfig struct {
-	Jitter    float64
-	Intervals []time.Duration
+	Jitter          float64
+	Intervals       []time.Duration
+	DynamicInterval DynamicIntervalFunc
 }
 
 const DefaultBackoffJitter = 0.1
@@ -119,21 +123,30 @@ func DefaultStartTask(conf *TaskConfig) {
 				return
 			default:
 			}
-			if conf.Backoff == nil {
+			var s time.Duration
+			switch {
+			case conf.Backoff == nil:
 				continue
+			case conf.Backoff.DynamicInterval != nil:
+				s = conf.Backoff.DynamicInterval(conf.Context, executionTime, invocation, err)
+			default:
+				bi := invocation - 1
+				if bi >= len(conf.Backoff.Intervals) {
+					bi = len(conf.Backoff.Intervals) - 1
+				}
+				if executionTime > backoffResetTime {
+					bi = 0
+				}
+				s = conf.Backoff.Intervals[bi]
 			}
-			bi := invocation - 1
-			if bi >= len(conf.Backoff.Intervals) {
-				bi = len(conf.Backoff.Intervals) - 1
-			}
-			if executionTime > backoffResetTime {
-				bi = 0
-			}
-			s := conf.Backoff.Intervals[bi]
 			if conf.Backoff.Jitter != 0 {
-				s = random.Jitter(conf.Backoff.Intervals[bi], conf.Backoff.Jitter)
+				s = random.Jitter(s, conf.Backoff.Jitter)
 			}
-			time.Sleep(s)
+			select {
+			case <-conf.Context.Done():
+				return
+			case <-time.After(s):
+			}
 		}
 	}()
 }
