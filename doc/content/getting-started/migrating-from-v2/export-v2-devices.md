@@ -33,12 +33,7 @@ Alternatively, you can export all the end devices with a single command and save
 $ ttnctl devices export-all --frequency-plan-id EU_863_870 > all-devices.json
 ```
 
-> **NOTE**: In the command above we used the `EU_863_870` frequency plan. You will need to change this to the frequency plan corresponding to your region. You can find a list of supported frequency plan IDs in [the lorawan-frequency-plans Github repository](https://github.com/TheThingsNetwork/lorawan-frequency-plans/blob/master/frequency-plans.yml).
-
-<!--
-TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/2421
-Add reference to docs after that is merged.
--->
+> **NOTE**: In the command above we used the `EU_863_870` frequency plan. You will need to change this to the frequency plan corresponding to your region. See [Frequency Plans]({{< ref "/reference/frequency-plans" >}}) for a list of supported Frequency Plans and their respective IDs.
 
 > **NOTE**: Keep in mind that an end device can only be registered in one Network Server at a time. After importing an end device to {{% tts %}}, you should remove it from {{% ttnv2 %}}. For OTAA devices, it is enough to simply change the AppKey, so the device can no longer join but the existing session is preserved. Next time the device joins, the activation will be handled by {{% tts %}}.
 
