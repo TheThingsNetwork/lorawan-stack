@@ -52,29 +52,29 @@ Below is an example `devices.json` file. The file may contain multiple devices, 
   "frequency_plan_id":"EU_863_870",
   "supports_join":true,
   "root_keys":{
-      "app_key":{
-          "key":"00000000000000000000000000000000"
-        }
-      },
-      "mac_settings":{
-          "rx1_delay":{
-              "value":"RX_DELAY_1"
-              },
-            "supports_32_bit_f_cnt":true
-        },
-        "session":{
-            "dev_addr":"00000000",
-            "keys":{
-                "app_s_key":{
-                    "key":"00000000000000000000000000000000"
-                },
-                "f_nwk_s_int_key":{
-                    "key":"00000000000000000000000000000000"
-                }
-            },
-        "last_f_cnt_up":0,
-        "last_n_f_cnt_down":0
+    "app_key":{
+      "key":"00000000000000000000000000000000"
     }
+  },
+  "mac_settings":{
+    "rx1_delay":{
+      "value":"RX_DELAY_1"
+      },
+    "supports_32_bit_f_cnt":true
+  },
+  "session":{
+    "dev_addr":"00000000",
+    "keys":{
+      "app_s_key":{
+        "key":"00000000000000000000000000000000"
+      },
+      "f_nwk_s_int_key":{
+        "key":"00000000000000000000000000000000"
+      }
+    },
+    "last_f_cnt_up":0,
+    "last_n_f_cnt_down":0
+  }
 }
 {
   "ids": {
@@ -83,6 +83,7 @@ Below is an example `devices.json` file. The file may contain multiple devices, 
       "application_id": "application-id"
     },
     "..."
+  }
 }
 ```
 
