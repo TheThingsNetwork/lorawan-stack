@@ -21,6 +21,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
+	loraclouddevicemanagementv1 "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -101,7 +102,8 @@ type PubSubConfig struct {
 
 // ApplicationPackagesConfig contains application packages associations configuration.
 type ApplicationPackagesConfig struct {
-	Registry packages.Registry `name:"-"`
+	packages.Config `name:",squash"`
+	Registry        packages.Registry `name:"-"`
 }
 
 // NewWebhooks returns a new web.Webhooks based on the configuration.
@@ -155,5 +157,11 @@ func (c ApplicationPackagesConfig) NewApplicationPackages(ctx context.Context, s
 	if c.Registry == nil {
 		return nil, nil
 	}
-	return packages.New(ctx, server, c.Registry)
+	handlers := make(map[string]packages.ApplicationPackageHandler)
+
+	// Initialize LoRa Cloud Device Management v1 package handler
+	loradmsHandler := loraclouddevicemanagementv1.New(server, c.Registry)
+	handlers[loradmsHandler.Package().Name] = loradmsHandler
+
+	return packages.New(ctx, server, c.Registry, handlers)
 }

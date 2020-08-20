@@ -205,15 +205,17 @@ func (p *DeviceManagementPackage) mergePackageData(def *ttnpb.ApplicationPackage
 	return &merged, fPort, nil
 }
 
-func init() {
-	packages.RegisterPackage(ttnpb.ApplicationPackage{
+// Package implements packages.ApplicationPackageHandler.
+func (p *DeviceManagementPackage) Package() *ttnpb.ApplicationPackage {
+	return &ttnpb.ApplicationPackage{
 		Name:         packageName,
 		DefaultFPort: 199,
-	}, packages.CreateApplicationPackage(
-		func(server io.Server, registry packages.Registry) packages.ApplicationPackageHandler {
-			return &DeviceManagementPackage{server, registry}
-		},
-	))
+	}
+}
+
+// New instantiates the LoRa Cloud Device Management package.
+func New(server io.Server, registry packages.Registry) packages.ApplicationPackageHandler {
+	return &DeviceManagementPackage{server, registry}
 }
 
 func uint8Ptr(x uint8) *uint8 {
