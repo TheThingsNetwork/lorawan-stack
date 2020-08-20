@@ -42,7 +42,7 @@ func init() {
 			MaxDataRate: ttnpb.DATA_RATE_7,
 		},
 	}
-	const beaconFrequency = 2422000000
+	const beaconFrequency = 2424000000
 
 	downlinkDRTable := [8][6]ttnpb.DataRateIndex{
 		{0, 0, 0, 0, 0, 0},
@@ -126,7 +126,7 @@ func init() {
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_FREQUENCIES,
 
-		DefaultRx2Parameters: Rx2Parameters{ttnpb.DATA_RATE_0, 2422000000},
+		DefaultRx2Parameters: Rx2Parameters{ttnpb.DATA_RATE_0, 2423000000},
 
 		Beacon: Beacon{
 			DataRateIndex:    ttnpb.DATA_RATE_3,

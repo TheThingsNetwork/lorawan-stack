@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- ISM2400 RX2, beacon and ping slot frequencies are now consistent with latest LoRaWAN specification draft.
+
 ### Security
 
 ## [3.9.0] - 2020-08-06
