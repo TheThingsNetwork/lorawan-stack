@@ -77,7 +77,11 @@ var eventsCommand = &cobra.Command{
 						}
 						break
 					}
-					events <- event
+					select {
+					case <-ctx.Done():
+						return
+					case events <- event:
+					}
 				}
 				wg.Done()
 			}()

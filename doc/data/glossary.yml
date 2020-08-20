@@ -12,6 +12,14 @@
 #    - <Alt term 1>
 #    - <Alt term 2>
 
+- term: Data Rate Offset
+  description: The Data Rate Offset sets the offset between the uplink data rate and the downlink data rate used to communicate with the End Device during the first reception slot (RX1).
+  link: https://lora-alliance.org/sites/default/files/2020-06/rp_2-1.0.1.pdf#page=27
+
+- term: Data Rate Index
+  description: The Data Rate Index specifies which data rate downlink communications will use, as given in the Regional Parameters.
+  link: https://lora-alliance.org/sites/default/files/2020-06/rp_2-1.0.1.pdf#page=25
+
 - term: Packet Forwarder
   description: A Packet Forwarder is a program running on a Gateway that receives and transmits LoRa packets, and forwards these packets to and from a Network Server.
 

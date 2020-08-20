@@ -7496,16 +7496,16 @@
       "type": "object",
       "properties": {
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "The type of authentication that was used. This is typically a bearer token."
         },
         "token_type": {
-          "type": "string"
+          "type": "string",
+          "description": "The type of token that was used. Common types are APIKey, AccessToken and SessionToken."
         },
         "token_id": {
-          "type": "string"
-        },
-        "remote_ip": {
-          "type": "string"
+          "type": "string",
+          "description": "The ID of the token that was used."
         }
       }
     },
@@ -10435,43 +10435,59 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the event. This can be used to find the (localized) event description."
         },
         "time": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Time at which the event was triggered."
         },
         "identifiers": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3EntityIdentifiers"
-          }
+          },
+          "description": "Identifiers of the entity (or entities) involved."
         },
         "data": {
-          "$ref": "#/definitions/protobufAny"
+          "$ref": "#/definitions/protobufAny",
+          "description": "Optional data attached to the event."
         },
         "correlation_ids": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Correlation IDs can be used to find related events and actions such as API calls."
         },
         "origin": {
-          "type": "string"
+          "type": "string",
+          "description": "The origin of the event. Typically the hostname of the server that created it."
         },
         "context": {
           "type": "object",
           "additionalProperties": {
             "type": "string",
             "format": "byte"
-          }
+          },
+          "description": "Event context, internal use only."
         },
         "visibility": {
           "$ref": "#/definitions/v3Rights",
           "description": "The event will be visible to a caller that has any of these rights."
         },
         "authentication": {
-          "$ref": "#/definitions/EventAuthentication"
+          "$ref": "#/definitions/EventAuthentication",
+          "description": "Details on the authentication provided by the caller that triggered this event."
+        },
+        "remote_ip": {
+          "type": "string",
+          "description": "The IP address of the caller that triggered this event."
+        },
+        "user_agent": {
+          "type": "string",
+          "description": "The IP address of the caller that triggered this event."
         }
       }
     },
@@ -11672,7 +11688,7 @@
           "description": "Time when the last downlink message was scheduled."
         }
       },
-      "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server and is read only."
+      "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server."
     },
     "v3MACVersion": {
       "type": "string",

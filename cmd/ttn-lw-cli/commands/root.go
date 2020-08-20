@@ -29,11 +29,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared/version"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
-	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/io"
+	cmdio "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	conf "go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/io"
 	"golang.org/x/oauth2"
 )
 
@@ -83,7 +84,7 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		}
 
 		// create input decoder on Stdin
-		if rd, ok := io.BufferedPipe(os.Stdin); ok {
+		if rd, ok := cmdio.BufferedPipe(os.Stdin); ok {
 			inputDecoder, err = getInputDecoder(rd)
 			if err != nil {
 				return err

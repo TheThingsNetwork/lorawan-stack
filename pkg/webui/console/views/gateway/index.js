@@ -155,7 +155,7 @@ export default class Gateway extends React.Component {
           )}
           {mayViewGatewayEvents.check(rights) && (
             <SideNavigation.Item
-              title={sharedMessages.data}
+              title={sharedMessages.liveData}
               path={`${matchedUrl}/data`}
               icon="data"
             />

@@ -139,4 +139,4 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         DOCKER_IMAGE: thethingsnetwork/lorawan-stack
         DOCKER_IMAGE_DEV: thethingsnetwork/lorawan-stack-dev
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import bind from 'autobind-decorator'
+import { Redirect } from 'react-router-dom'
 
 import PropTypes from '../../../lib/prop-types'
 
@@ -26,21 +28,39 @@ import PropTypes from '../../../lib/prop-types'
 })
 export default class Require extends Component {
   static propTypes = {
-    alternativeRender: PropTypes.func,
     children: PropTypes.node.isRequired,
     condition: PropTypes.bool.isRequired,
+    otherwise: PropTypes.shape({
+      redirect: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+      render: PropTypes.func,
+    }),
   }
   static defaultProps = {
-    alternativeRender: undefined,
+    otherwise: undefined,
+  }
+
+  @bind
+  alternativeRender() {
+    const { otherwise } = this.props
+    if (typeof otherwise === 'object') {
+      const { render, redirect } = otherwise
+
+      if (typeof redirect === 'function') {
+        return <Redirect to={redirect(this.props)} />
+      } else if (typeof redirect === 'string') {
+        return <Redirect to={redirect} />
+      } else if (typeof render === 'function') {
+        return render()
+      }
+    }
+
+    return null
   }
   render() {
-    const { condition, children, alternativeRender } = this.props
+    const { condition, children } = this.props
 
     if (!condition) {
-      if (typeof alternativeRender === 'function') {
-        return alternativeRender()
-      }
-      return null
+      return this.alternativeRender()
     }
 
     return children

@@ -51,6 +51,8 @@ jobs:
       run: tools/bin/mage go:lint
     - name: Generate i18n messages
       run: tools/bin/mage go:messages
+    - name: Generate event data
+      run: tools/bin/mage go:eventData
     - name: Generate allowed fieldmask paths
       run: tools/bin/mage jsSDK:allowedFieldMaskPaths
     - name: Check for diff

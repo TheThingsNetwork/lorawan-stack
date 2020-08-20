@@ -32,12 +32,15 @@ type OAuthClient struct {
 	component *component.Component
 	rootURL   string
 	config    Config
+	oauth     OAuth2ConfigProvider
+	nextKey   string
+	callback  Callback
 }
 
 var errNoOAuthConfig = errors.DefineInvalidArgument("no_oauth_config", "no OAuth configuration found for the OAuth client")
 
 func (c Config) isZero() bool {
-	return c.AuthorizeURL == "" || c.TokenURL == "" || c.ClientID == "" || c.ClientSecret == ""
+	return (c.AuthorizeURL == "" || c.TokenURL == "" || c.ClientID == "" || c.ClientSecret == "") && !c.customProvider
 }
 
 func (oc *OAuthClient) getMountPath() string {
@@ -65,16 +68,22 @@ func (oc *OAuthClient) withTLSClientConfig(ctx context.Context) (context.Context
 }
 
 // New returns a new OAuth client instance.
-func New(c *component.Component, config Config) (*OAuthClient, error) {
-	if config.isZero() {
-		return nil, errNoOAuthConfig.New()
-	}
-
+func New(c *component.Component, config Config, opts ...Option) (*OAuthClient, error) {
 	oc := &OAuthClient{
 		component: c,
 		config:    config,
+		nextKey:   "next",
+	}
+	oc.callback = oc.defaultCallback
+	oc.oauth = oc.defaultOAuth
+
+	for _, opt := range opts {
+		opt(oc)
 	}
 
+	if oc.config.isZero() {
+		return nil, errNoOAuthConfig.New()
+	}
 	return oc, nil
 }
 
@@ -89,7 +98,7 @@ func (oc *OAuthClient) configFromContext(ctx context.Context) *Config {
 	return &oc.config
 }
 
-func (oc *OAuthClient) oauth(c echo.Context) *oauth2.Config {
+func (oc *OAuthClient) defaultOAuth(c echo.Context) *oauth2.Config {
 	config := oc.configFromContext(c.Request().Context())
 
 	authorizeURL := config.AuthorizeURL

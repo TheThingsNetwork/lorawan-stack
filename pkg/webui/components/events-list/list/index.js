@@ -32,7 +32,7 @@ const getEventKey = event => {
 
 const ListContainer = React.memo(
   props => {
-    const { className, widget, entityId, renderEvent, items } = props
+    const { className, widget, renderEvent, entityId, items } = props
 
     const cls = classnames(className, {
       [style.listContainer]: !widget,
@@ -53,7 +53,14 @@ const ListContainer = React.memo(
         rowKey={getEventKey}
         renderItem={renderEvent}
         emptyMessage={sharedMessages.noEvents}
-        emptyMessageValues={{ entityId }}
+        emptyMessageValues={{
+          entityId,
+          pre: msg => (
+            <pre className={style.entityId} key="entity-id">
+              {msg}
+            </pre>
+          ),
+        }}
       />
     )
   },

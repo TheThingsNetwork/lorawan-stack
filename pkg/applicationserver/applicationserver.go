@@ -30,7 +30,6 @@ import (
 	iogrpc "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
-	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1" // The LoRa Cloud Device Management v1 package implementation
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/mqtt" // The MQTT integration provider
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
@@ -177,8 +176,10 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			if endpoint.Address() == "" {
 				continue
 			}
-			as.RegisterTask(as.Context(), fmt.Sprintf("serve_mqtt/%s", endpoint.Address()),
-				func(ctx context.Context) error {
+			as.RegisterTask(&component.TaskConfig{
+				Context: as.Context(),
+				ID:      fmt.Sprintf("serve_mqtt/%s", endpoint.Address()),
+				Func: func(ctx context.Context) error {
 					l, err := as.ListenTCP(endpoint.Address())
 					var lis net.Listener
 					if err == nil {
@@ -192,7 +193,10 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 					}
 					defer lis.Close()
 					return mqtt.Serve(ctx, retryIO, lis, version.Format, endpoint.Protocol())
-				}, component.TaskRestartOnFailure)
+				},
+				Restart: component.TaskRestartOnFailure,
+				Backoff: component.DefaultTaskBackoffConfig,
+			})
 		}
 	}
 
@@ -221,7 +225,13 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 
 	c.RegisterGRPC(as)
 	if as.linkMode == LinkAll {
-		c.RegisterTask(as.Context(), "link_all", as.linkAll, component.TaskRestartOnFailure)
+		c.RegisterTask(&component.TaskConfig{
+			Context: as.Context(),
+			ID:      "link_all",
+			Func:    as.linkAll,
+			Restart: component.TaskRestartOnFailure,
+			Backoff: component.DefaultTaskBackoffConfig,
+		})
 	}
 	return as, nil
 }
@@ -275,7 +285,11 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 		return nil, err
 	}
 	sub := io.NewSubscription(ctx, protocol, &ids)
-	link.subscribeCh <- sub
+	select {
+	case <-link.ctx.Done():
+		return nil, link.ctx.Err()
+	case link.subscribeCh <- sub:
+	}
 	go func() {
 		select {
 		case <-link.ctx.Done():
@@ -285,7 +299,11 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 			return
 		case <-sub.Context().Done():
 		}
-		link.unsubscribeCh <- sub
+		select {
+		case <-link.ctx.Done():
+			return
+		case link.unsubscribeCh <- sub:
+		}
 	}()
 	return sub, nil
 }
@@ -389,7 +407,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			errorDetails = *ttnpb.ErrorDetailsToProto(ttnErr)
 		}
 		for _, item := range items {
-			link.upCh <- &io.ContextualApplicationUp{
+			ctxUp := &io.ContextualApplicationUp{
 				Context: ctx,
 				ApplicationUp: &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: ids,
@@ -402,6 +420,11 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 					},
 				},
 			}
+			select {
+			case <-link.ctx.Done():
+				return link.ctx.Err()
+			case link.upCh <- ctxUp:
+			}
 			registerDropDownlink(ctx, ids, item, err)
 		}
 		return err
@@ -409,7 +432,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 	atomic.AddUint64(&link.downlinks, uint64(len(items)))
 	atomic.StoreInt64(&link.lastDownlinkTime, time.Now().UnixNano())
 	for _, item := range items {
-		link.upCh <- &io.ContextualApplicationUp{
+		ctxUp := &io.ContextualApplicationUp{
 			Context: ctx,
 			ApplicationUp: &ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: ids,
@@ -418,6 +441,11 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 					DownlinkQueued: item,
 				},
 			},
+		}
+		select {
+		case <-link.ctx.Done():
+			return link.ctx.Err()
+		case link.upCh <- ctxUp:
 		}
 		registerForwardDownlink(ctx, ids, item, link.connName)
 	}
@@ -1025,6 +1053,8 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 		session = dev.Session
 	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, msg.SessionKeyID):
 		session = dev.PendingSession
+	default:
+		return errUnknownSession.New()
 	}
 	if session.GetAppSKey() == nil {
 		return errNoAppSKey.New()

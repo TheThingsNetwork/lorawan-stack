@@ -37,6 +37,7 @@ var (
 	evtLinkFail = events.Define(
 		"as.link.fail", "fail link",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_LINK),
+		events.WithErrorDataType(),
 	)
 	evtApplicationSubscribe = events.Define(
 		"as.application.subscribe", "subscribe application",
@@ -53,14 +54,17 @@ var (
 	evtDropDataUp = events.Define(
 		"as.up.data.drop", "drop uplink data message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtForwardDataUp = events.Define(
 		"as.up.data.forward", "forward uplink data message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{}),
 	)
 	evtDecodeFailDataUp = events.Define(
 		"as.up.data.decode.fail", "decode uplink data message failure",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtReceiveJoinAccept = events.Define(
 		"as.up.join.receive", "receive join-accept message",
@@ -69,30 +73,41 @@ var (
 	evtDropJoinAccept = events.Define(
 		"as.up.join.drop", "drop join-accept message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtForwardJoinAccept = events.Define(
 		"as.up.join.forward", "forward join-accept message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{}),
 	)
 	evtReceiveDataDown = events.Define(
 		"as.down.data.receive", "receive downlink data message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationDownlink{}),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtDropDataDown = events.Define(
 		"as.down.data.drop", "drop downlink data message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtForwardDataDown = events.Define(
 		"as.down.data.forward", "forward downlink data message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationDownlink{}),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtLostQueueDataDown = events.Define(
 		"as.down.data.queue.lost", "lose downlink data queue",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtInvalidQueueDataDown = events.Define(
 		"as.down.data.queue.invalid", "invalid downlink data queue",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 )
 

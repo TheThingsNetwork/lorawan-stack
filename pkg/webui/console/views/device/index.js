@@ -197,7 +197,7 @@ export default class Device extends React.Component {
 
     const tabs = [
       { title: sharedMessages.overview, name: 'overview', link: basePath },
-      { title: sharedMessages.data, name: 'data', link: `${basePath}/data` },
+      { title: sharedMessages.liveData, name: 'data', link: `${basePath}/data` },
       {
         title: sharedMessages.messages,
         name: 'messages',

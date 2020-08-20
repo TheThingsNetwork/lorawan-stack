@@ -50,26 +50,35 @@ func TestNew(t *testing.T) {
 	a.So(evt.AuthType(), should.Equal, "")
 	a.So(evt.AuthTokenType(), should.Equal, "")
 	a.So(evt.AuthTokenID(), should.Equal, "")
-	a.So(evt.AuthRemoteIP(), should.Equal, "")
+	a.So(evt.RemoteIP(), should.Equal, "")
 
 	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs(
 		"authorization", "bearer MFRWG.token_id.token_key"))
 	ctx = peer.NewContext(ctx, &peer.Peer{
 		Addr: &net.TCPAddr{IP: net.IP{10, 10, 10, 10}, Port: 10000},
 	})
-	evt = events.New(ctx, "test.evt", "test event", events.WithAuthFromContext())
+	evt = events.New(ctx, "test.evt", "test event", events.WithAuthFromContext(), events.WithClientInfoFromContext())
 	a.So(evt.AuthType(), should.Equal, "bearer")
 	a.So(evt.AuthTokenType(), should.Equal, "AccessToken")
 	a.So(evt.AuthTokenID(), should.Equal, "token_id")
-	a.So(evt.AuthRemoteIP(), should.Equal, "10.10.10.10")
+	a.So(evt.RemoteIP(), should.Equal, "10.10.10.10")
 
 	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs("x-forwarded-for", "20.20.20.20"))
-	evt = events.New(ctx, "test.evt", "test event", events.WithAuthFromContext())
-	a.So(evt.AuthRemoteIP(), should.Equal, "20.20.20.20")
+	evt = events.New(ctx, "test.evt", "test event", events.WithAuthFromContext(), events.WithClientInfoFromContext())
+	a.So(evt.RemoteIP(), should.Equal, "20.20.20.20")
 
 	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs("x-forwarded-for", "30.30.30.30, 20.20.20.20"))
-	evt = events.New(ctx, "test.evt", "test event", events.WithAuthFromContext())
-	a.So(evt.AuthRemoteIP(), should.Equal, "30.30.30.30")
+	evt = events.New(ctx, "test.evt", "test event", events.WithAuthFromContext(), events.WithClientInfoFromContext())
+	a.So(evt.RemoteIP(), should.Equal, "30.30.30.30")
+
+	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs("user-agent", "agent/0.1"))
+	evt = events.New(ctx, "test.evt", "test event", events.WithAuthFromContext(), events.WithClientInfoFromContext())
+	a.So(evt.UserAgent(), should.Equal, "agent/0.1")
+
+	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs("grpcgateway-user-agent", "agent-from-grpcgateway-header/0.2"))
+	evt = events.New(ctx, "test.evt", "test event", events.WithAuthFromContext(), events.WithClientInfoFromContext())
+	a.So(evt.UserAgent(), should.Equal, "agent-from-grpcgateway-header/0.2")
+
 }
 
 func TestEvents(t *testing.T) {

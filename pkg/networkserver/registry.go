@@ -32,6 +32,24 @@ type DeviceRegistry interface {
 	SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 }
 
+var errDeviceExists = errors.DefineAlreadyExists("device_exists", "device already exists")
+
+// CreateDevice creates device dev in r.
+func CreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, context.Context, error) {
+	return r.SetByID(ctx, dev.ApplicationIdentifiers, dev.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel, func(_ context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		if stored != nil {
+			return nil, nil, errDeviceExists
+		}
+		return dev, paths, nil
+	})
+}
+
+// DeleteDevice deletes device identified by appID, devID from r.
+func DeleteDevice(ctx context.Context, r DeviceRegistry, appID ttnpb.ApplicationIdentifiers, devID string) error {
+	_, _, err := r.SetByID(ctx, appID, devID, nil, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) { return nil, nil, nil })
+	return err
+}
+
 func logRegistryRPCError(ctx context.Context, err error, msg string) {
 	logger := log.FromContext(ctx).WithError(err)
 	var printLog func(string)

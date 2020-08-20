@@ -16,17 +16,18 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
+import Status from '@ttn-lw/components/status'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessges from '@ttn-lw/lib/shared-messages'
 
 import Events from '../events'
 
 import style from './widget.styl'
 
 const m = defineMessages({
-  latestEvents: 'Latest events',
   seeAllActivity: 'See all activity',
 })
 
@@ -42,7 +43,9 @@ const EventsWidget = props => {
     <aside className={className}>
       <Events events={truncatedEvents} renderEvent={renderEvent} entityId={entityId} widget>
         <Events.Header className={style.header}>
-          <Message content={m.latestEvents} className={style.headerTitle} />
+          <Status flipped status="good">
+            <Message content={sharedMessges.liveData} className={style.headerTitle} />
+          </Status>
           <Link className={style.seeAllLink} secondary to={toAllUrl}>
             <Message content={m.seeAllActivity} /> →
           </Link>

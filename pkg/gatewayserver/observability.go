@@ -31,6 +31,8 @@ var (
 			ttnpb.RIGHT_GATEWAY_LINK,
 			ttnpb.RIGHT_GATEWAY_STATUS_READ,
 		),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtGatewayDisconnect = events.Define(
 		"gs.gateway.disconnect", "disconnect gateway",
@@ -42,26 +44,32 @@ var (
 	evtReceiveStatus = events.Define(
 		"gs.status.receive", "receive gateway status",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
+		events.WithDataType(&ttnpb.GatewayStatus{}),
 	)
 	evtForwardStatus = events.Define(
 		"gs.status.forward", "forward gateway status",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
+		events.WithDataType(&ttnpb.GatewayStatus{}),
 	)
 	evtDropStatus = events.Define(
 		"gs.status.drop", "drop gateway status",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
+		events.WithErrorDataType(),
 	)
 	evtFailStatus = events.Define(
 		"gs.status.fail", "fail to handle gateway status",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
+		events.WithErrorDataType(),
 	)
 	evtReceiveUp = events.Define(
 		"gs.up.receive", "receive uplink message",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.UplinkMessage{}),
 	)
 	evtDropUp = events.Define(
 		"gs.up.drop", "drop uplink message",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtForwardUp = events.Define(
 		"gs.up.forward", "forward uplink message",
@@ -70,10 +78,12 @@ var (
 	evtFailUp = events.Define(
 		"gs.up.fail", "fail to handle uplink message",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithErrorDataType(),
 	)
 	evtSendDown = events.Define(
 		"gs.down.send", "send downlink message",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.DownlinkMessage{}),
 	)
 	evtTxSuccessDown = events.Define(
 		"gs.down.tx.success", "transmit downlink message successful",
@@ -82,6 +92,7 @@ var (
 	evtTxFailureDown = events.Define(
 		"gs.down.tx.fail", "transmit downlink message failure",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithDataType(ttnpb.TxAcknowledgment_COLLISION_PACKET),
 	)
 )
 

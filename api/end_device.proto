@@ -285,7 +285,7 @@ message MACSettings {
 
 // MACState represents the state of MAC layer of the device.
 // MACState is reset on each join for OTAA or ResetInd for ABP devices.
-// This is used internally by the Network Server and is read only.
+// This is used internally by the Network Server.
 message MACState {
   option (gogoproto.populate) = false;
 
@@ -349,11 +349,11 @@ message MACState {
   // ADR Data rate index values rejected by the device.
   // Reset each time `current_parameters.channels` change.
   // Elements are sorted in ascending order.
-  repeated DataRateIndex rejected_adr_data_rate_indexes = 17 [(gogoproto.customname) = "RejectedADRDataRateIndexes", (validate.rules).repeated.max_items = 15, (validate.rules).repeated.items.enum.defined_only = true];
+  repeated DataRateIndex rejected_adr_data_rate_indexes = 17 [(gogoproto.customname) = "RejectedADRDataRateIndexes", (validate.rules).repeated = { max_items: 15, items{ enum{ defined_only: true } } }];
 
   // ADR TX output power index values rejected by the device.
   // Elements are sorted in ascending order.
-  repeated uint32 rejected_adr_tx_power_indexes = 18 [(gogoproto.customname) = "RejectedADRTxPowerIndexes", (validate.rules).repeated.max_items = 15, (validate.rules).repeated.items.uint32.lte = 15];
+  repeated uint32 rejected_adr_tx_power_indexes = 18 [(gogoproto.customname) = "RejectedADRTxPowerIndexes", (validate.rules).repeated = { max_items: 15, items{ uint32{ lte: 15 } } }];
 
   // Frequencies rejected by the device.
   repeated uint64 rejected_frequencies = 19 [(validate.rules).repeated.items.uint64.gte = 100000];

@@ -27,22 +27,36 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 message Event {
+  // Name of the event. This can be used to find the (localized) event description.
   string name = 1;
+  // Time at which the event was triggered.
   google.protobuf.Timestamp time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];
+  // Identifiers of the entity (or entities) involved.
   repeated EntityIdentifiers identifiers = 3;
+  // Optional data attached to the event.
   google.protobuf.Any data = 4;
+  // Correlation IDs can be used to find related events and actions such as API calls.
   repeated string correlation_ids = 5 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
+  // The origin of the event. Typically the hostname of the server that created it.
   string origin = 6;
+  // Event context, internal use only.
   map<string,bytes> context = 7;
   // The event will be visible to a caller that has any of these rights.
   Rights visibility = 8;
   message Authentication {
+    // The type of authentication that was used. This is typically a bearer token.
     string type = 1;
+    // The type of token that was used. Common types are APIKey, AccessToken and SessionToken.
     string token_type = 2;
+    // The ID of the token that was used.
     string token_id = 3 [(gogoproto.customname) = "TokenID"];
-    string remote_ip = 4 [(gogoproto.customname) = "RemoteIP"];
   }
+  // Details on the authentication provided by the caller that triggered this event.
   Authentication authentication = 9;
+  // The IP address of the caller that triggered this event.
+  string remote_ip = 10 [(gogoproto.customname) = "RemoteIP"];
+  // The IP address of the caller that triggered this event.
+  string user_agent = 11;
 }
 
 message StreamEventsRequest {

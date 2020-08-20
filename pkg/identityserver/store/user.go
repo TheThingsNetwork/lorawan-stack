@@ -195,3 +195,15 @@ func (usr *User) fromPB(pb *ttnpb.User, fieldMask *types.FieldMask) (columns []s
 	}
 	return
 }
+
+type userWithUID struct {
+	UID  string
+	User `gorm:"embedded"`
+}
+
+func (userWithUID) TableName() string { return "users" }
+
+func (u userWithUID) toPB(pb *ttnpb.User, fieldMask *types.FieldMask) {
+	u.User.Account.UID = u.UID
+	u.User.toPB(pb, fieldMask)
+}

@@ -226,9 +226,10 @@ The cluster keys are 128 bit, hex-encoded keys that cluster components use to au
 
 - `cluster.keys`: Keys used to communicate between components of the cluster. The first one will be used by the cluster to identify itself
 
-It is possible to configure the cluster to use TLS or not. We recommend to enable TLS for production deployments.
+It is possible to configure the cluster to use TLS or not. We recommend to enable TLS for production deployments. The server name used in the TLS handshake between cluster peers can be overridden so that {{% tts %}} can connect to cluster peers using private (IP) addresses, while using a (public) TLS certificate that doesn't include those private addresses.
 
 - `cluster.tls`: Do cluster gRPC over TLS
+- `cluster.tls-server-name`: Server name to use in TLS handshake to cluster peers
 
 ## Cache Options
 

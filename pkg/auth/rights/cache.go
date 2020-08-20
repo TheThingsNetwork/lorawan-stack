@@ -73,8 +73,13 @@ func (c *cachedRes) set(rights *ttnpb.Rights, err error) {
 	close(c.waitChan)
 }
 
-func (c *cachedRes) wait() {
-	<-c.waitChan
+func (c *cachedRes) wait(ctx context.Context) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-c.waitChan:
+		return nil
+	}
 }
 
 // NewInMemoryCache returns a new in-memory cache on top of the given fetcher.
@@ -156,7 +161,9 @@ func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID ttnpb.Appli
 	}
 	f.maybeCleanup()
 	f.mu.Unlock()
-	res.wait()
+	if err := res.wait(ctx); err != nil {
+		return nil, err
+	}
 	return res.rights, res.err
 }
 
@@ -172,7 +179,9 @@ func (f *inMemoryCache) ClientRights(ctx context.Context, clientID ttnpb.ClientI
 	}
 	f.maybeCleanup()
 	f.mu.Unlock()
-	res.wait()
+	if err := res.wait(ctx); err != nil {
+		return nil, err
+	}
 	return res.rights, res.err
 }
 
@@ -188,7 +197,9 @@ func (f *inMemoryCache) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayId
 	}
 	f.maybeCleanup()
 	f.mu.Unlock()
-	res.wait()
+	if err := res.wait(ctx); err != nil {
+		return nil, err
+	}
 	return res.rights, res.err
 }
 
@@ -204,7 +215,9 @@ func (f *inMemoryCache) OrganizationRights(ctx context.Context, orgID ttnpb.Orga
 	}
 	f.maybeCleanup()
 	f.mu.Unlock()
-	res.wait()
+	if err := res.wait(ctx); err != nil {
+		return nil, err
+	}
 	return res.rights, res.err
 }
 
@@ -220,6 +233,8 @@ func (f *inMemoryCache) UserRights(ctx context.Context, userID ttnpb.UserIdentif
 	}
 	f.maybeCleanup()
 	f.mu.Unlock()
-	res.wait()
+	if err := res.wait(ctx); err != nil {
+		return nil, err
+	}
 	return res.rights, res.err
 }

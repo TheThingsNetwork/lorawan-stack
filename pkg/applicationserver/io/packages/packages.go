@@ -41,19 +41,15 @@ type Server interface {
 	NewSubscription() *io.Subscription
 }
 
-// New returns an application packages server wrapping the given registries.
-func New(ctx context.Context, io io.Server, registry Registry) (Server, error) {
+// New returns an application packages server wrapping the given registries and handlers.
+func New(ctx context.Context, io io.Server, registry Registry, handlers map[string]ApplicationPackageHandler) (Server, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages")
-	s := &server{
+	return &server{
 		ctx:      ctx,
 		io:       io,
 		registry: registry,
-		handlers: make(map[string]ApplicationPackageHandler),
-	}
-	for _, p := range registeredPackages {
-		s.handlers[p.Name] = p.create(io, registry)
-	}
-	return s, nil
+		handlers: handlers,
+	}, nil
 }
 
 type associationsPair struct {
@@ -142,7 +138,7 @@ func (s *server) NewSubscription() *io.Subscription {
 	go func() {
 		for {
 			select {
-			case <-s.ctx.Done():
+			case <-sub.Context().Done():
 				return
 			case up := <-sub.Up():
 				if err := s.handleUp(up.Context, up.ApplicationUp); err != nil {

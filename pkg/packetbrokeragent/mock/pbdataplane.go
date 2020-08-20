@@ -93,11 +93,16 @@ type routerHomeNetworkServer struct {
 }
 
 func (s *routerHomeNetworkServer) Publish(ctx context.Context, req *packetbroker.PublishDownlinkMessageRequest) (*packetbroker.PublishDownlinkMessageResponse, error) {
-	s.downCh <- &packetbroker.RoutedDownlinkMessage{
+	down := &packetbroker.RoutedDownlinkMessage{
 		ForwarderNetId:    req.ForwarderNetId,
 		ForwarderId:       req.ForwarderId,
 		ForwarderTenantId: req.ForwarderTenantId,
 		Message:           req.Message,
+	}
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case s.downCh <- down:
 	}
 	return &packetbroker.PublishDownlinkMessageResponse{
 		Id: "test",

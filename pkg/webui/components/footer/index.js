@@ -57,6 +57,7 @@ const Footer = function({ className, links, supportLink }) {
             icon="contact_support"
             href={supportLink}
             target="_blank"
+            secondary
           />
         )}
       </div>

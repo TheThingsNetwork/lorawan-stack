@@ -86,7 +86,8 @@ type Component struct {
 
 	rightsFetcher rights.Fetcher
 
-	tasks []task
+	taskStarter TaskStarter
+	taskConfigs []*TaskConfig
 }
 
 // Option allows extending the component when it is instantiated with New.
@@ -99,6 +100,14 @@ type Option func(*Component)
 func WithClusterNew(f func(ctx context.Context, config *cluster.Config, options ...cluster.Option) (cluster.Cluster, error)) Option {
 	return func(c *Component) {
 		c.clusterNew = f
+	}
+}
+
+// WithTaskStarter returns an option that overrides the component's TaskStarter for
+// starting tasks.
+func WithTaskStarter(s TaskStarter) Option {
+	return func(c *Component) {
+		c.taskStarter = s
 	}
 }
 
@@ -140,6 +149,8 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 		tcpListeners: make(map[string]*listener),
 
 		KeyVault: keyVault,
+
+		taskStarter: StartTaskFunc(DefaultStartTask),
 	}
 
 	for _, opt := range opts {

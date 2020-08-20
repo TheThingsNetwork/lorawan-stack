@@ -6,7 +6,7 @@ weight:
 
 [InfluxDB Cloud 2.0](https://v2.docs.influxdata.com/v2.0/get-started/) is a serverless real-time monitoring platform specifically created for working with time series data. It combines data storage, user interface, visualization, processing, monitoring and alerting into one cohesive system. 
 
-This guide contains instructions to configure the [Telegraf agent](https://www.influxdata.com/time-series-platform/telegraf/) to subscribe to messages published by {{% tts %}} MQTT server and to forward the data into the InfluxDB Cloud 2.0.
+Besides being able to send data to InfluxDB Cloud 2.0, [Telegraf agent](https://www.influxdata.com/time-series-platform/telegraf/) can also be configured to subscribe to messages published by {{% tts %}} [MQTT server]({{< ref "/integrations/mqtt" >}}) or to listen to messages sent by {{% tts %}} Application Server via [HTTP Webhooks]({{< ref "/integrations/webhooks" >}}). This guide contains the instructions for both of these implementations.
 
 <!--more-->
 

@@ -15,12 +15,7 @@ Before getting started, we will discuss major breaking changes between {{% ttnv2
 
 {{% tts %}} requires the **LoRaWAN version** and **Regional Parameters** (LoRaWAN PHY version) to be set per end device. These default to LoRaWAN version **1.0.2** and LoRaWAN Regional Parameters version **1.0.2 Rev B** for end devices imported from {{% ttnv2 %}}, because this configuration is the most consistent with V2.
 
-This means that all end devices need a frequency plan. You will have to choose the frequency plan corresponding to your region. A list of supported Frequency Plan IDs is available in [the lorawan-frequency-plans Github repository](https://github.com/TheThingsNetwork/lorawan-frequency-plans/blob/master/frequency-plans.yml).
-
-<!--
-TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/2421
-Add reference to docs after that is merged.
--->
+This means that all end devices need a frequency plan. You will have to choose the frequency plan corresponding to your region. See [Frequency Plans]({{< ref "/reference/frequency-plans" >}}) for a list of supported Frequency Plans and their respective IDs.
 
 Furthermore, {{% tts %}} brings full support for all LoRaWAN versions, as well as Class B and Class C modes.
 
@@ -34,7 +29,7 @@ With Packet Broker enabled on both {{% tts %}} and {{% ttnv2 %}}, you can receiv
 
 For private {{% tts %}} deployments with Packet Broker disabled, you will need to re-configure your gateways to connect to {{% tts %}}, so that you can start receiving traffic from your end devices.
 
-In order to connect a gateway to {{% tts %}}, follow instructions for [Adding a Gateway in the Console]({{< ref "/getting-started/console/create-gateway" >}}) or [Adding a Gateway using the CLI]({{< ref "/getting-started/cli#create-gateway" >}}). Then, reconfigure the gateway to connect to {{% tts %}}, and regenerate its API key (if required).
+In order to connect a gateway to {{% tts %}}, follow instructions for [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}). Then, reconfigure the gateway to connect to {{% tts %}}, and regenerate its API key (if required).
 
 Also see [Gateways]({{< ref "/gateways" >}}) for instructions on configuring popular LoRaWAN gateways with {{% tts %}}.
 
@@ -44,7 +39,7 @@ Also see [Gateways]({{< ref "/gateways" >}}) for instructions on configuring pop
 
 For details on the data format of {{% ttnv2 %}}, see the documentation from [The Things Network](https://www.thethingsnetwork.org/docs/applications/mqtt/api.html).
 
-For details on the data format of {{% tts %}}, see the documentation in [Data Formats]({{% ref "/integrations/data-formats" %}}). It uses a different schema, different names, and has much richer metadata support. 
+For details on the data format of {{% tts %}}, see the documentation in [Data Formats]({{% ref "/integrations/data-formats" %}}). It uses a different schema, different names, and has much richer metadata support.
 
 **When migrating to {{% tts %}}, ensure your application can properly handle the new {{% tts %}} data format.**
 

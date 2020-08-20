@@ -19,9 +19,11 @@ import (
 	"sort"
 	"strings"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/peer"
 )
 
@@ -67,13 +69,8 @@ func WithVisibility(rights ...ttnpb.Right) Option {
 // WithAuthFromContext returns an option that extracts auth information from the context when the event is created.
 func WithAuthFromContext() Option {
 	return optionFunc(func(e *event) {
-		authentication := &ttnpb.Event_Authentication{}
-		if p, ok := peer.FromContext(e.ctx); ok && p.Addr != nil && p.Addr.String() != "pipe" {
-			if host, _, err := net.SplitHostPort(p.Addr.String()); err == nil {
-				authentication.RemoteIP = host
-			}
-		}
 		md := rpcmetadata.FromIncomingContext(e.ctx)
+		authentication := &ttnpb.Event_Authentication{}
 		if md.AuthType != "" {
 			authentication.Type = md.AuthType
 		}
@@ -83,13 +80,80 @@ func WithAuthFromContext() Option {
 				authentication.TokenID = tokenID
 			}
 		}
-		if md.XForwardedFor != "" {
-			xff := strings.Split(md.XForwardedFor, ",")
-			authentication.RemoteIP = strings.Trim(xff[0], " ")
-		}
-		if authentication.RemoteIP != "" || authentication.TokenID != "" ||
-			authentication.TokenType != "" || authentication.Type != "" {
+		if authentication.TokenID != "" || authentication.TokenType != "" || authentication.Type != "" {
 			e.innerEvent.Authentication = authentication
 		}
+	})
+}
+
+// WithClientInfoFromContext returns an option that extracts the UserAgent and the RemoteIP from the request context.
+func WithClientInfoFromContext() Option {
+	return optionFunc(func(e *event) {
+		if p, ok := peer.FromContext(e.ctx); ok && p.Addr != nil && p.Addr.String() != "pipe" {
+			if host, _, err := net.SplitHostPort(p.Addr.String()); err == nil {
+				e.innerEvent.RemoteIP = host
+			}
+		}
+		md := rpcmetadata.FromIncomingContext(e.ctx)
+		if md.XForwardedFor != "" {
+			xff := strings.Split(md.XForwardedFor, ",")
+			e.innerEvent.RemoteIP = strings.Trim(xff[0], " ")
+		}
+		if md := rpcmetadata.FromIncomingContext(e.ctx); md.UserAgent != "" {
+			e.innerEvent.UserAgent = md.UserAgent
+		}
+	})
+}
+
+// DefinitionOption is like Option, but applies to the definition instead.
+type DefinitionOption interface {
+	Option
+	applyToDefinition(*definition)
+}
+
+type definitionOptionFunc func(d *definition)
+
+func (definitionOptionFunc) applyTo(*event) {}
+
+func (f definitionOptionFunc) applyToDefinition(d *definition) { f(d) }
+
+// WithDataType returns an option that sets the data type of the event (for documentation).
+func WithDataType(t interface{}) DefinitionOption {
+	msg, err := marshalData(t)
+	if err != nil {
+		panic(err)
+	}
+	return definitionOptionFunc(func(d *definition) {
+		d.dataType = msg
+	})
+}
+
+var errorDataType, _ = marshalData(&ttnpb.ErrorDetails{
+	Namespace:     "pkg/example",
+	Name:          "example",
+	MessageFormat: "example error for `{attr_name}`",
+	Attributes: &pbtypes.Struct{
+		Fields: map[string]*pbtypes.Value{
+			"attr_name": {Kind: &pbtypes.Value_StringValue{
+				StringValue: "attr_value",
+			}},
+		},
+	},
+	Code: uint32(codes.Unknown),
+})
+
+// WithErrorDataType is a convenience function that sets the data type of the event to an error.
+func WithErrorDataType() DefinitionOption {
+	return definitionOptionFunc(func(d *definition) {
+		d.dataType = errorDataType
+	})
+}
+
+var updatedFieldsDataType, _ = marshalData([]string{"list.of", "updated.fields"})
+
+// WithUpdatedFieldsDataType is a convenience function that sets the data type of the event to a slice of updated fields.
+func WithUpdatedFieldsDataType() DefinitionOption {
+	return definitionOptionFunc(func(d *definition) {
+		d.dataType = updatedFieldsDataType
 	})
 }

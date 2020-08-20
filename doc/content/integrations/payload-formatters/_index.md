@@ -22,4 +22,3 @@ To work with payload formatters, it is important to understand how payload data 
 To see how your device encodes environmental data, see your product datasheet.
 
 See [The Things Network Learn](https://www.thethingsnetwork.org/docs/devices/bytes.html) for an introduction to working with bytes.
-

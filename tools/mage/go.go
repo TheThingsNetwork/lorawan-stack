@@ -282,3 +282,8 @@ nextLine:
 func (g Go) Messages() error {
 	return runGoTool("generate_i18n.go")
 }
+
+// EventData builds the file with event data.
+func (g Go) EventData() error {
+	return runGoTool("generate_event_data.go")
+}

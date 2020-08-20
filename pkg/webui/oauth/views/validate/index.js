@@ -13,38 +13,38 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
-import { push } from 'connected-react-router'
 import queryString from 'query-string'
-import { connect } from 'react-redux'
 
 import api from '@oauth/api'
 
 import Spinner from '@ttn-lw/components/spinner'
 import ErrorNotification from '@ttn-lw/components/error-notification'
 import Notification from '@ttn-lw/components/notification'
+import Link from '@ttn-lw/components/link'
+
+import Logo from '@ttn-lw/containers/logo'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { isNotFoundError, createFrontendError } from '@ttn-lw/lib/errors/utils'
+
+import style from './validate.styl'
 
 const m = defineMessages({
   validateSuccess: 'Contact info validated',
   validateFail: 'There was an error and the contact info could not be validated',
   goToLogin: 'Go to login',
+  tokenNotFoundTitle: 'Token not found',
+  tokenNotFoundMessage:
+    'The validation token was not found. This could mean that the contact info has already been validated. Otherwise, please contact an administrator.',
+  contactInfoValidation: 'Contact info validation',
 })
 
-@connect(
-  null,
-  {
-    goToLogin: () => push('/login'),
-  },
-)
 export default class Validate extends React.PureComponent {
   static propTypes = {
-    goToLogin: PropTypes.func.isRequired,
     location: PropTypes.location.isRequired,
   }
 
@@ -71,13 +71,20 @@ export default class Validate extends React.PureComponent {
       })
       this.handleSuccess()
     } catch (error) {
-      this.handleError(error)
+      if (error.response && error.response.data) {
+        if (isNotFoundError(error.response.data)) {
+          this.handleError(createFrontendError(m.tokenNotFoundTitle, m.tokenNotFoundMessage))
+        } else {
+          this.handleError(error.response.data)
+        }
+      } else {
+        this.handleError(error)
+      }
     }
   }
 
   render() {
     const { fetching, error, success } = this.state
-    const { goToLogin } = this.props
 
     if (fetching) {
       return (
@@ -88,32 +95,23 @@ export default class Validate extends React.PureComponent {
     }
 
     return (
-      <Container>
-        <Row justify="center" align="center">
-          <Col sm={12} md={8} lg={5}>
-            {error && (
-              <ErrorNotification
-                content={error}
-                title={m.validateFail}
-                action={goToLogin}
-                actionMessage={m.goToLogin}
-                buttonIcon={'error'}
-              />
-            )}
-            {success && (
-              <Notification
-                large
-                success
-                content={success}
-                title={m.validateSuccess}
-                action={goToLogin}
-                actionMessage={m.goToLogin}
-                buttonIcon={'check_circle'}
-              />
-            )}
-          </Col>
-        </Row>
-      </Container>
+      <div className={style.center}>
+        <Logo className={style.logo} />
+        <Message component="h3" content={m.contactInfoValidation} className={style.heading} />
+        {error && <ErrorNotification content={error} buttonIcon={'error'} small />}
+        {success && (
+          <Notification
+            large
+            success
+            content={success}
+            title={m.validateSuccess}
+            buttonIcon={'check_circle'}
+          />
+        )}
+        <Link secondary to="/login">
+          <Message className={style.goToLogin} content={m.goToLogin} />
+        </Link>
+      </div>
     )
   }
 }

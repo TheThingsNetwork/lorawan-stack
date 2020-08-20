@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { CancelablePromise } from 'cancelable-promise'
+
 /**
- * This middleware will check for request actions and attach a promise to the
- * action.
+ * This middleware will check for request actions and attach a cancelable
+ * promise to the action.
  *
  * @param {object} store - The store to apply the middleware to.
  * @returns {object} The middleware.
@@ -22,7 +24,7 @@
 const requestPromiseMiddleware = store => next =>
   function(action) {
     if (action.meta && action.meta._attachPromise) {
-      return new Promise(function(resolve, reject) {
+      return new CancelablePromise(function(resolve, reject) {
         action.meta = {
           ...action.meta,
           _resolve: resolve,

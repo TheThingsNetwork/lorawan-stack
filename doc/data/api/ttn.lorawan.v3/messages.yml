@@ -2704,9 +2704,11 @@ Event:
   name: Event
   fields:
   - name: name
+    comment: Name of the event. This can be used to find the (localized) event description.
     type: string
     default: ""
   - name: time
+    comment: Time at which the event was triggered.
     message:
       package: google.protobuf
       name: Timestamp
@@ -2714,25 +2716,30 @@ Event:
       required: true
     default: "0001-01-01T00:00:00Z"
   - name: identifiers
+    comment: Identifiers of the entity (or entities) involved.
     repeated:
       message:
         name: EntityIdentifiers
     default: []
   - name: data
+    comment: Optional data attached to the event.
     message:
       package: google.protobuf
       name: Any
     default: null
   - name: correlation_ids
+    comment: Correlation IDs can be used to find related events and actions such as API calls.
     repeated:
       type: string
       rules:
         max_len: 100
     default: []
   - name: origin
+    comment: The origin of the event. Typically the hostname of the server that created it.
     type: string
     default: ""
   - name: context
+    comment: Event context, internal use only.
     map_key:
       type: string
     map_value:
@@ -2744,22 +2751,31 @@ Event:
       name: Rights
     default: {}
   - name: authentication
+    comment: Details on the authentication provided by the caller that triggered this event.
     message:
       name: Event.Authentication
     default: {}
+  - name: remote_ip
+    comment: The IP address of the caller that triggered this event.
+    type: string
+    default: ""
+  - name: user_agent
+    comment: The IP address of the caller that triggered this event.
+    type: string
+    default: ""
 Event.Authentication:
   name: Event.Authentication
   fields:
   - name: type
+    comment: The type of authentication that was used. This is typically a bearer token.
     type: string
     default: ""
   - name: token_type
+    comment: The type of token that was used. Common types are APIKey, AccessToken and SessionToken.
     type: string
     default: ""
   - name: token_id
-    type: string
-    default: ""
-  - name: remote_ip
+    comment: The ID of the token that was used.
     type: string
     default: ""
 FCtrl:
@@ -3617,6 +3633,15 @@ GetGatewayRequest:
       package: google.protobuf
       name: FieldMask
     default: {}
+GetIsConfigurationRequest:
+  name: GetIsConfigurationRequest
+GetIsConfigurationResponse:
+  name: GetIsConfigurationResponse
+  fields:
+  - name: configuration
+    message:
+      name: IsConfiguration
+    default: {}
 GetOrganizationAPIKeyRequest:
   name: GetOrganizationAPIKeyRequest
   fields:
@@ -3763,6 +3788,145 @@ Invitations:
       message:
         name: Invitation
     default: []
+IsConfiguration:
+  name: IsConfiguration
+  fields:
+  - name: user_registration
+    message:
+      name: IsConfiguration.UserRegistration
+    default: {}
+  - name: profile_picture
+    message:
+      name: IsConfiguration.ProfilePicture
+    default: {}
+  - name: end_device_picture
+    message:
+      name: IsConfiguration.EndDevicePicture
+    default: {}
+  - name: user_rights
+    message:
+      name: IsConfiguration.UserRights
+    default: {}
+IsConfiguration.EndDevicePicture:
+  name: IsConfiguration.EndDevicePicture
+  fields:
+  - name: disable_upload
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+IsConfiguration.ProfilePicture:
+  name: IsConfiguration.ProfilePicture
+  fields:
+  - name: disable_upload
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+  - name: use_gravatar
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+IsConfiguration.UserRegistration:
+  name: IsConfiguration.UserRegistration
+  fields:
+  - name: invitation
+    message:
+      name: IsConfiguration.UserRegistration.Invitation
+    default: {}
+  - name: contact_info_validation
+    message:
+      name: IsConfiguration.UserRegistration.ContactInfoValidation
+    default: {}
+  - name: admin_approval
+    message:
+      name: IsConfiguration.UserRegistration.AdminApproval
+    default: {}
+  - name: password_requirements
+    message:
+      name: IsConfiguration.UserRegistration.PasswordRequirements
+    default: {}
+IsConfiguration.UserRegistration.AdminApproval:
+  name: IsConfiguration.UserRegistration.AdminApproval
+  fields:
+  - name: required
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+IsConfiguration.UserRegistration.ContactInfoValidation:
+  name: IsConfiguration.UserRegistration.ContactInfoValidation
+  fields:
+  - name: required
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+IsConfiguration.UserRegistration.Invitation:
+  name: IsConfiguration.UserRegistration.Invitation
+  fields:
+  - name: required
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+  - name: token_ttl
+    message:
+      package: google.protobuf
+      name: Duration
+    default: 0s
+IsConfiguration.UserRegistration.PasswordRequirements:
+  name: IsConfiguration.UserRegistration.PasswordRequirements
+  fields:
+  - name: min_length
+    message:
+      package: google.protobuf
+      name: UInt32Value
+    default: null
+  - name: max_length
+    message:
+      package: google.protobuf
+      name: UInt32Value
+    default: null
+  - name: min_uppercase
+    message:
+      package: google.protobuf
+      name: UInt32Value
+    default: null
+  - name: min_digits
+    message:
+      package: google.protobuf
+      name: UInt32Value
+    default: null
+  - name: min_special
+    message:
+      package: google.protobuf
+      name: UInt32Value
+    default: null
+IsConfiguration.UserRights:
+  name: IsConfiguration.UserRights
+  fields:
+  - name: create_applications
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+  - name: create_clients
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+  - name: create_gateways
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
+  - name: create_organizations
+    message:
+      package: google.protobuf
+      name: BoolValue
+    default: null
 JoinAcceptMICRequest:
   name: JoinAcceptMICRequest
   fields:
@@ -5604,7 +5768,7 @@ MACState:
   comment: |-
     MACState represents the state of MAC layer of the device.
     MACState is reset on each join for OTAA or ResetInd for ABP devices.
-    This is used internally by the Network Server and is read only.
+    This is used internally by the Network Server.
   fields:
   - name: current_parameters
     comment: Current LoRaWAN MAC parameters.
@@ -7429,6 +7593,10 @@ UplinkToken:
       package: google.protobuf
       name: Timestamp
     default: "0001-01-01T00:00:00Z"
+  - name: concentrator_time
+    comment: Absolute concentrator time as observed by the Gateway Server, accounting for rollovers.
+    type: int64
+    default: 0
 User:
   name: User
   comment: User is the message that defines a user on the network.

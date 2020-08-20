@@ -23,11 +23,20 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/openshift/osin"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
+
+var tokenHashSettings auth.HashValidator = pbkdf2.PBKDF2{
+	Iterations: 1000,
+	KeyLength:  32,
+	Algorithm:  pbkdf2.Sha256,
+	SaltLength: 16,
+}
 
 // rightsToScope transforms the list of rights into a string "scope".
 // This function is only used for compatibility with osin.

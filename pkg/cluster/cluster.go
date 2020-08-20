@@ -120,9 +120,10 @@ func New(ctx context.Context, config *Config, options ...Option) (Cluster, error
 
 func defaultNew(ctx context.Context, config *Config, options ...Option) (Cluster, error) {
 	c := &cluster{
-		ctx:   ctx,
-		tls:   config.TLS,
-		peers: make(map[string]*peer),
+		ctx:           ctx,
+		tls:           config.TLS,
+		tlsServerName: config.TLSServerName,
+		peers:         make(map[string]*peer),
 	}
 
 	if err := c.loadKeys(ctx, config.Keys...); err != nil {
@@ -160,11 +161,12 @@ func defaultNew(ctx context.Context, config *Config, options ...Option) (Cluster
 }
 
 type cluster struct {
-	ctx       context.Context
-	tls       bool
-	tlsConfig *tls.Config
-	peers     map[string]*peer
-	self      *peer
+	ctx           context.Context
+	tls           bool
+	tlsConfig     *tls.Config
+	tlsServerName string
+	peers         map[string]*peer
+	self          *peer
 
 	keys [][]byte
 }
@@ -209,20 +211,23 @@ func (c *cluster) addPeer(name string, target string, roles ...ttnpb.ClusterRole
 	if len(filteredRoles) == 0 {
 		return
 	}
+	tlsServerName := c.tlsServerName
+	if tlsServerName == "" {
+		colonPos := strings.LastIndex(target, ":")
+		if colonPos < 0 {
+			colonPos = len(target)
+		}
+		tlsServerName = target[:colonPos]
+	}
 	c.peers[name] = &peer{
-		name:   name,
-		target: target,
-		roles:  filteredRoles,
+		name:          name,
+		target:        target,
+		roles:         filteredRoles,
+		tlsServerName: tlsServerName,
 	}
 }
 
 func (c *cluster) Join() (err error) {
-	options := rpcclient.DefaultDialOptions(c.ctx)
-	if c.tls {
-		options = append(options, grpc.WithTransportCredentials(credentials.NewTLS(c.tlsConfig)))
-	} else {
-		options = append(options, grpc.WithInsecure())
-	}
 	for _, peer := range c.peers {
 		if peer.conn != nil {
 			continue
@@ -237,6 +242,17 @@ func (c *cluster) Join() (err error) {
 			logger.Warn("Not connecting to peer, empty address.")
 			peer.connErr = errPeerEmptyTarget
 			continue
+		}
+		options := rpcclient.DefaultDialOptions(c.ctx)
+		if c.tls {
+			tlsConfig := &tls.Config{}
+			if c.tlsConfig != nil {
+				tlsConfig = c.tlsConfig.Clone()
+			}
+			tlsConfig.ServerName = c.tlsServerName
+			options = append(options, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
+		} else {
+			options = append(options, grpc.WithInsecure())
 		}
 		logger.Debug("Connecting to peer...")
 		peer.conn, peer.connErr = grpc.DialContext(peer.ctx, peer.target, options...)

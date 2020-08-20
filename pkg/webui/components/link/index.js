@@ -17,6 +17,8 @@ import { Link as RouterLink } from 'react-router-dom'
 import classnames from 'classnames'
 import { injectIntl } from 'react-intl'
 
+import Icon from '@ttn-lw/components/icon'
+
 import { withEnv } from '@ttn-lw/lib/components/env'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -161,7 +163,9 @@ const DocLink = function(props) {
       name={name}
       onClick={onClick}
     >
+      <Icon className={style.docIcon} icon="book" />
       {children}
+      <Icon className={style.icon} icon="launch" />
     </a>
   )
 }
@@ -206,6 +210,7 @@ const AnchorLink = function(props) {
     secondary,
     primary,
     disabled,
+    external,
   } = props
 
   const formattedTitle = formatTitle(title, titleValues, intl.formatMessage)
@@ -225,10 +230,11 @@ const AnchorLink = function(props) {
       title={formattedTitle}
       id={id}
       href={href}
-      target={target}
+      target={external ? 'blank' : target}
       name={name}
     >
       {children}
+      {external ? <Icon className={style.icon} icon="launch" /> : null}
     </a>
   )
 }

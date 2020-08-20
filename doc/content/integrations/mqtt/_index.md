@@ -1,6 +1,7 @@
 ---
 title: "MQTT Server"
 description: ""
+aliases: [/guides/getting-started/mqtt]
 ---
 
 {{% tts %}} exposes an MQTT server to work with streaming events. This section explains how to connect an MQTT client and subscribe to uplinks or publish downlinks.
@@ -11,7 +12,7 @@ description: ""
 
 ## Creating an API Key
 
- In order to use the MQTT server you need to create a new API key to authenticate. The Console provides the required connection information and can be used to create an API key for authentication. In your application select the **MQTT** submenu from the **Integrations** side menu.
+In order to use the MQTT server you need to create a new API key to authenticate. The Console provides the required connection information and can be used to create an API key for authentication. In your application select the **MQTT** submenu from the **Integrations** side menu.
 
 {{< figure src="mqtt-integration.png" alt="MQTT connection information" >}}
 

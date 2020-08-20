@@ -25,6 +25,7 @@ import apiKeys from './api-keys'
 import collaborators from './collaborators'
 import webhooks from './webhooks'
 import pubsubs from './pubsubs'
+import applicationPackages from './application-packages'
 
 export default [
   ...user,
@@ -40,4 +41,5 @@ export default [
   ...collaborators,
   ...webhooks,
   ...pubsubs,
+  ...applicationPackages,
 ]

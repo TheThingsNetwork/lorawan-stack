@@ -1,6 +1,7 @@
 ---
 title: "MultiTech Conduit AEP"
 description: ""
+aliases: [/guides/connecting-gateways/multitechconduit]
 ---
 
 The [MultiTech MultiConnect® Conduit™](http://www.multitech.net/developer/products/multiconnect-Conduit-platform/) is a configurable, scalable cellular communications gateway for industrial IoT applications. The technical specifications of this Conduit can be found in the software guide in the [official documentation](http://www.multitech.net/developer/products/multiconnect-conduit-platform/conduit/) page.
@@ -19,7 +20,7 @@ This guide will help you set up the Multitech Conduit gateway to communicate ove
 
 ## Registration
 
-Create a gateway by following the instructions for the [Console]({{< ref "/getting-started/console/create-gateway" >}}) or the [CLI]({{< ref "/getting-started/cli/create-gateway" >}}).
+Create a gateway by following the instructions for [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}).
 
 > Note: The gateway EUI can be found at the bottom of the gateway under the field &quot;NODE LORA&quot;.
 
@@ -29,7 +30,7 @@ Firstly, you will need to generate a `global_conf.json` file required to add a c
 
 > **Warning:** The manual configuration of the frequency plan - required to make it work on the The Things (Enterprise) Stack - may result in a mismatch for some of the frequency bands used for the Multitech Gateway.
 
-The Gateway Configuration Server can be used to generate a proper `global_conf.json` configuration file for your gateway. You will need a Gateway API key with the `View gateway information` right enabled. The instructions for the same can be found in the relevant sections of the [Console]({{< ref "/getting-started/console/create-gateway" >}}) or the [CLI]({{< ref "/getting-started/cli/create-gateway" >}}) getting started guides.
+The Gateway Configuration Server can be used to generate a proper `global_conf.json` configuration file for your gateway. You will need a Gateway API key with the `View gateway information` right enabled. The instructions for the same can be found in the [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}) guide.
 
 Open the command prompt in Windows or any Linux terminal to run a curl command (as shown below) to generate the required `global_conf.json` file in your current working directory.
 

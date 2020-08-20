@@ -26,6 +26,10 @@ type builder struct {
 	options    []Option
 }
 
+func (b *builder) Definition() Definition {
+	return b.definition
+}
+
 func (b *builder) With(options ...Option) Builder {
 	extended := &builder{
 		definition: b.definition,
@@ -71,6 +75,8 @@ func (b *builder) BindData(data interface{}) Builder {
 
 // Builder is the interface for building events from definitions.
 type Builder interface {
+	Definition() Definition
+
 	With(opts ...Option) Builder
 	New(ctx context.Context, opts ...Option) Event
 
@@ -90,4 +96,13 @@ func (bs Builders) New(ctx context.Context, opts ...Option) []Event {
 		events[i] = b.New(ctx, opts...)
 	}
 	return events
+}
+
+// Definitions returns the definition for each builder in the list.
+func (bs Builders) Definitions() []Definition {
+	definitions := make([]Definition, len(bs))
+	for i, b := range bs {
+		definitions[i] = b.Definition()
+	}
+	return definitions
 }

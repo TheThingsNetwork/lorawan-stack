@@ -13,8 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Redirect } from 'react-router-dom'
-import bind from 'autobind-decorator'
 
 import Require from './require'
 
@@ -33,26 +31,9 @@ import Require from './require'
  */
 const withFeatureRequirement = (featureCheck, otherwise) => Component =>
   class WithFeatureRequirement extends React.Component {
-    @bind
-    alternativeRender() {
-      if (typeof otherwise === 'object') {
-        const { render, redirect } = otherwise
-
-        if (typeof redirect === 'function') {
-          return <Redirect to={redirect(this.props)} />
-        } else if (typeof redirect === 'string') {
-          return <Redirect to={redirect} />
-        } else if (typeof render === 'function') {
-          return render()
-        }
-      }
-
-      return null
-    }
-
     render() {
       return (
-        <Require featureCheck={featureCheck} alternativeRender={this.alternativeRender}>
+        <Require featureCheck={featureCheck} otherwise={otherwise}>
           <Component {...this.props} />
         </Require>
       )

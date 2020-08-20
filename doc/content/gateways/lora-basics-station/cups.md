@@ -14,7 +14,7 @@ weight: -1
 
 ## Create a Gateway
 
-Follow instructions for [Adding Gateways in the Console]({{< ref "/getting-started/console/create-gateway" >}}) or [Adding Gateways Using the Command-line interface]({{< ref "/getting-started/cli/create-gateway" >}}).
+Follow instructions for [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}).
 
 ## Create an API Key
 
@@ -22,7 +22,7 @@ CUPS requires an API Key with the following rights:
 - View gateway information
 - Edit basic gateway settings
 
-If you have not already created one, follow instructions for [Creating a Gateway API Key in the Console]({{< ref "/getting-started/console/create-gateway#create-gateway-api-key" >}}) or [Creating a Gateway API Key Using the Command-line interface]({{< ref "/getting-started/cli/create-gateway#create-gateway-api-key" >}}).
+If you have not already created one, follow instructions for creating a Gateway API Key in [Adding Gateways]({{< ref "/gateways/adding-gateways" >}}).
 
 ## Configure Gateway
 
@@ -30,16 +30,22 @@ On your gateway, set the following configuration fields.
 
 The `<server-address>` is the address of {{% tts %}}. If you followed the [Getting Started guide]({{< ref "/getting-started" >}}) this is the same as what you use instead of `thethings.example.com`.
 
-The `<gateway-api-key>` is the API Key you created above. Copy your gateway API Key in to a `gateway-api.key` file (the filename is not important) as an HTTP header in the following format:
+The `<gateway-api-key>` is the API Key you created above. Create a file named `cups.key` and copy your gateway API Key in as an HTTP header in the following format:
 
 ```
-Authorization: <gateway-api-key>
+Authorization: Bearer <gateway-api-key>
+```
+
+Some gateways require that the `cups.key` file is terminated with a Carriage Return Line Feed (`0x0D0A`) character. To easily add a CRLF character and save the file, use the following command:
+
+```bash
+echo "Authorization: Bearer <gateway-api-key>" | perl -p -e 's/\r\n|\n|\r/\r\n/g'  > cups.key
 ```
 
 If using Let's Encrypt to secure your domain, you may download the Let's Encrypt DST X3 Trust file [here](https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem.txt).
 
 CUPS URI: `https://<server-address>:443`
 
-CUPS Key: `<gateway-api-key>`
+CUPS Key: `cups.key`
 
 CUPS Trust: Use the CA certificate of your trust provider
