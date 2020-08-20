@@ -187,7 +187,7 @@ func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch 
 			return errMicrochipData.WithCause(err)
 		}
 		sn := s.Fields["uniqueId"].GetStringValue()
-		ch <- &ttnpb.EndDeviceTemplate{
+		tmpl := &ttnpb.EndDeviceTemplate{
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					JoinEUI: &joinEUI,
@@ -209,6 +209,11 @@ func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch 
 				},
 			},
 			MappingKey: sn,
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case ch <- tmpl:
 		}
 	}
 	return nil
@@ -343,7 +348,7 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 			return errMicrochipData.WithCause(err)
 		}
 		sn := s.Fields["uniqueId"].GetStringValue()
-		ch <- &ttnpb.EndDeviceTemplate{
+		tmpl := &ttnpb.EndDeviceTemplate{
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceID: strings.ToLower(fmt.Sprintf("eui-%s", devEUI)),
@@ -369,6 +374,11 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 				},
 			},
 			MappingKey: sn,
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case ch <- tmpl:
 		}
 	}
 	return nil

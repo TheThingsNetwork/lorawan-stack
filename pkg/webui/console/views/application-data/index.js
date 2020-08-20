@@ -44,7 +44,7 @@ const m = defineMessages({
   redirect: ({ appId }) => `/applications/${appId}`,
 })
 @withBreadcrumb('apps.single.data', function(props) {
-  return <Breadcrumb path={`/applications/${props.appId}/data`} content={sharedMessages.data} />
+  return <Breadcrumb path={`/applications/${props.appId}/data`} content={sharedMessages.liveData} />
 })
 export default class Data extends React.Component {
   static propTypes = {

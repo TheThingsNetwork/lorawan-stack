@@ -86,6 +86,10 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 		return err
 	}
 
+	return oc.callback(c, token, stateCookie.Next)
+}
+
+func (oc *OAuthClient) defaultCallback(c echo.Context, _ *oauth2.Token, next string) error {
 	config := oc.configFromContext(c.Request().Context())
-	return c.Redirect(http.StatusFound, config.RootURL+stateCookie.Next)
+	return c.Redirect(http.StatusFound, config.RootURL+next)
 }

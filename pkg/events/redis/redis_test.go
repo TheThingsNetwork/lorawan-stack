@@ -74,12 +74,12 @@ func TestRedisPubSub(t *testing.T) {
 		eventCh <- e
 	})
 
+	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
+
 	pubsub := redis.NewPubSub(redisConfig())
-	defer pubsub.Close()
+	defer pubsub.Close(ctx)
 
 	pubsub.Subscribe("redis.**", handler)
-
-	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
 
 	appID := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
 

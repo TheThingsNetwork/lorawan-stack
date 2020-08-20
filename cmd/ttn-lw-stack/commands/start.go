@@ -221,7 +221,13 @@ var startCommand = &cobra.Command{
 			if err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
-			ns.Component.RegisterTask(ns.Context(), "queue_downlink", nsDownlinkTasks.Run, component.TaskRestartOnFailure)
+			ns.Component.RegisterTask(&component.TaskConfig{
+				Context: ns.Context(),
+				ID:      "queue_downlink",
+				Func:    nsDownlinkTasks.Run,
+				Restart: component.TaskRestartOnFailure,
+				Backoff: component.DefaultTaskBackoffConfig,
+			})
 		}
 
 		if start.ApplicationServer || startDefault {

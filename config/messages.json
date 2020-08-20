@@ -1763,15 +1763,6 @@
       "file": "registry.go"
     }
   },
-  "error:pkg/applicationserver/io/packages:package_already_registered": {
-    "translations": {
-      "en": "package `{name}` already registered"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/packages",
-      "file": "registration.go"
-    }
-  },
   "error:pkg/applicationserver/io/packages:package_not_implemented": {
     "translations": {
       "en": "package `{name}` is not implemented"
@@ -5748,6 +5739,15 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:device_exists": {
+    "translations": {
+      "en": "device already exists"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "registry.go"
     }
   },
   "error:pkg/networkserver:device_not_found": {

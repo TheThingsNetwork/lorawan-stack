@@ -65,9 +65,10 @@ In the device settings, click the **Network Servers Dropdown** to view available
 
 ![Device parameters](device-parameters-selected.png)
 
-Select **Private** for the Network.
+Select **Public** for the Network.
 
-![Network private](device-parameters-network.png)
+![Network public](public.png)
+
 
 Click OK to save the parameters.
 

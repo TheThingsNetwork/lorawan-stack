@@ -54,7 +54,7 @@ message GenerateEndDeviceQRCodeRequest {
   EndDevice end_device = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 
   message Image {
-    uint32 image_size = 1 [(validate.rules).uint32.gte = 10, (validate.rules).uint32.lte = 1000];
+    uint32 image_size = 1 [(validate.rules).uint32 = {gte: 10, lte: 1000}];
   }
   Image image = 3;
 }

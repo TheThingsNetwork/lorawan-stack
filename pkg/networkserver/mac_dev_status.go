@@ -25,8 +25,13 @@ import (
 )
 
 var (
-	evtEnqueueDevStatusRequest = defineEnqueueMACRequestEvent("dev_status", "device status")()
-	evtReceiveDevStatusAnswer  = defineReceiveMACAnswerEvent("dev_status", "device status")()
+	evtEnqueueDevStatusRequest = defineEnqueueMACRequestEvent(
+		"dev_status", "device status",
+	)()
+	evtReceiveDevStatusAnswer = defineReceiveMACAnswerEvent(
+		"dev_status", "device status",
+		events.WithDataType(&ttnpb.MACCommand_DevStatusAns{}),
+	)()
 )
 
 const (

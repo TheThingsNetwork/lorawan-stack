@@ -15,7 +15,7 @@
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 
-import Button from '@ttn-lw/components/button'
+import Link from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
@@ -33,8 +33,6 @@ import {
 import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
 
 import style from './full-view.styl'
-
-const reload = () => location.reload()
 
 const FullViewError = function({ error, env }) {
   const isUnknown = isUnknownError(error)
@@ -64,14 +62,10 @@ const FullViewError = function({ error, env }) {
               content={errorTitleMessage}
             />
             <ErrorMessage className={style.fullViewErrorSub} content={errorMessageMessage} />
-            {isNotFoundError(error) ? (
-              <Button.AnchorLink
-                icon="keyboard_arrow_left"
-                message={sharedMessages.takeMeBack}
-                href={env.appRoot}
-              />
-            ) : (
-              <Button icon="refresh" message={sharedMessages.refreshPage} onClick={reload} />
+            {isNotFoundError(error) && (
+              <Link.Anchor icon="keyboard_arrow_left" href={env.appRoot} primary>
+                <Message content={sharedMessages.backToOverview} />
+              </Link.Anchor>
             )}
           </Col>
         </Row>

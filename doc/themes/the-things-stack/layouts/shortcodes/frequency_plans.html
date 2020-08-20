@@ -9,5 +9,8 @@
   {{- with index . "base-frequency" -}}
     <dd>Base Frequency: {{ . }} MHz</dd>
   {{- end -}}
+  {{- with index . "id" -}}
+    <dd>ID: {{ . }}</dd>
+  {{- end -}}
 </dl>
 {{- end }}

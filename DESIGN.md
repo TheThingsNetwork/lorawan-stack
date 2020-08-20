@@ -141,7 +141,7 @@ We use a classic `1140px`, 12 column, `28px` gutter responsive grid to arrange c
 ![Grid](https://user-images.githubusercontent.com/5710611/77135542-47391b00-6aae-11ea-92fa-5a4b574c1c72.png)
 
 In narrow mobile views, we use a two column grid. Extensive menus will collapse into toggle-able drawer and hamburger menus.
- 
+
 ### Scale
 
 #### How We Use Scale for Spacing

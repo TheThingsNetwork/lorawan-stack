@@ -28,9 +28,9 @@ import appStyle from '@console/views/app/app.styl'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './device-data.styl'
-
 import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
+
+import style from './device-data.styl'
 
 @connect(function(state, props) {
   const device = selectSelectedDevice(state)
@@ -46,7 +46,7 @@ import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/sel
   return (
     <Breadcrumb
       path={`/applications/${appId}/devices/${devId}/data`}
-      content={sharedMessages.data}
+      content={sharedMessages.liveData}
     />
   )
 })
@@ -63,7 +63,7 @@ export default class Data extends React.Component {
     return (
       <WithRootClass className={appStyle.stageFlex} id="stage">
         <div className={style.overflowContainer}>
-          <IntlHelmet hideHeading title={sharedMessages.data} />
+          <IntlHelmet hideHeading title={sharedMessages.liveData} />
           <DeviceEvents devIds={ids} />
         </div>
       </WithRootClass>

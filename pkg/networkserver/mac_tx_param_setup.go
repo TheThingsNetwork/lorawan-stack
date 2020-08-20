@@ -26,8 +26,13 @@ import (
 )
 
 var (
-	evtEnqueueTxParamSetupRequest = defineEnqueueMACRequestEvent("tx_param_setup", "Tx parameter setup")()
-	evtReceiveTxParamSetupAnswer  = defineReceiveMACAnswerEvent("tx_param_setup", "Tx parameter setup")()
+	evtEnqueueTxParamSetupRequest = defineEnqueueMACRequestEvent(
+		"tx_param_setup", "Tx parameter setup",
+		events.WithDataType(&ttnpb.MACCommand_TxParamSetupReq{}),
+	)()
+	evtReceiveTxParamSetupAnswer = defineReceiveMACAnswerEvent(
+		"tx_param_setup", "Tx parameter setup",
+	)()
 )
 
 func deviceNeedsTxParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {

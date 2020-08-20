@@ -119,7 +119,11 @@ func (c *connection) setup(ctx context.Context) error {
 			}
 			if pkt != nil {
 				logger.Debugf("Schedule %s packet", packet.Name[pkt.PacketType()])
-				controlCh <- pkt
+				select {
+				case <-ctx.Done():
+					return
+				case controlCh <- pkt:
+				}
 			}
 		}
 	}()

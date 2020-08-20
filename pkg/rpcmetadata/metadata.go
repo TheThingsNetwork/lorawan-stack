@@ -40,6 +40,9 @@ type MD struct {
 
 	// XForwardedFor is set from the X-Forwarded-For header.
 	XForwardedFor string
+
+	// UserAgent is set from the User-Agent or the grpcgateway-user-agent header.
+	UserAgent string
 }
 
 // RequireTransportSecurity returns true if authentication is configured
@@ -73,6 +76,9 @@ func (m MD) ToMetadata() metadata.MD {
 	}
 	if m.XForwardedFor != "" {
 		pairs = append(pairs, "x-forwarded-for", m.XForwardedFor)
+	}
+	if m.UserAgent != "" {
+		pairs = append(pairs, "user-agent", m.UserAgent)
 	}
 	return metadata.Pairs(pairs...)
 }
@@ -118,6 +124,11 @@ func FromMetadata(md metadata.MD) (m MD) {
 	}
 	if xForwardedFor, ok := md["x-forwarded-for"]; ok && len(xForwardedFor) > 0 {
 		m.XForwardedFor = xForwardedFor[len(xForwardedFor)-1]
+	}
+	if userAgent, ok := md["grpcgateway-user-agent"]; ok && len(userAgent) > 0 {
+		m.UserAgent = userAgent[len(userAgent)-1]
+	} else if userAgent, ok := md["user-agent"]; ok && len(userAgent) > 0 {
+		m.UserAgent = userAgent[len(userAgent)-1]
 	}
 	return
 }

@@ -23,9 +23,18 @@ import (
 )
 
 var (
-	evtEnqueueBeaconFreqRequest = defineEnqueueMACRequestEvent("beacon_freq", "beacon frequency change")()
-	evtReceiveBeaconFreqReject  = defineReceiveMACRejectEvent("beacon_freq", "beacon frequency change")()
-	evtReceiveBeaconFreqAccept  = defineReceiveMACAcceptEvent("beacon_freq", "beacon frequency change")()
+	evtEnqueueBeaconFreqRequest = defineEnqueueMACRequestEvent(
+		"beacon_freq", "beacon frequency change",
+		events.WithDataType(&ttnpb.MACCommand_BeaconFreqReq{}),
+	)()
+	evtReceiveBeaconFreqReject = defineReceiveMACRejectEvent(
+		"beacon_freq", "beacon frequency change",
+		events.WithDataType(&ttnpb.MACCommand_BeaconFreqAns{}),
+	)()
+	evtReceiveBeaconFreqAccept = defineReceiveMACAcceptEvent(
+		"beacon_freq", "beacon frequency change",
+		events.WithDataType(&ttnpb.MACCommand_BeaconFreqAns{}),
+	)()
 )
 
 func deviceNeedsBeaconFreqReq(dev *ttnpb.EndDevice) bool {

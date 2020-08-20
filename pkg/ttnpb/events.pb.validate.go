@@ -125,6 +125,10 @@ func (m *Event) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "remote_ip":
+			// no validation rules for RemoteIP
+		case "user_agent":
+			// no validation rules for UserAgent
 		default:
 			return EventValidationError{
 				field:  name,
@@ -322,8 +326,6 @@ func (m *Event_Authentication) ValidateFields(paths ...string) error {
 			// no validation rules for TokenType
 		case "token_id":
 			// no validation rules for TokenID
-		case "remote_ip":
-			// no validation rules for RemoteIP
 		default:
 			return Event_AuthenticationValidationError{
 				field:  name,

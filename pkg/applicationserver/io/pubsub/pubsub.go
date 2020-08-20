@@ -54,7 +54,13 @@ func New(c *component.Component, server io.Server, registry Registry) (*PubSub, 
 		server:    server,
 		registry:  registry,
 	}
-	ps.RegisterTask(ctx, "pubsubs_start_all", ps.startAll, component.TaskRestartOnFailure)
+	ps.RegisterTask(&component.TaskConfig{
+		Context: ctx,
+		ID:      "pubsubs_start_all",
+		Func:    ps.startAll,
+		Restart: component.TaskRestartOnFailure,
+		Backoff: component.DefaultTaskBackoffConfig,
+	})
 	return ps, nil
 }
 
@@ -67,37 +73,50 @@ func (ps *PubSub) startAll(ctx context.Context) error {
 	)
 }
 
-var startBackoff = []time.Duration{100 * time.Millisecond, 1 * time.Second, 10 * time.Second}
+var startBackoffConfig = &component.TaskBackoffConfig{
+	Jitter: component.DefaultBackoffJitter,
+	Intervals: []time.Duration{
+		100 * time.Millisecond,
+		time.Second,
+		10 * time.Second,
+	},
+}
 
 func (ps *PubSub) startTask(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"application_uid", unique.ID(ctx, ids.ApplicationIdentifiers),
 		"pub_sub_id", ids.PubSubID,
 	))
-	ps.StartTask(ctx, "pubsub", func(ctx context.Context) error {
-		target, err := ps.registry.Get(ctx, ids, ttnpb.ApplicationPubSubFieldPathsNested)
-		if err != nil {
-			if !errors.IsNotFound(err) {
-				log.FromContext(ctx).WithError(err).Error("Failed to stop pubsub")
+	ps.StartTask(&component.TaskConfig{
+		Context: ctx,
+		ID:      "pubsub",
+		Func: func(ctx context.Context) error {
+			target, err := ps.registry.Get(ctx, ids, ttnpb.ApplicationPubSubFieldPathsNested)
+			if err != nil {
+				if !errors.IsNotFound(err) {
+					log.FromContext(ctx).WithError(err).Error("Failed to stop pubsub")
+				}
+				return nil
 			}
-			return nil
-		}
 
-		err = ps.start(ctx, target)
-		switch {
-		case errors.IsFailedPrecondition(err),
-			errors.IsUnauthenticated(err),
-			errors.IsPermissionDenied(err),
-			errors.IsInvalidArgument(err):
-			log.FromContext(ctx).WithError(err).Warn("Failed to start")
-			return nil
-		case errors.IsCanceled(err),
-			errors.IsAlreadyExists(err):
-			return nil
-		default:
-			return err
-		}
-	}, component.TaskRestartOnFailure, 0.1, startBackoff...)
+			err = ps.start(ctx, target)
+			switch {
+			case errors.IsFailedPrecondition(err),
+				errors.IsUnauthenticated(err),
+				errors.IsPermissionDenied(err),
+				errors.IsInvalidArgument(err):
+				log.FromContext(ctx).WithError(err).Warn("Failed to start")
+				return nil
+			case errors.IsCanceled(err),
+				errors.IsAlreadyExists(err):
+				return nil
+			default:
+				return err
+			}
+		},
+		Restart: component.TaskRestartOnFailure,
+		Backoff: startBackoffConfig,
+	})
 }
 
 type integration struct {

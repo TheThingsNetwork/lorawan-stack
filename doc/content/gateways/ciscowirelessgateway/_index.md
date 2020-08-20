@@ -175,9 +175,9 @@ To enable this secret system, you can use the following commands:
 
 + `Gateway# configure terminal` to enter global configuration mode.
 + To set the secret, you can use different commands:
- `Gateway(config)# enable secret <secret>` to enter in plaintext the secret you wish to set, instead of `<secret>`. *Note*: Special characters cannot be used in plain secrets.
- `Gateway(config)# enable secret 5 <secret>` to enter the secret **md5-encrypted**.
- `Gateway(config)# enable secret 8 <secret>` to enter the secret **SHA512-encrypted**.
+  `Gateway(config)# enable secret <secret>` to enter in plaintext the secret you wish to set, instead of `<secret>`. *Note*: Special characters cannot be used in plain secrets.
+  `Gateway(config)# enable secret 5 <secret>` to enter the secret **md5-encrypted**.
+  `Gateway(config)# enable secret 8 <secret>` to enter the secret **SHA512-encrypted**.
 + `Gateway(config)# exit` to exit global configuration mode.
 + `Gateway#copy running-config startup-config` to save the configuration.
 

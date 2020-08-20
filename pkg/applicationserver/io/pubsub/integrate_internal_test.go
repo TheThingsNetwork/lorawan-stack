@@ -21,5 +21,5 @@ import (
 )
 
 func init() {
-	startBackoff = []time.Duration{(1 << 5) * test.Delay}
+	startBackoffConfig.Intervals = []time.Duration{(1 << 5) * test.Delay}
 }

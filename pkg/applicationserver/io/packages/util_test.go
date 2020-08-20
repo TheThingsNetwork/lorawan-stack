@@ -127,6 +127,13 @@ func (h *mockPackageHandler) HandleUp(ctx context.Context, defaultAssoc *ttnpb.A
 	return h.HandleUpFunc(ctx, defaultAssoc, assoc, up)
 }
 
+func (h *mockPackageHandler) Package() *ttnpb.ApplicationPackage {
+	return &ttnpb.ApplicationPackage{
+		Name:         "test-package",
+		DefaultFPort: 123,
+	}
+}
+
 type handleUpRequest struct {
 	ctx   context.Context
 	assoc *ttnpb.ApplicationPackageAssociation

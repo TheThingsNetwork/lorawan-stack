@@ -21,7 +21,7 @@ To communicate with the MQTT protocol, the Gateway Server and the gateway are ex
 
 See [Networking]({{< ref "/reference/networking" >}}) for the default port of the MQTT server.
 
-The username is `<gateway-id>`, and the password is a gateway API key with the `RIGHT_GATEWAY_LINK` right enabled. You can generate this API key using the [Console]({{< ref "/getting-started/console/create-gateway#create-gateway-api-key" >}}) or the [CLI]({{< ref "/getting-started/cli/create-gateway#create-gateway-api-key" >}}).
+The username is `<gateway-id>`, and the password is a gateway API key with the `RIGHT_GATEWAY_LINK` right enabled. You can generate this API key by following instructions in the [Creating Gateways]({{< ref "/gateways/adding-gateways#create-gateway-api-key" >}}) section.
 
 Authenticated clients get **write-only** access to the following topics:
 

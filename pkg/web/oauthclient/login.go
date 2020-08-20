@@ -24,7 +24,7 @@ import (
 // HandleLogin is the handler for redirecting the user to the authorization
 // endpoint.
 func (oc *OAuthClient) HandleLogin(c echo.Context) error {
-	next := c.QueryParam("next")
+	next := c.QueryParam(oc.nextKey)
 
 	// Only allow relative paths.
 	if !strings.HasPrefix(next, "/") && !strings.HasPrefix(next, "#") && !strings.HasPrefix(next, "?") {

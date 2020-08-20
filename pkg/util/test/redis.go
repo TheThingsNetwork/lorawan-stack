@@ -82,7 +82,7 @@ func (h redisHook) AfterProcessPipeline(context.Context, []redis.Cmder) error {
 func NewRedis(t testing.TB, namespace ...string) (*ttnredis.Client, func()) {
 	if os.Getenv("TEST_REDIS") != "1" {
 		t.Skip("TEST_REDIS is not set to `1`, skipping Redis tests")
-		panic("New called outside test")
+		panic("NewRedis called outside test")
 	}
 
 	conf := ttnredis.Config{

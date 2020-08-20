@@ -24,7 +24,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './webhook-template-info.styl'
 
 const m = defineMessages({
-  moreInfo: 'More info',
+  about: 'About {name}',
   documentation: 'Documentation',
   templateInformation: 'Template information',
 })
@@ -44,13 +44,13 @@ const WebhookTemplateInfo = ({ webhookTemplate }) => {
           <span className={style.description}>{description}</span>
           <span className={style.info}>
             {info_url && (
-              <Link.Anchor target="_blank" href={info_url}>
-                <Message content={m.moreInfo} />
+              <Link.Anchor primary href={info_url} external>
+                <Message content={m.about} values={{ name }} />
               </Link.Anchor>
             )}
             {showDivider && <span className={style.divider}>|</span>}
             {documentation_url && (
-              <Link.Anchor target="_blank" href={documentation_url}>
+              <Link.Anchor primary href={documentation_url} external>
                 <Message content={m.documentation} />
               </Link.Anchor>
             )}

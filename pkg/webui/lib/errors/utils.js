@@ -283,7 +283,10 @@ export const toMessageProps = function(error) {
       values: error.attributes,
     }
   } else if (isFrontend(error)) {
-    props = { content: error.errorMessage }
+    props = {
+      content: error.errorMessage,
+      title: error.errorTitle,
+    }
   } else if (isTranslated(error)) {
     // Fall back to normal message.
     props = { content: error }

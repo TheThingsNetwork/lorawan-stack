@@ -215,6 +215,8 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 			if location.Source != ttnpb.SOURCE_UNKNOWN {
 				md.Location = &location
 			}
+		} else if !c.gateway.LocationPublic {
+			md.Location = nil
 		}
 	}
 

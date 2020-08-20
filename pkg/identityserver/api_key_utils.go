@@ -18,8 +18,16 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
+
+var apiKeyHashSettings auth.HashValidator = pbkdf2.PBKDF2{
+	Iterations: 1000,
+	KeyLength:  32,
+	Algorithm:  pbkdf2.Sha256,
+	SaltLength: 16,
+}
 
 func generateAPIKey(ctx context.Context, name string, rights ...ttnpb.Right) (key *ttnpb.APIKey, token string, err error) {
 	token, err = auth.APIKey.Generate(ctx, "")
@@ -30,7 +38,7 @@ func generateAPIKey(ctx context.Context, name string, rights ...ttnpb.Right) (ke
 	if err != nil {
 		panic(err) // Bug in either Generate or SplitToken.
 	}
-	hashedKey, err := auth.Hash(ctx, generatedKey)
+	hashedKey, err := auth.Hash(auth.NewContextWithHashValidator(ctx, apiKeyHashSettings), generatedKey)
 	if err != nil {
 		return nil, "", err
 	}

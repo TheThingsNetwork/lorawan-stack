@@ -1,6 +1,7 @@
 ---
 title: "Gateway Configuration Server"
 description: ""
+aliases: [/components/gateway-configuration-server]
 ---
 
 The Gateway Configuration Server (GCS) generates configuration files for UDP gateways and manages gateway configuration and firmware updates for Basic Station and The Things Kickstarter gateways.

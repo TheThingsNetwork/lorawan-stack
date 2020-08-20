@@ -147,8 +147,10 @@ func TestHTTP(t *testing.T) {
 		certContent, err := ioutil.ReadFile("testdata/serverca.pem")
 		a.So(err, should.BeNil)
 		certPool.AppendCertsFromPEM(certContent)
-		client := http.Client{Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{RootCAs: certPool}},
+		client := http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{RootCAs: certPool},
+			},
 		}
 
 		{

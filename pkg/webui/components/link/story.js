@@ -32,8 +32,14 @@ storiesOf('Link', module)
         <Link.Anchor href="/">Show more</Link.Anchor>
       </div>
       <div>
+        <span style={titleStyle}>external anchor link:</span>
+        <Link.Anchor external href="/">
+          More information
+        </Link.Anchor>
+      </div>
+      <div>
         <span style={titleStyle}>doc link:</span>
-        <Link.DocLink path="/">Show more</Link.DocLink>
+        <Link.DocLink path="/getting-started">Getting Started</Link.DocLink>
       </div>
     </div>
   ))
@@ -50,12 +56,6 @@ storiesOf('Link', module)
         <Link.Anchor href="/">
           <div style={divStyle} />
         </Link.Anchor>
-      </div>
-      <div>
-        <span style={titleStyle}>doc linked block element:</span>
-        <Link.DocLink path="/">
-          <div style={divStyle} />
-        </Link.DocLink>
       </div>
     </div>
   ))
@@ -74,9 +74,15 @@ storiesOf('Link', module)
         </Link.Anchor>
       </div>
       <div>
+        <span style={titleStyle}>external anchor link:</span>
+        <Link.Anchor primary external href="/">
+          More information
+        </Link.Anchor>
+      </div>
+      <div>
         <span style={titleStyle}>doc link:</span>
-        <Link.DocLink primary path="/">
-          Show more
+        <Link.DocLink primary path="/getting-started">
+          Getting Started
         </Link.DocLink>
       </div>
     </div>
@@ -96,9 +102,15 @@ storiesOf('Link', module)
         </Link.Anchor>
       </div>
       <div>
+        <span style={titleStyle}>external anchor link:</span>
+        <Link.Anchor secondary external href="/">
+          More information
+        </Link.Anchor>
+      </div>
+      <div>
         <span style={titleStyle}>doc link:</span>
-        <Link.DocLink secondary path="/">
-          Show more
+        <Link.DocLink secondary path="/getting-started">
+          Getting Started
         </Link.DocLink>
       </div>
     </div>
@@ -117,11 +129,16 @@ storiesOf('Link', module)
           Show more
         </Link.Anchor>
       </div>
-
+      <div>
+        <span style={titleStyle}>external anchor link:</span>
+        <Link.Anchor external primary showVisited href="/">
+          More information
+        </Link.Anchor>
+      </div>
       <div>
         <span style={titleStyle}>doc link:</span>
-        <Link.DocLink primary showVisited path="/">
-          Show more
+        <Link.DocLink primary showVisited path="/getting-started">
+          Getting Started
         </Link.DocLink>
       </div>
     </div>
@@ -139,12 +156,6 @@ storiesOf('Link', module)
         <Link.Anchor primary disabled href="/">
           Show more
         </Link.Anchor>
-      </div>
-      <div>
-        <span style={titleStyle}>doc link:</span>
-        <Link.DocLink primary disabled path="/">
-          Show more
-        </Link.DocLink>
       </div>
     </div>
   ))

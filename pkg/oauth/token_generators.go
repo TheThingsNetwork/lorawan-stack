@@ -20,23 +20,24 @@ import (
 )
 
 func (s *server) GenerateAuthorizeToken(_ *osin.AuthorizeData) (string, error) {
-	return auth.AuthorizationCode.Generate(s.ctx, "")
+	return auth.AuthorizationCode.Generate(s.c.Context(), "")
 }
 
 func (s *server) GenerateAccessToken(_ *osin.AccessData, generateRefresh bool) (accessToken string, refreshToken string, err error) {
+	ctx := s.c.Context()
 	var id string
 	if generateRefresh {
-		id, err = auth.GenerateID(s.ctx)
+		id, err = auth.GenerateID(ctx)
 		if err != nil {
 			return
 		}
 	}
-	accessToken, err = auth.AccessToken.Generate(s.ctx, id)
+	accessToken, err = auth.AccessToken.Generate(ctx, id)
 	if err != nil {
 		return
 	}
 	if generateRefresh {
-		refreshToken, err = auth.RefreshToken.Generate(s.ctx, id)
+		refreshToken, err = auth.RefreshToken.Generate(ctx, id)
 		if err != nil {
 			return
 		}

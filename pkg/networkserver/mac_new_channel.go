@@ -23,9 +23,18 @@ import (
 )
 
 var (
-	evtEnqueueNewChannelRequest = defineEnqueueMACRequestEvent("new_channel", "new channel")()
-	evtReceiveNewChannelAccept  = defineReceiveMACAcceptEvent("new_channel", "new channel")()
-	evtReceiveNewChannelReject  = defineReceiveMACRejectEvent("new_channel", "new channel")()
+	evtEnqueueNewChannelRequest = defineEnqueueMACRequestEvent(
+		"new_channel", "new channel",
+		events.WithDataType(&ttnpb.MACCommand_NewChannelReq{}),
+	)()
+	evtReceiveNewChannelAccept = defineReceiveMACAcceptEvent(
+		"new_channel", "new channel",
+		events.WithDataType(&ttnpb.MACCommand_NewChannelAns{}),
+	)()
+	evtReceiveNewChannelReject = defineReceiveMACRejectEvent(
+		"new_channel", "new channel",
+		events.WithDataType(&ttnpb.MACCommand_NewChannelAns{}),
+	)()
 )
 
 func deviceNeedsNewChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {

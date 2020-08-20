@@ -174,8 +174,7 @@ func isSelectableField(name string) bool {
 
 func isSettableField(name string) bool {
 	switch name {
-	case "attributes", "contact_info", "password_updated_at", "temporary_password_created_at",
-		"temporary_password_expires_at", "antennas", "profile_picture":
+	case "attributes", "contact_info", "password_updated_at", "temporary_password_created_at", "antennas", "profile_picture":
 		return false
 	}
 	return true

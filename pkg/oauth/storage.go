@@ -170,7 +170,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 	if tokenType != auth.AccessToken {
 		return errNoAccessToken.New()
 	}
-	accessHash, err = auth.Hash(s.ctx, accessKey)
+	accessHash, err = auth.Hash(auth.NewContextWithHashValidator(s.ctx, tokenHashSettings), accessKey)
 	if err != nil {
 		return err
 	}
@@ -185,7 +185,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 		if refreshID != accessID {
 			return errTokenMismatch.WithAttributes("refresh_token_id", refreshID, "access_token_id", accessID)
 		}
-		refreshHash, err = auth.Hash(s.ctx, refreshKey)
+		refreshHash, err = auth.Hash(auth.NewContextWithHashValidator(s.ctx, tokenHashSettings), refreshKey)
 		if err != nil {
 			return err
 		}

@@ -1,6 +1,7 @@
 ---
 title: "Identity Server"
 description: ""
+aliases: [/components/identity-server]
 ---
 
 The Identity Server provides the registries that store entities such as applications with their end devices, gateways, users, organizations and OAuth clients. It also manages access control through memberships and API keys.

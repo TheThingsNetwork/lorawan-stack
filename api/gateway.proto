@@ -111,7 +111,7 @@ message Gateway {
 
   // Frequency plan IDs of the gateway.
   // The first element equals the frequency_plan_id field.
-  repeated string frequency_plan_ids = 20 [(gogoproto.customname) = "FrequencyPlanIDs", (validate.rules).repeated.max_items = 8, (validate.rules).repeated.items.string.max_len = 64];
+  repeated string frequency_plan_ids = 20 [(gogoproto.customname) = "FrequencyPlanIDs", (validate.rules).repeated = { max_items: 8, items{ string{ max_len: 64 } } }];
 
   repeated GatewayAntenna antennas = 13 [(gogoproto.nullable) = false];
   // The status of this gateway may be publicly displayed.

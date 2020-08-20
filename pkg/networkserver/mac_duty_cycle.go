@@ -23,8 +23,13 @@ import (
 )
 
 var (
-	evtEnqueueDutyCycleRequest = defineEnqueueMACRequestEvent("duty_cycle", "maximum aggregated transmit duty-cycle change")()
-	evtReceiveDutyCycleAnswer  = defineReceiveMACAnswerEvent("duty_cycle", "maximum aggregated transmit duty-cycle change")()
+	evtEnqueueDutyCycleRequest = defineEnqueueMACRequestEvent(
+		"duty_cycle", "maximum aggregated transmit duty-cycle change",
+		events.WithDataType(&ttnpb.MACCommand_DutyCycleReq{}),
+	)()
+	evtReceiveDutyCycleAnswer = defineReceiveMACAnswerEvent(
+		"duty_cycle", "maximum aggregated transmit duty-cycle change",
+	)()
 )
 
 func deviceNeedsDutyCycleReq(dev *ttnpb.EndDevice) bool {

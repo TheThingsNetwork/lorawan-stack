@@ -271,6 +271,13 @@ var (
 				logger.Warn("No fields selected, won't update anything")
 				return nil
 			}
+			if ttnpb.ContainsField("password", paths) {
+				logger.Warn("Most servers do not allow changing the password of a user like this.")
+				logger.Warnf("Use \"%s [user-id]\" to change your password.", usersUpdatePasswordCommand.CommandPath())
+				logger.Warnf("Use \"%s [user-id]\" if you forgot your password and want to request a temporary password.", usersForgotPasswordCommand.CommandPath())
+				logger.Warnf("Alternatively, admins may use \"%s [user-id] --temporary-password [pass]\" to set a temporary password for a user.", cmd.CommandPath())
+				logger.Warn("The user can then use this temporary password when changing their password.")
+			}
 			var user ttnpb.User
 			if err := util.SetFields(&user, setUserFlags); err != nil {
 				return err

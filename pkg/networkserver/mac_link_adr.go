@@ -26,9 +26,18 @@ import (
 )
 
 var (
-	evtEnqueueLinkADRRequest = defineEnqueueMACRequestEvent("link_adr", "link ADR")()
-	evtReceiveLinkADRAccept  = defineReceiveMACAcceptEvent("link_adr", "link ADR")()
-	evtReceiveLinkADRReject  = defineReceiveMACRejectEvent("link_adr", "link ADR")()
+	evtEnqueueLinkADRRequest = defineEnqueueMACRequestEvent(
+		"link_adr", "link ADR",
+		events.WithDataType(&ttnpb.MACCommand_LinkADRReq{}),
+	)()
+	evtReceiveLinkADRAccept = defineReceiveMACAcceptEvent(
+		"link_adr", "link ADR",
+		events.WithDataType(&ttnpb.MACCommand_LinkADRAns{}),
+	)()
+	evtReceiveLinkADRReject = defineReceiveMACRejectEvent(
+		"link_adr", "link ADR",
+		events.WithDataType(&ttnpb.MACCommand_LinkADRAns{}),
+	)()
 )
 
 func deviceNeedsLinkADRReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy band.Band) bool {

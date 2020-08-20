@@ -15,7 +15,7 @@
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 
-import Button from '@ttn-lw/components/button'
+import Link from '@ttn-lw/components/link'
 import Footer from '@ttn-lw/components/footer'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -25,8 +25,8 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import Header from '@console/containers/header'
 
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 import errorMessages from '@ttn-lw/lib/errors/error-messages'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import {
   httpStatusCode,
   isUnknown as isUnknownError,
@@ -37,8 +37,6 @@ import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './error.styl'
-
-const reload = () => location.reload()
 
 const FullViewErrorInner = function({ error, env }) {
   const isUnknown = isUnknownError(error)
@@ -66,14 +64,10 @@ const FullViewErrorInner = function({ error, env }) {
   let action = undefined
   if (isNotFound) {
     action = (
-      <Button.AnchorLink
-        icon="keyboard_arrow_left"
-        message={sharedMessages.takeMeBack}
-        href={env.appRoot}
-      />
+      <Link.Anchor icon="keyboard_arrow_left" href={env.appRoot} primary>
+        <Message content={sharedMessages.backToOverview} />
+      </Link.Anchor>
     )
-  } else if (isUnknown) {
-    action = <Button icon="refresh" message={sharedMessages.refreshPage} onClick={reload} />
   }
 
   return (

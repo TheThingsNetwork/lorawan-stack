@@ -17,7 +17,9 @@ package events
 import (
 	"context"
 	"fmt"
+	"sort"
 
+	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/i18n"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -27,7 +29,21 @@ const i18nPrefix = "event"
 type definition struct {
 	name        string
 	description string
+	dataType    proto.Message
 }
+
+// Definition describes an event definition.
+type Definition interface {
+	Name() string
+	Description() string
+	DataType() proto.Message
+}
+
+func (d *definition) Definition() Definition { return d }
+
+func (d definition) Name() string            { return d.name }
+func (d definition) Description() string     { return d.description }
+func (d definition) DataType() proto.Message { return d.dataType }
 
 func (d *definition) With(options ...Option) Builder {
 	extended := &builder{
@@ -56,6 +72,26 @@ func (d *definition) BindData(data interface{}) Builder {
 // Definitions of registered events.
 var definitions = make(map[string]*definition)
 
+// All returns all defined events, sorted by name.
+func All() Builders {
+	type definition struct {
+		name    string
+		builder Builder
+	}
+	var sorted = make([]*definition, 0, len(definitions))
+	for name, builder := range definitions {
+		sorted = append(sorted, &definition{name: name, builder: builder})
+	}
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].name < sorted[j].name
+	})
+	out := make(Builders, len(sorted))
+	for i, s := range sorted {
+		out[i] = s.builder
+	}
+	return out
+}
+
 // defineSkip registers an event and returns its definition.
 // The argument skip is the number of stack frames to ascend, with 0 identifying the caller of defineSkip.
 func defineSkip(name, description string, skip uint, opts ...Option) Builder {
@@ -65,6 +101,11 @@ func defineSkip(name, description string, skip uint, opts ...Option) Builder {
 	def := &definition{
 		name:        name,
 		description: description,
+	}
+	for _, opt := range opts {
+		if defOpt, ok := opt.(DefinitionOption); ok {
+			defOpt.applyToDefinition(def)
+		}
 	}
 	definitions[name] = def
 

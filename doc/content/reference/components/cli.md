@@ -1,6 +1,7 @@
 ---
 title: "Command-line Interface"
 description: ""
+aliases: [/components/cli]
 ---
 
 The Command-line Interface (CLI) provides a cross-platform interface for managing components through the command-line.

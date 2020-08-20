@@ -22,5 +22,5 @@ import (
 )
 
 func init() {
-	component.TaskBackoffDial = []time.Duration{(1 << 5) * test.Delay}
+	component.DialTaskBackoffConfig.Intervals = []time.Duration{(1 << 5) * test.Delay}
 }

@@ -362,12 +362,10 @@ var (
 				}
 				paths = append(paths, ttnpb.FlattenPaths(decodedPaths, endDeviceFlattenPaths)...)
 
-				if ttnpb.ContainsField("supports_join", paths) {
-					if abp && device.SupportsJoin {
-						return errActivationMode.New()
-					}
-					abp = !device.SupportsJoin
+				if abp && device.SupportsJoin {
+					logger.Warn("Reading from standard input, ignoring --abp and --multicast flags")
 				}
+				abp = !device.SupportsJoin
 			}
 
 			setDefaults, _ := cmd.Flags().GetBool("defaults")

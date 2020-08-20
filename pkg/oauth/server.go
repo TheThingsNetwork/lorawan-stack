@@ -22,6 +22,7 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/openshift/osin"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	web_errors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
@@ -43,10 +44,10 @@ type Server interface {
 }
 
 type server struct {
-	ctx        context.Context
-	config     Config
-	osinConfig *osin.ServerConfig
-	store      Store
+	c              *component.Component
+	configProvider ConfigProvider
+	osinConfig     *osin.ServerConfig
+	store          Store
 }
 
 // Store used by the OAuth server.
@@ -61,15 +62,11 @@ type Store interface {
 }
 
 // NewServer returns a new OAuth server on top of the given store.
-func NewServer(ctx context.Context, store Store, config Config) Server {
+func NewServer(c *component.Component, store Store, configProvider ConfigProvider) (Server, error) {
 	s := &server{
-		ctx:    ctx,
-		config: config,
-		store:  store,
-	}
-
-	if s.config.Mount == "" {
-		s.config.Mount = s.config.UI.MountPath()
+		c:              c,
+		configProvider: configProvider,
+		store:          store,
 	}
 
 	s.osinConfig = &osin.ServerConfig{
@@ -90,7 +87,7 @@ func NewServer(ctx context.Context, store Store, config Config) Server {
 		RetainTokenAfterRefresh:   false,
 	}
 
-	return s
+	return s, nil
 }
 
 type ctxKeyType struct{}
@@ -101,7 +98,15 @@ func (s *server) configFromContext(ctx context.Context) *Config {
 	if config, ok := ctx.Value(ctxKey).(*Config); ok {
 		return config
 	}
-	return &s.config
+	config := s.configProvider(ctx)
+	if config.Mount == "" {
+		config.Mount = config.UI.MountPath()
+	}
+	return &config
+}
+
+func (s *server) configFromEchoContext(c echo.Context) *Config {
+	return s.configFromContext(c.Request().Context())
 }
 
 func (s *server) now() time.Time { return time.Now().UTC() }
@@ -120,7 +125,7 @@ func (s *server) oauth2(ctx context.Context) *osin.Server {
 }
 
 func (s *server) Printf(format string, v ...interface{}) {
-	log.FromContext(s.ctx).Warnf(format, v...)
+	log.FromContext(s.c.Context()).Warnf(format, v...)
 }
 
 // These errors map to errors in the osin library.
@@ -184,7 +189,8 @@ func (s *server) output(c echo.Context, resp *osin.Response) error {
 		if err != nil {
 			return err
 		}
-		uiMount := strings.TrimSuffix(s.config.UI.MountPath(), "/")
+		config := s.configFromEchoContext(c)
+		uiMount := strings.TrimSuffix(config.UI.MountPath(), "/")
 		if strings.HasPrefix(location, "/code") || strings.HasPrefix(location, "/local-callback") {
 			location = uiMount + location
 		}
@@ -199,11 +205,12 @@ func (s *server) output(c echo.Context, resp *osin.Response) error {
 }
 
 func (s *server) RegisterRoutes(server *web.Server) {
+	config := s.configFromContext(s.c.Context())
 	root := server.Group(
-		s.config.Mount,
+		config.Mount,
 		func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {
-				config := s.configFromContext(c.Request().Context())
+				config := s.configFromEchoContext(c)
 				c.Set("template_data", config.UI.TemplateData)
 				frontendConfig := config.UI.FrontendConfig
 				frontendConfig.Language = config.UI.TemplateData.Language
@@ -220,7 +227,7 @@ func (s *server) RegisterRoutes(server *web.Server) {
 		}),
 	)
 
-	csrfMiddleware := middleware.CSRF("_csrf", "/", s.config.CSRFAuthKey)
+	csrfMiddleware := middleware.CSRF("_csrf", "/", config.CSRFAuthKey)
 
 	api := root.Group("/api", csrfMiddleware)
 	api.POST("/auth/login", s.Login)

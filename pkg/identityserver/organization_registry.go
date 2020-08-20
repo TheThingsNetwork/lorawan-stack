@@ -31,14 +31,21 @@ var (
 	evtCreateOrganization = events.Define(
 		"organization.create", "create organization",
 		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtUpdateOrganization = events.Define(
 		"organization.update", "update organization",
 		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
+		events.WithUpdatedFieldsDataType(),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 	evtDeleteOrganization = events.Define(
 		"organization.delete", "delete organization",
 		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
 	)
 )
 

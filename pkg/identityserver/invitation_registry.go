@@ -30,7 +30,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var evtCreateInvitation = events.Define("invitation.create", "create invitation")
+var evtCreateInvitation = events.Define(
+	"invitation.create", "create invitation",
+	events.WithAuthFromContext(),
+	events.WithClientInfoFromContext(),
+)
 
 var errNoInviteRights = errors.DefinePermissionDenied(
 	"no_invite_rights",

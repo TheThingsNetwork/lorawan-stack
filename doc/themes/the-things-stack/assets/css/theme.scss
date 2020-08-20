@@ -30,6 +30,8 @@ $title-family: "Manrope", $family-sans-serif;
 // Colors
 
 $blue: #2380ff;
+$blue-bis: lighten($blue, 38%);
+$blue-ter: lighten($blue, 42%);
 $white-bis: #fbfbfb;
 $white-ter : #ececec;
 $red: #f9595a;
@@ -56,6 +58,14 @@ $table-foot-cell-border-width: 1px 1px 1px;
 $table-cell-border: 1px solid $white-ter;
 $table-cell-border-width: 1px 1px 1px;
 $table-cell-padding: 1.2em 0.75em;
+
+$tabs-link-color: $blue;
+$tabs-link-hover-color: $tabs-link-color;
+$tabs-border-bottom-color: $blue;
+$tabs-boxed-link-active-border-bottom-color: $tabs-border-bottom-color;
+$tabs-boxed-link-active-background-color: $blue-bis;
+$tabs-boxed-link-hover-border-bottom-color: $tabs-border-bottom-color;
+$tabs-boxed-link-hover-background-color: $blue-ter;
 
 @import "bulma/sass/utilities/functions.sass";
 @import "bulma/sass/utilities/derived-variables.sass";
@@ -101,7 +111,7 @@ $table-cell-padding: 1.2em 0.75em;
 @import "bulma/sass/components/navbar.sass";
 // @import "bulma/sass/components/pagination.sass";
 // @import "bulma/sass/components/panel.sass";
-// @import "bulma/sass/components/tabs.sass";
+@import "bulma/sass/components/tabs.sass";
 
 // @import "bulma/sass/grid/_all";
 @import "bulma/sass/grid/columns.sass";
@@ -226,6 +236,10 @@ details + blockquote {
   margin-top: 1em;
 }
 
+.event-description:first-letter {
+  text-transform: uppercase;
+}
+
 .glossary {
   .term, .term-abbr, .term-alt{
     background-color: #ececec;
@@ -283,6 +297,14 @@ details + blockquote {
   line-height: 0;
   padding-left: 0.3em;
   padding-right: 0.3em;
+}
+
+#tab-content section {
+  display: none;
+}
+
+#tab-content section.is-active {
+  display: block;
 }
 
 @import "highlight.scss";

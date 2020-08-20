@@ -56,6 +56,22 @@ To render images without styling, use standard markdown syntax:
 
 ![I am a picture of Wienke](wienke.jpeg)
 
+## Console and CLI Tabs
+
+To separate instructions for the console and CLI, use the `tabs/container` shortcode, with nested `tabs/tab "Console"` and `tabs/tab "CLI"` shortcodes, to produce a tabbed view.
+
+{{< tabs/container "Console" "CLI" >}}
+
+{{< tabs/tab "Console" >}}
+## These are console instructions
+{{< /tabs/tab >}}
+
+{{< tabs/tab "CLI" >}}
+These are **cli**
+{{< /tabs/tab >}}
+
+{{< /tabs/container >}}
+
 ## Shortcodes
 
 Thou shalt always use the shortcode {{% tts %}} when referring to this product.
