@@ -464,7 +464,7 @@ matchLoop:
 			session = match.Device.PendingSession
 
 			if match.Device.MACState.PendingJoinRequest == nil {
-				logger.Error("Pending join-request missing")
+				logger.Warn("Pending join-request missing")
 				continue
 			}
 			match.Device.MACState.CurrentParameters.Rx1Delay = match.Device.MACState.PendingJoinRequest.RxDelay
