@@ -230,7 +230,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		<-ctx.Done()
 		as.linkErrors.Store(uid, ctx.Err())
 		as.links.Delete(uid)
-		if err := ctx.Err(); err != nil && !errors.IsCanceled(err) {
+		if err := ctx.Err(); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Link failed")
 			registerLinkFail(ctx, l, err)
 		}
@@ -252,10 +252,8 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	registerLinkStart(ctx, l)
 	go func() {
 		<-ctx.Done()
-		if err := ctx.Err(); errors.IsCanceled(err) {
-			logger.WithError(err).Info("Unlinked")
-			registerLinkStop(ctx, l)
-		}
+		logger.WithError(ctx.Err()).Info("Unlinked")
+		registerLinkStop(ctx, l)
 	}()
 
 	go l.run()
