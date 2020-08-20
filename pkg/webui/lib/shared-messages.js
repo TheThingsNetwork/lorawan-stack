@@ -45,7 +45,7 @@ export default defineMessages({
   appEUI: 'AppEUI',
   appEUIJoinEUI: 'AppEUI/JoinEUI',
   appEUIDescription:
-    'The AppEUI is a global application ID that uniquely identifies the owner of the end ­device. AppEUI is used for end devices with LoRaWAN versions 1.0.0-1.0.3, JoinEUI for 1.0.4+.',
+    'The AppEUI uniquely identifies the owner of the end device. If no AppEUI is provided by the device manufacturer (usually for development), it can be filled with zeros.',
   appId: 'Application ID',
   appKey: 'AppKey',
   appKeyDescription:
@@ -175,7 +175,7 @@ export default defineMessages({
   joinAccept: 'Join accept',
   joinEUI: 'JoinEUI',
   joinEUIDescription:
-    'JoinEUI identifies the Join Server. JoinEUI is used for end devices with LoRaWAN versions 1.0.4+, AppEUI for 1.0.0-1.0.3.',
+    'The JoinEUI identifies the Join Server. If no JoinEUI is provided by the device manufacturer (usually for development), it can be filled with zeros.',
   joinServerAddress: 'Join Server address',
   key: 'key',
   keyEdit: 'Edit API key',
