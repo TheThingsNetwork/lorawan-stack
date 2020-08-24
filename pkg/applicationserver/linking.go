@@ -44,40 +44,6 @@ func (as *ApplicationServer) linkAll(ctx context.Context) error {
 	)
 }
 
-var (
-	extendedLinkBackoffIntervals = append(component.DefaultTaskBackoffIntervals[:],
-		time.Minute,
-		5*time.Minute,
-		15*time.Minute,
-		30*time.Minute,
-	)
-
-	linkHealthyDuration = time.Minute
-	linkBackoffConfig   = &component.TaskBackoffConfig{
-		Jitter: component.DefaultTaskBackoffConfig.Jitter,
-		IntervalFunc: func(ctx context.Context, executionDuration time.Duration, invocation uint, err error) time.Duration {
-			intervals := component.DefaultTaskBackoffIntervals[:]
-			switch {
-			case errors.IsFailedPrecondition(err),
-				errors.IsUnauthenticated(err),
-				errors.IsPermissionDenied(err),
-				errors.IsInvalidArgument(err),
-				errors.IsAlreadyExists(err),
-				errors.IsCanceled(err):
-				intervals = extendedLinkBackoffIntervals
-			}
-			switch {
-			case executionDuration > linkHealthyDuration:
-				return intervals[0]
-			case invocation >= uint(len(intervals)):
-				return intervals[len(intervals)-1]
-			default:
-				return intervals[invocation-1]
-			}
-		},
-	}
-)
-
 func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.ApplicationIdentifiers) {
 	ctx = log.NewContextWithField(ctx, "application_uid", unique.ID(ctx, ids))
 	as.StartTask(&component.TaskConfig{
@@ -134,10 +100,7 @@ type link struct {
 
 const linkBufferSize = 10
 
-var (
-	errAlreadyLinked  = errors.DefineAlreadyExists("already_linked", "already linked to `{application_uid}`")
-	errNSPeerNotFound = errors.DefineNotFound("network_server_not_found", "Network Server not found for `{application_uid}`")
-)
+var errNSPeerNotFound = errors.DefineNotFound("network_server_not_found", "Network Server not found for `{application_uid}`")
 
 func (as *ApplicationServer) connectLink(ctx context.Context, link *link) error {
 	var allowInsecure bool

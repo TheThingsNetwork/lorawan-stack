@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider"
@@ -71,15 +70,6 @@ func (ps *PubSub) startAll(ctx context.Context) error {
 			return true
 		},
 	)
-}
-
-var startBackoffConfig = &component.TaskBackoffConfig{
-	Jitter: component.DefaultTaskBackoffJitter,
-	IntervalFunc: component.MakeTaskBackoffIntervalFunc(false, component.DefaultTaskBackoffResetDuration,
-		100*time.Millisecond,
-		time.Second,
-		10*time.Second,
-	),
 }
 
 func (ps *PubSub) startTask(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) {
@@ -260,9 +250,6 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		if err != nil {
 			logger.WithError(err).Warn("Pub/sub failed")
 			registerIntegrationFail(ctx, i, err)
-		} else {
-			logger.Info("Pub/sub stopped")
-			registerIntegrationStop(ctx, i)
 		}
 	}()
 
@@ -303,6 +290,10 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	i.startHandleDown(ctx)
 	logger.Info("Pub/sub started")
 	registerIntegrationStart(ctx, i)
+	defer func() {
+		logger.Info("Pub/sub stopped")
+		registerIntegrationStop(ctx, i)
+	}()
 
 	<-ctx.Done()
 	return ctx.Err()

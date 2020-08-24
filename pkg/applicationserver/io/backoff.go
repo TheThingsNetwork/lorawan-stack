@@ -22,43 +22,38 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
-// TaskHealthyDuration is the duration after which a task is considered to be in steady state.
-const TaskHealthyDuration = 1 * time.Minute
-
-// TaskBackoffConfig derives the component.DefaultTaskBackoffConfig and dynamically determines the backoff duration
-// based on recent error codes.
-var TaskBackoffConfig = &component.TaskBackoffConfig{
-	Jitter: component.DefaultTaskBackoffConfig.Jitter,
-	DynamicInterval: func(ctx context.Context, executionTime time.Duration, invocation int, err error) time.Duration {
-		defaultIntervals := component.DefaultTaskBackoffConfig.Intervals
-		extendedIntervals := append(defaultIntervals,
-			1*time.Minute,
-			5*time.Minute,
-			15*time.Minute,
-			30*time.Minute,
-		)
-
-		var intervals []time.Duration
-		switch {
-		case errors.IsFailedPrecondition(err),
-			errors.IsUnauthenticated(err),
-			errors.IsPermissionDenied(err),
-			errors.IsInvalidArgument(err),
-			errors.IsAlreadyExists(err),
-			errors.IsCanceled(err):
-			intervals = extendedIntervals
-		default:
-			intervals = defaultIntervals
-		}
-
-		bi := invocation - 1
-		if bi >= len(intervals) {
-			bi = len(intervals) - 1
-		}
-		if executionTime > TaskHealthyDuration {
-			bi = 0
-		}
-
-		return intervals[bi]
-	},
-}
+var (
+	// TaskExtendedBackoffIntervals extends the default backoff intervals with longer periods for
+	// higher invocation counts.
+	TaskExtendedBackoffIntervals = append(component.DefaultTaskBackoffIntervals[:],
+		time.Minute,
+		5*time.Minute,
+		15*time.Minute,
+		30*time.Minute,
+	)
+	// TaskBackoffConfig derives the component.DefaultTaskBackoffConfig and dynamically determines the backoff duration
+	// based on recent error codes.
+	TaskBackoffConfig = &component.TaskBackoffConfig{
+		Jitter: component.DefaultTaskBackoffJitter,
+		IntervalFunc: func(ctx context.Context, executionDuration time.Duration, invocation uint, err error) time.Duration {
+			intervals := component.DefaultTaskBackoffIntervals[:]
+			switch {
+			case errors.IsFailedPrecondition(err),
+				errors.IsUnauthenticated(err),
+				errors.IsPermissionDenied(err),
+				errors.IsInvalidArgument(err),
+				errors.IsAlreadyExists(err),
+				errors.IsCanceled(err):
+				intervals = TaskExtendedBackoffIntervals
+			}
+			switch {
+			case executionDuration > component.DefaultTaskBackoffResetDuration:
+				return intervals[0]
+			case invocation >= uint(len(intervals)):
+				return intervals[len(intervals)-1]
+			default:
+				return intervals[invocation-1]
+			}
+		},
+	}
+)
