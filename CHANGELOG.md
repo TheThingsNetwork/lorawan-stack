@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- CLI login issues when OAuth Server Address explicitly includes the `:443` HTTPS port.
+
 ### Security
 
 ## [3.9.1] - 2020-08-19
