@@ -46,6 +46,7 @@ type TaskBackoffConfig struct {
 	Jitter          float64
 	Intervals       []time.Duration
 	DynamicInterval DynamicIntervalFunc
+	OnFailure       bool
 }
 
 const DefaultBackoffJitter = 0.1
@@ -125,7 +126,7 @@ func DefaultStartTask(conf *TaskConfig) {
 			}
 			var s time.Duration
 			switch {
-			case conf.Backoff == nil:
+			case conf.Backoff == nil, conf.Backoff.OnFailure && err == nil:
 				continue
 			case conf.Backoff.DynamicInterval != nil:
 				s = conf.Backoff.DynamicInterval(conf.Context, executionTime, invocation, err)
