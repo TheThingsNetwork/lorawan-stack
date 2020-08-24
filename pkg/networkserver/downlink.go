@@ -1266,7 +1266,8 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 			QueuedApplicationUplinks: genState.appendApplicationUplinks(nil, false),
 		}
 
-	case !slot.Time.Before(timeNow()):
+	case slot.Time.After(timeNow()):
+		log.FromContext(ctx).Debug("Slot starts in the future, set absolute time in downlink request")
 		absTime = &slot.Time
 
 	case slot.Class == ttnpb.CLASS_B:
@@ -1313,13 +1314,13 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		Rx2Frequency:     freq,
 		AbsoluteTime:     absTime,
 	}
-	logger := log.FromContext(ctx)
 	down, queuedEvents, err := ns.scheduleDownlinkByPaths(
-		log.NewContext(ctx, loggerWithTxRequestFields(logger, req, false, true)),
+		log.NewContext(ctx, loggerWithTxRequestFields(log.FromContext(ctx), req, false, true)),
 		newDataDownlinkScheduleRequest(req, dev.EndDeviceIdentifiers, genDown.Payload, genDown.Confirmed),
 		paths...,
 	)
 	if err != nil {
+		logger := log.FromContext(ctx)
 		schedErr, ok := err.(downlinkSchedulingError)
 		if ok {
 			logger = loggerWithDownlinkSchedulingErrorFields(logger, schedErr)
