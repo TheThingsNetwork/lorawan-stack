@@ -986,7 +986,6 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genDown *generatedDownlink, genSta
 		dev.MACState.PendingApplicationDownlink = genState.ApplicationDownlink
 		dev.Session.LastConfFCntDown = genDown.FCnt
 	}
-	dev.MACState.QueuedResponses = nil
 	dev.MACState.RxWindowsAvailable = false
 	dev.MACState.RecentDownlinks = appendRecentDownlink(dev.MACState.RecentDownlinks, down.Message, recentDownlinkCount)
 	dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down.Message, recentDownlinkCount)
