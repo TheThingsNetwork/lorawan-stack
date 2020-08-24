@@ -1344,6 +1344,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 								},
 							},
 						}),
+						QueuedEvents: queuedEvents,
 					}
 				}
 				if len(genState.ApplicationDownlink.GetClassBC().GetGateways()) > 0 &&
@@ -1361,6 +1362,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 								},
 							},
 						}),
+						QueuedEvents: queuedEvents,
 					}
 				}
 			}
