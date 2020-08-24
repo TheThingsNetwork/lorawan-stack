@@ -1216,6 +1216,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 	})
 	for _, tc := range tcs {
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
 			a := assertions.New(t)
 
 			ns, ctx, _, stop := StartTest(t, TestConfig{
