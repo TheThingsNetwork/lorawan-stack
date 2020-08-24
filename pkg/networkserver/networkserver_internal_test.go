@@ -31,6 +31,9 @@ func TestNewDevAddr(t *testing.T) {
 				NetworkServer: Config{
 					NetID: types.NetID{0x00, 0x00, 0x13},
 				},
+				TaskStarter: StartTaskExclude(
+					DownlinkProcessTaskName,
+				),
 				Timeout: (1 << 3) * test.Delay,
 			},
 		)
@@ -64,6 +67,9 @@ func TestNewDevAddr(t *testing.T) {
 					NetID:           types.NetID{0x00, 0x00, 0x13},
 					DevAddrPrefixes: ps,
 				},
+				TaskStarter: StartTaskExclude(
+					DownlinkProcessTaskName,
+				),
 				Timeout: (1 << 3) * test.Delay,
 			},
 		)

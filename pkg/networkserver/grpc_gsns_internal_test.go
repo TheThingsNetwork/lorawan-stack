@@ -1222,6 +1222,9 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				NetworkServer: Config{
 					NetID: NetID,
 				},
+				TaskStarter: StartTaskExclude(
+					DownlinkProcessTaskName,
+				),
 				Timeout: (1 << 5) * test.Delay,
 			})
 			defer stop()

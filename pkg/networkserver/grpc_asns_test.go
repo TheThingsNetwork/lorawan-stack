@@ -41,6 +41,9 @@ func TestLinkApplication(t *testing.T) {
 
 	ns, ctx, env, stop := StartTest(t, TestConfig{
 		Timeout: (1 << 12) * test.Delay,
+		TaskStarter: StartTaskExclude(
+			DownlinkProcessTaskName,
+		),
 	})
 	defer stop()
 
@@ -1023,13 +1026,15 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							atomic.AddUint64(&addCalls, 1)
 							return tc.AddFunc(ctx, ids, startAt, replace)
 						},
-						PopFunc: DownlinkTaskPopBlockFunc,
 					},
 					DefaultMACSettings: MACSettingConfig{
 						StatusTimePeriodicity:  DurationPtr(0),
 						StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(0),
 					},
 				},
+				TaskStarter: StartTaskExclude(
+					DownlinkProcessTaskName,
+				),
 				Timeout: (1 << 9) * test.Delay,
 			})
 			defer stop()
@@ -1719,9 +1724,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 								atomic.AddUint64(&addCalls, 1)
 								return tc.AddFunc(ctx, ids, startAt, replace)
 							},
-							PopFunc: DownlinkTaskPopBlockFunc,
 						},
 					},
+					TaskStarter: StartTaskExclude(
+						DownlinkProcessTaskName,
+					),
 					Timeout: (1 << 9) * test.Delay,
 				},
 			)
@@ -2020,10 +2027,10 @@ func TestDownlinkQueueList(t *testing.T) {
 								return tc.GetByIDFunc(ctx, appID, devID, gets)
 							},
 						},
-						DownlinkTasks: &MockDownlinkTaskQueue{
-							PopFunc: DownlinkTaskPopBlockFunc,
-						},
 					},
+					TaskStarter: StartTaskExclude(
+						DownlinkProcessTaskName,
+					),
 					Timeout: (1 << 9) * test.Delay,
 				},
 			)

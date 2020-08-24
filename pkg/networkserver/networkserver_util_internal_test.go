@@ -17,6 +17,7 @@ package networkserver
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strings"
 	"sync"
 	"testing"
@@ -1745,6 +1746,22 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 		return nil, false
 	}
 	return dev, a.So(err, should.BeNil)
+}
+
+func StartTaskExclude(names ...string) component.StartTaskFunc {
+	if !sort.StringsAreSorted(names) {
+		panic("names must be sorted alphabetically")
+	}
+	return func(conf *component.TaskConfig) {
+		for _, name := range names {
+			if i := sort.Search(len(names), func(i int) bool {
+				return names[i] == name
+			}); i < len(names) && names[i] == name {
+				return
+			}
+		}
+		component.DefaultStartTask(conf)
+	}
 }
 
 type TestConfig struct {

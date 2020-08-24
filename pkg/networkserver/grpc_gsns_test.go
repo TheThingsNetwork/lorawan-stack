@@ -1748,12 +1748,13 @@ func TestHandleUplink(t *testing.T) {
 							Queue: auq,
 						},
 					},
+					TaskStarter: StartTaskExclude(
+						DownlinkProcessTaskName,
+					),
 					Timeout: (1 << 10) * test.Delay,
 				},
 			)
 			defer stop()
-
-			<-dtqEnv.Pop
 
 			clock := test.NewMockClock(time.Now().UTC())
 			defer SetMockClock(clock)()

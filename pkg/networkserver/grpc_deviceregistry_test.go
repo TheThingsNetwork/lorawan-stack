@@ -365,6 +365,9 @@ func TestDeviceRegistryGet(t *testing.T) {
 							},
 						},
 					},
+					TaskStarter: StartTaskExclude(
+						DownlinkProcessTaskName,
+					),
 					Timeout: (1 << 9) * test.Delay,
 				},
 			)
@@ -1511,9 +1514,11 @@ func TestDeviceRegistrySet(t *testing.T) {
 								atomic.AddUint64(&addCalls, 1)
 								return tc.AddFunc(ctx, ids, at, replace)
 							},
-							PopFunc: DownlinkTaskPopBlockFunc,
 						},
 					},
+					TaskStarter: StartTaskExclude(
+						DownlinkProcessTaskName,
+					),
 					Timeout: (1 << 9) * test.Delay,
 				},
 			)
@@ -1675,10 +1680,10 @@ func TestDeviceRegistryDelete(t *testing.T) {
 								return tc.SetByIDFunc(ctx, appID, devID, gets, f)
 							},
 						},
-						DownlinkTasks: &MockDownlinkTaskQueue{
-							PopFunc: DownlinkTaskPopBlockFunc,
-						},
 					},
+					TaskStarter: StartTaskExclude(
+						DownlinkProcessTaskName,
+					),
 					Timeout: (1 << 9) * test.Delay,
 				},
 			)

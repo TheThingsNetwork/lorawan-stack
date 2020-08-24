@@ -63,6 +63,9 @@ func TestGenerateDevAddr(t *testing.T) {
 				NetworkServer: Config{
 					NetID: tc.NetID,
 				},
+				TaskStarter: StartTaskExclude(
+					DownlinkProcessTaskName,
+				),
 				Timeout: (1 << 5) * test.Delay,
 			})
 			defer stop()
@@ -137,6 +140,9 @@ func TestGenerateDevAddr(t *testing.T) {
 					NetID:           types.NetID{0x00, 0x00, 0x13},
 					DevAddrPrefixes: tc.DevAddrPrefixes,
 				},
+				TaskStarter: StartTaskExclude(
+					DownlinkProcessTaskName,
+				),
 				Timeout: (1 << 7) * test.Delay,
 			})
 			defer stop()
