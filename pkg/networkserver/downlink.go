@@ -986,7 +986,6 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genDown *generatedDownlink, genSta
 		dev.MACState.PendingApplicationDownlink = genState.ApplicationDownlink
 		dev.Session.LastConfFCntDown = genDown.FCnt
 	}
-	dev.MACState.QueuedResponses = nil
 	dev.MACState.RxWindowsAvailable = false
 	dev.MACState.RecentDownlinks = appendRecentDownlink(dev.MACState.RecentDownlinks, down.Message, recentDownlinkCount)
 	dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down.Message, recentDownlinkCount)
@@ -1267,7 +1266,8 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 			QueuedApplicationUplinks: genState.appendApplicationUplinks(nil, false),
 		}
 
-	case !slot.Time.Before(timeNow()):
+	case slot.Time.After(timeNow()):
+		log.FromContext(ctx).Debug("Slot starts in the future, set absolute time in downlink request")
 		absTime = &slot.Time
 
 	case slot.Class == ttnpb.CLASS_B:
@@ -1314,13 +1314,13 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		Rx2Frequency:     freq,
 		AbsoluteTime:     absTime,
 	}
-	logger := log.FromContext(ctx)
 	down, queuedEvents, err := ns.scheduleDownlinkByPaths(
-		log.NewContext(ctx, loggerWithTxRequestFields(logger, req, false, true)),
+		log.NewContext(ctx, loggerWithTxRequestFields(log.FromContext(ctx), req, false, true)),
 		newDataDownlinkScheduleRequest(req, dev.EndDeviceIdentifiers, genDown.Payload, genDown.Confirmed),
 		paths...,
 	)
 	if err != nil {
+		logger := log.FromContext(ctx)
 		schedErr, ok := err.(downlinkSchedulingError)
 		if ok {
 			logger = loggerWithDownlinkSchedulingErrorFields(logger, schedErr)
@@ -1345,6 +1345,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 								},
 							},
 						}),
+						QueuedEvents: queuedEvents,
 					}
 				}
 				if len(genState.ApplicationDownlink.GetClassBC().GetGateways()) > 0 &&
@@ -1362,6 +1363,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 								},
 							},
 						}),
+						QueuedEvents: queuedEvents,
 					}
 				}
 			}
