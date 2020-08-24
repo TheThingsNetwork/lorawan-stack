@@ -111,7 +111,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 	})
-	s, err := oauth.NewServer(c, store, oauth.StaticConfigProvider(oauth.Config{
+	s, err := oauth.NewServer(c, store, oauth.Config{
 		Mount:       "/oauth",
 		CSRFAuthKey: []byte("12345678123456781234567812345678"),
 		UI: oauth.UIConfig{
@@ -121,7 +121,7 @@ func TestOAuthFlow(t *testing.T) {
 				CanonicalURL: "https://example.com/oauth",
 			},
 		},
-	}))
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -619,7 +619,7 @@ func TestTokenExchange(t *testing.T) {
 			},
 		},
 	})
-	s, err := oauth.NewServer(c, store, oauth.StaticConfigProvider(oauth.Config{
+	s, err := oauth.NewServer(c, store, oauth.Config{
 		Mount: "/oauth",
 		UI: oauth.UIConfig{
 			TemplateData: webui.TemplateData{
@@ -627,7 +627,7 @@ func TestTokenExchange(t *testing.T) {
 				Title:    "OAuth",
 			},
 		},
-	}))
+	})
 	if err != nil {
 		panic(err)
 	}
