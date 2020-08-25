@@ -45,19 +45,18 @@ func (as *ApplicationServer) linkAll(ctx context.Context) error {
 }
 
 var (
-	linkHealthyDuration = 1 * time.Minute
+	extendedLinkBackoffIntervals = append(component.DefaultTaskBackoffIntervals[:],
+		time.Minute,
+		5*time.Minute,
+		15*time.Minute,
+		30*time.Minute,
+	)
+
+	linkHealthyDuration = time.Minute
 	linkBackoffConfig   = &component.TaskBackoffConfig{
 		Jitter: component.DefaultTaskBackoffConfig.Jitter,
-		DynamicInterval: func(ctx context.Context, executionTime time.Duration, invocation int, err error) time.Duration {
-			defaultIntervals := component.DefaultTaskBackoffConfig.Intervals
-			extendedIntervals := append(defaultIntervals,
-				1*time.Minute,
-				5*time.Minute,
-				15*time.Minute,
-				30*time.Minute,
-			)
-
-			var intervals []time.Duration
+		IntervalFunc: func(ctx context.Context, executionDuration time.Duration, invocation uint, err error) time.Duration {
+			intervals := component.DefaultTaskBackoffIntervals[:]
 			switch {
 			case errors.IsFailedPrecondition(err),
 				errors.IsUnauthenticated(err),
@@ -65,20 +64,16 @@ var (
 				errors.IsInvalidArgument(err),
 				errors.IsAlreadyExists(err),
 				errors.IsCanceled(err):
-				intervals = extendedIntervals
+				intervals = extendedLinkBackoffIntervals
+			}
+			switch {
+			case executionDuration > linkHealthyDuration:
+				return intervals[0]
+			case invocation >= uint(len(intervals)):
+				return intervals[len(intervals)-1]
 			default:
-				intervals = defaultIntervals
+				return intervals[invocation-1]
 			}
-
-			bi := invocation - 1
-			if bi >= len(intervals) {
-				bi = len(intervals) - 1
-			}
-			if executionTime > linkHealthyDuration {
-				bi = 0
-			}
-
-			return intervals[bi]
 		},
 	}
 )

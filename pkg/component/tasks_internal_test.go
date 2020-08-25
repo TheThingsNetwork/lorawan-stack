@@ -27,17 +27,13 @@ import (
 )
 
 var TestTaskBackoffConfig = &TaskBackoffConfig{
-	Jitter: DefaultBackoffJitter,
-	Intervals: []time.Duration{
+	Jitter: DefaultTaskBackoffJitter,
+	IntervalFunc: MakeTaskBackoffIntervalFunc(false, 2*test.Delay,
 		test.Delay,
-		2 * test.Delay,
-		3 * test.Delay,
-		4 * test.Delay,
-	},
-}
-
-func init() {
-	backoffResetTime = 2 * test.Delay
+		2*test.Delay,
+		3*test.Delay,
+		4*test.Delay,
+	),
 }
 
 func TestTaskBackoffReset(t *testing.T) {
