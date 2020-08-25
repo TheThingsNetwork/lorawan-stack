@@ -5543,18 +5543,9 @@
       "file": "javascript.go"
     }
   },
-  "error:pkg/messageprocessors/javascript:output_range": {
+  "error:pkg/messageprocessors/javascript:output_errors": {
     "translations": {
-      "en": "output value `{value}` does not fall between `{low}` and `{high}`"
-    },
-    "description": {
-      "package": "pkg/messageprocessors/javascript",
-      "file": "javascript.go"
-    }
-  },
-  "error:pkg/messageprocessors/javascript:output_type": {
-    "translations": {
-      "en": "invalid output of type `{type}`"
+      "en": "{errors}"
     },
     "description": {
       "package": "pkg/messageprocessors/javascript",
@@ -6641,9 +6632,54 @@
       "file": "rpcserver.go"
     }
   },
+  "error:pkg/scripting/javascript:entrypoint_not_found": {
+    "translations": {
+      "en": "entrypoint `{entrypoint}` not found"
+    },
+    "description": {
+      "package": "pkg/scripting/javascript",
+      "file": "javascript.go"
+    }
+  },
+  "error:pkg/scripting/javascript:no_script_output": {
+    "translations": {
+      "en": "no script output"
+    },
+    "description": {
+      "package": "pkg/scripting/javascript",
+      "file": "javascript.go"
+    }
+  },
   "error:pkg/scripting/javascript:runtime": {
     "translations": {
       "en": "runtime error"
+    },
+    "description": {
+      "package": "pkg/scripting/javascript",
+      "file": "javascript.go"
+    }
+  },
+  "error:pkg/scripting/javascript:script": {
+    "translations": {
+      "en": "{message}"
+    },
+    "description": {
+      "package": "pkg/scripting/javascript",
+      "file": "javascript.go"
+    }
+  },
+  "error:pkg/scripting/javascript:script_interrupt": {
+    "translations": {
+      "en": "script interrupt"
+    },
+    "description": {
+      "package": "pkg/scripting/javascript",
+      "file": "javascript.go"
+    }
+  },
+  "error:pkg/scripting/javascript:script_timeout": {
+    "translations": {
+      "en": "script timeout"
     },
     "description": {
       "package": "pkg/scripting/javascript",
