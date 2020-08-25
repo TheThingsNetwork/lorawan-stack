@@ -37,39 +37,67 @@ const (
 	TaskRestartOnFailure
 )
 
-var backoffResetTime = time.Minute
+const (
+	DefaultTaskBackoffResetDuration = time.Minute
+	DefaultTaskBackoffJitter        = 0.1
+)
 
-// DynamicIntervalFunc is a function that decides the backoff interval based on the attempt history.
-type DynamicIntervalFunc func(ctx context.Context, executionTime time.Duration, invocation int, err error) time.Duration
+// TaskBackoffIntervalFunc is a function that decides the backoff interval based on the attempt history.
+// invocation is a counter, which starts at 1 and is incremented after each task function invocation.
+type TaskBackoffIntervalFunc func(ctx context.Context, executionDuration time.Duration, invocation uint, err error) time.Duration
 
+// TaskBackoffConfig represents task backoff configuration.
 type TaskBackoffConfig struct {
-	Jitter          float64
-	Intervals       []time.Duration
-	DynamicInterval DynamicIntervalFunc
+	Jitter       float64
+	IntervalFunc TaskBackoffIntervalFunc
 }
 
-const DefaultBackoffJitter = 0.1
+// MakeTaskBackoffIntervalFunc returns a new TaskBackoffIntervalFunc.
+func MakeTaskBackoffIntervalFunc(onFailure bool, resetDuration time.Duration, intervals ...time.Duration) TaskBackoffIntervalFunc {
+	return func(ctx context.Context, executionDuration time.Duration, invocation uint, err error) time.Duration {
+		switch {
+		case onFailure && err == nil:
+			return 0
+		case executionDuration > resetDuration:
+			return intervals[0]
+		case invocation >= uint(len(intervals)):
+			return intervals[len(intervals)-1]
+		default:
+			return intervals[invocation-1]
+		}
+	}
+}
 
-// DefaultTaskBackoffConfig is a default task backoff config to use.
-var DefaultTaskBackoffConfig = &TaskBackoffConfig{
-	Jitter: DefaultBackoffJitter,
-	Intervals: []time.Duration{
+var (
+	// DefaultTaskBackoffIntervals are the default task backoff intervals.
+	DefaultTaskBackoffIntervals = [...]time.Duration{
 		10 * time.Millisecond,
 		50 * time.Millisecond,
 		100 * time.Millisecond,
 		time.Second,
-	},
-}
+	}
+	// DefaultTaskBackoffIntervalFunc is the default TaskBackoffIntervalFunc.
+	DefaultTaskBackoffIntervalFunc = MakeTaskBackoffIntervalFunc(false, DefaultTaskBackoffResetDuration, DefaultTaskBackoffIntervals[:]...)
+	// DefaultTaskBackoffConfig is the default task backoff config.
+	DefaultTaskBackoffConfig = &TaskBackoffConfig{
+		Jitter:       DefaultTaskBackoffJitter,
+		IntervalFunc: DefaultTaskBackoffIntervalFunc,
+	}
 
-// DialTaskBackoffConfig is a default task backoff config to use.
-var DialTaskBackoffConfig = &TaskBackoffConfig{
-	Jitter: DefaultBackoffJitter,
-	Intervals: []time.Duration{
+	// DialTaskBackoffIntervals are the default task backoff intervals for tasks using Dial.
+	DialTaskBackoffIntervals = [...]time.Duration{
 		100 * time.Millisecond,
 		time.Second,
 		10 * time.Second,
-	},
-}
+	}
+	// DialTaskBackoffIntervalFunc is the default TaskBackoffIntervalFunc for tasks using Dial.
+	DialTaskBackoffIntervalFunc = MakeTaskBackoffIntervalFunc(false, DefaultTaskBackoffResetDuration, DialTaskBackoffIntervals[:]...)
+	// DialTaskBackoffConfig is the default task backoff config for tasks using Dial.
+	DialTaskBackoffConfig = &TaskBackoffConfig{
+		Jitter:       DefaultTaskBackoffJitter,
+		IntervalFunc: DialTaskBackoffIntervalFunc,
+	}
+)
 
 type TaskConfig struct {
 	Context context.Context
@@ -98,12 +126,15 @@ func (f StartTaskFunc) StartTask(conf *TaskConfig) {
 func DefaultStartTask(conf *TaskConfig) {
 	logger := log.FromContext(conf.Context).WithField("task_id", conf.ID)
 	go func() {
-		invocation := 0
+		invocation := uint(1)
 		for {
-			invocation++
+			if invocation == 0 {
+				logger.Warn("Invocation count rollover detected")
+				invocation = 1
+			}
 			startTime := time.Now()
 			err := conf.Func(conf.Context)
-			executionTime := time.Since(startTime)
+			executionDuration := time.Since(startTime)
 			if err != nil && err != context.Canceled {
 				logger.WithField("invocation", invocation).WithError(err).Warn("Task failed")
 			}
@@ -123,21 +154,12 @@ func DefaultStartTask(conf *TaskConfig) {
 				return
 			default:
 			}
-			var s time.Duration
-			switch {
-			case conf.Backoff == nil:
+			if conf.Backoff == nil {
 				continue
-			case conf.Backoff.DynamicInterval != nil:
-				s = conf.Backoff.DynamicInterval(conf.Context, executionTime, invocation, err)
-			default:
-				bi := invocation - 1
-				if bi >= len(conf.Backoff.Intervals) {
-					bi = len(conf.Backoff.Intervals) - 1
-				}
-				if executionTime > backoffResetTime {
-					bi = 0
-				}
-				s = conf.Backoff.Intervals[bi]
+			}
+			s := conf.Backoff.IntervalFunc(conf.Context, executionDuration, invocation, err)
+			if s == 0 {
+				continue
 			}
 			if conf.Backoff.Jitter != 0 {
 				s = random.Jitter(s, conf.Backoff.Jitter)
@@ -147,6 +169,7 @@ func DefaultStartTask(conf *TaskConfig) {
 				return
 			case <-time.After(s):
 			}
+			invocation++
 		}
 	}()
 }
