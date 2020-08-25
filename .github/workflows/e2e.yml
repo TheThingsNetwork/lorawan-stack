@@ -1,0 +1,66 @@
+name: End-to-end Tests
+on:
+  pull_request:
+    paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'pkg/**'
+      - 'tools/**'
+      - 'config/**'
+      - '!config/stack/ttn-lw-stack.yml'
+      - 'package.json'
+      - 'pkg/webui/**'
+      - 'sdk/js/**'
+      - 'yarn.lock'
+
+jobs:
+  end-to-end:
+    name: Frontend based (cypress)
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Get Yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(npx yarn cache dir)"
+      - name: Initialize Yarn module cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Initialize public folder cache
+        uses: actions/cache@v2
+        with:
+          path: public
+          key: ${{ runner.os }}-public-cache-${{ hashFiles('pkg/webui/**') }}-${{ hashFiles('sdk/js/**/*.js') }}-${{ hashFiles('config/webpack.config.babel.js') }}-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('pkg/ttnpb/field_mask_validation.go') }}
+      - name: Set up Go 1.14
+        uses: actions/setup-go@v2
+        with:
+          go-version: '~1.14'
+      - name: Initialize Go module cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Download Go tool dependencies
+        run: |
+          cd tools
+          go mod download
+      - name: Initialize tool binary cache
+        uses: actions/cache@v2
+        with:
+          path: tools/bin
+          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
+      - name: Make Mage
+        run: make tools/bin/mage
+      - name: Initialize stack environment
+        run: tools/bin/mage init
+      - name: Run test preparations
+        run: tools/bin/mage dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:dbDump js:Build
+      - name: Run frontend end-to-end tests
+        run: tools/bin/mage dev:startDevStack & tools/bin/mage -v js:cypressHeadless

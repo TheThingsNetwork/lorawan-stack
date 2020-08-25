@@ -28,6 +28,8 @@ After filling the fields in the **General Settings** section, scroll to the lowe
 
 You will now reach the device overview page for your device. The end device should now be able to join the private network.
 
+>Note: If you do not have a `JoinEUI` or `AppEUI`, it is okay to use `0000000000000000`. Be sure to use the same `JoinEUI` in your device as you enter in {{% tts %}}.
+
 {{< figure src="device-otaa-created.png" alt="OTAA device overview" >}}
 
 ### Activation By Personalization (ABP) Device
@@ -70,6 +72,8 @@ $ ttn-lw-cli end-devices create app1 dev1 \
 This will create a LoRaWAN 1.0.3 end device `dev1` in application `app1` with the `EU_863_870` frequency plan.
 
 The end device should now be able to join the private network.
+
+>Note: If you do not have a `JoinEUI` or `AppEUI`, it is okay to use `0000000000000000`. Be sure to use the same `JoinEUI` in your device as you enter in {{% tts %}}.
 
 >Note: The `AppEUI` is returned as `join_eui` (V3 uses LoRaWAN 1.1 terminology).
 

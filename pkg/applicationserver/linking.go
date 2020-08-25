@@ -44,6 +44,40 @@ func (as *ApplicationServer) linkAll(ctx context.Context) error {
 	)
 }
 
+var (
+	extendedLinkBackoffIntervals = append(component.DefaultTaskBackoffIntervals[:],
+		time.Minute,
+		5*time.Minute,
+		15*time.Minute,
+		30*time.Minute,
+	)
+
+	linkHealthyDuration = time.Minute
+	linkBackoffConfig   = &component.TaskBackoffConfig{
+		Jitter: component.DefaultTaskBackoffConfig.Jitter,
+		IntervalFunc: func(ctx context.Context, executionDuration time.Duration, invocation uint, err error) time.Duration {
+			intervals := component.DefaultTaskBackoffIntervals[:]
+			switch {
+			case errors.IsFailedPrecondition(err),
+				errors.IsUnauthenticated(err),
+				errors.IsPermissionDenied(err),
+				errors.IsInvalidArgument(err),
+				errors.IsAlreadyExists(err),
+				errors.IsCanceled(err):
+				intervals = extendedLinkBackoffIntervals
+			}
+			switch {
+			case executionDuration > linkHealthyDuration:
+				return intervals[0]
+			case invocation >= uint(len(intervals)):
+				return intervals[len(intervals)-1]
+			default:
+				return intervals[invocation-1]
+			}
+		},
+	}
+)
+
 func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.ApplicationIdentifiers) {
 	ctx = log.NewContextWithField(ctx, "application_uid", unique.ID(ctx, ids))
 	as.StartTask(&component.TaskConfig{
@@ -63,23 +97,10 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 				return nil
 			}
 
-			err = as.link(ctx, ids, target)
-			switch {
-			case errors.IsFailedPrecondition(err),
-				errors.IsUnauthenticated(err),
-				errors.IsPermissionDenied(err),
-				errors.IsInvalidArgument(err):
-				log.FromContext(ctx).WithError(err).Warn("Failed to link")
-				return nil
-			case errors.IsCanceled(err),
-				errors.IsAlreadyExists(err):
-				return nil
-			default:
-				return err
-			}
+			return as.link(ctx, ids, target)
 		},
 		Restart: component.TaskRestartOnFailure,
-		Backoff: component.DialTaskBackoffConfig,
+		Backoff: linkBackoffConfig,
 	})
 }
 
@@ -198,13 +219,13 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	}
 	if _, loaded := as.links.LoadOrStore(uid, l); loaded {
 		log.FromContext(ctx).Warn("Link already started")
-		return errAlreadyLinked.WithAttributes("application_uid", uid)
+		return nil
 	}
 	go func() {
 		<-ctx.Done()
 		as.linkErrors.Store(uid, ctx.Err())
 		as.links.Delete(uid)
-		if err := ctx.Err(); err != nil && !errors.IsCanceled(err) {
+		if err := ctx.Err(); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Link failed")
 			registerLinkFail(ctx, l, err)
 		}
@@ -226,10 +247,8 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	registerLinkStart(ctx, l)
 	go func() {
 		<-ctx.Done()
-		if err := ctx.Err(); errors.IsCanceled(err) {
-			logger.Info("Unlinked")
-			registerLinkStop(ctx, l)
-		}
+		logger.WithError(ctx.Err()).Info("Unlinked")
+		registerLinkStop(ctx, l)
 	}()
 
 	go l.run()
@@ -286,7 +305,7 @@ func (as *ApplicationServer) cancelLink(ctx context.Context, ids ttnpb.Applicati
 	if val, ok := as.links.Load(uid); ok {
 		l := val.(*link)
 		log.FromContext(ctx).WithField("application_uid", uid).Debug("Unlink")
-		l.cancel(context.Canceled)
+		l.cancel(nil)
 		select {
 		case <-ctx.Done():
 			return ctx.Err()

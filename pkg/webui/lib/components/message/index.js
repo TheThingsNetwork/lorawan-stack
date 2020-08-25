@@ -30,7 +30,7 @@ const renderContent = (content, component, props) => {
     }
   }
 
-  if (Boolean(component) || Boolean(props.className)) {
+  if (Boolean(Component) || Boolean(props.className)) {
     return <Component {...props}>{content}</Component>
   }
 

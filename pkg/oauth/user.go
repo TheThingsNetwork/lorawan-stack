@@ -17,7 +17,6 @@ package oauth
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"runtime/trace"
@@ -264,6 +263,9 @@ func (s *server) ClientLogout(c echo.Context) error {
 		} else {
 			for _, uri := range client.LogoutRedirectURIs {
 				redirectURI, err = osin.ValidateUri(uri, redirectParam)
+				if err == nil {
+					break
+				}
 			}
 			if err != nil {
 				return errInvalidLogoutRedirectURI.WithCause(err)
@@ -285,7 +287,7 @@ func (s *server) ClientLogout(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.Redirect(http.StatusFound, fmt.Sprintf("%s?%s", url.Path, url.RawQuery))
+	return c.Redirect(http.StatusFound, url.String())
 }
 
 func (s *server) Logout(c echo.Context) error {

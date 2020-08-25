@@ -193,19 +193,15 @@
   abbr:
     - AppID
 
-- term: Join EUI
-  description: The Join EUI (formerly called Application EUI) is a 64 bit extended unique identifier used to identify the join server during activation. This should be provided by the device manufacturer for pre-provisioned devices, or by the owner of the join server you will use.
+- term: JoinEUI
+  description: The JoinEUI (formerly called AppEUI) is a 64 bit extended unique identifier used to identify the Join Server during activation. This should be provided by the device manufacturer for pre-provisioned devices, or by the owner of the Join Server you will use. If you do not have a JoinEUI, it is okay to use `0000000000000000`, but ensure that you use the same JoinEUI in your device as you enter in The Things Stack.
+  link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=33
+
+- term: AppEUI
+  description: In LoRaWAN specifications prior to 1.1, JoinEUI was called AppEUI. See JoinEUI.
   link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=33
   alt:
-    - Application EUI
-  abbr:
     - JoinEUI
-
-- term: Application EUI
-  description: In LoRaWAN specifications prior to 1.1, Join EUI was called Application EUI. See Join EUI.
-  link: https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf#page=33
-  abbr:
-    - AppEUI
 
 - term: Application Session Key
   description: After activation, this encryption key is used to secure messages which carry a payload.

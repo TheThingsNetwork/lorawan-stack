@@ -245,6 +245,8 @@ const (
 	FUOTARequestType
 )
 
+var errRequestTypeUnsupported = errors.DefineInvalidArgument("request_type_unsupported", "request type `{type}` is unsupported")
+
 // MarshalJSON implements the json.Marshaler interface.
 func (t RequestType) MarshalJSON() ([]byte, error) {
 	var tp string
@@ -264,7 +266,7 @@ func (t RequestType) MarshalJSON() ([]byte, error) {
 	case FUOTARequestType:
 		tp = fuotaRequestType
 	default:
-		panic(fmt.Sprintf("RequestType %v is unsupported", t))
+		return nil, errRequestTypeUnsupported.WithAttributes("type", t)
 	}
 	return json.Marshal(tp)
 }
@@ -292,7 +294,7 @@ func (t *RequestType) UnmarshalJSON(b []byte) error {
 	case fuotaRequestType:
 		*t = FUOTARequestType
 	default:
-		panic(fmt.Sprintf("RequestType %v is unsupported", t))
+		return errRequestTypeUnsupported.WithAttributes("type", t)
 	}
 	return nil
 }
@@ -469,6 +471,8 @@ const (
 	gnssUplinkType    = "gnss"
 )
 
+var errUplinkTypeUnsupported = errors.DefineInvalidArgument("uplink_type_unsupported", "uplink type `{type}` is unsupported")
+
 // MarshalJSON implements the json.Marshaler interface.
 func (t LoRaUplinkType) MarshalJSON() ([]byte, error) {
 	var tp string
@@ -482,7 +486,7 @@ func (t LoRaUplinkType) MarshalJSON() ([]byte, error) {
 	case GNSSUplinkType:
 		tp = gnssUplinkType
 	default:
-		panic(fmt.Sprintf("LoRaUplinkType %v is unsupported", t))
+		return nil, errUplinkTypeUnsupported.WithAttributes("type", t)
 	}
 	return json.Marshal(tp)
 }
@@ -504,7 +508,7 @@ func (t *LoRaUplinkType) UnmarshalJSON(b []byte) error {
 	case gnssUplinkType:
 		*t = GNSSUplinkType
 	default:
-		panic(fmt.Sprintf("LoRaUplinkType %v is unsupported", t))
+		return errUplinkTypeUnsupported.WithAttributes("type", t)
 	}
 	return nil
 }
