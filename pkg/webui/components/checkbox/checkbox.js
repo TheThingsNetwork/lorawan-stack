@@ -125,6 +125,7 @@ class Checkbox extends React.PureComponent {
       onBlur,
       onFocus,
       indeterminate,
+      ...rest
     } = this.props
     const { checked } = this.state
 
@@ -142,6 +143,7 @@ class Checkbox extends React.PureComponent {
       checkboxProps.disabled = disabled
       checkboxProps.checked = checked
     }
+    checkboxProps.value = checkboxProps.checked
 
     const cls = classnames(className, style.wrapper, groupCls, {
       [style.disabled]: checkboxProps.disabled,
@@ -158,6 +160,7 @@ class Checkbox extends React.PureComponent {
             readOnly={readOnly}
             autoFocus={autoFocus}
             onChange={this.handleChange}
+            {...rest}
             {...checkboxProps}
           />
           <span className={style.checkmark} />

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - MAC commands (both requests and responses) are now only scheduled in class A downlink slots in accordance to latest revisions to LoRaWAN specification.
+- Scheduling failure events are now emitted on unsuccessful scheduling attempts.
 
 ### Deprecated
 
@@ -20,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - ISM2400 RX2, beacon and ping slot frequencies are now consistent with latest LoRaWAN specification draft.
+- CLI login issues when OAuth Server Address explicitly includes the `:443` HTTPS port.
 
 ### Security
 
@@ -37,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Network Server now only publishes payload-related downlink events if scheduling succeeds.
 - Moved remote IP event metadata outside authentication.
 - Admins can now set the expiration time of temporary passwords of users.
+- Application Server links are no longer canceled prematurely for special error codes. Longer back off times are used instead.
 
 ### Fixed
 

@@ -110,5 +110,12 @@ ca-key.pem
 /coverage
 /sdk/js/coverage
 
+# Cypress artifacts
+/cypress/screenshots
+/cypress/videos
+
+# Istanbul coverage
+.nyc_output
+
 # Release files
 /snapcraft.login

@@ -89,17 +89,25 @@ const appHTML = `
   </head>
   <body>
     <div id="app"></div>
-    <script>
-      window.APP_ROOT={{.MountPath}};
-      window.ASSETS_ROOT={{$assetsBaseURL}};
-      window.BRANDING_ROOT={{$brandingBaseURL}};
-      window.APP_CONFIG={{.AppConfig}};
-      window.SITE_NAME={{.SiteName}};
-      window.SITE_TITLE={{.Title}};
-			window.SITE_SUB_TITLE={{.SubTitle}};
-			window.SENTRY_DSN={{.SentryDSN}};
-			{{with .CSRFToken}}window.CSRF_TOKEN={{.}};{{end}}
-      {{with .PageData}}window.PAGE_DATA={{.}};{{end}}
+		<script>
+		(function (win) {
+			var config = {
+				APP_ROOT:{{.MountPath}},
+				ASSETS_ROOT:{{$assetsBaseURL}},
+				BRANDING_ROOT:{{$brandingBaseURL}},
+				APP_CONFIG:{{.AppConfig}},
+				SITE_NAME:{{.SiteName}},
+				SITE_TITLE:{{.Title}},
+				SITE_SUB_TITLE:{{.SubTitle}},
+				SENTRY_DSN:{{.SentryDSN}},
+				{{with .CSRFToken}}CSRF_TOKEN:{{.}},{{end}}
+				{{with .PageData}}PAGE_DATA:{{.}}{{end}}
+			};
+			win.__ttn_config__ = config;
+			if (win.Cypress && win.__initStackConfig) {
+				win.__initStackConfig(config);
+			}
+		})(window);
     </script>
     {{range .JSFiles}}<script type="text/javascript" src="{{$assetsBaseURL}}/{{.}}"></script>{{end}}
   </body>

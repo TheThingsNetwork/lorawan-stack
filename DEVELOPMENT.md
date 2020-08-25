@@ -726,9 +726,165 @@ $ tools/bin/mage go:eventData
 
 ## Testing
 
+### Unit Tests
+
+To run unit tests, use the following mage targets:
+
 ```bash
 $ tools/bin/mage go:test js:test jsSDK:test
 ```
+
+### End-to-end Tests
+
+We use [Cypress](https://cypress.io) for running frontend-based end-to-end tests. The tests specifications are located at `/cypress/integration`.
+
+#### Running frontend end-to-end tests locally
+
+Make sure to build the frontend assets and run the stack before executing end-to-end tests.
+
+`Cypress` provides two modes for running tests: headless and interactive.
+- Headless mode - will not display any browser GUI and output test progress into your terminal instead. This is helpful when one just needs see the results of the tests.
+- Interactive mode - will run an `Electron` based application together with the full-fledged browser. This is helpful when developig frontend applications as it provides hot reload, time travelling, browser extensions and DOM access.
+
+> Note: Currently, we test our frontend only in Chromium based browsers.
+
+You can run `Cypress` in the headless mode by running the following command:
+
+```bash
+$ tools/bin/mage js:cypressHeadless
+```
+
+You can run `Cypress` in the interactive mode by running the following command:
+
+```bash
+$ tools/bin/mage js:cypressInteractive
+```
+
+#### Code coverage
+
+Code coverage can be used to verify that tests invoke code for handling edge cases.
+To generate code coverage report run:
+
+- Global text summary.
+
+```bash
+$ npx nyc report --reporter=text-summary
+```
+
+- Per file text.
+
+```bash
+$ npx nyc report --reporter=text
+```
+
+- Per file with UI. This command will generate `index.html` file in the `coverage/cypress` folder.
+
+```bash
+$ npx nyc report --reporter=html
+```
+
+#### Writing End-to-End Tests
+
+It is highly suggested to read [Cypress documentation](https://docs.cypress.io/guides) before starting to write tests.
+
+##### Guding Principle
+
+We follow the following principle for writing useful end-to-end tests:
+
+> The more your tests resemble the way your software is used, the more confidence they can give you.
+
+This means that when writing tests, we always consider the real-life equivalent of the test scenario to design the test setup. This means:
+
+##### Selecting elements
+
+In line with the principle mentioned above, we have also included [`Testing Library`](https://testing-library.com/) to use advanced testing utilities. `Testing Library` has a good guide for [how to select elements](https://testing-library.com/docs/guide-which-query). We try to follow this guide for our end-to-end tests.
+
+In some cases it can be necessary to select DOM elements using a special selection data attribute. We use `data-test-id` for this purpose. Use this attribute to select DOM elements when more realistic means of selection are not sufficient. Use meaningful but concise ID values, such as `error-notification`.
+
+- Select DOM elements using text captions and labels when possible.
+  - Select form fields by its label via `cy.findByLabelText`, e.g. `cy.findByLabelText('User ID')`. Same for field errors,warnings and descriptions, use `cy.findErrorByLabelText`, `cy.findWarningByLabelText` and `cy.findDescriptionByLabelText`.
+  - Select buttons, links, tabs and other elements that are described by [ARIA roles](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques#Roles) via `cy.findByRole`, e.g. `cy.findByRole('button', {name: 'Submit'})`.
+  - Select text elements via `cy.findByText`.
+- Assert that selected elements are visible.
+
+  ```html
+  <!-- Instead of `visibility: hidden` it could be `display:none` or `z-index: -1` as well. -->
+  <div data-test-id="test" style="visibility: hidden">
+    Test content
+  </div>
+  ```
+
+  ```js
+  // Bad. This assertions will pass while not being visible to the user.
+  cy.findByTestId('test').should('exists')
+
+  // Good. This assertion will rightfully fail.
+  cy.findByTestId('test').should('be.visible')
+  ```
+
+##### Test runner globals
+
+`Cypress` uses [Mocha](https://mochajs.org/) as the test runner internally, while for unit tests we use [Jest](https://jestjs.io/). To keep our tests consistent we prefer using globals from `Jest` when possible.
+
+
+Jest globals | Mocha globals | Used for
+--- | --- | ---
+`describe` | `describe` | Group together related tests
+`it` | `it` | Define a single test
+`beforeEach`/`afterEach` | `beforeEach`/`AfterEach` | Hook before/after each test (`it`)
+`beforeAll`/`afterAll` | `before`/`after` | Hook before/after test block (`describe`)
+
+##### End-to-end tests file structure
+
+```bash
+./pkg/cypress
+|-- fixtures                    Cypress mocks
+|-- integration                 frontend end-to-end specifications (1)
+|   |-- console                 Console related end-to-end tests
+|   |   |-- users               tests related to user entity
+|   |   |-- ...
+|   |   |-- shared              tests that are not directly related to a specific entity (2)
+|   |-- oauth                   OAuth related end-to-end tests
+|   |   `-- ...
+|   `--smoke                    smoke tests (3)
+|-- plugins                     Cypress plugins
+|-- support                     Cypress commands and test utilities
+|-- screenshots                 screenshots generated when running tests (4)
+`-- videos                      videos generated when running tests (5)
+```
+
+1. `pkg/cypress/integration` contains all test specifications.
+  - Each test file must be placed into corresponding folder (`console`/`oauth`/`smoke`).
+  - Each test must follow the following naming: `{context}.spec.js`.
+  - One test file must have end-to-end tests dedicated only to a specific entity or view.
+2. `pkg/cypress/{console|oauth}/shared` contains all test specification not directly related to a single entity or a view. For example, `side-navigation.spec.js` or `header.spec.js` must be placed into the `cypress/console/shared` folder because both components are present on multiple views and are partially related to the stack entities. Make sure to scope cypress selections within the tested component using `cy.within`.
+3. `pkg/cypress/integration/smoke` contains tests that simulate a complete user story trying to do almost everything a typical user would do. For example, a typical smoke test can verify that the user is able to register, login, create application and register The Things Uno. For more details and diffeence between regular end-to-end and smoke tests see the [End-to-end tests structure](#organizing-end-to-end-tests) section.
+4. and 5. `Cypress` stores screenshots and videos to the appropriate folder after running end-to-end tests. These should not be added to the repository.
+
+##### Organizing end-to-end tests
+
+When writing end-to-end tests we comply with the following guidelines:
+
+- Tests are grouped by views for a specific entity. For example, when testing creation of application API keys:
+  1. Add test file `cypress/integration/console/applications/api-keys/create.spec.js`.
+  2. Test the behavior of the API key create view independently from any other specification.
+- Do not repeat actions via the UI that are not related to the current test context. Consider adding reusable [Cypress commands](https://docs.cypress.io/api/cypress-api/custom-commands.html) that do necessary test setup programmatically. This means that when testing any UI that is not the login specification and requies the user to be logged in, there is no need to log in through the login page, while we simply fetch the access token. Note: this does not mean that one cannot create a cypress command that performs actions via UI.
+- Extract components that appear on various views and test them separately instead of making assertions in each test where this component is used. For example, such components could be the page header and side navigation.
+- Dedicate at least one test to assert that the view displays its UI elements in place on initial load. Assert on UI changes in tests that trigger these changes.
+- Prefer duplicating entities with non-conflicting ids in tests instead of executing database teardown before each test. For example, when testing various scenarios for registering gateway, consider creating gateways with different ID's and EUI's instead of using a single gateway and drop the database before each test. Note: try to use this approach when possible, otherwise do not hesitate to restore database state before each test.
+- Consider various stack configurations when writing end-to-end tests. Some views have different UI depending on availability of diffenent stack components. For example, the end device wizard looks different for deployments with complete cluster (NS+JS+AS) and for JS-only configuration. Likewise, sections and entire views can be enabled or disabled based on our feature toggles. If your test scenario differs based on different feature toggle conditions, make sure to probe these preconditions in your tests.
+
+##### Smoke tests
+
+We distinguish between regular end-to-end tests and smoke tests. While regular end-to-end tests are scoped to a specific view or component and tests those in depth, smoke tests are testing complete user stories that are critical to the overall initegrity of the application and usually comprise multiple components and views, e.g. login flow, user registration or creation of applications. When writing smoke tests we comply with he following guidelines:
+
+- Smoke tests are testing complete user stories in a **wide and shallow** manner, meaning:
+  - performing some complex and critical flow that touches multiple components, APIs and/or views
+  - not testing different configurations or preconditions of the same flow in depth
+  - For example, when testing registration of The Things Uno:
+    1. Add test file `cypress/integration/smoke/devices/create.js`
+    2. Describe the whole user story to register the device including creating an application (or using an existing one), link the application and create the end device.
+- One smoke test should be encapsulated into a single `describeSmokeTest` declaration.
 
 ## Building and Running
 

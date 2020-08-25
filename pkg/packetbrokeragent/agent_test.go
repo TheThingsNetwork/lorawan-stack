@@ -43,7 +43,7 @@ import (
 )
 
 var (
-	timeout     = (1 << 4) * test.Delay
+	timeout     = (1 << 5) * test.Delay
 	testOptions []Option
 )
 
