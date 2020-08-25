@@ -316,7 +316,7 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 	t := test.MustTFromContext(ctx)
 
 	fp := FrequencyPlan(fpID)
-	phy := Band(fp.BandID, phyVersion)
+	phy := LoRaWANBands[fp.BandID][phyVersion]
 	upCh := phy.UplinkChannels[upChIdx]
 	upDR := phy.DataRates[upDRIdx].Rate
 
@@ -726,7 +726,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 
 		ids = *MakeOTAAIdentifiers(&joinReq.DevAddr)
 		fp := FrequencyPlan(fpID)
-		phy := Band(fp.BandID, phyVersion)
+		phy := LoRaWANBands[fp.BandID][phyVersion]
 
 		upChs := FrequencyPlanChannels(phy, fp.UplinkChannels, fp.DownlinkChannels...)
 		upChIdx := uint8(2)

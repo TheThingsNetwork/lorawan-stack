@@ -61,6 +61,8 @@ var (
 	FrequencyPlanChannels               = frequencyPlanChannels
 	HandleLinkCheckReq                  = handleLinkCheckReq
 	JoinResponseWithoutKeys             = joinResponseWithoutKeys
+	LoRaWANBands                        = lorawanBands
+	LoRaWANVersionPairs                 = lorawanVersionPairs
 	NewMACState                         = newMACState
 	TimePtr                             = timePtr
 
@@ -187,10 +189,6 @@ func AES128KeyPtr(key types.AES128Key) *types.AES128Key {
 
 func FrequencyPlan(id string) *frequencyplans.FrequencyPlan {
 	return test.Must(frequencyplans.NewStore(test.FrequencyPlansFetcher).GetByID(id)).(*frequencyplans.FrequencyPlan)
-}
-
-func Band(id string, phyVersion ttnpb.PHYVersion) band.Band {
-	return test.Must(test.Must(band.GetByID(id)).(band.Band).Version(phyVersion)).(band.Band)
 }
 
 func MakeDefaultEU868CurrentChannels() []*ttnpb.MACParameters_Channel {
@@ -582,18 +580,18 @@ func AppendMACCommanders(queue []*ttnpb.MACCommand, cmds ...MACCommander) []*ttn
 	return queue
 }
 
-func MakeUplinkMACBuffer(phy band.Band, cmds ...MACCommander) []byte {
+func MakeUplinkMACBuffer(phy *band.Band, cmds ...MACCommander) []byte {
 	var b []byte
 	for _, cmd := range cmds {
-		b = test.Must(lorawan.DefaultMACCommands.AppendUplink(phy, b, *cmd.MACCommand())).([]byte)
+		b = test.Must(lorawan.DefaultMACCommands.AppendUplink(*phy, b, *cmd.MACCommand())).([]byte)
 	}
 	return b
 }
 
-func MakeDownlinkMACBuffer(phy band.Band, cmds ...MACCommander) []byte {
+func MakeDownlinkMACBuffer(phy *band.Band, cmds ...MACCommander) []byte {
 	var b []byte
 	for _, cmd := range cmds {
-		b = test.Must(lorawan.DefaultMACCommands.AppendDownlink(phy, b, *cmd.MACCommand())).([]byte)
+		b = test.Must(lorawan.DefaultMACCommands.AppendDownlink(*phy, b, *cmd.MACCommand())).([]byte)
 	}
 	return b
 }
@@ -1907,29 +1905,13 @@ func MakeTestCaseName(parts ...string) string {
 	return strings.Join(parts, "/")
 }
 
-func ForEachBand(t *testing.T, f func(func(...string) string, band.Band, ttnpb.PHYVersion)) {
-	for phyID, phy := range band.All {
-		for _, phyVersion := range phy.Versions() {
+func ForEachBand(t *testing.T, f func(func(...string) string, *band.Band, ttnpb.PHYVersion)) {
+	for phyID, phyVersions := range LoRaWANBands {
+		for phyVersion, b := range phyVersions {
 			f(func(parts ...string) string {
-				return MakeTestCaseName(append(parts, fmt.Sprintf("%s/PHY:%s", phyID, phyVersion.String()))...)
-			}, Band(phyID, phyVersion), phyVersion)
+				return MakeTestCaseName(append(parts, phyID, fmt.Sprintf("PHY:%s", phyVersion.String()))...)
+			}, b, phyVersion)
 		}
-	}
-}
-
-func ForEachPHYVersion(f func(func(...string) string, ttnpb.PHYVersion)) {
-	for _, phyVersion := range []ttnpb.PHYVersion{
-		ttnpb.PHY_V1_0,
-		ttnpb.PHY_V1_0_1,
-		ttnpb.PHY_V1_0_2_REV_A,
-		ttnpb.PHY_V1_0_2_REV_B,
-		ttnpb.PHY_V1_0_3_REV_A,
-		ttnpb.PHY_V1_1_REV_A,
-		ttnpb.PHY_V1_1_REV_B,
-	} {
-		f(func(parts ...string) string {
-			return MakeTestCaseName(append(parts, fmt.Sprintf("PHY:%s", phyVersion.String()))...)
-		}, phyVersion)
 	}
 }
 
@@ -1973,21 +1955,21 @@ func ForEachFrequencyPlan(t *testing.T, f func(func(...string) string, string, *
 	}
 }
 
-func ForEachPHYMACVersion(f func(func(...string) string, ttnpb.PHYVersion, ttnpb.MACVersion)) {
-	ForEachPHYVersion(func(makePHYName func(...string) string, phyVersion ttnpb.PHYVersion) {
-		ForEachMACVersion(func(makeMACName func(...string) string, macVersion ttnpb.MACVersion) {
+func ForEachLoRaWANVersionPair(f func(func(...string) string, ttnpb.PHYVersion, ttnpb.MACVersion)) {
+	for macVersion, phyVersions := range LoRaWANVersionPairs {
+		for phyVersion := range phyVersions {
 			f(func(parts ...string) string {
-				return makePHYName(makeMACName(parts...))
+				return MakeTestCaseName(append(parts, fmt.Sprintf("MAC:%s", macVersion.String()), fmt.Sprintf("PHY:%s", phyVersion.String()))...)
 			}, phyVersion, macVersion)
-		})
-	})
+		}
+	}
 }
 
-func ForEachClassPHYMACVersion(f func(func(...string) string, ttnpb.Class, ttnpb.PHYVersion, ttnpb.MACVersion)) {
+func ForEachClassLoRaWANVersionPair(f func(func(...string) string, ttnpb.Class, ttnpb.PHYVersion, ttnpb.MACVersion)) {
 	ForEachClass(func(makeClassName func(...string) string, class ttnpb.Class) {
-		ForEachPHYMACVersion(func(makePHYMACName func(parts ...string) string, phyVersion ttnpb.PHYVersion, macVersion ttnpb.MACVersion) {
+		ForEachLoRaWANVersionPair(func(makeLoRaWANName func(parts ...string) string, phyVersion ttnpb.PHYVersion, macVersion ttnpb.MACVersion) {
 			f(func(parts ...string) string {
-				return makeClassName(makePHYMACName(parts...))
+				return makeClassName(makeLoRaWANName(parts...))
 			}, class, phyVersion, macVersion)
 		})
 	})
@@ -2003,26 +1985,26 @@ func ForEachClassMACVersion(f func(func(...string) string, ttnpb.Class, ttnpb.MA
 	})
 }
 
-func ForEachFrequencyPlanBandMACVersion(t *testing.T, f func(func(...string) string, string, *frequencyplans.FrequencyPlan, band.Band, ttnpb.PHYVersion, ttnpb.MACVersion)) {
+func ForEachFrequencyPlanLoRaWANVersionPair(t *testing.T, f func(func(...string) string, string, *frequencyplans.FrequencyPlan, *band.Band, ttnpb.PHYVersion, ttnpb.MACVersion)) {
 	ForEachFrequencyPlan(t, func(makeFPName func(...string) string, fpID string, fp *frequencyplans.FrequencyPlan) {
-		phy, err := band.GetByID(fp.BandID)
-		if err != nil {
-			t.Errorf("failed to get PHY by id `%s` associated with frequency plan `%s`: %s", fp.BandID, fpID, err)
-			return
-		}
-		for _, phyVersion := range phy.Versions() {
-			ForEachMACVersion(func(makeMACName func(parts ...string) string, macVersion ttnpb.MACVersion) {
-				f(func(parts ...string) string {
-					return makeFPName(makeMACName(append(parts, fmt.Sprintf("PHY:%s", phyVersion))...))
-				}, fpID, fp, Band(fp.BandID, phyVersion), phyVersion, macVersion)
-			})
-		}
+		ForEachLoRaWANVersionPair(func(makeLoRaWANName func(parts ...string) string, phyVersion ttnpb.PHYVersion, macVersion ttnpb.MACVersion) {
+			b, ok := LoRaWANBands[fp.BandID][phyVersion]
+			if !ok || b == nil {
+				return
+			}
+			f(func(parts ...string) string {
+				return makeFPName(makeLoRaWANName(parts...))
+			}, fpID, fp, b, phyVersion, macVersion)
+		})
 	})
 }
 
-func ForEachBandMACVersion(t *testing.T, f func(func(...string) string, band.Band, ttnpb.PHYVersion, ttnpb.MACVersion)) {
-	ForEachBand(t, func(makeBandName func(...string) string, phy band.Band, phyVersion ttnpb.PHYVersion) {
+func ForEachBandMACVersion(t *testing.T, f func(func(...string) string, *band.Band, ttnpb.PHYVersion, ttnpb.MACVersion)) {
+	ForEachBand(t, func(makeBandName func(...string) string, phy *band.Band, phyVersion ttnpb.PHYVersion) {
 		ForEachMACVersion(func(makeMACName func(...string) string, macVersion ttnpb.MACVersion) {
+			if _, ok := LoRaWANVersionPairs[macVersion][phyVersion]; !ok {
+				return
+			}
 			f(func(parts ...string) string {
 				return makeBandName(makeMACName(parts...))
 			}, phy, phyVersion, macVersion)

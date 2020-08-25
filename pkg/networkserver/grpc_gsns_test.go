@@ -588,7 +588,7 @@ func TestHandleUplink(t *testing.T) {
 		makeMDName := func(parts ...string) string {
 			return MakeTestCaseName(append(parts, fmt.Sprintf("Metadata length:%d", len(uplinkMDs)))...)
 		}
-		ForEachBand(t, func(makeLoopName func(...string) string, phy band.Band, phyVersion ttnpb.PHYVersion) {
+		ForEachBand(t, func(makeLoopName func(...string) string, phy *band.Band, phyVersion ttnpb.PHYVersion) {
 			switch phyVersion {
 			case ttnpb.PHY_V1_0_3_REV_A:
 			case ttnpb.PHY_V1_1_REV_B, ttnpb.PHY_V1_0_2_REV_B:
@@ -666,7 +666,7 @@ func TestHandleUplink(t *testing.T) {
 			)
 		})
 
-		ForEachFrequencyPlanBandMACVersion(t, func(makeLoopName func(...string) string, fpID string, fp *frequencyplans.FrequencyPlan, phy band.Band, phyVersion ttnpb.PHYVersion, macVersion ttnpb.MACVersion) {
+		ForEachFrequencyPlanLoRaWANVersionPair(t, func(makeLoopName func(...string) string, fpID string, fp *frequencyplans.FrequencyPlan, phy *band.Band, phyVersion ttnpb.PHYVersion, macVersion ttnpb.MACVersion) {
 			switch fpID {
 			case test.EUFrequencyPlanID, test.USFrequencyPlanID:
 			default:
@@ -1289,8 +1289,8 @@ func TestHandleUplink(t *testing.T) {
 
 			fpID := test.EUFrequencyPlanID
 			phyVersion := ttnpb.PHY_V1_1_REV_B
-			fp := test.Must(frequencyplans.NewStore(test.FrequencyPlansFetcher).GetByID(fpID)).(*frequencyplans.FrequencyPlan)
-			phy := test.Must(test.Must(band.GetByID(fp.BandID)).(band.Band).Version(phyVersion)).(band.Band)
+			fp := FrequencyPlan(fpID)
+			phy := LoRaWANBands[fp.BandID][phyVersion]
 			chIdx := uint8(len(phy.UplinkChannels) - 1)
 			ch := phy.UplinkChannels[chIdx]
 			drIdx := ch.MaxDataRate

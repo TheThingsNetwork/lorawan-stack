@@ -148,7 +148,7 @@ func makeDeferredMACHandler(dev *ttnpb.EndDevice, f macHandler) macHandler {
 }
 
 type matchedDevice struct {
-	phy band.Band
+	phy *band.Band
 
 	Context                  context.Context
 	ChannelIndex             uint8
@@ -196,7 +196,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 		logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
 		ctx = log.NewContext(ctx, logger)
 
-		_, phy, err := getDeviceBandVersion(dev.EndDevice, ns.FrequencyPlans)
+		_, phy, err := deviceFrequencyPlanAndBand(dev.EndDevice, ns.FrequencyPlans)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to get device's versioned band, skip")
 			continue
@@ -544,7 +544,7 @@ matchLoop:
 		var cmds []*ttnpb.MACCommand
 		for r := bytes.NewReader(cmdBuf); r.Len() > 0; {
 			cmd := &ttnpb.MACCommand{}
-			if err := lorawan.DefaultMACCommands.ReadUplink(match.phy, r, cmd); err != nil {
+			if err := lorawan.DefaultMACCommands.ReadUplink(*match.phy, r, cmd); err != nil {
 				logger.WithFields(log.Fields(
 					"bytes_left", r.Len(),
 					"mac_count", len(cmds),
@@ -1126,7 +1126,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return nil
 	}
 
-	fp, phy, err := getDeviceBandVersion(matched, ns.FrequencyPlans)
+	fp, phy, err := deviceFrequencyPlanAndBand(matched, ns.FrequencyPlans)
 	if err != nil {
 		return err
 	}
