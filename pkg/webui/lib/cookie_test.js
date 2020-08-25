@@ -14,16 +14,16 @@
 
 import getCookieValue from './cookie'
 
-describe('cookie utils', function() {
-  describe('`document.cookie` is empty', function() {
-    it('should return `undefined`', function() {
+describe('Cookie utils', function() {
+  describe('when `document.cookie` is empty', function() {
+    it('returns `undefined`', function() {
       const value = getCookieValue('missingKey')
 
       expect(value).toBeUndefined()
     })
   })
 
-  describe('`document.cookie` has a single entry', function() {
+  describe('when `document.cookie` has a single entry', function() {
     const key = 'testKey'
     const value = 'testValue'
 
@@ -35,16 +35,16 @@ describe('cookie utils', function() {
       document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 GMT`
     })
 
-    it('should extract value for existing key', function() {
+    it('extracts value for existing key', function() {
       expect(getCookieValue(key)).toBe(value)
     })
 
-    it('should return `undefined` for non existing key', function() {
+    it('returns `undefined` for non existing key', function() {
       expect(getCookieValue('nonExistingKey')).toBeUndefined()
     })
   })
 
-  describe('`document.cookie` has multiple entries', function() {
+  describe('when `document.cookie` has multiple entries', function() {
     const key1 = 'testKey1'
     const key2 = 'testKey2'
     const value1 = 'testValue1'
@@ -60,11 +60,11 @@ describe('cookie utils', function() {
       document.cookie = `${key2}=; expires=Thu, 01 Jan 1970 00:00:00 GMT`
     })
 
-    it('should extract the value of the first entry', function() {
+    it('extracts the value of the first entry', function() {
       expect(getCookieValue(key1)).toBe(value1)
     })
 
-    it('should extract the value of the second entry', function() {
+    it('extracts the value of the second entry', function() {
       expect(getCookieValue(key2)).toBe(value2)
     })
   })

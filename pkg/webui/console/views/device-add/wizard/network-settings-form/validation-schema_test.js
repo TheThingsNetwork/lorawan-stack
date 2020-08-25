@@ -71,8 +71,8 @@ describe('<NetworkSettingsForm /> validation schema', () => {
       },
     })
 
-  describe('is `ABP` activation mode', () => {
-    it('should handle `mac_settings.resets_f_cnt`', () => {
+  describe('when using `ABP` activation mode', () => {
+    it('handles `mac_settings.resets_f_cnt`', () => {
       const schema = {
         lorawan_version: '1.0.0',
         lorawan_phy_version: '1.0.0',
@@ -104,7 +104,7 @@ describe('<NetworkSettingsForm /> validation schema', () => {
       expect(validatedValue.mac_settings.resets_f_cnt).toBe(false)
     })
 
-    it('should require `f_nwk_s_int_key`', done => {
+    it('requires `f_nwk_s_int_key`', done => {
       const schema = {
         lorawan_version: '1.0.0',
         lorawan_phy_version: '1.0.0',
@@ -131,8 +131,8 @@ describe('<NetworkSettingsForm /> validation schema', () => {
     })
   })
 
-  describe('is `lorawan_version `1.1.0', () => {
-    it('should require `s_nwk_s_int_key` for `ABP` activation mode', done => {
+  describe('when `lorawan_version` is 1.1.0', () => {
+    it('requires `s_nwk_s_int_key` for `ABP` activation mode', done => {
       const schema = {
         lorawan_version: '1.1.0',
         lorawan_phy_version: '1.1.0-a',
@@ -161,7 +161,7 @@ describe('<NetworkSettingsForm /> validation schema', () => {
       }
     })
 
-    it('should require `nwk_s_enc_key` for `ABP` activation mode', done => {
+    it('requires `nwk_s_enc_key` for `ABP` activation mode', done => {
       const schema = {
         lorawan_version: '1.1.0',
         lorawan_phy_version: '1.1.0-a',
@@ -191,7 +191,7 @@ describe('<NetworkSettingsForm /> validation schema', () => {
       }
     })
 
-    it('should handle valid `session.keys` for `ABP` activation mode', () => {
+    it('handles valid `session.keys` for `ABP` activation mode', () => {
       const fNwkSIntKey = '1'.repeat(32)
       const sNwkSIntKey = '2'.repeat(32)
       const nwkSEncKey = '3'.repeat(32)
@@ -233,7 +233,7 @@ describe('<NetworkSettingsForm /> validation schema', () => {
       expect(keys.nwk_s_enc_key.key).toBe(nwkSEncKey)
     })
 
-    it('should require `s_nwk_s_int_key` for `multicast` activation mode', done => {
+    it('requires `s_nwk_s_int_key` for `multicast` activation mode', done => {
       const schema = {
         lorawan_version: '1.1.0',
         lorawan_phy_version: '1.1.0-a',
@@ -262,7 +262,7 @@ describe('<NetworkSettingsForm /> validation schema', () => {
       }
     })
 
-    it('should require `nwk_s_enc_key` for `multicast` activation mode', done => {
+    it('requires `nwk_s_enc_key` for `multicast` activation mode', done => {
       const schema = {
         lorawan_version: '1.1.0',
         lorawan_phy_version: '1.1.0-a',
@@ -291,7 +291,7 @@ describe('<NetworkSettingsForm /> validation schema', () => {
       }
     })
 
-    it('should handle valid `session.keys` for `multicast` activation mode', () => {
+    it('handles valid `session.keys` for `multicast` activation mode', () => {
       const fNwkSIntKey = '1'.repeat(32)
       const sNwkSIntKey = '2'.repeat(32)
       const nwkSEncKey = '3'.repeat(32)
@@ -333,7 +333,7 @@ describe('<NetworkSettingsForm /> validation schema', () => {
       expect(keys.nwk_s_enc_key.key).toBe(nwkSEncKey)
     })
 
-    it('should strip `session.keys` for `OTAA` activation mode', () => {
+    it('strips `session.keys` for `OTAA` activation mode', () => {
       const schema = {
         ids: {
           join_eui: '1'.repeat(16),
@@ -364,7 +364,7 @@ describe('<NetworkSettingsForm /> validation schema', () => {
       expect(validatedValue.session).toBeUndefined()
     })
 
-    it('should strip `session.keys` for `none` activation mode', () => {
+    it('strips `session.keys` for `none` activation mode', () => {
       const schema = {
         ids: {
           join_eui: '1'.repeat(16),

@@ -39,14 +39,14 @@ describe('<BasicSettingsForm /> validation schema', () => {
     }
   })
 
-  describe('is `OTAA` mode', () => {
+  describe('when using `OTAA` mode', () => {
     const validate = schema =>
       createValidation({
         activationMode: ACTIVATION_MODES.OTAA,
         lorawanVersion: '1.0.0',
       })(schema)
 
-    it('should require `join_eui`', done => {
+    it('requires `join_eui`', done => {
       schema.ids.dev_eui = deviceDevEUI
 
       try {
@@ -60,7 +60,7 @@ describe('<BasicSettingsForm /> validation schema', () => {
       }
     })
 
-    it('should require `dev_eui`', done => {
+    it('requires `dev_eui`', done => {
       schema.ids.join_eui = deviceJoinEUI
 
       try {
@@ -74,7 +74,7 @@ describe('<BasicSettingsForm /> validation schema', () => {
       }
     })
 
-    it('should process valid schema', () => {
+    it('processes valid schema', () => {
       schema.ids.join_eui = deviceJoinEUI
       schema.ids.dev_eui = deviceDevEUI
 
@@ -89,15 +89,15 @@ describe('<BasicSettingsForm /> validation schema', () => {
     })
   })
 
-  describe('is `ABP` activation mode', () => {
-    describe('is `lorawan_version` 1.0.4', () => {
+  describe('when using `ABP` activation mode', () => {
+    describe('when `lorawan_version` is 1.0.4', () => {
       const validate = schema =>
         createValidation({
           activationMode: ACTIVATION_MODES.ABP,
           lorawanVersion: '1.0.4',
         })(schema)
 
-      it('should require `dev_eui`', done => {
+      it('requires `dev_eui`', done => {
         try {
           validate(schema)
           done.fail('should fail')
@@ -118,14 +118,14 @@ describe('<BasicSettingsForm /> validation schema', () => {
       })
     })
 
-    describe('is `lorawan_version` 1.0.0', () => {
+    describe('when `lorawan_version` is 1.0.0', () => {
       const validate = schema =>
         createValidation({
           activationMode: ACTIVATION_MODES.ABP,
           lorawanVersion: '1.0.0',
         })(schema)
 
-      it('should process valid schema w/ or w/o `dev_eui`', () => {
+      it('processes valid schema w/ or w/o `dev_eui`', () => {
         let validatedValue = validate(schema)
 
         expect(validatedValue).toBeDefined()
@@ -150,15 +150,15 @@ describe('<BasicSettingsForm /> validation schema', () => {
     })
   })
 
-  describe('is `multicast` activation mode', () => {
-    describe('is `lorawan_version` 1.0.4', () => {
+  describe('when using `multicast` activation mode', () => {
+    describe('when `lorawan_version` is 1.0.4', () => {
       const validate = schema =>
         createValidation({
           activationMode: ACTIVATION_MODES.MULTICAST,
           lorawanVersion: '1.0.4',
         })(schema)
 
-      it('should require `dev_eui`', done => {
+      it('requires `dev_eui`', done => {
         try {
           validate(schema)
           done.fail('should fail')
@@ -171,14 +171,14 @@ describe('<BasicSettingsForm /> validation schema', () => {
       })
     })
 
-    describe('is `lorawan_version` 1.0.0', () => {
+    describe('when `lorawan_version` is 1.0.0', () => {
       const validate = schema =>
         createValidation({
           activationMode: ACTIVATION_MODES.MULTICAST,
           lorawanVersion: '1.0.0',
         })(schema)
 
-      it('should process valid schema w/ or w/o `dev_eui`', () => {
+      it('processes valid schema with or without `dev_eui`', () => {
         let validatedValue = validate(schema)
 
         expect(validatedValue).toBeDefined()
@@ -203,14 +203,14 @@ describe('<BasicSettingsForm /> validation schema', () => {
     })
   })
 
-  describe('is `none` activation mode', () => {
+  describe('when using `none` activation mode', () => {
     const validate = schema =>
       createValidation({
         activationMode: ACTIVATION_MODES.MULTICAST,
         lorawanVersion: '1.0.0',
       })(schema)
 
-    it('should process valid schema', () => {
+    it('processes valid schema', () => {
       const validatedValue = validate(schema)
 
       expect(validatedValue).toBeDefined()

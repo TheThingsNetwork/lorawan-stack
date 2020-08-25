@@ -14,27 +14,27 @@
 
 import getPaginationDriver from './index_driver'
 
-describe('Pagination', function() {
+describe('<Pagination />', function() {
   let driver = null
 
   beforeEach(function() {
     driver = getPaginationDriver()
   })
 
-  describe('has only a single page', function() {
+  describe('when it has only a single page', function() {
     describe('with hiding option disabled', function() {
       beforeEach(function() {
         driver.when.created({ pageCount: 1, hideIfOnlyOnePage: false })
       })
-      it('should match snapshot', function() {
+      it('matches snapshot', function() {
         expect(driver.component).toMatchSnapshot()
       })
 
-      it('should disable the previous page navigation', function() {
+      it('disables the previous page navigation', function() {
         expect(driver.is.prevNavigationDisabled()).toBeTruthy()
       })
 
-      it('should disable the next page navigation', function() {
+      it('disables the next page navigation', function() {
         expect(driver.is.nextNavigationDisabled()).toBeTruthy()
       })
     })
@@ -42,53 +42,53 @@ describe('Pagination', function() {
       beforeEach(function() {
         driver.when.created({ pageCount: 1 })
       })
-      it('should not render', function() {
+      it('does not render', function() {
         expect(driver.component).toBe(undefined)
       })
     })
   })
 
-  describe('has several pages', function() {
+  describe('when it has several pages', function() {
     beforeEach(function() {
       driver.when.created({ pageCount: 3 })
     })
 
-    it('should match snapshot', function() {
+    it('matches snapshot', function() {
       expect(driver.component).toMatchSnapshot()
     })
 
-    it('should select the first page', function() {
+    it('selects the first page', function() {
       expect(driver.is.firstPageSelected()).toBeTruthy()
     })
 
-    it('should disable the previous navigation', function() {
+    it('disables the previous navigation', function() {
       expect(driver.is.prevNavigationDisabled()).toBeTruthy()
     })
 
-    describe('the user moves to the next page', function() {
+    describe('when the user moves to the next page', function() {
       beforeEach(function() {
         driver.when.navigatedNextPage()
       })
 
-      it('should select the second page', function() {
+      it('selects the second page', function() {
         expect(driver.is.pageSelected(1)).toBeTruthy()
       })
 
-      it('should enable the previous navigation', function() {
+      it('enables the previous navigation', function() {
         expect(driver.is.prevNavigationDisabled()).toBeFalsy()
       })
     })
 
-    describe('the user moves to the last page', function() {
+    describe('when the user moves to the last page', function() {
       beforeEach(function() {
         driver.when.navigatedLastPage()
       })
 
-      it('should select the last page', function() {
+      it('selects the last page', function() {
         expect(driver.is.lastPageSelected()).toBeTruthy()
       })
 
-      it('should disable the the next navigation', function() {
+      it('shoulds disable the the next navigation', function() {
         expect(driver.is.nextNavigationDisabled()).toBeTruthy()
       })
     })

@@ -783,11 +783,147 @@ $ npx nyc report --reporter=text
 $ npx nyc report --reporter=html
 ```
 
+#### JavaScript based tests
+
+We find the [JS Unit Testing Guide](https://github.com/mawrkus/js-unit-testing-guide) a good starting point for informing our testing guidelines and we recommend reading through this guide. Note, that we employ some different approaches regarding [Grammar and Capitalization](#Grammar-and-capitalization).
+
+We have extracted and adapted the most important parts below.
+
+##### Pattern
+
+The goal of naming our tests is to have a concise and streamlined description helping us to understand what a test is testing specifically. In order to do that, we follow a **"unit of work - scenario/context - expected behaviour"** pattern:
+```js
+// Schema.
+describe('[unit of work]', () => {
+  it('[expected behaviour] when [scenario/context]', () => {
+    …
+  });
+});
+
+// Example.
+describe('Login', () => {
+  it('succeeds when using correct credentials', () => {
+    …
+  });
+});
+```
+
+This pattern will also help you organizing your tests better.
+
+##### Grammar and Capitalization
+
+Avoid using the modal verb `should` when describing tests. This will add redundancy and unnecessary verbosity to the test description. Instead, use a simple present tense sentence without any modality and with `when` as conjunction. Don't use end of sentence periods.
+
+The `[unit of work]` bit, as part of the outermost `describe()` function is always capitalized, whereas the `[expected behavior]` part of the `it()` function is always lowercase. This way, the suit will generate proper english sentences when concatenating the test descriptions.
+
+```js
+// Bad: using `should`.
+describe('Login', () => {
+  it('should succeed when using correct credentials', () => {
+    …
+  });
+});
+
+// Bad: wrong capitalization.
+describe('login', () => {
+  it('Succeeds when using correct credentials', () => {
+    …
+  });
+});
+
+// Good: No should and proper capitalization.
+describe('Login', () => {
+  it('succeeds when using correct credentials', () => {
+    …
+  });
+});
+
+```
+
+##### React Components
+
+When testing react components, the name of the component is written as `<ReactComponent />`.
+
+```js
+// Bad: not using JSX syntax.
+describe('MyComponent', () => {
+  it('matches snapshot', () => {
+    …
+  });
+});
+
+// Bad: describing the component instead of naming it.
+describe('My component', () => {
+  it('matches snapshot', () => {
+    …
+  });
+});
+
+// Good
+describe('<MyComponent />', () => {
+  it('matches snapshot', () => {
+    …
+  });
+});
+
+```
+
+##### Structurizing tests
+
+We always use the `describe() / it()` hooks to write all tests, even if there's only one test in the suite. This keeps our tests streamlined and allows for easy extension of the test suite.
+
+```js
+// Bad: using `test()` hook.
+test('flattens the object', () => {
+  …
+});
+
+// Good: using `describe() / it()` hooks
+describe('Get by path', () => {
+  it('succeeds when using correct credentials', () => {
+    …
+  });
+});
+
+```
+
+It's fine to use multiple hierarchies of `describe()` to group related tests more accurately:
+
+```js
+describe('User registration', () => {
+  it('succeeds when using valid inputs', () => {
+  });
+
+  describe('when using invalid input values', () => {
+    it('shows an error notification', () => {
+    });
+
+    it('does not perform a redirect', () => {
+    });
+  });
+
+  describe('when using an already registered email', () => {
+    it('shows an error notification', () => {
+    });
+  });
+});
+```
+
+##### Test Driven Development (TDD)
+
+Test Driven Development is a development philosophy that puts tests at the core of development. At The Things Industries, we don't enforce this method but we strongly encourage to adopt a process that emphasizes testing. Since adding fontend-based end-to-end tests to our codebase, we plan to do the following:
+
+1. Writing end-to-end tests for all newly added features
+2. Writing end-to-end tests for each (significant) bug that was resolved
+3. Gradually adding coverage to existing features
+
+Currently, we only employ frontend-based end-to-end tests, meaning that these tests can only be written if they are also operable through the frontend.
+
 #### Writing End-to-End Tests
 
 It is highly suggested to read [Cypress documentation](https://docs.cypress.io/guides) before starting to write tests.
 
-##### Guding Principle
+##### Guiding Principle
 
 We follow the following principle for writing useful end-to-end tests:
 

@@ -29,36 +29,36 @@ const children = (
   </React.Fragment>
 )
 
-describe('Profile Dropdown', function() {
+describe('<ProfileDropdown />', function() {
   let driver = null
 
   beforeEach(function() {
     driver = getProfileDropdownDriver()
   })
 
-  describe('is in initial state', function() {
+  describe('when in initial state', function() {
     beforeEach(function() {
       driver.when.created({ userName, children })
     })
-    it('should match snapshot', function() {
+    it('matches snapshot', function() {
       expect(driver.component).toMatchSnapshot()
     })
-    it('should not have the dropdown open by default', function() {
+    it('does not have the dropdown open by default', function() {
       expect(driver.is.dropdownOpen()).toBeFalsy()
     })
-    it('should open dropdown on click', function() {
+    it('opens dropdown on click', function() {
       driver.when.toggledDropdown()
       expect(driver.is.dropdownOpen()).toBeTruthy()
     })
 
-    describe('has dropdown open', function() {
+    describe('when it has dropdown open', function() {
       beforeEach(function() {
         driver.when.toggledDropdown()
       })
-      it('should match snapshot', function() {
+      it('matches snapshot', function() {
         expect(driver.component).toMatchSnapshot()
       })
-      it('should close dropdown on click', function() {
+      it('closes dropdown on click', function() {
         driver.when.toggledDropdown()
         expect(driver.is.dropdownOpen()).toBeFalsy()
       })

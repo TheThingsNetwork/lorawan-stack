@@ -14,7 +14,7 @@
 
 import { parseLorawanMacVersion } from './device-utils'
 
-describe('parseLorawanMacVersion', () => {
+describe('Parsing LoRaWAN Mac Version', () => {
   it.each([
     ['1.0.0', 100],
     ['1.0.1', 101],
@@ -32,7 +32,7 @@ describe('parseLorawanMacVersion', () => {
     [undefined, 0],
     ['invalid', 0],
     ['', 0],
-  ])('parseLorawanVersion(%p) = %i', (actual, expected) => {
+  ])('yields parseLorawanVersion(%p) = %i', (actual, expected) => {
     expect(parseLorawanMacVersion(actual)).toBe(expected)
   })
 })

@@ -14,11 +14,11 @@
 
 import computePrefixes from './compute-prefix'
 
-describe('computePrefix', function() {
-  describe('should compoute prefix lengths that round exactly to characters', () => {
+describe('Compute JoinEUI prefix', function() {
+  describe('when computing prefix lengths that round exactly to characters', () => {
     const joinEUI = '1'.repeat(16)
 
-    it('should compute empty prefix', () => {
+    it('computes empty prefix', () => {
       const length = 0
       const prefixes = computePrefixes(joinEUI, length)
 
@@ -26,7 +26,7 @@ describe('computePrefix', function() {
       expect(prefixes[0]).toBe('')
     })
 
-    it('should compute prefixes with length rounded to full bytes (1-8)', () => {
+    it('computes prefixes with length rounded to full bytes (1-8)', () => {
       for (let i = 1; i <= 8; i++) {
         const length = i * 8
         const prefixes = computePrefixes(joinEUI, length)
@@ -36,7 +36,7 @@ describe('computePrefix', function() {
       }
     })
 
-    it('should compute prefixes with length rounded to full hex chars (e.g. 0.5, 1.5 bytes)', () => {
+    it('computes prefixes with length rounded to full hex chars (e.g. 0.5, 1.5 bytes)', () => {
       for (let i = 1; i <= 8; i++) {
         const length = i * 8 - 4
         const prefixes = computePrefixes(joinEUI, length)
@@ -47,7 +47,7 @@ describe('computePrefix', function() {
     })
   })
 
-  describe('should compoute prefix lengths that do not round exactly to characters', () => {
+  describe('when computing prefix lengths that do not round exactly to characters', () => {
     const data = [
       {
         joinEUI: '1111111111111111',
@@ -91,7 +91,7 @@ describe('computePrefix', function() {
       },
     ]
 
-    it('should compute prefix of lengths that do not round exactly to characters', () => {
+    it('computes prefix of lengths that do not round exactly to characters', () => {
       for (let i = 0; i < data.length; i++) {
         const { joinEUI, length, result } = data[i]
         const prefixes = computePrefixes(joinEUI, length)

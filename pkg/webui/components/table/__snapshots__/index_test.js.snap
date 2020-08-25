@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Table has clickable rows should match snapshot 1`] = `
+exports[`<Table /> when it has clickable rows matches snapshot 1`] = `
 <div
   className="container"
 >
@@ -89,7 +89,7 @@ exports[`Table has clickable rows should match snapshot 1`] = `
 </div>
 `;
 
-exports[`Table has no data provided should match snapshot 1`] = `
+exports[`<Table /> when it has no data provided matches snapshot 1`] = `
 <div
   className="container"
 >
@@ -138,7 +138,7 @@ exports[`Table has no data provided should match snapshot 1`] = `
 </div>
 `;
 
-exports[`Table is paginated should match snapshot 1`] = `
+exports[`<Table /> when it is paginated matches snapshot 1`] = `
 <div
   className="container"
 >
@@ -253,7 +253,7 @@ exports[`Table is paginated should match snapshot 1`] = `
 </div>
 `;
 
-exports[`Table is sortable should match snapshot 1`] = `
+exports[`<Table /> when it is sortable matches snapshot 1`] = `
 <div
   className="container"
 >

@@ -14,7 +14,7 @@
 
 import { getHeadCellDriver, getDataCellDriver } from './index_driver'
 
-describe('HeadCell', function() {
+describe('<HeadCell />', function() {
   let driver = null
 
   beforeEach(function() {
@@ -24,11 +24,11 @@ describe('HeadCell', function() {
     })
   })
 
-  it('should match snapshot', function() {
+  it('matches snapshot', function() {
     expect(driver.component).toMatchSnapshot()
   })
 
-  it('should be a `th` element', function() {
+  it('is a `th` element', function() {
     expect(driver.get.cellType()).toBe('th')
   })
 })
@@ -43,11 +43,11 @@ describe('DataCell', function() {
     })
   })
 
-  it('should match snapshot', function() {
+  it('matches snapshot', function() {
     expect(driver.component).toMatchSnapshot()
   })
 
-  it('should be a `th` element', function() {
+  it('is a `th` element', function() {
     expect(driver.get.cellType()).toBe('td')
   })
 })
