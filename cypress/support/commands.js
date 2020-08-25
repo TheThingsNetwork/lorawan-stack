@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import stringToHash from '../../pkg/webui/lib/string-to-hash'
+import { getSiteName, getSiteTitle } from './utils'
 
 // Helper function to quickly login to the oauth app programmatically.
 Cypress.Commands.add('loginOAuth', credentials => {
@@ -171,4 +172,22 @@ Cypress.Commands.add('findWarningByLabelText', label => {
 // Helper function to select field description.
 Cypress.Commands.add('findDescriptionByLabelText', label => {
   return getFieldDescriptorByLabel(label)
+})
+
+// Helper function to get stack configuration object.
+Cypress.Commands.add('stackConfiguration', () => {
+  return cy.window().its('__ttn_config__')
+})
+
+// Change default behavior of `cy.title` to include title related entries from the stack configuration.
+Cypress.Commands.overwrite('title', original => {
+  return cy.stackConfiguration().then(config => {
+    return original().then(title => ({
+      title: title,
+      config: {
+        siteName: getSiteName(config),
+        siteTitle: getSiteTitle(config),
+      },
+    }))
+  })
 })
