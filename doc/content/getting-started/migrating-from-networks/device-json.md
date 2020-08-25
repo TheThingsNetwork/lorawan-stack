@@ -30,7 +30,7 @@ weight: 10
 | `session.last_f_cnt_up` | int | Optional, frame counter uplink. [More info]({{< ref "reference/api/end_device#message:MACSettings" >}}) |
 | `session.last_n_f_cnt_down` | int | Optional, frame counter downlinks. [More info]({{< ref "reference/api/end_device#message:MACSettings" >}}) |
 
-> Note: the column **Field** uses *Dot Notations*, the below examples uses *Bracket Notation*. `root_keys.nwk_app.key` can also be written as: 
+> Note: The dots in the **Field** column imply an embedded object. For example, `root_keys.nwk_app.key` must be set as: 
 > ```
 > "root_keys": {
 >   "nwk_key:": {
