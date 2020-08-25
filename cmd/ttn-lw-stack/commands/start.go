@@ -241,7 +241,7 @@ var startCommand = &cobra.Command{
 			config.AS.PubSub.Registry = &asiopsredis.PubSubRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("as", "io", "pubsub")),
 			}
-			config.AS.ApplicationPackages.Registry = &asioapredis.ApplicationPackagesRegistry{
+			config.AS.Packages.Registry = &asioapredis.ApplicationPackagesRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("as", "io", "applicationpackages")),
 			}
 			if config.AS.Webhooks.Target != "" {
