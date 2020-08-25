@@ -15,12 +15,10 @@
 package applicationserver
 
 import (
-	"time"
-
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 func init() {
-	linkBackoffConfig.DynamicInterval = nil
-	linkBackoffConfig.Intervals = []time.Duration{(1 << 5) * test.Delay}
+	linkBackoffConfig.IntervalFunc = component.MakeTaskBackoffIntervalFunc(false, component.DefaultTaskBackoffResetDuration, (1<<5)*test.Delay)
 }

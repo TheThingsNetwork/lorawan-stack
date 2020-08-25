@@ -74,12 +74,12 @@ func (ps *PubSub) startAll(ctx context.Context) error {
 }
 
 var startBackoffConfig = &component.TaskBackoffConfig{
-	Jitter: component.DefaultBackoffJitter,
-	Intervals: []time.Duration{
-		100 * time.Millisecond,
+	Jitter: component.DefaultTaskBackoffJitter,
+	IntervalFunc: component.MakeTaskBackoffIntervalFunc(false, component.DefaultTaskBackoffResetDuration,
+		100*time.Millisecond,
 		time.Second,
-		10 * time.Second,
-	},
+		10*time.Second,
+	),
 }
 
 func (ps *PubSub) startTask(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) {
