@@ -239,7 +239,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	}
 	evs := events.Builders{evt.With(events.WithData(pld))}
 
-	_, phy, err := deviceFrequencyPlanAndBand(dev, fps)
+	phy, err := deviceBand(dev, fps)
 	if err != nil {
 		return evs, err
 	}

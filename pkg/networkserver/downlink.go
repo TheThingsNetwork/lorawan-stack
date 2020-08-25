@@ -110,7 +110,7 @@ func (ns *NetworkServer) updateDataDownlinkTask(ctx context.Context, dev *ttnpb.
 		earliestAt = t
 	}
 	var taskAt time.Time
-	_, phy, err := deviceFrequencyPlanAndBand(dev, ns.FrequencyPlans)
+	phy, err := deviceBand(dev, ns.FrequencyPlans)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to determine device band")
 	} else {

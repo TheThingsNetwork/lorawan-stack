@@ -121,6 +121,11 @@ func deviceFrequencyPlanAndBand(dev *ttnpb.EndDevice, fps *frequencyplans.Store)
 	return fp, b, nil
 }
 
+func deviceBand(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*band.Band, error) {
+	_, phy, err := deviceFrequencyPlanAndBand(dev, fps)
+	return phy, err
+}
+
 func searchUplinkChannel(freq uint64, macState *ttnpb.MACState) (uint8, error) {
 	for i, ch := range macState.CurrentParameters.Channels {
 		if ch.UplinkFrequency == freq {

@@ -196,7 +196,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 		logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
 		ctx = log.NewContext(ctx, logger)
 
-		_, phy, err := deviceFrequencyPlanAndBand(dev.EndDevice, ns.FrequencyPlans)
+		phy, err := deviceBand(dev.EndDevice, ns.FrequencyPlans)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to get device's versioned band, skip")
 			continue

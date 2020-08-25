@@ -6098,7 +6098,7 @@ func TestGenerateDownlink(t *testing.T) {
 			}
 
 			dev := CopyEndDevice(tc.Device)
-			_, phy, err := deviceFrequencyPlanAndBand(dev, ns.FrequencyPlans)
+			phy, err := deviceBand(dev, ns.FrequencyPlans)
 			if !a.So(err, should.BeNil) {
 				t.Fail()
 				return
