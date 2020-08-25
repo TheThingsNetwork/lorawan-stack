@@ -15,8 +15,6 @@
 package oauth
 
 import (
-	"context"
-
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
@@ -42,14 +40,4 @@ type Config struct {
 	Mount       string   `name:"mount" description:"Path on the server where the OAuth server will be served"`
 	UI          UIConfig `name:"ui"`
 	CSRFAuthKey []byte   `name:"-"`
-}
-
-// ConfigProvider returns the server configuration based on the context.
-type ConfigProvider func(context.Context) Config
-
-// StaticConfigProvider is a provider that always returns the same config.
-func StaticConfigProvider(conf Config) ConfigProvider {
-	return func(context.Context) Config {
-		return conf
-	}
 }
