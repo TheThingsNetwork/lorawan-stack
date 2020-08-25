@@ -3573,7 +3573,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				setDevice := CopyEndDevice(getDevice)
 				setDevice.MACState.LastDownlinkAt = &downAt
 				setDevice.MACState.LastNetworkInitiatedDownlinkAt = &downAt
-				setDevice.MACState.QueuedResponses = nil
 				setDevice.MACState.RecentDownlinks = append(setDevice.MACState.RecentDownlinks, lastDown)
 				setDevice.MACState.RxWindowsAvailable = false
 				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
