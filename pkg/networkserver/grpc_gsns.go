@@ -173,6 +173,41 @@ type contextualEndDevice struct {
 	*ttnpb.EndDevice
 }
 
+func applyCFList(cfList *ttnpb.CFList, phy *band.Band, chs ...*ttnpb.MACParameters_Channel) ([]*ttnpb.MACParameters_Channel, bool) {
+	if cfList == nil {
+		return chs, true
+	}
+	switch cfList.Type {
+	case ttnpb.CFListType_FREQUENCIES:
+		for _, freq := range cfList.Freq {
+			if freq == 0 {
+				break
+			}
+			chs = append(chs, &ttnpb.MACParameters_Channel{
+				UplinkFrequency:   uint64(freq * 100),
+				DownlinkFrequency: uint64(freq * 100),
+				MaxDataRateIndex:  phy.MaxADRDataRateIndex,
+				EnableUplink:      true,
+			})
+		}
+
+	case ttnpb.CFListType_CHANNEL_MASKS:
+		if len(chs) != len(cfList.ChMasks) {
+			return nil, false
+		}
+		for i, m := range cfList.ChMasks {
+			if m {
+				continue
+			}
+			if chs[i] == nil {
+				return nil, false
+			}
+			chs[i].EnableUplink = m
+		}
+	}
+	return chs, true
+}
+
 // matchAndHandleDataUplink tries to match the data uplink message with a device and returns the matched device.
 func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, deduplicated bool, devs ...contextualEndDevice) (*matchedDevice, error) {
 	if len(up.RawPayload) < 4 {
@@ -474,38 +509,12 @@ matchLoop:
 				// The version will be further negotiated via RekeyInd/RekeyConf
 				match.Device.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
 			}
-			if match.Device.MACState.PendingJoinRequest.CFList != nil {
-				switch match.Device.MACState.PendingJoinRequest.CFList.Type {
-				case ttnpb.CFListType_FREQUENCIES:
-					for _, freq := range match.Device.MACState.PendingJoinRequest.CFList.Freq {
-						if freq == 0 {
-							break
-						}
-						match.Device.MACState.CurrentParameters.Channels = append(match.Device.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
-							UplinkFrequency:   uint64(freq * 100),
-							DownlinkFrequency: uint64(freq * 100),
-							MaxDataRateIndex:  match.phy.MaxADRDataRateIndex,
-							EnableUplink:      true,
-						})
-					}
-
-				case ttnpb.CFListType_CHANNEL_MASKS:
-					if len(match.Device.MACState.CurrentParameters.Channels) != len(match.Device.MACState.PendingJoinRequest.CFList.ChMasks) {
-						logger.Debug("Device channel length does not equal length of join-request ChMasks, skip")
-						continue matchLoop
-					}
-					for i, m := range match.Device.MACState.PendingJoinRequest.CFList.ChMasks {
-						if m {
-							continue
-						}
-						if match.Device.MACState.CurrentParameters.Channels[i] == nil {
-							logger.WithField("channel_index", i).Debug("Device channel present in join-request ChMasks is not defined, skip")
-							continue matchLoop
-						}
-						match.Device.MACState.CurrentParameters.Channels[i].EnableUplink = m
-					}
-				}
+			chs, ok := applyCFList(match.Device.MACState.PendingJoinRequest.CFList, match.phy, match.Device.MACState.CurrentParameters.Channels...)
+			if !ok {
+				logger.Debug("Failed to apply CFList, skip")
+				continue
 			}
+			match.Device.MACState.CurrentParameters.Channels = chs
 		}
 		if session.FNwkSIntKey == nil || len(session.FNwkSIntKey.Key) == 0 {
 			logger.Warn("Device missing FNwkSIntKey in registry, skip")
