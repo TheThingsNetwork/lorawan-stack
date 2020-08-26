@@ -400,6 +400,15 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 			} else {
 				dst.DecodedPayload = nil
 			}
+		case "decoded_payload_warnings":
+			if len(subs) > 0 {
+				return fmt.Errorf("'decoded_payload_warnings' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DecodedPayloadWarnings = src.DecodedPayloadWarnings
+			} else {
+				dst.DecodedPayloadWarnings = nil
+			}
 		case "rx_metadata":
 			if len(subs) > 0 {
 				return fmt.Errorf("'rx_metadata' has no subfields, but %s were specified", subs)
@@ -661,6 +670,15 @@ func (dst *ApplicationDownlink) SetFields(src *ApplicationDownlink, paths ...str
 				dst.DecodedPayload = src.DecodedPayload
 			} else {
 				dst.DecodedPayload = nil
+			}
+		case "decoded_payload_warnings":
+			if len(subs) > 0 {
+				return fmt.Errorf("'decoded_payload_warnings' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DecodedPayloadWarnings = src.DecodedPayloadWarnings
+			} else {
+				dst.DecodedPayloadWarnings = nil
 			}
 		case "confirmed":
 			if len(subs) > 0 {

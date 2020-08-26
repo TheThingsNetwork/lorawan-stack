@@ -7271,6 +7271,15 @@
       "file": "observability.go"
     }
   },
+  "event:as.down.data.decode.warning": {
+    "translations": {
+      "en": "decode downlink data message warning"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
   "event:as.down.data.drop": {
     "translations": {
       "en": "drop downlink data message"
@@ -7283,6 +7292,15 @@
   "event:as.down.data.encode.fail": {
     "translations": {
       "en": "encode downlink data message failure"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.down.data.encode.warning": {
+    "translations": {
+      "en": "encode downlink data message warning"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -7427,6 +7445,15 @@
   "event:as.up.data.decode.fail": {
     "translations": {
       "en": "decode uplink data message failure"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.data.decode.warning": {
+    "translations": {
+      "en": "decode uplink data message warning"
     },
     "description": {
       "package": "pkg/applicationserver",

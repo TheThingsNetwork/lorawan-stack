@@ -105,6 +105,7 @@ func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 	}
 
 	msg.FRMPayload = output.Bytes
+	msg.DecodedPayloadWarnings = output.Warnings
 	if output.FPort != nil {
 		fPort := *output.FPort
 		msg.FPort = uint32(fPort)
@@ -166,6 +167,7 @@ func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers,
 		return errOutput.WithCause(err)
 	}
 	msg.DecodedPayload = s
+	msg.DecodedPayloadWarnings = output.Warnings
 	return nil
 }
 
@@ -215,5 +217,6 @@ func (h *host) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 		return errOutput.WithCause(err)
 	}
 	msg.DecodedPayload = s
+	msg.DecodedPayloadWarnings = output.Warnings
 	return nil
 }

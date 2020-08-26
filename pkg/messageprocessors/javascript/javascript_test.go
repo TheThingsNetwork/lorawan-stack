@@ -144,18 +144,25 @@ func TestEncodeDownlink(t *testing.T) {
 		script := `
 		function encodeDownlink(input) {
 			var val = input.data.temperature * 100
+			var bytes = [
+				(val >> 8) & 0xff,
+				val & 0xff
+			];
+			var warnings = [];
+			if (input.data.temperature < -10) {
+				warnings.push("it's cold");
+			}
 			return {
-				bytes: [
-					(val >> 8) & 0xff,
-					val & 0xff
-				],
-				fPort: input.fPort
+				bytes: bytes,
+				fPort: input.fPort,
+				warnings: warnings
 			}
 		}
 		`
 		err := host.EncodeDownlink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
 		a.So(message.FRMPayload, should.Resemble, []byte{247, 174})
+		a.So(message.DecodedPayloadWarnings, should.Resemble, []string{"it's cold"})
 	}
 
 	// The Things Node example.
@@ -324,10 +331,16 @@ func TestDecodeUplink(t *testing.T) {
 	{
 		script := `
 		function decodeUplink(input) {
+			var data = {
+				temperature: (((input.bytes[0] & 0x80 ? input.bytes[0] - 0x100 : input.bytes[0]) << 8) | input.bytes[1]) / 100
+			}
+			var warnings = [];
+			if (data.temperature < -10) {
+				warnings.push("it's cold");
+			}
 			return {
-				data: {
-					temperature: (((input.bytes[0] & 0x80 ? input.bytes[0] - 0x100 : input.bytes[0]) << 8) | input.bytes[1]) / 100
-				}
+				data: data,
+				warnings: warnings
 			}
 		}
 		`
@@ -338,6 +351,7 @@ func TestDecodeUplink(t *testing.T) {
 		a.So(m, should.Resemble, map[string]interface{}{
 			"temperature": -21.3,
 		})
+		a.So(message.DecodedPayloadWarnings, should.Resemble, []string{"it's cold"})
 	}
 
 	// The Things Node example.
@@ -464,10 +478,16 @@ func TestDecodeDownlink(t *testing.T) {
 		function decodeDownlink(input) {
 			switch (input.fPort) {
 			case 4:
+				var data = {
+					color: ["red", "green", "blue"][input.bytes[0]]
+				}
+				var warnings = [];
+				if (data.color === "blue") {
+					warnings.push("this is my favorite color");
+				}
 				return {
-					data: {
-						color: ["red", "green", "blue"][input.bytes[0]]
-					}
+					data: data,
+					warnings: warnings
 				}
 			default:
 				return {
@@ -483,6 +503,7 @@ func TestDecodeDownlink(t *testing.T) {
 		a.So(m, should.Resemble, map[string]interface{}{
 			"color": "blue",
 		})
+		a.So(message.DecodedPayloadWarnings, should.Resemble, []string{"this is my favorite color"})
 	}
 
 	// Return invalid type.
