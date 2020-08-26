@@ -123,7 +123,7 @@ func (e *pubsub) Unsubscribe(name string, hdl Handler) {
 
 func (e *pubsub) Publish(evt Event) {
 	localEvent := local(evt)
-	publishes.WithLabelValues(evt.Context(), evt.Name()).Inc()
+	publishes.WithLabelValues(evt.Name()).Inc()
 	e.events <- tracedEvent{
 		event: localEvent.withCaller(),
 		trace: trace.StartRegion(evt.Context(), "publish event"),
