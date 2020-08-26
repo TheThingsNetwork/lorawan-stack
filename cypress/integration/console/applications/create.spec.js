@@ -62,10 +62,9 @@ describe('Application create', () => {
       .should('contain', 'Leave empty to link to the Network Server in the same cluster')
       .and('be.visible')
     cy.findByRole('button', { name: 'Create application' }).should('be.visible')
-    cy.title().should(
-      'eq',
-      `Add application - ${Cypress.config('siteTitle')} - ${Cypress.config('siteName')}`,
-    )
+    cy.title().then(({ title, config }) => {
+      expect(title).to.eq(`Add application - ${config.siteTitle} - ${config.siteName}`)
+    })
   })
 
   it('validates before submitting an empty form', () => {
@@ -123,10 +122,9 @@ describe('Application create', () => {
       cy.findByLabelText('Linking').should('not.exist')
       cy.findByLabelText('Network Server address').should('not.exist')
       cy.findByRole('button', { name: 'Create application' }).should('be.visible')
-      cy.title().should(
-        'eq',
-        `Add application - ${Cypress.config('siteTitle')} - ${Cypress.config('siteName')}`,
-      )
+      cy.title().then(({ title, config }) => {
+        expect(title).to.eq(`Add application - ${config.siteTitle} - ${config.siteName}`)
+      })
     })
   })
 })
