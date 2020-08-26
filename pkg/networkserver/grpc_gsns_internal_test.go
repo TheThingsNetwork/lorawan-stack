@@ -23,10 +23,8 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -103,57 +101,56 @@ func TestMatchAndHandleUplink(t *testing.T) {
 	}
 	var tcs []TestCase
 
-	fpID := test.EUFrequencyPlanID
-	phyVersion := ttnpb.PHY_V1_1_REV_B
-	fp := test.Must(frequencyplans.NewStore(test.FrequencyPlansFetcher).GetByID(fpID)).(*frequencyplans.FrequencyPlan)
-	phy := test.Must(test.Must(band.GetByID(fp.BandID)).(band.Band).Version(phyVersion)).(band.Band)
-	chIdx := uint8(len(phy.UplinkChannels) - 1)
-	ch := phy.UplinkChannels[chIdx]
-	drIdx := ch.MaxDataRate
-	dr := phy.DataRates[drIdx].Rate
+	ForEachLoRaWANVersionPair(t, func(makeName func(...string) string, macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion) {
+		fpID := test.EUFrequencyPlanID
+		fp := FrequencyPlan(fpID)
+		phy := LoRaWANBands[fp.BandID][phyVersion]
+		chIdx := uint8(len(phy.UplinkChannels) - 1)
+		ch := phy.UplinkChannels[chIdx]
+		drIdx := ch.MaxDataRate
+		dr := phy.DataRates[drIdx].Rate
 
-	for _, deduplicated := range [2]bool{
-		true,
-		false,
-	} {
-		deduplicated := deduplicated
-		makeName := func(parts ...string) string {
-			return MakeTestCaseName(append(parts, fmt.Sprintf("Deduplicated:%v", deduplicated))...)
-		}
-		macVersion := ttnpb.MAC_V1_0_4
-		tcs = append(tcs,
-			TestCase{
-				Name: makeName("Payload too short"),
-				Uplink: &ttnpb.UplinkMessage{
-					Settings: MakeUplinkSettings(dr, ch.Frequency),
-				},
-				MakeDevices: func(ctx context.Context) []contextualEndDevice {
-					return []contextualEndDevice{
-						{
-							Context: ctx,
-							EndDevice: &ttnpb.EndDevice{
-								EndDeviceIdentifiers: *MakeABPIdentifiers(true),
-								FrequencyPlanID:      test.EUFrequencyPlanID,
-								LoRaWANPHYVersion:    phyVersion,
-								LoRaWANVersion:       macVersion,
-								MACState:             MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
-								Session: &ttnpb.Session{
-									DevAddr:     DevAddr,
-									SessionKeys: *MakeSessionKeys(macVersion, false),
+		for _, deduplicated := range [2]bool{
+			true,
+			false,
+		} {
+			deduplicated := deduplicated
+			makeName := func(parts ...string) string {
+				return MakeTestCaseName(append(parts, fmt.Sprintf("Deduplicated:%v", deduplicated))...)
+			}
+			tcs = append(tcs,
+				TestCase{
+					Name: makeName("Payload too short"),
+					Uplink: &ttnpb.UplinkMessage{
+						Settings: MakeUplinkSettings(dr, ch.Frequency),
+					},
+					MakeDevices: func(ctx context.Context) []contextualEndDevice {
+						return []contextualEndDevice{
+							{
+								Context: ctx,
+								EndDevice: &ttnpb.EndDevice{
+									EndDeviceIdentifiers: *MakeABPIdentifiers(true),
+									FrequencyPlanID:      test.EUFrequencyPlanID,
+									LoRaWANPHYVersion:    phyVersion,
+									LoRaWANVersion:       macVersion,
+									MACState:             MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
+									Session: &ttnpb.Session{
+										DevAddr:     DevAddr,
+										SessionKeys: *MakeSessionKeys(macVersion, false),
+									},
 								},
 							},
-						},
-					}
+						}
+					},
+					Deduplicated: deduplicated,
+					DeviceAssertion: func(t *testing.T, dev *matchedDevice) bool {
+						return assertions.New(t).So(dev, should.BeNil)
+					},
+					Error: errRawPayloadTooShort,
 				},
-				Deduplicated: deduplicated,
-				DeviceAssertion: func(t *testing.T, dev *matchedDevice) bool {
-					return assertions.New(t).So(dev, should.BeNil)
-				},
-				Error: errRawPayloadTooShort,
-			},
-		)
-	}
-	ForEachMACVersion(func(makeName func(...string) string, macVersion ttnpb.MACVersion) {
+			)
+		}
+
 		makeSession := func(lastFCntUp, lastConfFCntDown uint32) *ttnpb.Session {
 			return &ttnpb.Session{
 				DevAddr:          DevAddr,
@@ -1093,8 +1090,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						), should.BeTrue) {
 							return false
 						}
-						matched.Context = nil     // Comparing context with should.Resemble results in infinite recursion.
-						matched.phy = band.Band{} // band.Band cannot be compared with neither should.Resemble, nor should.Equal.
+						matched.Context = nil // Comparing context with should.Resemble results in infinite recursion.
+						matched.phy = nil     // band.Band cannot be compared with neither should.Resemble, nor should.Equal.
 						if !a.So(test.AllTrue(
 							a.So(matched.SetPaths, should.HaveSameElementsDeep, devConf.SetPaths),
 							a.So(matched.QueuedEventBuilders, should.ResembleEventBuilders, devConf.MakeQueuedEvents(deduplicated)),

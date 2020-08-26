@@ -58,10 +58,10 @@ describe('<ApplicationSettingsForm /> validation schema', () => {
     })
   })
 
-  describe('`skip_payload_crypto` is set', () => {
+  describe('when `skip_payload_crypto` is set', () => {
     const schema = { skip_payload_crypto: true }
 
-    it('should strip `app_s_key`', () => {
+    it('strips `app_s_key`', () => {
       const validatedValue = validateWithKeys(schema)
 
       expect(validatedValue).toBeDefined()
@@ -69,8 +69,8 @@ describe('<ApplicationSettingsForm /> validation schema', () => {
     })
   })
 
-  describe('cannot edit keys', () => {
-    it('should strip `app_s_key`', () => {
+  describe('keys cannot be edited', () => {
+    it('strips `app_s_key`', () => {
       const schema = {
         keys: {
           app_s_key: {

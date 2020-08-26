@@ -14,7 +14,7 @@
 
 import getSortButtonDriver from './index_driver'
 
-describe('SortButton', function() {
+describe('<SortButton />', function() {
   let driver = null
   let onSort = null
 
@@ -23,7 +23,7 @@ describe('SortButton', function() {
     onSort = jest.fn()
   })
 
-  describe('is not active', function() {
+  describe('when it is not active', function() {
     beforeEach(function() {
       driver.when.created({
         active: false,
@@ -34,30 +34,30 @@ describe('SortButton', function() {
       })
     })
 
-    it('should match snapshot', function() {
+    it('matches snapshot', function() {
       expect(driver.component).toMatchSnapshot()
     })
 
-    it('should not have the `active` style', function() {
+    it('does not have the `active` style', function() {
       expect(driver.is.active()).toBeFalsy()
     })
 
-    it('should not have styling for the `descending` style', function() {
+    it('does not have styling for the `descending` style', function() {
       expect(driver.is.descending()).toBeFalsy()
     })
 
-    describe('the user presses the button', function() {
+    describe('when the user presses the button', function() {
       beforeEach(function() {
         driver.when.buttonPressed()
       })
 
-      it('should call the `onSort` function once', function() {
+      it('calls the `onSort` function once', function() {
         expect(onSort.mock.calls).toHaveLength(1)
       })
     })
   })
 
-  describe('is active', function() {
+  describe('when it is active', function() {
     describe('is in ascending direction', function() {
       beforeEach(function() {
         driver.when.created({
@@ -69,30 +69,30 @@ describe('SortButton', function() {
         })
       })
 
-      it('should match snapshot', function() {
+      it('matches snapshot', function() {
         expect(driver.component).toMatchSnapshot()
       })
 
-      it('should have the `active` style', function() {
+      it('has the `active` style', function() {
         expect(driver.is.active()).toBeTruthy()
       })
 
-      it('should not have styling for the `descending` style', function() {
+      it('has styling for the `descending` style', function() {
         expect(driver.is.descending()).toBeFalsy()
       })
 
-      describe('the user presses the button', function() {
+      describe('when the user presses the button', function() {
         beforeEach(function() {
           driver.when.buttonPressed()
         })
 
-        it('should call the `onSort` function once', function() {
+        it('calls the `onSort` function once', function() {
           expect(onSort.mock.calls).toHaveLength(1)
         })
       })
     })
 
-    describe('is in descending direction', function() {
+    describe('when it is in descending direction', function() {
       beforeEach(function() {
         driver.when.created({
           active: true,
@@ -103,24 +103,24 @@ describe('SortButton', function() {
         })
       })
 
-      it('should match snapshot', function() {
+      it('matches snapshot', function() {
         expect(driver.component).toMatchSnapshot()
       })
 
-      it('should have the `active` style', function() {
+      it('has the `active` style', function() {
         expect(driver.is.active()).toBeTruthy()
       })
 
-      it('should have styling for the `descending` style', function() {
+      it('has styling for the `descending` style', function() {
         expect(driver.is.descending()).toBeTruthy()
       })
 
-      describe('the user presses the button', function() {
+      describe('when the user presses the button', function() {
         beforeEach(function() {
           driver.when.buttonPressed()
         })
 
-        it('should call the `onSort` function once', function() {
+        it('calls the `onSort` function once', function() {
           expect(onSort.mock.calls).toHaveLength(1)
         })
       })

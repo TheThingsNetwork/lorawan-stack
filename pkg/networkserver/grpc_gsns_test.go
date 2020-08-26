@@ -588,17 +588,7 @@ func TestHandleUplink(t *testing.T) {
 		makeMDName := func(parts ...string) string {
 			return MakeTestCaseName(append(parts, fmt.Sprintf("Metadata length:%d", len(uplinkMDs)))...)
 		}
-		ForEachBand(t, func(makeLoopName func(...string) string, phy band.Band, phyVersion ttnpb.PHYVersion) {
-			switch phyVersion {
-			case ttnpb.PHY_V1_0_3_REV_A:
-			case ttnpb.PHY_V1_1_REV_B, ttnpb.PHY_V1_0_2_REV_B:
-				if testing.Short() {
-					return
-				}
-			default:
-				return
-			}
-
+		ForEachBand(t, func(makeLoopName func(...string) string, phy *band.Band, phyVersion ttnpb.PHYVersion) {
 			chIdx := uint8(len(phy.UplinkChannels) - 1)
 			ch := phy.UplinkChannels[chIdx]
 			drIdx := ch.MaxDataRate
@@ -666,31 +656,7 @@ func TestHandleUplink(t *testing.T) {
 			)
 		})
 
-		ForEachFrequencyPlanBandMACVersion(t, func(makeLoopName func(...string) string, fpID string, fp *frequencyplans.FrequencyPlan, phy band.Band, phyVersion ttnpb.PHYVersion, macVersion ttnpb.MACVersion) {
-			switch fpID {
-			case test.EUFrequencyPlanID, test.USFrequencyPlanID:
-			default:
-				return
-			}
-			switch phyVersion {
-			case ttnpb.PHY_V1_0_3_REV_A:
-			case ttnpb.PHY_V1_1_REV_B, ttnpb.PHY_V1_0_2_REV_B:
-				if testing.Short() {
-					return
-				}
-			default:
-				return
-			}
-			switch macVersion {
-			case ttnpb.MAC_V1_0_4:
-			case ttnpb.MAC_V1_1, ttnpb.MAC_V1_0_3:
-				if testing.Short() {
-					return
-				}
-			default:
-				return
-			}
-
+		ForEachFrequencyPlanLoRaWANVersionPair(t, func(makeLoopName func(...string) string, fpID string, fp *frequencyplans.FrequencyPlan, phy *band.Band, macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion) {
 			makeJoinResponse := func(withAppSKey bool) *ttnpb.JoinResponse {
 				return &ttnpb.JoinResponse{
 					RawPayload:  bytes.Repeat([]byte{0x42}, 17),
@@ -1276,21 +1242,10 @@ func TestHandleUplink(t *testing.T) {
 			}
 		})
 
-		ForEachMACVersion(func(makeLoopName func(...string) string, macVersion ttnpb.MACVersion) {
-			switch macVersion {
-			case ttnpb.MAC_V1_0_4:
-			case ttnpb.MAC_V1_1, ttnpb.MAC_V1_0_3:
-				if testing.Short() {
-					return
-				}
-			default:
-				return
-			}
-
+		ForEachLoRaWANVersionPair(t, func(makeLoopName func(...string) string, macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion) {
 			fpID := test.EUFrequencyPlanID
-			phyVersion := ttnpb.PHY_V1_1_REV_B
-			fp := test.Must(frequencyplans.NewStore(test.FrequencyPlansFetcher).GetByID(fpID)).(*frequencyplans.FrequencyPlan)
-			phy := test.Must(test.Must(band.GetByID(fp.BandID)).(band.Band).Version(phyVersion)).(band.Band)
+			fp := FrequencyPlan(fpID)
+			phy := LoRaWANBands[fp.BandID][phyVersion]
 			chIdx := uint8(len(phy.UplinkChannels) - 1)
 			ch := phy.UplinkChannels[chIdx]
 			drIdx := ch.MaxDataRate

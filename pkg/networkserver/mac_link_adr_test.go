@@ -151,7 +151,7 @@ func TestNeedsLinkADRReq(t *testing.T) {
 			a := assertions.New(t)
 
 			dev := CopyEndDevice(tc.InputDevice)
-			res := deviceNeedsLinkADRReq(dev, DefaultConfig.DefaultMACSettings.Parse(), Band(band.EU_863_870, ttnpb.PHY_V1_0_3_REV_A))
+			res := deviceNeedsLinkADRReq(dev, DefaultConfig.DefaultMACSettings.Parse(), LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_0_3_REV_A])
 			if tc.Needs {
 				a.So(res, should.BeTrue)
 			} else {
@@ -165,7 +165,7 @@ func TestNeedsLinkADRReq(t *testing.T) {
 func TestEnqueueLinkADRReq(t *testing.T) {
 	for _, tc := range []struct {
 		Name                        string
-		Band                        band.Band
+		Band                        *band.Band
 		InputDevice, ExpectedDevice *ttnpb.EndDevice
 		MaxDownlinkLength           uint16
 		MaxUplinkLength             uint16
@@ -174,7 +174,7 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 	}{
 		{
 			Name: "payload fits/US915 FSB2/MAC:1.0.3,PHY:1.0.3a",
-			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_0_3_REV_A)).(band.Band),
+			Band: LoRaWANBands[band.US_902_928][ttnpb.PHY_V1_0_3_REV_A],
 			InputDevice: &ttnpb.EndDevice{
 				FrequencyPlanID: test.USFrequencyPlanID,
 				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A),
@@ -231,7 +231,7 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 		},
 		{
 			Name: "payload fits/US915 FSB2/MAC:1.0.3,PHY:1.0.3a/ADR/rejected desired data rate and TX power",
-			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_0_3_REV_A)).(band.Band),
+			Band: LoRaWANBands[band.US_902_928][ttnpb.PHY_V1_0_3_REV_A],
 			InputDevice: &ttnpb.EndDevice{
 				FrequencyPlanID: test.USFrequencyPlanID,
 				MACState: func() *ttnpb.MACState {
@@ -317,7 +317,7 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 		},
 		{
 			Name: "payload fits/EU868/MAC:1.0.1,PHY:1.0.1/ADR/rejected all possible data rates",
-			Band: test.Must(test.Must(band.GetByID(band.EU_863_870)).(band.Band).Version(ttnpb.PHY_V1_0_1)).(band.Band),
+			Band: LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_0_1],
 			InputDevice: &ttnpb.EndDevice{
 				FrequencyPlanID: test.USFrequencyPlanID,
 				MACState: func() *ttnpb.MACState {
@@ -362,7 +362,7 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 		},
 		{
 			Name: "payload fits/US915 FSB2/MAC:1.0.4,PHY:1.0.3a/no data rate change",
-			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_0_3_REV_A)).(band.Band),
+			Band: LoRaWANBands[band.US_902_928][ttnpb.PHY_V1_0_3_REV_A],
 			InputDevice: &ttnpb.EndDevice{
 				FrequencyPlanID: test.USFrequencyPlanID,
 				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_4, ttnpb.PHY_V1_0_3_REV_A),
@@ -427,7 +427,7 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 		},
 		{
 			Name: "downlink does not fit/US915 FSB2/MAC:1.0.3,PHY:1.0.3a",
-			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_0_3_REV_A)).(band.Band),
+			Band: LoRaWANBands[band.US_902_928][ttnpb.PHY_V1_0_3_REV_A],
 			InputDevice: &ttnpb.EndDevice{
 				FrequencyPlanID: test.USFrequencyPlanID,
 				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A),
@@ -446,7 +446,7 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 		},
 		{
 			Name: "uplink does not fit/US915 FSB2/MAC:1.1,PHY:1.1b",
-			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
+			Band: LoRaWANBands[band.US_902_928][ttnpb.PHY_V1_1_REV_B],
 			InputDevice: &ttnpb.EndDevice{
 				FrequencyPlanID: test.USFrequencyPlanID,
 				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B),

@@ -214,7 +214,7 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 		return nil
 	}
 
-	fp, phy, err := getDeviceBandVersion(dev, fps)
+	fp, phy, err := deviceFrequencyPlanAndBand(dev, fps)
 	if err != nil {
 		return err
 	}

@@ -85,13 +85,13 @@ describe('SDK class', function() {
     stackConfig: { is: 'http://localhost:1885/api/v3' },
   })
 
-  test('instance instanciates successfully', async function() {
+  it('instanciates successfully', async function() {
     expect(ttn).toBeDefined()
     expect(ttn).toBeInstanceOf(TTN)
     expect(ttn.Applications).toBeInstanceOf(Applications)
   })
 
-  test('retrieves application instance correctly', async function() {
+  it('retrieves application instance correctly', async function() {
     const app = await ttn.Applications.getById('test')
     expect(app).toBeDefined()
   })

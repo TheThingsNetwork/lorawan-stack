@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SideNavigationItem is collapsable should match snapshot 1`] = `
+exports[`<SideNavigationItem /> when it is collapsable matches snapshot 1`] = `
 <li
   className="item"
 >
@@ -40,7 +40,7 @@ exports[`SideNavigationItem is collapsable should match snapshot 1`] = `
 </li>
 `;
 
-exports[`SideNavigationItem is flat should match snapshot 1`] = `
+exports[`<SideNavigationItem /> when it is flat matches snapshot 1`] = `
 <li
   className="item"
 >

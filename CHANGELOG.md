@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - ISM2400 RX2, beacon and ping slot frequencies are now consistent with latest LoRaWAN specification draft.
 - CLI login issues when OAuth Server Address explicitly includes the `:443` HTTPS port.
+- Documentation link for LoRa Cloud Device & Application Services in the Lora Cloud integration view in the Console.
 
 ### Security
 

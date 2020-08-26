@@ -21,14 +21,14 @@ import SideNavigation from '.'
 // Mock the window inner width to ensure initial render in expanded state.
 global.window.innerWidth = 1440
 
-describe('SideNavigation', function() {
+describe('<SideNavigation />', function() {
   let driver = null
 
   beforeEach(function() {
     driver = getSideNavigationDriver()
   })
 
-  describe('is flat', function() {
+  describe('when it is flat', function() {
     const props = {
       modifyAppContainerClasses: false,
       header: {
@@ -48,39 +48,39 @@ describe('SideNavigation', function() {
       driver.when.created(props)
     })
 
-    it('should match snapshot', function() {
+    it('matches snapshot', function() {
       expect(driver.component).toMatchSnapshot()
     })
 
-    it('should render correct number of items', function() {
+    it('renders correct number of items', function() {
       expect(driver.get.itemsCount()).toBe(2)
     })
-    it('should have no collapsable items', function() {
+    it('has no collapsable items', function() {
       expect(driver.get.collapsableItemsCount()).toBe(0)
     })
 
-    describe('the user minimizes the side navigation', function() {
+    describe('when the user minimizes the side navigation', function() {
       beforeEach(function() {
         driver.when.minimized()
       })
 
-      it('should become minimized', function() {
+      it('becomes minimized', function() {
         expect(driver.is.minimized()).toBeTruthy()
       })
 
-      describe('the user expands the side navigation back to normal state', function() {
+      describe('when the user expands the side navigation back to normal state', function() {
         beforeEach(function() {
           driver.when.minimized()
         })
 
-        it('should not be minimized', function() {
+        it('becomes maximized again', function() {
           expect(driver.is.minimized()).toBeFalsy()
         })
       })
     })
   })
 
-  describe('is nested', function() {
+  describe('when it is nested', function() {
     const props = {
       modifyAppContainerClasses: false,
       header: {
@@ -106,33 +106,33 @@ describe('SideNavigation', function() {
       driver.when.created(props)
     })
 
-    it('should match snapshot', function() {
+    it('matches snapshot', function() {
       expect(driver.component).toMatchSnapshot()
     })
 
-    it('should render correct number of top-level items', function() {
+    it('renders correct number of top-level items', function() {
       expect(driver.get.itemsCount()).toBe(3)
     })
 
-    it('should have correct number of collapsable items', function() {
+    it('has correct number of collapsable items', function() {
       expect(driver.get.collapsableItemsCount()).toBe(2)
     })
 
-    describe('the user minimizes the side navigation', function() {
+    describe('when the user minimizes the side navigation', function() {
       beforeEach(function() {
         driver.when.minimized()
       })
 
-      it('should become minimized', function() {
+      it('becomes minimized', function() {
         expect(driver.is.minimized()).toBeTruthy()
       })
 
-      describe('the user expands the side navigation back to normal state', function() {
+      describe('when the user expands the side navigation back to normal state', function() {
         beforeEach(function() {
           driver.when.minimized()
         })
 
-        it('should not be minimized', function() {
+        it('becomes maximized again', function() {
           expect(driver.is.minimized()).toBeFalsy()
         })
       })

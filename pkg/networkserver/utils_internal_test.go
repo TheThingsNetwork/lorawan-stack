@@ -994,7 +994,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			a := assertions.New(t)
 
 			ctx := log.NewContext(ctx, test.GetLogger(t))
-			ret, ok := nextDataDownlinkSlot(ctx, tc.Device, test.Must(band.GetByID(band.EU_863_870)).(band.Band), ttnpb.MACSettings{}, tc.EarliestAt)
+			ret, ok := nextDataDownlinkSlot(ctx, tc.Device, LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B], ttnpb.MACSettings{}, tc.EarliestAt)
 			if a.So(ok, should.Equal, tc.ExpectedOk) {
 				a.So(ret, should.Resemble, tc.ExpectedSlot)
 			}

@@ -110,7 +110,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		UserSessionStore: store.GetUserSessionStore(is.db),
 		ClientStore:      store.GetClientStore(is.db),
 		OAuthStore:       store.GetOAuthStore(is.db),
-	}, oauth.StaticConfigProvider(is.config.OAuth))
+	}, is.config.OAuth)
 	if err != nil {
 		return nil, err
 	}

@@ -25,8 +25,8 @@ describe('<JoinSettingsForm /> validation schema', () => {
     }
   })
 
-  describe('cannot edit keys', () => {
-    it('should strip `root_keys`', () => {
+  describe('when keys cannot be edited', () => {
+    it('strips `root_keys`', () => {
       const schema = {
         root_keys: { app_key: { key: '1'.repeat(32) } },
       }
@@ -55,8 +55,8 @@ describe('<JoinSettingsForm /> validation schema', () => {
     })
   })
 
-  describe('can edit keys', () => {
-    describe('is `lorawan_version` 1.0.0', () => {
+  describe('edit keys can be edited', () => {
+    describe('when `lorawan_version` is 1.0.0', () => {
       const validate = schema =>
         validationSchema.validateSync(schema, {
           context: {
@@ -65,7 +65,7 @@ describe('<JoinSettingsForm /> validation schema', () => {
           },
         })
 
-      it('should require `app_key`', done => {
+      it('requires `app_key`', done => {
         try {
           validate(schema)
           done.fail('should fail')
@@ -77,7 +77,7 @@ describe('<JoinSettingsForm /> validation schema', () => {
         }
       })
 
-      it('should handle `app_key`', () => {
+      it('handles `app_key`', () => {
         const appKey = '1'.repeat(32)
 
         schema.root_keys.app_key = { key: appKey }
@@ -92,7 +92,7 @@ describe('<JoinSettingsForm /> validation schema', () => {
         expect(root_keys.app_key.key).toBe(appKey)
       })
 
-      it('should strip `nwk_key`', () => {
+      it('strips `nwk_key`', () => {
         const appKey = '1'.repeat(32)
         const nwkKey = '2'.repeat(32)
 
@@ -111,7 +111,7 @@ describe('<JoinSettingsForm /> validation schema', () => {
       })
     })
 
-    describe('is `lorawan_version` 1.1.0', () => {
+    describe('`lorawan_version` is 1.1.0', () => {
       const validate = schema =>
         validationSchema.validateSync(schema, {
           context: {
@@ -120,7 +120,7 @@ describe('<JoinSettingsForm /> validation schema', () => {
           },
         })
 
-      it('should require `app_key`', done => {
+      it('requires `app_key`', done => {
         try {
           validate(schema)
           done.fail('should fail')
@@ -132,7 +132,7 @@ describe('<JoinSettingsForm /> validation schema', () => {
         }
       })
 
-      it('should require `nwk_key`', done => {
+      it('requires `nwk_key`', done => {
         const appKey = '1'.repeat(32)
 
         schema.root_keys.app_key = { key: appKey }
@@ -148,7 +148,7 @@ describe('<JoinSettingsForm /> validation schema', () => {
         }
       })
 
-      it('should handle `root_keys`', () => {
+      it('handles `root_keys`', () => {
         const appKey = '1'.repeat(32)
         const nwkKey = '2'.repeat(32)
 

@@ -33,21 +33,21 @@ var (
 	)()
 )
 
-func deviceADRAckLimit(dev *ttnpb.EndDevice, phy band.Band) ttnpb.ADRAckLimitExponent {
+func deviceADRAckLimit(dev *ttnpb.EndDevice, phy *band.Band) ttnpb.ADRAckLimitExponent {
 	if dev.MACState.CurrentParameters.ADRAckLimitExponent != nil {
 		return dev.MACState.CurrentParameters.ADRAckLimitExponent.Value
 	}
 	return phy.ADRAckLimit
 }
 
-func deviceADRAckDelay(dev *ttnpb.EndDevice, phy band.Band) ttnpb.ADRAckDelayExponent {
+func deviceADRAckDelay(dev *ttnpb.EndDevice, phy *band.Band) ttnpb.ADRAckDelayExponent {
 	if dev.MACState.CurrentParameters.ADRAckDelayExponent != nil {
 		return dev.MACState.CurrentParameters.ADRAckDelayExponent.Value
 	}
 	return phy.ADRAckDelay
 }
 
-func deviceNeedsADRParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
+func deviceNeedsADRParamSetupReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
 	if dev.GetMulticast() ||
 		dev.GetMACState() == nil ||
 		dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
@@ -59,7 +59,7 @@ func deviceNeedsADRParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
 			deviceADRAckDelay(dev, phy) != dev.MACState.DesiredParameters.ADRAckDelayExponent.Value
 }
 
-func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, phy band.Band) macCommandEnqueueState {
+func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, phy *band.Band) macCommandEnqueueState {
 	if !deviceNeedsADRParamSetupReq(dev, phy) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,

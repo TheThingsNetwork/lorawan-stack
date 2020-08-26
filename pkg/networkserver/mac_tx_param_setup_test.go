@@ -30,114 +30,112 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 	type TestCase struct {
 		Name        string
 		InputDevice *ttnpb.EndDevice
-		Band        band.Band
+		Band        *band.Band
 		Needs       bool
 	}
-	var tcs []TestCase
-
-	ForEachBand(t, func(makeBandName func(parts ...string) string, phy band.Band, _ ttnpb.PHYVersion) {
-		tcs = append(tcs,
-			TestCase{
-				Name:        makeBandName("no MAC state"),
-				InputDevice: &ttnpb.EndDevice{},
-				Band:        phy,
+	tcs := []TestCase{
+		{
+			Name:        "no MAC state",
+			InputDevice: &ttnpb.EndDevice{},
+			Band:        LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B],
+		},
+	}
+	for _, conf := range []struct {
+		Suffix                               string
+		CurrentParameters, DesiredParameters ttnpb.MACParameters
+		Needs                                bool
+	}{
+		{
+			Suffix: "current(EIRP:26,downlink:nil,uplink:nil),desired(EIRP:26,downlink:nil,uplink:nil)",
+			CurrentParameters: ttnpb.MACParameters{
+				MaxEIRP: 26,
 			},
-		)
-		for _, conf := range []struct {
-			Suffix                               string
-			CurrentParameters, DesiredParameters ttnpb.MACParameters
-			Needs                                bool
-		}{
-			{
-				Suffix: "current(EIRP:26,downlink:nil,uplink:nil),desired(EIRP:26,downlink:nil,uplink:nil)",
-				CurrentParameters: ttnpb.MACParameters{
-					MaxEIRP: 26,
-				},
-				DesiredParameters: ttnpb.MACParameters{
-					MaxEIRP: 26,
-				},
+			DesiredParameters: ttnpb.MACParameters{
+				MaxEIRP: 26,
 			},
-			{
-				Suffix: "current(EIRP:26,downlink:true,uplink:false),desired(EIRP:26,downlink:nil,uplink:nil)",
-				CurrentParameters: ttnpb.MACParameters{
-					MaxEIRP:           26,
-					DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-					UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
-				},
-				DesiredParameters: ttnpb.MACParameters{
-					MaxEIRP: 26,
-				},
+		},
+		{
+			Suffix: "current(EIRP:26,downlink:true,uplink:false),desired(EIRP:26,downlink:nil,uplink:nil)",
+			CurrentParameters: ttnpb.MACParameters{
+				MaxEIRP:           26,
+				DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
+				UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
 			},
-			{
-				Suffix: "current(EIRP:26,downlink:nil,uplink:nil),desired(EIRP:26,downlink:true,uplink:true)",
-				CurrentParameters: ttnpb.MACParameters{
-					MaxEIRP: 26,
-				},
-				DesiredParameters: ttnpb.MACParameters{
-					MaxEIRP:           26,
-					DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-					UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
-				},
-				Needs: true,
+			DesiredParameters: ttnpb.MACParameters{
+				MaxEIRP: 26,
 			},
-			{
-				Suffix: "current(EIRP:26,downlink:nil,uplink:nil),desired(EIRP:26,downlink:false,uplink:false)",
-				CurrentParameters: ttnpb.MACParameters{
-					MaxEIRP: 26,
-				},
-				DesiredParameters: ttnpb.MACParameters{
-					MaxEIRP:           26,
-					DownlinkDwellTime: &pbtypes.BoolValue{Value: false},
-					UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
-				},
-				Needs: true,
+		},
+		{
+			Suffix: "current(EIRP:26,downlink:nil,uplink:nil),desired(EIRP:26,downlink:true,uplink:true)",
+			CurrentParameters: ttnpb.MACParameters{
+				MaxEIRP: 26,
 			},
-			{
-				Suffix: "current(EIRP:26,downlink:true,uplink:nil),desired(EIRP:26,downlink:false,uplink:false)",
-				CurrentParameters: ttnpb.MACParameters{
-					MaxEIRP:           26,
-					DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-				},
-				DesiredParameters: ttnpb.MACParameters{
-					MaxEIRP:           26,
-					DownlinkDwellTime: &pbtypes.BoolValue{Value: false},
-					UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
-				},
-				Needs: true,
+			DesiredParameters: ttnpb.MACParameters{
+				MaxEIRP:           26,
+				DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
+				UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
 			},
-			{
-				Suffix: "current(EIRP:24,downlink:true,uplink:false),desired(EIRP:26,downlink:true,uplink:false)",
-				CurrentParameters: ttnpb.MACParameters{
-					MaxEIRP:           24,
-					DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-					UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
-				},
-				DesiredParameters: ttnpb.MACParameters{
-					MaxEIRP:           26,
-					DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-					UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
-				},
-				Needs: true,
+			Needs: true,
+		},
+		{
+			Suffix: "current(EIRP:26,downlink:nil,uplink:nil),desired(EIRP:26,downlink:false,uplink:false)",
+			CurrentParameters: ttnpb.MACParameters{
+				MaxEIRP: 26,
 			},
-		} {
-			ForEachMACVersion(func(makeMACName func(parts ...string) string, macVersion ttnpb.MACVersion) {
-				tcs = append(tcs,
-					TestCase{
-						Name: makeBandName(makeMACName(conf.Suffix)),
-						InputDevice: &ttnpb.EndDevice{
-							MACState: &ttnpb.MACState{
-								LoRaWANVersion:    macVersion,
-								CurrentParameters: conf.CurrentParameters,
-								DesiredParameters: conf.DesiredParameters,
-							},
+			DesiredParameters: ttnpb.MACParameters{
+				MaxEIRP:           26,
+				DownlinkDwellTime: &pbtypes.BoolValue{Value: false},
+				UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
+			},
+			Needs: true,
+		},
+		{
+			Suffix: "current(EIRP:26,downlink:true,uplink:nil),desired(EIRP:26,downlink:false,uplink:false)",
+			CurrentParameters: ttnpb.MACParameters{
+				MaxEIRP:           26,
+				DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
+			},
+			DesiredParameters: ttnpb.MACParameters{
+				MaxEIRP:           26,
+				DownlinkDwellTime: &pbtypes.BoolValue{Value: false},
+				UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
+			},
+			Needs: true,
+		},
+		{
+			Suffix: "current(EIRP:24,downlink:true,uplink:false),desired(EIRP:26,downlink:true,uplink:false)",
+			CurrentParameters: ttnpb.MACParameters{
+				MaxEIRP:           24,
+				DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
+				UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
+			},
+			DesiredParameters: ttnpb.MACParameters{
+				MaxEIRP:           26,
+				DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
+				UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
+			},
+			Needs: true,
+		},
+	} {
+		ForEachBandMACVersion(t, func(makeName func(parts ...string) string, phy *band.Band, phyVersion ttnpb.PHYVersion, macVersion ttnpb.MACVersion) {
+			tcs = append(tcs,
+				TestCase{
+					Name: makeName(conf.Suffix),
+					InputDevice: &ttnpb.EndDevice{
+						LoRaWANVersion:    macVersion,
+						LoRaWANPHYVersion: phyVersion,
+						MACState: &ttnpb.MACState{
+							LoRaWANVersion:    macVersion,
+							CurrentParameters: conf.CurrentParameters,
+							DesiredParameters: conf.DesiredParameters,
 						},
-						Band:  phy,
-						Needs: phy.TxParamSetupReqSupport && conf.Needs && macVersion.Compare(ttnpb.MAC_V1_0_2) >= 0,
 					},
-				)
-			})
-		}
-	})
+					Band:  phy,
+					Needs: phy.TxParamSetupReqSupport && conf.Needs && macVersion.Compare(ttnpb.MAC_V1_0_2) >= 0,
+				},
+			)
+		})
+	}
 
 	for _, tc := range tcs {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -319,7 +317,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 
 			dev := CopyEndDevice(tc.InputDevice)
 
-			st := enqueueTxParamSetupReq(test.Context(), dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, test.Must(test.Must(band.GetByID(band.AS_923)).(band.Band).Version(ttnpb.PHY_V1_1_REV_B)).(band.Band))
+			st := enqueueTxParamSetupReq(test.Context(), dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, LoRaWANBands[band.AS_923][ttnpb.PHY_V1_1_REV_B])
 			a.So(dev, should.Resemble, tc.ExpectedDevice)
 			a.So(st.QueuedEvents, should.ResembleEventBuilders, tc.State.QueuedEvents)
 			st.QueuedEvents = tc.State.QueuedEvents

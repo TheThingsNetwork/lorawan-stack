@@ -14,35 +14,35 @@
 
 import { createFetchingSelector } from '../fetching'
 
-describe('fetching selectors', function() {
+describe('Fetching selectors', function() {
   const BASE_ACTION_TYPE = 'BASE_ACTION'
   let initialState = null
 
-  describe('created with a single base action type', function() {
+  describe('when created with a single base action type', function() {
     const selector = createFetchingSelector(BASE_ACTION_TYPE)
 
     beforeAll(function() {
       initialState = { ui: { fetching: {} } }
     })
 
-    describe('has no fetching entries', function() {
-      it('should return `false`', function() {
+    describe('when it has no fetching entries', function() {
+      it('returns `false`', function() {
         expect(selector(initialState)).toBe(false)
       })
     })
 
-    describe('has fetching entry', function() {
+    describe('when it has fetching entry', function() {
       beforeAll(function() {
         initialState.ui.fetching[BASE_ACTION_TYPE] = true
       })
 
-      it('should return `true`', function() {
+      it('return `true`', function() {
         expect(selector(initialState)).toBe(true)
       })
     })
   })
 
-  describe('created with two base action types', function() {
+  describe('when created with two base action types', function() {
     const BASE_ACTION_TYPE_OTHER = 'BASE_ACTION_OTHER'
     const selector = createFetchingSelector([BASE_ACTION_TYPE, BASE_ACTION_TYPE_OTHER])
 
@@ -50,27 +50,27 @@ describe('fetching selectors', function() {
       initialState = { ui: { fetching: {} } }
     })
 
-    describe('has no fetching entries', function() {
-      it('should return `false`', function() {
+    describe('when it has no fetching entries', function() {
+      it('return `false`', function() {
         expect(selector(initialState)).toBe(false)
       })
     })
 
-    describe('has fetching entry', function() {
+    describe('when it has a fetching entry', function() {
       beforeAll(function() {
         initialState.ui.fetching[BASE_ACTION_TYPE] = true
       })
 
-      it('should return `true`', function() {
+      it('return `true`', function() {
         expect(selector(initialState)).toBe(true)
       })
 
-      describe('has two fetching entries', function() {
+      describe('when it has two fetching entries', function() {
         beforeAll(function() {
           initialState.ui.fetching[BASE_ACTION_TYPE_OTHER] = true
         })
 
-        it('should return `true`', function() {
+        it('return `true`', function() {
           expect(selector(initialState)).toBe(true)
         })
       })

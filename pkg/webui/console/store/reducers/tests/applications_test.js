@@ -28,41 +28,41 @@ import {
   deleteApplicationFailure,
 } from '../../actions/applications'
 
-describe('applications reducer', function() {
+describe('Applications reducer', function() {
   const defaultState = {
     entities: {},
     selectedApplication: null,
   }
 
-  it('should return the initial state', function() {
+  it('returns the initial state', function() {
     expect(reducer(undefined, { type: '@@TEST_INIT', payload: {} })).toEqual(defaultState)
   })
 
-  it('should ignore `getApplicationFailure` action', function() {
+  it('ignores `getApplicationFailure` action', function() {
     expect(reducer(defaultState, getApplicationFailure({ status: 404 }))).toEqual(defaultState)
   })
 
-  it('should ignore `updateApplicationFailure` action', function() {
+  it('ignores `updateApplicationFailure` action', function() {
     expect(reducer(defaultState, updateApplicationFailure({ status: 404 }))).toEqual(defaultState)
   })
 
-  it('should ignore `getApplicationsFailure` action', function() {
+  it('ignores `getApplicationsFailure` action', function() {
     expect(reducer(defaultState, getApplicationsFailure({ status: 404 }))).toEqual(defaultState)
   })
 
-  it('should ignore `updateApplication` action', function() {
+  it('ignores `updateApplication` action', function() {
     expect(reducer(defaultState, updateApplication('test-id', {}))).toEqual(defaultState)
   })
 
-  it('should ignore `deleteApplicationFailure` action', function() {
+  it('ignores `deleteApplicationFailure` action', function() {
     expect(reducer(defaultState, deleteApplicationFailure({ status: 404 }))).toEqual(defaultState)
   })
 
-  it('should ignore `deleteApplication` action', function() {
+  it('ignores `deleteApplication` action', function() {
     expect(reducer(defaultState, deleteApplication('test-id'))).toEqual(defaultState)
   })
 
-  describe('requests single application', function() {
+  describe('when requesting a single application', function() {
     const testApplicationId = 'test-app-id'
     const testApplication = { ids: { application_id: testApplicationId }, name: 'test-app' }
     let newState
@@ -71,29 +71,29 @@ describe('applications reducer', function() {
       newState = reducer(defaultState, getApplication(testApplicationId))
     })
 
-    it('should set `selectedApplication` on `getApplication` action', function() {
+    it('sets `selectedApplication` on `getApplication` action', function() {
       expect(newState.selectedApplication).toEqual(testApplicationId)
     })
 
-    it('should not update `entities` on `getApplication` action', function() {
+    it('does not update `entities` on `getApplication` action', function() {
       expect(newState.entities).toEqual(defaultState.entities)
     })
 
-    describe('receives application', function() {
+    describe('when receiving an application', function() {
       beforeAll(function() {
         newState = reducer(newState, getApplicationSuccess(testApplication))
       })
 
-      it('should not change `selectedApplication` on `getApplicationSuccess`', function() {
+      it('does change `selectedApplication` on `getApplicationSuccess`', function() {
         expect(newState.selectedApplication).toEqual(testApplicationId)
       })
 
-      it('should add new application to `entities` on `getApplicationSuccess`', function() {
+      it('adds new application to `entities` on `getApplicationSuccess`', function() {
         expect(Object.keys(newState.entities)).toHaveLength(1)
         expect(newState.entities[testApplicationId]).toEqual(testApplication)
       })
 
-      describe('updates application', function() {
+      describe('when it updates application', function() {
         const updatedTestApplication = {
           ids: { application_id: testApplicationId },
           name: 'updated-test-app',
@@ -104,32 +104,32 @@ describe('applications reducer', function() {
           updatedState = reducer(newState, updateApplicationSuccess(updatedTestApplication))
         })
 
-        it('should not change `selectedApplication` on `updateApplicationSuccess`', function() {
+        it('does not change `selectedApplication` on `updateApplicationSuccess`', function() {
           expect(updatedState.selectedApplication).toEqual(testApplicationId)
         })
 
-        it('should update application in `entities` on `updateApplicationSuccess` action', function() {
+        it('updates application in `entities` on `updateApplicationSuccess` action', function() {
           expect(updatedState.entities[testApplicationId].name).toEqual(updatedTestApplication.name)
         })
       })
 
-      describe('deletes application', function() {
+      describe('when deleting an application', function() {
         let updatedState
 
         beforeAll(function() {
           updatedState = reducer(newState, deleteApplicationSuccess({ id: testApplicationId }))
         })
 
-        it('should remove `selectedApplication` on `deleteApplicationSuccess`', function() {
+        it('removes `selectedApplication` on `deleteApplicationSuccess`', function() {
           expect(updatedState.selectedApplication).toBeNull()
         })
 
-        it('should remove application in `entities` on `deleteApplicationSuccess` action', function() {
+        it('removes application in `entities` on `deleteApplicationSuccess` action', function() {
           expect(updatedState.entities[testApplicationId]).toBeUndefined()
         })
       })
 
-      describe('requests another application', function() {
+      describe('when requesting another application', function() {
         const otherTestApplicationId = 'another-test-app-id'
         const otherTestApplication = {
           ids: { application_id: otherTestApplicationId },
@@ -141,50 +141,50 @@ describe('applications reducer', function() {
           updatedState = reducer(newState, getApplication(otherTestApplicationId))
         })
 
-        it('should set `selectedApplication` on `getApplication` action', function() {
+        it('sets `selectedApplication` on `getApplication` action', function() {
           expect(updatedState.selectedApplication).toEqual(otherTestApplicationId)
         })
 
-        it('should not update `entities` on `getApplication` action', function() {
+        it('does not update `entities` on `getApplication` action', function() {
           expect(Object.keys(updatedState.entities)).toHaveLength(1)
           expect(updatedState.entities[testApplicationId]).toEqual(testApplication)
         })
 
-        describe('receives application', function() {
+        describe('when receiving application', function() {
           beforeAll(function() {
             updatedState = reducer(updatedState, getApplicationSuccess(otherTestApplication))
           })
 
-          it('should not change `selectedApplication` on `getApplicationSuccess`', function() {
+          it('does not change `selectedApplication` on `getApplicationSuccess`', function() {
             expect(updatedState.selectedApplication).toEqual(otherTestApplicationId)
           })
 
-          it('should keep previously received application in `entities`', function() {
+          it('keeps previously received application in `entities`', function() {
             expect(updatedState.entities[testApplicationId]).toEqual(testApplication)
           })
 
-          it('should add new application to `entities` on `getApplicationSuccess`', function() {
+          it('adds new application to `entities` on `getApplicationSuccess`', function() {
             expect(Object.keys(updatedState.entities)).toHaveLength(2)
             expect(updatedState.entities[otherTestApplicationId]).toEqual(otherTestApplication)
           })
         })
       })
 
-      describe('requests a list of applications', function() {
+      describe('when requesting a list of applications', function() {
         beforeAll(function() {
           newState = reducer(newState, getApplicationsList({}))
         })
 
-        it('should not change `selectedApplication` on `getApplicationList` action', function() {
+        it('does not change `selectedApplication` on `getApplicationList` action', function() {
           expect(newState.selectedApplication).toEqual(testApplicationId)
         })
 
-        it('should not change `entities` on `getApplicationList` action', function() {
+        it('does not change `entities` on `getApplicationList` action', function() {
           expect(Object.keys(newState.entities)).toHaveLength(1)
           expect(newState.entities[testApplicationId]).toEqual(testApplication)
         })
 
-        describe('receives a list of applications', function() {
+        describe('when receiving a list of applications', function() {
           const entities = [
             { ids: { application_id: 'test-app-1' }, name: 'test-app-1' },
             { ids: { application_id: 'test-app-2' }, name: 'test-app-2' },
@@ -196,11 +196,11 @@ describe('applications reducer', function() {
             newState = reducer(newState, getApplicationsSuccess({ entities, totalCount }))
           })
 
-          it('should not remove previously received application on `getApplicationsSuccess` action', function() {
+          it('does not remove previously received application on `getApplicationsSuccess` action', function() {
             expect(newState.entities[testApplicationId]).toEqual(testApplication)
           })
 
-          it('should add new applications to `entities` on `getApplicationSuccess`', function() {
+          it('adds new applications to `entities` on `getApplicationSuccess`', function() {
             expect(Object.keys(newState.entities)).toHaveLength(4)
             for (const app of entities) {
               expect(newState.entities[app.ids.application_id]).toEqual(app)

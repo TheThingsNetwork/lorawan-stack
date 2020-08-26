@@ -22,7 +22,7 @@ const createEvent = (name, time, identifiers) => ({
 
 const getEventFixture = () => createEvent('test.name', '2019-09-10T07:30:14.232137918Z', ['id'])
 
-describe('GatewayConnectionReactor', () => {
+describe('<GatewayConnectionReactor />', () => {
   let driver = null
   const baseProps = {
     updateGatewayStatistics: () => {},
@@ -32,7 +32,7 @@ describe('GatewayConnectionReactor', () => {
     driver = getConnectionReactorDriver()
   })
 
-  it('should match snapshot', () => {
+  it('matches snapshot', () => {
     const props = {
       ...baseProps,
       latestEvent: getEventFixture(),
@@ -43,12 +43,12 @@ describe('GatewayConnectionReactor', () => {
     expect(driver.component).toMatchSnapshot()
   })
 
-  it('should render wrapped component', () => {
+  it('renders wrapped component', () => {
     driver.when.created(baseProps)
     expect(driver.is.wrappedComponentPresent()).toBe(true)
   })
 
-  it('should pass wrapped component props', () => {
+  it('passes wrapped component props', () => {
     const props = {
       ...baseProps,
       componentProp: 'prop',
@@ -60,7 +60,7 @@ describe('GatewayConnectionReactor', () => {
     expect(wrappedComponentProps.componentProp).toBe(props.componentProp)
   })
 
-  it('should call `updateGatewayStatistics` on new event of correct type', () => {
+  it('calls `updateGatewayStatistics` on new event of correct type', () => {
     const latestEvent = getEventFixture()
     const updateGatewayStatistics = jest.fn()
     const props = {

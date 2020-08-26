@@ -39,7 +39,7 @@ func TestNeedsBeaconFreqReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{},
 		},
 	)
-	ForEachClass(func(makeClassName func(parts ...string) string, class ttnpb.Class) {
+	ForEachClass(t, func(makeClassName func(parts ...string) string, class ttnpb.Class) {
 		for _, conf := range []struct {
 			Suffix                               string
 			CurrentParameters, DesiredParameters ttnpb.MACParameters

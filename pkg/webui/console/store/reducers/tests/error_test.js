@@ -14,24 +14,24 @@
 
 import reducer from '../ui/error'
 
-describe('error reducers', function() {
+describe('Error reducers', function() {
   const BASE = 'BASE_ACTION'
   const REQUEST = `${BASE}_REQUEST`
   const SUCCESS = `${BASE}_SUCCESS`
   const FAILURE = `${BASE}_FAILURE`
   const defaultState = {}
 
-  it('should return the initial state', function() {
+  it('return the initial state', function() {
     expect(reducer(undefined, {})).toEqual({})
   })
 
-  describe('dispatches invalid action type', function() {
-    it('should ignore base type', function() {
+  describe('when dispatching an invalid action type', function() {
+    it('ignores the base type', function() {
       expect(reducer(defaultState, { type: BASE })).toEqual(defaultState)
     })
   })
 
-  describe('dispatches the `failure` action', function() {
+  describe('when dispatching the `failure` action', function() {
     const error = { status: 404 }
     let newState
 
@@ -39,20 +39,20 @@ describe('error reducers', function() {
       newState = reducer(defaultState, { type: FAILURE, payload: error, error: true })
     })
 
-    it('should set error', function() {
+    it('set the error', function() {
       expect(newState).toEqual({ [BASE]: error })
     })
 
-    describe('dispatches the `success` action', function() {
-      it('should reset the error', function() {
+    describe('when dispatching the `success` action', function() {
+      it('reset the error', function() {
         expect(reducer(newState, { type: SUCCESS })).toEqual({
           [BASE]: undefined,
         })
       })
     })
 
-    describe('dispatches the `request` action', function() {
-      it('should reset the error', function() {
+    describe('when dispatching the `request` action', function() {
+      it('reset the error', function() {
         expect(reducer(newState, { type: REQUEST })).toEqual({
           [BASE]: undefined,
         })
