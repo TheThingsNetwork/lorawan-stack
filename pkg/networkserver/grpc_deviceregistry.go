@@ -398,7 +398,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				if !ttnpb.HasAnyField(sets, "lorawan_phy_version") {
 					req.EndDevice.LoRaWANPHYVersion = dev.LoRaWANPHYVersion
 				}
-				_, phy, err := getDeviceBandVersion(&req.EndDevice, ns.FrequencyPlans)
+				phy, err := deviceBand(&req.EndDevice, ns.FrequencyPlans)
 				if err != nil {
 					return nil, nil, err
 				}
@@ -420,7 +420,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errInvalidFieldMask.WithCause(err)
 		}
 
-		_, phy, err := getDeviceBandVersion(&req.EndDevice, ns.FrequencyPlans)
+		phy, err := deviceBand(&req.EndDevice, ns.FrequencyPlans)
 		if err != nil {
 			return nil, nil, err
 		}

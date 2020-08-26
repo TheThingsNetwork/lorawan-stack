@@ -158,7 +158,7 @@ func uplinkMetadata(ups ...*ttnpb.UplinkMessage) []*ttnpb.RxMetadata {
 	return mds
 }
 
-func txPowerStep(phy band.Band, from, to uint8) float32 {
+func txPowerStep(phy *band.Band, from, to uint8) float32 {
 	max := phy.MaxTxPowerIndex()
 	if from > max {
 		from = max
@@ -200,7 +200,7 @@ func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.D
 	return min, max, true
 }
 
-func adaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, defaults ttnpb.MACSettings) error {
+func adaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) error {
 	if len(dev.RecentADRUplinks) == 0 {
 		return nil
 	}

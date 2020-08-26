@@ -228,7 +228,6 @@
   "console.views.application-general-settings.index.deleteApp": "Delete application",
   "console.views.application-general-settings.index.modalWarning": "Are you sure you want to delete \"{appName}\"? This action cannot be undone and it will not be possible to reuse the application ID.",
   "console.views.application-general-settings.index.updateSuccess": "Application updated",
-  "console.views.application-integrations-lora-cloud.index.loRaCloudDeviceManagement": "LoRa Cloud Device Management",
   "console.views.application-integrations-lora-cloud.index.officialLoRaCloudDocumentation": "Official LoRa Cloud documentation",
   "console.views.application-integrations-lora-cloud.index.loRaCloudInfoText": "With the LoRa Cloud Device & Application Services protocol, you can manage common device functionality at the application layer for LoRaWAN®-enabled devices. This protocol consists of a set of messages that are exchanged on a predefined device management LoRaWAN port (199 by default). The purpose of these messages is three-fold:\n<ol><li>Periodically communicate info messages</li><li>Trigger client-initiated management commands</li><li>Run advanced, application-layer protocols which solve common LoRaWAN use cases</li></ol>",
   "console.views.application-integrations-lora-cloud.index.furtherResources": "Further resources",

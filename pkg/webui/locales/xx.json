@@ -228,7 +228,6 @@
   "console.views.application-general-settings.index.deleteApp": "Xxxxxx xxxxxxxxxxx",
   "console.views.application-general-settings.index.modalWarning": "Xxx xxx xxxx xxx xxxx xx xxxxxx \"{appName}\"? Xxxx xxxxxx xxxxxx xx xxxxxx xxx xx xxxx xxx xx xxxxxxxx xx xxxxx xxx xxxxxxxxxxx XX.",
   "console.views.application-general-settings.index.updateSuccess": "Xxxxxxxxxxx xxxxxxx",
-  "console.views.application-integrations-lora-cloud.index.loRaCloudDeviceManagement": "XxXx Xxxxx Xxxxxx Xxxxxxxxxx",
   "console.views.application-integrations-lora-cloud.index.officialLoRaCloudDocumentation": "Xxxxxxxx XxXx Xxxxx xxxxxxxxxxxxx",
   "console.views.application-integrations-lora-cloud.index.loRaCloudInfoText": "Xxxx xxx XxXx Xxxxx Xxxxxx x Xxxxxxxxxxx Xxxxxxxx xxxxxxxx, xxx xxx xxxxxx xxxxxx xxxxxx xxxxxxxxxxxxx xx xxx xxxxxxxxxxx xxxxx xxx XxXxXXXx-xxxxxxx xxxxxxx. Xxxx xxxxxxxx xxxxxxxx xx x xxx xx xxxxxxxx xxxx xxx xxxxxxxxx xx x xxxxxxxxxx xxxxxx xxxxxxxxxx XxXxXXX xxxx (xxx xx xxxxxxx). Xxx xxxxxxx xx xxxxx xxxxxxxx xx xxxxx-xxxx:\nxxxxxxxxXxxxxxxxxxxx xxxxxxxxxxx xxxx xxxxxxxxx/xxxxxxxXxxxxxx xxxxxx-xxxxxxxxx xxxxxxxxxx xxxxxxxxx/xxxxxxxXxx xxxxxxxx, xxxxxxxxxxx-xxxxx xxxxxxxxx xxxxx xxxxx xxxxxx XxXxXXX xxx xxxxxx/xxxx/xxx",
   "console.views.application-integrations-lora-cloud.index.furtherResources": "Xxxxxxx xxxxxxxxx",

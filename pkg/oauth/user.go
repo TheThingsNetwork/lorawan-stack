@@ -257,8 +257,7 @@ func (s *server) ClientLogout(c echo.Context) error {
 			if len(client.LogoutRedirectURIs) != 0 {
 				redirectURI = client.LogoutRedirectURIs[0]
 			} else {
-				config := s.configFromContext(ctx)
-				redirectURI = config.UI.MountPath()
+				redirectURI = s.config.UI.MountPath()
 			}
 		} else {
 			for _, uri := range client.LogoutRedirectURIs {

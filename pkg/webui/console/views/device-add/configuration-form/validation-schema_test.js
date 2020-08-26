@@ -26,7 +26,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       context,
     })
 
-  describe('has NS, JS and AS', () => {
+  describe('when having NS, JS and AS', () => {
     let schema
 
     beforeEach(() => {
@@ -49,7 +49,7 @@ describe('<ConfigurationForm /> validation schema', () => {
         mayEditKeys: true,
       })(schema)
 
-    it('should process `OTAA` activation mode', () => {
+    it('processes `OTAA` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.OTAA
 
       const validatedValue = validate(schema)
@@ -59,7 +59,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBe(false)
     })
 
-    it('should process `ABP` activation mode', () => {
+    it('processes `ABP` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.ABP
 
       const validatedValue = validate(schema)
@@ -69,7 +69,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBe(false)
     })
 
-    it('should process `multicast` activation mode', () => {
+    it('processes `multicast` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.MULTICAST
 
       const validatedValue = validate(schema)
@@ -79,7 +79,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBe(true)
     })
 
-    it('should process `none` activation mode', () => {
+    it('processes `none` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       const validatedValue = validate(schema)
@@ -89,7 +89,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBeUndefined()
     })
 
-    it('should process `join_server_address`', () => {
+    it('processes `join_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.OTAA
 
       const validatedValue = validate(schema)
@@ -98,7 +98,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.join_server_address).toBe(testHost)
     })
 
-    it('should process `network_server_address`', () => {
+    it('processes `network_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -128,7 +128,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.network_server_address).toBe(testHost)
     })
 
-    it('should process `application_server_address`', () => {
+    it('processes `application_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -158,7 +158,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.application_server_address).toBe(testHost)
     })
 
-    it('should process `lorawan_version`', () => {
+    it('processes `lorawan_version`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -188,7 +188,7 @@ describe('<ConfigurationForm /> validation schema', () => {
     })
   })
 
-  describe('has JS and AS (no NS)', () => {
+  describe('when having JS and AS (no NS)', () => {
     let schema
 
     beforeEach(() => {
@@ -211,7 +211,7 @@ describe('<ConfigurationForm /> validation schema', () => {
         mayEditKeys: true,
       })(schema)
 
-    it('should fail on `ABP` activation mode', done => {
+    it('fails on `ABP` activation mode', done => {
       schema._activation_mode = ACTIVATION_MODES.ABP
 
       try {
@@ -225,7 +225,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       }
     })
 
-    it('should fail on `multicast` activation mode', done => {
+    it('fails on `multicast` activation mode', done => {
       schema._activation_mode = ACTIVATION_MODES.MULTICAST
 
       try {
@@ -239,7 +239,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       }
     })
 
-    it('should process `OTAA` activation mode', () => {
+    it('processes `OTAA` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.OTAA
 
       const validatedValue = validate(schema)
@@ -249,7 +249,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBeUndefined()
     })
 
-    it('should process `none` activation mode', () => {
+    it('processes `none` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       const validatedValue = validate(schema)
@@ -259,7 +259,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBeUndefined()
     })
 
-    it('should process `join_server_address`', () => {
+    it('processes `join_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.OTAA
 
       const validatedValue = validate(schema)
@@ -268,7 +268,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.join_server_address).toBe(testHost)
     })
 
-    it('should strip `network_server_address`', () => {
+    it('strips `network_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -284,7 +284,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.network_server_address).toBeUndefined()
     })
 
-    it('should process `application_server_address`', () => {
+    it('processes `application_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -300,7 +300,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.application_server_address).toBe(testHost)
     })
 
-    it('should process `lorawan_version`', () => {
+    it('processes `lorawan_version`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -316,7 +316,7 @@ describe('<ConfigurationForm /> validation schema', () => {
     })
   })
 
-  describe('has NS and AS (no JS)', () => {
+  describe('when having NS and AS (no JS)', () => {
     let schema
 
     beforeEach(() => {
@@ -339,7 +339,7 @@ describe('<ConfigurationForm /> validation schema', () => {
         mayEditKeys: true,
       })(schema)
 
-    it('should fail on `OTAA` activation mode', done => {
+    it('fails on `OTAA` activation mode', done => {
       schema._activation_mode = ACTIVATION_MODES.OTAA
 
       try {
@@ -353,7 +353,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       }
     })
 
-    it('should process `ABP` activation mode', () => {
+    it('processes `ABP` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.ABP
 
       const validatedValue = validate(schema)
@@ -363,7 +363,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBe(false)
     })
 
-    it('should process `multicast` activation mode', () => {
+    it('processes `multicast` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.MULTICAST
 
       const validatedValue = validate(schema)
@@ -373,7 +373,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBe(true)
     })
 
-    it('should process `none` activation mode', () => {
+    it('processes `none` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       const validatedValue = validate(schema)
@@ -383,7 +383,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBeUndefined()
     })
 
-    it('should strip `join_server_address`', () => {
+    it('strips `join_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -406,7 +406,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.join_server_address).toBeUndefined()
     })
 
-    it('should process `network_server_address`', () => {
+    it('processes `network_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -429,7 +429,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.network_server_address).toBe(testHost)
     })
 
-    it('should process `application_server_address`', () => {
+    it('processes `application_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -452,7 +452,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.application_server_address).toBe(testHost)
     })
 
-    it('should process `lorawan_version`', () => {
+    it('processes `lorawan_version`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -475,7 +475,7 @@ describe('<ConfigurationForm /> validation schema', () => {
     })
   })
 
-  describe('has AS (no JS and NS)', () => {
+  describe('when having AS (no JS and NS)', () => {
     let schema
 
     beforeEach(() => {
@@ -497,7 +497,7 @@ describe('<ConfigurationForm /> validation schema', () => {
         asUrl: `http://${testHost}`,
       })(schema)
 
-    it('should fail on `ABP` activation mode', done => {
+    it('fails on `ABP` activation mode', done => {
       schema._activation_mode = ACTIVATION_MODES.ABP
 
       try {
@@ -511,7 +511,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       }
     })
 
-    it('should fail on `multicast` activation mode', done => {
+    it('fails on `multicast` activation mode', done => {
       schema._activation_mode = ACTIVATION_MODES.MULTICAST
 
       try {
@@ -525,7 +525,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       }
     })
 
-    it('should fail on `OTAA` activation mode', done => {
+    it('fails on `OTAA` activation mode', done => {
       schema._activation_mode = ACTIVATION_MODES.OTAA
 
       try {
@@ -539,7 +539,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       }
     })
 
-    it('should process `none` activation mode', () => {
+    it('processes `none` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       const validatedValue = validate(schema)
@@ -549,7 +549,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBeUndefined()
     })
 
-    it('should strip `join_server_address`', () => {
+    it('strips `join_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       const validatedValue = validate(schema)
@@ -558,7 +558,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.join_server_address).toBeUndefined()
     })
 
-    it('should strip `network_server_address`', () => {
+    it('strips `network_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       const validatedValue = validate(schema)
@@ -567,7 +567,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.network_server_address).toBeUndefined()
     })
 
-    it('should process `application_server_address`', () => {
+    it('processes `application_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       const validatedValue = validate(schema)
@@ -576,7 +576,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.application_server_address).toBeUndefined()
     })
 
-    it('should strip `lorawan_version`', () => {
+    it('strips `lorawan_version`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       const validatedValue = validate(schema)
@@ -585,7 +585,7 @@ describe('<ConfigurationForm /> validation schema', () => {
     })
   })
 
-  describe('has NS and JS (no AS)', () => {
+  describe('when having NS and JS (no AS)', () => {
     let schema
 
     beforeEach(() => {
@@ -608,7 +608,7 @@ describe('<ConfigurationForm /> validation schema', () => {
         mayEditKeys: true,
       })(schema)
 
-    it('should process `OTAA` activation mode', () => {
+    it('processes `OTAA` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.OTAA
 
       const validatedValue = validate(schema)
@@ -618,7 +618,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBe(false)
     })
 
-    it('should process `ABP` activation mode', () => {
+    it('processes `ABP` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.ABP
 
       const validatedValue = validate(schema)
@@ -628,7 +628,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBe(false)
     })
 
-    it('should process `multicast` activation mode', () => {
+    it('processes `multicast` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.MULTICAST
 
       const validatedValue = validate(schema)
@@ -638,7 +638,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBe(true)
     })
 
-    it('should process `none` activation mode', () => {
+    it('processes `none` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       const validatedValue = validate(schema)
@@ -648,7 +648,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBeUndefined()
     })
 
-    it('should strip `join_server_address`', () => {
+    it('strips `join_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -671,7 +671,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.join_server_address).toBeUndefined()
     })
 
-    it('should process `network_server_address`', () => {
+    it('processes `network_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -694,7 +694,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.network_server_address).toBe(testHost)
     })
 
-    it('should process `application_server_address`', () => {
+    it('processes `application_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -717,7 +717,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.application_server_address).toBeUndefined()
     })
 
-    it('should process `lorawan_version`', () => {
+    it('processes `lorawan_version`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)
@@ -747,7 +747,7 @@ describe('<ConfigurationForm /> validation schema', () => {
     })
   })
 
-  describe('is external JS', () => {
+  describe('when using external JS', () => {
     let schema
 
     beforeEach(() => {
@@ -770,7 +770,7 @@ describe('<ConfigurationForm /> validation schema', () => {
         mayEditKeys: true,
       })(schema)
 
-    it('should strip `join_server_address`', () => {
+    it('strips `join_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.OTAA
       schema._external_js = true
 
@@ -783,7 +783,7 @@ describe('<ConfigurationForm /> validation schema', () => {
     })
   })
 
-  describe('cannot edit keys', () => {
+  describe('when keys cannot be edited', () => {
     let schema
 
     beforeEach(() => {
@@ -806,7 +806,7 @@ describe('<ConfigurationForm /> validation schema', () => {
         mayEditKeys: false,
       })(schema)
 
-    it('should fail on `ABP` activation mode', done => {
+    it('fails on `ABP` activation mode', done => {
       schema._activation_mode = ACTIVATION_MODES.ABP
 
       try {
@@ -820,7 +820,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       }
     })
 
-    it('should fail on `multicast` activation mode', done => {
+    it('fails on `multicast` activation mode', done => {
       schema._activation_mode = ACTIVATION_MODES.MULTICAST
 
       try {
@@ -834,7 +834,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       }
     })
 
-    it('should process `OTAA` activation mode', () => {
+    it('processes `OTAA` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.OTAA
 
       const validatedValue = validate(schema)
@@ -844,7 +844,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBe(false)
     })
 
-    it('should process `none` activation mode', () => {
+    it('processes `none` activation mode', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       const validatedValue = validate(schema)
@@ -854,7 +854,7 @@ describe('<ConfigurationForm /> validation schema', () => {
       expect(validatedValue.multicast).toBeUndefined()
     })
 
-    it('should process `network_server_address`', () => {
+    it('processes `network_server_address`', () => {
       schema._activation_mode = ACTIVATION_MODES.NONE
 
       let validatedValue = validate(schema)

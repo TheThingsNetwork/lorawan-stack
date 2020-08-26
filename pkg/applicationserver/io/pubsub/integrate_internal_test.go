@@ -15,10 +15,11 @@
 package pubsub
 
 import (
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 func init() {
-	startBackoffConfig.IntervalFunc = component.MakeTaskBackoffIntervalFunc(false, component.DefaultTaskBackoffResetDuration, (1<<5)*test.Delay)
+	io.TaskBackoffConfig.IntervalFunc = component.MakeTaskBackoffIntervalFunc(false, component.DefaultTaskBackoffResetDuration, (1<<5)*test.Delay)
 }

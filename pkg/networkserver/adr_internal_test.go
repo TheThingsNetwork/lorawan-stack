@@ -473,7 +473,8 @@ func TestAdaptDataRate(t *testing.T) {
 			err := adaptDataRate(
 				log.NewContext(test.ContextWithTB(test.Context(), t), test.GetLogger(t)),
 				dev,
-				Band(fp.BandID, dev.LoRaWANPHYVersion), ttnpb.MACSettings{},
+				LoRaWANBands[fp.BandID][dev.LoRaWANPHYVersion],
+				ttnpb.MACSettings{},
 			)
 			if !a.So(err, should.Equal, tc.Error) {
 				t.Fatalf("ADR failed with: %s", err)

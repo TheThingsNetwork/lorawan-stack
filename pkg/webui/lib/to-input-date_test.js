@@ -14,28 +14,28 @@
 
 import toInputDate from './to-input-date'
 
-describe('toInputDate', function() {
-  describe('with correct argument', function() {
+describe('To input date converter', function() {
+  describe('when using a correct argument', function() {
     const date = new Date('2020-09-24T12:00:00Z')
 
-    it('should return a string length equal to 10', function() {
+    it('returns a string length equal to 10', function() {
       expect(toInputDate(date)).toHaveLength(10)
     })
 
-    it('should return a string of yyyy-mm--dd format', function() {
+    it('returns a string of yyyy-mm--dd format', function() {
       expect(toInputDate(date)).toMatch(/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/)
     })
   })
 
-  describe('with incorrect argument', function() {
+  describe('when unsing an incorrect argument', function() {
     const string = 'ABC123'
     const date = new Date('ABC123')
 
-    it('random string should return undefined', function() {
+    it('returns undefined when using a random string', function() {
       expect(toInputDate(string)).toBe(undefined)
     })
 
-    it('invalid date should return undefined', function() {
+    it('returns undefined when using an invalid date', function() {
       expect(toInputDate(date)).toBe(undefined)
     })
   })

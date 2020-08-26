@@ -18,7 +18,7 @@ import getSideNavigationItemDriver from './index_driver'
 
 import { SideNavigationItem } from '.'
 
-describe('SideNavigationItem', function() {
+describe('<SideNavigationItem />', function() {
   let driver = null
   const location = {
     pathname: '/',
@@ -28,7 +28,7 @@ describe('SideNavigationItem', function() {
     driver = getSideNavigationItemDriver()
   })
 
-  describe('is flat', function() {
+  describe('when it is flat', function() {
     beforeEach(function() {
       driver.when.created({
         title: 'test-title',
@@ -38,12 +38,12 @@ describe('SideNavigationItem', function() {
       })
     })
 
-    it('should match snapshot', function() {
+    it('matches snapshot', function() {
       expect(driver.component).toMatchSnapshot()
     })
   })
 
-  describe('is collapsable', function() {
+  describe('when it is collapsable', function() {
     beforeEach(function() {
       driver.when.created({
         title: 'test-title',
@@ -58,20 +58,20 @@ describe('SideNavigationItem', function() {
       })
     })
 
-    it('should match snapshot', function() {
+    it('matches snapshot', function() {
       expect(driver.component).toMatchSnapshot()
     })
 
-    describe('the user selects the item', function() {
+    describe('when the user selects the item', function() {
       beforeEach(function() {
         driver.when.itemSelected()
       })
 
-      it('should toggle the isExpanded state to true', function() {
+      it('toggles the isExpanded state to true', function() {
         expect(driver.component.state('isExpanded')).toBe(true)
       })
 
-      it('should toggle the isExpanded state to false again', function() {
+      it('toggles the isExpanded state to false again', function() {
         driver.when.itemSelected()
         expect(driver.component.state('isExpanded')).toBe(false)
       })

@@ -44,10 +44,10 @@ type Server interface {
 }
 
 type server struct {
-	c              *component.Component
-	configProvider ConfigProvider
-	osinConfig     *osin.ServerConfig
-	store          Store
+	c          *component.Component
+	config     Config
+	osinConfig *osin.ServerConfig
+	store      Store
 }
 
 // Store used by the OAuth server.
@@ -62,11 +62,15 @@ type Store interface {
 }
 
 // NewServer returns a new OAuth server on top of the given store.
-func NewServer(c *component.Component, store Store, configProvider ConfigProvider) (Server, error) {
+func NewServer(c *component.Component, store Store, config Config) (Server, error) {
 	s := &server{
-		c:              c,
-		configProvider: configProvider,
-		store:          store,
+		c:      c,
+		config: config,
+		store:  store,
+	}
+
+	if s.config.Mount == "" {
+		s.config.Mount = s.config.UI.MountPath()
 	}
 
 	s.osinConfig = &osin.ServerConfig{
@@ -98,15 +102,7 @@ func (s *server) configFromContext(ctx context.Context) *Config {
 	if config, ok := ctx.Value(ctxKey).(*Config); ok {
 		return config
 	}
-	config := s.configProvider(ctx)
-	if config.Mount == "" {
-		config.Mount = config.UI.MountPath()
-	}
-	return &config
-}
-
-func (s *server) configFromEchoContext(c echo.Context) *Config {
-	return s.configFromContext(c.Request().Context())
+	return &s.config
 }
 
 func (s *server) now() time.Time { return time.Now().UTC() }
@@ -189,8 +185,7 @@ func (s *server) output(c echo.Context, resp *osin.Response) error {
 		if err != nil {
 			return err
 		}
-		config := s.configFromEchoContext(c)
-		uiMount := strings.TrimSuffix(config.UI.MountPath(), "/")
+		uiMount := strings.TrimSuffix(s.config.UI.MountPath(), "/")
 		if strings.HasPrefix(location, "/code") || strings.HasPrefix(location, "/local-callback") {
 			location = uiMount + location
 		}
@@ -205,12 +200,11 @@ func (s *server) output(c echo.Context, resp *osin.Response) error {
 }
 
 func (s *server) RegisterRoutes(server *web.Server) {
-	config := s.configFromContext(s.c.Context())
 	root := server.Group(
-		config.Mount,
+		s.config.Mount,
 		func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {
-				config := s.configFromEchoContext(c)
+				config := s.configFromContext(c.Request().Context())
 				c.Set("template_data", config.UI.TemplateData)
 				frontendConfig := config.UI.FrontendConfig
 				frontendConfig.Language = config.UI.TemplateData.Language
@@ -227,7 +221,7 @@ func (s *server) RegisterRoutes(server *web.Server) {
 		}),
 	)
 
-	csrfMiddleware := middleware.CSRF("_csrf", "/", config.CSRFAuthKey)
+	csrfMiddleware := middleware.CSRF("_csrf", "/", s.config.CSRFAuthKey)
 
 	api := root.Group("/api", csrfMiddleware)
 	api.POST("/auth/login", s.Login)

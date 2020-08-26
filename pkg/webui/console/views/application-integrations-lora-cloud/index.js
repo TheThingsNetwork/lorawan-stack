@@ -42,7 +42,6 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 import style from './application-integrations-lora-cloud.styl'
 
 const m = defineMessages({
-  loRaCloudDeviceManagement: 'LoRa Cloud Device Management',
   officialLoRaCloudDocumentation: 'Official LoRa Cloud documentation',
   loRaCloudInfoText: `With the LoRa Cloud Device & Application Services protocol, you can manage common device functionality at the application layer for LoRaWAN®-enabled devices. This protocol consists of a set of messages that are exchanged on a predefined device management LoRaWAN port (199 by default). The purpose of these messages is three-fold:
 <ol><li>Periodically communicate info messages</li><li>Trigger client-initiated management commands</li><li>Run advanced, application-layer protocols which solve common LoRaWAN use cases</li></ol>`,
@@ -59,7 +58,7 @@ const LoRaCloud = () => {
     >
       <ErrorView ErrorComponent={SubViewError}>
         <Container>
-          <PageTitle title="LoRa Cloud™ Device & Application Services" />
+          <PageTitle title="LoRa Cloud Device & Application Services" />
           <Row>
             <Col lg={8} md={12}>
               <img className={style.logo} src={LoRaCloudImage} alt="LoRa Cloud" />
@@ -78,10 +77,10 @@ const LoRaCloud = () => {
                   className={style.furtherResources}
                 />
                 <Link.DocLink
-                  path="/integrations/application-packages/lora-cloud-device-management/"
+                  path="/integrations/application-packages/lora-cloud-device-and-application-services/"
                   secondary
                 >
-                  <Message content={m.loRaCloudDeviceManagement} />
+                  LoRa Cloud Device & Application Services
                 </Link.DocLink>
                 {' | '}
                 <Link.Anchor

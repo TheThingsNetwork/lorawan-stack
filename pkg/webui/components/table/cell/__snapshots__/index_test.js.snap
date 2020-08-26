@@ -1,18 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DataCell should match snapshot 1`] = `
-<Cell
-  centered={false}
-  className="cellData"
-  colSpan={1}
-  component="td"
-  small={false}
->
-  Data entry
-</Cell>
-`;
-
-exports[`HeadCell should match snapshot 1`] = `
+exports[`<HeadCell /> matches snapshot 1`] = `
 <Cell
   centered={false}
   className="cellHead"
@@ -28,5 +16,17 @@ exports[`HeadCell should match snapshot 1`] = `
     lowercase={false}
     uppercase={false}
   />
+</Cell>
+`;
+
+exports[`DataCell matches snapshot 1`] = `
+<Cell
+  centered={false}
+  className="cellData"
+  colSpan={1}
+  component="td"
+  small={false}
+>
+  Data entry
 </Cell>
 `;

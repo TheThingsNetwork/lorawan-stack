@@ -54,15 +54,15 @@ type InteropConfig struct {
 
 // Config represents the ApplicationServer configuration.
 type Config struct {
-	LinkMode            string                    `name:"link-mode" description:"Mode to link applications to their Network Server (all, explicit)"`
-	Devices             DeviceRegistry            `name:"-"`
-	Links               LinkRegistry              `name:"-"`
-	MQTT                config.MQTT               `name:"mqtt" description:"MQTT configuration"`
-	Webhooks            WebhooksConfig            `name:"webhooks" description:"Webhooks configuration"`
-	PubSub              PubSubConfig              `name:"pubsub" description:"Pub/sub messaging configuration"`
-	ApplicationPackages ApplicationPackagesConfig `name:"application-packages" description:"Application packages configuration"`
-	Interop             InteropConfig             `name:"interop" description:"Interop client configuration"`
-	DeviceKEKLabel      string                    `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
+	LinkMode       string                    `name:"link-mode" description:"Mode to link applications to their Network Server (all, explicit)"`
+	Devices        DeviceRegistry            `name:"-"`
+	Links          LinkRegistry              `name:"-"`
+	MQTT           config.MQTT               `name:"mqtt" description:"MQTT configuration"`
+	Webhooks       WebhooksConfig            `name:"webhooks" description:"Webhooks configuration"`
+	PubSub         PubSubConfig              `name:"pubsub" description:"Pub/sub messaging configuration"`
+	Packages       ApplicationPackagesConfig `name:"packages" description:"Application packages configuration"`
+	Interop        InteropConfig             `name:"interop" description:"Interop client configuration"`
+	DeviceKEKLabel string                    `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 }
 
 var errLinkMode = errors.DefineInvalidArgument("link_mode", "invalid link mode `{value}`")

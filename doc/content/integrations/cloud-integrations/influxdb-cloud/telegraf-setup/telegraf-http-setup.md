@@ -4,7 +4,7 @@ description: ""
 weight: 2
 ---
 
-This section contains instructions to configure the Telegraf agent to use [HTTP Listener v2](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/http_listener_v2/) plugin for integration with {{% tts %}} via Webhooks and to send data to InfluxDB Cloud 2.0.
+This section contains instructions to configure the Telegraf agent to use [HTTP Listener v2](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/http_listener_v2/) plugin for integration with {{% tts %}} via [HTTP Webhooks]({{< ref "/integrations/webhooks" >}}) and to send data to InfluxDB Cloud 2.0.
 
 <!--more-->
 

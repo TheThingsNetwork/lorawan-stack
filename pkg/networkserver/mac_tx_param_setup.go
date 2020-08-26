@@ -35,7 +35,7 @@ var (
 	)()
 )
 
-func deviceNeedsTxParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
+func deviceNeedsTxParamSetupReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
 	if !phy.TxParamSetupReqSupport ||
 		dev.GetMulticast() ||
 		dev.GetMACState() == nil ||
@@ -58,7 +58,7 @@ func deviceNeedsTxParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
 	return false
 }
 
-func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, phy band.Band) macCommandEnqueueState {
+func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, phy *band.Band) macCommandEnqueueState {
 	if !deviceNeedsTxParamSetupReq(dev, phy) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,

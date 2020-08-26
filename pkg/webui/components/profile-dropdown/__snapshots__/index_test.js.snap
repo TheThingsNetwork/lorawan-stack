@@ -1,6 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Profile Dropdown is in initial state has dropdown open should match snapshot 1`] = `
+exports[`<ProfileDropdown /> when in initial state matches snapshot 1`] = `
+<div
+  className="container"
+  onClick={[Function]}
+  onKeyPress={[Function]}
+  role="button"
+  tabIndex="0"
+>
+  <span
+    className="id"
+  >
+    kschiffer
+  </span>
+  <Icon
+    icon="arrow_drop_down"
+    large={false}
+    nudgeDown={false}
+    nudgeUp={false}
+    small={false}
+  />
+</div>
+`;
+
+exports[`<ProfileDropdown /> when in initial state when it has dropdown open matches snapshot 1`] = `
 <div
   className="container"
   onClick={[Function]}
@@ -38,28 +61,5 @@ exports[`Profile Dropdown is in initial state has dropdown open should match sna
       title="Logout"
     />
   </Dropdown>
-</div>
-`;
-
-exports[`Profile Dropdown is in initial state should match snapshot 1`] = `
-<div
-  className="container"
-  onClick={[Function]}
-  onKeyPress={[Function]}
-  role="button"
-  tabIndex="0"
->
-  <span
-    className="id"
-  >
-    kschiffer
-  </span>
-  <Icon
-    icon="arrow_drop_down"
-    large={false}
-    nudgeDown={false}
-    nudgeUp={false}
-    small={false}
-  />
 </div>
 `;

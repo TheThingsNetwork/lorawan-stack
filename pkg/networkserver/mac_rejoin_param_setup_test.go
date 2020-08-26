@@ -31,14 +31,12 @@ func TestNeedsRejoinParamSetupReq(t *testing.T) {
 		InputDevice *ttnpb.EndDevice
 		Needs       bool
 	}
-	var tcs []TestCase
-
-	tcs = append(tcs,
-		TestCase{
+	tcs := []TestCase{
+		{
 			Name:        "no MAC state",
 			InputDevice: &ttnpb.EndDevice{},
 		},
-	)
+	}
 	for _, conf := range []struct {
 		Suffix                               string
 		CurrentParameters, DesiredParameters ttnpb.MACParameters
@@ -80,7 +78,7 @@ func TestNeedsRejoinParamSetupReq(t *testing.T) {
 			Needs: true,
 		},
 	} {
-		ForEachMACVersion(func(makeMACName func(parts ...string) string, macVersion ttnpb.MACVersion) {
+		ForEachMACVersion(t, func(makeMACName func(parts ...string) string, macVersion ttnpb.MACVersion) {
 			tcs = append(tcs,
 				TestCase{
 					Name: makeMACName(conf.Suffix),

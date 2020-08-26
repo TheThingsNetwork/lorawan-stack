@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Pagination has only a single page with hiding option disabled should match snapshot 1`] = `
+exports[`<Pagination /> when it has only a single page with hiding option disabled matches snapshot 1`] = `
 <ul
   className="pagination"
 >
@@ -56,7 +56,7 @@ exports[`Pagination has only a single page with hiding option disabled should ma
 </ul>
 `;
 
-exports[`Pagination has several pages should match snapshot 1`] = `
+exports[`<Pagination /> when it has several pages matches snapshot 1`] = `
 <ul
   className="pagination"
 >

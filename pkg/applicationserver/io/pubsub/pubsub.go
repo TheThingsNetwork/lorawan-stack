@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider"
@@ -73,15 +72,6 @@ func (ps *PubSub) startAll(ctx context.Context) error {
 	)
 }
 
-var startBackoffConfig = &component.TaskBackoffConfig{
-	Jitter: component.DefaultTaskBackoffJitter,
-	IntervalFunc: component.MakeTaskBackoffIntervalFunc(false, component.DefaultTaskBackoffResetDuration,
-		100*time.Millisecond,
-		time.Second,
-		10*time.Second,
-	),
-}
-
 func (ps *PubSub) startTask(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"application_uid", unique.ID(ctx, ids.ApplicationIdentifiers),
@@ -99,23 +89,10 @@ func (ps *PubSub) startTask(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 				return nil
 			}
 
-			err = ps.start(ctx, target)
-			switch {
-			case errors.IsFailedPrecondition(err),
-				errors.IsUnauthenticated(err),
-				errors.IsPermissionDenied(err),
-				errors.IsInvalidArgument(err):
-				log.FromContext(ctx).WithError(err).Warn("Failed to start")
-				return nil
-			case errors.IsCanceled(err),
-				errors.IsAlreadyExists(err):
-				return nil
-			default:
-				return err
-			}
+			return ps.start(ctx, target)
 		},
 		Restart: component.TaskRestartOnFailure,
-		Backoff: startBackoffConfig,
+		Backoff: io.TaskBackoffConfig,
 	})
 }
 
@@ -233,8 +210,6 @@ func (i *integration) startHandleDown(ctx context.Context) {
 	}
 }
 
-var errAlreadyConfigured = errors.DefineAlreadyExists("already_configured", "already configured to `{application_uid}` `{pub_sub_id}`")
-
 func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err error) {
 	appUID := unique.ID(ctx, pb.ApplicationIdentifiers)
 	psUID := PubSubUID(appUID, pb.PubSubID)
@@ -267,17 +242,14 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	defer close(i.closed)
 	if _, loaded := ps.integrations.LoadOrStore(psUID, i); loaded {
 		logger.Debug("Pub/sub already started")
-		return errAlreadyConfigured.WithAttributes("application_uid", appUID, "pub_sub_id", pb.PubSubID)
+		return nil
 	}
 	defer ps.integrations.Delete(psUID)
 
 	defer func() {
-		if err != nil && !errors.IsCanceled(err) {
+		if err != nil {
 			logger.WithError(err).Warn("Pub/sub failed")
 			registerIntegrationFail(ctx, i, err)
-		} else {
-			logger.Info("Pub/sub canceled")
-			registerIntegrationStop(ctx, i)
 		}
 	}()
 
@@ -318,6 +290,10 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	i.startHandleDown(ctx)
 	logger.Info("Pub/sub started")
 	registerIntegrationStart(ctx, i)
+	defer func() {
+		logger.Info("Pub/sub stopped")
+		registerIntegrationStop(ctx, i)
+	}()
 
 	<-ctx.Done()
 	return ctx.Err()
@@ -328,7 +304,7 @@ func (ps *PubSub) stop(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifie
 	psUID := PubSubUID(appUID, ids.PubSubID)
 	if val, ok := ps.integrations.Load(psUID); ok {
 		i := val.(*integration)
-		i.cancel(context.Canceled)
+		i.cancel(nil)
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
