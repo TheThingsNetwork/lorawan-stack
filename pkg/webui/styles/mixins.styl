@@ -241,6 +241,17 @@ visually-hidden()
   clip: rect(0 0 0 0)
   overflow: hidden
 
+// Full width is a shorthand mixin to force an element to take all available width regardless of its parent.
+
+full-width()
+  left: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  max-width: 100vw;
+  position: relative;
+  right: 50%;
+  width: 100vw;
+
 
 // RESPONSIVENESS
 // ==============

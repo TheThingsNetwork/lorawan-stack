@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.container
-  padding: $cs.xxs
-  line-height: 1
-  height: $fs.m
-  display: flex
-  &:not(:last-child)
-    margin-right: $cs.l
-    +media-query($bp.s)
-      margin-right: $cs.xs
+import EntityTitleSectionContent from './content'
+import EntityCount from './entity-count'
+import MessagesCount from './messages-count'
 
-.icon
-  color: $c-icon-fill
-  margin-right: $cs.xs
+EntityTitleSectionContent.EntityCount = EntityCount
+EntityTitleSectionContent.MessagesCount = MessagesCount
 
-.value
-  font-weight: $fw.bold
-  margin-right: $cs.xxs
-
-.message
-  +media-query($bp.s)
-    display: none
+export default EntityTitleSectionContent
