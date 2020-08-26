@@ -43,8 +43,14 @@ In its configuration, choose **set by msg.method** for a **Method** and select *
 
 {{< figure src="http-request-node.png" alt="Configuring HTTP request node" >}}
 
+To avoid timeouts of the HTTP requests originating from {{% tts %}}, the **http in** node needs to be connected to an **http response** node.
+
+Add the **http response** node to the dashboard and configure it to reply to these requests with `200 OK`.
+
+{{< figure src="http-response-node.png" alt="Configuring HTTP response node" >}}
+
 Finally, add the **debug** node to the dashboard, configure it to display a **complete msg object** as an **Output** and finish by selecting **Done**.
 
-Connect these nodes and click the **Deploy** button in the upper right corner. Use the debug window below this button to monitor the results.
+Connect these nodes as shown on the picture below and click the **Deploy** button in the upper right corner. Use the debug window below this button to monitor the results.
 
 {{< figure src="final-setup.png" alt="Node-RED setup" >}}
