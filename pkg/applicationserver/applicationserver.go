@@ -63,7 +63,7 @@ type ApplicationServer struct {
 	linkMode         LinkMode
 	linkRegistry     LinkRegistry
 	deviceRegistry   DeviceRegistry
-	formatter        payloadFormatter
+	formatters       payloadFormatters
 	webhooks         web.Webhooks
 	webhookTemplates web.TemplateStore
 	pubsub           *pubsub.PubSub
@@ -121,19 +121,10 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		linkMode:       linkMode,
 		linkRegistry:   conf.Links,
 		deviceRegistry: wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
-		formatter: payloadFormatter{
-			repository: &devicerepository.Client{
-				Fetcher: drFetcher,
-			},
-			upFormatters: map[ttnpb.PayloadFormatter]messageprocessors.PayloadDecoder{
-				ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
-				ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
-			},
-			downFormatters: map[ttnpb.PayloadFormatter]messageprocessors.PayloadEncoder{
-				ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
-				ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
-			},
-		},
+		formatters: payloadFormatters(map[ttnpb.PayloadFormatter]messageprocessors.PayloadEncodeDecoder{
+			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
+			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
+		}),
 		interopClient: interopCl,
 		interopID:     conf.Interop.ID,
 	}
@@ -373,7 +364,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 						CorrelationIDs: item.CorrelationIDs,
 					}
 					if !skipPayloadCrypto(link, dev) {
-						if err := as.encodeAndEncrypt(ctx, dev, session, encryptedItem, link.DefaultFormatters); err != nil {
+						if err := as.encodeAndEncryptDownlink(ctx, dev, session, encryptedItem, link.DefaultFormatters); err != nil {
 							logger.WithError(err).Warn("Encoding and encryption of downlink message failed; drop item")
 							return nil, nil, err
 						}
@@ -462,7 +453,12 @@ var errNoAppSKey = errors.DefineCorruption("no_app_s_key", "no AppSKey")
 
 // DownlinkQueueList lists the application downlink queue of the given end device.
 func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error) {
-	dev, err := as.deviceRegistry.Get(ctx, ids, []string{"session", "skip_payload_crypto", "pending_session"})
+	dev, err := as.deviceRegistry.Get(ctx, ids, []string{
+		"formatters",
+		"session",
+		"skip_payload_crypto",
+		"pending_session",
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -495,17 +491,10 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	if skipPayloadCrypto(link, dev) {
 		return queue, nil
 	}
-	// TODO: Cache unwrapped keys (https://github.com/TheThingsNetwork/lorawan-stack/issues/36)
-	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, *session.AppSKey, as.KeyVault)
-	if err != nil {
-		return nil, err
-	}
 	for _, item := range queue {
-		b, err := crypto.DecryptDownlink(appSKey, session.DevAddr, item.FCnt, item.FRMPayload, false)
-		if err != nil {
+		if err := as.decryptAndDecodeDownlink(ctx, dev, item, link.DefaultFormatters); err != nil {
 			return nil, err
 		}
-		item.FRMPayload = b
 	}
 	return queue, nil
 }
@@ -934,7 +923,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		return err
 	}
 	if !skipPayloadCrypto(link, dev) {
-		if err := as.decryptAndDecode(ctx, dev, uplink, link.DefaultFormatters); err != nil {
+		if err := as.decryptAndDecodeUplink(ctx, dev, uplink, link.DefaultFormatters); err != nil {
 			return err
 		}
 	} else if dev.Session != nil && dev.Session.AppSKey != nil {
@@ -956,7 +945,7 @@ func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnp
 	if err != nil {
 		return err
 	}
-	return as.decode(ctx, dev, uplink, link.DefaultFormatters)
+	return as.decodeUplink(ctx, dev, uplink, link.DefaultFormatters)
 }
 
 func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *link) (pass bool, err error) {
@@ -1031,6 +1020,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 // If application payload crypto is skipped, this method returns nil.
 func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *link) error {
 	dev, err := as.deviceRegistry.Get(ctx, ids, []string{
+		"formatters",
 		"pending_session",
 		"session",
 		"skip_payload_crypto_override",
@@ -1041,27 +1031,7 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 	if skipPayloadCrypto(link, dev) {
 		return nil
 	}
-	var session *ttnpb.Session
-	switch {
-	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyID, msg.SessionKeyID):
-		session = dev.Session
-	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, msg.SessionKeyID):
-		session = dev.PendingSession
-	default:
-		return errUnknownSession.New()
-	}
-	if session.GetAppSKey() == nil {
-		return errNoAppSKey.New()
-	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, *session.AppSKey, as.KeyVault)
-	if err != nil {
-		return err
-	}
-	msg.FRMPayload, err = crypto.DecryptDownlink(appSKey, session.DevAddr, msg.FCnt, msg.FRMPayload, false)
-	if err != nil {
-		return err
-	}
-	return nil
+	return as.decryptAndDecodeDownlink(ctx, dev, msg, link.DefaultFormatters)
 }
 
 var errPayloadCryptoDisabled = errors.DefineAborted("payload_crypto_disabled", "payload crypto is disabled")

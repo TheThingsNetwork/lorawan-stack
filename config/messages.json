@@ -7262,9 +7262,27 @@
       "file": "observability.go"
     }
   },
+  "event:as.down.data.decode.fail": {
+    "translations": {
+      "en": "decode downlink data message failure"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
   "event:as.down.data.drop": {
     "translations": {
       "en": "drop downlink data message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.down.data.encode.fail": {
+    "translations": {
+      "en": "encode downlink data message failure"
     },
     "description": {
       "package": "pkg/applicationserver",

@@ -99,6 +99,16 @@ var (
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
+	evtEncodeFailDataDown = events.Define(
+		"as.down.data.encode.fail", "encode downlink data message failure",
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
+	)
+	evtDecodeFailDataDown = events.Define(
+		"as.down.data.decode.fail", "decode downlink data message failure",
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
+	)
 	evtLostQueueDataDown = events.Define(
 		"as.down.data.queue.lost", "lose downlink data queue",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
