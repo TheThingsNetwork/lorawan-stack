@@ -539,8 +539,334 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 	return nil, false
 }
 
-func frequencyPlanChannels(phy *band.Band, fpUpChs []frequencyplans.Channel, fpDownChs ...frequencyplans.Channel) []*ttnpb.MACParameters_Channel {
-	chs := make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels)+len(fpUpChs))
+func deviceDefaultClass(dev *ttnpb.EndDevice) (ttnpb.Class, error) {
+	switch {
+	case dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC:
+		return ttnpb.CLASS_C, nil
+	case !dev.Multicast:
+		return ttnpb.CLASS_A, nil
+	case dev.SupportsClassC:
+		return ttnpb.CLASS_C, nil
+	case dev.SupportsClassB:
+		return ttnpb.CLASS_B, nil
+	default:
+		return ttnpb.CLASS_A, errClassAMulticast.New()
+	}
+}
+
+func deviceDefaultLoRaWANVersion(dev *ttnpb.EndDevice) ttnpb.MACVersion {
+	switch {
+	case dev.Multicast:
+		return dev.LoRaWANVersion
+	case dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0:
+		return ttnpb.MAC_V1_1
+	default:
+		return dev.LoRaWANVersion
+	}
+}
+
+func deviceDefaultPingSlotPeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) *ttnpb.PingSlotPeriodValue {
+	switch {
+	case dev.GetMACSettings().GetPingSlotPeriodicity() != nil:
+		return dev.MACSettings.PingSlotPeriodicity
+	case defaults.GetPingSlotPeriodicity() != nil:
+		return defaults.PingSlotPeriodicity
+	default:
+		return nil
+	}
+}
+
+func deviceDesiredMaxEIRP(dev *ttnpb.EndDevice, phy *band.Band, fp *frequencyplans.FrequencyPlan, defaults ttnpb.MACSettings) float32 {
+	switch {
+	case fp.MaxEIRP != nil && *fp.MaxEIRP > 0 && *fp.MaxEIRP < phy.DefaultMaxEIRP:
+		return *fp.MaxEIRP
+	default:
+		return phy.DefaultMaxEIRP
+	}
+}
+
+func deviceDesiredUplinkDwellTime(fp *frequencyplans.FrequencyPlan) *pbtypes.BoolValue {
+	if fp.DwellTime.Uplinks == nil {
+		return nil
+	}
+	return &pbtypes.BoolValue{Value: *fp.DwellTime.Uplinks}
+}
+
+func deviceDesiredDownlinkDwellTime(fp *frequencyplans.FrequencyPlan) *pbtypes.BoolValue {
+	if fp.DwellTime.Downlinks == nil {
+		return nil
+	}
+	return &pbtypes.BoolValue{Value: *fp.DwellTime.Downlinks}
+}
+
+func deviceDefaultRX1Delay(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) ttnpb.RxDelay {
+	switch {
+	case dev.GetMACSettings().GetRx1Delay() != nil:
+		return dev.MACSettings.Rx1Delay.Value
+	case defaults.Rx1Delay != nil:
+		return defaults.Rx1Delay.Value
+	default:
+		return ttnpb.RxDelay(phy.ReceiveDelay1.Seconds())
+	}
+}
+
+func deviceDesiredRX1Delay(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) ttnpb.RxDelay {
+	switch {
+	case dev.GetMACSettings().GetDesiredRx1Delay() != nil:
+		return dev.MACSettings.DesiredRx1Delay.Value
+	case defaults.DesiredRx1Delay != nil:
+		return defaults.DesiredRx1Delay.Value
+	default:
+		return deviceDefaultRX1Delay(dev, phy, defaults)
+	}
+}
+
+func deviceDesiredADRAckLimitExponent(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) *ttnpb.ADRAckLimitExponentValue {
+	switch {
+	case dev.GetMACSettings().GetDesiredADRAckLimitExponent() != nil:
+		return &ttnpb.ADRAckLimitExponentValue{Value: dev.MACSettings.DesiredADRAckLimitExponent.Value}
+	case defaults.DesiredADRAckLimitExponent != nil:
+		return &ttnpb.ADRAckLimitExponentValue{Value: defaults.DesiredADRAckLimitExponent.Value}
+	default:
+		return &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit}
+	}
+}
+
+func deviceDesiredADRAckDelayExponent(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) *ttnpb.ADRAckDelayExponentValue {
+	switch {
+	case dev.GetMACSettings().GetDesiredADRAckDelayExponent() != nil:
+		return &ttnpb.ADRAckDelayExponentValue{Value: dev.MACSettings.DesiredADRAckDelayExponent.Value}
+	case defaults.DesiredADRAckDelayExponent != nil:
+		return &ttnpb.ADRAckDelayExponentValue{Value: defaults.DesiredADRAckDelayExponent.Value}
+	default:
+		return &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay}
+	}
+}
+
+func deviceDefaultRX1DataRateOffset(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint32 {
+	switch {
+	case dev.GetMACSettings().GetRx1DataRateOffset() != nil:
+		return dev.MACSettings.Rx1DataRateOffset.Value
+	case defaults.Rx1DataRateOffset != nil:
+		return defaults.Rx1DataRateOffset.Value
+	default:
+		return 0
+	}
+}
+
+func deviceDesiredRX1DataRateOffset(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint32 {
+	switch {
+	case dev.GetMACSettings().GetDesiredRx1DataRateOffset() != nil:
+		return dev.MACSettings.DesiredRx1DataRateOffset.Value
+	case defaults.DesiredRx1DataRateOffset != nil:
+		return defaults.DesiredRx1DataRateOffset.Value
+	default:
+		return deviceDefaultRX1DataRateOffset(dev, defaults)
+	}
+}
+
+func deviceDefaultRX2DataRateIndex(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) ttnpb.DataRateIndex {
+	switch {
+	case dev.GetMACSettings().GetRx2DataRateIndex() != nil:
+		return dev.MACSettings.Rx2DataRateIndex.Value
+	case defaults.Rx2DataRateIndex != nil:
+		return defaults.Rx2DataRateIndex.Value
+	default:
+		return phy.DefaultRx2Parameters.DataRateIndex
+	}
+}
+
+func deviceDesiredRX2DataRateIndex(dev *ttnpb.EndDevice, phy *band.Band, fp *frequencyplans.FrequencyPlan, defaults ttnpb.MACSettings) ttnpb.DataRateIndex {
+	switch {
+	case dev.GetMACSettings().GetDesiredRx2DataRateIndex() != nil:
+		return dev.MACSettings.DesiredRx2DataRateIndex.Value
+	case fp.DefaultRx2DataRate != nil:
+		return ttnpb.DataRateIndex(*fp.DefaultRx2DataRate)
+	case defaults.DesiredRx2DataRateIndex != nil:
+		return defaults.DesiredRx2DataRateIndex.Value
+	default:
+		return deviceDefaultRX2DataRateIndex(dev, phy, defaults)
+	}
+}
+
+func deviceDefaultRX2Frequency(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) uint64 {
+	switch {
+	case dev.GetMACSettings().GetRx2Frequency() != nil && dev.MACSettings.Rx2Frequency.Value != 0:
+		return dev.MACSettings.Rx2Frequency.Value
+	case defaults.Rx2Frequency != nil && dev.MACSettings.Rx2Frequency.Value != 0:
+		return defaults.Rx2Frequency.Value
+	default:
+		return phy.DefaultRx2Parameters.Frequency
+	}
+}
+
+func deviceDesiredRX2Frequency(dev *ttnpb.EndDevice, phy *band.Band, fp *frequencyplans.FrequencyPlan, defaults ttnpb.MACSettings) uint64 {
+	switch {
+	case dev.GetMACSettings().GetDesiredRx2Frequency() != nil && dev.MACSettings.DesiredRx2Frequency.Value != 0:
+		return dev.MACSettings.DesiredRx2Frequency.Value
+	case fp.Rx2Channel != nil:
+		return fp.Rx2Channel.Frequency
+	case defaults.DesiredRx2Frequency != nil && defaults.DesiredRx2Frequency.Value != 0:
+		return defaults.DesiredRx2Frequency.Value
+	default:
+		return deviceDefaultRX2Frequency(dev, phy, defaults)
+	}
+}
+
+func deviceDefaultMaxDutyCycle(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) ttnpb.AggregatedDutyCycle {
+	switch {
+	case dev.GetMACSettings().GetMaxDutyCycle() != nil:
+		return dev.MACSettings.MaxDutyCycle.Value
+	case defaults.MaxDutyCycle != nil:
+		return defaults.MaxDutyCycle.Value
+	default:
+		return ttnpb.DUTY_CYCLE_1
+	}
+}
+
+func deviceDesiredMaxDutyCycle(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) ttnpb.AggregatedDutyCycle {
+	switch {
+	case dev.GetMACSettings().GetDesiredMaxDutyCycle() != nil:
+		return dev.MACSettings.DesiredMaxDutyCycle.Value
+	case defaults.DesiredMaxDutyCycle != nil:
+		return defaults.DesiredMaxDutyCycle.Value
+	default:
+		return deviceDefaultMaxDutyCycle(dev, defaults)
+	}
+}
+
+func deviceDefaultPingSlotFrequency(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) uint64 {
+	switch {
+	case dev.GetMACSettings().GetPingSlotFrequency() != nil && dev.MACSettings.PingSlotFrequency.Value != 0:
+		return dev.MACSettings.PingSlotFrequency.Value
+	case defaults.PingSlotFrequency != nil && defaults.PingSlotFrequency.Value != 0:
+		return defaults.PingSlotFrequency.Value
+	case phy.PingSlotFrequency != nil:
+		return *phy.PingSlotFrequency
+	default:
+		return 0
+	}
+}
+
+func deviceDesiredPingSlotFrequency(dev *ttnpb.EndDevice, phy *band.Band, fp *frequencyplans.FrequencyPlan, defaults ttnpb.MACSettings) uint64 {
+	switch {
+	case dev.GetMACSettings().GetDesiredPingSlotFrequency() != nil && dev.MACSettings.DesiredPingSlotFrequency.Value != 0:
+		return dev.MACSettings.DesiredPingSlotFrequency.Value
+	case fp.PingSlot != nil && fp.PingSlot.Frequency != 0:
+		return fp.PingSlot.Frequency
+	case defaults.DesiredPingSlotFrequency != nil && defaults.DesiredPingSlotFrequency.Value != 0:
+		return defaults.DesiredPingSlotFrequency.Value
+	default:
+		return deviceDefaultPingSlotFrequency(dev, phy, defaults)
+	}
+}
+
+func deviceDefaultPingSlotDataRateIndexValue(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) *ttnpb.DataRateIndexValue {
+	switch {
+	case dev.GetMACSettings().GetPingSlotDataRateIndex() != nil:
+		return dev.MACSettings.PingSlotDataRateIndex
+	case defaults.PingSlotDataRateIndex != nil:
+		return defaults.PingSlotDataRateIndex
+	default:
+		// Default to mbed-os and LoRaMac-node behavior.
+		// https://github.com/Lora-net/LoRaMac-node/blob/87f19e84ae2fc4af72af9567fe722386de6ce9f4/src/mac/region/RegionCN779.h#L235.
+		return &ttnpb.DataRateIndexValue{Value: phy.Beacon.DataRateIndex}
+	}
+}
+
+func deviceDesiredPingSlotDataRateIndexValue(dev *ttnpb.EndDevice, phy *band.Band, fp *frequencyplans.FrequencyPlan, defaults ttnpb.MACSettings) *ttnpb.DataRateIndexValue {
+	switch {
+	case dev.GetMACSettings().GetDesiredPingSlotDataRateIndex() != nil:
+		return dev.MACSettings.DesiredPingSlotDataRateIndex
+	case fp.DefaultPingSlotDataRate != nil:
+		return &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex(*fp.DefaultPingSlotDataRate)}
+	case defaults.DesiredPingSlotDataRateIndex != nil:
+		return defaults.DesiredPingSlotDataRateIndex
+	default:
+		return deviceDefaultPingSlotDataRateIndexValue(dev, phy, defaults)
+	}
+}
+
+func deviceDefaultBeaconFrequency(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint64 {
+	switch {
+	case dev.GetMACSettings().GetBeaconFrequency() != nil && dev.MACSettings.BeaconFrequency.Value != 0:
+		return dev.MACSettings.BeaconFrequency.Value
+	case defaults.BeaconFrequency != nil:
+		return defaults.BeaconFrequency.Value
+	default:
+		return 0
+	}
+}
+
+func deviceDesiredBeaconFrequency(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint64 {
+	switch {
+	case dev.GetMACSettings().GetDesiredBeaconFrequency() != nil && dev.MACSettings.DesiredBeaconFrequency.Value != 0:
+		return dev.MACSettings.DesiredBeaconFrequency.Value
+	case defaults.DesiredBeaconFrequency != nil && defaults.DesiredBeaconFrequency.Value != 0:
+		return defaults.DesiredBeaconFrequency.Value
+	default:
+		return deviceDefaultBeaconFrequency(dev, defaults)
+	}
+}
+
+func deviceDefaultChannels(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) []*ttnpb.MACParameters_Channel {
+	// NOTE: FactoryPresetFrequencies does not indicate the data rate ranges allowed for channels.
+	// In the latest regional parameters spec(1.1b) the data rate ranges are DR0-DR5 for mandatory channels in all non-fixed channel plans,
+	// hence we assume the same range for predefined channels.
+	var chs []*ttnpb.MACParameters_Channel
+	switch {
+	case len(dev.GetMACSettings().GetFactoryPresetFrequencies()) > 0:
+		chs = make([]*ttnpb.MACParameters_Channel, 0, len(dev.MACSettings.FactoryPresetFrequencies))
+		for _, freq := range dev.MACSettings.FactoryPresetFrequencies {
+			chs = append(chs, &ttnpb.MACParameters_Channel{
+				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+				UplinkFrequency:   freq,
+				DownlinkFrequency: freq,
+				EnableUplink:      true,
+			})
+		}
+	case len(defaults.GetFactoryPresetFrequencies()) > 0:
+		chs = make([]*ttnpb.MACParameters_Channel, 0, len(defaults.FactoryPresetFrequencies))
+		for _, freq := range defaults.FactoryPresetFrequencies {
+			chs = append(chs, &ttnpb.MACParameters_Channel{
+				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+				UplinkFrequency:   freq,
+				DownlinkFrequency: freq,
+				EnableUplink:      true,
+			})
+		}
+	default:
+		if len(phy.DownlinkChannels) > len(phy.UplinkChannels) ||
+			len(phy.UplinkChannels) > int(phy.MaxUplinkChannels) ||
+			len(phy.DownlinkChannels) > int(phy.MaxDownlinkChannels) {
+			// NOTE: In case the spec changes and this assumption is not valid anymore,
+			// the implementation of this function won't be valid and has to be changed.
+			panic("uplink/downlink channel length is inconsistent")
+		}
+		chs = make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels))
+		for i, phyUpCh := range phy.UplinkChannels {
+			chs = append(chs, &ttnpb.MACParameters_Channel{
+				MinDataRateIndex:  phyUpCh.MinDataRate,
+				MaxDataRateIndex:  phyUpCh.MaxDataRate,
+				UplinkFrequency:   phyUpCh.Frequency,
+				DownlinkFrequency: phy.DownlinkChannels[i%len(phy.DownlinkChannels)].Frequency,
+				EnableUplink:      true,
+			})
+		}
+	}
+	return chs
+}
+
+func deviceDesiredChannels(phy *band.Band, fp *frequencyplans.FrequencyPlan, defaults ttnpb.MACSettings) []*ttnpb.MACParameters_Channel {
+	if len(phy.DownlinkChannels) > len(phy.UplinkChannels) || len(fp.DownlinkChannels) > len(fp.UplinkChannels) ||
+		len(phy.UplinkChannels) > int(phy.MaxUplinkChannels) || len(phy.DownlinkChannels) > int(phy.MaxDownlinkChannels) ||
+		len(fp.UplinkChannels) > int(phy.MaxUplinkChannels) || len(fp.DownlinkChannels) > int(phy.MaxDownlinkChannels) {
+		// NOTE: In case the spec changes and this assumption is not valid anymore,
+		// the implementation of this function won't be valid and has to be changed.
+		panic("uplink/downlink channel length is inconsistent")
+	}
+
+	chs := make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels)+len(fp.UplinkChannels))
 	for i, phyUpCh := range phy.UplinkChannels {
 		chs = append(chs, &ttnpb.MACParameters_Channel{
 			MinDataRateIndex:  phyUpCh.MinDataRate,
@@ -551,7 +877,7 @@ func frequencyPlanChannels(phy *band.Band, fpUpChs []frequencyplans.Channel, fpD
 	}
 
 outerUp:
-	for _, fpUpCh := range fpUpChs {
+	for _, fpUpCh := range fp.UplinkChannels {
 		for _, ch := range chs {
 			if ch.UplinkFrequency == fpUpCh.Frequency {
 				ch.MinDataRateIndex = ttnpb.DataRateIndex(fpUpCh.MinDataRate)
@@ -568,9 +894,9 @@ outerUp:
 			EnableUplink:      true,
 		})
 	}
-	if len(fpDownChs) > 0 {
+	if len(fp.DownlinkChannels) > 0 {
 		for i, ch := range chs {
-			ch.DownlinkFrequency = fpDownChs[i%len(fpDownChs)].Frequency
+			ch.DownlinkFrequency = fp.DownlinkChannels[i%len(fp.DownlinkChannels)].Frequency
 		}
 	}
 	return chs
@@ -581,251 +907,54 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 	if err != nil {
 		return nil, err
 	}
-
-	class := ttnpb.CLASS_A
-	if dev.Multicast {
-		if dev.SupportsClassC {
-			class = ttnpb.CLASS_C
-		} else if dev.SupportsClassB {
-			class = ttnpb.CLASS_B
-		} else {
-			return nil, errClassAMulticast.New()
-		}
-	} else if dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC {
-		class = ttnpb.CLASS_C
+	class, err := deviceDefaultClass(dev)
+	if err != nil {
+		return nil, err
 	}
-
-	macState := &ttnpb.MACState{
-		LoRaWANVersion: dev.LoRaWANVersion,
-		DeviceClass:    class,
-	}
-	if dev.GetMACSettings().GetPingSlotPeriodicity() != nil {
-		macState.PingSlotPeriodicity = dev.MACSettings.PingSlotPeriodicity
-	} else if defaults.GetPingSlotPeriodicity() != nil {
-		macState.PingSlotPeriodicity = defaults.PingSlotPeriodicity
-	}
-
-	macState.CurrentParameters.MaxEIRP = phy.DefaultMaxEIRP
-	if fp.MaxEIRP != nil && *fp.MaxEIRP > 0 && *fp.MaxEIRP < macState.CurrentParameters.MaxEIRP {
-		macState.DesiredParameters.MaxEIRP = *fp.MaxEIRP
-	} else {
-		macState.DesiredParameters.MaxEIRP = macState.CurrentParameters.MaxEIRP
-	}
-	if fp.DwellTime.Uplinks != nil {
-		macState.DesiredParameters.UplinkDwellTime = &pbtypes.BoolValue{Value: *fp.DwellTime.Uplinks}
-	}
-	if fp.DwellTime.Downlinks != nil {
-		macState.DesiredParameters.DownlinkDwellTime = &pbtypes.BoolValue{Value: *fp.DwellTime.Downlinks}
-	}
-
-	macState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_0
-	macState.DesiredParameters.ADRDataRateIndex = macState.CurrentParameters.ADRDataRateIndex
-
-	macState.CurrentParameters.ADRTxPowerIndex = 0
-	macState.DesiredParameters.ADRTxPowerIndex = macState.CurrentParameters.ADRTxPowerIndex
-
-	macState.CurrentParameters.ADRNbTrans = 1
-	macState.DesiredParameters.ADRNbTrans = macState.CurrentParameters.ADRNbTrans
-
-	macState.CurrentParameters.ADRAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit}
-	if dev.GetMACSettings().GetDesiredADRAckLimitExponent() != nil {
-		macState.DesiredParameters.ADRAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: dev.MACSettings.DesiredADRAckLimitExponent.Value}
-	} else if defaults.DesiredADRAckLimitExponent != nil {
-		macState.DesiredParameters.ADRAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: defaults.DesiredADRAckLimitExponent.Value}
-	} else {
-		macState.DesiredParameters.ADRAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit}
-	}
-
-	macState.CurrentParameters.ADRAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay}
-	if dev.GetMACSettings().GetDesiredADRAckDelayExponent() != nil {
-		macState.DesiredParameters.ADRAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: dev.MACSettings.DesiredADRAckDelayExponent.Value}
-	} else if defaults.DesiredADRAckDelayExponent != nil {
-		macState.DesiredParameters.ADRAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: defaults.DesiredADRAckDelayExponent.Value}
-	} else {
-		macState.DesiredParameters.ADRAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay}
-	}
-
-	if dev.GetMACSettings().GetRx1Delay() != nil {
-		macState.CurrentParameters.Rx1Delay = dev.MACSettings.Rx1Delay.Value
-	} else if defaults.Rx1Delay != nil {
-		macState.CurrentParameters.Rx1Delay = defaults.Rx1Delay.Value
-	} else {
-		macState.CurrentParameters.Rx1Delay = ttnpb.RxDelay(phy.ReceiveDelay1.Seconds())
-	}
-	if dev.GetMACSettings().GetDesiredRx1Delay() != nil {
-		macState.DesiredParameters.Rx1Delay = dev.MACSettings.DesiredRx1Delay.Value
-	} else if defaults.DesiredRx1Delay != nil {
-		macState.DesiredParameters.Rx1Delay = defaults.DesiredRx1Delay.Value
-	} else {
-		macState.DesiredParameters.Rx1Delay = macState.CurrentParameters.Rx1Delay
-	}
-
-	if dev.GetMACSettings().GetRx1DataRateOffset() != nil {
-		macState.CurrentParameters.Rx1DataRateOffset = dev.MACSettings.Rx1DataRateOffset.Value
-	} else if defaults.Rx1DataRateOffset != nil {
-		macState.CurrentParameters.Rx1DataRateOffset = defaults.Rx1DataRateOffset.Value
-	}
-	if dev.GetMACSettings().GetDesiredRx1DataRateOffset() != nil {
-		macState.DesiredParameters.Rx1DataRateOffset = dev.MACSettings.DesiredRx1DataRateOffset.Value
-	} else if defaults.DesiredRx1DataRateOffset != nil {
-		macState.DesiredParameters.Rx1DataRateOffset = defaults.DesiredRx1DataRateOffset.Value
-	} else {
-		macState.DesiredParameters.Rx1DataRateOffset = macState.CurrentParameters.Rx1DataRateOffset
-	}
-
-	if dev.GetMACSettings().GetRx2DataRateIndex() != nil {
-		macState.CurrentParameters.Rx2DataRateIndex = dev.MACSettings.Rx2DataRateIndex.Value
-	} else if defaults.Rx2DataRateIndex != nil {
-		macState.CurrentParameters.Rx2DataRateIndex = defaults.Rx2DataRateIndex.Value
-	} else {
-		macState.CurrentParameters.Rx2DataRateIndex = phy.DefaultRx2Parameters.DataRateIndex
-	}
-	if dev.GetMACSettings().GetDesiredRx2DataRateIndex() != nil {
-		macState.DesiredParameters.Rx2DataRateIndex = dev.MACSettings.DesiredRx2DataRateIndex.Value
-	} else if fp.DefaultRx2DataRate != nil {
-		macState.DesiredParameters.Rx2DataRateIndex = ttnpb.DataRateIndex(*fp.DefaultRx2DataRate)
-	} else if defaults.DesiredRx2DataRateIndex != nil {
-		macState.DesiredParameters.Rx2DataRateIndex = defaults.DesiredRx2DataRateIndex.Value
-	} else {
-		macState.DesiredParameters.Rx2DataRateIndex = macState.CurrentParameters.Rx2DataRateIndex
-	}
-
-	if dev.GetMACSettings().GetRx2Frequency() != nil && dev.MACSettings.Rx2Frequency.Value != 0 {
-		macState.CurrentParameters.Rx2Frequency = dev.MACSettings.Rx2Frequency.Value
-	} else if defaults.Rx2Frequency != nil && dev.MACSettings.Rx2Frequency.Value != 0 {
-		macState.CurrentParameters.Rx2Frequency = defaults.Rx2Frequency.Value
-	} else {
-		macState.CurrentParameters.Rx2Frequency = phy.DefaultRx2Parameters.Frequency
-	}
-	if dev.GetMACSettings().GetDesiredRx2Frequency() != nil && dev.MACSettings.DesiredRx2Frequency.Value != 0 {
-		macState.DesiredParameters.Rx2Frequency = dev.MACSettings.DesiredRx2Frequency.Value
-	} else if fp.Rx2Channel != nil {
-		macState.DesiredParameters.Rx2Frequency = fp.Rx2Channel.Frequency
-	} else if defaults.DesiredRx2Frequency != nil && defaults.DesiredRx2Frequency.Value != 0 {
-		macState.DesiredParameters.Rx2Frequency = defaults.DesiredRx2Frequency.Value
-	} else {
-		macState.DesiredParameters.Rx2Frequency = macState.CurrentParameters.Rx2Frequency
-	}
-
-	if dev.GetMACSettings().GetMaxDutyCycle() != nil {
-		macState.CurrentParameters.MaxDutyCycle = dev.MACSettings.MaxDutyCycle.Value
-	} else if defaults.MaxDutyCycle != nil {
-		macState.CurrentParameters.MaxDutyCycle = defaults.MaxDutyCycle.Value
-	} else {
-		macState.CurrentParameters.MaxDutyCycle = ttnpb.DUTY_CYCLE_1
-	}
-	if dev.GetMACSettings().GetDesiredMaxDutyCycle() != nil {
-		macState.DesiredParameters.MaxDutyCycle = dev.MACSettings.DesiredMaxDutyCycle.Value
-	} else if defaults.DesiredMaxDutyCycle != nil {
-		macState.DesiredParameters.MaxDutyCycle = defaults.DesiredMaxDutyCycle.Value
-	} else {
-		macState.DesiredParameters.MaxDutyCycle = macState.CurrentParameters.MaxDutyCycle
-	}
-
 	// TODO: Support rejoins. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
-	macState.CurrentParameters.RejoinTimePeriodicity = ttnpb.REJOIN_TIME_0
-	macState.DesiredParameters.RejoinTimePeriodicity = macState.CurrentParameters.RejoinTimePeriodicity
-
-	macState.CurrentParameters.RejoinCountPeriodicity = ttnpb.REJOIN_COUNT_16
-	macState.DesiredParameters.RejoinCountPeriodicity = macState.CurrentParameters.RejoinCountPeriodicity
-
-	if dev.GetMACSettings().GetPingSlotFrequency() != nil && dev.MACSettings.PingSlotFrequency.Value != 0 {
-		macState.CurrentParameters.PingSlotFrequency = dev.MACSettings.PingSlotFrequency.Value
-	} else if defaults.PingSlotFrequency != nil && defaults.PingSlotFrequency.Value != 0 {
-		macState.CurrentParameters.PingSlotFrequency = defaults.PingSlotFrequency.Value
-	} else if phy.PingSlotFrequency != nil {
-		macState.CurrentParameters.PingSlotFrequency = *phy.PingSlotFrequency
-	}
-	if dev.GetMACSettings().GetDesiredPingSlotFrequency() != nil && dev.MACSettings.DesiredPingSlotFrequency.Value != 0 {
-		macState.DesiredParameters.PingSlotFrequency = dev.MACSettings.DesiredPingSlotFrequency.Value
-	} else if fp.PingSlot != nil && fp.PingSlot.Frequency != 0 {
-		macState.DesiredParameters.PingSlotFrequency = fp.PingSlot.Frequency
-	} else if defaults.DesiredPingSlotFrequency != nil && defaults.DesiredPingSlotFrequency.Value != 0 {
-		macState.DesiredParameters.PingSlotFrequency = defaults.DesiredPingSlotFrequency.Value
-	} else {
-		macState.DesiredParameters.PingSlotFrequency = macState.CurrentParameters.PingSlotFrequency
-	}
-
-	if dev.GetMACSettings().GetPingSlotDataRateIndex() != nil {
-		macState.CurrentParameters.PingSlotDataRateIndexValue = dev.MACSettings.PingSlotDataRateIndex
-	} else if defaults.PingSlotDataRateIndex != nil {
-		macState.CurrentParameters.PingSlotDataRateIndexValue = defaults.PingSlotDataRateIndex
-	} else {
-		// Default to mbed-os and LoRaMac-node behavior.
-		// https://github.com/ARMmbed/mbed-os/blob/131ea2bb243eef898a501576e611ebbf504b079a/features/lorawan/lorastack/phy/LoRaPHY.cpp#L1625-L1630
-		// https://github.com/Lora-net/LoRaMac-node/blob/87f19e84ae2fc4af72af9567fe722386de6ce9f4/src/mac/region/RegionCN779.h#L235.
-		macState.CurrentParameters.PingSlotDataRateIndexValue = &ttnpb.DataRateIndexValue{Value: phy.Beacon.DataRateIndex}
-	}
-	if dev.GetMACSettings().GetDesiredPingSlotDataRateIndex() != nil {
-		macState.DesiredParameters.PingSlotDataRateIndexValue = dev.MACSettings.DesiredPingSlotDataRateIndex
-	} else if fp.DefaultPingSlotDataRate != nil {
-		macState.DesiredParameters.PingSlotDataRateIndexValue = &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex(*fp.DefaultPingSlotDataRate)}
-	} else if defaults.DesiredPingSlotDataRateIndex != nil {
-		macState.DesiredParameters.PingSlotDataRateIndexValue = defaults.DesiredPingSlotDataRateIndex
-	} else {
-		macState.DesiredParameters.PingSlotDataRateIndexValue = macState.CurrentParameters.PingSlotDataRateIndexValue
-	}
-
-	if dev.GetMACSettings().GetBeaconFrequency() != nil && dev.MACSettings.BeaconFrequency.Value != 0 {
-		macState.CurrentParameters.BeaconFrequency = dev.MACSettings.BeaconFrequency.Value
-	} else if defaults.BeaconFrequency != nil {
-		macState.CurrentParameters.BeaconFrequency = defaults.BeaconFrequency.Value
-	}
-	if dev.GetMACSettings().GetDesiredBeaconFrequency() != nil && dev.MACSettings.DesiredBeaconFrequency.Value != 0 {
-		macState.DesiredParameters.BeaconFrequency = dev.MACSettings.DesiredBeaconFrequency.Value
-	} else if defaults.DesiredBeaconFrequency != nil && defaults.DesiredBeaconFrequency.Value != 0 {
-		macState.DesiredParameters.BeaconFrequency = defaults.DesiredBeaconFrequency.Value
-	} else {
-		macState.DesiredParameters.BeaconFrequency = macState.CurrentParameters.BeaconFrequency
-	}
-
-	if len(phy.DownlinkChannels) > len(phy.UplinkChannels) || len(fp.DownlinkChannels) > len(fp.UplinkChannels) ||
-		len(phy.UplinkChannels) > int(phy.MaxUplinkChannels) || len(phy.DownlinkChannels) > int(phy.MaxDownlinkChannels) ||
-		len(fp.UplinkChannels) > int(phy.MaxUplinkChannels) || len(fp.DownlinkChannels) > int(phy.MaxDownlinkChannels) {
-		// NOTE: In case the spec changes and this assumption is not valid anymore,
-		// the implementation of this function won't be valid and has to be changed.
-		panic("uplink/downlink channel length is inconsistent")
-	}
-
-	// NOTE: FactoryPresetFrequencies does not indicate the data rate ranges allowed for channels.
-	// In the latest regional parameters spec(1.1b) the data rate ranges are DR0-DR5 for mandatory channels in all non-fixed channel plans,
-	// hence we assume the same range for predefined channels.
-	if len(dev.GetMACSettings().GetFactoryPresetFrequencies()) > 0 {
-		macState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(dev.MACSettings.FactoryPresetFrequencies))
-		for _, freq := range dev.MACSettings.FactoryPresetFrequencies {
-			macState.CurrentParameters.Channels = append(macState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
-				MinDataRateIndex:  0,
-				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-				UplinkFrequency:   freq,
-				DownlinkFrequency: freq,
-				EnableUplink:      true,
-			})
-		}
-	} else if len(defaults.GetFactoryPresetFrequencies()) > 0 {
-		macState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(defaults.FactoryPresetFrequencies))
-		for _, freq := range defaults.FactoryPresetFrequencies {
-			macState.CurrentParameters.Channels = append(macState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
-				MinDataRateIndex:  0,
-				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-				UplinkFrequency:   freq,
-				DownlinkFrequency: freq,
-				EnableUplink:      true,
-			})
-		}
-	} else {
-		macState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels))
-		for i, phyUpCh := range phy.UplinkChannels {
-			macState.CurrentParameters.Channels = append(macState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
-				MinDataRateIndex:  phyUpCh.MinDataRate,
-				MaxDataRateIndex:  phyUpCh.MaxDataRate,
-				UplinkFrequency:   phyUpCh.Frequency,
-				DownlinkFrequency: phy.DownlinkChannels[i%len(phy.DownlinkChannels)].Frequency,
-				EnableUplink:      true,
-			})
-		}
-	}
-	macState.DesiredParameters.Channels = frequencyPlanChannels(phy, fp.UplinkChannels, fp.DownlinkChannels...)
-	return macState, nil
+	return &ttnpb.MACState{
+		LoRaWANVersion:      deviceDefaultLoRaWANVersion(dev),
+		DeviceClass:         class,
+		PingSlotPeriodicity: deviceDefaultPingSlotPeriodicity(dev, defaults),
+		CurrentParameters: ttnpb.MACParameters{
+			MaxEIRP:                    phy.DefaultMaxEIRP,
+			ADRDataRateIndex:           ttnpb.DATA_RATE_0,
+			ADRNbTrans:                 1,
+			Rx1Delay:                   deviceDefaultRX1Delay(dev, phy, defaults),
+			Rx1DataRateOffset:          deviceDefaultRX1DataRateOffset(dev, defaults),
+			Rx2DataRateIndex:           deviceDefaultRX2DataRateIndex(dev, phy, defaults),
+			Rx2Frequency:               deviceDefaultRX2Frequency(dev, phy, defaults),
+			MaxDutyCycle:               deviceDefaultMaxDutyCycle(dev, defaults),
+			RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
+			RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
+			PingSlotFrequency:          deviceDefaultPingSlotFrequency(dev, phy, defaults),
+			BeaconFrequency:            deviceDefaultBeaconFrequency(dev, defaults),
+			Channels:                   deviceDefaultChannels(dev, phy, defaults),
+			ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit},
+			ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay},
+			PingSlotDataRateIndexValue: deviceDefaultPingSlotDataRateIndexValue(dev, phy, defaults),
+		},
+		DesiredParameters: ttnpb.MACParameters{
+			MaxEIRP:                    deviceDesiredMaxEIRP(dev, phy, fp, defaults),
+			ADRDataRateIndex:           ttnpb.DATA_RATE_0,
+			ADRNbTrans:                 1,
+			Rx1Delay:                   deviceDesiredRX1Delay(dev, phy, defaults),
+			Rx1DataRateOffset:          deviceDesiredRX1DataRateOffset(dev, defaults),
+			Rx2DataRateIndex:           deviceDesiredRX2DataRateIndex(dev, phy, fp, defaults),
+			Rx2Frequency:               deviceDesiredRX2Frequency(dev, phy, fp, defaults),
+			MaxDutyCycle:               deviceDesiredMaxDutyCycle(dev, defaults),
+			RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
+			RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
+			PingSlotFrequency:          deviceDesiredPingSlotFrequency(dev, phy, fp, defaults),
+			BeaconFrequency:            deviceDesiredBeaconFrequency(dev, defaults),
+			Channels:                   deviceDesiredChannels(phy, fp, defaults),
+			UplinkDwellTime:            deviceDesiredUplinkDwellTime(fp),
+			DownlinkDwellTime:          deviceDesiredDownlinkDwellTime(fp),
+			ADRAckLimitExponent:        deviceDesiredADRAckLimitExponent(dev, phy, defaults),
+			ADRAckDelayExponent:        deviceDesiredADRAckDelayExponent(dev, phy, defaults),
+			PingSlotDataRateIndexValue: deviceDesiredPingSlotDataRateIndexValue(dev, phy, fp, defaults),
+		},
+	}, nil
 }
 
 func publishEvents(ctx context.Context, evs ...events.Event) {
