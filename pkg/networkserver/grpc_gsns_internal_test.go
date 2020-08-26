@@ -101,57 +101,56 @@ func TestMatchAndHandleUplink(t *testing.T) {
 	}
 	var tcs []TestCase
 
-	fpID := test.EUFrequencyPlanID
-	phyVersion := ttnpb.PHY_V1_1_REV_B
-	fp := FrequencyPlan(fpID)
-	phy := LoRaWANBands[fp.BandID][phyVersion]
-	chIdx := uint8(len(phy.UplinkChannels) - 1)
-	ch := phy.UplinkChannels[chIdx]
-	drIdx := ch.MaxDataRate
-	dr := phy.DataRates[drIdx].Rate
+	ForEachLoRaWANVersionPair(t, func(makeName func(...string) string, macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion) {
+		fpID := test.EUFrequencyPlanID
+		fp := FrequencyPlan(fpID)
+		phy := LoRaWANBands[fp.BandID][phyVersion]
+		chIdx := uint8(len(phy.UplinkChannels) - 1)
+		ch := phy.UplinkChannels[chIdx]
+		drIdx := ch.MaxDataRate
+		dr := phy.DataRates[drIdx].Rate
 
-	for _, deduplicated := range [2]bool{
-		true,
-		false,
-	} {
-		deduplicated := deduplicated
-		makeName := func(parts ...string) string {
-			return MakeTestCaseName(append(parts, fmt.Sprintf("Deduplicated:%v", deduplicated))...)
-		}
-		macVersion := ttnpb.MAC_V1_0_4
-		tcs = append(tcs,
-			TestCase{
-				Name: makeName("Payload too short"),
-				Uplink: &ttnpb.UplinkMessage{
-					Settings: MakeUplinkSettings(dr, ch.Frequency),
-				},
-				MakeDevices: func(ctx context.Context) []contextualEndDevice {
-					return []contextualEndDevice{
-						{
-							Context: ctx,
-							EndDevice: &ttnpb.EndDevice{
-								EndDeviceIdentifiers: *MakeABPIdentifiers(true),
-								FrequencyPlanID:      test.EUFrequencyPlanID,
-								LoRaWANPHYVersion:    phyVersion,
-								LoRaWANVersion:       macVersion,
-								MACState:             MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
-								Session: &ttnpb.Session{
-									DevAddr:     DevAddr,
-									SessionKeys: *MakeSessionKeys(macVersion, false),
+		for _, deduplicated := range [2]bool{
+			true,
+			false,
+		} {
+			deduplicated := deduplicated
+			makeName := func(parts ...string) string {
+				return MakeTestCaseName(append(parts, fmt.Sprintf("Deduplicated:%v", deduplicated))...)
+			}
+			tcs = append(tcs,
+				TestCase{
+					Name: makeName("Payload too short"),
+					Uplink: &ttnpb.UplinkMessage{
+						Settings: MakeUplinkSettings(dr, ch.Frequency),
+					},
+					MakeDevices: func(ctx context.Context) []contextualEndDevice {
+						return []contextualEndDevice{
+							{
+								Context: ctx,
+								EndDevice: &ttnpb.EndDevice{
+									EndDeviceIdentifiers: *MakeABPIdentifiers(true),
+									FrequencyPlanID:      test.EUFrequencyPlanID,
+									LoRaWANPHYVersion:    phyVersion,
+									LoRaWANVersion:       macVersion,
+									MACState:             MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
+									Session: &ttnpb.Session{
+										DevAddr:     DevAddr,
+										SessionKeys: *MakeSessionKeys(macVersion, false),
+									},
 								},
 							},
-						},
-					}
+						}
+					},
+					Deduplicated: deduplicated,
+					DeviceAssertion: func(t *testing.T, dev *matchedDevice) bool {
+						return assertions.New(t).So(dev, should.BeNil)
+					},
+					Error: errRawPayloadTooShort,
 				},
-				Deduplicated: deduplicated,
-				DeviceAssertion: func(t *testing.T, dev *matchedDevice) bool {
-					return assertions.New(t).So(dev, should.BeNil)
-				},
-				Error: errRawPayloadTooShort,
-			},
-		)
-	}
-	ForEachMACVersion(func(makeName func(...string) string, macVersion ttnpb.MACVersion) {
+			)
+		}
+
 		makeSession := func(lastFCntUp, lastConfFCntDown uint32) *ttnpb.Session {
 			return &ttnpb.Session{
 				DevAddr:          DevAddr,

@@ -18,10 +18,12 @@ package networkserver
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"sync"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
