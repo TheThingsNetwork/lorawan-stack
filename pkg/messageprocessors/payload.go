@@ -20,18 +20,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// PayloadEncoder represents a payload encoder message processor.
-type PayloadEncoder interface {
-	Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, parameter string) error
-}
-
-// PayloadDecoder represents a payload decoder message processor.
-type PayloadDecoder interface {
-	Decode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationUplink, parameter string) error
-}
-
-// PayloadEncodeDecoder is the interface that groups the Encode and Decode methods.
+// PayloadEncodeDecoder provides an interface to encoding and decoding messages.
 type PayloadEncodeDecoder interface {
-	PayloadEncoder
-	PayloadDecoder
+	EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, parameter string) error
+	DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationUplink, parameter string) error
+	DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, parameter string) error
 }

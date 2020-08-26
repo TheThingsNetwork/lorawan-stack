@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,12 +40,12 @@ func New() messageprocessors.PayloadEncodeDecoder {
 	}
 }
 
-type encodeInput struct {
+type encodeDownlinkInput struct {
 	Data  map[string]interface{} `json:"data"`
 	FPort *uint8                 `json:"fPort"`
 }
 
-type encodeOutput struct {
+type encodeDownlinkOutput struct {
 	Bytes    []uint8  `json:"bytes"`
 	FPort    *uint8   `json:"fPort"`
 	Warnings []string `json:"warnings"`
@@ -58,9 +58,9 @@ var (
 	errOutputErrors = errors.DefineAborted("output_errors", "{errors}")
 )
 
-// Encode encodes the message's DecodedPayload to FRMPayload using the given script.
-func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
-	defer trace.StartRegion(ctx, "encode message").End()
+// EncodeDownlink encodes the message's DecodedPayload to FRMPayload using the given script.
+func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+	defer trace.StartRegion(ctx, "encode downlink message").End()
 
 	decoded := msg.DecodedPayload
 	if decoded == nil {
@@ -71,17 +71,18 @@ func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, versi
 		return errInput.WithCause(err)
 	}
 	fPort := uint8(msg.FPort)
-	input := encodeInput{
+	input := encodeDownlinkInput{
 		Data:  data,
 		FPort: &fPort,
 	}
 
+	// Fallback to legacy Encoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
 	script = fmt.Sprintf(`
 		%s
 
 		function main(input) {
-			if (typeof encode === 'function') {
-				return encode(input);
+			if (typeof encodeDownlink === 'function') {
+				return encodeDownlink(input);
 			}
 			return {
 				bytes: Encoder(input.data, input.fPort),
@@ -94,7 +95,7 @@ func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, versi
 		return err
 	}
 
-	var output encodeOutput
+	var output encodeDownlinkOutput
 	err = valueAs(&output)
 	if err != nil {
 		return errOutput.WithCause(err)
@@ -113,33 +114,33 @@ func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, versi
 	return nil
 }
 
-type decodeInput struct {
+type decodeUplinkInput struct {
 	Bytes []uint8 `json:"bytes"`
 	FPort uint8   `json:"fPort"`
 }
 
-type decodeOutput struct {
+type decodeUplinkOutput struct {
 	Data     map[string]interface{} `json:"data"`
 	Warnings []string               `json:"warnings"`
 	Errors   []string               `json:"errors"`
 }
 
-// Decode decodes the message's FRMPayload to DecodedPayload using the given script.
+// DecodeUplink decodes the message's FRMPayload to DecodedPayload using the given script.
+func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
+	defer trace.StartRegion(ctx, "decode uplink message").End()
 
-func (h *host) Decode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
-	defer trace.StartRegion(ctx, "decode message").End()
-
-	input := decodeInput{
+	input := decodeUplinkInput{
 		Bytes: msg.FRMPayload,
 		FPort: uint8(msg.FPort),
 	}
 
+	// Fallback to legacy Decoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
 	script = fmt.Sprintf(`
 		%s
 
 		function main(input) {
-			if (typeof decode === 'function') {
-				return decode(input);
+			if (typeof decodeUplink === 'function') {
+				return decodeUplink(input);
 			}
 			return {
 				data: Decoder(input.bytes, input.fPort)
@@ -151,7 +152,56 @@ func (h *host) Decode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, versi
 		return err
 	}
 
-	var output decodeOutput
+	var output decodeUplinkOutput
+	err = valueAs(&output)
+	if err != nil {
+		return errOutput.WithCause(err)
+	}
+	if len(output.Errors) > 0 {
+		return errOutputErrors.WithAttributes("errors", strings.Join(output.Errors, ", "))
+	}
+
+	s, err := gogoproto.Struct(output.Data)
+	if err != nil {
+		return errOutput.WithCause(err)
+	}
+	msg.DecodedPayload = s
+	return nil
+}
+
+type decodeDownlinkInput struct {
+	Bytes []uint8 `json:"bytes"`
+	FPort uint8   `json:"fPort"`
+}
+
+type decodeDownlinkOutput struct {
+	Data     map[string]interface{} `json:"data"`
+	Warnings []string               `json:"warnings"`
+	Errors   []string               `json:"errors"`
+}
+
+// DecodeUplink decodes the message's FRMPayload to DecodedPayload using the given script.
+func (h *host) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+	defer trace.StartRegion(ctx, "decode downlink message").End()
+
+	input := decodeDownlinkInput{
+		Bytes: msg.FRMPayload,
+		FPort: uint8(msg.FPort),
+	}
+
+	script = fmt.Sprintf(`
+		%s
+
+		function main(input) {
+			return decodeDownlink(input);
+		}
+	`, script)
+	valueAs, err := h.engine.Run(ctx, script, "main", input)
+	if err != nil {
+		return err
+	}
+
+	var output decodeDownlinkOutput
 	err = valueAs(&output)
 	if err != nil {
 		return errOutput.WithCause(err)
