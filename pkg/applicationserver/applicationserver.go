@@ -39,7 +39,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
-	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
@@ -113,11 +112,6 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		if err != nil {
 			return nil, err
 		}
-	}
-
-	drFetcher, err := baseConf.DeviceRepositoryFetcher(ctx)
-	if err != nil {
-		return nil, err
 	}
 
 	as = &ApplicationServer{

@@ -92,8 +92,43 @@ func TestApplicationServer(t *testing.T) {
 			FirmwareVersion: "1.1",
 		},
 		Formatters: &ttnpb.MessagePayloadFormatters{
-			UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
-			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+			UpFormatter: ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+			UpFormatterParameter: `function decodeUplink(input) {
+				var sum = 0;
+				for (i = 0; i < input.bytes.length; i++) {
+					sum += input.bytes[i];
+				}
+				return {
+					data: {
+						sum: sum
+					}
+				};
+			}
+			`,
+			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+			DownFormatterParameter: `function encodeDownlink(input) {
+				var bytes = [];
+				for (i = 0; i < input.data.sum; i++) {
+					bytes[i] = 1;
+				}
+				return {
+					bytes: bytes,
+					fPort: input.fPort
+				};
+			}
+
+			function decodeDownlink(input) {
+				var sum = 0;
+				for (i = 0; i < input.bytes.length; i++) {
+					sum += input.bytes[i];
+				}
+				return {
+					data: {
+						sum: sum
+					}
+				}
+			}
+			`,
 		},
 	}
 
@@ -105,44 +140,6 @@ func TestApplicationServer(t *testing.T) {
 		JoinEUI:                eui64Ptr(types.EUI64{0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 		DevEUI:                 eui64Ptr(types.EUI64{0x24, 0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 	}
-
-	deviceRepositoryData := map[string][]byte{
-		"brands.yml": []byte(`version: '3'
-brands:
-thethingsproducts:
-  name: The Things Products
-  url: https://www.thethingsnetwork.org`),
-		"thethingsproducts/devices.yml": []byte(`version: '3'
-devices:
-  thethingsnode:
-    name: The Things Node`),
-		"thethingsproducts/thethingsnode/versions.yml": []byte(`version: '3'
-hardware_versions:
-  '1.0':
-    - firmware_version: 1.1
-      payload_format:
-        up:
-          type: javascript
-          parameter: decoder.js
-        down:
-          type: javascript
-          parameter: encoder.js`),
-		"thethingsproducts/thethingsnode/1.0/decoder.js": []byte(`function Decoder(payload, f_port) {
-	var sum = 0;
-	for (i = 0; i < payload.length; i++) {
-		sum += payload[i];
-	}
-	return {
-		sum: sum
-	};
-}`),
-		"thethingsproducts/thethingsnode/1.0/encoder.js": []byte(`function Encoder(payload, f_port) {
-	var res = [];
-	for (i = 0; i < payload.sum; i++) {
-		res[i] = 1;
-	}
-	return res;
-}`)}
 
 	ctx := test.Context()
 	is, isAddr := startMockIS(ctx)
@@ -255,10 +252,6 @@ hardware_versions:
 				IdentityServer: isAddr,
 				JoinServer:     jsAddr,
 				NetworkServer:  nsAddr,
-			},
-			DeviceRepository: config.DeviceRepositoryConfig{
-				ConfigSource: "static",
-				Static:       deviceRepositoryData,
 			},
 			KeyVault: config.KeyVault{
 				Provider: "static",
