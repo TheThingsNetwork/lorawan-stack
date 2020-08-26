@@ -171,7 +171,7 @@ func UnmarshalMACPayload(b []byte, msg *ttnpb.MACPayload, isUplink bool) error {
 		msg.FPort = uint32(b[fPortIdx])
 
 		frmPayloadIdx := fPortIdx + 1
-		if n >= frmPayloadIdx {
+		if n > frmPayloadIdx {
 			msg.FRMPayload = make([]byte, 0, n-frmPayloadIdx)
 			msg.FRMPayload = append(msg.FRMPayload, b[frmPayloadIdx:]...)
 		}
