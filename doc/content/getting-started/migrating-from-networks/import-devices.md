@@ -5,8 +5,7 @@ weight: 20
 
 {{< cli-only >}}
 
-To import your devices, you need an Application in {{% tts %}}. This can be done by following instructions for [Creating an Application]({{% ref "integrations/adding-applications/" %}}).
-
+To import your devices, you need an Application in {{% tts %}}. This can be done by following instructions for [Creating an Application]({{< ref "integrations/adding-applications" >}}).
 
 To import devices, use the `devices.json` file you created in the previous step with `ttn-lw-cli`:
 
