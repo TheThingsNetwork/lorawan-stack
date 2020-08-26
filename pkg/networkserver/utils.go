@@ -25,6 +25,7 @@ import (
 	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
@@ -62,7 +63,7 @@ func timePtr(t time.Time) *time.Time {
 	return &t
 }
 
-func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy band.Band) bool {
+func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Band) bool {
 	if !phy.EnableADR {
 		return false
 	}
@@ -103,20 +104,26 @@ func deviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.
 	return DefaultClassCTimeout
 }
 
-func getDeviceBandVersion(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*frequencyplans.FrequencyPlan, band.Band, error) {
+var errNoBandVersion = errors.DefineInvalidArgument("no_band_version", "specified version `{ver}` of band `{id}` does not exist")
+
+func deviceFrequencyPlanAndBand(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*frequencyplans.FrequencyPlan, *band.Band, error) {
 	fp, err := fps.GetByID(dev.FrequencyPlanID)
 	if err != nil {
-		return nil, band.Band{}, err
+		return nil, nil, err
 	}
-	b, err := band.GetByID(fp.BandID)
-	if err != nil {
-		return nil, band.Band{}, err
-	}
-	b, err = b.Version(dev.LoRaWANPHYVersion)
-	if err != nil {
-		return nil, band.Band{}, err
+	b, ok := lorawanBands[fp.BandID][dev.LoRaWANPHYVersion]
+	if !ok || b == nil {
+		return nil, nil, errNoBandVersion.WithAttributes(
+			"ver", dev.LoRaWANPHYVersion,
+			"id", fp.BandID,
+		)
 	}
 	return fp, b, nil
+}
+
+func deviceBand(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*band.Band, error) {
+	_, phy, err := deviceFrequencyPlanAndBand(dev, fps)
+	return phy, err
 }
 
 func searchUplinkChannel(freq uint64, macState *ttnpb.MACState) (uint8, error) {
@@ -155,7 +162,7 @@ func deviceRejectedFrequency(dev *ttnpb.EndDevice, freq uint64) bool {
 	return i < len(dev.MACState.RejectedFrequencies) && dev.MACState.RejectedFrequencies[i] == freq
 }
 
-func deviceNeedsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time, phy band.Band, defaults ttnpb.MACSettings) bool {
+func deviceNeedsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time, phy *band.Band, defaults ttnpb.MACSettings) bool {
 	if dev.GetMulticast() {
 		return false
 	}
@@ -232,7 +239,7 @@ func (s networkInitiatedDownlinkSlot) IsContinuous() bool {
 
 // lastClassADataDownlinkSlot returns the latest class A downlink slot in current session
 // if such exists and true, otherwise it returns nil and false.
-func lastClassADataDownlinkSlot(dev *ttnpb.EndDevice, phy band.Band) (*classADownlinkSlot, bool) {
+func lastClassADataDownlinkSlot(dev *ttnpb.EndDevice, phy *band.Band) (*classADownlinkSlot, bool) {
 	if dev.GetMACState() == nil || len(dev.MACState.RecentUplinks) == 0 || dev.Multicast {
 		return nil, false
 	}
@@ -257,7 +264,7 @@ func lastClassADataDownlinkSlot(dev *ttnpb.EndDevice, phy band.Band) (*classADow
 // nextUnconfirmedNetworkInitiatedDownlinkAt returns the earliest possible time instant when next unconfirmed
 // network-initiated data downlink can be transmitted to the device given the data known by Network Server and true,
 // if such time instant exists, otherwise it returns time.Time{} and false.
-func nextUnconfirmedNetworkInitiatedDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band) (time.Time, bool) {
+func nextUnconfirmedNetworkInitiatedDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band) (time.Time, bool) {
 	switch {
 	case dev.GetMACState() == nil:
 		log.FromContext(ctx).Warn("Insufficient data to compute next network-initiated unconfirmed downlink slot")
@@ -293,7 +300,7 @@ func nextUnconfirmedNetworkInitiatedDownlinkAt(ctx context.Context, dev *ttnpb.E
 // nextConfirmedNetworkInitiatedDownlinkAt returns the earliest possible time instant when a confirmed
 // network-initiated data downlink can be transmitted to the device given the data known by Network Server and true,
 // if such time instant exists, otherwise it returns time.Time{} and false.
-func nextConfirmedNetworkInitiatedDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, defaults ttnpb.MACSettings) (time.Time, bool) {
+func nextConfirmedNetworkInitiatedDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) (time.Time, bool) {
 	if dev.GetMACState() == nil {
 		log.FromContext(ctx).Warn("Insufficient data to compute next network-initiated confirmed downlink slot")
 		return time.Time{}, false
@@ -412,7 +419,7 @@ func deviceHasPathForDownlink(ctx context.Context, dev *ttnpb.EndDevice, down *t
 
 // nextDataDownlinkSlot returns the next downlinkSlot before or at earliestAt when next data downlink can be transmitted to the device
 // given the data known by Network Server and true, if such downlinkSlot and downlink exist, otherwise it returns nil and false.
-func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, defaults ttnpb.MACSettings, earliestAt time.Time) (downlinkSlot, bool) {
+func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings, earliestAt time.Time) (downlinkSlot, bool) {
 	if dev.GetMACState() == nil {
 		return nil, false
 	}
@@ -532,7 +539,7 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy band.Ba
 	return nil, false
 }
 
-func frequencyPlanChannels(phy band.Band, fpUpChs []frequencyplans.Channel, fpDownChs ...frequencyplans.Channel) []*ttnpb.MACParameters_Channel {
+func frequencyPlanChannels(phy *band.Band, fpUpChs []frequencyplans.Channel, fpDownChs ...frequencyplans.Channel) []*ttnpb.MACParameters_Channel {
 	chs := make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels)+len(fpUpChs))
 	for i, phyUpCh := range phy.UplinkChannels {
 		chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -570,7 +577,7 @@ outerUp:
 }
 
 func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MACSettings) (*ttnpb.MACState, error) {
-	fp, phy, err := getDeviceBandVersion(dev, fps)
+	fp, phy, err := deviceFrequencyPlanAndBand(dev, fps)
 	if err != nil {
 		return nil, err
 	}

@@ -5138,8 +5138,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 }
 
 func TestGenerateDownlink(t *testing.T) {
-	phy := test.Must(test.Must(band.GetByID(band.EU_863_870)).(band.Band).Version(ttnpb.PHY_V1_1_REV_B)).(band.Band)
-
 	const appIDString = "process-downlink-test-app-id"
 	appID := ttnpb.ApplicationIdentifiers{ApplicationID: appIDString}
 	const devID = "process-downlink-test-dev-id"
@@ -5198,9 +5196,9 @@ func TestGenerateDownlink(t *testing.T) {
 		return append(b, mic[:]...)
 	}
 
-	encodeMAC := func(phy band.Band, cmds ...*ttnpb.MACCommand) (b []byte) {
+	encodeMAC := func(phy *band.Band, cmds ...*ttnpb.MACCommand) (b []byte) {
 		for _, cmd := range cmds {
-			b = test.Must(lorawan.DefaultMACCommands.AppendDownlink(phy, b, *cmd)).([]byte)
+			b = test.Must(lorawan.DefaultMACCommands.AppendDownlink(*phy, b, *cmd)).([]byte)
 		}
 		return
 	}
@@ -5908,7 +5906,7 @@ func TestGenerateDownlink(t *testing.T) {
 							},
 							FCnt: 42,
 							FOpts: encodeMAC(
-								phy,
+								LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B],
 								ttnpb.CID_DEV_STATUS.MACCommand(),
 							),
 						},
@@ -6014,7 +6012,7 @@ func TestGenerateDownlink(t *testing.T) {
 							},
 							FCnt: 42,
 							FOpts: encodeMAC(
-								phy,
+								LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B],
 								ttnpb.CID_DEV_STATUS.MACCommand(),
 							),
 						},
@@ -6100,7 +6098,7 @@ func TestGenerateDownlink(t *testing.T) {
 			}
 
 			dev := CopyEndDevice(tc.Device)
-			_, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+			phy, err := deviceBand(dev, ns.FrequencyPlans)
 			if !a.So(err, should.BeNil) {
 				t.Fail()
 				return

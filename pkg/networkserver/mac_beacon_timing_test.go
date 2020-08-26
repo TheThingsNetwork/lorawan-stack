@@ -39,7 +39,7 @@ func TestNeedsBeaconTimingReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{},
 		},
 	)
-	ForEachClass(func(makeClassName func(parts ...string) string, class ttnpb.Class) {
+	ForEachClass(t, func(makeClassName func(parts ...string) string, class ttnpb.Class) {
 		// TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
 		tcs = append(tcs,
 			TestCase{

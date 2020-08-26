@@ -5876,6 +5876,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:no_band_version": {
+    "translations": {
+      "en": "specified version `{ver}` of band `{id}` does not exist"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "utils.go"
+    }
+  },
   "error:pkg/networkserver:no_dev_eui": {
     "translations": {
       "en": "no DevEUI specified"

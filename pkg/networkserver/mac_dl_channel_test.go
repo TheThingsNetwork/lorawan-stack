@@ -101,7 +101,7 @@ func TestNeedsDLChannelReq(t *testing.T) {
 			Needs: true,
 		},
 	} {
-		ForEachMACVersion(func(makeMACName func(parts ...string) string, macVersion ttnpb.MACVersion) {
+		ForEachMACVersion(t, func(makeMACName func(parts ...string) string, macVersion ttnpb.MACVersion) {
 			tcs = append(tcs,
 				TestCase{
 					Name: makeMACName(conf.Suffix),

@@ -110,7 +110,7 @@ func (ns *NetworkServer) updateDataDownlinkTask(ctx context.Context, dev *ttnpb.
 		earliestAt = t
 	}
 	var taskAt time.Time
-	_, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+	phy, err := deviceBand(dev, ns.FrequencyPlans)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to determine device band")
 	} else {
@@ -148,7 +148,7 @@ func (ns *NetworkServer) updateDataDownlinkTask(ctx context.Context, dev *ttnpb.
 // device operating in a region where a fixed channel plan is defined in case
 // dev.MACState.CurrentParameters.Channels is not equal to dev.MACState.DesiredParameters.Channels.
 // Note, that generateDataDownlink assumes transmitAt is the earliest possible time a downlink can be transmitted to the device.
-func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, class ttnpb.Class, transmitAt time.Time, maxDownLen, maxUpLen uint16) (*generatedDownlink, generateDownlinkState, error) {
+func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, class ttnpb.Class, transmitAt time.Time, maxDownLen, maxUpLen uint16) (*generatedDownlink, generateDownlinkState, error) {
 	if dev.MACState == nil {
 		return nil, generateDownlinkState{}, errUnknownMACState.New()
 	}
@@ -270,7 +270,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			logger := logger.WithField("cid", cmd.CID)
 			logger.Debug("Add MAC command to buffer")
 			var err error
-			cmdBuf, err = spec.AppendDownlink(phy, cmdBuf, *cmd)
+			cmdBuf, err = spec.AppendDownlink(*phy, cmdBuf, *cmd)
 			if err != nil {
 				return nil, generateDownlinkState{}, errEncodeMAC.WithCause(err)
 			}
@@ -921,7 +921,7 @@ func appendRecentDownlink(recent []*ttnpb.DownlinkMessage, down *ttnpb.DownlinkM
 	return recent
 }
 
-func rx1Parameters(phy band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMessage) (uint64, ttnpb.DataRateIndex, error) {
+func rx1Parameters(phy *band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMessage) (uint64, ttnpb.DataRateIndex, error) {
 	if up.DeviceChannelIndex > math.MaxUint8 {
 		return 0, 0, errInvalidChannelIndex.New()
 	}
@@ -945,7 +945,7 @@ func rx1Parameters(phy band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMess
 }
 
 // maximumUplinkLength returns the maximum length of the next uplink after ups.
-func maximumUplinkLength(fp *frequencyplans.FrequencyPlan, phy band.Band, ups ...*ttnpb.UplinkMessage) (uint16, error) {
+func maximumUplinkLength(fp *frequencyplans.FrequencyPlan, phy *band.Band, ups ...*ttnpb.UplinkMessage) (uint16, error) {
 	// NOTE: If no data uplink is found, we assume ADR is off on the device and, hence, data rate index 0 is used in computation.
 	maxUpDRIdx := ttnpb.DATA_RATE_0
 loop:
@@ -1006,7 +1006,7 @@ type downlinkAttemptResult struct {
 	DownlinkTaskUpdateStrategy downlinkTaskUpdateStrategy
 }
 
-func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, fp *frequencyplans.FrequencyPlan, slot *classADownlinkSlot, maxUpLength uint16) downlinkAttemptResult {
+func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, fp *frequencyplans.FrequencyPlan, slot *classADownlinkSlot, maxUpLength uint16) downlinkAttemptResult {
 	ctx = events.ContextWithCorrelationID(ctx, slot.Uplink.CorrelationIDs...)
 	if !dev.MACState.RxWindowsAvailable {
 		log.FromContext(ctx).Error("RX windows not available, skip class A downlink slot")
@@ -1203,7 +1203,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 }
 
-func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, fp *frequencyplans.FrequencyPlan, slot *networkInitiatedDownlinkSlot, maxUpLength uint16) downlinkAttemptResult {
+func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, fp *frequencyplans.FrequencyPlan, slot *networkInitiatedDownlinkSlot, maxUpLength uint16) downlinkAttemptResult {
 	var drIdx ttnpb.DataRateIndex
 	var freq uint64
 	switch slot.Class {
@@ -1441,7 +1441,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					return nil, nil, nil
 				}
 
-				fp, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+				fp, phy, err := deviceFrequencyPlanAndBand(dev, ns.FrequencyPlans)
 				if err != nil {
 					taskUpdateStrategy = retryDownlinkTask
 					logger.WithError(err).Error("Failed to get frequency plan of the device, retry downlink slot")
