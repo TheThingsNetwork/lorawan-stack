@@ -751,16 +751,6 @@ ContactInfoRegistry:
       http:
       - method: PATCH
         path: /contact_info/validation
-DownlinkMessageProcessor:
-  name: DownlinkMessageProcessor
-  comment: The DownlinkMessageProcessor service processes downlink messages.
-  methods:
-    Process:
-      name: Process
-      input:
-        name: ProcessDownlinkMessageRequest
-      output:
-        name: ApplicationDownlink
 EndDeviceClaimingServer:
   name: EndDeviceClaimingServer
   methods:
@@ -1366,6 +1356,28 @@ JsEndDeviceRegistry:
       http:
       - method: DELETE
         path: /js/applications/{application_ids.application_id}/devices/{device_id}
+MessageProcessor:
+  name: MessageProcessor
+  comment: Encodes and decodes uplink messages.
+  methods:
+    EncodeDownlink:
+      name: EncodeDownlink
+      input:
+        name: EncodeDownlinkMessageRequest
+      output:
+        name: ApplicationDownlink
+    DecodeUplink:
+      name: DecodeUplink
+      input:
+        name: DecodeUplinkMessageRequest
+      output:
+        name: ApplicationUplink
+    DecodeDownlink:
+      name: DecodeDownlink
+      input:
+        name: DecodeDownlinkMessageRequest
+      output:
+        name: ApplicationDownlink
 NetworkCryptoService:
   name: NetworkCryptoService
   comment: Service for network layer cryptographic operations.
@@ -1710,16 +1722,6 @@ OrganizationRegistry:
       http:
       - method: DELETE
         path: /organizations/{organization_id}
-UplinkMessageProcessor:
-  name: UplinkMessageProcessor
-  comment: The UplinkMessageProcessor service processes uplink messages.
-  methods:
-    Process:
-      name: Process
-      input:
-        name: ProcessUplinkMessageRequest
-      output:
-        name: ApplicationUplink
 UserAccess:
   name: UserAccess
   methods:

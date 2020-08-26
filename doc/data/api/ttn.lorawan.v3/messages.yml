@@ -1894,6 +1894,62 @@ DataRateIndexValue:
     rules:
       defined_only: true
     default: DATA_RATE_0
+DecodeDownlinkMessageRequest:
+  name: DecodeDownlinkMessageRequest
+  fields:
+  - name: ids
+    message:
+      name: EndDeviceIdentifiers
+    rules:
+      required: true
+    default: {}
+  - name: end_device_version_ids
+    message:
+      name: EndDeviceVersionIdentifiers
+    rules:
+      required: true
+    default: {}
+  - name: message
+    message:
+      name: ApplicationDownlink
+    rules:
+      required: true
+    default: {}
+  - name: formatter
+    enum:
+      name: PayloadFormatter
+    default: FORMATTER_NONE
+  - name: parameter
+    type: string
+    default: ""
+DecodeUplinkMessageRequest:
+  name: DecodeUplinkMessageRequest
+  fields:
+  - name: ids
+    message:
+      name: EndDeviceIdentifiers
+    rules:
+      required: true
+    default: {}
+  - name: end_device_version_ids
+    message:
+      name: EndDeviceVersionIdentifiers
+    rules:
+      required: true
+    default: {}
+  - name: message
+    message:
+      name: ApplicationUplink
+    rules:
+      required: true
+    default: {}
+  - name: formatter
+    enum:
+      name: PayloadFormatter
+    default: FORMATTER_NONE
+  - name: parameter
+    type: string
+    default: ""
 DeleteInvitationRequest:
   name: DeleteInvitationRequest
   fields:
@@ -2001,6 +2057,34 @@ DownlinkQueueRequest:
       message:
         name: ApplicationDownlink
     default: []
+EncodeDownlinkMessageRequest:
+  name: EncodeDownlinkMessageRequest
+  fields:
+  - name: ids
+    message:
+      name: EndDeviceIdentifiers
+    rules:
+      required: true
+    default: {}
+  - name: end_device_version_ids
+    message:
+      name: EndDeviceVersionIdentifiers
+    rules:
+      required: true
+    default: {}
+  - name: message
+    message:
+      name: ApplicationDownlink
+    rules:
+      required: true
+    default: {}
+  - name: formatter
+    enum:
+      name: PayloadFormatter
+    default: FORMATTER_NONE
+  - name: parameter
+    type: string
+    default: ""
 EndDevice:
   name: EndDevice
   comment: |-
@@ -6450,54 +6534,6 @@ PingSlotPeriodValue:
     rules:
       defined_only: true
     default: PING_EVERY_1S
-ProcessDownlinkMessageRequest:
-  name: ProcessDownlinkMessageRequest
-  fields:
-  - name: ids
-    message:
-      name: EndDeviceIdentifiers
-    rules:
-      required: true
-    default: {}
-  - name: end_device_version_ids
-    message:
-      name: EndDeviceVersionIdentifiers
-    rules:
-      required: true
-    default: {}
-  - name: message
-    message:
-      name: ApplicationDownlink
-    rules:
-      required: true
-    default: {}
-  - name: parameter
-    type: string
-    default: ""
-ProcessUplinkMessageRequest:
-  name: ProcessUplinkMessageRequest
-  fields:
-  - name: ids
-    message:
-      name: EndDeviceIdentifiers
-    rules:
-      required: true
-    default: {}
-  - name: end_device_version_ids
-    message:
-      name: EndDeviceVersionIdentifiers
-    rules:
-      required: true
-    default: {}
-  - name: message
-    message:
-      name: ApplicationUplink
-    rules:
-      required: true
-    default: {}
-  - name: parameter
-    type: string
-    default: ""
 ProvisionEndDevicesRequest:
   name: ProvisionEndDevicesRequest
   fields:

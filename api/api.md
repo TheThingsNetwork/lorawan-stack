@@ -334,10 +334,10 @@
   - [Enum `RxDelay`](#ttn.lorawan.v3.RxDelay)
   - [Enum `TxSchedulePriority`](#ttn.lorawan.v3.TxSchedulePriority)
 - [File `lorawan-stack/api/message_services.proto`](#lorawan-stack/api/message_services.proto)
-  - [Message `ProcessDownlinkMessageRequest`](#ttn.lorawan.v3.ProcessDownlinkMessageRequest)
-  - [Message `ProcessUplinkMessageRequest`](#ttn.lorawan.v3.ProcessUplinkMessageRequest)
-  - [Service `DownlinkMessageProcessor`](#ttn.lorawan.v3.DownlinkMessageProcessor)
-  - [Service `UplinkMessageProcessor`](#ttn.lorawan.v3.UplinkMessageProcessor)
+  - [Message `DecodeDownlinkMessageRequest`](#ttn.lorawan.v3.DecodeDownlinkMessageRequest)
+  - [Message `DecodeUplinkMessageRequest`](#ttn.lorawan.v3.DecodeUplinkMessageRequest)
+  - [Message `EncodeDownlinkMessageRequest`](#ttn.lorawan.v3.EncodeDownlinkMessageRequest)
+  - [Service `MessageProcessor`](#ttn.lorawan.v3.MessageProcessor)
 - [File `lorawan-stack/api/messages.proto`](#lorawan-stack/api/messages.proto)
   - [Message `ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink)
   - [Message `ApplicationDownlink.ClassBC`](#ttn.lorawan.v3.ApplicationDownlink.ClassBC)
@@ -4768,13 +4768,14 @@ Transmission settings for downlink.
 
 ## <a name="lorawan-stack/api/message_services.proto">File `lorawan-stack/api/message_services.proto`</a>
 
-### <a name="ttn.lorawan.v3.ProcessDownlinkMessageRequest">Message `ProcessDownlinkMessageRequest`</a>
+### <a name="ttn.lorawan.v3.DecodeDownlinkMessageRequest">Message `DecodeDownlinkMessageRequest`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
 | `end_device_version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  |  |
 | `message` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
+| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  |  |
 | `parameter` | [`string`](#string) |  |  |
 
 #### Field Rules
@@ -4785,13 +4786,14 @@ Transmission settings for downlink.
 | `end_device_version_ids` | <p>`message.required`: `true`</p> |
 | `message` | <p>`message.required`: `true`</p> |
 
-### <a name="ttn.lorawan.v3.ProcessUplinkMessageRequest">Message `ProcessUplinkMessageRequest`</a>
+### <a name="ttn.lorawan.v3.DecodeUplinkMessageRequest">Message `DecodeUplinkMessageRequest`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
 | `end_device_version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  |  |
 | `message` | [`ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink) |  |  |
+| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  |  |
 | `parameter` | [`string`](#string) |  |  |
 
 #### Field Rules
@@ -4802,21 +4804,33 @@ Transmission settings for downlink.
 | `end_device_version_ids` | <p>`message.required`: `true`</p> |
 | `message` | <p>`message.required`: `true`</p> |
 
-### <a name="ttn.lorawan.v3.DownlinkMessageProcessor">Service `DownlinkMessageProcessor`</a>
+### <a name="ttn.lorawan.v3.EncodeDownlinkMessageRequest">Message `EncodeDownlinkMessageRequest`</a>
 
-The DownlinkMessageProcessor service processes downlink messages.
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| `end_device_version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  |  |
+| `message` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
+| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  |  |
+| `parameter` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+| `end_device_version_ids` | <p>`message.required`: `true`</p> |
+| `message` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.MessageProcessor">Service `MessageProcessor`</a>
+
+Encodes and decodes uplink messages.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `Process` | [`ProcessDownlinkMessageRequest`](#ttn.lorawan.v3.ProcessDownlinkMessageRequest) | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |
-
-### <a name="ttn.lorawan.v3.UplinkMessageProcessor">Service `UplinkMessageProcessor`</a>
-
-The UplinkMessageProcessor service processes uplink messages.
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| `Process` | [`ProcessUplinkMessageRequest`](#ttn.lorawan.v3.ProcessUplinkMessageRequest) | [`ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink) |  |
+| `EncodeDownlink` | [`EncodeDownlinkMessageRequest`](#ttn.lorawan.v3.EncodeDownlinkMessageRequest) | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |
+| `DecodeUplink` | [`DecodeUplinkMessageRequest`](#ttn.lorawan.v3.DecodeUplinkMessageRequest) | [`ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink) |  |
+| `DecodeDownlink` | [`DecodeDownlinkMessageRequest`](#ttn.lorawan.v3.DecodeDownlinkMessageRequest) | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |
 
 ## <a name="lorawan-stack/api/messages.proto">File `lorawan-stack/api/messages.proto`</a>
 

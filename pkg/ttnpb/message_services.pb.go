@@ -33,88 +33,27 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type ProcessUplinkMessageRequest struct {
-	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
-	EndDeviceVersionIDs  EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=end_device_version_ids,json=endDeviceVersionIds,proto3" json:"end_device_version_ids"`
-	Message              ApplicationUplink           `protobuf:"bytes,3,opt,name=message,proto3" json:"message"`
-	Parameter            string                      `protobuf:"bytes,4,opt,name=parameter,proto3" json:"parameter,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
-	XXX_sizecache        int32                       `json:"-"`
-}
-
-func (m *ProcessUplinkMessageRequest) Reset()      { *m = ProcessUplinkMessageRequest{} }
-func (*ProcessUplinkMessageRequest) ProtoMessage() {}
-func (*ProcessUplinkMessageRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6fa32647f6f069ac, []int{0}
-}
-func (m *ProcessUplinkMessageRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ProcessUplinkMessageRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ProcessUplinkMessageRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ProcessUplinkMessageRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ProcessUplinkMessageRequest.Merge(m, src)
-}
-func (m *ProcessUplinkMessageRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *ProcessUplinkMessageRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ProcessUplinkMessageRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ProcessUplinkMessageRequest proto.InternalMessageInfo
-
-func (m *ProcessUplinkMessageRequest) GetEndDeviceVersionIDs() EndDeviceVersionIdentifiers {
-	if m != nil {
-		return m.EndDeviceVersionIDs
-	}
-	return EndDeviceVersionIdentifiers{}
-}
-
-func (m *ProcessUplinkMessageRequest) GetMessage() ApplicationUplink {
-	if m != nil {
-		return m.Message
-	}
-	return ApplicationUplink{}
-}
-
-func (m *ProcessUplinkMessageRequest) GetParameter() string {
-	if m != nil {
-		return m.Parameter
-	}
-	return ""
-}
-
-type ProcessDownlinkMessageRequest struct {
+type EncodeDownlinkMessageRequest struct {
 	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
 	EndDeviceVersionIDs  EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=end_device_version_ids,json=endDeviceVersionIds,proto3" json:"end_device_version_ids"`
 	Message              ApplicationDownlink         `protobuf:"bytes,3,opt,name=message,proto3" json:"message"`
-	Parameter            string                      `protobuf:"bytes,4,opt,name=parameter,proto3" json:"parameter,omitempty"`
+	Formatter            PayloadFormatter            `protobuf:"varint,4,opt,name=formatter,proto3,enum=ttn.lorawan.v3.PayloadFormatter" json:"formatter,omitempty"`
+	Parameter            string                      `protobuf:"bytes,5,opt,name=parameter,proto3" json:"parameter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
 	XXX_sizecache        int32                       `json:"-"`
 }
 
-func (m *ProcessDownlinkMessageRequest) Reset()      { *m = ProcessDownlinkMessageRequest{} }
-func (*ProcessDownlinkMessageRequest) ProtoMessage() {}
-func (*ProcessDownlinkMessageRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6fa32647f6f069ac, []int{1}
+func (m *EncodeDownlinkMessageRequest) Reset()      { *m = EncodeDownlinkMessageRequest{} }
+func (*EncodeDownlinkMessageRequest) ProtoMessage() {}
+func (*EncodeDownlinkMessageRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_6fa32647f6f069ac, []int{0}
 }
-func (m *ProcessDownlinkMessageRequest) XXX_Unmarshal(b []byte) error {
+func (m *EncodeDownlinkMessageRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ProcessDownlinkMessageRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *EncodeDownlinkMessageRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_ProcessDownlinkMessageRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_EncodeDownlinkMessageRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -124,33 +63,180 @@ func (m *ProcessDownlinkMessageRequest) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *ProcessDownlinkMessageRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ProcessDownlinkMessageRequest.Merge(m, src)
+func (m *EncodeDownlinkMessageRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EncodeDownlinkMessageRequest.Merge(m, src)
 }
-func (m *ProcessDownlinkMessageRequest) XXX_Size() int {
+func (m *EncodeDownlinkMessageRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *ProcessDownlinkMessageRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ProcessDownlinkMessageRequest.DiscardUnknown(m)
+func (m *EncodeDownlinkMessageRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_EncodeDownlinkMessageRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ProcessDownlinkMessageRequest proto.InternalMessageInfo
+var xxx_messageInfo_EncodeDownlinkMessageRequest proto.InternalMessageInfo
 
-func (m *ProcessDownlinkMessageRequest) GetEndDeviceVersionIDs() EndDeviceVersionIdentifiers {
+func (m *EncodeDownlinkMessageRequest) GetEndDeviceVersionIDs() EndDeviceVersionIdentifiers {
 	if m != nil {
 		return m.EndDeviceVersionIDs
 	}
 	return EndDeviceVersionIdentifiers{}
 }
 
-func (m *ProcessDownlinkMessageRequest) GetMessage() ApplicationDownlink {
+func (m *EncodeDownlinkMessageRequest) GetMessage() ApplicationDownlink {
 	if m != nil {
 		return m.Message
 	}
 	return ApplicationDownlink{}
 }
 
-func (m *ProcessDownlinkMessageRequest) GetParameter() string {
+func (m *EncodeDownlinkMessageRequest) GetFormatter() PayloadFormatter {
+	if m != nil {
+		return m.Formatter
+	}
+	return PayloadFormatter_FORMATTER_NONE
+}
+
+func (m *EncodeDownlinkMessageRequest) GetParameter() string {
+	if m != nil {
+		return m.Parameter
+	}
+	return ""
+}
+
+type DecodeUplinkMessageRequest struct {
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	EndDeviceVersionIDs  EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=end_device_version_ids,json=endDeviceVersionIds,proto3" json:"end_device_version_ids"`
+	Message              ApplicationUplink           `protobuf:"bytes,3,opt,name=message,proto3" json:"message"`
+	Formatter            PayloadFormatter            `protobuf:"varint,4,opt,name=formatter,proto3,enum=ttn.lorawan.v3.PayloadFormatter" json:"formatter,omitempty"`
+	Parameter            string                      `protobuf:"bytes,5,opt,name=parameter,proto3" json:"parameter,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
+	XXX_sizecache        int32                       `json:"-"`
+}
+
+func (m *DecodeUplinkMessageRequest) Reset()      { *m = DecodeUplinkMessageRequest{} }
+func (*DecodeUplinkMessageRequest) ProtoMessage() {}
+func (*DecodeUplinkMessageRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_6fa32647f6f069ac, []int{1}
+}
+func (m *DecodeUplinkMessageRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DecodeUplinkMessageRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_DecodeUplinkMessageRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *DecodeUplinkMessageRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DecodeUplinkMessageRequest.Merge(m, src)
+}
+func (m *DecodeUplinkMessageRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *DecodeUplinkMessageRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DecodeUplinkMessageRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DecodeUplinkMessageRequest proto.InternalMessageInfo
+
+func (m *DecodeUplinkMessageRequest) GetEndDeviceVersionIDs() EndDeviceVersionIdentifiers {
+	if m != nil {
+		return m.EndDeviceVersionIDs
+	}
+	return EndDeviceVersionIdentifiers{}
+}
+
+func (m *DecodeUplinkMessageRequest) GetMessage() ApplicationUplink {
+	if m != nil {
+		return m.Message
+	}
+	return ApplicationUplink{}
+}
+
+func (m *DecodeUplinkMessageRequest) GetFormatter() PayloadFormatter {
+	if m != nil {
+		return m.Formatter
+	}
+	return PayloadFormatter_FORMATTER_NONE
+}
+
+func (m *DecodeUplinkMessageRequest) GetParameter() string {
+	if m != nil {
+		return m.Parameter
+	}
+	return ""
+}
+
+type DecodeDownlinkMessageRequest struct {
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	EndDeviceVersionIDs  EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=end_device_version_ids,json=endDeviceVersionIds,proto3" json:"end_device_version_ids"`
+	Message              ApplicationDownlink         `protobuf:"bytes,3,opt,name=message,proto3" json:"message"`
+	Formatter            PayloadFormatter            `protobuf:"varint,4,opt,name=formatter,proto3,enum=ttn.lorawan.v3.PayloadFormatter" json:"formatter,omitempty"`
+	Parameter            string                      `protobuf:"bytes,5,opt,name=parameter,proto3" json:"parameter,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
+	XXX_sizecache        int32                       `json:"-"`
+}
+
+func (m *DecodeDownlinkMessageRequest) Reset()      { *m = DecodeDownlinkMessageRequest{} }
+func (*DecodeDownlinkMessageRequest) ProtoMessage() {}
+func (*DecodeDownlinkMessageRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_6fa32647f6f069ac, []int{2}
+}
+func (m *DecodeDownlinkMessageRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DecodeDownlinkMessageRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_DecodeDownlinkMessageRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *DecodeDownlinkMessageRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DecodeDownlinkMessageRequest.Merge(m, src)
+}
+func (m *DecodeDownlinkMessageRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *DecodeDownlinkMessageRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DecodeDownlinkMessageRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DecodeDownlinkMessageRequest proto.InternalMessageInfo
+
+func (m *DecodeDownlinkMessageRequest) GetEndDeviceVersionIDs() EndDeviceVersionIdentifiers {
+	if m != nil {
+		return m.EndDeviceVersionIDs
+	}
+	return EndDeviceVersionIdentifiers{}
+}
+
+func (m *DecodeDownlinkMessageRequest) GetMessage() ApplicationDownlink {
+	if m != nil {
+		return m.Message
+	}
+	return ApplicationDownlink{}
+}
+
+func (m *DecodeDownlinkMessageRequest) GetFormatter() PayloadFormatter {
+	if m != nil {
+		return m.Formatter
+	}
+	return PayloadFormatter_FORMATTER_NONE
+}
+
+func (m *DecodeDownlinkMessageRequest) GetParameter() string {
 	if m != nil {
 		return m.Parameter
 	}
@@ -158,10 +244,12 @@ func (m *ProcessDownlinkMessageRequest) GetParameter() string {
 }
 
 func init() {
-	proto.RegisterType((*ProcessUplinkMessageRequest)(nil), "ttn.lorawan.v3.ProcessUplinkMessageRequest")
-	golang_proto.RegisterType((*ProcessUplinkMessageRequest)(nil), "ttn.lorawan.v3.ProcessUplinkMessageRequest")
-	proto.RegisterType((*ProcessDownlinkMessageRequest)(nil), "ttn.lorawan.v3.ProcessDownlinkMessageRequest")
-	golang_proto.RegisterType((*ProcessDownlinkMessageRequest)(nil), "ttn.lorawan.v3.ProcessDownlinkMessageRequest")
+	proto.RegisterType((*EncodeDownlinkMessageRequest)(nil), "ttn.lorawan.v3.EncodeDownlinkMessageRequest")
+	golang_proto.RegisterType((*EncodeDownlinkMessageRequest)(nil), "ttn.lorawan.v3.EncodeDownlinkMessageRequest")
+	proto.RegisterType((*DecodeUplinkMessageRequest)(nil), "ttn.lorawan.v3.DecodeUplinkMessageRequest")
+	golang_proto.RegisterType((*DecodeUplinkMessageRequest)(nil), "ttn.lorawan.v3.DecodeUplinkMessageRequest")
+	proto.RegisterType((*DecodeDownlinkMessageRequest)(nil), "ttn.lorawan.v3.DecodeDownlinkMessageRequest")
+	golang_proto.RegisterType((*DecodeDownlinkMessageRequest)(nil), "ttn.lorawan.v3.DecodeDownlinkMessageRequest")
 }
 
 func init() {
@@ -172,53 +260,57 @@ func init() {
 }
 
 var fileDescriptor_6fa32647f6f069ac = []byte{
-	// 573 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe4, 0x94, 0xcf, 0x6b, 0x13, 0x41,
-	0x14, 0xc7, 0x67, 0x52, 0xb5, 0x74, 0x15, 0x29, 0x5b, 0x28, 0x21, 0xea, 0x6b, 0x6d, 0x3d, 0x04,
-	0x24, 0xbb, 0x90, 0xfc, 0x05, 0x0d, 0x11, 0x2c, 0x22, 0x48, 0x40, 0x41, 0x41, 0xc2, 0x66, 0x77,
-	0xba, 0x19, 0x92, 0xcc, 0xac, 0x3b, 0x93, 0x8d, 0xb9, 0xf5, 0x22, 0x14, 0x4f, 0x1e, 0x3d, 0x7a,
-	0x11, 0x7a, 0xec, 0xb1, 0xc7, 0x1e, 0x73, 0xcc, 0x31, 0x07, 0x09, 0xdd, 0xd9, 0x4b, 0x8f, 0x3d,
-	0x16, 0x4f, 0x92, 0xcd, 0x96, 0xfc, 0x58, 0x53, 0xc5, 0xab, 0xb7, 0x79, 0xc9, 0x77, 0xbe, 0xdf,
-	0xf7, 0x3e, 0xfb, 0x18, 0x2d, 0xdf, 0xe2, 0xbe, 0xd5, 0xb5, 0x58, 0x41, 0x48, 0xcb, 0x6e, 0x9a,
-	0x96, 0x47, 0xcd, 0x36, 0x11, 0xc2, 0x72, 0x49, 0x4d, 0x10, 0x3f, 0xa0, 0x36, 0x11, 0x86, 0xe7,
-	0x73, 0xc9, 0xf5, 0xfb, 0x52, 0x32, 0x23, 0x51, 0x1b, 0x41, 0x29, 0xb7, 0xe7, 0x52, 0xd9, 0xe8,
-	0xd4, 0x0d, 0x9b, 0xb7, 0x4d, 0xc2, 0x02, 0xde, 0xf3, 0x7c, 0xfe, 0xb1, 0x67, 0xc6, 0x62, 0xbb,
-	0xe0, 0x12, 0x56, 0x08, 0xac, 0x16, 0x75, 0x2c, 0x49, 0xcc, 0xd4, 0x61, 0x62, 0x99, 0x2b, 0xcc,
-	0x58, 0xb8, 0xdc, 0xe5, 0x93, 0xcb, 0xf5, 0xce, 0x41, 0x5c, 0xc5, 0x45, 0x7c, 0x4a, 0xe4, 0x3b,
-	0xe9, 0x5e, 0x09, 0x73, 0x6a, 0x0e, 0x19, 0xb7, 0x99, 0x68, 0x76, 0xd3, 0x1a, 0xea, 0x10, 0x26,
-	0xe9, 0x01, 0x25, 0x7e, 0x32, 0x4a, 0x6e, 0x7b, 0xe9, 0xd0, 0x89, 0x62, 0x67, 0x98, 0xd1, 0x1e,
-	0xbc, 0xf2, 0xb9, 0x4d, 0x84, 0x78, 0xed, 0xb5, 0x28, 0x6b, 0xbe, 0x9c, 0xfc, 0x5f, 0x25, 0x1f,
-	0x3a, 0x44, 0x48, 0xfd, 0xb9, 0xb6, 0x42, 0x1d, 0x91, 0xc5, 0xdb, 0x38, 0x7f, 0xb7, 0xf8, 0xc4,
-	0x98, 0x47, 0x63, 0x3c, 0x63, 0x4e, 0x25, 0x6e, 0x6a, 0x7f, 0x1a, 0x5d, 0x5e, 0xff, 0x59, 0xbe,
-	0xfd, 0x19, 0x67, 0xd6, 0x71, 0x7f, 0xb4, 0x85, 0x06, 0xa3, 0x2d, 0x5c, 0x1d, 0x5b, 0xe8, 0x9f,
-	0xb0, 0xb6, 0x39, 0x9d, 0xa2, 0x16, 0x10, 0x5f, 0x50, 0xce, 0x6a, 0x63, 0xf7, 0x4c, 0xec, 0xfe,
-	0x74, 0xa9, 0xfb, 0x9b, 0x89, 0x76, 0x36, 0x64, 0x77, 0x36, 0x44, 0x8d, 0xb6, 0x36, 0x52, 0xe2,
-	0x8a, 0xa8, 0x6e, 0x90, 0x94, 0x83, 0xd0, 0xf7, 0xb5, 0xd5, 0x84, 0x41, 0x76, 0x25, 0xce, 0x7d,
-	0xbc, 0x98, 0xbb, 0xe7, 0x79, 0x2d, 0x6a, 0x5b, 0x92, 0x72, 0x36, 0x61, 0x52, 0xbe, 0x37, 0x9b,
-	0x56, 0xbd, 0xbe, 0xaf, 0x3f, 0xd4, 0xd6, 0x3c, 0xcb, 0xb7, 0xda, 0x44, 0x12, 0x3f, 0x7b, 0x6b,
-	0x1b, 0xe7, 0xd7, 0xaa, 0xd3, 0x1f, 0x76, 0x7e, 0x64, 0xb4, 0x47, 0x09, 0xda, 0x0a, 0xef, 0xb2,
-	0xff, 0x02, 0xee, 0x8b, 0x45, 0xb8, 0xbb, 0x37, 0xc0, 0xbd, 0xa6, 0xf2, 0x4f, 0x78, 0x8b, 0x42,
-	0xdb, 0x9c, 0xdb, 0xd8, 0x04, 0x35, 0xf7, 0xf5, 0xb7, 0xda, 0x6a, 0x52, 0xe8, 0xa9, 0xb1, 0x6f,
-	0xd8, 0xf5, 0xdc, 0x9f, 0x17, 0xa1, 0xd8, 0xd3, 0xb2, 0x0b, 0xdf, 0x72, 0x1a, 0xfb, 0x7e, 0x1a,
-	0x5b, 0x58, 0x12, 0xfb, 0xfb, 0x3d, 0xc8, 0xfd, 0x15, 0xa4, 0xef, 0xb8, 0x1f, 0x02, 0x1e, 0x84,
-	0x80, 0x87, 0x21, 0xa0, 0xf3, 0x10, 0xd0, 0x45, 0x08, 0xe8, 0x32, 0x04, 0x74, 0x15, 0x02, 0x3e,
-	0x54, 0x80, 0x8f, 0x14, 0xa0, 0x63, 0x05, 0xf8, 0x44, 0x01, 0x3a, 0x55, 0x80, 0xce, 0x14, 0xa0,
-	0xbe, 0x02, 0x3c, 0x50, 0x80, 0x87, 0x0a, 0xd0, 0xb9, 0x02, 0x7c, 0xa1, 0x00, 0x5d, 0x2a, 0xc0,
-	0x57, 0x0a, 0xd0, 0x61, 0x04, 0xe8, 0x28, 0x02, 0xfc, 0x25, 0x02, 0xf4, 0x35, 0x02, 0xfc, 0x2d,
-	0x02, 0x74, 0x1c, 0x01, 0x3a, 0x89, 0x00, 0x9f, 0x46, 0x80, 0xcf, 0x22, 0xc0, 0xef, 0x4c, 0x97,
-	0x1b, 0xb2, 0x41, 0x64, 0x83, 0x32, 0x57, 0x18, 0x8c, 0xc8, 0x2e, 0xf7, 0x9b, 0xe6, 0xfc, 0xbb,
-	0x12, 0x94, 0x4c, 0xaf, 0xe9, 0x9a, 0x52, 0x32, 0xaf, 0x5e, 0xbf, 0x13, 0x3f, 0x2c, 0xa5, 0x5f,
-	0x01, 0x00, 0x00, 0xff, 0xff, 0x78, 0xf2, 0xba, 0x1d, 0x71, 0x05, 0x00, 0x00,
+	// 632 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x55, 0x3f, 0x48, 0x1c, 0x4f,
+	0x18, 0x9d, 0xf1, 0x7e, 0xfe, 0x82, 0x1b, 0x11, 0x59, 0x21, 0xc8, 0x21, 0x9f, 0x17, 0x4d, 0x71,
+	0x24, 0xb9, 0x5d, 0xd0, 0x3e, 0xe0, 0x71, 0x86, 0x48, 0x08, 0xc8, 0x41, 0x52, 0x04, 0xc2, 0x31,
+	0xb7, 0x3b, 0xae, 0xc3, 0xdd, 0xcd, 0x6c, 0x76, 0xc6, 0x33, 0x76, 0x36, 0x01, 0x49, 0x95, 0x2e,
+	0x81, 0x34, 0x69, 0x02, 0x96, 0x96, 0x42, 0x1a, 0x4b, 0x4b, 0x4b, 0x2b, 0x71, 0x67, 0x1b, 0x4b,
+	0x4b, 0x49, 0x15, 0xf6, 0x8f, 0xdc, 0x9f, 0xe5, 0x8c, 0x5d, 0x02, 0x49, 0x37, 0xb3, 0xbc, 0xef,
+	0xbd, 0x79, 0xdf, 0x9b, 0x6f, 0xc7, 0x28, 0xb7, 0x45, 0x40, 0xb6, 0x09, 0xaf, 0x48, 0x45, 0x9c,
+	0x96, 0x4d, 0x7c, 0x66, 0x77, 0xa8, 0x94, 0xc4, 0xa3, 0x0d, 0x49, 0x83, 0x2e, 0x73, 0xa8, 0xb4,
+	0xfc, 0x40, 0x28, 0x61, 0x4e, 0x29, 0xc5, 0xad, 0x0c, 0x6d, 0x75, 0x97, 0x8b, 0x2b, 0x1e, 0x53,
+	0x9b, 0x5b, 0x4d, 0xcb, 0x11, 0x1d, 0x9b, 0xf2, 0xae, 0xd8, 0xf1, 0x03, 0xf1, 0x6e, 0xc7, 0x4e,
+	0xc0, 0x4e, 0xc5, 0xa3, 0xbc, 0xd2, 0x25, 0x6d, 0xe6, 0x12, 0x45, 0xed, 0xdc, 0x22, 0xa5, 0x2c,
+	0x56, 0xfa, 0x28, 0x3c, 0xe1, 0x89, 0xb4, 0xb8, 0xb9, 0xb5, 0x91, 0xec, 0x92, 0x4d, 0xb2, 0xca,
+	0xe0, 0x0b, 0xf9, 0xb3, 0x52, 0xee, 0x36, 0x5c, 0x1a, 0x1f, 0x33, 0xc3, 0x2c, 0xe6, 0x31, 0xcc,
+	0xa5, 0x5c, 0xb1, 0x0d, 0x46, 0x83, 0xcc, 0x4a, 0xb1, 0x34, 0xd2, 0x74, 0x86, 0x58, 0xf8, 0x52,
+	0x30, 0xe6, 0x56, 0xb9, 0x23, 0x5c, 0x5a, 0x13, 0xdb, 0xbc, 0xcd, 0x78, 0xeb, 0x45, 0x0a, 0xa8,
+	0xd3, 0xb7, 0x5b, 0x54, 0x2a, 0xf3, 0x99, 0x51, 0x60, 0xae, 0x9c, 0xc5, 0x25, 0x5c, 0xbe, 0xbb,
+	0xf4, 0xc0, 0x1a, 0xec, 0x8d, 0xb5, 0xca, 0xdd, 0x5a, 0x72, 0xaa, 0xb5, 0x9e, 0x76, 0x75, 0xfa,
+	0x47, 0x75, 0xfc, 0x03, 0x1e, 0x9b, 0xc6, 0xc7, 0x67, 0xf3, 0xe8, 0xe4, 0x6c, 0x1e, 0xd7, 0x63,
+	0x0a, 0xf3, 0x3d, 0x36, 0xee, 0xf5, 0x6c, 0x34, 0xba, 0x34, 0x90, 0x4c, 0xf0, 0x46, 0xcc, 0x3e,
+	0x96, 0xb0, 0x3f, 0x1a, 0xc9, 0xfe, 0x2a, 0xc5, 0xf6, 0x8b, 0x2c, 0xf6, 0x8b, 0xe8, 0xb3, 0xf9,
+	0x99, 0x1c, 0xb8, 0x26, 0xeb, 0x33, 0x34, 0xc7, 0x20, 0xcd, 0xe7, 0xc6, 0x9d, 0xac, 0x09, 0xb3,
+	0x85, 0x44, 0x77, 0x71, 0x58, 0x77, 0xc5, 0xf7, 0xdb, 0xcc, 0x21, 0x8a, 0x09, 0x7e, 0xdd, 0x95,
+	0xea, 0x64, 0xbf, 0x5e, 0xfd, 0x9a, 0xc1, 0x7c, 0x62, 0x4c, 0x6c, 0x88, 0xa0, 0x43, 0x94, 0xa2,
+	0xc1, 0xec, 0x7f, 0x25, 0x5c, 0x9e, 0x5a, 0x2a, 0x0d, 0xd3, 0xad, 0x93, 0x9d, 0xb6, 0x20, 0xee,
+	0xd3, 0x6b, 0x5c, 0xbd, 0x57, 0x62, 0xce, 0x19, 0x13, 0x3e, 0x09, 0x48, 0x87, 0xc6, 0xf5, 0xe3,
+	0x25, 0x5c, 0x9e, 0xa8, 0xf7, 0x3e, 0x2c, 0x7c, 0x2a, 0x18, 0xc5, 0x1a, 0x8d, 0xd3, 0x79, 0xe9,
+	0xff, 0x15, 0xd9, 0xac, 0x0d, 0x67, 0x73, 0xff, 0x86, 0x6c, 0xd2, 0x9e, 0xfc, 0x9e, 0x64, 0xe2,
+	0xb9, 0x49, 0x93, 0xf9, 0x37, 0x37, 0x7f, 0xdc, 0xdc, 0x2c, 0x7d, 0x1f, 0x33, 0xa6, 0xb3, 0x3c,
+	0xd6, 0x03, 0xe1, 0x50, 0x29, 0x45, 0x60, 0x3a, 0xc6, 0xd4, 0xe0, 0x9f, 0xce, 0x7c, 0x9c, 0x6f,
+	0xdc, 0xe8, 0x44, 0x8b, 0xb7, 0xb1, 0x6b, 0xbe, 0x31, 0x26, 0xfb, 0x07, 0xd6, 0x7c, 0x38, 0x5c,
+	0x34, 0x7a, 0x9c, 0x8b, 0xbf, 0xbe, 0xeb, 0xb1, 0x87, 0xc1, 0x5b, 0x97, 0xf7, 0x70, 0xd3, 0xad,
+	0xbc, 0x95, 0x87, 0xea, 0x37, 0x7c, 0x1c, 0x02, 0x3e, 0x09, 0x01, 0x9f, 0x86, 0x80, 0xce, 0x43,
+	0x40, 0x17, 0x21, 0xa0, 0xcb, 0x10, 0xd0, 0x55, 0x08, 0x78, 0x57, 0x03, 0xde, 0xd3, 0x80, 0xf6,
+	0x35, 0xe0, 0x03, 0x0d, 0xe8, 0x50, 0x03, 0x3a, 0xd2, 0x80, 0x8e, 0x35, 0xe0, 0x13, 0x0d, 0xf8,
+	0x54, 0x03, 0x3a, 0xd7, 0x80, 0x2f, 0x34, 0xa0, 0x4b, 0x0d, 0xf8, 0x4a, 0x03, 0xda, 0x8d, 0x00,
+	0xed, 0x45, 0x80, 0x3f, 0x46, 0x80, 0x3e, 0x47, 0x80, 0xbf, 0x46, 0x80, 0xf6, 0x23, 0x40, 0x07,
+	0x11, 0xe0, 0xc3, 0x08, 0xf0, 0x51, 0x04, 0xf8, 0xb5, 0xed, 0x09, 0x4b, 0x6d, 0x52, 0xb5, 0xc9,
+	0xb8, 0x27, 0x2d, 0x4e, 0xd5, 0xb6, 0x08, 0x5a, 0xf6, 0xe0, 0x0b, 0xd6, 0x5d, 0xb6, 0xfd, 0x96,
+	0x67, 0x2b, 0xc5, 0xfd, 0x66, 0xf3, 0xff, 0xe4, 0x09, 0x5b, 0xfe, 0x19, 0x00, 0x00, 0xff, 0xff,
+	0xe3, 0x81, 0x3e, 0xeb, 0xdb, 0x07, 0x00, 0x00,
 }
 
-func (this *ProcessUplinkMessageRequest) Equal(that interface{}) bool {
+func (this *EncodeDownlinkMessageRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*ProcessUplinkMessageRequest)
+	that1, ok := that.(*EncodeDownlinkMessageRequest)
 	if !ok {
-		that2, ok := that.(ProcessUplinkMessageRequest)
+		that2, ok := that.(EncodeDownlinkMessageRequest)
 		if ok {
 			that1 = &that2
 		} else {
@@ -237,6 +329,9 @@ func (this *ProcessUplinkMessageRequest) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.Message.Equal(&that1.Message) {
+		return false
+	}
+	if this.Formatter != that1.Formatter {
 		return false
 	}
 	if this.Parameter != that1.Parameter {
@@ -244,14 +339,14 @@ func (this *ProcessUplinkMessageRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *ProcessDownlinkMessageRequest) Equal(that interface{}) bool {
+func (this *DecodeUplinkMessageRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*ProcessDownlinkMessageRequest)
+	that1, ok := that.(*DecodeUplinkMessageRequest)
 	if !ok {
-		that2, ok := that.(ProcessDownlinkMessageRequest)
+		that2, ok := that.(DecodeUplinkMessageRequest)
 		if ok {
 			that1 = &that2
 		} else {
@@ -270,6 +365,45 @@ func (this *ProcessDownlinkMessageRequest) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.Message.Equal(&that1.Message) {
+		return false
+	}
+	if this.Formatter != that1.Formatter {
+		return false
+	}
+	if this.Parameter != that1.Parameter {
+		return false
+	}
+	return true
+}
+func (this *DecodeDownlinkMessageRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*DecodeDownlinkMessageRequest)
+	if !ok {
+		that2, ok := that.(DecodeDownlinkMessageRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.EndDeviceIdentifiers.Equal(&that1.EndDeviceIdentifiers) {
+		return false
+	}
+	if !this.EndDeviceVersionIDs.Equal(&that1.EndDeviceVersionIDs) {
+		return false
+	}
+	if !this.Message.Equal(&that1.Message) {
+		return false
+	}
+	if this.Formatter != that1.Formatter {
 		return false
 	}
 	if this.Parameter != that1.Parameter {
@@ -286,151 +420,151 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// UplinkMessageProcessorClient is the client API for UplinkMessageProcessor service.
+// MessageProcessorClient is the client API for MessageProcessor service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type UplinkMessageProcessorClient interface {
-	Process(ctx context.Context, in *ProcessUplinkMessageRequest, opts ...grpc.CallOption) (*ApplicationUplink, error)
+type MessageProcessorClient interface {
+	EncodeDownlink(ctx context.Context, in *EncodeDownlinkMessageRequest, opts ...grpc.CallOption) (*ApplicationDownlink, error)
+	DecodeUplink(ctx context.Context, in *DecodeUplinkMessageRequest, opts ...grpc.CallOption) (*ApplicationUplink, error)
+	DecodeDownlink(ctx context.Context, in *DecodeDownlinkMessageRequest, opts ...grpc.CallOption) (*ApplicationDownlink, error)
 }
 
-type uplinkMessageProcessorClient struct {
+type messageProcessorClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewUplinkMessageProcessorClient(cc *grpc.ClientConn) UplinkMessageProcessorClient {
-	return &uplinkMessageProcessorClient{cc}
+func NewMessageProcessorClient(cc *grpc.ClientConn) MessageProcessorClient {
+	return &messageProcessorClient{cc}
 }
 
-func (c *uplinkMessageProcessorClient) Process(ctx context.Context, in *ProcessUplinkMessageRequest, opts ...grpc.CallOption) (*ApplicationUplink, error) {
-	out := new(ApplicationUplink)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.UplinkMessageProcessor/Process", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// UplinkMessageProcessorServer is the server API for UplinkMessageProcessor service.
-type UplinkMessageProcessorServer interface {
-	Process(context.Context, *ProcessUplinkMessageRequest) (*ApplicationUplink, error)
-}
-
-// UnimplementedUplinkMessageProcessorServer can be embedded to have forward compatible implementations.
-type UnimplementedUplinkMessageProcessorServer struct {
-}
-
-func (*UnimplementedUplinkMessageProcessorServer) Process(ctx context.Context, req *ProcessUplinkMessageRequest) (*ApplicationUplink, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Process not implemented")
-}
-
-func RegisterUplinkMessageProcessorServer(s *grpc.Server, srv UplinkMessageProcessorServer) {
-	s.RegisterService(&_UplinkMessageProcessor_serviceDesc, srv)
-}
-
-func _UplinkMessageProcessor_Process_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ProcessUplinkMessageRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UplinkMessageProcessorServer).Process(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.UplinkMessageProcessor/Process",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UplinkMessageProcessorServer).Process(ctx, req.(*ProcessUplinkMessageRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-var _UplinkMessageProcessor_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "ttn.lorawan.v3.UplinkMessageProcessor",
-	HandlerType: (*UplinkMessageProcessorServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Process",
-			Handler:    _UplinkMessageProcessor_Process_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/message_services.proto",
-}
-
-// DownlinkMessageProcessorClient is the client API for DownlinkMessageProcessor service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type DownlinkMessageProcessorClient interface {
-	Process(ctx context.Context, in *ProcessDownlinkMessageRequest, opts ...grpc.CallOption) (*ApplicationDownlink, error)
-}
-
-type downlinkMessageProcessorClient struct {
-	cc *grpc.ClientConn
-}
-
-func NewDownlinkMessageProcessorClient(cc *grpc.ClientConn) DownlinkMessageProcessorClient {
-	return &downlinkMessageProcessorClient{cc}
-}
-
-func (c *downlinkMessageProcessorClient) Process(ctx context.Context, in *ProcessDownlinkMessageRequest, opts ...grpc.CallOption) (*ApplicationDownlink, error) {
+func (c *messageProcessorClient) EncodeDownlink(ctx context.Context, in *EncodeDownlinkMessageRequest, opts ...grpc.CallOption) (*ApplicationDownlink, error) {
 	out := new(ApplicationDownlink)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.DownlinkMessageProcessor/Process", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.MessageProcessor/EncodeDownlink", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// DownlinkMessageProcessorServer is the server API for DownlinkMessageProcessor service.
-type DownlinkMessageProcessorServer interface {
-	Process(context.Context, *ProcessDownlinkMessageRequest) (*ApplicationDownlink, error)
+func (c *messageProcessorClient) DecodeUplink(ctx context.Context, in *DecodeUplinkMessageRequest, opts ...grpc.CallOption) (*ApplicationUplink, error) {
+	out := new(ApplicationUplink)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.MessageProcessor/DecodeUplink", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-// UnimplementedDownlinkMessageProcessorServer can be embedded to have forward compatible implementations.
-type UnimplementedDownlinkMessageProcessorServer struct {
+func (c *messageProcessorClient) DecodeDownlink(ctx context.Context, in *DecodeDownlinkMessageRequest, opts ...grpc.CallOption) (*ApplicationDownlink, error) {
+	out := new(ApplicationDownlink)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.MessageProcessor/DecodeDownlink", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-func (*UnimplementedDownlinkMessageProcessorServer) Process(ctx context.Context, req *ProcessDownlinkMessageRequest) (*ApplicationDownlink, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Process not implemented")
+// MessageProcessorServer is the server API for MessageProcessor service.
+type MessageProcessorServer interface {
+	EncodeDownlink(context.Context, *EncodeDownlinkMessageRequest) (*ApplicationDownlink, error)
+	DecodeUplink(context.Context, *DecodeUplinkMessageRequest) (*ApplicationUplink, error)
+	DecodeDownlink(context.Context, *DecodeDownlinkMessageRequest) (*ApplicationDownlink, error)
 }
 
-func RegisterDownlinkMessageProcessorServer(s *grpc.Server, srv DownlinkMessageProcessorServer) {
-	s.RegisterService(&_DownlinkMessageProcessor_serviceDesc, srv)
+// UnimplementedMessageProcessorServer can be embedded to have forward compatible implementations.
+type UnimplementedMessageProcessorServer struct {
 }
 
-func _DownlinkMessageProcessor_Process_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ProcessDownlinkMessageRequest)
+func (*UnimplementedMessageProcessorServer) EncodeDownlink(ctx context.Context, req *EncodeDownlinkMessageRequest) (*ApplicationDownlink, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EncodeDownlink not implemented")
+}
+func (*UnimplementedMessageProcessorServer) DecodeUplink(ctx context.Context, req *DecodeUplinkMessageRequest) (*ApplicationUplink, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DecodeUplink not implemented")
+}
+func (*UnimplementedMessageProcessorServer) DecodeDownlink(ctx context.Context, req *DecodeDownlinkMessageRequest) (*ApplicationDownlink, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DecodeDownlink not implemented")
+}
+
+func RegisterMessageProcessorServer(s *grpc.Server, srv MessageProcessorServer) {
+	s.RegisterService(&_MessageProcessor_serviceDesc, srv)
+}
+
+func _MessageProcessor_EncodeDownlink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EncodeDownlinkMessageRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DownlinkMessageProcessorServer).Process(ctx, in)
+		return srv.(MessageProcessorServer).EncodeDownlink(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.DownlinkMessageProcessor/Process",
+		FullMethod: "/ttn.lorawan.v3.MessageProcessor/EncodeDownlink",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DownlinkMessageProcessorServer).Process(ctx, req.(*ProcessDownlinkMessageRequest))
+		return srv.(MessageProcessorServer).EncodeDownlink(ctx, req.(*EncodeDownlinkMessageRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _DownlinkMessageProcessor_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "ttn.lorawan.v3.DownlinkMessageProcessor",
-	HandlerType: (*DownlinkMessageProcessorServer)(nil),
+func _MessageProcessor_DecodeUplink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DecodeUplinkMessageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageProcessorServer).DecodeUplink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.MessageProcessor/DecodeUplink",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageProcessorServer).DecodeUplink(ctx, req.(*DecodeUplinkMessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MessageProcessor_DecodeDownlink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DecodeDownlinkMessageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageProcessorServer).DecodeDownlink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.MessageProcessor/DecodeDownlink",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageProcessorServer).DecodeDownlink(ctx, req.(*DecodeDownlinkMessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _MessageProcessor_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.MessageProcessor",
+	HandlerType: (*MessageProcessorServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Process",
-			Handler:    _DownlinkMessageProcessor_Process_Handler,
+			MethodName: "EncodeDownlink",
+			Handler:    _MessageProcessor_EncodeDownlink_Handler,
+		},
+		{
+			MethodName: "DecodeUplink",
+			Handler:    _MessageProcessor_DecodeUplink_Handler,
+		},
+		{
+			MethodName: "DecodeDownlink",
+			Handler:    _MessageProcessor_DecodeDownlink_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "lorawan-stack/api/message_services.proto",
 }
 
-func (m *ProcessUplinkMessageRequest) Marshal() (dAtA []byte, err error) {
+func (m *EncodeDownlinkMessageRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -440,12 +574,12 @@ func (m *ProcessUplinkMessageRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ProcessUplinkMessageRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *EncodeDownlinkMessageRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ProcessUplinkMessageRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *EncodeDownlinkMessageRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -455,7 +589,12 @@ func (m *ProcessUplinkMessageRequest) MarshalToSizedBuffer(dAtA []byte) (int, er
 		copy(dAtA[i:], m.Parameter)
 		i = encodeVarintMessageServices(dAtA, i, uint64(len(m.Parameter)))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x2a
+	}
+	if m.Formatter != 0 {
+		i = encodeVarintMessageServices(dAtA, i, uint64(m.Formatter))
+		i--
+		dAtA[i] = 0x20
 	}
 	{
 		size, err := m.Message.MarshalToSizedBuffer(dAtA[:i])
@@ -490,7 +629,7 @@ func (m *ProcessUplinkMessageRequest) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
-func (m *ProcessDownlinkMessageRequest) Marshal() (dAtA []byte, err error) {
+func (m *DecodeUplinkMessageRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -500,12 +639,12 @@ func (m *ProcessDownlinkMessageRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ProcessDownlinkMessageRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *DecodeUplinkMessageRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ProcessDownlinkMessageRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DecodeUplinkMessageRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -515,7 +654,77 @@ func (m *ProcessDownlinkMessageRequest) MarshalToSizedBuffer(dAtA []byte) (int, 
 		copy(dAtA[i:], m.Parameter)
 		i = encodeVarintMessageServices(dAtA, i, uint64(len(m.Parameter)))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x2a
+	}
+	if m.Formatter != 0 {
+		i = encodeVarintMessageServices(dAtA, i, uint64(m.Formatter))
+		i--
+		dAtA[i] = 0x20
+	}
+	{
+		size, err := m.Message.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMessageServices(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	{
+		size, err := m.EndDeviceVersionIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMessageServices(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.EndDeviceIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMessageServices(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *DecodeDownlinkMessageRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DecodeDownlinkMessageRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DecodeDownlinkMessageRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Parameter) > 0 {
+		i -= len(m.Parameter)
+		copy(dAtA[i:], m.Parameter)
+		i = encodeVarintMessageServices(dAtA, i, uint64(len(m.Parameter)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.Formatter != 0 {
+		i = encodeVarintMessageServices(dAtA, i, uint64(m.Formatter))
+		i--
+		dAtA[i] = 0x20
 	}
 	{
 		size, err := m.Message.MarshalToSizedBuffer(dAtA[:i])
@@ -561,28 +770,45 @@ func encodeVarintMessageServices(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func NewPopulatedProcessUplinkMessageRequest(r randyMessageServices, easy bool) *ProcessUplinkMessageRequest {
-	this := &ProcessUplinkMessageRequest{}
+func NewPopulatedEncodeDownlinkMessageRequest(r randyMessageServices, easy bool) *EncodeDownlinkMessageRequest {
+	this := &EncodeDownlinkMessageRequest{}
 	v1 := NewPopulatedEndDeviceIdentifiers(r, easy)
 	this.EndDeviceIdentifiers = *v1
 	v2 := NewPopulatedEndDeviceVersionIdentifiers(r, easy)
 	this.EndDeviceVersionIDs = *v2
-	v3 := NewPopulatedApplicationUplink(r, easy)
+	v3 := NewPopulatedApplicationDownlink(r, easy)
 	this.Message = *v3
+	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
 	this.Parameter = randStringMessageServices(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
 }
 
-func NewPopulatedProcessDownlinkMessageRequest(r randyMessageServices, easy bool) *ProcessDownlinkMessageRequest {
-	this := &ProcessDownlinkMessageRequest{}
+func NewPopulatedDecodeUplinkMessageRequest(r randyMessageServices, easy bool) *DecodeUplinkMessageRequest {
+	this := &DecodeUplinkMessageRequest{}
 	v4 := NewPopulatedEndDeviceIdentifiers(r, easy)
 	this.EndDeviceIdentifiers = *v4
 	v5 := NewPopulatedEndDeviceVersionIdentifiers(r, easy)
 	this.EndDeviceVersionIDs = *v5
-	v6 := NewPopulatedApplicationDownlink(r, easy)
+	v6 := NewPopulatedApplicationUplink(r, easy)
 	this.Message = *v6
+	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
+	this.Parameter = randStringMessageServices(r)
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedDecodeDownlinkMessageRequest(r randyMessageServices, easy bool) *DecodeDownlinkMessageRequest {
+	this := &DecodeDownlinkMessageRequest{}
+	v7 := NewPopulatedEndDeviceIdentifiers(r, easy)
+	this.EndDeviceIdentifiers = *v7
+	v8 := NewPopulatedEndDeviceVersionIdentifiers(r, easy)
+	this.EndDeviceVersionIDs = *v8
+	v9 := NewPopulatedApplicationDownlink(r, easy)
+	this.Message = *v9
+	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
 	this.Parameter = randStringMessageServices(r)
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -608,9 +834,9 @@ func randUTF8RuneMessageServices(r randyMessageServices) rune {
 	return rune(ru + 61)
 }
 func randStringMessageServices(r randyMessageServices) string {
-	v7 := r.Intn(100)
-	tmps := make([]rune, v7)
-	for i := 0; i < v7; i++ {
+	v10 := r.Intn(100)
+	tmps := make([]rune, v10)
+	for i := 0; i < v10; i++ {
 		tmps[i] = randUTF8RuneMessageServices(r)
 	}
 	return string(tmps)
@@ -632,11 +858,11 @@ func randFieldMessageServices(dAtA []byte, r randyMessageServices, fieldNumber i
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateMessageServices(dAtA, uint64(key))
-		v8 := r.Int63()
+		v11 := r.Int63()
 		if r.Intn(2) == 0 {
-			v8 *= -1
+			v11 *= -1
 		}
-		dAtA = encodeVarintPopulateMessageServices(dAtA, uint64(v8))
+		dAtA = encodeVarintPopulateMessageServices(dAtA, uint64(v11))
 	case 1:
 		dAtA = encodeVarintPopulateMessageServices(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -661,7 +887,7 @@ func encodeVarintPopulateMessageServices(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
-func (m *ProcessUplinkMessageRequest) Size() (n int) {
+func (m *EncodeDownlinkMessageRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -673,6 +899,9 @@ func (m *ProcessUplinkMessageRequest) Size() (n int) {
 	n += 1 + l + sovMessageServices(uint64(l))
 	l = m.Message.Size()
 	n += 1 + l + sovMessageServices(uint64(l))
+	if m.Formatter != 0 {
+		n += 1 + sovMessageServices(uint64(m.Formatter))
+	}
 	l = len(m.Parameter)
 	if l > 0 {
 		n += 1 + l + sovMessageServices(uint64(l))
@@ -680,7 +909,7 @@ func (m *ProcessUplinkMessageRequest) Size() (n int) {
 	return n
 }
 
-func (m *ProcessDownlinkMessageRequest) Size() (n int) {
+func (m *DecodeUplinkMessageRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -692,6 +921,31 @@ func (m *ProcessDownlinkMessageRequest) Size() (n int) {
 	n += 1 + l + sovMessageServices(uint64(l))
 	l = m.Message.Size()
 	n += 1 + l + sovMessageServices(uint64(l))
+	if m.Formatter != 0 {
+		n += 1 + sovMessageServices(uint64(m.Formatter))
+	}
+	l = len(m.Parameter)
+	if l > 0 {
+		n += 1 + l + sovMessageServices(uint64(l))
+	}
+	return n
+}
+
+func (m *DecodeDownlinkMessageRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.EndDeviceIdentifiers.Size()
+	n += 1 + l + sovMessageServices(uint64(l))
+	l = m.EndDeviceVersionIDs.Size()
+	n += 1 + l + sovMessageServices(uint64(l))
+	l = m.Message.Size()
+	n += 1 + l + sovMessageServices(uint64(l))
+	if m.Formatter != 0 {
+		n += 1 + sovMessageServices(uint64(m.Formatter))
+	}
 	l = len(m.Parameter)
 	if l > 0 {
 		n += 1 + l + sovMessageServices(uint64(l))
@@ -705,27 +959,43 @@ func sovMessageServices(x uint64) (n int) {
 func sozMessageServices(x uint64) (n int) {
 	return sovMessageServices((x << 1) ^ uint64((int64(x) >> 63)))
 }
-func (this *ProcessUplinkMessageRequest) String() string {
+func (this *EncodeDownlinkMessageRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ProcessUplinkMessageRequest{`,
+	s := strings.Join([]string{`&EncodeDownlinkMessageRequest{`,
 		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceIdentifiers), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
 		`EndDeviceVersionIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceVersionIDs), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1), `&`, ``, 1) + `,`,
-		`Message:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Message), "ApplicationUplink", "ApplicationUplink", 1), `&`, ``, 1) + `,`,
+		`Message:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Message), "ApplicationDownlink", "ApplicationDownlink", 1), `&`, ``, 1) + `,`,
+		`Formatter:` + fmt.Sprintf("%v", this.Formatter) + `,`,
 		`Parameter:` + fmt.Sprintf("%v", this.Parameter) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *ProcessDownlinkMessageRequest) String() string {
+func (this *DecodeUplinkMessageRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ProcessDownlinkMessageRequest{`,
+	s := strings.Join([]string{`&DecodeUplinkMessageRequest{`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceIdentifiers), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`EndDeviceVersionIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceVersionIDs), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Message:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Message), "ApplicationUplink", "ApplicationUplink", 1), `&`, ``, 1) + `,`,
+		`Formatter:` + fmt.Sprintf("%v", this.Formatter) + `,`,
+		`Parameter:` + fmt.Sprintf("%v", this.Parameter) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *DecodeDownlinkMessageRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&DecodeDownlinkMessageRequest{`,
 		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceIdentifiers), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
 		`EndDeviceVersionIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceVersionIDs), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Message:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Message), "ApplicationDownlink", "ApplicationDownlink", 1), `&`, ``, 1) + `,`,
+		`Formatter:` + fmt.Sprintf("%v", this.Formatter) + `,`,
 		`Parameter:` + fmt.Sprintf("%v", this.Parameter) + `,`,
 		`}`,
 	}, "")
@@ -739,7 +1009,7 @@ func valueToStringMessageServices(v interface{}) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
 }
-func (m *ProcessUplinkMessageRequest) Unmarshal(dAtA []byte) error {
+func (m *EncodeDownlinkMessageRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -762,10 +1032,10 @@ func (m *ProcessUplinkMessageRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ProcessUplinkMessageRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: EncodeDownlinkMessageRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ProcessUplinkMessageRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: EncodeDownlinkMessageRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -868,6 +1138,25 @@ func (m *ProcessUplinkMessageRequest) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Formatter", wireType)
+			}
+			m.Formatter = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessageServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Formatter |= PayloadFormatter(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Parameter", wireType)
 			}
@@ -923,7 +1212,7 @@ func (m *ProcessUplinkMessageRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ProcessDownlinkMessageRequest) Unmarshal(dAtA []byte) error {
+func (m *DecodeUplinkMessageRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -946,10 +1235,10 @@ func (m *ProcessDownlinkMessageRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ProcessDownlinkMessageRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: DecodeUplinkMessageRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ProcessDownlinkMessageRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DecodeUplinkMessageRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1052,6 +1341,228 @@ func (m *ProcessDownlinkMessageRequest) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Formatter", wireType)
+			}
+			m.Formatter = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessageServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Formatter |= PayloadFormatter(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Parameter", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessageServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthMessageServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMessageServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Parameter = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMessageServices(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthMessageServices
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthMessageServices
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DecodeDownlinkMessageRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMessageServices
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DecodeDownlinkMessageRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DecodeDownlinkMessageRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessageServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMessageServices
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMessageServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.EndDeviceIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceVersionIDs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessageServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMessageServices
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMessageServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.EndDeviceVersionIDs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessageServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMessageServices
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMessageServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Message.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Formatter", wireType)
+			}
+			m.Formatter = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessageServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Formatter |= PayloadFormatter(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Parameter", wireType)
 			}

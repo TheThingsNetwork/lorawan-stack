@@ -19314,9 +19314,9 @@
       "extensions": [],
       "messages": [
         {
-          "name": "ProcessDownlinkMessageRequest",
-          "longName": "ProcessDownlinkMessageRequest",
-          "fullName": "ttn.lorawan.v3.ProcessDownlinkMessageRequest",
+          "name": "DecodeDownlinkMessageRequest",
+          "longName": "DecodeDownlinkMessageRequest",
+          "fullName": "ttn.lorawan.v3.DecodeDownlinkMessageRequest",
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
@@ -19377,6 +19377,16 @@
               }
             },
             {
+              "name": "formatter",
+              "description": "",
+              "label": "",
+              "type": "PayloadFormatter",
+              "longType": "PayloadFormatter",
+              "fullType": "ttn.lorawan.v3.PayloadFormatter",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "parameter",
               "description": "",
               "label": "",
@@ -19389,9 +19399,9 @@
           ]
         },
         {
-          "name": "ProcessUplinkMessageRequest",
-          "longName": "ProcessUplinkMessageRequest",
-          "fullName": "ttn.lorawan.v3.ProcessUplinkMessageRequest",
+          "name": "DecodeUplinkMessageRequest",
+          "longName": "DecodeUplinkMessageRequest",
+          "fullName": "ttn.lorawan.v3.DecodeUplinkMessageRequest",
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
@@ -19452,6 +19462,101 @@
               }
             },
             {
+              "name": "formatter",
+              "description": "",
+              "label": "",
+              "type": "PayloadFormatter",
+              "longType": "PayloadFormatter",
+              "fullType": "ttn.lorawan.v3.PayloadFormatter",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "parameter",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EncodeDownlinkMessageRequest",
+          "longName": "EncodeDownlinkMessageRequest",
+          "fullName": "ttn.lorawan.v3.EncodeDownlinkMessageRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "end_device_version_ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceVersionIdentifiers",
+              "longType": "EndDeviceVersionIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "message",
+              "description": "",
+              "label": "",
+              "type": "ApplicationDownlink",
+              "longType": "ApplicationDownlink",
+              "fullType": "ttn.lorawan.v3.ApplicationDownlink",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "formatter",
+              "description": "",
+              "label": "",
+              "type": "PayloadFormatter",
+              "longType": "PayloadFormatter",
+              "fullType": "ttn.lorawan.v3.PayloadFormatter",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "parameter",
               "description": "",
               "label": "",
@@ -19466,41 +19571,45 @@
       ],
       "services": [
         {
-          "name": "DownlinkMessageProcessor",
-          "longName": "DownlinkMessageProcessor",
-          "fullName": "ttn.lorawan.v3.DownlinkMessageProcessor",
-          "description": "The DownlinkMessageProcessor service processes downlink messages.",
+          "name": "MessageProcessor",
+          "longName": "MessageProcessor",
+          "fullName": "ttn.lorawan.v3.MessageProcessor",
+          "description": "Encodes and decodes uplink messages.",
           "methods": [
             {
-              "name": "Process",
+              "name": "EncodeDownlink",
               "description": "",
-              "requestType": "ProcessDownlinkMessageRequest",
-              "requestLongType": "ProcessDownlinkMessageRequest",
-              "requestFullType": "ttn.lorawan.v3.ProcessDownlinkMessageRequest",
+              "requestType": "EncodeDownlinkMessageRequest",
+              "requestLongType": "EncodeDownlinkMessageRequest",
+              "requestFullType": "ttn.lorawan.v3.EncodeDownlinkMessageRequest",
               "requestStreaming": false,
               "responseType": "ApplicationDownlink",
               "responseLongType": "ApplicationDownlink",
               "responseFullType": "ttn.lorawan.v3.ApplicationDownlink",
               "responseStreaming": false
-            }
-          ]
-        },
-        {
-          "name": "UplinkMessageProcessor",
-          "longName": "UplinkMessageProcessor",
-          "fullName": "ttn.lorawan.v3.UplinkMessageProcessor",
-          "description": "The UplinkMessageProcessor service processes uplink messages.",
-          "methods": [
+            },
             {
-              "name": "Process",
+              "name": "DecodeUplink",
               "description": "",
-              "requestType": "ProcessUplinkMessageRequest",
-              "requestLongType": "ProcessUplinkMessageRequest",
-              "requestFullType": "ttn.lorawan.v3.ProcessUplinkMessageRequest",
+              "requestType": "DecodeUplinkMessageRequest",
+              "requestLongType": "DecodeUplinkMessageRequest",
+              "requestFullType": "ttn.lorawan.v3.DecodeUplinkMessageRequest",
               "requestStreaming": false,
               "responseType": "ApplicationUplink",
               "responseLongType": "ApplicationUplink",
               "responseFullType": "ttn.lorawan.v3.ApplicationUplink",
+              "responseStreaming": false
+            },
+            {
+              "name": "DecodeDownlink",
+              "description": "",
+              "requestType": "DecodeDownlinkMessageRequest",
+              "requestLongType": "DecodeDownlinkMessageRequest",
+              "requestFullType": "ttn.lorawan.v3.DecodeDownlinkMessageRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationDownlink",
+              "responseLongType": "ApplicationDownlink",
+              "responseFullType": "ttn.lorawan.v3.ApplicationDownlink",
               "responseStreaming": false
             }
           ]

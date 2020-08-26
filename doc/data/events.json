@@ -40,9 +40,19 @@
     "name": "as.application.unsubscribe",
     "description": "unsubscribe application"
   },
+  "as.down.data.decode.fail": {
+    "name": "as.down.data.decode.fail",
+    "description": "decode downlink data message failure",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
+  },
   "as.down.data.drop": {
     "name": "as.down.data.drop",
     "description": "drop downlink data message",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
+  },
+  "as.down.data.encode.fail": {
+    "name": "as.down.data.encode.fail",
+    "description": "encode downlink data message failure",
     "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
   },
   "as.down.data.forward": {
