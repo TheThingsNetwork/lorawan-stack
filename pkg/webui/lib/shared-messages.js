@@ -149,6 +149,7 @@ export default defineMessages({
   fNwkSIntKey: 'FNwkSIntKey',
   fNwkSIntKeyDescription: 'Forwarding network session integrity key',
   frequencyPlan: 'Frequency plan',
+  gateway: 'Gateway',
   gatewayDescription: 'Gateway description',
   gatewayEUI: 'Gateway EUI',
   gatewayID: 'Gateway ID',
