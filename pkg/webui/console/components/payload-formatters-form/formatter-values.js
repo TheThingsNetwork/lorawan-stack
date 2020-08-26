@@ -12,14 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const DEFAULT_UPLINK_JS_FORMATTER = `function Decoder(bytes, f_port) {
+const DEFAULT_UPLINK_JS_FORMATTER = `function decodeUplink(input) {
   return {
-    raw: bytes,
-    f_port: f_port
+    data: {
+      bytes: input.bytes
+    },
+    warnings: [],
+    errors: []
   };
 }`
-const DEFAULT_DOWNLINK_JS_FORMATTER = `function Encoder(payload, f_port) {
-  return [];
+const DEFAULT_DOWNLINK_JS_FORMATTER = `function encodeDownlink(input) {
+  return {
+    bytes: [],
+    fPort: 1,
+    warnings: [],
+    errors: []
+  };
+}
+
+function decodeDownlink(input) {
+  return {
+    data: {
+      bytes: input.bytes
+    },
+    warnings: [],
+    errors: []
+  }
 }`
 
 export const getDefaultJavascriptFormatter = uplink =>
