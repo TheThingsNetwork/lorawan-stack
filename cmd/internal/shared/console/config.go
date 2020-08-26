@@ -15,12 +15,8 @@
 package console
 
 import (
-	"fmt"
-	"strings"
-
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/console"
-	"go.thethings.network/lorawan-stack/v3/pkg/version"
 	"go.thethings.network/lorawan-stack/v3/pkg/web/oauthclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
@@ -47,7 +43,7 @@ var DefaultConsoleConfig = console.Config{
 			JSFiles:       []string{"console.js"},
 		},
 		FrontendConfig: console.FrontendConfig{
-			DocumentationBaseURL: fmt.Sprintf("https://thethingsstack.io/%s", strings.TrimSuffix(strings.TrimPrefix(version.TTN, "v"), "-dev")),
+			DocumentationBaseURL: "https://thethingsstack.io",
 			StackConfig: console.StackConfig{
 				IS:   webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
 				GS:   webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
