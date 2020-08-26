@@ -2002,8 +2002,8 @@ func ForEachFrequencyPlan(tb testing.TB, f func(func(...string) string, string, 
 func ForEachLoRaWANVersionPair(tb testing.TB, f func(func(...string) string, ttnpb.MACVersion, ttnpb.PHYVersion)) {
 	for macVersion, phyVersions := range LoRaWANVersionPairs {
 		switch macVersion {
-		case ttnpb.MAC_V1_0_4, ttnpb.MAC_V1_1:
-		case ttnpb.MAC_V1_0_3:
+		case ttnpb.MAC_V1_0_3, ttnpb.MAC_V1_1:
+		case ttnpb.MAC_V1_0_2:
 			if !testing.Short() {
 				break
 			}
