@@ -799,7 +799,6 @@ func (as *ApplicationServer) migrateDownlinkQueue(ctx context.Context, ids ttnpb
 	if oldSession.AppSKey == nil || newSession.AppSKey == nil {
 		return nil, errNoAppSKey.New()
 	}
-	// TODO: Cache unwrapped keys (https://github.com/TheThingsNetwork/lorawan-stack/issues/36)
 	oldAppSKey, err := cryptoutil.UnwrapAES128Key(ctx, *oldSession.AppSKey, as.KeyVault)
 	if err != nil {
 		return nil, err
