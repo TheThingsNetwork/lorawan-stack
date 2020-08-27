@@ -531,54 +531,45 @@ var GatewayAntennaIdentifiers = [...]ttnpb.GatewayAntennaIdentifiers{
 	},
 }
 
-func MakeUplinkSettings(dr ttnpb.DataRate, freq uint64) ttnpb.TxSettings {
+func MakeUplinkSettings(dr ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64) ttnpb.TxSettings {
 	return ttnpb.TxSettings{
-		DataRate:  *deepcopy.Copy(&dr).(*ttnpb.DataRate),
-		EnableCRC: true,
-		Frequency: freq,
-		Timestamp: 42,
+		DataRate:      *deepcopy.Copy(&dr).(*ttnpb.DataRate),
+		DataRateIndex: drIdx,
+		EnableCRC:     true,
+		Frequency:     freq,
+		Timestamp:     42,
 	}
 }
 
-func MakeJoinRequestDevNonce() types.DevNonce {
-	return types.DevNonce{0x00, 0x01}
+type UplinkMessageConfig struct {
+	RawPayload     []byte
+	Payload        *ttnpb.Message
+	DataRate       ttnpb.DataRate
+	DataRateIndex  ttnpb.DataRateIndex
+	Frequency      uint64
+	ChannelIndex   uint8
+	ReceivedAt     time.Time
+	RxMetadata     []*ttnpb.RxMetadata
+	CorrelationIDs []string
 }
 
-func MakeJoinRequestMIC() [4]byte {
-	return [...]byte{0x03, 0x02, 0x01, 0x00}
-}
-
-func MakeJoinRequestPHYPayload() [23]byte {
-	devNonce := MakeJoinRequestDevNonce()
-	mic := MakeJoinRequestMIC()
-	return [...]byte{
-		/* MHDR */
-		0b000_000_00,
-		JoinEUI[7], JoinEUI[6], JoinEUI[5], JoinEUI[4], JoinEUI[3], JoinEUI[2], JoinEUI[1], JoinEUI[0],
-		DevEUI[7], DevEUI[6], DevEUI[5], DevEUI[4], DevEUI[3], DevEUI[2], DevEUI[1], DevEUI[0],
-		/* DevNonce */
-		devNonce[1], devNonce[0],
-		/* MIC */
-		mic[0], mic[1], mic[2], mic[3],
+func MakeUplinkMessage(conf UplinkMessageConfig) *ttnpb.UplinkMessage {
+	return &ttnpb.UplinkMessage{
+		RawPayload:         conf.RawPayload,
+		Payload:            conf.Payload,
+		Settings:           MakeUplinkSettings(conf.DataRate, conf.DataRateIndex, conf.Frequency),
+		RxMetadata:         deepcopy.Copy(conf.RxMetadata).([]*ttnpb.RxMetadata),
+		ReceivedAt:         conf.ReceivedAt,
+		CorrelationIDs:     CopyStrings(conf.CorrelationIDs),
+		DeviceChannelIndex: uint32(conf.ChannelIndex),
 	}
 }
 
-func MakeJoinRequestDecodedPayload() *ttnpb.Message {
-	mic := MakeJoinRequestMIC()
-	return &ttnpb.Message{
-		MHDR: ttnpb.MHDR{
-			MType: ttnpb.MType_JOIN_REQUEST,
-			Major: ttnpb.Major_LORAWAN_R1,
-		},
-		MIC: mic[:],
-		Payload: &ttnpb.Message_JoinRequestPayload{
-			JoinRequestPayload: &ttnpb.JoinRequestPayload{
-				JoinEUI:  *JoinEUI.Copy(&types.EUI64{}),
-				DevEUI:   *DevEUI.Copy(&types.EUI64{}),
-				DevNonce: MakeJoinRequestDevNonce(),
-			},
-		},
-	}
+func WithMatchedUplinkSettings(msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex) *ttnpb.UplinkMessage {
+	msg = CopyUplinkMessage(msg)
+	msg.Settings.DataRateIndex = drIdx
+	msg.DeviceChannelIndex = uint32(chIdx)
+	return msg
 }
 
 var JoinRequestCorrelationIDs = [...]string{
@@ -587,43 +578,112 @@ var JoinRequestCorrelationIDs = [...]string{
 	"join-request-correlation-id-3",
 }
 
-func MakeJoinRequest(decodePayload bool, dr ttnpb.DataRate, freq uint64, mds ...*ttnpb.RxMetadata) *ttnpb.UplinkMessage {
-	phyPayload := MakeJoinRequestPHYPayload()
-	msg := &ttnpb.UplinkMessage{
-		CorrelationIDs: append([]string{}, JoinRequestCorrelationIDs[:]...),
-		RawPayload:     phyPayload[:],
-		RxMetadata:     mds,
-		ReceivedAt:     timeNow(),
-		Settings:       MakeUplinkSettings(dr, freq),
+func MakeJoinRequestPHYPayload(joinEUI, devEUI types.EUI64, devNonce types.DevNonce, mic [4]byte) []byte {
+	return []byte{
+		/* MHDR */
+		0b000_000_00,
+		joinEUI[7], joinEUI[6], joinEUI[5], joinEUI[4], joinEUI[3], joinEUI[2], joinEUI[1], joinEUI[0],
+		devEUI[7], devEUI[6], devEUI[5], devEUI[4], devEUI[3], devEUI[2], devEUI[1], devEUI[0],
+		/* DevNonce */
+		devNonce[1], devNonce[0],
+		/* MIC */
+		mic[0], mic[1], mic[2], mic[3],
 	}
-	if decodePayload {
-		msg.Payload = MakeJoinRequestDecodedPayload()
-	}
-	return msg
 }
 
-func MakeNsJsJoinRequest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fp *frequencyplans.FrequencyPlan, devAddr *types.DevAddr, rxDelay ttnpb.RxDelay, rx1DROffset uint8, rx2DR ttnpb.DataRateIndex, correlationIDs ...string) *ttnpb.JoinRequest {
-	phyPayload := MakeJoinRequestPHYPayload()
-	return &ttnpb.JoinRequest{
-		CFList:         frequencyplans.CFList(*fp, phyVersion),
-		CorrelationIDs: correlationIDs,
-		DevAddr: func() types.DevAddr {
-			if devAddr != nil {
-				return *devAddr.Copy(&types.DevAddr{})
-			} else {
-				return types.DevAddr{}
-			}
-		}(),
-		NetID:              *NetID.Copy(&types.NetID{}),
-		RawPayload:         phyPayload[:],
-		Payload:            MakeJoinRequestDecodedPayload(),
-		RxDelay:            rxDelay,
-		SelectedMACVersion: macVersion,
-		DownlinkSettings: ttnpb.DLSettings{
-			OptNeg:      macVersion.Compare(ttnpb.MAC_V1_1) >= 0,
-			Rx1DROffset: uint32(rx1DROffset),
-			Rx2DR:       rx2DR,
+func MakeJoinRequestDecodedPayload(joinEUI, devEUI types.EUI64, devNonce types.DevNonce, mic [4]byte) *ttnpb.Message {
+	return &ttnpb.Message{
+		MHDR: ttnpb.MHDR{
+			MType: ttnpb.MType_JOIN_REQUEST,
+			Major: ttnpb.Major_LORAWAN_R1,
 		},
+		MIC: CopyBytes(mic[:]),
+		Payload: &ttnpb.Message_JoinRequestPayload{
+			JoinRequestPayload: &ttnpb.JoinRequestPayload{
+				JoinEUI:  *joinEUI.Copy(&types.EUI64{}),
+				DevEUI:   *devEUI.Copy(&types.EUI64{}),
+				DevNonce: deepcopy.Copy(devNonce).(types.DevNonce),
+			},
+		},
+	}
+}
+
+type JoinRequestConfig struct {
+	DecodePayload bool
+
+	JoinEUI        types.EUI64
+	DevEUI         types.EUI64
+	DevNonce       types.DevNonce
+	DataRate       ttnpb.DataRate
+	DataRateIndex  ttnpb.DataRateIndex
+	Frequency      uint64
+	ChannelIndex   uint8
+	ReceivedAt     time.Time
+	RxMetadata     []*ttnpb.RxMetadata
+	CorrelationIDs []string
+	MIC            [4]byte
+}
+
+func MakeJoinRequest(conf JoinRequestConfig) *ttnpb.UplinkMessage {
+	return MakeUplinkMessage(UplinkMessageConfig{
+		RawPayload: MakeJoinRequestPHYPayload(conf.JoinEUI, conf.DevEUI, conf.DevNonce, conf.MIC),
+		Payload: func() *ttnpb.Message {
+			if conf.DecodePayload {
+				return MakeJoinRequestDecodedPayload(conf.JoinEUI, conf.DevEUI, conf.DevNonce, conf.MIC)
+			}
+			return nil
+		}(),
+		DataRate:      conf.DataRate,
+		DataRateIndex: conf.DataRateIndex,
+		Frequency:     conf.Frequency,
+		ChannelIndex:  conf.ChannelIndex,
+		ReceivedAt:    conf.ReceivedAt,
+		RxMetadata:    conf.RxMetadata,
+		CorrelationIDs: func() []string {
+			if len(conf.CorrelationIDs) == 0 {
+				return JoinRequestCorrelationIDs[:]
+			}
+			return conf.CorrelationIDs
+		}(),
+	})
+}
+
+type NsJsJoinRequestConfig struct {
+	JoinEUI            types.EUI64
+	DevEUI             types.EUI64
+	DevNonce           types.DevNonce
+	MIC                [4]byte
+	DevAddr            types.DevAddr
+	SelectedMACVersion ttnpb.MACVersion
+	NetID              types.NetID
+	RX1DataRateOffset  uint32
+	RX2DataRateIndex   ttnpb.DataRateIndex
+	RXDelay            ttnpb.RxDelay
+	FrequencyPlanID    string
+	PHYVersion         ttnpb.PHYVersion
+	CorrelationIDs     []string
+}
+
+func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
+	return &ttnpb.JoinRequest{
+		RawPayload:         MakeJoinRequestPHYPayload(conf.JoinEUI, conf.DevEUI, conf.DevNonce, conf.MIC),
+		Payload:            MakeJoinRequestDecodedPayload(conf.JoinEUI, conf.DevEUI, conf.DevNonce, conf.MIC),
+		DevAddr:            *conf.DevAddr.Copy(&types.DevAddr{}),
+		SelectedMACVersion: conf.SelectedMACVersion,
+		NetID:              *conf.NetID.Copy(&types.NetID{}),
+		DownlinkSettings: ttnpb.DLSettings{
+			Rx1DROffset: conf.RX1DataRateOffset,
+			Rx2DR:       conf.RX2DataRateIndex,
+			OptNeg:      conf.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+		},
+		RxDelay: conf.RXDelay,
+		CFList:  frequencyplans.CFList(*FrequencyPlan(conf.FrequencyPlanID), conf.PHYVersion),
+		CorrelationIDs: CopyStrings(func() []string {
+			if len(conf.CorrelationIDs) == 0 {
+				return JoinRequestCorrelationIDs[:]
+			}
+			return conf.CorrelationIDs
+		}()),
 	}
 }
 
@@ -703,13 +763,6 @@ func WithDeviceDataUplinkConfig(dev *ttnpb.EndDevice, pending bool, drIdx ttnpb.
 	}
 }
 
-func WithMatchedUplinkSettings(msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex) *ttnpb.UplinkMessage {
-	msg = CopyUplinkMessage(msg)
-	msg.Settings.DataRateIndex = drIdx
-	msg.DeviceChannelIndex = uint32(chIdx)
-	return msg
-}
-
 func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 	if !conf.FCtrl.Ack && conf.ConfFCntDown > 0 {
 		panic("ConfFCntDown must be zero for uplink frames with ACK bit unset")
@@ -754,36 +807,48 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 	}
 
 	phyPayload = append(phyPayload, mic[:]...)
-	msg := &ttnpb.UplinkMessage{
-		ReceivedAt: conf.ReceivedAt,
+	return MakeUplinkMessage(UplinkMessageConfig{
 		RawPayload: phyPayload,
-		RxMetadata: deepcopy.Copy(conf.RxMetadata).([]*ttnpb.RxMetadata),
-		Settings:   MakeUplinkSettings(conf.DataRate, conf.Frequency),
-		CorrelationIDs: CopyStrings(func() []string {
+		Payload: func() *ttnpb.Message {
+			if conf.DecodePayload {
+				return &ttnpb.Message{
+					MHDR: mhdr,
+					MIC:  phyPayload[len(phyPayload)-4:],
+					Payload: &ttnpb.Message_MACPayload{
+						MACPayload: &ttnpb.MACPayload{
+							FHDR:       fhdr,
+							FPort:      uint32(conf.FPort),
+							FRMPayload: CopyBytes(conf.FRMPayload),
+							FullFCnt:   conf.FCnt,
+						},
+					},
+				}
+			}
+			return nil
+		}(),
+		DataRate: conf.DataRate,
+		DataRateIndex: func() ttnpb.DataRateIndex {
+			if conf.Matched {
+				return conf.DataRateIndex
+			}
+			return 0
+		}(),
+		Frequency: conf.Frequency,
+		ChannelIndex: func() uint8 {
+			if conf.Matched {
+				return conf.ChannelIndex
+			}
+			return 0
+		}(),
+		ReceivedAt: conf.ReceivedAt,
+		RxMetadata: conf.RxMetadata,
+		CorrelationIDs: func() []string {
 			if len(conf.CorrelationIDs) == 0 {
 				return DataUplinkCorrelationIDs[:]
 			}
 			return conf.CorrelationIDs
-		}()),
-	}
-	if conf.DecodePayload {
-		msg.Payload = &ttnpb.Message{
-			MHDR: mhdr,
-			MIC:  phyPayload[len(phyPayload)-4:],
-			Payload: &ttnpb.Message_MACPayload{
-				MACPayload: &ttnpb.MACPayload{
-					FHDR:       fhdr,
-					FPort:      uint32(conf.FPort),
-					FRMPayload: CopyBytes(conf.FRMPayload),
-					FullFCnt:   conf.FCnt,
-				},
-			},
-		}
-	}
-	if conf.Matched {
-		return WithMatchedUplinkSettings(msg, conf.ChannelIndex, conf.DataRateIndex)
-	}
-	return msg
+		}(),
+	})
 }
 
 func MustEncryptDownlink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, isFOpts bool, b ...byte) []byte {
@@ -1007,6 +1072,29 @@ func MakeNsGsScheduleDownlinkChFunc(reqCh chan<- NsGsScheduleDownlinkRequest) fu
 	}
 }
 
+type InteropClientEnvironment struct {
+	HandleJoinRequest <-chan InteropClientHandleJoinRequestRequest
+}
+
+func newMockInteropClient(t *testing.T) (InteropClient, InteropClientEnvironment, func()) {
+	t.Helper()
+
+	handleJoinCh := make(chan InteropClientHandleJoinRequestRequest)
+	return &MockInteropClient{
+			HandleJoinRequestFunc: MakeInteropClientHandleJoinRequestChFunc(handleJoinCh),
+		}, InteropClientEnvironment{
+			HandleJoinRequest: handleJoinCh,
+		},
+		func() {
+			select {
+			case <-handleJoinCh:
+				t.Error("InteropClient.HandleJoin call missed")
+			default:
+				close(handleJoinCh)
+			}
+		}
+}
+
 func AssertInteropClientHandleJoinRequestRequest(ctx context.Context, reqCh <-chan InteropClientHandleJoinRequestRequest, assert func(context.Context, types.NetID, *ttnpb.JoinRequest) bool, resp InteropClientHandleJoinRequestResponse) bool {
 	t := test.MustTFromContext(ctx)
 	t.Helper()
@@ -1030,57 +1118,7 @@ func AssertInteropClientHandleJoinRequestRequest(ctx context.Context, reqCh <-ch
 	}
 }
 
-func AssertNsJsHandleJoinRequest(ctx context.Context, reqCh <-chan NsJsHandleJoinRequest, assert func(ctx context.Context, msg *ttnpb.JoinRequest) bool, resp NsJsHandleJoinResponse) bool {
-	t := test.MustTFromContext(ctx)
-	t.Helper()
-	select {
-	case <-ctx.Done():
-		t.Error("Timed out while waiting for NsJs.HandleJoin to be called")
-		return false
-
-	case req := <-reqCh:
-		if !assert(req.Context, req.Message) {
-			return false
-		}
-		select {
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for NsJs.HandleJoin response to be processed")
-			return false
-
-		case req.Response <- resp:
-			return true
-		}
-	}
-}
-
-func AssertAuthNsJsHandleJoinRequest(ctx context.Context, authReqCh <-chan test.ClusterAuthRequest, joinReqCh <-chan NsJsHandleJoinRequest, joinAssert func(ctx context.Context, msg *ttnpb.JoinRequest) bool, authResp grpc.CallOption, joinResp NsJsHandleJoinResponse) bool {
-	t := test.MustTFromContext(ctx)
-	t.Helper()
-	if !test.AssertClusterAuthRequest(ctx, authReqCh, authResp) {
-		return false
-	}
-	return AssertNsJsHandleJoinRequest(ctx, joinReqCh, joinAssert, joinResp)
-}
-
-func AssertNsJsPeerHandleAuthJoinRequest(ctx context.Context, peerReqCh <-chan test.ClusterGetPeerRequest, authReqCh <-chan test.ClusterAuthRequest, idsAssert func(ctx context.Context, ids ttnpb.Identifiers) bool, joinAssert func(ctx context.Context, msg *ttnpb.JoinRequest) bool, authResp grpc.CallOption, joinResp NsJsHandleJoinResponse) bool {
-	t := test.MustTFromContext(ctx)
-	t.Helper()
-	joinReqCh := make(chan NsJsHandleJoinRequest)
-	if !test.AssertClusterGetPeerRequest(ctx, peerReqCh, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-		return assertions.New(t).So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) && idsAssert(ctx, ids)
-	},
-		test.ClusterGetPeerResponse{
-			Peer: NewJSPeer(ctx, &MockNsJsServer{
-				HandleJoinFunc: MakeNsJsHandleJoinChFunc(joinReqCh),
-			}),
-		},
-	) {
-		return false
-	}
-	return AssertAuthNsJsHandleJoinRequest(ctx, authReqCh, joinReqCh, joinAssert, authResp, joinResp)
-}
-
-func AssertNsGsScheduleDownlinkRequest(ctx context.Context, reqCh <-chan NsGsScheduleDownlinkRequest, assert func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool, resp NsGsScheduleDownlinkResponse) bool {
+func AssertNsGsScheduleDownlinkRequest(ctx context.Context, reqCh <-chan NsGsScheduleDownlinkRequest, assert func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) bool, resp NsGsScheduleDownlinkResponse) bool {
 	t := test.MustTFromContext(ctx)
 	t.Helper()
 	select {
@@ -1089,7 +1127,7 @@ func AssertNsGsScheduleDownlinkRequest(ctx context.Context, reqCh <-chan NsGsSch
 		return false
 
 	case req := <-reqCh:
-		if !assert(req.Context, req.Message) {
+		if !assert(ctx, req.Context, req.Message) {
 			return false
 		}
 		select {
@@ -1103,11 +1141,59 @@ func AssertNsGsScheduleDownlinkRequest(ctx context.Context, reqCh <-chan NsGsSch
 	}
 }
 
-func AssertAuthNsGsScheduleDownlinkRequest(ctx context.Context, authReqCh <-chan test.ClusterAuthRequest, scheduleReqCh <-chan NsGsScheduleDownlinkRequest, scheduleAssert func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool, authResp grpc.CallOption, scheduleResp NsGsScheduleDownlinkResponse) bool {
+func AssertAuthNsGsScheduleDownlinkRequest(ctx context.Context, authReqCh <-chan test.ClusterAuthRequest, scheduleReqCh <-chan NsGsScheduleDownlinkRequest, scheduleAssert func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) bool, authResp grpc.CallOption, scheduleResp NsGsScheduleDownlinkResponse) bool {
 	if !test.AssertClusterAuthRequest(ctx, authReqCh, authResp) {
 		return false
 	}
 	return AssertNsGsScheduleDownlinkRequest(ctx, scheduleReqCh, scheduleAssert, scheduleResp)
+}
+
+func AssertProcessApplicationUp(ctx context.Context, link ttnpb.AsNs_LinkApplicationClient, assert func(context.Context, *ttnpb.ApplicationUp) bool) bool {
+	return test.MustTFromContext(ctx).Run("Application uplink", func(t *testing.T) {
+		a, ctx := test.NewWithContext(ctx, t)
+		t.Helper()
+
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+
+		var asUp *ttnpb.ApplicationUp
+		var err error
+		if !a.So(test.WaitContext(ctx, func() {
+			asUp, err = link.Recv()
+		}), should.BeTrue) {
+			t.Error("Timed out while waiting for application uplink to be sent to Application Server")
+			return
+		}
+		if !a.So(err, should.BeNil) {
+			t.Errorf("Failed to receive Application Server uplink: %s", err)
+			return
+		}
+		if !a.So(assert(ctx, asUp), should.BeTrue) {
+			t.Errorf("Application uplink assertion failed")
+			return
+		}
+		if !a.So(test.WaitContext(ctx, func() {
+			err = link.Send(ttnpb.Empty)
+		}), should.BeTrue) {
+			t.Error("Timed out while waiting for Network Server to process Application Server response")
+			return
+		}
+		if !a.So(err, should.BeNil) {
+			t.Errorf("Failed to send Application Server uplink response: %s", err)
+			return
+		}
+	})
+}
+
+func AssertProcessApplicationUps(ctx context.Context, link ttnpb.AsNs_LinkApplicationClient, asserts ...func(context.Context, *ttnpb.ApplicationUp) bool) bool {
+	t, a := test.MustNewTFromContext(ctx)
+	t.Helper()
+	for _, assert := range asserts {
+		if !a.So(AssertProcessApplicationUp(ctx, link, assert), should.BeTrue) {
+			return false
+		}
+	}
+	return true
 }
 
 func AssertNetworkServerClose(ctx context.Context, ns *NetworkServer) bool {
@@ -1118,29 +1204,6 @@ func AssertNetworkServerClose(ctx context.Context, ns *NetworkServer) bool {
 		return false
 	}
 	return true
-}
-
-type InteropClientEnvironment struct {
-	HandleJoinRequest <-chan InteropClientHandleJoinRequestRequest
-}
-
-func newMockInteropClient(t *testing.T) (InteropClient, InteropClientEnvironment, func()) {
-	t.Helper()
-
-	handleJoinCh := make(chan InteropClientHandleJoinRequestRequest)
-	return &MockInteropClient{
-			HandleJoinRequestFunc: MakeInteropClientHandleJoinRequestChFunc(handleJoinCh),
-		}, InteropClientEnvironment{
-			HandleJoinRequest: handleJoinCh,
-		},
-		func() {
-			select {
-			case <-handleJoinCh:
-				t.Error("InteropClient.HandleJoin call missed")
-			default:
-				close(handleJoinCh)
-			}
-		}
 }
 
 type TestClusterEnvironment struct {
@@ -1187,9 +1250,14 @@ func (env TestEnvironment) AssertLinkApplication(ctx context.Context, appID ttnp
 
 	var reqCIDs []string
 	if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
-		func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-			reqCIDs = events.CorrelationIDsFromContext(ctx)
-			return a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS) && a.So(ids, should.BeNil)
+		func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			_, a := test.MustNewTFromContext(ctx)
+			reqCIDs = events.CorrelationIDsFromContext(reqCtx)
+			return test.AllTrue(
+				a.So(reqCIDs, should.NotBeEmpty),
+				a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS),
+				a.So(ids, should.BeNil),
+			)
 		},
 		test.ClusterGetPeerResponse{
 			Peer: NewISPeer(ctx, &test.MockApplicationAccessServer{
@@ -1199,14 +1267,14 @@ func (env TestEnvironment) AssertLinkApplication(ctx context.Context, appID ttnp
 	), should.BeTrue) {
 		return nil, nil, false
 	}
-	a.So(reqCIDs, should.HaveLength, 1)
 
 	if !a.So(test.AssertListRightsRequest(ctx, listRightsCh,
-		func(ctx context.Context, ids ttnpb.Identifiers) bool {
-			md := rpcmetadata.FromIncomingContext(ctx)
-			cids := events.CorrelationIDsFromContext(ctx)
+		func(ctx, reqCtx context.Context, ids ttnpb.Identifiers) bool {
+			_, a := test.MustNewTFromContext(ctx)
+			md := rpcmetadata.FromIncomingContext(reqCtx)
+			cids := events.CorrelationIDsFromContext(reqCtx)
 			return a.So(cids, should.NotResemble, reqCIDs) &&
-				a.So(cids, should.HaveLength, 1) &&
+				a.So(cids, should.NotBeEmpty) &&
 				a.So(md.AuthType, should.Equal, "Bearer") &&
 				a.So(md.AuthValue, should.Equal, "link-application-key") &&
 				a.So(ids, should.Resemble, &appID)
@@ -1260,24 +1328,20 @@ func (env TestEnvironment) AssertWithApplicationLink(ctx context.Context, appID 
 	)
 }
 
-func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, assert func(context.Context, *ttnpb.DownlinkMessage) bool, paths []DownlinkPath) bool {
-	return test.MustTFromContext(ctx).Run("Schedule downlink", func(t *testing.T) {
-		a, ctx := test.NewWithContext(ctx, t)
-		t.Helper()
-
-		ctx, cancel := context.WithCancel(ctx)
-		defer cancel()
-
+func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, assert func(ctx, reqCtx context.Context, down *ttnpb.DownlinkMessage) bool, paths []DownlinkPath) bool {
+	return test.RunSubtestFromContext(ctx, "NsGs.ScheduleDownlink", func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 		scheduleDownlinkCh := make(chan NsGsScheduleDownlinkRequest)
 		gsPeer := NewGSPeer(ctx, &MockNsGsServer{
 			ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlinkCh),
 		})
 		for _, path := range paths {
-			if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-				return a.So(test.AllTrue(
+			if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+				_, a := test.MustNewTFromContext(ctx)
+				return test.AllTrue(
+					a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
 					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER),
 					a.So(ids, should.Resemble, *path.GatewayIdentifiers),
-				), should.BeTrue)
+				)
 			},
 				test.ClusterGetPeerResponse{
 					Peer: gsPeer,
@@ -1287,7 +1351,6 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, assert fu
 				return
 			}
 		}
-
 		if !a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, env.Cluster.Auth, scheduleDownlinkCh, assert,
 			&grpc.EmptyCallOption{},
 			NsGsScheduleDownlinkResponse{
@@ -1300,7 +1363,69 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, assert fu
 	})
 }
 
-func (env TestEnvironment) AssertSendDeviceUplink(ctx context.Context, expectedEvs []events.Event, eventEqual func(x, y events.Event) bool, ups ...*ttnpb.UplinkMessage) (<-chan error, bool) {
+func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, bool) {
+	dev = CopyEndDevice(dev)
+	return dev, test.RunSubtestFromContext(ctx, "Join-accept", func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+		fp := FrequencyPlan(dev.FrequencyPlanID)
+		phy := LoRaWANBands[fp.BandID][dev.LoRaWANPHYVersion]
+
+		up := LastUplink(dev.RecentUplinks...)
+		paths := DownlinkPathsFromMetadata(up.RxMetadata...)
+		txReq := &ttnpb.TxRequest{
+			Class:         ttnpb.CLASS_A,
+			DownlinkPaths: DownlinkProtoPaths(paths...),
+			Rx1Delay:      ttnpb.RxDelay(phy.JoinAcceptDelay1.Seconds()),
+			Rx1DataRateIndex: test.Must(phy.Rx1DataRate(
+				up.Settings.DataRateIndex,
+				uint32(dev.PendingMACState.CurrentParameters.Rx1DataRateOffset),
+				dev.PendingMACState.CurrentParameters.DownlinkDwellTime.GetValue()),
+			).(ttnpb.DataRateIndex),
+			Rx1Frequency:     phy.DownlinkChannels[test.Must(phy.Rx1Channel(uint8(up.DeviceChannelIndex))).(uint8)].Frequency,
+			Rx2DataRateIndex: dev.PendingMACState.CurrentParameters.Rx2DataRateIndex,
+			Rx2Frequency:     dev.PendingMACState.CurrentParameters.Rx2Frequency,
+			Priority:         ttnpb.TxSchedulePriority_HIGHEST,
+			FrequencyPlanID:  dev.FrequencyPlanID,
+		}
+		var scheduledDown *ttnpb.DownlinkMessage
+		if !a.So(env.AssertScheduleDownlink(ctx, func(ctx, reqCtx context.Context, down *ttnpb.DownlinkMessage) bool {
+			scheduledDown = down
+			return test.AllTrue(
+				a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
+				a.So(down.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, append(
+					dev.PendingMACState.QueuedJoinAccept.CorrelationIDs,
+					up.CorrelationIDs...,
+				),
+				),
+				a.So(down, should.Resemble, &ttnpb.DownlinkMessage{
+					CorrelationIDs: down.CorrelationIDs,
+					RawPayload:     dev.PendingMACState.QueuedJoinAccept.Payload,
+					Settings: &ttnpb.DownlinkMessage_Request{
+						Request: txReq,
+					},
+				}),
+			)
+		}, paths), should.BeTrue) {
+			t.Error("Join-accept assertion failed")
+			return
+		}
+		a.So(env.Events, should.ReceiveEventsResembling,
+			events.Builders([]events.Builder{
+				EvtScheduleJoinAcceptAttempt.With(events.WithData(txReq)),
+				EvtScheduleJoinAcceptSuccess.With(events.WithData(&ttnpb.ScheduleDownlinkResponse{})),
+			}).New(ctx),
+		)
+		dev.PendingSession = &ttnpb.Session{
+			DevAddr:     dev.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+			SessionKeys: dev.PendingMACState.QueuedJoinAccept.Keys,
+		}
+		dev.PendingMACState.PendingJoinRequest = &dev.PendingMACState.QueuedJoinAccept.Request
+		dev.PendingMACState.QueuedJoinAccept = nil
+		dev.PendingMACState.RxWindowsAvailable = false
+		dev.RecentDownlinks = AppendRecentDownlink(dev.RecentDownlinks, scheduledDown, RecentDownlinkCount)
+	})
+}
+
+func (env TestEnvironment) AssertHandleDeviceUplink(ctx context.Context, assert func(context.Context) bool, ups ...*ttnpb.UplinkMessage) bool {
 	t, a := test.MustNewTFromContext(ctx)
 	t.Helper()
 
@@ -1316,101 +1441,393 @@ func (env TestEnvironment) AssertSendDeviceUplink(ctx context.Context, expectedE
 	}()
 	for _, up := range ups[1:] {
 		up := up
-		time.AfterFunc((1<<3)*test.Delay, func() {
+		time.AfterFunc(env.Config.DeduplicationWindow/2, func() {
 			_, err := ttnpb.NewGsNsClient(env.ClientConn).HandleUplink(ctx, up)
 			t.Logf("Duplicate HandleUplink returned %v", err)
 			errCh <- err
 			wg.Done()
 		})
 	}
-	if !a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, len(expectedEvs), func(evs ...events.Event) bool {
-		if !a.So(evs, should.HaveSameElementsFunc, eventEqual, expectedEvs) {
-			actualEvs := map[events.Event]struct{}{}
-			for _, ev := range evs {
-				actualEvs[ev] = struct{}{}
-			}
-		outer:
-			for _, expected := range expectedEvs {
-				for actual := range actualEvs {
-					if eventEqual(expected, actual) {
-						delete(actualEvs, actual)
-						continue outer
-					}
-				}
-				t.Logf("Failed to match expected event '%s' with payload '%+v'", expected.Name(), expected.Data())
-			}
-			for actual := range actualEvs {
-				t.Logf("Failed to match actual event '%s' with payload '%+v'", actual.Name(), actual.Data())
-			}
-			return false
-		}
-		return true
-	}), should.BeTrue) {
-		t.Error("Data uplink duplicate event assertion failed")
-		return nil, false
+	if !a.So(assert(ctx), should.BeTrue) {
+		t.Error("Uplink handling assertion failed")
+		return false
 	}
 	for range ups[1:] {
 		select {
 		case <-ctx.Done():
 			t.Error("Timed out while waiting for duplicate HandleUplink to return")
-			return nil, false
+			return false
 
 		case err := <-errCh:
 			if !a.So(err, should.BeNil) {
 				t.Errorf("Failed to handle duplicate uplink: %s", err)
-				return nil, false
+				return false
 			}
 		}
 	}
-	return errCh, true
-}
-
-func AssertProcessApplicationUp(ctx context.Context, link ttnpb.AsNs_LinkApplicationClient, assert func(context.Context, *ttnpb.ApplicationUp) bool) bool {
-	return test.MustTFromContext(ctx).Run("Application uplink", func(t *testing.T) {
-		a, ctx := test.NewWithContext(ctx, t)
-		t.Helper()
-
-		ctx, cancel := context.WithCancel(ctx)
-		defer cancel()
-
-		var asUp *ttnpb.ApplicationUp
-		var err error
-		if !a.So(test.WaitContext(ctx, func() {
-			asUp, err = link.Recv()
-		}), should.BeTrue) {
-			t.Error("Timed out while waiting for application uplink to be sent to Application Server")
-			return
-		}
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for HandleUplink to return")
+		return false
+	case err := <-errCh:
 		if !a.So(err, should.BeNil) {
-			t.Errorf("Failed to receive Application Server uplink: %s", err)
-			return
-		}
-		if !a.So(assert(ctx, asUp), should.BeTrue) {
-			t.Errorf("Application uplink assertion failed")
-			return
-		}
-		if !a.So(test.WaitContext(ctx, func() {
-			err = link.Send(ttnpb.Empty)
-		}), should.BeTrue) {
-			t.Error("Timed out while waiting for Network Server to process Application Server response")
-			return
-		}
-		if !a.So(err, should.BeNil) {
-			t.Errorf("Failed to send Application Server uplink response: %s", err)
-			return
-		}
-	})
-}
-
-func AssertProcessApplicationUps(ctx context.Context, link ttnpb.AsNs_LinkApplicationClient, asserts ...func(context.Context, *ttnpb.ApplicationUp) bool) bool {
-	t, a := test.MustNewTFromContext(ctx)
-	t.Helper()
-	for _, assert := range asserts {
-		if !a.So(AssertProcessApplicationUp(ctx, link, assert), should.BeTrue) {
+			t.Errorf("Failed to handle uplink: %s", err)
 			return false
 		}
 	}
 	return true
+}
+
+func (env TestEnvironment) AssertHandleJoinRequest(ctx context.Context, conf JoinRequestConfig, assert func(ctx context.Context, ups ...*ttnpb.UplinkMessage) bool, duplicateMDs ...[]*ttnpb.RxMetadata) bool {
+	return test.RunSubtestFromContext(ctx, "Join-request", func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+		ups := []*ttnpb.UplinkMessage{MakeJoinRequest(conf)}
+		for _, mds := range duplicateMDs {
+			mds := mds
+			duplicateConf := conf
+			duplicateConf.RxMetadata = mds
+			ups = append(ups, MakeJoinRequest(duplicateConf))
+		}
+		a.So(env.AssertHandleDeviceUplink(ctx, func(ctx context.Context) bool {
+			return assert(ctx, ups...)
+		}, ups...), should.BeTrue)
+	})
+}
+
+func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf DataUplinkConfig, assert func(ctx context.Context, ups ...*ttnpb.UplinkMessage) bool, duplicateMDs ...[]*ttnpb.RxMetadata) bool {
+	return test.RunSubtestFromContext(ctx, "Data uplink", func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+		ups := []*ttnpb.UplinkMessage{MakeDataUplink(conf)}
+		for _, mds := range duplicateMDs {
+			mds := mds
+			duplicateConf := conf
+			duplicateConf.RxMetadata = mds
+			ups = append(ups, MakeDataUplink(duplicateConf))
+		}
+		a.So(env.AssertHandleDeviceUplink(ctx, func(ctx context.Context) bool {
+			return assert(ctx, ups...)
+		}, ups...), should.BeTrue)
+	})
+}
+
+func (env TestEnvironment) AssertNsJsJoin(ctx context.Context, getPeerAssert func(ctx, reqCtx context.Context, ids ttnpb.Identifiers) bool, joinAssert func(ctx, reqCtx context.Context, msg *ttnpb.JoinRequest) bool, joinResp *ttnpb.JoinResponse, err error) bool {
+	return test.RunSubtestFromContext(ctx, "NsJs.HandleJoin", func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+		joinReqCh := make(chan NsJsHandleJoinRequest)
+		if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			_, a := test.MustNewTFromContext(ctx)
+			return test.AllTrue(
+				a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER),
+				getPeerAssert(ctx, reqCtx, ids),
+			)
+		},
+			test.ClusterGetPeerResponse{
+				Peer: NewJSPeer(ctx, &MockNsJsServer{
+					HandleJoinFunc: MakeNsJsHandleJoinChFunc(joinReqCh),
+				}),
+			},
+		), should.BeTrue) {
+			return
+		}
+		if !a.So(test.AssertClusterAuthRequest(ctx, env.Cluster.Auth, &grpc.EmptyCallOption{}), should.BeTrue) {
+			return
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for NsJs.HandleJoin to be called")
+			return
+
+		case req := <-joinReqCh:
+			if !a.So(joinAssert(ctx, req.Context, req.Message), should.BeTrue) {
+				return
+			}
+			select {
+			case <-ctx.Done():
+				t.Error("Timed out while waiting for NsJs.HandleJoin response to be processed")
+				return
+
+			case req.Response <- NsJsHandleJoinResponse{
+				Response: joinResp,
+				Error:    err,
+			}:
+			}
+		}
+	})
+}
+
+func MakeDeduplicatedUplink(ups ...*ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
+	up := CopyUplinkMessage(ups[0])
+	for _, dupUp := range ups[1:] {
+		up.RxMetadata = append(up.RxMetadata, dupUp.RxMetadata...)
+	}
+	return up
+}
+
+type JoinAssertionConfig struct {
+	Link           ttnpb.AsNs_LinkApplicationClient
+	Device         *ttnpb.EndDevice
+	ChannelIndex   uint8
+	DataRateIndex  ttnpb.DataRateIndex
+	RxMetadatas    [][]*ttnpb.RxMetadata
+	CorrelationIDs []string
+
+	ClusterResponse *NsJsHandleJoinResponse
+	InteropResponse *InteropClientHandleJoinRequestResponse
+}
+
+func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionConfig) (*ttnpb.EndDevice, bool) {
+	_, a := test.MustNewTFromContext(ctx)
+
+	fp := FrequencyPlan(conf.Device.FrequencyPlanID)
+	phy := LoRaWANBands[fp.BandID][conf.Device.LoRaWANPHYVersion]
+	upCh := phy.UplinkChannels[conf.ChannelIndex]
+	upDR := phy.DataRates[conf.DataRateIndex].Rate
+
+	devNonce := types.DevNonce{0x42, 0x42}
+	mic := [4]byte{0x42, 0x42, 0x42, 0x42}
+
+	start := time.Now().UTC()
+
+	upConf := JoinRequestConfig{
+		JoinEUI:        *conf.Device.JoinEUI,
+		DevEUI:         *conf.Device.DevEUI,
+		DevNonce:       devNonce,
+		DataRate:       upDR,
+		Frequency:      upCh.Frequency,
+		RxMetadata:     conf.RxMetadatas[0],
+		CorrelationIDs: conf.CorrelationIDs,
+		MIC:            mic,
+	}
+	var dev *ttnpb.EndDevice
+	if !a.So(env.AssertHandleJoinRequest(
+		ctx,
+		upConf,
+		func(ctx context.Context, ups ...*ttnpb.UplinkMessage) bool {
+			t, a := test.MustNewTFromContext(ctx)
+
+			defaultMACSettings := env.Config.DefaultMACSettings.Parse()
+
+			defaultLoRaWANVersion := DeviceDefaultLoRaWANVersion(conf.Device)
+
+			defaultRX1DROffset := DeviceDefaultRX1DataRateOffset(conf.Device, defaultMACSettings)
+			defaultRX2DRIdx := DeviceDefaultRX2DataRateIndex(conf.Device, phy, defaultMACSettings)
+			defaultRX2Freq := DeviceDefaultRX2Frequency(conf.Device, phy, defaultMACSettings)
+
+			desiredRX1Delay := DeviceDesiredRX1Delay(conf.Device, phy, defaultMACSettings)
+			desiredRX1DROffset := DeviceDesiredRX1DataRateOffset(conf.Device, defaultMACSettings)
+			desiredRX2DRIdx := DeviceDesiredRX2DataRateIndex(conf.Device, phy, fp, defaultMACSettings)
+
+			deduplicatedUpConf := upConf
+			deduplicatedUpConf.DecodePayload = true
+			deduplicatedUpConf.ChannelIndex = conf.ChannelIndex
+			deduplicatedUpConf.DataRateIndex = conf.DataRateIndex
+			expectedEvBuilders := []events.Builder{
+				EvtReceiveJoinRequest.With(events.WithData(MakeJoinRequest(upConf))),
+			}
+			for _, up := range ups[1:] {
+				deduplicatedUpConf.RxMetadata = up.RxMetadata
+				expectedEvBuilders = append(expectedEvBuilders,
+					EvtReceiveJoinRequest.With(events.WithData(MakeJoinRequest(upConf))),
+					EvtDropJoinRequest.With(events.WithData(ErrDuplicate)),
+				)
+			}
+			var joinReq *ttnpb.JoinRequest
+			var joinResp *ttnpb.JoinResponse
+			if conf.ClusterResponse != nil {
+				if !a.So(env.AssertNsJsJoin(
+					ctx,
+					func(ctx, reqCtx context.Context, peerIDs ttnpb.Identifiers) bool {
+						return test.AllTrue(
+							a.So(events.CorrelationIDsFromContext(reqCtx), should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIDs),
+							a.So(peerIDs, should.Resemble, conf.Device.EndDeviceIdentifiers),
+						)
+					},
+					func(ctx, reqCtx context.Context, req *ttnpb.JoinRequest) bool {
+						joinReq = req
+						return test.AllTrue(
+							a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
+							a.So(req.DevAddr, should.NotBeEmpty),
+							a.So(req.DevAddr.NwkID(), should.Resemble, env.Config.NetID.ID()),
+							a.So(req.DevAddr.NetIDType(), should.Equal, env.Config.NetID.Type()),
+							a.So(req.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIDs),
+							a.So(req, should.Resemble, MakeNsJsJoinRequest(NsJsJoinRequestConfig{
+								JoinEUI:            *conf.Device.JoinEUI,
+								DevEUI:             *conf.Device.DevEUI,
+								DevNonce:           devNonce,
+								MIC:                mic,
+								DevAddr:            req.DevAddr,
+								SelectedMACVersion: defaultLoRaWANVersion,
+								NetID:              env.Config.NetID,
+								RX1DataRateOffset:  defaultRX1DROffset,
+								RX2DataRateIndex:   defaultRX2DRIdx,
+								RXDelay:            desiredRX1Delay,
+								FrequencyPlanID:    conf.Device.FrequencyPlanID,
+								PHYVersion:         conf.Device.LoRaWANPHYVersion,
+								CorrelationIDs:     req.CorrelationIDs,
+							})),
+						)
+					},
+					conf.ClusterResponse.Response,
+					conf.ClusterResponse.Error,
+				), should.BeTrue) {
+					return false
+				}
+				expectedEvBuilders = append(expectedEvBuilders,
+					EvtClusterJoinAttempt.With(events.WithData(joinReq)),
+				)
+				if conf.ClusterResponse.Error == nil {
+					expectedEvBuilders = append(expectedEvBuilders,
+						EvtClusterJoinSuccess.With(events.WithData(JoinResponseWithoutKeys(conf.ClusterResponse.Response))),
+					)
+					joinResp = conf.ClusterResponse.Response
+				}
+			}
+			if conf.InteropResponse != nil {
+				t.Fatal("Interop join assertion not implemented yet")
+				return false
+			}
+
+			dev = CopyEndDevice(conf.Device)
+			dev.PendingMACState = &ttnpb.MACState{
+				CurrentParameters: ttnpb.MACParameters{
+					MaxEIRP:                    phy.DefaultMaxEIRP,
+					ADRDataRateIndex:           ttnpb.DATA_RATE_0,
+					ADRNbTrans:                 1,
+					Rx1Delay:                   DeviceDefaultRX1Delay(dev, phy, defaultMACSettings),
+					Rx1DataRateOffset:          defaultRX1DROffset,
+					Rx2DataRateIndex:           defaultRX2DRIdx,
+					Rx2Frequency:               defaultRX2Freq,
+					MaxDutyCycle:               DeviceDefaultMaxDutyCycle(dev, defaultMACSettings),
+					RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
+					RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
+					PingSlotFrequency:          DeviceDefaultPingSlotFrequency(dev, phy, defaultMACSettings),
+					BeaconFrequency:            DeviceDefaultBeaconFrequency(dev, defaultMACSettings),
+					Channels:                   DeviceDefaultChannels(dev, phy, defaultMACSettings),
+					ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit},
+					ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay},
+					PingSlotDataRateIndexValue: DeviceDefaultPingSlotDataRateIndexValue(dev, phy, defaultMACSettings),
+				},
+				DesiredParameters: ttnpb.MACParameters{
+					MaxEIRP:                    DeviceDesiredMaxEIRP(dev, phy, fp, defaultMACSettings),
+					ADRDataRateIndex:           ttnpb.DATA_RATE_0,
+					ADRNbTrans:                 1,
+					Rx1Delay:                   desiredRX1Delay,
+					Rx1DataRateOffset:          desiredRX1DROffset,
+					Rx2DataRateIndex:           desiredRX2DRIdx,
+					Rx2Frequency:               DeviceDesiredRX2Frequency(dev, phy, fp, defaultMACSettings),
+					MaxDutyCycle:               DeviceDesiredMaxDutyCycle(dev, defaultMACSettings),
+					RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
+					RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
+					PingSlotFrequency:          DeviceDesiredPingSlotFrequency(dev, phy, fp, defaultMACSettings),
+					BeaconFrequency:            DeviceDesiredBeaconFrequency(dev, defaultMACSettings),
+					Channels:                   DeviceDesiredChannels(phy, fp, defaultMACSettings),
+					UplinkDwellTime:            DeviceDesiredUplinkDwellTime(fp),
+					DownlinkDwellTime:          DeviceDesiredDownlinkDwellTime(fp),
+					ADRAckLimitExponent:        DeviceDesiredADRAckLimitExponent(dev, phy, defaultMACSettings),
+					ADRAckDelayExponent:        DeviceDesiredADRAckDelayExponent(dev, phy, defaultMACSettings),
+					PingSlotDataRateIndexValue: DeviceDesiredPingSlotDataRateIndexValue(dev, phy, fp, defaultMACSettings),
+				},
+				DeviceClass:    test.Must(DeviceDefaultClass(dev)).(ttnpb.Class),
+				LoRaWANVersion: defaultLoRaWANVersion,
+				QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
+					Payload: joinResp.RawPayload,
+					Request: *joinReq,
+					Keys: func() ttnpb.SessionKeys {
+						keys := ttnpb.SessionKeys{
+							SessionKeyID: joinResp.SessionKeys.SessionKeyID,
+							FNwkSIntKey:  joinResp.SessionKeys.FNwkSIntKey,
+							NwkSEncKey:   joinResp.SessionKeys.NwkSEncKey,
+							SNwkSIntKey:  joinResp.SessionKeys.SNwkSIntKey,
+						}
+						if joinReq.DownlinkSettings.OptNeg {
+							keys.NwkSEncKey = keys.FNwkSIntKey
+							keys.SNwkSIntKey = keys.FNwkSIntKey
+						}
+						return *CopySessionKeys(&keys)
+					}(),
+					CorrelationIDs: joinResp.CorrelationIDs,
+				},
+				RxWindowsAvailable: true,
+			}
+			dev.RecentUplinks = AppendRecentUplink(dev.RecentUplinks, MakeJoinRequest(deduplicatedUpConf), RecentUplinkCount)
+
+			expectedEvs := events.Builders(append(
+				expectedEvBuilders,
+				EvtProcessJoinRequest,
+			)).New(
+				events.ContextWithCorrelationID(ctx, joinReq.CorrelationIDs...),
+				events.WithIdentifiers(conf.Device.EndDeviceIdentifiers),
+			)
+			expectedEvNames := func() []string {
+				names := []string{}
+				for _, ev := range expectedEvs {
+					names = append(names, ev.Name())
+				}
+				return names
+			}()
+			if !a.So(env.Events, should.ReceiveEventsFunc, func(ev, _ events.Event) bool {
+				t.Logf("%v event published with data: %v", ev.Name(), ev.Data())
+				if !a.So(ev.Name(), should.BeIn, expectedEvNames) {
+					return false
+				}
+				for i, name := range expectedEvNames {
+					if ev.Name() == name {
+						expectedEvNames = append(expectedEvNames[:i], expectedEvNames[i+1:]...)
+						return true
+					}
+				}
+				return false
+			}, expectedEvs) {
+				return false
+			}
+
+			idsWithDevAddr := conf.Device.EndDeviceIdentifiers
+			idsWithDevAddr.DevAddr = &joinReq.DevAddr
+			var appUp *ttnpb.ApplicationUp
+			if !a.So(AssertProcessApplicationUp(ctx, conf.Link, func(ctx context.Context, up *ttnpb.ApplicationUp) bool {
+				_, a := test.MustNewTFromContext(ctx)
+				recvAt := up.GetJoinAccept().GetReceivedAt()
+				appUp = up
+				return test.AllTrue(
+					a.So(up.CorrelationIDs, should.HaveSameElementsDeep, append(joinReq.CorrelationIDs, joinResp.CorrelationIDs...)),
+					a.So([]time.Time{start, recvAt, time.Now()}, should.BeChronological),
+					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: idsWithDevAddr,
+						CorrelationIDs:       up.CorrelationIDs,
+						Up: &ttnpb.ApplicationUp_JoinAccept{
+							JoinAccept: &ttnpb.ApplicationJoinAccept{
+								AppSKey:      joinResp.AppSKey,
+								SessionKeyID: joinResp.SessionKeyID,
+								ReceivedAt:   recvAt,
+							},
+						},
+					}),
+				)
+			}), should.BeTrue) {
+				t.Error("Failed to send join-accept to Application Server")
+				return false
+			}
+			return a.So(env.Events, should.ReceiveEventFunc, test.MakeEventEqual(test.EventEqualConfig{
+				Identifiers:    true,
+				Data:           true,
+				Origin:         true,
+				Context:        true,
+				Visibility:     true,
+				Authentication: true,
+				RemoteIP:       true,
+				UserAgent:      true,
+			}),
+				EvtForwardJoinAccept.NewWithIdentifiersAndData(conf.Link.Context(), idsWithDevAddr, &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: idsWithDevAddr,
+					CorrelationIDs:       appUp.CorrelationIDs,
+					Up: &ttnpb.ApplicationUp_JoinAccept{
+						JoinAccept: ApplicationJoinAcceptWithoutAppSKey(appUp.GetJoinAccept()),
+					},
+				}),
+			)
+		},
+		conf.RxMetadatas[1:]...,
+	), should.BeTrue) {
+		return nil, false
+	}
+	return env.AssertScheduleJoinAccept(ctx, dev)
 }
 
 func DownlinkProtoPaths(paths ...DownlinkPath) (pbs []*ttnpb.DownlinkPath) {
@@ -1418,260 +1835,6 @@ func DownlinkProtoPaths(paths ...DownlinkPath) (pbs []*ttnpb.DownlinkPath) {
 		pbs = append(pbs, p.DownlinkPath)
 	}
 	return pbs
-}
-
-type JoinAssertionConfig struct {
-	Context         context.Context
-	Link            ttnpb.AsNs_LinkApplicationClient
-	LinkContext     context.Context
-	Identifiers     ttnpb.EndDeviceIdentifiers
-	FrequencyPlanID string
-	MACVersion      ttnpb.MACVersion
-	PHYVersion      ttnpb.PHYVersion
-	ChannelIndex    uint8
-	DataRateIndex   ttnpb.DataRateIndex
-	EventEqual      func(x, y events.Event) bool
-
-	Response *ttnpb.JoinResponse
-
-	DesiredRX1Delay         ttnpb.RxDelay
-	RX1DROffset             uint8
-	DesiredRX1DROffset      uint8
-	RX2DataRateIndex        ttnpb.DataRateIndex
-	DesiredRX2DataRateIndex ttnpb.DataRateIndex
-	RX2Frequency            uint64
-}
-
-func (env TestEnvironment) AssertJoin(conf JoinAssertionConfig) (*ttnpb.JoinRequest, bool) {
-	t := test.MustTFromContext(conf.Context)
-
-	fp := FrequencyPlan(conf.FrequencyPlanID)
-	phy := LoRaWANBands[fp.BandID][conf.PHYVersion]
-	upCh := phy.UplinkChannels[conf.ChannelIndex]
-	upDR := phy.DataRates[conf.DataRateIndex].Rate
-
-	var expectedEvs []events.Event
-	var joinReq *ttnpb.JoinRequest
-	var joinCIDs []string
-	if !t.Run("Join-request", func(t *testing.T) {
-		a, ctx := test.NewWithContext(conf.Context, t)
-
-		ctx, cancel := context.WithCancel(ctx)
-		defer cancel()
-
-		handleJoinCh := make(chan NsJsHandleJoinRequest)
-		jsPeer := NewJSPeer(ctx, &MockNsJsServer{
-			HandleJoinFunc: MakeNsJsHandleJoinChFunc(handleJoinCh),
-		})
-
-		makeUplink := func(matched bool, rxMetadata ...*ttnpb.RxMetadata) *ttnpb.UplinkMessage {
-			msg := MakeJoinRequest(matched, upDR, upCh.Frequency, rxMetadata...)
-			if matched {
-				return WithMatchedUplinkSettings(msg, conf.ChannelIndex, conf.DataRateIndex)
-			}
-			return msg
-		}
-		var ups []*ttnpb.UplinkMessage
-		var firstUp *ttnpb.UplinkMessage
-		var preSendEvs []events.Event
-		for i, upMD := range [][]*ttnpb.RxMetadata{
-			RxMetadata[:2],
-			nil,
-			RxMetadata[2:],
-		} {
-			ups = append(ups, makeUplink(false, upMD...))
-			if i == 0 {
-				firstUp = makeUplink(true, upMD...)
-			} else {
-				preSendEvs = append(preSendEvs,
-					EvtReceiveJoinRequest.NewWithIdentifiersAndData(ctx, conf.Identifiers, makeUplink(true, upMD...)),
-					EvtDropJoinRequest.NewWithIdentifiersAndData(ctx, conf.Identifiers, ErrDuplicate),
-				)
-			}
-		}
-
-		start := time.Now()
-		handleUplinkErrCh, ok := env.AssertSendDeviceUplink(ctx, preSendEvs, conf.EventEqual, ups...)
-		if !a.So(ok, should.BeTrue) {
-			t.Error("Uplink send assertion failed")
-			return
-		}
-
-		var getPeerCtx context.Context
-		if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
-			func(ctx context.Context, role ttnpb.ClusterRole, peerIDs ttnpb.Identifiers) bool {
-				for _, cid := range ups[0].CorrelationIDs {
-					a.So(events.CorrelationIDsFromContext(ctx), should.Contain, cid)
-				}
-				getPeerCtx = ctx
-				return test.AllTrue(
-					a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER),
-					a.So(peerIDs, should.Resemble, conf.Identifiers),
-				)
-			},
-			test.ClusterGetPeerResponse{Peer: jsPeer},
-		), should.BeTrue) {
-			t.Error("Join Server peer look-up assertion failed")
-			return
-		}
-		joinReq = MakeNsJsJoinRequest(conf.MACVersion, conf.PHYVersion, fp, nil, conf.DesiredRX1Delay, uint8(conf.DesiredRX1DROffset), conf.DesiredRX2DataRateIndex, events.CorrelationIDsFromContext(getPeerCtx)...)
-		if !a.So(AssertAuthNsJsHandleJoinRequest(ctx, env.Cluster.Auth, handleJoinCh, func(ctx context.Context, req *ttnpb.JoinRequest) bool {
-			joinReq.DevAddr = req.DevAddr
-			return test.AllTrue(
-				a.So(req.DevAddr, should.NotBeEmpty),
-				a.So(req.DevAddr.NwkID(), should.Resemble, env.Config.NetID.ID()),
-				a.So(req.DevAddr.NetIDType(), should.Equal, env.Config.NetID.Type()),
-				a.So(req, should.Resemble, joinReq),
-			)
-		},
-			&grpc.EmptyCallOption{},
-			NsJsHandleJoinResponse{
-				Response: conf.Response,
-			},
-		), should.BeTrue) {
-			t.Error("Join-request send assertion failed")
-			return
-		}
-		joinCIDs = append(events.CorrelationIDsFromContext(getPeerCtx), conf.Response.CorrelationIDs...)
-
-		a.So(env.Events, should.ReceiveEventFunc, conf.EventEqual,
-			EvtReceiveJoinRequest.NewWithIdentifiersAndData(events.ContextWithCorrelationID(test.Context(), ups[0].CorrelationIDs...), conf.Identifiers, firstUp),
-		)
-		a.So(env.Events, should.ReceiveEventsResembling,
-			EvtClusterJoinAttempt.NewWithIdentifiersAndData(getPeerCtx, conf.Identifiers, joinReq),
-			EvtClusterJoinSuccess.NewWithIdentifiersAndData(getPeerCtx, conf.Identifiers, &ttnpb.JoinResponse{
-				RawPayload: conf.Response.RawPayload,
-				SessionKeys: ttnpb.SessionKeys{
-					SessionKeyID: conf.Response.SessionKeys.SessionKeyID,
-				},
-				Lifetime:       conf.Response.Lifetime,
-				CorrelationIDs: conf.Response.CorrelationIDs,
-			}),
-		)
-		a.So(env.Events, should.ReceiveEventFunc, conf.EventEqual,
-			EvtProcessJoinRequest.NewWithIdentifiersAndData(getPeerCtx, conf.Identifiers, makeUplink(true, RxMetadata[:]...)),
-		)
-		select {
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for HandleUplink to return")
-			return
-		case err := <-handleUplinkErrCh:
-			if !a.So(err, should.BeNil) {
-				t.Errorf("Failed to handle uplink: %s", err)
-				return
-			}
-		}
-
-		if !a.So(AssertProcessApplicationUp(ctx, conf.Link, func(ctx context.Context, up *ttnpb.ApplicationUp) bool {
-			expectedEvs = append(expectedEvs, EvtForwardJoinAccept.NewWithIdentifiersAndData(conf.LinkContext, up.EndDeviceIdentifiers, up))
-
-			a := assertions.New(test.MustTFromContext(ctx))
-			return a.So(test.AllTrue(
-				a.So(up.CorrelationIDs, should.HaveSameElementsDeep, joinCIDs),
-				a.So([]time.Time{start, up.GetJoinAccept().GetReceivedAt(), time.Now()}, should.BeChronological),
-				a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-					EndDeviceIdentifiers: *MakeOTAAIdentifiers(&joinReq.DevAddr),
-					CorrelationIDs:       up.CorrelationIDs,
-					Up: &ttnpb.ApplicationUp_JoinAccept{
-						JoinAccept: &ttnpb.ApplicationJoinAccept{
-							AppSKey:      conf.Response.AppSKey,
-							SessionKeyID: conf.Response.SessionKeyID,
-							ReceivedAt:   up.GetJoinAccept().GetReceivedAt(),
-						},
-					},
-				}),
-			), should.BeTrue)
-		}), should.BeTrue) {
-			t.Error("Failed to send join-accept to Application Server")
-			return
-		}
-	}) {
-		t.Error("Join-request assertion failed")
-		return nil, false
-	}
-	if joinReq == nil {
-		panic("JOIN REQ NOT TRUE")
-	}
-	return joinReq, t.Run("Join-accept", func(t *testing.T) {
-		a, ctx := test.NewWithContext(conf.Context, t)
-
-		ctx, cancel := context.WithCancel(ctx)
-		defer cancel()
-
-		paths := DownlinkPathsFromMetadata(RxMetadata[:]...)
-		txReq := &ttnpb.TxRequest{
-			Class:            ttnpb.CLASS_A,
-			DownlinkPaths:    DownlinkProtoPaths(paths...),
-			Rx1Delay:         ttnpb.RxDelay(phy.JoinAcceptDelay1.Seconds()),
-			Rx1DataRateIndex: test.Must(phy.Rx1DataRate(conf.DataRateIndex, uint32(conf.RX1DROffset), fp.DwellTime.GetUplinks())).(ttnpb.DataRateIndex),
-			Rx1Frequency:     phy.DownlinkChannels[test.Must(phy.Rx1Channel(conf.ChannelIndex)).(uint8)].Frequency,
-			Rx2DataRateIndex: conf.RX2DataRateIndex,
-			Rx2Frequency:     conf.RX2Frequency,
-			Priority:         ttnpb.TxSchedulePriority_HIGHEST,
-			FrequencyPlanID:  conf.FrequencyPlanID,
-		}
-		if !a.So(env.AssertScheduleDownlink(ctx, func(ctx context.Context, down *ttnpb.DownlinkMessage) bool {
-			return test.AllTrue(
-				a.So(events.CorrelationIDsFromContext(ctx), should.NotBeEmpty),
-				a.So(down.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, joinCIDs),
-				a.So(down, should.Resemble, &ttnpb.DownlinkMessage{
-					CorrelationIDs: down.CorrelationIDs,
-					RawPayload:     conf.Response.RawPayload,
-					Settings: &ttnpb.DownlinkMessage_Request{
-						Request: txReq,
-					},
-				}),
-			)
-		}, paths), should.BeTrue) {
-			t.Error("Join-accept assertion failed")
-			return
-		}
-		a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, 2+len(expectedEvs), func(evs ...events.Event) bool {
-			return a.So(evs, should.HaveSameElementsFunc, conf.EventEqual, append(expectedEvs,
-				EvtScheduleJoinAcceptAttempt.NewWithIdentifiersAndData(ctx, conf.Identifiers, txReq),
-				EvtScheduleJoinAcceptSuccess.NewWithIdentifiersAndData(ctx, conf.Identifiers, &ttnpb.ScheduleDownlinkResponse{}),
-			))
-		}), should.BeTrue)
-	})
-}
-
-func (env TestEnvironment) AssertSendDataUplink(ctx context.Context, link ttnpb.AsNs_LinkApplicationClient, linkCtx context.Context, ids ttnpb.EndDeviceIdentifiers, makeUplink func(matched bool, rxMetadata ...*ttnpb.RxMetadata) *ttnpb.UplinkMessage, eventEqual func(x, y events.Event) bool, processEvBuilders ...events.Builder) bool {
-	return test.MustTFromContext(ctx).Run("Data uplink", func(t *testing.T) {
-		a, ctx := test.NewWithContext(ctx, t)
-
-		ctx, cancel := context.WithCancel(ctx)
-		defer cancel()
-
-		expectedEvBuilders := processEvBuilders
-		var ups []*ttnpb.UplinkMessage
-		for i, upMD := range [][]*ttnpb.RxMetadata{
-			nil,
-			RxMetadata[3:],
-			RxMetadata[:3],
-		} {
-			ups = append(ups, makeUplink(false, upMD...))
-			expectedEvBuilders = append(expectedEvBuilders, EvtReceiveDataUplink.With(events.WithData(makeUplink(true, upMD...))))
-			if i > 0 {
-				expectedEvBuilders = append(expectedEvBuilders, EvtDropDataUplink.With(events.WithData(ErrDuplicate)))
-			}
-		}
-
-		handleUplinkErrCh, ok := env.AssertSendDeviceUplink(ctx, events.Builders(expectedEvBuilders).New(ctx, events.WithIdentifiers(ids)), eventEqual, ups...)
-		if !a.So(ok, should.BeTrue) {
-			t.Error("Uplink send assertion failed")
-			return
-		}
-		select {
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for HandleUplink to return")
-			return
-		case err := <-handleUplinkErrCh:
-			if !a.So(err, should.BeNil) {
-				t.Errorf("Failed to handle uplink: %s", err)
-				return
-			}
-		}
-	})
 }
 
 func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, bool) {
@@ -1702,8 +1865,9 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 
 	var reqCIDs []string
 	if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
-		func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-			reqCIDs = events.CorrelationIDsFromContext(ctx)
+		func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			_, a := test.MustNewTFromContext(ctx)
+			reqCIDs = events.CorrelationIDsFromContext(reqCtx)
 			return a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS) && a.So(ids, should.BeNil)
 		},
 		test.ClusterGetPeerResponse{
@@ -1718,8 +1882,9 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 	a.So(reqCIDs, should.HaveLength, 1)
 
 	if !a.So(test.AssertListRightsRequest(ctx, listRightsCh,
-		func(ctx context.Context, ids ttnpb.Identifiers) bool {
-			md := rpcmetadata.FromIncomingContext(ctx)
+		func(ctx, reqCtx context.Context, ids ttnpb.Identifiers) bool {
+			_, a := test.MustNewTFromContext(ctx)
+			md := rpcmetadata.FromIncomingContext(reqCtx)
 			return a.So(md.AuthType, should.Equal, "Bearer") &&
 				a.So(md.AuthValue, should.Equal, "set-key") &&
 				a.So(ids, should.Resemble, &req.EndDevice.ApplicationIdentifiers)
@@ -2098,8 +2263,6 @@ func MustCreateDevices(ctx context.Context, r DeviceRegistry, devs ...SetDeviceR
 	}
 	return setDevices
 }
-
-// TODO: Remove mocks below
 
 var _ ApplicationUplinkQueue = MockApplicationUplinkQueue{}
 

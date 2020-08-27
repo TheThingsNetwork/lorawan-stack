@@ -291,8 +291,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 	}
 
 	assertGetGatewayPeers := func(ctx context.Context, getPeerCh <-chan test.ClusterGetPeerRequest, peer124, peer3 cluster.Peer) bool {
-		t, a := test.MustNewTFromContext(ctx)
-		t.Helper()
 		return test.AssertClusterGetPeerRequestSequence(ctx, getPeerCh,
 			[]test.ClusterGetPeerResponse{
 				{Error: errors.New("peer not found")},
@@ -301,31 +299,36 @@ func TestProcessDownlinkTask(t *testing.T) {
 				{Peer: peer3},
 				{Peer: peer124},
 			},
-			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+				_, a := test.MustNewTFromContext(ctx)
 				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-0",
 					})
 			},
-			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+				_, a := test.MustNewTFromContext(ctx)
 				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-1",
 					})
 			},
-			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+				_, a := test.MustNewTFromContext(ctx)
 				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-2",
 					})
 			},
-			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+				_, a := test.MustNewTFromContext(ctx)
 				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-3",
 					})
 			},
-			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+				_, a := test.MustNewTFromContext(ctx)
 				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-4",
@@ -341,6 +344,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
+
 		makePath := func(i int) *ttnpb.DownlinkPath {
 			if fixedPaths {
 				return &ttnpb.DownlinkPath{
@@ -372,7 +376,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		var lastDown *ttnpb.DownlinkMessage
 		var correlationIDs []string
 		if !a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlink124Ch,
-			func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool {
+			func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) bool {
 				correlationIDs = msg.CorrelationIDs
 				lastDown = &ttnpb.DownlinkMessage{
 					CorrelationIDs: correlationIDs,
@@ -407,7 +411,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 			},
 		}
 		if !a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlink3Ch,
-			func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool {
+			func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) bool {
+				_, a := test.MustNewTFromContext(ctx)
 				return a.So(msg, should.Resemble, lastDown)
 			},
 			grpc.EmptyCallOption{},
@@ -430,7 +435,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 			},
 		}
 		if !a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlink124Ch,
-			func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool {
+			func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) bool {
+				_, a := test.MustNewTFromContext(ctx)
 				return a.So(msg, should.Resemble, lastDown)
 			},
 			grpc.EmptyCallOption{},
@@ -2897,12 +2903,16 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					RecentUplinks: []*ttnpb.UplinkMessage{
-						MakeJoinRequest(
-							true,
-							LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
-							DefaultEU868Channels[0].UplinkFrequency,
-							RxMetadata[:]...,
-						),
+						MakeJoinRequest(JoinRequestConfig{
+							DecodePayload: true,
+							JoinEUI:       types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+							DevEUI:        types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRateIndex: customCh.MinDataRateIndex,
+							Frequency:     DefaultEU868Channels[0].UplinkFrequency,
+							RxMetadata:    RxMetadata[:],
+							ReceivedAt:    now.Add(-time.Second),
+						}),
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,

@@ -37,7 +37,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
-	"google.golang.org/grpc"
 )
 
 func TestHandleUplink(t *testing.T) {
@@ -169,9 +168,8 @@ func TestHandleUplink(t *testing.T) {
 	}
 
 	assertHandleUplinkResponse := func(ctx context.Context, handleUplinkErrCh <-chan error, expectedErr error) bool {
-		t := test.MustTFromContext(ctx)
+		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
-		a := assertions.New(t)
 		select {
 		case <-ctx.Done():
 			t.Error("Timed out while waiting for NetworkServer.HandleUplink to return")
@@ -182,18 +180,15 @@ func TestHandleUplink(t *testing.T) {
 		}
 	}
 	assertHandleUplink := func(ctx context.Context, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error, up *ttnpb.UplinkMessage, f func() bool, expectedErr error) bool {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
+		_, a := test.MustNewTFromContext(ctx)
 		errCh := handle(ctx, up)
-		return assertions.New(t).So(test.AllTrue(
+		return a.So(test.AllTrue(
 			f(),
 			assertHandleUplinkResponse(ctx, errCh, expectedErr),
 		), should.BeTrue)
 	}
 	assertDeduplicateUplink := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, expectedUp *ttnpb.UplinkMessage, ok bool, err error) bool {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		return AssertDeduplicateUplink(ctx, env.UplinkDeduplicator.DeduplicateUplink, func(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration) bool {
 			return test.AllTrue(
 				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
@@ -208,9 +203,7 @@ func TestHandleUplink(t *testing.T) {
 		)
 	}
 	assertAccumulatedMetadata := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, expectedUp *ttnpb.UplinkMessage, mds []*ttnpb.RxMetadata, err error) bool {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		return AssertAccumulatedMetadata(ctx, env.UplinkDeduplicator.AccumulatedMetadata, func(ctx context.Context, up *ttnpb.UplinkMessage) bool {
 			return test.AllTrue(
 				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
@@ -224,9 +217,7 @@ func TestHandleUplink(t *testing.T) {
 		)
 	}
 	assertDownlinkTaskAdd := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers, expectedStartAt time.Time, replace bool, err error) bool {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		return AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
 			return test.AllTrue(
 				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
@@ -238,10 +229,9 @@ func TestHandleUplink(t *testing.T) {
 			err,
 		)
 	}
+
 	assertInteropJoin := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) bool {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		return AssertInteropClientHandleJoinRequestRequest(ctx, env.InteropClient.HandleJoinRequest,
 			func(ctx context.Context, id types.NetID, req *ttnpb.JoinRequest) bool {
 				joinReq.DevAddr = req.DevAddr
@@ -261,38 +251,8 @@ func TestHandleUplink(t *testing.T) {
 			},
 		)
 	}
-	assertClusterLocalJoin := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) bool {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
-		return AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
-			func(ctx context.Context, ids ttnpb.Identifiers) bool {
-				return test.AllTrue(
-					a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
-					a.So(ids, should.Resemble, expectedIDs),
-				)
-			},
-			func(ctx context.Context, req *ttnpb.JoinRequest) bool {
-				joinReq.DevAddr = req.DevAddr
-				return test.AllTrue(
-					a.So(req, should.NotBeNil),
-					a.So(req.DevAddr, should.NotBeEmpty),
-					a.So(req.DevAddr.NwkID(), should.Resemble, NetID.ID()),
-					a.So(req.DevAddr.NetIDType(), should.Equal, NetID.Type()),
-					a.So(req, should.Resemble, joinReq),
-				)
-			},
-			&grpc.EmptyCallOption{},
-			NsJsHandleJoinResponse{
-				Response: joinResp,
-				Error:    err,
-			},
-		)
-	}
 	assertJoinGetByEUI := func(ctx context.Context, env LegacyTestEnvironment, upCIDs []string, getDevice *ttnpb.EndDevice, err error) (context.Context, bool) {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		var getCtx context.Context
 		return getCtx, AssertDeviceRegistryGetByEUI(ctx, env.DeviceRegistry.GetByEUI, func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) bool {
 			getCtx = ctx
@@ -320,9 +280,7 @@ func TestHandleUplink(t *testing.T) {
 			})
 	}
 	assertJoinSetByID := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, getDevice, setDevice *ttnpb.EndDevice, expectedErr error, err error) (context.Context, bool) {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		var setCtx context.Context
 		return setCtx, AssertDeviceRegistrySetByID(ctx, env.DeviceRegistry.SetByID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) bool {
 			setCtx = ctx
@@ -354,9 +312,7 @@ func TestHandleUplink(t *testing.T) {
 			})
 	}
 	assertJoinApplicationUp := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, setDevice *ttnpb.EndDevice, joinResp *ttnpb.JoinResponse, recvAt time.Time, err error) bool {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		return AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 			ids := *deepcopy.Copy(&setDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers)
 			ids.DevAddr = &setDevice.PendingMACState.QueuedJoinAccept.Request.DevAddr
@@ -385,9 +341,7 @@ func TestHandleUplink(t *testing.T) {
 		}, err)
 	}
 	assertJoinDeduplicateSequence := func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, dev *ttnpb.EndDevice, ok bool, err error) (context.Context, bool) {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		getCtx, getOk := assertJoinGetByEUI(ctx, env, msg.CorrelationIDs, dev, nil)
 		if !a.So(getOk, should.BeTrue) {
 			return nil, false
@@ -399,16 +353,14 @@ func TestHandleUplink(t *testing.T) {
 		return getCtx, assertDeduplicateUplink(ctx, env, getCtx, msg, ok, err)
 	}
 	assertJoinGetPeerSequence := func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, dev *ttnpb.EndDevice, peer cluster.Peer, err error) (context.Context, bool) {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		getCtx, ok := assertJoinDeduplicateSequence(ctx, env, clock, msg, chIdx, drIdx, dev, true, nil)
 		if !a.So(ok, should.BeTrue) {
 			return nil, false
 		}
-		return getCtx, test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+		return getCtx, test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 			return test.AllTrue(
-				a.So(ctx, should.HaveParentContextOrEqual, getCtx),
+				a.So(reqCtx, should.HaveParentContextOrEqual, getCtx),
 				a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER),
 				a.So(ids, should.Resemble, dev.EndDeviceIdentifiers),
 			)
@@ -420,20 +372,38 @@ func TestHandleUplink(t *testing.T) {
 		)
 	}
 	assertJoinClusterLocalSequence := func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, dev *ttnpb.EndDevice, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) (context.Context, bool) {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		getCtx, ok := assertJoinDeduplicateSequence(ctx, env, clock, msg, chIdx, drIdx, dev, true, nil)
 		if !a.So(ok, should.BeTrue) {
 			return nil, false
 		}
 		joinReq.CorrelationIDs = msg.CorrelationIDs
-		return getCtx, assertClusterLocalJoin(ctx, env, getCtx, dev.EndDeviceIdentifiers, joinReq, joinResp, err)
+		return getCtx, env.TestEnvironment.AssertNsJsJoin(
+			ctx,
+			func(ctx, reqCtx context.Context, ids ttnpb.Identifiers) bool {
+				_, a := test.MustNewTFromContext(ctx)
+				return test.AllTrue(
+					a.So(reqCtx, should.HaveParentContextOrEqual, getCtx),
+					a.So(ids, should.Resemble, dev.EndDeviceIdentifiers),
+				)
+			},
+			func(ctx, _ context.Context, req *ttnpb.JoinRequest) bool {
+				_, a := test.MustNewTFromContext(ctx)
+				joinReq.DevAddr = req.DevAddr
+				return test.AllTrue(
+					a.So(req, should.NotBeNil),
+					a.So(req.DevAddr, should.NotBeEmpty),
+					a.So(req.DevAddr.NwkID(), should.Resemble, NetID.ID()),
+					a.So(req.DevAddr.NetIDType(), should.Equal, NetID.Type()),
+					a.So(req, should.Resemble, joinReq),
+				)
+			},
+			joinResp,
+			err,
+		)
 	}
 	assertJoinInteropSequence := func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, peerNotFound bool, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, dev *ttnpb.EndDevice, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) (context.Context, bool) {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		var getCtx context.Context
 		var ok bool
 		if peerNotFound {
@@ -449,9 +419,7 @@ func TestHandleUplink(t *testing.T) {
 	}
 
 	assertDataRangeByAddr := func(ctx context.Context, env LegacyTestEnvironment, upCIDs []string, err error, getDevices ...*ttnpb.EndDevice) ([]context.Context, bool) {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		var rangeCtx context.Context
 		var fCtxs []context.Context
 		return fCtxs, AssertDeviceRegistryRangeByAddr(ctx, env.DeviceRegistry.RangeByAddr, func(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) bool {
@@ -481,9 +449,7 @@ func TestHandleUplink(t *testing.T) {
 		)
 	}
 	assertDataDeduplicateSequence := func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, devs []*ttnpb.EndDevice, idx int, ok bool, err error) (context.Context, bool) {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		rangeCtxs, rangeOk := assertDataRangeByAddr(ctx, env, msg.CorrelationIDs, nil, devs...)
 		if !a.So(rangeOk, should.BeTrue) || !a.So(len(rangeCtxs), should.BeGreaterThan, idx) {
 			return nil, false
@@ -496,9 +462,7 @@ func TestHandleUplink(t *testing.T) {
 		return rangeCtx, assertDeduplicateUplink(ctx, env, rangeCtx, msg, ok, err)
 	}
 	assertDataSetByID := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, getDevice, setDevice *ttnpb.EndDevice, expectedSets []string, expectedErr error, err error) (context.Context, bool) {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		var setCtx context.Context
 		return setCtx, AssertDeviceRegistrySetByID(ctx, env.DeviceRegistry.SetByID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) bool {
 			setCtx = ctx
@@ -526,9 +490,7 @@ func TestHandleUplink(t *testing.T) {
 			})
 	}
 	assertDataApplicationUp := func(ctx context.Context, env LegacyTestEnvironment, expectedCtx context.Context, setDevice *ttnpb.EndDevice, msg *ttnpb.UplinkMessage, err error) bool {
-		t := test.MustTFromContext(ctx)
-		t.Helper()
-		a := assertions.New(t)
+		_, a := test.MustNewTFromContext(ctx)
 		macPayload := msg.Payload.GetMACPayload()
 		return AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 			return test.AllTrue(
@@ -573,9 +535,7 @@ func TestHandleUplink(t *testing.T) {
 		{
 			Name: "No settings",
 			Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-				return a.So(test.AllTrue(
+				return assertions.New(test.MustTFromContext(ctx)).So(test.AllTrue(
 					assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{}), invalidUplinkSettingsErr),
 					assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
 						RawPayload: []byte("testpayload"),
@@ -612,7 +572,7 @@ func TestHandleUplink(t *testing.T) {
 					Handler: func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
 							RxMetadata: uplinkMDs,
-							Settings:   MakeUplinkSettings(dr, ch.Frequency),
+							Settings:   MakeUplinkSettings(dr, 0, ch.Frequency),
 						}), ErrDecodePayload.WithCause(lorawan.UnmarshalMessage(nil, nil))), should.BeTrue)
 					},
 				},
@@ -634,7 +594,7 @@ func TestHandleUplink(t *testing.T) {
 								0x03, 0x02, 0x01, 0x00,
 							},
 							RxMetadata: uplinkMDs,
-							Settings:   MakeUplinkSettings(dr, ch.Frequency),
+							Settings:   MakeUplinkSettings(dr, 0, ch.Frequency),
 						}), ErrUnsupportedLoRaWANVersion.WithAttributes("version", uint32(1))), should.BeTrue)
 					},
 				},
@@ -644,7 +604,7 @@ func TestHandleUplink(t *testing.T) {
 						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
 							RawPayload: bytes.Repeat([]byte{0x20}, 33),
 							RxMetadata: uplinkMDs,
-							Settings:   MakeUplinkSettings(dr, ch.Frequency),
+							Settings:   MakeUplinkSettings(dr, 0, ch.Frequency),
 						}), nil), should.BeTrue)
 					},
 				},
@@ -658,7 +618,7 @@ func TestHandleUplink(t *testing.T) {
 						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
 							RawPayload: phyPayload,
 							RxMetadata: uplinkMDs,
-							Settings:   MakeUplinkSettings(dr, ch.Frequency),
+							Settings:   MakeUplinkSettings(dr, 0, ch.Frequency),
 						}), ErrDecodePayload.WithCause(lorawan.UnmarshalMessage(phyPayload, &ttnpb.Message{}))), should.BeTrue)
 					},
 				},
@@ -698,10 +658,35 @@ func TestHandleUplink(t *testing.T) {
 			dr := phy.DataRates[drIdx].Rate
 
 			makeNsJsJoinRequest := func(devAddr *types.DevAddr, correlationIDs ...string) *ttnpb.JoinRequest {
-				return MakeNsJsJoinRequest(macVersion, phyVersion, fp, devAddr, ttnpb.RX_DELAY_3, 0, ttnpb.DATA_RATE_2, correlationIDs...)
+				return MakeNsJsJoinRequest(NsJsJoinRequestConfig{
+					JoinEUI: JoinEUI,
+					DevEUI:  DevEUI,
+					DevAddr: func() types.DevAddr {
+						if devAddr == nil {
+							return types.DevAddr{}
+						}
+						return *devAddr
+					}(),
+					SelectedMACVersion: macVersion,
+					NetID:              NetID,
+					RX2DataRateIndex:   ttnpb.DATA_RATE_2,
+					RXDelay:            ttnpb.RX_DELAY_3,
+					FrequencyPlanID:    fpID,
+					PHYVersion:         phyVersion,
+					CorrelationIDs:     correlationIDs,
+				})
 			}
 			makeJoinRequest := func(decodePayload bool) *ttnpb.UplinkMessage {
-				return MakeJoinRequest(decodePayload, dr, ch.Frequency, uplinkMDs...)
+				return MakeJoinRequest(JoinRequestConfig{
+					DecodePayload: decodePayload,
+					JoinEUI:       JoinEUI,
+					DevEUI:        DevEUI,
+					DataRate:      dr,
+					DataRateIndex: drIdx,
+					Frequency:     ch.Frequency,
+					ChannelIndex:  chIdx,
+					RxMetadata:    uplinkMDs,
+				})
 			}
 
 			makeJoinName := func(parts ...string) string {
@@ -1208,7 +1193,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 						RawPayload: phyPayload,
 						RxMetadata: uplinkMDs,
-						Settings:   MakeUplinkSettings(dr, ch.Frequency),
+						Settings:   MakeUplinkSettings(dr, 0, ch.Frequency),
 					}
 					if decodePayload {
 						var pld *ttnpb.RejoinRequestPayload

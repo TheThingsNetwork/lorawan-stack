@@ -121,7 +121,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				TestCase{
 					Name: makeName("Payload too short"),
 					Uplink: &ttnpb.UplinkMessage{
-						Settings: MakeUplinkSettings(dr, ch.Frequency),
+						Settings: MakeUplinkSettings(dr, 0, ch.Frequency),
 					},
 					MakeDevices: func(ctx context.Context) []contextualEndDevice {
 						return []contextualEndDevice{
@@ -254,7 +254,15 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							PendingMACState:      MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
 							PendingSession:       makeSession(0x00, 0x00),
 						}
-						dev.PendingMACState.PendingJoinRequest = MakeNsJsJoinRequest(macVersion, phyVersion, fp, &DevAddr, ttnpb.RX_DELAY_4, 1, ttnpb.DATA_RATE_3)
+						dev.PendingMACState.PendingJoinRequest = MakeNsJsJoinRequest(NsJsJoinRequestConfig{
+							SelectedMACVersion: DeviceDefaultLoRaWANVersion(dev),
+							PHYVersion:         phyVersion,
+							FrequencyPlanID:    dev.FrequencyPlanID,
+							DevAddr:            DevAddr,
+							RX1DataRateOffset:  1,
+							RX2DataRateIndex:   ttnpb.DATA_RATE_3,
+							RXDelay:            ttnpb.RX_DELAY_4,
+						})
 						return dev
 					}(),
 					Pending: true,
@@ -640,7 +648,15 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							PendingMACState:      MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
 							PendingSession:       makeSession(0x00, 0x00),
 						}
-						dev.PendingMACState.PendingJoinRequest = MakeNsJsJoinRequest(macVersion, phyVersion, fp, &DevAddr, ttnpb.RX_DELAY_4, 1, ttnpb.DATA_RATE_3)
+						dev.PendingMACState.PendingJoinRequest = MakeNsJsJoinRequest(NsJsJoinRequestConfig{
+							SelectedMACVersion: DeviceDefaultLoRaWANVersion(dev),
+							PHYVersion:         phyVersion,
+							FrequencyPlanID:    dev.FrequencyPlanID,
+							DevAddr:            DevAddr,
+							RX1DataRateOffset:  1,
+							RX2DataRateIndex:   ttnpb.DATA_RATE_3,
+							RXDelay:            ttnpb.RX_DELAY_4,
+						})
 						return dev
 					}(),
 					Error: errDeviceNotFound,
