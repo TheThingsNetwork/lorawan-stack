@@ -18,3 +18,6 @@ If the import was successful, your devices is added to the list of end-devices i
 {{< figure src="../successful-import.png" alt="successful-import" >}}
 
 You can now start using your devices with {{% tts %}}!
+
+>Note: Don't forget to manually copy-paste the payload formatters (if applicable) from your {{% ttnv2 %}} to your {{% tts %}} application. [Click here]({{% ref "integrations/payload-formatters" %}}) for instructions on Payload Formatters in {{% tts %}}.
+
