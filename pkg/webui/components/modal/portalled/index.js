@@ -28,27 +28,18 @@ import Modal from '..'
  *
  * @returns {object} - The modal rendered into a portal.
  */
-const PortalledModal = function({ modal, visible, ...rest }) {
-  if (!modal) {
-    return null
-  }
-
-  const props = { ...rest, ...modal }
-
-  return DOM.createPortal(
-    visible && <Modal {...props} />,
-    document.getElementById('modal-container'),
-  )
-}
+const PortalledModal = ({ visible, ...modalProps }) =>
+  DOM.createPortal(visible && <Modal {...modalProps} />, document.getElementById('modal-container'))
 
 PortalledModal.Modal = Modal
 
 PortalledModal.propTypes = {
-  modal: PropTypes.shape({ ...Modal.propTypes }),
+  ...Modal.propTypes,
   visible: PropTypes.bool,
 }
 
 PortalledModal.defaultProps = {
+  ...Modal.defaultProps,
   visible: false,
 }
 
