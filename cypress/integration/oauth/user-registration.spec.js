@@ -27,9 +27,6 @@ describe('OAuth user registration', () => {
     cy.findByLabelText('Confirm password').should('be.visible')
     cy.findByRole('button', { name: 'Register' }).should('be.visible')
     cy.findByRole('button', { name: 'Cancel' }).should('be.visible')
-    cy.title().then(({ title, config }) => {
-      expect(title).to.eq(`Register - ${config.siteName}`)
-    })
   })
 
   it('validates before submitting an empty form', () => {

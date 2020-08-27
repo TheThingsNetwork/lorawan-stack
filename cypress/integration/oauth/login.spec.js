@@ -32,9 +32,6 @@ describe('OAuth login', () => {
     cy.findByRole('button', { name: 'Forgot password?' }).should('be.visible')
     cy.findByLabelText('User ID').should('be.visible')
     cy.findByLabelText('Password').should('be.visible')
-    cy.title().then(({ title, config }) => {
-      expect(title).to.eq(`Login - ${config.siteName}`)
-    })
   })
 
   it('validates before submitting an empty form', () => {
