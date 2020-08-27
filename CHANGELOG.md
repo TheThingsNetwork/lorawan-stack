@@ -10,12 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add `the-things-stack` device template converter, enabled by default. Effectively, this allows importing end devices from the Console.
+- Support for binary decoding downlink messages previously encoded with Javascript or CayenneLPP.
 
 ### Changed
 
 - Scheduling failure events are now emitted on unsuccessful scheduling attempts.
+- Default Javascript function signatures to `encodeDownlink()`, `decodeUplink()` and `decodeDownlink()`.
 
 ### Deprecated
+
+- Previous Javascript function signatures `Decoder()` and `Encoder()`, although they remain functional until further notice.
 
 ### Removed
 

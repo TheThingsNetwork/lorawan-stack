@@ -2169,14 +2169,16 @@
       "http": []
     }
   },
-  "DownlinkMessageProcessor": {
-    "Process": {
+  "MessageProcessor": {
+    "EncodeDownlink": {
       "file": "lorawan-stack/api/message_services.proto",
       "http": []
-    }
-  },
-  "UplinkMessageProcessor": {
-    "Process": {
+    },
+    "DecodeUplink": {
+      "file": "lorawan-stack/api/message_services.proto",
+      "http": []
+    },
+    "DecodeDownlink": {
       "file": "lorawan-stack/api/message_services.proto",
       "http": []
     }

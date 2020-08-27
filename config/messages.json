@@ -2195,15 +2195,6 @@
       "file": "payload.go"
     }
   },
-  "error:pkg/applicationserver:no_version": {
-    "translations": {
-      "en": "no end device version"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "payload.go"
-    }
-  },
   "error:pkg/applicationserver:not_linked": {
     "translations": {
       "en": "not linked to `{application_uid}`"
@@ -2229,15 +2220,6 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "applicationserver.go"
-    }
-  },
-  "error:pkg/applicationserver:version_unavailable": {
-    "translations": {
-      "en": "end device version is unavailable in the repository"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "payload.go"
     }
   },
   "error:pkg/applicationserver:webhooks_registry": {
@@ -2904,33 +2886,6 @@
     "description": {
       "package": "pkg/crypto",
       "file": "errors.go"
-    }
-  },
-  "error:pkg/devicerepository:fetch": {
-    "translations": {
-      "en": "failed to fetch file `{filename}`"
-    },
-    "description": {
-      "package": "pkg/devicerepository",
-      "file": "devicerepository.go"
-    }
-  },
-  "error:pkg/devicerepository:invalid_payload_formatter": {
-    "translations": {
-      "en": "invalid payload formatter `{formatter}`"
-    },
-    "description": {
-      "package": "pkg/devicerepository",
-      "file": "devicerepository.go"
-    }
-  },
-  "error:pkg/devicerepository:parse": {
-    "translations": {
-      "en": "parse failed"
-    },
-    "description": {
-      "package": "pkg/devicerepository",
-      "file": "devicerepository.go"
     }
   },
   "error:pkg/devicetemplateconverter:converter": {
@@ -5543,18 +5498,9 @@
       "file": "javascript.go"
     }
   },
-  "error:pkg/messageprocessors/javascript:output_range": {
+  "error:pkg/messageprocessors/javascript:output_errors": {
     "translations": {
-      "en": "output value `{value}` does not fall between `{low}` and `{high}`"
-    },
-    "description": {
-      "package": "pkg/messageprocessors/javascript",
-      "file": "javascript.go"
-    }
-  },
-  "error:pkg/messageprocessors/javascript:output_type": {
-    "translations": {
-      "en": "invalid output of type `{type}`"
+      "en": "{errors}"
     },
     "description": {
       "package": "pkg/messageprocessors/javascript",
@@ -6641,9 +6587,54 @@
       "file": "rpcserver.go"
     }
   },
+  "error:pkg/scripting/javascript:entrypoint_not_found": {
+    "translations": {
+      "en": "entrypoint `{entrypoint}` not found"
+    },
+    "description": {
+      "package": "pkg/scripting/javascript",
+      "file": "javascript.go"
+    }
+  },
+  "error:pkg/scripting/javascript:no_script_output": {
+    "translations": {
+      "en": "no script output"
+    },
+    "description": {
+      "package": "pkg/scripting/javascript",
+      "file": "javascript.go"
+    }
+  },
   "error:pkg/scripting/javascript:runtime": {
     "translations": {
       "en": "runtime error"
+    },
+    "description": {
+      "package": "pkg/scripting/javascript",
+      "file": "javascript.go"
+    }
+  },
+  "error:pkg/scripting/javascript:script": {
+    "translations": {
+      "en": "{message}"
+    },
+    "description": {
+      "package": "pkg/scripting/javascript",
+      "file": "javascript.go"
+    }
+  },
+  "error:pkg/scripting/javascript:script_interrupt": {
+    "translations": {
+      "en": "script interrupt"
+    },
+    "description": {
+      "package": "pkg/scripting/javascript",
+      "file": "javascript.go"
+    }
+  },
+  "error:pkg/scripting/javascript:script_timeout": {
+    "translations": {
+      "en": "script timeout"
     },
     "description": {
       "package": "pkg/scripting/javascript",
@@ -7271,9 +7262,45 @@
       "file": "observability.go"
     }
   },
+  "event:as.down.data.decode.fail": {
+    "translations": {
+      "en": "decode downlink data message failure"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.down.data.decode.warning": {
+    "translations": {
+      "en": "decode downlink data message warning"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
   "event:as.down.data.drop": {
     "translations": {
       "en": "drop downlink data message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.down.data.encode.fail": {
+    "translations": {
+      "en": "encode downlink data message failure"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.down.data.encode.warning": {
+    "translations": {
+      "en": "encode downlink data message warning"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -7418,6 +7445,15 @@
   "event:as.up.data.decode.fail": {
     "translations": {
       "en": "decode uplink data message failure"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.data.decode.warning": {
+    "translations": {
+      "en": "decode uplink data message warning"
     },
     "description": {
       "package": "pkg/applicationserver",

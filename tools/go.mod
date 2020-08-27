@@ -39,6 +39,5 @@ require (
 	github.com/mgechev/revive v1.0.2
 	go.thethings.network/lorawan-stack/v3 v3.0.0-00010101000000-000000000000
 	golang.org/x/tools v0.0.0-20200710042808-f1c4188a97a1
-	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v2 v2.3.0
 )

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,12 +41,6 @@ func TestEncode(t *testing.T) {
 		DeviceID: "foo-device",
 		DevEUI:   &eui,
 	}
-	version := &ttnpb.EndDeviceVersionIdentifiers{
-		BrandID:         "The Things Products",
-		ModelID:         "The Things Uno",
-		HardwareVersion: "1.0",
-		FirmwareVersion: "1.0.0",
-	}
 
 	// Happy flow.
 	{
@@ -62,9 +56,16 @@ func TestEncode(t *testing.T) {
 			},
 		}
 
-		err := host.Encode(ctx, ids, version, message, "")
+		err := host.EncodeDownlink(ctx, ids, nil, message, "")
 		a.So(err, should.BeNil)
 		a.So(message.FRMPayload, should.Resemble, []byte{2, 236, 69})
+
+		message.DecodedPayload = nil
+		err = host.DecodeDownlink(ctx, ids, nil, message, "")
+		a.So(err, should.BeNil)
+		m, err := gogoproto.Map(message.DecodedPayload)
+		a.So(err, should.BeNil)
+		a.So(m["value_2"], should.AlmostEqual, -50.51, 0.01)
 	}
 
 	// Test resilience against custom fields from the user. Should be fine.
@@ -104,7 +105,7 @@ func TestEncode(t *testing.T) {
 			},
 		}
 
-		err := host.Encode(ctx, ids, version, message, "")
+		err := host.EncodeDownlink(ctx, ids, nil, message, "")
 		a.So(err, should.BeNil)
 		a.So(message.FRMPayload, should.BeEmpty)
 	}
@@ -124,12 +125,6 @@ func TestDecode(t *testing.T) {
 		DeviceID: "foo-device",
 		DevEUI:   &eui,
 	}
-	version := &ttnpb.EndDeviceVersionIdentifiers{
-		BrandID:         "The Things Products",
-		ModelID:         "The Things Uno",
-		HardwareVersion: "1.0",
-		FirmwareVersion: "1.0.0",
-	}
 
 	message := &ttnpb.ApplicationUplink{
 		FRMPayload: []byte{
@@ -148,7 +143,7 @@ func TestDecode(t *testing.T) {
 		},
 	}
 
-	err := host.Decode(ctx, ids, version, message, "")
+	err := host.DecodeUplink(ctx, ids, nil, message, "")
 	a.So(err, should.BeNil)
 	m, err := gogoproto.Map(message.DecodedPayload)
 	a.So(err, should.BeNil)
