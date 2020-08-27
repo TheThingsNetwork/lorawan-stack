@@ -3,18 +3,16 @@ title: Import End Devices in The Things Stack
 weight: 50
 ---
 
-{{< cli-only >}}
+## Create a New Application on {{% tts %}}
 
-To import your devices to the application you [created]({{% relref "create-application" %}}), use the `devices.json` file you created in the previous step with `ttn-lw-cli`:
+Create a new application on {{% tts %}} where the end devices will be imported. This can be done from by following instructions for [Adding Applications]({{< ref "integrations/adding-applications" >}}).
 
-```bash
-$ ttn-lw-cli end-devices create --application-id "imported-application" < devices.json
-```
+> **NOTE**: In {{% tts %}}, applications do not have an `AppEUI`, the `AppEUI` is configured per-device.
 
-This will import your devices on {{% tts %}}. In case any device fails, you see a relevant error message at the end of the output.
+## Import Devices
 
-If the import was successful, your devices is added to the list of end-devices in your application.
+To import your devices to the application you created, use the `devices.json` file you exported using the V2 CLI.
 
-{{< figure src="../successful-import.png" alt="successful-import" >}}
+The devices.json file can be imported using the **Console** or the **CLI**. 
 
-You can now start using your devices with {{% tts %}}!
+Follow the instructions for [Importing Devices]({{< ref "getting-started/migrating-from-networks/import-devices" >}}) to add your devices to The Things Stack.

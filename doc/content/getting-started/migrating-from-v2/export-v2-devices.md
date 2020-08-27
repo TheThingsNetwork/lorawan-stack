@@ -1,6 +1,6 @@
 ---
-title: Export End Devices From V2
-weight: 40
+title: Export End Devices from V2
+weight: 20
 ---
 
 In this step, the end devices from {{% ttnv2 %}} will be exported in a JSON format that can then be parsed and imported by {{% tts %}}.

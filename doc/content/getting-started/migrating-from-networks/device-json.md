@@ -1,5 +1,5 @@
 ---
-title: "Create Device.json"
+title: "Create JSON file to be imported"
 description: ""
 weight: 10
 ---
