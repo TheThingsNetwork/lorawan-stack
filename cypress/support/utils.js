@@ -67,32 +67,10 @@ const disableGatewayServer = config => {
   })
 }
 
-/**
- * Returns the site title.
- *
- * @param {object} config - The stack configuration object.
- * @returns {string} - The site title.
- */
-const getSiteTitle = config => {
-  return config.SITE_TITLE
-}
-
-/**
- * Returns the site name.
- *
- * @param {object} config - The stack configuration object.
- * @returns {string} - The site name.
- */
-const getSiteName = config => {
-  return config.SITE_NAME
-}
-
 export {
   disableIdentityServer,
   disableNetworkServer,
   disableApplicationServer,
   disableJoinServer,
   disableGatewayServer,
-  getSiteName,
-  getSiteTitle,
 }

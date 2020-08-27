@@ -34,10 +34,6 @@ describe('OAuth change password', () => {
       .and('be.visible')
     cy.findByRole('button', { name: 'Change password' }).should('be.visible')
     cy.findByRole('button', { name: 'Cancel' }).should('be.visible')
-
-    cy.title().then(({ title, config }) => {
-      expect(title).to.eq(`Change password - ${config.siteName}`)
-    })
   })
 
   it('validates before submitting an empty form', () => {
