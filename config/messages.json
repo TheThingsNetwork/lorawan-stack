@@ -4445,6 +4445,15 @@
       "file": "store.go"
     }
   },
+  "error:pkg/identityserver/store:validation_already_exists": {
+    "translations": {
+      "en": "contact info validation already exists"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "contact_info_store.go"
+    }
+  },
   "error:pkg/identityserver/store:validation_token": {
     "translations": {
       "en": "validation token not found"
