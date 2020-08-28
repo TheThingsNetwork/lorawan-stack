@@ -513,6 +513,7 @@
   "lib.shared-messages.fNwkSIntKey": "XXxxXXxxXxx",
   "lib.shared-messages.fNwkSIntKeyDescription": "Xxxxxxxxxx xxxxxxx xxxxxxx xxxxxxxxx xxx",
   "lib.shared-messages.frequencyPlan": "Xxxxxxxxx xxxx",
+  "lib.shared-messages.gateway": "Xxxxxxx",
   "lib.shared-messages.gatewayDescription": "Xxxxxxx xxxxxxxxxxx",
   "lib.shared-messages.gatewayEUI": "Xxxxxxx XXX",
   "lib.shared-messages.gatewayID": "Xxxxxxx XX",

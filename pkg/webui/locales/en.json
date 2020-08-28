@@ -513,6 +513,7 @@
   "lib.shared-messages.fNwkSIntKey": "FNwkSIntKey",
   "lib.shared-messages.fNwkSIntKeyDescription": "Forwarding network session integrity key",
   "lib.shared-messages.frequencyPlan": "Frequency plan",
+  "lib.shared-messages.gateway": "Gateway",
   "lib.shared-messages.gatewayDescription": "Gateway description",
   "lib.shared-messages.gatewayEUI": "Gateway EUI",
   "lib.shared-messages.gatewayID": "Gateway ID",
