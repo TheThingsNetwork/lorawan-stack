@@ -23,6 +23,7 @@ import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import PortalledModal from '@ttn-lw/components/modal/portalled'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -46,14 +47,20 @@ const pathExpand = (url, fields) =>
 export default class WebhookTemplateForm extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
+    existCheck: PropTypes.string.isRequired,
     onSubmit: PropTypes.func.isRequired,
     onSubmitSuccess: PropTypes.func.isRequired,
     templateId: PropTypes.string.isRequired,
     webhookTemplate: PropTypes.webhookTemplate.isRequired,
   }
 
+  modalResolve = () => null
+  modalReject = () => null
+
   state = {
-    error: '',
+    error: undefined,
+    displayOverwriteModal: false,
+    existingId: undefined,
   }
 
   @bind
@@ -100,11 +107,22 @@ export default class WebhookTemplateForm extends Component {
 
   @bind
   async handleSubmit(values, { setSubmitting, resetForm }) {
-    const { onSubmit, onSubmitSuccess } = this.props
+    const { onSubmit, onSubmitSuccess, existCheck } = this.props
 
     await this.setState({ error: '' })
     try {
       const webhook = await this.convertTemplateToWebhook(values)
+
+      const webhookId = webhook.ids.webhook_id
+      const exists = await existCheck(webhookId)
+      if (exists) {
+        this.setState({ displayOverwriteModal: true, existingId: webhookId })
+        await new Promise((resolve, reject) => {
+          this.modalResolve = resolve
+          this.modalReject = reject
+        })
+      }
+
       const result = await onSubmit(webhook)
       resetForm({ values })
       onSubmitSuccess(result)
@@ -114,10 +132,20 @@ export default class WebhookTemplateForm extends Component {
     }
   }
 
+  @bind
+  handleReplaceModalDecision(mayReplace) {
+    if (mayReplace) {
+      this.modalResolve()
+    } else {
+      this.modalReject()
+    }
+    this.setState({ displayOverwriteModal: false })
+  }
+
   render() {
     const { templateId, webhookTemplate } = this.props
     const { name, fields } = webhookTemplate
-    const { error } = this.state
+    const { error, displayOverwriteModal, existingId } = this.state
     const validationSchema = Yup.object({
       ...fields.reduce(
         (acc, field) => ({
@@ -139,6 +167,17 @@ export default class WebhookTemplateForm extends Component {
     })
     return (
       <div>
+        <PortalledModal
+          title={sharedMessages.idAlreadyExists}
+          message={{
+            ...sharedMessages.webhookAlreadyExistsModalMessage,
+            values: { id: existingId },
+          }}
+          buttonMessage={sharedMessages.replaceWebhook}
+          onComplete={this.handleReplaceModalDecision}
+          approval
+          visible={displayOverwriteModal}
+        />
         <WebhookTemplateInfo webhookTemplate={webhookTemplate} />
         <Form
           onSubmit={this.handleSubmit}

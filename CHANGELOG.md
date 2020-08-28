@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - CLI login issues when OAuth Server Address explicitly includes the `:443` HTTPS port.
 - Documentation link for LoRa Cloud Device & Application Services in the Lora Cloud integration view in the Console.
+- Webhooks and Pub/Subs forms in the Console will now let users choose whether they want to overwrite an existing record when the ID already exists (as opposed to overwriting by default).
 
 ### Security
 

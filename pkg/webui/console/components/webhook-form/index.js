@@ -23,6 +23,7 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import Notification from '@ttn-lw/components/notification'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import ModalButton from '@ttn-lw/components/button/modal-button'
+import PortalledModal from '@ttn-lw/components/modal/portalled'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -81,6 +82,7 @@ const validationSchema = Yup.object().shape({
 export default class WebhookForm extends Component {
   static propTypes = {
     appId: PropTypes.string,
+    existCheck: PropTypes.func,
     initialWebhookValue: PropTypes.shape({
       ids: PropTypes.shape({
         webhook_id: PropTypes.string,
@@ -104,22 +106,38 @@ export default class WebhookForm extends Component {
     onDeleteSuccess: () => null,
     onDelete: () => null,
     webhookTemplate: undefined,
+    existCheck: () => false,
   }
 
   form = React.createRef()
+  modalResolve = () => null
+  modalReject = () => null
 
   state = {
-    error: '',
+    error: undefined,
+    displayOverwriteModal: false,
+    existingId: undefined,
   }
 
   @bind
   async handleSubmit(values, { setSubmitting, resetForm }) {
-    const { appId, onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
+    const { appId, onSubmit, onSubmitSuccess, onSubmitFailure, existCheck, update } = this.props
     const webhook = mapFormValuesToWebhook(values, appId)
 
     await this.setState({ error: '' })
 
     try {
+      if (!update) {
+        const webhookId = webhook.ids.webhook_id
+        const exists = await existCheck(webhookId)
+        if (exists) {
+          this.setState({ displayOverwriteModal: true, existingId: webhookId })
+          await new Promise((resolve, reject) => {
+            this.modalResolve = resolve
+            this.modalReject = reject
+          })
+        }
+      }
       const result = await onSubmit(webhook)
 
       resetForm({ values })
@@ -145,9 +163,19 @@ export default class WebhookForm extends Component {
     }
   }
 
+  @bind
+  handleReplaceModalDecision(mayReplace) {
+    if (mayReplace) {
+      this.modalResolve()
+    } else {
+      this.modalReject()
+    }
+    this.setState({ displayOverwriteModal: false })
+  }
+
   render() {
     const { update, initialWebhookValue, webhookTemplate } = this.props
-    const { error } = this.state
+    const { error, displayOverwriteModal, existingId } = this.state
     let initialValues = blankValues
     if (update && initialWebhookValue) {
       initialValues = mapWebhookToFormValues(initialWebhookValue)
@@ -155,6 +183,17 @@ export default class WebhookForm extends Component {
 
     return (
       <>
+        <PortalledModal
+          title={sharedMessages.idAlreadyExists}
+          message={{
+            ...sharedMessages.webhookAlreadyExistsModalMessage,
+            values: { id: existingId },
+          }}
+          buttonMessage={sharedMessages.replaceWebhook}
+          onComplete={this.handleReplaceModalDecision}
+          approval
+          visible={displayOverwriteModal}
+        />
         {Boolean(webhookTemplate) && <WebhookTemplateInfo webhookTemplate={webhookTemplate} />}
         <Form
           onSubmit={this.handleSubmit}
