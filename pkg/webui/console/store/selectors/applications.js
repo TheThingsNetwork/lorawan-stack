@@ -16,6 +16,7 @@ import {
   GET_APPS_LIST_BASE,
   GET_APPS_RIGHTS_LIST_BASE,
   GET_APP_BASE,
+  GET_APP_DEV_COUNT_BASE,
 } from '@console/store/actions/applications'
 import { GET_APP_LINK_BASE } from '@console/store/actions/link'
 
@@ -48,6 +49,8 @@ export const selectApplicationFetching = createFetchingSelector(GET_APP_BASE)
 export const selectApplicationError = createErrorSelector(GET_APP_BASE)
 export const selectApplicationDeviceCount = state =>
   selectApplicationStore(state).applicationDeviceCount
+export const selectApplicationDevicesFetching = createFetchingSelector(GET_APP_DEV_COUNT_BASE)
+export const selectApplicationDevicesError = createErrorSelector(GET_APP_DEV_COUNT_BASE)
 
 // Applications.
 const selectAppsIds = createPaginationIdsSelectorByEntity(ENTITY)
@@ -101,17 +104,24 @@ export const selectApplicationIsLinked = function(state) {
 // Composite.
 export const selectApplicationLastSeen = state => {
   const deviceDerived = selectDeviceDerivedStore(state)
-  const link = selectApplicationLinkStats(state)
+  const linkStats = selectApplicationLinkStats(state)
   const appId = selectSelectedApplicationId(state)
-  let lastSeen = link && link.last_up_received_at ? link.last_up_received_at : undefined
+  const {
+    last_up_received_at: lastUplinkSeenAt = null,
+    last_downlink_forwarded_at: lastDownlinkSeenAt = null,
+  } = linkStats || {}
+
+  let lastSeen =
+    Boolean(lastUplinkSeenAt) || Boolean(lastDownlinkSeenAt)
+      ? Math.max(new Date(lastUplinkSeenAt), new Date(lastDownlinkSeenAt))
+      : new Date(null)
+
   for (const device in deviceDerived) {
-    if (
-      device.startsWith(appId) &&
-      ((!lastSeen && deviceDerived[device].lastSeen) ||
-        (lastSeen && deviceDerived[device].lastSeen && lastSeen < deviceDerived[device].lastSeen))
-    ) {
-      lastSeen = deviceDerived[device].lastSeen
+    const derived = deviceDerived[device]
+    if (device.startsWith(appId) && derived.lastSeen) {
+      lastSeen = Math.max(new Date(derived.lastSeen), lastSeen)
     }
   }
-  return lastSeen
+
+  return lastSeen > new Date(null) ? new Date(lastSeen).toISOString() : undefined
 }
