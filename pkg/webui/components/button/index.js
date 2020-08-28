@@ -95,14 +95,24 @@ class Button extends React.PureComponent {
   }
 
   render() {
-    const { autoFocus, disabled, name, type, value, title: rawTitle, intl, busy } = this.props
+    const {
+      autoFocus,
+      disabled,
+      name,
+      type,
+      value,
+      title: rawTitle,
+      intl,
+      busy,
+      onBlur,
+    } = this.props
 
     let title = rawTitle
     if (typeof rawTitle === 'object' && rawTitle.id && rawTitle.defaultMessage) {
       title = intl.formatMessage(title)
     }
 
-    const htmlProps = { autoFocus, name, type, value, title }
+    const htmlProps = { autoFocus, name, type, value, title, onBlur }
     const buttonClassNames = assembleClassnames(this.props)
     return (
       <button
@@ -118,6 +128,7 @@ class Button extends React.PureComponent {
 
 Button.defaultProps = {
   onClick: () => null,
+  onBlur: undefined,
 }
 
 Button.Link = function(props) {
@@ -242,6 +253,7 @@ Button.propTypes = {
    * Not called if the button is in the `busy` or `disabled` state.
    */
   onClick: PropTypes.func,
+  onBlur: PropTypes.func,
   ...commonPropTypes,
 }
 
