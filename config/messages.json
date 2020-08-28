@@ -4679,6 +4679,15 @@
       "file": "invitation_registry.go"
     }
   },
+  "error:pkg/identityserver:no_validation_needed": {
+    "translations": {
+      "en": "no validation needed for this contact info"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "contact_info_registry.go"
+    }
+  },
   "error:pkg/identityserver:oauth_client_rejected": {
     "translations": {
       "en": "OAuth client was rejected"
@@ -4875,6 +4884,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:validations_already_sent": {
+    "translations": {
+      "en": "validations for this contact info already sent"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "contact_info_registry.go"
     }
   },
   "error:pkg/interop:activation": {
