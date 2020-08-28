@@ -26,7 +26,6 @@ import (
 	"github.com/oklog/ulid/v2"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
-	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -36,7 +35,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
-	"google.golang.org/grpc"
 )
 
 // handleDownlinkTaskQueueTest runs a test suite on q.
@@ -290,170 +288,84 @@ func TestProcessDownlinkTask(t *testing.T) {
 		return params
 	}
 
-	assertGetGatewayPeers := func(ctx context.Context, getPeerCh <-chan test.ClusterGetPeerRequest, peer124, peer3 cluster.Peer) bool {
-		return test.AssertClusterGetPeerRequestSequence(ctx, getPeerCh,
-			[]test.ClusterGetPeerResponse{
-				{Error: errors.New("peer not found")},
-				{Peer: peer124},
-				{Peer: peer124},
-				{Peer: peer3},
-				{Peer: peer124},
-			},
-			func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-				_, a := test.MustNewTFromContext(ctx)
-				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
-					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
-						GatewayID: "gateway-test-0",
-					})
-			},
-			func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-				_, a := test.MustNewTFromContext(ctx)
-				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
-					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
-						GatewayID: "gateway-test-1",
-					})
-			},
-			func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-				_, a := test.MustNewTFromContext(ctx)
-				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
-					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
-						GatewayID: "gateway-test-2",
-					})
-			},
-			func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-				_, a := test.MustNewTFromContext(ctx)
-				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
-					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
-						GatewayID: "gateway-test-3",
-					})
-			},
-			func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-				_, a := test.MustNewTFromContext(ctx)
-				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
-					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
-						GatewayID: "gateway-test-4",
-					})
-			},
-		)
-	}
-
-	assertScheduleGateways := func(ctx context.Context, authCh <-chan test.ClusterAuthRequest, scheduleDownlink124Ch, scheduleDownlink3Ch <-chan NsGsScheduleDownlinkRequest, payload []byte, makeTxRequest func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest, fixedPaths bool, resps ...NsGsScheduleDownlinkResponse) (*ttnpb.DownlinkMessage, bool) {
+	assertScheduleGateways := func(ctx context.Context, env TestEnvironment, fixedPaths bool, payload []byte, makeTxRequest func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest, resps ...NsGsScheduleDownlinkResponse) (*ttnpb.DownlinkMessage, bool) {
 		if len(resps) < 1 || len(resps) > 3 {
 			panic("invalid response count specified")
 		}
 
-		t, a := test.MustNewTFromContext(ctx)
-		t.Helper()
+		_, a := test.MustNewTFromContext(ctx)
 
-		makePath := func(i int) *ttnpb.DownlinkPath {
-			if fixedPaths {
-				return &ttnpb.DownlinkPath{
-					Path: &ttnpb.DownlinkPath_Fixed{
-						Fixed: &GatewayAntennaIdentifiers[i],
+		var downlinkPaths []DownlinkPath
+		if !fixedPaths {
+			downlinkPaths = DownlinkPathsFromMetadata(RxMetadata[:]...)
+		} else {
+			for i, ids := range GatewayAntennaIdentifiers {
+				downlinkPaths = append(downlinkPaths, DownlinkPath{
+					GatewayIdentifiers: &ids.GatewayIdentifiers,
+					DownlinkPath: &ttnpb.DownlinkPath{
+						Path: &ttnpb.DownlinkPath_Fixed{
+							Fixed: &GatewayAntennaIdentifiers[i],
+						},
 					},
-				}
-			}
-			return &ttnpb.DownlinkPath{
-				Path: &ttnpb.DownlinkPath_UplinkToken{
-					UplinkToken: func() *ttnpb.RxMetadata {
-						switch i {
-						case 1:
-							return RxMetadata[0]
-						case 2:
-							return RxMetadata[4]
-						case 3:
-							return RxMetadata[1]
-						case 4:
-							return RxMetadata[5]
-						default:
-							panic(fmt.Sprintf("Invalid index requested: %d", i))
-						}
-					}().UplinkToken,
-				},
+				})
 			}
 		}
 
 		var lastDown *ttnpb.DownlinkMessage
-		var correlationIDs []string
-		if !a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlink124Ch,
-			func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) bool {
-				correlationIDs = msg.CorrelationIDs
-				lastDown = &ttnpb.DownlinkMessage{
-					CorrelationIDs: correlationIDs,
-					RawPayload:     payload,
-					Settings: &ttnpb.DownlinkMessage_Request{
-						Request: makeTxRequest(
-							makePath(1),
-							makePath(2),
-						),
-					},
-				}
-				return a.So(msg, should.Resemble, lastDown)
-			},
-			grpc.EmptyCallOption{},
-			resps[0],
-		), should.BeTrue) {
-			t.Error("Downlink assertion failed for gateways 1 and 2")
-			return nil, false
-		}
-		t.Logf("Downlink correlation IDs: %v", correlationIDs)
-		if len(resps) == 1 {
-			return lastDown, true
-		}
-
-		lastDown = &ttnpb.DownlinkMessage{
-			CorrelationIDs: correlationIDs,
-			RawPayload:     payload,
-			Settings: &ttnpb.DownlinkMessage_Request{
-				Request: makeTxRequest(
-					makePath(3),
-				),
-			},
-		}
-		if !a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlink3Ch,
-			func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) bool {
+		return lastDown, a.So(env.AssertScheduleDownlink(
+			ctx,
+			MakeDownlinkPathsWithPeerIndex(downlinkPaths, 0, 1, 1, 2, 1),
+			func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool) {
 				_, a := test.MustNewTFromContext(ctx)
-				return a.So(msg, should.Resemble, lastDown)
+				return resps[0], test.AllTrue(
+					a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
+					a.So(msg.CorrelationIDs, should.NotBeEmpty),
+					a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+						CorrelationIDs: msg.CorrelationIDs,
+						RawPayload:     payload,
+						Settings: &ttnpb.DownlinkMessage_Request{
+							Request: makeTxRequest(
+								downlinkPaths[1].DownlinkPath,
+								downlinkPaths[2].DownlinkPath,
+							),
+						},
+					}),
+				)
 			},
-			grpc.EmptyCallOption{},
-			resps[1],
-		), should.BeTrue) {
-			t.Error("Downlink assertion failed for gateway 3")
-			return nil, false
-		}
-		if len(resps) == 2 {
-			return lastDown, true
-		}
-
-		lastDown = &ttnpb.DownlinkMessage{
-			CorrelationIDs: correlationIDs,
-			RawPayload:     payload,
-			Settings: &ttnpb.DownlinkMessage_Request{
-				Request: makeTxRequest(
-					makePath(4),
-				),
-			},
-		}
-		if !a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlink124Ch,
-			func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) bool {
+			func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool) {
 				_, a := test.MustNewTFromContext(ctx)
-				return a.So(msg, should.Resemble, lastDown)
+				return resps[1], test.AllTrue(
+					a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
+					a.So(msg.CorrelationIDs, should.NotBeEmpty),
+					a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+						CorrelationIDs: msg.CorrelationIDs,
+						RawPayload:     payload,
+						Settings: &ttnpb.DownlinkMessage_Request{
+							Request: makeTxRequest(
+								downlinkPaths[3].DownlinkPath,
+							),
+						},
+					}),
+				)
 			},
-			grpc.EmptyCallOption{},
-			resps[2],
-		), should.BeTrue) {
-			t.Error("Downlink assertion failed for gateway 4")
-			return nil, false
-		}
-		return lastDown, true
-	}
-
-	assertScheduleRxMetadataGateways := func(ctx context.Context, authCh <-chan test.ClusterAuthRequest, scheduleDownlink124Ch, scheduleDownlink3Ch <-chan NsGsScheduleDownlinkRequest, payload []byte, makeTxRequest func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest, resps ...NsGsScheduleDownlinkResponse) (*ttnpb.DownlinkMessage, bool) {
-		return assertScheduleGateways(ctx, authCh, scheduleDownlink124Ch, scheduleDownlink3Ch, payload, makeTxRequest, false, resps...)
-	}
-
-	assertScheduleClassBCGateways := func(ctx context.Context, authCh <-chan test.ClusterAuthRequest, scheduleDownlink124Ch, scheduleDownlink3Ch <-chan NsGsScheduleDownlinkRequest, payload []byte, makeTxRequest func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest, resps ...NsGsScheduleDownlinkResponse) (*ttnpb.DownlinkMessage, bool) {
-		return assertScheduleGateways(ctx, authCh, scheduleDownlink124Ch, scheduleDownlink3Ch, payload, makeTxRequest, true, resps...)
+			func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool) {
+				lastDown = msg
+				_, a := test.MustNewTFromContext(ctx)
+				return resps[2], test.AllTrue(
+					a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
+					a.So(msg.CorrelationIDs, should.NotBeEmpty),
+					a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+						CorrelationIDs: msg.CorrelationIDs,
+						RawPayload:     payload,
+						Settings: &ttnpb.DownlinkMessage_Request{
+							Request: makeTxRequest(
+								downlinkPaths[4].DownlinkPath,
+							),
+						},
+					}),
+				)
+			},
+		), should.BeTrue)
 	}
 
 	makeFailEventEqual := func(t *testing.T) func(x, y events.Event) bool {
@@ -1117,26 +1029,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
-				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer124 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
-				})
-
-				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer3 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
-				})
-
-				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return nil, time.Time{}, false
-				}
-
 				lastUp := LastUplink(dev.MACState.RecentUplinks...)
-				lastDown, ok := assertScheduleRxMetadataGateways(
+				lastDown, ok := assertScheduleGateways(
 					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
+					env,
+					false,
 					func() []byte {
 						b := []byte{
 							/* MHDR */
@@ -1285,26 +1182,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
-				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer124 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
-				})
-
-				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer3 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
-				})
-
-				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return nil, time.Time{}, false
-				}
-
 				lastUp := LastUplink(dev.MACState.RecentUplinks...)
-				lastDown, ok := assertScheduleRxMetadataGateways(
+				lastDown, ok := assertScheduleGateways(
 					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
+					env,
+					false,
 					func() []byte {
 						b := []byte{
 							/* MHDR */
@@ -1464,26 +1346,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
-				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer124 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
-				})
-
-				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer3 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
-				})
-
-				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return nil, time.Time{}, false
-				}
-
 				lastUp := LastUplink(dev.MACState.RecentUplinks...)
-				lastDown, ok := assertScheduleRxMetadataGateways(
+				lastDown, ok := assertScheduleGateways(
 					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
+					env,
+					false,
 					func() []byte {
 						b := []byte{
 							/* MHDR */
@@ -1637,26 +1504,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
-				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer124 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
-				})
-
-				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer3 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
-				})
-
-				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return nil, time.Time{}, false
-				}
-
 				lastUp := LastUplink(dev.MACState.RecentUplinks...)
-				lastDown, ok := assertScheduleRxMetadataGateways(
+				lastDown, ok := assertScheduleGateways(
 					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
+					env,
+					false,
 					func() []byte {
 						b := []byte{
 							/* MHDR */
@@ -1819,25 +1671,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
-				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer124 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
-				})
-
-				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer3 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
-				})
-
-				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return nil, time.Time{}, false
-				}
-
-				lastDown, ok := assertScheduleRxMetadataGateways(
+				lastDown, ok := assertScheduleGateways(
 					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
+					env,
+					false,
 					func() []byte {
 						b := []byte{
 							/* MHDR */
@@ -1974,26 +1811,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
-				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer124 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
-				})
-
-				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer3 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
-				})
-
-				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return nil, time.Time{}, false
-				}
-
 				lastUp := LastUplink(dev.MACState.RecentUplinks...)
-				lastDown, ok := assertScheduleRxMetadataGateways(
+				lastDown, ok := assertScheduleGateways(
 					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
+					env,
+					false,
 					func() []byte {
 						b := []byte{
 							/* MHDR */
@@ -2156,25 +1978,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
-				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer124 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
-				})
-
-				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer3 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
-				})
-
-				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return nil, time.Time{}, false
-				}
-
-				lastDown, ok := assertScheduleRxMetadataGateways(
+				lastDown, ok := assertScheduleGateways(
 					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
+					env,
+					false,
 					func() []byte {
 						b := []byte{
 							/* MHDR */
@@ -2308,25 +2115,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
-				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer124 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
-				})
-
-				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer3 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
-				})
-
-				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return nil, time.Time{}, false
-				}
-
-				lastDown, ok := assertScheduleRxMetadataGateways(
+				lastDown, ok := assertScheduleGateways(
 					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
+					env,
+					false,
 					func() []byte {
 						b := []byte{
 							/* MHDR */
@@ -2457,25 +2249,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
-				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer124 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
-				})
-
-				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer3 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
-				})
-
-				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return nil, time.Time{}, false
-				}
-
-				lastDown, ok := assertScheduleRxMetadataGateways(
+				lastDown, ok := assertScheduleGateways(
 					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
+					env,
+					false,
 					func() []byte {
 						b := []byte{
 							/* MHDR */
@@ -2636,25 +2413,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
-				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer124 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
-				})
-
-				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer3 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
-				})
-
-				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return nil, time.Time{}, false
-				}
-
-				lastDown, ok := assertScheduleClassBCGateways(
+				lastDown, ok := assertScheduleGateways(
 					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
+					env,
+					true,
 					func() []byte {
 						b := []byte{
 							/* MHDR */
@@ -2944,26 +2706,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
-				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer124 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
-				})
-
-				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
-				peer3 := NewGSPeer(ctx, &MockNsGsServer{
-					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
-				})
-
-				if !a.So(assertGetGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
-					return nil, time.Time{}, false
-				}
-
 				lastUp := LastUplink(dev.RecentUplinks...)
-				lastDown, ok := assertScheduleRxMetadataGateways(
+				lastDown, ok := assertScheduleGateways(
 					ctx,
-					env.Cluster.Auth,
-					scheduleDownlink124Ch,
-					scheduleDownlink3Ch,
+					env,
+					false,
 					bytes.Repeat([]byte{0x42}, 33),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{

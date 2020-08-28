@@ -95,6 +95,9 @@ func makeOTAAFlowTest(createDevice *ttnpb.SetEndDeviceRequest, f func(context.Co
 			t.Error("Device failed to join")
 			return
 		}
+		if !ok {
+			panic("WTF")
+		}
 		t.Logf("Device successfully joined. DevAddr: %s", dev.PendingSession.DevAddr)
 		f(ctx, env, dev, link, linkCtx)
 	}

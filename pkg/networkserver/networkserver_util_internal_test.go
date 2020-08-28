@@ -1118,36 +1118,6 @@ func AssertInteropClientHandleJoinRequestRequest(ctx context.Context, reqCh <-ch
 	}
 }
 
-func AssertNsGsScheduleDownlinkRequest(ctx context.Context, reqCh <-chan NsGsScheduleDownlinkRequest, assert func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) bool, resp NsGsScheduleDownlinkResponse) bool {
-	t := test.MustTFromContext(ctx)
-	t.Helper()
-	select {
-	case <-ctx.Done():
-		t.Error("Timed out while waiting for NsGs.ScheduleDownlink to be called")
-		return false
-
-	case req := <-reqCh:
-		if !assert(ctx, req.Context, req.Message) {
-			return false
-		}
-		select {
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for NsGs.ScheduleDownlink response to be processed")
-			return false
-
-		case req.Response <- resp:
-			return true
-		}
-	}
-}
-
-func AssertAuthNsGsScheduleDownlinkRequest(ctx context.Context, authReqCh <-chan test.ClusterAuthRequest, scheduleReqCh <-chan NsGsScheduleDownlinkRequest, scheduleAssert func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) bool, authResp grpc.CallOption, scheduleResp NsGsScheduleDownlinkResponse) bool {
-	if !test.AssertClusterAuthRequest(ctx, authReqCh, authResp) {
-		return false
-	}
-	return AssertNsGsScheduleDownlinkRequest(ctx, scheduleReqCh, scheduleAssert, scheduleResp)
-}
-
 func AssertProcessApplicationUp(ctx context.Context, link ttnpb.AsNs_LinkApplicationClient, assert func(context.Context, *ttnpb.ApplicationUp) bool) bool {
 	return test.MustTFromContext(ctx).Run("Application uplink", func(t *testing.T) {
 		a, ctx := test.NewWithContext(ctx, t)
@@ -1328,37 +1298,128 @@ func (env TestEnvironment) AssertWithApplicationLink(ctx context.Context, appID 
 	)
 }
 
-func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, assert func(ctx, reqCtx context.Context, down *ttnpb.DownlinkMessage) bool, paths []DownlinkPath) bool {
-	return test.RunSubtestFromContext(ctx, "NsGs.ScheduleDownlink", func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-		scheduleDownlinkCh := make(chan NsGsScheduleDownlinkRequest)
-		gsPeer := NewGSPeer(ctx, &MockNsGsServer{
-			ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlinkCh),
+type DownlinkPathWithPeerIndex struct {
+	DownlinkPath
+	PeerIndex uint
+}
+
+func MakeDownlinkPathsWithPeerIndex(downlinkPaths []DownlinkPath, peerIdxs ...uint) []DownlinkPathWithPeerIndex {
+	if len(downlinkPaths) != len(peerIdxs) {
+		panic("mismatch in path and index count")
+	}
+	paths := []DownlinkPathWithPeerIndex{}
+	for i, path := range downlinkPaths {
+		paths = append(paths, DownlinkPathWithPeerIndex{
+			DownlinkPath: path,
+			PeerIndex:    peerIdxs[i],
 		})
+	}
+	return paths
+}
+
+func uintRepeat(v uint, count int) []uint {
+	vs := []uint{}
+	for i := 0; i < count; i++ {
+		vs = append(vs, v)
+	}
+	return vs
+}
+
+func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, paths []DownlinkPathWithPeerIndex, asserts ...func(ctx, reqCtx context.Context, down *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool)) bool {
+	return test.RunSubtestFromContext(ctx, "NsGs.ScheduleDownlink", func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+		if len(asserts) > len(paths) {
+			panic("invalid assertion count")
+		}
+
+		type Peer struct {
+			cluster.Peer
+			ScheduleDownlink <-chan NsGsScheduleDownlinkRequest
+		}
+		peers := map[uint]Peer{}
+		peerSequence := []uint{}
 		for _, path := range paths {
-			if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-				_, a := test.MustNewTFromContext(ctx)
-				return test.AllTrue(
-					a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
-					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER),
-					a.So(ids, should.Resemble, *path.GatewayIdentifiers),
-				)
-			},
-				test.ClusterGetPeerResponse{
-					Peer: gsPeer,
-				},
-			), should.BeTrue) {
-				t.Error("Gateway Server peer look-up assertion failed")
-				return
+			if path.PeerIndex == 0 {
+				continue
+			}
+			_, ok := peers[path.PeerIndex]
+			if ok {
+				continue
+			}
+			scheduleDownlinkCh := make(chan NsGsScheduleDownlinkRequest)
+			peers[path.PeerIndex] = Peer{
+				Peer: NewGSPeer(ctx, &MockNsGsServer{
+					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlinkCh),
+				}),
+				ScheduleDownlink: scheduleDownlinkCh,
+			}
+			if len(peerSequence) == 0 || peerSequence[len(peerSequence)-1] != path.PeerIndex {
+				peerSequence = append(peerSequence, path.PeerIndex)
 			}
 		}
-		if !a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, env.Cluster.Auth, scheduleDownlinkCh, assert,
-			&grpc.EmptyCallOption{},
-			NsGsScheduleDownlinkResponse{
-				Response: &ttnpb.ScheduleDownlinkResponse{},
-			},
-		), should.BeTrue) {
-			t.Error("Gateway Server scheduling assertion failed")
+		if !a.So(test.AssertClusterGetPeerRequestSequence(ctx, env.Cluster.GetPeer, func() []test.ClusterGetPeerResponse {
+			resps := []test.ClusterGetPeerResponse{}
+			for _, path := range paths {
+				resps = append(resps, func() test.ClusterGetPeerResponse {
+					if path.PeerIndex == 0 {
+						return test.ClusterGetPeerResponse{
+							Error: errors.New("Cluster.GetPeer error"),
+						}
+					}
+					return test.ClusterGetPeerResponse{
+						Peer: peers[path.PeerIndex],
+					}
+				}())
+			}
+			return resps
+		}(), func() []func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			fs := []func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool{}
+			for _, path := range paths {
+				fs = append(fs, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+					_, a := test.MustNewTFromContext(ctx)
+					return test.AllTrue(
+						a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
+						a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER),
+						a.So(ids, should.Resemble, *path.GatewayIdentifiers),
+					)
+				})
+			}
+			return fs
+		}()...), should.BeTrue) {
+			t.Error("Gateway Server peer look-up assertion failed")
 			return
+		}
+
+		if len(asserts) != len(peerSequence) {
+			panic("mismatch in assertion and peer count")
+		}
+
+		for i, peerIdx := range peerSequence {
+			if !a.So(test.AssertClusterAuthRequest(
+				ctx,
+				env.Cluster.Auth,
+				&grpc.EmptyCallOption{},
+			), should.BeTrue) {
+				return
+			}
+			select {
+			case <-ctx.Done():
+				t.Error("Timed out while waiting for NsGs.ScheduleDownlink to be called")
+				return
+			case req := <-peers[peerIdx].ScheduleDownlink:
+				resp, ok := asserts[i](ctx, req.Context, req.Message)
+				if !a.So(ok, should.BeTrue) {
+					return
+				}
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for NsGs.ScheduleDownlink response to be processed")
+					return
+
+				case req.Response <- resp:
+					return
+				}
+
+			}
 		}
 	})
 }
@@ -1370,10 +1431,10 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 		phy := LoRaWANBands[fp.BandID][dev.LoRaWANPHYVersion]
 
 		up := LastUplink(dev.RecentUplinks...)
-		paths := DownlinkPathsFromMetadata(up.RxMetadata...)
+		downlinkPaths := DownlinkPathsFromMetadata(up.RxMetadata...)
 		txReq := &ttnpb.TxRequest{
 			Class:         ttnpb.CLASS_A,
-			DownlinkPaths: DownlinkProtoPaths(paths...),
+			DownlinkPaths: DownlinkProtoPaths(downlinkPaths...),
 			Rx1Delay:      ttnpb.RxDelay(phy.JoinAcceptDelay1.Seconds()),
 			Rx1DataRateIndex: test.Must(phy.Rx1DataRate(
 				up.Settings.DataRateIndex,
@@ -1387,24 +1448,29 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 			FrequencyPlanID:  dev.FrequencyPlanID,
 		}
 		var scheduledDown *ttnpb.DownlinkMessage
-		if !a.So(env.AssertScheduleDownlink(ctx, func(ctx, reqCtx context.Context, down *ttnpb.DownlinkMessage) bool {
-			scheduledDown = down
-			return test.AllTrue(
-				a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
-				a.So(down.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, append(
-					dev.PendingMACState.QueuedJoinAccept.CorrelationIDs,
-					up.CorrelationIDs...,
-				),
-				),
-				a.So(down, should.Resemble, &ttnpb.DownlinkMessage{
-					CorrelationIDs: down.CorrelationIDs,
-					RawPayload:     dev.PendingMACState.QueuedJoinAccept.Payload,
-					Settings: &ttnpb.DownlinkMessage_Request{
-						Request: txReq,
-					},
-				}),
-			)
-		}, paths), should.BeTrue) {
+		if !a.So(env.AssertScheduleDownlink(
+			ctx,
+			MakeDownlinkPathsWithPeerIndex(downlinkPaths, uintRepeat(1, len(downlinkPaths))...),
+			func(ctx, reqCtx context.Context, down *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool) {
+				scheduledDown = down
+				return NsGsScheduleDownlinkResponse{
+						Response: &ttnpb.ScheduleDownlinkResponse{},
+					}, test.AllTrue(
+						a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
+						a.So(down.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, append(
+							dev.PendingMACState.QueuedJoinAccept.CorrelationIDs,
+							up.CorrelationIDs...,
+						),
+						),
+						a.So(down, should.Resemble, &ttnpb.DownlinkMessage{
+							CorrelationIDs: down.CorrelationIDs,
+							RawPayload:     dev.PendingMACState.QueuedJoinAccept.Payload,
+							Settings: &ttnpb.DownlinkMessage_Request{
+								Request: txReq,
+							},
+						}),
+					)
+			}), should.BeTrue) {
 			t.Error("Join-accept assertion failed")
 			return
 		}
