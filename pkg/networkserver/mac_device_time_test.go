@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -131,7 +130,7 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+				dev := CopyEndDevice(tc.Device)
 
 				evs, err := handleDeviceTimeReq(ctx, dev, tc.Message)
 				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||

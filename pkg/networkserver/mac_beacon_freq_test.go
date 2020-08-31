@@ -18,7 +18,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -204,7 +203,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+				dev := CopyEndDevice(tc.Device)
 
 				var err error
 				evs, err := handleBeaconFreqAns(ctx, dev, tc.Payload)

@@ -18,7 +18,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -151,7 +150,7 @@ func TestHandleResetInd(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+				dev := CopyEndDevice(tc.Device)
 
 				evs, err := handleResetInd(ctx, dev, tc.Payload, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
 				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||

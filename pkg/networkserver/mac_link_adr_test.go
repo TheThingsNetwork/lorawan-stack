@@ -18,7 +18,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -1011,7 +1010,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+				dev := CopyEndDevice(tc.Device)
 
 				evs, err := handleLinkADRAns(ctx, dev, tc.Payload, tc.DupCount, frequencyplans.NewStore(test.FrequencyPlansFetcher))
 				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||

@@ -332,7 +332,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+				dev := CopyEndDevice(tc.Device)
 
 				evs, err := handleDevStatusAns(ctx, dev, tc.Payload, tc.FCntUp, tc.ReceivedAt)
 				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
