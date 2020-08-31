@@ -15,6 +15,7 @@
 package networkserver
 
 import (
+	"context"
 	"testing"
 
 	"github.com/mohae/deepcopy"
@@ -64,17 +65,19 @@ func TestNeedsRxTimingSetupReq(t *testing.T) {
 			Needs: true,
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-
-			dev := CopyEndDevice(tc.InputDevice)
-			res := deviceNeedsRxTimingSetupReq(dev)
-			if tc.Needs {
-				a.So(res, should.BeTrue)
-			} else {
-				a.So(res, should.BeFalse)
-			}
-			a.So(dev, should.Resemble, tc.InputDevice)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.InputDevice)
+				res := deviceNeedsRxTimingSetupReq(dev)
+				if tc.Needs {
+					a.So(res, should.BeTrue)
+				} else {
+					a.So(res, should.BeFalse)
+				}
+				a.So(dev, should.Resemble, tc.InputDevice)
+			},
 		})
 	}
 }
@@ -123,18 +126,20 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-
-			evs, err := handleRxTimingSetupAns(test.Context(), dev)
-			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
-				tc.Error == nil && !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventBuilders, tc.Events)
+				evs, err := handleRxTimingSetupAns(ctx, dev)
+				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
+					tc.Error == nil && !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				a.So(dev, should.Resemble, tc.Expected)
+				a.So(evs, should.ResembleEventBuilders, tc.Events)
+			},
 		})
 	}
 }

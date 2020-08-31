@@ -15,6 +15,7 @@
 package networkserver
 
 import (
+	"context"
 	"testing"
 
 	"github.com/mohae/deepcopy"
@@ -145,18 +146,20 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-
-			evs, err := handleDeviceModeInd(test.Context(), dev, tc.Payload)
-			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
-				tc.Error == nil && !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventBuilders, tc.Events)
+				evs, err := handleDeviceModeInd(ctx, dev, tc.Payload)
+				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
+					tc.Error == nil && !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				a.So(dev, should.Resemble, tc.Expected)
+				a.So(evs, should.ResembleEventBuilders, tc.Events)
+			},
 		})
 	}
 }

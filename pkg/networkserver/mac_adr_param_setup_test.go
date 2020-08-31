@@ -15,6 +15,7 @@
 package networkserver
 
 import (
+	"context"
 	"testing"
 
 	"github.com/mohae/deepcopy"
@@ -165,17 +166,19 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 	})
 
 	for _, tc := range tcs {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-
-			dev := CopyEndDevice(tc.InputDevice)
-			res := deviceNeedsADRParamSetupReq(dev, tc.Band)
-			if tc.Needs {
-				a.So(res, should.BeTrue)
-			} else {
-				a.So(res, should.BeFalse)
-			}
-			a.So(dev, should.Resemble, tc.InputDevice)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.InputDevice)
+				res := deviceNeedsADRParamSetupReq(dev, tc.Band)
+				if tc.Needs {
+					a.So(res, should.BeTrue)
+				} else {
+					a.So(res, should.BeFalse)
+				}
+				a.So(dev, should.Resemble, tc.InputDevice)
+			},
 		})
 	}
 }
@@ -226,18 +229,20 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-
-			evs, err := handleADRParamSetupAns(test.Context(), dev)
-			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
-				tc.Error == nil && !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventBuilders, tc.Events)
+				evs, err := handleADRParamSetupAns(ctx, dev)
+				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
+					tc.Error == nil && !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				a.So(dev, should.Resemble, tc.Expected)
+				a.So(evs, should.ResembleEventBuilders, tc.Events)
+			},
 		})
 	}
 }

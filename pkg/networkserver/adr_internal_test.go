@@ -15,6 +15,7 @@
 package networkserver
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"math/rand"
@@ -23,7 +24,6 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -218,14 +218,20 @@ func TestLossRate(t *testing.T) {
 			Rate:    3. / 7.,
 		},
 	} {
-		t.Run(func() string {
-			var ss []string
-			for _, up := range tc.Uplinks {
-				ss = append(ss, fmt.Sprintf("%d", up.Payload.GetMACPayload().FHDR.FCnt))
-			}
-			return fmt.Sprintf("NbTrans %d/%s", tc.NbTrans, strings.Join(ss, ","))
-		}(), func(t *testing.T) {
-			assertions.New(t).So(lossRate(tc.NbTrans, tc.Uplinks...), should.Equal, tc.Rate)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name: MakeTestCaseName(
+				fmt.Sprintf("nb_trans:%d", tc.NbTrans),
+				strings.Join(func() (ss []string) {
+					for _, up := range tc.Uplinks {
+						ss = append(ss, fmt.Sprintf("%d", up.Payload.GetMACPayload().FHDR.FCnt))
+					}
+					return ss
+				}(), ","),
+			),
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				a.So(lossRate(tc.NbTrans, tc.Uplinks...), should.Equal, tc.Rate)
+			},
 		})
 	}
 }
@@ -465,25 +471,22 @@ func TestAdaptDataRate(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-
-			dev := CopyEndDevice(tc.Device)
-			fp := FrequencyPlan(dev.FrequencyPlanID)
-			err := adaptDataRate(
-				log.NewContext(test.ContextWithTB(test.Context(), t), test.GetLogger(t)),
-				dev,
-				LoRaWANBands[fp.BandID][dev.LoRaWANPHYVersion],
-				ttnpb.MACSettings{},
-			)
-			if !a.So(err, should.Equal, tc.Error) {
-				t.Fatalf("ADR failed with: %s", err)
-			}
-			expected := CopyEndDevice(tc.Device)
-			if tc.DeviceDiff != nil {
-				tc.DeviceDiff(expected)
-			}
-			a.So(dev, should.Resemble, expected)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.Device)
+				fp := FrequencyPlan(dev.FrequencyPlanID)
+				err := adaptDataRate(ctx, dev, LoRaWANBands[fp.BandID][dev.LoRaWANPHYVersion], ttnpb.MACSettings{})
+				if !a.So(err, should.Equal, tc.Error) {
+					t.Fatalf("ADR failed with: %s", err)
+				}
+				expected := CopyEndDevice(tc.Device)
+				if tc.DeviceDiff != nil {
+					tc.DeviceDiff(expected)
+				}
+				a.So(dev, should.Resemble, expected)
+			},
 		})
 	}
 }

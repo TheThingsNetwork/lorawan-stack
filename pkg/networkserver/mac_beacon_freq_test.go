@@ -15,6 +15,7 @@
 package networkserver
 
 import (
+	"context"
 	"testing"
 
 	"github.com/mohae/deepcopy"
@@ -82,17 +83,19 @@ func TestNeedsBeaconFreqReq(t *testing.T) {
 	})
 
 	for _, tc := range tcs {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-
-			dev := CopyEndDevice(tc.InputDevice)
-			res := deviceNeedsBeaconFreqReq(dev)
-			if tc.Needs {
-				a.So(res, should.BeTrue)
-			} else {
-				a.So(res, should.BeFalse)
-			}
-			a.So(dev, should.Resemble, tc.InputDevice)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.InputDevice)
+				res := deviceNeedsBeaconFreqReq(dev)
+				if tc.Needs {
+					a.So(res, should.BeTrue)
+				} else {
+					a.So(res, should.BeFalse)
+				}
+				a.So(dev, should.Resemble, tc.InputDevice)
+			},
 		})
 	}
 }
@@ -197,19 +200,21 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-
-			var err error
-			evs, err := handleBeaconFreqAns(test.Context(), dev, tc.Payload)
-			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
-				tc.Error == nil && !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventBuilders, tc.Events)
+				var err error
+				evs, err := handleBeaconFreqAns(ctx, dev, tc.Payload)
+				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
+					tc.Error == nil && !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				a.So(dev, should.Resemble, tc.Expected)
+				a.So(evs, should.ResembleEventBuilders, tc.Events)
+			},
 		})
 	}
 }
