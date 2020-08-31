@@ -341,57 +341,56 @@ func TestDeviceRegistryGet(t *testing.T) {
 			GetByIDCalls: 1,
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Timeout:  (1 << 9) * test.Delay,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				var getByIDCalls uint64
 
-			var getByIDCalls uint64
-
-			ns, ctx, _, stop := StartTest(
-				t,
-				TestConfig{
-					Component: component.Config{
-						ServiceBase: config.ServiceBase{
-							KeyVault: config.KeyVault{
-								Provider: "static",
-								Static:   tc.KeyVault,
+				ns, ctx, _, stop := StartTest(
+					t,
+					TestConfig{
+						Context: ctx,
+						Component: component.Config{
+							ServiceBase: config.ServiceBase{
+								KeyVault: config.KeyVault{
+									Provider: "static",
+									Static:   tc.KeyVault,
+								},
 							},
 						},
-					},
-					NetworkServer: Config{
-						Devices: &MockDeviceRegistry{
-							GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
-								atomic.AddUint64(&getByIDCalls, 1)
-								return tc.GetByIDFunc(ctx, appID, devID, gets)
+						NetworkServer: Config{
+							Devices: &MockDeviceRegistry{
+								GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
+									atomic.AddUint64(&getByIDCalls, 1)
+									return tc.GetByIDFunc(ctx, appID, devID, gets)
+								},
 							},
 						},
+						TaskStarter: StartTaskExclude(
+							DownlinkProcessTaskName,
+						),
 					},
-					TaskStarter: StartTaskExclude(
-						DownlinkProcessTaskName,
-					),
-					Timeout: (1 << 9) * test.Delay,
-				},
-			)
-			defer stop()
+				)
+				defer stop()
 
-			ns.AddContextFiller(tc.ContextFunc)
-			ns.AddContextFiller(func(ctx context.Context) context.Context {
-				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
-				_ = cancel
-				return ctx
-			})
-			ns.AddContextFiller(func(ctx context.Context) context.Context {
-				return test.ContextWithTB(ctx, t)
-			})
+				ns.AddContextFiller(tc.ContextFunc)
+				ns.AddContextFiller(func(ctx context.Context) context.Context {
+					return test.ContextWithTB(ctx, t)
+				})
 
-			req := deepcopy.Copy(tc.Request).(*ttnpb.GetEndDeviceRequest)
-			dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Get(ctx, req)
-			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
-				a.So(dev, should.BeNil)
-			} else if a.So(err, should.BeNil) {
-				a.So(dev, should.Resemble, tc.Device)
-			}
-			a.So(req, should.Resemble, tc.Request)
-			a.So(getByIDCalls, should.Equal, tc.GetByIDCalls)
+				req := deepcopy.Copy(tc.Request).(*ttnpb.GetEndDeviceRequest)
+				dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Get(ctx, req)
+				if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+					a.So(dev, should.BeNil)
+				} else if a.So(err, should.BeNil) {
+					a.So(dev, should.Resemble, tc.Device)
+				}
+				a.So(req, should.Resemble, tc.Request)
+				a.So(getByIDCalls, should.Equal, tc.GetByIDCalls)
+			},
 		})
 	}
 }
@@ -1494,58 +1493,62 @@ func TestDeviceRegistrySet(t *testing.T) {
 			SetByIDCalls: 1,
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Timeout:  (1 << 9) * test.Delay,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				var addCalls, setByIDCalls uint64
 
-			var addCalls, setByIDCalls uint64
-
-			ns, ctx, env, stop := StartTest(
-				t,
-				TestConfig{
-					NetworkServer: Config{
-						Devices: &MockDeviceRegistry{
-							SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-								atomic.AddUint64(&setByIDCalls, 1)
-								return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+				ns, ctx, env, stop := StartTest(
+					t,
+					TestConfig{
+						Context: ctx,
+						NetworkServer: Config{
+							Devices: &MockDeviceRegistry{
+								SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+									atomic.AddUint64(&setByIDCalls, 1)
+									return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+								},
+							},
+							DownlinkTasks: &MockDownlinkTaskQueue{
+								AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
+									atomic.AddUint64(&addCalls, 1)
+									return tc.AddFunc(ctx, ids, at, replace)
+								},
 							},
 						},
-						DownlinkTasks: &MockDownlinkTaskQueue{
-							AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-								atomic.AddUint64(&addCalls, 1)
-								return tc.AddFunc(ctx, ids, at, replace)
-							},
-						},
+						TaskStarter: StartTaskExclude(
+							DownlinkProcessTaskName,
+						),
 					},
-					TaskStarter: StartTaskExclude(
-						DownlinkProcessTaskName,
-					),
-					Timeout: (1 << 9) * test.Delay,
-				},
-			)
-			defer stop()
+				)
+				defer stop()
 
-			go LogEvents(t, env.Events)
+				go LogEvents(t, env.Events)
 
-			ns.AddContextFiller(tc.ContextFunc)
-			ns.AddContextFiller(func(ctx context.Context) context.Context {
-				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
-				_ = cancel
-				return ctx
-			})
-			ns.AddContextFiller(func(ctx context.Context) context.Context {
-				return test.ContextWithTB(ctx, t)
-			})
+				ns.AddContextFiller(tc.ContextFunc)
+				ns.AddContextFiller(func(ctx context.Context) context.Context {
+					ctx, cancel := context.WithTimeout(ctx, (1<<9)*test.Delay)
+					_ = cancel
+					return ctx
+				})
+				ns.AddContextFiller(func(ctx context.Context) context.Context {
+					return test.ContextWithTB(ctx, t)
+				})
 
-			req := deepcopy.Copy(tc.Request).(*ttnpb.SetEndDeviceRequest)
-			dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Set(ctx, req)
-			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
-				a.So(dev, should.BeNil)
-			} else if a.So(err, should.BeNil) {
-				a.So(dev, should.Resemble, tc.Device)
-			}
-			a.So(req, should.Resemble, tc.Request)
-			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
-			a.So(addCalls, should.Equal, tc.AddCalls)
+				req := deepcopy.Copy(tc.Request).(*ttnpb.SetEndDeviceRequest)
+				dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Set(ctx, req)
+				if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+					a.So(dev, should.BeNil)
+				} else if a.So(err, should.BeNil) {
+					a.So(dev, should.Resemble, tc.Device)
+				}
+				a.So(req, should.Resemble, tc.Request)
+				a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
+				a.So(addCalls, should.Equal, tc.AddCalls)
+			},
 		})
 	}
 }
@@ -1664,52 +1667,50 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			SetByIDCalls: 1,
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Timeout:  (1 << 9) * test.Delay,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				var setByIDCalls uint64
 
-			var setByIDCalls uint64
-
-			ns, ctx, env, stop := StartTest(
-				t,
-				TestConfig{
-					Component: component.Config{},
-					NetworkServer: Config{
-						Devices: &MockDeviceRegistry{
-							SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-								atomic.AddUint64(&setByIDCalls, 1)
-								return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+				ns, ctx, env, stop := StartTest(
+					t,
+					TestConfig{
+						Context: ctx,
+						NetworkServer: Config{
+							Devices: &MockDeviceRegistry{
+								SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+									atomic.AddUint64(&setByIDCalls, 1)
+									return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+								},
 							},
 						},
+						TaskStarter: StartTaskExclude(
+							DownlinkProcessTaskName,
+						),
 					},
-					TaskStarter: StartTaskExclude(
-						DownlinkProcessTaskName,
-					),
-					Timeout: (1 << 9) * test.Delay,
-				},
-			)
-			defer stop()
+				)
+				defer stop()
 
-			go LogEvents(t, env.Events)
+				go LogEvents(t, env.Events)
 
-			ns.AddContextFiller(tc.ContextFunc)
-			ns.AddContextFiller(func(ctx context.Context) context.Context {
-				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
-				_ = cancel
-				return ctx
-			})
-			ns.AddContextFiller(func(ctx context.Context) context.Context {
-				return test.ContextWithTB(ctx, t)
-			})
+				ns.AddContextFiller(tc.ContextFunc)
+				ns.AddContextFiller(func(ctx context.Context) context.Context {
+					return test.ContextWithTB(ctx, t)
+				})
 
-			req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)
-			res, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Delete(ctx, req)
-			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
-			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
-				a.So(res, should.BeNil)
-			} else if a.So(err, should.BeNil) {
-				a.So(res, should.Resemble, ttnpb.Empty)
-			}
-			a.So(req, should.Resemble, tc.Request)
+				req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)
+				res, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Delete(ctx, req)
+				a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
+				if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+					a.So(res, should.BeNil)
+				} else if a.So(err, should.BeNil) {
+					a.So(res, should.Resemble, ttnpb.Empty)
+				}
+				a.So(req, should.Resemble, tc.Request)
+			},
 		})
 	}
 }

@@ -242,6 +242,7 @@ func TestNewMACState(t *testing.T) {
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -299,6 +300,7 @@ func TestBeaconTimeBefore(t *testing.T) {
 			Expected: 10 * beaconPeriod,
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Time.String(),
 			Parallel: true,
@@ -473,6 +475,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			ExpectedOk:   true,
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -503,9 +506,6 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 	}
 
 	beaconTime := gpstime.Parse(beaconPeriod)
-
-	clock := test.NewMockClock(beaconTime.Add(time.Millisecond))
-	defer SetMockClock(clock)()
 
 	up := &ttnpb.UplinkMessage{
 		Payload: &ttnpb.Message{
@@ -992,10 +992,14 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			ExpectedOk: true,
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				clock := test.NewMockClock(beaconTime.Add(time.Millisecond))
+				defer SetMockClock(clock)()
+
 				ret, ok := nextDataDownlinkSlot(ctx, tc.Device, LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B], ttnpb.MACSettings{}, tc.EarliestAt)
 				if a.So(ok, should.Equal, tc.ExpectedOk) {
 					a.So(ret, should.Resemble, tc.ExpectedSlot)

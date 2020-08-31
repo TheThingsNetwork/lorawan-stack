@@ -77,14 +77,18 @@ func TestAppendRecentUplink(t *testing.T) {
 			Expected: ups[1:3],
 		},
 	} {
-		t.Run(fmt.Sprintf("recent_length:%d,window:%v", len(tc.Recent), tc.Window), func(t *testing.T) {
-			a := assertions.New(t)
-			recent := CopyUplinkMessages(tc.Recent...)
-			up := CopyUplinkMessage(tc.Up)
-			ret := appendRecentUplink(recent, up, tc.Window)
-			a.So(recent, should.Resemble, tc.Recent)
-			a.So(up, should.Resemble, tc.Up)
-			a.So(ret, should.Resemble, tc.Expected)
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     fmt.Sprintf("recent_length:%d,window:%v", len(tc.Recent), tc.Window),
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				recent := CopyUplinkMessages(tc.Recent...)
+				up := CopyUplinkMessage(tc.Up)
+				ret := appendRecentUplink(recent, up, tc.Window)
+				a.So(recent, should.Resemble, tc.Recent)
+				a.So(up, should.Resemble, tc.Up)
+				a.So(ret, should.Resemble, tc.Expected)
+			},
 		})
 	}
 }
@@ -1231,26 +1235,28 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		}
 	})
 	for _, tc := range tcs {
-		t.Run(tc.Name, func(t *testing.T) {
-			t.Parallel()
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Timeout:  (1 << 11) * test.Delay,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				ns, ctx, _, stop := StartTest(t, TestConfig{
+					Context: ctx,
+					NetworkServer: Config{
+						NetID: NetID,
+					},
+					TaskStarter: StartTaskExclude(
+						DownlinkProcessTaskName,
+					),
+				})
+				defer stop()
 
-			a := assertions.New(t)
-
-			ns, ctx, _, stop := StartTest(t, TestConfig{
-				NetworkServer: Config{
-					NetID: NetID,
-				},
-				TaskStarter: StartTaskExclude(
-					DownlinkProcessTaskName,
-				),
-				Timeout: (1 << 5) * test.Delay,
-			})
-			defer stop()
-
-			dev, err := ns.matchAndHandleDataUplink(CopyUplinkMessage(tc.Uplink), tc.Deduplicated, tc.MakeDevices(ctx)...)
-			if a.So(err, should.EqualErrorOrDefinition, tc.Error) {
-				a.So(tc.DeviceAssertion(t, dev), should.BeTrue)
-			}
+				dev, err := ns.matchAndHandleDataUplink(CopyUplinkMessage(tc.Uplink), tc.Deduplicated, tc.MakeDevices(ctx)...)
+				if a.So(err, should.EqualErrorOrDefinition, tc.Error) {
+					a.So(tc.DeviceAssertion(t, dev), should.BeTrue)
+				}
+			},
 		})
 	}
 }

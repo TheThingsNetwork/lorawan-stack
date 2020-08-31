@@ -86,14 +86,18 @@ func TestAppendRecentDownlink(t *testing.T) {
 			Expected: downs[1:3],
 		},
 	} {
-		t.Run(fmt.Sprintf("recent_length:%d,window:%v", len(tc.Recent), tc.Window), func(t *testing.T) {
-			a := assertions.New(t)
-			recent := CopyDownlinkMessages(tc.Recent...)
-			down := CopyDownlinkMessage(tc.Down)
-			ret := appendRecentDownlink(recent, down, tc.Window)
-			a.So(recent, should.Resemble, tc.Recent)
-			a.So(down, should.Resemble, tc.Down)
-			a.So(ret, should.Resemble, tc.Expected)
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     fmt.Sprintf("recent_length:%d,window:%v", len(tc.Recent), tc.Window),
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				recent := CopyDownlinkMessages(tc.Recent...)
+				down := CopyDownlinkMessage(tc.Down)
+				ret := appendRecentDownlink(recent, down, tc.Window)
+				a.So(recent, should.Resemble, tc.Recent)
+				a.So(down, should.Resemble, tc.Down)
+				a.So(ret, should.Resemble, tc.Expected)
+			},
 		})
 	}
 }
@@ -1026,70 +1030,67 @@ func TestGenerateDownlink(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Timeout:  (1 << 7) * test.Delay,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				c := component.MustNew(
+					log.Noop,
+					&component.Config{},
+					component.WithClusterNew(func(context.Context, *cluster.Config, ...cluster.Option) (cluster.Cluster, error) {
+						return &test.MockCluster{
+							JoinFunc: test.ClusterJoinNilFunc,
+						}, nil
+					}),
+				)
+				c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
-			logger := test.GetLogger(t)
+				componenttest.StartComponent(t, c)
 
-			ctx := test.ContextWithTB(test.Context(), t)
-			ctx = log.NewContext(ctx, logger)
-			ctx, cancel := context.WithTimeout(ctx, (1<<7)*test.Delay)
-			defer cancel()
+				ns := &NetworkServer{
+					Component: c,
+					ctx:       ctx,
+					defaultMACSettings: ttnpb.MACSettings{
+						StatusTimePeriodicity:  DurationPtr(0),
+						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+					},
+				}
 
-			c := component.MustNew(
-				log.Noop,
-				&component.Config{},
-				component.WithClusterNew(func(context.Context, *cluster.Config, ...cluster.Option) (cluster.Cluster, error) {
-					return &test.MockCluster{
-						JoinFunc: test.ClusterJoinNilFunc,
-					}, nil
-				}),
-			)
-			c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
+				dev := CopyEndDevice(tc.Device)
+				phy, err := deviceBand(dev, ns.FrequencyPlans)
+				if !a.So(err, should.BeNil) {
+					t.Fail()
+					return
+				}
 
-			componenttest.StartComponent(t, c)
+				genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, dev.MACState.DeviceClass, time.Now(), math.MaxUint16, math.MaxUint16)
+				if tc.Error != nil {
+					a.So(err, should.EqualErrorOrDefinition, tc.Error)
+					a.So(genDown, should.BeNil)
+					return
+				}
+				// TODO: Assert AS uplinks generated(https://github.com/TheThingsNetwork/lorawan-stack/issues/631).
 
-			ns := &NetworkServer{
-				Component: c,
-				ctx:       ctx,
-				defaultMACSettings: ttnpb.MACSettings{
-					StatusTimePeriodicity:  DurationPtr(0),
-					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
-				},
-			}
+				if !a.So(err, should.BeNil) || !a.So(genDown, should.NotBeNil) {
+					t.Fail()
+					return
+				}
 
-			dev := CopyEndDevice(tc.Device)
-			phy, err := deviceBand(dev, ns.FrequencyPlans)
-			if !a.So(err, should.BeNil) {
-				t.Fail()
-				return
-			}
+				a.So(genDown.Payload, should.Resemble, tc.Bytes)
+				if tc.ApplicationDownlinkAssertion != nil {
+					a.So(tc.ApplicationDownlinkAssertion(t, genState.ApplicationDownlink), should.BeTrue)
+				} else {
+					a.So(genState.ApplicationDownlink, should.BeNil)
+				}
 
-			genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, dev.MACState.DeviceClass, time.Now(), math.MaxUint16, math.MaxUint16)
-			if tc.Error != nil {
-				a.So(err, should.EqualErrorOrDefinition, tc.Error)
-				a.So(genDown, should.BeNil)
-				return
-			}
-			// TODO: Assert AS uplinks generated(https://github.com/TheThingsNetwork/lorawan-stack/issues/631).
-
-			if !a.So(err, should.BeNil) || !a.So(genDown, should.NotBeNil) {
-				t.Fail()
-				return
-			}
-
-			a.So(genDown.Payload, should.Resemble, tc.Bytes)
-			if tc.ApplicationDownlinkAssertion != nil {
-				a.So(tc.ApplicationDownlinkAssertion(t, genState.ApplicationDownlink), should.BeTrue)
-			} else {
-				a.So(genState.ApplicationDownlink, should.BeNil)
-			}
-
-			if tc.DeviceAssertion != nil {
-				a.So(tc.DeviceAssertion(t, dev), should.BeTrue)
-			} else {
-				a.So(dev, should.Resemble, tc.Device)
-			}
+				if tc.DeviceAssertion != nil {
+					a.So(tc.DeviceAssertion(t, dev), should.BeTrue)
+				} else {
+					a.So(dev, should.Resemble, tc.Device)
+				}
+			},
 		})
 	}
 }

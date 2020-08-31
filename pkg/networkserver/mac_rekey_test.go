@@ -243,6 +243,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			},
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

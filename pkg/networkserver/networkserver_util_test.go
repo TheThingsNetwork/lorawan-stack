@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -73,14 +72,13 @@ func NewRedisDeviceRegistry(t testing.TB) (DeviceRegistry, func()) {
 }
 
 func NewRedisDownlinkTaskQueue(t testing.TB) (DownlinkTaskQueue, func()) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
 	cl, flush := test.NewRedis(t, append(redisNamespace[:], "downlink-tasks")...)
 	q := redis.NewDownlinkTaskQueue(cl, 10000, redisConsumerGroup, redisConsumerID)
-	err := q.Init()
-	a.So(err, should.BeNil)
+	a.So(q.Init(), should.BeNil)
 
-	ctx, cancel := context.WithCancel(test.Context())
+	ctx, cancel := context.WithCancel(ctx)
 	errCh := make(chan error, 1)
 	go func() {
 		t.Log("Running Redis downlink task queue...")
@@ -102,7 +100,7 @@ func NewRedisDownlinkTaskQueue(t testing.TB) (DownlinkTaskQueue, func()) {
 
 			var runErr error
 			select {
-			case <-time.After(Timeout):
+			case <-time.After((1 << 6) * test.Delay):
 				t.Error("Timed out waiting for redis.DownlinkTaskQueue.Run to return")
 			case runErr = <-errCh:
 			}

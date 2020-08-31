@@ -64,6 +64,7 @@ func TestNeedsRxTimingSetupReq(t *testing.T) {
 			Needs: true,
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -125,6 +126,7 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 			},
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

@@ -38,10 +38,8 @@ import (
 )
 
 // handleDownlinkTaskQueueTest runs a test suite on q.
-func handleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
-	a := assertions.New(t)
-
-	ctx := test.Context()
+func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
+	t, a := test.MustNewTFromContext(ctx)
 
 	pbs := [...]ttnpb.EndDeviceIdentifiers{
 		{
@@ -98,6 +96,7 @@ func handleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
 	// Ensure the goroutine has started
 	nextPop <- struct{}{}
 
+	// Ensure Pop is blocking on empty queue.
 	select {
 	case s := <-slotCh:
 		t.Fatalf("Pop called f on empty schedule, slot: %+v", s)
@@ -128,7 +127,7 @@ func handleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
 		a.So(err, should.BeNil)
 		t.Fatal("Pop returned without calling f on non-empty schedule")
 
-	case <-time.After(10 * Timeout):
+	case <-ctx.Done():
 		t.Fatal("Timed out waiting for Pop to call f")
 	}
 
@@ -138,7 +137,7 @@ func handleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
 			t.FailNow()
 		}
 
-	case <-time.After(Timeout):
+	case <-ctx.Done():
 		t.Fatal("Timed out waiting for Pop to return")
 	}
 
@@ -195,7 +194,7 @@ func handleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
 			a.So(err, should.BeNil)
 			t.Fatal("Pop returned without calling f on non-empty schedule")
 
-		case <-time.After(Timeout):
+		case <-ctx.Done():
 			t.Fatal("Timed out waiting for Pop to call f")
 		}
 
@@ -205,7 +204,7 @@ func handleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
 				t.FailNow()
 			}
 
-		case <-time.After(Timeout):
+		case <-ctx.Done():
 			t.Fatal("Timed out waiting for Pop to return")
 		}
 	}
@@ -216,34 +215,46 @@ func handleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
 }
 
 func TestDownlinkTaskQueues(t *testing.T) {
-	t.Parallel()
-
-	for _, tc := range []struct {
-		Name string
-		New  func(t testing.TB) (q DownlinkTaskQueue, closeFn func())
-		N    uint16
-	}{
-		{
-			Name: "Redis",
-			New:  NewRedisDownlinkTaskQueue,
-			N:    8,
+	test.RunTest(t, test.TestConfig{
+		Func: func(ctx context.Context, _ *assertions.Assertion) {
+			for _, tc := range []struct {
+				Name string
+				New  func(t testing.TB) (q DownlinkTaskQueue, closeFn func())
+			}{
+				{
+					Name: "Redis",
+					New:  NewRedisDownlinkTaskQueue,
+				},
+			} {
+				tc := tc
+				test.RunSubtestFromContext(ctx, test.SubtestConfig{
+					Name:     tc.Name,
+					Parallel: true,
+					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+						q, closeFn := tc.New(t)
+						if closeFn != nil {
+							defer closeFn()
+						}
+						test.RunSubtestFromContext(ctx, test.SubtestConfig{
+							Name: "1st run",
+							Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+								handleDownlinkTaskQueueTest(ctx, q)
+							},
+						})
+						if t.Failed() {
+							t.Skip("Skipping 2nd run")
+						}
+						test.RunSubtestFromContext(ctx, test.SubtestConfig{
+							Name: "2st run",
+							Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+								handleDownlinkTaskQueueTest(ctx, q)
+							},
+						})
+					},
+				})
+			}
 		},
-	} {
-		for i := 0; i < int(tc.N); i++ {
-			t.Run(fmt.Sprintf("%s/%d", tc.Name, i), func(t *testing.T) {
-				t.Parallel()
-				q, closeFn := tc.New(t)
-				if closeFn != nil {
-					defer closeFn()
-				}
-				t.Run("1st run", func(t *testing.T) { handleDownlinkTaskQueueTest(t, q) })
-				if t.Failed() {
-					t.Skip("Skipping 2nd run")
-				}
-				t.Run("2nd run", func(t *testing.T) { handleDownlinkTaskQueueTest(t, q) })
-			})
-		}
-	}
+	})
 }
 
 func TestProcessDownlinkTask(t *testing.T) {
@@ -300,6 +311,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			downlinkPaths = DownlinkPathsFromMetadata(RxMetadata[:]...)
 		} else {
 			for i, ids := range GatewayAntennaIdentifiers {
+				ids := ids
 				downlinkPaths = append(downlinkPaths, DownlinkPath{
 					GatewayIdentifiers: &ids.GatewayIdentifiers,
 					DownlinkPath: &ttnpb.DownlinkPath{
@@ -312,59 +324,48 @@ func TestProcessDownlinkTask(t *testing.T) {
 		}
 
 		var lastDown *ttnpb.DownlinkMessage
-		return lastDown, a.So(env.AssertScheduleDownlink(
-			ctx,
-			MakeDownlinkPathsWithPeerIndex(downlinkPaths, 0, 1, 1, 2, 1),
-			func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool) {
-				_, a := test.MustNewTFromContext(ctx)
-				return resps[0], test.AllTrue(
-					a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
-					a.So(msg.CorrelationIDs, should.NotBeEmpty),
-					a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-						CorrelationIDs: msg.CorrelationIDs,
-						RawPayload:     payload,
-						Settings: &ttnpb.DownlinkMessage_Request{
-							Request: makeTxRequest(
-								downlinkPaths[1].DownlinkPath,
-								downlinkPaths[2].DownlinkPath,
-							),
-						},
-					}),
-				)
-			},
-			func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool) {
-				_, a := test.MustNewTFromContext(ctx)
-				return resps[1], test.AllTrue(
-					a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
-					a.So(msg.CorrelationIDs, should.NotBeEmpty),
-					a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-						CorrelationIDs: msg.CorrelationIDs,
-						RawPayload:     payload,
-						Settings: &ttnpb.DownlinkMessage_Request{
-							Request: makeTxRequest(
-								downlinkPaths[3].DownlinkPath,
-							),
-						},
-					}),
-				)
-			},
-			func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool) {
+		var asserts []func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool)
+		for i, resp := range resps {
+			i := i
+			resp := resp
+			asserts = append(asserts, func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool) {
 				lastDown = msg
 				_, a := test.MustNewTFromContext(ctx)
-				return resps[2], test.AllTrue(
+				return resp, test.AllTrue(
 					a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
 					a.So(msg.CorrelationIDs, should.NotBeEmpty),
 					a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 						CorrelationIDs: msg.CorrelationIDs,
 						RawPayload:     payload,
 						Settings: &ttnpb.DownlinkMessage_Request{
-							Request: makeTxRequest(
-								downlinkPaths[4].DownlinkPath,
-							),
+							Request: makeTxRequest(func() []*ttnpb.DownlinkPath {
+								switch i {
+								case 0:
+									return []*ttnpb.DownlinkPath{
+										downlinkPaths[1].DownlinkPath,
+										downlinkPaths[2].DownlinkPath,
+									}
+								case 1:
+									return []*ttnpb.DownlinkPath{
+										downlinkPaths[3].DownlinkPath,
+									}
+								case 2:
+									return []*ttnpb.DownlinkPath{
+										downlinkPaths[4].DownlinkPath,
+									}
+								default:
+									panic("invalid response count")
+								}
+							}()...),
 						},
 					}),
 				)
-			},
+			})
+		}
+		return lastDown, a.So(env.AssertScheduleDownlink(
+			ctx,
+			MakeDownlinkPathsWithPeerIndex(downlinkPaths, []uint{0, 1, 1, 2, 1}...),
+			asserts...,
 		), should.BeTrue)
 	}
 
@@ -1102,6 +1103,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return nil, time.Time{}, false
 				}
 				return nil, time.Time{}, test.AllTrue(
+					ok,
 					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						append(lastUp.CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
 					),
@@ -2755,107 +2757,110 @@ func TestProcessDownlinkTask(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:    tc.Name,
+			Timeout: (1 << 10) * test.Delay,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				errCh := make(chan error, 1)
+				_, ctx, env, stop := StartTest(t, TestConfig{
+					Context:       ctx,
+					NetworkServer: DefaultConfig,
+					TaskStarter: component.StartTaskFunc(func(conf *component.TaskConfig) {
+						if conf.ID != DownlinkProcessTaskName {
+							component.DefaultStartTask(conf)
+							return
+						}
+						go func() {
+							errCh <- conf.Func(conf.Context)
+						}()
+					}),
+				})
+				defer stop()
 
-			errCh := make(chan error, 1)
-			_, ctx, env, stop := StartTest(t, TestConfig{
-				NetworkServer: DefaultConfig,
-				TaskStarter: component.StartTaskFunc(func(conf *component.TaskConfig) {
-					if conf.ID != DownlinkProcessTaskName {
-						component.DefaultStartTask(conf)
-						return
-					}
-					go func() {
-						errCh <- conf.Func(conf.Context)
-					}()
-				}),
-				Timeout: (1 << 10) * test.Delay,
-			})
-			defer stop()
+				var created *ttnpb.EndDevice
+				if tc.CreateDevice.EndDevice != nil {
+					created, ctx = MustCreateDevice(ctx, env.Devices, tc.CreateDevice.EndDevice, tc.CreateDevice.Paths...)
+				}
+				test.Must(nil, env.DownlinkTasks.Add(ctx, ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: appID,
+					DeviceID:               devID,
+				}, time.Now(), true))
 
-			var created *ttnpb.EndDevice
-			if tc.CreateDevice.EndDevice != nil {
-				created, ctx = MustCreateDevice(ctx, env.Devices, tc.CreateDevice.EndDevice, tc.CreateDevice.Paths...)
-			}
-			test.Must(nil, env.DownlinkTasks.Add(ctx, ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: appID,
-				DeviceID:               devID,
-			}, time.Now(), true))
-
-			var (
-				down   *ttnpb.DownlinkMessage
-				downAt time.Time
-			)
-			if tc.DownlinkAssertion != nil {
-				var ok bool
-				down, downAt, ok = tc.DownlinkAssertion(ctx, env, created)
-				if !a.So(ok, should.BeTrue) {
-					t.FailNow()
-				}
-			}
-
-			select {
-			case <-ctx.Done():
-				t.Fatal("Timed out while waiting for processDownlinkTask to return")
-
-			case err := <-errCh:
-				if tc.ErrorAssertion == nil {
-					a.So(err, should.BeNil)
-				} else {
-					a.So(tc.ErrorAssertion(t, err), should.BeTrue)
-				}
-			}
-
-			updated, ctx, err := env.Devices.GetByID(ctx, appID, devID, ttnpb.EndDeviceFieldPathsTopLevel)
-			if tc.CreateDevice.EndDevice != nil {
-				if !a.So(err, should.BeNil) {
-					t.FailNow()
-				}
-			} else {
-				if !test.AllTrue(
-					a.So(err, should.NotBeNil),
-					a.So(errors.IsNotFound(err), should.BeTrue),
-				) {
-					t.FailNow()
-				}
-			}
-			if len(tc.DeviceDiffs) == 0 {
-				a.So(updated, should.Resemble, created)
-			} else {
-				expected := CopyEndDevice(created)
-				expected.UpdatedAt = updated.UpdatedAt
-				if !a.So(updated.UpdatedAt, should.HappenAfter, created.UpdatedAt) {
-					t.FailNow()
-				}
-				if down != nil {
-					expected.RecentDownlinks = AppendRecentDownlink(expected.RecentDownlinks, down, RecentDownlinkCount)
-				}
-				for _, diff := range tc.DeviceDiffs {
-					if !a.So(diff(ctx, expected, created, updated, down, downAt), should.BeTrue) {
+				var (
+					down   *ttnpb.DownlinkMessage
+					downAt time.Time
+				)
+				if tc.DownlinkAssertion != nil {
+					var ok bool
+					down, downAt, ok = tc.DownlinkAssertion(ctx, env, created)
+					if !a.So(ok, should.BeTrue) {
 						t.FailNow()
 					}
 				}
-				if !test.AllTrue(
-					a.So(updated, should.Resemble, expected),
-					a.So(err, should.BeNil),
-				) {
-					t.FailNow()
-				}
-			}
 
-			a.So(env.AssertWithApplicationLink(ctx, appID, func(ctx context.Context, link ttnpb.AsNs_LinkApplicationClient) bool {
-				return a.So(AssertProcessApplicationUps(ctx, link, func() []func(context.Context, *ttnpb.ApplicationUp) bool {
-					var upAsserts []func(context.Context, *ttnpb.ApplicationUp) bool
-					for _, assert := range tc.ApplicationUplinkAssertions {
-						upAsserts = append(upAsserts, func(ctx context.Context, up *ttnpb.ApplicationUp) bool {
-							_, a := test.MustNewTFromContext(ctx)
-							return a.So(assert(ctx, created, up), should.BeTrue)
-						})
+				select {
+				case <-ctx.Done():
+					t.Fatal("Timed out while waiting for processDownlinkTask to return")
+
+				case err := <-errCh:
+					if tc.ErrorAssertion == nil {
+						a.So(err, should.BeNil)
+					} else {
+						a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 					}
-					return upAsserts
-				}()...), should.BeTrue)
-			}), should.BeTrue)
+				}
+
+				updated, ctx, err := env.Devices.GetByID(ctx, appID, devID, ttnpb.EndDeviceFieldPathsTopLevel)
+				if tc.CreateDevice.EndDevice != nil {
+					if !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
+				} else {
+					if !test.AllTrue(
+						a.So(err, should.NotBeNil),
+						a.So(errors.IsNotFound(err), should.BeTrue),
+					) {
+						t.FailNow()
+					}
+				}
+				if len(tc.DeviceDiffs) == 0 {
+					a.So(updated, should.Resemble, created)
+				} else {
+					expected := CopyEndDevice(created)
+					expected.UpdatedAt = updated.UpdatedAt
+					if !a.So(updated.UpdatedAt, should.HappenAfter, created.UpdatedAt) {
+						t.FailNow()
+					}
+					if down != nil {
+						expected.RecentDownlinks = AppendRecentDownlink(expected.RecentDownlinks, down, RecentDownlinkCount)
+					}
+					for _, diff := range tc.DeviceDiffs {
+						if !a.So(diff(ctx, expected, created, updated, down, downAt), should.BeTrue) {
+							t.FailNow()
+						}
+					}
+					if !test.AllTrue(
+						a.So(updated, should.Resemble, expected),
+						a.So(err, should.BeNil),
+					) {
+						t.FailNow()
+					}
+				}
+
+				a.So(env.AssertWithApplicationLink(ctx, appID, func(ctx context.Context, link ttnpb.AsNs_LinkApplicationClient) bool {
+					return a.So(AssertProcessApplicationUps(ctx, link, func() []func(context.Context, *ttnpb.ApplicationUp) bool {
+						var upAsserts []func(context.Context, *ttnpb.ApplicationUp) bool
+						for _, assert := range tc.ApplicationUplinkAssertions {
+							upAsserts = append(upAsserts, func(ctx context.Context, up *ttnpb.ApplicationUp) bool {
+								_, a := test.MustNewTFromContext(ctx)
+								return a.So(assert(ctx, created, up), should.BeTrue)
+							})
+						}
+						return upAsserts
+					}()...), should.BeTrue)
+				}), should.BeTrue)
+			},
 		})
 	}
 }

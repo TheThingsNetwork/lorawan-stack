@@ -164,6 +164,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 			Needs: 1000-1 >= DefaultStatusCountPeriodicity,
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -328,6 +329,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

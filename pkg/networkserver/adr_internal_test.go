@@ -218,6 +218,7 @@ func TestLossRate(t *testing.T) {
 			Rate:    3. / 7.,
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name: MakeTestCaseName(
 				fmt.Sprintf("nb_trans:%d", tc.NbTrans),
@@ -471,6 +472,7 @@ func TestAdaptDataRate(t *testing.T) {
 			},
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

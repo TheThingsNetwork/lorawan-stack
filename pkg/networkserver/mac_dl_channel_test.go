@@ -119,6 +119,7 @@ func TestNeedsDLChannelReq(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -286,6 +287,7 @@ func TestEnqueueDLChannelReq(t *testing.T) {
 			},
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name: tc.Name,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
@@ -327,6 +329,9 @@ func TestEnqueueDLChannelReq(t *testing.T) {
 							{},
 						},
 					} {
+						tc := tc
+						conf := conf
+						pendingReqs := pendingReqs
 						test.RunSubtest(t, test.SubtestConfig{
 							Name:     fmt.Sprintf("max_downlink_len:%d,max_uplink_len:%d,pending_requests:%d", conf.MaxDownlinkLength, conf.MaxUplinkLength, len(pendingReqs)),
 							Parallel: true,
@@ -606,6 +611,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 			},
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

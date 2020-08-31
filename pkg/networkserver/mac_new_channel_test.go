@@ -347,6 +347,7 @@ func TestNeedsNewChannelReq(t *testing.T) {
 			Needs: true,
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -478,6 +479,7 @@ func TestEnqueueNewChannelReq(t *testing.T) {
 			},
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name: tc.Name,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
@@ -519,6 +521,8 @@ func TestEnqueueNewChannelReq(t *testing.T) {
 							{},
 						},
 					} {
+						conf := conf
+						pendingReqs := pendingReqs
 						test.RunSubtest(t, test.SubtestConfig{
 							Name:     fmt.Sprintf("max_downlink_len:%d,max_uplink_len:%d,pending_requests:%d", conf.MaxDownlinkLength, conf.MaxUplinkLength, len(pendingReqs)),
 							Parallel: true,
@@ -696,6 +700,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 			},
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

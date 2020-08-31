@@ -146,6 +146,7 @@ func TestNeedsLinkADRReq(t *testing.T) {
 			Needs: true,
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -465,6 +466,7 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -1006,6 +1008,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			},
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

@@ -15,6 +15,7 @@
 package networkserver_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -56,24 +57,27 @@ func TestGenerateDevAddr(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				ns, ctx, _, stop := StartTest(t, TestConfig{
+					Context: ctx,
+					NetworkServer: Config{
+						NetID: tc.NetID,
+					},
+					TaskStarter: StartTaskExclude(
+						DownlinkProcessTaskName,
+					),
+				})
+				defer stop()
 
-			ns, ctx, _, stop := StartTest(t, TestConfig{
-				NetworkServer: Config{
-					NetID: tc.NetID,
-				},
-				TaskStarter: StartTaskExclude(
-					DownlinkProcessTaskName,
-				),
-				Timeout: (1 << 5) * test.Delay,
-			})
-			defer stop()
-
-			devAddr, err := ttnpb.NewNsClient(ns.LoopbackConn()).GenerateDevAddr(ctx, ttnpb.Empty)
-			if a.So(err, should.BeNil) {
-				a.So(devAddr.DevAddr.HasPrefix(tc.DevAddrPrefix), should.BeTrue)
-			}
+				devAddr, err := ttnpb.NewNsClient(ns.LoopbackConn()).GenerateDevAddr(ctx, ttnpb.Empty)
+				if a.So(err, should.BeNil) {
+					a.So(devAddr.DevAddr.HasPrefix(tc.DevAddrPrefix), should.BeTrue)
+				}
+			},
 		})
 	}
 	for _, tc := range []struct {
@@ -132,41 +136,44 @@ func TestGenerateDevAddr(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				ns, ctx, _, stop := StartTest(t, TestConfig{
+					Context: ctx,
+					NetworkServer: Config{
+						NetID:           types.NetID{0x00, 0x00, 0x13},
+						DevAddrPrefixes: tc.DevAddrPrefixes,
+					},
+					TaskStarter: StartTaskExclude(
+						DownlinkProcessTaskName,
+					),
+				})
+				defer stop()
 
-			ns, ctx, _, stop := StartTest(t, TestConfig{
-				NetworkServer: Config{
-					NetID:           types.NetID{0x00, 0x00, 0x13},
-					DevAddrPrefixes: tc.DevAddrPrefixes,
-				},
-				TaskStarter: StartTaskExclude(
-					DownlinkProcessTaskName,
-				),
-				Timeout: (1 << 7) * test.Delay,
-			})
-			defer stop()
+				hasOneOfPrefixes := func(devAddr *types.DevAddr, seen map[types.DevAddrPrefix]int, prefixes ...types.DevAddrPrefix) bool {
+					for i, p := range prefixes {
+						if devAddr.HasPrefix(p) {
+							seen[prefixes[i]]++
+							return true
+						}
+					}
+					return false
+				}
 
-			hasOneOfPrefixes := func(devAddr *types.DevAddr, seen map[types.DevAddrPrefix]int, prefixes ...types.DevAddrPrefix) bool {
-				for i, p := range prefixes {
-					if devAddr.HasPrefix(p) {
-						seen[prefixes[i]]++
-						return true
+				seen := map[types.DevAddrPrefix]int{}
+				for i := 0; i < 100; i++ {
+					devAddr, err := ttnpb.NewNsClient(ns.LoopbackConn()).GenerateDevAddr(ctx, ttnpb.Empty)
+					if a.So(err, should.BeNil) {
+						a.So(hasOneOfPrefixes(devAddr.DevAddr, seen, tc.DevAddrPrefixes[0], tc.DevAddrPrefixes[1], tc.DevAddrPrefixes[2]), should.BeTrue)
 					}
 				}
-				return false
-			}
-
-			seen := map[types.DevAddrPrefix]int{}
-			for i := 0; i < 100; i++ {
-				devAddr, err := ttnpb.NewNsClient(ns.LoopbackConn()).GenerateDevAddr(ctx, ttnpb.Empty)
-				if a.So(err, should.BeNil) {
-					a.So(hasOneOfPrefixes(devAddr.DevAddr, seen, tc.DevAddrPrefixes[0], tc.DevAddrPrefixes[1], tc.DevAddrPrefixes[2]), should.BeTrue)
-				}
-			}
-			a.So(seen[tc.DevAddrPrefixes[0]], should.BeGreaterThan, 0)
-			a.So(seen[tc.DevAddrPrefixes[1]], should.BeGreaterThan, 0)
-			a.So(seen[tc.DevAddrPrefixes[2]], should.BeGreaterThan, 0)
+				a.So(seen[tc.DevAddrPrefixes[0]], should.BeGreaterThan, 0)
+				a.So(seen[tc.DevAddrPrefixes[1]], should.BeGreaterThan, 0)
+				a.So(seen[tc.DevAddrPrefixes[2]], should.BeGreaterThan, 0)
+			},
 		})
 	}
 }

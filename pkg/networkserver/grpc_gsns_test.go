@@ -1332,7 +1332,7 @@ func TestHandleUplink(t *testing.T) {
 				makeDataSetDevice := func(ctx context.Context, getDevice *ttnpb.EndDevice, decodedMsg *ttnpb.UplinkMessage) (*ttnpb.EndDevice, events.Builders) {
 					setDevice := CopyEndDevice(getDevice)
 					setDevice.MACState.QueuedResponses = nil
-					evs := test.Must(HandleLinkCheckReq(test.Context(), setDevice, decodedMsg)).(events.Builders)
+					evs := test.Must(HandleLinkCheckReq(ctx, setDevice, decodedMsg)).(events.Builders)
 					setDevice.MACState.RecentUplinks = AppendRecentUplink(setDevice.MACState.RecentUplinks, WithMatchedUplinkSettings(decodedMsg, chIdx, drIdx), RecentUplinkCount)
 					setDevice.MACState.RxWindowsAvailable = true
 					setDevice.RecentUplinks = AppendRecentUplink(setDevice.RecentUplinks, WithMatchedUplinkSettings(decodedMsg, chIdx, drIdx), RecentUplinkCount)
@@ -1705,69 +1705,75 @@ func TestHandleUplink(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		t.Run(tc.Name, func(t *testing.T) {
-			dtq, dtqEnv, dtqClose := newMockDownlinkTaskQueue(t)
-			defer dtqClose()
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Timeout:  (1 << 10) * test.Delay,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dtq, dtqEnv, dtqClose := newMockDownlinkTaskQueue(t)
+				defer dtqClose()
 
-			dr, drEnv, drClose := newMockDeviceRegistry(t)
-			defer drClose()
+				dr, drEnv, drClose := newMockDeviceRegistry(t)
+				defer drClose()
 
-			ud, udEnv, udClose := newMockUplinkDeduplicator(t)
-			defer udClose()
+				ud, udEnv, udClose := newMockUplinkDeduplicator(t)
+				defer udClose()
 
-			auq, auqEnv, auqClose := newMockApplicationUplinkQueue(t)
-			defer auqClose()
+				auq, auqEnv, auqClose := newMockApplicationUplinkQueue(t)
+				defer auqClose()
 
-			ns, ctx, env, stop := StartTest(
-				t,
-				TestConfig{
-					NetworkServer: Config{
-						NetID:               *NetID.Copy(&types.NetID{}),
-						DeduplicationWindow: DeduplicationWindow,
-						CooldownWindow:      CooldownWindow,
+				ns, ctx, env, stop := StartTest(
+					t,
+					TestConfig{
+						Context: ctx,
+						NetworkServer: Config{
+							NetID:               *NetID.Copy(&types.NetID{}),
+							DeduplicationWindow: DeduplicationWindow,
+							CooldownWindow:      CooldownWindow,
 
-						DownlinkTasks:      dtq,
-						Devices:            dr,
-						UplinkDeduplicator: ud,
-						ApplicationUplinkQueue: ApplicationUplinkQueueConfig{
-							Queue: auq,
+							DownlinkTasks:      dtq,
+							Devices:            dr,
+							UplinkDeduplicator: ud,
+							ApplicationUplinkQueue: ApplicationUplinkQueueConfig{
+								Queue: auq,
+							},
 						},
+						TaskStarter: StartTaskExclude(
+							DownlinkProcessTaskName,
+						),
 					},
-					TaskStarter: StartTaskExclude(
-						DownlinkProcessTaskName,
-					),
-					Timeout: (1 << 10) * test.Delay,
-				},
-			)
-			defer stop()
+				)
+				defer stop()
 
-			clock := test.NewMockClock(time.Now().UTC())
-			defer SetMockClock(clock)()
+				clock := test.NewMockClock(time.Now().UTC())
+				defer SetMockClock(clock)()
 
-			if !tc.Handler(ctx, LegacyTestEnvironment{
-				TestEnvironment: env,
+				if !tc.Handler(ctx, LegacyTestEnvironment{
+					TestEnvironment: env,
 
-				DownlinkTasks:      dtqEnv,
-				DeviceRegistry:     drEnv,
-				UplinkDeduplicator: udEnv,
-				ApplicationUplinks: auqEnv,
-			}, clock, func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan error {
-				ch := make(chan error)
-				go func() {
-					_, err := ttnpb.NewGsNsClient(ns.LoopbackConn()).HandleUplink(ctx, CopyUplinkMessage(msg))
-					ttnErr, ok := errors.From(err)
-					if ok {
-						ch <- ttnErr
-					} else {
-						ch <- err
-					}
-					close(ch)
-				}()
-				return ch
-			}) {
-				t.Error("Test handler failed")
-			}
-			assertions.New(t).So(AssertNetworkServerClose(ctx, ns), should.BeTrue)
+					DownlinkTasks:      dtqEnv,
+					DeviceRegistry:     drEnv,
+					UplinkDeduplicator: udEnv,
+					ApplicationUplinks: auqEnv,
+				}, clock, func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan error {
+					ch := make(chan error)
+					go func() {
+						_, err := ttnpb.NewGsNsClient(ns.LoopbackConn()).HandleUplink(ctx, CopyUplinkMessage(msg))
+						ttnErr, ok := errors.From(err)
+						if ok {
+							ch <- ttnErr
+						} else {
+							ch <- err
+						}
+						close(ch)
+					}()
+					return ch
+				}) {
+					t.Error("Test handler failed")
+				}
+				a.So(AssertNetworkServerClose(ctx, ns), should.BeTrue)
+			},
 		})
 	}
 }
