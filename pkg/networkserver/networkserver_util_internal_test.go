@@ -1117,6 +1117,7 @@ func AssertInteropClientHandleJoinRequestRequest(ctx context.Context, reqCh <-ch
 }
 
 func AssertProcessApplicationUp(ctx context.Context, link ttnpb.AsNs_LinkApplicationClient, assert func(context.Context, *ttnpb.ApplicationUp) bool) bool {
+	test.MustTFromContext(ctx).Helper()
 	return test.RunSubtestFromContext(ctx, test.SubtestConfig{
 		Name: "AsNs.LinkApplication.Recv",
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
@@ -1330,6 +1331,7 @@ func UintRepeat(v uint, count int) []uint {
 }
 
 func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, paths []DownlinkPathWithPeerIndex, asserts ...func(ctx, reqCtx context.Context, down *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool)) bool {
+	test.MustTFromContext(ctx).Helper()
 	return test.RunSubtestFromContext(ctx, test.SubtestConfig{
 		Name: "NsGs.ScheduleDownlink",
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
@@ -1436,7 +1438,8 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, paths []D
 }
 
 func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, bool) {
-	_, a := test.MustNewTFromContext(ctx)
+	t, a := test.MustNewTFromContext(ctx)
+	t.Helper()
 	dev = CopyEndDevice(dev)
 	return dev, test.AllTrue(
 		a.So(test.RunSubtestFromContext(ctx, test.SubtestConfig{
@@ -1516,7 +1519,8 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 }
 
 func (env TestEnvironment) AssertHandleDeviceUplink(ctx context.Context, assert func(context.Context, func(...events.Event) bool) bool, ups ...*ttnpb.UplinkMessage) bool {
-	_, a := test.MustNewTFromContext(ctx)
+	t, a := test.MustNewTFromContext(ctx)
+	t.Helper()
 	return a.So(test.RunSubtestFromContext(ctx, test.SubtestConfig{
 		Name: "GsNs.HandleUplink",
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
@@ -1592,7 +1596,8 @@ func (env TestEnvironment) AssertHandleDeviceUplink(ctx context.Context, assert 
 }
 
 func (env TestEnvironment) AssertHandleJoinRequest(ctx context.Context, conf JoinRequestConfig, assert func(ctx context.Context, assertEvents func(...events.Event) bool, ups ...*ttnpb.UplinkMessage) bool, duplicateMDs ...[]*ttnpb.RxMetadata) bool {
-	_, a := test.MustNewTFromContext(ctx)
+	t, a := test.MustNewTFromContext(ctx)
+	t.Helper()
 	return a.So(test.RunSubtestFromContext(ctx, test.SubtestConfig{
 		Name: "Join-request",
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
@@ -1618,7 +1623,8 @@ func (env TestEnvironment) AssertHandleJoinRequest(ctx context.Context, conf Joi
 }
 
 func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf DataUplinkConfig, assert func(ctx context.Context, assertEvents func(...events.Event) bool, ups ...*ttnpb.UplinkMessage) bool, duplicateMDs ...[]*ttnpb.RxMetadata) bool {
-	_, a := test.MustNewTFromContext(ctx)
+	t, a := test.MustNewTFromContext(ctx)
+	t.Helper()
 	return a.So(test.RunSubtestFromContext(ctx, test.SubtestConfig{
 		Name: "Data uplink",
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
@@ -1644,6 +1650,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 }
 
 func (env TestEnvironment) AssertNsJsJoin(ctx context.Context, getPeerAssert func(ctx, reqCtx context.Context, ids ttnpb.Identifiers) bool, joinAssert func(ctx, reqCtx context.Context, msg *ttnpb.JoinRequest) bool, joinResp *ttnpb.JoinResponse, err error) bool {
+	test.MustTFromContext(ctx).Helper()
 	return test.RunSubtestFromContext(ctx, test.SubtestConfig{
 		Name: "NsJs.HandleJoin",
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
@@ -1705,7 +1712,8 @@ type JoinAssertionConfig struct {
 }
 
 func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionConfig) (*ttnpb.EndDevice, bool) {
-	_, a := test.MustNewTFromContext(ctx)
+	t, a := test.MustNewTFromContext(ctx)
+	t.Helper()
 
 	fp := FrequencyPlan(conf.Device.FrequencyPlanID)
 	phy := LoRaWANBands[fp.BandID][conf.Device.LoRaWANPHYVersion]
@@ -1734,6 +1742,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 			upConf,
 			func(ctx context.Context, assertEvents func(...events.Event) bool, ups ...*ttnpb.UplinkMessage) bool {
 				t, a := test.MustNewTFromContext(ctx)
+				t.Helper()
 
 				defaultMACSettings := env.Config.DefaultMACSettings.Parse()
 

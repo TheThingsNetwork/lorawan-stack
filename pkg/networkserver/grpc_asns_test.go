@@ -486,7 +486,6 @@ func TestLinkApplication(t *testing.T) {
 				return a.So(evs, should.HaveSameElementsFunc,
 					test.MakeEventEqual(test.EventEqualConfig{
 						Identifiers:    true,
-						Data:           true,
 						CorrelationIDs: true,
 						Origin:         true,
 						Context:        true,
