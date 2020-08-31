@@ -15,6 +15,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
+import { Col, Row, Container } from 'react-grid-system'
 
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -25,7 +26,7 @@ import withRequest from '@ttn-lw/lib/components/with-request'
 import withEnv from '@ttn-lw/lib/components/env'
 import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
-import EntityTitleSection from '@console/components/entity-title-section'
+import DeviceTitleSection from '@console/containers/device-title-section'
 
 import DeviceData from '@console/views/device-data'
 import DeviceGeneralSettings from '@console/views/device-general-settings'
@@ -52,8 +53,6 @@ import {
   selectSelectedDevice,
   selectDeviceFetching,
   selectDeviceError,
-  selectDeviceUplinkFrameCount,
-  selectDeviceLastSeen,
 } from '@console/store/selectors/devices'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
@@ -69,8 +68,6 @@ import style from './device.styl'
       devId,
       appId,
       device,
-      deviceUplinkFrameCount: selectDeviceUplinkFrameCount(state, appId, devId),
-      deviceLastSeen: selectDeviceLastSeen(state, appId, devId),
       mayReadKeys: checkFromState(mayReadApplicationDeviceKeys, state),
       mayScheduleDownlinks: checkFromState(mayScheduleDownlinks, state),
       fetching: selectDeviceFetching(state),
@@ -135,8 +132,6 @@ export default class Device extends React.Component {
   static propTypes = {
     devId: PropTypes.string.isRequired,
     device: PropTypes.device.isRequired,
-    deviceLastSeen: PropTypes.string,
-    deviceUplinkFrameCount: PropTypes.number,
     env: PropTypes.env,
     location: PropTypes.location.isRequired,
     match: PropTypes.match.isRequired,
@@ -145,8 +140,6 @@ export default class Device extends React.Component {
   }
 
   static defaultProps = {
-    deviceLastSeen: undefined,
-    deviceUplinkFrameCount: undefined,
     env: undefined,
   }
 
@@ -163,19 +156,17 @@ export default class Device extends React.Component {
         params: { appId },
       },
       devId,
-      device: {
-        name,
-        description,
-        join_server_address,
-        supports_join,
-        root_keys,
-        application_server_address,
-      },
-      deviceUplinkFrameCount,
-      deviceLastSeen,
+      device,
       env: { siteName },
       mayScheduleDownlinks,
     } = this.props
+    const {
+      name,
+      join_server_address,
+      supports_join,
+      root_keys,
+      application_server_address,
+    } = device
 
     const jsConfig = selectJsConfig()
     const hasJs =
@@ -228,15 +219,17 @@ export default class Device extends React.Component {
     return (
       <React.Fragment>
         <IntlHelmet titleTemplate={`%s - ${name || devId} - ${siteName}`} />
-        <EntityTitleSection.Device
-          deviceId={devId}
-          deviceName={name}
-          description={description}
-          lastSeen={deviceLastSeen}
-          uplinkFrameCount={deviceUplinkFrameCount}
-        >
-          <Tabs className={style.tabs} narrow tabs={tabs} />
-        </EntityTitleSection.Device>
+        <div>
+          <Container>
+            <Row>
+              <Col sm={12}>
+                <DeviceTitleSection appId={appId} devId={devId}>
+                  <Tabs className={style.tabs} narrow tabs={tabs} />
+                </DeviceTitleSection>
+              </Col>
+            </Row>
+          </Container>
+        </div>
         <Switch>
           <Route exact path={basePath} component={DeviceOverview} />
           <Route exact path={`${basePath}/data`} component={DeviceData} />

@@ -120,6 +120,7 @@ export default defineMessages({
   deviceEUIDescription: 'The DevEUI is the unique identifier for this end device',
   deviceIdPlaceholder: 'my-new-device',
   deviceNamePlaceholder: 'My new end device',
+  device: 'End device',
   devices: 'End devices',
   devID: 'End device ID',
   devName: 'End device name',
