@@ -358,18 +358,16 @@ func TestHandleUplink(t *testing.T) {
 		if !a.So(ok, should.BeTrue) {
 			return nil, false
 		}
-		return getCtx, test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-			return test.AllTrue(
-				a.So(reqCtx, should.HaveParentContextOrEqual, getCtx),
-				a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER),
-				a.So(ids, should.Resemble, dev.EndDeviceIdentifiers),
-			)
-		},
-			test.ClusterGetPeerResponse{
-				Peer:  peer,
-				Error: err,
-			},
-		)
+		return getCtx, test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (test.ClusterGetPeerResponse, bool) {
+			return test.ClusterGetPeerResponse{
+					Peer:  peer,
+					Error: err,
+				}, test.AllTrue(
+					a.So(reqCtx, should.HaveParentContextOrEqual, getCtx),
+					a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER),
+					a.So(ids, should.Resemble, dev.EndDeviceIdentifiers),
+				)
+		})
 	}
 	assertJoinClusterLocalSequence := func(ctx context.Context, env LegacyTestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex, dev *ttnpb.EndDevice, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) (context.Context, bool) {
 		_, a := test.MustNewTFromContext(ctx)

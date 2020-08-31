@@ -362,11 +362,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 				)
 			})
 		}
-		return lastDown, a.So(env.AssertScheduleDownlink(
+		if !a.So(env.AssertScheduleDownlink(
 			ctx,
 			MakeDownlinkPathsWithPeerIndex(downlinkPaths, []uint{0, 1, 1, 2, 1}...),
 			asserts...,
-		), should.BeTrue)
+		), should.BeTrue) {
+			t.Error("NsGs.ScheduleDownlink assertion failed")
+			return nil, false
+		}
+		return lastDown, true
 	}
 
 	makeFailEventEqual := func(t *testing.T) func(x, y events.Event) bool {
