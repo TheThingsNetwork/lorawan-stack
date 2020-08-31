@@ -728,7 +728,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 		fp := FrequencyPlan(fpID)
 		phy := LoRaWANBands[fp.BandID][phyVersion]
 
-		upChs := FrequencyPlanChannels(phy, fp.UplinkChannels, fp.DownlinkChannels...)
+		upChs := DeviceDesiredChannels(phy, fp, env.Config.DefaultMACSettings.Parse())
 		upChIdx := uint8(2)
 		upDRIdx := ttnpb.DATA_RATE_1
 
