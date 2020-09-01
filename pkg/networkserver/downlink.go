@@ -31,6 +31,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc"
@@ -110,7 +112,7 @@ func (ns *NetworkServer) updateDataDownlinkTask(ctx context.Context, dev *ttnpb.
 		earliestAt = t
 	}
 	var taskAt time.Time
-	phy, err := deviceBand(dev, ns.FrequencyPlans)
+	phy, err := DeviceBand(dev, ns.FrequencyPlans)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to determine device band")
 	} else {
@@ -208,59 +210,59 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 
 		cmdBuf = make([]byte, 0, maxDownLen)
-		enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) macCommandEnqueueState, 0, 13)
+		enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) mac.EnqueueState, 0, 13)
 		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0) >= 0 {
 			enqueuers = append(enqueuers,
-				enqueueDutyCycleReq,
-				enqueueRxParamSetupReq,
-				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) macCommandEnqueueState {
-					return enqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings, transmitAt)
+				mac.EnqueueDutyCycleReq,
+				mac.EnqueueRxParamSetupReq,
+				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
+					return mac.EnqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings, transmitAt)
 				},
-				enqueueNewChannelReq,
-				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) macCommandEnqueueState {
+				mac.EnqueueNewChannelReq,
+				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
 					// NOTE: LinkADRReq must be enqueued after NewChannelReq.
-					st, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings, phy)
+					st, err := mac.EnqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings, phy)
 					if err != nil {
 						logger.WithError(err).Error("Failed to enqueue LinkADRReq")
-						return macCommandEnqueueState{
+						return mac.EnqueueState{
 							MaxDownLen: maxDownLen,
 							MaxUpLen:   maxUpLen,
 						}
 					}
 					return st
 				},
-				enqueueRxTimingSetupReq,
+				mac.EnqueueRxTimingSetupReq,
 			)
 			if dev.MACState.DeviceClass == ttnpb.CLASS_B {
 				if class == ttnpb.CLASS_A {
 					enqueuers = append(enqueuers,
-						enqueuePingSlotChannelReq,
+						mac.EnqueuePingSlotChannelReq,
 					)
 				}
 				enqueuers = append(enqueuers,
-					enqueueBeaconFreqReq,
+					mac.EnqueueBeaconFreqReq,
 				)
 			}
 		}
 		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 {
 			if phy.TxParamSetupReqSupport {
 				enqueuers = append(enqueuers,
-					func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) macCommandEnqueueState {
-						return enqueueTxParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
+					func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
+						return mac.EnqueueTxParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
 					},
 				)
 			}
 			enqueuers = append(enqueuers,
-				enqueueDLChannelReq,
+				mac.EnqueueDLChannelReq,
 			)
 		}
 		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 			enqueuers = append(enqueuers,
-				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) macCommandEnqueueState {
-					return enqueueADRParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
+				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
+					return mac.EnqueueADRParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
 				},
-				enqueueForceRejoinReq,
-				enqueueRejoinParamSetupReq,
+				mac.EnqueueForceRejoinReq,
+				mac.EnqueueRejoinParamSetupReq,
 			)
 		}
 
@@ -292,7 +294,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	var needsDownlink bool
 	var up *ttnpb.UplinkMessage
 	if dev.MACState.RxWindowsAvailable && len(dev.MACState.RecentUplinks) > 0 {
-		up = lastUplink(dev.MACState.RecentUplinks...)
+		up = LastUplink(dev.MACState.RecentUplinks...)
 		switch up.Payload.MHDR.MType {
 		case ttnpb.MType_UNCONFIRMED_UP:
 			if up.Payload.GetMACPayload().FCtrl.ADRAckReq {
@@ -310,7 +312,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			DevAddr: dev.Session.DevAddr,
 			FCtrl: ttnpb.FCtrl{
 				Ack: up != nil && up.Payload.MHDR.MType == ttnpb.MType_CONFIRMED_UP,
-				ADR: deviceUseADR(dev, ns.defaultMACSettings, phy),
+				ADR: mac.DeviceUseADR(dev, ns.defaultMACSettings, phy),
 			},
 		},
 	}
@@ -980,12 +982,12 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genDown *generatedDownlink, genSta
 	if genState.ApplicationDownlink == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && genDown.FCnt > dev.Session.LastNFCntDown {
 		dev.Session.LastNFCntDown = genDown.FCnt
 	}
-	dev.MACState.LastDownlinkAt = timePtr(down.TransmitAt)
+	dev.MACState.LastDownlinkAt = TimePtr(down.TransmitAt)
 	if genDown.NeedsMACAnswer || genDown.Confirmed {
-		dev.MACState.LastConfirmedDownlinkAt = timePtr(down.TransmitAt)
+		dev.MACState.LastConfirmedDownlinkAt = TimePtr(down.TransmitAt)
 	}
 	if class := down.Message.GetRequest().GetClass(); class == ttnpb.CLASS_B || class == ttnpb.CLASS_C {
-		dev.MACState.LastNetworkInitiatedDownlinkAt = timePtr(down.TransmitAt)
+		dev.MACState.LastNetworkInitiatedDownlinkAt = TimePtr(down.TransmitAt)
 	}
 
 	if genState.ApplicationDownlink != nil && genState.ApplicationDownlink.Confirmed {
@@ -1447,7 +1449,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					return nil, nil, nil
 				}
 
-				fp, phy, err := deviceFrequencyPlanAndBand(dev, ns.FrequencyPlans)
+				fp, phy, err := DeviceFrequencyPlanAndBand(dev, ns.FrequencyPlans)
 				if err != nil {
 					taskUpdateStrategy = retryDownlinkTask
 					logger.WithError(err).Error("Failed to get frequency plan of the device, retry downlink slot")
@@ -1471,7 +1473,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						logger.Error("No recent uplinks found, skip downlink slot")
 						return dev, nil, nil
 					}
-					up := lastUplink(dev.RecentUplinks...)
+					up := LastUplink(dev.RecentUplinks...)
 					switch up.Payload.MHDR.MType {
 					case ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
 					default:

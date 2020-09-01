@@ -32,6 +32,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -1059,7 +1061,7 @@ func TestGenerateDownlink(t *testing.T) {
 				}
 
 				dev := CopyEndDevice(tc.Device)
-				phy, err := deviceBand(dev, ns.FrequencyPlans)
+				phy, err := DeviceBand(dev, ns.FrequencyPlans)
 				if !a.So(err, should.BeNil) {
 					t.Fail()
 					return

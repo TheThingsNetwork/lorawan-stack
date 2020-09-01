@@ -16,83 +16,15 @@ package networkserver
 
 import (
 	"context"
-	"fmt"
 	"strings"
-	"unicode"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
-
-func macEventOptions(extraOpts ...events.Option) []events.Option {
-	return append([]events.Option{events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ)}, extraOpts...)
-}
-
-func defineReceiveMACAcceptEvent(name, desc string, opts ...events.Option) func() events.Builder {
-	return events.DefineFunc(
-		fmt.Sprintf("ns.mac.%s.answer.accept", name), fmt.Sprintf("%s accept received", desc),
-		macEventOptions(opts...)...,
-	)
-}
-
-func defineReceiveMACAnswerEvent(name, desc string, opts ...events.Option) func() events.Builder {
-	return events.DefineFunc(
-		fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer received", desc),
-		macEventOptions(opts...)...,
-	)
-}
-
-func defineReceiveMACIndicationEvent(name, desc string, opts ...events.Option) func() events.Builder {
-	return events.DefineFunc(
-		fmt.Sprintf("ns.mac.%s.indication", name), fmt.Sprintf("%s indication received", desc),
-		macEventOptions(opts...)...,
-	)
-}
-
-func defineReceiveMACRejectEvent(name, desc string, opts ...events.Option) func() events.Builder {
-	return events.DefineFunc(
-		fmt.Sprintf("ns.mac.%s.answer.reject", name), fmt.Sprintf("%s rejection received", desc),
-		macEventOptions(opts...)...,
-	)
-}
-
-func defineReceiveMACRequestEvent(name, desc string, opts ...events.Option) func() events.Builder {
-	return events.DefineFunc(
-		fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request received", desc),
-		macEventOptions(opts...)...,
-	)
-}
-
-func defineEnqueueMACAnswerEvent(name, desc string, opts ...events.Option) func() events.Builder {
-	return events.DefineFunc(
-		fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer enqueued", desc),
-		macEventOptions(opts...)...,
-	)
-}
-
-func defineEnqueueMACConfirmationEvent(name, desc string, opts ...events.Option) func() events.Builder {
-	return events.DefineFunc(
-		fmt.Sprintf("ns.mac.%s.confirmation", name), fmt.Sprintf("%s confirmation enqueued", desc),
-		macEventOptions(opts...)...,
-	)
-}
-
-func defineEnqueueMACRequestEvent(name, desc string, opts ...events.Option) func() events.Builder {
-	return events.DefineFunc(
-		fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request enqueued", desc),
-		macEventOptions(opts...)...,
-	)
-}
-
-func defineClassSwitchEvent(class rune) func() events.Builder {
-	return events.DefineFunc(
-		fmt.Sprintf("ns.class.switch.%c", class), fmt.Sprintf("switched to class %c", unicode.ToUpper(class)),
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
-	)
-}
 
 var (
 	evtBeginApplicationLink = events.Define(
@@ -208,16 +140,6 @@ var (
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
-	evtEnqueueProprietaryMACAnswer  = defineEnqueueMACAnswerEvent("proprietary", "proprietary MAC command")
-	evtEnqueueProprietaryMACRequest = defineEnqueueMACRequestEvent("proprietary", "proprietary MAC command")
-	evtReceiveProprietaryMAC        = events.Define(
-		"ns.mac.proprietary.receive", "receive proprietary MAC command",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
-	)
-
-	evtClassASwitch = defineClassSwitchEvent('a')()
-	evtClassBSwitch = defineClassSwitchEvent('b')()
-	evtClassCSwitch = defineClassSwitchEvent('c')()
 )
 
 const (
@@ -394,7 +316,7 @@ func registerDropUplink(ctx context.Context, msg *ttnpb.UplinkMessage, err error
 }
 
 func registerMergeMetadata(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	gtwCount, _ := rxMetadataStats(ctx, msg.RxMetadata)
+	gtwCount, _ := RXMetadataStats(ctx, msg.RxMetadata)
 	nsMetrics.uplinkGateways.WithLabelValues(ctx).Observe(float64(gtwCount))
 }
 

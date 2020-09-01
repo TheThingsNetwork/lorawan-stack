@@ -24,6 +24,9 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -259,7 +262,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							PendingSession:       makeSession(0x00, 0x00),
 						}
 						dev.PendingMACState.PendingJoinRequest = MakeNsJsJoinRequest(NsJsJoinRequestConfig{
-							SelectedMACVersion: DeviceDefaultLoRaWANVersion(dev),
+							SelectedMACVersion: mac.DeviceDefaultLoRaWANVersion(dev),
 							PHYVersion:         phyVersion,
 							FrequencyPlanID:    dev.FrequencyPlanID,
 							DevAddr:            DevAddr,
@@ -494,18 +497,18 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					MakeQueuedEvents: func(deduplicated bool) events.Builders {
 						if deduplicated {
 							return events.Builders{
-								evtReceiveLinkCheckRequest.BindData(nil),
-								evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-								evtEnqueuePingSlotInfoAnswer.BindData(nil),
-								evtReceiveDeviceTimeRequest.BindData(nil),
-								evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
+								mac.EvtReceiveLinkCheckRequest.BindData(nil),
+								mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+								mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
+								mac.EvtReceiveDeviceTimeRequest.BindData(nil),
+								mac.EvtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 							}
 						}
 						return events.Builders{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-							evtEnqueuePingSlotInfoAnswer.BindData(nil),
-							evtReceiveDeviceTimeRequest.BindData(nil),
-							evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
+							mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
+							mac.EvtReceiveDeviceTimeRequest.BindData(nil),
+							mac.EvtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 						}
 					},
 				},
@@ -554,18 +557,18 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					MakeQueuedEvents: func(deduplicated bool) events.Builders {
 						if deduplicated {
 							return events.Builders{
-								evtReceiveLinkCheckRequest.BindData(nil),
-								evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-								evtEnqueuePingSlotInfoAnswer.BindData(nil),
-								evtReceiveDeviceTimeRequest.BindData(nil),
-								evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
+								mac.EvtReceiveLinkCheckRequest.BindData(nil),
+								mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+								mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
+								mac.EvtReceiveDeviceTimeRequest.BindData(nil),
+								mac.EvtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 							}
 						}
 						return events.Builders{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-							evtEnqueuePingSlotInfoAnswer.BindData(nil),
-							evtReceiveDeviceTimeRequest.BindData(nil),
-							evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
+							mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
+							mac.EvtReceiveDeviceTimeRequest.BindData(nil),
+							mac.EvtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 						}
 					},
 				},
@@ -615,18 +618,18 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					MakeQueuedEvents: func(deduplicated bool) events.Builders {
 						if deduplicated {
 							return events.Builders{
-								evtReceiveLinkCheckRequest.BindData(nil),
-								evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-								evtEnqueuePingSlotInfoAnswer.BindData(nil),
-								evtReceiveDeviceTimeRequest.BindData(nil),
-								evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
+								mac.EvtReceiveLinkCheckRequest.BindData(nil),
+								mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+								mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
+								mac.EvtReceiveDeviceTimeRequest.BindData(nil),
+								mac.EvtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 							}
 						}
 						return events.Builders{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-							evtEnqueuePingSlotInfoAnswer.BindData(nil),
-							evtReceiveDeviceTimeRequest.BindData(nil),
-							evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
+							mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
+							mac.EvtReceiveDeviceTimeRequest.BindData(nil),
+							mac.EvtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 						}
 					},
 				},
@@ -653,7 +656,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							PendingSession:       makeSession(0x00, 0x00),
 						}
 						dev.PendingMACState.PendingJoinRequest = MakeNsJsJoinRequest(NsJsJoinRequestConfig{
-							SelectedMACVersion: DeviceDefaultLoRaWANVersion(dev),
+							SelectedMACVersion: mac.DeviceDefaultLoRaWANVersion(dev),
 							PHYVersion:         phyVersion,
 							FrequencyPlanID:    dev.FrequencyPlanID,
 							DevAddr:            DevAddr,
@@ -700,8 +703,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					},
 					MakeQueuedEvents: func(bool) events.Builders {
 						return events.Builders{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-							evtEnqueuePingSlotInfoAnswer.BindData(nil),
+							mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
 						}
 					},
 				}),
@@ -751,8 +754,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					},
 					MakeQueuedEvents: func(bool) events.Builders {
 						return events.Builders{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-							evtEnqueuePingSlotInfoAnswer.BindData(nil),
+							mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
 						}
 					},
 				},
@@ -869,7 +872,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					},
 					MakeQueuedEvents: func(bool) events.Builders {
 						return events.Builders{
-							evtClassBSwitch.BindData(ttnpb.CLASS_A),
+							mac.EvtClassBSwitch.BindData(ttnpb.CLASS_A),
 						}
 					},
 				},

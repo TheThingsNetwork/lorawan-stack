@@ -27,6 +27,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -150,11 +153,11 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 				Class: ttnpb.CLASS_C,
 			}
 			expectedUpEvBuilders = append(expectedUpEvBuilders,
-				EvtReceiveRekeyIndication.With(events.WithData(rekeyInd)),
-				EvtEnqueueRekeyConfirmation.With(events.WithData(rekeyConf)),
-				EvtReceiveDeviceModeIndication.With(events.WithData(deviceModeInd)),
-				EvtClassCSwitch.With(events.WithData(ttnpb.CLASS_A)),
-				EvtEnqueueDeviceModeConfirmation.With(events.WithData(deviceModeConf)),
+				mac.EvtReceiveRekeyIndication.With(events.WithData(rekeyInd)),
+				mac.EvtEnqueueRekeyConfirmation.With(events.WithData(rekeyConf)),
+				mac.EvtReceiveDeviceModeIndication.With(events.WithData(deviceModeInd)),
+				mac.EvtClassCSwitch.With(events.WithData(ttnpb.CLASS_A)),
+				mac.EvtEnqueueDeviceModeConfirmation.With(events.WithData(deviceModeConf)),
 			)
 			downCmders = append(downCmders,
 				rekeyConf,
@@ -289,11 +292,11 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 		}
 
 		downCmders = append(downCmders, ttnpb.CID_DEV_STATUS)
-		expectedEvBuilders := []events.Builder{EvtEnqueueDevStatusRequest}
+		expectedEvBuilders := []events.Builder{mac.EvtEnqueueDevStatusRequest}
 		for _, cmd := range linkADRReqs {
 			cmd := cmd
 			downCmders = append(downCmders, cmd)
-			expectedEvBuilders = append(expectedEvBuilders, EvtEnqueueLinkADRRequest.With(events.WithData(cmd)))
+			expectedEvBuilders = append(expectedEvBuilders, mac.EvtEnqueueLinkADRRequest.With(events.WithData(cmd)))
 		}
 
 		paths := DownlinkPathsFromMetadata(RxMetadata[:]...)

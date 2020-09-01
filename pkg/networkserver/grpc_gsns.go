@@ -32,6 +32,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -231,7 +233,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 		logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
 		ctx = log.NewContext(ctx, logger)
 
-		phy, err := deviceBand(dev.EndDevice, ns.FrequencyPlans)
+		phy, err := DeviceBand(dev.EndDevice, ns.FrequencyPlans)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to get device's versioned band, skip")
 			continue
@@ -270,7 +272,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 			pendingDev := dev.EndDevice
 			if dev.Session != nil && dev.MACState != nil && dev.Session.DevAddr == pld.DevAddr {
 				logger.Error("Same DevAddr was assigned to a device in two consecutive sessions")
-				pendingDev = copyEndDevice(dev.EndDevice)
+				pendingDev = CopyEndDevice(dev.EndDevice)
 			}
 			pendingDev.MACState = pendingDev.PendingMACState
 			pendingDev.PendingMACState = nil
@@ -384,7 +386,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 				continue
 			}
 
-			macState, err := newMACState(dev.EndDevice, ns.FrequencyPlans, ns.defaultMACSettings)
+			macState, err := mac.NewState(dev.EndDevice, ns.FrequencyPlans, ns.defaultMACSettings)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to generate new MAC state")
 				continue
@@ -420,13 +422,13 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 		ctx = log.NewContext(ctx, logger)
 
 		if fCnt != pld.FCnt && resetsFCnt(dev.EndDevice, ns.defaultMACSettings) {
-			macState, err := newMACState(dev.EndDevice, ns.FrequencyPlans, ns.defaultMACSettings)
+			macState, err := mac.NewState(dev.EndDevice, ns.FrequencyPlans, ns.defaultMACSettings)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to generate new MAC state")
 				continue
 			}
 			if !macState.LoRaWANVersion.HasMaxFCntGap() || uint(pld.FCnt) <= phy.MaxFCntGap {
-				dev := copyEndDevice(dev.EndDevice)
+				dev := CopyEndDevice(dev.EndDevice)
 				dev.MACState = macState
 
 				gap := fCntResetGap(dev.Session.LastFCntUp, pld.FCnt)
@@ -592,15 +594,15 @@ matchLoop:
 
 			case match.Device.MACState.DeviceClass != ttnpb.CLASS_B:
 				logger.WithField("previous_class", match.Device.MACState.DeviceClass).Debug("Switch device class to class B")
-				match.QueuedEventBuilders = append(match.QueuedEventBuilders, evtClassBSwitch.BindData(match.Device.MACState.DeviceClass))
+				match.QueuedEventBuilders = append(match.QueuedEventBuilders, mac.EvtClassBSwitch.BindData(match.Device.MACState.DeviceClass))
 				match.Device.MACState.DeviceClass = ttnpb.CLASS_B
 			}
 		} else if match.Device.MACState.DeviceClass == ttnpb.CLASS_B {
 			if match.Device.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && match.Device.SupportsClassC {
-				match.QueuedEventBuilders = append(match.QueuedEventBuilders, evtClassCSwitch.BindData(ttnpb.CLASS_B))
+				match.QueuedEventBuilders = append(match.QueuedEventBuilders, mac.EvtClassCSwitch.BindData(ttnpb.CLASS_B))
 				match.Device.MACState.DeviceClass = ttnpb.CLASS_C
 			} else {
-				match.QueuedEventBuilders = append(match.QueuedEventBuilders, evtClassASwitch.BindData(ttnpb.CLASS_B))
+				match.QueuedEventBuilders = append(match.QueuedEventBuilders, mac.EvtClassASwitch.BindData(ttnpb.CLASS_B))
 				match.Device.MACState.DeviceClass = ttnpb.CLASS_A
 			}
 		}
@@ -619,13 +621,13 @@ matchLoop:
 			var err error
 			switch cmd.CID {
 			case ttnpb.CID_RESET:
-				evs, err = handleResetInd(ctx, match.Device, cmd.GetResetInd(), ns.FrequencyPlans, ns.defaultMACSettings)
+				evs, err = mac.HandleResetInd(ctx, match.Device, cmd.GetResetInd(), ns.FrequencyPlans, ns.defaultMACSettings)
 			case ttnpb.CID_LINK_CHECK:
 				if !deduplicated {
-					match.deferMACHandler(handleLinkCheckReq)
+					match.deferMACHandler(mac.HandleLinkCheckReq)
 					continue macLoop
 				}
-				evs, err = handleLinkCheckReq(ctx, match.Device, up)
+				evs, err = mac.HandleLinkCheckReq(ctx, match.Device, up)
 			case ttnpb.CID_LINK_ADR:
 				pld := cmd.GetLinkADRAns()
 				dupCount := 0
@@ -645,13 +647,13 @@ matchLoop:
 					break
 				}
 				cmds = cmds[dupCount:]
-				evs, err = handleLinkADRAns(ctx, match.Device, pld, uint(dupCount), ns.FrequencyPlans)
+				evs, err = mac.HandleLinkADRAns(ctx, match.Device, pld, uint(dupCount), ns.FrequencyPlans)
 			case ttnpb.CID_DUTY_CYCLE:
-				evs, err = handleDutyCycleAns(ctx, match.Device)
+				evs, err = mac.HandleDutyCycleAns(ctx, match.Device)
 			case ttnpb.CID_RX_PARAM_SETUP:
-				evs, err = handleRxParamSetupAns(ctx, match.Device, cmd.GetRxParamSetupAns())
+				evs, err = mac.HandleRxParamSetupAns(ctx, match.Device, cmd.GetRxParamSetupAns())
 			case ttnpb.CID_DEV_STATUS:
-				evs, err = handleDevStatusAns(ctx, match.Device, cmd.GetDevStatusAns(), session.LastFCntUp, up.ReceivedAt)
+				evs, err = mac.HandleDevStatusAns(ctx, match.Device, cmd.GetDevStatusAns(), session.LastFCntUp, up.ReceivedAt)
 				if err == nil {
 					match.SetPaths = append(match.SetPaths,
 						"battery_percentage",
@@ -661,31 +663,31 @@ matchLoop:
 					)
 				}
 			case ttnpb.CID_NEW_CHANNEL:
-				evs, err = handleNewChannelAns(ctx, match.Device, cmd.GetNewChannelAns())
+				evs, err = mac.HandleNewChannelAns(ctx, match.Device, cmd.GetNewChannelAns())
 			case ttnpb.CID_RX_TIMING_SETUP:
-				evs, err = handleRxTimingSetupAns(ctx, match.Device)
+				evs, err = mac.HandleRxTimingSetupAns(ctx, match.Device)
 			case ttnpb.CID_TX_PARAM_SETUP:
-				evs, err = handleTxParamSetupAns(ctx, match.Device)
+				evs, err = mac.HandleTxParamSetupAns(ctx, match.Device)
 			case ttnpb.CID_DL_CHANNEL:
-				evs, err = handleDLChannelAns(ctx, match.Device, cmd.GetDLChannelAns())
+				evs, err = mac.HandleDLChannelAns(ctx, match.Device, cmd.GetDLChannelAns())
 			case ttnpb.CID_REKEY:
-				evs, err = handleRekeyInd(ctx, match.Device, cmd.GetRekeyInd(), pld.DevAddr)
+				evs, err = mac.HandleRekeyInd(ctx, match.Device, cmd.GetRekeyInd(), pld.DevAddr)
 			case ttnpb.CID_ADR_PARAM_SETUP:
-				evs, err = handleADRParamSetupAns(ctx, match.Device)
+				evs, err = mac.HandleADRParamSetupAns(ctx, match.Device)
 			case ttnpb.CID_DEVICE_TIME:
-				evs, err = handleDeviceTimeReq(ctx, match.Device, up)
+				evs, err = mac.HandleDeviceTimeReq(ctx, match.Device, up)
 			case ttnpb.CID_REJOIN_PARAM_SETUP:
-				evs, err = handleRejoinParamSetupAns(ctx, match.Device, cmd.GetRejoinParamSetupAns())
+				evs, err = mac.HandleRejoinParamSetupAns(ctx, match.Device, cmd.GetRejoinParamSetupAns())
 			case ttnpb.CID_PING_SLOT_INFO:
-				evs, err = handlePingSlotInfoReq(ctx, match.Device, cmd.GetPingSlotInfoReq())
+				evs, err = mac.HandlePingSlotInfoReq(ctx, match.Device, cmd.GetPingSlotInfoReq())
 			case ttnpb.CID_PING_SLOT_CHANNEL:
-				evs, err = handlePingSlotChannelAns(ctx, match.Device, cmd.GetPingSlotChannelAns())
+				evs, err = mac.HandlePingSlotChannelAns(ctx, match.Device, cmd.GetPingSlotChannelAns())
 			case ttnpb.CID_BEACON_TIMING:
-				evs, err = handleBeaconTimingReq(ctx, match.Device)
+				evs, err = mac.HandleBeaconTimingReq(ctx, match.Device)
 			case ttnpb.CID_BEACON_FREQ:
-				evs, err = handleBeaconFreqAns(ctx, match.Device, cmd.GetBeaconFreqAns())
+				evs, err = mac.HandleBeaconFreqAns(ctx, match.Device, cmd.GetBeaconFreqAns())
 			case ttnpb.CID_DEVICE_MODE:
-				evs, err = handleDeviceModeInd(ctx, match.Device, cmd.GetDeviceModeInd())
+				evs, err = mac.HandleDeviceModeInd(ctx, match.Device, cmd.GetDeviceModeInd())
 			default:
 				logger.Warn("Unknown MAC command received, skip the rest")
 				break macLoop
@@ -919,7 +921,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 	publishEvents(ctx, queuedEvents...)
 	queuedEvents = nil
-	up = copyUplinkMessage(up)
+	up = CopyUplinkMessage(up)
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
@@ -993,12 +995,12 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			stored.MACState.DesiredParameters.ADRDataRateIndex = stored.MACState.CurrentParameters.ADRDataRateIndex
 			stored.MACState.DesiredParameters.ADRTxPowerIndex = stored.MACState.CurrentParameters.ADRTxPowerIndex
 			stored.MACState.DesiredParameters.ADRNbTrans = stored.MACState.CurrentParameters.ADRNbTrans
-			if !pld.FHDR.ADR || !deviceUseADR(stored, ns.defaultMACSettings, matched.phy) {
+			if !pld.FHDR.ADR || !mac.DeviceUseADR(stored, ns.defaultMACSettings, matched.phy) {
 				stored.RecentADRUplinks = nil
 				return stored, paths, nil
 			}
-			stored.RecentADRUplinks = appendRecentUplink(stored.RecentADRUplinks, up, optimalADRUplinkCount)
-			if err := adaptDataRate(ctx, stored, matched.phy, ns.defaultMACSettings); err != nil {
+			stored.RecentADRUplinks = appendRecentUplink(stored.RecentADRUplinks, up, mac.OptimalADRUplinkCount)
+			if err := mac.AdaptDataRate(ctx, stored, matched.phy, ns.defaultMACSettings); err != nil {
 				logger.WithError(err).Info("Failed to adapt data rate, avoid ADR")
 			}
 			return stored, paths, nil
@@ -1135,7 +1137,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return nil
 	}
 
-	fp, phy, err := deviceFrequencyPlanAndBand(matched, ns.FrequencyPlans)
+	fp, phy, err := DeviceFrequencyPlanAndBand(matched, ns.FrequencyPlans)
 	if err != nil {
 		return err
 	}
@@ -1148,7 +1150,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		"data_rate_index", drIdx,
 	)
 
-	macState, err := newMACState(matched, ns.FrequencyPlans, ns.defaultMACSettings)
+	macState, err := mac.NewState(matched, ns.FrequencyPlans, ns.defaultMACSettings)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to reset device's MAC state")
 		return err
@@ -1220,7 +1222,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 
 	publishEvents(ctx, queuedEvents...)
 	queuedEvents = nil
-	up = copyUplinkMessage(up)
+	up = CopyUplinkMessage(up)
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
@@ -1263,7 +1265,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	matched = stored
 	ctx = storedCtx
 
-	// TODO: Extract this into a utility function shared with handleRejoinRequest. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
+	// TODO: Extract this into a utility function shared with mac.HandleRejoinRequest. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
 	downAt := up.ReceivedAt.Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - req.RxDelay.Duration()/2 - nsScheduleWindow())
 	if earliestAt := timeNow().Add(nsScheduleWindow()); downAt.Before(earliestAt) {
 		downAt = earliestAt

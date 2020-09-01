@@ -20,6 +20,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -141,11 +142,11 @@ var DefaultConfig = Config{
 		MaxApplicationDownlink: "high",
 	},
 	DefaultMACSettings: MACSettingConfig{
-		ADRMargin:              func(v float32) *float32 { return &v }(DefaultADRMargin),
+		ADRMargin:              func(v float32) *float32 { return &v }(mac.DefaultADRMargin),
 		DesiredRx1Delay:        func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_5),
-		ClassBTimeout:          func(v time.Duration) *time.Duration { return &v }(DefaultClassBTimeout),
-		ClassCTimeout:          func(v time.Duration) *time.Duration { return &v }(DefaultClassCTimeout),
-		StatusTimePeriodicity:  func(v time.Duration) *time.Duration { return &v }(DefaultStatusTimePeriodicity),
-		StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(DefaultStatusCountPeriodicity),
+		ClassBTimeout:          func(v time.Duration) *time.Duration { return &v }(mac.DefaultClassBTimeout),
+		ClassCTimeout:          func(v time.Duration) *time.Duration { return &v }(mac.DefaultClassCTimeout),
+		StatusTimePeriodicity:  func(v time.Duration) *time.Duration { return &v }(mac.DefaultStatusTimePeriodicity),
+		StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(mac.DefaultStatusCountPeriodicity),
 	},
 }

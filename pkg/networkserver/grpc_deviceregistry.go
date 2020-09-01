@@ -23,6 +23,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -398,7 +400,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				if !ttnpb.HasAnyField(sets, "lorawan_phy_version") {
 					req.EndDevice.LoRaWANPHYVersion = dev.LoRaWANPHYVersion
 				}
-				phy, err := deviceBand(&req.EndDevice, ns.FrequencyPlans)
+				phy, err := DeviceBand(&req.EndDevice, ns.FrequencyPlans)
 				if err != nil {
 					return nil, nil, err
 				}
@@ -420,7 +422,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errInvalidFieldMask.WithCause(err)
 		}
 
-		phy, err := deviceBand(&req.EndDevice, ns.FrequencyPlans)
+		phy, err := DeviceBand(&req.EndDevice, ns.FrequencyPlans)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -525,7 +527,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			)
 		}
 
-		macState, err := newMACState(&req.EndDevice, ns.FrequencyPlans, ns.defaultMACSettings)
+		macState, err := mac.NewState(&req.EndDevice, ns.FrequencyPlans, ns.defaultMACSettings)
 		if err != nil {
 			return nil, nil, err
 		}

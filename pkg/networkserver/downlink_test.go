@@ -31,6 +31,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -443,7 +446,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	}
 
 	_, ctx := test.New(t)
-	pingAt, ok := NextPingSlotAt(ctx, &ttnpb.EndDevice{
+	pingAt, ok := mac.NextPingSlotAt(ctx, &ttnpb.EndDevice{
 		Session: &ttnpb.Session{
 			DevAddr: devAddr,
 		},
@@ -1266,7 +1269,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					),
 					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
-						EvtEnqueueDevStatusRequest,
+						mac.EvtEnqueueDevStatusRequest,
 					),
 				)
 			},
@@ -1424,7 +1427,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					),
 					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
-						EvtEnqueueDevStatusRequest,
+						mac.EvtEnqueueDevStatusRequest,
 					),
 				)
 			},
@@ -1586,7 +1589,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					),
 					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
-						EvtEnqueueDevStatusRequest,
+						mac.EvtEnqueueDevStatusRequest,
 					),
 				)
 			},
@@ -1895,7 +1898,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					),
 					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
-						EvtEnqueueDevStatusRequest,
+						mac.EvtEnqueueDevStatusRequest,
 					),
 				)
 			},
