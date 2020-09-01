@@ -419,7 +419,7 @@ func (conf TxConfirmation) ToTxAck(ctx context.Context, tokens io.DownlinkTokens
 	return &txAck
 }
 
-// ToUplink implements Format.
+// HandleUp implements Formatter.
 func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time) ([]byte, error) {
 	logger := log.FromContext(ctx)
 	typ, err := Type(raw)
