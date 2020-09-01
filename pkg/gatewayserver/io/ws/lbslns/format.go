@@ -15,12 +15,17 @@
 package lbslns
 
 import (
+	"fmt"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 )
 
-var errSessionStateNotFound = errors.DefineUnavailable("session_state_not_found", "session state not found")
+var (
+	errSessionStateNotFound = errors.DefineUnavailable("session_state_not_found", "session state not found")
+	trafficEndPointPrefix   = "/traffic"
+)
 
 // State represents the LBS Session state.
 type State struct {
@@ -34,4 +39,11 @@ type lbsLNS struct {
 // NewFormatter returns a new LoRa Basic Station LNS formatter.
 func NewFormatter() ws.Formatter {
 	return &lbsLNS{}
+}
+
+func (f *lbsLNS) Endpoints() ws.Endpoints {
+	return ws.Endpoints{
+		ConnectionInfo: "/router-info",
+		Traffic:        fmt.Sprintf("%s/:id", trafficEndPointPrefix),
+	}
 }

@@ -19,10 +19,8 @@ import (
 	"testing"
 	"time"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
-
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -38,7 +36,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 	state := State{
 		ID: 0x11,
 	}
-	session.State.Store(deepcopy.Copy(state))
+	session.State.Store(state)
 	for _, tc := range []struct {
 		Name                    string
 		DownlinkMessage         ttnpb.DownlinkMessage

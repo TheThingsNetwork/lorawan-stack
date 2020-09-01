@@ -28,10 +28,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var errEmptyGatewayEUI = errors.DefineFailedPrecondition("empty_gateway_eui", "empty gateway EUI")
+var (
+	errEmptyGatewayEUI = errors.DefineFailedPrecondition("empty_gateway_eui", "empty gateway EUI")
+)
 
 // HandleConnectionInfo implements Formatter.
-func (f *lbsLNS) HandleConnectionInfo(ctx context.Context, raw []byte, server io.Server, ep ws.EndPoint, receivedAt time.Time) []byte {
+func (f *lbsLNS) HandleConnectionInfo(ctx context.Context, raw []byte, server io.Server, info ws.ServerInfo, receivedAt time.Time) []byte {
 	var req DiscoverQuery
 
 	if err := json.Unmarshal(raw, &req); err != nil {
@@ -57,7 +59,7 @@ func (f *lbsLNS) HandleConnectionInfo(ctx context.Context, raw []byte, server io
 		Muxs: basicstation.EUI{
 			Prefix: "muxs",
 		},
-		URI: fmt.Sprintf("%s://%s%s/%s", ep.Scheme, ep.Address, ep.Prefix, euiWithPrefix),
+		URI: fmt.Sprintf("%s://%s%s/%s", info.Scheme, info.Address, trafficEndPointPrefix, euiWithPrefix),
 	}
 
 	data, err := json.Marshal(res)

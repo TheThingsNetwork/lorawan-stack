@@ -41,12 +41,8 @@ import (
 )
 
 var (
-	errListener = errors.DefineFailedPrecondition(
-		"listener",
-		"failed to serve Basic Station frontend listener",
-	)
-	errGatewayID      = errors.DefineInvalidArgument("invalid_gateway_id", "invalid gateway id `{id}`")
-	errNoAuthProvided = errors.DefineUnauthenticated("no_auth_provided", "no auth provided for gateway id `{id}`")
+	errGatewayID      = errors.DefineInvalidArgument("invalid_gateway_id", "invalid gateway ID `{id}`")
+	errNoAuthProvided = errors.DefineUnauthenticated("no_auth_provided", "no auth provided `{uid}`")
 )
 
 type srv struct {
@@ -60,12 +56,12 @@ type srv struct {
 	formatter            Formatter
 }
 
-func (*srv) Protocol() string            { return "basicstation" }
-func (*srv) SupportsDownlinkClaim() bool { return false }
+func (s *srv) Protocol() string            { return "ws" }
+func (s *srv) SupportsDownlinkClaim() bool { return false }
 
 // New creates a new WebSocket frontend.
 func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config) *echo.Echo {
-	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
+	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/ws")
 
 	webServer := echo.New()
 	webServer.Logger = web.NewNoopLogger()
@@ -86,8 +82,9 @@ func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config)
 		cfg:       cfg,
 	}
 
-	webServer.GET("/router-info", s.handleDiscover)
-	webServer.GET("/traffic/:id", s.handleTraffic)
+	eps := s.formatter.Endpoints()
+	webServer.GET(eps.ConnectionInfo, s.handleConnectionInfo)
+	webServer.GET(eps.Traffic, s.handleTraffic)
 
 	go func() {
 		<-ctx.Done()
@@ -97,7 +94,7 @@ func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config)
 	return webServer
 }
 
-func (s *srv) handleDiscover(c echo.Context) error {
+func (s *srv) handleConnectionInfo(c echo.Context) error {
 	ctx := c.Request().Context()
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"endpoint", "discover",
@@ -121,18 +118,17 @@ func (s *srv) handleDiscover(c echo.Context) error {
 		scheme = "wss"
 	}
 
-	ep := EndPoint{
+	info := ServerInfo{
 		Scheme:  scheme,
 		Address: c.Request().Host,
-		Prefix:  "/traffic",
 	}
 
-	resp := s.formatter.HandleConnectionInfo(ctx, data, s.server, ep, time.Now())
+	resp := s.formatter.HandleConnectionInfo(ctx, data, s.server, info, time.Now())
 	if err := ws.WriteMessage(websocket.TextMessage, resp); err != nil {
-		logger.WithError(err).Warn("Failed to write discover response message")
+		logger.WithError(err).Warn("Failed to write connection info response message")
 		return err
 	}
-	logger.Debug("Sent discover response message")
+	logger.Debug("Sent connection info response message")
 	return nil
 }
 
@@ -202,7 +198,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			})
 		} else {
 			// We error here directly as there is no need make an RPC call to the IS to get a failed rights check due to no Auth.
-			return errNoAuthProvided
+			return errNoAuthProvided.WithAttributes("uid", uid)
 		}
 	}
 

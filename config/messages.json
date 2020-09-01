@@ -3664,16 +3664,7 @@
   },
   "error:pkg/gatewayserver/io/ws:invalid_gateway_id": {
     "translations": {
-      "en": "invalid gateway id `{id}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/ws",
-      "file": "ws.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/ws:listener": {
-    "translations": {
-      "en": "failed to serve Basic Station frontend listener"
+      "en": "invalid gateway ID `{id}`"
     },
     "description": {
       "package": "pkg/gatewayserver/io/ws",
@@ -3682,7 +3673,7 @@
   },
   "error:pkg/gatewayserver/io/ws:no_auth_provided": {
     "translations": {
-      "en": "no auth provided for gateway id `{id}`"
+      "en": "no auth provided `{uid}`"
     },
     "description": {
       "package": "pkg/gatewayserver/io/ws",
