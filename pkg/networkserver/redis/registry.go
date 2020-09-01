@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"encoding"
-	"fmt"
 	"io"
 	"math/rand"
 	"runtime/trace"

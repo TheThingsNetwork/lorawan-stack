@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package networkserver_test
+package test
 
 import (
 	"context"
@@ -23,15 +23,13 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-// handleRegistryTest runs a test suite on reg.
-func handleRegistryTest(ctx context.Context, reg DeviceRegistry) {
+func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 	t, a := test.MustNewTFromContext(ctx)
 
 	pb := &ttnpb.EndDevice{
@@ -353,31 +351,26 @@ func handleRegistryTest(ctx context.Context, reg DeviceRegistry) {
 	}
 }
 
-func TestRegistries(t *testing.T) {
-	for _, tc := range []struct {
-		Name string
-		New  func(t testing.TB) (reg DeviceRegistry, closeFn func())
-	}{
-		{
-			Name: "Redis",
-			New:  NewRedisDeviceRegistry,
+// HandleDeviceRegistryTest runs a DeviceRegistry test suite on reg.
+func HandleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
+	test.RunTest(t, test.TestConfig{
+		Parallel: true,
+		Func: func(ctx context.Context, a *assertions.Assertion) {
+			test.RunSubtestFromContext(ctx, test.SubtestConfig{
+				Name: "1st run",
+				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+					handleDeviceRegistryTest(ctx, reg)
+				},
+			})
+			if t.Failed() {
+				t.Skip("Skipping 2nd run")
+			}
+			test.RunSubtestFromContext(ctx, test.SubtestConfig{
+				Name: "2st run",
+				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+					handleDeviceRegistryTest(ctx, reg)
+				},
+			})
 		},
-	} {
-		tc := tc
-		test.RunSubtest(t, test.SubtestConfig{
-			Name:     MakeTestCaseName(tc.Name),
-			Parallel: true,
-			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				reg, closeFn := tc.New(t)
-				if closeFn != nil {
-					defer closeFn()
-				}
-				t.Run("1st run", func(t *testing.T) { handleRegistryTest(ctx, reg) })
-				if t.Failed() {
-					t.Skip("Skipping 2nd run")
-				}
-				t.Run("2nd run", func(t *testing.T) { handleRegistryTest(ctx, reg) })
-			},
-		})
-	}
+	})
 }
