@@ -2043,6 +2043,11 @@ func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.Application
 	return m.SetByIDFunc(ctx, appID, devID, paths, f)
 }
 
+// RangeByUplinkMatches panics.
+func (m MockDeviceRegistry) RangeByUplinkMatches(context.Context, *ttnpb.UplinkMessage, time.Duration, func(context.Context, UplinkMatch) bool) error {
+	panic("RangeByUplinkMatches must not be called")
+}
+
 var _ UplinkDeduplicator = &MockUplinkDeduplicator{}
 
 type MockUplinkDeduplicator struct {
