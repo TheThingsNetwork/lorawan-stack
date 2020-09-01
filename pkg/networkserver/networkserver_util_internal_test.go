@@ -2018,9 +2018,8 @@ var _ DeviceRegistry = MockDeviceRegistry{}
 
 // MockDeviceRegistry is a mock DeviceRegistry used for testing.
 type MockDeviceRegistry struct {
-	GetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
-	SetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
-	RangeByAddrFunc func(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error
+	GetByIDFunc func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
+	SetByIDFunc func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 }
 
 // GetByEUI panics.
@@ -2034,14 +2033,6 @@ func (m MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.Application
 		panic("GetByID called, but not set")
 	}
 	return m.GetByIDFunc(ctx, appID, devID, paths)
-}
-
-// RangeByAddr calls RangeByAddrFunc if set and panics otherwise.
-func (m MockDeviceRegistry) RangeByAddr(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error {
-	if m.RangeByAddrFunc == nil {
-		panic("RangeByAddr called, but not set")
-	}
-	return m.RangeByAddrFunc(ctx, devAddr, paths, f)
 }
 
 // SetByID calls SetByIDFunc if set and panics otherwise.

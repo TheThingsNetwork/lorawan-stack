@@ -42,103 +42,148 @@ func handleRegistryTest(ctx context.Context, reg DeviceRegistry) {
 			DeviceID:               "test-dev",
 		},
 		Session: &ttnpb.Session{
-			DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+			DevAddr:    types.DevAddr{0x42, 0xff, 0xff, 0xff},
+			LastFCntUp: 41,
+		},
+		MACState: &ttnpb.MACState{
+			LoRaWANVersion: ttnpb.MAC_V1_0_3,
 		},
 		PendingSession: &ttnpb.Session{
 			DevAddr: types.DevAddr{0x43, 0xff, 0xff, 0xff},
 		},
+		PendingMACState: &ttnpb.MACState{
+			LoRaWANVersion: ttnpb.MAC_V1_1,
+		},
 	}
 
-	ret, devCtx, err := reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+	type uplinkMatch struct {
+		*ttnpb.EndDevice
+		IsPending bool
+	}
+	assertUplinkMatches := func(ctx context.Context, up *ttnpb.UplinkMessage, expectedMatches ...uplinkMatch) bool {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+
+		var matches []UplinkMatch
+		err := reg.RangeByUplinkMatches(ctx, up, time.Second, func(storedCtx context.Context, match UplinkMatch) bool {
+			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
+			matches = append(matches, match)
+			return false
+		})
+		if !test.AllTrue(
+			a.So(err, should.BeNil),
+			a.So(matches, should.HaveLength, len(expectedMatches)),
+		) {
+			return false
+		}
+		for i, match := range matches {
+			expectedMatch := expectedMatches[i]
+			session, macState, msb := expectedMatch.Session, expectedMatch.MACState, expectedMatch.Session.LastFCntUp&0xffff0000
+			if expectedMatch.IsPending {
+				session, macState, msb = expectedMatch.PendingSession, expectedMatch.PendingMACState, 0
+			}
+			if !test.AllTrue(
+				a.So(match.ApplicationIdentifiers(), should.Resemble, expectedMatch.ApplicationIdentifiers),
+				a.So(match.DeviceID(), should.Equal, expectedMatch.DeviceID),
+				a.So(match.LoRaWANVersion(), should.Equal, macState.LoRaWANVersion),
+				a.So(match.FNwkSIntKey(), should.Resemble, session.FNwkSIntKey),
+				a.So(match.FCnt(), should.Equal, msb|up.Payload.GetMACPayload().FCnt),
+				a.So(match.LastFCnt(), should.Equal, session.LastFCntUp),
+				a.So(match.IsPending(), should.Equal, expectedMatch.IsPending),
+				a.So(match.ResetsFCnt(), should.Resemble, expectedMatch.GetMACSettings().GetResetsFCnt()),
+			) {
+				return false
+			}
+		}
+		return true
+	}
+
+	stored, storedCtx, err := reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
-	a.So(ret, should.BeNil)
+	a.So(stored, should.BeNil)
 
-	ret, devCtx, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+	stored, storedCtx, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
-	a.So(ret, should.BeNil)
+	a.So(stored, should.BeNil)
 
-	var rets []*ttnpb.EndDevice
-	err = reg.RangeByAddr(ctx, pb.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(devCtx context.Context, dev *ttnpb.EndDevice) bool {
-		a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-		rets = append(rets, dev)
-		return true
-	})
-	a.So(err, should.BeNil)
-	a.So(rets, should.BeNil)
+	currentUp := &ttnpb.UplinkMessage{
+		Payload: &ttnpb.Message{
+			Payload: &ttnpb.Message_MACPayload{
+				MACPayload: &ttnpb.MACPayload{
+					FHDR: ttnpb.FHDR{
+						FCnt:    42,
+						DevAddr: pb.Session.DevAddr,
+					},
+				},
+			},
+		},
+	}
+	pendingUp := &ttnpb.UplinkMessage{
+		Payload: &ttnpb.Message{
+			Payload: &ttnpb.Message_MACPayload{
+				MACPayload: &ttnpb.MACPayload{
+					FHDR: ttnpb.FHDR{
+						FCnt:    4242,
+						DevAddr: pb.PendingSession.DevAddr,
+					},
+				},
+			},
+		},
+	}
 
-	rets = nil
-	err = reg.RangeByAddr(ctx, pb.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(devCtx context.Context, dev *ttnpb.EndDevice) bool {
-		a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-		rets = append(rets, dev)
-		return true
-	})
-	a.So(err, should.BeNil)
-	a.So(rets, should.BeNil)
+	for i := 0; i < 4; i++ {
+		a.So(assertUplinkMatches(ctx, currentUp), should.BeTrue)
+		a.So(assertUplinkMatches(ctx, pendingUp), should.BeTrue)
+	}
 
 	start := time.Now()
 
-	ret, ctx, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
+	stored, storedCtx, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
 		[]string{
 			"ids.dev_eui",
 			"ids.join_eui",
 			"pending_session",
 			"session",
 		},
-		func(devCtx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-			a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+		func(storedCtx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 			if !a.So(stored, should.BeNil) {
 				t.Fatal("Registry is not empty")
 			}
 			return nil, nil, nil
 		},
 	)
-	if !a.So(err, should.BeNil) || !a.So(ret, should.BeNil) {
+	if !a.So(err, should.BeNil) || !a.So(stored, should.BeNil) {
 		t.Fatalf("Failed to get device via SetByID: %s", err)
 	}
-	a.So(ret, should.BeNil)
+	a.So(stored, should.BeNil)
 
-	ret, devCtx, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
-		[]string{
-			"ids.application_ids",
-			"ids.dev_eui",
-			"ids.device_id",
-			"ids.join_eui",
-			"pending_session",
-			"session",
-		},
-		func(devCtx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-			a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-			if !a.So(stored, should.BeNil) {
-				t.Fatal("Registry is not empty")
-			}
-			return pb, []string{
-				"ids.application_ids",
-				"ids.dev_eui",
-				"ids.device_id",
-				"ids.join_eui",
-				"pending_session",
-				"session",
-			}, nil
-		},
+	stored, storedCtx, err = CreateDevice(ctx, reg, pb,
+		"ids.application_ids",
+		"ids.dev_eui",
+		"ids.device_id",
+		"ids.join_eui",
+		"pending_session",
+		"session",
 	)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
+	if !a.So(err, should.BeNil) || !a.So(stored, should.NotBeNil) {
 		t.Fatalf("Failed to create device: %s", err)
 	}
-	a.So(ret.CreatedAt, should.HappenAfter, start)
-	a.So(ret.UpdatedAt, should.HappenAfter, start)
-	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
-	pb.CreatedAt = ret.CreatedAt
-	pb.UpdatedAt = ret.UpdatedAt
-	a.So(ret, should.HaveEmptyDiff, pb)
+	a.So(stored.CreatedAt, should.HappenAfter, start)
+	a.So(stored.UpdatedAt, should.Equal, stored.CreatedAt)
+	pb.CreatedAt = stored.CreatedAt
+	pb.UpdatedAt = stored.UpdatedAt
+	a.So(stored, should.HaveEmptyDiff, pb)
 
-	ret, devCtx, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
+	stored, storedCtx, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
 		[]string{
 			"ids.application_ids",
 			"ids.dev_eui",
@@ -147,199 +192,165 @@ func handleRegistryTest(ctx context.Context, reg DeviceRegistry) {
 			"pending_session",
 			"session",
 		},
-		func(devCtx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-			a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+		func(storedCtx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 			a.So(stored, should.HaveEmptyDiff, pb)
 			return &ttnpb.EndDevice{}, nil, nil
 		},
 	)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
+	if !a.So(err, should.BeNil) || !a.So(stored, should.NotBeNil) {
 		t.Fatalf("Failed to get device via SetByID: %s", err)
 	}
-	a.So(ret, should.HaveEmptyDiff, pb)
+	a.So(stored, should.HaveEmptyDiff, pb)
 
-	ret, devCtx, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+	stored, storedCtx, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 	a.So(err, should.BeNil)
-	a.So(ret, should.HaveEmptyDiff, pb)
+	a.So(stored, should.HaveEmptyDiff, pb)
 
-	ret, devCtx, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+	stored, storedCtx, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 	a.So(err, should.BeNil)
-	a.So(ret, should.HaveEmptyDiff, pb)
+	a.So(stored, should.HaveEmptyDiff, pb)
 
-	err = reg.RangeByAddr(ctx, pb.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(devCtx context.Context, dev *ttnpb.EndDevice) bool {
-		a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-		rets = append(rets, dev)
-		return true
-	})
-	a.So(err, should.BeNil)
-	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pb})
+	a.So(assertUplinkMatches(ctx, currentUp,
+		uplinkMatch{
+			EndDevice: pb,
+		},
+	), should.BeTrue)
 
-	rets = nil
-	err = reg.RangeByAddr(ctx, pb.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(devCtx context.Context, dev *ttnpb.EndDevice) bool {
-		a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-		rets = append(rets, dev)
-		return true
-	})
-	a.So(err, should.BeNil)
-	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pb})
+	a.So(assertUplinkMatches(ctx, pendingUp,
+		uplinkMatch{
+			EndDevice: pb,
+			IsPending: true,
+		},
+	), should.BeTrue)
 
 	pbOther := CopyEndDevice(pb)
+	pbOther.Session.LastFCntUp = pb.Session.LastFCntUp + 1
 	pbOther.EndDeviceIdentifiers.DeviceID = "test-dev-other"
 	pbOther.EndDeviceIdentifiers.DevEUI = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
-	ret, devCtx, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+	stored, storedCtx, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
-	a.So(ret, should.BeNil)
+	a.So(stored, should.BeNil)
 
-	ret, devCtx, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+	stored, storedCtx, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
-	a.So(ret, should.BeNil)
+	a.So(stored, should.BeNil)
 
-	ret, devCtx, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceID,
-		[]string{
-			"ids.application_ids",
-			"ids.dev_eui",
-			"ids.device_id",
-			"ids.join_eui",
-			"pending_session",
-			"session",
-		},
-		func(devCtx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-			a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-			if !a.So(stored, should.BeNil) {
-				t.Fatal("Registry is not empty")
-			}
-			return pbOther, []string{
-				"ids.application_ids",
-				"ids.dev_eui",
-				"ids.device_id",
-				"ids.join_eui",
-				"pending_session",
-				"session",
-			}, nil
-		},
+	stored, storedCtx, err = CreateDevice(ctx, reg, pbOther,
+		"ids.application_ids",
+		"ids.dev_eui",
+		"ids.device_id",
+		"ids.join_eui",
+		"pending_session",
+		"session",
 	)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
+	if !a.So(err, should.BeNil) || !a.So(stored, should.NotBeNil) {
 		t.Fatalf("Failed to create device: %s", err)
 	}
-	a.So(ret.CreatedAt, should.HappenAfter, pb.CreatedAt)
-	a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
-	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
-	pbOther.CreatedAt = ret.CreatedAt
-	pbOther.UpdatedAt = ret.UpdatedAt
-	a.So(ret, should.HaveEmptyDiff, pbOther)
+	a.So(stored.CreatedAt, should.HappenAfter, start)
+	a.So(stored.UpdatedAt, should.Equal, stored.CreatedAt)
+	pbOther.CreatedAt = stored.CreatedAt
+	pbOther.UpdatedAt = stored.UpdatedAt
+	a.So(stored, should.HaveEmptyDiff, pbOther)
 
-	ret, devCtx, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+	stored, storedCtx, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 	a.So(err, should.BeNil)
-	a.So(ret, should.Resemble, pbOther)
+	a.So(stored, should.Resemble, pbOther)
 
-	ret, devCtx, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+	stored, storedCtx, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 	a.So(err, should.BeNil)
-	a.So(ret, should.Resemble, pbOther)
+	a.So(stored, should.Resemble, pbOther)
 
-	rets = nil
-	err = reg.RangeByAddr(ctx, pbOther.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(devCtx context.Context, dev *ttnpb.EndDevice) bool {
-		a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-		rets = append(rets, dev)
-		return true
-	})
-	a.So(err, should.BeNil)
-	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pb, pbOther})
-
-	rets = nil
-	err = reg.RangeByAddr(ctx, pbOther.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(devCtx context.Context, dev *ttnpb.EndDevice) bool {
-		a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-		rets = append(rets, dev)
-		return true
-	})
-	a.So(err, should.BeNil)
-	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pb, pbOther})
+	for i := 0; i < 4; i++ {
+		a.So(assertUplinkMatches(ctx, currentUp,
+			uplinkMatch{
+				EndDevice: pbOther,
+			},
+			uplinkMatch{
+				EndDevice: pb,
+			},
+		), should.BeTrue)
+		a.So(assertUplinkMatches(ctx, pendingUp,
+			uplinkMatch{
+				EndDevice: pbOther,
+				IsPending: true,
+			},
+			uplinkMatch{
+				EndDevice: pb,
+				IsPending: true,
+			},
+		), should.BeTrue)
+	}
 
 	err = DeleteDevice(ctx, reg, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	ret, devCtx, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+	stored, storedCtx, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
-	a.So(ret, should.BeNil)
+	a.So(stored, should.BeNil)
 
-	ret, devCtx, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+	stored, storedCtx, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
-	a.So(ret, should.BeNil)
+	a.So(stored, should.BeNil)
 
-	rets = nil
-	err = reg.RangeByAddr(ctx, pb.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(devCtx context.Context, dev *ttnpb.EndDevice) bool {
-		a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-		rets = append(rets, dev)
-		return true
-	})
-	a.So(err, should.BeNil)
-	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pbOther})
-
-	rets = nil
-	err = reg.RangeByAddr(ctx, pb.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(devCtx context.Context, dev *ttnpb.EndDevice) bool {
-		a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-		rets = append(rets, dev)
-		return true
-	})
-	a.So(err, should.BeNil)
-	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pbOther})
+	for i := 0; i < 4; i++ {
+		a.So(assertUplinkMatches(ctx, currentUp,
+			uplinkMatch{
+				EndDevice: pbOther,
+			},
+		), should.BeTrue)
+		a.So(assertUplinkMatches(ctx, pendingUp,
+			uplinkMatch{
+				EndDevice: pbOther,
+				IsPending: true,
+			},
+		), should.BeTrue)
+	}
 
 	err = DeleteDevice(ctx, reg, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	ret, devCtx, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+	stored, storedCtx, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
-	a.So(ret, should.BeNil)
+	a.So(stored, should.BeNil)
 
-	ret, devCtx, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
+	stored, storedCtx, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
-	a.So(ret, should.BeNil)
+	a.So(stored, should.BeNil)
 
-	rets = nil
-	err = reg.RangeByAddr(ctx, pbOther.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(devCtx context.Context, dev *ttnpb.EndDevice) bool {
-		a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-		rets = append(rets, dev)
-		return true
-	})
-	a.So(err, should.BeNil)
-	a.So(rets, should.BeNil)
-
-	rets = nil
-	err = reg.RangeByAddr(ctx, pbOther.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(devCtx context.Context, dev *ttnpb.EndDevice) bool {
-		a.So(devCtx, should.HaveParentContextOrEqual, ctx)
-		rets = append(rets, dev)
-		return true
-	})
-	a.So(err, should.BeNil)
-	a.So(rets, should.BeNil)
+	for i := 0; i < 4; i++ {
+		a.So(assertUplinkMatches(ctx, currentUp), should.BeTrue)
+		a.So(assertUplinkMatches(ctx, pendingUp), should.BeTrue)
+	}
 }
 
 func TestRegistries(t *testing.T) {
