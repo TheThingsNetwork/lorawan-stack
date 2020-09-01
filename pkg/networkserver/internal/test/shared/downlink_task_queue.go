@@ -204,9 +204,11 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 
 // HandleDownlinkTaskQueueTest runs a DownlinkTaskQueue test suite on reg.
 func HandleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
+	t.Helper()
 	test.RunTest(t, test.TestConfig{
 		Parallel: true,
 		Func: func(ctx context.Context, a *assertions.Assertion) {
+			t.Helper()
 			test.RunSubtestFromContext(ctx, test.SubtestConfig{
 				Name: "1st run",
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {

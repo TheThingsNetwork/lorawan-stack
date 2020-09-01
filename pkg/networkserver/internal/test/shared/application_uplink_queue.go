@@ -236,9 +236,11 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 
 // HandleApplicationUplinkQueueTest runs a ApplicationUplinkQueue test suite on reg.
 func HandleApplicationUplinkQueueTest(t *testing.T, q ApplicationUplinkQueue) {
+	t.Helper()
 	test.RunTest(t, test.TestConfig{
 		Parallel: true,
 		Func: func(ctx context.Context, a *assertions.Assertion) {
+			t.Helper()
 			test.RunSubtestFromContext(ctx, test.SubtestConfig{
 				Name: "1st run",
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
