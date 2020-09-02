@@ -84,19 +84,26 @@ func runTestFromContext(ctx context.Context, conf TestConfig) {
 	if conf.Parallel {
 		t.Parallel()
 	}
-	timeout := conf.Timeout
-	if timeout == 0 {
-		timeout = defaultTestTimeout
-	}
 	a, ctx := New(t)
-	ctx, cancel := context.WithTimeout(ctx, timeout)
+	ctx, cancel := context.WithDeadline(ctx, func() time.Time {
+		timeout := conf.Timeout
+		if timeout == 0 {
+			timeout = defaultTestTimeout
+		}
+		dl := time.Now().Add(timeout)
+		tDL, ok := t.Deadline()
+		if ok && tDL.Before(dl) {
+			return tDL
+		}
+		return dl
+	}())
 	defer cancel()
 
 	dl, ok := ctx.Deadline()
 	if !ok {
 		panic("missing deadline in context")
 	}
-	timeout = time.Until(dl)
+	timeout := time.Until(dl)
 
 	start := time.Now()
 	doneCh := make(chan struct{})
