@@ -57,8 +57,8 @@ var (
 	AdaptDataRate                       = adaptDataRate
 	AppendRecentUplink                  = appendRecentUplink
 	ApplicationJoinAcceptWithoutAppSKey = applicationJoinAcceptWithoutAppSKey
+	DeviceDesiredChannels               = deviceDesiredChannels
 	DownlinkPathsFromMetadata           = downlinkPathsFromMetadata
-	FrequencyPlanChannels               = frequencyPlanChannels
 	HandleLinkCheckReq                  = handleLinkCheckReq
 	JoinResponseWithoutKeys             = joinResponseWithoutKeys
 	LoRaWANBands                        = lorawanBands
@@ -650,9 +650,6 @@ func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, 
 		Settings:       MakeUplinkSettings(dr, freq),
 	}
 	if decodePayload {
-		if frmPayload == nil {
-			frmPayload = []byte{}
-		}
 		msg.Payload = &ttnpb.Message{
 			MHDR: mhdr,
 			MIC:  phyPayload[len(phyPayload)-4:],

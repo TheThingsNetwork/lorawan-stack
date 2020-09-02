@@ -242,19 +242,21 @@ func TestNewMACState(t *testing.T) {
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				pb := CopyEndDevice(tc.Device)
 
-			pb := CopyEndDevice(tc.Device)
-
-			macState, err := newMACState(pb, tc.FrequencyPlanStore, ttnpb.MACSettings{})
-			if tc.ErrorAssertion != nil {
-				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
-			} else {
-				a.So(err, should.BeNil)
-			}
-			a.So(macState, should.Resemble, tc.MACState)
-			a.So(pb, should.Resemble, tc.Device)
+				macState, err := newMACState(pb, tc.FrequencyPlanStore, ttnpb.MACSettings{})
+				if tc.ErrorAssertion != nil {
+					a.So(tc.ErrorAssertion(t, err), should.BeTrue)
+				} else {
+					a.So(err, should.BeNil)
+				}
+				a.So(macState, should.Resemble, tc.MACState)
+				a.So(pb, should.Resemble, tc.Device)
+			},
 		})
 	}
 }
@@ -297,10 +299,12 @@ func TestBeaconTimeBefore(t *testing.T) {
 			Expected: 10 * beaconPeriod,
 		},
 	} {
-		t.Run(tc.Time.String(), func(t *testing.T) {
-			a := assertions.New(t)
-			ret := beaconTimeBefore(tc.Time)
-			a.So(ret, should.Equal, tc.Expected)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Time.String(),
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				a.So(beaconTimeBefore(tc.Time), should.Equal, tc.Expected)
+			},
 		})
 	}
 }
@@ -469,22 +473,22 @@ func TestNextPingSlotAt(t *testing.T) {
 			ExpectedOk:   true,
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-
-			ctx := test.Context()
-			ctx = log.NewContext(ctx, test.GetLogger(t))
-
-			ret, ok := nextPingSlotAt(ctx, tc.Device, tc.EarliestAt)
-			if a.So(ok, should.Equal, tc.ExpectedOk) {
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				ret, ok := nextPingSlotAt(ctx, tc.Device, tc.EarliestAt)
+				if !a.So(ok, should.Equal, tc.ExpectedOk) {
+					t.FailNow()
+				}
 				a.So(ret, should.Resemble, tc.ExpectedTime)
-			}
-			if ok {
-				earliestAt := ret
-				ret, ok = nextPingSlotAt(ctx, tc.Device, earliestAt)
-				a.So(ok, should.BeTrue)
-				a.So(ret, should.Resemble, earliestAt)
-			}
+				if ok {
+					earliestAt := ret
+					ret, ok = nextPingSlotAt(ctx, tc.Device, earliestAt)
+					a.So(ok, should.BeTrue)
+					a.So(ret, should.Resemble, earliestAt)
+				}
+			},
 		})
 	}
 }
@@ -530,8 +534,6 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 	}
 
 	absTime := beaconTime.Add(time.Hour)
-
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
 	type TestCase struct {
 		Name         string
@@ -726,7 +728,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 				EarliestAt: beforeRX1,
 				Device:     dev,
 				ExpectedSlot: &networkInitiatedDownlinkSlot{
-					Time:  nextPingSlotAt(ctx, dev, rx2),
+					Time:  nextPingSlotAt(log.NewContext(test.Context(), test.GetLogger(t)), dev, rx2),
 					Class: ttnpb.CLASS_B,
 				},
 				ExpectedOk: true,
@@ -990,14 +992,15 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			ExpectedOk: true,
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-
-			ctx := log.NewContext(ctx, test.GetLogger(t))
-			ret, ok := nextDataDownlinkSlot(ctx, tc.Device, LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B], ttnpb.MACSettings{}, tc.EarliestAt)
-			if a.So(ok, should.Equal, tc.ExpectedOk) {
-				a.So(ret, should.Resemble, tc.ExpectedSlot)
-			}
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				ret, ok := nextDataDownlinkSlot(ctx, tc.Device, LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B], ttnpb.MACSettings{}, tc.EarliestAt)
+				if a.So(ok, should.Equal, tc.ExpectedOk) {
+					a.So(ret, should.Resemble, tc.ExpectedSlot)
+				}
+			},
 		})
 	}
 }

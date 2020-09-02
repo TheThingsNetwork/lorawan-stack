@@ -15,11 +15,11 @@
 package networkserver
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"testing"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -347,17 +347,19 @@ func TestNeedsNewChannelReq(t *testing.T) {
 			Needs: true,
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-
-			dev := CopyEndDevice(tc.InputDevice)
-			res := deviceNeedsNewChannelReq(dev)
-			if tc.Needs {
-				a.So(res, should.BeTrue)
-			} else {
-				a.So(res, should.BeFalse)
-			}
-			a.So(dev, should.Resemble, tc.InputDevice)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.InputDevice)
+				res := deviceNeedsNewChannelReq(dev)
+				if tc.Needs {
+					a.So(res, should.BeTrue)
+				} else {
+					a.So(res, should.BeFalse)
+				}
+				a.So(dev, should.Resemble, tc.InputDevice)
+			},
 		})
 	}
 }
@@ -476,75 +478,80 @@ func TestEnqueueNewChannelReq(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			downlinkLength := 1 + lorawan.DefaultMACCommands[ttnpb.CID_NEW_CHANNEL].DownlinkLength
-			uplinkLength := 1 + lorawan.DefaultMACCommands[ttnpb.CID_NEW_CHANNEL].UplinkLength
+		test.RunSubtest(t, test.SubtestConfig{
+			Name: tc.Name,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				downlinkLength := 1 + lorawan.DefaultMACCommands[ttnpb.CID_NEW_CHANNEL].DownlinkLength
+				uplinkLength := 1 + lorawan.DefaultMACCommands[ttnpb.CID_NEW_CHANNEL].UplinkLength
 
-			type TestConf struct {
-				MaxDownlinkLength, MaxUplinkLength uint16
-				ExpectedCount                      int
-			}
-			confs := []TestConf{
-				{},
-				{
-					MaxUplinkLength: math.MaxUint16,
-				},
-				{
-					MaxDownlinkLength: math.MaxUint16,
-				},
-				{
-					MaxDownlinkLength: math.MaxUint16,
-					MaxUplinkLength:   math.MaxUint16,
-					ExpectedCount:     len(tc.ExpectedRequests),
-				},
-			}
-			for i := range tc.ExpectedRequests {
-				for j := 0; j <= i; j++ {
-					confs = append(confs, TestConf{
-						MaxDownlinkLength: uint16(i+1) * downlinkLength,
-						MaxUplinkLength:   uint16(j+1) * uplinkLength,
-						ExpectedCount:     j + 1,
-					})
+				type TestConf struct {
+					MaxDownlinkLength, MaxUplinkLength uint16
+					ExpectedCount                      int
 				}
-			}
-
-			for _, conf := range confs {
-				for _, pendingReqs := range [][]*ttnpb.MACCommand{
-					nil,
+				confs := []TestConf{
+					{},
 					{
-						{},
+						MaxUplinkLength: math.MaxUint16,
 					},
-				} {
-					t.Run(fmt.Sprintf("max_downlink_len:%d,max_uplink_len:%d,pending_requests:%d", conf.MaxDownlinkLength, conf.MaxUplinkLength, len(pendingReqs)), func(t *testing.T) {
-						a := assertions.New(t)
-
-						dev := &ttnpb.EndDevice{
-							MACState: &ttnpb.MACState{
-								CurrentParameters: tc.CurrentParameters,
-								DesiredParameters: tc.DesiredParameters,
-								PendingRequests:   pendingReqs,
-							},
-						}
-						reqs := tc.ExpectedRequests[:conf.ExpectedCount]
-						expectedDev := CopyEndDevice(dev)
-						var expectedEvs events.Builders
-						for _, req := range reqs {
-							expectedDev.MACState.PendingRequests = append(expectedDev.MACState.PendingRequests, req.MACCommand())
-							expectedEvs = append(expectedEvs, evtEnqueueNewChannelRequest.With(events.WithData(req)))
-						}
-
-						st := enqueueNewChannelReq(test.Context(), dev, conf.MaxDownlinkLength, conf.MaxUplinkLength)
-						a.So(dev, should.Resemble, expectedDev)
-						a.So(st.QueuedEvents, should.ResembleEventBuilders, expectedEvs)
-						a.So(st, should.Resemble, macCommandEnqueueState{
-							MaxDownLen:   conf.MaxDownlinkLength - uint16(conf.ExpectedCount)*downlinkLength,
-							MaxUpLen:     conf.MaxUplinkLength - uint16(conf.ExpectedCount)*uplinkLength,
-							Ok:           len(tc.ExpectedRequests) == conf.ExpectedCount,
-							QueuedEvents: st.QueuedEvents,
-						})
-					})
+					{
+						MaxDownlinkLength: math.MaxUint16,
+					},
+					{
+						MaxDownlinkLength: math.MaxUint16,
+						MaxUplinkLength:   math.MaxUint16,
+						ExpectedCount:     len(tc.ExpectedRequests),
+					},
 				}
-			}
+				for i := range tc.ExpectedRequests {
+					for j := 0; j <= i; j++ {
+						confs = append(confs, TestConf{
+							MaxDownlinkLength: uint16(i+1) * downlinkLength,
+							MaxUplinkLength:   uint16(j+1) * uplinkLength,
+							ExpectedCount:     j + 1,
+						})
+					}
+				}
+
+				for _, conf := range confs {
+					for _, pendingReqs := range [][]*ttnpb.MACCommand{
+						nil,
+						{
+							{},
+						},
+					} {
+						test.RunSubtest(t, test.SubtestConfig{
+							Name:     fmt.Sprintf("max_downlink_len:%d,max_uplink_len:%d,pending_requests:%d", conf.MaxDownlinkLength, conf.MaxUplinkLength, len(pendingReqs)),
+							Parallel: true,
+							Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+								dev := &ttnpb.EndDevice{
+									MACState: &ttnpb.MACState{
+										CurrentParameters: tc.CurrentParameters,
+										DesiredParameters: tc.DesiredParameters,
+										PendingRequests:   pendingReqs,
+									},
+								}
+								reqs := tc.ExpectedRequests[:conf.ExpectedCount]
+								expectedDev := CopyEndDevice(dev)
+								var expectedEvs events.Builders
+								for _, req := range reqs {
+									expectedDev.MACState.PendingRequests = append(expectedDev.MACState.PendingRequests, req.MACCommand())
+									expectedEvs = append(expectedEvs, evtEnqueueNewChannelRequest.With(events.WithData(req)))
+								}
+
+								st := enqueueNewChannelReq(ctx, dev, conf.MaxDownlinkLength, conf.MaxUplinkLength)
+								a.So(dev, should.Resemble, expectedDev)
+								a.So(st.QueuedEvents, should.ResembleEventBuilders, expectedEvs)
+								a.So(st, should.Resemble, macCommandEnqueueState{
+									MaxDownLen:   conf.MaxDownlinkLength - uint16(conf.ExpectedCount)*downlinkLength,
+									MaxUpLen:     conf.MaxUplinkLength - uint16(conf.ExpectedCount)*uplinkLength,
+									Ok:           len(tc.ExpectedRequests) == conf.ExpectedCount,
+									QueuedEvents: st.QueuedEvents,
+								})
+							},
+						})
+					}
+				}
+			},
 		})
 	}
 }
@@ -689,18 +696,20 @@ func TestHandleNewChannelAns(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.Device)
 
-			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-
-			evs, err := handleNewChannelAns(test.Context(), dev, tc.Payload)
-			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
-				tc.Error == nil && !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventBuilders, tc.Events)
+				evs, err := handleNewChannelAns(ctx, dev, tc.Payload)
+				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
+					tc.Error == nil && !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				a.So(dev, should.Resemble, tc.Expected)
+				a.So(evs, should.ResembleEventBuilders, tc.Events)
+			},
 		})
 	}
 }

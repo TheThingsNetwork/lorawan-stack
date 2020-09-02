@@ -15,15 +15,13 @@
 package events
 
 import (
-	"context"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 )
 
 const subsystem = "events"
 
-var publishes = metrics.NewContextualCounterVec(
+var publishes = metrics.NewCounterVec(
 	prometheus.CounterOpts{
 		Subsystem: subsystem,
 		Name:      "publishes_total",
@@ -41,7 +39,7 @@ var subscriptions = metrics.NewGaugeVec(
 	[]string{"name"},
 )
 
-var channelDropped = metrics.NewContextualCounterVec(
+var channelDropped = metrics.NewCounterVec(
 	prometheus.CounterOpts{
 		Subsystem: subsystem,
 		Name:      "channel_dropped_total",
@@ -51,10 +49,9 @@ var channelDropped = metrics.NewContextualCounterVec(
 )
 
 func initMetrics(name string) {
-	ctx := context.Background()
-	publishes.WithLabelValues(ctx, name).Add(0)
+	publishes.WithLabelValues(name).Add(0)
 	subscriptions.WithLabelValues(name).Add(0)
-	channelDropped.WithLabelValues(ctx, name).Add(0)
+	channelDropped.WithLabelValues(name).Add(0)
 }
 
 func init() {

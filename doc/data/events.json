@@ -40,10 +40,30 @@
     "name": "as.application.unsubscribe",
     "description": "unsubscribe application"
   },
+  "as.down.data.decode.fail": {
+    "name": "as.down.data.decode.fail",
+    "description": "decode downlink data message failure",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
+  },
+  "as.down.data.decode.warning": {
+    "name": "as.down.data.decode.warning",
+    "description": "decode downlink data message warning",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ApplicationDownlink"}
+  },
   "as.down.data.drop": {
     "name": "as.down.data.drop",
     "description": "drop downlink data message",
     "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
+  },
+  "as.down.data.encode.fail": {
+    "name": "as.down.data.encode.fail",
+    "description": "encode downlink data message failure",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
+  },
+  "as.down.data.encode.warning": {
+    "name": "as.down.data.encode.warning",
+    "description": "encode downlink data message warning",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ApplicationDownlink"}
   },
   "as.down.data.forward": {
     "name": "as.down.data.forward",
@@ -120,6 +140,11 @@
     "name": "as.up.data.decode.fail",
     "description": "decode uplink data message failure",
     "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
+  },
+  "as.up.data.decode.warning": {
+    "name": "as.up.data.decode.warning",
+    "description": "decode uplink data message warning",
+    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ApplicationUplink","settings":{"data_rate":{}},"received_at":"0001-01-01T00:00:00Z"}
   },
   "as.up.data.drop": {
     "name": "as.up.data.drop",

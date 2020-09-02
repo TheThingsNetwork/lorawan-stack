@@ -32,6 +32,7 @@ class RadioButton extends React.PureComponent {
     checked: PropTypes.bool,
     className: PropTypes.string,
     disabled: PropTypes.bool,
+    id: PropTypes.string,
     label: PropTypes.message,
     name: PropTypes.string,
     onBlur: PropTypes.func,
@@ -50,6 +51,7 @@ class RadioButton extends React.PureComponent {
     readOnly: false,
     value: undefined,
     autoFocus: false,
+    id: undefined,
     onChange: () => null,
     onBlur: () => null,
     onFocus: () => null,
@@ -99,6 +101,7 @@ class RadioButton extends React.PureComponent {
       onFocus,
       value,
       checked,
+      id,
     } = this.props
 
     const radioProps = {}
@@ -131,6 +134,7 @@ class RadioButton extends React.PureComponent {
             onFocus={onFocus}
             onChange={this.handleChange}
             value={value}
+            id={id}
             {...radioProps}
           />
           <span className={style.dot} />

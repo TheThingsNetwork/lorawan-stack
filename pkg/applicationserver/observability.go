@@ -66,6 +66,11 @@ var (
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
+	evtDecodeWarningDataUp = events.Define(
+		"as.up.data.decode.warning", "decode uplink data message warning",
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUplink{}),
+	)
 	evtReceiveJoinAccept = events.Define(
 		"as.up.join.receive", "receive join-accept message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
@@ -98,6 +103,26 @@ var (
 		events.WithDataType(&ttnpb.ApplicationDownlink{}),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
+	)
+	evtEncodeFailDataDown = events.Define(
+		"as.down.data.encode.fail", "encode downlink data message failure",
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
+	)
+	evtEncodeWarningDataDown = events.Define(
+		"as.down.data.encode.warning", "encode downlink data message warning",
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationDownlink{}),
+	)
+	evtDecodeFailDataDown = events.Define(
+		"as.down.data.decode.fail", "decode downlink data message failure",
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
+	)
+	evtDecodeWarningDataDown = events.Define(
+		"as.down.data.decode.warning", "decode downlink data message warning",
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationDownlink{}),
 	)
 	evtLostQueueDataDown = events.Define(
 		"as.down.data.queue.lost", "lose downlink data queue",

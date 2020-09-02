@@ -15,6 +15,7 @@
 package ttnpb
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -79,9 +80,26 @@ func (v *Major) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v MACVersion) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("MACVersion enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
+}
+
 // MarshalText implements encoding.TextMarshaler interface.
 func (v MACVersion) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
+}
+
+// UnmarshalBinary implements encoding.BinaryMarshaler interface.
+func (v *MACVersion) UnmarshalBinary(b []byte) error {
+	if len(b) != 1 {
+		return errCouldNotParse("MACVersion")(string(b))
+	}
+	*v = MACVersion(b[0])
+	return nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.

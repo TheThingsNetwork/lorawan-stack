@@ -45,7 +45,7 @@ export default defineMessages({
   appEUI: 'AppEUI',
   appEUIJoinEUI: 'AppEUI/JoinEUI',
   appEUIDescription:
-    'The AppEUI is a global application ID that uniquely identifies the owner of the end ­device. AppEUI is used for end devices with LoRaWAN versions 1.0.0-1.0.3, JoinEUI for 1.0.4+.',
+    'The AppEUI uniquely identifies the owner of the end device. If no AppEUI is provided by the device manufacturer (usually for development), it can be filled with zeros.',
   appId: 'Application ID',
   appKey: 'AppKey',
   appKeyDescription:
@@ -168,13 +168,14 @@ export default defineMessages({
   homeNetIDDescription: 'ID to identify the LoRaWAN network',
   hours: 'hours',
   id: 'ID',
+  idAlreadyExists: 'ID already exists',
   import: 'Import',
   importDevices: 'Import end devices',
   integrations: 'Integrations',
   joinAccept: 'Join accept',
   joinEUI: 'JoinEUI',
   joinEUIDescription:
-    'JoinEUI identifies the Join Server. JoinEUI is used for end devices with LoRaWAN versions 1.0.4+, AppEUI for 1.0.0-1.0.3.',
+    'The JoinEUI identifies the Join Server. If no JoinEUI is provided by the device manufacturer (usually for development), it can be filled with zeros.',
   joinServerAddress: 'Join Server address',
   key: 'key',
   keyEdit: 'Edit API key',
@@ -260,6 +261,7 @@ export default defineMessages({
   pubsubs: 'Pub/Subs',
   redirecting: 'Redirecting…',
   refresh: 'Refresh',
+  replaceWebhook: 'Replace webhook',
   removeCollaborator: 'Remove collaborator',
   resetsFCnt: 'Resets frame counters',
   resetsJoinNonces: 'Resets join nonces',
@@ -331,6 +333,8 @@ export default defineMessages({
   validFrom: 'Valid from',
   validTo: 'Valid to',
   value: 'value',
+  webhookAlreadyExistsModalMessage:
+    'A Webhook with the ID "{id}" already exists. Do you wish to replace this webhook?',
   webhookBaseUrl: 'Base URL',
   webhookFormat: 'Webhook format',
   webhookId: 'Webhook ID',

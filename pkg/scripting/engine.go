@@ -20,5 +20,5 @@ import (
 
 // Engine represents a scripting engine.
 type Engine interface {
-	Run(ctx context.Context, script string, env map[string]interface{}) (interface{}, error)
+	Run(ctx context.Context, script, fn string, params ...interface{}) (func(target interface{}) error, error)
 }

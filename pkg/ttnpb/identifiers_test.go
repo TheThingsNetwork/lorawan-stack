@@ -132,8 +132,9 @@ func TestCombinedIdentifiers(t *testing.T) {
 		NewPopulatedGetApplicationLinkRequest(test.Randy, true),
 		NewPopulatedSetApplicationLinkRequest(test.Randy, true),
 
-		NewPopulatedProcessDownlinkMessageRequest(test.Randy, true),
-		NewPopulatedProcessUplinkMessageRequest(test.Randy, true),
+		NewPopulatedEncodeDownlinkMessageRequest(test.Randy, true),
+		NewPopulatedDecodeUplinkMessageRequest(test.Randy, true),
+		NewPopulatedDecodeDownlinkMessageRequest(test.Randy, true),
 
 		NewPopulatedListOAuthAccessTokensRequest(test.Randy, true),
 		NewPopulatedListOAuthClientAuthorizationsRequest(test.Randy, true),

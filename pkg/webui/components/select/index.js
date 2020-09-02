@@ -31,6 +31,7 @@ class Select extends React.PureComponent {
     className: PropTypes.string,
     disabled: PropTypes.bool,
     error: PropTypes.bool,
+    id: PropTypes.string,
     intl: PropTypes.shape({
       formatMessage: PropTypes.func,
     }).isRequired,
@@ -58,6 +59,7 @@ class Select extends React.PureComponent {
     error: false,
     warning: false,
     value: undefined,
+    id: undefined,
   }
 
   constructor(props) {
@@ -124,6 +126,7 @@ class Select extends React.PureComponent {
       error,
       warning,
       name,
+      id,
       ...rest
     } = this.props
 
@@ -144,6 +147,7 @@ class Select extends React.PureComponent {
     return (
       <ReactSelect
         className={cls}
+        inputId={id}
         classNamePrefix="select"
         value={getValue(translatedOptions, value)}
         options={translatedOptions}

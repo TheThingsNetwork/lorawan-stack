@@ -29,7 +29,7 @@
   display: flex
   align-items: center
   &:not(.textarea)
-    max-height: 2.3rem
+    max-height: $default-input-height
 
   &.focus
     border-color: $c-active-blue
@@ -81,7 +81,7 @@
   display: inline-block
   flex-grow: 2
   z-index: $zi.slight
-  height: 2.3rem
+  height: $default-input-height
   min-width: 0
 
   &[type='password']
@@ -140,6 +140,7 @@ textarea.input
   display: flex
 
   .button
+    max-height: $default-input-height
     border-radius: 0 $br.s $br.s 0
     height: 100%
     margin-left: -1px

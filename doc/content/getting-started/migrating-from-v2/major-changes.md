@@ -49,12 +49,7 @@ For details on the data format of {{% tts %}}, see the documentation in [Data Fo
 
 {{% tts %}} has support for an uplink payload formatter (similar to the payload decoder) and a downlink payload formatter (similar to the payload encoder). These can be set per application, and can even be overridden per end device. Similar to {{% ttnv2 %}}, CayenneLPP and Javascript functions are supported.
 
-Migrating the {{% ttnv2 %}} payload encoder and decoder to an uplink and downlink payload formatter should be straightforward, since they have the same format.
-
-<!--
-TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/598
-Add a reference here once Payload Formatters are documented.
--->
+Migrating the {{% ttnv2 %}} payload encoder and decoder to an uplink and downlink payload formatter should be straightforward. See [Payload Formatters]({{< ref "/integrations/payload-formatters" >}}) for more details.
 
 ### Integrations
 

@@ -15,11 +15,11 @@
 package applicationserver
 
 import (
+	"bytes"
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
-	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -29,7 +29,7 @@ import (
 
 var errNoPayload = errors.Define("no_payload", "no payload")
 
-func (as *ApplicationServer) encodeAndEncrypt(ctx context.Context, dev *ttnpb.EndDevice, session *ttnpb.Session, downlink *ttnpb.ApplicationDownlink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
+func (as *ApplicationServer) encodeAndEncryptDownlink(ctx context.Context, dev *ttnpb.EndDevice, session *ttnpb.Session, downlink *ttnpb.ApplicationDownlink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
 	if session == nil || session.AppSKey == nil {
 		return errNoAppSKey.New()
 	}
@@ -45,8 +45,12 @@ func (as *ApplicationServer) encodeAndEncrypt(ctx context.Context, dev *ttnpb.En
 			formatter, parameter = defaultFormatters.DownFormatter, defaultFormatters.DownFormatterParameter
 		}
 		if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
-			if err := as.formatter.Encode(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, downlink, formatter, parameter); err != nil {
+			if err := as.formatters.EncodeDownlink(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, downlink, formatter, parameter); err != nil {
+				events.Publish(evtEncodeFailDataDown.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, err))
 				return err
+			}
+			if len(downlink.DecodedPayloadWarnings) > 0 {
+				events.Publish(evtEncodeWarningDataDown.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, downlink))
 			}
 		}
 	}
@@ -62,14 +66,14 @@ func (as *ApplicationServer) encodeAndEncrypt(ctx context.Context, dev *ttnpb.En
 	return nil
 }
 
-func (as *ApplicationServer) decryptAndDecode(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
-	if err := as.decrypt(ctx, dev, uplink); err != nil {
+func (as *ApplicationServer) decryptAndDecodeUplink(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
+	if err := as.decryptUplink(ctx, dev, uplink); err != nil {
 		return err
 	}
-	return as.decode(ctx, dev, uplink, defaultFormatters)
+	return as.decodeUplink(ctx, dev, uplink, defaultFormatters)
 }
 
-func (as *ApplicationServer) decrypt(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink) error {
+func (as *ApplicationServer) decryptUplink(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink) error {
 	if dev.Session == nil || dev.Session.AppSKey == nil {
 		return errNoAppSKey.New()
 	}
@@ -85,7 +89,7 @@ func (as *ApplicationServer) decrypt(ctx context.Context, dev *ttnpb.EndDevice, 
 	return nil
 }
 
-func (as *ApplicationServer) decode(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
+func (as *ApplicationServer) decodeUplink(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
 	var formatter ttnpb.PayloadFormatter
 	var parameter string
 	if dev.Formatters != nil {
@@ -94,74 +98,99 @@ func (as *ApplicationServer) decode(ctx context.Context, dev *ttnpb.EndDevice, u
 		formatter, parameter = defaultFormatters.UpFormatter, defaultFormatters.UpFormatterParameter
 	}
 	if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
-		if err := as.formatter.Decode(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, uplink, formatter, parameter); err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Payload decoding failed")
+		if err := as.formatters.DecodeUplink(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, uplink, formatter, parameter); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to decode uplink")
 			events.Publish(evtDecodeFailDataUp.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, err))
+		} else if len(uplink.DecodedPayloadWarnings) > 0 {
+			events.Publish(evtDecodeWarningDataUp.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, uplink))
 		}
 	}
 	return nil
 }
 
-type payloadFormatter struct {
-	repository     *devicerepository.Client
-	upFormatters   map[ttnpb.PayloadFormatter]messageprocessors.PayloadDecoder
-	downFormatters map[ttnpb.PayloadFormatter]messageprocessors.PayloadEncoder
+func (as *ApplicationServer) decryptAndDecodeDownlink(ctx context.Context, dev *ttnpb.EndDevice, downlink *ttnpb.ApplicationDownlink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
+	if err := as.decryptDownlink(ctx, dev, downlink); err != nil {
+		return err
+	}
+	return as.decodeDownlink(ctx, dev, downlink, defaultFormatters)
 }
 
-var (
-	errNoVersion          = errors.DefineFailedPrecondition("no_version", "no end device version")
-	errVersionUnavailable = errors.DefineUnavailable("version_unavailable", "end device version is unavailable in the repository")
-)
-
-func (p payloadFormatter) getRepositoryFormatters(version *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatters, error) {
-	if version == nil || p.repository == nil {
-		return nil, errNoVersion.New()
+func (as *ApplicationServer) decryptDownlink(ctx context.Context, dev *ttnpb.EndDevice, downlink *ttnpb.ApplicationDownlink) error {
+	var session *ttnpb.Session
+	switch {
+	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyID, downlink.SessionKeyID):
+		session = dev.Session
+	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, downlink.SessionKeyID):
+		session = dev.PendingSession
+	default:
+		return errUnknownSession.New()
 	}
-	versions, err := p.repository.DeviceVersions(version.BrandID, version.ModelID)
+	if session.GetAppSKey() == nil {
+		return errNoAppSKey.New()
+	}
+	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, *dev.Session.AppSKey, as.KeyVault)
 	if err != nil {
-		return nil, errVersionUnavailable.WithCause(err)
+		return err
 	}
-	for _, v := range versions {
-		if v.FirmwareVersion == version.FirmwareVersion && v.HardwareVersion == version.HardwareVersion {
-			return &v.DefaultFormatters, nil
+	frmPayload, err := crypto.DecryptDownlink(appSKey, dev.Session.DevAddr, downlink.FCnt, downlink.FRMPayload, false)
+	if err != nil {
+		return err
+	}
+	downlink.FRMPayload = frmPayload
+	return nil
+}
+
+func (as *ApplicationServer) decodeDownlink(ctx context.Context, dev *ttnpb.EndDevice, downlink *ttnpb.ApplicationDownlink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
+	var formatter ttnpb.PayloadFormatter
+	var parameter string
+	if dev.Formatters != nil {
+		formatter, parameter = dev.Formatters.DownFormatter, dev.Formatters.DownFormatterParameter
+	} else if defaultFormatters != nil {
+		formatter, parameter = defaultFormatters.DownFormatter, defaultFormatters.DownFormatterParameter
+	}
+	if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
+		if err := as.formatters.DecodeDownlink(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, downlink, formatter, parameter); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to decode downlink")
+			events.Publish(evtDecodeFailDataDown.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, err))
+		} else if len(downlink.DecodedPayloadWarnings) > 0 {
+			events.Publish(evtDecodeWarningDataDown.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, downlink))
 		}
 	}
-	return nil, errVersionUnavailable.New()
+	return nil
 }
+
+type payloadFormatters map[ttnpb.PayloadFormatter]messageprocessors.PayloadEncodeDecoder
 
 var errFormatterNotConfigured = errors.DefineFailedPrecondition("formatter_not_configured", "formatter `{formatter}` is not configured")
 
-func (p payloadFormatter) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
-	if formatter == ttnpb.PayloadFormatter_FORMATTER_REPOSITORY {
-		formatters, err := p.getRepositoryFormatters(version)
-		if err != nil {
-			return err
-		}
-		formatter, parameter = formatters.DownFormatter, formatters.DownFormatterParameter
-	}
-	mp, ok := p.downFormatters[formatter]
+func (p payloadFormatters) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
+	mp, ok := p[formatter]
 	if !ok {
 		return errFormatterNotConfigured.WithAttributes("formatter", formatter)
 	}
-	if err := mp.Encode(ctx, ids, version, msg, parameter); err != nil {
+	if err := mp.EncodeDownlink(ctx, ids, version, msg, parameter); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (p payloadFormatter) Decode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error {
-	if formatter == ttnpb.PayloadFormatter_FORMATTER_REPOSITORY {
-		formatters, err := p.getRepositoryFormatters(version)
-		if err != nil {
-			return err
-		}
-		formatter, parameter = formatters.UpFormatter, formatters.UpFormatterParameter
-	}
-	mp, ok := p.upFormatters[formatter]
+func (p payloadFormatters) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error {
+	mp, ok := p[formatter]
 	if !ok {
 		return errFormatterNotConfigured.WithAttributes("formatter", formatter)
 	}
-	if err := mp.Decode(ctx, ids, version, msg, parameter); err != nil {
+	if err := mp.DecodeUplink(ctx, ids, version, msg, parameter); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p payloadFormatters) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
+	mp, ok := p[formatter]
+	if !ok {
+		return errFormatterNotConfigured.WithAttributes("formatter", formatter)
+	}
+	if err := mp.DecodeDownlink(ctx, ids, version, msg, parameter); err != nil {
 		return err
 	}
 	return nil

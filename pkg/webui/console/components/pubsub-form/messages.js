@@ -43,4 +43,8 @@ export default defineMessages({
   selectPemFile: 'Select .pem file…',
   pemFileProvided: '.pem file has been provided',
   useCredentials: 'Use credentials',
+  alreadyExistsModalTitle: 'ID already exists',
+  alreadyExistsModalMessage:
+    'A Pub/Sub with the ID "{id}" already exists. Do you wish to replace this Pub/Sub?',
+  replacePubsub: 'Replace Pub/Sub',
 })

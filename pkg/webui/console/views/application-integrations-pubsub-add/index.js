@@ -26,6 +26,7 @@ import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
 import PubsubForm from '@console/components/pubsub-form'
 
+import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -49,6 +50,22 @@ export default class ApplicationPubsubAdd extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     navigateToList: PropTypes.func.isRequired,
+  }
+
+  @bind
+  async existCheck(pubsubId) {
+    const { appId } = this.props
+
+    try {
+      await api.application.pubsubs.get(appId, pubsubId, [])
+      return true
+    } catch (error) {
+      if (isNotFoundError(error)) {
+        return false
+      }
+
+      throw error
+    }
   }
 
   @bind
@@ -78,6 +95,7 @@ export default class ApplicationPubsubAdd extends Component {
               update={false}
               onSubmit={this.handleSubmit}
               onSubmitSuccess={this.handleSubmitSuccess}
+              existCheck={this.existCheck}
             />
           </Col>
         </Row>

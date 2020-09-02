@@ -74,7 +74,7 @@ const Prompt = props => {
   return (
     <>
       <RouterPrompt when={when} message={handlePromptTrigger} />
-      <PortalledModal visible={showModal} approval onComplete={handleModalComplete} modal={modal}>
+      <PortalledModal visible={showModal} {...modal} approval onComplete={handleModalComplete}>
         {children}
       </PortalledModal>
     </>

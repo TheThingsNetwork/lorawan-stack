@@ -15,6 +15,7 @@
 package networkserver
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -163,19 +164,21 @@ func TestNeedsDevStatusReq(t *testing.T) {
 			Needs: 1000-1 >= DefaultStatusCountPeriodicity,
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-
-			dev := CopyEndDevice(tc.InputDevice)
-			defaults := deepcopy.Copy(tc.Defaults).(ttnpb.MACSettings)
-			res := deviceNeedsDevStatusReq(dev, tc.Defaults, scheduleAt)
-			if tc.Needs {
-				a.So(res, should.BeTrue)
-			} else {
-				a.So(res, should.BeFalse)
-			}
-			a.So(dev, should.Resemble, tc.InputDevice)
-			a.So(defaults, should.Resemble, tc.Defaults)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.InputDevice)
+				defaults := deepcopy.Copy(tc.Defaults).(ttnpb.MACSettings)
+				res := deviceNeedsDevStatusReq(dev, tc.Defaults, scheduleAt)
+				if tc.Needs {
+					a.So(res, should.BeTrue)
+				} else {
+					a.So(res, should.BeFalse)
+				}
+				a.So(dev, should.Resemble, tc.InputDevice)
+				a.So(defaults, should.Resemble, tc.Defaults)
+			},
 		})
 	}
 }
@@ -325,18 +328,20 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.Device)
 
-			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-
-			evs, err := handleDevStatusAns(test.Context(), dev, tc.Payload, tc.FCntUp, tc.ReceivedAt)
-			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
-				tc.Error == nil && !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventBuilders, tc.Events)
+				evs, err := handleDevStatusAns(ctx, dev, tc.Payload, tc.FCntUp, tc.ReceivedAt)
+				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
+					tc.Error == nil && !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				a.So(dev, should.Resemble, tc.Expected)
+				a.So(evs, should.ResembleEventBuilders, tc.Events)
+			},
 		})
 	}
 }

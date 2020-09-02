@@ -31,18 +31,22 @@ func TestRun(t *testing.T) {
 	ctx := test.Context()
 
 	script := `
-		(function () {
+		function test() {
 			return {
 				x: 42
 			}
-		})()
+		}
 	`
-
 	e := New(scripting.DefaultOptions)
-	output, err := e.Run(ctx, script, nil)
+	as, err := e.Run(ctx, script, "test")
 	a.So(err, should.BeNil)
-	a.So(output, should.HaveSameTypeAs, map[string]interface{}{})
-	a.So(output.(map[string]interface{})["x"], should.Equal, 42)
+
+	var output struct {
+		X int `json:"x"`
+	}
+	err = as(&output)
+	a.So(err, should.BeNil)
+	a.So(output.X, should.Equal, 42)
 }
 
 func TestRunError(t *testing.T) {
@@ -51,13 +55,13 @@ func TestRunError(t *testing.T) {
 	ctx := test.Context()
 
 	script := `
-		(function () {
+		function test() {
 			throw Error("something didn't work")
-		})()
+		}
 	`
 
 	e := New(scripting.DefaultOptions)
-	_, err := e.Run(ctx, script, nil)
+	_, err := e.Run(ctx, script, "test")
 	a.So(err, should.NotBeNil)
 }
 
@@ -67,16 +71,16 @@ func TestRunStackOverflow(t *testing.T) {
 	ctx := test.Context()
 
 	script := `
-		(function () {
+		function test() {
 			var obj = {foo: "bar"};
 			obj.ob = obj;
 			return obj;
-		})()
+		}
 	`
 
 	e := New(scripting.DefaultOptions)
-	_, err := e.Run(ctx, script, nil)
-	a.So(err, should.NotBeNil)
+	_, err := e.Run(ctx, script, "test")
+	a.So(err, should.BeNil)
 }
 
 func TestRunTimeout(t *testing.T) {
@@ -85,14 +89,14 @@ func TestRunTimeout(t *testing.T) {
 	ctx := test.Context()
 
 	script := `
-		(function () {
+		function test() {
 			while (true) { }
 			return {};
-		})()
+		}
 	`
 
 	e := New(scripting.DefaultOptions)
-	_, err := e.Run(ctx, script, nil)
+	_, err := e.Run(ctx, script, "test")
 	a.So(err, should.NotBeNil)
-	a.So(errors.IsDeadlineExceeded(errors.Cause(err)), should.BeTrue)
+	a.So(errors.IsDeadlineExceeded(err), should.BeTrue)
 }
