@@ -184,8 +184,8 @@ func applyCFList(cfList *ttnpb.CFList, phy *band.Band, chs ...*ttnpb.MACParamete
 				break
 			}
 			chs = append(chs, &ttnpb.MACParameters_Channel{
-				UplinkFrequency:   uint64(freq * 100),
-				DownlinkFrequency: uint64(freq * 100),
+				UplinkFrequency:   uint64(freq) * phy.FreqMultiplier,
+				DownlinkFrequency: uint64(freq) * phy.FreqMultiplier,
 				MaxDataRateIndex:  phy.MaxADRDataRateIndex,
 				EnableUplink:      true,
 			})
