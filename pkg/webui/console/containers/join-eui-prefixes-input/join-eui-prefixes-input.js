@@ -141,6 +141,7 @@ class JoinEUIPrefixesInput extends React.PureComponent {
   render() {
     const {
       className,
+      id,
       name,
       description,
       disabled,
@@ -184,6 +185,7 @@ class JoinEUIPrefixesInput extends React.PureComponent {
         {selectComponent}
         <Input
           showPerChar
+          id={id}
           ref={this.inputRef}
           className={style.byte}
           value={inputValue}
@@ -218,6 +220,7 @@ JoinEUIPrefixesInput.propTypes = {
   disabled: PropTypes.bool,
   error: PropTypes.bool,
   fetching: PropTypes.bool,
+  id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,

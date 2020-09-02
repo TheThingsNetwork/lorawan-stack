@@ -26,6 +26,7 @@ const m = defineMessages({
 const DevAddrInput = props => {
   const {
     className,
+    id,
     name,
     onFocus,
     onChange,
@@ -65,6 +66,7 @@ const DevAddrInput = props => {
   return (
     <Input
       type="byte"
+      id={id}
       min={4}
       max={4}
       action={action}
@@ -91,6 +93,7 @@ DevAddrInput.propTypes = {
   generatedError: PropTypes.bool.isRequired,
   generatedLoading: PropTypes.bool.isRequired,
   generatedValue: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
   loading: PropTypes.bool,
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.func.isRequired,
