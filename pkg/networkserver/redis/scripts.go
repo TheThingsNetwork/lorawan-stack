@@ -45,25 +45,36 @@ if redis.call('pexpire', KEYS[6], ARGV[2]) +
    redis.call('pexpire', KEYS[15], ARGV[2]) > 0 then
 	return nil
 end
+local n, sorted = 0, 0
 local fromCurrent = '('..ARGV[1]
 local shortIdx = redis.call('zcount', KEYS[2], fromCurrent, '+inf')
-if redis.call('sort', KEYS[2], 'by', 'nosort', 'limit', 0, shortIdx, 'store', KEYS[6]) > 0 then
+sorted = redis.call('sort', KEYS[2], 'by', 'nosort', 'limit', 0, shortIdx, 'store', KEYS[6])
+if sorted > 0 then
+  n += sorted
   redis.call('pexpire', KEYS[6], ARGV[2])
 end
 local longIdx = redis.call('zcount', KEYS[3], fromCurrent, '+inf')
-if redis.call('sort', KEYS[3], 'by', 'nosort', 'limit', 0, longIdx, 'store', KEYS[8]) > 0 then
+sorted = redis.call('sort', KEYS[3], 'by', 'nosort', 'limit', 0, longIdx, 'store', KEYS[8])
+if sorted > 0 then
+  n += sorted
   redis.call('pexpire', KEYS[8], ARGV[2])
 end
-if redis.call('sort', KEYS[3], 'by', 'nosort', 'limit', longIdx, -1, 'store', KEYS[10]) > 0 then
+sorted = redis.call('sort', KEYS[3], 'by', 'nosort', 'limit', longIdx, -1, 'store', KEYS[10])
+if sorted > 0 then
+  n += sorted
   redis.call('pexpire', KEYS[10], ARGV[2])
 end
-if redis.call('sort', KEYS[4], 'by', 'nosort', 'store', KEYS[12]) > 0 then
+sorted = redis.call('sort', KEYS[4], 'by', 'nosort', 'store', KEYS[12])
+if sorted > 0 then
+  n += sorted
   redis.call('pexpire', KEYS[12], ARGV[2])
 end
-if redis.call('sort', KEYS[5], 'by', 'nosort', 'store', KEYS[14]) > 0 then
+sorted = redis.call('sort', KEYS[5], 'by', 'nosort', 'store', KEYS[14])
+if sorted > 0 then
+  n += sorted
   redis.call('pexpire', KEYS[14], ARGV[2])
 end
-return nil`)
+return sorted`)
 
 	deviceMatchScanScript = redis.NewScript(`if #ARGV == 2 then
 	redis.call("lrem", KEYS[2], 1, ARGV[2])
