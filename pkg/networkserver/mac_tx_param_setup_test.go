@@ -15,6 +15,7 @@
 package networkserver
 
 import (
+	"context"
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -138,17 +139,19 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-
-			dev := CopyEndDevice(tc.InputDevice)
-			res := deviceNeedsTxParamSetupReq(dev, tc.Band)
-			if tc.Needs {
-				a.So(res, should.BeTrue)
-			} else {
-				a.So(res, should.BeFalse)
-			}
-			a.So(dev, should.Resemble, tc.InputDevice)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.InputDevice)
+				res := deviceNeedsTxParamSetupReq(dev, tc.Band)
+				if tc.Needs {
+					a.So(res, should.BeTrue)
+				} else {
+					a.So(res, should.BeFalse)
+				}
+				a.So(dev, should.Resemble, tc.InputDevice)
+			},
 		})
 	}
 }
@@ -312,16 +315,18 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.InputDevice)
 
-			dev := CopyEndDevice(tc.InputDevice)
-
-			st := enqueueTxParamSetupReq(test.Context(), dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, LoRaWANBands[band.AS_923][ttnpb.PHY_V1_1_REV_B])
-			a.So(dev, should.Resemble, tc.ExpectedDevice)
-			a.So(st.QueuedEvents, should.ResembleEventBuilders, tc.State.QueuedEvents)
-			st.QueuedEvents = tc.State.QueuedEvents
-			a.So(st, should.Resemble, tc.State)
+				st := enqueueTxParamSetupReq(ctx, dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, LoRaWANBands[band.AS_923][ttnpb.PHY_V1_1_REV_B])
+				a.So(dev, should.Resemble, tc.ExpectedDevice)
+				a.So(st.QueuedEvents, should.ResembleEventBuilders, tc.State.QueuedEvents)
+				st.QueuedEvents = tc.State.QueuedEvents
+				a.So(st, should.Resemble, tc.State)
+			},
 		})
 	}
 }
@@ -374,18 +379,20 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.InputDevice)
 
-			dev := CopyEndDevice(tc.InputDevice)
-
-			evs, err := handleTxParamSetupAns(test.Context(), dev)
-			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
-				tc.Error == nil && !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			a.So(dev, should.Resemble, tc.ExpectedDevice)
-			a.So(evs, should.ResembleEventBuilders, tc.Events)
+				evs, err := handleTxParamSetupAns(ctx, dev)
+				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
+					tc.Error == nil && !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				a.So(dev, should.Resemble, tc.ExpectedDevice)
+				a.So(evs, should.ResembleEventBuilders, tc.Events)
+			},
 		})
 	}
 }

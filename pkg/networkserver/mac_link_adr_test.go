@@ -15,14 +15,13 @@
 package networkserver
 
 import (
+	"context"
 	"testing"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -147,17 +146,19 @@ func TestNeedsLinkADRReq(t *testing.T) {
 			Needs: true,
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-
-			dev := CopyEndDevice(tc.InputDevice)
-			res := deviceNeedsLinkADRReq(dev, DefaultConfig.DefaultMACSettings.Parse(), LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_0_3_REV_A])
-			if tc.Needs {
-				a.So(res, should.BeTrue)
-			} else {
-				a.So(res, should.BeFalse)
-			}
-			a.So(dev, should.Resemble, tc.InputDevice)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.InputDevice)
+				res := deviceNeedsLinkADRReq(dev, DefaultConfig.DefaultMACSettings.Parse(), LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_0_3_REV_A])
+				if tc.Needs {
+					a.So(res, should.BeTrue)
+				} else {
+					a.So(res, should.BeFalse)
+				}
+				a.So(dev, should.Resemble, tc.InputDevice)
+			},
 		})
 	}
 }
@@ -464,19 +465,21 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.InputDevice)
 
-			dev := CopyEndDevice(tc.InputDevice)
-
-			st, err := enqueueLinkADRReq(log.NewContext(test.Context(), test.GetLogger(t)), dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, ttnpb.MACSettings{}, tc.Band)
-			if !a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
-				t.FailNow()
-			}
-			a.So(dev, should.Resemble, tc.ExpectedDevice)
-			a.So(st.QueuedEvents, should.ResembleEventBuilders, tc.State.QueuedEvents)
-			st.QueuedEvents = tc.State.QueuedEvents
-			a.So(st, should.Resemble, tc.State)
+				st, err := enqueueLinkADRReq(ctx, dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, ttnpb.MACSettings{}, tc.Band)
+				if !a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+					t.FailNow()
+				}
+				a.So(dev, should.Resemble, tc.ExpectedDevice)
+				a.So(st.QueuedEvents, should.ResembleEventBuilders, tc.State.QueuedEvents)
+				st.QueuedEvents = tc.State.QueuedEvents
+				a.So(st, should.Resemble, tc.State)
+			},
 		})
 	}
 }
@@ -1003,18 +1006,20 @@ func TestHandleLinkADRAns(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				dev := CopyEndDevice(tc.Device)
 
-			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-
-			evs, err := handleLinkADRAns(test.Context(), dev, tc.Payload, tc.DupCount, frequencyplans.NewStore(test.FrequencyPlansFetcher))
-			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
-				tc.Error == nil && !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			a.So(dev, should.Resemble, tc.Expected)
-			a.So(evs, should.ResembleEventBuilders, tc.Events)
+				evs, err := handleLinkADRAns(ctx, dev, tc.Payload, tc.DupCount, frequencyplans.NewStore(test.FrequencyPlansFetcher))
+				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
+					tc.Error == nil && !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				a.So(dev, should.Resemble, tc.Expected)
+				a.So(evs, should.ResembleEventBuilders, tc.Events)
+			},
 		})
 	}
 }
