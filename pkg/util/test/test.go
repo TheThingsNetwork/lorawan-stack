@@ -82,7 +82,8 @@ func runTestFromContext(ctx context.Context, conf TestConfig) {
 	t.Helper()
 
 	if conf.Parallel {
-		t.Parallel()
+		// TODO: Enable once https://github.com/TheThingsNetwork/lorawan-stack/pull/3052 is merged.
+		// t.Parallel()
 	}
 	timeout := conf.Timeout
 	if timeout == 0 {
