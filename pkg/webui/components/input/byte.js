@@ -147,10 +147,28 @@ export default class ByteInput extends React.Component {
 
   @bind
   onChange(evt) {
+    const { max, showPerChar } = this.props
+    const { data } = evt.nativeEvent
+
+    let value = clean(event.target.value)
+    const normalizedMax = showPerChar ? Math.ceil(max / 2) : max
+
+    // Check if the value already has length equal to `max`.
+    const isValueMaxLength = value.length === normalizedMax * 2
+    // Check if the cursor is placed after the last placeholder chararcter.
+    const isCursorAfterMask = evt.target.selectionStart === normalizedMax * 3 - 1
+
+    if (!isValueMaxLength && isCursorAfterMask && data !== null) {
+      const hexMatch = data.match(hex)
+      if (hexMatch !== null) {
+        value += hexMatch[0]
+      }
+    }
+
     this.props.onChange({
       target: {
         name: evt.target.name,
-        value: clean(evt.target.value),
+        value,
       },
     })
   }
