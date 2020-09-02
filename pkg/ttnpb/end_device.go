@@ -75,3 +75,10 @@ func (m *SetEndDeviceRequest) ValidateContext(context.Context) error {
 		"end_device.ids.device_id",
 	)...)
 }
+
+func (s *Session) GetSessionKeys() *SessionKeys {
+	if s == nil {
+		return nil
+	}
+	return &s.SessionKeys
+}
