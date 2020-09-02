@@ -15,6 +15,7 @@
 /Makefile @htdvisser @rvolosatovs @johanstokking
 /tools @htdvisser @rvolosatovs @johanstokking
 /.github/workflows @htdvisser @rvolosatovs @johanstokking
+/cypress @bafonins @kschiffer
 
 # API, configuration, CLI and storage compatibility
 /api @johanstokking @htdvisser @rvolosatovs
