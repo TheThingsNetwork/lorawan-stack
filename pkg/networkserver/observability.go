@@ -276,6 +276,14 @@ var nsMetrics = &messageMetrics{
 		},
 		nil,
 	),
+	micComputations: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "mic_compute_total",
+			Help:      "Total number of MIC computations",
+		},
+		nil,
+	),
 	micMismatches: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
@@ -314,6 +322,7 @@ type messageMetrics struct {
 	uplinkForwarded  *metrics.ContextualCounterVec
 	uplinkDropped    *metrics.ContextualCounterVec
 	uplinkGateways   *metrics.ContextualHistogramVec
+	micComputations  *metrics.ContextualCounterVec
 	micMismatches    *metrics.ContextualCounterVec
 
 	downlinkAttempted *metrics.ContextualCounterVec
@@ -327,6 +336,7 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.uplinkForwarded.Describe(ch)
 	m.uplinkDropped.Describe(ch)
 	m.uplinkGateways.Describe(ch)
+	m.micComputations.Describe(ch)
 	m.micMismatches.Describe(ch)
 
 	m.downlinkAttempted.Describe(ch)
@@ -340,6 +350,7 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.uplinkForwarded.Collect(ch)
 	m.uplinkDropped.Collect(ch)
 	m.uplinkGateways.Collect(ch)
+	m.micComputations.Collect(ch)
 	m.micMismatches.Collect(ch)
 
 	m.downlinkAttempted.Collect(ch)
@@ -385,6 +396,10 @@ func registerDropUplink(ctx context.Context, msg *ttnpb.UplinkMessage, err error
 func registerMergeMetadata(ctx context.Context, msg *ttnpb.UplinkMessage) {
 	gtwCount, _ := rxMetadataStats(ctx, msg.RxMetadata)
 	nsMetrics.uplinkGateways.WithLabelValues(ctx).Observe(float64(gtwCount))
+}
+
+func registerMICComputation(ctx context.Context) {
+	nsMetrics.micComputations.WithLabelValues(ctx).Inc()
 }
 
 func registerMICMismatch(ctx context.Context) {
