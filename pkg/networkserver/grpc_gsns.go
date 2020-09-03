@@ -211,7 +211,7 @@ func applyCFList(cfList *ttnpb.CFList, phy *band.Band, chs ...*ttnpb.MACParamete
 }
 
 // matchAndHandleDataUplink tries to match the data uplink message with a device and returns the matched device.
-func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, deduplicated bool, devs ...contextualEndDevice) (*matchedDevice, error) {
+func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, deduplicated bool, cmacF [4]byte, devs ...contextualEndDevice) (*matchedDevice, error) {
 	if len(up.RawPayload) < 4 {
 		return nil, errRawPayloadTooShort.New()
 	}
@@ -518,15 +518,6 @@ matchLoop:
 			}
 			match.Device.MACState.CurrentParameters.Channels = chs
 		}
-		if session.FNwkSIntKey == nil || len(session.FNwkSIntKey.Key) == 0 {
-			logger.Warn("Device missing FNwkSIntKey in registry, skip")
-			continue
-		}
-		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, *session.FNwkSIntKey, ns.KeyVault)
-		if err != nil {
-			logger.WithField("kek_label", session.FNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap FNwkSIntKey, skip")
-			continue
-		}
 
 		cmdBuf := pld.FOpts
 		if pld.FPort == 0 && len(pld.FRMPayload) > 0 {
@@ -562,7 +553,7 @@ matchLoop:
 				)).WithError(err).Warn("Failed to read MAC command")
 				break
 			}
-			logger := logger.WithField("cid", cmd.CID)
+			logger := logger.WithField("command", cmd)
 			logger.Debug("Read MAC command")
 			def, ok := lorawan.DefaultMACCommands[cmd.CID]
 			switch {
@@ -612,10 +603,9 @@ matchLoop:
 		for len(cmds) > 0 {
 			var cmd *ttnpb.MACCommand
 			cmd, cmds = cmds[0], cmds[1:]
-			logger := logger.WithField("cid", cmd.CID)
-			ctx := log.NewContext(ctx, logger)
-
+			logger := logger.WithField("command", cmd)
 			logger.Debug("Handle MAC command")
+			ctx := log.NewContext(ctx, logger)
 
 			var evs events.Builders
 			var err error
@@ -730,19 +720,8 @@ matchLoop:
 		ctx = log.NewContext(ctx, logger)
 		match.ChannelIndex = chIdx
 
-		var computedMIC [4]byte
-		if match.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-			logger.Errorf(" fNwkSIntKey %v", fNwkSIntKey)
-			logger.Errorf(" pld.DevAddr %v", pld.DevAddr)
-			logger.Errorf(" match.FCnt %v", match.FCnt)
-			logger.Errorf(" up.RawPayload[:len(up.RawPayload)-4] %v", up.RawPayload[:len(up.RawPayload)-4])
-			computedMIC, err = crypto.ComputeLegacyUplinkMIC(
-				fNwkSIntKey,
-				pld.DevAddr,
-				match.FCnt,
-				up.RawPayload[:len(up.RawPayload)-4],
-			)
-		} else {
+		// NOTE: MIC check for pre-1.1 devices is already performed.
+		if match.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 			if match.Device.Session.SNwkSIntKey == nil || len(match.Device.Session.SNwkSIntKey.Key) == 0 {
 				logger.Warn("Device missing SNwkSIntKey in registry, skip")
 				continue
@@ -759,17 +738,9 @@ matchLoop:
 			if pld.Ack {
 				confFCnt = match.Device.Session.LastConfFCntDown
 			}
-			logger.Errorf(" sNwkSIntKey %v", sNwkSIntKey)
-			logger.Errorf(" fNwkSIntKey %v", fNwkSIntKey)
-			logger.Errorf(" confFCnt %v", confFCnt)
-			logger.Errorf(" uint8(match.DataRateIndex) %v", uint8(match.DataRateIndex))
-			logger.Errorf(" chIdx %v", chIdx)
-			logger.Errorf(" pld.DevAddr %v", pld.DevAddr)
-			logger.Errorf(" match.FCnt %v", match.FCnt)
-			logger.Errorf(" up.RawPayload[:len(up.RawPayload)-4] %v", up.RawPayload[:len(up.RawPayload)-4])
-			computedMIC, err = crypto.ComputeUplinkMIC(
+			fullMIC, err := crypto.ComputeUplinkMICFromLegacy(
+				cmacF,
 				sNwkSIntKey,
-				fNwkSIntKey,
 				confFCnt,
 				uint8(match.DataRateIndex),
 				chIdx,
@@ -777,14 +748,15 @@ matchLoop:
 				match.FCnt,
 				up.RawPayload[:len(up.RawPayload)-4],
 			)
-		}
-		if err != nil {
-			logger.WithError(err).Error("Failed to compute MIC")
-			continue
-		}
-		if !bytes.Equal(up.Payload.MIC, computedMIC[:]) {
-			logger.Debug("MIC mismatch")
-			continue
+			if err != nil {
+				logger.WithError(err).Error("Failed to compute 1.1 MIC")
+				continue
+			}
+			if !bytes.Equal(up.Payload.MIC, fullMIC[:]) {
+				logger.Debug("Full MIC mismatch")
+				registerMICMismatch(ctx)
+				continue
+			}
 		}
 
 		if match.pendingApplicationDownlink != nil {
@@ -870,24 +842,23 @@ func (ns *NetworkServer) mergeMetadata(ctx context.Context, up *ttnpb.UplinkMess
 	registerMergeMetadata(ctx, up)
 }
 
-func matchCmacf(ctx context.Context, fNwkSIntKey types.AES128Key, macVersion ttnpb.MACVersion, fCnt uint32, up *ttnpb.UplinkMessage) bool {
-	cmacf, err := crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, up.Payload.GetMACPayload().DevAddr, fCnt, up.RawPayload[:len(up.RawPayload)-4])
+func matchCmacF(ctx context.Context, fNwkSIntKey types.AES128Key, macVersion ttnpb.MACVersion, fCnt uint32, up *ttnpb.UplinkMessage) ([4]byte, bool) {
+	cmacF, err := crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, up.Payload.GetMACPayload().DevAddr, fCnt, up.RawPayload[:len(up.RawPayload)-4])
 	if err != nil {
-		log.FromContext(ctx).WithError(err).Error("Failed to compute cmacf")
-		return true
+		log.FromContext(ctx).WithError(err).Error("Failed to compute cmacF")
+		return [4]byte{}, false
 	}
 	var micMatch bool
 	if macVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-		micMatch = bytes.Equal(up.Payload.MIC, cmacf[:])
+		micMatch = bytes.Equal(up.Payload.MIC, cmacF[:])
 	} else {
-		micMatch = bytes.Equal(up.Payload.MIC[:2], cmacf[:2])
+		micMatch = bytes.Equal(up.Payload.MIC[2:], cmacF[:2])
 	}
 	if !micMatch {
-		log.FromContext(ctx).Debug("MIC mismatch")
 		registerMICMismatch(ctx)
-		return false
+		return [4]byte{}, false
 	}
-	return true
+	return cmacF, true
 }
 
 func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
@@ -927,7 +898,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			}
 			fCnt := match.FCnt()
 			macVersion := match.LoRaWANVersion()
-			if !matchCmacf(ctx, fNwkSIntKey, macVersion, fCnt, up) {
+			cmacF, ok := matchCmacF(ctx, fNwkSIntKey, macVersion, fCnt, up)
+			if !ok {
 				if pld.FCnt == fCnt || match.IsPending() || !resetsFCnt(&ttnpb.EndDevice{
 					MACSettings: &ttnpb.MACSettings{
 						ResetsFCnt: match.ResetsFCnt(),
@@ -938,20 +910,19 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				}
 				// FCnt reset
 				fCnt = pld.FCnt
-				if !matchCmacf(ctx, fNwkSIntKey, macVersion, fCnt, up) {
+				cmacF, ok = matchCmacF(ctx, fNwkSIntKey, macVersion, fCnt, up)
+				if !ok {
 					return false
 				}
 			}
 
 			dev, ctx, err := ns.devices.GetByID(ctx, appID, devID, handleDataUplinkGetPaths[:])
 			if err != nil {
-				log.FromContext(ctx).WithError(err).Warn("Failed to get device after cmacf matching")
+				log.FromContext(ctx).WithError(err).Warn("Failed to get device after cmacF matching")
 				return false
 			}
 
-			// TODO: Reuse CMACF and decoded values.
-
-			matched, err = ns.matchAndHandleDataUplink(up, false, contextualEndDevice{
+			matched, err = ns.matchAndHandleDataUplink(up, false, cmacF, contextualEndDevice{
 				Context:   ctx,
 				EndDevice: dev,
 			})
@@ -1026,23 +997,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			}
 
 			if !stored.CreatedAt.Equal(matched.Device.CreatedAt) || !stored.UpdatedAt.Equal(matched.Device.UpdatedAt) {
-				rematched, err := ns.matchAndHandleDataUplink(up, true, contextualEndDevice{
-					Context:   ctx,
-					EndDevice: stored,
-				})
-				if err != nil {
-					return nil, nil, errOutdatedData.WithCause(err)
-				}
-				matched = rematched
-
-				ctx = matched.Context
-				pld.FullFCnt = matched.FCnt
-				up.DeviceChannelIndex = uint32(matched.ChannelIndex)
-				up.Settings.DataRateIndex = matched.DataRateIndex
-				logger = log.FromContext(ctx).WithFields(log.Fields(
-					"data_rate_index", up.Settings.DataRateIndex,
-					"device_channel_index", up.DeviceChannelIndex,
-				))
+				// TODO: Rematch device (ISSUE REF)
+				return nil, nil, errOutdatedData.New()
 			}
 
 			queuedApplicationUplinks = append(queuedApplicationUplinks, matched.QueuedApplicationUplinks...)
