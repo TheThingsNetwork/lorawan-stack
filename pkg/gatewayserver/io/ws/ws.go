@@ -96,8 +96,9 @@ func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config)
 
 func (s *srv) handleConnectionInfo(c echo.Context) error {
 	ctx := c.Request().Context()
+	eps := s.formatter.Endpoints()
 	logger := log.FromContext(ctx).WithFields(log.Fields(
-		"endpoint", "discover",
+		"endpoint", eps.ConnectionInfo,
 		"remote_addr", c.Request().RemoteAddr,
 	))
 	ws, err := s.upgrader.Upgrade(c.Response(), c.Request(), nil)
@@ -139,9 +140,10 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	id := c.Param("id")
 	auth := c.Request().Header.Get(echo.HeaderAuthorization)
 	ctx := c.Request().Context()
+	eps := s.formatter.Endpoints()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
-		"endpoint", "traffic",
+		"endpoint", eps.Traffic,
 		"remote_addr", c.Request().RemoteAddr,
 	))
 

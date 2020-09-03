@@ -73,7 +73,10 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.Downli
 		state State
 		ok    bool
 	)
-	if state, ok = ws.SessionFromContext(ctx).State.Load().(State); !ok {
+	session := ws.SessionFromContext(ctx)
+	session.DataMu.Lock()
+	defer session.DataMu.Unlock()
+	if state, ok = session.Data.(State); !ok {
 		return nil, errSessionStateNotFound
 	}
 	xTime := int64(state.ID)<<48 | (int64(concentratorTime) / int64(time.Microsecond) & 0xFFFFFFFFFF)

@@ -16,7 +16,7 @@ package ws
 
 import (
 	"context"
-	"sync/atomic"
+	"sync"
 )
 
 type sessionKeyType struct{}
@@ -25,7 +25,8 @@ var sessionKey sessionKeyType
 
 // Session contains the session state for a single gateway.
 type Session struct {
-	State atomic.Value
+	DataMu sync.Mutex
+	Data   interface{}
 }
 
 // NewContextWithSession returns a new context with the session.

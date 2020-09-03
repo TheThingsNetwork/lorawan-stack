@@ -480,10 +480,11 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			return nil, err
 		}
 		session := ws.SessionFromContext(ctx)
-		lbsState := State{
+		session.DataMu.Lock()
+		session.Data = State{
 			ID: int32(jreq.UpInfo.XTime >> 48),
 		}
-		session.State.Store(lbsState)
+		session.DataMu.Unlock()
 		recordTime(jreq.RefTime, jreq.UpInfo.XTime, receivedAt)
 
 	case TypeUpstreamUplinkDataFrame:
@@ -506,10 +507,11 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			return nil, err
 		}
 		session := ws.SessionFromContext(ctx)
-		lbsState := State{
+		session.DataMu.Lock()
+		session.Data = State{
 			ID: int32(updf.UpInfo.XTime >> 48),
 		}
-		session.State.Store(lbsState)
+		session.DataMu.Unlock()
 		recordTime(updf.RefTime, updf.UpInfo.XTime, receivedAt)
 
 	case TypeUpstreamTxConfirmation:
@@ -526,10 +528,11 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			return nil, err
 		}
 		session := ws.SessionFromContext(ctx)
-		lbsState := State{
+		session.DataMu.Lock()
+		session.Data = State{
 			ID: int32(txConf.XTime >> 48),
 		}
-		session.State.Store(lbsState)
+		session.DataMu.Unlock()
 		recordTime(txConf.RefTime, txConf.XTime, receivedAt)
 		return nil, err
 

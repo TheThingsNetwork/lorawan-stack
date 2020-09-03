@@ -33,10 +33,9 @@ func TestFromDownlinkMessage(t *testing.T) {
 	ctx := context.Background()
 	uid := unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"})
 	var session ws.Session
-	state := State{
+	session.Data = State{
 		ID: 0x11,
 	}
-	session.State.Store(state)
 	for _, tc := range []struct {
 		Name                    string
 		DownlinkMessage         ttnpb.DownlinkMessage
