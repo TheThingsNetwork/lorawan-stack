@@ -18,15 +18,17 @@ end
 
 
 for i = 1, #KEYS, 2 do
-	local uid = redis.call('rpoplpush', KEYS[i], KEYS[i+1])
+  local uid
+  if KEYS[i]:sub(-7) == "pending" then
+	  uid = redis.call('rpop', KEYS[i])
+  else
+	  uid = redis.call('rpoplpush', KEYS[i], KEYS[i+1])
+  end
 	if uid then
 	  for j = i, #KEYS, 1 do
 	  	redis.call('pexpire', KEYS[j], ARGV[1])
 	  end
-	  return {
-	  	i,
-	  	uid,
-	  }
+	  return {i,uid}
 	end
 end
 return nil

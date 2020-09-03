@@ -472,7 +472,6 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		// TODO: Remove once https://github.com/TheThingsNetwork/lorawan-stack/issues/2698 is closed.
 		cacheTTL = time.Millisecond
 	}
-
 	pld := up.Payload.GetMACPayload()
 	addrKey := r.addrKey(pld.DevAddr)
 
@@ -540,17 +539,69 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		matchKeys.Input.Legacy,
 		matchKeys.Processing.Legacy,
 	}, lsb, cacheTTL.Milliseconds()).Result()
-	if err != nil && err != redis.Nil {
+	if err != nil {
+		if err == redis.Nil {
+			return errNoUplinkMatch
+		}
 		return ttnredis.ConvertError(err)
 	}
-	if err != redis.Nil {
-		s, ok := v.(string)
-		if !ok {
-			log.FromContext(ctx).WithError(err).Error("Failed to parse match value recorded")
-			return errDatabaseCorruption.New()
+	// NOTE: Lua indexing starts from 1.
+	var scanKeys []string
+	switch v := v.(type) {
+	case []interface{}:
+		keyIndexes := make([]uint8, 0, len(v))
+		for _, iface := range v {
+			idx, ok := iface.(int64)
+			if !ok {
+				log.FromContext(ctx).Error("Failed to process match script return value as index")
+				return errDatabaseCorruption.New()
+			}
+			if idx < 6 || idx > 15 {
+				log.FromContext(ctx).WithField("index", idx).Error("Index out of bounds returned by match script")
+				return errDatabaseCorruption.New()
+			}
+			keyIndexes = append(keyIndexes, uint8(idx))
 		}
+		scanKeys = make([]string, 0, 10)
+		for i := 0; i < len(keyIndexes); i++ {
+			switch keyIndexes[i] {
+			case 6:
+				scanKeys = append(scanKeys, matchKeys.Input.ShortFCnt, matchKeys.Processing.ShortFCnt)
+			case 7:
+				scanKeys = append(scanKeys, matchKeys.Processing.ShortFCnt)
+				continue
+			case 8:
+				scanKeys = append(scanKeys, matchKeys.Input.LongFCntNoRollover, matchKeys.Processing.LongFCntNoRollover)
+			case 9:
+				scanKeys = append(scanKeys, matchKeys.Processing.LongFCntNoRollover)
+				continue
+			case 10:
+				scanKeys = append(scanKeys, matchKeys.Input.LongFCntRollover, matchKeys.Processing.LongFCntRollover)
+			case 11:
+				scanKeys = append(scanKeys, matchKeys.Processing.LongFCntRollover)
+				continue
+			case 12:
+				scanKeys = append(scanKeys, matchKeys.Input.Pending, matchKeys.Processing.Pending)
+			case 13:
+				scanKeys = append(scanKeys, matchKeys.Processing.Pending)
+				continue
+			case 14:
+				scanKeys = append(scanKeys, matchKeys.Input.Legacy, matchKeys.Processing.Legacy)
+			case 15:
+				scanKeys = append(scanKeys, matchKeys.Processing.Legacy)
+				continue
+			default:
+				panic("invalid index")
+			}
+			if len(keyIndexes) > i+1 && keyIndexes[i+1] == keyIndexes[i]+1 {
+				// Next key is "processing" key, which is already added above - skip
+				i++
+			}
+		}
+
+	case string:
 		res := &MatchResult{}
-		if err := msgpack.Unmarshal([]byte(s), res); err != nil {
+		if err := msgpack.Unmarshal([]byte(v), res); err != nil {
 			return err
 		}
 
@@ -569,20 +620,12 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			}
 		}
 		return errNoUplinkMatch
+
+	default:
+		log.FromContext(ctx).WithField("value", v).WithError(err).Error("Failed to process matching result")
+		return errDatabaseCorruption.New()
 	}
 
-	scanKeys := []string{
-		matchKeys.Input.ShortFCnt,
-		matchKeys.Processing.ShortFCnt,
-		matchKeys.Input.LongFCntNoRollover,
-		matchKeys.Processing.LongFCntNoRollover,
-		matchKeys.Input.LongFCntRollover,
-		matchKeys.Processing.LongFCntRollover,
-		matchKeys.Input.Pending,
-		matchKeys.Processing.Pending,
-		matchKeys.Input.Legacy,
-		matchKeys.Processing.Legacy,
-	}
 	args := make([]interface{}, 1, 2)
 	args[0] = cacheTTL.Milliseconds()
 	for len(scanKeys) > 0 {
@@ -593,30 +636,31 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		if err == redis.Nil {
 			return errNoUplinkMatch
 		}
-		ss, ok := v.([]interface{})
-		if !ok || len(ss) != 2 || ss[0] == nil {
+		vs, ok := v.([]interface{})
+		if !ok || len(vs) != 2 || vs[0] == nil {
 			log.FromContext(ctx).WithField("value", v).Error("Invalid value returned by device match scan script")
 			return errDatabaseCorruption.New()
 		}
-		i, ok := ss[0].(int64)
-		if !ok {
-			log.FromContext(ctx).WithField("index", ss[0]).Error("Invalid index returned by device match scan script")
+		i, ok := vs[0].(int64)
+		switch {
+		case !ok:
+			log.FromContext(ctx).WithField("index", vs[0]).Error("Invalid index returned by device match scan script")
 			return errDatabaseCorruption.New()
-		}
-		if i == 0 || int64(len(scanKeys)) < i {
+		case i < 1, int64(len(scanKeys)) < i:
 			log.FromContext(ctx).WithFields(log.Fields(
 				"index", i,
 				"scan_key_count", len(scanKeys),
 			)).Error("Invalid index returned by device match scan script")
-			// NOTE: Lua indexing starts from 1.
 			return errDatabaseCorruption.New()
+		case i > 1:
+			scanKeys = scanKeys[i-1:]
 		}
-		scanKeys = scanKeys[i-1:]
 
-		if ss[1] == nil {
+		vsUID := vs[1]
+		if vsUID == nil {
 			return errDatabaseCorruption.New()
 		}
-		uid, err := decodeString(ss[1])
+		uid, err := decodeString(vsUID)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Error("Failed to parse uid returned by device match scan script as a string")
 			return errDatabaseCorruption.WithCause(err)
@@ -652,9 +696,9 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			}
 		}
 		if len(args) > 1 {
-			args[1] = ss[1]
+			args[1] = vsUID
 		} else {
-			args = append(args, ss[1])
+			args = append(args, vsUID)
 		}
 	}
 	return errNoUplinkMatch
@@ -665,6 +709,24 @@ func equalEUI64(x, y *types.EUI64) bool {
 		return x == y
 	}
 	return x.Equal(*y)
+}
+
+func removeLegacyDevAddrMapping(r redis.Cmdable, addrKey, uid string) {
+	r.SRem(addrKey, uid)
+}
+
+func removeCurrentDevAddrMapping(r redis.Cmdable, addrKey, uid string, supports32Bit bool) {
+	removeLegacyDevAddrMapping(r, addrKey, uid)
+	if !supports32Bit {
+		r.ZRem(ttnredis.Key(addrKey, shortFCntKey), uid)
+	} else {
+		r.ZRem(ttnredis.Key(addrKey, longFCntKey), uid)
+	}
+}
+
+func removePendingDevAddrMapping(r redis.Cmdable, addrKey, uid string) {
+	removeLegacyDevAddrMapping(r, addrKey, uid)
+	r.SRem(ttnredis.Key(addrKey, pendingKey), uid)
 }
 
 // SetByID sets device by appID, devID.
@@ -737,10 +799,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					p.Del(r.euiKey(*stored.JoinEUI, *stored.DevEUI))
 				}
 				if stored.PendingSession != nil {
-					p.SRem(r.addrKey(stored.PendingSession.DevAddr), uid)
+					removePendingDevAddrMapping(p, r.addrKey(stored.PendingSession.DevAddr), uid)
 				}
 				if stored.Session != nil {
-					p.SRem(r.addrKey(stored.Session.DevAddr), uid)
+					removeCurrentDevAddrMapping(p, r.addrKey(stored.Session.DevAddr), uid, deviceSupports32BitFCnt(stored))
 				}
 				return nil
 			}
@@ -810,95 +872,76 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			var delFields []string
 			var setFields []interface{}
 
-			switch {
-			case stored.GetMACSettings().GetResetsFCnt() == nil && updated.MACSettings.GetResetsFCnt() == nil:
-			case updated.MACSettings.GetResetsFCnt() == nil:
+			// NOTE: The following sequence of switches use concept of "container" - a container is the pointer type "containing" the field value we're interested in.
+
+			switch storedCont, updatedCont := stored.GetMACSettings().GetResetsFCnt(), updated.MACSettings.GetResetsFCnt(); {
+			case storedCont == nil && updatedCont == nil:
+			case updatedCont == nil:
 				delFields = append(delFields, "mac_settings.resets_f_cnt")
-			case stored.GetMACSettings().GetResetsFCnt() == nil,
-				stored.MACSettings.ResetsFCnt.Value != updated.MACSettings.ResetsFCnt.Value:
-				setFields = append(setFields, "mac_settings.resets_f_cnt", encodeBool(updated.MACSettings.ResetsFCnt.Value))
+			case storedCont == nil, storedCont.Value != updatedCont.Value:
+				setFields = append(setFields, "mac_settings.resets_f_cnt", encodeBool(updatedCont.Value))
 			}
 
-			switch {
-			case stored.GetMACState() == nil && updated.MACState == nil:
-			case updated.MACState == nil:
+			switch storedCont, updatedCont := stored.GetMACState(), updated.MACState; {
+			case storedCont == nil && updatedCont == nil:
+			case updatedCont == nil:
 				delFields = append(delFields, "mac_state.lorawan_version")
-			case stored.GetMACState() == nil,
-				stored.MACState.LoRaWANVersion != updated.MACState.LoRaWANVersion:
-				setFields = append(setFields, "mac_state.lorawan_version", updated.MACState.LoRaWANVersion)
+			case storedCont == nil, storedCont.LoRaWANVersion != updatedCont.LoRaWANVersion:
+				setFields = append(setFields, "mac_state.lorawan_version", updatedCont.LoRaWANVersion)
 			}
 
-			switch {
-			case stored.GetPendingMACState() == nil && updated.PendingMACState == nil:
-			case updated.PendingMACState == nil:
+			switch storedCont, updatedCont := stored.GetPendingMACState(), updated.PendingMACState; {
+			case storedCont == nil && updatedCont == nil:
+			case updatedCont == nil:
 				delFields = append(delFields, "pending_mac_state.lorawan_version")
-			case stored.GetPendingMACState() == nil,
-				stored.PendingMACState.LoRaWANVersion != updated.PendingMACState.LoRaWANVersion:
-				setFields = append(setFields, "pending_mac_state.lorawan_version", updated.PendingMACState.LoRaWANVersion)
+			case storedCont == nil, storedCont.LoRaWANVersion != updatedCont.LoRaWANVersion:
+				setFields = append(setFields, "pending_mac_state.lorawan_version", updatedCont.LoRaWANVersion)
 			}
 
-			switch {
-			case stored.GetPendingSession().GetSessionKeys().GetFNwkSIntKey().GetKey() == nil &&
-				updated.PendingSession.GetSessionKeys().GetFNwkSIntKey().GetKey() == nil:
-			case updated.PendingSession.GetSessionKeys().GetFNwkSIntKey().GetKey() == nil:
-				delFields = append(delFields, "pending_session.keys.f_nwk_s_int_key.key")
-			case stored.GetPendingSession().GetSessionKeys().GetFNwkSIntKey().GetKey() == nil ||
-				!stored.GetPendingSession().GetSessionKeys().GetFNwkSIntKey().GetKey().Equal(*updated.PendingSession.FNwkSIntKey.Key):
-				setFields = append(setFields, "pending_session.keys.f_nwk_s_int_key.key", updated.PendingSession.FNwkSIntKey.Key)
-			}
-
-			switch {
-			case stored.GetPendingSession().GetSessionKeys().GetFNwkSIntKey().GetKEKLabel() == "" &&
-				updated.PendingSession.GetSessionKeys().GetFNwkSIntKey().GetKEKLabel() == "":
-			case updated.PendingSession.GetSessionKeys().GetFNwkSIntKey().GetKEKLabel() == "":
+			switch storedCont, updatedCont := stored.GetPendingSession().GetSessionKeys().GetFNwkSIntKey(), updated.GetPendingSession().GetSessionKeys().GetFNwkSIntKey(); {
+			case storedCont == nil && updatedCont == nil:
+			case updatedCont == nil:
 				delFields = append(delFields, "pending_session.keys.f_nwk_s_int_key.kek_label")
-			case stored.GetPendingSession().GetSessionKeys().GetFNwkSIntKey().GetKEKLabel() == updated.PendingSession.FNwkSIntKey.KEKLabel:
-				setFields = append(setFields, "pending_session.keys.f_nwk_s_int_key.kek_label", updated.PendingSession.FNwkSIntKey.KEKLabel)
-			}
-
-			switch {
-			case len(stored.GetPendingSession().GetSessionKeys().GetFNwkSIntKey().GetEncryptedKey()) == 0 &&
-				len(updated.PendingSession.GetSessionKeys().GetFNwkSIntKey().GetEncryptedKey()) == 0:
-			case len(updated.PendingSession.GetSessionKeys().GetFNwkSIntKey().GetEncryptedKey()) == 0:
 				delFields = append(delFields, "pending_session.keys.f_nwk_s_int_key.encrypted_key")
-			case !bytes.Equal(stored.GetPendingSession().GetSessionKeys().GetFNwkSIntKey().GetEncryptedKey(), updated.PendingSession.FNwkSIntKey.EncryptedKey):
-				setFields = append(setFields, "pending_session.keys.f_nwk_s_int_key.encrypted_key", updated.PendingSession.FNwkSIntKey.EncryptedKey)
+			case storedCont == nil, !bytes.Equal(storedCont.EncryptedKey, updatedCont.EncryptedKey):
+				setFields = append(setFields, "pending_session.keys.f_nwk_s_int_key.encrypted_key", updatedCont.EncryptedKey)
+				fallthrough
+			case storedCont == nil, storedCont.KEKLabel != updatedCont.KEKLabel:
+				setFields = append(setFields, "pending_session.keys.f_nwk_s_int_key.kek_label", updatedCont.KEKLabel)
+			}
+			switch storedCont, updatedCont := stored.GetPendingSession().GetSessionKeys().GetFNwkSIntKey().GetKey(), updated.GetPendingSession().GetSessionKeys().GetFNwkSIntKey().GetKey(); {
+			case storedCont == nil && updatedCont == nil:
+			case updatedCont == nil:
+				delFields = append(delFields, "pending_session.keys.f_nwk_s_int_key.key")
+			case storedCont == nil, storedCont.Equal(*updatedCont):
+				setFields = append(setFields, "pending_session.keys.f_nwk_s_int_key.key", *updatedCont)
 			}
 
-			switch {
-			case stored.GetSession().GetSessionKeys().GetFNwkSIntKey().GetKey() == nil &&
-				updated.Session.GetSessionKeys().GetFNwkSIntKey().GetKey() == nil:
-			case updated.Session.GetSessionKeys().GetFNwkSIntKey().GetKey() == nil:
-				delFields = append(delFields, "session.keys.f_nwk_s_int_key.key")
-			case stored.GetSession().GetSessionKeys().GetFNwkSIntKey().GetKey() == nil ||
-				!stored.GetSession().GetSessionKeys().GetFNwkSIntKey().GetKey().Equal(*updated.Session.FNwkSIntKey.Key):
-				setFields = append(setFields, "session.keys.f_nwk_s_int_key.key", updated.Session.FNwkSIntKey.Key)
-			}
-
-			switch {
-			case stored.GetSession().GetSessionKeys().GetFNwkSIntKey().GetKEKLabel() == "" &&
-				updated.Session.GetSessionKeys().GetFNwkSIntKey().GetKEKLabel() == "":
-			case updated.Session.GetSessionKeys().GetFNwkSIntKey().GetKEKLabel() == "":
+			switch storedCont, updatedCont := stored.GetSession().GetSessionKeys().GetFNwkSIntKey(), updated.GetSession().GetSessionKeys().GetFNwkSIntKey(); {
+			case storedCont == nil && updatedCont == nil:
+			case updatedCont == nil:
 				delFields = append(delFields, "session.keys.f_nwk_s_int_key.kek_label")
-			case stored.GetSession().GetSessionKeys().GetFNwkSIntKey().GetKEKLabel() == updated.Session.FNwkSIntKey.KEKLabel:
-				setFields = append(setFields, "session.keys.f_nwk_s_int_key.kek_label", updated.Session.FNwkSIntKey.KEKLabel)
-			}
-
-			switch {
-			case len(stored.GetSession().GetSessionKeys().GetFNwkSIntKey().GetEncryptedKey()) == 0 &&
-				len(updated.Session.GetSessionKeys().GetFNwkSIntKey().GetEncryptedKey()) == 0:
-			case len(updated.Session.GetSessionKeys().GetFNwkSIntKey().GetEncryptedKey()) == 0:
 				delFields = append(delFields, "session.keys.f_nwk_s_int_key.encrypted_key")
-			case !bytes.Equal(stored.GetSession().GetSessionKeys().GetFNwkSIntKey().GetEncryptedKey(), updated.Session.FNwkSIntKey.EncryptedKey):
-				setFields = append(setFields, "session.keys.f_nwk_s_int_key.encrypted_key", updated.Session.FNwkSIntKey.EncryptedKey)
+			case storedCont == nil, !bytes.Equal(storedCont.EncryptedKey, updatedCont.EncryptedKey):
+				setFields = append(setFields, "session.keys.f_nwk_s_int_key.encrypted_key", updatedCont.EncryptedKey)
+				fallthrough
+			case storedCont == nil, storedCont.KEKLabel != updatedCont.KEKLabel:
+				setFields = append(setFields, "session.keys.f_nwk_s_int_key.kek_label", updatedCont.KEKLabel)
+			}
+			switch storedCont, updatedCont := stored.GetSession().GetSessionKeys().GetFNwkSIntKey().GetKey(), updated.GetSession().GetSessionKeys().GetFNwkSIntKey().GetKey(); {
+			case storedCont == nil && updatedCont == nil:
+			case updatedCont == nil:
+				delFields = append(delFields, "session.keys.f_nwk_s_int_key.key")
+			case storedCont == nil, storedCont.Equal(*updatedCont):
+				setFields = append(setFields, "session.keys.f_nwk_s_int_key.key", *updatedCont)
 			}
 
-			switch {
-			case stored.GetSession().GetLastFCntUp() == 0 && updated.Session.GetLastFCntUp() == 0:
-			case updated.Session.GetLastFCntUp() == 0:
+			switch storedCont, updatedCont := stored.GetSession(), updated.GetSession(); {
+			case storedCont == nil && updatedCont == nil:
+			case updatedCont == nil:
 				delFields = append(delFields, "session.last_f_cnt_up")
-			case stored.GetSession().GetLastFCntUp() == updated.Session.LastFCntUp:
-				setFields = append(setFields, "session.last_f_cnt_up", updated.Session.LastFCntUp)
+			case storedCont == nil, storedCont.LastFCntUp != updatedCont.LastFCntUp:
+				setFields = append(setFields, "session.last_f_cnt_up", updatedCont.LastFCntUp)
 			}
 
 			fk := ttnredis.Key(uk, fieldKey)
@@ -912,17 +955,22 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			storedSupports32BitFCnt := deviceSupports32BitFCnt(stored)
 			updatedSupports32BitFCnt := deviceSupports32BitFCnt(updated)
 
+			if stored.GetPendingSession() == nil || updated.GetPendingSession() == nil ||
+				!updated.PendingSession.DevAddr.Equal(stored.PendingSession.DevAddr) {
+				if stored.GetPendingSession() != nil {
+					removePendingDevAddrMapping(p, r.addrKey(stored.PendingSession.DevAddr), uid)
+				}
+
+				if updated.GetPendingSession() != nil {
+					p.SAdd(ttnredis.Key(r.addrKey(updated.PendingSession.DevAddr), pendingKey), uid)
+				}
+			}
+
 			if stored.GetSession() == nil || updated.GetSession() == nil ||
 				!updated.Session.DevAddr.Equal(stored.Session.DevAddr) ||
 				storedSupports32BitFCnt != updatedSupports32BitFCnt {
 				if stored.GetSession() != nil {
-					addrKey := r.addrKey(stored.Session.DevAddr)
-					p.ZRem(addrKey, uid)
-					if !storedSupports32BitFCnt {
-						p.ZRem(ttnredis.Key(addrKey, shortFCntKey), uid)
-					} else {
-						p.ZRem(ttnredis.Key(addrKey, longFCntKey), uid)
-					}
+					removeCurrentDevAddrMapping(p, r.addrKey(stored.Session.DevAddr), uid, storedSupports32BitFCnt)
 				}
 
 				if updated.GetSession() != nil {
@@ -936,19 +984,6 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					} else {
 						p.ZAdd(ttnredis.Key(addrKey, longFCntKey), z)
 					}
-				}
-			}
-
-			if stored.GetPendingSession() == nil || updated.GetPendingSession() == nil ||
-				!updated.PendingSession.DevAddr.Equal(stored.PendingSession.DevAddr) {
-				if stored.GetPendingSession() != nil {
-					addrKey := r.addrKey(stored.PendingSession.DevAddr)
-					p.SRem(addrKey, uid)
-					p.SRem(ttnredis.Key(addrKey, pendingKey), uid)
-				}
-
-				if updated.GetPendingSession() != nil {
-					p.SAdd(ttnredis.Key(r.addrKey(updated.PendingSession.DevAddr), pendingKey), uid)
 				}
 			}
 
