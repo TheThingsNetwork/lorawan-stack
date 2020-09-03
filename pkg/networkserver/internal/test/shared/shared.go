@@ -14,3 +14,7 @@
 
 // Package test contains testing utilities usable by all subpackages of networkserver excluding itself.
 package test
+
+import "go.thethings.network/lorawan-stack/v3/pkg/util/test"
+
+var CacheTTL = (1 << 5) * test.Delay

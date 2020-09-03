@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
@@ -31,64 +32,184 @@ import (
 )
 
 func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
-	t, a := test.MustNewTFromContext(ctx)
-
 	type uplinkMatch struct {
 		*ttnpb.EndDevice
 		IsPending bool
 	}
-	assertUplinkMatches := func(ctx context.Context, up *ttnpb.UplinkMessage, expectedMatches ...uplinkMatch) bool {
-		t := test.MustTFromContext(ctx)
+	assertUplinkMatch := func(ctx context.Context, up *ttnpb.UplinkMessage, maxAttempts uint, expectedMatch uplinkMatch) bool {
+		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
-		a := assertions.New(t)
 
-		if len(expectedMatches) == 0 {
-			if !a.So(errors.IsNotFound(reg.RangeByUplinkMatches(ctx, up, time.Second, func(storedCtx context.Context, match UplinkMatch) bool {
-				a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-				return false
-			})), should.BeTrue) {
-				t.Error("Devices matched, when no match was expected")
-				return false
-			}
-			return true
+		expectedSession, expectedMACState, expectedMSB := expectedMatch.Session, expectedMatch.MACState, expectedMatch.Session.LastFCntUp&0xffff0000
+		if expectedMatch.IsPending {
+			expectedSession, expectedMACState, expectedMSB = expectedMatch.PendingSession, expectedMatch.PendingMACState, 0
 		}
+		var matched bool
+		var attempts []UplinkMatch
+		err := reg.RangeByUplinkMatches(ctx, up, CacheTTL, func(storedCtx context.Context, match UplinkMatch) bool {
+			attempts = append(attempts, match)
+			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
+			matched = test.AllTrue(
+				match.ApplicationIdentifiers() == expectedMatch.ApplicationIdentifiers,
+				match.DeviceID() == expectedMatch.DeviceID,
+				match.LoRaWANVersion() == expectedMACState.LoRaWANVersion,
+				match.FNwkSIntKey().Equal(expectedSession.FNwkSIntKey),
+				match.FCnt() == expectedMSB|up.Payload.GetMACPayload().FCnt,
+				match.LastFCnt() == expectedSession.LastFCntUp,
+				match.IsPending() == expectedMatch.IsPending,
+				match.ResetsFCnt() == expectedMatch.GetMACSettings().GetResetsFCnt(),
+			)
+			return matched
+		})
+		if !a.So(len(attempts), should.BeLessThanOrEqualTo, maxAttempts) {
+			t.Errorf("Attempted matches: %s", pretty.Sprint(attempts))
+		}
+		if !a.So(err, should.BeNil) {
+			t.Errorf("Expected nil error, got: %v\n", errors.Stack(err))
+		}
+		if !a.So(matched, should.BeTrue) {
+			t.Errorf("Device did not match after %d attempts", len(attempts))
+		}
+		return !a.Failed()
+	}
+	assertNoUplinkMatch := func(ctx context.Context, up *ttnpb.UplinkMessage, maxAttempts uint) bool {
+		t, a := test.MustNewTFromContext(ctx)
+		t.Helper()
 
-		var matches []UplinkMatch
-		if !test.AllTrue(
-			a.So(reg.RangeByUplinkMatches(ctx, up, time.Second, func(storedCtx context.Context, match UplinkMatch) bool {
-				a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-				matches = append(matches, match)
-				return false
-			}), should.BeNil),
-			a.So(matches, should.HaveLength, len(expectedMatches)),
-		) {
-			t.Error("No matching device found")
+		var attempts []UplinkMatch
+		err := reg.RangeByUplinkMatches(ctx, up, CacheTTL, func(storedCtx context.Context, match UplinkMatch) bool {
+			attempts = append(attempts, match)
+			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
+			return false
+		})
+		if !a.So(len(attempts), should.BeLessThanOrEqualTo, maxAttempts) {
+			t.Errorf("Attempted matches: %s", pretty.Sprint(attempts))
+		}
+		if !a.So(err, should.NotBeNil) {
 			return false
 		}
-		for i, match := range matches {
-			expectedMatch := expectedMatches[i]
-			session, macState, msb := expectedMatch.Session, expectedMatch.MACState, expectedMatch.Session.LastFCntUp&0xffff0000
-			if expectedMatch.IsPending {
-				session, macState, msb = expectedMatch.PendingSession, expectedMatch.PendingMACState, 0
-			}
-			if !test.AllTrue(
-				a.So(match.ApplicationIdentifiers(), should.Resemble, expectedMatch.ApplicationIdentifiers),
-				a.So(match.DeviceID(), should.Equal, expectedMatch.DeviceID),
-				a.So(match.LoRaWANVersion(), should.Equal, macState.LoRaWANVersion),
-				a.So(match.FNwkSIntKey(), should.Resemble, session.FNwkSIntKey),
-				a.So(match.FCnt(), should.Equal, msb|up.Payload.GetMACPayload().FCnt),
-				a.So(match.LastFCnt(), should.Equal, session.LastFCntUp),
-				a.So(match.IsPending(), should.Equal, expectedMatch.IsPending),
-				a.So(match.ResetsFCnt(), should.Resemble, expectedMatch.GetMACSettings().GetResetsFCnt()),
-			) {
-				t.Error("Invalid devices matched")
-				return false
-			}
+		if !a.So(errors.IsNotFound(err), should.BeTrue) {
+			t.Errorf("Expected 'Not found' error, got: %v", errors.Stack(err))
+		}
+		return !a.Failed()
+	}
+	assertNoDevice := func(ctx context.Context, pb *ttnpb.EndDevice) bool {
+		t, a := test.MustNewTFromContext(ctx)
+		t.Helper()
+
+		stored, storedCtx, err := reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
+		if !test.AllTrue(
+			a.So(err, should.NotBeNil),
+			a.So(errors.IsNotFound(err), should.BeTrue),
+			a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
+			a.So(stored, should.BeNil),
+		) {
+			t.Error("GetByID assertion failed with empty registry")
+			return false
+		}
+
+		stored, storedCtx, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+		if !test.AllTrue(
+			a.So(err, should.NotBeNil),
+			a.So(errors.IsNotFound(err), should.BeTrue),
+			a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
+			a.So(stored, should.BeNil),
+		) {
+			t.Error("GetByEUI assertion failed with empty registry")
+			return false
+		}
+
+		stored, storedCtx, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel,
+			func(storedCtx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+				a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
+				if !a.So(stored, should.BeNil) {
+					t.Error("Registry is not empty")
+				}
+				return nil, nil, nil
+			},
+		)
+		if !test.AllTrue(
+			a.So(err, should.BeNil),
+			a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
+			a.So(stored, should.BeNil),
+		) {
+			t.Error("Read-only SetByID assertion failed with empty registry")
+			return false
+		}
+		return !a.Failed()
+	}
+	assertCreateDevice := func(ctx context.Context, pb *ttnpb.EndDevice, fields ...string) bool {
+		t, a := test.MustNewTFromContext(ctx)
+		t.Helper()
+
+		if !a.So(assertNoDevice(ctx, pb), should.BeTrue) {
+			t.Error("Registry not empty")
+			return false
+		}
+
+		start := time.Now()
+
+		stored, storedCtx, err := CreateDevice(ctx, reg, pb, fields...)
+		pb.CreatedAt = stored.GetCreatedAt()
+		pb.UpdatedAt = stored.GetUpdatedAt()
+		if !test.AllTrue(
+			a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
+			a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
+			a.So(stored.GetCreatedAt(), should.HappenAfter, start),
+			a.So(stored.GetUpdatedAt(), should.Equal, stored.GetCreatedAt()),
+			a.So(stored, should.Resemble, pb),
+		) {
+			t.Error("Device creation assertion failed")
+			return false
+		}
+		ctx = storedCtx
+
+		stored, storedCtx, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
+		if !test.AllTrue(
+			a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
+			a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
+			a.So(stored, should.Resemble, pb),
+		) {
+			t.Error("GetByID assertion failed with non-empty registry")
+			return false
+		}
+		ctx = storedCtx
+
+		stored, storedCtx, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+		if !test.AllTrue(
+			a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
+			a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
+			a.So(stored, should.Resemble, pb),
+		) {
+			t.Error("GetByEUI assertion failed with non-empty registry")
+			return false
+		}
+		ctx = storedCtx
+
+		stored, storedCtx, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID, fields,
+			func(storedCtx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+				a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
+				a.So(stored, should.Resemble, pb)
+				return stored, nil, nil
+			},
+		)
+		if !test.AllTrue(
+			a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
+			a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
+			a.So(stored, should.Resemble, pb),
+		) {
+			t.Error("Read-only SetByID assertion failed with non-empty registry")
+			return false
 		}
 		return true
 	}
 
+	t, a := test.MustNewTFromContext(ctx)
+
 	pb := &ttnpb.EndDevice{
+		FrequencyPlanID:   test.EUFrequencyPlanID,
+		LoRaWANVersion:    ttnpb.MAC_V1_0_3,
+		LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -98,283 +219,176 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		Session: &ttnpb.Session{
 			DevAddr:    types.DevAddr{0x42, 0xff, 0xff, 0xff},
 			LastFCntUp: 41,
+			SessionKeys: ttnpb.SessionKeys{
+				FNwkSIntKey: &ttnpb.KeyEnvelope{
+					Key: &types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+			},
 		},
 		MACState: MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A),
 		PendingSession: &ttnpb.Session{
 			DevAddr: types.DevAddr{0x43, 0xff, 0xff, 0xff},
+			SessionKeys: ttnpb.SessionKeys{
+				FNwkSIntKey: &ttnpb.KeyEnvelope{
+					EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe},
+					KEKLabel:     "kek-label",
+				},
+				SNwkSIntKey: &ttnpb.KeyEnvelope{
+					EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfd},
+					KEKLabel:     "kek-label",
+				},
+				NwkSEncKey: &ttnpb.KeyEnvelope{
+					EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfc},
+					KEKLabel:     "kek-label",
+				},
+			},
 		},
 		PendingMACState: MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B),
 	}
 	pbFields := []string{
+		"frequency_plan_id",
 		"ids.application_ids",
 		"ids.dev_eui",
 		"ids.device_id",
 		"ids.join_eui",
+		"lorawan_phy_version",
+		"lorawan_version",
 		"mac_state",
 		"pending_mac_state",
 		"pending_session",
 		"session",
 	}
-	currentUp := &ttnpb.UplinkMessage{
-		Payload: &ttnpb.Message{
-			Payload: &ttnpb.Message_MACPayload{
-				MACPayload: &ttnpb.MACPayload{
-					FHDR: ttnpb.FHDR{
-						FCnt:    42,
-						DevAddr: pb.Session.DevAddr,
-					},
-				},
-			},
-		},
+
+	pbCurrentUp := MakeDataUplink(WithDeviceDataUplinkConfig(pb, false, ttnpb.DATA_RATE_2, 1, 1)(DataUplinkConfig{
+		DecodePayload: true,
+		FPort:         0x01,
+	}))
+	pbPendingUp := MakeDataUplink(WithDeviceDataUplinkConfig(pb, true, ttnpb.DATA_RATE_1, 2, 42)(DataUplinkConfig{
+		DecodePayload: true,
+		FPort:         0x42,
+	}))
+
+	if !a.So(assertNoUplinkMatch(ctx, pbCurrentUp, 0), should.BeTrue) {
+		t.Fatal("pb current session uplink matching assertion failed with empty registry")
 	}
-	pendingUp := &ttnpb.UplinkMessage{
-		Payload: &ttnpb.Message{
-			Payload: &ttnpb.Message_MACPayload{
-				MACPayload: &ttnpb.MACPayload{
-					FHDR: ttnpb.FHDR{
-						FCnt:    4242,
-						DevAddr: pb.PendingSession.DevAddr,
-					},
-				},
-			},
-		},
+	if !a.So(assertNoUplinkMatch(ctx, pbPendingUp, 0), should.BeTrue) {
+		t.Fatal("pb pending session uplink matching assertion failed with empty registry")
 	}
 
-	stored, storedCtx, err := reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-	if !test.AllTrue(
-		a.So(err, should.NotBeNil),
-		a.So(errors.IsNotFound(err), should.BeTrue),
-		a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
-		a.So(stored, should.BeNil),
-	) {
-		t.Fatal("GetByID assertion failed with empty registry")
+	if !a.So(assertCreateDevice(ctx, pb, pbFields...), should.BeTrue) {
+		t.Fatal("pb creation assertion failed")
 	}
 
-	stored, storedCtx, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	if !test.AllTrue(
-		a.So(err, should.NotBeNil),
-		a.So(errors.IsNotFound(err), should.BeTrue),
-		a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
-		a.So(stored, should.BeNil),
-	) {
-		t.Fatal("GetByEUI assertion failed with empty registry")
-	}
-
-	stored, storedCtx, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID, pbFields,
-		func(storedCtx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-			if !a.So(stored, should.BeNil) {
-				t.Fatal("Registry is not empty")
-			}
-			return nil, nil, nil
-		},
-	)
-	if !test.AllTrue(
-		a.So(err, should.BeNil),
-		a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
-		a.So(stored, should.BeNil),
-	) {
-		t.Fatal("Read-only SetByID assertion failed with empty registry")
-	}
-
-	if !a.So(assertUplinkMatches(ctx, currentUp), should.BeTrue) {
-		t.Fatal("RangeByUplinkMatches assertion failed for current session uplink with empty registry")
-	}
-	if !a.So(assertUplinkMatches(ctx, pendingUp), should.BeTrue) {
-		t.Fatal("RangeByUplinkMatches assertion failed for pending session uplink with empty registry")
-	}
-
-	start := time.Now()
-
-	stored, storedCtx, err = CreateDevice(storedCtx, reg, pb, pbFields...)
-	pb.CreatedAt = stored.GetCreatedAt()
-	pb.UpdatedAt = stored.GetUpdatedAt()
-	if !test.AllTrue(
-		a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
-		a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
-		a.So(stored.GetCreatedAt(), should.HappenAfter, start),
-		a.So(stored.GetUpdatedAt(), should.Equal, stored.GetCreatedAt()),
-		a.So(stored, should.Resemble, pb),
-	) {
-		t.Fatal("Device creation assertion failed")
-	}
-	ctx = storedCtx
-
-	stored, storedCtx, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-	if !test.AllTrue(
-		a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
-		a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
-		a.So(stored, should.Resemble, pb),
-	) {
-		t.Fatal("GetByID assertion failed with non-empty registry")
-	}
-	ctx = storedCtx
-
-	stored, storedCtx, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	if !test.AllTrue(
-		a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
-		a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
-		a.So(stored, should.Resemble, pb),
-	) {
-		t.Fatal("GetByEUI assertion failed with non-empty registry")
-	}
-	ctx = storedCtx
-
-	stored, storedCtx, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID, pbFields,
-		func(storedCtx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-			a.So(stored, should.Resemble, pb)
-			return stored, nil, nil
-		},
-	)
-	if !test.AllTrue(
-		a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
-		a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
-		a.So(stored, should.Resemble, pb),
-	) {
-		t.Fatal("Read-only SetByID assertion failed with non-empty registry")
-	}
-	ctx = storedCtx
-
-	if !a.So(assertUplinkMatches(ctx, currentUp,
+	if !a.So(assertUplinkMatch(ctx, pbCurrentUp, 1,
 		uplinkMatch{
 			EndDevice: pb,
 		},
 	), should.BeTrue) {
-		t.Fatal("RangeByUplinkMatches assertion failed for current session uplink with non-empty registry")
+		t.Fatal("pb current session uplink matching assertion failed with non-empty registry")
 	}
-	if !a.So(assertUplinkMatches(ctx, pendingUp,
+	if !a.So(assertUplinkMatch(ctx, pbPendingUp, 1,
 		uplinkMatch{
 			EndDevice: pb,
 			IsPending: true,
 		},
 	), should.BeTrue) {
-		t.Fatal("RangeByUplinkMatches assertion failed for pending session uplink with non-empty registry")
+		t.Fatal("pb pending session uplink matching assertion failed with non-empty registry")
 	}
 
 	pbOther := CopyEndDevice(pb)
-	pbOther.Session.LastFCntUp = pb.Session.LastFCntUp + 1
+	pbOther.Session.LastFCntUp = pbCurrentUp.Payload.GetMACPayload().FCnt
+	pbOther.Session.FNwkSIntKey.Key = &types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe}
+	pbOther.PendingSession = nil
 	pbOther.EndDeviceIdentifiers.DeviceID = "test-dev-other"
 	pbOther.EndDeviceIdentifiers.DevEUI = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
-	stored, storedCtx, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
-		t.Fatalf("Error received: %v", err)
-	}
-	a.So(stored, should.BeNil)
+	pbOtherCurrentUp := MakeDataUplink(WithDeviceDataUplinkConfig(pbOther, false, ttnpb.DATA_RATE_2, 1, 0)(DataUplinkConfig{
+		DecodePayload: true,
+		FPort:         0x01,
+	}))
 
-	stored, storedCtx, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
-		t.Fatalf("Error received: %v", err)
-	}
-	a.So(stored, should.BeNil)
-
-	stored, storedCtx, err = CreateDevice(ctx, reg, pbOther,
-		"ids.application_ids",
-		"ids.dev_eui",
-		"ids.device_id",
-		"ids.join_eui",
-		"pending_session",
-		"session",
-	)
-	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-	if !a.So(err, should.BeNil) || !a.So(stored, should.NotBeNil) {
-		t.Fatalf("Failed to create device: %s", err)
-	}
-	a.So(stored.CreatedAt, should.HappenAfter, start)
-	a.So(stored.UpdatedAt, should.Equal, stored.CreatedAt)
-	pbOther.CreatedAt = stored.CreatedAt
-	pbOther.UpdatedAt = stored.UpdatedAt
-	a.So(stored, should.HaveEmptyDiff, pbOther)
-
-	stored, storedCtx, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-	a.So(err, should.BeNil)
-	a.So(stored, should.Resemble, pbOther)
-
-	stored, storedCtx, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-	a.So(err, should.BeNil)
-	a.So(stored, should.Resemble, pbOther)
-
-	for i := 0; i < 4; i++ {
-		a.So(assertUplinkMatches(ctx, currentUp,
-			uplinkMatch{
-				EndDevice: pbOther,
-			},
-			uplinkMatch{
-				EndDevice: pb,
-			},
-		), should.BeTrue)
-		a.So(assertUplinkMatches(ctx, pendingUp,
-			uplinkMatch{
-				EndDevice: pbOther,
-				IsPending: true,
-			},
-			uplinkMatch{
-				EndDevice: pb,
-				IsPending: true,
-			},
-		), should.BeTrue)
+	if !a.So(assertCreateDevice(ctx, pbOther, pbFields...), should.BeTrue) {
+		t.Fatal("pbOther creation assertion failed")
 	}
 
-	err = DeleteDevice(ctx, reg, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID)
+	if !a.So(assertUplinkMatch(ctx, pbOtherCurrentUp, 1,
+		uplinkMatch{
+			EndDevice: pbOther,
+		},
+	), should.BeTrue) {
+		t.Fatal("pbOther current session uplink matching assertion failed")
+	}
+	if !a.So(assertUplinkMatch(ctx, pbCurrentUp, 1,
+		uplinkMatch{
+			EndDevice: pb,
+		},
+	), should.BeTrue) {
+		t.Fatal("cached pb current session uplink matching assertion failed")
+	}
+	if !a.So(assertUplinkMatch(ctx, pbPendingUp, 1,
+		uplinkMatch{
+			EndDevice: pb,
+			IsPending: true,
+		},
+	), should.BeTrue) {
+		t.Fatal("cached pb pending session uplink matching assertion failed")
+	}
+	if !a.So(assertUplinkMatch(ctx, pbOtherCurrentUp, 1,
+		uplinkMatch{
+			EndDevice: pbOther,
+		},
+	), should.BeTrue) {
+		t.Fatal("cached pbOther current session uplink matching assertion failed")
+	}
+
+	err := DeleteDevice(ctx, reg, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID)
 	if !a.So(err, should.BeNil) {
-		t.FailNow()
+		t.Fatalf("pb deletion failed with: %s", errors.Stack(err))
 	}
 
-	stored, storedCtx, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
-		t.Fatalf("Error received: %v", err)
+	if !a.So(assertNoDevice(ctx, pb), should.BeTrue) {
+		t.Fatalf("Failed to assert registry emptiness after pb deletion")
 	}
-	a.So(stored, should.BeNil)
 
-	stored, storedCtx, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
-		t.Fatalf("Error received: %v", err)
-	}
-	a.So(stored, should.BeNil)
-
-	for i := 0; i < 4; i++ {
-		a.So(assertUplinkMatches(ctx, currentUp,
-			uplinkMatch{
-				EndDevice: pbOther,
-			},
-		), should.BeTrue)
-		a.So(assertUplinkMatches(ctx, pendingUp,
-			uplinkMatch{
-				EndDevice: pbOther,
-				IsPending: true,
-			},
-		), should.BeTrue)
+	if !a.So(assertUplinkMatch(ctx, pbOtherCurrentUp, 1,
+		uplinkMatch{
+			EndDevice: pbOther,
+		},
+	), should.BeTrue) {
+		t.Fatal("pbOther current session uplink matching assertion failed")
 	}
 
 	err = DeleteDevice(ctx, reg, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID)
 	if !a.So(err, should.BeNil) {
-		t.FailNow()
+		t.Fatalf("pbOther deletion failed with: %s", errors.Stack(err))
 	}
 
-	stored, storedCtx, err = reg.GetByID(ctx, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
-		t.Fatalf("Error received: %v", err)
+	if !a.So(assertNoDevice(ctx, pbOther), should.BeTrue) {
+		t.Fatalf("Failed to assert registry emptiness after pbOther deletion")
 	}
-	a.So(stored, should.BeNil)
 
-	stored, storedCtx, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
-		t.Fatalf("Error received: %v", err)
+	// NOTE: Even though devices are deleted, the matching results are still cached (within TTL) and matched here. That is expected.
+	if !a.So(assertUplinkMatch(ctx, pbCurrentUp, 1,
+		uplinkMatch{
+			EndDevice: pb,
+		},
+	), should.BeTrue) {
+		t.Fatal("cached pb current session uplink matching assertion failed after device deletion")
 	}
-	a.So(stored, should.BeNil)
-
-	for i := 0; i < 4; i++ {
-		a.So(assertUplinkMatches(ctx, currentUp), should.BeTrue)
-		a.So(assertUplinkMatches(ctx, pendingUp), should.BeTrue)
+	if !a.So(assertUplinkMatch(ctx, pbPendingUp, 1,
+		uplinkMatch{
+			EndDevice: pb,
+			IsPending: true,
+		},
+	), should.BeTrue) {
+		t.Fatal("cached pb pending session uplink matching assertion failed after device deletion")
+	}
+	if !a.So(assertUplinkMatch(ctx, pbOtherCurrentUp, 1,
+		uplinkMatch{
+			EndDevice: pbOther,
+		},
+	), should.BeTrue) {
+		t.Fatal("pbOther current session uplink matching assertion failed after device deletion")
 	}
 }
 
@@ -385,15 +399,17 @@ func HandleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		Parallel: true,
 		Func: func(ctx context.Context, a *assertions.Assertion) {
 			t.Helper()
-			test.RunSubtestFromContext(ctx, test.SubtestConfig{
+			if !test.RunSubtestFromContext(ctx, test.SubtestConfig{
 				Name: "1st run",
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 					handleDeviceRegistryTest(ctx, reg)
 				},
-			})
-			if t.Failed() {
+			}) {
 				t.Skip("Skipping 2nd run")
 			}
+			sleepFor := 2 * CacheTTL
+			t.Logf("Sleeping for %v for cached values to get cleaned up...", sleepFor)
+			time.Sleep(sleepFor)
 			test.RunSubtestFromContext(ctx, test.SubtestConfig{
 				Name: "2st run",
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
