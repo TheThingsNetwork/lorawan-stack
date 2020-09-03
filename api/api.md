@@ -50,6 +50,7 @@
 - [File `lorawan-stack/api/applicationserver_pubsub.proto`](#lorawan-stack/api/applicationserver_pubsub.proto)
   - [Message `ApplicationPubSub`](#ttn.lorawan.v3.ApplicationPubSub)
   - [Message `ApplicationPubSub.MQTTProvider`](#ttn.lorawan.v3.ApplicationPubSub.MQTTProvider)
+  - [Message `ApplicationPubSub.MQTTProvider.HeadersEntry`](#ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.HeadersEntry)
   - [Message `ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message)
   - [Message `ApplicationPubSub.NATSProvider`](#ttn.lorawan.v3.ApplicationPubSub.NATSProvider)
   - [Message `ApplicationPubSubFormats`](#ttn.lorawan.v3.ApplicationPubSubFormats)
@@ -1105,6 +1106,7 @@ The MQTT provider settings.
 | `tls_ca` | [`bytes`](#bytes) |  | The server Root CA certificate. PEM formatted. |
 | `tls_client_cert` | [`bytes`](#bytes) |  | The client certificate. PEM formatted. |
 | `tls_client_key` | [`bytes`](#bytes) |  | The client private key. PEM formatted. |
+| `headers` | [`ApplicationPubSub.MQTTProvider.HeadersEntry`](#ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.HeadersEntry) | repeated | HTTP headers to use on MQTT-over-Websocket connections. |
 
 #### Field Rules
 
@@ -1114,6 +1116,13 @@ The MQTT provider settings.
 | `client_id` | <p>`string.max_len`: `23`</p> |
 | `username` | <p>`string.max_len`: `100`</p> |
 | `password` | <p>`string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.HeadersEntry">Message `ApplicationPubSub.MQTTProvider.HeadersEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSub.Message">Message `ApplicationPubSub.Message`</a>
 

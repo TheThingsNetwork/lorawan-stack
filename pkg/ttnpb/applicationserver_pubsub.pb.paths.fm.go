@@ -41,6 +41,7 @@ var ApplicationPubSubFieldPathsNested = []string{
 	"provider",
 	"provider.mqtt",
 	"provider.mqtt.client_id",
+	"provider.mqtt.headers",
 	"provider.mqtt.password",
 	"provider.mqtt.publish_qos",
 	"provider.mqtt.server_url",
@@ -145,6 +146,7 @@ var SetApplicationPubSubRequestFieldPathsNested = []string{
 	"pubsub.provider",
 	"pubsub.provider.mqtt",
 	"pubsub.provider.mqtt.client_id",
+	"pubsub.provider.mqtt.headers",
 	"pubsub.provider.mqtt.password",
 	"pubsub.provider.mqtt.publish_qos",
 	"pubsub.provider.mqtt.server_url",
@@ -176,6 +178,7 @@ var ApplicationPubSub_NATSProviderFieldPathsTopLevel = []string{
 }
 var ApplicationPubSub_MQTTProviderFieldPathsNested = []string{
 	"client_id",
+	"headers",
 	"password",
 	"publish_qos",
 	"server_url",
@@ -189,6 +192,7 @@ var ApplicationPubSub_MQTTProviderFieldPathsNested = []string{
 
 var ApplicationPubSub_MQTTProviderFieldPathsTopLevel = []string{
 	"client_id",
+	"headers",
 	"password",
 	"publish_qos",
 	"server_url",

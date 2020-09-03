@@ -2973,6 +2973,47 @@
               "fullType": "bytes",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "headers",
+              "description": "HTTP headers to use on MQTT-over-Websocket connections.",
+              "label": "repeated",
+              "type": "HeadersEntry",
+              "longType": "ApplicationPubSub.MQTTProvider.HeadersEntry",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.HeadersEntry",
+              "ismap": true,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "HeadersEntry",
+          "longName": "ApplicationPubSub.MQTTProvider.HeadersEntry",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.HeadersEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

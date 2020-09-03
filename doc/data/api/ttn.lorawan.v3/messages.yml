@@ -647,6 +647,13 @@ ApplicationPubSub.MQTTProvider:
     comment: The client private key. PEM formatted.
     type: bytes
     default: ""
+  - name: headers
+    comment: HTTP headers to use on MQTT-over-Websocket connections.
+    map_key:
+      type: string
+    map_value:
+      type: string
+    default: {}
 ApplicationPubSub.Message:
   name: ApplicationPubSub.Message
   fields:
