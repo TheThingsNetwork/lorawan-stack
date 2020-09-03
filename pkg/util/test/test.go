@@ -145,7 +145,11 @@ type SubtestConfig struct {
 func RunSubtestFromContext(ctx context.Context, conf SubtestConfig) bool {
 	t := MustTFromContext(ctx)
 	t.Helper()
-	return t.Run(conf.Name, func(t *testing.T) {
+	// NOTE: When `-failfast` is specified, t.Run may not run and return true.
+	// https://github.com/golang/go/blob/ae658cb19a265f3f4694cd4aec508b4565bda6aa/src/testing/testing.go#L1158-L1160
+	var called bool
+	ok := t.Run(conf.Name, func(t *testing.T) {
+		called = true
 		t.Helper()
 
 		timeout := conf.Timeout
@@ -162,6 +166,10 @@ func RunSubtestFromContext(ctx context.Context, conf SubtestConfig) bool {
 			},
 		})
 	})
+	if ok && !called {
+		t.Skip("Subtest did not execute, perhaps due to `-failfast`")
+	}
+	return ok && called
 }
 
 func RunSubtest(t *testing.T, conf SubtestConfig) bool {
