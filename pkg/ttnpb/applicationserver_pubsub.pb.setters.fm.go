@@ -757,6 +757,15 @@ func (dst *ApplicationPubSub_MQTTProvider) SetFields(src *ApplicationPubSub_MQTT
 			} else {
 				dst.TLSClientKey = nil
 			}
+		case "headers":
+			if len(subs) > 0 {
+				return fmt.Errorf("'headers' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Headers = src.Headers
+			} else {
+				dst.Headers = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

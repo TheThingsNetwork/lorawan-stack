@@ -1799,6 +1799,15 @@
       "file": "tls.go"
     }
   },
+  "error:pkg/applicationserver/io/pubsub/provider/mqtt:configure_http_headers": {
+    "translations": {
+      "en": "configure HTTP headers"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/provider/mqtt",
+      "file": "provider.go"
+    }
+  },
   "error:pkg/applicationserver/io/pubsub/provider/mqtt:connect_failed": {
     "translations": {
       "en": "connection to MQTT server failed"
