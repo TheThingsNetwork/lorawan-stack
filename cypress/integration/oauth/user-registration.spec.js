@@ -19,7 +19,6 @@ describe('OAuth user registration', () => {
   })
 
   it('displays UI elements in place', () => {
-    cy.findByText('Create a new The Things Stack for LoRaWAN account', { selector: 'h1' })
     cy.findByLabelText('User ID').should('be.visible')
     cy.findByLabelText('Name').should('be.visible')
     cy.findByLabelText('Email').should('be.visible')
