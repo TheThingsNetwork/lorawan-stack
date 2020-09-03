@@ -620,6 +620,8 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "decoded_payload_warnings":
+
 		case "rx_metadata":
 
 			if len(m.GetRxMetadata()) < 1 {
@@ -1061,6 +1063,8 @@ func (m *ApplicationDownlink) ValidateFields(paths ...string) error {
 					}
 				}
 			}
+
+		case "decoded_payload_warnings":
 
 		case "confirmed":
 			// no validation rules for Confirmed

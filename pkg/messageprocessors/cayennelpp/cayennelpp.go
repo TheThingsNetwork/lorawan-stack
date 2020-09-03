@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,9 +42,9 @@ var (
 	errOutput = errors.Define("output", "invalid output")
 )
 
-// Encode encodes the message's DecodedPayload to FRMPayload using CayenneLPP encoding.
-func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
-	defer trace.StartRegion(ctx, "encode message").End()
+// EncodeDownlink encodes the message's DecodedPayload to FRMPayload using CayenneLPP encoding.
+func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+	defer trace.StartRegion(ctx, "encode downlink message").End()
 
 	decoded := msg.DecodedPayload
 	if decoded == nil {
@@ -71,13 +71,30 @@ func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, versi
 	return nil
 }
 
-// Decode decodes the message's FRMPayload to DecodedPayload using CayenneLPP decoding.
-func (h *host) Decode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
-	defer trace.StartRegion(ctx, "decode message").End()
+// DecodeUplink decodes the message's FRMPayload to DecodedPayload using CayenneLPP decoding.
+func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
+	defer trace.StartRegion(ctx, "decode uplink message").End()
 
 	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FRMPayload))
 	m := decodedMap(make(map[string]interface{}))
 	if err := decoder.DecodeUplink(m); err != nil {
+		return errOutput.WithCause(err)
+	}
+	s, err := gogoproto.Struct(m)
+	if err != nil {
+		return errOutput.WithCause(err)
+	}
+	msg.DecodedPayload = s
+	return nil
+}
+
+// DecodeDownlink decodes the message's FRMPayload to DecodedPayload using CayenneLPP decoding.
+func (h *host) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+	defer trace.StartRegion(ctx, "decode downlink message").End()
+
+	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FRMPayload))
+	m := decodedMap(make(map[string]interface{}))
+	if err := decoder.DecodeDownlink(m); err != nil {
 		return errOutput.WithCause(err)
 	}
 	s, err := gogoproto.Struct(m)
@@ -146,4 +163,8 @@ func (d decodedMap) GPS(channel uint8, latitude, longitude, altitude float32) {
 		"longitude": longitude,
 		"altitude":  altitude,
 	}
+}
+
+func (d decodedMap) Port(channel uint8, value float32) {
+	d[formatName(valueKey, channel)] = value
 }

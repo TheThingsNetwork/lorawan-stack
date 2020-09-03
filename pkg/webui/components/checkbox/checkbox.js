@@ -33,6 +33,7 @@ class Checkbox extends React.PureComponent {
     checked: PropTypes.bool,
     className: PropTypes.string,
     disabled: PropTypes.bool,
+    id: PropTypes.string,
     indeterminate: PropTypes.bool,
     label: PropTypes.message,
     name: PropTypes.string.isRequired,
@@ -48,6 +49,7 @@ class Checkbox extends React.PureComponent {
     className: undefined,
     label: sharedMessages.enabled,
     disabled: false,
+    id: undefined,
     readOnly: false,
     autoFocus: false,
     onChange: () => null,
@@ -125,6 +127,7 @@ class Checkbox extends React.PureComponent {
       onBlur,
       onFocus,
       indeterminate,
+      id,
       ...rest
     } = this.props
     const { checked } = this.state
@@ -160,7 +163,9 @@ class Checkbox extends React.PureComponent {
             readOnly={readOnly}
             autoFocus={autoFocus}
             onChange={this.handleChange}
-            {...rest}
+            id={id}
+            aria-describedby={rest['aria-describedby']}
+            aria-invalid={rest['aria-invalid']}
             {...checkboxProps}
           />
           <span className={style.checkmark} />

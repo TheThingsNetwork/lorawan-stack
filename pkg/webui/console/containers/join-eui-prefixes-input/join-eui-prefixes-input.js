@@ -28,6 +28,7 @@ import style from './join-eui-prefixes-input.styl'
 
 const m = defineMessages({
   empty: 'No prefix',
+  zeroInput: 'Fill with zeros',
 })
 
 const getOptions = prefixes => {
@@ -70,16 +71,22 @@ class JoinEUIPrefixesInput extends React.PureComponent {
     return `${name}-prefix`
   }
 
+  _getFillButtonName() {
+    const { name } = this.props
+
+    return `${name}-fill`
+  }
+
   @bind
-  async handleChange(value) {
+  async handleChange(value, enforceValidation = false) {
     const { onChange } = this.props
     const { prefix } = this.state
 
     if (!Boolean(prefix)) {
       await this.setState({ prefix: emptyOption.value })
-      onChange(value)
+      onChange(value, enforceValidation)
     } else {
-      onChange(`${prefix}${value}`)
+      onChange(`${prefix}${value}`, enforceValidation)
     }
   }
 
@@ -103,14 +110,20 @@ class JoinEUIPrefixesInput extends React.PureComponent {
 
     const nextTarget = Boolean(relatedTarget) ? relatedTarget : {}
     const selectName = this._getPrefixSelectName()
+    const fillName = this._getFillButtonName()
 
-    if (target.name === name && nextTarget.name !== selectName) {
+    // Only trigger the blur event when the blur leaves all related inputs.
+    if ([name, selectName, fillName].includes(nextTarget.name)) {
+      return
+    }
+
+    if (target.name === name) {
       const { prefix } = this.state
       const { value } = target
 
       target.value = `${prefix}${value}`
       onBlur(event)
-    } else if (target.name === selectName && nextTarget.name !== name) {
+    } else if (target.name === selectName || target.name === fillName) {
       const { prefix } = this.state
       const { value } = this.props
 
@@ -119,9 +132,16 @@ class JoinEUIPrefixesInput extends React.PureComponent {
     }
   }
 
+  @bind
+  async handleZerosClick() {
+    await this.setState({ prefix: emptyOption.value })
+    this.handleChange('0000000000000000', true)
+  }
+
   render() {
     const {
       className,
+      id,
       name,
       description,
       disabled,
@@ -165,6 +185,7 @@ class JoinEUIPrefixesInput extends React.PureComponent {
         {selectComponent}
         <Input
           showPerChar
+          id={id}
           ref={this.inputRef}
           className={style.byte}
           value={inputValue}
@@ -178,6 +199,15 @@ class JoinEUIPrefixesInput extends React.PureComponent {
           onChange={this.handleChange}
           onBlur={this.handleBlur}
           error={error}
+          action={{
+            type: 'button',
+            title: m.zeroInput,
+            onClick: this.handleZerosClick,
+            onBlur: this.handleBlur,
+            raw: true,
+            name: this._getFillButtonName(),
+            children: <span className={style.zeroFillButton}>00</span>,
+          }}
         />
       </div>
     )
@@ -190,6 +220,7 @@ JoinEUIPrefixesInput.propTypes = {
   disabled: PropTypes.bool,
   error: PropTypes.bool,
   fetching: PropTypes.bool,
+  id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
@@ -210,7 +241,7 @@ JoinEUIPrefixesInput.defaultProps = {
   fetching: false,
   prefixes: [],
   showPrefixes: true,
-  value: undefined,
+  value: '',
   error: false,
   description: undefined,
 }

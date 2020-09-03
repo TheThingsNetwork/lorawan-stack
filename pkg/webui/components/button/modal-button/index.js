@@ -74,7 +74,7 @@ class ModalButton extends React.Component {
 
     return (
       <React.Fragment>
-        <PortalledModal visible={this.state.modalVisible} modal={modalComposedData} />
+        <PortalledModal visible={this.state.modalVisible} {...modalComposedData} />
         <Button onClick={this.handleClick} message={message} {...rest} />
       </React.Fragment>
     )

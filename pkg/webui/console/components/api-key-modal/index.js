@@ -46,13 +46,11 @@ const ApiKeyModal = function(props) {
   return (
     <PortalledModal
       visible={visible}
-      modal={{
-        ...rest,
-        title: m.title,
-        subtitle: m.subtitle,
-        approval: false,
-        buttonMessage: m.buttonMessage,
-      }}
+      {...rest}
+      title={m.title}
+      subtitle={m.subtitle}
+      approval={false}
+      buttonMessage={m.buttonMessage}
     >
       <div className={style.left}>
         <Message component="h4" content={m.grantedRights} />

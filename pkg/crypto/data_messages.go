@@ -119,14 +119,10 @@ func ComputeLegacyUplinkMIC(key types.AES128Key, addr types.DevAddr, fCnt uint32
 	return computeMIC(key, 0, 0, addr, fCnt, payload)
 }
 
-// ComputeUplinkMIC computes the Uplink Message Integrity Code.
+// ComputeUplinkMICFromLegacy computes the Uplink Message Integrity Code from legacy MIC.
 // - The payload contains MHDR | FHDR | FPort | FRMPayload
 // - If this uplink has the ACK bit set, confFCnt must be set to the FCnt of the last downlink.
-func ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32, txDRIdx uint8, txChIdx uint8, addr types.DevAddr, fCnt uint32, payload []byte) ([4]byte, error) {
-	cmacF, err := computeMIC(fNwkSIntKey, 0, 0, addr, fCnt, payload)
-	if err != nil {
-		return [4]byte{}, err
-	}
+func ComputeUplinkMICFromLegacy(cmacF [4]byte, sNwkSIntKey types.AES128Key, confFCnt uint32, txDRIdx uint8, txChIdx uint8, addr types.DevAddr, fCnt uint32, payload []byte) ([4]byte, error) {
 	sHash, _ := cmac.New(sNwkSIntKey[:])
 	var b1 [aes.BlockSize]byte
 	b1[0] = 0x49
@@ -136,7 +132,7 @@ func ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32,
 	copy(b1[6:10], reverse(addr[:]))
 	binary.LittleEndian.PutUint32(b1[10:14], fCnt)
 	b1[15] = uint8(len(payload))
-	_, err = sHash.Write(b1[:])
+	_, err := sHash.Write(b1[:])
 	if err != nil {
 		return [4]byte{}, err
 	}
@@ -148,6 +144,17 @@ func ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32,
 	copy(mic[:2], sHash.Sum([]byte{}))
 	copy(mic[2:], cmacF[:])
 	return mic, nil
+}
+
+// ComputeUplinkMIC computes the Uplink Message Integrity Code.
+// - The payload contains MHDR | FHDR | FPort | FRMPayload
+// - If this uplink has the ACK bit set, confFCnt must be set to the FCnt of the last downlink.
+func ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32, txDRIdx uint8, txChIdx uint8, addr types.DevAddr, fCnt uint32, payload []byte) ([4]byte, error) {
+	cmacF, err := computeMIC(fNwkSIntKey, 0, 0, addr, fCnt, payload)
+	if err != nil {
+		return [4]byte{}, err
+	}
+	return ComputeUplinkMICFromLegacy(cmacF, sNwkSIntKey, confFCnt, txDRIdx, txChIdx, addr, fCnt, payload)
 }
 
 // ComputeLegacyDownlinkMIC computes the Downlink Message Integrity Code.

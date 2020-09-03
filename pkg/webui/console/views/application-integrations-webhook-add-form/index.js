@@ -30,6 +30,7 @@ import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 import WebhookForm from '@console/components/webhook-form'
 import WebhookTemplateForm from '@console/components/webhook-template-form'
 
+import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -105,6 +106,22 @@ export default class ApplicationWebhookAddForm extends Component {
     navigateToList(appId)
   }
 
+  @bind
+  async existCheck(webhookId) {
+    const { appId } = this.props
+
+    try {
+      await api.application.webhooks.get(appId, webhookId, [])
+      return true
+    } catch (error) {
+      if (isNotFoundError(error)) {
+        return false
+      }
+
+      throw error
+    }
+  }
+
   render() {
     const { templateId, isCustom, webhookTemplate, appId } = this.props
     let pageTitle = m.addCustomWebhook
@@ -135,6 +152,7 @@ export default class ApplicationWebhookAddForm extends Component {
                 update={false}
                 onSubmit={this.handleSubmit}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                existCheck={this.existCheck}
               />
             ) : (
               <WebhookTemplateForm
@@ -143,6 +161,7 @@ export default class ApplicationWebhookAddForm extends Component {
                 onSubmit={this.handleSubmit}
                 onSubmitSuccess={this.handleSubmitSuccess}
                 webhookTemplate={webhookTemplate}
+                existCheck={this.existCheck}
               />
             )}
           </Col>

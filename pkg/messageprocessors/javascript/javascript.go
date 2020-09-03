@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package javascript
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"runtime/trace"
+	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
@@ -40,116 +40,183 @@ func New() messageprocessors.PayloadEncodeDecoder {
 	}
 }
 
-func (h *host) createEnvironment(ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers) map[string]interface{} {
-	env := make(map[string]interface{})
-	if ids.DevEUI != nil {
-		env["dev_eui"] = ids.DevEUI.String()
-	}
-	if version != nil {
-		env["brand"] = version.BrandID
-		env["model"] = version.ModelID
-		env["hardware_version"] = version.HardwareVersion
-		env["firmware_version"] = version.FirmwareVersion
-	}
-	return env
+type encodeDownlinkInput struct {
+	Data  map[string]interface{} `json:"data"`
+	FPort *uint8                 `json:"fPort"`
+}
+
+type encodeDownlinkOutput struct {
+	Bytes    []uint8  `json:"bytes"`
+	FPort    *uint8   `json:"fPort"`
+	Warnings []string `json:"warnings"`
+	Errors   []string `json:"errors"`
 }
 
 var (
-	errInput       = errors.DefineInvalidArgument("input", "invalid input")
-	errOutput      = errors.Define("output", "invalid output")
-	errOutputType  = errors.Define("output_type", "invalid output of type `{type}`")
-	errOutputRange = errors.Define("output_range", "output value `{value}` does not fall between `{low}` and `{high}`")
+	errInput        = errors.DefineInvalidArgument("input", "invalid input")
+	errOutput       = errors.Define("output", "invalid output")
+	errOutputErrors = errors.DefineAborted("output_errors", "{errors}")
 )
 
-// Encode encodes the message's DecodedPayload to FRMPayload using the given script.
-func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
-	defer trace.StartRegion(ctx, "encode message").End()
+// EncodeDownlink encodes the message's DecodedPayload to FRMPayload using the given script.
+func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+	defer trace.StartRegion(ctx, "encode downlink message").End()
 
 	decoded := msg.DecodedPayload
 	if decoded == nil {
 		return nil
 	}
-	m, err := gogoproto.Map(decoded)
+	data, err := gogoproto.Map(decoded)
 	if err != nil {
 		return errInput.WithCause(err)
 	}
-	env := h.createEnvironment(ids, version)
-	env["payload"] = m
-	env["f_port"] = msg.FPort
+	fPort := uint8(msg.FPort)
+	input := encodeDownlinkInput{
+		Data:  data,
+		FPort: &fPort,
+	}
+
+	// Fallback to legacy Encoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
 	script = fmt.Sprintf(`
 		%s
-		Encoder(env.payload, env.f_port)
+
+		function main(input) {
+			if (typeof encodeDownlink === 'function') {
+				return encodeDownlink(input);
+			}
+			return {
+				bytes: Encoder(input.data, input.fPort),
+				fPort: input.fPort
+			}
+		}
 	`, script)
-	value, err := h.engine.Run(ctx, script, env)
+	valueAs, err := h.engine.Run(ctx, script, "main", input)
 	if err != nil {
 		return err
 	}
-	if value == nil || reflect.TypeOf(value).Kind() != reflect.Slice {
-		return errOutputType.New()
+
+	var output encodeDownlinkOutput
+	err = valueAs(&output)
+	if err != nil {
+		return errOutput.WithCause(err)
 	}
-	slice := reflect.ValueOf(value)
-	frmPayload := make([]byte, slice.Len())
-	for i := 0; i < slice.Len(); i++ {
-		val := slice.Index(i).Interface()
-		var b int64
-		switch i := val.(type) {
-		case int:
-			b = int64(i)
-		case int8:
-			b = int64(i)
-		case int16:
-			b = int64(i)
-		case int32:
-			b = int64(i)
-		case int64:
-			b = i
-		case uint8:
-			b = int64(i)
-		case uint16:
-			b = int64(i)
-		case uint32:
-			b = int64(i)
-		case uint64:
-			b = int64(i)
-		default:
-			return errOutputType.WithAttributes("type", fmt.Sprintf("%T", i))
-		}
-		if b < 0x00 || b > 0xFF {
-			return errOutputRange.WithAttributes(
-				"value", b,
-				"low", 0x00,
-				"high", 0xFF,
-			)
-		}
-		frmPayload[i] = byte(b)
+	if len(output.Errors) > 0 {
+		return errOutputErrors.WithAttributes("errors", strings.Join(output.Errors, ", "))
 	}
-	msg.FRMPayload = frmPayload
+
+	msg.FRMPayload = output.Bytes
+	msg.DecodedPayloadWarnings = output.Warnings
+	if output.FPort != nil {
+		fPort := *output.FPort
+		msg.FPort = uint32(fPort)
+	} else if msg.FPort == 0 {
+		msg.FPort = 1
+	}
 	return nil
 }
 
-// Decode decodes the message's FRMPayload to DecodedPayload using the given script.
-func (h *host) Decode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
-	defer trace.StartRegion(ctx, "decode message").End()
+type decodeUplinkInput struct {
+	Bytes []uint8 `json:"bytes"`
+	FPort uint8   `json:"fPort"`
+}
 
-	env := h.createEnvironment(ids, version)
-	env["payload"] = msg.FRMPayload
-	env["f_port"] = msg.FPort
+type decodeUplinkOutput struct {
+	Data     map[string]interface{} `json:"data"`
+	Warnings []string               `json:"warnings"`
+	Errors   []string               `json:"errors"`
+}
+
+// DecodeUplink decodes the message's FRMPayload to DecodedPayload using the given script.
+func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
+	defer trace.StartRegion(ctx, "decode uplink message").End()
+
+	input := decodeUplinkInput{
+		Bytes: msg.FRMPayload,
+		FPort: uint8(msg.FPort),
+	}
+
+	// Fallback to legacy Decoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
 	script = fmt.Sprintf(`
 		%s
-		Decoder(env.payload, env.f_port)
+
+		function main(input) {
+			if (typeof decodeUplink === 'function') {
+				return decodeUplink(input);
+			}
+			return {
+				data: Decoder(input.bytes, input.fPort)
+			}
+		}
 	`, script)
-	value, err := h.engine.Run(ctx, script, env)
+	valueAs, err := h.engine.Run(ctx, script, "main", input)
 	if err != nil {
 		return err
 	}
-	m, ok := value.(map[string]interface{})
-	if !ok {
-		return errOutput.New()
+
+	var output decodeUplinkOutput
+	err = valueAs(&output)
+	if err != nil {
+		return errOutput.WithCause(err)
 	}
-	s, err := gogoproto.Struct(m)
+	if len(output.Errors) > 0 {
+		return errOutputErrors.WithAttributes("errors", strings.Join(output.Errors, ", "))
+	}
+
+	s, err := gogoproto.Struct(output.Data)
 	if err != nil {
 		return errOutput.WithCause(err)
 	}
 	msg.DecodedPayload = s
+	msg.DecodedPayloadWarnings = output.Warnings
+	return nil
+}
+
+type decodeDownlinkInput struct {
+	Bytes []uint8 `json:"bytes"`
+	FPort uint8   `json:"fPort"`
+}
+
+type decodeDownlinkOutput struct {
+	Data     map[string]interface{} `json:"data"`
+	Warnings []string               `json:"warnings"`
+	Errors   []string               `json:"errors"`
+}
+
+// DecodeUplink decodes the message's FRMPayload to DecodedPayload using the given script.
+func (h *host) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+	defer trace.StartRegion(ctx, "decode downlink message").End()
+
+	input := decodeDownlinkInput{
+		Bytes: msg.FRMPayload,
+		FPort: uint8(msg.FPort),
+	}
+
+	script = fmt.Sprintf(`
+		%s
+
+		function main(input) {
+			return decodeDownlink(input);
+		}
+	`, script)
+	valueAs, err := h.engine.Run(ctx, script, "main", input)
+	if err != nil {
+		return err
+	}
+
+	var output decodeDownlinkOutput
+	err = valueAs(&output)
+	if err != nil {
+		return errOutput.WithCause(err)
+	}
+	if len(output.Errors) > 0 {
+		return errOutputErrors.WithAttributes("errors", strings.Join(output.Errors, ", "))
+	}
+
+	s, err := gogoproto.Struct(output.Data)
+	if err != nil {
+		return errOutput.WithCause(err)
+	}
+	msg.DecodedPayload = s
+	msg.DecodedPayloadWarnings = output.Warnings
 	return nil
 }

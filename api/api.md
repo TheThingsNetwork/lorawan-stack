@@ -334,10 +334,10 @@
   - [Enum `RxDelay`](#ttn.lorawan.v3.RxDelay)
   - [Enum `TxSchedulePriority`](#ttn.lorawan.v3.TxSchedulePriority)
 - [File `lorawan-stack/api/message_services.proto`](#lorawan-stack/api/message_services.proto)
-  - [Message `ProcessDownlinkMessageRequest`](#ttn.lorawan.v3.ProcessDownlinkMessageRequest)
-  - [Message `ProcessUplinkMessageRequest`](#ttn.lorawan.v3.ProcessUplinkMessageRequest)
-  - [Service `DownlinkMessageProcessor`](#ttn.lorawan.v3.DownlinkMessageProcessor)
-  - [Service `UplinkMessageProcessor`](#ttn.lorawan.v3.UplinkMessageProcessor)
+  - [Message `DecodeDownlinkMessageRequest`](#ttn.lorawan.v3.DecodeDownlinkMessageRequest)
+  - [Message `DecodeUplinkMessageRequest`](#ttn.lorawan.v3.DecodeUplinkMessageRequest)
+  - [Message `EncodeDownlinkMessageRequest`](#ttn.lorawan.v3.EncodeDownlinkMessageRequest)
+  - [Service `MessageProcessor`](#ttn.lorawan.v3.MessageProcessor)
 - [File `lorawan-stack/api/messages.proto`](#lorawan-stack/api/messages.proto)
   - [Message `ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink)
   - [Message `ApplicationDownlink.ClassBC`](#ttn.lorawan.v3.ApplicationDownlink.ClassBC)
@@ -4768,13 +4768,14 @@ Transmission settings for downlink.
 
 ## <a name="lorawan-stack/api/message_services.proto">File `lorawan-stack/api/message_services.proto`</a>
 
-### <a name="ttn.lorawan.v3.ProcessDownlinkMessageRequest">Message `ProcessDownlinkMessageRequest`</a>
+### <a name="ttn.lorawan.v3.DecodeDownlinkMessageRequest">Message `DecodeDownlinkMessageRequest`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
 | `end_device_version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  |  |
 | `message` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
+| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  |  |
 | `parameter` | [`string`](#string) |  |  |
 
 #### Field Rules
@@ -4785,13 +4786,14 @@ Transmission settings for downlink.
 | `end_device_version_ids` | <p>`message.required`: `true`</p> |
 | `message` | <p>`message.required`: `true`</p> |
 
-### <a name="ttn.lorawan.v3.ProcessUplinkMessageRequest">Message `ProcessUplinkMessageRequest`</a>
+### <a name="ttn.lorawan.v3.DecodeUplinkMessageRequest">Message `DecodeUplinkMessageRequest`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
 | `end_device_version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  |  |
 | `message` | [`ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink) |  |  |
+| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  |  |
 | `parameter` | [`string`](#string) |  |  |
 
 #### Field Rules
@@ -4802,21 +4804,33 @@ Transmission settings for downlink.
 | `end_device_version_ids` | <p>`message.required`: `true`</p> |
 | `message` | <p>`message.required`: `true`</p> |
 
-### <a name="ttn.lorawan.v3.DownlinkMessageProcessor">Service `DownlinkMessageProcessor`</a>
+### <a name="ttn.lorawan.v3.EncodeDownlinkMessageRequest">Message `EncodeDownlinkMessageRequest`</a>
 
-The DownlinkMessageProcessor service processes downlink messages.
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| `end_device_version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  |  |
+| `message` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
+| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  |  |
+| `parameter` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+| `end_device_version_ids` | <p>`message.required`: `true`</p> |
+| `message` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.MessageProcessor">Service `MessageProcessor`</a>
+
+Encodes and decodes uplink messages.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `Process` | [`ProcessDownlinkMessageRequest`](#ttn.lorawan.v3.ProcessDownlinkMessageRequest) | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |
-
-### <a name="ttn.lorawan.v3.UplinkMessageProcessor">Service `UplinkMessageProcessor`</a>
-
-The UplinkMessageProcessor service processes uplink messages.
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| `Process` | [`ProcessUplinkMessageRequest`](#ttn.lorawan.v3.ProcessUplinkMessageRequest) | [`ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink) |  |
+| `EncodeDownlink` | [`EncodeDownlinkMessageRequest`](#ttn.lorawan.v3.EncodeDownlinkMessageRequest) | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |
+| `DecodeUplink` | [`DecodeUplinkMessageRequest`](#ttn.lorawan.v3.DecodeUplinkMessageRequest) | [`ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink) |  |
+| `DecodeDownlink` | [`DecodeDownlinkMessageRequest`](#ttn.lorawan.v3.DecodeDownlinkMessageRequest) | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |
 
 ## <a name="lorawan-stack/api/messages.proto">File `lorawan-stack/api/messages.proto`</a>
 
@@ -4828,7 +4842,8 @@ The UplinkMessageProcessor service processes uplink messages.
 | `f_port` | [`uint32`](#uint32) |  |  |
 | `f_cnt` | [`uint32`](#uint32) |  |  |
 | `frm_payload` | [`bytes`](#bytes) |  | The frame payload of the downlink message. The payload is encrypted if the skip_payload_crypto field of the EndDevice is true. |
-| `decoded_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
+| `decoded_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | The decoded frame payload of the downlink message. When scheduling downlink with a message processor configured for the end device (see formatters) or application (see default_formatters), this fields acts as input for the downlink encoder, and the output is set to frm_payload. When reading downlink (listing the queue, downlink message events, etc), this fields acts as output of the downlink decoder, and the input is frm_payload. |
+| `decoded_payload_warnings` | [`string`](#string) | repeated | Warnings generated by the message processor while encoding frm_payload (scheduling downlink) or decoding the frm_payload (reading downlink). |
 | `confirmed` | [`bool`](#bool) |  |  |
 | `class_b_c` | [`ApplicationDownlink.ClassBC`](#ttn.lorawan.v3.ApplicationDownlink.ClassBC) |  | Optional gateway and timing information for class B and C. If set, this downlink message will only be transmitted as class B or C downlink. If not set, this downlink message may be transmitted in class A, B and C. |
 | `priority` | [`TxSchedulePriority`](#ttn.lorawan.v3.TxSchedulePriority) |  | Priority for scheduling the downlink message. |
@@ -4962,13 +4977,14 @@ The UplinkMessageProcessor service processes uplink messages.
 | `f_port` | [`uint32`](#uint32) |  |  |
 | `f_cnt` | [`uint32`](#uint32) |  |  |
 | `frm_payload` | [`bytes`](#bytes) |  | The frame payload of the uplink message. The payload is still encrypted if the skip_payload_crypto field of the EndDevice is true, which is indicated by the presence of the app_s_key field. |
-| `decoded_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
+| `decoded_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | The decoded frame payload of the uplink message. This field is set by the message processor that is configured for the end device (see formatters) or application (see default_formatters). |
+| `decoded_payload_warnings` | [`string`](#string) | repeated | Warnings generated by the message processor while decoding the frm_payload. |
 | `rx_metadata` | [`RxMetadata`](#ttn.lorawan.v3.RxMetadata) | repeated | A list of metadata for each antenna of each gateway that received this message. |
 | `settings` | [`TxSettings`](#ttn.lorawan.v3.TxSettings) |  | Settings for the transmission. |
 | `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Server time when the Network Server received the message. |
 | `app_s_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  | The AppSKey of the current session. This field is only present if the skip_payload_crypto field of the EndDevice is true. Can be used to decrypt uplink payloads and encrypt downlink payloads. |
 | `last_a_f_cnt_down` | [`uint32`](#uint32) |  | The last AFCntDown of the current session. This field is only present if the skip_payload_crypto field of the EndDevice is true. Can be used with app_s_key to encrypt downlink payloads. |
-| `confirmed` | [`bool`](#bool) |  | next: 12 |
+| `confirmed` | [`bool`](#bool) |  |  |
 
 #### Field Rules
 

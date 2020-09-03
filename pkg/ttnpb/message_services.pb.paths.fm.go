@@ -2,12 +2,50 @@
 
 package ttnpb
 
-var ProcessUplinkMessageRequestFieldPathsNested = []string{
+var EncodeDownlinkMessageRequestFieldPathsNested = []string{
 	"end_device_version_ids",
 	"end_device_version_ids.brand_id",
 	"end_device_version_ids.firmware_version",
 	"end_device_version_ids.hardware_version",
 	"end_device_version_ids.model_id",
+	"formatter",
+	"ids",
+	"ids.application_ids",
+	"ids.application_ids.application_id",
+	"ids.dev_addr",
+	"ids.dev_eui",
+	"ids.device_id",
+	"ids.join_eui",
+	"message",
+	"message.class_b_c",
+	"message.class_b_c.absolute_time",
+	"message.class_b_c.gateways",
+	"message.confirmed",
+	"message.correlation_ids",
+	"message.decoded_payload",
+	"message.decoded_payload_warnings",
+	"message.f_cnt",
+	"message.f_port",
+	"message.frm_payload",
+	"message.priority",
+	"message.session_key_id",
+	"parameter",
+}
+
+var EncodeDownlinkMessageRequestFieldPathsTopLevel = []string{
+	"end_device_version_ids",
+	"formatter",
+	"ids",
+	"message",
+	"parameter",
+}
+var DecodeUplinkMessageRequestFieldPathsNested = []string{
+	"end_device_version_ids",
+	"end_device_version_ids.brand_id",
+	"end_device_version_ids.firmware_version",
+	"end_device_version_ids.hardware_version",
+	"end_device_version_ids.model_id",
+	"formatter",
 	"ids",
 	"ids.application_ids",
 	"ids.application_ids.application_id",
@@ -22,6 +60,7 @@ var ProcessUplinkMessageRequestFieldPathsNested = []string{
 	"message.app_s_key.key",
 	"message.confirmed",
 	"message.decoded_payload",
+	"message.decoded_payload_warnings",
 	"message.f_cnt",
 	"message.f_port",
 	"message.frm_payload",
@@ -50,18 +89,20 @@ var ProcessUplinkMessageRequestFieldPathsNested = []string{
 	"parameter",
 }
 
-var ProcessUplinkMessageRequestFieldPathsTopLevel = []string{
+var DecodeUplinkMessageRequestFieldPathsTopLevel = []string{
 	"end_device_version_ids",
+	"formatter",
 	"ids",
 	"message",
 	"parameter",
 }
-var ProcessDownlinkMessageRequestFieldPathsNested = []string{
+var DecodeDownlinkMessageRequestFieldPathsNested = []string{
 	"end_device_version_ids",
 	"end_device_version_ids.brand_id",
 	"end_device_version_ids.firmware_version",
 	"end_device_version_ids.hardware_version",
 	"end_device_version_ids.model_id",
+	"formatter",
 	"ids",
 	"ids.application_ids",
 	"ids.application_ids.application_id",
@@ -76,6 +117,7 @@ var ProcessDownlinkMessageRequestFieldPathsNested = []string{
 	"message.confirmed",
 	"message.correlation_ids",
 	"message.decoded_payload",
+	"message.decoded_payload_warnings",
 	"message.f_cnt",
 	"message.f_port",
 	"message.frm_payload",
@@ -84,8 +126,9 @@ var ProcessDownlinkMessageRequestFieldPathsNested = []string{
 	"parameter",
 }
 
-var ProcessDownlinkMessageRequestFieldPathsTopLevel = []string{
+var DecodeDownlinkMessageRequestFieldPathsTopLevel = []string{
 	"end_device_version_ids",
+	"formatter",
 	"ids",
 	"message",
 	"parameter",
