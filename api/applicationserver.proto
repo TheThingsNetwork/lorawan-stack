@@ -36,7 +36,11 @@ message ApplicationLink {
   // the normal port inference (with DNS lookup, otherwise defaults) is used.
   // Leave empty when linking to a cluster Network Server.
   string network_server_address = 1 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
+  // The API key to use to link the Application Server to Network Server.
+  // This API key needs to have RIGHT_APPLICATION_LINK.
   string api_key = 2 [(gogoproto.customname) = "APIKey", (validate.rules).string.min_len = 1];
+  // Default message payload formatters to use when there are no formatters
+  // defined on the end device level.
   MessagePayloadFormatters default_formatters = 3;
   // Enable TLS for linking to the external Network Server.
   // For cluster-local Network Servers, the cluster's TLS setting is used.
@@ -74,6 +78,8 @@ message ApplicationLinkStats {
 
 // The As service manages the Application Server.
 service As {
+  // Get a link configuration from the Application Server to Network Server.
+  // This only contains the configuration. Use GetLinkStats to view statistics and any link errors.
   rpc GetLink(GetApplicationLinkRequest) returns (ApplicationLink) {
     option (google.api.http) = {
       get: "/as/applications/{application_ids.application_id}/link"
@@ -82,7 +88,8 @@ service As {
 
   // Set a link configuration from the Application Server a Network Server.
   // This call returns immediately after setting the link configuration; it does not wait for a link to establish.
-  // To get link statistics or errors, use the `GetLinkStats` call.
+  // To get link statistics or errors, use GetLinkStats.
+  // Note that there can only be one Application Server instance linked to a Network Server for a given application at a time.
   rpc SetLink(SetApplicationLinkRequest) returns (ApplicationLink) {
     option (google.api.http) = {
       put: "/as/applications/{application_ids.application_id}/link",
@@ -90,6 +97,7 @@ service As {
     };
   };
 
+  // Delete the link between the Application Server and Network Server for the specified application.
   rpc DeleteLink(ApplicationIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/as/applications/{application_id}/link",
@@ -108,29 +116,36 @@ service As {
 
 // The AppAs service connects an application or integration to an Application Server.
 service AppAs {
+  // Subscribe to upstream messages.
   rpc Subscribe(ApplicationIdentifiers) returns (stream ApplicationUp);
+  // Push downlink messages to the end of the downlink queue.
   rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/push",
       body: "*"
     };
   };
+  // Replace the entire downlink queue with the specified messages.
+  // This can also be used to empty the queue by specifying no messages.
   rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/replace",
       body: "*"
     };
   };
+  // List the items currently in the downlink queue.
   rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks) {
     option (google.api.http) = {
       get: "/as/applications/{application_ids.application_id}/devices/{device_id}/down"
     };
   };
+  // Get connection information to connect an MQTT client.
   rpc GetMQTTConnectionInfo(ApplicationIdentifiers) returns (MQTTConnectionInfo) {
     option (google.api.http) = {
       get: "/as/applications/{application_id}/mqtt-connection-info"
     };
   };
+  // Simulate an upstream message. This can be used to test integrations.
   rpc SimulateUplink(ApplicationUp) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/simulate",

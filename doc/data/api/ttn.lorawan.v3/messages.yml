@@ -298,11 +298,17 @@ ApplicationLink:
       pattern: ^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$
     default: ""
   - name: api_key
+    comment: |-
+      The API key to use to link the Application Server to Network Server.
+      This API key needs to have RIGHT_APPLICATION_LINK.
     type: string
     rules:
       min_len: 1
     default: ""
   - name: default_formatters
+    comment: |-
+      Default message payload formatters to use when there are no formatters
+      defined on the end device level.
     message:
       name: MessagePayloadFormatters
     default: {}
@@ -3365,16 +3371,18 @@ GatewayUp:
   comment: GatewayUp may contain zero or more uplink messages and/or a status message for the gateway.
   fields:
   - name: uplink_messages
-    comment: UplinkMessages received by the gateway.
+    comment: Uplink messages received by the gateway.
     repeated:
       message:
         name: UplinkMessage
     default: []
   - name: gateway_status
+    comment: Gateway status produced by the gateway.
     message:
       name: GatewayStatus
     default: {}
   - name: tx_acknowledgment
+    comment: A transmission acknowledgement or error.
     message:
       name: TxAcknowledgment
     default: {}
@@ -6835,6 +6843,7 @@ ScheduleDownlinkErrorDetails:
   name: ScheduleDownlinkErrorDetails
   fields:
   - name: path_errors
+    comment: Errors per path when downlink scheduling failed.
     repeated:
       message:
         name: ErrorDetails
@@ -6843,6 +6852,7 @@ ScheduleDownlinkResponse:
   name: ScheduleDownlinkResponse
   fields:
   - name: delay
+    comment: The amount of time between the message has been scheduled and it will be transmitted by the gateway.
     message:
       package: google.protobuf
       name: Duration

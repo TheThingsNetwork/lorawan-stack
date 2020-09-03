@@ -727,8 +727,8 @@ Application is the message that defines an Application in the network.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `network_server_address` | [`string`](#string) |  | The address of the external Network Server where to link to. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. Leave empty when linking to a cluster Network Server. |
-| `api_key` | [`string`](#string) |  |  |
-| `default_formatters` | [`MessagePayloadFormatters`](#ttn.lorawan.v3.MessagePayloadFormatters) |  |  |
+| `api_key` | [`string`](#string) |  | The API key to use to link the Application Server to Network Server. This API key needs to have RIGHT_APPLICATION_LINK. |
+| `default_formatters` | [`MessagePayloadFormatters`](#ttn.lorawan.v3.MessagePayloadFormatters) |  | Default message payload formatters to use when there are no formatters defined on the end device level. |
 | `tls` | [`bool`](#bool) |  | Enable TLS for linking to the external Network Server. For cluster-local Network Servers, the cluster's TLS setting is used. |
 | `skip_payload_crypto` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Skip decryption of uplink payloads and encryption of downlink payloads. Leave empty for the using the Application Server's default setting. |
 
@@ -792,12 +792,12 @@ The AppAs service connects an application or integration to an Application Serve
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `Subscribe` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`ApplicationUp`](#ttn.lorawan.v3.ApplicationUp) _stream_ |  |
-| `DownlinkQueuePush` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
-| `DownlinkQueueReplace` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
-| `DownlinkQueueList` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`ApplicationDownlinks`](#ttn.lorawan.v3.ApplicationDownlinks) |  |
-| `GetMQTTConnectionInfo` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) |  |
-| `SimulateUplink` | [`ApplicationUp`](#ttn.lorawan.v3.ApplicationUp) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+| `Subscribe` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`ApplicationUp`](#ttn.lorawan.v3.ApplicationUp) _stream_ | Subscribe to upstream messages. |
+| `DownlinkQueuePush` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Push downlink messages to the end of the downlink queue. |
+| `DownlinkQueueReplace` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Replace the entire downlink queue with the specified messages. This can also be used to empty the queue by specifying no messages. |
+| `DownlinkQueueList` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`ApplicationDownlinks`](#ttn.lorawan.v3.ApplicationDownlinks) | List the items currently in the downlink queue. |
+| `GetMQTTConnectionInfo` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) | Get connection information to connect an MQTT client. |
+| `SimulateUplink` | [`ApplicationUp`](#ttn.lorawan.v3.ApplicationUp) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Simulate an upstream message. This can be used to test integrations. |
 
 #### HTTP bindings
 
@@ -815,9 +815,9 @@ The As service manages the Application Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `GetLink` | [`GetApplicationLinkRequest`](#ttn.lorawan.v3.GetApplicationLinkRequest) | [`ApplicationLink`](#ttn.lorawan.v3.ApplicationLink) |  |
-| `SetLink` | [`SetApplicationLinkRequest`](#ttn.lorawan.v3.SetApplicationLinkRequest) | [`ApplicationLink`](#ttn.lorawan.v3.ApplicationLink) | Set a link configuration from the Application Server a Network Server. This call returns immediately after setting the link configuration; it does not wait for a link to establish. To get link statistics or errors, use the `GetLinkStats` call. |
-| `DeleteLink` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+| `GetLink` | [`GetApplicationLinkRequest`](#ttn.lorawan.v3.GetApplicationLinkRequest) | [`ApplicationLink`](#ttn.lorawan.v3.ApplicationLink) | Get a link configuration from the Application Server to Network Server. This only contains the configuration. Use GetLinkStats to view statistics and any link errors. |
+| `SetLink` | [`SetApplicationLinkRequest`](#ttn.lorawan.v3.SetApplicationLinkRequest) | [`ApplicationLink`](#ttn.lorawan.v3.ApplicationLink) | Set a link configuration from the Application Server a Network Server. This call returns immediately after setting the link configuration; it does not wait for a link to establish. To get link statistics or errors, use GetLinkStats. Note that there can only be one Application Server instance linked to a Network Server for a given application at a time. |
+| `DeleteLink` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the link between the Application Server and Network Server for the specified application. |
 | `GetLinkStats` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`ApplicationLinkStats`](#ttn.lorawan.v3.ApplicationLinkStats) | GetLinkStats returns the link statistics. This call returns a NotFound error code if there is no link for the given application identifiers. This call returns the error code of the link error if linking to a Network Server failed. |
 
 #### HTTP bindings
@@ -3063,21 +3063,21 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `uplink_messages` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) | repeated | UplinkMessages received by the gateway. |
-| `gateway_status` | [`GatewayStatus`](#ttn.lorawan.v3.GatewayStatus) |  |  |
-| `tx_acknowledgment` | [`TxAcknowledgment`](#ttn.lorawan.v3.TxAcknowledgment) |  |  |
+| `uplink_messages` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) | repeated | Uplink messages received by the gateway. |
+| `gateway_status` | [`GatewayStatus`](#ttn.lorawan.v3.GatewayStatus) |  | Gateway status produced by the gateway. |
+| `tx_acknowledgment` | [`TxAcknowledgment`](#ttn.lorawan.v3.TxAcknowledgment) |  | A transmission acknowledgement or error. |
 
 ### <a name="ttn.lorawan.v3.ScheduleDownlinkErrorDetails">Message `ScheduleDownlinkErrorDetails`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `path_errors` | [`ErrorDetails`](#ttn.lorawan.v3.ErrorDetails) | repeated |  |
+| `path_errors` | [`ErrorDetails`](#ttn.lorawan.v3.ErrorDetails) | repeated | Errors per path when downlink scheduling failed. |
 
 ### <a name="ttn.lorawan.v3.ScheduleDownlinkResponse">Message `ScheduleDownlinkResponse`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `delay` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `delay` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | The amount of time between the message has been scheduled and it will be transmitted by the gateway. |
 
 #### Field Rules
 
@@ -3103,10 +3103,10 @@ The GtwGs service connects a gateway to a Gateway Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `LinkGateway` | [`GatewayUp`](#ttn.lorawan.v3.GatewayUp) _stream_ | [`GatewayDown`](#ttn.lorawan.v3.GatewayDown) _stream_ | Link the gateway to the Gateway Server. |
-| `GetConcentratorConfig` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`ConcentratorConfig`](#ttn.lorawan.v3.ConcentratorConfig) | GetConcentratorConfig associated to the gateway. |
-| `GetMQTTConnectionInfo` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) | Get the MQTT server address and the username for the gateway. |
-| `GetMQTTV2ConnectionInfo` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) | Get the MQTTV2 server address and the username for the gateway. |
+| `LinkGateway` | [`GatewayUp`](#ttn.lorawan.v3.GatewayUp) _stream_ | [`GatewayDown`](#ttn.lorawan.v3.GatewayDown) _stream_ | Link a gateway to the Gateway Server for streaming upstream messages and downstream messages. |
+| `GetConcentratorConfig` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`ConcentratorConfig`](#ttn.lorawan.v3.ConcentratorConfig) | Get configuration for the concentrator. |
+| `GetMQTTConnectionInfo` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) | Get connection information to connect an MQTT gateway. |
+| `GetMQTTV2ConnectionInfo` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) | Get legacy connection information to connect a The Things Network Stack V2 MQTT gateway. |
 
 #### HTTP bindings
 
@@ -3121,7 +3121,7 @@ The NsGs service connects a Network Server to a Gateway Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `ScheduleDownlink` | [`DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage) | [`ScheduleDownlinkResponse`](#ttn.lorawan.v3.ScheduleDownlinkResponse) | ScheduleDownlink instructs the Gateway Server to schedule a downlink message. The Gateway Server may refuse if there are any conflicts in the schedule or if a duty cycle prevents the gateway from transmitting. |
+| `ScheduleDownlink` | [`DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage) | [`ScheduleDownlinkResponse`](#ttn.lorawan.v3.ScheduleDownlinkResponse) | Instructs the Gateway Server to schedule a downlink message. The Gateway Server may refuse if there are any conflicts in the schedule or if a duty cycle prevents the gateway from transmitting. |
 
 ## <a name="lorawan-stack/api/identifiers.proto">File `lorawan-stack/api/identifiers.proto`</a>
 

@@ -8683,10 +8683,12 @@
           "description": "The address of the external Network Server where to link to.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nLeave empty when linking to a cluster Network Server."
         },
         "api_key": {
-          "type": "string"
+          "type": "string",
+          "description": "The API key to use to link the Application Server to Network Server.\nThis API key needs to have RIGHT_APPLICATION_LINK."
         },
         "default_formatters": {
-          "$ref": "#/definitions/v3MessagePayloadFormatters"
+          "$ref": "#/definitions/v3MessagePayloadFormatters",
+          "description": "Default message payload formatters to use when there are no formatters\ndefined on the end device level."
         },
         "tls": {
           "type": "boolean",
@@ -12482,7 +12484,8 @@
       "type": "object",
       "properties": {
         "delay": {
-          "type": "string"
+          "type": "string",
+          "description": "The amount of time between the message has been scheduled and it will be transmitted by the gateway."
         }
       }
     },
