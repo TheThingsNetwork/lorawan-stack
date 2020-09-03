@@ -18,7 +18,7 @@ import { configure, addDecorator } from '@storybook/react'
 import { Provider } from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
 import { IntlProvider } from 'react-intl'
-import createHistory from 'history/createMemoryHistory'
+import { createMemoryHistory } from 'history'
 
 import { EnvProvider } from '@ttn-lw/lib/components/env'
 
@@ -28,7 +28,7 @@ import createStore from './store'
 import Center from './center'
 import env from './env'
 
-const history = createHistory()
+const history = createMemoryHistory()
 const store = createStore(history)
 const req = require.context('../../pkg/webui/', true, /story\.js$/)
 const load = () => req.keys().forEach(req)
