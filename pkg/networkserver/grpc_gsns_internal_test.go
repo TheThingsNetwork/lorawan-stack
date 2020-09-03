@@ -1254,7 +1254,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				})
 				defer stop()
 
-				dev, err := ns.matchAndHandleDataUplink(CopyUplinkMessage(tc.Uplink), tc.Deduplicated, tc.MakeDevices(ctx)...)
+				dev, err := ns.matchAndHandleDataUplink(CopyUplinkMessage(tc.Uplink), tc.Deduplicated, [4]byte{0x01, 0x02, 0x03, 0x04}, tc.MakeDevices(ctx)...)
 				if a.So(err, should.EqualErrorOrDefinition, tc.Error) {
 					a.So(tc.DeviceAssertion(t, dev), should.BeTrue)
 				}
