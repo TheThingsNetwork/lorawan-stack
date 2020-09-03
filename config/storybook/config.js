@@ -20,6 +20,9 @@ import { ConnectedRouter } from 'connected-react-router'
 import { IntlProvider } from 'react-intl'
 import { createMemoryHistory } from 'history'
 
+import messages from '@ttn-lw/locales/en.json'
+import backendMessages from '@ttn-lw/locales/.backend/en.json'
+
 import { EnvProvider } from '@ttn-lw/lib/components/env'
 
 import '../../pkg/webui/styles/main.styl'
@@ -37,7 +40,7 @@ addDecorator(function(story) {
   return (
     <EnvProvider env={env}>
       <Provider store={store}>
-        <IntlProvider key="key" messages={{}} locale="en-US">
+        <IntlProvider key="key" messages={{ ...messages, ...backendMessages }} locale="en-US">
           <ConnectedRouter history={history}>
             <Center>{story()}</Center>
           </ConnectedRouter>
