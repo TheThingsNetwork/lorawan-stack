@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	loraclouddevicemanagementv1 "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1"
@@ -46,6 +47,7 @@ type InteropConfig struct {
 type Config struct {
 	Devices        DeviceRegistry            `name:"-"`
 	Links          LinkRegistry              `name:"-"`
+	Distribution   DistributionConfig        `name:"distribution" description:"Distribution configuration"`
 	MQTT           config.MQTT               `name:"mqtt" description:"MQTT configuration"`
 	Webhooks       WebhooksConfig            `name:"webhooks" description:"Webhooks configuration"`
 	PubSub         PubSubConfig              `name:"pubsub" description:"Pub/sub messaging configuration"`
@@ -68,6 +70,11 @@ type WebhooksConfig struct {
 	Workers   int                 `name:"workers" description:"Number of workers to process requests"`
 	Templates web.TemplatesConfig `name:"templates" description:"The store of the webhook templates"`
 	Downlinks web.DownlinksConfig `name:"downlink" description:"The downlink queue operations configuration"`
+}
+
+// DistributionConfig contains the upstream traffic distribution configuration of the Application Server.
+type DistributionConfig struct {
+	PubSub distribution.PubSub `name:"-"`
 }
 
 // PubSubConfig contains go-cloud pub/sub configuration of the Application Server.

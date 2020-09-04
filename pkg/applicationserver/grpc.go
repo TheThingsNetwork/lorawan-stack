@@ -16,9 +16,13 @@ package applicationserver
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -70,4 +74,35 @@ func (as *ApplicationServer) GetLinkStats(ctx context.Context, ids *ttnpb.Applic
 	}
 	// TODO: Do we return a deprecated error ?
 	return &ttnpb.ApplicationLinkStats{}, nil
+}
+
+func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHandleUplinkRequest) (*types.Empty, error) {
+	for _, up := range req.ApplicationUplinks {
+		ctx := events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
+		logger := log.FromContext(ctx)
+		up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
+		// TODO: How can we use the caller name here ?
+		registerReceiveUp(ctx, up, "replace-me")
+
+		now := time.Now().UTC()
+		up.ReceivedAt = &now
+
+		pass, err := as.handleUp(ctx, up, nil)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to process upstream message")
+			registerDropUp(ctx, up, err)
+			continue
+		}
+		if !pass {
+			continue
+		}
+
+		if err := as.SendUp(ctx, up); err != nil {
+			logger.WithError(err).Warn("Failed to send upstream message")
+			registerDropUp(ctx, up, err)
+			continue
+		}
+		registerForwardUp(ctx, up)
+	}
+	return ttnpb.Empty, nil
 }

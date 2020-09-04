@@ -20,11 +20,11 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net"
-	"sync"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	iogrpc "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mqtt"
@@ -67,8 +67,7 @@ type ApplicationServer struct {
 	pubsub           *pubsub.PubSub
 	appPackages      packages.Server
 
-	links              sync.Map
-	linkErrors         sync.Map
+	distributor        *distribution.Distributor
 	defaultSubscribers []*io.Subscription
 
 	grpc struct {
@@ -117,6 +116,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
 		}),
+		distributor:   distribution.NewDistributor(ctx, conf.Distribution.PubSub),
 		interopClient: interopCl,
 		interopID:     conf.Interop.ID,
 	}
@@ -207,6 +207,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 // RegisterServices registers services provided by as at s.
 func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsServer(s, as)
+	ttnpb.RegisterNsAsServer(s, as)
 	ttnpb.RegisterAsEndDeviceRegistryServer(s, as.grpc.asDevices)
 	ttnpb.RegisterAppAsServer(s, as.grpc.appAs)
 	if as.webhooks != nil {
@@ -241,21 +242,24 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 	if err := rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(
 		events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:conn:%s", events.NewCorrelationID())),
 		"application_uid", uid,
 	)
-
-	sub := io.NewSubscription(ctx, protocol, &ids)
-	// TODO: Subscribe sub to Distributor.
-	return sub, nil
+	return as.distributor.Subscribe(ctx, protocol, ids)
 }
 
 // SendUp processes the given uplink and then sends it to the application frontends.
-func (as *ApplicationServer) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
-	// TODO: Send to Distributor.
+func (as *ApplicationServer) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) (err error) {
+	if err := as.distributor.SendUp(ctx, up); err != nil {
+		return err
+	}
+	for _, sub := range as.defaultSubscribers {
+		if err := sub.SendUp(ctx, up); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to send message to default subscription")
+		}
+	}
 	return nil
 }
 
