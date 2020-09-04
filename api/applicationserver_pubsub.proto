@@ -67,6 +67,9 @@ message ApplicationPubSub {
     bytes tls_client_cert = 9 [(gogoproto.customname) = "TLSClientCert"];
     // The client private key. PEM formatted.
     bytes tls_client_key = 10 [(gogoproto.customname) = "TLSClientKey"];
+
+    // HTTP headers to use on MQTT-over-Websocket connections.
+    map<string,string> headers = 11;
   }
   // The provider for the PubSub.
   oneof provider {

@@ -20,6 +20,7 @@ const env = {
   config: {
     documentationBaseUrl: 'https://thethingsstack.io',
   },
+  csrfToken: '',
 }
 
 export default env

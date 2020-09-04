@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstationlns
+package ws
 
 import "time"
 
-// Config defines the Basic Station configuration of the Gateway Server.
+// Config defines the LoRa Basics Station configuration of the Gateway Server.
 type Config struct {
 	UseTrafficTLSAddress bool          `name:"use-traffic-tls-address" description:"Use WSS for the traffic address regardless of the TLS setting"`
 	WSPingInterval       time.Duration `name:"ws-ping-interval" description:"Interval to send WS ping messages"`

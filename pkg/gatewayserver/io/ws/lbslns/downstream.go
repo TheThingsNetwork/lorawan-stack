@@ -12,20 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package messages
+package lbslns
 
 import (
+	"context"
 	"encoding/hex"
 	"encoding/json"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var errDownlinkMessage = errors.Define("downlink_message", "could not translate downlink message")
+var errNoClockSync = errors.DefineUnavailable("no_clock_sync", "no clock sync")
 
-// DownlinkMessage is the LoRaWAN downlink message sent to the basic station.
+// DownlinkMessage is the LoRaWAN downlink message sent to the LoRa Basics Station.
 type DownlinkMessage struct {
 	DevEUI      string  `json:"DevEui"`
 	DeviceClass uint    `json:"dC"`
@@ -40,8 +43,8 @@ type DownlinkMessage struct {
 	MuxTime     float64 `json:"MuxTime"`
 }
 
-// MarshalJSON implements json.Marshaler.
-func (dnmsg DownlinkMessage) MarshalJSON() ([]byte, error) {
+// marshalJSON marshals dnmsg to a JSON byte array.
+func (dnmsg DownlinkMessage) marshalJSON() ([]byte, error) {
 	type Alias DownlinkMessage
 	return json.Marshal(struct {
 		Type string `json:"msgtype"`
@@ -52,12 +55,34 @@ func (dnmsg DownlinkMessage) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// FromDownlinkMessage translates the ttnpb.DownlinkMessage to LNS DownlinkMessage "dnmsg".
-func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, rawPayload []byte, scheduledMsg *ttnpb.TxSettings, dlToken int64, dlTime time.Time, xTime int64) DownlinkMessage {
+// unmarshalJSON unmarshals dnmsg from a JSON byte array.
+func (dnmsg *DownlinkMessage) unmarshalJSON(data []byte) error {
+	return json.Unmarshal(data, dnmsg)
+}
+
+// FromDownlink implements Formatter.
+func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.DownlinkMessage, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
 	var dnmsg DownlinkMessage
-	dnmsg.Pdu = hex.EncodeToString(rawPayload)
-	dnmsg.RCtx = int64(scheduledMsg.Downlink.AntennaIndex)
-	dnmsg.Diid = dlToken
+	settings := down.GetScheduled()
+	dnmsg.Pdu = hex.EncodeToString(down.GetRawPayload())
+	dnmsg.RCtx = int64(settings.Downlink.AntennaIndex)
+	dnmsg.Diid = int64(f.tokens.Next(down.CorrelationIDs, dlTime))
+
+	// The first 16 bits of XTime gets the session ID from the upstream latestXTime and the other 48 bits are concentrator timestamp accounted for rollover.
+	var (
+		state State
+		ok    bool
+	)
+	session := ws.SessionFromContext(ctx)
+	session.DataMu.Lock()
+	defer session.DataMu.Unlock()
+	if state, ok = session.Data.(State); !ok {
+		return nil, errSessionStateNotFound
+	}
+	xTime := int64(state.ID)<<48 | (int64(concentratorTime) / int64(time.Microsecond) & 0xFFFFFFFFFF)
+
+	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay). The calculated offset is in microseconds.
+	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*int(time.Second/time.Microsecond))
 
 	// This field is not used but needs to be defined for the station to parse the json.
 	dnmsg.DevEUI = "00-00-00-00-00-00-00-00"
@@ -67,8 +92,8 @@ func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, rawPayload []byte, schedu
 	dnmsg.RxDelay = 1
 
 	// Fix the Tx Parameters since we don't use the gateway scheduler.
-	dnmsg.Rx1DR = int(scheduledMsg.DataRateIndex)
-	dnmsg.Rx1Freq = int(scheduledMsg.Frequency)
+	dnmsg.Rx1DR = int(settings.DataRateIndex)
+	dnmsg.Rx1Freq = int(settings.Frequency)
 
 	// Add the MuxTime for RTT measurement
 	dnmsg.MuxTime = float64(dlTime.UnixNano()) / float64(time.Second)
@@ -76,10 +101,7 @@ func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, rawPayload []byte, schedu
 	// The GS controls the scheduling and hence for the gateway, its always Class A.
 	dnmsg.DeviceClass = uint(ttnpb.CLASS_A)
 
-	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay). The calculated offset is in microseconds.
-	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*int(time.Second/time.Microsecond))
-
-	return dnmsg
+	return dnmsg.marshalJSON()
 }
 
 // ToDownlinkMessage translates the LNS DownlinkMessage "dnmsg" to ttnpb.DownlinkMessage.
