@@ -121,7 +121,6 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 		a.So(s.id, should.Resemble, pbs[0])
 		a.So(s.t, should.Equal, time.Unix(0, 0))
 		if !a.So(s.ctx, should.HaveParentContextOrEqual, popCtx) {
-			t.Log(s.ctx == popCtx)
 			t.Fatal(s.ctx)
 		}
 		s.errCh <- nil
@@ -365,7 +364,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				)
 			})
 		}
-		if !a.So(env.AssertScheduleDownlink(
+		if !a.So(env.AssertLegacyScheduleDownlink(
 			ctx,
 			MakeDownlinkPathsWithPeerIndex(downlinkPaths, []uint{0, 1, 1, 2, 1}...),
 			asserts...,

@@ -463,6 +463,38 @@ func MakeDownlinkMACBuffer(phy *band.Band, cmds ...MACCommander) []byte {
 	return b
 }
 
+func messageGenerationKeys(sk *ttnpb.SessionKeys, macVersion ttnpb.MACVersion) ttnpb.SessionKeys {
+	if sk == nil {
+		return *MakeSessionKeys(macVersion, false)
+	}
+	decrypt := func(ke *ttnpb.KeyEnvelope) *types.AES128Key {
+		switch {
+		case ke == nil:
+			return nil
+		case ke.Key != nil:
+			return ke.Key
+		case len(ke.EncryptedKey) > 0:
+			k := &types.AES128Key{}
+			test.Must(nil, k.UnmarshalBinary(ke.EncryptedKey))
+			return k
+		default:
+			return nil
+		}
+	}
+	return ttnpb.SessionKeys{
+		SessionKeyID: sk.SessionKeyID,
+		FNwkSIntKey: &ttnpb.KeyEnvelope{
+			Key: decrypt(sk.FNwkSIntKey),
+		},
+		SNwkSIntKey: &ttnpb.KeyEnvelope{
+			Key: decrypt(sk.SNwkSIntKey),
+		},
+		NwkSEncKey: &ttnpb.KeyEnvelope{
+			Key: decrypt(sk.NwkSEncKey),
+		},
+	}
+}
+
 func MustEncryptUplink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, isFOpts bool, b ...byte) []byte {
 	return test.Must(crypto.EncryptUplink(key, devAddr, fCnt, b, isFOpts)).([]byte)
 }
@@ -515,41 +547,14 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 	if !conf.FCtrl.Ack && conf.ConfFCntDown > 0 {
 		panic("ConfFCntDown must be zero for uplink frames with ACK bit unset")
 	}
-	var keys ttnpb.SessionKeys
-	if conf.SessionKeys == nil {
-		keys = *MakeSessionKeys(conf.MACVersion, false)
-	} else {
-		decrypt := func(ke *ttnpb.KeyEnvelope) *types.AES128Key {
-			switch {
-			case ke == nil:
-				return nil
-			case ke.Key != nil:
-				return ke.Key
-			case len(ke.EncryptedKey) > 0:
-				k := &types.AES128Key{}
-				test.Must(nil, k.UnmarshalBinary(ke.EncryptedKey))
-				return k
-			default:
-				return nil
-			}
-		}
-		keys = ttnpb.SessionKeys{
-			FNwkSIntKey: &ttnpb.KeyEnvelope{
-				Key: decrypt(conf.SessionKeys.FNwkSIntKey),
-			},
-			SNwkSIntKey: &ttnpb.KeyEnvelope{
-				Key: decrypt(conf.SessionKeys.SNwkSIntKey),
-			},
-			NwkSEncKey: &ttnpb.KeyEnvelope{
-				Key: decrypt(conf.SessionKeys.NwkSEncKey),
-			},
-		}
-	}
 	devAddr := *conf.DevAddr.Copy(&types.DevAddr{})
+	keys := messageGenerationKeys(conf.SessionKeys, conf.MACVersion)
+	frmPayload := conf.FRMPayload
+	fOpts := conf.FOpts
 	if len(conf.FRMPayload) > 0 && conf.FPort == 0 {
-		conf.FRMPayload = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, false, conf.FRMPayload...)
+		frmPayload = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, false, frmPayload...)
 	} else if len(conf.FOpts) > 0 && conf.MACVersion.EncryptFOpts() {
-		conf.FOpts = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, true, conf.FOpts...)
+		fOpts = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, true, fOpts...)
 	}
 	mType := ttnpb.MType_UNCONFIRMED_UP
 	if conf.Confirmed {
@@ -563,7 +568,7 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 		DevAddr: devAddr,
 		FCtrl:   conf.FCtrl,
 		FCnt:    conf.FCnt & 0xffff,
-		FOpts:   CopyBytes(conf.FOpts),
+		FOpts:   CopyBytes(fOpts),
 	}
 	phyPayload := test.Must(lorawan.MarshalMessage(ttnpb.Message{
 		MHDR: mhdr,
@@ -571,7 +576,7 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 			MACPayload: &ttnpb.MACPayload{
 				FHDR:       fhdr,
 				FPort:      uint32(conf.FPort),
-				FRMPayload: conf.FRMPayload,
+				FRMPayload: frmPayload,
 			},
 		},
 	})).([]byte)
@@ -595,7 +600,7 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 						MACPayload: &ttnpb.MACPayload{
 							FHDR:       fhdr,
 							FPort:      uint32(conf.FPort),
-							FRMPayload: CopyBytes(conf.FRMPayload),
+							FRMPayload: CopyBytes(frmPayload),
 							FullFCnt:   conf.FCnt,
 						},
 					},
@@ -632,19 +637,35 @@ func MustEncryptDownlink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32
 	return test.Must(crypto.EncryptDownlink(key, devAddr, fCnt, b, isFOpts)).([]byte)
 }
 
-func MakeDataDownlink(macVersion ttnpb.MACVersion, confirmed bool, devAddr types.DevAddr, fCtrl ttnpb.FCtrl, fCnt, confFCntUp uint32, fPort uint8, frmPayload, fOpts []byte, txReq *ttnpb.TxRequest, cids ...string) *ttnpb.DownlinkMessage {
-	if !fCtrl.Ack && confFCntUp > 0 {
+type DataDownlinkConfig struct {
+	Confirmed  bool
+	MACVersion ttnpb.MACVersion
+	DevAddr    types.DevAddr
+	FCtrl      ttnpb.FCtrl
+	FCnt       uint32
+	ConfFCntUp uint32
+	FPort      uint8
+	FRMPayload []byte
+	FOpts      []byte
+
+	SessionKeys *ttnpb.SessionKeys
+}
+
+func MakeDataDownlinkPHYPayload(conf DataDownlinkConfig) []byte {
+	if !conf.FCtrl.Ack && conf.ConfFCntUp > 0 {
 		panic("ConfFCntDown must be zero for uplink frames with ACK bit unset")
 	}
-	devAddr = *devAddr.Copy(&types.DevAddr{})
-	keys := MakeSessionKeys(macVersion, false)
-	if len(frmPayload) > 0 && fPort == 0 {
-		frmPayload = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, fCnt, false, frmPayload...)
-	} else if len(fOpts) > 0 && macVersion.EncryptFOpts() {
-		fOpts = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, fCnt, true, fOpts...)
+	devAddr := *conf.DevAddr.Copy(&types.DevAddr{})
+	keys := messageGenerationKeys(conf.SessionKeys, conf.MACVersion)
+	frmPayload := conf.FRMPayload
+	fOpts := conf.FOpts
+	if len(frmPayload) > 0 && conf.FPort == 0 {
+		frmPayload = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, false, frmPayload...)
+	} else if len(fOpts) > 0 && conf.MACVersion.EncryptFOpts() {
+		fOpts = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, true, fOpts...)
 	}
 	mType := ttnpb.MType_UNCONFIRMED_DOWN
-	if confirmed {
+	if conf.Confirmed {
 		mType = ttnpb.MType_CONFIRMED_DOWN
 	}
 	phyPayload := test.Must(lorawan.MarshalMessage(ttnpb.Message{
@@ -656,29 +677,23 @@ func MakeDataDownlink(macVersion ttnpb.MACVersion, confirmed bool, devAddr types
 			MACPayload: &ttnpb.MACPayload{
 				FHDR: ttnpb.FHDR{
 					DevAddr: devAddr,
-					FCtrl:   fCtrl,
-					FCnt:    fCnt & 0xffff,
+					FCtrl:   conf.FCtrl,
+					FCnt:    conf.FCnt & 0xffff,
 					FOpts:   fOpts,
 				},
-				FPort:      uint32(fPort),
+				FPort:      uint32(conf.FPort),
 				FRMPayload: frmPayload,
 			},
 		},
 	})).([]byte)
 	var mic [4]byte
 	switch {
-	case macVersion.Compare(ttnpb.MAC_V1_1) < 0:
-		mic = test.Must(crypto.ComputeLegacyDownlinkMIC(*keys.FNwkSIntKey.Key, devAddr, fCnt, phyPayload)).([4]byte)
+	case conf.MACVersion.Compare(ttnpb.MAC_V1_1) < 0:
+		mic = test.Must(crypto.ComputeLegacyDownlinkMIC(*keys.FNwkSIntKey.Key, devAddr, conf.FCnt, phyPayload)).([4]byte)
 	default:
-		mic = test.Must(crypto.ComputeDownlinkMIC(*keys.SNwkSIntKey.Key, devAddr, confFCntUp, fCnt, phyPayload)).([4]byte)
+		mic = test.Must(crypto.ComputeDownlinkMIC(*keys.SNwkSIntKey.Key, devAddr, conf.ConfFCntUp, conf.FCnt, phyPayload)).([4]byte)
 	}
-	return &ttnpb.DownlinkMessage{
-		CorrelationIDs: append([]string{}, cids...),
-		RawPayload:     append(phyPayload, mic[:]...),
-		Settings: &ttnpb.DownlinkMessage_Request{
-			Request: txReq,
-		},
-	}
+	return append(phyPayload, mic[:]...)
 }
 
 func MakeTestCaseName(parts ...string) string {

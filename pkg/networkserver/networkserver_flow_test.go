@@ -17,6 +17,7 @@ package networkserver_test
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -36,7 +37,81 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func makeOTAAFlowTest(createDevice *ttnpb.SetEndDeviceRequest, f func(context.Context, TestEnvironment, *ttnpb.EndDevice, ttnpb.AsNs_LinkApplicationClient)) func(context.Context, TestEnvironment) {
+func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fpID string, otaa bool) ([]MACCommander, []events.Builder) {
+	switch fpID {
+	case test.EUFrequencyPlanID:
+		linkADRReq := &ttnpb.MACCommand_LinkADRReq{
+			ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
+			DataRateIndex: ttnpb.DATA_RATE_4,
+			TxPowerIndex:  1,
+			NbTrans:       1,
+		}
+		return []MACCommander{
+				linkADRReq,
+			}, []events.Builder{
+				mac.EvtEnqueueLinkADRRequest.With(events.WithData(linkADRReq)),
+			}
+	case test.USFrequencyPlanID:
+		linkADRReqs := []MACCommander{
+			&ttnpb.MACCommand_LinkADRReq{
+				ChannelMask:   []bool{false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true},
+				DataRateIndex: ttnpb.DATA_RATE_2,
+				TxPowerIndex:  1,
+				NbTrans:       1,
+			},
+		}
+		if !otaa || phyVersion.Compare(ttnpb.PHY_V1_0_3_REV_A) < 0 {
+			linkADRReqs = append([]MACCommander{
+				&ttnpb.MACCommand_LinkADRReq{
+					ChannelMask:        []bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+					ChannelMaskControl: 7,
+					DataRateIndex:      ttnpb.DATA_RATE_2,
+					TxPowerIndex:       1,
+					NbTrans:            1,
+				},
+			}, linkADRReqs...)
+		}
+		var evBuilders []events.Builder
+		for _, req := range linkADRReqs {
+			req := req
+			evBuilders = append(evBuilders, mac.EvtEnqueueLinkADRRequest.With(events.WithData(req)))
+		}
+		return linkADRReqs, evBuilders
+	case test.ASAUFrequencyPlanID:
+		newChannelReq := &ttnpb.MACCommand_NewChannelReq{
+			ChannelIndex:     7,
+			Frequency:        924600000,
+			MaxDataRateIndex: ttnpb.DATA_RATE_5,
+		}
+		linkADRReq := &ttnpb.MACCommand_LinkADRReq{
+			ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
+			DataRateIndex: ttnpb.DATA_RATE_4,
+			TxPowerIndex:  1,
+			NbTrans:       1,
+		}
+		return []MACCommander{
+				newChannelReq,
+				linkADRReq,
+			}, []events.Builder{
+				mac.EvtEnqueueNewChannelRequest.With(events.WithData(newChannelReq)),
+				mac.EvtEnqueueLinkADRRequest.With(events.WithData(linkADRReq)),
+			}
+	default:
+		panic(fmt.Errorf("unknown LinkADRReqs for %s frequency plan", fpID))
+	}
+}
+
+type OTAAFlowTestConfig struct {
+	CreateDevice *ttnpb.SetEndDeviceRequest
+	Func         func(context.Context, TestEnvironment, *ttnpb.EndDevice, ttnpb.AsNs_LinkApplicationClient)
+
+	UplinkMACCommanders   []MACCommander
+	UplinkEventBuilders   []events.Builder
+	DownlinkMACCommanders []MACCommander
+	DownlinkEventBuilders []events.Builder
+}
+
+func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnvironment) {
 	return func(ctx context.Context, env TestEnvironment) {
 		t, a := test.MustNewTFromContext(ctx)
 
@@ -65,7 +140,7 @@ func makeOTAAFlowTest(createDevice *ttnpb.SetEndDeviceRequest, f func(context.Co
 			}
 		}()
 
-		dev, ok := env.AssertSetDevice(ctx, true, createDevice)
+		dev, ok := env.AssertSetDevice(ctx, true, conf.CreateDevice)
 		if !a.So(ok, should.BeTrue) {
 			t.Error("Failed to create device")
 			return
@@ -74,7 +149,7 @@ func makeOTAAFlowTest(createDevice *ttnpb.SetEndDeviceRequest, f func(context.Co
 		a.So(dev.CreatedAt, should.HappenAfter, start)
 		a.So(dev.UpdatedAt, should.Equal, dev.CreatedAt)
 		a.So([]time.Time{start, dev.CreatedAt, time.Now()}, should.BeChronological)
-		a.So(dev, should.ResembleFields, &createDevice.EndDevice, createDevice.FieldMask.Paths)
+		a.So(dev, should.ResembleFields, &conf.CreateDevice.EndDevice, conf.CreateDevice.FieldMask.Paths)
 
 		dev, ok = env.AssertJoin(ctx, JoinAssertionConfig{
 			Link:          link,
@@ -87,8 +162,8 @@ func makeOTAAFlowTest(createDevice *ttnpb.SetEndDeviceRequest, f func(context.Co
 				RxMetadata[:3],
 			},
 			CorrelationIDs: []string{
-				"GsNs-1",
-				"GsNs-2",
+				"GsNs-join-1",
+				"GsNs-join-2",
 			},
 
 			ClusterResponse: &NsJsHandleJoinResponse{
@@ -105,287 +180,178 @@ func makeOTAAFlowTest(createDevice *ttnpb.SetEndDeviceRequest, f func(context.Co
 			return
 		}
 		t.Logf("Device successfully joined. DevAddr: %s", dev.PendingSession.DevAddr)
-		f(ctx, env, dev, link)
-	}
-}
-
-func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fpID string, linkADRReqs ...*ttnpb.MACCommand_LinkADRReq) func(context.Context, TestEnvironment) {
-	return makeOTAAFlowTest(&ttnpb.SetEndDeviceRequest{
-		EndDevice: ttnpb.EndDevice{
-			EndDeviceIdentifiers: *MakeOTAAIdentifiers(nil),
-			FrequencyPlanID:      fpID,
-			LoRaWANVersion:       macVersion,
-			LoRaWANPHYVersion:    phyVersion,
-			SupportsClassC:       true,
-			SupportsJoin:         true,
-		},
-		FieldMask: pbtypes.FieldMask{
-			Paths: []string{
-				"frequency_plan_id",
-				"lorawan_phy_version",
-				"lorawan_version",
-				"supports_class_c",
-				"supports_join",
-			},
-		},
-	}, func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice, link ttnpb.AsNs_LinkApplicationClient) {
-		t, a := test.MustNewTFromContext(ctx)
 
 		var upCmders []MACCommander
-		var expectedUpEvBuilders []events.Builder
+		var upEvBuilders []events.Builder
 		var downCmders []MACCommander
-		if macVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+		if dev.PendingMACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 			rekeyInd := &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: ttnpb.MINOR_1,
 			}
-			deviceModeInd := &ttnpb.MACCommand_DeviceModeInd{
-				Class: ttnpb.CLASS_C,
-			}
-			upCmders = append(upCmders,
+			upCmders = []MACCommander{
 				rekeyInd,
-				deviceModeInd,
-			)
+			}
 
 			rekeyConf := &ttnpb.MACCommand_RekeyConf{
 				MinorVersion: ttnpb.MINOR_1,
 			}
-			deviceModeConf := &ttnpb.MACCommand_DeviceModeConf{
-				Class: ttnpb.CLASS_C,
-			}
-			expectedUpEvBuilders = append(expectedUpEvBuilders,
+			upEvBuilders = []events.Builder{
 				mac.EvtReceiveRekeyIndication.With(events.WithData(rekeyInd)),
 				mac.EvtEnqueueRekeyConfirmation.With(events.WithData(rekeyConf)),
-				mac.EvtReceiveDeviceModeIndication.With(events.WithData(deviceModeInd)),
-				mac.EvtClassCSwitch.With(events.WithData(ttnpb.CLASS_A)),
-				mac.EvtEnqueueDeviceModeConfirmation.With(events.WithData(deviceModeConf)),
-			)
-			downCmders = append(downCmders,
+			}
+			downCmders = []MACCommander{
 				rekeyConf,
-				deviceModeConf,
-			)
+			}
 		}
 
-		fp := FrequencyPlan(fpID)
-		phy := LoRaWANBands[fp.BandID][phyVersion]
+		fp := FrequencyPlan(dev.FrequencyPlanID)
+		phy := LoRaWANBands[fp.BandID][dev.LoRaWANPHYVersion]
 
 		deviceChannels, ok := ApplyCFList(dev.PendingMACState.PendingJoinRequest.CFList, phy, dev.PendingMACState.CurrentParameters.Channels...)
 		if !a.So(ok, should.BeTrue) {
-			t.Fatal("Failed to apply CFList")
+			t.Error("Failed to apply CFList")
 			return
 		}
 		dev.PendingMACState.CurrentParameters.Channels = deviceChannels
-		upChIdx := uint8(2)
-		upDRIdx := ttnpb.DATA_RATE_1
-		upConf := WithDeviceDataUplinkConfig(dev, true, upDRIdx, upChIdx, 0)(DataUplinkConfig{
-			Confirmed:      true,
-			FCtrl:          ttnpb.FCtrl{ADR: true},
-			FPort:          0x42,
-			FRMPayload:     []byte("test"),
-			FOpts:          MakeUplinkMACBuffer(phy, upCmders...),
-			RxMetadata:     RxMetadata[:2],
-			CorrelationIDs: []string{"GsNs-data-0"},
-		})
-		start := time.Now()
-		if !a.So(env.AssertHandleDataUplink(
-			ctx,
-			upConf,
-			func(ctx context.Context, assertEvents func(...events.Event) bool, ups ...*ttnpb.UplinkMessage) bool {
-				deduplicatedUpConf := upConf
-				deduplicatedUpConf.DecodePayload = true
-				deduplicatedUpConf.Matched = true
-				for _, up := range ups[1:] {
-					deduplicatedUpConf.RxMetadata = append(deduplicatedUpConf.RxMetadata, up.RxMetadata...)
-				}
-				deduplicatedUp := MakeDataUplink(deduplicatedUpConf)
-
-				dev.EndDeviceIdentifiers.DevAddr = &dev.PendingMACState.PendingJoinRequest.DevAddr
-				dev.MACState = dev.PendingMACState
-				dev.MACState.CurrentParameters.Rx1Delay = dev.PendingMACState.PendingJoinRequest.RxDelay
-				dev.MACState.CurrentParameters.Rx1DataRateOffset = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx1DROffset
-				dev.MACState.CurrentParameters.Rx2DataRateIndex = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx2DR
-				dev.MACState.PendingJoinRequest = nil
-				dev.MACState.RecentUplinks = AppendRecentUplink(dev.MACState.RecentUplinks, deduplicatedUp, RecentUplinkCount)
-				dev.Session = dev.PendingSession
-				dev.PendingMACState = nil
-				dev.PendingSession = nil
-				dev.RecentUplinks = AppendRecentUplink(dev.RecentUplinks, deduplicatedUp, RecentUplinkCount)
-
-				if !a.So(assertEvents(events.Builders(func() []events.Builder {
-					evBuilders := []events.Builder{
-						EvtReceiveDataUplink,
-					}
-					for range ups[1:] {
-						evBuilders = append(evBuilders,
-							EvtReceiveDataUplink,
-							EvtDropDataUplink.With(events.WithData(ErrDuplicate)),
-						)
-					}
-					return append(
-						append(
-							evBuilders,
-							expectedUpEvBuilders...,
-						),
-						EvtProcessDataUplink,
-					)
-				}()).New(
-					ctx,
-					events.WithIdentifiers(dev.EndDeviceIdentifiers),
-				)...), should.BeTrue) {
-					t.Error("Uplink event assertion failed")
-					return false
-				}
-
-				var appUp *ttnpb.ApplicationUp
-				if !a.So(AssertProcessApplicationUp(ctx, link, func(ctx context.Context, up *ttnpb.ApplicationUp) bool {
-					_, a := test.MustNewTFromContext(ctx)
-					recvAt := up.GetUplinkMessage().GetReceivedAt()
-					appUp = up
-					return test.AllTrue(
-						a.So(up.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, deduplicatedUp.CorrelationIDs),
-						a.So(up.GetUplinkMessage().GetRxMetadata(), should.HaveSameElementsDeep, deduplicatedUp.RxMetadata),
-						a.So([]time.Time{start, recvAt, time.Now()}, should.BeChronological),
-						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-							CorrelationIDs:       up.CorrelationIDs,
-							Up: &ttnpb.ApplicationUp_UplinkMessage{
-								UplinkMessage: &ttnpb.ApplicationUplink{
-									Confirmed:    deduplicatedUp.Payload.MHDR.MType == ttnpb.MType_CONFIRMED_UP,
-									FPort:        deduplicatedUp.Payload.GetMACPayload().FPort,
-									FRMPayload:   deduplicatedUp.Payload.GetMACPayload().FRMPayload,
-									ReceivedAt:   up.GetUplinkMessage().GetReceivedAt(),
-									RxMetadata:   up.GetUplinkMessage().GetRxMetadata(),
-									Settings:     deduplicatedUp.Settings,
-									SessionKeyID: MakeSessionKeys(macVersion, false).SessionKeyID,
-								},
-							},
-						}),
-					)
-				}), should.BeTrue) {
-					t.Error("Failed to send data uplink to Application Server")
-					return false
-				}
-				return a.So(env.Events, should.ReceiveEventFunc, test.MakeEventEqual(test.EventEqualConfig{
-					Identifiers:    true,
-					Data:           true,
-					Origin:         true,
-					Context:        true,
-					Visibility:     true,
-					Authentication: true,
-					RemoteIP:       true,
-					UserAgent:      true,
-				}),
-					EvtForwardDataUplink.New(
-						link.Context(),
-						events.WithIdentifiers(dev.EndDeviceIdentifiers),
-						events.WithData(appUp),
-					),
-				)
+		dev.EndDeviceIdentifiers.DevAddr = &dev.PendingSession.DevAddr
+		dev, ok = env.AssertHandleDataUplink(ctx, DataUplinkAssertionConfig{
+			Link:          link,
+			Device:        dev,
+			ChannelIndex:  2,
+			DataRateIndex: ttnpb.DATA_RATE_1,
+			RxMetadatas: [][]*ttnpb.RxMetadata{
+				RxMetadata[:2],
+				RxMetadata[2:],
 			},
-			RxMetadata[2:],
-		), should.BeTrue) {
+			CorrelationIDs: []string{"GsNs-data-0"},
+
+			Confirmed:     true,
+			Pending:       true,
+			FRMPayload:    []byte("test"),
+			FOpts:         MakeUplinkMACBuffer(phy, append(upCmders, conf.UplinkMACCommanders...)...),
+			FCtrl:         ttnpb.FCtrl{ADR: true},
+			FPort:         0x42,
+			EventBuilders: append(upEvBuilders, conf.UplinkEventBuilders...),
+		})
+		if !a.So(ok, should.BeTrue) {
+			t.Error("Data uplink assertion failed")
 			return
 		}
 
-		downCmders = append(downCmders, ttnpb.CID_DEV_STATUS)
-		expectedEvBuilders := []events.Builder{mac.EvtEnqueueDevStatusRequest}
-		for _, cmd := range linkADRReqs {
-			cmd := cmd
-			downCmders = append(downCmders, cmd)
-			expectedEvBuilders = append(expectedEvBuilders, mac.EvtEnqueueLinkADRRequest.With(events.WithData(cmd)))
-		}
+		fpCmders, fpEvBuilders := frequencyPlanMACCommands(dev.MACState.LoRaWANVersion, dev.LoRaWANPHYVersion, dev.FrequencyPlanID, true)
+		downEvBuilders := append(conf.DownlinkEventBuilders, fpEvBuilders...)
+		downCmders = append(downCmders, conf.DownlinkMACCommanders...)
+		downCmders = append(downCmders, fpCmders...)
 
-		paths := DownlinkPathsFromMetadata(RxMetadata[:]...)
-		txReq := &ttnpb.TxRequest{
-			Class:            ttnpb.CLASS_A,
-			DownlinkPaths:    DownlinkProtoPaths(paths...),
-			Rx1Delay:         dev.MACState.CurrentParameters.Rx1Delay,
-			Rx1DataRateIndex: test.Must(phy.Rx1DataRate(upDRIdx, dev.MACState.CurrentParameters.Rx1DataRateOffset, dev.MACState.CurrentParameters.DownlinkDwellTime.GetValue())).(ttnpb.DataRateIndex),
-			Rx1Frequency:     phy.DownlinkChannels[test.Must(phy.Rx1Channel(upChIdx)).(uint8)].Frequency,
-			Rx2DataRateIndex: dev.MACState.CurrentParameters.Rx2DataRateIndex,
-			Rx2Frequency:     phy.DefaultRx2Parameters.Frequency,
-			Priority:         ttnpb.TxSchedulePriority_HIGHEST,
-			FrequencyPlanID:  fpID,
+		fOpts := MakeDownlinkMACBuffer(phy, downCmders...)
+		var frmPayload []byte
+		if len(fOpts) > 15 {
+			frmPayload = fOpts
+			fOpts = nil
 		}
-		if !a.So(env.AssertScheduleDownlink(
-			ctx,
-			MakeDownlinkPathsWithPeerIndex(paths, UintRepeat(1, len(paths))...),
-			func(ctx, reqCtx context.Context, down *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool) {
-				return NsGsScheduleDownlinkResponse{
-						Response: &ttnpb.ScheduleDownlinkResponse{},
-					}, test.AllTrue(
-						a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
-						a.So(down.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, LastUplink(dev.RecentUplinks...).CorrelationIDs),
-						a.So(down, should.Resemble, MakeDataDownlink(macVersion, false, dev.Session.DevAddr, ttnpb.FCtrl{
-							ADR: true,
-							Ack: true,
-						}, 0x00, 0x00, 0x00, nil, MakeDownlinkMACBuffer(phy, downCmders...), txReq, down.CorrelationIDs...)),
-					)
-			}), should.BeTrue) {
-			t.Error("Failed to schedule downlink on Gateway Server")
+		dev, ok = env.AssertScheduleDataDownlink(ctx, DataDownlinkAssertionConfig{
+			SetRX1:   true,
+			SetRX2:   true,
+			Device:   dev,
+			Class:    ttnpb.CLASS_A,
+			Priority: ttnpb.TxSchedulePriority_HIGHEST,
+			Payload: MakeDataDownlinkPHYPayload(DataDownlinkConfig{
+				MACVersion: dev.MACState.LoRaWANVersion,
+				DevAddr:    dev.Session.DevAddr,
+				FCtrl: ttnpb.FCtrl{
+					ADR: true,
+					Ack: true,
+				},
+				FRMPayload:  frmPayload,
+				FOpts:       fOpts,
+				SessionKeys: &dev.Session.SessionKeys,
+			}),
+			PeerIndexes: []uint{0, 1},
+			Responses: []NsGsScheduleDownlinkResponse{
+				{
+					Response: &ttnpb.ScheduleDownlinkResponse{},
+				},
+			},
+		})
+		if !a.So(ok, should.BeTrue) {
+			t.Error("Data downlink assertion failed")
 			return
 		}
-		a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, 2+len(expectedEvBuilders), func(evs ...events.Event) bool {
-			return a.So(evs, should.HaveSameElementsFunc, test.MakeEventEqual(test.EventEqualConfig{
-				Identifiers:    true,
-				Origin:         true,
-				Context:        true,
-				Visibility:     true,
-				Authentication: true,
-				RemoteIP:       true,
-				UserAgent:      true,
-			}), events.Builders(append(
-				expectedEvBuilders,
-				EvtScheduleDataDownlinkAttempt.With(events.WithData(txReq)),
-				EvtScheduleDataDownlinkSuccess.With(events.WithData(&ttnpb.ScheduleDownlinkResponse{})),
-			)).New(
-				ctx,
-				events.WithIdentifiers(dev.EndDeviceIdentifiers)),
-			)
-		}), should.BeTrue)
+		if !a.So(env.Events, should.ReceiveEventsResembling, events.Builders(downEvBuilders).New(
+			events.ContextWithCorrelationID(ctx, LastDownlink(dev.RecentDownlinks...).CorrelationIDs...),
+			events.WithIdentifiers(dev.EndDeviceIdentifiers)),
+		) {
+			t.Error("Data downlink event assertion failed")
+			return
+		}
+
+		conf.Func(ctx, env, dev, link)
+	}
+}
+
+func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fpID string) func(context.Context, TestEnvironment) {
+	var upCmders []MACCommander
+	var upEvBuilders []events.Builder
+	var downCmders []MACCommander
+	if macVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+		deviceModeInd := &ttnpb.MACCommand_DeviceModeInd{
+			Class: ttnpb.CLASS_C,
+		}
+		upCmders = []MACCommander{
+			deviceModeInd,
+		}
+
+		deviceModeConf := &ttnpb.MACCommand_DeviceModeConf{
+			Class: ttnpb.CLASS_C,
+		}
+		upEvBuilders = []events.Builder{
+			mac.EvtReceiveDeviceModeIndication.With(events.WithData(deviceModeInd)),
+			mac.EvtClassCSwitch.With(events.WithData(ttnpb.CLASS_A)),
+			mac.EvtEnqueueDeviceModeConfirmation.With(events.WithData(deviceModeConf)),
+		}
+		downCmders = []MACCommander{
+			deviceModeConf,
+		}
+	}
+	return makeOTAAFlowTest(OTAAFlowTestConfig{
+		CreateDevice: &ttnpb.SetEndDeviceRequest{
+			EndDevice: ttnpb.EndDevice{
+				EndDeviceIdentifiers: *MakeOTAAIdentifiers(nil),
+				FrequencyPlanID:      fpID,
+				LoRaWANVersion:       macVersion,
+				LoRaWANPHYVersion:    phyVersion,
+				SupportsClassC:       true,
+				SupportsJoin:         true,
+			},
+			FieldMask: pbtypes.FieldMask{
+				Paths: []string{
+					"frequency_plan_id",
+					"lorawan_phy_version",
+					"lorawan_version",
+					"supports_class_c",
+					"supports_join",
+				},
+			},
+		},
+		UplinkMACCommanders:   upCmders,
+		UplinkEventBuilders:   upEvBuilders,
+		DownlinkMACCommanders: append(downCmders, ttnpb.CID_DEV_STATUS),
+		DownlinkEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
+		Func: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice, link ttnpb.AsNs_LinkApplicationClient) {
+		},
 	})
 }
 
 func TestFlow(t *testing.T) {
 	ForEachFrequencyPlanLoRaWANVersionPair(t, func(makeName func(...string) string, fpID string, _ *frequencyplans.FrequencyPlan, phy *band.Band, macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion) {
 		for flowName, handleFlowTest := range map[string]func(context.Context, TestEnvironment){
-			MakeTestCaseName("Class C", "OTAA"): makeClassCOTAAFlowTest(macVersion, phyVersion, fpID, func() []*ttnpb.MACCommand_LinkADRReq {
-				switch phy.ID {
-				case band.EU_863_870:
-					return []*ttnpb.MACCommand_LinkADRReq{
-						{
-							ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
-							DataRateIndex: ttnpb.DATA_RATE_4,
-							TxPowerIndex:  1,
-							NbTrans:       1,
-						},
-					}
-				case band.US_902_928:
-					return []*ttnpb.MACCommand_LinkADRReq{
-						{
-							ChannelMask:        []bool{false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true},
-							ChannelMaskControl: 7,
-							DataRateIndex:      ttnpb.DATA_RATE_2,
-							TxPowerIndex:       1,
-							NbTrans:            1,
-						},
-						{
-							ChannelMask:   []bool{false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true},
-							DataRateIndex: ttnpb.DATA_RATE_2,
-							TxPowerIndex:  1,
-							NbTrans:       1,
-						},
-					}
-				default:
-					t.Skipf("Unknown LinkADRReqs for %s band", phy.ID)
-					panic("unreachable")
-				}
-			}()...),
+			MakeTestCaseName("Class C", "OTAA"): makeClassCOTAAFlowTest(macVersion, phyVersion, fpID),
 		} {
 			handleFlowTest := handleFlowTest
 			test.RunSubtest(t, test.SubtestConfig{
 				Name:     makeName(flowName),
 				Parallel: true,
-				Timeout:  (1 << 14) * test.Delay,
+				Timeout:  (1 << 15) * test.Delay,
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 					nsConf := DefaultConfig
 					nsConf.NetID = test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
@@ -397,7 +363,6 @@ func TestFlow(t *testing.T) {
 						NetworkServer: nsConf,
 					})
 					defer stop()
-
 					handleFlowTest(ctx, env)
 				},
 			})
