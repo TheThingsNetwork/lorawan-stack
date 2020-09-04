@@ -1655,6 +1655,15 @@
       "file": "redis.go"
     }
   },
+  "error:pkg/applicationserver/distribution:empty_set": {
+    "translations": {
+      "en": "empty set"
+    },
+    "description": {
+      "package": "pkg/applicationserver/distribution",
+      "file": "subscription_set.go"
+    }
+  },
   "error:pkg/applicationserver/io/grpc:connect": {
     "translations": {
       "en": "failed to connect application `{application_uid}`"

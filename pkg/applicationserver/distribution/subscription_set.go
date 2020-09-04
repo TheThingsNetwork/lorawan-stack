@@ -17,9 +17,11 @@ package distribution
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -79,6 +81,11 @@ func (s *set) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	}
 }
 
+// emptySetTimeout is the period after which an empty set is cancelled.
+const emptySetTimeout = time.Minute
+
+var errEmptySet = errors.DefineAborted("empty_set", "empty set")
+
 func (s *set) run() {
 	subscribers := make(map[*io.Subscription]string)
 
@@ -88,6 +95,8 @@ func (s *set) run() {
 		}
 	}()
 
+	ticker := time.NewTicker(emptySetTimeout)
+	lastAction := time.Now()
 	for {
 		select {
 		case <-s.ctx.Done():
@@ -96,17 +105,30 @@ func (s *set) run() {
 			correlationID := fmt.Sprintf("as:subscriber:%s", events.NewCorrelationID())
 			subscribers[sub] = correlationID
 			s.observeSubscribe(correlationID, sub)
+			lastAction = time.Now()
 		case sub := <-s.unsubscribeCh:
 			if correlationID, ok := subscribers[sub]; ok {
 				delete(subscribers, sub)
 				s.observeUnsubscribe(correlationID, sub)
 			}
+			lastAction = time.Now()
 		case up := <-s.upCh:
 			for sub := range subscribers {
 				if err := sub.SendUp(up.Context, up.ApplicationUp); err != nil {
 					log.FromContext(sub.Context()).WithError(err).Warn("Send message failed")
 				}
 			}
+		case <-ticker.C:
+			if len(subscribers) > 0 {
+				// There are still subscribers in the set.
+				continue
+			}
+			if time.Now().Sub(lastAction) < emptySetTimeout {
+				// We had activity in the last period.
+				continue
+			}
+			s.cancel(errEmptySet.New())
+			return
 		}
 	}
 }

@@ -98,19 +98,6 @@
     "description": "update end device",
     "data": {"@type":"type.googleapis.com/google.protobuf.Value","value":["list.of","updated.fields"]}
   },
-  "as.link.fail": {
-    "name": "as.link.fail",
-    "description": "fail link",
-    "data": {"@type":"type.googleapis.com/ttn.lorawan.v3.ErrorDetails","namespace":"pkg/example","name":"example","message_format":"example error for `{attr_name}`","attributes":{"attr_name":"attr_value"},"code":2}
-  },
-  "as.link.start": {
-    "name": "as.link.start",
-    "description": "start link"
-  },
-  "as.link.stop": {
-    "name": "as.link.stop",
-    "description": "stop link"
-  },
   "as.pubsub.delete": {
     "name": "as.pubsub.delete",
     "description": "delete pub/sub",

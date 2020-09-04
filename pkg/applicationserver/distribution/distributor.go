@@ -65,20 +65,20 @@ func (d *Distributor) loadOrCreateSet(ctx context.Context, ids ttnpb.Application
 		return exists, nil
 	}
 
-	var err error
-	defer func() {
-		close(s.init)
-		if err != nil {
-			d.sets.Delete(uid)
-		}
-	}()
+	defer close(s.init)
 
 	ctx = log.NewContextWithField(d.ctx, "application_uid", uid)
-	ctx, err = unique.WithContext(ctx, uid)
+	ctx, err := unique.WithContext(ctx, uid)
 	if err != nil {
+		d.sets.Delete(uid)
 		return nil, err
 	}
 	s.ctx, s.cancel = errorcontext.New(ctx)
+
+	go func() {
+		<-s.ctx.Done()
+		d.sets.Delete(uid)
+	}()
 
 	go func() {
 		if err := d.pubsub.Subscribe(s.ctx, ids, s.SendUp); err != nil {
