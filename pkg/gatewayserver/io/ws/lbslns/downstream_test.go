@@ -21,8 +21,10 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -30,7 +32,7 @@ func timePtr(time time.Time) *time.Time { return &time }
 
 func TestFromDownlinkMessage(t *testing.T) {
 	var lbsLNS lbsLNS
-	ctx := context.Background()
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	uid := unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"})
 	var session ws.Session
 	session.Data = State{
