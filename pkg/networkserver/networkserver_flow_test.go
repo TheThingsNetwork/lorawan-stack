@@ -362,6 +362,13 @@ func TestFlow(t *testing.T) {
 				case band.US_902_928:
 					return []*ttnpb.MACCommand_LinkADRReq{
 						{
+							ChannelMask:        []bool{false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true},
+							ChannelMaskControl: 7,
+							DataRateIndex:      ttnpb.DATA_RATE_2,
+							TxPowerIndex:       1,
+							NbTrans:            1,
+						},
+						{
 							ChannelMask:   []bool{false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true},
 							DataRateIndex: ttnpb.DATA_RATE_2,
 							TxPowerIndex:  1,
