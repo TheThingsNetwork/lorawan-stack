@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package messages
+package lbslns
 
 import (
 	"encoding/json"
-	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
-// Definition of message types.
+// MessageType is the type of the message.
+type MessageType string
+
+// Definition of LoRa Basic Station message types.
 const (
 	// Upstream types for messages from the Gateway.
 	TypeUpstreamVersion              = "version"
@@ -55,6 +58,8 @@ type DiscoverResponse struct {
 	Error string           `json:"error,omitempty"`
 }
 
+var errNotSupported = errors.DefineFailedPrecondition("not_supported", "not supported")
+
 // Type returns the message type of the given data.
 func Type(data []byte) (string, error) {
 	msg := struct {
@@ -64,39 +69,4 @@ func Type(data []byte) (string, error) {
 		return "", err
 	}
 	return msg.Type, nil
-}
-
-// Version contains version information.
-// This message is sent by the gateway.
-type Version struct {
-	Station  string `json:"station"`
-	Firmware string `json:"firmware"`
-	Package  string `json:"package"`
-	Model    string `json:"model"`
-	Protocol int    `json:"protocol"`
-	Features string `json:"features,omitempty"`
-}
-
-// MarshalJSON implements json.Marshaler.
-func (v Version) MarshalJSON() ([]byte, error) {
-	type Alias Version
-	return json.Marshal(struct {
-		Type string `json:"msgtype"`
-		Alias
-	}{
-		Type:  TypeUpstreamVersion,
-		Alias: Alias(v),
-	})
-}
-
-// IsProduction checks the features field for "prod" and returns true if found.
-// This is then used to set debug options in the router config.
-func (v Version) IsProduction() bool {
-	if v.Features == "" {
-		return false
-	}
-	if strings.Contains(v.Features, "prod") {
-		return true
-	}
-	return false
 }
