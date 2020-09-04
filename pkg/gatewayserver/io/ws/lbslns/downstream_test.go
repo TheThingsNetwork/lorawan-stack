@@ -12,24 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package messages
+package lbslns
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func timePtr(time time.Time) *time.Time { return &time }
 
 func TestFromDownlinkMessage(t *testing.T) {
+	var lbsLNS lbsLNS
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+	uid := unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"})
+	var session ws.Session
+	session.Data = State{
+		ID: 0x11,
+	}
 	for _, tc := range []struct {
 		Name                    string
 		DownlinkMessage         ttnpb.DownlinkMessage
-		GatewayIDs              ttnpb.GatewayIdentifiers
 		ExpectedDownlinkMessage DownlinkMessage
 	}{
 		{
@@ -49,11 +60,12 @@ func TestFromDownlinkMessage(t *testing.T) {
 						Timestamp: 1553300787,
 					},
 				},
+				CorrelationIDs: []string{"correlation1"},
 			},
-			GatewayIDs: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			ExpectedDownlinkMessage: DownlinkMessage{
 				DevEUI:      "00-00-00-00-00-00-00-00",
 				DeviceClass: 0,
+				Diid:        1,
 				Pdu:         "596d7868616d74686332356b4a334d3d3d",
 				RxDelay:     1,
 				Rx1DR:       2,
@@ -79,11 +91,12 @@ func TestFromDownlinkMessage(t *testing.T) {
 						},
 					},
 				},
+				CorrelationIDs: []string{"correlation2"},
 			},
-			GatewayIDs: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			ExpectedDownlinkMessage: DownlinkMessage{
 				DevEUI:      "00-00-00-00-00-00-00-00",
 				DeviceClass: 0,
+				Diid:        2,
 				Pdu:         "596d7868616d74686332356b4a334d3d3d",
 				RxDelay:     1,
 				Rx1DR:       2,
@@ -96,8 +109,14 @@ func TestFromDownlinkMessage(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			dnmsg := FromDownlinkMessage(tc.GatewayIDs, tc.DownlinkMessage.GetRawPayload(), tc.DownlinkMessage.GetScheduled(), 0, time.Unix(1554300787, 123456000), 0x00)
-			dnmsg.XTime = 0
+			ctx := context.Background()
+			sessionCtx := ws.NewContextWithSession(ctx, &session)
+			raw, err := lbsLNS.FromDownlink(sessionCtx, uid, tc.DownlinkMessage, 1554300787, time.Unix(1554300787, 123456000))
+			a.So(err, should.BeNil)
+			var dnmsg DownlinkMessage
+			err = dnmsg.unmarshalJSON(raw)
+			a.So(err, should.BeNil)
+			dnmsg.XTime = tc.ExpectedDownlinkMessage.XTime
 			if !a.So(dnmsg, should.Resemble, tc.ExpectedDownlinkMessage) {
 				t.Fatalf("Invalid DownlinkMessage: %v", dnmsg)
 			}

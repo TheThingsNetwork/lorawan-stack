@@ -1799,6 +1799,15 @@
       "file": "tls.go"
     }
   },
+  "error:pkg/applicationserver/io/pubsub/provider/mqtt:configure_http_headers": {
+    "translations": {
+      "en": "configure HTTP headers"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/provider/mqtt",
+      "file": "provider.go"
+    }
+  },
   "error:pkg/applicationserver/io/pubsub/provider/mqtt:connect_failed": {
     "translations": {
       "en": "connection to MQTT server failed"
@@ -3392,105 +3401,6 @@
       "file": "http_gateway.go"
     }
   },
-  "error:pkg/gatewayserver/io/basicstationlns/messages:data_rate": {
-    "translations": {
-      "en": "data rate not found"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns/messages",
-      "file": "util.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/basicstationlns/messages:data_rate_index": {
-    "translations": {
-      "en": "data rate index is out of range"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns/messages",
-      "file": "util.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/basicstationlns/messages:downlink_message": {
-    "translations": {
-      "en": "could not translate downlink message"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns/messages",
-      "file": "downstream.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/basicstationlns/messages:join_request_message": {
-    "translations": {
-      "en": "invalid join-request message received"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns/messages",
-      "file": "upstream.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/basicstationlns/messages:uid": {
-    "translations": {
-      "en": "invalid uid `{uid}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns/messages",
-      "file": "util.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/basicstationlns/messages:uplink_data_Frame": {
-    "translations": {
-      "en": "invalid uplink data frame received"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns/messages",
-      "file": "upstream.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/basicstationlns/messages:uplink_message": {
-    "translations": {
-      "en": "invalid uplink message received"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns/messages",
-      "file": "upstream.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/basicstationlns:empty_gateway_eui": {
-    "translations": {
-      "en": "empty gateway EUI"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns",
-      "file": "basicstationlns.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/basicstationlns:invalid_gateway_id": {
-    "translations": {
-      "en": "invalid gateway id `{id}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns",
-      "file": "basicstationlns.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/basicstationlns:listener": {
-    "translations": {
-      "en": "failed to serve Basic Station frontend listener"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns",
-      "file": "basicstationlns.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/basicstationlns:no_auth_provided": {
-    "translations": {
-      "en": "no auth provided for gateway id `{id}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns",
-      "file": "basicstationlns.go"
-    }
-  },
   "error:pkg/gatewayserver/io/grpc:connect": {
     "translations": {
       "en": "failed to connect gateway `{gateway_uid}`"
@@ -3669,6 +3579,114 @@
     "description": {
       "package": "pkg/gatewayserver/io/udp",
       "file": "udp.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws/lbslns:empty_gateway_eui": {
+    "translations": {
+      "en": "empty gateway EUI"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/lbslns",
+      "file": "discover.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws/lbslns:join_request_message": {
+    "translations": {
+      "en": "invalid join-request message received"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/lbslns",
+      "file": "upstream.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws/lbslns:no_clock_sync": {
+    "translations": {
+      "en": "no clock sync"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/lbslns",
+      "file": "downstream.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws/lbslns:not_supported": {
+    "translations": {
+      "en": "not supported"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/lbslns",
+      "file": "messages.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws/lbslns:session_state_not_found": {
+    "translations": {
+      "en": "session state not found"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/lbslns",
+      "file": "format.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws/lbslns:uplink_data_Frame": {
+    "translations": {
+      "en": "invalid uplink data frame received"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/lbslns",
+      "file": "upstream.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws/lbslns:uplink_message": {
+    "translations": {
+      "en": "invalid uplink message received"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/lbslns",
+      "file": "upstream.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws/util:data_rate": {
+    "translations": {
+      "en": "data rate not found"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/util",
+      "file": "util.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws/util:data_rate_index": {
+    "translations": {
+      "en": "data rate index is out of range"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/util",
+      "file": "util.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws/util:uid": {
+    "translations": {
+      "en": "invalid uid `{uid}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/util",
+      "file": "util.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws:invalid_gateway_id": {
+    "translations": {
+      "en": "invalid gateway ID `{id}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws",
+      "file": "ws.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws:no_auth_provided": {
+    "translations": {
+      "en": "no auth provided `{uid}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws",
+      "file": "ws.go"
     }
   },
   "error:pkg/gatewayserver/io:buffer_full": {
@@ -6380,13 +6398,13 @@
       "file": "translation.go"
     }
   },
-  "error:pkg/pfconfig/basicstationlns:frequency_plan": {
+  "error:pkg/pfconfig/lbslns:frequency_plan": {
     "translations": {
       "en": "invalid frequency plan `{name}`"
     },
     "description": {
-      "package": "pkg/pfconfig/basicstationlns",
-      "file": "basicstationlns.go"
+      "package": "pkg/pfconfig/lbslns",
+      "file": "lbslns.go"
     }
   },
   "error:pkg/pfconfig/shared:empty_gateway_server_address": {

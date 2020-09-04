@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package messages
+package util
 
 import (
 	"bytes"
@@ -30,7 +30,7 @@ var (
 	errUID           = errors.DefineInvalidArgument("uid", "invalid uid `{uid}`")
 )
 
-func getInt32AsByteSlice(value int32) ([]byte, error) {
+func GetInt32AsByteSlice(value int32) ([]byte, error) {
 	b := new(bytes.Buffer)
 	err := binary.Write(b, binary.LittleEndian, value)
 	if err != nil {
@@ -39,7 +39,7 @@ func getInt32AsByteSlice(value int32) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func getFCtrlAsUint(fCtrl ttnpb.FCtrl) uint {
+func GetFCtrlAsUint(fCtrl ttnpb.FCtrl) uint {
 	var ret uint
 	if fCtrl.GetADR() {
 		ret = ret | 0x80
@@ -56,7 +56,7 @@ func getFCtrlAsUint(fCtrl ttnpb.FCtrl) uint {
 	return ret
 }
 
-func getDataRateFromIndex(bandID string, index int) (ttnpb.DataRate, bool, error) {
+func GetDataRateFromIndex(bandID string, index int) (ttnpb.DataRate, bool, error) {
 	phy, err := band.GetByID(bandID)
 	if err != nil {
 		return ttnpb.DataRate{}, false, errDataRateIndex.WithCause(err)
@@ -76,7 +76,7 @@ func getDataRateFromIndex(bandID string, index int) (ttnpb.DataRate, bool, error
 	return dr.Rate, false, nil
 }
 
-func getDataRateIndexFromDataRate(bandID string, dr ttnpb.DataRate) (int, error) {
+func GetDataRateIndexFromDataRate(bandID string, dr ttnpb.DataRate) (int, error) {
 	if (dr == ttnpb.DataRate{}) {
 		return 0, errDataRate.New()
 	}

@@ -7396,6 +7396,13 @@
           "type": "string",
           "format": "byte",
           "description": "The client private key. PEM formatted."
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "HTTP headers to use on MQTT-over-Websocket connections."
         }
       },
       "description": "The MQTT provider settings."

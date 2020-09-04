@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package messages
+package lbslns
 
 import (
+	"context"
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
@@ -24,6 +25,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/util"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -51,7 +57,7 @@ type RadioMetaData struct {
 	UpInfo    UpInfo `json:"upinfo"`
 }
 
-// JoinRequest is the LoRaWAN Join Request message from the BasicStation.
+// JoinRequest is the LoRaWAN Join Request message from LoRa Basics Station protocol.
 type JoinRequest struct {
 	MHdr     uint             `json:"MHdr"`
 	JoinEUI  basicstation.EUI `json:"JoinEui"`
@@ -74,7 +80,7 @@ func (req JoinRequest) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// UplinkDataFrame is the LoRaWAN Uplink message from the BasicStation.
+// UplinkDataFrame is the LoRaWAN Uplink message of the LoRa Basics Station protocol.
 type UplinkDataFrame struct {
 	MHdr       uint    `json:"MHdr"`
 	DevAddr    int32   `json:"DevAddr"`
@@ -123,8 +129,8 @@ func (conf TxConfirmation) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// ToUplinkMessage extracts fields from the basic station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
-func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
+// toUplinkMessage extracts fields from the Basics Station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
+func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
 	up.ReceivedAt = receivedAt
 
@@ -133,7 +139,7 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		return nil, errJoinRequestMessage.WithCause(err)
 	}
 
-	micBytes, err := getInt32AsByteSlice(req.MIC)
+	micBytes, err := util.GetInt32AsByteSlice(req.MIC)
 	if err != nil {
 		return nil, errJoinRequestMessage.WithCause(err)
 	}
@@ -172,7 +178,7 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	}
 	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
-	dataRate, isLora, err := getDataRateFromIndex(bandID, req.RadioMetaData.DataRate)
+	dataRate, isLora, err := util.GetDataRateFromIndex(bandID, req.RadioMetaData.DataRate)
 	if err != nil {
 		return nil, errJoinRequestMessage.WithCause(err)
 	}
@@ -193,7 +199,7 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	return &up, nil
 }
 
-// FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the Basic Station Join Request Frame.
+// FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the LoRa Basics Station Join Request Frame.
 func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string) error {
 	var payload ttnpb.Message
 	err := lorawan.UnmarshalMessage(up.RawPayload, &payload)
@@ -221,7 +227,7 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	}
 	req.DevNonce = uint(binary.BigEndian.Uint16(devNonce[:]))
 
-	dr, err := getDataRateIndexFromDataRate(bandID, up.Settings.GetDataRate())
+	dr, err := util.GetDataRateIndexFromDataRate(bandID, up.Settings.GetDataRate())
 	if err != nil {
 		return err
 	}
@@ -247,8 +253,8 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	return nil
 }
 
-// ToUplinkMessage extracts fields from the basic station Uplink Data Frame "updf" message and converts them into an UplinkMessage for the network server.
-func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
+// toUplinkMessage extracts fields from the LoRa Basics Station Uplink Data Frame "updf" message and converts them into an UplinkMessage for the network server.
+func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
 	up.ReceivedAt = receivedAt
 
@@ -260,7 +266,7 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		return nil, errUplinkDataFrame.New()
 	}
 
-	micBytes, err := getInt32AsByteSlice(updf.MIC)
+	micBytes, err := util.GetInt32AsByteSlice(updf.MIC)
 	if err != nil {
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
@@ -330,7 +336,7 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	}
 	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
-	dataRate, isLora, err := getDataRateFromIndex(bandID, updf.RadioMetaData.DataRate)
+	dataRate, isLora, err := util.GetDataRateFromIndex(bandID, updf.RadioMetaData.DataRate)
 	if err != nil {
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
@@ -350,7 +356,7 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	return &up, nil
 }
 
-// FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the Basic Station UplinkDataFrame.
+// FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the LoRa Basics Station UplinkDataFrame.
 func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string) error {
 	var payload ttnpb.Message
 	err := lorawan.UnmarshalMessage(up.RawPayload, &payload)
@@ -369,12 +375,12 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 	updf.DevAddr = int32(macPayload.DevAddr.MarshalNumber())
 	updf.FOpts = hex.EncodeToString(macPayload.GetFOpts())
 
-	updf.FCtrl = getFCtrlAsUint(macPayload.FCtrl)
+	updf.FCtrl = util.GetFCtrlAsUint(macPayload.FCtrl)
 	updf.FCnt = uint(macPayload.GetFCnt())
 	updf.FRMPayload = hex.EncodeToString(macPayload.GetFRMPayload())
 	updf.MIC = int32(binary.LittleEndian.Uint32(payload.MIC[:]))
 
-	dr, err := getDataRateIndexFromDataRate(bandID, up.Settings.GetDataRate())
+	dr, err := util.GetDataRateIndexFromDataRate(bandID, up.Settings.GetDataRate())
 	if err != nil {
 		return err
 	}
@@ -400,10 +406,142 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 	return nil
 }
 
-// ToTxAcknowledgment extracts fields from the basic station TxConfirmation "dntxed" message and converts them into a TxAcknowledgment for the network server.
-func ToTxAcknowledgment(correlationIDs []string) ttnpb.TxAcknowledgment {
-	return ttnpb.TxAcknowledgment{
-		CorrelationIDs: correlationIDs,
-		Result:         ttnpb.TxAcknowledgment_SUCCESS,
+// ToTxAck converts the LoRa Basics Station TxConfirmation message to ttnpb.TxAcknowledgment
+func (conf TxConfirmation) ToTxAck(ctx context.Context, tokens io.DownlinkTokens, receivedAt time.Time) *ttnpb.TxAcknowledgment {
+	var txAck ttnpb.TxAcknowledgment
+	if cids, _, ok := tokens.Get(uint16(conf.Diid), receivedAt); ok {
+		txAck.CorrelationIDs = cids
+		txAck.Result = ttnpb.TxAcknowledgment_SUCCESS
+	} else {
+		logger := log.FromContext(ctx)
+		logger.WithField("diid", conf.Diid).Debug("Tx acknowledgement either does not correspond to a downlink message or arrived too late")
 	}
+	return &txAck
+}
+
+// HandleUp implements Formatter.
+func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time) ([]byte, error) {
+	logger := log.FromContext(ctx)
+	typ, err := Type(raw)
+	if err != nil {
+		logger.WithError(err).Debug("Failed to parse message type")
+		return nil, err
+	}
+	logger = logger.WithFields(log.Fields(
+		"upstream_type", typ,
+	))
+
+	recordTime := func(refTime float64, xTime int64, server time.Time) {
+		sec, nsec := math.Modf(refTime)
+		if sec != 0 {
+			ref := time.Unix(int64(sec), int64(nsec*1e9))
+			conn.RecordRTT(server.Sub(ref), server)
+		}
+		conn.SyncWithGatewayConcentrator(
+			// The concentrator timestamp is the 32 LSB.
+			uint32(xTime&0xFFFFFFFF),
+			server,
+			// The Basic Station epoch is the 48 LSB.
+			scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFF)*time.Microsecond),
+		)
+	}
+
+	switch typ {
+	case TypeUpstreamVersion:
+		ctx, msg, stat, err := f.GetRouterConfig(ctx, raw, conn.BandID(), conn.FrequencyPlans(), receivedAt)
+		logger = log.FromContext(ctx)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to generate router configuration")
+			return nil, err
+		}
+		if err := conn.HandleStatus(stat); err != nil {
+			logger.WithError(err).Warn("Failed to handle status message")
+			return nil, err
+		}
+		return msg, nil
+
+	case TypeUpstreamJoinRequest:
+		var jreq JoinRequest
+		if err := json.Unmarshal(raw, &jreq); err != nil {
+			return nil, err
+		}
+		// TODO: Remove (https://github.com/lorabasics/basicstation/issues/74)
+		if jreq.UpInfo.XTime == 0 {
+			logger.Warn("Received join-request without xtime, drop message")
+			break
+		}
+		up, err := jreq.toUplinkMessage(ids, conn.BandID(), receivedAt)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to parse join request")
+			return nil, err
+		}
+		if err := conn.HandleUp(up); err != nil {
+			logger.WithError(err).Warn("Failed to handle upstream message")
+			return nil, err
+		}
+		session := ws.SessionFromContext(ctx)
+		session.DataMu.Lock()
+		session.Data = State{
+			ID: int32(jreq.UpInfo.XTime >> 48),
+		}
+		session.DataMu.Unlock()
+		recordTime(jreq.RefTime, jreq.UpInfo.XTime, receivedAt)
+
+	case TypeUpstreamUplinkDataFrame:
+		var updf UplinkDataFrame
+		if err := json.Unmarshal(raw, &updf); err != nil {
+			return nil, err
+		}
+		// TODO: Remove (https://github.com/lorabasics/basicstation/issues/74)
+		if updf.UpInfo.XTime == 0 {
+			logger.Warn("Received uplink without xtime, drop message")
+			return nil, nil
+		}
+		up, err := updf.toUplinkMessage(ids, conn.BandID(), receivedAt)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to parse uplink message")
+			return nil, err
+		}
+		if err := conn.HandleUp(up); err != nil {
+			logger.WithError(err).Warn("Failed to handle upstream message")
+			return nil, err
+		}
+		session := ws.SessionFromContext(ctx)
+		session.DataMu.Lock()
+		session.Data = State{
+			ID: int32(updf.UpInfo.XTime >> 48),
+		}
+		session.DataMu.Unlock()
+		recordTime(updf.RefTime, updf.UpInfo.XTime, receivedAt)
+
+	case TypeUpstreamTxConfirmation:
+		var txConf TxConfirmation
+		if err := json.Unmarshal(raw, &txConf); err != nil {
+			return nil, err
+		}
+		txAck := txConf.ToTxAck(ctx, f.tokens, receivedAt)
+		if txAck == nil {
+			break
+		}
+		if err := conn.HandleTxAck(txAck); err != nil {
+			logger.WithError(err).Warn("Failed to handle tx ack message")
+			return nil, err
+		}
+		session := ws.SessionFromContext(ctx)
+		session.DataMu.Lock()
+		session.Data = State{
+			ID: int32(txConf.XTime >> 48),
+		}
+		session.DataMu.Unlock()
+		recordTime(txConf.RefTime, txConf.XTime, receivedAt)
+		return nil, err
+
+	case TypeUpstreamProprietaryDataFrame, TypeUpstreamRemoteShell, TypeUpstreamTimeSync:
+		logger.WithField("message_type", typ).Debug("Message type not implemented")
+		break
+	default:
+		logger.WithField("message_type", typ).Debug("Unknown message type")
+		break
+	}
+	return nil, nil
 }

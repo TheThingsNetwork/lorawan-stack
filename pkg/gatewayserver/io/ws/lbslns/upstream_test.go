@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package messages
+package lbslns
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -250,7 +251,7 @@ func TestJoinRequest(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			msg, err := tc.JoinRequest.ToUplinkMessage(tc.GatewayIDs, tc.BandID, time.Time{})
+			msg, err := tc.JoinRequest.toUplinkMessage(tc.GatewayIDs, tc.BandID, time.Time{})
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -427,7 +428,7 @@ func TestUplinkDataFrame(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			msg, err := tc.UplinkDataFrame.ToUplinkMessage(tc.GatewayIDs, tc.FrequencyPlanID, time.Time{})
+			msg, err := tc.UplinkDataFrame.toUplinkMessage(tc.GatewayIDs, tc.FrequencyPlanID, time.Time{})
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -643,13 +644,19 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 
 func TestTxAck(t *testing.T) {
 	a := assertions.New(t)
+	txConf := TxConfirmation{
+		Diid:    1,
+		RefTime: 0,
+	}
 	correlationIDs := []string{"i3N84kvunPAS8wOmiEKbhsP62wNMRdmn", "deK3h59wUZhR0xb17eumTkauGQxoB5xn"}
-	res := ToTxAcknowledgment(correlationIDs)
-
-	if !a.So(res, should.Resemble, ttnpb.TxAcknowledgment{
+	var lnsLNS lbsLNS
+	now := time.Now()
+	lnsLNS.tokens.Next(correlationIDs, time.Unix(int64(0), 0))
+	txAck := txConf.ToTxAck(context.Background(), lnsLNS.tokens, now)
+	if !a.So(txAck, should.Resemble, &ttnpb.TxAcknowledgment{
 		CorrelationIDs: correlationIDs,
 		Result:         ttnpb.TxAcknowledgment_SUCCESS,
 	}) {
-		t.Fatalf("Unexpected TxAck: %v", res)
+		t.Fatalf("Unexpected TxAck: %v", txAck)
 	}
 }

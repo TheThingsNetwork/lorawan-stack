@@ -1138,6 +1138,8 @@ func (m *ApplicationPubSub_MQTTProvider) ValidateFields(paths ...string) error {
 			// no validation rules for TLSClientCert
 		case "tls_client_key":
 			// no validation rules for TLSClientKey
+		case "headers":
+			// no validation rules for Headers
 		default:
 			return ApplicationPubSub_MQTTProviderValidationError{
 				field:  name,
