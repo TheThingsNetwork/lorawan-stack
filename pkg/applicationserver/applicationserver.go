@@ -120,13 +120,12 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		interopClient: interopCl,
 		interopID:     conf.Interop.ID,
 	}
-	retryIO := io.NewRetryServer(as)
 
 	as.grpc.asDevices = asEndDeviceRegistryServer{
 		AS:       as,
 		kekLabel: conf.DeviceKEKLabel,
 	}
-	as.grpc.appAs = iogrpc.New(retryIO, iogrpc.WithMQTTConfigProvider(as))
+	as.grpc.appAs = iogrpc.New(as, iogrpc.WithMQTTConfigProvider(as))
 
 	ctx, cancel := context.WithCancel(as.Context())
 	defer func() {
@@ -169,7 +168,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 						)
 					}
 					defer lis.Close()
-					return mqtt.Serve(ctx, retryIO, lis, version.Format, endpoint.Protocol())
+					return mqtt.Serve(ctx, as, lis, version.Format, endpoint.Protocol())
 				},
 				Restart: component.TaskRestartOnFailure,
 				Backoff: component.DefaultTaskBackoffConfig,
@@ -189,7 +188,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		return nil, err
 	}
 
-	if as.pubsub, err = conf.PubSub.NewPubSub(c, retryIO); err != nil {
+	if as.pubsub, err = conf.PubSub.NewPubSub(c, as); err != nil {
 		return nil, err
 	}
 
