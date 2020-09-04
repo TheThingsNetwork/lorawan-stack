@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scheduling failure events are now emitted on unsuccessful scheduling attempts.
 - Default Javascript function signatures to `encodeDownlink()`, `decodeUplink()` and `decodeDownlink()`.
 - Default Class B timeout is increased from 1 minute to 10 minutes as was originally intended.
+- Update Go to 1.15
 
 ### Deprecated
 
