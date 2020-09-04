@@ -19,45 +19,35 @@ import (
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// NewSubscriptionSet creates a Distributor that has only one
-// underlying set of subscribers. The lifetime of the Distributor
-// is bound to the one of the provided context.
-func NewSubscriptionSet(ctx context.Context) Distributor {
-	set := &subscriptionSet{
-		ctx:           ctx,
-		subscribeCh:   make(chan *io.Subscription),
-		unsubscribeCh: make(chan *io.Subscription),
-		upCh:          make(chan *io.ContextualApplicationUp),
-	}
-	go set.run()
-	return set
-}
+type set struct {
+	ctx    context.Context
+	cancel errorcontext.CancelFunc
 
-type subscriptionSet struct {
-	ctx context.Context
+	init chan struct{}
 
 	subscribeCh   chan *io.Subscription
 	unsubscribeCh chan *io.Subscription
-
-	upCh chan *io.ContextualApplicationUp
+	upCh          chan *io.ContextualApplicationUp
 }
 
-// Subscribe implements Distributor.
-func (s *subscriptionSet) Subscribe(ctx context.Context, sub *io.Subscription) error {
+// Subscribe creates a subscription for the provided application with the given protocol.
+func (s *set) Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
+	sub := io.NewSubscription(ctx, protocol, &ids)
 	select {
 	case <-s.ctx.Done():
 		// Propagate the subscription set shutdown to the subscription.
 		sub.Disconnect(s.ctx.Err())
-		return s.ctx.Err()
+		return nil, s.ctx.Err()
 	case <-ctx.Done():
 		// Propagate the main context shutdown to the subscription.
 		sub.Disconnect(ctx.Err())
-		return ctx.Err()
+		return nil, ctx.Err()
 	case s.subscribeCh <- sub:
 	}
 	go func() {
@@ -72,11 +62,11 @@ func (s *subscriptionSet) Subscribe(ctx context.Context, sub *io.Subscription) e
 			}
 		}
 	}()
-	return nil
+	return sub, nil
 }
 
-// SendUp implements Distributor.
-func (s *subscriptionSet) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+// SendUp sends the upstream traffic to the subscribers.
+func (s *set) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	ctxUp := &io.ContextualApplicationUp{
 		Context:       ctx,
 		ApplicationUp: up,
@@ -89,7 +79,7 @@ func (s *subscriptionSet) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) e
 	}
 }
 
-func (s *subscriptionSet) run() {
+func (s *set) run() {
 	subscribers := make(map[*io.Subscription]string)
 
 	defer func() {
@@ -121,12 +111,12 @@ func (s *subscriptionSet) run() {
 	}
 }
 
-func (s *subscriptionSet) observeSubscribe(correlationID string, sub *io.Subscription) {
+func (s *set) observeSubscribe(correlationID string, sub *io.Subscription) {
 	registerSubscribe(events.ContextWithCorrelationID(s.ctx, correlationID), sub)
 	log.FromContext(sub.Context()).Debug("Subscribed")
 }
 
-func (s *subscriptionSet) observeUnsubscribe(correlationID string, sub *io.Subscription) {
+func (s *set) observeUnsubscribe(correlationID string, sub *io.Subscription) {
 	registerUnsubscribe(events.ContextWithCorrelationID(s.ctx, correlationID), sub)
 	log.FromContext(sub.Context()).Debug("Unsubscribed")
 }

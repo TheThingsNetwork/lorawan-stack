@@ -16,99 +16,64 @@ package redis
 
 import (
 	"context"
-	"sync"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution"
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
-
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
-// New creates a Distributor using Redis Pub/Sub.
-// This Distributor routes messages based on the application identifiers.
-func New(ctx context.Context, cl *ttnredis.Client) distribution.Distributor {
-	return &distributor{
-		ctx:   ctx,
-		redis: cl,
-	}
+// PubSub is a Redis-based upstream traffic Pub/Sub.
+type PubSub struct {
+	Redis *ttnredis.Client
 }
 
-type distributor struct {
-	ctx   context.Context
-	redis *ttnredis.Client
-
-	sets sync.Map
-}
-
-func (d *distributor) uidUplinkKey(uid string) string {
-	return d.redis.Key("uid", uid, "uplinks")
+func (ps *PubSub) uidUplinkKey(uid string) string {
+	return ps.Redis.Key("uid", uid, "uplinks")
 }
 
 // SendUp publishes the uplink to Pub/Sub.
-func (d *distributor) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+func (ps *PubSub) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	s, err := ttnredis.MarshalProto(up)
 	if err != nil {
 		return err
 	}
 	uid := unique.ID(ctx, up.ApplicationIdentifiers)
-	channel := d.uidUplinkKey(uid)
-	if err = d.redis.Publish(channel, s).Err(); err != nil {
+	ch := ps.uidUplinkKey(uid)
+	if err = ps.Redis.Publish(ch, s).Err(); err != nil {
 		return ttnredis.ConvertError(err)
 	}
 	return nil
 }
 
-func (d *distributor) loadOrCreateSet(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (*set, error) {
+var errChannelClosed = errors.DefineResourceExhausted("channel_closed", "channel closed")
+
+// Subscribe subscribes to the traffic of the provided application and processes it using the handler.
+func (ps *PubSub) Subscribe(ctx context.Context, ids ttnpb.ApplicationIdentifiers, handler func(context.Context, *ttnpb.ApplicationUp) error) error {
 	uid := unique.ID(ctx, ids)
-	s := &set{
-		init: make(chan struct{}),
-	}
-	if existing, loaded := d.sets.LoadOrStore(uid, s); loaded {
-		exists := existing.(*set)
+	ch := ps.uidUplinkKey(uid)
+
+	sub := ps.Redis.Subscribe(ch)
+	defer sub.Close()
+	msgs := sub.Channel()
+
+	for {
 		select {
 		case <-ctx.Done():
-			return nil, ctx.Err()
-		case <-exists.init:
+			return ctx.Err()
+		case msg, ok := <-msgs:
+			if !ok {
+				return errChannelClosed.New()
+			}
+
+			up := &ttnpb.ApplicationUp{}
+			if err := ttnredis.UnmarshalProto(msg.Payload, up); err != nil {
+				return err
+			}
+
+			if err := handler(ctx, up); err != nil {
+				return err
+			}
 		}
-		if exists.initErr != nil {
-			return nil, exists.initErr
-		}
-		return exists, nil
 	}
-
-	var err error
-	defer func() {
-		s.initErr = err
-		close(s.init)
-		if err != nil {
-			d.sets.Delete(uid)
-		}
-	}()
-
-	ctx = log.NewContextWithField(d.ctx, "application_uid", uid)
-	ctx, err = unique.WithContext(ctx, uid)
-	if err != nil {
-		return nil, err
-	}
-
-	channel := d.uidUplinkKey(uid)
-	ps := d.redis.Subscribe(channel)
-	if err = s.setup(ctx, ps); err != nil {
-		return nil, err
-	}
-
-	return s, nil
-}
-
-// Subscribe adds the subscription to the appropriate subscription set.
-// The subscription is automatically removed when cancelled.
-func (d *distributor) Subscribe(ctx context.Context, sub *io.Subscription) error {
-	s, err := d.loadOrCreateSet(ctx, *sub.ApplicationIDs())
-	if err != nil {
-		return err
-	}
-	return s.Subscribe(ctx, sub)
 }
