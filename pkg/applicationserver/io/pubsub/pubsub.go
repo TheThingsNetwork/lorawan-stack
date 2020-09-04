@@ -161,7 +161,12 @@ func (i *integration) handleUp(ctx context.Context) {
 
 func (i *integration) handleDown(ctx context.Context, op func(io.Server, context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error, subscription *pubsub.Subscription) {
 	logger := log.FromContext(ctx)
-	for ctx.Err() == nil {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+		}
 		msg, err := subscription.Receive(ctx)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to receive downlink queue operation")
