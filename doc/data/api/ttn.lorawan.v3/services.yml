@@ -4,6 +4,7 @@ AppAs:
   methods:
     Subscribe:
       name: Subscribe
+      comment: Subscribe to upstream messages.
       input:
         name: ApplicationIdentifiers
       output:
@@ -11,6 +12,7 @@ AppAs:
         stream: true
     DownlinkQueuePush:
       name: DownlinkQueuePush
+      comment: Push downlink messages to the end of the downlink queue.
       input:
         name: DownlinkQueueRequest
       output:
@@ -21,6 +23,9 @@ AppAs:
         path: /as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/push
     DownlinkQueueReplace:
       name: DownlinkQueueReplace
+      comment: |-
+        Replace the entire downlink queue with the specified messages.
+        This can also be used to empty the queue by specifying no messages.
       input:
         name: DownlinkQueueRequest
       output:
@@ -31,6 +36,7 @@ AppAs:
         path: /as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/replace
     DownlinkQueueList:
       name: DownlinkQueueList
+      comment: List the items currently in the downlink queue.
       input:
         name: EndDeviceIdentifiers
       output:
@@ -40,6 +46,7 @@ AppAs:
         path: /as/applications/{application_ids.application_id}/devices/{device_id}/down
     GetMQTTConnectionInfo:
       name: GetMQTTConnectionInfo
+      comment: Get connection information to connect an MQTT client.
       input:
         name: ApplicationIdentifiers
       output:
@@ -49,6 +56,7 @@ AppAs:
         path: /as/applications/{application_id}/mqtt-connection-info
     SimulateUplink:
       name: SimulateUplink
+      comment: Simulate an upstream message. This can be used to test integrations.
       input:
         name: ApplicationUp
       output:
@@ -465,6 +473,9 @@ As:
   methods:
     GetLink:
       name: GetLink
+      comment: |-
+        Get a link configuration from the Application Server to Network Server.
+        This only contains the configuration. Use GetLinkStats to view statistics and any link errors.
       input:
         name: GetApplicationLinkRequest
       output:
@@ -477,7 +488,8 @@ As:
       comment: |-
         Set a link configuration from the Application Server a Network Server.
         This call returns immediately after setting the link configuration; it does not wait for a link to establish.
-        To get link statistics or errors, use the `GetLinkStats` call.
+        To get link statistics or errors, use GetLinkStats.
+        Note that there can only be one Application Server instance linked to a Network Server for a given application at a time.
       input:
         name: SetApplicationLinkRequest
       output:
@@ -487,6 +499,7 @@ As:
         path: /as/applications/{application_ids.application_id}/link
     DeleteLink:
       name: DeleteLink
+      comment: Delete the link between the Application Server and Network Server for the specified application.
       input:
         name: ApplicationIdentifiers
       output:
@@ -1242,7 +1255,7 @@ GtwGs:
   methods:
     LinkGateway:
       name: LinkGateway
-      comment: Link the gateway to the Gateway Server.
+      comment: Link a gateway to the Gateway Server for streaming upstream messages and downstream messages.
       input:
         name: GatewayUp
         stream: true
@@ -1251,7 +1264,7 @@ GtwGs:
         stream: true
     GetConcentratorConfig:
       name: GetConcentratorConfig
-      comment: GetConcentratorConfig associated to the gateway.
+      comment: Get configuration for the concentrator.
       input:
         package: google.protobuf
         name: Empty
@@ -1259,7 +1272,7 @@ GtwGs:
         name: ConcentratorConfig
     GetMQTTConnectionInfo:
       name: GetMQTTConnectionInfo
-      comment: Get the MQTT server address and the username for the gateway.
+      comment: Get connection information to connect an MQTT gateway.
       input:
         name: GatewayIdentifiers
       output:
@@ -1269,7 +1282,7 @@ GtwGs:
         path: /gs/gateways/{gateway_id}/mqtt-connection-info
     GetMQTTV2ConnectionInfo:
       name: GetMQTTV2ConnectionInfo
-      comment: Get the MQTTV2 server address and the username for the gateway.
+      comment: Get legacy connection information to connect a The Things Network Stack V2 MQTT gateway.
       input:
         name: GatewayIdentifiers
       output:
@@ -1481,7 +1494,7 @@ NsGs:
     ScheduleDownlink:
       name: ScheduleDownlink
       comment: |-
-        ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
+        Instructs the Gateway Server to schedule a downlink message.
         The Gateway Server may refuse if there are any conflicts in the schedule or
         if a duty cycle prevents the gateway from transmitting.
       input:
