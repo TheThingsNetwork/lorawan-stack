@@ -262,9 +262,8 @@ func TestApplicationServer(t *testing.T) {
 		},
 	})
 	config := &applicationserver.Config{
-		LinkMode: "all",
-		Devices:  deviceRegistry,
-		Links:    linkRegistry,
+		Devices: deviceRegistry,
+		Links:   linkRegistry,
 		MQTT: config.MQTT{
 			Listen: ":1883",
 		},
@@ -2243,9 +2242,8 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		},
 	})
 	config := &applicationserver.Config{
-		LinkMode: "all",
-		Devices:  deviceRegistry,
-		Links:    linkRegistry,
+		Devices: deviceRegistry,
+		Links:   linkRegistry,
 	}
 	as, err := applicationserver.New(c, config)
 	if !a.So(err, should.BeNil) {

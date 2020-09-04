@@ -19,8 +19,6 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -46,11 +44,6 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 	if err != nil {
 		return nil, err
 	}
-	if err := as.cancelLink(ctx, req.ApplicationIdentifiers); err != nil && !errors.IsNotFound(err) {
-		log.FromContext(ctx).WithError(err).Warn("Failed to cancel link")
-	}
-	as.startLinkTask(as.Context(), req.ApplicationIdentifiers)
-
 	res := &ttnpb.ApplicationLink{}
 	if err := res.SetFields(link, req.FieldMask.Paths...); err != nil {
 		return nil, err
@@ -62,9 +55,6 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 func (as *ApplicationServer) DeleteLink(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
 	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
-	}
-	if err := as.cancelLink(ctx, *ids); err != nil && !errors.IsNotFound(err) {
-		log.FromContext(ctx).WithError(err).Warn("Failed to cancel link")
 	}
 	_, err := as.linkRegistry.Set(ctx, *ids, nil, func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) { return nil, nil, nil })
 	if err != nil {
@@ -78,23 +68,6 @@ func (as *ApplicationServer) GetLinkStats(ctx context.Context, ids *ttnpb.Applic
 	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
 	}
-
-	link, err := as.getLink(ctx, *ids)
-	if err != nil {
-		return nil, err
-	}
-
-	stats := &ttnpb.ApplicationLinkStats{}
-	lt := link.GetLinkTime()
-	stats.LinkedAt = &lt
-	stats.NetworkServerAddress = link.NetworkServerAddress
-	if n, t, ok := link.GetUpStats(); ok {
-		stats.UpCount = n
-		stats.LastUpReceivedAt = &t
-	}
-	if n, t, ok := link.GetDownlinkStats(); ok {
-		stats.DownlinkCount = n
-		stats.LastDownlinkForwardedAt = &t
-	}
-	return stats, nil
+	// TODO: Do we return a deprecated error ?
+	return &ttnpb.ApplicationLinkStats{}, nil
 }
