@@ -151,7 +151,8 @@ func (i *integration) handleUp(ctx context.Context) {
 			})
 			if err != nil {
 				logger.WithError(err).Warn("Failed to publish upstream message")
-				continue
+				i.cancel(err)
+				return
 			}
 			logger.Debug("Publish upstream message")
 		}
@@ -164,7 +165,8 @@ func (i *integration) handleDown(ctx context.Context, op func(io.Server, context
 		msg, err := subscription.Receive(ctx)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to receive downlink queue operation")
-			continue
+			i.cancel(err)
+			return
 		}
 		msg.Ack()
 		operation, err := i.format.ToDownlinkQueueRequest(msg.Body)
