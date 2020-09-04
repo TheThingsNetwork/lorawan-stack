@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/types"
+	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -77,17 +78,33 @@ func (as *ApplicationServer) GetLinkStats(ctx context.Context, ids *ttnpb.Applic
 }
 
 func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHandleUplinkRequest) (*types.Empty, error) {
+	if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
 	for _, up := range req.ApplicationUplinks {
 		ctx := events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
 		logger := log.FromContext(ctx)
 		up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
 		// TODO: How can we use the caller name here ?
+		// Maybe as part of the request ?
 		registerReceiveUp(ctx, up, "replace-me")
 
 		now := time.Now().UTC()
 		up.ReceivedAt = &now
 
-		pass, err := as.handleUp(ctx, up, nil)
+		// TODO: Maybe the request should be homogenous (and include the appID) ?
+		// Otherwise we probably want to cache the link while processing.
+		link, err := as.linkRegistry.Get(ctx, up.ApplicationIdentifiers, []string{
+			"default_formatters",
+			"skip_payload_crypto",
+		})
+		if err != nil {
+			logger.WithError(err).Warn("Failed to retrieve link")
+			registerDropUp(ctx, up, err)
+			continue
+		}
+
+		pass, err := as.handleUp(ctx, up, link)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to process upstream message")
 			registerDropUp(ctx, up, err)

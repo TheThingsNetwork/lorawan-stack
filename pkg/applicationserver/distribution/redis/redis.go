@@ -28,12 +28,12 @@ type PubSub struct {
 	Redis *ttnredis.Client
 }
 
-func (ps *PubSub) uidUplinkKey(uid string) string {
+func (ps PubSub) uidUplinkKey(uid string) string {
 	return ps.Redis.Key("uid", uid, "uplinks")
 }
 
 // SendUp publishes the uplink to Pub/Sub.
-func (ps *PubSub) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+func (ps PubSub) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	s, err := ttnredis.MarshalProto(up)
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func (ps *PubSub) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
 var errChannelClosed = errors.DefineResourceExhausted("channel_closed", "channel closed")
 
 // Subscribe subscribes to the traffic of the provided application and processes it using the handler.
-func (ps *PubSub) Subscribe(ctx context.Context, ids ttnpb.ApplicationIdentifiers, handler func(context.Context, *ttnpb.ApplicationUp) error) error {
+func (ps PubSub) Subscribe(ctx context.Context, ids ttnpb.ApplicationIdentifiers, handler func(context.Context, *ttnpb.ApplicationUp) error) error {
 	uid := unique.ID(ctx, ids)
 	ch := ps.uidUplinkKey(uid)
 

@@ -34,6 +34,7 @@ import (
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
@@ -45,6 +46,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/cayennelpp"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/javascript"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc"
@@ -198,6 +200,8 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		as.defaultSubscribers = append(as.defaultSubscribers, as.appPackages.NewSubscription())
 		c.RegisterGRPC(as.appPackages)
 	}
+
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsAs", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(as)
 	return as, nil
