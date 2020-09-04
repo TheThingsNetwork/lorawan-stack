@@ -1593,68 +1593,6 @@ func MustCreateDevices(ctx context.Context, r DeviceRegistry, devs ...SetDeviceR
 	return setDevices
 }
 
-var _ ApplicationUplinkQueue = MockApplicationUplinkQueue{}
-
-// MockApplicationUplinkQueue is a mock ApplicationUplinkQueue used for testing.
-type MockApplicationUplinkQueue struct {
-	AddFunc       func(ctx context.Context, ups ...*ttnpb.ApplicationUp) error
-	SubscribeFunc func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f func(context.Context, *ttnpb.ApplicationUp) error) error
-}
-
-// Add calls AddFunc if set and panics otherwise.
-func (m MockApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.ApplicationUp) error {
-	if m.AddFunc == nil {
-		panic("Add called, but not set")
-	}
-	return m.AddFunc(ctx, ups...)
-}
-
-// Subscribe calls SubscribeFunc if set and panics otherwise.
-func (m MockApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f func(context.Context, *ttnpb.ApplicationUp) error) error {
-	if m.SubscribeFunc == nil {
-		panic("Subscribe called, but not set")
-	}
-	return m.SubscribeFunc(ctx, appID, f)
-}
-
-type ApplicationUplinkQueueAddRequest struct {
-	Context  context.Context
-	Uplinks  []*ttnpb.ApplicationUp
-	Response chan<- error
-}
-
-func MakeApplicationUplinkQueueAddChFunc(reqCh chan<- ApplicationUplinkQueueAddRequest) func(context.Context, ...*ttnpb.ApplicationUp) error {
-	return func(ctx context.Context, ups ...*ttnpb.ApplicationUp) error {
-		respCh := make(chan error)
-		reqCh <- ApplicationUplinkQueueAddRequest{
-			Context:  ctx,
-			Uplinks:  ups,
-			Response: respCh,
-		}
-		return <-respCh
-	}
-}
-
-type ApplicationUplinkQueueSubscribeRequest struct {
-	Context     context.Context
-	Identifiers ttnpb.ApplicationIdentifiers
-	Func        func(context.Context, *ttnpb.ApplicationUp) error
-	Response    chan<- error
-}
-
-func MakeApplicationUplinkQueueSubscribeChFunc(reqCh chan<- ApplicationUplinkQueueSubscribeRequest) func(context.Context, ttnpb.ApplicationIdentifiers, func(context.Context, *ttnpb.ApplicationUp) error) error {
-	return func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f func(context.Context, *ttnpb.ApplicationUp) error) error {
-		respCh := make(chan error)
-		reqCh <- ApplicationUplinkQueueSubscribeRequest{
-			Context:     ctx,
-			Identifiers: appID,
-			Func:        f,
-			Response:    respCh,
-		}
-		return <-respCh
-	}
-}
-
 var _ DownlinkTaskQueue = MockDownlinkTaskQueue{}
 
 // MockDownlinkTaskQueue is a mock DownlinkTaskQueue used for testing.
@@ -1679,68 +1617,18 @@ func (m MockDownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, 
 	return m.PopFunc(ctx, f)
 }
 
-type DownlinkTaskAddRequest struct {
-	Context     context.Context
-	Identifiers ttnpb.EndDeviceIdentifiers
-	Time        time.Time
-	Replace     bool
-	Response    chan<- error
-}
-
-func MakeDownlinkTaskAddChFunc(reqCh chan<- DownlinkTaskAddRequest) func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) error {
-	return func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error {
-		respCh := make(chan error)
-		reqCh <- DownlinkTaskAddRequest{
-			Context:     ctx,
-			Identifiers: devID,
-			Time:        t,
-			Replace:     replace,
-			Response:    respCh,
-		}
-		return <-respCh
-	}
-}
-
-type DownlinkTaskPopRequest struct {
-	Context  context.Context
-	Func     func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error
-	Response chan<- error
-}
-
-func MakeDownlinkTaskPopChFunc(reqCh chan<- DownlinkTaskPopRequest) func(context.Context, func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
-	return func(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
-		respCh := make(chan error)
-		reqCh <- DownlinkTaskPopRequest{
-			Context:  ctx,
-			Func:     f,
-			Response: respCh,
-		}
-		return <-respCh
-	}
-}
-
-// DownlinkTaskPopBlockFunc is DownlinkTasks.Pop function, which blocks until context is done and returns nil.
-func DownlinkTaskPopBlockFunc(ctx context.Context, _ func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
-	<-ctx.Done()
-	return nil
-}
-
 var _ DeviceRegistry = MockDeviceRegistry{}
 
 // MockDeviceRegistry is a mock DeviceRegistry used for testing.
 type MockDeviceRegistry struct {
-	GetByEUIFunc    func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, context.Context, error)
 	GetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
-	RangeByAddrFunc func(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error
 	SetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
+	RangeByAddrFunc func(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error
 }
 
-// GetByEUI calls GetByEUIFunc if set and panics otherwise.
+// GetByEUI panics.
 func (m MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, context.Context, error) {
-	if m.GetByEUIFunc == nil {
-		panic("GetByEUI called, but not set")
-	}
-	return m.GetByEUIFunc(ctx, joinEUI, devEUI, paths)
+	panic("GetByEUI must not be called")
 }
 
 // GetByID calls GetByIDFunc if set and panics otherwise.
@@ -1765,117 +1653,6 @@ func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.Application
 		panic("SetByID called, but not set")
 	}
 	return m.SetByIDFunc(ctx, appID, devID, paths, f)
-}
-
-type contextualDeviceAndError struct {
-	Device  *ttnpb.EndDevice
-	Context context.Context
-	Error   error
-}
-
-type DeviceRegistryGetByEUIResponse contextualDeviceAndError
-
-type DeviceRegistryGetByEUIRequest struct {
-	Context  context.Context
-	JoinEUI  types.EUI64
-	DevEUI   types.EUI64
-	Paths    []string
-	Response chan<- DeviceRegistryGetByEUIResponse
-}
-
-func MakeDeviceRegistryGetByEUIChFunc(reqCh chan<- DeviceRegistryGetByEUIRequest) func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.EndDevice, context.Context, error) {
-	return func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, context.Context, error) {
-		respCh := make(chan DeviceRegistryGetByEUIResponse)
-		reqCh <- DeviceRegistryGetByEUIRequest{
-			Context:  ctx,
-			JoinEUI:  joinEUI,
-			DevEUI:   devEUI,
-			Paths:    paths,
-			Response: respCh,
-		}
-		resp := <-respCh
-		return resp.Device, resp.Context, resp.Error
-	}
-}
-
-type DeviceRegistryGetByIDResponse contextualDeviceAndError
-
-type DeviceRegistryGetByIDRequest struct {
-	Context                context.Context
-	ApplicationIdentifiers ttnpb.ApplicationIdentifiers
-	DeviceID               string
-	Paths                  []string
-	Response               chan<- DeviceRegistryGetByIDResponse
-}
-
-func MakeDeviceRegistryGetByIDChFunc(reqCh chan<- DeviceRegistryGetByIDRequest) func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, context.Context, error) {
-	return func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
-		respCh := make(chan DeviceRegistryGetByIDResponse)
-		reqCh <- DeviceRegistryGetByIDRequest{
-			Context:                ctx,
-			ApplicationIdentifiers: appID,
-			DeviceID:               devID,
-			Paths:                  paths,
-			Response:               respCh,
-		}
-		resp := <-respCh
-		return resp.Device, resp.Context, resp.Error
-	}
-}
-
-type DeviceRegistryRangeByAddrRequest struct {
-	Context  context.Context
-	DevAddr  types.DevAddr
-	Paths    []string
-	Func     func(context.Context, *ttnpb.EndDevice) bool
-	Response chan<- error
-}
-
-func MakeDeviceRegistryRangeByAddrChFunc(reqCh chan<- DeviceRegistryRangeByAddrRequest) func(context.Context, types.DevAddr, []string, func(context.Context, *ttnpb.EndDevice) bool) error {
-	return func(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error {
-		respCh := make(chan error)
-		reqCh <- DeviceRegistryRangeByAddrRequest{
-			Context:  ctx,
-			DevAddr:  devAddr,
-			Paths:    paths,
-			Func:     f,
-			Response: respCh,
-		}
-		return <-respCh
-	}
-}
-
-type DeviceRegistrySetByIDResponse contextualDeviceAndError
-
-type DeviceRegistrySetByIDRequest struct {
-	Context                context.Context
-	ApplicationIdentifiers ttnpb.ApplicationIdentifiers
-	DeviceID               string
-	Paths                  []string
-	Func                   func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)
-	Response               chan<- DeviceRegistrySetByIDResponse
-}
-
-func MakeDeviceRegistrySetByIDChFunc(reqCh chan<- DeviceRegistrySetByIDRequest) func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-	return func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-		respCh := make(chan DeviceRegistrySetByIDResponse)
-		reqCh <- DeviceRegistrySetByIDRequest{
-			Context:                ctx,
-			ApplicationIdentifiers: appID,
-			DeviceID:               devID,
-			Paths:                  paths,
-			Func:                   f,
-			Response:               respCh,
-		}
-		resp := <-respCh
-		return resp.Device, resp.Context, resp.Error
-	}
-}
-
-type DeviceRegistrySetByIDRequestFuncResponse struct {
-	Device *ttnpb.EndDevice
-	Paths  []string
-	Error  error
 }
 
 var _ UplinkDeduplicator = &MockUplinkDeduplicator{}
@@ -1951,29 +1728,6 @@ func MakeUplinkDeduplicatorAccumulatedMetadataChFunc(reqCh chan<- UplinkDeduplic
 	}
 }
 
-func AssertDownlinkTaskAddRequest(ctx context.Context, reqCh <-chan DownlinkTaskAddRequest, assert func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) bool, resp error) bool {
-	t := test.MustTFromContext(ctx)
-	t.Helper()
-	select {
-	case <-ctx.Done():
-		t.Error("Timed out while waiting for DownlinkTasks.Add to be called")
-		return false
-
-	case req := <-reqCh:
-		if !assert(req.Context, req.Identifiers, req.Time, req.Replace) {
-			return false
-		}
-		select {
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for DownlinkTasks.Add response to be processed")
-			return false
-
-		case req.Response <- resp:
-			return true
-		}
-	}
-}
-
 func AssertDeduplicateUplink(ctx context.Context, reqCh <-chan UplinkDeduplicatorDeduplicateUplinkRequest, assert func(context.Context, *ttnpb.UplinkMessage, time.Duration) bool, resp UplinkDeduplicatorDeduplicateUplinkResponse) bool {
 	t := test.MustTFromContext(ctx)
 	t.Helper()
@@ -2012,98 +1766,6 @@ func AssertAccumulatedMetadata(ctx context.Context, reqCh <-chan UplinkDeduplica
 		select {
 		case <-ctx.Done():
 			t.Error("Timed out while waiting for UplinkDeduplicator.AccumulatedMetadata response to be processed")
-			return false
-
-		case req.Response <- resp:
-			return true
-		}
-	}
-}
-
-func AssertDeviceRegistryGetByEUI(ctx context.Context, reqCh <-chan DeviceRegistryGetByEUIRequest, assert func(context.Context, types.EUI64, types.EUI64, []string) bool, respFunc func(context.Context) DeviceRegistryGetByEUIResponse) bool {
-	t := test.MustTFromContext(ctx)
-	t.Helper()
-	select {
-	case <-ctx.Done():
-		t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
-		return false
-
-	case req := <-reqCh:
-		if !assert(req.Context, req.JoinEUI, req.DevEUI, req.Paths) {
-			return false
-		}
-		select {
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for DeviceRegistry.GetByEUI response to be processed")
-			return false
-
-		case req.Response <- respFunc(req.Context):
-			return true
-		}
-	}
-}
-
-func AssertDeviceRegistrySetByID(ctx context.Context, reqCh <-chan DeviceRegistrySetByIDRequest, assert func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) bool, respFunc func(context.Context) DeviceRegistrySetByIDResponse) bool {
-	t := test.MustTFromContext(ctx)
-	t.Helper()
-	select {
-	case <-ctx.Done():
-		t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
-		return false
-
-	case req := <-reqCh:
-		if !assert(req.Context, req.ApplicationIdentifiers, req.DeviceID, req.Paths, req.Func) {
-			return false
-		}
-		select {
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
-			return false
-
-		case req.Response <- respFunc(req.Context):
-			return true
-		}
-	}
-}
-
-func AssertDeviceRegistryRangeByAddr(ctx context.Context, reqCh <-chan DeviceRegistryRangeByAddrRequest, assert func(context.Context, types.DevAddr, []string, func(context.Context, *ttnpb.EndDevice) bool) bool, resp error) bool {
-	t := test.MustTFromContext(ctx)
-	t.Helper()
-	select {
-	case <-ctx.Done():
-		t.Error("Timed out while waiting for DeviceRegistry.RangeByAddr to be called")
-		return false
-
-	case req := <-reqCh:
-		if !assert(req.Context, req.DevAddr, req.Paths, req.Func) {
-			return false
-		}
-		select {
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for DeviceRegistry.RangeByAddr response to be processed")
-			return false
-
-		case req.Response <- resp:
-			return true
-		}
-	}
-}
-
-func AssertApplicationUplinkQueueAddRequest(ctx context.Context, reqCh <-chan ApplicationUplinkQueueAddRequest, assert func(context.Context, ...*ttnpb.ApplicationUp) bool, resp error) bool {
-	t := test.MustTFromContext(ctx)
-	t.Helper()
-	select {
-	case <-ctx.Done():
-		t.Error("Timed out while waiting for ApplicationUplinkQueue.Add to be called")
-		return false
-
-	case req := <-reqCh:
-		if !assert(req.Context, req.Uplinks...) {
-			return false
-		}
-		select {
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for ApplicationUplinkQueue.Add response to be processed")
 			return false
 
 		case req.Response <- resp:

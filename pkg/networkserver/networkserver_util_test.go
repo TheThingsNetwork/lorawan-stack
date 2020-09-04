@@ -129,92 +129,6 @@ func NewRedisUplinkDeduplicator(t testing.TB) (UplinkDeduplicator, func()) {
 		}
 }
 
-type DeviceRegistryEnvironment struct {
-	GetByID     <-chan DeviceRegistryGetByIDRequest
-	GetByEUI    <-chan DeviceRegistryGetByEUIRequest
-	RangeByAddr <-chan DeviceRegistryRangeByAddrRequest
-	SetByID     <-chan DeviceRegistrySetByIDRequest
-}
-
-func newMockDeviceRegistry(t *testing.T) (DeviceRegistry, DeviceRegistryEnvironment, func()) {
-	t.Helper()
-
-	getByEUICh := make(chan DeviceRegistryGetByEUIRequest)
-	getByIDCh := make(chan DeviceRegistryGetByIDRequest)
-	rangeByAddrCh := make(chan DeviceRegistryRangeByAddrRequest)
-	setByIDCh := make(chan DeviceRegistrySetByIDRequest)
-	return &MockDeviceRegistry{
-			GetByEUIFunc:    MakeDeviceRegistryGetByEUIChFunc(getByEUICh),
-			GetByIDFunc:     MakeDeviceRegistryGetByIDChFunc(getByIDCh),
-			RangeByAddrFunc: MakeDeviceRegistryRangeByAddrChFunc(rangeByAddrCh),
-			SetByIDFunc:     MakeDeviceRegistrySetByIDChFunc(setByIDCh),
-		}, DeviceRegistryEnvironment{
-			GetByEUI:    getByEUICh,
-			GetByID:     getByIDCh,
-			RangeByAddr: rangeByAddrCh,
-			SetByID:     setByIDCh,
-		},
-		func() {
-			select {
-			case <-getByEUICh:
-				t.Error("DeviceRegistry.GetByEUI call missed")
-			default:
-				close(getByEUICh)
-			}
-			select {
-			case <-getByIDCh:
-				t.Error("DeviceRegistry.GetByID call missed")
-			default:
-				close(getByIDCh)
-			}
-			select {
-			case <-rangeByAddrCh:
-				t.Error("DeviceRegistry.RangeByAddr call missed")
-			default:
-				close(rangeByAddrCh)
-			}
-			select {
-			case <-setByIDCh:
-				t.Error("DeviceRegistry.SetByID call missed")
-			default:
-				close(setByIDCh)
-			}
-		}
-}
-
-type DownlinkTaskQueueEnvironment struct {
-	Add <-chan DownlinkTaskAddRequest
-	Pop <-chan DownlinkTaskPopRequest
-}
-
-func newMockDownlinkTaskQueue(t *testing.T) (DownlinkTaskQueue, DownlinkTaskQueueEnvironment, func()) {
-	t.Helper()
-
-	addCh := make(chan DownlinkTaskAddRequest)
-	popCh := make(chan DownlinkTaskPopRequest)
-	return &MockDownlinkTaskQueue{
-			AddFunc: MakeDownlinkTaskAddChFunc(addCh),
-			PopFunc: MakeDownlinkTaskPopChFunc(popCh),
-		}, DownlinkTaskQueueEnvironment{
-			Add: addCh,
-			Pop: popCh,
-		},
-		func() {
-			select {
-			case <-addCh:
-				t.Error("DownlinkTaskQueue.Add call missed")
-			default:
-				close(addCh)
-			}
-			select {
-			case <-popCh:
-				t.Error("DownlinkTaskQueue.Pop call missed")
-			default:
-				close(popCh)
-			}
-		}
-}
-
 type UplinkDeduplicatorEnvironment struct {
 	DeduplicateUplink   <-chan UplinkDeduplicatorDeduplicateUplinkRequest
 	AccumulatedMetadata <-chan UplinkDeduplicatorAccumulatedMetadataRequest
@@ -244,39 +158,6 @@ func newMockUplinkDeduplicator(t *testing.T) (UplinkDeduplicator, UplinkDeduplic
 				t.Error("UplinkDeduplicator.AccumulatedMetadata call missed")
 			default:
 				close(accumulatedMetadataCh)
-			}
-		}
-}
-
-type ApplicationUplinkQueueEnvironment struct {
-	Add       <-chan ApplicationUplinkQueueAddRequest
-	Subscribe <-chan ApplicationUplinkQueueSubscribeRequest
-}
-
-func newMockApplicationUplinkQueue(t *testing.T) (ApplicationUplinkQueue, ApplicationUplinkQueueEnvironment, func()) {
-	t.Helper()
-
-	addCh := make(chan ApplicationUplinkQueueAddRequest)
-	subscribeCh := make(chan ApplicationUplinkQueueSubscribeRequest)
-	return &MockApplicationUplinkQueue{
-			AddFunc:       MakeApplicationUplinkQueueAddChFunc(addCh),
-			SubscribeFunc: MakeApplicationUplinkQueueSubscribeChFunc(subscribeCh),
-		}, ApplicationUplinkQueueEnvironment{
-			Add:       addCh,
-			Subscribe: subscribeCh,
-		},
-		func() {
-			select {
-			case <-addCh:
-				t.Error("ApplicationUplinkQueue.Add call missed")
-			default:
-				close(addCh)
-			}
-			select {
-			case <-subscribeCh:
-				t.Error("ApplicationUplinkQueue.Subscribe call missed")
-			default:
-				close(subscribeCh)
 			}
 		}
 }
