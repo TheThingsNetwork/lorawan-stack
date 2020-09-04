@@ -20362,15 +20362,7 @@
               "longType": "ApplicationDownlink",
               "fullType": "ttn.lorawan.v3.ApplicationDownlink",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "repeated.min_items",
-                    "value": 1
-                  }
-                ]
-              }
+              "defaultValue": ""
             },
             {
               "name": "last_f_cnt_down",

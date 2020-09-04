@@ -4989,12 +4989,6 @@ Encodes and decodes uplink messages.
 | `downlinks` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) | repeated |  |
 | `last_f_cnt_down` | [`uint32`](#uint32) |  |  |
 
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `downlinks` | <p>`repeated.min_items`: `1`</p> |
-
 ### <a name="ttn.lorawan.v3.ApplicationJoinAccept">Message `ApplicationJoinAccept`</a>
 
 | Field | Type | Label | Description |

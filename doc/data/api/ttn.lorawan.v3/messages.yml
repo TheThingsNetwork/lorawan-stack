@@ -243,8 +243,6 @@ ApplicationInvalidatedDownlinks:
   name: ApplicationInvalidatedDownlinks
   fields:
   - name: downlinks
-    rules:
-      min_items: 1
     repeated:
       message:
         name: ApplicationDownlink
