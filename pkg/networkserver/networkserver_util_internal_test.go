@@ -1478,7 +1478,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 					Rx1Delay:      ttnpb.RxDelay(phy.JoinAcceptDelay1.Seconds()),
 					Rx1DataRateIndex: test.Must(phy.Rx1DataRate(
 						up.Settings.DataRateIndex,
-						uint32(dev.PendingMACState.CurrentParameters.Rx1DataRateOffset),
+						dev.PendingMACState.CurrentParameters.Rx1DataRateOffset,
 						dev.PendingMACState.CurrentParameters.DownlinkDwellTime.GetValue()),
 					).(ttnpb.DataRateIndex),
 					Rx1Frequency:     phy.DownlinkChannels[test.Must(phy.Rx1Channel(uint8(up.DeviceChannelIndex))).(uint8)].Frequency,
