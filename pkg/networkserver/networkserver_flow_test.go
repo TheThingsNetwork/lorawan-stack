@@ -173,23 +173,18 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 			t.Fatal("Failed to apply CFList")
 			return
 		}
+		dev.PendingMACState.CurrentParameters.Channels = deviceChannels
 		upChIdx := uint8(2)
 		upDRIdx := ttnpb.DATA_RATE_1
-		upConf := DataUplinkConfig{
+		upConf := WithDeviceDataUplinkConfig(dev, true, upDRIdx, upChIdx, 0)(DataUplinkConfig{
 			Confirmed:      true,
-			MACVersion:     macVersion,
-			DevAddr:        dev.PendingMACState.PendingJoinRequest.DevAddr,
 			FCtrl:          ttnpb.FCtrl{ADR: true},
 			FPort:          0x42,
 			FRMPayload:     []byte("test"),
 			FOpts:          MakeUplinkMACBuffer(phy, upCmders...),
-			DataRate:       phy.DataRates[upDRIdx].Rate,
-			DataRateIndex:  upDRIdx,
-			Frequency:      deviceChannels[upChIdx].UplinkFrequency,
-			ChannelIndex:   upChIdx,
 			RxMetadata:     RxMetadata[:2],
 			CorrelationIDs: []string{"GsNs-data-0"},
-		}
+		})
 		start := time.Now()
 		if !a.So(env.AssertHandleDataUplink(
 			ctx,

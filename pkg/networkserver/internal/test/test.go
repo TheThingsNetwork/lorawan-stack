@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package test contains testing utilities usable by all subpackages of networkserver including itself.
 package test
 
 import (
@@ -486,9 +487,11 @@ type DataUplinkConfig struct {
 	RxMetadata     []*ttnpb.RxMetadata
 	CorrelationIDs []string
 	ReceivedAt     time.Time
+
+	SessionKeys *ttnpb.SessionKeys
 }
 
-func WithDeviceDataUplinkConfig(dev *ttnpb.EndDevice, pending bool, drIdx ttnpb.DataRateIndex, chIdx uint8, lostFrames uint32) func(DataUplinkConfig) DataUplinkConfig {
+func WithDeviceDataUplinkConfig(dev *ttnpb.EndDevice, pending bool, drIdx ttnpb.DataRateIndex, chIdx uint8, fCntDelta uint32) func(DataUplinkConfig) DataUplinkConfig {
 	session := dev.Session
 	macState := dev.MACState
 	if pending {
@@ -498,9 +501,12 @@ func WithDeviceDataUplinkConfig(dev *ttnpb.EndDevice, pending bool, drIdx ttnpb.
 	return func(conf DataUplinkConfig) DataUplinkConfig {
 		conf.MACVersion = macState.LoRaWANVersion
 		conf.DevAddr = session.DevAddr
-		conf.FCnt = session.LastFCntUp + 1 + lostFrames
+		conf.FCnt = session.LastFCntUp + fCntDelta
 		conf.DataRate = LoRaWANBands[FrequencyPlan(dev.FrequencyPlanID).BandID][dev.LoRaWANPHYVersion].DataRates[drIdx].Rate
+		conf.DataRateIndex = drIdx
 		conf.Frequency = macState.CurrentParameters.Channels[chIdx].UplinkFrequency
+		conf.ChannelIndex = chIdx
+		conf.SessionKeys = &session.SessionKeys
 		return conf
 	}
 }
@@ -509,8 +515,37 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 	if !conf.FCtrl.Ack && conf.ConfFCntDown > 0 {
 		panic("ConfFCntDown must be zero for uplink frames with ACK bit unset")
 	}
+	var keys ttnpb.SessionKeys
+	if conf.SessionKeys == nil {
+		keys = *MakeSessionKeys(conf.MACVersion, false)
+	} else {
+		decrypt := func(ke *ttnpb.KeyEnvelope) *types.AES128Key {
+			switch {
+			case ke == nil:
+				return nil
+			case ke.Key != nil:
+				return ke.Key
+			case len(ke.EncryptedKey) > 0:
+				k := &types.AES128Key{}
+				test.Must(nil, k.UnmarshalBinary(ke.EncryptedKey))
+				return k
+			default:
+				return nil
+			}
+		}
+		keys = ttnpb.SessionKeys{
+			FNwkSIntKey: &ttnpb.KeyEnvelope{
+				Key: decrypt(conf.SessionKeys.FNwkSIntKey),
+			},
+			SNwkSIntKey: &ttnpb.KeyEnvelope{
+				Key: decrypt(conf.SessionKeys.SNwkSIntKey),
+			},
+			NwkSEncKey: &ttnpb.KeyEnvelope{
+				Key: decrypt(conf.SessionKeys.NwkSEncKey),
+			},
+		}
+	}
 	devAddr := *conf.DevAddr.Copy(&types.DevAddr{})
-	keys := MakeSessionKeys(conf.MACVersion, false)
 	if len(conf.FRMPayload) > 0 && conf.FPort == 0 {
 		conf.FRMPayload = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, false, conf.FRMPayload...)
 	} else if len(conf.FOpts) > 0 && conf.MACVersion.EncryptFOpts() {
