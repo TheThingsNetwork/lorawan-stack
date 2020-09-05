@@ -47,8 +47,6 @@ func (s *set) Subscribe(ctx context.Context, protocol string, ids ttnpb.Applicat
 		sub.Disconnect(s.ctx.Err())
 		return nil, s.ctx.Err()
 	case <-ctx.Done():
-		// Propagate the main context shutdown to the subscription.
-		sub.Disconnect(ctx.Err())
 		return nil, ctx.Err()
 	case s.subscribeCh <- sub:
 	}
@@ -96,6 +94,7 @@ func (s *set) run() {
 	}()
 
 	ticker := time.NewTicker(emptySetTimeout)
+	defer ticker.Stop()
 	lastAction := time.Now()
 	for {
 		select {

@@ -81,6 +81,22 @@ func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHa
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
+
+	links := make(map[ttnpb.ApplicationIdentifiers]*ttnpb.ApplicationLink)
+	for _, up := range req.ApplicationUplinks {
+		if _, ok := links[up.ApplicationIdentifiers]; ok {
+			continue
+		}
+		link, err := as.linkRegistry.Get(ctx, up.ApplicationIdentifiers, []string{
+			"default_formatters",
+			"skip_payload_crypto",
+		})
+		if err != nil {
+			return nil, err
+		}
+		links[up.ApplicationIdentifiers] = link
+	}
+
 	for _, up := range req.ApplicationUplinks {
 		ctx := events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
 		logger := log.FromContext(ctx)
@@ -92,19 +108,7 @@ func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHa
 		now := time.Now().UTC()
 		up.ReceivedAt = &now
 
-		// TODO: Maybe the request should be homogenous (and include the appID) ?
-		// Otherwise we probably want to cache the link while processing.
-		link, err := as.linkRegistry.Get(ctx, up.ApplicationIdentifiers, []string{
-			"default_formatters",
-			"skip_payload_crypto",
-		})
-		if err != nil {
-			logger.WithError(err).Warn("Failed to retrieve link")
-			registerDropUp(ctx, up, err)
-			continue
-		}
-
-		pass, err := as.handleUp(ctx, up, link)
+		pass, err := as.handleUp(ctx, up, links[up.ApplicationIdentifiers])
 		if err != nil {
 			logger.WithError(err).Warn("Failed to process upstream message")
 			registerDropUp(ctx, up, err)

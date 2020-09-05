@@ -253,7 +253,7 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 	return as.distributor.Subscribe(ctx, protocol, ids)
 }
 
-// SendUp processes the given uplink and then sends it to the application frontends.
+// SendUp broadcasts upstream traffic to the application frontends.
 func (as *ApplicationServer) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) (err error) {
 	if err := as.distributor.SendUp(ctx, up); err != nil {
 		return err
