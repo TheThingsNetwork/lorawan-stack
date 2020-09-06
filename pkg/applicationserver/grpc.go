@@ -16,14 +16,10 @@ package applicationserver
 
 import (
 	"context"
-	"fmt"
-	"time"
 
 	"github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -40,20 +36,16 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
 	}
-	// Get all the fields here for starting the link task.
-	link, err := as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, ttnpb.ApplicationLinkFieldPathsTopLevel,
+	return as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, ttnpb.ApplicationLinkFieldPathsTopLevel,
 		func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
-			return &req.ApplicationLink, req.FieldMask.Paths, nil
+			if link != nil {
+				return &req.ApplicationLink, req.FieldMask.Paths, nil
+			}
+			return &req.ApplicationLink, append(req.FieldMask.Paths,
+				"application_ids",
+			), nil
 		},
 	)
-	if err != nil {
-		return nil, err
-	}
-	res := &ttnpb.ApplicationLink{}
-	if err := res.SetFields(link, req.FieldMask.Paths...); err != nil {
-		return nil, err
-	}
-	return res, nil
 }
 
 // DeleteLink implements ttnpb.AsServer.
@@ -77,53 +69,23 @@ func (as *ApplicationServer) GetLinkStats(ctx context.Context, ids *ttnpb.Applic
 	return &ttnpb.ApplicationLinkStats{}, nil
 }
 
+// HandleUplink implements ttnpb.NsAsServer.
 func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHandleUplinkRequest) (*types.Empty, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
-
-	links := make(map[ttnpb.ApplicationIdentifiers]*ttnpb.ApplicationLink)
+	link, err := as.linkRegistry.Get(ctx, req.ApplicationUplinks[0].ApplicationIdentifiers, []string{
+		"default_formatters",
+		"skip_payload_crypto",
+	})
+	if err != nil {
+		return nil, err
+	}
+	// TODO: Merge downlink queue invalidations (https://github.com/TheThingsNetwork/lorawan-stack/issues/1523)
 	for _, up := range req.ApplicationUplinks {
-		if _, ok := links[up.ApplicationIdentifiers]; ok {
-			continue
-		}
-		link, err := as.linkRegistry.Get(ctx, up.ApplicationIdentifiers, []string{
-			"default_formatters",
-			"skip_payload_crypto",
-		})
-		if err != nil {
+		if err := as.processUp(ctx, up, link); err != nil {
 			return nil, err
 		}
-		links[up.ApplicationIdentifiers] = link
-	}
-
-	for _, up := range req.ApplicationUplinks {
-		ctx := events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
-		logger := log.FromContext(ctx)
-		up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
-		// TODO: How can we use the caller name here ?
-		// Maybe as part of the request ?
-		registerReceiveUp(ctx, up, "replace-me")
-
-		now := time.Now().UTC()
-		up.ReceivedAt = &now
-
-		pass, err := as.handleUp(ctx, up, links[up.ApplicationIdentifiers])
-		if err != nil {
-			logger.WithError(err).Warn("Failed to process upstream message")
-			registerDropUp(ctx, up, err)
-			continue
-		}
-		if !pass {
-			continue
-		}
-
-		if err := as.SendUp(ctx, up); err != nil {
-			logger.WithError(err).Warn("Failed to send upstream message")
-			registerDropUp(ctx, up, err)
-			continue
-		}
-		registerForwardUp(ctx, up)
 	}
 	return ttnpb.Empty, nil
 }

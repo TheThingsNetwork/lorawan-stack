@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/grpc/peer"
 )
 
 var (
@@ -204,7 +205,11 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.downlinkDropped.Collect(ch)
 }
 
-func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp, ns string) {
+func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
+	ns := "application"
+	if peer, ok := peer.FromContext(ctx); ok {
+		ns = peer.Addr.String()
+	}
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
 		events.Publish(evtReceiveJoinAccept.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, nil))

@@ -253,8 +253,47 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 	}
 }
 
-// SendUp broadcasts upstream traffic to the application frontends.
+// SendUp processes the given upstream message and then broadcasts it to the application frontends.
 func (as *ApplicationServer) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+	link, err := as.linkRegistry.Get(ctx, up.ApplicationIdentifiers, []string{
+		"default_formatters",
+		"skip_payload_crypto",
+	})
+	if err != nil {
+		return err
+	}
+	return as.processUp(ctx, up, link)
+}
+
+func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
+	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
+	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
+	registerReceiveUp(ctx, up)
+
+	now := time.Now().UTC()
+	up.ReceivedAt = &now
+
+	pass, err := as.handleUp(ctx, up, link)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to process upstream message")
+		registerDropUp(ctx, up, err)
+		return nil
+	}
+	if !pass {
+		return nil
+	}
+
+	if err := as.broadcastUp(ctx, up); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to broadcast upstream message")
+		registerDropUp(ctx, up, err)
+		return nil
+	}
+	registerForwardUp(ctx, up)
+
+	return nil
+}
+
+func (as *ApplicationServer) broadcastUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	if err := as.localDistributor.SendUp(ctx, up); err != nil {
 		return err
 	}
@@ -371,7 +410,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			errorDetails = *ttnpb.ErrorDetailsToProto(ttnErr)
 		}
 		for _, item := range items {
-			if err := as.SendUp(ctx, &ttnpb.ApplicationUp{
+			if err := as.broadcastUp(ctx, &ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: ids,
 				CorrelationIDs:       item.CorrelationIDs,
 				Up: &ttnpb.ApplicationUp_DownlinkFailed{
@@ -388,7 +427,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 		return err
 	}
 	for _, item := range items {
-		if err := as.SendUp(ctx, &ttnpb.ApplicationUp{
+		if err := as.broadcastUp(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ids,
 			CorrelationIDs:       item.CorrelationIDs,
 			Up: &ttnpb.ApplicationUp_DownlinkQueued{
