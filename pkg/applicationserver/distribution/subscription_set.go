@@ -27,12 +27,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// NewSubscriptionSet creates a new subscription set. A non zero timeout represents
+// newSubscriptionSet creates a new subscription set. A non zero timeout represents
 // the period after which the set will shut down if empty. If the timeout is zero,
 // the set never timeouts.
-func NewSubscriptionSet(ctx context.Context, timeout time.Duration) *SubscriptionSet {
+func newSubscriptionSet(ctx context.Context, timeout time.Duration) *subscriptionSet {
 	ctx, cancel := errorcontext.New(ctx)
-	s := &SubscriptionSet{
+	s := &subscriptionSet{
 		ctx:           ctx,
 		cancel:        cancel,
 		timeout:       timeout,
@@ -44,9 +44,7 @@ func NewSubscriptionSet(ctx context.Context, timeout time.Duration) *Subscriptio
 	return s
 }
 
-// SubscriptionSet maintains a set of subscriptions to which
-// upstream traffic can be sent in a broadcast fashion.
-type SubscriptionSet struct {
+type subscriptionSet struct {
 	ctx    context.Context
 	cancel errorcontext.CancelFunc
 
@@ -58,17 +56,17 @@ type SubscriptionSet struct {
 }
 
 // Context returns the context of the set.
-func (s *SubscriptionSet) Context() context.Context {
+func (s *subscriptionSet) Context() context.Context {
 	return s.ctx
 }
 
 // Cancel cancels the set and the associated subscriptions.
-func (s *SubscriptionSet) Cancel(err error) {
+func (s *subscriptionSet) Cancel(err error) {
 	s.cancel(err)
 }
 
 // Subscribe creates a subscription for the provided application with the given protocol.
-func (s *SubscriptionSet) Subscribe(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
+func (s *subscriptionSet) Subscribe(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
 	sub := io.NewSubscription(ctx, protocol, ids)
 	select {
 	case <-s.ctx.Done():
@@ -95,7 +93,7 @@ func (s *SubscriptionSet) Subscribe(ctx context.Context, protocol string, ids *t
 }
 
 // SendUp sends the upstream traffic to the subscribers.
-func (s *SubscriptionSet) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+func (s *subscriptionSet) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	ctxUp := &io.ContextualApplicationUp{
 		Context:       ctx,
 		ApplicationUp: up,
@@ -110,7 +108,7 @@ func (s *SubscriptionSet) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) e
 
 var errEmptySet = errors.DefineAborted("empty_set", "empty set")
 
-func (s *SubscriptionSet) run() {
+func (s *subscriptionSet) run() {
 	subscribers := make(map[*io.Subscription]string)
 
 	defer func() {
@@ -158,12 +156,12 @@ func (s *SubscriptionSet) run() {
 	}
 }
 
-func (s *SubscriptionSet) observeSubscribe(correlationID string, sub *io.Subscription) {
+func (s *subscriptionSet) observeSubscribe(correlationID string, sub *io.Subscription) {
 	registerSubscribe(events.ContextWithCorrelationID(s.ctx, correlationID), sub)
 	log.FromContext(sub.Context()).Debug("Subscribed")
 }
 
-func (s *SubscriptionSet) observeUnsubscribe(correlationID string, sub *io.Subscription) {
+func (s *subscriptionSet) observeUnsubscribe(correlationID string, sub *io.Subscription) {
 	registerUnsubscribe(events.ContextWithCorrelationID(s.ctx, correlationID), sub)
 	log.FromContext(sub.Context()).Debug("Unsubscribed")
 }

@@ -1664,6 +1664,24 @@
       "file": "subscription_set.go"
     }
   },
+  "error:pkg/applicationserver/distribution:missing_identifiers": {
+    "translations": {
+      "en": "subscriptions without identifiers are not supported"
+    },
+    "description": {
+      "package": "pkg/applicationserver/distribution",
+      "file": "pubsub_distributor.go"
+    }
+  },
+  "error:pkg/applicationserver/distribution:set_not_found": {
+    "translations": {
+      "en": "set not found"
+    },
+    "description": {
+      "package": "pkg/applicationserver/distribution",
+      "file": "subscription_map.go"
+    }
+  },
   "error:pkg/applicationserver/io/grpc:connect": {
     "translations": {
       "en": "failed to connect application `{application_uid}`"

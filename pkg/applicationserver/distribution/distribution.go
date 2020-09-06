@@ -17,6 +17,7 @@ package distribution
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -26,4 +27,12 @@ type PubSub interface {
 	SendUp(context.Context, *ttnpb.ApplicationUp) error
 	// Subscribe to the traffic of a specific application.
 	Subscribe(context.Context, ttnpb.ApplicationIdentifiers, func(context.Context, *ttnpb.ApplicationUp) error) error
+}
+
+// Distributor sends upstream traffic from publishers to subscribers.
+type Distributor interface {
+	// SendUp publishes traffic to the subscribers.
+	SendUp(context.Context, *ttnpb.ApplicationUp) error
+	// Subscribe to the traffic of a specific application.
+	Subscribe(context.Context, string, *ttnpb.ApplicationIdentifiers) (*io.Subscription, error)
 }
