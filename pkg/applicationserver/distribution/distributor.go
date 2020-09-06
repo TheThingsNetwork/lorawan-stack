@@ -17,19 +17,22 @@ package distribution
 import (
 	"context"
 	"sync"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 // NewDistributor creates a Distributor on top of the provided PubSub.
-func NewDistributor(ctx context.Context, pubsub PubSub) *Distributor {
+// The underlying pub/sub subscriptions can timeout if there are no active subscribers.
+// A timeout of 0 means the underlying subscriptions never timeout.
+func NewDistributor(ctx context.Context, pubsub PubSub, timeout time.Duration) *Distributor {
 	return &Distributor{
-		ctx:    ctx,
-		pubsub: pubsub,
+		ctx:     ctx,
+		pubsub:  pubsub,
+		timeout: timeout,
 	}
 }
 
@@ -37,9 +40,10 @@ func NewDistributor(ctx context.Context, pubsub PubSub) *Distributor {
 // Multiple subscribers to the same application share the underlying
 // PubSub subscription.
 type Distributor struct {
-	ctx    context.Context
-	pubsub PubSub
-	sets   sync.Map
+	ctx     context.Context
+	pubsub  PubSub
+	sets    sync.Map
+	timeout time.Duration
 }
 
 // SendUp sends traffic to the underlying Pub/Sub.
@@ -47,49 +51,61 @@ func (d *Distributor) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error
 	return d.pubsub.SendUp(ctx, up)
 }
 
-func (d *Distributor) loadOrCreateSet(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (*set, error) {
+type distributorSet struct {
+	set *SubscriptionSet
+
+	init    chan struct{}
+	initErr error
+}
+
+func (d *Distributor) loadOrCreateSet(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (*SubscriptionSet, error) {
 	uid := unique.ID(ctx, ids)
-	s := &set{
-		init:          make(chan struct{}),
-		subscribeCh:   make(chan *io.Subscription),
-		unsubscribeCh: make(chan *io.Subscription),
-		upCh:          make(chan *io.ContextualApplicationUp),
+	s := &distributorSet{
+		init: make(chan struct{}),
 	}
 	if existing, loaded := d.sets.LoadOrStore(uid, s); loaded {
-		exists := existing.(*set)
+		exists := existing.(*distributorSet)
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
 		case <-exists.init:
 		}
-		return exists, nil
+		if exists.initErr != nil {
+			return nil, exists.initErr
+		}
+		return exists.set, nil
 	}
 
-	defer close(s.init)
-
-	ctx = log.NewContextWithField(d.ctx, "application_uid", uid)
-	ctx, err := unique.WithContext(ctx, uid)
-	if err != nil {
-		d.sets.Delete(uid)
-		return nil, err
-	}
-	s.ctx, s.cancel = errorcontext.New(ctx)
-
-	go func() {
-		<-s.ctx.Done()
-		d.sets.Delete(uid)
-	}()
-
-	go func() {
-		if err := d.pubsub.Subscribe(s.ctx, ids, s.SendUp); err != nil {
-			log.FromContext(s.ctx).WithError(err).Warn("Pub/Sub subscription failed")
-			s.cancel(err)
+	var err error
+	defer func() {
+		close(s.init)
+		if err != nil {
+			s.initErr = err
+			d.sets.Delete(uid)
 		}
 	}()
 
-	go s.run()
+	ctx = log.NewContextWithField(d.ctx, "application_uid", uid)
+	ctx, err = unique.WithContext(ctx, uid)
+	if err != nil {
+		return nil, err
+	}
 
-	return s, nil
+	set := NewSubscriptionSet(ctx, d.timeout)
+	go func() {
+		<-set.Context().Done()
+		d.sets.Delete(uid)
+	}()
+	go func() {
+		ctx := set.Context()
+		if err := d.pubsub.Subscribe(ctx, ids, set.SendUp); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Pub/Sub subscription failed")
+			set.Cancel(err)
+		}
+	}()
+	s.set = set
+
+	return set, nil
 }
 
 // Subscribe creates a subscription in the associated subscription set.
@@ -98,5 +114,5 @@ func (d *Distributor) Subscribe(ctx context.Context, protocol string, ids ttnpb.
 	if err != nil {
 		return nil, err
 	}
-	return s.Subscribe(ctx, protocol, ids)
+	return s.Subscribe(ctx, protocol, &ids)
 }

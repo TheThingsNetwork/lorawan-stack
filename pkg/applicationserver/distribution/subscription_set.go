@@ -27,20 +27,49 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-type set struct {
+// NewSubscriptionSet creates a new subscription set. A non zero timeout represents
+// the period after which the set will shut down if empty. If the timeout is zero,
+// the set never timeouts.
+func NewSubscriptionSet(ctx context.Context, timeout time.Duration) *SubscriptionSet {
+	ctx, cancel := errorcontext.New(ctx)
+	s := &SubscriptionSet{
+		ctx:           ctx,
+		cancel:        cancel,
+		timeout:       timeout,
+		subscribeCh:   make(chan *io.Subscription),
+		unsubscribeCh: make(chan *io.Subscription),
+		upCh:          make(chan *io.ContextualApplicationUp),
+	}
+	go s.run()
+	return s
+}
+
+// SubscriptionSet maintains a set of subscriptions to which
+// upstream traffic can be sent in a broadcast fashion.
+type SubscriptionSet struct {
 	ctx    context.Context
 	cancel errorcontext.CancelFunc
 
-	init chan struct{}
+	timeout time.Duration
 
 	subscribeCh   chan *io.Subscription
 	unsubscribeCh chan *io.Subscription
 	upCh          chan *io.ContextualApplicationUp
 }
 
+// Context returns the context of the set.
+func (s *SubscriptionSet) Context() context.Context {
+	return s.ctx
+}
+
+// Cancel cancels the set and the associated subscriptions.
+func (s *SubscriptionSet) Cancel(err error) {
+	s.cancel(err)
+}
+
 // Subscribe creates a subscription for the provided application with the given protocol.
-func (s *set) Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
-	sub := io.NewSubscription(ctx, protocol, &ids)
+func (s *SubscriptionSet) Subscribe(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
+	sub := io.NewSubscription(ctx, protocol, ids)
 	select {
 	case <-s.ctx.Done():
 		// Propagate the subscription set shutdown to the subscription.
@@ -66,7 +95,7 @@ func (s *set) Subscribe(ctx context.Context, protocol string, ids ttnpb.Applicat
 }
 
 // SendUp sends the upstream traffic to the subscribers.
-func (s *set) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+func (s *SubscriptionSet) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	ctxUp := &io.ContextualApplicationUp{
 		Context:       ctx,
 		ApplicationUp: up,
@@ -79,12 +108,9 @@ func (s *set) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	}
 }
 
-// emptySetTimeout is the period after which an empty set is cancelled.
-const emptySetTimeout = time.Minute
-
 var errEmptySet = errors.DefineAborted("empty_set", "empty set")
 
-func (s *set) run() {
+func (s *SubscriptionSet) run() {
 	subscribers := make(map[*io.Subscription]string)
 
 	defer func() {
@@ -93,8 +119,8 @@ func (s *set) run() {
 		}
 	}()
 
-	ticker := time.NewTicker(emptySetTimeout)
-	defer ticker.Stop()
+	tickCh, tickStop := newTicker(s.timeout)
+	defer tickStop()
 	lastAction := time.Now()
 	for {
 		select {
@@ -117,12 +143,12 @@ func (s *set) run() {
 					log.FromContext(sub.Context()).WithError(err).Warn("Send message failed")
 				}
 			}
-		case <-ticker.C:
+		case <-tickCh:
 			if len(subscribers) > 0 {
 				// There are still subscribers in the set.
 				continue
 			}
-			if time.Now().Sub(lastAction) < emptySetTimeout {
+			if time.Now().Sub(lastAction) < s.timeout {
 				// We had activity in the last period.
 				continue
 			}
@@ -132,12 +158,22 @@ func (s *set) run() {
 	}
 }
 
-func (s *set) observeSubscribe(correlationID string, sub *io.Subscription) {
+func (s *SubscriptionSet) observeSubscribe(correlationID string, sub *io.Subscription) {
 	registerSubscribe(events.ContextWithCorrelationID(s.ctx, correlationID), sub)
 	log.FromContext(sub.Context()).Debug("Subscribed")
 }
 
-func (s *set) observeUnsubscribe(correlationID string, sub *io.Subscription) {
+func (s *SubscriptionSet) observeUnsubscribe(correlationID string, sub *io.Subscription) {
 	registerUnsubscribe(events.ContextWithCorrelationID(s.ctx, correlationID), sub)
 	log.FromContext(sub.Context()).Debug("Unsubscribed")
+}
+
+// newTicker creates a ticking channel similar to time.Ticker.
+// If the period is 0, the ticker will never fire.
+func newTicker(d time.Duration) (<-chan time.Time, func()) {
+	if d == 0 {
+		return make(chan time.Time), func() {}
+	}
+	t := time.NewTicker(d)
+	return t.C, t.Stop
 }

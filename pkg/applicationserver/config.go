@@ -74,7 +74,8 @@ type WebhooksConfig struct {
 
 // DistributionConfig contains the upstream traffic distribution configuration of the Application Server.
 type DistributionConfig struct {
-	PubSub distribution.PubSub `name:"-"`
+	PubSub  distribution.PubSub `name:"-"`
+	Timeout time.Duration       `name:"timeout" description:"Wait timeout of an empty subscription set"`
 }
 
 // PubSubConfig contains go-cloud pub/sub configuration of the Application Server.

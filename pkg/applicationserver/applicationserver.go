@@ -118,7 +118,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
 		}),
-		distributor:   distribution.NewDistributor(ctx, conf.Distribution.PubSub),
+		distributor:   distribution.NewDistributor(ctx, conf.Distribution.PubSub, conf.Distribution.Timeout),
 		interopClient: interopCl,
 		interopID:     conf.Interop.ID,
 	}

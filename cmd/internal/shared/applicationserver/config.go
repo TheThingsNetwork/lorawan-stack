@@ -45,4 +45,7 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		Workers:   16,
 		Downlinks: web.DownlinksConfig{PublicAddress: shared.DefaultPublicURL + "/api/v3"},
 	},
+	Distribution: applicationserver.DistributionConfig{
+		Timeout: time.Minute,
+	},
 }
