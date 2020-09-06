@@ -41,6 +41,22 @@ const (
 )
 
 var subMetrics = &subscriptionMetrics{
+	subscriptionSetsStarted: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "subscription_sets_started_total",
+			Help:      "Number of subscription sets started",
+		},
+		[]string{},
+	),
+	subscriptionSetsStopped: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "subscription_sets_stopped_total",
+			Help:      "Number of subscription sets stopped",
+		},
+		[]string{},
+	),
 	subscriptionsStarted: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
@@ -64,18 +80,33 @@ func init() {
 }
 
 type subscriptionMetrics struct {
-	subscriptionsStarted *metrics.ContextualCounterVec
-	subscriptionsStopped *metrics.ContextualCounterVec
+	subscriptionSetsStarted *metrics.ContextualCounterVec
+	subscriptionSetsStopped *metrics.ContextualCounterVec
+	subscriptionsStarted    *metrics.ContextualCounterVec
+	subscriptionsStopped    *metrics.ContextualCounterVec
 }
 
 func (m subscriptionMetrics) Describe(ch chan<- *prometheus.Desc) {
+	m.subscriptionSetsStarted.Describe(ch)
+	m.subscriptionSetsStopped.Describe(ch)
 	m.subscriptionsStarted.Describe(ch)
 	m.subscriptionsStopped.Describe(ch)
 }
 
 func (m subscriptionMetrics) Collect(ch chan<- prometheus.Metric) {
+	m.subscriptionSetsStarted.Collect(ch)
+	m.subscriptionSetsStopped.Collect(ch)
 	m.subscriptionsStarted.Collect(ch)
 	m.subscriptionsStopped.Collect(ch)
+}
+
+func registerSubscriptionSetStart(ctx context.Context) {
+	subMetrics.subscriptionSetsStarted.WithLabelValues(ctx).Inc()
+	subMetrics.subscriptionSetsStopped.WithLabelValues(ctx) // Initialize the "stopped" counter.
+}
+
+func registerSubscriptionSetStop(ctx context.Context) {
+	subMetrics.subscriptionSetsStopped.WithLabelValues(ctx).Inc()
 }
 
 func registerSubscribe(ctx context.Context, sub *io.Subscription) {

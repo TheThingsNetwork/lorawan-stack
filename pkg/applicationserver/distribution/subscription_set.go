@@ -27,6 +27,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
+const subscriptionSetBufferSize = 16
+
 // newSubscriptionSet creates a new subscription set. The timeout represents
 // the period after which the set will shut down if empty. If the timeout is
 // zero, the set never timeouts.
@@ -36,9 +38,9 @@ func newSubscriptionSet(ctx context.Context, timeout time.Duration) *subscriptio
 		ctx:           ctx,
 		cancel:        cancel,
 		timeout:       timeout,
-		subscribeCh:   make(chan *io.Subscription),
-		unsubscribeCh: make(chan *io.Subscription),
-		upCh:          make(chan *io.ContextualApplicationUp),
+		subscribeCh:   make(chan *io.Subscription, 1),
+		unsubscribeCh: make(chan *io.Subscription, 1),
+		upCh:          make(chan *io.ContextualApplicationUp, subscriptionSetBufferSize),
 	}
 	go s.run()
 	return s
@@ -111,6 +113,9 @@ func (s *subscriptionSet) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) e
 var errEmptySet = errors.DefineAborted("empty_set", "empty set")
 
 func (s *subscriptionSet) run() {
+	registerSubscriptionSetStart(s.ctx)
+	defer registerSubscriptionSetStop(s.ctx)
+
 	subscribers := make(map[*io.Subscription]string)
 
 	defer func() {
