@@ -27,9 +27,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// newSubscriptionSet creates a new subscription set. A non zero timeout represents
-// the period after which the set will shut down if empty. If the timeout is zero,
-// the set never timeouts.
+// newSubscriptionSet creates a new subscription set. The timeout represents
+// the period after which the set will shut down if empty. If the timeout is
+// zero, the set never timeouts.
 func newSubscriptionSet(ctx context.Context, timeout time.Duration) *subscriptionSet {
 	ctx, cancel := errorcontext.New(ctx)
 	s := &subscriptionSet{
@@ -69,12 +69,12 @@ func (s *subscriptionSet) Cancel(err error) {
 func (s *subscriptionSet) Subscribe(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
 	sub := io.NewSubscription(ctx, protocol, ids)
 	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
 	case <-s.ctx.Done():
 		// Propagate the subscription set shutdown to the subscription.
 		sub.Disconnect(s.ctx.Err())
 		return nil, s.ctx.Err()
-	case <-ctx.Done():
-		return nil, ctx.Err()
 	case s.subscribeCh <- sub:
 	}
 	go func() {
@@ -101,6 +101,8 @@ func (s *subscriptionSet) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) e
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
+	case <-s.ctx.Done():
+		return s.ctx.Err()
 	case s.upCh <- ctxUp:
 		return nil
 	}

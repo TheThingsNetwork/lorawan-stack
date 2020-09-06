@@ -122,7 +122,7 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 			}
 		}()
 	}
-	return web.NewWebhooks(ctx, server, c.Registry, target, c.Downlinks), nil
+	return web.NewWebhooks(ctx, server, c.Registry, target, c.Downlinks)
 }
 
 // NewPubSub returns a new pubsub.PubSub based on the configuration.

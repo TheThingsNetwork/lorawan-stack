@@ -28,14 +28,12 @@ import (
 // A timeout of 0 means the underlying subscriptions never timeout.
 func NewLocalDistributor(ctx context.Context, timeout time.Duration) Distributor {
 	return &localDistributor{
-		ctx:           ctx,
 		broadcast:     newSubscriptionSet(ctx, 0),
 		subscriptions: newSubscriptionMap(ctx, timeout, noSetup),
 	}
 }
 
 type localDistributor struct {
-	ctx           context.Context
 	broadcast     *subscriptionSet
 	subscriptions *subscriptionMap
 }
@@ -45,7 +43,7 @@ func (d *localDistributor) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) 
 	if err := d.broadcast.SendUp(ctx, up); err != nil {
 		return err
 	}
-	set, err := d.subscriptions.LoadSet(ctx, up.ApplicationIdentifiers)
+	set, err := d.subscriptions.Load(ctx, up.ApplicationIdentifiers)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	} else if err == nil {
@@ -60,7 +58,7 @@ func (d *localDistributor) Subscribe(ctx context.Context, protocol string, ids *
 	if ids == nil {
 		return d.broadcast.Subscribe(ctx, protocol, ids)
 	}
-	s, err := d.subscriptions.LoadOrCreateSet(ctx, *ids)
+	s, err := d.subscriptions.LoadOrCreate(ctx, *ids)
 	if err != nil {
 		return nil, err
 	}

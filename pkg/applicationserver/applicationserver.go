@@ -33,7 +33,6 @@ import (
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/mqtt" // The MQTT integration provider
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
-	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -69,8 +68,8 @@ type ApplicationServer struct {
 	pubsub           *pubsub.PubSub
 	appPackages      packages.Server
 
-	distributor        *distribution.Distributor
-	defaultSubscribers []*io.Subscription
+	clusterDistributor distribution.Distributor
+	localDistributor   distribution.Distributor
 
 	grpc struct {
 		asDevices asEndDeviceRegistryServer
@@ -118,9 +117,10 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
 		}),
-		distributor:   distribution.NewDistributor(ctx, conf.Distribution.PubSub, conf.Distribution.Timeout),
-		interopClient: interopCl,
-		interopID:     conf.Interop.ID,
+		clusterDistributor: distribution.NewPubSubDistributor(ctx, conf.Distribution.Timeout, conf.Distribution.PubSub),
+		localDistributor:   distribution.NewLocalDistributor(ctx, conf.Distribution.Timeout),
+		interopClient:      interopCl,
+		interopID:          conf.Interop.ID,
 	}
 
 	as.grpc.asDevices = asEndDeviceRegistryServer{
@@ -182,7 +182,6 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		return nil, err
 	} else if webhooks != nil {
 		as.webhooks = webhooks
-		as.defaultSubscribers = append(as.defaultSubscribers, webhooks.NewSubscription())
 		c.RegisterWeb(webhooks)
 	}
 
@@ -197,7 +196,6 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	if as.appPackages, err = conf.Packages.NewApplicationPackages(ctx, as); err != nil {
 		return nil, err
 	} else if as.appPackages != nil {
-		as.defaultSubscribers = append(as.defaultSubscribers, as.appPackages.NewSubscription())
 		c.RegisterGRPC(as.appPackages)
 	}
 
@@ -240,30 +238,27 @@ func (as *ApplicationServer) Roles() []ttnpb.ClusterRole {
 }
 
 // Subscribe subscribes an application or integration by its identifiers to the Application Server, and returns a
-// io.Subscription for traffic and control.
-func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
-	if err := rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
-		return nil, err
+// Subscription for traffic and control. If the cluster parameter is true, the subscription receives all of the
+// traffic of the application. Otherwise, only traffic that was processed locally is sent.
+func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers, cluster bool) (*io.Subscription, error) {
+	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:conn:%s", events.NewCorrelationID()))
+	if ids != nil {
+		uid := unique.ID(ctx, ids)
+		ctx = log.NewContextWithField(ctx, "application_uid", uid)
 	}
-	uid := unique.ID(ctx, ids)
-	ctx = log.NewContextWithField(
-		events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:conn:%s", events.NewCorrelationID())),
-		"application_uid", uid,
-	)
-	return as.distributor.Subscribe(ctx, protocol, ids)
+	if cluster {
+		return as.clusterDistributor.Subscribe(ctx, protocol, ids)
+	} else {
+		return as.localDistributor.Subscribe(ctx, protocol, ids)
+	}
 }
 
 // SendUp broadcasts upstream traffic to the application frontends.
-func (as *ApplicationServer) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) (err error) {
-	if err := as.distributor.SendUp(ctx, up); err != nil {
+func (as *ApplicationServer) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+	if err := as.localDistributor.SendUp(ctx, up); err != nil {
 		return err
 	}
-	for _, sub := range as.defaultSubscribers {
-		if err := sub.SendUp(ctx, up); err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to send message to default subscription")
-		}
-	}
-	return nil
+	return as.clusterDistributor.SendUp(ctx, up)
 }
 
 func skipPayloadCrypto(link *ttnpb.ApplicationLink, dev *ttnpb.EndDevice) bool {

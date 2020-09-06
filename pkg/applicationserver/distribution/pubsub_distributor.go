@@ -29,14 +29,12 @@ import (
 // A timeout of 0 means the underlying subscription sets never timeout.
 func NewPubSubDistributor(ctx context.Context, timeout time.Duration, pubsub PubSub) Distributor {
 	return &pubSubDistributor{
-		ctx:           ctx,
 		pubsub:        pubsub,
 		subscriptions: newSubscriptionMap(ctx, timeout, subscribeSetToPubSub(pubsub)),
 	}
 }
 
 type pubSubDistributor struct {
-	ctx           context.Context
 	pubsub        PubSub
 	subscriptions *subscriptionMap
 }
@@ -53,7 +51,7 @@ func (d *pubSubDistributor) Subscribe(ctx context.Context, protocol string, ids 
 	if ids == nil {
 		return nil, errMissingIdentifiers.New()
 	}
-	s, err := d.subscriptions.LoadOrCreateSet(ctx, *ids)
+	s, err := d.subscriptions.LoadOrCreate(ctx, *ids)
 	if err != nil {
 		return nil, err
 	}
