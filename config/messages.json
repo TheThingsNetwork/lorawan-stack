@@ -5606,6 +5606,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver/redis:database_corruption": {
+    "translations": {
+      "en": "database is corrupted"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "redis.go"
+    }
+  },
   "error:pkg/networkserver/redis:duplicate_identifiers": {
     "translations": {
       "en": "duplicate identifiers"
@@ -5618,6 +5627,15 @@
   "error:pkg/networkserver/redis:invalid_fieldmask": {
     "translations": {
       "en": "invalid fieldmask"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/networkserver/redis:invalid_format": {
+    "translations": {
+      "en": "invalid value format"
     },
     "description": {
       "package": "pkg/networkserver/redis",
@@ -5649,6 +5667,15 @@
     "description": {
       "package": "pkg/networkserver/redis",
       "file": "application_uplink_queue.go"
+    }
+  },
+  "error:pkg/networkserver/redis:no_uplink_match": {
+    "translations": {
+      "en": "no device matches uplink"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
     }
   },
   "error:pkg/networkserver/redis:read_only_field": {
