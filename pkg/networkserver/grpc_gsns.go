@@ -738,6 +738,7 @@ matchLoop:
 			if pld.Ack {
 				confFCnt = match.Device.Session.LastConfFCntDown
 			}
+			registerMICComputation(ctx)
 			fullMIC, err := crypto.ComputeUplinkMICFromLegacy(
 				cmacF,
 				sNwkSIntKey,
@@ -843,6 +844,7 @@ func (ns *NetworkServer) mergeMetadata(ctx context.Context, up *ttnpb.UplinkMess
 }
 
 func matchCmacF(ctx context.Context, fNwkSIntKey types.AES128Key, macVersion ttnpb.MACVersion, fCnt uint32, up *ttnpb.UplinkMessage) ([4]byte, bool) {
+	registerMICComputation(ctx)
 	cmacF, err := crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, up.Payload.GetMACPayload().DevAddr, fCnt, up.RawPayload[:len(up.RawPayload)-4])
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to compute cmacF")
