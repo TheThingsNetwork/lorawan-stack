@@ -69,7 +69,7 @@ func MustNewTFromContext(ctx context.Context) (*testing.T, *assertions.Assertion
 	return t, assertions.New(t)
 }
 
-var defaultTestTimeout = (1 << 15) * Delay
+var defaultTestTimeout = (1 << 18) * Delay
 
 type TestConfig struct {
 	Parallel bool
