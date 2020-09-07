@@ -289,6 +289,32 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 	}
 }
 
+func makeClassAOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fpID string) func(context.Context, TestEnvironment) {
+	return makeOTAAFlowTest(OTAAFlowTestConfig{
+		CreateDevice: &ttnpb.SetEndDeviceRequest{
+			EndDevice: ttnpb.EndDevice{
+				EndDeviceIdentifiers: *MakeOTAAIdentifiers(nil),
+				FrequencyPlanID:      fpID,
+				LoRaWANVersion:       macVersion,
+				LoRaWANPHYVersion:    phyVersion,
+				SupportsJoin:         true,
+			},
+			FieldMask: pbtypes.FieldMask{
+				Paths: []string{
+					"frequency_plan_id",
+					"lorawan_phy_version",
+					"lorawan_version",
+					"supports_join",
+				},
+			},
+		},
+		DownlinkMACCommanders: []MACCommander{ttnpb.CID_DEV_STATUS},
+		DownlinkEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
+		Func: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice, link ttnpb.AsNs_LinkApplicationClient) {
+		},
+	})
+}
+
 func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fpID string) func(context.Context, TestEnvironment) {
 	var upCmders []MACCommander
 	var upEvBuilders []events.Builder
@@ -345,6 +371,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 func TestFlow(t *testing.T) {
 	ForEachFrequencyPlanLoRaWANVersionPair(t, func(makeName func(...string) string, fpID string, _ *frequencyplans.FrequencyPlan, phy *band.Band, macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion) {
 		for flowName, handleFlowTest := range map[string]func(context.Context, TestEnvironment){
+			MakeTestCaseName("Class A", "OTAA"): makeClassAOTAAFlowTest(macVersion, phyVersion, fpID),
 			MakeTestCaseName("Class C", "OTAA"): makeClassCOTAAFlowTest(macVersion, phyVersion, fpID),
 		} {
 			handleFlowTest := handleFlowTest
