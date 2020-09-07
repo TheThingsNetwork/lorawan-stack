@@ -18,8 +18,9 @@ import "go.thethings.network/lorawan-stack/v3/pkg/types"
 
 // Config represents the JoinServer configuration.
 type Config struct {
-	Devices         DeviceRegistry      `name:"-"`
-	Keys            KeyRegistry         `name:"-"`
-	JoinEUIPrefixes []types.EUI64Prefix `name:"join-eui-prefix" description:"JoinEUI prefixes handled by this JS"`
-	DeviceKEKLabel  string              `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
+	Devices                       DeviceRegistry                       `name:"-"`
+	Keys                          KeyRegistry                          `name:"-"`
+	ApplicationActivationSettings ApplicationActivationSettingRegistry `name:"-"`
+	JoinEUIPrefixes               []types.EUI64Prefix                  `name:"join-eui-prefix" description:"JoinEUI prefixes handled by this JS"`
+	DeviceKEKLabel                string                               `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 }

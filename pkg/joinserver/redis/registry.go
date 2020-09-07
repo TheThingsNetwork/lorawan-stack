@@ -501,3 +501,139 @@ func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 	}
 	return pb, nil
 }
+
+// applyApplicationActivationSettingsFieldMask applies fields specified by paths from src to dst and returns the result.
+// If dst is nil, a new ApplicationActivationSettings is created.
+func applyApplicationActivationSettingsFieldMask(dst, src *ttnpb.ApplicationActivationSettings, paths ...string) (*ttnpb.ApplicationActivationSettings, error) {
+	if dst == nil {
+		dst = &ttnpb.ApplicationActivationSettings{}
+	}
+	return dst, dst.SetFields(src, paths...)
+}
+
+// filterGetApplicationActivationSettings returns a new ttnpb.ApplicationActivationSettings with only fields specified by paths set.
+func filterGetApplicationActivationSettings(pb *ttnpb.ApplicationActivationSettings, paths ...string) (*ttnpb.ApplicationActivationSettings, error) {
+	return applyApplicationActivationSettingsFieldMask(nil, pb, paths...)
+}
+
+// ApplicationActivationSettingRegistry is an implementation of joinserver.ApplicationActivationSettingRegistry.
+type ApplicationActivationSettingRegistry struct {
+	Redis *ttnredis.Client
+}
+
+func (r *ApplicationActivationSettingRegistry) uidKey(uid string) string {
+	return r.Redis.Key("uid", uid)
+}
+
+// GetByID gets application activation settings by appID.
+func (r *ApplicationActivationSettingRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationActivationSettings, error) {
+	if appID.IsZero() {
+		return nil, errInvalidIdentifiers.New()
+	}
+
+	defer trace.StartRegion(ctx, "get application activation settings").End()
+
+	pb := &ttnpb.ApplicationActivationSettings{}
+	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, appID))).ScanProto(pb); err != nil {
+		return nil, err
+	}
+	return filterGetApplicationActivationSettings(pb, paths...)
+}
+
+// SetByID sets application activation settings by appID.
+func (r *ApplicationActivationSettingRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, gets []string, f func(*ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error)) (*ttnpb.ApplicationActivationSettings, error) {
+	if appID.IsZero() {
+		return nil, errInvalidIdentifiers.New()
+	}
+	uk := r.uidKey(unique.ID(ctx, appID))
+
+	defer trace.StartRegion(ctx, "set application activation settings").End()
+
+	var pb *ttnpb.ApplicationActivationSettings
+	err := r.Redis.Watch(func(tx *redis.Tx) error {
+		cmd := ttnredis.GetProto(tx, uk)
+		stored := &ttnpb.ApplicationActivationSettings{}
+		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
+			stored = nil
+		} else if err != nil {
+			return err
+		}
+
+		var err error
+		if stored != nil {
+			pb = &ttnpb.ApplicationActivationSettings{}
+			if err := cmd.ScanProto(pb); err != nil {
+				return err
+			}
+			pb, err = filterGetApplicationActivationSettings(pb, gets...)
+			if err != nil {
+				return err
+			}
+		}
+
+		var sets []string
+		pb, sets, err = f(pb)
+		if err != nil {
+			return err
+		}
+		if stored == nil && pb == nil {
+			return nil
+		}
+		if pb != nil && len(sets) == 0 {
+			pb, err = filterGetApplicationActivationSettings(stored, gets...)
+			return err
+		}
+
+		var pipelined func(redis.Pipeliner) error
+		if pb == nil && len(sets) == 0 {
+			pipelined = func(p redis.Pipeliner) error {
+				p.Del(uk)
+				return nil
+			}
+		} else {
+			if pb == nil {
+				pb = &ttnpb.ApplicationActivationSettings{}
+			}
+
+			updated := &ttnpb.ApplicationActivationSettings{}
+			if stored == nil {
+				updated, err = applyApplicationActivationSettingsFieldMask(updated, pb, sets...)
+				if err != nil {
+					return err
+				}
+			} else {
+				if err := cmd.ScanProto(updated); err != nil {
+					return err
+				}
+				updated, err = applyApplicationActivationSettingsFieldMask(updated, pb, sets...)
+				if err != nil {
+					return err
+				}
+			}
+			if err := updated.ValidateFields(sets...); err != nil {
+				return err
+			}
+
+			pipelined = func(p redis.Pipeliner) error {
+				_, err := ttnredis.SetProto(p, uk, updated, 0)
+				if err != nil {
+					return err
+				}
+				return nil
+			}
+			pb, err = filterGetApplicationActivationSettings(updated, gets...)
+			if err != nil {
+				return err
+			}
+		}
+		_, err = tx.TxPipelined(pipelined)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, uk)
+	if err != nil {
+		return nil, ttnredis.ConvertError(err)
+	}
+	return pb, nil
+}

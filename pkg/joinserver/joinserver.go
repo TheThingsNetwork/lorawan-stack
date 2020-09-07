@@ -56,8 +56,9 @@ type JoinServer struct {
 	*component.Component
 	ctx context.Context
 
-	devices DeviceRegistry
-	keys    KeyRegistry
+	devices                       DeviceRegistry
+	keys                          KeyRegistry
+	applicationActivationSettings ApplicationActivationSettingRegistry
 
 	euiPrefixes []types.EUI64Prefix
 
@@ -65,10 +66,11 @@ type JoinServer struct {
 	entropy   io.Reader
 
 	grpc struct {
-		nsJs      nsJsServer
-		asJs      asJsServer
-		jsDevices jsEndDeviceRegistryServer
-		js        jsServer
+		nsJs                          nsJsServer
+		asJs                          asJsServer
+		jsDevices                     jsEndDeviceRegistryServer
+		js                            jsServer
+		applicationActivationSettings applicationActivationSettingsRegistryServer
 	}
 	interop interopServer
 }
@@ -84,8 +86,9 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		Component: c,
 		ctx:       log.NewContextWithField(c.Context(), "namespace", "joinserver"),
 
-		devices: conf.Devices,
-		keys:    conf.Keys,
+		devices:                       conf.Devices,
+		keys:                          conf.Keys,
+		applicationActivationSettings: conf.ApplicationActivationSettings,
 
 		euiPrefixes: conf.JoinEUIPrefixes,
 
@@ -126,12 +129,14 @@ func (js *JoinServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterNsJsServer(s, js.grpc.nsJs)
 	ttnpb.RegisterJsEndDeviceRegistryServer(s, js.grpc.jsDevices)
 	ttnpb.RegisterJsServer(s, js.grpc.js)
+	ttnpb.RegisterApplicationActivationSettingRegistryServer(s, js.grpc.applicationActivationSettings)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (js *JoinServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterJsHandler(js.Context(), s, conn)
 	ttnpb.RegisterJsEndDeviceRegistryHandler(js.Context(), s, conn)
+	ttnpb.RegisterApplicationActivationSettingRegistryHandler(js.Context(), s, conn)
 }
 
 // RegisterInterop registers the NS-JS and AS-JS interop services.

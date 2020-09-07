@@ -319,7 +319,7 @@ func TestHandleJoin(t *testing.T) {
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
 						KEKLabel: "as:as.test.org",
-						EncryptedKey: MustWrapAES128Key(
+						EncryptedKey: MustWrapKey(
 							crypto.DeriveAppSKey(
 								appKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -331,7 +331,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
 						KEKLabel: "ns:ns.test.org",
-						EncryptedKey: MustWrapAES128Key(
+						EncryptedKey: MustWrapKey(
 							crypto.DeriveSNwkSIntKey(
 								nwkKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -343,7 +343,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						KEKLabel: "ns:ns.test.org",
-						EncryptedKey: MustWrapAES128Key(
+						EncryptedKey: MustWrapKey(
 							crypto.DeriveFNwkSIntKey(
 								nwkKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -355,7 +355,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
 						KEKLabel: "ns:ns.test.org",
-						EncryptedKey: MustWrapAES128Key(
+						EncryptedKey: MustWrapKey(
 							crypto.DeriveNwkSEncKey(
 								nwkKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -446,7 +446,7 @@ func TestHandleJoin(t *testing.T) {
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
 						KEKLabel: "test-as-kek",
-						EncryptedKey: MustWrapAES128Key(
+						EncryptedKey: MustWrapKey(
 							crypto.DeriveAppSKey(
 								appKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -458,7 +458,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
 						KEKLabel: "test-ns-kek",
-						EncryptedKey: MustWrapAES128Key(
+						EncryptedKey: MustWrapKey(
 							crypto.DeriveSNwkSIntKey(
 								nwkKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -470,7 +470,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						KEKLabel: "test-ns-kek",
-						EncryptedKey: MustWrapAES128Key(
+						EncryptedKey: MustWrapKey(
 							crypto.DeriveFNwkSIntKey(
 								nwkKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -482,7 +482,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
 						KEKLabel: "test-ns-kek",
-						EncryptedKey: MustWrapAES128Key(
+						EncryptedKey: MustWrapKey(
 							crypto.DeriveNwkSEncKey(
 								nwkKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
