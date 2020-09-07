@@ -351,9 +351,10 @@ func TestFlow(t *testing.T) {
 			test.RunSubtest(t, test.SubtestConfig{
 				Name:     makeName(flowName),
 				Parallel: true,
-				Timeout:  (1 << 15) * test.Delay,
+				Timeout:  (1 << 17) * test.Delay,
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 					nsConf := DefaultConfig
+					nsConf.DefaultMACSettings.DesiredRx1Delay = func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_15)
 					nsConf.NetID = test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
 					nsConf.DeduplicationWindow = (1 << 4) * test.Delay
 					nsConf.CooldownWindow = (1 << 9) * test.Delay
