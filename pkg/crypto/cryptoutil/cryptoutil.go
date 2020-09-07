@@ -74,6 +74,22 @@ func UnwrapAES128Key(ctx context.Context, wrapped ttnpb.KeyEnvelope, v crypto.Ke
 	return key, nil
 }
 
+// UnwrapKeyEnvelope calls UnwrapAES128Key on the given key envelope using the given key vault if necessary and
+// returns the result as a key envelope.
+// NOTE: UnwrapKeyEnvelope returns ke if unwrapping is not necessary.
+func UnwrapKeyEnvelope(ctx context.Context, ke *ttnpb.KeyEnvelope, v crypto.KeyVault) (*ttnpb.KeyEnvelope, error) {
+	if !ke.GetKey().IsZero() || len(ke.GetEncryptedKey()) == 0 {
+		return ke, nil
+	}
+	k, err := UnwrapAES128Key(ctx, *ke, v)
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.KeyEnvelope{
+		Key: &k,
+	}, nil
+}
+
 func pathWithPrefix(prefix, path string) string {
 	if prefix == "" {
 		return path
