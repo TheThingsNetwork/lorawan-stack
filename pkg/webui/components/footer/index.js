@@ -43,7 +43,7 @@ const Footer = function({ className, links, supportLink }) {
           The Things Network
         </Link.Anchor>
       </div>
-      <div>
+      <div className={style.right}>
         {links.map((item, key) => (
           <Link.Anchor secondary key={key} className={style.link} href={item.link}>
             <Message content={item.title} />

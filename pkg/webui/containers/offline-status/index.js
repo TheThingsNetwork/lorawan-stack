@@ -15,9 +15,10 @@
 import React, { Component } from 'react'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
+import classnames from 'classnames'
 
 import toast from '@ttn-lw/components/toast'
-import Status from '@ttn-lw/components/status'
+import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -87,28 +88,14 @@ export default class OfflineStatus extends Component {
     const { showOfflineOnly } = this.props
     const { online } = this.state
 
-    let statusIndicator = null
-    let message = null
-
-    if (online === undefined) {
-      return null
-    } else if (online) {
-      message = sharedMessages.online
-      statusIndicator = 'good'
-    } else {
-      statusIndicator = 'bad'
-      message = sharedMessages.offline
-    }
-
-    if (showOfflineOnly && online) {
+    if ((showOfflineOnly && online) || online === undefined) {
       return null
     }
 
     return (
-      <span>
-        <Status className={style.status} status={statusIndicator}>
-          <Message className={style.message} content={message} />
-        </Status>
+      <span className={classnames(style.status, { [style.online]: online })}>
+        <Icon className={style.icon} icon={online ? 'info' : 'error'} />
+        <Message content={online ? sharedMessages.online : sharedMessages.offline} />
       </span>
     )
   }

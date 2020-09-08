@@ -15,6 +15,16 @@
 .status
   display: inline-flex
   min-width: 60px
+  align-items: center
+  margin-right: $cs.xs
 
-.message
-  margin: 0 $cs.xxs 0 $cs.xs
+  &.online
+    .icon
+      color: $c-info
+
+  &:not(.online)
+    .icon
+      color: $c-error
+
+.icon
+  margin-right: $cs.xxs
