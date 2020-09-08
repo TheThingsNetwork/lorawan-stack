@@ -16,9 +16,9 @@ import React from 'react'
 
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
-import Checkbox from '@ttn-lw/components/checkbox'
 import Input from '@ttn-lw/components/input'
 import Radio from '@ttn-lw/components/radio-button'
+import Checkbox from '@ttn-lw/components/checkbox'
 import Select from '@ttn-lw/components/select'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
@@ -36,6 +36,7 @@ import {
   LORAWAN_VERSIONS,
   LORAWAN_PHY_VERSIONS,
   generate16BytesKey,
+  DEVICE_CLASSES,
 } from '@console/lib/device-utils'
 
 import messages from '../messages'
@@ -51,6 +52,12 @@ import validationSchema from './validation-schema'
 
 const NetworkServerForm = React.memo(props => {
   const { device, onSubmit, onSubmitSuccess, mayEditKeys, mayReadKeys } = props
+  const {
+    supports_class_b = false,
+    supports_class_c = false,
+    multicast = false,
+    supports_join = false,
+  } = device
 
   const isABP = isDeviceABP(device)
   const isMulticast = isDeviceMulticast(device)
@@ -66,6 +73,18 @@ const NetworkServerForm = React.memo(props => {
     parseLorawanMacVersion(device.lorawan_version),
   )
 
+  const initialDeviceClass = supports_class_c
+    ? DEVICE_CLASSES.CLASS_C
+    : supports_class_b
+    ? DEVICE_CLASSES.CLASS_B
+    : DEVICE_CLASSES.CLASS_A
+
+  const initialActivationMode = supports_join
+    ? ACTIVATION_MODES.OTAA
+    : multicast
+    ? ACTIVATION_MODES.MULTICAST
+    : ACTIVATION_MODES.ABP
+
   const validationContext = React.useMemo(
     () => ({
       mayEditKeys,
@@ -76,28 +95,19 @@ const NetworkServerForm = React.memo(props => {
     [device, mayEditKeys, mayReadKeys],
   )
 
-  const initialValues = React.useMemo(() => {
-    const { multicast = false, supports_join = false } = device
-
-    let _activation_mode = ACTIVATION_MODES.ABP
-    if (supports_join) {
-      _activation_mode = ACTIVATION_MODES.OTAA
-    } else if (multicast) {
-      _activation_mode = ACTIVATION_MODES.MULTICAST
-    }
-
-    const values = {
-      ...device,
-      _activation_mode,
-    }
-
-    return validationSchema.cast(values, { context: validationContext })
-  }, [device, validationContext])
+  const initialValues = React.useMemo(
+    () =>
+      validationSchema.cast(
+        { ...device, _activation_mode: initialActivationMode, _device_class: initialDeviceClass },
+        { context: validationContext },
+      ),
+    [device, initialActivationMode, initialDeviceClass, validationContext],
+  )
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
       const castedValues = validationSchema.cast(values, { context: validationContext })
-      const updatedValues = diff(initialValues, castedValues, ['_activation_mode'])
+      const updatedValues = diff(initialValues, castedValues, ['_activation_mode', '_device_class'])
 
       setError('')
       try {
@@ -195,15 +205,20 @@ const NetworkServerForm = React.memo(props => {
       />
       <NsFrequencyPlansSelect name="frequency_plan_id" required />
       <Form.Field
-        title={sharedMessages.supportsClassB}
-        name="supports_class_b"
-        component={Checkbox}
-      />
-      <Form.Field
-        title={sharedMessages.supportsClassC}
-        name="supports_class_c"
-        component={Checkbox}
-      />
+        title={sharedMessages.deviceClass}
+        name="_device_class"
+        component={Radio.Group}
+        horizontal={false}
+        required
+      >
+        <Radio
+          label={sharedMessages.supportsClassA}
+          value={DEVICE_CLASSES.CLASS_A}
+          disabled={isMulticast}
+        />
+        <Radio label={sharedMessages.supportsClassB} value={DEVICE_CLASSES.CLASS_B} />
+        <Radio label={sharedMessages.supportsClassC} value={DEVICE_CLASSES.CLASS_C} />
+      </Form.Field>
       <Form.Field
         title={sharedMessages.activationMode}
         disabled
