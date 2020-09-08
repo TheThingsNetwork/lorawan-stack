@@ -26,7 +26,15 @@ import PrevButton from './prev-button'
 import NextButton from './next-button'
 
 const WizardForm = React.forwardRef((props, ref) => {
-  const { validationSchema, validationContext, onSubmit, children, initialValues, error } = props
+  const {
+    validationSchema,
+    validationContext,
+    onSubmit,
+    children,
+    initialValues,
+    error,
+    excludePaths,
+  } = props
   const context = useWizardContext()
   const { onNextStep, currentStep, steps, snapshot, onComplete, completeMessage } = context
 
@@ -46,7 +54,11 @@ const WizardForm = React.forwardRef((props, ref) => {
     async (values, formikBag) => {
       const castedValues = validationSchema.cast(values, {
         context: validationContext,
+        stripUnknown: true,
       })
+      for (const excludePath of excludePaths) {
+        delete castedValues[excludePath]
+      }
 
       if (onSubmit) {
         await onSubmit(merge({}, snapshot, castedValues), formikBag)
@@ -56,13 +68,18 @@ const WizardForm = React.forwardRef((props, ref) => {
         return onComplete(merge({}, snapshot, castedValues), formikBag)
       }
 
-      onNextStep(
-        validationSchema.cast(values, {
-          context: validationContext,
-        }),
-      )
+      onNextStep(castedValues)
     },
-    [isLastStep, onComplete, onNextStep, onSubmit, snapshot, validationContext, validationSchema],
+    [
+      excludePaths,
+      isLastStep,
+      onComplete,
+      onNextStep,
+      onSubmit,
+      snapshot,
+      validationContext,
+      validationSchema,
+    ],
   )
 
   return (
@@ -90,6 +107,7 @@ const WizardForm = React.forwardRef((props, ref) => {
 WizardForm.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
   error: PropTypes.error,
+  excludePaths: PropTypes.arrayOf(PropTypes.string),
   initialValues: PropTypes.shape({}),
   onSubmit: PropTypes.func,
   validationContext: PropTypes.shape({}),
@@ -104,6 +122,7 @@ WizardForm.defaultProps = {
   validationContext: {},
   initialValues: {},
   error: undefined,
+  excludePaths: [],
 }
 
 export default WizardForm
