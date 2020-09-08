@@ -3230,6 +3230,15 @@
       "file": "grpc.go"
     }
   },
+  "error:pkg/events/redis:channel_closed": {
+    "translations": {
+      "en": "channel closed"
+    },
+    "description": {
+      "package": "pkg/events/redis",
+      "file": "redis.go"
+    }
+  },
   "error:pkg/fetch:fetch_file": {
     "translations": {
       "en": "could not fetch file `{filename}`"

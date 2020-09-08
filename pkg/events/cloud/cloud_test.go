@@ -15,11 +15,12 @@
 package cloud_test
 
 import (
-	"context"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/cloud"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -30,11 +31,14 @@ import (
 )
 
 func Example() {
+	// The component is used for automatic backoff on subscription failures.
+	c := &component.Component{}
+
 	// Import the desired cloud pub-sub drivers (see godoc.org/gocloud.dev).
 	// In this example we use "gocloud.dev/pubsub/mempubsub".
 
 	// This sends all events received from a Go Cloud pub sub to the default pubsub.
-	cloudPubSub, err := cloud.WrapPubSub(context.TODO(), events.DefaultPubSub(), "mem://events", "mem://events")
+	cloudPubSub, err := cloud.WrapPubSub(events.DefaultPubSub(), c, "mem://events", "mem://events")
 	if err != nil {
 		// Handle error.
 	}
@@ -42,6 +46,8 @@ func Example() {
 	// Replace the default pubsub so that we will now publish to a Go Cloud pub sub.
 	events.SetDefaultPubSub(cloudPubSub)
 }
+
+var timeout = (1 << 10) * test.Delay
 
 func TestCloudPubSub(t *testing.T) {
 	a := assertions.New(t)
@@ -56,12 +62,15 @@ func TestCloudPubSub(t *testing.T) {
 		eventCh <- e
 	})
 
-	pubsub, err := cloud.NewPubSub(test.Context(), "mem://events_test", "mem://events_test")
+	c := componenttest.NewComponent(t, &component.Config{})
+	pubsub, err := cloud.NewPubSub(c, "mem://events_test", "mem://events_test")
 	a.So(err, should.BeNil)
 
-	defer pubsub.Close()
+	defer pubsub.Close(test.Context())
 
 	pubsub.Subscribe("cloud.**", handler)
+
+	time.Sleep(timeout)
 
 	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
 
@@ -91,7 +100,7 @@ func TestCloudPubSub(t *testing.T) {
 		if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 1) {
 			a.So(e.Identifiers()[0].GetApplicationIDs(), should.Resemble, &appID)
 		}
-	case <-time.After(time.Second):
+	case <-time.After(timeout):
 		t.Error("Did not receive expected event")
 		t.FailNow()
 	}
@@ -106,7 +115,7 @@ func TestCloudPubSub(t *testing.T) {
 			a.So(e.Identifiers()[0].GetDeviceIDs(), should.Resemble, &devID)
 			a.So(e.Identifiers()[1].GetGatewayIDs(), should.Resemble, &gtwID)
 		}
-	case <-time.After(time.Second):
+	case <-time.After(timeout):
 		t.Error("Did not receive expected event")
 		t.FailNow()
 	}

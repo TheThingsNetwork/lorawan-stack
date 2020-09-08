@@ -21,6 +21,8 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/redis"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -53,13 +55,17 @@ func redisConfig() ttnredis.Config {
 }
 
 func Example() {
+	// The component is used for automatic backoff on subscription failures.
+	c := &component.Component{}
 	// This sends all events received from Redis to the default pubsub.
-	redisPubSub := redis.WrapPubSub(events.DefaultPubSub(), ttnredis.Config{
+	redisPubSub := redis.WrapPubSub(events.DefaultPubSub(), c, ttnredis.Config{
 		// Config here...
 	})
 	// Replace the default pubsub so that we will now publish to Redis.
 	events.SetDefaultPubSub(redisPubSub)
 }
+
+var timeout = (1 << 10) * test.Delay
 
 func TestRedisPubSub(t *testing.T) {
 	a := assertions.New(t)
@@ -76,10 +82,12 @@ func TestRedisPubSub(t *testing.T) {
 
 	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
 
-	pubsub := redis.NewPubSub(redisConfig())
+	c := componenttest.NewComponent(t, &component.Config{})
+	pubsub := redis.NewPubSub(c, redisConfig())
 	defer pubsub.Close(ctx)
 
 	pubsub.Subscribe("redis.**", handler)
+	time.Sleep(timeout)
 
 	appID := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
 
@@ -90,7 +98,7 @@ func TestRedisPubSub(t *testing.T) {
 		if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 1) {
 			a.So(e.Identifiers()[0].GetApplicationIDs(), should.Resemble, appID)
 		}
-	case <-time.After(time.Second):
+	case <-time.After(timeout):
 		t.Error("Did not receive expected event")
 		t.FailNow()
 	}
