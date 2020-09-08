@@ -28,7 +28,6 @@ func TestNewDevAddr(t *testing.T) {
 	test.RunSubtest(t, test.SubtestConfig{
 		Name:     "From NetID",
 		Parallel: true,
-		Timeout:  (1 << 8) * test.Delay,
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 			ns, ctx, _, stop := StartTest(
 				t,
@@ -54,7 +53,6 @@ func TestNewDevAddr(t *testing.T) {
 	test.RunSubtest(t, test.SubtestConfig{
 		Name:     "Configured DevAddr prefixes",
 		Parallel: true,
-		Timeout:  (1 << 8) * test.Delay,
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 			ps := []types.DevAddrPrefix{
 				{

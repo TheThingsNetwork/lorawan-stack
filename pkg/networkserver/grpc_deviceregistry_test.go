@@ -347,7 +347,6 @@ func TestDeviceRegistryGet(t *testing.T) {
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
-			Timeout:  (1 << 9) * test.Delay,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				var getByIDCalls uint64
 
@@ -1499,7 +1498,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
-			Timeout:  (1 << 9) * test.Delay,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				var addCalls, setByIDCalls uint64
 
@@ -1531,11 +1529,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 				go LogEvents(t, env.Events)
 
 				ns.AddContextFiller(tc.ContextFunc)
-				ns.AddContextFiller(func(ctx context.Context) context.Context {
-					ctx, cancel := context.WithTimeout(ctx, (1<<9)*test.Delay)
-					_ = cancel
-					return ctx
-				})
 				ns.AddContextFiller(func(ctx context.Context) context.Context {
 					return test.ContextWithTB(ctx, t)
 				})
@@ -1673,7 +1666,6 @@ func TestDeviceRegistryDelete(t *testing.T) {
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
-			Timeout:  (1 << 9) * test.Delay,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				var setByIDCalls uint64
 

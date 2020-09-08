@@ -1242,7 +1242,6 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
-			Timeout:  (1 << 11) * test.Delay,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				ns, ctx, _, stop := StartTest(t, TestConfig{
 					Context: ctx,

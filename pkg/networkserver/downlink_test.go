@@ -2765,8 +2765,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	} {
 		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
-			Name:    tc.Name,
-			Timeout: (1 << 10) * test.Delay,
+			Name: tc.Name,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				errCh := make(chan error, 1)
 				_, ctx, env, stop := StartTest(t, TestConfig{

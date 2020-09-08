@@ -1036,7 +1036,6 @@ func TestGenerateDownlink(t *testing.T) {
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
-			Timeout:  (1 << 7) * test.Delay,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				c := component.MustNew(
 					log.Noop,
