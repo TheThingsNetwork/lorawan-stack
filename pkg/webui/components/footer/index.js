@@ -18,8 +18,7 @@ import { defineMessages } from 'react-intl'
 
 import Button from '@ttn-lw/components/button'
 import Link from '@ttn-lw/components/link'
-
-import OfflineStatus from '@ttn-lw/containers/offline-status'
+import OfflineStatus from '@ttn-lw/components/offline-status'
 
 import Message from '@ttn-lw/lib/components/message'
 
