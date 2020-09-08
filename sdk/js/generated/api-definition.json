@@ -2056,6 +2056,72 @@
       ]
     }
   },
+  "ApplicationActivationSettingRegistry": {
+    "Get": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/js/applications/{application_ids.application_id}/settings",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "application_server_id",
+        "home_net_id",
+        "kek",
+        "kek.encrypted_key",
+        "kek.kek_label",
+        "kek.key",
+        "kek_label"
+      ]
+    },
+    "Set": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/js/applications/{application_ids.application_id}/settings",
+          "body": "*",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "application_server_id",
+        "home_net_id",
+        "kek",
+        "kek.encrypted_key",
+        "kek.kek_label",
+        "kek.key",
+        "kek_label"
+      ]
+    },
+    "Delete": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/js/applications/{application_ids.application_id}/settings",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "application_server_id",
+        "home_net_id",
+        "kek",
+        "kek.encrypted_key",
+        "kek.kek_label",
+        "kek.key",
+        "kek_label"
+      ]
+    }
+  },
   "ApplicationCryptoService": {
     "DeriveAppSKey": {
       "file": "lorawan-stack/api/joinserver.proto",

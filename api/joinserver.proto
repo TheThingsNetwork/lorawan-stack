@@ -18,6 +18,7 @@ import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "lorawan-stack/api/end_device.proto";
 import "lorawan-stack/api/identifiers.proto";
@@ -189,6 +190,57 @@ service JsEndDeviceRegistry {
   rpc Delete(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/js/applications/{application_ids.application_id}/devices/{device_id}"
+    };
+  };
+}
+
+message ApplicationActivationSettings {
+  // The KEK label to use for wrapping application keys.
+  string kek_label = 1 [(gogoproto.customname) = "KEKLabel", (validate.rules).string.max_len = 2048];
+  // The (encrypted) Key Encryption Key.
+  KeyEnvelope kek = 2 [(gogoproto.customname) = "KEK"];
+  // Home NetID.
+  bytes home_net_id = 3 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID", (gogoproto.customname) = "HomeNetID"];
+  // The AS-ID of the Application Server to use.
+  string application_server_id = 4 [(gogoproto.customname) = "ApplicationServerID", (validate.rules).string.max_len = 100];
+}
+
+message GetApplicationActivationSettingsRequest {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message SetApplicationActivationSettingsRequest {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
+  ApplicationActivationSettings settings = 2 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
+  google.protobuf.FieldMask field_mask = 3 [(gogoproto.nullable) = false];
+}
+
+message DeleteApplicationActivationSettingsRequest {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
+}
+
+// The ApplicationActivationSettingRegistry service allows clients to manage their application activation settings.
+service ApplicationActivationSettingRegistry {
+  // Get returns application activation settings.
+  rpc Get(GetApplicationActivationSettingsRequest) returns (ApplicationActivationSettings) {
+    option (google.api.http) = {
+      get: "/js/applications/{application_ids.application_id}/settings"
+    };
+  };
+
+  // Set creates or updates application activation settings.
+  rpc Set(SetApplicationActivationSettingsRequest) returns (ApplicationActivationSettings) {
+    option (google.api.http) = {
+      post: "/js/applications/{application_ids.application_id}/settings"
+      body: "*"
+    };
+  };
+
+  // Delete deletes application activation settings.
+  rpc Delete(DeleteApplicationActivationSettingsRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/js/applications/{application_ids.application_id}/settings"
     };
   };
 }

@@ -67,6 +67,11 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 	"/ttn.lorawan.v3.ApplicationRegistry/Update":              ApplicationFieldPathsNested,
 	"/ttn.lorawan.v3.EntityRegistrySearch/SearchApplications": ApplicationFieldPathsNested,
 
+	// Application Activation Settings:
+	"/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Get":    ApplicationActivationSettingsFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Set":    ApplicationActivationSettingsFieldPathsNested,
+	"/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Delete": ApplicationActivationSettingsFieldPathsNested,
+
 	// Application Webhook Templates:
 	"/ttn.lorawan.v3.ApplicationWebhookRegistry/GetTemplate":   ApplicationWebhookTemplateFieldPathsNested,
 	"/ttn.lorawan.v3.ApplicationWebhookRegistry/ListTemplates": ApplicationWebhookTemplateFieldPathsNested,

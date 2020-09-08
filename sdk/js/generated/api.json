@@ -14538,6 +14538,73 @@
           ]
         },
         {
+          "name": "ApplicationActivationSettings",
+          "longName": "ApplicationActivationSettings",
+          "fullName": "ttn.lorawan.v3.ApplicationActivationSettings",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "kek_label",
+              "description": "The KEK label to use for wrapping application keys.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            },
+            {
+              "name": "kek",
+              "description": "The (encrypted) Key Encryption Key.",
+              "label": "",
+              "type": "KeyEnvelope",
+              "longType": "KeyEnvelope",
+              "fullType": "ttn.lorawan.v3.KeyEnvelope",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "home_net_id",
+              "description": "Home NetID.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "application_server_id",
+              "description": "The AS-ID of the Application Server to use.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "CryptoServicePayloadRequest",
           "longName": "CryptoServicePayloadRequest",
           "fullName": "ttn.lorawan.v3.CryptoServicePayloadRequest",
@@ -14648,6 +14715,27 @@
           ]
         },
         {
+          "name": "DeleteApplicationActivationSettingsRequest",
+          "longName": "DeleteApplicationActivationSettingsRequest",
+          "fullName": "ttn.lorawan.v3.DeleteApplicationActivationSettingsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "DeriveSessionKeysRequest",
           "longName": "DeriveSessionKeysRequest",
           "fullName": "ttn.lorawan.v3.DeriveSessionKeysRequest",
@@ -14751,6 +14839,37 @@
               "type": "Struct",
               "longType": "google.protobuf.Struct",
               "fullType": "google.protobuf.Struct",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetApplicationActivationSettingsRequest",
+          "longName": "GetApplicationActivationSettingsRequest",
+          "fullName": "ttn.lorawan.v3.GetApplicationActivationSettingsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
               "ismap": false,
               "defaultValue": ""
             }
@@ -15208,9 +15327,125 @@
               "defaultValue": ""
             }
           ]
+        },
+        {
+          "name": "SetApplicationActivationSettingsRequest",
+          "longName": "SetApplicationActivationSettingsRequest",
+          "fullName": "ttn.lorawan.v3.SetApplicationActivationSettingsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "settings",
+              "description": "",
+              "label": "",
+              "type": "ApplicationActivationSettings",
+              "longType": "ApplicationActivationSettings",
+              "fullType": "ttn.lorawan.v3.ApplicationActivationSettings",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
         }
       ],
       "services": [
+        {
+          "name": "ApplicationActivationSettingRegistry",
+          "longName": "ApplicationActivationSettingRegistry",
+          "fullName": "ttn.lorawan.v3.ApplicationActivationSettingRegistry",
+          "description": "The ApplicationActivationSettingRegistry service allows clients to manage their application activation settings.",
+          "methods": [
+            {
+              "name": "Get",
+              "description": "Get returns application activation settings.",
+              "requestType": "GetApplicationActivationSettingsRequest",
+              "requestLongType": "GetApplicationActivationSettingsRequest",
+              "requestFullType": "ttn.lorawan.v3.GetApplicationActivationSettingsRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationActivationSettings",
+              "responseLongType": "ApplicationActivationSettings",
+              "responseFullType": "ttn.lorawan.v3.ApplicationActivationSettings",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/js/applications/{application_ids.application_id}/settings"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Set",
+              "description": "Set creates or updates application activation settings.",
+              "requestType": "SetApplicationActivationSettingsRequest",
+              "requestLongType": "SetApplicationActivationSettingsRequest",
+              "requestFullType": "ttn.lorawan.v3.SetApplicationActivationSettingsRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationActivationSettings",
+              "responseLongType": "ApplicationActivationSettings",
+              "responseFullType": "ttn.lorawan.v3.ApplicationActivationSettings",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/js/applications/{application_ids.application_id}/settings",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete",
+              "description": "Delete deletes application activation settings.",
+              "requestType": "DeleteApplicationActivationSettingsRequest",
+              "requestLongType": "DeleteApplicationActivationSettingsRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteApplicationActivationSettingsRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/js/applications/{application_ids.application_id}/settings"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
         {
           "name": "ApplicationCryptoService",
           "longName": "ApplicationCryptoService",

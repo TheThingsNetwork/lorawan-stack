@@ -4407,6 +4407,111 @@
         ]
       }
     },
+    "/js/applications/{application_ids.application_id}/settings": {
+      "get": {
+        "operationId": "ApplicationActivationSettingRegistry_Get",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationActivationSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ApplicationActivationSettingRegistry"
+        ]
+      },
+      "delete": {
+        "operationId": "ApplicationActivationSettingRegistry_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationActivationSettingRegistry"
+        ]
+      },
+      "post": {
+        "operationId": "ApplicationActivationSettingRegistry_Set",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationActivationSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetApplicationActivationSettingsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationActivationSettingRegistry"
+        ]
+      }
+    },
     "/js/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
         "operationId": "JsEndDeviceRegistry_Set2",
@@ -8868,6 +8973,28 @@
       },
       "description": "Application is the message that defines an Application in the network."
     },
+    "v3ApplicationActivationSettings": {
+      "type": "object",
+      "properties": {
+        "kek_label": {
+          "type": "string",
+          "description": "The KEK label to use for wrapping application keys."
+        },
+        "kek": {
+          "$ref": "#/definitions/v3KeyEnvelope",
+          "description": "The (encrypted) Key Encryption Key."
+        },
+        "home_net_id": {
+          "type": "string",
+          "format": "byte",
+          "description": "Home NetID."
+        },
+        "application_server_id": {
+          "type": "string",
+          "description": "The AS-ID of the Application Server to use."
+        }
+      }
+    },
     "v3ApplicationDownlink": {
       "type": "object",
       "properties": {
@@ -12938,6 +13065,20 @@
         }
       },
       "description": "Session keys for a LoRaWAN session.\nOnly the components for which the keys were meant, will have the key-encryption-key (KEK) to decrypt the individual keys."
+    },
+    "v3SetApplicationActivationSettingsRequest": {
+      "type": "object",
+      "properties": {
+        "application_ids": {
+          "$ref": "#/definitions/v3ApplicationIdentifiers"
+        },
+        "settings": {
+          "$ref": "#/definitions/v3ApplicationActivationSettings"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask"
+        }
+      }
     },
     "v3SetApplicationCollaboratorRequest": {
       "type": "object",
