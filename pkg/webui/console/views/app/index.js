@@ -18,6 +18,7 @@ import { connect } from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
 import { Route, Switch } from 'react-router-dom'
 import classnames from 'classnames'
+import bind from 'autobind-decorator'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
 import Footer from '@ttn-lw/components/footer'
@@ -41,6 +42,8 @@ import FullViewError, { FullViewErrorInner } from '@console/views/error'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import dev from '@ttn-lw/lib/dev'
 
+import { setConnectionStatus } from '@console/store/actions/status'
+
 import {
   selectUser,
   selectUserFetching,
@@ -48,19 +51,26 @@ import {
   selectUserRights,
   selectUserIsAdmin,
 } from '@console/store/selectors/user'
+import { selectConnectionStatus } from '@console/store/selectors/status'
 
 import style from './app.styl'
 
 const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
 
 @withEnv
-@connect(state => ({
-  user: selectUser(state),
-  fetching: selectUserFetching(state),
-  error: selectUserError(state),
-  rights: selectUserRights(state),
-  isAdmin: selectUserIsAdmin(state),
-}))
+@connect(
+  state => ({
+    user: selectUser(state),
+    fetching: selectUserFetching(state),
+    error: selectUserError(state),
+    rights: selectUserRights(state),
+    isAdmin: selectUserIsAdmin(state),
+    isOnline: selectConnectionStatus(state),
+  }),
+  {
+    setConnectionStatus,
+  },
+)
 @(Component => (dev ? hot(Component) : Component))
 class ConsoleApp extends React.PureComponent {
   static propTypes = {
@@ -72,7 +82,9 @@ class ConsoleApp extends React.PureComponent {
       replace: PropTypes.func,
     }).isRequired,
     isAdmin: PropTypes.bool,
+    isOnline: PropTypes.bool.isRequired,
     rights: PropTypes.rights,
+    setConnectionStatus: PropTypes.func.isRequired,
     user: PropTypes.user,
   }
   static defaultProps = {
@@ -82,6 +94,23 @@ class ConsoleApp extends React.PureComponent {
     rights: undefined,
   }
 
+  @bind
+  handleConnectionStatusChange({ type }) {
+    const { setConnectionStatus } = this.props
+
+    setConnectionStatus(type === 'online')
+  }
+
+  componentDidMount() {
+    window.addEventListener('online', this.handleConnectionStatusChange)
+    window.addEventListener('offline', this.handleConnectionStatusChange)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('online', this.handleConnectionStatusChange)
+    window.removeEventListener('offline', this.handleConnectionStatusChange)
+  }
+
   render() {
     const {
       user,
@@ -89,6 +118,7 @@ class ConsoleApp extends React.PureComponent {
       error,
       rights,
       isAdmin,
+      isOnline,
       history,
       env: {
         siteTitle,
@@ -145,7 +175,7 @@ class ConsoleApp extends React.PureComponent {
                   </div>
                 </WithAuth>
               </main>
-              <Footer className={style.footer} supportLink={supportLink} />
+              <Footer className={style.footer} supportLink={supportLink} isOnline={isOnline} />
             </div>
           </ErrorView>
         </ConnectedRouter>
