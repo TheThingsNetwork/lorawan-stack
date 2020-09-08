@@ -15,7 +15,7 @@
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { parseLorawanMacVersion, ACTIVATION_MODES } from '@console/lib/device-utils'
+import { parseLorawanMacVersion, ACTIVATION_MODES, DEVICE_CLASSES } from '@console/lib/device-utils'
 
 const factoryPresetFreqNumericTest = frequencies => {
   return frequencies.every(freq => {
@@ -36,6 +36,21 @@ const validationSchema = Yup.object()
     _activation_mode: Yup.mixed()
       .oneOf([ACTIVATION_MODES.ABP, ACTIVATION_MODES.OTAA, ACTIVATION_MODES.MULTICAST])
       .required(sharedMessages.validateRequired),
+    _device_class: Yup.mixed().when(['_activation_mode'], (mode, schema) => {
+      const isMulticast = mode === ACTIVATION_MODES.MULTICAST
+
+      if (isMulticast) {
+        return schema
+          .oneOf([DEVICE_CLASSES.CLASS_B, DEVICE_CLASSES.CLASS_C])
+          .default(DEVICE_CLASSES.CLASS_B)
+          .required(sharedMessages.validateRequired)
+      }
+
+      return schema
+        .oneOf(Object.values(DEVICE_CLASSES))
+        .default(DEVICE_CLASSES.CLASS_A)
+        .required(sharedMessages.validateRequired)
+    }),
     lorawan_version: Yup.string().required(sharedMessages.validateRequired),
     lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
     frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),

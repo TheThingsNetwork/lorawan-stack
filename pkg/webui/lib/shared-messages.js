@@ -120,6 +120,7 @@ export default defineMessages({
   deviceAddrDescription:
     'Device address, issued by the Network Server or chosen by device manufacturer in case of testing range',
   deviceCounted: '{count, plural, one {End device} other {End devices}}',
+  deviceClass: 'End device class',
   deviceDescDescription:
     'Optional end device description; can also be used to save notes about the end device',
   deviceDescPlaceholder: 'Description for my new end device',

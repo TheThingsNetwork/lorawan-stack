@@ -16,7 +16,6 @@ import React from 'react'
 
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
-import Checkbox from '@ttn-lw/components/checkbox'
 import Input from '@ttn-lw/components/input'
 import Radio from '@ttn-lw/components/radio-button'
 import Select from '@ttn-lw/components/select'
@@ -75,35 +74,18 @@ const NetworkServerForm = React.memo(props => {
   const [lorawanVersion, setLorawanVersion] = React.useState(device.lorawan_version)
   const lwVersion = parseLorawanMacVersion(lorawanVersion)
 
-  const [deviceClass, setDeviceClass] = React.useState(() => {
-    if (supports_class_c) {
-      return DEVICE_CLASSES.CLASS_C
-    }
+  const initialDeviceClass = supports_class_c
+    ? DEVICE_CLASSES.CLASS_C
+    : supports_class_b
+    ? DEVICE_CLASSES.CLASS_B
+    : DEVICE_CLASSES.CLASS_A
+  const [deviceClass, setDeviceClass] = React.useState(initialDeviceClass)
 
-    if (supports_class_b) {
-      return DEVICE_CLASSES.CLASS_B
-    }
-
-    return DEVICE_CLASSES.CLASS_A
-  })
-  const handleDeviceClassChange = React.useCallback(evt => {
-    const { checked, name } = evt.target
-
-    if (name === 'supports_class_c' && checked) {
-      setDeviceClass(DEVICE_CLASSES.CLASS_C)
-    } else if (name === 'supports_class_b' && checked) {
-      setDeviceClass(DEVICE_CLASSES.CLASS_B)
-    } else {
-      setDeviceClass(DEVICE_CLASSES.CLASS_A)
-    }
-  }, [])
-
-  let activationMode = ACTIVATION_MODES.ABP
-  if (supports_join) {
-    activationMode = ACTIVATION_MODES.OTAA
-  } else if (multicast) {
-    activationMode = ACTIVATION_MODES.MULTICAST
-  }
+  const initialActivationMode = supports_join
+    ? ACTIVATION_MODES.OTAA
+    : multicast
+    ? ACTIVATION_MODES.MULTICAST
+    : ACTIVATION_MODES.ABP
 
   const validationContext = React.useMemo(
     () => ({
@@ -118,10 +100,14 @@ const NetworkServerForm = React.memo(props => {
   const initialValues = React.useMemo(
     () =>
       validationSchema.cast(
-        { ...device, _activation_mode: activationMode },
+        {
+          ...device,
+          _activation_mode: initialActivationMode,
+          _device_classes: { class_b: device.supports_class_b, class_c: device.supports_class_c },
+        },
         { context: validationContext },
       ),
-    [activationMode, device, validationContext],
+    [device, initialActivationMode, validationContext],
   )
 
   const onFormSubmit = React.useCallback(
@@ -136,7 +122,8 @@ const NetworkServerForm = React.memo(props => {
 
       setError('')
       try {
-        await onSubmit(updatedValues)
+        // Always submit current `mac_settings` values to avoid overwriting nested entries.
+        await onSubmit({ ...updatedValues, mac_settings: castedValues.mac_settings })
         resetForm({ values: castedValues })
         onSubmitSuccess()
       } catch (err) {
@@ -224,17 +211,18 @@ const NetworkServerForm = React.memo(props => {
       />
       <NsFrequencyPlansSelect name="frequency_plan_id" required />
       <Form.Field
-        title={sharedMessages.supportsClassB}
-        name="supports_class_b"
-        component={Checkbox}
-        onChange={handleDeviceClassChange}
-      />
-      <Form.Field
-        title={sharedMessages.supportsClassC}
-        name="supports_class_c"
-        component={Checkbox}
-        onChange={handleDeviceClassChange}
-      />
+        title={sharedMessages.deviceClass}
+        name="_device_classes"
+        component={Checkbox.Group}
+        required={isMulticast}
+      >
+        <Checkbox
+          name="class_b"
+          label={sharedMessages.supportsClassB}
+          onChange={handleClassBChange}
+        />
+        <Checkbox name="class_c" label={sharedMessages.supportsClassC} />
+      </Form.Field>
       <Form.Field
         title={sharedMessages.frameCounterWidth}
         name="mac_settings.supports_32_bit_f_cnt"
@@ -313,7 +301,7 @@ const NetworkServerForm = React.memo(props => {
           )}
         </>
       )}
-      <MacSettingsSection activationMode={activationMode} deviceClass={deviceClass} />
+      <MacSettingsSection activationMode={initialActivationMode} deviceClass={deviceClass} />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
       </SubmitBar>
