@@ -26,7 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
-func formatError(err error) string {
+func FormatError(err error) string {
 	var s string
 	for i, err := range errors.Stack(err) {
 		s += fmt.Sprintf(`
@@ -57,7 +57,7 @@ var Delay = time.Millisecond * func() time.Duration {
 // Must returns v if err is nil and panics otherwise.
 func Must(v interface{}, err error) interface{} {
 	if err != nil {
-		panic(fmt.Sprintf("Must received error: %v", formatError(err)))
+		panic(fmt.Sprintf("Must received error: %v", FormatError(err)))
 	}
 	return v
 }
@@ -77,7 +77,7 @@ func MustMultiple(vs ...interface{}) []interface{} {
 	}
 
 	if err != nil {
-		panic(fmt.Sprintf("MustMultiple received error: %s", formatError(err)))
+		panic(fmt.Sprintf("MustMultiple received error: %s", FormatError(err)))
 	}
 	return vs[:n-1]
 }
