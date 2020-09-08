@@ -26,7 +26,7 @@ import Message from '@ttn-lw/lib/components/message'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { ACTIVATION_MODES, DEVICE_CLASSES } from '@console/lib/device-utils'
+import { ACTIVATION_MODES } from '@console/lib/device-utils'
 
 const m = defineMessages({
   delayValue: '{count, plural, one {{count} second} other {{count} seconds}}',
@@ -66,9 +66,8 @@ const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
 })
 
 const MacSettingsSection = props => {
-  const { activationMode, deviceClass, resetsFCnt: initialFCnt, initiallyCollapsed } = props
+  const { activationMode, resetsFCnt: initialFCnt, initiallyCollapsed, isClassB } = props
 
-  const isClassB = deviceClass === DEVICE_CLASSES.CLASS_B
   const isABP = activationMode === ACTIVATION_MODES.ABP
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
 
@@ -172,14 +171,15 @@ const MacSettingsSection = props => {
 
 MacSettingsSection.propTypes = {
   activationMode: PropTypes.oneOf(Object.values(ACTIVATION_MODES)).isRequired,
-  deviceClass: PropTypes.oneOf(Object.values(DEVICE_CLASSES)).isRequired,
   initiallyCollapsed: PropTypes.bool,
+  isClassB: PropTypes.bool,
   resetsFCnt: PropTypes.bool,
 }
 
 MacSettingsSection.defaultProps = {
   resetsFCnt: false,
   initiallyCollapsed: true,
+  isClassB: false,
 }
 
 export default MacSettingsSection

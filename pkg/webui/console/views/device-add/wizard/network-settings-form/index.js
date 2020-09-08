@@ -26,6 +26,7 @@ import Wizard from '@ttn-lw/components/wizard'
 import Form from '@ttn-lw/components/form'
 
 import PhyVersionInput from '@console/components/phy-version-input'
+import MacSettingsSection from '@console/components/mac-settings-section'
 
 import DevAddrInput from '@console/containers/dev-addr-input'
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
@@ -34,7 +35,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import {
-  DEVICE_CLASSES,
   ACTIVATION_MODES,
   LORAWAN_VERSIONS,
   FRAME_WIDTH_COUNT,
@@ -70,11 +70,13 @@ const defaultFormValues = {
 const NetworkSettingsForm = props => {
   const { activationMode, lorawanVersion, error } = props
 
-  const [deviceClass, setDeviceClass] = React.useState(
-    activationMode === ACTIVATION_MODES.MULTICAST ? DEVICE_CLASSES.CLASS_B : DEVICE_CLASSES.CLASS_A,
-  )
+  const [isClassB, setClassB] = React.useState(activationMode === ACTIVATION_MODES.MULTICAST)
+  const handleClassBChange = React.useCallback(evt => {
+    const { checked } = evt.target
 
-  const isClassB = deviceClass === DEVICE_CLASSES.CLASS_B
+    setClassB(checked)
+  }, [])
+
   const isABP = activationMode === ACTIVATION_MODES.ABP
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
   const lwVersion = parseLorawanMacVersion(lorawanVersion)
@@ -98,6 +100,7 @@ const NetworkSettingsForm = props => {
       validationSchema={validationSchema}
       validationContext={validationContext}
       error={error}
+      excludePaths={excludePaths}
     >
       <NsFrequencyPlansSelect
         required
@@ -125,20 +128,6 @@ const NetworkSettingsForm = props => {
         glossaryId={glossaryId.REGIONAL_PARAMETERS}
       />
       <Form.Field
-        title={sharedMessages.supportsClassB}
-        name="supports_class_b"
-        component={Checkbox}
-        onChange={handleDeviceClassChange}
-      />
-      <Form.Field
-        title={sharedMessages.supportsClassC}
-        name="supports_class_c"
-        component={Checkbox}
-        disabled={isMulticast}
-        glossaryId={glossaryId.CLASS_C}
-        onChange={handleDeviceClassChange}
-      />
-      <Form.Field
         title={sharedMessages.frameCounterWidth}
         name="mac_settings.supports_32_bit_f_cnt"
         component={Radio.Group}
@@ -147,6 +136,19 @@ const NetworkSettingsForm = props => {
       >
         <Radio label={sharedMessages['16Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_16_BIT} />
         <Radio label={sharedMessages['32Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_32_BIT} />
+      </Form.Field>
+      <Form.Field
+        title={sharedMessages.deviceClass}
+        name="_device_classes"
+        component={Checkbox.Group}
+        required={isMulticast}
+      >
+        <Checkbox
+          name="class_b"
+          label={sharedMessages.supportsClassB}
+          onChange={handleClassBChange}
+        />
+        <Checkbox name="class_c" label={sharedMessages.supportsClassC} />
       </Form.Field>
       {(isMulticast || isABP) && (
         <>
@@ -211,8 +213,8 @@ const NetworkSettingsForm = props => {
       )}
       <MacSettingsSection
         activationMode={activationMode}
-        deviceClass={deviceClass}
-        initiallyCollapsed={!isClassB}
+        isClassB={isClassB}
+        initiallyCollapsed={!isMulticast}
       />
     </Wizard.Form>
   )

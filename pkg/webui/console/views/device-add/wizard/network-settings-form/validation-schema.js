@@ -15,7 +15,7 @@
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { ACTIVATION_MODES, parseLorawanMacVersion, DEVICE_CLASSES } from '@console/lib/device-utils'
+import { ACTIVATION_MODES, parseLorawanMacVersion } from '@console/lib/device-utils'
 
 const factoryPresetFreqNumericTest = frequencies => {
   return frequencies.every(freq => {
@@ -35,13 +35,31 @@ const validationSchema = Yup.object({
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
   lorawan_version: Yup.string().required(sharedMessages.validateRequired),
   lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
-  supports_class_b: Yup.boolean().default(false),
-  supports_class_c: Yup.boolean().default(false),
+  supports_class_b: Yup.boolean().when(['_device_classes'], (deviceClasses = {}, schema) => {
+    return schema.transform(() => undefined).default(deviceClasses.class_b || false)
+  }),
+  supports_class_c: Yup.boolean().when(['_device_classes'], (deviceClasses = {}, schema) => {
+    return schema.transform(() => undefined).default(deviceClasses.class_c || false)
+  }),
+  _device_classes: Yup.object({
+    class_b: Yup.boolean(),
+    class_c: Yup.boolean(),
+  }).when(['$activationMode'], (mode, schema) => {
+    if (mode === ACTIVATION_MODES.MULTICAST) {
+      return schema.test(
+        'has-class-checked',
+        sharedMessages.validateRequired,
+        classes => !classes || Object.values(classes).some(supportsClass => Boolean(supportsClass)),
+      )
+    }
+
+    return schema
+  }),
   supports_join: Yup.boolean().default(false),
   multicast: Yup.boolean().default(false),
   mac_settings: Yup.object({
     rx1_delay: Yup.lazy(delay => {
-      if (!Boolean(delay) || typeof delay.value === 'undefined') {
+      if (!Boolean(delay) || delay.value === undefined || delay.value === '') {
         return Yup.object().strip()
       }
 
@@ -70,7 +88,7 @@ const validationSchema = Yup.object({
       otherwise: schema => schema.strip(),
     }),
     rx2_data_rate_index: Yup.lazy(dataRate => {
-      if (!Boolean(dataRate) || typeof dataRate.value === 'undefined') {
+      if (!Boolean(dataRate) || dataRate.value === '' || dataRate.value === undefined) {
         return Yup.object().strip()
       }
 
@@ -80,27 +98,40 @@ const validationSchema = Yup.object({
           .max(15, Yup.passValues(sharedMessages.validateNumberLte)),
       })
     }),
-    rx2_frequency: Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte)),
-    ping_slot_periodicity: Yup.lazy(periodicity => {
-      if (!Boolean(periodicity) || typeof periodicity.value === 'undefined') {
-        return Yup.object().strip()
+    rx2_frequency: Yup.lazy(frequency => {
+      if (frequency === undefined || frequency === '') {
+        return Yup.number().strip()
+      }
+      return Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
+    }),
+    ping_slot_periodicity: Yup.object().when(
+      ['$isClassB', '$activationMode'],
+      (isClassB, mode, schema) => {
+        if (!isClassB) {
+          return schema.strip()
+        }
+
+        if (mode !== ACTIVATION_MODES.MULTICAST) {
+          return schema.shape({
+            value: Yup.string(),
+          })
+        }
+
+        return schema.shape({
+          value: Yup.string().required(sharedMessages.validateRequired),
+        })
+      },
+    ),
+    ping_slot_frequency: Yup.lazy(value => {
+      if (!Boolean(value)) {
+        return Yup.number().strip()
       }
 
-      return Yup.object().when('$isClassB', {
+      return Yup.number().when('$isClassB', {
         is: true,
-        then: schema =>
-          schema
-            .shape({
-              value: Yup.string(),
-            })
-            .required(sharedMessages.validateRequired),
+        then: schema => schema.min(100000, Yup.passValues(sharedMessages.validateNumberGte)),
         otherwise: schema => schema.strip(),
       })
-    }),
-    ping_slot_frequency: Yup.number().when('$isClassB', {
-      is: true,
-      then: schema => schema.min(100000, Yup.passValues(sharedMessages.validateNumberGte)),
-      otherwise: schema => schema.strip(),
     }),
     factory_preset_frequencies: Yup.lazy(frequencies => {
       if (!Boolean(frequencies)) {
@@ -163,21 +194,6 @@ const validationSchema = Yup.object({
       })
     },
   ),
-  _device_class: Yup.mixed().when(['$activationMode'], (mode, schema) => {
-    const isMulticast = mode === ACTIVATION_MODES.MULTICAST
-
-    if (isMulticast) {
-      return schema
-        .oneOf([DEVICE_CLASSES.CLASS_B, DEVICE_CLASSES.CLASS_C])
-        .default(DEVICE_CLASSES.CLASS_B)
-        .required(sharedMessages.validateRequired)
-    }
-
-    return schema
-      .oneOf(Object.values(DEVICE_CLASSES))
-      .default(DEVICE_CLASSES.CLASS_A)
-      .required(sharedMessages.validateRequired)
-  }),
 }).noUnknown()
 
 export default validationSchema
