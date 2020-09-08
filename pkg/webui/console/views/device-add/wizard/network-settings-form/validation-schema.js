@@ -15,24 +15,26 @@
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { ACTIVATION_MODES, parseLorawanMacVersion } from '@console/lib/device-utils'
+import { ACTIVATION_MODES, parseLorawanMacVersion, DEVICE_CLASSES } from '@console/lib/device-utils'
 
 const validationSchema = Yup.object({
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
   lorawan_version: Yup.string().required(sharedMessages.validateRequired),
   lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
-  supports_class_b: Yup.boolean().default(false),
-  supports_class_c: Yup.boolean().default(false),
+  supports_class_b: Yup.boolean().when(['_device_class'], (devClass, schema) =>
+    schema.transform(() => undefined).default(devClass === DEVICE_CLASSES.CLASS_B),
+  ),
+  supports_class_c: Yup.boolean().when(['_device_class'], (devClass, schema) =>
+    schema.transform(() => undefined).default(devClass === DEVICE_CLASSES.CLASS_C),
+  ),
   supports_join: Yup.boolean().default(false),
   multicast: Yup.boolean().default(false),
-  mac_settings: Yup.object().when(['$activationMode'], (mode, schema) => {
-    if (mode === ACTIVATION_MODES.ABP) {
-      return schema.shape({
-        resets_f_cnt: Yup.boolean().default(false),
-      })
-    }
-
-    return schema.strip()
+  mac_settings: Yup.object({
+    resets_f_cnt: Yup.boolean().when('$activationMode', {
+      is: ACTIVATION_MODES.ABP,
+      then: schema => schema.default(false),
+      otherwise: schema => schema.strip(),
+    }),
   }),
   session: Yup.object().when(
     ['lorawan_version', '$activationMode'],
@@ -75,6 +77,21 @@ const validationSchema = Yup.object({
       })
     },
   ),
+  _device_class: Yup.mixed().when(['$activationMode'], (mode, schema) => {
+    const isMulticast = mode === ACTIVATION_MODES.MULTICAST
+
+    if (isMulticast) {
+      return schema
+        .oneOf([DEVICE_CLASSES.CLASS_B, DEVICE_CLASSES.CLASS_C])
+        .default(DEVICE_CLASSES.CLASS_B)
+        .required(sharedMessages.validateRequired)
+    }
+
+    return schema
+      .oneOf(Object.values(DEVICE_CLASSES))
+      .default(DEVICE_CLASSES.CLASS_A)
+      .required(sharedMessages.validateRequired)
+  }),
 }).noUnknown()
 
 export default validationSchema
