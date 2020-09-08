@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,34 +13,37 @@
 // limitations under the License.
 
 .container
+  line-height: 1
+  height: $fs.m
   display: flex
-  flex-wrap: nowrap
-  height: $default-input-height
-  margin-right: $cs.l
-  align-items: center
 
-  .message-count:last-child
-    margin-left: $cs.m
+  &:not(:last-child)
+    margin-right: $cs.l
+    +media-query($bp.s)
+      margin-right: $cs.xs
 
-.message-count
-  display: inline-flex
-  align-items: center
-  flex-wrap: nowrap
+  .message
+    color: $tc-deep-gray
 
-  .icon
-    nudge('up')
-    color: $c-active-blue
+  &.error
+    .icon,
+    .value,
+    .message
+      color: $c-error
 
-.messages
-  margin-left: $cs.m
-  display: flex
-  align-items: center
+  &.error .message
+    font-weight: $fw.bold
 
-  +media-query($bp.xs)
-    flex-basis: 100%
+.icon
+  color: $c-icon-fill
+  margin-right: $cs.xs
 
-.status
-  white-space: nowrap
+.value
+  color: $tc-deep-gray
+  font-weight: $fw.bold
+  margin-right: $cs.xxs
 
-  .date-time
-    margin-left: $cs.xxs
+.container:not(.error)
+  .message
+    +media-query($bp.s)
+      display: none

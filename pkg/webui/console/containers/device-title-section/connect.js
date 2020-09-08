@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,15 +14,22 @@
 
 import { connect } from 'react-redux'
 
-import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
+import {
+  selectDeviceByIds,
+  selectDeviceUplinkFrameCount,
+  selectDeviceLastSeen,
+} from '@console/store/selectors/devices'
 
-const mapStateToProps = state => {
-  const gtwId = selectSelectedGatewayId(state)
+const mapStateToProps = (state, props) => {
+  const { devId, appId } = props
 
   return {
-    gtwId,
-    gateway: selectSelectedGateway(state),
+    devId,
+    appId,
+    device: selectDeviceByIds(state, appId, devId),
+    uplinkFrameCount: selectDeviceUplinkFrameCount(state, appId, devId),
+    lastSeen: selectDeviceLastSeen(state, appId, devId),
   }
 }
 
-export default GatewayOverview => connect(mapStateToProps)(GatewayOverview)
+export default TitleSection => connect(mapStateToProps)(TitleSection)

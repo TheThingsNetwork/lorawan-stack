@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,58 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.container-device
-  border-bottom: 1px solid $c-divider
-  margin-bottom: $ls.xs
-  &-inner
-    &.has-description
-      padding-bottom: 0
+.container
+  margin-top: $ls.s
 
-      .description
-        text-margin-bottom($ls.xs)
+.icon
+  height: 4rem
+  width: 3.5rem
+
+.title-section-container
+  display: flex
+  flex-wrap: nowrap
+
+.title-section
+  display: inline-flex
+  flex-direction: column
+  justify-content: center
+  align-items: flex-start
+  padding-left: $cs.m
 
 .title
   text-margin-top($ls.m)
   text-margin-bottom($cs.m)
-  font-weight: $fwh.bolder
+  color: $tc-black
+  font-weight: $fw.bolder
+  font-size: $fs.xl
+  margin: 0
 
-.below-title
-  one-liner()
-  display: flex
+.id
+  color: $c-icon-fill
 
-.description
-  text-margin-top($ls.s)
-  text-margin-bottom($ls.s)
-  display: block
+  &-prefix
+    font-weight: $fw.bold
 
-.bottom
-  horizontalize()
-  text-margin-top(2.5rem)
-  text-margin-bottom(1.3rem)
-
-.children, .creation-date
-  display: flex
-  align-items: center
-
-.creation-date
-  color: $tc-subtle-gray
-  +media-query($bp.s)
-    display: none
+    &:after
+      content: ':'
+      padding-right: $cs.xxs
 
 .h-rule
+  full-width()
   margin-top: 0
   margin-bottom: $ls.m
+
   +media-query($bp.s)
     margin-bottom: $ls.s
-
-.messages
-  one-liner()
-  margin-left: $cs.m
-  display: flex
-
-.message-count
-  &:first-child
-    margin-right: $cs.xxs
-
-.icon
-  color: $c-active-blue

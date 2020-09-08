@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { connect } from 'react-redux'
+.container
+  display: flex
+  justify-content: space-between
+  align-items: center
+  flex-wrap: wrap
+  margin: $ls.s 0 $ls.xxs
 
-import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
+.content
+  display: flex
+  align-items: center
+  flex-wrap: wrap
 
-const mapStateToProps = state => {
-  const gtwId = selectSelectedGatewayId(state)
+.creation-date
+  one-liner()
+  color: $tc-subtle-gray
 
-  return {
-    gtwId,
-    gateway: selectSelectedGateway(state),
-  }
-}
-
-export default GatewayOverview => connect(mapStateToProps)(GatewayOverview)
+  +media-query($bp.xxs)
+    padding-top: $cs.xs
+    flex-basis: 100%

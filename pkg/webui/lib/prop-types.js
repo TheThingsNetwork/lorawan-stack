@@ -259,4 +259,18 @@ PropTypes.webhookTemplate = PropTypes.shape({
 })
 PropTypes.webhookTemplates = PropTypes.arrayOf(PropTypes.webhookTemplate)
 
+PropTypes.applicationLink = PropTypes.shape({
+  network_server_address: PropTypes.string,
+  api_key: PropTypes.string.isRequired,
+  tls: PropTypes.bool,
+  skip_payload_crypto: PropTypes.bool,
+})
+
+PropTypes.applicationLinkStats = PropTypes.shape({
+  linked_at: PropTypes.string.isRequired,
+  last_up_received_at: PropTypes.string,
+  last_downlink_forwarded_at: PropTypes.string,
+  up_count: PropTypes.string,
+  downlink_count: PropTypes.string,
+})
 export default PropTypes

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { connect } from 'react-redux'
+import EntityTitleSectionContent from './content'
+import EntityCount from './entity-count'
+import MessagesCount from './messages-count'
 
-import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
+EntityTitleSectionContent.EntityCount = EntityCount
+EntityTitleSectionContent.MessagesCount = MessagesCount
 
-const mapStateToProps = state => {
-  const gtwId = selectSelectedGatewayId(state)
-
-  return {
-    gtwId,
-    gateway: selectSelectedGateway(state),
-  }
-}
-
-export default GatewayOverview => connect(mapStateToProps)(GatewayOverview)
+export default EntityTitleSectionContent
