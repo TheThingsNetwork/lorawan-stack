@@ -41,10 +41,8 @@ Some gateways require that the `lns.key` file is terminated with a Carriage Retu
 echo "Authorization: Bearer <gateway-api-key>" | perl -p -e 's/\r\n|\n|\r/\r\n/g'  > lns.key
 ```
 
-If using Let's Encrypt to secure your domain, you may download the Let's Encrypt DST X3 Trust file [here](https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem.txt).
-
 TC URI: `wss://<server-address>:8887`
 
-TC Key: `lns.key`
+TC Key: `lns.key` (created above)
 
-TC Trust: Use the CA certificate of your trust provider
+TC Trust: Use the CA certificate of your trust provider or see the [Root Certificates Reference]({{< ref src="/reference/root-certificates" >}})
