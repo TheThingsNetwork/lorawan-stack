@@ -20,6 +20,7 @@ import (
 	"github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -60,13 +61,11 @@ func (as *ApplicationServer) DeleteLink(ctx context.Context, ids *ttnpb.Applicat
 	return ttnpb.Empty, nil
 }
 
+var errUnimplemented = errors.DefineUnimplemented("unimplemented", "unimplemented")
+
 // GetLinkStats implements ttnpb.AsServer.
 func (as *ApplicationServer) GetLinkStats(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLinkStats, error) {
-	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
-		return nil, err
-	}
-	// TODO: Do we return a deprecated error ?
-	return &ttnpb.ApplicationLinkStats{}, nil
+	return nil, errUnimplemented.New()
 }
 
 // HandleUplink implements ttnpb.NsAsServer.
