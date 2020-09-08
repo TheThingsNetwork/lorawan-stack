@@ -39,12 +39,12 @@ type pubSubDistributor struct {
 	subscriptions *subscriptionMap
 }
 
-// SendUp sends traffic to the underlying Pub/Sub.
-func (d *pubSubDistributor) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
-	return d.pubsub.SendUp(ctx, up)
+// Publish publishes traffic to the underlying Pub/Sub.
+func (d *pubSubDistributor) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
+	return d.pubsub.Publish(ctx, up)
 }
 
-var errMissingIdentifiers = errors.DefineUnimplemented("missing_identifiers", "subscriptions without identifiers are not supported")
+var errMissingIdentifiers = errors.DefineFailedPrecondition("missing_identifiers", "subscriptions without identifiers are not supported")
 
 // Subscribe creates a subscription in the associated subscription set.
 func (d *pubSubDistributor) Subscribe(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
@@ -62,7 +62,7 @@ func subscribeSetToPubSub(pubsub PubSub) func(*subscriptionSet, ttnpb.Applicatio
 	return func(set *subscriptionSet, ids ttnpb.ApplicationIdentifiers) error {
 		go func() {
 			ctx := set.Context()
-			if err := pubsub.Subscribe(ctx, ids, set.SendUp); err != nil {
+			if err := pubsub.Subscribe(ctx, ids, set.Publish); err != nil {
 				log.FromContext(ctx).WithError(err).Warn("Pub/Sub subscription failed")
 				set.Cancel(err)
 			}

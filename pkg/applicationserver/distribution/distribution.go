@@ -23,16 +23,16 @@ import (
 
 // PubSub sends upstream traffic from publishers to subscribers.
 type PubSub interface {
-	// SendUp publishes traffic to the subscribers.
-	SendUp(context.Context, *ttnpb.ApplicationUp) error
+	// Publish publishes traffic to the subscribers.
+	Publish(context.Context, *ttnpb.ApplicationUp) error
 	// Subscribe to the traffic of a specific application.
 	Subscribe(context.Context, ttnpb.ApplicationIdentifiers, func(context.Context, *ttnpb.ApplicationUp) error) error
 }
 
 // Distributor sends upstream traffic from publishers to subscribers.
 type Distributor interface {
-	// SendUp publishes traffic to the subscribers.
-	SendUp(context.Context, *ttnpb.ApplicationUp) error
+	// Publish publishes traffic to the subscribers.
+	Publish(context.Context, *ttnpb.ApplicationUp) error
 	// Subscribe to the traffic of a specific application.
 	Subscribe(context.Context, string, *ttnpb.ApplicationIdentifiers) (*io.Subscription, error)
 }

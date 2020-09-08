@@ -38,16 +38,16 @@ type localDistributor struct {
 	subscriptions *subscriptionMap
 }
 
-// SendUp sends traffic to the underlying subscriptions.
-func (d *localDistributor) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
-	if err := d.broadcast.SendUp(ctx, up); err != nil {
+// Publish publishes traffic to the underlying subscriptions.
+func (d *localDistributor) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
+	if err := d.broadcast.Publish(ctx, up); err != nil {
 		return err
 	}
 	set, err := d.subscriptions.Load(ctx, up.ApplicationIdentifiers)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	} else if err == nil {
-		return set.SendUp(ctx, up)
+		return set.Publish(ctx, up)
 	}
 	return nil
 }

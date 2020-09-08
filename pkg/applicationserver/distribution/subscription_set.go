@@ -94,8 +94,8 @@ func (s *subscriptionSet) Subscribe(ctx context.Context, protocol string, ids *t
 	return sub, nil
 }
 
-// SendUp sends the upstream traffic to the subscribers.
-func (s *subscriptionSet) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+// Publish publishes the upstream traffic to the subscribers.
+func (s *subscriptionSet) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	ctxUp := &io.ContextualApplicationUp{
 		Context:       ctx,
 		ApplicationUp: up,
@@ -144,7 +144,7 @@ func (s *subscriptionSet) run() {
 			lastAction = time.Now()
 		case up := <-s.upCh:
 			for sub := range subscribers {
-				if err := sub.SendUp(up.Context, up.ApplicationUp); err != nil {
+				if err := sub.Publish(up.Context, up.ApplicationUp); err != nil {
 					log.FromContext(sub.Context()).WithError(err).Warn("Send message failed")
 				}
 			}

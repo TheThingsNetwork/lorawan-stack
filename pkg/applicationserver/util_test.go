@@ -109,7 +109,7 @@ func (ns *mockNS) sendTraffic(ctx context.Context, link chan *mockNSASConn) {
 			return
 		case up := <-ns.upCh:
 			if _, err := client.HandleUplink(ctx, &ttnpb.NsAsHandleUplinkRequest{
-				ApplicationUplinks: []*ttnpb.ApplicationUp{up},
+				ApplicationUps: []*ttnpb.ApplicationUp{up},
 			}, auth); err != nil {
 				panic(err)
 			}

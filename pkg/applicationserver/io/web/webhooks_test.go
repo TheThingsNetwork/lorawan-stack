@@ -347,7 +347,7 @@ func TestWebhooks(t *testing.T) {
 						} {
 							t.Run(tc.Name, func(t *testing.T) {
 								a := assertions.New(t)
-								err := as.SendUp(ctx, tc.Message)
+								err := as.Publish(ctx, tc.Message)
 								if !a.So(err, should.BeNil) {
 									t.FailNow()
 								}

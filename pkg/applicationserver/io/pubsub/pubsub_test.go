@@ -311,7 +311,7 @@ func TestPubSub(t *testing.T) {
 				ctx, cancel := context.WithCancel(ctx)
 				defer cancel()
 
-				err := sub.SendUp(ctx, tc.Message)
+				err := sub.Publish(ctx, tc.Message)
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
 				}

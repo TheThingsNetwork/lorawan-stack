@@ -155,7 +155,7 @@ func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pb
 		return nil, err
 	}
 	up.Simulated = true
-	if err := s.server.SendUp(ctx, up); err != nil {
+	if err := s.server.Publish(ctx, up); err != nil {
 		return nil, err
 	}
 	return ttnpb.Empty, nil

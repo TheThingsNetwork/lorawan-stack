@@ -32,8 +32,8 @@ func (ps PubSub) uidUplinkKey(uid string) string {
 	return ps.Redis.Key("uid", uid, "uplinks")
 }
 
-// SendUp publishes the uplink to Pub/Sub.
-func (ps PubSub) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+// Publish publishes the uplink to Pub/Sub.
+func (ps PubSub) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	s, err := ttnredis.MarshalProto(up)
 	if err != nil {
 		return err

@@ -323,7 +323,7 @@ func TestAssociations(t *testing.T) {
 			t.Run(tc.name, func(t *testing.T) {
 				a := assertions.New(t)
 
-				err := as.SendUp(ctx, tc.up)
+				err := as.Publish(ctx, tc.up)
 				a.So(err, should.BeNil)
 
 				select {
@@ -367,7 +367,7 @@ func TestAssociations(t *testing.T) {
 		a.So(res, should.NotBeNil)
 		a.So(res.Associations, should.BeEmpty)
 
-		err = as.SendUp(ctx, &registeredApplicationUp1)
+		err = as.Publish(ctx, &registeredApplicationUp1)
 		a.So(err, should.BeNil)
 		select {
 		case <-handleUpCh:

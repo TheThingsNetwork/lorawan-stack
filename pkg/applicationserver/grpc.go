@@ -74,7 +74,7 @@ func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHa
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
-	link, err := as.linkRegistry.Get(ctx, req.ApplicationUplinks[0].ApplicationIdentifiers, []string{
+	link, err := as.linkRegistry.Get(ctx, req.ApplicationUps[0].ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})
@@ -82,7 +82,7 @@ func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHa
 		return nil, err
 	}
 	// TODO: Merge downlink queue invalidations (https://github.com/TheThingsNetwork/lorawan-stack/issues/1523)
-	for _, up := range req.ApplicationUplinks {
+	for _, up := range req.ApplicationUps {
 		if err := as.processUp(ctx, up, link); err != nil {
 			return nil, err
 		}
