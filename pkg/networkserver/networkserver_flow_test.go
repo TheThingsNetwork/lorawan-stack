@@ -383,7 +383,7 @@ func TestFlow(t *testing.T) {
 					nsConf := DefaultConfig
 					nsConf.DefaultMACSettings.DesiredRx1Delay = func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_15)
 					nsConf.NetID = test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
-					nsConf.DeduplicationWindow = (1 << 4) * test.Delay
+					nsConf.DeduplicationWindow = (1 << 5) * test.Delay
 					nsConf.CooldownWindow = (1 << 9) * test.Delay
 
 					_, ctx, env, stop := StartTest(t, TestConfig{
