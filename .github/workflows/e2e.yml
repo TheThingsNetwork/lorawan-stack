@@ -61,6 +61,6 @@ jobs:
       - name: Initialize stack environment
         run: tools/bin/mage init
       - name: Run test preparations
-        run: tools/bin/mage dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:dbDump js:Build
+        run: tools/bin/mage dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:sqlDump js:Build
       - name: Run frontend end-to-end tests
         run: tools/bin/mage dev:startDevStack & tools/bin/mage -v js:cypressHeadless
