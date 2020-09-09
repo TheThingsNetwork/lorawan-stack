@@ -12,5 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// eslint-disable-next-line import/prefer-default-export
-export const selectOfflineStatus = state => (state.offline ? state.offline.online : undefined)
+.status
+  display: inline-flex
+  min-width: 60px
+  align-items: center
+  margin-right: $cs.xs
+
+  &.online
+    .icon
+      color: $c-info
+
+  &:not(.online)
+    .icon
+      color: $c-error
+
+.icon
+  margin-right: $cs.xxs
