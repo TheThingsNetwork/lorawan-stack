@@ -6,6 +6,8 @@ weight: -1
 
 This guide documents the process of migrating end devices from third party networks to {{% tts %}}.
 
+<!--more-->
+
 To complete this guide, you need the latest version of `ttn-lw-cli`, the CLI for {{% tts %}}.
 
 {{< cli-only >}}
