@@ -35,7 +35,7 @@ func WrapPubSub(wrapped events.PubSub, c *component.Component, pubURL, subURL st
 	ctx, cancel := context.WithCancel(ctx)
 	ps = &PubSub{
 		PubSub:      wrapped,
-		c:           c,
+		component:   c,
 		ctx:         ctx,
 		cancel:      cancel,
 		contentType: "application/protobuf",
@@ -58,7 +58,7 @@ func NewPubSub(c *component.Component, pubURL, subURL string) (*PubSub, error) {
 type PubSub struct {
 	events.PubSub
 
-	c           *component.Component
+	component   *component.Component
 	ctx         context.Context
 	cancel      context.CancelFunc
 	contentType string
@@ -133,7 +133,7 @@ func (ps *PubSub) subscribeTask(ctx context.Context) error {
 // Subscribe to events from Go Cloud.
 func (ps *PubSub) Subscribe(name string, hdl events.Handler) error {
 	ps.subOnce.Do(func() {
-		ps.c.StartTask(&component.TaskConfig{
+		ps.component.StartTask(&component.TaskConfig{
 			Context: ps.ctx,
 			ID:      "events_cloud_subscribe",
 			Func:    ps.subscribeTask,

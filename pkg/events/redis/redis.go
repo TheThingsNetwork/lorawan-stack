@@ -39,7 +39,7 @@ func WrapPubSub(wrapped events.PubSub, c *component.Component, conf ttnredis.Con
 	ctx, cancel := context.WithCancel(ctx)
 	return &PubSub{
 		PubSub:       wrapped,
-		c:            c,
+		component:    c,
 		ctx:          ctx,
 		cancel:       cancel,
 		client:       ttnRedisClient.Client,
@@ -56,7 +56,7 @@ func NewPubSub(c *component.Component, conf ttnredis.Config) *PubSub {
 type PubSub struct {
 	events.PubSub
 
-	c            *component.Component
+	component    *component.Component
 	ctx          context.Context
 	cancel       context.CancelFunc
 	eventChannel string
@@ -99,7 +99,7 @@ func (ps *PubSub) subscribeTask(ctx context.Context) error {
 // Subscribe implements the events.Subscriber interface.
 func (ps *PubSub) Subscribe(name string, hdl events.Handler) error {
 	ps.subOnce.Do(func() {
-		ps.c.StartTask(&component.TaskConfig{
+		ps.component.StartTask(&component.TaskConfig{
 			Context: ps.ctx,
 			ID:      "events_redis_subscribe",
 			Func:    ps.subscribeTask,

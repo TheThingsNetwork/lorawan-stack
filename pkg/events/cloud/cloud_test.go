@@ -15,6 +15,7 @@
 package cloud_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -50,73 +51,88 @@ func Example() {
 var timeout = (1 << 10) * test.Delay
 
 func TestCloudPubSub(t *testing.T) {
-	a := assertions.New(t)
+	test.RunTest(t, test.TestConfig{
+		Timeout: 4 * timeout,
+		Func: func(ctx context.Context, a *assertions.Assertion) {
+			events.IncludeCaller = true
 
-	events.IncludeCaller = true
+			eventCh := make(chan events.Event)
+			handler := events.HandlerFunc(func(e events.Event) {
+				t.Logf("Received event %v", e)
+				a.So(e.Time().IsZero(), should.BeFalse)
+				a.So(e.Context(), should.NotBeNil)
+				eventCh <- e
+			})
 
-	eventCh := make(chan events.Event)
-	handler := events.HandlerFunc(func(e events.Event) {
-		t.Logf("Received event %v", e)
-		a.So(e.Time().IsZero(), should.BeFalse)
-		a.So(e.Context(), should.NotBeNil)
-		eventCh <- e
+			c := componenttest.NewComponent(t, &component.Config{})
+			pubsub, err := cloud.NewPubSub(c, "mem://events_test", "mem://events_test")
+			a.So(err, should.BeNil)
+
+			defer pubsub.Close(ctx)
+
+			pubsub.Subscribe("cloud.**", handler)
+
+			time.Sleep(timeout)
+
+			ctx = events.ContextWithCorrelationID(ctx, t.Name())
+
+			eui := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
+			devAddr := types.DevAddr{1, 2, 3, 4}
+			appID := ttnpb.ApplicationIdentifiers{
+				ApplicationID: "test-app",
+			}
+			devID := ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID,
+				DeviceID:               "test-dev",
+				DevEUI:                 &eui,
+				JoinEUI:                &eui,
+				DevAddr:                &devAddr,
+			}
+			gtwID := ttnpb.GatewayIdentifiers{
+				GatewayID: "test-gtw",
+				EUI:       &eui,
+			}
+
+			test.RunSubtestFromContext(ctx, test.SubtestConfig{
+				Name:    "publish_json",
+				Timeout: timeout,
+				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+					cloud.SetContentType(pubsub, "application/json")
+
+					pubsub.Publish(events.New(ctx, "cloud.test.evt0", "cloud test event 0", events.WithIdentifiers(appID)))
+					select {
+					case e := <-eventCh:
+						a.So(e.Name(), should.Equal, "cloud.test.evt0")
+						if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 1) {
+							a.So(e.Identifiers()[0].GetApplicationIDs(), should.Resemble, &appID)
+						}
+					case <-ctx.Done():
+						t.Error("Did not receive expected event")
+						t.FailNow()
+					}
+				},
+			})
+
+			test.RunSubtestFromContext(ctx, test.SubtestConfig{
+				Name:    "publish_pb",
+				Timeout: timeout,
+				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+					cloud.SetContentType(pubsub, "application/protobuf")
+
+					pubsub.Publish(events.New(ctx, "cloud.test.evt1", "cloud test event 1", events.WithIdentifiers(&devID, &gtwID)))
+					select {
+					case e := <-eventCh:
+						a.So(e.Name(), should.Equal, "cloud.test.evt1")
+						if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 2) {
+							a.So(e.Identifiers()[0].GetDeviceIDs(), should.Resemble, &devID)
+							a.So(e.Identifiers()[1].GetGatewayIDs(), should.Resemble, &gtwID)
+						}
+					case <-ctx.Done():
+						t.Error("Did not receive expected event")
+						t.FailNow()
+					}
+				},
+			})
+		},
 	})
-
-	c := componenttest.NewComponent(t, &component.Config{})
-	pubsub, err := cloud.NewPubSub(c, "mem://events_test", "mem://events_test")
-	a.So(err, should.BeNil)
-
-	defer pubsub.Close(test.Context())
-
-	pubsub.Subscribe("cloud.**", handler)
-
-	time.Sleep(timeout)
-
-	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
-
-	eui := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
-	devAddr := types.DevAddr{1, 2, 3, 4}
-	appID := ttnpb.ApplicationIdentifiers{
-		ApplicationID: "test-app",
-	}
-	devID := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: appID,
-		DeviceID:               "test-dev",
-		DevEUI:                 &eui,
-		JoinEUI:                &eui,
-		DevAddr:                &devAddr,
-	}
-	gtwID := ttnpb.GatewayIdentifiers{
-		GatewayID: "test-gtw",
-		EUI:       &eui,
-	}
-
-	cloud.SetContentType(pubsub, "application/json")
-
-	pubsub.Publish(events.New(ctx, "cloud.test.evt0", "cloud test event 0", events.WithIdentifiers(appID)))
-	select {
-	case e := <-eventCh:
-		a.So(e.Name(), should.Equal, "cloud.test.evt0")
-		if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 1) {
-			a.So(e.Identifiers()[0].GetApplicationIDs(), should.Resemble, &appID)
-		}
-	case <-time.After(timeout):
-		t.Error("Did not receive expected event")
-		t.FailNow()
-	}
-
-	cloud.SetContentType(pubsub, "application/protobuf")
-
-	pubsub.Publish(events.New(ctx, "cloud.test.evt1", "cloud test event 1", events.WithIdentifiers(&devID, &gtwID)))
-	select {
-	case e := <-eventCh:
-		a.So(e.Name(), should.Equal, "cloud.test.evt1")
-		if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 2) {
-			a.So(e.Identifiers()[0].GetDeviceIDs(), should.Resemble, &devID)
-			a.So(e.Identifiers()[1].GetGatewayIDs(), should.Resemble, &gtwID)
-		}
-	case <-time.After(timeout):
-		t.Error("Did not receive expected event")
-		t.FailNow()
-	}
 }

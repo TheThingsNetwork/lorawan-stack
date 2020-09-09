@@ -15,6 +15,7 @@
 package redis_test
 
 import (
+	"context"
 	"os"
 	"strconv"
 	"testing"
@@ -68,38 +69,47 @@ func Example() {
 var timeout = (1 << 10) * test.Delay
 
 func TestRedisPubSub(t *testing.T) {
-	a := assertions.New(t)
+	test.RunTest(t, test.TestConfig{
+		Timeout: 4 * timeout,
+		Func: func(ctx context.Context, a *assertions.Assertion) {
+			events.IncludeCaller = true
 
-	events.IncludeCaller = true
+			eventCh := make(chan events.Event)
+			handler := events.HandlerFunc(func(e events.Event) {
+				t.Logf("Received event %v", e)
+				a.So(e.Time().IsZero(), should.BeFalse)
+				a.So(e.Context(), should.NotBeNil)
+				eventCh <- e
+			})
 
-	eventCh := make(chan events.Event)
-	handler := events.HandlerFunc(func(e events.Event) {
-		t.Logf("Received event %v", e)
-		a.So(e.Time().IsZero(), should.BeFalse)
-		a.So(e.Context(), should.NotBeNil)
-		eventCh <- e
+			ctx = events.ContextWithCorrelationID(ctx, t.Name())
+
+			c := componenttest.NewComponent(t, &component.Config{})
+			pubsub := redis.NewPubSub(c, redisConfig())
+			defer pubsub.Close(ctx)
+
+			pubsub.Subscribe("redis.**", handler)
+			time.Sleep(timeout)
+
+			appID := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
+
+			test.RunSubtestFromContext(ctx, test.SubtestConfig{
+				Name:    "publish",
+				Timeout: timeout,
+				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+					pubsub.Publish(events.New(ctx, "redis.test.evt0", "redis test event 0", events.WithIdentifiers(appID)))
+					select {
+					case e := <-eventCh:
+						a.So(e.Name(), should.Equal, "redis.test.evt0")
+						if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 1) {
+							a.So(e.Identifiers()[0].GetApplicationIDs(), should.Resemble, appID)
+						}
+					case <-ctx.Done():
+						t.Error("Did not receive expected event")
+						t.FailNow()
+					}
+				},
+			})
+		},
 	})
-
-	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
-
-	c := componenttest.NewComponent(t, &component.Config{})
-	pubsub := redis.NewPubSub(c, redisConfig())
-	defer pubsub.Close(ctx)
-
-	pubsub.Subscribe("redis.**", handler)
-	time.Sleep(timeout)
-
-	appID := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
-
-	pubsub.Publish(events.New(ctx, "redis.test.evt0", "redis test event 0", events.WithIdentifiers(appID)))
-	select {
-	case e := <-eventCh:
-		a.So(e.Name(), should.Equal, "redis.test.evt0")
-		if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 1) {
-			a.So(e.Identifiers()[0].GetApplicationIDs(), should.Resemble, appID)
-		}
-	case <-time.After(timeout):
-		t.Error("Did not receive expected event")
-		t.FailNow()
-	}
 }

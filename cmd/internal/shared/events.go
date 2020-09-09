@@ -28,21 +28,21 @@ import (
 )
 
 // InitializeEvents initializes the event system.
-func InitializeEvents(ctx context.Context, c *component.Component, config config.ServiceBase) error {
-	switch config.Events.Backend {
+func InitializeEvents(ctx context.Context, c *component.Component, conf config.ServiceBase) error {
+	switch conf.Events.Backend {
 	case "internal":
 		return nil // this is the default.
 	case "redis":
-		events.SetDefaultPubSub(redis.NewPubSub(c, config.Events.Redis))
+		events.SetDefaultPubSub(redis.NewPubSub(c, conf.Events.Redis))
 		return nil
 	case "cloud":
-		ps, err := cloud.NewPubSub(c, config.Events.Cloud.PublishURL, config.Events.Cloud.SubscribeURL)
+		ps, err := cloud.NewPubSub(c, conf.Events.Cloud.PublishURL, conf.Events.Cloud.SubscribeURL)
 		if err != nil {
 			return err
 		}
 		events.SetDefaultPubSub(ps)
 		return nil
 	default:
-		return fmt.Errorf("unknown events backend: %s", config.Events.Backend)
+		return fmt.Errorf("unknown events backend: %s", conf.Events.Backend)
 	}
 }
