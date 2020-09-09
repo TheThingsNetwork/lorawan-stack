@@ -4,6 +4,6 @@ description: ""
 weight: 
 ---
 
-Here you can find detailed guides for integrating with popular MQTT clients. 
+This section contains detailed guides for integrating with popular MQTT clients. 
 
 <!--more-->
