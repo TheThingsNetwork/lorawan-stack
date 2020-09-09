@@ -30,12 +30,12 @@ import (
 
 // WrapPubSub wraps an existing PubSub and publishes all events received from Go Cloud to that PubSub.
 // If the subURL is an empty string, this PubSub will only publish to Go Cloud.
-func WrapPubSub(wrapped events.PubSub, c *component.Component, pubURL, subURL string) (ps *PubSub, err error) {
-	ctx := log.NewContextWithField(c.Context(), "namespace", "events/cloud")
+func WrapPubSub(ctx context.Context, wrapped events.PubSub, taskStarter component.TaskStarter, pubURL, subURL string) (ps *PubSub, err error) {
+	ctx = log.NewContextWithField(ctx, "namespace", "events/cloud")
 	ctx, cancel := context.WithCancel(ctx)
 	ps = &PubSub{
 		PubSub:      wrapped,
-		component:   c,
+		taskStarter: taskStarter,
 		ctx:         ctx,
 		cancel:      cancel,
 		contentType: "application/protobuf",
@@ -50,15 +50,15 @@ func WrapPubSub(wrapped events.PubSub, c *component.Component, pubURL, subURL st
 
 // NewPubSub creates a new PubSub that publishes and subscribes to Go Cloud.
 // If the subURL is an empty string, this PubSub will only publish to Go Cloud.
-func NewPubSub(c *component.Component, pubURL, subURL string) (*PubSub, error) {
-	return WrapPubSub(events.NewPubSub(events.DefaultBufferSize), c, pubURL, subURL)
+func NewPubSub(ctx context.Context, taskStarter component.TaskStarter, pubURL, subURL string) (*PubSub, error) {
+	return WrapPubSub(ctx, events.NewPubSub(events.DefaultBufferSize), taskStarter, pubURL, subURL)
 }
 
 // PubSub with Go Cloud backend.
 type PubSub struct {
 	events.PubSub
 
-	component   *component.Component
+	taskStarter component.TaskStarter
 	ctx         context.Context
 	cancel      context.CancelFunc
 	contentType string
@@ -133,7 +133,7 @@ func (ps *PubSub) subscribeTask(ctx context.Context) error {
 // Subscribe to events from Go Cloud.
 func (ps *PubSub) Subscribe(name string, hdl events.Handler) error {
 	ps.subOnce.Do(func() {
-		ps.component.StartTask(&component.TaskConfig{
+		ps.taskStarter.StartTask(&component.TaskConfig{
 			Context: ps.ctx,
 			ID:      "events_cloud_subscribe",
 			Func:    ps.subscribeTask,

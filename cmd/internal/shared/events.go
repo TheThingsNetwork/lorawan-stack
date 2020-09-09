@@ -28,15 +28,15 @@ import (
 )
 
 // InitializeEvents initializes the event system.
-func InitializeEvents(ctx context.Context, c *component.Component, conf config.ServiceBase) error {
+func InitializeEvents(ctx context.Context, taskStarter component.TaskStarter, conf config.ServiceBase) error {
 	switch conf.Events.Backend {
 	case "internal":
 		return nil // this is the default.
 	case "redis":
-		events.SetDefaultPubSub(redis.NewPubSub(c, conf.Events.Redis))
+		events.SetDefaultPubSub(redis.NewPubSub(ctx, taskStarter, conf.Events.Redis))
 		return nil
 	case "cloud":
-		ps, err := cloud.NewPubSub(c, conf.Events.Cloud.PublishURL, conf.Events.Cloud.SubscribeURL)
+		ps, err := cloud.NewPubSub(ctx, taskStarter, conf.Events.Cloud.PublishURL, conf.Events.Cloud.SubscribeURL)
 		if err != nil {
 			return err
 		}

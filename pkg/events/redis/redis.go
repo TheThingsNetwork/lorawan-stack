@@ -29,17 +29,17 @@ import (
 )
 
 // WrapPubSub wraps an existing PubSub and publishes all events received from Redis to that PubSub.
-func WrapPubSub(wrapped events.PubSub, c *component.Component, conf ttnredis.Config) *PubSub {
+func WrapPubSub(ctx context.Context, wrapped events.PubSub, taskStarter component.TaskStarter, conf ttnredis.Config) *PubSub {
 	ttnRedisClient := ttnredis.New(&conf)
 	eventChannel := ttnRedisClient.Key("events")
-	ctx := log.NewContextWithFields(c.Context(), log.Fields(
+	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "events/redis",
 		"channel", eventChannel,
 	))
 	ctx, cancel := context.WithCancel(ctx)
 	return &PubSub{
 		PubSub:       wrapped,
-		component:    c,
+		taskStarter:  taskStarter,
 		ctx:          ctx,
 		cancel:       cancel,
 		client:       ttnRedisClient.Client,
@@ -48,15 +48,15 @@ func WrapPubSub(wrapped events.PubSub, c *component.Component, conf ttnredis.Con
 }
 
 // NewPubSub creates a new PubSub that publishes and subscribes to Redis.
-func NewPubSub(c *component.Component, conf ttnredis.Config) *PubSub {
-	return WrapPubSub(events.NewPubSub(events.DefaultBufferSize), c, conf)
+func NewPubSub(ctx context.Context, taskStarter component.TaskStarter, conf ttnredis.Config) *PubSub {
+	return WrapPubSub(ctx, events.NewPubSub(events.DefaultBufferSize), taskStarter, conf)
 }
 
 // PubSub with Redis backend.
 type PubSub struct {
 	events.PubSub
 
-	component    *component.Component
+	taskStarter  component.TaskStarter
 	ctx          context.Context
 	cancel       context.CancelFunc
 	eventChannel string
@@ -99,7 +99,7 @@ func (ps *PubSub) subscribeTask(ctx context.Context) error {
 // Subscribe implements the events.Subscriber interface.
 func (ps *PubSub) Subscribe(name string, hdl events.Handler) error {
 	ps.subOnce.Do(func() {
-		ps.component.StartTask(&component.TaskConfig{
+		ps.taskStarter.StartTask(&component.TaskConfig{
 			Context: ps.ctx,
 			ID:      "events_redis_subscribe",
 			Func:    ps.subscribeTask,

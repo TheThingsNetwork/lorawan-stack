@@ -21,7 +21,6 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
-	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/cloud"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -32,14 +31,14 @@ import (
 )
 
 func Example() {
-	// The component is used for automatic backoff on subscription failures.
-	c := &component.Component{}
+	// The task starter is used for automatic re-subscription on failure.
+	taskStarter := component.StartTaskFunc(component.DefaultStartTask)
 
 	// Import the desired cloud pub-sub drivers (see godoc.org/gocloud.dev).
 	// In this example we use "gocloud.dev/pubsub/mempubsub".
 
 	// This sends all events received from a Go Cloud pub sub to the default pubsub.
-	cloudPubSub, err := cloud.WrapPubSub(events.DefaultPubSub(), c, "mem://events", "mem://events")
+	cloudPubSub, err := cloud.WrapPubSub(context.TODO(), events.DefaultPubSub(), taskStarter, "mem://events", "mem://events")
 	if err != nil {
 		// Handle error.
 	}
@@ -64,8 +63,8 @@ func TestCloudPubSub(t *testing.T) {
 				eventCh <- e
 			})
 
-			c := componenttest.NewComponent(t, &component.Config{})
-			pubsub, err := cloud.NewPubSub(c, "mem://events_test", "mem://events_test")
+			taskStarter := component.StartTaskFunc(component.DefaultStartTask)
+			pubsub, err := cloud.NewPubSub(ctx, taskStarter, "mem://events_test", "mem://events_test")
 			a.So(err, should.BeNil)
 
 			defer pubsub.Close(ctx)
