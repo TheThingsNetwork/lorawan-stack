@@ -136,13 +136,13 @@ func (Dev) DBRestore(ctx context.Context) error {
 	}
 	db, err := store.Open(ctx, databaseURI)
 	if err != nil {
-		return nil
+		return err
 	}
 	defer db.Close()
 
 	b, err := ioutil.ReadFile(filepath.Join(".cache", "sqldump.sql"))
 	if err != nil {
-		return nil
+		return err
 	}
 	return db.Exec(fmt.Sprintf(`DROP DATABASE %s;
 		CREATE DATABASE %s;
