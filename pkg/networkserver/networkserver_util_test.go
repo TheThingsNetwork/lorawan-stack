@@ -57,7 +57,7 @@ func NewRedisDeviceRegistry(t testing.TB) (DeviceRegistry, func()) {
 	cl, flush := test.NewRedis(t, append(redisNamespace[:], "devices")...)
 	reg := &redis.DeviceRegistry{
 		Redis:   cl,
-		LockTTL: test.Delay << 10,
+		LockTTL: (1 << 7) * test.Delay,
 	}
 	if err := reg.Init(); err != nil {
 		t.Fatalf("Failed to initialize Redis device registry: %s", err)
@@ -100,7 +100,7 @@ func NewRedisDownlinkTaskQueue(t testing.TB) (DownlinkTaskQueue, func()) {
 
 			var runErr error
 			select {
-			case <-time.After((1 << 6) * test.Delay):
+			case <-time.After((1 << 10) * test.Delay):
 				t.Error("Timed out waiting for redis.DownlinkTaskQueue.Run to return")
 			case runErr = <-errCh:
 			}
