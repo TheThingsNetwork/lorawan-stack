@@ -635,6 +635,7 @@
   "lib.shared-messages.searchById": "Xxxxxx xx XX",
   "lib.shared-messages.seconds": "xxxxxxx",
   "lib.shared-messages.secure": "Xxxxxx",
+  "lib.shared-messages.serviceData": "Xxxxxxx xxxx",
   "lib.shared-messages.settings": "Xxxxxxxx",
   "lib.shared-messages.skipCryptoDescription": "Xxxx xxxxxxxxxx xx xxxxxx xxxxxxxx xxx xxxxxxxxxx xx xxxxxxxx xxxxxxxx",
   "lib.shared-messages.skipCryptoPlaceholder": "Xxxxxxxxxx/xxxxxxxxxx xxxxxxxx",
