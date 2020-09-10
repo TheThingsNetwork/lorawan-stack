@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Webhooks and Pub/Subs forms in the Console will now let users choose whether they want to overwrite an existing record when the ID already exists (as opposed to overwriting by default).
 - Pub/Sub integrations not backing off on internal connection failures.
 - Network Server ping slot-related field validation.
+- Memory usage of Network Server application uplink queues.
 
 ### Security
 
