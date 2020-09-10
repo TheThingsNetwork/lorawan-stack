@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"runtime"
 	"testing"
 	"time"
 
@@ -376,13 +377,25 @@ func TestFlow(t *testing.T) {
 		} {
 			handleFlowTest := handleFlowTest
 			test.RunSubtest(t, test.SubtestConfig{
-				Name:    makeName(flowName),
-				Timeout: (1 << 17) * test.Delay,
+				Name:     makeName(flowName),
+				Parallel: true,
+				Timeout:  (1 << 17) * test.Delay,
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 					nsConf := DefaultConfig
-					nsConf.DefaultMACSettings.DesiredRx1Delay = func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_1)
+					nsConf.DefaultMACSettings.DesiredRx1Delay = func() *ttnpb.RxDelay {
+						var d ttnpb.RxDelay
+						switch cpus := runtime.NumCPU(); {
+						case cpus <= 1:
+							d = ttnpb.RX_DELAY_4
+						case cpus >= 12:
+							d = ttnpb.RX_DELAY_15
+						default:
+							d = ttnpb.RxDelay(cpus + 3)
+						}
+						return &d
+					}()
 					nsConf.NetID = test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
-					nsConf.DeduplicationWindow = (1 << 5) * test.Delay
+					nsConf.DeduplicationWindow = (1 << 6) * test.Delay
 					nsConf.CooldownWindow = (1 << 9) * test.Delay
 
 					_, ctx, env, stop := StartTest(t, TestConfig{
