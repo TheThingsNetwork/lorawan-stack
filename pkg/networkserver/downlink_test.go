@@ -385,6 +385,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 			yProto.Time = time.Time{}
 			xProto.Data = nil
 			yProto.Data = nil
+			xProto.UniqueID = ""
+			yProto.UniqueID = ""
 			return test.AllTrue(
 				a.So(x.Data(), should.BeError) && a.So(y.Data(), should.BeError) && a.So(x.Data(), should.HaveSameErrorDefinitionAs, y.Data()),
 				a.So(xProto, should.Resemble, yProto),
