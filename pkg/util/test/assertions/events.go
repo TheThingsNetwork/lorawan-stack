@@ -52,6 +52,8 @@ func ShouldResembleEvent(actual interface{}, expected ...interface{}) string {
 	if s := assertions.ShouldBeNil(err); s != success {
 		return s
 	}
+	ap.UniqueID = ""
+	ep.UniqueID = ""
 	ap.Time = time.Time{}
 	ep.Time = time.Time{}
 	ap.Authentication = nil

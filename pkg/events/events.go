@@ -35,6 +35,7 @@ import (
 
 // Event interface
 type Event interface {
+	UniqueID() string
 	Context() context.Context
 	Name() string
 	Time() time.Time
@@ -57,6 +58,7 @@ func local(evt Event) *event {
 		localEvent = &event{
 			ctx: evt.Context(),
 			innerEvent: ttnpb.Event{
+				UniqueID:       evt.UniqueID(),
 				Name:           evt.Name(),
 				Time:           evt.Time(),
 				Identifiers:    evt.Identifiers(),
@@ -125,6 +127,7 @@ func (e *event) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (e event) UniqueID() string                        { return e.innerEvent.UniqueID }
 func (e event) Context() context.Context                { return e.ctx }
 func (e event) Name() string                            { return e.innerEvent.Name }
 func (e event) Time() time.Time                         { return e.innerEvent.Time }
@@ -243,6 +246,7 @@ func FromProto(pb *ttnpb.Event) (Event, error) {
 		ctx:  ctx,
 		data: data,
 		innerEvent: ttnpb.Event{
+			UniqueID:       pb.UniqueID,
 			Name:           pb.Name,
 			Time:           pb.Time,
 			Identifiers:    pb.Identifiers,

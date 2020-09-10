@@ -110,6 +110,7 @@ func AssertEventPubSubPublishRequests(ctx context.Context, reqCh <-chan EventPub
 }
 
 type EventEqualConfig struct {
+	UniqueID       bool
 	Time           bool
 	Identifiers    bool
 	Data           bool
@@ -137,6 +138,10 @@ func MakeEventEqual(conf EventEqualConfig) func(a, b events.Event) bool {
 			return false
 		}
 
+		if !conf.UniqueID {
+			ap.UniqueID = ""
+			bp.UniqueID = ""
+		}
 		if !conf.Time {
 			ap.Time = time.Time{}
 			bp.Time = time.Time{}

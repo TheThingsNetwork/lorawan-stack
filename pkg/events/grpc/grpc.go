@@ -127,6 +127,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		return err
 	}
 	if err := stream.Send(&ttnpb.Event{
+		UniqueID:       events.NewCorrelationID(),
 		Name:           "events.stream.start",
 		Time:           time.Now().UTC(),
 		Identifiers:    req.Identifiers,

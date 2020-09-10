@@ -43,6 +43,7 @@ func (b *builder) New(ctx context.Context, opts ...Option) Event {
 	evt := &event{
 		ctx: ctx,
 		innerEvent: ttnpb.Event{
+			UniqueID:       NewCorrelationID(),
 			Name:           b.definition.name,
 			Time:           time.Now().UTC(),
 			Origin:         hostname,
