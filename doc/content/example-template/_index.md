@@ -116,3 +116,11 @@ services:
   stack:
     image: 'thethingsnetwork/lorawan-stack:<the tag>'
 ```
+
+### Referencing Files
+
+It is also possible to host source code (or any text file) and display it using shortcodes. For example:
+
+{{< highlight yaml "linenos=table,linenostart=5" >}}
+{{< readfile path="/content/getting-started/installation/configuration/docker-compose.yml" from=5 to=13 >}}
+{{< /highlight >}}
