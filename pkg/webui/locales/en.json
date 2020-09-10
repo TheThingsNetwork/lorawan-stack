@@ -635,6 +635,7 @@
   "lib.shared-messages.searchById": "Search by ID",
   "lib.shared-messages.seconds": "seconds",
   "lib.shared-messages.secure": "Secure",
+  "lib.shared-messages.serviceData": "Service data",
   "lib.shared-messages.settings": "Settings",
   "lib.shared-messages.skipCryptoDescription": "Skip decryption of uplink payloads and encryption of downlink payloads",
   "lib.shared-messages.skipCryptoPlaceholder": "Encryption/decryption disabled",
