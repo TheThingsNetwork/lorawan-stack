@@ -129,6 +129,8 @@ func (m *Event) ValidateFields(paths ...string) error {
 			// no validation rules for RemoteIP
 		case "user_agent":
 			// no validation rules for UserAgent
+		case "unique_id":
+			// no validation rules for UniqueID
 		default:
 			return EventValidationError{
 				field:  name,

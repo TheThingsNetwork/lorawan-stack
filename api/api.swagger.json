@@ -10511,6 +10511,10 @@
         "user_agent": {
           "type": "string",
           "description": "The IP address of the caller that triggered this event."
+        },
+        "unique_id": {
+          "type": "string",
+          "description": "The unique identifier of the event, assigned on creation."
         }
       }
     },
