@@ -395,8 +395,8 @@ func TestFlow(t *testing.T) {
 						return &d
 					}()
 					nsConf.NetID = test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
-					nsConf.DeduplicationWindow = (1 << 6) * test.Delay
-					nsConf.CooldownWindow = (1 << 9) * test.Delay
+					nsConf.DeduplicationWindow = (1 << 8) * test.Delay
+					nsConf.CooldownWindow = (1 << 11) * test.Delay
 
 					_, ctx, env, stop := StartTest(t, TestConfig{
 						Context:       ctx,
