@@ -69,30 +69,33 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 			return err
 		}
 
-		var (
-			streamID             string
-			maxLen, maxLenApprox int64
-		)
-		switch up.Up.(type) {
+		var streamID string
+		var pipelined func(p redis.Pipeliner)
+		switch pld := up.Up.(type) {
 		case *ttnpb.ApplicationUp_JoinAccept:
 			streamID = q.uidJoinAcceptKey(uid)
-			maxLenApprox = q.maxLen
 		case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
 			streamID = q.uidInvalidationKey(uid)
-			maxLen = 1
+			pipelined = func(p redis.Pipeliner) {
+				p.Set(deviceUIDLastInvalidationKey(q.redis, unique.ID(ctx, up.EndDeviceIdentifiers)), pld.DownlinkQueueInvalidated.LastFCntDown, 0)
+			}
 		default:
 			streamID = q.uidGenericUplinkKey(uid)
-			maxLenApprox = q.maxLen
 		}
-
-		if err = q.redis.XAdd(&redis.XAddArgs{
-			Stream:       streamID,
-			MaxLen:       maxLen,
-			MaxLenApprox: maxLenApprox,
-			Values: map[string]interface{}{
-				payloadKey: s,
-			},
-		}).Err(); err != nil {
+		_, err = q.redis.Pipelined(func(p redis.Pipeliner) error {
+			p.XAdd(&redis.XAddArgs{
+				Stream:       streamID,
+				MaxLenApprox: q.maxLen,
+				Values: map[string]interface{}{
+					payloadKey: s,
+				},
+			})
+			if pipelined != nil {
+				pipelined(p)
+			}
+			return nil
+		})
+		if err != nil {
 			return ttnredis.ConvertError(err)
 		}
 
@@ -165,6 +168,7 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 		if err != nil && err != redis.Nil {
 			return ttnredis.ConvertError(err)
 		}
+		var invalidationFCnts map[string]uint64
 		for _, ret := range rets {
 			for _, msg := range ret.Messages {
 				v, ok := msg.Values[payloadKey]
@@ -179,8 +183,26 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 				if err = ttnredis.UnmarshalProto(s, up); err != nil {
 					return err
 				}
-				if err = f(ctx, up); err != nil {
-					return err
+				var skipF bool
+				if ret.Stream == invalidationUpStream {
+					devUID := unique.ID(ctx, up.EndDeviceIdentifiers)
+					lastFCnt, ok := invalidationFCnts[devUID]
+					if !ok {
+						lastFCnt, err = q.redis.Get(deviceUIDLastInvalidationKey(q.redis, devUID)).Uint64()
+						if err != nil {
+							return ttnredis.ConvertError(err)
+						}
+						if invalidationFCnts == nil {
+							invalidationFCnts = make(map[string]uint64, len(rets))
+						}
+						invalidationFCnts[devUID] = lastFCnt
+					}
+					skipF = uint64(up.GetDownlinkQueueInvalidated().GetLastFCntDown()) < lastFCnt
+				}
+				if !skipF {
+					if err = f(ctx, up); err != nil {
+						return err
+					}
 				}
 				_, err := q.redis.Pipelined(func(p redis.Pipeliner) error {
 					p.XAck(ret.Stream, q.group, msg.ID)
