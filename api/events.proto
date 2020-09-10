@@ -57,6 +57,8 @@ message Event {
   string remote_ip = 10 [(gogoproto.customname) = "RemoteIP"];
   // The IP address of the caller that triggered this event.
   string user_agent = 11;
+  // The unique identifier of the event, assigned on creation.
+  string unique_id = 12 [(gogoproto.customname) = "UniqueID"];
 }
 
 message StreamEventsRequest {

@@ -15,6 +15,7 @@ var EventFieldPathsNested = []string{
 	"origin",
 	"remote_ip",
 	"time",
+	"unique_id",
 	"user_agent",
 	"visibility",
 	"visibility.rights",
@@ -30,6 +31,7 @@ var EventFieldPathsTopLevel = []string{
 	"origin",
 	"remote_ip",
 	"time",
+	"unique_id",
 	"user_agent",
 	"visibility",
 }

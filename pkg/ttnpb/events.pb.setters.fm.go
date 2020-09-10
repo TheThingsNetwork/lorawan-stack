@@ -146,6 +146,16 @@ func (dst *Event) SetFields(src *Event, paths ...string) error {
 				var zero string
 				dst.UserAgent = zero
 			}
+		case "unique_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'unique_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UniqueID = src.UniqueID
+			} else {
+				var zero string
+				dst.UniqueID = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

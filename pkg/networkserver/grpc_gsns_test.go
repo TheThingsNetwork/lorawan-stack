@@ -152,6 +152,8 @@ func TestHandleUplink(t *testing.T) {
 		if err != nil {
 			return false
 		}
+		ap.UniqueID = ""
+		bp.UniqueID = ""
 		ap.Time = time.Time{}
 		bp.Time = time.Time{}
 		ap.Data = nil

@@ -2545,6 +2545,7 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 | `authentication` | [`Event.Authentication`](#ttn.lorawan.v3.Event.Authentication) |  | Details on the authentication provided by the caller that triggered this event. |
 | `remote_ip` | [`string`](#string) |  | The IP address of the caller that triggered this event. |
 | `user_agent` | [`string`](#string) |  | The IP address of the caller that triggered this event. |
+| `unique_id` | [`string`](#string) |  | The unique identifier of the event, assigned on creation. |
 
 #### Field Rules
 

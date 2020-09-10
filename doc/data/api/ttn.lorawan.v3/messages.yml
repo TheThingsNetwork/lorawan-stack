@@ -2871,6 +2871,10 @@ Event:
     comment: The IP address of the caller that triggered this event.
     type: string
     default: ""
+  - name: unique_id
+    comment: The unique identifier of the event, assigned on creation.
+    type: string
+    default: ""
 Event.Authentication:
   name: Event.Authentication
   fields:

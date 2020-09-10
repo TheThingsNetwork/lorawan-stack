@@ -84,6 +84,8 @@ func flowTestEventEqual(x, y events.Event) bool {
 	if err != nil {
 		return false
 	}
+	xp.UniqueID = ""
+	yp.UniqueID = ""
 	xp.Data = nil
 	yp.Data = nil
 	xp.Time = time.Time{}
@@ -143,6 +145,8 @@ Y: %v`,
 			t.Errorf("Failed to encode y to proto: %s", err)
 			return false
 		}
+		xp.UniqueID = ""
+		yp.UniqueID = ""
 		xp.Data = nil
 		yp.Data = nil
 		xp.Time = time.Time{}
