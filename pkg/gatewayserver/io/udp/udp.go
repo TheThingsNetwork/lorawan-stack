@@ -317,7 +317,14 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 		logger.WithError(err).Error("Failed to claim downlink")
 		return errClaimDownlinkFailed.WithCause(err)
 	}
-	defer s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers)
+	logger.Info("Downlink path claimed")
+	defer func() {
+		if err := s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers); err != nil {
+			logger.WithError(err).Error("Failed to unclaim downlink")
+			return
+		}
+		logger.Info("Downlink path unclaimed")
+	}()
 	healthCheck := time.NewTicker(s.config.DownlinkPathExpires / 2)
 	defer healthCheck.Stop()
 	for {
