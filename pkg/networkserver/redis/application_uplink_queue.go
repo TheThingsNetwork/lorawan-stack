@@ -144,7 +144,12 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 				if err = f(ctx, up); err != nil {
 					return err
 				}
-				if err = q.redis.XAck(upStream, q.group, msg.ID).Err(); err != nil {
+				_, err := q.redis.Pipelined(func(p redis.Pipeliner) error {
+					p.XAck(upStream, q.group, msg.ID)
+					p.XDel(upStream, msg.ID)
+					return nil
+				})
+				if err != nil {
 					return ttnredis.ConvertError(err)
 				}
 			}
