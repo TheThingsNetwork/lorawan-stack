@@ -69,7 +69,7 @@ func MustNewTFromContext(ctx context.Context) (*testing.T, *assertions.Assertion
 	return t, assertions.New(t)
 }
 
-var defaultTestTimeout = (1 << 15) * Delay
+var defaultTestTimeout = (1 << 18) * Delay
 
 type TestConfig struct {
 	Parallel bool
@@ -82,22 +82,28 @@ func runTestFromContext(ctx context.Context, conf TestConfig) {
 	t.Helper()
 
 	if conf.Parallel {
-		// TODO: Enable once https://github.com/TheThingsNetwork/lorawan-stack/pull/3052 is merged.
-		// t.Parallel()
-	}
-	timeout := conf.Timeout
-	if timeout == 0 {
-		timeout = defaultTestTimeout
+		t.Parallel()
 	}
 	a, ctx := New(t)
-	ctx, cancel := context.WithTimeout(ctx, timeout)
+	ctx, cancel := context.WithDeadline(ctx, func() time.Time {
+		timeout := conf.Timeout
+		if timeout == 0 {
+			timeout = defaultTestTimeout
+		}
+		dl := time.Now().Add(timeout)
+		tDL, ok := t.Deadline()
+		if ok && tDL.Before(dl) {
+			return tDL
+		}
+		return dl
+	}())
 	defer cancel()
 
 	dl, ok := ctx.Deadline()
 	if !ok {
 		panic("missing deadline in context")
 	}
-	timeout = time.Until(dl)
+	timeout := time.Until(dl)
 
 	start := time.Now()
 	doneCh := make(chan struct{})
@@ -139,7 +145,11 @@ type SubtestConfig struct {
 func RunSubtestFromContext(ctx context.Context, conf SubtestConfig) bool {
 	t := MustTFromContext(ctx)
 	t.Helper()
-	return t.Run(conf.Name, func(t *testing.T) {
+	// NOTE: When `-failfast` is specified, t.Run may not run and return true.
+	// https://github.com/golang/go/blob/ae658cb19a265f3f4694cd4aec508b4565bda6aa/src/testing/testing.go#L1158-L1160
+	var called bool
+	ok := t.Run(conf.Name, func(t *testing.T) {
+		called = true
 		t.Helper()
 
 		timeout := conf.Timeout
@@ -156,6 +166,10 @@ func RunSubtestFromContext(ctx context.Context, conf SubtestConfig) bool {
 			},
 		})
 	})
+	if ok && !called {
+		t.Skip("Subtest did not execute, perhaps due to `-failfast`")
+	}
+	return ok && called
 }
 
 func RunSubtest(t *testing.T, conf SubtestConfig) bool {

@@ -5525,6 +5525,78 @@
       "file": "javascript.go"
     }
   },
+  "error:pkg/networkserver/internal:corrupted_mac_state": {
+    "translations": {
+      "en": "MAC state is corrupted"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver/internal:data_rate": {
+    "translations": {
+      "en": "invalid data rate"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver/internal:no_band_version": {
+    "translations": {
+      "en": "specified version `{ver}` of band `{id}` does not exist"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "utils.go"
+    }
+  },
+  "error:pkg/networkserver/internal:payload": {
+    "translations": {
+      "en": "invalid payload"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver/internal:unknown_chanel": {
+    "translations": {
+      "en": "channel is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver/mac:class_a_multicast": {
+    "translations": {
+      "en": "multicast device in class A mode"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "utils.go"
+    }
+  },
+  "error:pkg/networkserver/mac:no_payload": {
+    "translations": {
+      "en": "no message payload specified"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver/mac:request_not_found": {
+    "translations": {
+      "en": "MAC response received, but corresponding request not found"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver/redis:duplicate_identifiers": {
     "translations": {
       "en": "duplicate identifiers"
@@ -5609,15 +5681,6 @@
   "error:pkg/networkserver:channel_index": {
     "translations": {
       "en": "invalid channel index"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:class_a_multicast": {
-    "translations": {
-      "en": "multicast device in class A mode"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -5838,15 +5901,6 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:no_band_version": {
-    "translations": {
-      "en": "specified version `{ver}` of band `{id}` does not exist"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "utils.go"
     }
   },
   "error:pkg/networkserver:no_dev_eui": {
@@ -7870,7 +7924,7 @@
       "en": "switched to class A"
     },
     "description": {
-      "package": "pkg/networkserver",
+      "package": "pkg/networkserver/mac",
       "file": "observability.go"
     }
   },
@@ -7879,7 +7933,7 @@
       "en": "switched to class B"
     },
     "description": {
-      "package": "pkg/networkserver",
+      "package": "pkg/networkserver/mac",
       "file": "observability.go"
     }
   },
@@ -7888,7 +7942,7 @@
       "en": "switched to class C"
     },
     "description": {
-      "package": "pkg/networkserver",
+      "package": "pkg/networkserver/mac",
       "file": "observability.go"
     }
   },
@@ -7978,8 +8032,8 @@
       "en": "ADR parameter setup answer received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_adr_param_setup.go"
+      "package": "pkg/networkserver/mac",
+      "file": "adr_param_setup.go"
     }
   },
   "event:ns.mac.adr_param_setup.request": {
@@ -7987,8 +8041,8 @@
       "en": "ADR parameter setup request enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_adr_param_setup.go"
+      "package": "pkg/networkserver/mac",
+      "file": "adr_param_setup.go"
     }
   },
   "event:ns.mac.beacon_freq.answer.accept": {
@@ -7996,8 +8050,8 @@
       "en": "beacon frequency change accept received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_beacon_freq.go"
+      "package": "pkg/networkserver/mac",
+      "file": "beacon_freq.go"
     }
   },
   "event:ns.mac.beacon_freq.answer.reject": {
@@ -8005,8 +8059,8 @@
       "en": "beacon frequency change rejection received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_beacon_freq.go"
+      "package": "pkg/networkserver/mac",
+      "file": "beacon_freq.go"
     }
   },
   "event:ns.mac.beacon_freq.request": {
@@ -8014,8 +8068,8 @@
       "en": "beacon frequency change request enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_beacon_freq.go"
+      "package": "pkg/networkserver/mac",
+      "file": "beacon_freq.go"
     }
   },
   "event:ns.mac.dev_status.answer": {
@@ -8023,8 +8077,8 @@
       "en": "device status answer received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_dev_status.go"
+      "package": "pkg/networkserver/mac",
+      "file": "dev_status.go"
     }
   },
   "event:ns.mac.dev_status.request": {
@@ -8032,8 +8086,8 @@
       "en": "device status request enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_dev_status.go"
+      "package": "pkg/networkserver/mac",
+      "file": "dev_status.go"
     }
   },
   "event:ns.mac.device_mode.confirmation": {
@@ -8041,8 +8095,8 @@
       "en": "device mode confirmation enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_device_mode.go"
+      "package": "pkg/networkserver/mac",
+      "file": "device_mode.go"
     }
   },
   "event:ns.mac.device_mode.indication": {
@@ -8050,8 +8104,8 @@
       "en": "device mode indication received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_device_mode.go"
+      "package": "pkg/networkserver/mac",
+      "file": "device_mode.go"
     }
   },
   "event:ns.mac.device_time.answer": {
@@ -8059,8 +8113,8 @@
       "en": "device time answer enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_device_time.go"
+      "package": "pkg/networkserver/mac",
+      "file": "device_time.go"
     }
   },
   "event:ns.mac.device_time.request": {
@@ -8068,8 +8122,8 @@
       "en": "device time request received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_device_time.go"
+      "package": "pkg/networkserver/mac",
+      "file": "device_time.go"
     }
   },
   "event:ns.mac.dl_channel.answer.accept": {
@@ -8077,8 +8131,8 @@
       "en": "downlink Rx1 channel frequency modification accept received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_dl_channel.go"
+      "package": "pkg/networkserver/mac",
+      "file": "dl_channel.go"
     }
   },
   "event:ns.mac.dl_channel.answer.reject": {
@@ -8086,8 +8140,8 @@
       "en": "downlink Rx1 channel frequency modification rejection received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_dl_channel.go"
+      "package": "pkg/networkserver/mac",
+      "file": "dl_channel.go"
     }
   },
   "event:ns.mac.dl_channel.request": {
@@ -8095,8 +8149,8 @@
       "en": "downlink Rx1 channel frequency modification request enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_dl_channel.go"
+      "package": "pkg/networkserver/mac",
+      "file": "dl_channel.go"
     }
   },
   "event:ns.mac.duty_cycle.answer": {
@@ -8104,8 +8158,8 @@
       "en": "maximum aggregated transmit duty-cycle change answer received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_duty_cycle.go"
+      "package": "pkg/networkserver/mac",
+      "file": "duty_cycle.go"
     }
   },
   "event:ns.mac.duty_cycle.request": {
@@ -8113,8 +8167,8 @@
       "en": "maximum aggregated transmit duty-cycle change request enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_duty_cycle.go"
+      "package": "pkg/networkserver/mac",
+      "file": "duty_cycle.go"
     }
   },
   "event:ns.mac.force_rejoin.request": {
@@ -8122,8 +8176,8 @@
       "en": "force rejoin request enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_force_rejoin.go"
+      "package": "pkg/networkserver/mac",
+      "file": "force_rejoin.go"
     }
   },
   "event:ns.mac.link_adr.answer.accept": {
@@ -8131,8 +8185,8 @@
       "en": "link ADR accept received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_link_adr.go"
+      "package": "pkg/networkserver/mac",
+      "file": "link_adr.go"
     }
   },
   "event:ns.mac.link_adr.answer.reject": {
@@ -8140,8 +8194,8 @@
       "en": "link ADR rejection received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_link_adr.go"
+      "package": "pkg/networkserver/mac",
+      "file": "link_adr.go"
     }
   },
   "event:ns.mac.link_adr.request": {
@@ -8149,8 +8203,8 @@
       "en": "link ADR request enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_link_adr.go"
+      "package": "pkg/networkserver/mac",
+      "file": "link_adr.go"
     }
   },
   "event:ns.mac.link_check.answer": {
@@ -8158,8 +8212,8 @@
       "en": "link check answer enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_link_check.go"
+      "package": "pkg/networkserver/mac",
+      "file": "link_check.go"
     }
   },
   "event:ns.mac.link_check.request": {
@@ -8167,8 +8221,8 @@
       "en": "link check request received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_link_check.go"
+      "package": "pkg/networkserver/mac",
+      "file": "link_check.go"
     }
   },
   "event:ns.mac.new_channel.answer.accept": {
@@ -8176,8 +8230,8 @@
       "en": "new channel accept received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_new_channel.go"
+      "package": "pkg/networkserver/mac",
+      "file": "new_channel.go"
     }
   },
   "event:ns.mac.new_channel.answer.reject": {
@@ -8185,8 +8239,8 @@
       "en": "new channel rejection received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_new_channel.go"
+      "package": "pkg/networkserver/mac",
+      "file": "new_channel.go"
     }
   },
   "event:ns.mac.new_channel.request": {
@@ -8194,8 +8248,8 @@
       "en": "new channel request enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_new_channel.go"
+      "package": "pkg/networkserver/mac",
+      "file": "new_channel.go"
     }
   },
   "event:ns.mac.ping_slot_channel.answer.accept": {
@@ -8203,8 +8257,8 @@
       "en": "ping slot channel accept received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_ping_slot_channel.go"
+      "package": "pkg/networkserver/mac",
+      "file": "ping_slot_channel.go"
     }
   },
   "event:ns.mac.ping_slot_channel.request": {
@@ -8212,8 +8266,8 @@
       "en": "ping slot channel request enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_ping_slot_channel.go"
+      "package": "pkg/networkserver/mac",
+      "file": "ping_slot_channel.go"
     }
   },
   "event:ns.mac.ping_slot_info.answer": {
@@ -8221,8 +8275,8 @@
       "en": "ping slot info answer enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_ping_slot_info.go"
+      "package": "pkg/networkserver/mac",
+      "file": "ping_slot_info.go"
     }
   },
   "event:ns.mac.ping_slot_info.request": {
@@ -8230,8 +8284,8 @@
       "en": "ping slot info request received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_ping_slot_info.go"
+      "package": "pkg/networkserver/mac",
+      "file": "ping_slot_info.go"
     }
   },
   "event:ns.mac.proprietary.receive": {
@@ -8239,7 +8293,7 @@
       "en": "receive proprietary MAC command"
     },
     "description": {
-      "package": "pkg/networkserver",
+      "package": "pkg/networkserver/mac",
       "file": "observability.go"
     }
   },
@@ -8248,8 +8302,8 @@
       "en": "rejoin parameter setup answer received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_rejoin_param_setup.go"
+      "package": "pkg/networkserver/mac",
+      "file": "rejoin_param_setup.go"
     }
   },
   "event:ns.mac.rejoin_param_setup.request": {
@@ -8257,8 +8311,8 @@
       "en": "rejoin parameter setup request enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_rejoin_param_setup.go"
+      "package": "pkg/networkserver/mac",
+      "file": "rejoin_param_setup.go"
     }
   },
   "event:ns.mac.rekey.confirmation": {
@@ -8266,8 +8320,8 @@
       "en": "device rekey confirmation enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_rekey.go"
+      "package": "pkg/networkserver/mac",
+      "file": "rekey.go"
     }
   },
   "event:ns.mac.rekey.indication": {
@@ -8275,8 +8329,8 @@
       "en": "device rekey indication received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_rekey.go"
+      "package": "pkg/networkserver/mac",
+      "file": "rekey.go"
     }
   },
   "event:ns.mac.reset.confirmation": {
@@ -8284,8 +8338,8 @@
       "en": "device reset confirmation enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_reset.go"
+      "package": "pkg/networkserver/mac",
+      "file": "reset.go"
     }
   },
   "event:ns.mac.reset.indication": {
@@ -8293,8 +8347,8 @@
       "en": "device reset indication received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_reset.go"
+      "package": "pkg/networkserver/mac",
+      "file": "reset.go"
     }
   },
   "event:ns.mac.rx_param_setup.answer.accept": {
@@ -8302,8 +8356,8 @@
       "en": "Rx parameter setup accept received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_rx_param_setup.go"
+      "package": "pkg/networkserver/mac",
+      "file": "rx_param_setup.go"
     }
   },
   "event:ns.mac.rx_param_setup.answer.reject": {
@@ -8311,8 +8365,8 @@
       "en": "Rx parameter setup rejection received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_rx_param_setup.go"
+      "package": "pkg/networkserver/mac",
+      "file": "rx_param_setup.go"
     }
   },
   "event:ns.mac.rx_param_setup.request": {
@@ -8320,8 +8374,8 @@
       "en": "Rx parameter setup request enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_rx_param_setup.go"
+      "package": "pkg/networkserver/mac",
+      "file": "rx_param_setup.go"
     }
   },
   "event:ns.mac.rx_timing_setup.answer": {
@@ -8329,8 +8383,8 @@
       "en": "Rx timing setup answer received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_rx_timing_setup.go"
+      "package": "pkg/networkserver/mac",
+      "file": "rx_timing_setup.go"
     }
   },
   "event:ns.mac.rx_timing_setup.request": {
@@ -8338,8 +8392,8 @@
       "en": "Rx timing setup request enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_rx_timing_setup.go"
+      "package": "pkg/networkserver/mac",
+      "file": "rx_timing_setup.go"
     }
   },
   "event:ns.mac.tx_param_setup.answer": {
@@ -8347,8 +8401,8 @@
       "en": "Tx parameter setup answer received"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_tx_param_setup.go"
+      "package": "pkg/networkserver/mac",
+      "file": "tx_param_setup.go"
     }
   },
   "event:ns.mac.tx_param_setup.request": {
@@ -8356,8 +8410,8 @@
       "en": "Tx parameter setup request enqueued"
     },
     "description": {
-      "package": "pkg/networkserver",
-      "file": "mac_tx_param_setup.go"
+      "package": "pkg/networkserver/mac",
+      "file": "tx_param_setup.go"
     }
   },
   "event:ns.up.data.drop": {

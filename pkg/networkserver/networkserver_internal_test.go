@@ -15,79 +15,88 @@
 package networkserver
 
 import (
+	"context"
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestNewDevAddr(t *testing.T) {
-	t.Run("From NetID", func(t *testing.T) {
-		ns, ctx, _, stop := StartTest(
-			t,
-			component.Config{},
-			Config{
-				NetID: types.NetID{0x00, 0x00, 0x13},
-				DownlinkTasks: MockDownlinkTaskQueue{
-					PopFunc: DownlinkTaskPopBlockFunc,
+	test.RunSubtest(t, test.SubtestConfig{
+		Name:     "From NetID",
+		Parallel: true,
+		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+			ns, ctx, _, stop := StartTest(
+				t,
+				TestConfig{
+					Context: ctx,
+					NetworkServer: Config{
+						NetID: types.NetID{0x00, 0x00, 0x13},
+					},
+					TaskStarter: StartTaskExclude(
+						DownlinkProcessTaskName,
+					),
 				},
-			},
-			(1<<3)*test.Delay,
-		)
-		defer stop()
+			)
+			defer stop()
 
-		assertions.New(t).So(ns.newDevAddr(ctx, nil).HasPrefix(types.DevAddrPrefix{
-			DevAddr: types.DevAddr{0x26, 0, 0, 0},
-			Length:  7,
-		}), should.BeTrue)
+			a.So(ns.newDevAddr(ctx, nil).HasPrefix(types.DevAddrPrefix{
+				DevAddr: types.DevAddr{0x26, 0, 0, 0},
+				Length:  7,
+			}), should.BeTrue)
+		},
 	})
 
-	t.Run("Configured DevAddr prefixes", func(t *testing.T) {
-		ps := []types.DevAddrPrefix{
-			{
-				DevAddr: types.DevAddr{0x26, 0x01, 0x00, 0x00},
-				Length:  16,
-			},
-			{
-				DevAddr: types.DevAddr{0x26, 0xff, 0x01, 0x00},
-				Length:  24,
-			},
-			{
-				DevAddr: types.DevAddr{0x27, 0x00, 0x00, 0x00},
-				Length:  8,
-			},
-		}
-		ns, ctx, _, stop := StartTest(
-			t,
-			component.Config{},
-			Config{
-				NetID: types.NetID{0x00, 0x00, 0x13},
-				DownlinkTasks: MockDownlinkTaskQueue{
-					PopFunc: DownlinkTaskPopBlockFunc,
+	test.RunSubtest(t, test.SubtestConfig{
+		Name:     "Configured DevAddr prefixes",
+		Parallel: true,
+		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+			ps := []types.DevAddrPrefix{
+				{
+					DevAddr: types.DevAddr{0x26, 0x01, 0x00, 0x00},
+					Length:  16,
 				},
-				DevAddrPrefixes: ps,
-			},
-			(1<<3)*test.Delay,
-		)
-		defer stop()
+				{
+					DevAddr: types.DevAddr{0x26, 0xff, 0x01, 0x00},
+					Length:  24,
+				},
+				{
+					DevAddr: types.DevAddr{0x27, 0x00, 0x00, 0x00},
+					Length:  8,
+				},
+			}
+			ns, ctx, _, stop := StartTest(
+				t,
+				TestConfig{
+					Context: ctx,
+					NetworkServer: Config{
+						NetID:           types.NetID{0x00, 0x00, 0x13},
+						DevAddrPrefixes: ps,
+					},
+					TaskStarter: StartTaskExclude(
+						DownlinkProcessTaskName,
+					),
+				},
+			)
+			defer stop()
 
-		seen := map[types.DevAddrPrefix]int{}
-		for i := 0; i < 100; i++ {
-			devAddr := ns.newDevAddr(ctx, nil)
-			for _, p := range ps {
-				if devAddr.HasPrefix(p) {
-					seen[p]++
-					break
+			seen := map[types.DevAddrPrefix]int{}
+			for i := 0; i < 100; i++ {
+				devAddr := ns.newDevAddr(ctx, nil)
+				for _, p := range ps {
+					if devAddr.HasPrefix(p) {
+						seen[p]++
+						break
+					}
 				}
 			}
-		}
 
-		a := assertions.New(t)
-		a.So(seen[ps[0]], should.BeGreaterThan, 0)
-		a.So(seen[ps[1]], should.BeGreaterThan, 0)
-		a.So(seen[ps[2]], should.BeGreaterThan, 0)
+			a.So(seen[ps[0]], should.BeGreaterThan, 0)
+			a.So(seen[ps[1]], should.BeGreaterThan, 0)
+			a.So(seen[ps[2]], should.BeGreaterThan, 0)
+		},
 	})
 }

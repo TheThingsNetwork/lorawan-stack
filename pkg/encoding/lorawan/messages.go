@@ -442,7 +442,7 @@ func AppendMessage(dst []byte, msg ttnpb.Message) ([]byte, error) {
 		}
 		dst, err = AppendMACPayload(dst, *pld, false)
 		if err != nil {
-			return nil, errFailedEncoding("MACPayload").WithCause(err)
+			return nil, errFailedEncoding("downlink MACPayload").WithCause(err)
 		}
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		pld := msg.GetMACPayload()

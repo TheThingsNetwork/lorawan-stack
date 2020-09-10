@@ -16,13 +16,14 @@ package networkserver_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -30,10 +31,8 @@ import (
 )
 
 // handleRegistryTest runs a test suite on reg.
-func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
-	a := assertions.New(t)
-
-	ctx := test.Context()
+func handleRegistryTest(ctx context.Context, reg DeviceRegistry) {
+	t, a := test.MustNewTFromContext(ctx)
 
 	pb := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -344,36 +343,30 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 }
 
 func TestRegistries(t *testing.T) {
-	t.Parallel()
-
 	for _, tc := range []struct {
 		Name string
-		New  func(t testing.TB) (reg DeviceRegistry, closeFn func() error)
-		N    uint16
+		New  func(t testing.TB) (reg DeviceRegistry, closeFn func())
 	}{
 		{
 			Name: "Redis",
 			New:  NewRedisDeviceRegistry,
-			N:    8,
 		},
 	} {
-		for i := 0; i < int(tc.N); i++ {
-			t.Run(fmt.Sprintf("%s/%d", tc.Name, i), func(t *testing.T) {
-				t.Parallel()
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     MakeTestCaseName(tc.Name),
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				reg, closeFn := tc.New(t)
 				if closeFn != nil {
-					defer func() {
-						if err := closeFn(); err != nil {
-							t.Errorf("Failed to close registry: %s", err)
-						}
-					}()
+					defer closeFn()
 				}
-				t.Run("1st run", func(t *testing.T) { handleRegistryTest(t, reg) })
+				t.Run("1st run", func(t *testing.T) { handleRegistryTest(ctx, reg) })
 				if t.Failed() {
 					t.Skip("Skipping 2nd run")
 				}
-				t.Run("2nd run", func(t *testing.T) { handleRegistryTest(t, reg) })
-			})
-		}
+				t.Run("2nd run", func(t *testing.T) { handleRegistryTest(ctx, reg) })
+			},
+		})
 	}
 }

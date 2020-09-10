@@ -23,8 +23,10 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -78,14 +80,18 @@ func TestAppendRecentUplink(t *testing.T) {
 			Expected: ups[1:3],
 		},
 	} {
-		t.Run(fmt.Sprintf("recent_length:%d,window:%v", len(tc.Recent), tc.Window), func(t *testing.T) {
-			a := assertions.New(t)
-			recent := CopyUplinkMessages(tc.Recent...)
-			up := CopyUplinkMessage(tc.Up)
-			ret := appendRecentUplink(recent, up, tc.Window)
-			a.So(recent, should.Resemble, tc.Recent)
-			a.So(up, should.Resemble, tc.Up)
-			a.So(ret, should.Resemble, tc.Expected)
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     fmt.Sprintf("recent_length:%d,window:%v", len(tc.Recent), tc.Window),
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				recent := CopyUplinkMessages(tc.Recent...)
+				up := CopyUplinkMessage(tc.Up)
+				ret := appendRecentUplink(recent, up, tc.Window)
+				a.So(recent, should.Resemble, tc.Recent)
+				a.So(up, should.Resemble, tc.Up)
+				a.So(ret, should.Resemble, tc.Expected)
+			},
 		})
 	}
 }
@@ -122,7 +128,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				TestCase{
 					Name: makeName("Payload too short"),
 					Uplink: &ttnpb.UplinkMessage{
-						Settings: MakeUplinkSettings(dr, ch.Frequency),
+						Settings: MakeUplinkSettings(dr, 0, ch.Frequency),
 					},
 					MakeDevices: func(ctx context.Context) []contextualEndDevice {
 						return []contextualEndDevice{
@@ -255,7 +261,15 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							PendingMACState:      MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
 							PendingSession:       makeSession(0x00, 0x00),
 						}
-						dev.PendingMACState.PendingJoinRequest = MakeNsJsJoinRequest(macVersion, phyVersion, fp, &DevAddr, ttnpb.RX_DELAY_4, 1, ttnpb.DATA_RATE_3)
+						dev.PendingMACState.PendingJoinRequest = MakeNsJsJoinRequest(NsJsJoinRequestConfig{
+							SelectedMACVersion: mac.DeviceDefaultLoRaWANVersion(dev),
+							PHYVersion:         phyVersion,
+							FrequencyPlanID:    dev.FrequencyPlanID,
+							DevAddr:            DevAddr,
+							RX1DataRateOffset:  1,
+							RX2DataRateIndex:   ttnpb.DATA_RATE_3,
+							RXDelay:            ttnpb.RX_DELAY_4,
+						})
 						return dev
 					}(),
 					Pending: true,
@@ -295,7 +309,15 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							Session:              makeSession(0x00, 0x00),
 						}
 						dev.MACState.PendingRequests = []*ttnpb.MACCommand{ttnpb.CID_DEV_STATUS.MACCommand()}
-						up := MakeDataUplink(macVersion, true, false, DevAddr, ttnpb.FCtrl{}, 0x00, 0x00, 0x00, nil, nil, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1)
+						up := MakeDataUplink(DataUplinkConfig{
+							MACVersion:    macVersion,
+							DecodePayload: true,
+							DevAddr:       DevAddr,
+							DataRate:      dr,
+							DataRateIndex: drIdx,
+							Frequency:     phy.UplinkChannels[chIdx-1].Frequency,
+							ChannelIndex:  chIdx - 1,
+						})
 						up.ReceivedAt = upRecvAt.Add(-time.Nanosecond)
 						dev.MACState.RecentUplinks = appendRecentUplink(dev.MACState.RecentUplinks, up, recentUplinkCount)
 						dev.RecentUplinks = appendRecentUplink(dev.RecentUplinks, up, recentUplinkCount)
@@ -316,7 +338,15 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						}
 						dev.MACState.CurrentParameters.ADRNbTrans = 2
 						dev.MACState.PendingRequests = []*ttnpb.MACCommand{ttnpb.CID_DEV_STATUS.MACCommand()}
-						up := MakeDataUplink(macVersion, true, false, DevAddr, ttnpb.FCtrl{}, 0x00, 0x00, 0x00, nil, nil, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1)
+						up := MakeDataUplink(DataUplinkConfig{
+							MACVersion:    macVersion,
+							DecodePayload: true,
+							DevAddr:       DevAddr,
+							DataRate:      dr,
+							DataRateIndex: drIdx,
+							Frequency:     phy.UplinkChannels[chIdx-1].Frequency,
+							ChannelIndex:  chIdx - 1,
+						})
 						up.ReceivedAt = upRecvAt.Add(-time.Nanosecond)
 						dev.MACState.RecentUplinks = appendRecentUplink(dev.MACState.RecentUplinks, up, recentUplinkCount)
 						dev.RecentUplinks = appendRecentUplink(dev.RecentUplinks, up, recentUplinkCount)
@@ -467,18 +497,18 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					MakeQueuedEvents: func(deduplicated bool) events.Builders {
 						if deduplicated {
 							return events.Builders{
-								evtReceiveLinkCheckRequest.BindData(nil),
-								evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-								evtEnqueuePingSlotInfoAnswer.BindData(nil),
-								evtReceiveDeviceTimeRequest.BindData(nil),
-								evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
+								mac.EvtReceiveLinkCheckRequest.BindData(nil),
+								mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+								mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
+								mac.EvtReceiveDeviceTimeRequest.BindData(nil),
+								mac.EvtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 							}
 						}
 						return events.Builders{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-							evtEnqueuePingSlotInfoAnswer.BindData(nil),
-							evtReceiveDeviceTimeRequest.BindData(nil),
-							evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
+							mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
+							mac.EvtReceiveDeviceTimeRequest.BindData(nil),
+							mac.EvtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 						}
 					},
 				},
@@ -527,18 +557,18 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					MakeQueuedEvents: func(deduplicated bool) events.Builders {
 						if deduplicated {
 							return events.Builders{
-								evtReceiveLinkCheckRequest.BindData(nil),
-								evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-								evtEnqueuePingSlotInfoAnswer.BindData(nil),
-								evtReceiveDeviceTimeRequest.BindData(nil),
-								evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
+								mac.EvtReceiveLinkCheckRequest.BindData(nil),
+								mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+								mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
+								mac.EvtReceiveDeviceTimeRequest.BindData(nil),
+								mac.EvtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 							}
 						}
 						return events.Builders{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-							evtEnqueuePingSlotInfoAnswer.BindData(nil),
-							evtReceiveDeviceTimeRequest.BindData(nil),
-							evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
+							mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
+							mac.EvtReceiveDeviceTimeRequest.BindData(nil),
+							mac.EvtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 						}
 					},
 				},
@@ -588,18 +618,18 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					MakeQueuedEvents: func(deduplicated bool) events.Builders {
 						if deduplicated {
 							return events.Builders{
-								evtReceiveLinkCheckRequest.BindData(nil),
-								evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-								evtEnqueuePingSlotInfoAnswer.BindData(nil),
-								evtReceiveDeviceTimeRequest.BindData(nil),
-								evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
+								mac.EvtReceiveLinkCheckRequest.BindData(nil),
+								mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+								mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
+								mac.EvtReceiveDeviceTimeRequest.BindData(nil),
+								mac.EvtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 							}
 						}
 						return events.Builders{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-							evtEnqueuePingSlotInfoAnswer.BindData(nil),
-							evtReceiveDeviceTimeRequest.BindData(nil),
-							evtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
+							mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
+							mac.EvtReceiveDeviceTimeRequest.BindData(nil),
+							mac.EvtEnqueueDeviceTimeAnswer.BindData(deviceTimeAns),
 						}
 					},
 				},
@@ -625,7 +655,15 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							PendingMACState:      MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
 							PendingSession:       makeSession(0x00, 0x00),
 						}
-						dev.PendingMACState.PendingJoinRequest = MakeNsJsJoinRequest(macVersion, phyVersion, fp, &DevAddr, ttnpb.RX_DELAY_4, 1, ttnpb.DATA_RATE_3)
+						dev.PendingMACState.PendingJoinRequest = MakeNsJsJoinRequest(NsJsJoinRequestConfig{
+							SelectedMACVersion: mac.DeviceDefaultLoRaWANVersion(dev),
+							PHYVersion:         phyVersion,
+							FrequencyPlanID:    dev.FrequencyPlanID,
+							DevAddr:            DevAddr,
+							RX1DataRateOffset:  1,
+							RX2DataRateIndex:   ttnpb.DATA_RATE_3,
+							RXDelay:            ttnpb.RX_DELAY_4,
+						})
 						return dev
 					}(),
 					Error: errDeviceNotFound,
@@ -665,8 +703,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					},
 					MakeQueuedEvents: func(bool) events.Builders {
 						return events.Builders{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-							evtEnqueuePingSlotInfoAnswer.BindData(nil),
+							mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
 						}
 					},
 				}),
@@ -716,8 +754,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					},
 					MakeQueuedEvents: func(bool) events.Builders {
 						return events.Builders{
-							evtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
-							evtEnqueuePingSlotInfoAnswer.BindData(nil),
+							mac.EvtReceivePingSlotInfoRequest.BindData(pingSlotInfoReq),
+							mac.EvtEnqueuePingSlotInfoAnswer.BindData(nil),
 						}
 					},
 				},
@@ -834,7 +872,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					},
 					MakeQueuedEvents: func(bool) events.Builders {
 						return events.Builders{
-							evtClassBSwitch.BindData(ttnpb.CLASS_A),
+							mac.EvtClassBSwitch.BindData(ttnpb.CLASS_A),
 						}
 					},
 				},
@@ -855,11 +893,23 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						}
 						dev.MACState.CurrentParameters.ADRNbTrans = 3
 						dev.MACState.PendingRequests = []*ttnpb.MACCommand{{}, {}}
-						up := MakeDataUplink(macVersion, true, false, DevAddr, ttnpb.FCtrl{
-							ADR:       true,
-							ADRAckReq: true,
-							ClassB:    true,
-						}, 0xff00, 0, 0x01, []byte("test-payload"), []byte{}, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1)
+						up := MakeDataUplink(DataUplinkConfig{
+							MACVersion:    macVersion,
+							DecodePayload: true,
+							DevAddr:       DevAddr,
+							FCtrl: ttnpb.FCtrl{
+								ADR:       true,
+								ADRAckReq: true,
+								ClassB:    true,
+							},
+							FCnt:          0xff00,
+							FPort:         0x01,
+							FRMPayload:    []byte("test-payload"),
+							DataRate:      dr,
+							DataRateIndex: drIdx,
+							Frequency:     phy.UplinkChannels[chIdx-1].Frequency,
+							ChannelIndex:  chIdx - 1,
+						})
 						up.ReceivedAt = upRecvAt.Add(-time.Nanosecond)
 						dev.MACState.RecentUplinks = appendRecentUplink(dev.MACState.RecentUplinks, up, recentUplinkCount)
 						dev.RecentUplinks = appendRecentUplink(dev.RecentUplinks, up, recentUplinkCount)
@@ -958,12 +1008,27 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		} {
 			upName := makeName(fmt.Sprintf("confirmed:%v,ack:%v,adr:%v,adr_ack_req:%v,class_b:%v,f_cnt:0x%x,conf_f_cnt_down:0x%x,f_port:%v,frm_payload:%v,fOpts:%v",
 				upConf.Confirmed, upConf.Ack, upConf.ADR, upConf.ADRAckReq, upConf.ClassB, upConf.FCnt, upConf.ConfFCntDown, upConf.FPort, hex.EncodeToString(upConf.FRMPayload), hex.EncodeToString(upConf.FOpts)))
-			up := MakeDataUplink(macVersion, true, upConf.Confirmed, DevAddr, ttnpb.FCtrl{
-				Ack:       upConf.Ack,
-				ADR:       upConf.ADR,
-				ADRAckReq: upConf.ADRAckReq,
-				ClassB:    upConf.ClassB,
-			}, upConf.FCnt, upConf.ConfFCntDown, upConf.FPort, upConf.FRMPayload, upConf.FOpts, dr, drIdx, ch.Frequency, chIdx)
+			up := MakeDataUplink(DataUplinkConfig{
+				MACVersion:    macVersion,
+				DecodePayload: true,
+				Confirmed:     upConf.Confirmed,
+				DevAddr:       DevAddr,
+				FCtrl: ttnpb.FCtrl{
+					Ack:       upConf.Ack,
+					ADR:       upConf.ADR,
+					ADRAckReq: upConf.ADRAckReq,
+					ClassB:    upConf.ClassB,
+				},
+				FCnt:          upConf.FCnt,
+				ConfFCntDown:  upConf.ConfFCntDown,
+				FPort:         upConf.FPort,
+				FRMPayload:    upConf.FRMPayload,
+				FOpts:         upConf.FOpts,
+				DataRate:      dr,
+				DataRateIndex: drIdx,
+				Frequency:     ch.Frequency,
+				ChannelIndex:  chIdx,
+			})
 			up.ReceivedAt = upRecvAt
 			for _, deduplicated := range [2]bool{
 				true,
@@ -1173,20 +1238,27 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		}
 	})
 	for _, tc := range tcs {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				ns, ctx, _, stop := StartTest(t, TestConfig{
+					Context: ctx,
+					NetworkServer: Config{
+						NetID: NetID,
+					},
+					TaskStarter: StartTaskExclude(
+						DownlinkProcessTaskName,
+					),
+				})
+				defer stop()
 
-			ns, ctx, env, stop := StartTest(t, component.Config{}, Config{
-				NetID: NetID,
-			}, (1<<5)*test.Delay)
-			defer stop()
-
-			<-env.DownlinkTasks.Pop
-
-			dev, err := ns.matchAndHandleDataUplink(CopyUplinkMessage(tc.Uplink), tc.Deduplicated, tc.MakeDevices(ctx)...)
-			if a.So(err, should.EqualErrorOrDefinition, tc.Error) {
-				a.So(tc.DeviceAssertion(t, dev), should.BeTrue)
-			}
+				dev, err := ns.matchAndHandleDataUplink(CopyUplinkMessage(tc.Uplink), tc.Deduplicated, tc.MakeDevices(ctx)...)
+				if a.So(err, should.EqualErrorOrDefinition, tc.Error) {
+					a.So(tc.DeviceAssertion(t, dev), should.BeTrue)
+				}
+			},
 		})
 	}
 }

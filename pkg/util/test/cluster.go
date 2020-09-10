@@ -265,7 +265,7 @@ func AssertClusterAuthRequest(ctx context.Context, reqCh <-chan ClusterAuthReque
 	}
 }
 
-func AssertClusterGetPeerRequest(ctx context.Context, reqCh <-chan ClusterGetPeerRequest, assert func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool, resp ClusterGetPeerResponse) bool {
+func AssertClusterGetPeerRequest(ctx context.Context, reqCh <-chan ClusterGetPeerRequest, assert func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (ClusterGetPeerResponse, bool)) bool {
 	t := MustTFromContext(ctx)
 	t.Helper()
 	select {
@@ -275,7 +275,9 @@ func AssertClusterGetPeerRequest(ctx context.Context, reqCh <-chan ClusterGetPee
 
 	case req := <-reqCh:
 		t.Log("Cluster.GetPeer called")
-		if !assert(req.Context, req.Role, req.Identifiers) {
+		resp, ok := assert(ctx, req.Context, req.Role, req.Identifiers)
+		if !ok {
+			t.Error("Cluster.GetPeer request assertion failed")
 			return false
 		}
 		select {
@@ -287,19 +289,4 @@ func AssertClusterGetPeerRequest(ctx context.Context, reqCh <-chan ClusterGetPee
 			return true
 		}
 	}
-}
-
-func AssertClusterGetPeerRequestSequence(ctx context.Context, reqCh <-chan ClusterGetPeerRequest, peers []ClusterGetPeerResponse, assertions ...func(context.Context, ttnpb.ClusterRole, ttnpb.Identifiers) bool) bool {
-	t := MustTFromContext(ctx)
-	t.Helper()
-	if len(peers) != len(assertions) {
-		panic("Length mismatch between peers and assertions")
-	}
-	for i, p := range peers {
-		if !AssertClusterGetPeerRequest(ctx, reqCh, assertions[i], p) {
-			t.Errorf("Cluster.GetPeer assertion failed for peer %d", i)
-			return false
-		}
-	}
-	return true
 }
