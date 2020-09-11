@@ -162,7 +162,7 @@ func (s *srv) handlePackets() {
 			}
 
 			if err := s.handleUp(cs.io.Context(), cs, packet); err != nil {
-				logger.WithError(err).Warn("Failed to handle packet")
+				logger.WithError(err).Warn("Failed to handle upstream packet")
 			}
 		}
 	}
@@ -239,7 +239,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 		state.startHandleDown.Do(func() {
 			go func() {
 				if err := s.handleDown(ctx, state); err != nil {
-					logger.WithError(err).Warn("Downlink handler failed")
+					logger.WithError(err).Warn("Failed to handle downstream packet")
 				}
 			}()
 		})
@@ -326,13 +326,13 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 	}()
 	logger := log.FromContext(ctx)
 	if err := s.server.ClaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers); err != nil {
-		logger.WithError(err).Error("Failed to claim downlink")
+		logger.WithError(err).Error("Failed to claim downlink path")
 		return errClaimDownlinkFailed.WithCause(err)
 	}
 	logger.Info("Downlink path claimed")
 	defer func() {
 		if err := s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers); err != nil {
-			logger.WithError(err).Error("Failed to unclaim downlink")
+			logger.WithError(err).Error("Failed to unclaim downlink path")
 			return
 		}
 		logger.Info("Downlink path unclaimed")

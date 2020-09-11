@@ -68,16 +68,16 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 	}
 	logger := log.FromContext(ctx)
 	if err := h.cluster.ClaimIDs(ctx, ids); err != nil {
-		logger.WithError(err).Error("Failed to claim gateway")
+		logger.WithError(err).Error("Failed to claim downlink path")
 		return err
 	}
-	logger.Info("Gateway claimed")
+	logger.Info("Downlink path claimed")
 	defer func() {
 		if err := h.cluster.UnclaimIDs(ctx, ids); err != nil {
-			logger.WithError(err).Error("Failed to unclaim gateway")
+			logger.WithError(err).Error("Failed to unclaim downlink path")
 			return
 		}
-		logger.Info("Gateway unclaimed")
+		logger.Info("Downlink path unclaimed")
 	}()
 	<-ctx.Done()
 	return ctx.Err()
