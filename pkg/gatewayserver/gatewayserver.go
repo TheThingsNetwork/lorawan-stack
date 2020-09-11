@@ -559,11 +559,12 @@ var (
 )
 
 type upstreamHost struct {
-	name     string
-	handler  upstream.Handler
-	handlers int32
-	handleWg sync.WaitGroup
-	handleCh chan upstreamItem
+	name          string
+	handler       upstream.Handler
+	handlers      int32
+	handleWg      sync.WaitGroup
+	handleCh      chan upstreamItem
+	correlationID string
 }
 
 type upstreamItem struct {
@@ -595,8 +596,10 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 				return
 			case item := <-host.handleCh:
 				ctx := item.ctx
+				ctx = events.ContextWithCorrelationID(ctx, host.correlationID)
 				switch msg := item.val.(type) {
 				case *ttnpb.GatewayUplinkMessage:
+					msg.CorrelationIDs = append(msg.CorrelationIDs, host.correlationID)
 					drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
 						logger := logger.WithError(err)
 						if ids.JoinEUI != nil {
@@ -651,9 +654,10 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 	hosts := make([]*upstreamHost, 0, len(gs.upstreamHandlers))
 	for name, handler := range gs.upstreamHandlers {
 		host := &upstreamHost{
-			name:     name,
-			handler:  handler,
-			handleCh: make(chan upstreamItem),
+			name:          name,
+			handler:       handler,
+			handleCh:      make(chan upstreamItem),
+			correlationID: fmt.Sprintf("gs:up:host:%s", events.NewCorrelationID()),
 		}
 		hosts = append(hosts, host)
 		defer host.handleWg.Wait()
