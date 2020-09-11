@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.9.2] - 2020-09-11
+
+### Added
+
 - Add `the-things-stack` device template converter, enabled by default. Effectively, this allows importing end devices from the Console.
 - Support for binary decoding downlink messages previously encoded with Javascript or CayenneLPP.
 - Service data fields to pub/subs and webhooks in the Console.
@@ -25,8 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Previous Javascript function signatures `Decoder()` and `Encoder()`, although they remain functional until further notice.
 
-### Removed
-
 ### Fixed
 
 - CLI login issues when OAuth Server Address explicitly includes the `:443` HTTPS port.
@@ -35,8 +47,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pub/Sub integrations not backing off on internal connection failures.
 - Network Server ping slot-related field validation.
 - Memory usage of Network Server application uplink queues.
-
-### Security
 
 ## [3.9.1] - 2020-08-19
 
@@ -1043,7 +1053,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.1...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.2...HEAD
+[3.9.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.1...v3.9.2
 [3.9.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.0...v3.9.1
 [3.9.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.6...v3.9.0
 [3.8.6]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.5...v3.8.6
