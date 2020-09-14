@@ -1147,7 +1147,7 @@
             },
             {
               "name": "api_key",
-              "description": "",
+              "description": "The API key to use to link the Application Server to Network Server.\nThis API key needs to have RIGHT_APPLICATION_LINK.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -1165,7 +1165,7 @@
             },
             {
               "name": "default_formatters",
-              "description": "",
+              "description": "Default message payload formatters to use when there are no formatters\ndefined on the end device level.",
               "label": "",
               "type": "MessagePayloadFormatters",
               "longType": "MessagePayloadFormatters",
@@ -1380,7 +1380,7 @@
           "methods": [
             {
               "name": "Subscribe",
-              "description": "",
+              "description": "Subscribe to upstream messages.",
               "requestType": "ApplicationIdentifiers",
               "requestLongType": "ApplicationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
@@ -1392,7 +1392,7 @@
             },
             {
               "name": "DownlinkQueuePush",
-              "description": "",
+              "description": "Push downlink messages to the end of the downlink queue.",
               "requestType": "DownlinkQueueRequest",
               "requestLongType": "DownlinkQueueRequest",
               "requestFullType": "ttn.lorawan.v3.DownlinkQueueRequest",
@@ -1415,7 +1415,7 @@
             },
             {
               "name": "DownlinkQueueReplace",
-              "description": "",
+              "description": "Replace the entire downlink queue with the specified messages.\nThis can also be used to empty the queue by specifying no messages.",
               "requestType": "DownlinkQueueRequest",
               "requestLongType": "DownlinkQueueRequest",
               "requestFullType": "ttn.lorawan.v3.DownlinkQueueRequest",
@@ -1438,7 +1438,7 @@
             },
             {
               "name": "DownlinkQueueList",
-              "description": "",
+              "description": "List the items currently in the downlink queue.",
               "requestType": "EndDeviceIdentifiers",
               "requestLongType": "EndDeviceIdentifiers",
               "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
@@ -1460,7 +1460,7 @@
             },
             {
               "name": "GetMQTTConnectionInfo",
-              "description": "",
+              "description": "Get connection information to connect an MQTT client.",
               "requestType": "ApplicationIdentifiers",
               "requestLongType": "ApplicationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
@@ -1482,7 +1482,7 @@
             },
             {
               "name": "SimulateUplink",
-              "description": "",
+              "description": "Simulate an upstream message. This can be used to test integrations.",
               "requestType": "ApplicationUp",
               "requestLongType": "ApplicationUp",
               "requestFullType": "ttn.lorawan.v3.ApplicationUp",
@@ -1513,7 +1513,7 @@
           "methods": [
             {
               "name": "GetLink",
-              "description": "",
+              "description": "Get a link configuration from the Application Server to Network Server.\nThis only contains the configuration. Use GetLinkStats to view statistics and any link errors.",
               "requestType": "GetApplicationLinkRequest",
               "requestLongType": "GetApplicationLinkRequest",
               "requestFullType": "ttn.lorawan.v3.GetApplicationLinkRequest",
@@ -1535,7 +1535,7 @@
             },
             {
               "name": "SetLink",
-              "description": "Set a link configuration from the Application Server a Network Server.\nThis call returns immediately after setting the link configuration; it does not wait for a link to establish.\nTo get link statistics or errors, use the `GetLinkStats` call.",
+              "description": "Set a link configuration from the Application Server a Network Server.\nThis call returns immediately after setting the link configuration; it does not wait for a link to establish.\nTo get link statistics or errors, use GetLinkStats.\nNote that there can only be one Application Server instance linked to a Network Server for a given application at a time.",
               "requestType": "SetApplicationLinkRequest",
               "requestLongType": "SetApplicationLinkRequest",
               "requestFullType": "ttn.lorawan.v3.SetApplicationLinkRequest",
@@ -1558,7 +1558,7 @@
             },
             {
               "name": "DeleteLink",
-              "description": "",
+              "description": "Delete the link between the Application Server and Network Server for the specified application.",
               "requestType": "ApplicationIdentifiers",
               "requestLongType": "ApplicationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
@@ -2971,6 +2971,47 @@
               "type": "bytes",
               "longType": "bytes",
               "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "headers",
+              "description": "HTTP headers to use on MQTT-over-Websocket connections.",
+              "label": "repeated",
+              "type": "HeadersEntry",
+              "longType": "ApplicationPubSub.MQTTProvider.HeadersEntry",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.HeadersEntry",
+              "ismap": true,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "HeadersEntry",
+          "longName": "ApplicationPubSub.MQTTProvider.HeadersEntry",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.HeadersEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "defaultValue": ""
             }
@@ -12466,7 +12507,7 @@
           "fields": [
             {
               "name": "uplink_messages",
-              "description": "UplinkMessages received by the gateway.",
+              "description": "Uplink messages received by the gateway.",
               "label": "repeated",
               "type": "UplinkMessage",
               "longType": "UplinkMessage",
@@ -12476,7 +12517,7 @@
             },
             {
               "name": "gateway_status",
-              "description": "",
+              "description": "Gateway status produced by the gateway.",
               "label": "",
               "type": "GatewayStatus",
               "longType": "GatewayStatus",
@@ -12486,7 +12527,7 @@
             },
             {
               "name": "tx_acknowledgment",
-              "description": "",
+              "description": "A transmission acknowledgement or error.",
               "label": "",
               "type": "TxAcknowledgment",
               "longType": "TxAcknowledgment",
@@ -12507,7 +12548,7 @@
           "fields": [
             {
               "name": "path_errors",
-              "description": "",
+              "description": "Errors per path when downlink scheduling failed.",
               "label": "repeated",
               "type": "ErrorDetails",
               "longType": "ErrorDetails",
@@ -12528,7 +12569,7 @@
           "fields": [
             {
               "name": "delay",
-              "description": "",
+              "description": "The amount of time between the message has been scheduled and it will be transmitted by the gateway.",
               "label": "",
               "type": "Duration",
               "longType": "google.protobuf.Duration",
@@ -12586,7 +12627,7 @@
           "methods": [
             {
               "name": "LinkGateway",
-              "description": "Link the gateway to the Gateway Server.",
+              "description": "Link a gateway to the Gateway Server for streaming upstream messages and downstream messages.",
               "requestType": "GatewayUp",
               "requestLongType": "GatewayUp",
               "requestFullType": "ttn.lorawan.v3.GatewayUp",
@@ -12598,7 +12639,7 @@
             },
             {
               "name": "GetConcentratorConfig",
-              "description": "GetConcentratorConfig associated to the gateway.",
+              "description": "Get configuration for the concentrator.",
               "requestType": "Empty",
               "requestLongType": ".google.protobuf.Empty",
               "requestFullType": "google.protobuf.Empty",
@@ -12610,7 +12651,7 @@
             },
             {
               "name": "GetMQTTConnectionInfo",
-              "description": "Get the MQTT server address and the username for the gateway.",
+              "description": "Get connection information to connect an MQTT gateway.",
               "requestType": "GatewayIdentifiers",
               "requestLongType": "GatewayIdentifiers",
               "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
@@ -12632,7 +12673,7 @@
             },
             {
               "name": "GetMQTTV2ConnectionInfo",
-              "description": "Get the MQTTV2 server address and the username for the gateway.",
+              "description": "Get legacy connection information to connect a The Things Network Stack V2 MQTT gateway.",
               "requestType": "GatewayIdentifiers",
               "requestLongType": "GatewayIdentifiers",
               "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
@@ -12662,7 +12703,7 @@
           "methods": [
             {
               "name": "ScheduleDownlink",
-              "description": "ScheduleDownlink instructs the Gateway Server to schedule a downlink message.\nThe Gateway Server may refuse if there are any conflicts in the schedule or\nif a duty cycle prevents the gateway from transmitting.",
+              "description": "Instructs the Gateway Server to schedule a downlink message.\nThe Gateway Server may refuse if there are any conflicts in the schedule or\nif a duty cycle prevents the gateway from transmitting.",
               "requestType": "DownlinkMessage",
               "requestLongType": "DownlinkMessage",
               "requestFullType": "ttn.lorawan.v3.DownlinkMessage",

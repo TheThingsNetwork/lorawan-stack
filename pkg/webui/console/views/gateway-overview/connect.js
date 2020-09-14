@@ -14,66 +14,15 @@
 
 import { connect } from 'react-redux'
 
-import {
-  checkFromState,
-  mayViewOrEditGatewayApiKeys,
-  mayViewOrEditGatewayCollaborators,
-} from '@console/lib/feature-checks'
-
-import { getCollaboratorsList } from '@console/store/actions/collaborators'
-import { getApiKeysList } from '@console/store/actions/api-keys'
-
 import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
-import { selectApiKeysTotalCount, selectApiKeysFetching } from '@console/store/selectors/api-keys'
-import {
-  selectCollaboratorsTotalCount,
-  selectCollaboratorsFetching,
-} from '@console/store/selectors/collaborators'
 
 const mapStateToProps = state => {
   const gtwId = selectSelectedGatewayId(state)
-  const collaboratorsTotalCount = selectCollaboratorsTotalCount(state, { id: gtwId })
-  const apiKeysTotalCount = selectApiKeysTotalCount(state)
-  const mayViewGatewayApiKeys = checkFromState(mayViewOrEditGatewayApiKeys, state)
-  const mayViewGatewayCollaborators = checkFromState(mayViewOrEditGatewayCollaborators, state)
-  const collaboratorsFetching =
-    (mayViewGatewayCollaborators && collaboratorsTotalCount === undefined) ||
-    selectCollaboratorsFetching(state)
-  const apiKeysFetching =
-    (mayViewGatewayApiKeys && apiKeysTotalCount === undefined) || selectApiKeysFetching(state)
 
   return {
     gtwId,
     gateway: selectSelectedGateway(state),
-    mayViewGatewayApiKeys,
-    mayViewGatewayCollaborators,
-    collaboratorsTotalCount,
-    apiKeysTotalCount,
-    statusBarFetching: collaboratorsFetching || apiKeysFetching,
   }
 }
-const mapDispatchToProps = dispatch => ({
-  loadData(mayViewGatewayCollaborators, mayViewGatewayApiKeys, gtwId) {
-    if (mayViewGatewayCollaborators) dispatch(getCollaboratorsList('gateway', gtwId))
-    if (mayViewGatewayApiKeys) dispatch(getApiKeysList('gateway', gtwId))
-  },
-})
 
-const mergeProps = (stateProps, dispatchProps, ownProps) => ({
-  ...stateProps,
-  ...dispatchProps,
-  ...ownProps,
-  loadData: () =>
-    dispatchProps.loadData(
-      stateProps.mayViewGatewayCollaborators,
-      stateProps.mayViewGatewayApiKeys,
-      stateProps.gtwId,
-    ),
-})
-
-export default GatewayOverview =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-    mergeProps,
-  )(GatewayOverview)
+export default GatewayOverview => connect(mapStateToProps)(GatewayOverview)

@@ -436,12 +436,18 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				); err != nil {
 					return nil, nil, errInvalidFieldMask.WithCause(err)
 				}
+				if dev.GetMACSettings().GetPingSlotFrequency() == nil {
+					return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.ping_slot_frequency")
+				}
 			}
 			if ns.defaultMACSettings.PingSlotPeriodicity == nil && ttnpb.HasAnyField(req.FieldMask.Paths, "multicast") && req.EndDevice.Multicast {
 				if err := ttnpb.RequireFields(sets,
 					"mac_settings.ping_slot_periodicity.value",
 				); err != nil {
 					return nil, nil, errInvalidFieldMask.WithCause(err)
+				}
+				if dev.GetMACSettings().GetPingSlotPeriodicity() == nil {
+					return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.ping_slot_periodicity")
 				}
 			}
 		}

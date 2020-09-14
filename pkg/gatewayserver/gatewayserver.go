@@ -41,10 +41,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/basicstationlns"
 	iogrpc "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/grpc"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/ns"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/packetbroker"
@@ -234,10 +235,13 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 				ID:      fmt.Sprintf("serve_mqtt/%s", endpoint.Address()),
 				Func: func(ctx context.Context) error {
 					l, err := gs.ListenTCP(endpoint.Address())
-					var lis net.Listener
-					if err == nil {
-						lis, err = endpoint.Listen(l)
+					if err != nil {
+						return errListenFrontend.WithCause(err).WithAttributes(
+							"address", endpoint.Address(),
+							"protocol", endpoint.Protocol(),
+						)
 					}
+					lis, err := endpoint.Listen(l)
 					if err != nil {
 						return errListenFrontend.WithCause(err).WithAttributes(
 							"address", endpoint.Address(),
@@ -253,58 +257,83 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		}
 	}
 
-	// Start Basic Station listeners.
-	bsCtx := gs.Context()
-	if conf.BasicStation.FallbackFrequencyPlanID != "" {
-		bsCtx = frequencyplans.WithFallbackID(bsCtx, conf.BasicStation.FallbackFrequencyPlanID)
+	// Start Web Socket listeners.
+	type listenerConfig struct {
+		fallbackFreqPlanID string
+		listen             string
+		listenTLS          string
+		frontend           ws.Config
 	}
-	bsWebServer := basicstationlns.New(bsCtx, gs, basicstationlns.Config{
-		UseTrafficTLSAddress: conf.BasicStation.UseTrafficTLSAddress,
-		WSPingInterval:       conf.BasicStation.WSPingInterval,
-		AllowUnauthenticated: conf.BasicStation.AllowUnauthenticated,
-	})
-	for _, endpoint := range []component.Endpoint{
-		component.NewTCPEndpoint(conf.BasicStation.Listen, "Basic Station"),
-		component.NewTLSEndpoint(conf.BasicStation.ListenTLS, "Basic Station", component.WithNextProtos("h2", "http/1.1")),
-	} {
-		endpoint := endpoint
-		if endpoint.Address() == "" {
-			continue
-		}
-		gs.RegisterTask(&component.TaskConfig{
-			Context: gs.Context(),
-			ID:      fmt.Sprintf("serve_basicstation/%s", endpoint.Address()),
-			Func: func(ctx context.Context) error {
-				l, err := gs.ListenTCP(endpoint.Address())
-				var lis net.Listener
-				if err == nil {
-					lis, err = endpoint.Listen(l)
-				}
-				if err != nil {
-					return errListenFrontend.WithCause(err).WithAttributes(
-						"address", endpoint.Address(),
-						"protocol", endpoint.Protocol(),
-					)
-				}
-				defer lis.Close()
-
-				srv := http.Server{
-					Handler:           bsWebServer,
-					ReadTimeout:       120 * time.Second,
-					ReadHeaderTimeout: 5 * time.Second,
-					ErrorLog:          stdlog.New(ioutil.Discard, "", 0),
-				}
-				go func() {
-					<-ctx.Done()
-					srv.Close()
-				}()
-				return srv.Serve(lis)
+	for _, version := range []struct {
+		Name           string
+		Formatter      ws.Formatter
+		listenerConfig listenerConfig
+	}{
+		{
+			Name:      "basicstation",
+			Formatter: lbslns.NewFormatter(),
+			listenerConfig: listenerConfig{
+				fallbackFreqPlanID: conf.BasicStation.FallbackFrequencyPlanID,
+				listen:             conf.BasicStation.Listen,
+				listenTLS:          conf.BasicStation.ListenTLS,
+				frontend: ws.Config{
+					UseTrafficTLSAddress: conf.BasicStation.UseTrafficTLSAddress,
+					WSPingInterval:       conf.BasicStation.WSPingInterval,
+					AllowUnauthenticated: conf.BasicStation.AllowUnauthenticated,
+				},
 			},
-			Restart: component.TaskRestartOnFailure,
-			Backoff: component.DefaultTaskBackoffConfig,
-		})
-	}
+		},
+	} {
+		ctx := gs.Context()
+		if version.listenerConfig.fallbackFreqPlanID != "" {
+			ctx = frequencyplans.WithFallbackID(ctx, version.listenerConfig.fallbackFreqPlanID)
+		}
+		webServer := ws.New(ctx, gs, version.Formatter, version.listenerConfig.frontend)
+		for _, endpoint := range []component.Endpoint{
+			component.NewTCPEndpoint(version.listenerConfig.listen, version.Name),
+			component.NewTLSEndpoint(version.listenerConfig.listenTLS, version.Name, component.WithNextProtos("h2", "http/1.1")),
+		} {
+			endpoint := endpoint
+			if endpoint.Address() == "" {
+				continue
+			}
+			gs.RegisterTask(&component.TaskConfig{
+				Context: gs.Context(),
+				ID:      fmt.Sprintf("serve_%s/%s", version.Name, endpoint.Address()),
+				Func: func(ctx context.Context) error {
+					l, err := gs.ListenTCP(endpoint.Address())
+					if err != nil {
+						return errListenFrontend.WithCause(err).WithAttributes(
+							"address", endpoint.Address(),
+							"protocol", endpoint.Protocol(),
+						)
+					}
+					lis, err := endpoint.Listen(l)
+					if err != nil {
+						return errListenFrontend.WithCause(err).WithAttributes(
+							"address", endpoint.Address(),
+							"protocol", endpoint.Protocol(),
+						)
+					}
+					defer lis.Close()
 
+					srv := http.Server{
+						Handler:           webServer,
+						ReadTimeout:       120 * time.Second,
+						ReadHeaderTimeout: 5 * time.Second,
+						ErrorLog:          stdlog.New(ioutil.Discard, "", 0),
+					}
+					go func() {
+						<-ctx.Done()
+						srv.Close()
+					}()
+					return srv.Serve(lis)
+				},
+				Restart: component.TaskRestartOnFailure,
+				Backoff: component.DefaultTaskBackoffConfig,
+			})
+		}
+	}
 	return gs, nil
 }
 
@@ -530,11 +559,12 @@ var (
 )
 
 type upstreamHost struct {
-	name     string
-	handler  upstream.Handler
-	handlers int32
-	handleWg sync.WaitGroup
-	handleCh chan upstreamItem
+	name          string
+	handler       upstream.Handler
+	handlers      int32
+	handleWg      sync.WaitGroup
+	handleCh      chan upstreamItem
+	correlationID string
 }
 
 type upstreamItem struct {
@@ -566,8 +596,13 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 				return
 			case item := <-host.handleCh:
 				ctx := item.ctx
+				ctx = events.ContextWithCorrelationID(ctx, host.correlationID)
 				switch msg := item.val.(type) {
 				case *ttnpb.GatewayUplinkMessage:
+					msgC := *msg
+					msg = &msgC
+					msg.CorrelationIDs = append(make([]string, 0, len(msg.CorrelationIDs)+1), msg.CorrelationIDs...)
+					msg.CorrelationIDs = append(msg.CorrelationIDs, host.correlationID)
 					drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
 						logger := logger.WithError(err)
 						if ids.JoinEUI != nil {
@@ -622,9 +657,10 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 	hosts := make([]*upstreamHost, 0, len(gs.upstreamHandlers))
 	for name, handler := range gs.upstreamHandlers {
 		host := &upstreamHost{
-			name:     name,
-			handler:  handler,
-			handleCh: make(chan upstreamItem),
+			name:          name,
+			handler:       handler,
+			handleCh:      make(chan upstreamItem),
+			correlationID: fmt.Sprintf("gs:up:host:%s", events.NewCorrelationID()),
 		}
 		hosts = append(hosts, host)
 		defer host.handleWg.Wait()

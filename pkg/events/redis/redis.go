@@ -21,80 +21,118 @@ import (
 	"sync"
 
 	"github.com/go-redis/redis/v7"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 )
 
 // WrapPubSub wraps an existing PubSub and publishes all events received from Redis to that PubSub.
-func WrapPubSub(wrapped events.PubSub, conf ttnredis.Config) (ps *PubSub) {
+func WrapPubSub(ctx context.Context, wrapped events.PubSub, taskStarter component.TaskStarter, conf ttnredis.Config) *PubSub {
 	ttnRedisClient := ttnredis.New(&conf)
-	ps = &PubSub{
+	eventChannel := ttnRedisClient.Key("events")
+	ctx = log.NewContextWithFields(ctx, log.Fields(
+		"namespace", "events/redis",
+		"channel", eventChannel,
+	))
+	ctx, cancel := context.WithCancel(ctx)
+	return &PubSub{
 		PubSub:       wrapped,
+		taskStarter:  taskStarter,
+		ctx:          ctx,
+		cancel:       cancel,
 		client:       ttnRedisClient.Client,
-		eventChannel: ttnRedisClient.Key("events"),
-		closeWait:    make(chan struct{}),
+		eventChannel: eventChannel,
 	}
-	return
 }
 
 // NewPubSub creates a new PubSub that publishes and subscribes to Redis.
-func NewPubSub(conf ttnredis.Config) *PubSub {
-	return WrapPubSub(events.NewPubSub(events.DefaultBufferSize), conf)
+func NewPubSub(ctx context.Context, taskStarter component.TaskStarter, conf ttnredis.Config) *PubSub {
+	return WrapPubSub(ctx, events.NewPubSub(events.DefaultBufferSize), taskStarter, conf)
 }
 
 // PubSub with Redis backend.
 type PubSub struct {
 	events.PubSub
 
+	taskStarter  component.TaskStarter
+	ctx          context.Context
+	cancel       context.CancelFunc
 	eventChannel string
 	client       *redis.Client
 	subOnce      sync.Once
-	sub          *redis.PubSub
-	closeWait    chan struct{}
+}
+
+var errChannelClosed = errors.DefineAborted("channel_closed", "channel closed")
+
+func (ps *PubSub) subscribeTask(ctx context.Context) error {
+	logger := log.FromContext(ctx)
+	sub := ps.client.Subscribe(ps.eventChannel)
+	logger.Info("Subscribed")
+	defer func() {
+		if err := sub.Close(); err != nil {
+			logger.WithError(err).Warn("Failed to close Redis subscription")
+		} else {
+			logger.Info("Unsubscribed")
+		}
+	}()
+	ch := sub.Channel()
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case msg, ok := <-ch:
+			if !ok {
+				return errChannelClosed.New()
+			}
+			evt, err := events.UnmarshalJSON([]byte(msg.Payload))
+			if err != nil {
+				logger.WithError(err).Warn("Failed to unmarshal event from JSON")
+				continue
+			}
+			ps.PubSub.Publish(evt)
+		}
+	}
 }
 
 // Subscribe implements the events.Subscriber interface.
 func (ps *PubSub) Subscribe(name string, hdl events.Handler) error {
 	ps.subOnce.Do(func() {
-		ps.sub = ps.client.Subscribe(ps.eventChannel)
-		go func() {
-			defer close(ps.closeWait)
-			for {
-				msg, err := ps.sub.ReceiveMessage()
-				if err != nil {
-					return
-				}
-				if evt, err := events.UnmarshalJSON([]byte(msg.Payload)); err == nil {
-					ps.PubSub.Publish(evt)
-				}
-			}
-		}()
+		ps.taskStarter.StartTask(&component.TaskConfig{
+			Context: ps.ctx,
+			ID:      "events_redis_subscribe",
+			Func:    ps.subscribeTask,
+			Restart: component.TaskRestartOnFailure,
+			Backoff: component.DefaultTaskBackoffConfig,
+		})
 	})
 	return ps.PubSub.Subscribe(name, hdl)
 }
 
 // Close the Redis publisher.
 func (ps *PubSub) Close(ctx context.Context) error {
-	var unsubErr error
-	if ps.sub != nil {
-		unsubErr = ps.sub.Unsubscribe(ps.eventChannel)
-	}
-	closeErr := ps.client.Close()
+	ps.cancel()
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
-	case <-ps.closeWait:
+	case <-ps.ctx.Done():
+		if err := ps.client.Close(); err != nil {
+			return err
+		}
+		return ps.ctx.Err()
 	}
-	if unsubErr != nil {
-		return unsubErr
-	}
-	return closeErr
 }
 
 // Publish an event to Redis.
 func (ps *PubSub) Publish(evt events.Event) {
-	json, err := json.Marshal(evt)
-	if err == nil {
-		ps.client.Publish(ps.eventChannel, string(json))
+	logger := log.FromContext(ps.ctx)
+	b, err := json.Marshal(evt)
+	if err != nil {
+		logger.WithError(err).Warn("Failed to marshal event to JSON")
+		return
+	}
+	if err := ps.client.Publish(ps.eventChannel, b).Err(); err != nil {
+		logger.WithError(err).Warn("Failed to publish event")
 	}
 }

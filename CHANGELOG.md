@@ -9,29 +9,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.9.2] - 2020-09-11
+
+### Added
+
 - Add `the-things-stack` device template converter, enabled by default. Effectively, this allows importing end devices from the Console.
 - Support for binary decoding downlink messages previously encoded with Javascript or CayenneLPP.
 - Common CA certificates available in documentation.
+- Service data fields to pub/subs and webhooks in the Console.
 
 ### Changed
 
 - Scheduling failure events are now emitted on unsuccessful scheduling attempts.
 - Default Javascript function signatures to `encodeDownlink()`, `decodeUplink()` and `decodeDownlink()`.
 - Default Class B timeout is increased from 1 minute to 10 minutes as was originally intended.
+- Update Go to 1.15
+- Application, gateway, organization and end device title sections in the Console.
 
 ### Deprecated
 
 - Previous Javascript function signatures `Decoder()` and `Encoder()`, although they remain functional until further notice.
-
-### Removed
 
 ### Fixed
 
 - CLI login issues when OAuth Server Address explicitly includes the `:443` HTTPS port.
 - Documentation link for LoRa Cloud Device & Application Services in the Lora Cloud integration view in the Console.
 - Webhooks and Pub/Subs forms in the Console will now let users choose whether they want to overwrite an existing record when the ID already exists (as opposed to overwriting by default).
-
-### Security
+- Pub/Sub integrations not backing off on internal connection failures.
+- Network Server ping slot-related field validation.
+- Memory usage of Network Server application uplink queues.
 
 ## [3.9.1] - 2020-08-19
 
@@ -1038,7 +1054,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.1...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.2...HEAD
+[3.9.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.1...v3.9.2
 [3.9.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.0...v3.9.1
 [3.9.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.6...v3.9.0
 [3.8.6]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.5...v3.8.6

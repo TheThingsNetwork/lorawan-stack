@@ -389,6 +389,13 @@ export default class PubsubForm extends Component {
           component={Input.Toggled}
         />
         <Form.Field
+          name="service_data"
+          type="toggled-input"
+          title={sharedMessages.serviceData}
+          placeholder={pathPlaceholder}
+          component={Input.Toggled}
+        />
+        <Form.Field
           name="downlink_push"
           type="toggled-input"
           title={sharedMessages.downlinkPush}

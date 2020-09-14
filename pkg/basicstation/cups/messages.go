@@ -123,8 +123,10 @@ func (r UpdateInfoResponse) MarshalBinary() ([]byte, error) {
 	} else {
 		return nil, errFieldLength.WithAttributes("field", "tcCred", "length", credLen, "maximum", math.MaxUint16)
 	}
-	if sigLen := len(r.Signature); sigLen <= math.MaxUint16 {
-		binary.LittleEndian.PutUint16(lenBytes, uint16(sigLen))
+	// NOTE: Unlikely that the signature length exceeds 32bits (or even 16 for that matter) so this is safe to do.
+	if sigLen := uint64(len(r.Signature)); sigLen <= math.MaxUint32 {
+		lenBytes := make([]byte, 4)
+		binary.LittleEndian.PutUint32(lenBytes, uint32(sigLen))
 		b.Write(lenBytes) // sigLen
 		crc := make([]byte, 4)
 		binary.LittleEndian.PutUint32(crc, r.SignatureKeyCRC)
@@ -205,12 +207,12 @@ func (r *UpdateInfoResponse) UnmarshalBinary(data []byte) error {
 	} else {
 		r.LNSCredentials = nil
 	}
-	sigLenBytes := make([]byte, 2)
+	sigLenBytes := make([]byte, 4)
 	_, err = b.Read(sigLenBytes)
 	if err != nil {
 		return err
 	}
-	sigLen := binary.LittleEndian.Uint16(sigLenBytes)
+	sigLen := binary.LittleEndian.Uint32(sigLenBytes)
 	keyCRCBytes := make([]byte, 4)
 	_, err = b.Read(keyCRCBytes)
 	if err != nil {

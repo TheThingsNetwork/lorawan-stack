@@ -529,6 +529,109 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 		},
 
+		// Based on https://github.com/TheThingsNetwork/lorawan-stack/issues/3198.
+		{
+			Name: "Create multicast class B device without ping slot periodicity",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+							},
+						},
+					},
+				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"ids.dev_eui",
+					"ids.device_id",
+					"ids.join_eui",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"lorawan_version",
+					"mac_settings",
+					"mac_state",
+					"multicast",
+					"queued_application_downlinks",
+					"recent_uplinks",
+					"session.dev_addr",
+					"session.keys.f_nwk_s_int_key.key",
+					"session.last_conf_f_cnt_down",
+					"session.last_f_cnt_up",
+					"session.last_n_f_cnt_down",
+					"session.queued_application_downlinks",
+					"supports_class_b",
+					"supports_class_c",
+					"supports_join",
+				})
+
+				dev, sets, err := f(ctx, nil)
+				if !a.So(err, should.NotBeNil) {
+					return nil, ctx, errors.New("test failed")
+				}
+				a.So(dev, should.BeNil)
+				a.So(sets, should.BeNil)
+				a.So(errors.IsInvalidArgument(err), should.BeTrue)
+				return nil, ctx, err
+			},
+			Request: &ttnpb.SetEndDeviceRequest{
+				EndDevice: ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
+					LoRaWANVersion:    ttnpb.MAC_V1_0,
+					Multicast:         true,
+					Session: &ttnpb.Session{
+						SessionKeys: ttnpb.SessionKeys{
+							FNwkSIntKey: &ttnpb.KeyEnvelope{
+								Key: &FNwkSIntKey,
+							},
+						},
+						DevAddr: DevAddr,
+					},
+					SupportsClassB: true,
+				},
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{
+						"frequency_plan_id",
+						"ids.dev_eui",
+						"ids.device_id",
+						"ids.join_eui",
+						"lorawan_phy_version",
+						"lorawan_version",
+						"mac_settings",
+						"multicast",
+						"session.dev_addr",
+						"session.keys.f_nwk_s_int_key.key",
+						"supports_class_b",
+						"supports_class_c",
+						"supports_join",
+					},
+				},
+			},
+			SetByIDCalls: 1,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
+		},
+
 		{
 			Name: "Create OTAA device with invalid frequency plan",
 			ContextFunc: func(ctx context.Context) context.Context {

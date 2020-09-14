@@ -15,24 +15,18 @@
 package shared
 
 import (
-	"context"
-
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 )
 
-// Initialize global packages.
-func Initialize(ctx context.Context, config *config.ServiceBase) error {
+// Initialize configuration fallbacks.
+func InitializeFallbacks(conf *config.ServiceBase) error {
 	// Fallback to the default Redis configuration for the cache system
-	if config.Cache.Redis.IsZero() {
-		config.Cache.Redis = config.Redis
+	if conf.Cache.Redis.IsZero() {
+		conf.Cache.Redis = conf.Redis
 	}
 	// Fallback to the default Redis configuration for the events system
-	if config.Events.Redis.IsZero() {
-		config.Events.Redis = config.Redis
-	}
-
-	if err := InitializeEvents(ctx, *config); err != nil {
-		return err
+	if conf.Events.Redis.IsZero() {
+		conf.Events.Redis = conf.Redis
 	}
 	return nil
 }

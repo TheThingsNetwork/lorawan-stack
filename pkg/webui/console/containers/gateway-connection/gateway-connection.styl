@@ -23,16 +23,24 @@
     margin-left: $cs.m
 
 .message-count
-  .icon
-    color: $c-active-blue
+  display: inline-flex
+  align-items: center
+  flex-wrap: nowrap
 
-.icon
-  nudge('up')
+  .icon
+    nudge('up')
+    color: $c-active-blue
 
 .messages
   margin-left: $cs.m
   display: flex
   align-items: center
 
-.date-time
-  margin-left: $cs.xxs
+  +media-query($bp.xs)
+    flex-basis: 100%
+
+.status
+  white-space: nowrap
+
+  .date-time
+    margin-left: $cs.xxs

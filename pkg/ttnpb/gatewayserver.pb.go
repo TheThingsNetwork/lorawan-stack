@@ -40,9 +40,11 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // GatewayUp may contain zero or more uplink messages and/or a status message for the gateway.
 type GatewayUp struct {
-	// UplinkMessages received by the gateway.
-	UplinkMessages       []*UplinkMessage  `protobuf:"bytes,1,rep,name=uplink_messages,json=uplinkMessages,proto3" json:"uplink_messages,omitempty"`
-	GatewayStatus        *GatewayStatus    `protobuf:"bytes,2,opt,name=gateway_status,json=gatewayStatus,proto3" json:"gateway_status,omitempty"`
+	// Uplink messages received by the gateway.
+	UplinkMessages []*UplinkMessage `protobuf:"bytes,1,rep,name=uplink_messages,json=uplinkMessages,proto3" json:"uplink_messages,omitempty"`
+	// Gateway status produced by the gateway.
+	GatewayStatus *GatewayStatus `protobuf:"bytes,2,opt,name=gateway_status,json=gatewayStatus,proto3" json:"gateway_status,omitempty"`
+	// A transmission acknowledgement or error.
 	TxAcknowledgment     *TxAcknowledgment `protobuf:"bytes,3,opt,name=tx_acknowledgment,json=txAcknowledgment,proto3" json:"tx_acknowledgment,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -149,6 +151,7 @@ func (m *GatewayDown) GetDownlinkMessage() *DownlinkMessage {
 }
 
 type ScheduleDownlinkResponse struct {
+	// The amount of time between the message has been scheduled and it will be transmitted by the gateway.
 	Delay                time.Duration `protobuf:"bytes,1,opt,name=delay,proto3,stdduration" json:"delay"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -194,6 +197,7 @@ func (m *ScheduleDownlinkResponse) GetDelay() time.Duration {
 }
 
 type ScheduleDownlinkErrorDetails struct {
+	// Errors per path when downlink scheduling failed.
 	PathErrors           []*ErrorDetails `protobuf:"bytes,1,rep,name=path_errors,json=pathErrors,proto3" json:"path_errors,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -439,13 +443,13 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type GtwGsClient interface {
-	// Link the gateway to the Gateway Server.
+	// Link a gateway to the Gateway Server for streaming upstream messages and downstream messages.
 	LinkGateway(ctx context.Context, opts ...grpc.CallOption) (GtwGs_LinkGatewayClient, error)
-	// GetConcentratorConfig associated to the gateway.
+	// Get configuration for the concentrator.
 	GetConcentratorConfig(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*ConcentratorConfig, error)
-	// Get the MQTT server address and the username for the gateway.
+	// Get connection information to connect an MQTT gateway.
 	GetMQTTConnectionInfo(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*MQTTConnectionInfo, error)
-	// Get the MQTTV2 server address and the username for the gateway.
+	// Get legacy connection information to connect a The Things Network Stack V2 MQTT gateway.
 	GetMQTTV2ConnectionInfo(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*MQTTConnectionInfo, error)
 }
 
@@ -517,13 +521,13 @@ func (c *gtwGsClient) GetMQTTV2ConnectionInfo(ctx context.Context, in *GatewayId
 
 // GtwGsServer is the server API for GtwGs service.
 type GtwGsServer interface {
-	// Link the gateway to the Gateway Server.
+	// Link a gateway to the Gateway Server for streaming upstream messages and downstream messages.
 	LinkGateway(GtwGs_LinkGatewayServer) error
-	// GetConcentratorConfig associated to the gateway.
+	// Get configuration for the concentrator.
 	GetConcentratorConfig(context.Context, *types.Empty) (*ConcentratorConfig, error)
-	// Get the MQTT server address and the username for the gateway.
+	// Get connection information to connect an MQTT gateway.
 	GetMQTTConnectionInfo(context.Context, *GatewayIdentifiers) (*MQTTConnectionInfo, error)
-	// Get the MQTTV2 server address and the username for the gateway.
+	// Get legacy connection information to connect a The Things Network Stack V2 MQTT gateway.
 	GetMQTTV2ConnectionInfo(context.Context, *GatewayIdentifiers) (*MQTTConnectionInfo, error)
 }
 
@@ -660,7 +664,7 @@ var _GtwGs_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NsGsClient interface {
-	// ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
+	// Instructs the Gateway Server to schedule a downlink message.
 	// The Gateway Server may refuse if there are any conflicts in the schedule or
 	// if a duty cycle prevents the gateway from transmitting.
 	ScheduleDownlink(ctx context.Context, in *DownlinkMessage, opts ...grpc.CallOption) (*ScheduleDownlinkResponse, error)
@@ -685,7 +689,7 @@ func (c *nsGsClient) ScheduleDownlink(ctx context.Context, in *DownlinkMessage, 
 
 // NsGsServer is the server API for NsGs service.
 type NsGsServer interface {
-	// ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
+	// Instructs the Gateway Server to schedule a downlink message.
 	// The Gateway Server may refuse if there are any conflicts in the schedule or
 	// if a duty cycle prevents the gateway from transmitting.
 	ScheduleDownlink(context.Context, *DownlinkMessage) (*ScheduleDownlinkResponse, error)

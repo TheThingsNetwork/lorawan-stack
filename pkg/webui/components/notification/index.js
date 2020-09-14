@@ -40,7 +40,7 @@ const Notification = function({
   action,
   actionMessage,
   buttonIcon,
-  ...rest
+  'data-test-id': dataTestId,
 }) {
   const classname = classnames(style.notification, className, {
     [style.error]: error,
@@ -59,7 +59,7 @@ const Notification = function({
   }
 
   return (
-    <div className={classname} data-test-id="notification" {...rest}>
+    <div className={classname} data-test-id={dataTestId}>
       <div className={style.container}>
         <Icon className={style.icon} icon={icon} large={!small} />
         <div className={style.content}>
@@ -89,6 +89,7 @@ Notification.propTypes = {
   buttonIcon: PropTypes.string,
   className: PropTypes.string,
   content: PropTypes.oneOfType([PropTypes.message, PropTypes.error, PropTypes.string]),
+  'data-test-id': PropTypes.string,
   details: PropTypes.error,
   error: PropTypes.bool,
   info: PropTypes.bool,
@@ -105,6 +106,7 @@ Notification.defaultProps = {
   buttonIcon: '',
   className: undefined,
   content: undefined,
+  'data-test-id': 'notification',
   error: false,
   info: false,
   small: false,

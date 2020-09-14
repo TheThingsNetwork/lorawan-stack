@@ -20,6 +20,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -114,10 +115,10 @@ func (d Dev) SQLRestoreSnapshot() error {
 	return d.SQLStart()
 }
 
-// DBDump performs an SQL database dump of the dev database to the .cache folder.
-func (Dev) DBDump() error {
+// SQLDump performs an SQL database dump of the dev database to the .cache folder.
+func (Dev) SQLDump() error {
 	if mg.Verbose() {
-		fmt.Println("Saving database dump")
+		fmt.Println("Saving sql database dump")
 	}
 	if err := os.MkdirAll(".cache", 0755); err != nil {
 		return err
@@ -129,26 +130,45 @@ func (Dev) DBDump() error {
 	return ioutil.WriteFile(filepath.Join(".cache", "sqldump.sql"), []byte(output), 0644)
 }
 
-// DBRestore restores the dev database using a previously generated dump.
-func (Dev) DBRestore(ctx context.Context) error {
+// SQLRestore restores the dev database using a previously generated dump.
+func (Dev) SQLRestore(ctx context.Context) error {
 	if mg.Verbose() {
 		fmt.Println("Restoring database from dump")
 	}
 	db, err := store.Open(ctx, databaseURI)
 	if err != nil {
-		return nil
+		return err
 	}
 	defer db.Close()
 
 	b, err := ioutil.ReadFile(filepath.Join(".cache", "sqldump.sql"))
 	if err != nil {
-		return nil
+		return err
 	}
 	return db.Exec(fmt.Sprintf(`DROP DATABASE %s;
 		CREATE DATABASE %s;
 		%s`,
 		devDatabaseName, devDatabaseName, string(b)),
 	).Error
+}
+
+// RedisFlush deletes all keys from redis.
+func (Dev) RedisFlush() error {
+	if mg.Verbose() {
+		fmt.Println("Deleting all keys from redis")
+	}
+
+	keys, err := sh.Output("docker-compose", dockerComposeFlags("exec", "-T", "redis", "redis-cli", "keys", "ttn:v3:*")...)
+	if err != nil {
+		return err
+	}
+	ks := strings.Split(keys, "\n")
+	if len(ks) == 0 {
+		return nil
+	}
+	flags := dockerComposeFlags(append([]string{"exec", "-T", "redis", "redis-cli", "del"}, ks...)...)
+	_, err = sh.Exec(nil, nil, os.Stderr, "docker-compose", flags...)
+	return err
 }
 
 // DBStart starts the databases of the development environment.

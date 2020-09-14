@@ -17,6 +17,8 @@ package mqtt
 
 import (
 	"context"
+	"crypto/tls"
+	"net/http"
 	"net/url"
 	"time"
 
@@ -24,6 +26,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"gocloud.dev/pubsub"
 )
@@ -47,31 +50,100 @@ var errConnectFailed = errors.Define("connect_failed", "connection to MQTT serve
 
 // OpenConnection implements provider.Provider using the MQTT driver.
 func (impl) OpenConnection(ctx context.Context, target provider.Target) (pc *provider.Connection, err error) {
-	settings, ok := target.GetProvider().(*ttnpb.ApplicationPubSub_MQTT)
+	provider, ok := target.GetProvider().(*ttnpb.ApplicationPubSub_MQTT)
 	if !ok {
 		panic("wrong provider type provided to OpenConnection")
+	}
+
+	var tlsConfig *tls.Config
+	if provider.MQTT.UseTLS {
+		var err error
+		tlsConfig, err = createTLSConfig(provider.MQTT.TLSCA, provider.MQTT.TLSClientCert, provider.MQTT.TLSClientKey)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	headers := make(http.Header, len(provider.MQTT.Headers))
+	for k, v := range provider.MQTT.Headers {
+		headers.Set(k, v)
+	}
+	settings := Settings{
+		URL:      provider.MQTT.ServerURL,
+		ClientID: provider.MQTT.ClientID,
+		Username: provider.MQTT.Username,
+		Password: provider.MQTT.Password,
+		TLS:      tlsConfig,
+		HTTPHeadersProvider: func(ctx context.Context) (http.Header, error) {
+			return headers, nil
+		},
+		PublishQoS:   byte(provider.MQTT.PublishQoS),
+		SubscribeQoS: byte(provider.MQTT.SubscribeQoS),
 	}
 	return OpenConnection(ctx, settings, target)
 }
 
+// HTTPHeadersProvider provides HTTP headers as they are needed by the MQTT client.
+type HTTPHeadersProvider func(context.Context) (headers http.Header, err error)
+
+// Settings configure the MQTT client.
+type Settings struct {
+	URL,
+	ClientID,
+	Username,
+	Password string
+	TLS                 *tls.Config
+	HTTPHeadersProvider HTTPHeadersProvider
+	PublishQoS,
+	SubscribeQoS byte
+}
+
+var errConfigureHTTPHeaders = errors.Define("configure_http_headers", "configure HTTP headers")
+
 // OpenConnection opens a MQTT connection using the given settings.
-func OpenConnection(ctx context.Context, settings *ttnpb.ApplicationPubSub_MQTT, topics provider.Topics) (*provider.Connection, error) {
-	serverURL, err := adaptURLScheme(settings.MQTT.ServerURL)
+func OpenConnection(ctx context.Context, settings Settings, topics provider.Topics) (*provider.Connection, error) {
+	serverURL, err := adaptURLScheme(settings.URL)
 	if err != nil {
 		return nil, err
 	}
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"url", serverURL,
+		"client_id", settings.ClientID,
+		"username", settings.Username,
+	))
+
 	clientOpts := mqtt.NewClientOptions()
 	clientOpts.AddBroker(serverURL)
-	clientOpts.SetClientID(settings.MQTT.ClientID)
-	clientOpts.SetUsername(settings.MQTT.Username)
-	clientOpts.SetPassword(settings.MQTT.Password)
-	if settings.MQTT.UseTLS {
-		config, err := createTLSConfig(settings.MQTT.TLSCA, settings.MQTT.TLSClientCert, settings.MQTT.TLSClientKey)
+	clientOpts.SetClientID(settings.ClientID)
+	clientOpts.SetUsername(settings.Username)
+	clientOpts.SetPassword(settings.Password)
+	clientOpts.SetTLSConfig(settings.TLS)
+
+	if settings.HTTPHeadersProvider != nil {
+		headers, err := settings.HTTPHeadersProvider(ctx)
 		if err != nil {
-			return nil, err
+			return nil, errConfigureHTTPHeaders.WithCause(err)
 		}
-		clientOpts.SetTLSConfig(config)
+		clientOpts.SetHTTPHeaders(headers)
 	}
+	clientOpts.SetOnConnectHandler(func(_ mqtt.Client) {
+		logger.Debug("Connected to MQTT server")
+	})
+	clientOpts.SetConnectionLostHandler(func(_ mqtt.Client, err error) {
+		logger.WithError(err).Debug("Disconnected from MQTT server")
+	})
+	clientOpts.SetReconnectingHandler(func(_ mqtt.Client, clientOpts *mqtt.ClientOptions) {
+		logger.Debug("Reconnect to MQTT server")
+		if settings.HTTPHeadersProvider != nil {
+			headers, err := settings.HTTPHeadersProvider(ctx)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to configure HTTP headers on MQTT reconnect")
+				return
+			}
+			clientOpts.SetHTTPHeaders(headers)
+		}
+	})
+
 	client := mqtt.NewClient(clientOpts)
 	token := client.Connect()
 	if !token.WaitTimeout(timeout) {
@@ -132,7 +204,7 @@ func OpenConnection(ctx context.Context, settings *ttnpb.ApplicationPubSub_MQTT,
 			client,
 			mqtt_topic.Join(append(mqtt_topic.Split(topics.GetBaseTopic()), mqtt_topic.Split(t.message.GetTopic())...)),
 			timeout,
-			byte(settings.MQTT.PublishQoS),
+			settings.PublishQoS,
 		); err != nil {
 			client.Disconnect(uint(timeout / time.Millisecond))
 			return nil, err
@@ -159,7 +231,7 @@ func OpenConnection(ctx context.Context, settings *ttnpb.ApplicationPubSub_MQTT,
 			client,
 			mqtt_topic.Join(append(mqtt_topic.Split(topics.GetBaseTopic()), mqtt_topic.Split(s.message.GetTopic())...)),
 			timeout,
-			byte(settings.MQTT.SubscribeQoS),
+			settings.SubscribeQoS,
 		); err != nil {
 			client.Disconnect(uint(timeout / time.Millisecond))
 			return nil, err

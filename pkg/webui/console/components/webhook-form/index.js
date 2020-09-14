@@ -294,6 +294,13 @@ export default class WebhookForm extends Component {
             placeholder={pathPlaceholder}
             component={Input.Toggled}
           />
+          <Form.Field
+            name="service_data"
+            type="toggled-input"
+            title={sharedMessages.serviceData}
+            placeholder={pathPlaceholder}
+            component={Input.Toggled}
+          />
           <SubmitBar>
             <Form.Submit
               component={SubmitButton}
