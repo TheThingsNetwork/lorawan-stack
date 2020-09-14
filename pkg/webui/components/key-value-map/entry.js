@@ -46,8 +46,20 @@ class Entry extends React.Component {
     onChange(index, { value: newValue })
   }
 
+  @bind
+  handleBlur(event) {
+    const { name, onBlur, value } = this.props
+
+    onBlur({
+      target: {
+        name,
+        value,
+      },
+    })
+  }
+
   render() {
-    const { name, index, keyPlaceholder, valuePlaceholder, value, onBlur } = this.props
+    const { name, index, keyPlaceholder, valuePlaceholder, value } = this.props
 
     return (
       <div className={style.entriesRow}>
@@ -66,7 +78,7 @@ class Entry extends React.Component {
           placeholder={valuePlaceholder}
           type="text"
           onChange={this.handleValueChanged}
-          onBlur={onBlur}
+          onBlur={this.handleBlur}
           value={value.value}
           code
         />
