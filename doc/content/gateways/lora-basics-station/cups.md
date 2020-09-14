@@ -42,10 +42,8 @@ Some gateways require that the `cups.key` file is terminated with a Carriage Ret
 echo "Authorization: Bearer <gateway-api-key>" | perl -p -e 's/\r\n|\n|\r/\r\n/g'  > cups.key
 ```
 
-If using Let's Encrypt to secure your domain, you may download the Let's Encrypt DST X3 Trust file [here](https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem.txt).
-
 CUPS URI: `https://<server-address>:443`
 
-CUPS Key: `cups.key`
+CUPS Key: `cups.key` (created above)
 
-CUPS Trust: Use the CA certificate of your trust provider
+CUPS Trust: Use the CA certificate of your trust provider or see the [Root Certificates Reference]({{< ref src="/reference/root-certificates" >}})
