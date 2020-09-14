@@ -2704,6 +2704,16 @@
               "defaultValue": ""
             },
             {
+              "name": "aws_iot",
+              "description": "",
+              "label": "",
+              "type": "AWSIoTProvider",
+              "longType": "ApplicationPubSub.AWSIoTProvider",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "base_topic",
               "description": "Base topic name to which the messages topic is appended.",
               "label": "",
@@ -2830,6 +2840,275 @@
               "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
               "ismap": false,
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AWSIoTProvider",
+          "longName": "ApplicationPubSub.AWSIoTProvider",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "region",
+              "description": "The AWS region.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "af-south-1",
+                      "ap-east-1",
+                      "ap-northeast-1",
+                      "ap-northeast-2",
+                      "ap-south-1",
+                      "ap-southeast-1",
+                      "ap-southeast-2",
+                      "ca-central-1",
+                      "eu-central-1",
+                      "eu-north-1",
+                      "eu-south-1",
+                      "eu-west-1",
+                      "eu-west-2",
+                      "eu-west-3",
+                      "me-south-1",
+                      "sa-east-1",
+                      "us-east-1",
+                      "us-east-2",
+                      "us-west-1",
+                      "us-west-2"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "access_key",
+              "description": "If set, the integration will use an AWS access key.",
+              "label": "",
+              "type": "AccessKey",
+              "longType": "ApplicationPubSub.AWSIoTProvider.AccessKey",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.AccessKey",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "assume_role",
+              "description": "If set, the integration will assume the given role during operation.",
+              "label": "",
+              "type": "AssumeRole",
+              "longType": "ApplicationPubSub.AWSIoTProvider.AssumeRole",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.AssumeRole",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "endpoint_address",
+              "description": "The endpoint address to connect to. If the endpoint address is left empty,\nthe integration will try to discover it.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 128
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])|)$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "default",
+              "description": "Enable the default integration. This overrides custom base topic and message topics of the pub/sub integration.",
+              "label": "",
+              "type": "DefaultIntegration",
+              "longType": "ApplicationPubSub.AWSIoTProvider.DefaultIntegration",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.DefaultIntegration",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AccessKey",
+          "longName": "ApplicationPubSub.AWSIoTProvider.AccessKey",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.AccessKey",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "access_key_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.min_len",
+                    "value": 16
+                  },
+                  {
+                    "name": "string.max_len",
+                    "value": 128
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[\\w]*$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "secret_access_key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 40
+                  }
+                ]
+              }
+            },
+            {
+              "name": "session_token",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 256
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AssumeRole",
+          "longName": "ApplicationPubSub.AWSIoTProvider.AssumeRole",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.AssumeRole",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "arn",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^arn:aws:iam::[0-9]{12}:role\\/[A-Za-z0-9_+=,.@-]+$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "external_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 1224
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[\\w+=,.@:\\/-]*$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "session_duration",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DefaultIntegration",
+          "longName": "ApplicationPubSub.AWSIoTProvider.DefaultIntegration",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.DefaultIntegration",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "stack_name",
+              "description": "The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 128
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[A-Za-z][A-Za-z0-9\\-]*$"
+                  }
+                ]
+              }
             }
           ]
         },
