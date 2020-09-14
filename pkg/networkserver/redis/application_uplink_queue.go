@@ -51,11 +51,11 @@ func (q *ApplicationUplinkQueue) uidGenericUplinkKey(uid string) string {
 }
 
 func (q *ApplicationUplinkQueue) uidInvalidationKey(uid string) string {
-	return q.redis.Key(q.uidGenericUplinkKey(uid), "invalidation")
+	return ttnredis.Key(q.uidGenericUplinkKey(uid), "invalidation")
 }
 
 func (q *ApplicationUplinkQueue) uidJoinAcceptKey(uid string) string {
-	return q.redis.Key(q.uidGenericUplinkKey(uid), "join-accept")
+	return ttnredis.Key(q.uidGenericUplinkKey(uid), "join-accept")
 }
 
 const payloadKey = "payload"
