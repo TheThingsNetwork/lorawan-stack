@@ -46,8 +46,12 @@ func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group, id stri
 	}
 }
 
+func ApplicationUplinkQueueUIDGenericUplinkKey(cl *ttnredis.Client, uid string) string {
+	return cl.Key("uid", uid, "uplinks")
+}
+
 func (q *ApplicationUplinkQueue) uidGenericUplinkKey(uid string) string {
-	return q.redis.Key("uid", uid, "uplinks")
+	return ApplicationUplinkQueueUIDGenericUplinkKey(q.redis, uid)
 }
 
 func (q *ApplicationUplinkQueue) uidInvalidationKey(uid string) string {
