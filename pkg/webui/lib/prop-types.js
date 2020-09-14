@@ -28,7 +28,7 @@ PropTypes.formatters = PropTypes.shape({
 PropTypes.message = PropTypes.oneOfType([
   PropTypes.shape({
     id: PropTypes.string.isRequired,
-    value: PropTypes.object,
+    value: PropTypes.shape({}),
     defaultMessage: PropTypes.string,
   }),
   PropTypes.string,
@@ -38,12 +38,12 @@ PropTypes.message = PropTypes.oneOfType([
 PropTypes.error = PropTypes.oneOfType([
   PropTypes.oneOfType([
     PropTypes.shape({
-      details: PropTypes.array.isRequired,
+      details: PropTypes.arrayOf(PropTypes.shape({})),
       message: PropTypes.string.isRequired,
       code: PropTypes.number.isRequired,
     }),
     PropTypes.shape({
-      details: PropTypes.array.isRequired,
+      details: PropTypes.arrayOf(PropTypes.shape({})),
       message: PropTypes.string.isRequired,
       grpc_code: PropTypes.number.isRequired,
     }),
@@ -52,7 +52,7 @@ PropTypes.error = PropTypes.oneOfType([
   PropTypes.string,
   PropTypes.shape({
     message: PropTypes.string,
-    stack: PropTypes.object,
+    stack: PropTypes.shape({}),
   }),
   PropTypes.instanceOf(Error),
 ])
@@ -70,8 +70,8 @@ PropTypes.link = PropTypes.shape({
 PropTypes.event = PropTypes.shape({
   name: PropTypes.string.isRequired,
   time: PropTypes.string.isRequired,
-  identifiers: PropTypes.array.isRequired,
-  data: PropTypes.object,
+  identifiers: PropTypes.arrayOf(PropTypes.shape({})),
+  data: PropTypes.shape({}),
 })
 PropTypes.events = PropTypes.arrayOf(PropTypes.event)
 
