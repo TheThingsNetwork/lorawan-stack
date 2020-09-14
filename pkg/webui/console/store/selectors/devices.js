@@ -20,6 +20,7 @@ import {
   createEventsSelector,
   createEventsErrorSelector,
   createEventsStatusSelector,
+  createEventsInterruptedSelector,
 } from './events'
 import {
   createPaginationIdsSelectorByEntity,
@@ -76,3 +77,4 @@ export const selectDevicesError = state => selectDevsError(state)
 export const selectDeviceEvents = createEventsSelector(ENTITY)
 export const selectDeviceEventsError = createEventsErrorSelector(ENTITY)
 export const selectDeviceEventsStatus = createEventsStatusSelector(ENTITY)
+export const selectDeviceEventsInterruptted = createEventsInterruptedSelector(ENTITY)
