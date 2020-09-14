@@ -13,21 +13,33 @@
 // limitations under the License.
 
 import React from 'react'
-import classnames from 'classnames'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-import { toMessageProps } from '@ttn-lw/lib/errors/utils'
+import { hasCauses, getBackendErrorRootCause, toMessageProps } from '@ttn-lw/lib/errors/utils'
 
-import style from './error-message.styl'
-
-const ErrorMessage = function({ content, className, ...rest }) {
-  const props = {
-    className: classnames(className, style.message),
+const ErrorMessage = function({ content, withRootCause, className, ...rest }) {
+  const baseProps = {
+    className,
     firstToUpper: true,
-    ...toMessageProps(content),
     ...rest,
+  }
+
+  if (withRootCause && hasCauses(content)) {
+    const rootProps = { ...baseProps, ...toMessageProps(content) }
+    const causeProps = { ...baseProps, ...toMessageProps(getBackendErrorRootCause(content)) }
+
+    return (
+      <span className={baseProps.className}>
+        <Message {...rootProps} />: <Message {...causeProps} />
+      </span>
+    )
+  }
+
+  const props = {
+    ...toMessageProps(content),
+    ...baseProps,
   }
 
   return <Message {...props} />
@@ -41,10 +53,12 @@ ErrorMessage.propTypes = {
    * be a usual message type, in case of frontend-defined errors.
    */
   content: PropTypes.error.isRequired,
+  withRootCause: PropTypes.bool,
 }
 
 ErrorMessage.defaultProps = {
   className: undefined,
+  withRootCause: false,
 }
 
 export default ErrorMessage
