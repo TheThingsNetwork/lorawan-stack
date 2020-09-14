@@ -6,7 +6,9 @@ exports[`<GatewayConnectionReactor /> matches snapshot 1`] = `
   latestEvent={
     Object {
       "identifiers": Array [
-        "id",
+        Object {
+          "device_ids": Object {},
+        },
       ],
       "name": "test.name",
       "time": "2019-09-10T07:30:14.232137918Z",
