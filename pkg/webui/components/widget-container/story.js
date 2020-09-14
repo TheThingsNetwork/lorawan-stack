@@ -12,5 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.header-title
-  font-weight: $fw.bold
+import React from 'react'
+import { storiesOf } from '@storybook/react'
+
+import WidgetContainer from '.'
+
+storiesOf('WidgetContainer', module).add('Default', () => (
+  <div style={{ width: '500px' }}>
+    <WidgetContainer title="Location" toAllUrl="#" linkMessage="Change location">
+      <div
+        style={{
+          height: '300px',
+          border: '1px solid gray',
+          backgroundColor: '#eee',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'gray',
+        }}
+      >
+        Map placeholder as example
+      </div>
+    </WidgetContainer>
+  </div>
+))

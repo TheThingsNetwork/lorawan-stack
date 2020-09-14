@@ -12,5 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+.container
+  &:not(:last-child)
+    margin-bottom: $ls.m
+
+.header
+  margin-bottom: $cs.xxs
+  display: flex
+  align-items: center
+  justify-content: space-between
+  padding-left: 0
+  padding-right: 0
+
+
 .header-title
   font-weight: $fw.bold
+
+.see-all-link
+  text-decoration: none
+
+.body-link
+  color: inherit

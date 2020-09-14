@@ -248,12 +248,12 @@ buttonChildren.defaultProps = {
 }
 
 Button.propTypes = {
+  onBlur: PropTypes.func,
   /**
    * A click listener to be called when the button is pressed.
    * Not called if the button is in the `busy` or `disabled` state.
    */
   onClick: PropTypes.func,
-  onBlur: PropTypes.func,
   ...commonPropTypes,
 }
 
