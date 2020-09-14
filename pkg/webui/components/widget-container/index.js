@@ -49,7 +49,7 @@ WidgetContainer.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   linkMessage: PropTypes.message.isRequired,
-  title: PropTypes.oneOfType([PropTypes.message.isRequired, PropTypes.message.node]).isRequired,
+  title: PropTypes.oneOfType([PropTypes.message, PropTypes.node]).isRequired,
   toAllUrl: PropTypes.string.isRequired,
 }
 
