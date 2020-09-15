@@ -553,6 +553,8 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkAck, link)
 	case *ttnpb.ApplicationUp_DownlinkNack:
 		return true, as.handleDownlinkNack(ctx, up.EndDeviceIdentifiers, p.DownlinkNack, link)
+	case *ttnpb.ApplicationUp_ServiceData:
+		return true, nil
 	default:
 		return false, nil
 	}

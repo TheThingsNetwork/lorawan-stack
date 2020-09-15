@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Incorrect uplink FCnt display in end device title section.
+- Service Data messages being routed incorrectly.
 
 ### Security
 
