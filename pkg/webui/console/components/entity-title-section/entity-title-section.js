@@ -40,7 +40,6 @@ const EntityTitleSection = props => {
         </div>
       </div>
       {children}
-      <hr className={style.hRule} />
     </section>
   )
 }
