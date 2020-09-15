@@ -38,7 +38,7 @@ import (
 func TestLinkApplication(t *testing.T) {
 	a := assertions.New(t)
 
-	ns, ctx, env, stop := StartTest(t, component.Config{}, Config{}, (1<<12)*test.Delay)
+	ns, ctx, env, stop := StartTest(t, component.Config{}, Config{DownlinkQueueCapacity: 100}, (1<<12)*test.Delay)
 	defer stop()
 
 	<-env.DownlinkTasks.Pop
@@ -1090,6 +1090,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						StatusTimePeriodicity:  DurationPtr(0),
 						StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(0),
 					},
+					DownlinkQueueCapacity: 100,
 				},
 				(1<<9)*test.Delay,
 			)
@@ -1780,6 +1781,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						},
 						PopFunc: DownlinkTaskPopBlockFunc,
 					},
+					DownlinkQueueCapacity: 100,
 				},
 				(1<<9)*test.Delay,
 			)
@@ -2079,6 +2081,7 @@ func TestDownlinkQueueList(t *testing.T) {
 					DownlinkTasks: &MockDownlinkTaskQueue{
 						PopFunc: DownlinkTaskPopBlockFunc,
 					},
+					DownlinkQueueCapacity: 100,
 				},
 				(1<<9)*test.Delay,
 			)

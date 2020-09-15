@@ -24,6 +24,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -245,9 +246,13 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 	return nil
 }
 
+var errDownlinkQueueCapacityExceeded = errors.DefineResourceExhausted("downlink_queue_capacity_exceeded", "Downlink queue capacity exceeded")
+
 // DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
+	if n := len(req.Downlinks); n > ns.downlinkQueueCapacity*2 {
+		return nil, errDownlinkQueueCapacityExceeded.New()
+	} else if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
 	}
 
@@ -285,6 +290,9 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 			if err := matchQueuedApplicationDownlinks(ctx, dev, ns.FrequencyPlans, req.Downlinks...); err != nil {
 				return nil, nil, err
 			}
+			if len(dev.Session.GetQueuedApplicationDownlinks()) > ns.downlinkQueueCapacity || len(dev.PendingSession.GetQueuedApplicationDownlinks()) > ns.downlinkQueueCapacity {
+				return nil, nil, errDownlinkQueueCapacityExceeded.New()
+			}
 			return dev, []string{
 				"session.queued_application_downlinks",
 				"pending_session.queued_application_downlinks",
@@ -310,10 +318,11 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 
 // DownlinkQueuePush is called by the Application Server to push a downlink to queue for a device.
 func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	if len(req.Downlinks) == 0 {
+	if n := len(req.Downlinks); n > ns.downlinkQueueCapacity*2 {
+		return nil, errDownlinkQueueCapacityExceeded.New()
+	} else if n == 0 {
 		return ttnpb.Empty, nil
-	}
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
+	} else if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
 	}
 
@@ -339,6 +348,9 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 			}
 			if err := matchQueuedApplicationDownlinks(ctx, dev, ns.FrequencyPlans, req.Downlinks...); err != nil {
 				return nil, nil, err
+			}
+			if len(dev.Session.GetQueuedApplicationDownlinks()) > ns.downlinkQueueCapacity || len(dev.PendingSession.GetQueuedApplicationDownlinks()) > ns.downlinkQueueCapacity {
+				return nil, nil, errDownlinkQueueCapacityExceeded.New()
 			}
 			return dev, []string{
 				"session.queued_application_downlinks",
