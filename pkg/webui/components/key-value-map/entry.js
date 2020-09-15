@@ -28,6 +28,18 @@ const m = defineMessages({
 })
 
 class Entry extends React.Component {
+  _getKeyInputName() {
+    const { name, index } = this.props
+
+    return `${name}[${index}].key`
+  }
+
+  _getValueInputName() {
+    const { name, index } = this.props
+
+    return `${name}[${index}].value`
+  }
+
   @bind
   handleRemoveButtonClicked(event) {
     const { onRemoveButtonClick, index } = this.props
@@ -50,31 +62,40 @@ class Entry extends React.Component {
   handleBlur(event) {
     const { name, onBlur, value } = this.props
 
-    onBlur({
-      target: {
-        name,
-        value,
-      },
-    })
+    const { relatedTarget } = event
+    const nextTarget = relatedTarget || {}
+
+    if (
+      nextTarget.name !== this._getKeyInputName() &&
+      nextTarget.name !== this._getValueInputName()
+    ) {
+      onBlur({
+        target: {
+          name,
+          value,
+        },
+      })
+    }
   }
 
   render() {
-    const { name, index, keyPlaceholder, valuePlaceholder, value } = this.props
+    const { keyPlaceholder, valuePlaceholder, value } = this.props
 
     return (
       <div className={style.entriesRow}>
         <Input
           className={style.input}
-          name={`${name}[${index}].key`}
+          name={this._getKeyInputName()}
           placeholder={keyPlaceholder}
           type="text"
           onChange={this.handleKeyChanged}
+          onBlur={this.handleBlur}
           value={value.key}
           code
         />
         <Input
           className={style.input}
-          name={`${name}[${index}].value`}
+          name={this._getValueInputName()}
           placeholder={valuePlaceholder}
           type="text"
           onChange={this.handleValueChanged}
