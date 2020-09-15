@@ -5095,6 +5095,12 @@ Downlink message from the network to the end device
 | `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
 | `downlinks` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) | repeated |  |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `downlinks` | <p>`repeated.max_items`: `100000`</p> |
+
 ### <a name="ttn.lorawan.v3.GatewayUplinkMessage">Message `GatewayUplinkMessage`</a>
 
 | Field | Type | Label | Description |
