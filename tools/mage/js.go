@@ -42,7 +42,6 @@ func yarnWorkingDirectoryArg(elem ...string) string {
 func installYarn() error {
 	ok, err := target.Path(
 		filepath.Join("node_modules", "yarn"),
-		"package.json",
 	)
 	if err != nil {
 		return targetError(err)
