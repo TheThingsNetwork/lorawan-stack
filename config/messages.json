@@ -5750,6 +5750,15 @@
       "file": "config.go"
     }
   },
+  "error:pkg/networkserver:downlink_queue_capacity_exceeded": {
+    "translations": {
+      "en": "Downlink queue capacity exceeded"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_asns.go"
+    }
+  },
   "error:pkg/networkserver:duplicate": {
     "translations": {
       "en": "uplink is a duplicate"
