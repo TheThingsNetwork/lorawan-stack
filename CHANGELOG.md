@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update Go to 1.15
 - Application, gateway, organization and end device title sections in the Console.
 - Network Server downlink queues now have a capacity - by default maximum application downlink queue length is 10000 elements.
+- Improve ADR algorithm loss rate computation.
 
 ### Deprecated
 

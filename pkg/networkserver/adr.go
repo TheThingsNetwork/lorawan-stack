@@ -90,51 +90,25 @@ func deviceADRMargin(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) float32 {
 	return DefaultADRMargin
 }
 
-func lossRate(nbTrans uint32, ups ...*ttnpb.UplinkMessage) float32 {
+func lossRate(ups ...*ttnpb.UplinkMessage) float32 {
 	if len(ups) < 2 {
 		return 0
 	}
 
 	min := ups[0].Payload.GetMACPayload().FullFCnt
-	max := lastUplink(ups...).Payload.GetMACPayload().FullFCnt
-
-	fCnt := min + 1
-	var fCntTrans uint32
+	lastFCnt := min
 	var lost uint32
-	n := uint32(len(ups))
-
-loop:
-	for i := 0; i < len(ups); i++ {
-		switch v := ups[i].Payload.GetMACPayload().FullFCnt; v {
-		case min:
-			continue
-
-		case fCnt:
-			fCntTrans++
-
-		default:
-			if v < fCnt {
-				// FCnt reset encountered
-				return lossRate(nbTrans, ups[i:]...)
-			}
-
-			if fCntTrans < nbTrans {
-				d := nbTrans - fCntTrans
-				lost += d
-				n += d
-			}
-			d := (v - fCnt - 1) * nbTrans
-			lost += d
-			n += d
-
-			if v == max {
-				break loop
-			}
-			fCnt = v
-			fCntTrans = 1
+	for i, up := range ups[1:] {
+		fCnt := up.Payload.GetMACPayload().FullFCnt
+		switch {
+		case fCnt < lastFCnt:
+			return lossRate(ups[1+i:]...)
+		case fCnt >= lastFCnt+1:
+			lost += fCnt - lastFCnt - 1
 		}
+		lastFCnt = fCnt
 	}
-	return float32(lost) / float32(n)
+	return float32(lost) / float32(1+lastUplink(ups...).Payload.GetMACPayload().FullFCnt-min)
 }
 
 func maxSNRFromMetadata(mds ...*ttnpb.RxMetadata) (float32, bool) {
@@ -326,7 +300,7 @@ func adaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		dev.MACState.DesiredParameters.ADRNbTrans = maxNbTrans
 	}
 	if len(dev.RecentADRUplinks) >= 2 {
-		switch r := lossRate(dev.MACState.CurrentParameters.ADRNbTrans, dev.RecentADRUplinks...); {
+		switch r := lossRate(dev.RecentADRUplinks...); {
 		case r < 0.05:
 			dev.MACState.DesiredParameters.ADRNbTrans = 1 + dev.MACState.DesiredParameters.ADRNbTrans/3
 		case r < 0.10:
