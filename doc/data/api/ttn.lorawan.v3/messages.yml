@@ -2194,6 +2194,8 @@ DownlinkQueueRequest:
       name: EndDeviceIdentifiers
     default: {}
   - name: downlinks
+    rules:
+      max_items: 100000
     repeated:
       message:
         name: ApplicationDownlink

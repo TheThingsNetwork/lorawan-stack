@@ -2009,6 +2009,13 @@ func (m *DownlinkQueueRequest) ValidateFields(paths ...string) error {
 
 		case "downlinks":
 
+			if len(m.GetDownlinks()) > 100000 {
+				return DownlinkQueueRequestValidationError{
+					field:  "downlinks",
+					reason: "value must contain no more than 100000 item(s)",
+				}
+			}
+
 			for idx, item := range m.GetDownlinks() {
 				_, _ = idx, item
 
