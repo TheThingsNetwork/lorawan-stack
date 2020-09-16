@@ -14,5 +14,6 @@
 
 import registrationTests from './registration'
 import applicationTests from './applications'
+import featureToggleTests from './feature-toggles'
 
-export default [...registrationTests, ...applicationTests]
+export default [...registrationTests, ...applicationTests, ...featureToggleTests]

@@ -77,6 +77,13 @@ Cypress.Commands.add('loginConsole', credentials => {
   })
 })
 
+// Helper function to obtain the currently active access token.
+Cypress.Commands.add('getAccessToken', callback => {
+  const tokenString = window.localStorage.getItem(`accessToken-${stringToHash('/console')}`)
+  const accessToken = JSON.parse(tokenString).access_token
+  callback(accessToken)
+})
+
 // Helper function to create a new user programmatically.
 Cypress.Commands.add('createUser', user => {
   const baseUrl = Cypress.config('baseUrl')
@@ -98,9 +105,45 @@ Cypress.Commands.add('createUser', user => {
     })
   })
 
-  // Reset cookies and local storage to avoid csrf and session state inconsitencies within tests.
+  // Reset cookies and local storage to avoid csrf and session state inconsistencies within tests.
   cy.clearCookies()
   cy.clearLocalStorage()
+})
+
+// Helper function to create a new application programmatically.
+Cypress.Commands.add('createApplication', (application, userId) => {
+  const baseUrl = Cypress.config('baseUrl')
+  cy.getAccessToken(accessToken => {
+    cy.request({
+      method: 'POST',
+      url: `${baseUrl}/api/v3/users/${userId}/applications`,
+      body: { application },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+  })
+})
+
+// Helper function to set an application collaborator programmatically.
+Cypress.Commands.add('setApplicationCollaborator', (applicationId, collaboratorId, rights) => {
+  const baseUrl = Cypress.config('baseUrl')
+  cy.getAccessToken(accessToken => {
+    const body = {
+      collaborator: {
+        ids: { user_ids: { user_id: collaboratorId } },
+        rights,
+      },
+    }
+    cy.request({
+      method: 'PUT',
+      url: `${baseUrl}/api/v3/applications/${applicationId}/collaborators`,
+      body,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+  })
 })
 
 // Helper function to quickly seed the database to a fresh state using a
