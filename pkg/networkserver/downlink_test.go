@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
@@ -272,6 +273,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 	nwkSEncKey := types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	sNwkSIntKey := types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
+	joinAcceptBytes := append([]byte{0b001_000_00}, bytes.Repeat([]byte{0x42}, 32)...)
+
 	sessionKeys := &ttnpb.SessionKeys{
 		FNwkSIntKey: &ttnpb.KeyEnvelope{
 			Key: &fNwkSIntKey,
@@ -401,8 +404,18 @@ func TestProcessDownlinkTask(t *testing.T) {
 			evIDOpt := events.WithIdentifiers(ids)
 			for i := uint(0); i < n; i++ {
 				if !test.AllTrue(
-					a.So(env.Events, should.ReceiveEventResembling,
-						attempt.With(events.WithData(down)).New(ctx, evIDOpt)),
+					a.So(env.Events, should.ReceiveEventFunc, test.MakeEventEqual(test.EventEqualConfig{
+						Identifiers:    true,
+						CorrelationIDs: true,
+						Origin:         true,
+						Context:        true,
+						Visibility:     true,
+						Authentication: true,
+						RemoteIP:       true,
+						UserAgent:      true,
+					}),
+						attempt.With(events.WithData(down)).New(ctx, evIDOpt),
+					),
 					a.So(env.Events, should.ReceiveEventFunc, makeFailEventEqual(t),
 						fail.With(events.WithData(err)).New(ctx, evIDOpt)),
 				) {
@@ -415,13 +428,25 @@ func TestProcessDownlinkTask(t *testing.T) {
 	makeAssertReceiveScheduleSuccessAttemptEvents := func(attempt, success events.Builder) func(context.Context, TestEnvironment, *ttnpb.DownlinkMessage, ttnpb.EndDeviceIdentifiers, *ttnpb.ScheduleDownlinkResponse, ...events.Builder) bool {
 		return func(ctx context.Context, env TestEnvironment, down *ttnpb.DownlinkMessage, ids ttnpb.EndDeviceIdentifiers, resp *ttnpb.ScheduleDownlinkResponse, evs ...events.Builder) bool {
 			_, a := test.MustNewTFromContext(ctx)
-			return a.So(env.Events, should.ReceiveEventsResembling, events.Builders(append([]events.Builder{
-				attempt.With(events.WithData(down)),
-				success.With(events.WithData(resp)),
-			}, evs...)).New(
-				events.ContextWithCorrelationID(ctx, down.CorrelationIDs...),
-				events.WithIdentifiers(ids),
-			))
+			ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIDs...)
+			evIDOpt := events.WithIdentifiers(ids)
+			return test.AllTrue(
+				a.So(env.Events, should.ReceiveEventFunc, test.MakeEventEqual(test.EventEqualConfig{
+					Identifiers:    true,
+					CorrelationIDs: true,
+					Origin:         true,
+					Context:        true,
+					Visibility:     true,
+					Authentication: true,
+					RemoteIP:       true,
+					UserAgent:      true,
+				}),
+					attempt.With(events.WithData(down)).New(ctx, evIDOpt),
+				),
+				a.So(env.Events, should.ReceiveEventsResembling, events.Builders(append([]events.Builder{
+					success.With(events.WithData(resp)),
+				}, evs...)).New(ctx, evIDOpt)),
+			)
 		}
 	}
 
@@ -2666,7 +2691,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
 							Keys:    *sessionKeys,
-							Payload: bytes.Repeat([]byte{0x42}, 33),
+							Payload: joinAcceptBytes,
 							Request: ttnpb.JoinRequest{
 								RawPayload: bytes.Repeat([]byte{0x42}, 23),
 								DevAddr:    devAddr,
@@ -2721,7 +2746,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ctx,
 					env,
 					false,
-					bytes.Repeat([]byte{0x42}, 33),
+					joinAcceptBytes,
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,
@@ -2840,6 +2865,25 @@ func TestProcessDownlinkTask(t *testing.T) {
 						t.FailNow()
 					}
 					if down != nil {
+						msg := &ttnpb.Message{}
+						test.Must(nil, lorawan.UnmarshalMessage(down.RawPayload, msg))
+						switch msg.MType {
+						case ttnpb.MType_CONFIRMED_DOWN, ttnpb.MType_UNCONFIRMED_DOWN:
+							pld := msg.GetMACPayload()
+							pld.FullFCnt = created.Session.LastNFCntDown&0xffff0000 | pld.FCnt
+						case ttnpb.MType_JOIN_ACCEPT:
+							msg.Payload = &ttnpb.Message_JoinAcceptPayload{
+								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
+									NetID:      created.PendingMACState.QueuedJoinAccept.Request.NetID,
+									DevAddr:    created.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+									DLSettings: created.PendingMACState.QueuedJoinAccept.Request.DownlinkSettings,
+									RxDelay:    created.PendingMACState.QueuedJoinAccept.Request.RxDelay,
+									CFList:     created.PendingMACState.QueuedJoinAccept.Request.CFList,
+								},
+							}
+						}
+						down.RawPayload = nil
+						down.Payload = msg
 						expected.RecentDownlinks = AppendRecentDownlink(expected.RecentDownlinks, down, RecentDownlinkCount)
 					}
 					for _, diff := range tc.DeviceDiffs {

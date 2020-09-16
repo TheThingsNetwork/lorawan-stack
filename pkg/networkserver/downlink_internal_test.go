@@ -117,7 +117,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 
 	encodeMessage := func(msg *ttnpb.Message, ver ttnpb.MACVersion, confFCnt uint32) []byte {
 		msg = deepcopy.Copy(msg).(*ttnpb.Message)
-		mac := msg.GetMACPayload()
+		pld := msg.GetMACPayload()
 
 		b, err := lorawan.MarshalMessage(*msg)
 		if err != nil {
@@ -134,7 +134,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			panic(fmt.Errorf("unknown version %s", ver))
 		}
 
-		mic, err := crypto.ComputeDownlinkMIC(key, mac.DevAddr, confFCnt, mac.FCnt, b)
+		mic, err := crypto.ComputeDownlinkMIC(key, pld.DevAddr, confFCnt, pld.FCnt, b)
 		if err != nil {
 			t.Fatal("Failed to compute MIC")
 		}
@@ -144,7 +144,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 	for _, tc := range []struct {
 		Name                         string
 		Device                       *ttnpb.EndDevice
-		Bytes                        []byte
+		Payload                      *ttnpb.Message
+		ConfFCnt                     uint32
 		ApplicationDownlinkAssertion func(t *testing.T, down *ttnpb.ApplicationDownlink) bool
 		DeviceAssertion              func(*testing.T, *ttnpb.EndDevice) bool
 		Error                        error
@@ -277,7 +278,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				FrequencyPlanID:   band.EU_863_870,
 			},
-			Bytes: encodeMessage(&ttnpb.Message{
+			Payload: &ttnpb.Message{
 				MHDR: ttnpb.MHDR{
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
@@ -295,7 +296,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 						FullFCnt: 42,
 					},
 				},
-			}, ttnpb.MAC_V1_1, 24),
+			},
+			ConfFCnt: 24,
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -381,7 +383,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				FrequencyPlanID:   band.EU_863_870,
 			},
-			Bytes: encodeMessage(&ttnpb.Message{
+			Payload: &ttnpb.Message{
 				MHDR: ttnpb.MHDR{
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
@@ -401,7 +403,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
-			}, ttnpb.MAC_V1_1, 0),
+			},
 			ApplicationDownlinkAssertion: func(t *testing.T, down *ttnpb.ApplicationDownlink) bool {
 				return assertions.New(t).So(down, should.Resemble, &ttnpb.ApplicationDownlink{
 					Confirmed:  false,
@@ -495,7 +497,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				FrequencyPlanID:   band.EU_863_870,
 			},
-			Bytes: encodeMessage(&ttnpb.Message{
+			Payload: &ttnpb.Message{
 				MHDR: ttnpb.MHDR{
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
@@ -515,7 +517,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
-			}, ttnpb.MAC_V1_1, 24),
+			},
+			ConfFCnt: 24,
 			ApplicationDownlinkAssertion: func(t *testing.T, down *ttnpb.ApplicationDownlink) bool {
 				return assertions.New(t).So(down, should.Resemble, &ttnpb.ApplicationDownlink{
 					Confirmed:  false,
@@ -608,7 +611,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				FrequencyPlanID:   band.EU_863_870,
 			},
-			Bytes: encodeMessage(&ttnpb.Message{
+			Payload: &ttnpb.Message{
 				MHDR: ttnpb.MHDR{
 					MType: ttnpb.MType_CONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
@@ -628,7 +631,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
-			}, ttnpb.MAC_V1_1, 0),
+			},
 			ApplicationDownlinkAssertion: func(t *testing.T, down *ttnpb.ApplicationDownlink) bool {
 				return assertions.New(t).So(down, should.Resemble, &ttnpb.ApplicationDownlink{
 					Confirmed:  true,
@@ -725,7 +728,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				FrequencyPlanID:   band.EU_863_870,
 			},
-			Bytes: encodeMessage(&ttnpb.Message{
+			Payload: &ttnpb.Message{
 				MHDR: ttnpb.MHDR{
 					MType: ttnpb.MType_CONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
@@ -745,7 +748,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 						FRMPayload: []byte("test"),
 					},
 				},
-			}, ttnpb.MAC_V1_1, 24),
+			},
+			ConfFCnt: 24,
 			ApplicationDownlinkAssertion: func(t *testing.T, down *ttnpb.ApplicationDownlink) bool {
 				return assertions.New(t).So(down, should.Resemble, &ttnpb.ApplicationDownlink{
 					Confirmed:  true,
@@ -840,7 +844,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				FrequencyPlanID:   band.EU_863_870,
 			},
-			Bytes: encodeMessage(&ttnpb.Message{
+			Payload: &ttnpb.Message{
 				MHDR: ttnpb.MHDR{
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
@@ -862,7 +866,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						FullFCnt: 42,
 					},
 				},
-			}, ttnpb.MAC_V1_1, 0),
+			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
 				if !a.So(dev.MACState, should.NotBeNil) {
@@ -947,7 +951,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				FrequencyPlanID:   band.EU_863_870,
 			},
-			Bytes: encodeMessage(&ttnpb.Message{
+			Payload: &ttnpb.Message{
 				MHDR: ttnpb.MHDR{
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
@@ -969,7 +973,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						FullFCnt: 42,
 					},
 				},
-			}, ttnpb.MAC_V1_1, 0),
+			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
 				if !a.So(dev.MACState, should.NotBeNil) {
@@ -1063,7 +1067,11 @@ func TestGenerateDataDownlink(t *testing.T) {
 					return
 				}
 
-				a.So(genDown.Payload, should.Resemble, tc.Bytes)
+				b := encodeMessage(tc.Payload, dev.MACState.LoRaWANVersion, tc.ConfFCnt)
+				a.So(genDown.RawPayload, should.Resemble, b)
+				pld := CopyMessage(tc.Payload)
+				pld.MIC = b[len(b)-4:]
+				a.So(genDown.Payload, should.Resemble, pld)
 				if tc.ApplicationDownlinkAssertion != nil {
 					a.So(tc.ApplicationDownlinkAssertion(t, genState.ApplicationDownlink), should.BeTrue)
 				} else {

@@ -250,23 +250,27 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			frmPayload = fOpts
 			fOpts = nil
 		}
+		down := MakeDataDownlink(DataDownlinkConfig{
+			DecodePayload: true,
+
+			MACVersion: dev.MACState.LoRaWANVersion,
+			DevAddr:    dev.Session.DevAddr,
+			FCtrl: ttnpb.FCtrl{
+				ADR: true,
+				Ack: true,
+			},
+			FRMPayload:  frmPayload,
+			FOpts:       fOpts,
+			SessionKeys: &dev.Session.SessionKeys,
+		})
 		dev, ok = env.AssertScheduleDataDownlink(ctx, DataDownlinkAssertionConfig{
-			SetRX1:   true,
-			SetRX2:   true,
-			Device:   dev,
-			Class:    ttnpb.CLASS_A,
-			Priority: ttnpb.TxSchedulePriority_HIGHEST,
-			Payload: MakeDataDownlinkPHYPayload(DataDownlinkConfig{
-				MACVersion: dev.MACState.LoRaWANVersion,
-				DevAddr:    dev.Session.DevAddr,
-				FCtrl: ttnpb.FCtrl{
-					ADR: true,
-					Ack: true,
-				},
-				FRMPayload:  frmPayload,
-				FOpts:       fOpts,
-				SessionKeys: &dev.Session.SessionKeys,
-			}),
+			SetRX1:      true,
+			SetRX2:      true,
+			Device:      dev,
+			Class:       ttnpb.CLASS_A,
+			Priority:    ttnpb.TxSchedulePriority_HIGHEST,
+			Payload:     down.Payload,
+			RawPayload:  down.RawPayload,
 			PeerIndexes: []uint{0, 1},
 			Responses: []NsGsScheduleDownlinkResponse{
 				{
