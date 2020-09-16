@@ -599,8 +599,11 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 				ctx = events.ContextWithCorrelationID(ctx, host.correlationID)
 				switch msg := item.val.(type) {
 				case *ttnpb.GatewayUplinkMessage:
-					msgC := *msg
-					msg = &msgC
+					up := *msg.UplinkMessage
+					msg = &ttnpb.GatewayUplinkMessage{
+						BandID:        msg.BandID,
+						UplinkMessage: &up,
+					}
 					msg.CorrelationIDs = append(make([]string, 0, len(msg.CorrelationIDs)+1), msg.CorrelationIDs...)
 					msg.CorrelationIDs = append(msg.CorrelationIDs, host.correlationID)
 					drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
