@@ -1,9 +1,6 @@
 {
   "viewportHeight": 900,
   "viewportWidth": 1440,
-  "consoleRootPath": "/console",
-  "oauthRootPath": "/oauth",
-  "assetsRootPath": "/assets",
   "defaultCommandTimeout": 10000,
   "ignoreTestFiles": "!*.spec.js"
 }
