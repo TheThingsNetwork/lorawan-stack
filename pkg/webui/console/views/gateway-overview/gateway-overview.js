@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import GatewayMap from '@console/components/gateway-map'
 
 import GatewayEvents from '@console/containers/gateway-events'
-// Import GatewayConnection from '@console/containers/gateway-connection'
 import GatewayTitleSection from '@console/containers/gateway-title-section'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
@@ -34,6 +33,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewGatewayInfo } from '@console/lib/feature-checks'
+
+import style from './gateway-overview.styl'
 
 @withFeatureRequirement(mayViewGatewayInfo, {
   redirect: '/',
@@ -105,23 +106,29 @@ export default class GatewayOverview extends React.Component {
     ]
 
     return (
-      <Container>
-        <IntlHelmet title={sharedMessages.overview} />
-        <Row>
-          <Col sm={12}>
-            <GatewayTitleSection gtwId={gtwId} />
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={12} lg={6}>
-            <DataSheet data={sheetData} />
-          </Col>
-          <Col sm={12} lg={6}>
-            <GatewayEvents gtwId={gtwId} widget />
-            <GatewayMap gtwId={gtwId} gateway={this.props.gateway} />
-          </Col>
-        </Row>
-      </Container>
+      <>
+        <div className={style.titleSection}>
+          <Container>
+            <IntlHelmet title={sharedMessages.overview} />
+            <Row>
+              <Col sm={12}>
+                <GatewayTitleSection gtwId={gtwId} />
+              </Col>
+            </Row>
+          </Container>
+        </div>
+        <Container>
+          <Row>
+            <Col sm={12} lg={6}>
+              <DataSheet data={sheetData} />
+            </Col>
+            <Col sm={12} lg={6}>
+              <GatewayEvents gtwId={gtwId} widget />
+              <GatewayMap gtwId={gtwId} gateway={this.props.gateway} />
+            </Col>
+          </Row>
+        </Container>
+      </>
     )
   }
 }

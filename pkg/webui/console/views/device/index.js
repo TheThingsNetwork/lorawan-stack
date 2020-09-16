@@ -219,7 +219,7 @@ export default class Device extends React.Component {
     return (
       <React.Fragment>
         <IntlHelmet titleTemplate={`%s - ${name || devId} - ${siteName}`} />
-        <div>
+        <div className={style.titleSection}>
           <Container>
             <Row>
               <Col sm={12}>

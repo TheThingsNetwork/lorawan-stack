@@ -62,27 +62,33 @@ class ApplicationOverview extends React.Component {
     ]
 
     return (
-      <Container>
-        <IntlHelmet title={sharedMessages.overview} />
-        <Row>
-          <Col sm={12}>
-            <ApplicationTitleSection appId={appId} />
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={12} lg={6}>
-            <DataSheet data={sheetData} className={style.generalInformation} />
-          </Col>
-          <Col sm={12} lg={6}>
-            <ApplicationEvents appId={appId} widget />
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={12} className={style.table}>
-            <DevicesTable pageSize={PAGE_SIZES.SMALL} devicePathPrefix="/devices" />
-          </Col>
-        </Row>
-      </Container>
+      <>
+        <div className={style.titleSection}>
+          <Container>
+            <IntlHelmet title={sharedMessages.overview} />
+            <Row>
+              <Col sm={12}>
+                <ApplicationTitleSection appId={appId} />
+              </Col>
+            </Row>
+          </Container>
+        </div>
+        <Container>
+          <Row>
+            <Col sm={12} lg={6}>
+              <DataSheet data={sheetData} className={style.generalInformation} />
+            </Col>
+            <Col sm={12} lg={6}>
+              <ApplicationEvents appId={appId} widget />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={12} className={style.table}>
+              <DevicesTable pageSize={PAGE_SIZES.SMALL} devicePathPrefix="/devices" />
+            </Col>
+          </Row>
+        </Container>
+      </>
     )
   }
 }
