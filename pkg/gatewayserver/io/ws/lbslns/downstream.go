@@ -68,6 +68,10 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.Downli
 	dnmsg.RCtx = int64(settings.Downlink.AntennaIndex)
 	dnmsg.Diid = int64(f.tokens.Next(down.CorrelationIDs, dlTime))
 
+	// Chosen fixed values.
+	dnmsg.Priority = 25
+	dnmsg.RxDelay = 1
+
 	// The first 16 bits of XTime gets the session ID from the upstream latestXTime and the other 48 bits are concentrator timestamp accounted for rollover.
 	var (
 		state State
@@ -86,10 +90,6 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.Downli
 
 	// This field is not used but needs to be defined for the station to parse the json.
 	dnmsg.DevEUI = "00-00-00-00-00-00-00-00"
-
-	// Chosen fixed values.
-	dnmsg.Priority = 25
-	dnmsg.RxDelay = 1
 
 	// Fix the Tx Parameters since we don't use the gateway scheduler.
 	dnmsg.Rx1DR = int(settings.DataRateIndex)
