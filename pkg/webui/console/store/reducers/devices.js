@@ -71,7 +71,7 @@ const devices = function(state = defaultState, { type, payload, event }) {
       }
 
       // Update derived last seen value if possible.
-      const { recent_uplinks, session } = payload
+      const { recent_uplinks } = payload
       const derived = {}
       if (recent_uplinks) {
         const last_uplink = Boolean(recent_uplinks)
@@ -80,11 +80,6 @@ const devices = function(state = defaultState, { type, payload, event }) {
         if (last_uplink) {
           derived.lastSeen = last_uplink.received_at
         }
-      }
-
-      // Update uplink frame counts if possible.
-      if (session) {
-        derived.uplinkFrameCount = session.last_f_cnt_up
       }
 
       return mergeDerived(updatedState, id, derived)
@@ -127,7 +122,7 @@ const devices = function(state = defaultState, { type, payload, event }) {
       else if (event.name === uplinkFrameCountEvent) {
         const id = getCombinedDeviceId(event.identifiers[0].device_ids)
         return mergeDerived(state, id, {
-          uplinkFrameCount: getByPath(event, 'data.payload.mac_payload.f_hdr.f_cnt'),
+          uplinkFrameCount: getByPath(event, 'data.payload.mac_payload.full_f_cnt'),
         })
       }
       return state

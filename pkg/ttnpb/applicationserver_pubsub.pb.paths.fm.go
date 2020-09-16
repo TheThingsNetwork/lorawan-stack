@@ -39,6 +39,20 @@ var ApplicationPubSubFieldPathsNested = []string{
 	"location_solved",
 	"location_solved.topic",
 	"provider",
+	"provider.aws_iot",
+	"provider.aws_iot.access_key",
+	"provider.aws_iot.access_key.access_key_id",
+	"provider.aws_iot.access_key.secret_access_key",
+	"provider.aws_iot.access_key.session_token",
+	"provider.aws_iot.assume_role",
+	"provider.aws_iot.assume_role.arn",
+	"provider.aws_iot.assume_role.external_id",
+	"provider.aws_iot.assume_role.session_duration",
+	"provider.aws_iot.deployment",
+	"provider.aws_iot.deployment.default",
+	"provider.aws_iot.deployment.default.stack_name",
+	"provider.aws_iot.endpoint_address",
+	"provider.aws_iot.region",
 	"provider.mqtt",
 	"provider.mqtt.client_id",
 	"provider.mqtt.headers",
@@ -144,6 +158,20 @@ var SetApplicationPubSubRequestFieldPathsNested = []string{
 	"pubsub.location_solved",
 	"pubsub.location_solved.topic",
 	"pubsub.provider",
+	"pubsub.provider.aws_iot",
+	"pubsub.provider.aws_iot.access_key",
+	"pubsub.provider.aws_iot.access_key.access_key_id",
+	"pubsub.provider.aws_iot.access_key.secret_access_key",
+	"pubsub.provider.aws_iot.access_key.session_token",
+	"pubsub.provider.aws_iot.assume_role",
+	"pubsub.provider.aws_iot.assume_role.arn",
+	"pubsub.provider.aws_iot.assume_role.external_id",
+	"pubsub.provider.aws_iot.assume_role.session_duration",
+	"pubsub.provider.aws_iot.deployment",
+	"pubsub.provider.aws_iot.deployment.default",
+	"pubsub.provider.aws_iot.deployment.default.stack_name",
+	"pubsub.provider.aws_iot.endpoint_address",
+	"pubsub.provider.aws_iot.region",
 	"pubsub.provider.mqtt",
 	"pubsub.provider.mqtt.client_id",
 	"pubsub.provider.mqtt.headers",
@@ -203,10 +231,62 @@ var ApplicationPubSub_MQTTProviderFieldPathsTopLevel = []string{
 	"use_tls",
 	"username",
 }
+var ApplicationPubSub_AWSIoTProviderFieldPathsNested = []string{
+	"access_key",
+	"access_key.access_key_id",
+	"access_key.secret_access_key",
+	"access_key.session_token",
+	"assume_role",
+	"assume_role.arn",
+	"assume_role.external_id",
+	"assume_role.session_duration",
+	"deployment",
+	"deployment.default",
+	"deployment.default.stack_name",
+	"endpoint_address",
+	"region",
+}
+
+var ApplicationPubSub_AWSIoTProviderFieldPathsTopLevel = []string{
+	"access_key",
+	"assume_role",
+	"deployment",
+	"endpoint_address",
+	"region",
+}
 var ApplicationPubSub_MessageFieldPathsNested = []string{
 	"topic",
 }
 
 var ApplicationPubSub_MessageFieldPathsTopLevel = []string{
 	"topic",
+}
+var ApplicationPubSub_AWSIoTProvider_AccessKeyFieldPathsNested = []string{
+	"access_key_id",
+	"secret_access_key",
+	"session_token",
+}
+
+var ApplicationPubSub_AWSIoTProvider_AccessKeyFieldPathsTopLevel = []string{
+	"access_key_id",
+	"secret_access_key",
+	"session_token",
+}
+var ApplicationPubSub_AWSIoTProvider_AssumeRoleFieldPathsNested = []string{
+	"arn",
+	"external_id",
+	"session_duration",
+}
+
+var ApplicationPubSub_AWSIoTProvider_AssumeRoleFieldPathsTopLevel = []string{
+	"arn",
+	"external_id",
+	"session_duration",
+}
+var ApplicationPubSub_AWSIoTProvider_DefaultIntegrationFieldPathsNested = []string{
+	"stack_name",
+}
+
+var ApplicationPubSub_AWSIoTProvider_DefaultIntegrationFieldPathsTopLevel = []string{
+	"stack_name",
 }

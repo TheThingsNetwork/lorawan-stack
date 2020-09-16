@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/cloud"
@@ -27,21 +28,21 @@ import (
 )
 
 // InitializeEvents initializes the event system.
-func InitializeEvents(ctx context.Context, config config.ServiceBase) (err error) {
-	switch config.Events.Backend {
+func InitializeEvents(ctx context.Context, taskStarter component.TaskStarter, conf config.ServiceBase) error {
+	switch conf.Events.Backend {
 	case "internal":
 		return nil // this is the default.
 	case "redis":
-		events.SetDefaultPubSub(redis.NewPubSub(config.Events.Redis))
+		events.SetDefaultPubSub(redis.NewPubSub(ctx, taskStarter, conf.Events.Redis))
 		return nil
 	case "cloud":
-		ps, err := cloud.NewPubSub(ctx, config.Events.Cloud.PublishURL, config.Events.Cloud.SubscribeURL)
+		ps, err := cloud.NewPubSub(ctx, taskStarter, conf.Events.Cloud.PublishURL, conf.Events.Cloud.SubscribeURL)
 		if err != nil {
 			return err
 		}
 		events.SetDefaultPubSub(ps)
 		return nil
 	default:
-		return fmt.Errorf("unknown events backend: %s", config.Events.Backend)
+		return fmt.Errorf("unknown events backend: %s", conf.Events.Backend)
 	}
 }

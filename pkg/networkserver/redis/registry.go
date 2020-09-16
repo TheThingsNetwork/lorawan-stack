@@ -58,7 +58,7 @@ func (r *DeviceRegistry) Init() error {
 }
 
 func (r *DeviceRegistry) uidKey(uid string) string {
-	return r.Redis.Key("uid", uid)
+	return deviceUIDKey(r.Redis, uid)
 }
 
 func (r *DeviceRegistry) addrKey(addr types.DevAddr) string {
@@ -224,6 +224,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		if pb == nil && len(sets) == 0 {
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(uk)
+				p.Del(deviceUIDLastInvalidationKey(r.Redis, uid))
 				if stored.JoinEUI != nil && stored.DevEUI != nil {
 					p.Del(r.euiKey(*stored.JoinEUI, *stored.DevEUI))
 				}

@@ -61,9 +61,7 @@ const m = defineMessages({
 })
 
 const headerCheck = headers =>
-  headers === undefined ||
-  (headers instanceof Array &&
-    (headers.length === 0 || headers.every(header => header.key !== '' && header.value !== '')))
+  headers.length === 0 || headers.every(({ value, key }) => value !== '' && key !== '')
 
 const validationSchema = Yup.object().shape({
   webhook_id: Yup.string()
@@ -72,7 +70,15 @@ const validationSchema = Yup.object().shape({
     .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
   format: Yup.string().required(sharedMessages.validateRequired),
-  headers: Yup.array().test('has no empty string values', m.headersValidateRequired, headerCheck),
+  headers: Yup.array()
+    .of(
+      Yup.object({
+        key: Yup.string().default(''),
+        value: Yup.string().default(''),
+      }),
+    )
+    .test('has no empty string values', m.headersValidateRequired, headerCheck)
+    .default([]),
   base_url: Yup.string()
     .matches(urlRegexp, sharedMessages.validateUrl)
     .required(sharedMessages.validateRequired),
@@ -291,6 +297,13 @@ export default class WebhookForm extends Component {
             name="location_solved"
             type="toggled-input"
             title={sharedMessages.locationSolved}
+            placeholder={pathPlaceholder}
+            component={Input.Toggled}
+          />
+          <Form.Field
+            name="service_data"
+            type="toggled-input"
+            title={sharedMessages.serviceData}
             placeholder={pathPlaceholder}
             component={Input.Toggled}
           />

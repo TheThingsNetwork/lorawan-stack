@@ -161,7 +161,9 @@ func (s *srv) handlePackets() {
 				break
 			}
 
-			s.handleUp(cs.io.Context(), cs, packet)
+			if err := s.handleUp(cs.io.Context(), cs, packet); err != nil {
+				logger.WithError(err).Warn("Failed to handle upstream packet")
+			}
 		}
 	}
 }
@@ -235,7 +237,11 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 		})
 		state.startHandleDownMu.RLock()
 		state.startHandleDown.Do(func() {
-			go s.handleDown(ctx, state)
+			go func() {
+				if err := s.handleDown(ctx, state); err != nil {
+					logger.WithError(err).Warn("Failed to handle downstream packet")
+				}
+			}()
 		})
 		state.startHandleDownMu.RUnlock()
 
@@ -312,12 +318,25 @@ var (
 )
 
 func (s *srv) handleDown(ctx context.Context, state *state) error {
+	defer func() {
+		state.lastDownlinkPath.Store(downlinkPath{})
+		state.startHandleDownMu.Lock()
+		state.startHandleDown = &sync.Once{}
+		state.startHandleDownMu.Unlock()
+	}()
 	logger := log.FromContext(ctx)
 	if err := s.server.ClaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers); err != nil {
-		logger.WithError(err).Error("Failed to claim downlink")
+		logger.WithError(err).Error("Failed to claim downlink path")
 		return errClaimDownlinkFailed.WithCause(err)
 	}
-	defer s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers)
+	logger.Info("Downlink path claimed")
+	defer func() {
+		if err := s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers); err != nil {
+			logger.WithError(err).Error("Failed to unclaim downlink path")
+			return
+		}
+		logger.Info("Downlink path unclaimed")
+	}()
 	healthCheck := time.NewTicker(s.config.DownlinkPathExpires / 2)
 	defer healthCheck.Stop()
 	for {
@@ -374,10 +393,6 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 			lastSeenPull := time.Unix(0, atomic.LoadInt64(&state.lastSeenPull))
 			if time.Since(lastSeenPull) > s.config.DownlinkPathExpires {
 				logger.Debug("Downlink path expired")
-				state.lastDownlinkPath.Store(downlinkPath{})
-				state.startHandleDownMu.Lock()
-				state.startHandleDown = &sync.Once{}
-				state.startHandleDownMu.Unlock()
 				return errDownlinkPathExpired.New()
 			}
 		}

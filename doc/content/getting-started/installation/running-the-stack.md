@@ -40,7 +40,9 @@ $ docker-compose run --rm stack is-db create-oauth-client \
   --redirect-uri "code"
 ```
 
-We do the same for the console. For `--secret`, make sure to enter the same value as you set for `console.oauth.client-secret` in the [Configuration]({{< relref "configuration" >}}) step.
+We do the same for the console. 
+
+> For `--secret`, make sure to enter the same value as you set for `console.oauth.client-secret` in the [Configuration]({{< relref "configuration" >}}) step.
 
 ```bash
 $ docker-compose run --rm stack is-db create-oauth-client \

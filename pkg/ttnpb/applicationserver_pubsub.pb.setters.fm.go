@@ -466,6 +466,39 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 							dst.Provider = nil
 						}
 					}
+				case "aws_iot":
+					_, srcOk := src.Provider.(*ApplicationPubSub_AWSIoT)
+					if !srcOk && src.Provider != nil {
+						return fmt.Errorf("attempt to set oneof 'aws_iot', while different oneof is set in source")
+					}
+					_, dstOk := dst.Provider.(*ApplicationPubSub_AWSIoT)
+					if !dstOk && dst.Provider != nil {
+						return fmt.Errorf("attempt to set oneof 'aws_iot', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ApplicationPubSub_AWSIoTProvider
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.Provider.(*ApplicationPubSub_AWSIoT).AWSIoT
+						}
+						if dstOk {
+							newDst = dst.Provider.(*ApplicationPubSub_AWSIoT).AWSIoT
+						} else {
+							newDst = &ApplicationPubSub_AWSIoTProvider{}
+							dst.Provider = &ApplicationPubSub_AWSIoT{AWSIoT: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Provider = src.Provider
+						} else {
+							dst.Provider = nil
+						}
+					}
 
 				default:
 					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
@@ -774,6 +807,141 @@ func (dst *ApplicationPubSub_MQTTProvider) SetFields(src *ApplicationPubSub_MQTT
 	return nil
 }
 
+func (dst *ApplicationPubSub_AWSIoTProvider) SetFields(src *ApplicationPubSub_AWSIoTProvider, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "region":
+			if len(subs) > 0 {
+				return fmt.Errorf("'region' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Region = src.Region
+			} else {
+				var zero string
+				dst.Region = zero
+			}
+		case "access_key":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationPubSub_AWSIoTProvider_AccessKey
+				if (src == nil || src.AccessKey == nil) && dst.AccessKey == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.AccessKey
+				}
+				if dst.AccessKey != nil {
+					newDst = dst.AccessKey
+				} else {
+					newDst = &ApplicationPubSub_AWSIoTProvider_AccessKey{}
+					dst.AccessKey = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.AccessKey = src.AccessKey
+				} else {
+					dst.AccessKey = nil
+				}
+			}
+		case "assume_role":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationPubSub_AWSIoTProvider_AssumeRole
+				if (src == nil || src.AssumeRole == nil) && dst.AssumeRole == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.AssumeRole
+				}
+				if dst.AssumeRole != nil {
+					newDst = dst.AssumeRole
+				} else {
+					newDst = &ApplicationPubSub_AWSIoTProvider_AssumeRole{}
+					dst.AssumeRole = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.AssumeRole = src.AssumeRole
+				} else {
+					dst.AssumeRole = nil
+				}
+			}
+		case "endpoint_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'endpoint_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EndpointAddress = src.EndpointAddress
+			} else {
+				var zero string
+				dst.EndpointAddress = zero
+			}
+
+		case "deployment":
+			if len(subs) == 0 && src == nil {
+				dst.Deployment = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Deployment = src.Deployment
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "default":
+					_, srcOk := src.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default)
+					if !srcOk && src.Deployment != nil {
+						return fmt.Errorf("attempt to set oneof 'default', while different oneof is set in source")
+					}
+					_, dstOk := dst.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default)
+					if !dstOk && dst.Deployment != nil {
+						return fmt.Errorf("attempt to set oneof 'default', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ApplicationPubSub_AWSIoTProvider_DefaultIntegration
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default).Default
+						}
+						if dstOk {
+							newDst = dst.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default).Default
+						} else {
+							newDst = &ApplicationPubSub_AWSIoTProvider_DefaultIntegration{}
+							dst.Deployment = &ApplicationPubSub_AWSIoTProvider_Default{Default: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Deployment = src.Deployment
+						} else {
+							dst.Deployment = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ApplicationPubSub_Message) SetFields(src *ApplicationPubSub_Message, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -786,6 +954,108 @@ func (dst *ApplicationPubSub_Message) SetFields(src *ApplicationPubSub_Message, 
 			} else {
 				var zero string
 				dst.Topic = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ApplicationPubSub_AWSIoTProvider_AccessKey) SetFields(src *ApplicationPubSub_AWSIoTProvider_AccessKey, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "access_key_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'access_key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AccessKeyID = src.AccessKeyID
+			} else {
+				var zero string
+				dst.AccessKeyID = zero
+			}
+		case "secret_access_key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'secret_access_key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SecretAccessKey = src.SecretAccessKey
+			} else {
+				var zero string
+				dst.SecretAccessKey = zero
+			}
+		case "session_token":
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_token' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SessionToken = src.SessionToken
+			} else {
+				var zero string
+				dst.SessionToken = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ApplicationPubSub_AWSIoTProvider_AssumeRole) SetFields(src *ApplicationPubSub_AWSIoTProvider_AssumeRole, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "arn":
+			if len(subs) > 0 {
+				return fmt.Errorf("'arn' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ARN = src.ARN
+			} else {
+				var zero string
+				dst.ARN = zero
+			}
+		case "external_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'external_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ExternalID = src.ExternalID
+			} else {
+				var zero string
+				dst.ExternalID = zero
+			}
+		case "session_duration":
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_duration' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SessionDuration = src.SessionDuration
+			} else {
+				dst.SessionDuration = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ApplicationPubSub_AWSIoTProvider_DefaultIntegration) SetFields(src *ApplicationPubSub_AWSIoTProvider_DefaultIntegration, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "stack_name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'stack_name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.StackName = src.StackName
+			} else {
+				var zero string
+				dst.StackName = zero
 			}
 
 		default:

@@ -1147,7 +1147,7 @@
             },
             {
               "name": "api_key",
-              "description": "",
+              "description": "The API key to use to link the Application Server to Network Server.\nThis API key needs to have RIGHT_APPLICATION_LINK.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -1165,7 +1165,7 @@
             },
             {
               "name": "default_formatters",
-              "description": "",
+              "description": "Default message payload formatters to use when there are no formatters\ndefined on the end device level.",
               "label": "",
               "type": "MessagePayloadFormatters",
               "longType": "MessagePayloadFormatters",
@@ -1380,7 +1380,7 @@
           "methods": [
             {
               "name": "Subscribe",
-              "description": "",
+              "description": "Subscribe to upstream messages.",
               "requestType": "ApplicationIdentifiers",
               "requestLongType": "ApplicationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
@@ -1392,7 +1392,7 @@
             },
             {
               "name": "DownlinkQueuePush",
-              "description": "",
+              "description": "Push downlink messages to the end of the downlink queue.",
               "requestType": "DownlinkQueueRequest",
               "requestLongType": "DownlinkQueueRequest",
               "requestFullType": "ttn.lorawan.v3.DownlinkQueueRequest",
@@ -1415,7 +1415,7 @@
             },
             {
               "name": "DownlinkQueueReplace",
-              "description": "",
+              "description": "Replace the entire downlink queue with the specified messages.\nThis can also be used to empty the queue by specifying no messages.",
               "requestType": "DownlinkQueueRequest",
               "requestLongType": "DownlinkQueueRequest",
               "requestFullType": "ttn.lorawan.v3.DownlinkQueueRequest",
@@ -1438,7 +1438,7 @@
             },
             {
               "name": "DownlinkQueueList",
-              "description": "",
+              "description": "List the items currently in the downlink queue.",
               "requestType": "EndDeviceIdentifiers",
               "requestLongType": "EndDeviceIdentifiers",
               "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
@@ -1460,7 +1460,7 @@
             },
             {
               "name": "GetMQTTConnectionInfo",
-              "description": "",
+              "description": "Get connection information to connect an MQTT client.",
               "requestType": "ApplicationIdentifiers",
               "requestLongType": "ApplicationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
@@ -1482,7 +1482,7 @@
             },
             {
               "name": "SimulateUplink",
-              "description": "",
+              "description": "Simulate an upstream message. This can be used to test integrations.",
               "requestType": "ApplicationUp",
               "requestLongType": "ApplicationUp",
               "requestFullType": "ttn.lorawan.v3.ApplicationUp",
@@ -1513,7 +1513,7 @@
           "methods": [
             {
               "name": "GetLink",
-              "description": "",
+              "description": "Get a link configuration from the Application Server to Network Server.\nThis only contains the configuration. Use GetLinkStats to view statistics and any link errors.",
               "requestType": "GetApplicationLinkRequest",
               "requestLongType": "GetApplicationLinkRequest",
               "requestFullType": "ttn.lorawan.v3.GetApplicationLinkRequest",
@@ -1535,7 +1535,7 @@
             },
             {
               "name": "SetLink",
-              "description": "Set a link configuration from the Application Server a Network Server.\nThis call returns immediately after setting the link configuration; it does not wait for a link to establish.\nTo get link statistics or errors, use the `GetLinkStats` call.",
+              "description": "Set a link configuration from the Application Server a Network Server.\nThis call returns immediately after setting the link configuration; it does not wait for a link to establish.\nTo get link statistics or errors, use GetLinkStats.\nNote that there can only be one Application Server instance linked to a Network Server for a given application at a time.",
               "requestType": "SetApplicationLinkRequest",
               "requestLongType": "SetApplicationLinkRequest",
               "requestFullType": "ttn.lorawan.v3.SetApplicationLinkRequest",
@@ -1558,7 +1558,7 @@
             },
             {
               "name": "DeleteLink",
-              "description": "",
+              "description": "Delete the link between the Application Server and Network Server for the specified application.",
               "requestType": "ApplicationIdentifiers",
               "requestLongType": "ApplicationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
@@ -2704,6 +2704,16 @@
               "defaultValue": ""
             },
             {
+              "name": "aws_iot",
+              "description": "",
+              "label": "",
+              "type": "AWSIoTProvider",
+              "longType": "ApplicationPubSub.AWSIoTProvider",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "base_topic",
               "description": "Base topic name to which the messages topic is appended.",
               "label": "",
@@ -2830,6 +2840,275 @@
               "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
               "ismap": false,
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AWSIoTProvider",
+          "longName": "ApplicationPubSub.AWSIoTProvider",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "region",
+              "description": "The AWS region.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "af-south-1",
+                      "ap-east-1",
+                      "ap-northeast-1",
+                      "ap-northeast-2",
+                      "ap-south-1",
+                      "ap-southeast-1",
+                      "ap-southeast-2",
+                      "ca-central-1",
+                      "eu-central-1",
+                      "eu-north-1",
+                      "eu-south-1",
+                      "eu-west-1",
+                      "eu-west-2",
+                      "eu-west-3",
+                      "me-south-1",
+                      "sa-east-1",
+                      "us-east-1",
+                      "us-east-2",
+                      "us-west-1",
+                      "us-west-2"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "access_key",
+              "description": "If set, the integration will use an AWS access key.",
+              "label": "",
+              "type": "AccessKey",
+              "longType": "ApplicationPubSub.AWSIoTProvider.AccessKey",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.AccessKey",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "assume_role",
+              "description": "If set, the integration will assume the given role during operation.",
+              "label": "",
+              "type": "AssumeRole",
+              "longType": "ApplicationPubSub.AWSIoTProvider.AssumeRole",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.AssumeRole",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "endpoint_address",
+              "description": "The endpoint address to connect to. If the endpoint address is left empty,\nthe integration will try to discover it.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 128
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])|)$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "default",
+              "description": "Enable the default integration. This overrides custom base topic and message topics of the pub/sub integration.",
+              "label": "",
+              "type": "DefaultIntegration",
+              "longType": "ApplicationPubSub.AWSIoTProvider.DefaultIntegration",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.DefaultIntegration",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AccessKey",
+          "longName": "ApplicationPubSub.AWSIoTProvider.AccessKey",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.AccessKey",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "access_key_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.min_len",
+                    "value": 16
+                  },
+                  {
+                    "name": "string.max_len",
+                    "value": 128
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[\\w]*$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "secret_access_key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 40
+                  }
+                ]
+              }
+            },
+            {
+              "name": "session_token",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 256
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AssumeRole",
+          "longName": "ApplicationPubSub.AWSIoTProvider.AssumeRole",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.AssumeRole",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "arn",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^arn:aws:iam::[0-9]{12}:role\\/[A-Za-z0-9_+=,.@-]+$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "external_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 1224
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[\\w+=,.@:\\/-]*$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "session_duration",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DefaultIntegration",
+          "longName": "ApplicationPubSub.AWSIoTProvider.DefaultIntegration",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.AWSIoTProvider.DefaultIntegration",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "stack_name",
+              "description": "The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 128
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[A-Za-z][A-Za-z0-9\\-]*$"
+                  }
+                ]
+              }
             }
           ]
         },
@@ -12517,7 +12796,7 @@
           "fields": [
             {
               "name": "uplink_messages",
-              "description": "UplinkMessages received by the gateway.",
+              "description": "Uplink messages received by the gateway.",
               "label": "repeated",
               "type": "UplinkMessage",
               "longType": "UplinkMessage",
@@ -12527,7 +12806,7 @@
             },
             {
               "name": "gateway_status",
-              "description": "",
+              "description": "Gateway status produced by the gateway.",
               "label": "",
               "type": "GatewayStatus",
               "longType": "GatewayStatus",
@@ -12537,7 +12816,7 @@
             },
             {
               "name": "tx_acknowledgment",
-              "description": "",
+              "description": "A transmission acknowledgement or error.",
               "label": "",
               "type": "TxAcknowledgment",
               "longType": "TxAcknowledgment",
@@ -12558,7 +12837,7 @@
           "fields": [
             {
               "name": "path_errors",
-              "description": "",
+              "description": "Errors per path when downlink scheduling failed.",
               "label": "repeated",
               "type": "ErrorDetails",
               "longType": "ErrorDetails",
@@ -12579,7 +12858,7 @@
           "fields": [
             {
               "name": "delay",
-              "description": "",
+              "description": "The amount of time between the message has been scheduled and it will be transmitted by the gateway.",
               "label": "",
               "type": "Duration",
               "longType": "google.protobuf.Duration",
@@ -12637,7 +12916,7 @@
           "methods": [
             {
               "name": "LinkGateway",
-              "description": "Link the gateway to the Gateway Server.",
+              "description": "Link a gateway to the Gateway Server for streaming upstream messages and downstream messages.",
               "requestType": "GatewayUp",
               "requestLongType": "GatewayUp",
               "requestFullType": "ttn.lorawan.v3.GatewayUp",
@@ -12649,7 +12928,7 @@
             },
             {
               "name": "GetConcentratorConfig",
-              "description": "GetConcentratorConfig associated to the gateway.",
+              "description": "Get configuration for the concentrator.",
               "requestType": "Empty",
               "requestLongType": ".google.protobuf.Empty",
               "requestFullType": "google.protobuf.Empty",
@@ -12661,7 +12940,7 @@
             },
             {
               "name": "GetMQTTConnectionInfo",
-              "description": "Get the MQTT server address and the username for the gateway.",
+              "description": "Get connection information to connect an MQTT gateway.",
               "requestType": "GatewayIdentifiers",
               "requestLongType": "GatewayIdentifiers",
               "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
@@ -12683,7 +12962,7 @@
             },
             {
               "name": "GetMQTTV2ConnectionInfo",
-              "description": "Get the MQTTV2 server address and the username for the gateway.",
+              "description": "Get legacy connection information to connect a The Things Network Stack V2 MQTT gateway.",
               "requestType": "GatewayIdentifiers",
               "requestLongType": "GatewayIdentifiers",
               "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
@@ -12713,7 +12992,7 @@
           "methods": [
             {
               "name": "ScheduleDownlink",
-              "description": "ScheduleDownlink instructs the Gateway Server to schedule a downlink message.\nThe Gateway Server may refuse if there are any conflicts in the schedule or\nif a duty cycle prevents the gateway from transmitting.",
+              "description": "Instructs the Gateway Server to schedule a downlink message.\nThe Gateway Server may refuse if there are any conflicts in the schedule or\nif a duty cycle prevents the gateway from transmitting.",
               "requestType": "DownlinkMessage",
               "requestLongType": "DownlinkMessage",
               "requestFullType": "ttn.lorawan.v3.DownlinkMessage",
@@ -20694,7 +20973,15 @@
               "longType": "ApplicationDownlink",
               "fullType": "ttn.lorawan.v3.ApplicationDownlink",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 100000
+                  }
+                ]
+              }
             }
           ]
         },

@@ -15,12 +15,14 @@
 package redis_test
 
 import (
+	"context"
 	"os"
 	"strconv"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/redis"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -53,45 +55,60 @@ func redisConfig() ttnredis.Config {
 }
 
 func Example() {
+	// The task starter is used for automatic re-subscription on failure.
+	taskStarter := component.StartTaskFunc(component.DefaultStartTask)
 	// This sends all events received from Redis to the default pubsub.
-	redisPubSub := redis.WrapPubSub(events.DefaultPubSub(), ttnredis.Config{
+	redisPubSub := redis.WrapPubSub(context.TODO(), events.DefaultPubSub(), taskStarter, ttnredis.Config{
 		// Config here...
 	})
 	// Replace the default pubsub so that we will now publish to Redis.
 	events.SetDefaultPubSub(redisPubSub)
 }
 
+var timeout = (1 << 10) * test.Delay
+
 func TestRedisPubSub(t *testing.T) {
-	a := assertions.New(t)
+	test.RunTest(t, test.TestConfig{
+		Timeout: 4 * timeout,
+		Func: func(ctx context.Context, a *assertions.Assertion) {
+			events.IncludeCaller = true
 
-	events.IncludeCaller = true
+			eventCh := make(chan events.Event)
+			handler := events.HandlerFunc(func(e events.Event) {
+				t.Logf("Received event %v", e)
+				a.So(e.Time().IsZero(), should.BeFalse)
+				a.So(e.Context(), should.NotBeNil)
+				eventCh <- e
+			})
 
-	eventCh := make(chan events.Event)
-	handler := events.HandlerFunc(func(e events.Event) {
-		t.Logf("Received event %v", e)
-		a.So(e.Time().IsZero(), should.BeFalse)
-		a.So(e.Context(), should.NotBeNil)
-		eventCh <- e
+			ctx = events.ContextWithCorrelationID(ctx, t.Name())
+
+			taskStarter := component.StartTaskFunc(component.DefaultStartTask)
+			pubsub := redis.NewPubSub(ctx, taskStarter, redisConfig())
+			defer pubsub.Close(ctx)
+
+			pubsub.Subscribe("redis.**", handler)
+			time.Sleep(timeout)
+
+			appID := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
+
+			test.RunSubtestFromContext(ctx, test.SubtestConfig{
+				Name:    "publish",
+				Timeout: timeout,
+				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+					pubsub.Publish(events.New(ctx, "redis.test.evt0", "redis test event 0", events.WithIdentifiers(appID)))
+					select {
+					case e := <-eventCh:
+						a.So(e.Name(), should.Equal, "redis.test.evt0")
+						if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 1) {
+							a.So(e.Identifiers()[0].GetApplicationIDs(), should.Resemble, appID)
+						}
+					case <-ctx.Done():
+						t.Error("Did not receive expected event")
+						t.FailNow()
+					}
+				},
+			})
+		},
 	})
-
-	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
-
-	pubsub := redis.NewPubSub(redisConfig())
-	defer pubsub.Close(ctx)
-
-	pubsub.Subscribe("redis.**", handler)
-
-	appID := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
-
-	pubsub.Publish(events.New(ctx, "redis.test.evt0", "redis test event 0", events.WithIdentifiers(appID)))
-	select {
-	case e := <-eventCh:
-		a.So(e.Name(), should.Equal, "redis.test.evt0")
-		if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 1) {
-			a.So(e.Identifiers()[0].GetApplicationIDs(), should.Resemble, appID)
-		}
-	case <-time.After(time.Second):
-		t.Error("Did not receive expected event")
-		t.FailNow()
-	}
 }

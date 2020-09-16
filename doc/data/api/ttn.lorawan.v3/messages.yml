@@ -298,11 +298,17 @@ ApplicationLink:
       pattern: ^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$
     default: ""
   - name: api_key
+    comment: |-
+      The API key to use to link the Application Server to Network Server.
+      This API key needs to have RIGHT_APPLICATION_LINK.
     type: string
     rules:
       min_len: 1
     default: ""
   - name: default_formatters
+    comment: |-
+      Default message payload formatters to use when there are no formatters
+      defined on the end device level.
     message:
       name: MessagePayloadFormatters
     default: {}
@@ -542,6 +548,10 @@ ApplicationPubSub:
     message:
       name: ApplicationPubSub.MQTTProvider
     default: {}
+  - name: aws_iot
+    message:
+      name: ApplicationPubSub.AWSIoTProvider
+    default: {}
   - name: base_topic
     comment: Base topic name to which the messages topic is appended.
     type: string
@@ -600,6 +610,113 @@ ApplicationPubSub:
     field_names:
     - nats
     - mqtt
+    - aws_iot
+ApplicationPubSub.AWSIoTProvider:
+  name: ApplicationPubSub.AWSIoTProvider
+  fields:
+  - name: region
+    comment: The AWS region.
+    type: string
+    rules:
+      in:
+      - af-south-1
+      - ap-east-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-south-1
+      - ap-southeast-1
+      - ap-southeast-2
+      - ca-central-1
+      - eu-central-1
+      - eu-north-1
+      - eu-south-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - me-south-1
+      - sa-east-1
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+    default: ""
+  - name: access_key
+    comment: If set, the integration will use an AWS access key.
+    message:
+      name: ApplicationPubSub.AWSIoTProvider.AccessKey
+    default: {}
+  - name: assume_role
+    comment: If set, the integration will assume the given role during operation.
+    message:
+      name: ApplicationPubSub.AWSIoTProvider.AssumeRole
+    default: {}
+  - name: endpoint_address
+    comment: |-
+      The endpoint address to connect to. If the endpoint address is left empty,
+      the integration will try to discover it.
+    type: string
+    rules:
+      max_len: 128
+      pattern: ^((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])|)$
+    default: ""
+  - name: default
+    comment: Enable the default integration. This overrides custom base topic and message topics of the pub/sub integration.
+    message:
+      name: ApplicationPubSub.AWSIoTProvider.DefaultIntegration
+    default: {}
+  oneofs:
+  - name: deployment
+    field_names:
+    - default
+ApplicationPubSub.AWSIoTProvider.AccessKey:
+  name: ApplicationPubSub.AWSIoTProvider.AccessKey
+  fields:
+  - name: access_key_id
+    type: string
+    rules:
+      min_len: 16
+      max_len: 128
+      pattern: ^[\w]*$
+    default: ""
+  - name: secret_access_key
+    type: string
+    rules:
+      max_len: 40
+    default: ""
+  - name: session_token
+    type: string
+    rules:
+      max_len: 256
+    default: ""
+ApplicationPubSub.AWSIoTProvider.AssumeRole:
+  name: ApplicationPubSub.AWSIoTProvider.AssumeRole
+  fields:
+  - name: arn
+    type: string
+    rules:
+      pattern: ^arn:aws:iam::[0-9]{12}:role\/[A-Za-z0-9_+=,.@-]+$
+    default: ""
+  - name: external_id
+    type: string
+    rules:
+      max_len: 1224
+      pattern: ^[\w+=,.@:\/-]*$
+    default: ""
+  - name: session_duration
+    message:
+      package: google.protobuf
+      name: Duration
+    default: 0s
+ApplicationPubSub.AWSIoTProvider.DefaultIntegration:
+  name: ApplicationPubSub.AWSIoTProvider.DefaultIntegration
+  fields:
+  - name: stack_name
+    comment: The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration.
+    type: string
+    rules:
+      max_len: 128
+      pattern: ^[A-Za-z][A-Za-z0-9\-]*$
+    default: ""
 ApplicationPubSub.MQTTProvider:
   name: ApplicationPubSub.MQTTProvider
   comment: The MQTT provider settings.
@@ -2077,6 +2194,8 @@ DownlinkQueueRequest:
       name: EndDeviceIdentifiers
     default: {}
   - name: downlinks
+    rules:
+      max_items: 100000
     repeated:
       message:
         name: ApplicationDownlink
@@ -3376,16 +3495,18 @@ GatewayUp:
   comment: GatewayUp may contain zero or more uplink messages and/or a status message for the gateway.
   fields:
   - name: uplink_messages
-    comment: UplinkMessages received by the gateway.
+    comment: Uplink messages received by the gateway.
     repeated:
       message:
         name: UplinkMessage
     default: []
   - name: gateway_status
+    comment: Gateway status produced by the gateway.
     message:
       name: GatewayStatus
     default: {}
   - name: tx_acknowledgment
+    comment: A transmission acknowledgement or error.
     message:
       name: TxAcknowledgment
     default: {}
@@ -6846,6 +6967,7 @@ ScheduleDownlinkErrorDetails:
   name: ScheduleDownlinkErrorDetails
   fields:
   - name: path_errors
+    comment: Errors per path when downlink scheduling failed.
     repeated:
       message:
         name: ErrorDetails
@@ -6854,6 +6976,7 @@ ScheduleDownlinkResponse:
   name: ScheduleDownlinkResponse
   fields:
   - name: delay
+    comment: The amount of time between the message has been scheduled and it will be transmitted by the gateway.
     message:
       package: google.protobuf
       name: Duration

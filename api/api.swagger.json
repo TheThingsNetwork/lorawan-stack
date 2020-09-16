@@ -7340,6 +7340,43 @@
     }
   },
   "definitions": {
+    "AWSIoTProviderAccessKey": {
+      "type": "object",
+      "properties": {
+        "access_key_id": {
+          "type": "string"
+        },
+        "secret_access_key": {
+          "type": "string"
+        },
+        "session_token": {
+          "type": "string"
+        }
+      }
+    },
+    "AWSIoTProviderAssumeRole": {
+      "type": "object",
+      "properties": {
+        "arn": {
+          "type": "string"
+        },
+        "external_id": {
+          "type": "string"
+        },
+        "session_duration": {
+          "type": "string"
+        }
+      }
+    },
+    "AWSIoTProviderDefaultIntegration": {
+      "type": "object",
+      "properties": {
+        "stack_name": {
+          "type": "string",
+          "description": "The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration."
+        }
+      }
+    },
     "ApplicationDownlinkClassBC": {
       "type": "object",
       "properties": {
@@ -7354,6 +7391,31 @@
           "type": "string",
           "format": "date-time",
           "description": "Absolute time when the downlink message should be transmitted.\nThis requires the gateway to have GPS time synchronization.\nIf the time is in the past or if there is a scheduling conflict, the downlink message fails.\nIf null, the time is selected based on slot availability. This is recommended in class B mode."
+        }
+      }
+    },
+    "ApplicationPubSubAWSIoTProvider": {
+      "type": "object",
+      "properties": {
+        "region": {
+          "type": "string",
+          "description": "The AWS region."
+        },
+        "access_key": {
+          "$ref": "#/definitions/AWSIoTProviderAccessKey",
+          "description": "If set, the integration will use an AWS access key."
+        },
+        "assume_role": {
+          "$ref": "#/definitions/AWSIoTProviderAssumeRole",
+          "description": "If set, the integration will assume the given role during operation."
+        },
+        "endpoint_address": {
+          "type": "string",
+          "description": "The endpoint address to connect to. If the endpoint address is left empty,\nthe integration will try to discover it."
+        },
+        "default": {
+          "$ref": "#/definitions/AWSIoTProviderDefaultIntegration",
+          "description": "Enable the default integration. This overrides custom base topic and message topics of the pub/sub integration."
         }
       }
     },
@@ -8690,10 +8752,12 @@
           "description": "The address of the external Network Server where to link to.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nLeave empty when linking to a cluster Network Server."
         },
         "api_key": {
-          "type": "string"
+          "type": "string",
+          "description": "The API key to use to link the Application Server to Network Server.\nThis API key needs to have RIGHT_APPLICATION_LINK."
         },
         "default_formatters": {
-          "$ref": "#/definitions/v3MessagePayloadFormatters"
+          "$ref": "#/definitions/v3MessagePayloadFormatters",
+          "description": "Default message payload formatters to use when there are no formatters\ndefined on the end device level."
         },
         "tls": {
           "type": "boolean",
@@ -8893,6 +8957,9 @@
         },
         "mqtt": {
           "$ref": "#/definitions/ApplicationPubSubMQTTProvider"
+        },
+        "aws_iot": {
+          "$ref": "#/definitions/ApplicationPubSubAWSIoTProvider"
         },
         "base_topic": {
           "type": "string",
@@ -12493,7 +12560,8 @@
       "type": "object",
       "properties": {
         "delay": {
-          "type": "string"
+          "type": "string",
+          "description": "The amount of time between the message has been scheduled and it will be transmitted by the gateway."
         }
       }
     },

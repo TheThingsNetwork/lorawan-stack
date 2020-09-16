@@ -43,9 +43,13 @@ type ApplicationLink struct {
 	// The typical format of the address is "host:port". If the port is omitted,
 	// the normal port inference (with DNS lookup, otherwise defaults) is used.
 	// Leave empty when linking to a cluster Network Server.
-	NetworkServerAddress string                    `protobuf:"bytes,1,opt,name=network_server_address,json=networkServerAddress,proto3" json:"network_server_address,omitempty"`
-	APIKey               string                    `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
-	DefaultFormatters    *MessagePayloadFormatters `protobuf:"bytes,3,opt,name=default_formatters,json=defaultFormatters,proto3" json:"default_formatters,omitempty"`
+	NetworkServerAddress string `protobuf:"bytes,1,opt,name=network_server_address,json=networkServerAddress,proto3" json:"network_server_address,omitempty"`
+	// The API key to use to link the Application Server to Network Server.
+	// This API key needs to have RIGHT_APPLICATION_LINK.
+	APIKey string `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
+	// Default message payload formatters to use when there are no formatters
+	// defined on the end device level.
+	DefaultFormatters *MessagePayloadFormatters `protobuf:"bytes,3,opt,name=default_formatters,json=defaultFormatters,proto3" json:"default_formatters,omitempty"`
 	// Enable TLS for linking to the external Network Server.
 	// For cluster-local Network Servers, the cluster's TLS setting is used.
 	TLS bool `protobuf:"varint,4,opt,name=tls,proto3" json:"tls,omitempty"`
@@ -576,11 +580,15 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AsClient interface {
+	// Get a link configuration from the Application Server to Network Server.
+	// This only contains the configuration. Use GetLinkStats to view statistics and any link errors.
 	GetLink(ctx context.Context, in *GetApplicationLinkRequest, opts ...grpc.CallOption) (*ApplicationLink, error)
 	// Set a link configuration from the Application Server a Network Server.
 	// This call returns immediately after setting the link configuration; it does not wait for a link to establish.
-	// To get link statistics or errors, use the `GetLinkStats` call.
+	// To get link statistics or errors, use GetLinkStats.
+	// Note that there can only be one Application Server instance linked to a Network Server for a given application at a time.
 	SetLink(ctx context.Context, in *SetApplicationLinkRequest, opts ...grpc.CallOption) (*ApplicationLink, error)
+	// Delete the link between the Application Server and Network Server for the specified application.
 	DeleteLink(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 	// GetLinkStats returns the link statistics.
 	// This call returns a NotFound error code if there is no link for the given application identifiers.
@@ -634,11 +642,15 @@ func (c *asClient) GetLinkStats(ctx context.Context, in *ApplicationIdentifiers,
 
 // AsServer is the server API for As service.
 type AsServer interface {
+	// Get a link configuration from the Application Server to Network Server.
+	// This only contains the configuration. Use GetLinkStats to view statistics and any link errors.
 	GetLink(context.Context, *GetApplicationLinkRequest) (*ApplicationLink, error)
 	// Set a link configuration from the Application Server a Network Server.
 	// This call returns immediately after setting the link configuration; it does not wait for a link to establish.
-	// To get link statistics or errors, use the `GetLinkStats` call.
+	// To get link statistics or errors, use GetLinkStats.
+	// Note that there can only be one Application Server instance linked to a Network Server for a given application at a time.
 	SetLink(context.Context, *SetApplicationLinkRequest) (*ApplicationLink, error)
+	// Delete the link between the Application Server and Network Server for the specified application.
 	DeleteLink(context.Context, *ApplicationIdentifiers) (*types.Empty, error)
 	// GetLinkStats returns the link statistics.
 	// This call returns a NotFound error code if there is no link for the given application identifiers.
@@ -768,11 +780,18 @@ var _As_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AppAsClient interface {
+	// Subscribe to upstream messages.
 	Subscribe(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (AppAs_SubscribeClient, error)
+	// Push downlink messages to the end of the downlink queue.
 	DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	// Replace the entire downlink queue with the specified messages.
+	// This can also be used to empty the queue by specifying no messages.
 	DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	// List the items currently in the downlink queue.
 	DownlinkQueueList(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*ApplicationDownlinks, error)
+	// Get connection information to connect an MQTT client.
 	GetMQTTConnectionInfo(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*MQTTConnectionInfo, error)
+	// Simulate an upstream message. This can be used to test integrations.
 	SimulateUplink(ctx context.Context, in *ApplicationUp, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
@@ -863,11 +882,18 @@ func (c *appAsClient) SimulateUplink(ctx context.Context, in *ApplicationUp, opt
 
 // AppAsServer is the server API for AppAs service.
 type AppAsServer interface {
+	// Subscribe to upstream messages.
 	Subscribe(*ApplicationIdentifiers, AppAs_SubscribeServer) error
+	// Push downlink messages to the end of the downlink queue.
 	DownlinkQueuePush(context.Context, *DownlinkQueueRequest) (*types.Empty, error)
+	// Replace the entire downlink queue with the specified messages.
+	// This can also be used to empty the queue by specifying no messages.
 	DownlinkQueueReplace(context.Context, *DownlinkQueueRequest) (*types.Empty, error)
+	// List the items currently in the downlink queue.
 	DownlinkQueueList(context.Context, *EndDeviceIdentifiers) (*ApplicationDownlinks, error)
+	// Get connection information to connect an MQTT client.
 	GetMQTTConnectionInfo(context.Context, *ApplicationIdentifiers) (*MQTTConnectionInfo, error)
+	// Simulate an upstream message. This can be used to test integrations.
 	SimulateUplink(context.Context, *ApplicationUp) (*types.Empty, error)
 }
 

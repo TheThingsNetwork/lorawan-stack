@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,19 +17,15 @@ import { Container, Col, Row } from 'react-grid-system'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
 import Tag from '@ttn-lw/components/tag'
-import Spinner from '@ttn-lw/components/spinner'
 
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import withRequest from '@ttn-lw/lib/components/with-request'
 
 import GatewayMap from '@console/components/gateway-map'
-import EntityTitleSection from '@console/components/entity-title-section'
-import KeyValueTag from '@console/components/key-value-tag'
 
 import GatewayEvents from '@console/containers/gateway-events'
-import GatewayConnection from '@console/containers/gateway-connection'
+import GatewayTitleSection from '@console/containers/gateway-title-section'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
@@ -38,37 +34,22 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewGatewayInfo } from '@console/lib/feature-checks'
 
-@withRequest(({ gtwId, loadData }) => loadData(gtwId), () => false)
+import style from './gateway-overview.styl'
+
 @withFeatureRequirement(mayViewGatewayInfo, {
   redirect: '/',
 })
 export default class GatewayOverview extends React.Component {
   static propTypes = {
-    apiKeysTotalCount: PropTypes.number,
-    collaboratorsTotalCount: PropTypes.number,
     gateway: PropTypes.gateway.isRequired,
     gtwId: PropTypes.string.isRequired,
-    mayViewGatewayApiKeys: PropTypes.bool.isRequired,
-    mayViewGatewayCollaborators: PropTypes.bool.isRequired,
-    statusBarFetching: PropTypes.bool.isRequired,
-  }
-
-  static defaultProps = {
-    apiKeysTotalCount: undefined,
-    collaboratorsTotalCount: undefined,
   }
 
   render() {
     const {
       gtwId,
-      collaboratorsTotalCount,
-      apiKeysTotalCount,
-      statusBarFetching,
-      mayViewGatewayApiKeys,
-      mayViewGatewayCollaborators,
       gateway: {
         ids,
-        name,
         description,
         created_at,
         updated_at,
@@ -125,39 +106,18 @@ export default class GatewayOverview extends React.Component {
     ]
 
     return (
-      <React.Fragment>
-        <EntityTitleSection
-          entityId={gtwId}
-          entityName={name}
-          description={description}
-          creationDate={created_at}
-        >
-          <GatewayConnection gtwId={gtwId} />
-          {statusBarFetching ? (
-            <Spinner after={0} faded micro inline>
-              <Message content={sharedMessages.fetching} />
-            </Spinner>
-          ) : (
-            <React.Fragment>
-              {mayViewGatewayCollaborators && (
-                <KeyValueTag
-                  icon="collaborators"
-                  value={collaboratorsTotalCount}
-                  keyMessage={sharedMessages.collaboratorCounted}
-                />
-              )}
-              {mayViewGatewayApiKeys && (
-                <KeyValueTag
-                  icon="api_keys"
-                  value={apiKeysTotalCount}
-                  keyMessage={sharedMessages.apiKeyCounted}
-                />
-              )}
-            </React.Fragment>
-          )}
-        </EntityTitleSection>
+      <>
+        <div className={style.titleSection}>
+          <Container>
+            <IntlHelmet title={sharedMessages.overview} />
+            <Row>
+              <Col sm={12}>
+                <GatewayTitleSection gtwId={gtwId} />
+              </Col>
+            </Row>
+          </Container>
+        </div>
         <Container>
-          <IntlHelmet title={sharedMessages.overview} />
           <Row>
             <Col sm={12} lg={6}>
               <DataSheet data={sheetData} />
@@ -168,7 +128,7 @@ export default class GatewayOverview extends React.Component {
             </Col>
           </Row>
         </Container>
-      </React.Fragment>
+      </>
     )
   }
 }

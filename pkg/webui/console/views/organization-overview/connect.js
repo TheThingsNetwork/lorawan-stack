@@ -15,72 +15,17 @@
 import { connect } from 'react-redux'
 
 import {
-  checkFromState,
-  mayViewOrEditOrganizationApiKeys,
-  mayViewOrEditOrganizationCollaborators,
-} from '@console/lib/feature-checks'
-
-import { getCollaboratorsList } from '@console/store/actions/collaborators'
-import { getApiKeysList } from '@console/store/actions/api-keys'
-
-import {
   selectSelectedOrganization,
   selectSelectedOrganizationId,
 } from '@console/store/selectors/organizations'
-import { selectApiKeysTotalCount, selectApiKeysFetching } from '@console/store/selectors/api-keys'
-import {
-  selectCollaboratorsTotalCount,
-  selectCollaboratorsFetching,
-} from '@console/store/selectors/collaborators'
 
 const mapStateToProps = state => {
   const orgId = selectSelectedOrganizationId(state)
-  const collaboratorsTotalCount = selectCollaboratorsTotalCount(state)
-  const apiKeysTotalCount = selectApiKeysTotalCount(state)
-  const mayViewOrganizationApiKeys = checkFromState(mayViewOrEditOrganizationApiKeys, state)
-  const mayViewOrganizationCollaborators = checkFromState(
-    mayViewOrEditOrganizationCollaborators,
-    state,
-  )
-  const collaboratorsFetching =
-    (mayViewOrganizationCollaborators && collaboratorsTotalCount === undefined) ||
-    selectCollaboratorsFetching(state)
-  const apiKeysFetching =
-    (mayViewOrganizationApiKeys && apiKeysTotalCount === undefined) || selectApiKeysFetching(state)
 
   return {
     orgId,
     organization: selectSelectedOrganization(state),
-    collaboratorsTotalCount,
-    apiKeysTotalCount,
-    mayViewOrganizationApiKeys,
-    mayViewOrganizationCollaborators,
-    statusBarFetching: apiKeysFetching || collaboratorsFetching,
   }
 }
 
-const mapDispatchToProps = dispatch => ({
-  loadData(mayViewOrganizationCollaborators, mayViewOrganizationApiKeys, orgId) {
-    if (mayViewOrganizationCollaborators) dispatch(getCollaboratorsList('organization', orgId))
-    if (mayViewOrganizationApiKeys) dispatch(getApiKeysList('organization', orgId))
-  },
-})
-
-const mergeProps = (stateProps, dispatchProps, ownProps) => ({
-  ...stateProps,
-  ...dispatchProps,
-  ...ownProps,
-  loadData: () =>
-    dispatchProps.loadData(
-      stateProps.mayViewOrganizationCollaborators,
-      stateProps.mayViewOrganizationApiKeys,
-      stateProps.orgId,
-    ),
-})
-
-export default Overview =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-    mergeProps,
-  )(Overview)
+export default Overview => connect(mapStateToProps)(Overview)

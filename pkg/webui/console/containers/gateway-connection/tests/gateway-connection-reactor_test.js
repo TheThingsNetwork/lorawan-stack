@@ -20,7 +20,8 @@ const createEvent = (name, time, identifiers) => ({
   identifiers,
 })
 
-const getEventFixture = () => createEvent('test.name', '2019-09-10T07:30:14.232137918Z', ['id'])
+const getEventFixture = () =>
+  createEvent('test.name', '2019-09-10T07:30:14.232137918Z', [{ device_ids: {} }])
 
 describe('<GatewayConnectionReactor />', () => {
   let driver = null

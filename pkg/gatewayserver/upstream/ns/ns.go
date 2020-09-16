@@ -20,6 +20,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
@@ -65,8 +66,19 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 	if conn.Frontend().SupportsDownlinkClaim() {
 		return nil
 	}
-	h.cluster.ClaimIDs(ctx, ids)
-	defer h.cluster.UnclaimIDs(ctx, ids)
+	logger := log.FromContext(ctx)
+	if err := h.cluster.ClaimIDs(ctx, ids); err != nil {
+		logger.WithError(err).Error("Failed to claim downlink path")
+		return err
+	}
+	logger.Info("Downlink path claimed")
+	defer func() {
+		if err := h.cluster.UnclaimIDs(ctx, ids); err != nil {
+			logger.WithError(err).Error("Failed to unclaim downlink path")
+			return
+		}
+		logger.Info("Downlink path unclaimed")
+	}()
 	<-ctx.Done()
 	return ctx.Err()
 }

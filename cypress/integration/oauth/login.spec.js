@@ -25,7 +25,6 @@ describe('OAuth login', () => {
       .findByRole('img')
       .should('be.visible')
       .should('have.attr', 'src', `${Cypress.config('assetsRootPath')}/logo.svg`)
-    cy.findByText('The Things Stack for LoRaWAN', { selector: 'h1' }).should('be.visible')
     cy.findByText('Please login to continue').should('be.visible')
     cy.findByRole('button', { name: 'Create an account' }).should('be.visible')
     cy.findByRole('button', { name: 'Forgot password?' }).should('be.visible')
