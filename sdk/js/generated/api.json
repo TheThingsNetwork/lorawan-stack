@@ -19086,7 +19086,11 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "bytes.len",
+                    "name": "bytes.min_len",
+                    "value": 0
+                  },
+                  {
+                    "name": "bytes.max_len",
                     "value": 4
                   }
                 ]

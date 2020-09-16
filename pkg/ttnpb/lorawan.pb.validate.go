@@ -64,10 +64,10 @@ func (m *Message) ValidateFields(paths ...string) error {
 
 		case "mic":
 
-			if len(m.GetMIC()) != 4 {
+			if l := len(m.GetMIC()); l < 0 || l > 4 {
 				return MessageValidationError{
 					field:  "mic",
-					reason: "value length must be 4 bytes",
+					reason: "value length must be between 0 and 4 bytes, inclusive",
 				}
 			}
 

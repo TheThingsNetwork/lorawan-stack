@@ -6228,7 +6228,7 @@ Message:
   - name: mic
     type: bytes
     rules:
-      len: 4
+      max_len: 4
     default: ""
   - name: mac_payload
     message:
