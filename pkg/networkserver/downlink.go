@@ -425,7 +425,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	switch {
 	case genState.ApplicationDownlink != nil:
 		loggerWithApplicationDownlinkFields(logger, genState.ApplicationDownlink).Debug("Add application downlink to buffer")
-		pld.FHDR.FCnt = genState.ApplicationDownlink.FCnt
+		pld.FullFCnt = genState.ApplicationDownlink.FCnt
 		pld.FPort = genState.ApplicationDownlink.FPort
 		pld.FRMPayload = genState.ApplicationDownlink.FRMPayload
 		if genState.ApplicationDownlink.Confirmed {
@@ -437,14 +437,16 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		if dev.Session.LastNFCntDown > 0 || len(dev.MACState.RecentDownlinks) > 0 {
 			fCnt = dev.Session.LastNFCntDown + 1
 		}
-		pld.FHDR.FCnt = fCnt
+		pld.FullFCnt = fCnt
 
 	default:
 		return nil, genState, errNoDownlink.New()
 	}
+	pld.FHDR.FCnt = pld.FullFCnt & 0xffff
 
 	logger = logger.WithFields(log.Fields(
 		"f_cnt", pld.FHDR.FCnt,
+		"full_f_cnt", pld.FullFCnt,
 		"f_port", pld.FPort,
 		"m_type", mType,
 	))
@@ -459,7 +461,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			logger.WithField("kek_label", dev.Session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return nil, genState, err
 		}
-		fCnt := pld.FHDR.FCnt
+		fCnt := pld.FullFCnt
 		if pld.FPort != 0 {
 			fCnt = dev.Session.LastNFCntDown
 		}
@@ -480,7 +482,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 				DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 					Downlinks:    dev.Session.QueuedApplicationDownlinks,
-					LastFCntDown: pld.FHDR.FCnt,
+					LastFCntDown: pld.FullFCnt,
 				},
 			},
 		})
@@ -534,19 +536,19 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		mic, err = crypto.ComputeLegacyDownlinkMIC(
 			key,
 			dev.Session.DevAddr,
-			pld.FHDR.FCnt,
+			pld.FullFCnt,
 			b,
 		)
 	} else {
 		var confFCnt uint32
 		if pld.Ack {
-			confFCnt = up.GetPayload().GetMACPayload().GetFCnt()
+			confFCnt = up.GetPayload().GetMACPayload().GetFullFCnt()
 		}
 		mic, err = crypto.ComputeDownlinkMIC(
 			key,
 			dev.Session.DevAddr,
 			confFCnt,
-			pld.FHDR.FCnt,
+			pld.FullFCnt,
 			b,
 		)
 	}
