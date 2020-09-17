@@ -15,103 +15,17 @@
 import { connect } from 'react-redux'
 
 import {
-  checkFromState,
-  mayViewOrEditApplicationApiKeys,
-  mayViewOrEditApplicationCollaborators,
-  mayViewApplicationDevices,
-  mayLinkApplication,
-} from '@console/lib/feature-checks'
-
-import { getCollaboratorsList } from '@console/store/actions/collaborators'
-import { getApiKeysList } from '@console/store/actions/api-keys'
-import { getApplicationLink } from '@console/store/actions/link'
-import { getApplicationDeviceCount } from '@console/store/actions/applications'
-
-import { selectApiKeysTotalCount, selectApiKeysFetching } from '@console/store/selectors/api-keys'
-import {
-  selectCollaboratorsTotalCount,
-  selectCollaboratorsFetching,
-} from '@console/store/selectors/collaborators'
-import {
   selectSelectedApplication,
   selectSelectedApplicationId,
-  selectApplicationLinkIndicator,
-  selectApplicationLinkFetching,
-  selectApplicationDeviceCount,
-  selectApplicationLastSeen,
 } from '@console/store/selectors/applications'
 
-const mapStateToProps = (state, props) => {
+const mapStateToProps = state => {
   const appId = selectSelectedApplicationId(state)
-  const collaboratorsTotalCount = selectCollaboratorsTotalCount(state, { id: appId })
-  const apiKeysTotalCount = selectApiKeysTotalCount(state)
-  const devicesTotalCount = selectApplicationDeviceCount(state)
-  const mayViewApplicationApiKeys = checkFromState(mayViewOrEditApplicationApiKeys, state)
-  const mayViewApplicationCollaborators = checkFromState(
-    mayViewOrEditApplicationCollaborators,
-    state,
-  )
-  const mayViewApplicationLink = checkFromState(mayLinkApplication, state)
-  const mayViewDevices = checkFromState(mayViewApplicationDevices, state)
-  const collaboratorsFetching =
-    (mayViewApplicationCollaborators && collaboratorsTotalCount === undefined) ||
-    selectCollaboratorsFetching(state)
-  const apiKeysFetching =
-    (mayViewApplicationApiKeys && apiKeysTotalCount === undefined) || selectApiKeysFetching(state)
-  const devicesFetching = mayViewDevices && devicesTotalCount === undefined
 
   return {
     appId,
     application: selectSelectedApplication(state),
-    applicationLastSeen: selectApplicationLastSeen(state),
-    collaboratorsTotalCount,
-    apiKeysTotalCount,
-    devicesTotalCount,
-    mayViewApplicationApiKeys,
-    mayViewApplicationCollaborators,
-    mayViewApplicationLink,
-    mayViewDevices,
-    link: selectApplicationLinkIndicator(state),
-    statusBarFetching:
-      collaboratorsFetching ||
-      apiKeysFetching ||
-      devicesFetching ||
-      selectApplicationLinkFetching(state),
   }
 }
 
-const mapDispatchToProps = dispatch => ({
-  loadData(
-    mayViewApplicationCollaborators,
-    mayViewApplicationApiKeys,
-    mayViewApplicationLink,
-    mayViewDevices,
-    appId,
-  ) {
-    if (mayViewApplicationCollaborators) dispatch(getCollaboratorsList('application', appId))
-    if (mayViewApplicationApiKeys) dispatch(getApiKeysList('application', appId))
-    if (mayViewApplicationLink) dispatch(getApplicationLink(appId))
-    if (mayViewDevices) dispatch(getApplicationDeviceCount(appId))
-  },
-})
-
-const mergeProps = (stateProps, dispatchProps, ownProps) => ({
-  ...stateProps,
-  ...dispatchProps,
-  ...ownProps,
-  loadData: () =>
-    dispatchProps.loadData(
-      stateProps.mayViewApplicationCollaborators,
-      stateProps.mayViewApplicationApiKeys,
-      stateProps.mayViewApplicationLink,
-      stateProps.mayViewDevices,
-      stateProps.appId,
-    ),
-})
-
-export default ApplicationOverview =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-    mergeProps,
-  )(ApplicationOverview)
+export default ApplicationOverview => connect(mapStateToProps)(ApplicationOverview)

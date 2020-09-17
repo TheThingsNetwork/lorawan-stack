@@ -912,7 +912,7 @@ func TestTraffic(t *testing.T) {
 				RxDelay:     1,
 				Rx1Freq:     868100000,
 				Rx1DR:       5,
-				XTime:       1553759666,
+				XTime:       12666375505739186,
 				Priority:    25,
 				MuxTime:     1554300787.123456,
 			},
@@ -1019,7 +1019,6 @@ func TestTraffic(t *testing.T) {
 						if err := json.Unmarshal(res, &msg); err != nil {
 							t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 						}
-						msg.XTime = tc.ExpectedBSDownstream.(lbslns.DownlinkMessage).XTime
 						msg.MuxTime = tc.ExpectedBSDownstream.(lbslns.DownlinkMessage).MuxTime
 						if !a.So(msg, should.Resemble, tc.ExpectedBSDownstream.(lbslns.DownlinkMessage)) {
 							t.Fatalf("Incorrect Downlink received: %s", string(res))

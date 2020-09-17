@@ -36,6 +36,7 @@ import { SHARED_NAME as COLLABORATORS_SHARED_NAME } from '@console/store/actions
 import user from './user'
 import users from './users'
 import init from './init'
+import status from './status'
 import applications from './applications'
 import devices from './devices'
 import gateways from './gateways'
@@ -64,6 +65,7 @@ export default history =>
     user,
     users,
     init,
+    status,
     applications,
     link,
     devices,

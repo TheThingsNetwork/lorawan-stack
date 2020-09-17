@@ -127,6 +127,7 @@ type Config struct {
 	DefaultMACSettings     MACSettingConfig             `name:"default-mac-settings" description:"Default MAC settings to fallback to if not specified by device, band or frequency plan"`
 	Interop                config.InteropClient         `name:"interop" description:"Interop client configuration"`
 	DeviceKEKLabel         string                       `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
+	DownlinkQueueCapacity  int                          `name:"downlink-queue-capacity" description:"Maximum downlink queue size per-session"`
 }
 
 // DefaultConfig is the default Network Server configuration.
@@ -149,4 +150,5 @@ var DefaultConfig = Config{
 		StatusTimePeriodicity:  func(v time.Duration) *time.Duration { return &v }(mac.DefaultStatusTimePeriodicity),
 		StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(mac.DefaultStatusCountPeriodicity),
 	},
+	DownlinkQueueCapacity: 10000,
 }

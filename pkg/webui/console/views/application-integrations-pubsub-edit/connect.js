@@ -41,6 +41,7 @@ const pubsubEntitySelector = [
   'downlink_sent',
   'join_accept',
   'location_solved',
+  'service_data',
   'uplink_message',
 ]
 

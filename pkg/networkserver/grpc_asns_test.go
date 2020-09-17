@@ -1084,6 +1084,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							StatusTimePeriodicity:  DurationPtr(0),
 							StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(0),
 						},
+						DownlinkQueueCapacity: 100,
 					},
 					TaskStarter: StartTaskExclude(
 						DownlinkProcessTaskName,
@@ -1778,6 +1779,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 									return tc.AddFunc(ctx, ids, startAt, replace)
 								},
 							},
+							DownlinkQueueCapacity: 100,
 						},
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,
@@ -2076,6 +2078,7 @@ func TestDownlinkQueueList(t *testing.T) {
 									return tc.GetByIDFunc(ctx, appID, devID, gets)
 								},
 							},
+							DownlinkQueueCapacity: 100,
 						},
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,

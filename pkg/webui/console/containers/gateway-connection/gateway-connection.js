@@ -90,7 +90,7 @@ class GatewayConnection extends React.PureComponent {
     }
 
     return (
-      <Status status={statusIndicator} flipped>
+      <Status className={style.status} status={statusIndicator} flipped>
         <Message className={style.lastSeen} content={message} />
         {statusIndicator === 'good' && lastSeen && (
           <DateTime.Relative className={style.dateTime} value={lastSeen} />

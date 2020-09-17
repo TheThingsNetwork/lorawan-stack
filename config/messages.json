@@ -3230,6 +3230,15 @@
       "file": "grpc.go"
     }
   },
+  "error:pkg/events/redis:channel_closed": {
+    "translations": {
+      "en": "channel closed"
+    },
+    "description": {
+      "package": "pkg/events/redis",
+      "file": "redis.go"
+    }
+  },
   "error:pkg/fetch:fetch_file": {
     "translations": {
       "en": "could not fetch file `{filename}`"
@@ -5802,6 +5811,15 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "config.go"
+    }
+  },
+  "error:pkg/networkserver:downlink_queue_capacity_exceeded": {
+    "translations": {
+      "en": "Downlink queue capacity exceeded"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_asns.go"
     }
   },
   "error:pkg/networkserver:duplicate": {

@@ -91,6 +91,7 @@ export default class WebhookTemplateForm extends Component {
       downlink_failed: pathExpand(template.downlink_failed, fields),
       downlink_queued: pathExpand(template.downlink_queued, fields),
       location_solved: pathExpand(template.location_solved, fields),
+      service_data: pathExpand(template.service_data, fields),
     }
 
     if (template.create_downlink_api_key) {

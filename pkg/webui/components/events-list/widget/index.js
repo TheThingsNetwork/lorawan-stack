@@ -15,8 +15,8 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
-import Link from '@ttn-lw/components/link'
 import Status from '@ttn-lw/components/status'
+import WidgetContainer from '@ttn-lw/components/widget-container'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -39,20 +39,23 @@ const EventsWidget = props => {
     truncatedEvents = events.slice(0, limit)
   }
 
+  const title = (
+    <Status flipped status="good">
+      <Message content={sharedMessges.liveData} className={style.headerTitle} />
+    </Status>
+  )
+
   return (
-    <aside className={className}>
+    <WidgetContainer
+      title={title}
+      toAllUrl={toAllUrl}
+      linkMessage={m.seeAllActivity}
+      className={className}
+    >
       <Events events={truncatedEvents} renderEvent={renderEvent} entityId={entityId} widget>
-        <Events.Header className={style.header}>
-          <Status flipped status="good">
-            <Message content={sharedMessges.liveData} className={style.headerTitle} />
-          </Status>
-          <Link className={style.seeAllLink} secondary to={toAllUrl}>
-            <Message content={m.seeAllActivity} /> →
-          </Link>
-        </Events.Header>
         <Events.List />
       </Events>
-    </aside>
+    </WidgetContainer>
   )
 }
 

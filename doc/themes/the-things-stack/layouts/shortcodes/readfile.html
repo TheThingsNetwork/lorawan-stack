@@ -1,0 +1,9 @@
+{{ $f := .Get "path" | readFile }}
+{{ $fs := split $f "\n"}}
+{{ $from := or (.Get "from") 1 }}
+{{ $from = sub $from 1 }}
+{{ $to := or (.Get "to") (len $fs) }}
+{{ $to = sub $to $from }}
+{{ $o := after $from $fs | first $to }}
+{{ $p := delimit $o "\n" }}
+{{ $p | safeHTML }}

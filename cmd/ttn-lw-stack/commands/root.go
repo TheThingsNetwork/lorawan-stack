@@ -61,6 +61,11 @@ var (
 				return err
 			}
 
+			// initialize configuration fallbacks
+			if err := shared.InitializeFallbacks(&config.ServiceBase); err != nil {
+				return err
+			}
+
 			// create logger
 			logger = log.NewLogger(
 				log.WithLevel(config.Base.Log.Level),
@@ -86,12 +91,7 @@ var (
 
 			ctx = log.NewContext(ctx, logger)
 
-			// initialize shared packages
-			if err := shared.Initialize(ctx, &config.ServiceBase); err != nil {
-				return err
-			}
-
-			return err
+			return nil
 		},
 	}
 )

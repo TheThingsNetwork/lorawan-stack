@@ -41,7 +41,6 @@ const createToast = function() {
         info={type === INFO}
         error={type === ERROR}
         warning={type === WARNING}
-        message={type === DEFAULT}
       />,
       {
         onClose: () => next(),

@@ -36,7 +36,7 @@ func TestUpdateInfoResponse(t *testing.T) {
 			CUPSCredentials: bytes.Repeat([]byte("CUPS CREDENTIALS"), 1000),
 			LNSCredentials:  bytes.Repeat([]byte("LNS CREDENTIALS"), 1000),
 			SignatureKeyCRC: 12345678,
-			Signature:       bytes.Repeat([]byte("THIS IS THE SIGNATURE"), 100),
+			Signature:       bytes.Repeat([]byte("THIS IS THE SIGNATURE"), 1000),
 			UpdateData:      bytes.Repeat([]byte("THIS IS THE UPDATE DATA"), 1000),
 		}},
 	} {

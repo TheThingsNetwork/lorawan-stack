@@ -14,3 +14,13 @@
 
 // Package redis provides Redis implementations of interfaces used by networkserver.
 package redis
+
+import ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
+
+func deviceUIDKey(cl *ttnredis.Client, uid string) string {
+	return cl.Key("uid", uid)
+}
+
+func deviceUIDLastInvalidationKey(cl *ttnredis.Client, uid string) string {
+	return ttnredis.Key(deviceUIDKey(cl, uid), "last-invalidation")
+}

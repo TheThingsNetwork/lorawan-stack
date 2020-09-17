@@ -50,6 +50,22 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 )
 
+func NewComponentDeviceRegistryRedis(conf Config, name string) *redis.Client {
+	return redis.New(conf.Redis.WithNamespace(name, "devices"))
+}
+
+func NewNetworkServerDeviceRegistryRedis(conf Config) *redis.Client {
+	return NewComponentDeviceRegistryRedis(conf, "ns")
+}
+
+func NewNetworkServerApplicationUplinkQueueRedis(conf Config) *redis.Client {
+	return redis.New(conf.Redis.WithNamespace("ns", "application-uplinks"))
+}
+
+func NewNetworkServerDownlinkTaskRedis(conf Config) *redis.Client {
+	return redis.New(conf.Redis.WithNamespace("ns", "tasks"))
+}
+
 var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unknown component `{component}`")
 
 var startCommand = &cobra.Command{
@@ -140,6 +156,10 @@ var startCommand = &cobra.Command{
 			return shared.ErrInitializeBaseComponent.WithCause(err)
 		}
 
+		if err := shared.InitializeEvents(ctx, c, config.ServiceBase); err != nil {
+			return err
+		}
+
 		c.RegisterGRPC(events_grpc.NewEventsServer(c.Context(), events.DefaultPubSub()))
 		c.RegisterGRPC(component.NewConfigurationServer(c))
 
@@ -195,11 +215,11 @@ var startCommand = &cobra.Command{
 				uplinkQueueSize = math.MaxInt64
 			}
 			config.NS.ApplicationUplinkQueue.Queue = nsredis.NewApplicationUplinkQueue(
-				redis.New(config.Redis.WithNamespace("ns", "application-uplinks")),
+				NewNetworkServerApplicationUplinkQueueRedis(*config),
 				int64(uplinkQueueSize), redisConsumerGroup, redisConsumerID,
 			)
 			devices := &nsredis.DeviceRegistry{
-				Redis:   redis.New(config.Redis.WithNamespace("ns", "devices")),
+				Redis:   NewNetworkServerDeviceRegistryRedis(*config),
 				LockTTL: time.Second,
 			}
 			if err := devices.Init(); err != nil {
@@ -210,7 +230,7 @@ var startCommand = &cobra.Command{
 				Redis: redis.New(config.Cache.Redis.WithNamespace("ns", "uplink-deduplication")),
 			}
 			nsDownlinkTasks := nsredis.NewDownlinkTaskQueue(
-				redis.New(config.Redis.WithNamespace("ns", "tasks")),
+				NewNetworkServerDownlinkTaskRedis(*config),
 				100000, redisConsumerGroup, redisConsumerID,
 			)
 			if err := nsDownlinkTasks.Init(); err != nil {
@@ -236,7 +256,7 @@ var startCommand = &cobra.Command{
 				Redis: redis.New(config.Redis.WithNamespace("as", "links")),
 			}
 			config.AS.Devices = &asredis.DeviceRegistry{
-				Redis: redis.New(config.Redis.WithNamespace("as", "devices")),
+				Redis: NewComponentDeviceRegistryRedis(*config, "as"),
 			}
 			config.AS.PubSub.Registry = &asiopsredis.PubSubRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("as", "io", "pubsub")),
@@ -259,7 +279,7 @@ var startCommand = &cobra.Command{
 		if start.JoinServer || startDefault {
 			logger.Info("Setting up Join Server")
 			config.JS.Devices = &jsredis.DeviceRegistry{
-				Redis: redis.New(config.Redis.WithNamespace("js", "devices")),
+				Redis: NewComponentDeviceRegistryRedis(*config, "js"),
 			}
 			config.JS.Keys = &jsredis.KeyRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("js", "keys")),

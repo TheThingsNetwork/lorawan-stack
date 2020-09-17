@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,19 +18,13 @@ import { Col, Row, Container } from 'react-grid-system'
 import PAGE_SIZES from '@console/constants/page-sizes'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
-import Status from '@ttn-lw/components/status'
-import Spinner from '@ttn-lw/components/spinner'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import Message from '@ttn-lw/lib/components/message'
-import withRequest from '@ttn-lw/lib/components/with-request'
-
-import KeyValueTag from '@console/components/key-value-tag'
-import EntityTitleSection from '@console/components/entity-title-section'
 
 import DevicesTable from '@console/containers/devices-table'
 import ApplicationEvents from '@console/containers/application-events'
+import ApplicationTitleSection from '@console/containers/application-title-section'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
@@ -41,75 +35,20 @@ import { mayViewApplicationInfo } from '@console/lib/feature-checks'
 
 import style from './application-overview.styl'
 
-@withRequest(({ appId, loadData }) => loadData(appId), () => false)
 @withFeatureRequirement(mayViewApplicationInfo, {
   redirect: '/',
 })
 class ApplicationOverview extends React.Component {
   static propTypes = {
-    apiKeysTotalCount: PropTypes.number,
     appId: PropTypes.string.isRequired,
     application: PropTypes.application.isRequired,
-    applicationLastSeen: PropTypes.string,
-    collaboratorsTotalCount: PropTypes.number,
-    devicesTotalCount: PropTypes.number,
-    link: PropTypes.bool,
-    mayViewApplicationApiKeys: PropTypes.bool.isRequired,
-    mayViewApplicationCollaborators: PropTypes.bool.isRequired,
-    mayViewApplicationLink: PropTypes.bool.isRequired,
-    mayViewDevices: PropTypes.bool.isRequired,
-    statusBarFetching: PropTypes.bool.isRequired,
-  }
-
-  static defaultProps = {
-    apiKeysTotalCount: undefined,
-    applicationLastSeen: undefined,
-    collaboratorsTotalCount: undefined,
-    devicesTotalCount: undefined,
-    link: undefined,
   }
 
   render() {
     const {
-      apiKeysTotalCount,
       appId,
-      application: { name, description, created_at, updated_at },
-      applicationLastSeen,
-      collaboratorsTotalCount,
-      devicesTotalCount,
-      link,
-      mayViewApplicationApiKeys,
-      mayViewApplicationCollaborators,
-      mayViewApplicationLink,
-      mayViewDevices,
-      statusBarFetching,
+      application: { created_at, updated_at },
     } = this.props
-
-    const linkStatus = typeof link === 'boolean' ? (link ? 'good' : 'bad') : 'mediocre'
-    let linkLabel = sharedMessages.fetching
-    let linkElement
-    if (typeof link === 'boolean') {
-      if (link) {
-        if (applicationLastSeen) {
-          linkElement = (
-            <Status className={style.status} status={linkStatus} flipped>
-              <Message content={sharedMessages.lastSeen} />{' '}
-              <DateTime.Relative value={applicationLastSeen} />
-            </Status>
-          )
-        } else {
-          linkLabel = sharedMessages.linked
-        }
-      } else {
-        linkLabel = sharedMessages.notLinked
-      }
-    }
-
-    if (!linkElement) {
-      linkElement = (
-        <Status className={style.status} label={linkLabel} status={linkStatus} flipped />
-      )
-    }
 
     const sheetData = [
       {
@@ -123,46 +62,18 @@ class ApplicationOverview extends React.Component {
     ]
 
     return (
-      <React.Fragment>
-        <EntityTitleSection
-          entityId={appId}
-          entityName={name}
-          description={description}
-          creationDate={created_at}
-        >
-          {statusBarFetching ? (
-            <Spinner after={0} faded micro inline>
-              <Message content={sharedMessages.fetching} />
-            </Spinner>
-          ) : (
-            <React.Fragment>
-              {mayViewApplicationLink && linkElement}
-              {mayViewDevices && (
-                <KeyValueTag
-                  icon="devices"
-                  value={devicesTotalCount}
-                  keyMessage={sharedMessages.deviceCounted}
-                />
-              )}
-              {mayViewApplicationCollaborators && (
-                <KeyValueTag
-                  icon="collaborators"
-                  value={collaboratorsTotalCount}
-                  keyMessage={sharedMessages.collaboratorCounted}
-                />
-              )}
-              {mayViewApplicationApiKeys && (
-                <KeyValueTag
-                  icon="api_keys"
-                  value={apiKeysTotalCount}
-                  keyMessage={sharedMessages.apiKeyCounted}
-                />
-              )}
-            </React.Fragment>
-          )}
-        </EntityTitleSection>
+      <>
+        <div className={style.titleSection}>
+          <Container>
+            <IntlHelmet title={sharedMessages.overview} />
+            <Row>
+              <Col sm={12}>
+                <ApplicationTitleSection appId={appId} />
+              </Col>
+            </Row>
+          </Container>
+        </div>
         <Container>
-          <IntlHelmet title={sharedMessages.overview} />
           <Row>
             <Col sm={12} lg={6}>
               <DataSheet data={sheetData} className={style.generalInformation} />
@@ -177,7 +88,7 @@ class ApplicationOverview extends React.Component {
             </Col>
           </Row>
         </Container>
-      </React.Fragment>
+      </>
     )
   }
 }

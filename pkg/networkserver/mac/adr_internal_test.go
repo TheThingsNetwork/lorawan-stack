@@ -23,7 +23,6 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -92,7 +91,6 @@ func TestLossRate(t *testing.T) {
 	for _, tc := range []struct {
 		Name    string
 		Uplinks []*ttnpb.UplinkMessage
-		NbTrans uint32
 		Rate    float32
 	}{
 		{
@@ -101,7 +99,6 @@ func TestLossRate(t *testing.T) {
 				{FCnt: 12},
 				{FCnt: 13},
 			}),
-			NbTrans: 1,
 		},
 		{
 			Uplinks: ADRMatrixToUplinks([]ADRMatrixRow{
@@ -112,7 +109,6 @@ func TestLossRate(t *testing.T) {
 				{FCnt: 13},
 				{FCnt: 13},
 			}),
-			NbTrans: 2,
 		},
 		{
 			Uplinks: ADRMatrixToUplinks([]ADRMatrixRow{
@@ -126,7 +122,6 @@ func TestLossRate(t *testing.T) {
 				{FCnt: 13},
 				{FCnt: 13},
 			}),
-			NbTrans: 3,
 		},
 		{
 			Uplinks: ADRMatrixToUplinks([]ADRMatrixRow{
@@ -135,7 +130,6 @@ func TestLossRate(t *testing.T) {
 				{FCnt: 12},
 				{FCnt: 13},
 			}),
-			NbTrans: 2,
 		},
 		{
 			Uplinks: ADRMatrixToUplinks([]ADRMatrixRow{
@@ -146,23 +140,20 @@ func TestLossRate(t *testing.T) {
 				{FCnt: 12},
 				{FCnt: 13},
 			}),
-			NbTrans: 3,
 		},
 		{
 			Uplinks: ADRMatrixToUplinks([]ADRMatrixRow{
 				{FCnt: 11},
 				{FCnt: 13},
 			}),
-			NbTrans: 1,
-			Rate:    1. / 3.,
+			Rate: 1. / 3.,
 		},
 		{
 			Uplinks: ADRMatrixToUplinks([]ADRMatrixRow{
 				{FCnt: 11},
 				{FCnt: 14},
 			}),
-			NbTrans: 1,
-			Rate:    2. / 4.,
+			Rate: 2. / 4.,
 		},
 		{
 			Uplinks: ADRMatrixToUplinks([]ADRMatrixRow{
@@ -170,8 +161,7 @@ func TestLossRate(t *testing.T) {
 				{FCnt: 13},
 				{FCnt: 15},
 			}),
-			NbTrans: 1,
-			Rate:    2. / 5.,
+			Rate: 2. / 5.,
 		},
 		{
 			Uplinks: ADRMatrixToUplinks([]ADRMatrixRow{
@@ -181,8 +171,6 @@ func TestLossRate(t *testing.T) {
 				{FCnt: 13},
 				{FCnt: 13},
 			}),
-			NbTrans: 2,
-			Rate:    1. / 6.,
 		},
 		{
 			Uplinks: ADRMatrixToUplinks([]ADRMatrixRow{
@@ -190,8 +178,6 @@ func TestLossRate(t *testing.T) {
 				{FCnt: 12},
 				{FCnt: 13},
 			}),
-			NbTrans: 2,
-			Rate:    1. / 4.,
 		},
 		{
 			Uplinks: ADRMatrixToUplinks([]ADRMatrixRow{
@@ -202,8 +188,6 @@ func TestLossRate(t *testing.T) {
 				{FCnt: 13},
 				{FCnt: 13},
 			}),
-			NbTrans: 3,
-			Rate:    1. / 7.,
 		},
 		{
 			Uplinks: ADRMatrixToUplinks([]ADRMatrixRow{
@@ -214,24 +198,20 @@ func TestLossRate(t *testing.T) {
 				{FCnt: 3},
 				{FCnt: 3},
 			}),
-			NbTrans: 3,
-			Rate:    3. / 7.,
+			Rate: 1. / 3.,
 		},
 	} {
 		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
-			Name: MakeTestCaseName(
-				fmt.Sprintf("nb_trans:%d", tc.NbTrans),
-				strings.Join(func() (ss []string) {
-					for _, up := range tc.Uplinks {
-						ss = append(ss, fmt.Sprintf("%d", up.Payload.GetMACPayload().FHDR.FCnt))
-					}
-					return ss
-				}(), ","),
-			),
+			Name: strings.Join(func() (ss []string) {
+				for _, up := range tc.Uplinks {
+					ss = append(ss, fmt.Sprintf("%d", up.Payload.GetMACPayload().FHDR.FCnt))
+				}
+				return ss
+			}(), ","),
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				a.So(lossRate(tc.NbTrans, tc.Uplinks...), should.Equal, tc.Rate)
+				a.So(lossRate(tc.Uplinks...), should.Equal, tc.Rate)
 			},
 		})
 	}
