@@ -299,7 +299,7 @@ func adaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	if dev.MACState.DesiredParameters.ADRNbTrans > maxNbTrans {
 		dev.MACState.DesiredParameters.ADRNbTrans = maxNbTrans
 	}
-	if len(dev.RecentADRUplinks) >= 2 {
+	if len(dev.RecentADRUplinks) >= optimalADRUplinkCount/2 {
 		switch r := lossRate(dev.RecentADRUplinks...); {
 		case r < 0.05:
 			dev.MACState.DesiredParameters.ADRNbTrans = 1 + dev.MACState.DesiredParameters.ADRNbTrans/3
