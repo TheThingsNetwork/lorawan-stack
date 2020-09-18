@@ -95,6 +95,7 @@ const JoinSettingsForm = React.memo(props => {
           />
           {lwVersion >= 110 && (
             <Form.Field
+              required
               title={sharedMessages.nwkKey}
               name="root_keys.nwk_key.key"
               type="byte"
