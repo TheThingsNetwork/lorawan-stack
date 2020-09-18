@@ -260,7 +260,7 @@ var startCommand = &cobra.Command{
 				Redis: NewComponentDeviceRegistryRedis(*config, "as"),
 			}
 			config.AS.Distribution.PubSub = &asdistribredis.PubSub{
-				Redis: redis.New(config.Redis.WithNamespace("as", "traffic")),
+				Redis: redis.New(config.Cache.Redis.WithNamespace("as", "traffic")),
 			}
 			config.AS.PubSub.Registry = &asiopsredis.PubSubRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("as", "io", "pubsub")),

@@ -2177,6 +2177,15 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:linking_not_implemented": {
+    "translations": {
+      "en": "linking is not implemented"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "grpc.go"
+    }
+  },
   "error:pkg/applicationserver:listen_frontend": {
     "translations": {
       "en": "failed to start frontend listener `{protocol}` on address `{address}`"
@@ -2220,15 +2229,6 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "applicationserver.go"
-    }
-  },
-  "error:pkg/applicationserver:unimplemented": {
-    "translations": {
-      "en": "unimplemented"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "grpc.go"
     }
   },
   "error:pkg/applicationserver:unknown_session": {

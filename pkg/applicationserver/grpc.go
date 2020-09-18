@@ -61,11 +61,11 @@ func (as *ApplicationServer) DeleteLink(ctx context.Context, ids *ttnpb.Applicat
 	return ttnpb.Empty, nil
 }
 
-var errUnimplemented = errors.DefineUnimplemented("unimplemented", "unimplemented")
+var errNotImplemented = errors.DefineUnimplemented("linking_not_implemented", "linking is not implemented")
 
 // GetLinkStats implements ttnpb.AsServer.
 func (as *ApplicationServer) GetLinkStats(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLinkStats, error) {
-	return nil, errUnimplemented.New()
+	return nil, errNotImplemented.New()
 }
 
 // HandleUplink implements ttnpb.NsAsServer.
