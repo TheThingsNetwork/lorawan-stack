@@ -4,6 +4,7 @@ exports[`<SideNavigation /> when it is flat matches snapshot 1`] = `
 <Fragment>
   <nav
     className="navigation"
+    data-test-id="navigation-sidebar"
   >
     <div
       className="mobileHeader"
@@ -112,6 +113,7 @@ exports[`<SideNavigation /> when it is nested matches snapshot 1`] = `
 <Fragment>
   <nav
     className="navigation"
+    data-test-id="navigation-sidebar"
   >
     <div
       className="mobileHeader"

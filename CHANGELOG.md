@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Gateway Server panic on upstream message handling.
+- Incorrect redirects for restricted routes in the Console.
 
 ## [3.9.3] - 2020-09-15
 

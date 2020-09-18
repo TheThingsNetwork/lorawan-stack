@@ -45,9 +45,7 @@ export default class Require extends Component {
     if (typeof otherwise === 'object') {
       const { render, redirect } = otherwise
 
-      if (typeof redirect === 'function') {
-        return <Redirect to={redirect(this.props)} />
-      } else if (typeof redirect === 'string') {
+      if (typeof redirect === 'string') {
         return <Redirect to={redirect} />
       } else if (typeof render === 'function') {
         return render()
