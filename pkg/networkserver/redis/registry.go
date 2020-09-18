@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -291,14 +292,6 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 			if pb.GetMACSettings().GetResetsFCnt() != nil {
 				resetsFCnt = &pb.MACSettings.ResetsFCnt.Value
 			}
-			fCnt := uint32(lsb)
-			switch {
-			case !deviceSupports32BitFCnt(pb), fCnt >= pb.Session.LastFCntUp, fCnt == 0 && pb.Session.LastFCntUp == 0:
-			case fCnt > pb.Session.LastFCntUp&0xffff:
-				fCnt |= pb.Session.LastFCntUp &^ 0xffff
-			case pb.Session.LastFCntUp < 0xffff0000:
-				fCnt |= (pb.Session.LastFCntUp + 0x10000) &^ 0xffff
-			}
 			if pb.ApplicationIdentifiers != appID || pb.DeviceID != devID {
 				return nil, errDatabaseCorruption.New()
 			}
@@ -310,7 +303,7 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 				fNwkSIntKeyKEKLabel:     pb.Session.FNwkSIntKey.KEKLabel,
 				fNwkSIntKeyEncryptedKey: pb.Session.FNwkSIntKey.EncryptedKey,
 				resetsFCnt:              resetsFCnt,
-				fCnt:                    fCnt,
+				fCnt:                    FullFCnt(lsb, pb.Session.LastFCntUp, deviceSupports32BitFCnt(pb)),
 				lastFCnt:                pb.Session.LastFCntUp,
 			})
 		}
