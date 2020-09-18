@@ -1033,7 +1033,26 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 			}
 			a.So(env.Events, should.ReceiveEventsResembling,
 				EvtScheduleJoinAcceptAttempt.With(
-					events.WithData(scheduledDown),
+					events.WithData(&ttnpb.DownlinkMessage{
+						RawPayload: dev.PendingMACState.QueuedJoinAccept.Payload,
+						Payload: &ttnpb.Message{
+							MHDR: ttnpb.MHDR{
+								MType: ttnpb.MType_JOIN_ACCEPT,
+								Major: ttnpb.Major_LORAWAN_R1,
+							},
+							Payload: &ttnpb.Message_JoinAcceptPayload{
+								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
+									NetID:      dev.PendingMACState.QueuedJoinAccept.Request.NetID,
+									DevAddr:    dev.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+									DLSettings: dev.PendingMACState.QueuedJoinAccept.Request.DownlinkSettings,
+									RxDelay:    dev.PendingMACState.QueuedJoinAccept.Request.RxDelay,
+									CFList:     dev.PendingMACState.QueuedJoinAccept.Request.CFList,
+								},
+							},
+						},
+						Settings:       scheduledDown.Settings,
+						CorrelationIDs: scheduledDown.CorrelationIDs,
+					}),
 					events.WithIdentifiers(dev.EndDeviceIdentifiers),
 				).New(ctx),
 				EvtScheduleJoinAcceptSuccess.With(
@@ -1061,7 +1080,8 @@ type DataDownlinkAssertionConfig struct {
 	Priority       ttnpb.TxSchedulePriority
 	AbsoluteTime   *time.Time
 	FixedPaths     []ttnpb.GatewayAntennaIdentifiers
-	Payload        []byte
+	RawPayload     []byte
+	Payload        *ttnpb.Message
 	CorrelationIDs []string
 	PeerIndexes    []uint
 	Responses      []NsGsScheduleDownlinkResponse
@@ -1087,14 +1107,19 @@ func (env TestEnvironment) AssertScheduleDataDownlink(ctx context.Context, conf 
 				RX1Delay:        dev.MACState.CurrentParameters.Rx1Delay,
 				Uplink:          LastUplink(dev.MACState.RecentUplinks...),
 				Priority:        conf.Priority,
-				Payload:         conf.Payload,
+				Payload:         conf.RawPayload,
 				PeerIndexes:     conf.PeerIndexes,
 				Responses:       conf.Responses,
 			})
 			a.So(ok, should.BeTrue)
 			a.So(env.Events, should.ReceiveEventsResembling,
 				EvtScheduleDataDownlinkAttempt.With(
-					events.WithData(scheduledDown),
+					events.WithData(&ttnpb.DownlinkMessage{
+						RawPayload:     conf.RawPayload,
+						Payload:        conf.Payload,
+						Settings:       scheduledDown.Settings,
+						CorrelationIDs: scheduledDown.CorrelationIDs,
+					}),
 					events.WithIdentifiers(dev.EndDeviceIdentifiers),
 				).New(ctx),
 				EvtScheduleDataDownlinkSuccess.With(

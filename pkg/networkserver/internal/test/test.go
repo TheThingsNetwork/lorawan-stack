@@ -72,6 +72,11 @@ func CopyStrings(ss []string) []string {
 	return append([]string{}, ss...)
 }
 
+// CopyMessage returns a deep copy of *ttnpb.Message pb.
+func CopyMessage(pb *ttnpb.Message) *ttnpb.Message {
+	return deepcopy.Copy(pb).(*ttnpb.Message)
+}
+
 // CopyUplinkMessages returns a deep copy of ...*ttnpb.UplinkMessage pbs.
 func CopyUplinkMessages(pbs ...*ttnpb.UplinkMessage) []*ttnpb.UplinkMessage {
 	return deepcopy.Copy(pbs).([]*ttnpb.UplinkMessage)
@@ -638,6 +643,8 @@ func MustEncryptDownlink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32
 }
 
 type DataDownlinkConfig struct {
+	DecodePayload bool
+
 	Confirmed  bool
 	MACVersion ttnpb.MACVersion
 	DevAddr    types.DevAddr
@@ -651,7 +658,7 @@ type DataDownlinkConfig struct {
 	SessionKeys *ttnpb.SessionKeys
 }
 
-func MakeDataDownlinkPHYPayload(conf DataDownlinkConfig) []byte {
+func MakeDataDownlink(conf DataDownlinkConfig) *ttnpb.DownlinkMessage {
 	if !conf.FCtrl.Ack && conf.ConfFCntUp > 0 {
 		panic("ConfFCntDown must be zero for uplink frames with ACK bit unset")
 	}
@@ -668,7 +675,7 @@ func MakeDataDownlinkPHYPayload(conf DataDownlinkConfig) []byte {
 	if conf.Confirmed {
 		mType = ttnpb.MType_CONFIRMED_DOWN
 	}
-	phyPayload := test.Must(lorawan.MarshalMessage(ttnpb.Message{
+	msg := &ttnpb.Message{
 		MHDR: ttnpb.MHDR{
 			MType: mType,
 			Major: ttnpb.Major_LORAWAN_R1,
@@ -681,11 +688,13 @@ func MakeDataDownlinkPHYPayload(conf DataDownlinkConfig) []byte {
 					FCnt:    conf.FCnt & 0xffff,
 					FOpts:   fOpts,
 				},
+				FullFCnt:   conf.FCnt,
 				FPort:      uint32(conf.FPort),
 				FRMPayload: frmPayload,
 			},
 		},
-	})).([]byte)
+	}
+	phyPayload := test.Must(lorawan.MarshalMessage(*msg)).([]byte)
 	var mic [4]byte
 	switch {
 	case conf.MACVersion.Compare(ttnpb.MAC_V1_1) < 0:
@@ -693,7 +702,16 @@ func MakeDataDownlinkPHYPayload(conf DataDownlinkConfig) []byte {
 	default:
 		mic = test.Must(crypto.ComputeDownlinkMIC(*keys.SNwkSIntKey.Key, devAddr, conf.ConfFCntUp, conf.FCnt, phyPayload)).([4]byte)
 	}
-	return append(phyPayload, mic[:]...)
+	msg.MIC = mic[:]
+	return &ttnpb.DownlinkMessage{
+		RawPayload: append(phyPayload, mic[:]...),
+		Payload: func() *ttnpb.Message {
+			if !conf.DecodePayload {
+				return nil
+			}
+			return msg
+		}(),
+	}
 }
 
 func MakeTestCaseName(parts ...string) string {

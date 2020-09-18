@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Decoded downlink payloads are now published as part of downlink attempt events.
+- Decoded downlink payloads are stored now by Network Server.
+- Raw downlink PHY payloads are not stored anymore by Network Server.
+
 ### Deprecated
 
 ### Removed

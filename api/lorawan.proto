@@ -28,7 +28,7 @@ message Message {
   option (gogoproto.populate) = false;
 
   MHDR m_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  bytes mic = 2 [(gogoproto.customname) = "MIC", (validate.rules).bytes.len = 4];
+  bytes mic = 2 [(gogoproto.customname) = "MIC", (validate.rules).bytes = { min_len: 0, max_len: 4 }];
 
   // Payload represents either MACPayload, RejoinRequestPayload, JoinRequestPayload or JoinAcceptPayload
   // - MACPayload length is in range [7:M] bytes, where M is PHY specific.
