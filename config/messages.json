@@ -6029,6 +6029,15 @@
       "file": "grpc_gsns.go"
     }
   },
+  "error:pkg/networkserver:retransmission_delay_exceeded": {
+    "translations": {
+      "en": "retransmission delay exceeded maximum"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_gsns.go"
+    }
+  },
   "error:pkg/networkserver:schedule": {
     "translations": {
       "en": "all downlink scheduling attempts failed"
@@ -6038,9 +6047,27 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:transmission_number_exceeded": {
+    "translations": {
+      "en": "transmission number exceeded maximum"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_gsns.go"
+    }
+  },
   "error:pkg/networkserver:unknown_chanel": {
     "translations": {
       "en": "channel is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:unknown_f_nwk_s_int_key": {
+    "translations": {
+      "en": "FNwkSIntKey is unknown"
     },
     "description": {
       "package": "pkg/networkserver",
