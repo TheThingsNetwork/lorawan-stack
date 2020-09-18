@@ -246,3 +246,23 @@ func (dst *ApplicationLinkStats) SetFields(src *ApplicationLinkStats, paths ...s
 	}
 	return nil
 }
+
+func (dst *NsAsHandleUplinkRequest) SetFields(src *NsAsHandleUplinkRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "application_ups":
+			if len(subs) > 0 {
+				return fmt.Errorf("'application_ups' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ApplicationUps = src.ApplicationUps
+			} else {
+				dst.ApplicationUps = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

@@ -265,7 +265,7 @@ func TestTraffic(t *testing.T) {
 					}
 				}()
 
-				err := sub.SendUp(ctx, tc.Message)
+				err := sub.Publish(ctx, tc.Message)
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
 				}

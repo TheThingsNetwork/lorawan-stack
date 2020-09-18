@@ -25,6 +25,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
+	asdistribredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution/redis"
 	asioapredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/redis"
 	asiopsredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/redis"
 	asiowebredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/redis"
@@ -257,6 +258,9 @@ var startCommand = &cobra.Command{
 			}
 			config.AS.Devices = &asredis.DeviceRegistry{
 				Redis: NewComponentDeviceRegistryRedis(*config, "as"),
+			}
+			config.AS.Distribution.PubSub = &asdistribredis.PubSub{
+				Redis: redis.New(config.Cache.Redis.WithNamespace("as", "traffic")),
 			}
 			config.AS.PubSub.Registry = &asiopsredis.PubSubRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("as", "io", "pubsub")),

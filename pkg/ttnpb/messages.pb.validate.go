@@ -1394,13 +1394,6 @@ func (m *ApplicationInvalidatedDownlinks) ValidateFields(paths ...string) error 
 		switch name {
 		case "downlinks":
 
-			if len(m.GetDownlinks()) < 1 {
-				return ApplicationInvalidatedDownlinksValidationError{
-					field:  "downlinks",
-					reason: "value must contain at least 1 item(s)",
-				}
-			}
-
 			for idx, item := range m.GetDownlinks() {
 				_, _ = idx, item
 

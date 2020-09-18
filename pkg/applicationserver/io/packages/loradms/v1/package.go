@@ -138,7 +138,7 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 
 	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loradas:%s", events.NewCorrelationID()))...)
 	now := time.Now().UTC()
-	err = p.server.SendUp(ctx, &ttnpb.ApplicationUp{
+	err = p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: up.EndDeviceIdentifiers,
 		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
 		ReceivedAt:           &now,

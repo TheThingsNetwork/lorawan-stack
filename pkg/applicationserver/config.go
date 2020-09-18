@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	loraclouddevicemanagementv1 "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1"
@@ -29,16 +30,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-)
-
-// LinkMode defines how applications are linked to their Network Server.
-type LinkMode int
-
-const (
-	// LinkAll links all applications in the link registry to their Network Server automatically.
-	LinkAll LinkMode = iota
-	// LinkExplicit links applications on request.
-	LinkExplicit
 )
 
 // InteropClient is a client, which Application Server can use for interoperability.
@@ -54,29 +45,15 @@ type InteropConfig struct {
 
 // Config represents the ApplicationServer configuration.
 type Config struct {
-	LinkMode       string                    `name:"link-mode" description:"Mode to link applications to their Network Server (all, explicit)"`
 	Devices        DeviceRegistry            `name:"-"`
 	Links          LinkRegistry              `name:"-"`
+	Distribution   DistributionConfig        `name:"distribution" description:"Distribution configuration"`
 	MQTT           config.MQTT               `name:"mqtt" description:"MQTT configuration"`
 	Webhooks       WebhooksConfig            `name:"webhooks" description:"Webhooks configuration"`
 	PubSub         PubSubConfig              `name:"pubsub" description:"Pub/sub messaging configuration"`
 	Packages       ApplicationPackagesConfig `name:"packages" description:"Application packages configuration"`
 	Interop        InteropConfig             `name:"interop" description:"Interop client configuration"`
 	DeviceKEKLabel string                    `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
-}
-
-var errLinkMode = errors.DefineInvalidArgument("link_mode", "invalid link mode `{value}`")
-
-// GetLinkMode returns the converted configuration's link mode to LinkMode.
-func (c Config) GetLinkMode() (LinkMode, error) {
-	switch c.LinkMode {
-	case "all":
-		return LinkAll, nil
-	case "explicit":
-		return LinkExplicit, nil
-	default:
-		return LinkMode(0), errLinkMode.WithAttributes("value", c.LinkMode)
-	}
 }
 
 var (
@@ -93,6 +70,12 @@ type WebhooksConfig struct {
 	Workers   int                 `name:"workers" description:"Number of workers to process requests"`
 	Templates web.TemplatesConfig `name:"templates" description:"The store of the webhook templates"`
 	Downlinks web.DownlinksConfig `name:"downlink" description:"The downlink queue operations configuration"`
+}
+
+// DistributionConfig contains the upstream traffic distribution configuration of the Application Server.
+type DistributionConfig struct {
+	PubSub  distribution.PubSub `name:"-"`
+	Timeout time.Duration       `name:"timeout" description:"Wait timeout of an empty subscription set"`
 }
 
 // PubSubConfig contains go-cloud pub/sub configuration of the Application Server.
@@ -139,7 +122,7 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 			}
 		}()
 	}
-	return web.NewWebhooks(ctx, server, c.Registry, target, c.Downlinks), nil
+	return web.NewWebhooks(ctx, server, c.Registry, target, c.Downlinks)
 }
 
 // NewPubSub returns a new pubsub.PubSub based on the configuration.

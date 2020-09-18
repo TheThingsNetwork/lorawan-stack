@@ -27,10 +27,12 @@
   - [Message `ApplicationLink`](#ttn.lorawan.v3.ApplicationLink)
   - [Message `ApplicationLinkStats`](#ttn.lorawan.v3.ApplicationLinkStats)
   - [Message `GetApplicationLinkRequest`](#ttn.lorawan.v3.GetApplicationLinkRequest)
+  - [Message `NsAsHandleUplinkRequest`](#ttn.lorawan.v3.NsAsHandleUplinkRequest)
   - [Message `SetApplicationLinkRequest`](#ttn.lorawan.v3.SetApplicationLinkRequest)
   - [Service `AppAs`](#ttn.lorawan.v3.AppAs)
   - [Service `As`](#ttn.lorawan.v3.As)
   - [Service `AsEndDeviceRegistry`](#ttn.lorawan.v3.AsEndDeviceRegistry)
+  - [Service `NsAs`](#ttn.lorawan.v3.NsAs)
 - [File `lorawan-stack/api/applicationserver_packages.proto`](#lorawan-stack/api/applicationserver_packages.proto)
   - [Message `ApplicationPackage`](#ttn.lorawan.v3.ApplicationPackage)
   - [Message `ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation)
@@ -776,6 +778,18 @@ Link stats as monitored by the Application Server.
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.NsAsHandleUplinkRequest">Message `NsAsHandleUplinkRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ups` | [`ApplicationUp`](#ttn.lorawan.v3.ApplicationUp) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ups` | <p>`repeated.min_items`: `1`</p> |
+
 ### <a name="ttn.lorawan.v3.SetApplicationLinkRequest">Message `SetApplicationLinkRequest`</a>
 
 | Field | Type | Label | Description |
@@ -852,6 +866,14 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `Set` | `PUT` | `/api/v3/as/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}` | `*` |
 | `Set` | `POST` | `/api/v3/as/applications/{end_device.ids.application_ids.application_id}/devices` | `*` |
 | `Delete` | `DELETE` | `/api/v3/as/applications/{application_ids.application_id}/devices/{device_id}` |  |
+
+### <a name="ttn.lorawan.v3.NsAs">Service `NsAs`</a>
+
+The NsAs service connects a Network Server to an Application Server.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `HandleUplink` | [`NsAsHandleUplinkRequest`](#ttn.lorawan.v3.NsAsHandleUplinkRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
 
 ## <a name="lorawan-stack/api/applicationserver_packages.proto">File `lorawan-stack/api/applicationserver_packages.proto`</a>
 
@@ -4966,12 +4988,6 @@ Encodes and decodes uplink messages.
 | ----- | ---- | ----- | ----------- |
 | `downlinks` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) | repeated |  |
 | `last_f_cnt_down` | [`uint32`](#uint32) |  |  |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `downlinks` | <p>`repeated.min_items`: `1`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationJoinAccept">Message `ApplicationJoinAccept`</a>
 

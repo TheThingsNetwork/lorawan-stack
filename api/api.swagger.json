@@ -1049,7 +1049,7 @@
     },
     "/as/applications/{application_ids.application_id}/link": {
       "get": {
-        "summary": "Get returns the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
+        "summary": "Subscribe to upstream messages.",
         "operationId": "As_GetLink",
         "responses": {
           "200": {
@@ -1089,7 +1089,7 @@
         ]
       },
       "put": {
-        "summary": "Set creates or updates the device.",
+        "summary": "Push downlink messages to the end of the downlink queue.",
         "operationId": "As_SetLink",
         "responses": {
           "200": {
@@ -1165,7 +1165,7 @@
     },
     "/as/applications/{application_id}/link": {
       "delete": {
-        "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
+        "summary": "Replace the entire downlink queue with the specified messages.\nThis can also be used to empty the queue by specifying no messages.",
         "operationId": "As_DeleteLink",
         "responses": {
           "200": {
@@ -1196,6 +1196,7 @@
     },
     "/as/applications/{application_id}/link/stats": {
       "get": {
+        "summary": "List the items currently in the downlink queue.",
         "operationId": "As_GetLinkStats",
         "responses": {
           "200": {

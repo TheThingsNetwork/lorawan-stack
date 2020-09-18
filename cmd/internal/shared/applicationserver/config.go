@@ -31,7 +31,6 @@ var DefaultWebhookTemplatesConfig = web.TemplatesConfig{
 
 // DefaultApplicationServerConfig is the default configuration for the Application Server.
 var DefaultApplicationServerConfig = applicationserver.Config{
-	LinkMode: "all",
 	MQTT: config.MQTT{
 		Listen:           ":1883",
 		ListenTLS:        ":8883",
@@ -45,5 +44,8 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		QueueSize: 16,
 		Workers:   16,
 		Downlinks: web.DownlinksConfig{PublicAddress: shared.DefaultPublicURL + "/api/v3"},
+	},
+	Distribution: applicationserver.DistributionConfig{
+		Timeout: time.Minute,
 	},
 }

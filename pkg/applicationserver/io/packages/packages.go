@@ -38,18 +38,36 @@ type server struct {
 // Server is an application packages frontend.
 type Server interface {
 	rpcserver.Registerer
-	NewSubscription() *io.Subscription
 }
 
 // New returns an application packages server wrapping the given registries and handlers.
 func New(ctx context.Context, io io.Server, registry Registry, handlers map[string]ApplicationPackageHandler) (Server, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages")
-	return &server{
+	s := &server{
 		ctx:      ctx,
 		io:       io,
 		registry: registry,
 		handlers: handlers,
-	}, nil
+	}
+	sub, err := io.Subscribe(ctx, "applicationpackages", nil, false)
+	if err != nil {
+		return nil, err
+	}
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-sub.Context().Done():
+				return
+			case up := <-sub.Up():
+				if err := s.handleUp(up.Context, up.ApplicationUp); err != nil {
+					log.FromContext(s.ctx).WithError(err).Warn("Failed to handle message")
+				}
+			}
+		}
+	}()
+	return s, nil
 }
 
 type associationsPair struct {
@@ -130,22 +148,4 @@ func (s *server) RegisterHandlers(rs *runtime.ServeMux, conn *grpc.ClientConn) {
 	for _, subsystem := range s.handlers {
 		subsystem.RegisterHandlers(rs, conn)
 	}
-}
-
-// NewSubscription creates a new default subscription for upstream application packages traffic.
-func (s *server) NewSubscription() *io.Subscription {
-	sub := io.NewSubscription(s.ctx, "applicationpackages", nil)
-	go func() {
-		for {
-			select {
-			case <-sub.Context().Done():
-				return
-			case up := <-sub.Up():
-				if err := s.handleUp(up.Context, up.ApplicationUp); err != nil {
-					log.FromContext(s.ctx).WithError(err).Warn("Failed to handle message")
-				}
-			}
-		}
-	}()
-	return sub
 }
