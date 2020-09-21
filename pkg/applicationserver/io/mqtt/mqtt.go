@@ -253,12 +253,8 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "application_uid", uid)
 
-	if err := rights.RequireApplication(ctx, ids); err != nil {
-		return nil, err
-	}
-
 	var err error
-	c.io, err = c.server.Subscribe(ctx, "mqtt", &ids, true)
+	c.io, err = c.server.Subscribe(ctx, "mqtt", ids)
 	if err != nil {
 		return nil, err
 	}

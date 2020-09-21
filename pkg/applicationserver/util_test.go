@@ -24,11 +24,11 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -62,21 +62,17 @@ type mockNS struct {
 	upCh            chan *ttnpb.ApplicationUp
 	downlinkQueueMu sync.RWMutex
 	downlinkQueue   map[string][]*ttnpb.ApplicationDownlink
+	validateAuth    func(rpcmetadata.MD) bool
 }
 
-type mockNSASConn struct {
-	cc   *grpc.ClientConn
-	auth grpc.CallOption
-}
-
-func startMockNS(ctx context.Context, link chan *mockNSASConn) (*mockNS, string) {
+func startMockNS(ctx context.Context, validateAuth func(rpcmetadata.MD) bool) (*mockNS, string) {
 	ns := &mockNS{
 		linkCh:        make(chan ttnpb.ApplicationIdentifiers, 1),
 		unlinkCh:      make(chan ttnpb.ApplicationIdentifiers, 1),
 		upCh:          make(chan *ttnpb.ApplicationUp, 1),
 		downlinkQueue: make(map[string][]*ttnpb.ApplicationDownlink),
+		validateAuth:  validateAuth,
 	}
-	go ns.sendTraffic(ctx, link)
 	srv := rpcserver.New(ctx)
 	ttnpb.RegisterAsNsServer(srv.Server, ns)
 	lis, err := net.Listen("tcp", "localhost:0")
@@ -90,28 +86,39 @@ func startMockNS(ctx context.Context, link chan *mockNSASConn) (*mockNS, string)
 var errPermissionDenied = errors.DefinePermissionDenied("permission_denied", "permission denied")
 
 func (ns *mockNS) LinkApplication(stream ttnpb.AsNs_LinkApplicationServer) error {
-	panic("unused")
-}
-
-func (ns *mockNS) sendTraffic(ctx context.Context, link chan *mockNSASConn) {
-	var cc *grpc.ClientConn
-	var auth grpc.CallOption
-	select {
-	case <-ctx.Done():
-		return
-	case l := <-link:
-		cc, auth = l.cc, l.auth
+	ctx := stream.Context()
+	md := rpcmetadata.FromIncomingContext(ctx)
+	ids := ttnpb.ApplicationIdentifiers{
+		ApplicationID: md.ID,
 	}
-	client := ttnpb.NewNsAsClient(cc)
+	if err := ids.ValidateContext(ctx); err != nil {
+		return err
+	}
+	if !ns.validateAuth(md) {
+		return errPermissionDenied.New()
+	}
+
+	select {
+	case ns.linkCh <- ids:
+	default:
+	}
+	defer func() {
+		select {
+		case ns.unlinkCh <- ids:
+		default:
+		}
+	}()
+
 	for {
 		select {
-		case <-ctx.Done():
-			return
+		case <-stream.Context().Done():
+			return nil
 		case up := <-ns.upCh:
-			if _, err := client.HandleUplink(ctx, &ttnpb.NsAsHandleUplinkRequest{
-				ApplicationUps: []*ttnpb.ApplicationUp{up},
-			}, auth); err != nil {
-				panic(err)
+			if err := stream.Send(up); err != nil {
+				return err
+			}
+			if _, err := stream.Recv(); err != nil {
+				return err
 			}
 		}
 	}
