@@ -191,6 +191,7 @@ func TestAssociations(t *testing.T) {
 	c.RegisterGRPC(srv)
 	componenttest.StartComponent(t, c)
 	defer c.Close()
+	sub := srv.NewSubscription()
 
 	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
 		AuthType:      "Bearer",
@@ -323,7 +324,7 @@ func TestAssociations(t *testing.T) {
 			t.Run(tc.name, func(t *testing.T) {
 				a := assertions.New(t)
 
-				err := as.Publish(ctx, tc.up)
+				err := sub.SendUp(ctx, tc.up)
 				a.So(err, should.BeNil)
 
 				select {
@@ -367,7 +368,7 @@ func TestAssociations(t *testing.T) {
 		a.So(res, should.NotBeNil)
 		a.So(res.Associations, should.BeEmpty)
 
-		err = as.Publish(ctx, &registeredApplicationUp1)
+		err = sub.SendUp(ctx, &registeredApplicationUp1)
 		a.So(err, should.BeNil)
 		select {
 		case <-handleUpCh:

@@ -22,6 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -226,6 +227,13 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		"provider", fmt.Sprintf("%T", pb.Provider),
 	))
 	logger := log.FromContext(ctx)
+	ctx = rights.NewContext(ctx, rights.Rights{
+		ApplicationRights: map[string]*ttnpb.Rights{
+			appUID: {
+				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_TRAFFIC_READ}, // Required by io.Subscribe.
+			},
+		},
+	})
 	ctx, cancel := errorcontext.New(ctx)
 	defer func() {
 		cancel(err)
@@ -267,7 +275,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 			logger.Debug("Shutdown pub/sub connection success")
 		}
 	}()
-	i.sub, err = ps.server.Subscribe(ctx, "pubsub", &pb.ApplicationIdentifiers, false)
+	i.sub, err = ps.server.Subscribe(ctx, "pubsub", pb.ApplicationIdentifiers)
 	if err != nil {
 		return err
 	}

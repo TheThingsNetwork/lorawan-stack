@@ -243,6 +243,8 @@ ApplicationInvalidatedDownlinks:
   name: ApplicationInvalidatedDownlinks
   fields:
   - name: downlinks
+    rules:
+      min_items: 1
     repeated:
       message:
         name: ApplicationDownlink
@@ -6282,16 +6284,6 @@ MessagePayloadFormatters:
     comment: Parameter for the down_formatter, must be set together.
     type: string
     default: ""
-NsAsHandleUplinkRequest:
-  name: NsAsHandleUplinkRequest
-  fields:
-  - name: application_ups
-    rules:
-      min_items: 1
-    repeated:
-      message:
-        name: ApplicationUp
-    default: []
 NwkSKeysResponse:
   name: NwkSKeysResponse
   fields:
