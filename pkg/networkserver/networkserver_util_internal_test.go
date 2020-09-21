@@ -2044,6 +2044,6 @@ func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.Application
 }
 
 // RangeByUplinkMatches panics.
-func (m MockDeviceRegistry) RangeByUplinkMatches(context.Context, *ttnpb.UplinkMessage, time.Duration, func(context.Context, UplinkMatch) bool) error {
+func (m MockDeviceRegistry) RangeByUplinkMatches(context.Context, *ttnpb.UplinkMessage, time.Duration, func(context.Context, UplinkMatch) (bool, error)) error {
 	panic("RangeByUplinkMatches must not be called")
 }

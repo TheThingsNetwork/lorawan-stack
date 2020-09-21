@@ -458,7 +458,7 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 var errNoUplinkMatch = errors.DefineNotFound("no_uplink_match", "no device matches uplink")
 
 // RangeByUplinkMatches ranges over devices matching the uplink.
-func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, cacheTTL time.Duration, f func(context.Context, networkserver.UplinkMatch) bool) error {
+func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, cacheTTL time.Duration, f func(context.Context, networkserver.UplinkMatch) (bool, error)) error {
 	defer trace.StartRegion(ctx, "range end devices by dev_addr").End()
 	if cacheTTL < time.Millisecond {
 		// TODO: Remove once https://github.com/TheThingsNetwork/lorawan-stack/issues/2698 is closed.
@@ -607,11 +607,15 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			return err
 		}
 		for _, m := range ms {
-			if f(ctx, m) {
+			ok, err := f(ctx, m)
+			if err != nil {
+				return errNoUplinkMatch.WithCause(err)
+			}
+			if ok {
 				return nil
 			}
 		}
-		return errNoUplinkMatch
+		return errNoUplinkMatch.New()
 
 	default:
 		log.FromContext(ctx).WithField("value", v).WithError(err).Error("Failed to process matching result")
@@ -668,7 +672,11 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			return err
 		}
 		for _, m := range ms {
-			if f(ctx, m) {
+			ok, err := f(ctx, m)
+			if err != nil {
+				return errNoUplinkMatch.WithCause(err)
+			}
+			if ok {
 				b, err := msgpack.Marshal(MatchResult{
 					Key: scanKeys[0],
 					UID: uid,
@@ -693,7 +701,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			args = append(args, vsUID)
 		}
 	}
-	return errNoUplinkMatch
+	return errNoUplinkMatch.New()
 }
 
 func equalEUI64(x, y *types.EUI64) bool {

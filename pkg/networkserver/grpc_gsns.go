@@ -729,12 +729,12 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	)
 	const matchTTL = time.Minute
 	if err := ns.devices.RangeByUplinkMatches(ctx, up, matchTTL,
-		func(ctx context.Context, match UplinkMatch) bool {
+		func(ctx context.Context, match UplinkMatch) (bool, error) {
 			if pld.Ack && match.IsPending() {
 				// TODO: Perform this optimization in the storage backend.
 				// (https://github.com/TheThingsNetwork/lorawan-stack/issues/3254)
 				log.FromContext(ctx).Debug("Uplink carrying ACK for pending session, skip")
-				return false
+				return false, nil
 			}
 
 			appID := match.ApplicationIdentifiers()
@@ -751,7 +751,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			fNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, *fNwkSIntKeyEnvelope, ns.KeyVault)
 			if err != nil {
 				log.FromContext(ctx).WithError(err).WithField("kek_label", fNwkSIntKeyEnvelope.KEKLabel).Warn("Failed to unwrap FNwkSIntKey, skip")
-				return false
+				return false, nil
 			}
 			isPending := match.IsPending()
 			fCnt := match.FCnt()
@@ -769,14 +769,14 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 						ResetsFCnt: match.ResetsFCnt(),
 					},
 				}, ns.defaultMACSettings) {
-					return false
+					return false, nil
 				}
 
 				// FCnt reset
 				fCnt = pld.FCnt
 				cmacF, ok = matchCmacF(ctx, fNwkSIntKey, macVersion, fCnt, up)
 				if !ok {
-					return false
+					return false, nil
 				}
 				matchType = fCntResetMatch
 			}
@@ -789,22 +789,19 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			dev, ctx, err := ns.devices.GetByID(ctx, appID, devID, handleDataUplinkGetPaths[:])
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Warn("Failed to get device after cmacF matching")
-				return false
+				return false, nil
 			}
 			matched, ok, err = ns.matchAndHandleDataUplink(ctx, dev, up, false, cmacFMatchingResult{
 				MatchType: matchType,
 				FullFCnt:  fCnt,
 				CmacF:     cmacF,
 			})
-			return ok
+			return ok, err
 		}); err != nil {
 		logRegistryRPCError(ctx, err, "Failed to find devices in registry by DevAddr")
-		return err
+		return errDeviceNotFound.WithCause(err)
 	}
 	if !ok {
-		if err != nil {
-			return errDeviceNotFound.WithCause(err)
-		}
 		return errDeviceNotFound
 	}
 

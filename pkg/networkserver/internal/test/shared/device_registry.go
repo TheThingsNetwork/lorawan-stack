@@ -46,7 +46,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		}
 		var matched bool
 		var attempts []UplinkMatch
-		err := reg.RangeByUplinkMatches(ctx, up, CacheTTL, func(storedCtx context.Context, match UplinkMatch) bool {
+		err := reg.RangeByUplinkMatches(ctx, up, CacheTTL, func(storedCtx context.Context, match UplinkMatch) (bool, error) {
 			attempts = append(attempts, match)
 			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 			matched = test.AllTrue(
@@ -59,7 +59,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 				match.IsPending() == expectedMatch.IsPending,
 				match.ResetsFCnt() == expectedMatch.GetMACSettings().GetResetsFCnt(),
 			)
-			return matched
+			return matched, nil
 		})
 		if !a.So(len(attempts), should.BeLessThanOrEqualTo, maxAttempts) {
 			t.Errorf("Attempted matches: %s", pretty.Sprint(attempts))
@@ -77,10 +77,10 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		t.Helper()
 
 		var attempts []UplinkMatch
-		err := reg.RangeByUplinkMatches(ctx, up, CacheTTL, func(storedCtx context.Context, match UplinkMatch) bool {
+		err := reg.RangeByUplinkMatches(ctx, up, CacheTTL, func(storedCtx context.Context, match UplinkMatch) (bool, error) {
 			attempts = append(attempts, match)
 			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-			return false
+			return false, nil
 		})
 		if !a.So(len(attempts), should.BeLessThanOrEqualTo, maxAttempts) {
 			t.Errorf("Attempted matches: %s", pretty.Sprint(attempts))
