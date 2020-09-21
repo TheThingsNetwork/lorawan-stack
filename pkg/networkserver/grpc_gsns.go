@@ -268,30 +268,30 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			return nil, false, nil
 		}
 		ctx = log.NewContextWithField(ctx, "transmission", nbTrans)
-		if nbTrans < 2 || lastAt.IsZero() {
+		if nbTrans >= 2 && lastAt.IsZero() {
 			log.FromContext(ctx).Debug("Repeated FCnt value, but frame is not a retransmission, skip")
 			return nil, false, nil
 		}
 
-		maxDelay := maxRetransmissionDelay(dev.MACState.CurrentParameters.Rx1Delay)
-		delay := up.ReceivedAt.Sub(lastAt)
-
-		ctx = log.NewContextWithFields(ctx, log.Fields(
-			"last_transmission_at", lastAt,
-			"max_retransmission_delay", maxDelay,
-			"retransmission_delay", delay,
-		))
-		if delay > maxDelay {
-			log.FromContext(ctx).Warn("Retransmission delay exceeds maximum, skip")
-			return nil, true, errRetransmissionDelayExceeded
-		}
-		if nbTrans > maxNbTrans {
-			log.FromContext(ctx).Warn("Transmission number exceeds maximum, skip")
-			return nil, true, errTransmissionNumberExceeded
-		}
-
 		isRetransmission = nbTrans > 1
-		if !isRetransmission && dev.MACState.PendingApplicationDownlink != nil {
+		if isRetransmission {
+			delay := up.ReceivedAt.Sub(lastAt)
+			maxDelay := maxRetransmissionDelay(dev.MACState.CurrentParameters.Rx1Delay)
+
+			ctx = log.NewContextWithFields(ctx, log.Fields(
+				"last_transmission_at", lastAt,
+				"max_retransmission_delay", maxDelay,
+				"retransmission_delay", delay,
+			))
+			if delay > maxDelay {
+				log.FromContext(ctx).Warn("Retransmission delay exceeds maximum, skip")
+				return nil, true, errRetransmissionDelayExceeded
+			}
+			if nbTrans > maxNbTrans {
+				log.FromContext(ctx).Warn("Transmission number exceeds maximum, skip")
+				return nil, true, errTransmissionNumberExceeded
+			}
+		} else if dev.MACState.PendingApplicationDownlink != nil {
 			asUp := &ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 				Up: &ttnpb.ApplicationUp_DownlinkNack{
