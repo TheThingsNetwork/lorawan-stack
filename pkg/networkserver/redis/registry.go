@@ -932,7 +932,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			case storedCont == nil && updatedCont == nil:
 			case updatedCont == nil:
 				delFields = append(delFields, "session.keys.f_nwk_s_int_key.key")
-			case storedCont == nil, storedCont.Equal(*updatedCont):
+			case storedCont == nil, !storedCont.Equal(*updatedCont):
 				setFields = append(setFields, "session.keys.f_nwk_s_int_key.key", *updatedCont)
 			}
 
