@@ -299,11 +299,11 @@ details + blockquote {
   padding-right: 0.3em;
 }
 
-#tab-content section {
+.tab-content section {
   display: none;
 }
 
-#tab-content section.is-active {
+.tab-content section.is-active {
   display: block;
 }
 
