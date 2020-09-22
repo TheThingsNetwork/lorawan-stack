@@ -2654,6 +2654,15 @@
       "file": "listeners.go"
     }
   },
+  "error:pkg/component:task_recovered": {
+    "translations": {
+      "en": "task recovered"
+    },
+    "description": {
+      "package": "pkg/component",
+      "file": "tasks.go"
+    }
+  },
   "error:pkg/config/tlsconfig:acme_already_initialized": {
     "translations": {
       "en": "ACME already initialized"
