@@ -271,7 +271,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 			Jitter:       component.DefaultTaskBackoffConfig.Jitter,
 			IntervalFunc: component.MakeTaskBackoffIntervalFunc(true, component.DefaultTaskBackoffResetDuration, component.DefaultTaskBackoffIntervals[:]...),
 		},
-		RecoverPanics: true,
 	})
 	c.RegisterGRPC(ns)
 	return ns, nil
