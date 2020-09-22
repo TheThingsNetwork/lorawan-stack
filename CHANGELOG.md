@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support for sending end device uplinks in the Console.
+- PHY version filtering based on LoRaWAN MAC in the Console.
 
 ### Changed
 
