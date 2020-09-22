@@ -12,9 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import DownlinkForm from './downlink-form'
-import connect from './connect'
+import { connect } from 'react-redux'
 
-const ConnectedDownlinkForm = connect(DownlinkForm)
+import api from '@console/api'
 
-export { ConnectedDownlinkForm as default, DownlinkForm }
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectSelectedDeviceId } from '@console/store/selectors/devices'
+
+const mapStateToProps = state => {
+  const appId = selectSelectedApplicationId(state)
+  const devId = selectSelectedDeviceId(state)
+
+  return {
+    appId,
+    devId,
+    downlinkQueue: api.downlinkQueue,
+  }
+}
+
+export default DownlinkForm => connect(mapStateToProps)(DownlinkForm)
