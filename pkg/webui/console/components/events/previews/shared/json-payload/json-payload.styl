@@ -12,8 +12,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.overflow-container
-  margin-top: $ls.s * -1
-  display: flex
-  flex: 1
-  overflow-y: auto
+$c-string = #f5a623
+$c-number = #57a700
+$c-boolean = $c-number
+$c-invalid = $c-error
+
+.json-payload
+  display: inline-block
+  font-family: $font-family-mono
+  font-size: $fs.s
+  color: $tc-black
+
+  &-array
+    &:before
+      content: '[ '
+
+    &:after
+      content: ' ]'
+
+  &-object
+    &:before
+      content: '{ '
+
+    &:after
+      content: ' }'
+
+.string
+  color: $c-string
+
+.number
+  color: $c-number
+
+.boolean
+  color: $c-boolean
+
+.key
+  padding-right: $cs.xs
+
+  &:after
+    content: ':'
+
+.value
+  &:not(:last-of-type)
+    padding-right: $cs.xs
+
+    &:after
+      color: $tc-black
+      content: ','
+
+.invalid
+  color: $c-invalid

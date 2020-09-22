@@ -12,8 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.overflow-container
-  margin-top: $ls.s * -1
-  display: flex
-  flex: 1
-  overflow-y: auto
+import { createNetworkErrorEvent, createUnknownErrorEvent } from './definitions'
+
+export const defineSyntheticEvent = name => data => ({
+  time: new Date().toISOString(),
+  name: `synthetic.${name}`,
+  isError: name.startsWith('error'),
+  isSynthetic: true,
+  data,
+})
+
+export const createSyntheticEventFromError = error => {
+  if (error instanceof Error) {
+    const errorString = error.toString()
+    if (error.message === 'network error') {
+      return createNetworkErrorEvent({ error: errorString })
+    }
+
+    return createUnknownErrorEvent({ error: errorString })
+  }
+}

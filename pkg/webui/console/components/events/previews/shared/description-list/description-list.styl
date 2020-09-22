@@ -12,8 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.overflow-container
-  margin-top: $ls.s * -1
-  display: flex
-  flex: 1
-  overflow-y: auto
+.description-list
+  font-family: $font-family-mono
+  font-size: $fs.s
+  margin: 0
+
+.container
+  display: inline-flex
+  align-items: center
+
+  &:not(:last-child)
+    padding-right: $cs.s
+
+  .term
+    color: $tc-subtle-gray
+
+    &:after
+      content: ':'
+
+.value
+  margin-left: $cs.xs
+
+.empty-byte
+  color: $tc-subtle-gray
+  font-style: italic
+
+  &:before
+    content: '<'
+  &:after
+    content: '>'
+

@@ -233,15 +233,27 @@ export const getBackendErrorDefaultMessage = error =>
   error.details[0].message_format || error.message.replace(/^.*\s/, '')
 
 /**
- * Returns the root cause of the error.
+ * Returns whether the error has one or more cause properties.
+ *
+ * @param {object} error - The backend error object.
+ * @returns {boolean} - Whether the error has one or more cuase properties.
+ */
+export const hasCauses = error => isBackendErrorDetails(error) && 'cause' in error
+
+/**
+ * Returns the root cause of the backend error.
  *
  * @param {object} error - The backend error object.
  * @returns {object} - The root cause of `error`.
  */
 export const getBackendErrorRootCause = error => {
-  const details = getBackendErrorDetails(error)
+  let rootCause
+  if (hasCauses(error)) {
+    rootCause = error.cause
+  } else {
+    rootCause = getBackendErrorDetails(error)
+  }
 
-  let rootCause = details
   while ('cause' in rootCause) {
     rootCause = rootCause.cause
   }

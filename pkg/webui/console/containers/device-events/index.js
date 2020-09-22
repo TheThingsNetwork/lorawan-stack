@@ -17,7 +17,7 @@ import { connect } from 'react-redux'
 
 import ErrorNotification from '@ttn-lw/components/error-notification'
 
-import DeviceEventsList from '@console/components/events-list/application/device'
+import Events from '@console/components/events'
 
 import { getApplicationId, getDeviceId, combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -45,15 +45,16 @@ const DeviceEvents = props => {
 
   if (widget) {
     return (
-      <DeviceEventsList.Widget
+      <Events.Widget
         events={events}
+        entityId={devId}
         toAllUrl={`/applications/${appId}/devices/${devId}/data`}
-        deviceId={devId}
+        scoped
       />
     )
   }
 
-  return <DeviceEventsList events={events} onClear={onClear} deviceId={devId} />
+  return <Events events={events} entityId={devId} onClear={onClear} scoped widget />
 }
 
 DeviceEvents.propTypes = {
