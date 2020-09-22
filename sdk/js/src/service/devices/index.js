@@ -563,6 +563,22 @@ class Devices {
     // Combine all stream sources to one subscription generator.
     return combineStreams(streams)
   }
+
+  async simulateUplink(applicationId, deviceId, uplink) {
+    const result = await this._api.AppAs.SimulateUplink(
+      {
+        routeParams: {
+          'end_device_ids.application_ids.application_id': applicationId,
+          'end_device_ids.device_id': deviceId,
+        },
+      },
+      {
+        uplink_message: uplink,
+      },
+    )
+
+    return Marshaler.payloadSingleResponse(result)
+  }
 }
 
 export default Devices
