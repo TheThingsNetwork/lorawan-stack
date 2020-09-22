@@ -1089,7 +1089,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		transmitAt time.Time
 		maxDR      band.DataRate
 	)
-	if attemptRX1 && rx1DRIdx > dev.MACState.CurrentParameters.Rx2DataRateIndex {
+	if attemptRX1 && rx1DRIdx > dev.MACState.CurrentParameters.Rx2DataRateIndex || !attemptRX2 {
 		transmitAt = slot.RX1()
 		maxDR = rx1DR
 	} else {
