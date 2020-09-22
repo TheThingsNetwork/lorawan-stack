@@ -486,6 +486,12 @@
       ]
     }
   },
+  "NsAs": {
+    "HandleUplink": {
+      "file": "lorawan-stack/api/applicationserver.proto",
+      "http": []
+    }
+  },
   "ApplicationUpStorage": {
     "GetStoredApplicationUp": {
       "file": "lorawan-stack/api/applicationserver_integrations_storage.proto",

@@ -114,6 +114,15 @@ service As {
   };
 }
 
+message NsAsHandleUplinkRequest {
+  repeated ApplicationUp application_ups = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+// The NsAs service connects a Network Server to an Application Server.
+service NsAs {
+  rpc HandleUplink(NsAsHandleUplinkRequest) returns (google.protobuf.Empty);
+}
+
 // The AppAs service connects an application or integration to an Application Server.
 service AppAs {
   // Subscribe to upstream messages.

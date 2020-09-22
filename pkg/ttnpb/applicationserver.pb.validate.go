@@ -515,3 +515,108 @@ var _ interface {
 } = ApplicationLinkStatsValidationError{}
 
 var _ApplicationLinkStats_NetworkServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
+
+// ValidateFields checks the field values on NsAsHandleUplinkRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *NsAsHandleUplinkRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = NsAsHandleUplinkRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ups":
+
+			if len(m.GetApplicationUps()) < 1 {
+				return NsAsHandleUplinkRequestValidationError{
+					field:  "application_ups",
+					reason: "value must contain at least 1 item(s)",
+				}
+			}
+
+			for idx, item := range m.GetApplicationUps() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return NsAsHandleUplinkRequestValidationError{
+							field:  fmt.Sprintf("application_ups[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return NsAsHandleUplinkRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// NsAsHandleUplinkRequestValidationError is the validation error returned by
+// NsAsHandleUplinkRequest.ValidateFields if the designated constraints aren't met.
+type NsAsHandleUplinkRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e NsAsHandleUplinkRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e NsAsHandleUplinkRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e NsAsHandleUplinkRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e NsAsHandleUplinkRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e NsAsHandleUplinkRequestValidationError) ErrorName() string {
+	return "NsAsHandleUplinkRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e NsAsHandleUplinkRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sNsAsHandleUplinkRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = NsAsHandleUplinkRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = NsAsHandleUplinkRequestValidationError{}
