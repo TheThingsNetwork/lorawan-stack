@@ -436,7 +436,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				); err != nil {
 					return nil, nil, errInvalidFieldMask.WithCause(err)
 				}
-				if dev.GetMACSettings().GetPingSlotFrequency() == nil {
+				if req.EndDevice.GetMACSettings().GetPingSlotFrequency() == nil {
 					return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.ping_slot_frequency")
 				}
 			}
@@ -446,7 +446,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				); err != nil {
 					return nil, nil, errInvalidFieldMask.WithCause(err)
 				}
-				if dev.GetMACSettings().GetPingSlotPeriodicity() == nil {
+				if req.EndDevice.GetMACSettings().GetPingSlotPeriodicity() == nil {
 					return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.ping_slot_periodicity")
 				}
 			}
