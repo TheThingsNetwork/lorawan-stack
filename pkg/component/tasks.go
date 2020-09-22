@@ -16,6 +16,7 @@ package component
 
 import (
 	"context"
+	"runtime/debug"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -100,11 +101,12 @@ var (
 )
 
 type TaskConfig struct {
-	Context context.Context
-	ID      string
-	Func    TaskFunc
-	Restart TaskRestart
-	Backoff *TaskBackoffConfig
+	Context       context.Context
+	ID            string
+	Func          TaskFunc
+	Restart       TaskRestart
+	Backoff       *TaskBackoffConfig
+	RecoverPanics bool
 }
 
 // RegisterTask registers a task, optionally with restart policy and backoff, to be started after the component started.
@@ -123,55 +125,80 @@ func (f StartTaskFunc) StartTask(conf *TaskConfig) {
 	f(conf)
 }
 
-func DefaultStartTask(conf *TaskConfig) {
+func runTask(invocation uint, conf *TaskConfig) {
 	logger := log.FromContext(conf.Context).WithField("task_id", conf.ID)
-	go func() {
-		invocation := uint(1)
-		for {
-			if invocation == 0 {
-				logger.Warn("Invocation count rollover detected")
-				invocation = 1
-			}
-			startTime := time.Now()
-			err := conf.Func(conf.Context)
-			executionDuration := time.Since(startTime)
-			if err != nil && err != context.Canceled {
-				logger.WithField("invocation", invocation).WithError(err).Warn("Task failed")
-			}
-			switch conf.Restart {
-			case TaskRestartNever:
-				return
-			case TaskRestartAlways:
-			case TaskRestartOnFailure:
-				if err == nil {
-					return
+	if conf.RecoverPanics {
+		defer func() {
+			if v := recover(); v != nil {
+				logger := logger
+				err, ok := v.(error)
+				if ok {
+					logger = logger.WithError(err)
+				} else {
+					logger = logger.WithField("error", v)
 				}
-			default:
-				panic("Invalid TaskConfig.Restart value")
+				logger.Errorf("Task panicked with:\n%s", debug.Stack())
+
+				switch conf.Restart {
+				case TaskRestartNever:
+					return
+				case TaskRestartAlways, TaskRestartOnFailure:
+					go runTask(invocation, conf)
+				default:
+					panic("Invalid TaskConfig.Restart value")
+				}
 			}
-			select {
-			case <-conf.Context.Done():
-				return
-			default:
-			}
-			if conf.Backoff == nil {
-				continue
-			}
-			s := conf.Backoff.IntervalFunc(conf.Context, executionDuration, invocation, err)
-			if s == 0 {
-				continue
-			}
-			if conf.Backoff.Jitter != 0 {
-				s = random.Jitter(s, conf.Backoff.Jitter)
-			}
-			select {
-			case <-conf.Context.Done():
-				return
-			case <-time.After(s):
-			}
-			invocation++
+		}()
+	}
+
+	for {
+		if invocation == 0 {
+			logger.Warn("Invocation count rollover detected")
+			invocation = 1
 		}
-	}()
+		startTime := time.Now()
+		err := conf.Func(conf.Context)
+		executionDuration := time.Since(startTime)
+		if err != nil && err != context.Canceled {
+			logger.WithField("invocation", invocation).WithError(err).Warn("Task failed")
+		}
+		switch conf.Restart {
+		case TaskRestartNever:
+			return
+		case TaskRestartAlways:
+		case TaskRestartOnFailure:
+			if err == nil {
+				return
+			}
+		default:
+			panic("Invalid TaskConfig.Restart value")
+		}
+		select {
+		case <-conf.Context.Done():
+			return
+		default:
+		}
+		if conf.Backoff == nil {
+			continue
+		}
+		s := conf.Backoff.IntervalFunc(conf.Context, executionDuration, invocation, err)
+		if s == 0 {
+			continue
+		}
+		if conf.Backoff.Jitter != 0 {
+			s = random.Jitter(s, conf.Backoff.Jitter)
+		}
+		select {
+		case <-conf.Context.Done():
+			return
+		case <-time.After(s):
+		}
+		invocation++
+	}
+}
+
+func DefaultStartTask(conf *TaskConfig) {
+	go runTask(1, conf)
 }
 
 func (c *Component) StartTask(conf *TaskConfig) {
