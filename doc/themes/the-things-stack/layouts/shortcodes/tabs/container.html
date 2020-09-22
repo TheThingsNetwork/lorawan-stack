@@ -1,7 +1,7 @@
-<div class="tabs is-boxed" id="tabs">
+<div class="tabs is-boxed">
   <ul>
     {{ range .Params }}
-    <li class="is-active" data-tab="{{ . | urlize }}">
+    <li data-tab="{{ . | urlize }}">
       <a>
         <span>{{ . }}</span>
       </a>
@@ -9,6 +9,6 @@
     {{ end }}
   </ul>
 </div>
-<div id="tab-content" class="content">
+<div class="tab-content content">
   {{ .Inner | markdownify }}
 </div>
