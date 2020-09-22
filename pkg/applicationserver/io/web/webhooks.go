@@ -137,8 +137,6 @@ func (s *QueuedSink) Process(req *http.Request) error {
 type Webhooks interface {
 	ttnweb.Registerer
 	Registry() WebhookRegistry
-	// NewSubscription returns a new webhooks integration subscription.
-	NewSubscription() *io.Subscription
 }
 
 type webhooks struct {
@@ -150,15 +148,34 @@ type webhooks struct {
 }
 
 // NewWebhooks returns a new Webhooks.
-func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry, target Sink, downlinks DownlinksConfig) Webhooks {
+func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry, target Sink, downlinks DownlinksConfig) (Webhooks, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/web")
-	return &webhooks{
+	w := &webhooks{
 		ctx:       ctx,
 		server:    server,
 		registry:  registry,
 		target:    target,
 		downlinks: downlinks,
 	}
+	sub, err := server.Subscribe(ctx, "webhook", nil, false)
+	if err != nil {
+		return nil, err
+	}
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-sub.Context().Done():
+				return
+			case msg := <-sub.Up():
+				if err := w.handleUp(msg.Context, msg.ApplicationUp); err != nil {
+					log.FromContext(ctx).WithError(err).Warn("Failed to handle message")
+				}
+			}
+		}
+	}()
+	return w, nil
 }
 
 func (w *webhooks) Registry() WebhookRegistry { return w.registry }
@@ -198,23 +215,6 @@ func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID ttnpb.Applic
 		devID.DeviceID,
 		op,
 	)
-}
-
-func (w *webhooks) NewSubscription() *io.Subscription {
-	sub := io.NewSubscription(w.ctx, "webhook", nil)
-	go func() {
-		for {
-			select {
-			case <-w.ctx.Done():
-				return
-			case msg := <-sub.Up():
-				if err := w.handleUp(msg.Context, msg.ApplicationUp); err != nil {
-					log.FromContext(w.ctx).WithError(err).Warn("Failed to handle message")
-				}
-			}
-		}
-	}()
-	return sub
 }
 
 func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {

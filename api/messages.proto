@@ -292,7 +292,7 @@ message ApplicationDownlinkFailed {
 }
 
 message ApplicationInvalidatedDownlinks {
-  repeated ApplicationDownlink downlinks = 1 [(validate.rules).repeated.min_items = 1];
+  repeated ApplicationDownlink downlinks = 1;
   uint32 last_f_cnt_down = 2;
 }
 

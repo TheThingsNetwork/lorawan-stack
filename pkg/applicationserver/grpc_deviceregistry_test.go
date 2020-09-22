@@ -304,7 +304,6 @@ func TestDeviceRegistryGet(t *testing.T) {
 					},
 				}),
 				&Config{
-					LinkMode: "explicit",
 					Devices: &MockDeviceRegistry{
 						GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 							atomic.AddUint64(&getCalls, 1)
@@ -533,7 +532,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 			as := test.Must(New(componenttest.NewComponent(t, &component.Config{}),
 				&Config{
-					LinkMode: "explicit",
 					Devices: &MockDeviceRegistry{
 						SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 							atomic.AddUint64(&setCalls, 1)
@@ -691,7 +689,6 @@ func TestDeviceRegistryDelete(t *testing.T) {
 
 			as := test.Must(New(componenttest.NewComponent(t, &component.Config{}),
 				&Config{
-					LinkMode: "explicit",
 					Devices: &MockDeviceRegistry{
 						SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 							atomic.AddUint64(&setCalls, 1)

@@ -34,6 +34,7 @@ import (
 	nats_client "github.com/nats-io/nats.go"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
+	distribredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution/redis"
 	iopubsubredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/redis"
 	iowebredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/redis"
@@ -143,9 +144,8 @@ func TestApplicationServer(t *testing.T) {
 
 	is, isAddr := startMockIS(ctx)
 	js, jsAddr := startMockJS(ctx)
-	ns, nsAddr := startMockNS(ctx, func(md rpcmetadata.MD) bool {
-		return md.AuthType == "Bearer" && md.AuthValue == registeredApplicationKey
-	})
+	nsConnChan := make(chan *mockNSASConn)
+	ns, nsAddr := startMockNS(ctx, nsConnChan)
 
 	// Register the application in the Entity Registry.
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
@@ -211,6 +211,11 @@ func TestApplicationServer(t *testing.T) {
 	defer pubsubRedisClient.Close()
 	pubsubRegistry := iopubsubredis.PubSubRegistry{Redis: pubsubRedisClient}
 
+	distribRedisClient, distribFlush := test.NewRedis(t, "applicationserver_test", "traffic")
+	defer distribFlush()
+	defer distribRedisClient.Close()
+	distribPubSub := distribredis.PubSub{Redis: distribRedisClient}
+
 	natsServer := nats_test_server.RunServer(&nats_server.Options{
 		Host:           "127.0.0.1",
 		Port:           4124,
@@ -261,9 +266,8 @@ func TestApplicationServer(t *testing.T) {
 		},
 	})
 	config := &applicationserver.Config{
-		LinkMode: "all",
-		Devices:  deviceRegistry,
-		Links:    linkRegistry,
+		Devices: deviceRegistry,
+		Links:   linkRegistry,
 		MQTT: config.MQTT{
 			Listen: ":1883",
 		},
@@ -279,6 +283,9 @@ func TestApplicationServer(t *testing.T) {
 		EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
 			Fetcher: &noopEndDeviceFetcher{},
 		},
+		Distribution: applicationserver.DistributionConfig{
+			PubSub: distribPubSub,
+		},
 	}
 	as, err := applicationserver.New(c, config)
 	if !a.So(err, should.BeNil) {
@@ -291,12 +298,19 @@ func TestApplicationServer(t *testing.T) {
 
 	componenttest.StartComponent(t, c)
 	defer c.Close()
+
+	select {
+	case <-ctx.Done():
+		return
+	case nsConnChan <- &mockNSASConn{
+		cc:   as.LoopbackConn(),
+		auth: as.WithClusterAuth(),
+	}:
+	}
+
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_JOIN_SERVER)
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
-
-	// Delay for the AS-NS link to establish.
-	time.Sleep(Timeout)
 
 	for _, ptc := range []struct {
 		Protocol         string
@@ -983,6 +997,8 @@ func TestApplicationServer(t *testing.T) {
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
+									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyID: []byte{0x22},
 									FPort:        22,
 									FCnt:         22,
@@ -996,6 +1012,8 @@ func TestApplicationServer(t *testing.T) {
 								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
+										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+										Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyID: []byte{0x22},
 										FPort:        22,
 										FCnt:         22,
@@ -1126,6 +1144,8 @@ func TestApplicationServer(t *testing.T) {
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
+									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyID: []byte{0x33},
 									FPort:        42,
 									FCnt:         42,
@@ -1139,6 +1159,8 @@ func TestApplicationServer(t *testing.T) {
 								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
+										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+										Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyID: []byte{0x33},
 										FPort:        42,
 										FCnt:         42,
@@ -1554,6 +1576,8 @@ func TestApplicationServer(t *testing.T) {
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
+									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyID: []byte{0x44},
 									FPort:        24,
 									FCnt:         24,
@@ -1567,6 +1591,8 @@ func TestApplicationServer(t *testing.T) {
 								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
+										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+										Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyID: []byte{0x44},
 										FPort:        24,
 										FCnt:         24,
@@ -1791,6 +1817,8 @@ func TestApplicationServer(t *testing.T) {
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
+									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyID: []byte{0x55},
 									FPort:        42,
 									FCnt:         42,
@@ -1804,6 +1832,8 @@ func TestApplicationServer(t *testing.T) {
 								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
+										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+										Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyID: []byte{0x55},
 										FPort:        42,
 										FCnt:         42,
@@ -1898,6 +1928,8 @@ func TestApplicationServer(t *testing.T) {
 							EndDeviceIdentifiers: withDevAddr(unregisteredDeviceID, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
+									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyID: []byte{0x55},
 									FPort:        11,
 									FCnt:         11,
@@ -2198,9 +2230,8 @@ func TestSkipPayloadCrypto(t *testing.T) {
 
 	is, isAddr := startMockIS(ctx)
 	js, jsAddr := startMockJS(ctx)
-	ns, nsAddr := startMockNS(ctx, func(md rpcmetadata.MD) bool {
-		return md.AuthType == "Bearer" && md.AuthValue == registeredApplicationKey
-	})
+	nsConnChan := make(chan *mockNSASConn)
+	ns, nsAddr := startMockNS(ctx, nsConnChan)
 
 	// Register the application in the Entity Registry.
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
@@ -2253,6 +2284,11 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		t.Fatalf("Failed to set link in registry: %s", err)
 	}
 
+	distribRedisClient, distribFlush := test.NewRedis(t, "applicationserver_test", "traffic")
+	defer distribFlush()
+	defer distribRedisClient.Close()
+	distribPubSub := distribredis.PubSub{Redis: distribRedisClient}
+
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
@@ -2273,11 +2309,13 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		},
 	})
 	config := &applicationserver.Config{
-		LinkMode: "all",
-		Devices:  deviceRegistry,
-		Links:    linkRegistry,
+		Devices: deviceRegistry,
+		Links:   linkRegistry,
 		EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
 			Fetcher: &noopEndDeviceFetcher{},
+		},
+		Distribution: applicationserver.DistributionConfig{
+			PubSub: distribPubSub,
 		},
 	}
 	as, err := applicationserver.New(c, config)
@@ -2291,12 +2329,19 @@ func TestSkipPayloadCrypto(t *testing.T) {
 
 	componenttest.StartComponent(t, c)
 	defer c.Close()
+
+	select {
+	case <-ctx.Done():
+		return
+	case nsConnChan <- &mockNSASConn{
+		cc:   as.LoopbackConn(),
+		auth: as.WithClusterAuth(),
+	}:
+	}
+
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_JOIN_SERVER)
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
-
-	// Delay for the AS-NS link to establish.
-	time.Sleep(Timeout)
 
 	chs := &connChannels{
 		up:          make(chan *ttnpb.ApplicationUp, 1),
@@ -2439,6 +2484,8 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
+									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyID: []byte{0x22},
 									FPort:        22,
 									FCnt:         22,
@@ -2453,6 +2500,8 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 									Up: &ttnpb.ApplicationUp_UplinkMessage{
 										UplinkMessage: &ttnpb.ApplicationUplink{
+											RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+											Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
 											SessionKeyID: []byte{0x22},
 											FPort:        22,
 											FCnt:         22,
@@ -2471,6 +2520,8 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 									Up: &ttnpb.ApplicationUp_UplinkMessage{
 										UplinkMessage: &ttnpb.ApplicationUplink{
+											RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+											Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
 											SessionKeyID: []byte{0x22},
 											FPort:        22,
 											FCnt:         22,

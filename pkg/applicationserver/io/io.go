@@ -32,11 +32,12 @@ type Server interface {
 	// FillContext fills the given context.
 	// This method should only be used for request contexts.
 	FillContext(ctx context.Context) context.Context
-	// SendUp sends upstream traffic to the Application Server.
-	SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error
+	// Publish publishes upstream traffic to the Application Server.
+	Publish(ctx context.Context, up *ttnpb.ApplicationUp) error
 	// Subscribe subscribes an application or integration by its identifiers to the Application Server, and returns a
-	// Subscription for traffic and control.
-	Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*Subscription, error)
+	// Subscription for traffic and control. If the cluster parameter is true, the subscription receives all of the
+	// traffic of the application. Otherwise, only traffic that was processed locally is sent.
+	Subscribe(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers, cluster bool) (*Subscription, error)
 	// DownlinkQueuePush pushes the given downlink messages to the end device's application downlink queue.
 	DownlinkQueuePush(context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
 	// DownlinkQueueReplace replaces the end device's application downlink queue with the given downlink messages.
@@ -90,9 +91,9 @@ func (s *Subscription) ApplicationIDs() *ttnpb.ApplicationIdentifiers { return s
 
 var errBufferFull = errors.DefineResourceExhausted("buffer_full", "buffer is full")
 
-// SendUp sends an upstream message.
+// Publish publishes an upstream message.
 // This method returns immediately, returning nil if the message is buffered, or with an error when the buffer is full.
-func (s *Subscription) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+func (s *Subscription) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	ctxUp := &ContextualApplicationUp{
 		Context:       ctx,
 		ApplicationUp: up,
