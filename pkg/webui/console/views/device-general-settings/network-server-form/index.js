@@ -23,6 +23,8 @@ import Select from '@ttn-lw/components/select'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
 
+import PhyVersionInput from '@console/components/phy-version-input'
+
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import DevAddrInput from '@console/containers/dev-addr-input'
 
@@ -34,7 +36,6 @@ import {
   parseLorawanMacVersion,
   ACTIVATION_MODES,
   LORAWAN_VERSIONS,
-  LORAWAN_PHY_VERSIONS,
   generate16BytesKey,
 } from '@console/lib/device-utils'
 
@@ -62,9 +63,9 @@ const NetworkServerForm = React.memo(props => {
   const [resetsFCnt, setResetsFCnt] = React.useState(
     (isABP && device.mac_settings && device.mac_settings.resets_f_cnt) || false,
   )
-  const [lorawanVersion, setLorawanVersion] = React.useState(
-    parseLorawanMacVersion(device.lorawan_version),
-  )
+
+  const [lorawanVersion, setLorawanVersion] = React.useState(device.lorawan_version)
+  const lwVersion = parseLorawanMacVersion(lorawanVersion)
 
   const validationContext = React.useMemo(
     () => ({
@@ -122,7 +123,7 @@ const NetworkServerForm = React.memo(props => {
     version => {
       const isABP = initialValues._activation_mode === ACTIVATION_MODES.ABP
       const lwVersion = parseLorawanMacVersion(version)
-      setLorawanVersion(lwVersion)
+      setLorawanVersion(version)
       const { setValues, values: formValues } = formRef.current
       const { session = {} } = formValues
       const { session: initialSession } = initialValues
@@ -189,9 +190,9 @@ const NetworkServerForm = React.memo(props => {
         title={sharedMessages.phyVersion}
         description={sharedMessages.lorawanPhyVersionDescription}
         name="lorawan_phy_version"
-        component={Select}
+        component={PhyVersionInput}
+        lorawanVersion={lorawanVersion}
         required
-        options={LORAWAN_PHY_VERSIONS}
       />
       <NsFrequencyPlansSelect name="frequency_plan_id" required />
       <Form.Field
@@ -231,7 +232,7 @@ const NetworkServerForm = React.memo(props => {
             required={mayReadKeys && mayEditKeys}
           />
           <Form.Field
-            title={lorawanVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
+            title={lwVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
             name="session.keys.f_nwk_s_int_key.key"
             type="byte"
             min={16}
@@ -246,7 +247,7 @@ const NetworkServerForm = React.memo(props => {
             mayGenerateValue={mayEditKeys}
             onGenerateValue={generate16BytesKey}
           />
-          {lorawanVersion >= 110 && (
+          {lwVersion >= 110 && (
             <Form.Field
               title={sharedMessages.sNwkSIKey}
               name="session.keys.s_nwk_s_int_key.key"
@@ -260,7 +261,7 @@ const NetworkServerForm = React.memo(props => {
               onGenerateValue={generate16BytesKey}
             />
           )}
-          {lorawanVersion >= 110 && (
+          {lwVersion >= 110 && (
             <Form.Field
               title={sharedMessages.nwkSEncKey}
               name="session.keys.nwk_s_enc_key.key"
