@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import DeviceMessages from './device-messages'
-import connect from './connect'
+import { connect } from 'react-redux'
 
-const ConnectedDeviceMessages = connect(DeviceMessages)
+import { mayScheduleDownlinks, maySendUplink, checkFromState } from '@console/lib/feature-checks'
 
-export { ConnectedDeviceMessages as default, DeviceMessages }
+const mapStateToProps = state => ({
+  mayScheduleDownlinks: checkFromState(mayScheduleDownlinks, state),
+  maySendUplink: checkFromState(maySendUplink, state),
+})
+
+export default DeviceMessages => connect(mapStateToProps)(DeviceMessages)

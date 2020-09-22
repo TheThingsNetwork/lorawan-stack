@@ -44,6 +44,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import {
   mayReadApplicationDeviceKeys,
   mayScheduleDownlinks,
+  maySendUplink,
   checkFromState,
 } from '@console/lib/feature-checks'
 
@@ -70,6 +71,7 @@ import style from './device.styl'
       device,
       mayReadKeys: checkFromState(mayReadApplicationDeviceKeys, state),
       mayScheduleDownlinks: checkFromState(mayScheduleDownlinks, state),
+      maySendUplink: checkFromState(maySendUplink, state),
       fetching: selectDeviceFetching(state),
       error: selectDeviceError(state),
     }
@@ -130,12 +132,13 @@ import style from './device.styl'
 @withEnv
 export default class Device extends React.Component {
   static propTypes = {
+    appId: PropTypes.string.isRequired,
     devId: PropTypes.string.isRequired,
     device: PropTypes.device.isRequired,
     env: PropTypes.env,
     location: PropTypes.location.isRequired,
-    match: PropTypes.match.isRequired,
     mayScheduleDownlinks: PropTypes.bool.isRequired,
+    maySendUplink: PropTypes.bool.isRequired,
     stopStream: PropTypes.func.isRequired,
   }
 
@@ -152,13 +155,12 @@ export default class Device extends React.Component {
   render() {
     const {
       location: { pathname },
-      match: {
-        params: { appId },
-      },
+      appId,
       devId,
       device,
       env: { siteName },
       mayScheduleDownlinks,
+      maySendUplink,
     } = this.props
     const {
       name,
@@ -178,6 +180,9 @@ export default class Device extends React.Component {
     const asConfig = selectAsConfig()
     const hasAs =
       asConfig.enabled && application_server_address === getHostnameFromUrl(asConfig.base_url)
+    const hideMessages = !hasAs || !(mayScheduleDownlinks || maySendUplink)
+    const hidePayloadFormatters = !hasAs
+    const hideClaiming = !hasJs
 
     const basePath = `/applications/${appId}/devices/${devId}`
 
@@ -185,6 +190,9 @@ export default class Device extends React.Component {
     const payloadFormattersLink = pathname.startsWith(`${basePath}/payload-formatters`)
       ? pathname
       : `${basePath}/payload-formatters`
+    const messagesLink = pathname.startsWith(`${basePath}/messages`)
+      ? pathname
+      : `${basePath}/messages`
 
     const tabs = [
       { title: sharedMessages.overview, name: 'overview', link: basePath },
@@ -192,8 +200,9 @@ export default class Device extends React.Component {
       {
         title: sharedMessages.messages,
         name: 'messages',
-        link: `${basePath}/messages`,
-        hidden: !mayScheduleDownlinks,
+        exact: false,
+        link: messagesLink,
+        hidden: hideMessages,
       },
       { title: sharedMessages.location, name: 'location', link: `${basePath}/location` },
       {
@@ -201,13 +210,13 @@ export default class Device extends React.Component {
         name: 'develop',
         link: payloadFormattersLink,
         exact: false,
-        hidden: !hasAs,
+        hidden: hidePayloadFormatters,
       },
       {
         title: sharedMessages.claiming,
         name: 'claim-auth-code',
         link: `${basePath}/claim-auth-code`,
-        hidden: !hasJs,
+        hidden: hideClaiming,
       },
       {
         title: sharedMessages.generalSettings,
@@ -233,13 +242,13 @@ export default class Device extends React.Component {
         <Switch>
           <Route exact path={basePath} component={DeviceOverview} />
           <Route exact path={`${basePath}/data`} component={DeviceData} />
-          <Route exact path={`${basePath}/messages`} component={DeviceMessages} />
+          {!hideMessages && <Route path={`${basePath}/messages`} component={DeviceMessages} />}
           <Route exact path={`${basePath}/location`} component={DeviceLocation} />
           <Route exact path={`${basePath}/general-settings`} component={DeviceGeneralSettings} />
-          {hasAs && (
+          {!hidePayloadFormatters && (
             <Route path={`${basePath}/payload-formatters`} component={DevicePayloadFormatters} />
           )}
-          {hasJs && (
+          {!hideClaiming && (
             <Route path={`${basePath}/claim-auth-code`} component={DeviceClaimAuthenticationCode} />
           )}
           <NotFoundRoute />
