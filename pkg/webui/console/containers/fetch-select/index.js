@@ -100,6 +100,7 @@ export default function({
         title,
         options,
         description,
+        ...rest
       } = this.props
 
       return (
@@ -116,6 +117,7 @@ export default function({
           warning={Boolean(error) ? warning : undefined}
           menuPlacement={menuPlacement}
           onChange={this.handleChange}
+          {...rest}
         />
       )
     }
