@@ -119,6 +119,10 @@ enum Right {
   RIGHT_GATEWAY_STATUS_READ = 38;
   // The right to view view gateway location.
   RIGHT_GATEWAY_LOCATION_READ = 39;
+  // The right to store secrets associated with this gateway.
+  RIGHT_GATEWAY_WRITE_SECRETS = 57;
+  // The right to retrieve secrets associated with this gateway.
+  RIGHT_GATEWAY_READ_SECRETS = 58;
   // The pseudo-right for all (current and future) gateway rights.
   RIGHT_GATEWAY_ALL = 40;
 
@@ -155,6 +159,8 @@ enum Right {
 
   // The pseudo-right for all (current and future) possible rights.
   RIGHT_ALL = 55;
+
+  // Next value; 59
 }
 
 message Rights {

@@ -2718,6 +2718,9 @@ Gateway is the message that defines a gateway on the network.
 | `downlink_path_constraint` | [`DownlinkPathConstraint`](#ttn.lorawan.v3.DownlinkPathConstraint) |  |  |
 | `schedule_anytime_delay` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite. |
 | `update_location_from_status` | [`bool`](#bool) |  | update the location of this gateway from status messages |
+| `lbs_lns_secret` | [`Secret`](#ttn.lorawan.v3.Secret) |  | The LoRa Basics Station LNS secret. This is either an auth token (such as an API Key) or a TLS private certificate. Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
+
+next: 23 |
 
 #### Field Rules
 
@@ -6082,6 +6085,8 @@ Right is the enum that defines all the different rights to do something in the n
 | `RIGHT_GATEWAY_LINK` | 37 | The right to link as Gateway to a Gateway Server for traffic exchange, i.e. write uplink and read downlink (API keys only) This right is typically only given to a gateway. This right implies RIGHT_GATEWAY_INFO. |
 | `RIGHT_GATEWAY_STATUS_READ` | 38 | The right to view gateway status. |
 | `RIGHT_GATEWAY_LOCATION_READ` | 39 | The right to view view gateway location. |
+| `RIGHT_GATEWAY_WRITE_SECRETS` | 57 | The right to store secrets associated with this gateway. |
+| `RIGHT_GATEWAY_READ_SECRETS` | 58 | The right to retrieve secrets associated with this gateway. |
 | `RIGHT_GATEWAY_ALL` | 40 | The pseudo-right for all (current and future) gateway rights. |
 | `RIGHT_ORGANIZATION_INFO` | 41 | The right to view organization information. |
 | `RIGHT_ORGANIZATION_SETTINGS_BASIC` | 42 | The right to edit basic organization settings. |
