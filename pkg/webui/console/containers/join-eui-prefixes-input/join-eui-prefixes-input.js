@@ -46,7 +46,10 @@ const getOptions = prefixes => {
       const hasDuplicate = Boolean(result.find(pr => pr.value === computedPrefix))
       if (!hasDuplicate) {
         result.push({
-          label: computedPrefix.toUpperCase(),
+          label: computedPrefix
+            .toUpperCase()
+            .match(/.{1,2}/g)
+            .join(' '),
           value: computedPrefix,
         })
       }
@@ -181,7 +184,7 @@ class JoinEUIPrefixesInput extends React.PureComponent {
     }
 
     return (
-      <div className={classnames(className, style.container)}>
+      <div className={classnames(className, style.container, { [style.noPrefix]: prefix === '' })}>
         {selectComponent}
         <Input
           showPerChar

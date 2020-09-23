@@ -16,9 +16,20 @@
   display: flex
   flex-wrap: wrap
 
+  &:not(.no-prefix)
+    :global(.select__value-container)
+      font-family: $font-family-mono
+      font-weight: $fw.bold
+      font-size: $fs.s
+
   .select
     flex-basis: 100%
     margin-bottom: $cs.xs
+
+    :global(.select__option):not(:first-child)
+      font-family: $font-family-mono
+      font-weight: $fw.bold
+      font-size: $fs.s
 
   .byte
     flex-basis: 100%
