@@ -5120,6 +5120,24 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/joinserver:application_activation_settings": {
+    "translations": {
+      "en": "failed to get application activation settings"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "joinserver.go"
+    }
+  },
+  "error:pkg/joinserver:application_activation_settings_not_found": {
+    "translations": {
+      "en": "application activation settings not found"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "grpc_application_activation_settings_registry.go"
+    }
+  },
   "error:pkg/joinserver:caller_not_authorized": {
     "translations": {
       "en": "caller `{name}` is not authorized for the entity"
@@ -5280,6 +5298,15 @@
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:kek": {
+    "translations": {
+      "en": "KEK not found"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "joinserver.go"
     }
   },
   "error:pkg/joinserver:lorawan_major_version": {
@@ -5528,6 +5555,15 @@
   "error:pkg/joinserver:unknown_join_eui": {
     "translations": {
       "en": "JoinEUI specified is not known"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:unwrap_key": {
+    "translations": {
+      "en": "failed to unwrap key"
     },
     "description": {
       "package": "pkg/joinserver",
