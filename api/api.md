@@ -445,6 +445,8 @@
   - [Message `SearchEntitiesRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchEntitiesRequest.AttributesContainEntry)
   - [Service `EndDeviceRegistrySearch`](#ttn.lorawan.v3.EndDeviceRegistrySearch)
   - [Service `EntityRegistrySearch`](#ttn.lorawan.v3.EntityRegistrySearch)
+- [File `lorawan-stack/api/secrets.proto`](#lorawan-stack/api/secrets.proto)
+  - [Message `Secret`](#ttn.lorawan.v3.Secret)
 - [File `lorawan-stack/api/user.proto`](#lorawan-stack/api/user.proto)
   - [Message `CreateTemporaryPasswordRequest`](#ttn.lorawan.v3.CreateTemporaryPasswordRequest)
   - [Message `CreateUserAPIKeyRequest`](#ttn.lorawan.v3.CreateUserAPIKeyRequest)
@@ -6199,6 +6201,23 @@ This service is not implemented on all deployments.
 | `SearchGateways` | `GET` | `/api/v3/search/gateways` |  |
 | `SearchOrganizations` | `GET` | `/api/v3/search/organizations` |  |
 | `SearchUsers` | `GET` | `/api/v3/search/users` |  |
+
+## <a name="lorawan-stack/api/secrets.proto">File `lorawan-stack/api/secrets.proto`</a>
+
+### <a name="ttn.lorawan.v3.Secret">Message `Secret`</a>
+
+Secret contains a secret value. It also contains the ID of the Encryption key used to encrypt it.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key_id` | [`string`](#string) |  | ID of the Key used to encrypt the secret. |
+| `value` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `value` | <p>`bytes.max_len`: `2048`</p> |
 
 ## <a name="lorawan-stack/api/user.proto">File `lorawan-stack/api/user.proto`</a>
 
