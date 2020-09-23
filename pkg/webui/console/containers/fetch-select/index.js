@@ -24,6 +24,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 const formatOptions = options =>
   Object.keys(options).map(key => ({ value: key, label: options[key] }))
 
+const { component, ...fieldPropTypes } = Field.propTypes
+
 export default function({
   optionsSelector,
   errorSelector,
@@ -46,31 +48,24 @@ export default function({
   )
   class FetchSelect extends React.PureComponent {
     static propTypes = {
-      autoFocus: PropTypes.bool,
+      ...fieldPropTypes,
+      ...Select.propTypes,
       description: PropTypes.message,
-      error: PropTypes.error,
       fetchOptions: PropTypes.func.isRequired,
-      fetching: PropTypes.bool,
       menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
-      name: PropTypes.string.isRequired,
       onChange: PropTypes.func,
       options: PropTypes.arrayOf(
         PropTypes.shape({ value: PropTypes.string, label: PropTypes.message }),
       ),
-      required: PropTypes.bool,
       title: PropTypes.message,
       warning: PropTypes.message,
     }
 
     static defaultProps = {
-      autoFocus: false,
       description: defaultDescription,
       menuPlacement: 'auto',
-      error: undefined,
-      fetching: false,
       onChange: () => null,
       options: [],
-      required: false,
       title: defaultTitle,
       warning: defaultWarning,
     }
@@ -89,35 +84,15 @@ export default function({
     }
 
     render() {
-      const {
-        name,
-        required,
-        autoFocus,
-        error,
-        fetching,
-        menuPlacement,
-        warning,
-        title,
-        options,
-        description,
-        ...rest
-      } = this.props
+      const { error, fetching, warning, ...rest } = this.props
 
       return (
         <Field
+          {...rest}
           component={Select}
-          type="select"
-          options={options}
-          name={name}
-          required={required}
-          title={title}
-          description={description}
-          autoFocus={autoFocus}
           isLoading={fetching}
           warning={Boolean(error) ? warning : undefined}
-          menuPlacement={menuPlacement}
           onChange={this.handleChange}
-          {...rest}
         />
       )
     }
