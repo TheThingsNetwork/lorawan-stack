@@ -29,7 +29,7 @@ var (
 	//
 	// KEYS[14] - list of uids of devices matching either current or pending session DevAddr not present in either KEYS[2], KEYS[3], nor KEYS[4]
 	// KEYS[15] - list of uids of devices matching either current or pending session DevAddr not present in either KEYS[2], KEYS[3], nor KEYS[4] being processed
-	// NOTE: It is expected that count of devices using 16-bit frame counters << count of devices using 32-bit frame counters.
+	// NOTE: The script is optimized for the assumption that count of devices using 16-bit frame counters << count of devices using 32-bit frame counters.
 	deviceMatchScript = redis.NewScript(`if redis.call('pexpire', KEYS[1], ARGV[2]) > 0 then
   return redis.call('get', KEYS[1])
 end

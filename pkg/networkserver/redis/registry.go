@@ -533,7 +533,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	}, lsb, cacheTTL.Milliseconds()).Result()
 	if err != nil {
 		if err == redis.Nil {
-			return errNoUplinkMatch
+			return errNoUplinkMatch.New()
 		}
 		return ttnredis.ConvertError(err)
 	}
@@ -630,7 +630,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			return ttnredis.ConvertError(err)
 		}
 		if err == redis.Nil {
-			return errNoUplinkMatch
+			return errNoUplinkMatch.New()
 		}
 		vs, ok := v.([]interface{})
 		if !ok || len(vs) != 2 || vs[0] == nil {
