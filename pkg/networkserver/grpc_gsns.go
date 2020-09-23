@@ -844,12 +844,10 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 	ns.mergeMetadata(ctx, up)
 
-	logger := log.FromContext(ctx)
-
 	for _, f := range matched.DeferredMACHandlers {
 		evs, err := f(ctx, matched.Device, up)
 		if err != nil {
-			logger.WithError(err).Warn("Failed to process MAC command after deduplication")
+			log.FromContext(ctx).WithError(err).Warn("Failed to process MAC command after deduplication")
 			break
 		}
 		matched.QueuedEventBuilders = append(matched.QueuedEventBuilders, evs...)
@@ -858,10 +856,10 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	var queuedApplicationUplinks []*ttnpb.ApplicationUp
 	defer func() { ns.enqueueApplicationUplinks(ctx, queuedApplicationUplinks...) }()
 
-	stored, storedCtx, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceID, handleDataUplinkGetPaths[:],
+	stored, _, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceID, handleDataUplinkGetPaths[:],
 		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if stored == nil {
-				logger.Warn("Device deleted during uplink handling, drop")
+				log.FromContext(ctx).Warn("Device deleted during uplink handling, drop")
 				return nil, nil, errOutdatedData.New()
 			}
 
@@ -879,7 +877,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 							return nil, nil, errOutdatedData.WithCause(err)
 						}
 					}
-					cmacF, ok := matchCmacF(ctx, fNwkSIntKey, stored.PendingMACState.LoRaWANVersion, pld.FCnt, up)
+					var cmacF [4]byte
+					cmacF, ok = matchCmacF(ctx, fNwkSIntKey, stored.PendingMACState.LoRaWANVersion, pld.FCnt, up)
 					if !ok {
 						return nil, nil, errOutdatedData.New()
 					}
@@ -902,14 +901,14 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 						}
 					}
 					fCnt := FullFCnt(uint16(pld.FCnt&0xffff), stored.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(stored, ns.defaultMACSettings))
-					cmacF, ok := matchCmacF(ctx, fNwkSIntKey, stored.MACState.LoRaWANVersion, fCnt, up)
+					var cmacF [4]byte
+					cmacF, ok = matchCmacF(ctx, fNwkSIntKey, stored.MACState.LoRaWANVersion, fCnt, up)
 					if !ok {
 						if pld.FCnt == fCnt || pld.Ack || !mac.DeviceResetsFCnt(stored, ns.defaultMACSettings) {
 							return nil, nil, errOutdatedData.New()
 						}
 
 						// FCnt reset
-						fCnt = pld.FCnt
 						cmacF, ok = matchCmacF(ctx, fNwkSIntKey, stored.MACState.LoRaWANVersion, pld.FCnt, up)
 						if !ok {
 							return nil, nil, errOutdatedData.New()
@@ -939,10 +938,15 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				pld.FullFCnt = matched.FullFCnt
 				up.DeviceChannelIndex = uint32(matched.ChannelIndex)
 				up.Settings.DataRateIndex = matched.DataRateIndex
-				ctx = log.NewContextWithFields(matched.Context, log.Fields(
+				matched.Context = log.NewContextWithFields(matched.Context, log.Fields(
 					"data_rate_index", up.Settings.DataRateIndex,
 					"device_channel_index", up.DeviceChannelIndex,
+					"f_cnt_reset", matched.MatchType == fCntResetMatch,
+					"full_f_cnt_up", matched.FullFCnt,
+					"mac_version", matched.Device.MACState.LoRaWANVersion,
+					"pending_session", matched.MatchType == pendingSessionMatch,
 				))
+				ctx = matched.Context
 			}
 
 			queuedApplicationUplinks = append(queuedApplicationUplinks, matched.QueuedApplicationUplinks...)
@@ -976,7 +980,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			}
 			stored.RecentADRUplinks = appendRecentUplink(stored.RecentADRUplinks, up, mac.OptimalADRUplinkCount)
 			if err := mac.AdaptDataRate(ctx, stored, matched.phy, ns.defaultMACSettings); err != nil {
-				logger.WithError(err).Info("Failed to adapt data rate, avoid ADR")
+				log.FromContext(ctx).WithError(err).Info("Failed to adapt data rate, avoid ADR")
 			}
 			return stored, paths, nil
 		})
@@ -986,10 +990,10 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		return err
 	}
 	matched.Device = stored
-	ctx = storedCtx
+	ctx = matched.Context
 
 	if err := ns.updateDataDownlinkTask(ctx, stored, time.Time{}); err != nil {
-		logger.WithError(err).Error("Failed to update downlink task queue after data uplink")
+		log.FromContext(ctx).WithError(err).Error("Failed to update downlink task queue after data uplink")
 	}
 	if !matched.IsRetransmission {
 		queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
