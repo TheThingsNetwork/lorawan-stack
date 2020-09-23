@@ -808,11 +808,11 @@ func (as *ApplicationServer) migrateDownlinkQueue(ctx context.Context, ids ttnpb
 	if oldSession.AppSKey == nil || newSession.AppSKey == nil {
 		return nil, errNoAppSKey.New()
 	}
-	oldAppSKey, err := cryptoutil.UnwrapAES128Key(ctx, *oldSession.AppSKey, as.KeyVault)
+	oldAppSKey, err := cryptoutil.UnwrapAES128Key(ctx, oldSession.AppSKey, as.KeyVault)
 	if err != nil {
 		return nil, err
 	}
-	newAppSKey, err := cryptoutil.UnwrapAES128Key(ctx, *newSession.AppSKey, as.KeyVault)
+	newAppSKey, err := cryptoutil.UnwrapAES128Key(ctx, newSession.AppSKey, as.KeyVault)
 	if err != nil {
 		return nil, err
 	}

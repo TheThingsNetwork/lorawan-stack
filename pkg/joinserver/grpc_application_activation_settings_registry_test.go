@@ -67,7 +67,7 @@ func TestApplicationActivationSettingsRegistryServer(t *testing.T) {
 		jsKEKLabel:      jsKEK[:],
 		sessionKEKLabel: sessionKEK[:],
 	})
-	jsKEKEnvelopeUnwrapped := ttnpb.KeyEnvelope{
+	jsKEKEnvelopeUnwrapped := &ttnpb.KeyEnvelope{
 		Key: &jsKEK,
 	}
 	jsKEKEnvelopeWrapped := MustWrapAES128Key(ctx, jsKEK, jsKEKLabel, keyVault)
@@ -221,24 +221,24 @@ func TestApplicationActivationSettingsRegistryServer(t *testing.T) {
 			Name: "KEK encrypted at rest",
 			CreateSettings: &ttnpb.ApplicationActivationSettings{
 				KEKLabel: sessionKEKLabel,
-				KEK:      &jsKEKEnvelopeWrapped,
+				KEK:      jsKEKEnvelopeWrapped,
 			},
 			GetSettings: &ttnpb.ApplicationActivationSettings{
 				KEKLabel: sessionKEKLabel,
-				KEK:      &jsKEKEnvelopeUnwrapped,
+				KEK:      jsKEKEnvelopeUnwrapped,
 			},
 		},
 		{
 			Name: "KEK sent plaintext",
 			CreateSettings: &ttnpb.ApplicationActivationSettings{
 				KEKLabel:            sessionKEKLabel,
-				KEK:                 &jsKEKEnvelopeUnwrapped,
+				KEK:                 jsKEKEnvelopeUnwrapped,
 				NetID:               &netID,
 				ApplicationServerID: asID,
 			},
 			GetSettings: &ttnpb.ApplicationActivationSettings{
 				KEKLabel:            sessionKEKLabel,
-				KEK:                 &jsKEKEnvelopeUnwrapped,
+				KEK:                 jsKEKEnvelopeUnwrapped,
 				NetID:               &netID,
 				ApplicationServerID: asID,
 			},

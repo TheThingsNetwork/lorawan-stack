@@ -303,7 +303,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				dev.Session.FNwkSIntKey = &ke
 			}
 		}(*req.EndDevice.Session.FNwkSIntKey)
-		req.EndDevice.Session.FNwkSIntKey = &fNwkSIntKey
+		req.EndDevice.Session.FNwkSIntKey = fNwkSIntKey
 		sets = ttnpb.AddFields(sets,
 			"session.keys.f_nwk_s_int_key.encrypted_key",
 			"session.keys.f_nwk_s_int_key.kek_label",
@@ -319,7 +319,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				dev.Session.NwkSEncKey = &ke
 			}
 		}(*req.EndDevice.Session.NwkSEncKey)
-		req.EndDevice.Session.NwkSEncKey = &nwkSEncKey
+		req.EndDevice.Session.NwkSEncKey = nwkSEncKey
 		sets = ttnpb.AddFields(sets,
 			"session.keys.nwk_s_enc_key.encrypted_key",
 			"session.keys.nwk_s_enc_key.kek_label",
@@ -335,7 +335,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				dev.Session.SNwkSIntKey = &ke
 			}
 		}(*req.EndDevice.Session.SNwkSIntKey)
-		req.EndDevice.Session.SNwkSIntKey = &sNwkSIntKey
+		req.EndDevice.Session.SNwkSIntKey = sNwkSIntKey
 		sets = ttnpb.AddFields(sets,
 			"session.keys.s_nwk_s_int_key.encrypted_key",
 			"session.keys.s_nwk_s_int_key.kek_label",

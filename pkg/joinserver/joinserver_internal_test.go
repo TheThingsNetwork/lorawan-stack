@@ -43,8 +43,8 @@ func MustWrapKey(key types.AES128Key, kek []byte) []byte {
 	return test.Must(crypto.WrapKey(key[:], kek)).([]byte)
 }
 
-func MustWrapAES128Key(ctx context.Context, key types.AES128Key, kekLabel string, v crypto.KeyVault) ttnpb.KeyEnvelope {
-	return test.Must(cryptoutil.WrapAES128Key(ctx, key, kekLabel, v)).(ttnpb.KeyEnvelope)
+func MustWrapAES128Key(ctx context.Context, key types.AES128Key, kekLabel string, v crypto.KeyVault) *ttnpb.KeyEnvelope {
+	return test.Must(cryptoutil.WrapAES128Key(ctx, key, kekLabel, v)).(*ttnpb.KeyEnvelope)
 }
 
 type AsJsServer = asJsServer

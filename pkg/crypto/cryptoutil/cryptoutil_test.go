@@ -46,12 +46,12 @@ func TestWrapAES128Key(t *testing.T) {
 		Name     string
 		Key      types.AES128Key
 		KEKLabel string
-		Expected ttnpb.KeyEnvelope
+		Expected *ttnpb.KeyEnvelope
 	}{
 		{
 			Name: "WrapWithoutKEK",
 			Key:  key,
-			Expected: ttnpb.KeyEnvelope{
+			Expected: &ttnpb.KeyEnvelope{
 				EncryptedKey: key[:],
 			},
 		},
@@ -59,7 +59,7 @@ func TestWrapAES128Key(t *testing.T) {
 			Name:     "WrapWithKEK",
 			Key:      key,
 			KEKLabel: "key",
-			Expected: ttnpb.KeyEnvelope{
+			Expected: &ttnpb.KeyEnvelope{
 				EncryptedKey: cipherKey,
 				KEKLabel:     "key",
 			},
@@ -75,20 +75,20 @@ func TestWrapAES128Key(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name          string
-		Envelope      ttnpb.KeyEnvelope
+		Envelope      *ttnpb.KeyEnvelope
 		ExpectedError func(error) bool
 		ExpectedKey   types.AES128Key
 	}{
 		{
 			Name: "UnwrapWithoutKEK",
-			Envelope: ttnpb.KeyEnvelope{
+			Envelope: &ttnpb.KeyEnvelope{
 				EncryptedKey: key[:],
 			},
 			ExpectedKey: key,
 		},
 		{
 			Name: "UnwrapWithKEK",
-			Envelope: ttnpb.KeyEnvelope{
+			Envelope: &ttnpb.KeyEnvelope{
 				KEKLabel:     "key",
 				EncryptedKey: cipherKey,
 			},
@@ -96,7 +96,7 @@ func TestWrapAES128Key(t *testing.T) {
 		},
 		{
 			Name: "UnwrapInvalid",
-			Envelope: ttnpb.KeyEnvelope{
+			Envelope: &ttnpb.KeyEnvelope{
 				KEKLabel:     "other",
 				EncryptedKey: cipherOther,
 			},

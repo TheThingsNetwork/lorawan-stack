@@ -122,7 +122,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					Key: rootKeysEnc.GetNwkKey().GetKey(),
 				}
 			case len(rootKeysEnc.GetNwkKey().GetEncryptedKey()) > 0:
-				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, *rootKeysEnc.NwkKey, srv.JS.KeyVault)
+				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, rootKeysEnc.NwkKey, srv.JS.KeyVault)
 				if err != nil {
 					return nil, err
 				}
@@ -149,7 +149,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					Key: rootKeysEnc.GetAppKey().GetKey(),
 				}
 			case len(rootKeysEnc.GetAppKey().GetEncryptedKey()) > 0:
-				appKey, err := cryptoutil.UnwrapAES128Key(ctx, *rootKeysEnc.AppKey, srv.JS.KeyVault)
+				appKey, err := cryptoutil.UnwrapAES128Key(ctx, rootKeysEnc.AppKey, srv.JS.KeyVault)
 				if err != nil {
 					return nil, err
 				}
@@ -214,7 +214,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 				dev.RootKeys.AppKey = &ke
 			}
 		}(*req.EndDevice.RootKeys.AppKey)
-		req.EndDevice.RootKeys.AppKey = &appKey
+		req.EndDevice.RootKeys.AppKey = appKey
 		sets = ttnpb.AddFields(sets,
 			"root_keys.app_key.encrypted_key",
 			"root_keys.app_key.kek_label",
@@ -231,7 +231,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 					dev.RootKeys.NwkKey = &ke
 				}
 			}(*req.EndDevice.RootKeys.NwkKey)
-			req.EndDevice.RootKeys.NwkKey = &nwkKey
+			req.EndDevice.RootKeys.NwkKey = nwkKey
 		} else if req.EndDevice.RootKeys != nil {
 			req.EndDevice.RootKeys.NwkKey = nil
 		}

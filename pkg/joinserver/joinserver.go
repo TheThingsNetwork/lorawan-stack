@@ -396,7 +396,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			var networkCryptoService cryptoservices.Network
 			if req.SelectedMACVersion.UseNwkKey() && dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {
 				// LoRaWAN 1.1 and higher use a NwkKey.
-				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, *dev.RootKeys.NwkKey, js.KeyVault)
+				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.NwkKey, js.KeyVault)
 				if err != nil {
 					return nil, nil, err
 				}
@@ -407,7 +407,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 			var applicationCryptoService cryptoservices.Application
 			if dev.RootKeys != nil && dev.RootKeys.AppKey != nil {
-				appKey, err := cryptoutil.UnwrapAES128Key(ctx, *dev.RootKeys.AppKey, js.KeyVault)
+				appKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.AppKey, js.KeyVault)
 				if err != nil {
 					return nil, nil, err
 				}
@@ -482,7 +482,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 						if sets.KEK == nil {
 							return nil, nil, errNoKEK.New()
 						}
-						kek, err = cryptoutil.UnwrapAES128Key(ctx, *sets.KEK, js.KeyVault)
+						kek, err = cryptoutil.UnwrapAES128Key(ctx, sets.KEK, js.KeyVault)
 						if err != nil {
 							return nil, nil, errUnwrapKey.WithCause(err)
 						}
