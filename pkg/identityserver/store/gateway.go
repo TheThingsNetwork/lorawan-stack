@@ -15,6 +15,7 @@
 package store
 
 import (
+	"bytes"
 	"sort"
 	"strings"
 	"time"
@@ -63,11 +64,15 @@ type Gateway struct {
 	UpdateLocationFromStatus bool `gorm:"default:false not null"`
 
 	Antennas []GatewayAntenna
+
+	LBSLNSSecret []byte `gorm:"type:BYTEA;column:lbs_lns_secret"`
 }
 
 func init() {
 	registerModel(&Gateway{})
 }
+
+var lbsLNSSecretSeparator = []byte(":")
 
 // functions to set fields from the gateway model into the gateway proto.
 var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
@@ -114,6 +119,15 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 		pb.Antennas = make([]ttnpb.GatewayAntenna, len(gtw.Antennas))
 		for i, antenna := range gtw.Antennas {
 			pb.Antennas[i] = antenna.toPB()
+		}
+	},
+	lbsLNSSecretField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		blocks := bytes.SplitN(gtw.LBSLNSSecret, lbsLNSSecretSeparator, -1)
+		if len(blocks) == 2 {
+			pb.LBSLNSSecret = &ttnpb.Secret{
+				KeyID: string(blocks[0]),
+				Value: blocks[1],
+			}
 		}
 	},
 }
@@ -165,6 +179,15 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 			gtw.Antennas[i] = antenna
 		}
 	},
+	lbsLNSSecretField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		if pb.LBSLNSSecret != nil {
+			var secretBuffer bytes.Buffer
+			secretBuffer.WriteString(pb.LBSLNSSecret.KeyID)
+			secretBuffer.Write(lbsLNSSecretSeparator)
+			secretBuffer.Write(pb.LBSLNSSecret.Value)
+			gtw.LBSLNSSecret = secretBuffer.Bytes()
+		}
+	},
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
@@ -196,6 +219,7 @@ var gatewayColumnNames = map[string][]string{
 	gatewayServerAddressField:     {gatewayServerAddressField},
 	hardwareVersionField:          {"hardware_version"},
 	locationPublicField:           {locationPublicField},
+	lbsLNSSecretField:             {lbsLNSSecretField},
 	modelIDField:                  {"model_id"},
 	nameField:                     {nameField},
 	scheduleAnytimeDelayField:     {scheduleAnytimeDelayField},
