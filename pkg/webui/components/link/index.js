@@ -28,7 +28,7 @@ import { url as urlPattern } from '@ttn-lw/lib/regexp'
 import style from './link.styl'
 
 const m = defineMessages({
-  glossaryTitle: 'Read our glossary on "{term}"',
+  glossaryTitle: 'See "{term}" in the glossary',
 })
 
 const formatTitle = function(content, values, formatter) {
