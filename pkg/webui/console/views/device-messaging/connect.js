@@ -21,4 +21,4 @@ const mapStateToProps = state => ({
   maySendUplink: checkFromState(maySendUplink, state),
 })
 
-export default DeviceMessages => connect(mapStateToProps)(DeviceMessages)
+export default DeviceMessaging => connect(mapStateToProps)(DeviceMessaging)

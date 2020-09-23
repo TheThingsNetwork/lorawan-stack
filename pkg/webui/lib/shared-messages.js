@@ -200,7 +200,7 @@ export default defineMessages({
   lorawanPhyVersionDescription: 'The LoRaWAN PHY version of the end device',
   macVersion: 'LoRaWAN version',
   macVersionDescription: 'The LoRaWAN version (MAC), as provided by the device manufacturer',
-  messages: 'Messages',
+  messaging: 'Messaging',
   messageTypes: 'Message types',
   milliseconds: 'milliseconds',
   minutes: 'minutes',

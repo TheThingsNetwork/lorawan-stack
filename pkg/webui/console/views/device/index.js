@@ -30,7 +30,7 @@ import DeviceTitleSection from '@console/containers/device-title-section'
 
 import DeviceData from '@console/views/device-data'
 import DeviceGeneralSettings from '@console/views/device-general-settings'
-import DeviceMessages from '@console/views/device-messages'
+import DeviceMessaging from '@console/views/device-messaging'
 import DeviceLocation from '@console/views/device-location'
 import DevicePayloadFormatters from '@console/views/device-payload-formatters'
 import DeviceClaimAuthenticationCode from '@console/views/device-claim-authentication-code'
@@ -180,7 +180,7 @@ export default class Device extends React.Component {
     const asConfig = selectAsConfig()
     const hasAs =
       asConfig.enabled && application_server_address === getHostnameFromUrl(asConfig.base_url)
-    const hideMessages = !hasAs || !(mayScheduleDownlinks || maySendUplink)
+    const hideMessaging = !hasAs || !(mayScheduleDownlinks || maySendUplink)
     const hidePayloadFormatters = !hasAs
     const hideClaiming = !hasJs
 
@@ -190,19 +190,19 @@ export default class Device extends React.Component {
     const payloadFormattersLink = pathname.startsWith(`${basePath}/payload-formatters`)
       ? pathname
       : `${basePath}/payload-formatters`
-    const messagesLink = pathname.startsWith(`${basePath}/messages`)
+    const messagingLink = pathname.startsWith(`${basePath}/messaging`)
       ? pathname
-      : `${basePath}/messages`
+      : `${basePath}/messaging`
 
     const tabs = [
       { title: sharedMessages.overview, name: 'overview', link: basePath },
       { title: sharedMessages.liveData, name: 'data', link: `${basePath}/data` },
       {
-        title: sharedMessages.messages,
-        name: 'messages',
+        title: sharedMessages.messaging,
+        name: 'messaging',
         exact: false,
-        link: messagesLink,
-        hidden: hideMessages,
+        link: messagingLink,
+        hidden: hideMessaging,
       },
       { title: sharedMessages.location, name: 'location', link: `${basePath}/location` },
       {
@@ -242,7 +242,7 @@ export default class Device extends React.Component {
         <Switch>
           <Route exact path={basePath} component={DeviceOverview} />
           <Route exact path={`${basePath}/data`} component={DeviceData} />
-          {!hideMessages && <Route path={`${basePath}/messages`} component={DeviceMessages} />}
+          {!hideMessaging && <Route path={`${basePath}/messaging`} component={DeviceMessaging} />}
           <Route exact path={`${basePath}/location`} component={DeviceLocation} />
           <Route exact path={`${basePath}/general-settings`} component={DeviceGeneralSettings} />
           {!hidePayloadFormatters && (

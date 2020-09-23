@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import DeviceMessages from './device-messages'
+import DeviceMessaging from './device-messaging'
 import connect from './connect'
 
-const ConnectedDeviceMessages = connect(DeviceMessages)
+const ConnectedDeviceMessages = connect(DeviceMessaging)
 
-export { ConnectedDeviceMessages as default, DeviceMessages }
+export { ConnectedDeviceMessages as default, DeviceMessaging }

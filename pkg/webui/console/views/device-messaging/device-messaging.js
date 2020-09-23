@@ -31,9 +31,9 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { mayWriteTraffic } from '@console/lib/feature-checks'
 
-import style from './device-messages.styl'
+import style from './device-messaging.styl'
 
-const DeviceMessages = ({ match, mayScheduleDownlinks, maySendUplink }) => {
+const DeviceMessaging = ({ match, mayScheduleDownlinks, maySendUplink }) => {
   const { url } = match
 
   const tabs =
@@ -49,7 +49,7 @@ const DeviceMessages = ({ match, mayScheduleDownlinks, maySendUplink }) => {
 
   return (
     <Container>
-      <IntlHelmet title={sharedMessages.messages} />
+      <IntlHelmet title={sharedMessages.messaging} />
       <Row>
         {tabs.length > 0 && (
           <Col sm={12}>
@@ -69,7 +69,7 @@ const DeviceMessages = ({ match, mayScheduleDownlinks, maySendUplink }) => {
   )
 }
 
-DeviceMessages.propTypes = {
+DeviceMessaging.propTypes = {
   match: PropTypes.match.isRequired,
   mayScheduleDownlinks: PropTypes.bool.isRequired,
   maySendUplink: PropTypes.bool.isRequired,
@@ -77,4 +77,4 @@ DeviceMessages.propTypes = {
 
 export default withFeatureRequirement(mayWriteTraffic, {
   redirect: ({ appId, devId }) => `/applications/${appId}/devices/${devId}`,
-})(DeviceMessages)
+})(DeviceMessaging)
