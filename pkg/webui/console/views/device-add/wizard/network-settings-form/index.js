@@ -14,9 +14,11 @@
 
 import React from 'react'
 
-import Radio from '@ttn-lw/components/radio-button'
+import glossaryId from '@console/constants/glossary-ids'
+
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
+import Radio from '@ttn-lw/components/radio-button'
 import Select from '@ttn-lw/components/select'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
@@ -111,6 +113,7 @@ const NetworkSettingsForm = props => {
         name="lorawan_phy_version"
         component={PhyVersionInput}
         lorawanVersion={lorawanVersion}
+        glossaryId={glossaryId.REGIONAL_PARAMETERS}
       />
       <Form.Field
         title={sharedMessages.supportsClassC}
