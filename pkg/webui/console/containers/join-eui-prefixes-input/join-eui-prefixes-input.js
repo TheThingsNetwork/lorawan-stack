@@ -157,8 +157,8 @@ class JoinEUIPrefixesInput extends React.PureComponent {
     const { prefix } = this.state
 
     let selectComponent = null
-    if (showPrefixes) {
-      const selectOptions = getOptions(prefixes)
+    const selectOptions = getOptions(prefixes)
+    if (showPrefixes && selectOptions.length > 0) {
       selectOptions.unshift(emptyOption)
 
       selectComponent = (
@@ -170,7 +170,6 @@ class JoinEUIPrefixesInput extends React.PureComponent {
           onChange={this.handlePrefixChange}
           onBlur={this.handleBlur}
           error={error}
-          isLoading={fetching}
           value={prefix}
         />
       )
@@ -202,6 +201,7 @@ class JoinEUIPrefixesInput extends React.PureComponent {
           onChange={this.handleChange}
           onBlur={this.handleBlur}
           error={error}
+          loading={fetching}
           action={{
             type: 'button',
             title: m.zeroInput,
