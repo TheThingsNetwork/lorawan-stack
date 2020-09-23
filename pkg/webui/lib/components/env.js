@@ -25,8 +25,6 @@ export const withEnv = function(Component) {
   class WithEnv extends Base {
     static displayName = `WithEnv(${displayName(Component)})`
 
-    static propTypes = Component.propTypes
-
     static contextTypes = {
       env: PropTypes.env,
     }
