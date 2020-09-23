@@ -1,6 +1,6 @@
 {
   "name": "ttn-stack",
-  "version": "3.9.3",
+  "version": "3.9.4",
   "description": "The Things Stack",
   "main": "index.js",
   "repository": "https://github.com/TheThingsNetwork/lorawan-stack.git",

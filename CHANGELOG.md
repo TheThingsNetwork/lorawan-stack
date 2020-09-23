@@ -10,18 +10,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
-- Detail view of events in the Console moved to the side.
-- Display the full event object when expanded in the Console (used to be `event.data` only).
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
- - Performance issues of event views in the Console (freezing after some time).
 
+### Security
+
+## [3.9.4] - 2020-09-23
+
+### Changed
+
+- Detail view of events in the Console moved to the side.
+- Display the full event object when expanded in the Console (used to be `event.data` only).
+
+### Fixed
+
+- Performance issues of event views in the Console (freezing after some time).
 - Gateway Server panic on upstream message handling.
 - Incorrect redirects for restricted routes in the Console.
+- Validation of MAC settings in the Network Server.
+- Network Server panic when RX2 parameters cannot be computed.
 
 ## [3.9.3] - 2020-09-15
 
@@ -1062,7 +1073,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.3...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.4...HEAD
+[3.9.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.3...v3.9.4
 [3.9.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.1...v3.9.3
 [3.9.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.0...v3.9.1
 [3.9.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.6...v3.9.0
