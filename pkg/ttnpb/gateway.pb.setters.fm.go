@@ -509,6 +509,31 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 				var zero bool
 				dst.UpdateLocationFromStatus = zero
 			}
+		case "lbs_lns_secret":
+			if len(subs) > 0 {
+				var newDst, newSrc *Secret
+				if (src == nil || src.LBSLNSSecret == nil) && dst.LBSLNSSecret == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.LBSLNSSecret
+				}
+				if dst.LBSLNSSecret != nil {
+					newDst = dst.LBSLNSSecret
+				} else {
+					newDst = &Secret{}
+					dst.LBSLNSSecret = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.LBSLNSSecret = src.LBSLNSSecret
+				} else {
+					dst.LBSLNSSecret = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

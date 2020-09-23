@@ -25,6 +25,7 @@ import "lorawan-stack/api/enums.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/metadata.proto";
 import "lorawan-stack/api/rights.proto";
+import "lorawan-stack/api/secrets.proto";
 
 package ttn.lorawan.v3;
 
@@ -131,8 +132,11 @@ message Gateway {
   google.protobuf.Duration schedule_anytime_delay = 19 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
   // update the location of this gateway from status messages
   bool update_location_from_status = 21;
-
-  // next: 22
+  // The LoRa Basics Station LNS secret.
+  // This is either an auth token (such as an API Key) or a TLS private certificate.
+  // Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
+  Secret lbs_lns_secret = 22 [(gogoproto.customname) = "LBSLNSSecret"];
+  // next: 23
 }
 
 message Gateways {
