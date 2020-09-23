@@ -17,6 +17,7 @@
   "components.input.generate.generate": "Generate",
   "components.key-value-map.entry.deleteEntry": "Delete entry",
   "components.key-value-map.index.addEntry": "Add entry",
+  "components.link.index.glossaryTitle": "Read our glossary on \"{term}\"",
   "components.mobile-menu.index.loggedInAs": "Logged in as <b>{userId}</b>",
   "components.navigation.side.index.hideSidebar": "Hide sidebar",
   "components.notification.details.index.showDetails": "Show details",

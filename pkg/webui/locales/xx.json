@@ -17,6 +17,7 @@
   "components.input.generate.generate": "Xxxxxxxx",
   "components.key-value-map.entry.deleteEntry": "Xxxxxx xxxxx",
   "components.key-value-map.index.addEntry": "Xxx xxxxx",
+  "components.link.index.glossaryTitle": "Xxxx xxx xxxxxxxx xx \"{term}\"",
   "components.mobile-menu.index.loggedInAs": "Xxxxxx xx xx xxx{userId}x/xx",
   "components.navigation.side.index.hideSidebar": "Xxxx xxxxxxx",
   "components.notification.details.index.showDetails": "Xxxx xxxxxxx",
