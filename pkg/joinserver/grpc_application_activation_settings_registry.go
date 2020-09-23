@@ -29,6 +29,8 @@ type applicationActivationSettingsRegistryServer struct {
 	kekLabel string
 }
 
+var errApplicationActivationSettingsNotFound = errors.DefineNotFound("application_activation_settings_not_found", "application activation settings not found")
+
 // Get implements ttnpb.ApplicationActivationSettingsRegistryServer.
 func (srv applicationActivationSettingsRegistryServer) Get(ctx context.Context, req *ttnpb.GetApplicationActivationSettingsRequest) (*ttnpb.ApplicationActivationSettings, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
@@ -43,7 +45,7 @@ func (srv applicationActivationSettingsRegistryServer) Get(ctx context.Context, 
 	}
 	kek, err := cryptoutil.UnwrapKeyEnvelope(ctx, sets.KEK, srv.JS.KeyVault)
 	if err != nil {
-		return nil, err
+		return nil, errUnwrapKey.WithCause(err)
 	}
 	sets.KEK = kek
 	return sets, nil
@@ -58,9 +60,9 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 	if k := req.ApplicationActivationSettings.KEK.GetKey(); !k.IsZero() {
 		kek, err := cryptoutil.WrapAES128Key(ctx, *k, srv.kekLabel, srv.JS.KeyVault)
 		if err != nil {
-			return nil, err
+			return nil, errWrapKey.WithCause(err)
 		}
-		sets.KEK = &kek
+		sets.KEK = kek
 	}
 	sets, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIdentifiers, nil, func(sets *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
 		return sets, ttnpb.ApplicationActivationSettingsFieldPathsTopLevel, nil
