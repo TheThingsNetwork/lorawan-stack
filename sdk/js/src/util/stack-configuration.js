@@ -118,10 +118,10 @@ class StackConfiguration {
   }
 
   /**
-   * Join Server hostname getter.
+   * Gateway Configuration Server hostname getter.
    *
-   * @returns {?string} - The hostname of the Join Server of the stack
-   * configuration.
+   * @returns {?string} - The hostname of the Gateway Configuration Server
+   * of the stack configuration.
    */
   get gcsHost() {
     return this.isComponentAvailable('gcs') && this.getComponentHostByName('gcs')
