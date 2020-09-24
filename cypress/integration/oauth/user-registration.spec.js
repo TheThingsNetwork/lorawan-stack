@@ -19,7 +19,9 @@ describe('OAuth user registration', () => {
   })
 
   it('displays UI elements in place', () => {
-    cy.findByText(`Create a new ${Cypress.config('siteName')} account`, { selector: 'h1' })
+    cy.findByText(`Create a new ${Cypress.config('oauthSiteName')} account`, {
+      selector: 'h1',
+    }).should('be.visible')
     cy.findByLabelText('User ID').should('be.visible')
     cy.findByLabelText('Name').should('be.visible')
     cy.findByLabelText('Email').should('be.visible')
