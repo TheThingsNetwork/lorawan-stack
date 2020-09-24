@@ -74,7 +74,7 @@ $minimize-button-height = 5rem
     overflow-y: auto
     overflow-x: hidden
   +media-query($bp.s)
-    height: 4rem
+    height: $sidebar-mobile-menu-height
     width: 100%
 
   &-minimized
@@ -116,7 +116,8 @@ $minimize-button-height = 5rem
   +media-query($bp.s)
     border-normal(bottom)
     display: flex
-    padding: $cs.m $cs.s
+    padding: 0 $cs.s
+    height: $sidebar-mobile-menu-height
 
   .expand-icon
     margin-right: $cs.s

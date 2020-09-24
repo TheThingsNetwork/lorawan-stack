@@ -29,15 +29,30 @@ import Require from './require'
  * rendered.
  * @returns {Function} - An instance of the `withFeatureRequirement` HOC.
  */
-const withFeatureRequirement = (featureCheck, otherwise) => Component =>
-  class WithFeatureRequirement extends React.Component {
+const withFeatureRequirement = (featureCheck, otherwise) => Component => {
+  return class WithFeatureRequirement extends React.Component {
+    constructor(props) {
+      super(props)
+
+      if (
+        typeof otherwise === 'object' &&
+        'redirect' in otherwise &&
+        typeof otherwise.redirect === 'function'
+      ) {
+        this.otherwise = { ...otherwise, redirect: otherwise.redirect(props) }
+      } else {
+        this.otherwise = otherwise
+      }
+    }
+
     render() {
       return (
-        <Require featureCheck={featureCheck} otherwise={otherwise}>
+        <Require featureCheck={featureCheck} otherwise={this.otherwise}>
           <Component {...this.props} />
         </Require>
       )
     }
   }
+}
 
 export default withFeatureRequirement

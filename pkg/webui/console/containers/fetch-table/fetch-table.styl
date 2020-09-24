@@ -26,9 +26,16 @@
     .filters-left
       padding-bottom: 0
 
-      +media-query($bp.xs)
+    +media-query($bp.xs)
+      .filters-left
         padding-bottom: $cs.s
         flex-basis: 100%
+
+      .tabs
+        border-normal('bottom')
+      
+      &.top-rule
+        border: none
 
   &-left
     flex-basis: auto

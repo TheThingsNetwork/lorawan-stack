@@ -201,7 +201,7 @@ export class SideNavigation extends Component {
 
     return (
       <>
-        <nav className={navigationClassNames} ref={this.ref}>
+        <nav className={navigationClassNames} ref={this.ref} data-test-id="navigation-sidebar">
           <div className={style.mobileHeader} onClick={this.onDrawerExpandClick}>
             <Icon className={style.expandIcon} icon="more_vert" />
             <Icon className={style.icon} icon={header.icon} />
