@@ -12,9 +12,9 @@ LoRaWAN devices should always comply to the [LoRaWAN specification](https://www.
 
 The goal of these best practices is to optimize individual devices (especially for battery consumption) and the network as a whole (to reliably and efficiently serve more devices with the same number of gateways).
 
-## Unnecessary Join Requests
+## Eliminate Unnecessary Join Requests
 
-The LoRaWAN specification warns especially against systematic rejoin in case of network failure. A device should keep the result of an activation in permanent storage if the device is expected to be turned off during its lifetime.
+The LoRaWAN specification warns specifically against systematic rejoin in case of network failure. A device should keep the result of an activation in permanent storage if the device is expected to be power-cycled during its lifetime.
 
 A device may temporarily lose connection with the network for many reasons: if the network server or gateways are suffering from an outage, if there’s no coverage in the area, etc. Whenever a device rejoins, it consumes the closest gateway’s airtime to emit the downlink - and if many devices in an area are rejoining at the same time (e.g. in case of a temporary gateway outage), this leads to network bloating in the area.
 
@@ -22,7 +22,9 @@ A device may temporarily lose connection with the network for many reasons: if t
 
 Limit the frequency of your transmissions to the minimum possible. Can you sample data once a day? Or even less?
 
-Encode messages as efficiently as possible. Shorter messages means shorter transmission time.
+Encode messages as efficiently as possible. Shorter messages mean shorter transmission time.
+
+Avoid confirmed uplink messages. Confirmed uplinks should only be used in the case where 100% assurance of transmission is necessary, e.g. alarms.
 
 The duty cycle of radio devices is often regulated by government. If this is the case, the duty cycle is commonly set to 1%, but make sure to check the regulations of your local government to be sure.
 
@@ -30,7 +32,13 @@ In Europe, duty cycles are regulated by section 7.2.3 of the ETSI EN300.220 stan
 
 Additionally, the LoRaWAN specification dictates duty cycles for the join frequencies, the frequencies devices of all LoRaWAN-compliant networks use for over-the-air activations (OTAA) of devices. In most regions this duty cycle is set to 1%.
 
+## Expect Packet Loss
+
+You should expect packet loss up to 10%. Implement Forward Error Correction if that's a problem.
+
 ## Synchronization, Backoff, and Jitter
+
+([See LoRaWAN Specification 1.0.3, line 1065](https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf)).
 
 Synchronization of devices happens if end devices respond to a large-scale external event - for example, hundreds of end devices that are connected to the same power source and the power is switched off and on again, or hundreds of end devices that are connected to the same gateway, and the firmware of the gateway needs to be updated.
 
@@ -52,11 +60,43 @@ But what if you have another site with thousands of these devices? Then the 10 s
 
 An implementation like this prevents persistent failures of sites and the network as a whole and helps speed up recovery after outages.
 
-## Additional Best Practices
+## Use a Good Random Number Generator
 
-- Save device parameters between regular power cycles
-- Use a true random number generator (especially for jitter and channel hopping)
-- Use [OTAA]({{< ref "/reference/glossary#otaa" >}}) instead of [ABP]({{< ref "/reference/glossary#abp" >}})
-- Optimize [data rate]({{< ref "/reference/glossary#data-rate" >}})
-- Try to use [ADR]({{< ref "/reference/glossary#adr" >}}) for non moving devices, and ADR for moving devices
-- Avoid non-essential downlinks
+True randomness in a device's random number generator is especially important for preventing network congestion. If devices share a seed for a pseudorandom number generator, they will choose the same random numbers. Devices should use a unique seed such as the device address.
+
+Bad randomization will result in an uneven distribution of channels selected for random channel selection, causing subpar network performance. ([LoRaWAN Specification 1.0.3, line 244](https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf)).
+
+Bad randomization will also result in transmission synchronization if devices respond to a large scale external event (for example, if they are all powered on at the same time).
+
+## Use ADR for Stationary Devices
+
+For devices that don't move, the LoRaWAN specification recommends allowing the Network Server to control the data rate to minimize power consumption.
+
+For moving devices, ADR should not be used since RF conditions will likely change, but since many moving devices are temporarily stationary, it is possible to save additional power by requesting ADR only during the time a device is stationary. ([LoRaWAN Specification 1.0.3, line 438](https://lora-alliance.org/sites/default/files/2018-07/lorawan1.0.3.pdf)).
+
+You may also use application specific knowledge to predict when ADR is appropriate. A tracking device can detect when it is moving, for example. A parked car sensor can detect when a parked car will affect RF conditions, and should fall back to another strategy. 
+
+## Use OTAA
+
+OTAA devices perform a join-procedure with the network, during which a dynamic Device Address is assigned and security keys are negotiated with the device. Activation by Personalization (ABP) requires hardcoding the Device Address as well as the security keys in the device, which is insecure. ABP also has the downside that devices can not switch network providers without manually changing keys in the device.
+
+## Power Cycles
+
+Devices should save network parameters between regular power cycles. This includes session parameters like `DevAddr`, session keys, `FCnt`, and nonces. This allows the device to easily Join, as keys and counters remain synchronized.
+
+Devices should also randomize initial power on delay (i.e. Join). See [Synchronization, Backoff, and Jitter](#synchronization-backoff-jitter)
+
+## Frame Counters
+
+Devices must increment the frame counter after each uplink and downlink. Devices should use 32 bit counters for FCntUp and FCntDwn to prevent replay attacks.
+
+## Ack
+
+It is possible that you will not receive an ACK for every confirmed uplink or downlink. A good rule of thumb is to wait for at least **three** missed ACK's to assume link loss.
+
+In the case of link loss, do the following:
+
+- Set TX power to the maximum allowed/supported, and try again
+- Decrease data rate step by step, and try again
+- Reset to default channels, and try again
+- Send periodic join requests with backoff
