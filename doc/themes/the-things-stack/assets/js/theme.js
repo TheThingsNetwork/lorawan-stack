@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  const tabs = [...document.querySelectorAll('#tabs li')];
-  const tabContent = [...document.querySelectorAll('#tab-content section')];
+  const tabs = [...document.querySelectorAll('.tabs li')];
+  const tabContent = [...document.querySelectorAll('.tab-content section')];
   const activeClass = 'is-active';
 
   function init() {
@@ -51,16 +51,19 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function toggleTab(key) {
-    let tab = getTabByKey(key)
+    let activeTabs = getTabsByKey(key)
 
-    if(!tab) return
+    if(!activeTabs) return
 
     tabs.forEach((tab) => {
       if (tab && tab.classList.contains(activeClass)) {
         tab.classList.remove(activeClass);
       }
     });
-    tab.classList.add(activeClass);
+
+    activeTabs.forEach((tab) => {
+      tab.classList.add(activeClass);
+    })
 
     tabContent.forEach((item) => {
       if (item && item.classList.contains(activeClass)) {
@@ -76,8 +79,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  function getTabByKey(key) {
-    return document.querySelectorAll(`[data-tab="${key}"]`)[0];
+  function getTabsByKey(key) {
+    return [...document.querySelectorAll(`[data-tab="${key}"]`)];
   }
 
   init();

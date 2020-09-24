@@ -1,0 +1,247 @@
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// We need to use absolute values here due to the way that `react-window` works.
+$event-container-height = 40px
+
+.container
+  display: flex
+  flex-grow: 1
+  flex-direction: column
+  justify-content: space-between
+  position: relative
+  overflow: hidden
+  min-width: 50rem
+
+  +media-query-min($bp.s)
+    // Ensure at least 18 events to be visible at once on desktop.
+    min-height: $event-container-height * 18
+
+  +media-query($bp.s)
+    // Ensure at least 10 events to be visible at once on mobile.
+    min-height: $event-container-height * 12
+
+.header
+  border-normal('bottom')
+  background-color: white
+  height: 3rem
+  z-index: $zi.slight
+  box-sizing: border-box
+  display: flex
+
+.header-cells
+  .cell-time
+    justify-content: center
+
+  & > div:not(.cell-preview):not(:last-child)
+    font-weight: $fw.bold
+
+.header-cells, .event
+  padding: $cs.xxs 0 $cs.xxs $cs.xs
+  display: flex
+  align-items: center
+  flex: 1
+  justify-content: flex-start
+
+  & > div:not(.cell-preview):not(.cell-error):not(:last-child)
+    padding-right: $cs.s
+    flex-grow: 0
+    flex-shrink: 0
+    white-space: nowrap
+
+.sticky-container
+  flex-grow: 1
+  right: $cs.s
+  display: flex
+  justify-content: flex-end
+  +media-query-min($bp.xs)
+    position: sticky
+
+  .actions
+    background-color: white
+
+.widget-container
+  border-normal()
+  box-sizing: border-box
+  min-width: 15rem
+  height: 13rem
+  overflow: hidden
+
+  .event
+    height: 30px
+
+.widget-header-title
+  font-weight: $fw.bold
+
+.body
+  overflow: hidden
+  background-color: $c-backdrop-lighter
+  flex-grow: 1
+  position: relative
+
+  ol
+    padding-left: 0
+    margin: 0
+    list-style: none
+
+.event
+  height: $event-container-height
+  background-color: transparent
+  box-sizing: border-box
+
+  &.active
+    background-color: white
+    box-shadow: 0 0 2rem 0 rgba(0,0,0,.1)
+
+  &.widget
+    padding: 0 0 0 $cs.xs
+
+    .cell-type
+      flex-grow: 1
+      overflow: hidden
+      text-overflow: ellipsis
+      display: flex
+
+  &:not(.widget)
+    .cell-preview
+      overflow-y: auto
+
+  &.synthetic
+    background-color: lighten($tc-warning, 55)
+    .cell-time
+      color: $tc-warning
+
+  &:not(.widget)
+    cursor: pointer
+    transition: background-color ease-in-out $ad.s
+
+    &:hover:not(.active)
+      background-color: $c-backdrop
+
+  .cell-time, .cell-type, .cell-id, .cell-error
+    overflow: hidden
+    text-overflow: ellipsis
+    white-space: nowrap
+    font-family: $font-family-mono
+    font-size: $fs.s
+
+  .cell-time
+    color: $tc-subtle-gray
+
+  .cell-type span, .cell-id span
+    overflow: hidden
+    text-overflow: ellipsis
+
+.cell-time
+  flex-basis: 6rem
+  display: flex
+
+.cell-id
+  flex-basis: 12%
+  min-width: 6rem
+
+.event:not(.widget) .cell-type, .header-cells .cell-type
+  flex-basis: 17%
+  min-width: 14rem
+  max-width: 20rem
+  display: flex
+
+.cell-preview
+  flex-basis: auto
+  flex-grow: 1
+  padding-right: 0
+  white-space: nowrap
+
+  &::-webkit-scrollbar
+    width: .3rem
+    height: .3rem
+
+.cell-data, .cell-error
+  flex-grow: 1
+
+.cell-error
+  color: $tc-error
+
+.event-icon
+  margin-right: $cs.xxs
+
+.empty-message
+  &-container
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    position: absolute
+    display: flex
+    align-items: center
+    justify-content: center
+
+  &-content
+    color: $tc-subtle-gray
+    pre
+      display: inline
+      font-size: $fs.s
+
+.sidebar
+  &-container
+    border-normal(left)
+    background-color: white
+    flex-direction: column
+    display: flex
+
+    +media-query-min($bp.s)
+      sidebar-transition(right)
+      z-index: $zi.slight
+      height: 100%
+      position: absolute
+      width: 43rem
+      right: -43rem
+
+      &.expanded
+        right: 0
+        box-shadow: 0 0 8rem 2rem rgba(0,0,0,.2)
+
+    +media-query($bp.s)
+      sidebar-transition(left)
+      z-index: $zi.nav
+      position: fixed
+      width: 100vw
+      left: 100vw
+      top: $header-height-mobile
+      height: "calc(100vh - %s)" % ($header-height-mobile)
+
+      &.expanded
+        left: 0vw
+
+  &-header
+    display: flex
+    justify-content: space-between
+    align-items: center
+    padding: 0 $cs.xs
+    height: $breadcrumbs-bar-height
+    box-sizing: border-box
+    flex-grow: 0
+
+  &-content
+    flex-grow: 1
+    overflow: auto
+
+  &-close-button
+    reset-button()
+    width: 2rem
+    height: 100%
+    padding: $cs.xxs
+
+  &-title
+    font-weight: $fw.bold

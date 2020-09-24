@@ -15,13 +15,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import ErrorNotification from '@ttn-lw/components/error-notification'
-
-import ApplicationEventsList from '@console/components/events-list/application'
+import Events from '@console/components/events'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { mayViewApplicationEvents } from '@console/lib/feature-checks'
@@ -31,53 +28,30 @@ import {
   startApplicationEventsStream,
 } from '@console/store/actions/applications'
 
-import {
-  selectApplicationEvents,
-  selectApplicationEventsError,
-} from '@console/store/selectors/applications'
+import { selectApplicationEvents } from '@console/store/selectors/applications'
 
 const ApplicationEvents = props => {
-  const { appId, events, error, onRestart, widget, onClear } = props
-
-  if (error) {
-    return (
-      <ErrorNotification
-        small
-        title={sharedMessages.eventsCannotShow}
-        content={error}
-        action={onRestart}
-        actionMessage={sharedMessages.restartStream}
-        buttonIcon="refresh"
-      />
-    )
-  }
+  const { appId, events, widget, onClear } = props
 
   if (widget) {
     return (
-      <ApplicationEventsList.Widget
-        events={events}
-        toAllUrl={`/applications/${appId}/data`}
-        appId={appId}
-      />
+      <Events.Widget entityId={appId} events={events} toAllUrl={`/applications/${appId}/data`} />
     )
   }
 
-  return <ApplicationEventsList events={events} onClear={onClear} appId={appId} />
+  return <Events entityId={appId} events={events} onClear={onClear} />
 }
 
 ApplicationEvents.propTypes = {
   appId: PropTypes.string.isRequired,
-  error: PropTypes.error,
   events: PropTypes.events,
   onClear: PropTypes.func.isRequired,
-  onRestart: PropTypes.func.isRequired,
   widget: PropTypes.bool,
 }
 
 ApplicationEvents.defaultProps = {
   widget: false,
   events: [],
-  error: undefined,
 }
 
 export default withFeatureRequirement(mayViewApplicationEvents)(
@@ -87,7 +61,6 @@ export default withFeatureRequirement(mayViewApplicationEvents)(
 
       return {
         events: selectApplicationEvents(state, appId),
-        error: selectApplicationEventsError(state, appId),
       }
     },
     (dispatch, ownProps) => ({
