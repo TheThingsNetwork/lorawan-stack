@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.title-section
-  border-normal('bottom')
-  margin-bottom: $ls.s
+const composeDataUri = (data, mimeType = 'data:application/json;charset=utf-8') =>
+  `${mimeType},${encodeURIComponent(data)}`
 
-  +media-query($bp.s)
-    margin-bottom: $ls.xs
+const downloadDataUriAsFile = (dataUri, filename) => {
+  const node = document.createElement('a')
+  node.setAttribute('href', dataUri)
+  node.setAttribute('download', filename)
+  document.body.appendChild(node) // Required for Firefox.
+  node.click()
+  node.remove()
+}
 
-.not-available
-  color: $tc-subtle-gray
+export { composeDataUri, downloadDataUriAsFile }
