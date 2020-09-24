@@ -22,6 +22,7 @@ import { selectUserRights, selectUserIsAdmin } from '@console/store/selectors/us
 const stackConfig = selectStackConfig()
 const asEnabled = stackConfig.as.enabled
 const gsEnabled = stackConfig.gs.enabled
+const gcsEnabled = stackConfig.gcs.enabled
 
 export const checkFromState = (featureCheck, state) =>
   featureCheck.check(featureCheck.rightsSelector(state))
@@ -113,7 +114,6 @@ export const mayScheduleDownlinks = {
   rightsSelector: selectApplicationRights,
   check: rights => rights.includes('RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE') && asEnabled,
 }
-
 export const mayViewOrEditApplicationPackages = {
   rightsSelector: selectApplicationRights,
   check: rights => rights.includes('RIGHT_APPLICATION_SETTINGS_PACKAGES') && asEnabled,
@@ -155,6 +155,10 @@ export const mayViewGatewayStatus = {
 export const mayViewOrEditGatewayLocation = {
   rightsSelector: selectGatewayRights,
   check: rights => rights.includes('RIGHT_GATEWAY_LOCATION_READ'),
+}
+export const mayViewGatewayConfJson = {
+  rightsSelector: selectGatewayRights,
+  check: rights => rights.includes('RIGHT_GATEWAY_INFO') && gcsEnabled,
 }
 
 // Organization related feature checks.
