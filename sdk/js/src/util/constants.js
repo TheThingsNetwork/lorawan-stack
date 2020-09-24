@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const STACK_COMPONENTS = ['as', 'is', 'ns', 'js', 'gs', 'edtc', 'qrg']
+export const STACK_COMPONENTS = ['as', 'is', 'ns', 'js', 'gs', 'edtc', 'qrg', 'gcs']
 
 export const URI_PREFIX_STACK_COMPONENT_MAP = {
   as: 'as',
@@ -21,4 +21,5 @@ export const URI_PREFIX_STACK_COMPONENT_MAP = {
   gs: 'gs',
   edtc: 'edtc',
   qrg: 'qrg',
+  gcs: 'gcs',
 }
