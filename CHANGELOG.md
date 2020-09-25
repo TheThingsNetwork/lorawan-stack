@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Broken link to setting device location in the device map widget.
 - Error events causing Console becoming unresponsive and crashing.
 - Incorrect entity count in title sections in the Console.
+- Incorrect event detail panel open/close behavior for some events in the Console.
 
 ### Security
 
