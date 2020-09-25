@@ -734,5 +734,5 @@ func (js *JoinServer) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EU
 		}
 		return nil, nil
 	}
-	return sets.NetID, nil
+	return sets.HomeNetID, nil
 }
