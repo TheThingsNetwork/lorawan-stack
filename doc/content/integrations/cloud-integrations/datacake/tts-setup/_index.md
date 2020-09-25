@@ -8,6 +8,8 @@ After finishing Datacake setup, make a Webhook integration on {{% tts %}} with t
 
 <!--more-->
 
+>Note: **Datacake** Webhook template is now available on {{% tts %}}, but in case you want to create a **Custom webhook**, this guide can be helpful. Read more about these templates in the [Webhook templates]({{< ref "/integrations/webhooks/webhook-templates" >}}) page.
+
 >Note: this section follows the [HTTP Webhooks]({{< ref "/integrations/webhooks" >}}) guide. 
 
 Fill in the **Webhook ID** field and choose **JSON** for **Webhook format**. 
@@ -20,4 +22,8 @@ Per the **Webhook Settings** information that can be found in the **Configuratio
 
 Check the message types for which you want to enable this webhook.
 
-Once the setup is finished, you can navigate to device's **Debug** tab, where you can see the incoming messages and their details.
+>Note: Datacake webhook template has the `Uplink message` type enabled by the default. 
+
+Once the setup is finished, you can navigate to device's **Debug** tab on Datacake, where you can see the incoming messages and proceed with manipulating or monitoring your data.
+
+Check the official Datacake documentation to learn how to [decode the payload](https://docs.datacake.de/lorawan/payload-decoders) received from {{% tts %}}. 
