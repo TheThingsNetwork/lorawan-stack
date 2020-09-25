@@ -61,16 +61,21 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return nil, err
 	}
-	sets := &req.ApplicationActivationSettings
-	if k := req.ApplicationActivationSettings.KEK.GetKey(); !k.IsZero() {
+	sets := req.FieldMask.Paths
+	reqKEK := req.ApplicationActivationSettings.KEK
+	if k := reqKEK.GetKey(); !k.IsZero() && ttnpb.HasAnyField(sets, "kek.key") {
 		kek, err := cryptoutil.WrapAES128Key(ctx, *k, srv.kekLabel, srv.JS.KeyVault)
 		if err != nil {
 			return nil, errWrapKey.WithCause(err)
 		}
-		sets.KEK = kek
+		req.ApplicationActivationSettings.KEK = kek
+		sets = ttnpb.AddFields(sets,
+			"kek.encrypted_key",
+			"kek.kek_label",
+		)
 	}
-	sets, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIdentifiers, nil, func(sets *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
-		return sets, req.FieldMask.Paths, nil
+	v, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths, func(*ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+		return &req.ApplicationActivationSettings, sets, nil
 	})
 	if errors.IsNotFound(err) {
 		return nil, errApplicationActivationSettingsNotFound.WithCause(err)
@@ -78,7 +83,8 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	return sets, nil
+	v.KEK = reqKEK
+	return v, nil
 }
 
 // Delete implements ttnpb.ApplicationActivationSettingsRegistryServer.
@@ -86,8 +92,8 @@ func (srv applicationActivationSettingsRegistryServer) Delete(ctx context.Contex
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return nil, err
 	}
-	_, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIdentifiers, nil, func(sets *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
-		if sets == nil {
+	_, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIdentifiers, nil, func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+		if stored == nil {
 			return nil, nil, errApplicationActivationSettingsNotFound.New()
 		}
 		return nil, nil, nil
