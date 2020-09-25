@@ -47,6 +47,10 @@ func MustWrapAES128Key(ctx context.Context, key types.AES128Key, kekLabel string
 	return test.Must(cryptoutil.WrapAES128Key(ctx, key, kekLabel, v)).(*ttnpb.KeyEnvelope)
 }
 
+func MustWrapAES128KeyWithKEK(ctx context.Context, key types.AES128Key, kekLabel string, kek types.AES128Key) *ttnpb.KeyEnvelope {
+	return test.Must(cryptoutil.WrapAES128KeyWithKEK(ctx, key, kekLabel, kek)).(*ttnpb.KeyEnvelope)
+}
+
 type AsJsServer = asJsServer
 type NsJsServer = nsJsServer
 type JsDeviceServer = jsEndDeviceRegistryServer

@@ -472,7 +472,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					"kek_label",
 				})
 				if err != nil {
-					if errors.IsNotFound(err) {
+					if !errors.IsNotFound(err) {
 						return nil, nil, errGetApplicationActivationSettings.WithCause(err)
 					}
 					if asKEKLabel == "" {
