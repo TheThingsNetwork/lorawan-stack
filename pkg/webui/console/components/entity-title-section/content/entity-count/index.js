@@ -36,7 +36,7 @@ const EntityCount = props => {
       to={toAllUrl}
     >
       <Icon className={style.icon} icon={icon} nudgeUp />
-      <span className={style.value}>{value} </span>
+      {!errored && <span className={style.value}>{value} </span>}
       <Message
         className={style.message}
         content={errored ? sharedMessages.notAvailable : keyMessage}
