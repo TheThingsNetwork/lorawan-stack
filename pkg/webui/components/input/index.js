@@ -206,7 +206,7 @@ class Input extends React.Component {
         </div>
         {hasAction && (
           <div className={style.actions}>
-            <Button className={style.button} {...action} />
+            <Button className={style.button} disabled={disabled} {...action} />
           </div>
         )}
       </div>
