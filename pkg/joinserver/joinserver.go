@@ -97,6 +97,10 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		entropy:   ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 0),
 	}
 
+	js.grpc.applicationActivationSettings = applicationActivationSettingsRegistryServer{
+		JS:       js,
+		kekLabel: conf.DeviceKEKLabel,
+	}
 	js.grpc.jsDevices = jsEndDeviceRegistryServer{
 		JS:       js,
 		kekLabel: conf.DeviceKEKLabel,
@@ -110,6 +114,7 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Js", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationActivationSettingsRegistry", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Js", cluster.HookName, c.ClusterAuthUnaryHook())
