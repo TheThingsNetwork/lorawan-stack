@@ -36,7 +36,7 @@ func (srv applicationActivationSettingsRegistryServer) Get(ctx context.Context, 
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 		return nil, err
 	}
-	sets, err := srv.JS.applicationActivationSettings.GetByID(ctx, req.ApplicationIdentifiers, ttnpb.ApplicationActivationSettingsFieldPathsTopLevel)
+	sets, err := srv.JS.applicationActivationSettings.GetByID(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths)
 	if errors.IsNotFound(err) {
 		return nil, errApplicationActivationSettingsNotFound.WithCause(err)
 	}
@@ -65,7 +65,7 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 		sets.KEK = kek
 	}
 	sets, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIdentifiers, nil, func(sets *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
-		return sets, ttnpb.ApplicationActivationSettingsFieldPathsTopLevel, nil
+		return sets, req.FieldMask.Paths, nil
 	})
 	if errors.IsNotFound(err) {
 		return nil, errApplicationActivationSettingsNotFound.WithCause(err)
