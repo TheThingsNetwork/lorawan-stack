@@ -34,9 +34,10 @@ const EntityCount = props => {
         [style.error]: errored,
       })}
       to={toAllUrl}
+      disabled={errored}
     >
       <Icon className={style.icon} icon={icon} nudgeUp />
-      <span className={style.value}>{value} </span>
+      {!errored && <span className={style.value}>{value} </span>}
       <Message
         className={style.message}
         content={errored ? sharedMessages.notAvailable : keyMessage}
