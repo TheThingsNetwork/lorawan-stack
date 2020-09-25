@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import * as Sentry from '@sentry/browser'
 
 import Icon from '@ttn-lw/components/icon'
 
@@ -28,9 +27,8 @@ import style from './events.styl'
 class EventErrorBoundary extends React.Component {
   state = { hasErrored: false, error: undefined, expanded: false }
 
-  static getDerivedStateFromError(error) {
-    Sentry.captureException(error)
-    return { hasErrored: true, error }
+  static getDerivedStateFromError() {
+    return { hasErrored: true }
   }
 
   render() {
