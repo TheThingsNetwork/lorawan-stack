@@ -50,8 +50,9 @@ var (
 )
 
 var (
-	errAdminsCreateGateways = errors.DefinePermissionDenied("admins_create_gateways", "gateways may only be created by admins, or in organizations")
-	errGatewayEUITaken      = errors.DefineAlreadyExists("gateway_eui_taken", "a gateway with EUI `{gateway_eui}` is already registered as `{gateway_id}`")
+	errAdminsCreateGateways       = errors.DefinePermissionDenied("admins_create_gateways", "gateways may only be created by admins, or in organizations")
+	errGatewayEUITaken            = errors.DefineAlreadyExists("gateway_eui_taken", "a gateway with EUI `{gateway_eui}` is already registered as `{gateway_id}`")
+	errGatewaySecretEncryptionKey = errors.DefineNotFound("gateway_secret_encryption_key_not_found", "a gateway secret encryption key with id `{id}` not found")
 )
 
 func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
@@ -75,6 +76,18 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	}
 	if len(req.FrequencyPlanIDs) == 0 && req.FrequencyPlanID != "" {
 		req.FrequencyPlanIDs = []string{req.FrequencyPlanID}
+	}
+
+	if req.LBSLNSSecret != nil {
+		if is.config.Gateways.EncryptionKeyID == "" {
+			return nil, errGatewaySecretEncryptionKey
+		}
+		encrypted, err := is.KeyVault.Encrypt(ctx, req.LBSLNSSecret.Value, is.config.Gateways.EncryptionKeyID)
+		if err != nil {
+			return nil, err
+		}
+		req.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
+		req.LBSLNSSecret.Value = encrypted
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
@@ -113,6 +126,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		return nil, err
 	}
 	events.Publish(evtCreateGateway.NewWithIdentifiersAndData(ctx, req.GatewayIdentifiers, nil))
+
 	return gtw, nil
 }
 
@@ -136,6 +150,13 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 			return nil, err
 		}
 	}
+
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "lbs_lns_secret") {
+		if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS); err != nil {
+			return nil, err
+		}
+	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtw, err = store.GetGatewayStore(db).GetGateway(ctx, &req.GatewayIdentifiers, &req.FieldMask)
 		if err != nil {
@@ -151,6 +172,17 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	if gtw.LBSLNSSecret != nil {
+		if gtw.LBSLNSSecret.KeyID == "" {
+			return nil, errGatewaySecretEncryptionKey.WithAttributes("id", gtw.LBSLNSSecret.KeyID)
+		}
+		decrypted, err := is.KeyVault.Decrypt(ctx, gtw.LBSLNSSecret.Value, gtw.LBSLNSSecret.KeyID)
+		if err != nil {
+			return nil, err
+		}
+		gtw.LBSLNSSecret.Value = decrypted
 	}
 
 	// Backwards compatibility for frequency_plan_id field.
@@ -254,6 +286,19 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO) != nil {
 			gtws.Gateways[i] = gtw.PublicSafe()
 		}
+
+		if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
+			gtws.Gateways[i].LBSLNSSecret = nil
+		} else if gtw.LBSLNSSecret != nil {
+			if gtw.LBSLNSSecret.KeyID == "" {
+				return nil, errGatewaySecretEncryptionKey.WithAttributes("id", gtw.LBSLNSSecret.KeyID)
+			}
+			decrypted, err := is.KeyVault.Decrypt(ctx, gtw.LBSLNSSecret.Value, gtw.LBSLNSSecret.KeyID)
+			if err != nil {
+				return nil, err
+			}
+			gtws.Gateways[i].LBSLNSSecret.Value = decrypted
+		}
 	}
 
 	return gtws, nil
@@ -283,6 +328,21 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 			return nil, err
 		}
 	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "lbs_lns_secret") && req.LBSLNSSecret != nil {
+		if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
+			return nil, err
+		}
+		if is.config.Gateways.EncryptionKeyID == "" {
+			return nil, errGatewaySecretEncryptionKey
+		}
+		encrypted, err := is.KeyVault.Encrypt(ctx, req.LBSLNSSecret.Value, is.config.Gateways.EncryptionKeyID)
+		if err != nil {
+			return nil, err
+		}
+		req.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
+		req.LBSLNSSecret.Value = encrypted
+	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtw, err = store.GetGatewayStore(db).UpdateGateway(ctx, &req.Gateway, &req.FieldMask)
 		if err != nil {

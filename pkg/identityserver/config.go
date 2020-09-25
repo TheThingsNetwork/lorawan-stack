@@ -77,6 +77,9 @@ type Config struct {
 		SMTP         smtp.Config          `name:"smtp"`
 		Templates    emailTemplatesConfig `name:"templates"`
 	} `name:"email"`
+	Gateways struct {
+		EncryptionKeyID string `name:"encryption-key-id" description:"ID of the key used to encrypt gateway secrets at rest"`
+	}
 }
 
 type emailTemplatesConfig struct {

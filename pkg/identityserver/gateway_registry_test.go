@@ -297,3 +297,180 @@ func TestGatewaysPagination(t *testing.T) {
 		}
 	})
 }
+
+func TestGatewaysSecrets(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		reg := ttnpb.NewGatewayRegistryClient(cc)
+
+		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
+		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
+
+		eui := types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}
+
+		gatewayID := "foo-with-secret"
+		gatewayName := "Foo Gateway with Secret"
+
+		secret := &ttnpb.Secret{
+			KeyID: "is-test",
+			Value: []byte("my very secret value"),
+		}
+
+		is.config.UserRights.CreateGateways = false
+
+		_, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+			Gateway: ttnpb.Gateway{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: gatewayID,
+					EUI:       &eui,
+				},
+				Name: gatewayName,
+			},
+			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+		is.config.UserRights.CreateGateways = true
+
+		_, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+			Gateway: ttnpb.Gateway{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: gatewayID,
+					EUI:       &eui,
+				},
+				Name:         gatewayName,
+				LBSLNSSecret: secret,
+			},
+			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+		a.So(errors.IsNotFound(err), should.BeTrue)
+
+		is.config.Gateways.EncryptionKeyID = "is-test"
+
+		created, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+			Gateway: ttnpb.Gateway{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: gatewayID,
+					EUI:       &eui,
+				},
+				Name:         gatewayName,
+				LBSLNSSecret: secret,
+			},
+			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		a.So(err, should.BeNil)
+		if a.So(created, should.NotBeNil) {
+			a.So(created.Name, should.Equal, gatewayName)
+			a.So(created.LBSLNSSecret, should.NotBeNil)
+		}
+
+		got, err := reg.Get(ctx, &ttnpb.GetGatewayRequest{
+			GatewayIdentifiers: created.GatewayIdentifiers,
+			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret"}},
+		}, creds)
+
+		a.So(err, should.BeNil)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.Name, should.Equal, created.Name)
+			if a.So(got.EUI, should.NotBeNil) {
+				a.So(*got.EUI, should.Equal, eui)
+			}
+			a.So(got.LBSLNSSecret, should.Resemble, secret)
+		}
+
+		ids, err := reg.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+			EUI: eui,
+		}, credsWithoutRights)
+
+		a.So(err, should.BeNil)
+		if a.So(ids, should.NotBeNil) {
+			a.So(ids.GatewayID, should.Equal, created.GatewayID)
+		}
+
+		_, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+			Gateway: ttnpb.Gateway{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: "bar",
+					EUI:       &eui,
+				},
+				Name: "Bar Gateway",
+			},
+			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(err, should.HaveSameErrorDefinitionAs, errGatewayEUITaken)
+		}
+
+		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
+			GatewayIdentifiers: created.GatewayIdentifiers,
+			FieldMask:          ptypes.FieldMask{Paths: []string{"ids"}},
+		}, credsWithoutRights)
+
+		a.So(err, should.BeNil)
+
+		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
+			GatewayIdentifiers: created.GatewayIdentifiers,
+			FieldMask:          ptypes.FieldMask{Paths: []string{"lbs_lns_secret"}},
+		}, credsWithoutRights)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		updated, err := reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
+			Gateway: ttnpb.Gateway{
+				GatewayIdentifiers: created.GatewayIdentifiers,
+				LBSLNSSecret: &ttnpb.Secret{
+					Value: []byte("my new secret value"),
+				},
+			},
+			FieldMask: ptypes.FieldMask{Paths: []string{"lbs_lns_secret"}},
+		}, creds)
+
+		a.So(err, should.BeNil)
+		a.So(updated, should.NotBeNil)
+		a.So(updated.LBSLNSSecret, should.NotBeNil)
+
+		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
+			GatewayIdentifiers: created.GatewayIdentifiers,
+			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret"}},
+		}, creds)
+
+		a.So(err, should.BeNil)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.Name, should.Equal, created.Name)
+			if a.So(got.EUI, should.NotBeNil) {
+				a.So(*got.EUI, should.Equal, eui)
+			}
+			if a.So(got.LBSLNSSecret, should.NotBeNil) {
+				a.So(got.LBSLNSSecret.Value, should.Resemble, []byte("my new secret value"))
+			}
+		}
+
+		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{userID.OrganizationOrUserIdentifiers()} {
+			list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
+				FieldMask:    ptypes.FieldMask{Paths: []string{"lbs_lns_secret"}},
+				Collaborator: collaborator,
+			}, creds)
+			a.So(err, should.BeNil)
+			if a.So(list, should.NotBeNil) && a.So(list.Gateways, should.NotBeEmpty) {
+				var found bool
+				for _, item := range list.Gateways {
+					if item.GatewayID == created.GatewayID {
+						found = true
+						a.So(item.LBSLNSSecret, should.Resemble, got.LBSLNSSecret)
+					}
+				}
+				a.So(found, should.BeTrue)
+			}
+		}
+
+		_, err = reg.Delete(ctx, &created.GatewayIdentifiers, creds)
+
+		a.So(err, should.BeNil)
+	})
+}
