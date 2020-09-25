@@ -51,8 +51,13 @@ func (srv applicationActivationSettingsRegistryServer) Get(ctx context.Context, 
 	return sets, nil
 }
 
+var errNoPaths = errors.DefineInvalidArgument("no_paths", "no paths specified")
+
 // Set implements ttnpb.ApplicationActivationSettingsRegistryServer.
 func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, req *ttnpb.SetApplicationActivationSettingsRequest) (*ttnpb.ApplicationActivationSettings, error) {
+	if len(req.FieldMask.Paths) == 0 {
+		return nil, errNoPaths
+	}
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return nil, err
 	}
