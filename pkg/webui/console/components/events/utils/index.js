@@ -20,7 +20,7 @@ import SyntheticErrorEventPreview from '../previews/synthetic/error'
 
 import { eventIconMap, dataTypeMap, applicationUpMessages } from './definitions'
 
-export const getEventId = event => `${event.time}-${event.name}`
+export const getEventId = event => event.unique_id
 
 export const getEventIconByName = eventName => {
   const definition = eventIconMap.find(e => e.test.test(eventName))
