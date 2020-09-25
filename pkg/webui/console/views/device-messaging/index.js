@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import DownlinkForm from './downlink-form'
+import DeviceMessaging from './device-messaging'
 import connect from './connect'
 
-const ConnectedDownlinkForm = connect(DownlinkForm)
+const ConnectedDeviceMessages = connect(DeviceMessaging)
 
-export { ConnectedDownlinkForm as default, DownlinkForm }
+export { ConnectedDeviceMessages as default, DeviceMessaging }

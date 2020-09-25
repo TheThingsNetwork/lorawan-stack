@@ -205,6 +205,9 @@ export default {
     update: ttnClient.Applications.Devices.updateById.bind(ttnClient.Applications.Devices),
     eventsSubscribe: ttnClient.Applications.Devices.openStream.bind(ttnClient.Applications.Devices),
     delete: ttnClient.Applications.Devices.deleteById.bind(ttnClient.Applications.Devices),
+    simulateUplink: ttnClient.Applications.Devices.simulateUplink.bind(
+      ttnClient.Applications.Devices,
+    ),
   },
   deviceTemplates: {
     listFormats: ttnClient.Applications.Devices.listTemplateFormats.bind(

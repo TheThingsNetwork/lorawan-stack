@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import DownlinkForm from './downlink-form'
-import connect from './connect'
+import { connect } from 'react-redux'
 
-const ConnectedDownlinkForm = connect(DownlinkForm)
+import { mayScheduleDownlinks, maySendUplink, checkFromState } from '@console/lib/feature-checks'
 
-export { ConnectedDownlinkForm as default, DownlinkForm }
+const mapStateToProps = state => ({
+  mayScheduleDownlinks: checkFromState(mayScheduleDownlinks, state),
+  maySendUplink: checkFromState(maySendUplink, state),
+})
+
+export default DeviceMessaging => connect(mapStateToProps)(DeviceMessaging)

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support for sending end device uplinks in the Console.
+
 ### Changed
 
 - Decoded downlink payloads are now published as part of downlink attempt events.

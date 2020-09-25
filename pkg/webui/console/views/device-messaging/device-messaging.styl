@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import DownlinkForm from './downlink-form'
-import connect from './connect'
+.tabs
+  margin-top: 0
+  margin-bottom: $ls.s
 
-const ConnectedDownlinkForm = connect(DownlinkForm)
-
-export { ConnectedDownlinkForm as default, DownlinkForm }
+  +media-query($bp.s)
+    background: none
+    margin-right: 0
