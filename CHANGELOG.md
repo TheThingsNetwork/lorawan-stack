@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- Join EUI prefixes select on empty prefixes configuration in Join Server.
+
 ### Fixed
 
 - Broken link to setting device location in the device map widget.
