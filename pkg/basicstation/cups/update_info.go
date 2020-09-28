@@ -50,14 +50,13 @@ const (
 	cupsStationAttribute       = "cups-station"
 	cupsModelAttribute         = "cups-model"
 	cupsPackageAttribute       = "cups-package"
-	lnsCredentialsIDAttribute  = "lns-credentials-id"
-	lnsCredentialsAttribute    = "lns-credentials"
 )
 
 var (
 	errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
 	errCUPSNotEnabled  = errors.DefinePermissionDenied("cups_not_enabled", "CUPS is not enabled for gateway `{gateway_uid}`")
 	errInvalidToken    = errors.DefinePermissionDenied("invalid_token", "invalid provisioning token")
+	errLNSCredentials  = errors.DefineNotFound("lns_credentials_not_found", "LNS credentials not found for gateway `{gateway_uid}`")
 )
 
 func getAuthHeader(ctx context.Context) string {
@@ -119,14 +118,27 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	if err != nil {
 		return nil, err
 	}
+	_, err = registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
+		Gateway: ttnpb.Gateway{
+			GatewayIdentifiers: ids,
+			LBSLNSSecret: &ttnpb.Secret{
+				Value: []byte(lnsKey.Key),
+			},
+		},
+		FieldMask: pbtypes.FieldMask{
+			Paths: []string{"lbs_lns_secret"},
+		},
+	}, auth)
+	if err != nil {
+		return nil, err
+	}
+
 	logger.WithField("api_key_id", lnsKey.ID).Info("Created gateway API key for LNS")
 	gtw.Attributes = map[string]string{
 		cupsAttribute:              "true",
 		cupsAuthHeaderAttribute:    getAuthHeader(ctx),
 		cupsCredentialsIDAttribute: cupsKey.ID,
 		cupsCredentialsAttribute:   fmt.Sprintf("Bearer %s", cupsKey.Key),
-		lnsCredentialsIDAttribute:  lnsKey.ID,
-		lnsCredentialsAttribute:    fmt.Sprintf("Bearer %s", lnsKey.Key),
 	}
 	return gtw, nil
 }
@@ -138,6 +150,7 @@ var getGatewayMask = pbtypes.FieldMask{Paths: []string{
 	"auto_update",
 	"update_channel",
 	"frequency_plan_id",
+	"lbs_lns_secret",
 }}
 
 // UpdateInfo implements the CUPS update-info handler.
@@ -179,7 +192,6 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-
 	uid := unique.ID(ctx, gtw.GatewayIdentifiers)
 	logger = logger.WithField("gateway_uid", uid)
 
@@ -208,6 +220,10 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 
 	if gtw.Attributes == nil {
 		gtw.Attributes = make(map[string]string)
+	}
+
+	if gtw.LBSLNSSecret == nil {
+		return errLNSCredentials.WithAttributes("gateway_uid", uid)
 	}
 
 	if s.requireExplicitEnable || gtw.Attributes[cupsAttribute] != "" {
@@ -262,14 +278,12 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	if credentials := gtw.Attributes[lnsCredentialsAttribute]; credentials != "" {
-		lnsCredentials, err := TokenCredentials(lnsTrust, credentials)
-		if err != nil {
-			return err
-		}
-		if crc32.ChecksumIEEE(lnsCredentials) != req.LNSCredentialsCRC {
-			res.LNSCredentials = lnsCredentials
-		}
+	lnsCredentials, err := TokenCredentials(lnsTrust, string(gtw.LBSLNSSecret.Value))
+	if err != nil {
+		return err
+	}
+	if crc32.ChecksumIEEE(lnsCredentials) != req.LNSCredentialsCRC {
+		res.LNSCredentials = lnsCredentials
 	}
 
 	if gtw.AutoUpdate {
