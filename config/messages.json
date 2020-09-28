@@ -5615,6 +5615,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver/redis:database_corruption": {
+    "translations": {
+      "en": "database is corrupted"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "redis.go"
+    }
+  },
   "error:pkg/networkserver/redis:duplicate_identifiers": {
     "translations": {
       "en": "duplicate identifiers"
@@ -5627,6 +5636,15 @@
   "error:pkg/networkserver/redis:invalid_fieldmask": {
     "translations": {
       "en": "invalid fieldmask"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/networkserver/redis:invalid_format": {
+    "translations": {
+      "en": "invalid value format"
     },
     "description": {
       "package": "pkg/networkserver/redis",
@@ -5658,6 +5676,15 @@
     "description": {
       "package": "pkg/networkserver/redis",
       "file": "application_uplink_queue.go"
+    }
+  },
+  "error:pkg/networkserver/redis:no_uplink_match": {
+    "translations": {
+      "en": "no device matches uplink"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
     }
   },
   "error:pkg/networkserver/redis:read_only_field": {
@@ -6011,6 +6038,15 @@
       "file": "grpc_gsns.go"
     }
   },
+  "error:pkg/networkserver:retransmission_delay_exceeded": {
+    "translations": {
+      "en": "retransmission delay exceeded maximum"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_gsns.go"
+    }
+  },
   "error:pkg/networkserver:schedule": {
     "translations": {
       "en": "all downlink scheduling attempts failed"
@@ -6020,9 +6056,27 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:transmission_number_exceeded": {
+    "translations": {
+      "en": "transmission number exceeded maximum"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_gsns.go"
+    }
+  },
   "error:pkg/networkserver:unknown_chanel": {
     "translations": {
       "en": "channel is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:unknown_f_nwk_s_int_key": {
+    "translations": {
+      "en": "FNwkSIntKey is unknown"
     },
     "description": {
       "package": "pkg/networkserver",

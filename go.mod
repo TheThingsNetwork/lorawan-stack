@@ -102,6 +102,7 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/valyala/fasttemplate v1.1.0 // indirect
+	github.com/vmihailenco/msgpack/v5 v5.0.0-beta.1
 	go.opencensus.io v0.22.3
 	go.packetbroker.org/api/v3 v3.0.0
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2

@@ -127,6 +127,28 @@ func DeviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Ba
 	return true
 }
 
+func DeviceResetsFCnt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
+	switch {
+	case dev.GetMACSettings().GetResetsFCnt() != nil:
+		return dev.MACSettings.ResetsFCnt.Value
+	case defaults.GetResetsFCnt() != nil:
+		return defaults.ResetsFCnt.Value
+	default:
+		return false
+	}
+}
+
+func DeviceSupports32BitFCnt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
+	switch {
+	case dev.GetMACSettings().GetSupports32BitFCnt() != nil:
+		return dev.MACSettings.Supports32BitFCnt.Value
+	case defaults.GetSupports32BitFCnt() != nil:
+		return defaults.Supports32BitFCnt.Value
+	default:
+		return true
+	}
+}
+
 var errClassAMulticast = errors.DefineInvalidArgument("class_a_multicast", "multicast device in class A mode")
 
 func DeviceDefaultClass(dev *ttnpb.EndDevice) (ttnpb.Class, error) {

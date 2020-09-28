@@ -15,7 +15,15 @@
 // Package redis provides Redis implementations of interfaces used by networkserver.
 package redis
 
-import ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
+import (
+	"encoding/base64"
+	"hash/fnv"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
+)
+
+//go:generate go run ./generate_scripts.go
 
 func deviceUIDKey(cl *ttnredis.Client, uid string) string {
 	return cl.Key("uid", uid)
@@ -24,3 +32,13 @@ func deviceUIDKey(cl *ttnredis.Client, uid string) string {
 func deviceUIDLastInvalidationKey(cl *ttnredis.Client, uid string) string {
 	return ttnredis.Key(deviceUIDKey(cl, uid), "last-invalidation")
 }
+
+var keyEncoding = base64.RawStdEncoding
+
+func uplinkPayloadHash(b []byte) string {
+	h := fnv.New64a()
+	_, _ = h.Write(b)
+	return keyEncoding.EncodeToString(h.Sum(nil))
+}
+
+var errDatabaseCorruption = errors.DefineCorruption("database_corruption", "database is corrupted")

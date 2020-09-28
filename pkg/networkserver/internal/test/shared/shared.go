@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package networkserver_test
+// Package test contains testing utilities usable by all subpackages of networkserver excluding itself.
+package test
 
-import (
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test/shared"
-)
+import "go.thethings.network/lorawan-stack/v3/pkg/util/test"
 
-func init() {
-	NewApplicationUplinkQueue = NewRedisApplicationUplinkQueue
-	NewDeviceRegistry = NewRedisDeviceRegistry
-	NewDownlinkTaskQueue = NewRedisDownlinkTaskQueue
-	NewUplinkDeduplicator = NewRedisUplinkDeduplicator
-}
+var CacheTTL = (1 << 5) * test.Delay

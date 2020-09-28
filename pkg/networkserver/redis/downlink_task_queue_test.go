@@ -12,16 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package networkserver_test
+package redis_test
 
 import (
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	"testing"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test/shared"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
 )
 
-func init() {
-	NewApplicationUplinkQueue = NewRedisApplicationUplinkQueue
-	NewDeviceRegistry = NewRedisDeviceRegistry
-	NewDownlinkTaskQueue = NewRedisDownlinkTaskQueue
-	NewUplinkDeduplicator = NewRedisUplinkDeduplicator
+var _ networkserver.DownlinkTaskQueue = &DownlinkTaskQueue{}
+
+func TestDownlinkTaskQueue(t *testing.T) {
+	q, closeFn := NewRedisDownlinkTaskQueue(t)
+	t.Cleanup(closeFn)
+	HandleDownlinkTaskQueueTest(t, q)
 }

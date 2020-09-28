@@ -2018,9 +2018,8 @@ var _ DeviceRegistry = MockDeviceRegistry{}
 
 // MockDeviceRegistry is a mock DeviceRegistry used for testing.
 type MockDeviceRegistry struct {
-	GetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
-	SetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
-	RangeByAddrFunc func(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error
+	GetByIDFunc func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
+	SetByIDFunc func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 }
 
 // GetByEUI panics.
@@ -2036,14 +2035,6 @@ func (m MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.Application
 	return m.GetByIDFunc(ctx, appID, devID, paths)
 }
 
-// RangeByAddr calls RangeByAddrFunc if set and panics otherwise.
-func (m MockDeviceRegistry) RangeByAddr(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error {
-	if m.RangeByAddrFunc == nil {
-		panic("RangeByAddr called, but not set")
-	}
-	return m.RangeByAddrFunc(ctx, devAddr, paths, f)
-}
-
 // SetByID calls SetByIDFunc if set and panics otherwise.
 func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 	if m.SetByIDFunc == nil {
@@ -2052,121 +2043,7 @@ func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.Application
 	return m.SetByIDFunc(ctx, appID, devID, paths, f)
 }
 
-var _ UplinkDeduplicator = &MockUplinkDeduplicator{}
-
-type MockUplinkDeduplicator struct {
-	DeduplicateUplinkFunc   func(context.Context, *ttnpb.UplinkMessage, time.Duration) (bool, error)
-	AccumulatedMetadataFunc func(context.Context, *ttnpb.UplinkMessage) ([]*ttnpb.RxMetadata, error)
-}
-
-// DeduplicateUplink calls DeduplicateUplinkFunc if set and panics otherwise.
-func (m MockUplinkDeduplicator) DeduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage, d time.Duration) (bool, error) {
-	if m.DeduplicateUplinkFunc == nil {
-		panic("DeduplicateUplink called, but not set")
-	}
-	return m.DeduplicateUplinkFunc(ctx, up, d)
-}
-
-// AccumulatedMetadata calls AccumulatedMetadataFunc if set and panics otherwise.
-func (m MockUplinkDeduplicator) AccumulatedMetadata(ctx context.Context, up *ttnpb.UplinkMessage) ([]*ttnpb.RxMetadata, error) {
-	if m.AccumulatedMetadataFunc == nil {
-		panic("AccumulatedMetadata called, but not set")
-	}
-	return m.AccumulatedMetadataFunc(ctx, up)
-}
-
-type UplinkDeduplicatorDeduplicateUplinkResponse struct {
-	Ok    bool
-	Error error
-}
-
-type UplinkDeduplicatorDeduplicateUplinkRequest struct {
-	Context  context.Context
-	Uplink   *ttnpb.UplinkMessage
-	Window   time.Duration
-	Response chan<- UplinkDeduplicatorDeduplicateUplinkResponse
-}
-
-func MakeUplinkDeduplicatorDeduplicateUplinkChFunc(reqCh chan<- UplinkDeduplicatorDeduplicateUplinkRequest) func(context.Context, *ttnpb.UplinkMessage, time.Duration) (bool, error) {
-	return func(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration) (bool, error) {
-		respCh := make(chan UplinkDeduplicatorDeduplicateUplinkResponse)
-		reqCh <- UplinkDeduplicatorDeduplicateUplinkRequest{
-			Context:  ctx,
-			Uplink:   up,
-			Window:   window,
-			Response: respCh,
-		}
-		resp := <-respCh
-		return resp.Ok, resp.Error
-	}
-}
-
-type UplinkDeduplicatorAccumulatedMetadataResponse struct {
-	Metadata []*ttnpb.RxMetadata
-	Error    error
-}
-
-type UplinkDeduplicatorAccumulatedMetadataRequest struct {
-	Context  context.Context
-	Uplink   *ttnpb.UplinkMessage
-	Response chan<- UplinkDeduplicatorAccumulatedMetadataResponse
-}
-
-func MakeUplinkDeduplicatorAccumulatedMetadataChFunc(reqCh chan<- UplinkDeduplicatorAccumulatedMetadataRequest) func(context.Context, *ttnpb.UplinkMessage) ([]*ttnpb.RxMetadata, error) {
-	return func(ctx context.Context, up *ttnpb.UplinkMessage) ([]*ttnpb.RxMetadata, error) {
-		respCh := make(chan UplinkDeduplicatorAccumulatedMetadataResponse)
-		reqCh <- UplinkDeduplicatorAccumulatedMetadataRequest{
-			Context:  ctx,
-			Uplink:   up,
-			Response: respCh,
-		}
-		resp := <-respCh
-		return resp.Metadata, resp.Error
-	}
-}
-
-func AssertDeduplicateUplink(ctx context.Context, reqCh <-chan UplinkDeduplicatorDeduplicateUplinkRequest, assert func(context.Context, *ttnpb.UplinkMessage, time.Duration) bool, resp UplinkDeduplicatorDeduplicateUplinkResponse) bool {
-	t := test.MustTFromContext(ctx)
-	t.Helper()
-	select {
-	case <-ctx.Done():
-		t.Error("Timed out while waiting for UplinkDeduplicator.DeduplicateUplink to be called")
-		return false
-
-	case req := <-reqCh:
-		if !assert(req.Context, req.Uplink, req.Window) {
-			return false
-		}
-		select {
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for UplinkDeduplicator.DeduplicateUplink response to be processed")
-			return false
-
-		case req.Response <- resp:
-			return true
-		}
-	}
-}
-
-func AssertAccumulatedMetadata(ctx context.Context, reqCh <-chan UplinkDeduplicatorAccumulatedMetadataRequest, assert func(context.Context, *ttnpb.UplinkMessage) bool, resp UplinkDeduplicatorAccumulatedMetadataResponse) bool {
-	t := test.MustTFromContext(ctx)
-	t.Helper()
-	select {
-	case <-ctx.Done():
-		t.Error("Timed out while waiting for UplinkDeduplicator.AccumulatedMetadata to be called")
-		return false
-
-	case req := <-reqCh:
-		if !assert(req.Context, req.Uplink) {
-			return false
-		}
-		select {
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for UplinkDeduplicator.AccumulatedMetadata response to be processed")
-			return false
-
-		case req.Response <- resp:
-			return true
-		}
-	}
+// RangeByUplinkMatches panics.
+func (m MockDeviceRegistry) RangeByUplinkMatches(context.Context, *ttnpb.UplinkMessage, time.Duration, func(context.Context, UplinkMatch) (bool, error)) error {
+	panic("RangeByUplinkMatches must not be called")
 }

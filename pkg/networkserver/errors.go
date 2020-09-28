@@ -54,6 +54,7 @@ var (
 	errRawPayloadTooShort         = errors.Define("raw_payload_too_short", "length of RawPayload must not be less than 4")
 	errSchedule                   = errors.Define("schedule", "all downlink scheduling attempts failed")
 	errUnknownChannel             = errors.Define("unknown_chanel", "channel is unknown")
+	errUnknownFNwkSIntKey         = errors.DefineNotFound("unknown_f_nwk_s_int_key", "FNwkSIntKey is unknown")
 	errUnknownMACState            = errors.DefineFailedPrecondition("unknown_mac_state", "MAC state is unknown")
 	errUnknownNwkSEncKey          = errors.DefineNotFound("unknown_nwk_s_enc_key", "NwkSEncKey is unknown")
 	errUnknownSession             = errors.DefineNotFound("unknown_session", "unknown session")

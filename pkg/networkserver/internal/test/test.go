@@ -504,6 +504,10 @@ func MustEncryptUplink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, 
 	return test.Must(crypto.EncryptUplink(key, devAddr, fCnt, b, isFOpts)).([]byte)
 }
 
+func MustComputeUplinkCMACF(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, b ...byte) [4]byte {
+	return test.Must(crypto.ComputeLegacyUplinkMIC(key, devAddr, fCnt, b)).([4]byte)
+}
+
 type DataUplinkConfig struct {
 	DecodePayload bool
 	Matched       bool
