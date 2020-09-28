@@ -13,6 +13,7 @@ on:
       - 'pkg/webui/**'
       - 'sdk/js/**'
       - 'yarn.lock'
+      - 'cypress/**'
 
 jobs:
   end-to-end:
