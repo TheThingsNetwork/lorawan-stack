@@ -19,6 +19,7 @@ export const defineSyntheticEvent = name => data => ({
   name: `synthetic.${name}`,
   isError: name.startsWith('error'),
   isSynthetic: true,
+  unique_id: `synthetic.${Date.now()}`,
   data,
 })
 
