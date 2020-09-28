@@ -55,6 +55,12 @@ export const selectDeviceUplinkFrameCount = function(state, appId, devId) {
 
   return derived.uplinkFrameCount
 }
+export const selectDeviceDownlinkFrameCount = function(state, appId, devId) {
+  const derived = selectDeviceDerivedById(state, combineDeviceIds(appId, devId))
+  if (!Boolean(derived)) return undefined
+
+  return derived.downlinkFrameCount
+}
 export const selectDeviceLastSeen = function(state, appId, devId) {
   const derived = selectDeviceDerivedById(state, combineDeviceIds(appId, devId))
   if (!Boolean(derived)) return undefined

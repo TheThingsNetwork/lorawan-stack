@@ -17,6 +17,8 @@ import { mergeWith, merge } from 'lodash'
 import { getCombinedDeviceId, combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 import getByPath from '@ttn-lw/lib/get-by-path'
 
+import { parseLorawanMacVersion } from '@console/lib/device-utils'
+
 import {
   GET_DEV,
   GET_DEVICES_LIST_SUCCESS,
@@ -33,6 +35,7 @@ const defaultState = {
 
 const heartbeatEvents = ['ns.up.data.receive', 'ns.up.join.receive', 'ns.up.rejoin.receive']
 const uplinkFrameCountEvent = 'ns.up.data.process'
+const downlinkFrameCountEvent = 'ns.down.data.schedule.attempt'
 
 const mergeDerived = (state, id, derived) =>
   Object.keys(derived).length > 0
@@ -118,13 +121,31 @@ const devices = function(state = defaultState, { type, payload, event }) {
         }
       }
 
-      // Detect uplink process event to update uplink frame count state.
+      // Detect uplink/downlink process events to update uplink/downlink frame count state.
       else if (event.name === uplinkFrameCountEvent) {
-        const id = getCombinedDeviceId(event.identifiers[0].device_ids)
-        return mergeDerived(state, id, {
+        return mergeDerived(state, getCombinedDeviceId(event.identifiers[0].device_ids), {
           uplinkFrameCount: getByPath(event, 'data.payload.mac_payload.full_f_cnt'),
         })
+      } else if (event.name === downlinkFrameCountEvent) {
+        const combinedDeviceId = getCombinedDeviceId(event.identifiers[0].device_ids)
+        const lorawanVersion = getByPath(state.entities, `${combinedDeviceId}.lorawan_version`)
+
+        if (parseLorawanMacVersion(lorawanVersion) < 110) {
+          return mergeDerived(state, combinedDeviceId, {
+            downlinkFrameCount: getByPath(event, 'data.payload.mac_payload.full_f_cnt'),
+          })
+        }
+
+        // For 1.1+ end devices there are two frame counters. If `f_port` is equal to 0 - then it's the "network" frame counter,
+        // otherwise it's the "application" frame counter. Currently, we display only the application counter.
+        // Also, see https://github.com/TheThingsNetwork/lorawan-stack/issues/2740.
+        if (getByPath(event, 'data.payload.f_port') > 0) {
+          return mergeDerived(state, combinedDeviceId, {
+            downlinkFrameCount: getByPath(event, 'data.payload.mac_payload.full_f_cnt'),
+          })
+        }
       }
+
       return state
     default:
       return state
