@@ -25,4 +25,7 @@ export default Object.freeze({
   REGIONAL_PARAMETERS: 'regional-parameters',
   CLASS_C: 'class-c',
   NETWORK_SESSION_KEY: 'network-session-key',
+  FORWARDING_NETWORK_SESSION_INTEGRITY_KEY: 'forwarding-network-session-integrity-key',
+  SERVING_NETWORK_SESSION_INTEGRITY_KEY: 'serving-network-session-integrity-key',
+  NETWORK_SESSION_ENCRYPTION_KEY: 'network-session-encryption-key',
 })

@@ -170,7 +170,11 @@ const NetworkSettingsForm = props => {
             }
             component={Input.Generate}
             onGenerateValue={generate16BytesKey}
-            glossaryId={glossaryId.NETWORK_SESSION_KEY}
+            glossaryId={
+              lwVersion >= 110
+                ? glossaryId.NETWORK_SESSION_KEY
+                : glossaryId.FORWARDING_NETWORK_SESSION_INTEGRITY_KEY
+            }
           />
           {lwVersion >= 110 && (
             <Form.Field
@@ -184,6 +188,7 @@ const NetworkSettingsForm = props => {
               description={sharedMessages.sNwkSIKeyDescription}
               component={Input.Generate}
               onGenerateValue={generate16BytesKey}
+              glossaryId={glossaryId.SERVING_NETWORK_SESSION_INTEGRITY_KEY}
             />
           )}
           {lwVersion >= 110 && (
@@ -198,6 +203,7 @@ const NetworkSettingsForm = props => {
               description={sharedMessages.nwkSEncKeyDescription}
               component={Input.Generate}
               onGenerateValue={generate16BytesKey}
+              glossaryId={glossaryId.NETWORK_SESSION_ENCRYPTION_KEY}
             />
           )}
         </>
