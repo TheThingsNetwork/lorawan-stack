@@ -15,10 +15,12 @@
 package commands
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -280,4 +282,42 @@ func getDataReader(name string, flagSet *pflag.FlagSet) (io.Reader, error) {
 		name = "default"
 	}
 	return nil, errNoData.WithAttributes("name", name)
+}
+
+const timeFormat = "2006-01-02 15:04:05"
+
+func timestampFlags(name, description string) *pflag.FlagSet {
+	flags := &pflag.FlagSet{}
+
+	description = fmt.Sprintf("%s (format: '%s')", description, timeFormat)
+
+	flags.String(name, "", description)
+	flags.String(fmt.Sprintf("%s-utc", name), "", fmt.Sprintf("%s (UTC)", description))
+
+	return flags
+}
+
+func parseTime(s string, location *time.Location) (*time.Time, error) {
+	if s == "" {
+		return nil, nil
+	}
+
+	t, err := time.ParseInLocation(timeFormat, s, location)
+	if err != nil {
+		return nil, err
+	}
+	return &t, nil
+}
+
+func getTimestampFlags(flags *pflag.FlagSet, name string) (*time.Time, error) {
+	utcName := fmt.Sprintf("%s-utc", name)
+	if flags.Changed(utcName) {
+		s, _ := flags.GetString(utcName)
+		return parseTime(s, time.UTC)
+	}
+	if flags.Changed(name) {
+		s, _ := flags.GetString(name)
+		return parseTime(s, time.Local)
+	}
+	return nil, nil
 }
