@@ -16,8 +16,15 @@
   margin-bottom: $cs.l
   display: flex
   width: 100%
+  flex-wrap: wrap
 
   .label
+    display: flex
+    flex-shrink: 0
+    user-select: none
+    font-weight: $fw.bold
+    width: 100%
+
     &::after
       display: none
 
@@ -29,10 +36,9 @@
       color: $c-active-blue
       font-weight: 800
 
-.label
-  display: flex
-  flex-shrink: 0
-  user-select: none
+  &.horizontal
+    .label
+      align-items: center
 
 .description
   font-weight: $fw.normal
@@ -80,6 +86,7 @@
   display: block
   height: 1rem
   width: 1rem
+  line-height: 1
   margin-left: $cs.xxs
 
 .err
@@ -125,3 +132,6 @@
     .label
       width: 14rem
       font-weight: $fw.normal
+
+  .glossary-link
+    nudge('up', 2px)
