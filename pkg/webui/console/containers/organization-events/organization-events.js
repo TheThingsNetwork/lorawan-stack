@@ -14,28 +14,12 @@
 
 import React from 'react'
 
-import ErrorNotification from '@ttn-lw/components/error-notification'
-
 import Events from '@console/components/events'
 
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 const OrganizationEvents = props => {
-  const { orgId, events, error, onRestart, widget, onClear } = props
-
-  if (error) {
-    return (
-      <ErrorNotification
-        small
-        title={sharedMessages.eventsCannotShow}
-        content={error}
-        action={onRestart}
-        actionMessage={sharedMessages.restartStream}
-        buttonIcon="refresh"
-      />
-    )
-  }
+  const { orgId, events, widget, onClear, truncated } = props
 
   if (widget) {
     return (
@@ -48,22 +32,20 @@ const OrganizationEvents = props => {
     )
   }
 
-  return <Events events={events} onClear={onClear} entityId={orgId} />
+  return <Events events={events} onClear={onClear} entityId={orgId} truncated={truncated} />
 }
 
 OrganizationEvents.propTypes = {
-  error: PropTypes.error,
   events: PropTypes.events,
   onClear: PropTypes.func.isRequired,
-  onRestart: PropTypes.func.isRequired,
   orgId: PropTypes.string.isRequired,
+  truncated: PropTypes.bool.isRequired,
   widget: PropTypes.bool,
 }
 
 OrganizationEvents.defaultProps = {
   widget: false,
   events: [],
-  error: undefined,
 }
 
 export default OrganizationEvents
