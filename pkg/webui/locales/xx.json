@@ -76,6 +76,7 @@
   "console.components.events.messages.dataPreview": "Xxxx xxxxxxx",
   "console.components.events.messages.seeAllActivity": "Xxx xxx xxxxxxxx",
   "console.components.events.messages.syntheticEvent": "Xxxx: Xxxx xxxx xxxxx xxx xxx xxxxxxxxx xxxx xxx xxxxx xxxxxx",
+  "console.components.events.messages.eventsTruncated": "Xxx xxxxxx xxxx xxxx xxxxxxxxx xx xxxx xxxxxx",
   "console.components.events.previews.shared.json-payload.index.invalid": "Xxxxxxx XXXX",
   "console.components.gateway-data-form.index.enforced": "Xxxxxxxx",
   "console.components.gateway-data-form.index.dutyCycle": "Xxxx xxxxx",

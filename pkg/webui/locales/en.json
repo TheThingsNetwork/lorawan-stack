@@ -76,6 +76,7 @@
   "console.components.events.messages.dataPreview": "Data preview",
   "console.components.events.messages.seeAllActivity": "See all activity",
   "console.components.events.messages.syntheticEvent": "Note: This meta event did not originate from the event stream",
+  "console.components.events.messages.eventsTruncated": "Old events have been truncated to save memory",
   "console.components.events.previews.shared.json-payload.index.invalid": "Invalid JSON",
   "console.components.gateway-data-form.index.enforced": "Enforced",
   "console.components.gateway-data-form.index.dutyCycle": "Duty cycle",
