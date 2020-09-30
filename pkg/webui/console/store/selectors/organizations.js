@@ -27,6 +27,7 @@ import {
   createEventsErrorSelector,
   createEventsStatusSelector,
   createEventsInterruptedSelector,
+  createEventsTruncatedSelector,
 } from './events'
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
@@ -68,3 +69,4 @@ export const selectOrganizationEvents = createEventsSelector(ENTITY)
 export const selectOrganizationEventsError = createEventsErrorSelector(ENTITY)
 export const selectOrganizationEventsStatus = createEventsStatusSelector(ENTITY)
 export const selectOrganizationEventsInterrupted = createEventsInterruptedSelector(ENTITY)
+export const selectOrganizationEventsTruncated = createEventsTruncatedSelector(ENTITY)

@@ -35,30 +35,17 @@ import {
   createClearEventsActionType,
 } from '@console/store/actions/events'
 
-const addEvent = (events, event) => {
-  // See https://github.com/TheThingsNetwork/lorawan-stack/pull/2989
-  if (event.name === 'events.stream.start' || event.name === 'events.stream.stop') {
-    return events
-  }
+const addEvents = (state, events) => ({
+  ...state,
+  events: [...events, ...state.events].slice(0, EVENT_STORE_LIMIT),
+  truncated: events.length + state.events.length > EVENT_STORE_LIMIT,
+})
 
-  const currentEvents = events
+const addEvent = (state, event) => addEvents(state, [event])
 
-  // Keep events sorted in descending order by `time`.
-  let insertIndex = 0
-  while (insertIndex < currentEvents.length) {
-    const currentEventTime = currentEvents[insertIndex].time
-
-    if (event.time < currentEventTime) {
-      insertIndex += 1
-    } else {
-      break
-    }
-  }
-
-  return [...currentEvents.slice(0, insertIndex), event, ...currentEvents.slice(insertIndex)]
-}
 const defaultState = {
   events: [],
+  truncated: false,
   error: undefined,
   interrupted: false,
   status: CONNECTION_STATUS.DISCONNECTED,
