@@ -25,8 +25,8 @@ import {
   createStopEventsStreamActionType,
   clearEvents,
   createClearEventsActionType,
-  createGetEventMessageSuccessActionType,
-  getEventMessageSuccess,
+  createGetEventMessagesSuccessActionType,
+  getEventMessagesSuccess,
 } from './events'
 import {
   createPaginationRequestActions,
@@ -111,11 +111,11 @@ export const START_GTW_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActi
 export const START_GTW_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
 export const STOP_GTW_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_GTW_EVENTS = createClearEventsActionType(SHARED_NAME)
-export const GET_GTW_EVENT_MESSAGE_SUCCESS = createGetEventMessageSuccessActionType(SHARED_NAME)
+export const GET_GTW_EVENT_MESSAGES_SUCCESS = createGetEventMessagesSuccessActionType(SHARED_NAME)
 
 export const startGatewayEventsStream = startEventsStream(SHARED_NAME)
 export const startGatewayEventsStreamSuccess = startEventsStreamSuccess(SHARED_NAME)
 export const startGatewayEventsStreamFailure = startEventsStreamFailure(SHARED_NAME)
 export const stopGatewayEventsStream = stopEventsStream(SHARED_NAME)
 export const clearGatewayEventsStream = clearEvents(SHARED_NAME)
-export const getGatewayEventMessageSuccess = getEventMessageSuccess(SHARED_NAME)
+export const getGatewayEventMessagesSuccess = getEventMessagesSuccess(SHARED_NAME)

@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import CONNECTION_STATUS from '@console/constants/connection-status'
+import EVENT_STORE_LIMIT from '@console/constants/event-store-limit'
+
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
 
 import {
@@ -22,7 +25,7 @@ import {
 import { createSyntheticEventFromError } from '@console/lib/events/utils'
 
 import {
-  createGetEventMessageSuccessActionType,
+  createGetEventMessagesSuccessActionType,
   createGetEventMessageFailureActionType,
   createStartEventsStreamActionType,
   createStartEventsStreamSuccessActionType,
@@ -31,8 +34,6 @@ import {
   createEventStreamClosedActionType,
   createClearEventsActionType,
 } from '@console/store/actions/events'
-
-import CONNECTION_STATUS from '../../constants/connection-status'
 
 const addEvent = (events, event) => {
   // See https://github.com/TheThingsNetwork/lorawan-stack/pull/2989
@@ -68,7 +69,7 @@ const createNamedEventReducer = function(reducerName = '') {
   const START_EVENTS_SUCCESS = createStartEventsStreamSuccessActionType(reducerName)
   const START_EVENTS_FAILURE = createStartEventsStreamFailureActionType(reducerName)
   const STOP_EVENTS = createStopEventsStreamActionType(reducerName)
-  const GET_EVENT_SUCCESS = createGetEventMessageSuccessActionType(reducerName)
+  const GET_EVENTS_SUCCESS = createGetEventMessagesSuccessActionType(reducerName)
   const GET_EVENT_FAILURE = createGetEventMessageFailureActionType(reducerName)
   const CLEAR_EVENTS = createClearEventsActionType(reducerName)
   const EVENT_STREAM_CLOSED = createEventStreamClosedActionType(reducerName)
@@ -82,32 +83,24 @@ const createNamedEventReducer = function(reducerName = '') {
         }
       case START_EVENTS_SUCCESS:
         return {
-          ...state,
-          events: state.interrupted
-            ? addEvent(state.events, createStatusReconnectedEvent())
-            : state.events,
+          ...(state.interrupted ? addEvent(state, createStatusReconnectedEvent()) : state),
           status: CONNECTION_STATUS.CONNECTED,
           interrupted: false,
           error: undefined,
         }
-      case GET_EVENT_SUCCESS:
-        return {
-          ...state,
-          events: addEvent(state.events, action.event),
-        }
+      case GET_EVENTS_SUCCESS:
+        return addEvents(state, action.events)
       case START_EVENTS_FAILURE:
         return {
-          ...state,
-          events: !state.interrupted
-            ? addEvent(state.events, createSyntheticEventFromError(action.error))
-            : state.events,
+          ...(!state.interrupted
+            ? addEvent(state, createSyntheticEventFromError(action.error))
+            : event.state),
           error: action.error,
           status: CONNECTION_STATUS.DISCONNECTED,
         }
       case GET_EVENT_FAILURE:
         return {
-          ...state,
-          events: addEvent(state.events, createSyntheticEventFromError(action.error)),
+          ...addEvent(state, createSyntheticEventFromError(action.error)),
           status: CONNECTION_STATUS.DISCONNECTED,
           interrupted: true,
         }
@@ -119,8 +112,7 @@ const createNamedEventReducer = function(reducerName = '') {
         }
       case EVENT_STREAM_CLOSED:
         return {
-          ...state,
-          events: addEvent(state.events, createStatusClosedEvent()),
+          ...addEvent(state, createStatusClosedEvent()),
           status: CONNECTION_STATUS.DISCONNECTED,
           interrupted: true,
         }
@@ -128,6 +120,7 @@ const createNamedEventReducer = function(reducerName = '') {
         return {
           ...state,
           events: [createStatusClearedEvent()],
+          truncated: false,
         }
       default:
         return state
@@ -139,7 +132,7 @@ const createNamedEventsReducer = function(reducerName = '') {
   const START_EVENTS = createStartEventsStreamActionType(reducerName)
   const START_EVENTS_SUCCESS = createStartEventsStreamSuccessActionType(reducerName)
   const START_EVENTS_FAILURE = createStartEventsStreamFailureActionType(reducerName)
-  const GET_EVENT_SUCCESS = createGetEventMessageSuccessActionType(reducerName)
+  const GET_EVENTS_SUCCESS = createGetEventMessagesSuccessActionType(reducerName)
   const GET_EVENT_FAILURE = createGetEventMessageFailureActionType(reducerName)
   const CLEAR_EVENTS = createClearEventsActionType(reducerName)
   const STOP_EVENTS = createStopEventsStreamActionType(reducerName)
@@ -160,7 +153,7 @@ const createNamedEventsReducer = function(reducerName = '') {
       case STOP_EVENTS:
       case EVENT_STREAM_CLOSED:
       case GET_EVENT_FAILURE:
-      case GET_EVENT_SUCCESS:
+      case GET_EVENTS_SUCCESS:
       case CLEAR_EVENTS:
         return {
           ...state,

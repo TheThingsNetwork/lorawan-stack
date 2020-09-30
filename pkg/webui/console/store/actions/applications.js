@@ -31,7 +31,7 @@ import {
   createStopEventsStreamActionType,
   clearEvents,
   createClearEventsActionType,
-  createGetEventMessageSuccessActionType,
+  createGetEventMessagesSuccessActionType,
 } from './events'
 
 export const SHARED_NAME = 'APPLICATION'
@@ -105,7 +105,7 @@ export const START_APP_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActi
 export const START_APP_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
 export const STOP_APP_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_APP_EVENTS = createClearEventsActionType(SHARED_NAME)
-export const GET_APP_EVENT_MESSAGE_SUCCESS = createGetEventMessageSuccessActionType(SHARED_NAME)
+export const GET_APP_EVENT_MESSAGES_SUCCESS = createGetEventMessagesSuccessActionType(SHARED_NAME)
 
 export const startApplicationEventsStream = startEventsStream(SHARED_NAME)
 export const startApplicationEventsStreamSuccess = startEventsStreamSuccess(SHARED_NAME)

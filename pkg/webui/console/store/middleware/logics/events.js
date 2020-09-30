@@ -16,6 +16,7 @@ import { createLogic } from 'redux-logic'
 
 import CONNECTION_STATUS from '@console/constants/connection-status'
 
+import createBufferedProcess from '@ttn-lw/lib/create-buffered-process'
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
 import { isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
 
@@ -33,8 +34,8 @@ import {
   createStartEventsStreamSuccessActionType,
   createEventStreamClosedActionType,
   createGetEventMessageFailureActionType,
-  createGetEventMessageSuccessActionType,
-  getEventMessageSuccess,
+  createGetEventMessagesSuccessActionType,
+  getEventMessagesSuccess,
   getEventMessageFailure,
   startEventsStreamFailure,
   startEventsStreamSuccess,
@@ -59,12 +60,12 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
   const STOP_EVENTS = createStopEventsStreamActionType(reducerName)
   const EVENT_STREAM_CLOSED = createEventStreamClosedActionType(reducerName)
   const GET_EVENT_MESSAGE_FAILURE = createGetEventMessageFailureActionType(reducerName)
-  const GET_EVENT_MESSAGE_SUCCESS = createGetEventMessageSuccessActionType(reducerName)
+  const GET_EVENT_MESSAGES_SUCCESS = createGetEventMessagesSuccessActionType(reducerName)
   const startEventsSuccess = startEventsStreamSuccess(reducerName)
   const startEventsFailure = startEventsStreamFailure(reducerName)
   const closeEvents = eventStreamClosed(reducerName)
   const startEvents = startEventsStream(reducerName)
-  const getEventSuccess = getEventMessageSuccess(reducerName)
+  const getEventsSuccess = getEventMessagesSuccess(reducerName)
   const getEventFailure = getEventMessageFailure(reducerName)
   const selectEntityEventsStatus = createEventsStatusSelector(entityName)
   const selectEntityEventsInterrupted = createEventsInterruptedSelector(entityName)
@@ -104,12 +105,33 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
       async process({ getState, action }, dispatch) {
         const { id } = action
 
+        const {
+          addToBuffer: addToEventBuffer,
+          clearBuffer: clearEventBuffer,
+        } = createBufferedProcess(events => {
+          const processedEvents = events
+            .filter(
+              // See https://github.com/TheThingsNetwork/lorawan-stack/pull/2989
+              event => event.name !== 'events.stream.start' && event.name !== 'events.stream.stop',
+            )
+            .sort((a, b) => (a.time > b.time ? -1 : 1))
+
+          if (processedEvents.length > 0) {
+            dispatch(getEventsSuccess(id, processedEvents))
+          }
+        })
+
         try {
           channel = await onEventsStart([id])
 
           channel.on('start', () => dispatch(startEventsSuccess(id)))
-          channel.on('chunk', message => dispatch(getEventSuccess(id, message)))
-          channel.on('error', error => dispatch(getEventFailure(id, error)))
+          channel.on('chunk', addToEventBuffer)
+          channel.on('error', error => {
+            // Clear event buffer before committing the failure event
+            // to avoid race conditions.
+            clearEventBuffer()
+            dispatch(getEventFailure(id, error))
+          })
           channel.on('close', () => dispatch(closeEvents(id)))
         } catch (error) {
           if (isUnauthenticatedError(error)) {
@@ -152,7 +174,7 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
     }),
     createLogic({
       type: [GET_EVENT_MESSAGE_FAILURE, EVENT_STREAM_CLOSED],
-      cancelType: [START_EVENTS_SUCCESS, GET_EVENT_MESSAGE_SUCCESS, STOP_EVENTS],
+      cancelType: [START_EVENTS_SUCCESS, GET_EVENT_MESSAGES_SUCCESS, STOP_EVENTS],
       warnTimeout: 0,
       validate({ getState, action = {} }, allow, reject) {
         if (!action.id) {

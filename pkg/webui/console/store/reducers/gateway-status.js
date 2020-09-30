@@ -19,7 +19,7 @@ import { isGsStatusReceiveEvent, isGsUplinkReceiveEvent } from '@ttn-lw/lib/sele
 import {
   GET_GTW,
   UPDATE_GTW_STATS_SUCCESS,
-  GET_GTW_EVENT_MESSAGE_SUCCESS,
+  GET_GTW_EVENT_MESSAGES_SUCCESS,
 } from '@console/store/actions/gateways'
 
 const handleStatsUpdate = (state, { stats = {} }) => {
@@ -38,8 +38,11 @@ const handleStatsUpdate = (state, { stats = {} }) => {
   return state
 }
 
-const handleEventUpdate = (state, event) => {
-  if (isGsStatusReceiveEvent(event.name) || isGsUplinkReceiveEvent(event.name)) {
+const handleEventsUpdate = (state, events) => {
+  const event = events.find(
+    event => isGsStatusReceiveEvent(event.name) || isGsUplinkReceiveEvent(event.name),
+  )
+  if (event) {
     let lastSeen = new Date(event.time)
 
     if (state.lastSeen) {
@@ -63,7 +66,7 @@ const gatewayStatus = handleActions(
   {
     [GET_GTW]: () => defaultState,
     [UPDATE_GTW_STATS_SUCCESS]: (state, { payload }) => handleStatsUpdate(state, payload),
-    [GET_GTW_EVENT_MESSAGE_SUCCESS]: (state, { event }) => handleEventUpdate(state, event),
+    [GET_GTW_EVENT_MESSAGES_SUCCESS]: (state, { events }) => handleEventsUpdate(state, events),
   },
   defaultState,
 )

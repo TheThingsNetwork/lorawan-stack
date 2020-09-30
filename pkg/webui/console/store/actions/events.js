@@ -22,7 +22,7 @@ export const createStopEventsStreamActionType = name => `STOP_${name}_EVENT_STRE
 
 export const createEventStreamClosedActionType = name => `${name}_EVENT_STREAM_CLOSED`
 
-export const createGetEventMessageSuccessActionType = name => `GET_${name}_EVENT_MESSAGE_SUCCESS`
+export const createGetEventMessagesSuccessActionType = name => `GET_${name}_EVENT_MESSAGES_SUCCESS`
 
 export const createGetEventMessageFailureActionType = name => `GET_${name}_EVENT_MESSAGE_FAILURE`
 
@@ -51,10 +51,10 @@ export const eventStreamClosed = name => id => ({
   id,
 })
 
-export const getEventMessageSuccess = name => (id, event) => ({
-  type: createGetEventMessageSuccessActionType(name),
+export const getEventMessagesSuccess = name => (id, events) => ({
+  type: createGetEventMessagesSuccessActionType(name),
   id,
-  event,
+  events,
 })
 
 export const getEventMessageFailure = name => (id, error) => ({

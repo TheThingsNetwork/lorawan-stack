@@ -23,7 +23,7 @@ import {
   GET_DEV_SUCCESS,
   UPDATE_DEV_SUCCESS,
 } from '@console/store/actions/devices'
-import { GET_APP_EVENT_MESSAGE_SUCCESS } from '@console/store/actions/applications'
+import { GET_APP_EVENT_MESSAGES_SUCCESS } from '@console/store/actions/applications'
 
 const defaultState = {
   entities: {},
@@ -32,7 +32,7 @@ const defaultState = {
 }
 
 const heartbeatEvents = ['ns.up.data.receive', 'ns.up.join.receive', 'ns.up.rejoin.receive']
-const uplinkFrameCountEvent = 'ns.up.data.process'
+const uplinkFrameCountEventName = 'ns.up.data.process'
 
 const mergeDerived = (state, id, derived) =>
   Object.keys(derived).length > 0
@@ -43,7 +43,7 @@ const mergeDerived = (state, id, derived) =>
       })
     : state
 
-const devices = function(state = defaultState, { type, payload, event }) {
+const devices = function(state = defaultState, { type, payload, events, event }) {
   switch (type) {
     case GET_DEV:
       return {
@@ -98,13 +98,14 @@ const devices = function(state = defaultState, { type, payload, event }) {
         ...state,
         entities,
       }
-    case GET_APP_EVENT_MESSAGE_SUCCESS:
+    case GET_APP_EVENT_MESSAGES_SUCCESS: {
       // Detect heartbeat events to update last seen state.
-      if (heartbeatEvents.includes(event.name)) {
-        const id = getCombinedDeviceId(event.identifiers[0].device_ids)
-        const receivedAt = getByPath(event, 'data.received_at')
+      const derived = {}
+      const id = events[0].identifiers[0].device_ids.device_id
+      const heartbeatEvent = events.find(event => heartbeatEvents.includes(event.name))
+      if (heartbeatEvent) {
+        const receivedAt = getByPath(heartbeatEvent, 'data.received_at')
         if (receivedAt) {
-          const derived = {}
           const currentDerived = state.derived[id]
           if (currentDerived) {
             // Only update if the event was actually more recent than the current value.
@@ -114,18 +115,24 @@ const devices = function(state = defaultState, { type, payload, event }) {
           } else {
             derived.lastSeen = receivedAt
           }
-          return mergeDerived(state, id, derived)
         }
       }
 
       // Detect uplink process event to update uplink frame count state.
-      else if (event.name === uplinkFrameCountEvent) {
-        const id = getCombinedDeviceId(event.identifiers[0].device_ids)
-        return mergeDerived(state, id, {
-          uplinkFrameCount: getByPath(event, 'data.payload.mac_payload.full_f_cnt'),
-        })
+      const uplinkFrameCountEvent = events.find(event => event.name === uplinkFrameCountEventName)
+      if (uplinkFrameCountEvent) {
+        derived.uplinkFrameCount = getByPath(
+          uplinkFrameCountEvent,
+          'data.payload.mac_payload.full_f_cnt',
+        )
       }
+
+      if (Object.keys(derived).length > 0) {
+        return mergeDerived(state, id, derived)
+      }
+
       return state
+    }
     default:
       return state
   }
