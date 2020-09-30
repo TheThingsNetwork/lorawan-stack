@@ -32,7 +32,7 @@ export const createEventsInterruptedSelector = entity =>
   function(state, entityId) {
     const store = selectEventsStore(state.events[entity], entityId)
 
-    return store ? store.interrupted : false
+    return Boolean(store.interrupted)
   }
 
 export const createEventsErrorSelector = entity =>
@@ -40,6 +40,13 @@ export const createEventsErrorSelector = entity =>
     const store = selectEventsStore(state.events[entity], entityId)
 
     return store ? store.error : undefined
+  }
+
+export const createEventsTruncatedSelector = entity =>
+  function(state, entityId) {
+    const store = selectEventsStore(state.events[entity], entityId)
+
+    return Boolean(store.truncated)
   }
 
 export const createLatestEventSelector = function(entity) {

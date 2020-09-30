@@ -25,6 +25,7 @@ import {
   createEventsErrorSelector,
   createEventsStatusSelector,
   createEventsInterruptedSelector,
+  createEventsTruncatedSelector,
   createLatestEventSelector,
 } from './events'
 import { createRightsSelector, createPseudoRightsSelector } from './rights'
@@ -65,6 +66,7 @@ export const selectGatewayEvents = createEventsSelector(ENTITY)
 export const selectGatewayEventsError = createEventsErrorSelector(ENTITY)
 export const selectGatewayEventsStatus = createEventsStatusSelector(ENTITY)
 export const selectGatewayEventsInterrupted = createEventsInterruptedSelector(ENTITY)
+export const selectGatewayEventsTruncated = createEventsTruncatedSelector(ENTITY)
 export const selectLatestGatewayEvent = createLatestEventSelector(ENTITY)
 
 // Rights.

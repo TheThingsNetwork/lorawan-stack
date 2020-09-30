@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import EVENT_STORE_LIMIT from '@console/constants/event-store-limit'
+
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
 
 import {
@@ -37,7 +39,7 @@ import CONNECTION_STATUS from '../../constants/connection-status'
 const addEvent = (events, event) => {
   // See https://github.com/TheThingsNetwork/lorawan-stack/pull/2989
   if (event.name === 'events.stream.start' || event.name === 'events.stream.stop') {
-    return events
+    return { events }
   }
 
   const currentEvents = events
@@ -54,10 +56,16 @@ const addEvent = (events, event) => {
     }
   }
 
-  return [...currentEvents.slice(0, insertIndex), event, ...currentEvents.slice(insertIndex)]
+  const newEvents = currentEvents
+    .slice(0, insertIndex)
+    .concat(event, currentEvents.slice(insertIndex, EVENT_STORE_LIMIT - 1))
+
+  return { events: newEvents, truncated: newEvents.length === EVENT_STORE_LIMIT }
 }
+
 const defaultState = {
   events: [],
+  truncated: false,
   error: undefined,
   interrupted: false,
   status: CONNECTION_STATUS.DISCONNECTED,
@@ -83,9 +91,7 @@ const createNamedEventReducer = function(reducerName = '') {
       case START_EVENTS_SUCCESS:
         return {
           ...state,
-          events: state.interrupted
-            ? addEvent(state.events, createStatusReconnectedEvent())
-            : state.events,
+          ...(state.interrupted ? addEvent(state.events, createStatusReconnectedEvent()) : {}),
           status: CONNECTION_STATUS.CONNECTED,
           interrupted: false,
           error: undefined,
@@ -93,21 +99,21 @@ const createNamedEventReducer = function(reducerName = '') {
       case GET_EVENT_SUCCESS:
         return {
           ...state,
-          events: addEvent(state.events, action.event),
+          ...addEvent(state.events, action.event),
         }
       case START_EVENTS_FAILURE:
         return {
           ...state,
-          events: !state.interrupted
+          ...(!state.interrupted
             ? addEvent(state.events, createSyntheticEventFromError(action.error))
-            : state.events,
+            : {}),
           error: action.error,
           status: CONNECTION_STATUS.DISCONNECTED,
         }
       case GET_EVENT_FAILURE:
         return {
           ...state,
-          events: addEvent(state.events, createSyntheticEventFromError(action.error)),
+          ...addEvent(state.events, createSyntheticEventFromError(action.error)),
           status: CONNECTION_STATUS.DISCONNECTED,
           interrupted: true,
         }
@@ -120,7 +126,7 @@ const createNamedEventReducer = function(reducerName = '') {
       case EVENT_STREAM_CLOSED:
         return {
           ...state,
-          events: addEvent(state.events, createStatusClosedEvent()),
+          ...addEvent(state.events, createStatusClosedEvent()),
           status: CONNECTION_STATUS.DISCONNECTED,
           interrupted: true,
         }
@@ -128,6 +134,7 @@ const createNamedEventReducer = function(reducerName = '') {
         return {
           ...state,
           events: [createStatusClearedEvent()],
+          truncated: false,
         }
       default:
         return state
