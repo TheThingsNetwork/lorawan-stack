@@ -24,7 +24,7 @@ import m from './messages'
 
 import style from './events.styl'
 
-class EventErrorBoundary extends React.Component {
+class EventErrorBoundary extends React.PureComponent {
   state = { hasErrored: false, error: undefined, expanded: false }
 
   static getDerivedStateFromError() {

@@ -15,7 +15,6 @@
 import React from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-import getByPath from '@ttn-lw/lib/get-by-path'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import messages from '../messages'
@@ -24,26 +23,33 @@ import DescriptionList from './shared/description-list'
 
 const UplinkMessagePreview = React.memo(({ event }) => {
   const { data } = event
-  let frmPayload, fPort, snr, devAddr, fCnt, joinEui, devEui
+  let frmPayload, fPort, snr, devAddr, fCnt, joinEui, devEui, bandwidth
 
   if ('payload' in data && 'mac_payload' in data.payload) {
-    devAddr = getByPath(data, 'payload.mac_payload.f_hdr.dev_addr')
-    frmPayload = getByPath(data, 'payload.mac_payload.frm_payload')
-    fPort = getByPath(data, 'payload.mac_payload.f_port')
-    fCnt = getByPath(data, 'payload.mac_payload.f_hdr.f_cnt')
+    const macPayload = data.payload.mac_payload
+
+    if ('f_hdr' in macPayload) {
+      devAddr = macPayload.f_hdr.dev_addr
+      fCnt = macPayload.f_hdr.f_cnt
+    }
+    frmPayload = macPayload.frmPayload
+    fPort = macPayload.f_port
   }
 
   if ('payload' in data && 'join_request_payload' in data.payload) {
-    joinEui = getByPath(data, 'payload.join_request_payload.join_eui')
-    devEui = getByPath(data, 'payload.join_request_payload.dev_eui')
+    joinEui = data.payload.join_request_payload.join_eui
+    devEui = data.payload.join_request_payload.dev_eui
   }
 
   if ('rx_metadata' in data) {
     snr = data.rx_metadata[0].snr
   }
 
-  const rawPayload = getByPath(data, 'raw_payload')
-  const bandwidth = getByPath(data, 'settings.data_rate.lora.bandwidth')
+  const rawPayload = data.rawPayload
+
+  if ('settings' in data && 'data_rate' in data.settings && 'lora' in data.settings.data_rate) {
+    bandwidth = data.settings.data_rate.lora.bandwidth
+  }
 
   return (
     <DescriptionList>

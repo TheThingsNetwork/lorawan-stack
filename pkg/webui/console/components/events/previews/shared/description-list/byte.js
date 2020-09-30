@@ -40,15 +40,7 @@ const DescriptionListByteItem = ({ title, data: rawData, convertToHex }) => {
       {isEmpty ? (
         <Message className={style.emptyByte} firstToLower content={sharedMessages.empty} />
       ) : (
-        <SafeInspector
-          data={data}
-          hideable={false}
-          initiallyVisible
-          small
-          noCopy
-          noTransform
-          disableResize
-        />
+        <SafeInspector.Light data={data} small />
       )}
     </DescriptionListItem>
   )
