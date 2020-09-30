@@ -23,15 +23,15 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { mayViewApplicationEvents } from '@console/lib/feature-checks'
 
-import {
-  clearApplicationEventsStream,
-  startApplicationEventsStream,
-} from '@console/store/actions/applications'
+import { clearApplicationEventsStream } from '@console/store/actions/applications'
 
-import { selectApplicationEvents } from '@console/store/selectors/applications'
+import {
+  selectApplicationEvents,
+  selectApplicationEventsTruncated,
+} from '@console/store/selectors/applications'
 
 const ApplicationEvents = props => {
-  const { appId, events, widget, onClear } = props
+  const { appId, events, widget, onClear, truncated } = props
 
   if (widget) {
     return (
@@ -39,13 +39,14 @@ const ApplicationEvents = props => {
     )
   }
 
-  return <Events entityId={appId} events={events} onClear={onClear} />
+  return <Events entityId={appId} events={events} onClear={onClear} truncated={truncated} />
 }
 
 ApplicationEvents.propTypes = {
   appId: PropTypes.string.isRequired,
   events: PropTypes.events,
   onClear: PropTypes.func.isRequired,
+  truncated: PropTypes.bool.isRequired,
   widget: PropTypes.bool,
 }
 
@@ -61,11 +62,11 @@ export default withFeatureRequirement(mayViewApplicationEvents)(
 
       return {
         events: selectApplicationEvents(state, appId),
+        truncated: selectApplicationEventsTruncated(state, appId),
       }
     },
     (dispatch, ownProps) => ({
       onClear: () => dispatch(clearApplicationEventsStream(ownProps.appId)),
-      onRestart: () => dispatch(startApplicationEventsStream(ownProps.appId)),
     }),
   )(ApplicationEvents),
 )

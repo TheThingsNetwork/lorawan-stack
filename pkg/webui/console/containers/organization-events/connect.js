@@ -14,14 +14,11 @@
 
 import { connect } from 'react-redux'
 
-import {
-  clearOrganizationEventsStream,
-  startOrganizationEventsStream,
-} from '@console/store/actions/organizations'
+import { clearOrganizationEventsStream } from '@console/store/actions/organizations'
 
 import {
   selectOrganizationEvents,
-  selectOrganizationEventsError,
+  selectOrganizationEventsTruncated,
 } from '@console/store/selectors/organizations'
 
 const mapStateToProps = (state, props) => {
@@ -29,12 +26,11 @@ const mapStateToProps = (state, props) => {
 
   return {
     events: selectOrganizationEvents(state, orgId),
-    error: selectOrganizationEventsError(state, orgId),
+    truncated: selectOrganizationEventsTruncated(state, orgId),
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  onRestart: () => dispatch(startOrganizationEventsStream(ownProps.orgId)),
   onClear: () => dispatch(clearOrganizationEventsStream(ownProps.orgId)),
 })
 
