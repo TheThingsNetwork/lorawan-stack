@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for sending end device uplinks in the Console.
 - PHY version filtering based on LoRaWAN MAC in the Console.
 - Meta information and status events in the event views in the Console.
+- Limitation of displayed and stored events in the Console to 2000.
 
 ### Changed
 
@@ -31,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Incorrect entity count in title sections in the Console.
 - Incorrect event detail panel open/close behavior for some events in the Console.
 - Improved error resilience and stability of the event views in the Console.
+- Further performance optimizations for event views in the Console.
 
 ### Security
 
