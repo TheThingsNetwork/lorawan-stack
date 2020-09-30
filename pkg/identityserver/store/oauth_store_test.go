@@ -60,7 +60,7 @@ func TestOAuthStore(t *testing.T) {
 			}
 			a.So(empty, should.BeNil)
 
-			start := time.Now()
+			start := cleanTime(time.Now())
 
 			created, err := store.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
 				ClientIDs: *clientIDs,
@@ -73,8 +73,8 @@ func TestOAuthStore(t *testing.T) {
 			if a.So(created, should.NotBeNil) {
 				a.So(created.UserIDs.UserID, should.Equal, "test-user")
 				a.So(created.ClientIDs.ClientID, should.Equal, "test-client")
-				a.So(created.CreatedAt, should.HappenAfter, start)
-				a.So(created.UpdatedAt, should.HappenAfter, start)
+				a.So(created.CreatedAt, should.HappenOnOrAfter, start)
+				a.So(created.UpdatedAt, should.HappenOnOrAfter, start)
 			}
 
 			got, err := store.GetAuthorization(ctx, userIDs, clientIDs)
@@ -84,8 +84,8 @@ func TestOAuthStore(t *testing.T) {
 			if a.So(got, should.NotBeNil) {
 				a.So(created.UserIDs.UserID, should.Equal, "test-user")
 				a.So(created.ClientIDs.ClientID, should.Equal, "test-client")
-				a.So(got.CreatedAt, should.HappenAfter, start)
-				a.So(got.UpdatedAt, should.HappenAfter, start)
+				a.So(got.CreatedAt, should.HappenOnOrAfter, start)
+				a.So(got.UpdatedAt, should.HappenOnOrAfter, start)
 			}
 
 			list, err := store.ListAuthorizations(ctx, userIDs)
@@ -134,7 +134,7 @@ func TestOAuthStore(t *testing.T) {
 				a.So(errors.IsNotFound(err), should.BeTrue)
 			}
 
-			start := time.Now()
+			start := cleanTime(time.Now())
 
 			err = store.CreateAuthorizationCode(ctx, &ttnpb.OAuthAuthorizationCode{
 				ClientIDs:   *clientIDs,
@@ -156,7 +156,7 @@ func TestOAuthStore(t *testing.T) {
 				a.So(got.Code, should.Equal, code)
 				a.So(got.RedirectURI, should.Equal, redirectURI)
 				a.So(got.State, should.Equal, state)
-				a.So(got.CreatedAt, should.HappenAfter, start)
+				a.So(got.CreatedAt, should.HappenOnOrAfter, start)
 				if a.So(got.Rights, should.HaveLength, len(rights)) {
 					for _, right := range rights {
 						a.So(got.Rights, should.Contain, right)
@@ -204,7 +204,7 @@ func TestOAuthStore(t *testing.T) {
 			}
 			a.So(empty, should.BeNil)
 
-			start := time.Now()
+			start := cleanTime(time.Now())
 
 			err = store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 				UserIDs:      *userIDs,
@@ -226,7 +226,7 @@ func TestOAuthStore(t *testing.T) {
 				a.So(got.ID, should.Equal, tokenID)
 				a.So(got.AccessToken, should.Equal, access)
 				a.So(got.RefreshToken, should.Equal, refresh)
-				a.So(got.CreatedAt, should.HappenAfter, start)
+				a.So(got.CreatedAt, should.HappenOnOrAfter, start)
 				if a.So(got.Rights, should.HaveLength, len(rights)) {
 					for _, right := range rights {
 						a.So(got.Rights, should.Contain, right)
