@@ -658,13 +658,15 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		}
 		uid, err := decodeString(vsUID)
 		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Failed to parse uid returned by device match scan script as a string")
+			log.FromContext(ctx).WithError(err).
+				Error("Failed to parse UID returned by device match scan script as a string")
 			return errDatabaseCorruption.WithCause(err)
 		}
 
 		ids, err := unique.ToDeviceID(uid)
 		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Failed to parse uid returned by device match scan script as device identifiers")
+			log.FromContext(ctx).WithError(err).WithField("uid", uid).
+				Error("Failed to parse UID returned by device match scan script as device identifiers")
 			return errDatabaseCorruption.WithCause(err)
 		}
 		ms, err := getUplinkMatch(ctx, r.Redis, matchKeys.Input, matchKeys.Processing, ids.ApplicationIdentifiers, ids.DeviceID, pld.DevAddr, lsb, scanKeys[0], r.uidKey(uid))
@@ -716,7 +718,6 @@ func removeLegacyDevAddrMapping(r redis.Cmdable, addrKey, uid string) {
 }
 
 func removeCurrentDevAddrMapping(r redis.Cmdable, addrKey, uid string, supports32Bit bool) {
-	removeLegacyDevAddrMapping(r, addrKey, uid)
 	if !supports32Bit {
 		r.ZRem(ttnredis.Key(addrKey, shortFCntKey), uid)
 	} else {
@@ -725,7 +726,6 @@ func removeCurrentDevAddrMapping(r redis.Cmdable, addrKey, uid string, supports3
 }
 
 func removePendingDevAddrMapping(r redis.Cmdable, addrKey, uid string) {
-	removeLegacyDevAddrMapping(r, addrKey, uid)
 	r.SRem(ttnredis.Key(addrKey, pendingKey), uid)
 }
 
@@ -799,9 +799,11 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					p.Del(r.euiKey(*stored.JoinEUI, *stored.DevEUI))
 				}
 				if stored.PendingSession != nil {
+					removeLegacyDevAddrMapping(p, r.addrKey(stored.PendingSession.DevAddr), uid)
 					removePendingDevAddrMapping(p, r.addrKey(stored.PendingSession.DevAddr), uid)
 				}
 				if stored.Session != nil {
+					removeLegacyDevAddrMapping(p, r.addrKey(stored.Session.DevAddr), uid)
 					removeCurrentDevAddrMapping(p, r.addrKey(stored.Session.DevAddr), uid, deviceSupports32BitFCnt(stored))
 				}
 				return nil
@@ -958,6 +960,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			if stored.GetPendingSession() == nil || updated.GetPendingSession() == nil ||
 				!updated.PendingSession.DevAddr.Equal(stored.PendingSession.DevAddr) {
 				if stored.GetPendingSession() != nil {
+					removeLegacyDevAddrMapping(p, r.addrKey(stored.PendingSession.DevAddr), uid)
 					removePendingDevAddrMapping(p, r.addrKey(stored.PendingSession.DevAddr), uid)
 				}
 
@@ -970,19 +973,19 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				!updated.Session.DevAddr.Equal(stored.Session.DevAddr) ||
 				storedSupports32BitFCnt != updatedSupports32BitFCnt {
 				if stored.GetSession() != nil {
+					removeLegacyDevAddrMapping(p, r.addrKey(stored.Session.DevAddr), uid)
 					removeCurrentDevAddrMapping(p, r.addrKey(stored.Session.DevAddr), uid, storedSupports32BitFCnt)
 				}
 
 				if updated.GetSession() != nil {
-					addrKey := r.addrKey(updated.Session.DevAddr)
 					z := &redis.Z{
 						Score:  float64(updated.Session.LastFCntUp),
 						Member: uid,
 					}
 					if !updatedSupports32BitFCnt {
-						p.ZAdd(ttnredis.Key(addrKey, shortFCntKey), z)
+						p.ZAdd(ttnredis.Key(r.addrKey(updated.Session.DevAddr), shortFCntKey), z)
 					} else {
-						p.ZAdd(ttnredis.Key(addrKey, longFCntKey), z)
+						p.ZAdd(ttnredis.Key(r.addrKey(updated.Session.DevAddr), longFCntKey), z)
 					}
 				}
 			}
