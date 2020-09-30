@@ -15,9 +15,11 @@
 import React, { useState, useCallback } from 'react'
 import classnames from 'classnames'
 
+import EVENT_STORE_LIMIT from '@console/constants/event-store-limit'
 import hamburgerMenuClose from '@assets/misc/hamburger-menu-close.svg'
 
 import Button from '@ttn-lw/components/button'
+import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -32,81 +34,91 @@ import { getEventId } from './utils'
 
 import style from './events.styl'
 
-const Events = React.memo(({ events, scoped, paused, onClear, onPauseToggle, entityId }) => {
-  const [focus, setFocus] = useState({ eventId: undefined, visible: false })
-  const onPause = useCallback(() => onPauseToggle(paused), [onPauseToggle, paused])
-  const handleRowClick = useCallback(
-    eventId => {
-      if (eventId !== focus.eventId) {
-        setFocus({ eventId, visible: eventId })
-      } else {
-        setFocus({ eventId: undefined, visible: false })
-      }
-    },
-    [focus],
-  )
+const Events = React.memo(
+  ({ events, scoped, paused, onClear, onPauseToggle, entityId, truncated }) => {
+    const [focus, setFocus] = useState({ eventId: undefined, visible: false })
+    const onPause = useCallback(() => onPauseToggle(paused), [onPauseToggle, paused])
+    const handleRowClick = useCallback(
+      eventId => {
+        if (eventId !== focus.eventId) {
+          setFocus({ eventId, visible: eventId })
+        } else {
+          setFocus({ eventId: undefined, visible: false })
+        }
+      },
+      [focus],
+    )
 
-  const handleEventInfoCloseClick = useCallback(() => {
-    setFocus({ entityId: undefined, visible: false })
-  }, [])
+    const handleEventInfoCloseClick = useCallback(() => {
+      setFocus({ eventId: undefined, visible: false })
+    }, [])
 
-  return (
-    <div className={style.container}>
-      <section className={style.header}>
-        <div className={style.headerCells}>
-          <Message content={sharedMessages.time} className={style.cellTime} component="div" />
-          {!scoped && (
-            <Message content={sharedMessages.entityId} className={style.cellId} component="div" />
-          )}
-          <Message content={sharedMessages.type} className={style.cellType} component="div" />
-          <Message content={m.dataPreview} className={style.cellData} component="div" />
-          <div className={style.stickyContainer}>
-            <div className={style.actions}>
-              <Button
-                onClick={onPause}
-                message={paused ? sharedMessages.resume : sharedMessages.pause}
-                naked
-                secondary={!paused}
-                warning={paused}
-                icon={paused ? 'play_arrow' : 'pause'}
-              />
-              <Button
-                onClick={onClear}
-                message={sharedMessages.clear}
-                naked
-                secondary
-                icon="delete"
-              />
+    return (
+      <div className={style.container}>
+        <section className={style.header}>
+          <div className={style.headerCells}>
+            <Message content={sharedMessages.time} className={style.cellTime} component="div" />
+            {!scoped && (
+              <Message content={sharedMessages.entityId} className={style.cellId} component="div" />
+            )}
+            <Message content={sharedMessages.type} className={style.cellType} component="div" />
+            <Message content={m.dataPreview} className={style.cellData} component="div" />
+            <div className={style.stickyContainer}>
+              <div className={style.actions}>
+                <Button
+                  onClick={onPause}
+                  message={paused ? sharedMessages.resume : sharedMessages.pause}
+                  naked
+                  secondary={!paused}
+                  warning={paused}
+                  icon={paused ? 'play_arrow' : 'pause'}
+                />
+                <Button
+                  onClick={onClear}
+                  message={sharedMessages.clear}
+                  naked
+                  secondary
+                  icon="delete"
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-      <section className={style.body}>
-        <EventsList
-          events={events}
-          paused={paused}
-          scoped={scoped}
-          entityId={entityId}
-          onRowClick={handleRowClick}
-          activeId={focus.eventId}
-        />
-      </section>
-      <section className={classnames(style.sidebarContainer, { [style.expanded]: focus.visible })}>
-        <div className={style.sidebarHeader}>
-          <Message content={m.eventDetails} className={style.sidebarTitle} />
-          <button className={style.sidebarCloseButton} onClick={handleEventInfoCloseClick}>
-            <img src={hamburgerMenuClose} alt="Close event info" />
-          </button>
-        </div>
-        <div className={style.sidebarContent}>
-          {Boolean(focus.eventId) && (
-            <EventDetails event={events.find(event => getEventId(event) === focus.eventId)} />
-          )}
-        </div>
-      </section>
-    </div>
-  )
-})
+        </section>
+        <section className={style.body}>
+          <EventsList
+            events={events}
+            paused={paused}
+            scoped={scoped}
+            entityId={entityId}
+            onRowClick={handleRowClick}
+            activeId={focus.eventId}
+          />
+        </section>
+        {truncated && (
+          <div className={style.truncated}>
+            <Icon icon="info" />
+            <Message content={m.eventsTruncated} values={{ limit: EVENT_STORE_LIMIT }} />
+          </div>
+        )}
+        <section
+          className={classnames(style.sidebarContainer, { [style.expanded]: focus.visible })}
+        >
+          <div className={style.sidebarHeader}>
+            <Message content={m.eventDetails} className={style.sidebarTitle} />
+            <button className={style.sidebarCloseButton} onClick={handleEventInfoCloseClick}>
+              <img src={hamburgerMenuClose} alt="Close event info" />
+            </button>
+          </div>
+          <div className={style.sidebarContent}>
+            {Boolean(focus.eventId) && (
+              <EventDetails event={events.find(event => getEventId(event) === focus.eventId)} />
+            )}
+          </div>
+        </section>
+      </div>
+    )
+  },
+)
 
 Events.propTypes = {
   entityId: PropTypes.string.isRequired,
@@ -115,6 +127,7 @@ Events.propTypes = {
   onPauseToggle: PropTypes.func,
   paused: PropTypes.bool.isRequired,
   scoped: PropTypes.bool,
+  truncated: PropTypes.bool.isRequired,
 }
 
 Events.defaultProps = {
