@@ -17,11 +17,19 @@ import { push, replace } from 'connected-react-router'
 
 import api from '@console/api'
 
+import withRequest from '@ttn-lw/lib/components/with-request'
+
 import { selectNsConfig, selectAsConfig, selectJsConfig } from '@ttn-lw/lib/selectors/env'
 
 import { checkFromState, mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
 
+import { getJoinEUIPrefixes } from '@console/store/actions/join-server'
+
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import {
+  selectJoinEUIPrefixes,
+  selectJoinEUIPrefixesFetching,
+} from '@console/store/selectors/join-server'
 
 const mapStateToProps = state => ({
   appId: selectSelectedApplicationId(state),
@@ -30,6 +38,8 @@ const mapStateToProps = state => ({
   asConfig: selectAsConfig(),
   mayEditKeys: checkFromState(mayEditApplicationDeviceKeys, state),
   createDevice: (appId, device) => api.device.create(appId, device),
+  fetching: selectJoinEUIPrefixesFetching(state),
+  prefixes: selectJoinEUIPrefixes(state),
 })
 
 const mapDispatchToProps = (dispatch, { match }) => ({
@@ -38,10 +48,11 @@ const mapDispatchToProps = (dispatch, { match }) => ({
     dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
   redirectToWizard: () => dispatch(push(`${match.url}/steps`)),
   redirectToConfiguration: () => dispatch(replace(match.url)),
+  getPrefixes: () => dispatch(getJoinEUIPrefixes()),
 })
 
 export default DeviceAdd =>
   connect(
     mapStateToProps,
     mapDispatchToProps,
-  )(DeviceAdd)
+  )(withRequest(({ getPrefixes }) => getPrefixes(), ({ fetching }) => fetching)(DeviceAdd))

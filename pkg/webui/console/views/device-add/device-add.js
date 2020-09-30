@@ -32,7 +32,7 @@ const m = defineMessages({
   title: 'Add new end device',
 })
 
-const FunctionalDeviceAdd = React.memo(props => {
+const DeviceAdd = React.memo(props => {
   const {
     match,
     location,
@@ -46,6 +46,7 @@ const FunctionalDeviceAdd = React.memo(props => {
     asConfig,
     mayEditKeys,
     createDevice,
+    prefixes,
   } = props
 
   const [configuration, setConfiguration] = React.useState(undefined)
@@ -110,6 +111,7 @@ const FunctionalDeviceAdd = React.memo(props => {
               {({ match }) =>
                 hasConfiguration ? (
                   <DeviceWizard
+                    prefixes={prefixes}
                     createDevice={handleCreateDevice}
                     createDeviceSuccess={handleCreateDeviceSuccess}
                     rollbackProgress={rollbackProgress}
@@ -130,7 +132,7 @@ const FunctionalDeviceAdd = React.memo(props => {
   )
 })
 
-FunctionalDeviceAdd.propTypes = {
+DeviceAdd.propTypes = {
   appId: PropTypes.string.isRequired,
   asConfig: PropTypes.stackComponent.isRequired,
   createDevice: PropTypes.func.isRequired,
@@ -139,12 +141,17 @@ FunctionalDeviceAdd.propTypes = {
   match: PropTypes.match.isRequired,
   mayEditKeys: PropTypes.bool.isRequired,
   nsConfig: PropTypes.stackComponent.isRequired,
+  prefixes: PropTypes.euiPrefixes,
   redirectToConfiguration: PropTypes.func.isRequired,
   redirectToEndDevice: PropTypes.func.isRequired,
   redirectToNextLocation: PropTypes.func.isRequired,
   redirectToWizard: PropTypes.func.isRequired,
 }
 
+DeviceAdd.defaultProps = {
+  prefixes: [],
+}
+
 export default withBreadcrumb('devices.add', props => (
   <Breadcrumb path={`/applications/${props.appId}/devices/add`} content={sharedMessages.add} />
-))(FunctionalDeviceAdd)
+))(DeviceAdd)
