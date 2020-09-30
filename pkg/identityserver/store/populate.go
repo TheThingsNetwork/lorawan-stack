@@ -176,29 +176,36 @@ type Populator struct {
 
 // Populate the database.
 func (p *Populator) Populate(ctx context.Context, db *gorm.DB) (err error) {
+	tx := db.Begin()
+	defer func() {
+		if commitErr := tx.Commit().Error; err == nil {
+			err = commitErr
+		}
+	}()
+
 	hashValidator := pbkdf2.Default()
 	hashValidator.Iterations = 10
 	ctx = auth.NewContextWithHashValidator(ctx, hashValidator)
-	if err = p.populateApplications(ctx, db); err != nil {
-		return err
+	if err = p.populateApplications(ctx, tx); err != nil {
+		return fmt.Errorf("failed to populate applications: %w", err)
 	}
-	if err = p.populateClients(ctx, db); err != nil {
-		return err
+	if err = p.populateClients(ctx, tx); err != nil {
+		return fmt.Errorf("failed to populate clients: %w", err)
 	}
-	if err = p.populateGateways(ctx, db); err != nil {
-		return err
+	if err = p.populateGateways(ctx, tx); err != nil {
+		return fmt.Errorf("failed to populate gateways: %w", err)
 	}
-	if err = p.populateOrganizations(ctx, db); err != nil {
-		return err
+	if err = p.populateOrganizations(ctx, tx); err != nil {
+		return fmt.Errorf("failed to populate organizations: %w", err)
 	}
-	if err = p.populateUsers(ctx, db); err != nil {
-		return err
+	if err = p.populateUsers(ctx, tx); err != nil {
+		return fmt.Errorf("failed to populate users: %w", err)
 	}
-	if err = p.populateAPIKeys(ctx, db); err != nil {
-		return err
+	if err = p.populateAPIKeys(ctx, tx); err != nil {
+		return fmt.Errorf("failed to populate API keys: %w", err)
 	}
-	if err = p.populateMemberships(ctx, db); err != nil {
-		return err
+	if err = p.populateMemberships(ctx, tx); err != nil {
+		return fmt.Errorf("failed to populate memberships: %w", err)
 	}
 	return nil
 }
