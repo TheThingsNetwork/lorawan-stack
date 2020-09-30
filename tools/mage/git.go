@@ -110,7 +110,6 @@ var gitCommitPrefixes = []string{
 	"cli",
 	"console",
 	"dev",
-	"doc",
 	"dtc",
 	"gcs",
 	"gs",

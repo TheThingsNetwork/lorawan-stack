@@ -17,7 +17,7 @@ package emails
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
 // Data for emails.
-// Update doc/content/reference/email-templates/available.md when changing fields or adding new emails.
+// Update https://github.com/TheThingsIndustries/lorawan-stack-docs/blob/master/doc/content/reference/email-templates/available.md when changing fields or adding new emails.
 type Data struct {
 	// User we're sending this email to. We need at least an Email.
 	User struct {
