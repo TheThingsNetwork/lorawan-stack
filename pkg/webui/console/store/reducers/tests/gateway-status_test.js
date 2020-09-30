@@ -16,8 +16,15 @@ import reducer, { defaultState } from '../gateway-status'
 import {
   getGateway,
   updateGatewayStatisticsSuccess,
-  getGatewayEventMessageSuccess,
+  getGatewayEventMessagesSuccess,
 } from '../../actions/gateways'
+
+const genericEvent = {
+  identifiers: [{ gateway_ids: { gateway_id: 'test-gateway-id' } }],
+  name: 'gateway.update',
+  time: '2020-04-23T09:41:04.134034132Z',
+  unique_id: '01EK2PTJ6J42DKWGC2F3PZ32TM',
+}
 
 describe('Gateway-status reducer', () => {
   it('returns the initial state', () => {
@@ -118,7 +125,7 @@ describe('Gateway-status reducer', () => {
         time: '2019-09-24T13:40:30.033728431Z',
       }
 
-      newState = reducer(defaultState, getGatewayEventMessageSuccess('test-gtw-id', event))
+      newState = reducer(defaultState, getGatewayEventMessagesSuccess('test-gtw-id', [event]))
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
       expect(newState.lastSeen).toStrictEqual(new Date(event.time))
@@ -130,7 +137,22 @@ describe('Gateway-status reducer', () => {
         time: '2019-09-24T13:45:30.033728431Z',
       }
 
-      newState = reducer(newState, getGatewayEventMessageSuccess('test-gtw-id', event))
+      newState = reducer(newState, getGatewayEventMessagesSuccess('test-gtw-id', [event]))
+      expect(newState !== defaultState).toBe(true)
+      expect(newState.lastSeen).toBeDefined()
+      expect(newState.lastSeen).toStrictEqual(new Date(event.time))
+    })
+
+    it('updates `lastSeen` on most recent uplink event when dispatching multiple events', () => {
+      const event = {
+        name: 'gs.up.receive',
+        time: '2019-09-24T13:50:30.033728431Z',
+      }
+
+      newState = reducer(
+        newState,
+        getGatewayEventMessagesSuccess('test-gtw-id', [genericEvent, event]),
+      )
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
       expect(newState.lastSeen).toStrictEqual(new Date(event.time))
@@ -142,7 +164,7 @@ describe('Gateway-status reducer', () => {
         time: '2019-09-24T13:30:30.033728431Z',
       }
 
-      newState = reducer(newState, getGatewayEventMessageSuccess('test-gtw-id', event))
+      newState = reducer(newState, getGatewayEventMessagesSuccess('test-gtw-id', [event]))
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
       expect(newState.lastSeen).not.toStrictEqual(new Date(event.time))
@@ -154,7 +176,7 @@ describe('Gateway-status reducer', () => {
         time: '2019-09-24T13:50:30.033728431Z',
       }
 
-      newState = reducer(newState, getGatewayEventMessageSuccess('test-gtw-id', event))
+      newState = reducer(newState, getGatewayEventMessagesSuccess('test-gtw-id', [event]))
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
       expect(newState.lastSeen).toStrictEqual(new Date(event.time))
@@ -166,7 +188,22 @@ describe('Gateway-status reducer', () => {
         time: '2019-09-24T13:55:30.033728431Z',
       }
 
-      newState = reducer(newState, getGatewayEventMessageSuccess('test-gtw-id', event))
+      newState = reducer(newState, getGatewayEventMessagesSuccess('test-gtw-id', [event]))
+      expect(newState !== defaultState).toBe(true)
+      expect(newState.lastSeen).toBeDefined()
+      expect(newState.lastSeen).toStrictEqual(new Date(event.time))
+    })
+
+    it('updates `lastSeen` on most recent status event when dispatching multiple events', () => {
+      const event = {
+        name: 'gs.status.receive',
+        time: '2019-09-24T13:59:30.033728431Z',
+      }
+
+      newState = reducer(
+        newState,
+        getGatewayEventMessagesSuccess('test-gtw-id', [genericEvent, event]),
+      )
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
       expect(newState.lastSeen).toStrictEqual(new Date(event.time))
@@ -178,7 +215,7 @@ describe('Gateway-status reducer', () => {
         time: '2019-09-24T13:35:30.033728431Z',
       }
 
-      newState = reducer(newState, getGatewayEventMessageSuccess('test-gtw-id', event))
+      newState = reducer(newState, getGatewayEventMessagesSuccess('test-gtw-id', [event]))
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
       expect(newState.lastSeen).not.toStrictEqual(new Date(event.time))
