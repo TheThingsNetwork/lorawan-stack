@@ -24,13 +24,10 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './safe-inspector.styl'
+import chunkArray from './chunk-array'
+import SafeInspectorLight from './light'
 
-function chunkArray(array, chunkSize) {
-  return Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, index) =>
-    array.slice(index * chunkSize, (index + 1) * chunkSize),
-  )
-}
+import style from './safe-inspector.styl'
 
 function selectText(node) {
   if (document.body.createTextRange) {
@@ -326,5 +323,7 @@ export class SafeInspector extends Component {
     )
   }
 }
+
+SafeInspector.Light = SafeInspectorLight
 
 export default SafeInspector
