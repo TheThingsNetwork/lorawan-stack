@@ -78,6 +78,8 @@
   "console.components.events.messages.dataPreview": "Data preview",
   "console.components.events.messages.seeAllActivity": "See all activity",
   "console.components.events.messages.syntheticEvent": "Note: This meta event did not originate from the event stream",
+  "console.components.events.messages.eventsTruncated": "Old events have been truncated to save memory. The current event limit per stream is {limit}.",
+  "console.components.events.messages.eventUnavailable": "This event is not available anymore. It was likely truncated to save memory.",
   "console.components.events.previews.shared.json-payload.index.invalid": "Invalid JSON",
   "console.components.join-eui-prefixes-input.index.empty": "No prefix",
   "console.components.join-eui-prefixes-input.index.zeroInput": "Fill with zeros",
