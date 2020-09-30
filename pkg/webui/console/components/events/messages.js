@@ -34,6 +34,7 @@ const messages = defineMessages({
   dataPreview: 'Data preview',
   seeAllActivity: 'See all activity',
   syntheticEvent: 'Note: This meta event did not originate from the event stream',
+  eventsTruncated: 'Old events have been truncated to save memory',
 })
 
 export default messages

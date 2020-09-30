@@ -18,6 +18,7 @@ import classnames from 'classnames'
 import hamburgerMenuClose from '@assets/misc/hamburger-menu-close.svg'
 
 import Button from '@ttn-lw/components/button'
+import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -32,7 +33,7 @@ import { getEventId } from './utils'
 
 import style from './events.styl'
 
-const Events = React.memo(({ events, scoped, onClear, entityId }) => {
+const Events = React.memo(({ events, scoped, onClear, entityId, truncated }) => {
   const [paused, setPause] = useState(false)
   const [focus, setFocus] = useState({ eventId: undefined, visible: false })
   const onPause = useCallback(() => setPause(paused => !paused), [])
@@ -91,6 +92,12 @@ const Events = React.memo(({ events, scoped, onClear, entityId }) => {
           activeId={focus.eventId}
         />
       </section>
+      {truncated && (
+        <div className={style.truncated}>
+          <Icon icon="info" />
+          <Message content={m.eventsTruncated} />
+        </div>
+      )}
       <section className={classnames(style.sidebarContainer, { [style.expanded]: focus.visible })}>
         <div className={style.sidebarHeader}>
           <Message content={m.eventDetails} className={style.sidebarTitle} />
@@ -113,6 +120,7 @@ Events.propTypes = {
   events: PropTypes.events.isRequired,
   onClear: PropTypes.func,
   scoped: PropTypes.bool,
+  truncated: PropTypes.bool.isRequired,
 }
 
 Events.defaultProps = {
