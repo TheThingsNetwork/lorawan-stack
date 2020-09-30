@@ -111,7 +111,7 @@ var userModelSetters = map[string]func(*User, *ttnpb.User){
 		if pb.PasswordUpdatedAt != nil {
 			usr.PasswordUpdatedAt = cleanTime(*pb.PasswordUpdatedAt)
 		} else {
-			usr.PasswordUpdatedAt = time.Now()
+			usr.PasswordUpdatedAt = cleanTime(time.Now())
 		}
 	},
 	requirePasswordUpdateField: func(usr *User, pb *ttnpb.User) { usr.RequirePasswordUpdate = pb.RequirePasswordUpdate },
