@@ -53,10 +53,6 @@ jobs:
       run: tools/bin/mage js:deps
     - name: Build frontend
       run: tools/bin/mage js:clean js:build
-    - name: Install documentation dependencies
-      run: tools/bin/mage docs:deps
-    - name: Build documentation
-      run: tools/bin/mage docs:build
     - name: File versioning
       run: tools/bin/mage version:files
     - name: Check for diff

@@ -55,7 +55,7 @@ func (Version) Current() error {
 }
 
 const (
-	goVersionFilePath          = "pkg/version/ttn.go"
+	goVersionFilePath = "pkg/version/ttn.go"
 )
 
 var packageJSONFilePaths = []string{"package.json", "sdk/js/package.json"}
