@@ -14,6 +14,7 @@
 
 import React from 'react'
 
+import Radio from '@ttn-lw/components/radio-button'
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Select from '@ttn-lw/components/select'
@@ -33,8 +34,11 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import {
   ACTIVATION_MODES,
   LORAWAN_VERSIONS,
+  FRAME_WIDTH_COUNT,
   parseLorawanMacVersion,
   generate16BytesKey,
+  fCntWidthEncode,
+  fCntWidthDecode,
 } from '@console/lib/device-utils'
 
 import validationSchema from './validation-schema'
@@ -45,6 +49,7 @@ const defaultFormValues = {
   supports_class_c: false,
   mac_settings: {
     resets_f_cnt: false,
+    supports_32_bit_f_cnt: true,
   },
   session: {
     dev_addr: '',
@@ -113,6 +118,16 @@ const NetworkSettingsForm = props => {
         name="supports_class_c"
         component={Checkbox}
       />
+      <Form.Field
+        title={sharedMessages.frameCounterWidth}
+        name="mac_settings.supports_32_bit_f_cnt"
+        component={Radio.Group}
+        encode={fCntWidthEncode}
+        decode={fCntWidthDecode}
+      >
+        <Radio label={sharedMessages['16Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_16_BIT} />
+        <Radio label={sharedMessages['32Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_32_BIT} />
+      </Form.Field>
       {(isMulticast || isABP) && (
         <>
           <DevAddrInput
