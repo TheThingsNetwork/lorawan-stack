@@ -295,6 +295,9 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 			if pb.ApplicationIdentifiers != appID || pb.DeviceID != devID {
 				return nil, errDatabaseCorruption.New()
 			}
+			if err := pb.MACState.LoRaWANVersion.Validate(); err != nil {
+				return nil, errDatabaseCorruption.WithCause(err)
+			}
 			ms = append(ms, &uplinkMatch{
 				appID:                   appID,
 				devID:                   devID,
@@ -311,6 +314,9 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 			pb.GetPendingSession() != nil &&
 			pb.PendingSession.DevAddr.Equal(devAddr) &&
 			pb.PendingSession.FNwkSIntKey != nil {
+			if err := pb.PendingMACState.LoRaWANVersion.Validate(); err != nil {
+				return nil, errDatabaseCorruption.WithCause(err)
+			}
 			ms = append(ms, &uplinkMatch{
 				appID:                   appID,
 				devID:                   devID,
