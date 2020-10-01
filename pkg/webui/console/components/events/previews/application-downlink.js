@@ -16,8 +16,6 @@ import React from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { base64ToHex } from '@console/lib/bytes'
-
 import messages from '../messages'
 
 import DescriptionList from './shared/description-list'
@@ -25,13 +23,12 @@ import DescriptionList from './shared/description-list'
 const ApplicationDownlinkPreview = React.memo(({ event }) => {
   const { data, identifiers } = event
   const deviceIds = identifiers[0].device_ids
-  const hex = base64ToHex(data.frm_payload)
 
   return (
     <DescriptionList>
       <DescriptionList.Byte title={messages.devAddr} data={deviceIds.dev_addr} />
       <DescriptionList.Item title={messages.fPort}>{data.f_port}</DescriptionList.Item>
-      <DescriptionList.Byte title={messages.frmPayload} data={hex} />
+      <DescriptionList.Byte title={messages.frmPayload} data={data.frm_payload} convertToHex />
     </DescriptionList>
   )
 })
