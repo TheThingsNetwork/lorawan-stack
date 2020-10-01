@@ -1,9 +1,0 @@
----
-title: "Gateways"
-description: ""
-weight: 3
-menu:
-  main:
-    weight: 3
-aliases: [/guides/connecting-gateways]
----

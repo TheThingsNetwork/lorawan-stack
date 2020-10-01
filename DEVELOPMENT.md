@@ -206,23 +206,7 @@ $ tools/bin/mage proto:clean proto:all jsSDK:definitions
 
 ### Documentation
 
-The documentation site for The Things Stack is built from the `doc` folder.
-All content is stored as Markdown files in `doc/content`.
-
-Data for generated documentation like API and glossary is stored in `doc/data`.
-
-In order to build the documentation site with the right theme, you need to run
-`tools/bin/mage docs:deps` from time to time.
-
->Note: as a workaround for [this](https://github.com/gohugoio/hugo/issues/7083), `tools/bin/mage docs:deps` also pulls the latest version of [frequency-plans.yml](https://github.com/TheThingsNetwork/lorawan-frequency-plans/).
-
-You can start a development server with live reloading by running
-`tools/bin/mage docs:server`. This command will print the address of the server.
-
-The documentation site can be built by running `tools/bin/mage docs:build`. This will
-output the site to `docs/public`.
-
-For more details on how our documentation site is written, see the [Hugo docs](https://gohugo.io/documentation/).
+The documentation site for The Things Stack is built from the [`lorawan-stack-docs`(https://github.com/TheThingsIndustries/lorawan-stack-docs) repository.
 
 ### Web UI
 
