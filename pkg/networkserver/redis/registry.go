@@ -295,6 +295,9 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 			if pb.ApplicationIdentifiers != appID || pb.DeviceID != devID {
 				return nil, errDatabaseCorruption.New()
 			}
+			if err := pb.MACState.LoRaWANVersion.Validate(); err != nil {
+				return nil, errDatabaseCorruption.WithCause(err)
+			}
 			ms = append(ms, &uplinkMatch{
 				appID:                   appID,
 				devID:                   devID,
@@ -311,6 +314,9 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 			pb.GetPendingSession() != nil &&
 			pb.PendingSession.DevAddr.Equal(devAddr) &&
 			pb.PendingSession.FNwkSIntKey != nil {
+			if err := pb.PendingMACState.LoRaWANVersion.Validate(); err != nil {
+				return nil, errDatabaseCorruption.WithCause(err)
+			}
 			ms = append(ms, &uplinkMatch{
 				appID:                   appID,
 				devID:                   devID,
@@ -627,6 +633,10 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	for len(scanKeys) > 0 {
 		v, err := deviceMatchScanScript.Run(r.Redis, scanKeys, args...).Result()
 		if err != nil && err != redis.Nil {
+			log.FromContext(ctx).WithFields(log.Fields(
+				"scan_keys", scanKeys,
+				"args", args,
+			)).Error("Failed to run device match scan script")
 			return ttnredis.ConvertError(err)
 		}
 		if err == redis.Nil {
@@ -698,9 +708,9 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			}
 		}
 		if len(args) > 1 {
-			args[1] = vsUID
+			args[1] = uid
 		} else {
-			args = append(args, vsUID)
+			args = append(args, uid)
 		}
 	}
 	return errNoUplinkMatch.New()
