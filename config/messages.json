@@ -5669,6 +5669,15 @@
       "file": "application_uplink_queue.go"
     }
   },
+  "error:pkg/networkserver/redis:missing_field_value": {
+    "translations": {
+      "en": "missing field `{field}` value"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/networkserver/redis:missing_payload": {
     "translations": {
       "en": "missing payload"
