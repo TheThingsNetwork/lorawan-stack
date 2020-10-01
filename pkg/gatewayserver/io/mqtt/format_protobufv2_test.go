@@ -137,6 +137,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 	validV3Metadata := []*ttnpb.RxMetadata{
 		{
 			GatewayIdentifiers: ids,
+			ChannelRSSI:        -2,
 			RSSI:               -2,
 			SNR:                -75,
 			Time:               &nilTime,

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - Support for sending end device uplinks in the Console.
 - PHY version filtering based on LoRaWAN MAC in the Console.
 - Meta information and status events in the event views in the Console.
@@ -32,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Incorrect entity count in title sections in the Console.
 - Incorrect event detail panel open/close behavior for some events in the Console.
 - Improved error resilience and stability of the event views in the Console.
+- RSSI metadata for MQTT gateways connected with The Things Network Stack V2 protocol.
 
 ### Security
 
