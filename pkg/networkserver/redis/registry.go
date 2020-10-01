@@ -268,6 +268,8 @@ func decodeAES128Key(v interface{}) (*types.AES128Key, error) {
 	return key, nil
 }
 
+var errMissingField = errors.DefineCorruption("missing_field_value", "missing field `{field}` value")
+
 func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingKeys matchKeySet, appID ttnpb.ApplicationIdentifiers, devID string, devAddr types.DevAddr, lsb uint16, matchKey, uidKey string) ([]*uplinkMatch, error) {
 	var isPending bool
 	switch matchKey {
@@ -367,6 +369,11 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 	}
 	for i, v := range vs {
 		if v == nil {
+			switch name := fields[i]; name {
+			case "pending_mac_state.lorawan_version", "mac_state.lorawan_version":
+				log.FromContext(ctx).WithField("field", name).Error("Device is missing required field")
+				return nil, errDatabaseCorruption.WithCause(errMissingField.WithAttributes("field", name).New())
+			}
 			continue
 		}
 		if isPending {
@@ -608,6 +615,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			log.FromContext(ctx).WithError(err).Error("Failed to parse match uid value recorded")
 			return errDatabaseCorruption.WithCause(err)
 		}
+		ctx := log.NewContextWithField(ctx, "device_uid", res.UID)
 		ms, err := getUplinkMatch(ctx, r.Redis, matchKeys.Input, matchKeys.Processing, ids.ApplicationIdentifiers, ids.DeviceID, pld.DevAddr, lsb, res.Key, r.uidKey(res.UID))
 		if err != nil {
 			return err
@@ -672,6 +680,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				Error("Failed to parse UID returned by device match scan script as a string")
 			return errDatabaseCorruption.WithCause(err)
 		}
+		ctx := log.NewContextWithField(ctx, "device_uid", uid)
 
 		ids, err := unique.ToDeviceID(uid)
 		if err != nil {

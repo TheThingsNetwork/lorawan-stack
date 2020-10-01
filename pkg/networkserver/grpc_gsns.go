@@ -737,15 +737,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				return false, nil
 			}
 
-			appID := match.ApplicationIdentifiers()
-			devID := match.DeviceID()
-			ctx = log.NewContextWithFields(ctx, log.Fields(
-				"device_uid", unique.ID(ctx, ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
-				}),
-			))
-
 			fNwkSIntKeyEnvelope = match.FNwkSIntKey()
 			var err error
 			fNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, *fNwkSIntKeyEnvelope, ns.KeyVault)
@@ -756,6 +747,10 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			isPending := match.IsPending()
 			fCnt := match.FCnt()
 			macVersion := match.LoRaWANVersion()
+			ctx = log.NewContextWithFields(ctx, log.Fields(
+				"mac_version", macVersion,
+				"pending_session", isPending,
+			))
 
 			matchType := currentSessionMatch
 			if isPending {
@@ -783,10 +778,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			ctx = log.NewContextWithFields(ctx, log.Fields(
 				"f_cnt_reset", matchType == fCntResetMatch,
 				"full_f_cnt_up", fCnt,
-				"mac_version", macVersion,
-				"pending_session", matchType == pendingSessionMatch,
 			))
-			dev, ctx, err := ns.devices.GetByID(ctx, appID, devID, handleDataUplinkGetPaths[:])
+			dev, ctx, err := ns.devices.GetByID(ctx, match.ApplicationIdentifiers(), match.DeviceID(), handleDataUplinkGetPaths[:])
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Warn("Failed to get device after cmacF matching")
 				return false, nil
