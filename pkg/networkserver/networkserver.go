@@ -138,6 +138,8 @@ const (
 
 // New returns new NetworkServer.
 func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, error) {
+	ctx := log.NewContextWithField(c.Context(), "namespace", "networkserver")
+
 	switch {
 	case conf.DeduplicationWindow == 0:
 		return nil, errInvalidConfiguration.WithCause(errors.New("DeduplicationWindow must be greater than 0"))
@@ -172,8 +174,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	if err != nil {
 		return nil, err
 	}
-
-	ctx := log.NewContextWithField(c.Context(), "namespace", "networkserver")
 
 	var interopCl InteropClient
 	if !conf.Interop.IsZero() {
