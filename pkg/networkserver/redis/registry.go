@@ -706,9 +706,9 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			}
 		}
 		if len(args) > 1 {
-			args[1] = vsUID
+			args[1] = uid
 		} else {
-			args = append(args, vsUID)
+			args = append(args, uid)
 		}
 	}
 	return errNoUplinkMatch.New()
