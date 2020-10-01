@@ -90,6 +90,7 @@ import style from './device.styl'
       'version_ids',
       'frequency_plan_id',
       'mac_settings.resets_f_cnt',
+      'mac_settings.supports_32_bit_f_cnt',
       'resets_join_nonces',
       'supports_class_c',
       'supports_join',
