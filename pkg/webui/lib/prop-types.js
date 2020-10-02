@@ -273,4 +273,12 @@ PropTypes.applicationLinkStats = PropTypes.shape({
   up_count: PropTypes.string,
   downlink_count: PropTypes.string,
 })
+
+PropTypes.euiPrefix = PropTypes.shape({
+  join_eui: PropTypes.string,
+  length: PropTypes.number,
+})
+
+PropTypes.euiPrefixes = PropTypes.arrayOf(PropTypes.euiPrefix)
+
 export default PropTypes

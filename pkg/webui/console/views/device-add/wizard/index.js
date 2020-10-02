@@ -48,6 +48,7 @@ const DeviceWizard = React.memo(props => {
     createDevice,
     createDeviceSuccess,
     rollbackProgress,
+    prefixes,
   } = props
 
   const [completed, setCompleted] = React.useState(false)
@@ -128,6 +129,7 @@ const DeviceWizard = React.memo(props => {
                   lorawanVersion={lorawanVersion}
                   match={match}
                   title={m.basicTitle}
+                  prefixes={prefixes}
                 />
               </Wizard.Step>
               {showNetworkStep && (
@@ -187,6 +189,7 @@ DeviceWizard.propTypes = {
   match: PropTypes.match.isRequired,
   mayEditKeys: PropTypes.bool.isRequired,
   nsConfig: PropTypes.stackComponent.isRequired,
+  prefixes: PropTypes.euiPrefixes.isRequired,
   rollbackProgress: PropTypes.func.isRequired,
 }
 

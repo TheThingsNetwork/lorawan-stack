@@ -20,7 +20,7 @@ import Form from '@ttn-lw/components/form'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
-import JoinEUIPrefixesInput from '@console/containers/join-eui-prefixes-input'
+import JoinEUIPRefixesInput from '@console/components/join-eui-prefixes-input'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -40,7 +40,7 @@ const defaultInitialValues = {
 }
 
 const BasicSettingsForm = props => {
-  const { lorawanVersion, activationMode, error } = props
+  const { lorawanVersion, activationMode, error, prefixes } = props
 
   const validationContext = React.useMemo(
     () => ({
@@ -72,14 +72,16 @@ const BasicSettingsForm = props => {
       {!isNone && (
         <>
           {isOTAA && (
-            <JoinEUIPrefixesInput
+            <Form.Field
               title={lwVersion < 104 ? sharedMessages.appEUI : sharedMessages.joinEUI}
+              component={JoinEUIPRefixesInput}
               name="ids.join_eui"
               description={
                 lwVersion < 104
                   ? sharedMessages.appEUIDescription
                   : sharedMessages.joinEUIDescription
               }
+              prefixes={prefixes}
               required
               showPrefixes
             />
@@ -119,6 +121,7 @@ BasicSettingsForm.propTypes = {
   activationMode: PropTypes.oneOf(Object.values(ACTIVATION_MODES)).isRequired,
   error: PropTypes.error,
   lorawanVersion: PropTypes.string.isRequired,
+  prefixes: PropTypes.euiPrefixes.isRequired,
 }
 
 BasicSettingsForm.defaultProps = {
