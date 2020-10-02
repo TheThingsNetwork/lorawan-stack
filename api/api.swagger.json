@@ -9170,6 +9170,10 @@
         "confirmed": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "consumed_airtime": {
+          "type": "string",
+          "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings."
         }
       }
     },
@@ -11147,6 +11151,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "consumed_airtime": {
+          "type": "string",
+          "description": "Consumed airtime for the transmission of the join request. Calculated by Network Server using the RawPayload size and the transmission settings."
         }
       }
     },
@@ -13085,6 +13093,10 @@
           "type": "integer",
           "format": "int64",
           "description": "Index of the device channel that received the message.\nSet by Network Server."
+        },
+        "consumed_airtime": {
+          "type": "string",
+          "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings."
         }
       },
       "title": "Uplink message from the end device to the network"

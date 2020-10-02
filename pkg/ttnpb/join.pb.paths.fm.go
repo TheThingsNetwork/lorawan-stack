@@ -7,6 +7,7 @@ var JoinRequestFieldPathsNested = []string{
 	"cf_list.ch_masks",
 	"cf_list.freq",
 	"cf_list.type",
+	"consumed_airtime",
 	"correlation_ids",
 	"dev_addr",
 	"downlink_settings",
@@ -66,6 +67,7 @@ var JoinRequestFieldPathsNested = []string{
 
 var JoinRequestFieldPathsTopLevel = []string{
 	"cf_list",
+	"consumed_airtime",
 	"correlation_ids",
 	"dev_addr",
 	"downlink_settings",

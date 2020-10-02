@@ -138,6 +138,15 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 			} else {
 				dst.CorrelationIDs = nil
 			}
+		case "consumed_airtime":
+			if len(subs) > 0 {
+				return fmt.Errorf("'consumed_airtime' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ConsumedAirtime = src.ConsumedAirtime
+			} else {
+				dst.ConsumedAirtime = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

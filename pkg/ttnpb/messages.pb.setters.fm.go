@@ -100,6 +100,15 @@ func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 				var zero uint32
 				dst.DeviceChannelIndex = zero
 			}
+		case "consumed_airtime":
+			if len(subs) > 0 {
+				return fmt.Errorf("'consumed_airtime' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ConsumedAirtime = src.ConsumedAirtime
+			} else {
+				dst.ConsumedAirtime = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -490,6 +499,15 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 			} else {
 				var zero bool
 				dst.Confirmed = zero
+			}
+		case "consumed_airtime":
+			if len(subs) > 0 {
+				return fmt.Errorf("'consumed_airtime' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ConsumedAirtime = src.ConsumedAirtime
+			} else {
+				dst.ConsumedAirtime = nil
 			}
 
 		default:

@@ -59,6 +59,7 @@ var DecodeUplinkMessageRequestFieldPathsNested = []string{
 	"message.app_s_key.kek_label",
 	"message.app_s_key.key",
 	"message.confirmed",
+	"message.consumed_airtime",
 	"message.decoded_payload",
 	"message.decoded_payload_warnings",
 	"message.f_cnt",

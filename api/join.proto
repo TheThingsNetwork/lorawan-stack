@@ -38,6 +38,9 @@ message JoinRequest {
   CFList cf_list = 8 [(gogoproto.customname) = "CFList"];
   reserved 9; // Reserved for CFListType.
   repeated string correlation_ids = 10 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
+
+  // Consumed airtime for the transmission of the join request. Calculated by Network Server using the RawPayload size and the transmission settings.
+  google.protobuf.Duration consumed_airtime = 11 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
 }
 
 message JoinResponse {
