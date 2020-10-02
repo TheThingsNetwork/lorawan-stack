@@ -2249,6 +2249,9 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		LinkMode: "all",
 		Devices:  deviceRegistry,
 		Links:    linkRegistry,
+		EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
+			Fetcher: &noopEndDeviceFetcher{},
+		},
 	}
 	as, err := applicationserver.New(c, config)
 	if !a.So(err, should.BeNil) {

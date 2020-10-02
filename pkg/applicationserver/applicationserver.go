@@ -131,6 +131,10 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		interopID:        conf.Interop.ID,
 		endDeviceFetcher: conf.EndDeviceFetcher.Fetcher,
 	}
+
+	if as.endDeviceFetcher == nil {
+		as.endDeviceFetcher = &NoopEndDeviceFetcher{}
+	}
 	retryIO := io.NewRetryServer(as)
 
 	as.grpc.asDevices = asEndDeviceRegistryServer{
