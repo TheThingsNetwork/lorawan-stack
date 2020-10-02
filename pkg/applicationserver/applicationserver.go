@@ -80,6 +80,8 @@ type ApplicationServer struct {
 
 	interopClient InteropClient
 	interopID     string
+
+	endDeviceFetcher EndDeviceFetcher
 }
 
 // Context returns the context of the Application Server.
@@ -125,8 +127,9 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
 		}),
-		interopClient: interopCl,
-		interopID:     conf.Interop.ID,
+		interopClient:    interopCl,
+		interopID:        conf.Interop.ID,
+		endDeviceFetcher: conf.EndDeviceFetcher.Fetcher,
 	}
 	retryIO := io.NewRetryServer(as)
 
@@ -931,6 +934,11 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		uplink.AppSKey = dev.Session.AppSKey
 		uplink.LastAFCntDown = dev.Session.LastAFCntDown
 	}
+
+	if isDev, err := as.endDeviceFetcher.Get(ctx, dev.EndDeviceIdentifiers, "locations"); err == nil {
+		fmt.Println("\n\n++", isDev.Locations)
+	}
+
 	// TODO: Run uplink messages through location solvers async (https://github.com/TheThingsNetwork/lorawan-stack/issues/37)
 	return nil
 }
