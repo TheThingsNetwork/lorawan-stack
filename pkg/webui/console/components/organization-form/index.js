@@ -28,7 +28,7 @@ import { id as organizationIdRegexp } from '@console/lib/regexp'
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
     organization_id: Yup.string()
-      .matches(organizationIdRegexp, sharedMessages.validateIdFormat)
+      .matches(organizationIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
       .min(2, Yup.passValues(sharedMessages.validateTooShort))
       .max(25, Yup.passValues(sharedMessages.validateTooLong))
       .required(sharedMessages.validateRequired),

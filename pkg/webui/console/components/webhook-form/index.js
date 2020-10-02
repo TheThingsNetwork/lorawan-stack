@@ -65,7 +65,7 @@ const headerCheck = headers =>
 
 const validationSchema = Yup.object().shape({
   webhook_id: Yup.string()
-    .matches(webhookIdRegexp, sharedMessages.validateIdFormat)
+    .matches(webhookIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
@@ -80,9 +80,12 @@ const validationSchema = Yup.object().shape({
     .test('has no empty string values', m.headersValidateRequired, headerCheck)
     .default([]),
   base_url: Yup.string()
-    .matches(urlRegexp, sharedMessages.validateUrl)
+    .matches(urlRegexp, Yup.passValues(sharedMessages.validateUrl))
     .required(sharedMessages.validateRequired),
-  downlink_api_key: Yup.string().matches(webhookAPIKeyRegexp, sharedMessages.validateApiKey),
+  downlink_api_key: Yup.string().matches(
+    webhookAPIKeyRegexp,
+    Yup.passValues(sharedMessages.validateApiKey),
+  ),
 })
 
 export default class WebhookForm extends Component {

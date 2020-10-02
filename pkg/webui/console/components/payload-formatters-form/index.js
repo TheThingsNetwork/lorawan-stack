@@ -59,7 +59,7 @@ const validationSchema = Yup.object().shape({
     then: Yup.string().required(sharedMessages.validateRequired),
   }),
   [FIELD_NAMES.GRPC]: Yup.string()
-    .matches(addressRegexp, sharedMessages.validateAddressFormat)
+    .matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
     .when(FIELD_NAMES.RADIO, {
       is: TYPES.GRPC,
       then: Yup.string().required(sharedMessages.validateRequired),

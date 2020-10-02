@@ -36,7 +36,7 @@ import { id as collaboratorIdRegexp } from '@console/lib/regexp'
 
 const validationSchema = Yup.object().shape({
   collaborator_id: Yup.string()
-    .matches(collaboratorIdRegexp, sharedMessages.validateIdFormat)
+    .matches(collaboratorIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
     .required(sharedMessages.validateRequired),
   collaborator_type: Yup.string().required(sharedMessages.validateRequired),
   rights: Yup.array().min(1, sharedMessages.validateRights),

@@ -31,11 +31,11 @@ const validationSchema = Yup.object()
         }
 
         if (!asEnabled) {
-          return schema.matches(addressRegexp, sharedMessages.validateAddressFormat)
+          return schema.matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
         }
 
         return schema
-          .matches(addressRegexp, sharedMessages.validateAddressFormat)
+          .matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
           .default(getHostFromUrl(asUrl))
       },
     ),
@@ -47,21 +47,21 @@ const validationSchema = Yup.object()
         }
 
         if (!nsEnabled) {
-          return schema.matches(addressRegexp, sharedMessages.validateAddressFormat)
+          return schema.matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
         }
 
         if (!mayEditKeys) {
           if (activationMode === ACTIVATION_MODES.OTAA) {
             return schema
-              .matches(addressRegexp, sharedMessages.validateAddressFormat)
+              .matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
               .default(getHostFromUrl(nsUrl))
           }
 
-          return schema.matches(addressRegexp, sharedMessages.validateAddressFormat)
+          return schema.matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
         }
 
         return schema
-          .matches(addressRegexp, sharedMessages.validateAddressFormat)
+          .matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
           .default(getHostFromUrl(nsUrl))
       },
     ),
@@ -73,7 +73,7 @@ const validationSchema = Yup.object()
         }
 
         return schema
-          .matches(addressRegexp, sharedMessages.validateAddressFormat)
+          .matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
           .transform(toUndefined)
           .default(getHostFromUrl(jsUrl))
       },
