@@ -52,7 +52,7 @@ const m = defineMessages({
 const validationSchema = Yup.object({
   claim_authentication_code: Yup.object({
     value: Yup.string()
-      .matches(/^[A-Z0-9]{1,32}$/, m.validateCode)
+      .matches(/^[A-Z0-9]{1,32}$/, Yup.passValues(m.validateCode))
       .required(sharedMessages.validateRequired),
     valid_from: Yup.date(),
     valid_to: Yup.date().when('valid_from', (validFrom, schema) => {

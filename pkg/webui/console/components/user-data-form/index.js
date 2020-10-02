@@ -43,7 +43,7 @@ const approvalStates = [
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
     user_id: Yup.string()
-      .matches(userIdRegexp, sharedMessages.validateIdFormat)
+      .matches(userIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
       .min(2, Yup.passValues(sharedMessages.validateTooShort))
       .max(25, Yup.passValues(sharedMessages.validateTooLong))
       .required(sharedMessages.validateRequired),

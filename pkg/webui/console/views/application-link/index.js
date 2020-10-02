@@ -82,9 +82,12 @@ const m = defineMessages({
 
 const validationSchema = Yup.object().shape({
   api_key: Yup.string()
-    .matches(apiKey, sharedMessages.validateApiKey)
+    .matches(apiKey, Yup.passValues(sharedMessages.validateApiKey))
     .required(sharedMessages.validateRequired),
-  network_server_address: Yup.string().matches(address, sharedMessages.validateAddressFormat),
+  network_server_address: Yup.string().matches(
+    address,
+    Yup.passValues(sharedMessages.validateAddressFormat),
+  ),
   tls: Yup.bool(),
 })
 

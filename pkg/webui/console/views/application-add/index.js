@@ -60,7 +60,7 @@ const m = defineMessages({
 const validationSchema = Yup.object().shape({
   owner_id: Yup.string().required(sharedMessages.validateRequired),
   application_id: Yup.string()
-    .matches(applicationIdRegexp, sharedMessages.validateIdFormat)
+    .matches(applicationIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
@@ -71,7 +71,7 @@ const validationSchema = Yup.object().shape({
   description: Yup.string(),
   network_server_address: Yup.string().when('link', {
     is: true,
-    then: schema => schema.matches(address, sharedMessages.validateAddressFormat),
+    then: schema => schema.matches(address, Yup.passValues(sharedMessages.validateAddressFormat)),
   }),
 })
 

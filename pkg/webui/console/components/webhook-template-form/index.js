@@ -155,7 +155,7 @@ export default class WebhookTemplateForm extends Component {
         }),
         {
           webhook_id: Yup.string()
-            .matches(webhookIdRegexp, sharedMessages.validateIdFormat)
+            .matches(webhookIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
             .min(2, Yup.passValues(sharedMessages.validateTooShort))
             .max(25, Yup.passValues(sharedMessages.validateTooLong))
             .required(sharedMessages.validateRequired),

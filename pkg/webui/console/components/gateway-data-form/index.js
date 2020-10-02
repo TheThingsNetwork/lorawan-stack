@@ -69,7 +69,7 @@ const validationSchema = Yup.object().shape({
   owner_id: Yup.string(),
   ids: Yup.object().shape({
     gateway_id: Yup.string()
-      .matches(gatewayIdRegexp, sharedMessages.validateIdFormat)
+      .matches(gatewayIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
       .min(2, Yup.passValues(sharedMessages.validateTooShort))
       .max(36, Yup.passValues(sharedMessages.validateTooLong))
       .required(sharedMessages.validateRequired),
@@ -83,13 +83,19 @@ const validationSchema = Yup.object().shape({
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
   frequency_plan_id: Yup.string(),
-  gateway_server_address: Yup.string().matches(addressRegexp, sharedMessages.validateAddressFormat),
+  gateway_server_address: Yup.string().matches(
+    addressRegexp,
+    Yup.passValues(sharedMessages.validateAddressFormat),
+  ),
   location_public: Yup.boolean().default(false),
   status_public: Yup.boolean().default(false),
   schedule_downlink_late: Yup.boolean().default(false),
   update_location_from_status: Yup.boolean().default(false),
   auto_update: Yup.boolean().default(false),
-  schedule_anytime_delay: Yup.string().matches(delayRegexp, sharedMessages.validateDelayFormat),
+  schedule_anytime_delay: Yup.string().matches(
+    delayRegexp,
+    Yup.passValues(sharedMessages.validateDelayFormat),
+  ),
   attributes: Yup.array()
     .test(
       'has no empty string values',

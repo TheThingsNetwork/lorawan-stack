@@ -36,11 +36,11 @@ const validationSchema = Yup.object()
     description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
     network_server_address: Yup.string().matches(
       addressRegexp,
-      sharedMessages.validateAddressFormat,
+      Yup.passValues(sharedMessages.validateAddressFormat),
     ),
     application_server_address: Yup.string().matches(
       addressRegexp,
-      sharedMessages.validateAddressFormat,
+      Yup.passValues(sharedMessages.validateAddressFormat),
     ),
     _external_js: Yup.boolean(),
     join_server_address: Yup.string().when(['$supportsJoin'], (supportsJoin, schema) => {
@@ -48,7 +48,9 @@ const validationSchema = Yup.object()
         return schema.strip()
       }
 
-      return schema.matches(addressRegexp, sharedMessages.validateAddressFormat).default('')
+      return schema
+        .matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
+        .default('')
     }),
     resets_join_nonces: Yup.bool().when(
       ['$supportsJoin', '$lorawanVersion', '_external_js'],

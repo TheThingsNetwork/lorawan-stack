@@ -19,7 +19,7 @@ import { id as deviceIdRegexp } from '@ttn-lw/lib/regexp'
 import { ACTIVATION_MODES, parseLorawanMacVersion } from '@console/lib/device-utils'
 
 const deviceIdSchema = Yup.string()
-  .matches(deviceIdRegexp, sharedMessages.validateIdFormat)
+  .matches(deviceIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
   .min(2, Yup.passValues(sharedMessages.validateTooShort))
   .max(36, Yup.passValues(sharedMessages.validateTooLong))
   .required(sharedMessages.validateRequired)
