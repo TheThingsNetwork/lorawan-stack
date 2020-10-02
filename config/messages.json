@@ -2132,6 +2132,15 @@
       "file": "payload.go"
     }
   },
+  "error:pkg/applicationserver:invalid_ttl": {
+    "translations": {
+      "en": "Invalid TTL `{ttl}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "config.go"
+    }
+  },
   "error:pkg/applicationserver:join_server_unavailable": {
     "translations": {
       "en": "Join Server unavailable for JoinEUI `{join_eui}`"
