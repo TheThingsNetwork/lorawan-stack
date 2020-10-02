@@ -355,6 +355,7 @@
   - [Message `ApplicationServiceData`](#ttn.lorawan.v3.ApplicationServiceData)
   - [Message `ApplicationUp`](#ttn.lorawan.v3.ApplicationUp)
   - [Message `ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink)
+  - [Message `ApplicationUplink.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplink.LocationsEntry)
   - [Message `DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage)
   - [Message `DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest)
   - [Message `GatewayUplinkMessage`](#ttn.lorawan.v3.GatewayUplinkMessage)
@@ -5062,6 +5063,7 @@ Encodes and decodes uplink messages.
 | `last_a_f_cnt_down` | [`uint32`](#uint32) |  | The last AFCntDown of the current session. This field is only present if the skip_payload_crypto field of the EndDevice is true. Can be used with app_s_key to encrypt downlink payloads. |
 | `confirmed` | [`bool`](#bool) |  |  |
 | `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings. |
+| `locations` | [`ApplicationUplink.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplink.LocationsEntry) | repeated | End device location metadata, set by the Application Server while handling the message. |
 
 #### Field Rules
 
@@ -5071,6 +5073,13 @@ Encodes and decodes uplink messages.
 | `f_port` | <p>`uint32.lte`: `255`</p><p>`uint32.gte`: `1`</p><p>`uint32.not_in`: `[224]`</p> |
 | `rx_metadata` | <p>`repeated.min_items`: `1`</p> |
 | `settings` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationUplink.LocationsEntry">Message `ApplicationUplink.LocationsEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`Location`](#ttn.lorawan.v3.Location) |  |  |
 
 ### <a name="ttn.lorawan.v3.DownlinkMessage">Message `DownlinkMessage`</a>
 

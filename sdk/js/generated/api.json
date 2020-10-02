@@ -20888,6 +20888,47 @@
               "fullType": "google.protobuf.Duration",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "locations",
+              "description": "End device location metadata, set by the Application Server while handling the message.",
+              "label": "repeated",
+              "type": "LocationsEntry",
+              "longType": "ApplicationUplink.LocationsEntry",
+              "fullType": "ttn.lorawan.v3.ApplicationUplink.LocationsEntry",
+              "ismap": true,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LocationsEntry",
+          "longName": "ApplicationUplink.LocationsEntry",
+          "fullName": "ttn.lorawan.v3.ApplicationUplink.LocationsEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "Location",
+              "longType": "Location",
+              "fullType": "ttn.lorawan.v3.Location",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

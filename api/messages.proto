@@ -209,7 +209,10 @@ message ApplicationUplink {
   // Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings.
   google.protobuf.Duration consumed_airtime = 13 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
 
-  // next: 14
+  // End device location metadata, set by the Application Server while handling the message.
+  map<string,Location> locations = 14;
+
+  // next: 15
 }
 
 message ApplicationLocation {
