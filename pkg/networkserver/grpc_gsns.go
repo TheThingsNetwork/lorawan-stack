@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
+	"go.thethings.network/lorawan-stack/v3/pkg/toa"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -994,14 +995,15 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			CorrelationIDs:       up.CorrelationIDs,
 			Up: &ttnpb.ApplicationUp_UplinkMessage{
 				UplinkMessage: &ttnpb.ApplicationUplink{
-					Confirmed:    up.Payload.MType == ttnpb.MType_CONFIRMED_UP,
-					FCnt:         pld.FullFCnt,
-					FPort:        pld.FPort,
-					FRMPayload:   pld.FRMPayload,
-					RxMetadata:   up.RxMetadata,
-					SessionKeyID: stored.Session.SessionKeyID,
-					Settings:     up.Settings,
-					ReceivedAt:   up.ReceivedAt,
+					Confirmed:       up.Payload.MType == ttnpb.MType_CONFIRMED_UP,
+					FCnt:            pld.FullFCnt,
+					FPort:           pld.FPort,
+					FRMPayload:      pld.FRMPayload,
+					RxMetadata:      up.RxMetadata,
+					SessionKeyID:    stored.Session.SessionKeyID,
+					Settings:        up.Settings,
+					ReceivedAt:      up.ReceivedAt,
+					ConsumedAirtime: up.ConsumedAirtime,
 				},
 			},
 		})
@@ -1167,6 +1169,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			Rx2DR:       macState.DesiredParameters.Rx2DataRateIndex,
 			OptNeg:      matched.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 		},
+		ConsumedAirtime: up.ConsumedAirtime,
 	}
 
 	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.EndDeviceIdentifiers, req)
@@ -1326,6 +1329,11 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	}
 	ctx = log.NewContext(ctx, logger)
 
+	if t, err := toa.Compute(len(up.RawPayload), up.Settings); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to compute time-on-air")
+	} else {
+		up.ConsumedAirtime = &t
+	}
 	switch up.Payload.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		return ttnpb.Empty, ns.handleDataUplink(ctx, up)

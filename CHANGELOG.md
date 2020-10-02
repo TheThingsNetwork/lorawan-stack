@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PHY version filtering based on LoRaWAN MAC in the Console.
 - Meta information and status events in the event views in the Console.
 - Support for setting the frame counter width of an end device in the Console.
+- Include consumed airtime metadata in uplink messages and join requests (see `uplink_message.consumed_airtime` field).
 
 ### Changed
 
