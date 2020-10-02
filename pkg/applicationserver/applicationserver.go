@@ -935,10 +935,6 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		uplink.LastAFCntDown = dev.Session.LastAFCntDown
 	}
 
-	if isDev, err := as.endDeviceFetcher.Get(ctx, dev.EndDeviceIdentifiers, "locations"); err == nil {
-		fmt.Println("\n\n++", isDev.Locations)
-	}
-
 	// TODO: Run uplink messages through location solvers async (https://github.com/TheThingsNetwork/lorawan-stack/issues/37)
 	return nil
 }
