@@ -18,7 +18,6 @@ import { FormattedNumber } from 'react-intl'
 
 import Status from '@ttn-lw/components/status'
 import Icon from '@ttn-lw/components/icon'
-import Button from '@ttn-lw/components/button'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
@@ -100,20 +99,7 @@ class GatewayConnection extends React.PureComponent {
   }
 
   get messages() {
-    const { statistics, error, startStatistics, fetching } = this.props
-
-    if (isNotFoundError(error)) {
-      return (
-        <Button
-          naked
-          secondary
-          disabled={fetching}
-          title={sharedMessages.refresh}
-          icon="refresh"
-          onClick={startStatistics}
-        />
-      )
-    }
+    const { statistics } = this.props
 
     if (!statistics) {
       return null
