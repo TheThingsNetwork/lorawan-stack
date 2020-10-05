@@ -17,7 +17,7 @@ import { connect } from 'react-redux'
 
 import ErrorNotification from '@ttn-lw/components/error-notification'
 
-import GatewayEventsList from '@console/components/events-list/gateway'
+import Events from '@console/components/events'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
@@ -48,15 +48,11 @@ const GatewayEvents = props => {
 
   if (widget) {
     return (
-      <GatewayEventsList.Widget
-        events={events}
-        toAllUrl={`/gateways/${gtwId}/data`}
-        gtwId={gtwId}
-      />
+      <Events.Widget events={events} entityId={gtwId} toAllUrl={`/gateways/${gtwId}/data`} scoped />
     )
   }
 
-  return <GatewayEventsList events={events} onClear={onClear} gtwId={gtwId} />
+  return <Events events={events} entityId={gtwId} onClear={onClear} scoped />
 }
 
 GatewayEvents.propTypes = {

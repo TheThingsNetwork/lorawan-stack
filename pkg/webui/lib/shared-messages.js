@@ -16,6 +16,8 @@ import { defineMessages } from 'react-intl'
 
 export default defineMessages({
   // Keep these sorted alphabetically.
+  '16Bit': '16 bit',
+  '32Bit': '32 bit',
   abp: 'Activation by personalization (ABP)',
   activationMode: 'Activation mode',
   add: 'Add',
@@ -149,6 +151,7 @@ export default defineMessages({
   firmwareVersion: 'Firmware version',
   fNwkSIntKey: 'FNwkSIntKey',
   fNwkSIntKeyDescription: 'Forwarding network session integrity key',
+  frameCounterWidth: 'Frame counter width',
   frequencyPlan: 'Frequency plan',
   gateway: 'Gateway',
   gatewayDescription: 'Gateway description',
@@ -200,7 +203,7 @@ export default defineMessages({
   lorawanPhyVersionDescription: 'The LoRaWAN PHY version of the end device',
   macVersion: 'LoRaWAN version',
   macVersionDescription: 'The LoRaWAN version (MAC), as provided by the device manufacturer',
-  messages: 'Messages',
+  messaging: 'Messaging',
   messageTypes: 'Message types',
   milliseconds: 'milliseconds',
   minutes: 'minutes',
@@ -318,11 +321,14 @@ export default defineMessages({
   validateApiKey: 'API keys must follow the format "NNSXS.[…].[…]"',
   validateDelayFormat: '{field} must be a positive, whole number',
   validateEmail: 'An email address must use exactly one "@" and use no special characters',
+  validateHexLength: '{field} must be a complete hex value',
   validateIdFormat: '{field} must contain only lowercase letters, numbers and dashes (-)',
   validateInt32: '{field} must be a whole number, negative or positive',
   validateLatitude: 'Latitude must be a whole or decimal number between -90 and 90',
   validateLength: '{field} must be exactly {length} characters long',
   validateLongitude: 'Longitude must be a whole or decimal number between -180 and 180',
+  validateNumberGte: '{field} must be at least {min} or higher',
+  validateNumberLte: '{field} must be {max} or lower',
   validateMqttPassword: '{field} must be empty or have at least 2 characters',
   validateMqttUrl:
     'MQTT URLs must have the format "mqtt[s]://[username][:password]@host.domain[:port]"',

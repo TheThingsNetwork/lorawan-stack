@@ -15,8 +15,17 @@
 package redis_test
 
 import (
+	"testing"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test/shared"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
 )
 
 var _ networkserver.ApplicationUplinkQueue = &ApplicationUplinkQueue{}
+
+func TestApplicationUplinkQueue(t *testing.T) {
+	q, closeFn := NewRedisApplicationUplinkQueue(t)
+	t.Cleanup(closeFn)
+	HandleApplicationUplinkQueueTest(t, q)
+}

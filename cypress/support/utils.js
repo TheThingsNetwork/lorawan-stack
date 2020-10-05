@@ -21,6 +21,10 @@ const disableIdentityServer = config => {
   Cypress._.merge(config, {
     APP_CONFIG: { stack_config: { is: { enabled: false, base_url: '' } } },
   })
+  Cypress.config({
+    isBaseUrl: '',
+    isEnabled: false,
+  })
 }
 
 /**
@@ -31,6 +35,10 @@ const disableIdentityServer = config => {
 const disableNetworkServer = config => {
   Cypress._.merge(config, {
     APP_CONFIG: { stack_config: { ns: { enabled: false, base_url: '' } } },
+  })
+  Cypress.config({
+    nsBaseUrl: '',
+    nsEnabled: false,
   })
 }
 
@@ -43,6 +51,10 @@ const disableApplicationServer = config => {
   Cypress._.merge(config, {
     APP_CONFIG: { stack_config: { as: { enabled: false, base_url: '' } } },
   })
+  Cypress.config({
+    asBaseUrl: '',
+    asEnabled: false,
+  })
 }
 
 /**
@@ -54,6 +66,10 @@ const disableJoinServer = config => {
   Cypress._.merge(config, {
     APP_CONFIG: { stack_config: { js: { enabled: false, base_url: '' } } },
   })
+  Cypress.config({
+    jsBaseUrl: '',
+    jsEnabled: false,
+  })
 }
 
 /**
@@ -64,6 +80,10 @@ const disableJoinServer = config => {
 const disableGatewayServer = config => {
   Cypress._.merge(config, {
     APP_CONFIG: { stack_config: { gs: { enabled: false, base_url: '' } } },
+  })
+  Cypress.config({
+    gsBaseUrl: '',
+    gsEnabled: false,
   })
 }
 

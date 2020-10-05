@@ -16,14 +16,32 @@ package component
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"runtime/debug"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 )
 
 // TaskFunc is the task function.
 type TaskFunc func(context.Context) error
+
+func (f TaskFunc) Execute(ctx context.Context) (err error) {
+	defer func() {
+		if p := recover(); p != nil {
+			fmt.Fprintf(os.Stderr, "%s\n%s", p, debug.Stack())
+			if pErr, ok := p.(error); ok {
+				err = errTaskRecovered.WithCause(pErr)
+			} else {
+				err = errTaskRecovered.WithAttributes("panic", p)
+			}
+		}
+	}()
+	return f(ctx)
+}
 
 // TaskRestart defines a task's restart policy.
 type TaskRestart uint8
@@ -123,6 +141,8 @@ func (f StartTaskFunc) StartTask(conf *TaskConfig) {
 	f(conf)
 }
 
+var errTaskRecovered = errors.Define("task_recovered", "task recovered")
+
 func DefaultStartTask(conf *TaskConfig) {
 	logger := log.FromContext(conf.Context).WithField("task_id", conf.ID)
 	go func() {
@@ -133,7 +153,7 @@ func DefaultStartTask(conf *TaskConfig) {
 				invocation = 1
 			}
 			startTime := time.Now()
-			err := conf.Func(conf.Context)
+			err := conf.Func.Execute(conf.Context)
 			executionDuration := time.Since(startTime)
 			if err != nil && err != context.Canceled {
 				logger.WithField("invocation", invocation).WithError(err).Warn("Task failed")

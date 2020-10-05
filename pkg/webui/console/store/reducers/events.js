@@ -15,52 +15,51 @@
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
 
 import {
+  createStatusReconnectedEvent,
+  createStatusClearedEvent,
+  createStatusClosedEvent,
+} from '@console/lib/events/definitions'
+import { createSyntheticEventFromError } from '@console/lib/events/utils'
+
+import {
   createGetEventMessageSuccessActionType,
   createGetEventMessageFailureActionType,
   createStartEventsStreamActionType,
   createStartEventsStreamSuccessActionType,
   createStartEventsStreamFailureActionType,
   createStopEventsStreamActionType,
+  createEventStreamClosedActionType,
   createClearEventsActionType,
 } from '@console/store/actions/events'
 
 import CONNECTION_STATUS from '../../constants/connection-status'
 
-const addEvent = (state, event) => {
+const addEvent = (events, event) => {
   // See https://github.com/TheThingsNetwork/lorawan-stack/pull/2989
   if (event.name === 'events.stream.start' || event.name === 'events.stream.stop') {
-    return state
+    return events
   }
 
-  const currentEvents = state.events
-  const eventTime = new Date(event.time).getTime()
+  const currentEvents = events
 
   // Keep events sorted in descending order by `time`.
   let insertIndex = 0
   while (insertIndex < currentEvents.length) {
-    const currentEventTime = new Date(currentEvents[insertIndex].time).getTime()
+    const currentEventTime = currentEvents[insertIndex].time
 
-    if (eventTime < currentEventTime) {
+    if (event.time < currentEventTime) {
       insertIndex += 1
     } else {
       break
     }
   }
 
-  const events = [
-    ...currentEvents.slice(0, insertIndex),
-    event,
-    ...currentEvents.slice(insertIndex),
-  ]
-
-  return {
-    ...state,
-    events,
-  }
+  return [...currentEvents.slice(0, insertIndex), event, ...currentEvents.slice(insertIndex)]
 }
 const defaultState = {
   events: [],
   error: undefined,
+  interrupted: false,
   status: CONNECTION_STATUS.DISCONNECTED,
 }
 
@@ -72,6 +71,7 @@ const createNamedEventReducer = function(reducerName = '') {
   const GET_EVENT_SUCCESS = createGetEventMessageSuccessActionType(reducerName)
   const GET_EVENT_FAILURE = createGetEventMessageFailureActionType(reducerName)
   const CLEAR_EVENTS = createClearEventsActionType(reducerName)
+  const EVENT_STREAM_CLOSED = createEventStreamClosedActionType(reducerName)
 
   return function(state = defaultState, action) {
     switch (action.type) {
@@ -83,27 +83,51 @@ const createNamedEventReducer = function(reducerName = '') {
       case START_EVENTS_SUCCESS:
         return {
           ...state,
-          error: undefined,
+          events: state.interrupted
+            ? addEvent(state.events, createStatusReconnectedEvent())
+            : state.events,
           status: CONNECTION_STATUS.CONNECTED,
+          interrupted: false,
+          error: undefined,
         }
       case GET_EVENT_SUCCESS:
-        return addEvent(state, action.event)
+        return {
+          ...state,
+          events: addEvent(state.events, action.event),
+        }
       case START_EVENTS_FAILURE:
+        return {
+          ...state,
+          events: !state.interrupted
+            ? addEvent(state.events, createSyntheticEventFromError(action.error))
+            : state.events,
+          error: action.error,
+          status: CONNECTION_STATUS.DISCONNECTED,
+        }
       case GET_EVENT_FAILURE:
         return {
           ...state,
-          error: action.error,
-          status: CONNECTION_STATUS.ERROR,
+          events: addEvent(state.events, createSyntheticEventFromError(action.error)),
+          status: CONNECTION_STATUS.DISCONNECTED,
+          interrupted: true,
         }
       case STOP_EVENTS:
         return {
           ...state,
           status: CONNECTION_STATUS.DISCONNECTED,
+          interrupted: false,
+        }
+      case EVENT_STREAM_CLOSED:
+        return {
+          ...state,
+          events: addEvent(state.events, createStatusClosedEvent()),
+          status: CONNECTION_STATUS.DISCONNECTED,
+          interrupted: true,
         }
       case CLEAR_EVENTS:
         return {
           ...state,
-          events: [],
+          events: [createStatusClearedEvent()],
         }
       default:
         return state
@@ -119,6 +143,7 @@ const createNamedEventsReducer = function(reducerName = '') {
   const GET_EVENT_FAILURE = createGetEventMessageFailureActionType(reducerName)
   const CLEAR_EVENTS = createClearEventsActionType(reducerName)
   const STOP_EVENTS = createStopEventsStreamActionType(reducerName)
+  const EVENT_STREAM_CLOSED = createEventStreamClosedActionType(reducerName)
   const event = createNamedEventReducer(reducerName)
 
   return function(state = {}, action) {
@@ -133,6 +158,7 @@ const createNamedEventsReducer = function(reducerName = '') {
       case START_EVENTS_FAILURE:
       case START_EVENTS_SUCCESS:
       case STOP_EVENTS:
+      case EVENT_STREAM_CLOSED:
       case GET_EVENT_FAILURE:
       case GET_EVENT_SUCCESS:
       case CLEAR_EVENTS:

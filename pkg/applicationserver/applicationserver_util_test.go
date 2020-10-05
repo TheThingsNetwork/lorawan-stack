@@ -47,3 +47,11 @@ func (r MockDeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifi
 	}
 	return r.SetFunc(ctx, ids, paths, f)
 }
+
+// noopEndDeviceFetcher is a no-op.
+type noopEndDeviceFetcher struct{}
+
+// Get implements the EndDeviceFetcher interface.
+func (noopEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
+	return nil, errNotFound.New()
+}

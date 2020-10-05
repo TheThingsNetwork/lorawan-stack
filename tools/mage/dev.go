@@ -46,7 +46,6 @@ func (Dev) Misspell() error {
 		"config",
 		"CONTRIBUTING.md",
 		"DEVELOPMENT.md",
-		"doc",
 		"docker-compose.yml",
 		"Dockerfile",
 		"lorawan-stack.go",

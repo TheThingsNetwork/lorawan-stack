@@ -21,6 +21,24 @@ export const ACTIVATION_MODES = Object.freeze({
   NONE: 'none',
 })
 
+export const PHY_V1_0 = { value: '1.0.0', label: 'PHY V1.0' }
+export const PHY_V1_0_1 = { value: '1.0.1', label: 'PHY V1.0.1' }
+export const PHY_V1_0_2_REV_A = { value: '1.0.2-a', label: 'PHY V1.0.2 REV A' }
+export const PHY_V1_0_2_REV_B = { value: '1.0.2-b', label: 'PHY V1.0.2 REV B' }
+export const PHY_V1_0_3_REV_A = { value: '1.0.3-a', label: 'PHY V1.0.3 REV A' }
+export const PHY_V1_1_REV_A = { value: '1.1.0-a', label: 'PHY V1.1 REV A' }
+export const PHY_V1_1_REV_B = { value: '1.1.0-b', label: 'PHY V1.1 REV B' }
+
+export const LORAWAN_PHY_VERSIONS = Object.freeze([
+  PHY_V1_0,
+  PHY_V1_0_1,
+  PHY_V1_0_2_REV_A,
+  PHY_V1_0_2_REV_B,
+  PHY_V1_0_3_REV_A,
+  PHY_V1_1_REV_A,
+  PHY_V1_1_REV_B,
+])
+
 export const LORAWAN_VERSIONS = Object.freeze([
   { value: '1.0.0', label: 'MAC V1.0' },
   { value: '1.0.1', label: 'MAC V1.0.1' },
@@ -30,15 +48,10 @@ export const LORAWAN_VERSIONS = Object.freeze([
   { value: '1.1.0', label: 'MAC V1.1' },
 ])
 
-export const LORAWAN_PHY_VERSIONS = Object.freeze([
-  { value: '1.0.0', label: 'PHY V1.0' },
-  { value: '1.0.1', label: 'PHY V1.0.1' },
-  { value: '1.0.2-a', label: 'PHY V1.0.2 REV A' },
-  { value: '1.0.2-b', label: 'PHY V1.0.2 REV B' },
-  { value: '1.0.3-a', label: 'PHY V1.0.3 REV A' },
-  { value: '1.1.0-a', label: 'PHY V1.1 REV A' },
-  { value: '1.1.0-b', label: 'PHY V1.1 REV B' },
-])
+export const FRAME_WIDTH_COUNT = Object.freeze({
+  SUPPORTS_16_BIT: 'supports_16_bit',
+  SUPPORTS_32_BIT: 'supports_32_bit',
+})
 
 const lwRegexp = /^[1-9].[0-9].[0-9]$/
 const lwCache = {}
@@ -83,3 +96,30 @@ export const parseLorawanMacVersion = strMacVersion => {
  * @returns {string} - 16 bytes hex string.
  */
 export const generate16BytesKey = () => randomByteString(32)
+
+/**
+ * Encodes string value of the frame counter width radio field to boolean
+ * value necessary for `supports_32_bit_f_ct`.
+ *
+ * @param {string} value - String representation of `supports_32_bit_f_ct` field,
+ * either `supports_16_bit` or `supports_32_bit`.
+ * @returns {boolean} - True if value is equal to `supports_32_bit`, false otherwise.
+ * @example
+ *  const encodedValue = fCntWidthEncode(FRAME_WIDTH_COUNT.SUPPORTS_32_BIT); // returns true
+ *  const encodedValue = fCntWidthEncode(FRAME_WIDTH_COUNT.SUPPORTS_16_BIT); // returns false
+ */
+export const fCntWidthEncode = value => value === FRAME_WIDTH_COUNT.SUPPORTS_32_BIT
+
+/**
+ * Decodes boolean value of `supports_32_bit_f_cnt` to string value
+ * accepted by the radio field.
+ *
+ * @param {boolean} value - Value of `supports_32_bit_f_cnt`.
+ * @returns {string} - String representation of `supports_32_bit_f_cnt` field.
+ * Returns `supports_32_bit` if value is true, `supports_16_bit` if false.
+ * @example
+ *  const decodedValue = fCntWidthDecode(true); // returns `supports_32_bit`
+ *  const decodedValue = fCntWidthDecode(false); // returns `supports_16_bit`
+ */
+export const fCntWidthDecode = value =>
+  value ? FRAME_WIDTH_COUNT.SUPPORTS_32_BIT : FRAME_WIDTH_COUNT.SUPPORTS_16_BIT

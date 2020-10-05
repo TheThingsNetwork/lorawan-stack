@@ -182,7 +182,7 @@ func (h Headers) Check() error {
 	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			switch path {
-			case ".cache", ".dev", ".env", ".git", "dist", "node_modules", "public", "sdk/js/dist", "sdk/js/node_modules", "vendor", "doc/public":
+			case ".cache", ".dev", ".env", ".git", "dist", "node_modules", "public", "sdk/js/dist", "sdk/js/node_modules", "vendor":
 				return filepath.SkipDir
 			}
 			return nil

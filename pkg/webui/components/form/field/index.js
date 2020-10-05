@@ -122,7 +122,8 @@ class FormField extends React.Component {
     const { setFieldValue, setFieldTouched } = this.context
 
     // Check if the value is react's synthetic event.
-    const newValue = this.extractValue(value)
+    const isSyntheticEvent = typeof value === 'object' && 'target' in value
+    const newValue = encode(this.extractValue(value))
 
     // TODO: Remove `await` and event persist when https://github.com/jaredpalmer/formik/issues/2457
     // is resolved.
@@ -136,7 +137,7 @@ class FormField extends React.Component {
       setFieldTouched(name)
     }
 
-    onChange(encode(value))
+    onChange(isSyntheticEvent ? value : encode(value))
   }
 
   @bind

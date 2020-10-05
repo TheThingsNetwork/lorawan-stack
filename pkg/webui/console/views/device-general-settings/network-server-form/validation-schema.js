@@ -89,10 +89,13 @@ const validationSchema = Yup.object()
       if (mode === ACTIVATION_MODES.ABP) {
         return schema.shape({
           resets_f_cnt: Yup.boolean(),
+          supports_32_bit_f_cnt: Yup.boolean().default(true),
         })
       }
 
-      return schema.strip()
+      return schema.shape({
+        supports_32_bit_f_cnt: Yup.boolean().default(true),
+      })
     }),
   })
   .noUnknown()

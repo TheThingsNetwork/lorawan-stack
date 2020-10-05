@@ -269,6 +269,11 @@ var startCommand = &cobra.Command{
 					Redis: redis.New(config.Redis.WithNamespace("as", "io", "webhooks")),
 				}
 			}
+			fetcher, err := config.AS.EndDeviceFetcher.NewFetcher(c)
+			if err != nil {
+				return shared.ErrInitializeApplicationServer.WithCause(err)
+			}
+			config.AS.EndDeviceFetcher.Fetcher = fetcher
 			as, err := applicationserver.New(c, &config.AS)
 			if err != nil {
 				return shared.ErrInitializeApplicationServer.WithCause(err)

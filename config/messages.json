@@ -2132,6 +2132,15 @@
       "file": "payload.go"
     }
   },
+  "error:pkg/applicationserver:invalid_ttl": {
+    "translations": {
+      "en": "Invalid TTL `{ttl}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "config.go"
+    }
+  },
   "error:pkg/applicationserver:join_server_unavailable": {
     "translations": {
       "en": "Join Server unavailable for JoinEUI `{join_eui}`"
@@ -2652,6 +2661,15 @@
     "description": {
       "package": "pkg/component",
       "file": "listeners.go"
+    }
+  },
+  "error:pkg/component:task_recovered": {
+    "translations": {
+      "en": "task recovered"
+    },
+    "description": {
+      "package": "pkg/component",
+      "file": "tasks.go"
     }
   },
   "error:pkg/config/tlsconfig:acme_already_initialized": {
@@ -5606,6 +5624,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver/redis:database_corruption": {
+    "translations": {
+      "en": "database is corrupted"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "redis.go"
+    }
+  },
   "error:pkg/networkserver/redis:duplicate_identifiers": {
     "translations": {
       "en": "duplicate identifiers"
@@ -5618,6 +5645,15 @@
   "error:pkg/networkserver/redis:invalid_fieldmask": {
     "translations": {
       "en": "invalid fieldmask"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/networkserver/redis:invalid_format": {
+    "translations": {
+      "en": "invalid value format"
     },
     "description": {
       "package": "pkg/networkserver/redis",
@@ -5642,6 +5678,15 @@
       "file": "application_uplink_queue.go"
     }
   },
+  "error:pkg/networkserver/redis:missing_field_value": {
+    "translations": {
+      "en": "missing field `{field}` value"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/networkserver/redis:missing_payload": {
     "translations": {
       "en": "missing payload"
@@ -5649,6 +5694,15 @@
     "description": {
       "package": "pkg/networkserver/redis",
       "file": "application_uplink_queue.go"
+    }
+  },
+  "error:pkg/networkserver/redis:no_uplink_match": {
+    "translations": {
+      "en": "no device matches uplink"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
     }
   },
   "error:pkg/networkserver/redis:read_only_field": {
@@ -6002,6 +6056,15 @@
       "file": "grpc_gsns.go"
     }
   },
+  "error:pkg/networkserver:retransmission_delay_exceeded": {
+    "translations": {
+      "en": "retransmission delay exceeded maximum"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_gsns.go"
+    }
+  },
   "error:pkg/networkserver:schedule": {
     "translations": {
       "en": "all downlink scheduling attempts failed"
@@ -6011,9 +6074,27 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:transmission_number_exceeded": {
+    "translations": {
+      "en": "transmission number exceeded maximum"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_gsns.go"
+    }
+  },
   "error:pkg/networkserver:unknown_chanel": {
     "translations": {
       "en": "channel is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:unknown_f_nwk_s_int_key": {
+    "translations": {
+      "en": "FNwkSIntKey is unknown"
     },
     "description": {
       "package": "pkg/networkserver",

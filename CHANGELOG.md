@@ -10,20 +10,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - GCS endpoint to download UDP gateway configuration file.
+- Support for sending end device uplinks in the Console.
+- PHY version filtering based on LoRaWAN MAC in the Console.
+- Meta information and status events in the event views in the Console.
+- Support for setting the frame counter width of an end device in the Console.
 
 ### Changed
 
 - Decoded downlink payloads are now published as part of downlink attempt events.
 - Decoded downlink payloads are stored now by Network Server.
 - Raw downlink PHY payloads are not stored anymore by Network Server.
+- Move documentation to [lorawan-stack-docs](https://github.com/TheThingsIndustries/lorawan-stack-docs).
 
 ### Deprecated
 
 ### Removed
 
+- Join EUI prefixes select on empty prefixes configuration in Join Server.
+
 ### Fixed
 
+- Broken link to setting device location in the device map widget.
+- Error events causing Console becoming unresponsive and crashing.
+- Incorrect entity count in title sections in the Console.
+- Incorrect event detail panel open/close behavior for some events in the Console.
+- Improved error resilience and stability of the event views in the Console.
+- RSSI metadata for MQTT gateways connected with The Things Network Stack V2 protocol.
+- Gateway ID usage in upstream connection.
+
+### Security
+
+## [3.9.4] - 2020-09-23
+
+### Changed
+
+- Detail view of events in the Console moved to the side.
+- Display the full event object when expanded in the Console (used to be `event.data` only).
+
+### Fixed
+- Performance issues of event views in the Console (freezing after some time).
 - Gateway Server panic on upstream message handling.
+- Incorrect redirects for restricted routes in the Console.
+- Validation of MAC settings in the Network Server.
+- Network Server panic when RX2 parameters cannot be computed.
 
 ## [3.9.3] - 2020-09-15
 
@@ -1066,7 +1095,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.3...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.4...HEAD
+[3.9.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.3...v3.9.4
 [3.9.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.1...v3.9.3
 [3.9.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.0...v3.9.1
 [3.9.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.8.6...v3.9.0

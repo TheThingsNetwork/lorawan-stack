@@ -167,12 +167,16 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 	mdTime := time.Unix(0, gwMetadata.Time)
 	if antennas := gwMetadata.Antennas; len(antennas) > 0 {
 		for _, antenna := range antennas {
+			rssi := antenna.ChannelRssi
+			if rssi == 0 {
+				rssi = antenna.Rssi
+			}
 			uplink.RxMetadata = append(uplink.RxMetadata, &ttnpb.RxMetadata{
 				GatewayIdentifiers:    ids,
 				AntennaIndex:          antenna.Antenna,
-				ChannelRSSI:           antenna.ChannelRssi,
+				ChannelRSSI:           rssi,
 				FrequencyOffset:       antenna.FrequencyOffset,
-				RSSI:                  antenna.Rssi,
+				RSSI:                  rssi,
 				RSSIStandardDeviation: antenna.RssiStandardDeviation,
 				SNR:                   antenna.Snr,
 				Time:                  &mdTime,
@@ -183,6 +187,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		uplink.RxMetadata = append(uplink.RxMetadata, &ttnpb.RxMetadata{
 			GatewayIdentifiers: ids,
 			AntennaIndex:       0,
+			ChannelRSSI:        gwMetadata.Rssi,
 			RSSI:               gwMetadata.Rssi,
 			SNR:                gwMetadata.Snr,
 			Time:               &mdTime,

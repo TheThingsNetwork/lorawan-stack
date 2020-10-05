@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/bluele/gcache"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	loraclouddevicemanagementv1 "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1"
@@ -52,17 +53,31 @@ type InteropConfig struct {
 	ID                   string `name:"id" description:"AS-ID used for interoperability"`
 }
 
+// EndDeviceFetcherConfig represents configuration for the end device fetcher in Application Server.
+type EndDeviceFetcherConfig struct {
+	Fetcher EndDeviceFetcher            `name:"-"`
+	Cache   EndDeviceFetcherCacheConfig `name:"cache" description:"Cache configuration options for the end device fetcher"`
+}
+
+// EndDeviceFetcherCacheConfig represents configuration for device information caching in Application Server.
+type EndDeviceFetcherCacheConfig struct {
+	Enable bool          `name:"enable" description:"Cache fetched end devices"`
+	TTL    time.Duration `name:"ttl" description:"TTL for cached end devices"`
+	Size   int           `name:"size" description:"Cache size"`
+}
+
 // Config represents the ApplicationServer configuration.
 type Config struct {
-	LinkMode       string                    `name:"link-mode" description:"Mode to link applications to their Network Server (all, explicit)"`
-	Devices        DeviceRegistry            `name:"-"`
-	Links          LinkRegistry              `name:"-"`
-	MQTT           config.MQTT               `name:"mqtt" description:"MQTT configuration"`
-	Webhooks       WebhooksConfig            `name:"webhooks" description:"Webhooks configuration"`
-	PubSub         PubSubConfig              `name:"pubsub" description:"Pub/sub messaging configuration"`
-	Packages       ApplicationPackagesConfig `name:"packages" description:"Application packages configuration"`
-	Interop        InteropConfig             `name:"interop" description:"Interop client configuration"`
-	DeviceKEKLabel string                    `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
+	LinkMode         string                    `name:"link-mode" description:"Mode to link applications to their Network Server (all, explicit)"`
+	Devices          DeviceRegistry            `name:"-"`
+	Links            LinkRegistry              `name:"-"`
+	EndDeviceFetcher EndDeviceFetcherConfig    `name:"fetcher" description:"End Device fetcher configuration"`
+	MQTT             config.MQTT               `name:"mqtt" description:"MQTT configuration"`
+	Webhooks         WebhooksConfig            `name:"webhooks" description:"Webhooks configuration"`
+	PubSub           PubSubConfig              `name:"pubsub" description:"Pub/sub messaging configuration"`
+	Packages         ApplicationPackagesConfig `name:"packages" description:"Application packages configuration"`
+	Interop          InteropConfig             `name:"interop" description:"Interop client configuration"`
+	DeviceKEKLabel   string                    `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 }
 
 var errLinkMode = errors.DefineInvalidArgument("link_mode", "invalid link mode `{value}`")
@@ -164,4 +179,28 @@ func (c ApplicationPackagesConfig) NewApplicationPackages(ctx context.Context, s
 	handlers[loradmsHandler.Package().Name] = loradmsHandler
 
 	return packages.New(ctx, server, c.Registry, handlers)
+}
+
+var (
+	errInvalidTTL = errors.DefineInvalidArgument("invalid_ttl", "Invalid TTL `{ttl}`")
+)
+
+// NewFetcher creates an EndDeviceFetcher from config.
+func (c EndDeviceFetcherConfig) NewFetcher(comp *component.Component) (EndDeviceFetcher, error) {
+	fetcher := NewRegistryEndDeviceFetcher(comp)
+	if c.Cache.Enable {
+		if c.Cache.TTL <= 0 {
+			return nil, errInvalidTTL.WithAttributes("ttl", c.Cache.TTL)
+		}
+		var builder *gcache.CacheBuilder
+		if c.Cache.Size > 0 {
+			builder = gcache.New(c.Cache.Size).LFU()
+		} else {
+			builder = gcache.New(-1)
+		}
+		builder = builder.Expiration(c.Cache.TTL)
+		fetcher = NewCachedEndDeviceFetcher(fetcher, builder.Build())
+	}
+
+	return fetcher, nil
 }

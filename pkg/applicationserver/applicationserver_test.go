@@ -277,6 +277,9 @@ func TestApplicationServer(t *testing.T) {
 		PubSub: applicationserver.PubSubConfig{
 			Registry: pubsubRegistry,
 		},
+		EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
+			Fetcher: &noopEndDeviceFetcher{},
+		},
 	}
 	as, err := applicationserver.New(c, config)
 	if !a.So(err, should.BeNil) {

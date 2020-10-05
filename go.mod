@@ -16,6 +16,9 @@ replace gopkg.in/DATA-DOG/go-sqlmock.v1 => gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.
 // Versions higher trigger google/protobuf update past v1.3.5.
 replace gocloud.dev => gocloud.dev v0.19.0
 
+// Remove this once https://github.com/eclipse/paho.mqtt.golang/pull/451 is merged.
+replace github.com/eclipse/paho.mqtt.golang => github.com/johanstokking/paho.mqtt.golang v1.2.1-0.20200917115254-cf2daad9593e
+
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
 	github.com/PuerkitoBio/purell v1.1.1
@@ -99,6 +102,7 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/valyala/fasttemplate v1.1.0 // indirect
+	github.com/vmihailenco/msgpack/v5 v5.0.0-beta.1
 	go.opencensus.io v0.22.3
 	go.packetbroker.org/api/v3 v3.0.0
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2

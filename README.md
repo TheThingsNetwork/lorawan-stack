@@ -56,7 +56,7 @@ LoRaWAN is a protocol for low-power wide area networks. It allows for large scal
 
 ## Getting Started
 
-You want to **install The Things Stack**? Fantastic! Here's the [Getting Started guide](./doc/gettingstarted.md).
+You want to **install The Things Stack**? Fantastic! Here's the [Getting Started guide](https://ttn.fyi/v3/getting-started).
 
 Do you want to **set up a local development environment**? See the [DEVELOPMENT.md](DEVELOPMENT.md) for instructions.
 

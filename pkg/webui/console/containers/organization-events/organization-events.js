@@ -16,7 +16,7 @@ import React from 'react'
 
 import ErrorNotification from '@ttn-lw/components/error-notification'
 
-import OrganizationEventsList from '@console/components/events-list/organization'
+import Events from '@console/components/events'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -39,15 +39,16 @@ const OrganizationEvents = props => {
 
   if (widget) {
     return (
-      <OrganizationEventsList.Widget
+      <Events.Widget
         events={events}
         toAllUrl={`/organizations/${orgId}/data`}
-        orgId={orgId}
+        entityId={orgId}
+        scoped
       />
     )
   }
 
-  return <OrganizationEventsList events={events} onClear={onClear} orgId={orgId} />
+  return <Events events={events} onClear={onClear} entityId={orgId} />
 }
 
 OrganizationEvents.propTypes = {

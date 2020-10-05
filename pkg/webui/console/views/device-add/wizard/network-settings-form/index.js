@@ -14,6 +14,7 @@
 
 import React from 'react'
 
+import Radio from '@ttn-lw/components/radio-button'
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Select from '@ttn-lw/components/select'
@@ -21,6 +22,8 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Wizard from '@ttn-lw/components/wizard'
 import Form from '@ttn-lw/components/form'
+
+import PhyVersionInput from '@console/components/phy-version-input'
 
 import DevAddrInput from '@console/containers/dev-addr-input'
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
@@ -31,38 +34,14 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import {
   ACTIVATION_MODES,
   LORAWAN_VERSIONS,
-  LORAWAN_PHY_VERSIONS,
+  FRAME_WIDTH_COUNT,
   parseLorawanMacVersion,
   generate16BytesKey,
+  fCntWidthEncode,
+  fCntWidthDecode,
 } from '@console/lib/device-utils'
 
 import validationSchema from './validation-schema'
-
-const lorawanPhyMap = {
-  100: [{ value: '1.0.0', label: 'PHY V1.0' }],
-  101: [{ value: '1.0.1', label: 'PHY V1.0.1' }],
-  102: [
-    { value: '1.0.2-a', label: 'PHY V1.0.2 REV A' },
-    { value: '1.0.2-b', label: 'PHY V1.0.2 REV B' },
-  ],
-  103: [{ value: '1.0.3-a', label: 'PHY V1.0.3 REV A' }],
-  104: [{ value: '1.0.0', label: 'PHY V1.0' }, { value: '1.0.1', label: 'PHY V1.0.1' }],
-  110: [
-    { value: '1.1.0-a', label: 'PHY V1.1 REV A' },
-    { value: '1.1.0-b', label: 'PHY V1.1 REV B' },
-  ],
-  0: LORAWAN_PHY_VERSIONS,
-}
-
-/**
- * Filters available lorawan phy versions by lorawan version.
- *
- * @param {number} version - Lorawan version.
- * @returns {Array} - A list of matching lorawan phy version options based on `version`.
- */
-const getLorawanPhyByVersion = version => {
-  return lorawanPhyMap[version] || LORAWAN_PHY_VERSIONS
-}
 
 const defaultFormValues = {
   lorawan_phy_version: '',
@@ -70,6 +49,7 @@ const defaultFormValues = {
   supports_class_c: false,
   mac_settings: {
     resets_f_cnt: false,
+    supports_32_bit_f_cnt: true,
   },
   session: {
     dev_addr: '',
@@ -97,10 +77,6 @@ const NetworkSettingsForm = props => {
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
   const lwVersion = parseLorawanMacVersion(lorawanVersion)
 
-  const lorawanPhyVersionOptions = React.useMemo(() => getLorawanPhyByVersion(lwVersion), [
-    lwVersion,
-  ])
-
   const validationContext = React.useMemo(
     () => ({
       activationMode,
@@ -108,16 +84,8 @@ const NetworkSettingsForm = props => {
     [activationMode],
   )
   const initialFormValues = React.useMemo(
-    () =>
-      validationSchema.cast(
-        {
-          ...defaultFormValues,
-          lorawan_phy_version:
-            lorawanPhyVersionOptions.length > 1 ? '' : lorawanPhyVersionOptions[0].value,
-        },
-        { context: validationContext },
-      ),
-    [lorawanPhyVersionOptions, validationContext],
+    () => validationSchema.cast(defaultFormValues, { context: validationContext }),
+    [validationContext],
   )
 
   return (
@@ -132,6 +100,7 @@ const NetworkSettingsForm = props => {
         required
         disabled
         title={sharedMessages.macVersion}
+        description={sharedMessages.macVersionDescription}
         name="lorawan_version"
         component={Select}
         options={LORAWAN_VERSIONS}
@@ -139,15 +108,26 @@ const NetworkSettingsForm = props => {
       <Form.Field
         required
         title={sharedMessages.phyVersion}
+        description={sharedMessages.lorawanPhyVersionDescription}
         name="lorawan_phy_version"
-        component={Select}
-        options={lorawanPhyVersionOptions}
+        component={PhyVersionInput}
+        lorawanVersion={lorawanVersion}
       />
       <Form.Field
         title={sharedMessages.supportsClassC}
         name="supports_class_c"
         component={Checkbox}
       />
+      <Form.Field
+        title={sharedMessages.frameCounterWidth}
+        name="mac_settings.supports_32_bit_f_cnt"
+        component={Radio.Group}
+        encode={fCntWidthEncode}
+        decode={fCntWidthDecode}
+      >
+        <Radio label={sharedMessages['16Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_16_BIT} />
+        <Radio label={sharedMessages['32Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_32_BIT} />
+      </Form.Field>
       {(isMulticast || isABP) && (
         <>
           <DevAddrInput
@@ -174,7 +154,7 @@ const NetworkSettingsForm = props => {
             max={16}
             required
             description={
-              lorawanVersion >= 110
+              lwVersion >= 110
                 ? sharedMessages.fNwkSIntKeyDescription
                 : sharedMessages.nwkSKeyDescription
             }

@@ -15,6 +15,8 @@
 const tasks = require('./tasks')
 
 module.exports = (on, config) => {
+  tasks.stackConfigTask(on, config)
+
   if (process.env.NODE_ENV === 'development') {
     tasks.codeCoverageTask(on, config)
   }

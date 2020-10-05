@@ -127,3 +127,19 @@ func CopyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {
 func CopyUplinkMessage(pb *ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
 	return deepcopy.Copy(pb).(*ttnpb.UplinkMessage)
 }
+
+// FullFCnt returns full FCnt given fCnt, lastFCnt and whether or not 32-bit FCnts are supported.
+func FullFCnt(fCnt uint16, lastFCnt uint32, supports32BitFCnt bool) uint32 {
+	switch {
+	case fCnt == 0 && lastFCnt == 0:
+		return 0
+	case !supports32BitFCnt:
+		return uint32(fCnt)
+	case uint32(fCnt) > lastFCnt&0xffff:
+		return uint32(fCnt) | lastFCnt&^0xffff
+	case lastFCnt < 0xffff0000:
+		return uint32(fCnt) | (lastFCnt+0x10000)&^0xffff
+	default:
+		return uint32(fCnt)
+	}
+}
