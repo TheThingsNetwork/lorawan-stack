@@ -12,13 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import EntityTitleSectionContent from './content'
-import EntityCount from './entity-count'
-import MessagesCount from './messages-count'
-import LastSeen from './last-seen'
+.container
+  display: inline-block
 
-EntityTitleSectionContent.EntityCount = EntityCount
-EntityTitleSectionContent.MessagesCount = MessagesCount
-EntityTitleSectionContent.LastSeen = LastSeen
-
-export default EntityTitleSectionContent
+.message
+  margin-right: $cs.xxs
