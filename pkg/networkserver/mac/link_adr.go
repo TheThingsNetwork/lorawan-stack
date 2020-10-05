@@ -41,94 +41,90 @@ var (
 	)()
 )
 
-func DeviceNeedsLinkADRReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Band) bool {
-	if dev.GetMulticast() || dev.GetMACState() == nil {
-		return false
-	}
-	// TODO: Check that a LinkADRReq *can* be scheduled given the rejections received so far. (https://github.com/TheThingsNetwork/lorawan-stack/issues/2192)
-	for i, currentCh := range dev.MACState.CurrentParameters.Channels {
-		switch {
-		case i >= len(dev.MACState.DesiredParameters.Channels):
-			if currentCh.GetEnableUplink() {
-				return true
-			}
-		case currentCh.GetEnableUplink() != dev.MACState.DesiredParameters.Channels[i].GetEnableUplink():
-			return true
-		}
-	}
-	if dev.MACState.DesiredParameters.ADRNbTrans != dev.MACState.CurrentParameters.ADRNbTrans {
-		return true
-	}
-	if !DeviceUseADR(dev, defaults, phy) {
-		return false
-	}
-	return dev.MACState.DesiredParameters.ADRDataRateIndex != dev.MACState.CurrentParameters.ADRDataRateIndex ||
-		dev.MACState.DesiredParameters.ADRTxPowerIndex != dev.MACState.CurrentParameters.ADRTxPowerIndex
+type linkADRReqParameters struct {
+	Masks         []band.ChMaskCntlPair
+	DataRateIndex ttnpb.DataRateIndex
+	TxPowerIndex  uint32
 }
 
-const (
-	noChangeDataRateIndex = ttnpb.DATA_RATE_15
-	noChangeTXPowerIndex  = 15
-)
-
-func EnqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings, phy *band.Band) (EnqueueState, error) {
-	if !DeviceNeedsLinkADRReq(dev, defaults, phy) {
-		return EnqueueState{
-			MaxDownLen: maxDownLen,
-			MaxUpLen:   maxUpLen,
-			Ok:         true,
-		}, nil
+func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Band) (linkADRReqParameters, bool, error) {
+	if dev.GetMulticast() || dev.GetMACState() == nil {
+		return linkADRReqParameters{}, false, nil
 	}
+	var needsChMask bool
+	for i := 0; !needsChMask && i < len(dev.MACState.CurrentParameters.Channels); i++ {
+		isEnabled := dev.MACState.CurrentParameters.Channels[i].GetEnableUplink()
+		if i >= len(dev.MACState.DesiredParameters.Channels) {
+			needsChMask = isEnabled
+		} else {
+			needsChMask = isEnabled != dev.MACState.DesiredParameters.Channels[i].GetEnableUplink()
+		}
+	}
+	switch {
+	case needsChMask:
+		// NOTE: LinkADRReq is scheduled regardless of ADR settings if channel mask is required, which often is the case with ABP devices or when ChMask CFList is not supported/used.
+	case !DeviceUseADR(dev, defaults, phy):
+		return linkADRReqParameters{}, false, nil
+	case dev.MACState.DesiredParameters.ADRNbTrans != dev.MACState.CurrentParameters.ADRNbTrans,
+		dev.MACState.DesiredParameters.ADRDataRateIndex != dev.MACState.CurrentParameters.ADRDataRateIndex,
+		dev.MACState.DesiredParameters.ADRTxPowerIndex != dev.MACState.CurrentParameters.ADRTxPowerIndex:
+	default:
+		return linkADRReqParameters{}, false, nil
+	}
+
 	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MACState.DesiredParameters.Channels...)
 	if !ok ||
 		len(dev.MACState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) ||
 		dev.MACState.DesiredParameters.ADRTxPowerIndex > uint32(phy.MaxTxPowerIndex()) ||
 		dev.MACState.DesiredParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
-		return EnqueueState{
-			MaxDownLen: maxDownLen,
-			MaxUpLen:   maxUpLen,
-		}, ErrCorruptedMACState.New()
+		return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
 	}
 	if dev.MACState.CurrentParameters.ADRDataRateIndex > minDataRateIndex {
 		minDataRateIndex = dev.MACState.CurrentParameters.ADRDataRateIndex
 	}
 	if dev.MACState.DesiredParameters.ADRDataRateIndex < minDataRateIndex || dev.MACState.DesiredParameters.ADRDataRateIndex > maxDataRateIndex {
-		return EnqueueState{
-			MaxDownLen: maxDownLen,
-			MaxUpLen:   maxUpLen,
-		}, ErrCorruptedMACState.New()
+		log.FromContext(ctx).Error("return 2")
+		return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
 	}
 
-	currentChs := make([]bool, phy.MaxUplinkChannels)
-	for i, ch := range dev.MACState.CurrentParameters.Channels {
-		currentChs[i] = ch.GetEnableUplink()
-	}
-	desiredChs := make([]bool, phy.MaxUplinkChannels)
-	for i, ch := range dev.MACState.DesiredParameters.Channels {
-		if ch.GetEnableUplink() && ch.UplinkFrequency == 0 {
-			return EnqueueState{
-				MaxDownLen: maxDownLen,
-				MaxUpLen:   maxUpLen,
-			}, ErrCorruptedMACState.New()
+	var desiredMasks []band.ChMaskCntlPair
+	if needsChMask {
+		currentChs := make([]bool, phy.MaxUplinkChannels)
+		for i, ch := range dev.MACState.CurrentParameters.Channels {
+			currentChs[i] = ch.GetEnableUplink()
 		}
-		if DeviceNeedsNewChannelReqAtIndex(dev, i) {
-			currentChs[i] = ch != nil && ch.UplinkFrequency != 0
+		desiredChs := make([]bool, phy.MaxUplinkChannels)
+		for i, ch := range dev.MACState.DesiredParameters.Channels {
+			if ch.GetEnableUplink() && ch.UplinkFrequency == 0 {
+				return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
+			}
+			if DeviceNeedsNewChannelReqAtIndex(dev, i) {
+				currentChs[i] = ch != nil && ch.UplinkFrequency != 0
+			}
+			desiredChs[i] = ch.GetEnableUplink()
 		}
-		desiredChs[i] = ch.GetEnableUplink()
-	}
-	desiredMasks, err := phy.GenerateChMasks(currentChs, desiredChs)
-	if err != nil {
-		return EnqueueState{
-			MaxDownLen: maxDownLen,
-			MaxUpLen:   maxUpLen,
-		}, err
-	}
-	if len(desiredMasks) > math.MaxUint16 {
-		// Something is really wrong.
-		return EnqueueState{
-			MaxDownLen: maxDownLen,
-			MaxUpLen:   maxUpLen,
-		}, ErrCorruptedMACState.New()
+		var err error
+		desiredMasks, err = phy.GenerateChMasks(currentChs, desiredChs)
+		if err != nil {
+			return linkADRReqParameters{}, false, err
+		}
+		if len(desiredMasks) > math.MaxUint16 {
+			// Something is really wrong.
+			return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
+		}
+	} else {
+		// If no ChMask is required, send ChMaskCntl=0 mask, which leaves current channel state intact.
+		// NOTE: Implementation assumes that all bands support ChMaskCntl=0, which controls first 16 channels.
+		// In an unlikely case this assumption is no longer valid - the implementation must change.
+		var mask [16]bool
+		for i := 0; i < len(dev.MACState.CurrentParameters.Channels) && i < 16; i++ {
+			mask[i] = dev.MACState.CurrentParameters.Channels[i].EnableUplink
+		}
+		desiredMasks = []band.ChMaskCntlPair{
+			{
+				Mask: mask,
+			},
+		}
 	}
 
 	drIdx := dev.MACState.DesiredParameters.ADRDataRateIndex
@@ -139,10 +135,7 @@ func EnqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 
 	case len(desiredMasks) == 0 && dev.MACState.DesiredParameters.ADRNbTrans == dev.MACState.CurrentParameters.ADRNbTrans:
 		log.FromContext(ctx).Debug("Either desired data rate index or TX power output index have been rejected and there are no channel mask and NbTrans changes desired, avoid enqueueing LinkADRReq")
-		return EnqueueState{
-			MaxDownLen: maxDownLen,
-			MaxUpLen:   maxUpLen,
-		}, nil
+		return linkADRReqParameters{}, false, nil
 
 	case dev.MACState.LoRaWANVersion.HasNoChangeDataRateIndex() && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) &&
 		dev.MACState.LoRaWANVersion.HasNoChangeTXPowerIndex() && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex):
@@ -159,10 +152,7 @@ func EnqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 					"desired_adr_nb_trans", dev.MACState.DesiredParameters.ADRNbTrans,
 					"desired_mask_count", len(desiredMasks),
 				)).Warn("Device rejected either all available data rate indexes or all available TX power output indexes and there are channel mask or NbTrans changes desired, avoid enqueueing LinkADRReq")
-				return EnqueueState{
-					MaxDownLen: maxDownLen,
-					MaxUpLen:   maxUpLen,
-				}, nil
+				return linkADRReqParameters{}, false, nil
 			}
 			for drIdx > minDataRateIndex && (deviceRejectedADRDataRateIndex(dev, drIdx) || txPowerIdx == 0 && deviceRejectedADRTXPowerIndex(dev, txPowerIdx)) {
 				// Increase data rate until a non-rejected index is found.
@@ -182,29 +172,61 @@ func EnqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 	if txPowerIdx == dev.MACState.CurrentParameters.ADRTxPowerIndex && dev.MACState.LoRaWANVersion.HasNoChangeTXPowerIndex() && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex) {
 		txPowerIdx = noChangeTXPowerIndex
 	}
+	return linkADRReqParameters{
+		Masks:         desiredMasks,
+		DataRateIndex: drIdx,
+		TxPowerIndex:  txPowerIdx,
+	}, true, nil
+}
+
+func DeviceNeedsLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Band) bool {
+	_, required, err := generateLinkADRReq(ctx, dev, defaults, phy)
+	return err == nil && required
+}
+
+const (
+	noChangeDataRateIndex = ttnpb.DATA_RATE_15
+	noChangeTXPowerIndex  = 15
+)
+
+func EnqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings, phy *band.Band) (EnqueueState, error) {
+	params, required, err := generateLinkADRReq(ctx, dev, defaults, phy)
+	if err != nil {
+		return EnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+		}, err
+	}
+	if !required {
+		return EnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+			Ok:         true,
+		}, nil
+	}
 
 	var st EnqueueState
 	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_LINK_ADR, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
-		if int(nDown) < len(desiredMasks) {
+		if int(nDown) < len(params.Masks) {
 			return nil, 0, nil, false
 		}
 
 		uplinksNeeded := uint16(1)
 		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-			uplinksNeeded = uint16(len(desiredMasks))
+			uplinksNeeded = uint16(len(params.Masks))
 		}
 		if nUp < uplinksNeeded {
 			return nil, 0, nil, false
 		}
-		evs := make(events.Builders, 0, len(desiredMasks))
-		cmds := make([]*ttnpb.MACCommand, 0, len(desiredMasks))
-		for i, m := range desiredMasks {
+		evs := make(events.Builders, 0, len(params.Masks))
+		cmds := make([]*ttnpb.MACCommand, 0, len(params.Masks))
+		for i, m := range params.Masks {
 			req := &ttnpb.MACCommand_LinkADRReq{
-				DataRateIndex:      drIdx,
-				TxPowerIndex:       txPowerIdx,
+				DataRateIndex:      params.DataRateIndex,
+				TxPowerIndex:       params.TxPowerIndex,
 				NbTrans:            dev.MACState.DesiredParameters.ADRNbTrans,
 				ChannelMaskControl: uint32(m.Cntl),
-				ChannelMask:        desiredMasks[i].Mask[:],
+				ChannelMask:        params.Masks[i].Mask[:],
 			}
 			cmds = append(cmds, req.MACCommand())
 			evs = append(evs, EvtEnqueueLinkADRRequest.With(events.WithData(req)))

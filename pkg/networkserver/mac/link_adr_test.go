@@ -16,477 +16,280 @@ package mac_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
+	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test/shared"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func TestNeedsLinkADRReq(t *testing.T) {
+func TestLinkADRReq(t *testing.T) {
 	for _, tc := range []struct {
-		Name        string
-		InputDevice *ttnpb.EndDevice
-		Needs       bool
+		Name                                             string
+		BandID                                           string
+		LoRaWANVersion                                   ttnpb.MACVersion
+		LoRaWANPHYVersion                                ttnpb.PHYVersion
+		CurrentChannels, DesiredChannels                 []*ttnpb.MACParameters_Channel
+		CurrentADRDataRateIndex, DesiredADRDataRateIndex ttnpb.DataRateIndex
+		CurrentADRTxPowerIndex, DesiredADRTxPowerIndex   uint32
+		CurrentADRNbTrans, DesiredADRNbTrans             uint32
+		RejectedADRDataRateIndexes                       []ttnpb.DataRateIndex
+		RejectedADRTxPowerIndexes                        []uint32
+		Commands                                         []*ttnpb.MACCommand_LinkADRReq
+		ErrorAssertion                                   func(*testing.T, error) bool
 	}{
 		{
-			Name:        "no MAC state",
-			InputDevice: &ttnpb.EndDevice{},
-		},
-		{
-			Name: "current(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[]),desired(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[])",
-			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
-						ADRDataRateIndex: ttnpb.DATA_RATE_1,
-						ADRNbTrans:       2,
-						ADRTxPowerIndex:  3,
+			Name:              "ABP channel setup",
+			BandID:            band.US_902_928,
+			LoRaWANVersion:    ttnpb.MAC_V1_0_3,
+			LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+			CurrentChannels:   MakeDefaultUS915CurrentChannels(),
+			CurrentADRNbTrans: 1,
+			DesiredChannels:   MakeDefaultUS915FSB2DesiredChannels(),
+			DesiredADRNbTrans: 1,
+			Commands: []*ttnpb.MACCommand_LinkADRReq{
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
 					},
-					DesiredParameters: ttnpb.MACParameters{
-						ADRDataRateIndex: ttnpb.DATA_RATE_1,
-						ADRNbTrans:       2,
-						ADRTxPowerIndex:  3,
+					ChannelMaskControl: 7,
+					NbTrans:            1,
+				},
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						true, true, true, true, true, true, true, true,
 					},
+					NbTrans: 1,
 				},
 			},
 		},
 		{
-			Name: "current(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[on,on,off]),desired(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[on,on,off])",
-			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
-						ADRDataRateIndex: ttnpb.DATA_RATE_1,
-						ADRNbTrans:       2,
-						ADRTxPowerIndex:  3,
-						Channels: []*ttnpb.MACParameters_Channel{
-							{EnableUplink: true},
-							{EnableUplink: true},
-							{},
-						},
+			Name:              "ABP channel setup",
+			BandID:            band.US_902_928,
+			LoRaWANVersion:    ttnpb.MAC_V1_1,
+			LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+			CurrentChannels:   MakeDefaultUS915CurrentChannels(),
+			CurrentADRNbTrans: 1,
+			DesiredChannels:   MakeDefaultUS915FSB2DesiredChannels(),
+			DesiredADRNbTrans: 1,
+			Commands: []*ttnpb.MACCommand_LinkADRReq{
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
 					},
-					DesiredParameters: ttnpb.MACParameters{
-						ADRDataRateIndex: ttnpb.DATA_RATE_1,
-						ADRNbTrans:       2,
-						ADRTxPowerIndex:  3,
-						Channels: []*ttnpb.MACParameters_Channel{
-							{EnableUplink: true},
-							{EnableUplink: true},
-							{},
-						},
+					ChannelMaskControl: 7,
+					DataRateIndex:      ttnpb.DATA_RATE_15,
+					TxPowerIndex:       15,
+					NbTrans:            1,
+				},
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						true, true, true, true, true, true, true, true,
 					},
+					DataRateIndex: ttnpb.DATA_RATE_15,
+					TxPowerIndex:  15,
+					NbTrans:       1,
 				},
 			},
 		},
 		{
-			Name: "current(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[]),desired(data-rate-index:1,nb-trans:2,tx-power-index:4,channels:[])",
-			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
-						ADRDataRateIndex: ttnpb.DATA_RATE_1,
-						ADRNbTrans:       2,
-						ADRTxPowerIndex:  3,
+			Name:                    "ADR",
+			BandID:                  band.US_902_928,
+			LoRaWANVersion:          ttnpb.MAC_V1_0_3,
+			LoRaWANPHYVersion:       ttnpb.PHY_V1_0_3_REV_A,
+			CurrentChannels:         MakeDefaultUS915FSB2DesiredChannels(),
+			CurrentADRNbTrans:       1,
+			DesiredChannels:         MakeDefaultUS915FSB2DesiredChannels(),
+			DesiredADRDataRateIndex: ttnpb.DATA_RATE_3,
+			DesiredADRTxPowerIndex:  1,
+			DesiredADRNbTrans:       2,
+			RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
+				ttnpb.DATA_RATE_2,
+			},
+			RejectedADRTxPowerIndexes: []uint32{
+				0,
+				1,
+			},
+			Commands: []*ttnpb.MACCommand_LinkADRReq{
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						true, true, true, true, true, true, true, true,
 					},
-					DesiredParameters: ttnpb.MACParameters{
-						ADRDataRateIndex: ttnpb.DATA_RATE_1,
-						ADRNbTrans:       2,
-						ADRTxPowerIndex:  4,
-					},
+					DataRateIndex: ttnpb.DATA_RATE_1,
+					TxPowerIndex:  15,
+					NbTrans:       2,
 				},
 			},
-			Needs: true,
 		},
 		{
-			Name: "current(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[]),desired(data-rate-index:1,nb-trans:3,tx-power-index:3,channels:[])",
-			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
-						ADRDataRateIndex: ttnpb.DATA_RATE_1,
-						ADRNbTrans:       2,
-						ADRTxPowerIndex:  3,
+			Name:                    "ADR",
+			BandID:                  band.EU_863_870,
+			LoRaWANVersion:          ttnpb.MAC_V1_0_1,
+			LoRaWANPHYVersion:       ttnpb.PHY_V1_0_1,
+			CurrentADRDataRateIndex: ttnpb.DATA_RATE_1,
+			CurrentADRNbTrans:       1,
+			CurrentChannels:         MakeDefaultEU868DesiredChannels(),
+			DesiredADRDataRateIndex: ttnpb.DATA_RATE_5,
+			DesiredADRNbTrans:       2,
+			DesiredADRTxPowerIndex:  3,
+			DesiredChannels:         MakeDefaultEU868DesiredChannels(),
+			RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
+				ttnpb.DATA_RATE_1,
+				ttnpb.DATA_RATE_2,
+				ttnpb.DATA_RATE_3,
+				ttnpb.DATA_RATE_4,
+			},
+			Commands: []*ttnpb.MACCommand_LinkADRReq{
+				{
+					ChannelMask: []bool{
+						true, true, true, true, true, true, true, true,
+						false, false, false, false, false, false, false, false,
 					},
-					DesiredParameters: ttnpb.MACParameters{
-						ADRDataRateIndex: ttnpb.DATA_RATE_1,
-						ADRNbTrans:       3,
-						ADRTxPowerIndex:  3,
-					},
+					DataRateIndex: ttnpb.DATA_RATE_5,
+					TxPowerIndex:  3,
+					NbTrans:       2,
 				},
 			},
-			Needs: true,
 		},
 		{
-			Name: "current(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[on,on,on]),desired(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[off,on,off])",
-			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
-						ADRDataRateIndex: ttnpb.DATA_RATE_1,
-						ADRNbTrans:       2,
-						ADRTxPowerIndex:  3,
-						Channels: []*ttnpb.MACParameters_Channel{
-							{EnableUplink: true},
-							{EnableUplink: true},
-							{EnableUplink: true},
-						},
-					},
-					DesiredParameters: ttnpb.MACParameters{
-						ADRDataRateIndex: ttnpb.DATA_RATE_1,
-						ADRNbTrans:       2,
-						ADRTxPowerIndex:  3,
-						Channels: []*ttnpb.MACParameters_Channel{
-							{},
-							{EnableUplink: true},
-							{},
-						},
-					},
-				},
+			Name:                    "ADR",
+			BandID:                  band.EU_863_870,
+			LoRaWANVersion:          ttnpb.MAC_V1_0_1,
+			LoRaWANPHYVersion:       ttnpb.PHY_V1_0_1,
+			CurrentADRDataRateIndex: ttnpb.DATA_RATE_1,
+			CurrentADRNbTrans:       1,
+			CurrentChannels:         MakeDefaultEU868DesiredChannels(),
+			DesiredADRDataRateIndex: ttnpb.DATA_RATE_5,
+			DesiredADRNbTrans:       1,
+			DesiredADRTxPowerIndex:  3,
+			DesiredChannels:         MakeDefaultEU868DesiredChannels(),
+			RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
+				ttnpb.DATA_RATE_1,
+				ttnpb.DATA_RATE_2,
+				ttnpb.DATA_RATE_3,
+				ttnpb.DATA_RATE_4,
+				ttnpb.DATA_RATE_5,
 			},
-			Needs: true,
 		},
 	} {
 		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
-			Name:     tc.Name,
-			Parallel: true,
+			Name: fmt.Sprintf("%s/Band:%s,MAC:%s,PHY:%s,DR:%d->%d,TX:%d->%d,NB:%d->%d,rejected_DR:%v,rejected_TX:%v",
+				tc.Name,
+				tc.BandID,
+				tc.LoRaWANVersion,
+				tc.LoRaWANPHYVersion,
+				tc.CurrentADRDataRateIndex, tc.DesiredADRDataRateIndex,
+				tc.CurrentADRTxPowerIndex, tc.DesiredADRTxPowerIndex,
+				tc.CurrentADRNbTrans, tc.DesiredADRNbTrans,
+				tc.RejectedADRDataRateIndexes,
+				tc.RejectedADRTxPowerIndexes,
+			),
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := CopyEndDevice(tc.InputDevice)
-				res := DeviceNeedsLinkADRReq(dev, ttnpb.MACSettings{
-					UseADR: &pbtypes.BoolValue{Value: true},
-				}, LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_0_3_REV_A])
-				if tc.Needs {
-					a.So(res, should.BeTrue)
-				} else {
-					a.So(res, should.BeFalse)
-				}
-				a.So(dev, should.Resemble, tc.InputDevice)
-			},
-		})
-	}
-}
+				pb := CopyEndDevice(&ttnpb.EndDevice{
+					MACState: &ttnpb.MACState{
+						LoRaWANVersion: tc.LoRaWANVersion,
+						CurrentParameters: ttnpb.MACParameters{
+							Channels:         tc.CurrentChannels,
+							ADRDataRateIndex: tc.CurrentADRDataRateIndex,
+							ADRTxPowerIndex:  tc.CurrentADRTxPowerIndex,
+							ADRNbTrans:       tc.CurrentADRNbTrans,
+						},
+						DesiredParameters: ttnpb.MACParameters{
+							Channels:         tc.DesiredChannels,
+							ADRDataRateIndex: tc.DesiredADRDataRateIndex,
+							ADRTxPowerIndex:  tc.DesiredADRTxPowerIndex,
+							ADRNbTrans:       tc.DesiredADRNbTrans,
+						},
+						RejectedADRDataRateIndexes: tc.RejectedADRDataRateIndexes,
+						RejectedADRTxPowerIndexes:  tc.RejectedADRTxPowerIndexes,
+					},
+				})
+				phy := LoRaWANBands[tc.BandID][tc.LoRaWANPHYVersion]
 
-func TestEnqueueLinkADRReq(t *testing.T) {
-	for _, tc := range []struct {
-		Name                        string
-		Band                        *band.Band
-		InputDevice, ExpectedDevice *ttnpb.EndDevice
-		MaxDownlinkLength           uint16
-		MaxUplinkLength             uint16
-		State                       EnqueueState
-		ErrorAssertion              func(*testing.T, error) bool
-	}{
-		{
-			Name: "payload fits/US915 FSB2/MAC:1.0.3,PHY:1.0.3a",
-			Band: LoRaWANBands[band.US_902_928][ttnpb.PHY_V1_0_3_REV_A],
-			InputDevice: &ttnpb.EndDevice{
-				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A),
-			},
-			ExpectedDevice: &ttnpb.EndDevice{
-				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState: func() *ttnpb.MACState {
-					macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A)
-					macState.PendingRequests = []*ttnpb.MACCommand{
-						(&ttnpb.MACCommand_LinkADRReq{
-							ChannelMask: []bool{
-								false, false, false, false, false, false, false, false,
-								false, false, false, false, false, false, false, false,
-							},
-							ChannelMaskControl: 7,
-							NbTrans:            1,
-						}).MACCommand(),
-						(&ttnpb.MACCommand_LinkADRReq{
-							ChannelMask: []bool{
-								false, false, false, false, false, false, false, false,
-								true, true, true, true, true, true, true, true,
-							},
-							NbTrans: 1,
-						}).MACCommand(),
+				test.RunSubtestFromContext(ctx, test.SubtestConfig{
+					Name:     "needs",
+					Parallel: true,
+					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+						dev := CopyEndDevice(pb)
+						a.So(DeviceNeedsLinkADRReq(ctx, dev, DefaultMACSettings, phy), func() func(interface{}, ...interface{}) string {
+							if len(tc.Commands) > 0 {
+								return should.BeTrue
+							}
+							return should.BeFalse
+						}())
+						a.So(dev, should.Resemble, pb)
+					},
+				})
+				for _, n := range func() []int {
+					if len(tc.Commands) == 0 {
+						return []int{0}
 					}
-					return macState
-				}(),
-			},
-			MaxDownlinkLength: 42,
-			MaxUplinkLength:   24,
-			State: EnqueueState{
-				MaxDownLen: 32,
-				MaxUpLen:   20,
-				Ok:         true,
-				QueuedEvents: events.Builders{
-					EvtEnqueueLinkADRRequest.With(events.WithData(&ttnpb.MACCommand_LinkADRReq{
-						ChannelMask: []bool{
-							false, false, false, false, false, false, false, false,
-							false, false, false, false, false, false, false, false,
+					return []int{0, int(len(tc.Commands))}
+				}() {
+					cmds := tc.Commands[:n]
+					cmdLen := uint16(5 * n)
+					answerLen := 2 * func() uint16 {
+						if n == 0 {
+							return 0
+						}
+						switch {
+						case tc.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0:
+							return 1
+						default:
+							return uint16(n)
+						}
+					}()
+					test.RunSubtestFromContext(ctx, test.SubtestConfig{
+						Name:     fmt.Sprintf("enqueue/max_down_len:%d", cmdLen),
+						Parallel: true,
+						Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+							dev := CopyEndDevice(pb)
+							st, err := EnqueueLinkADRReq(ctx, dev, cmdLen, answerLen, DefaultMACSettings, phy)
+							if tc.ErrorAssertion != nil {
+								if !a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+									t.FailNow()
+								}
+								a.So(st, should.Equal, EnqueueState{
+									MaxDownLen: cmdLen,
+									MaxUpLen:   answerLen,
+									Ok:         false,
+								})
+								return
+							}
+							if !a.So(err, should.BeNil) {
+								t.Fatalf("Failed to enqueue LinkADRReq: %s", err)
+							}
+							expectedDevice := CopyEndDevice(pb)
+							var expectedEventBuilders []events.Builder
+							for _, cmd := range cmds {
+								expectedDevice.MACState.PendingRequests = append(expectedDevice.MACState.PendingRequests, cmd.MACCommand())
+								expectedEventBuilders = append(expectedEventBuilders, EvtEnqueueLinkADRRequest.BindData(cmd))
+							}
+							a.So(st.QueuedEvents, should.ResembleEventBuilders, events.Builders(expectedEventBuilders))
+							if a.So(st, should.Resemble, EnqueueState{
+								QueuedEvents: st.QueuedEvents,
+								Ok:           len(cmds) == len(tc.Commands),
+							}) {
+								a.So(dev, should.Resemble, expectedDevice)
+							}
 						},
-						ChannelMaskControl: 7,
-						NbTrans:            1,
-					})),
-					EvtEnqueueLinkADRRequest.With(events.WithData(&ttnpb.MACCommand_LinkADRReq{
-						ChannelMask: []bool{
-							false, false, false, false, false, false, false, false,
-							true, true, true, true, true, true, true, true,
-						},
-						NbTrans: 1,
-					})),
-				},
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
-		},
-		{
-			Name: "payload fits/US915 FSB2/MAC:1.0.3,PHY:1.0.3a/ADR/rejected desired data rate and TX power",
-			Band: LoRaWANBands[band.US_902_928][ttnpb.PHY_V1_0_3_REV_A],
-			InputDevice: &ttnpb.EndDevice{
-				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState: func() *ttnpb.MACState {
-					macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A)
-					macState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_3
-					macState.DesiredParameters.ADRTxPowerIndex = 1
-					macState.RejectedADRDataRateIndexes = []ttnpb.DataRateIndex{
-						ttnpb.DATA_RATE_2,
-					}
-					macState.RejectedADRTxPowerIndexes = []uint32{
-						0,
-						1,
-					}
-					return macState
-				}(),
-			},
-			ExpectedDevice: &ttnpb.EndDevice{
-				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState: func() *ttnpb.MACState {
-					macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A)
-					macState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_3
-					macState.DesiredParameters.ADRTxPowerIndex = 1
-					macState.RejectedADRDataRateIndexes = []ttnpb.DataRateIndex{
-						ttnpb.DATA_RATE_2,
-					}
-					macState.RejectedADRTxPowerIndexes = []uint32{
-						0,
-						1,
-					}
-					macState.PendingRequests = []*ttnpb.MACCommand{
-						(&ttnpb.MACCommand_LinkADRReq{
-							ChannelMask: []bool{
-								false, false, false, false, false, false, false, false,
-								false, false, false, false, false, false, false, false,
-							},
-							ChannelMaskControl: 7,
-							NbTrans:            1,
-							DataRateIndex:      ttnpb.DATA_RATE_1,
-							TxPowerIndex:       15,
-						}).MACCommand(),
-						(&ttnpb.MACCommand_LinkADRReq{
-							ChannelMask: []bool{
-								false, false, false, false, false, false, false, false,
-								true, true, true, true, true, true, true, true,
-							},
-							NbTrans:       1,
-							DataRateIndex: ttnpb.DATA_RATE_1,
-							TxPowerIndex:  15,
-						}).MACCommand(),
-					}
-					return macState
-				}(),
-			},
-			MaxDownlinkLength: 42,
-			MaxUplinkLength:   24,
-			State: EnqueueState{
-				MaxDownLen: 32,
-				MaxUpLen:   20,
-				Ok:         true,
-				QueuedEvents: events.Builders{
-					EvtEnqueueLinkADRRequest.With(events.WithData(&ttnpb.MACCommand_LinkADRReq{
-						ChannelMask: []bool{
-							false, false, false, false, false, false, false, false,
-							false, false, false, false, false, false, false, false,
-						},
-						ChannelMaskControl: 7,
-						NbTrans:            1,
-						DataRateIndex:      ttnpb.DATA_RATE_1,
-						TxPowerIndex:       15,
-					})),
-					EvtEnqueueLinkADRRequest.With(events.WithData(&ttnpb.MACCommand_LinkADRReq{
-						ChannelMask: []bool{
-							false, false, false, false, false, false, false, false,
-							true, true, true, true, true, true, true, true,
-						},
-						NbTrans:       1,
-						DataRateIndex: ttnpb.DATA_RATE_1,
-						TxPowerIndex:  15,
-					})),
-				},
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
-		},
-		{
-			Name: "payload fits/EU868/MAC:1.0.1,PHY:1.0.1/ADR/rejected all possible data rates",
-			Band: LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_0_1],
-			InputDevice: &ttnpb.EndDevice{
-				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState: func() *ttnpb.MACState {
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_1, ttnpb.PHY_V1_0_1)
-					macState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_1
-					macState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_5
-					macState.DesiredParameters.ADRTxPowerIndex = 3
-					macState.RejectedADRDataRateIndexes = []ttnpb.DataRateIndex{
-						ttnpb.DATA_RATE_1,
-						ttnpb.DATA_RATE_2,
-						ttnpb.DATA_RATE_3,
-						ttnpb.DATA_RATE_4,
-						ttnpb.DATA_RATE_5,
-					}
-					return macState
-				}(),
-			},
-			ExpectedDevice: &ttnpb.EndDevice{
-				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState: func() *ttnpb.MACState {
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_1, ttnpb.PHY_V1_0_1)
-					macState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_1
-					macState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_5
-					macState.DesiredParameters.ADRTxPowerIndex = 3
-					macState.RejectedADRDataRateIndexes = []ttnpb.DataRateIndex{
-						ttnpb.DATA_RATE_1,
-						ttnpb.DATA_RATE_2,
-						ttnpb.DATA_RATE_3,
-						ttnpb.DATA_RATE_4,
-						ttnpb.DATA_RATE_5,
-					}
-					return macState
-				}(),
-			},
-			MaxDownlinkLength: 42,
-			MaxUplinkLength:   24,
-			State: EnqueueState{
-				MaxDownLen: 42,
-				MaxUpLen:   24,
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
-		},
-		{
-			Name: "payload fits/US915 FSB2/MAC:1.0.4,PHY:1.0.3a/no data rate change",
-			Band: LoRaWANBands[band.US_902_928][ttnpb.PHY_V1_0_3_REV_A],
-			InputDevice: &ttnpb.EndDevice{
-				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_4, ttnpb.PHY_V1_0_3_REV_A),
-			},
-			ExpectedDevice: &ttnpb.EndDevice{
-				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState: func() *ttnpb.MACState {
-					macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_4, ttnpb.PHY_V1_0_3_REV_A)
-					macState.PendingRequests = []*ttnpb.MACCommand{
-						(&ttnpb.MACCommand_LinkADRReq{
-							ChannelMask: []bool{
-								false, false, false, false, false, false, false, false,
-								false, false, false, false, false, false, false, false,
-							},
-							ChannelMaskControl: 7,
-							NbTrans:            1,
-							DataRateIndex:      ttnpb.DATA_RATE_15,
-							TxPowerIndex:       15,
-						}).MACCommand(),
-						(&ttnpb.MACCommand_LinkADRReq{
-							ChannelMask: []bool{
-								false, false, false, false, false, false, false, false,
-								true, true, true, true, true, true, true, true,
-							},
-							NbTrans:       1,
-							DataRateIndex: ttnpb.DATA_RATE_15,
-							TxPowerIndex:  15,
-						}).MACCommand(),
-					}
-					return macState
-				}(),
-			},
-			MaxDownlinkLength: 42,
-			MaxUplinkLength:   24,
-			State: EnqueueState{
-				MaxDownLen: 32,
-				MaxUpLen:   20,
-				Ok:         true,
-				QueuedEvents: events.Builders{
-					EvtEnqueueLinkADRRequest.With(events.WithData(&ttnpb.MACCommand_LinkADRReq{
-						ChannelMask: []bool{
-							false, false, false, false, false, false, false, false,
-							false, false, false, false, false, false, false, false,
-						},
-						ChannelMaskControl: 7,
-						NbTrans:            1,
-						DataRateIndex:      ttnpb.DATA_RATE_15,
-						TxPowerIndex:       15,
-					})),
-					EvtEnqueueLinkADRRequest.With(events.WithData(&ttnpb.MACCommand_LinkADRReq{
-						ChannelMask: []bool{
-							false, false, false, false, false, false, false, false,
-							true, true, true, true, true, true, true, true,
-						},
-						NbTrans:       1,
-						DataRateIndex: ttnpb.DATA_RATE_15,
-						TxPowerIndex:  15,
-					})),
-				},
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
-		},
-		{
-			Name: "downlink does not fit/US915 FSB2/MAC:1.0.3,PHY:1.0.3a",
-			Band: LoRaWANBands[band.US_902_928][ttnpb.PHY_V1_0_3_REV_A],
-			InputDevice: &ttnpb.EndDevice{
-				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A),
-			},
-			ExpectedDevice: &ttnpb.EndDevice{
-				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A),
-			},
-			MaxDownlinkLength: 7,
-			MaxUplinkLength:   24,
-			State: EnqueueState{
-				MaxDownLen: 7,
-				MaxUpLen:   24,
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
-		},
-		{
-			Name: "uplink does not fit/US915 FSB2/MAC:1.1,PHY:1.1b",
-			Band: LoRaWANBands[band.US_902_928][ttnpb.PHY_V1_1_REV_B],
-			InputDevice: &ttnpb.EndDevice{
-				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B),
-			},
-			ExpectedDevice: &ttnpb.EndDevice{
-				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B),
-			},
-			MaxDownlinkLength: 42,
-			MaxUplinkLength:   1,
-			State: EnqueueState{
-				MaxDownLen: 42,
-				MaxUpLen:   1,
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
-		},
-	} {
-		tc := tc
-		test.RunSubtest(t, test.SubtestConfig{
-			Name:     tc.Name,
-			Parallel: true,
-			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := CopyEndDevice(tc.InputDevice)
-
-				st, err := EnqueueLinkADRReq(ctx, dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, ttnpb.MACSettings{}, tc.Band)
-				if !a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
-					t.FailNow()
+					})
 				}
-				a.So(dev, should.Resemble, tc.ExpectedDevice)
-				a.So(st.QueuedEvents, should.ResembleEventBuilders, tc.State.QueuedEvents)
-				st.QueuedEvents = tc.State.QueuedEvents
-				a.So(st, should.Resemble, tc.State)
 			},
 		})
 	}

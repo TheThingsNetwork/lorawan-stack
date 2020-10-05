@@ -31,6 +31,37 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
+func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.DataRateIndex, ok bool) {
+	i := 0
+	for {
+		if i >= len(chs) {
+			return 0, 0, false
+		}
+		if chs[i].EnableUplink {
+			break
+		}
+		i++
+	}
+
+	min = chs[i].MinDataRateIndex
+	max = chs[i].MaxDataRateIndex
+	for _, ch := range chs[i+1:] {
+		if !ch.EnableUplink {
+			continue
+		}
+		if ch.MaxDataRateIndex > max {
+			max = ch.MaxDataRateIndex
+		}
+		if ch.MinDataRateIndex < min {
+			min = ch.MinDataRateIndex
+		}
+	}
+	if min > max {
+		return 0, 0, false
+	}
+	return min, max, true
+}
+
 // DefaultClassBTimeout is the default time-out for the device to respond to class B downlink messages.
 // When waiting for a response times out, the downlink message is considered lost, and the downlink task triggers again.
 const DefaultClassBTimeout = 10 * time.Minute
