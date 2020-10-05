@@ -16,6 +16,8 @@ import { defineMessages } from 'react-intl'
 
 export default defineMessages({
   // Keep these sorted alphabetically.
+  '16Bit': '16 bit',
+  '32Bit': '32 bit',
   abp: 'Activation by personalization (ABP)',
   activationMode: 'Activation mode',
   add: 'Add',
@@ -149,6 +151,7 @@ export default defineMessages({
   firmwareVersion: 'Firmware version',
   fNwkSIntKey: 'FNwkSIntKey',
   fNwkSIntKeyDescription: 'Forwarding network session integrity key',
+  frameCounterWidth: 'Frame counter width',
   frequencyPlan: 'Frequency plan',
   gateway: 'Gateway',
   gatewayDescription: 'Gateway description',

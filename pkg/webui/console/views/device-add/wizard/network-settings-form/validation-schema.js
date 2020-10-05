@@ -27,11 +27,13 @@ const validationSchema = Yup.object({
   mac_settings: Yup.object().when(['$activationMode'], (mode, schema) => {
     if (mode === ACTIVATION_MODES.ABP) {
       return schema.shape({
-        resets_f_cnt: Yup.boolean().default(false),
+        resets_f_cnt: Yup.boolean().default(true),
+        supports_32_bit_f_cnt: Yup.boolean().default(true),
       })
     }
-
-    return schema.strip()
+    return schema.shape({
+      supports_32_bit_f_cnt: Yup.boolean().default(true),
+    })
   }),
   session: Yup.object().when(
     ['lorawan_version', '$activationMode'],

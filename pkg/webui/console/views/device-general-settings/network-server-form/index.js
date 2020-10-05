@@ -35,8 +35,11 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import {
   parseLorawanMacVersion,
   ACTIVATION_MODES,
+  FRAME_WIDTH_COUNT,
   LORAWAN_VERSIONS,
   generate16BytesKey,
+  fCntWidthEncode,
+  fCntWidthDecode,
 } from '@console/lib/device-utils'
 
 import messages from '../messages'
@@ -200,6 +203,16 @@ const NetworkServerForm = React.memo(props => {
         name="supports_class_c"
         component={Checkbox}
       />
+      <Form.Field
+        title={sharedMessages.frameCounterWidth}
+        name="mac_settings.supports_32_bit_f_cnt"
+        component={Radio.Group}
+        encode={fCntWidthEncode}
+        decode={fCntWidthDecode}
+      >
+        <Radio label={sharedMessages['16Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_16_BIT} />
+        <Radio label={sharedMessages['32Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_32_BIT} />
+      </Form.Field>
       <Form.Field
         title={sharedMessages.activationMode}
         disabled
