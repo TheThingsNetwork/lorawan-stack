@@ -45,6 +45,7 @@ type linkADRReqParameters struct {
 	Masks         []band.ChMaskCntlPair
 	DataRateIndex ttnpb.DataRateIndex
 	TxPowerIndex  uint32
+	NbTrans       uint32
 }
 
 func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Band) (linkADRReqParameters, bool, error) {
@@ -116,11 +117,15 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnp
 		}
 	}
 
-	var drIdx ttnpb.DataRateIndex
-	var txPowerIdx uint32
+	var (
+		drIdx      ttnpb.DataRateIndex
+		txPowerIdx uint32
+		nbTrans    uint32
+	)
 	if !useADR {
 		drIdx = dev.MACState.CurrentParameters.ADRDataRateIndex
 		txPowerIdx = dev.MACState.CurrentParameters.ADRTxPowerIndex
+		nbTrans = dev.MACState.CurrentParameters.ADRNbTrans
 	} else {
 		minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MACState.DesiredParameters.Channels...)
 		if !ok ||
@@ -137,6 +142,7 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnp
 
 		drIdx = dev.MACState.DesiredParameters.ADRDataRateIndex
 		txPowerIdx = dev.MACState.DesiredParameters.ADRTxPowerIndex
+		nbTrans = dev.MACState.DesiredParameters.ADRNbTrans
 		switch {
 		case !deviceRejectedADRDataRateIndex(dev, drIdx) && !deviceRejectedADRTXPowerIndex(dev, txPowerIdx):
 			// Only send the desired DataRateIndex and TXPowerIndex if neither of them were rejected.
@@ -185,6 +191,7 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnp
 		Masks:         desiredMasks,
 		DataRateIndex: drIdx,
 		TxPowerIndex:  txPowerIdx,
+		NbTrans:       nbTrans,
 	}, true, nil
 }
 
@@ -233,7 +240,7 @@ func EnqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 			req := &ttnpb.MACCommand_LinkADRReq{
 				DataRateIndex:      params.DataRateIndex,
 				TxPowerIndex:       params.TxPowerIndex,
-				NbTrans:            dev.MACState.DesiredParameters.ADRNbTrans,
+				NbTrans:            params.NbTrans,
 				ChannelMaskControl: uint32(m.Cntl),
 				ChannelMask:        params.Masks[i].Mask[:],
 			}

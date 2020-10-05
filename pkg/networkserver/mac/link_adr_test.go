@@ -293,8 +293,9 @@ func TestLinkADRReq(t *testing.T) {
 			CurrentADRNbTrans:       1,
 			CurrentADRDataRateIndex: ttnpb.DATA_RATE_1,
 			DesiredChannels:         MakeDefaultUS915FSB2DesiredChannels(),
-			DesiredADRNbTrans:       1,
+			DesiredADRNbTrans:       2,
 			DesiredADRDataRateIndex: ttnpb.DATA_RATE_2,
+			DesiredADRTxPowerIndex:  3,
 			NoADRCommands: []*ttnpb.MACCommand_LinkADRReq{
 				{
 					ChannelMask: []bool{
@@ -322,7 +323,8 @@ func TestLinkADRReq(t *testing.T) {
 					},
 					ChannelMaskControl: 7,
 					DataRateIndex:      ttnpb.DATA_RATE_2,
-					NbTrans:            1,
+					TxPowerIndex:       3,
+					NbTrans:            2,
 				},
 				{
 					ChannelMask: []bool{
@@ -330,7 +332,8 @@ func TestLinkADRReq(t *testing.T) {
 						true, true, true, true, true, true, true, true,
 					},
 					DataRateIndex: ttnpb.DATA_RATE_2,
-					NbTrans:       1,
+					TxPowerIndex:  3,
+					NbTrans:       2,
 				},
 			},
 		},

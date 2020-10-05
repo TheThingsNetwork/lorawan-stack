@@ -15,6 +15,7 @@
 package networkserver
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"sort"
@@ -28,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
@@ -979,6 +981,13 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 							CorrelationIDs: req.Message.CorrelationIDs,
 						}),
 					) {
+						if !bytes.Equal(req.Message.RawPayload, conf.Payload) {
+							actual := &ttnpb.Message{}
+							expected := &ttnpb.Message{}
+							a.So(lorawan.UnmarshalMessage(req.Message.RawPayload, actual), should.BeNil)
+							a.So(lorawan.UnmarshalMessage(conf.Payload, expected), should.BeNil)
+							a.So(actual, should.Resemble, expected)
+						}
 						t.Errorf("NsGs.ScheduleDownlink request assertion failed for schedule attempt number %d", i)
 						return
 					}
