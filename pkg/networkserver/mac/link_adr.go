@@ -60,31 +60,17 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnp
 			needsChMask = isEnabled != dev.MACState.DesiredParameters.Channels[i].GetEnableUplink()
 		}
 	}
+	useADR := DeviceUseADR(dev, defaults, phy)
 	switch {
 	case needsChMask:
 		// NOTE: LinkADRReq is scheduled regardless of ADR settings if channel mask is required, which often is the case with ABP devices or when ChMask CFList is not supported/used.
-	case !DeviceUseADR(dev, defaults, phy):
+	case !useADR:
 		return linkADRReqParameters{}, false, nil
 	case dev.MACState.DesiredParameters.ADRNbTrans != dev.MACState.CurrentParameters.ADRNbTrans,
 		dev.MACState.DesiredParameters.ADRDataRateIndex != dev.MACState.CurrentParameters.ADRDataRateIndex,
 		dev.MACState.DesiredParameters.ADRTxPowerIndex != dev.MACState.CurrentParameters.ADRTxPowerIndex:
 	default:
 		return linkADRReqParameters{}, false, nil
-	}
-
-	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MACState.DesiredParameters.Channels...)
-	if !ok ||
-		len(dev.MACState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) ||
-		dev.MACState.DesiredParameters.ADRTxPowerIndex > uint32(phy.MaxTxPowerIndex()) ||
-		dev.MACState.DesiredParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
-		return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
-	}
-	if dev.MACState.CurrentParameters.ADRDataRateIndex > minDataRateIndex {
-		minDataRateIndex = dev.MACState.CurrentParameters.ADRDataRateIndex
-	}
-	if dev.MACState.DesiredParameters.ADRDataRateIndex < minDataRateIndex || dev.MACState.DesiredParameters.ADRDataRateIndex > maxDataRateIndex {
-		log.FromContext(ctx).Error("return 2")
-		return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
 	}
 
 	var desiredMasks []band.ChMaskCntlPair
@@ -127,42 +113,63 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnp
 		}
 	}
 
-	drIdx := dev.MACState.DesiredParameters.ADRDataRateIndex
-	txPowerIdx := dev.MACState.DesiredParameters.ADRTxPowerIndex
-	switch {
-	case !deviceRejectedADRDataRateIndex(dev, drIdx) && !deviceRejectedADRTXPowerIndex(dev, txPowerIdx):
-		// Only send the desired DataRateIndex and TXPowerIndex if neither of them were rejected.
+	var drIdx ttnpb.DataRateIndex
+	var txPowerIdx uint32
+	if !useADR {
+		drIdx = dev.MACState.CurrentParameters.ADRDataRateIndex
+		txPowerIdx = dev.MACState.CurrentParameters.ADRTxPowerIndex
+	} else {
+		minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MACState.DesiredParameters.Channels...)
+		if !ok ||
+			len(dev.MACState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) ||
+			dev.MACState.DesiredParameters.ADRTxPowerIndex > uint32(phy.MaxTxPowerIndex()) ||
+			dev.MACState.DesiredParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
+			return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
+		}
+		if dev.MACState.CurrentParameters.ADRDataRateIndex > minDataRateIndex {
+			minDataRateIndex = dev.MACState.CurrentParameters.ADRDataRateIndex
+		}
+		if dev.MACState.DesiredParameters.ADRDataRateIndex < minDataRateIndex || dev.MACState.DesiredParameters.ADRDataRateIndex > maxDataRateIndex {
+			return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
+		}
 
-	case len(desiredMasks) == 0 && dev.MACState.DesiredParameters.ADRNbTrans == dev.MACState.CurrentParameters.ADRNbTrans:
-		log.FromContext(ctx).Debug("Either desired data rate index or TX power output index have been rejected and there are no channel mask and NbTrans changes desired, avoid enqueueing LinkADRReq")
-		return linkADRReqParameters{}, false, nil
+		drIdx = dev.MACState.DesiredParameters.ADRDataRateIndex
+		txPowerIdx = dev.MACState.DesiredParameters.ADRTxPowerIndex
+		switch {
+		case !deviceRejectedADRDataRateIndex(dev, drIdx) && !deviceRejectedADRTXPowerIndex(dev, txPowerIdx):
+			// Only send the desired DataRateIndex and TXPowerIndex if neither of them were rejected.
 
-	case dev.MACState.LoRaWANVersion.HasNoChangeDataRateIndex() && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) &&
-		dev.MACState.LoRaWANVersion.HasNoChangeTXPowerIndex() && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex):
-		drIdx = noChangeDataRateIndex
-		txPowerIdx = noChangeTXPowerIndex
+		case len(desiredMasks) == 0 && dev.MACState.DesiredParameters.ADRNbTrans == dev.MACState.CurrentParameters.ADRNbTrans:
+			log.FromContext(ctx).Debug("Either desired data rate index or TX power output index have been rejected and there are no channel mask and NbTrans changes desired, avoid enqueueing LinkADRReq")
+			return linkADRReqParameters{}, false, nil
 
-	default:
-		for deviceRejectedADRDataRateIndex(dev, drIdx) || deviceRejectedADRTXPowerIndex(dev, txPowerIdx) {
-			// Since either data rate or TX power index (or both) were rejected by the device, undo the
-			// desired ADR adjustments step-by-step until possibly fitting index pair is found.
-			if drIdx == minDataRateIndex && (deviceRejectedADRDataRateIndex(dev, drIdx) || txPowerIdx == 0) {
-				log.FromContext(ctx).WithFields(log.Fields(
-					"current_adr_nb_trans", dev.MACState.CurrentParameters.ADRNbTrans,
-					"desired_adr_nb_trans", dev.MACState.DesiredParameters.ADRNbTrans,
-					"desired_mask_count", len(desiredMasks),
-				)).Warn("Device rejected either all available data rate indexes or all available TX power output indexes and there are channel mask or NbTrans changes desired, avoid enqueueing LinkADRReq")
-				return linkADRReqParameters{}, false, nil
-			}
-			for drIdx > minDataRateIndex && (deviceRejectedADRDataRateIndex(dev, drIdx) || txPowerIdx == 0 && deviceRejectedADRTXPowerIndex(dev, txPowerIdx)) {
-				// Increase data rate until a non-rejected index is found.
-				// Set TX power to maximum possible value.
-				drIdx--
-				txPowerIdx = uint32(phy.MaxTxPowerIndex())
-			}
-			for txPowerIdx > 0 && deviceRejectedADRTXPowerIndex(dev, txPowerIdx) {
-				// Increase TX output power until a non-rejected index is found.
-				txPowerIdx--
+		case dev.MACState.LoRaWANVersion.HasNoChangeDataRateIndex() && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) &&
+			dev.MACState.LoRaWANVersion.HasNoChangeTXPowerIndex() && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex):
+			drIdx = noChangeDataRateIndex
+			txPowerIdx = noChangeTXPowerIndex
+
+		default:
+			for deviceRejectedADRDataRateIndex(dev, drIdx) || deviceRejectedADRTXPowerIndex(dev, txPowerIdx) {
+				// Since either data rate or TX power index (or both) were rejected by the device, undo the
+				// desired ADR adjustments step-by-step until possibly fitting index pair is found.
+				if drIdx == minDataRateIndex && (deviceRejectedADRDataRateIndex(dev, drIdx) || txPowerIdx == 0) {
+					log.FromContext(ctx).WithFields(log.Fields(
+						"current_adr_nb_trans", dev.MACState.CurrentParameters.ADRNbTrans,
+						"desired_adr_nb_trans", dev.MACState.DesiredParameters.ADRNbTrans,
+						"desired_mask_count", len(desiredMasks),
+					)).Warn("Device rejected either all available data rate indexes or all available TX power output indexes and there are channel mask or NbTrans changes desired, avoid enqueueing LinkADRReq")
+					return linkADRReqParameters{}, false, nil
+				}
+				for drIdx > minDataRateIndex && (deviceRejectedADRDataRateIndex(dev, drIdx) || txPowerIdx == 0 && deviceRejectedADRTXPowerIndex(dev, txPowerIdx)) {
+					// Increase data rate until a non-rejected index is found.
+					// Set TX power to maximum possible value.
+					drIdx--
+					txPowerIdx = uint32(phy.MaxTxPowerIndex())
+				}
+				for txPowerIdx > 0 && deviceRejectedADRTXPowerIndex(dev, txPowerIdx) {
+					// Increase TX output power until a non-rejected index is found.
+					txPowerIdx--
+				}
 			}
 		}
 	}

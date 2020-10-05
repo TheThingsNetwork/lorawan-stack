@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"testing"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -44,7 +45,7 @@ func TestLinkADRReq(t *testing.T) {
 		CurrentADRNbTrans, DesiredADRNbTrans             uint32
 		RejectedADRDataRateIndexes                       []ttnpb.DataRateIndex
 		RejectedADRTxPowerIndexes                        []uint32
-		Commands                                         []*ttnpb.MACCommand_LinkADRReq
+		NoADRCommands, ADRCommands                       []*ttnpb.MACCommand_LinkADRReq
 		ErrorAssertion                                   func(*testing.T, error) bool
 	}{
 		{
@@ -56,7 +57,7 @@ func TestLinkADRReq(t *testing.T) {
 			CurrentADRNbTrans: 1,
 			DesiredChannels:   MakeDefaultUS915FSB2DesiredChannels(),
 			DesiredADRNbTrans: 1,
-			Commands: []*ttnpb.MACCommand_LinkADRReq{
+			NoADRCommands: []*ttnpb.MACCommand_LinkADRReq{
 				{
 					ChannelMask: []bool{
 						false, false, false, false, false, false, false, false,
@@ -83,7 +84,7 @@ func TestLinkADRReq(t *testing.T) {
 			CurrentADRNbTrans: 1,
 			DesiredChannels:   MakeDefaultUS915FSB2DesiredChannels(),
 			DesiredADRNbTrans: 1,
-			Commands: []*ttnpb.MACCommand_LinkADRReq{
+			NoADRCommands: []*ttnpb.MACCommand_LinkADRReq{
 				{
 					ChannelMask: []bool{
 						false, false, false, false, false, false, false, false,
@@ -123,7 +124,7 @@ func TestLinkADRReq(t *testing.T) {
 				0,
 				1,
 			},
-			Commands: []*ttnpb.MACCommand_LinkADRReq{
+			ADRCommands: []*ttnpb.MACCommand_LinkADRReq{
 				{
 					ChannelMask: []bool{
 						false, false, false, false, false, false, false, false,
@@ -153,7 +154,7 @@ func TestLinkADRReq(t *testing.T) {
 				ttnpb.DATA_RATE_3,
 				ttnpb.DATA_RATE_4,
 			},
-			Commands: []*ttnpb.MACCommand_LinkADRReq{
+			ADRCommands: []*ttnpb.MACCommand_LinkADRReq{
 				{
 					ChannelMask: []bool{
 						true, true, true, true, true, true, true, true,
@@ -185,10 +186,60 @@ func TestLinkADRReq(t *testing.T) {
 				ttnpb.DATA_RATE_5,
 			},
 		},
+		{
+			Name:                    "ABP channel setup + ADR",
+			BandID:                  band.US_902_928,
+			LoRaWANVersion:          ttnpb.MAC_V1_0_3,
+			LoRaWANPHYVersion:       ttnpb.PHY_V1_0_3_REV_A,
+			CurrentChannels:         MakeDefaultUS915CurrentChannels(),
+			CurrentADRNbTrans:       1,
+			CurrentADRDataRateIndex: ttnpb.DATA_RATE_1,
+			DesiredChannels:         MakeDefaultUS915FSB2DesiredChannels(),
+			DesiredADRNbTrans:       1,
+			DesiredADRDataRateIndex: ttnpb.DATA_RATE_2,
+			NoADRCommands: []*ttnpb.MACCommand_LinkADRReq{
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+					ChannelMaskControl: 7,
+					DataRateIndex:      ttnpb.DATA_RATE_1,
+					NbTrans:            1,
+				},
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						true, true, true, true, true, true, true, true,
+					},
+					DataRateIndex: ttnpb.DATA_RATE_1,
+					NbTrans:       1,
+				},
+			},
+			ADRCommands: []*ttnpb.MACCommand_LinkADRReq{
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+					ChannelMaskControl: 7,
+					DataRateIndex:      ttnpb.DATA_RATE_2,
+					NbTrans:            1,
+				},
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						true, true, true, true, true, true, true, true,
+					},
+					DataRateIndex: ttnpb.DATA_RATE_2,
+					NbTrans:       1,
+				},
+			},
+		},
 	} {
 		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
-			Name: fmt.Sprintf("%s/Band:%s,MAC:%s,PHY:%s,DR:%d->%d,TX:%d->%d,NB:%d->%d,rejected_DR:%v,rejected_TX:%v",
+			Name: fmt.Sprintf("%s/band:%s,MAC:%s,PHY:%s,DR:%d->%d,TX:%d->%d,NB:%d->%d,rejected_DR:%v,rejected_TX:%v",
 				tc.Name,
 				tc.BandID,
 				tc.LoRaWANVersion,
@@ -200,95 +251,126 @@ func TestLinkADRReq(t *testing.T) {
 				tc.RejectedADRTxPowerIndexes,
 			),
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				pb := CopyEndDevice(&ttnpb.EndDevice{
-					MACState: &ttnpb.MACState{
-						LoRaWANVersion: tc.LoRaWANVersion,
-						CurrentParameters: ttnpb.MACParameters{
-							Channels:         tc.CurrentChannels,
-							ADRDataRateIndex: tc.CurrentADRDataRateIndex,
-							ADRTxPowerIndex:  tc.CurrentADRTxPowerIndex,
-							ADRNbTrans:       tc.CurrentADRNbTrans,
+				makeDevice := func(adr bool) *ttnpb.EndDevice {
+					return CopyEndDevice(&ttnpb.EndDevice{
+						MACState: &ttnpb.MACState{
+							LoRaWANVersion: tc.LoRaWANVersion,
+							CurrentParameters: ttnpb.MACParameters{
+								Channels:         tc.CurrentChannels,
+								ADRDataRateIndex: tc.CurrentADRDataRateIndex,
+								ADRTxPowerIndex:  tc.CurrentADRTxPowerIndex,
+								ADRNbTrans:       tc.CurrentADRNbTrans,
+							},
+							DesiredParameters: ttnpb.MACParameters{
+								Channels:         tc.DesiredChannels,
+								ADRDataRateIndex: tc.DesiredADRDataRateIndex,
+								ADRTxPowerIndex:  tc.DesiredADRTxPowerIndex,
+								ADRNbTrans:       tc.DesiredADRNbTrans,
+							},
+							RejectedADRDataRateIndexes: tc.RejectedADRDataRateIndexes,
+							RejectedADRTxPowerIndexes:  tc.RejectedADRTxPowerIndexes,
 						},
-						DesiredParameters: ttnpb.MACParameters{
-							Channels:         tc.DesiredChannels,
-							ADRDataRateIndex: tc.DesiredADRDataRateIndex,
-							ADRTxPowerIndex:  tc.DesiredADRTxPowerIndex,
-							ADRNbTrans:       tc.DesiredADRNbTrans,
-						},
-						RejectedADRDataRateIndexes: tc.RejectedADRDataRateIndexes,
-						RejectedADRTxPowerIndexes:  tc.RejectedADRTxPowerIndexes,
-					},
-				})
+						MACSettings: func() *ttnpb.MACSettings {
+							if DefaultMACSettings.UseADR != nil && DefaultMACSettings.UseADR.Value == adr || DefaultMACSettings.UseADR == nil && adr {
+								return nil
+							}
+							return &ttnpb.MACSettings{
+								UseADR: &pbtypes.BoolValue{Value: adr},
+							}
+						}(),
+					})
+				}
 				phy := LoRaWANBands[tc.BandID][tc.LoRaWANPHYVersion]
 
 				test.RunSubtestFromContext(ctx, test.SubtestConfig{
-					Name:     "needs",
+					Name:     "DeviceNeedsLinkADRReq",
 					Parallel: true,
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-						dev := CopyEndDevice(pb)
+						dev := makeDevice(true)
 						a.So(DeviceNeedsLinkADRReq(ctx, dev, DefaultMACSettings, phy), func() func(interface{}, ...interface{}) string {
-							if len(tc.Commands) > 0 {
+							if len(tc.ADRCommands) > 0 || len(tc.NoADRCommands) > 0 {
 								return should.BeTrue
 							}
 							return should.BeFalse
 						}())
-						a.So(dev, should.Resemble, pb)
+						a.So(dev, should.Resemble, makeDevice(true))
+
+						dev = makeDevice(false)
+						a.So(DeviceNeedsLinkADRReq(ctx, dev, DefaultMACSettings, phy), func() func(interface{}, ...interface{}) string {
+							if len(tc.NoADRCommands) > 0 {
+								return should.BeTrue
+							}
+							return should.BeFalse
+						}())
+						a.So(dev, should.Resemble, makeDevice(false))
 					},
 				})
-				for _, n := range func() []int {
-					if len(tc.Commands) == 0 {
-						return []int{0}
-					}
-					return []int{0, int(len(tc.Commands))}
-				}() {
-					cmds := tc.Commands[:n]
-					cmdLen := uint16(5 * n)
-					answerLen := 2 * func() uint16 {
-						if n == 0 {
-							return 0
+				for adr, cmds := range map[bool][]*ttnpb.MACCommand_LinkADRReq{
+					true: func() []*ttnpb.MACCommand_LinkADRReq {
+						if len(tc.ADRCommands) == 0 {
+							return tc.NoADRCommands
 						}
-						switch {
-						case tc.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0:
-							return 1
-						default:
-							return uint16(n)
+						return tc.ADRCommands
+					}(),
+					false: tc.NoADRCommands,
+				} {
+					for _, n := range func() []int {
+						if len(cmds) == 0 {
+							return []int{0}
 						}
-					}()
-					test.RunSubtestFromContext(ctx, test.SubtestConfig{
-						Name:     fmt.Sprintf("enqueue/max_down_len:%d", cmdLen),
-						Parallel: true,
-						Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-							dev := CopyEndDevice(pb)
-							st, err := EnqueueLinkADRReq(ctx, dev, cmdLen, answerLen, DefaultMACSettings, phy)
-							if tc.ErrorAssertion != nil {
-								if !a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
-									t.FailNow()
+						return []int{0, len(cmds)}
+					}() {
+						adr := adr
+						cmdsFit := n >= len(cmds)
+						cmdLen := uint16(5 * n)
+						cmds := cmds[:n]
+						answerLen := 2 * func() uint16 {
+							if n == 0 {
+								return 0
+							}
+							switch {
+							case tc.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0:
+								return 1
+							default:
+								return uint16(n)
+							}
+						}()
+						test.RunSubtestFromContext(ctx, test.SubtestConfig{
+							Name:     fmt.Sprintf("EnqueueLinkADRReq/adr:%v,max_down_len:%d", adr, cmdLen),
+							Parallel: true,
+							Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+								dev := makeDevice(adr)
+								st, err := EnqueueLinkADRReq(ctx, dev, cmdLen, answerLen, DefaultMACSettings, phy)
+								if tc.ErrorAssertion != nil {
+									if !a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+										t.FailNow()
+									}
+									a.So(st, should.Equal, EnqueueState{
+										MaxDownLen: cmdLen,
+										MaxUpLen:   answerLen,
+										Ok:         false,
+									})
+									return
 								}
-								a.So(st, should.Equal, EnqueueState{
-									MaxDownLen: cmdLen,
-									MaxUpLen:   answerLen,
-									Ok:         false,
-								})
-								return
-							}
-							if !a.So(err, should.BeNil) {
-								t.Fatalf("Failed to enqueue LinkADRReq: %s", err)
-							}
-							expectedDevice := CopyEndDevice(pb)
-							var expectedEventBuilders []events.Builder
-							for _, cmd := range cmds {
-								expectedDevice.MACState.PendingRequests = append(expectedDevice.MACState.PendingRequests, cmd.MACCommand())
-								expectedEventBuilders = append(expectedEventBuilders, EvtEnqueueLinkADRRequest.BindData(cmd))
-							}
-							a.So(st.QueuedEvents, should.ResembleEventBuilders, events.Builders(expectedEventBuilders))
-							if a.So(st, should.Resemble, EnqueueState{
-								QueuedEvents: st.QueuedEvents,
-								Ok:           len(cmds) == len(tc.Commands),
-							}) {
-								a.So(dev, should.Resemble, expectedDevice)
-							}
-						},
-					})
+								if !a.So(err, should.BeNil) {
+									t.Fatalf("Failed to enqueue LinkADRReq: %s", err)
+								}
+								expectedDevice := makeDevice(adr)
+								var expectedEventBuilders []events.Builder
+								for _, cmd := range cmds {
+									expectedDevice.MACState.PendingRequests = append(expectedDevice.MACState.PendingRequests, cmd.MACCommand())
+									expectedEventBuilders = append(expectedEventBuilders, EvtEnqueueLinkADRRequest.BindData(cmd))
+								}
+								a.So(st.QueuedEvents, should.ResembleEventBuilders, events.Builders(expectedEventBuilders))
+								if a.So(st, should.Resemble, EnqueueState{
+									QueuedEvents: st.QueuedEvents,
+									Ok:           cmdsFit,
+								}) {
+									a.So(dev, should.Resemble, expectedDevice)
+								}
+							},
+						})
+					}
 				}
 			},
 		})
