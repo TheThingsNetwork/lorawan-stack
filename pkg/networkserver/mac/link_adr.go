@@ -41,6 +41,11 @@ var (
 	)()
 )
 
+const (
+	noChangeDataRateIndex = ttnpb.DATA_RATE_15
+	noChangeTXPowerIndex  = 15
+)
+
 type linkADRReqParameters struct {
 	Masks         []band.ChMaskCntlPair
 	DataRateIndex ttnpb.DataRateIndex
@@ -55,18 +60,26 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnp
 	if len(dev.MACState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) {
 		return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
 	}
-	var needsChMask bool
-	for i := 0; !needsChMask && i < len(dev.MACState.CurrentParameters.Channels); i++ {
-		isEnabled := dev.MACState.CurrentParameters.Channels[i].GetEnableUplink()
-		if i >= len(dev.MACState.DesiredParameters.Channels) {
-			needsChMask = isEnabled
-		} else {
-			needsChMask = isEnabled != dev.MACState.DesiredParameters.Channels[i].GetEnableUplink()
-		}
+
+	currentChs := make([]bool, phy.MaxUplinkChannels)
+	for i, ch := range dev.MACState.CurrentParameters.Channels {
+		currentChs[i] = ch.GetEnableUplink()
 	}
+	desiredChs := make([]bool, phy.MaxUplinkChannels)
+	for i, ch := range dev.MACState.DesiredParameters.Channels {
+		isEnabled := ch.GetEnableUplink()
+		if isEnabled && ch.UplinkFrequency == 0 {
+			return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
+		}
+		if DeviceNeedsNewChannelReqAtIndex(dev, i) {
+			currentChs[i] = ch != nil && ch.UplinkFrequency != 0
+		}
+		desiredChs[i] = isEnabled
+	}
+
 	useADR := DeviceUseADR(dev, defaults, phy)
 	switch {
-	case needsChMask:
+	case !band.EqualChMasks(currentChs, desiredChs):
 		// NOTE: LinkADRReq is scheduled regardless of ADR settings if channel mask is required, which often is the case with ABP devices or when ChMask CFList is not supported/used.
 	case !useADR:
 		return linkADRReqParameters{}, false, nil
@@ -76,45 +89,13 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnp
 	default:
 		return linkADRReqParameters{}, false, nil
 	}
-
-	var desiredMasks []band.ChMaskCntlPair
-	if needsChMask {
-		currentChs := make([]bool, phy.MaxUplinkChannels)
-		for i, ch := range dev.MACState.CurrentParameters.Channels {
-			currentChs[i] = ch.GetEnableUplink()
-		}
-		desiredChs := make([]bool, phy.MaxUplinkChannels)
-		for i, ch := range dev.MACState.DesiredParameters.Channels {
-			if ch.GetEnableUplink() && ch.UplinkFrequency == 0 {
-				return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
-			}
-			if DeviceNeedsNewChannelReqAtIndex(dev, i) {
-				currentChs[i] = ch != nil && ch.UplinkFrequency != 0
-			}
-			desiredChs[i] = ch.GetEnableUplink()
-		}
-		var err error
-		desiredMasks, err = phy.GenerateChMasks(currentChs, desiredChs)
-		if err != nil {
-			return linkADRReqParameters{}, false, err
-		}
-		if len(desiredMasks) > math.MaxUint16 {
-			// Something is really wrong.
-			return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
-		}
-	} else {
-		// If no ChMask is required, send ChMaskCntl=0 mask, which leaves current channel state intact.
-		// NOTE: Implementation assumes that all bands support ChMaskCntl=0, which controls first 16 channels.
-		// In an unlikely case this assumption is no longer valid - the implementation must change.
-		var mask [16]bool
-		for i := 0; i < len(dev.MACState.CurrentParameters.Channels) && i < 16; i++ {
-			mask[i] = dev.MACState.CurrentParameters.Channels[i].EnableUplink
-		}
-		desiredMasks = []band.ChMaskCntlPair{
-			{
-				Mask: mask,
-			},
-		}
+	desiredMasks, err := phy.GenerateChMasks(currentChs, desiredChs)
+	if err != nil {
+		return linkADRReqParameters{}, false, err
+	}
+	if len(desiredMasks) > math.MaxUint16 {
+		// Something is really wrong.
+		return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
 	}
 
 	var (
@@ -199,11 +180,6 @@ func DeviceNeedsLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, defaults t
 	_, required, err := generateLinkADRReq(ctx, dev, defaults, phy)
 	return err == nil && required
 }
-
-const (
-	noChangeDataRateIndex = ttnpb.DATA_RATE_15
-	noChangeTXPowerIndex  = 15
-)
 
 func EnqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings, phy *band.Band) (EnqueueState, error) {
 	params, required, err := generateLinkADRReq(ctx, dev, defaults, phy)
