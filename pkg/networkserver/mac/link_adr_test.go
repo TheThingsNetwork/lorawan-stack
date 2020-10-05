@@ -46,8 +46,106 @@ func TestLinkADRReq(t *testing.T) {
 		RejectedADRDataRateIndexes                       []ttnpb.DataRateIndex
 		RejectedADRTxPowerIndexes                        []uint32
 		NoADRCommands, ADRCommands                       []*ttnpb.MACCommand_LinkADRReq
-		ErrorAssertion                                   func(*testing.T, error) bool
+		NoADRErrorAssertion, ADRErrorAssertion           func(*testing.T, error) bool
 	}{
+		{
+			Name:              "no channels",
+			BandID:            band.US_902_928,
+			LoRaWANVersion:    ttnpb.MAC_V1_0_3,
+			LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+			CurrentADRNbTrans: 1,
+			DesiredADRNbTrans: 1,
+		},
+		{
+			Name:              "invalid channel",
+			BandID:            band.US_902_928,
+			LoRaWANVersion:    ttnpb.MAC_V1_0_3,
+			LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+			CurrentChannels:   MakeDefaultUS915FSB2DesiredChannels(),
+			CurrentADRNbTrans: 1,
+			DesiredChannels: []*ttnpb.MACParameters_Channel{
+				{EnableUplink: true},
+			},
+			DesiredADRNbTrans: 1,
+			NoADRErrorAssertion: func(t *testing.T, err error) bool {
+				a, _ := test.New(t)
+				return a.So(err, should.BeError)
+			},
+		},
+		{
+			Name:              "invalid channel count",
+			BandID:            band.EU_863_870,
+			LoRaWANVersion:    ttnpb.MAC_V1_0_3,
+			LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+			CurrentChannels:   MakeDefaultEU868CurrentChannels(),
+			CurrentADRNbTrans: 1,
+			DesiredChannels:   MakeDefaultUS915FSB2DesiredChannels(),
+			DesiredADRNbTrans: 1,
+			NoADRErrorAssertion: func(t *testing.T, err error) bool {
+				a, _ := test.New(t)
+				return a.So(err, should.BeError)
+			},
+		},
+		{
+			Name:              "invalid band channels",
+			BandID:            band.EU_863_870,
+			LoRaWANVersion:    ttnpb.MAC_V1_0_3,
+			LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+			CurrentChannels:   MakeDefaultUS915CurrentChannels(),
+			CurrentADRNbTrans: 1,
+			DesiredChannels:   MakeDefaultUS915FSB2DesiredChannels(),
+			DesiredADRNbTrans: 1,
+			NoADRErrorAssertion: func(t *testing.T, err error) bool {
+				a, _ := test.New(t)
+				return a.So(err, should.BeError)
+			},
+		},
+		{
+			Name:                    "non-existent data rate",
+			BandID:                  band.EU_863_870,
+			LoRaWANVersion:          ttnpb.MAC_V1_0_3,
+			LoRaWANPHYVersion:       ttnpb.PHY_V1_0_3_REV_A,
+			CurrentChannels:         MakeDefaultEU868DesiredChannels(),
+			CurrentADRNbTrans:       1,
+			DesiredChannels:         MakeDefaultEU868DesiredChannels(),
+			DesiredADRDataRateIndex: ttnpb.DATA_RATE_15,
+			DesiredADRNbTrans:       1,
+			ADRErrorAssertion: func(t *testing.T, err error) bool {
+				a, _ := test.New(t)
+				return a.So(err, should.BeError)
+			},
+		},
+		{
+			Name:                    "data rate too low",
+			BandID:                  band.EU_863_870,
+			LoRaWANVersion:          ttnpb.MAC_V1_0_3,
+			LoRaWANPHYVersion:       ttnpb.PHY_V1_0_3_REV_A,
+			CurrentChannels:         MakeDefaultEU868DesiredChannels(),
+			CurrentADRNbTrans:       1,
+			CurrentADRDataRateIndex: ttnpb.DATA_RATE_2,
+			DesiredChannels:         MakeDefaultEU868DesiredChannels(),
+			DesiredADRDataRateIndex: ttnpb.DATA_RATE_1,
+			DesiredADRNbTrans:       1,
+			ADRErrorAssertion: func(t *testing.T, err error) bool {
+				a, _ := test.New(t)
+				return a.So(err, should.BeError)
+			},
+		},
+		{
+			Name:                   "TX power too high",
+			BandID:                 band.EU_863_870,
+			LoRaWANVersion:         ttnpb.MAC_V1_0_3,
+			LoRaWANPHYVersion:      ttnpb.PHY_V1_0_3_REV_A,
+			CurrentChannels:        MakeDefaultEU868DesiredChannels(),
+			CurrentADRNbTrans:      1,
+			DesiredChannels:        MakeDefaultEU868DesiredChannels(),
+			DesiredADRTxPowerIndex: 14,
+			DesiredADRNbTrans:      1,
+			ADRErrorAssertion: func(t *testing.T, err error) bool {
+				a, _ := test.New(t)
+				return a.So(err, should.BeError)
+			},
+		},
 		{
 			Name:              "ABP channel setup",
 			BandID:            band.US_902_928,
@@ -325,10 +423,9 @@ func TestLinkADRReq(t *testing.T) {
 						cmdLen := uint16(5 * n)
 						cmds := cmds[:n]
 						answerLen := 2 * func() uint16 {
-							if n == 0 {
-								return 0
-							}
 							switch {
+							case n == 0:
+								return 0
 							case tc.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0:
 								return 1
 							default:
@@ -341,11 +438,20 @@ func TestLinkADRReq(t *testing.T) {
 							Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 								dev := makeDevice(adr)
 								st, err := EnqueueLinkADRReq(ctx, dev, cmdLen, answerLen, DefaultMACSettings, phy)
-								if tc.ErrorAssertion != nil {
-									if !a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+								if errorAssertion := func() func(*testing.T, error) bool {
+									switch {
+									case !adr:
+										return tc.NoADRErrorAssertion
+									case tc.ADRErrorAssertion != nil:
+										return tc.ADRErrorAssertion
+									default:
+										return tc.NoADRErrorAssertion
+									}
+								}(); errorAssertion != nil {
+									if !a.So(errorAssertion(t, err), should.BeTrue) {
 										t.FailNow()
 									}
-									a.So(st, should.Equal, EnqueueState{
+									a.So(st, should.Resemble, EnqueueState{
 										MaxDownLen: cmdLen,
 										MaxUpLen:   answerLen,
 										Ok:         false,

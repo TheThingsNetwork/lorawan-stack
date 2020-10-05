@@ -51,6 +51,9 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnp
 	if dev.GetMulticast() || dev.GetMACState() == nil {
 		return linkADRReqParameters{}, false, nil
 	}
+	if len(dev.MACState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) {
+		return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
+	}
 	var needsChMask bool
 	for i := 0; !needsChMask && i < len(dev.MACState.CurrentParameters.Channels); i++ {
 		isEnabled := dev.MACState.CurrentParameters.Channels[i].GetEnableUplink()
@@ -121,7 +124,6 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnp
 	} else {
 		minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MACState.DesiredParameters.Channels...)
 		if !ok ||
-			len(dev.MACState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) ||
 			dev.MACState.DesiredParameters.ADRTxPowerIndex > uint32(phy.MaxTxPowerIndex()) ||
 			dev.MACState.DesiredParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
 			return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
