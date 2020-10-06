@@ -16,13 +16,14 @@ import React from 'react'
 
 import Status from '@ttn-lw/components/status'
 
-import DateTime from '@ttn-lw/lib/components/date-time'
-import Message from '@ttn-lw/lib/components/message'
+import EntityTitleSection from '@console/components/entity-title-section'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './status.styl'
+
+const { Content } = EntityTitleSection
 
 const ApplicationStatus = React.memo(props => {
   const { linked, lastSeen } = props
@@ -30,20 +31,15 @@ const ApplicationStatus = React.memo(props => {
   const linkStatus = linked ? 'good' : 'bad'
   const linkLabel = linked ? sharedMessages.linked : sharedMessages.notLinked
 
-  let linkElement
   if (linked && lastSeen) {
-    linkElement = (
+    return (
       <Status className={style.status} status={linkStatus} flipped>
-        <Message content={sharedMessages.lastSeen} /> <DateTime.Relative value={lastSeen} />
+        <Content.lastSeen lastSeen={lastSeen} />
       </Status>
     )
   }
 
-  if (!linkElement) {
-    linkElement = <Status className={style.status} label={linkLabel} status={linkStatus} flipped />
-  }
-
-  return linkElement
+  return <Status className={style.status} label={linkLabel} status={linkStatus} flipped />
 })
 
 ApplicationStatus.propTypes = {

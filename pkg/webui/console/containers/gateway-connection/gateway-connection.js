@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,14 +19,17 @@ import { FormattedNumber } from 'react-intl'
 import Status from '@ttn-lw/components/status'
 import Icon from '@ttn-lw/components/icon'
 
-import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
+
+import EntityTitleSection from '@console/components/entity-title-section'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { isNotFoundError, isTranslated } from '@ttn-lw/lib/errors/utils'
 
 import style from './gateway-connection.styl'
+
+const { Content } = EntityTitleSection
 
 class GatewayConnection extends React.PureComponent {
   static propTypes = {
@@ -81,7 +84,7 @@ class GatewayConnection extends React.PureComponent {
       statusIndicator = 'unknown'
       message = error.message
     } else if (hasStatistics) {
-      message = hasLastSeen ? sharedMessages.lastSeen : sharedMessages.connected
+      message = sharedMessages.connected
       statusIndicator = 'good'
     } else {
       message = sharedMessages.unknown
@@ -90,9 +93,10 @@ class GatewayConnection extends React.PureComponent {
 
     return (
       <Status className={style.status} status={statusIndicator} flipped>
-        <Message className={style.lastSeen} content={message} />
-        {statusIndicator === 'good' && lastSeen && (
-          <DateTime.Relative className={style.dateTime} value={lastSeen} />
+        {statusIndicator === 'good' && hasLastSeen ? (
+          <Content.LastSeen lastSeen={lastSeen} />
+        ) : (
+          <Message content={message} />
         )}
       </Status>
     )
