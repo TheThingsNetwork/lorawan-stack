@@ -18,6 +18,7 @@ import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "lorawan-stack/api/error.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/keys.proto";
@@ -83,6 +84,9 @@ message UplinkMessage {
   // Index of the device channel that received the message.
   // Set by Network Server.
   uint32 device_channel_index = 9 [(validate.rules).uint32 = {lte: 255}];
+
+  // Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings.
+  google.protobuf.Duration consumed_airtime = 10 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
 }
 
 // Downlink message from the network to the end device
@@ -202,7 +206,10 @@ message ApplicationUplink {
 
   bool confirmed = 11;
 
-  // next: 13
+  // Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings.
+  google.protobuf.Duration consumed_airtime = 13 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
+
+  // next: 14
 }
 
 message ApplicationLocation {

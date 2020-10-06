@@ -124,6 +124,18 @@ func (m *JoinRequest) ValidateFields(paths ...string) error {
 
 			}
 
+		case "consumed_airtime":
+
+			if v, ok := interface{}(m.GetConsumedAirtime()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return JoinRequestValidationError{
+						field:  "consumed_airtime",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return JoinRequestValidationError{
 				field:  name,

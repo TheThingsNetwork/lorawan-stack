@@ -3,6 +3,7 @@
 package ttnpb
 
 var UplinkMessageFieldPathsNested = []string{
+	"consumed_airtime",
 	"correlation_ids",
 	"device_channel_index",
 	"payload",
@@ -74,6 +75,7 @@ var UplinkMessageFieldPathsNested = []string{
 }
 
 var UplinkMessageFieldPathsTopLevel = []string{
+	"consumed_airtime",
 	"correlation_ids",
 	"device_channel_index",
 	"payload",
@@ -189,6 +191,7 @@ var TxAcknowledgmentFieldPathsTopLevel = []string{
 var GatewayUplinkMessageFieldPathsNested = []string{
 	"band_id",
 	"message",
+	"message.consumed_airtime",
 	"message.correlation_ids",
 	"message.device_channel_index",
 	"message.payload",
@@ -269,6 +272,7 @@ var ApplicationUplinkFieldPathsNested = []string{
 	"app_s_key.kek_label",
 	"app_s_key.key",
 	"confirmed",
+	"consumed_airtime",
 	"decoded_payload",
 	"decoded_payload_warnings",
 	"f_cnt",
@@ -301,6 +305,7 @@ var ApplicationUplinkFieldPathsNested = []string{
 var ApplicationUplinkFieldPathsTopLevel = []string{
 	"app_s_key",
 	"confirmed",
+	"consumed_airtime",
 	"decoded_payload",
 	"decoded_payload_warnings",
 	"f_cnt",
@@ -554,6 +559,7 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.uplink_message.app_s_key.kek_label",
 	"up.uplink_message.app_s_key.key",
 	"up.uplink_message.confirmed",
+	"up.uplink_message.consumed_airtime",
 	"up.uplink_message.decoded_payload",
 	"up.uplink_message.decoded_payload_warnings",
 	"up.uplink_message.f_cnt",

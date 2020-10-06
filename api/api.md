@@ -3452,6 +3452,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `rx_delay` | [`RxDelay`](#ttn.lorawan.v3.RxDelay) |  |  |
 | `cf_list` | [`CFList`](#ttn.lorawan.v3.CFList) |  | Optional CFList. |
 | `correlation_ids` | [`string`](#string) | repeated |  |
+| `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the join request. Calculated by Network Server using the RawPayload size and the transmission settings. |
 
 #### Field Rules
 
@@ -5060,6 +5061,7 @@ Encodes and decodes uplink messages.
 | `app_s_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  | The AppSKey of the current session. This field is only present if the skip_payload_crypto field of the EndDevice is true. Can be used to decrypt uplink payloads and encrypt downlink payloads. |
 | `last_a_f_cnt_down` | [`uint32`](#uint32) |  | The last AFCntDown of the current session. This field is only present if the skip_payload_crypto field of the EndDevice is true. Can be used with app_s_key to encrypt downlink payloads. |
 | `confirmed` | [`bool`](#bool) |  |  |
+| `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings. |
 
 #### Field Rules
 
@@ -5158,6 +5160,7 @@ Uplink message from the end device to the network
 | `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Server time when a component received the message. The Gateway Server and Network Server set this value to their local server time of reception. |
 | `correlation_ids` | [`string`](#string) | repeated |  |
 | `device_channel_index` | [`uint32`](#uint32) |  | Index of the device channel that received the message. Set by Network Server. |
+| `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings. |
 
 #### Field Rules
 

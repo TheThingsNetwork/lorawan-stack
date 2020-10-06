@@ -14103,6 +14103,16 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "consumed_airtime",
+              "description": "Consumed airtime for the transmission of the join request. Calculated by Network Server using the RawPayload size and the transmission settings.",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -20868,6 +20878,16 @@
               "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "consumed_airtime",
+              "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings.",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -21244,6 +21264,16 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "consumed_airtime",
+              "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings.",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         }
