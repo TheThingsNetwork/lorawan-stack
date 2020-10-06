@@ -25,7 +25,7 @@ import style from './status.styl'
 
 const { Content } = EntityTitleSection
 
-const ApplicationStatus = React.memo(props => {
+const ApplicationStatus = props => {
   const { linked, lastSeen } = props
 
   const linkStatus = linked ? 'good' : 'bad'
@@ -34,13 +34,13 @@ const ApplicationStatus = React.memo(props => {
   if (linked && lastSeen) {
     return (
       <Status className={style.status} status={linkStatus} flipped>
-        <Content.lastSeen lastSeen={lastSeen} />
+        <Content.LastSeen lastSeen={lastSeen} />
       </Status>
     )
   }
 
   return <Status className={style.status} label={linkLabel} status={linkStatus} flipped />
-})
+}
 
 ApplicationStatus.propTypes = {
   lastSeen: PropTypes.string,
