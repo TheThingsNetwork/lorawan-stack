@@ -13,9 +13,8 @@
 // limitations under the License.
 
 .container
-  line-height: 1
-  height: $fs.m
   display: flex
+  align-items: flex-end
 
   &:not(:last-child)
     margin-right: $cs.l
@@ -35,6 +34,7 @@
     font-weight: $fw.bold
 
 .icon
+  nudge('up', 2px)
   color: $c-icon-fill
   margin-right: $cs.xs
 
