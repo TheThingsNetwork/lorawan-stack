@@ -27,8 +27,6 @@ import EntityTitleSection from '@console/components/entity-title-section'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import LastSeen from '../../components/entity-title-section/content/last-seen'
-
 import style from './device-title-section.styl'
 
 const m = defineMessages({
@@ -59,7 +57,7 @@ const DeviceTitleSection = props => {
           <>
             {showLastSeen ? (
               <Status status="good" flipped>
-                <LastSeen lastSeen={lastSeen} />
+                <Content.LastSeen lastSeen={lastSeen} />
               </Status>
             ) : (
               <Status status="mediocre" label={m.lastSeenUnavailable} flipped />
