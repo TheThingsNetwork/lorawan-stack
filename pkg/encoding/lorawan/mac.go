@@ -108,7 +108,6 @@ var DefaultMACCommands = MACCommandSpec{
 	ttnpb.CID_LINK_CHECK: &MACCommandDescriptor{
 		InitiatedByDevice: true,
 
-		UplinkLength: 0,
 		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
@@ -215,7 +214,6 @@ var DefaultMACCommands = MACCommandSpec{
 	ttnpb.CID_DUTY_CYCLE: &MACCommandDescriptor{
 		InitiatedByDevice: false,
 
-		UplinkLength: 0,
 		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
@@ -332,7 +330,6 @@ var DefaultMACCommands = MACCommandSpec{
 			return nil
 		}),
 
-		DownlinkLength: 0,
 		AppendDownlink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
@@ -406,7 +403,6 @@ var DefaultMACCommands = MACCommandSpec{
 	ttnpb.CID_RX_TIMING_SETUP: &MACCommandDescriptor{
 		InitiatedByDevice: false,
 
-		UplinkLength: 0,
 		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
@@ -434,7 +430,6 @@ var DefaultMACCommands = MACCommandSpec{
 	ttnpb.CID_TX_PARAM_SETUP: &MACCommandDescriptor{
 		InitiatedByDevice: false,
 
-		UplinkLength: 0,
 		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
@@ -560,7 +555,6 @@ var DefaultMACCommands = MACCommandSpec{
 	ttnpb.CID_ADR_PARAM_SETUP: &MACCommandDescriptor{
 		InitiatedByDevice: false,
 
-		UplinkLength: 0,
 		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
@@ -596,7 +590,6 @@ var DefaultMACCommands = MACCommandSpec{
 	ttnpb.CID_DEVICE_TIME: &MACCommandDescriptor{
 		InitiatedByDevice: true,
 
-		UplinkLength: 0,
 		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
@@ -742,7 +735,6 @@ var DefaultMACCommands = MACCommandSpec{
 			return nil
 		}),
 
-		DownlinkLength: 0,
 		AppendDownlink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
@@ -805,7 +797,6 @@ var DefaultMACCommands = MACCommandSpec{
 	ttnpb.CID_BEACON_TIMING: &MACCommandDescriptor{
 		InitiatedByDevice: true,
 
-		UplinkLength: 0,
 		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},

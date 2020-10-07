@@ -144,37 +144,6 @@ func txPowerStep(phy *band.Band, from, to uint8) float32 {
 	return phy.TxOffset[from] - phy.TxOffset[to]
 }
 
-func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.DataRateIndex, ok bool) {
-	i := 0
-	for {
-		if i >= len(chs) {
-			return 0, 0, false
-		}
-		if chs[i].EnableUplink {
-			break
-		}
-		i++
-	}
-
-	min = chs[i].MinDataRateIndex
-	max = chs[i].MaxDataRateIndex
-	for _, ch := range chs[i+1:] {
-		if !ch.EnableUplink {
-			continue
-		}
-		if ch.MaxDataRateIndex > max {
-			max = ch.MaxDataRateIndex
-		}
-		if ch.MinDataRateIndex < min {
-			min = ch.MinDataRateIndex
-		}
-	}
-	if min > max {
-		return 0, 0, false
-	}
-	return min, max, true
-}
-
 func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) error {
 	if len(dev.RecentADRUplinks) == 0 {
 		return nil

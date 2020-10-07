@@ -43,7 +43,6 @@ func TestNeedsBeaconTimingReq(t *testing.T) {
 		},
 	)
 	ForEachClass(t, func(makeClassName func(parts ...string) string, class ttnpb.Class) {
-		// TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
 		tcs = append(tcs,
 			TestCase{
 				Name: makeClassName("empty parameters"),
@@ -92,7 +91,7 @@ func TestHandleBeaconTimingReq(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
-						// TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
+						// TODO: Support BeaconTimingReq. (https://github.com/TheThingsNetwork/lorawan-stack/issues/2431)
 					},
 				},
 			},
@@ -114,7 +113,7 @@ func TestHandleBeaconTimingReq(t *testing.T) {
 						{},
 						{},
 						{},
-						// TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
+						// TODO: Support BeaconTimingReq. (https://github.com/TheThingsNetwork/lorawan-stack/issues/2431)
 					},
 				},
 			},

@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Decoded downlink payloads are stored now by Network Server.
 - Raw downlink PHY payloads are not stored anymore by Network Server.
 - Move documentation to [lorawan-stack-docs](https://github.com/TheThingsIndustries/lorawan-stack-docs).
+- Improve LinkADRReq scheduling condition computation and, as a consequence, downlink task efficiency.
 
 ### Deprecated
 
@@ -39,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Gateway ID usage in upstream connection.
 - Last seen counter for applications, end devices and gateways in the Console.
 - `Use credentials` option being always checked in Pub/Sub edit form in the Console.
+- FPending being set on downlinks, when LinkADRReq is required, but all available TxPower and data rate index combinations are rejected by the device.
 
 ### Security
 

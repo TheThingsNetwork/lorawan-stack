@@ -216,7 +216,7 @@ func MakeDefaultEU868MACState(class ttnpb.Class, macVersion ttnpb.MACVersion, ph
 	}
 }
 
-func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
+var DefaultUS915Channels = func() []*ttnpb.MACParameters_Channel {
 	var chs []*ttnpb.MACParameters_Channel
 	for i := 0; i < 64; i++ {
 		chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -237,6 +237,14 @@ func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParamet
 	for i := 0; i < 72; i++ {
 		chs[i].DownlinkFrequency = uint64(923300000 + 600000*(i%8))
 	}
+	return chs
+}()
+
+func MakeDefaultUS915CurrentChannels() []*ttnpb.MACParameters_Channel {
+	return deepcopy.Copy(DefaultUS915Channels[:]).([]*ttnpb.MACParameters_Channel)
+}
+
+func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
 	return ttnpb.MACParameters{
 		ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
 		ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
@@ -249,13 +257,13 @@ func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParamet
 		Rx1Delay:                   ttnpb.RX_DELAY_1,
 		Rx2DataRateIndex:           ttnpb.DATA_RATE_8,
 		Rx2Frequency:               923300000,
-		Channels:                   chs,
+		Channels:                   MakeDefaultUS915CurrentChannels(),
 	}
 }
 
-func MakeDefaultUS915FSB2DesiredMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
-	params := MakeDefaultUS915CurrentMACParameters(ver)
-	for _, ch := range params.Channels {
+func MakeDefaultUS915FSB2DesiredChannels() []*ttnpb.MACParameters_Channel {
+	chs := MakeDefaultUS915CurrentChannels()
+	for _, ch := range chs {
 		switch ch.UplinkFrequency {
 		case 903900000,
 			904100000,
@@ -265,10 +273,16 @@ func MakeDefaultUS915FSB2DesiredMACParameters(ver ttnpb.PHYVersion) ttnpb.MACPar
 			904900000,
 			905100000,
 			905300000:
-			continue
+		default:
+			ch.EnableUplink = false
 		}
-		ch.EnableUplink = false
 	}
+	return chs
+}
+
+func MakeDefaultUS915FSB2DesiredMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
+	params := MakeDefaultUS915CurrentMACParameters(ver)
+	params.Channels = MakeDefaultUS915FSB2DesiredChannels()
 	return params
 }
 

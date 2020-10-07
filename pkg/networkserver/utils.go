@@ -265,7 +265,7 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 		case mac.DeviceNeedsDutyCycleReq(dev):
 			logger.Debug("Device needs DutyCycleReq, choose class A downlink slot")
 			return classA, true
-		case mac.DeviceNeedsLinkADRReq(dev, defaults, phy):
+		case mac.DeviceNeedsLinkADRReq(ctx, dev, defaults, phy):
 			logger.Debug("Device needs LinkADRReq, choose class A downlink slot")
 			return classA, true
 		case mac.DeviceNeedsNewChannelReq(dev):
