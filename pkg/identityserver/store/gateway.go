@@ -122,12 +122,14 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 		}
 	},
 	lbsLNSSecretField: func(pb *ttnpb.Gateway, gtw *Gateway) {
-		blocks := bytes.SplitN(gtw.LBSLNSSecret, lbsLNSSecretSeparator, -1)
+		blocks := bytes.SplitN(gtw.LBSLNSSecret, lbsLNSSecretSeparator, 2)
 		if len(blocks) == 2 {
 			pb.LBSLNSSecret = &ttnpb.Secret{
 				KeyID: string(blocks[0]),
 				Value: blocks[1],
 			}
+		} else {
+			pb.LBSLNSSecret = nil
 		}
 	},
 }
@@ -186,6 +188,8 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 			secretBuffer.Write(lbsLNSSecretSeparator)
 			secretBuffer.Write(pb.LBSLNSSecret.Value)
 			gtw.LBSLNSSecret = secretBuffer.Bytes()
+		} else {
+			gtw.LBSLNSSecret = nil
 		}
 	},
 }

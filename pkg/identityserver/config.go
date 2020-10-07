@@ -79,7 +79,7 @@ type Config struct {
 	} `name:"email"`
 	Gateways struct {
 		EncryptionKeyID string `name:"encryption-key-id" description:"ID of the key used to encrypt gateway secrets at rest"`
-	}
+	} `name:"gateways"`
 }
 
 type emailTemplatesConfig struct {
