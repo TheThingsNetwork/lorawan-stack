@@ -15,207 +15,15 @@
 package oauth
 
 import (
-	"context"
-	"encoding/json"
 	"net/http"
 	"net/url"
-	"runtime/trace"
-	"time"
 
 	"github.com/gogo/protobuf/types"
 	echo "github.com/labstack/echo/v4"
 	osin "github.com/openshift/osin"
-	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/web/cookie"
 )
-
-const authCookieName = "_session"
-
-func (s *server) authCookie() *cookie.Cookie {
-	return &cookie.Cookie{
-		Name:     authCookieName,
-		Path:     "/",
-		HTTPOnly: true,
-	}
-}
-
-var errAuthCookie = errors.DefineUnauthenticated("auth_cookie", "could not get auth cookie")
-
-func (s *server) getAuthCookie(c echo.Context) (cookie auth.CookieShape, err error) {
-	ok, err := s.authCookie().Get(c.Response(), c.Request(), &cookie)
-	if err != nil {
-		return cookie, err
-	}
-	if !ok {
-		return cookie, errAuthCookie.New()
-	}
-	return cookie, nil
-}
-
-func (s *server) updateAuthCookie(c echo.Context, update func(value *auth.CookieShape) error) error {
-	cookie := &auth.CookieShape{}
-	_, err := s.authCookie().Get(c.Response(), c.Request(), cookie)
-	if err != nil {
-		return err
-	}
-	if err = update(cookie); err != nil {
-		return err
-	}
-	return s.authCookie().Set(c.Response(), c.Request(), cookie)
-}
-
-func (s *server) removeAuthCookie(c echo.Context) {
-	s.authCookie().Remove(c.Response(), c.Request())
-}
-
-const userSessionKey = "user_session"
-
-var errSessionExpired = errors.DefineUnauthenticated("session_expired", "session expired")
-
-func (s *server) getSession(c echo.Context) (*ttnpb.UserSession, error) {
-	existing := c.Get(userSessionKey)
-	if session, ok := existing.(*ttnpb.UserSession); ok {
-		return session, nil
-	}
-	cookie, err := s.getAuthCookie(c)
-	if err != nil {
-		return nil, err
-	}
-	session, err := s.store.GetSession(
-		c.Request().Context(),
-		&ttnpb.UserIdentifiers{UserID: cookie.UserID},
-		cookie.SessionID,
-	)
-	if err != nil {
-		return nil, err
-	}
-	if session.ExpiresAt != nil && session.ExpiresAt.Before(time.Now()) {
-		return nil, errSessionExpired.New()
-	}
-	c.Set(userSessionKey, session)
-	return session, nil
-}
-
-const userKey = "user"
-
-func (s *server) getUser(c echo.Context) (*ttnpb.User, error) {
-	existing := c.Get(userKey)
-	if user, ok := existing.(*ttnpb.User); ok {
-		return user, nil
-	}
-	session, err := s.getSession(c)
-	if err != nil {
-		return nil, err
-	}
-	user, err := s.store.GetUser(
-		c.Request().Context(),
-		&ttnpb.UserIdentifiers{UserID: session.UserIdentifiers.UserID},
-		nil,
-	)
-	if err != nil {
-		return nil, err
-	}
-	c.Set(userKey, user)
-	return user, nil
-}
-
-func (s *server) CurrentUser(c echo.Context) error {
-	session, err := s.getSession(c)
-	if err != nil {
-		return err
-	}
-	user, err := s.getUser(c)
-	if err != nil {
-		return err
-	}
-	safeUser := user.PublicSafe()
-	userJSON, _ := jsonpb.TTN().Marshal(safeUser)
-	return c.JSON(http.StatusOK, struct {
-		User       json.RawMessage `json:"user"`
-		LoggedInAt time.Time       `json:"logged_in_at"`
-	}{
-		User:       userJSON,
-		LoggedInAt: session.CreatedAt,
-	})
-}
-
-type loginRequest struct {
-	UserID   string `json:"user_id" form:"user_id"`
-	Password string `json:"password" form:"password"`
-}
-
-var errIncorrectPasswordOrUserID = errors.DefineInvalidArgument("no_user_id_password_match", "incorrect password or user ID")
-
-func (s *server) doLogin(ctx context.Context, userID, password string) error {
-	ids := &ttnpb.UserIdentifiers{UserID: userID}
-	if err := ids.ValidateContext(ctx); err != nil {
-		return err
-	}
-	user, err := s.store.GetUser(
-		ctx,
-		ids,
-		&types.FieldMask{Paths: []string{"password"}},
-	)
-	if err != nil {
-		if errors.IsNotFound(err) {
-			return errIncorrectPasswordOrUserID.New()
-		}
-		return err
-	}
-	region := trace.StartRegion(ctx, "validate password")
-	ok, err := auth.Validate(user.Password, password)
-	region.End()
-	if err != nil || !ok {
-		events.Publish(evtUserLoginFailed.NewWithIdentifiersAndData(ctx, user.UserIdentifiers, nil))
-		return errIncorrectPasswordOrUserID.New()
-	}
-	return nil
-}
-
-func (s *server) Login(c echo.Context) error {
-	ctx := c.Request().Context()
-	req := new(loginRequest)
-	if err := c.Bind(req); err != nil {
-		return err
-	}
-	if err := s.doLogin(ctx, req.UserID, req.Password); err != nil {
-		return err
-	}
-	if err := s.CreateUserSession(c, ttnpb.UserIdentifiers{UserID: req.UserID}); err != nil {
-		return err
-	}
-	return c.NoContent(http.StatusNoContent)
-}
-
-func (s *server) CreateUserSession(c echo.Context, userIDs ttnpb.UserIdentifiers) error {
-	ctx := c.Request().Context()
-	tokenSecret, err := auth.GenerateKey(ctx)
-	if err != nil {
-		return err
-	}
-	hashedSecret, err := auth.Hash(auth.NewContextWithHashValidator(ctx, tokenHashSettings), tokenSecret)
-	if err != nil {
-		return err
-	}
-	session, err := s.store.CreateSession(ctx, &ttnpb.UserSession{
-		UserIdentifiers: userIDs,
-		SessionSecret:   hashedSecret,
-	})
-	if err != nil {
-		return err
-	}
-	events.Publish(evtUserLogin.NewWithIdentifiersAndData(ctx, userIDs, nil))
-	return s.updateAuthCookie(c, func(cookie *auth.CookieShape) error {
-		cookie.UserID = session.UserIdentifiers.UserID
-		cookie.SessionID = session.SessionID
-		cookie.SessionSecret = tokenSecret
-		return nil
-	})
-}
 
 var (
 	errInvalidLogoutRedirectURI = errors.DefineInvalidArgument(
@@ -247,7 +55,7 @@ func (s *server) ClientLogout(c echo.Context) error {
 		if err = s.store.DeleteAccessToken(ctx, accessTokenID); err != nil {
 			return err
 		}
-		events.Publish(evtUserLogout.NewWithIdentifiersAndData(ctx, at.UserIDs, nil))
+		events.Publish(evtAccessTokenDeleted.NewWithIdentifiersAndData(ctx, at.UserIDs, nil))
 		err = s.store.DeleteSession(ctx, &at.UserIDs, at.UserSessionID)
 		if err != nil && !errors.IsNotFound(err) {
 			return err
@@ -269,34 +77,20 @@ func (s *server) ClientLogout(c echo.Context) error {
 			}
 		}
 	}
-	session, err := s.getSession(c)
+	session, err := s.session.Get(c)
 	if err != nil && !errors.IsUnauthenticated(err) && !errors.IsNotFound(err) {
 		return err
 	}
 	if session != nil {
-		events.Publish(evtUserLogout.NewWithIdentifiersAndData(ctx, session.UserIdentifiers, nil))
+		events.Publish(evtUserSessionTerminated.NewWithIdentifiersAndData(ctx, session.UserIdentifiers, nil))
 		if err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionID); err != nil {
 			return err
 		}
 	}
-	s.removeAuthCookie(c)
+	s.session.RemoveAuthCookie(c)
 	url, err := url.Parse(redirectURI)
 	if err != nil {
 		return err
 	}
 	return c.Redirect(http.StatusFound, url.String())
-}
-
-func (s *server) Logout(c echo.Context) error {
-	ctx := c.Request().Context()
-	session, err := s.getSession(c)
-	if err != nil {
-		return err
-	}
-	events.Publish(evtUserLogout.NewWithIdentifiersAndData(ctx, session.UserIdentifiers, nil))
-	if err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionID); err != nil {
-		return err
-	}
-	s.removeAuthCookie(c)
-	return c.NoContent(http.StatusNoContent)
 }

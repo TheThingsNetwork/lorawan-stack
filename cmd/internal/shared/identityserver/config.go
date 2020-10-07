@@ -28,15 +28,17 @@ import (
 var DefaultIdentityServerConfig = identityserver.Config{
 	DatabaseURI: "postgresql://root@localhost:26257/ttn_lorawan_dev?sslmode=disable",
 	OAuth: oauth.Config{
+		Mount: "/oauth",
 		UI: oauth.UIConfig{
 			TemplateData: webui.TemplateData{
 				SiteName:      "The Things Stack for LoRaWAN",
+				Title:         "Account",
 				Language:      "en",
 				CanonicalURL:  shared.DefaultOAuthPublicURL,
 				AssetsBaseURL: shared.DefaultAssetsBaseURL,
 				IconPrefix:    "oauth-",
-				CSSFiles:      []string{"oauth.css"},
-				JSFiles:       []string{"oauth.js"},
+				CSSFiles:      []string{"account.css"},
+				JSFiles:       []string{"account.js"},
 			},
 			FrontendConfig: oauth.FrontendConfig{
 				StackConfig: oauth.StackConfig{

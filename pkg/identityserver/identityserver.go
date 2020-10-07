@@ -20,6 +20,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres database driver.
+	"go.thethings.network/lorawan-stack/v3/pkg/account"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -46,6 +47,7 @@ type IdentityServer struct {
 	db             *gorm.DB
 	redis          *redis.Client
 	emailTemplates *email.TemplateRegistry
+	account        account.Server
 	oauth          oauth.Server
 }
 
@@ -106,10 +108,18 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		store.ClientStore
 		store.OAuthStore
 	}{
-		UserStore:        store.GetUserStore(is.db),
-		UserSessionStore: store.GetUserSessionStore(is.db),
 		ClientStore:      store.GetClientStore(is.db),
 		OAuthStore:       store.GetOAuthStore(is.db),
+		UserStore:        store.GetUserStore(is.db),
+		UserSessionStore: store.GetUserSessionStore(is.db),
+	}, is.config.OAuth)
+
+	is.account = account.NewServer(is.Context(), struct {
+		store.UserStore
+		store.UserSessionStore
+	}{
+		UserStore:        store.GetUserStore(is.db),
+		UserSessionStore: store.GetUserSessionStore(is.db),
 	}, is.config.OAuth)
 	if err != nil {
 		return nil, err
@@ -148,6 +158,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 
 	c.RegisterGRPC(is)
 	c.RegisterWeb(is.oauth)
+	c.RegisterWeb(is.account)
 
 	return is, nil
 }

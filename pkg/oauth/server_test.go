@@ -27,6 +27,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gorilla/securecookie"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
@@ -57,6 +58,7 @@ var (
 		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
 		SessionID:       "session_id",
 		CreatedAt:       time.Now().Truncate(time.Second),
+		SessionSecret:   "secret-1234",
 	}
 	mockUser = &ttnpb.User{
 		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
@@ -74,6 +76,8 @@ var (
 		UserSessionID: "session_id",
 	}
 )
+
+var authCookie *http.Cookie
 
 func init() {
 	ctx := test.Context()
@@ -93,6 +97,25 @@ func init() {
 		panic(err)
 	}
 	mockClient.Secret = secret
+
+	// Create session cookie
+	sc := securecookie.New(
+		[]byte("12345678123456781234567812345678"),
+		[]byte("12345678123456781234567812345678"),
+	)
+	authCookieContent := &auth.CookieShape{
+		UserID:        "user",
+		SessionID:     "session_id",
+		SessionSecret: "secret-1234",
+	}
+	encoded, _ := sc.Encode("_session", authCookieContent)
+	authCookie = &http.Cookie{
+		Name:     "_session",
+		Value:    encoded,
+		Path:     "/",
+		Secure:   true,
+		HttpOnly: true,
+	}
 }
 
 func TestOAuthFlow(t *testing.T) {
@@ -150,6 +173,7 @@ func TestOAuthFlow(t *testing.T) {
 		Name             string
 		StoreSetup       func(*mockStore)
 		StoreCheck       func(*testing.T, *mockStore)
+		UseCookie        *http.Cookie
 		Method           string
 		Path             string
 		Body             interface{}
@@ -158,114 +182,13 @@ func TestOAuthFlow(t *testing.T) {
 		ExpectedBody     string
 	}{
 		{
-			Method:           "GET",
-			Path:             "/oauth/",
-			ExpectedCode:     http.StatusFound,
-			ExpectedRedirect: "/oauth/login",
-		},
-		{
-			Method:           "GET",
-			Path:             "/oauth/authorize",
-			ExpectedCode:     http.StatusFound,
-			ExpectedRedirect: "/oauth/login",
-		},
-		{
-			Method:       "GET",
-			Path:         "/oauth/login",
-			ExpectedCode: http.StatusOK,
-			ExpectedBody: "The Things Network OAuth",
-		},
-		{
-			Name:         "GET me without auth",
-			Method:       "GET",
-			Path:         "/oauth/api/me",
-			ExpectedCode: http.StatusUnauthorized,
-		},
-		{
-			Name:         "logout without auth",
-			Method:       "POST",
-			Path:         "/oauth/api/auth/logout",
-			ExpectedCode: http.StatusUnauthorized,
-		},
-		{
-			StoreSetup: func(s *mockStore) {
-				s.err.getUser = mockErrUnauthenticated
-			},
-			Method:       "POST",
-			Path:         "/oauth/api/auth/login",
-			Body:         loginFormData{"json", "user", "pass"},
-			ExpectedCode: http.StatusUnauthorized,
-			StoreCheck: func(t *testing.T, s *mockStore) {
-				a := assertions.New(t)
-				a.So(s.calls, should.Contain, "GetUser")
-				if a.So(s.req.userIDs, should.NotBeNil) {
-					a.So(s.req.userIDs.UserID, should.Equal, "user")
-				}
-			},
-		},
-		{
-			Name: "login error",
-			StoreSetup: func(s *mockStore) {
-				s.err.getUser = mockErrUnauthenticated
-			},
-			Method:       "POST",
-			Path:         "/oauth/api/auth/login",
-			Body:         loginFormData{"form", "user", "pass"},
-			ExpectedCode: http.StatusUnauthorized,
-			StoreCheck: func(t *testing.T, s *mockStore) {
-				a := assertions.New(t)
-				a.So(s.calls, should.Contain, "GetUser")
-				if a.So(s.req.userIDs, should.NotBeNil) {
-					a.So(s.req.userIDs.UserID, should.Equal, "user")
-				}
-			},
-		},
-		{
-			Name: "login wrong password",
-			StoreSetup: func(s *mockStore) {
-				s.res.user = mockUser
-			},
-			Method:       "POST",
-			Path:         "/oauth/api/auth/login",
-			Body:         loginFormData{"json", "user", "wrong_pass"},
-			ExpectedCode: http.StatusBadRequest,
-		},
-		{
-			Name: "login",
-			StoreSetup: func(s *mockStore) {
-				s.res.user = mockUser
-				s.res.session = mockSession
-			},
-			Method:       "POST",
-			Path:         "/oauth/api/auth/login",
-			Body:         loginFormData{"json", "user", "pass"},
-			ExpectedCode: http.StatusNoContent,
-		},
-		{
-			Name: "GET me with auth",
-			StoreSetup: func(s *mockStore) {
-				s.res.session = mockSession
-				s.res.user = mockUser
-			},
-			Method:       "GET",
-			Path:         "/oauth/api/me",
-			ExpectedCode: http.StatusOK,
-			ExpectedBody: `"user_id":"user"`,
-			StoreCheck: func(t *testing.T, s *mockStore) {
-				a := assertions.New(t)
-				a.So(s.calls, should.Contain, "GetUser")
-				a.So(s.req.userIDs.GetUserID(), should.Equal, "user")
-				a.So(s.req.sessionID, should.Equal, "session_id") // actually the before-last call.
-			},
-		},
-		{
 			Name: "redirect to root",
 			StoreSetup: func(s *mockStore) {
 				s.res.session = mockSession
 				s.res.user = mockUser
 			},
 			Method:           "GET",
-			Path:             "/oauth/login",
+			Path:             "/oauth/authorize",
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "/oauth",
 		},
@@ -279,6 +202,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 			Method:       "GET",
 			Path:         "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			UseCookie:    authCookie,
 			ExpectedCode: http.StatusOK,
 			ExpectedBody: `"client":{"ids":{"client_id":"client"}`,
 			StoreCheck: func(t *testing.T, s *mockStore) {
@@ -298,6 +222,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 			Method:       "GET",
 			Path:         "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			UseCookie:    authCookie,
 			ExpectedCode: http.StatusNotFound,
 			ExpectedBody: `NotFound`,
 		},
@@ -316,6 +241,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 			Method:       "GET",
 			Path:         "/oauth/authorize?client_id=client&redirect_uri=http://other-uri/callback&response_type=code&state=foo",
+			UseCookie:    authCookie,
 			ExpectedCode: http.StatusForbidden,
 			ExpectedBody: `redirect URI`,
 		},
@@ -334,6 +260,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 			Method:           "GET",
 			Path:             "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			UseCookie:        authCookie,
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "http://uri/callback?error=invalid_client",
 		},
@@ -352,6 +279,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 			Method:           "GET",
 			Path:             "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			UseCookie:        authCookie,
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "http://uri/callback?error=invalid_client",
 		},
@@ -370,6 +298,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 			Method:           "GET",
 			Path:             "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			UseCookie:        authCookie,
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "http://uri/callback?error=invalid_client",
 		},
@@ -388,6 +317,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 			Method:           "GET",
 			Path:             "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
+			UseCookie:        authCookie,
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "http://uri/callback?error=invalid_grant",
 		},
@@ -402,6 +332,7 @@ func TestOAuthFlow(t *testing.T) {
 			Method:           "POST",
 			Path:             "/oauth/authorize?client_id=client&redirect_uri=http://uri/callback&response_type=code&state=foo",
 			Body:             authorizeFormData{encoding: "form", Authorize: true},
+			UseCookie:        authCookie,
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "http://uri/callback?code=",
 			StoreCheck: func(t *testing.T, s *mockStore) {
@@ -420,22 +351,6 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 		{
-			Name: "logout",
-			StoreSetup: func(s *mockStore) {
-				s.res.session = mockSession
-				s.res.user = mockUser
-			},
-			Method:       "POST",
-			Path:         "/oauth/api/auth/logout",
-			ExpectedCode: http.StatusNoContent,
-			StoreCheck: func(t *testing.T, s *mockStore) {
-				a := assertions.New(t)
-				a.So(s.calls, should.Contain, "DeleteSession")
-				a.So(s.req.userIDs.GetUserID(), should.Equal, "user")
-				a.So(s.req.sessionID, should.Equal, "session_id")
-			},
-		},
-		{
 			Name: "client-initiated logout",
 			StoreSetup: func(s *mockStore) {
 				s.res.session = mockSession
@@ -444,6 +359,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 			Method:           "GET",
 			Path:             "/oauth/logout?access_token_id=access-token-id&post_logout_redirect_uri=http://uri/alternative-logout-callback?foo=bar",
+			UseCookie:        authCookie,
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "/alternative-logout-callback?foo=bar",
 			StoreCheck: func(t *testing.T, s *mockStore) {
@@ -463,6 +379,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 			Method:           "GET",
 			Path:             "/oauth/logout?access_token_id=access-token-id&post_logout_redirect_uri=http://other-host/logout-callback?foo=bar",
+			UseCookie:        authCookie,
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "http://other-host/logout-callback?foo=bar",
 			StoreCheck: func(t *testing.T, s *mockStore) {
@@ -482,6 +399,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 			Method:           "GET",
 			Path:             "/oauth/logout?access_token_id=access-token-id",
+			UseCookie:        authCookie,
 			ExpectedCode:     http.StatusFound,
 			ExpectedRedirect: "/logout-callback",
 			StoreCheck: func(t *testing.T, s *mockStore) {
@@ -501,6 +419,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 			Method:       "GET",
 			Path:         "/oauth/logout?access_token_id=access-token-id&post_logout_redirect_uri=http://uri/false-callback",
+			UseCookie:    authCookie,
 			ExpectedCode: http.StatusBadRequest,
 			StoreCheck: func(t *testing.T, s *mockStore) {
 				a := assertions.New(t)
@@ -563,21 +482,12 @@ func TestOAuthFlow(t *testing.T) {
 				req.AddCookie(c)
 			}
 
+			if tt.UseCookie != nil {
+				req.AddCookie(tt.UseCookie)
+			}
+
 			var contentType string
 			switch b := tt.Body.(type) {
-			case loginFormData:
-				if b.encoding == "json" {
-					json, _ := json.Marshal(b)
-					body = bytes.NewBuffer(json)
-					contentType = "application/json"
-				}
-				if b.encoding == "form" {
-					body = bytes.NewBuffer([]byte(url.Values{
-						"user_id":  []string{b.UserID},
-						"password": []string{b.Password},
-					}.Encode()))
-					contentType = "application/x-www-form-urlencoded"
-				}
 			case authorizeFormData:
 				if b.encoding == "json" {
 					json, _ := json.Marshal(b)
