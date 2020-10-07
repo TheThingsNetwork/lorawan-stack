@@ -50,7 +50,6 @@ type mockStoreContents struct {
 	}
 	err struct {
 		getUser                 error
-		createSession           error
 		getSession              error
 		deleteSession           error
 		getClient               error
@@ -87,12 +86,6 @@ func (s *mockStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fiel
 	s.req.ctx, s.req.userIDs, s.req.fieldMask = ctx, id, fieldMask
 	s.calls = append(s.calls, "GetUser")
 	return s.res.user, s.err.getUser
-}
-
-func (s *mockStore) CreateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error) {
-	s.req.ctx, s.req.session = ctx, sess
-	s.calls = append(s.calls, "CreateSession")
-	return s.res.session, s.err.createSession
 }
 
 func (s *mockStore) GetSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) (*ttnpb.UserSession, error) {

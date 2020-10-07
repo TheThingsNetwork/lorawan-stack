@@ -182,11 +182,11 @@ var startCommand = &cobra.Command{
 			if config.Cache.Service == "redis" {
 				is.SetRedisCache(redis.New(config.Cache.Redis.WithNamespace("is", "cache")))
 			}
-			if oauthMount := config.IS.OAuth.UI.MountPath(); oauthMount != "/" {
-				if !strings.HasSuffix(oauthMount, "/") {
-					oauthMount += "/"
+			if accountAppMount := config.IS.OAuth.UI.MountPath(); accountAppMount != "/" {
+				if !strings.HasSuffix(accountAppMount, "/") {
+					accountAppMount += "/"
 				}
-				rootRedirect = web.Redirect("/", http.StatusFound, oauthMount)
+				rootRedirect = web.Redirect("/", http.StatusFound, accountAppMount)
 			}
 		}
 
