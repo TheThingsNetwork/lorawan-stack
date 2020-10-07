@@ -18,7 +18,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
-// UIConfig is the combined configuration for the OAuth UI.
+// UIConfig is the combined configuration for the OAuth and Account UI.
 type UIConfig struct {
 	webui.TemplateData `name:",squash"`
 	FrontendConfig     `name:",squash"`
@@ -37,7 +37,7 @@ type FrontendConfig struct {
 
 // Config is the configuration for the OAuth server.
 type Config struct {
-	Mount       string   `name:"mount" description:"Path on the server where the OAuth server will be served"`
+	Mount       string   `name:"mount" description:"Path on the server where the Account application and OAuth services will be served"`
 	UI          UIConfig `name:"ui"`
 	CSRFAuthKey []byte   `name:"-"`
 }

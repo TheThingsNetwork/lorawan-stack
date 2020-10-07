@@ -22,6 +22,7 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/openshift/osin"
+	"go.thethings.network/lorawan-stack/v3/pkg/account/session"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	web_errors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
@@ -36,9 +37,6 @@ import (
 type Server interface {
 	web.Registerer
 
-	Login(c echo.Context) error
-	CurrentUser(c echo.Context) error
-	Logout(c echo.Context) error
 	Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc
 	Token(c echo.Context) error
 }
@@ -48,6 +46,7 @@ type server struct {
 	config     Config
 	osinConfig *osin.ServerConfig
 	store      Store
+	session    session.Session
 }
 
 // Store used by the OAuth server.
@@ -64,9 +63,10 @@ type Store interface {
 // NewServer returns a new OAuth server on top of the given store.
 func NewServer(c *component.Component, store Store, config Config) (Server, error) {
 	s := &server{
-		c:      c,
-		config: config,
-		store:  store,
+		c:       c,
+		config:  config,
+		store:   store,
+		session: session.Session{Store: store},
 	}
 
 	if s.config.Mount == "" {
@@ -223,18 +223,14 @@ func (s *server) RegisterRoutes(server *web.Server) {
 
 	csrfMiddleware := middleware.CSRF("_csrf", "/", s.config.CSRFAuthKey)
 
-	api := root.Group("/api", csrfMiddleware)
-	api.POST("/auth/login", s.Login)
-	api.POST("/auth/logout", s.Logout, s.requireLogin)
-	api.GET("/me", s.CurrentUser, s.requireLogin)
-
 	page := root.Group("", csrfMiddleware)
-	page.GET("/login", webui.Template.Handler, s.redirectToNext)
+
+	// The logout route is currently in use by existing OAuth clients. As part of
+	// the public API it should not be removed in this major.
 	page.GET("/logout", s.ClientLogout)
+
 	page.GET("/authorize", s.Authorize(webui.Template.Handler), s.redirectToLogin)
 	page.POST("/authorize", s.Authorize(webui.Template.Handler), s.redirectToLogin)
-	page.GET("/", webui.Template.Handler, s.redirectToLogin)
-	page.GET("/*", webui.Template.Handler)
 
 	root.GET("/local-callback", s.redirectToLocal)
 
