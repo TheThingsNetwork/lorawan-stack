@@ -36,6 +36,7 @@
 /pkg/types @johanstokking @htdvisser @rvolosatovs
 /pkg/webui @bafonins @kschiffer @pgalic96
 /pkg/oauth @htdvisser @bafonins @kschiffer
+/pkg/basicstation @KrishnaIyer @htdvisser
 
 # Subsystems
 /pkg/applicationserver @johanstokking @adriansmares @KrishnaIyer
