@@ -57,8 +57,10 @@ export const mapNatsFormValues = function(nats) {
   }
 }
 
-export const mapMqttFormValues = function(mqtt) {
-  return merge({ _use_credentials: Boolean(mqtt.username || mqtt.password) }, mqttBlankValues, mqtt)
+export const mapMqttFormValues = mqtt => {
+  return merge({}, mqttBlankValues, mqtt, {
+    _use_credentials: Boolean(mqtt.username || mqtt.password),
+  })
 }
 
 const mapPubsubMessageTypeToFormValue = messageType =>
