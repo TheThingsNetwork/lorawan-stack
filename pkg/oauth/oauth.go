@@ -75,7 +75,7 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 		if req.Method != http.MethodGet && req.Method != http.MethodPost {
 			return c.NoContent(http.StatusMethodNotAllowed)
 		}
-		session, err := s.getSession(c)
+		session, err := s.session.Get(c)
 		if err != nil {
 			return err
 		}
@@ -137,7 +137,7 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 			case http.MethodGet:
 				safeClient := client.PublicSafe()
 				clientJSON, _ := jsonpb.TTN().Marshal(safeClient)
-				user, err := s.getUser(c)
+				user, err := s.session.GetUser(c)
 				if err != nil {
 					return err
 				}
@@ -218,7 +218,7 @@ func (s *server) Token(c echo.Context) error {
 		ar.Authorized = clientHasGrant(&client, ttnpb.GRANT_REFRESH_TOKEN)
 	case osin.PASSWORD:
 		if clientHasGrant(&client, ttnpb.GRANT_PASSWORD) {
-			if err := s.doLogin(req.Context(), ar.Username, ar.Password); err != nil {
+			if err := s.session.DoLogin(req.Context(), ar.Username, ar.Password); err != nil {
 				return err
 			}
 			ar.Authorized = true
