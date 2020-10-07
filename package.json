@@ -151,7 +151,7 @@
       "\\.(css|styl|less|sass)$": "identity-obj-proxy",
       "^\\@ttn-lw(.*)": "<rootDir>/pkg/webui$1",
       "^\\@console(.*)": "<rootDir>/pkg/webui/console$1",
-      "^\\@oauth(.*)": "<rootDir>/pkg/webui/oauth$1",
+      "^\\@account(.*)": "<rootDir>/pkg/webui/account$1",
       "^\\@assets(.*)": "<rootDir>/pkg/webui/assets$1"
     }
   },

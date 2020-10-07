@@ -1,0 +1,74 @@
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.full-height-center
+  height: 100%
+  display: flex
+  justify-content: center
+  align-items: center
+  padding: $ls.xs 0
+  +media-query($bp.s)
+    height: auto
+
+  & > div
+    nudge('up', 4%)
+    nudge('left', 2%)
+    display: flex
+    justify-content: center
+    align-items: center
+    box-sizing: border-box
+    +media-query($bp.s)
+      width: 100%
+      flex-direction: column
+      top: 0
+      left: 0
+      padding: 0 $ls.xxs
+
+.left
+  border-normal('right')
+  flex: 0 1 0
+  width: 12rem
+  display: flex
+  align-items: center
+  padding-right: $ls.l
+  text-align: center
+
+  +media-query($bp.s)
+    border-right: none
+    padding-right: 0
+    padding-bottom: $ls.s
+    border-normal('bottom')
+
+  & > div > span
+    one-liner()
+
+.logo img
+  width: 100%
+
+.right
+  padding-left: $ls.l
+  padding-top: $ls.xs
+  padding-bottom: $ls.xs
+  width: 330px
+
+  +media-query($bp.s)
+    padding-left: 0
+    width: 100%
+
+  h1
+    margin-bottom: $ls.m
+    line-height: 1
+
+    +media-query($bp.s)
+      text-align: center

@@ -108,7 +108,7 @@ export default {
       all: {
         '@ttn-lw': path.resolve(context, 'pkg/webui'),
         '@console': path.resolve(context, 'pkg/webui/console'),
-        '@oauth': path.resolve(context, 'pkg/webui/oauth'),
+        '@account': path.resolve(context, 'pkg/webui/account'),
         '@assets': path.resolve(context, 'pkg/webui/assets'),
       },
       development: {
@@ -125,7 +125,7 @@ export default {
     publicPath: `${ASSETS_ROOT}/`,
     proxy: [
       {
-        context: ['/console', '/oauth', '/api'],
+        context: ['/console', '/account', '/api'],
         target: WEBPACK_DEV_SERVER_USE_TLS ? 'https://localhost:8885' : 'http://localhost:1885',
         changeOrigin: true,
         secure: false,
@@ -144,7 +144,7 @@ export default {
   },
   entry: {
     console: ['./config/root.js', './pkg/webui/console.js'],
-    oauth: ['./config/root.js', './pkg/webui/oauth.js'],
+    account: ['./config/root.js', './pkg/webui/account.js'],
   },
   output: {
     filename: production ? '[name].[chunkhash].js' : '[name].js',

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,32 +15,29 @@
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 
-import Link from '@ttn-lw/components/link'
-import Footer from '@ttn-lw/components/footer'
+import Link from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
 import { withEnv } from '@ttn-lw/lib/components/env'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
-import errorMessages from '@ttn-lw/lib/errors/error-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import errorMessages from '@ttn-lw/lib/errors/error-messages'
 import {
   httpStatusCode,
   isUnknown as isUnknownError,
   isNotFoundError,
-  isFrontend as isFrontendError,
 } from '@ttn-lw/lib/errors/utils'
 import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './error.styl'
+import style from './full-view.styl'
 
-const FullViewErrorInner = function({ error, env }) {
+const FullViewError = function({ error, env }) {
   const isUnknown = isUnknownError(error)
   const statusCode = httpStatusCode(error)
   const isNotFound = isNotFoundError(error)
-  const isFrontend = isFrontendError(error)
 
   let errorTitleMessage = errorMessages.unknownErrorTitle
   let errorMessageMessage = errorMessages.contactAdministrator
@@ -52,27 +49,12 @@ const FullViewErrorInner = function({ error, env }) {
   if (statusCode) {
     errorTitleMessage = statusCodeMessages[statusCode]
   }
-  if (isFrontend) {
-    errorMessageMessage = error.errorMessage
-    if (Boolean(error.errorTitle)) {
-      errorTitleMessage = error.errorTitle
-    }
-  }
-
-  let action = undefined
-  if (isNotFound) {
-    action = (
-      <Link.Anchor icon="keyboard_arrow_left" href={env.appRoot} primary>
-        <Message content={sharedMessages.backToOverview} />
-      </Link.Anchor>
-    )
-  }
 
   return (
     <div className={style.fullViewError} data-test-id="full-error-view">
       <Container>
         <Row>
-          <Col md={6} sm={12}>
+          <Col sm={12} md={6}>
             <IntlHelmet title={errorMessages.error} />
             <Message
               className={style.fullViewErrorHeader}
@@ -80,7 +62,11 @@ const FullViewErrorInner = function({ error, env }) {
               content={errorTitleMessage}
             />
             <ErrorMessage className={style.fullViewErrorSub} content={errorMessageMessage} />
-            {action}
+            {isNotFoundError(error) && (
+              <Link.Anchor icon="keyboard_arrow_left" href={env.appRoot} primary>
+                <Message content={sharedMessages.backToOverview} />
+              </Link.Anchor>
+            )}
           </Col>
         </Row>
       </Container>
@@ -88,36 +74,9 @@ const FullViewErrorInner = function({ error, env }) {
   )
 }
 
-const FullViewErrorInnerWithEnv = withEnv(FullViewErrorInner)
-
-const FullViewError = function({ error, header: Header }) {
-  return (
-    <div className={style.wrapper}>
-      {Boolean(Header) && <Header className={style.header} anchored />}
-      <div className={style.flexWrapper}>
-        <FullViewErrorInnerWithEnv error={error} />
-      </div>
-      <Footer />
-    </div>
-  )
-}
-
-FullViewErrorInner.propTypes = {
-  env: PropTypes.env,
-  error: PropTypes.error.isRequired,
-}
-
 FullViewError.propTypes = {
+  env: PropTypes.env.isRequired,
   error: PropTypes.error.isRequired,
-  header: PropTypes.node,
 }
 
-FullViewError.defaultProps = {
-  header: undefined,
-}
-
-FullViewErrorInner.defaultProps = {
-  env: undefined,
-}
-
-export { FullViewError as default, FullViewErrorInnerWithEnv as FullViewErrorInner }
+export default withEnv(FullViewError)

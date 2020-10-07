@@ -53,10 +53,10 @@ rules:
       - index
       newlines-between: always
       pathGroups:
-      - pattern: "\\@{ttn-lw,console,oauth}/constants"
+      - pattern: "\\@{ttn-lw,console,account}/constants"
         group: internal
         position: after
-      - pattern: "\\@{console,oauth}/api"
+      - pattern: "\\@{console,account}/api"
         group: internal
         position: after
       - pattern: "\\@ttn-lw/components/**"
@@ -68,34 +68,34 @@ rules:
       - pattern: "\\@ttn-lw/lib/components/**"
         group: internal
         position: after
-      - pattern: "\\@{console,oauth}/components/**"
+      - pattern: "\\@{console,account}/components/**"
         group: internal
         position: after
-      - pattern: "\\@{console,oauth}/containers/**"
+      - pattern: "\\@{console,account}/containers/**"
         group: internal
         position: after
-      - pattern: "\\@{console,oauth}/lib/components/**"
+      - pattern: "\\@{console,account}/lib/components/**"
         group: internal
         position: after
-      - pattern: "\\@{console,oauth}/views/**"
+      - pattern: "\\@{console,account}/views/**"
         group: internal
         position: after
       - pattern: "\\@ttn-lw/lib/**"
         group: internal
         position: after
-      - pattern: "\\@{console,oauth}/lib/**"
+      - pattern: "\\@{console,account}/lib/**"
         group: internal
         position: after
-      - pattern: "\\@{console,oauth}/store/actions/**"
+      - pattern: "\\@{console,account}/store/actions/**"
         group: internal
         position: after
-      - pattern: "\\@{console,oauth}/store/reducers/**"
+      - pattern: "\\@{console,account}/store/reducers/**"
         group: internal
         position: after
-      - pattern: "\\@{console,oauth}/store/selectors/**"
+      - pattern: "\\@{console,account}/store/selectors/**"
         group: internal
         position: after
-      - pattern: "\\@{console,oauth}/store/middleware/**"
+      - pattern: "\\@{console,account}/store/middleware/**"
         group: internal
         position: after
       - pattern: "(\\@assets/**|\\@ttn-lw/styles/**)"
