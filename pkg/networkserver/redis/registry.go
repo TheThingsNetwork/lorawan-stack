@@ -25,6 +25,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/blang/semver"
 	"github.com/go-redis/redis/v7"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/oklog/ulid/v2"
@@ -58,6 +59,8 @@ const (
 type DeviceRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
+	// CompatibilityVersion denotes the lowest possible stack version the registry should be compatible with.
+	CompatibiltyVersion semver.Version
 
 	entropyMu *sync.Mutex
 	entropy   io.Reader
@@ -892,6 +895,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 
 			var delFields []string
 			var setFields []interface{}
+			forceFieldWrite := r.CompatibiltyVersion.Compare(semver.Version{Major: 3, Minor: 10}) < 0
 
 			// NOTE: The following sequence of switches use concept of "container" - a container is the pointer type "containing" the field value we're interested in.
 
@@ -899,7 +903,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			case storedCont == nil && updatedCont == nil:
 			case updatedCont == nil:
 				delFields = append(delFields, "mac_settings.resets_f_cnt")
-			case storedCont == nil, storedCont.Value != updatedCont.Value:
+			case storedCont == nil, storedCont.Value != updatedCont.Value, forceFieldWrite:
 				setFields = append(setFields, "mac_settings.resets_f_cnt", encodeBool(updatedCont.Value))
 			}
 
@@ -907,7 +911,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			case storedCont == nil && updatedCont == nil:
 			case updatedCont == nil:
 				delFields = append(delFields, "mac_state.lorawan_version")
-			case storedCont == nil, storedCont.LoRaWANVersion != updatedCont.LoRaWANVersion:
+			case storedCont == nil, storedCont.LoRaWANVersion != updatedCont.LoRaWANVersion, forceFieldWrite:
 				setFields = append(setFields, "mac_state.lorawan_version", updatedCont.LoRaWANVersion)
 			}
 
@@ -915,7 +919,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			case storedCont == nil && updatedCont == nil:
 			case updatedCont == nil:
 				delFields = append(delFields, "pending_mac_state.lorawan_version")
-			case storedCont == nil, storedCont.LoRaWANVersion != updatedCont.LoRaWANVersion:
+			case storedCont == nil, storedCont.LoRaWANVersion != updatedCont.LoRaWANVersion, forceFieldWrite:
 				setFields = append(setFields, "pending_mac_state.lorawan_version", updatedCont.LoRaWANVersion)
 			}
 
@@ -924,17 +928,17 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			case updatedCont == nil:
 				delFields = append(delFields, "pending_session.keys.f_nwk_s_int_key.kek_label")
 				delFields = append(delFields, "pending_session.keys.f_nwk_s_int_key.encrypted_key")
-			case storedCont == nil, !bytes.Equal(storedCont.EncryptedKey, updatedCont.EncryptedKey):
+			case storedCont == nil, !bytes.Equal(storedCont.EncryptedKey, updatedCont.EncryptedKey), forceFieldWrite:
 				setFields = append(setFields, "pending_session.keys.f_nwk_s_int_key.encrypted_key", updatedCont.EncryptedKey)
 				fallthrough
-			case storedCont == nil, storedCont.KEKLabel != updatedCont.KEKLabel:
+			case storedCont == nil, storedCont.KEKLabel != updatedCont.KEKLabel, forceFieldWrite:
 				setFields = append(setFields, "pending_session.keys.f_nwk_s_int_key.kek_label", updatedCont.KEKLabel)
 			}
 			switch storedCont, updatedCont := stored.GetPendingSession().GetSessionKeys().GetFNwkSIntKey().GetKey(), updated.GetPendingSession().GetSessionKeys().GetFNwkSIntKey().GetKey(); {
 			case storedCont == nil && updatedCont == nil:
 			case updatedCont == nil:
 				delFields = append(delFields, "pending_session.keys.f_nwk_s_int_key.key")
-			case storedCont == nil, !storedCont.Equal(*updatedCont):
+			case storedCont == nil, !storedCont.Equal(*updatedCont), forceFieldWrite:
 				setFields = append(setFields, "pending_session.keys.f_nwk_s_int_key.key", *updatedCont)
 			}
 
@@ -943,10 +947,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			case updatedCont == nil:
 				delFields = append(delFields, "session.keys.f_nwk_s_int_key.kek_label")
 				delFields = append(delFields, "session.keys.f_nwk_s_int_key.encrypted_key")
-			case storedCont == nil, !bytes.Equal(storedCont.EncryptedKey, updatedCont.EncryptedKey):
+			case storedCont == nil, !bytes.Equal(storedCont.EncryptedKey, updatedCont.EncryptedKey), forceFieldWrite:
 				setFields = append(setFields, "session.keys.f_nwk_s_int_key.encrypted_key", updatedCont.EncryptedKey)
 				fallthrough
-			case storedCont == nil, storedCont.KEKLabel != updatedCont.KEKLabel:
+			case storedCont == nil, storedCont.KEKLabel != updatedCont.KEKLabel, forceFieldWrite:
 				setFields = append(setFields, "session.keys.f_nwk_s_int_key.kek_label", updatedCont.KEKLabel)
 			}
 			switch storedCont, updatedCont := stored.GetSession().GetSessionKeys().GetFNwkSIntKey().GetKey(), updated.GetSession().GetSessionKeys().GetFNwkSIntKey().GetKey(); {
@@ -961,7 +965,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			case storedCont == nil && updatedCont == nil:
 			case updatedCont == nil:
 				delFields = append(delFields, "session.last_f_cnt_up")
-			case storedCont == nil, storedCont.LastFCntUp != updatedCont.LastFCntUp:
+			case storedCont == nil, storedCont.LastFCntUp != updatedCont.LastFCntUp, forceFieldWrite:
 				setFields = append(setFields, "session.last_f_cnt_up", updatedCont.LastFCntUp)
 			}
 
