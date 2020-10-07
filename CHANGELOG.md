@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for setting the frame counter width of an end device in the Console.
 - Include consumed airtime metadata in uplink messages and join requests (see `uplink_message.consumed_airtime` field).
 - Store and retrieve LBS LNS Secrets from database.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added column.
 
 ### Changed
 
