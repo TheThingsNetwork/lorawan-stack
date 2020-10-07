@@ -334,22 +334,47 @@ func TestGatewaysSecrets(t *testing.T) {
 
 		is.config.UserRights.CreateGateways = true
 
-		_, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+		// Plaintext
+		euiWithoutEncKey := types.EUI64{0x22, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}
+		gatewayIDWithoutEncKey := "foo-without-encryption-key"
+		gatewayNameWithoutEncKey := "Foo Gateway without encryption key"
+
+		created, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-					GatewayID: gatewayID,
-					EUI:       &eui,
+					GatewayID: gatewayIDWithoutEncKey,
+					EUI:       &euiWithoutEncKey,
 				},
-				Name:         gatewayName,
+				Name:         gatewayNameWithoutEncKey,
 				LBSLNSSecret: secret,
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),
 		}, creds)
-		a.So(errors.IsNotFound(err), should.BeTrue)
 
+		a.So(err, should.BeNil)
+		if a.So(created, should.NotBeNil) {
+			a.So(created.Name, should.Equal, gatewayNameWithoutEncKey)
+			a.So(created.LBSLNSSecret, should.NotBeNil)
+		}
+
+		got, err := reg.Get(ctx, &ttnpb.GetGatewayRequest{
+			GatewayIdentifiers: created.GatewayIdentifiers,
+			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret"}},
+		}, creds)
+
+		a.So(err, should.BeNil)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.Name, should.Equal, created.Name)
+			if a.So(got.EUI, should.NotBeNil) {
+				a.So(*got.EUI, should.Equal, euiWithoutEncKey)
+			}
+			a.So(got.LBSLNSSecret.Value, should.Resemble, secret.Value)
+		}
+
+		// With Encryption Key
 		is.config.Gateways.EncryptionKeyID = "is-test"
 
-		created, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+		created, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 					GatewayID: gatewayID,
@@ -367,7 +392,7 @@ func TestGatewaysSecrets(t *testing.T) {
 			a.So(created.LBSLNSSecret, should.NotBeNil)
 		}
 
-		got, err := reg.Get(ctx, &ttnpb.GetGatewayRequest{
+		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
 			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret"}},
 		}, creds)

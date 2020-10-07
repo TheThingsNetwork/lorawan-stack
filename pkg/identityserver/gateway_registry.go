@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -79,15 +80,18 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	}
 
 	if req.LBSLNSSecret != nil {
-		if is.config.Gateways.EncryptionKeyID == "" {
-			return nil, errGatewaySecretEncryptionKey
+		value := req.LBSLNSSecret.Value
+		if is.config.Gateways.EncryptionKeyID != "" {
+			value, err = is.KeyVault.Encrypt(ctx, req.LBSLNSSecret.Value, is.config.Gateways.EncryptionKeyID)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			logger := log.FromContext(ctx)
+			logger.Warn("No encryption key defined, storing as plaintext")
 		}
-		encrypted, err := is.KeyVault.Encrypt(ctx, req.LBSLNSSecret.Value, is.config.Gateways.EncryptionKeyID)
-		if err != nil {
-			return nil, err
-		}
+		req.LBSLNSSecret.Value = value
 		req.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
-		req.LBSLNSSecret.Value = encrypted
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
@@ -175,14 +179,18 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	}
 
 	if gtw.LBSLNSSecret != nil {
-		if gtw.LBSLNSSecret.KeyID == "" {
-			return nil, errGatewaySecretEncryptionKey.WithAttributes("id", gtw.LBSLNSSecret.KeyID)
+		value := gtw.LBSLNSSecret.Value
+		if gtw.LBSLNSSecret.KeyID != "" {
+			value, err = is.KeyVault.Decrypt(ctx, gtw.LBSLNSSecret.Value, gtw.LBSLNSSecret.KeyID)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			logger := log.FromContext(ctx)
+			logger.Warn("No encryption key defined, returning stored value")
 		}
-		decrypted, err := is.KeyVault.Decrypt(ctx, gtw.LBSLNSSecret.Value, gtw.LBSLNSSecret.KeyID)
-		if err != nil {
-			return nil, err
-		}
-		gtw.LBSLNSSecret.Value = decrypted
+		gtw.LBSLNSSecret.Value = value
+		gtw.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
 	}
 
 	// Backwards compatibility for frequency_plan_id field.
@@ -287,17 +295,23 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			gtws.Gateways[i] = gtw.PublicSafe()
 		}
 
-		if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
-			gtws.Gateways[i].LBSLNSSecret = nil
-		} else if gtw.LBSLNSSecret != nil {
-			if gtw.LBSLNSSecret.KeyID == "" {
-				return nil, errGatewaySecretEncryptionKey.WithAttributes("id", gtw.LBSLNSSecret.KeyID)
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "lbs_lns_secret") {
+			if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
+				gtws.Gateways[i].LBSLNSSecret = nil
+			} else if gtws.Gateways[i].LBSLNSSecret != nil {
+				value := gtws.Gateways[i].LBSLNSSecret.Value
+				if gtws.Gateways[i].LBSLNSSecret.KeyID != "" {
+					value, err = is.KeyVault.Decrypt(ctx, gtws.Gateways[i].LBSLNSSecret.Value, gtws.Gateways[i].LBSLNSSecret.KeyID)
+					if err != nil {
+						return nil, err
+					}
+				} else {
+					logger := log.FromContext(ctx)
+					logger.Warn("No encryption key defined, returning stored value")
+				}
+				gtws.Gateways[i].LBSLNSSecret.Value = value
+				gtws.Gateways[i].LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
 			}
-			decrypted, err := is.KeyVault.Decrypt(ctx, gtw.LBSLNSSecret.Value, gtw.LBSLNSSecret.KeyID)
-			if err != nil {
-				return nil, err
-			}
-			gtws.Gateways[i].LBSLNSSecret.Value = decrypted
 		}
 	}
 
@@ -328,19 +342,24 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 			return nil, err
 		}
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "lbs_lns_secret") && req.LBSLNSSecret != nil {
-		if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
+
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "lbs_lns_secret") {
+		if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
 			return nil, err
+		} else if req.LBSLNSSecret != nil {
+			value := req.LBSLNSSecret.Value
+			if is.config.Gateways.EncryptionKeyID != "" {
+				value, err = is.KeyVault.Encrypt(ctx, req.LBSLNSSecret.Value, is.config.Gateways.EncryptionKeyID)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				logger := log.FromContext(ctx)
+				logger.Warn("No encryption key defined, storing as plaintext")
+			}
+			req.LBSLNSSecret.Value = value
+			req.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
 		}
-		if is.config.Gateways.EncryptionKeyID == "" {
-			return nil, errGatewaySecretEncryptionKey
-		}
-		encrypted, err := is.KeyVault.Encrypt(ctx, req.LBSLNSSecret.Value, is.config.Gateways.EncryptionKeyID)
-		if err != nil {
-			return nil, err
-		}
-		req.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
-		req.LBSLNSSecret.Value = encrypted
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
