@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - RSSI metadata for MQTT gateways connected with The Things Network Stack V2 protocol.
 - Gateway ID usage in upstream connection.
 - Last seen counter for applications, end devices and gateways in the Console.
+- `Use credentials` option being always checked in Pub/Sub edit form in the Console.
 
 ### Security
 
@@ -49,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Display the full event object when expanded in the Console (used to be `event.data` only).
 
 ### Fixed
+
 - Performance issues of event views in the Console (freezing after some time).
 - Gateway Server panic on upstream message handling.
 - Incorrect redirects for restricted routes in the Console.
