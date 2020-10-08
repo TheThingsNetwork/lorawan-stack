@@ -1163,6 +1163,121 @@
         ]
       }
     },
+    "/as/applications/{application_ids.application_id}/packages/storage/{type}": {
+      "get": {
+        "operationId": "ApplicationUpStorage_GetStoredApplicationUp2",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/v3ApplicationUp"
+                },
+                "error": {
+                  "$ref": "#/definitions/runtimeStreamError"
+                }
+              },
+              "title": "Stream result of v3ApplicationUp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "description": "Query upstream messages of a specific type. If not set, then all upstream messages are returned.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "end_device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "end_device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "limit",
+            "description": "Limit number of results.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "Query upstream messages after this timestamp only.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "before",
+            "description": "Query upstream messages before this timestamp only.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "f_port",
+            "description": "Query uplinks on a specific FPort only.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order",
+            "description": "Order results.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationUpStorage"
+        ]
+      }
+    },
     "/as/applications/{application_id}/link": {
       "delete": {
         "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
@@ -1655,6 +1770,121 @@
         ],
         "tags": [
           "ApplicationPackageRegistry"
+        ]
+      }
+    },
+    "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/storage/{type}": {
+      "get": {
+        "operationId": "ApplicationUpStorage_GetStoredApplicationUp",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/v3ApplicationUp"
+                },
+                "error": {
+                  "$ref": "#/definitions/runtimeStreamError"
+                }
+              },
+              "title": "Stream result of v3ApplicationUp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "description": "Query upstream messages of a specific type. If not set, then all upstream messages are returned.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "end_device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "end_device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "limit",
+            "description": "Limit number of results.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "Query upstream messages after this timestamp only.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "before",
+            "description": "Query upstream messages before this timestamp only.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "f_port",
+            "description": "Query uplinks on a specific FPort only.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order",
+            "description": "Order results.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationUpStorage"
         ]
       }
     },

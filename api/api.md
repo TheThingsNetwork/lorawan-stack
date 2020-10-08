@@ -31,6 +31,9 @@
   - [Service `AppAs`](#ttn.lorawan.v3.AppAs)
   - [Service `As`](#ttn.lorawan.v3.As)
   - [Service `AsEndDeviceRegistry`](#ttn.lorawan.v3.AsEndDeviceRegistry)
+- [File `lorawan-stack/api/applicationserver_integrations_storage.proto`](#lorawan-stack/api/applicationserver_integrations_storage.proto)
+  - [Message `GetStoredApplicationUpRequest`](#ttn.lorawan.v3.GetStoredApplicationUpRequest)
+  - [Service `ApplicationUpStorage`](#ttn.lorawan.v3.ApplicationUpStorage)
 - [File `lorawan-stack/api/applicationserver_packages.proto`](#lorawan-stack/api/applicationserver_packages.proto)
   - [Message `ApplicationPackage`](#ttn.lorawan.v3.ApplicationPackage)
   - [Message `ApplicationPackageAssociation`](#ttn.lorawan.v3.ApplicationPackageAssociation)
@@ -855,6 +858,41 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `Set` | `PUT` | `/api/v3/as/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}` | `*` |
 | `Set` | `POST` | `/api/v3/as/applications/{end_device.ids.application_ids.application_id}/devices` | `*` |
 | `Delete` | `DELETE` | `/api/v3/as/applications/{application_ids.application_id}/devices/{device_id}` |  |
+
+## <a name="lorawan-stack/api/applicationserver_integrations_storage.proto">File `lorawan-stack/api/applicationserver_integrations_storage.proto`</a>
+
+### <a name="ttn.lorawan.v3.GetStoredApplicationUpRequest">Message `GetStoredApplicationUpRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Query upstream messages from all end devices of an application. Cannot be used in conjuction with EndDeviceIdentifiers. |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | Query upstream messages from a single end device. Cannot be used in conjuction with ApplicationIdentifiers. |
+| `type` | [`string`](#string) |  | Query upstream messages of a specific type. If not set, then all upstream messages are returned. |
+| `limit` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Limit number of results. |
+| `after` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Query upstream messages after this timestamp only. |
+| `before` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Query upstream messages before this timestamp only. |
+| `f_port` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Query uplinks on a specific FPort only. |
+| `order` | [`string`](#string) |  | Order results. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `type` | <p>`string.in`: `[ uplink_message join_accept downlink_ack downlink_nack downlink_sent downlink_failed downlink_queued downlink_queue_invalidated location_solved service_data]`</p> |
+| `order` | <p>`string.in`: `[ -received_at received_at]`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationUpStorage">Service `ApplicationUpStorage`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `GetStoredApplicationUp` | [`GetStoredApplicationUpRequest`](#ttn.lorawan.v3.GetStoredApplicationUpRequest) | [`ApplicationUp`](#ttn.lorawan.v3.ApplicationUp) _stream_ |  |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `GetStoredApplicationUp` | `GET` | `/api/v3/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/storage/{type}` |  |
+| `GetStoredApplicationUp` | `GET` | `/api/v3/as/applications/{application_ids.application_id}/packages/storage/{type}` |  |
 
 ## <a name="lorawan-stack/api/applicationserver_packages.proto">File `lorawan-stack/api/applicationserver_packages.proto`</a>
 
