@@ -57,16 +57,18 @@ const WizardForm = React.forwardRef((props, ref) => {
         context: validationContext,
         stripUnknown: true,
       })
-      for (const excludePath of excludePaths) {
-        delete castedValues[excludePath]
-      }
 
       if (onSubmit) {
         await onSubmit(merge({}, snapshot, castedValues), formikBag)
       }
 
       if (isLastStep) {
-        return onComplete(merge({}, snapshot, castedValues), formikBag)
+        const result = merge({}, snapshot, castedValues)
+        for (const excludePath of excludePaths) {
+          delete result[excludePath]
+        }
+
+        return onComplete(result, formikBag)
       }
 
       onNextStep(castedValues)
