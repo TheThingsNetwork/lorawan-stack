@@ -35,6 +35,8 @@ var (
 	setGatewayAntennaFlags = util.FieldFlags(&ttnpb.GatewayAntenna{}, "antenna")
 
 	selectAllGatewayFlags = util.SelectAllFlagSet("gateway")
+
+	gatewayFlattenPaths = []string{"lbs_lns_secret"}
 )
 
 func gatewayIDFlags() *pflag.FlagSet {
@@ -164,6 +166,8 @@ var (
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.GatewayRegistry/Get"])
 
+			paths = append(paths, ttnpb.FlattenPaths(paths, gatewayFlattenPaths)...)
+
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
@@ -201,6 +205,7 @@ var (
 				return err
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setGatewayFlags, attributesFlags())
+			paths = append(paths, ttnpb.FlattenPaths(paths, gatewayFlattenPaths)...)
 
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
@@ -280,6 +285,7 @@ var (
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setGatewayFlags, attributesFlags())
 			antennaPaths := util.UpdateFieldMask(cmd.Flags(), setGatewayAntennaFlags)
+			paths = append(paths, ttnpb.FlattenPaths(paths, gatewayFlattenPaths)...)
 
 			if gtwID.EUI != nil {
 				paths = append(paths, "ids.eui")
