@@ -941,7 +941,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 
 	isDev, err := as.endDeviceFetcher.Get(ctx, ids, "locations")
 	if err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")
+		logger.WithError(err).Warn("Failed to retrieve end device locations")
 	} else {
 		uplink.Locations = isDev.GetLocations()
 	}
