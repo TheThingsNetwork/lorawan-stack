@@ -24,6 +24,7 @@ const messages = defineMessages({
   txPower: 'Tx Power',
   bandwidth: 'Bandwidth',
   metrics: 'Metrics',
+  versions: 'Versions',
   snr: 'SNR',
   sessionKeyId: 'Session key ID',
   selectedMacVersion: 'Selected MAC version',

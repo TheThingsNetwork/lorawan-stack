@@ -24,12 +24,20 @@ import JSONPayload from './shared/json-payload'
 
 const GatewayStatusPreview = React.memo(({ event }) => {
   const metrics = getByPath(event, 'data.metrics')
+  const versions = getByPath(event, 'data.versions')
 
   return (
     <DescriptionList>
-      <DescriptionList.Item title={messages.metrics}>
-        <JSONPayload data={metrics} />
-      </DescriptionList.Item>
+      {Boolean(metrics) && (
+        <DescriptionList.Item title={messages.metrics}>
+          <JSONPayload data={metrics} />
+        </DescriptionList.Item>
+      )}
+      {Boolean(versions) && (
+        <DescriptionList.Item title={messages.versions}>
+          <JSONPayload data={versions} />
+        </DescriptionList.Item>
+      )}
     </DescriptionList>
   )
 })
