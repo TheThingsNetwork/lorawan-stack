@@ -1330,7 +1330,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	ctx = log.NewContext(ctx, logger)
 
 	if t, err := toa.Compute(len(up.RawPayload), up.Settings); err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to compute time-on-air")
+		log.FromContext(ctx).WithError(err).Debug("Failed to compute time-on-air")
 	} else {
 		up.ConsumedAirtime = &t
 	}
