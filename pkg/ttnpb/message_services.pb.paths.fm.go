@@ -66,6 +66,7 @@ var DecodeUplinkMessageRequestFieldPathsNested = []string{
 	"message.f_port",
 	"message.frm_payload",
 	"message.last_a_f_cnt_down",
+	"message.locations",
 	"message.received_at",
 	"message.rx_metadata",
 	"message.session_key_id",

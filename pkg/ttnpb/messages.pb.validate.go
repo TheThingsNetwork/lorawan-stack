@@ -710,6 +710,25 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "locations":
+
+			for key, val := range m.GetLocations() {
+				_ = val
+
+				// no validation rules for Locations[key]
+
+				if v, ok := interface{}(val).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ApplicationUplinkValidationError{
+							field:  fmt.Sprintf("locations[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
 		default:
 			return ApplicationUplinkValidationError{
 				field:  name,

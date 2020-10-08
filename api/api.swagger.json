@@ -9174,6 +9174,13 @@
         "consumed_airtime": {
           "type": "string",
           "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings."
+        },
+        "locations": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/lorawanv3Location"
+          },
+          "description": "End device location metadata, set by the Application Server while handling the message."
         }
       }
     },

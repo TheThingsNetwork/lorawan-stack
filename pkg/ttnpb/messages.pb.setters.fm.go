@@ -509,6 +509,15 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 			} else {
 				dst.ConsumedAirtime = nil
 			}
+		case "locations":
+			if len(subs) > 0 {
+				return fmt.Errorf("'locations' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Locations = src.Locations
+			} else {
+				dst.Locations = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

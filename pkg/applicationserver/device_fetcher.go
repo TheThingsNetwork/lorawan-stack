@@ -31,6 +31,14 @@ type EndDeviceFetcher interface {
 	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error)
 }
 
+// NoopEndDeviceFetcher is a no-op.
+type NoopEndDeviceFetcher struct{}
+
+// Get implements the EndDeviceFetcher interface.
+func (f *NoopEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
+	return nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
+}
+
 // endDeviceFetcher fetches end devices
 type endDeviceFetcher struct {
 	c *component.Component
