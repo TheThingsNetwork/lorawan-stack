@@ -92,9 +92,9 @@ export default class ProgressBar extends PureComponent {
     let displayEstimation = null
 
     if (showEstimation && percentage < 100) {
-      const now = new Date(Date.now() + 1000)
+      const now = Date.now()
       let eta = new Date(startTime + estimatedDuration)
-      if (eta < now) {
+      if (eta <= now) {
         // Avoid estimations in the past.
         eta = new Date(now + 1000)
       }
