@@ -118,6 +118,7 @@ func OpenConnection(ctx context.Context, settings Settings, topics provider.Topi
 	clientOpts.SetUsername(settings.Username)
 	clientOpts.SetPassword(settings.Password)
 	clientOpts.SetTLSConfig(settings.TLS)
+	clientOpts.SetKeepAlive(time.Minute)
 
 	if settings.HTTPHeadersProvider != nil {
 		headers, err := settings.HTTPHeadersProvider(ctx)
