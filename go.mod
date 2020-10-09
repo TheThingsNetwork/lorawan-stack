@@ -16,8 +16,8 @@ replace gopkg.in/DATA-DOG/go-sqlmock.v1 => gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.
 // Versions higher trigger google/protobuf update past v1.3.5.
 replace gocloud.dev => gocloud.dev v0.19.0
 
-// Remove this once https://github.com/eclipse/paho.mqtt.golang/pull/451 is merged.
-replace github.com/eclipse/paho.mqtt.golang => github.com/johanstokking/paho.mqtt.golang v1.2.1-0.20200917115254-cf2daad9593e
+// Use the latest master in order to avoid accidental downgrades to v1.2.0.
+replace github.com/eclipse/paho.mqtt.golang => github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200918111050-ba85050a1f23
 
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
@@ -32,7 +32,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dlclark/regexp2 v1.2.1 // indirect
 	github.com/dop251/goja v0.0.0-20200824171909-536f9d946569
-	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200609161119-ca94c5368c77
+	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200918111050-ba85050a1f23
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/felixge/httpsnoop v1.0.1
 	github.com/fsnotify/fsnotify v1.4.9
@@ -111,11 +111,9 @@ require (
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/image v0.0.0-20200430140353-33d19683fad8 // indirect
 	golang.org/x/mod v0.3.0 // indirect
-	golang.org/x/net v0.0.0-20200822124328-c89045814202
+	golang.org/x/net v0.0.0-20201009032441-dbdefad45b89
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
-	golang.org/x/sys v0.0.0-20200519105757-fe76b779f299 // indirect
-	golang.org/x/text v0.3.3 // indirect
 	google.golang.org/api v0.24.0
 	google.golang.org/genproto v0.0.0-20200507105951-43844f6eee31
 	google.golang.org/grpc v1.29.1
