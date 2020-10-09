@@ -31,7 +31,7 @@ import (
 	"gocloud.dev/pubsub"
 )
 
-var timeout = (1 << 3) * time.Second
+var shutdownTimeout = (1 << 3) * time.Second
 
 type impl struct {
 }
@@ -42,7 +42,7 @@ type connection struct {
 
 // Shutdown implements provider.Shutdowner.
 func (c *connection) Shutdown(_ context.Context) error {
-	c.Disconnect(uint(timeout / time.Millisecond))
+	c.Disconnect(uint(shutdownTimeout / time.Millisecond))
 	return nil
 }
 
@@ -101,7 +101,7 @@ type Settings struct {
 var errConfigureHTTPHeaders = errors.Define("configure_http_headers", "configure HTTP headers")
 
 // OpenConnection opens a MQTT connection using the given settings.
-func OpenConnection(ctx context.Context, settings Settings, topics provider.Topics) (*provider.Connection, error) {
+func OpenConnection(ctx context.Context, settings Settings, topics provider.Topics) (pc *provider.Connection, err error) {
 	serverURL, err := adaptURLScheme(settings.URL)
 	if err != nil {
 		return nil, err
@@ -146,12 +146,15 @@ func OpenConnection(ctx context.Context, settings Settings, topics provider.Topi
 
 	client := mqtt.NewClient(clientOpts)
 	token := client.Connect()
-	if !token.WaitTimeout(timeout) {
-		return nil, errConnectFailed.WithCause(context.DeadlineExceeded)
-	} else if token.Error() != nil {
-		return nil, errConnectFailed.WithCause(token.Error())
+	defer func() {
+		if err != nil {
+			client.Disconnect(uint(shutdownTimeout / time.Millisecond))
+		}
+	}()
+	if err := waitToken(ctx, token); err != nil {
+		return nil, errConnectFailed.WithCause(err)
 	}
-	pc := &provider.Connection{
+	pc = &provider.Connection{
 		ProviderConnection: &connection{
 			Client: client,
 		},
@@ -203,10 +206,8 @@ func OpenConnection(ctx context.Context, settings Settings, topics provider.Topi
 		if *t.topic, err = OpenTopic(
 			client,
 			mqtt_topic.Join(append(mqtt_topic.Split(topics.GetBaseTopic()), mqtt_topic.Split(t.message.GetTopic())...)),
-			timeout,
 			settings.PublishQoS,
 		); err != nil {
-			client.Disconnect(uint(timeout / time.Millisecond))
 			return nil, err
 		}
 	}
@@ -230,10 +231,8 @@ func OpenConnection(ctx context.Context, settings Settings, topics provider.Topi
 			ctx,
 			client,
 			mqtt_topic.Join(append(mqtt_topic.Split(topics.GetBaseTopic()), mqtt_topic.Split(s.message.GetTopic())...)),
-			timeout,
 			settings.SubscribeQoS,
 		); err != nil {
-			client.Disconnect(uint(timeout / time.Millisecond))
 			return nil, err
 		}
 	}

@@ -37,23 +37,22 @@ type topic struct {
 var errNilClient = errors.DefineInvalidArgument("nil_client", "client is nil")
 
 // OpenTopic returns a *pubsub.Topic that publishes to the given topic name with the given MQTT client.
-func OpenTopic(client mqtt.Client, topicName string, timeout time.Duration, qos byte) (*pubsub.Topic, error) {
-	dt, err := openDriverTopic(client, topicName, timeout, qos)
+func OpenTopic(client mqtt.Client, topicName string, qos byte) (*pubsub.Topic, error) {
+	dt, err := openDriverTopic(client, topicName, qos)
 	if err != nil {
 		return nil, err
 	}
 	return pubsub.NewTopic(dt, nil), nil
 }
 
-func openDriverTopic(client mqtt.Client, topicName string, timeout time.Duration, qos byte) (driver.Topic, error) {
+func openDriverTopic(client mqtt.Client, topicName string, qos byte) (driver.Topic, error) {
 	if client == nil {
 		return nil, errNilClient.New()
 	}
 	dt := &topic{
-		client:  client,
-		topic:   topicName,
-		timeout: timeout,
-		qos:     qos,
+		client: client,
+		topic:  topicName,
+		qos:    qos,
 	}
 	return dt, nil
 }
@@ -80,10 +79,8 @@ func (t *topic) SendBatch(ctx context.Context, msgs []*driver.Message) error {
 			return err
 		}
 		token := t.client.Publish(t.topic, t.qos, false, body)
-		if !token.WaitTimeout(timeout) {
-			return errPublishFailed.WithCause(context.DeadlineExceeded)
-		} else if token.Error() != nil {
-			return errPublishFailed.WithCause(token.Error())
+		if err := waitToken(ctx, token); err != nil {
+			return errPublishFailed.WithCause(err)
 		}
 	}
 	return nil
@@ -155,6 +152,7 @@ func (*topic) ErrorCode(err error) gcerrors.ErrorCode {
 func (*topic) Close() error { return nil }
 
 type subscription struct {
+	ctx     context.Context
 	client  mqtt.Client
 	topic   string
 	subCh   chan mqtt.Message
@@ -165,8 +163,8 @@ type subscription struct {
 const subscriptionQueueSize = 16
 
 // OpenSubscription returns a *pubsub.Subscription that subscribes to the given topic name with the given MQTT client.
-func OpenSubscription(ctx context.Context, client mqtt.Client, topicName string, timeout time.Duration, qos byte) (*pubsub.Subscription, error) {
-	ds, err := openDriverSubscription(ctx, client, topicName, timeout, qos)
+func OpenSubscription(ctx context.Context, client mqtt.Client, topicName string, qos byte) (*pubsub.Subscription, error) {
+	ds, err := openDriverSubscription(ctx, client, topicName, qos)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +173,7 @@ func OpenSubscription(ctx context.Context, client mqtt.Client, topicName string,
 
 var errSubscribeFailed = errors.Define("subscribe_failed", "subscribe to MQTT topic failed")
 
-func openDriverSubscription(ctx context.Context, client mqtt.Client, topicName string, timeout time.Duration, qos byte) (driver.Subscription, error) {
+func openDriverSubscription(ctx context.Context, client mqtt.Client, topicName string, qos byte) (driver.Subscription, error) {
 	if client == nil {
 		return nil, errNilClient.New()
 	}
@@ -188,16 +186,14 @@ func openDriverSubscription(ctx context.Context, client mqtt.Client, topicName s
 		}
 	}
 	token := client.Subscribe(topicName, qos, handler)
-	if !token.WaitTimeout(timeout) {
-		return nil, errSubscribeFailed.WithCause(context.DeadlineExceeded)
-	} else if token.Error() != nil {
-		return nil, errSubscribeFailed.WithCause(token.Error())
+	if err := waitToken(ctx, token); err != nil {
+		return nil, errSubscribeFailed.WithCause(err)
 	}
 	ds := &subscription{
-		client:  client,
-		topic:   topicName,
-		subCh:   subCh,
-		timeout: timeout,
+		ctx:    ctx,
+		client: client,
+		topic:  topicName,
+		subCh:  subCh,
 	}
 	return ds, nil
 }
@@ -264,10 +260,8 @@ func (s *subscription) Close() error {
 		return nil
 	}
 	token := s.client.Unsubscribe(s.topic)
-	if !token.WaitTimeout(timeout) {
-		return errUnsubscribeFailed.WithCause(context.DeadlineExceeded)
-	} else if token.Error() != nil {
-		return errUnsubscribeFailed.WithCause(token.Error())
+	if err := waitToken(s.ctx, token); err != nil {
+		return errUnsubscribeFailed.WithCause(err)
 	}
 	return nil
 }

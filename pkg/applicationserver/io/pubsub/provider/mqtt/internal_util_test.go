@@ -21,7 +21,10 @@ import (
 	mqttnet "github.com/TheThingsIndustries/mystique/pkg/net"
 	"github.com/TheThingsIndustries/mystique/pkg/server"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
+
+var timeout = (1 << 8) * test.Delay
 
 func startMQTTServer(ctx context.Context, tlsConfig *tls.Config) (mqttnet.Listener, mqttnet.Listener, error) {
 	logger := log.FromContext(ctx)
