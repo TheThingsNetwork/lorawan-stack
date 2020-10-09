@@ -647,7 +647,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			log.FromContext(ctx).WithFields(log.Fields(
 				"scan_keys", scanKeys,
 				"args", args,
-			)).Error("Failed to run device match scan script")
+			)).WithError(err).Error("Failed to run device match scan script")
 			return ttnredis.ConvertError(err)
 		}
 		if err == redis.Nil {
