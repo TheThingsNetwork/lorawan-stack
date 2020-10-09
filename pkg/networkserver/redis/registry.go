@@ -60,7 +60,7 @@ type DeviceRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
 	// CompatibilityVersion denotes the lowest possible stack version the registry should be compatible with.
-	CompatibiltyVersion semver.Version
+	CompatibilityVersion semver.Version
 
 	entropyMu *sync.Mutex
 	entropy   io.Reader
@@ -905,7 +905,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 
 			var delFields []string
 			var setFields []interface{}
-			forceFieldWrite := r.CompatibiltyVersion.Compare(semver.Version{Major: 3, Minor: 10}) < 0
+			forceFieldWrite := r.CompatibilityVersion.Compare(semver.Version{Major: 3, Minor: 10}) < 0
 
 			// NOTE: The following sequence of switches use concept of "container" - a container is the pointer type "containing" the field value we're interested in.
 
