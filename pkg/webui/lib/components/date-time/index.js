@@ -15,7 +15,11 @@
 import React from 'react'
 import { FormattedDate, FormattedTime } from 'react-intl'
 
+import Message from '@ttn-lw/lib/components/message'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { warn } from '@ttn-lw/lib/log'
 
 import RelativeTime from './relative'
 
@@ -34,6 +38,15 @@ class DateTime extends React.PureComponent {
       }
 
       result += formattedTime
+    }
+
+    if (isNaN(dateValue)) {
+      warn('Invalid date passed to DateTime component')
+      return (
+        <time className={className}>
+          <Message content={sharedMessages.unknown} firstToLower />
+        </time>
+      )
     }
 
     return (
