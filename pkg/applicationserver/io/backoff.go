@@ -25,7 +25,7 @@ import (
 var (
 	// TaskExtendedBackoffIntervals extends the default backoff intervals with longer periods for
 	// higher invocation counts.
-	TaskExtendedBackoffIntervals = append(component.DefaultTaskBackoffIntervals[:],
+	TaskExtendedBackoffIntervals = append(component.DialTaskBackoffIntervals[:],
 		time.Minute,
 		5*time.Minute,
 		15*time.Minute,
@@ -43,7 +43,8 @@ var (
 				errors.IsPermissionDenied(err),
 				errors.IsInvalidArgument(err),
 				errors.IsAlreadyExists(err),
-				errors.IsCanceled(err):
+				errors.IsCanceled(err),
+				errors.IsNotFound(err):
 				intervals = TaskExtendedBackoffIntervals
 			}
 			switch {
