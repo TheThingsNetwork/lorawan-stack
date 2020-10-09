@@ -56,10 +56,10 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 				"default_formatters",
 				"skip_payload_crypto",
 			})
-			if err != nil {
-				if !errors.IsNotFound(err) {
-					log.FromContext(ctx).WithError(err).Error("Failed to get link")
-				}
+			if err != nil && !errors.IsNotFound(err) {
+				return err
+			} else if err != nil {
+				log.FromContext(ctx).WithError(err).Warn("Link not found")
 				return nil
 			}
 

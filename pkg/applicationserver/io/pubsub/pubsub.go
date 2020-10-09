@@ -82,10 +82,10 @@ func (ps *PubSub) startTask(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 		ID:      "pubsub",
 		Func: func(ctx context.Context) error {
 			target, err := ps.registry.Get(ctx, ids, ttnpb.ApplicationPubSubFieldPathsNested)
-			if err != nil {
-				if !errors.IsNotFound(err) {
-					log.FromContext(ctx).WithError(err).Error("Failed to stop pubsub")
-				}
+			if err != nil && !errors.IsNotFound(err) {
+				return err
+			} else if err != nil {
+				log.FromContext(ctx).WithError(err).Warn("Pub/Sub not found")
 				return nil
 			}
 
