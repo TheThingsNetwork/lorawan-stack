@@ -201,7 +201,7 @@ func TestInvalidLoRa2400(t *testing.T) {
 					Bandwidth:       812000,
 				},
 			},
-		}, "1/9")
+		}, "1/9LI")
 		_, err = Compute(len(downlink.RawPayload), *downlink.GetScheduled())
 		a.So(err, should.NotBeNil)
 	}
@@ -215,7 +215,7 @@ func TestInvalidLoRa2400(t *testing.T) {
 					Bandwidth:       812000,
 				},
 			},
-		}, "4/5")
+		}, "4/5LI")
 		_, err = Compute(len(downlink.RawPayload), *downlink.GetScheduled())
 		a.So(err, should.NotBeNil)
 	}
@@ -229,7 +229,7 @@ func TestInvalidLoRa2400(t *testing.T) {
 					Bandwidth:       0,
 				},
 			},
-		}, "4/5")
+		}, "4/5LI")
 		_, err = Compute(len(downlink.RawPayload), *downlink.GetScheduled())
 		a.So(err, should.NotBeNil)
 	}
@@ -248,7 +248,7 @@ func TestDifferentLoRa2400SFs(t *testing.T) {
 		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 12, Bandwidth: 812000}}}: 142502500,
 	}
 	for dr, ns := range sfTests {
-		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, dr, "4/5")
+		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, dr, "4/5LI")
 		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, time.Duration(ns), 50)
@@ -264,7 +264,7 @@ func TestDifferentLoRa2400BWs(t *testing.T) {
 		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 1625000}}}: 2776600,
 	}
 	for dr, ns := range bwTests {
-		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, dr, "4/5")
+		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, dr, "4/5LI")
 		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, ns, 50)
@@ -274,9 +274,10 @@ func TestDifferentLoRa2400BWs(t *testing.T) {
 func TestDifferentLoRa2400CRs(t *testing.T) {
 	a := assertions.New(t)
 	crTests := map[string]time.Duration{
-		"4/5": 5556700,
-		"4/6": 6029600,
-		"4/8": 6817700,
+		"4/5LI": 5556700,
+		"4/6LI": 6029600,
+		"4/7LI": 6817700,
+		"4/8LI": 6817700,
 	}
 	for cr, ns := range crTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, ttnpb.DataRate{
@@ -311,7 +312,7 @@ func TestDifferentLoRa2400PayloadSizes(t *testing.T) {
 					Bandwidth:       812000,
 				},
 			},
-		}, "4/5")
+		}, "4/5LI")
 		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, ns, 50)
@@ -332,7 +333,7 @@ func TestDifferentLoRa2400CRCs(t *testing.T) {
 					Bandwidth:       812000,
 				},
 			},
-		}, "4/5")
+		}, "4/5LI")
 		dl.GetScheduled().EnableCRC = crc
 		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
 		a.So(err, should.BeNil)

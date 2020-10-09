@@ -42,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Last seen counter for applications, end devices and gateways in the Console.
 - `Use credentials` option being always checked in Pub/Sub edit form in the Console.
 - FPending being set on downlinks, when LinkADRReq is required, but all available TxPower and data rate index combinations are rejected by the device.
+- Coding rate for LoRa 2.4 GHz: it's now `4/8LI`.
 
 ### Security
 
