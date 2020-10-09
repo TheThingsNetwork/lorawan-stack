@@ -51,6 +51,7 @@ jobs:
       run: tools/bin/mage jsSDK:clean jsSDK:build
     - name: Install JS dependencies
       run: tools/bin/mage js:deps
+      timeout-minutes: 5
     - name: Build frontend
       run: tools/bin/mage js:clean js:build
     - name: File versioning
