@@ -857,72 +857,79 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				return nil, nil, errOutdatedData.New()
 			}
 
-			if !stored.CreatedAt.Equal(matched.Device.CreatedAt) || !stored.UpdatedAt.Equal(matched.Device.UpdatedAt) {
-				switch {
-				case stored.PendingSession != nil && stored.PendingSession.DevAddr == pld.DevAddr:
-					if stored.PendingSession.FNwkSIntKey == nil {
-						return nil, nil, errOutdatedData.WithCause(errUnknownFNwkSIntKey)
-					}
-					if !fNwkSIntKeyEnvelope.Equal(stored.PendingSession.FNwkSIntKey) {
-						var err error
-						fNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, *stored.PendingSession.FNwkSIntKey, ns.KeyVault)
-						if err != nil {
-							log.FromContext(ctx).WithError(err).WithField("kek_label", fNwkSIntKeyEnvelope.KEKLabel).Warn("Failed to unwrap FNwkSIntKey, skip")
-							return nil, nil, errOutdatedData.WithCause(err)
+			if ok = stored.CreatedAt.Equal(matched.Device.CreatedAt) && stored.UpdatedAt.Equal(matched.Device.UpdatedAt); !ok {
+				matched, ok, err = func() (*matchResult, bool, error) {
+					if matched.MatchType == pendingSessionMatch && stored.PendingSession != nil && stored.PendingSession.DevAddr == pld.DevAddr {
+						if stored.PendingSession.FNwkSIntKey == nil {
+							return nil, false, errUnknownFNwkSIntKey
+						}
+						if !fNwkSIntKeyEnvelope.Equal(stored.PendingSession.FNwkSIntKey) {
+							var err error
+							fNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, *stored.PendingSession.FNwkSIntKey, ns.KeyVault)
+							if err != nil {
+								log.FromContext(ctx).WithError(err).WithField("kek_label", fNwkSIntKeyEnvelope.KEKLabel).Warn("Failed to unwrap FNwkSIntKey, skip")
+								return nil, false, err
+							}
+						}
+						var cmacF [4]byte
+						cmacF, ok = matchCmacF(ctx, fNwkSIntKey, stored.PendingMACState.LoRaWANVersion, pld.FCnt, up)
+						if ok {
+							stored := stored
+							if stored.Session != nil && stored.Session.DevAddr == pld.DevAddr {
+								stored = CopyEndDevice(stored)
+							}
+							matched, ok, err = ns.matchAndHandleDataUplink(ctx, stored, up, true, cmacFMatchingResult{
+								MatchType: pendingSessionMatch,
+								FullFCnt:  pld.FCnt,
+								CmacF:     cmacF,
+							})
+							if err != nil {
+								return nil, false, err
+							}
+							if ok {
+								return matched, true, nil
+							}
 						}
 					}
-					var cmacF [4]byte
-					cmacF, ok = matchCmacF(ctx, fNwkSIntKey, stored.PendingMACState.LoRaWANVersion, pld.FCnt, up)
-					if !ok {
-						return nil, nil, errOutdatedData.New()
-					}
-					matched, ok, err = ns.matchAndHandleDataUplink(ctx, stored, up, true, cmacFMatchingResult{
-						MatchType: pendingSessionMatch,
-						FullFCnt:  pld.FCnt,
-						CmacF:     cmacF,
-					})
 
-				case stored.Session != nil && stored.Session.DevAddr == pld.DevAddr:
+					if stored.Session == nil || stored.Session.DevAddr != pld.DevAddr {
+						return nil, false, nil
+					}
 					if stored.Session.FNwkSIntKey == nil {
-						return nil, nil, errOutdatedData.WithCause(errUnknownFNwkSIntKey)
+						return nil, false, errUnknownFNwkSIntKey
 					}
 					if !fNwkSIntKeyEnvelope.Equal(stored.Session.FNwkSIntKey) {
 						var err error
 						fNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, *stored.Session.FNwkSIntKey, ns.KeyVault)
 						if err != nil {
 							log.FromContext(ctx).WithError(err).WithField("kek_label", fNwkSIntKeyEnvelope.KEKLabel).Warn("Failed to unwrap FNwkSIntKey, skip")
-							return nil, nil, errOutdatedData.WithCause(err)
+							return nil, false, err
 						}
 					}
-					fCnt := FullFCnt(uint16(pld.FCnt&0xffff), stored.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(stored, ns.defaultMACSettings))
-					var cmacF [4]byte
-					cmacF, ok = matchCmacF(ctx, fNwkSIntKey, stored.MACState.LoRaWANVersion, fCnt, up)
-					if !ok {
-						if pld.FCnt == fCnt || pld.Ack || !mac.DeviceResetsFCnt(stored, ns.defaultMACSettings) {
-							return nil, nil, errOutdatedData.New()
-						}
 
-						// FCnt reset
+					fCnt := pld.FCnt
+					matchType := matched.MatchType
+					var cmacF [4]byte
+					if matched.MatchType == fCntResetMatch && mac.DeviceResetsFCnt(stored, ns.defaultMACSettings) {
 						cmacF, ok = matchCmacF(ctx, fNwkSIntKey, stored.MACState.LoRaWANVersion, pld.FCnt, up)
-						if !ok {
-							return nil, nil, errOutdatedData.New()
+					}
+					if matched.MatchType == currentSessionMatch || !ok {
+						fCnt = FullFCnt(uint16(pld.FCnt&0xffff), stored.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(stored, ns.defaultMACSettings))
+						if matched.MatchType == fCntResetMatch && fCnt == pld.FCnt {
+							// NOTE: This was already attempted above and did not succeed.
+							return nil, false, nil
 						}
-						matched, ok, err = ns.matchAndHandleDataUplink(ctx, stored, up, true, cmacFMatchingResult{
-							MatchType: fCntResetMatch,
-							FullFCnt:  pld.FCnt,
+						cmacF, ok = matchCmacF(ctx, fNwkSIntKey, stored.MACState.LoRaWANVersion, fCnt, up)
+					}
+					if ok {
+						return ns.matchAndHandleDataUplink(ctx, stored, up, true, cmacFMatchingResult{
+							MatchType: matchType,
+							FullFCnt:  fCnt,
 							CmacF:     cmacF,
 						})
-						break
 					}
-					matched, ok, err = ns.matchAndHandleDataUplink(ctx, stored, up, true, cmacFMatchingResult{
-						MatchType: currentSessionMatch,
-						FullFCnt:  fCnt,
-						CmacF:     cmacF,
-					})
-
-				default:
-					return nil, nil, errOutdatedData.New()
-				}
+					return nil, false, nil
+				}()
 				if err != nil {
 					return nil, nil, errOutdatedData.WithCause(err)
 				}
@@ -1150,10 +1157,14 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 
 	devAddr := ns.newDevAddr(ctx, matched)
-	for matched.Session != nil && devAddr.Equal(matched.Session.DevAddr) {
+	const maxDevAddrGenerationRetries = 5
+	for i := 0; i < maxDevAddrGenerationRetries && matched.Session != nil && devAddr.Equal(matched.Session.DevAddr); i++ {
 		devAddr = ns.newDevAddr(ctx, matched)
 	}
 	ctx = log.NewContextWithField(ctx, "dev_addr", devAddr)
+	if matched.Session != nil && devAddr.Equal(matched.Session.DevAddr) {
+		log.FromContext(ctx).Error("Reusing the DevAddr used for current session")
+	}
 
 	req := &ttnpb.JoinRequest{
 		Payload:            up.Payload,
