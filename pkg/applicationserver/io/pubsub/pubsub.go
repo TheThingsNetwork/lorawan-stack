@@ -311,7 +311,7 @@ func (ps *PubSub) stop(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifie
 	psUID := PubSubUID(appUID, ids.PubSubID)
 	if val, ok := ps.integrations.Load(psUID); ok {
 		i := val.(*integration)
-		i.cancel(nil)
+		i.cancel(context.Canceled)
 		select {
 		case <-ctx.Done():
 			return ctx.Err()

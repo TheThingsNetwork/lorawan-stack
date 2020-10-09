@@ -268,7 +268,7 @@ func (as *ApplicationServer) cancelLink(ctx context.Context, ids ttnpb.Applicati
 	if val, ok := as.links.Load(uid); ok {
 		l := val.(*link)
 		log.FromContext(ctx).WithField("application_uid", uid).Debug("Unlink")
-		l.cancel(nil)
+		l.cancel(context.Canceled)
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
