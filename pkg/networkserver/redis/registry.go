@@ -719,10 +719,20 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				return nil
 			}
 		}
-		if len(args) > 1 {
-			args[1] = uid
-		} else {
-			args = append(args, uid)
+		switch scanKeys[0] {
+		case matchKeys.Processing.ShortFCnt,
+			matchKeys.Processing.LongFCntNoRollover,
+			matchKeys.Processing.LongFCntRollover,
+			matchKeys.Processing.Pending,
+			matchKeys.Processing.Legacy:
+			// If the UID is from processing set, we don't need to remove it
+			args = args[:1]
+		default:
+			if len(args) > 1 {
+				args[1] = uid
+			} else {
+				args = append(args, uid)
+			}
 		}
 	}
 	return errNoUplinkMatch.New()

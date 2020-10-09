@@ -17,7 +17,7 @@ if #ARGV == 2 then
 end
 
 
-for i = 1, #KEYS, 2 do
+for i = 1, #KEYS do
   local uid
   if KEYS[i]:sub(-10) == "processing" then
 	  uid = redis.call('rpop', KEYS[i])
