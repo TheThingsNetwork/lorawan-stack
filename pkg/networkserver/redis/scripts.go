@@ -74,7 +74,7 @@ return nil`)
 end
 for i = 1, #KEYS, 2 do
   local uid
-  if KEYS[i]:sub(-7) == "pending" then
+  if KEYS[i]:sub(-10) == "processing" then
 	  uid = redis.call('rpop', KEYS[i])
   else
 	  uid = redis.call('rpoplpush', KEYS[i], KEYS[i+1])
