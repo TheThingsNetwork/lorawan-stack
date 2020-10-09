@@ -19,7 +19,6 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/sha512"
-	"crypto/subtle"
 	"fmt"
 	"hash/crc32"
 	"net"
@@ -42,7 +41,6 @@ import (
 
 const (
 	cupsAttribute              = "cups"
-	cupsAuthHeaderAttribute    = "cups-auth-header"
 	cupsURIAttribute           = "cups-uri"
 	cupsLastSeenAttribute      = "cups-last-seen"
 	cupsCredentialsIDAttribute = "cups-credentials-id"
@@ -101,6 +99,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_GATEWAY_INFO,
 			ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
+			ttnpb.RIGHT_GATEWAY_READ_SECRETS,
 		},
 	}, auth)
 	if err != nil {
@@ -136,7 +135,6 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	logger.WithField("api_key_id", lnsKey.ID).Info("Created gateway API key for LNS")
 	gtw.Attributes = map[string]string{
 		cupsAttribute:              "true",
-		cupsAuthHeaderAttribute:    getAuthHeader(ctx),
 		cupsCredentialsIDAttribute: cupsKey.ID,
 		cupsCredentialsAttribute:   fmt.Sprintf("Bearer %s", cupsKey.Key),
 	}
@@ -176,46 +174,55 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	}
 	serverAuth := s.getServerAuth(ctx)
 
-	var gtw *ttnpb.Gateway
-	ids, err := registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+	var ids *ttnpb.GatewayIdentifiers
+	ids, err = registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
 		EUI: req.Router.EUI64,
 	}, serverAuth)
-	if err == nil {
-		logger.WithField("gateway_uid", unique.ID(ctx, ids)).Debug("Found gateway for EUI")
-		gtw, err = registry.Get(ctx, &ttnpb.GetGatewayRequest{
-			GatewayIdentifiers: *ids,
-			FieldMask:          getGatewayMask,
-		}, serverAuth)
-	} else if errors.IsNotFound(err) && s.registerUnknown {
-		gtw, err = s.registerGateway(ctx, req)
+	if err != nil {
+		if errors.IsNotFound(err) && s.registerUnknown {
+			gtw, err := s.registerGateway(ctx, req)
+			if err != nil {
+				return err
+			}
+			ids = &gtw.GatewayIdentifiers
+			// Use the generated CUPS API Key for authenticating subsequent calls.
+			md := metadata.New(map[string]string{
+				"id":            ids.GatewayID,
+				"authorization": fmt.Sprintf("Bearer %s", gtw.Attributes[cupsCredentialsAttribute]),
+			})
+			if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
+				md = metadata.Join(ctxMd, md)
+			}
+			ctx = metadata.NewIncomingContext(ctx, md)
+		} else {
+			return err
+		}
 	}
+
+	uid := unique.ID(ctx, ids)
+	logger.WithField("gateway_uid", uid).Debug("Found gateway for EUI")
+
+	var gatewayAuth grpc.CallOption
+	if rights.RequireGateway(ctx, *ids,
+		ttnpb.RIGHT_GATEWAY_INFO,
+		ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
+		ttnpb.RIGHT_GATEWAY_READ_SECRETS,
+	) == nil {
+		logger.Debug("Authorized with The Things Stack token")
+	} else {
+		return errUnauthenticated.New()
+	}
+	gatewayAuth, err = rpcmetadata.WithForwardedAuth(ctx, s.component.AllowInsecureForCredentials())
 	if err != nil {
 		return err
 	}
-	uid := unique.ID(ctx, gtw.GatewayIdentifiers)
-	logger = logger.WithField("gateway_uid", uid)
 
-	var gatewayAuth grpc.CallOption
-	if rights.RequireGateway(ctx, gtw.GatewayIdentifiers,
-		ttnpb.RIGHT_GATEWAY_INFO,
-		ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
-	) == nil {
-		logger.Debug("Authorized with The Things Stack token")
-		gatewayAuth, err = rpcmetadata.WithForwardedAuth(ctx, s.component.AllowInsecureForCredentials())
-		if err != nil {
-			return err
-		}
-	} else if gtw.Attributes[cupsAuthHeaderAttribute] != "" {
-		if subtle.ConstantTimeCompare([]byte(getAuthHeader(ctx)), []byte(gtw.Attributes[cupsAuthHeaderAttribute])) != 1 {
-			return errInvalidToken.New()
-		}
-		logger.Debug("Authorized with CUPS Auth Header")
-		md := rpcmetadata.FromIncomingContext(ctx)
-		md.AuthType, md.AuthValue = "Bearer", gtw.Attributes[cupsCredentialsAttribute]
-		md.AllowInsecure = s.component.AllowInsecureForCredentials()
-		gatewayAuth = grpc.PerRPCCredentials(md)
-	} else {
-		return errUnauthenticated.New()
+	gtw, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
+		GatewayIdentifiers: *ids,
+		FieldMask:          getGatewayMask,
+	}, gatewayAuth)
+	if err != nil {
+		return err
 	}
 
 	if gtw.Attributes == nil {

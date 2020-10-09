@@ -162,7 +162,7 @@ var (
 	mockRightsFetcher = rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
 		md := rpcmetadata.FromIncomingContext(ctx)
 		if md.AuthType == "Bearer" {
-			return ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC), nil
+			return ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC, ttnpb.RIGHT_GATEWAY_READ_SECRETS), nil
 		}
 		return nil, rights.ErrNoGatewayRights
 	})
@@ -256,6 +256,7 @@ func TestServer(t *testing.T) {
 					ID:  "KEYID",
 					Key: "KEYCONTENTS",
 				}
+				c.res.Get = c.res.Create
 			},
 			Options: []Option{
 				WithRegisterUnknown(&ttnpb.OrganizationOrUserIdentifiers{}, mockAuthFunc),
@@ -399,8 +400,8 @@ func TestServer(t *testing.T) {
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
 			err := s.UpdateInfo(c)
-			if tt.AssertError != nil {
-				a.So(tt.AssertError(err), should.BeTrue)
+			if tt.AssertError != nil && !a.So(tt.AssertError(err), should.BeTrue) {
+				t.Fatalf("Unexpected error :%v", err)
 			}
 			if tt.AssertResponse != nil {
 				tt.AssertResponse(a, rec)

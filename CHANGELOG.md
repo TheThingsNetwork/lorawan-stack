@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Decoded downlink payloads are stored now by Network Server.
 - Raw downlink PHY payloads are not stored anymore by Network Server.
 - Move documentation to [lorawan-stack-docs](https://github.com/TheThingsIndustries/lorawan-stack-docs).
+- CUPS Server only accepts The Things Stack API Key for token auth.
 
 ### Deprecated
 
