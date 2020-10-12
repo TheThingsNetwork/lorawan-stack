@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add end device location metadata on forwarded uplink messages (see `uplink_message.locations` field).
 - Store and retrieve LBS LNS Secrets from database.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added column.
+  - To encrypt the secrets set `is.gateways.encryption-key-id`.
 
 ### Changed
 
