@@ -56,7 +56,7 @@ var errNoPaths = errors.DefineInvalidArgument("no_paths", "no paths specified")
 // Set implements ttnpb.ApplicationActivationSettingsRegistryServer.
 func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, req *ttnpb.SetApplicationActivationSettingsRequest) (*ttnpb.ApplicationActivationSettings, error) {
 	if len(req.FieldMask.Paths) == 0 {
-		return nil, errNoPaths
+		return nil, errInvalidFieldMask.WithCause(errNoPaths)
 	}
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return nil, err
@@ -69,12 +69,24 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 			return nil, errWrapKey.WithCause(err)
 		}
 		req.ApplicationActivationSettings.KEK = kek
+		sets = append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
 		sets = ttnpb.AddFields(sets,
 			"kek.encrypted_key",
 			"kek.kek_label",
 		)
 	}
-	v, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths, func(*ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+	v, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths, func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+		if stored == nil {
+			if err := ttnpb.RequireFields(req.FieldMask.Paths,
+				"kek_label",
+			); err != nil {
+				return nil, nil, errInvalidFieldMask.WithCause(err)
+			}
+			if !ttnpb.HasAnyField(req.FieldMask.Paths, "kek.key") ||
+				!ttnpb.HasAnyField(req.FieldMask.Paths, "kek.encrypted_key") && !ttnpb.HasAnyField(req.FieldMask.Paths, "kek.kek_label") {
+				return nil, nil, errInvalidFieldMask.WithCause(ttnpb.RequireFields(req.FieldMask.Paths, "kek.key"))
+			}
+		}
 		return &req.ApplicationActivationSettings, sets, nil
 	})
 	if errors.IsNotFound(err) {
