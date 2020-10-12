@@ -120,7 +120,7 @@ func init() {
 		GenerateChMasks: generateChMask16,
 		ParseChMask:     parseChMask16,
 
-		LoRaCodingRate: "4/8",
+		LoRaCodingRate: "4/8LI",
 
 		FreqMultiplier:   200,
 		ImplementsCFList: true,
@@ -130,7 +130,7 @@ func init() {
 
 		Beacon: Beacon{
 			DataRateIndex:    ttnpb.DATA_RATE_3,
-			CodingRate:       "4/8",
+			CodingRate:       "4/8LI",
 			ComputeFrequency: func(_ float64) uint64 { return beaconFrequency },
 		},
 		PingSlotFrequency: uint64Ptr(beaconFrequency),

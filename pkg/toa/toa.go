@@ -81,7 +81,7 @@ func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandw
 		return time.Duration(timeOnAir), nil
 
 	case frequency >= 2400000000 && frequency < 2500000000:
-		// See https://www.semtech.com/uploads/documents/DS_SX1280-1_V2.2.pdf, 7.4.4.2
+		// See Semtech SX1280/SX1281/SX1282 Data Sheet Rev 3.0, 7.4.4
 		nBitCRC := 0.0
 		if crc {
 			nBitCRC = 16.0
@@ -90,14 +90,14 @@ func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandw
 		bw := float64(bandwidth) / 1000
 		var cr float64
 		switch codingRate {
-		case "4/5":
+		case "4/5LI":
 			cr = 5
-		case "4/6":
+		case "4/6LI":
 			cr = 6
-		case "4/8":
+		case "4/7LI", "4/8LI": // 4/7LI is wrongly defined; it is in fact 4/8LI.
 			cr = 8
 		default:
-			return 0, errCodingRate
+			return 0, errCodingRate.New()
 		}
 		var nBitHeaderSpace float64
 		var denominator float64
