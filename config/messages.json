@@ -3239,6 +3239,15 @@
       "file": "attributes.go"
     }
   },
+  "error:pkg/errors:request": {
+    "translations": {
+      "en": "request to `{url}` failed"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "conversion.go"
+    }
+  },
   "error:pkg/errors:validation": {
     "translations": {
       "en": "invalid `{field}`: {reason}"
@@ -3246,6 +3255,15 @@
     "description": {
       "package": "pkg/errors",
       "file": "validation.go"
+    }
+  },
+  "error:pkg/errors:x509_unknown_authority": {
+    "translations": {
+      "en": "unknown certificate authority"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "conversion.go"
     }
   },
   "error:pkg/events/grpc:no_identifiers": {
