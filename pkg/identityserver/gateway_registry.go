@@ -87,8 +87,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 				return nil, err
 			}
 		} else {
-			logger := log.FromContext(ctx)
-			logger.Warn("No encryption key defined, storing as plaintext")
+			log.FromContext(ctx).Warn("No encryption key defined, storing as plaintext")
 		}
 		req.LBSLNSSecret.Value = value
 		req.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
@@ -186,8 +185,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 				return nil, err
 			}
 		} else {
-			logger := log.FromContext(ctx)
-			logger.Warn("No encryption key defined, returning stored value")
+			log.FromContext(ctx).Warn("No encryption key defined, returning stored value")
 		}
 		gtw.LBSLNSSecret.Value = value
 		gtw.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
