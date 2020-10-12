@@ -52,6 +52,7 @@ jobs:
       continue-on-error: true
     - name: Install JS dependencies
       run: tools/bin/mage js:deps
+      timeout-minutes: 5
     - name: Check headers
       run: tools/bin/mage headers:check
     - name: Fix common spelling mistakes
