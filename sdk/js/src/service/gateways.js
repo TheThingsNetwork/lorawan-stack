@@ -184,6 +184,19 @@ class Gateways {
     // Combine all stream sources to one subscription generator.
     return combineStreams(streams)
   }
+
+  // Gateway Configuration Server.
+
+  async getGlobalConf(gatewayId) {
+    // Endpoint hardcoded because it is not part of the gRPC API.
+    // Refactor implementation once the following issue is resolved:
+    // https://github.com/TheThingsNetwork/lorawan-stack/issues/3280
+    const endpoint = `/gcs/gateways/${gatewayId}/semtechudp/global_conf.json`
+
+    const response = this._api._connector.handleRequest('get', endpoint, 'gcs', false)
+
+    return Marshaler.payloadSingleResponse(response)
+  }
 }
 
 export default Gateways

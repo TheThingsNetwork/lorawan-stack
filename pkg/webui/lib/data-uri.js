@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const STACK_COMPONENTS = ['as', 'is', 'ns', 'js', 'gs', 'edtc', 'qrg', 'gcs']
+const composeDataUri = (data, mimeType = 'data:application/json;charset=utf-8') =>
+  `${mimeType},${encodeURIComponent(data)}`
 
-export const URI_PREFIX_STACK_COMPONENT_MAP = {
-  as: 'as',
-  ns: 'ns',
-  js: 'js',
-  gs: 'gs',
-  edtc: 'edtc',
-  qrg: 'qrg',
-  gcs: 'gcs',
+const downloadDataUriAsFile = (dataUri, filename) => {
+  const node = document.createElement('a')
+  node.setAttribute('href', dataUri)
+  node.setAttribute('download', filename)
+  document.body.appendChild(node) // Required for Firefox.
+  node.click()
+  node.remove()
 }
+
+export { composeDataUri, downloadDataUriAsFile }
