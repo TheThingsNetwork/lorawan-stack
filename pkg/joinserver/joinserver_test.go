@@ -2613,7 +2613,6 @@ func TestGetHomeNetID(t *testing.T) {
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"net_id",
-					"network_server_address",
 				})
 				return nil, errTest.New()
 			},
@@ -2636,7 +2635,6 @@ func TestGetHomeNetID(t *testing.T) {
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"net_id",
-					"network_server_address",
 				})
 				return &ttnpb.ContextualEndDevice{
 					Context: ctx,
