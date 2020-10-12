@@ -60,7 +60,7 @@ type DeviceRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
 	// CompatibilityVersion denotes the lowest possible stack version the registry should be compatible with.
-	CompatibiltyVersion semver.Version
+	CompatibilityVersion semver.Version
 
 	entropyMu *sync.Mutex
 	entropy   io.Reader
@@ -647,7 +647,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			log.FromContext(ctx).WithFields(log.Fields(
 				"scan_keys", scanKeys,
 				"args", args,
-			)).Error("Failed to run device match scan script")
+			)).WithError(err).Error("Failed to run device match scan script")
 			return ttnredis.ConvertError(err)
 		}
 		if err == redis.Nil {
@@ -719,10 +719,20 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				return nil
 			}
 		}
-		if len(args) > 1 {
-			args[1] = uid
-		} else {
-			args = append(args, uid)
+		switch scanKeys[0] {
+		case matchKeys.Processing.ShortFCnt,
+			matchKeys.Processing.LongFCntNoRollover,
+			matchKeys.Processing.LongFCntRollover,
+			matchKeys.Processing.Pending,
+			matchKeys.Processing.Legacy:
+			// If the UID is from processing set, we don't need to remove it
+			args = args[:1]
+		default:
+			if len(args) > 1 {
+				args[1] = uid
+			} else {
+				args = append(args, uid)
+			}
 		}
 	}
 	return errNoUplinkMatch.New()
@@ -895,7 +905,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 
 			var delFields []string
 			var setFields []interface{}
-			forceFieldWrite := r.CompatibiltyVersion.Compare(semver.Version{Major: 3, Minor: 10}) < 0
+			forceFieldWrite := r.CompatibilityVersion.Compare(semver.Version{Major: 3, Minor: 10}) < 0
 
 			// NOTE: The following sequence of switches use concept of "container" - a container is the pointer type "containing" the field value we're interested in.
 
