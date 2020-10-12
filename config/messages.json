@@ -5444,6 +5444,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/joinserver:no_paths": {
+    "translations": {
+      "en": "no paths specified"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "grpc_application_activation_settings_registry.go"
+    }
+  },
   "error:pkg/joinserver:no_payload": {
     "translations": {
       "en": "no message payload specified"
