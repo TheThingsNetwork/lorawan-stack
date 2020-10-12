@@ -29,7 +29,7 @@ func TestContactInfoStore(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
 
-	now := time.Now()
+	now := cleanTime(time.Now())
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, &ContactInfo{}, &Application{})

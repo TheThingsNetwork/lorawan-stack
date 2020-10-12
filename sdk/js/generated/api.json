@@ -10953,6 +10953,16 @@
               "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "lbs_lns_secret",
+              "description": "The LoRa Basics Station LNS secret.\nThis is either an auth token (such as an API Key) or a TLS private certificate.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.\n\nnext: 23",
+              "label": "",
+              "type": "Secret",
+              "longType": "Secret",
+              "fullType": "ttn.lorawan.v3.Secret",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -25012,6 +25022,16 @@
               "description": "The right to view view gateway location."
             },
             {
+              "name": "RIGHT_GATEWAY_WRITE_SECRETS",
+              "number": "57",
+              "description": "The right to store secrets associated with this gateway."
+            },
+            {
+              "name": "RIGHT_GATEWAY_READ_SECRETS",
+              "number": "58",
+              "description": "The right to retrieve secrets associated with this gateway."
+            },
+            {
               "name": "RIGHT_GATEWAY_ALL",
               "number": "40",
               "description": "The pseudo-right for all (current and future) gateway rights."
@@ -25809,6 +25829,59 @@
           ]
         }
       ]
+    },
+    {
+      "name": "lorawan-stack/api/secrets.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "Secret",
+          "longName": "Secret",
+          "fullName": "ttn.lorawan.v3.Secret",
+          "description": "Secret contains a secret value. It also contains the ID of the Encryption key used to encrypt it.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key_id",
+              "description": "ID of the Key used to encrypt the secret.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "services": []
     },
     {
       "name": "lorawan-stack/api/user.proto",

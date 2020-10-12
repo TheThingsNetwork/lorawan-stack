@@ -2555,6 +2555,15 @@
       "file": "update_info.go"
     }
   },
+  "error:pkg/basicstation/cups:lns_credentials_not_found": {
+    "translations": {
+      "en": "LNS credentials not found for gateway `{gateway_uid}`"
+    },
+    "description": {
+      "package": "pkg/basicstation/cups",
+      "file": "update_info.go"
+    }
+  },
   "error:pkg/basicstation/cups:no_trust": {
     "translations": {
       "en": "no trusted certificate found"
@@ -4511,6 +4520,15 @@
   "error:pkg/identityserver:gateway_eui_taken": {
     "translations": {
       "en": "a gateway with EUI `{gateway_eui}` is already registered as `{gateway_id}`"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
+  "error:pkg/identityserver:gateway_secret_encryption_key_not_found": {
+    "translations": {
+      "en": "a gateway secret encryption key with id `{id}` not found"
     },
     "description": {
       "package": "pkg/identityserver",

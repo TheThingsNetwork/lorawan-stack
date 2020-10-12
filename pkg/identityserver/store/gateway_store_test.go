@@ -38,6 +38,14 @@ func TestGatewayStore(t *testing.T) {
 
 		eui := &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 		scheduleAnytimeDelay := time.Second
+		secret := &ttnpb.Secret{
+			KeyID: "my-secret-key-id",
+			Value: []byte("my very secret value"),
+		}
+		otherSecret := &ttnpb.Secret{
+			KeyID: "my-secret-key-id",
+			Value: []byte("my other very secret value"),
+		}
 		created, err := store.CreateGateway(ctx, &ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayID: "foo",
@@ -55,6 +63,7 @@ func TestGatewayStore(t *testing.T) {
 			},
 			ScheduleAnytimeDelay:     &scheduleAnytimeDelay,
 			UpdateLocationFromStatus: true,
+			LBSLNSSecret:             secret,
 		})
 
 		a.So(err, should.BeNil)
@@ -70,9 +79,11 @@ func TestGatewayStore(t *testing.T) {
 			a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 			a.So(*created.ScheduleAnytimeDelay, should.Equal, time.Second)
 			a.So(created.UpdateLocationFromStatus, should.BeTrue)
+			a.So(created.LBSLNSSecret, should.NotBeNil)
+			a.So(created.LBSLNSSecret, should.Resemble, secret)
 		}
 
-		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
+		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "lbs_lns_secret"}})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -82,6 +93,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.Attributes, should.HaveLength, 3)
 			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 			a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
+			a.So(got.LBSLNSSecret, should.Resemble, created.LBSLNSSecret)
 		}
 
 		byEUI, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{EUI: &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}}, &pbtypes.FieldMask{Paths: []string{"name"}})
@@ -89,6 +101,7 @@ func TestGatewayStore(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(byEUI, should.NotBeNil) {
 			a.So(byEUI.GatewayID, should.Equal, got.GatewayID)
+			a.So(byEUI.LBSLNSSecret, should.BeNil)
 		}
 
 		_, err = store.UpdateGateway(ctx, &ttnpb.Gateway{
@@ -114,7 +127,8 @@ func TestGatewayStore(t *testing.T) {
 			},
 			ScheduleAnytimeDelay:     nil,
 			UpdateLocationFromStatus: false,
-		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "antennas", "schedule_anytime_delay", "update_location_from_status"}})
+			LBSLNSSecret:             otherSecret,
+		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "antennas", "schedule_anytime_delay", "update_location_from_status", "lbs_lns_secret"}})
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
@@ -130,6 +144,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 			a.So(*updated.ScheduleAnytimeDelay, should.Equal, time.Duration(0))
 			a.So(updated.UpdateLocationFromStatus, should.BeFalse)
+			a.So(updated.LBSLNSSecret, should.Resemble, otherSecret)
 		}
 
 		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, nil)
@@ -143,6 +158,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.Antennas, should.HaveLength, len(updated.Antennas))
 			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 			a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
+			a.So(got.LBSLNSSecret, should.Resemble, otherSecret)
 		}
 
 		list, err := store.FindGateways(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})

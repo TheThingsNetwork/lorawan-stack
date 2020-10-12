@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for setting the frame counter width of an end device in the Console.
 - Include consumed airtime metadata in uplink messages and join requests (see `uplink_message.consumed_airtime` field).
 - Add end device location metadata on forwarded uplink messages (see `uplink_message.locations` field).
+- Store and retrieve LBS LNS Secrets from database.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added column.
+  - To encrypt the secrets set `is.gateways.encryption-key-id`.
 
 ### Changed
 
@@ -23,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Raw downlink PHY payloads are not stored anymore by Network Server.
 - Move documentation to [lorawan-stack-docs](https://github.com/TheThingsIndustries/lorawan-stack-docs).
 - Improve LinkADRReq scheduling condition computation and, as a consequence, downlink task efficiency.
+- CUPS Server only accepts The Things Stack API Key for token auth.
 
 ### Deprecated
 
