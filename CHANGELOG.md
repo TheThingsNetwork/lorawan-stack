@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Store and retrieve LBS LNS Secrets from database.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added column.
   - To encrypt the secrets set `is.gateways.encryption-key-id`.
+- Storage Integration API.
+- CLI support for Storage Integration (see `ttn-lw-cli end-devices storage` and `ttn-lw-cli applications storage` commands).
 
 ### Changed
 

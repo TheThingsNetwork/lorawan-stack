@@ -486,6 +486,32 @@
       ]
     }
   },
+  "ApplicationUpStorage": {
+    "GetStoredApplicationUp": {
+      "file": "lorawan-stack/api/applicationserver_integrations_storage.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/storage/{type}",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id",
+            "type"
+          ],
+          "stream": true
+        },
+        {
+          "method": "get",
+          "pattern": "/as/applications/{application_ids.application_id}/packages/storage/{type}",
+          "parameters": [
+            "application_ids.application_id",
+            "type"
+          ],
+          "stream": true
+        }
+      ]
+    }
+  },
   "ApplicationPackageRegistry": {
     "List": {
       "file": "lorawan-stack/api/applicationserver_packages.proto",
