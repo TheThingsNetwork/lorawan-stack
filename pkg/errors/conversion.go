@@ -16,7 +16,9 @@ package errors
 
 import (
 	"context"
+	"crypto/x509"
 	"net"
+	"net/url"
 
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/status"
@@ -31,6 +33,10 @@ var (
 	errNetDNS            = DefineUnavailable("net_dns", "{message}", "message", "temporary", "timeout", "not_found")
 	errNetUnknownNetwork = DefineNotFound("net_unknown_network", "{message}", "message", "temporary", "timeout")
 	errNetOperation      = DefineUnavailable("net_operation", "{message}", "message", "op", "net", "source", "address", "timeout", "temporary")
+
+	errRequest = Define("request", "request to `{url}` failed")
+
+	errX509UnknownAuthority = DefineUnavailable("x509_unknown_authority", "unknown certificate authority")
 )
 
 // From returns an *Error if it can be derived from the given input.
@@ -119,6 +125,17 @@ func From(err error) (out *Error, ok bool) {
 		if err.Err != nil {
 			e = e.WithAttributes("message", err.Error())
 		}
+		return &e, true
+	case *url.Error:
+		e := build(errRequest, 0).WithAttributes(
+			"url", err.URL,
+		)
+		if err.Err != nil {
+			e = e.WithCause(err.Err)
+		}
+		return &e, true
+	case x509.UnknownAuthorityError, *x509.UnknownAuthorityError:
+		e := build(errX509UnknownAuthority, 0)
 		return &e, true
 	}
 	return nil, false
