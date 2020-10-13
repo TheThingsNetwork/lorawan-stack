@@ -193,7 +193,7 @@ const getFieldDescriptorByLabel = label => {
     .get('@field')
     .invoke('attr', 'aria-describedby')
     .then(describedBy => {
-      return cy.get(`[id=${describedBy}]`)
+      return cy.get(`[id="${describedBy}"]`)
     })
 }
 
