@@ -99,11 +99,11 @@ func HandleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 		dev.MACState.CurrentParameters.Rx2Frequency = req.Rx2Frequency
 		return nil
 	}, dev.MACState.PendingRequests...)
-	Evt := EvtReceiveRxParamSetupAccept
+	ev := EvtReceiveRxParamSetupAccept
 	if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
-		Evt = EvtReceiveRxParamSetupReject
+		ev = EvtReceiveRxParamSetupReject
 	}
 	return events.Builders{
-		Evt.With(events.WithData(pld)),
+		ev.With(events.WithData(pld)),
 	}, err
 }

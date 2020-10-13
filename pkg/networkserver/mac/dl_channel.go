@@ -135,11 +135,11 @@ func HandleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		dev.MACState.CurrentParameters.Channels[req.ChannelIndex].DownlinkFrequency = req.Frequency
 		return nil
 	}, dev.MACState.PendingRequests...)
-	Evt := EvtReceiveDLChannelAccept
+	ev := EvtReceiveDLChannelAccept
 	if !pld.ChannelIndexAck || !pld.FrequencyAck {
-		Evt = EvtReceiveDLChannelReject
+		ev = EvtReceiveDLChannelReject
 	}
 	return events.Builders{
-		Evt.With(events.WithData(pld)),
+		ev.With(events.WithData(pld)),
 	}, err
 }

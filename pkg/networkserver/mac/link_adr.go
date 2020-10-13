@@ -243,16 +243,16 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		return nil, ErrInvalidPayload.New()
 	}
 
-	Evt := EvtReceiveLinkADRAccept
+	ev := EvtReceiveLinkADRAccept
 	if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
-		Evt = EvtReceiveLinkADRReject
+		ev = EvtReceiveLinkADRReject
 
 		// See "Table 6: LinkADRAns status bits signification" of LoRaWAN 1.1 specification
 		if !pld.ChannelMaskAck {
 			log.FromContext(ctx).Warn("Either Network Server sent a channel mask, which enables a yet undefined channel or requires all channels to be disabled, or device is malfunctioning.")
 		}
 	}
-	evs := events.Builders{Evt.With(events.WithData(pld))}
+	evs := events.Builders{ev.With(events.WithData(pld))}
 
 	phy, err := DeviceBand(dev, fps)
 	if err != nil {

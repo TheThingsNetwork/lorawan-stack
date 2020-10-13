@@ -163,11 +163,11 @@ func HandleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		ch.EnableUplink = true
 		return nil
 	}, dev.MACState.PendingRequests...)
-	Evt := EvtReceiveNewChannelAccept
+	ev := EvtReceiveNewChannelAccept
 	if !pld.DataRateAck || !pld.FrequencyAck {
-		Evt = EvtReceiveNewChannelReject
+		ev = EvtReceiveNewChannelReject
 	}
 	return events.Builders{
-		Evt.With(events.WithData(pld)),
+		ev.With(events.WithData(pld)),
 	}, err
 }
