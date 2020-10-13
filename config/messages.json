@@ -611,6 +611,15 @@
       "file": "i18n.go"
     }
   },
+  "enum:RIGHT_GATEWAY_READ_SECRETS": {
+    "translations": {
+      "en": "retrieve secrets associated with a gateway"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:RIGHT_GATEWAY_SETTINGS_API_KEYS": {
     "translations": {
       "en": "view and edit gateway API keys"
@@ -659,6 +668,15 @@
   "enum:RIGHT_GATEWAY_TRAFFIC_READ": {
     "translations": {
       "en": "read gateway traffic"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_GATEWAY_WRITE_SECRETS": {
+    "translations": {
+      "en": "store secrets for a gateway"
     },
     "description": {
       "package": "pkg/ttnpb",
