@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -25,6 +26,7 @@ import { checkFromState, mayCreateOrganizations } from '@console/lib/feature-che
 
 import { getOrganizationsList } from '@console/store/actions/organizations'
 
+import { selectUserIsAdmin } from '@console/store/selectors/user'
 import {
   selectOrganizations,
   selectOrganizationsTotalCount,
@@ -53,15 +55,35 @@ const headers = [
   },
 ]
 
-export default class OrganizationsTable extends Component {
+const OWNED_TAB = 'owned'
+const ALL_TAB = 'all'
+const tabs = [
+  {
+    title: sharedMessages.organizations,
+    name: OWNED_TAB,
+  },
+  {
+    title: sharedMessages.allAdmin,
+    name: ALL_TAB,
+  },
+]
+
+class OrganizationsTable extends Component {
   static propTypes = {
+    isAdmin: PropTypes.bool.isRequired,
     pageSize: PropTypes.number.isRequired,
   }
 
   constructor(props) {
     super(props)
 
-    this.getOrganizationsList = params => getOrganizationsList(params, ['name', 'description'])
+    this.getOrganizationsList = params => {
+      const { tab, query } = params
+
+      return getOrganizationsList(params, ['name', 'description'], {
+        isSearch: tab === ALL_TAB || query.length > 0,
+      })
+    }
   }
 
   baseDataSelector(state) {
@@ -75,7 +97,7 @@ export default class OrganizationsTable extends Component {
   }
 
   render() {
-    const { pageSize } = this.props
+    const { pageSize, isAdmin } = this.props
 
     return (
       <FetchTable
@@ -87,7 +109,12 @@ export default class OrganizationsTable extends Component {
         baseDataSelector={this.baseDataSelector}
         pageSize={pageSize}
         searchable
+        tabs={isAdmin ? tabs : []}
       />
     )
   }
 }
+
+export default connect(state => ({
+  isAdmin: selectUserIsAdmin(state),
+}))(OrganizationsTable)

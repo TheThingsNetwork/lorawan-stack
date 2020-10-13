@@ -41,9 +41,9 @@ const getOrganizationsLogic = createRequestLogic({
     const {
       params: { page, limit, order, query },
     } = action.payload
-    const { selectors } = action.meta
+    const { selectors, options } = action.meta
 
-    const data = query
+    const data = options.isSearch
       ? await api.organizations.search(
           {
             page,
