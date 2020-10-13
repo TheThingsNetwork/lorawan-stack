@@ -9681,6 +9681,92 @@
               "fullType": "google.protobuf.Timestamp",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "rejected_data_rate_ranges",
+              "description": "Data rate ranges rejected by the device per frequency.",
+              "label": "repeated",
+              "type": "RejectedDataRateRangesEntry",
+              "longType": "MACState.RejectedDataRateRangesEntry",
+              "fullType": "ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry",
+              "ismap": true,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DataRateRange",
+          "longName": "MACState.DataRateRange",
+          "fullName": "ttn.lorawan.v3.MACState.DataRateRange",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "min_data_rate_index",
+              "description": "",
+              "label": "",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "max_data_rate_index",
+              "description": "",
+              "label": "",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DataRateRanges",
+          "longName": "MACState.DataRateRanges",
+          "fullName": "ttn.lorawan.v3.MACState.DataRateRanges",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ranges",
+              "description": "",
+              "label": "repeated",
+              "type": "DataRateRange",
+              "longType": "MACState.DataRateRange",
+              "fullType": "ttn.lorawan.v3.MACState.DataRateRange",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  }
+                ]
+              }
             }
           ]
         },
@@ -9768,6 +9854,37 @@
                   }
                 ]
               }
+            }
+          ]
+        },
+        {
+          "name": "RejectedDataRateRangesEntry",
+          "longName": "MACState.RejectedDataRateRangesEntry",
+          "fullName": "ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "DataRateRanges",
+              "longType": "MACState.DataRateRanges",
+              "fullType": "ttn.lorawan.v3.MACState.DataRateRanges",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

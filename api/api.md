@@ -147,7 +147,10 @@
   - [Message `MACParameters.Channel`](#ttn.lorawan.v3.MACParameters.Channel)
   - [Message `MACSettings`](#ttn.lorawan.v3.MACSettings)
   - [Message `MACState`](#ttn.lorawan.v3.MACState)
+  - [Message `MACState.DataRateRange`](#ttn.lorawan.v3.MACState.DataRateRange)
+  - [Message `MACState.DataRateRanges`](#ttn.lorawan.v3.MACState.DataRateRanges)
   - [Message `MACState.JoinAccept`](#ttn.lorawan.v3.MACState.JoinAccept)
+  - [Message `MACState.RejectedDataRateRangesEntry`](#ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry)
   - [Message `Session`](#ttn.lorawan.v3.Session)
   - [Message `SetEndDeviceRequest`](#ttn.lorawan.v3.SetEndDeviceRequest)
   - [Message `UpdateEndDeviceRequest`](#ttn.lorawan.v3.UpdateEndDeviceRequest)
@@ -2453,6 +2456,7 @@ This is used internally by the Network Server.
 | `rejected_adr_tx_power_indexes` | [`uint32`](#uint32) | repeated | ADR TX output power index values rejected by the device. Elements are sorted in ascending order. |
 | `rejected_frequencies` | [`uint64`](#uint64) | repeated | Frequencies rejected by the device. |
 | `last_downlink_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the last downlink message was scheduled. |
+| `rejected_data_rate_ranges` | [`MACState.RejectedDataRateRangesEntry`](#ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry) | repeated | Data rate ranges rejected by the device per frequency. |
 
 #### Field Rules
 
@@ -2465,6 +2469,32 @@ This is used internally by the Network Server.
 | `rejected_adr_data_rate_indexes` | <p>`repeated.max_items`: `15`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
 | `rejected_adr_tx_power_indexes` | <p>`repeated.max_items`: `15`</p><p>`repeated.items.uint32.lte`: `15`</p> |
 | `rejected_frequencies` | <p>`repeated.items.uint64.gte`: `100000`</p> |
+
+### <a name="ttn.lorawan.v3.MACState.DataRateRange">Message `MACState.DataRateRange`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `min_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
+| `max_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `min_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
+| `max_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.MACState.DataRateRanges">Message `MACState.DataRateRanges`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ranges` | [`MACState.DataRateRange`](#ttn.lorawan.v3.MACState.DataRateRange) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ranges` | <p>`repeated.min_items`: `1`</p> |
 
 ### <a name="ttn.lorawan.v3.MACState.JoinAccept">Message `MACState.JoinAccept`</a>
 
@@ -2483,6 +2513,13 @@ This is used internally by the Network Server.
 | `request` | <p>`message.required`: `true`</p> |
 | `keys` | <p>`message.required`: `true`</p> |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry">Message `MACState.RejectedDataRateRangesEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`uint64`](#uint64) |  |  |
+| `value` | [`MACState.DataRateRanges`](#ttn.lorawan.v3.MACState.DataRateRanges) |  |  |
 
 ### <a name="ttn.lorawan.v3.Session">Message `Session`</a>
 

@@ -360,6 +360,16 @@ message MACState {
 
   // Time when the last downlink message was scheduled.
   google.protobuf.Timestamp last_downlink_at = 20 [(gogoproto.stdtime) = true];
+
+  message DataRateRange {
+    DataRateIndex min_data_rate_index = 1 [(validate.rules).enum.defined_only = true];
+    DataRateIndex max_data_rate_index = 2 [(validate.rules).enum.defined_only = true];
+  }
+  message DataRateRanges {
+    repeated DataRateRange ranges = 1 [(validate.rules).repeated = { min_items: 1 }];
+  }
+  // Data rate ranges rejected by the device per frequency.
+  map<uint64, DataRateRanges> rejected_data_rate_ranges = 21;
 }
 
 // Power state of the device.

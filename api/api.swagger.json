@@ -8326,6 +8326,28 @@
         }
       }
     },
+    "MACStateDataRateRange": {
+      "type": "object",
+      "properties": {
+        "min_data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        },
+        "max_data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        }
+      }
+    },
+    "MACStateDataRateRanges": {
+      "type": "object",
+      "properties": {
+        "ranges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MACStateDataRateRange"
+          }
+        }
+      }
+    },
     "MACStateJoinAccept": {
       "type": "object",
       "properties": {
@@ -12029,6 +12051,13 @@
           "type": "string",
           "format": "date-time",
           "description": "Time when the last downlink message was scheduled."
+        },
+        "rejected_data_rate_ranges": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/MACStateDataRateRanges"
+          },
+          "description": "Data rate ranges rejected by the device per frequency."
         }
       },
       "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server."
