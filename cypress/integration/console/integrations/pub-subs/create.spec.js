@@ -45,68 +45,306 @@ describe('Application Pub/Sub create', () => {
       cy.findByLabelText('MQTT').check()
     })
 
-    it('succeeds adding pub-sub without credentials', () => {
-      const pubSub = {
-        id: 'no-creds-pub-sub',
-        serverUrl: 'mqtts://example.com',
-        clientId: 'no-creds-client-id',
-        subscribe_qos: 'AT_MOST_ONCE',
-        publish_qos: 'AT_MOST_ONCE',
-        format: 'json',
-        uplinkSubTopic: 'uplink-test-sub-topic',
-      }
-      cy.findByLabelText('Pub/Sub ID').type(pubSub.id)
-      cy.findByLabelText('Server URL').type(pubSub.serverUrl)
-      cy.findByLabelText('Client ID').type(pubSub.clientId)
-      cy.findByLabelText('Use credentials').uncheck({ force: true })
-      cy.findByLabelText('Subscribe QoS').selectOption(pubSub.subscribe_qos)
-      cy.findByLabelText('Publish QoS').selectOption(pubSub.publish_qos)
-      cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
-      cy.get('#uplink_message_checkbox').check()
-      cy.findByLabelText('Uplink message').type(pubSub.uplinkSubTopic)
-      cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
-
-      cy.location('pathname').should(
-        'eq',
-        `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
-      )
+    it('displays UI elements in place', () => {
+      cy.findByRole('heading', { name: 'Add Pub/Sub' }).should('be.visible')
+      cy.findByRole('heading', { name: 'General information' }).should('be.visible')
+      cy.findByRole('heading', { name: 'MQTT configuration' }).should('be.visible')
+      cy.findByRole('heading', { name: 'Message types' }).should('be.visible')
+      cy.findByLabelText('Pub/Sub ID')
+        .should('have.attr', 'placeholder')
+        .and('eq', 'my-new-pubsub')
+      cy.findByLabelText('Server URL')
+        .should('have.attr', 'placeholder')
+        .and('eq', 'mqtts://example.com')
+      cy.findByLabelText('Client ID')
+        .should('have.attr', 'placeholder')
+        .and('eq', 'my-client-id')
+      cy.findByLabelText('Username')
+        .should('have.attr', 'placeholder')
+        .and('eq', 'my-username')
+      cy.findByLabelText('Password')
+        .should('have.attr', 'placeholder')
+        .and('eq', 'my-password')
+      cy.findByLabelText('Base topic')
+        .should('have.attr', 'placeholder')
+        .and('eq', 'base-topic')
+      cy.findByTestId('notification')
+        .should('be.visible')
+        .findByText('For each enabled message type, an optional sub-topic can be defined')
+        .should('be.visible')
+      cy.findByRole('button', { name: 'Add Pub/Sub' }).should('be.visible')
     })
 
-    it('succeeds adding pub-sub with credentials', () => {
-      const pubSub = {
-        id: 'with-creds-pub-sub',
-        serverUrl: 'mqtts://example.com',
-        clientId: 'with-creds-client-id',
-        username: 'test-username',
-        subscribe_qos: 'AT_MOST_ONCE',
-        publish_qos: 'AT_MOST_ONCE',
-        format: 'json',
-        uplinkSubTopic: 'uplink-test-sub-topic',
-      }
-      cy.findByLabelText('Pub/Sub ID').type(pubSub.id)
-      cy.findByLabelText('Server URL').type(pubSub.serverUrl)
-      cy.findByLabelText('Client ID').type(pubSub.clientId)
-      cy.findByLabelText('Use credentials').check({ force: true })
-      cy.findByLabelText('Username').type(pubSub.username)
-      cy.findByLabelText('Subscribe QoS').selectOption(pubSub.subscribe_qos)
-      cy.findByLabelText('Publish QoS').selectOption(pubSub.publish_qos)
-      cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
-      cy.get('#uplink_message_checkbox').check()
-      cy.findByLabelText('Uplink message').type(pubSub.uplinkSubTopic)
-      cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
+    describe('has credentials', () => {
+      beforeEach(() => {
+        cy.findByLabelText('Use credentials').check({ force: true })
+      })
 
-      cy.location('pathname').should(
-        'eq',
-        `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
-      )
+      it('validates before submitting an empty form', () => {
+        cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
+
+        cy.findErrorByLabelText('Pub/Sub ID')
+          .should('contain.text', 'Pub/Sub ID is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Server URL')
+          .should('contain.text', 'Server URL is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Client ID')
+          .should('contain.text', 'Client ID is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Username')
+          .should('contain.text', 'Username is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Subscribe QoS')
+          .should('contain.text', 'Subscribe QoS is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Publish QoS')
+          .should('contain.text', 'Publish QoS is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Pub/Sub format')
+          .should('contain.text', 'Pub/Sub format is required')
+          .and('be.visible')
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+        )
+      })
+
+      it('succeeds adding pub-sub', () => {
+        const pubSub = {
+          id: 'with-creds-mqtt',
+          serverUrl: 'mqtts://example.com',
+          clientId: 'with-creds-mqtt-id',
+          username: 'test-mqtt-username',
+          subscribe_qos: 'AT_MOST_ONCE',
+          publish_qos: 'AT_MOST_ONCE',
+          format: 'json',
+          uplinkSubTopic: 'uplink-test-sub-topic',
+        }
+        cy.findByLabelText('Pub/Sub ID').type(pubSub.id)
+        cy.findByLabelText('Server URL').type(pubSub.serverUrl)
+        cy.findByLabelText('Client ID').type(pubSub.clientId)
+        cy.findByLabelText('Username').type(pubSub.username)
+        cy.findByLabelText('Subscribe QoS').selectOption(pubSub.subscribe_qos)
+        cy.findByLabelText('Publish QoS').selectOption(pubSub.publish_qos)
+        cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
+        cy.get('#uplink_message_checkbox').check()
+        cy.findByLabelText('Uplink message').type(pubSub.uplinkSubTopic)
+        cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
+
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+        )
+      })
+    })
+
+    describe('has no credentials', () => {
+      beforeEach(() => {
+        cy.findByLabelText('Use credentials').uncheck({ force: true })
+      })
+
+      it('validates before submitting an empty form', () => {
+        cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
+
+        cy.findErrorByLabelText('Pub/Sub ID')
+          .should('contain.text', 'Pub/Sub ID is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Server URL')
+          .should('contain.text', 'Server URL is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Client ID')
+          .should('contain.text', 'Client ID is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Subscribe QoS')
+          .should('contain.text', 'Subscribe QoS is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Publish QoS')
+          .should('contain.text', 'Publish QoS is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Pub/Sub format')
+          .should('contain.text', 'Pub/Sub format is required')
+          .and('be.visible')
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+        )
+      })
+
+      it('succeeds adding pub-sub', () => {
+        const pubSub = {
+          id: 'no-creds-mqtt',
+          serverUrl: 'mqtts://example.com',
+          clientId: 'no-creds-mqtt-id',
+          subscribe_qos: 'AT_MOST_ONCE',
+          publish_qos: 'AT_MOST_ONCE',
+          format: 'json',
+          uplinkSubTopic: 'uplink-test-sub-topic',
+        }
+        cy.findByLabelText('Pub/Sub ID').type(pubSub.id)
+        cy.findByLabelText('Server URL').type(pubSub.serverUrl)
+        cy.findByLabelText('Client ID').type(pubSub.clientId)
+        cy.findByLabelText('Use credentials').uncheck({ force: true })
+        cy.findByLabelText('Subscribe QoS').selectOption(pubSub.subscribe_qos)
+        cy.findByLabelText('Publish QoS').selectOption(pubSub.publish_qos)
+        cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
+        cy.get('#uplink_message_checkbox').check()
+        cy.findByLabelText('Uplink message').type(pubSub.uplinkSubTopic)
+        cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
+
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+        )
+      })
     })
   })
 
   describe('Nats', () => {
     beforeEach(() => {
-      cy.login({ user_id: userId, password: user.password })
-      cy.visit(`/applications/${userId}/integrations/pubsubs/add`)
-      cy.findByLabelText('Nats').check()
+      cy.loginConsole({ user_id: userId, password: user.password })
+      cy.visit(
+        `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+      )
+      cy.findByLabelText('NATS').check()
+    })
+
+    it('displays UI elements in place', () => {
+      cy.findByRole('heading', { name: 'Add Pub/Sub' }).should('be.visible')
+      cy.findByRole('heading', { name: 'General information' }).should('be.visible')
+      cy.findByRole('heading', { name: 'NATS configuration' }).should('be.visible')
+      cy.findByRole('heading', { name: 'Message types' }).should('be.visible')
+      cy.findByLabelText('Pub/Sub ID')
+        .should('have.attr', 'placeholder')
+        .and('eq', 'my-new-pubsub')
+      cy.findByLabelText('Username')
+        .should('have.attr', 'placeholder')
+        .and('eq', 'my-username')
+      cy.findByLabelText('Password')
+        .should('have.attr', 'placeholder')
+        .and('eq', 'my-password')
+      cy.findByLabelText('Address')
+        .should('have.attr', 'placeholder')
+        .and('eq', 'nats.example.com')
+      cy.findByLabelText('Port')
+        .should('have.attr', 'placeholder')
+        .and('eq', '4222')
+      cy.findByLabelText('Base topic')
+        .should('have.attr', 'placeholder')
+        .and('eq', 'base-topic')
+      cy.findByTestId('notification')
+        .should('be.visible')
+        .findByText('For each enabled message type, an optional sub-topic can be defined')
+        .should('be.visible')
+      cy.findByRole('button', { name: 'Add Pub/Sub' }).should('be.visible')
+    })
+
+    describe('has credentials', () => {
+      beforeEach(() => {
+        cy.findByLabelText('Use credentials').check({ force: true })
+      })
+
+      it('validates before submitting an empty form', () => {
+        cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
+
+        cy.findErrorByLabelText('Pub/Sub ID')
+          .should('contain.text', 'Pub/Sub ID is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Username')
+          .should('contain.text', 'Username is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Password')
+          .should('contain.text', 'Password is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Address')
+          .should('contain.text', 'Address is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Port')
+          .should('contain.text', 'Port is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Pub/Sub format')
+          .should('contain.text', 'Pub/Sub format is required')
+          .and('be.visible')
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+        )
+      })
+
+      it('succeeds adding pub-sub', () => {
+        const pubSub = {
+          id: 'with-creds-nats',
+          username: 'test-nats-username',
+          password: 'test-nats-password',
+          address: 'nats.example.com',
+          port: '4222',
+          format: 'json',
+          uplinkSubTopic: 'uplink-test-sub-topic',
+        }
+        cy.findByLabelText('Pub/Sub ID').type(pubSub.id)
+        cy.findByLabelText('Username').type(pubSub.username)
+        cy.findByLabelText('Password').type(pubSub.password)
+        cy.findByLabelText('Address').type(pubSub.address)
+        cy.findByLabelText('Port').type(pubSub.port)
+        cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
+        cy.get('#uplink_message_checkbox').check()
+        cy.findByLabelText('Uplink message').type(pubSub.uplinkSubTopic)
+        cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
+
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+        )
+      })
+    })
+
+    describe('has no credentials', () => {
+      beforeEach(() => {
+        cy.findByLabelText('Use credentials').uncheck({ force: true })
+      })
+
+      it('validates before submitting an empty form', () => {
+        cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
+
+        cy.findErrorByLabelText('Pub/Sub ID')
+          .should('contain.text', 'Pub/Sub ID is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Address')
+          .should('contain.text', 'Address is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Port')
+          .should('contain.text', 'Port is required')
+          .and('be.visible')
+        cy.findErrorByLabelText('Pub/Sub format')
+          .should('contain.text', 'Pub/Sub format is required')
+          .and('be.visible')
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+        )
+      })
+
+      it('succeeds adding pub-sub', () => {
+        const pubSub = {
+          id: 'no-creds-nats',
+          address: 'nats.example.com',
+          port: '4222',
+          format: 'json',
+          uplinkSubTopic: 'uplink-test-sub-topic',
+        }
+        cy.findByLabelText('Pub/Sub ID').type(pubSub.id)
+        cy.findByLabelText('Address').type(pubSub.address)
+        cy.findByLabelText('Port').type(pubSub.port)
+        cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
+        cy.get('#uplink_message_checkbox').check()
+        cy.findByLabelText('Uplink message').type(pubSub.uplinkSubTopic)
+        cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
+
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+        )
+      })
     })
   })
 })
