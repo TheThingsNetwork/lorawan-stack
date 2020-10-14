@@ -282,7 +282,7 @@ func TestNewChannelReq(t *testing.T) {
 		test.RunSubtest(t, test.SubtestConfig{
 			Name: func() string {
 				formatChannels := func(chs ...*ttnpb.MACParameters_Channel) string {
-					return fmt.Sprintf("[%s]", test.MapJoinStrings(func(_, v interface{}) string {
+					return fmt.Sprintf("[%s]", test.JoinStringsMap(func(_, v interface{}) string {
 						ch := v.(*ttnpb.MACParameters_Channel)
 						if ch == nil {
 							return "nil"
@@ -293,13 +293,11 @@ func TestNewChannelReq(t *testing.T) {
 				return fmt.Sprintf("channels:%s->%s,rejected_freqs:[%s],rejected_drs:[%s]",
 					formatChannels(tc.CurrentChannels...),
 					formatChannels(tc.DesiredChannels...),
-					test.MapJoinStrings(func(_, v interface{}) string {
-						return fmt.Sprint(v)
-					}, ",", tc.RejectedFrequencies),
-					test.MapJoinStrings(func(freq, rs interface{}) string {
+					test.JoinStringsf("%d", ",", false, tc.RejectedFrequencies),
+					test.JoinStringsMap(func(freq, rs interface{}) string {
 						return fmt.Sprintf("%d:[%s]",
 							freq,
-							test.MapJoinStrings(func(_, v interface{}) string {
+							test.JoinStringsMap(func(_, v interface{}) string {
 								r := v.(*ttnpb.MACState_DataRateRange)
 								return fmt.Sprintf("%d-%d", r.MinDataRateIndex, r.MaxDataRateIndex)
 							}, "", rs.(*ttnpb.MACState_DataRateRanges).Ranges),

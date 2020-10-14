@@ -349,12 +349,8 @@ func TestLinkADRReq(t *testing.T) {
 				tc.CurrentADRDataRateIndex, tc.DesiredADRDataRateIndex,
 				tc.CurrentADRTxPowerIndex, tc.DesiredADRTxPowerIndex,
 				tc.CurrentADRNbTrans, tc.DesiredADRNbTrans,
-				fmt.Sprintf("[%s]", test.MapJoinStrings(func(_, v interface{}) string {
-					return fmt.Sprint(v)
-				}, ",", tc.RejectedADRDataRateIndexes)),
-				fmt.Sprintf("[%s]", test.MapJoinStrings(func(_, v interface{}) string {
-					return fmt.Sprint(v)
-				}, ",", tc.RejectedADRTxPowerIndexes)),
+				fmt.Sprintf("[%s]", test.JoinStringsf("%d", ",", false, tc.RejectedADRDataRateIndexes)),
+				fmt.Sprintf("[%s]", test.JoinStringsf("%d", ",", false, tc.RejectedADRTxPowerIndexes)),
 			),
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				makeDevice := func(adr bool) *ttnpb.EndDevice {
