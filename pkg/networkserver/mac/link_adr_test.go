@@ -22,6 +22,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
@@ -348,8 +349,12 @@ func TestLinkADRReq(t *testing.T) {
 				tc.CurrentADRDataRateIndex, tc.DesiredADRDataRateIndex,
 				tc.CurrentADRTxPowerIndex, tc.DesiredADRTxPowerIndex,
 				tc.CurrentADRNbTrans, tc.DesiredADRNbTrans,
-				tc.RejectedADRDataRateIndexes,
-				tc.RejectedADRTxPowerIndexes,
+				fmt.Sprintf("[%s]", test.MapJoinStrings(func(_, v interface{}) string {
+					return fmt.Sprint(v)
+				}, ",", tc.RejectedADRDataRateIndexes)),
+				fmt.Sprintf("[%s]", test.MapJoinStrings(func(_, v interface{}) string {
+					return fmt.Sprint(v)
+				}, ",", tc.RejectedADRTxPowerIndexes)),
 			),
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				makeDevice := func(adr bool) *ttnpb.EndDevice {
@@ -416,16 +421,18 @@ func TestLinkADRReq(t *testing.T) {
 					false: tc.NoADRCommands,
 				} {
 					for _, n := range func() []int {
-						if len(cmds) == 0 {
+						switch len(cmds) {
+						case 0:
 							return []int{0}
+						default:
+							return []int{0, len(cmds)}
 						}
-						return []int{0, len(cmds)}
 					}() {
 						adr := adr
 						cmdsFit := n >= len(cmds)
-						cmdLen := uint16(5 * n)
+						cmdLen := (1 + lorawan.DefaultMACCommands[ttnpb.CID_LINK_ADR].DownlinkLength) * uint16(n)
 						cmds := cmds[:n]
-						answerLen := 2 * func() uint16 {
+						answerLen := (1 + lorawan.DefaultMACCommands[ttnpb.CID_LINK_ADR].UplinkLength) * func() uint16 {
 							switch {
 							case n == 0:
 								return 0
