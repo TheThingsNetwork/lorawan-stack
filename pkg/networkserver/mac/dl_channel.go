@@ -39,18 +39,19 @@ var (
 )
 
 func DeviceNeedsDLChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
-	if i >= len(dev.MACState.CurrentParameters.Channels) || i >= len(dev.MACState.DesiredParameters.Channels) {
+	if i >= len(dev.MACState.DesiredParameters.Channels) {
 		return false
 	}
-	desiredCh, currentCh := dev.MACState.DesiredParameters.Channels[i], dev.MACState.CurrentParameters.Channels[i]
-	if desiredCh == nil || currentCh == nil {
+	desiredCh := dev.MACState.DesiredParameters.Channels[i]
+	if desiredCh == nil || desiredCh.UplinkFrequency == 0 || deviceRejectedFrequency(dev, desiredCh.DownlinkFrequency) {
 		return false
 	}
 	if DeviceNeedsNewChannelReqAtIndex(dev, i) {
-		// Cannot define a downlink frequency for disabled channel.
-		return desiredCh.UplinkFrequency != 0 && desiredCh.DownlinkFrequency != desiredCh.UplinkFrequency
+		return desiredCh.DownlinkFrequency != desiredCh.UplinkFrequency
 	}
-	return desiredCh.DownlinkFrequency != currentCh.DownlinkFrequency
+	// NOTE: Given the conditional before DeviceNeedsNewChannelReqAtIndex call and since no NewChannelReq is required,
+	// len(dev.MACState.CurrentParameters.Channels) > i && dev.MACState.CurrentParameters.Channels[i] != nil.
+	return desiredCh.DownlinkFrequency != dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency
 }
 
 func DeviceNeedsDLChannelReq(dev *ttnpb.EndDevice) bool {
@@ -59,7 +60,7 @@ func DeviceNeedsDLChannelReq(dev *ttnpb.EndDevice) bool {
 		dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
 		return false
 	}
-	for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {
+	for i := range dev.MACState.DesiredParameters.Channels {
 		if DeviceNeedsDLChannelReqAtIndex(dev, i) {
 			return true
 		}
