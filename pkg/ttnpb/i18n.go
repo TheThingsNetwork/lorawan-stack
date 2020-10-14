@@ -141,6 +141,8 @@ func init() {
 	defineEnum(RIGHT_GATEWAY_LINK, "link as Gateway to a Gateway Server for traffic exchange, i.e. write uplink and read downlink")
 	defineEnum(RIGHT_GATEWAY_STATUS_READ, "view gateway status")
 	defineEnum(RIGHT_GATEWAY_LOCATION_READ, "view gateway location")
+	defineEnum(RIGHT_GATEWAY_WRITE_SECRETS, "store secrets for a gateway")
+	defineEnum(RIGHT_GATEWAY_READ_SECRETS, "retrieve secrets associated with a gateway")
 	defineEnum(RIGHT_GATEWAY_ALL, "all gateway rights")
 
 	defineEnum(RIGHT_ORGANIZATION_INFO, "view organization information")
