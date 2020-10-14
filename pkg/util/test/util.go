@@ -140,3 +140,17 @@ func AllTrue(vs ...bool) bool {
 	}
 	return true
 }
+
+// MapJoinStrings maps contents of xs to strings using f and joins them with sep.
+func MapJoinStrings(f func(k interface{}, v interface{}) string, sep string, xs interface{}) string {
+	r, ok := WrapRanger(xs)
+	if !ok {
+		panic(fmt.Sprintf("cannot range over values of type %T", xs))
+	}
+	var ss []string
+	r.Range(func(k, v interface{}) bool {
+		ss = append(ss, f(k, v))
+		return true
+	})
+	return strings.Join(ss, sep)
+}
