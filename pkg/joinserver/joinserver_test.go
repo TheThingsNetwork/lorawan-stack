@@ -163,8 +163,7 @@ func TestHandleJoin(t *testing.T) {
 				LoRaWANVersion:       ttnpb.MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 			},
-			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
-			NextLastJoinNonce:             1,
+			NextLastJoinNonce: 1,
 			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_1,
 				RawPayload: []byte{
