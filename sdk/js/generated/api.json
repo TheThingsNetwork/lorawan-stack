@@ -1706,7 +1706,7 @@
           "fields": [
             {
               "name": "application_ids",
-              "description": "Query upstream messages from all end devices of an application. Cannot be used in conjuction with EndDeviceIdentifiers.",
+              "description": "Query upstream messages from all end devices of an application. Cannot be used in conjunction with EndDeviceIdentifiers.",
               "label": "",
               "type": "ApplicationIdentifiers",
               "longType": "ApplicationIdentifiers",
@@ -1716,7 +1716,7 @@
             },
             {
               "name": "end_device_ids",
-              "description": "Query upstream messages from a single end device. Cannot be used in conjuction with ApplicationIdentifiers.",
+              "description": "Query upstream messages from a single end device. Cannot be used in conjunction with ApplicationIdentifiers.",
               "label": "",
               "type": "EndDeviceIdentifiers",
               "longType": "EndDeviceIdentifiers",

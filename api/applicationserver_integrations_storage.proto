@@ -27,9 +27,9 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 message GetStoredApplicationUpRequest {
-  // Query upstream messages from all end devices of an application. Cannot be used in conjuction with EndDeviceIdentifiers.
+  // Query upstream messages from all end devices of an application. Cannot be used in conjunction with EndDeviceIdentifiers.
   ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = true, (gogoproto.customname) = "ApplicationIDs"];
-  // Query upstream messages from a single end device. Cannot be used in conjuction with ApplicationIdentifiers.
+  // Query upstream messages from a single end device. Cannot be used in conjunction with ApplicationIdentifiers.
   EndDeviceIdentifiers end_device_ids = 2 [(gogoproto.nullable) = true, (gogoproto.customname) = "EndDeviceIDs"];
 
   // Query upstream messages of a specific type. If not set, then all upstream messages are returned.
