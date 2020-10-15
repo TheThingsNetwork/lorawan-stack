@@ -1402,6 +1402,15 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			} else {
 				dst.LastDownlinkAt = nil
 			}
+		case "rejected_data_rate_ranges":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rejected_data_rate_ranges' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RejectedDataRateRanges = src.RejectedDataRateRanges
+			} else {
+				dst.RejectedDataRateRanges = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -2648,6 +2657,57 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 				dst.CorrelationIDs = src.CorrelationIDs
 			} else {
 				dst.CorrelationIDs = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACState_DataRateRange) SetFields(src *MACState_DataRateRange, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "min_data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinDataRateIndex = src.MinDataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.MinDataRateIndex = zero
+			}
+		case "max_data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxDataRateIndex = src.MaxDataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.MaxDataRateIndex = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACState_DataRateRanges) SetFields(src *MACState_DataRateRanges, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ranges":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ranges' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Ranges = src.Ranges
+			} else {
+				dst.Ranges = nil
 			}
 
 		default:

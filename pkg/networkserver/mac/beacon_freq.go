@@ -81,9 +81,9 @@ func HandleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		return nil, ErrNoPayload.New()
 	}
 
-	Evt := EvtReceiveBeaconFreqAccept
+	ev := EvtReceiveBeaconFreqAccept
 	if !pld.FrequencyAck {
-		Evt = EvtReceiveBeaconFreqReject
+		ev = EvtReceiveBeaconFreqReject
 	}
 
 	var err error
@@ -97,6 +97,6 @@ func HandleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		return nil
 	}, dev.MACState.PendingRequests...)
 	return events.Builders{
-		Evt.With(events.WithData(pld)),
+		ev.With(events.WithData(pld)),
 	}, err
 }

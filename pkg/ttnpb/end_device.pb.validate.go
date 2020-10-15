@@ -1607,6 +1607,25 @@ func (m *MACState) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "rejected_data_rate_ranges":
+
+			for key, val := range m.GetRejectedDataRateRanges() {
+				_ = val
+
+				// no validation rules for RejectedDataRateRanges[key]
+
+				if v, ok := interface{}(val).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return MACStateValidationError{
+							field:  fmt.Sprintf("rejected_data_rate_ranges[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
 		default:
 			return MACStateValidationError{
 				field:  name,
@@ -3809,3 +3828,207 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MACState_JoinAcceptValidationError{}
+
+// ValidateFields checks the field values on MACState_DataRateRange with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MACState_DataRateRange) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACState_DataRateRangeFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "min_data_rate_index":
+
+			if _, ok := DataRateIndex_name[int32(m.GetMinDataRateIndex())]; !ok {
+				return MACState_DataRateRangeValidationError{
+					field:  "min_data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		case "max_data_rate_index":
+
+			if _, ok := DataRateIndex_name[int32(m.GetMaxDataRateIndex())]; !ok {
+				return MACState_DataRateRangeValidationError{
+					field:  "max_data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		default:
+			return MACState_DataRateRangeValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACState_DataRateRangeValidationError is the validation error returned by
+// MACState_DataRateRange.ValidateFields if the designated constraints aren't met.
+type MACState_DataRateRangeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACState_DataRateRangeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MACState_DataRateRangeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MACState_DataRateRangeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACState_DataRateRangeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACState_DataRateRangeValidationError) ErrorName() string {
+	return "MACState_DataRateRangeValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACState_DataRateRangeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACState_DataRateRange.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACState_DataRateRangeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACState_DataRateRangeValidationError{}
+
+// ValidateFields checks the field values on MACState_DataRateRanges with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MACState_DataRateRanges) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACState_DataRateRangesFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "ranges":
+
+			if len(m.GetRanges()) < 1 {
+				return MACState_DataRateRangesValidationError{
+					field:  "ranges",
+					reason: "value must contain at least 1 item(s)",
+				}
+			}
+
+			for idx, item := range m.GetRanges() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return MACState_DataRateRangesValidationError{
+							field:  fmt.Sprintf("ranges[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return MACState_DataRateRangesValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACState_DataRateRangesValidationError is the validation error returned by
+// MACState_DataRateRanges.ValidateFields if the designated constraints aren't met.
+type MACState_DataRateRangesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACState_DataRateRangesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MACState_DataRateRangesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MACState_DataRateRangesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACState_DataRateRangesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACState_DataRateRangesValidationError) ErrorName() string {
+	return "MACState_DataRateRangesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACState_DataRateRangesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACState_DataRateRanges.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACState_DataRateRangesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACState_DataRateRangesValidationError{}

@@ -120,3 +120,12 @@ func deviceRejectedFrequency(dev *ttnpb.EndDevice, freq uint64) bool {
 	i := searchUint64(freq, dev.MACState.RejectedFrequencies...)
 	return i < len(dev.MACState.RejectedFrequencies) && dev.MACState.RejectedFrequencies[i] == freq
 }
+
+func deviceRejectedDataRateRange(dev *ttnpb.EndDevice, freq uint64, min, max ttnpb.DataRateIndex) bool {
+	for _, r := range dev.MACState.RejectedDataRateRanges[freq].GetRanges() {
+		if r.MinDataRateIndex == min && r.MaxDataRateIndex == max {
+			return true
+		}
+	}
+	return false
+}

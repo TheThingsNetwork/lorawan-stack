@@ -502,6 +502,7 @@ var MACStateFieldPathsNested = []string{
 	"recent_uplinks",
 	"rejected_adr_data_rate_indexes",
 	"rejected_adr_tx_power_indexes",
+	"rejected_data_rate_ranges",
 	"rejected_frequencies",
 	"rx_windows_available",
 }
@@ -525,6 +526,7 @@ var MACStateFieldPathsTopLevel = []string{
 	"recent_uplinks",
 	"rejected_adr_data_rate_indexes",
 	"rejected_adr_tx_power_indexes",
+	"rejected_data_rate_ranges",
 	"rejected_frequencies",
 	"rx_windows_available",
 }
@@ -837,6 +839,7 @@ var EndDeviceFieldPathsNested = []string{
 	"mac_state.recent_uplinks",
 	"mac_state.rejected_adr_data_rate_indexes",
 	"mac_state.rejected_adr_tx_power_indexes",
+	"mac_state.rejected_data_rate_ranges",
 	"mac_state.rejected_frequencies",
 	"mac_state.rx_windows_available",
 	"max_frequency",
@@ -1069,6 +1072,7 @@ var EndDeviceFieldPathsNested = []string{
 	"pending_mac_state.recent_uplinks",
 	"pending_mac_state.rejected_adr_data_rate_indexes",
 	"pending_mac_state.rejected_adr_tx_power_indexes",
+	"pending_mac_state.rejected_data_rate_ranges",
 	"pending_mac_state.rejected_frequencies",
 	"pending_mac_state.rx_windows_available",
 	"pending_session",
@@ -1521,6 +1525,7 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_state.recent_uplinks",
 	"end_device.mac_state.rejected_adr_data_rate_indexes",
 	"end_device.mac_state.rejected_adr_tx_power_indexes",
+	"end_device.mac_state.rejected_data_rate_ranges",
 	"end_device.mac_state.rejected_frequencies",
 	"end_device.mac_state.rx_windows_available",
 	"end_device.max_frequency",
@@ -1753,6 +1758,7 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.pending_mac_state.recent_uplinks",
 	"end_device.pending_mac_state.rejected_adr_data_rate_indexes",
 	"end_device.pending_mac_state.rejected_adr_tx_power_indexes",
+	"end_device.pending_mac_state.rejected_data_rate_ranges",
 	"end_device.pending_mac_state.rejected_frequencies",
 	"end_device.pending_mac_state.rx_windows_available",
 	"end_device.pending_session",
@@ -2147,6 +2153,7 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_state.recent_uplinks",
 	"end_device.mac_state.rejected_adr_data_rate_indexes",
 	"end_device.mac_state.rejected_adr_tx_power_indexes",
+	"end_device.mac_state.rejected_data_rate_ranges",
 	"end_device.mac_state.rejected_frequencies",
 	"end_device.mac_state.rx_windows_available",
 	"end_device.max_frequency",
@@ -2379,6 +2386,7 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.pending_mac_state.recent_uplinks",
 	"end_device.pending_mac_state.rejected_adr_data_rate_indexes",
 	"end_device.pending_mac_state.rejected_adr_tx_power_indexes",
+	"end_device.pending_mac_state.rejected_data_rate_ranges",
 	"end_device.pending_mac_state.rejected_frequencies",
 	"end_device.pending_mac_state.rx_windows_available",
 	"end_device.pending_session",
@@ -2815,6 +2823,7 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_state.recent_uplinks",
 	"end_device.mac_state.rejected_adr_data_rate_indexes",
 	"end_device.mac_state.rejected_adr_tx_power_indexes",
+	"end_device.mac_state.rejected_data_rate_ranges",
 	"end_device.mac_state.rejected_frequencies",
 	"end_device.mac_state.rx_windows_available",
 	"end_device.max_frequency",
@@ -3047,6 +3056,7 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"end_device.pending_mac_state.recent_uplinks",
 	"end_device.pending_mac_state.rejected_adr_data_rate_indexes",
 	"end_device.pending_mac_state.rejected_adr_tx_power_indexes",
+	"end_device.pending_mac_state.rejected_data_rate_ranges",
 	"end_device.pending_mac_state.rejected_frequencies",
 	"end_device.pending_mac_state.rx_windows_available",
 	"end_device.pending_session",
@@ -3443,6 +3453,7 @@ var EndDeviceTemplateFieldPathsNested = []string{
 	"end_device.mac_state.recent_uplinks",
 	"end_device.mac_state.rejected_adr_data_rate_indexes",
 	"end_device.mac_state.rejected_adr_tx_power_indexes",
+	"end_device.mac_state.rejected_data_rate_ranges",
 	"end_device.mac_state.rejected_frequencies",
 	"end_device.mac_state.rx_windows_available",
 	"end_device.max_frequency",
@@ -3675,6 +3686,7 @@ var EndDeviceTemplateFieldPathsNested = []string{
 	"end_device.pending_mac_state.recent_uplinks",
 	"end_device.pending_mac_state.rejected_adr_data_rate_indexes",
 	"end_device.pending_mac_state.rejected_adr_tx_power_indexes",
+	"end_device.pending_mac_state.rejected_data_rate_ranges",
 	"end_device.pending_mac_state.rejected_frequencies",
 	"end_device.pending_mac_state.rx_windows_available",
 	"end_device.pending_session",
@@ -3905,4 +3917,20 @@ var MACState_JoinAcceptFieldPathsTopLevel = []string{
 	"keys",
 	"payload",
 	"request",
+}
+var MACState_DataRateRangeFieldPathsNested = []string{
+	"max_data_rate_index",
+	"min_data_rate_index",
+}
+
+var MACState_DataRateRangeFieldPathsTopLevel = []string{
+	"max_data_rate_index",
+	"min_data_rate_index",
+}
+var MACState_DataRateRangesFieldPathsNested = []string{
+	"ranges",
+}
+
+var MACState_DataRateRangesFieldPathsTopLevel = []string{
+	"ranges",
 }
