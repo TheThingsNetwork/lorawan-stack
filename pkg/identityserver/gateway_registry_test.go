@@ -339,7 +339,7 @@ func TestGatewaysSecrets(t *testing.T) {
 		gatewayIDWithoutEncKey := "foo-without-encryption-key"
 		gatewayNameWithoutEncKey := "Foo Gateway without encryption key"
 
-		created, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+		createdWithoutEncKey, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 					GatewayID: gatewayIDWithoutEncKey,
@@ -352,19 +352,19 @@ func TestGatewaysSecrets(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		if a.So(created, should.NotBeNil) {
-			a.So(created.Name, should.Equal, gatewayNameWithoutEncKey)
-			a.So(created.LBSLNSSecret, should.NotBeNil)
+		if a.So(createdWithoutEncKey, should.NotBeNil) {
+			a.So(createdWithoutEncKey.Name, should.Equal, gatewayNameWithoutEncKey)
+			a.So(createdWithoutEncKey.LBSLNSSecret, should.NotBeNil)
 		}
 
 		got, err := reg.Get(ctx, &ttnpb.GetGatewayRequest{
-			GatewayIdentifiers: created.GatewayIdentifiers,
+			GatewayIdentifiers: createdWithoutEncKey.GatewayIdentifiers,
 			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.Name, should.Equal, created.Name)
+			a.So(got.Name, should.Equal, createdWithoutEncKey.Name)
 			if a.So(got.EUI, should.NotBeNil) {
 				a.So(*got.EUI, should.Equal, euiWithoutEncKey)
 			}
@@ -374,7 +374,7 @@ func TestGatewaysSecrets(t *testing.T) {
 		// With Encryption Key
 		is.config.Gateways.EncryptionKeyID = "is-test"
 
-		created, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+		created, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 					GatewayID: gatewayID,
@@ -494,8 +494,10 @@ func TestGatewaysSecrets(t *testing.T) {
 			}
 		}
 
-		_, err = reg.Delete(ctx, &created.GatewayIdentifiers, creds)
+		_, err = reg.Delete(ctx, &createdWithoutEncKey.GatewayIdentifiers, creds)
+		a.So(err, should.BeNil)
 
+		_, err = reg.Delete(ctx, &created.GatewayIdentifiers, creds)
 		a.So(err, should.BeNil)
 	})
 }
