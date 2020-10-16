@@ -264,7 +264,15 @@ func (Dev) StartDevStack() error {
 	if mg.Verbose() {
 		fmt.Println("Starting the Stack")
 	}
-	return execGo(nil, os.Stderr, "run", "./cmd/ttn-lw-stack", "start")
+	if err := os.MkdirAll(".cache", 0755); err != nil {
+		return err
+	}
+	logFile, err := os.OpenFile(filepath.Join(".cache", "devStack.log"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	defer logFile.Close()
+	return execGo(logFile, logFile, "run", "./cmd/ttn-lw-stack", "start")
 }
 
 func init() {
