@@ -21,5 +21,5 @@ import (
 )
 
 func init() {
-	io.TaskBackoffConfig.IntervalFunc = component.MakeTaskBackoffIntervalFunc(false, component.DefaultTaskBackoffResetDuration, (1<<5)*test.Delay)
+	io.DialTaskBackoffConfig.IntervalFunc = component.MakeTaskBackoffIntervalFunc(false, component.DefaultTaskBackoffResetDuration, (1<<5)*test.Delay)
 }

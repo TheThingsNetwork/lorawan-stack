@@ -23,20 +23,20 @@ import (
 )
 
 var (
-	// TaskExtendedBackoffIntervals extends the default backoff intervals with longer periods for
-	// higher invocation counts.
-	TaskExtendedBackoffIntervals = append(component.DialTaskBackoffIntervals[:],
+	dialTaskBackoffIntervals = append(component.DialTaskBackoffIntervals[:],
 		time.Minute,
+	)
+	dialTaskExtendedBackoffIntervals = append(dialTaskBackoffIntervals[:],
 		5*time.Minute,
 		15*time.Minute,
 		30*time.Minute,
 	)
-	// TaskBackoffConfig derives the component.DefaultTaskBackoffConfig and dynamically determines the backoff duration
+	// DialTaskBackoffConfig derives the component.DialTaskBackoffConfig and dynamically determines the backoff duration
 	// based on recent error codes.
-	TaskBackoffConfig = &component.TaskBackoffConfig{
+	DialTaskBackoffConfig = &component.TaskBackoffConfig{
 		Jitter: component.DefaultTaskBackoffJitter,
 		IntervalFunc: func(ctx context.Context, executionDuration time.Duration, invocation uint, err error) time.Duration {
-			intervals := component.DefaultTaskBackoffIntervals[:]
+			intervals := dialTaskBackoffIntervals
 			switch {
 			case errors.IsFailedPrecondition(err),
 				errors.IsUnauthenticated(err),
@@ -45,7 +45,7 @@ var (
 				errors.IsAlreadyExists(err),
 				errors.IsCanceled(err),
 				errors.IsNotFound(err):
-				intervals = TaskExtendedBackoffIntervals
+				intervals = dialTaskExtendedBackoffIntervals
 			}
 			switch {
 			case executionDuration > component.DefaultTaskBackoffResetDuration:

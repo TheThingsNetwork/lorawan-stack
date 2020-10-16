@@ -66,7 +66,7 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 			return as.link(ctx, ids, target)
 		},
 		Restart: component.TaskRestartOnFailure,
-		Backoff: io.TaskBackoffConfig,
+		Backoff: io.DialTaskBackoffConfig,
 	})
 }
 
