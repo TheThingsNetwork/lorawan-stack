@@ -65,3 +65,9 @@ jobs:
         run: tools/bin/mage dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:sqlDump js:Build
       - name: Run frontend end-to-end tests
         run: tools/bin/mage dev:startDevStack & tools/bin/mage -v js:cypressHeadless
+      - name: Upload logs
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: logs
+          path: .cache/devStack.log
