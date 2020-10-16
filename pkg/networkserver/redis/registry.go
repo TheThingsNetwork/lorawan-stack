@@ -684,55 +684,69 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			return errDatabaseCorruption.WithCause(err)
 		}
 		ctx := log.NewContextWithField(ctx, "device_uid", uid)
+		ok, err = func() (ok bool, err error) {
+			defer func() {
+				if err != nil || ok {
+					return
+				}
+				switch scanKeys[0] {
+				case matchKeys.Processing.ShortFCnt,
+					matchKeys.Processing.LongFCntNoRollover,
+					matchKeys.Processing.LongFCntRollover,
+					matchKeys.Processing.Pending,
+					matchKeys.Processing.Legacy:
+					// If the UID is from processing set, we don't need to remove it
+					args = args[:1]
+				default:
+					if len(args) > 1 {
+						args[1] = uid
+					} else {
+						args = append(args, uid)
+					}
+				}
+			}()
 
-		ids, err := unique.ToDeviceID(uid)
-		if err != nil {
-			log.FromContext(ctx).WithError(err).WithField("uid", uid).
-				Error("Failed to parse UID returned by device match scan script as device identifiers")
-			return errDatabaseCorruption.WithCause(err)
-		}
-		ms, err := getUplinkMatch(ctx, r.Redis, matchKeys.Input, matchKeys.Processing, ids.ApplicationIdentifiers, ids.DeviceID, pld.DevAddr, lsb, scanKeys[0], r.uidKey(uid))
+			ids, err := unique.ToDeviceID(uid)
+			if err != nil {
+				log.FromContext(ctx).WithError(err).WithField("uid", uid).
+					Error("Failed to parse UID returned by device match scan script as device identifiers")
+				return false, errDatabaseCorruption.WithCause(err)
+			}
+			ms, err := getUplinkMatch(ctx, r.Redis, matchKeys.Input, matchKeys.Processing, ids.ApplicationIdentifiers, ids.DeviceID, pld.DevAddr, lsb, scanKeys[0], r.uidKey(uid))
+			if err != nil {
+				return false, err
+			}
+			for _, m := range ms {
+				ok, err := f(ctx, m)
+				if err != nil {
+					return false, errNoUplinkMatch.WithCause(err)
+				}
+				if ok {
+					b, err := msgpack.Marshal(MatchResult{
+						Key: scanKeys[0],
+						UID: uid,
+					})
+					if err != nil {
+						return false, err
+					}
+					_, err = r.Redis.Pipelined(func(p redis.Pipeliner) error {
+						p.Set(matchKeys.Match, string(b), cacheTTL)
+						p.Del(scanKeys...)
+						return nil
+					})
+					if err != nil {
+						return false, ttnredis.ConvertError(err)
+					}
+					return true, nil
+				}
+			}
+			return false, nil
+		}()
 		if err != nil {
 			return err
 		}
-		for _, m := range ms {
-			ok, err := f(ctx, m)
-			if err != nil {
-				return errNoUplinkMatch.WithCause(err)
-			}
-			if ok {
-				b, err := msgpack.Marshal(MatchResult{
-					Key: scanKeys[0],
-					UID: uid,
-				})
-				if err != nil {
-					return err
-				}
-				_, err = r.Redis.Pipelined(func(p redis.Pipeliner) error {
-					p.Set(matchKeys.Match, string(b), cacheTTL)
-					p.Del(scanKeys...)
-					return nil
-				})
-				if err != nil {
-					return ttnredis.ConvertError(err)
-				}
-				return nil
-			}
-		}
-		switch scanKeys[0] {
-		case matchKeys.Processing.ShortFCnt,
-			matchKeys.Processing.LongFCntNoRollover,
-			matchKeys.Processing.LongFCntRollover,
-			matchKeys.Processing.Pending,
-			matchKeys.Processing.Legacy:
-			// If the UID is from processing set, we don't need to remove it
-			args = args[:1]
-		default:
-			if len(args) > 1 {
-				args[1] = uid
-			} else {
-				args = append(args, uid)
-			}
+		if ok {
+			return nil
 		}
 	}
 	return errNoUplinkMatch.New()
