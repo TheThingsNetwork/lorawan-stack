@@ -708,12 +708,14 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 
 			ids, err := unique.ToDeviceID(uid)
 			if err != nil {
-				log.FromContext(ctx).WithError(err).WithField("uid", uid).
+				log.FromContext(ctx).WithError(err).
 					Error("Failed to parse UID returned by device match scan script as device identifiers")
 				return false, errDatabaseCorruption.WithCause(err)
 			}
 			ms, err := getUplinkMatch(ctx, r.Redis, matchKeys.Input, matchKeys.Processing, ids.ApplicationIdentifiers, ids.DeviceID, pld.DevAddr, lsb, scanKeys[0], r.uidKey(uid))
 			if err != nil {
+				log.FromContext(ctx).WithError(err).
+					Error("Failed to get uplink matches")
 				return false, err
 			}
 			for _, m := range ms {
