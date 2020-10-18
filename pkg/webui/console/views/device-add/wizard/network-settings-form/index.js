@@ -46,7 +46,6 @@ import validationSchema from './validation-schema'
 const defaultFormValues = {
   lorawan_phy_version: '',
   frequency_plan_id: '',
-  supports_class_c: false,
   mac_settings: {
     resets_f_cnt: false,
     supports_32_bit_f_cnt: true,
@@ -117,6 +116,7 @@ const NetworkSettingsForm = props => {
         title={sharedMessages.supportsClassC}
         name="supports_class_c"
         component={Checkbox}
+        disabled={isMulticast}
       />
       <Form.Field
         title={sharedMessages.frameCounterWidth}
