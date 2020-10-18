@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import ReactSelect from 'react-select'
+import ReactSelect, { components } from 'react-select'
 import { injectIntl } from 'react-intl'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
@@ -21,6 +21,18 @@ import classnames from 'classnames'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './select.styl'
+
+const Input = props => {
+  const { selectProps } = props
+
+  return <components.Input {...props} aria-describedby={selectProps['aria-describedby']} />
+}
+
+Input.propTypes = {
+  selectProps: PropTypes.shape({
+    'aria-describedby': PropTypes.string,
+  }).isRequired,
+}
 
 // Map value to a plain string, instead of value object.
 // See: https://github.com/JedWatson/react-select/issues/2841
@@ -156,6 +168,8 @@ class Select extends React.PureComponent {
         onFocus={onFocus}
         isDisabled={disabled}
         name={name}
+        components={{ Input }}
+        aria-describedby={rest['aria-describedby']}
         {...rest}
       />
     )

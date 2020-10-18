@@ -173,13 +173,27 @@ Cypress.Commands.add('augmentStackConfig', fns => {
 
 // Selectors.
 
+// Helper function to select an option. Use this function instead of `cy.select` as it allows
+// interacting with `react-select` in both interactive and headless modes of cypress.
+Cypress.Commands.add('selectOption', { prevSubject: true }, (subject, option) => {
+  cy.wrap(subject).type(option, { force: true })
+
+  cy.get('.select__option')
+    .first()
+    .then($option => {
+      // Native `cy.click` even with the `force` option doesnt work properly in headless electron
+      // environment causing issues when dealing with `react-select` (in interactive mode this works fine).
+      Cypress.$($option).trigger('click')
+    })
+})
+
 const getFieldDescriptorByLabel = label => {
   cy.findByLabelText(label).as('field')
   return cy
     .get('@field')
     .invoke('attr', 'aria-describedby')
     .then(describedBy => {
-      return cy.get(`[id=${describedBy}]`)
+      return cy.get(`[id="${describedBy}"]`)
     })
 }
 
