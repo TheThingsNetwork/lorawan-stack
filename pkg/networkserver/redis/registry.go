@@ -413,7 +413,7 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 			}
 		} else {
 			switch fields[i] {
-			case "mac_settings.resets_f_cnt.value":
+			case "mac_settings.resets_f_cnt":
 				v, err := decodeBool(v)
 				if err != nil {
 					return nil, errDatabaseCorruption.WithCause(err)
