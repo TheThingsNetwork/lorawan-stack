@@ -215,7 +215,7 @@ func wrapKeyWithVault(ctx context.Context, key types.AES128Key, kekLabel string,
 				Key: &key,
 			}, nil
 		}
-		return nil, errWrapKey.WithCause(err)
+		return nil, errWrapKey.WithAttributes("label", kekLabel).WithCause(err)
 	}
 	return ke, nil
 }
@@ -230,7 +230,7 @@ func wrapKeyWithKEK(ctx context.Context, key types.AES128Key, kekLabel string, k
 	}
 	ke, err := cryptoutil.WrapAES128KeyWithKEK(ctx, key, kekLabel, kek)
 	if err != nil {
-		return nil, errWrapKey.WithCause(err)
+		return nil, errWrapKey.WithAttributes("label", kekLabel).WithCause(err)
 	}
 	return ke, nil
 }
