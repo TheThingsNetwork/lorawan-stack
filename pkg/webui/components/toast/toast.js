@@ -41,6 +41,7 @@ const createToast = function() {
         info={type === INFO}
         error={type === ERROR}
         warning={type === WARNING}
+        data-test-id="toast-notification"
       />,
       {
         onClose: () => next(),
