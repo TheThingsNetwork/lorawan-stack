@@ -92,7 +92,7 @@ func (ps *PubSub) startTask(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 			return ps.start(ctx, target)
 		},
 		Restart: component.TaskRestartOnFailure,
-		Backoff: io.TaskBackoffConfig,
+		Backoff: io.DialTaskBackoffConfig,
 	})
 }
 
