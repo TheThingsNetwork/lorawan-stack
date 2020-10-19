@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"encoding"
+	"fmt"
 	"io"
 	"math/rand"
 	"runtime/trace"
@@ -190,11 +191,12 @@ func (m uplinkMatch) IsPending() bool {
 }
 
 type matchKeySet struct {
-	ShortFCnt          string
-	LongFCntNoRollover string
-	LongFCntRollover   string
-	Pending            string
-	Legacy             string
+	ShortFCntLE string
+	LongFCntLE  string
+	LongFCntGT  string
+	Pending     string
+	ShortFCntGT string
+	Legacy      string
 }
 
 func boolPtr(v bool) *bool {
@@ -276,9 +278,10 @@ var errMissingField = errors.DefineCorruption("missing_field_value", "missing fi
 func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingKeys matchKeySet, appID ttnpb.ApplicationIdentifiers, devID string, devAddr types.DevAddr, lsb uint16, matchKey, uidKey string) ([]*uplinkMatch, error) {
 	var isPending bool
 	switch matchKey {
-	case inputKeys.ShortFCnt, processingKeys.ShortFCnt,
-		inputKeys.LongFCntNoRollover, processingKeys.LongFCntNoRollover,
-		inputKeys.LongFCntRollover, processingKeys.LongFCntRollover:
+	case inputKeys.ShortFCntLE, processingKeys.ShortFCntLE,
+		inputKeys.ShortFCntGT, processingKeys.ShortFCntGT,
+		inputKeys.LongFCntLE, processingKeys.LongFCntLE,
+		inputKeys.LongFCntGT, processingKeys.LongFCntGT:
 	case inputKeys.Pending, processingKeys.Pending:
 		// NOTE: While the legacy key may point to a pending session, we can safely ignore that
 		// and let device rejoin and perform migration to new format.
@@ -298,7 +301,7 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 				resetsFCnt = &pb.MACSettings.ResetsFCnt.Value
 			}
 			if pb.ApplicationIdentifiers != appID || pb.DeviceID != devID {
-				return nil, errDatabaseCorruption.New()
+				return nil, errDatabaseCorruption.WithCause(errInvalidIdentifiers.New())
 			}
 			if err := pb.MACState.LoRaWANVersion.Validate(); err != nil {
 				return nil, errDatabaseCorruption.WithCause(err)
@@ -335,7 +338,7 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 		}
 		return ms, nil
 	default:
-		return nil, errDatabaseCorruption.New()
+		panic(fmt.Sprintf("invalid match key specified `%s`", matchKey))
 	}
 
 	var fields []string
@@ -362,7 +365,7 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 		return nil, ttnredis.ConvertError(err)
 	}
 	if len(vs) != len(fields) {
-		return nil, errDatabaseCorruption.New()
+		panic("invalid Redis answer field count")
 	}
 	m := &uplinkMatch{
 		appID:     appID,
@@ -406,7 +409,7 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 				}
 				m.fNwkSIntKeyKey = v
 			default:
-				return nil, errDatabaseCorruption.New()
+				panic(fmt.Sprintf("unknown field received from Redis: `%s`", fields[i]))
 			}
 		} else {
 			switch fields[i] {
@@ -450,21 +453,21 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 					return nil, errDatabaseCorruption.WithCause(errInvalidFormat.WithCause(err))
 				}
 				m.lastFCnt = uint32(n)
-				switch matchKey {
-				case inputKeys.ShortFCnt, processingKeys.ShortFCnt:
-				case inputKeys.LongFCntNoRollover, processingKeys.LongFCntNoRollover:
-					m.fCnt |= m.lastFCnt &^ 0xffff
-				case inputKeys.LongFCntRollover, processingKeys.LongFCntRollover:
-					if n > 0xffff_0000 {
-						return nil, errDatabaseCorruption.New()
+				m.fCnt = FullFCnt(lsb, m.lastFCnt, func() bool {
+					switch matchKey {
+					case inputKeys.ShortFCntLE, processingKeys.ShortFCntLE,
+						inputKeys.ShortFCntGT, processingKeys.ShortFCntGT:
+						return false
+					case inputKeys.LongFCntLE, processingKeys.LongFCntLE,
+						inputKeys.LongFCntGT, processingKeys.LongFCntGT:
+						return true
+					default:
+						panic(fmt.Sprintf("invalid match key specified: `%s`", matchKey))
 					}
-					m.fCnt |= (m.lastFCnt + 0x1_0000) &^ 0xffff
-				default:
-					return nil, errDatabaseCorruption.New()
-				}
+				}())
 
 			default:
-				return nil, errDatabaseCorruption.New()
+				panic(fmt.Sprintf("unknown field received from Redis: `%s`", fields[i]))
 			}
 		}
 	}
@@ -504,19 +507,21 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	}{
 		Match: ttnredis.Key(addrKey, "match", payloadHash),
 		Input: matchKeySet{
-			ShortFCnt:          ttnredis.Key(addrKeys.ShortFCnt, payloadHash),
-			LongFCntNoRollover: ttnredis.Key(addrKeys.LongFCnt, payloadHash, "no-rollover"),
-			LongFCntRollover:   ttnredis.Key(addrKeys.LongFCnt, payloadHash, "rollover"),
-			Pending:            ttnredis.Key(addrKeys.Pending, payloadHash),
-			Legacy:             ttnredis.Key(addrKeys.Legacy, payloadHash),
+			ShortFCntLE: ttnredis.Key(addrKeys.ShortFCnt, payloadHash, "le"),
+			LongFCntLE:  ttnredis.Key(addrKeys.LongFCnt, payloadHash, "le"),
+			LongFCntGT:  ttnredis.Key(addrKeys.LongFCnt, payloadHash, "gt"),
+			Pending:     ttnredis.Key(addrKeys.Pending, payloadHash),
+			ShortFCntGT: ttnredis.Key(addrKeys.ShortFCnt, payloadHash, "gt"),
+			Legacy:      ttnredis.Key(addrKeys.Legacy, payloadHash),
 		},
 	}
 	matchKeys.Processing = matchKeySet{
-		ShortFCnt:          ttnredis.Key(matchKeys.Input.ShortFCnt, "processing"),
-		LongFCntNoRollover: ttnredis.Key(matchKeys.Input.LongFCntNoRollover, "processing"),
-		LongFCntRollover:   ttnredis.Key(matchKeys.Input.LongFCntRollover, "processing"),
-		Pending:            ttnredis.Key(matchKeys.Input.Pending, "processing"),
-		Legacy:             ttnredis.Key(matchKeys.Input.Legacy, "processing"),
+		ShortFCntLE: ttnredis.Key(matchKeys.Input.ShortFCntLE, "processing"),
+		LongFCntLE:  ttnredis.Key(matchKeys.Input.LongFCntLE, "processing"),
+		LongFCntGT:  ttnredis.Key(matchKeys.Input.LongFCntGT, "processing"),
+		Pending:     ttnredis.Key(matchKeys.Input.Pending, "processing"),
+		ShortFCntGT: ttnredis.Key(matchKeys.Input.ShortFCntGT, "processing"),
+		Legacy:      ttnredis.Key(matchKeys.Input.Legacy, "processing"),
 	}
 
 	type MatchResult struct {
@@ -532,17 +537,20 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		addrKeys.Pending,
 		addrKeys.Legacy,
 
-		matchKeys.Input.ShortFCnt,
-		matchKeys.Processing.ShortFCnt,
+		matchKeys.Input.ShortFCntLE,
+		matchKeys.Processing.ShortFCntLE,
 
-		matchKeys.Input.LongFCntNoRollover,
-		matchKeys.Processing.LongFCntNoRollover,
+		matchKeys.Input.LongFCntLE,
+		matchKeys.Processing.LongFCntLE,
 
-		matchKeys.Input.LongFCntRollover,
-		matchKeys.Processing.LongFCntRollover,
+		matchKeys.Input.LongFCntGT,
+		matchKeys.Processing.LongFCntGT,
 
 		matchKeys.Input.Pending,
 		matchKeys.Processing.Pending,
+
+		matchKeys.Input.ShortFCntGT,
+		matchKeys.Processing.ShortFCntGT,
 
 		matchKeys.Input.Legacy,
 		matchKeys.Processing.Legacy,
@@ -574,19 +582,19 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		for i := 0; i < len(keyIndexes); i++ {
 			switch keyIndexes[i] {
 			case 6:
-				scanKeys = append(scanKeys, matchKeys.Input.ShortFCnt, matchKeys.Processing.ShortFCnt)
+				scanKeys = append(scanKeys, matchKeys.Input.ShortFCntLE, matchKeys.Processing.ShortFCntLE)
 			case 7:
-				scanKeys = append(scanKeys, matchKeys.Processing.ShortFCnt)
+				scanKeys = append(scanKeys, matchKeys.Processing.ShortFCntLE)
 				continue
 			case 8:
-				scanKeys = append(scanKeys, matchKeys.Input.LongFCntNoRollover, matchKeys.Processing.LongFCntNoRollover)
+				scanKeys = append(scanKeys, matchKeys.Input.LongFCntLE, matchKeys.Processing.LongFCntLE)
 			case 9:
-				scanKeys = append(scanKeys, matchKeys.Processing.LongFCntNoRollover)
+				scanKeys = append(scanKeys, matchKeys.Processing.LongFCntLE)
 				continue
 			case 10:
-				scanKeys = append(scanKeys, matchKeys.Input.LongFCntRollover, matchKeys.Processing.LongFCntRollover)
+				scanKeys = append(scanKeys, matchKeys.Input.LongFCntGT, matchKeys.Processing.LongFCntGT)
 			case 11:
-				scanKeys = append(scanKeys, matchKeys.Processing.LongFCntRollover)
+				scanKeys = append(scanKeys, matchKeys.Processing.LongFCntGT)
 				continue
 			case 12:
 				scanKeys = append(scanKeys, matchKeys.Input.Pending, matchKeys.Processing.Pending)
@@ -594,8 +602,13 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				scanKeys = append(scanKeys, matchKeys.Processing.Pending)
 				continue
 			case 14:
-				scanKeys = append(scanKeys, matchKeys.Input.Legacy, matchKeys.Processing.Legacy)
+				scanKeys = append(scanKeys, matchKeys.Input.ShortFCntGT, matchKeys.Processing.ShortFCntGT)
 			case 15:
+				scanKeys = append(scanKeys, matchKeys.Processing.ShortFCntGT)
+				continue
+			case 16:
+				scanKeys = append(scanKeys, matchKeys.Input.Legacy, matchKeys.Processing.Legacy)
+			case 17:
 				scanKeys = append(scanKeys, matchKeys.Processing.Legacy)
 				continue
 			default:
@@ -690,10 +703,11 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 					return
 				}
 				switch scanKeys[0] {
-				case matchKeys.Processing.ShortFCnt,
-					matchKeys.Processing.LongFCntNoRollover,
-					matchKeys.Processing.LongFCntRollover,
+				case matchKeys.Processing.ShortFCntLE,
+					matchKeys.Processing.LongFCntLE,
+					matchKeys.Processing.LongFCntGT,
 					matchKeys.Processing.Pending,
+					matchKeys.Processing.ShortFCntGT,
 					matchKeys.Processing.Legacy:
 					// If the UID is from processing set, we don't need to remove it
 					args = args[:1]
