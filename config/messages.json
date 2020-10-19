@@ -5581,7 +5581,7 @@
   },
   "error:pkg/joinserver:wrap_key": {
     "translations": {
-      "en": "failed to wrap key"
+      "en": "failed to wrap key with KEK label `{label}`"
     },
     "description": {
       "package": "pkg/joinserver",
