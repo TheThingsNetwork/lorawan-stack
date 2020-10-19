@@ -193,8 +193,8 @@ func (m uplinkMatch) IsPending() bool {
 type matchKeySet struct {
 	ShortFCntLE string
 	LongFCntLE  string
-	LongFCntGT  string
 	Pending     string
+	LongFCntGT  string
 	ShortFCntGT string
 	Legacy      string
 }
@@ -509,8 +509,8 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		Input: matchKeySet{
 			ShortFCntLE: ttnredis.Key(addrKeys.ShortFCnt, payloadHash, "le"),
 			LongFCntLE:  ttnredis.Key(addrKeys.LongFCnt, payloadHash, "le"),
-			LongFCntGT:  ttnredis.Key(addrKeys.LongFCnt, payloadHash, "gt"),
 			Pending:     ttnredis.Key(addrKeys.Pending, payloadHash),
+			LongFCntGT:  ttnredis.Key(addrKeys.LongFCnt, payloadHash, "gt"),
 			ShortFCntGT: ttnredis.Key(addrKeys.ShortFCnt, payloadHash, "gt"),
 			Legacy:      ttnredis.Key(addrKeys.Legacy, payloadHash),
 		},
@@ -518,8 +518,8 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	matchKeys.Processing = matchKeySet{
 		ShortFCntLE: ttnredis.Key(matchKeys.Input.ShortFCntLE, "processing"),
 		LongFCntLE:  ttnredis.Key(matchKeys.Input.LongFCntLE, "processing"),
-		LongFCntGT:  ttnredis.Key(matchKeys.Input.LongFCntGT, "processing"),
 		Pending:     ttnredis.Key(matchKeys.Input.Pending, "processing"),
+		LongFCntGT:  ttnredis.Key(matchKeys.Input.LongFCntGT, "processing"),
 		ShortFCntGT: ttnredis.Key(matchKeys.Input.ShortFCntGT, "processing"),
 		Legacy:      ttnredis.Key(matchKeys.Input.Legacy, "processing"),
 	}
@@ -543,11 +543,11 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		matchKeys.Input.LongFCntLE,
 		matchKeys.Processing.LongFCntLE,
 
-		matchKeys.Input.LongFCntGT,
-		matchKeys.Processing.LongFCntGT,
-
 		matchKeys.Input.Pending,
 		matchKeys.Processing.Pending,
+
+		matchKeys.Input.LongFCntGT,
+		matchKeys.Processing.LongFCntGT,
 
 		matchKeys.Input.ShortFCntGT,
 		matchKeys.Processing.ShortFCntGT,
@@ -592,14 +592,14 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				scanKeys = append(scanKeys, matchKeys.Processing.LongFCntLE)
 				continue
 			case 10:
-				scanKeys = append(scanKeys, matchKeys.Input.LongFCntGT, matchKeys.Processing.LongFCntGT)
+				scanKeys = append(scanKeys, matchKeys.Input.Pending, matchKeys.Processing.Pending)
 			case 11:
-				scanKeys = append(scanKeys, matchKeys.Processing.LongFCntGT)
+				scanKeys = append(scanKeys, matchKeys.Processing.Pending)
 				continue
 			case 12:
-				scanKeys = append(scanKeys, matchKeys.Input.Pending, matchKeys.Processing.Pending)
+				scanKeys = append(scanKeys, matchKeys.Input.LongFCntGT, matchKeys.Processing.LongFCntGT)
 			case 13:
-				scanKeys = append(scanKeys, matchKeys.Processing.Pending)
+				scanKeys = append(scanKeys, matchKeys.Processing.LongFCntGT)
 				continue
 			case 14:
 				scanKeys = append(scanKeys, matchKeys.Input.ShortFCntGT, matchKeys.Processing.ShortFCntGT)
@@ -705,8 +705,8 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				switch scanKeys[0] {
 				case matchKeys.Processing.ShortFCntLE,
 					matchKeys.Processing.LongFCntLE,
-					matchKeys.Processing.LongFCntGT,
 					matchKeys.Processing.Pending,
+					matchKeys.Processing.LongFCntGT,
 					matchKeys.Processing.ShortFCntGT,
 					matchKeys.Processing.Legacy:
 					// If the UID is from processing set, we don't need to remove it
