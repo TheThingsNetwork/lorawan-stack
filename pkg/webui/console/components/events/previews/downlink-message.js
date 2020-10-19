@@ -15,7 +15,6 @@
 import React from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-import getByPath from '@ttn-lw/lib/get-by-path'
 
 import messages from '../messages'
 
@@ -23,14 +22,18 @@ import DescriptionList from './shared/description-list'
 
 const DownLinkMessagePreview = React.memo(({ event }) => {
   const { data } = event
+  let txPower, bandwidth, frmPayload
+
   if ('scheduled' in data) {
-    const rawPayload = getByPath(data, 'raw_payload')
-    const txPower = getByPath(data, 'scheduled.downlink.tx_power')
-    const bandwidth = getByPath(data, 'scheduled.data_rate.lora.bandwidth')
+    if ('downlink' in data.scheduled) {
+      txPower = data.scheduled.downlink.txPower
+    }
+    if ('data_rate' in data.scheduled && 'lora' in data.scheduled.data_rate) {
+      bandwidth = data.scheduled.data_rate.lora.bandwidth
+    }
 
     return (
       <DescriptionList>
-        <DescriptionList.Byte title={messages.rawPayload} data={rawPayload} convertToHex />
         <DescriptionList.Item title={messages.txPower} data={txPower} />
         <DescriptionList.Item title={messages.bandwidth} data={bandwidth} />
       </DescriptionList>
@@ -39,8 +42,10 @@ const DownLinkMessagePreview = React.memo(({ event }) => {
 
   if ('request' in data) {
     const devAddr = event.identifiers[0].device_ids.device_addr
-    const frmPayload = getByPath(data, 'event.payload.mac_payload.frm_payload')
-    const rx1Delay = getByPath(data, 'request.rx1_delay')
+    if ('payload' in data && 'mac_payload' in data.payload) {
+      frmPayload = data.payload.mac_payload.frm_payload
+    }
+    const rx1Delay = data.request.rx1_delay
 
     return (
       <DescriptionList>

@@ -16,7 +16,6 @@ import React from 'react'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import getByPath from '@ttn-lw/lib/get-by-path'
 
 import messages from '../messages'
 
@@ -25,8 +24,11 @@ import DescriptionList from './shared/description-list'
 const JoinResponsePreview = React.memo(({ event }) => {
   const { identifiers, data } = event
   const ids = identifiers[0].device_ids
+  let sessionKeyId
 
-  const sessionKeyId = getByPath(data, 'session_keys.session_key_id')
+  if ('session_keys' in data) {
+    sessionKeyId = data.session_keys.session_key_id
+  }
 
   return (
     <DescriptionList>

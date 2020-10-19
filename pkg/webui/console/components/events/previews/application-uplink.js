@@ -16,7 +16,6 @@ import React from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import getByPath from '@ttn-lw/lib/get-by-path'
 
 import messages from '../messages'
 
@@ -26,13 +25,15 @@ import JSONPayload from './shared/json-payload'
 const ApplicationUplinkPreview = React.memo(({ event }) => {
   const { data, identifiers } = event
   const deviceIds = identifiers[0].device_ids
-  let snr
+  let snr, bandwidth
 
   if ('rx_metadata' in data) {
     snr = data.rx_metadata[0].snr
   }
 
-  const bandwidth = getByPath(data, 'settings.data_rate.lora.bandwidth')
+  if ('settings' in data && 'data_rate' in data.settings && 'lora' in data.settings.data_rate) {
+    bandwidth = data.settings.data_rate.lora.bandwidth
+  }
 
   return (
     <DescriptionList>

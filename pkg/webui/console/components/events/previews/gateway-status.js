@@ -15,7 +15,6 @@
 import React from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-import getByPath from '@ttn-lw/lib/get-by-path'
 
 import messages from '../messages'
 
@@ -23,8 +22,8 @@ import DescriptionList from './shared/description-list'
 import JSONPayload from './shared/json-payload'
 
 const GatewayStatusPreview = React.memo(({ event }) => {
-  const metrics = getByPath(event, 'data.metrics')
-  const versions = getByPath(event, 'data.versions')
+  const versions = event.data.versions
+  const metrics = event.data.metrics
 
   return (
     <DescriptionList>
