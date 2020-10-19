@@ -135,10 +135,10 @@ func FullFCnt(fCnt uint16, lastFCnt uint32, supports32BitFCnt bool) uint32 {
 		return 0
 	case !supports32BitFCnt:
 		return uint32(fCnt)
-	case uint32(fCnt) > lastFCnt&0xffff:
-		return uint32(fCnt) | lastFCnt&^0xffff
+	case uint32(fCnt) >= lastFCnt&0xffff:
+		return lastFCnt&^0xffff | uint32(fCnt)
 	case lastFCnt < 0xffff0000:
-		return uint32(fCnt) | (lastFCnt+0x10000)&^0xffff
+		return (lastFCnt+0x10000)&^0xffff | uint32(fCnt)
 	default:
 		return uint32(fCnt)
 	}

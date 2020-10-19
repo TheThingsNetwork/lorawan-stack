@@ -753,9 +753,17 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				"pending_session", isPending,
 			))
 
-			matchType := currentSessionMatch
-			if isPending {
+			var matchType sessionMatchType
+			switch {
+			case isPending:
 				matchType = pendingSessionMatch
+			case fCnt < match.LastFCnt():
+				if pld.FCnt != fCnt {
+					panic("invalid FCnt")
+				}
+				matchType = fCntResetMatch
+			default:
+				matchType = currentSessionMatch
 			}
 			var cmacF [4]byte
 			cmacF, ok = matchCmacF(ctx, fNwkSIntKey, macVersion, fCnt, up)

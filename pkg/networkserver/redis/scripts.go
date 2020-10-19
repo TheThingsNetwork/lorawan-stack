@@ -15,20 +15,23 @@ var (
 	// KEYS[4] 	- set of uids of devices matching pending session DevAddr
 	// KEYS[5]  - set of uids of devices matching either current or pending session DevAddr (legacy)
 	//
-	// KEYS[6] 	- sorted list of uid, LastFCntUp, FNwkSIntKey, MACVersion of matching devices using 16-bit frame counters
-	// KEYS[7] 	- sorted list of uid, LastFCntUp, FNwkSIntKey, MACVersion of matching devices using 16-bit frame counters being processed
+	// KEYS[6] 	- sorted list of uids of devices matching using 16-bit frame counters
+	// KEYS[7] 	- sorted list of uids of devices matching using 16-bit frame counters being processed
 	//
-	// KEYS[8] 	- sorted list of uid, LastFCntUp, FNwkSIntKey, MACVersion of matching devices using 32-bit frame counters with no rollover
-	// KEYS[9] 	- sorted list of uid, LastFCntUp, FNwkSIntKey, MACVersion of matching devices using 32-bit frame counters with no rollover being processed
+	// KEYS[8] 	- sorted list of uids of devices matching using 32-bit frame counters with no rollover
+	// KEYS[9] 	- sorted list of uids of devices matching using 32-bit frame counters with no rollover being processed
 	//
-	// KEYS[10]	- sorted list of uid, LastFCntUp, FNwkSIntKey, MACVersion of matching devices using 32-bit frame counters with rollover
-	// KEYS[11] - sorted list of uid, LastFCntUp, FNwkSIntKey, MACVersion of matching devices using 32-bit frame counters with rollover being processed
+	// KEYS[10] - list of uids of devices matching pending session DevAddr
+	// KEYS[11] - list of uids of devices matching pending session DevAddr being processed
 	//
-	// KEYS[12] - list of uids of devices matching pending session DevAddr
-	// KEYS[13] - list of uids of devices matching pending session DevAddr being processed
+	// KEYS[12]	- sorted list of uids of devices matching using 32-bit frame counters with rollover
+	// KEYS[13] - sorted list of uids of devices matching using 32-bit frame counters with rollover being processed
 	//
-	// KEYS[14] - list of uids of devices matching either current or pending session DevAddr not present in either KEYS[2], KEYS[3], nor KEYS[4]
-	// KEYS[15] - list of uids of devices matching either current or pending session DevAddr not present in either KEYS[2], KEYS[3], nor KEYS[4] being processed
+	// KEYS[14] - sorted list of uids of devices matching using 16-bit frame counters with a reset
+	// KEYS[15] - sorted list of uids of devices matching using 16-bit frame counters with a reset being processed
+	//
+	// KEYS[16] - list of uids of devices matching either current or pending session DevAddr not present in either KEYS[2], KEYS[3], nor KEYS[4]
+	// KEYS[17] - list of uids of devices matching either current or pending session DevAddr not present in either KEYS[2], KEYS[3], nor KEYS[4] being processed
 	// NOTE: The script is optimized for the assumption that count of devices using 16-bit frame counters << count of devices using 32-bit frame counters.
 	deviceMatchScript = redis.NewScript(`if redis.call('pexpire', KEYS[1], ARGV[2]) > 0 then
   return redis.call('get', KEYS[1])
@@ -52,17 +55,21 @@ if redis.call('sort', KEYS[3], 'by', 'nosort', 'limit', 0, longCount, 'store', K
   redis.call('pexpire', KEYS[8], ARGV[2])
   table.insert(toScan, 8)
 end
-if redis.call('sort', KEYS[3], 'by', 'nosort', 'limit', longCount, -1, 'store', KEYS[10]) > 0 then
+if redis.call('sort', KEYS[4], 'by', 'nosort', 'store', KEYS[10]) > 0 then
   redis.call('pexpire', KEYS[10], ARGV[2])
   table.insert(toScan, 10)
 end
-if redis.call('sort', KEYS[4], 'by', 'nosort', 'store', KEYS[12]) > 0 then
+if redis.call('sort', KEYS[3], 'by', 'nosort', 'limit', longCount, -1, 'store', KEYS[12]) > 0 then
   redis.call('pexpire', KEYS[12], ARGV[2])
   table.insert(toScan, 12)
 end
-if redis.call('sort', KEYS[5], 'by', 'nosort', 'store', KEYS[14]) > 0 then
+if redis.call('sort', KEYS[2], 'by', 'nosort', 'limit', shortCount, -1, 'store', KEYS[14]) > 0 then
   redis.call('pexpire', KEYS[14], ARGV[2])
   table.insert(toScan, 14)
+end
+if redis.call('sort', KEYS[5], 'by', 'nosort', 'store', KEYS[16]) > 0 then
+  redis.call('pexpire', KEYS[16], ARGV[2])
+  table.insert(toScan, 16)
 end
 if #toScan > 0 then
     return toScan
