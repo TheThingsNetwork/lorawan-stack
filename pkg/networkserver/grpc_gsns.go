@@ -408,7 +408,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			log.FromContext(ctx).Warn("Device missing NwkSEncKey in registry, skip")
 			return nil, false, nil
 		}
-		key, err := cryptoutil.UnwrapAES128Key(ctx, *session.NwkSEncKey, ns.KeyVault)
+		key, err := cryptoutil.UnwrapAES128Key(ctx, session.NwkSEncKey, ns.KeyVault)
 		if err != nil {
 			log.FromContext(ctx).WithField("kek_label", session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey, skip")
 			return nil, false, nil
@@ -612,7 +612,7 @@ macLoop:
 		}
 
 		var sNwkSIntKey types.AES128Key
-		sNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, *dev.Session.SNwkSIntKey, ns.KeyVault)
+		sNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, dev.Session.SNwkSIntKey, ns.KeyVault)
 		if err != nil {
 			logger.WithField("kek_label", dev.Session.SNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey, skip")
 			return nil, false, nil
@@ -740,7 +740,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 			fNwkSIntKeyEnvelope = match.FNwkSIntKey()
 			var err error
-			fNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, *fNwkSIntKeyEnvelope, ns.KeyVault)
+			fNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, fNwkSIntKeyEnvelope, ns.KeyVault)
 			if err != nil {
 				log.FromContext(ctx).WithError(err).WithField("kek_label", fNwkSIntKeyEnvelope.KEKLabel).Warn("Failed to unwrap FNwkSIntKey, skip")
 				return false, nil
@@ -865,7 +865,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 						}
 						if !fNwkSIntKeyEnvelope.Equal(stored.PendingSession.FNwkSIntKey) {
 							var err error
-							fNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, *stored.PendingSession.FNwkSIntKey, ns.KeyVault)
+							fNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, stored.PendingSession.FNwkSIntKey, ns.KeyVault)
 							if err != nil {
 								log.FromContext(ctx).WithError(err).WithField("kek_label", fNwkSIntKeyEnvelope.KEKLabel).Warn("Failed to unwrap FNwkSIntKey, skip")
 								return nil, false, err
@@ -900,7 +900,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 					}
 					if !fNwkSIntKeyEnvelope.Equal(stored.Session.FNwkSIntKey) {
 						var err error
-						fNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, *stored.Session.FNwkSIntKey, ns.KeyVault)
+						fNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, stored.Session.FNwkSIntKey, ns.KeyVault)
 						if err != nil {
 							log.FromContext(ctx).WithError(err).WithField("kek_label", fNwkSIntKeyEnvelope.KEKLabel).Warn("Failed to unwrap FNwkSIntKey, skip")
 							return nil, false, err

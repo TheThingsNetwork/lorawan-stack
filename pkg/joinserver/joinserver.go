@@ -36,6 +36,7 @@ import (
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoservices"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
@@ -56,8 +57,9 @@ type JoinServer struct {
 	*component.Component
 	ctx context.Context
 
-	devices DeviceRegistry
-	keys    KeyRegistry
+	devices                       DeviceRegistry
+	keys                          KeyRegistry
+	applicationActivationSettings ApplicationActivationSettingRegistry
 
 	euiPrefixes []types.EUI64Prefix
 
@@ -65,10 +67,11 @@ type JoinServer struct {
 	entropy   io.Reader
 
 	grpc struct {
-		nsJs      nsJsServer
-		asJs      asJsServer
-		jsDevices jsEndDeviceRegistryServer
-		js        jsServer
+		nsJs                          nsJsServer
+		asJs                          asJsServer
+		jsDevices                     jsEndDeviceRegistryServer
+		js                            jsServer
+		applicationActivationSettings applicationActivationSettingsRegistryServer
 	}
 	interop interopServer
 }
@@ -84,8 +87,9 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		Component: c,
 		ctx:       log.NewContextWithField(c.Context(), "namespace", "joinserver"),
 
-		devices: conf.Devices,
-		keys:    conf.Keys,
+		devices:                       conf.Devices,
+		keys:                          conf.Keys,
+		applicationActivationSettings: conf.ApplicationActivationSettings,
 
 		euiPrefixes: conf.JoinEUIPrefixes,
 
@@ -93,6 +97,10 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		entropy:   ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 0),
 	}
 
+	js.grpc.applicationActivationSettings = applicationActivationSettingsRegistryServer{
+		JS:       js,
+		kekLabel: conf.DeviceKEKLabel,
+	}
 	js.grpc.jsDevices = jsEndDeviceRegistryServer{
 		JS:       js,
 		kekLabel: conf.DeviceKEKLabel,
@@ -106,6 +114,7 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Js", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationActivationSettingsRegistry", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Js", cluster.HookName, c.ClusterAuthUnaryHook())
@@ -126,12 +135,14 @@ func (js *JoinServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterNsJsServer(s, js.grpc.nsJs)
 	ttnpb.RegisterJsEndDeviceRegistryServer(s, js.grpc.jsDevices)
 	ttnpb.RegisterJsServer(s, js.grpc.js)
+	ttnpb.RegisterApplicationActivationSettingRegistryServer(s, js.grpc.applicationActivationSettings)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (js *JoinServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterJsHandler(js.Context(), s, conn)
 	ttnpb.RegisterJsEndDeviceRegistryHandler(js.Context(), s, conn)
+	ttnpb.RegisterApplicationActivationSettingRegistryHandler(js.Context(), s, conn)
 }
 
 // RegisterInterop registers the NS-JS and AS-JS interop services.
@@ -189,20 +200,45 @@ func validateCallerByAddress(dn pkix.Name, addr string) error {
 	return nil
 }
 
-// wrapKeyIfKEKExists wraps the given key with the KEK label.
-// If the configured key vault cannot find the KEK, the key is returned in the clear.
-func (js *JoinServer) wrapKeyIfKEKExists(ctx context.Context, key types.AES128Key, kekLabel string) (*ttnpb.KeyEnvelope, error) {
-	env, err := cryptoutil.WrapAES128Key(ctx, key, kekLabel, js.KeyVault)
+// wrapKeyWithVault wraps the given key with the configured KEK label.
+// If KEK label is empty or wrapping fails with err, for which plaintextCond(err) is true, the key is returned in the clear.
+func wrapKeyWithVault(ctx context.Context, key types.AES128Key, kekLabel string, kv crypto.KeyVault, plaintextCond func(error) bool) (*ttnpb.KeyEnvelope, error) {
+	if kekLabel == "" {
+		return &ttnpb.KeyEnvelope{
+			Key: &key,
+		}, nil
+	}
+	ke, err := cryptoutil.WrapAES128Key(ctx, key, kekLabel, kv)
 	if err != nil {
-		if errors.IsNotFound(err) {
+		if plaintextCond != nil && plaintextCond(err) {
 			return &ttnpb.KeyEnvelope{
 				Key: &key,
 			}, nil
 		}
-		return nil, err
+		return nil, errWrapKey.WithCause(err)
 	}
-	return &env, nil
+	return ke, nil
 }
+
+// wrapKeyWithKEK wraps the given key with the configured KEK label.
+// If KEK label is empty, the key is returned in the clear.
+func wrapKeyWithKEK(ctx context.Context, key types.AES128Key, kekLabel string, kek types.AES128Key) (*ttnpb.KeyEnvelope, error) {
+	if kekLabel == "" {
+		return &ttnpb.KeyEnvelope{
+			Key: &key,
+		}, nil
+	}
+	ke, err := cryptoutil.WrapAES128KeyWithKEK(ctx, key, kekLabel, kek)
+	if err != nil {
+		return nil, errWrapKey.WithCause(err)
+	}
+	return ke, nil
+}
+
+var (
+	errGetApplicationActivationSettings = errors.Define("application_activation_settings", "failed to get application activation settings")
+	errNoKEK                            = errors.DefineNotFound("kek", "KEK not found")
+)
 
 // HandleJoin handles the given join-request.
 func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (res *ttnpb.JoinResponse, err error) {
@@ -378,7 +414,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			var networkCryptoService cryptoservices.Network
 			if req.SelectedMACVersion.UseNwkKey() && dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {
 				// LoRaWAN 1.1 and higher use a NwkKey.
-				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, *dev.RootKeys.NwkKey, js.KeyVault)
+				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.NwkKey, js.KeyVault)
 				if err != nil {
 					return nil, nil, err
 				}
@@ -389,7 +425,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 			var applicationCryptoService cryptoservices.Application
 			if dev.RootKeys != nil && dev.RootKeys.AppKey != nil {
-				appKey, err := cryptoutil.UnwrapAES128Key(ctx, *dev.RootKeys.AppKey, js.KeyVault)
+				appKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.AppKey, js.KeyVault)
 				if err != nil {
 					return nil, nil, err
 				}
@@ -436,42 +472,99 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				return nil, nil, errDeriveAppSKey.WithCause(err)
 			}
 
-			nsKEKLabel := dev.NetworkServerKEKLabel
-			if nsKEKLabel == "" {
-				nsKEKLabel = js.KeyVault.NsKEKLabel(ctx, dev.NetID, dev.NetworkServerAddress)
+			var (
+				fNwkSIntKeyEnvelope *ttnpb.KeyEnvelope
+				sNwkSIntKeyEnvelope *ttnpb.KeyEnvelope
+				nwkSEncKeyEnvelope  *ttnpb.KeyEnvelope
+				appSKeyEnvelope     *ttnpb.KeyEnvelope
+
+				nsPlaintextCond func(error) bool
+				asPlaintextCond func(error) bool
+			)
+			nsKEKLabel, asKEKLabel := dev.NetworkServerKEKLabel, dev.ApplicationServerKEKLabel
+			if nsKEKLabel == "" || asKEKLabel == "" {
+				sets, err := js.applicationActivationSettings.GetByID(ctx, cryptoDev.ApplicationIdentifiers, []string{
+					"kek",
+					"kek_label",
+				})
+				if err != nil {
+					if !errors.IsNotFound(err) {
+						return nil, nil, errGetApplicationActivationSettings.WithCause(err)
+					}
+					if asKEKLabel == "" {
+						asKEKLabel = js.KeyVault.AsKEKLabel(ctx, dev.ApplicationServerAddress)
+						asPlaintextCond = errors.IsNotFound
+					}
+					if nsKEKLabel == "" {
+						nsKEKLabel = js.KeyVault.NsKEKLabel(ctx, dev.NetID, dev.NetworkServerAddress)
+						nsPlaintextCond = errors.IsNotFound
+					}
+				} else {
+					var kek types.AES128Key
+					if sets.KEKLabel != "" {
+						if sets.KEK == nil {
+							return nil, nil, errNoKEK.New()
+						}
+						kek, err = cryptoutil.UnwrapAES128Key(ctx, sets.KEK, js.KeyVault)
+						if err != nil {
+							return nil, nil, errUnwrapKey.WithCause(err)
+						}
+					}
+					if nsKEKLabel == "" {
+						fNwkSIntKeyEnvelope, err = wrapKeyWithKEK(ctx, nwkSKeys.FNwkSIntKey, sets.KEKLabel, kek)
+						if err != nil {
+							return nil, nil, err
+						}
+						if req.SelectedMACVersion.UseNwkKey() {
+							sNwkSIntKeyEnvelope, err = wrapKeyWithKEK(ctx, nwkSKeys.SNwkSIntKey, sets.KEKLabel, kek)
+							if err != nil {
+								return nil, nil, err
+							}
+							nwkSEncKeyEnvelope, err = wrapKeyWithKEK(ctx, nwkSKeys.NwkSEncKey, sets.KEKLabel, kek)
+							if err != nil {
+								return nil, nil, err
+							}
+						}
+					}
+					if asKEKLabel == "" {
+						appSKeyEnvelope, err = wrapKeyWithKEK(ctx, appSKey, sets.KEKLabel, kek)
+						if err != nil {
+							return nil, nil, err
+						}
+					}
+				}
 			}
-			asKEKLabel := dev.ApplicationServerKEKLabel
-			if asKEKLabel == "" {
-				asKEKLabel = js.KeyVault.AsKEKLabel(ctx, dev.ApplicationServerAddress)
+			if nsKEKLabel != "" {
+				fNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.FNwkSIntKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
+				if err != nil {
+					return nil, nil, err
+				}
+				if req.SelectedMACVersion.UseNwkKey() {
+					sNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.SNwkSIntKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
+					if err != nil {
+						return nil, nil, err
+					}
+					nwkSEncKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.NwkSEncKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
+					if err != nil {
+						return nil, nil, err
+					}
+				}
+			}
+			if asKEKLabel != "" {
+				appSKeyEnvelope, err = wrapKeyWithVault(ctx, appSKey, asKEKLabel, js.KeyVault, asPlaintextCond)
+				if err != nil {
+					return nil, nil, err
+				}
 			}
 
-			sessionKeys := ttnpb.SessionKeys{
+			sk := ttnpb.SessionKeys{
 				SessionKeyID: skID[:],
+				FNwkSIntKey:  fNwkSIntKeyEnvelope,
+				NwkSEncKey:   nwkSEncKeyEnvelope,
+				SNwkSIntKey:  sNwkSIntKeyEnvelope,
+				AppSKey:      appSKeyEnvelope,
 			}
-			sessionKeys.FNwkSIntKey, err = js.wrapKeyIfKEKExists(ctx, nwkSKeys.FNwkSIntKey, nsKEKLabel)
-			if err != nil {
-				return nil, nil, errWrapKey.WithCause(err)
-			}
-			sessionKeys.AppSKey, err = js.wrapKeyIfKEKExists(ctx, appSKey, asKEKLabel)
-			if err != nil {
-				return nil, nil, errWrapKey.WithCause(err)
-			}
-			if req.SelectedMACVersion.UseNwkKey() {
-				sessionKeys.SNwkSIntKey, err = js.wrapKeyIfKEKExists(ctx, nwkSKeys.SNwkSIntKey, nsKEKLabel)
-				if err != nil {
-					return nil, nil, errWrapKey.WithCause(err)
-				}
-				sessionKeys.NwkSEncKey, err = js.wrapKeyIfKEKExists(ctx, nwkSKeys.NwkSEncKey, nsKEKLabel)
-				if err != nil {
-					return nil, nil, errWrapKey.WithCause(err)
-				}
-			}
-
-			res = &ttnpb.JoinResponse{
-				RawPayload:  append(b[:1], enc...),
-				SessionKeys: sessionKeys,
-			}
-			_, err = js.keys.SetByID(ctx, *dev.JoinEUI, *dev.DevEUI, res.SessionKeys.SessionKeyID,
+			_, err = js.keys.SetByID(ctx, *dev.JoinEUI, *dev.DevEUI, sk.SessionKeyID,
 				[]string{
 					"session_key_id",
 					"f_nwk_s_int_key",
@@ -483,7 +576,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					if stored != nil {
 						return nil, nil, errDuplicateIdentifiers.New()
 					}
-					return &res.SessionKeys, []string{
+					return &sk, []string{
 						"session_key_id",
 						"f_nwk_s_int_key",
 						"s_nwk_s_int_key",
@@ -499,12 +592,16 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			dev.Session = &ttnpb.Session{
 				StartedAt:   time.Now().UTC(),
 				DevAddr:     req.DevAddr,
-				SessionKeys: res.SessionKeys,
+				SessionKeys: sk,
 			}
 			dev.EndDeviceIdentifiers.DevAddr = &req.DevAddr
 			paths = append(paths, "session", "ids.dev_addr")
 
 			handled = true
+			res = &ttnpb.JoinResponse{
+				RawPayload:  append(b[:1], enc...),
+				SessionKeys: sk,
+			}
 			return dev, paths, nil
 		},
 	)
@@ -591,7 +688,21 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 				return nil, err
 			}
 		} else {
-			return nil, errNoApplicationServerID.New()
+			sets, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
+				"application_server_id",
+			})
+			if err != nil {
+				if !errors.IsNotFound(err) {
+					return nil, errGetApplicationActivationSettings.WithCause(err)
+				}
+				return nil, errNoApplicationServerID.New()
+			}
+			if sets.ApplicationServerID == "" {
+				return nil, errNoApplicationServerID.New()
+			}
+			if err := validateCallerByID(dn, sets.ApplicationServerID); err != nil {
+				return nil, err
+			}
 		}
 	} else if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
@@ -624,12 +735,22 @@ func (js *JoinServer) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EU
 	dev, err := js.devices.GetByEUI(ctx, joinEUI, devEUI,
 		[]string{
 			"net_id",
-			"network_server_address",
 		},
 	)
 	if err != nil {
 		return nil, errRegistryOperation.WithCause(err)
 	}
-
-	return dev.NetID, nil
+	if dev.NetID != nil {
+		return dev.NetID, nil
+	}
+	sets, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
+		"home_net_id",
+	})
+	if err != nil {
+		if !errors.IsNotFound(err) {
+			return nil, errGetApplicationActivationSettings.WithCause(err)
+		}
+		return nil, nil
+	}
+	return sets.HomeNetID, nil
 }

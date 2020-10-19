@@ -244,9 +244,12 @@
   - [Message `JoinResponse`](#ttn.lorawan.v3.JoinResponse)
 - [File `lorawan-stack/api/joinserver.proto`](#lorawan-stack/api/joinserver.proto)
   - [Message `AppSKeyResponse`](#ttn.lorawan.v3.AppSKeyResponse)
+  - [Message `ApplicationActivationSettings`](#ttn.lorawan.v3.ApplicationActivationSettings)
   - [Message `CryptoServicePayloadRequest`](#ttn.lorawan.v3.CryptoServicePayloadRequest)
   - [Message `CryptoServicePayloadResponse`](#ttn.lorawan.v3.CryptoServicePayloadResponse)
+  - [Message `DeleteApplicationActivationSettingsRequest`](#ttn.lorawan.v3.DeleteApplicationActivationSettingsRequest)
   - [Message `DeriveSessionKeysRequest`](#ttn.lorawan.v3.DeriveSessionKeysRequest)
+  - [Message `GetApplicationActivationSettingsRequest`](#ttn.lorawan.v3.GetApplicationActivationSettingsRequest)
   - [Message `GetRootKeysRequest`](#ttn.lorawan.v3.GetRootKeysRequest)
   - [Message `JoinAcceptMICRequest`](#ttn.lorawan.v3.JoinAcceptMICRequest)
   - [Message `JoinEUIPrefix`](#ttn.lorawan.v3.JoinEUIPrefix)
@@ -257,6 +260,8 @@
   - [Message `ProvisionEndDevicesRequest.IdentifiersList`](#ttn.lorawan.v3.ProvisionEndDevicesRequest.IdentifiersList)
   - [Message `ProvisionEndDevicesRequest.IdentifiersRange`](#ttn.lorawan.v3.ProvisionEndDevicesRequest.IdentifiersRange)
   - [Message `SessionKeyRequest`](#ttn.lorawan.v3.SessionKeyRequest)
+  - [Message `SetApplicationActivationSettingsRequest`](#ttn.lorawan.v3.SetApplicationActivationSettingsRequest)
+  - [Service `ApplicationActivationSettingRegistry`](#ttn.lorawan.v3.ApplicationActivationSettingRegistry)
   - [Service `ApplicationCryptoService`](#ttn.lorawan.v3.ApplicationCryptoService)
   - [Service `AsJs`](#ttn.lorawan.v3.AsJs)
   - [Service `Js`](#ttn.lorawan.v3.Js)
@@ -3575,6 +3580,22 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ----------- |
 | `app_s_key` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.ApplicationActivationSettings">Message `ApplicationActivationSettings`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `kek_label` | [`string`](#string) |  | The KEK label to use for wrapping application keys. |
+| `kek` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  | The (encrypted) Key Encryption Key. |
+| `home_net_id` | [`bytes`](#bytes) |  | Home NetID. |
+| `application_server_id` | [`string`](#string) |  | The AS-ID of the Application Server to use. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `kek_label` | <p>`string.max_len`: `2048`</p> |
+| `application_server_id` | <p>`string.max_len`: `100`</p> |
+
 ### <a name="ttn.lorawan.v3.CryptoServicePayloadRequest">Message `CryptoServicePayloadRequest`</a>
 
 | Field | Type | Label | Description |
@@ -3599,6 +3620,12 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ---- | ----- | ----------- |
 | `payload` | [`bytes`](#bytes) |  |  |
 
+### <a name="ttn.lorawan.v3.DeleteApplicationActivationSettingsRequest">Message `DeleteApplicationActivationSettingsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+
 ### <a name="ttn.lorawan.v3.DeriveSessionKeysRequest">Message `DeriveSessionKeysRequest`</a>
 
 | Field | Type | Label | Description |
@@ -3618,6 +3645,13 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `ids` | <p>`message.required`: `true`</p> |
 | `lorawan_version` | <p>`enum.defined_only`: `true`</p> |
 | `provisioner_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
+
+### <a name="ttn.lorawan.v3.GetApplicationActivationSettingsRequest">Message `GetApplicationActivationSettingsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
 
 ### <a name="ttn.lorawan.v3.GetRootKeysRequest">Message `GetRootKeysRequest`</a>
 
@@ -3728,6 +3762,32 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | Field | Validations |
 | ----- | ----------- |
 | `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
+
+### <a name="ttn.lorawan.v3.SetApplicationActivationSettingsRequest">Message `SetApplicationActivationSettingsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `settings` | [`ApplicationActivationSettings`](#ttn.lorawan.v3.ApplicationActivationSettings) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+### <a name="ttn.lorawan.v3.ApplicationActivationSettingRegistry">Service `ApplicationActivationSettingRegistry`</a>
+
+The ApplicationActivationSettingRegistry service allows clients to manage their application activation settings.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Get` | [`GetApplicationActivationSettingsRequest`](#ttn.lorawan.v3.GetApplicationActivationSettingsRequest) | [`ApplicationActivationSettings`](#ttn.lorawan.v3.ApplicationActivationSettings) | Get returns application activation settings. |
+| `Set` | [`SetApplicationActivationSettingsRequest`](#ttn.lorawan.v3.SetApplicationActivationSettingsRequest) | [`ApplicationActivationSettings`](#ttn.lorawan.v3.ApplicationActivationSettings) | Set creates or updates application activation settings. |
+| `Delete` | [`DeleteApplicationActivationSettingsRequest`](#ttn.lorawan.v3.DeleteApplicationActivationSettingsRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete deletes application activation settings. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Get` | `GET` | `/api/v3/js/applications/{application_ids.application_id}/settings` |  |
+| `Set` | `POST` | `/api/v3/js/applications/{application_ids.application_id}/settings` | `*` |
+| `Delete` | `DELETE` | `/api/v3/js/applications/{application_ids.application_id}/settings` |  |
 
 ### <a name="ttn.lorawan.v3.ApplicationCryptoService">Service `ApplicationCryptoService`</a>
 

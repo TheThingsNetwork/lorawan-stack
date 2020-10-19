@@ -289,6 +289,9 @@ var startCommand = &cobra.Command{
 			config.JS.Keys = &jsredis.KeyRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("js", "keys")),
 			}
+			config.JS.ApplicationActivationSettings = &jsredis.ApplicationActivationSettingRegistry{
+				Redis: redis.New(config.Redis.WithNamespace("js", "application-activation-settings")),
+			}
 			js, err := joinserver.New(c, &config.JS)
 			if err != nil {
 				return shared.ErrInitializeJoinServer.WithCause(err)

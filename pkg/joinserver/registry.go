@@ -31,7 +31,9 @@ type DeviceRegistry interface {
 
 // DeleteDevice deletes device identified by joinEUI, devEUI from r.
 func DeleteDevice(ctx context.Context, r DeviceRegistry, appID ttnpb.ApplicationIdentifiers, devID string) error {
-	_, err := r.SetByID(ctx, appID, devID, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) { return nil, nil, nil })
+	_, err := r.SetByID(ctx, appID, devID, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		return nil, nil, nil
+	})
 	return err
 }
 
@@ -43,6 +45,22 @@ type KeyRegistry interface {
 
 // DeleteKeys deletes session keys identified by devEUI, id pair from r.
 func DeleteKeys(ctx context.Context, r KeyRegistry, joinEUI, devEUI types.EUI64, id []byte) error {
-	_, err := r.SetByID(ctx, joinEUI, devEUI, id, nil, func(keys *ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) { return nil, nil, nil })
+	_, err := r.SetByID(ctx, joinEUI, devEUI, id, nil, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) {
+		return nil, nil, nil
+	})
+	return err
+}
+
+// ApplicationActivationSettingRegistry is a registry, containing application activation settings.
+type ApplicationActivationSettingRegistry interface {
+	GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationActivationSettings, error)
+	SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error)) (*ttnpb.ApplicationActivationSettings, error)
+}
+
+// DeleteApplicationActivationSettings deletes application activation settings from r.
+func DeleteApplicationActivationSettings(ctx context.Context, r ApplicationActivationSettingRegistry, appID ttnpb.ApplicationIdentifiers) error {
+	_, err := r.SetByID(ctx, appID, nil, func(*ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+		return nil, nil, nil
+	})
 	return err
 }

@@ -150,7 +150,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 				dev.Session.AppSKey = &ke
 			}
 		}(*req.EndDevice.Session.AppSKey)
-		req.EndDevice.Session.AppSKey = &appSKey
+		req.EndDevice.Session.AppSKey = appSKey
 		sets = ttnpb.AddFields(sets,
 			"session.keys.app_s_key.encrypted_key",
 			"session.keys.app_s_key.kek_label",

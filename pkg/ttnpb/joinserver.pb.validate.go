@@ -1093,6 +1093,438 @@ var _ interface {
 
 var _ProvisionEndDevicesRequest_ProvisionerID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
+// ValidateFields checks the field values on ApplicationActivationSettings with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *ApplicationActivationSettings) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationActivationSettingsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "kek_label":
+
+			if utf8.RuneCountInString(m.GetKEKLabel()) > 2048 {
+				return ApplicationActivationSettingsValidationError{
+					field:  "kek_label",
+					reason: "value length must be at most 2048 runes",
+				}
+			}
+
+		case "kek":
+
+			if v, ok := interface{}(m.GetKEK()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationActivationSettingsValidationError{
+						field:  "kek",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "home_net_id":
+			// no validation rules for HomeNetID
+		case "application_server_id":
+
+			if utf8.RuneCountInString(m.GetApplicationServerID()) > 100 {
+				return ApplicationActivationSettingsValidationError{
+					field:  "application_server_id",
+					reason: "value length must be at most 100 runes",
+				}
+			}
+
+		default:
+			return ApplicationActivationSettingsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationActivationSettingsValidationError is the validation error
+// returned by ApplicationActivationSettings.ValidateFields if the designated
+// constraints aren't met.
+type ApplicationActivationSettingsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationActivationSettingsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationActivationSettingsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationActivationSettingsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationActivationSettingsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationActivationSettingsValidationError) ErrorName() string {
+	return "ApplicationActivationSettingsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationActivationSettingsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationActivationSettings.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationActivationSettingsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationActivationSettingsValidationError{}
+
+// ValidateFields checks the field values on
+// GetApplicationActivationSettingsRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *GetApplicationActivationSettingsRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetApplicationActivationSettingsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetApplicationActivationSettingsRequestValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetApplicationActivationSettingsRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return GetApplicationActivationSettingsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetApplicationActivationSettingsRequestValidationError is the validation
+// error returned by GetApplicationActivationSettingsRequest.ValidateFields if
+// the designated constraints aren't met.
+type GetApplicationActivationSettingsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetApplicationActivationSettingsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetApplicationActivationSettingsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetApplicationActivationSettingsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetApplicationActivationSettingsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetApplicationActivationSettingsRequestValidationError) ErrorName() string {
+	return "GetApplicationActivationSettingsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetApplicationActivationSettingsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetApplicationActivationSettingsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetApplicationActivationSettingsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetApplicationActivationSettingsRequestValidationError{}
+
+// ValidateFields checks the field values on
+// SetApplicationActivationSettingsRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *SetApplicationActivationSettingsRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = SetApplicationActivationSettingsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return SetApplicationActivationSettingsRequestValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "settings":
+
+			if v, ok := interface{}(&m.ApplicationActivationSettings).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return SetApplicationActivationSettingsRequestValidationError{
+						field:  "settings",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return SetApplicationActivationSettingsRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return SetApplicationActivationSettingsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// SetApplicationActivationSettingsRequestValidationError is the validation
+// error returned by SetApplicationActivationSettingsRequest.ValidateFields if
+// the designated constraints aren't met.
+type SetApplicationActivationSettingsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetApplicationActivationSettingsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetApplicationActivationSettingsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SetApplicationActivationSettingsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetApplicationActivationSettingsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetApplicationActivationSettingsRequestValidationError) ErrorName() string {
+	return "SetApplicationActivationSettingsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetApplicationActivationSettingsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetApplicationActivationSettingsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetApplicationActivationSettingsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetApplicationActivationSettingsRequestValidationError{}
+
+// ValidateFields checks the field values on
+// DeleteApplicationActivationSettingsRequest with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *DeleteApplicationActivationSettingsRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = DeleteApplicationActivationSettingsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return DeleteApplicationActivationSettingsRequestValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return DeleteApplicationActivationSettingsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// DeleteApplicationActivationSettingsRequestValidationError is the validation
+// error returned by DeleteApplicationActivationSettingsRequest.ValidateFields
+// if the designated constraints aren't met.
+type DeleteApplicationActivationSettingsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteApplicationActivationSettingsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteApplicationActivationSettingsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteApplicationActivationSettingsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteApplicationActivationSettingsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteApplicationActivationSettingsRequestValidationError) ErrorName() string {
+	return "DeleteApplicationActivationSettingsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteApplicationActivationSettingsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteApplicationActivationSettingsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteApplicationActivationSettingsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteApplicationActivationSettingsRequestValidationError{}
+
 // ValidateFields checks the field values on JoinEUIPrefix with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

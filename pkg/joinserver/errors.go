@@ -60,6 +60,7 @@ var (
 	errUnknownJoinEUI                 = errors.Define("unknown_join_eui", "JoinEUI specified is not known")
 	errUnsupportedLoRaWANMajorVersion = errors.DefineInvalidArgument("lorawan_major_version", "unsupported LoRaWAN major version: `{major}`")
 	errUnsupportedMACVersion          = errors.DefineInvalidArgument("mac_version", "unsupported MAC version: `{version}`")
+	errUnwrapKey                      = errors.Define("unwrap_key", "failed to unwrap key")
 	errWrapKey                        = errors.Define("wrap_key", "failed to wrap key")
 	errWrongPayloadType               = errors.DefineInvalidArgument("payload_type", "wrong payload type: {type}")
 )

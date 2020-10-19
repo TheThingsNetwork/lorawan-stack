@@ -437,20 +437,23 @@ func (s *mockNetworkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.De
 	if err != nil {
 		return nil, err
 	}
-	res := &ttnpb.NwkSKeysResponse{}
-	res.FNwkSIntKey, err = cryptoutil.WrapAES128Key(ctx, nwkSKeys.FNwkSIntKey, "", s.KeyVault)
+	fNwkSIntKeyEnvelope, err := cryptoutil.WrapAES128Key(ctx, nwkSKeys.FNwkSIntKey, "", s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
-	res.SNwkSIntKey, err = cryptoutil.WrapAES128Key(ctx, nwkSKeys.SNwkSIntKey, "", s.KeyVault)
+	sNwkSIntKeyEnvelope, err := cryptoutil.WrapAES128Key(ctx, nwkSKeys.SNwkSIntKey, "", s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
-	res.NwkSEncKey, err = cryptoutil.WrapAES128Key(ctx, nwkSKeys.NwkSEncKey, "", s.KeyVault)
+	nwkSEncKeyEnvelope, err := cryptoutil.WrapAES128Key(ctx, nwkSKeys.NwkSEncKey, "", s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
-	return res, nil
+	return &ttnpb.NwkSKeysResponse{
+		FNwkSIntKey: *fNwkSIntKeyEnvelope,
+		SNwkSIntKey: *sNwkSIntKeyEnvelope,
+		NwkSEncKey:  *nwkSEncKeyEnvelope,
+	}, nil
 }
 
 func (s *mockNetworkRPCServer) GetNwkKey(ctx context.Context, req *ttnpb.GetRootKeysRequest) (*ttnpb.KeyEnvelope, error) {
@@ -461,11 +464,7 @@ func (s *mockNetworkRPCServer) GetNwkKey(ctx context.Context, req *ttnpb.GetRoot
 	if err != nil {
 		return nil, err
 	}
-	env, err := cryptoutil.WrapAES128Key(ctx, *nwkKey, "", s.KeyVault)
-	if err != nil {
-		return nil, err
-	}
-	return &env, nil
+	return cryptoutil.WrapAES128Key(ctx, *nwkKey, "", s.KeyVault)
 }
 
 type mockApplicationRPCServer struct {
@@ -481,12 +480,13 @@ func (s *mockApplicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb
 	if err != nil {
 		return nil, err
 	}
-	res := &ttnpb.AppSKeyResponse{}
-	res.AppSKey, err = cryptoutil.WrapAES128Key(ctx, appSKey, "", s.KeyVault)
+	appSKeyEnvelope, err := cryptoutil.WrapAES128Key(ctx, appSKey, "", s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
-	return res, nil
+	return &ttnpb.AppSKeyResponse{
+		AppSKey: *appSKeyEnvelope,
+	}, nil
 }
 
 func (s *mockApplicationRPCServer) GetAppKey(ctx context.Context, req *ttnpb.GetRootKeysRequest) (*ttnpb.KeyEnvelope, error) {
@@ -497,9 +497,5 @@ func (s *mockApplicationRPCServer) GetAppKey(ctx context.Context, req *ttnpb.Get
 	if err != nil {
 		return nil, err
 	}
-	env, err := cryptoutil.WrapAES128Key(ctx, *appKey, "", s.KeyVault)
-	if err != nil {
-		return nil, err
-	}
-	return &env, nil
+	return cryptoutil.WrapAES128Key(ctx, *appKey, "", s.KeyVault)
 }

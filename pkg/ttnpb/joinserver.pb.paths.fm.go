@@ -157,6 +157,59 @@ var ProvisionEndDevicesRequestFieldPathsTopLevel = []string{
 	"provisioner_id",
 	"provisioning_data",
 }
+var ApplicationActivationSettingsFieldPathsNested = []string{
+	"application_server_id",
+	"home_net_id",
+	"kek",
+	"kek.encrypted_key",
+	"kek.kek_label",
+	"kek.key",
+	"kek_label",
+}
+
+var ApplicationActivationSettingsFieldPathsTopLevel = []string{
+	"application_server_id",
+	"home_net_id",
+	"kek",
+	"kek_label",
+}
+var GetApplicationActivationSettingsRequestFieldPathsNested = []string{
+	"application_ids",
+	"application_ids.application_id",
+	"field_mask",
+}
+
+var GetApplicationActivationSettingsRequestFieldPathsTopLevel = []string{
+	"application_ids",
+	"field_mask",
+}
+var SetApplicationActivationSettingsRequestFieldPathsNested = []string{
+	"application_ids",
+	"application_ids.application_id",
+	"field_mask",
+	"settings",
+	"settings.application_server_id",
+	"settings.home_net_id",
+	"settings.kek",
+	"settings.kek.encrypted_key",
+	"settings.kek.kek_label",
+	"settings.kek.key",
+	"settings.kek_label",
+}
+
+var SetApplicationActivationSettingsRequestFieldPathsTopLevel = []string{
+	"application_ids",
+	"field_mask",
+	"settings",
+}
+var DeleteApplicationActivationSettingsRequestFieldPathsNested = []string{
+	"application_ids",
+	"application_ids.application_id",
+}
+
+var DeleteApplicationActivationSettingsRequestFieldPathsTopLevel = []string{
+	"application_ids",
+}
 var JoinEUIPrefixFieldPathsNested = []string{
 	"join_eui",
 	"length",
