@@ -56,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Coding rate for LoRa 2.4 GHz: it's now `4/8LI`.
 - End device import in the Console crashing in Firefox.
 - Creation of multicast end devices in the Console.
+- Overwriting values in the end device wizard in the Console.
 
 ### Security
 

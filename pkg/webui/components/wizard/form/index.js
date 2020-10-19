@@ -56,11 +56,7 @@ const WizardForm = React.forwardRef((props, ref) => {
         return onComplete(merge({}, snapshot, castedValues), formikBag)
       }
 
-      onNextStep(
-        validationSchema.cast(values, {
-          context: validationContext,
-        }),
-      )
+      onNextStep(castedValues)
     },
     [isLastStep, onComplete, onNextStep, onSubmit, snapshot, validationContext, validationSchema],
   )

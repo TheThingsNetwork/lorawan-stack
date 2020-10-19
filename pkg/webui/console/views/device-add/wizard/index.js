@@ -37,7 +37,7 @@ import ApplicationSettingsForm from './application-settings-form'
 import JoinSettingsForm from './join-settings-form'
 import Prompt from './prompt'
 
-const DeviceWizard = React.memo(props => {
+const DeviceWizard = props => {
   const {
     configuration,
     asConfig,
@@ -171,7 +171,7 @@ const DeviceWizard = React.memo(props => {
       }}
     </Wizard>
   )
-})
+}
 
 DeviceWizard.propTypes = {
   asConfig: PropTypes.stackComponent.isRequired,
