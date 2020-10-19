@@ -19,8 +19,6 @@ import { upperFirst } from 'lodash'
 
 import Icon from '@ttn-lw/components/icon'
 
-import DateTime from '@ttn-lw/lib/components/date-time'
-
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { eventMessages } from '@console/lib/events/definitions'
@@ -53,14 +51,17 @@ const Event = React.memo(({ event, scoped, widget, rowStyle, onRowClick, eventId
     [style.active]: active,
     [style.synthetic]: event.isSynthetic,
   })
+
+  // Using a custom conversion instead of `<DateTime />` here
+  // for performance reasons.
+  const time = new Date(event.time).toLocaleTimeString('en-US', { hour12: false })
+
   return (
     <li className={eventClasses} style={rowStyle} onClick={handleRowClick}>
       <ErrorBoundary>
         <div className={style.cellTime} title={`${event.time}: ${typeValue}`}>
           <Icon icon={icon} className={style.eventIcon} />
-          <div>
-            <DateTime value={event.time} date={false} />
-          </div>
+          <div>{time}</div>
         </div>
         {!scoped && (
           <div className={style.cellId} title={entityId}>
@@ -79,6 +80,8 @@ const Event = React.memo(({ event, scoped, widget, rowStyle, onRowClick, eventId
     </li>
   )
 })
+
+Event.displayName = 'Event'
 
 Event.propTypes = {
   active: PropTypes.bool,

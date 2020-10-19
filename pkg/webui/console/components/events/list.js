@@ -56,7 +56,7 @@ const EventsList = React.memo(
               width={width}
               itemCount={events.length}
               itemSize={40}
-              overscanCount={25}
+              overscanCount={30}
             >
               {({ index, style }) => {
                 const eventId = getEventId(events[index])
