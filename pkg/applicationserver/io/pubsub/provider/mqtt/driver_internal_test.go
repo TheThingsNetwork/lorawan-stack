@@ -34,7 +34,7 @@ type harness struct {
 }
 
 func (h *harness) CreateTopic(ctx context.Context, testName string) (dt driver.Topic, cleanup func(), err error) {
-	dt, err = openDriverTopic(h.client, fmt.Sprintf("test/%s", testName), timeout, 1)
+	dt, err = openDriverTopic(h.client, fmt.Sprintf("test/%s", testName), 1)
 	if err != nil {
 		return nil, func() {}, err
 	}
@@ -46,7 +46,7 @@ func (h *harness) MakeNonexistentTopic(ctx context.Context) (driver.Topic, error
 }
 
 func (h *harness) CreateSubscription(ctx context.Context, t driver.Topic, testName string) (ds driver.Subscription, cleanup func(), err error) {
-	dt, err := openDriverSubscription(ctx, h.client, fmt.Sprintf("test/%s", testName), timeout, 1)
+	dt, err := openDriverSubscription(ctx, h.client, fmt.Sprintf("test/%s", testName), 1)
 	if err != nil {
 		return nil, func() {}, err
 	}
