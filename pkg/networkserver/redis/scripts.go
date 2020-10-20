@@ -37,7 +37,7 @@ var (
   return redis.call('get', KEYS[1])
 end
 local toScan = {}
-for i=6,15 do
+for i=6,17 do
   if redis.call('pexpire', KEYS[i], ARGV[2]) == 1 then
     table.insert(toScan, i)
   end

@@ -46,7 +46,7 @@ end
 
 -- Update expiration of all match keys - if any exist - return.
 local toScan = {}
-for i=6,15 do
+for i=6,17 do
   if redis.call('pexpire', KEYS[i], ARGV[2]) == 1 then
     table.insert(toScan, i)
   end

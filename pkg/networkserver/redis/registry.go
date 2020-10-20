@@ -561,7 +561,8 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		}
 		return ttnredis.ConvertError(err)
 	}
-	// NOTE: Lua indexing starts from 1.
+	// NOTE(1): Indexes must be consistent with lua/deviceMatch.lua.
+	// NOTE(2): Lua indexing starts from 1.
 	var scanKeys []string
 	switch v := v.(type) {
 	case []interface{}:
@@ -569,16 +570,11 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		for _, iface := range v {
 			idx, ok := iface.(int64)
 			if !ok {
-				log.FromContext(ctx).Error("Failed to process match script return value as index")
-				return errDatabaseCorruption.New()
-			}
-			if idx < 6 || idx > 17 {
-				log.FromContext(ctx).WithField("index", idx).Error("Index out of bounds returned by match script")
-				return errDatabaseCorruption.New()
+				panic(fmt.Sprintf("failed to process match script return value '%v' as index", iface))
 			}
 			keyIndexes = append(keyIndexes, uint8(idx))
 		}
-		scanKeys = make([]string, 0, 10)
+		scanKeys = make([]string, 0, 12)
 		for i := 0; i < len(keyIndexes); i++ {
 			switch keyIndexes[i] {
 			case 6:
@@ -586,33 +582,39 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			case 7:
 				scanKeys = append(scanKeys, matchKeys.Processing.ShortFCntLE)
 				continue
+
 			case 8:
 				scanKeys = append(scanKeys, matchKeys.Input.LongFCntLE, matchKeys.Processing.LongFCntLE)
 			case 9:
 				scanKeys = append(scanKeys, matchKeys.Processing.LongFCntLE)
 				continue
+
 			case 10:
 				scanKeys = append(scanKeys, matchKeys.Input.Pending, matchKeys.Processing.Pending)
 			case 11:
 				scanKeys = append(scanKeys, matchKeys.Processing.Pending)
 				continue
+
 			case 12:
 				scanKeys = append(scanKeys, matchKeys.Input.LongFCntGT, matchKeys.Processing.LongFCntGT)
 			case 13:
 				scanKeys = append(scanKeys, matchKeys.Processing.LongFCntGT)
 				continue
+
 			case 14:
 				scanKeys = append(scanKeys, matchKeys.Input.ShortFCntGT, matchKeys.Processing.ShortFCntGT)
 			case 15:
 				scanKeys = append(scanKeys, matchKeys.Processing.ShortFCntGT)
 				continue
+
 			case 16:
 				scanKeys = append(scanKeys, matchKeys.Input.Legacy, matchKeys.Processing.Legacy)
 			case 17:
 				scanKeys = append(scanKeys, matchKeys.Processing.Legacy)
 				continue
+
 			default:
-				panic("invalid index")
+				panic(fmt.Sprintf("invalid index returned by match script: %d", keyIndexes[i]))
 			}
 			if len(keyIndexes) > i+1 && keyIndexes[i+1] == keyIndexes[i]+1 {
 				// Next key is "processing" key, which is already added above - skip
