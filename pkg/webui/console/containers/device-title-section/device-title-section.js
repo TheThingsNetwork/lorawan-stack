@@ -36,10 +36,19 @@ const m = defineMessages({
 const { Content } = EntityTitleSection
 
 const DeviceTitleSection = props => {
-  const { devId, fetching, device, uplinkFrameCount, lastSeen, children } = props
+  const {
+    devId,
+    fetching,
+    device,
+    uplinkFrameCount,
+    downlinkFrameCount,
+    lastSeen,
+    children,
+  } = props
 
   const showLastSeen = Boolean(lastSeen)
   const showUplinkCount = typeof uplinkFrameCount === 'number'
+  const showDownlinkCount = typeof downlinkFrameCount === 'number'
 
   return (
     <EntityTitleSection
@@ -70,6 +79,14 @@ const DeviceTitleSection = props => {
                 iconClassName={style.messageIcon}
               />
             )}
+            {showDownlinkCount && (
+              <Content.MessagesCount
+                icon="downlink"
+                value={downlinkFrameCount}
+                tooltipMessage={sharedMessages.downlinkFrameCount}
+                iconClassName={style.messageIcon}
+              />
+            )}
           </>
         )}
       </Content>
@@ -82,6 +99,7 @@ DeviceTitleSection.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   devId: PropTypes.string.isRequired,
   device: PropTypes.device.isRequired,
+  downlinkFrameCount: PropTypes.number,
   fetching: PropTypes.bool,
   lastSeen: PropTypes.string,
   uplinkFrameCount: PropTypes.number,
@@ -92,6 +110,7 @@ DeviceTitleSection.defaultProps = {
   lastSeen: undefined,
   children: null,
   fetching: false,
+  downlinkFrameCount: undefined,
 }
 
 export default DeviceTitleSection
