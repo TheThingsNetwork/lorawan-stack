@@ -20,12 +20,16 @@ import Events from '@console/components/events'
 import { getApplicationId, getDeviceId, combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { clearDeviceEventsStream } from '@console/store/actions/devices'
+import {
+  clearDeviceEventsStream,
+  pauseDeviceEventsStream,
+  resumeDeviceEventsStream,
+} from '@console/store/actions/devices'
 
-import { selectDeviceEvents } from '@console/store/selectors/devices'
+import { selectDeviceEvents, selectDeviceEventsPaused } from '@console/store/selectors/devices'
 
 const DeviceEvents = props => {
-  const { appId, devId, events, widget, onClear } = props
+  const { appId, devId, events, widget, paused, onClear, onPauseToggle } = props
 
   if (widget) {
     return (
@@ -38,7 +42,17 @@ const DeviceEvents = props => {
     )
   }
 
-  return <Events events={events} entityId={devId} onClear={onClear} scoped widget />
+  return (
+    <Events
+      events={events}
+      entityId={devId}
+      paused={paused}
+      onClear={onClear}
+      onPauseToggle={onPauseToggle}
+      scoped
+      widget
+    />
+  )
 }
 
 DeviceEvents.propTypes = {
@@ -52,6 +66,8 @@ DeviceEvents.propTypes = {
   }).isRequired,
   events: PropTypes.events,
   onClear: PropTypes.func.isRequired,
+  onPauseToggle: PropTypes.func.isRequired,
+  paused: PropTypes.bool.isRequired,
   widget: PropTypes.bool,
 }
 
@@ -72,6 +88,7 @@ export default connect(
       devId,
       appId,
       events: selectDeviceEvents(state, combinedId),
+      paused: selectDeviceEventsPaused(state, combinedId),
     }
   },
   (dispatch, ownProps) => {
@@ -79,6 +96,10 @@ export default connect(
 
     return {
       onClear: () => dispatch(clearDeviceEventsStream(devIds)),
+      onPauseToggle: paused =>
+        paused
+          ? dispatch(resumeDeviceEventsStream(devIds))
+          : dispatch(pauseDeviceEventsStream(devIds)),
     }
   },
 )(DeviceEvents)
