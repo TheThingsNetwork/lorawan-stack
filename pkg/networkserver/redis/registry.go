@@ -572,7 +572,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				log.FromContext(ctx).Error("Failed to process match script return value as index")
 				return errDatabaseCorruption.New()
 			}
-			if idx < 6 || idx > 15 {
+			if idx < 6 || idx > 17 {
 				log.FromContext(ctx).WithField("index", idx).Error("Index out of bounds returned by match script")
 				return errDatabaseCorruption.New()
 			}
