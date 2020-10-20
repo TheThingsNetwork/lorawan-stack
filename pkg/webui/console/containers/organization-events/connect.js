@@ -14,27 +14,19 @@
 
 import { connect } from 'react-redux'
 
-import {
-  clearOrganizationEventsStream,
-  startOrganizationEventsStream,
-} from '@console/store/actions/organizations'
+import { clearOrganizationEventsStream } from '@console/store/actions/organizations'
 
-import {
-  selectOrganizationEvents,
-  selectOrganizationEventsError,
-} from '@console/store/selectors/organizations'
+import { selectOrganizationEvents } from '@console/store/selectors/organizations'
 
 const mapStateToProps = (state, props) => {
   const { orgId } = props
 
   return {
     events: selectOrganizationEvents(state, orgId),
-    error: selectOrganizationEventsError(state, orgId),
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  onRestart: () => dispatch(startOrganizationEventsStream(ownProps.orgId)),
   onClear: () => dispatch(clearOrganizationEventsStream(ownProps.orgId)),
 })
 

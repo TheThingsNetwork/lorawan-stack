@@ -15,33 +15,17 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import ErrorNotification from '@ttn-lw/components/error-notification'
-
 import Events from '@console/components/events'
 
 import { getApplicationId, getDeviceId, combineDeviceIds } from '@ttn-lw/lib/selectors/id'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { clearDeviceEventsStream, startDeviceEventsStream } from '@console/store/actions/devices'
+import { clearDeviceEventsStream } from '@console/store/actions/devices'
 
-import { selectDeviceEvents, selectDeviceEventsError } from '@console/store/selectors/devices'
+import { selectDeviceEvents } from '@console/store/selectors/devices'
 
 const DeviceEvents = props => {
-  const { appId, devId, events, error, onRestart, widget, onClear } = props
-
-  if (error) {
-    return (
-      <ErrorNotification
-        small
-        title={sharedMessages.eventsCannotShow}
-        content={error}
-        action={onRestart}
-        actionMessage={sharedMessages.restartStream}
-        buttonIcon="refresh"
-      />
-    )
-  }
+  const { appId, devId, events, widget, onClear } = props
 
   if (widget) {
     return (
@@ -66,17 +50,14 @@ DeviceEvents.propTypes = {
       application_id: PropTypes.string,
     }),
   }).isRequired,
-  error: PropTypes.error,
   events: PropTypes.events,
   onClear: PropTypes.func.isRequired,
-  onRestart: PropTypes.func.isRequired,
   widget: PropTypes.bool,
 }
 
 DeviceEvents.defaultProps = {
   widget: false,
   events: [],
-  error: undefined,
 }
 
 export default connect(
@@ -91,7 +72,6 @@ export default connect(
       devId,
       appId,
       events: selectDeviceEvents(state, combinedId),
-      error: selectDeviceEventsError(state, combinedId),
     }
   },
   (dispatch, ownProps) => {
@@ -99,7 +79,6 @@ export default connect(
 
     return {
       onClear: () => dispatch(clearDeviceEventsStream(devIds)),
-      onRestart: () => dispatch(startDeviceEventsStream(devIds)),
     }
   },
 )(DeviceEvents)

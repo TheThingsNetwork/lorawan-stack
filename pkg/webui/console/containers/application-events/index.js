@@ -23,10 +23,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { mayViewApplicationEvents } from '@console/lib/feature-checks'
 
-import {
-  clearApplicationEventsStream,
-  startApplicationEventsStream,
-} from '@console/store/actions/applications'
+import { clearApplicationEventsStream } from '@console/store/actions/applications'
 
 import { selectApplicationEvents } from '@console/store/selectors/applications'
 
@@ -65,7 +62,6 @@ export default withFeatureRequirement(mayViewApplicationEvents)(
     },
     (dispatch, ownProps) => ({
       onClear: () => dispatch(clearApplicationEventsStream(ownProps.appId)),
-      onRestart: () => dispatch(startApplicationEventsStream(ownProps.appId)),
     }),
   )(ApplicationEvents),
 )
