@@ -67,9 +67,9 @@ jobs:
       with:
         result-encoding: string
         script: |
-          const tag = context.ref.slice('refs/rev/'.length);
+          const tag = context.ref.slice('refs/rev/v'.length);
           const tagParts = tag.split('.');
-          require('fs').writeFileSync('/tmp/release-notes.md', `[Release notes](https://github.com/TheThingsNetwork/lorawan-stack/blob/${tag}/CHANGELOG.md#${tagParts[0]}${tagParts[1]}${tagParts[2]}---${{ steps.date.outputs.result }})`);
+          require('fs').writeFileSync('/tmp/release-notes.md', `[Release notes](https://github.com/TheThingsNetwork/lorawan-stack/blob/${tag}/CHANGELOG.md#${tagParts[0]}${tagParts[1]}${tagParts[2]}---${{ steps.date.outputs.value }})`);
     - name: Determine Goreleaser version
       id: goreleaser_version
       run: echo "::set-output name=value::$(cat tools/go.mod | grep 'github.com/goreleaser/goreleaser v' | cut -d ' ' -f 2)"
