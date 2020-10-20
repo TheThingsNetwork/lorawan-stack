@@ -343,6 +343,10 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 		ApplicationIdentifiers: *c.io.ApplicationIDs(),
 		DeviceID:               deviceID,
 	}
+	if err := ids.ValidateContext(c.io.Context()); err != nil {
+		logger.WithError(err).Warn("Failed to validate message identifiers")
+		return
+	}
 	logger.WithFields(log.Fields(
 		"device_uid", unique.ID(c.io.Context(), ids),
 		"count", len(items.Downlinks),
