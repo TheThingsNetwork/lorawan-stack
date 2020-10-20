@@ -311,8 +311,10 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 	))
 	log.FromContext(ctx).Debug("Replaced application downlink queue")
 
-	if err := ns.updateDataDownlinkTask(ctx, dev, time.Time{}); err != nil {
-		log.FromContext(ctx).WithError(err).Error("Failed to update downlink task queue after downlink queue replace")
+	if len(req.Downlinks) > 0 {
+		if err := ns.updateDataDownlinkTask(ctx, dev, time.Time{}); err != nil {
+			log.FromContext(ctx).WithError(err).Error("Failed to update downlink task queue after downlink queue replace")
+		}
 	}
 	return ttnpb.Empty, nil
 }
