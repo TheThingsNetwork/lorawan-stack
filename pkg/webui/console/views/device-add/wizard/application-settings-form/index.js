@@ -19,7 +19,7 @@ import Input from '@ttn-lw/components/input'
 import Form from '@ttn-lw/components/form'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
-import Wizard from '@ttn-lw/components/wizard'
+import Wizard, { useWizardContext } from '@ttn-lw/components/wizard'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -30,23 +30,17 @@ import validationSchema from './validation-schema'
 
 const defaultFormValues = {
   skip_payload_crypto: false,
-  session: {
-    keys: {
-      app_s_key: {
-        key: '',
-      },
-    },
-  },
 }
 
-const ApplicationSettingsForm = React.memo(props => {
+const ApplicationSettingsForm = props => {
   const { mayEditKeys, error } = props
+  const { snapshot } = useWizardContext()
 
   const validationContext = React.useMemo(() => ({ mayEditKeys }), [mayEditKeys])
 
   const formRef = React.useRef(null)
 
-  const [skipCrypto, setSkipCrypto] = React.useState(false)
+  const [skipCrypto, setSkipCrypto] = React.useState(snapshot.skip_payload_crypto)
   const handleSkipCryptoChange = React.useCallback(
     evt => {
       const { setValues, values } = formRef.current
@@ -54,17 +48,7 @@ const ApplicationSettingsForm = React.memo(props => {
       setSkipCrypto(evt.target.checked)
       setValues(
         validationSchema.cast(
-          {
-            ...values,
-            skip_payload_crypto: evt.target.checked,
-            session: {
-              keys: {
-                app_s_key: {
-                  key: '',
-                },
-              },
-            },
-          },
+          { ...values, skip_payload_crypto: evt.target.checked },
           { context: validationContext },
         ),
       )
@@ -106,7 +90,7 @@ const ApplicationSettingsForm = React.memo(props => {
       )}
     </Wizard.Form>
   )
-})
+}
 
 ApplicationSettingsForm.propTypes = {
   error: PropTypes.error,
