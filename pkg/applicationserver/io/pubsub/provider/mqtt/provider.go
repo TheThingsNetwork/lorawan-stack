@@ -128,13 +128,13 @@ func OpenConnection(ctx context.Context, settings Settings, topics provider.Topi
 		clientOpts.SetHTTPHeaders(headers)
 	}
 	clientOpts.SetOnConnectHandler(func(_ mqtt.Client) {
-		logger.Debug("Connected to MQTT server")
+		logger.Info("Connected to MQTT server")
 	})
 	clientOpts.SetConnectionLostHandler(func(_ mqtt.Client, err error) {
-		logger.WithError(err).Debug("Disconnected from MQTT server")
+		logger.WithError(err).Info("Disconnected from MQTT server")
 	})
 	clientOpts.SetReconnectingHandler(func(_ mqtt.Client, clientOpts *mqtt.ClientOptions) {
-		logger.Debug("Reconnect to MQTT server")
+		logger.Info("Reconnect to MQTT server")
 		if settings.HTTPHeadersProvider != nil {
 			headers, err := settings.HTTPHeadersProvider(ctx)
 			if err != nil {
