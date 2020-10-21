@@ -32,57 +32,64 @@ const (
 )
 
 func NewRedisApplicationUplinkQueue(ctx context.Context) (ApplicationUplinkQueue, func()) {
-	t := test.MustTBFromContext(ctx)
+	tb := test.MustTBFromContext(ctx)
 	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "application-uplinks")...)
-	return redis.NewApplicationUplinkQueue(cl, 100, redisConsumerGroup, redisConsumerID),
+	q := redis.NewApplicationUplinkQueue(cl, 100, redisConsumerGroup, redisConsumerID)
+	if err := q.Init(ctx); err != nil {
+		tb.Fatalf("Failed to initialize Redis application uplink queue: %s", test.FormatError(err))
+	}
+	return q,
 		func() {
+			if err := q.Close(ctx); err != nil {
+				tb.Errorf("Failed to close Redis application uplink queue: %s", err)
+			}
 			flush()
 			if err := cl.Close(); err != nil {
-				t.Errorf("Failed to close Redis uplink queue client: %s", test.FormatError(err))
+				tb.Errorf("Failed to close Redis application uplink queue client: %s", test.FormatError(err))
 			}
 		}
 }
 
 func NewRedisDeviceRegistry(ctx context.Context) (DeviceRegistry, func()) {
-	t := test.MustTBFromContext(ctx)
+	tb := test.MustTBFromContext(ctx)
 	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "devices")...)
 	reg := &redis.DeviceRegistry{
 		Redis:   cl,
 		LockTTL: test.Delay << 10,
 	}
 	if err := reg.Init(ctx); err != nil {
-		t.Fatalf("Failed to initialize Redis device registry: %s", test.FormatError(err))
+		tb.Fatalf("Failed to initialize Redis device registry: %s", test.FormatError(err))
 	}
 	return reg,
 		func() {
 			flush()
 			if err := cl.Close(); err != nil {
-				t.Errorf("Failed to close Redis device registry client: %s", test.FormatError(err))
+				tb.Errorf("Failed to close Redis device registry client: %s", test.FormatError(err))
 			}
 		}
 }
 
 func NewRedisDownlinkTaskQueue(ctx context.Context) (DownlinkTaskQueue, func()) {
-	t := test.MustTBFromContext(ctx)
+	tb := test.MustTBFromContext(ctx)
 	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "downlink-tasks")...)
 	q := redis.NewDownlinkTaskQueue(cl, 10000, redisConsumerGroup, redisConsumerID)
 	if err := q.Init(ctx); err != nil {
-		t.Fatalf("Failed to initialize Redis downlink task queue: %s", test.FormatError(err))
+		tb.Fatalf("Failed to initialize Redis downlink task queue: %s", test.FormatError(err))
 	}
 	return q,
 		func() {
 			if err := q.Close(ctx); err != nil {
-				t.Errorf("Failed to close Redis downlink task queue: %s", test.FormatError(err))
+				tb.Errorf("Failed to close Redis downlink task queue: %s", test.FormatError(err))
 			}
 			flush()
 			if err := cl.Close(); err != nil {
-				t.Errorf("Failed to close Redis downlink task queue client: %s", test.FormatError(err))
+				tb.Errorf("Failed to close Redis downlink task queue client: %s", test.FormatError(err))
 			}
 		}
 }
 
 func NewRedisUplinkDeduplicator(ctx context.Context) (UplinkDeduplicator, func()) {
-	t := test.MustTBFromContext(ctx)
+	tb := test.MustTBFromContext(ctx)
 
 	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "uplink-deduplication")...)
 	return &redis.UplinkDeduplicator{
@@ -91,7 +98,7 @@ func NewRedisUplinkDeduplicator(ctx context.Context) (UplinkDeduplicator, func()
 		func() {
 			flush()
 			if err := cl.Close(); err != nil {
-				t.Errorf("Failed to close Redis uplink deduplicator client: %s", test.FormatError(err))
+				tb.Errorf("Failed to close Redis uplink deduplicator client: %s", test.FormatError(err))
 			}
 		}
 }
