@@ -18,8 +18,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
-	"sync"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -29,31 +27,22 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
-	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
+
+type ApplicationUplinkQueueRangeFunc func(limit int, f func(...*ttnpb.ApplicationUp) error) (bool, error)
 
 type ApplicationUplinkQueue interface {
 	// Add adds application uplinks ups to queue.
 	// Implementations must ensure that Add returns fast.
 	Add(ctx context.Context, ups ...*ttnpb.ApplicationUp) error
 
-	// Subscribe calls f sequentially for each application uplink in the queue.
-	// If f returns a non-nil error or ctx is done, Subscribe stops the iteration.
-	// TODO: Use ...*ttnpb.ApplicationUp in callback once https://github.com/TheThingsNetwork/lorawan-stack/issues/1523 is implemented.
-	Subscribe(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f func(context.Context, *ttnpb.ApplicationUp) error) error
-}
-
-type applicationUpStream struct {
-	cancel    context.CancelFunc
-	waitClose func()
-}
-
-func (s applicationUpStream) Close() error {
-	s.cancel()
-	s.waitClose()
-	return nil
+	// PopApplication calls f on the most recent application uplink task in the schedule, for which timestamp is in range [0, time.Now()],
+	// if such is available, otherwise it blocks until it is.
+	// Context passed to f must be derived from ctx.
+	// Implementations must respect ctx.Deadline() value on best-effort basis, if such is present.
+	Pop(ctx context.Context, f func(context.Context, ttnpb.ApplicationIdentifiers, ApplicationUplinkQueueRangeFunc) (time.Time, error)) error
 }
 
 func applicationJoinAcceptWithoutAppSKey(pld *ttnpb.ApplicationJoinAccept) *ttnpb.ApplicationJoinAccept {
@@ -65,72 +54,47 @@ func applicationJoinAcceptWithoutAppSKey(pld *ttnpb.ApplicationJoinAccept) *ttnp
 	}
 }
 
-// LinkApplication is called by the Application Server to subscribe to application events.
-func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) error {
-	ctx := link.Context()
-
-	ids := ttnpb.ApplicationIdentifiers{
-		ApplicationID: rpcmetadata.FromIncomingContext(ctx).ID,
-	}
-	if err := ids.ValidateContext(ctx); err != nil {
-		return err
-	}
-	if err := rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
-		return err
-	}
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-
-	ctx, cancel := context.WithCancel(ctx)
-	ws := &applicationUpStream{
-		cancel:    cancel,
-		waitClose: wg.Wait,
-	}
-	defer func() {
-		wg.Done()
-	}()
-
-	uid := unique.ID(ctx, ids)
-	logger := log.FromContext(ctx).WithField("application_uid", uid)
-
-	v, ok := ns.applicationServers.LoadOrStore(uid, ws)
-	for ok {
-		logger.Debug("Close existing application link")
-		if err := v.(io.Closer).Close(); err != nil {
-			logger.WithError(err).Warn("Failed to close existing application link")
+func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error {
+	return ns.applicationUplinks.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueRangeFunc) (time.Time, error) {
+		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, appID)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")
+			return time.Now().Add(time.Minute), nil
 		}
-		v, ok = ns.applicationServers.LoadOrStore(uid, ws)
-	}
-	defer ns.applicationServers.Delete(uid)
 
-	logger.Debug("Linked application")
-	events.Publish(evtBeginApplicationLink.NewWithIdentifiersAndData(ctx, ids, nil))
-	err := ns.applicationUplinks.Subscribe(ctx, ids, func(ctx context.Context, up *ttnpb.ApplicationUp) error {
-		if err := link.Send(up); err != nil {
-			return err
+		cl := ttnpb.NewNsAsClient(conn)
+		for ok := false; !ok; {
+			ok, err = f(100, func(ups ...*ttnpb.ApplicationUp) error {
+				_, err := cl.HandleUplink(ctx, &ttnpb.NsAsHandleUplinkRequest{
+					ApplicationUps: ups,
+				}, ns.WithClusterAuth())
+				if err != nil {
+					return err
+				}
+				for _, up := range ups {
+					switch pld := up.Up.(type) {
+					case *ttnpb.ApplicationUp_UplinkMessage:
+						registerForwardDataUplink(ctx, pld.UplinkMessage)
+						events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, up))
+					case *ttnpb.ApplicationUp_JoinAccept:
+						events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
+							EndDeviceIdentifiers: up.EndDeviceIdentifiers,
+							CorrelationIDs:       up.CorrelationIDs,
+							Up: &ttnpb.ApplicationUp_JoinAccept{
+								JoinAccept: applicationJoinAcceptWithoutAppSKey(pld.JoinAccept),
+							},
+						}))
+					}
+				}
+				return nil
+			})
+			if err != nil {
+				log.FromContext(ctx).WithError(err).Warn("Failed to pop application uplinks")
+				return time.Now().Add(time.Minute), nil
+			}
 		}
-		if _, err := link.Recv(); err != nil {
-			return err
-		}
-		switch pld := up.Up.(type) {
-		case *ttnpb.ApplicationUp_UplinkMessage:
-			registerForwardDataUplink(ctx, pld.UplinkMessage)
-			events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, up))
-		case *ttnpb.ApplicationUp_JoinAccept:
-			events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: up.EndDeviceIdentifiers,
-				CorrelationIDs:       up.CorrelationIDs,
-				Up: &ttnpb.ApplicationUp_JoinAccept{
-					JoinAccept: applicationJoinAcceptWithoutAppSKey(pld.JoinAccept),
-				},
-			}))
-		}
-		return nil
+		return time.Time{}, nil
 	})
-	logger.WithError(err).Debug("Close application link")
-	events.Publish(evtEndApplicationLink.NewWithIdentifiersAndData(ctx, ids, err))
-	return err
 }
 
 // matchApplicationDownlinks validates downs and adds them to session.QueuedApplicationDownlinks.

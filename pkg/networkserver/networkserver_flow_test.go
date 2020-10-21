@@ -25,7 +25,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
@@ -104,7 +103,7 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 
 type OTAAFlowTestConfig struct {
 	CreateDevice *ttnpb.SetEndDeviceRequest
-	Func         func(context.Context, TestEnvironment, *ttnpb.EndDevice, ttnpb.AsNs_LinkApplicationClient)
+	Func         func(context.Context, TestEnvironment, *ttnpb.EndDevice)
 
 	UplinkMACCommanders   []MACCommander
 	UplinkEventBuilders   []events.Builder
@@ -118,29 +117,6 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 
 		start := time.Now()
 
-		linkCtx, closeLink := context.WithCancel(ctx)
-		link, linkCIDs, ok := env.AssertLinkApplication(linkCtx, AppID)
-		if !a.So(ok, should.BeTrue) || !a.So(link, should.NotBeNil) {
-			t.Error("AS link assertion failed")
-			closeLink()
-			return
-		}
-		defer func() {
-			closeLink()
-			if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-				return a.So(ev.Data(), should.BeError) && test.AllTrue(
-					a.So(errors.IsCanceled(ev.Data().(error)), should.BeTrue),
-					a.So(ev, should.ResembleEvent, EvtEndApplicationLink.New(
-						events.ContextWithCorrelationID(ctx, linkCIDs...),
-						events.WithIdentifiers(AppID),
-						events.WithData(ev.Data().(error)),
-					)),
-				)
-			}), should.BeTrue) {
-				t.Error("AS link end event assertion failed")
-			}
-		}()
-
 		dev, ok := env.AssertSetDevice(ctx, true, conf.CreateDevice)
 		if !a.So(ok, should.BeTrue) {
 			t.Error("Failed to create device")
@@ -153,7 +129,6 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		a.So(dev, should.ResembleFields, &conf.CreateDevice.EndDevice, conf.CreateDevice.FieldMask.Paths)
 
 		dev, ok = env.AssertJoin(ctx, JoinAssertionConfig{
-			Link:          link,
 			Device:        dev,
 			ChannelIndex:  1,
 			DataRateIndex: ttnpb.DATA_RATE_2,
@@ -216,7 +191,6 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		dev.PendingMACState.CurrentParameters.Channels = deviceChannels
 		dev.EndDeviceIdentifiers.DevAddr = &dev.PendingSession.DevAddr
 		dev, ok = env.AssertHandleDataUplink(ctx, DataUplinkAssertionConfig{
-			Link:          link,
 			Device:        dev,
 			ChannelIndex:  2,
 			DataRateIndex: ttnpb.DATA_RATE_1,
@@ -290,7 +264,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 
-		conf.Func(ctx, env, dev, link)
+		conf.Func(ctx, env, dev)
 	}
 }
 
@@ -315,7 +289,7 @@ func makeClassAOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 		},
 		DownlinkMACCommanders: []MACCommander{ttnpb.CID_DEV_STATUS},
 		DownlinkEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
-		Func: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice, link ttnpb.AsNs_LinkApplicationClient) {
+		Func: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) {
 		},
 	})
 }
@@ -368,7 +342,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 		UplinkEventBuilders:   upEvBuilders,
 		DownlinkMACCommanders: append(downCmders, ttnpb.CID_DEV_STATUS),
 		DownlinkEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
-		Func: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice, link ttnpb.AsNs_LinkApplicationClient) {
+		Func: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) {
 		},
 	})
 }
