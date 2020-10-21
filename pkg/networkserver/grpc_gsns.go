@@ -819,12 +819,12 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	queuedEvents := []events.Event{
 		evtReceiveDataUplink.NewWithIdentifiersAndData(ctx, matched.Device.EndDeviceIdentifiers, up),
 	}
-	defer func() {
+	defer func(ids ttnpb.EndDeviceIdentifiers) {
 		if err != nil {
-			queuedEvents = append(queuedEvents, evtDropDataUplink.NewWithIdentifiersAndData(ctx, matched.Device.EndDeviceIdentifiers, err))
+			queuedEvents = append(queuedEvents, evtDropDataUplink.NewWithIdentifiersAndData(ctx, ids, err))
 		}
 		publishEvents(ctx, queuedEvents...)
-	}()
+	}(matched.Device.EndDeviceIdentifiers)
 
 	ok, err = ns.deduplicateUplink(ctx, up)
 	if err != nil {
