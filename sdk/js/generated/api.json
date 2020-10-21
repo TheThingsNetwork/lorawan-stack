@@ -22585,18 +22585,6 @@
           "description": "The AsNs service connects an Application Server to a Network Server.",
           "methods": [
             {
-              "name": "LinkApplication",
-              "description": "",
-              "requestType": "Empty",
-              "requestLongType": ".google.protobuf.Empty",
-              "requestFullType": "google.protobuf.Empty",
-              "requestStreaming": true,
-              "responseType": "ApplicationUp",
-              "responseLongType": "ApplicationUp",
-              "responseFullType": "ttn.lorawan.v3.ApplicationUp",
-              "responseStreaming": true
-            },
-            {
               "name": "DownlinkQueueReplace",
               "description": "",
               "requestType": "DownlinkQueueRequest",
