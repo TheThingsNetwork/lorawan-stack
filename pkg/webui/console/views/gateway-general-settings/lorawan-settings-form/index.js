@@ -15,6 +15,7 @@
 import React from 'react'
 
 import delay from '@console/constants/delays'
+import frequencyPlans from '@console/constants/frequency-plans'
 
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -46,6 +47,8 @@ const decodeDelayValue = value => {
   }
 }
 
+const isEmptyFrequencyPlan = value => value === frequencyPlans.EMPTY_FREQ_PLAN
+
 const isNotValidDuration = value => {
   const { duration, unit } = decodeDelayValue(value)
 
@@ -74,13 +77,28 @@ const LorawanSettingsForm = React.memo(props => {
     setShouldDisplayWarning(isNotValidDuration(value))
   }, [])
 
+  const [showFrequencyPlanWarning, setShowFrequencyPlanWarning] = React.useState(
+    isEmptyFrequencyPlan(gateway.frequency_plan_id) || !gateway.frequency_plan_id,
+  )
+
+  const onFrequencyPlanChange = React.useCallback(freqPlan => {
+    setShowFrequencyPlanWarning(isEmptyFrequencyPlan(freqPlan.value))
+  }, [])
+
   const initialValues = React.useMemo(() => {
-    return validationSchema.cast(gateway)
+    return {
+      ...validationSchema.cast(gateway),
+      frequency_plan_id: gateway.frequency_plan_id || frequencyPlans.EMPTY_FREQ_PLAN,
+    }
   }, [gateway])
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
-      const castedValues = validationSchema.cast(values)
+      const castedValues = validationSchema.cast(
+        isEmptyFrequencyPlan(values.frequency_plan_id)
+          ? { ...values, frequency_plan_id: '' }
+          : values,
+      )
 
       setError(undefined)
       try {
@@ -103,7 +121,12 @@ const LorawanSettingsForm = React.memo(props => {
       error={error}
       enableReinitialize
     >
-      <GsFrequencyPlansSelect name="frequency_plan_id" menuPlacement="top" />
+      <GsFrequencyPlansSelect
+        name="frequency_plan_id"
+        menuPlacement="top"
+        onChange={onFrequencyPlanChange}
+        warning={showFrequencyPlanWarning ? sharedMessages.frequencyPlanWarning : undefined}
+      />
       <Form.Field
         title={sharedMessages.gatewayScheduleDownlinkLate}
         name="schedule_downlink_late"
