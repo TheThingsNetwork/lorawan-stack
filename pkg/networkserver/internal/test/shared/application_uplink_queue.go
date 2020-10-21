@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -152,7 +153,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		t.Fatal("Timed out while waiting for Subscribe to return")
 
 	case err := <-app1SubErrCh:
-		if !a.So(err, should.Resemble, context.Canceled) {
+		if !a.So(errors.IsCanceled(err), should.BeTrue) {
 			t.Fatalf("Received unexpected Subscribe error: %v", err)
 		}
 	}
@@ -228,7 +229,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		t.Fatal("Timed out while waiting for Subscribe to return")
 
 	case err := <-app2SubErrCh:
-		if !a.So(err, should.Resemble, context.Canceled) {
+		if !a.So(errors.IsCanceled(err), should.BeTrue) {
 			t.Fatalf("Received unexpected Subscribe error: %v", err)
 		}
 	}

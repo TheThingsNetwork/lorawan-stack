@@ -260,7 +260,7 @@ func TestPopTask(t *testing.T) {
 	ctx, cancel := context.WithCancel(test.Context())
 	defer cancel()
 
-	err := PopTask(cl, cl.Key("testGroup"), "testID", -1, func(string, string, time.Time) error {
+	err := PopTask(cl, cl.Key("testGroup"), "testID", -1, func(redis.Pipeliner, string, string, time.Time) error {
 		t.Fatal("f must not be called")
 		return nil
 	}, cl.Key("testKeyNonExistent"))
@@ -277,38 +277,38 @@ func TestPopTask(t *testing.T) {
 		}
 	}
 
-	err = PopTask(cl, "testGroupNonExistent", "testID", -1, func(string, string, time.Time) error {
+	err = PopTask(cl, "testGroupNonExistent", "testID", -1, func(redis.Pipeliner, string, string, time.Time) error {
 		t.Fatal("f must not be called")
 		return nil
 	}, cl.Key("testKey"))
 	a.So(err, should.NotBeNil)
 
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(string, string, time.Time) error {
+	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(redis.Pipeliner, string, string, time.Time) error {
 		t.Fatal("f must not be called")
 		return nil
 	})
 	a.So(err, should.BeNil)
 
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(string, string, time.Time) error {
+	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(redis.Pipeliner, string, string, time.Time) error {
 		t.Fatal("f must not be called")
 		return nil
 	}, cl.Key("testKey"), cl.Key("testKey2"))
 	a.So(err, should.BeNil)
 
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(string, string, time.Time) error {
+	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(redis.Pipeliner, string, string, time.Time) error {
 		t.Fatal("f must not be called")
 		return nil
 	}, cl.Key("testKey2"))
 	a.So(err, should.BeNil)
 
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(string, string, time.Time) error {
+	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(redis.Pipeliner, string, string, time.Time) error {
 		t.Fatal("f must not be called")
 		return nil
 	}, cl.Key("testKeyNonExistent"))
 	a.So(err, should.NotBeNil)
 
 	go func() {
-		err := PopTask(cl, cl.Key("testGroup"), "testID", 0, func(string, string, time.Time) error {
+		err := PopTask(cl, cl.Key("testGroup"), "testID", 0, func(redis.Pipeliner, string, string, time.Time) error {
 			t.Fatal("f must not be called")
 			return nil
 		}, cl.Key("testKey3"))
@@ -357,7 +357,7 @@ func TestPopTask(t *testing.T) {
 	}
 
 	fCalls := 0
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(k string, payload string, startAt time.Time) error {
+	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(_ redis.Pipeliner, k string, payload string, startAt time.Time) error {
 		a.So(fCalls, should.Equal, 0)
 		a.So(k, should.Equal, cl.Key("testKey"))
 		a.So(payload, should.Equal, "testPayload")
@@ -367,7 +367,7 @@ func TestPopTask(t *testing.T) {
 	}, cl.Key("testKey"))
 	a.So(err, should.BeNil)
 
-	err = PopTask(cl, cl.Key("testGroup"), "testID2", -1, func(k string, payload string, startAt time.Time) error {
+	err = PopTask(cl, cl.Key("testGroup"), "testID2", -1, func(_ redis.Pipeliner, k string, payload string, startAt time.Time) error {
 		a.So(fCalls, should.Equal, 1)
 		a.So(k, should.Equal, cl.Key("testKey"))
 		a.So(payload, should.Equal, "testPayload2")
@@ -378,7 +378,7 @@ func TestPopTask(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	errTest := errors.New("test")
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(k string, payload string, startAt time.Time) error {
+	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(_ redis.Pipeliner, k string, payload string, startAt time.Time) error {
 		a.So(fCalls, should.Equal, 2)
 		a.So(k, should.Equal, cl.Key("testKey"))
 		a.So(payload, should.Equal, "testPayload")
@@ -388,7 +388,7 @@ func TestPopTask(t *testing.T) {
 	}, cl.Key("testKey"))
 	a.So(err, should.HaveSameErrorDefinitionAs, errTest)
 
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(k string, payload string, startAt time.Time) error {
+	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(_ redis.Pipeliner, k string, payload string, startAt time.Time) error {
 		a.So(fCalls, should.Equal, 3)
 		a.So(k, should.Equal, cl.Key("testKey2"))
 		a.So(payload, should.Equal, "testPayload")
@@ -523,7 +523,7 @@ func TestTaskQueue(t *testing.T) {
 	popReqCh := make(chan popReq)
 	go func() {
 		for req := range popReqCh {
-			req.errCh <- q.Pop(req.ctx, func(payload string, startAt time.Time) error {
+			req.errCh <- q.Pop(req.ctx, nil, func(_ redis.Pipeliner, payload string, startAt time.Time) error {
 				errCh := make(chan error, 1)
 				req.taskCh <- task{
 					payload: payload,
@@ -567,7 +567,7 @@ func TestTaskQueue(t *testing.T) {
 	case <-time.After(10 * test.Delay):
 	}
 
-	err = q.Add("testPayload", time.Unix(0, 0), false)
+	err = q.Add(nil, "testPayload", time.Unix(0, 0), false)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -587,37 +587,37 @@ func TestTaskQueue(t *testing.T) {
 		t.Fatal("Timed out waiting for Pop to call f")
 	}
 
-	err = q.Add("0", time.Unix(0, 42), false)
+	err = q.Add(nil, "0", time.Unix(0, 42), false)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	err = q.Add("1", time.Now().Add(time.Hour), false)
+	err = q.Add(nil, "1", time.Now().Add(time.Hour), false)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	err = q.Add("1", time.Now().Add(2*time.Hour), true)
+	err = q.Add(nil, "1", time.Now().Add(2*time.Hour), true)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	err = q.Add("1", time.Unix(13, 0), false)
+	err = q.Add(nil, "1", time.Unix(13, 0), false)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	err = q.Add("1", time.Unix(42, 0), true)
+	err = q.Add(nil, "1", time.Unix(42, 0), true)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	err = q.Add("2", time.Now().Add(42*time.Hour), true)
+	err = q.Add(nil, "2", time.Now().Add(42*time.Hour), true)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	err = q.Add("2", time.Unix(42, 42), true)
+	err = q.Add(nil, "2", time.Unix(42, 42), true)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -662,7 +662,7 @@ func TestTaskQueue(t *testing.T) {
 
 	cancel()
 	// Unblock DispatchTasks in Run()
-	err = q.Add("42", time.Unix(0, 0), true)
+	err = q.Add(nil, "42", time.Unix(0, 0), true)
 	a.So(err, should.BeNil)
 
 	select {

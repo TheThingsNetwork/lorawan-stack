@@ -20,12 +20,14 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test/shared"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 var _ networkserver.DeviceRegistry = &DeviceRegistry{}
 
 func TestDeviceRegistry(t *testing.T) {
-	reg, closeFn := NewRedisDeviceRegistry(t)
+	_, ctx := test.New(t)
+	reg, closeFn := NewRedisDeviceRegistry(ctx)
 	t.Cleanup(closeFn)
 	HandleDeviceRegistryTest(t, reg)
 }

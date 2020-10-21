@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,12 +20,14 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test/shared"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 var _ networkserver.ApplicationUplinkQueue = &ApplicationUplinkQueue{}
 
 func TestApplicationUplinkQueue(t *testing.T) {
-	q, closeFn := NewRedisApplicationUplinkQueue(t)
+	_, ctx := test.New(t)
+	q, closeFn := NewRedisApplicationUplinkQueue(ctx)
 	t.Cleanup(closeFn)
 	HandleApplicationUplinkQueueTest(t, q)
 }

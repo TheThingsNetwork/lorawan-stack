@@ -353,9 +353,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 				var getByIDCalls uint64
 
 				ns, ctx, _, stop := StartTest(
-					t,
+					ctx,
 					TestConfig{
-						Context: ctx,
 						Component: component.Config{
 							ServiceBase: config.ServiceBase{
 								KeyVault: config.KeyVault{
@@ -1720,9 +1719,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 				var addCalls, setByIDCalls uint64
 
 				ns, ctx, env, stop := StartTest(
-					t,
+					ctx,
 					TestConfig{
-						Context: ctx,
 						NetworkServer: Config{
 							Devices: &MockDeviceRegistry{
 								SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
@@ -2294,9 +2292,8 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				var setByIDCalls uint64
 
 				ns, ctx, env, stop := StartTest(
-					t,
+					ctx,
 					TestConfig{
-						Context: ctx,
 						NetworkServer: Config{
 							Devices: &MockDeviceRegistry{
 								SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {

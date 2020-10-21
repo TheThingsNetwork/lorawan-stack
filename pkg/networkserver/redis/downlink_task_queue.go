@@ -18,6 +18,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/go-redis/redis/v7"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -25,7 +26,7 @@ import (
 
 // DownlinkTaskQueue is an implementation of networkserver.DownlinkTaskQueue.
 type DownlinkTaskQueue struct {
-	*ttnredis.TaskQueue
+	queue *ttnredis.TaskQueue
 }
 
 const (
@@ -34,24 +35,36 @@ const (
 
 // NewDownlinkTaskQueue returns new downlink task queue.
 func NewDownlinkTaskQueue(cl *ttnredis.Client, maxLen int64, group, id string) *DownlinkTaskQueue {
-	return &DownlinkTaskQueue{TaskQueue: &ttnredis.TaskQueue{
-		Redis:  cl,
-		MaxLen: maxLen,
-		Group:  group,
-		ID:     id,
-		Key:    cl.Key(downlinkKey),
-	}}
+	return &DownlinkTaskQueue{
+		queue: &ttnredis.TaskQueue{
+			Redis:  cl,
+			MaxLen: maxLen,
+			Group:  group,
+			ID:     id,
+			Key:    cl.Key(downlinkKey),
+		},
+	}
+}
+
+// Init initializes the DownlinkTaskQueue.
+func (q *DownlinkTaskQueue) Init() error {
+	return q.queue.Init()
+}
+
+// Run dispatches tasks until ctx.Deadline() is reached(if present) or read on ctx.Done() succeeds.
+func (q *DownlinkTaskQueue) Run(ctx context.Context) error {
+	return q.queue.Run(ctx)
 }
 
 // Add adds downlink task for device identified by devID at time startAt.
 func (q *DownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-	return q.TaskQueue.Add(unique.ID(ctx, devID), startAt, replace)
+	return q.queue.Add(nil, unique.ID(ctx, devID), startAt, replace)
 }
 
 // Pop calls f on the earliest downlink task in the schedule, for which timestamp is in range [0, time.Now()],
 // if such is available, otherwise it blocks until it is.
-func (q *DownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
-	return q.TaskQueue.Pop(ctx, func(uid string, startAt time.Time) error {
+func (q *DownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error {
+	return q.queue.Pop(ctx, nil, func(p redis.Pipeliner, uid string, startAt time.Time) error {
 		ids, err := unique.ToDeviceID(uid)
 		if err != nil {
 			return err
@@ -60,6 +73,10 @@ func (q *DownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttn
 		if err != nil {
 			return err
 		}
-		return f(ctx, ids, startAt)
+		t, err := f(ctx, ids, startAt)
+		if err != nil || t.IsZero() {
+			return err
+		}
+		return q.queue.Add(p, uid, t, true)
 	})
 }

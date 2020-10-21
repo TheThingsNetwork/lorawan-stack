@@ -2690,8 +2690,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: tc.Name,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				errCh := make(chan error, 1)
-				_, ctx, env, stop := StartTest(t, TestConfig{
-					Context:       ctx,
+				_, ctx, env, stop := StartTest(ctx, TestConfig{
 					NetworkServer: DefaultConfig,
 					TaskStarter: component.StartTaskFunc(func(conf *component.TaskConfig) {
 						if conf.ID != DownlinkProcessTaskName {

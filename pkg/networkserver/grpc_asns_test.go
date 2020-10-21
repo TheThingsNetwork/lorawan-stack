@@ -812,31 +812,33 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				var addCalls, setByIDCalls uint64
 
-				ns, ctx, _, stop := StartTest(t, TestConfig{
-					Context: ctx,
-					NetworkServer: Config{
-						Devices: &MockDeviceRegistry{
-							SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-								atomic.AddUint64(&setByIDCalls, 1)
-								return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+				ns, ctx, _, stop := StartTest(
+					ctx,
+					TestConfig{
+						NetworkServer: Config{
+							Devices: &MockDeviceRegistry{
+								SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+									atomic.AddUint64(&setByIDCalls, 1)
+									return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+								},
 							},
-						},
-						DownlinkTasks: &MockDownlinkTaskQueue{
-							AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-								atomic.AddUint64(&addCalls, 1)
-								return tc.AddFunc(ctx, ids, startAt, replace)
+							DownlinkTasks: &MockDownlinkTaskQueue{
+								AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+									atomic.AddUint64(&addCalls, 1)
+									return tc.AddFunc(ctx, ids, startAt, replace)
+								},
 							},
+							DefaultMACSettings: MACSettingConfig{
+								StatusTimePeriodicity:  DurationPtr(0),
+								StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(0),
+							},
+							DownlinkQueueCapacity: 100,
 						},
-						DefaultMACSettings: MACSettingConfig{
-							StatusTimePeriodicity:  DurationPtr(0),
-							StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(0),
-						},
-						DownlinkQueueCapacity: 100,
+						TaskStarter: StartTaskExclude(
+							DownlinkProcessTaskName,
+						),
 					},
-					TaskStarter: StartTaskExclude(
-						DownlinkProcessTaskName,
-					),
-				})
+				)
 				defer stop()
 
 				ns.AddContextFiller(tc.ContextFunc)
@@ -1503,9 +1505,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 				var addCalls, setByIDCalls uint64
 
 				ns, ctx, env, stop := StartTest(
-					t,
+					ctx,
 					TestConfig{
-						Context: ctx,
 						NetworkServer: Config{
 							Devices: &MockDeviceRegistry{
 								SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
@@ -1808,9 +1809,8 @@ func TestDownlinkQueueList(t *testing.T) {
 				var getByIDCalls uint64
 
 				ns, ctx, env, stop := StartTest(
-					t,
+					ctx,
 					TestConfig{
-						Context: ctx,
 						NetworkServer: Config{
 							Devices: &MockDeviceRegistry{
 								GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {

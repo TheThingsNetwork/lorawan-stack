@@ -589,7 +589,7 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 // id is the consumer group ID.
 // ks are the keys to pop from.
 // Tasks are acked if f returns without error.
-func PopTask(r redis.Cmdable, group, id string, timeout time.Duration, f func(k string, payload string, startAt time.Time) error, ks ...string) error {
+func PopTask(r redis.Cmdable, group, id string, timeout time.Duration, f func(p redis.Pipeliner, k string, payload string, startAt time.Time) error, ks ...string) (err error) {
 	if len(ks) == 0 {
 		return nil
 	}
@@ -612,6 +612,17 @@ func PopTask(r redis.Cmdable, group, id string, timeout time.Duration, f func(k 
 	if err != nil && err != redis.Nil {
 		return ConvertError(err)
 	}
+	if len(rets) == 0 {
+		return nil
+	}
+
+	p := r.Pipeline()
+	defer func() {
+		_, pErr := p.Exec()
+		if err == nil && pErr != nil {
+			err = ConvertError(pErr)
+		}
+	}()
 	for i, ret := range rets {
 		for _, msg := range ret.Messages {
 			var startAt time.Time
@@ -620,11 +631,11 @@ func PopTask(r redis.Cmdable, group, id string, timeout time.Duration, f func(k 
 				if !ok {
 					return errInvalidKeyValueType.WithAttributes("key", startAtKey)
 				}
-				i, err := strconv.ParseInt(s, 10, 64)
+				nsec, err := strconv.ParseInt(s, 10, 64)
 				if err != nil {
 					return errInvalidKeyValueType.WithAttributes("key", startAtKey).WithCause(err)
 				}
-				startAt = time.Unix(0, i).UTC()
+				startAt = time.Unix(0, nsec).UTC()
 			}
 
 			var payload string
@@ -634,11 +645,10 @@ func PopTask(r redis.Cmdable, group, id string, timeout time.Duration, f func(k 
 					return errInvalidKeyValueType.WithAttributes("key", payloadKey)
 				}
 			}
-			if err := f(ks[i], payload, startAt); err != nil {
+			if err = f(p, ks[i], payload, startAt); err != nil {
 				return err
 			}
-			_, err = r.XAck(ret.Stream, group, msg.ID).Result()
-			return ConvertError(err)
+			p.XAck(ret.Stream, group, msg.ID)
 		}
 	}
 	return nil
@@ -704,21 +714,27 @@ func (q *TaskQueue) Run(ctx context.Context) error {
 }
 
 // Add adds a task s to the queue with a timestamp startAt.
-func (q *TaskQueue) Add(s string, startAt time.Time, replace bool) error {
-	return AddTask(q.Redis, q.Key, q.MaxLen, s, startAt, replace)
+func (q *TaskQueue) Add(r redis.Cmdable, s string, startAt time.Time, replace bool) error {
+	if r == nil {
+		r = q.Redis
+	}
+	return AddTask(r, q.Key, q.MaxLen, s, startAt, replace)
 }
 
 // Pop calls f on the most recent task in the queue, for which timestamp is in range [0, time.Now()],
 // if such is available, otherwise it blocks until it is.
 // If ctx.Deadline() is present, Pop will return at or shortly after it.
-func (q *TaskQueue) Pop(ctx context.Context, f func(string, time.Time) error) error {
+func (q *TaskQueue) Pop(ctx context.Context, r redis.Cmdable, f func(redis.Pipeliner, string, time.Time) error) error {
+	if r == nil {
+		r = q.Redis
+	}
 	var timeout time.Duration
 	dl, ok := ctx.Deadline()
 	if ok {
 		timeout = time.Until(dl)
 	}
-	return PopTask(q.Redis, q.Group, q.ID, timeout, func(_ string, payload string, startAt time.Time) error {
-		return f(payload, startAt)
+	return PopTask(r, q.Group, q.ID, timeout, func(p redis.Pipeliner, _ string, payload string, startAt time.Time) error {
+		return f(p, payload, startAt)
 	}, q.Key)
 }
 

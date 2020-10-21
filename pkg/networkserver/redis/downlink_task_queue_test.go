@@ -20,12 +20,14 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test/shared"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 var _ networkserver.DownlinkTaskQueue = &DownlinkTaskQueue{}
 
 func TestDownlinkTaskQueue(t *testing.T) {
-	q, closeFn := NewRedisDownlinkTaskQueue(t)
+	_, ctx := test.New(t)
+	q, closeFn := NewRedisDownlinkTaskQueue(ctx)
 	t.Cleanup(closeFn)
 	HandleDownlinkTaskQueueTest(t, q)
 }

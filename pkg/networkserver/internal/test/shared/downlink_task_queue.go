@@ -52,10 +52,10 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 	}
 
 	type slot struct {
-		ctx   context.Context
-		id    ttnpb.EndDeviceIdentifiers
-		t     time.Time
-		errCh chan<- error
+		ctx    context.Context
+		id     ttnpb.EndDeviceIdentifiers
+		t      time.Time
+		respCh chan<- TaskPopFuncResponse
 	}
 
 	popCtx := context.WithValue(ctx, &struct{}{}, "pop")
@@ -68,15 +68,16 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 			select {
 			case <-ctx.Done():
 				return
-			case errCh <- q.Pop(popCtx, func(ctx context.Context, id ttnpb.EndDeviceIdentifiers, t time.Time) error {
-				errCh := make(chan error)
+			case errCh <- q.Pop(popCtx, func(ctx context.Context, id ttnpb.EndDeviceIdentifiers, t time.Time) (time.Time, error) {
+				respCh := make(chan TaskPopFuncResponse)
 				slotCh <- slot{
-					ctx:   ctx,
-					id:    id,
-					t:     t,
-					errCh: errCh,
+					ctx:    ctx,
+					id:     id,
+					t:      t,
+					respCh: respCh,
 				}
-				return <-errCh
+				resp := <-respCh
+				return resp.Time, resp.Error
 			}):
 			}
 		}
@@ -91,8 +92,7 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 		t.Fatalf("Pop called f on empty schedule, slot: %+v", s)
 
 	case err := <-errCh:
-		a.So(err, should.BeNil)
-		t.Fatal("Pop returned on empty schedule")
+		t.Fatalf("Pop returned on empty schedule with error: %s", test.FormatError(err))
 
 	case <-time.After(test.Delay):
 	}
@@ -109,7 +109,7 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 		if !a.So(s.ctx, should.HaveParentContextOrEqual, popCtx) {
 			t.Fatal(s.ctx)
 		}
-		s.errCh <- nil
+		s.respCh <- TaskPopFuncResponse{}
 
 	case err := <-errCh:
 		a.So(err, should.BeNil)
@@ -176,7 +176,7 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 			a.So(s.id, should.Resemble, expectedID)
 			a.So(s.t, should.Equal, expectedAt)
 			a.So(s.ctx, should.HaveParentContextOrEqual, popCtx)
-			s.errCh <- nil
+			s.respCh <- TaskPopFuncResponse{}
 
 		case err := <-errCh:
 			a.So(err, should.BeNil)
