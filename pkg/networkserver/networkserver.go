@@ -129,11 +129,20 @@ type NetworkServer struct {
 // Option configures the NetworkServer.
 type Option func(ns *NetworkServer)
 
-var DefaultOptions []Option
+var (
+	DefaultOptions []Option
+
+	processTaskBackoff = &component.TaskBackoffConfig{
+		Jitter:       component.DefaultTaskBackoffConfig.Jitter,
+		IntervalFunc: component.MakeTaskBackoffIntervalFunc(true, component.DefaultTaskBackoffResetDuration, component.DefaultTaskBackoffIntervals[:]...),
+	}
+)
 
 const (
-	downlinkProcessTaskName = "process_downlink"
-	maxInt                  = int(^uint(0) >> 1)
+	applicationUplinkProcessTaskName = "process_application_uplink"
+	downlinkProcessTaskName          = "process_downlink"
+
+	maxInt = int(^uint(0) >> 1)
 )
 
 // New returns new NetworkServer.
@@ -207,6 +216,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		deviceKEKLabel:        conf.DeviceKEKLabel,
 		downlinkQueueCapacity: conf.DownlinkQueueCapacity,
 	}
+	ctx = ns.Context()
 
 	if len(opts) == 0 {
 		opts = DefaultOptions
@@ -224,16 +234,18 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Ns", cluster.HookName, c.ClusterAuthUnaryHook())
 
-	ns.RegisterTask(&component.TaskConfig{
-		Context: ns.Context(),
-		ID:      downlinkProcessTaskName,
-		Func:    ns.processDownlinkTask,
-		Restart: component.TaskRestartAlways,
-		Backoff: &component.TaskBackoffConfig{
-			Jitter:       component.DefaultTaskBackoffConfig.Jitter,
-			IntervalFunc: component.MakeTaskBackoffIntervalFunc(true, component.DefaultTaskBackoffResetDuration, component.DefaultTaskBackoffIntervals[:]...),
-		},
-	})
+	for id, f := range map[string]func(context.Context) error{
+		applicationUplinkProcessTaskName: ns.processApplicationUplinkTask,
+		downlinkProcessTaskName:          ns.processDownlinkTask,
+	} {
+		ns.RegisterTask(&component.TaskConfig{
+			Context: ctx,
+			ID:      id,
+			Func:    f,
+			Restart: component.TaskRestartAlways,
+			Backoff: processTaskBackoff,
+		})
+	}
 	c.RegisterGRPC(ns)
 	return ns, nil
 }
