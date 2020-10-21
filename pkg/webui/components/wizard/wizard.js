@@ -20,7 +20,7 @@ import renderCallback from '../../lib/render-callback'
 
 import { WizardContext } from './context'
 
-const FIRST_STEP = 1
+const FIRST_STEP = 0
 
 // Action types.
 const INIT = 'INIT'
@@ -38,6 +38,8 @@ const reducer = (state, action) => {
       const { values, step: currentStep } = action
 
       // Replace current step values when navigating between wizard steps.
+      if (values) {
+      }
       const snapshots = [
         ...oldSnapshots.slice(0, oldStep - 1),
         values,
@@ -54,12 +56,12 @@ const reducer = (state, action) => {
   }
 }
 
-const Wizard = props => {
-  const { initialStep, onComplete, initialValues, completeMessage } = props
+const Wizard = React.forwardRef((props, ref) => {
+  const { initialStepId, onComplete, initialValues, completeMessage } = props
 
   const [state, dispatch] = React.useReducer(reducer, {
     // Active step in the wizard.
-    currentStep: initialStep,
+    currentStepId: initialStepId,
     // A list of all steps in the wizard.
     steps: [],
     // A list of form values for each step in the wizard.
@@ -67,20 +69,31 @@ const Wizard = props => {
     snapshots: [],
   })
 
-  const { currentStep, steps, snapshots } = state
-
-  const stepsCount = steps.length
+  const { currentStepId, steps, snapshots } = state
 
   const stepsInit = React.useCallback(steps => {
     dispatch({ type: INIT, steps })
   }, [])
+  const goToStep = React.useCallback(stepId => {
+    dispatch({ type: GO_TO_STEP, step: stepId })
+  }, [])
   const prevStep = React.useCallback(
-    values => dispatch({ type: GO_TO_STEP, step: Math.max(currentStep - 1, FIRST_STEP), values }),
-    [currentStep],
+    values => {
+      const currentStepIndex = steps.findIndex(({ id }) => id === currentStepId)
+      const prevStep = steps[Math.max(currentStepIndex - 1, FIRST_STEP)] || {}
+
+      dispatch({ type: GO_TO_STEP, step: prevStep.id || currentStepId, values })
+    },
+    [currentStepId, steps],
   )
   const nextStep = React.useCallback(
-    values => dispatch({ type: GO_TO_STEP, step: Math.min(currentStep + 1, stepsCount), values }),
-    [currentStep, stepsCount],
+    values => {
+      const currentStepIndex = steps.findIndex(({ id }) => id === currentStepId)
+      const nextStep = steps[Math.min(currentStepIndex + 1, steps.length - 1)] || {}
+
+      dispatch({ type: GO_TO_STEP, step: nextStep.id || currentStepId, values })
+    },
+    [currentStepId, steps],
   )
 
   const snapshot = React.useMemo(() => merge({}, initialValues, ...snapshots), [
@@ -94,28 +107,30 @@ const Wizard = props => {
     onNextStep: nextStep,
     onPrevStep: prevStep,
     onStepsInit: stepsInit,
-    currentStep,
+    onStepChange: goToStep,
+    currentStepId,
     snapshot,
     steps,
   }
+
+  React.useImperativeHandle(ref, () => context)
 
   return (
     <WizardContext.Provider value={context}>
       {renderCallback(props, context)}
     </WizardContext.Provider>
   )
-}
+})
 
 Wizard.propTypes = {
   completeMessage: PropTypes.message,
-  initialStep: PropTypes.number,
+  initialStepId: PropTypes.string.isRequired,
   initialValues: PropTypes.shape({}),
   onComplete: PropTypes.func.isRequired,
 }
 
 Wizard.defaultProps = {
   initialValues: {},
-  initialStep: 1,
   completeMessage: undefined,
 }
 

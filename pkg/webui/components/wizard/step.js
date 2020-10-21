@@ -25,12 +25,15 @@ const Step = props => {
 
 Step.propTypes = {
   children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
+  id: PropTypes.string.isRequired,
   onSubmit: PropTypes.func,
+  render: PropTypes.func,
 }
 
 Step.defaultProps = {
   render: undefined,
   children: [],
+  onSubmit: undefined,
 }
 
 export default Step

@@ -31,11 +31,9 @@ const m = defineMessages({
 
 const WizardNextButton = props => {
   const { isLastStep, completeMessage } = props
-  const { currentStep, steps } = useWizardContext()
+  const { currentStepId, steps } = useWizardContext()
 
-  const { title: nextStepTitle } = steps.find(
-    ({ stepNumber }) => stepNumber === currentStep + 1,
-  ) || { title: m.next }
+  const { title: nextStepTitle } = steps.find(({ id }) => id === currentStepId) || { title: m.next }
 
   const nextMessage = isLastStep
     ? Boolean(completeMessage)

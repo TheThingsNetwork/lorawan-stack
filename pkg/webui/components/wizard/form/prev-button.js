@@ -29,7 +29,7 @@ const m = defineMessages({
 
 const WizardPrevButton = props => {
   const { isFirstStep, validationSchema, validationContext } = props
-  const { onPrevStep, currentStep, steps } = useWizardContext()
+  const { onPrevStep, currentStepId, steps } = useWizardContext()
   const { values } = useFormContext()
 
   const handlePrevStep = React.useCallback(() => {
@@ -44,7 +44,7 @@ const WizardPrevButton = props => {
     return null
   }
 
-  const { title: prevMessage } = steps.find(({ stepNumber }) => stepNumber === currentStep - 1) || {
+  const { title: prevMessage } = steps.find(({ id }) => id === currentStepId) || {
     title: m.next,
   }
 

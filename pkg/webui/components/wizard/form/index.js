@@ -28,14 +28,16 @@ import NextButton from './next-button'
 const WizardForm = React.forwardRef((props, ref) => {
   const { validationSchema, validationContext, onSubmit, children, initialValues, error } = props
   const context = useWizardContext()
-  const { onNextStep, currentStep, steps, snapshot, onComplete, completeMessage } = context
+  const { onNextStep, currentStepId, steps, snapshot, onComplete, completeMessage } = context
 
   const formRef = React.useRef(null)
   const combinedRef = useCombinedRefs(ref, formRef)
 
   const stepsCount = steps.length
-  const isFirstStep = stepsCount > 0 ? currentStep === 1 : true
-  const isLastStep = stepsCount > 0 ? currentStep === stepsCount : true
+  const currentStepIndex = steps.findIndex(({ id }) => id === currentStepId)
+
+  const isFirstStep = stepsCount > 0 ? currentStepIndex === 0 : true
+  const isLastStep = stepsCount > 0 ? currentStepIndex === stepsCount - 1 : true
 
   const formInitialValues = React.useMemo(
     () => validationSchema.cast(merge({}, initialValues, snapshot), { context: validationContext }),
