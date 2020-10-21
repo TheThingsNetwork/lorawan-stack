@@ -23,7 +23,7 @@ const messages = defineMessages({
   appTitle: 'Application layer settings',
   appDescription: 'Application session key to encrypt/decrypt LoRaWAN payload.',
   joinTitle: 'Join settings',
-  joinDescription: 'Root keys, net ID and kek labels.',
+  joinDescription: 'Root keys, NetID and kek labels.',
 })
 
 export default messages
