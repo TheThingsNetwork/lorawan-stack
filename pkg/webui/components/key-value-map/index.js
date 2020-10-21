@@ -79,7 +79,7 @@ class KeyValueMap extends React.PureComponent {
     } = this.props
 
     return (
-      <div className={classnames(className, style.container)}>
+      <div data-test-id={'key-value-map'} className={classnames(className, style.container)}>
         <div>
           {value &&
             value.map((value, index) => (

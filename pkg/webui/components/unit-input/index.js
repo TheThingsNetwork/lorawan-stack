@@ -98,6 +98,7 @@ class UnitInput extends React.PureComponent {
       <React.Fragment>
         <div className={classnames(className, style.container)}>
           <Input
+            data-test-id={name}
             className={style.number}
             type="number"
             step="any"
