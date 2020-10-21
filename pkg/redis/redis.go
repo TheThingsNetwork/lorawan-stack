@@ -660,9 +660,6 @@ func (q *TaskQueue) Init() error {
 
 // Run dispatches tasks until ctx.Deadline() is reached(if present) or read on ctx.Done() succeeds.
 func (q *TaskQueue) Run(ctx context.Context) error {
-	if err := q.Init(); err != nil {
-		return err
-	}
 	defer func() {
 		_, err := q.Redis.Pipelined(func(p redis.Pipeliner) error {
 			p.XGroupDelConsumer(InputTaskKey(q.Key), q.Group, q.ID)
