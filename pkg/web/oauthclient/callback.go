@@ -51,6 +51,15 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 
 	stateCookie, err := oc.getStateCookie(c)
 	if err != nil {
+		// Running the callback without state cookie often occurs when re-running
+		// the callback after successful token exchange (e.g. using the browser's
+		// back button after logging in). If there is a valid auth cookie, we just
+		// redirect back to the client mount instead of showing an error.
+		value, err := oc.getAuthCookie(c)
+		if err == nil && value.AccessToken != "" {
+			config := oc.configFromContext(c.Request().Context())
+			return c.Redirect(http.StatusFound, config.RootURL)
+		}
 		return err
 	}
 
