@@ -231,7 +231,7 @@ var (
 func (s *server) ClientLogout(c echo.Context) error {
 	ctx := c.Request().Context()
 	accessTokenID := c.QueryParam("access_token_id")
-	var redirectURI string
+	redirectURI := s.config.UI.MountPath()
 	if accessTokenID == "" {
 		return errMissingAccessTokenIDParam
 	}
@@ -256,8 +256,6 @@ func (s *server) ClientLogout(c echo.Context) error {
 		if redirectParam == "" {
 			if len(client.LogoutRedirectURIs) != 0 {
 				redirectURI = client.LogoutRedirectURIs[0]
-			} else {
-				redirectURI = s.config.UI.MountPath()
 			}
 		} else {
 			for _, uri := range client.LogoutRedirectURIs {
