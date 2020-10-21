@@ -2352,10 +2352,6 @@
     }
   },
   "AsNs": {
-    "LinkApplication": {
-      "file": "lorawan-stack/api/networkserver.proto",
-      "http": []
-    },
     "DownlinkQueueReplace": {
       "file": "lorawan-stack/api/networkserver.proto",
       "http": []
