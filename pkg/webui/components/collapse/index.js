@@ -49,6 +49,7 @@ const Collapse = props => {
         </div>
         <div className={style.button}>
           <Button
+            type="button"
             secondary
             className={style.expandButton}
             disabled={disabled}
