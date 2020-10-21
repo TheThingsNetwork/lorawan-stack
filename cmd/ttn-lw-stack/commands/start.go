@@ -211,14 +211,19 @@ var startCommand = &cobra.Command{
 
 			logger.Info("Setting up Network Server")
 
-			uplinkQueueSize := config.NS.ApplicationUplinkQueue.BufferSize
+			applicationUplinkQueueSize := config.NS.ApplicationUplinkQueue.BufferSize
 			if config.NS.ApplicationUplinkQueue.BufferSize > math.MaxInt64 {
-				uplinkQueueSize = math.MaxInt64
+				applicationUplinkQueueSize = math.MaxInt64
 			}
-			config.NS.ApplicationUplinkQueue.Queue = nsredis.NewApplicationUplinkQueue(
+			applicationUplinkQueue := nsredis.NewApplicationUplinkQueue(
 				NewNetworkServerApplicationUplinkQueueRedis(*config),
-				int64(uplinkQueueSize), redisConsumerGroup, redisConsumerID,
+				int64(applicationUplinkQueueSize), redisConsumerGroup, redisConsumerID,
 			)
+			if err := applicationUplinkQueue.Init(ctx); err != nil {
+				return shared.ErrInitializeNetworkServer.WithCause(err)
+			}
+			defer applicationUplinkQueue.Close(ctx)
+			config.NS.ApplicationUplinkQueue.Queue = applicationUplinkQueue
 			devices := &nsredis.DeviceRegistry{
 				Redis:   NewNetworkServerDeviceRegistryRedis(*config),
 				LockTTL: time.Second,
@@ -230,15 +235,15 @@ var startCommand = &cobra.Command{
 			config.NS.UplinkDeduplicator = &nsredis.UplinkDeduplicator{
 				Redis: redis.New(config.Cache.Redis.WithNamespace("ns", "uplink-deduplication")),
 			}
-			nsDownlinkTasks := nsredis.NewDownlinkTaskQueue(
+			downlinkTasks := nsredis.NewDownlinkTaskQueue(
 				NewNetworkServerDownlinkTaskRedis(*config),
 				100000, redisConsumerGroup, redisConsumerID,
 			)
-			if err := nsDownlinkTasks.Init(ctx); err != nil {
+			if err := downlinkTasks.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
-			defer nsDownlinkTasks.Close(ctx)
-			config.NS.DownlinkTasks = nsDownlinkTasks
+			defer downlinkTasks.Close(ctx)
+			config.NS.DownlinkTasks = downlinkTasks
 			ns, err := networkserver.New(c, &config.NS)
 			if err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
