@@ -511,6 +511,26 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 		{
+			Name: "client-initiated without logout redirect URI set in the client",
+			StoreSetup: func(s *mockStore) {
+				s.res.session = mockSession
+				s.res.client = mockClient
+				s.res.client.LogoutRedirectURIs = []string{}
+				s.res.accessToken = mockAccessToken
+			},
+			Method:           "GET",
+			Path:             "/oauth/logout?access_token_id=access-token-id&post_logout_redirect_uri=http://uri/logout-callback",
+			ExpectedCode:     http.StatusFound,
+			ExpectedRedirect: "/oauth",
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.calls, should.Contain, "DeleteSession")
+				a.So(s.calls, should.Contain, "DeleteAccessToken")
+				a.So(s.calls, should.Contain, "GetAccessToken")
+				a.So(s.calls, should.Contain, "GetClient")
+			},
+		},
+		{
 			Name: "client-initiated logout without access token",
 			StoreSetup: func(s *mockStore) {
 				s.res.session = mockSession
