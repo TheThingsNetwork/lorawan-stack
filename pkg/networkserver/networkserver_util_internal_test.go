@@ -1726,6 +1726,20 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 			}
 
 			deduplicatedUp := MakeDataUplink(deduplicatedUpConf)
+			if conf.Pending {
+				dev.MACState = dev.PendingMACState
+				dev.MACState.CurrentParameters.Rx1Delay = dev.PendingMACState.PendingJoinRequest.RxDelay
+				dev.MACState.CurrentParameters.Rx1DataRateOffset = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx1DROffset
+				dev.MACState.CurrentParameters.Rx2DataRateIndex = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx2DR
+				dev.MACState.PendingJoinRequest = nil
+				dev.Session = dev.PendingSession
+				dev.PendingMACState = nil
+				dev.PendingSession = nil
+			}
+			dev.MACState.RecentUplinks = AppendRecentUplink(dev.MACState.RecentUplinks, deduplicatedUp, RecentUplinkCount)
+			if conf.FPort == 0 {
+				return
+			}
 			var appUp *ttnpb.ApplicationUp
 			if !a.So(AssertProcessApplicationUp(ctx, conf.Link, func(ctx context.Context, up *ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
@@ -1773,17 +1787,6 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 			) {
 				t.Error("Application Server forwarding event assertion failed")
 			}
-			if conf.Pending {
-				dev.MACState = dev.PendingMACState
-				dev.MACState.CurrentParameters.Rx1Delay = dev.PendingMACState.PendingJoinRequest.RxDelay
-				dev.MACState.CurrentParameters.Rx1DataRateOffset = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx1DROffset
-				dev.MACState.CurrentParameters.Rx2DataRateIndex = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx2DR
-				dev.MACState.PendingJoinRequest = nil
-				dev.Session = dev.PendingSession
-				dev.PendingMACState = nil
-				dev.PendingSession = nil
-			}
-			dev.MACState.RecentUplinks = AppendRecentUplink(dev.MACState.RecentUplinks, deduplicatedUp, RecentUplinkCount)
 		},
 	}), should.BeTrue)
 }
