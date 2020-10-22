@@ -249,7 +249,8 @@ func (c *cluster) Join() (err error) {
 			if c.tlsConfig != nil {
 				tlsConfig = c.tlsConfig.Clone()
 			}
-			tlsConfig.ServerName = c.tlsServerName
+			tlsConfig.ServerName = peer.tlsServerName
+			logger = logger.WithField("tls_server_name", peer.tlsServerName)
 			options = append(options, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
 		} else {
 			options = append(options, grpc.WithInsecure())
