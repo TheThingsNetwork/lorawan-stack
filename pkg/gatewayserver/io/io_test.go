@@ -74,6 +74,8 @@ func TestFlow(t *testing.T) {
 	a.So(time.Since(conn.ConnectTime()), should.BeLessThan, timeout)
 	a.So(conn.Gateway(), should.Resemble, gtw)
 	a.So(conn.Frontend().Protocol(), should.Equal, "mock")
+	a.So(conn.PrimaryFrequencyPlan(), should.NotBeNil)
+	a.So(conn.PrimaryFrequencyPlan().BandID, should.Equal, "EU_863_870")
 
 	{
 		frontend.Up <- &ttnpb.UplinkMessage{

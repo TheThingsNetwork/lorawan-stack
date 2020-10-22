@@ -78,13 +78,14 @@ type Connection struct {
 	ctx       context.Context
 	cancelCtx errorcontext.CancelFunc
 
-	frontend   Frontend
-	gateway    *ttnpb.Gateway
-	gatewayFPs map[string]*frequencyplans.FrequencyPlan
-	bandID     string
-	fps        *frequencyplans.Store
-	scheduler  *scheduling.Scheduler
-	rtts       *rtts
+	frontend         Frontend
+	gateway          *ttnpb.Gateway
+	gatewayPrimaryFP *frequencyplans.FrequencyPlan
+	gatewayFPs       map[string]*frequencyplans.FrequencyPlan
+	bandID           string
+	fps              *frequencyplans.Store
+	scheduler        *scheduling.Scheduler
+	rtts             *rtts
 
 	upCh     chan *ttnpb.GatewayUplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
@@ -142,19 +143,20 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 		ctx:       ctx,
 		cancelCtx: cancelCtx,
 
-		frontend:    frontend,
-		gateway:     gateway,
-		gatewayFPs:  gatewayFPs,
-		bandID:      bandID,
-		fps:         fps,
-		scheduler:   scheduler,
-		rtts:        newRTTs(maxRTTs, rttTTL),
-		upCh:        make(chan *ttnpb.GatewayUplinkMessage, bufferSize),
-		downCh:      make(chan *ttnpb.DownlinkMessage, bufferSize),
-		statusCh:    make(chan *ttnpb.GatewayStatus, bufferSize),
-		txAckCh:     make(chan *ttnpb.TxAcknowledgment, bufferSize),
-		locCh:       make(chan struct{}, 1),
-		connectTime: time.Now().UnixNano(),
+		frontend:         frontend,
+		gateway:          gateway,
+		gatewayPrimaryFP: fp0,
+		gatewayFPs:       gatewayFPs,
+		bandID:           bandID,
+		fps:              fps,
+		scheduler:        scheduler,
+		rtts:             newRTTs(maxRTTs, rttTTL),
+		upCh:             make(chan *ttnpb.GatewayUplinkMessage, bufferSize),
+		downCh:           make(chan *ttnpb.DownlinkMessage, bufferSize),
+		statusCh:         make(chan *ttnpb.GatewayStatus, bufferSize),
+		txAckCh:          make(chan *ttnpb.TxAcknowledgment, bufferSize),
+		locCh:            make(chan struct{}, 1),
+		connectTime:      time.Now().UnixNano(),
 
 		statsChangedCh: make(chan struct{}, 1),
 	}, nil
@@ -626,6 +628,9 @@ func (c *Connection) Stats() *ttnpb.GatewayConnectionStats {
 
 // FrequencyPlans returns the frequency plans for the gateway.
 func (c *Connection) FrequencyPlans() map[string]*frequencyplans.FrequencyPlan { return c.gatewayFPs }
+
+// PrimaryFrequencyPlan returns the primary frequency plan of the gateway.
+func (c *Connection) PrimaryFrequencyPlan() *frequencyplans.FrequencyPlan { return c.gatewayPrimaryFP }
 
 // BandID returns the common band ID for the frequency plans in this connection.
 // TODO: Handle mixed bands (https://github.com/TheThingsNetwork/lorawan-stack/issues/1394)
