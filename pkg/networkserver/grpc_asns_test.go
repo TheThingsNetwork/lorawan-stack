@@ -72,9 +72,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				err := errors.New("SetByIDFunc must not be called")
@@ -113,9 +112,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
@@ -176,9 +174,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -257,9 +254,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -348,9 +344,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -554,9 +549,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -639,9 +633,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -729,9 +722,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -903,9 +895,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				err := errors.New("SetByIDFunc must not be called")
@@ -944,9 +935,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
@@ -1008,9 +998,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -1089,9 +1078,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -1180,9 +1168,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
