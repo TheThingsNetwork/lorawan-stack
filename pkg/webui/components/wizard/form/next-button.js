@@ -15,9 +15,8 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
-import SubmitButton from '@ttn-lw/components/submit-button'
 import Button from '@ttn-lw/components/button'
-import Form from '@ttn-lw/components/form'
+import { useFormContext } from '@ttn-lw/components/form'
 import { useWizardContext } from '@ttn-lw/components/wizard'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -31,7 +30,8 @@ const m = defineMessages({
 
 const WizardNextButton = props => {
   const { isLastStep, completeMessage } = props
-  const { currentStepId, steps } = useWizardContext()
+  const { currentStepId, steps, onStepComplete } = useWizardContext()
+  const { disabled, submitForm, isSubmitting, isValidating, values } = useFormContext()
 
   const { title: nextStepTitle } = steps.find(({ id }) => id === currentStepId) || { title: m.next }
 
@@ -41,11 +41,22 @@ const WizardNextButton = props => {
       : m.complete
     : nextStepTitle
 
+  const handleClick = React.useCallback(() => {
+    onStepComplete(values)
+    submitForm()
+  }, [onStepComplete, submitForm, values])
+
   return (
-    <Form.Submit component={SubmitButton}>
+    <Button
+      type="submit"
+      primary
+      onClick={handleClick}
+      disabled={disabled}
+      busy={isSubmitting || isValidating}
+    >
       <Message content={nextMessage} />
       {!isLastStep && <Button.Icon icon="keyboard_arrow_right" type="right" />}
-    </Form.Submit>
+    </Button>
   )
 }
 

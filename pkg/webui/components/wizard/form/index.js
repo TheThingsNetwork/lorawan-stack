@@ -26,9 +26,9 @@ import PrevButton from './prev-button'
 import NextButton from './next-button'
 
 const WizardForm = React.forwardRef((props, ref) => {
-  const { validationSchema, validationContext, onSubmit, children, initialValues, error } = props
+  const { validationSchema, validationContext, onSubmit, children, initialValues } = props
   const context = useWizardContext()
-  const { onNextStep, currentStepId, steps, snapshot, onComplete, completeMessage } = context
+  const { onNextStep, currentStepId, steps, snapshot, onComplete, completeMessage, error } = context
 
   const formRef = React.useRef(null)
   const combinedRef = useCombinedRefs(ref, formRef)
@@ -87,7 +87,6 @@ const WizardForm = React.forwardRef((props, ref) => {
 
 WizardForm.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
-  error: PropTypes.error,
   initialValues: PropTypes.shape({}),
   onSubmit: PropTypes.func,
   validationContext: PropTypes.shape({}),
@@ -101,7 +100,6 @@ WizardForm.defaultProps = {
   onSubmit: undefined,
   validationContext: {},
   initialValues: {},
-  error: undefined,
 }
 
 export default WizardForm

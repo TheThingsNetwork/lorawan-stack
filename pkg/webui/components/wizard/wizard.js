@@ -25,6 +25,8 @@ const FIRST_STEP = 0
 // Action types.
 const INIT = 'INIT'
 const GO_TO_STEP = 'GO_TO_STEP'
+const SET_ERROR = 'SET_ERROR'
+const COMPLETE_STEP = 'COMPLETE_STEP'
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -34,22 +36,33 @@ const reducer = (state, action) => {
         steps: action.steps,
       }
     case GO_TO_STEP:
-      const { snapshots: oldSnapshots, currentStep: oldStep } = state
-      const { values, step: currentStep } = action
-
-      // Replace current step values when navigating between wizard steps.
-      if (values) {
+      return {
+        ...state,
+        currentStepId: action.step,
+        error: undefined,
       }
+    case SET_ERROR:
+      return {
+        ...state,
+        error: action.error,
+        currentStepId: action.step,
+      }
+    case COMPLETE_STEP:
+      const { snapshots: oldSnapshots, currentStepId: oldStepId, steps } = state
+      const { values } = action
+
+      const oldStepIndex = steps.findIndex(({ id }) => id === oldStepId)
+      // Replace current step values when navigating between wizard steps.
       const snapshots = [
-        ...oldSnapshots.slice(0, oldStep - 1),
+        ...oldSnapshots.slice(0, oldStepIndex),
         values,
-        ...oldSnapshots.slice(oldStep),
+        ...oldSnapshots.slice(oldStepIndex + 1),
       ]
 
       return {
         ...state,
-        currentStep,
         snapshots,
+        error: undefined,
       }
     default:
       return state
@@ -60,7 +73,7 @@ const Wizard = React.forwardRef((props, ref) => {
   const { initialStepId, onComplete, initialValues, completeMessage } = props
 
   const [state, dispatch] = React.useReducer(reducer, {
-    // Active step in the wizard.
+    error: undefined,
     currentStepId: initialStepId,
     // A list of all steps in the wizard.
     steps: [],
@@ -69,13 +82,14 @@ const Wizard = React.forwardRef((props, ref) => {
     snapshots: [],
   })
 
-  const { currentStepId, steps, snapshots } = state
+  const { currentStepId, steps, snapshots, error } = state
 
   const stepsInit = React.useCallback(steps => {
     dispatch({ type: INIT, steps })
   }, [])
-  const goToStep = React.useCallback(stepId => {
-    dispatch({ type: GO_TO_STEP, step: stepId })
+  const completeStep = React.useCallback(values => {
+    console.log('kekster mani suka')
+    dispatch({ type: COMPLETE_STEP, values })
   }, [])
   const prevStep = React.useCallback(
     values => {
@@ -95,6 +109,9 @@ const Wizard = React.forwardRef((props, ref) => {
     },
     [currentStepId, steps],
   )
+  const setError = React.useCallback((step, error) => {
+    dispatch({ type: SET_ERROR, step, error })
+  }, [])
 
   const snapshot = React.useMemo(() => merge({}, initialValues, ...snapshots), [
     initialValues,
@@ -102,15 +119,17 @@ const Wizard = React.forwardRef((props, ref) => {
   ])
 
   const context = {
+    currentStepId,
     completeMessage,
     onComplete,
     onNextStep: nextStep,
     onPrevStep: prevStep,
     onStepsInit: stepsInit,
-    onStepChange: goToStep,
-    currentStepId,
+    onStepComplete: completeStep,
+    onError: setError,
     snapshot,
     steps,
+    error,
   }
 
   React.useImperativeHandle(ref, () => context)
