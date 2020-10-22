@@ -88,7 +88,6 @@ const Wizard = React.forwardRef((props, ref) => {
     dispatch({ type: INIT, steps })
   }, [])
   const completeStep = React.useCallback(values => {
-    console.log('kekster mani suka')
     dispatch({ type: COMPLETE_STEP, values })
   }, [])
   const prevStep = React.useCallback(

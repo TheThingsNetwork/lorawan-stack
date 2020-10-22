@@ -23,6 +23,8 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import style from './form.styl'
+
 const m = defineMessages({
   prev: 'Previous',
 })
@@ -44,14 +46,13 @@ const WizardPrevButton = props => {
     return null
   }
 
-  const { title: prevMessage } = steps.find(({ id }) => id === currentStepId) || {
-    title: m.next,
-  }
+  const currentStepIndex = steps.findIndex(({ id }) => id === currentStepId)
+  const { title: prevMessage } = steps[currentStepIndex - 1] || { title: m.prev }
 
   return (
-    <Button secondary onClick={handlePrevStep} type="button">
+    <Button className={style.button} secondary onClick={handlePrevStep} type="button">
       <Button.Icon icon="keyboard_arrow_left" type="left" />
-      <Message content={prevMessage} />
+      <Message className={style.messagePrev} content={prevMessage} />
     </Button>
   )
 }
