@@ -2001,6 +2001,7 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 	ctx, cancel := context.WithCancel(ctx)
 	return ns, ctx, env, func() {
 		cancel()
+		ns.Close()
 		for _, f := range closeFuncs {
 			f()
 		}
