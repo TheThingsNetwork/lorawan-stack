@@ -804,9 +804,7 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 	var err error
 	var callOpt grpc.CallOption
 	callOpt, err = rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
-	if errors.IsUnauthenticated(err) {
-		callOpt = gs.WithClusterAuth()
-	} else if err != nil {
+	if err != nil {
 		return
 	}
 	registry, err := gs.getRegistry(ctx, &conn.Gateway().GatewayIdentifiers)
