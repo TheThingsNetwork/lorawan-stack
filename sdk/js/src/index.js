@@ -24,6 +24,7 @@ import Users from './service/users'
 import Auth from './service/auth'
 import EventHandler from './util/events'
 import StackConfiguration from './util/stack-configuration'
+import { STACK_COMPONENTS_MAP } from './util/constants'
 
 class TtnLw {
   constructor(token, { stackConfig, connectionType, defaultUserId, axiosConfig }) {
@@ -53,4 +54,4 @@ class TtnLw {
   }
 }
 
-export default TtnLw
+export { TtnLw as default, STACK_COMPONENTS_MAP }
