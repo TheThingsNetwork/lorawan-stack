@@ -8090,24 +8090,6 @@
       "file": "observability.go"
     }
   },
-  "event:ns.application.link.begin": {
-    "translations": {
-      "en": "begin application link"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "observability.go"
-    }
-  },
-  "event:ns.application.link.end": {
-    "translations": {
-      "en": "end application link"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "observability.go"
-    }
-  },
   "event:ns.class.switch.a": {
     "translations": {
       "en": "switched to class A"
