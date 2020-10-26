@@ -16,8 +16,8 @@ import { createNetworkErrorEvent, createUnknownErrorEvent } from './definitions'
 
 export const defineSyntheticEvent = name => data => ({
   time: new Date().toISOString(),
-  name: `synthetic.${name}`,
-  isError: name.startsWith('error'),
+  name,
+  isError: name.startsWith('synthetic.error'),
   isSynthetic: true,
   unique_id: `synthetic.${Date.now()}`,
   data,

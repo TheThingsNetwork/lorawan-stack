@@ -23,12 +23,19 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { mayViewApplicationEvents } from '@console/lib/feature-checks'
 
-import { clearApplicationEventsStream } from '@console/store/actions/applications'
+import {
+  clearApplicationEventsStream,
+  pauseApplicationEventsStream,
+  resumeApplicationEventsStream,
+} from '@console/store/actions/applications'
 
-import { selectApplicationEvents } from '@console/store/selectors/applications'
+import {
+  selectApplicationEvents,
+  selectApplicationEventsPaused,
+} from '@console/store/selectors/applications'
 
 const ApplicationEvents = props => {
-  const { appId, events, widget, onClear } = props
+  const { appId, events, widget, paused, onClear, onPauseToggle } = props
 
   if (widget) {
     return (
@@ -36,13 +43,23 @@ const ApplicationEvents = props => {
     )
   }
 
-  return <Events entityId={appId} events={events} onClear={onClear} />
+  return (
+    <Events
+      entityId={appId}
+      events={events}
+      paused={paused}
+      onClear={onClear}
+      onPauseToggle={onPauseToggle}
+    />
+  )
 }
 
 ApplicationEvents.propTypes = {
   appId: PropTypes.string.isRequired,
   events: PropTypes.events,
   onClear: PropTypes.func.isRequired,
+  onPauseToggle: PropTypes.func.isRequired,
+  paused: PropTypes.bool.isRequired,
   widget: PropTypes.bool,
 }
 
@@ -58,10 +75,15 @@ export default withFeatureRequirement(mayViewApplicationEvents)(
 
       return {
         events: selectApplicationEvents(state, appId),
+        paused: selectApplicationEventsPaused(state, appId),
       }
     },
     (dispatch, ownProps) => ({
       onClear: () => dispatch(clearApplicationEventsStream(ownProps.appId)),
+      onPauseToggle: paused =>
+        paused
+          ? dispatch(resumeApplicationEventsStream(ownProps.appId))
+          : dispatch(pauseApplicationEventsStream(ownProps.appId)),
     }),
   )(ApplicationEvents),
 )

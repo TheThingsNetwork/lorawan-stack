@@ -15,7 +15,6 @@
 import React from 'react'
 import { FixedSizeList as List } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
-import { isEqual } from 'lodash'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -41,68 +40,49 @@ EmptyMessage.propTypes = {
   entityId: PropTypes.string.isRequired,
 }
 
-const EventsList = React.memo(
-  ({ events, scoped, entityId, onRowClick, activeId }) => {
-    if (!events.length) {
-      return <EmptyMessage entityId={entityId} />
-    }
+const EventsList = React.memo(({ events, scoped, entityId, onRowClick, activeId }) => {
+  if (!events.length) {
+    return <EmptyMessage entityId={entityId} />
+  }
 
-    return (
-      <AutoSizer>
-        {({ height, width }) => (
-          <ol>
-            <List
-              height={height}
-              width={width}
-              itemCount={events.length}
-              itemSize={40}
-              overscanCount={25}
-            >
-              {({ index, style }) => {
-                const eventId = getEventId(events[index])
-                return (
-                  <Event
-                    event={events[index]}
-                    eventId={eventId}
-                    key={eventId}
-                    scoped={scoped}
-                    rowStyle={style}
-                    onRowClick={onRowClick}
-                    index={index}
-                    active={eventId === activeId}
-                  />
-                )
-              }}
-            </List>
-          </ol>
-        )}
-      </AutoSizer>
-    )
-  },
-  (
-    { paused: oldPaused, events: oldEvents, ...oldProps },
-    { paused: newPaused, events: newEvents, ...newProps },
-  ) => {
-    // Do not update if in the `paused` state unless events are cleared.
-    if (newPaused && oldEvents.length < newEvents.length) {
-      return true
-    }
-
-    // Always update on new events if not in the `paused` state.
-    if (oldEvents !== newEvents) {
-      return false
-    }
-
-    return isEqual(newProps, oldProps)
-  },
-)
+  return (
+    <AutoSizer>
+      {({ height, width }) => (
+        <ol>
+          <List
+            height={height}
+            width={width}
+            itemCount={events.length}
+            itemSize={40}
+            overscanCount={25}
+          >
+            {({ index, style }) => {
+              const eventId = getEventId(events[index])
+              return (
+                <Event
+                  event={events[index]}
+                  eventId={eventId}
+                  key={eventId}
+                  scoped={scoped}
+                  rowStyle={style}
+                  onRowClick={onRowClick}
+                  index={index}
+                  active={eventId === activeId}
+                />
+              )
+            }}
+          </List>
+        </ol>
+      )}
+    </AutoSizer>
+  )
+})
 
 EventsList.propTypes = {
   activeId: PropTypes.string,
   entityId: PropTypes.string.isRequired,
   events: PropTypes.events.isRequired,
   onRowClick: PropTypes.func.isRequired,
-  paused: PropTypes.bool.isRequired,
   scoped: PropTypes.bool,
 }
 

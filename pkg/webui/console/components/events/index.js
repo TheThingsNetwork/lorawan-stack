@@ -32,10 +32,9 @@ import { getEventId } from './utils'
 
 import style from './events.styl'
 
-const Events = React.memo(({ events, scoped, onClear, entityId }) => {
-  const [paused, setPause] = useState(false)
+const Events = React.memo(({ events, scoped, paused, onClear, onPauseToggle, entityId }) => {
   const [focus, setFocus] = useState({ eventId: undefined, visible: false })
-  const onPause = useCallback(() => setPause(paused => !paused), [])
+  const onPause = useCallback(() => onPauseToggle(paused), [onPauseToggle, paused])
   const handleRowClick = useCallback(
     eventId => {
       if (eventId !== focus.eventId) {
@@ -67,7 +66,8 @@ const Events = React.memo(({ events, scoped, onClear, entityId }) => {
                 onClick={onPause}
                 message={paused ? sharedMessages.resume : sharedMessages.pause}
                 naked
-                secondary
+                secondary={!paused}
+                warning={paused}
                 icon={paused ? 'play_arrow' : 'pause'}
               />
               <Button
@@ -112,12 +112,15 @@ Events.propTypes = {
   entityId: PropTypes.string.isRequired,
   events: PropTypes.events.isRequired,
   onClear: PropTypes.func,
+  onPauseToggle: PropTypes.func,
+  paused: PropTypes.bool.isRequired,
   scoped: PropTypes.bool,
 }
 
 Events.defaultProps = {
   scoped: false,
   onClear: () => null,
+  onPauseToggle: () => null,
 }
 
 Events.Widget = Widget
