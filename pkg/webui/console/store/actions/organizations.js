@@ -26,6 +26,10 @@ import {
   createStartEventsStreamSuccessActionType,
   startEventsStreamFailure,
   createStartEventsStreamFailureActionType,
+  pauseEventsStream,
+  createPauseEventsStreamActionType,
+  resumeEventsStream,
+  createResumeEventsStreamActionType,
   stopEventsStream,
   createStopEventsStreamActionType,
   clearEvents,
@@ -98,11 +102,15 @@ export const [
 export const START_ORG_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_ORG_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)
 export const START_ORG_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
+export const PAUSE_ORG_EVENT_STREAM = createPauseEventsStreamActionType(SHARED_NAME)
+export const RESUME_ORG_EVENT_STREAM = createResumeEventsStreamActionType(SHARED_NAME)
 export const STOP_ORG_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_ORG_EVENTS = createClearEventsActionType(SHARED_NAME)
 
 export const startOrganizationEventsStream = startEventsStream(SHARED_NAME)
 export const startOrganizationEventsStreamSuccess = startEventsStreamSuccess(SHARED_NAME)
 export const startOrganizationEventsStreamFailure = startEventsStreamFailure(SHARED_NAME)
+export const pauseOrganizationEventsStream = pauseEventsStream(SHARED_NAME)
+export const resumeOrganizationEventsStream = resumeEventsStream(SHARED_NAME)
 export const stopOrganizationEventsStream = stopEventsStream(SHARED_NAME)
 export const clearOrganizationEventsStream = clearEvents(SHARED_NAME)
