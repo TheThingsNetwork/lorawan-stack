@@ -14,6 +14,7 @@
 
 import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
+import { connect } from 'react-redux'
 
 import Icon from '@ttn-lw/components/icon'
 
@@ -23,50 +24,75 @@ import FetchTable from '@console/containers/fetch-table'
 
 import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { selectUserId } from '@console/store/selectors/user'
 
 import style from './collaborators-table.styl'
 
 const m = defineMessages({
   id: 'User / Organization ID',
+  currentUserIndicator: '(This is you)',
 })
 
-const headers = [
-  {
-    name: 'ids',
-    displayName: m.id,
-    render: ids => getCollaboratorId({ ids }),
-  },
-  {
-    name: 'ids',
-    displayName: sharedMessages.type,
-    render(ids) {
-      const isUser = 'user_ids' in ids
-      const icon = isUser ? 'user' : 'organization'
-
-      return (
-        <span>
-          <Icon icon={icon} className={style.collaboratorIcon} />
-          <Message content={isUser ? sharedMessages.user : sharedMessages.organization} />
-        </span>
-      )
-    },
-  },
-  {
-    name: 'rights',
-    displayName: sharedMessages.rights,
-    render(rights) {
-      for (let i = 0; i < rights.length; i++) {
-        if (rights[i].includes('_ALL')) {
-          return <Message content={sharedMessages.all} />
-        }
-      }
-
-      return <span>{rights.length}</span>
-    },
-  },
-]
-
+@connect(state => ({
+  currentUserId: selectUserId(state),
+}))
 export default class CollaboratorsTable extends Component {
+  static propTypes = {
+    currentUserId: PropTypes.string.isRequired,
+  }
+
+  constructor(props) {
+    super(props)
+    this.headers = [
+      {
+        name: 'ids',
+        displayName: m.id,
+        render(ids) {
+          const isUser = 'user_ids' in ids
+          const collaboratorId = getCollaboratorId({ ids })
+          if (isUser && collaboratorId === props.currentUserId) {
+            return (
+              <span>
+                {collaboratorId} <Message className={style.hint} content={m.currentUserIndicator} />
+              </span>
+            )
+          }
+          return collaboratorId
+        },
+      },
+      {
+        name: 'ids',
+        displayName: sharedMessages.type,
+        render(ids) {
+          const isUser = 'user_ids' in ids
+          const icon = isUser ? 'user' : 'organization'
+
+          return (
+            <span>
+              <Icon icon={icon} className={style.collaboratorIcon} />
+              <Message content={isUser ? sharedMessages.user : sharedMessages.organization} />
+            </span>
+          )
+        },
+      },
+      {
+        name: 'rights',
+        displayName: sharedMessages.rights,
+        render(rights) {
+          for (let i = 0; i < rights.length; i++) {
+            if (rights[i].includes('_ALL')) {
+              return <Message content={sharedMessages.all} />
+            }
+          }
+
+          return <span>{rights.length}</span>
+        },
+      },
+    ]
+  }
+
   getCollaboratorPathPrefix(collaborator) {
     return `/${'user_ids' in collaborator.ids ? 'user' : 'organization'}/${getCollaboratorId(
       collaborator,
@@ -77,7 +103,7 @@ export default class CollaboratorsTable extends Component {
     return (
       <FetchTable
         entity="collaborators"
-        headers={headers}
+        headers={this.headers}
         getItemPathPrefix={this.getCollaboratorPathPrefix}
         addMessage={sharedMessages.addCollaborator}
         tableTitle={<Message content={sharedMessages.collaborators} />}
