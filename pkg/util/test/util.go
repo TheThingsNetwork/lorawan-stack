@@ -27,6 +27,9 @@ import (
 )
 
 func FormatError(err error) string {
+	if err == nil {
+		return "nil"
+	}
 	var s string
 	for i, err := range errors.Stack(err) {
 		s += fmt.Sprintf(`
