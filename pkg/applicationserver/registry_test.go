@@ -168,47 +168,49 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 }
 
 func TestDeviceRegistry(t *testing.T) {
-	t.Parallel()
-
 	namespace := [...]string{
 		"applicationserver_test",
 		"devices",
 	}
 	for _, tc := range []struct {
 		Name string
-		New  func(t testing.TB) (reg DeviceRegistry, closeFn func() error)
+		New  func(ctx context.Context) (reg DeviceRegistry, closeFn func() error)
 		N    uint16
 	}{
 		{
 			Name: "Redis",
-			New: func(t testing.TB) (DeviceRegistry, func() error) {
-				cl, flush := test.NewRedis(t, namespace[:]...)
-				reg := &redis.DeviceRegistry{Redis: cl}
-				return reg, func() error {
-					flush()
-					return cl.Close()
-				}
+			New: func(ctx context.Context) (DeviceRegistry, func() error) {
+				cl, flush := test.NewRedis(ctx, namespace[:]...)
+				return &redis.DeviceRegistry{
+						Redis: cl,
+					}, func() error {
+						flush()
+						return cl.Close()
+					}
 			},
 			N: 8,
 		},
 	} {
 		for i := 0; i < int(tc.N); i++ {
-			t.Run(fmt.Sprintf("%s/%d", tc.Name, i), func(t *testing.T) {
-				t.Parallel()
-				reg, closeFn := tc.New(t)
-				reg = wrapEndDeviceRegistryWithReplacedFields(reg, replacedEndDeviceFields...)
-				if closeFn != nil {
-					defer func() {
-						if err := closeFn(); err != nil {
-							t.Errorf("Failed to close registry: %v", err)
-						}
-					}()
-				}
-				t.Run("1st run", func(t *testing.T) { handleDeviceRegistryTest(t, reg) })
-				if t.Failed() {
-					t.Skip("Skipping 2nd run")
-				}
-				t.Run("2nd run", func(t *testing.T) { handleDeviceRegistryTest(t, reg) })
+			test.RunSubtest(t, test.SubtestConfig{
+				Name:     fmt.Sprintf("%s/%d", tc.Name, i),
+				Parallel: true,
+				Func: func(ctx context.Context, t *testing.T, _ *assertions.Assertion) {
+					reg, closeFn := tc.New(ctx)
+					reg = wrapEndDeviceRegistryWithReplacedFields(reg, replacedEndDeviceFields...)
+					if closeFn != nil {
+						defer func() {
+							if err := closeFn(); err != nil {
+								t.Errorf("Failed to close registry: %v", err)
+							}
+						}()
+					}
+					t.Run("1st run", func(t *testing.T) { handleDeviceRegistryTest(t, reg) })
+					if t.Failed() {
+						t.Skip("Skipping 2nd run")
+					}
+					t.Run("2nd run", func(t *testing.T) { handleDeviceRegistryTest(t, reg) })
+				},
 			})
 		}
 	}
@@ -287,46 +289,48 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 }
 
 func TestLinkRegistry(t *testing.T) {
-	t.Parallel()
-
 	namespace := [...]string{
 		"applicationserver_test",
 		"links",
 	}
 	for _, tc := range []struct {
 		Name string
-		New  func(t testing.TB) (reg LinkRegistry, closeFn func() error)
+		New  func(ctx context.Context) (reg LinkRegistry, closeFn func() error)
 		N    uint16
 	}{
 		{
 			Name: "Redis",
-			New: func(t testing.TB) (LinkRegistry, func() error) {
-				cl, flush := test.NewRedis(t, namespace[:]...)
-				reg := &redis.LinkRegistry{Redis: cl}
-				return reg, func() error {
-					flush()
-					return cl.Close()
-				}
+			New: func(ctx context.Context) (LinkRegistry, func() error) {
+				cl, flush := test.NewRedis(ctx, namespace[:]...)
+				return &redis.LinkRegistry{
+						Redis: cl,
+					}, func() error {
+						flush()
+						return cl.Close()
+					}
 			},
 			N: 8,
 		},
 	} {
 		for i := 0; i < int(tc.N); i++ {
-			t.Run(fmt.Sprintf("%s/%d", tc.Name, i), func(t *testing.T) {
-				t.Parallel()
-				reg, closeFn := tc.New(t)
-				if closeFn != nil {
-					defer func() {
-						if err := closeFn(); err != nil {
-							t.Errorf("Failed to close registry: %v", err)
-						}
-					}()
-				}
-				t.Run("1st run", func(t *testing.T) { handleLinkRegistryTest(t, reg) })
-				if t.Failed() {
-					t.Skip("Skipping 2nd run")
-				}
-				t.Run("2nd run", func(t *testing.T) { handleLinkRegistryTest(t, reg) })
+			test.RunSubtest(t, test.SubtestConfig{
+				Name:     fmt.Sprintf("%s/%d", tc.Name, i),
+				Parallel: true,
+				Func: func(ctx context.Context, t *testing.T, _ *assertions.Assertion) {
+					reg, closeFn := tc.New(ctx)
+					if closeFn != nil {
+						defer func() {
+							if err := closeFn(); err != nil {
+								t.Errorf("Failed to close registry: %v", err)
+							}
+						}()
+					}
+					t.Run("1st run", func(t *testing.T) { handleLinkRegistryTest(t, reg) })
+					if t.Failed() {
+						t.Skip("Skipping 2nd run")
+					}
+					t.Run("2nd run", func(t *testing.T) { handleLinkRegistryTest(t, reg) })
+				},
 			})
 		}
 	}

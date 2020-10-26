@@ -20,7 +20,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -88,7 +88,7 @@ func (r *ApplicationPackagesRegistry) makeAssociationKeyFunc(uid string) func(po
 func (r ApplicationPackagesRegistry) GetAssociation(ctx context.Context, ids ttnpb.ApplicationPackageAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageAssociation, error) {
 	pb := &ttnpb.ApplicationPackageAssociation{}
 	defer trace.StartRegion(ctx, "get application package association by id").End()
-	if err := ttnredis.GetProto(r.Redis, r.associationKey(unique.ID(ctx, ids.EndDeviceIdentifiers), r.fPortStr(ids.FPort))).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(ctx, r.Redis, r.associationKey(unique.ID(ctx, ids.EndDeviceIdentifiers), r.fPortStr(ids.FPort))).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyAssociationFieldMask(nil, pb, appendImplicitAssociationGetPaths(paths...)...)
@@ -102,12 +102,12 @@ func (r ApplicationPackagesRegistry) ListAssociations(ctx context.Context, ids t
 
 	defer trace.StartRegion(ctx, "list application package associations by device id").End()
 
-	err := r.Redis.Watch(func(tx *redis.Tx) (err error) {
+	err := r.Redis.Watch(ctx, func(tx *redis.Tx) (err error) {
 		opts := []ttnredis.FindProtosOption{ttnredis.FindProtosSorted(false)}
 
 		limit, offset := ttnredis.PaginationLimitAndOffsetFromContext(ctx)
 		if limit != 0 {
-			total, err := tx.SCard(uidKey).Result()
+			total, err := tx.SCard(ctx, uidKey).Result()
 			if err != nil {
 				return err
 			}
@@ -115,7 +115,7 @@ func (r ApplicationPackagesRegistry) ListAssociations(ctx context.Context, ids t
 			opts = append(opts, ttnredis.FindProtosWithOffsetAndCount(offset, limit))
 		}
 
-		return ttnredis.FindProtos(tx, uidKey, r.makeAssociationKeyFunc(devUID), opts...).Range(func() (proto.Message, func() (bool, error)) {
+		return ttnredis.FindProtos(ctx, tx, uidKey, r.makeAssociationKeyFunc(devUID), opts...).Range(func() (proto.Message, func() (bool, error)) {
 			pb := &ttnpb.ApplicationPackageAssociation{}
 			return pb, func() (bool, error) {
 				pb, err := applyAssociationFieldMask(nil, pb, appendImplicitAssociationGetPaths(paths...)...)
@@ -143,8 +143,8 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 	defer trace.StartRegion(ctx, "set application package association by id").End()
 
 	var pb *ttnpb.ApplicationPackageAssociation
-	err := r.Redis.Watch(func(tx *redis.Tx) error {
-		cmd := ttnredis.GetProto(tx, associationkey)
+	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+		cmd := ttnredis.GetProto(ctx, tx, associationkey)
 		stored := &ttnpb.ApplicationPackageAssociation{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
 			stored = nil
@@ -188,8 +188,8 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 		var pipelined func(redis.Pipeliner) error
 		if pb == nil && len(sets) == 0 {
 			pipelined = func(p redis.Pipeliner) error {
-				p.Del(associationkey)
-				p.SRem(uidKey, ids.FPort)
+				p.Del(ctx, associationkey)
+				p.SRem(ctx, uidKey, ids.FPort)
 				return nil
 			}
 		} else {
@@ -245,10 +245,10 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 			}
 
 			pipelined = func(p redis.Pipeliner) error {
-				if _, err := ttnredis.SetProto(p, associationkey, updated, 0); err != nil {
+				if _, err := ttnredis.SetProto(ctx, p, associationkey, updated, 0); err != nil {
 					return err
 				}
-				p.SAdd(uidKey, ids.FPort)
+				p.SAdd(ctx, uidKey, ids.FPort)
 				return nil
 			}
 
@@ -257,7 +257,7 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 				return err
 			}
 		}
-		_, err = tx.TxPipelined(pipelined)
+		_, err = tx.TxPipelined(ctx, pipelined)
 		if err != nil {
 			return err
 		}
@@ -273,7 +273,7 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 func (r ApplicationPackagesRegistry) GetDefaultAssociation(ctx context.Context, ids ttnpb.ApplicationPackageDefaultAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageDefaultAssociation, error) {
 	pb := &ttnpb.ApplicationPackageDefaultAssociation{}
 	defer trace.StartRegion(ctx, "get application package default association by id").End()
-	if err := ttnredis.GetProto(r.Redis, r.associationKey(unique.ID(ctx, ids.ApplicationIdentifiers), r.fPortStr(ids.FPort))).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(ctx, r.Redis, r.associationKey(unique.ID(ctx, ids.ApplicationIdentifiers), r.fPortStr(ids.FPort))).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyDefaultAssociationFieldMask(nil, pb, appendImplicitAssociationGetPaths(paths...)...)
@@ -287,12 +287,12 @@ func (r ApplicationPackagesRegistry) ListDefaultAssociations(ctx context.Context
 
 	defer trace.StartRegion(ctx, "list application package default associations by application id").End()
 
-	err := r.Redis.Watch(func(tx *redis.Tx) (err error) {
+	err := r.Redis.Watch(ctx, func(tx *redis.Tx) (err error) {
 		opts := []ttnredis.FindProtosOption{ttnredis.FindProtosSorted(false)}
 
 		limit, offset := ttnredis.PaginationLimitAndOffsetFromContext(ctx)
 		if limit != 0 {
-			total, err := tx.SCard(uidKey).Result()
+			total, err := tx.SCard(ctx, uidKey).Result()
 			if err != nil {
 				return err
 			}
@@ -300,7 +300,7 @@ func (r ApplicationPackagesRegistry) ListDefaultAssociations(ctx context.Context
 			opts = append(opts, ttnredis.FindProtosWithOffsetAndCount(offset, limit))
 		}
 
-		return ttnredis.FindProtos(tx, uidKey, r.makeAssociationKeyFunc(appUID), opts...).Range(func() (proto.Message, func() (bool, error)) {
+		return ttnredis.FindProtos(ctx, tx, uidKey, r.makeAssociationKeyFunc(appUID), opts...).Range(func() (proto.Message, func() (bool, error)) {
 			pb := &ttnpb.ApplicationPackageDefaultAssociation{}
 			return pb, func() (bool, error) {
 				pb, err := applyDefaultAssociationFieldMask(nil, pb, appendImplicitAssociationGetPaths(paths...)...)
@@ -328,8 +328,8 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 	defer trace.StartRegion(ctx, "set application package default association by id").End()
 
 	var pb *ttnpb.ApplicationPackageDefaultAssociation
-	err := r.Redis.Watch(func(tx *redis.Tx) error {
-		cmd := ttnredis.GetProto(tx, associationkey)
+	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+		cmd := ttnredis.GetProto(ctx, tx, associationkey)
 		stored := &ttnpb.ApplicationPackageDefaultAssociation{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
 			stored = nil
@@ -373,8 +373,8 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 		var pipelined func(redis.Pipeliner) error
 		if pb == nil && len(sets) == 0 {
 			pipelined = func(p redis.Pipeliner) error {
-				p.Del(associationkey)
-				p.SRem(uidKey, ids.FPort)
+				p.Del(ctx, associationkey)
+				p.SRem(ctx, uidKey, ids.FPort)
 				return nil
 			}
 		} else {
@@ -426,10 +426,10 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 			}
 
 			pipelined = func(p redis.Pipeliner) error {
-				if _, err := ttnredis.SetProto(p, associationkey, updated, 0); err != nil {
+				if _, err := ttnredis.SetProto(ctx, p, associationkey, updated, 0); err != nil {
 					return err
 				}
-				p.SAdd(uidKey, ids.FPort)
+				p.SAdd(ctx, uidKey, ids.FPort)
 				return nil
 			}
 
@@ -438,7 +438,7 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 				return err
 			}
 		}
-		_, err = tx.Pipelined(pipelined)
+		_, err = tx.Pipelined(ctx, pipelined)
 		if err != nil {
 			return err
 		}

@@ -69,9 +69,8 @@ var (
 )
 
 func TestGatewayServer(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
-	ctx := test.Context()
 	is, isAddr := startMockIS(ctx)
 	ns, nsAddr := mock.StartNS(ctx)
 
@@ -118,7 +117,7 @@ func TestGatewayServer(t *testing.T) {
 		UpdateConnectionStatsDebounceTime: 0,
 	}
 	if os.Getenv("TEST_REDIS") == "1" {
-		statsRedisClient, statsFlush := test.NewRedis(t, "gatewayserver_test")
+		statsRedisClient, statsFlush := test.NewRedis(ctx, "gatewayserver_test")
 		defer statsFlush()
 		defer statsRedisClient.Close()
 		statsRegistry := &gsredis.GatewayConnectionStatsRegistry{

@@ -22,7 +22,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis/v8"
 	ulid "github.com/oklog/ulid/v2"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 )
@@ -79,10 +79,10 @@ func (h redisHook) AfterProcessPipeline(context.Context, []redis.Cmder) error {
 // and a flush function, which should be called after the client is not needed anymore to clean the namespace.
 // NewRedis respects TEST_REDIS, REDIS_ADDRESS and REDIS_DB environment variables.
 // Client returned logs commands executed.
-func NewRedis(t testing.TB, namespace ...string) (*ttnredis.Client, func()) {
+func NewRedis(ctx context.Context, namespace ...string) (*ttnredis.Client, func()) {
+	t := MustTBFromContext(ctx)
 	if os.Getenv("TEST_REDIS") != "1" {
 		t.Skip("TEST_REDIS is not set to `1`, skipping Redis tests")
-		panic("NewRedis called outside test")
 	}
 
 	conf := ttnredis.Config{
@@ -104,7 +104,7 @@ func NewRedis(t testing.TB, namespace ...string) (*ttnredis.Client, func()) {
 	}
 
 	cl := ttnredis.New(conf)
-	if err := cl.Ping().Err(); err != nil {
+	if err := cl.Ping(ctx).Err(); err != nil {
 		t.Fatalf("Failed to ping Redis: `%s`", err)
 	}
 
@@ -119,14 +119,14 @@ func NewRedis(t testing.TB, namespace ...string) (*ttnredis.Client, func()) {
 		defer cl.Close()
 
 		q := cl.Key("*")
-		keys, err := cl.Client.Keys(q).Result()
+		keys, err := cl.Client.Keys(ctx, q).Result()
 		if err != nil {
 			logger.WithField("query", q).Fatal("Failed to query Redis for keys")
 			return
 		}
 
 		if len(keys) > 0 {
-			n, err := cl.Client.Del(keys...).Result()
+			n, err := cl.Client.Del(ctx, keys...).Result()
 			if err != nil {
 				logger.WithError(err).Fatal("Failed to delete existing keys")
 				return

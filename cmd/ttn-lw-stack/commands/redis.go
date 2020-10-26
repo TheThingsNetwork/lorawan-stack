@@ -15,13 +15,15 @@
 package commands
 
 import (
+	"context"
+
 	"github.com/spf13/cobra"
 	nsredis "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 )
 
-func rangeRedisKeysIteration(cl *redis.Client, cursor uint64, scanKey string, f func(k string) bool) (uint64, error) {
-	ks, cursor, err := cl.Scan(cursor, scanKey, 1).Result()
+func rangeRedisKeysIteration(ctx context.Context, cl *redis.Client, cursor uint64, scanKey string, f func(k string) bool) (uint64, error) {
+	ks, cursor, err := cl.Scan(ctx, cursor, scanKey, 1).Result()
 	if err != nil {
 		return 0, err
 	}
@@ -33,13 +35,13 @@ func rangeRedisKeysIteration(cl *redis.Client, cursor uint64, scanKey string, f 
 	return cursor, nil
 }
 
-func rangeRedisKeys(cl *redis.Client, scanKey string, f func(k string) bool) error {
-	cursor, err := rangeRedisKeysIteration(cl, 0, scanKey, f)
+func rangeRedisKeys(ctx context.Context, cl *redis.Client, scanKey string, f func(k string) bool) error {
+	cursor, err := rangeRedisKeysIteration(ctx, cl, 0, scanKey, f)
 	if err != nil {
 		return err
 	}
 	for cursor > 0 {
-		cursor, err = rangeRedisKeysIteration(cl, cursor, scanKey, f)
+		cursor, err = rangeRedisKeysIteration(ctx, cl, cursor, scanKey, f)
 		if err != nil {
 			return err
 		}
@@ -64,8 +66,8 @@ var (
 			cl := NewNetworkServerApplicationUplinkQueueRedis(*config)
 			var deleted uint64
 			defer func() { logger.Debugf("%d processed stream entries deleted", deleted) }()
-			return rangeRedisKeys(cl, nsredis.ApplicationUplinkQueueUIDGenericUplinkKey(cl, "*"), func(k string) bool {
-				gs, err := cl.XInfoGroups(k).Result()
+			return rangeRedisKeys(ctx, cl, nsredis.ApplicationUplinkQueueUIDGenericUplinkKey(cl, "*"), func(k string) bool {
+				gs, err := cl.XInfoGroups(ctx, k).Result()
 				if err != nil {
 					logger.WithError(err).Errorf("Failed to query groups of stream %q", k)
 					return true
@@ -77,7 +79,7 @@ var (
 					}
 					last := "-"
 					for {
-						msgs, err := cl.XRangeN(k, last, g.LastDeliveredID, 1).Result()
+						msgs, err := cl.XRangeN(ctx, k, last, g.LastDeliveredID, 1).Result()
 						if err != nil {
 							logger.WithError(err).Errorf("Failed to XRANGE over stream %q", k)
 							return true
@@ -90,7 +92,7 @@ var (
 							ids = append(ids, msg.ID)
 							last = msg.ID
 						}
-						_, err = cl.XDel(k, ids...).Result()
+						_, err = cl.XDel(ctx, k, ids...).Result()
 						if err != nil {
 							logger.WithError(err).Errorf("Failed to XDEL from stream %q, continue to next stream", k)
 							return true

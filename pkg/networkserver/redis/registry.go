@@ -27,7 +27,7 @@ import (
 	"time"
 
 	"github.com/blang/semver"
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis/v8"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/oklog/ulid/v2"
 	"github.com/vmihailenco/msgpack/v5"
@@ -67,8 +67,8 @@ type DeviceRegistry struct {
 	entropy   io.Reader
 }
 
-func (r *DeviceRegistry) Init() error {
-	if err := ttnredis.InitMutex(r.Redis); err != nil {
+func (r *DeviceRegistry) Init(ctx context.Context) error {
+	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
 		return err
 	}
 	r.entropyMu = &sync.Mutex{}
@@ -108,7 +108,7 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	defer trace.StartRegion(ctx, "get end device by id").End()
 
 	pb := &ttnpb.EndDevice{}
-	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(ctx, r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, ctx, err
 	}
 	pb, err := ttnpb.FilterGetEndDevice(pb, paths...)
@@ -123,7 +123,7 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 	defer trace.StartRegion(ctx, "get end device by eui").End()
 
 	pb := &ttnpb.EndDevice{}
-	if err := ttnredis.FindProto(r.Redis, r.euiKey(joinEUI, devEUI), func(uid string) (string, error) {
+	if err := ttnredis.FindProto(ctx, r.Redis, r.euiKey(joinEUI, devEUI), func(uid string) (string, error) {
 		return r.uidKey(uid), nil
 	}).ScanProto(pb); err != nil {
 		return nil, ctx, err
@@ -288,7 +288,7 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 		isPending = true
 	case inputKeys.Legacy, processingKeys.Legacy:
 		pb := &ttnpb.EndDevice{}
-		if err := ttnredis.GetProto(r, uidKey).ScanProto(pb); err != nil {
+		if err := ttnredis.GetProto(ctx, r, uidKey).ScanProto(pb); err != nil {
 			return nil, err
 		}
 		ms := make([]*uplinkMatch, 0, 2)
@@ -360,7 +360,7 @@ func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingK
 		}
 	}
 
-	vs, err := r.HMGet(ttnredis.Key(uidKey, fieldKey), fields...).Result()
+	vs, err := r.HMGet(ctx, ttnredis.Key(uidKey, fieldKey), fields...).Result()
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
@@ -529,7 +529,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		UID string
 	}
 	lsb := uint16(pld.FCnt)
-	v, err := deviceMatchScript.Run(r.Redis, []string{
+	v, err := deviceMatchScript.Run(ctx, r.Redis, []string{
 		matchKeys.Match,
 
 		addrKeys.ShortFCnt,
@@ -657,7 +657,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	args := make([]interface{}, 1, 2)
 	args[0] = cacheTTL.Milliseconds()
 	for len(scanKeys) > 0 {
-		v, err := deviceMatchScanScript.Run(r.Redis, scanKeys, args...).Result()
+		v, err := deviceMatchScanScript.Run(ctx, r.Redis, scanKeys, args...).Result()
 		if err != nil && err != redis.Nil {
 			log.FromContext(ctx).WithFields(log.Fields(
 				"scan_keys", scanKeys,
@@ -747,9 +747,9 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 					if err != nil {
 						return false, err
 					}
-					_, err = r.Redis.Pipelined(func(p redis.Pipeliner) error {
-						p.Set(matchKeys.Match, string(b), cacheTTL)
-						p.Del(scanKeys...)
+					_, err = r.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
+						p.Set(ctx, matchKeys.Match, string(b), cacheTTL)
+						p.Del(ctx, scanKeys...)
 						return nil
 					})
 					if err != nil {
@@ -777,20 +777,20 @@ func equalEUI64(x, y *types.EUI64) bool {
 	return x.Equal(*y)
 }
 
-func removeLegacyDevAddrMapping(r redis.Cmdable, addrKey, uid string) {
-	r.SRem(addrKey, uid)
+func removeLegacyDevAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string) {
+	r.SRem(ctx, addrKey, uid)
 }
 
-func removeCurrentDevAddrMapping(r redis.Cmdable, addrKey, uid string, supports32Bit bool) {
+func removeCurrentDevAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string, supports32Bit bool) {
 	if !supports32Bit {
-		r.ZRem(ttnredis.Key(addrKey, shortFCntKey), uid)
+		r.ZRem(ctx, ttnredis.Key(addrKey, shortFCntKey), uid)
 	} else {
-		r.ZRem(ttnredis.Key(addrKey, longFCntKey), uid)
+		r.ZRem(ctx, ttnredis.Key(addrKey, longFCntKey), uid)
 	}
 }
 
-func removePendingDevAddrMapping(r redis.Cmdable, addrKey, uid string) {
-	r.SRem(ttnredis.Key(addrKey, pendingKey), uid)
+func removePendingDevAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string) {
+	r.SRem(ctx, ttnredis.Key(addrKey, pendingKey), uid)
 }
 
 // SetByID sets device by appID, devID.
@@ -816,7 +816,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	}
 	lockIDStr := lockID.String()
 	if err = ttnredis.LockedWatch(ctx, r.Redis, uk, lockIDStr, r.LockTTL, func(tx *redis.Tx) error {
-		cmd := ttnredis.GetProto(tx, uk)
+		cmd := ttnredis.GetProto(ctx, tx, uk)
 		stored := &ttnpb.EndDevice{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
 			stored = nil
@@ -855,20 +855,20 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			pb, err = ttnpb.FilterGetEndDevice(stored, gets...)
 			return err
 		}
-		_, err = tx.TxPipelined(func(p redis.Pipeliner) error {
+		_, err = tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
 			if pb == nil && len(sets) == 0 {
-				p.Del(uk)
-				p.Del(deviceUIDLastInvalidationKey(r.Redis, uid))
+				p.Del(ctx, uk)
+				p.Del(ctx, deviceUIDLastInvalidationKey(r.Redis, uid))
 				if stored.JoinEUI != nil && stored.DevEUI != nil {
-					p.Del(r.euiKey(*stored.JoinEUI, *stored.DevEUI))
+					p.Del(ctx, r.euiKey(*stored.JoinEUI, *stored.DevEUI))
 				}
 				if stored.PendingSession != nil {
-					removeLegacyDevAddrMapping(p, r.addrKey(stored.PendingSession.DevAddr), uid)
-					removePendingDevAddrMapping(p, r.addrKey(stored.PendingSession.DevAddr), uid)
+					removeLegacyDevAddrMapping(ctx, p, r.addrKey(stored.PendingSession.DevAddr), uid)
+					removePendingDevAddrMapping(ctx, p, r.addrKey(stored.PendingSession.DevAddr), uid)
 				}
 				if stored.Session != nil {
-					removeLegacyDevAddrMapping(p, r.addrKey(stored.Session.DevAddr), uid)
-					removeCurrentDevAddrMapping(p, r.addrKey(stored.Session.DevAddr), uid, deviceSupports32BitFCnt(stored))
+					removeLegacyDevAddrMapping(ctx, p, r.addrKey(stored.Session.DevAddr), uid)
+					removeCurrentDevAddrMapping(ctx, p, r.addrKey(stored.Session.DevAddr), uid, deviceSupports32BitFCnt(stored))
 				}
 				return nil
 			}
@@ -892,18 +892,18 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					if err := ttnredis.LockMutex(ctx, tx, ek, lockIDStr, r.LockTTL); err != nil {
 						return err
 					}
-					if err := tx.Watch(ek).Err(); err != nil {
+					if err := tx.Watch(ctx, ek).Err(); err != nil {
 						return err
 					}
-					i, err := tx.Exists(ek).Result()
+					i, err := tx.Exists(ctx, ek).Result()
 					if err != nil {
 						return err
 					}
 					if i != 0 {
 						return errDuplicateIdentifiers.New()
 					}
-					p.Set(ek, uid, 0)
-					ttnredis.UnlockMutex(p, ek, lockIDStr, r.LockTTL)
+					p.Set(ctx, ek, uid, 0)
+					ttnredis.UnlockMutex(ctx, p, ek, lockIDStr, r.LockTTL)
 				}
 			} else {
 				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationID != stored.ApplicationID {
@@ -1013,10 +1013,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 
 			fk := ttnredis.Key(uk, fieldKey)
 			if len(delFields) > 0 {
-				p.HDel(fk, delFields...)
+				p.HDel(ctx, fk, delFields...)
 			}
 			if len(setFields) > 0 {
-				p.HSet(fk, setFields...)
+				p.HSet(ctx, fk, setFields...)
 			}
 
 			storedSupports32BitFCnt := deviceSupports32BitFCnt(stored)
@@ -1025,12 +1025,12 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			if stored.GetPendingSession() == nil || updated.GetPendingSession() == nil ||
 				!updated.PendingSession.DevAddr.Equal(stored.PendingSession.DevAddr) {
 				if stored.GetPendingSession() != nil {
-					removeLegacyDevAddrMapping(p, r.addrKey(stored.PendingSession.DevAddr), uid)
-					removePendingDevAddrMapping(p, r.addrKey(stored.PendingSession.DevAddr), uid)
+					removeLegacyDevAddrMapping(ctx, p, r.addrKey(stored.PendingSession.DevAddr), uid)
+					removePendingDevAddrMapping(ctx, p, r.addrKey(stored.PendingSession.DevAddr), uid)
 				}
 
 				if updated.GetPendingSession() != nil {
-					p.SAdd(ttnredis.Key(r.addrKey(updated.PendingSession.DevAddr), pendingKey), uid)
+					p.SAdd(ctx, ttnredis.Key(r.addrKey(updated.PendingSession.DevAddr), pendingKey), uid)
 				}
 			}
 
@@ -1038,8 +1038,8 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				!updated.Session.DevAddr.Equal(stored.Session.DevAddr) ||
 				storedSupports32BitFCnt != updatedSupports32BitFCnt {
 				if stored.GetSession() != nil {
-					removeLegacyDevAddrMapping(p, r.addrKey(stored.Session.DevAddr), uid)
-					removeCurrentDevAddrMapping(p, r.addrKey(stored.Session.DevAddr), uid, storedSupports32BitFCnt)
+					removeLegacyDevAddrMapping(ctx, p, r.addrKey(stored.Session.DevAddr), uid)
+					removeCurrentDevAddrMapping(ctx, p, r.addrKey(stored.Session.DevAddr), uid, storedSupports32BitFCnt)
 				}
 
 				if updated.GetSession() != nil {
@@ -1048,14 +1048,14 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 						Member: uid,
 					}
 					if !updatedSupports32BitFCnt {
-						p.ZAdd(ttnredis.Key(r.addrKey(updated.Session.DevAddr), shortFCntKey), z)
+						p.ZAdd(ctx, ttnredis.Key(r.addrKey(updated.Session.DevAddr), shortFCntKey), z)
 					} else {
-						p.ZAdd(ttnredis.Key(r.addrKey(updated.Session.DevAddr), longFCntKey), z)
+						p.ZAdd(ctx, ttnredis.Key(r.addrKey(updated.Session.DevAddr), longFCntKey), z)
 					}
 				}
 			}
 
-			_, err := ttnredis.SetProto(p, uk, updated, 0)
+			_, err := ttnredis.SetProto(ctx, p, uk, updated, 0)
 			if err != nil {
 				return err
 			}

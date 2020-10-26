@@ -45,7 +45,7 @@ func NewDownlinkTaskQueue(cl *ttnredis.Client, maxLen int64, group, id string) *
 
 // Add adds downlink task for device identified by devID at time startAt.
 func (q *DownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-	return q.TaskQueue.Add(unique.ID(ctx, devID), startAt, replace)
+	return q.TaskQueue.Add(ctx, unique.ID(ctx, devID), startAt, replace)
 }
 
 // Pop calls f on the earliest downlink task in the schedule, for which timestamp is in range [0, time.Now()],

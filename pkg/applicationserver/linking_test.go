@@ -37,11 +37,10 @@ import (
 )
 
 func TestLink(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
 	registeredApplicationKey := "secret"
 
-	ctx := test.Context()
 	ns, nsAddr := startMockNS(ctx, func(md rpcmetadata.MD) bool {
 		return md.AuthType == "Bearer" && md.AuthValue == registeredApplicationKey
 	})
@@ -56,7 +55,7 @@ func TestLink(t *testing.T) {
 	app1 := ttnpb.ApplicationIdentifiers{ApplicationID: "app1"}
 	app2 := ttnpb.ApplicationIdentifiers{ApplicationID: "app2"}
 	app3 := ttnpb.ApplicationIdentifiers{ApplicationID: "app3"}
-	redisClient, flush := test.NewRedis(t, "applicationserver_test")
+	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
 	linkRegistry := &redis.LinkRegistry{Redis: redisClient}

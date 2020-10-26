@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -34,18 +34,18 @@ import (
 var Timeout = 10 * test.Delay
 
 func TestAddTask(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
-	cl, flush := test.NewRedis(t, "redis_test")
+	cl, flush := test.NewRedis(ctx, "AddTask")
 	defer flush()
 	defer cl.Close()
 
-	err := AddTask(cl, cl.Key("testKey"), 10, "testPayload", time.Unix(0, 42), false)
+	err := AddTask(ctx, cl, cl.Key("testKey"), 10, "testPayload", time.Unix(0, 42), false)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	rets, err := cl.Client.XRead(&redis.XReadArgs{
+	rets, err := cl.Client.XRead(ctx, &redis.XReadArgs{
 		Streams: []string{InputTaskKey(cl.Key("testKey")), "0"},
 		Count:   10,
 		Block:   -1,
@@ -68,12 +68,12 @@ func TestAddTask(t *testing.T) {
 		}
 	}
 
-	err = AddTask(cl, cl.Key("testKey"), 10, "testPayload", time.Unix(0, 42), true)
+	err = AddTask(ctx, cl, cl.Key("testKey"), 10, "testPayload", time.Unix(0, 42), true)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	rets, err = cl.Client.XRead(&redis.XReadArgs{
+	rets, err = cl.Client.XRead(ctx, &redis.XReadArgs{
 		Streams: []string{InputTaskKey(cl.Key("testKey")), "0"},
 		Count:   10,
 		Block:   -1,

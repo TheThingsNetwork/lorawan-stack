@@ -28,8 +28,7 @@ import (
 )
 
 func TestFindIndirectMemberships(t *testing.T) {
-	ctx := test.Context()
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		s := newStore(db)
@@ -85,9 +84,9 @@ func TestFindIndirectMemberships(t *testing.T) {
 }
 
 func TestMembershipStore(t *testing.T) {
-	ctx := test.Context()
-
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
+		_, ctx := test.New(t)
+
 		prepareTest(db,
 			&Membership{},
 			&Account{}, &User{}, &Organization{},
@@ -98,7 +97,7 @@ func TestMembershipStore(t *testing.T) {
 		store := GetMembershipStore(db)
 
 		if os.Getenv("TEST_REDIS") == "1" {
-			redis, flush := test.NewRedis(t, "is_membership_store")
+			redis, flush := test.NewRedis(ctx, "is_membership_store")
 			defer flush()
 			store = GetMembershipCache(store, redis, time.Minute)
 		}
@@ -214,7 +213,7 @@ func TestMembershipStore(t *testing.T) {
 			},
 		} {
 			t.Run(tt.Name, func(t *testing.T) {
-				a := assertions.New(t)
+				a, ctx := test.New(t)
 
 				memberEntityRights, err := store.GetMember(ctx, tt.Identifiers, tt.MemberIdentifiers)
 
