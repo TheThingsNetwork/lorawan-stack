@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/mohae/deepcopy"
-	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -27,16 +26,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-var (
-	Timeout = 10 * test.Delay
-)
+var Timeout = 10 * test.Delay
 
 func TestRegistry(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
-	ctx := test.Context()
-
-	cl, flush := test.NewRedis(t, "redis_test")
+	cl, flush := test.NewRedis(ctx, "redis_test")
 	defer flush()
 	defer cl.Close()
 

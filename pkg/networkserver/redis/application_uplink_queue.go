@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis/v8"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -81,13 +81,13 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 		case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
 			streamID = q.uidInvalidationKey(uid)
 			pipelined = func(p redis.Pipeliner) {
-				p.Set(deviceUIDLastInvalidationKey(q.redis, unique.ID(ctx, up.EndDeviceIdentifiers)), pld.DownlinkQueueInvalidated.LastFCntDown, 0)
+				p.Set(ctx, deviceUIDLastInvalidationKey(q.redis, unique.ID(ctx, up.EndDeviceIdentifiers)), pld.DownlinkQueueInvalidated.LastFCntDown, 0)
 			}
 		default:
 			streamID = q.uidGenericUplinkKey(uid)
 		}
-		_, err = q.redis.Pipelined(func(p redis.Pipeliner) error {
-			p.XAdd(&redis.XAddArgs{
+		_, err = q.redis.Pipelined(ctx, func(p redis.Pipeliner) error {
+			p.XAdd(ctx, &redis.XAddArgs{
 				Stream:       streamID,
 				MaxLenApprox: q.maxLen,
 				Values: map[string]interface{}{
@@ -120,12 +120,12 @@ var (
 )
 
 func (q *ApplicationUplinkQueue) initConsumer(ctx context.Context, streamID string) (func(), error) {
-	_, err := q.redis.XGroupCreateMkStream(streamID, q.group, "0").Result()
+	_, err := q.redis.XGroupCreateMkStream(ctx, streamID, q.group, "0").Result()
 	if err != nil && !ttnredis.IsConsumerGroupExistsErr(err) {
 		return nil, ttnredis.ConvertError(err)
 	}
 	return func() {
-		if err := q.redis.XGroupDelConsumer(streamID, q.group, q.id).Err(); err != nil {
+		if err := q.redis.XGroupDelConsumer(ctx, streamID, q.group, q.id).Err(); err != nil {
 			log.FromContext(ctx).WithError(err).WithFields(log.Fields(
 				"consumer", q.id,
 				"group", q.group,
@@ -163,7 +163,7 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 	}
 	defer q.subscriptions.Delete(uid)
 	for {
-		rets, err := q.redis.XReadGroup(&redis.XReadGroupArgs{
+		rets, err := q.redis.XReadGroup(ctx, &redis.XReadGroupArgs{
 			Group:    q.group,
 			Consumer: q.id,
 			Streams:  []string{joinAcceptUpStream, joinAcceptUpStream, invalidationUpStream, invalidationUpStream, genericUpStream, genericUpStream, "0", ">", "0", ">", "0", ">"},
@@ -192,7 +192,7 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 					devUID := unique.ID(ctx, up.EndDeviceIdentifiers)
 					lastFCnt, ok := invalidationFCnts[devUID]
 					if !ok {
-						lastFCnt, err = q.redis.Get(deviceUIDLastInvalidationKey(q.redis, devUID)).Uint64()
+						lastFCnt, err = q.redis.Get(ctx, deviceUIDLastInvalidationKey(q.redis, devUID)).Uint64()
 						if err != nil {
 							return ttnredis.ConvertError(err)
 						}
@@ -208,9 +208,9 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 						return err
 					}
 				}
-				_, err := q.redis.Pipelined(func(p redis.Pipeliner) error {
-					p.XAck(ret.Stream, q.group, msg.ID)
-					p.XDel(ret.Stream, msg.ID)
+				_, err := q.redis.Pipelined(ctx, func(p redis.Pipeliner) error {
+					p.XAck(ctx, ret.Stream, q.group, msg.ID)
+					p.XDel(ctx, ret.Stream, msg.ID)
 					return nil
 				})
 				if err != nil {

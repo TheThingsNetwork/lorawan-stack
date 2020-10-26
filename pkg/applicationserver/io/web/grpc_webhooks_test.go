@@ -35,8 +35,7 @@ import (
 )
 
 func TestWebhookRegistryRPC(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	is, isAddr := startMockIS(ctx)
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
@@ -52,7 +51,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 			},
 		},
 	})
-	redisClient, flush := test.NewRedis(t, "applicationserver_test")
+	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
 	webhookReg := &redis.WebhookRegistry{Redis: redisClient}

@@ -18,7 +18,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -76,7 +76,7 @@ func (r *PubSubRegistry) makeUIDKeyFunc(appUID string) func(id string) string {
 // Get implements pubsub.Registry.
 func (r PubSubRegistry) Get(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers, paths []string) (*ttnpb.ApplicationPubSub, error) {
 	pb := &ttnpb.ApplicationPubSub{}
-	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids.ApplicationIdentifiers), ids.PubSubID)).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(ctx, r.Redis, r.uidKey(unique.ID(ctx, ids.ApplicationIdentifiers), ids.PubSubID)).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyPubSubFieldMask(nil, pb, appendImplicitPubSubGetPaths(paths...)...)
@@ -86,7 +86,7 @@ var errApplicationUID = errors.DefineCorruption("application_uid", "invalid appl
 
 // Range implements pubsub.Registry.
 func (r PubSubRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationPubSub) bool) error {
-	uids, err := r.Redis.SMembers(r.allKey(ctx)).Result()
+	uids, err := r.Redis.SMembers(ctx, r.allKey(ctx)).Result()
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (r PubSubRegistry) Range(ctx context.Context, paths []string, f func(contex
 			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID, "pub_sub_id", psID)
 		}
 		pb := &ttnpb.ApplicationPubSub{}
-		if err := ttnredis.GetProto(r.Redis, r.uidKey(appUID, psID)).ScanProto(pb); err != nil {
+		if err := ttnredis.GetProto(ctx, r.Redis, r.uidKey(appUID, psID)).ScanProto(pb); err != nil {
 			return err
 		}
 		if err != nil {
@@ -122,7 +122,7 @@ func (r PubSubRegistry) Range(ctx context.Context, paths []string, f func(contex
 func (r PubSubRegistry) List(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationPubSub, error) {
 	var pbs []*ttnpb.ApplicationPubSub
 	appUID := unique.ID(ctx, ids)
-	err := ttnredis.FindProtos(r.Redis, r.appKey(appUID), r.makeUIDKeyFunc(appUID)).Range(func() (proto.Message, func() (bool, error)) {
+	err := ttnredis.FindProtos(ctx, r.Redis, r.appKey(appUID), r.makeUIDKeyFunc(appUID)).Range(func() (proto.Message, func() (bool, error)) {
 		pb := &ttnpb.ApplicationPubSub{}
 		return pb, func() (bool, error) {
 			pb, err := applyPubSubFieldMask(nil, pb, appendImplicitPubSubGetPaths(paths...)...)
@@ -145,8 +145,8 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 	ik := r.uidKey(appUID, ids.PubSubID)
 
 	var pb *ttnpb.ApplicationPubSub
-	err := r.Redis.Watch(func(tx *redis.Tx) error {
-		cmd := ttnredis.GetProto(tx, ik)
+	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+		cmd := ttnredis.GetProto(ctx, tx, ik)
 		stored := &ttnpb.ApplicationPubSub{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
 			stored = nil
@@ -190,9 +190,9 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 		var pipelined func(redis.Pipeliner) error
 		if pb == nil && len(sets) == 0 {
 			pipelined = func(p redis.Pipeliner) error {
-				p.Del(ik)
-				p.SRem(r.appKey(appUID), stored.PubSubID)
-				p.SRem(r.allKey(ctx), pubsub.PubSubUID(appUID, stored.PubSubID))
+				p.Del(ctx, ik)
+				p.SRem(ctx, r.appKey(appUID), stored.PubSubID)
+				p.SRem(ctx, r.allKey(ctx), pubsub.PubSubUID(appUID, stored.PubSubID))
 				return nil
 			}
 		} else {
@@ -244,11 +244,11 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 			}
 
 			pipelined = func(p redis.Pipeliner) error {
-				if _, err := ttnredis.SetProto(p, ik, updated, 0); err != nil {
+				if _, err := ttnredis.SetProto(ctx, p, ik, updated, 0); err != nil {
 					return err
 				}
-				p.SAdd(r.appKey(appUID), updated.PubSubID)
-				p.SAdd(r.allKey(ctx), pubsub.PubSubUID(appUID, updated.PubSubID))
+				p.SAdd(ctx, r.appKey(appUID), updated.PubSubID)
+				p.SAdd(ctx, r.allKey(ctx), pubsub.PubSubUID(appUID, updated.PubSubID))
 				return nil
 			}
 
@@ -257,7 +257,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 				return err
 			}
 		}
-		_, err = tx.TxPipelined(pipelined)
+		_, err = tx.TxPipelined(ctx, pipelined)
 		if err != nil {
 			return err
 		}

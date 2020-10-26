@@ -36,8 +36,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-func NewRedisApplicationActivationSettingRegistry(t testing.TB) (ApplicationActivationSettingRegistry, func()) {
-	cl, flush := test.NewRedis(t, "application-activation-settings")
+func NewRedisApplicationActivationSettingRegistry(ctx context.Context) (ApplicationActivationSettingRegistry, func()) {
+	tb := test.MustTBFromContext(ctx)
+	cl, flush := test.NewRedis(ctx, "application-activation-settings")
 	reg := &redis.ApplicationActivationSettingRegistry{
 		Redis: cl,
 	}
@@ -45,7 +46,7 @@ func NewRedisApplicationActivationSettingRegistry(t testing.TB) (ApplicationActi
 		func() {
 			flush()
 			if err := cl.Close(); err != nil {
-				t.Errorf("Failed to close Redis appliation activation setting registry client: %s", err)
+				tb.Errorf("Failed to close Redis appliation activation setting registry client: %s", err)
 			}
 		}
 }
@@ -80,8 +81,8 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		AuthValue:     "key",
 		AllowInsecure: true,
 	})
-	newJS := func(t *testing.T, rights ...ttnpb.Right) (ttnpb.ApplicationActivationSettingRegistryClient, ApplicationActivationSettingRegistry, func()) {
-		reg, closeFn := NewRedisApplicationActivationSettingRegistry(t)
+	newJS := func(ctx context.Context, rights ...ttnpb.Right) (ttnpb.ApplicationActivationSettingRegistryClient, ApplicationActivationSettingRegistry, func()) {
+		reg, closeFn := NewRedisApplicationActivationSettingRegistry(ctx)
 
 		js := test.Must(New(
 			componenttest.NewComponent(t, &component.Config{},
@@ -89,7 +90,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 					return &test.MockCluster{
 						JoinFunc: test.ClusterJoinNilFunc,
 						GetPeerFunc: func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (cluster.Peer, error) {
-							a, _ := test.New(t)
+							_, a := test.MustNewTFromContext(ctx)
 							a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS)
 							return test.Must(test.NewGRPCServerPeer(ctx, &test.MockApplicationAccessServer{
 								ListRightsFunc: func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
@@ -199,7 +200,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Name:     fmt.Sprintf("Get errors/%s", tc.Name),
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				cl, _, stop := newJS(t, tc.Rights...)
+				cl, _, stop := newJS(ctx, tc.Rights...)
 				defer stop()
 
 				sets, err := cl.Get(ctx, tc.Request, credOpt)
@@ -313,7 +314,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Name:     fmt.Sprintf("Set errors/%s", tc.Name),
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				cl, _, stop := newJS(t, tc.Rights...)
+				cl, _, stop := newJS(ctx, tc.Rights...)
 				defer stop()
 
 				sets, err := cl.Set(ctx, tc.Request, credOpt)
@@ -393,7 +394,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Name:     fmt.Sprintf("Delete errors/%s", tc.Name),
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				cl, _, stop := newJS(t, tc.Rights...)
+				cl, _, stop := newJS(ctx, tc.Rights...)
 				defer stop()
 
 				v, err := cl.Delete(ctx, tc.Request, credOpt)
@@ -440,7 +441,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Name:     fmt.Sprintf("Flow/%s", tc.Name),
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				cl, reg, stop := newJS(t,
+				cl, reg, stop := newJS(ctx,
 					ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
 					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				)

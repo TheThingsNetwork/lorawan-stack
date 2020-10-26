@@ -30,7 +30,6 @@ import (
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -77,8 +76,7 @@ var (
 )
 
 func TestAuthentication(t *testing.T) {
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
 	is, isAddr := startMockIS(ctx)
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
@@ -95,7 +93,7 @@ func TestAuthentication(t *testing.T) {
 		},
 	})
 	as := mock.NewServer(c)
-	redisClient, flush := test.NewRedis(t, "applicationserver_test")
+	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
 	apRegistry := &redis.ApplicationPackagesRegistry{Redis: redisClient}
@@ -156,8 +154,7 @@ func TestAuthentication(t *testing.T) {
 }
 
 func TestAssociations(t *testing.T) {
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
 	is, isAddr := startMockIS(ctx)
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
@@ -174,7 +171,7 @@ func TestAssociations(t *testing.T) {
 		},
 	})
 	as := mock.NewServer(c)
-	redisClient, flush := test.NewRedis(t, "applicationserver_test")
+	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
 	apRegistry := &redis.ApplicationPackagesRegistry{Redis: redisClient}

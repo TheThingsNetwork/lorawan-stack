@@ -2,7 +2,7 @@
 
 package redis
 
-import "github.com/go-redis/redis/v7"
+import "github.com/go-redis/redis/v8"
 
 var (
 	popTaskScript = redis.NewScript(`local function format_ready(xs)

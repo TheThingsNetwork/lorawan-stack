@@ -34,15 +34,15 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestWebhooks(t *testing.T) {
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	redisClient, flush := test.NewRedis(t, "web_test")
+	_, ctx := test.New(t)
+
+	redisClient, flush := test.NewRedis(ctx, "web_test")
 	defer flush()
 	defer redisClient.Close()
 	downlinks := web.DownlinksConfig{
@@ -77,6 +77,7 @@ func TestWebhooks(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("Prefix%q/Suffix%q", tc.prefix, tc.suffix), func(t *testing.T) {
+			_, ctx := test.New(t)
 			_, err := registry.Set(ctx, ids, nil, func(_ *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 				return &ttnpb.ApplicationWebhook{
 						ApplicationWebhookIdentifiers: ids,

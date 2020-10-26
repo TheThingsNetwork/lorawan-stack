@@ -18,7 +18,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis/v8"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -47,18 +47,18 @@ func NewDownlinkTaskQueue(cl *ttnredis.Client, maxLen int64, group, id string) *
 }
 
 // Init initializes the DownlinkTaskQueue.
-func (q *DownlinkTaskQueue) Init() error {
-	return q.queue.Init()
+func (q *DownlinkTaskQueue) Init(ctx context.Context) error {
+	return q.queue.Init(ctx)
 }
 
-// Run dispatches tasks until ctx.Deadline() is reached(if present) or read on ctx.Done() succeeds.
-func (q *DownlinkTaskQueue) Run(ctx context.Context) error {
-	return q.queue.Run(ctx)
+// Close closes the DownlinkTaskQueue.
+func (q *DownlinkTaskQueue) Close(ctx context.Context) error {
+	return q.queue.Close(ctx)
 }
 
 // Add adds downlink task for device identified by devID at time startAt.
 func (q *DownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-	return q.queue.Add(nil, unique.ID(ctx, devID), startAt, replace)
+	return q.queue.Add(ctx, nil, unique.ID(ctx, devID), startAt, replace)
 }
 
 // Pop calls f on the earliest downlink task in the schedule, for which timestamp is in range [0, time.Now()],
@@ -77,6 +77,6 @@ func (q *DownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttn
 		if err != nil || t.IsZero() {
 			return err
 		}
-		return q.queue.Add(p, uid, t, true)
+		return q.queue.Add(ctx, p, uid, t, true)
 	})
 }

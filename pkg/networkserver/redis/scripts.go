@@ -2,7 +2,7 @@
 
 package redis
 
-import "github.com/go-redis/redis/v7"
+import "github.com/go-redis/redis/v8"
 
 var (
 	// ARGV[1]	- 2 LSB of FCnt (same as 16-bit FCnt field in MAC frames)
