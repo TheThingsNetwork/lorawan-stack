@@ -211,7 +211,7 @@ func TestApplicationServer(t *testing.T) {
 	defer pubsubRedisClient.Close()
 	pubsubRegistry := iopubsubredis.PubSubRegistry{Redis: pubsubRedisClient}
 
-	distribRedisClient, distribFlush := test.NewRedis(t, "applicationserver_test", "traffic")
+	distribRedisClient, distribFlush := test.NewRedis(ctx, "applicationserver_test", "traffic")
 	defer distribFlush()
 	defer distribRedisClient.Close()
 	distribPubSub := distribredis.PubSub{Redis: distribRedisClient}
@@ -2284,7 +2284,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		t.Fatalf("Failed to set link in registry: %s", err)
 	}
 
-	distribRedisClient, distribFlush := test.NewRedis(t, "applicationserver_test", "traffic")
+	distribRedisClient, distribFlush := test.NewRedis(ctx, "applicationserver_test", "traffic")
 	defer distribFlush()
 	defer distribRedisClient.Close()
 	distribPubSub := distribredis.PubSub{Redis: distribRedisClient}

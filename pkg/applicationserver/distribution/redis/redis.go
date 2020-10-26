@@ -40,7 +40,7 @@ func (ps PubSub) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	}
 	uid := unique.ID(ctx, up.ApplicationIdentifiers)
 	ch := ps.uidUplinkKey(uid)
-	if err = ps.Redis.Publish(ch, s).Err(); err != nil {
+	if err = ps.Redis.Publish(ctx, ch, s).Err(); err != nil {
 		return ttnredis.ConvertError(err)
 	}
 	return nil
@@ -53,7 +53,7 @@ func (ps PubSub) Subscribe(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 	uid := unique.ID(ctx, ids)
 	ch := ps.uidUplinkKey(uid)
 
-	sub := ps.Redis.Subscribe(ch)
+	sub := ps.Redis.Subscribe(ctx, ch)
 	defer sub.Close()
 	msgs := sub.Channel()
 
