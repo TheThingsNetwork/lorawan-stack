@@ -482,8 +482,26 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				asPlaintextCond func(error) bool
 			)
 			nsKEKLabel, asKEKLabel := dev.NetworkServerKEKLabel, dev.ApplicationServerKEKLabel
-			if nsKEKLabel == "" || asKEKLabel == "" {
-				sets, err := js.applicationActivationSettings.GetByID(ctx, cryptoDev.ApplicationIdentifiers, []string{
+			if nsKEKLabel == "" {
+				nsKEKLabel = js.KeyVault.NsKEKLabel(ctx, dev.NetID, dev.NetworkServerAddress)
+				nsPlaintextCond = errors.IsNotFound
+			}
+			fNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.FNwkSIntKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
+			if err != nil {
+				return nil, nil, err
+			}
+			if req.SelectedMACVersion.UseNwkKey() {
+				sNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.SNwkSIntKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
+				if err != nil {
+					return nil, nil, err
+				}
+				nwkSEncKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.NwkSEncKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
+				if err != nil {
+					return nil, nil, err
+				}
+			}
+			if asKEKLabel == "" {
+				appSettings, err := js.applicationActivationSettings.GetByID(ctx, cryptoDev.ApplicationIdentifiers, []string{
 					"kek",
 					"kek_label",
 				})
@@ -491,60 +509,20 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					if !errors.IsNotFound(err) {
 						return nil, nil, errGetApplicationActivationSettings.WithCause(err)
 					}
-					if asKEKLabel == "" {
-						asKEKLabel = js.KeyVault.AsKEKLabel(ctx, dev.ApplicationServerAddress)
-						asPlaintextCond = errors.IsNotFound
-					}
-					if nsKEKLabel == "" {
-						nsKEKLabel = js.KeyVault.NsKEKLabel(ctx, dev.NetID, dev.NetworkServerAddress)
-						nsPlaintextCond = errors.IsNotFound
-					}
+					asKEKLabel = js.KeyVault.AsKEKLabel(ctx, dev.ApplicationServerAddress)
+					asPlaintextCond = errors.IsNotFound
 				} else {
 					var kek types.AES128Key
-					if sets.KEKLabel != "" {
-						if sets.KEK == nil {
+					if appSettings.KEKLabel != "" {
+						if appSettings.KEK == nil {
 							return nil, nil, errNoKEK.New()
 						}
-						kek, err = cryptoutil.UnwrapAES128Key(ctx, sets.KEK, js.KeyVault)
+						kek, err = cryptoutil.UnwrapAES128Key(ctx, appSettings.KEK, js.KeyVault)
 						if err != nil {
 							return nil, nil, errUnwrapKey.WithCause(err)
 						}
 					}
-					if nsKEKLabel == "" {
-						fNwkSIntKeyEnvelope, err = wrapKeyWithKEK(ctx, nwkSKeys.FNwkSIntKey, sets.KEKLabel, kek)
-						if err != nil {
-							return nil, nil, err
-						}
-						if req.SelectedMACVersion.UseNwkKey() {
-							sNwkSIntKeyEnvelope, err = wrapKeyWithKEK(ctx, nwkSKeys.SNwkSIntKey, sets.KEKLabel, kek)
-							if err != nil {
-								return nil, nil, err
-							}
-							nwkSEncKeyEnvelope, err = wrapKeyWithKEK(ctx, nwkSKeys.NwkSEncKey, sets.KEKLabel, kek)
-							if err != nil {
-								return nil, nil, err
-							}
-						}
-					}
-					if asKEKLabel == "" {
-						appSKeyEnvelope, err = wrapKeyWithKEK(ctx, appSKey, sets.KEKLabel, kek)
-						if err != nil {
-							return nil, nil, err
-						}
-					}
-				}
-			}
-			if nsKEKLabel != "" {
-				fNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.FNwkSIntKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
-				if err != nil {
-					return nil, nil, err
-				}
-				if req.SelectedMACVersion.UseNwkKey() {
-					sNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.SNwkSIntKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
-					if err != nil {
-						return nil, nil, err
-					}
-					nwkSEncKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.NwkSEncKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
+					appSKeyEnvelope, err = wrapKeyWithKEK(ctx, appSKey, appSettings.KEKLabel, kek)
 					if err != nil {
 						return nil, nil, err
 					}
