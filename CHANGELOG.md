@@ -19,6 +19,7 @@ For details about compatibility between different releases, see the **Commitment
 - Limitation of displayed and stored events in the Console to 2000.
 - Application Server will unwrap the AppSKey if it can, even if skipping payload crypto is enabled. This is to avoid upstream applications to receive wrapped keys they cannot unwrap. For end-to-end encryption, configure Join Servers with wrap keys unknown to the Application Server.
 - More precise payload labels for event previews in the Console.
+- Improved Network Server downlink task performance.
 
 ### Deprecated
 
@@ -75,7 +76,6 @@ For details about compatibility between different releases, see the **Commitment
 - Gateway server can now update the gateway location only if the gateway is authenticated.
 - Right to manage links on Application Server is now `RIGHT_APPLICATION_SETTINGS_BASIC`.
 - Network Server does not store `recent_uplinks`, `recent_adr_uplinks` and `recent_downlinks` anymore.
-- Improved Network Server downlink task performance.
 
 ### Removed
 
