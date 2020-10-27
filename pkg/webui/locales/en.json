@@ -183,6 +183,7 @@
   "console.containers.application-payload-formatters.uplink.infoText": "These payload formatters are executed on uplink messages from all end devices in this application. Note: end device level payload formatters have precedence.",
   "console.containers.applications-table.index.ownedTabTitle": "Owned applications",
   "console.containers.collaborators-table.index.id": "User / Organization ID",
+  "console.containers.collaborators-table.index.currentUserIndicator": "(This is you)",
   "console.containers.dev-addr-input.dev-addr-input.generate": "Generate end device address",
   "console.containers.dev-addr-input.index.devAddrFetchingFailure": "There was an error and the end device address could not be generated",
   "console.containers.device-importer.index.proceed": "Proceed",
