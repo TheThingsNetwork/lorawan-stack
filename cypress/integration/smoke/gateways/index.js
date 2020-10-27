@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import registrationTests from './registration'
-import applicationTests from './applications'
-import featureToggleTests from './feature-toggles'
-import gatewayTests from './gateways'
+import deleteTests from './delete'
 
-export default [...registrationTests, ...applicationTests, ...featureToggleTests, ...gatewayTests]
+export default [...deleteTests]

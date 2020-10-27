@@ -12,9 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import registrationTests from './registration'
-import applicationTests from './applications'
-import featureToggleTests from './feature-toggles'
-import gatewayTests from './gateways'
+import Yup from '@ttn-lw/lib/yup'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-export default [...registrationTests, ...applicationTests, ...featureToggleTests, ...gatewayTests]
+import { delay as delayRegexp } from '@console/lib/regexp'
+
+const validationSchema = Yup.object().shape({
+  frequency_plan_id: Yup.string(),
+  schedule_downlink_late: Yup.boolean().default(false),
+  schedule_anytime_delay: Yup.string().matches(
+    delayRegexp,
+    Yup.passValues(sharedMessages.validateDelayFormat),
+  ),
+})
+
+export default validationSchema

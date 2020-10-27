@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { Col, Row, Container } from 'react-grid-system'
@@ -23,34 +22,26 @@ import { replace } from 'connected-react-router'
 import toast from '@ttn-lw/components/toast'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import ModalButton from '@ttn-lw/components/button/modal-button'
-import FormSubmit from '@ttn-lw/components/form/submit'
-import SubmitButton from '@ttn-lw/components/submit-button'
 import PageTitle from '@ttn-lw/components/page-title'
-
-import GatewayDataForm from '@console/components/gateway-data-form'
+import Collapse from '@ttn-lw/components/collapse'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
-import Require from '@console/lib/components/require'
 
+import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import diff from '@ttn-lw/lib/diff'
 
 import { mayEditBasicGatewayInformation, mayDeleteGateway } from '@console/lib/feature-checks'
-import { mapFormValueToAttributes, mapAttributesToFormValue } from '@console/lib/attributes'
+import { mapFormValueToAttributes } from '@console/lib/attributes'
 
 import { attachPromise } from '@console/store/actions/lib'
 import { updateGateway, deleteGateway } from '@console/store/actions/gateways'
 
 import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
 
-const m = defineMessages({
-  updateSuccess: 'Gateway updated',
-  deleteGateway: 'Delete gateway',
-  modalWarning:
-    'Are you sure you want to delete "{gtwName}"? This action cannot be undone and it will not be possible to reuse the gateway ID.',
-})
+import LorawanSettingsForm from './lorawan-settings-form'
+import BasicSettingsForm from './basic-settings-form'
+import m from './messages'
 
 @connect(
   state => ({
@@ -90,131 +81,106 @@ export default class GatewayGeneralSettings extends React.Component {
     updateGateway: PropTypes.func.isRequired,
   }
 
-  constructor(props) {
-    super(props)
-
-    this.formRef = React.createRef()
-  }
-
-  state = {
-    error: '',
-  }
-
   @bind
   async handleSubmit(values) {
-    const { gtwId, gateway, updateGateway } = this.props
+    const { gtwId, updateGateway, gateway } = this.props
 
-    await this.setState({ error: '' })
-
-    const { ids: valuesIds, ...valuesRest } = values
-    const { ids: gatewayIds, ...gatewayRest } = gateway
-
-    const idsDiff = diff(gatewayIds, valuesIds)
-    const entityDiff = diff({ ...gatewayRest }, { ...valuesRest })
-
-    let changed
-    if (Object.keys(idsDiff).length) {
-      changed = { ids: idsDiff, ...entityDiff }
-    } else {
-      changed = entityDiff
-    }
+    const changed = diff(gateway, values)
 
     const update =
       'attributes' in changed
         ? { ...changed, attributes: mapFormValueToAttributes(values.attributes) }
         : changed
+    return updateGateway(gtwId, update)
+  }
 
-    try {
-      await updateGateway(gtwId, update)
-      this.formRef.current.resetForm()
-      toast({
-        title: gtwId,
-        message: m.updateSuccess,
-        type: toast.types.SUCCESS,
-      })
-    } catch (error) {
-      this.formRef.current.resetForm({ values })
-      await this.setState({ error })
-    }
+  @bind
+  async handleSubmitSuccess() {
+    const { gateway } = this.props
+
+    const {
+      ids: { gateway_id: gatewayId },
+    } = gateway
+
+    toast({
+      title: gatewayId,
+      message: m.updateSuccess,
+      type: toast.types.SUCCESS,
+    })
   }
 
   @bind
   async handleDelete() {
-    const { gtwId, deleteGateway, onDeleteSuccess } = this.props
+    const { gtwId, deleteGateway } = this.props
 
-    await this.setState({ error: '' })
+    return deleteGateway(gtwId)
+  }
 
-    try {
-      await deleteGateway(gtwId)
-      onDeleteSuccess()
-    } catch (error) {
-      this.formRef.current.setSubmitting(false)
-      this.setState({ error })
-    }
+  @bind
+  async handleDeleteSuccess() {
+    const { gateway, onDeleteSuccess } = this.props
+    const {
+      ids: { gateway_id: gatewayId },
+    } = gateway
+
+    onDeleteSuccess()
+    toast({
+      title: gatewayId,
+      message: m.deleteSuccess,
+      type: toast.types.SUCCESS,
+    })
+  }
+
+  @bind
+  async handleDeleteFailure() {
+    const { gateway } = this.props
+    const {
+      ids: { gateway_id: gatewayId },
+    } = gateway
+
+    toast({
+      title: gatewayId,
+      message: m.deleteFailure,
+      type: toast.types.ERROR,
+    })
   }
 
   render() {
-    const { gateway, gtwId } = this.props
-    const { error } = this.state
-    const {
-      ids,
-      gateway_server_address,
-      frequency_plan_id,
-      enforce_duty_cycle,
-      name,
-      description,
-      location_public,
-      status_public,
-      schedule_downlink_late,
-      update_location_from_status,
-      auto_update,
-      update_channel,
-      schedule_anytime_delay,
-      attributes,
-    } = gateway
-
-    const initialValues = {
-      ids: { ...ids },
-      gateway_server_address,
-      frequency_plan_id,
-      enforce_duty_cycle,
-      name,
-      description,
-      location_public,
-      status_public,
-      schedule_downlink_late,
-      update_location_from_status,
-      auto_update,
-      update_channel,
-      schedule_anytime_delay,
-      attributes: mapAttributesToFormValue(attributes),
-    }
+    const { gateway } = this.props
 
     return (
       <Container>
-        <PageTitle title={sharedMessages.generalSettings} />
+        <PageTitle title={sharedMessages.generalSettings} hideHeading />
         <Row>
           <Col lg={8} md={12}>
-            <GatewayDataForm
-              error={error}
-              onSubmit={this.handleSubmit}
-              initialValues={initialValues}
-              formRef={this.formRef}
-              update
+            <Collapse
+              title={m.basicTitle}
+              description={m.basicDescription}
+              disabled={false}
+              initialCollapsed={false}
             >
-              <FormSubmit component={SubmitButton} message={sharedMessages.saveChanges} />
-              <Require featureCheck={mayDeleteGateway}>
-                <ModalButton
-                  type="button"
-                  icon="delete"
-                  danger
-                  naked
-                  message={m.deleteGateway}
-                  modalData={{ message: { values: { gtwName: name || gtwId }, ...m.modalWarning } }}
-                  onApprove={this.handleDelete}
-                />
-              </Require>
-            </GatewayDataForm>
+              <BasicSettingsForm
+                gateway={gateway}
+                onSubmit={this.handleSubmit}
+                onSubmitSuccess={this.handleSubmitSuccess}
+                onDelete={this.handleDelete}
+                onDeleteSuccess={this.handleDeleteSuccess}
+                onDeleteFailure={this.handleDeleteFailure}
+                mayDeleteGateway={mayDeleteGateway}
+              />
+            </Collapse>
+            <Collapse
+              title={m.lorawanTitle}
+              description={m.lorawanDescription}
+              disabled={false}
+              initialCollapsed
+            >
+              <LorawanSettingsForm
+                gateway={gateway}
+                onSubmit={this.handleSubmit}
+                onSubmitSuccess={this.handleSubmitSuccess}
+              />
+            </Collapse>
           </Col>
         </Row>
       </Container>

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -73,6 +73,7 @@ export default defineMessages({
   attributesValidateRequired:
     'All attribute entry values are required. Please remove empty entries.',
   automaticUpdates: 'Automatic updates',
+  autoUpdateDescription: 'Gateway can be updated automatically',
   backToOverview: 'Back to overview',
   brand: 'Brand',
   cancel: 'Cancel',
@@ -109,6 +110,8 @@ export default defineMessages({
   currentCollaborators: 'Current collaborators',
   data: 'Data',
   defineRights: 'Define rights',
+  delayWarning:
+    'Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.',
   description: 'Description',
   devAddr: 'Device address',
   devDesc: 'End device description',
@@ -138,11 +141,15 @@ export default defineMessages({
   downlinkReplace: 'Downlink replace',
   downlinkSent: 'Downlink sent',
   downlinksScheduled: 'Downlinks (re)scheduled',
+  dutyCycle: 'Duty cycle',
   edit: 'Edit',
   email: 'Email',
   emailAddress: 'Email address',
   empty: 'Empty',
   enabled: 'Enabled',
+  enforced: 'Enforced',
+  enforceDutyCycleDescription:
+    'Recommended for all gateways in order to respect spectrum regulations',
   entityId: 'Entity ID',
   eventsCannotShow: 'Cannot show events',
   external: 'External',
@@ -154,11 +161,16 @@ export default defineMessages({
   frameCounterWidth: 'Frame counter width',
   frequencyPlan: 'Frequency plan',
   gateway: 'Gateway',
+  gatewayDescDescription:
+    'Optional gateway description; can also be used to save notes about the gateway',
+  gatewayDescPlaceholder: 'Description for my new gateway',
   gatewayDescription: 'Gateway description',
   gatewayEUI: 'Gateway EUI',
   gatewayID: 'Gateway ID',
+  gatewayIdPlaceholder: 'my-new-gateway',
   gatewayLocation: 'Gateway location',
-  gatewayName: 'Gateway Name',
+  gatewayName: 'Gateway name',
+  gatewayNamePlaceholder: 'My new gateway',
   gateways: 'Gateways',
   gatewayScheduleDownlinkLate: 'Schedule downlink late',
   gatewayServerAddress: 'Gateway Server address',
@@ -167,6 +179,7 @@ export default defineMessages({
   general: 'General',
   generalInformation: 'General information',
   generalSettings: 'General settings',
+  gsServerAddressDescription: 'The address of the Gateway Server to connect to',
   hardware: 'Hardware',
   hardwareVersion: 'Hardware version',
   homeNetID: 'Home NetID',
@@ -276,6 +289,10 @@ export default defineMessages({
   rights: 'Rights',
   rootKeys: 'Root keys',
   saveChanges: 'Save changes',
+  scheduleAnyTimeDelay: 'Schedule any time delay',
+  scheduleAnyTimeDescription:
+    'Configure gateway delay (minimum: {minimumValue}ms, default: {defaultValue}ms)',
+  scheduleDownlinkLateDescription: 'Enable server-side buffer of downlink messages',
   searchById: 'Search by ID',
   seconds: 'seconds',
   secure: 'Secure',
@@ -294,6 +311,7 @@ export default defineMessages({
   stateRequested: 'Requested',
   stateSuspended: 'Suspended',
   status: 'Status',
+  statusDescription: 'The status of this gateway may be publicly displayed',
   statusUnknown: 'Status unknown',
   success: 'Success',
   supportsClassC: 'Supports class C',
@@ -303,6 +321,7 @@ export default defineMessages({
   traffic: 'Traffic',
   type: 'Type',
   unknown: 'Unknown',
+  updateChannelDescription: 'Channel for gateway automatic updates',
   updatedAt: 'Last updated at',
   uplink: 'Uplink',
   uplinkFrameCount: 'Uplink frame count',

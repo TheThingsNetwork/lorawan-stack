@@ -146,6 +146,21 @@ Cypress.Commands.add('setApplicationCollaborator', (applicationId, collaboratorI
   })
 })
 
+// Helper function to create a new gateway programmatically
+Cypress.Commands.add('createGateway', (gateway, userId) => {
+  const baseUrl = Cypress.config('baseUrl')
+  cy.getAccessToken(accessToken => {
+    cy.request({
+      method: 'POST',
+      url: `${baseUrl}/api/v3/users/${userId}/gateways`,
+      body: { gateway },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+  })
+})
+
 // Helper function to quickly seed the database to a fresh state using a
 // previously generated sql dump.
 Cypress.Commands.add('dropAndSeedDatabase', () => {

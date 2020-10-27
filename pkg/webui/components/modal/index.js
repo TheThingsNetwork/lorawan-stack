@@ -157,7 +157,12 @@ class Modal extends React.PureComponent {
     return (
       <React.Fragment>
         {!inline && <div key="shadow" className={style.shadow} />}
-        <RootComponent key="modal" className={modalClassNames} {...rest}>
+        <RootComponent
+          data-test-id="modal-window"
+          key="modal"
+          className={modalClassNames}
+          {...rest}
+        >
           {title && (
             <div className={style.titleSection}>
               <div>
