@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 - Network Server does not retry rejected `NewChannelReq` data rate ranges or rejected `DLChannelReq` frequencies anymore.
 - Functionality to allow admin users to list all organizations in the Console.
 - Downlink count for end devices in the Console.
+- Support for Application Activation Settings in the Join Server to configure Application Server KEK, ID and Home NetID.
 
 ### Changed
 
