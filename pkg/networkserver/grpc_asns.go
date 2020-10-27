@@ -58,7 +58,6 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error
 	const retryInterval = time.Minute
 
 	return ns.applicationUplinks.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueRangeFunc) (time.Time, error) {
-		log.FromContext(ctx).Error("POP CLOSURE CALLED")
 		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, appID)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")
