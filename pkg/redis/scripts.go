@@ -16,21 +16,23 @@ local xs = redis.call('xreadgroup', 'group', ARGV[1], ARGV[2], 'count', '1', 'st
 if xs then
   return format_ready(xs)
 end
-xs = redis.call('xreadgroup', 'group', ARGV[1], ARGV[2], 'NOACK', 'streams', KEYS[2], '>')
+xs = redis.call('xreadgroup', 'group', ARGV[1], ARGV[2], 'noack', 'streams', KEYS[2], '>')
 if xs then
-  local zs = {}
   for i, x in ipairs(xs[1][2]) do
-    local start_at, payload
+    local start_at, payload, replace
     for j=1,#x[2],2 do
       local name = x[2][j]
       if     name == 'start_at' then start_at = x[2][j+1]
       elseif name == 'payload'  then payload  = x[2][j+1]
+      elseif name == 'replace'  then replace  = x[2][j+1]
       end
     end
-    zs[#zs+1] = start_at
-    zs[#zs+1] = payload
+    if replace then
+      redis.call('zadd', KEYS[3], start_at, payload)
+    else
+      redis.call('zadd', KEYS[3], 'nx', start_at, payload)
+    end
   end
-  redis.call('zadd', KEYS[3], unpack(zs))
 end
 local zs = redis.call('zrangebyscore', KEYS[3], '-inf', ARGV[3], 'withscores')
 if #zs > 0 then
@@ -50,7 +52,7 @@ if #zs > 0 then
   ret[#ret+1] = zs[2]
 end
 xs = redis.call('xrevrange', KEYS[2], '+', '-', 'count', '1')
-if xs then
+if #xs > 0 then
   ret[#ret+1] = 'last_id'
   ret[#ret+1] = xs[1][1]
 end

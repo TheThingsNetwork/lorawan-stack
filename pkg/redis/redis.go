@@ -405,9 +405,9 @@ func IsConsumerGroupExistsErr(err error) bool {
 	return err != nil && err.Error() == "BUSYGROUP Consumer Group name already exists"
 }
 
-// InitTaskGroup initializes the task group for streams at InputTaskKey(k) and ReadyTaskKey(k).
+// initTaskGroup initializes the task group for streams at InputTaskKey(k) and ReadyTaskKey(k).
 // It must be called before all other task-related functions at subkeys of k.
-func InitTaskGroup(ctx context.Context, r redis.Cmdable, group, k string) error {
+func initTaskGroup(ctx context.Context, r redis.Cmdable, group, k string) error {
 	_, err := r.Pipelined(ctx, func(p redis.Pipeliner) error {
 		p.XGroupCreateMkStream(ctx, InputTaskKey(k), group, "$")
 		p.XGroupCreateMkStream(ctx, ReadyTaskKey(k), group, "$")
@@ -419,9 +419,9 @@ func InitTaskGroup(ctx context.Context, r redis.Cmdable, group, k string) error 
 	return ConvertError(err)
 }
 
-// AddTask adds a task identified by payload with timestamp startAt to the stream at InputTaskKey(k).
+// addTask adds a task identified by payload with timestamp startAt to the stream at InputTaskKey(k).
 // maxLen is the approximate length of the stream, to which it may be trimmed.
-func AddTask(ctx context.Context, r redis.Cmdable, k string, maxLen int64, payload string, startAt time.Time, replace bool) error {
+func addTask(ctx context.Context, r redis.Cmdable, k string, maxLen int64, payload string, startAt time.Time, replace bool) error {
 	m := make(map[string]interface{}, 2)
 	m[payloadKey] = payload
 	if replace {
@@ -445,24 +445,14 @@ func parseTime(s string) (time.Time, error) {
 	return time.Unix(0, int64(nsec)).UTC(), nil
 }
 
-// TODO: Update comment
-// DispatchTasks dispatches ready-to-execute tasks from input task streams and waiting task sets to ready task streams.
-// It first attempts to read at most maxLen tasks from streams at input task keys corresponding to ks as a consumer id from group group.
-// It blocks until deadline, if it is not zero, otherwise it blocks forever.
-// It then adds all the tasks read from the stream to the sorted set
-// at corresponding waiting task key and acks them.
-// Note that task payload is used as the key in the sorted set.
-// It then proceeds to add all the tasks from the sorted set, for which execution time is at or before time.Now() to corresponding ready task stream.
-
-// PopTask calls f on the most recent task in the queue, for which timestamp is in range [0, time.Now()]
-// If timeout value is 0 - PopTask blocks forever
-// If timeout value is negative - PopTask does not block
-// If timeout value is positive - PopTask blocks until either a task is popped or timeout has passed.
+// popTask calls f on the most recent task in the queue, for which timestamp is in range [0, time.Now()] or blocks until such is available or context is done.
+// If there are no tasks available for immediate processing, popTask lazily dispatches available tasks for itself and all other callers of popTask.
 // group is the consumer group name.
 // id is the consumer group ID.
-// ks are the keys to pop from.
-// Tasks are acked if f returns without error.
-func PopTask(ctx context.Context, r redis.Cmdable, group, id string, f func(p redis.Pipeliner, payload string, startAt time.Time) error, k string) (err error) {
+// k is the keys to pop from.
+// Pipeline is executed even if f returns an error.
+// Tasks are acked only if f returns without error.
+func popTask(ctx context.Context, r redis.Cmdable, group, id string, f func(p redis.Pipeliner, payload string, startAt time.Time) error, k string) (err error) {
 	var (
 		readyStream   = ReadyTaskKey(k)
 		inputStream   = InputTaskKey(k)
@@ -542,7 +532,7 @@ func PopTask(ctx context.Context, r redis.Cmdable, group, id string, f func(p re
 				Count:   1,
 				Block:   block,
 			}).Result()
-			if err != nil {
+			if err != nil && err != redis.Nil {
 				return ConvertError(err)
 			}
 			continue
@@ -586,11 +576,10 @@ type TaskQueue struct {
 // Init initializes the task queue.
 // It must be called at least once before using the queue.
 func (q *TaskQueue) Init(ctx context.Context) error {
-	return InitTaskGroup(ctx, q.Redis, q.Group, q.Key)
+	return initTaskGroup(ctx, q.Redis, q.Group, q.Key)
 }
 
-// TODO: Update comment
-// Run dispatches tasks until ctx.Deadline() is reached(if present) or read on ctx.Done() succeeds.
+// Close closes the TaskQueue.
 func (q *TaskQueue) Close(ctx context.Context) error {
 	_, err := q.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
 		p.XGroupDelConsumer(ctx, InputTaskKey(q.Key), q.Group, q.ID)
@@ -605,19 +594,17 @@ func (q *TaskQueue) Add(ctx context.Context, r redis.Cmdable, s string, startAt 
 	if r == nil {
 		r = q.Redis
 	}
-	return AddTask(ctx, r, q.Key, q.MaxLen, s, startAt, replace)
+	return addTask(ctx, r, q.Key, q.MaxLen, s, startAt, replace)
 }
 
 // Pop calls f on the most recent task in the queue, for which timestamp is in range [0, time.Now()],
-// if such is available, otherwise it blocks until it is.
-// If ctx.Deadline() is present, Pop will return at or shortly after it.
+// if such is available, otherwise it blocks until it is or context is done.
+// Pipeline is executed even if f returns an error.
 func (q *TaskQueue) Pop(ctx context.Context, r redis.Cmdable, f func(redis.Pipeliner, string, time.Time) error) error {
 	if r == nil {
 		r = q.Redis
 	}
-	return PopTask(ctx, r, q.Group, q.ID, func(p redis.Pipeliner, payload string, startAt time.Time) error {
-		return f(p, payload, startAt)
-	}, q.Key)
+	return popTask(ctx, r, q.Group, q.ID, f, q.Key)
 }
 
 // Scripter is redis.scripter.

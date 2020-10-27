@@ -17,7 +17,6 @@ package redis_test
 import (
 	"context"
 	"fmt"
-	"sync"
 	"testing"
 	"time"
 
@@ -25,18 +24,62 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-var Timeout = 10 * test.Delay
+func TestInitTaskGroup(t *testing.T) {
+	for _, tc := range []struct {
+		Name           string
+		Populate       func(context.Context, *Client) bool
+		Group, Key     string
+		ErrorAssertion func(*testing.T, error) bool
+	}{
+		{
+			Name:           "no streams/no groups",
+			Populate:       func(ctx context.Context, cl *Client) bool { return true },
+			Group:          "testGroup",
+			Key:            "testKey",
+			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+		},
+		{
+			Name: "streams exist/groups exist",
+			Populate: func(ctx context.Context, cl *Client) bool {
+				_, a := test.MustNewTFromContext(ctx)
+				_, err := cl.XGroupCreateMkStream(ctx, InputTaskKey(cl.Key("testKey")), cl.Key("testGroup"), "0").Result()
+				if !a.So(err, should.BeNil) {
+					return false
+				}
+				_, err = cl.XGroupCreateMkStream(ctx, ReadyTaskKey(cl.Key("testKey")), cl.Key("testGroup"), "0").Result()
+				return a.So(err, should.BeNil)
+			},
+			Group:          "testGroup",
+			Key:            "testKey",
+			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+		},
+	} {
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				cl, flush := test.NewRedis(ctx, "redis_test")
+				defer flush()
+				defer cl.Close()
+
+				a.So(tc.Populate(ctx, cl), should.BeTrue)
+
+				err := InitTaskGroup(ctx, cl, cl.Key(tc.Group), cl.Key(tc.Key))
+				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
+			},
+		})
+	}
+}
 
 func TestAddTask(t *testing.T) {
 	a, ctx := test.New(t)
 
-	cl, flush := test.NewRedis(ctx, "AddTask")
+	cl, flush := test.NewRedis(ctx, "redis_test")
 	defer flush()
 	defer cl.Close()
 
@@ -106,79 +149,153 @@ func TestAddTask(t *testing.T) {
 	}
 }
 
-func TestDispatchTasks(t *testing.T) {
-	a := assertions.New(t)
+func TestPopTask(t *testing.T) {
+	a, ctx := test.New(t)
 
-	cl, flush := test.NewRedis(t, "redis_test")
+	cl, flush := test.NewRedis(ctx, "redis_test")
 	defer flush()
 	defer cl.Close()
+
+	const (
+		testGroup = "testGroup"
+
+		testKey1 = "testKey1"
+		testKey2 = "testKey2"
+	)
+
+	assertPop := func(ctx context.Context, inputKey, expectedPayload string, expectedStartAt time.Time) bool {
+		t, a := test.MustNewTFromContext(ctx)
+		t.Helper()
+
+		var called bool
+		errCh := make(chan error, 1)
+		go func() {
+			errCh <- PopTask(ctx, cl.Client, testGroup, "testID", func(p redis.Pipeliner, payload string, startAt time.Time) error {
+				p.Ping(ctx)
+				if !test.AllTrue(
+					a.So(called, should.BeFalse),
+					a.So(payload, should.Equal, expectedPayload),
+					a.So(startAt, should.Resemble, expectedStartAt),
+				) {
+					t.Errorf("PopTask assertion failed for task with expected payload %s and expected starting time of %s", expectedPayload, expectedStartAt)
+				}
+				called = true
+				return nil
+			}, inputKey)
+		}()
+
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for Pop callback to be called")
+			return false
+
+		case err := <-errCh:
+			if !a.So(err, should.BeNil) {
+				t.Errorf("PopTask failed with: %s", test.FormatError(err))
+			}
+			return a.So(called, should.BeTrue) && !a.Failed()
+		}
+	}
+
+	testKeys := [...]string{
+		cl.Key("testKey1"),
+		cl.Key("testKey2"),
+	}
+	for _, k := range testKeys {
+		_, err := cl.XGroupCreateMkStream(ctx, InputTaskKey(k), testGroup, "0").Result()
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		_, err = cl.XGroupCreateMkStream(ctx, ReadyTaskKey(k), testGroup, "0").Result()
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		timeout := (1 >> 5) * test.Delay
+
+		timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+		err = PopTask(timeoutCtx, cl.Client, testGroup, "testID", func(redis.Pipeliner, string, time.Time) error {
+			panic("must not be called")
+		}, k)
+		cancel()
+		if a.So(err, should.BeError) {
+			a.So(errors.IsDeadlineExceeded(err), should.BeTrue)
+		}
+
+		cancelCtx, cancel := context.WithCancel(ctx)
+		time.AfterFunc(timeout, cancel)
+		err = PopTask(cancelCtx, cl.Client, testGroup, "testID", func(redis.Pipeliner, string, time.Time) error {
+			panic("must not be called")
+		}, k)
+		cancel()
+		if a.So(err, should.BeError) {
+			a.So(errors.IsCanceled(err), should.BeTrue)
+		}
+	}
+
+	inputKeys := [...]string{
+		InputTaskKey(testKeys[0]),
+		InputTaskKey(testKeys[1]),
+	}
+
+	payloads := [...]string{
+		"testPayload",
+		"testPayload2",
+		"testPayload3",
+	}
 
 	now := time.Now()
 	nextMin := now.Add(time.Hour)
 
-	for _, k := range []string{
-		"testKey",
-		"testKey2",
-	} {
-		_, err := cl.XGroupCreateMkStream(InputTaskKey(cl.Key(k)), cl.Key("testGroup"), "0").Result()
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-
-		_, err = cl.XGroupCreateMkStream(ReadyTaskKey(cl.Key(k)), cl.Key("testGroup"), "0").Result()
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-	}
-
 	for _, x := range []*redis.XAddArgs{
 		{
-			Stream: InputTaskKey(cl.Key("testKey")),
+			Stream: inputKeys[0],
 			Values: map[string]interface{}{
 				"start_at": fmt.Sprintf("%d", time.Unix(0, 42).UnixNano()),
-				"payload":  "testPayload",
+				"payload":  payloads[0],
 			},
 		},
 		{
-			Stream: InputTaskKey(cl.Key("testKey")),
+			Stream: inputKeys[0],
 			Values: map[string]interface{}{
 				"start_at": fmt.Sprintf("%d", time.Unix(0, 43).UnixNano()),
-				"payload":  "testPayload",
+				"payload":  payloads[0],
 			},
 		},
 		{
-			Stream: InputTaskKey(cl.Key("testKey")),
+			Stream: inputKeys[0],
 			Values: map[string]interface{}{
 				"start_at": fmt.Sprintf("%d", time.Unix(0, 41).UnixNano()),
-				"payload":  "testPayload",
+				"payload":  payloads[0],
 			},
 		},
 		{
-			Stream: InputTaskKey(cl.Key("testKey")),
+			Stream: inputKeys[0],
 			Values: map[string]interface{}{
 				"start_at": fmt.Sprintf("%d", time.Unix(0, 41).UnixNano()),
-				"payload":  "testPayload",
+				"payload":  payloads[0],
 			},
 		},
 		{
-			Stream: InputTaskKey(cl.Key("testKey2")),
+			Stream: inputKeys[1],
 			Values: map[string]interface{}{
 				"start_at": fmt.Sprintf("%d", time.Unix(0, 66).UnixNano()),
-				"payload":  "testPayload",
+				"payload":  payloads[0],
 			},
 		},
 		{
-			Stream: InputTaskKey(cl.Key("testKey")),
+			Stream: inputKeys[0],
 			Values: map[string]interface{}{
 				"start_at": nextMin.UnixNano(),
-				"payload":  "testPayload2",
+				"payload":  payloads[1],
 			},
 		},
 		{
-			Stream: InputTaskKey(cl.Key("testKey")),
+			Stream: inputKeys[0],
 			Values: map[string]interface{}{
 				"start_at": "0",
-				"payload":  "testPayload3",
+				"payload":  payloads[2],
 			},
 		},
 		{
@@ -189,292 +306,21 @@ func TestDispatchTasks(t *testing.T) {
 			},
 		},
 	} {
-		_, err := cl.Client.XAdd(x).Result()
+		_, err := cl.Client.XAdd(ctx, x).Result()
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
 	}
 
-	min, err := DispatchTasks(cl, cl.Key("testGroup"), "testID", 100, time.Now(), cl.Key("testKey"), cl.Key("testKey2"))
-	if !a.So(err, should.BeNil) {
-		t.Errorf("Error cause: %v", errors.Cause(err))
-		t.FailNow()
-	}
-	// NOTE: the timestamp gets converted to float64 under the hood, so some precision can be lost.
-	a.So(min.UTC(), should.Resemble, time.Unix(0, int64(float64(nextMin.UnixNano()))).UTC())
-
-	rets, err := cl.XReadStreams(ReadyTaskKey(cl.Key("testKey")), ReadyTaskKey(cl.Key("testKey2")), "0", "0").Result()
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	if !a.So(rets, should.HaveLength, 2) || !a.So(rets[0].Messages, should.HaveLength, 2) || !a.So(rets[1].Messages, should.HaveLength, 1) {
-		t.FailNow()
-	}
-
-	expected := []redis.XStream{
-		{
-			Stream: ReadyTaskKey(cl.Key("testKey")),
-			Messages: []redis.XMessage{
-				{
-					Values: map[string]interface{}{
-						"start_at": "0",
-						"payload":  "testPayload3",
-					},
-				},
-				{
-					Values: map[string]interface{}{
-						"start_at": fmt.Sprintf("%d", time.Unix(0, 42).UnixNano()),
-						"payload":  "testPayload",
-					},
-				},
-			},
-		},
-		{
-			Stream: ReadyTaskKey(cl.Key("testKey2")),
-			Messages: []redis.XMessage{
-				{
-					Values: map[string]interface{}{
-						"start_at": fmt.Sprintf("%d", time.Unix(0, 66).UnixNano()),
-						"payload":  "testPayload",
-					},
-				},
-			},
-		},
-	}
-
-	for i, ret := range rets {
-		for j, msg := range ret.Messages {
-			expected[i].Messages[j].ID = msg.ID
-		}
-	}
-	a.So(rets, should.Resemble, expected)
-}
-
-func TestPopTask(t *testing.T) {
-	a := assertions.New(t)
-
-	cl, flush := test.NewRedis(t, "redis_test")
-	defer flush()
-	defer cl.Close()
-
-	ctx, cancel := context.WithCancel(test.Context())
-	defer cancel()
-
-	err := PopTask(cl, cl.Key("testGroup"), "testID", -1, func(redis.Pipeliner, string, string, time.Time) error {
-		t.Fatal("f must not be called")
-		return nil
-	}, cl.Key("testKeyNonExistent"))
-	a.So(err, should.NotBeNil)
-
-	for _, k := range []string{
-		"testKey",
-		"testKey2",
-		"testKey3", // Stays empty
-	} {
-		_, err := cl.XGroupCreateMkStream(ReadyTaskKey(cl.Key(k)), cl.Key("testGroup"), "0").Result()
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-	}
-
-	err = PopTask(cl, "testGroupNonExistent", "testID", -1, func(redis.Pipeliner, string, string, time.Time) error {
-		t.Fatal("f must not be called")
-		return nil
-	}, cl.Key("testKey"))
-	a.So(err, should.NotBeNil)
-
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(redis.Pipeliner, string, string, time.Time) error {
-		t.Fatal("f must not be called")
-		return nil
-	})
-	a.So(err, should.BeNil)
-
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(redis.Pipeliner, string, string, time.Time) error {
-		t.Fatal("f must not be called")
-		return nil
-	}, cl.Key("testKey"), cl.Key("testKey2"))
-	a.So(err, should.BeNil)
-
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(redis.Pipeliner, string, string, time.Time) error {
-		t.Fatal("f must not be called")
-		return nil
-	}, cl.Key("testKey2"))
-	a.So(err, should.BeNil)
-
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(redis.Pipeliner, string, string, time.Time) error {
-		t.Fatal("f must not be called")
-		return nil
-	}, cl.Key("testKeyNonExistent"))
-	a.So(err, should.NotBeNil)
-
-	go func() {
-		err := PopTask(cl, cl.Key("testGroup"), "testID", 0, func(redis.Pipeliner, string, string, time.Time) error {
-			t.Fatal("f must not be called")
-			return nil
-		}, cl.Key("testKey3"))
-		select {
-		case <-ctx.Done():
-			t.Logf("Blocked PopTask returned, error: %s", err)
-		default:
-			t.Fatalf("PopTask returned too early, error: %s", err)
-		}
-	}()
-
-	for _, x := range []*redis.XAddArgs{
-		{
-			Stream: ReadyTaskKey(cl.Key("testKey")),
-			Values: map[string]interface{}{
-				"start_at": fmt.Sprintf("%d", time.Unix(0, 42).UnixNano()),
-				"payload":  "testPayload",
-			},
-		},
-		{
-			Stream: ReadyTaskKey(cl.Key("testKey")),
-			Values: map[string]interface{}{
-				"start_at": fmt.Sprintf("%d", time.Unix(0, 43).UnixNano()),
-				"payload":  "testPayload2",
-			},
-		},
-		{
-			Stream: ReadyTaskKey(cl.Key("testKey")),
-			Values: map[string]interface{}{
-				"start_at": fmt.Sprintf("%d", time.Unix(0, 41).UnixNano()),
-				"payload":  "testPayload",
-			},
-		},
-		{
-			Stream: ReadyTaskKey(cl.Key("testKey2")),
-			Values: map[string]interface{}{
-				"start_at": fmt.Sprintf("%d", time.Unix(0, 41).UnixNano()),
-				"payload":  "testPayload",
-			},
-		},
-	} {
-		_, err := cl.Client.XAdd(x).Result()
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-	}
-
-	fCalls := 0
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(_ redis.Pipeliner, k string, payload string, startAt time.Time) error {
-		a.So(fCalls, should.Equal, 0)
-		a.So(k, should.Equal, cl.Key("testKey"))
-		a.So(payload, should.Equal, "testPayload")
-		a.So(startAt, should.Equal, time.Unix(0, 42).UTC())
-		fCalls++
-		return nil
-	}, cl.Key("testKey"))
-	a.So(err, should.BeNil)
-
-	err = PopTask(cl, cl.Key("testGroup"), "testID2", -1, func(_ redis.Pipeliner, k string, payload string, startAt time.Time) error {
-		a.So(fCalls, should.Equal, 1)
-		a.So(k, should.Equal, cl.Key("testKey"))
-		a.So(payload, should.Equal, "testPayload2")
-		a.So(startAt, should.Equal, time.Unix(0, 43).UTC())
-		fCalls++
-		return nil
-	}, cl.Key("testKey"))
-	a.So(err, should.BeNil)
-
-	errTest := errors.New("test")
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(_ redis.Pipeliner, k string, payload string, startAt time.Time) error {
-		a.So(fCalls, should.Equal, 2)
-		a.So(k, should.Equal, cl.Key("testKey"))
-		a.So(payload, should.Equal, "testPayload")
-		a.So(startAt, should.Equal, time.Unix(0, 41).UTC())
-		fCalls++
-		return errTest.New()
-	}, cl.Key("testKey"))
-	a.So(err, should.HaveSameErrorDefinitionAs, errTest)
-
-	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(_ redis.Pipeliner, k string, payload string, startAt time.Time) error {
-		a.So(fCalls, should.Equal, 3)
-		a.So(k, should.Equal, cl.Key("testKey2"))
-		a.So(payload, should.Equal, "testPayload")
-		a.So(startAt, should.Equal, time.Unix(0, 41).UTC())
-		fCalls++
-		return nil
-	}, cl.Key("testKey2"))
-	a.So(err, should.BeNil)
-
-	a.So(fCalls, should.Equal, 4)
-
-	xp, err := cl.XPending(ReadyTaskKey(cl.Key("testKey")), cl.Key("testGroup")).Result()
-	if !a.So(err, should.BeNil) {
-		t.Fatal("Failed to query pending tasks")
-	}
-	a.So(xp.Lower, should.Equal, xp.Higher)
-	a.So(xp, should.Resemble, &redis.XPending{
-		Count:  1,
-		Lower:  xp.Lower,
-		Higher: xp.Higher,
-		Consumers: map[string]int64{
-			"testID": 1,
-		},
-	})
-
-	xp, err = cl.XPending(ReadyTaskKey(cl.Key("testKey2")), cl.Key("testGroup")).Result()
-	if !a.So(err, should.BeNil) {
-		t.Fatal("Failed to query pending tasks")
-	}
-	a.So(xp, should.Resemble, &redis.XPending{})
-}
-
-func TestInitTaskGroup(t *testing.T) {
-	for _, tc := range []struct {
-		Name           string
-		Populate       func(t *testing.T, cl *Client) bool
-		Group, Key     string
-		ErrorAssertion func(t *testing.T, err error) bool
-	}{
-		{
-			Name:           "no streams/no groups",
-			Populate:       func(t *testing.T, cl *Client) bool { return true },
-			Group:          "testGroup",
-			Key:            "testKey",
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
-		},
-		{
-			Name: "streams exist/groups exist",
-			Populate: func(t *testing.T, cl *Client) bool {
-				a := assertions.New(t)
-				_, err := cl.XGroupCreateMkStream(InputTaskKey(cl.Key("testKey")), cl.Key("testGroup"), "0").Result()
-				if !a.So(err, should.BeNil) {
-					return false
-				}
-				_, err = cl.XGroupCreateMkStream(ReadyTaskKey(cl.Key("testKey")), cl.Key("testGroup"), "0").Result()
-				if !a.So(err, should.BeNil) {
-					return false
-				}
-				return true
-			},
-			Group:          "testGroup",
-			Key:            "testKey",
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
-		},
-	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			t.Parallel()
-
-			a := assertions.New(t)
-
-			cl, flush := test.NewRedis(t, "redis_test")
-			defer flush()
-			defer cl.Close()
-
-			a.So(tc.Populate(t, cl), should.BeTrue)
-
-			err := InitTaskGroup(cl, cl.Key(tc.Group), cl.Key(tc.Key))
-			a.So(tc.ErrorAssertion(t, err), should.BeTrue)
-		})
-	}
+	a.So(assertPop(ctx, testKeys[0], payloads[2], time.Unix(0, 0).UTC()), should.BeTrue)
+	a.So(assertPop(ctx, testKeys[0], payloads[0], time.Unix(0, 42).UTC()), should.BeTrue)
+	a.So(assertPop(ctx, testKeys[1], payloads[0], time.Unix(0, 66).UTC()), should.BeTrue)
 }
 
 func TestTaskQueue(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
-	cl, flush := test.NewRedis(t, "redis_test")
+	cl, flush := test.NewRedis(ctx, "redis_test")
 	defer flush()
 	defer cl.Close()
 
@@ -486,203 +332,72 @@ func TestTaskQueue(t *testing.T) {
 		Key:    cl.Key("test"),
 	}
 
-	err := q.Init()
+	err := q.Init(ctx)
 	a.So(err, should.BeNil)
-
-	runCtx, cancel := context.WithCancel(test.Context())
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	runErrCh := make(chan error, 1)
-	go func() {
-		wg.Done()
-		t.Log("Running Redis downlink task queue...")
-		err := q.Run(runCtx)
-		runErrCh <- err
-		close(runErrCh)
-		t.Logf("Stopped Redis downlink task queue with error: %s", err)
-	}()
-	wg.Wait()
-
-	type task struct {
-		payload string
-		startAt time.Time
-		errCh   chan<- error
-	}
-	type popReq struct {
-		ctx    context.Context
-		taskCh chan task
-		errCh  chan error
-	}
-	newPopReq := func(ctx context.Context) popReq {
-		return popReq{
-			ctx:    ctx,
-			taskCh: make(chan task, 1),
-			errCh:  make(chan error, 1),
-		}
-	}
-	popReqCh := make(chan popReq)
-	go func() {
-		for req := range popReqCh {
-			req.errCh <- q.Pop(req.ctx, nil, func(_ redis.Pipeliner, payload string, startAt time.Time) error {
-				errCh := make(chan error, 1)
-				req.taskCh <- task{
-					payload: payload,
-					startAt: startAt,
-					errCh:   errCh,
-				}
-				close(req.taskCh)
-				return <-errCh
-			})
-			close(req.errCh)
-		}
+	defer func() {
+		err := q.Close(ctx)
+		a.So(err, should.BeNil)
 	}()
 
-	ctx, ctxCancel := context.WithDeadline(test.Context(), time.Now().Add(-1))
-	defer ctxCancel()
-	req := newPopReq(ctx)
-	popReqCh <- req
-
-	select {
-	case x := <-req.taskCh:
-		t.Fatalf("Non-blocking Pop called f on empty schedule, task: %+v", x)
-
-	case err := <-req.errCh:
-		a.So(err, should.BeNil)
-
-	case <-time.After(Timeout):
-		t.Fatalf("Non-blocking Pop blocked for %v", Timeout)
-	}
-
-	req = newPopReq(test.Context())
-	popReqCh <- req
-
-	select {
-	case x := <-req.taskCh:
-		t.Fatalf("Blocking Pop called f on empty schedule, task: %+v", x)
-
-	case err := <-req.errCh:
-		a.So(err, should.BeNil)
-		t.Fatal("Blocking Pop returned on empty schedule")
-
-	case <-time.After(10 * test.Delay):
-	}
-
-	err = q.Add(nil, "testPayload", time.Unix(0, 0), false)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-
-	select {
-	case x := <-req.taskCh:
-		a.So(x.payload, should.Equal, "testPayload")
-		a.So(x.startAt, should.Equal, time.Unix(0, 0))
-		x.errCh <- nil
-		close(x.errCh)
-
-	case err := <-req.errCh:
-		a.So(err, should.BeNil)
-		t.Fatal("Run returned without calling f on non-empty schedule")
-
-	case <-time.After(Timeout):
-		t.Fatal("Timed out waiting for Pop to call f")
-	}
-
-	err = q.Add(nil, "0", time.Unix(0, 42), false)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-
-	err = q.Add(nil, "1", time.Now().Add(time.Hour), false)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-
-	err = q.Add(nil, "1", time.Now().Add(2*time.Hour), true)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-
-	err = q.Add(nil, "1", time.Unix(13, 0), false)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-
-	err = q.Add(nil, "1", time.Unix(42, 0), true)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-
-	err = q.Add(nil, "2", time.Now().Add(42*time.Hour), true)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-
-	err = q.Add(nil, "2", time.Unix(42, 42), true)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-
-	expectTask := func(t *testing.T, expectedPayload string, expectedAt time.Time) {
+	assertPop := func(ctx context.Context, r redis.Cmdable, expectedPayload string, expectedStartAt time.Time) bool {
+		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
 
-		a := assertions.New(t)
-
-		req := newPopReq(test.Context())
-		popReqCh <- req
-
-		select {
-		case x := <-req.taskCh:
-			a.So(x.payload, should.Equal, expectedPayload)
-			a.So(x.startAt, should.Equal, expectedAt)
-			x.errCh <- nil
-			close(x.errCh)
-
-		case err := <-req.errCh:
-			a.So(err, should.BeNil)
-			t.Fatal("Pop returned without calling f on non-empty schedule")
-
-		case <-time.After(Timeout):
-			t.Fatal("Timed out waiting for Pop to call f")
+		type popFuncReq struct {
+			Pipeliner redis.Pipeliner
+			Payload   string
+			Time      time.Time
+			Response  chan<- error
 		}
 
-		select {
-		case err := <-req.errCh:
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
+		var called bool
+		errCh := make(chan error, 1)
+		go func() {
+			errCh <- q.Pop(ctx, r, func(p redis.Pipeliner, payload string, startAt time.Time) error {
+				p.Ping(ctx)
+				a.So(called, should.BeFalse)
+				a.So(payload, should.Equal, expectedPayload)
+				a.So(startAt, should.Resemble, expectedStartAt)
+				called = true
+				return nil
+			})
+		}()
 
-		case <-time.After(Timeout):
-			t.Fatal("Timed out waiting for Pop to return")
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for Pop callback to be called")
+			return false
+
+		case err := <-errCh:
+			return test.AllTrue(
+				a.So(err, should.BeNil),
+				a.So(called, should.BeTrue),
+			)
 		}
 	}
 
-	expectTask(t, "0", time.Unix(0, 42))
-	expectTask(t, "1", time.Unix(42, 0))
-	expectTask(t, "2", time.Unix(42, 42))
-
-	cancel()
-	// Unblock DispatchTasks in Run()
-	err = q.Add(nil, "42", time.Unix(0, 0), true)
-	a.So(err, should.BeNil)
-
-	select {
-	case err := <-runErrCh:
-		if err != nil && err != context.Canceled {
-			t.Errorf("Failed to run queue: %s(cause: %s)", err, errors.Cause(err))
-		}
-
-	case <-time.After(Timeout):
-		t.Error("Timed out waiting for Run to return")
+	p := cl.Pipeline()
+	switch {
+	case !a.So(q.Add(ctx, nil, "test", time.Now(), true), should.BeNil),
+		!a.So(q.Add(ctx, p, "test", time.Unix(0, 42), true), should.BeNil),
+		!a.So(q.Add(ctx, nil, "test", time.Unix(0, 24), false), should.BeNil),
+		!a.So(q.Add(ctx, p, "test2", time.Unix(0, 43), false), should.BeNil),
+		!a.So(q.Add(ctx, p, "test", time.Unix(0, 420), false), should.BeNil),
+		!a.So(func() error {
+			_, err := p.Exec(ctx)
+			return err
+		}(), should.BeNil),
+		!a.So(assertPop(ctx, nil, "test", time.Unix(0, 42).UTC()), should.BeTrue),
+		!a.So(q.Add(ctx, nil, "test2", time.Unix(0, 41), true), should.BeNil),
+		!a.So(assertPop(ctx, nil, "test2", time.Unix(0, 43).UTC()), should.BeTrue),
+		!a.So(assertPop(ctx, nil, "test2", time.Unix(0, 41).UTC()), should.BeTrue):
 	}
 }
 
 func TestProtoDeduplicator(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
-	ctx := test.ContextWithTB(test.Context(), t)
-	ctx = log.NewContext(ctx, test.GetLogger(t))
-
-	cl, flush := test.NewRedis(t, "redis_test")
+	cl, flush := test.NewRedis(ctx, "redis_test")
 	defer flush()
 	defer cl.Close()
 
@@ -736,15 +451,15 @@ func TestProtoDeduplicator(t *testing.T) {
 	}
 	a.So(v, should.BeFalse)
 
-	ss, err := cl.LRange(ListKey(key1), 0, -1).Result()
+	ss, err := cl.LRange(ctx, ListKey(key1), 0, -1).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	lockTTL, err := cl.PTTL(LockKey(key1)).Result()
+	lockTTL, err := cl.PTTL(ctx, LockKey(key1)).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	listTTL, err := cl.PTTL(ListKey(key1)).Result()
+	listTTL, err := cl.PTTL(ctx, ListKey(key1)).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -759,15 +474,15 @@ func TestProtoDeduplicator(t *testing.T) {
 	a.So(listTTL, should.BeGreaterThan, 0)
 	a.So(listTTL, should.BeLessThanOrEqualTo, ttl)
 
-	ss, err = cl.LRange(ListKey(key2), 0, -1).Result()
+	ss, err = cl.LRange(ctx, ListKey(key2), 0, -1).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	lockTTL, err = cl.PTTL(LockKey(key2)).Result()
+	lockTTL, err = cl.PTTL(ctx, LockKey(key2)).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	listTTL, err = cl.PTTL(ListKey(key2)).Result()
+	listTTL, err = cl.PTTL(ctx, ListKey(key2)).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -782,14 +497,12 @@ func TestProtoDeduplicator(t *testing.T) {
 }
 
 func TestMutex(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
-	ctx := test.ContextWithTB(test.Context(), t)
-	ctx = log.NewContext(ctx, test.GetLogger(t))
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Second+(1<<8)*test.Delay)
 	defer cancel()
 
-	cl, flush := test.NewRedis(t, "redis_test")
+	cl, flush := test.NewRedis(ctx, "redis_test")
 	defer flush()
 	defer cl.Close()
 
@@ -801,7 +514,7 @@ func TestMutex(t *testing.T) {
 		t.Fatalf("Failed to lock mutex: %s", err)
 	}
 
-	lockTTL, err := cl.PTTL(LockKey(key)).Result()
+	lockTTL, err := cl.PTTL(ctx, LockKey(key)).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -824,7 +537,7 @@ func TestMutex(t *testing.T) {
 	case <-ctx.Done():
 		t.Fatalf("Timed out while waiting for LockMutex with a deadline to return")
 	case err := <-timeoutErrCh:
-		a.So(err, should.Resemble, context.DeadlineExceeded)
+		a.So(errors.IsDeadlineExceeded(err), should.BeTrue)
 	}
 	select {
 	case err := <-blockErrCh:
@@ -832,7 +545,7 @@ func TestMutex(t *testing.T) {
 	default:
 	}
 
-	err = UnlockMutex(cl, key, "test-id-1", ttl)
+	err = UnlockMutex(ctx, cl, key, "test-id-1", ttl)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("Failed to unlock mutex: %s", err)
 	}
@@ -843,22 +556,22 @@ func TestMutex(t *testing.T) {
 	case err := <-blockErrCh:
 		a.So(err, should.BeNil)
 	}
-	lockTTL, err = cl.PTTL(LockKey(key)).Result()
+	lockTTL, err = cl.PTTL(ctx, LockKey(key)).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(lockTTL, should.BeGreaterThan, 0)
 	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
 
-	err = UnlockMutex(cl, key, "test-id-2", ttl)
+	err = UnlockMutex(ctx, cl, key, "test-id-2", ttl)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("Failed to unlock mutex: %s", err)
 	}
-	lockTTL, err = cl.PTTL(LockKey(key)).Result()
+	lockTTL, err = cl.PTTL(ctx, LockKey(key)).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	listTTL, err := cl.PTTL(ListKey(key)).Result()
+	listTTL, err := cl.PTTL(ctx, ListKey(key)).Result()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -866,11 +579,11 @@ func TestMutex(t *testing.T) {
 	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
 	a.So(listTTL, should.BeLessThanOrEqualTo, lockTTL)
 
-	err = UnlockMutex(cl, key, "non-existent-id", ttl)
+	err = UnlockMutex(ctx, cl, key, "non-existent-id", ttl)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("Failed to unlock existent mutex with non-existent ID: %s", err)
 	}
-	err = UnlockMutex(cl, cl.Key("non-existent-key"), "non-existent-id", ttl)
+	err = UnlockMutex(ctx, cl, cl.Key("non-existent-key"), "non-existent-id", ttl)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("Failed to unlock non-existent mutex: %s", err)
 	}

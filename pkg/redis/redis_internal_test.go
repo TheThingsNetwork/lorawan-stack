@@ -17,4 +17,8 @@ package redis
 var (
 	Encoding       = encoding
 	ErrNoArguments = errNoArguments
+
+	InitTaskGroup = initTaskGroup
+	AddTask       = addTask
+	PopTask       = popTask
 )
