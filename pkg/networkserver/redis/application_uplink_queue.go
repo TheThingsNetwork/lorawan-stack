@@ -258,7 +258,7 @@ func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context
 				return false, err
 			}
 			for streamID, ids := range msgIDs {
-				// NOTE: Both calls bellow copy contents of ids internally.
+				// NOTE: Both calls below copy contents of ids internally.
 				p.XAck(ctx, streamID, q.group, ids...)
 				p.XDel(ctx, streamID, ids...)
 			}
