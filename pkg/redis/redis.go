@@ -727,11 +727,6 @@ func LockMutex(ctx context.Context, r redis.Cmdable, k, id string, expiration ti
 				timeout = until
 			}
 		}
-		if timeout < time.Second {
-			// Necessary until https://github.com/go-redis/redis/issues/1363 is resolved.
-			log.FromContext(ctx).WithField("timeout", timeout).Debug("Truncating BLPop timeout to 1 second")
-			timeout = time.Second
-		}
 		popRes, err := r.BLPop(ctx, timeout, listKey).Result()
 		if err != nil && err != redis.Nil {
 			return ConvertError(err)
