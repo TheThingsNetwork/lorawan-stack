@@ -1940,8 +1940,8 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 		}
 		closeFuncs = append(closeFuncs, func() {
 			select {
-			case <-handleJoinCh:
-				tb.Error("InteropClient.HandleJoin call missed")
+			case req := <-handleJoinCh:
+				tb.Errorf("InteropClient.HandleJoin call missed: %+v", req)
 			default:
 				close(handleJoinCh)
 			}
@@ -1959,20 +1959,20 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 			f()
 		}
 		select {
-		case <-authCh:
-			tb.Error("Cluster.Auth call missed")
+		case req := <-authCh:
+			tb.Errorf("Cluster.Auth call missed: %+v", req)
 		default:
 			close(authCh)
 		}
 		select {
-		case <-getPeerCh:
-			tb.Error("Cluster.GetPeer call missed")
+		case req := <-getPeerCh:
+			tb.Errorf("Cluster.GetPeer call missed: %+v", req)
 		default:
 			close(getPeerCh)
 		}
 		select {
-		case <-eventsPublishCh:
-			tb.Error("events.Publish call missed")
+		case req := <-eventsPublishCh:
+			tb.Errorf("events.Publish call missed: %+v", req)
 		default:
 			close(eventsPublishCh)
 		}
