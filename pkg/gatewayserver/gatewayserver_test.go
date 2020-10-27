@@ -154,12 +154,14 @@ func TestGatewayServer(t *testing.T) {
 		DetectsInvalidMessages bool
 		DetectsDisconnect      bool
 		TimeoutOnInvalidAuth   bool
+		HasAuth                bool
 		ValidAuth              func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
 		Link                   func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
 	}{
 		{
 			Protocol:          "grpc",
 			SupportsStatus:    true,
+			HasAuth:           true,
 			DetectsDisconnect: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
@@ -218,6 +220,7 @@ func TestGatewayServer(t *testing.T) {
 		{
 			Protocol:             "mqtt",
 			SupportsStatus:       true,
+			HasAuth:              true,
 			DetectsDisconnect:    true,
 			TimeoutOnInvalidAuth: true, // The MQTT client keeps reconnecting on invalid auth.
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
@@ -434,6 +437,7 @@ func TestGatewayServer(t *testing.T) {
 			SupportsStatus:         false,
 			DetectsDisconnect:      true,
 			DetectsInvalidMessages: true,
+			HasAuth:                true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.EUI != nil
 			},
@@ -694,7 +698,7 @@ func TestGatewayServer(t *testing.T) {
 				}
 			})
 
-			if ptc.SupportsStatus {
+			if ptc.SupportsStatus && ptc.HasAuth {
 				t.Run("UpdateLocation", func(t *testing.T) {
 					for _, tc := range []struct {
 						Name           string

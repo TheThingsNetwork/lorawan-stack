@@ -482,7 +482,7 @@ type Gateway struct {
 	DownlinkPathConstraint DownlinkPathConstraint `protobuf:"varint,18,opt,name=downlink_path_constraint,json=downlinkPathConstraint,proto3,enum=ttn.lorawan.v3.DownlinkPathConstraint" json:"downlink_path_constraint,omitempty"`
 	// Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite.
 	ScheduleAnytimeDelay *time.Duration `protobuf:"bytes,19,opt,name=schedule_anytime_delay,json=scheduleAnytimeDelay,proto3,stdduration" json:"schedule_anytime_delay,omitempty"`
-	// update the location of this gateway from status messages
+	// Update the location of this gateway from status messages. This only works for gateways connecting with authentication; gateways connected over UDP are not supported.
 	UpdateLocationFromStatus bool `protobuf:"varint,21,opt,name=update_location_from_status,json=updateLocationFromStatus,proto3" json:"update_location_from_status,omitempty"`
 	// The LoRa Basics Station LNS secret.
 	// This is either an auth token (such as an API Key) or a TLS private certificate.
