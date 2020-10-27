@@ -264,6 +264,29 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 
+		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+			if !a.So(env.AssertNsAsHandleUplink(ctx, dev.ApplicationIdentifiers, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+				_, a := test.MustNewTFromContext(ctx)
+				if !a.So(ups, should.HaveLength, 1) {
+					return false
+				}
+				up := ups[0]
+				return test.AllTrue(
+					// TODO: Enable this assertion once https://github.com/TheThingsNetwork/lorawan-stack/issues/3416 is done.
+					// a.So(up.CorrelationIDs, should.HaveSameElementsDeep, LastDownlink(dev.RecentDownlinks...).CorrelationIDs),
+					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+						CorrelationIDs:       up.CorrelationIDs,
+						Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+							DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{},
+						},
+					}),
+				)
+			}, nil), should.BeTrue) {
+				t.Error("Failed to send queue invalidation to Application Server")
+				return
+			}
+		}
 		conf.Func(ctx, env, dev)
 	}
 }
