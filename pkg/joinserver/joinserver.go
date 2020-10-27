@@ -320,10 +320,21 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		},
 		func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dn, ok := auth.X509DNFromContext(ctx); ok {
-				if dev.NetID == nil {
+				netID := dev.NetID
+				if netID == nil {
+					appSettings, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
+						"home_net_id",
+					})
+					if err == nil {
+						netID = appSettings.HomeNetID
+					} else if !errors.IsNotFound(err) {
+						return nil, nil, errLookupNetID.WithCause(err)
+					}
+				}
+				if netID == nil {
 					return nil, nil, errNoNetID.New()
 				}
-				if !req.NetID.Equal(*dev.NetID) {
+				if !req.NetID.Equal(*netID) {
 					return nil, nil, errNetIDMismatch.WithAttributes("net_id", req.NetID)
 				}
 				if dev.NetworkServerAddress != "" {

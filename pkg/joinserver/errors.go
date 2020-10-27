@@ -33,6 +33,7 @@ var (
 	errGenerateSessionKeyID           = errors.Define("generate_session_key_id", "failed to generate session key ID")
 	errInvalidIdentifiers             = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 	errJoinNonceTooHigh               = errors.Define("join_nonce_too_high", "JoinNonce is too high")
+	errLookupNetID                    = errors.Define("lookup_net_id", "lookup NetID")
 	errMICMismatch                    = errors.DefineInvalidArgument("mic_mismatch", "MIC mismatch")
 	errNetIDMismatch                  = errors.DefineInvalidArgument("net_id_mismatch", "NetID `{net_id}` does not match")
 	errNoAppKey                       = errors.DefineCorruption("no_app_key", "no AppKey specified")
