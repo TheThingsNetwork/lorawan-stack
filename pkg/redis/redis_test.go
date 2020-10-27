@@ -170,7 +170,7 @@ func TestPopTask(t *testing.T) {
 		var called bool
 		errCh := make(chan error, 1)
 		go func() {
-			errCh <- PopTask(ctx, cl.Client, testGroup, "testID", func(p redis.Pipeliner, payload string, startAt time.Time) error {
+			errCh <- PopTask(ctx, cl.Client, testGroup, "testID", 10, func(p redis.Pipeliner, payload string, startAt time.Time) error {
 				p.Ping(ctx)
 				if !test.AllTrue(
 					a.So(called, should.BeFalse),
@@ -215,7 +215,7 @@ func TestPopTask(t *testing.T) {
 		timeout := (1 >> 5) * test.Delay
 
 		timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
-		err = PopTask(timeoutCtx, cl.Client, testGroup, "testID", func(redis.Pipeliner, string, time.Time) error {
+		err = PopTask(timeoutCtx, cl.Client, testGroup, "testID", 10, func(redis.Pipeliner, string, time.Time) error {
 			panic("must not be called")
 		}, k)
 		cancel()
@@ -225,7 +225,7 @@ func TestPopTask(t *testing.T) {
 
 		cancelCtx, cancel := context.WithCancel(ctx)
 		time.AfterFunc(timeout, cancel)
-		err = PopTask(cancelCtx, cl.Client, testGroup, "testID", func(redis.Pipeliner, string, time.Time) error {
+		err = PopTask(cancelCtx, cl.Client, testGroup, "testID", 10, func(redis.Pipeliner, string, time.Time) error {
 			panic("must not be called")
 		}, k)
 		cancel()

@@ -17,7 +17,8 @@
 -- and returns a table containing "ready" and the task. Otherwise, it returns "waiting", last_id and next_at, if such exist.
 -- ARGV[1] - group ID
 -- ARGV[2] - consumer ID
--- ARGV[3] - pivot - current time, expressed as nanoseconds elapsed since Unix epoch.
+-- ARGV[3] - pivot - current time, expressed as nanoseconds elapsed since Unix epoch
+-- ARGV[4] - approximate maximum length of ready task stream
 --
 -- KEYS[1] - ready task key
 -- KEYS[2] - input task key
@@ -31,7 +32,7 @@ local function format_ready(xs)
   return ret
 end
 
-local xs = redis.call('xreadgroup', 'group', ARGV[1], ARGV[2], 'count', '1', 'streams', KEYS[1], '>')
+local xs = redis.call('xreadgroup', 'group', ARGV[1], ARGV[2], 'count', 1, 'streams', KEYS[1], '>')
 if xs then
   return format_ready(xs)
 end
@@ -61,20 +62,20 @@ if #zs > 0 then
   for i=1,#zs,2 do
     local member = zs[i]
     members[#members+1] = member
-    redis.call('xadd', KEYS[1], '*', 'payload', member, 'start_at', zs[i+1])
+    redis.call('xadd', KEYS[1], 'maxlen', '~', ARGV[4],'*', 'payload', member, 'start_at', zs[i+1])
   end
   redis.call('zrem', KEYS[3], unpack(members))
-  return format_ready(redis.call('xreadgroup', 'group', ARGV[1], ARGV[2], 'count', '1', 'streams', KEYS[1], '>'))
+  return format_ready(redis.call('xreadgroup', 'group', ARGV[1], ARGV[2], 'count', 1, 'streams', KEYS[1], '>'))
 end
 
 local ret = { 'waiting' }
-zs = redis.call('zrangebyscore', KEYS[3], '-inf', '+inf', 'withscores', 'limit', '0', '1')
+zs = redis.call('zrangebyscore', KEYS[3], '-inf', '+inf', 'withscores', 'limit', 0, 1)
 if #zs > 0 then
   ret[#ret+1] = 'next_at'
   ret[#ret+1] = zs[2]
 end
 
-xs = redis.call('xrevrange', KEYS[2], '+', '-', 'count', '1')
+xs = redis.call('xrevrange', KEYS[2], '+', '-', 'count', 1)
 if #xs > 0 then
   ret[#ret+1] = 'last_id'
   ret[#ret+1] = xs[1][1]

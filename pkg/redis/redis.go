@@ -452,14 +452,14 @@ func parseTime(s string) (time.Time, error) {
 // k is the keys to pop from.
 // Pipeline is executed even if f returns an error.
 // Tasks are acked only if f returns without error.
-func popTask(ctx context.Context, r redis.Cmdable, group, id string, f func(p redis.Pipeliner, payload string, startAt time.Time) error, k string) (err error) {
+func popTask(ctx context.Context, r redis.Cmdable, group, id string, maxLen int64, f func(p redis.Pipeliner, payload string, startAt time.Time) error, k string) (err error) {
 	var (
 		readyStream   = ReadyTaskKey(k)
 		inputStream   = InputTaskKey(k)
 		waitingStream = WaitingTaskKey(k)
 	)
 	for {
-		res, err := popTaskScript.Run(ctx, r, []string{readyStream, inputStream, waitingStream}, group, id, time.Now().UnixNano()).Result()
+		res, err := popTaskScript.Run(ctx, r, []string{readyStream, inputStream, waitingStream}, group, id, time.Now().UnixNano(), maxLen).Result()
 		if err != nil && err != redis.Nil {
 			return ConvertError(err)
 		}
@@ -561,6 +561,7 @@ func popTask(ctx context.Context, r redis.Cmdable, group, id string, f func(p re
 			return err
 		}
 		p.XAck(ctx, readyStream, group, fields["id"])
+		p.XDel(ctx, readyStream, fields["id"])
 		return nil
 	}
 }
@@ -604,7 +605,7 @@ func (q *TaskQueue) Pop(ctx context.Context, r redis.Cmdable, f func(redis.Pipel
 	if r == nil {
 		r = q.Redis
 	}
-	return popTask(ctx, r, q.Group, q.ID, f, q.Key)
+	return popTask(ctx, r, q.Group, q.ID, q.MaxLen, f, q.Key)
 }
 
 // Scripter is redis.scripter.
