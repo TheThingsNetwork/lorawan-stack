@@ -75,7 +75,7 @@ Open source projects are great, but a stable and reliable open source ecosystem 
 5. We will not break the API between components and events within minor versions. So at least the same minor versions of components are compatible with each other.
 6. We reserve the right to fix bugs in API, configuration and storage in patches and minor updates. This may break components, gateways and applications that rely on buggy behavior.
 
-As we are continuously adding functionality in minor versions and fixing issues in patch versions, we are also introducing new configurations and new defaults. We therefore recommend reading the release notes before upgrading to a new version.
+As we are continuously adding functionality and fixes in new releases, we are also introducing new configurations and new defaults. We therefore recommend reading the release notes before upgrading to a new version.
 
 You can find the releases and their notes on the [Releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
 
