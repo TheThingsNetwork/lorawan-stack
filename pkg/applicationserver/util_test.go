@@ -45,13 +45,16 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 func eui64Ptr(eui types.EUI64) *types.EUI64 {
 	return &eui
 }
+
 func devAddrPtr(devAddr types.DevAddr) *types.DevAddr {
 	return &devAddr
 }
+
 func withDevAddr(ids ttnpb.EndDeviceIdentifiers, devAddr types.DevAddr) ttnpb.EndDeviceIdentifiers {
 	ids.DevAddr = &devAddr
 	return ids
 }
+
 func aes128KeyPtr(key types.AES128Key) *types.AES128Key {
 	return &key
 }
@@ -88,10 +91,6 @@ func startMockNS(ctx context.Context, link chan *mockNSASConn) (*mockNS, string)
 }
 
 var errPermissionDenied = errors.DefinePermissionDenied("permission_denied", "permission denied")
-
-func (ns *mockNS) LinkApplication(stream ttnpb.AsNs_LinkApplicationServer) error {
-	panic("unused")
-}
 
 func (ns *mockNS) sendTraffic(ctx context.Context, link chan *mockNSASConn) {
 	var cc *grpc.ClientConn
