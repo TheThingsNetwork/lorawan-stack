@@ -220,7 +220,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		t.Fatal("Timed out while waiting for Subscribe to return")
 
 	case err := <-app1SubErrCh:
-		if !a.So(err, should.Resemble, context.Canceled) {
+		if !a.So(errors.IsCanceled(err), should.BeTrue) {
 			t.Fatalf("Received unexpected Subscribe error: %v", err)
 		}
 	}

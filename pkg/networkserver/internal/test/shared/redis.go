@@ -20,7 +20,6 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
-	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 var redisNamespace = [...]string{
@@ -39,7 +38,7 @@ func NewRedisApplicationUplinkQueue(ctx context.Context) (ApplicationUplinkQueue
 		func() {
 			flush()
 			if err := cl.Close(); err != nil {
-				t.Errorf("Failed to close Redis uplink queue client: %s", err)
+				t.Errorf("Failed to close Redis uplink queue client: %s", test.FormatError(err))
 			}
 		}
 }
@@ -52,34 +51,32 @@ func NewRedisDeviceRegistry(ctx context.Context) (DeviceRegistry, func()) {
 		LockTTL: test.Delay << 10,
 	}
 	if err := reg.Init(ctx); err != nil {
-		t.Fatalf("Failed to initialize Redis device registry: %s", err)
+		t.Fatalf("Failed to initialize Redis device registry: %s", test.FormatError(err))
 	}
 	return reg,
 		func() {
 			flush()
 			if err := cl.Close(); err != nil {
-				t.Errorf("Failed to close Redis device registry client: %s", err)
+				t.Errorf("Failed to close Redis device registry client: %s", test.FormatError(err))
 			}
 		}
 }
 
 func NewRedisDownlinkTaskQueue(ctx context.Context) (DownlinkTaskQueue, func()) {
-	t, a := test.MustNewTBFromContext(ctx)
-
+	t := test.MustTBFromContext(ctx)
 	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "downlink-tasks")...)
 	q := redis.NewDownlinkTaskQueue(cl, 10000, redisConsumerGroup, redisConsumerID)
-	a.So(q.Init(ctx), should.BeNil)
-
-	ctx, cancel := context.WithCancel(ctx)
+	if err := q.Init(ctx); err != nil {
+		t.Fatalf("Failed to initialize Redis downlink task queue: %s", test.FormatError(err))
+	}
 	return q,
 		func() {
 			if err := q.Close(ctx); err != nil {
-				t.Errorf("Failed to close Redis downlink task queue: %s", err)
+				t.Errorf("Failed to close Redis downlink task queue: %s", test.FormatError(err))
 			}
-			cancel()
 			flush()
 			if err := cl.Close(); err != nil {
-				t.Errorf("Failed to close Redis downlink task queue client: %s", err)
+				t.Errorf("Failed to close Redis downlink task queue client: %s", test.FormatError(err))
 			}
 		}
 }
@@ -94,7 +91,7 @@ func NewRedisUplinkDeduplicator(ctx context.Context) (UplinkDeduplicator, func()
 		func() {
 			flush()
 			if err := cl.Close(); err != nil {
-				t.Errorf("Failed to close Redis uplink deduplicator client: %s", err)
+				t.Errorf("Failed to close Redis uplink deduplicator client: %s", test.FormatError(err))
 			}
 		}
 }

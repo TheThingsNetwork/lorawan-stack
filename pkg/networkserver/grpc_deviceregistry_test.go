@@ -2038,8 +2038,7 @@ func TestDeviceRegistryReset(t *testing.T) {
 				}(),
 				Parallel: true,
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-					ns, ctx, env, stop := StartTest(t, TestConfig{
-						Context: ctx,
+					ns, ctx, env, stop := StartTest(ctx, TestConfig{
 						Component: component.Config{
 							ServiceBase: config.ServiceBase{
 								GRPC: config.GRPC{
