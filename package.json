@@ -102,7 +102,7 @@
     "react-ace": "^6.3.2",
     "react-display-name": "^0.2.3",
     "react-dom": "^16.9.0",
-    "react-grid-system": "^4.3.1",
+    "react-grid-system": "^7.0.3",
     "react-helmet": "^6.1.0",
     "react-hot-loader": "^4.12.11",
     "react-intl": "^5.4.5",
