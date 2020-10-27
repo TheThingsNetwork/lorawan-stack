@@ -38,6 +38,7 @@ For details about compatibility between different releases, see the **Commitment
 - CUPS Server only accepts The Things Stack API Key for token auth.
 - Improve MQTT Pub/Sub task restart conditions and error propagation.
 - Pausing event streams is not saving up arriving events during the pause anymore.
+- Gateway server can now update the gateway location only if the gateway is authenticated.
 
 ### Deprecated
 
