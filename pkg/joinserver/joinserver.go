@@ -319,12 +319,27 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			"used_dev_nonces",
 		},
 		func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			getAppSettings := func(ids ttnpb.ApplicationIdentifiers) func() (*ttnpb.ApplicationActivationSettings, error) {
+				var (
+					res *ttnpb.ApplicationActivationSettings
+					err error
+				)
+				return func() (*ttnpb.ApplicationActivationSettings, error) {
+					if res == nil && err == nil {
+						res, err = js.applicationActivationSettings.GetByID(ctx, ids, []string{
+							"home_net_id",
+							"kek_label",
+							"kek",
+						})
+					}
+					return res, err
+				}
+			}(dev.ApplicationIdentifiers)
+
 			if dn, ok := auth.X509DNFromContext(ctx); ok {
 				netID := dev.NetID
 				if netID == nil {
-					appSettings, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
-						"home_net_id",
-					})
+					appSettings, err := getAppSettings()
 					if err == nil {
 						netID = appSettings.HomeNetID
 					} else if !errors.IsNotFound(err) {
@@ -512,10 +527,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				}
 			}
 			if asKEKLabel == "" {
-				appSettings, err := js.applicationActivationSettings.GetByID(ctx, cryptoDev.ApplicationIdentifiers, []string{
-					"kek",
-					"kek_label",
-				})
+				appSettings, err := getAppSettings()
 				if err != nil {
 					if !errors.IsNotFound(err) {
 						return nil, nil, errGetApplicationActivationSettings.WithCause(err)
