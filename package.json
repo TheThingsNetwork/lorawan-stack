@@ -108,7 +108,7 @@
     "react-hot-loader": "^4.12.11",
     "react-intl": "^5.4.5",
     "react-leaflet": "^2.6.3",
-    "react-paginate": "^5.2.3",
+    "react-paginate": "^6.5.0",
     "react-redux": "^7.1.0",
     "react-router-dom": "^5.1.2",
     "react-select": "^3.1.0",

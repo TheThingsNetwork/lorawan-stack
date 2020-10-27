@@ -12554,10 +12554,10 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
-react-paginate@^5.2.3:
-  version "5.3.1"
-  resolved "https://registry.yarnpkg.com/react-paginate/-/react-paginate-5.3.1.tgz#bb8da341774e154c89b9e091ccb74ab1efa28ac2"
-  integrity sha512-HcRUUWPR4mwmT41OiAi8qrezq75iJPqZPjIrtaT/ebGyZHDC6hJP363e6zNNCcvlL1Wgcq4BTbwkq1fkl7Nn5g==
+react-paginate@^6.5.0:
+  version "6.5.0"
+  resolved "https://registry.yarnpkg.com/react-paginate/-/react-paginate-6.5.0.tgz#b9baf53627b115cfd688afa048776aa45bffda19"
+  integrity sha512-H7xSi9jyiJzgfaj+2nNhQcjZfwzJ/Mxb64V2RiyDctjZyCWojwsaGwMqhLBpQ58iAuMVtBMRQ7ECqMcUKG9QSQ==
   dependencies:
     prop-types "^15.6.1"
 
@@ -14812,7 +14812,7 @@ tslib@^2.0.1:
   integrity sha512-SgIkNheinmEBgx1IUNirK0TUD4X9yjjBRTqqjggWCU3pUEqIk3/Uwl3yRixYKT6WjQuGiwDv4NomL3wqRCj+CQ==
 
 "ttn-lw@file:sdk/js":
-  version "3.10.0-dev"
+  version "3.10.0-rc2"
   dependencies:
     arraybuffer-to-string "^1.0.2"
     axios "^0.19.0"
