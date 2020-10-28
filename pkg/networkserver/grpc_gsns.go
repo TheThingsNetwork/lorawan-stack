@@ -524,13 +524,13 @@ macLoop:
 				break
 			}
 			cmds = cmds[dupCount:]
-			evs, err = mac.HandleLinkADRAns(ctx, dev, pld, uint(dupCount), ns.FrequencyPlans)
+			evs, err = mac.HandleLinkADRAns(ctx, dev, pld, uint(dupCount), cmacFMatchResult.FullFCnt, ns.FrequencyPlans)
 		case ttnpb.CID_DUTY_CYCLE:
 			evs, err = mac.HandleDutyCycleAns(ctx, dev)
 		case ttnpb.CID_RX_PARAM_SETUP:
 			evs, err = mac.HandleRxParamSetupAns(ctx, dev, cmd.GetRxParamSetupAns())
 		case ttnpb.CID_DEV_STATUS:
-			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), session.LastFCntUp, up.ReceivedAt)
+			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), cmacFMatchResult.FullFCnt, up.ReceivedAt)
 			if err == nil {
 				setPaths = append(setPaths,
 					"battery_percentage",
@@ -981,10 +981,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			stored.MACState.DesiredParameters.ADRTxPowerIndex = stored.MACState.CurrentParameters.ADRTxPowerIndex
 			stored.MACState.DesiredParameters.ADRNbTrans = stored.MACState.CurrentParameters.ADRNbTrans
 			if !pld.FHDR.ADR || !mac.DeviceUseADR(stored, ns.defaultMACSettings, matched.phy) {
-				stored.RecentADRUplinks = nil
 				return stored, paths, nil
 			}
-			stored.RecentADRUplinks = appendRecentUplink(stored.RecentADRUplinks, up, mac.OptimalADRUplinkCount)
 			if err := mac.AdaptDataRate(ctx, stored, matched.phy, ns.defaultMACSettings); err != nil {
 				log.FromContext(ctx).WithError(err).Info("Failed to adapt data rate, avoid ADR")
 			}

@@ -235,7 +235,7 @@ func EnqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 	return st, nil
 }
 
-func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, dupCount uint, fps *frequencyplans.Store) (events.Builders, error) {
+func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, dupCount uint, fCntUp uint32, fps *frequencyplans.Store) (events.Builders, error) {
 	if pld == nil {
 		return nil, ErrNoPayload.New()
 	}
@@ -320,15 +320,15 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	}
 	if !dev.MACState.LoRaWANVersion.HasNoChangeDataRateIndex() || req.DataRateIndex != noChangeDataRateIndex {
 		dev.MACState.CurrentParameters.ADRDataRateIndex = req.DataRateIndex
-		dev.RecentADRUplinks = nil
+		dev.MACState.LastADRChangeFCntUp = fCntUp
 	}
 	if !dev.MACState.LoRaWANVersion.HasNoChangeTXPowerIndex() || req.TxPowerIndex != noChangeTXPowerIndex {
 		dev.MACState.CurrentParameters.ADRTxPowerIndex = req.TxPowerIndex
-		dev.RecentADRUplinks = nil
+		dev.MACState.LastADRChangeFCntUp = fCntUp
 	}
 	if req.NbTrans > 0 && dev.MACState.CurrentParameters.ADRNbTrans != req.NbTrans {
 		dev.MACState.CurrentParameters.ADRNbTrans = req.NbTrans
-		dev.RecentADRUplinks = nil
+		dev.MACState.LastADRChangeFCntUp = fCntUp
 	}
 	return evs, nil
 }

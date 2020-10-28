@@ -76,18 +76,14 @@ type ADRMatrixRow struct {
 }
 
 func ADRMatrixToUplinks(m []ADRMatrixRow) []*ttnpb.UplinkMessage {
-	if len(m) > 20 {
-		panic("ADR matrix contains more than 20 rows")
-	}
-
-	ups := make([]*ttnpb.UplinkMessage, 0, 20)
+	ups := make([]*ttnpb.UplinkMessage, 0, len(m))
 	for _, r := range m {
 		ups = append(ups, NewADRUplink(r.FCnt, r.MaxSNR, r.GtwDiversity, r.Confirmed, r.TxSettings))
 	}
 	return ups
 }
 
-func TestLossRate(t *testing.T) {
+func TestADRLossRate(t *testing.T) {
 	for _, tc := range []struct {
 		Name    string
 		Uplinks []*ttnpb.UplinkMessage
@@ -211,7 +207,7 @@ func TestLossRate(t *testing.T) {
 			}(), ","),
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				a.So(lossRate(tc.Uplinks...), should.Equal, tc.Rate)
+				a.So(adrLossRate(tc.Uplinks...), should.Equal, tc.Rate)
 			},
 		})
 	}

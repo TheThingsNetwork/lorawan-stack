@@ -490,43 +490,7 @@ func TestLinkADRReq(t *testing.T) {
 }
 
 func TestHandleLinkADRAns(t *testing.T) {
-	recentADRUplinks := []*ttnpb.UplinkMessage{
-		{
-			Payload: &ttnpb.Message{
-				MHDR: ttnpb.MHDR{
-					MType: ttnpb.MType_UNCONFIRMED_UP,
-				},
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
-						FHDR: ttnpb.FHDR{
-							FCtrl: ttnpb.FCtrl{
-								ADR: true,
-							},
-							FCnt: 42,
-						},
-					},
-				},
-			},
-		},
-		{
-			Payload: &ttnpb.Message{
-				MHDR: ttnpb.MHDR{
-					MType: ttnpb.MType_UNCONFIRMED_UP,
-				},
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
-						FHDR: ttnpb.FHDR{
-							FCtrl: ttnpb.FCtrl{
-								ADR: true,
-							},
-							FCnt: 43,
-						},
-					},
-				},
-			},
-		},
-	}
-
+	const fCntUp = 42
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
@@ -543,7 +507,6 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-				RecentADRUplinks: recentADRUplinks,
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -551,7 +514,6 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-				RecentADRUplinks: recentADRUplinks,
 			},
 			Error: ErrNoPayload,
 		},
@@ -563,7 +525,6 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-				RecentADRUplinks: recentADRUplinks,
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -571,7 +532,6 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
-				RecentADRUplinks: recentADRUplinks,
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{
 				ChannelMaskAck:   true,
@@ -615,7 +575,6 @@ func TestHandleLinkADRAns(t *testing.T) {
 						}).MACCommand(),
 					},
 				},
-				RecentADRUplinks: recentADRUplinks,
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -638,7 +597,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 							nil,
 						},
 					},
-					PendingRequests: []*ttnpb.MACCommand{},
+					PendingRequests:     []*ttnpb.MACCommand{},
+					LastADRChangeFCntUp: fCntUp,
 				},
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{
@@ -703,7 +663,6 @@ func TestHandleLinkADRAns(t *testing.T) {
 						}).MACCommand(),
 					},
 				},
-				RecentADRUplinks: recentADRUplinks,
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -731,7 +690,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 							{EnableUplink: false},
 						},
 					},
-					PendingRequests: []*ttnpb.MACCommand{},
+					PendingRequests:     []*ttnpb.MACCommand{},
+					LastADRChangeFCntUp: fCntUp,
 				},
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{
@@ -797,7 +757,6 @@ func TestHandleLinkADRAns(t *testing.T) {
 						}).MACCommand(),
 					},
 				},
-				RecentADRUplinks: recentADRUplinks,
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -825,7 +784,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 							{EnableUplink: false},
 						},
 					},
-					PendingRequests: []*ttnpb.MACCommand{},
+					PendingRequests:     []*ttnpb.MACCommand{},
+					LastADRChangeFCntUp: fCntUp,
 				},
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{
@@ -889,8 +849,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 							},
 						}).MACCommand(),
 					},
+					LastADRChangeFCntUp: fCntUp - 3,
 				},
-				RecentADRUplinks: recentADRUplinks,
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -930,6 +890,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 							},
 						}).MACCommand(),
 					},
+					LastADRChangeFCntUp: fCntUp,
 				},
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{
@@ -979,6 +940,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 							},
 						}).MACCommand(),
 					},
+					LastADRChangeFCntUp: fCntUp - 2,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
@@ -993,8 +955,9 @@ func TestHandleLinkADRAns(t *testing.T) {
 						params.ADRNbTrans = 3
 						return params
 					}(),
-					DesiredParameters: MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.PHY_V1_0_2_REV_B),
-					PendingRequests:   []*ttnpb.MACCommand{},
+					DesiredParameters:   MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.PHY_V1_0_2_REV_B),
+					PendingRequests:     []*ttnpb.MACCommand{},
+					LastADRChangeFCntUp: fCntUp,
 				},
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{
@@ -1018,7 +981,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				dev := CopyEndDevice(tc.Device)
 
-				evs, err := HandleLinkADRAns(ctx, dev, tc.Payload, tc.DupCount, frequencyplans.NewStore(test.FrequencyPlansFetcher))
+				evs, err := HandleLinkADRAns(ctx, dev, tc.Payload, tc.DupCount, fCntUp, frequencyplans.NewStore(test.FrequencyPlansFetcher))
 				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 					tc.Error == nil && !a.So(err, should.BeNil) {
 					t.FailNow()

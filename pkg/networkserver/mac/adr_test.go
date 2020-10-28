@@ -87,13 +87,13 @@ func TestAdaptDataRate(t *testing.T) {
 						ADRTxPowerIndex:  2,
 						Channels:         MakeDefaultEU868CurrentChannels(),
 					},
+					RecentUplinks: semtechPaperUplinks,
 				},
 				MACSettings: &ttnpb.MACSettings{
 					ADRMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
-				RecentADRUplinks: semtechPaperUplinks,
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				dev.MACState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_4
@@ -118,13 +118,13 @@ func TestAdaptDataRate(t *testing.T) {
 					RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
 						ttnpb.DATA_RATE_1, ttnpb.DATA_RATE_4,
 					},
+					RecentUplinks: semtechPaperUplinks,
 				},
 				MACSettings: &ttnpb.MACSettings{
 					ADRMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
-				RecentADRUplinks: semtechPaperUplinks,
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				dev.MACState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_3
@@ -149,13 +149,13 @@ func TestAdaptDataRate(t *testing.T) {
 					RejectedADRTxPowerIndexes: []uint32{
 						1,
 					},
+					RecentUplinks: semtechPaperUplinks,
 				},
 				MACSettings: &ttnpb.MACSettings{
 					ADRMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
-				RecentADRUplinks: semtechPaperUplinks,
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				dev.MACState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_4
@@ -180,13 +180,13 @@ func TestAdaptDataRate(t *testing.T) {
 					RejectedADRTxPowerIndexes: []uint32{
 						0, 1,
 					},
+					RecentUplinks: semtechPaperUplinks,
 				},
 				MACSettings: &ttnpb.MACSettings{
 					ADRMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
-				RecentADRUplinks: semtechPaperUplinks,
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				dev.MACState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_3
@@ -214,13 +214,13 @@ func TestAdaptDataRate(t *testing.T) {
 					RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
 						ttnpb.DATA_RATE_1, ttnpb.DATA_RATE_4,
 					},
+					RecentUplinks: semtechPaperUplinks,
 				},
 				MACSettings: &ttnpb.MACSettings{
 					ADRMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
-				RecentADRUplinks: semtechPaperUplinks,
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				dev.MACState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_3
@@ -248,13 +248,13 @@ func TestAdaptDataRate(t *testing.T) {
 					RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
 						ttnpb.DATA_RATE_3,
 					},
+					RecentUplinks: semtechPaperUplinks,
 				},
 				MACSettings: &ttnpb.MACSettings{
 					ADRMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
-				RecentADRUplinks: semtechPaperUplinks,
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				dev.MACState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_2
