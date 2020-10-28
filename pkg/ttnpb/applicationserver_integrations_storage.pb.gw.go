@@ -20,6 +20,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -30,6 +31,7 @@ var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
+var _ = metadata.Join
 
 var (
 	filter_ApplicationUpStorage_GetStoredApplicationUp_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3, "type": 4}, Base: []int{1, 1, 1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 2, 3, 2, 1, 4, 5, 6}}
@@ -159,6 +161,7 @@ func request_ApplicationUpStorage_GetStoredApplicationUp_1(ctx context.Context, 
 // RegisterApplicationUpStorageHandlerServer registers the http handlers for service ApplicationUpStorage to "mux".
 // UnaryRPC     :call ApplicationUpStorageServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterApplicationUpStorageHandlerFromEndpoint instead.
 func RegisterApplicationUpStorageHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ApplicationUpStorageServer) error {
 
 	mux.Handle("GET", pattern_ApplicationUpStorage_GetStoredApplicationUp_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
