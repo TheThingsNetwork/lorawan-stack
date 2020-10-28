@@ -278,6 +278,9 @@ export default {
   ns: {
     generateDevAddress: ttnClient.Ns.generateDevAddress.bind(ttnClient.Ns),
   },
+  is: {
+    getConfiguration: ttnClient.Is.getConfiguration.bind(ttnClient.Is),
+  },
   organizations: {
     list: ttnClient.Organizations.getAll.bind(ttnClient.Organizations),
     search: ttnClient.Organizations.search.bind(ttnClient.Organizations),
