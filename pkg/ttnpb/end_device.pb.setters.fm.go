@@ -1411,6 +1411,16 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			} else {
 				dst.RejectedDataRateRanges = nil
 			}
+		case "last_adr_change_f_cnt_up":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_adr_change_f_cnt_up' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastADRChangeFCntUp = src.LastADRChangeFCntUp
+			} else {
+				var zero uint32
+				dst.LastADRChangeFCntUp = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

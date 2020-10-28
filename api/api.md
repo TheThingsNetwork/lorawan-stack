@@ -2462,6 +2462,7 @@ This is used internally by the Network Server.
 | `rejected_frequencies` | [`uint64`](#uint64) | repeated | Frequencies rejected by the device. |
 | `last_downlink_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the last downlink message was scheduled. |
 | `rejected_data_rate_ranges` | [`MACState.RejectedDataRateRangesEntry`](#ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry) | repeated | Data rate ranges rejected by the device per frequency. |
+| `last_adr_change_f_cnt_up` | [`uint32`](#uint32) |  | Frame counter of uplink, which confirmed the last ADR parameter change. |
 
 #### Field Rules
 

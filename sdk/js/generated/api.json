@@ -9691,6 +9691,16 @@
               "fullType": "ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry",
               "ismap": true,
               "defaultValue": ""
+            },
+            {
+              "name": "last_adr_change_f_cnt_up",
+              "description": "Frame counter of uplink, which confirmed the last ADR parameter change.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

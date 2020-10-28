@@ -370,6 +370,9 @@ message MACState {
   }
   // Data rate ranges rejected by the device per frequency.
   map<uint64, DataRateRanges> rejected_data_rate_ranges = 21;
+
+  // Frame counter of uplink, which confirmed the last ADR parameter change.
+  uint32 last_adr_change_f_cnt_up = 22 [(gogoproto.customname) = "LastADRChangeFCntUp"];
 }
 
 // Power state of the device.
