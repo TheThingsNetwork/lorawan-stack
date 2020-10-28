@@ -74,7 +74,6 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 	jsKEKEnvelopeUnwrapped := &ttnpb.KeyEnvelope{
 		Key: &jsKEK,
 	}
-	jsKEKEnvelopeWrapped := MustWrapAES128Key(ctx, jsKEK, jsKEKLabel, keyVault)
 
 	credOpt := grpc.PerRPCCredentials(rpcmetadata.MD{
 		AuthType:      "Bearer",
@@ -234,7 +233,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				ApplicationIdentifiers: appID,
 				ApplicationActivationSettings: ttnpb.ApplicationActivationSettings{
 					KEKLabel: sessionKEKLabel,
-					KEK:      jsKEKEnvelopeWrapped,
+					KEK:      jsKEKEnvelopeUnwrapped,
 				},
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{
@@ -253,7 +252,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				ApplicationIdentifiers: appID,
 				ApplicationActivationSettings: ttnpb.ApplicationActivationSettings{
 					KEKLabel: sessionKEKLabel,
-					KEK:      jsKEKEnvelopeWrapped,
+					KEK:      jsKEKEnvelopeUnwrapped,
 				},
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{
@@ -275,7 +274,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				ApplicationIdentifiers: appID,
 				ApplicationActivationSettings: ttnpb.ApplicationActivationSettings{
 					KEKLabel: sessionKEKLabel,
-					KEK:      jsKEKEnvelopeWrapped,
+					KEK:      jsKEKEnvelopeUnwrapped,
 				},
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{
@@ -297,7 +296,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				ApplicationIdentifiers: appID,
 				ApplicationActivationSettings: ttnpb.ApplicationActivationSettings{
 					KEKLabel: sessionKEKLabel,
-					KEK:      jsKEKEnvelopeWrapped,
+					KEK:      jsKEKEnvelopeUnwrapped,
 				},
 			},
 			Rights: []ttnpb.Right{
@@ -414,21 +413,6 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		CreatePaths    []string
 		GetSettings    *ttnpb.ApplicationActivationSettings
 	}{
-		{
-			Name: "KEK encrypted at rest",
-			CreateSettings: &ttnpb.ApplicationActivationSettings{
-				KEKLabel: sessionKEKLabel,
-				KEK:      jsKEKEnvelopeWrapped,
-			},
-			CreatePaths: []string{
-				"kek",
-				"kek_label",
-			},
-			GetSettings: &ttnpb.ApplicationActivationSettings{
-				KEKLabel: sessionKEKLabel,
-				KEK:      jsKEKEnvelopeUnwrapped,
-			},
-		},
 		{
 			Name: "KEK sent plaintext",
 			CreateSettings: &ttnpb.ApplicationActivationSettings{
