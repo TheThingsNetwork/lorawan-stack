@@ -115,7 +115,7 @@ func TestLink(t *testing.T) {
 				ctx := rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(ctx, app2): {
-							Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_LINK},
+							Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC},
 						},
 					},
 				})
@@ -217,7 +217,7 @@ func TestLink(t *testing.T) {
 				ctx := rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(ctx, app3): {
-							Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_LINK},
+							Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC},
 						},
 					},
 				})

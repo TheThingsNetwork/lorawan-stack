@@ -39,6 +39,7 @@ For details about compatibility between different releases, see the **Commitment
 - Improve MQTT Pub/Sub task restart conditions and error propagation.
 - Pausing event streams is not saving up arriving events during the pause anymore.
 - Gateway server can now update the gateway location only if the gateway is authenticated.
+- Right to manage links on Application Server is now `RIGHT_APPLICATION_SETTINGS_BASIC`.
 
 ### Deprecated
 
