@@ -9373,6 +9373,9 @@
         "downlink_queued": {
           "$ref": "#/definitions/v3ApplicationPubSubMessage"
         },
+        "downlink_queue_invalidated": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage"
+        },
         "location_solved": {
           "$ref": "#/definitions/v3ApplicationPubSubMessage"
         },
@@ -9628,6 +9631,9 @@
         "downlink_queued": {
           "$ref": "#/definitions/v3ApplicationWebhookMessage"
         },
+        "downlink_queue_invalidated": {
+          "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
         "location_solved": {
           "$ref": "#/definitions/v3ApplicationWebhookMessage"
         },
@@ -9733,6 +9739,9 @@
           "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
         },
         "downlink_queued": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "downlink_queue_invalidated": {
           "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
         },
         "location_solved": {
