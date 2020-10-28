@@ -37,6 +37,7 @@ const pubsubEntitySelector = [
   'downlink_nack',
   'downlink_push',
   'downlink_queued',
+  'downlink_queue_invalidated',
   'downlink_replace',
   'downlink_sent',
   'join_accept',

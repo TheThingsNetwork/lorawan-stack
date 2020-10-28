@@ -226,6 +226,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 			"downlink_failed",
 			"downlink_nack",
 			"downlink_queued",
+			"downlink_queue_invalidated",
 			"downlink_sent",
 			"format",
 			"headers",
@@ -280,6 +281,8 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 		cfg = hook.DownlinkFailed
 	case *ttnpb.ApplicationUp_DownlinkQueued:
 		cfg = hook.DownlinkQueued
+	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
+		cfg = hook.DownlinkQueueInvalidated
 	case *ttnpb.ApplicationUp_LocationSolved:
 		cfg = hook.LocationSolved
 	case *ttnpb.ApplicationUp_ServiceData:

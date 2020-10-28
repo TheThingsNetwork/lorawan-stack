@@ -111,6 +111,10 @@ func TestV3Topics(t *testing.T) {
 			Expected: fmt.Sprintf("v3/%s/devices/%s/down/queued", appUID, devID),
 		},
 		{
+			Fn:       topics.Default.DownlinkQueueInvalidatedTopic,
+			Expected: fmt.Sprintf("v3/%s/devices/%s/down/invalidated", appUID, devID),
+		},
+		{
 			Fn:       topics.Default.LocationSolvedTopic,
 			Expected: fmt.Sprintf("v3/%s/devices/%s/location/solved", appUID, devID),
 		},

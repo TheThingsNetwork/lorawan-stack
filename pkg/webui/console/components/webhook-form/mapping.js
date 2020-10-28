@@ -40,6 +40,7 @@ export const mapWebhookToFormValues = webhook => ({
   downlink_sent: mapWebhookMessageTypeToFormValue(webhook.downlink_sent),
   downlink_failed: mapWebhookMessageTypeToFormValue(webhook.downlink_failed),
   downlink_queued: mapWebhookMessageTypeToFormValue(webhook.downlink_queued),
+  downlink_queue_invalidated: mapWebhookMessageTypeToFormValue(webhook.downlink_queue_invalidated),
   location_solved: mapWebhookMessageTypeToFormValue(webhook.location_solved),
   service_data: mapWebhookMessageTypeToFormValue(webhook.service_data),
 })
@@ -77,6 +78,9 @@ export const mapFormValuesToWebhook = function(values, appId) {
     downlink_sent: mapMessageTypeFormValueToWebhookMessageType(values.downlink_sent),
     downlink_failed: mapMessageTypeFormValueToWebhookMessageType(values.downlink_failed),
     downlink_queued: mapMessageTypeFormValueToWebhookMessageType(values.downlink_queued),
+    downlink_queue_invalidated: mapMessageTypeFormValueToWebhookMessageType(
+      values.downlink_queue_invalidated,
+    ),
     location_solved: mapMessageTypeFormValueToWebhookMessageType(values.location_solved),
     service_data: mapMessageTypeFormValueToWebhookMessageType(values.service_data),
   }
@@ -94,6 +98,7 @@ export const blankValues = {
   downlink_sent: { enabled: false, value: '' },
   downlink_failed: { enabled: false, value: '' },
   downlink_queued: { enabled: false, value: '' },
+  downlink_queue_invalidated: { enabled: false, value: '' },
   location_solved: { enabled: false, value: '' },
   service_data: { enabled: false, value: '' },
 }

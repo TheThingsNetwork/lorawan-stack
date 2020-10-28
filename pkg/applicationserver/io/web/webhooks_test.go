@@ -104,6 +104,9 @@ func TestWebhooks(t *testing.T) {
 						DownlinkQueued: &ttnpb.ApplicationWebhook_Message{
 							Path: tc.prefix + "down/queued",
 						},
+						DownlinkQueueInvalidated: &ttnpb.ApplicationWebhook_Message{
+							Path: tc.prefix + "down/invalidated",
+						},
 						DownlinkFailed: &ttnpb.ApplicationWebhook_Message{
 							Path: tc.prefix + "down/failed",
 						},
@@ -121,6 +124,7 @@ func TestWebhooks(t *testing.T) {
 						"downlink_failed",
 						"downlink_nack",
 						"downlink_queued",
+						"downlink_queue_invalidated",
 						"downlink_sent",
 						"format",
 						"headers",
@@ -278,6 +282,27 @@ func TestWebhooks(t *testing.T) {
 								},
 								OK:  true,
 								URL: fmt.Sprintf("%s/down/queued", baseURL),
+							},
+							{
+								Name: "DownlinkMessage/QueueInvalidated",
+								Message: &ttnpb.ApplicationUp{
+									EndDeviceIdentifiers: registeredDeviceID,
+									Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+										DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
+											Downlinks: []*ttnpb.ApplicationDownlink{
+												{
+													SessionKeyID: []byte{0x22},
+													FCnt:         42,
+													FPort:        42,
+													FRMPayload:   []byte{0x1, 0x2, 0x3},
+												},
+											},
+											LastFCntDown: 42,
+										},
+									},
+								},
+								OK:  true,
+								URL: fmt.Sprintf("%s/down/invalidated", baseURL),
 							},
 							{
 								Name: "DownlinkMessage/Failed",
