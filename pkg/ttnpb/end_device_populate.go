@@ -15,11 +15,7 @@
 package ttnpb
 
 import (
-	"sort"
-
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/mohae/deepcopy"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion {
@@ -63,95 +59,6 @@ func NewPopulatedMACState(r randyEndDevice, easy bool) *MACState {
 	if r.Intn(10) != 0 {
 		out.PendingApplicationDownlink = NewPopulatedApplicationDownlink(r, easy)
 	}
-	return out
-}
-
-func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
-	out := &EndDevice{}
-	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, easy)
-	out.RootKeys = NewPopulatedRootKeys(r, easy)
-
-	out.LastDevNonce = r.Uint32()
-	out.LastJoinNonce = r.Uint32()
-	out.LastRJCount0 = r.Uint32()
-	out.LastRJCount1 = r.Uint32()
-
-	out.UsedDevNonces = make([]uint32, r.Intn(100))
-	for i := range out.UsedDevNonces {
-		out.UsedDevNonces[i] = r.Uint32()
-	}
-	sort.Slice(out.UsedDevNonces, func(i, j int) bool { return out.UsedDevNonces[i] < out.UsedDevNonces[j] })
-
-	if r.Intn(10) != 0 {
-		out.Session = NewPopulatedSession(r, easy)
-	}
-	if out.Session != nil {
-		out.EndDeviceIdentifiers.DevAddr = &types.DevAddr{}
-		copy(out.EndDeviceIdentifiers.DevAddr[:], out.Session.DevAddr[:])
-	}
-
-	out.LoRaWANVersion = MAC_V1_1
-	out.LoRaWANPHYVersion = PHY_V1_1_REV_B
-	out.FrequencyPlanID = "EU_863_870"
-	out.MACSettings = NewPopulatedMACSettings(r, easy)
-	out.MACState = NewPopulatedMACState(r, easy)
-	out.MACState.CurrentParameters.Channels = []*MACParameters_Channel{
-		{
-			UplinkFrequency:   868100000,
-			DownlinkFrequency: 868100000,
-			MinDataRateIndex:  0,
-			MaxDataRateIndex:  5,
-			EnableUplink:      true,
-		},
-		{
-			UplinkFrequency:   868300000,
-			DownlinkFrequency: 868300000,
-			MinDataRateIndex:  0,
-			MaxDataRateIndex:  5,
-			EnableUplink:      true,
-		},
-		{
-			UplinkFrequency:   868500000,
-			DownlinkFrequency: 868500000,
-			MinDataRateIndex:  0,
-			MaxDataRateIndex:  5,
-			EnableUplink:      true,
-		},
-	}
-	out.MACState.DesiredParameters.Channels = deepcopy.Copy(out.MACState.CurrentParameters.Channels).([]*MACParameters_Channel)
-	out.NetworkServerAddress = randStringEndDevice(r)
-	out.ApplicationServerAddress = randStringEndDevice(r)
-	out.VersionIDs = NewPopulatedEndDeviceVersionIdentifiers(r, easy)
-	if r.Intn(10) != 0 {
-		out.RecentUplinks = make([]*UplinkMessage, r.Intn(5))
-		for i := range out.RecentUplinks {
-			out.RecentUplinks[i] = NewPopulatedUplinkMessage(r, easy)
-		}
-	}
-	if r.Intn(10) != 0 {
-		out.RecentDownlinks = make([]*DownlinkMessage, r.Intn(5))
-		for i := range out.RecentDownlinks {
-			out.RecentDownlinks[i] = NewPopulatedDownlinkMessage(r, easy)
-		}
-	}
-	if r.Intn(10) != 0 {
-		out.QueuedApplicationDownlinks = make([]*ApplicationDownlink, r.Intn(5))
-		for i := range out.QueuedApplicationDownlinks {
-			out.QueuedApplicationDownlinks[i] = NewPopulatedApplicationDownlink(r, easy)
-		}
-	}
-	out.LastDevStatusReceivedAt = pbtypes.NewPopulatedStdTime(r, easy)
-	if r.Intn(2) == 0 {
-		out.BatteryPercentage = &pbtypes.FloatValue{
-			Value: float32(r.Intn(100)) / 100,
-		}
-	}
-	out.DownlinkMargin = r.Int31()
-	if r.Intn(2) == 0 {
-		out.DownlinkMargin *= -1
-	}
-	out.Formatters = NewPopulatedMessagePayloadFormatters(r, easy)
-	out.SupportsJoin = r.Intn(2) == 0
 	return out
 }
 

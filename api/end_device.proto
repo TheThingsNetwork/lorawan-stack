@@ -381,8 +381,6 @@ enum PowerState {
 
 // Authentication code for end devices.
 message EndDeviceAuthenticationCode {
-  option (gogoproto.populate) = false;
-
   string value = 1 [(validate.rules).string.pattern = "^[A-Z0-9]{1,32}$"];
   google.protobuf.Timestamp valid_from = 2 [(gogoproto.stdtime) = true];
   google.protobuf.Timestamp valid_to = 3 [(gogoproto.stdtime) = true];
@@ -392,8 +390,6 @@ message EndDeviceAuthenticationCode {
 // The persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.
 // SDKs are responsible for combining (if desired) the three.
 message EndDevice {
-  option (gogoproto.populate) = false;
-
   EndDeviceIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
