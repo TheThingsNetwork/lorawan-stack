@@ -21,6 +21,10 @@ import {
   createStartEventsStreamSuccessActionType,
   startEventsStreamFailure,
   createStartEventsStreamFailureActionType,
+  pauseEventsStream,
+  createPauseEventsStreamActionType,
+  resumeEventsStream,
+  createResumeEventsStreamActionType,
   stopEventsStream,
   createStopEventsStreamActionType,
   clearEvents,
@@ -109,6 +113,8 @@ export const stopGatewayStatistics = () => ({ type: STOP_GTW_STATS })
 export const START_GTW_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_GTW_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)
 export const START_GTW_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
+export const PAUSE_GTW_EVENT_STREAM = createPauseEventsStreamActionType(SHARED_NAME)
+export const RESUME_GTW_EVENT_STREAM = createResumeEventsStreamActionType(SHARED_NAME)
 export const STOP_GTW_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_GTW_EVENTS = createClearEventsActionType(SHARED_NAME)
 export const GET_GTW_EVENT_MESSAGE_SUCCESS = createGetEventMessageSuccessActionType(SHARED_NAME)
@@ -116,6 +122,8 @@ export const GET_GTW_EVENT_MESSAGE_SUCCESS = createGetEventMessageSuccessActionT
 export const startGatewayEventsStream = startEventsStream(SHARED_NAME)
 export const startGatewayEventsStreamSuccess = startEventsStreamSuccess(SHARED_NAME)
 export const startGatewayEventsStreamFailure = startEventsStreamFailure(SHARED_NAME)
+export const pauseGatewayEventsStream = pauseEventsStream(SHARED_NAME)
+export const resumeGatewayEventsStream = resumeEventsStream(SHARED_NAME)
 export const stopGatewayEventsStream = stopEventsStream(SHARED_NAME)
 export const clearGatewayEventsStream = clearEvents(SHARED_NAME)
 export const getGatewayEventMessageSuccess = getEventMessageSuccess(SHARED_NAME)

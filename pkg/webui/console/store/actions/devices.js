@@ -19,6 +19,10 @@ import {
   createStartEventsStreamSuccessActionType,
   startEventsStreamFailure,
   createStartEventsStreamFailureActionType,
+  pauseEventsStream,
+  createPauseEventsStreamActionType,
+  resumeEventsStream,
+  createResumeEventsStreamActionType,
   stopEventsStream,
   createStopEventsStreamActionType,
   clearEvents,
@@ -67,6 +71,11 @@ export const START_DEVICE_EVENT_STREAM_FAILURE = createStartEventsStreamFailureA
   SHARED_NAME,
 )
 export const STOP_DEVICE_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
+
+export const PAUSE_DEVICE_EVENT_STREAM = createPauseEventsStreamActionType(SHARED_NAME)
+
+export const RESUME_DEVICE_EVENT_STREAM = createResumeEventsStreamActionType(SHARED_NAME)
+
 export const CLEAR_DEVICE_EVENTS = createClearEventsActionType(SHARED_NAME)
 
 export const startDeviceEventsStream = startEventsStream(SHARED_NAME)
@@ -74,6 +83,10 @@ export const startDeviceEventsStream = startEventsStream(SHARED_NAME)
 export const startDeviceEventsStreamSuccess = startEventsStreamSuccess(SHARED_NAME)
 
 export const startDeviceEventsStreamFailure = startEventsStreamFailure(SHARED_NAME)
+
+export const pauseDeviceEventsStream = pauseEventsStream(SHARED_NAME)
+
+export const resumeDeviceEventsStream = resumeEventsStream(SHARED_NAME)
 
 export const stopDeviceEventsStream = stopEventsStream(SHARED_NAME)
 

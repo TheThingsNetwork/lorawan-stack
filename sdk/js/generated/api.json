@@ -11235,7 +11235,7 @@
             },
             {
               "name": "update_location_from_status",
-              "description": "update the location of this gateway from status messages",
+              "description": "Update the location of this gateway from status messages. This only works for gateways connecting with authentication; gateways connected over UDP are not supported.",
               "label": "",
               "type": "bool",
               "longType": "bool",

@@ -28,11 +28,18 @@ export const createEventsStatusSelector = entity =>
     return store ? store.status : 'unknown'
   }
 
+export const createEventsPausedSelector = entity =>
+  function(state, entityId) {
+    const store = selectEventsStore(state.events[entity], entityId)
+
+    return Boolean(store.paused)
+  }
+
 export const createEventsInterruptedSelector = entity =>
   function(state, entityId) {
     const store = selectEventsStore(state.events[entity], entityId)
 
-    return store ? store.interrupted : false
+    return Boolean(store.interrupted)
   }
 
 export const createEventsErrorSelector = entity =>

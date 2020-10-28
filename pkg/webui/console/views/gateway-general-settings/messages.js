@@ -12,24 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createNetworkErrorEvent, createUnknownErrorEvent } from './definitions'
+import { defineMessages } from 'react-intl'
 
-export const defineSyntheticEvent = name => data => ({
-  time: new Date().toISOString(),
-  name,
-  isError: name.startsWith('synthetic.error'),
-  isSynthetic: true,
-  unique_id: `synthetic.${Date.now()}`,
-  data,
+const messages = defineMessages({
+  basicTitle: 'Basic settings',
+  basicDescription: 'General settings, gateway updates and metadata',
+  lorawanTitle: 'LoRaWAN options',
+  lorawanDescription: 'LoRaWAN network-layer settings',
+  updateSuccess: 'Gateway updated',
+  deleteSuccess: 'Gateway deleted',
+  deleteFailure: 'Gateway delete error',
+  deleteGateway: 'Delete gateway',
+  modalWarning:
+    'Are you sure you want to delete "{gtwName}"? This action cannot be undone and it will not be possible to reuse the gateway ID.',
 })
 
-export const createSyntheticEventFromError = error => {
-  if (error instanceof Error) {
-    const errorString = error.toString()
-    if (error.message === 'network error') {
-      return createNetworkErrorEvent({ error: errorString })
-    }
-
-    return createUnknownErrorEvent({ error: errorString })
-  }
-}
+export default messages

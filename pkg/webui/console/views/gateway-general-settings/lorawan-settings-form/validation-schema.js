@@ -12,24 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createNetworkErrorEvent, createUnknownErrorEvent } from './definitions'
+import Yup from '@ttn-lw/lib/yup'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-export const defineSyntheticEvent = name => data => ({
-  time: new Date().toISOString(),
-  name,
-  isError: name.startsWith('synthetic.error'),
-  isSynthetic: true,
-  unique_id: `synthetic.${Date.now()}`,
-  data,
+import { delay as delayRegexp } from '@console/lib/regexp'
+
+const validationSchema = Yup.object().shape({
+  frequency_plan_id: Yup.string(),
+  schedule_downlink_late: Yup.boolean().default(false),
+  schedule_anytime_delay: Yup.string().matches(
+    delayRegexp,
+    Yup.passValues(sharedMessages.validateDelayFormat),
+  ),
 })
 
-export const createSyntheticEventFromError = error => {
-  if (error instanceof Error) {
-    const errorString = error.toString()
-    if (error.message === 'network error') {
-      return createNetworkErrorEvent({ error: errorString })
-    }
-
-    return createUnknownErrorEvent({ error: errorString })
-  }
-}
+export default validationSchema

@@ -12,24 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createNetworkErrorEvent, createUnknownErrorEvent } from './definitions'
+import deleteTests from './delete'
 
-export const defineSyntheticEvent = name => data => ({
-  time: new Date().toISOString(),
-  name,
-  isError: name.startsWith('synthetic.error'),
-  isSynthetic: true,
-  unique_id: `synthetic.${Date.now()}`,
-  data,
-})
-
-export const createSyntheticEventFromError = error => {
-  if (error instanceof Error) {
-    const errorString = error.toString()
-    if (error.message === 'network error') {
-      return createNetworkErrorEvent({ error: errorString })
-    }
-
-    return createUnknownErrorEvent({ error: errorString })
-  }
-}
+export default [...deleteTests]

@@ -27,7 +27,7 @@ export const eventMessages = defineMessages({
   'synthetic.status.reconnecting:type': 'Reconnecting',
   'synthetic.status.reconnecting:preview': 'Attempting to reconnect…',
 
-  'synthetic.status.reconnected:type': 'Stream resumed',
+  'synthetic.status.reconnected:type': 'Stream reconnected',
   'synthetic.status.reconnected:preview': 'The stream connection has been re-established',
 
   'synthetic.status.closed:type': 'Stream connection closed',
@@ -35,14 +35,22 @@ export const eventMessages = defineMessages({
 
   'synthetic.status.cleared:type': 'Events cleared',
   'synthetic.status.cleared:preview': 'The events list has been cleared',
+
+  'synthetic.status.paused:type': 'Stream paused',
+  'synthetic.status.paused:preview': 'The event stream has been paused',
+
+  'synthetic.status.resumed:type': 'Stream resumed',
+  'synthetic.status.resumed:preview': 'The event stream has been resumed after being paused',
 })
 
-export const EVENT_UNKNOWN_ERROR = 'error.unknown'
-export const EVENT_NETWORK_ERROR = 'error.network_error'
-export const EVENT_STATUS_RECONNECTING = 'status.reconnecting'
-export const EVENT_STATUS_RECONNECTED = 'status.reconnected'
-export const EVENT_STATUS_CLOSED = 'status.closed'
-export const EVENT_STATUS_CLEARED = 'status.cleared'
+export const EVENT_UNKNOWN_ERROR = 'synthetic.error.unknown'
+export const EVENT_NETWORK_ERROR = 'synthetic.error.network_error'
+export const EVENT_STATUS_RECONNECTING = 'synthetic.status.reconnecting'
+export const EVENT_STATUS_RECONNECTED = 'synthetic.status.reconnected'
+export const EVENT_STATUS_CLOSED = 'synthetic.status.closed'
+export const EVENT_STATUS_CLEARED = 'synthetic.status.cleared'
+export const EVENT_STATUS_PAUSED = 'synthetic.status.paused'
+export const EVENT_STATUS_RESUMED = 'synthetic.status.resumed'
 
 export const createUnknownErrorEvent = defineSyntheticEvent(EVENT_UNKNOWN_ERROR)
 export const createNetworkErrorEvent = defineSyntheticEvent(EVENT_NETWORK_ERROR)
@@ -50,3 +58,5 @@ export const createStatusReconnectingEvent = defineSyntheticEvent(EVENT_STATUS_R
 export const createStatusReconnectedEvent = defineSyntheticEvent(EVENT_STATUS_RECONNECTED)
 export const createStatusClosedEvent = defineSyntheticEvent(EVENT_STATUS_CLOSED)
 export const createStatusClearedEvent = defineSyntheticEvent(EVENT_STATUS_CLEARED)
+export const createStatusPausedEvent = defineSyntheticEvent(EVENT_STATUS_PAUSED)
+export const createStatusResumedEvent = defineSyntheticEvent(EVENT_STATUS_RESUMED)

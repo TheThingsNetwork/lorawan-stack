@@ -7,18 +7,35 @@ c/identity server:
 c/gateway server:
 - pkg/gatewayserver/*
 - pkg/gatewayserver/**/*
+- pkg/basicstation/*
 
 c/gateway conf server:
 - pkg/gatewayconfigurationserver/*
 - pkg/gatewayconfigurationserver/**/*
+- pkg/basicstation/*
+- pkg/basicstation/cups/*
+- pkg/pfconfig/*
+- pkg/pfconfig/**/*
+
+c/cups:
+- pkg/basicstation/*
+- pkg/basicstation/cups/*
 
 c/network server:
 - pkg/networkserver/*
 - pkg/networkserver/**/*
 
+c/device converter:
+- pkg/devicetemplateconverter/*
+- pkg/devicetemplates/*
+
 c/application server:
 - pkg/applicationserver/*
 - pkg/applicationserver/**/*
+- pkg/messageprocessors/*
+- pkg/messageprocessors/**/*
+- pkg/scripting/*
+- pkg/scripting/**/*
 
 c/join server:
 - pkg/joinserver/*
@@ -41,12 +58,17 @@ compat/config:
 - pkg/**/config.go
 - pkg/**/config.*.go
 - pkg/config/*.go
+- pkg/config/**/*.go
 
 compat/db:
 - pkg/identityserver/store/*.go
 - pkg/identityserver/store/**/*.go
 - pkg/**/redis/*.go
 - pkg/**/redis/**/*.go
+
+security:
+- pkg/crypto/*
+- pkg/crypto/**/*
 
 # NOTE: We're not assigning bump/minor because that is a choice for the maintainer.
 
@@ -56,12 +78,6 @@ dependencies:
 - yarn.lock
 - sdk/js/yarn.lock
 
-documentation:
-- '*.md'
-- '**/*.md'
-- doc/content/*
-- doc/content/**/*
-
 ui/cli:
 - cmd/ttn-lw-cli/*
 - cmd/ttn-lw-cli/**/*
@@ -69,3 +85,8 @@ ui/cli:
 ui/web:
 - pkg/webui/*
 - pkg/webui/**/*
+- pkg/web/oauthclient/*
+
+tooling:
+- tools/*
+- tools/**/*

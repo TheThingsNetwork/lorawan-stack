@@ -11145,7 +11145,7 @@
         "update_location_from_status": {
           "type": "boolean",
           "format": "boolean",
-          "title": "update the location of this gateway from status messages"
+          "description": "Update the location of this gateway from status messages. This only works for gateways connecting with authentication; gateways connected over UDP are not supported."
         },
         "lbs_lns_secret": {
           "$ref": "#/definitions/v3Secret",

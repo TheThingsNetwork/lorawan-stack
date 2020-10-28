@@ -19,6 +19,7 @@ import bind from 'autobind-decorator'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import toast from '@ttn-lw/components/toast'
+import Collapse from '@ttn-lw/components/collapse'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -33,7 +34,6 @@ import JoinServerForm from './join-server-form'
 import NetworkServerForm from './network-server-form'
 import { isDeviceOTAA, isDeviceJoined } from './utils'
 import m from './messages'
-import Collapse from './collapse'
 
 import style from './device-general-settings.styl'
 

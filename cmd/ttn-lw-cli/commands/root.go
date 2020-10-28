@@ -222,7 +222,6 @@ func requireAuth() error {
 		}
 		logger.Warnf("Access token expired at %s", friendlyExpiry)
 	}
-	logger.Error("Please login with the login command")
 	return errUnauthenticated
 }
 

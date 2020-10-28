@@ -23,12 +23,16 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { mayViewGatewayEvents } from '@console/lib/feature-checks'
 
-import { clearGatewayEventsStream } from '@console/store/actions/gateways'
+import {
+  clearGatewayEventsStream,
+  pauseGatewayEventsStream,
+  resumeGatewayEventsStream,
+} from '@console/store/actions/gateways'
 
-import { selectGatewayEvents } from '@console/store/selectors/gateways'
+import { selectGatewayEvents, selectGatewayEventsPaused } from '@console/store/selectors/gateways'
 
 const GatewayEvents = props => {
-  const { gtwId, events, widget, onClear } = props
+  const { gtwId, events, widget, paused, onPauseToggle, onClear } = props
 
   if (widget) {
     return (
@@ -36,13 +40,24 @@ const GatewayEvents = props => {
     )
   }
 
-  return <Events events={events} entityId={gtwId} onClear={onClear} scoped />
+  return (
+    <Events
+      events={events}
+      entityId={gtwId}
+      paused={paused}
+      onClear={onClear}
+      onPauseToggle={onPauseToggle}
+      scoped
+    />
+  )
 }
 
 GatewayEvents.propTypes = {
   events: PropTypes.events,
   gtwId: PropTypes.string.isRequired,
   onClear: PropTypes.func.isRequired,
+  onPauseToggle: PropTypes.func.isRequired,
+  paused: PropTypes.bool.isRequired,
   widget: PropTypes.bool,
 }
 
@@ -58,10 +73,15 @@ export default withFeatureRequirement(mayViewGatewayEvents)(
 
       return {
         events: selectGatewayEvents(state, gtwId),
+        paused: selectGatewayEventsPaused(state, gtwId),
       }
     },
     (dispatch, ownProps) => ({
       onClear: () => dispatch(clearGatewayEventsStream(ownProps.gtwId)),
+      onPauseToggle: paused =>
+        paused
+          ? dispatch(resumeGatewayEventsStream(ownProps.gtwId))
+          : dispatch(pauseGatewayEventsStream(ownProps.gtwId)),
     }),
   )(GatewayEvents),
 )

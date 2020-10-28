@@ -14,7 +14,6 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import { defineMessages } from 'react-intl'
 
 import delay from '@console/constants/delays'
 
@@ -30,84 +29,12 @@ import Message from '@ttn-lw/lib/components/message'
 import { GsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import OwnersSelect from '@console/containers/owners-select'
 
-import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { attributeValidCheck, attributeTooShortCheck } from '@console/lib/attributes'
-import {
-  id as gatewayIdRegexp,
-  address as addressRegexp,
-  unit as unitRegexp,
-  emptyDuration as emptyDurationRegexp,
-  delay as delayRegexp,
-} from '@console/lib/regexp'
+import { unit as unitRegexp, emptyDuration as emptyDurationRegexp } from '@console/lib/regexp'
 
-const m = defineMessages({
-  enforced: 'Enforced',
-  dutyCycle: 'Duty cycle',
-  gatewayIdPlaceholder: 'my-new-gateway',
-  gatewayNamePlaceholder: 'My new gateway',
-  gsServerAddressDescription: 'The address of the Gateway Server to connect to',
-  gatewayDescPlaceholder: 'Description for my new gateway',
-  gatewayDescDescription:
-    'Optional gateway description; can also be used to save notes about the gateway',
-  statusDescription: 'The status of this gateway may be publicly displayed',
-  scheduleDownlinkLateDescription: 'Enable server-side buffer of downlink messages',
-  autoUpdateDescription: 'Gateway can be updated automatically',
-  updateChannelDescription: 'Channel for gateway automatic updates',
-  enforceDutyCycleDescription:
-    'Recommended for all gateways in order to respect spectrum regulations',
-  scheduleAnyTimeDelay: 'Schedule any time delay',
-  scheduleAnyTimeDescription:
-    'Configure gateway delay (minimum: {minimumValue}ms, default: {defaultValue}ms)',
-  delayWarning:
-    'Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.',
-})
-
-const validationSchema = Yup.object().shape({
-  owner_id: Yup.string(),
-  ids: Yup.object().shape({
-    gateway_id: Yup.string()
-      .matches(gatewayIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
-      .min(2, Yup.passValues(sharedMessages.validateTooShort))
-      .max(36, Yup.passValues(sharedMessages.validateTooLong))
-      .required(sharedMessages.validateRequired),
-    eui: Yup.nullableString().length(8 * 2, Yup.passValues(sharedMessages.validateLength)),
-  }),
-  name: Yup.string()
-    .min(2, Yup.passValues(sharedMessages.validateTooShort))
-    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
-  update_channel: Yup.string()
-    .min(2, Yup.passValues(sharedMessages.validateTooShort))
-    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
-  description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-  frequency_plan_id: Yup.string(),
-  gateway_server_address: Yup.string().matches(
-    addressRegexp,
-    Yup.passValues(sharedMessages.validateAddressFormat),
-  ),
-  location_public: Yup.boolean().default(false),
-  status_public: Yup.boolean().default(false),
-  schedule_downlink_late: Yup.boolean().default(false),
-  update_location_from_status: Yup.boolean().default(false),
-  auto_update: Yup.boolean().default(false),
-  schedule_anytime_delay: Yup.string().matches(
-    delayRegexp,
-    Yup.passValues(sharedMessages.validateDelayFormat),
-  ),
-  attributes: Yup.array()
-    .test(
-      'has no empty string values',
-      sharedMessages.attributesValidateRequired,
-      attributeValidCheck,
-    )
-    .test(
-      'has key length longer than 2',
-      sharedMessages.attributeKeyValidateTooShort,
-      attributeTooShortCheck,
-    ),
-})
+import validationSchema from './validation-schema'
 
 class GatewayDataForm extends React.Component {
   static propTypes = {
@@ -195,7 +122,7 @@ class GatewayDataForm extends React.Component {
         <Form.Field
           title={sharedMessages.gatewayID}
           name="ids.gateway_id"
-          placeholder={m.gatewayIdPlaceholder}
+          placeholder={sharedMessages.gatewayIdPlaceholder}
           required
           disabled={update}
           component={Input}
@@ -211,21 +138,21 @@ class GatewayDataForm extends React.Component {
         />
         <Form.Field
           title={sharedMessages.gatewayName}
-          placeholder={m.gatewayNamePlaceholder}
+          placeholder={sharedMessages.gatewayNamePlaceholder}
           name="name"
           component={Input}
         />
         <Form.Field
           title={sharedMessages.gatewayDescription}
-          description={m.gatewayDescDescription}
-          placeholder={m.gatewayDescPlaceholder}
+          description={sharedMessages.gatewayDescDescription}
+          placeholder={sharedMessages.gatewayDescPlaceholder}
           name="description"
           type="textarea"
           component={Input}
         />
         <Form.Field
           title={sharedMessages.gatewayServerAddress}
-          description={m.gsServerAddressDescription}
+          description={sharedMessages.gsServerAddressDescription}
           placeholder={sharedMessages.addressPlaceholder}
           name="gateway_server_address"
           component={Input}
@@ -235,7 +162,7 @@ class GatewayDataForm extends React.Component {
           name="status_public"
           component={Checkbox}
           label={sharedMessages.public}
-          description={m.statusDescription}
+          description={sharedMessages.statusDescription}
         />
         <Form.Field
           name="attributes"
@@ -252,21 +179,21 @@ class GatewayDataForm extends React.Component {
           title={sharedMessages.gatewayScheduleDownlinkLate}
           name="schedule_downlink_late"
           component={Checkbox}
-          description={m.scheduleDownlinkLateDescription}
+          description={sharedMessages.scheduleDownlinkLateDescription}
         />
         <Form.Field
-          title={m.dutyCycle}
+          title={sharedMessages.dutyCycle}
           name="enforce_duty_cycle"
           component={Checkbox}
-          label={m.enforced}
-          description={m.enforceDutyCycleDescription}
+          label={sharedMessages.enforced}
+          description={sharedMessages.enforceDutyCycleDescription}
         />
         <Form.Field
-          title={m.scheduleAnyTimeDelay}
+          title={sharedMessages.scheduleAnyTimeDelay}
           name="schedule_anytime_delay"
           component={UnitInput}
           description={{
-            ...m.scheduleAnyTimeDescription,
+            ...sharedMessages.scheduleAnyTimeDescription,
             values: {
               minimumValue: delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY,
               defaultValue: delay.DEFAULT_GATEWAY_SCHEDULE_ANYTIME_DELAY,
@@ -282,7 +209,7 @@ class GatewayDataForm extends React.Component {
           warning={
             shouldDisplayWarning
               ? {
-                  ...m.delayWarning,
+                  ...sharedMessages.delayWarning,
                   values: { minimumValue: delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY },
                 }
               : undefined
@@ -294,11 +221,11 @@ class GatewayDataForm extends React.Component {
           title={sharedMessages.automaticUpdates}
           name="auto_update"
           component={Checkbox}
-          description={m.autoUpdateDescription}
+          description={sharedMessages.autoUpdateDescription}
         />
         <Form.Field
           title={sharedMessages.channel}
-          description={m.updateChannelDescription}
+          description={sharedMessages.updateChannelDescription}
           placeholder={sharedMessages.stable}
           name="update_channel"
           component={Input}
