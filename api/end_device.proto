@@ -527,16 +527,10 @@ message EndDevice {
   // Stored in Network Server.
   int32 downlink_margin = 36;
 
-  // Recent uplink messages with ADR bit set to 1 sorted by time. Stored in Network Server.
-  // The field is reset each time an uplink message carrying MACPayload is received with ADR bit set to 0.
-  // The number of messages stored is in the range [0,20];
-  repeated UplinkMessage recent_adr_uplinks = 37 [(gogoproto.customname) = "RecentADRUplinks"];
-  // Recent uplink messages sorted by time. Stored in Network Server.
-  // The number of messages stored may depend on configuration.
-  repeated UplinkMessage recent_uplinks = 38;
-  // Recent downlink messages sorted by time. Stored in Network Server.
-  // The number of messages stored may depend on configuration.
-  repeated DownlinkMessage recent_downlinks = 39;
+  reserved 37; // Deprecated: recent_adr_uplinks
+  reserved 38; // Deprecated: recent_uplinks
+  reserved 39; // Deprecated: recent_downlinks
+
   // Queued Application downlink messages. Stored in Application Server,
   // which sets them on the Network Server.
   // This field is deprecated and is always set equal to session.queued_application_downlinks.
