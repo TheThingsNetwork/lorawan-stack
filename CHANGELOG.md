@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- More password validation rules in the user management form in the Console.
+
 ### Changed
 
 ### Deprecated

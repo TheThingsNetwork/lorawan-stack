@@ -40,6 +40,19 @@ const approvalStates = [
   'STATE_SUSPENDED',
 ]
 
+const m = defineMessages({
+  adminLabel: 'Administrator',
+  userDescPlaceholder: 'Description for my new user',
+  userDescDescription: 'Optional user description; can also be used to save notes about the user',
+  userIdPlaceholder: 'jane-doe',
+  userNamePlaceholder: 'Jane Doe',
+  emailPlaceholder: 'mail@example.com',
+  emailAddressDescription:
+    'Primary email address used for logging in; this address is not publicly visible',
+  modalWarning:
+    'Are you sure you want to delete the user "{userId}". This action cannot be undone and it will not be possible to reuse the user ID.',
+})
+
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
     user_id: Yup.string()
@@ -60,34 +73,41 @@ const validationSchema = Yup.object().shape({
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
 })
 
-const passwordValidationSchema = validationSchema.concat(
-  Yup.object().shape({
-    password: Yup.string().required(sharedMessages.validateRequired),
-    confirmPassword: Yup.string()
-      .required(sharedMessages.validateRequired)
-      .oneOf([Yup.ref('password'), null], sharedMessages.validatePasswordMatch),
-  }),
-)
+const createPasswordValidationSchema = requirements => {
+  let passwordValidation = Yup.string().required(sharedMessages.validateRequired)
 
-const m = defineMessages({
-  adminLabel: 'Administrator',
-  userDescPlaceholder: 'Description for my new user',
-  userDescDescription: 'Optional user description; can also be used to save notes about the user',
-  userIdPlaceholder: 'jane-doe',
-  userNamePlaceholder: 'Jane Doe',
-  emailPlaceholder: 'mail@example.com',
-  emailAddressDescription:
-    'Primary email address used for logging in; this address is not publicly visible',
-  modalWarning:
-    'Are you sure you want to delete the user "{userId}". This action cannot be undone and it will not be possible to reuse the user ID.',
-})
+  if (Number(requirements.min_length) > 0) {
+    passwordValidation = passwordValidation.min(
+      requirements.min_length,
+      Yup.passValues(sharedMessages.validateTooShort),
+    )
+  }
+  if (Number(requirements.max_length) > 0) {
+    passwordValidation = passwordValidation.max(
+      requirements.max_length,
+      Yup.passValues(sharedMessages.validateTooLong),
+    )
+  }
+
+  return validationSchema.concat(
+    Yup.object().shape({
+      password: passwordValidation,
+      confirmPassword: Yup.string()
+        .required(sharedMessages.validateRequired)
+        .oneOf([Yup.ref('password'), null], sharedMessages.validatePasswordMatch),
+    }),
+  )
+}
 
 @injectIntl
 class UserForm extends React.Component {
   constructor(props) {
     super(props)
-    const { update } = props
-    this.validationSchema = update ? validationSchema : passwordValidationSchema
+
+    const { update, passwordRequirements } = props
+    this.validationSchema = update
+      ? validationSchema
+      : createPasswordValidationSchema(passwordRequirements)
     this.state = {
       error: '',
     }
@@ -111,6 +131,7 @@ class UserForm extends React.Component {
     onSubmit: PropTypes.func.isRequired,
     onSubmitFailure: PropTypes.func,
     onSubmitSuccess: PropTypes.func,
+    passwordRequirements: PropTypes.passwordRequirements,
     update: PropTypes.bool,
   }
 
@@ -131,6 +152,7 @@ class UserForm extends React.Component {
     onDelete: () => null,
     onDeleteFailure: () => null,
     onDeleteSuccess: () => null,
+    passwordRequirements: {},
   }
 
   @bind
