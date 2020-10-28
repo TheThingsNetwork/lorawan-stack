@@ -193,6 +193,10 @@ func OpenConnection(ctx context.Context, settings Settings, topics provider.Topi
 			message: topics.GetDownlinkQueued(),
 		},
 		{
+			topic:   &pc.Topics.DownlinkQueueInvalidated,
+			message: topics.GetDownlinkQueueInvalidated(),
+		},
+		{
 			topic:   &pc.Topics.LocationSolved,
 			message: topics.GetLocationSolved(),
 		},

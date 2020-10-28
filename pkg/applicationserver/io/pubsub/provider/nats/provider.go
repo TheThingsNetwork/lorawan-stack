@@ -86,6 +86,10 @@ func (impl) OpenConnection(ctx context.Context, target provider.Target) (pc *pro
 			message: target.GetDownlinkQueued(),
 		},
 		{
+			topic:   &pc.Topics.DownlinkQueueInvalidated,
+			message: target.GetDownlinkQueueInvalidated(),
+		},
+		{
 			topic:   &pc.Topics.LocationSolved,
 			message: target.GetLocationSolved(),
 		},

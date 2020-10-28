@@ -157,6 +157,8 @@ func (c *connection) setup(ctx context.Context) error {
 					topicParts = c.format.DownlinkFailedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
 				case *ttnpb.ApplicationUp_DownlinkQueued:
 					topicParts = c.format.DownlinkQueuedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
+				case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
+					topicParts = c.format.DownlinkQueueInvalidatedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
 				case *ttnpb.ApplicationUp_LocationSolved:
 					topicParts = c.format.LocationSolvedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
 				case *ttnpb.ApplicationUp_ServiceData:
@@ -271,6 +273,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 			c.format.DownlinkSentTopic(uid, topic.PartWildcard),
 			c.format.DownlinkFailedTopic(uid, topic.PartWildcard),
 			c.format.DownlinkQueuedTopic(uid, topic.PartWildcard),
+			c.format.DownlinkQueueInvalidatedTopic(uid, topic.PartWildcard),
 			c.format.LocationSolvedTopic(uid, topic.PartWildcard),
 			c.format.ServiceDataTopic(uid, topic.PartWildcard),
 		)

@@ -46,15 +46,16 @@ type Connection struct {
 	Push    *pubsub.Topic
 	Replace *pubsub.Topic
 
-	UplinkMessage  *pubsub.Subscription
-	JoinAccept     *pubsub.Subscription
-	DownlinkAck    *pubsub.Subscription
-	DownlinkNack   *pubsub.Subscription
-	DownlinkSent   *pubsub.Subscription
-	DownlinkFailed *pubsub.Subscription
-	DownlinkQueued *pubsub.Subscription
-	LocationSolved *pubsub.Subscription
-	ServiceData    *pubsub.Subscription
+	UplinkMessage            *pubsub.Subscription
+	JoinAccept               *pubsub.Subscription
+	DownlinkAck              *pubsub.Subscription
+	DownlinkNack             *pubsub.Subscription
+	DownlinkSent             *pubsub.Subscription
+	DownlinkFailed           *pubsub.Subscription
+	DownlinkQueued           *pubsub.Subscription
+	DownlinkQueueInvalidated *pubsub.Subscription
+	LocationSolved           *pubsub.Subscription
+	ServiceData              *pubsub.Subscription
 }
 
 func (c *Connection) ApplicationPubSubIdentifiers() *ttnpb.ApplicationPubSubIdentifiers {
@@ -83,6 +84,7 @@ func (c *Connection) Shutdown(ctx context.Context) (err error) {
 		c.DownlinkSent,
 		c.DownlinkFailed,
 		c.DownlinkQueued,
+		c.DownlinkQueueInvalidated,
 		c.LocationSolved,
 		c.ServiceData,
 	} {
@@ -150,6 +152,10 @@ func (i *Impl) OpenConnection(ctx context.Context, target provider.Target) (pc *
 		{
 			topic:        &pc.Topics.DownlinkQueued,
 			subscription: &conn.DownlinkQueued,
+		},
+		{
+			topic:        &pc.Topics.DownlinkQueueInvalidated,
+			subscription: &conn.DownlinkQueueInvalidated,
 		},
 		{
 			topic:        &pc.Topics.LocationSolved,
