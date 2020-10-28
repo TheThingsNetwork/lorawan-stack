@@ -382,6 +382,13 @@ export default class PubsubForm extends Component {
           component={Input.Toggled}
         />
         <Form.Field
+          name="downlink_queue_invalidated"
+          type="toggled-input"
+          title={sharedMessages.downlinkQueueInvalidated}
+          placeholder={pathPlaceholder}
+          component={Input.Toggled}
+        />
+        <Form.Field
           name="location_solved"
           type="toggled-input"
           title={sharedMessages.locationSolved}
