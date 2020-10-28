@@ -10741,27 +10741,6 @@
           "format": "int32",
           "description": "Demodulation signal-to-noise ratio (dB).\nReceived via the DevStatus MAC command at last_dev_status_received_at.\nStored in Network Server."
         },
-        "recent_adr_uplinks": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v3UplinkMessage"
-          },
-          "title": "Recent uplink messages with ADR bit set to 1 sorted by time. Stored in Network Server.\nThe field is reset each time an uplink message carrying MACPayload is received with ADR bit set to 0.\nThe number of messages stored is in the range [0,20];"
-        },
-        "recent_uplinks": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v3UplinkMessage"
-          },
-          "description": "Recent uplink messages sorted by time. Stored in Network Server.\nThe number of messages stored may depend on configuration."
-        },
-        "recent_downlinks": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v3DownlinkMessage"
-          },
-          "description": "Recent downlink messages sorted by time. Stored in Network Server.\nThe number of messages stored may depend on configuration."
-        },
         "queued_application_downlinks": {
           "type": "array",
           "items": {
