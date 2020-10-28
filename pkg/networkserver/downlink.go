@@ -1472,7 +1472,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				"mac_state",
 				"multicast",
 				"pending_mac_state",
-				"recent_uplinks",
 				"session",
 			},
 			func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -1501,11 +1500,11 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					logger = logger.WithField("downlink_type", "join-accept")
 					ctx = log.NewContext(ctx, logger)
 
-					if len(dev.RecentUplinks) == 0 {
+					if len(dev.PendingMACState.RecentUplinks) == 0 {
 						logger.Error("No recent uplinks found, skip downlink slot")
 						return dev, nil, nil
 					}
-					up := LastUplink(dev.RecentUplinks...)
+					up := LastUplink(dev.PendingMACState.RecentUplinks...)
 					switch up.Payload.MHDR.MType {
 					case ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
 					default:

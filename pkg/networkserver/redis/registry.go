@@ -936,6 +936,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			}
 
 			updated.RecentDownlinks = nil
+			updated.RecentUplinks = nil
 
 			var delFields []string
 			var setFields []interface{}

@@ -132,7 +132,6 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
-					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(ctx, nil)
@@ -195,7 +194,6 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
-					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
@@ -277,7 +275,6 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
-					"recent_uplinks",
 					"session",
 				})
 
@@ -369,7 +366,6 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
-					"recent_uplinks",
 					"session",
 				})
 
@@ -484,7 +480,6 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
-					"recent_uplinks",
 					"session",
 				})
 
@@ -966,7 +961,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
-					"recent_uplinks",
 					"session",
 				})
 
@@ -1030,7 +1024,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
-					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
@@ -1112,7 +1105,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
-					"recent_uplinks",
 					"session",
 				})
 
@@ -1204,7 +1196,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
-					"recent_uplinks",
 					"session",
 				})
 
@@ -1304,7 +1295,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
-					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
@@ -1386,7 +1376,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
-					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
@@ -1463,7 +1452,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
-					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{

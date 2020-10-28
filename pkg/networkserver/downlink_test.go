@@ -2479,18 +2479,18 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 						RxWindowsAvailable: true,
-					},
-					RecentUplinks: []*ttnpb.UplinkMessage{
-						MakeJoinRequest(JoinRequestConfig{
-							DecodePayload: true,
-							JoinEUI:       types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-							DevEUI:        types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
-							DataRateIndex: customCh.MinDataRateIndex,
-							Frequency:     DefaultEU868Channels[0].UplinkFrequency,
-							RxMetadata:    RxMetadata[:],
-							ReceivedAt:    now.Add(-time.Second),
-						}),
+						RecentUplinks: []*ttnpb.UplinkMessage{
+							MakeJoinRequest(JoinRequestConfig{
+								DecodePayload: true,
+								JoinEUI:       types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+								DevEUI:        types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+								DataRateIndex: customCh.MinDataRateIndex,
+								Frequency:     DefaultEU868Channels[0].UplinkFrequency,
+								RxMetadata:    RxMetadata[:],
+								ReceivedAt:    now.Add(-time.Second),
+							}),
+						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
@@ -2514,7 +2514,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"ids",
 					"lorawan_phy_version",
 					"pending_mac_state",
-					"recent_uplinks",
 					"session",
 					"supports_join",
 				},

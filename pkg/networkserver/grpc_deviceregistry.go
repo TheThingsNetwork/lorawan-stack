@@ -358,7 +358,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"mac_settings",
 			"mac_state",
 			"multicast",
-			"recent_uplinks",
 			"session.dev_addr",
 			"session.last_conf_f_cnt_down",
 			"session.last_f_cnt_up",

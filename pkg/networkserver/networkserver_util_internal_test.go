@@ -1025,7 +1025,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 				Session:         dev.PendingSession,
 				Class:           ttnpb.CLASS_A,
 				RX1Delay:        ttnpb.RxDelay(phy.JoinAcceptDelay1.Seconds()),
-				Uplink:          LastUplink(dev.RecentUplinks...),
+				Uplink:          LastUplink(dev.PendingMACState.RecentUplinks...),
 				Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 				Payload:         dev.PendingMACState.QueuedJoinAccept.Payload,
 				CorrelationIDs:  dev.PendingMACState.QueuedJoinAccept.CorrelationIDs,
@@ -1494,8 +1494,10 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					CorrelationIDs: joinResp.CorrelationIDs,
 				},
 				RxWindowsAvailable: true,
+				RecentUplinks: []*ttnpb.UplinkMessage{
+					MakeJoinRequest(deduplicatedUpConf),
+				},
 			}
-			dev.RecentUplinks = AppendRecentUplink(dev.RecentUplinks, MakeJoinRequest(deduplicatedUpConf), RecentUplinkCount)
 
 			idsWithDevAddr := conf.Device.EndDeviceIdentifiers
 			idsWithDevAddr.DevAddr = &joinReq.DevAddr
@@ -1724,7 +1726,6 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 				dev.PendingMACState = nil
 				dev.PendingSession = nil
 			}
-			dev.RecentUplinks = AppendRecentUplink(dev.RecentUplinks, deduplicatedUp, RecentUplinkCount)
 			dev.MACState.RecentUplinks = AppendRecentUplink(dev.MACState.RecentUplinks, deduplicatedUp, RecentUplinkCount)
 		},
 	}), should.BeTrue)

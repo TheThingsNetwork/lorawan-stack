@@ -272,7 +272,6 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 			"last_dev_status_received_at",
 			"lorawan_phy_version",
 			"mac_settings",
-			"recent_uplinks",
 		)
 	}
 
@@ -342,7 +341,6 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 			"multicast",
 			"pending_mac_state",
 			"pending_session",
-			"recent_uplinks",
 			"session",
 		},
 		func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
