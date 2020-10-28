@@ -683,7 +683,6 @@ var handleDataUplinkGetPaths = [...]string{
 	"multicast",
 	"pending_mac_state",
 	"pending_session",
-	"recent_adr_uplinks",
 	"session",
 	"supports_class_b",
 	"supports_class_c",
@@ -966,9 +965,16 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				"mac_state.desired_parameters.adr_nb_trans",
 				"mac_state.desired_parameters.adr_tx_power_index",
 				"mac_state.recent_uplinks",
-				"recent_adr_uplinks",
 			)
-			stored.MACState.RecentUplinks = appendRecentUplink(stored.MACState.RecentUplinks, up, recentUplinkCount)
+			stored.MACState.RecentUplinks = appendRecentUplink(stored.MACState.RecentUplinks, &ttnpb.UplinkMessage{
+				Payload:            up.Payload,
+				Settings:           up.Settings,
+				RxMetadata:         up.RxMetadata,
+				ReceivedAt:         up.ReceivedAt,
+				CorrelationIDs:     up.CorrelationIDs,
+				DeviceChannelIndex: up.DeviceChannelIndex,
+				ConsumedAirtime:    up.ConsumedAirtime,
+			}, recentUplinkCount)
 			if !pld.FHDR.ADR {
 				paths = ttnpb.AddFields(paths,
 					"mac_state.current_parameters.adr_data_rate_index",
@@ -1238,7 +1244,15 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			} else {
 				invalidatedQueue = stored.GetPendingSession().GetQueuedApplicationDownlinks()
 			}
-			macState.RecentUplinks = []*ttnpb.UplinkMessage{up}
+			macState.RecentUplinks = []*ttnpb.UplinkMessage{{
+				Payload:            up.Payload,
+				Settings:           up.Settings,
+				RxMetadata:         up.RxMetadata,
+				ReceivedAt:         up.ReceivedAt,
+				CorrelationIDs:     up.CorrelationIDs,
+				DeviceChannelIndex: up.DeviceChannelIndex,
+				ConsumedAirtime:    up.ConsumedAirtime,
+			}}
 			stored.PendingMACState = macState
 			return stored, []string{
 				"pending_mac_state",

@@ -935,9 +935,6 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				updated.CreatedAt = updated.UpdatedAt
 			}
 
-			updated.RecentDownlinks = nil
-			updated.RecentUplinks = nil
-
 			var delFields []string
 			var setFields []interface{}
 			forceFieldWrite := r.CompatibilityVersion.Compare(semver.Version{Major: 3, Minor: 10}) < 0

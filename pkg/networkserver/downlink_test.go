@@ -408,6 +408,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
 							}),
 						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_0_3,
+							}),
+						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
@@ -442,6 +448,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:        ttnpb.CLASS_A,
 						LoRaWANVersion:     ttnpb.MAC_V1_1,
 						RxWindowsAvailable: true,
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_0_3,
+							}),
+						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
@@ -533,6 +545,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second - time.Nanosecond),
 							}),
 						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_0_3,
+							}),
+						},
 					},
 					MACSettings: &ttnpb.MACSettings{
 						StatusTimePeriodicity:  DurationPtr(0),
@@ -583,6 +601,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ChannelIndex:  customChIdx,
 								RxMetadata:    RxMetadata[:],
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
+						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_0_3,
 							}),
 						},
 						RxWindowsAvailable: true,
@@ -636,6 +660,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ChannelIndex:  customChIdx,
 								RxMetadata:    RxMetadata[:],
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
+						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_0_3,
 							}),
 						},
 						RxWindowsAvailable: true,
@@ -726,6 +756,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
 							}),
 						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_0_3,
+							}),
+						},
 						RxWindowsAvailable: true,
 					},
 					MACSettings: &ttnpb.MACSettings{
@@ -813,6 +849,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ChannelIndex:  customChIdx,
 								RxMetadata:    RxMetadata[:],
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
+						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
 							}),
 						},
 						RxWindowsAvailable: true,
@@ -967,6 +1009,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ChannelIndex:  customChIdx,
 								RxMetadata:    RxMetadata[:],
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
+						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
 							}),
 						},
 						RxWindowsAvailable: true,
@@ -1133,6 +1181,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
 							}),
 						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
+							}),
+						},
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
@@ -1289,6 +1343,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ChannelIndex:  customChIdx,
 								RxMetadata:    RxMetadata[:],
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
+						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
 							}),
 						},
 						RxWindowsAvailable: true,
@@ -1449,6 +1509,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							}),
 						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
+							}),
+						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
@@ -1595,6 +1661,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ChannelIndex:  customChIdx,
 								RxMetadata:    RxMetadata[:],
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
+							}),
+						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
 							}),
 						},
 						RxWindowsAvailable: true,
@@ -1764,6 +1836,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second - time.Nanosecond),
 							}),
 						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
+							}),
+						},
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
@@ -1895,6 +1973,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ChannelIndex:  customChIdx,
 								RxMetadata:    RxMetadata[:],
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second),
+							}),
+						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
 							}),
 						},
 						RxWindowsAvailable: true,
@@ -2031,6 +2115,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ChannelIndex:  customChIdx,
 								RxMetadata:    RxMetadata[:],
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration()),
+							}),
+						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
 							}),
 						},
 					},
@@ -2197,6 +2287,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second),
 							}),
 						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
+							}),
+						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
@@ -2343,6 +2439,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ReceivedAt:    now.Add(-time.Second),
 							}),
 						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
+							}),
+						},
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
@@ -2407,6 +2509,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ChannelIndex:  customChIdx,
 								RxMetadata:    RxMetadata[:],
 								ReceivedAt:    now.Add(-time.Second),
+							}),
+						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
 							}),
 						},
 						RxWindowsAvailable: true,
@@ -2491,6 +2599,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ReceivedAt:    now.Add(-time.Second),
 							}),
 						},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
+							}),
+						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
@@ -2521,7 +2635,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 
-				lastUp := LastUplink(dev.RecentUplinks...)
+				lastUp := LastUplink(dev.PendingMACState.RecentUplinks...)
 				lastDown, ok := assertScheduleGateways(
 					ctx,
 					env,
@@ -2565,6 +2679,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						SessionKeys: created.PendingMACState.QueuedJoinAccept.Keys,
 					}
 					expected.PendingMACState.QueuedJoinAccept = nil
+					expected.PendingMACState.RecentDownlinks = AppendRecentDownlink(expected.PendingMACState.RecentDownlinks, down, RecentDownlinkCount)
 					return true
 				},
 			},

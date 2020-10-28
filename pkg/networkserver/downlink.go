@@ -303,9 +303,15 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				logger.Debug("Need downlink for ADRAckReq")
 				needsDownlink = true
 			}
+
 		case ttnpb.MType_CONFIRMED_UP:
 			logger.Debug("Need downlink for confirmed uplink")
 			needsDownlink = true
+
+		case ttnpb.MType_PROPRIETARY:
+
+		default:
+			panic(fmt.Sprintf("invalid uplink MType: %s", up.Payload.MType))
 		}
 	}
 
@@ -444,11 +450,22 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		}
 
 	case len(cmdBuf) > 0, needsDownlink:
-		var fCnt uint32
-		if dev.Session.LastNFCntDown > 0 || len(dev.MACState.RecentDownlinks) > 0 {
-			fCnt = dev.Session.LastNFCntDown + 1
-		}
-		pld.FullFCnt = fCnt
+		pld.FullFCnt = func() uint32 {
+			for i := len(dev.MACState.RecentDownlinks) - 1; i >= 0; i-- {
+				down := dev.MACState.RecentDownlinks[i]
+				switch down.Payload.MType {
+				case ttnpb.MType_UNCONFIRMED_DOWN, ttnpb.MType_CONFIRMED_DOWN:
+					return dev.Session.LastNFCntDown + 1
+				case ttnpb.MType_JOIN_ACCEPT:
+					// TODO: Support rejoins (https://github.com/TheThingsNetwork/lorawan-stack/issues/8).
+					return 0
+				case ttnpb.MType_PROPRIETARY:
+				default:
+					panic(fmt.Sprintf("invalid downlink MType: %s", down.Payload.MType))
+				}
+			}
+			return 0
+		}()
 
 	default:
 		return nil, genState, errNoDownlink.New()
@@ -1629,9 +1646,15 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					dev.PendingMACState.PendingJoinRequest = &dev.PendingMACState.QueuedJoinAccept.Request
 					dev.PendingMACState.QueuedJoinAccept = nil
 					dev.PendingMACState.RxWindowsAvailable = false
+					dev.PendingMACState.RecentDownlinks = appendRecentDownlink(dev.PendingMACState.RecentDownlinks, &ttnpb.DownlinkMessage{
+						Payload:        down.Message.Payload,
+						Settings:       down.Message.Settings,
+						CorrelationIDs: down.Message.CorrelationIDs,
+					}, recentDownlinkCount)
 					return dev, []string{
 						"pending_mac_state.pending_join_request",
 						"pending_mac_state.queued_join_accept",
+						"pending_mac_state.recent_downlinks",
 						"pending_mac_state.rx_windows_available",
 						"pending_session.dev_addr",
 						"pending_session.keys",

@@ -1076,6 +1076,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 			dev.PendingMACState.PendingJoinRequest = &dev.PendingMACState.QueuedJoinAccept.Request
 			dev.PendingMACState.QueuedJoinAccept = nil
 			dev.PendingMACState.RxWindowsAvailable = false
+			dev.PendingMACState.RecentDownlinks = AppendRecentDownlink(dev.PendingMACState.RecentDownlinks, scheduledDown, RecentDownlinkCount)
 		},
 	}), should.BeTrue)
 }
@@ -1135,6 +1136,7 @@ func (env TestEnvironment) AssertScheduleDataDownlink(ctx context.Context, conf 
 					events.WithIdentifiers(dev.EndDeviceIdentifiers),
 				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIDs...)),
 			)
+			dev.MACState.RecentDownlinks = AppendRecentDownlink(dev.MACState.RecentDownlinks, scheduledDown, RecentDownlinkCount)
 		},
 	}), should.BeTrue)
 }

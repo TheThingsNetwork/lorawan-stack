@@ -673,6 +673,8 @@ type DataDownlinkConfig struct {
 	FRMPayload []byte
 	FOpts      []byte
 
+	Request ttnpb.TxRequest
+
 	SessionKeys *ttnpb.SessionKeys
 }
 
@@ -722,6 +724,9 @@ func MakeDataDownlink(conf DataDownlinkConfig) *ttnpb.DownlinkMessage {
 	}
 	msg.MIC = mic[:]
 	return &ttnpb.DownlinkMessage{
+		Settings: &ttnpb.DownlinkMessage_Request{
+			Request: deepcopy.Copy(&conf.Request).(*ttnpb.TxRequest),
+		},
 		RawPayload: append(phyPayload, mic[:]...),
 		Payload: func() *ttnpb.Message {
 			if !conf.DecodePayload {

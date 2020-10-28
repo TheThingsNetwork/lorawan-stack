@@ -17,13 +17,13 @@ package networkserver
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"sync"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
@@ -151,10 +151,7 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 	if macState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 	outer:
 		for i := len(macState.RecentDownlinks) - 1; i >= 0; i-- {
-			var pld ttnpb.Message
-			if err := lorawan.UnmarshalMessage(macState.RecentDownlinks[i].RawPayload, &pld); err != nil {
-				return unmatched, errDecodePayload.WithCause(err)
-			}
+			pld := macState.RecentDownlinks[i].Payload
 			switch pld.MType {
 			case ttnpb.MType_UNCONFIRMED_DOWN, ttnpb.MType_CONFIRMED_DOWN:
 				macPayload := pld.GetMACPayload()
@@ -167,6 +164,13 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 					minFCnt = macPayload.FCnt + 1
 					break outer
 				}
+			case ttnpb.MType_JOIN_ACCEPT:
+				// TODO: Support rejoins (https://github.com/TheThingsNetwork/lorawan-stack/issues/8).
+				minFCnt = 0
+				break outer
+			case ttnpb.MType_PROPRIETARY:
+			default:
+				panic(fmt.Sprintf("invalid downlink MType: %s", pld.MType))
 			}
 		}
 	} else if session.LastNFCntDown > 0 || session.LastNFCntDown == 0 && len(macState.RecentDownlinks) > 0 {

@@ -153,7 +153,7 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	for i := len(dev.MACState.RecentUplinks) - 1; i >= 0; i-- {
 		up := dev.MACState.RecentUplinks[i]
 		if (up.Payload.MType == ttnpb.MType_UNCONFIRMED_UP || up.Payload.MType == ttnpb.MType_CONFIRMED_UP) &&
-			up.Payload.GetMACPayload().FCnt >= dev.MACState.LastADRChangeFCntUp {
+			up.Payload.GetMACPayload().FullFCnt >= dev.MACState.LastADRChangeFCntUp {
 			continue
 		}
 		adrUplinks = dev.MACState.RecentUplinks[i+1:]
