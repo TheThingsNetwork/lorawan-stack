@@ -2665,7 +2665,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}
 						down.RawPayload = nil
 						down.Payload = msg
-						expected.RecentDownlinks = AppendRecentDownlink(expected.RecentDownlinks, down, RecentDownlinkCount)
 					}
 					for _, diff := range tc.DeviceDiffs {
 						if !a.So(diff(ctx, expected, created, updated, down, downAt), should.BeTrue) {

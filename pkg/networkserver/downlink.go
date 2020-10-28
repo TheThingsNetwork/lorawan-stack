@@ -1019,7 +1019,6 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genState generateDownlinkState, ne
 		CorrelationIDs: down.Message.CorrelationIDs,
 	}
 	dev.MACState.RecentDownlinks = appendRecentDownlink(dev.MACState.RecentDownlinks, msg, recentDownlinkCount)
-	dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, msg, recentDownlinkCount)
 	dev.MACState.RxWindowsAvailable = false
 }
 
@@ -1233,7 +1232,6 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			"mac_state.queued_responses",
 			"mac_state.recent_downlinks",
 			"mac_state.rx_windows_available",
-			"recent_downlinks",
 			"session",
 		),
 		QueuedApplicationUplinks: genState.appendApplicationUplinks(nil, true),
@@ -1438,7 +1436,6 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 			"mac_state.queued_responses",
 			"mac_state.recent_downlinks",
 			"mac_state.rx_windows_available",
-			"recent_downlinks",
 			"session",
 		),
 		QueuedApplicationUplinks: genState.appendApplicationUplinks(nil, true),
@@ -1475,7 +1472,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				"mac_state",
 				"multicast",
 				"pending_mac_state",
-				"recent_downlinks",
 				"recent_uplinks",
 				"session",
 			},
@@ -1634,18 +1630,12 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					dev.PendingMACState.PendingJoinRequest = &dev.PendingMACState.QueuedJoinAccept.Request
 					dev.PendingMACState.QueuedJoinAccept = nil
 					dev.PendingMACState.RxWindowsAvailable = false
-					dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, &ttnpb.DownlinkMessage{
-						Payload:        down.Message.Payload,
-						Settings:       down.Message.Settings,
-						CorrelationIDs: down.Message.CorrelationIDs,
-					}, recentDownlinkCount)
 					return dev, []string{
 						"pending_mac_state.pending_join_request",
 						"pending_mac_state.queued_join_accept",
 						"pending_mac_state.rx_windows_available",
 						"pending_session.dev_addr",
 						"pending_session.keys",
-						"recent_downlinks",
 					}, nil
 				}
 

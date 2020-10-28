@@ -283,7 +283,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 		if !a.So(env.Events, should.ReceiveEventsResembling, events.Builders(downEvBuilders).New(
-			events.ContextWithCorrelationID(ctx, LastDownlink(dev.RecentDownlinks...).CorrelationIDs...),
+			events.ContextWithCorrelationID(ctx, LastDownlink(dev.MACState.RecentDownlinks...).CorrelationIDs...),
 			events.WithIdentifiers(dev.EndDeviceIdentifiers)),
 		) {
 			t.Error("Data downlink event assertion failed")
