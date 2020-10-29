@@ -439,7 +439,7 @@ class Devices {
         return components
       }, [])
 
-      this._deleteDevice(applicationId, deviceId, rollbackComponents)
+      await this._deleteDevice(applicationId, deviceId, rollbackComponents)
 
       // Throw the first error.
       throw errors[0].error
