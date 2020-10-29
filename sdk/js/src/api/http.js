@@ -15,7 +15,7 @@
 import axios from 'axios'
 import { cloneDeep, get } from 'lodash'
 
-import { URI_PREFIX_STACK_COMPONENT_MAP } from '../util/constants'
+import { URI_PREFIX_STACK_COMPONENT_MAP, STACK_COMPONENTS_MAP } from '../util/constants'
 import EventHandler from '../util/events'
 
 import stream from './stream/stream-node'
@@ -159,7 +159,7 @@ class Http {
       const component = endpoint.split('/')[1]
       return Boolean(URI_PREFIX_STACK_COMPONENT_MAP[component])
         ? URI_PREFIX_STACK_COMPONENT_MAP[component]
-        : 'is'
+        : STACK_COMPONENTS_MAP.is
     } catch (err) {
       throw new Error('Unable to extract The Things Stack component:', endpoint)
     }

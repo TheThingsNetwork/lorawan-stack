@@ -14,6 +14,7 @@
 
 import Marshaler from '../util/marshaler'
 import combineStreams from '../util/combine-streams'
+import { STACK_COMPONENTS_MAP } from '../util/constants'
 
 import Devices from './devices'
 import ApiKeys from './api-keys'
@@ -22,6 +23,8 @@ import Collaborators from './collaborators'
 import Webhooks from './webhooks'
 import PubSubs from './pubsubs'
 import Packages from './application-packages'
+
+const { is: IS, as: AS, ns: NS, js: JS, dtc: DTC } = STACK_COMPONENTS_MAP
 
 /**
  * Applications Class provides an abstraction on all applications and manages
@@ -193,11 +196,11 @@ class Applications {
     // check for stack components on different hosts and open distinct stream
     // connections for any distinct host if need be.
     const distinctComponents = this._stackConfig.getComponentsWithDistinctBaseUrls([
-      'is',
-      'js',
-      'ns',
-      'as',
-      'dtc',
+      IS,
+      JS,
+      NS,
+      AS,
+      DTC,
     ])
 
     const streams = distinctComponents.map(component =>

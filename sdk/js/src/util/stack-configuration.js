@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable import/prefer-default-export */
-
-import { STACK_COMPONENTS } from './constants'
+import { STACK_COMPONENTS, STACK_COMPONENTS_MAP } from './constants'
 
 class StackConfiguration {
   constructor(stackConfig) {
@@ -84,7 +82,10 @@ class StackConfiguration {
    * onfiguration.
    */
   get isHost() {
-    return this.isComponentAvailable('is') && this.getComponentHostByName('is')
+    return (
+      this.isComponentAvailable(STACK_COMPONENTS_MAP.is) &&
+      this.getComponentHostByName(STACK_COMPONENTS_MAP.is)
+    )
   }
 
   /**
@@ -94,7 +95,10 @@ class StackConfiguration {
    * configuration.
    */
   get nsHost() {
-    return this.isComponentAvailable('ns') && this.getComponentHostByName('ns')
+    return (
+      this.isComponentAvailable(STACK_COMPONENTS_MAP.ns) &&
+      this.getComponentHostByName(STACK_COMPONENTS_MAP.ns)
+    )
   }
 
   /**
@@ -104,7 +108,10 @@ class StackConfiguration {
    * configuration.
    */
   get asHost() {
-    return this.isComponentAvailable('as') && this.getComponentHostByName('as')
+    return (
+      this.isComponentAvailable(STACK_COMPONENTS_MAP.as) &&
+      this.getComponentHostByName(STACK_COMPONENTS_MAP.as)
+    )
   }
 
   /**
@@ -114,7 +121,10 @@ class StackConfiguration {
    * configuration.
    */
   get jsHost() {
-    return this.isComponentAvailable('js') && this.getComponentHostByName('js')
+    return (
+      this.isComponentAvailable(STACK_COMPONENTS_MAP.js) &&
+      this.getComponentHostByName(STACK_COMPONENTS_MAP.js)
+    )
   }
 
   /**
@@ -124,7 +134,10 @@ class StackConfiguration {
    * of the stack configuration.
    */
   get gcsHost() {
-    return this.isComponentAvailable('gcs') && this.getComponentHostByName('gcs')
+    return (
+      this.isComponentAvailable(STACK_COMPONENTS_MAP.gcs) &&
+      this.getComponentHostByName(STACK_COMPONENTS_MAP.gcs)
+    )
   }
 
   /**
