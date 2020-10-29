@@ -524,13 +524,13 @@ macLoop:
 				break
 			}
 			cmds = cmds[dupCount:]
-			evs, err = mac.HandleLinkADRAns(ctx, dev, pld, uint(dupCount), ns.FrequencyPlans)
+			evs, err = mac.HandleLinkADRAns(ctx, dev, pld, uint(dupCount), cmacFMatchResult.FullFCnt, ns.FrequencyPlans)
 		case ttnpb.CID_DUTY_CYCLE:
 			evs, err = mac.HandleDutyCycleAns(ctx, dev)
 		case ttnpb.CID_RX_PARAM_SETUP:
 			evs, err = mac.HandleRxParamSetupAns(ctx, dev, cmd.GetRxParamSetupAns())
 		case ttnpb.CID_DEV_STATUS:
-			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), session.LastFCntUp, up.ReceivedAt)
+			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), cmacFMatchResult.FullFCnt, up.ReceivedAt)
 			if err == nil {
 				setPaths = append(setPaths,
 					"battery_percentage",
@@ -683,8 +683,6 @@ var handleDataUplinkGetPaths = [...]string{
 	"multicast",
 	"pending_mac_state",
 	"pending_session",
-	"recent_adr_uplinks",
-	"recent_uplinks",
 	"session",
 	"supports_class_b",
 	"supports_class_c",
@@ -967,11 +965,16 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				"mac_state.desired_parameters.adr_nb_trans",
 				"mac_state.desired_parameters.adr_tx_power_index",
 				"mac_state.recent_uplinks",
-				"recent_adr_uplinks",
-				"recent_uplinks",
 			)
-			stored.MACState.RecentUplinks = appendRecentUplink(stored.MACState.RecentUplinks, up, recentUplinkCount)
-			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
+			stored.MACState.RecentUplinks = appendRecentUplink(stored.MACState.RecentUplinks, &ttnpb.UplinkMessage{
+				Payload:            up.Payload,
+				Settings:           up.Settings,
+				RxMetadata:         up.RxMetadata,
+				ReceivedAt:         up.ReceivedAt,
+				CorrelationIDs:     up.CorrelationIDs,
+				DeviceChannelIndex: up.DeviceChannelIndex,
+				ConsumedAirtime:    up.ConsumedAirtime,
+			}, recentUplinkCount)
 			if !pld.FHDR.ADR {
 				paths = ttnpb.AddFields(paths,
 					"mac_state.current_parameters.adr_data_rate_index",
@@ -984,10 +987,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			stored.MACState.DesiredParameters.ADRTxPowerIndex = stored.MACState.CurrentParameters.ADRTxPowerIndex
 			stored.MACState.DesiredParameters.ADRNbTrans = stored.MACState.CurrentParameters.ADRNbTrans
 			if !pld.FHDR.ADR || !mac.DeviceUseADR(stored, ns.defaultMACSettings, matched.phy) {
-				stored.RecentADRUplinks = nil
 				return stored, paths, nil
 			}
-			stored.RecentADRUplinks = appendRecentUplink(stored.RecentADRUplinks, up, mac.OptimalADRUplinkCount)
 			if err := mac.AdaptDataRate(ctx, stored, matched.phy, ns.defaultMACSettings); err != nil {
 				log.FromContext(ctx).WithError(err).Info("Failed to adapt data rate, avoid ADR")
 			}
@@ -1231,7 +1232,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			"frequency_plan_id",
 			"lorawan_phy_version",
 			"pending_session.queued_application_downlinks",
-			"recent_uplinks",
 			"session.queued_application_downlinks",
 		},
 		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -1244,11 +1244,18 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			} else {
 				invalidatedQueue = stored.GetPendingSession().GetQueuedApplicationDownlinks()
 			}
+			macState.RecentUplinks = []*ttnpb.UplinkMessage{{
+				Payload:            up.Payload,
+				Settings:           up.Settings,
+				RxMetadata:         up.RxMetadata,
+				ReceivedAt:         up.ReceivedAt,
+				CorrelationIDs:     up.CorrelationIDs,
+				DeviceChannelIndex: up.DeviceChannelIndex,
+				ConsumedAirtime:    up.ConsumedAirtime,
+			}}
 			stored.PendingMACState = macState
-			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
 			return stored, []string{
 				"pending_mac_state",
-				"recent_uplinks",
 			}, nil
 		})
 	if err != nil {

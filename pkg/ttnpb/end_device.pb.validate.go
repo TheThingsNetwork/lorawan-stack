@@ -1626,6 +1626,8 @@ func (m *MACState) ValidateFields(paths ...string) error {
 
 			}
 
+		case "last_adr_change_f_cnt_up":
+			// no validation rules for LastADRChangeFCntUp
 		default:
 			return MACStateValidationError{
 				field:  name,
@@ -2175,57 +2177,6 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "downlink_margin":
 			// no validation rules for DownlinkMargin
-		case "recent_adr_uplinks":
-
-			for idx, item := range m.GetRecentADRUplinks() {
-				_, _ = idx, item
-
-				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
-					if err := v.ValidateFields(subs...); err != nil {
-						return EndDeviceValidationError{
-							field:  fmt.Sprintf("recent_adr_uplinks[%v]", idx),
-							reason: "embedded message failed validation",
-							cause:  err,
-						}
-					}
-				}
-
-			}
-
-		case "recent_uplinks":
-
-			for idx, item := range m.GetRecentUplinks() {
-				_, _ = idx, item
-
-				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
-					if err := v.ValidateFields(subs...); err != nil {
-						return EndDeviceValidationError{
-							field:  fmt.Sprintf("recent_uplinks[%v]", idx),
-							reason: "embedded message failed validation",
-							cause:  err,
-						}
-					}
-				}
-
-			}
-
-		case "recent_downlinks":
-
-			for idx, item := range m.GetRecentDownlinks() {
-				_, _ = idx, item
-
-				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
-					if err := v.ValidateFields(subs...); err != nil {
-						return EndDeviceValidationError{
-							field:  fmt.Sprintf("recent_downlinks[%v]", idx),
-							reason: "embedded message failed validation",
-							cause:  err,
-						}
-					}
-				}
-
-			}
-
 		case "queued_application_downlinks":
 
 			for idx, item := range m.GetQueuedApplicationDownlinks() {

@@ -303,9 +303,15 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				logger.Debug("Need downlink for ADRAckReq")
 				needsDownlink = true
 			}
+
 		case ttnpb.MType_CONFIRMED_UP:
 			logger.Debug("Need downlink for confirmed uplink")
 			needsDownlink = true
+
+		case ttnpb.MType_PROPRIETARY:
+
+		default:
+			panic(fmt.Sprintf("invalid uplink MType: %s", up.Payload.MType))
 		}
 	}
 
@@ -444,11 +450,22 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		}
 
 	case len(cmdBuf) > 0, needsDownlink:
-		var fCnt uint32
-		if dev.Session.LastNFCntDown > 0 || len(dev.MACState.RecentDownlinks) > 0 {
-			fCnt = dev.Session.LastNFCntDown + 1
-		}
-		pld.FullFCnt = fCnt
+		pld.FullFCnt = func() uint32 {
+			for i := len(dev.MACState.RecentDownlinks) - 1; i >= 0; i-- {
+				down := dev.MACState.RecentDownlinks[i]
+				switch down.Payload.MType {
+				case ttnpb.MType_UNCONFIRMED_DOWN, ttnpb.MType_CONFIRMED_DOWN:
+					return dev.Session.LastNFCntDown + 1
+				case ttnpb.MType_JOIN_ACCEPT:
+					// TODO: Support rejoins (https://github.com/TheThingsNetwork/lorawan-stack/issues/8).
+					return 0
+				case ttnpb.MType_PROPRIETARY:
+				default:
+					panic(fmt.Sprintf("invalid downlink MType: %s", down.Payload.MType))
+				}
+			}
+			return 0
+		}()
 
 	default:
 		return nil, genState, errNoDownlink.New()
@@ -1019,7 +1036,6 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genState generateDownlinkState, ne
 		CorrelationIDs: down.Message.CorrelationIDs,
 	}
 	dev.MACState.RecentDownlinks = appendRecentDownlink(dev.MACState.RecentDownlinks, msg, recentDownlinkCount)
-	dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, msg, recentDownlinkCount)
 	dev.MACState.RxWindowsAvailable = false
 }
 
@@ -1233,7 +1249,6 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			"mac_state.queued_responses",
 			"mac_state.recent_downlinks",
 			"mac_state.rx_windows_available",
-			"recent_downlinks",
 			"session",
 		),
 		QueuedApplicationUplinks: genState.appendApplicationUplinks(nil, true),
@@ -1438,7 +1453,6 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 			"mac_state.queued_responses",
 			"mac_state.recent_downlinks",
 			"mac_state.rx_windows_available",
-			"recent_downlinks",
 			"session",
 		),
 		QueuedApplicationUplinks: genState.appendApplicationUplinks(nil, true),
@@ -1475,8 +1489,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				"mac_state",
 				"multicast",
 				"pending_mac_state",
-				"recent_downlinks",
-				"recent_uplinks",
 				"session",
 			},
 			func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -1505,11 +1517,11 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					logger = logger.WithField("downlink_type", "join-accept")
 					ctx = log.NewContext(ctx, logger)
 
-					if len(dev.RecentUplinks) == 0 {
+					if len(dev.PendingMACState.RecentUplinks) == 0 {
 						logger.Error("No recent uplinks found, skip downlink slot")
 						return dev, nil, nil
 					}
-					up := LastUplink(dev.RecentUplinks...)
+					up := LastUplink(dev.PendingMACState.RecentUplinks...)
 					switch up.Payload.MHDR.MType {
 					case ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
 					default:
@@ -1634,7 +1646,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					dev.PendingMACState.PendingJoinRequest = &dev.PendingMACState.QueuedJoinAccept.Request
 					dev.PendingMACState.QueuedJoinAccept = nil
 					dev.PendingMACState.RxWindowsAvailable = false
-					dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, &ttnpb.DownlinkMessage{
+					dev.PendingMACState.RecentDownlinks = appendRecentDownlink(dev.PendingMACState.RecentDownlinks, &ttnpb.DownlinkMessage{
 						Payload:        down.Message.Payload,
 						Settings:       down.Message.Settings,
 						CorrelationIDs: down.Message.CorrelationIDs,
@@ -1642,10 +1654,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					return dev, []string{
 						"pending_mac_state.pending_join_request",
 						"pending_mac_state.queued_join_accept",
+						"pending_mac_state.recent_downlinks",
 						"pending_mac_state.rx_windows_available",
 						"pending_session.dev_addr",
 						"pending_session.keys",
-						"recent_downlinks",
 					}, nil
 				}
 

@@ -91,7 +91,7 @@ func deviceADRMargin(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) float32 {
 	return DefaultADRMargin
 }
 
-func lossRate(ups ...*ttnpb.UplinkMessage) float32 {
+func adrLossRate(ups ...*ttnpb.UplinkMessage) float32 {
 	if len(ups) < 2 {
 		return 0
 	}
@@ -103,7 +103,7 @@ func lossRate(ups ...*ttnpb.UplinkMessage) float32 {
 		fCnt := up.Payload.GetMACPayload().FullFCnt
 		switch {
 		case fCnt < lastFCnt:
-			return lossRate(ups[1+i:]...)
+			return adrLossRate(ups[1+i:]...)
 		case fCnt >= lastFCnt+1:
 			lost += fCnt - lastFCnt - 1
 		}
@@ -145,8 +145,19 @@ func txPowerStep(phy *band.Band, from, to uint8) float32 {
 }
 
 func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) error {
-	if len(dev.RecentADRUplinks) == 0 {
+	if dev.MACState == nil || len(dev.MACState.RecentUplinks) == 0 {
 		return nil
+	}
+
+	adrUplinks := dev.MACState.RecentUplinks
+	for i := len(dev.MACState.RecentUplinks) - 1; i >= 0; i-- {
+		up := dev.MACState.RecentUplinks[i]
+		if (up.Payload.MType == ttnpb.MType_UNCONFIRMED_UP || up.Payload.MType == ttnpb.MType_CONFIRMED_UP) &&
+			up.Payload.GetMACPayload().FullFCnt >= dev.MACState.LastADRChangeFCntUp {
+			continue
+		}
+		adrUplinks = dev.MACState.RecentUplinks[i+1:]
+		break
 	}
 
 	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MACState.CurrentParameters.Channels...)
@@ -199,12 +210,12 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		return nil
 	}
 
-	maxSNR, ok := maxSNRFromMetadata(uplinkMetadata(dev.RecentADRUplinks...)...)
+	maxSNR, ok := maxSNRFromMetadata(uplinkMetadata(adrUplinks...)...)
 	if !ok {
 		log.FromContext(ctx).Debug("Failed to determine max SNR, avoid ADR.")
 		return nil
 	}
-	up := LastUplink(dev.RecentADRUplinks...)
+	up := LastUplink(adrUplinks...)
 
 	// The link margin indicates how much stronger the signal (SNR) is than the
 	// minimum (floor) that we need to demodulate the signal. We subtract a
@@ -220,7 +231,7 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		}
 		margin = maxSNR - df - deviceADRMargin(dev, defaults)
 	}
-	if len(dev.RecentADRUplinks) < OptimalADRUplinkCount {
+	if len(adrUplinks) < OptimalADRUplinkCount {
 		margin -= safetyMargin
 	}
 
@@ -269,8 +280,8 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	if dev.MACState.DesiredParameters.ADRNbTrans > maxNbTrans {
 		dev.MACState.DesiredParameters.ADRNbTrans = maxNbTrans
 	}
-	if len(dev.RecentADRUplinks) >= OptimalADRUplinkCount/2 {
-		switch r := lossRate(dev.RecentADRUplinks...); {
+	if len(adrUplinks) >= OptimalADRUplinkCount/2 {
+		switch r := adrLossRate(adrUplinks...); {
 		case r < 0.05:
 			dev.MACState.DesiredParameters.ADRNbTrans = 1 + dev.MACState.DesiredParameters.ADRNbTrans/3
 		case r < 0.10:

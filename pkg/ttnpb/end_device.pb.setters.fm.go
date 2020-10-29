@@ -1411,6 +1411,16 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			} else {
 				dst.RejectedDataRateRanges = nil
 			}
+		case "last_adr_change_f_cnt_up":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_adr_change_f_cnt_up' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastADRChangeFCntUp = src.LastADRChangeFCntUp
+			} else {
+				var zero uint32
+				dst.LastADRChangeFCntUp = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -1992,33 +2002,6 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			} else {
 				var zero int32
 				dst.DownlinkMargin = zero
-			}
-		case "recent_adr_uplinks":
-			if len(subs) > 0 {
-				return fmt.Errorf("'recent_adr_uplinks' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.RecentADRUplinks = src.RecentADRUplinks
-			} else {
-				dst.RecentADRUplinks = nil
-			}
-		case "recent_uplinks":
-			if len(subs) > 0 {
-				return fmt.Errorf("'recent_uplinks' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.RecentUplinks = src.RecentUplinks
-			} else {
-				dst.RecentUplinks = nil
-			}
-		case "recent_downlinks":
-			if len(subs) > 0 {
-				return fmt.Errorf("'recent_downlinks' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.RecentDownlinks = src.RecentDownlinks
-			} else {
-				dst.RecentDownlinks = nil
 			}
 		case "queued_application_downlinks":
 			if len(subs) > 0 {

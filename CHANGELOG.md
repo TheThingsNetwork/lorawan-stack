@@ -42,6 +42,7 @@ For details about compatibility between different releases, see the **Commitment
 - Pausing event streams is not saving up arriving events during the pause anymore.
 - Gateway server can now update the gateway location only if the gateway is authenticated.
 - Right to manage links on Application Server is now `RIGHT_APPLICATION_SETTINGS_BASIC`.
+- Network Server does not store `recent_uplinks`, `recent_adr_uplinks` and `recent_downlinks` anymore.
 
 ### Deprecated
 
@@ -67,6 +68,7 @@ For details about compatibility between different releases, see the **Commitment
 - Overwriting values in the end device wizard in the Console.
 - Redirect loops when logging out of the Console if the Console OAuth client had no logout redirect URI(s) set.
 - Event selection not working properly when the event stream is paused in the Console.
+- Network Server DevStatusReq scheduling conditions in relation to frame counter value.
 
 ### Security
 

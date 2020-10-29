@@ -261,6 +261,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 							},
 						},
 					}},
+					RecentDownlinks: []*ttnpb.DownlinkMessage{
+						MakeDataDownlink(DataDownlinkConfig{
+							DecodePayload: true,
+							MACVersion:    ttnpb.MAC_V1_1,
+						}),
+					},
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
@@ -322,6 +328,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 								},
 							},
 						}},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
+							}),
+						},
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
@@ -827,6 +839,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 							Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 						},
 					}},
+					RecentDownlinks: []*ttnpb.DownlinkMessage{
+						MakeDataDownlink(DataDownlinkConfig{
+							DecodePayload: true,
+							MACVersion:    ttnpb.MAC_V1_1,
+						}),
+					},
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       devAddr,
@@ -895,6 +913,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 								Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 							},
 						}},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
+							}),
+						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
@@ -935,6 +959,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 							Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 						},
 					}},
+					RecentDownlinks: []*ttnpb.DownlinkMessage{
+						MakeDataDownlink(DataDownlinkConfig{
+							DecodePayload: true,
+							MACVersion:    ttnpb.MAC_V1_1,
+						}),
+					},
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       devAddr,
@@ -1001,6 +1031,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 								Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 							},
 						}},
+						RecentDownlinks: []*ttnpb.DownlinkMessage{
+							MakeDataDownlink(DataDownlinkConfig{
+								DecodePayload: true,
+								MACVersion:    ttnpb.MAC_V1_1,
+							}),
+						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
