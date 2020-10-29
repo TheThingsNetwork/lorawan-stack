@@ -96,6 +96,9 @@ func TestOpenConnection(t *testing.T) {
 		DownlinkQueued: &ttnpb.ApplicationPubSub_Message{
 			Topic: "downlink/queued",
 		},
+		DownlinkQueueInvalidated: &ttnpb.ApplicationPubSub_Message{
+			Topic: "downlink/invalidated",
+		},
 		LocationSolved: &ttnpb.ApplicationPubSub_Message{
 			Topic: "location/solved",
 		},
@@ -298,6 +301,11 @@ func TestOpenConnection(t *testing.T) {
 						name:      "ValidDownlinkQueued",
 						topicName: "app1/ps1/downlink/queued",
 						topic:     conn.Topics.DownlinkQueued,
+					},
+					{
+						name:      "ValidDownlinkQueueInvalidated",
+						topicName: "app1/ps1/downlink/invalidated",
+						topic:     conn.Topics.DownlinkQueueInvalidated,
 					},
 					{
 						name:      "ValidLocationSolved",

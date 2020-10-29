@@ -2994,6 +2994,16 @@
               "defaultValue": ""
             },
             {
+              "name": "downlink_queue_invalidated",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "location_solved",
               "description": "",
               "label": "",
@@ -4104,6 +4114,16 @@
               "defaultValue": ""
             },
             {
+              "name": "downlink_queue_invalidated",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhook.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhook.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "location_solved",
               "description": "",
               "label": "",
@@ -4560,6 +4580,16 @@
             },
             {
               "name": "downlink_queued",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhookTemplate.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_queue_invalidated",
               "description": "",
               "label": "",
               "type": "Message",

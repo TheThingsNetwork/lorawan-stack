@@ -27,6 +27,8 @@ For details about compatibility between different releases, see the **Commitment
 - Network Server does not retry rejected `NewChannelReq` data rate ranges or rejected `DLChannelReq` frequencies anymore.
 - Functionality to allow admin users to list all organizations in the Console.
 - Downlink count for end devices in the Console.
+- Support for Application Activation Settings in the Join Server to configure Application Server KEK, ID and Home NetID.
+- Downlink queue invalidated message sent upstream by Application Server to support applications to re-encrypt the downlink queue when Application Server skips FRMPayload crypto.
 
 ### Changed
 
@@ -39,6 +41,7 @@ For details about compatibility between different releases, see the **Commitment
 - Improve MQTT Pub/Sub task restart conditions and error propagation.
 - Pausing event streams is not saving up arriving events during the pause anymore.
 - Gateway server can now update the gateway location only if the gateway is authenticated.
+- Right to manage links on Application Server is now `RIGHT_APPLICATION_SETTINGS_BASIC`.
 
 ### Deprecated
 

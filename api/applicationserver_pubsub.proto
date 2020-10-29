@@ -139,8 +139,11 @@ message ApplicationPubSub {
   Message downlink_sent = 13;
   Message downlink_failed = 14;
   Message downlink_queued = 15;
+  Message downlink_queue_invalidated = 19;
   Message location_solved = 16;
   Message service_data = 18;
+
+  // next: 20
 }
 
 message ApplicationPubSubs {

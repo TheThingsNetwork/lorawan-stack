@@ -989,7 +989,8 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 				// When skipping application payload crypto, the upstream application is responsible for recalculating the
 				// downlink queue. No error is returned here to pass the downlink queue invalidation message upstream.
 				pass = true
-				return dev, nil, nil
+				dev.Session.LastAFCntDown = invalid.LastFCntDown
+				return dev, []string{"session.last_a_f_cnt_down"}, nil
 			}
 			if err := as.recalculateDownlinkQueue(ctx, dev, link, dev.Session, invalid.Downlinks, invalid.LastFCntDown+1, true); err != nil {
 				return nil, nil, err

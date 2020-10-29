@@ -331,6 +331,18 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "downlink_queue_invalidated":
+
+			if v, ok := interface{}(m.GetDownlinkQueueInvalidated()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationPubSubValidationError{
+						field:  "downlink_queue_invalidated",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "location_solved":
 
 			if v, ok := interface{}(m.GetLocationSolved()).(interface{ ValidateFields(...string) error }); ok {

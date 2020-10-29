@@ -223,15 +223,16 @@ func (f webhookTemplateField) toPB() *ttnpb.ApplicationWebhookTemplateField {
 }
 
 type webhookTemplatePaths struct {
-	UplinkMessage  *string `yaml:"uplink-message,omitempty"`
-	JoinAccept     *string `yaml:"join-accept,omitempty"`
-	DownlinkAck    *string `yaml:"downlink-ack,omitempty"`
-	DownlinkNack   *string `yaml:"downlink-nack,omitempty"`
-	DownlinkSent   *string `yaml:"downlink-sent,omitempty"`
-	DownlinkFailed *string `yaml:"downlink-failed,omitempty"`
-	DownlinkQueued *string `yaml:"downlink-queued,omitempty"`
-	LocationSolved *string `yaml:"location-solved,omitempty"`
-	ServiceData    *string `yaml:"service-data,omitempty"`
+	UplinkMessage            *string `yaml:"uplink-message,omitempty"`
+	JoinAccept               *string `yaml:"join-accept,omitempty"`
+	DownlinkAck              *string `yaml:"downlink-ack,omitempty"`
+	DownlinkNack             *string `yaml:"downlink-nack,omitempty"`
+	DownlinkSent             *string `yaml:"downlink-sent,omitempty"`
+	DownlinkFailed           *string `yaml:"downlink-failed,omitempty"`
+	DownlinkQueued           *string `yaml:"downlink-queued,omitempty"`
+	DownlinkQueueInvalidated *string `yaml:"downlink-queue-invalidated,omitempty"`
+	LocationSolved           *string `yaml:"location-solved,omitempty"`
+	ServiceData              *string `yaml:"service-data,omitempty"`
 }
 
 type webhookTemplate struct {
@@ -271,24 +272,25 @@ func (t webhookTemplate) toPB() *ttnpb.ApplicationWebhookTemplate {
 		ApplicationWebhookTemplateIdentifiers: ttnpb.ApplicationWebhookTemplateIdentifiers{
 			TemplateID: t.TemplateID,
 		},
-		Name:                 t.Name,
-		Description:          t.Description,
-		LogoURL:              t.LogoURL,
-		InfoURL:              t.InfoURL,
-		DocumentationURL:     t.DocumentationURL,
-		BaseURL:              t.BaseURL,
-		Headers:              t.Headers,
-		Format:               t.Format,
-		Fields:               t.pbFields(),
-		CreateDownlinkAPIKey: t.CreateDownlinkAPIKey,
-		UplinkMessage:        t.pathToMessage(t.Paths.UplinkMessage),
-		JoinAccept:           t.pathToMessage(t.Paths.JoinAccept),
-		DownlinkAck:          t.pathToMessage(t.Paths.DownlinkAck),
-		DownlinkNack:         t.pathToMessage(t.Paths.DownlinkNack),
-		DownlinkSent:         t.pathToMessage(t.Paths.DownlinkSent),
-		DownlinkFailed:       t.pathToMessage(t.Paths.DownlinkFailed),
-		DownlinkQueued:       t.pathToMessage(t.Paths.DownlinkQueued),
-		LocationSolved:       t.pathToMessage(t.Paths.LocationSolved),
-		ServiceData:          t.pathToMessage(t.Paths.ServiceData),
+		Name:                     t.Name,
+		Description:              t.Description,
+		LogoURL:                  t.LogoURL,
+		InfoURL:                  t.InfoURL,
+		DocumentationURL:         t.DocumentationURL,
+		BaseURL:                  t.BaseURL,
+		Headers:                  t.Headers,
+		Format:                   t.Format,
+		Fields:                   t.pbFields(),
+		CreateDownlinkAPIKey:     t.CreateDownlinkAPIKey,
+		UplinkMessage:            t.pathToMessage(t.Paths.UplinkMessage),
+		JoinAccept:               t.pathToMessage(t.Paths.JoinAccept),
+		DownlinkAck:              t.pathToMessage(t.Paths.DownlinkAck),
+		DownlinkNack:             t.pathToMessage(t.Paths.DownlinkNack),
+		DownlinkSent:             t.pathToMessage(t.Paths.DownlinkSent),
+		DownlinkFailed:           t.pathToMessage(t.Paths.DownlinkFailed),
+		DownlinkQueued:           t.pathToMessage(t.Paths.DownlinkQueued),
+		DownlinkQueueInvalidated: t.pathToMessage(t.Paths.DownlinkQueueInvalidated),
+		LocationSolved:           t.pathToMessage(t.Paths.LocationSolved),
+		ServiceData:              t.pathToMessage(t.Paths.ServiceData),
 	}
 }

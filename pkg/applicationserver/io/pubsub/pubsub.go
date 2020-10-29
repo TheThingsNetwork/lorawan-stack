@@ -133,6 +133,8 @@ func (i *integration) handleUp(ctx context.Context) {
 				topic = i.conn.Topics.DownlinkFailed
 			case *ttnpb.ApplicationUp_DownlinkQueued:
 				topic = i.conn.Topics.DownlinkQueued
+			case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
+				topic = i.conn.Topics.DownlinkQueueInvalidated
 			case *ttnpb.ApplicationUp_LocationSolved:
 				topic = i.conn.Topics.LocationSolved
 			case *ttnpb.ApplicationUp_ServiceData:

@@ -42,6 +42,7 @@ const webhookEntitySelector = [
   'downlink_sent',
   'downlink_failed',
   'downlink_queued',
+  'downlink_queue_invalidated',
   'location_solved',
   'service_data',
   'template_ids',

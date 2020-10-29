@@ -473,6 +473,9 @@ func TestApplicationServer(t *testing.T) {
 						DownlinkQueued: &ttnpb.ApplicationPubSub_Message{
 							Topic: "up.downlink.queued",
 						},
+						DownlinkQueueInvalidated: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up.downlink.invalidated",
+						},
 						LocationSolved: &ttnpb.ApplicationPubSub_Message{
 							Topic: "up.location.solved",
 						},
@@ -487,6 +490,7 @@ func TestApplicationServer(t *testing.T) {
 							"downlink_failed",
 							"downlink_nack",
 							"downlink_queued",
+							"downlink_queue_invalidated",
 							"downlink_sent",
 							"downlink_push",
 							"downlink_replace",
@@ -613,6 +617,9 @@ func TestApplicationServer(t *testing.T) {
 						DownlinkQueued: &ttnpb.ApplicationPubSub_Message{
 							Topic: "up/downlink/queued",
 						},
+						DownlinkQueueInvalidated: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up/downlink/invalidated",
+						},
 						LocationSolved: &ttnpb.ApplicationPubSub_Message{
 							Topic: "up/location/solved",
 						},
@@ -627,6 +634,7 @@ func TestApplicationServer(t *testing.T) {
 							"downlink_failed",
 							"downlink_nack",
 							"downlink_queued",
+							"downlink_queue_invalidated",
 							"downlink_sent",
 							"downlink_push",
 							"downlink_replace",
@@ -1191,6 +1199,27 @@ func TestApplicationServer(t *testing.T) {
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
+					},
+					{
+						Name: "RegisteredDevice/DownlinkMessage/QueueInvalidated",
+						IDs:  registeredDevice.EndDeviceIdentifiers,
+						Message: &ttnpb.ApplicationUp{
+							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+								DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
+									Downlinks: []*ttnpb.ApplicationDownlink{
+										{
+											SessionKeyID: []byte{0x33},
+											FPort:        42,
+											FCnt:         42,
+											FRMPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
+										},
+									},
+									LastFCntDown: 42,
+								},
+							},
+						},
+						ExpectTimeout: true, // Payload encryption is carried out by AS; this message is not sent upstream.
 					},
 					{
 						Name: "RegisteredDevice/DownlinkMessage/Sent",

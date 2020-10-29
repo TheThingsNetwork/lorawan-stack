@@ -58,13 +58,19 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 	if len(req.FieldMask.Paths) == 0 {
 		return nil, errInvalidFieldMask.WithCause(errNoPaths)
 	}
+
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "kek.key") && req.ApplicationActivationSettings.GetKEK().GetKey().IsZero() {
+		return nil, errInvalidFieldValue.WithAttributes("field", "kek.key")
+	}
+
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return nil, err
 	}
+
 	sets := req.FieldMask.Paths
 	reqKEK := req.ApplicationActivationSettings.KEK
-	if k := reqKEK.GetKey(); !k.IsZero() && ttnpb.HasAnyField(sets, "kek.key") {
-		kek, err := cryptoutil.WrapAES128Key(ctx, *k, srv.kekLabel, srv.JS.KeyVault)
+	if ttnpb.HasAnyField(sets, "kek.key") {
+		kek, err := cryptoutil.WrapAES128Key(ctx, *req.ApplicationActivationSettings.KEK.Key, srv.kekLabel, srv.JS.KeyVault)
 		if err != nil {
 			return nil, errWrapKey.WithCause(err)
 		}
@@ -76,22 +82,8 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 		)
 	}
 	v, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths, func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
-		if stored == nil {
-			if err := ttnpb.RequireFields(req.FieldMask.Paths,
-				"kek_label",
-			); err != nil {
-				return nil, nil, errInvalidFieldMask.WithCause(err)
-			}
-			if !ttnpb.HasAnyField(req.FieldMask.Paths, "kek.key") ||
-				!ttnpb.HasAnyField(req.FieldMask.Paths, "kek.encrypted_key") && !ttnpb.HasAnyField(req.FieldMask.Paths, "kek.kek_label") {
-				return nil, nil, errInvalidFieldMask.WithCause(ttnpb.RequireFields(req.FieldMask.Paths, "kek.key"))
-			}
-		}
 		return &req.ApplicationActivationSettings, sets, nil
 	})
-	if errors.IsNotFound(err) {
-		return nil, errApplicationActivationSettingsNotFound.WithCause(err)
-	}
 	if err != nil {
 		return nil, err
 	}
