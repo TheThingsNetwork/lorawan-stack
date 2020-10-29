@@ -12,16 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'raf/polyfill'
-import { configure, shallow, render, mount } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
 import snapshotDiff from 'snapshot-diff'
 
-configure({ adapter: new Adapter() })
-
-global.shallow = shallow
-global.mount = mount
-global.render = render
 global.snapshotDiff = snapshotDiff
 
 /* eslint-disable no-console */
