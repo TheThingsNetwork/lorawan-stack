@@ -5,7 +5,7 @@ go 1.15
 replace go.thethings.network/lorawan-stack/v3 => ../
 
 // Dependency of lorawan-stack.
-replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.14.5-gogo
+replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.15.2-gogo
 
 // Dependency of lorawan-stack.
 replace gopkg.in/DATA-DOG/go-sqlmock.v1 => gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0

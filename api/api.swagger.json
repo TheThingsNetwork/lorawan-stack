@@ -23,7 +23,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -103,7 +103,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -142,7 +142,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -184,7 +184,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -229,7 +229,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -268,7 +268,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -314,7 +314,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -352,7 +352,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -404,7 +404,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -456,7 +456,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -501,7 +501,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -530,6 +530,7 @@
     },
     "/applications/{application_ids.application_id}/devices": {
       "get": {
+        "summary": "List end devices in the given application.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "EndDeviceRegistry_List",
         "responses": {
           "200": {
@@ -539,7 +540,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -594,6 +595,7 @@
     },
     "/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
+        "summary": "Delete the end device with the given IDs.\nBefore deleting an end device from the EndDeviceRegistry (the Identity Server),\nthe device needs to be deleted from the JsEndDeviceRegistry, AsEndDeviceRegistry and NsEndDeviceRegistry.\nThis is NOT done automatically.",
         "operationId": "EndDeviceRegistry_Delete",
         "responses": {
           "200": {
@@ -603,7 +605,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -664,7 +666,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -695,7 +697,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -716,6 +718,7 @@
     },
     "/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
+        "summary": "Create a new end device within an application.\nAfter creating a device in the EndDeviceRegistry (Identity Server), it still\nneeds to be created in the NsEndDeviceRegistry, AsEndDeviceRegistry and JsEndDeviceRegistry.",
         "operationId": "EndDeviceRegistry_Create",
         "responses": {
           "200": {
@@ -725,7 +728,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -754,6 +757,7 @@
     },
     "/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}": {
       "put": {
+        "summary": "Update the OAuth client, changing the fields specified by the field mask to the provided values.",
         "operationId": "EndDeviceRegistry_Update",
         "responses": {
           "200": {
@@ -763,7 +767,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -798,6 +802,7 @@
     },
     "/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}": {
       "get": {
+        "summary": "Get the end device with the given identifiers, selecting the fields specified\nin the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "EndDeviceRegistry_Get",
         "responses": {
           "200": {
@@ -807,7 +812,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -869,6 +874,7 @@
     },
     "/as/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
+        "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
         "operationId": "AsEndDeviceRegistry_Delete",
         "responses": {
           "200": {
@@ -878,7 +884,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -929,6 +935,7 @@
     },
     "/as/applications/{application_ids.application_id}/devices/{device_id}/down": {
       "get": {
+        "summary": "List the items currently in the downlink queue.",
         "operationId": "AppAs_DownlinkQueueList",
         "responses": {
           "200": {
@@ -938,7 +945,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -989,6 +996,7 @@
     },
     "/as/applications/{application_ids.application_id}/devices/{device_id}/packages": {
       "get": {
+        "summary": "List returns the available packages for the end device.",
         "operationId": "ApplicationPackageRegistry_List",
         "responses": {
           "200": {
@@ -998,7 +1006,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1049,7 +1057,7 @@
     },
     "/as/applications/{application_ids.application_id}/link": {
       "get": {
-        "summary": "Get returns the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
+        "summary": "Get a link configuration from the Application Server to Network Server.\nThis only contains the configuration. Use GetLinkStats to view statistics and any link errors.",
         "operationId": "As_GetLink",
         "responses": {
           "200": {
@@ -1059,7 +1067,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1089,7 +1097,7 @@
         ]
       },
       "put": {
-        "summary": "Set creates or updates the device.",
+        "summary": "Set a link configuration from the Application Server a Network Server.\nThis call returns immediately after setting the link configuration; it does not wait for a link to establish.\nTo get link statistics or errors, use GetLinkStats.\nNote that there can only be one Application Server instance linked to a Network Server for a given application at a time.",
         "operationId": "As_SetLink",
         "responses": {
           "200": {
@@ -1099,7 +1107,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1128,6 +1136,7 @@
     },
     "/as/applications/{application_ids.application_id}/packages/associations/{f_port}": {
       "delete": {
+        "summary": "DeleteDefaultAssociation removes the default association on the FPort of the application.",
         "operationId": "ApplicationPackageRegistry_DeleteDefaultAssociation",
         "responses": {
           "200": {
@@ -1137,7 +1146,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1183,7 +1192,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1280,7 +1289,7 @@
     },
     "/as/applications/{application_id}/link": {
       "delete": {
-        "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
+        "summary": "Delete the link between the Application Server and Network Server for the specified application.",
         "operationId": "As_DeleteLink",
         "responses": {
           "200": {
@@ -1290,7 +1299,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1311,6 +1320,7 @@
     },
     "/as/applications/{application_id}/link/stats": {
       "get": {
+        "summary": "GetLinkStats returns the link statistics.\nThis call returns a NotFound error code if there is no link for the given application identifiers.\nThis call returns the error code of the link error if linking to a Network Server failed.",
         "operationId": "As_GetLinkStats",
         "responses": {
           "200": {
@@ -1320,7 +1330,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1341,6 +1351,7 @@
     },
     "/as/applications/{application_id}/mqtt-connection-info": {
       "get": {
+        "summary": "Get connection information to connect an MQTT client.",
         "operationId": "AppAs_GetMQTTConnectionInfo",
         "responses": {
           "200": {
@@ -1350,7 +1361,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1371,6 +1382,7 @@
     },
     "/as/applications/{association.ids.end_device_ids.application_ids.application_id}/devices/{association.ids.end_device_ids.device_id}/packages/associations/{association.ids.f_port}": {
       "put": {
+        "summary": "SetAssociation updates or creates the association on the FPort of the end device.",
         "operationId": "ApplicationPackageRegistry_SetAssociation",
         "responses": {
           "200": {
@@ -1380,7 +1392,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1422,6 +1434,7 @@
     },
     "/as/applications/{default.ids.application_ids.application_id}/packages/associations/{default.ids.f_port}": {
       "put": {
+        "summary": "SetDefaultAssociation updates or creates the default association on the FPort of the application.",
         "operationId": "ApplicationPackageRegistry_SetDefaultAssociation",
         "responses": {
           "200": {
@@ -1431,7 +1444,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1467,6 +1480,7 @@
     },
     "/as/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
+        "summary": "Set creates or updates the device.",
         "operationId": "AsEndDeviceRegistry_Set2",
         "responses": {
           "200": {
@@ -1476,7 +1490,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1505,6 +1519,7 @@
     },
     "/as/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}": {
       "put": {
+        "summary": "Set creates or updates the device.",
         "operationId": "AsEndDeviceRegistry_Set",
         "responses": {
           "200": {
@@ -1514,7 +1529,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1549,6 +1564,7 @@
     },
     "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}": {
       "get": {
+        "summary": "Get returns the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
         "operationId": "AsEndDeviceRegistry_Get",
         "responses": {
           "200": {
@@ -1558,7 +1574,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1620,6 +1636,7 @@
     },
     "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/push": {
       "post": {
+        "summary": "Push downlink messages to the end of the downlink queue.",
         "operationId": "AppAs_DownlinkQueuePush",
         "responses": {
           "200": {
@@ -1629,7 +1646,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1664,6 +1681,7 @@
     },
     "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/replace": {
       "post": {
+        "summary": "Replace the entire downlink queue with the specified messages.\nThis can also be used to empty the queue by specifying no messages.",
         "operationId": "AppAs_DownlinkQueueReplace",
         "responses": {
           "200": {
@@ -1673,7 +1691,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1708,6 +1726,7 @@
     },
     "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/associations/{f_port}": {
       "delete": {
+        "summary": "DeleteAssociation removes the association on the FPort of the end device.",
         "operationId": "ApplicationPackageRegistry_DeleteAssociation",
         "responses": {
           "200": {
@@ -1717,7 +1736,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1793,7 +1812,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1890,6 +1909,7 @@
     },
     "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/simulate": {
       "post": {
+        "summary": "Simulate an upstream message. This can be used to test integrations.",
         "operationId": "AppAs_SimulateUplink",
         "responses": {
           "200": {
@@ -1899,7 +1919,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -1934,6 +1954,7 @@
     },
     "/as/applications/{ids.application_ids.application_id}/devices/{ids.device_id}/packages/associations": {
       "get": {
+        "summary": "ListAssociations returns all of the associations of the end device.",
         "operationId": "ApplicationPackageRegistry_ListAssociations",
         "responses": {
           "200": {
@@ -1943,7 +1964,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2021,6 +2042,7 @@
     },
     "/as/applications/{ids.application_ids.application_id}/packages/associations/{ids.f_port}": {
       "get": {
+        "summary": "GetDefaultAssociation returns the default association registered on the FPort of the application.",
         "operationId": "ApplicationPackageRegistry_GetDefaultAssociation",
         "responses": {
           "200": {
@@ -2030,7 +2052,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2069,6 +2091,7 @@
     },
     "/as/applications/{ids.application_id}/packages/associations": {
       "get": {
+        "summary": "ListDefaultAssociations returns all of the default associations of the application.",
         "operationId": "ApplicationPackageRegistry_ListDefaultAssociations",
         "responses": {
           "200": {
@@ -2078,7 +2101,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2126,6 +2149,7 @@
     },
     "/as/applications/{ids.end_device_ids.application_ids.application_id}/devices/{ids.end_device_ids.device_id}/packages/associations/{ids.f_port}": {
       "get": {
+        "summary": "GetAssociation returns the association registered on the FPort of the end device.",
         "operationId": "ApplicationPackageRegistry_GetAssociation",
         "responses": {
           "200": {
@@ -2135,7 +2159,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2213,7 +2237,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2235,7 +2259,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2276,7 +2300,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2312,7 +2336,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2359,7 +2383,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2397,7 +2421,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2441,7 +2465,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2463,7 +2487,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2498,7 +2522,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2539,7 +2563,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2580,7 +2604,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2616,7 +2640,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2663,7 +2687,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2701,7 +2725,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2736,6 +2760,7 @@
     },
     "/auth_info": {
       "get": {
+        "summary": "AuthInfo returns information about the authentication that is used on the request.",
         "operationId": "EntityAccess_AuthInfo",
         "responses": {
           "200": {
@@ -2745,7 +2770,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2758,6 +2783,7 @@
     },
     "/clients": {
       "get": {
+        "summary": "List OAuth clients where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the OAuth clients the caller\nhas access to.\nSimilar to Get, this selects the fields sepcified in the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "ClientRegistry_List",
         "responses": {
           "200": {
@@ -2767,7 +2793,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2837,6 +2863,7 @@
     },
     "/clients/{client.ids.client_id}": {
       "put": {
+        "summary": "Update the OAuth client, changing the fields specified by the field mask to the provided values.",
         "operationId": "ClientRegistry_Update",
         "responses": {
           "200": {
@@ -2846,7 +2873,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2875,6 +2902,7 @@
     },
     "/clients/{client_ids.client_id}": {
       "get": {
+        "summary": "Get the OAuth client with the given identifiers, selecting the fields specified\nin the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "ClientRegistry_Get",
         "responses": {
           "200": {
@@ -2884,7 +2912,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2916,6 +2944,7 @@
     },
     "/clients/{client_ids.client_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
       "get": {
+        "summary": "Get the rights of a collaborator (member) of the client.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
         "operationId": "ClientAccess_GetCollaborator2",
         "responses": {
           "200": {
@@ -2925,7 +2954,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -2967,6 +2996,7 @@
     },
     "/clients/{client_ids.client_id}/collaborator/user/{collaborator.user_ids.user_id}": {
       "get": {
+        "summary": "Get the rights of a collaborator (member) of the client.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
         "operationId": "ClientAccess_GetCollaborator",
         "responses": {
           "200": {
@@ -2976,7 +3006,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3018,6 +3048,7 @@
     },
     "/clients/{client_ids.client_id}/collaborators": {
       "get": {
+        "summary": "List the collaborators on this OAuth client.",
         "operationId": "ClientAccess_ListCollaborators",
         "responses": {
           "200": {
@@ -3027,7 +3058,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3062,6 +3093,7 @@
         ]
       },
       "put": {
+        "summary": "Set the rights of a collaborator (member) on the OAuth client.\nThis method can also be used to delete the collaborator, by giving them no rights.\nThe caller is required to have all assigned or/and removed rights.",
         "operationId": "ClientAccess_SetCollaborator",
         "responses": {
           "200": {
@@ -3071,7 +3103,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3100,6 +3132,7 @@
     },
     "/clients/{client_id}": {
       "delete": {
+        "summary": "Delete the OAuth client. This may not release the client ID for reuse.",
         "operationId": "ClientRegistry_Delete",
         "responses": {
           "200": {
@@ -3109,7 +3142,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3130,6 +3163,7 @@
     },
     "/clients/{client_id}/rights": {
       "get": {
+        "summary": "List the rights the caller has on this application.",
         "operationId": "ClientAccess_ListRights",
         "responses": {
           "200": {
@@ -3139,7 +3173,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3169,7 +3203,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3192,6 +3226,7 @@
     },
     "/contact_info/validation": {
       "post": {
+        "summary": "Request validation for the non-validated contact info for the given entity.",
         "operationId": "ContactInfoRegistry_RequestValidation",
         "responses": {
           "200": {
@@ -3201,7 +3236,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3212,6 +3247,7 @@
         ]
       },
       "patch": {
+        "summary": "Validate confirms a contact info validation.",
         "operationId": "ContactInfoRegistry_Validate",
         "responses": {
           "200": {
@@ -3221,7 +3257,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3243,7 +3279,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3281,7 +3317,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3302,6 +3338,7 @@
     },
     "/edcs/claim": {
       "post": {
+        "summary": "Claims the end device by claim authentication code or QR code and transfers the device to the target application.",
         "operationId": "EndDeviceClaimingServer_Claim",
         "responses": {
           "200": {
@@ -3311,7 +3348,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3334,6 +3371,7 @@
     },
     "/edtc/convert": {
       "post": {
+        "summary": "Converts the binary data to a stream of end device templates.",
         "operationId": "EndDeviceTemplateConverter_Convert",
         "responses": {
           "200": {
@@ -3352,7 +3390,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3375,6 +3413,7 @@
     },
     "/edtc/formats": {
       "get": {
+        "summary": "Returns the configured formats to convert from.",
         "operationId": "EndDeviceTemplateConverter_ListFormats",
         "responses": {
           "200": {
@@ -3384,7 +3423,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3397,6 +3436,7 @@
     },
     "/events": {
       "post": {
+        "summary": "Stream live events, optionally with a tail of historical events (depending on server support and retention policy).\nEvents may arrive out-of-order.",
         "operationId": "Events_Stream",
         "responses": {
           "200": {
@@ -3415,7 +3455,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3438,6 +3478,7 @@
     },
     "/gateways": {
       "get": {
+        "summary": "List gateways where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the gateways the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "GatewayRegistry_List",
         "responses": {
           "200": {
@@ -3447,7 +3488,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3517,6 +3558,7 @@
     },
     "/gateways/{gateway.ids.gateway_id}": {
       "put": {
+        "summary": "Update the gateway, changing the fields specified by the field mask to the provided values.",
         "operationId": "GatewayRegistry_Update",
         "responses": {
           "200": {
@@ -3526,7 +3568,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3555,6 +3597,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}": {
       "get": {
+        "summary": "Get the gateway with the given identifiers, selecting the fields specified\nin the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "GatewayRegistry_Get",
         "responses": {
           "200": {
@@ -3564,7 +3607,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3604,6 +3647,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/api-keys": {
       "get": {
+        "summary": "List the API keys for this gateway.",
         "operationId": "GatewayAccess_ListAPIKeys",
         "responses": {
           "200": {
@@ -3613,7 +3657,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3656,6 +3700,7 @@
         ]
       },
       "post": {
+        "summary": "Create an API key scoped to this gateway.",
         "operationId": "GatewayAccess_CreateAPIKey",
         "responses": {
           "200": {
@@ -3665,7 +3710,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3694,6 +3739,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/api-keys/{api_key.id}": {
       "put": {
+        "summary": "Update the rights of an API key of the gateway.\nThis method can also be used to delete the API key, by giving it no rights.\nThe caller is required to have all assigned or/and removed rights.",
         "operationId": "GatewayAccess_UpdateAPIKey",
         "responses": {
           "200": {
@@ -3703,7 +3749,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3739,6 +3785,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}": {
       "get": {
+        "summary": "Get a single API key of this gateway.",
         "operationId": "GatewayAccess_GetAPIKey",
         "responses": {
           "200": {
@@ -3748,7 +3795,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3784,6 +3831,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
       "get": {
+        "summary": "Get the rights of a collaborator (member) of the gateway.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
         "operationId": "GatewayAccess_GetCollaborator2",
         "responses": {
           "200": {
@@ -3793,7 +3841,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3843,6 +3891,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/collaborator/user/{collaborator.user_ids.user_id}": {
       "get": {
+        "summary": "Get the rights of a collaborator (member) of the gateway.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
         "operationId": "GatewayAccess_GetCollaborator",
         "responses": {
           "200": {
@@ -3852,7 +3901,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3902,6 +3951,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/collaborators": {
       "get": {
+        "summary": "List the collaborators on this gateway.",
         "operationId": "GatewayAccess_ListCollaborators",
         "responses": {
           "200": {
@@ -3911,7 +3961,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3954,6 +4004,7 @@
         ]
       },
       "put": {
+        "summary": "Set the rights of a collaborator (member) on the gateway.\nThis method can also be used to delete the collaborator, by giving them no rights.\nThe caller is required to have all assigned or/and removed rights.",
         "operationId": "GatewayAccess_SetCollaborator",
         "responses": {
           "200": {
@@ -3963,7 +4014,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -3992,6 +4043,7 @@
     },
     "/gateways/{gateway_id}": {
       "delete": {
+        "summary": "Delete the gateway. This may not release the gateway ID for reuse, but it does release the EUI.",
         "operationId": "GatewayRegistry_Delete",
         "responses": {
           "200": {
@@ -4001,7 +4053,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4030,6 +4082,7 @@
     },
     "/gateways/{gateway_id}/rights": {
       "get": {
+        "summary": "List the rights the caller has on this gateway.",
         "operationId": "GatewayAccess_ListRights",
         "responses": {
           "200": {
@@ -4039,7 +4092,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4068,6 +4121,7 @@
     },
     "/gs/gateways/{gateway_id}/connection/stats": {
       "get": {
+        "summary": "Get statistics about the current gateway connection to the Gateway Server.\nThis is not persisted between reconnects.",
         "operationId": "Gs_GetGatewayConnectionStats",
         "responses": {
           "200": {
@@ -4077,7 +4131,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4106,6 +4160,7 @@
     },
     "/gs/gateways/{gateway_id}/mqtt-connection-info": {
       "get": {
+        "summary": "Get connection information to connect an MQTT gateway.",
         "operationId": "GtwGs_GetMQTTConnectionInfo",
         "responses": {
           "200": {
@@ -4115,7 +4170,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4144,6 +4199,7 @@
     },
     "/gs/gateways/{gateway_id}/mqttv2-connection-info": {
       "get": {
+        "summary": "Get legacy connection information to connect a The Things Network Stack V2 MQTT gateway.",
         "operationId": "GtwGs_GetMQTTV2ConnectionInfo",
         "responses": {
           "200": {
@@ -4153,7 +4209,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4182,6 +4238,7 @@
     },
     "/invitations": {
       "get": {
+        "summary": "List the invitations the caller has sent.",
         "operationId": "UserInvitationRegistry_List",
         "responses": {
           "200": {
@@ -4191,7 +4248,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4220,6 +4277,7 @@
         ]
       },
       "delete": {
+        "summary": "Delete (revoke) a user invitation.",
         "operationId": "UserInvitationRegistry_Delete",
         "responses": {
           "200": {
@@ -4229,7 +4287,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4248,6 +4306,7 @@
         ]
       },
       "post": {
+        "summary": "Invite a user to join the network.",
         "operationId": "UserInvitationRegistry_Send",
         "responses": {
           "200": {
@@ -4257,7 +4316,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4289,7 +4348,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4302,6 +4361,7 @@
     },
     "/js/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
+        "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
         "operationId": "JsEndDeviceRegistry_Delete",
         "responses": {
           "200": {
@@ -4311,7 +4371,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4362,6 +4422,7 @@
     },
     "/js/applications/{application_ids.application_id}/provision-devices": {
       "put": {
+        "summary": "This rpc is deprecated; use EndDeviceTemplateConverter service instead.\nTODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/999)",
         "operationId": "JsEndDeviceRegistry_Provision",
         "responses": {
           "200": {
@@ -4380,7 +4441,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4409,6 +4470,7 @@
     },
     "/js/applications/{application_ids.application_id}/settings": {
       "get": {
+        "summary": "Get returns application activation settings.",
         "operationId": "ApplicationActivationSettingRegistry_Get",
         "responses": {
           "200": {
@@ -4418,7 +4480,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4448,6 +4510,7 @@
         ]
       },
       "delete": {
+        "summary": "Delete deletes application activation settings.",
         "operationId": "ApplicationActivationSettingRegistry_Delete",
         "responses": {
           "200": {
@@ -4457,7 +4520,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4476,6 +4539,7 @@
         ]
       },
       "post": {
+        "summary": "Set creates or updates application activation settings.",
         "operationId": "ApplicationActivationSettingRegistry_Set",
         "responses": {
           "200": {
@@ -4485,7 +4549,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4514,6 +4578,7 @@
     },
     "/js/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
+        "summary": "Set creates or updates the device.",
         "operationId": "JsEndDeviceRegistry_Set2",
         "responses": {
           "200": {
@@ -4523,7 +4588,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4552,6 +4617,7 @@
     },
     "/js/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}": {
       "put": {
+        "summary": "Set creates or updates the device.",
         "operationId": "JsEndDeviceRegistry_Set",
         "responses": {
           "200": {
@@ -4561,7 +4627,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4596,6 +4662,7 @@
     },
     "/js/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}": {
       "get": {
+        "summary": "Get returns the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
         "operationId": "JsEndDeviceRegistry_Get",
         "responses": {
           "200": {
@@ -4605,7 +4672,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4676,7 +4743,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4689,6 +4756,7 @@
     },
     "/ns/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
+        "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
         "operationId": "NsEndDeviceRegistry_Delete",
         "responses": {
           "200": {
@@ -4698,7 +4766,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4749,6 +4817,7 @@
     },
     "/ns/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
+        "summary": "Set creates or updates the device.",
         "operationId": "NsEndDeviceRegistry_Set2",
         "responses": {
           "200": {
@@ -4758,7 +4827,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4787,6 +4856,7 @@
     },
     "/ns/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}": {
       "put": {
+        "summary": "Set creates or updates the device.",
         "operationId": "NsEndDeviceRegistry_Set",
         "responses": {
           "200": {
@@ -4796,7 +4866,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4831,6 +4901,7 @@
     },
     "/ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}": {
       "get": {
+        "summary": "Get returns the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
         "operationId": "NsEndDeviceRegistry_Get",
         "responses": {
           "200": {
@@ -4840,7 +4911,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4902,6 +4973,7 @@
     },
     "/ns/dev_addr": {
       "get": {
+        "summary": "GenerateDevAddr requests a device address assignment from the Network Server.",
         "operationId": "Ns_GenerateDevAddr",
         "responses": {
           "200": {
@@ -4911,7 +4983,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -4924,6 +4996,7 @@
     },
     "/organizations": {
       "get": {
+        "summary": "List organizations where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the organizations the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "OrganizationRegistry_List",
         "responses": {
           "200": {
@@ -4933,7 +5006,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5013,7 +5086,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5091,7 +5164,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5121,6 +5194,7 @@
     },
     "/organizations/{collaborator.organization_ids.organization_id}/clients": {
       "get": {
+        "summary": "List OAuth clients where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the OAuth clients the caller\nhas access to.\nSimilar to Get, this selects the fields sepcified in the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "ClientRegistry_List3",
         "responses": {
           "200": {
@@ -5130,7 +5204,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5198,6 +5272,7 @@
         ]
       },
       "post": {
+        "summary": "Create a new OAuth client. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
         "operationId": "ClientRegistry_Create2",
         "responses": {
           "200": {
@@ -5207,7 +5282,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5237,6 +5312,7 @@
     },
     "/organizations/{collaborator.organization_ids.organization_id}/gateways": {
       "get": {
+        "summary": "List gateways where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the gateways the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "GatewayRegistry_List3",
         "responses": {
           "200": {
@@ -5246,7 +5322,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5314,6 +5390,7 @@
         ]
       },
       "post": {
+        "summary": "Create a new gateway. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
         "operationId": "GatewayRegistry_Create2",
         "responses": {
           "200": {
@@ -5323,7 +5400,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5353,6 +5430,7 @@
     },
     "/organizations/{organization.ids.organization_id}": {
       "put": {
+        "summary": "Update the organization, changing the fields specified by the field mask to the provided values.",
         "operationId": "OrganizationRegistry_Update",
         "responses": {
           "200": {
@@ -5362,7 +5440,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5392,6 +5470,7 @@
     },
     "/organizations/{organization_ids.organization_id}": {
       "get": {
+        "summary": "Get the organization with the given identifiers, selecting the fields specified\nin the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "OrganizationRegistry_Get",
         "responses": {
           "200": {
@@ -5401,7 +5480,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5434,6 +5513,7 @@
     },
     "/organizations/{organization_ids.organization_id}/api-keys": {
       "get": {
+        "summary": "List the API keys for this organization.",
         "operationId": "OrganizationAccess_ListAPIKeys",
         "responses": {
           "200": {
@@ -5443,7 +5523,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5479,6 +5559,7 @@
         ]
       },
       "post": {
+        "summary": "Create an API key scoped to this organization.\nOrganization API keys can give access to the organization itself, as well as\nany application, gateway and OAuth client this organization is a collaborator of.",
         "operationId": "OrganizationAccess_CreateAPIKey",
         "responses": {
           "200": {
@@ -5488,7 +5569,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5518,6 +5599,7 @@
     },
     "/organizations/{organization_ids.organization_id}/api-keys/{api_key.id}": {
       "put": {
+        "summary": "Update the rights of an API key of the organization.\nThis method can also be used to delete the API key, by giving it no rights.\nThe caller is required to have all assigned or/and removed rights.",
         "operationId": "OrganizationAccess_UpdateAPIKey",
         "responses": {
           "200": {
@@ -5527,7 +5609,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5564,6 +5646,7 @@
     },
     "/organizations/{organization_ids.organization_id}/api-keys/{key_id}": {
       "get": {
+        "summary": "Get a single API key of this organization.",
         "operationId": "OrganizationAccess_GetAPIKey",
         "responses": {
           "200": {
@@ -5573,7 +5656,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5602,6 +5685,7 @@
     },
     "/organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}": {
       "get": {
+        "summary": "Get the rights of a collaborator (member) of the organization.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
         "operationId": "OrganizationAccess_GetCollaborator",
         "responses": {
           "200": {
@@ -5611,7 +5695,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5647,6 +5731,7 @@
     },
     "/organizations/{organization_ids.organization_id}/collaborators": {
       "get": {
+        "summary": "List the collaborators on this organization.",
         "operationId": "OrganizationAccess_ListCollaborators",
         "responses": {
           "200": {
@@ -5656,7 +5741,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5692,6 +5777,7 @@
         ]
       },
       "put": {
+        "summary": "Set the rights of a collaborator (member) on the organization.\nOrganization collaborators can get access to the organization itself, as well as\nany application, gateway and OAuth client this organization is a collaborator of.\nThis method can also be used to delete the collaborator, by giving them no rights.\nThe caller is required to have all assigned or/and removed rights.",
         "operationId": "OrganizationAccess_SetCollaborator",
         "responses": {
           "200": {
@@ -5701,7 +5787,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5731,6 +5817,7 @@
     },
     "/organizations/{organization_id}": {
       "delete": {
+        "summary": "Delete the organization. This may not release the organization ID for reuse.",
         "operationId": "OrganizationRegistry_Delete",
         "responses": {
           "200": {
@@ -5740,7 +5827,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5762,6 +5849,7 @@
     },
     "/organizations/{organization_id}/rights": {
       "get": {
+        "summary": "List the rights the caller has on this organization.",
         "operationId": "OrganizationAccess_ListRights",
         "responses": {
           "200": {
@@ -5771,7 +5859,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5793,6 +5881,7 @@
     },
     "/qr-codes/end-devices": {
       "post": {
+        "summary": "Generates a QR code.",
         "operationId": "EndDeviceQRCodeGenerator_Generate",
         "responses": {
           "200": {
@@ -5802,7 +5891,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5825,6 +5914,7 @@
     },
     "/qr-codes/end-devices/formats": {
       "get": {
+        "summary": "Returns the supported formats.",
         "operationId": "EndDeviceQRCodeGenerator_ListFormats",
         "responses": {
           "200": {
@@ -5834,7 +5924,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5847,6 +5937,7 @@
     },
     "/qr-codes/end-devices/formats/{format_id}": {
       "get": {
+        "summary": "Return the QR code format.",
         "operationId": "EndDeviceQRCodeGenerator_GetFormat",
         "responses": {
           "200": {
@@ -5856,7 +5947,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5886,7 +5977,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -5965,7 +6056,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6071,7 +6162,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6150,7 +6241,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6229,7 +6320,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6308,7 +6399,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6378,6 +6469,7 @@
     },
     "/users": {
       "get": {
+        "summary": "List users of the network. This method is typically restricted to admins only.",
         "operationId": "UserRegistry_List",
         "responses": {
           "200": {
@@ -6387,7 +6479,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6434,6 +6526,7 @@
         ]
       },
       "post": {
+        "summary": "Register a new user. This method may be restricted by network settings.",
         "operationId": "UserRegistry_Create",
         "responses": {
           "200": {
@@ -6443,7 +6536,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6476,7 +6569,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6554,7 +6647,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6584,6 +6677,7 @@
     },
     "/users/{collaborator.user_ids.user_id}/clients": {
       "get": {
+        "summary": "List OAuth clients where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the OAuth clients the caller\nhas access to.\nSimilar to Get, this selects the fields sepcified in the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "ClientRegistry_List2",
         "responses": {
           "200": {
@@ -6593,7 +6687,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6661,6 +6755,7 @@
         ]
       },
       "post": {
+        "summary": "Create a new OAuth client. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
         "operationId": "ClientRegistry_Create",
         "responses": {
           "200": {
@@ -6670,7 +6765,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6700,6 +6795,7 @@
     },
     "/users/{collaborator.user_ids.user_id}/gateways": {
       "get": {
+        "summary": "List gateways where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the gateways the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "GatewayRegistry_List2",
         "responses": {
           "200": {
@@ -6709,7 +6805,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6777,6 +6873,7 @@
         ]
       },
       "post": {
+        "summary": "Create a new gateway. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
         "operationId": "GatewayRegistry_Create",
         "responses": {
           "200": {
@@ -6786,7 +6883,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6816,6 +6913,7 @@
     },
     "/users/{collaborator.user_ids.user_id}/organizations": {
       "get": {
+        "summary": "List organizations where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the organizations the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "OrganizationRegistry_List2",
         "responses": {
           "200": {
@@ -6825,7 +6923,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6893,6 +6991,7 @@
         ]
       },
       "post": {
+        "summary": "Create a new organization. This also sets the given user as\nfirst collaborator with all possible rights.",
         "operationId": "OrganizationRegistry_Create",
         "responses": {
           "200": {
@@ -6902,7 +7001,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6932,6 +7031,7 @@
     },
     "/users/{user.ids.user_id}": {
       "put": {
+        "summary": "Update the user, changing the fields specified by the field mask to the provided values.\nThis method can not be used to change the password, see the UpdatePassword method for that.",
         "operationId": "UserRegistry_Update",
         "responses": {
           "200": {
@@ -6941,7 +7041,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -6971,6 +7071,7 @@
     },
     "/users/{user_ids.user_id}": {
       "get": {
+        "summary": "Get the user with the given identifiers, selecting the fields given by the\nfield mask. The method may return more or less fields, depending on the rights\nof the caller.",
         "operationId": "UserRegistry_Get",
         "responses": {
           "200": {
@@ -6980,7 +7081,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7020,6 +7121,7 @@
     },
     "/users/{user_ids.user_id}/api-keys": {
       "get": {
+        "summary": "List the API keys for this user.",
         "operationId": "UserAccess_ListAPIKeys",
         "responses": {
           "200": {
@@ -7029,7 +7131,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7072,6 +7174,7 @@
         ]
       },
       "post": {
+        "summary": "Create an API key scoped to this user.\nUser API keys can give access to the user itself, as well as\nany organization, application, gateway and OAuth client this user is a collaborator of.",
         "operationId": "UserAccess_CreateAPIKey",
         "responses": {
           "200": {
@@ -7081,7 +7184,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7111,6 +7214,7 @@
     },
     "/users/{user_ids.user_id}/api-keys/{api_key.id}": {
       "put": {
+        "summary": "Update the rights of an API key of the user.\nThis method can also be used to delete the API key, by giving it no rights.\nThe caller is required to have all assigned or/and removed rights.",
         "operationId": "UserAccess_UpdateAPIKey",
         "responses": {
           "200": {
@@ -7120,7 +7224,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7157,6 +7261,7 @@
     },
     "/users/{user_ids.user_id}/api-keys/{key_id}": {
       "get": {
+        "summary": "Get a single API key of this user.",
         "operationId": "UserAccess_GetAPIKey",
         "responses": {
           "200": {
@@ -7166,7 +7271,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7211,7 +7316,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7272,7 +7377,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7316,7 +7421,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7383,7 +7488,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7424,6 +7529,7 @@
     },
     "/users/{user_ids.user_id}/password": {
       "put": {
+        "summary": "Update the password of the user.",
         "operationId": "UserRegistry_UpdatePassword",
         "responses": {
           "200": {
@@ -7433,7 +7539,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7463,6 +7569,7 @@
     },
     "/users/{user_ids.user_id}/sessions": {
       "get": {
+        "summary": "List the active sessions for the given user.",
         "operationId": "UserSessionRegistry_List",
         "responses": {
           "200": {
@@ -7472,7 +7579,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7524,6 +7631,7 @@
     },
     "/users/{user_ids.user_id}/sessions/{session_id}": {
       "delete": {
+        "summary": "Delete (revoke) the given user session.",
         "operationId": "UserSessionRegistry_Delete",
         "responses": {
           "200": {
@@ -7533,7 +7641,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7568,6 +7676,7 @@
     },
     "/users/{user_ids.user_id}/temporary_password": {
       "post": {
+        "summary": "Create a temporary password that can be used for updating a forgotten password.\nThe generated password is sent to the user's email address.",
         "operationId": "UserRegistry_CreateTemporaryPassword",
         "responses": {
           "200": {
@@ -7577,7 +7686,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7599,6 +7708,7 @@
     },
     "/users/{user_id}": {
       "delete": {
+        "summary": "Delete the user. This may not release the user ID for reuse.",
         "operationId": "UserRegistry_Delete",
         "responses": {
           "200": {
@@ -7608,7 +7718,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7637,6 +7747,7 @@
     },
     "/users/{user_id}/rights": {
       "get": {
+        "summary": "List the rights the caller has on this user.",
         "operationId": "UserAccess_ListRights",
         "responses": {
           "200": {
@@ -7646,7 +7757,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -7776,8 +7887,7 @@
           "$ref": "#/definitions/MQTTProviderQoS"
         },
         "use_tls": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "tls_ca": {
           "type": "string",
@@ -7982,8 +8092,7 @@
       "type": "object",
       "properties": {
         "disable_upload": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -7991,12 +8100,10 @@
       "type": "object",
       "properties": {
         "disable_upload": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "use_gravatar": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -8021,8 +8128,7 @@
       "type": "object",
       "properties": {
         "required": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -8030,8 +8136,7 @@
       "type": "object",
       "properties": {
         "required": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "token_ttl": {
           "type": "string"
@@ -8042,20 +8147,16 @@
       "type": "object",
       "properties": {
         "create_applications": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "create_clients": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "create_gateways": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "create_organizations": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -8076,8 +8177,7 @@
       "type": "object",
       "properties": {
         "frequency_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -8107,12 +8207,10 @@
       "type": "object",
       "properties": {
         "channel_index_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "frequency_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -8200,16 +8298,13 @@
       "type": "object",
       "properties": {
         "channel_mask_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "data_rate_index_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "tx_power_index_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -8226,8 +8321,7 @@
         "channel_mask": {
           "type": "array",
           "items": {
-            "type": "boolean",
-            "format": "boolean"
+            "type": "boolean"
           }
         },
         "channel_mask_control": {
@@ -8258,12 +8352,10 @@
       "type": "object",
       "properties": {
         "frequency_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "data_rate_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -8290,12 +8382,10 @@
       "type": "object",
       "properties": {
         "frequency_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "data_rate_index_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -8323,8 +8413,7 @@
       "type": "object",
       "properties": {
         "max_time_exponent_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -8377,16 +8466,13 @@
       "type": "object",
       "properties": {
         "rx2_data_rate_index_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "rx1_data_rate_offset_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "rx2_frequency_ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -8422,12 +8508,10 @@
           "title": "Indicates the maximum EIRP value in dBm, indexed by the following vector:\n[ 8 10 12 13 14 16 18 20 21 24 26 27 29 30 33 36 ]"
         },
         "uplink_dwell_time": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "downlink_dwell_time": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -8568,7 +8652,6 @@
         },
         "invert_polarization": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Invert LoRa polarization; false for LoRaWAN uplink, true for downlink."
         }
       },
@@ -8578,8 +8661,7 @@
       "type": "object",
       "properties": {
         "required": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -9028,8 +9110,7 @@
           "description": "Warnings generated by the message processor while encoding frm_payload (scheduling downlink) or decoding the frm_payload (reading downlink)."
         },
         "confirmed": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "class_b_c": {
           "$ref": "#/definitions/ApplicationDownlinkClassBC",
@@ -9113,7 +9194,6 @@
         },
         "pending_session": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Indicates whether the security context refers to the pending session, i.e. when this join-accept is an answer to a\nrejoin-request."
         },
         "received_at": {
@@ -9140,12 +9220,10 @@
         },
         "tls": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Enable TLS for linking to the external Network Server.\nFor cluster-local Network Servers, the cluster's TLS setting is used."
         },
         "skip_payload_crypto": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nLeave empty for the using the Application Server's default setting."
         }
       }
@@ -9487,7 +9565,6 @@
         },
         "simulated": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Signals if the message is coming from the Network Server or is simulated."
         }
       }
@@ -9550,8 +9627,7 @@
           "description": "The last AFCntDown of the current session.\nThis field is only present if the skip_payload_crypto field of the EndDevice\nis true.\nCan be used with app_s_key to encrypt downlink payloads."
         },
         "confirmed": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "consumed_airtime": {
           "type": "string",
@@ -9717,7 +9793,6 @@
         },
         "create_downlink_api_key": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Control the creation of the downlink queue operations API key."
         },
         "uplink_message": {
@@ -9766,7 +9841,6 @@
         },
         "secret": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Secret decides if the field should be shown in plain-text or should stay hidden."
         },
         "default_value": {
@@ -9842,8 +9916,7 @@
           "$ref": "#/definitions/v3Rights"
         },
         "is_admin": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -9875,8 +9948,7 @@
         "ch_masks": {
           "type": "array",
           "items": {
-            "type": "boolean",
-            "format": "boolean"
+            "type": "boolean"
           },
           "description": "ChMasks controlling the channels to be used.\nLength of this field must be equal to the amount of uplink channels\ndefined by the selected frequency plan."
         }
@@ -9935,7 +10007,6 @@
         },
         "invalidate_authentication_code": {
           "type": "boolean",
-          "format": "boolean",
           "description": "If set, invalidate the authentication code with which the device gets claimed. This prohibits subsequent claiming requests."
         }
       }
@@ -10007,12 +10078,10 @@
         },
         "skip_authorization": {
           "type": "boolean",
-          "format": "boolean",
           "description": "If set, the authorization page will be skipped.\nThis field can only be modified by admins."
         },
         "endorsed": {
           "type": "boolean",
-          "format": "boolean",
           "description": "If set, the authorization page will show endorsement.\nThis field can only be modified by admins."
         },
         "grants": {
@@ -10136,8 +10205,7 @@
           "type": "string"
         },
         "public": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "validated_at": {
           "type": "string",
@@ -10356,7 +10424,6 @@
         },
         "opt_neg": {
           "type": "boolean",
-          "format": "boolean",
           "description": "OptNeg is set if Network Server implements LoRaWAN 1.1 or greater."
         }
       }
@@ -10562,12 +10629,10 @@
         },
         "supports_class_b": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Whether the device supports class B.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
         },
         "supports_class_c": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Whether the device supports class C.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
         },
         "lorawan_version": {
@@ -10594,12 +10659,10 @@
         },
         "supports_join": {
           "type": "boolean",
-          "format": "boolean",
           "description": "The device supports join (it's OTAA).\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
         },
         "resets_join_nonces": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Whether the device resets the join and dev nonces (not LoRaWAN compliant). Stored in Join Server.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
         },
         "root_keys": {
@@ -10720,7 +10783,6 @@
         },
         "multicast": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Indicates whether this device represents a multicast group."
         },
         "claim_authentication_code": {
@@ -10729,12 +10791,10 @@
         },
         "skip_payload_crypto": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nThis field is deprecated, use skip_payload_crypto_override instead."
         },
         "skip_payload_crypto_override": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nThis field overrides the application-level setting."
         }
       },
@@ -10988,24 +11048,19 @@
       "type": "object",
       "properties": {
         "adr": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "adr_ack_req": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "ack": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "f_pending": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "class_b": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -11101,8 +11156,7 @@
           "description": "The address of the Gateway Server to connect to.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band."
         },
         "auto_update": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "update_channel": {
           "type": "string"
@@ -11126,22 +11180,18 @@
         },
         "status_public": {
           "type": "boolean",
-          "format": "boolean",
           "description": "The status of this gateway may be publicly displayed."
         },
         "location_public": {
           "type": "boolean",
-          "format": "boolean",
           "description": "The location of this gateway may be publicly displayed."
         },
         "schedule_downlink_late": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Enable server-side buffering of downlink messages. This is recommended for gateways using the Semtech UDP Packet\nForwarder v2.x or older, as it does not feature a just-in-time queue. If enabled, the Gateway Server schedules the\ndownlink message late to the gateway so that it does not overwrite previously scheduled downlink messages that have\nnot been transmitted yet."
         },
         "enforce_duty_cycle": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Enforcing gateway duty cycle is recommended for all gateways to respect spectrum regulations. Disable enforcing the\nduty cycle only in controlled research and development environments."
         },
         "downlink_path_constraint": {
@@ -11153,7 +11203,6 @@
         },
         "update_location_from_status": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Update the location of this gateway from status messages. This only works for gateways connecting with authentication; gateways connected over UDP are not supported."
         },
         "lbs_lns_secret": {
@@ -11269,8 +11318,7 @@
       "type": "object",
       "properties": {
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "chip_type": {
           "type": "string"
@@ -11868,12 +11916,10 @@
         },
         "uplink_dwell_time": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Whether uplink dwell time is set (400ms).\nIf this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it)."
         },
         "downlink_dwell_time": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Whether downlink dwell time is set (400ms).\nIf this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it)."
         },
         "adr_ack_limit_exponent": {
@@ -11914,7 +11960,6 @@
         },
         "enable_uplink": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Channel can be used by device for uplink."
         }
       }
@@ -12004,12 +12049,10 @@
         },
         "supports_32_bit_f_cnt": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Whether the device supports 32-bit frame counters.\nIf unset, the default value from Network Server configuration will be used."
         },
         "use_adr": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Whether the Network Server should use ADR for the device.\nIf unset, the default value from Network Server configuration will be used."
         },
         "adr_margin": {
@@ -12019,7 +12062,6 @@
         },
         "resets_f_cnt": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Whether the device resets the frame counters (not LoRaWAN compliant).\nIf unset, the default value from Network Server configuration will be used."
         },
         "status_time_periodicity": {
@@ -12138,7 +12180,6 @@
         },
         "rx_windows_available": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Whether or not Rx windows are expected to be open.\nSet to true every time an uplink is received.\nSet to false every time a successful downlink scheduling attempt is made."
         },
         "recent_uplinks": {
@@ -13340,7 +13381,6 @@
         },
         "enable_crc": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled."
         },
         "timestamp": {
@@ -13478,7 +13518,6 @@
         },
         "revoke_all_access": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Revoke active sessions and access tokens of user if true. To be used if credentials are suspected to be compromised."
         }
       }
@@ -13589,8 +13628,7 @@
           "format": "date-time"
         },
         "require_password_update": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "state": {
           "$ref": "#/definitions/v3State",
@@ -13598,7 +13636,6 @@
         },
         "admin": {
           "type": "boolean",
-          "format": "boolean",
           "description": "This user is an admin.\nThis field can only be modified by other admins."
         },
         "temporary_password": {
