@@ -301,7 +301,7 @@
   "console.views.device-add.messages.appTitle": "Application layer settings",
   "console.views.device-add.messages.appDescription": "Application session key to encrypt/decrypt LoRaWAN payload.",
   "console.views.device-add.messages.joinTitle": "Join settings",
-  "console.views.device-add.messages.joinDescription": "Root keys, net ID and kek labels.",
+  "console.views.device-add.messages.joinDescription": "Root keys, NetID and kek labels.",
   "console.views.device-add.wizard.prompt.index.modalTitle": "Confirm navigation",
   "console.views.device-add.wizard.prompt.index.modalMessage": "Are you sure you want to leave this page and abort the end device creation? There are unsaved changes that will be lost.",
   "console.views.device-add.wizard.prompt.index.modalApproveText": "Confirm navigation",

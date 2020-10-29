@@ -12,26 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import PropTypes from '@ttn-lw/lib/prop-types'
-import renderCallback from '@ttn-lw/lib/render-callback'
-
-import { useWizardContext } from './context'
-
-const Step = props => {
-  const context = useWizardContext()
-
-  return renderCallback(props, context)
-}
-
-Step.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
-  id: PropTypes.string.isRequired,
-  render: PropTypes.func,
-}
-
-Step.defaultProps = {
-  render: undefined,
-  children: [],
-}
-
-export default Step
+export { STACK_COMPONENTS_MAP as default } from 'ttn-lw'

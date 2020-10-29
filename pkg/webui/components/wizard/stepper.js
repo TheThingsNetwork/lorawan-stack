@@ -21,17 +21,21 @@ import Stepper from '../stepper'
 import { useWizardContext } from './context'
 
 const WizardStepper = props => {
-  const { currentStep, steps } = useWizardContext()
+  const { currentStepId, steps, error } = useWizardContext()
   const { children, ...rest } = props
 
-  if (steps.length <= 1) {
+  const currentStepIndex = steps.findIndex(({ id }) => id === currentStepId)
+
+  if (steps.length <= 1 || currentStepIndex < 0) {
     return null
   }
 
+  const status = Boolean(error) ? 'failure' : 'current'
+
   return (
-    <Stepper {...rest} currentStep={currentStep}>
+    <Stepper {...rest} status={status} currentStep={currentStepIndex + 1}>
       {React.Children.map(children, (child, index) => {
-        if (child !== null && child.type.displayName === 'Stepper.Step') {
+        if (React.isValidElement(child) && child.type.displayName === 'Stepper.Step') {
           return React.cloneElement(child, {
             ...child.props,
             stepNumber: index + 1,

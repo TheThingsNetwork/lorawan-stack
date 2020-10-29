@@ -14,7 +14,7 @@
 
 import axios from 'axios'
 
-import TTN from 'ttn-lw'
+import TTN, { STACK_COMPONENTS_MAP } from 'ttn-lw'
 
 import toast from '@ttn-lw/components/toast'
 
@@ -30,14 +30,14 @@ const stackConfig = selectStackConfig()
 const appRoot = selectApplicationRootPath()
 
 const stack = {
-  is: stackConfig.is.enabled ? stackConfig.is.base_url : undefined,
-  gs: stackConfig.gs.enabled ? stackConfig.gs.base_url : undefined,
-  ns: stackConfig.ns.enabled ? stackConfig.ns.base_url : undefined,
-  as: stackConfig.as.enabled ? stackConfig.as.base_url : undefined,
-  js: stackConfig.js.enabled ? stackConfig.js.base_url : undefined,
-  edtc: stackConfig.edtc.enabled ? stackConfig.edtc.base_url : undefined,
-  qrg: stackConfig.qrg.enabled ? stackConfig.qrg.base_url : undefined,
-  gcs: stackConfig.gcs.enabled ? stackConfig.gcs.base_url : undefined,
+  [STACK_COMPONENTS_MAP.is]: stackConfig.is.enabled ? stackConfig.is.base_url : undefined,
+  [STACK_COMPONENTS_MAP.gs]: stackConfig.gs.enabled ? stackConfig.gs.base_url : undefined,
+  [STACK_COMPONENTS_MAP.ns]: stackConfig.ns.enabled ? stackConfig.ns.base_url : undefined,
+  [STACK_COMPONENTS_MAP.as]: stackConfig.as.enabled ? stackConfig.as.base_url : undefined,
+  [STACK_COMPONENTS_MAP.js]: stackConfig.js.enabled ? stackConfig.js.base_url : undefined,
+  [STACK_COMPONENTS_MAP.edtc]: stackConfig.edtc.enabled ? stackConfig.edtc.base_url : undefined,
+  [STACK_COMPONENTS_MAP.qrg]: stackConfig.qrg.enabled ? stackConfig.qrg.base_url : undefined,
+  [STACK_COMPONENTS_MAP.gcs]: stackConfig.gcs.enabled ? stackConfig.gcs.base_url : undefined,
 }
 
 const isBaseUrl = stackConfig.is.base_url

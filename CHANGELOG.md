@@ -29,6 +29,7 @@ For details about compatibility between different releases, see the **Commitment
 - Downlink count for end devices in the Console.
 - Support for Application Activation Settings in the Join Server to configure Application Server KEK, ID and Home NetID.
 - Downlink queue invalidated message sent upstream by Application Server to support applications to re-encrypt the downlink queue when Application Server skips FRMPayload crypto.
+- Navigation to errored step in the end device wizard in the Console.
 
 ### Changed
 

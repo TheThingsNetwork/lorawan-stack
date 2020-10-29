@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import STACK_COMPONENTS_MAP from '@console/constants/stack-components'
+
 import Wizard from '@ttn-lw/components/wizard'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -37,6 +39,13 @@ import ApplicationSettingsForm from './application-settings-form'
 import JoinSettingsForm from './join-settings-form'
 import Prompt from './prompt'
 
+const WIZARD_STEPS_MAP = {
+  BASIC: STACK_COMPONENTS_MAP.is,
+  NETWORK: STACK_COMPONENTS_MAP.ns,
+  APPLICATION: STACK_COMPONENTS_MAP.as,
+  JOIN: STACK_COMPONENTS_MAP.js,
+}
+
 const DeviceWizard = props => {
   const {
     configuration,
@@ -52,7 +61,8 @@ const DeviceWizard = props => {
   } = props
 
   const [completed, setCompleted] = React.useState(false)
-  const [error, setError] = React.useState('')
+
+  const wizardRef = React.useRef(null)
 
   const handleWizardComplete = React.useCallback(
     async values => {
@@ -61,7 +71,16 @@ const DeviceWizard = props => {
         setCompleted(true)
         return createDeviceSuccess(values)
       } catch (error) {
-        setError(error)
+        const { steps, onError } = wizardRef.current
+        const { request_details = {} } = error
+
+        const erroredStep = steps.find(({ id }) => {
+          return id === request_details.stack_component
+        })
+
+        if (typeof erroredStep !== 'undefined') {
+          onError(erroredStep.id, error)
+        }
       }
     },
     [createDevice, createDeviceSuccess],
@@ -82,11 +101,12 @@ const DeviceWizard = props => {
   return (
     <Wizard
       initialValues={configuration}
+      initialStepId={WIZARD_STEPS_MAP.BASIC}
       onComplete={handleWizardComplete}
       completeMessage={sharedMessages.addDevice}
+      ref={wizardRef}
     >
       {({ snapshot }) => {
-        const stepperStatus = Boolean(error) ? 'failure' : 'current'
         const activationMode = getActivationMode(snapshot)
         const lorawanVersion = getLorawanVersion(snapshot)
 
@@ -109,7 +129,7 @@ const DeviceWizard = props => {
               shouldBlockNavigation={handleBlockNavigation}
               onApprove={handlePromptApprove}
             />
-            <Wizard.Stepper status={stepperStatus}>
+            <Wizard.Stepper>
               <Wizard.Stepper.Step title={m.basicTitle} description={m.basicDescription} />
               {showNetworkStep && (
                 <Wizard.Stepper.Step title={m.networkTitle} description={m.networkDescription} />
@@ -122,9 +142,8 @@ const DeviceWizard = props => {
               )}
             </Wizard.Stepper>
             <Wizard.Steps>
-              <Wizard.Step title={m.basicTitle}>
+              <Wizard.Step title={m.basicTitle} id={WIZARD_STEPS_MAP.BASIC}>
                 <BasicSettingsForm
-                  error={error}
                   activationMode={activationMode}
                   lorawanVersion={lorawanVersion}
                   match={match}
@@ -133,9 +152,8 @@ const DeviceWizard = props => {
                 />
               </Wizard.Step>
               {showNetworkStep && (
-                <Wizard.Step title={m.networkTitle}>
+                <Wizard.Step title={m.networkTitle} id={WIZARD_STEPS_MAP.NETWORK}>
                   <NetworkSettingsForm
-                    error={error}
                     activationMode={activationMode}
                     lorawanVersion={lorawanVersion}
                     mayEditKeys={mayEditKeys}
@@ -145,9 +163,8 @@ const DeviceWizard = props => {
                 </Wizard.Step>
               )}
               {showApplicationStep && (
-                <Wizard.Step title={m.appTitle}>
+                <Wizard.Step title={m.appTitle} id={WIZARD_STEPS_MAP.APPLICATION}>
                   <ApplicationSettingsForm
-                    error={error}
                     mayEditKeys={mayEditKeys}
                     match={match}
                     title={m.appTitle}
@@ -155,9 +172,8 @@ const DeviceWizard = props => {
                 </Wizard.Step>
               )}
               {showJoinStep && (
-                <Wizard.Step title={m.joinTitle}>
+                <Wizard.Step title={m.joinTitle} id={WIZARD_STEPS_MAP.JOIN}>
                   <JoinSettingsForm
-                    error={error}
                     lorawanVersion={lorawanVersion}
                     mayEditKeys={mayEditKeys}
                     match={match}

@@ -14,6 +14,7 @@
 
 import Marshaler from '../util/marshaler'
 import combineStreams from '../util/combine-streams'
+import { STACK_COMPONENTS_MAP } from '../util/constants'
 
 import ApiKeys from './api-keys'
 import Collaborators from './collaborators'
@@ -175,7 +176,10 @@ class Gateways {
     // Event streams can come from multiple stack components. It is necessary to
     // check for stack components on different hosts and open distinct stream
     // connections for any distinct host if need be.
-    const distinctComponents = this._stackConfig.getComponentsWithDistinctBaseUrls(['is', 'gs'])
+    const distinctComponents = this._stackConfig.getComponentsWithDistinctBaseUrls([
+      STACK_COMPONENTS_MAP.is,
+      STACK_COMPONENTS_MAP.gs,
+    ])
 
     const streams = distinctComponents.map(component =>
       this._api.Events.Stream({ component }, payload),
