@@ -95,6 +95,9 @@ func TestPubSub(t *testing.T) {
 		DownlinkQueued: &ttnpb.ApplicationPubSub_Message{
 			Topic: "downlink.queued",
 		},
+		DownlinkQueueInvalidated: &ttnpb.ApplicationPubSub_Message{
+			Topic: "downlink.invalidated",
+		},
 		LocationSolved: &ttnpb.ApplicationPubSub_Message{
 			Topic: "location.solved",
 		},
@@ -108,6 +111,7 @@ func TestPubSub(t *testing.T) {
 		"downlink_failed",
 		"downlink_nack",
 		"downlink_queued",
+		"downlink_queue_invalidated",
 		"downlink_sent",
 		"downlink_push",
 		"downlink_replace",
@@ -247,6 +251,26 @@ func TestPubSub(t *testing.T) {
 					},
 				},
 				Subscription: conn.DownlinkQueued,
+			},
+			{
+				Name: "DownlinkMessage/QueueInvalidated",
+				Message: &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: registeredDeviceID,
+					Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+						DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
+							Downlinks: []*ttnpb.ApplicationDownlink{
+								{
+									SessionKeyID: []byte{0x22},
+									FCnt:         42,
+									FPort:        42,
+									FRMPayload:   []byte{0x1, 0x2, 0x3},
+								},
+							},
+							LastFCntDown: 42,
+						},
+					},
+				},
+				Subscription: conn.DownlinkQueueInvalidated,
 			},
 			{
 				Name: "DownlinkMessage/Failed",

@@ -33,6 +33,7 @@ type Topics interface {
 	GetDownlinkSent() *ttnpb.ApplicationPubSub_Message
 	GetDownlinkFailed() *ttnpb.ApplicationPubSub_Message
 	GetDownlinkQueued() *ttnpb.ApplicationPubSub_Message
+	GetDownlinkQueueInvalidated() *ttnpb.ApplicationPubSub_Message
 	GetLocationSolved() *ttnpb.ApplicationPubSub_Message
 	GetServiceData() *ttnpb.ApplicationPubSub_Message
 	GetDownlinkPush() *ttnpb.ApplicationPubSub_Message

@@ -5309,6 +5309,15 @@
       "file": "joinserver.go"
     }
   },
+  "error:pkg/joinserver:lookup_net_id": {
+    "translations": {
+      "en": "lookup NetID"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/joinserver:lorawan_major_version": {
     "translations": {
       "en": "unsupported LoRaWAN major version: `{major}`"

@@ -424,6 +424,31 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 					dst.DownlinkQueued = nil
 				}
 			}
+		case "downlink_queue_invalidated":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationWebhookTemplate_Message
+				if (src == nil || src.DownlinkQueueInvalidated == nil) && dst.DownlinkQueueInvalidated == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DownlinkQueueInvalidated
+				}
+				if dst.DownlinkQueueInvalidated != nil {
+					newDst = dst.DownlinkQueueInvalidated
+				} else {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.DownlinkQueueInvalidated = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkQueueInvalidated = src.DownlinkQueueInvalidated
+				} else {
+					dst.DownlinkQueueInvalidated = nil
+				}
+			}
 		case "location_solved":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationWebhookTemplate_Message
@@ -789,6 +814,31 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 					dst.DownlinkQueued = src.DownlinkQueued
 				} else {
 					dst.DownlinkQueued = nil
+				}
+			}
+		case "downlink_queue_invalidated":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationWebhook_Message
+				if (src == nil || src.DownlinkQueueInvalidated == nil) && dst.DownlinkQueueInvalidated == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DownlinkQueueInvalidated
+				}
+				if dst.DownlinkQueueInvalidated != nil {
+					newDst = dst.DownlinkQueueInvalidated
+				} else {
+					newDst = &ApplicationWebhook_Message{}
+					dst.DownlinkQueueInvalidated = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkQueueInvalidated = src.DownlinkQueueInvalidated
+				} else {
+					dst.DownlinkQueueInvalidated = nil
 				}
 			}
 		case "location_solved":

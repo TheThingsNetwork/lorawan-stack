@@ -602,6 +602,18 @@ func (m *ApplicationWebhookTemplate) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "downlink_queue_invalidated":
+
+			if v, ok := interface{}(m.GetDownlinkQueueInvalidated()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookTemplateValidationError{
+						field:  "downlink_queue_invalidated",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "location_solved":
 
 			if v, ok := interface{}(m.GetLocationSolved()).(interface{ ValidateFields(...string) error }); ok {
@@ -972,6 +984,18 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationWebhookValidationError{
 						field:  "downlink_queued",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink_queue_invalidated":
+
+			if v, ok := interface{}(m.GetDownlinkQueueInvalidated()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookValidationError{
+						field:  "downlink_queue_invalidated",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

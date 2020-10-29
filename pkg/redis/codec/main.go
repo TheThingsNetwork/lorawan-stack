@@ -50,6 +50,8 @@ func main() {
 
 	case "ttnpb.EndDevice":
 		pb = &ttnpb.EndDevice{}
+	case "ttnpb.ApplicationActivationSettings":
+		pb = &ttnpb.ApplicationActivationSettings{}
 	default:
 		log.Printf("Unknown type: `%s`", *typ)
 		flag.Usage()

@@ -334,6 +334,31 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 					dst.DownlinkQueued = nil
 				}
 			}
+		case "downlink_queue_invalidated":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationPubSub_Message
+				if (src == nil || src.DownlinkQueueInvalidated == nil) && dst.DownlinkQueueInvalidated == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DownlinkQueueInvalidated
+				}
+				if dst.DownlinkQueueInvalidated != nil {
+					newDst = dst.DownlinkQueueInvalidated
+				} else {
+					newDst = &ApplicationPubSub_Message{}
+					dst.DownlinkQueueInvalidated = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkQueueInvalidated = src.DownlinkQueueInvalidated
+				} else {
+					dst.DownlinkQueueInvalidated = nil
+				}
+			}
 		case "location_solved":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPubSub_Message

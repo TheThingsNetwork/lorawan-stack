@@ -41,15 +41,16 @@ func (ds *DownlinkSubscriptions) Shutdown(ctx context.Context) error {
 
 // UplinkTopics contains the topics for the uplink messages.
 type UplinkTopics struct {
-	UplinkMessage  *pubsub.Topic
-	JoinAccept     *pubsub.Topic
-	DownlinkAck    *pubsub.Topic
-	DownlinkNack   *pubsub.Topic
-	DownlinkSent   *pubsub.Topic
-	DownlinkFailed *pubsub.Topic
-	DownlinkQueued *pubsub.Topic
-	LocationSolved *pubsub.Topic
-	ServiceData    *pubsub.Topic
+	UplinkMessage            *pubsub.Topic
+	JoinAccept               *pubsub.Topic
+	DownlinkAck              *pubsub.Topic
+	DownlinkNack             *pubsub.Topic
+	DownlinkSent             *pubsub.Topic
+	DownlinkFailed           *pubsub.Topic
+	DownlinkQueued           *pubsub.Topic
+	DownlinkQueueInvalidated *pubsub.Topic
+	LocationSolved           *pubsub.Topic
+	ServiceData              *pubsub.Topic
 }
 
 // Shutdown shutdowns the active topics.
@@ -62,6 +63,7 @@ func (ut *UplinkTopics) Shutdown(ctx context.Context) error {
 		ut.DownlinkSent,
 		ut.DownlinkFailed,
 		ut.DownlinkQueued,
+		ut.DownlinkQueueInvalidated,
 		ut.LocationSolved,
 		ut.ServiceData,
 	)

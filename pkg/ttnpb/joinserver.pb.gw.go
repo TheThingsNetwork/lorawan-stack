@@ -21,6 +21,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -31,6 +32,7 @@ var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
+var _ = metadata.Join
 
 var (
 	filter_JsEndDeviceRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
@@ -660,11 +662,14 @@ func local_request_Js_GetJoinEUIPrefixes_0(ctx context.Context, marshaler runtim
 // RegisterJsEndDeviceRegistryHandlerServer registers the http handlers for service JsEndDeviceRegistry to "mux".
 // UnaryRPC     :call JsEndDeviceRegistryServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterJsEndDeviceRegistryHandlerFromEndpoint instead.
 func RegisterJsEndDeviceRegistryHandlerServer(ctx context.Context, mux *runtime.ServeMux, server JsEndDeviceRegistryServer) error {
 
 	mux.Handle("GET", pattern_JsEndDeviceRegistry_Get_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -672,6 +677,7 @@ func RegisterJsEndDeviceRegistryHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_JsEndDeviceRegistry_Get_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -685,6 +691,8 @@ func RegisterJsEndDeviceRegistryHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("PUT", pattern_JsEndDeviceRegistry_Set_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -692,6 +700,7 @@ func RegisterJsEndDeviceRegistryHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_JsEndDeviceRegistry_Set_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -705,6 +714,8 @@ func RegisterJsEndDeviceRegistryHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("POST", pattern_JsEndDeviceRegistry_Set_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -712,6 +723,7 @@ func RegisterJsEndDeviceRegistryHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_JsEndDeviceRegistry_Set_1(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -732,6 +744,8 @@ func RegisterJsEndDeviceRegistryHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("DELETE", pattern_JsEndDeviceRegistry_Delete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -739,6 +753,7 @@ func RegisterJsEndDeviceRegistryHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_JsEndDeviceRegistry_Delete_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -755,11 +770,14 @@ func RegisterJsEndDeviceRegistryHandlerServer(ctx context.Context, mux *runtime.
 // RegisterApplicationActivationSettingRegistryHandlerServer registers the http handlers for service ApplicationActivationSettingRegistry to "mux".
 // UnaryRPC     :call ApplicationActivationSettingRegistryServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterApplicationActivationSettingRegistryHandlerFromEndpoint instead.
 func RegisterApplicationActivationSettingRegistryHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ApplicationActivationSettingRegistryServer) error {
 
 	mux.Handle("GET", pattern_ApplicationActivationSettingRegistry_Get_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -767,6 +785,7 @@ func RegisterApplicationActivationSettingRegistryHandlerServer(ctx context.Conte
 			return
 		}
 		resp, md, err := local_request_ApplicationActivationSettingRegistry_Get_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -780,6 +799,8 @@ func RegisterApplicationActivationSettingRegistryHandlerServer(ctx context.Conte
 	mux.Handle("POST", pattern_ApplicationActivationSettingRegistry_Set_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -787,6 +808,7 @@ func RegisterApplicationActivationSettingRegistryHandlerServer(ctx context.Conte
 			return
 		}
 		resp, md, err := local_request_ApplicationActivationSettingRegistry_Set_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -800,6 +822,8 @@ func RegisterApplicationActivationSettingRegistryHandlerServer(ctx context.Conte
 	mux.Handle("DELETE", pattern_ApplicationActivationSettingRegistry_Delete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -807,6 +831,7 @@ func RegisterApplicationActivationSettingRegistryHandlerServer(ctx context.Conte
 			return
 		}
 		resp, md, err := local_request_ApplicationActivationSettingRegistry_Delete_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -823,11 +848,14 @@ func RegisterApplicationActivationSettingRegistryHandlerServer(ctx context.Conte
 // RegisterJsHandlerServer registers the http handlers for service Js to "mux".
 // UnaryRPC     :call JsServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterJsHandlerFromEndpoint instead.
 func RegisterJsHandlerServer(ctx context.Context, mux *runtime.ServeMux, server JsServer) error {
 
 	mux.Handle("GET", pattern_Js_GetJoinEUIPrefixes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -835,6 +863,7 @@ func RegisterJsHandlerServer(ctx context.Context, mux *runtime.ServeMux, server 
 			return
 		}
 		resp, md, err := local_request_Js_GetJoinEUIPrefixes_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
