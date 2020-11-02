@@ -4813,6 +4813,41 @@
         "tags": [
           "NsEndDeviceRegistry"
         ]
+      },
+      "patch": {
+        "summary": "Reset resets device state.",
+        "operationId": "NsEndDeviceRegistry_Reset",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NsEndDeviceRegistry"
+        ]
       }
     },
     "/ns/applications/{end_device.ids.application_ids.application_id}/devices": {

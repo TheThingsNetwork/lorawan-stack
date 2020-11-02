@@ -73,6 +73,13 @@ service NsEndDeviceRegistry {
     };
   };
 
+  // Reset resets device state.
+  rpc Reset(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      patch: "/ns/applications/{application_ids.application_id}/devices/{device_id}"
+    };
+  };
+
   // Delete deletes the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
   rpc Delete(EndDeviceIdentifiers) returns (google.protobuf.Empty) {

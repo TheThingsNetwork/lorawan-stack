@@ -5505,6 +5505,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | ----------- | ------------ | ------------- | ------------|
 | `Get` | [`GetEndDeviceRequest`](#ttn.lorawan.v3.GetEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 | `Set` | [`SetEndDeviceRequest`](#ttn.lorawan.v3.SetEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Set creates or updates the device. |
+| `Reset` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Reset resets device state. |
 | `Delete` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 
 #### HTTP bindings
@@ -5514,6 +5515,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | `Get` | `GET` | `/api/v3/ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}` |  |
 | `Set` | `PUT` | `/api/v3/ns/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}` | `*` |
 | `Set` | `POST` | `/api/v3/ns/applications/{end_device.ids.application_ids.application_id}/devices` | `*` |
+| `Reset` | `PATCH` | `/api/v3/ns/applications/{application_ids.application_id}/devices/{device_id}` |  |
 | `Delete` | `DELETE` | `/api/v3/ns/applications/{application_ids.application_id}/devices/{device_id}` |  |
 
 ## <a name="lorawan-stack/api/oauth.proto">File `lorawan-stack/api/oauth.proto`</a>

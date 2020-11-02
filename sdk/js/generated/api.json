@@ -22661,6 +22661,28 @@
               }
             },
             {
+              "name": "Reset",
+              "description": "Reset resets device state.",
+              "requestType": "EndDeviceIdentifiers",
+              "requestLongType": "EndDeviceIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PATCH",
+                      "pattern": "/ns/applications/{application_ids.application_id}/devices/{device_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
               "name": "Delete",
               "description": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
               "requestType": "EndDeviceIdentifiers",
