@@ -35,7 +35,10 @@ const WizardNextButton = props => {
   const { currentStepId, steps, onStepComplete } = useWizardContext()
   const { disabled, submitForm, isSubmitting, isValidating, values } = useFormContext()
 
-  const { title: nextStepTitle } = steps.find(({ id }) => id === currentStepId) || { title: m.next }
+  const stepIndex = steps.findIndex(({ id }) => id === currentStepId)
+  const { title: nextStepTitle } = steps[Math.min(stepIndex + 1, steps.length - 1)] || {
+    title: m.next,
+  }
 
   const nextMessage = isLastStep
     ? Boolean(completeMessage)
