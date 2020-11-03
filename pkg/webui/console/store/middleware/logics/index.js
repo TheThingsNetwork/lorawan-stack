@@ -26,6 +26,7 @@ import collaborators from './collaborators'
 import webhooks from './webhooks'
 import pubsubs from './pubsubs'
 import applicationPackages from './application-packages'
+import is from './identity-server'
 
 export default [
   ...user,
@@ -42,4 +43,5 @@ export default [
   ...webhooks,
   ...pubsubs,
   ...applicationPackages,
+  ...is,
 ]

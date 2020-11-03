@@ -19,6 +19,7 @@ import Token from './util/token'
 import Gateways from './service/gateways'
 import Js from './service/join-server'
 import Ns from './service/network-server'
+import Is from './service/identity-server'
 import Organizations from './service/organizations'
 import Users from './service/users'
 import Auth from './service/auth'
@@ -45,6 +46,7 @@ class TtnLw {
     })
     this.Js = new Js(this.api.Js)
     this.Ns = new Ns(this.api.Ns)
+    this.Is = new Is(this.api.Is)
     this.Organizations = new Organizations(this.api)
     this.Users = new Users(this.api)
     this.Auth = new Auth(this.api.EntityAccess)

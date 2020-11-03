@@ -279,6 +279,13 @@ PropTypes.euiPrefix = PropTypes.shape({
   length: PropTypes.number,
 })
 
+PropTypes.passwordRequirements = PropTypes.shape({
+  min_length: PropTypes.number,
+  max_length: PropTypes.number,
+  min_uppercase: PropTypes.number,
+  min_digits: PropTypes.number,
+})
+
 PropTypes.euiPrefixes = PropTypes.arrayOf(PropTypes.euiPrefix)
 
 export default PropTypes
