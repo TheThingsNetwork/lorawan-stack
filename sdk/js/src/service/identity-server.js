@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import snapshotDiff from 'snapshot-diff'
+import Marshaler from '../util/marshaler'
 
-global.snapshotDiff = snapshotDiff
-
-/* eslint-disable no-console */
-const originalConsoleError = console.error
-console.error = function(message, ...args) {
-  console.log(message)
-  if (/(Invalid prop|Failed prop type|Failed context type)/gi.test(message)) {
-    throw new Error(message)
+class Is {
+  constructor(service) {
+    this._api = service
   }
 
-  originalConsoleError.apply(console, [message, ...args])
+  async getConfiguration() {
+    const result = await this._api.GetConfiguration()
+
+    return Marshaler.payloadSingleResponse(result)
+  }
 }
-/* eslint-enable no-console */
+
+export default Is

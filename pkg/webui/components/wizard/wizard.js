@@ -20,11 +20,13 @@ import renderCallback from '../../lib/render-callback'
 
 import { WizardContext } from './context'
 
-const FIRST_STEP = 1
+const FIRST_STEP = 0
 
 // Action types.
 const INIT = 'INIT'
 const GO_TO_STEP = 'GO_TO_STEP'
+const SET_ERROR = 'SET_ERROR'
+const COMPLETE_STEP = 'COMPLETE_STEP'
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -34,32 +36,45 @@ const reducer = (state, action) => {
         steps: action.steps,
       }
     case GO_TO_STEP:
-      const { snapshots: oldSnapshots, currentStep: oldStep } = state
-      const { values, step: currentStep } = action
+      return {
+        ...state,
+        currentStepId: action.step,
+        error: undefined,
+      }
+    case SET_ERROR:
+      return {
+        ...state,
+        error: action.error,
+        currentStepId: action.step,
+      }
+    case COMPLETE_STEP:
+      const { snapshots: oldSnapshots, currentStepId: oldStepId, steps } = state
+      const { values } = action
 
+      const oldStepIndex = steps.findIndex(({ id }) => id === oldStepId)
       // Replace current step values when navigating between wizard steps.
       const snapshots = [
-        ...oldSnapshots.slice(0, oldStep - 1),
+        ...oldSnapshots.slice(0, oldStepIndex),
         values,
-        ...oldSnapshots.slice(oldStep),
+        ...oldSnapshots.slice(oldStepIndex + 1),
       ]
 
       return {
         ...state,
-        currentStep,
         snapshots,
+        error: undefined,
       }
     default:
       return state
   }
 }
 
-const Wizard = props => {
-  const { initialStep, onComplete, initialValues, completeMessage } = props
+const Wizard = React.forwardRef((props, ref) => {
+  const { initialStepId, onComplete, initialValues, completeMessage } = props
 
   const [state, dispatch] = React.useReducer(reducer, {
-    // Active step in the wizard.
-    currentStep: initialStep,
+    error: undefined,
+    currentStepId: initialStepId,
     // A list of all steps in the wizard.
     steps: [],
     // A list of form values for each step in the wizard.
@@ -67,21 +82,35 @@ const Wizard = props => {
     snapshots: [],
   })
 
-  const { currentStep, steps, snapshots } = state
-
-  const stepsCount = steps.length
+  const { currentStepId, steps, snapshots, error } = state
 
   const stepsInit = React.useCallback(steps => {
     dispatch({ type: INIT, steps })
   }, [])
+  const completeStep = React.useCallback(values => {
+    dispatch({ type: COMPLETE_STEP, values })
+  }, [])
   const prevStep = React.useCallback(
-    values => dispatch({ type: GO_TO_STEP, step: Math.max(currentStep - 1, FIRST_STEP), values }),
-    [currentStep],
+    values => {
+      const currentStepIndex = steps.findIndex(({ id }) => id === currentStepId)
+      const prevStep = steps[Math.max(currentStepIndex - 1, FIRST_STEP)] || {}
+
+      dispatch({ type: GO_TO_STEP, step: prevStep.id || currentStepId, values })
+    },
+    [currentStepId, steps],
   )
   const nextStep = React.useCallback(
-    values => dispatch({ type: GO_TO_STEP, step: Math.min(currentStep + 1, stepsCount), values }),
-    [currentStep, stepsCount],
+    values => {
+      const currentStepIndex = steps.findIndex(({ id }) => id === currentStepId)
+      const nextStep = steps[Math.min(currentStepIndex + 1, steps.length - 1)] || {}
+
+      dispatch({ type: GO_TO_STEP, step: nextStep.id || currentStepId, values })
+    },
+    [currentStepId, steps],
   )
+  const setError = React.useCallback((step, error) => {
+    dispatch({ type: SET_ERROR, step, error })
+  }, [])
 
   const snapshot = React.useMemo(() => merge({}, initialValues, ...snapshots), [
     initialValues,
@@ -89,33 +118,37 @@ const Wizard = props => {
   ])
 
   const context = {
+    currentStepId,
     completeMessage,
     onComplete,
     onNextStep: nextStep,
     onPrevStep: prevStep,
     onStepsInit: stepsInit,
-    currentStep,
+    onStepComplete: completeStep,
+    onError: setError,
     snapshot,
     steps,
+    error,
   }
+
+  React.useImperativeHandle(ref, () => context)
 
   return (
     <WizardContext.Provider value={context}>
       {renderCallback(props, context)}
     </WizardContext.Provider>
   )
-}
+})
 
 Wizard.propTypes = {
   completeMessage: PropTypes.message,
-  initialStep: PropTypes.number,
+  initialStepId: PropTypes.string.isRequired,
   initialValues: PropTypes.shape({}),
   onComplete: PropTypes.func.isRequired,
 }
 
 Wizard.defaultProps = {
   initialValues: {},
-  initialStep: 1,
   completeMessage: undefined,
 }
 

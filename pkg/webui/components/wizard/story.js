@@ -38,7 +38,7 @@ const Debug = () => (
     </div>
     <WizardContext.Consumer>
       {({ onNextStep, onPrevStep, onStepsInit, steps, ...rest }) => {
-        const formattedSteps = steps.map(({ title }) => ({ title }))
+        const formattedSteps = steps.map(({ title, id }) => ({ title, id }))
 
         return (
           <pre
@@ -60,14 +60,14 @@ const stepSubmit = desc => data => action(desc)(data)
 const onComplete = data => action('OnComplete')(data)
 
 storiesOf('Wizard', module).add('Basic', () => (
-  <Wizard onComplete={onComplete} completeMessage="Create account">
+  <Wizard onComplete={onComplete} completeMessage="Create account" initialStepId="1">
     <Wizard.Stepper>
       <Wizard.Stepper.Step title="Account settings" description="E-mail and password" />
       <Wizard.Stepper.Step title="Personal information" description="Year of birth and gender" />
       <Wizard.Stepper.Step title="Details" description="Account comment" />
     </Wizard.Stepper>
     <Wizard.Steps>
-      <Wizard.Step title="Account settings">
+      <Wizard.Step title="Account settings" id="1">
         <Wizard.Form
           validationSchema={Yup.object({
             email: Yup.string()
@@ -82,7 +82,7 @@ storiesOf('Wizard', module).add('Basic', () => (
           <Form.Field component={Input} type="password" name="password" title="Password" required />
         </Wizard.Form>
       </Wizard.Step>
-      <Wizard.Step title="Personal information">
+      <Wizard.Step title="Personal information" id="2">
         <Wizard.Form
           onSubmit={stepSubmit('step2')}
           validationSchema={Yup.object({
@@ -108,7 +108,7 @@ storiesOf('Wizard', module).add('Basic', () => (
           />
         </Wizard.Form>
       </Wizard.Step>
-      <Wizard.Step title="Details">
+      <Wizard.Step title="Details" id="3">
         <Wizard.Form
           onSubmit={stepSubmit('step3')}
           validationSchema={Yup.object({

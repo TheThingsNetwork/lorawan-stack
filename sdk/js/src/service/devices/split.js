@@ -16,6 +16,9 @@ import traverse from 'traverse'
 
 import Marshaler from '../../util/marshaler'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
+import { STACK_COMPONENTS_MAP } from '../../util/constants'
+
+const { is: IS, ns: NS, as: AS, js: JS } = STACK_COMPONENTS_MAP
 
 /**
  * Takes the requested paths of the device and returns a request tree. The
@@ -31,7 +34,7 @@ import deviceEntityMap from '../../../generated/device-entity-map.json'
  * @returns {object} A request tree object, consisting of resulting paths for
  * each component eg: `{ is: ['ids'], as: ['session'], js: ['root_keys'] }`.
  */
-function splitPaths(paths = [], direction, base = {}, components = ['is', 'ns', 'as', 'js']) {
+function splitPaths(paths = [], direction, base = {}, components = [IS, NS, AS, JS]) {
   const result = base
   const retrieveIndex = direction === 'get' ? 0 : 1
 
@@ -178,16 +181,16 @@ export async function makeRequests(
   }
 
   const result = [
-    { component: 'ns', hasAttempted: false, hasErrored: false },
-    { component: 'as', hasAttempted: false, hasErrored: false },
-    { component: 'js', hasAttempted: false, hasErrored: false },
-    { component: 'is', hasAttempted: false, hasErrored: false },
+    { component: NS, hasAttempted: false, hasErrored: false },
+    { component: AS, hasAttempted: false, hasErrored: false },
+    { component: JS, hasAttempted: false, hasErrored: false },
+    { component: IS, hasAttempted: false, hasErrored: false },
   ]
 
   const { end_device = {} } = payload
 
   // Do a possible IS request first.
-  if (stackConfig.isComponentAvailable('is') && 'is' in requestTree) {
+  if (stackConfig.isComponentAvailable(IS) && IS in requestTree) {
     let func
     if (isSet) {
       func = 'Update'
@@ -202,7 +205,7 @@ export async function makeRequests(
     result[3] = await requestWrapper(
       api.EndDeviceRegistry[func],
       params,
-      'is',
+      IS,
       {
         ...splitPayload(payload, requestTree.is, { ids: end_device.ids }),
         ...Marshaler.pathsToFieldMask(requestTree.is),
@@ -222,22 +225,22 @@ export async function makeRequests(
   }
 
   // Compose an array of possible api calls to NS, AS, JS.
-  if (stackConfig.isComponentAvailable('ns') && 'ns' in requestTree) {
-    requests[0] = requestWrapper(api.NsEndDeviceRegistry[rpcFunction], params, 'ns', {
-      ...splitPayload(payload, requestTree.ns),
-      ...Marshaler.pathsToFieldMask(requestTree.ns),
+  if (stackConfig.isComponentAvailable(NS) && NS in requestTree) {
+    requests[0] = requestWrapper(api.NsEndDeviceRegistry[rpcFunction], params, NS, {
+      ...splitPayload(payload, requestTree[NS]),
+      ...Marshaler.pathsToFieldMask(requestTree[NS]),
     })
   }
-  if (stackConfig.isComponentAvailable('as') && 'as' in requestTree) {
-    requests[1] = requestWrapper(api.AsEndDeviceRegistry[rpcFunction], params, 'as', {
-      ...splitPayload(payload, requestTree.as),
-      ...Marshaler.pathsToFieldMask(requestTree.as),
+  if (stackConfig.isComponentAvailable(AS) && AS in requestTree) {
+    requests[1] = requestWrapper(api.AsEndDeviceRegistry[rpcFunction], params, AS, {
+      ...splitPayload(payload, requestTree[AS]),
+      ...Marshaler.pathsToFieldMask(requestTree[AS]),
     })
   }
-  if (stackConfig.isComponentAvailable('js') && 'js' in requestTree) {
-    requests[2] = requestWrapper(api.JsEndDeviceRegistry[rpcFunction], params, 'js', {
-      ...splitPayload(payload, requestTree.js, { ids: end_device.ids }),
-      ...Marshaler.pathsToFieldMask(requestTree.js),
+  if (stackConfig.isComponentAvailable(JS) && JS in requestTree) {
+    requests[2] = requestWrapper(api.JsEndDeviceRegistry[rpcFunction], params, JS, {
+      ...splitPayload(payload, requestTree[JS], { ids: end_device.ids }),
+      ...Marshaler.pathsToFieldMask(requestTree[JS]),
     })
   }
 

@@ -20,21 +20,24 @@ import { useWizardContext } from '.'
 
 const Steps = props => {
   const { children } = props
-  const { onStepsInit, currentStep } = useWizardContext()
+  const { onStepsInit, currentStepId } = useWizardContext()
 
   const childrenRef = React.useRef(children)
   React.useEffect(() => {
     onStepsInit(
       React.Children.toArray(childrenRef.current)
         .filter(child => React.isValidElement(child) && child.type.displayName === 'Wizard.Step')
-        .map((step, index) => ({ stepNumber: index + 1, title: step.props.title })),
+        .map((step, index) => ({
+          title: step.props.title,
+          id: step.props.id,
+        })),
     )
   }, [onStepsInit])
 
   return React.Children.toArray(children)
     .filter(child => React.isValidElement(child) && child.type.displayName === 'Wizard.Step')
     .reduce((acc, child, index) => {
-      if (index + 1 === currentStep) {
+      if (child.props.id === currentStepId) {
         return child
       }
 

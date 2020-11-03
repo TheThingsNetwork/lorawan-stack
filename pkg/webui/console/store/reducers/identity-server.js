@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import snapshotDiff from 'snapshot-diff'
+import { handleActions } from 'redux-actions'
 
-global.snapshotDiff = snapshotDiff
+import { GET_IS_CONFIGURATION_SUCCESS } from '@console/store/actions/identity-server'
 
-/* eslint-disable no-console */
-const originalConsoleError = console.error
-console.error = function(message, ...args) {
-  console.log(message)
-  if (/(Invalid prop|Failed prop type|Failed context type)/gi.test(message)) {
-    throw new Error(message)
-  }
-
-  originalConsoleError.apply(console, [message, ...args])
+const defaultState = {
+  configuration: {},
 }
-/* eslint-enable no-console */
+
+export default handleActions(
+  {
+    [GET_IS_CONFIGURATION_SUCCESS]: (state, { payload }) => ({
+      ...state,
+      configuration: payload.configuration,
+    }),
+  },
+  defaultState,
+)

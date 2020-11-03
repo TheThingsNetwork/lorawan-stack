@@ -15,14 +15,15 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
-import SubmitButton from '@ttn-lw/components/submit-button'
 import Button from '@ttn-lw/components/button'
-import Form from '@ttn-lw/components/form'
+import { useFormContext } from '@ttn-lw/components/form'
 import { useWizardContext } from '@ttn-lw/components/wizard'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import style from './form.styl'
 
 const m = defineMessages({
   next: 'Next',
@@ -31,11 +32,13 @@ const m = defineMessages({
 
 const WizardNextButton = props => {
   const { isLastStep, completeMessage } = props
-  const { currentStep, steps } = useWizardContext()
+  const { currentStepId, steps, onStepComplete } = useWizardContext()
+  const { disabled, submitForm, isSubmitting, isValidating, values } = useFormContext()
 
-  const { title: nextStepTitle } = steps.find(
-    ({ stepNumber }) => stepNumber === currentStep + 1,
-  ) || { title: m.next }
+  const stepIndex = steps.findIndex(({ id }) => id === currentStepId)
+  const { title: nextStepTitle } = steps[Math.min(stepIndex + 1, steps.length - 1)] || {
+    title: m.next,
+  }
 
   const nextMessage = isLastStep
     ? Boolean(completeMessage)
@@ -43,11 +46,23 @@ const WizardNextButton = props => {
       : m.complete
     : nextStepTitle
 
+  const handleClick = React.useCallback(() => {
+    onStepComplete(values)
+    submitForm()
+  }, [onStepComplete, submitForm, values])
+
   return (
-    <Form.Submit component={SubmitButton}>
+    <Button
+      className={style.button}
+      type="submit"
+      primary
+      onClick={handleClick}
+      disabled={disabled}
+      busy={isSubmitting || isValidating}
+    >
       <Message content={nextMessage} />
-      {!isLastStep && <Button.Icon icon="keyboard_arrow_right" type="right" />}
-    </Form.Submit>
+      <Button.Icon icon={isLastStep ? '' : 'keyboard_arrow_right'} type="right" />
+    </Button>
   )
 }
 

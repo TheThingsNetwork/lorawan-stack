@@ -21,9 +21,12 @@ import Marshaler from '../../util/marshaler'
 import combineStreams from '../../util/combine-streams'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 import DownlinkQueue from '../downlink-queue'
+import { STACK_COMPONENTS_MAP } from '../../util/constants'
 
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
 import mergeDevice from './merge'
+
+const { is: IS, ns: NS, as: AS, js: JS, dtc: DTC } = STACK_COMPONENTS_MAP
 
 /**
  * Devices Class provides an abstraction on all devices and manages data
@@ -105,7 +108,7 @@ class Devices {
     return mergeResult ? mergeDevice(deviceParts) : deviceParts
   }
 
-  async _deleteDevice(applicationId, deviceId, components = ['is', 'ns', 'as', 'js']) {
+  async _deleteDevice(applicationId, deviceId, components = [IS, NS, AS, JS]) {
     if (!Boolean(applicationId)) {
       throw new Error('Missing application ID for device')
     }
@@ -122,13 +125,13 @@ class Devices {
     }
 
     const requests = []
-    if (this._stackConfig.isComponentAvailable('as') && components.includes('as')) {
+    if (this._stackConfig.isComponentAvailable(AS) && components.includes(AS)) {
       requests.push(this._api.AsEndDeviceRegistry.Delete(params))
     }
-    if (this._stackConfig.isComponentAvailable('js') && components.includes('js')) {
+    if (this._stackConfig.isComponentAvailable(JS) && components.includes(JS)) {
       requests.push(this._api.JsEndDeviceRegistry.Delete(params))
     }
-    if (this._stackConfig.isComponentAvailable('ns') && components.includes('ns')) {
+    if (this._stackConfig.isComponentAvailable(NS) && components.includes(NS)) {
       requests.push(this._api.NsEndDeviceRegistry.Delete(params))
     }
 
@@ -157,7 +160,7 @@ class Devices {
       throw errors[0].reason
     }
 
-    if (this._stackConfig.isComponentAvailable('is') && components.includes('is')) {
+    if (this._stackConfig.isComponentAvailable(IS) && components.includes(IS)) {
       const response = await this._api.EndDeviceRegistry.Delete(params)
 
       return Marshaler.payloadSingleResponse(response)
@@ -218,7 +221,7 @@ class Devices {
 
     const errors = deviceParts.filter(part => {
       // Consider all errors from IS and ignore 404 for JS, AS and NS
-      if (part.hasErrored && (part.component === 'is' || part.error.code !== 5)) {
+      if (part.hasErrored && (part.component === IS || part.error.code !== 5)) {
         return true
       }
 
@@ -289,10 +292,10 @@ class Devices {
     // Assemble paths for end device fields that need to be retrieved first to
     // make the update request.
     const combinePaths = []
-    if ('as' in requestTree && !('application_server_address' in patch)) {
+    if (AS in requestTree && !('application_server_address' in patch)) {
       combinePaths.push(['application_server_address'])
     }
-    if ('js' in requestTree && !('join_server_address' in patch)) {
+    if (JS in requestTree && !('join_server_address' in patch)) {
       combinePaths.push(['join_server_address'])
       combinePaths.push(['supports_join'])
 
@@ -302,7 +305,7 @@ class Devices {
         combinePaths.push(['ids', 'join_eui'])
       }
     }
-    if ('ns' in requestTree && !('network_server_address' in patch)) {
+    if (NS in requestTree && !('network_server_address' in patch)) {
       combinePaths.push(['network_server_address'])
     }
 
@@ -325,7 +328,7 @@ class Devices {
 
     // Make sure to include `join_eui` and `dev_eui` for js request as those are
     // required.
-    if ('js' in requestTree) {
+    if (JS in requestTree) {
       const { ids = {} } = patch
       const {
         ids: { join_eui, dev_eui },
@@ -439,7 +442,7 @@ class Devices {
         return components
       }, [])
 
-      this._deleteDevice(applicationId, deviceId, rollbackComponents)
+      await this._deleteDevice(applicationId, deviceId, rollbackComponents)
 
       // Throw the first error.
       throw errors[0].error
@@ -549,11 +552,11 @@ class Devices {
     // check for stack components on different hosts and open distinct stream
     // connections for any distinct host if need be.
     const distinctComponents = this._stackConfig.getComponentsWithDistinctBaseUrls([
-      'is',
-      'js',
-      'ns',
-      'as',
-      'dtc',
+      IS,
+      JS,
+      NS,
+      AS,
+      DTC,
     ])
 
     const streams = distinctComponents.map(component =>

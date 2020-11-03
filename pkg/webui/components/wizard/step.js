@@ -25,7 +25,8 @@ const Step = props => {
 
 Step.propTypes = {
   children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
-  onSubmit: PropTypes.func,
+  id: PropTypes.string.isRequired,
+  render: PropTypes.func,
 }
 
 Step.defaultProps = {

@@ -11,8 +11,26 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- GCS endpoint to download UDP gateway configuration file.
-- `console.ui.gcs.base-url` and `console.ui.gcs.base-url` Console configuration options.
+- More password validation rules in the user management form in the Console.
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+- Next button title in the end device wizard in the Console.
+
+### Security
+
+## [3.10.0] - 2020-11-02
+
+### Added
+
+- Gateway Configuration Server endpoint to download UDP gateway configuration file.
+  - In the Console this requires a new `console.ui.gcs.base-url` configuration option to be set.
 - Support for sending end device uplinks in the Console.
 - PHY version filtering based on LoRaWAN MAC in the Console.
 - Meta information and status events in the event views in the Console.
@@ -21,7 +39,7 @@ For details about compatibility between different releases, see the **Commitment
 - Add end device location metadata on forwarded uplink messages (see `uplink_message.locations` field).
 - Store and retrieve LBS LNS Secrets from database.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added column.
-  - To encrypt the secrets set `is.gateways.encryption-key-id`.
+  - To encrypt the secrets, set the new `is.gateways.encryption-key-id` configuration option.
 - Storage Integration API.
 - CLI support for Storage Integration (see `ttn-lw-cli end-devices storage` and `ttn-lw-cli applications storage` commands).
 - Network Server does not retry rejected `NewChannelReq` data rate ranges or rejected `DLChannelReq` frequencies anymore.
@@ -29,6 +47,7 @@ For details about compatibility between different releases, see the **Commitment
 - Downlink count for end devices in the Console.
 - Support for Application Activation Settings in the Join Server to configure Application Server KEK, ID and Home NetID.
 - Downlink queue invalidated message sent upstream by Application Server to support applications to re-encrypt the downlink queue when Application Server skips FRMPayload crypto.
+- Navigation to errored step in the end device wizard in the Console.
 
 ### Changed
 
@@ -43,8 +62,6 @@ For details about compatibility between different releases, see the **Commitment
 - Gateway server can now update the gateway location only if the gateway is authenticated.
 - Right to manage links on Application Server is now `RIGHT_APPLICATION_SETTINGS_BASIC`.
 - Network Server does not store `recent_uplinks`, `recent_adr_uplinks` and `recent_downlinks` anymore.
-
-### Deprecated
 
 ### Removed
 
@@ -69,8 +86,6 @@ For details about compatibility between different releases, see the **Commitment
 - Redirect loops when logging out of the Console if the Console OAuth client had no logout redirect URI(s) set.
 - Event selection not working properly when the event stream is paused in the Console.
 - Network Server DevStatusReq scheduling conditions in relation to frame counter value.
-
-### Security
 
 ## [3.9.4] - 2020-09-23
 
@@ -1128,7 +1143,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.4...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.0...HEAD
+[3.10.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.4...v3.10.0
 [3.9.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.3...v3.9.4
 [3.9.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.1...v3.9.3
 [3.9.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.0...v3.9.1
