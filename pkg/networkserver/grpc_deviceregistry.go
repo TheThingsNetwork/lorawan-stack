@@ -50,19 +50,48 @@ var (
 	)
 )
 
-// Get implements NsEndDeviceRegistryServer.
-func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
-		return nil, err
+const maxRequiredDeviceReadRightCount = 3
+
+func appendRequiredDeviceReadRights(rights []ttnpb.Right, gets ...string) []ttnpb.Right {
+	if len(gets) == 0 {
+		return rights
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths,
+	rights = append(rights,
+		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+	)
+	if ttnpb.HasAnyField(gets,
 		"pending_session.queued_application_downlinks",
 		"queued_application_downlinks",
 		"session.queued_application_downlinks",
 	) {
-		if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
-			return nil, err
-		}
+		rights = append(rights, ttnpb.RIGHT_APPLICATION_LINK)
+	}
+	if ttnpb.HasAnyField(gets,
+		"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
+		"mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
+		"mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
+		"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
+		"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
+		"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
+		"pending_session.keys.f_nwk_s_int_key.key",
+		"pending_session.keys.nwk_s_enc_key.key",
+		"pending_session.keys.s_nwk_s_int_key.key",
+		"session.keys.f_nwk_s_int_key.key",
+		"session.keys.nwk_s_enc_key.key",
+		"session.keys.s_nwk_s_int_key.key",
+	) {
+		rights = append(rights, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS)
+	}
+	return rights
+}
+
+// Get implements NsEndDeviceRegistryServer.
+func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, appendRequiredDeviceReadRights(
+		make([]ttnpb.Right, 0, maxRequiredDeviceReadRightCount),
+		req.FieldMask.Paths...,
+	)...); err != nil {
+		return nil, err
 	}
 
 	gets := req.FieldMask.Paths
@@ -80,9 +109,6 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		"session.keys.nwk_s_enc_key.key",
 		"session.keys.s_nwk_s_int_key.key",
 	) {
-		if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
-			return nil, err
-		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"pending_session.keys.f_nwk_s_int_key.key",
 		) {
@@ -274,8 +300,25 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		return nil, errInvalidFieldValue.WithAttributes("field", "supports_join")
 	}
 
-	if err = rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
-		return nil, err
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "session") && ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state") {
+		if req.EndDevice.Session == nil && req.EndDevice.MACState != nil {
+			return nil, errInvalidFieldValue.WithAttributes("field", "session")
+		}
+		if req.EndDevice.Session != nil && req.EndDevice.MACState == nil {
+			return nil, errInvalidFieldValue.WithAttributes("field", "mac_state")
+		}
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "pending_session") && ttnpb.HasAnyField(req.FieldMask.Paths, "pending_mac_state") {
+		if req.EndDevice.PendingSession == nil && req.EndDevice.PendingMACState != nil {
+			return nil, errInvalidFieldValue.WithAttributes("field", "pending_session")
+		}
+		if req.EndDevice.PendingSession != nil && req.EndDevice.PendingMACState == nil {
+			return nil, errInvalidFieldValue.WithAttributes("field", "pending_mac_state")
+		}
+	}
+
+	requiredRights := []ttnpb.Right{
+		ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths,
 		"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
@@ -287,9 +330,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"session.keys.s_nwk_s_int_key.key",
 		"session.keys.session_key_id",
 	) {
-		if err = rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
-			return nil, err
-		}
+		requiredRights = append(requiredRights, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS)
+	}
+	if err = rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, requiredRights...); err != nil {
+		return nil, err
 	}
 
 	sets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
@@ -368,12 +412,12 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 
 	var evt events.Event
-	dev, ctx, err = ns.devices.SetByID(ctx, req.EndDevice.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDevice.EndDeviceIdentifiers.DeviceID, gets, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	dev, ctx, err = ns.devices.SetByID(ctx, req.EndDevice.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDevice.EndDeviceIdentifiers.DeviceID, gets, func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if ttnpb.HasAnyField(sets, "version_ids") {
 			// TODO: Apply version IDs (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
 		}
 
-		if dev != nil {
+		if stored != nil {
 			evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
 			if err := ttnpb.ProhibitFields(sets,
 				"ids.dev_addr",
@@ -394,10 +438,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				"mac_settings.use_adr.value",
 			) {
 				if !ttnpb.HasAnyField(sets, "frequency_plan_id") {
-					req.EndDevice.FrequencyPlanID = dev.FrequencyPlanID
+					req.EndDevice.FrequencyPlanID = stored.FrequencyPlanID
 				}
 				if !ttnpb.HasAnyField(sets, "lorawan_phy_version") {
-					req.EndDevice.LoRaWANPHYVersion = dev.LoRaWANPHYVersion
+					req.EndDevice.LoRaWANPHYVersion = stored.LoRaWANPHYVersion
 				}
 				phy, err := DeviceBand(&req.EndDevice, ns.FrequencyPlans)
 				if err != nil {
@@ -559,6 +603,72 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 
+// Reset implements NsEndDeviceRegistryServer.
+func (ns *NetworkServer) Reset(ctx context.Context, req *ttnpb.ResetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, appendRequiredDeviceReadRights(
+		append(make([]ttnpb.Right, 0, 1+maxRequiredDeviceReadRightCount), ttnpb.RIGHT_APPLICATION_DEVICES_WRITE),
+		req.FieldMask.Paths...,
+	)...); err != nil {
+		return nil, err
+	}
+
+	dev, _, err := ns.devices.SetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, ttnpb.AddFields(append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...),
+		"frequency_plan_id",
+		"lorawan_phy_version",
+		"lorawan_version",
+		"mac_settings",
+		"session.dev_addr",
+		"session.queued_application_downlinks",
+		"session.keys",
+		"supports_join",
+	), func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		if stored == nil {
+			return nil, nil, errDeviceNotFound.New()
+		}
+
+		stored.BatteryPercentage = nil
+		stored.DownlinkMargin = 0
+		stored.LastDevStatusReceivedAt = nil
+		stored.MACState = nil
+		stored.PendingMACState = nil
+		stored.PendingSession = nil
+		stored.PowerState = ttnpb.PowerState_POWER_UNKNOWN
+		if stored.SupportsJoin {
+			stored.Session = nil
+		} else {
+			if stored.Session == nil {
+				return nil, nil, errCorruptedMACState.New()
+			}
+
+			macState, err := mac.NewState(stored, ns.FrequencyPlans, ns.defaultMACSettings)
+			if err != nil {
+				return nil, nil, err
+			}
+			stored.MACState = macState
+			stored.Session = &ttnpb.Session{
+				DevAddr:                    stored.Session.DevAddr,
+				SessionKeys:                stored.Session.SessionKeys,
+				StartedAt:                  timeNow().UTC(),
+				QueuedApplicationDownlinks: stored.Session.QueuedApplicationDownlinks,
+			}
+		}
+		return stored, []string{
+			"battery_percentage",
+			"downlink_margin",
+			"last_dev_status_received_at",
+			"mac_state",
+			"pending_mac_state",
+			"pending_session",
+			"session",
+		}, nil
+	})
+	if err != nil {
+		logRegistryRPCError(ctx, err, "Failed to reset device state in registry")
+		return nil, err
+	}
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
+}
+
 // Delete implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
@@ -579,5 +689,5 @@ func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentif
 	if evt != nil {
 		events.Publish(evt)
 	}
-	return ttnpb.Empty, err
+	return ttnpb.Empty, nil
 }

@@ -525,6 +525,80 @@ type TestEnvironment struct {
 	*grpc.ClientConn
 }
 
+func (env TestEnvironment) AssertListApplicationRights(ctx context.Context, appID ttnpb.ApplicationIdentifiers, authType, authValue string, rights ...ttnpb.Right) bool {
+	t, a := test.MustNewTFromContext(ctx)
+	t.Helper()
+
+	listRightsCh := make(chan test.ApplicationAccessListRightsRequest)
+	defer func() {
+		close(listRightsCh)
+	}()
+
+	if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
+		func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (test.ClusterGetPeerResponse, bool) {
+			_, a := test.MustNewTFromContext(ctx)
+			return test.ClusterGetPeerResponse{
+					Peer: NewISPeer(ctx, &test.MockApplicationAccessServer{
+						ListRightsFunc: test.MakeApplicationAccessListRightsChFunc(listRightsCh),
+					}),
+				}, test.AllTrue(
+					a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS),
+					a.So(ids, should.BeNil),
+				)
+		},
+	), should.BeTrue) {
+		return false
+	}
+	return a.So(test.AssertListRightsRequest(ctx, listRightsCh,
+		func(ctx, reqCtx context.Context, ids ttnpb.Identifiers) bool {
+			_, a := test.MustNewTFromContext(ctx)
+			md := rpcmetadata.FromIncomingContext(reqCtx)
+			return test.AllTrue(
+				a.So(md.AuthType, should.Equal, authType),
+				a.So(md.AuthValue, should.Equal, authValue),
+				a.So(ids, should.Resemble, &appID),
+			)
+		}, rights...,
+	), should.BeTrue)
+}
+
+func (env TestEnvironment) AssertResetDevice(ctx context.Context, req *ttnpb.ResetEndDeviceRequest, rights ...ttnpb.Right) (*ttnpb.EndDevice, error, bool) {
+	t, a := test.MustNewTFromContext(ctx)
+	t.Helper()
+
+	const (
+		authType  = "Bearer"
+		authValue = "reset-key"
+	)
+	var (
+		dev *ttnpb.EndDevice
+		err error
+	)
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		dev, err = ttnpb.NewNsEndDeviceRegistryClient(env.ClientConn).Reset(
+			ctx,
+			req,
+			grpc.PerRPCCredentials(rpcmetadata.MD{
+				AuthType:      authType,
+				AuthValue:     authValue,
+				AllowInsecure: true,
+			}),
+		)
+		wg.Done()
+	}()
+	if !a.So(env.AssertListApplicationRights(ctx, req.ApplicationIdentifiers, authType, authValue, rights...), should.BeTrue) {
+		t.Error("ListRights assertion failed")
+		return nil, nil, false
+	}
+	if !a.So(test.WaitContext(ctx, wg.Wait), should.BeTrue) {
+		t.Error("Timed out while waiting for Reset call to return")
+		return nil, nil, false
+	}
+	return dev, err, true
+}
+
 func (env TestEnvironment) AssertLinkApplication(ctx context.Context, appID ttnpb.ApplicationIdentifiers, replaceEvents ...events.Event) (ttnpb.AsNs_LinkApplicationClient, []string, bool) {
 	t, a := test.MustNewTFromContext(ctx)
 	t.Helper()
@@ -604,7 +678,7 @@ func (env TestEnvironment) AssertLinkApplication(ctx context.Context, appID ttnp
 		t.Errorf("Link failed with: %s", err)
 		return nil, nil, false
 	}
-	return link, reqCIDs, a.So(err, should.BeNil)
+	return link, reqCIDs, true
 }
 
 func (env TestEnvironment) AssertWithApplicationLink(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f func(context.Context, ttnpb.AsNs_LinkApplicationClient) bool, replaceEvents ...events.Event) bool {
