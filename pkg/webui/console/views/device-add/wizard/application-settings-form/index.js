@@ -33,7 +33,7 @@ const defaultFormValues = {
 }
 
 const ApplicationSettingsForm = props => {
-  const { mayEditKeys, error } = props
+  const { mayEditKeys } = props
   const { snapshot } = useWizardContext()
 
   const validationContext = React.useMemo(() => ({ mayEditKeys }), [mayEditKeys])
@@ -62,7 +62,6 @@ const ApplicationSettingsForm = props => {
       ref={formRef}
       validationSchema={validationSchema}
       validationContext={validationContext}
-      error={error}
     >
       <Form.Field
         autoFocus
@@ -93,12 +92,7 @@ const ApplicationSettingsForm = props => {
 }
 
 ApplicationSettingsForm.propTypes = {
-  error: PropTypes.error,
   mayEditKeys: PropTypes.bool.isRequired,
-}
-
-ApplicationSettingsForm.defaultProps = {
-  error: undefined,
 }
 
 const WrappedApplicationSettingsForm = withBreadcrumb('device.add.steps.app', props => (

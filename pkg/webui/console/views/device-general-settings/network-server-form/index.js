@@ -203,7 +203,7 @@ const NetworkServerForm = React.memo(props => {
       />
       <NsFrequencyPlansSelect name="frequency_plan_id" required />
       <Form.Field
-        title={sharedMessages.deviceClass}
+        title={sharedMessages.lorawanClassCapabilities}
         name="_device_classes"
         component={Checkbox.Group}
         required={isMulticast}

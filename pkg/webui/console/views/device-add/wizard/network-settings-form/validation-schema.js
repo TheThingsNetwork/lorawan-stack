@@ -107,13 +107,19 @@ const validationSchema = Yup.object({
     ping_slot_periodicity: Yup.object().when(
       ['$isClassB', '$activationMode'],
       (isClassB, mode, schema) => {
-        if (!isClassB) {
+        if (!isClassB && mode !== ACTIVATION_MODES.MULTICAST) {
           return schema.strip()
         }
 
         if (mode !== ACTIVATION_MODES.MULTICAST) {
-          return schema.shape({
-            value: Yup.string(),
+          return Yup.lazy(pingSlot => {
+            if (!pingSlot || !pingSlot.value) {
+              return schema.strip()
+            }
+
+            return schema.shape({
+              value: Yup.string(),
+            })
           })
         }
 
