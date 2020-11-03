@@ -26,14 +26,8 @@ import PrevButton from './prev-button'
 import NextButton from './next-button'
 
 const WizardForm = React.forwardRef((props, ref) => {
-  const {
-    validationSchema,
-    validationContext,
-    onSubmit,
-    children,
-    initialValues,
-    excludePaths,
-  } = props
+  const { validationSchema, validationContext, onSubmit, children, initialValues } = props
+
   const context = useWizardContext()
   const { onNextStep, currentStepId, steps, snapshot, onComplete, completeMessage, error } = context
 
@@ -63,26 +57,12 @@ const WizardForm = React.forwardRef((props, ref) => {
       }
 
       if (isLastStep) {
-        const result = merge({}, snapshot, castedValues)
-        for (const excludePath of excludePaths) {
-          delete result[excludePath]
-        }
-
-        return onComplete(result, formikBag)
+        return onComplete(merge({}, snapshot, castedValues), formikBag)
       }
 
-      onNextStep(castedValues)
+      onNextStep()
     },
-    [
-      excludePaths,
-      isLastStep,
-      onComplete,
-      onNextStep,
-      onSubmit,
-      snapshot,
-      validationContext,
-      validationSchema,
-    ],
+    [isLastStep, onComplete, onNextStep, onSubmit, snapshot, validationContext, validationSchema],
   )
 
   return (
@@ -101,7 +81,12 @@ const WizardForm = React.forwardRef((props, ref) => {
           validationContext={validationContext}
           validationSchema={validationSchema}
         />
-        <NextButton isLastStep={isLastStep} completeMessage={completeMessage} />
+        <NextButton
+          isLastStep={isLastStep}
+          completeMessage={completeMessage}
+          validationContext={validationContext}
+          validationSchema={validationSchema}
+        />
       </SubmitBar>
     </Form>
   )
@@ -109,7 +94,6 @@ const WizardForm = React.forwardRef((props, ref) => {
 
 WizardForm.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
-  excludePaths: PropTypes.arrayOf(PropTypes.string),
   initialValues: PropTypes.shape({}),
   onSubmit: PropTypes.func,
   validationContext: PropTypes.shape({}),
@@ -123,7 +107,6 @@ WizardForm.defaultProps = {
   onSubmit: undefined,
   validationContext: {},
   initialValues: {},
-  excludePaths: [],
 }
 
 export default WizardForm
