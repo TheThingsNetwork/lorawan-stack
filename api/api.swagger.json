@@ -4813,41 +4813,6 @@
         "tags": [
           "NsEndDeviceRegistry"
         ]
-      },
-      "patch": {
-        "summary": "Reset resets device state.",
-        "operationId": "NsEndDeviceRegistry_Reset",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "application_ids.application_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "device_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "NsEndDeviceRegistry"
-        ]
       }
     },
     "/ns/applications/{end_device.ids.application_ids.application_id}/devices": {
@@ -4999,6 +4964,49 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "NsEndDeviceRegistry"
+        ]
+      },
+      "patch": {
+        "summary": "Reset resets device state.",
+        "operationId": "NsEndDeviceRegistry_Reset",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3EndDevice"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ResetEndDeviceRequest"
+            }
           }
         ],
         "tags": [
@@ -12816,6 +12824,18 @@
         "KEYS"
       ],
       "default": "CONTEXT"
+    },
+    "v3ResetEndDeviceRequest": {
+      "type": "object",
+      "properties": {
+        "end_device_ids": {
+          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the end device fields that should be returned.\nSee the API reference for which fields can be returned by the different services."
+        }
+      }
     },
     "v3Right": {
       "type": "string",

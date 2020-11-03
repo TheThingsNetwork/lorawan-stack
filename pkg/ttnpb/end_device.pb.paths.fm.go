@@ -3149,6 +3149,21 @@ var SetEndDeviceRequestFieldPathsTopLevel = []string{
 	"end_device",
 	"field_mask",
 }
+var ResetEndDeviceRequestFieldPathsNested = []string{
+	"end_device_ids",
+	"end_device_ids.application_ids",
+	"end_device_ids.application_ids.application_id",
+	"end_device_ids.dev_addr",
+	"end_device_ids.dev_eui",
+	"end_device_ids.device_id",
+	"end_device_ids.join_eui",
+	"field_mask",
+}
+
+var ResetEndDeviceRequestFieldPathsTopLevel = []string{
+	"end_device_ids",
+	"field_mask",
+}
 var EndDeviceTemplateFieldPathsNested = []string{
 	"end_device",
 	"end_device.application_server_address",

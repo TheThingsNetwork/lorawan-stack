@@ -610,6 +610,13 @@ message SetEndDeviceRequest {
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
+message ResetEndDeviceRequest {
+  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the end device fields that should be returned.
+  // See the API reference for which fields can be returned by the different services.
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
 message EndDeviceTemplate {
   EndDevice end_device = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];

@@ -74,9 +74,10 @@ service NsEndDeviceRegistry {
   };
 
   // Reset resets device state.
-  rpc Reset(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
+  rpc Reset(ResetEndDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
-      patch: "/ns/applications/{application_ids.application_id}/devices/{device_id}"
+      patch: "/ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}"
+      body: "*"
     };
   };
 
