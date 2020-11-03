@@ -144,14 +144,9 @@ func wrapEndDeviceRegistryWithReplacedFields(r DeviceRegistry, fields ...registr
 
 var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 	{
-		Old: "mac_state.current_parameters.adr_ack_delay",
-		New: "mac_state.current_parameters.adr_ack_delay_exponent",
-		GetTransform: func(dev *ttnpb.EndDevice) {
-			if dev.MACState == nil {
-				return
-			}
-			dev.MACState.CurrentParameters.ADRAckDelay = uint32(dev.MACState.CurrentParameters.ADRAckDelayExponent.GetValue())
-		},
+		Old:          "mac_state.current_parameters.adr_ack_delay",
+		New:          "mac_state.current_parameters.adr_ack_delay_exponent",
+		GetTransform: func(dev *ttnpb.EndDevice) {},
 		SetTransform: func(dev *ttnpb.EndDevice, _, _ bool) error {
 			if dev.MACState == nil {
 				return nil
@@ -162,14 +157,9 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		},
 	},
 	{
-		Old: "mac_state.current_parameters.adr_ack_limit",
-		New: "mac_state.current_parameters.adr_ack_limit_exponent",
-		GetTransform: func(dev *ttnpb.EndDevice) {
-			if dev.MACState == nil {
-				return
-			}
-			dev.MACState.CurrentParameters.ADRAckLimit = uint32(dev.MACState.CurrentParameters.ADRAckLimitExponent.GetValue())
-		},
+		Old:          "mac_state.current_parameters.adr_ack_limit",
+		New:          "mac_state.current_parameters.adr_ack_limit_exponent",
+		GetTransform: func(dev *ttnpb.EndDevice) {},
 		SetTransform: func(dev *ttnpb.EndDevice, _, _ bool) error {
 			if dev.MACState == nil {
 				return nil
@@ -180,14 +170,9 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		},
 	},
 	{
-		Old: "mac_state.current_parameters.ping_slot_data_rate_index",
-		New: "mac_state.current_parameters.ping_slot_data_rate_index_value",
-		GetTransform: func(dev *ttnpb.EndDevice) {
-			if dev.MACState == nil {
-				return
-			}
-			dev.MACState.CurrentParameters.PingSlotDataRateIndex = dev.MACState.CurrentParameters.PingSlotDataRateIndexValue.GetValue()
-		},
+		Old:          "mac_state.current_parameters.ping_slot_data_rate_index",
+		New:          "mac_state.current_parameters.ping_slot_data_rate_index_value",
+		GetTransform: func(dev *ttnpb.EndDevice) {},
 		SetTransform: func(dev *ttnpb.EndDevice, _, _ bool) error {
 			if dev.MACState == nil {
 				return nil
@@ -198,14 +183,9 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		},
 	},
 	{
-		Old: "mac_state.desired_parameters.adr_ack_delay",
-		New: "mac_state.desired_parameters.adr_ack_delay_exponent",
-		GetTransform: func(dev *ttnpb.EndDevice) {
-			if dev.MACState == nil {
-				return
-			}
-			dev.MACState.DesiredParameters.ADRAckDelay = uint32(dev.MACState.DesiredParameters.ADRAckDelayExponent.GetValue())
-		},
+		Old:          "mac_state.desired_parameters.adr_ack_delay",
+		New:          "mac_state.desired_parameters.adr_ack_delay_exponent",
+		GetTransform: func(dev *ttnpb.EndDevice) {},
 		SetTransform: func(dev *ttnpb.EndDevice, _, _ bool) error {
 			if dev.MACState == nil {
 				return nil
@@ -216,14 +196,9 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		},
 	},
 	{
-		Old: "mac_state.desired_parameters.adr_ack_limit",
-		New: "mac_state.desired_parameters.adr_ack_limit_exponent",
-		GetTransform: func(dev *ttnpb.EndDevice) {
-			if dev.MACState == nil {
-				return
-			}
-			dev.MACState.DesiredParameters.ADRAckLimit = uint32(dev.MACState.DesiredParameters.ADRAckLimitExponent.GetValue())
-		},
+		Old:          "mac_state.desired_parameters.adr_ack_limit",
+		New:          "mac_state.desired_parameters.adr_ack_limit_exponent",
+		GetTransform: func(dev *ttnpb.EndDevice) {},
 		SetTransform: func(dev *ttnpb.EndDevice, _, _ bool) error {
 			if dev.MACState == nil {
 				return nil
@@ -234,14 +209,9 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		},
 	},
 	{
-		Old: "mac_state.desired_parameters.ping_slot_data_rate_index",
-		New: "mac_state.desired_parameters.ping_slot_data_rate_index_value",
-		GetTransform: func(dev *ttnpb.EndDevice) {
-			if dev.MACState == nil {
-				return
-			}
-			dev.MACState.DesiredParameters.PingSlotDataRateIndex = dev.MACState.DesiredParameters.PingSlotDataRateIndexValue.GetValue()
-		},
+		Old:          "mac_state.desired_parameters.ping_slot_data_rate_index",
+		New:          "mac_state.desired_parameters.ping_slot_data_rate_index_value",
+		GetTransform: func(dev *ttnpb.EndDevice) {},
 		SetTransform: func(dev *ttnpb.EndDevice, _, _ bool) error {
 			if dev.MACState == nil {
 				return nil
@@ -252,23 +222,9 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		},
 	},
 	{
-		Old: "queued_application_downlinks",
-		New: "session.queued_application_downlinks",
-		GetTransform: func(dev *ttnpb.EndDevice) {
-			switch {
-			case dev.QueuedApplicationDownlinks == nil && dev.GetSession().GetQueuedApplicationDownlinks() == nil:
-				return
-
-			case dev.QueuedApplicationDownlinks != nil:
-				if dev.Session == nil {
-					dev.Session = &ttnpb.Session{}
-				}
-				dev.Session.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks
-
-			default:
-				dev.QueuedApplicationDownlinks = dev.Session.QueuedApplicationDownlinks
-			}
-		},
+		Old:          "queued_application_downlinks",
+		New:          "session.queued_application_downlinks",
+		GetTransform: func(dev *ttnpb.EndDevice) {},
 		SetTransform: func(dev *ttnpb.EndDevice, useOld, useNew bool) error {
 			switch {
 			case useOld && useNew:
