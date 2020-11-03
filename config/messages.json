@@ -5426,6 +5426,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/joinserver:no_kek_label": {
+    "translations": {
+      "en": "no KEK label specified"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "grpc_application_activation_settings_registry.go"
+    }
+  },
   "error:pkg/joinserver:no_net_id": {
     "translations": {
       "en": "no NetID specified"
