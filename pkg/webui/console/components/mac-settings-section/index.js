@@ -20,13 +20,19 @@ import Select from '@ttn-lw/components/select'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Input from '@ttn-lw/components/input'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
+import Radio from '@ttn-lw/components/radio-button'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { ACTIVATION_MODES } from '@console/lib/device-utils'
+import {
+  ACTIVATION_MODES,
+  FRAME_WIDTH_COUNT,
+  fCntWidthEncode,
+  fCntWidthDecode,
+} from '@console/lib/device-utils'
 
 const m = defineMessages({
   delayValue: '{count, plural, one {{count} second} other {{count} seconds}}',
@@ -85,6 +91,16 @@ const MacSettingsSection = props => {
       initiallyCollapsed={initiallyCollapsed}
     >
       <Form.SubTitle title={m.macSettings} />
+      <Form.Field
+        title={sharedMessages.frameCounterWidth}
+        name="mac_settings.supports_32_bit_f_cnt"
+        component={Radio.Group}
+        encode={fCntWidthEncode}
+        decode={fCntWidthDecode}
+      >
+        <Radio label={sharedMessages['16Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_16_BIT} />
+        <Radio label={sharedMessages['32Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_32_BIT} />
+      </Form.Field>
       {isABP && (
         <>
           <Form.Field
@@ -142,7 +158,7 @@ const MacSettingsSection = props => {
         addMessage={m.freqAdd}
         valuePlaceholder={m.frequencyPlaceholder}
       />
-      {isClassB && (
+      {(isClassB || isMulticast) && (
         <>
           <Form.Field
             title={m.pingSlotPeriodicityTitle}
