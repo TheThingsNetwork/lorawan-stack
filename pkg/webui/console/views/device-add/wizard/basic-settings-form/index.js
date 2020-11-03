@@ -33,7 +33,7 @@ import validationSchema from './validation-schema'
 
 const defaultInitialValues = {
   ids: {
-    device_id: undefined,
+    device_id: '',
     dev_eui: undefined,
     join_eui: undefined,
   },
