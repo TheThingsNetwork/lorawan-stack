@@ -222,6 +222,17 @@ func FieldsWithPrefix(prefix string, paths ...string) []string {
 	return ret
 }
 
+// FieldsWithoutPrefix returns the paths under prefix with said prefix removed.
+func FieldsWithoutPrefix(prefix string, paths ...string) []string {
+	ret := make([]string, 0, len(paths))
+	for _, p := range paths {
+		if i := strings.Index(p, prefix+"."); i >= 0 {
+			ret = append(ret, p[1+len(prefix):])
+		}
+	}
+	return ret
+}
+
 // AddImplicitEndDeviceGetFields appends implicit EndDevice get paths to paths if not already present.
 func AddImplicitEndDeviceGetFields(paths ...string) []string {
 	return AddFields(paths,
