@@ -769,7 +769,7 @@ var (
 	}
 	endDevicesResetCommand = &cobra.Command{
 		Use:   "reset [application-id] [device-id]",
-		Short: "Reset state of an end device",
+		Short: "Reset state of an end device to factory defaults",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			forwardDeprecatedDeviceFlags(cmd.Flags())
 
@@ -803,8 +803,8 @@ var (
 			if err != nil {
 				return err
 			}
-			logger.WithField("paths", nsPaths).Debug("Reset end device on Network Server")
-			nsDevice, err := ttnpb.NewNsEndDeviceRegistryClient(ns).Reset(ctx, &ttnpb.ResetEndDeviceRequest{
+			logger.WithField("paths", nsPaths).Debug("Reset end device to factory defaults on Network Server")
+			nsDevice, err := ttnpb.NewNsEndDeviceRegistryClient(ns).ResetFactoryDefaults(ctx, &ttnpb.ResetAndGetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
 				FieldMask:            pbtypes.FieldMask{Paths: nsPaths},
 			})
