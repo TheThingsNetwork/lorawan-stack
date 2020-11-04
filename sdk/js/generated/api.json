@@ -9899,9 +9899,9 @@
           ]
         },
         {
-          "name": "ResetEndDeviceRequest",
-          "longName": "ResetEndDeviceRequest",
-          "fullName": "ttn.lorawan.v3.ResetEndDeviceRequest",
+          "name": "ResetAndGetEndDeviceRequest",
+          "longName": "ResetAndGetEndDeviceRequest",
+          "fullName": "ttn.lorawan.v3.ResetAndGetEndDeviceRequest",
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
@@ -22700,11 +22700,11 @@
               }
             },
             {
-              "name": "Reset",
-              "description": "Reset resets device state.",
-              "requestType": "ResetEndDeviceRequest",
-              "requestLongType": "ResetEndDeviceRequest",
-              "requestFullType": "ttn.lorawan.v3.ResetEndDeviceRequest",
+              "name": "ResetFactoryDefaults",
+              "description": "ResetFactoryDefaults resets device state to factory defaults.",
+              "requestType": "ResetAndGetEndDeviceRequest",
+              "requestLongType": "ResetAndGetEndDeviceRequest",
+              "requestFullType": "ttn.lorawan.v3.ResetAndGetEndDeviceRequest",
               "requestStreaming": false,
               "responseType": "EndDevice",
               "responseLongType": "EndDevice",

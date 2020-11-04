@@ -4971,8 +4971,8 @@
         ]
       },
       "patch": {
-        "summary": "Reset resets device state.",
-        "operationId": "NsEndDeviceRegistry_Reset",
+        "summary": "ResetFactoryDefaults resets device state to factory defaults.",
+        "operationId": "NsEndDeviceRegistry_ResetFactoryDefaults",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5005,7 +5005,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v3ResetEndDeviceRequest"
+              "$ref": "#/definitions/v3ResetAndGetEndDeviceRequest"
             }
           }
         ],
@@ -12825,7 +12825,7 @@
       ],
       "default": "CONTEXT"
     },
-    "v3ResetEndDeviceRequest": {
+    "v3ResetAndGetEndDeviceRequest": {
       "type": "object",
       "properties": {
         "end_device_ids": {

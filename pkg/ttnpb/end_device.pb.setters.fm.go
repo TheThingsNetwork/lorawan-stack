@@ -2384,7 +2384,7 @@ func (dst *SetEndDeviceRequest) SetFields(src *SetEndDeviceRequest, paths ...str
 	return nil
 }
 
-func (dst *ResetEndDeviceRequest) SetFields(src *ResetEndDeviceRequest, paths ...string) error {
+func (dst *ResetAndGetEndDeviceRequest) SetFields(src *ResetAndGetEndDeviceRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "end_device_ids":

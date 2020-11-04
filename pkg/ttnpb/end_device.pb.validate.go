@@ -3069,16 +3069,16 @@ var _ interface {
 	ErrorName() string
 } = SetEndDeviceRequestValidationError{}
 
-// ValidateFields checks the field values on ResetEndDeviceRequest with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *ResetEndDeviceRequest) ValidateFields(paths ...string) error {
+// ValidateFields checks the field values on ResetAndGetEndDeviceRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *ResetAndGetEndDeviceRequest) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = ResetEndDeviceRequestFieldPathsNested
+		paths = ResetAndGetEndDeviceRequestFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
@@ -3088,7 +3088,7 @@ func (m *ResetEndDeviceRequest) ValidateFields(paths ...string) error {
 
 			if v, ok := interface{}(&m.EndDeviceIdentifiers).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
-					return ResetEndDeviceRequestValidationError{
+					return ResetAndGetEndDeviceRequestValidationError{
 						field:  "end_device_ids",
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -3100,7 +3100,7 @@ func (m *ResetEndDeviceRequest) ValidateFields(paths ...string) error {
 
 			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
-					return ResetEndDeviceRequestValidationError{
+					return ResetAndGetEndDeviceRequestValidationError{
 						field:  "field_mask",
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -3109,7 +3109,7 @@ func (m *ResetEndDeviceRequest) ValidateFields(paths ...string) error {
 			}
 
 		default:
-			return ResetEndDeviceRequestValidationError{
+			return ResetAndGetEndDeviceRequestValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -3118,9 +3118,10 @@ func (m *ResetEndDeviceRequest) ValidateFields(paths ...string) error {
 	return nil
 }
 
-// ResetEndDeviceRequestValidationError is the validation error returned by
-// ResetEndDeviceRequest.ValidateFields if the designated constraints aren't met.
-type ResetEndDeviceRequestValidationError struct {
+// ResetAndGetEndDeviceRequestValidationError is the validation error returned
+// by ResetAndGetEndDeviceRequest.ValidateFields if the designated constraints
+// aren't met.
+type ResetAndGetEndDeviceRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -3128,24 +3129,24 @@ type ResetEndDeviceRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e ResetEndDeviceRequestValidationError) Field() string { return e.field }
+func (e ResetAndGetEndDeviceRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ResetEndDeviceRequestValidationError) Reason() string { return e.reason }
+func (e ResetAndGetEndDeviceRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ResetEndDeviceRequestValidationError) Cause() error { return e.cause }
+func (e ResetAndGetEndDeviceRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ResetEndDeviceRequestValidationError) Key() bool { return e.key }
+func (e ResetAndGetEndDeviceRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ResetEndDeviceRequestValidationError) ErrorName() string {
-	return "ResetEndDeviceRequestValidationError"
+func (e ResetAndGetEndDeviceRequestValidationError) ErrorName() string {
+	return "ResetAndGetEndDeviceRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e ResetEndDeviceRequestValidationError) Error() string {
+func (e ResetAndGetEndDeviceRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -3157,14 +3158,14 @@ func (e ResetEndDeviceRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sResetEndDeviceRequest.%s: %s%s",
+		"invalid %sResetAndGetEndDeviceRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ResetEndDeviceRequestValidationError{}
+var _ error = ResetAndGetEndDeviceRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -3172,7 +3173,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ResetEndDeviceRequestValidationError{}
+} = ResetAndGetEndDeviceRequestValidationError{}
 
 // ValidateFields checks the field values on EndDeviceTemplate with the rules
 // defined in the proto definition for this message. If any rules are
