@@ -851,7 +851,7 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 		"version_ids.hardware_version",
 		"version_ids.model_id",
 	},
-	"/ttn.lorawan.v3.NsEndDeviceRegistry/Reset": nsEndDeviceReadFieldPaths[:],
+	"/ttn.lorawan.v3.NsEndDeviceRegistry/ResetFactoryDefaults": nsEndDeviceReadFieldPaths[:],
 
 	// Gateways:
 	"/ttn.lorawan.v3.EntityRegistrySearch/SearchGateways": GatewayFieldPathsNested,
