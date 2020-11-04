@@ -73,6 +73,14 @@ service NsEndDeviceRegistry {
     };
   };
 
+  // ResetFactoryDefaults resets device state to factory defaults.
+  rpc ResetFactoryDefaults(ResetAndGetEndDeviceRequest) returns (EndDevice) {
+    option (google.api.http) = {
+      patch: "/ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}"
+      body: "*"
+    };
+  };
+
   // Delete deletes the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
   rpc Delete(EndDeviceIdentifiers) returns (google.protobuf.Empty) {

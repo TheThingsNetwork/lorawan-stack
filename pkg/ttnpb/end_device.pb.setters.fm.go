@@ -2384,6 +2384,45 @@ func (dst *SetEndDeviceRequest) SetFields(src *SetEndDeviceRequest, paths ...str
 	return nil
 }
 
+func (dst *ResetAndGetEndDeviceRequest) SetFields(src *ResetAndGetEndDeviceRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "end_device_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceIdentifiers
+				if src != nil {
+					newSrc = &src.EndDeviceIdentifiers
+				}
+				newDst = &dst.EndDeviceIdentifiers
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+				} else {
+					var zero EndDeviceIdentifiers
+					dst.EndDeviceIdentifiers = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero types.FieldMask
+				dst.FieldMask = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *EndDeviceTemplate) SetFields(src *EndDeviceTemplate, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

@@ -542,7 +542,7 @@ var (
 			}
 
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
-			if device.CreatedAt.IsZero() || (!res.CreatedAt.IsZero() && res.CreatedAt.Before(res.CreatedAt)) {
+			if device.CreatedAt.IsZero() || (!res.CreatedAt.IsZero() && res.CreatedAt.Before(device.CreatedAt)) {
 				device.CreatedAt = res.CreatedAt
 			}
 			if res.UpdatedAt.After(device.UpdatedAt) {
@@ -765,6 +765,61 @@ var (
 					return err
 				}
 			}
+		},
+	}
+	endDevicesResetCommand = &cobra.Command{
+		Use:   "reset [application-id] [device-id]",
+		Short: "Reset state of an end device to factory defaults",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			forwardDeprecatedDeviceFlags(cmd.Flags())
+
+			devID, err := getEndDeviceID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+			paths := util.SelectFieldMask(cmd.Flags(), selectEndDeviceFlags)
+
+			isPaths, nsPaths, _, _ := splitEndDeviceGetPaths(paths...)
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
+			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: *devID,
+				FieldMask:            pbtypes.FieldMask{Paths: isPaths},
+			})
+			if err != nil {
+				return err
+			}
+
+			nsMismatch, _, _ := compareServerAddressesEndDevice(device, config)
+			if nsMismatch {
+				return errors.New("Network Server address does not match")
+			}
+
+			ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			logger.WithField("paths", nsPaths).Debug("Reset end device to factory defaults on Network Server")
+			nsDevice, err := ttnpb.NewNsEndDeviceRegistryClient(ns).ResetFactoryDefaults(ctx, &ttnpb.ResetAndGetEndDeviceRequest{
+				EndDeviceIdentifiers: *devID,
+				FieldMask:            pbtypes.FieldMask{Paths: nsPaths},
+			})
+			if err != nil {
+				return err
+			}
+			device.SetFields(nsDevice, "ids.dev_addr")
+			device.SetFields(nsDevice, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...)
+			if device.CreatedAt.IsZero() || (!nsDevice.CreatedAt.IsZero() && nsDevice.CreatedAt.Before(device.CreatedAt)) {
+				device.CreatedAt = nsDevice.CreatedAt
+			}
+			if nsDevice.UpdatedAt.After(device.UpdatedAt) {
+				device.UpdatedAt = nsDevice.UpdatedAt
+			}
+			return io.Write(os.Stdout, config.OutputFormat, device)
 		},
 	}
 	endDevicesDeleteCommand = &cobra.Command{
@@ -1058,7 +1113,7 @@ To generate a QR code for multiple end devices:
 				ext = exts[0]
 			}
 			filename := path.Join(folder, device.DeviceID+ext)
-			if err := ioutil.WriteFile(filename, res.Image.Embedded.Data, 0644); err != nil {
+			if err := ioutil.WriteFile(filename, res.Image.Embedded.Data, 0o644); err != nil {
 				return err
 			}
 
@@ -1194,6 +1249,10 @@ func init() {
 	endDevicesProvisionCommand.Flags().String("join-eui", "", "(hex)")
 	endDevicesProvisionCommand.Flags().String("start-dev-eui", "", "starting DevEUI to provision (hex)")
 	endDevicesCommand.AddCommand(endDevicesProvisionCommand)
+	endDevicesResetCommand.Flags().AddFlagSet(endDeviceIDFlags())
+	endDevicesResetCommand.Flags().AddFlagSet(selectEndDeviceFlags)
+	endDevicesResetCommand.Flags().AddFlagSet(selectAllEndDeviceFlags)
+	endDevicesCommand.AddCommand(endDevicesResetCommand)
 	endDevicesDeleteCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesCommand.AddCommand(endDevicesDeleteCommand)
 	endDevicesClaimCommand.Flags().AddFlagSet(applicationIDFlags())

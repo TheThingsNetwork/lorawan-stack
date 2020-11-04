@@ -27,11 +27,14 @@ import (
 )
 
 func FormatError(err error) string {
+	if err == nil {
+		return "nil"
+	}
 	var s string
 	for i, err := range errors.Stack(err) {
 		s += fmt.Sprintf(`
-%s-> %s`,
-			strings.Repeat("-", i), err,
+%s-> %s (attributes: %v)`,
+			strings.Repeat("-", i), err, errors.Attributes(err),
 		)
 	}
 	return s

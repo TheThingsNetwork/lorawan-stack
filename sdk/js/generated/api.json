@@ -9899,6 +9899,45 @@
           ]
         },
         {
+          "name": "ResetAndGetEndDeviceRequest",
+          "longName": "ResetAndGetEndDeviceRequest",
+          "fullName": "ttn.lorawan.v3.ResetAndGetEndDeviceRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "end_device_ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "The names of the end device fields that should be returned.\nSee the API reference for which fields can be returned by the different services.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "Session",
           "longName": "Session",
           "fullName": "ttn.lorawan.v3.Session",
@@ -22654,6 +22693,29 @@
                     {
                       "method": "POST",
                       "pattern": "/ns/applications/{end_device.ids.application_ids.application_id}/devices",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ResetFactoryDefaults",
+              "description": "ResetFactoryDefaults resets device state to factory defaults.",
+              "requestType": "ResetAndGetEndDeviceRequest",
+              "requestLongType": "ResetAndGetEndDeviceRequest",
+              "requestFullType": "ttn.lorawan.v3.ResetAndGetEndDeviceRequest",
+              "requestStreaming": false,
+              "responseType": "EndDevice",
+              "responseLongType": "EndDevice",
+              "responseFullType": "ttn.lorawan.v3.EndDevice",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PATCH",
+                      "pattern": "/ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}",
                       "body": "*"
                     }
                   ]

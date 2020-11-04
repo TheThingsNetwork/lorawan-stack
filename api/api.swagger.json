@@ -4969,6 +4969,49 @@
         "tags": [
           "NsEndDeviceRegistry"
         ]
+      },
+      "patch": {
+        "summary": "ResetFactoryDefaults resets device state to factory defaults.",
+        "operationId": "NsEndDeviceRegistry_ResetFactoryDefaults",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3EndDevice"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ResetAndGetEndDeviceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "NsEndDeviceRegistry"
+        ]
       }
     },
     "/ns/dev_addr": {
@@ -12781,6 +12824,18 @@
         "KEYS"
       ],
       "default": "CONTEXT"
+    },
+    "v3ResetAndGetEndDeviceRequest": {
+      "type": "object",
+      "properties": {
+        "end_device_ids": {
+          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the end device fields that should be returned.\nSee the API reference for which fields can be returned by the different services."
+        }
+      }
     },
     "v3Right": {
       "type": "string",
