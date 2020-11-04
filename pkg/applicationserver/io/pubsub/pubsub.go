@@ -46,7 +46,7 @@ type PubSub struct {
 
 // New creates a new pusub frontend.
 func New(c *component.Component, server io.Server, registry Registry) (*PubSub, error) {
-	ctx := log.NewContextWithField(c.FillContext(c.Context()), "namespace", "applicationserver/io/pubsub")
+	ctx := log.NewContextWithField(c.Context(), "namespace", "applicationserver/io/pubsub")
 	ps := &PubSub{
 		Component: c,
 		ctx:       ctx,
