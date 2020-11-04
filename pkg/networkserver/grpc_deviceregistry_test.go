@@ -2047,7 +2047,7 @@ func TestDeviceRegistryReset(t *testing.T) {
 								GRPC: config.GRPC{
 									LogIgnoreMethods: []string{
 										"/ttn.lorawan.v3.ApplicationAccess/ListRights",
-										"/ttn.lorawan.v3.NsEndDeviceRegistry/Reset",
+										"/ttn.lorawan.v3.NsEndDeviceRegistry/ResetFactoryDefaults",
 									},
 								},
 							},
@@ -2068,9 +2068,9 @@ func TestDeviceRegistryReset(t *testing.T) {
 						defer SetMockClock(test.NewMockClock(now))()
 					}
 
-					dev, err, ok := env.AssertResetDevice(
+					dev, err, ok := env.AssertResetFactoryDefaults(
 						ctx,
-						&ttnpb.ResetEndDeviceRequest{
+						&ttnpb.ResetAndGetEndDeviceRequest{
 							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 								ApplicationIdentifiers: appID,
 								DeviceID:               devID,
@@ -2089,9 +2089,9 @@ func TestDeviceRegistryReset(t *testing.T) {
 						return
 					}
 
-					dev, err, ok = env.AssertResetDevice(
+					dev, err, ok = env.AssertResetFactoryDefaults(
 						ctx,
-						&ttnpb.ResetEndDeviceRequest{
+						&ttnpb.ResetAndGetEndDeviceRequest{
 							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 								ApplicationIdentifiers: appID,
 								DeviceID:               devID,
@@ -2160,7 +2160,6 @@ func TestDeviceRegistryReset(t *testing.T) {
 					expected.Session = session
 					expected.UpdatedAt = dev.UpdatedAt
 					if !a.So(dev, should.Resemble, test.Must(ttnpb.FilterGetEndDevice(expected, conf.Paths...)).(*ttnpb.EndDevice)) {
-						t.Logf("GOT MAC STATE: %v\nEXPECTED MAC STATE: %v", dev.MACState, expected.MACState)
 						return
 					}
 					updated, _, err := env.Devices.GetByID(ctx, appID, devID, ttnpb.EndDeviceFieldPathsTopLevel)

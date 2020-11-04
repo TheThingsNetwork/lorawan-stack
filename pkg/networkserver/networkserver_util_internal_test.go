@@ -562,7 +562,7 @@ func (env TestEnvironment) AssertListApplicationRights(ctx context.Context, appI
 	), should.BeTrue)
 }
 
-func (env TestEnvironment) AssertResetDevice(ctx context.Context, req *ttnpb.ResetEndDeviceRequest, rights ...ttnpb.Right) (*ttnpb.EndDevice, error, bool) {
+func (env TestEnvironment) AssertResetFactoryDefaults(ctx context.Context, req *ttnpb.ResetAndGetEndDeviceRequest, rights ...ttnpb.Right) (*ttnpb.EndDevice, error, bool) {
 	t, a := test.MustNewTFromContext(ctx)
 	t.Helper()
 
@@ -577,7 +577,7 @@ func (env TestEnvironment) AssertResetDevice(ctx context.Context, req *ttnpb.Res
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
-		dev, err = ttnpb.NewNsEndDeviceRegistryClient(env.ClientConn).Reset(
+		dev, err = ttnpb.NewNsEndDeviceRegistryClient(env.ClientConn).ResetFactoryDefaults(
 			ctx,
 			req,
 			grpc.PerRPCCredentials(rpcmetadata.MD{

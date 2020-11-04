@@ -610,8 +610,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 
-// Reset implements NsEndDeviceRegistryServer.
-func (ns *NetworkServer) Reset(ctx context.Context, req *ttnpb.ResetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+// ResetFactoryDefaults implements NsEndDeviceRegistryServer.
+func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.ResetAndGetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, appendRequiredDeviceReadRights(
 		append(make([]ttnpb.Right, 0, 1+maxRequiredDeviceReadRightCount), ttnpb.RIGHT_APPLICATION_DEVICES_WRITE),
 		req.FieldMask.Paths...,
