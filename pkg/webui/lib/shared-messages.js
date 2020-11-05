@@ -108,6 +108,7 @@ export default defineMessages({
   created: 'Created',
   createdAt: 'Created at',
   currentCollaborators: 'Current collaborators',
+  currentUserIndicator: '(This is you)',
   data: 'Data',
   defineRights: 'Define rights',
   delayWarning:
