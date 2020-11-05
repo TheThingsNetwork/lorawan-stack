@@ -63,7 +63,8 @@ export default class UsersTable extends Component {
           if (userId === props.currentUserId) {
             return (
               <span>
-                {userId} <Message className={style.hint} content={sharedMessages.currentUserIndicator} />
+                {userId}{' '}
+                <Message className={style.hint} content={sharedMessages.currentUserIndicator} />
               </span>
             )
           }

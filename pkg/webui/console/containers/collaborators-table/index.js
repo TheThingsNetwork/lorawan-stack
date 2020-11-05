@@ -54,7 +54,8 @@ export default class CollaboratorsTable extends Component {
           if (isUser && collaboratorId === props.currentUserId) {
             return (
               <span>
-                {collaboratorId} <Message className={style.hint} content={sharedMessages.currentUserIndicator} />
+                {collaboratorId}{' '}
+                <Message className={style.hint} content={sharedMessages.currentUserIndicator} />
               </span>
             )
           }
