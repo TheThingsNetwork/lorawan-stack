@@ -307,6 +307,53 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 			},
 		},
+		{
+			Name: "Empty KEK",
+			Request: &ttnpb.SetApplicationActivationSettingsRequest{
+				ApplicationIdentifiers: appID,
+				ApplicationActivationSettings: ttnpb.ApplicationActivationSettings{
+					KEKLabel: sessionKEKLabel,
+					KEK: &ttnpb.KeyEnvelope{
+						Key: &types.AES128Key{},
+					},
+				},
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{
+						"kek_label",
+						"kek",
+					},
+				},
+			},
+			Rights: []ttnpb.Right{
+				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
+				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
+		},
+		{
+			Name: "KEK with empty label",
+			Request: &ttnpb.SetApplicationActivationSettingsRequest{
+				ApplicationIdentifiers: appID,
+				ApplicationActivationSettings: ttnpb.ApplicationActivationSettings{
+					KEK: jsKEKEnvelopeUnwrapped,
+				},
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{
+						"kek_label",
+						"kek",
+					},
+				},
+			},
+			Rights: []ttnpb.Right{
+				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
+				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
+		},
 	} {
 		tc := tc
 		test.RunSubtestFromContext(ctx, test.SubtestConfig{
@@ -503,6 +550,24 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 							t.Fatalf("Failed to update settings: %s", test.FormatError(err))
 						}
 						a.So(sets, should.Resemble, tc.CreateSettings)
+					},
+				})
+				test.RunSubtestFromContext(ctx, test.SubtestConfig{
+					Name: "Remove KEK",
+					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+						sets, err := cl.Set(ctx, &ttnpb.SetApplicationActivationSettingsRequest{
+							ApplicationIdentifiers: appID,
+							FieldMask: pbtypes.FieldMask{
+								Paths: []string{
+									"kek_label",
+									"kek",
+								},
+							},
+						}, credOpt)
+						if !a.So(err, should.BeNil) {
+							t.Fatalf("Failed to remove KEK: %s", test.FormatError(err))
+						}
+						a.So(sets, should.Resemble, &ttnpb.ApplicationActivationSettings{})
 					},
 				})
 				test.RunSubtestFromContext(ctx, test.SubtestConfig{
