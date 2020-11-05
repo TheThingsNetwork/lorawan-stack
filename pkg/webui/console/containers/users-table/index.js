@@ -159,7 +159,6 @@ export default class UsersTable extends Component {
         baseDataSelector={this.baseDataSelector}
         pageSize={pageSize}
         searchable
-        {...this.props}
       />
     )
   }
