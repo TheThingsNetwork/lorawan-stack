@@ -38,13 +38,8 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 		return nil, err
 	}
 	return as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, ttnpb.ApplicationLinkFieldPathsTopLevel,
-		func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
-			if link != nil {
-				return &req.ApplicationLink, req.FieldMask.Paths, nil
-			}
-			return &req.ApplicationLink, append(req.FieldMask.Paths,
-				"application_ids",
-			), nil
+		func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+			return &req.ApplicationLink, req.FieldMask.Paths, nil
 		},
 	)
 }
