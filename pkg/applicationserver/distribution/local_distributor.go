@@ -26,10 +26,10 @@ import (
 // NewLocalDistributor creates a Distributor that routes the traffic locally.
 // The underlying subscription sets can timeout if there are no active subscribers.
 // A timeout of 0 means the underlying subscriptions never timeout.
-func NewLocalDistributor(ctx context.Context, timeout time.Duration) Distributor {
+func NewLocalDistributor(ctx context.Context, rd RequestDecoupler, timeout time.Duration) Distributor {
 	return &localDistributor{
-		broadcast:     newSubscriptionSet(ctx, 0),
-		subscriptions: newSubscriptionMap(ctx, timeout, noSetup),
+		broadcast:     newSubscriptionSet(ctx, rd, 0),
+		subscriptions: newSubscriptionMap(ctx, rd, timeout, noSetup),
 	}
 }
 
