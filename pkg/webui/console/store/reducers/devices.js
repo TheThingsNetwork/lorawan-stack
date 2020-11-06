@@ -74,14 +74,17 @@ const devices = function(state = defaultState, { type, payload, event }) {
       }
 
       // Update derived last seen value if possible.
-      const { recent_uplinks } = payload
+      const { mac_state } = payload
       const derived = {}
-      if (recent_uplinks) {
-        const last_uplink = Boolean(recent_uplinks)
-          ? recent_uplinks[recent_uplinks.length - 1]
-          : undefined
-        if (last_uplink) {
-          derived.lastSeen = last_uplink.received_at
+      if (mac_state) {
+        const { recent_uplinks } = mac_state
+        if (recent_uplinks) {
+          const last_uplink = Boolean(recent_uplinks)
+            ? recent_uplinks[recent_uplinks.length - 1]
+            : undefined
+          if (last_uplink) {
+            derived.lastSeen = last_uplink.received_at
+          }
         }
       }
 

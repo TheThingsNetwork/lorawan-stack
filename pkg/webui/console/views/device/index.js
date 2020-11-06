@@ -107,8 +107,7 @@ import style from './device.styl'
       'application_server_kek_label',
       'network_server_kek_label',
       'claim_authentication_code',
-      'recent_uplinks',
-      'recent_downlinks',
+      'mac_state.recent_uplinks',
       'attributes',
       'skip_payload_crypto',
     ]
