@@ -16,13 +16,33 @@ package applicationserver
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
+
+func removeDeprecatedPaths(ctx context.Context, paths []string) []string {
+	validPaths := make([]string, 0, len(paths))
+nextPath:
+	for _, path := range paths {
+		for _, deprecated := range []string{
+			"api_key",
+			"network_server_address",
+		} {
+			if path == deprecated {
+				warning.Add(ctx, fmt.Sprintf("field %v is deprecated", deprecated))
+				continue nextPath
+			}
+			validPaths = append(validPaths, path)
+		}
+	}
+	return validPaths
+}
 
 // getLink calls the underlying link registry in order to retrieve the link.
 // If the link is not found, an empty link is returned instead.
@@ -41,6 +61,7 @@ func (as *ApplicationServer) GetLink(ctx context.Context, req *ttnpb.GetApplicat
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
+	req.FieldMask.Paths = removeDeprecatedPaths(ctx, req.FieldMask.Paths)
 	return as.linkRegistry.Get(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths)
 }
 
@@ -49,6 +70,7 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
+	req.FieldMask.Paths = removeDeprecatedPaths(ctx, req.FieldMask.Paths)
 	return as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, ttnpb.ApplicationLinkFieldPathsTopLevel,
 		func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 			return &req.ApplicationLink, req.FieldMask.Paths, nil

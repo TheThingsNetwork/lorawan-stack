@@ -1376,15 +1376,6 @@
       "file": "applications.go"
     }
   },
-  "error:cmd/ttn-lw-cli/commands:no_application_link_api_key": {
-    "translations": {
-      "en": "no application link API key set"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-cli/commands",
-      "file": "applications_link.go"
-    }
-  },
   "error:cmd/ttn-lw-cli/commands:no_client_id": {
     "translations": {
       "en": "no client ID set"

@@ -190,12 +190,11 @@ func TestApplicationServer(t *testing.T) {
 	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
 	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
-			APIKey: registeredApplicationKey,
 			DefaultFormatters: &ttnpb.MessagePayloadFormatters{
 				UpFormatter:   registeredApplicationFormatter,
 				DownFormatter: registeredApplicationFormatter,
 			},
-		}, []string{"api_key", "default_formatters"}, nil
+		}, []string{"default_formatters"}, nil
 	})
 	if err != nil {
 		t.Fatalf("Failed to set link in registry: %s", err)
@@ -2276,9 +2275,8 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
 	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
-			APIKey:            registeredApplicationKey,
 			SkipPayloadCrypto: &pbtypes.BoolValue{Value: true},
-		}, []string{"api_key", "skip_payload_crypto"}, nil
+		}, []string{"skip_payload_crypto"}, nil
 	})
 	if err != nil {
 		t.Fatalf("Failed to set link in registry: %s", err)

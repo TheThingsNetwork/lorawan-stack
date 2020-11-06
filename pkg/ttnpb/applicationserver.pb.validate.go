@@ -50,24 +50,6 @@ func (m *ApplicationLink) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "network_server_address":
-
-			if !_ApplicationLink_NetworkServerAddress_Pattern.MatchString(m.GetNetworkServerAddress()) {
-				return ApplicationLinkValidationError{
-					field:  "network_server_address",
-					reason: "value does not match regex pattern \"^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$\"",
-				}
-			}
-
-		case "api_key":
-
-			if utf8.RuneCountInString(m.GetAPIKey()) < 1 {
-				return ApplicationLinkValidationError{
-					field:  "api_key",
-					reason: "value length must be at least 1 runes",
-				}
-			}
-
 		case "default_formatters":
 
 			if v, ok := interface{}(m.GetDefaultFormatters()).(interface{ ValidateFields(...string) error }); ok {
@@ -157,8 +139,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationLinkValidationError{}
-
-var _ApplicationLink_NetworkServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
 
 // ValidateFields checks the field values on GetApplicationLinkRequest with the
 // rules defined in the proto definition for this message. If any rules are
