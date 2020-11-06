@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/types"
-	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/formatters"
 	mock_server "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
@@ -30,7 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -43,9 +41,9 @@ type messageWithError struct {
 }
 
 func TestPubSub(t *testing.T) {
-	a := assertions.New(t)
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	redisClient, flush := test.NewRedis(t, "pubsub_test")
+	a, ctx := test.New(t)
+
+	redisClient, flush := test.NewRedis(ctx, "pubsub_test")
 	defer flush()
 	defer redisClient.Close()
 	registry := &redis.PubSubRegistry{

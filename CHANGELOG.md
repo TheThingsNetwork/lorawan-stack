@@ -63,6 +63,7 @@ For details about compatibility between different releases, see the **Commitment
 - Gateway server can now update the gateway location only if the gateway is authenticated.
 - Right to manage links on Application Server is now `RIGHT_APPLICATION_SETTINGS_BASIC`.
 - Network Server does not store `recent_uplinks`, `recent_adr_uplinks` and `recent_downlinks` anymore.
+- Improved Network Server downlink task performance.
 
 ### Removed
 

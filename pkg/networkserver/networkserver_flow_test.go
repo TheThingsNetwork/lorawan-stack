@@ -402,8 +402,7 @@ func TestFlow(t *testing.T) {
 					nsConf.DeduplicationWindow = (1 << 8) * test.Delay
 					nsConf.CooldownWindow = (1 << 11) * test.Delay
 
-					_, ctx, env, stop := StartTest(t, TestConfig{
-						Context:       ctx,
+					_, ctx, env, stop := StartTest(ctx, TestConfig{
 						NetworkServer: nsConf,
 					})
 					defer stop()

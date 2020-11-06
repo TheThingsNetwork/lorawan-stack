@@ -62,8 +62,7 @@ func TestGenerateDevAddr(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				ns, ctx, _, stop := StartTest(t, TestConfig{
-					Context: ctx,
+				ns, ctx, _, stop := StartTest(ctx, TestConfig{
 					NetworkServer: Config{
 						NetID: tc.NetID,
 					},
@@ -141,8 +140,7 @@ func TestGenerateDevAddr(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				ns, ctx, _, stop := StartTest(t, TestConfig{
-					Context: ctx,
+				ns, ctx, _, stop := StartTest(ctx, TestConfig{
 					NetworkServer: Config{
 						NetID:           types.NetID{0x00, 0x00, 0x13},
 						DevAddrPrefixes: tc.DevAddrPrefixes,

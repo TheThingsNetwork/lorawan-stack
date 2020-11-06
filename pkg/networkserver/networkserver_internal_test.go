@@ -30,9 +30,8 @@ func TestNewDevAddr(t *testing.T) {
 		Parallel: true,
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 			ns, ctx, _, stop := StartTest(
-				t,
+				ctx,
 				TestConfig{
-					Context: ctx,
 					NetworkServer: Config{
 						NetID: types.NetID{0x00, 0x00, 0x13},
 					},
@@ -69,9 +68,8 @@ func TestNewDevAddr(t *testing.T) {
 				},
 			}
 			ns, ctx, _, stop := StartTest(
-				t,
+				ctx,
 				TestConfig{
-					Context: ctx,
 					NetworkServer: Config{
 						NetID:           types.NetID{0x00, 0x00, 0x13},
 						DevAddrPrefixes: ps,

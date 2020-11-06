@@ -23,14 +23,18 @@ import (
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 )
 
-//go:generate go run ./generate_scripts.go
+//go:generate go run ./../../redis/generate_scripts.go
 
-func deviceUIDKey(cl *ttnredis.Client, uid string) string {
-	return cl.Key("uid", uid)
+type keyer interface {
+	Key(ks ...string) string
 }
 
-func deviceUIDLastInvalidationKey(cl *ttnredis.Client, uid string) string {
-	return ttnredis.Key(deviceUIDKey(cl, uid), "last-invalidation")
+func deviceUIDKey(r keyer, uid string) string {
+	return r.Key("uid", uid)
+}
+
+func deviceUIDLastInvalidationKey(r keyer, uid string) string {
+	return ttnredis.Key(deviceUIDKey(r, uid), "last-invalidation")
 }
 
 var keyEncoding = base64.RawStdEncoding

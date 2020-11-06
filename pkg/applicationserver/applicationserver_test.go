@@ -61,7 +61,7 @@ type connChannels struct {
 }
 
 func TestApplicationServer(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
 	// This application will be added to the Entity Registry and to the link registry of the Application Server so that it
 	// links automatically on start to the Network Server.
@@ -141,7 +141,6 @@ func TestApplicationServer(t *testing.T) {
 		DevEUI:                 eui64Ptr(types.EUI64{0x24, 0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 	}
 
-	ctx := test.Context()
 	is, isAddr := startMockIS(ctx)
 	js, jsAddr := startMockJS(ctx)
 	ns, nsAddr := startMockNS(ctx, func(md rpcmetadata.MD) bool {
@@ -180,12 +179,12 @@ func TestApplicationServer(t *testing.T) {
 		KEKLabel:     "test",
 	})
 
-	devsRedisClient, devsFlush := test.NewRedis(t, "applicationserver_test", "devices")
+	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
 	defer devsFlush()
 	defer devsRedisClient.Close()
 	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient}
 
-	linksRedisClient, linksFlush := test.NewRedis(t, "applicationserver_test", "links")
+	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
 	defer linksFlush()
 	defer linksRedisClient.Close()
 	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
@@ -202,12 +201,12 @@ func TestApplicationServer(t *testing.T) {
 		t.Fatalf("Failed to set link in registry: %s", err)
 	}
 
-	webhooksRedisClient, webhooksFlush := test.NewRedis(t, "applicationserver_test", "webhooks")
+	webhooksRedisClient, webhooksFlush := test.NewRedis(ctx, "applicationserver_test", "webhooks")
 	defer webhooksFlush()
 	defer webhooksRedisClient.Close()
 	webhookRegistry := iowebredis.WebhookRegistry{Redis: webhooksRedisClient}
 
-	pubsubRedisClient, pubsubFlush := test.NewRedis(t, "applicationserver_test", "pubsub")
+	pubsubRedisClient, pubsubFlush := test.NewRedis(ctx, "applicationserver_test", "pubsub")
 	defer pubsubFlush()
 	defer pubsubRedisClient.Close()
 	pubsubRegistry := iopubsubredis.PubSubRegistry{Redis: pubsubRedisClient}
@@ -2180,7 +2179,7 @@ func TestApplicationServer(t *testing.T) {
 }
 
 func TestSkipPayloadCrypto(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
 	// This application will be added to the Entity Registry and to the link registry of the Application Server so that it
 	// links automatically on start to the Network Server.
@@ -2197,7 +2196,6 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		},
 	}
 
-	ctx := test.Context()
 	is, isAddr := startMockIS(ctx)
 	js, jsAddr := startMockJS(ctx)
 	ns, nsAddr := startMockNS(ctx, func(md rpcmetadata.MD) bool {
@@ -2236,12 +2234,12 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		KEKLabel:     "test",
 	})
 
-	devsRedisClient, devsFlush := test.NewRedis(t, "applicationserver_test", "devices")
+	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
 	defer devsFlush()
 	defer devsRedisClient.Close()
 	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient}
 
-	linksRedisClient, linksFlush := test.NewRedis(t, "applicationserver_test", "links")
+	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
 	defer linksFlush()
 	defer linksRedisClient.Close()
 	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}

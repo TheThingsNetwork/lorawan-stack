@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"sync"
 
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis/v8"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -68,7 +68,7 @@ var errChannelClosed = errors.DefineAborted("channel_closed", "channel closed")
 
 func (ps *PubSub) subscribeTask(ctx context.Context) error {
 	logger := log.FromContext(ctx)
-	sub := ps.client.Subscribe(ps.eventChannel)
+	sub := ps.client.Subscribe(ctx, ps.eventChannel)
 	logger.Info("Subscribed")
 	defer func() {
 		if err := sub.Close(); err != nil {
@@ -132,7 +132,7 @@ func (ps *PubSub) Publish(evt events.Event) {
 		logger.WithError(err).Warn("Failed to marshal event to JSON")
 		return
 	}
-	if err := ps.client.Publish(ps.eventChannel, b).Err(); err != nil {
+	if err := ps.client.Publish(ps.ctx, ps.eventChannel, b).Err(); err != nil {
 		logger.WithError(err).Warn("Failed to publish event")
 	}
 }

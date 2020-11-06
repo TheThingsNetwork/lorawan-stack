@@ -50,7 +50,7 @@ func (c *membershipCache) cacheKey(ctx context.Context, id *ttnpb.OrganizationOr
 
 func (c *membershipCache) GetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers) (*ttnpb.Rights, error) {
 	cacheKey := c.cacheKey(ctx, id, entityID)
-	if cached, err := c.redis.Get(cacheKey).Bytes(); err == nil {
+	if cached, err := c.redis.Get(ctx, cacheKey).Bytes(); err == nil {
 		if len(cached) == 0 {
 			return nil, errMembershipNotFound.WithAttributes(
 				"account_id", id.IDString(),
@@ -66,14 +66,14 @@ func (c *membershipCache) GetMember(ctx context.Context, id *ttnpb.OrganizationO
 	rights, err := c.MembershipStore.GetMember(ctx, id, entityID)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			if cacheErr := c.redis.Set(cacheKey, "", c.ttl).Err(); cacheErr != nil {
+			if cacheErr := c.redis.Set(ctx, cacheKey, "", c.ttl).Err(); cacheErr != nil {
 				log.FromContext(ctx).WithError(cacheErr).Error("Failed to set membership cache")
 			}
 		}
 		return nil, err
 	}
 	if cache, err := rights.Marshal(); err == nil {
-		if cacheErr := c.redis.Set(cacheKey, cache, c.ttl).Err(); cacheErr != nil {
+		if cacheErr := c.redis.Set(ctx, cacheKey, cache, c.ttl).Err(); cacheErr != nil {
 			log.FromContext(ctx).WithError(cacheErr).Error("Failed to set membership cache")
 		}
 	}
@@ -87,7 +87,7 @@ func (c *membershipCache) SetMember(ctx context.Context, id *ttnpb.OrganizationO
 	}
 	// NOTE: Only invalidate. We can't set the new rights, since we don't know if
 	// the transaction will succeed.
-	if cacheErr := c.redis.Del(c.cacheKey(ctx, id, entityID)).Err(); cacheErr != nil {
+	if cacheErr := c.redis.Del(ctx, c.cacheKey(ctx, id, entityID)).Err(); cacheErr != nil {
 		log.FromContext(ctx).WithError(cacheErr).Error("Failed to invalidate membership cache")
 	}
 	return nil

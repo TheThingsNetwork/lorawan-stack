@@ -48,7 +48,7 @@ type DownlinkTaskQueue interface {
 	// if such is available, otherwise it blocks until it is.
 	// Context passed to f must be derived from ctx.
 	// Implementations must respect ctx.Deadline() value on best-effort basis, if such is present.
-	Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error
+	Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error
 }
 
 func loggerWithApplicationDownlinkFields(logger log.Interface, down *ttnpb.ApplicationDownlink) log.Interface {
@@ -100,11 +100,10 @@ func (s generateDownlinkState) appendApplicationUplinks(ups []*ttnpb.Application
 	}
 }
 
-func (ns *NetworkServer) updateDataDownlinkTask(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) error {
-	logger := log.FromContext(ctx)
+func (ns *NetworkServer) nextDataDownlinkTaskAt(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) (time.Time, error) {
 	if dev.GetMACState() == nil || dev.GetSession() == nil {
-		logger.Debug("Avoid updating downlink task queue for device with no MAC state or session")
-		return nil
+		log.FromContext(ctx).Debug("Cannot compute next downlink task time for device with no MAC state or session")
+		return time.Time{}, nil
 	}
 
 	if t := timeNow().UTC().Add(nsScheduleWindow()); earliestAt.Before(t) {
@@ -113,27 +112,35 @@ func (ns *NetworkServer) updateDataDownlinkTask(ctx context.Context, dev *ttnpb.
 	var taskAt time.Time
 	phy, err := DeviceBand(dev, ns.FrequencyPlans)
 	if err != nil {
-		logger.WithError(err).Warn("Failed to determine device band")
-	} else {
-		slot, ok := nextDataDownlinkSlot(ctx, dev, phy, ns.defaultMACSettings, earliestAt)
-		if !ok {
-			return nil
-		}
-		from := slot.From()
-		switch {
-		case slot.IsContinuous():
-			// Continuous downlink slot, enqueue at the time it becomes available.
-			taskAt = from
+		log.FromContext(ctx).WithError(err).Warn("Failed to determine device band")
+		return time.Time{}, nil
+	}
+	slot, ok := nextDataDownlinkSlot(ctx, dev, phy, ns.defaultMACSettings, earliestAt)
+	if !ok {
+		return time.Time{}, nil
+	}
+	from := slot.From()
+	switch {
+	case slot.IsContinuous():
+		// Continuous downlink slot, enqueue at the time it becomes available.
+		taskAt = from
 
-		case !from.IsZero():
-			// Absolute time downlink slot, enqueue in advance to allow for scheduling.
-			taskAt = from.Add(-dev.MACState.CurrentParameters.Rx1Delay.Duration() - nsScheduleWindow())
-		}
+	case !from.IsZero():
+		// Absolute time downlink slot, enqueue in advance to allow for scheduling.
+		taskAt = from.Add(-dev.MACState.CurrentParameters.Rx1Delay.Duration() - nsScheduleWindow())
 	}
 	if taskAt.Before(earliestAt) {
 		taskAt = earliestAt
 	}
-	logger.WithField("start_at", taskAt).Debug("Add downlink task")
+	return taskAt, nil
+}
+
+func (ns *NetworkServer) updateDataDownlinkTask(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) error {
+	taskAt, err := ns.nextDataDownlinkTaskAt(ctx, dev, earliestAt)
+	if err != nil || taskAt.IsZero() {
+		return err
+	}
+	log.FromContext(ctx).WithField("start_at", taskAt).Debug("Add downlink task")
 	return ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, taskAt, true)
 }
 
@@ -1464,8 +1471,8 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 // NOTE: ctx.Done() is not guaranteed to be respected by processDownlinkTask.
 func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 	var setErr bool
-	var addErr bool
-	err := ns.downlinkTasks.Pop(ctx, func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
+	var computeNextErr bool
+	err := ns.downlinkTasks.Pop(ctx, func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) (time.Time, error) {
 		ctx = log.NewContextWithFields(ctx, log.Fields(
 			"device_uid", unique.ID(ctx, devID),
 			"started_at", timeNow().UTC(),
@@ -1738,7 +1745,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		if err != nil {
 			setErr = true
 			logger.WithError(err).Error("Failed to update device in registry")
-			return err
+			return time.Time{}, err
 		}
 
 		var earliestAt time.Time
@@ -1749,20 +1756,20 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 			earliestAt = timeNow().Add(downlinkRetryInterval + nsScheduleWindow())
 
 		case noDownlinkTask:
-			return nil
+			return time.Time{}, nil
 
 		default:
 			panic(fmt.Errorf("unmatched downlink task update strategy: %v", taskUpdateStrategy))
 		}
-		logger.WithField("earliest_at", earliestAt).Debug("Update downlink task queue after downlink attempt")
-		if err := ns.updateDataDownlinkTask(ctx, dev, earliestAt); err != nil {
-			addErr = true
-			logger.WithError(err).Error("Failed to update downlink task queue after downlink attempt")
-			return err
+		nextTaskAt, err := ns.nextDataDownlinkTaskAt(ctx, dev, earliestAt)
+		if err != nil {
+			computeNextErr = true
+			logger.WithError(err).Error("Failed to compute next downlink task time after downlink attempt")
+			return time.Time{}, nil
 		}
-		return nil
+		return nextTaskAt, nil
 	})
-	if err != nil && !setErr && !addErr {
+	if err != nil && !setErr && !computeNextErr {
 		log.FromContext(ctx).WithError(err).Error("Failed to pop entry from downlink task queue")
 	}
 	return err

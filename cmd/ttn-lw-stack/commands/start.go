@@ -222,7 +222,7 @@ var startCommand = &cobra.Command{
 				Redis:   NewNetworkServerDeviceRegistryRedis(*config),
 				LockTTL: time.Second,
 			}
-			if err := devices.Init(); err != nil {
+			if err := devices.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
 			config.NS.Devices = devices
@@ -233,21 +233,16 @@ var startCommand = &cobra.Command{
 				NewNetworkServerDownlinkTaskRedis(*config),
 				100000, redisConsumerGroup, redisConsumerID,
 			)
-			if err := nsDownlinkTasks.Init(); err != nil {
+			if err := nsDownlinkTasks.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
+			defer nsDownlinkTasks.Close(ctx)
 			config.NS.DownlinkTasks = nsDownlinkTasks
 			ns, err := networkserver.New(c, &config.NS)
 			if err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
-			ns.Component.RegisterTask(&component.TaskConfig{
-				Context: ns.Context(),
-				ID:      "queue_downlink",
-				Func:    nsDownlinkTasks.Run,
-				Restart: component.TaskRestartOnFailure,
-				Backoff: component.DefaultTaskBackoffConfig,
-			})
+			_ = ns
 		}
 
 		if start.ApplicationServer || startDefault {

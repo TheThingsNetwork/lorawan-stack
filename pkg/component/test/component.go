@@ -22,17 +22,17 @@ import (
 )
 
 // NewComponent returns a new Component that can be used for testing.
-func NewComponent(t *testing.T, config *component.Config, opts ...component.Option) *component.Component {
-	c, err := component.New(test.GetLogger(t), config, opts...)
+func NewComponent(tb testing.TB, config *component.Config, opts ...component.Option) *component.Component {
+	c, err := component.New(test.GetLogger(tb), config, opts...)
 	if err != nil {
-		t.Fatalf("Failed to create component: %v", err)
+		tb.Fatalf("Failed to create component: %v", err)
 	}
 	return c
 }
 
 // StartComponent starts the component for testing.
-func StartComponent(t *testing.T, c *component.Component) {
+func StartComponent(tb testing.TB, c *component.Component) {
 	if err := c.Start(); err != nil {
-		t.Fatalf("Failed to start component: %v", err)
+		tb.Fatalf("Failed to start component: %v", err)
 	}
 }

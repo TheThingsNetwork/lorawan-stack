@@ -96,10 +96,10 @@ var (
 	EvtScheduleJoinAcceptSuccess   = evtScheduleJoinAcceptSuccess
 	EvtUpdateEndDevice             = evtUpdateEndDevice
 
-	NewDeviceRegistry         func(t testing.TB) (DeviceRegistry, func())
-	NewApplicationUplinkQueue func(t testing.TB) (ApplicationUplinkQueue, func())
-	NewDownlinkTaskQueue      func(t testing.TB) (DownlinkTaskQueue, func())
-	NewUplinkDeduplicator     func(t testing.TB) (UplinkDeduplicator, func())
+	NewDeviceRegistry         func(context.Context) (DeviceRegistry, func())
+	NewApplicationUplinkQueue func(context.Context) (ApplicationUplinkQueue, func())
+	NewDownlinkTaskQueue      func(context.Context) (DownlinkTaskQueue, func())
+	NewUplinkDeduplicator     func(context.Context) (UplinkDeduplicator, func())
 )
 
 type DownlinkPath = downlinkPath
@@ -408,25 +408,6 @@ func MakeNsGsScheduleDownlinkChFunc(reqCh chan<- NsGsScheduleDownlinkRequest) fu
 
 type InteropClientEnvironment struct {
 	HandleJoinRequest <-chan InteropClientHandleJoinRequestRequest
-}
-
-func newMockInteropClient(t *testing.T) (InteropClient, InteropClientEnvironment, func()) {
-	t.Helper()
-
-	handleJoinCh := make(chan InteropClientHandleJoinRequestRequest)
-	return &MockInteropClient{
-			HandleJoinRequestFunc: MakeInteropClientHandleJoinRequestChFunc(handleJoinCh),
-		}, InteropClientEnvironment{
-			HandleJoinRequest: handleJoinCh,
-		},
-		func() {
-			select {
-			case <-handleJoinCh:
-				t.Error("InteropClient.HandleJoin call missed")
-			default:
-				close(handleJoinCh)
-			}
-		}
 }
 
 func AssertInteropClientHandleJoinRequestRequest(ctx context.Context, reqCh <-chan InteropClientHandleJoinRequestRequest, assert func(context.Context, types.NetID, *ttnpb.JoinRequest) bool, resp InteropClientHandleJoinRequestResponse) bool {
@@ -1907,15 +1888,15 @@ func StartTaskExclude(names ...string) component.StartTaskFunc {
 }
 
 type TestConfig struct {
-	Context              context.Context
 	NetworkServer        Config
 	NetworkServerOptions []Option
 	Component            component.Config
 	TaskStarter          component.TaskStarter
 }
 
-func StartTest(t *testing.T, conf TestConfig) (*NetworkServer, context.Context, TestEnvironment, func()) {
-	t.Helper()
+func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Context, TestEnvironment, func()) {
+	tb := test.MustTBFromContext(ctx)
+	tb.Helper()
 
 	authCh := make(chan test.ClusterAuthRequest)
 	getPeerCh := make(chan test.ClusterGetPeerRequest)
@@ -1949,28 +1930,28 @@ func StartTest(t *testing.T, conf TestConfig) (*NetworkServer, context.Context, 
 	}
 
 	if conf.NetworkServer.Devices == nil {
-		v, closeFn := NewDeviceRegistry(t)
+		v, closeFn := NewDeviceRegistry(ctx)
 		if closeFn != nil {
 			closeFuncs = append(closeFuncs, closeFn)
 		}
 		conf.NetworkServer.Devices = v
 	}
 	if conf.NetworkServer.ApplicationUplinkQueue.Queue == nil {
-		v, closeFn := NewApplicationUplinkQueue(t)
+		v, closeFn := NewApplicationUplinkQueue(ctx)
 		if closeFn != nil {
 			closeFuncs = append(closeFuncs, closeFn)
 		}
 		conf.NetworkServer.ApplicationUplinkQueue.Queue = v
 	}
 	if conf.NetworkServer.DownlinkTasks == nil {
-		v, closeFn := NewDownlinkTaskQueue(t)
+		v, closeFn := NewDownlinkTaskQueue(ctx)
 		if closeFn != nil {
 			closeFuncs = append(closeFuncs, closeFn)
 		}
 		conf.NetworkServer.DownlinkTasks = v
 	}
 	if conf.NetworkServer.UplinkDeduplicator == nil {
-		v, closeFn := NewUplinkDeduplicator(t)
+		v, closeFn := NewUplinkDeduplicator(ctx)
 		if closeFn != nil {
 			closeFuncs = append(closeFuncs, closeFn)
 		}
@@ -1978,7 +1959,7 @@ func StartTest(t *testing.T, conf TestConfig) (*NetworkServer, context.Context, 
 	}
 
 	ns := test.Must(New(
-		componenttest.NewComponent(t, &conf.Component, cmpOpts...),
+		componenttest.NewComponent(tb, &conf.Component, cmpOpts...),
 		&conf.NetworkServer,
 		conf.NetworkServerOptions...,
 	)).(*NetworkServer)
@@ -1994,16 +1975,27 @@ func StartTest(t *testing.T, conf TestConfig) (*NetworkServer, context.Context, 
 		Events: eventsPublishCh,
 	}
 	if ns.interopClient == nil {
-		m, mEnv, closeM := newMockInteropClient(t)
-		ns.interopClient = m
-		env.InteropClient = &mEnv
-		closeFuncs = append(closeFuncs, closeM)
+		handleJoinCh := make(chan InteropClientHandleJoinRequestRequest)
+		ns.interopClient = &MockInteropClient{
+			HandleJoinRequestFunc: MakeInteropClientHandleJoinRequestChFunc(handleJoinCh),
+		}
+		env.InteropClient = &InteropClientEnvironment{
+			HandleJoinRequest: handleJoinCh,
+		}
+		closeFuncs = append(closeFuncs, func() {
+			select {
+			case <-handleJoinCh:
+				tb.Error("InteropClient.HandleJoin call missed")
+			default:
+				close(handleJoinCh)
+			}
+		})
 	}
 
-	componenttest.StartComponent(t, ns.Component)
+	componenttest.StartComponent(tb, ns.Component)
 	env.ClientConn = ns.LoopbackConn()
 
-	ctx, cancel := context.WithCancel(conf.Context)
+	ctx, cancel := context.WithCancel(ctx)
 	return ns, ctx, env, func() {
 		cancel()
 		for _, f := range closeFuncs {
@@ -2011,19 +2003,19 @@ func StartTest(t *testing.T, conf TestConfig) (*NetworkServer, context.Context, 
 		}
 		select {
 		case <-authCh:
-			t.Error("Cluster.Auth call missed")
+			tb.Error("Cluster.Auth call missed")
 		default:
 			close(authCh)
 		}
 		select {
 		case <-getPeerCh:
-			t.Error("Cluster.GetPeer call missed")
+			tb.Error("Cluster.GetPeer call missed")
 		default:
 			close(getPeerCh)
 		}
 		select {
 		case <-eventsPublishCh:
-			t.Error("events.Publish call missed")
+			tb.Error("events.Publish call missed")
 		default:
 			close(eventsPublishCh)
 		}
@@ -2079,7 +2071,7 @@ var _ DownlinkTaskQueue = MockDownlinkTaskQueue{}
 // MockDownlinkTaskQueue is a mock DownlinkTaskQueue used for testing.
 type MockDownlinkTaskQueue struct {
 	AddFunc func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error
-	PopFunc func(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error
+	PopFunc func(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error
 }
 
 // Add calls AddFunc if set and panics otherwise.
@@ -2091,7 +2083,7 @@ func (m MockDownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIde
 }
 
 // Pop calls PopFunc if set and panics otherwise.
-func (m MockDownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
+func (m MockDownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error {
 	if m.PopFunc == nil {
 		panic("Pop called, but not set")
 	}

@@ -31,7 +31,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/joinserver/redis"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -57,16 +56,14 @@ func mustEncryptJoinAccept(key types.AES128Key, pld []byte) []byte {
 }
 
 func TestHandleJoin(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
-	ctx := test.Context()
-
-	redisClient, flush := test.NewRedis(t, "joinserver_test")
+	redisClient, flush := test.NewRedis(ctx, "joinserver_test")
 	defer flush()
 	defer redisClient.Close()
 	devReg := &redis.DeviceRegistry{Redis: redisClient}
 	keyReg := &redis.KeyRegistry{Redis: redisClient}
-	aasReg, aasRegCloseFn := NewRedisApplicationActivationSettingRegistry(t)
+	aasReg, aasRegCloseFn := NewRedisApplicationActivationSettingRegistry(ctx)
 	defer aasRegCloseFn()
 
 	c := componenttest.NewComponent(t, &component.Config{})
@@ -1930,85 +1927,61 @@ func TestHandleJoin(t *testing.T) {
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-			ctx := tc.ContextFunc(ctx)
-			ctx = log.NewContext(ctx, test.GetLogger(t))
+		test.RunSubtestFromContext(ctx, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				ctx = tc.ContextFunc(ctx)
 
-			redisClient, flush := test.NewRedis(t, "joinserver_test")
-			defer flush()
-			defer redisClient.Close()
-			devReg := &redis.DeviceRegistry{Redis: redisClient}
-			keyReg := &redis.KeyRegistry{Redis: redisClient}
-			aasReg, aasRegCloseFn := NewRedisApplicationActivationSettingRegistry(t)
-			defer aasRegCloseFn()
+				redisClient, flush := test.NewRedis(ctx, "joinserver_test")
+				defer flush()
+				defer redisClient.Close()
+				devReg := &redis.DeviceRegistry{Redis: redisClient}
+				keyReg := &redis.KeyRegistry{Redis: redisClient}
+				aasReg, aasRegCloseFn := NewRedisApplicationActivationSettingRegistry(ctx)
+				defer aasRegCloseFn()
 
-			if tc.ApplicationActivationSettings != nil {
-				_, err := aasReg.SetByID(ctx, tc.Device.ApplicationIdentifiers, nil, func(sets *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
-					if sets != nil {
-						panic("Application activation setting registry is not empty")
+				if tc.ApplicationActivationSettings != nil {
+					_, err := aasReg.SetByID(ctx, tc.Device.ApplicationIdentifiers, nil, func(sets *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+						if sets != nil {
+							panic("Application activation setting registry is not empty")
+						}
+						return tc.ApplicationActivationSettings, ttnpb.ApplicationActivationSettingsFieldPathsTopLevel, nil
+					})
+					if !a.So(err, should.BeNil) {
+						t.Fatalf("Failed to set application activation settings: %s", err)
 					}
-					return tc.ApplicationActivationSettings, ttnpb.ApplicationActivationSettingsFieldPathsTopLevel, nil
-				})
-				if !a.So(err, should.BeNil) {
-					t.Fatalf("Failed to set application activation settings: %s", err)
 				}
-			}
 
-			c := componenttest.NewComponent(t, &component.Config{
-				ServiceBase: config.ServiceBase{
-					KeyVault: config.KeyVault{
-						Provider: "static",
-						Static:   tc.KeyVault,
+				c := componenttest.NewComponent(t, &component.Config{
+					ServiceBase: config.ServiceBase{
+						KeyVault: config.KeyVault{
+							Provider: "static",
+							Static:   tc.KeyVault,
+						},
 					},
-				},
-			})
-			js := test.Must(New(
-				c,
-				&Config{
-					ApplicationActivationSettings: aasReg,
-					Devices:                       devReg,
-					Keys:                          keyReg,
-					JoinEUIPrefixes:               joinEUIPrefixes,
-				},
-			)).(*JoinServer)
-			componenttest.StartComponent(t, c)
+				})
+				js := test.Must(New(
+					c,
+					&Config{
+						ApplicationActivationSettings: aasReg,
+						Devices:                       devReg,
+						Keys:                          keyReg,
+						JoinEUIPrefixes:               joinEUIPrefixes,
+					},
+				)).(*JoinServer)
+				componenttest.StartComponent(t, c)
 
-			pb := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+				pb := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			start := time.Now()
+				start := time.Now()
 
-			ret, err := devReg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
-				[]string{
-					"application_server_address",
-					"application_server_id",
-					"application_server_kek_label",
-					"created_at",
-					"last_dev_nonce",
-					"last_join_nonce",
-					"lorawan_version",
-					"net_id",
-					"network_server_address",
-					"network_server_kek_label",
-					"provisioner_id",
-					"provisioning_data",
-					"root_keys",
-					"resets_join_nonces",
-					"updated_at",
-					"used_dev_nonces",
-				},
-				func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-					if !a.So(stored, should.BeNil) {
-						t.Fatal("Registry is not empty")
-					}
-					return CopyEndDevice(pb), []string{
+				ret, err := devReg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
+					[]string{
 						"application_server_address",
 						"application_server_id",
 						"application_server_kek_label",
-						"ids.application_ids",
-						"ids.dev_eui",
-						"ids.device_id",
-						"ids.join_eui",
+						"created_at",
 						"last_dev_nonce",
 						"last_join_nonce",
 						"lorawan_version",
@@ -2019,78 +1992,102 @@ func TestHandleJoin(t *testing.T) {
 						"provisioning_data",
 						"root_keys",
 						"resets_join_nonces",
+						"updated_at",
 						"used_dev_nonces",
-					}, nil
-				},
-			)
-			if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
-				t.Fatalf("Failed to create device: %s", err)
-			}
-			a.So(ret.CreatedAt, should.HappenAfter, start)
-			a.So(ret.UpdatedAt, should.HappenAfter, start)
-			a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
-			pb.CreatedAt = ret.CreatedAt
-			pb.UpdatedAt = ret.UpdatedAt
-			a.So(ret, should.HaveEmptyDiff, pb)
-
-			res, err := js.HandleJoin(ctx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
-			if tc.ErrorAssertion != nil {
-				if !a.So(err, should.BeError) || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
-					t.Fatalf("Received an unexpected error: %s", err)
+					},
+					func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+						if !a.So(stored, should.BeNil) {
+							t.Fatal("Registry is not empty")
+						}
+						return CopyEndDevice(pb), []string{
+							"application_server_address",
+							"application_server_id",
+							"application_server_kek_label",
+							"ids.application_ids",
+							"ids.dev_eui",
+							"ids.device_id",
+							"ids.join_eui",
+							"last_dev_nonce",
+							"last_join_nonce",
+							"lorawan_version",
+							"net_id",
+							"network_server_address",
+							"network_server_kek_label",
+							"provisioner_id",
+							"provisioning_data",
+							"root_keys",
+							"resets_join_nonces",
+							"used_dev_nonces",
+						}, nil
+					},
+				)
+				if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+					t.Fatalf("Failed to create device: %s", err)
 				}
-				a.So(res, should.BeNil)
-				return
-			}
+				a.So(ret.CreatedAt, should.HappenAfter, start)
+				a.So(ret.UpdatedAt, should.HappenAfter, start)
+				a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
+				pb.CreatedAt = ret.CreatedAt
+				pb.UpdatedAt = ret.UpdatedAt
+				a.So(ret, should.HaveEmptyDiff, pb)
 
-			if !a.So(err, should.BeNil) || !a.So(res, should.NotBeNil) {
-				t.FailNow()
-			}
-			expectedResp := deepcopy.Copy(tc.JoinResponse).(*ttnpb.JoinResponse)
-			a.So(res.SessionKeyID, should.NotBeEmpty)
-			expectedResp.SessionKeyID = res.SessionKeyID
-			a.So(res, should.Resemble, expectedResp)
+				res, err := js.HandleJoin(ctx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
+				if tc.ErrorAssertion != nil {
+					if !a.So(err, should.BeError) || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
+						t.Fatalf("Received an unexpected error: %s", err)
+					}
+					a.So(res, should.BeNil)
+					return
+				}
 
-			retCtx, err := devReg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-			if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
-				t.FailNow()
-			}
-			ret = retCtx.EndDevice
-			a.So(ret.CreatedAt, should.Equal, pb.CreatedAt)
-			a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
-			pb.UpdatedAt = ret.UpdatedAt
-			pb.LastJoinNonce = tc.NextLastJoinNonce
-			if tc.JoinRequest.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-				pb.UsedDevNonces = tc.NextUsedDevNonces
-			} else {
-				pb.LastDevNonce = tc.NextLastDevNonce
-			}
-			if !a.So(ret.Session, should.NotBeNil) {
-				t.FailNow()
-			}
-			a.So([]time.Time{start, ret.GetSession().GetStartedAt(), time.Now()}, should.BeChronological)
-			pb.Session = &ttnpb.Session{
-				DevAddr:     tc.JoinRequest.DevAddr,
-				SessionKeys: res.SessionKeys,
-				StartedAt:   ret.GetSession().GetStartedAt(),
-			}
-			pb.DevAddr = &tc.JoinRequest.DevAddr
-			a.So(ret, should.HaveEmptyDiff, pb)
+				if !a.So(err, should.BeNil) || !a.So(res, should.NotBeNil) {
+					t.FailNow()
+				}
+				expectedResp := deepcopy.Copy(tc.JoinResponse).(*ttnpb.JoinResponse)
+				a.So(res.SessionKeyID, should.NotBeEmpty)
+				expectedResp.SessionKeyID = res.SessionKeyID
+				a.So(res, should.Resemble, expectedResp)
 
-			res, err = js.HandleJoin(ctx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
-			if !tc.Device.ResetsJoinNonces {
-				a.So(err, should.BeError)
-				a.So(res, should.BeNil)
-			} else {
-				a.So(err, should.BeNil)
-				a.So(res, should.NotBeNil)
-			}
+				retCtx, err := devReg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+				if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+					t.FailNow()
+				}
+				ret = retCtx.EndDevice
+				a.So(ret.CreatedAt, should.Equal, pb.CreatedAt)
+				a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
+				pb.UpdatedAt = ret.UpdatedAt
+				pb.LastJoinNonce = tc.NextLastJoinNonce
+				if tc.JoinRequest.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+					pb.UsedDevNonces = tc.NextUsedDevNonces
+				} else {
+					pb.LastDevNonce = tc.NextLastDevNonce
+				}
+				if !a.So(ret.Session, should.NotBeNil) {
+					t.FailNow()
+				}
+				a.So([]time.Time{start, ret.GetSession().GetStartedAt(), time.Now()}, should.BeChronological)
+				pb.Session = &ttnpb.Session{
+					DevAddr:     tc.JoinRequest.DevAddr,
+					SessionKeys: res.SessionKeys,
+					StartedAt:   ret.GetSession().GetStartedAt(),
+				}
+				pb.DevAddr = &tc.JoinRequest.DevAddr
+				a.So(ret, should.HaveEmptyDiff, pb)
+
+				res, err = js.HandleJoin(ctx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
+				if !tc.Device.ResetsJoinNonces {
+					a.So(err, should.BeError)
+					a.So(res, should.BeNil)
+				} else {
+					a.So(err, should.BeNil)
+					a.So(res, should.NotBeNil)
+				}
+			},
 		})
 	}
 }
 
 func TestGetNwkSKeys(t *testing.T) {
-	ctx := test.Context()
-
 	errTest := errors.New("test")
 
 	for _, tc := range []struct {
@@ -2264,38 +2261,39 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-			ctx := test.ContextWithTB(tc.ContextFunc(ctx), t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				ctx = tc.ContextFunc(ctx)
 
-			c := componenttest.NewComponent(t, &component.Config{})
-			js := test.Must(New(
-				c,
-				&Config{
-					Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetByID},
-					Devices: &MockDeviceRegistry{},
-				},
-			)).(*JoinServer)
-			componenttest.StartComponent(t, c)
-			res, err := js.GetNwkSKeys(ctx, tc.KeyRequest)
+				c := componenttest.NewComponent(t, &component.Config{})
+				js := test.Must(New(
+					c,
+					&Config{
+						Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetByID},
+						Devices: &MockDeviceRegistry{},
+					},
+				)).(*JoinServer)
+				componenttest.StartComponent(t, c)
+				res, err := js.GetNwkSKeys(ctx, tc.KeyRequest)
 
-			if tc.ErrorAssertion != nil {
-				if !tc.ErrorAssertion(t, err) {
-					t.Errorf("Received unexpected error: %s", err)
+				if tc.ErrorAssertion != nil {
+					if !tc.ErrorAssertion(t, err) {
+						t.Errorf("Received unexpected error: %s", err)
+					}
+					a.So(res, should.BeNil)
+					return
 				}
-				a.So(res, should.BeNil)
-				return
-			}
 
-			a.So(err, should.BeNil)
-			a.So(res, should.Resemble, tc.KeyResponse)
+				a.So(err, should.BeNil)
+				a.So(res, should.Resemble, tc.KeyResponse)
+			},
 		})
 	}
 }
 
 func TestGetAppSKey(t *testing.T) {
-	ctx := test.Context()
-
 	errNotFound := errors.DefineNotFound("test_not_found", "not found")
 
 	for _, tc := range []struct {
@@ -2545,36 +2543,37 @@ func TestGetAppSKey(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-			ctx := test.ContextWithTB(tc.ContextFunc(ctx), t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				ctx = tc.ContextFunc(ctx)
 
-			js := test.Must(New(
-				componenttest.NewComponent(t, &component.Config{}),
-				&Config{
-					Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetKeyByID},
-					Devices: &MockDeviceRegistry{GetByEUIFunc: tc.GetDeviceByEUI},
-				},
-			)).(*JoinServer)
-			res, err := js.GetAppSKey(ctx, tc.KeyRequest)
+				js := test.Must(New(
+					componenttest.NewComponent(t, &component.Config{}),
+					&Config{
+						Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetKeyByID},
+						Devices: &MockDeviceRegistry{GetByEUIFunc: tc.GetDeviceByEUI},
+					},
+				)).(*JoinServer)
+				res, err := js.GetAppSKey(ctx, tc.KeyRequest)
 
-			if tc.ErrorAssertion != nil {
-				if !tc.ErrorAssertion(t, err) {
-					t.Errorf("Received unexpected error: %s", err)
+				if tc.ErrorAssertion != nil {
+					if !tc.ErrorAssertion(t, err) {
+						t.Errorf("Received unexpected error: %s", err)
+					}
+					a.So(res, should.BeNil)
+					return
 				}
-				a.So(res, should.BeNil)
-				return
-			}
 
-			a.So(err, should.BeNil)
-			a.So(res, should.Resemble, tc.KeyResponse)
+				a.So(err, should.BeNil)
+				a.So(res, should.Resemble, tc.KeyResponse)
+			},
 		})
 	}
 }
 
 func TestGetHomeNetID(t *testing.T) {
-	ctx := test.Context()
-
 	errTest := errors.New("test")
 
 	for _, tc := range []struct {
@@ -2633,30 +2632,33 @@ func TestGetHomeNetID(t *testing.T) {
 			Response: &types.NetID{0x42, 0xff, 0xff},
 		},
 	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
-			ctx := test.ContextWithTB(tc.ContextFunc(ctx), t)
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				ctx = tc.ContextFunc(ctx)
 
-			js := test.Must(New(
-				componenttest.NewComponent(t, &component.Config{}),
-				&Config{
-					Devices: &MockDeviceRegistry{
-						GetByEUIFunc: tc.GetByEUI,
+				js := test.Must(New(
+					componenttest.NewComponent(t, &component.Config{}),
+					&Config{
+						Devices: &MockDeviceRegistry{
+							GetByEUIFunc: tc.GetByEUI,
+						},
 					},
-				},
-			)).(*JoinServer)
-			netID, err := js.GetHomeNetID(ctx, tc.JoinEUI, tc.DevEUI)
+				)).(*JoinServer)
+				netID, err := js.GetHomeNetID(ctx, tc.JoinEUI, tc.DevEUI)
 
-			if tc.ErrorAssertion != nil {
-				if !tc.ErrorAssertion(t, err) {
-					t.Errorf("Received unexpected error: %s", err)
+				if tc.ErrorAssertion != nil {
+					if !tc.ErrorAssertion(t, err) {
+						t.Errorf("Received unexpected error: %s", err)
+					}
+					a.So(netID, should.BeNil)
+					return
 				}
-				a.So(netID, should.BeNil)
-				return
-			}
 
-			a.So(err, should.BeNil)
-			a.So(netID, should.Resemble, tc.Response)
+				a.So(err, should.BeNil)
+				a.So(netID, should.Resemble, tc.Response)
+			},
 		})
 	}
 }
