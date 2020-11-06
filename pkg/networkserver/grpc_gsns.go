@@ -720,34 +720,38 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	)
 	const matchTTL = time.Minute
 	if err := ns.devices.RangeByUplinkMatches(ctx, up, matchTTL,
-		func(ctx context.Context, match UplinkMatch) (bool, error) {
-			if pld.Ack && match.IsPending() {
+		func(ctx context.Context, match *UplinkMatch) (bool, error) {
+			if pld.Ack && match.IsPending {
 				// TODO: Perform this optimization in the storage backend.
 				// (https://github.com/TheThingsNetwork/lorawan-stack/issues/3254)
 				log.FromContext(ctx).Debug("Uplink carrying ACK for pending session, skip")
 				return false, nil
 			}
 
-			fNwkSIntKeyEnvelope = match.FNwkSIntKey()
+			fNwkSIntKeyEnvelope = match.FNwkSIntKey
 			var err error
 			fNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, fNwkSIntKeyEnvelope, ns.KeyVault)
 			if err != nil {
 				log.FromContext(ctx).WithError(err).WithField("kek_label", fNwkSIntKeyEnvelope.KEKLabel).Warn("Failed to unwrap FNwkSIntKey, skip")
 				return false, nil
 			}
-			isPending := match.IsPending()
-			fCnt := match.FCnt()
-			macVersion := match.LoRaWANVersion()
+			isPending := match.IsPending
+			macVersion := match.LoRaWANVersion
 			ctx = log.NewContextWithFields(ctx, log.Fields(
 				"mac_version", macVersion,
 				"pending_session", isPending,
 			))
 
+			fCnt := FullFCnt(uint16(pld.FCnt), match.LastFCnt, mac.DeviceSupports32BitFCnt(&ttnpb.EndDevice{
+				MACSettings: &ttnpb.MACSettings{
+					Supports32BitFCnt: match.Supports32BitFCnt,
+				},
+			}, ns.defaultMACSettings))
 			var matchType sessionMatchType
 			switch {
 			case isPending:
 				matchType = pendingSessionMatch
-			case fCnt < match.LastFCnt():
+			case fCnt < match.LastFCnt:
 				if pld.FCnt != fCnt {
 					panic("invalid FCnt")
 				}
@@ -760,7 +764,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			if !ok {
 				if pld.FCnt == fCnt || pld.Ack || isPending || !mac.DeviceResetsFCnt(&ttnpb.EndDevice{
 					MACSettings: &ttnpb.MACSettings{
-						ResetsFCnt: match.ResetsFCnt(),
+						ResetsFCnt: match.ResetsFCnt,
 					},
 				}, ns.defaultMACSettings) {
 					return false, nil
@@ -778,7 +782,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				"f_cnt_reset", matchType == fCntResetMatch,
 				"full_f_cnt_up", fCnt,
 			))
-			dev, ctx, err := ns.devices.GetByID(ctx, match.ApplicationIdentifiers(), match.DeviceID(), handleDataUplinkGetPaths[:])
+			dev, ctx, err := ns.devices.GetByID(ctx, match.ApplicationIdentifiers, match.DeviceID, handleDataUplinkGetPaths[:])
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Warn("Failed to get device after cmacF matching")
 				return false, nil

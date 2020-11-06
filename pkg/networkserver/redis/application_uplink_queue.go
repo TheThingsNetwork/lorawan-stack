@@ -37,7 +37,6 @@ type ApplicationUplinkQueue struct {
 }
 
 const (
-	uidKey     = "uid"
 	payloadKey = "payload"
 )
 
@@ -60,7 +59,7 @@ func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group, id stri
 }
 
 func ApplicationUplinkQueueUIDGenericUplinkKey(r keyer, uid string) string {
-	return r.Key(uidKey, uid, "uplinks")
+	return ttnredis.Key(UIDKey(r, uid), "uplinks")
 }
 
 func (q *ApplicationUplinkQueue) uidGenericUplinkKey(uid string) string {
@@ -106,7 +105,7 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 				uidStreamID = q.uidJoinAcceptKey(uid)
 			case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
 				uidStreamID = q.uidInvalidationKey(uid)
-				p.Set(ctx, deviceUIDLastInvalidationKey(q.redis, unique.ID(ctx, up.EndDeviceIdentifiers)), pld.DownlinkQueueInvalidated.LastFCntDown, 0)
+				p.Set(ctx, uidLastInvalidationKey(q.redis, unique.ID(ctx, up.EndDeviceIdentifiers)), pld.DownlinkQueueInvalidated.LastFCntDown, 0)
 			default:
 				uidStreamID = q.uidGenericUplinkKey(uid)
 			}
@@ -237,7 +236,7 @@ func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context
 						devUID := unique.ID(ctx, up.EndDeviceIdentifiers)
 						lastFCnt, ok := invalidationFCnts[devUID]
 						if !ok {
-							lastFCnt, err = q.redis.Get(ctx, deviceUIDLastInvalidationKey(q.redis, devUID)).Uint64()
+							lastFCnt, err = q.redis.Get(ctx, uidLastInvalidationKey(q.redis, devUID)).Uint64()
 							if err != nil {
 								return false, ttnredis.ConvertError(err)
 							}

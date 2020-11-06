@@ -10,88 +10,59 @@ var (
 	//
 	// KEYS[1] 	- previous matching result key
 	//
-	// KEYS[2] 	- sorted set of uids of devices matching current session DevAddr using 16-bit frame counters sorted by LastFCntUp
-	// KEYS[3] 	- sorted set of uids of devices matching current session DevAddr using 32-bit frame counters sorted by 2 LSB of LastFCntUp
-	// KEYS[4] 	- set of uids of devices matching pending session DevAddr
-	// KEYS[5]  - set of uids of devices matching either current or pending session DevAddr (legacy)
+	// KEYS[2] 	- sorted set of uids of devices matching current session DevAddr sorted ascending by LSB of LastFCntUp
+	// KEYS[3] 	- hash containing msgpack-encoded sessions for devices matching current session DevAddr keyed by uid
 	//
-	// KEYS[6] 	- sorted list of uids of devices matching using 16-bit frame counters
-	// KEYS[7] 	- sorted list of uids of devices matching using 16-bit frame counters being processed
+	// KEYS[4] 	- sorted set of uids of devices matching pending session DevAddr sorted ascending by creation time
+	// KEYS[5] 	- hash containing msgpack-encoded sessions for devices matching pending session DevAddr keyed by uid
 	//
-	// KEYS[8] 	- sorted list of uids of devices matching using 32-bit frame counters with no rollover
-	// KEYS[9] 	- sorted list of uids of devices matching using 32-bit frame counters with no rollover being processed
+	// KEYS[6] 	- sorted list of uids of devices matching with current session LastFCntUp LSB being lower than or equalt to current
+	// KEYS[7] 	- sorted list of uids of devices matching with current session LastFCntUp LSB being greater than current
+	// KEYS[8]  - sorted list of uids of devices matching pending session DevAddr
 	//
-	// KEYS[10] - list of uids of devices matching pending session DevAddr
-	// KEYS[11] - list of uids of devices matching pending session DevAddr being processed
-	//
-	// KEYS[12]	- sorted list of uids of devices matching using 32-bit frame counters with rollover
-	// KEYS[13] - sorted list of uids of devices matching using 32-bit frame counters with rollover being processed
-	//
-	// KEYS[14] - sorted list of uids of devices matching using 16-bit frame counters with a reset
-	// KEYS[15] - sorted list of uids of devices matching using 16-bit frame counters with a reset being processed
-	//
-	// KEYS[16] - list of uids of devices matching either current or pending session DevAddr not present in either KEYS[2], KEYS[3], nor KEYS[4]
-	// KEYS[17] - list of uids of devices matching either current or pending session DevAddr not present in either KEYS[2], KEYS[3], nor KEYS[4] being processed
-	// NOTE: The script is optimized for the assumption that count of devices using 16-bit frame counters << count of devices using 32-bit frame counters.
-	deviceMatchScript = redis.NewScript(`if redis.call('pexpire', KEYS[1], ARGV[2]) > 0 then
-  return redis.call('get', KEYS[1])
+	// KEYS[9] - copy of KEYS[3]
+	// KEYS[10] - copy of KEYS[5]
+	deviceMatchScript = redis.NewScript(`if redis.call('pexpire', KEYS[1], ARGV[2]) == 1 then
+  return { 'result', redis.call('get', KEYS[1]) }
 end
-local toScan = {}
-for i=6,17 do
+local to_scan = { 'scan' }
+for i=6,8 do
   if redis.call('pexpire', KEYS[i], ARGV[2]) == 1 then
-    table.insert(toScan, i)
+    table.insert(to_scan, i)
   end
 end
-if #toScan > 0 then
-    return toScan
+if #to_scan > 1 then
+  for i=9,10 do
+    redis.call('pexpire', KEYS[i], ARGV[2])
+  end
+  return to_scan
 end
-local shortCount = redis.call('zcount', KEYS[2], '-inf', ARGV[1])
-if redis.call('sort', KEYS[2], 'by', 'nosort', 'limit', 0, shortCount, 'store', KEYS[6]) > 0 then
+local pivot = redis.call('zcount', KEYS[2], '-inf', ARGV[1])
+if pivot > 0 then
+  redis.call('sort', KEYS[2], 'by', 'nosort', 'limit', 0, pivot, 'store', KEYS[6])
   redis.call('pexpire', KEYS[6], ARGV[2])
-  table.insert(toScan, 6)
+  table.insert(to_scan, 6)
 end
-local longCount = redis.call('zcount', KEYS[3], '-inf', ARGV[1])
-if redis.call('sort', KEYS[3], 'by', 'nosort', 'limit', 0, longCount, 'store', KEYS[8]) > 0 then
-  redis.call('pexpire', KEYS[8], ARGV[2])
-  table.insert(toScan, 8)
+local gt = redis.call('sort', KEYS[2], 'by', 'nosort', 'limit', pivot, -1, 'store', KEYS[7])
+if gt > 0 then
+  redis.call('pexpire', KEYS[7], ARGV[2])
+  table.insert(to_scan, 7)
 end
-if redis.call('sort', KEYS[4], 'by', 'nosort', 'store', KEYS[10]) > 0 then
-  redis.call('pexpire', KEYS[10], ARGV[2])
-  table.insert(toScan, 10)
+if pivot > 0 or gt > 0 then
+  redis.call('copy', KEYS[3], KEYS[9])
 end
-if redis.call('sort', KEYS[3], 'by', 'nosort', 'limit', longCount, -1, 'store', KEYS[12]) > 0 then
-  redis.call('pexpire', KEYS[12], ARGV[2])
-  table.insert(toScan, 12)
+if redis.call('sort', KEYS[4], 'by', 'nosort', 'store', KEYS[8]) > 0 then
+  redis.call('pexpire', KEYS[9], ARGV[2])
+  table.insert(to_scan, 9)
+  redis.call('copy', KEYS[5], KEYS[10])
 end
-if redis.call('sort', KEYS[2], 'by', 'nosort', 'limit', shortCount, -1, 'store', KEYS[14]) > 0 then
-  redis.call('pexpire', KEYS[14], ARGV[2])
-  table.insert(toScan, 14)
-end
-if redis.call('sort', KEYS[5], 'by', 'nosort', 'store', KEYS[16]) > 0 then
-  redis.call('pexpire', KEYS[16], ARGV[2])
-  table.insert(toScan, 16)
-end
-if #toScan > 0 then
-    return toScan
+if #to_scan > 1 then
+    return to_scan
 end
 return nil`)
 
-	deviceMatchScanScript = redis.NewScript(`if #ARGV == 2 then
-	redis.call("lrem", KEYS[2], 1, ARGV[2])
-end
-for i = 1, #KEYS do
-  local uid
-  if KEYS[i]:sub(-10) == "processing" then
-	  uid = redis.call('rpop', KEYS[i])
-  else
-	  uid = redis.call('rpoplpush', KEYS[i], KEYS[i+1])
-  end
-	if uid then
-	  for j = i, #KEYS, 1 do
-	  	redis.call('pexpire', KEYS[j], ARGV[1])
-	  end
-	  return {i,uid}
-	end
-end
-return nil`)
+	deviceMatchScanScript = redis.NewScript(`if redis.call('lindex', KEYS[1], 0) == ARGV[1] then
+  redis.call('ltrim', KEYS[1], 1, -1)
+  redis.call('hdel', KEYS[2], ARGV[1])
+end`)
 )
