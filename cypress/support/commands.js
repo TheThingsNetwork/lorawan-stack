@@ -161,6 +161,21 @@ Cypress.Commands.add('createGateway', (gateway, userId) => {
   })
 })
 
+// Helper function to create a new organization programmatically
+Cypress.Commands.add('createOrganization', (organization, userId) => {
+  const baseUrl = Cypress.config('baseUrl')
+  cy.getAccessToken(accessToken => {
+    cy.request({
+      method: 'POST',
+      url: `${baseUrl}/api/v3/users/${userId}/organizations`,
+      body: { organization },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+  })
+})
+
 // Helper function to quickly seed the database to a fresh state using a
 // previously generated sql dump.
 Cypress.Commands.add('dropAndSeedDatabase', () => {
