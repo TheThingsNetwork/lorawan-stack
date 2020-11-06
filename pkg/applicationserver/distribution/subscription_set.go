@@ -32,11 +32,12 @@ const subscriptionSetBufferSize = 16
 // newSubscriptionSet creates a new subscription set. The timeout represents
 // the period after which the set will shut down if empty. If the timeout is
 // zero, the set never timeouts.
-func newSubscriptionSet(ctx context.Context, timeout time.Duration) *subscriptionSet {
+func newSubscriptionSet(ctx context.Context, rd RequestDecoupler, timeout time.Duration) *subscriptionSet {
 	ctx, cancel := errorcontext.New(ctx)
 	s := &subscriptionSet{
 		ctx:           ctx,
 		cancel:        cancel,
+		rd:            rd,
 		timeout:       timeout,
 		subscribeCh:   make(chan *io.Subscription, 1),
 		unsubscribeCh: make(chan *io.Subscription, 1),
@@ -47,11 +48,10 @@ func newSubscriptionSet(ctx context.Context, timeout time.Duration) *subscriptio
 }
 
 type subscriptionSet struct {
-	ctx    context.Context
-	cancel errorcontext.CancelFunc
-
-	timeout time.Duration
-
+	ctx           context.Context
+	cancel        errorcontext.CancelFunc
+	rd            RequestDecoupler
+	timeout       time.Duration
 	subscribeCh   chan *io.Subscription
 	unsubscribeCh chan *io.Subscription
 	upCh          chan *io.ContextualApplicationUp
@@ -97,7 +97,7 @@ func (s *subscriptionSet) Subscribe(ctx context.Context, protocol string, ids *t
 // Publish publishes the upstream traffic to the subscribers.
 func (s *subscriptionSet) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	ctxUp := &io.ContextualApplicationUp{
-		Context:       ctx,
+		Context:       s.rd.FromRequestContext(ctx),
 		ApplicationUp: up,
 	}
 	select {

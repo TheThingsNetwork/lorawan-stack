@@ -28,19 +28,22 @@ import (
 // newSubscriptionMap creates a mapping between application identifiers and subscription sets.
 // The timeout represents the period after which a set will shut down if empty. If the timeout
 // is zero, the sets never timeout.
-func newSubscriptionMap(ctx context.Context, timeout time.Duration, setup func(*subscriptionSet, ttnpb.ApplicationIdentifiers) error) *subscriptionMap {
+func newSubscriptionMap(ctx context.Context, rd RequestDecoupler, timeout time.Duration, setup func(*subscriptionSet, ttnpb.ApplicationIdentifiers) error) *subscriptionMap {
 	return &subscriptionMap{
 		ctx:     ctx,
+		rd:      rd,
 		timeout: timeout,
 		setup:   setup,
 	}
 }
 
 type subscriptionMap struct {
-	ctx     context.Context
-	timeout time.Duration
-	setup   func(*subscriptionSet, ttnpb.ApplicationIdentifiers) error
-	sets    sync.Map
+	ctx      context.Context
+	rd       RequestDecoupler
+	timeout  time.Duration
+	setup    func(*subscriptionSet, ttnpb.ApplicationIdentifiers) error
+	decouple func(context.Context) context.Context
+	sets     sync.Map
 }
 
 type subscriptionMapSet struct {
@@ -106,7 +109,7 @@ func (m *subscriptionMap) LoadOrCreate(ctx context.Context, ids ttnpb.Applicatio
 		return nil, err
 	}
 
-	set := newSubscriptionSet(ctx, m.timeout)
+	set := newSubscriptionSet(ctx, m.rd, m.timeout)
 	if err = m.setup(set, ids); err != nil {
 		set.Cancel(err)
 		return nil, err

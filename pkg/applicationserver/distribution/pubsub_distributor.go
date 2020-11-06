@@ -27,10 +27,10 @@ import (
 // NewPubSubDistributor creates a Distributor on top of the provided PubSub.
 // The underlying subscription sets can timeout if there are no active subscribers.
 // A timeout of 0 means the underlying subscription sets never timeout.
-func NewPubSubDistributor(ctx context.Context, timeout time.Duration, pubsub PubSub) Distributor {
+func NewPubSubDistributor(ctx context.Context, rd RequestDecoupler, timeout time.Duration, pubsub PubSub) Distributor {
 	return &pubSubDistributor{
 		pubsub:        pubsub,
-		subscriptions: newSubscriptionMap(ctx, timeout, subscribeSetToPubSub(pubsub)),
+		subscriptions: newSubscriptionMap(ctx, rd, timeout, subscribeSetToPubSub(pubsub)),
 	}
 }
 
