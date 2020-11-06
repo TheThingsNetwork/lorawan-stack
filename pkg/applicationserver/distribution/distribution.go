@@ -36,3 +36,9 @@ type Distributor interface {
 	// Subscribe to the traffic of a specific application.
 	Subscribe(context.Context, string, *ttnpb.ApplicationIdentifiers) (*io.Subscription, error)
 }
+
+// RequestDecoupler decouples the security information found in a context
+// from the lifetime of the context.
+type RequestDecoupler interface {
+	FromRequestContext(ctx context.Context) context.Context
+}

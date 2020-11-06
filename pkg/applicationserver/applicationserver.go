@@ -119,8 +119,8 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
 		}),
-		clusterDistributor: distribution.NewPubSubDistributor(ctx, conf.Distribution.Timeout, conf.Distribution.PubSub),
-		localDistributor:   distribution.NewLocalDistributor(ctx, conf.Distribution.Timeout),
+		clusterDistributor: distribution.NewPubSubDistributor(ctx, c, conf.Distribution.Timeout, conf.Distribution.PubSub),
+		localDistributor:   distribution.NewLocalDistributor(ctx, c, conf.Distribution.Timeout),
 		interopClient:      interopCl,
 		interopID:          conf.Interop.ID,
 		endDeviceFetcher:   conf.EndDeviceFetcher.Fetcher,
@@ -426,7 +426,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			errorDetails = *ttnpb.ErrorDetailsToProto(ttnErr)
 		}
 		for _, item := range items {
-			if err := as.publishUp(as.FromRequestContext(ctx), &ttnpb.ApplicationUp{
+			if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: ids,
 				CorrelationIDs:       item.CorrelationIDs,
 				Up: &ttnpb.ApplicationUp_DownlinkFailed{
@@ -443,7 +443,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 		return err
 	}
 	for _, item := range items {
-		if err := as.publishUp(as.FromRequestContext(ctx), &ttnpb.ApplicationUp{
+		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ids,
 			CorrelationIDs:       item.CorrelationIDs,
 			Up: &ttnpb.ApplicationUp_DownlinkQueued{
