@@ -262,7 +262,7 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 
 // Publish processes the given upstream message and then publishes it to the application frontends.
 func (as *ApplicationServer) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
-	link, err := as.linkRegistry.Get(ctx, up.ApplicationIdentifiers, []string{
+	link, err := as.getLink(ctx, up.ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})
@@ -344,7 +344,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 	if err != nil {
 		return err
 	}
-	link, err := as.linkRegistry.Get(ctx, ids.ApplicationIdentifiers, []string{
+	link, err := as.getLink(ctx, ids.ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})
@@ -482,7 +482,7 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	if err != nil {
 		return nil, err
 	}
-	link, err := as.linkRegistry.Get(ctx, ids.ApplicationIdentifiers, []string{
+	link, err := as.getLink(ctx, ids.ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})

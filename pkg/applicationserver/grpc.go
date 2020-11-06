@@ -24,6 +24,18 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
+// getLink calls the underlying link registry in order to retrieve the link.
+// If the link is not found, an empty link is returned instead.
+func (as *ApplicationServer) getLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
+	link, err := as.linkRegistry.Get(ctx, ids, paths)
+	if err != nil && errors.IsNotFound(err) {
+		return &ttnpb.ApplicationLink{}, nil
+	} else if err != nil {
+		return nil, err
+	}
+	return link, nil
+}
+
 // GetLink implements ttnpb.AsServer.
 func (as *ApplicationServer) GetLink(ctx context.Context, req *ttnpb.GetApplicationLinkRequest) (*ttnpb.ApplicationLink, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
@@ -56,11 +68,11 @@ func (as *ApplicationServer) DeleteLink(ctx context.Context, ids *ttnpb.Applicat
 	return ttnpb.Empty, nil
 }
 
-var errNotImplemented = errors.DefineUnimplemented("linking_not_implemented", "linking is not implemented")
+var errLinkingNotImplemented = errors.DefineUnimplemented("linking_not_implemented", "linking is not implemented")
 
 // GetLinkStats implements ttnpb.AsServer.
 func (as *ApplicationServer) GetLinkStats(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLinkStats, error) {
-	return nil, errNotImplemented.New()
+	return nil, errLinkingNotImplemented.New()
 }
 
 // HandleUplink implements ttnpb.NsAsServer.
@@ -68,7 +80,7 @@ func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHa
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
-	link, err := as.linkRegistry.Get(ctx, req.ApplicationUps[0].ApplicationIdentifiers, []string{
+	link, err := as.getLink(ctx, req.ApplicationUps[0].ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})
