@@ -14,6 +14,12 @@
 
 package ttnpb
 
+var asApplicationLinkFieldPaths = append(
+	ApplicationLinkFieldPathsNested[:],
+	"api_key",
+	"network_server_address",
+)
+
 var isEndDeviceReadFieldPaths = []string{
 	"application_server_address",
 	"attributes",
@@ -597,8 +603,8 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 	"/ttn.lorawan.v3.ApplicationPackageRegistry/SetDefaultAssociation":   ApplicationPackageDefaultAssociationFieldPathsNested,
 
 	// Application Links:
-	"/ttn.lorawan.v3.As/GetLink": ApplicationLinkFieldPathsNested,
-	"/ttn.lorawan.v3.As/SetLink": ApplicationLinkFieldPathsNested,
+	"/ttn.lorawan.v3.As/GetLink": asApplicationLinkFieldPaths,
+	"/ttn.lorawan.v3.As/SetLink": asApplicationLinkFieldPaths,
 
 	// Clients:
 	"/ttn.lorawan.v3.ClientRegistry/Get":                 omitFields(ClientFieldPathsNested, "secret"),
