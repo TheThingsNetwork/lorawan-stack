@@ -35,6 +35,7 @@ jobs:
       id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(npx yarn cache dir)"
     - name: Initialize Yarn module cache
+      id: yarn-cache
       uses: actions/cache@v2
       with:
         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -72,6 +73,7 @@ jobs:
     - name: Build JS SDK
       run: tools/bin/mage jsSDK:clean jsSDK:build
     - name: Install JS dependencies
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
       run: tools/bin/mage js:deps
       timeout-minutes: 5
     - name: Build frontend
