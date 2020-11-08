@@ -49,7 +49,7 @@ import {
 } from '@console/store/selectors/collaborators'
 
 @connect(
-  function(state, props) {
+  (state, props) => {
     const gtwId = selectSelectedGatewayId(state, props)
 
     const { collaboratorId, collaboratorType } = props.match.params
