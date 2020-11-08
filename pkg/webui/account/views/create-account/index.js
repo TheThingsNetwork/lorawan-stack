@@ -133,7 +133,7 @@ export default class CreateAccount extends React.PureComponent {
         invitation_token,
       })
 
-      push('/login', {
+      push(`/login${location.search}`, {
         info: getSuccessMessage(result.data.state),
       })
     } catch (error) {
@@ -228,7 +228,12 @@ export default class CreateAccount extends React.PureComponent {
                 className={style.submitButton}
                 alwaysEnabled
               />
-              <Button.Link to="/login" naked secondary message={sharedMessages.login} />
+              <Button.Link
+                to={`/login${location.search}`}
+                naked
+                secondary
+                message={sharedMessages.login}
+              />
             </div>
           </Form>
         </div>
