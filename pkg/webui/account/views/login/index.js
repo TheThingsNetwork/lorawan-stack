@@ -143,7 +143,7 @@ export default class Login extends React.PureComponent {
                 alwaysEnabled
               />
               <Button.Link
-                to="/register"
+                to={`/register${location.search}`}
                 secondary
                 message={m.createAccount}
                 className={style.registerButton}
