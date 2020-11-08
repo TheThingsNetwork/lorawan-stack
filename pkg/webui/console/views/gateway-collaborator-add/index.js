@@ -49,7 +49,7 @@ import { selectSelectedCollaborator } from '@console/store/selectors/collaborato
     rights: selectGatewayRights(state),
     pseudoRights: selectGatewayPseudoRights(state),
   }),
-  (dispatch, ownProps) => ({
+  dispatch => ({
     getGatewaysRightsList: gtwId => dispatch(getGatewaysRightsList(gtwId)),
     redirectToList: gtwId => dispatch(push(`/gateways/${gtwId}/collaborators`)),
   }),
@@ -61,7 +61,7 @@ import { selectSelectedCollaborator } from '@console/store/selectors/collaborato
     redirectToList: () => dispatchProps.redirectToList(stateProps.gtwId),
   }),
 )
-@withBreadcrumb('gtws.single.collaborators.add', function(props) {
+@withBreadcrumb('gtws.single.collaborators.add', props => {
   const gtwId = props.gtwId
   return <Breadcrumb path={`/gateways/${gtwId}/collaborators/add`} content={sharedMessages.add} />
 })

@@ -70,7 +70,7 @@ import {
 } from '@console/store/selectors/applications'
 
 @connect(
-  function(state, props) {
+  (state, props) => {
     return {
       appId: props.match.params.appId,
       fetching: selectApplicationFetching(state) || selectApplicationRightsFetching(state),
