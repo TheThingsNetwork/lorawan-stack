@@ -30,10 +30,6 @@ describe('OAuth overview', () => {
 
     cy.findByText(`You are logged in as ${user.ids.user_id}.`).should('be.visible')
     cy.findByRole('button', { name: 'Logout' }).should('be.visible')
-    cy.findByRole('link', { name: 'Change password' })
-      .should('be.visible')
-      .should('have.attr', 'href')
-      .and('eq', `${Cypress.config('oauthRootPath')}/update-password`)
   })
 
   it('succeeds when logging out', () => {
