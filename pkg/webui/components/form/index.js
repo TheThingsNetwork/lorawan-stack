@@ -38,7 +38,9 @@ class InnerForm extends React.PureComponent {
     children: PropTypes.node.isRequired,
     className: PropTypes.string,
     formError: PropTypes.error,
+    formErrorTitle: PropTypes.message,
     formInfo: PropTypes.message,
+    formInfoTitle: PropTypes.message,
     handleSubmit: PropTypes.func.isRequired,
     horizontal: PropTypes.bool,
     isSubmitting: PropTypes.bool.isRequired,
@@ -47,8 +49,10 @@ class InnerForm extends React.PureComponent {
 
   static defaultProps = {
     className: undefined,
-    formError: '',
-    formInfo: '',
+    formError: undefined,
+    formErrorTitle: undefined,
+    formInfo: undefined,
+    formInfoTitle: undefined,
     horizontal: true,
   }
 
@@ -82,7 +86,9 @@ class InnerForm extends React.PureComponent {
       className,
       children,
       formError,
+      formErrorTitle,
       formInfo,
+      formInfoTitle,
       horizontal,
       handleSubmit,
       ...rest
@@ -92,8 +98,8 @@ class InnerForm extends React.PureComponent {
       <form className={classnames(style.container, className)} onSubmit={handleSubmit}>
         {(formError || formInfo) && (
           <div style={{ outline: 'none' }} ref={this.notificationRef} tabIndex="-1">
-            {formError && <ErrorNotification content={formError} small />}
-            {formInfo && <Notification content={formInfo} info small />}
+            {formError && <ErrorNotification content={formError} title={formErrorTitle} small />}
+            {formInfo && <Notification content={formInfo} title={formInfoTitle} info small />}
           </div>
         )}
         <FormContext.Provider
@@ -111,7 +117,7 @@ class InnerForm extends React.PureComponent {
 
 const formRenderer = ({ children, ...rest }) =>
   function(renderProps) {
-    const { className, horizontal, error, info, disabled } = rest
+    const { className, horizontal, error, errorTitle, info, infoTitle, disabled } = rest
     const { handleSubmit, ...restFormikProps } = renderProps
 
     return (
@@ -119,7 +125,9 @@ const formRenderer = ({ children, ...rest }) =>
         className={className}
         horizontal={horizontal}
         formError={error}
+        formErrorTitle={errorTitle}
         formInfo={info}
+        formInfoTitle={infoTitle}
         handleSubmit={handleSubmit}
         disabled={disabled}
         {...restFormikProps}
