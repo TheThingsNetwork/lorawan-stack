@@ -38,7 +38,9 @@ class InnerForm extends React.PureComponent {
     children: PropTypes.node.isRequired,
     className: PropTypes.string,
     formError: PropTypes.error,
+    formErrorTitle: PropTypes.message,
     formInfo: PropTypes.message,
+    formInfoTitle: PropTypes.message,
     handleSubmit: PropTypes.func.isRequired,
     isSubmitting: PropTypes.bool.isRequired,
     isValid: PropTypes.bool.isRequired,
@@ -46,8 +48,10 @@ class InnerForm extends React.PureComponent {
 
   static defaultProps = {
     className: undefined,
-    formError: '',
-    formInfo: '',
+    formError: undefined,
+    formErrorTitle: undefined,
+    formInfo: undefined,
+    formInfoTitle: undefined,
   }
 
   constructor(props) {
@@ -76,14 +80,23 @@ class InnerForm extends React.PureComponent {
   }
 
   render() {
-    const { className, children, formError, formInfo, handleSubmit, ...rest } = this.props
+    const {
+      className,
+      children,
+      formError,
+      formErrorTitle,
+      formInfo,
+      formInfoTitle,
+      handleSubmit,
+      ...rest
+    } = this.props
 
     return (
       <form className={classnames(style.container, className)} onSubmit={handleSubmit}>
         {(formError || formInfo) && (
           <div style={{ outline: 'none' }} ref={this.notificationRef} tabIndex="-1">
-            {formError && <ErrorNotification content={formError} small />}
-            {formInfo && <Notification content={formInfo} info small />}
+            {formError && <ErrorNotification content={formError} title={formErrorTitle} small />}
+            {formInfo && <Notification content={formInfo} title={formInfoTitle} info small />}
           </div>
         )}
         <FormContext.Provider
@@ -100,14 +113,16 @@ class InnerForm extends React.PureComponent {
 
 const formRenderer = ({ children, ...rest }) =>
   function(renderProps) {
-    const { className, error, info, disabled } = rest
+    const { className, error, errorTitle, info, infoTitle, disabled } = rest
     const { handleSubmit, ...restFormikProps } = renderProps
 
     return (
       <InnerForm
         className={className}
         formError={error}
+        formErrorTitle={errorTitle}
         formInfo={info}
+        formInfoTitle={infoTitle}
         handleSubmit={handleSubmit}
         disabled={disabled}
         {...restFormikProps}
