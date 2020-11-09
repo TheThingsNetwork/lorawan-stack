@@ -20,15 +20,18 @@ describe('OAuth login', () => {
   it('displays UI elements in place', () => {
     cy.visit(Cypress.config('oauthRootPath'))
 
-    cy.findByRole('link')
-      .should('have.attr', 'href', `${Cypress.config('oauthRootPath')}/`)
-      .findByRole('img')
-      .should('be.visible')
-      .should('have.attr', 'src', `${Cypress.config('oauthAssetsRootPath')}/logo.svg`)
-      .should('have.attr', 'alt', `${Cypress.config('oauthSiteName')} Logo`)
+    cy.get('header').within(() => {
+      cy.findByRole('link')
+        .should('have.attr', 'href', `${Cypress.config('oauthRootPath')}/`)
+        .findByRole('img')
+        .should('be.visible')
+        .should('have.attr', 'src', `${Cypress.config('oauthAssetsRootPath')}/account.svg`)
+        .should('have.attr', 'alt', `${Cypress.config('oauthSiteName')} Logo`)
+    })
+
     cy.findByText('Please login to continue').should('be.visible')
-    cy.findByRole('button', { name: 'Create an account' }).should('be.visible')
-    cy.findByRole('button', { name: 'Forgot password?' }).should('be.visible')
+    cy.findByRole('link', { name: 'Create an account' }).should('be.visible')
+    cy.findByRole('link', { name: 'Forgot password?' }).should('be.visible')
     cy.findByLabelText('User ID').should('be.visible')
     cy.findByLabelText('Password').should('be.visible')
   })
@@ -74,8 +77,7 @@ describe('OAuth login', () => {
 
     cy.findByTestId('error-notification')
       .should('be.visible')
-      .findByText('incorrect password or user ID')
-      .should('be.visible')
+      .contains('incorrect password or user ID')
     cy.location('pathname').should('eq', `${Cypress.config('oauthRootPath')}/login`)
   })
 })
