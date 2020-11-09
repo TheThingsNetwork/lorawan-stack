@@ -23,13 +23,13 @@ const loginConsole = defineSmokeTest('succeeds registering and logging into the 
   }
   cy.visit(Cypress.config('consoleRootPath'))
 
-  cy.findByRole('button', { name: 'Create an account' }).click()
+  cy.findByRole('link', { name: 'Create an account' }).click()
   cy.findByLabelText('User ID').type(user.user_id)
   cy.findByLabelText('Name').type(user.name)
   cy.findByLabelText('Email').type(user.email)
   cy.findByLabelText('Password').type(user.password)
   cy.findByLabelText('Confirm password').type(user.password)
-  cy.findByRole('button', { name: 'Register' }).click()
+  cy.findByRole('button', { name: 'Create account' }).click()
 
   cy.findByTestId('notification')
     .should('be.visible')
@@ -46,7 +46,7 @@ const loginConsole = defineSmokeTest('succeeds registering and logging into the 
   cy.findByTestId('full-error-view').should('not.exist')
 })
 
-const loginOAuth = defineSmokeTest('succeeds registering and logging into the Oauth app', () => {
+const loginOAuth = defineSmokeTest('succeeds registering and logging into the Account app', () => {
   const user = {
     user_id: 'oauth-login-test-user',
     name: 'OAuth Login Test User',
@@ -55,13 +55,13 @@ const loginOAuth = defineSmokeTest('succeeds registering and logging into the Oa
   }
   cy.visit(Cypress.config('oauthRootPath'))
 
-  cy.findByRole('button', { name: 'Create an account' }).click()
+  cy.findByRole('link', { name: 'Create an account' }).click()
   cy.findByLabelText('User ID').type(user.user_id)
   cy.findByLabelText('Name').type(user.name)
   cy.findByLabelText('Email').type(user.email)
   cy.findByLabelText('Password').type(user.password)
   cy.findByLabelText('Confirm password').type(user.password)
-  cy.findByRole('button', { name: 'Register' }).click()
+  cy.findByRole('button', { name: 'Create account' }).click()
 
   cy.findByTestId('notification')
     .should('be.visible')

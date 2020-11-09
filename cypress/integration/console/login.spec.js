@@ -27,8 +27,7 @@ describe('Console login', () => {
     cy.location('pathname').should('include', Cypress.config('oauthRootPath'))
     cy.findByTestId('error-notification')
       .should('be.visible')
-      .findByText('incorrect password or user ID')
-      .should('be.visible')
+      .contains('incorrect password or user ID')
   })
 
   it('succeeds logging in with valid credentials', () => {

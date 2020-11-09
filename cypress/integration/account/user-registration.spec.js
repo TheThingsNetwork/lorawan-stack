@@ -19,21 +19,22 @@ describe('OAuth user registration', () => {
   })
 
   it('displays UI elements in place', () => {
-    cy.findByText(`Create a new ${Cypress.config('oauthSiteName')} account`, {
+    cy.findByText(Cypress.config('oauthSiteName'), {
       selector: 'h1',
     }).should('be.visible')
+    cy.findByText('Create a new account').should('be.visible')
     cy.findByLabelText('User ID').should('be.visible')
     cy.findByLabelText('Name').should('be.visible')
     cy.findByLabelText('Email').should('be.visible')
     cy.findByLabelText('Password').should('be.visible')
     cy.findByLabelText('Confirm password').should('be.visible')
-    cy.findByRole('button', { name: 'Register' }).should('be.visible')
-    cy.findByRole('button', { name: 'Cancel' }).should('be.visible')
+    cy.findByRole('button', { name: 'Create account' }).should('be.visible')
+    cy.findByRole('link', { name: 'Login' }).should('be.visible')
   })
 
   it('validates before submitting an empty form', () => {
     cy.visit(`${Cypress.config('oauthRootPath')}/register`)
-    cy.findByRole('button', { name: 'Register' }).click()
+    cy.findByRole('button', { name: 'Create account' }).click()
 
     cy.findErrorByLabelText('User ID')
       .should('contain.text', 'User ID is required')

@@ -34,7 +34,7 @@ describe('OAuth change password', () => {
       .and('be.visible')
     cy.findByRole('button', { name: 'Change password' }).should('be.visible')
     cy.findByRole('button', { name: 'Cancel' }).should('be.visible')
-  })
+  }).skip()
 
   it('validates before submitting an empty form', () => {
     const user = {
@@ -56,7 +56,7 @@ describe('OAuth change password', () => {
       .and('be.visible')
 
     cy.location('pathname').should('eq', `${Cypress.config('oauthRootPath')}/update-password`)
-  })
+  }).skip()
 
   it('succeeds changing password when revoking access', () => {
     const newPassword = 'ABCDefg321!'
@@ -78,7 +78,7 @@ describe('OAuth change password', () => {
       .should('be.visible')
       .should('contain', 'Password changed')
     cy.location('pathname').should('include', `${Cypress.config('oauthRootPath')}/login`)
-  })
+  }).skip()
 
   it('succeeds changing password without revoking access', () => {
     const newPassword = 'ABCDefg321!'
@@ -102,5 +102,5 @@ describe('OAuth change password', () => {
       .should('be.visible')
       .should('contain', 'Password changed')
     cy.location('pathname').should('include', `${Cypress.config('oauthRootPath')}/login`)
-  })
+  }).skip()
 })
