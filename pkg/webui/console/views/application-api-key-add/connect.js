@@ -13,13 +13,32 @@
 // limitations under the License.
 
 import { connect } from 'react-redux'
+import { replace } from 'connected-react-router'
 
 import api from '@console/api'
 
-const mapStateToProps = () => {
-  return {
-    createApiKey: (appId, key) => api.application.apiKeys.create(appId, key),
-  }
-}
+import { getApplicationsRightsList } from '@console/store/actions/applications'
 
-export default ApplicationApiKeyAdd => connect(mapStateToProps)(ApplicationApiKeyAdd)
+import {
+  selectSelectedApplicationId,
+  selectApplicationRights,
+  selectApplicationPseudoRights,
+  selectApplicationRightsError,
+  selectApplicationRightsFetching,
+} from '@console/store/selectors/applications'
+
+export default ApplicationApiKeyAdd =>
+  connect(
+    state => ({
+      appId: selectSelectedApplicationId(state),
+      fetching: selectApplicationRightsFetching(state),
+      error: selectApplicationRightsError(state),
+      rights: selectApplicationRights(state),
+      pseudoRights: selectApplicationPseudoRights(state),
+      createApiKey: (appId, key) => api.application.apiKeys.create(appId, key),
+    }),
+    dispatch => ({
+      getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
+      navigateToList: appId => dispatch(replace(`/applications/${appId}/api-keys`)),
+    }),
+  )(ApplicationApiKeyAdd)
