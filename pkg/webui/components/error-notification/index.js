@@ -20,7 +20,7 @@ import { isBackend, toMessageProps } from '@ttn-lw/lib/errors/utils'
 import { error } from '@ttn-lw/lib/log'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const ErrorNotification = function({ content, ...rest }) {
+const ErrorNotification = function({ content, title, ...rest }) {
   const message = toMessageProps(content)
   let details = undefined
 
@@ -33,7 +33,7 @@ const ErrorNotification = function({ content, ...rest }) {
     <Notification
       error
       content={message.content}
-      title={message.title}
+      title={title || message.title}
       messageValues={message.values}
       details={details}
       data-test-id="error-notification"
@@ -44,6 +44,11 @@ const ErrorNotification = function({ content, ...rest }) {
 
 ErrorNotification.propTypes = {
   content: PropTypes.oneOfType([PropTypes.message, PropTypes.error, PropTypes.string]).isRequired,
+  title: PropTypes.message,
+}
+
+ErrorNotification.defaultProps = {
+  title: undefined,
 }
 
 export default ErrorNotification
