@@ -90,10 +90,10 @@ const FullViewErrorInner = function({ error, env }) {
 
 const FullViewErrorInnerWithEnv = withEnv(FullViewErrorInner)
 
-const FullViewError = ({ error, onlineStatus, header: Header }) => {
+const FullViewError = function({ error, header, onlineStatus, header: Header }) {
   return (
     <div className={style.wrapper}>
-      {Boolean(Header) && <Header className={style.header} anchored />}
+      {Boolean(header) && header}
       <div className={style.flexWrapper}>
         <FullViewErrorInnerWithEnv error={error} />
       </div>
