@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ApplicationApiKeyAdd from './application-api-key-add'
-import connect from './connect'
+import { connect } from 'react-redux'
 
-const ConnectedApplicationApiKeyAdd = connect(ApplicationApiKeyAdd)
+import api from '@console/api'
 
-export { ConnectedApplicationApiKeyAdd as default, ApplicationApiKeyAdd }
+const mapStateToProps = () => {
+  return {
+    createApiKey: (appId, key) => api.application.apiKeys.create(appId, key),
+  }
+}
+
+export default ApplicationApiKeyAdd => connect(mapStateToProps)(ApplicationApiKeyAdd)
