@@ -58,6 +58,8 @@ jobs:
       run: make tools/bin/mage
     - name: Install JS SDK dependencies
       run: tools/bin/mage jsSDK:deps
+    - name: Generate JS SDK allowed field masks
+      run: tools/bin/mage jsSDK:allowedFieldMaskPaths jsSDK:deviceFieldMasks
     - name: Build JS SDK
       run: tools/bin/mage jsSDK:clean jsSDK:build
     - name: Install JS dependencies
