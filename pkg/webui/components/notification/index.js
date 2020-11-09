@@ -65,7 +65,12 @@ const Notification = ({
         <div className={style.content}>
           {title && <Message className={style.title} content={title} component="h4" />}
           <div>
-            <Message content={content} values={messageValues} convertBackticks={Boolean(error)} />
+            <Message
+              content={content}
+              values={messageValues}
+              firstToUpper
+              convertBackticks={Boolean(error)}
+            />
             {action && (
               <Button
                 secondary
