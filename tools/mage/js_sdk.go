@@ -171,3 +171,17 @@ func (k JsSDK) AllowedFieldMaskPaths() error {
 	}
 	return runGoTool("generate_allowed_field_mask_paths.go")
 }
+
+// DeviceFieldMasks generates end device entity map.
+func (k JsSDK) DeviceFieldMasks() error {
+	ok, err := target.Path(
+		filepath.Join("sdk", "js", "generated", "device-entity-map.json"),
+		filepath.Join("sdk", "js", "generated", "device-field-masks.json"))
+	if err != nil {
+		return targetError(err)
+	}
+	if !ok {
+		return nil
+	}
+	return sh.Run("node", "sdk/js/util/device-field-mask-mapper.js")
+}
