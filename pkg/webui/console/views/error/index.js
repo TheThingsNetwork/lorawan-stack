@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './error.styl'
 
-const FullViewErrorInner = function({ error, env }) {
+const FullViewErrorInner = ({ error, env }) => {
   const isUnknown = isUnknownError(error)
   const statusCode = httpStatusCode(error)
   const isNotFound = isNotFoundError(error)
@@ -92,7 +92,7 @@ const FullViewErrorInner = function({ error, env }) {
 
 const FullViewErrorInnerWithEnv = withEnv(FullViewErrorInner)
 
-const FullViewError = function({ error }) {
+const FullViewError = ({ error }) => {
   return (
     <div className={style.wrapper}>
       <Header className={style.header} anchored />
