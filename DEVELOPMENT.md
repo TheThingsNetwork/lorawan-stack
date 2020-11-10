@@ -724,7 +724,7 @@ We use [Cypress](https://cypress.io) for running frontend-based end-to-end tests
 
 #### Running frontend end-to-end tests locally
 
-Make sure to build the frontend assets and run the stack before executing end-to-end tests.
+Make sure to [build the frontend assets](#building-the-frontend), [start The Things Stack](#starting-the-things-stack) and run `tools/bin/mage dev:sqlDump` to save database dump before executing end-to-end tests.
 
 `Cypress` provides two modes for running tests: headless and interactive.
 - Headless mode - will not display any browser GUI and output test progress into your terminal instead. This is helpful when one just needs see the results of the tests.
