@@ -35,7 +35,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
-	"go.thethings.network/lorawan-stack/v3/pkg/web/cookie"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
@@ -252,7 +251,6 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 
 	server.Use(
 		echomiddleware.Gzip(),
-		cookie.Cookies(hashKey, blockKey),
 	)
 
 	s := &Server{
