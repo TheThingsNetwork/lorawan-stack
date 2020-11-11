@@ -12,36 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-+media-query-min($bp.xxs)
-  .horizontal.field
-    flex-direction: row
-    justify-content: space-between
-    flex-wrap: nowrap
-
-    .title
-      font-weight: $fw.normal
-      padding-top: 0
-
-    .component-area
-      display: flex
-      flex-grow: 1
-      width: calc(100% - 14rem)
-      flex-direction: column
-
-    .label
-      display: flex
-      width: 14rem
-      font-weight: $fw.normal
-
 .field
   margin-bottom: $cs.l
   display: flex
-  flex-wrap: wrap
   width: 100%
 
   .label
-    font-weight: $fw.bold
-
     &::after
       display: none
 
@@ -53,13 +29,8 @@
       color: $c-active-blue
       font-weight: 800
 
-  &.horizontal
-    .title, .info-area, .label::after
-      padding-top: $cs.xxs
-
 .label
-  display: block
-  width:  100%
+  display: flex
   flex-shrink: 0
   user-select: none
 
@@ -69,7 +40,6 @@
 
 .component-area
   flex-shrink: 0
-  width: 100%
 
 .messages
   flex-shrink: 0
@@ -106,6 +76,12 @@
     flex-grow: 0
     flex-shrink: 0
 
+.glossary-link
+  display: block
+  height: 1rem
+  width: 1rem
+  margin-left: $cs.xxs
+
 .err
   color: $c-error
 
@@ -114,3 +90,38 @@
 
 .disabled .info-area
     opacity: .4
+
++media-query($bp.s)
+  .field
+    flex-wrap: wrap
+
+    &.horizontal
+      .title, .info-area, .label::after
+        padding-top: $cs.xxs
+
+  .component-area
+    width: 100%
+
+  .label
+    font-weight: $fw.bold
+    width:  100%
+
++media-query-min($bp.xxs)
+  .horizontal.field
+    flex-direction: row
+    justify-content: space-between
+    flex-wrap: nowrap
+
+    .title
+      font-weight: $fw.normal
+      padding-top: 0
+
+    .component-area
+      display: flex
+      flex-grow: 1
+      width: calc(100% - 14rem)
+      flex-direction: column
+
+    .label
+      width: 14rem
+      font-weight: $fw.normal

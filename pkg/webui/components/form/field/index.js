@@ -18,6 +18,7 @@ import classnames from 'classnames'
 import { getIn } from 'formik'
 
 import Icon from '@ttn-lw/components/icon'
+import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -70,6 +71,8 @@ class FormField extends React.Component {
     description: PropTypes.message,
     disabled: PropTypes.bool,
     encode: PropTypes.func,
+    glossaryId: PropTypes.string,
+    glossaryTerm: PropTypes.message,
     name: PropTypes.string.isRequired,
     onChange: PropTypes.func,
     readOnly: PropTypes.bool,
@@ -86,6 +89,8 @@ class FormField extends React.Component {
     onChange: () => null,
     warning: '',
     description: '',
+    glossaryTerm: '',
+    glossaryId: '',
     readOnly: false,
     required: false,
   }
@@ -162,6 +167,8 @@ class FormField extends React.Component {
       disabled,
       required,
       readOnly,
+      glossaryTerm,
+      glossaryId,
       component: Component,
     } = this.props
     const { horizontal, disabled: formDisabled } = this.context
@@ -174,6 +181,7 @@ class FormField extends React.Component {
     const hasError = Boolean(fieldError)
     const hasWarning = Boolean(warning)
     const hasDescription = Boolean(description)
+    const hasGlossaryTerm = Boolean(glossaryId)
 
     const showError = fieldTouched && hasError
     const showWarning = !hasError && hasWarning
@@ -227,6 +235,15 @@ class FormField extends React.Component {
       <div className={cls} data-needs-focus={showError}>
         <label className={style.label} htmlFor={fieldComponentProps.id}>
           <Message content={title} className={style.title} />
+          {hasGlossaryTerm && (
+            <Link.GlossaryLink
+              hideTerm
+              secondary
+              term={glossaryTerm || title}
+              glossaryId={glossaryId}
+              className={style.glossaryLink}
+            />
+          )}
         </label>
         <div className={style.componentArea}>
           <Component

@@ -15,16 +15,21 @@
 import React from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import classnames from 'classnames'
-import { injectIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 
 import Icon from '@ttn-lw/components/icon'
 
 import { withEnv } from '@ttn-lw/lib/components/env'
+import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { url as urlPattern } from '@ttn-lw/lib/regexp'
 
 import style from './link.styl'
+
+const m = defineMessages({
+  glossaryTitle: 'Read our glossary on "{term}"',
+})
 
 const formatTitle = function(content, values, formatter) {
   if (typeof content === 'object' && content.id && content.defaultMessage) {
@@ -46,13 +51,13 @@ const Link = function(props) {
     replace,
     target,
     showVisited,
-    intl,
     onClick,
     secondary,
     primary,
   } = props
 
-  const formattedTitle = formatTitle(title, titleValues, intl.formatMessage)
+  const { formatMessage } = useIntl()
+  const formattedTitle = formatTitle(title, titleValues, formatMessage)
   const classNames = classnames(style.link, className, {
     [style.linkVisited]: showVisited,
     [style.primary]: primary,
@@ -83,9 +88,6 @@ Link.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
-  intl: PropTypes.shape({
-    formatMessage: PropTypes.func,
-  }).isRequired,
   onClick: PropTypes.func,
   primary: PropTypes.bool,
   replace: PropTypes.bool,
@@ -130,17 +132,18 @@ const DocLink = function(props) {
     path,
     children,
     showVisited,
-    intl,
     secondary,
     primary,
     disabled,
     to,
+    raw,
     onClick,
     env: {
       config: { documentationBaseUrl },
     },
   } = props
 
+  const { formatMessage } = useIntl()
   const classNames = classnames(style.link, className, {
     [style.linkVisited]: showVisited,
     [style.primary]: primary,
@@ -150,7 +153,7 @@ const DocLink = function(props) {
     return <span className={classnames(classNames, style.disabled)}>{children}</span>
   }
   const link = documentationBaseUrl.concat(path)
-  const formattedTitle = formatTitle(title, titleValues, intl.formatMessage)
+  const formattedTitle = formatTitle(title, titleValues, formatMessage)
 
   return (
     <a
@@ -163,9 +166,9 @@ const DocLink = function(props) {
       name={name}
       onClick={onClick}
     >
-      <Icon className={style.docIcon} icon="book" />
+      {!raw && <Icon className={style.docIcon} icon="book" />}
       {children}
-      <Icon className={style.icon} icon="launch" />
+      {!raw && <Icon className={style.icon} icon="launch" />}
     </a>
   )
 }
@@ -175,6 +178,7 @@ DocLink.propTypes = {
   env: PropTypes.env.isRequired,
   name: PropTypes.string,
   path: PropTypes.string.isRequired,
+  raw: PropTypes.bool,
   showVisited: PropTypes.bool,
   to: PropTypes.oneOfType([
     PropTypes.string,
@@ -193,7 +197,45 @@ DocLink.defaultProps = {
   name: undefined,
   showVisited: false,
   to: undefined,
+  raw: false,
 }
+
+Link.DocLink = withEnv(DocLink)
+
+const GlossaryLink = ({ glossaryId, term, hideTerm, primary, secondary, className }) => {
+  const { formatMessage } = useIntl()
+  return (
+    <Link.DocLink
+      primary={primary}
+      secondary={secondary}
+      className={className}
+      path={`/reference/glossary#${glossaryId}`}
+      title={m.glossaryTitle}
+      titleValues={{ term: formatTitle(term, undefined, formatMessage) }}
+      raw
+    >
+      {!hideTerm && <Message content={term} />} <Icon className={style.glossaryIcon} icon="help" />
+    </Link.DocLink>
+  )
+}
+
+GlossaryLink.propTypes = {
+  className: PropTypes.string,
+  glossaryId: PropTypes.string.isRequired,
+  hideTerm: PropTypes.bool,
+  primary: PropTypes.bool,
+  secondary: PropTypes.bool,
+  term: PropTypes.message.isRequired,
+}
+
+GlossaryLink.defaultProps = {
+  className: '',
+  hideTerm: false,
+  primary: false,
+  secondary: false,
+}
+
+Link.GlossaryLink = GlossaryLink
 
 const AnchorLink = function(props) {
   const {
@@ -206,14 +248,14 @@ const AnchorLink = function(props) {
     target,
     children,
     showVisited,
-    intl,
     secondary,
     primary,
     disabled,
     external,
   } = props
 
-  const formattedTitle = formatTitle(title, titleValues, intl.formatMessage)
+  const { formatMessage } = useIntl()
+  const formattedTitle = formatTitle(title, titleValues, formatMessage)
   const classNames = classnames(style.link, className, {
     [style.linkVisited]: showVisited,
     [style.primary]: primary,
@@ -252,8 +294,7 @@ AnchorLink.defaultProps = {
   showVisited: false,
 }
 
-Link.Anchor = injectIntl(AnchorLink)
-Link.DocLink = withEnv(injectIntl(DocLink))
+Link.Anchor = AnchorLink
 
 const BaseAnchorLink = function({ env, href, ...rest }) {
   const { appRoot } = env
@@ -268,4 +309,5 @@ BaseAnchorLink.propTypes = AnchorLink.propTypes
 BaseAnchorLink.defaultProps = AnchorLink.defaultProps
 
 Link.BaseAnchor = withEnv(BaseAnchorLink)
-export default injectIntl(Link)
+
+export default Link
