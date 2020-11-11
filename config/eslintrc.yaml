@@ -14,6 +14,7 @@ plugins:
   - prettier
   - import
   - cypress
+  - prefer-arrow
 
 settings:
   import/ignore:
@@ -160,6 +161,13 @@ rules:
   jsdoc/require-hyphen-before-param-description: warn
   jsdoc/check-indentation: warn
   jsdoc/require-description-complete-sentence: warn
+
+  prefer-arrow/prefer-arrow-functions:
+    - warn
+    - disallowPrototype: true
+      singleReturnOnly: false
+      classPropertiesAllowed: false
+      allowStandaloneDeclarations: false
 
 # Overwrite jest's expect rules for cypress test files, which uses a different
 # assertion syntax.
