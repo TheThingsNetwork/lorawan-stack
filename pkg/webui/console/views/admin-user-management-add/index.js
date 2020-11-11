@@ -45,7 +45,7 @@ import {
   }),
   {
     createUser: attachPromise(createUser),
-    navigateToList: () => push(`/admin/user-management/`),
+    navigateToList: () => push(`/admin/user-management`),
     getConfiguration: () => getIsConfiguration(),
   },
 )
