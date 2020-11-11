@@ -14,6 +14,7 @@ on:
       - 'sdk/js/**'
       - 'yarn.lock'
       - 'cypress/**'
+      - 'docker-compose.yml'
 
 jobs:
   end-to-end:
