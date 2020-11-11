@@ -25,36 +25,27 @@ import { ApiKeyCreateForm } from '@console/components/api-key-form'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-@withBreadcrumb('apps.single.api-keys.add', function(props) {
+@withBreadcrumb('apps.single.api-keys.add', props => {
   const appId = props.appId
   return <Breadcrumb path={`/applications/${appId}/api-keys/add`} content={sharedMessages.add} />
 })
 export default class ApplicationApiKeyAdd extends React.Component {
   static propTypes = {
-    appId: PropTypes.string.isRequired,
-    createApiKey: PropTypes.func.isRequired,
+    createApplicationApiKey: PropTypes.func.isRequired,
     navigateToList: PropTypes.func.isRequired,
     pseudoRights: PropTypes.rights.isRequired,
     rights: PropTypes.rights.isRequired,
   }
 
-  constructor(props) {
-    super(props)
-
-    const { createApiKey, appId } = props
-
-    this.createApplicationKey = key => createApiKey(appId, key)
-  }
-
   @bind
   handleApprove() {
-    const { navigateToList, appId } = this.props
+    const { navigateToList } = this.props
 
-    navigateToList(appId)
+    navigateToList()
   }
 
   render() {
-    const { rights, pseudoRights } = this.props
+    const { rights, pseudoRights, createApplicationApiKey } = this.props
 
     return (
       <Container>
@@ -64,7 +55,7 @@ export default class ApplicationApiKeyAdd extends React.Component {
             <ApiKeyCreateForm
               rights={rights}
               pseudoRights={pseudoRights}
-              onCreate={this.createApplicationKey}
+              onCreate={createApplicationApiKey}
               onCreateSuccess={this.handleApprove}
             />
           </Col>

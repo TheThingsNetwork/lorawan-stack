@@ -25,7 +25,7 @@ import { ApiKeyEditForm } from '@console/components/api-key-form'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-@withBreadcrumb('apps.single.api-keys.edit', function(props) {
+@withBreadcrumb('apps.single.api-keys.edit', props => {
   const { appId, keyId } = props
 
   return (
@@ -35,33 +35,22 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 export default class ApplicationApiKeyEdit extends React.Component {
   static propTypes = {
     apiKey: PropTypes.apiKey.isRequired,
-    appId: PropTypes.string.isRequired,
-    deleteApiKey: PropTypes.func.isRequired,
+    deleteApplicationKey: PropTypes.func.isRequired,
     deleteSuccess: PropTypes.func.isRequired,
-    editApiKey: PropTypes.func.isRequired,
-    keyId: PropTypes.string.isRequired,
+    editApplicationKey: PropTypes.func.isRequired,
     pseudoRights: PropTypes.rights.isRequired,
     rights: PropTypes.rights.isRequired,
   }
 
-  constructor(props) {
-    super(props)
-
-    const { deleteApiKey, editApiKey, appId, keyId } = props
-
-    this.deleteApplicationKey = id => deleteApiKey(appId, id)
-    this.editApplicationKey = key => editApiKey(appId, keyId, key)
-  }
-
   @bind
   onDeleteSuccess() {
-    const { appId, deleteSuccess } = this.props
+    const { deleteSuccess } = this.props
 
-    deleteSuccess(appId)
+    deleteSuccess()
   }
 
   render() {
-    const { apiKey, rights, pseudoRights } = this.props
+    const { apiKey, rights, pseudoRights, deleteApplicationKey, editApplicationKey } = this.props
 
     return (
       <Container>
@@ -72,8 +61,8 @@ export default class ApplicationApiKeyEdit extends React.Component {
               rights={rights}
               pseudoRights={pseudoRights}
               apiKey={apiKey}
-              onEdit={this.editApplicationKey}
-              onDelete={this.deleteApplicationKey}
+              onEdit={editApplicationKey}
+              onDelete={deleteApplicationKey}
               onDeleteSuccess={this.onDeleteSuccess}
             />
           </Col>

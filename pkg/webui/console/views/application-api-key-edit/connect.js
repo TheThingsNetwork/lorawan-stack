@@ -52,15 +52,23 @@ export default ApplicationApiKeyEdit =>
         pseudoRights: selectApplicationPseudoRights(state),
         fetching: keyFetching || rightsFetching,
         error: keyError || rightsError,
-        deleteApiKey: (appId, id) => api.application.apiKeys.delete(appId, id),
-        editApiKey: (appId, keyId, key) => api.application.apiKeys.update(appId, keyId, key),
       }
     },
     dispatch => ({
       getApiKey(appId, keyId) {
         dispatch(getApiKey('application', appId, keyId))
       },
+      deleteApiKey: api.application.apiKeys.delete,
       deleteSuccess: appId => dispatch(replace(`/applications/${appId}/api-keys`)),
+      editApiKey: api.application.apiKeys.update,
+    }),
+    (stateProps, dispatchProps, ownProps) => ({
+      ...stateProps,
+      ...dispatchProps,
+      ...ownProps,
+      deleteApplicationKey: key => dispatchProps.deleteApiKey(stateProps.appId, key),
+      editApplicationKey: key => dispatchProps.editApiKey(stateProps.appId, stateProps.keyId, key),
+      deleteSuccess: () => dispatchProps.deleteSuccess(stateProps.appId),
     }),
   )(
     withRequest(

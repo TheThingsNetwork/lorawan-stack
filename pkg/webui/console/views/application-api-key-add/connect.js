@@ -35,10 +35,18 @@ export default ApplicationApiKeyAdd =>
       error: selectApplicationRightsError(state),
       rights: selectApplicationRights(state),
       pseudoRights: selectApplicationPseudoRights(state),
-      createApiKey: (appId, key) => api.application.apiKeys.create(appId, key),
     }),
     dispatch => ({
+      createApiKey: api.application.apiKeys.create,
       getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
       navigateToList: appId => dispatch(replace(`/applications/${appId}/api-keys`)),
+    }),
+    (stateProps, dispatchProps, ownProps) => ({
+      ...stateProps,
+      ...dispatchProps,
+      ...ownProps,
+      createApplicationApiKey: key => dispatchProps.createApiKey(stateProps.appId, key),
+      navigateToList: () => dispatchProps.navigateToList(stateProps.appId),
+      getApplicationsRightsList: () => dispatchProps.getApplicationsRightsList(stateProps.appId),
     }),
   )(ApplicationApiKeyAdd)
