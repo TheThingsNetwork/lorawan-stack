@@ -194,8 +194,11 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 	}
 	if options.redirectToHTTPS != nil {
 		redirectConfig.Scheme = func(string) string { return "https" }
-		redirectConfig.Port = func(current uint) uint {
-			return uint(options.redirectToHTTPS[int(current)])
+		// Only redirect to HTTPS port if no port redirection has been configured
+		if redirectConfig.Port == nil {
+			redirectConfig.Port = func(current uint) uint {
+				return uint(options.redirectToHTTPS[int(current)])
+			}
 		}
 	}
 
