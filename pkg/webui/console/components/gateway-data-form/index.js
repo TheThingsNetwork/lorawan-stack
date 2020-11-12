@@ -16,7 +16,6 @@ import React from 'react'
 import bind from 'autobind-decorator'
 
 import delay from '@console/constants/delays'
-import glossaryId from '@console/constants/glossary-ids'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -136,7 +135,6 @@ class GatewayDataForm extends React.Component {
           max={8}
           placeholder={sharedMessages.gatewayEUI}
           component={Input}
-          glossaryId={glossaryId.GATEWAY_EUI}
         />
         <Form.Field
           title={sharedMessages.gatewayName}
@@ -176,11 +174,7 @@ class GatewayDataForm extends React.Component {
           description={sharedMessages.attributeDescription}
         />
         <Message component="h4" content={sharedMessages.lorawanOptions} />
-        <GsFrequencyPlansSelect
-          name="frequency_plan_id"
-          menuPlacement="top"
-          glossaryId={glossaryId.FREQUENCY_PLAN}
-        />
+        <GsFrequencyPlansSelect name="frequency_plan_id" menuPlacement="top" />
         <Form.Field
           title={sharedMessages.gatewayScheduleDownlinkLate}
           name="schedule_downlink_late"
