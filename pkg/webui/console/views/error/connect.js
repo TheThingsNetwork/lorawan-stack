@@ -12,16 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.title
-  margin-top: $ls.l
+import { connect } from 'react-redux'
 
-  span
-    nudge('up', 4px)
-    color: $c-error
-    margin-right: $cs.s
+import { selectConnectionStatus } from '@console/store/selectors/status'
 
-  h2
-    display: inline
-
-.button
-  margin-top: $ls.m
+export default ErrorView =>
+  connect(state => ({
+    isOnline: selectConnectionStatus(state),
+  }))(ErrorView)
