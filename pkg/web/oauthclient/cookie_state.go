@@ -53,7 +53,7 @@ func newState(next string) state {
 
 func (oc *OAuthClient) getStateCookie(c echo.Context) (state, error) {
 	s := state{}
-	ok, err := oc.StateCookie().Get(c, &s)
+	ok, err := oc.StateCookie().Get(c.Response(), c.Request(), &s)
 	if err != nil {
 		return s, echo.NewHTTPError(http.StatusBadRequest, "Invalid state cookie")
 	}
@@ -66,9 +66,9 @@ func (oc *OAuthClient) getStateCookie(c echo.Context) (state, error) {
 }
 
 func (oc *OAuthClient) setStateCookie(c echo.Context, value state) error {
-	return oc.StateCookie().Set(c, value)
+	return oc.StateCookie().Set(c.Response(), c.Request(), value)
 }
 
 func (oc *OAuthClient) removeStateCookie(c echo.Context) {
-	oc.StateCookie().Remove(c)
+	oc.StateCookie().Remove(c.Response(), c.Request())
 }

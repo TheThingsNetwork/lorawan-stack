@@ -46,7 +46,7 @@ func (s *server) authCookie() *cookie.Cookie {
 var errAuthCookie = errors.DefineUnauthenticated("auth_cookie", "could not get auth cookie")
 
 func (s *server) getAuthCookie(c echo.Context) (cookie auth.CookieShape, err error) {
-	ok, err := s.authCookie().Get(c, &cookie)
+	ok, err := s.authCookie().Get(c.Response(), c.Request(), &cookie)
 	if err != nil {
 		return cookie, err
 	}
@@ -58,18 +58,18 @@ func (s *server) getAuthCookie(c echo.Context) (cookie auth.CookieShape, err err
 
 func (s *server) updateAuthCookie(c echo.Context, update func(value *auth.CookieShape) error) error {
 	cookie := &auth.CookieShape{}
-	_, err := s.authCookie().Get(c, cookie)
+	_, err := s.authCookie().Get(c.Response(), c.Request(), cookie)
 	if err != nil {
 		return err
 	}
 	if err = update(cookie); err != nil {
 		return err
 	}
-	return s.authCookie().Set(c, cookie)
+	return s.authCookie().Set(c.Response(), c.Request(), cookie)
 }
 
 func (s *server) removeAuthCookie(c echo.Context) {
-	s.authCookie().Remove(c)
+	s.authCookie().Remove(c.Response(), c.Request())
 }
 
 const userSessionKey = "user_session"

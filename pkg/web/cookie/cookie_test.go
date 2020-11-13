@@ -20,10 +20,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	echo "github.com/labstack/echo/v4"
+	"github.com/gorilla/mux"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 	"golang.org/x/net/publicsuffix"
 )
 
@@ -36,54 +37,49 @@ type testCookieValue struct {
 	Value string
 }
 
-func testSetCookie(t *testing.T, value string) echo.HandlerFunc {
+func testSetCookie(t *testing.T, value string) http.HandlerFunc {
 	a := assertions.New(t)
-	return func(c echo.Context) error {
-		err := testCookieSettings.Set(c, &testCookieValue{
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := testCookieSettings.Set(w, r, &testCookieValue{
 			Value: value,
 		})
 		a.So(err, should.BeNil)
-
-		return err
 	}
 }
 
-func testGetCookie(t *testing.T, value string, exists bool) echo.HandlerFunc {
+func testGetCookie(t *testing.T, value string, exists bool) http.HandlerFunc {
 	a := assertions.New(t)
-	return func(c echo.Context) error {
+	return func(w http.ResponseWriter, r *http.Request) {
 		var v testCookieValue
-		ok, err := testCookieSettings.Get(c, &v)
+		ok, err := testCookieSettings.Get(w, r, &v)
 		a.So(err, should.BeNil)
 		a.So(ok, should.Equal, exists)
 		a.So(v.Value, should.Equal, value)
 
-		present := testCookieSettings.Exists(c)
+		present := testCookieSettings.Exists(r)
 		a.So(present, should.Equal, exists)
-
-		return err
 	}
 }
 
-func testDeleteCookie() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		testCookieSettings.Remove(c)
-
-		return nil
+func testDeleteCookie() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		testCookieSettings.Remove(w, r)
 	}
 }
 
 func TestCookie(t *testing.T) {
-	e := echo.New()
+	root := mux.NewRouter()
+
 	a := assertions.New(t)
 	blockKey := random.Bytes(32)
 	hashKey := random.Bytes(64)
 
-	e.Use(Cookies(hashKey, blockKey))
+	root.Use(mux.MiddlewareFunc(webmiddleware.Cookies(hashKey, blockKey)))
 
-	e.GET("/set", testSetCookie(t, "test_value"))
-	e.GET("/get", testGetCookie(t, "test_value", true))
-	e.GET("/del", testDeleteCookie())
-	e.GET("/no_cookie", testGetCookie(t, "", false))
+	root.Path("/set").HandlerFunc(testSetCookie(t, "test_value")).Methods(http.MethodGet)
+	root.Path("/get").HandlerFunc(testGetCookie(t, "test_value", true)).Methods(http.MethodGet)
+	root.Path("/del").HandlerFunc(testDeleteCookie()).Methods(http.MethodGet)
+	root.Path("/no_cookie").HandlerFunc(testGetCookie(t, "", false)).Methods(http.MethodGet)
 
 	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 	if err != nil {
@@ -99,7 +95,7 @@ func TestCookie(t *testing.T) {
 
 		rec := httptest.NewRecorder()
 
-		e.ServeHTTP(rec, req)
+		root.ServeHTTP(rec, req)
 
 		resp := rec.Result()
 		resp.Request = req
