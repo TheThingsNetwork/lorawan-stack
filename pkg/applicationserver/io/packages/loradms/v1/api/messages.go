@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"net/http"
 
 	"github.com/golang/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -36,14 +37,21 @@ type baseResponse struct {
 	Errors []string    `json:"errors"`
 }
 
-var errAPICallFailed = errors.Define("api_call_failed", "", "")
+var (
+	errAPICallFailed = errors.Define("api_call_failed", "", "")
+	errRequest       = errors.DefineUnavailable("request", "request failed with status `{code}`")
+)
 
-func parse(result interface{}, body io.Reader) error {
-	defer io.Copy(ioutil.Discard, body)
+func parse(result interface{}, res *http.Response) error {
+	defer res.Body.Close()
+	defer io.Copy(ioutil.Discard, res.Body)
+	if res.StatusCode < 200 || res.StatusCode > 299 {
+		return errRequest.WithAttributes("code", res.StatusCode)
+	}
 	r := &baseResponse{
 		Result: result,
 	}
-	err := json.NewDecoder(body).Decode(r)
+	err := json.NewDecoder(res.Body).Decode(r)
 	if err != nil {
 		return err
 	}

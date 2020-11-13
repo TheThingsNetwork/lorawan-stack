@@ -41,9 +41,8 @@ func (u *Uplinks) Send(ctx context.Context, uplinks objects.DeviceUplinks) (obje
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 	response := make(objects.DeviceUplinkResponses)
-	err = parse(&response, resp.Body)
+	err = parse(&response, resp)
 	if err != nil {
 		return nil, err
 	}
