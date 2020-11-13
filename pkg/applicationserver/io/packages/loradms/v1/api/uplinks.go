@@ -27,9 +27,7 @@ type Uplinks struct {
 	cl *Client
 }
 
-const (
-	uplinkEntity = "uplink"
-)
+const uplinkEntity = "uplink"
 
 // Send sends the given uplink to the Device Management service.
 func (u *Uplinks) Send(uplinks objects.DeviceUplinks) (objects.DeviceUplinkResponses, error) {

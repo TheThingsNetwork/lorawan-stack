@@ -41,7 +41,6 @@ type Client struct {
 	baseURL *url.URL
 	cl      *http.Client
 
-	Tokens  *Tokens
 	Uplinks *Uplinks
 }
 
@@ -109,7 +108,6 @@ func New(cl *http.Client, opts ...Option) (*Client, error) {
 		cl:      cl,
 		baseURL: urlutil.CloneURL(DefaultServerURL),
 	}
-	client.Tokens = &Tokens{client}
 	client.Uplinks = &Uplinks{client}
 	for _, opt := range opts {
 		opt.apply(client)

@@ -20,16 +20,10 @@ import (
 	"io/ioutil"
 
 	"github.com/golang/protobuf/proto"
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api/objects"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
-const (
-	listOperation   = "list"
-	updateOperation = "update"
-	addOperation    = "add"
-	sendOperation   = "send"
-)
+const sendOperation = "send"
 
 type apiErrorDetail string
 
@@ -62,13 +56,4 @@ func parse(result interface{}, body io.Reader) error {
 		details = append(details, &ed)
 	}
 	return errAPICallFailed.WithDetails(details...)
-}
-
-type tokensListResponse struct {
-	Tokens []objects.TokenInfo `json:"tokens"`
-}
-
-type tokenAddRequest struct {
-	Name         string   `json:"name"`
-	Capabilities []string `json:"capabilities"`
 }

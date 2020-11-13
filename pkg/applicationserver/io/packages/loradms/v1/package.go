@@ -131,7 +131,7 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 	}
 
 	result := response.Result
-	resultStruct, err := toStruct(&result)
+	resultStruct, err := toStruct(result.Raw)
 	if err != nil {
 		return err
 	}

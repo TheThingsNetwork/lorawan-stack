@@ -65,10 +65,12 @@ func TestUplinks(t *testing.T) {
 						req := <-reqChan
 						a.So(resp, should.Resemble, objects.DeviceUplinkResponses{
 							eui: objects.DeviceUplinkResponse{
-								Result: objects.UplinkResponse{
-									Downlink: &objects.LoRaDnlink{
-										Port:    22,
-										Payload: objects.Hex{0x04, 0x05},
+								Result: objects.ExtendedUplinkResponse{
+									UplinkResponse: objects.UplinkResponse{
+										Downlink: &objects.LoRaDnlink{
+											Port:    22,
+											Payload: objects.Hex{0x04, 0x05},
+										},
 									},
 								},
 							},
