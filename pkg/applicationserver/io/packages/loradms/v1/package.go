@@ -38,9 +38,14 @@ import (
 const packageName = "lora-cloud-device-management-v1"
 
 // DeviceManagementPackage is the LoRa Cloud Device Management application package.
+//
+// TODO: Once https://github.com/TheThingsNetwork/lorawan-stack/issues/2533 is implemented,
+// change io.Server usage to an interface that extends io.Server, but with the HTTPClient()
+// method added, and remove the custom client.
 type DeviceManagementPackage struct {
 	server   io.Server
 	registry packages.Registry
+	client   *http.Client
 }
 
 // RegisterServices implements packages.ApplicationPackageHandler.
@@ -108,12 +113,12 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 	logger := log.FromContext(ctx)
 	eui := objects.EUI(*up.DevEUI)
 
-	client, err := api.New(http.DefaultClient, api.WithToken(data.token), api.WithBaseURL(data.serverURL))
+	client, err := api.New(p.client, api.WithToken(data.token), api.WithBaseURL(data.serverURL))
 	if err != nil {
 		logger.WithError(err).Debug("Failed to create API client")
 		return err
 	}
-	resp, err := client.Uplinks.Send(objects.DeviceUplinks{
+	resp, err := client.Uplinks.Send(ctx, objects.DeviceUplinks{
 		eui: loraUp,
 	})
 	if err != nil {
@@ -215,7 +220,13 @@ func (p *DeviceManagementPackage) Package() *ttnpb.ApplicationPackage {
 
 // New instantiates the LoRa Cloud Device Management package.
 func New(server io.Server, registry packages.Registry) packages.ApplicationPackageHandler {
-	return &DeviceManagementPackage{server, registry}
+	return &DeviceManagementPackage{
+		server:   server,
+		registry: registry,
+		client: &http.Client{
+			Timeout: 30 * time.Second,
+		},
+	}
 }
 
 func uint8Ptr(x uint8) *uint8 {

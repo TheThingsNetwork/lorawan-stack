@@ -16,6 +16,7 @@ package api_test
 
 import (
 	"bytes"
+	"context"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -24,12 +25,13 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api/objects"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestUplinks(t *testing.T) {
-	withClient(t, nil,
-		func(t *testing.T, reqChan <-chan *http.Request, respChan chan<- *http.Response, errChan chan<- error, cl *api.Client) {
+	withClient(test.Context(), t, nil,
+		func(ctx context.Context, t *testing.T, reqChan <-chan *http.Request, respChan chan<- *http.Response, errChan chan<- error, cl *api.Client) {
 			for _, tc := range []struct {
 				name   string
 				body   string
@@ -52,7 +54,7 @@ func TestUplinks(t *testing.T) {
 				}`,
 					assert: func(a *assertions.Assertion, u *api.Uplinks) {
 						eui := objects.EUI{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
-						resp, err := u.Send(objects.DeviceUplinks{
+						resp, err := u.Send(ctx, objects.DeviceUplinks{
 							eui: &objects.LoRaUplink{
 								FCnt:      uint32Ptr(42),
 								Port:      uint8Ptr(199),
