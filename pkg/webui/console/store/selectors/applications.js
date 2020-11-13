@@ -32,6 +32,7 @@ import {
   createEventsStatusSelector,
   createEventsInterruptedSelector,
   createEventsPausedSelector,
+  createEventsTruncatedSelector,
 } from './events'
 import { createRightsSelector, createPseudoRightsSelector } from './rights'
 import { createFetchingSelector } from './fetching'
@@ -72,6 +73,7 @@ export const selectApplicationEventsError = createEventsErrorSelector(ENTITY)
 export const selectApplicationEventsStatus = createEventsStatusSelector(ENTITY)
 export const selectApplicationEventsInterrupted = createEventsInterruptedSelector(ENTITY)
 export const selectApplicationEventsPaused = createEventsPausedSelector(ENTITY)
+export const selectApplicationEventsTruncated = createEventsTruncatedSelector(ENTITY)
 
 // Rights.
 export const selectApplicationRights = createRightsSelector(ENTITY)

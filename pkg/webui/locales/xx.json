@@ -78,6 +78,8 @@
   "console.components.events.messages.dataPreview": "Xxxx xxxxxxx",
   "console.components.events.messages.seeAllActivity": "Xxx xxx xxxxxxxx",
   "console.components.events.messages.syntheticEvent": "Xxxx: Xxxx xxxx xxxxx xxx xxx xxxxxxxxx xxxx xxx xxxxx xxxxxx",
+  "console.components.events.messages.eventsTruncated": "Xxx xxxxxx xxxx xxxx xxxxxxxxx xx xxxx xxxxxx. Xxx xxxxxxx xxxxx xxxxx xxx xxxxxx xx {limit}.",
+  "console.components.events.messages.eventUnavailable": "Xxxx xxxxx xx xxx xxxxxxxxx xxxxxxx. Xx xxx xxxxxx xxxxxxxxx xx xxxx xxxxxx.",
   "console.components.events.previews.shared.json-payload.index.invalid": "Xxxxxxx XXXX",
   "console.components.join-eui-prefixes-input.index.empty": "Xx xxxxxx",
   "console.components.join-eui-prefixes-input.index.zeroInput": "Xxxx xxxx xxxxx",

@@ -32,10 +32,11 @@ import {
 import {
   selectApplicationEvents,
   selectApplicationEventsPaused,
+  selectApplicationEventsTruncated,
 } from '@console/store/selectors/applications'
 
 const ApplicationEvents = props => {
-  const { appId, events, widget, paused, onClear, onPauseToggle } = props
+  const { appId, events, widget, paused, onClear, onPauseToggle, truncated } = props
 
   if (widget) {
     return (
@@ -49,6 +50,7 @@ const ApplicationEvents = props => {
       events={events}
       paused={paused}
       onClear={onClear}
+      truncated={truncated}
       onPauseToggle={onPauseToggle}
     />
   )
@@ -60,6 +62,7 @@ ApplicationEvents.propTypes = {
   onClear: PropTypes.func.isRequired,
   onPauseToggle: PropTypes.func.isRequired,
   paused: PropTypes.bool.isRequired,
+  truncated: PropTypes.bool.isRequired,
   widget: PropTypes.bool,
 }
 
@@ -76,6 +79,7 @@ export default withFeatureRequirement(mayViewApplicationEvents)(
       return {
         events: selectApplicationEvents(state, appId),
         paused: selectApplicationEventsPaused(state, appId),
+        truncated: selectApplicationEventsTruncated(state, appId),
       }
     },
     (dispatch, ownProps) => ({

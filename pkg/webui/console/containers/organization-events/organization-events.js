@@ -19,7 +19,7 @@ import Events from '@console/components/events'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 const OrganizationEvents = props => {
-  const { orgId, events, widget, paused, onPauseToggle, onClear } = props
+  const { orgId, events, widget, paused, onPauseToggle, onClear, truncated } = props
 
   if (widget) {
     return (
@@ -38,6 +38,7 @@ const OrganizationEvents = props => {
       paused={paused}
       onClear={onClear}
       onPauseToggle={onPauseToggle}
+      truncated={truncated}
       entityId={orgId}
     />
   )
@@ -49,6 +50,7 @@ OrganizationEvents.propTypes = {
   onPauseToggle: PropTypes.func.isRequired,
   orgId: PropTypes.string.isRequired,
   paused: PropTypes.bool.isRequired,
+  truncated: PropTypes.bool.isRequired,
   widget: PropTypes.bool,
 }
 
