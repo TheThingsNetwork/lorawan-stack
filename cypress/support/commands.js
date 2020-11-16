@@ -125,6 +125,21 @@ Cypress.Commands.add('createApplication', (application, userId) => {
   })
 })
 
+// Helper function to create a new api key programmatically
+Cypress.Commands.add('createApiKey', (mode, name, apiKey) => {
+  const baseUrl = Cypress.config('baseUrl')
+  cy.getAccessToken(accessToken => {
+    cy.request({
+      method: 'POST',
+      url: `${baseUrl}/api/v3/${mode}/${name}/api-keys`,
+      body: { ...apiKey },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+  })
+})
+
 // Helper function to set an application collaborator programmatically.
 Cypress.Commands.add('setApplicationCollaborator', (applicationId, collaboratorId, rights) => {
   const baseUrl = Cypress.config('baseUrl')

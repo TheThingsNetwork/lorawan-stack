@@ -36,7 +36,7 @@ import {
 
 export default ApplicationApiKeyEdit =>
   connect(
-    function(state, props) {
+    (state, props) => {
       const { apiKeyId } = props.match.params
 
       const keyFetching = selectApiKeyFetching(state)
