@@ -16,12 +16,14 @@ package api_test
 
 import (
 	"bytes"
+	"context"
 	"io/ioutil"
 	"net/http"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -40,7 +42,7 @@ func chanRoundTrip(reqChan chan<- *http.Request, respChan <-chan *http.Response,
 	)
 }
 
-func withClient(t *testing.T, opts []api.Option, f func(*testing.T, <-chan *http.Request, chan<- *http.Response, chan<- error, *api.Client)) {
+func withClient(ctx context.Context, t *testing.T, opts []api.Option, f func(context.Context, *testing.T, <-chan *http.Request, chan<- *http.Response, chan<- error, *api.Client)) {
 	reqChan := make(chan *http.Request, 5)
 	respChan := make(chan *http.Response, 5)
 	errChan := make(chan error, 5)
@@ -50,12 +52,12 @@ func withClient(t *testing.T, opts []api.Option, f func(*testing.T, <-chan *http
 	if !assertions.New(t).So(err, should.BeNil) {
 		t.FailNow()
 	}
-	f(t, reqChan, respChan, errChan, cl)
+	f(ctx, t, reqChan, respChan, errChan, cl)
 }
 
 func TestNoAuth(t *testing.T) {
-	withClient(t, nil,
-		func(t *testing.T, reqChan <-chan *http.Request, respChan chan<- *http.Response, errChan chan<- error, cl *api.Client) {
+	withClient(test.Context(), t, nil,
+		func(ctx context.Context, t *testing.T, reqChan <-chan *http.Request, respChan chan<- *http.Response, errChan chan<- error, cl *api.Client) {
 			a := assertions.New(t)
 
 			respChan <- &http.Response{
@@ -63,7 +65,7 @@ func TestNoAuth(t *testing.T) {
 			}
 			errChan <- nil
 
-			resp, err := cl.Do("foo", "bar", "baz", http.MethodGet, nil)
+			resp, err := cl.Do(ctx, "foo", "bar", "baz", http.MethodGet, nil)
 			req := <-reqChan
 			a.So(resp, should.NotBeNil)
 			a.So(err, should.BeNil)
@@ -72,8 +74,8 @@ func TestNoAuth(t *testing.T) {
 }
 
 func TestAuth(t *testing.T) {
-	withClient(t, []api.Option{api.WithToken("foobar")},
-		func(t *testing.T, reqChan <-chan *http.Request, respChan chan<- *http.Response, errChan chan<- error, cl *api.Client) {
+	withClient(test.Context(), t, []api.Option{api.WithToken("foobar")},
+		func(ctx context.Context, t *testing.T, reqChan <-chan *http.Request, respChan chan<- *http.Response, errChan chan<- error, cl *api.Client) {
 			a := assertions.New(t)
 
 			respChan <- &http.Response{
@@ -81,7 +83,7 @@ func TestAuth(t *testing.T) {
 			}
 			errChan <- nil
 
-			resp, err := cl.Do("foo", "bar", "baz", http.MethodGet, nil)
+			resp, err := cl.Do(ctx, "foo", "bar", "baz", http.MethodGet, nil)
 			req := <-reqChan
 			a.So(resp, should.NotBeNil)
 			a.So(err, should.BeNil)

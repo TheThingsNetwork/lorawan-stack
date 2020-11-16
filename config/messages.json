@@ -1691,24 +1691,6 @@
       "file": "mqtt.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:invalid_request_type": {
-    "translations": {
-      "en": "request type `{type}` is invalid"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/packages/loradms/v1/api/objects",
-      "file": "objects.go"
-    }
-  },
-  "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:request_type_unsupported": {
-    "translations": {
-      "en": "request type `{type}` is unsupported"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/packages/loradms/v1/api/objects",
-      "file": "objects.go"
-    }
-  },
   "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:uplink_type_unsupported": {
     "translations": {
       "en": "uplink type `{type}` is unsupported"
@@ -1721,6 +1703,15 @@
   "error:pkg/applicationserver/io/packages/loradms/v1/api:api_call_failed": {
     "translations": {
       "en": ""
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1/api",
+      "file": "messages.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/loradms/v1/api:request": {
+    "translations": {
+      "en": "request failed with status `{code}`"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/loradms/v1/api",
