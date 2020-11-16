@@ -16,12 +16,13 @@ package fetch_test
 
 import (
 	"fmt"
+	"net/http"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 )
 
 func Example() {
-	fetcher, err := fetch.FromHTTP("http://webserver.thethings.network/repository", true)
+	fetcher, err := fetch.FromHTTP(http.DefaultTransport, "http://webserver.thethings.network/repository", true)
 	if err != nil {
 		panic(err)
 	}

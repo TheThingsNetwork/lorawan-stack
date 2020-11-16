@@ -39,7 +39,7 @@ func (oc *OAuthClient) freshToken(c echo.Context) (*oauth2.Token, error) {
 		Expiry:       time.Now(),
 	}
 
-	ctx, err := oc.withTLSClientConfig(c.Request().Context())
+	ctx, err := oc.withHTTPClient(c.Request().Context())
 	if err != nil {
 		return nil, err
 	}

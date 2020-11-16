@@ -16,6 +16,7 @@ package web
 
 import (
 	"context"
+	"net/http"
 	"net/url"
 	"os"
 
@@ -29,6 +30,8 @@ type TemplatesConfig struct {
 	Directory   string            `name:"directory" description:"Retrieve the webhook templates from the filesystem"`
 	URL         string            `name:"url" description:"Retrieve the webhook templates from a web server"`
 	LogoBaseURL string            `name:"logo-base-url" description:"The base URL for the logo storage"`
+
+	Transport http.RoundTripper `name:"-"`
 }
 
 // TemplateStore contains the webhook templates.
@@ -53,7 +56,7 @@ func (c TemplatesConfig) NewTemplateStore() (TemplateStore, error) {
 		fallthrough
 	case c.URL != "":
 		var err error
-		fetcher, err = fetch.FromHTTP(c.URL, true)
+		fetcher, err = fetch.FromHTTP(c.Transport, c.URL, true)
 		if err != nil {
 			return nil, err
 		}

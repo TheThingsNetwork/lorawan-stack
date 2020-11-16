@@ -16,6 +16,7 @@ package web_test
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/gogo/protobuf/types"
@@ -228,7 +229,8 @@ description: Bar`),
 			a := assertions.New(t)
 
 			config := web.TemplatesConfig{
-				Static: tc.contents,
+				Static:    tc.contents,
+				Transport: http.DefaultTransport,
 			}
 			store, err := config.NewTemplateStore()
 			a.So(err, should.BeNil)

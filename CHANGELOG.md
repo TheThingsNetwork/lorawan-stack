@@ -23,6 +23,8 @@ For details about compatibility between different releases, see the **Commitment
 
 - Changed the pub/sub channels that the Redis backend of the Events system uses.
 - Changed the encoding of events transported by the Redis backend of the Events system.
+- All external HTTP calls are now using TLS client configuration. This fixes issues where HTTP calls would fail if custom (e.g. self-signed) CAs were used.
+- All external HTTP calls are now using a default timeout. This fixes issues where HTTP calls would stall for a long time.
 
 ### Deprecated
 

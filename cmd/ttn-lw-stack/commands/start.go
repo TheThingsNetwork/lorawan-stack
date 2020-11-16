@@ -190,6 +190,17 @@ var startCommand = &cobra.Command{
 
 		redisConsumerID := redis.Key(host, strconv.Itoa(os.Getpid()))
 
+		transport, err := c.HTTPTransport(ctx)
+		if err != nil {
+			return err
+		}
+		if conf := config.ServiceBase.FrequencyPlans; conf.Transport == nil {
+			conf.Transport = transport
+		}
+		if conf := config.ServiceBase.Interop.SenderClientCA; conf.Transport == nil {
+			conf.Transport = transport
+		}
+
 		if start.IdentityServer {
 			logger.Info("Setting up Identity Server")
 			if config.IS.OAuth.UI.TemplateData.SentryDSN == "" {
