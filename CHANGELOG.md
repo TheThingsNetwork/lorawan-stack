@@ -17,6 +17,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Limitation of displayed and stored events in the Console to 2000.
 - Application Server will unwrap the AppSKey if it can, even if skipping payload crypto is enabled. This is to avoid upstream applications to receive wrapped keys they cannot unwrap. For end-to-end encryption, configure Join Servers with wrap keys unknown to the Application Server.
+- More precise payload labels for event previews in the Console.
 
 ### Deprecated
 
@@ -30,6 +31,7 @@ For details about compatibility between different releases, see the **Commitment
   - If the HTTPS server is available on `https://thethings.example.com:8443`, the following config is required: `--http.redirect-to-tls --http.redirect-to-host=thethings.example.com:8443`.
 - Status display on the error view in the Console.
 - Event views in the Console freezing after receiving thousands of events.
+- Wrong FPort value displayed for downlink attempt events in the Console.
 
 ### Security
 
