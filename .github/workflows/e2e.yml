@@ -34,10 +34,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Initialize public folder cache
+        id: public-cache
         uses: actions/cache@v2
         with:
           path: public
-          key: ${{ runner.os }}-public-cache-${{ hashFiles('pkg/webui/**') }}-${{ hashFiles('sdk/js/**/*.js') }}-${{ hashFiles('config/webpack.config.babel.js') }}-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('pkg/ttnpb/field_mask_validation.go') }}
+          key: public-cache-${{ hashFiles('pkg/webui/**') }}-${{ hashFiles('sdk/js/**/*.js', 'sdk/js/generated/*.json') }}-${{ hashFiles('config/webpack.config.babel.js') }}-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock')}}
       - name: Set up Go 1.14
         uses: actions/setup-go@v2
         with:
@@ -63,7 +64,10 @@ jobs:
       - name: Initialize stack environment
         run: tools/bin/mage init
       - name: Run test preparations
-        run: tools/bin/mage dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:sqlDump js:Build
+        run: tools/bin/mage dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:sqlDump
+      - name: Build frontend
+        if: steps.public-cache.outputs.cache-hit != 'true'
+        run: tools/bin/mage js:build
       - name: Run frontend end-to-end tests
         run: tools/bin/mage dev:startDevStack & tools/bin/mage -v js:cypressHeadless
       - name: Upload logs

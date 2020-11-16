@@ -88,6 +88,12 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: '~1.15'
+    - name: Initialize public folder cache
+      id: public-cache
+      uses: actions/cache@v2
+      with:
+        path: public
+        key: public-cache-${{ hashFiles('pkg/webui/**') }}-${{ hashFiles('sdk/js/**/*.js', 'sdk/js/generated/*.json') }}-${{ hashFiles('config/webpack.config.babel.js') }}-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock')}}
     - name: Initialize Go module cache
       uses: actions/cache@v2
       with:
@@ -114,7 +120,8 @@ jobs:
       run: tools/bin/mage js:deps
       timeout-minutes: 5
     - name: Build frontend
-      run: tools/bin/mage js:clean js:build
+      if: steps.public-cache.outputs.cache-hit != 'true'
+      run: tools/bin/mage js:build
     - name: Test JS SDK code
       run: tools/bin/mage jsSDK:test
     - name: Test frontend code
