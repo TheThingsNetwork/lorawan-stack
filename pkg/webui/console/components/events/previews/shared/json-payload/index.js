@@ -73,7 +73,7 @@ KeyValue.propTypes = {
     PropTypes.number,
     PropTypes.shape({}),
     PropTypes.array,
-  ]).isRequired,
+  ]),
   showKey: PropTypes.bool,
 }
 
