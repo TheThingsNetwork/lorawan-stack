@@ -28,6 +28,7 @@ const messages = defineMessages({
   snr: 'SNR',
   sessionKeyId: 'Session key ID',
   selectedMacVersion: 'Selected MAC version',
+  rx1Delay: 'Rx1 Delay',
   // Generic messages
   eventDetails: 'Event details',
   errorOverviewEntry:

@@ -38,15 +38,17 @@ const DownLinkMessagePreview = React.memo(({ event }) => {
   }
 
   if ('request' in data) {
-    const devAddr = event.identifiers[0].device_ids.device_addr
-    const frmPayload = getByPath(data, 'event.payload.mac_payload.frm_payload')
+    const devAddr = event.identifiers[0].device_ids.dev_addr
+    const frmPayload = getByPath(data, 'payload.mac_payload.frm_payload')
     const rx1Delay = getByPath(data, 'request.rx1_delay')
+    const fPort = getByPath(data, 'payload.mac_payload.f_port')
 
     return (
       <DescriptionList>
-        <DescriptionList.Item title={messages.devAddr} data={devAddr} />
-        <DescriptionList.Byte title={messages.frmPayload} data={frmPayload} convertToHex />
-        <DescriptionList.Item title={messages.fPort} data={rx1Delay} />
+        <DescriptionList.Byte title={messages.devAddr} data={devAddr} />
+        <DescriptionList.Item title={messages.fPort} data={fPort} />
+        <DescriptionList.Byte title={messages.MACPayload} data={frmPayload} convertToHex />
+        <DescriptionList.Item title={messages.rx1Delay} data={rx1Delay} />
       </DescriptionList>
     )
   }
