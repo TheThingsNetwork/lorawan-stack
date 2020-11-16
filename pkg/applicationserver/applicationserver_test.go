@@ -2269,7 +2269,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 			KeyVault: config.KeyVault{
 				Provider: "static",
 				Static: map[string][]byte{
-					"test": {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F},
+					"known": {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F},
 				},
 			},
 		},
@@ -2350,9 +2350,9 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		{Value: false},
 	} {
 		hasOverride := map[bool]string{true: "Overrides", false: "NoOverride"}[override != nil]
-		effectiveSkip := override != nil && override.Value || override == nil
+		kekLabel := map[bool]string{true: "unknown", false: "known"}[override.GetValue()]
 
-		t.Run(fmt.Sprintf("%v/%v", hasOverride, effectiveSkip), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%v/%v", hasOverride, override.GetValue()), func(t *testing.T) {
 			t.Run("Uplink", func(t *testing.T) {
 				ns.reset()
 				devsFlush()
@@ -2382,14 +2382,14 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									AppSKey: &ttnpb.KeyEnvelope{
 										// AppSKey is []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}
 										EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
-										KEKLabel:     "test",
+										KEKLabel:     kekLabel,
 									},
 								},
 							},
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
-							if effectiveSkip {
+							if override.GetValue() {
 								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 									Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -2398,7 +2398,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 											AppSKey: &ttnpb.KeyEnvelope{
 												// AppSKey is []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}
 												EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
-												KEKLabel:     "test",
+												KEKLabel:     kekLabel,
 											},
 										},
 									},
@@ -2427,7 +2427,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									SessionKeyID: []byte{0x22},
 									AppSKey: &ttnpb.KeyEnvelope{
 										EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
-										KEKLabel:     "test",
+										KEKLabel:     kekLabel,
 									},
 								},
 								LastAFCntDown: 0,
@@ -2450,7 +2450,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
-							if effectiveSkip {
+							if override.GetValue() {
 								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 									Up: &ttnpb.ApplicationUp_UplinkMessage{
@@ -2461,7 +2461,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 											FRMPayload:   []byte{0x01},
 											AppSKey: &ttnpb.KeyEnvelope{
 												EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
-												KEKLabel:     "test",
+												KEKLabel:     kekLabel,
 											},
 										},
 									},
@@ -2504,7 +2504,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
-							if effectiveSkip {
+							if override.GetValue() {
 								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 									Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
@@ -2569,7 +2569,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							SessionKeyID: []byte{0x11},
 							AppSKey: &ttnpb.KeyEnvelope{
 								EncryptedKey: []byte{0x1f, 0xa6, 0x8b, 0xa, 0x81, 0x12, 0xb4, 0x47, 0xae, 0xf3, 0x4b, 0xd8, 0xfb, 0x5a, 0x7b, 0x82, 0x9d, 0x3e, 0x86, 0x23, 0x71, 0xd2, 0xcf, 0xe5},
-								KEKLabel:     "test",
+								KEKLabel:     kekLabel,
 							},
 						},
 					}

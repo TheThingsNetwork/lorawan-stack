@@ -16,6 +16,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - Limitation of displayed and stored events in the Console to 2000.
+- Application Server will unwrap the AppSKey if it can, even if skipping payload crypto is enabled. This is to avoid upstream applications to receive wrapped keys they cannot unwrap. For end-to-end encryption, configure Join Servers with wrap keys unknown to the Application Server.
 
 ### Deprecated
 
