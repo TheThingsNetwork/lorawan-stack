@@ -1191,9 +1191,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 	registerForwardJoinRequest(ctx, up)
 
-	respRecvAt := timeNow()
 	keys := resp.SessionKeys
-	keys.AppSKey = nil
 	if !req.DownlinkSettings.OptNeg {
 		keys.NwkSEncKey = keys.FNwkSIntKey
 		keys.SNwkSIntKey = keys.FNwkSIntKey
@@ -1218,7 +1216,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	ns.mergeMetadata(ctx, up)
 
 	logger := log.FromContext(ctx)
-	var invalidatedQueue []*ttnpb.ApplicationDownlink
 	stored, storedCtx, err := ns.devices.SetByID(ctx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, matched.EndDeviceIdentifiers.DeviceID,
 		[]string{
 			"frequency_plan_id",
@@ -1230,11 +1227,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			if stored == nil {
 				logger.Warn("Device deleted during join-request handling, drop")
 				return nil, nil, errOutdatedData.New()
-			}
-			if stored.Session != nil {
-				invalidatedQueue = stored.Session.QueuedApplicationDownlinks
-			} else {
-				invalidatedQueue = stored.GetPendingSession().GetQueuedApplicationDownlinks()
 			}
 			macState.RecentUplinks = []*ttnpb.UplinkMessage{{
 				Payload:            up.Payload,
@@ -1267,24 +1259,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	if err := ns.downlinkTasks.Add(ctx, stored.EndDeviceIdentifiers, downAt, true); err != nil {
 		logger.WithError(err).Error("Failed to add downlink task after join-request")
 	}
-	ns.enqueueApplicationUplinks(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: stored.EndDeviceIdentifiers.ApplicationIdentifiers,
-			DeviceID:               stored.EndDeviceIdentifiers.DeviceID,
-			DevEUI:                 stored.EndDeviceIdentifiers.DevEUI,
-			JoinEUI:                stored.EndDeviceIdentifiers.JoinEUI,
-			DevAddr:                &devAddr,
-		},
-		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
-		Up: &ttnpb.ApplicationUp_JoinAccept{
-			JoinAccept: &ttnpb.ApplicationJoinAccept{
-				AppSKey:              resp.SessionKeys.AppSKey,
-				InvalidatedDownlinks: invalidatedQueue,
-				SessionKeyID:         resp.SessionKeys.SessionKeyID,
-				ReceivedAt:           respRecvAt,
-			},
-		},
-	})
 	queuedEvents = append(queuedEvents, evtProcessJoinRequest.NewWithIdentifiersAndData(ctx, matched.EndDeviceIdentifiers, up))
 	registerProcessUplink(ctx, up)
 	return nil
