@@ -16,7 +16,8 @@ import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
   // Field messages
-  frmPayload: 'FRMPayload',
+  payload: 'Payload',
+  MACPayload: 'MAC payload',
   devAddr: 'DevAddr',
   fPort: 'FPort',
   fCnt: 'FCnt',
@@ -28,6 +29,7 @@ const messages = defineMessages({
   snr: 'SNR',
   sessionKeyId: 'Session key ID',
   selectedMacVersion: 'Selected MAC version',
+  rx1Delay: 'Rx1 Delay',
   // Generic messages
   eventDetails: 'Event details',
   errorOverviewEntry:
