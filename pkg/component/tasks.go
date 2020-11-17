@@ -148,10 +148,9 @@ func DefaultStartTask(conf *TaskConfig) {
 	logger := log.FromContext(conf.Context).WithField("task_id", conf.ID)
 	go func() {
 		defer func() {
-			if conf.Done == nil {
-				return
+			if done := conf.Done; done != nil {
+				done()
 			}
-			conf.Done()
 		}()
 		invocation := uint(1)
 		for {
