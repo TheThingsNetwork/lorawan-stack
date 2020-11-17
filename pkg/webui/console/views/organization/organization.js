@@ -41,7 +41,7 @@ import {
 } from '@console/lib/feature-checks'
 
 @withEnv
-@withBreadcrumb('orgs.single', function(props) {
+@withBreadcrumb('orgs.single', props => {
   const {
     orgId,
     organization: { name },
