@@ -54,20 +54,23 @@ func applicationJoinAcceptWithoutAppSKey(pld *ttnpb.ApplicationJoinAccept) *ttnp
 	}
 }
 
-func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error {
-	const retryInterval = time.Minute
+const (
+	applicationUplinkTaskRetryInterval = time.Minute
+	applicationUplinkLimit             = 100
+)
 
+func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error {
 	return ns.applicationUplinks.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueRangeFunc) (time.Time, error) {
 		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, appID)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")
-			return time.Now().Add(retryInterval), nil
+			return time.Now().Add(applicationUplinkTaskRetryInterval), nil
 		}
 
 		cl := ttnpb.NewNsAsClient(conn)
 		for ok := false; !ok; {
 			var sendErr bool
-			ok, err = f(100, func(ups ...*ttnpb.ApplicationUp) error {
+			ok, err = f(applicationUplinkLimit, func(ups ...*ttnpb.ApplicationUp) error {
 				_, err := cl.HandleUplink(ctx, &ttnpb.NsAsHandleUplinkRequest{
 					ApplicationUps: ups,
 				}, ns.WithClusterAuth())
@@ -97,7 +100,7 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error
 				if !sendErr {
 					log.FromContext(ctx).WithError(err).Error("Failed to pop application uplinks")
 				}
-				return time.Now().Add(retryInterval), nil
+				return time.Now().Add(applicationUplinkTaskRetryInterval), nil
 			}
 		}
 		return time.Time{}, nil
