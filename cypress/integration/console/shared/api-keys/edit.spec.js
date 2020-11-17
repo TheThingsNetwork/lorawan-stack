@@ -28,39 +28,40 @@ describe('API keys', () => {
 
   before(() => {
     cy.dropAndSeedDatabase()
-
     cy.createUser(user)
-    cy.loginConsole({
-      user_id: userId,
-      password: user.password,
-    })
-
-    cy.clearLocalStorage()
-    cy.clearCookies()
   })
 
   describe('Application', () => {
     const applicationId = 'api-keys-test-app'
     const application = { ids: { application_id: applicationId } }
+    const entity = 'applications'
 
     before(() => {
       cy.loginConsole({ user_id: userId, password: user.password })
       cy.createApplication(application, userId)
-      cy.createApiKey('applications', applicationId, apiKey)
       cy.clearLocalStorage()
       cy.clearCookies()
     })
 
     beforeEach(() => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+      cy.createApiKey(entity, applicationId, apiKey)
     })
 
     it('succeeds editing api key', () => {
-      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/api-keys`)
+      cy.get(`@${entity}_apiKeyId`).then(apiKeyId => {
+        cy.visit(
+          `${Cypress.config('consoleRootPath')}/applications/${applicationId}/api-keys/${apiKeyId}`,
+        )
+      })
 
-      cy.findByRole('cell', { name: apiKeyName }).click()
+      cy.findByLabelText('Name').type('_updated')
+      cy.findByLabelText('Grant individual rights').check()
+      cy.findByLabelText('Select all').check()
+
       cy.findByRole('button', { name: 'Save changes' }).click()
 
+      cy.findByTestId('error-notification').should('not.exist')
       cy.findByTestId('toast-notification')
         .should('be.visible')
         .findByText(`API key updated`)
@@ -68,9 +69,12 @@ describe('API keys', () => {
     })
 
     it('succeeds deleting api key', () => {
-      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/api-keys`)
+      cy.get(`@${entity}_apiKeyId`).then(apiKeyId => {
+        cy.visit(
+          `${Cypress.config('consoleRootPath')}/applications/${applicationId}/api-keys/${apiKeyId}`,
+        )
+      })
 
-      cy.findByRole('cell', { name: apiKeyName }).click()
       cy.findByRole('button', { name: /Delete key/ }).click()
 
       cy.findByTestId('modal-window')
@@ -94,25 +98,32 @@ describe('API keys', () => {
   describe('Gateway', () => {
     const gatewayId = 'api-keys-test-gateway'
     const gateway = { ids: { gateway_id: gatewayId } }
+    const entity = 'gateways'
 
     before(() => {
       cy.loginConsole({ user_id: userId, password: user.password })
       cy.createGateway(gateway, userId)
-      cy.createApiKey('gateways', gatewayId, apiKey)
       cy.clearLocalStorage()
       cy.clearCookies()
     })
 
     beforeEach(() => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+      cy.createApiKey(entity, gatewayId, apiKey)
     })
 
     it('succeeds editing api key', () => {
-      cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/api-keys`)
+      cy.get(`@${entity}_apiKeyId`).then(apiKeyId => {
+        cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/api-keys/${apiKeyId}`)
+      })
 
-      cy.findByRole('cell', { name: apiKeyName }).click()
+      cy.findByLabelText('Name').type('_updated')
+      cy.findByLabelText('Grant individual rights').check()
+      cy.findByLabelText('Select all').check()
+
       cy.findByRole('button', { name: 'Save changes' }).click()
 
+      cy.findByTestId('error-notification').should('not.exist')
       cy.findByTestId('toast-notification')
         .should('be.visible')
         .findByText(`API key updated`)
@@ -120,9 +131,10 @@ describe('API keys', () => {
     })
 
     it('succeeds deleting api key', () => {
-      cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/api-keys`)
+      cy.get(`@${entity}_apiKeyId`).then(apiKeyId => {
+        cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/api-keys/${apiKeyId}`)
+      })
 
-      cy.findByRole('cell', { name: apiKeyName }).click()
       cy.findByRole('button', { name: /Delete key/ }).click()
 
       cy.findByTestId('modal-window')
@@ -148,25 +160,36 @@ describe('API keys', () => {
     const organization = {
       ids: { organization_id: organizationId },
     }
+    const entity = 'organizations'
 
     before(() => {
       cy.loginConsole({ user_id: userId, password: user.password })
       cy.createOrganization(organization, userId)
-      cy.createApiKey('organizations', organizationId, apiKey)
       cy.clearLocalStorage()
       cy.clearCookies()
     })
 
     beforeEach(() => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+      cy.createApiKey(entity, organizationId, apiKey)
     })
 
     it('succeeds editing api key', () => {
-      cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${organizationId}/api-keys`)
+      cy.get(`@${entity}_apiKeyId`).then(apiKeyId => {
+        cy.visit(
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/organizations/${organizationId}/api-keys/${apiKeyId}`,
+        )
+      })
 
-      cy.findByRole('cell', { name: apiKeyName }).click()
+      cy.findByLabelText('Name').type('_updated')
+      cy.findByLabelText('Grant individual rights').check()
+      cy.findByLabelText('Select all').check()
+
       cy.findByRole('button', { name: 'Save changes' }).click()
 
+      cy.findByTestId('error-notification').should('not.exist')
       cy.findByTestId('toast-notification')
         .should('be.visible')
         .findByText(`API key updated`)
@@ -174,9 +197,14 @@ describe('API keys', () => {
     })
 
     it('succeeds deleting api key', () => {
-      cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${organizationId}/api-keys`)
+      cy.get(`@${entity}_apiKeyId`).then(apiKeyId => {
+        cy.visit(
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/organizations/${organizationId}/api-keys/${apiKeyId}`,
+        )
+      })
 
-      cy.findByRole('cell', { name: apiKeyName }).click()
       cy.findByRole('button', { name: /Delete key/ }).click()
 
       cy.findByTestId('modal-window')

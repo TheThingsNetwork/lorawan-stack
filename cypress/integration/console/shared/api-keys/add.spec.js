@@ -24,15 +24,7 @@ describe('API keys', () => {
 
   before(() => {
     cy.dropAndSeedDatabase()
-
     cy.createUser(user)
-    cy.loginConsole({
-      user_id: userId,
-      password: user.password,
-    })
-
-    cy.clearLocalStorage()
-    cy.clearCookies()
   })
 
   describe('Application', () => {

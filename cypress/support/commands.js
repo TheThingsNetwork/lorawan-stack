@@ -126,16 +126,19 @@ Cypress.Commands.add('createApplication', (application, userId) => {
 })
 
 // Helper function to create a new api key programmatically
-Cypress.Commands.add('createApiKey', (mode, name, apiKey) => {
+Cypress.Commands.add('createApiKey', (entity, entityId, apiKey) => {
   const baseUrl = Cypress.config('baseUrl')
   cy.getAccessToken(accessToken => {
     cy.request({
       method: 'POST',
-      url: `${baseUrl}/api/v3/${mode}/${name}/api-keys`,
+      url: `${baseUrl}/api/v3/${entity}/${entityId}/api-keys`,
       body: { ...apiKey },
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+    }).then(response => {
+      const apiKeyId = response.body && response.body.id
+      cy.wrap(apiKeyId).as(`${entity}_apiKeyId`)
     })
   })
 })
