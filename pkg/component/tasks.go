@@ -121,6 +121,7 @@ type TaskConfig struct {
 	Context context.Context
 	ID      string
 	Func    TaskFunc
+	Done    func()
 	Restart TaskRestart
 	Backoff *TaskBackoffConfig
 }
@@ -146,6 +147,11 @@ var errTaskRecovered = errors.Define("task_recovered", "task recovered")
 func DefaultStartTask(conf *TaskConfig) {
 	logger := log.FromContext(conf.Context).WithField("task_id", conf.ID)
 	go func() {
+		defer func() {
+			if done := conf.Done; done != nil {
+				done()
+			}
+		}()
 		invocation := uint(1)
 		for {
 			if invocation == 0 {
