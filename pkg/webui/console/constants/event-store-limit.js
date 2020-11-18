@@ -12,9 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ApplicationCollaboratorAdd from './application-collaborator-add'
-import connect from './connect'
-
-const ConnectedCollaboratorAdd = connect(ApplicationCollaboratorAdd)
-
-export { ConnectedCollaboratorAdd as default, ApplicationCollaboratorAdd }
+export default 2000

@@ -16,7 +16,8 @@ import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
   // Field messages
-  frmPayload: 'FRMPayload',
+  payload: 'Payload',
+  MACPayload: 'MAC payload',
   devAddr: 'DevAddr',
   fPort: 'FPort',
   fCnt: 'FCnt',
@@ -28,6 +29,7 @@ const messages = defineMessages({
   snr: 'SNR',
   sessionKeyId: 'Session key ID',
   selectedMacVersion: 'Selected MAC version',
+  rx1Delay: 'Rx1 Delay',
   // Generic messages
   eventDetails: 'Event details',
   errorOverviewEntry:
@@ -35,6 +37,9 @@ const messages = defineMessages({
   dataPreview: 'Data preview',
   seeAllActivity: 'See all activity',
   syntheticEvent: 'Note: This meta event did not originate from the event stream',
+  eventsTruncated:
+    'Old events have been truncated to save memory. The current event limit per stream is {limit}.',
+  eventUnavailable: 'This event is not available anymore. It was likely truncated to save memory.',
 })
 
 export default messages

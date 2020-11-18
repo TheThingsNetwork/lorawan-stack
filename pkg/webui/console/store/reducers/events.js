@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import EVENT_STORE_LIMIT from '@console/constants/event-store-limit'
+
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
 
 import {
@@ -44,19 +46,19 @@ const addEvent = (state, event) => {
   const { paused } = state
 
   if (paused && !event.name.startsWith('synthetic')) {
-    return events
+    return {}
   }
 
   // See https://github.com/TheThingsNetwork/lorawan-stack/pull/2989
   if (event.name === 'events.stream.start' || event.name === 'events.stream.stop') {
-    return events
+    return {}
   }
 
   // We want to disregard events that arrived after event resumption but are
   // timestamped before it. This is to avoid showing events before the synthetic
   // resumption event.
   if (events[0] && events[0].name === EVENT_STATUS_RESUMED && event.time < events[0].time) {
-    return events
+    return {}
   }
 
   const currentEvents = events
@@ -73,10 +75,16 @@ const addEvent = (state, event) => {
     }
   }
 
-  return [...currentEvents.slice(0, insertIndex), event, ...currentEvents.slice(insertIndex)]
+  const newEvents = currentEvents
+    .slice(0, insertIndex)
+    .concat(event, currentEvents.slice(insertIndex, EVENT_STORE_LIMIT - 1))
+
+  return { events: newEvents, truncated: events.length + 1 > EVENT_STORE_LIMIT }
 }
+
 const defaultState = {
   events: [],
+  truncated: false,
   error: undefined,
   interrupted: false,
   paused: false,
@@ -105,9 +113,7 @@ const createNamedEventReducer = function(reducerName = '') {
       case START_EVENTS_SUCCESS:
         return {
           ...state,
-          events: state.interrupted
-            ? addEvent(state, createStatusReconnectedEvent())
-            : state.events,
+          ...(state.interrupted ? addEvent(state, createStatusReconnectedEvent()) : state.events),
           status: CONNECTION_STATUS.CONNECTED,
           interrupted: false,
           error: undefined,
@@ -115,34 +121,34 @@ const createNamedEventReducer = function(reducerName = '') {
       case GET_EVENT_SUCCESS:
         return {
           ...state,
-          events: addEvent(state, action.event),
+          ...addEvent(state, action.event),
         }
       case START_EVENTS_FAILURE:
         return {
           ...state,
-          events: !state.interrupted
+          ...(!state.interrupted
             ? addEvent(state, createSyntheticEventFromError(action.error))
-            : state.events,
+            : state.events),
           error: action.error,
           status: CONNECTION_STATUS.DISCONNECTED,
         }
       case GET_EVENT_FAILURE:
         return {
           ...state,
-          events: addEvent(state, createSyntheticEventFromError(action.error)),
+          ...addEvent(state, createSyntheticEventFromError(action.error)),
           status: CONNECTION_STATUS.DISCONNECTED,
           interrupted: true,
         }
       case PAUSE_EVENTS:
         return {
           ...state,
-          events: addEvent(state, createStatusPausedEvent()),
+          ...addEvent(state, createStatusPausedEvent()),
           paused: true,
         }
       case RESUME_EVENTS:
         return {
           ...state,
-          events: addEvent(state, createStatusResumedEvent()),
+          ...addEvent(state, createStatusResumedEvent()),
           paused: false,
         }
       case STOP_EVENTS:
@@ -154,7 +160,7 @@ const createNamedEventReducer = function(reducerName = '') {
       case EVENT_STREAM_CLOSED:
         return {
           ...state,
-          events: addEvent(state, createStatusClosedEvent()),
+          ...addEvent(state, createStatusClosedEvent()),
           status: CONNECTION_STATUS.DISCONNECTED,
           interrupted: true,
         }
@@ -162,6 +168,7 @@ const createNamedEventReducer = function(reducerName = '') {
         return {
           ...state,
           events: [createStatusClearedEvent()],
+          truncated: false,
         }
       default:
         return state

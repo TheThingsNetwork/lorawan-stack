@@ -27,6 +27,7 @@ class NullableStringSchemaType extends StringSchema {
 
     const self = this
 
+    /* eslint-disable prefer-arrow/prefer-arrow-functions */
     self.withMutation(function() {
       self
         .transform(function(value) {
@@ -38,6 +39,7 @@ class NullableStringSchemaType extends StringSchema {
         })
         .nullable(true)
     })
+    /* eslint-enable prefer-arrow/prefer-arrow-functions */
   }
 }
 

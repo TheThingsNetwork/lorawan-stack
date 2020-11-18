@@ -300,7 +300,15 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 	return sub, nil
 }
 
-func skipPayloadCrypto(link *link, dev *ttnpb.EndDevice) bool {
+// skipPayloadCrypto indicates whether LoRaWAN FRMPayload encryption and decryption should be skipped.
+// This method returns true if the AppSKey of the given session is wrapped and cannot be unwrapped by the Application
+// Server, and if the end device's skip_payload_crypto_override is true or if the link's skip_payload_crypto is true.
+func (as *ApplicationServer) skipPayloadCrypto(ctx context.Context, link *link, dev *ttnpb.EndDevice, session *ttnpb.Session) bool {
+	if session != nil {
+		if _, err := cryptoutil.UnwrapAES128Key(ctx, session.AppSKey, as.KeyVault); err == nil {
+			return false
+		}
+	}
 	if dev.SkipPayloadCryptoOverride != nil {
 		return dev.SkipPayloadCryptoOverride.Value
 	}
@@ -354,9 +362,10 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			}
 			var encryptedItems []*ttnpb.ApplicationDownlink
 			for _, session := range sessions {
+				skipPayloadCrypto := as.skipPayloadCrypto(ctx, link, dev, session)
 				for _, item := range items {
 					fCnt := session.LastAFCntDown + 1
-					if skipPayloadCrypto(link, dev) {
+					if skipPayloadCrypto {
 						fCnt = item.FCnt
 					}
 					encryptedItem := &ttnpb.ApplicationDownlink{
@@ -370,7 +379,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 						Priority:       item.Priority,
 						CorrelationIDs: item.CorrelationIDs,
 					}
-					if !skipPayloadCrypto(link, dev) {
+					if !skipPayloadCrypto {
 						if err := as.encodeAndEncryptDownlink(ctx, dev, session, encryptedItem, link.DefaultFormatters); err != nil {
 							logger.WithError(err).Warn("Encoding and encryption of downlink message failed; drop item")
 							return nil, nil, err
@@ -495,7 +504,7 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 		return nil, errNoAppSKey.New()
 	}
 	queue, _ = ttnpb.PartitionDownlinksBySessionKeyIDEquality(session.SessionKeyID, res.Downlinks...)
-	if skipPayloadCrypto(link, dev) {
+	if as.skipPayloadCrypto(ctx, link, dev, session) {
 		return queue, nil
 	}
 	for _, item := range queue {
@@ -619,7 +628,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				StartedAt: time.Now().UTC(),
 			}
 			mask = append(mask, "pending_session")
-			if !skipPayloadCrypto(link, dev) {
+			if !as.skipPayloadCrypto(ctx, link, dev, dev.PendingSession) {
 				if len(joinAccept.InvalidatedDownlinks) > 0 {
 					// The Network Server does not reset the downlink queues as the new security session is established,
 					// but rather when the session is confirmed on the first uplink. The downlink queue of the current
@@ -666,9 +675,6 @@ type downlinkQueueTransaction func(context.Context, *ttnpb.EndDevice) error
 // runDownlinkQueueTransaction runs the provided downlink queue transaction on the device. If the transaction
 // fails, the LastAFCntDown session fields are restored to their previous values and the downlink queue is reset.
 func (as *ApplicationServer) runDownlinkQueueTransaction(ctx context.Context, dev *ttnpb.EndDevice, link *link, t downlinkQueueTransaction) error {
-	if skipPayloadCrypto(link, dev) {
-		return errPayloadCryptoDisabled.New()
-	}
 	logger := log.FromContext(ctx)
 	pendingSession := dev.PendingSession
 	if pendingSession != nil {
@@ -677,6 +683,9 @@ func (as *ApplicationServer) runDownlinkQueueTransaction(ctx context.Context, de
 	session := dev.Session
 	if session != nil {
 		logger = logger.WithField("session_key_id", session.SessionKeyID)
+	}
+	if as.skipPayloadCrypto(ctx, link, dev, session) || as.skipPayloadCrypto(ctx, link, dev, pendingSession) {
+		return errPayloadCryptoDisabled.New()
 	}
 	ctx = log.NewContext(ctx, logger)
 	oldPendingLastAFCntDown := pendingSession.GetLastAFCntDown()
@@ -930,7 +939,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	if err != nil {
 		return err
 	}
-	if !skipPayloadCrypto(link, dev) {
+	if !as.skipPayloadCrypto(ctx, link, dev, dev.Session) {
 		if err := as.decryptAndDecodeUplink(ctx, dev, uplink, link.DefaultFormatters); err != nil {
 			return err
 		}
@@ -985,7 +994,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 			if dev.Session == nil {
 				return nil, nil, errNoDeviceSession.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
-			if skipPayloadCrypto(link, dev) {
+			if as.skipPayloadCrypto(ctx, link, dev, dev.Session) {
 				// When skipping application payload crypto, the upstream application is responsible for recalculating the
 				// downlink queue. No error is returned here to pass the downlink queue invalidation message upstream.
 				pass = true
@@ -1053,7 +1062,14 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 	if err != nil {
 		return err
 	}
-	if skipPayloadCrypto(link, dev) {
+	var session *ttnpb.Session
+	switch {
+	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyID, msg.SessionKeyID):
+		session = dev.Session
+	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, msg.SessionKeyID):
+		session = dev.PendingSession
+	}
+	if as.skipPayloadCrypto(ctx, link, dev, session) {
 		return nil
 	}
 	return as.decryptAndDecodeDownlink(ctx, dev, msg, link.DefaultFormatters)

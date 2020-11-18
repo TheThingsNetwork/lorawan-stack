@@ -51,7 +51,10 @@ func (srv applicationActivationSettingsRegistryServer) Get(ctx context.Context, 
 	return sets, nil
 }
 
-var errNoPaths = errors.DefineInvalidArgument("no_paths", "no paths specified")
+var (
+	errNoPaths    = errors.DefineInvalidArgument("no_paths", "no paths specified")
+	errNoKEKLabel = errors.DefineInvalidArgument("no_kek_label", "no KEK label specified")
+)
 
 // Set implements ttnpb.ApplicationActivationSettingsRegistryServer.
 func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, req *ttnpb.SetApplicationActivationSettingsRequest) (*ttnpb.ApplicationActivationSettings, error) {
@@ -59,8 +62,17 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 		return nil, errInvalidFieldMask.WithCause(errNoPaths)
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "kek.key") && req.ApplicationActivationSettings.GetKEK().GetKey().IsZero() {
-		return nil, errInvalidFieldValue.WithAttributes("field", "kek.key")
+	reqKEK := req.ApplicationActivationSettings.KEK
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "kek.key") && reqKEK != nil {
+		if reqKEK.Key.IsZero() {
+			return nil, errInvalidFieldValue.WithAttributes("field", "kek.key")
+		}
+		if err := ttnpb.RequireFields(req.FieldMask.Paths, "kek_label"); err != nil {
+			return nil, errInvalidFieldMask.WithCause(err)
+		}
+		if req.KEKLabel == "" {
+			return nil, errNoKEKLabel.New()
+		}
 	}
 
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
@@ -68,9 +80,8 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 	}
 
 	sets := req.FieldMask.Paths
-	reqKEK := req.ApplicationActivationSettings.KEK
-	if ttnpb.HasAnyField(sets, "kek.key") {
-		kek, err := cryptoutil.WrapAES128Key(ctx, *req.ApplicationActivationSettings.KEK.Key, srv.kekLabel, srv.JS.KeyVault)
+	if ttnpb.HasAnyField(sets, "kek.key") && reqKEK != nil {
+		kek, err := cryptoutil.WrapAES128Key(ctx, *reqKEK.Key, srv.kekLabel, srv.JS.KeyVault)
 		if err != nil {
 			return nil, errWrapKey.WithCause(err)
 		}

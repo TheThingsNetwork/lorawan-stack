@@ -197,9 +197,9 @@ class Gateways {
     // https://github.com/TheThingsNetwork/lorawan-stack/issues/3280
     const endpoint = `/gcs/gateways/${gatewayId}/semtechudp/global_conf.json`
 
-    const response = this._api._connector.handleRequest('get', endpoint, 'gcs', false)
+    const response = await this._api._connector.handleRequest('get', endpoint, 'gcs', false)
 
-    return Marshaler.payloadSingleResponse(response)
+    return Marshaler.payloadSingleResponse(response.data)
   }
 }
 

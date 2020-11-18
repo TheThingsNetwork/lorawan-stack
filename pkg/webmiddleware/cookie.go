@@ -41,8 +41,8 @@ func Cookies(hashKey, blockKey []byte) MiddlewareFunc {
 var errInvalidContext = errors.DefineInternal("secure_cookie_invalid_context", "No secure cookie value in this context")
 
 // GetSecureCookie retrieves the secure cookie encoder from the context.
-func GetSecureCookie(ctx context.Context) (secureCookie *securecookie.SecureCookie, err error) {
-	secureCookie = ctx.Value(secureCookieCtxKey).(*securecookie.SecureCookie)
+func GetSecureCookie(ctx context.Context) (*securecookie.SecureCookie, error) {
+	secureCookie, _ := ctx.Value(secureCookieCtxKey).(*securecookie.SecureCookie)
 	if secureCookie == nil {
 		return nil, errInvalidContext
 	}

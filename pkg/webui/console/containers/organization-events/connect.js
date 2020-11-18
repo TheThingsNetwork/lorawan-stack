@@ -23,6 +23,7 @@ import {
 import {
   selectOrganizationEvents,
   selectOrganizationEventsPaused,
+  selectOrganizationEventsTruncated,
 } from '@console/store/selectors/organizations'
 
 const mapStateToProps = (state, props) => {
@@ -31,6 +32,7 @@ const mapStateToProps = (state, props) => {
   return {
     events: selectOrganizationEvents(state, orgId),
     paused: selectOrganizationEventsPaused(state, orgId),
+    truncated: selectOrganizationEventsTruncated(state, orgId),
   }
 }
 

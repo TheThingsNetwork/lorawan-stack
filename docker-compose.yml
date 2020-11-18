@@ -4,7 +4,7 @@ services:
   # If using CockroachDB:
   cockroach:
     image: cockroachdb/cockroach
-    command: start --http-port 26256 --insecure
+    command: start-single-node --http-port 26256 --insecure
     restart: unless-stopped
     volumes:
       - ${DEV_DATA_DIR:-.env/data}/cockroach:/cockroach/cockroach-data

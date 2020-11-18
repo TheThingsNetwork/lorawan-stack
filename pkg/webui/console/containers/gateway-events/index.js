@@ -29,10 +29,14 @@ import {
   resumeGatewayEventsStream,
 } from '@console/store/actions/gateways'
 
-import { selectGatewayEvents, selectGatewayEventsPaused } from '@console/store/selectors/gateways'
+import {
+  selectGatewayEvents,
+  selectGatewayEventsPaused,
+  selectGatewayEventsTruncated,
+} from '@console/store/selectors/gateways'
 
 const GatewayEvents = props => {
-  const { gtwId, events, widget, paused, onPauseToggle, onClear } = props
+  const { gtwId, events, widget, paused, onPauseToggle, onClear, truncated } = props
 
   if (widget) {
     return (
@@ -47,6 +51,7 @@ const GatewayEvents = props => {
       paused={paused}
       onClear={onClear}
       onPauseToggle={onPauseToggle}
+      truncated={truncated}
       scoped
     />
   )
@@ -58,6 +63,7 @@ GatewayEvents.propTypes = {
   onClear: PropTypes.func.isRequired,
   onPauseToggle: PropTypes.func.isRequired,
   paused: PropTypes.bool.isRequired,
+  truncated: PropTypes.bool.isRequired,
   widget: PropTypes.bool,
 }
 
@@ -74,6 +80,7 @@ export default withFeatureRequirement(mayViewGatewayEvents)(
       return {
         events: selectGatewayEvents(state, gtwId),
         paused: selectGatewayEventsPaused(state, gtwId),
+        truncated: selectGatewayEventsTruncated(state, gtwId),
       }
     },
     (dispatch, ownProps) => ({

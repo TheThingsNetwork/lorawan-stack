@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 
 import Status from '@ttn-lw/components/status'
 import Icon from '@ttn-lw/components/icon'
@@ -23,11 +24,13 @@ import FetchTable from '@console/containers/fetch-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { getUserId } from '@ttn-lw/lib/selectors/id'
 
 import { checkFromState, mayManageUsers } from '@console/lib/feature-checks'
 
 import { getUsersList } from '@console/store/actions/users'
 
+import { selectUserId } from '@console/store/selectors/user'
 import {
   selectUsers,
   selectUsersTotalCount,
@@ -37,81 +40,96 @@ import {
 
 import style from './users-table.styl'
 
-const headers = [
-  {
-    name: 'ids.user_id',
-    displayName: sharedMessages.id,
-    width: 28,
-    sortable: true,
-    sortKey: 'user_id',
-  },
-  {
-    name: 'name',
-    displayName: sharedMessages.name,
-    width: 22,
-    sortable: true,
-  },
-  {
-    name: 'primary_email_address',
-    displayName: sharedMessages.email,
-    width: 28,
-    sortable: true,
-  },
-  {
-    name: 'state',
-    displayName: sharedMessages.state,
-    width: 15,
-    sortable: true,
-    render(state) {
-      let indicator = 'unknown'
-      let label = sharedMessages.notSet
-      switch (state) {
-        case 'STATE_APPROVED':
-          indicator = 'good'
-          label = sharedMessages.stateApproved
-          break
-        case 'STATE_REQUESTED':
-          indicator = 'mediocre'
-          label = sharedMessages.stateRequested
-          break
-        case 'STATE_REJECTED':
-          indicator = 'bad'
-          label = sharedMessages.stateRejected
-          break
-        case 'STATE_FLAGGED':
-          indicator = 'bad'
-          label = sharedMessages.stateFlagged
-          break
-        case 'STATE_SUSPENDED':
-          indicator = 'bad'
-          label = sharedMessages.stateSuspended
-          break
-      }
-
-      return <Status status={indicator} label={label} pulse={false} />
-    },
-  },
-  {
-    name: 'admin',
-    displayName: sharedMessages.admin,
-    width: 7,
-    render(isAdmin) {
-      if (isAdmin) {
-        return <Icon className={style.icon} icon="check" />
-      }
-
-      return null
-    },
-  },
-]
-
+@connect(state => ({
+  currentUserId: selectUserId(state),
+}))
 export default class UsersTable extends Component {
   static propTypes = {
+    currentUserId: PropTypes.string.isRequired,
     pageSize: PropTypes.number.isRequired,
   }
 
   constructor(props) {
     super(props)
+    this.headers = [
+      {
+        name: 'ids.user_id',
+        displayName: sharedMessages.id,
+        width: 28,
+        sortable: true,
+        sortKey: 'user_id',
+        render(ids) {
+          const userId = getUserId({ ids })
+          if (userId === props.currentUserId) {
+            return (
+              <span>
+                {userId}{' '}
+                <Message className={style.hint} content={sharedMessages.currentUserIndicator} />
+              </span>
+            )
+          }
+          return userId
+        },
+      },
+      {
+        name: 'name',
+        displayName: sharedMessages.name,
+        width: 22,
+        sortable: true,
+      },
+      {
+        name: 'primary_email_address',
+        displayName: sharedMessages.email,
+        width: 28,
+        sortable: true,
+      },
+      {
+        name: 'state',
+        displayName: sharedMessages.state,
+        width: 15,
+        sortable: true,
+        render(state) {
+          let indicator = 'unknown'
+          let label = sharedMessages.notSet
+          switch (state) {
+            case 'STATE_APPROVED':
+              indicator = 'good'
+              label = sharedMessages.stateApproved
+              break
+            case 'STATE_REQUESTED':
+              indicator = 'mediocre'
+              label = sharedMessages.stateRequested
+              break
+            case 'STATE_REJECTED':
+              indicator = 'bad'
+              label = sharedMessages.stateRejected
+              break
+            case 'STATE_FLAGGED':
+              indicator = 'bad'
+              label = sharedMessages.stateFlagged
+              break
+            case 'STATE_SUSPENDED':
+              indicator = 'bad'
+              label = sharedMessages.stateSuspended
+              break
+          }
+
+          return <Status status={indicator} label={label} pulse={false} />
+        },
+      },
+      {
+        name: 'admin',
+        displayName: sharedMessages.admin,
+        width: 7,
+        render(isAdmin) {
+          if (isAdmin) {
+            return <Icon className={style.icon} icon="check" />
+          }
+
+          return null
+        },
+      },
+    ]
 
     this.getUsersList = params =>
       getUsersList(params, ['name', 'primary_email_address', 'state', 'admin'])
@@ -133,7 +151,7 @@ export default class UsersTable extends Component {
     return (
       <FetchTable
         entity="users"
-        headers={headers}
+        headers={this.headers}
         addMessage={sharedMessages.userAdd}
         tableTitle={<Message content={sharedMessages.users} />}
         getItemsAction={this.getUsersList}
