@@ -14,9 +14,11 @@
 
 import React from 'react'
 
-import Radio from '@ttn-lw/components/radio-button'
+import glossaryId from '@console/constants/glossary-ids'
+
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
+import Radio from '@ttn-lw/components/radio-button'
 import Select from '@ttn-lw/components/select'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
@@ -94,7 +96,12 @@ const NetworkSettingsForm = props => {
       validationContext={validationContext}
       error={error}
     >
-      <NsFrequencyPlansSelect required autoFocus name="frequency_plan_id" />
+      <NsFrequencyPlansSelect
+        required
+        autoFocus
+        glossaryId={glossaryId.FREQUENCY_PLAN}
+        name="frequency_plan_id"
+      />
       <Form.Field
         required
         disabled
@@ -103,6 +110,7 @@ const NetworkSettingsForm = props => {
         name="lorawan_version"
         component={Select}
         options={LORAWAN_VERSIONS}
+        glossaryId={glossaryId.LORAWAN_VERSION}
       />
       <Form.Field
         required
@@ -111,12 +119,14 @@ const NetworkSettingsForm = props => {
         name="lorawan_phy_version"
         component={PhyVersionInput}
         lorawanVersion={lorawanVersion}
+        glossaryId={glossaryId.REGIONAL_PARAMETERS}
       />
       <Form.Field
         title={sharedMessages.supportsClassC}
         name="supports_class_c"
         component={Checkbox}
         disabled={isMulticast}
+        glossaryId={glossaryId.CLASS_C}
       />
       <Form.Field
         title={sharedMessages.frameCounterWidth}
@@ -160,6 +170,11 @@ const NetworkSettingsForm = props => {
             }
             component={Input.Generate}
             onGenerateValue={generate16BytesKey}
+            glossaryId={
+              lwVersion >= 110
+                ? glossaryId.NETWORK_SESSION_KEY
+                : glossaryId.FORWARDING_NETWORK_SESSION_INTEGRITY_KEY
+            }
           />
           {lwVersion >= 110 && (
             <Form.Field
@@ -173,6 +188,7 @@ const NetworkSettingsForm = props => {
               description={sharedMessages.sNwkSIKeyDescription}
               component={Input.Generate}
               onGenerateValue={generate16BytesKey}
+              glossaryId={glossaryId.SERVING_NETWORK_SESSION_INTEGRITY_KEY}
             />
           )}
           {lwVersion >= 110 && (
@@ -187,6 +203,7 @@ const NetworkSettingsForm = props => {
               description={sharedMessages.nwkSEncKeyDescription}
               component={Input.Generate}
               onGenerateValue={generate16BytesKey}
+              glossaryId={glossaryId.NETWORK_SESSION_ENCRYPTION_KEY}
             />
           )}
         </>

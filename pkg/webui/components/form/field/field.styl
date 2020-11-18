@@ -18,9 +18,16 @@
     justify-content: space-between
     flex-wrap: nowrap
 
+    &.horizontal
+      .label-container, .info-area
+        padding-top: $cs.xxs
+
+    &.required
+      .label::after
+        padding-top: $cs.xxs
+
     .title
       font-weight: $fw.normal
-      padding-top: 0
 
     .component-area
       display: flex
@@ -39,7 +46,7 @@
   flex-wrap: wrap
   width: 100%
 
-  .label
+  .title
     font-weight: $fw.bold
 
     &::after
@@ -53,15 +60,16 @@
       color: $c-active-blue
       font-weight: 800
 
-  &.horizontal
-    .title, .info-area, .label::after
-      padding-top: $cs.xxs
-
 .label
-  display: block
+  display: flex
+  align-items: flex-start
   width:  100%
   flex-shrink: 0
   user-select: none
+
+.label-container
+  display: flex
+  align-items: center
 
 .description
   font-weight: $fw.normal
@@ -105,6 +113,10 @@
     vertical-align: text-top
     flex-grow: 0
     flex-shrink: 0
+
+.glossary-link
+  display: block
+  text-decoration: none
 
 .err
   color: $c-error
