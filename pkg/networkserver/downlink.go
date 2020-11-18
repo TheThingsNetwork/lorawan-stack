@@ -525,6 +525,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 					DownlinkNack: dev.MACState.PendingApplicationDownlink,
 				},
 			})
+			dev.MACState.PendingApplicationDownlink = nil
 		}
 	}
 
