@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import glossaryId from '@console/constants/glossary-ids'
+
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Form from '@ttn-lw/components/form'
@@ -89,6 +91,7 @@ const JoinSettingsForm = React.memo(props => {
             disabled={!mayEditKeys}
             mayGenerateValue={mayEditKeys}
             onGenerateValue={generate16BytesKey}
+            glossaryId={glossaryId.APP_KEY}
           />
           {lwVersion >= 110 && (
             <Form.Field

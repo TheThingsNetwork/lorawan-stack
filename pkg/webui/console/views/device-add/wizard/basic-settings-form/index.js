@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import glossaryId from '@console/constants/glossary-ids'
+
 import Input from '@ttn-lw/components/input'
 import Wizard from '@ttn-lw/components/wizard'
 import Form from '@ttn-lw/components/form'
@@ -84,6 +86,7 @@ const BasicSettingsForm = props => {
               prefixes={prefixes}
               required
               showPrefixes
+              glossaryId={lwVersion < 104 ? glossaryId.APP_EUI : glossaryId.JOIN_EUI}
             />
           )}
           <Form.Field
@@ -95,6 +98,7 @@ const BasicSettingsForm = props => {
             description={sharedMessages.deviceEUIDescription}
             required={isOTAA || lwVersion === 104}
             component={Input}
+            glossaryId={glossaryId.DEV_EUI}
           />
         </>
       )}
