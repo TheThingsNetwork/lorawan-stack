@@ -47,7 +47,7 @@ type DownlinkTaskQueue interface {
 	// Pop calls f on the most recent downlink task in the schedule, for which timestamp is in range [0, time.Now()],
 	// if such is available, otherwise it blocks until it is.
 	// Context passed to f must be derived from ctx.
-	// Implementations must respect ctx.Deadline() value on best-effort basis, if such is present.
+	// Implementations must respect ctx.Done() value on best-effort basis.
 	Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error
 }
 

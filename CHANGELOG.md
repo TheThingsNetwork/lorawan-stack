@@ -16,13 +16,15 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - Network Server does not store `recent_uplinks`, `recent_adr_uplinks` and `recent_downlinks` anymore.
-- Limitation of displayed and stored events in the Console to 2000.
-- Application Server will unwrap the AppSKey if it can, even if skipping payload crypto is enabled. This is to avoid upstream applications to receive wrapped keys they cannot unwrap. For end-to-end encryption, configure Join Servers with wrap keys unknown to the Application Server.
-- More precise payload labels for event previews in the Console.
+- Improved Network Server downlink task performance.
 
 ### Deprecated
 
 ### Removed
+
+- Application Server linking. The Network Server now pushes data to the cluster Application Server instead.
+  - Applications which desire to handle payload decryption within their own domains should disable payload decryption at application or device level and decrypt the payload on their own end.
+  - While not backwards compatible, the decision to remove linking was heavily motivated by scalability concerns - the previous linking model scales poorly when taking high availability and load balancing concerns into account.
 
 ### Fixed
 
@@ -94,16 +96,10 @@ For details about compatibility between different releases, see the **Commitment
 - Pausing event streams is not saving up arriving events during the pause anymore.
 - Gateway server can now update the gateway location only if the gateway is authenticated.
 - Right to manage links on Application Server is now `RIGHT_APPLICATION_SETTINGS_BASIC`.
-- Network Server does not store `recent_uplinks`, `recent_adr_uplinks` and `recent_downlinks` anymore.
-- Improved Network Server downlink task performance.
-- Network Server does not forward FPort==0 uplinks to Application Server anymore.
 
 ### Removed
 
 - Join EUI prefixes select on empty prefixes configuration in Join Server.
-- Application Server linking. The Network Server now pushes data to the cluster Application Server instead.
-  - Applications which desire to handle payload decryption within their own domains should disable payload decryption at application or device level and decrypt the payload on their own end.
-  - While not backwards compatible, the decision to remove linking was heavily motivated by scalability concerns - the previous linking model scales poorly when taking high availability and load balancing concerns into account.
 
 ### Fixed
 
