@@ -32,6 +32,8 @@ For details about compatibility between different releases, see the **Commitment
 - Status display on the error view in the Console.
 - Event views in the Console freezing after receiving thousands of events.
 - Wrong FPort value displayed for downlink attempt events in the Console.
+- Network Server sending duplicate application downlink NACKs.
+- Network Server now sends downlink NACK when it assumes confirmed downlink is lost.
 
 ### Security
 
