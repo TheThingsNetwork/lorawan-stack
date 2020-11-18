@@ -39,21 +39,23 @@ describe('API keys', () => {
     before(() => {
       cy.loginConsole({ user_id: userId, password: user.password })
       cy.createApplication(application, userId)
+      cy.createApiKey(entity, applicationId, apiKey, key => {
+        Cypress.config('apiKeyId', key.id)
+      })
       cy.clearLocalStorage()
       cy.clearCookies()
     })
 
     beforeEach(() => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-      cy.createApiKey(entity, applicationId, apiKey)
     })
 
     it('succeeds editing api key', () => {
-      cy.get(`@${entity}_apiKeyId`).then(apiKeyId => {
-        cy.visit(
-          `${Cypress.config('consoleRootPath')}/applications/${applicationId}/api-keys/${apiKeyId}`,
-        )
-      })
+      cy.visit(
+        `${Cypress.config(
+          'consoleRootPath',
+        )}/applications/${applicationId}/api-keys/${Cypress.config('apiKeyId')}`,
+      )
 
       cy.findByLabelText('Name').type('_updated')
       cy.findByLabelText('Grant individual rights').check()
@@ -69,11 +71,11 @@ describe('API keys', () => {
     })
 
     it('succeeds deleting api key', () => {
-      cy.get(`@${entity}_apiKeyId`).then(apiKeyId => {
-        cy.visit(
-          `${Cypress.config('consoleRootPath')}/applications/${applicationId}/api-keys/${apiKeyId}`,
-        )
-      })
+      cy.visit(
+        `${Cypress.config(
+          'consoleRootPath',
+        )}/applications/${applicationId}/api-keys/${Cypress.config('apiKeyId')}`,
+      )
 
       cy.findByRole('button', { name: /Delete key/ }).click()
 
@@ -103,6 +105,9 @@ describe('API keys', () => {
     before(() => {
       cy.loginConsole({ user_id: userId, password: user.password })
       cy.createGateway(gateway, userId)
+      cy.createApiKey(entity, gatewayId, apiKey, key => {
+        Cypress.config('apiKeyId', key.id)
+      })
       cy.clearLocalStorage()
       cy.clearCookies()
     })
@@ -113,9 +118,11 @@ describe('API keys', () => {
     })
 
     it('succeeds editing api key', () => {
-      cy.get(`@${entity}_apiKeyId`).then(apiKeyId => {
-        cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/api-keys/${apiKeyId}`)
-      })
+      cy.visit(
+        `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/api-keys/${Cypress.config(
+          'apiKeyId',
+        )}`,
+      )
 
       cy.findByLabelText('Name').type('_updated')
       cy.findByLabelText('Grant individual rights').check()
@@ -131,9 +138,11 @@ describe('API keys', () => {
     })
 
     it('succeeds deleting api key', () => {
-      cy.get(`@${entity}_apiKeyId`).then(apiKeyId => {
-        cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/api-keys/${apiKeyId}`)
-      })
+      cy.visit(
+        `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/api-keys/${Cypress.config(
+          'apiKeyId',
+        )}`,
+      )
 
       cy.findByRole('button', { name: /Delete key/ }).click()
 
@@ -165,6 +174,9 @@ describe('API keys', () => {
     before(() => {
       cy.loginConsole({ user_id: userId, password: user.password })
       cy.createOrganization(organization, userId)
+      cy.createApiKey(entity, organizationId, apiKey, key => {
+        Cypress.config('apiKeyId', key.id)
+      })
       cy.clearLocalStorage()
       cy.clearCookies()
     })
@@ -175,13 +187,11 @@ describe('API keys', () => {
     })
 
     it('succeeds editing api key', () => {
-      cy.get(`@${entity}_apiKeyId`).then(apiKeyId => {
-        cy.visit(
-          `${Cypress.config(
-            'consoleRootPath',
-          )}/organizations/${organizationId}/api-keys/${apiKeyId}`,
-        )
-      })
+      cy.visit(
+        `${Cypress.config(
+          'consoleRootPath',
+        )}/organizations/${organizationId}/api-keys/${Cypress.config('apiKeyId')}`,
+      )
 
       cy.findByLabelText('Name').type('_updated')
       cy.findByLabelText('Grant individual rights').check()
@@ -197,13 +207,11 @@ describe('API keys', () => {
     })
 
     it('succeeds deleting api key', () => {
-      cy.get(`@${entity}_apiKeyId`).then(apiKeyId => {
-        cy.visit(
-          `${Cypress.config(
-            'consoleRootPath',
-          )}/organizations/${organizationId}/api-keys/${apiKeyId}`,
-        )
-      })
+      cy.visit(
+        `${Cypress.config(
+          'consoleRootPath',
+        )}/organizations/${organizationId}/api-keys/${Cypress.config('apiKeyId')}`,
+      )
 
       cy.findByRole('button', { name: /Delete key/ }).click()
 

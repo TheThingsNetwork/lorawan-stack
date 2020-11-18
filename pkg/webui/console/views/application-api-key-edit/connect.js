@@ -55,7 +55,7 @@ export default ApplicationApiKeyEdit =>
       }
     },
     dispatch => ({
-      getApiKey(appId, keyId) {
+      getApiKey: (appId, keyId) => {
         dispatch(getApiKey('application', appId, keyId))
       },
       deleteApiKey: api.application.apiKeys.delete,

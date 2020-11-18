@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { noop } from 'lodash'
+
 import stringToHash from '../../pkg/webui/lib/string-to-hash'
 
 // Helper function to quickly login to the oauth app programmatically.
@@ -126,7 +128,7 @@ Cypress.Commands.add('createApplication', (application, userId) => {
 })
 
 // Helper function to create a new api key programmatically
-Cypress.Commands.add('createApiKey', (entity, entityId, apiKey) => {
+Cypress.Commands.add('createApiKey', (entity, entityId, apiKey, cb = noop) => {
   const baseUrl = Cypress.config('baseUrl')
   cy.getAccessToken(accessToken => {
     cy.request({
@@ -136,10 +138,7 @@ Cypress.Commands.add('createApiKey', (entity, entityId, apiKey) => {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }).then(response => {
-      const apiKeyId = response.body && response.body.id
-      cy.wrap(apiKeyId).as(`${entity}_apiKeyId`)
-    })
+    }).then(response => cb(response.body))
   })
 })
 
