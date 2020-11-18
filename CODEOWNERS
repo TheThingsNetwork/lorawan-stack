@@ -34,6 +34,16 @@
 /pkg/jsonpb @johanstokking @htdvisser @rvolosatovs
 /pkg/ttnpb @johanstokking @htdvisser @rvolosatovs
 
+/api/applicationserver_packages.proto @adriansmares
+/api/applicationserver_pubsub.proto @adriansmares
+/api/applicationserver_web.proto @adriansmares
+/api/applicationserver_integrations_storage.proto @neoaggelos
+/api/deviceclaimingserver.proto @johanstokking
+/api/identityserver @htdvisser
+/api/joinserver.proto @johanstokking
+/api/lorawan.proto @rvolosatovs
+/api/qrcodegenerator.proto @johanstokking
+
 # Security
 /pkg/auth @johanstokking @htdvisser
 /pkg/crypto @johanstokking @htdvisser @rvolosatovs
