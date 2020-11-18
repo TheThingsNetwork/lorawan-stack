@@ -106,7 +106,7 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 		upCh, ok := q.subscriptions.Load(uid)
 		if ok {
 			select {
-			case upCh.(chan *ttnpb.ApplicationUp) <- up:
+			case upCh.(chan struct{}) <- struct{}{}:
 			default:
 			}
 		}
@@ -156,12 +156,13 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 		defer delConsumer()
 	}
 
-	upCh := make(chan *ttnpb.ApplicationUp, 1)
+	upCh := make(chan struct{}, 1)
 	_, ok := q.subscriptions.LoadOrStore(uid, upCh)
 	if ok {
 		panic(fmt.Sprintf("duplicate subscription for application %s", uid))
 	}
 	defer q.subscriptions.Delete(uid)
+
 	for {
 		rets, err := q.redis.XReadGroup(&redis.XReadGroupArgs{
 			Group:    q.group,
@@ -169,12 +170,17 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 			Streams:  []string{joinAcceptUpStream, joinAcceptUpStream, invalidationUpStream, invalidationUpStream, genericUpStream, genericUpStream, "0", ">", "0", ">", "0", ">"},
 			Count:    1,
 		}).Result()
-		if err != nil && err != redis.Nil {
+		if err != nil {
 			return ttnredis.ConvertError(err)
 		}
-		var invalidationFCnts map[string]uint64
+
+		var (
+			n                 int
+			invalidationFCnts map[string]uint64
+		)
 		for _, ret := range rets {
 			for _, msg := range ret.Messages {
+				n++
 				v, ok := msg.Values[payloadKey]
 				if !ok {
 					return errMissingPayload.New()
@@ -218,12 +224,14 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 				}
 			}
 		}
+		if n == 0 {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
 
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-
-		case <-upCh:
+			case <-upCh:
+				continue
+			}
 		}
 	}
 }

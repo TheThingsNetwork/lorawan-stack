@@ -34,6 +34,7 @@ For details about compatibility between different releases, see the **Commitment
 - Wrong FPort value displayed for downlink attempt events in the Console.
 - Network Server sending duplicate application downlink NACKs.
 - Network Server now sends downlink NACK when it assumes confirmed downlink is lost.
+- Network Server application uplink drainage.
 
 ### Security
 
