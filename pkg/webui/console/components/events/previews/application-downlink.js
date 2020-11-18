@@ -28,7 +28,7 @@ const ApplicationDownlinkPreview = React.memo(({ event }) => {
     <DescriptionList>
       <DescriptionList.Byte title={messages.devAddr} data={deviceIds.dev_addr} />
       <DescriptionList.Item title={messages.fPort}>{data.f_port}</DescriptionList.Item>
-      <DescriptionList.Byte title={messages.frmPayload} data={data.frm_payload} convertToHex />
+      <DescriptionList.Byte title={messages.payload} data={data.frm_payload} convertToHex />
     </DescriptionList>
   )
 })

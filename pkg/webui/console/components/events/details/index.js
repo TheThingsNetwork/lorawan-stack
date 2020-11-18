@@ -29,6 +29,14 @@ import style from './details.styl'
 const EventDetails = ({ className, children, event }) => {
   const hasChildren = Boolean(children)
 
+  if (!Boolean(event)) {
+    return (
+      <div className={classnames(className, style.details)}>
+        <Notification content={messages.eventUnavailable} warning small />
+      </div>
+    )
+  }
+
   return (
     <div className={classnames(className, style.details)}>
       {event.isSynthetic && <Notification content={messages.syntheticEvent} info small />}
@@ -44,12 +52,13 @@ const EventDetails = ({ className, children, event }) => {
 EventDetails.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   className: PropTypes.string,
-  event: PropTypes.event.isRequired,
+  event: PropTypes.event,
 }
 
 EventDetails.defaultProps = {
   children: null,
   className: undefined,
+  event: undefined,
 }
 
 export default EventDetails

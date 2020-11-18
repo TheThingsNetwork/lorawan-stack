@@ -96,6 +96,8 @@ type Settings struct {
 	HTTPHeadersProvider HTTPHeadersProvider
 	PublishQoS,
 	SubscribeQoS byte
+	WebSocketReadBufferSize,
+	WebSocketWriteBufferSize int
 }
 
 var errConfigureHTTPHeaders = errors.Define("configure_http_headers", "configure HTTP headers")
@@ -119,6 +121,10 @@ func OpenConnection(ctx context.Context, settings Settings, topics provider.Topi
 	clientOpts.SetPassword(settings.Password)
 	clientOpts.SetTLSConfig(settings.TLS)
 	clientOpts.SetKeepAlive(time.Minute)
+	clientOpts.SetWebsocketOptions(&mqtt.WebsocketOptions{
+		ReadBufferSize:  settings.WebSocketReadBufferSize,
+		WriteBufferSize: settings.WebSocketWriteBufferSize,
+	})
 
 	if settings.HTTPHeadersProvider != nil {
 		headers, err := settings.HTTPHeadersProvider(ctx)

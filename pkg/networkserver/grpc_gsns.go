@@ -310,6 +310,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 				}
 			}
 			queuedApplicationUplinks = []*ttnpb.ApplicationUp{asUp}
+			dev.MACState.PendingApplicationDownlink = nil
 		}
 
 		fCntGap = cmacFMatchResult.FullFCnt - dev.Session.LastFCntUp
@@ -348,6 +349,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 					CorrelationIDs: append(dev.MACState.PendingApplicationDownlink.CorrelationIDs, up.CorrelationIDs...),
 				},
 			}
+			dev.MACState.PendingApplicationDownlink = nil
 		}
 		dev.MACState = dev.PendingMACState
 		dev.PendingSession.StartedAt = up.ReceivedAt
@@ -378,6 +380,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 					CorrelationIDs: append(dev.MACState.PendingApplicationDownlink.CorrelationIDs, up.CorrelationIDs...),
 				},
 			}
+			dev.MACState.PendingApplicationDownlink = nil
 		}
 		dev.MACState = macState
 		dev.Session.StartedAt = up.ReceivedAt

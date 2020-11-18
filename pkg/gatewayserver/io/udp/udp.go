@@ -172,10 +172,11 @@ var errConnectionNotReady = errors.DefineUnavailable("connection_not_ready", "co
 
 func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 	cs := &state{
-		ioWait:          make(chan struct{}),
-		startHandleDown: &sync.Once{},
-		lastSeenPull:    time.Now().UnixNano(),
-		lastSeenPush:    time.Now().UnixNano(),
+		ioWait:           make(chan struct{}),
+		downlinkTaskDone: &sync.WaitGroup{},
+		startHandleDown:  &sync.Once{},
+		lastSeenPull:     time.Now().UnixNano(),
+		lastSeenPush:     time.Now().UnixNano(),
 	}
 	val, loaded := s.connections.LoadOrStore(eui, cs)
 	cs = val.(*state)
@@ -237,7 +238,9 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 		})
 		state.startHandleDownMu.RLock()
 		state.startHandleDown.Do(func() {
+			state.downlinkTaskDone.Add(1)
 			go func() {
+				defer state.downlinkTaskDone.Done()
 				if err := s.handleDown(ctx, state); err != nil {
 					logger.WithError(err).Warn("Failed to handle downstream packet")
 				}
@@ -443,6 +446,7 @@ func (s *srv) gc() {
 				select {
 				case <-state.io.Context().Done():
 					logger.Debug("Connection context done")
+					state.downlinkTaskDone.Wait()
 					s.connections.Delete(k)
 				default:
 					lastSeenPull := time.Unix(0, atomic.LoadInt64(&state.lastSeenPull))
@@ -450,8 +454,9 @@ func (s *srv) gc() {
 						lastSeenPush := time.Unix(0, atomic.LoadInt64(&state.lastSeenPush))
 						if time.Since(lastSeenPush) > s.config.ConnectionExpires {
 							logger.Debug("Connection expired")
-							s.connections.Delete(k)
 							state.io.Disconnect(errConnectionExpired)
+							state.downlinkTaskDone.Wait()
+							s.connections.Delete(k)
 						}
 					}
 				}
@@ -479,6 +484,7 @@ type state struct {
 	clock   scheduling.RolloverClock
 	clockMu sync.RWMutex
 
+	downlinkTaskDone  *sync.WaitGroup
 	lastDownlinkPath  atomic.Value // downlinkPath
 	startHandleDown   *sync.Once
 	startHandleDownMu sync.RWMutex

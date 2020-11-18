@@ -529,16 +529,27 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	logger = logger.WithField("f_pending", pld.FHDR.FCtrl.FPending)
 	ctx = log.NewContext(ctx, logger)
 
-	confirmed := mType == ttnpb.MType_CONFIRMED_DOWN
-	if confirmed && class != ttnpb.CLASS_A {
-		confirmedAt, ok := nextConfirmedNetworkInitiatedDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
-		if !ok {
-			return nil, genState, errCorruptedMACState.New()
+	if mType == ttnpb.MType_CONFIRMED_DOWN {
+		if class != ttnpb.CLASS_A {
+			confirmedAt, ok := nextConfirmedNetworkInitiatedDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
+			if !ok {
+				return nil, genState, errCorruptedMACState.New()
+			}
+			if confirmedAt.After(transmitAt) {
+				// Caller must have checked this already.
+				logger.WithField("confirmed_at", confirmedAt).Error("Confirmed class B/C downlink attempt performed too soon")
+				return nil, genState, errConfirmedDownlinkTooSoon.New()
+			}
 		}
-		if confirmedAt.After(transmitAt) {
-			// Caller must have checked this already.
-			logger.WithField("confirmed_at", confirmedAt).Error("Confirmed class B/C downlink attempt performed too soon")
-			return nil, genState, errConfirmedDownlinkTooSoon.New()
+		if dev.MACState.PendingApplicationDownlink != nil {
+			genState.ifScheduledApplicationUps = append(genState.ifScheduledApplicationUps, &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+				CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+				Up: &ttnpb.ApplicationUp_DownlinkNack{
+					DownlinkNack: dev.MACState.PendingApplicationDownlink,
+				},
+			})
+			dev.MACState.PendingApplicationDownlink = nil
 		}
 	}
 

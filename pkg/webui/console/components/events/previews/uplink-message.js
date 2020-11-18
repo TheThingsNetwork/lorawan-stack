@@ -52,7 +52,7 @@ const UplinkMessagePreview = React.memo(({ event }) => {
       <DescriptionList.Item title={messages.fCnt} data={fCnt} />
       <DescriptionList.Byte title={sharedMessages.joinEUI} data={joinEui} />
       <DescriptionList.Byte title={sharedMessages.devEUI} data={devEui} />
-      <DescriptionList.Byte title={messages.frmPayload} data={frmPayload} convertToHex />
+      <DescriptionList.Byte title={messages.MACPayload} data={frmPayload} convertToHex />
       <DescriptionList.Item title={messages.bandwidth} data={bandwidth} />
       <DescriptionList.Item title={messages.snr} data={snr} />
       <DescriptionList.Byte title={messages.rawPayload} data={rawPayload} convertToHex />

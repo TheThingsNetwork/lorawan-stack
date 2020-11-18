@@ -50,7 +50,7 @@ const m = defineMessages({
 })
 
 @connect(
-  function(state) {
+  state => {
     const link = selectApplicationLink(state)
     const fetching = selectApplicationLinkFetching(state)
 
@@ -64,7 +64,7 @@ const m = defineMessages({
     getLink: (id, selector) => dispatch(getApplicationLink(id, selector)),
   }),
 )
-@withBreadcrumb('apps.single.payload-formatters', function(props) {
+@withBreadcrumb('apps.single.payload-formatters', props => {
   const { appId } = props
 
   return (

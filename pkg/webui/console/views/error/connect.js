@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,21 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package objects_test
+import { connect } from 'react-redux'
 
-import (
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api/objects"
-)
+import { selectConnectionStatus } from '@console/store/selectors/status'
 
-func Uint8(i uint8) *uint8 {
-	return &i
-}
-
-func Uint32(i uint32) *uint32 {
-	return &i
-}
-
-func ResetRequestParam(i uint8) *objects.ResetRequestParam {
-	v := objects.ResetRequestParam(i)
-	return &v
-}
+export default ErrorView =>
+  connect(state => ({
+    isOnline: selectConnectionStatus(state),
+  }))(ErrorView)

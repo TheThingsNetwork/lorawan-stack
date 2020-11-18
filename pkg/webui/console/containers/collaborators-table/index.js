@@ -32,7 +32,6 @@ import style from './collaborators-table.styl'
 
 const m = defineMessages({
   id: 'User / Organization ID',
-  currentUserIndicator: '(This is you)',
 })
 
 @connect(state => ({
@@ -55,7 +54,8 @@ export default class CollaboratorsTable extends Component {
           if (isUser && collaboratorId === props.currentUserId) {
             return (
               <span>
-                {collaboratorId} <Message className={style.hint} content={m.currentUserIndicator} />
+                {collaboratorId}{' '}
+                <Message className={style.hint} content={sharedMessages.currentUserIndicator} />
               </span>
             )
           }

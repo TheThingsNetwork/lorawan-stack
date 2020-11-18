@@ -49,6 +49,13 @@ export const createEventsErrorSelector = entity =>
     return store ? store.error : undefined
   }
 
+export const createEventsTruncatedSelector = entity =>
+  function(state, entityId) {
+    const store = selectEventsStore(state.events[entity], entityId)
+
+    return Boolean(store.truncated)
+  }
+
 export const createLatestEventSelector = function(entity) {
   const eventsSelector = createEventsSelector(entity)
 

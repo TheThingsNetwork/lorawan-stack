@@ -15,6 +15,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -41,7 +42,6 @@ type Client struct {
 	baseURL *url.URL
 	cl      *http.Client
 
-	Tokens  *Tokens
 	Uplinks *Uplinks
 }
 
@@ -60,7 +60,7 @@ type queryParam struct {
 	key, value string
 }
 
-func (c *Client) newRequest(method, category, entity, operation string, body io.Reader, queryParams ...queryParam) (*http.Request, error) {
+func (c *Client) newRequest(ctx context.Context, method, category, entity, operation string, body io.Reader, queryParams ...queryParam) (*http.Request, error) {
 	u := urlutil.CloneURL(c.baseURL)
 	u.Path = path.Join(basePath, category, entity, operation)
 	q := u.Query()
@@ -68,7 +68,7 @@ func (c *Client) newRequest(method, category, entity, operation string, body io.
 		q.Add(p.key, p.value)
 	}
 	u.RawQuery = q.Encode()
-	req, err := http.NewRequest(method, u.String(), body)
+	req, err := http.NewRequestWithContext(ctx, method, u.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +81,8 @@ func (c *Client) newRequest(method, category, entity, operation string, body io.
 }
 
 // Do executes a new HTTP request with the given parameters and body and returns the response.
-func (c *Client) Do(method, category, entity, operation string, body io.Reader, queryParams ...queryParam) (*http.Response, error) {
-	req, err := c.newRequest(method, category, entity, operation, body, queryParams...)
+func (c *Client) Do(ctx context.Context, method, category, entity, operation string, body io.Reader, queryParams ...queryParam) (*http.Response, error) {
+	req, err := c.newRequest(ctx, method, category, entity, operation, body, queryParams...)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,6 @@ func New(cl *http.Client, opts ...Option) (*Client, error) {
 		cl:      cl,
 		baseURL: urlutil.CloneURL(DefaultServerURL),
 	}
-	client.Tokens = &Tokens{client}
 	client.Uplinks = &Uplinks{client}
 	for _, opt := range opts {
 		opt.apply(client)

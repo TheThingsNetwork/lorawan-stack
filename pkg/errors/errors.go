@@ -56,7 +56,7 @@ func (e Error) Error() string { return e.String() }
 func (e Error) Fields() map[string]interface{} {
 	res := make(map[string]interface{})
 	pref := "error_cause"
-	for cause := Cause(e); cause != nil && !IsInternal(cause); cause = Cause(cause) {
+	for cause := Cause(e); cause != nil; cause = Cause(cause) {
 		res[pref] = cause.Error()
 		pref += "_cause"
 	}

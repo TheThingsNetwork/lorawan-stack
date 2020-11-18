@@ -425,6 +425,7 @@ var errNewConnection = errors.DefineAborted("new_connection", "new connection fr
 type connectionEntry struct {
 	*io.Connection
 	upstreamDone chan struct{}
+	tasksDone    *sync.WaitGroup
 }
 
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
@@ -499,9 +500,15 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	if err != nil {
 		return nil, err
 	}
+	wg := &sync.WaitGroup{}
+	// The tasks will always start once the entry is stored.
+	// As such, we must ensure any new connection waits for
+	// all of the upstream tasks to finish.
+	wg.Add(len(gs.upstreamHandlers))
 	connEntry := connectionEntry{
 		Connection:   conn,
 		upstreamDone: make(chan struct{}),
+		tasksDone:    wg,
 	}
 	for existing, exists := gs.connections.LoadOrStore(uid, connEntry); exists; existing, exists = gs.connections.LoadOrStore(uid, connEntry) {
 		existingConnEntry := existing.(connectionEntry)
@@ -512,6 +519,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 			return nil, ctx.Err()
 		case <-existingConnEntry.upstreamDone:
 		}
+		existingConnEntry.tasksDone.Wait()
 	}
 	registerGatewayConnect(ctx, ids, frontend.Protocol())
 	logger.Info("Connected")
@@ -531,6 +539,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 			Func: func(ctx context.Context) error {
 				return handler.ConnectGateway(ctx, ids, conn)
 			},
+			Done:    wg.Done,
 			Restart: component.TaskRestartOnFailure,
 			Backoff: component.DialTaskBackoffConfig,
 		})

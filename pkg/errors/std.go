@@ -12,9 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ApplicationCollaboratorAdd from './application-collaborator-add'
-import connect from './connect'
+package errors
 
-const ConnectedCollaboratorAdd = connect(ApplicationCollaboratorAdd)
+import (
+	stderrors "errors"
+)
 
-export { ConnectedCollaboratorAdd as default, ApplicationCollaboratorAdd }
+// Alias standard library error functions.
+var (
+	As     = stderrors.As
+	Is     = stderrors.Is
+	Unwrap = stderrors.Unwrap
+)
+
+// Unwrap makes the Error implement error unwrapping.
+func (e Error) Unwrap() error {
+	return e.cause
+}
+
+// Is makes the Error implement error comparison.
+func (e Error) Is(target error) bool {
+	return Resemble(e, target)
+}
+
+// Unwrap makes the Definition implement error unwrapping.
+func (Definition) Unwrap() error {
+	return nil
+}
+
+// Is makes the Definition implement error comparison.
+func (d Definition) Is(target error) bool {
+	return Resemble(d, target)
+}

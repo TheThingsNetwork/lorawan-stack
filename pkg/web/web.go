@@ -35,7 +35,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
-	"go.thethings.network/lorawan-stack/v3/pkg/web/cookie"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
@@ -194,8 +193,11 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 	}
 	if options.redirectToHTTPS != nil {
 		redirectConfig.Scheme = func(string) string { return "https" }
-		redirectConfig.Port = func(current uint) uint {
-			return uint(options.redirectToHTTPS[int(current)])
+		// Only redirect to HTTPS port if no port redirection has been configured
+		if redirectConfig.Port == nil {
+			redirectConfig.Port = func(current uint) uint {
+				return uint(options.redirectToHTTPS[int(current)])
+			}
 		}
 	}
 
@@ -252,7 +254,6 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 
 	server.Use(
 		echomiddleware.Gzip(),
-		cookie.Cookies(hashKey, blockKey),
 	)
 
 	s := &Server{

@@ -26,10 +26,14 @@ import {
   resumeDeviceEventsStream,
 } from '@console/store/actions/devices'
 
-import { selectDeviceEvents, selectDeviceEventsPaused } from '@console/store/selectors/devices'
+import {
+  selectDeviceEvents,
+  selectDeviceEventsPaused,
+  selectDeviceEventsTruncated,
+} from '@console/store/selectors/devices'
 
 const DeviceEvents = props => {
-  const { appId, devId, events, widget, paused, onClear, onPauseToggle } = props
+  const { appId, devId, events, widget, paused, onClear, onPauseToggle, truncated } = props
 
   if (widget) {
     return (
@@ -49,6 +53,7 @@ const DeviceEvents = props => {
       paused={paused}
       onClear={onClear}
       onPauseToggle={onPauseToggle}
+      truncated={truncated}
       scoped
       widget
     />
@@ -68,6 +73,7 @@ DeviceEvents.propTypes = {
   onClear: PropTypes.func.isRequired,
   onPauseToggle: PropTypes.func.isRequired,
   paused: PropTypes.bool.isRequired,
+  truncated: PropTypes.bool.isRequired,
   widget: PropTypes.bool,
 }
 
@@ -89,6 +95,7 @@ export default connect(
       appId,
       events: selectDeviceEvents(state, combinedId),
       paused: selectDeviceEventsPaused(state, combinedId),
+      truncated: selectDeviceEventsTruncated(state, combinedId),
     }
   },
   (dispatch, ownProps) => {

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import axios from 'axios'
-import { cloneDeep, get } from 'lodash'
+import { cloneDeep, get, isObject } from 'lodash'
 
 import { URI_PREFIX_STACK_COMPONENT_MAP, STACK_COMPONENTS_MAP } from '../util/constants'
 import EventHandler from '../util/events'
@@ -117,10 +117,12 @@ class Http {
         // Augment the default error with config entries as well as the stack component
         // abbreviation that threw an error.
         // TODO: Consider changing this, see https://github.com/TheThingsNetwork/lorawan-stack/issues/3424.
-        error.request_details = {
-          url: get(err, 'response.config.url'),
-          method: get(err, 'response.config.method'),
-          stack_component: parsedComponent,
+        if (isObject(error)) {
+          error.request_details = {
+            url: get(err, 'response.config.url'),
+            method: get(err, 'response.config.method'),
+            stack_component: parsedComponent,
+          }
         }
 
         throw error

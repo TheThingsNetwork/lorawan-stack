@@ -15,18 +15,13 @@
 package cookie
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/gorilla/securecookie"
-	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 )
 
 const (
-	// encoderKey is the key where the encoder will be stored on the request.
-	encoderKey = "cookie.encoder"
-
 	// tombstone is the cookie tombstone value.
 	tombstone = "<deleted>"
 )
@@ -46,42 +41,21 @@ type Cookie struct {
 	HTTPOnly bool
 }
 
-// Cookies is a middleware function that makes the handlers capable of handling cookies via
-// methods of this package.
-func Cookies(hashKey, blockKey []byte) echo.MiddlewareFunc {
-	s := securecookie.New(hashKey, blockKey)
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			c.Set(encoderKey, s)
-			return next(c)
-		}
-	}
-}
-
-func getConfig(c echo.Context) (*securecookie.SecureCookie, error) {
-	encoder, _ := c.Get(encoderKey).(*securecookie.SecureCookie)
-	if encoder == nil {
-		return nil, fmt.Errorf("No cookie.encoder set")
-	}
-
-	return encoder, nil
-}
-
 // Get decodes the cookie into the value. Returns false if the cookie is not there.
-func (d *Cookie) Get(c echo.Context, v interface{}) (bool, error) {
-	s, err := getConfig(c)
+func (d *Cookie) Get(w http.ResponseWriter, r *http.Request, v interface{}) (bool, error) {
+	s, err := webmiddleware.GetSecureCookie(r.Context())
 	if err != nil {
 		return false, err
 	}
 
-	cookie, err := c.Request().Cookie(d.Name)
+	cookie, err := r.Cookie(d.Name)
 	if err != nil || cookie.Value == tombstone {
 		return false, nil
 	}
 
 	err = s.Decode(d.Name, cookie.Value, v)
 	if err != nil {
-		d.Remove(c)
+		d.Remove(w, r)
 		return false, nil
 	}
 
@@ -89,8 +63,8 @@ func (d *Cookie) Get(c echo.Context, v interface{}) (bool, error) {
 }
 
 // Set the value of the cookie.
-func (d *Cookie) Set(c echo.Context, v interface{}) error {
-	s, err := getConfig(c)
+func (d *Cookie) Set(w http.ResponseWriter, r *http.Request, v interface{}) error {
+	s, err := webmiddleware.GetSecureCookie(r.Context())
 	if err != nil {
 		return err
 	}
@@ -100,7 +74,7 @@ func (d *Cookie) Set(c echo.Context, v interface{}) error {
 		return err
 	}
 
-	http.SetCookie(c.Response().Writer, &http.Cookie{
+	http.SetCookie(w, &http.Cookie{
 		Name:     d.Name,
 		Path:     d.Path,
 		MaxAge:   int(d.MaxAge.Nanoseconds() / 1000),
@@ -112,18 +86,18 @@ func (d *Cookie) Set(c echo.Context, v interface{}) error {
 }
 
 // Exists checks if the cookies exists.
-func (d *Cookie) Exists(c echo.Context) bool {
-	cookie, err := c.Request().Cookie(d.Name)
+func (d *Cookie) Exists(r *http.Request) bool {
+	cookie, err := r.Cookie(d.Name)
 	return err == nil && cookie.Value != tombstone
 }
 
 // Remove the cookie with the specified name (if it exists).
-func (d *Cookie) Remove(c echo.Context) {
-	if !d.Exists(c) {
+func (d *Cookie) Remove(w http.ResponseWriter, r *http.Request) {
+	if !d.Exists(r) {
 		return
 	}
 
-	http.SetCookie(c.Response().Writer, &http.Cookie{
+	http.SetCookie(w, &http.Cookie{
 		Name:     d.Name,
 		Path:     d.Path,
 		HttpOnly: d.HTTPOnly,
@@ -135,7 +109,7 @@ func (d *Cookie) Remove(c echo.Context) {
 	// Additionally, explicitly remove the cookie also from the current path.
 	// This can be necessary to also remove old cookies when the cookie paths
 	// have been changed.
-	http.SetCookie(c.Response().Writer, &http.Cookie{
+	http.SetCookie(w, &http.Cookie{
 		Name:     d.Name,
 		HttpOnly: d.HTTPOnly,
 		Value:    tombstone,
