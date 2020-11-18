@@ -108,7 +108,7 @@ func (s *QueuedSink) Run(ctx context.Context) error {
 					return
 				case req := <-s.Queue:
 					if err := s.Target.Process(req); err != nil {
-						log.FromContext(ctx).WithError(err).Warn("Failed to process message")
+						log.FromContext(req.Context()).WithError(err).Warn("Failed to process message")
 					}
 				}
 			}
@@ -325,7 +325,7 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest(http.MethodPost, finalURL.String(), bytes.NewReader(buf))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, finalURL.String(), bytes.NewReader(buf))
 	if err != nil {
 		return nil, err
 	}

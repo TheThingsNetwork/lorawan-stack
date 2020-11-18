@@ -134,11 +134,6 @@ func (c *connection) setup(ctx context.Context) error {
 			select {
 			case <-ctx.Done():
 				return
-			case <-c.io.Context().Done():
-				err := c.io.Context().Err()
-				cancel(err)
-				logger.WithError(err).Debug("Subscription canceled")
-				return
 			case up := <-c.io.Up():
 				logger := logger.WithField("device_uid", unique.ID(up.Context, up.EndDeviceIdentifiers))
 				var topicParts []string
@@ -190,11 +185,7 @@ func (c *connection) setup(ctx context.Context) error {
 			select {
 			case <-ctx.Done():
 				return
-			case pkt, ok := <-controlCh:
-				if !ok {
-					controlCh = nil
-					continue
-				}
+			case pkt := <-controlCh:
 				err = c.mqtt.Send(pkt)
 			case pkt, ok := <-c.session.PublishChan():
 				if !ok {
@@ -204,11 +195,6 @@ func (c *connection) setup(ctx context.Context) error {
 				err = c.mqtt.Send(pkt)
 			}
 			if err != nil {
-				if err != stdio.EOF {
-					logger.WithError(err).Error("Send failed, closing session")
-				} else {
-					logger.Info("Disconnected")
-				}
 				cancel(err)
 				return
 			}
@@ -219,6 +205,7 @@ func (c *connection) setup(ctx context.Context) error {
 	go func() {
 		select {
 		case <-ctx.Done():
+			logger.WithError(ctx.Err()).Info("Disconnected")
 			c.session.Close()
 			c.mqtt.Close()
 		}

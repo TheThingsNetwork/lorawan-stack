@@ -145,10 +145,7 @@ func (c *connection) setup(ctx context.Context) (err error) {
 		defer recoverMQTTFrontend(ctx)
 		for {
 			select {
-			case <-c.io.Context().Done():
-				err := c.io.Context().Err()
-				cancel(err)
-				logger.WithError(err).Debug("Done sending downlink")
+			case <-ctx.Done():
 				return
 			case down := <-c.io.Down():
 				buf, err := c.format.FromDownlink(down, c.io.Gateway().GatewayIdentifiers)
@@ -176,11 +173,7 @@ func (c *connection) setup(ctx context.Context) (err error) {
 			select {
 			case <-ctx.Done():
 				return
-			case pkt, ok := <-controlCh:
-				if !ok {
-					controlCh = nil
-					continue
-				}
+			case pkt := <-controlCh:
 				err = c.mqtt.Send(pkt)
 			case pkt, ok := <-c.session.PublishChan():
 				if !ok {
@@ -190,11 +183,6 @@ func (c *connection) setup(ctx context.Context) (err error) {
 				err = c.mqtt.Send(pkt)
 			}
 			if err != nil {
-				if err != stdio.EOF {
-					logger.WithError(err).Error("Send failed, close session")
-				} else {
-					logger.Info("Disconnected")
-				}
 				cancel(err)
 				return
 			}
@@ -205,6 +193,7 @@ func (c *connection) setup(ctx context.Context) (err error) {
 	go func() {
 		select {
 		case <-ctx.Done():
+			logger.WithError(ctx.Err()).Info("Disconnected")
 			c.session.Close()
 			c.mqtt.Close()
 		}
