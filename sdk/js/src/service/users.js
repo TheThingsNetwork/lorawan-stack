@@ -109,6 +109,16 @@ class Users {
     })
     return Marshaler.unwrapUser(response)
   }
+
+  // Miscellaneous.
+
+  async getRightsById(userId) {
+    const result = await this._api.UserAccess.ListRights({
+      routeParams: { user_id: userId },
+    })
+
+    return Marshaler.unwrapRights(result)
+  }
 }
 
 export default Users
