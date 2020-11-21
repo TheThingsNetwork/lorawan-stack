@@ -268,6 +268,7 @@ export default {
     applications: ttnClient.Applications.getRightsById.bind(ttnClient.Applications),
     gateways: ttnClient.Gateways.getRightsById.bind(ttnClient.Gateways),
     organizations: ttnClient.Organizations.getRightsById.bind(ttnClient.Organizations),
+    users: ttnClient.Users.getRightsById.bind(ttnClient.Users),
   },
   configuration: {
     listNsFrequencyPlans: ttnClient.Configuration.listNsFrequencyPlans.bind(
