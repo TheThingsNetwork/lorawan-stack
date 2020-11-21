@@ -121,6 +121,13 @@ export default {
     delete: ttnClient.Users.deleteById.bind(ttnClient.Users),
     search: ttnClient.Users.search.bind(ttnClient.Users),
     authInfo: ttnClient.Auth.getAuthInfo.bind(ttnClient.Auth),
+    apiKeys: {
+      get: ttnClient.Users.ApiKeys.getById.bind(ttnClient.Users.ApiKeys),
+      list: ttnClient.Users.ApiKeys.getAll.bind(ttnClient.Users.ApiKeys),
+      update: ttnClient.Users.ApiKeys.updateById.bind(ttnClient.Users.ApiKeys),
+      delete: ttnClient.Users.ApiKeys.deleteById.bind(ttnClient.Users.ApiKeys),
+      create: ttnClient.Users.ApiKeys.create.bind(ttnClient.Users.ApiKeys),
+    },
   },
   applications: {
     list: ttnClient.Applications.getAll.bind(ttnClient.Applications),
