@@ -11,16 +11,22 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Reset functionality in Network Server, which resets session context and MAC state (see `ttn-lw-cli end-devices reset` command). For OTAA all data is wiped and device must rejoin, for ABP session keys, device address and downlink queue are preserved, while MAC state is reset.
+
 ### Changed
+
+- Network Server does not store `recent_uplinks`, `recent_adr_uplinks` and `recent_downlinks` anymore.
+- Improved Network Server downlink task performance.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
-- Uplink frame counter reset handling.
 
+- Uplink frame counter reset handling.
 - Uplink retransmission handling in Network Server.
+- Network Server DevStatusReq scheduling conditions in relation to frame counter value.
 
 ### Security
 
@@ -29,7 +35,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - More password validation rules in the user management form in the Console.
-- Reset functionality in Network Server, which resets session context and MAC state (see `ttn-lw-cli end-devices reset` command). For OTAA all data is wiped and device must rejoin, for ABP session keys, device address and downlink queue are preserved, while MAC state is reset.
 
 ### Changed
 
@@ -87,8 +92,6 @@ For details about compatibility between different releases, see the **Commitment
 - Pausing event streams is not saving up arriving events during the pause anymore.
 - Gateway server can now update the gateway location only if the gateway is authenticated.
 - Right to manage links on Application Server is now `RIGHT_APPLICATION_SETTINGS_BASIC`.
-- Network Server does not store `recent_uplinks`, `recent_adr_uplinks` and `recent_downlinks` anymore.
-- Improved Network Server downlink task performance.
 
 ### Removed
 
@@ -112,7 +115,6 @@ For details about compatibility between different releases, see the **Commitment
 - Overwriting values in the end device wizard in the Console.
 - Redirect loops when logging out of the Console if the Console OAuth client had no logout redirect URI(s) set.
 - Event selection not working properly when the event stream is paused in the Console.
-- Network Server DevStatusReq scheduling conditions in relation to frame counter value.
 
 ## [3.9.4] - 2020-09-23
 
