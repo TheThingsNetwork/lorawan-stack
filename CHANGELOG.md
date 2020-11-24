@@ -20,6 +20,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 - Uplink frame counter reset handling.
 
+- Uplink retransmission handling in Network Server.
+
 ### Security
 
 ## [3.10.1] - 2020-11-19
