@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"math"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -72,31 +71,6 @@ func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.Uplink
 	return true, nil
 }
 
-// transmissionNumber returns the number of the transmission up would represent if appended to ups
-// and the time of the last transmission of phyPayload in ups, if such is found.
-func transmissionNumber(phyPayload []byte, ups ...*ttnpb.UplinkMessage) (uint32, time.Time, error) {
-	if len(phyPayload) < 4 {
-		return 0, time.Time{}, errRawPayloadTooShort.New()
-	}
-
-	nb := uint32(1)
-	var lastTrans time.Time
-	for i := len(ups) - 1; i >= 0; i-- {
-		up := ups[i]
-		if len(up.RawPayload) < 4 {
-			return 0, time.Time{}, errRawPayloadTooShort.New()
-		}
-		if !bytes.Equal(phyPayload[:len(phyPayload)-4], up.RawPayload[:len(up.RawPayload)-4]) {
-			break
-		}
-		nb++
-		if up.ReceivedAt.After(lastTrans) {
-			lastTrans = up.ReceivedAt
-		}
-	}
-	return nb, lastTrans, nil
-}
-
 func maxTransmissionNumber(ver ttnpb.MACVersion, confirmed bool, nbTrans uint32) uint32 {
 	if !confirmed {
 		return nbTrans
@@ -109,14 +83,6 @@ func maxTransmissionNumber(ver ttnpb.MACVersion, confirmed bool, nbTrans uint32)
 
 func maxRetransmissionDelay(rxDelay ttnpb.RxDelay) time.Duration {
 	return rxDelay.Duration() + time.Second + retransmissionWindow
-}
-
-func fCntResetGap(last, recv uint32) uint32 {
-	if math.MaxUint32-last < recv {
-		return last + recv
-	} else {
-		return math.MaxUint32
-	}
 }
 
 func matchCmacF(ctx context.Context, fNwkSIntKey types.AES128Key, macVersion ttnpb.MACVersion, fCnt uint32, up *ttnpb.UplinkMessage) ([4]byte, bool) {
@@ -263,14 +229,34 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 
 		maxNbTrans := maxTransmissionNumber(dev.MACState.LoRaWANVersion, up.Payload.MType == ttnpb.MType_CONFIRMED_UP, dev.MACState.CurrentParameters.ADRNbTrans)
 		ctx = log.NewContextWithField(ctx, "max_transmissions", maxNbTrans)
-		nbTrans, lastAt, err := transmissionNumber(up.RawPayload, dev.MACState.RecentUplinks...)
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Failed to determine transmission number, skip")
-			return nil, false, nil
+
+		nbTrans := uint32(1)
+		var (
+			lastAt             time.Time
+			recentUpPHYPayload []byte
+		)
+		for i := len(dev.MACState.RecentUplinks) - 1; i >= 0; i-- {
+			recentUp := dev.MACState.RecentUplinks[i]
+			recentUpPHYPayload, err = lorawan.AppendMessage(recentUpPHYPayload[:0], *recentUp.Payload)
+			if err != nil {
+				log.FromContext(ctx).WithError(err).Error("Failed to marshal recent uplink payload, skip")
+				return nil, false, nil
+			}
+			if len(recentUpPHYPayload) < 4 {
+				log.FromContext(ctx).Error("Length of marshaled recent uplink payload is too short, skip")
+				return nil, false, nil
+			}
+			if !bytes.Equal(up.RawPayload, recentUpPHYPayload[:len(recentUpPHYPayload)-4]) {
+				break
+			}
+			nbTrans++
+			if recentUp.ReceivedAt.After(lastAt) {
+				lastAt = recentUp.ReceivedAt
+			}
 		}
 		ctx = log.NewContextWithField(ctx, "transmission", nbTrans)
 		if nbTrans >= 2 && lastAt.IsZero() {
-			log.FromContext(ctx).Debug("Repeated FCnt value, but frame is not a retransmission, skip")
+			log.FromContext(ctx).Error("Unknown transmission delay, skip")
 			return nil, false, nil
 		}
 
@@ -385,14 +371,17 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		dev.MACState = macState
 		dev.Session.StartedAt = up.ReceivedAt
 
+		fCntGap = cmacFMatchResult.FullFCnt
 		session = dev.Session
-		fCntGap = fCntResetGap(dev.Session.LastFCntUp, cmacFMatchResult.FullFCnt)
 
 	default:
 		panic(fmt.Sprintf("invalid data uplink match type '%v'", cmacFMatchResult.MatchType))
 	}
 	if dev.MACState.LoRaWANVersion.HasMaxFCntGap() && uint(fCntGap) > phy.MaxFCntGap {
-		log.FromContext(ctx).Debug("FCnt gap exceeds maximum after reset, skip")
+		log.FromContext(ctx).WithFields(log.Fields(
+			"f_cnt_gap", fCntGap,
+			"max_f_cnt_gap", phy.MaxFCntGap,
+		)).Debug("FCnt gap exceeds maximum after reset, skip")
 		return nil, false, nil
 	}
 

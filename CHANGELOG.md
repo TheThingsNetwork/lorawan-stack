@@ -11,6 +11,23 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+- Uplink frame counter reset handling.
+
+- Uplink retransmission handling in Network Server.
+
+### Security
+
+## [3.10.1] - 2020-11-19
+
+### Added
+
 - More password validation rules in the user management form in the Console.
 - Reset functionality in Network Server, which resets session context and MAC state (see `ttn-lw-cli end-devices reset` command). For OTAA all data is wiped and device must rejoin, for ABP session keys, device address and downlink queue are preserved, while MAC state is reset.
 
@@ -20,23 +37,18 @@ For details about compatibility between different releases, see the **Commitment
 - Application Server will unwrap the AppSKey if it can, even if skipping payload crypto is enabled. This is to avoid upstream applications to receive wrapped keys they cannot unwrap. For end-to-end encryption, configure Join Servers with wrap keys unknown to the Application Server.
 - More precise payload labels for event previews in the Console.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Next button title in the end device wizard in the Console.
 - Navigation to the user edit page after creation in the Console.
-- The port number of the `--http.redirect-to-host` option was ignored when `--http.redirect-to-tls` was used. This could lead to situations where the HTTPS server would always redirect to port 443, even if a different one was specified.
-  - If the HTTPS server is available on `https://thethings.example.com:8443`, the following config is required: `--http.redirect-to-tls --http.redirect-to-host=thethings.example.com:8443`.
+- The port number of the `http.redirect-to-host` option was ignored when `http.redirect-to-tls` was used. This could lead to situations where the HTTPS server would always redirect to port 443, even if a different one was specified.
+  - If the HTTPS server is available on `https://thethings.example.com:8443`, the following flags (or equivalent environment variables or configuration options) are required: `--http.redirect-to-tls --http.redirect-to-host=thethings.example.com:8443`.
 - Status display on the error view in the Console.
 - Event views in the Console freezing after receiving thousands of events.
 - Wrong FPort value displayed for downlink attempt events in the Console.
 - Network Server sending duplicate application downlink NACKs.
 - Network Server now sends downlink NACK when it assumes confirmed downlink is lost.
-
-### Security
+- Network Server application uplink drainage.
 
 ## [3.10.0] - 2020-11-02
 
@@ -61,6 +73,7 @@ For details about compatibility between different releases, see the **Commitment
 - Support for Application Activation Settings in the Join Server to configure Application Server KEK, ID and Home NetID.
 - Downlink queue invalidated message sent upstream by Application Server to support applications to re-encrypt the downlink queue when Application Server skips FRMPayload crypto.
 - Navigation to errored step in the end device wizard in the Console.
+- Reference available glossary entries for form fields in the Console.
 
 ### Changed
 
@@ -1157,7 +1170,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.0...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.1...HEAD
+[3.10.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.0...v3.10.1
 [3.10.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.4...v3.10.0
 [3.9.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.3...v3.9.4
 [3.9.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.1...v3.9.3

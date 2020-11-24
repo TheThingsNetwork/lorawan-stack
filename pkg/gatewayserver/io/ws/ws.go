@@ -272,6 +272,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				dnmsg, err := s.formatter.FromDownlink(sessionCtx, uid, *down, concentratorTime, dlTime)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
+					continue
 				}
 
 				logger.Info("Send downlink message")

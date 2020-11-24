@@ -22,7 +22,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 @withRouter
 class ErrorView extends React.Component {
   static propTypes = {
-    ErrorComponent: PropTypes.func.isRequired,
+    ErrorComponent: PropTypes.oneOfType([PropTypes.elementType, PropTypes.func]).isRequired,
     children: PropTypes.node.isRequired,
     history: PropTypes.history.isRequired,
   }

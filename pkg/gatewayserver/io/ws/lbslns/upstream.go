@@ -534,14 +534,13 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 		}
 		session.DataMu.Unlock()
 		recordTime(txConf.RefTime, txConf.XTime, receivedAt)
-		return nil, err
 
 	case TypeUpstreamProprietaryDataFrame, TypeUpstreamRemoteShell, TypeUpstreamTimeSync:
 		logger.WithField("message_type", typ).Debug("Message type not implemented")
-		break
+
 	default:
 		logger.WithField("message_type", typ).Debug("Unknown message type")
-		break
+
 	}
 	return nil, nil
 }
