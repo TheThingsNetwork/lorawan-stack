@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"math"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -109,14 +108,6 @@ func maxTransmissionNumber(ver ttnpb.MACVersion, confirmed bool, nbTrans uint32)
 
 func maxRetransmissionDelay(rxDelay ttnpb.RxDelay) time.Duration {
 	return rxDelay.Duration() + time.Second + retransmissionWindow
-}
-
-func fCntResetGap(last, recv uint32) uint32 {
-	if math.MaxUint32-last < recv {
-		return last + recv
-	} else {
-		return math.MaxUint32
-	}
 }
 
 func matchCmacF(ctx context.Context, fNwkSIntKey types.AES128Key, macVersion ttnpb.MACVersion, fCnt uint32, up *ttnpb.UplinkMessage) ([4]byte, bool) {
@@ -385,14 +376,17 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		dev.MACState = macState
 		dev.Session.StartedAt = up.ReceivedAt
 
+		fCntGap = cmacFMatchResult.FullFCnt
 		session = dev.Session
-		fCntGap = fCntResetGap(dev.Session.LastFCntUp, cmacFMatchResult.FullFCnt)
 
 	default:
 		panic(fmt.Sprintf("invalid data uplink match type '%v'", cmacFMatchResult.MatchType))
 	}
 	if dev.MACState.LoRaWANVersion.HasMaxFCntGap() && uint(fCntGap) > phy.MaxFCntGap {
-		log.FromContext(ctx).Debug("FCnt gap exceeds maximum after reset, skip")
+		log.FromContext(ctx).WithFields(log.Fields(
+			"f_cnt_gap", fCntGap,
+			"max_f_cnt_gap", phy.MaxFCntGap,
+		)).Debug("FCnt gap exceeds maximum after reset, skip")
 		return nil, false, nil
 	}
 
