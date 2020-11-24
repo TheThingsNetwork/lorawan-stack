@@ -76,7 +76,7 @@ const initialValues = {
   password_confirm: '',
 }
 
-const getSuccessMessage = function(state) {
+const getSuccessMessage = state => {
   switch (state) {
     case 'STATE_REQUESTED':
       return m.registrationPending

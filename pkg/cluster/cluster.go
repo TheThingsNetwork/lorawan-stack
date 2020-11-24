@@ -198,6 +198,18 @@ func (c *cluster) loadKeys(ctx context.Context, keys ...string) error {
 	return nil
 }
 
+func (c *cluster) getTLSServerName(target string) string {
+	tlsServerName := c.tlsServerName
+	if tlsServerName == "" {
+		colonPos := strings.LastIndex(target, ":")
+		if colonPos < 0 {
+			colonPos = len(target)
+		}
+		tlsServerName = target[:colonPos]
+	}
+	return tlsServerName
+}
+
 func (c *cluster) addPeer(name string, target string, roles ...ttnpb.ClusterRole) {
 	if target == "" {
 		return
@@ -211,19 +223,11 @@ func (c *cluster) addPeer(name string, target string, roles ...ttnpb.ClusterRole
 	if len(filteredRoles) == 0 {
 		return
 	}
-	tlsServerName := c.tlsServerName
-	if tlsServerName == "" {
-		colonPos := strings.LastIndex(target, ":")
-		if colonPos < 0 {
-			colonPos = len(target)
-		}
-		tlsServerName = target[:colonPos]
-	}
 	c.peers[name] = &peer{
 		name:          name,
 		target:        target,
 		roles:         filteredRoles,
-		tlsServerName: tlsServerName,
+		tlsServerName: c.getTLSServerName(target),
 	}
 }
 

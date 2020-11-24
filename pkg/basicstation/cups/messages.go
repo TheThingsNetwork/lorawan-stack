@@ -23,6 +23,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"math"
+	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -84,7 +85,7 @@ func TokenCredentials(trust *x509.Certificate, authorization string) ([]byte, er
 	out = append(out, trust.Raw...)
 	// TODO: Refactor when client side TLS is supported https://github.com/TheThingsNetwork/lorawan-stack/issues/137
 	out = append(out, emptyClientCert...)
-	out = append(out, []byte(fmt.Sprintf("%s%s%s", "Authorization: ", authorization, "\r\n"))...)
+	out = append(out, []byte(fmt.Sprintf("%s%s%s", "Authorization: ", strings.TrimRight(authorization, "\r\n"), "\r\n"))...)
 	return out, nil
 }
 

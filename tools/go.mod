@@ -15,7 +15,7 @@ replace gopkg.in/DATA-DOG/go-sqlmock.v1 => gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.
 replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v13.3.1+incompatible
 
 // TODO: Remove once https://github.com/magefile/mage/pull/307 is merged.
-replace github.com/magefile/mage v1.9.1 => github.com/TheThingsIndustries/mage v1.9.1-0.20200520191129-8bccc5d0bd6f
+replace github.com/magefile/mage => github.com/TheThingsIndustries/mage v1.10.0
 
 // Dependency of lorawan-stack.
 replace gocloud.dev => gocloud.dev v0.19.0
@@ -33,7 +33,7 @@ require (
 	github.com/gobuffalo/envy v1.9.0 // indirect
 	github.com/gohugoio/hugo v0.71.0
 	github.com/goreleaser/goreleaser v0.140.1
-	github.com/magefile/mage v1.9.1
+	github.com/magefile/mage v1.10.0
 	github.com/mattn/goveralls v0.0.5
 	github.com/mdempsky/unconvert v0.0.0-20200228143138-95ecdbfc0b5f
 	github.com/mgechev/revive v1.0.2
