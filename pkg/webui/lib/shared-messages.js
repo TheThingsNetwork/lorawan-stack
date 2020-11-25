@@ -267,6 +267,7 @@ export default defineMessages({
   payloadFormattersUpdateFailure: 'There was an error updating the payload formatter',
   payloadFormattersUpdateSuccess: 'Payload formatter updated',
   payloadFormattersUplink: 'Uplink payload formatters',
+  personalApiKeys: 'Personal API keys',
   phyVersion: 'Regional Parameters version',
   phyVersionDescription:
     'The Regional Parameters version (PHY), as provided by the device manufacturer',

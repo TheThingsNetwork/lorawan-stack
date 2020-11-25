@@ -37,7 +37,7 @@ import { selectUser } from '@console/store/selectors/user'
 
 @withRouter
 @connect(
-  function(state) {
+  state => {
     const user = selectUser(state)
     if (Boolean(user)) {
       return {
@@ -138,6 +138,11 @@ class Header extends Component {
             path="/admin/user-management"
           />
         )}
+        <Dropdown.Item
+          title={sharedMessages.personalApiKeys}
+          icon="api_keys"
+          path="/user/api-keys"
+        />
         <Dropdown.Item title={sharedMessages.logout} icon="logout" action={handleLogout} />
       </React.Fragment>
     )
@@ -157,6 +162,11 @@ class Header extends Component {
             />
           </React.Fragment>
         )}
+        <Dropdown.Item
+          title={sharedMessages.personalApiKeys}
+          icon="api_keys"
+          path="/user/api-keys"
+        />
       </React.Fragment>
     )
 
