@@ -210,7 +210,7 @@ type RFConfig struct {
 	Type        string  `json:"type,omitempty"`
 	Frequency   uint64  `json:"freq"`
 	RSSIOffset  float32 `json:"rssi_offset"`
-	TxEnable    bool    `json:"tx_enable"`
+	TxEnable    bool    `json:"tx_enable,omitempty"`
 	TxFreqMin   uint64  `json:"tx_freq_min,omitempty"`
 	TxFreqMax   uint64  `json:"tx_freq_max,omitempty"`
 	TxNotchFreq uint64  `json:"tx_notch_freq,omitempty"`
