@@ -38,7 +38,7 @@ func (Dev) Misspell() error {
 	return runGoTool("github.com/client9/misspell/cmd/misspell", "-w", "-i", "mosquitto",
 		".editorconfig",
 		".gitignore",
-		".goreleaser.yml",
+		".goreleaser.release.yml",
 		".revive.toml",
 		".travis.yml",
 		"api",
