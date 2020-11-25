@@ -39,6 +39,7 @@ func (Dev) Misspell() error {
 		".editorconfig",
 		".gitignore",
 		".goreleaser.release.yml",
+		".goreleaser.snapshot.yml",
 		".revive.toml",
 		".travis.yml",
 		"api",
