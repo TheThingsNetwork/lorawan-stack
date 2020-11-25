@@ -26,7 +26,7 @@ const defaultState = {
   rights: undefined,
 }
 
-const user = function(state = defaultState, { type, payload }) {
+const user = (state = defaultState, { type, payload }) => {
   switch (type) {
     case GET_USER_ME:
       return {

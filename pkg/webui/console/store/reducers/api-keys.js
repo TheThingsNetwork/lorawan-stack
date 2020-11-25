@@ -30,7 +30,7 @@ const apiKey = (state = {}, apiKey) => ({
   ...apiKey,
 })
 
-const apiKeys = function(state = defaultState, { type, payload }) {
+const apiKeys = (state = defaultState, { type, payload }) => {
   switch (type) {
     case GET_API_KEY:
       return {
