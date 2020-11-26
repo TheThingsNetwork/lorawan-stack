@@ -53,7 +53,7 @@ var DefaultClusterConfig = cluster.Config{}
 var DefaultHTTPConfig = config.HTTP{
 	Listen:         ":1885",
 	ListenTLS:      ":8885",
-	TrustedProxies: []string{"10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"},
+	TrustedProxies: []string{"127.0.0.0/8", "10.0.0.0/8", "100.64.0.0/10", "172.16.0.0/12", "192.168.0.0/16"},
 	Static: config.HTTPStaticConfig{
 		Mount:      "/assets",
 		SearchPath: []string{"public", "/srv/ttn-lorawan/public"},
