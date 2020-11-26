@@ -155,6 +155,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		errors.StreamServerInterceptor(),
 		// NOTE: All middleware that works with lorawan-stack/pkg/errors errors must be placed below.
 		sentrymiddleware.StreamServerInterceptor(),
+		grpc_recovery.StreamServerInterceptor(recoveryOpts...),
 		validator.StreamServerInterceptor(),
 		hooks.StreamServerInterceptor(),
 	}
@@ -171,6 +172,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		errors.UnaryServerInterceptor(),
 		// NOTE: All middleware that works with lorawan-stack/pkg/errors errors must be placed below.
 		sentrymiddleware.UnaryServerInterceptor(),
+		grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
 		validator.UnaryServerInterceptor(),
 		hooks.UnaryServerInterceptor(),
 	}
@@ -189,16 +191,10 @@ func New(ctx context.Context, opts ...Option) *Server {
 			Timeout:           20 * time.Second,
 		}),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
-			append(
-				append(streamInterceptors, options.streamInterceptors...),
-				grpc_recovery.StreamServerInterceptor(recoveryOpts...),
-			)...,
+			append(streamInterceptors, options.streamInterceptors...)...,
 		)),
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			append(
-				append(unaryInterceptors, options.unaryInterceptors...),
-				grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
-			)...,
+			append(unaryInterceptors, options.unaryInterceptors...)...,
 		)),
 	}
 	server.Server = grpc.NewServer(append(baseOptions, options.serverOptions...)...)
