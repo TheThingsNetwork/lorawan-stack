@@ -77,7 +77,7 @@ class FormField extends React.Component {
     onChange: PropTypes.func,
     readOnly: PropTypes.bool,
     required: PropTypes.bool,
-    title: PropTypes.message.isRequired,
+    title: PropTypes.message,
     warning: PropTypes.message,
   }
 
@@ -93,6 +93,7 @@ class FormField extends React.Component {
     glossaryId: '',
     readOnly: false,
     required: false,
+    title: undefined,
   }
 
   componentDidMount() {
@@ -182,6 +183,7 @@ class FormField extends React.Component {
     const hasWarning = Boolean(warning)
     const hasDescription = Boolean(description)
     const hasGlossaryTerm = Boolean(glossaryId)
+    const hasTitle = Boolean(title)
 
     const showError = fieldTouched && hasError
     const showWarning = !hasError && hasWarning
