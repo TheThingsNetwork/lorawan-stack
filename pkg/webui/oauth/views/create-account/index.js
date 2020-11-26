@@ -191,7 +191,6 @@ export default class CreateAccount extends React.PureComponent {
               initialValues={initialValues}
               error={error}
               validationSchema={validationSchema}
-              horizontal={false}
             >
               <Form.Field
                 component={Input}

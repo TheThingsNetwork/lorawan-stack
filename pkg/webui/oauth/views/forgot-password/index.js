@@ -115,7 +115,6 @@ export default class ForgotPassword extends React.PureComponent {
               error={error}
               info={info}
               validationSchema={validationSchema}
-              horizontal={false}
             >
               <Form.Field
                 title={sharedMessages.userId}
