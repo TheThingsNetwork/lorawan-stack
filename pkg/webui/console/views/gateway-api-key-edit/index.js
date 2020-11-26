@@ -47,7 +47,7 @@ import {
 } from '@console/store/selectors/api-keys'
 
 @connect(
-  function(state, props) {
+  (state, props) => {
     const apiKeyId = props.match.params.apiKeyId
     const keyFetching = selectApiKeyFetching(state)
     const rightsFetching = selectGatewayRightsFetching(state)

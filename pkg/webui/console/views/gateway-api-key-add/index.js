@@ -42,7 +42,7 @@ import {
 } from '@console/store/selectors/gateways'
 
 @connect(
-  (state, props) => ({
+  state => ({
     gtwId: selectSelectedGatewayId(state),
     fetching: selectGatewayRightsFetching(state),
     error: selectGatewayRightsError(state),
