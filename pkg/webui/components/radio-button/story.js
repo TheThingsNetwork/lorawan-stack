@@ -68,7 +68,7 @@ storiesOf('Radio', module)
   .add('Group (vertical)', () => (
     <div>
       <div style={{ padding: '20px' }}>
-        <RadioGroup name="radio" initialValue="1" horizontal={false}>
+        <RadioGroup name="radio" initialValue="1">
           <Radio label="Radio 1" value="1" />
           <Radio label="Radio 2" value="2" />
           <Radio label="Radio 3" value="3" />
@@ -76,7 +76,7 @@ storiesOf('Radio', module)
         </RadioGroup>
       </div>
       <div style={{ padding: '20px' }}>
-        <RadioGroup name="radio-with-disabled" initialValue="1" horizontal={false}>
+        <RadioGroup name="radio-with-disabled" initialValue="1">
           <Radio label="Radio 1" value="1" />
           <Radio label="Radio 2" value="2" disabled />
           <Radio label="Radio 3" value="3" disabled />
@@ -84,7 +84,7 @@ storiesOf('Radio', module)
         </RadioGroup>
       </div>
       <div style={{ padding: '20px' }}>
-        <RadioGroup name="radio-all-disabled" initialValue="1" disabled horizontal={false}>
+        <RadioGroup name="radio-all-disabled" initialValue="1" disabled>
           <Radio label="Radio 1" value="1" />
           <Radio label="Radio 2" value="2" />
           <Radio label="Radio 3" value="3" />
