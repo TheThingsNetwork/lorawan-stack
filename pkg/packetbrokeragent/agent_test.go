@@ -37,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"gopkg.in/square/go-jose.v2"
@@ -324,8 +325,8 @@ func TestForwarder(t *testing.T) {
 		a := assertions.New(t)
 
 		token := test.Must(json.Marshal(GatewayUplinkToken{
-			GatewayID: "test-gateway",
-			Token:     []byte{0x1, 0x2, 0x3, 0x4},
+			GatewayUID: unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}),
+			Token:      []byte{0x1, 0x2, 0x3, 0x4},
 		})).([]byte)
 		tokenObj := test.Must(tokenEncrypter.Encrypt(token)).(*jose.JSONWebEncryption)
 		tokenCompact := test.Must(tokenObj.CompactSerialize()).(string)

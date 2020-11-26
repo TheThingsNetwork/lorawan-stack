@@ -53,6 +53,11 @@ const (
 // TenantContextFiller fills the parent context based on the tenant ID.
 type TenantContextFiller func(parent context.Context, tenantID string) (context.Context, error)
 
+type downlinkMessage struct {
+	*agentUplinkToken
+	*packetbroker.DownlinkMessage
+}
+
 // Agent implements the Packet Broker Agent component, acting as Home Network.
 //
 // Agent exposes the GsPba and NsPba interfaces for forwarding uplink and subscribing to uplink.
@@ -71,8 +76,8 @@ type Agent struct {
 
 	tenantContextFillers []TenantContextFiller
 
-	upstreamCh   chan *ttnpb.GatewayUplinkMessage
-	downstreamCh chan *ttnpb.DownlinkMessage
+	upstreamCh   chan *packetbroker.UplinkMessage
+	downstreamCh chan *downlinkMessage
 
 	grpc struct {
 		nsPba ttnpb.NsPbaServer
@@ -131,7 +136,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		devAddrPrefixes:   devAddrPrefixes,
 	}
 	if a.forwarderConfig.Enable {
-		a.upstreamCh = make(chan *ttnpb.GatewayUplinkMessage, upstreamBufferSize)
+		a.upstreamCh = make(chan *packetbroker.UplinkMessage, upstreamBufferSize)
 		if len(a.forwarderConfig.TokenKey) == 0 {
 			a.forwarderConfig.TokenKey = random.Bytes(16)
 			logger.WithField("token_key", hex.EncodeToString(a.forwarderConfig.TokenKey)).Warn("No token key configured, generated a random one")
@@ -158,13 +163,15 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		}
 	}
 	if a.homeNetworkConfig.Enable {
-		a.downstreamCh = make(chan *ttnpb.DownlinkMessage, downstreamBufferSize)
+		a.downstreamCh = make(chan *downlinkMessage, downstreamBufferSize)
 	}
 	a.grpc.nsPba = &nsPbaServer{
 		downstreamCh: a.downstreamCh,
 	}
 	a.grpc.gsPba = &gsPbaServer{
-		upstreamCh: a.upstreamCh,
+		tokenEncrypter:   a.forwarderConfig.TokenEncrypter,
+		messageEncrypter: a,
+		upstreamCh:       a.upstreamCh,
 	}
 	for _, opt := range opts {
 		opt(a)
@@ -259,7 +266,7 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 	logger := log.FromContext(ctx)
 	logger.Info("Connected as Forwarder")
 
-	uplinkCh := make(chan *ttnpb.GatewayUplinkMessage)
+	uplinkCh := make(chan *packetbroker.UplinkMessage)
 	defer close(uplinkCh)
 
 	wg := &sync.WaitGroup{}
@@ -295,7 +302,7 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 	}
 }
 
-func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn, uplinkCh <-chan *ttnpb.GatewayUplinkMessage) error {
+func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn, uplinkCh <-chan *packetbroker.UplinkMessage) error {
 	logger := log.FromContext(ctx)
 	client := packetbroker.NewRouterForwarderDataClient(conn)
 	for {
@@ -304,16 +311,7 @@ func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn
 			return ctx.Err()
 		case <-time.After(workerIdleTimeout):
 			return nil
-		case up := <-uplinkCh:
-			msg, err := toPBUplink(ctx, up, a.forwarderConfig)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to convert outgoing uplink message")
-				continue
-			}
-			if err := a.encryptUplink(ctx, msg); err != nil {
-				logger.WithError(err).Warn("Failed to encrypt outgoing uplink message")
-				continue
-			}
+		case msg := <-uplinkCh:
 			req := &packetbroker.PublishUplinkMessageRequest{
 				ForwarderNetId:    a.netID.MarshalNumber(),
 				ForwarderId:       a.clusterID,
@@ -437,15 +435,20 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 		}
 	}
 
-	ids, msg, err := fromPBDownlink(ctx, down.Message, receivedAt, a.forwarderConfig)
+	uid, msg, err := fromPBDownlink(ctx, down.Message, receivedAt, a.forwarderConfig)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to convert incoming downlink message")
+		return err
+	}
+	ids, err := unique.ToGatewayID(uid)
+	if err != nil {
+		logger.WithField("gateway_uid", uid).WithError(err).Warn("Failed to get gateway identifier")
 		return err
 	}
 
 	req := msg.GetRequest()
 	pairs := []interface{}{
-		"gateway_uid", unique.ID(ctx, ids),
+		"gateway_uid", uid,
 		"attempt_rx1", req.Rx1Frequency != 0,
 		"attempt_rx2", req.Rx2Frequency != 0,
 		"downlink_class", req.Class,
@@ -747,7 +750,7 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 	logger := log.FromContext(ctx)
 	logger.Info("Connected as Home Network")
 
-	downlinkCh := make(chan *ttnpb.DownlinkMessage)
+	downlinkCh := make(chan *downlinkMessage)
 	defer close(downlinkCh)
 
 	wg := &sync.WaitGroup{}
@@ -783,7 +786,7 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 	}
 }
 
-func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientConn, downlinkCh <-chan *ttnpb.DownlinkMessage) error {
+func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientConn, downlinkCh <-chan *downlinkMessage) error {
 	logger := log.FromContext(ctx)
 	client := packetbroker.NewRouterHomeNetworkDataClient(conn)
 	for {
@@ -793,11 +796,7 @@ func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientCo
 		case <-time.After(workerIdleTimeout):
 			return nil
 		case down := <-downlinkCh:
-			msg, token, err := toPBDownlink(ctx, down)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to convert outgoing downlink message")
-				continue
-			}
+			msg, token := down.DownlinkMessage, down.agentUplinkToken
 			logger := logger.WithFields(log.Fields(
 				"forwarder_net_id", token.ForwarderNetID,
 				"forwarder_tenant_id", token.ForwarderTenantID,

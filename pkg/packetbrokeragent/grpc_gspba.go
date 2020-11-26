@@ -19,14 +19,23 @@ import (
 	"fmt"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	packetbroker "go.packetbroker.org/api/v3"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"gopkg.in/square/go-jose.v2"
 )
 
+type messageEncrypter interface {
+	encryptUplink(context.Context, *packetbroker.UplinkMessage) error
+}
+
 type gsPbaServer struct {
-	upstreamCh chan *ttnpb.GatewayUplinkMessage
+	tokenEncrypter   jose.Encrypter
+	messageEncrypter messageEncrypter
+	upstreamCh       chan *packetbroker.UplinkMessage
 }
 
 var errForwarderDisabled = errors.DefineFailedPrecondition("forwarder_disabled", "Forwarder is disabled")
@@ -47,10 +56,20 @@ func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplink
 	)...)
 	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
 
+	msg, err := toPBUplink(ctx, up, s.tokenEncrypter)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to convert outgoing uplink message")
+		return nil, err
+	}
+	if err := s.messageEncrypter.encryptUplink(ctx, msg); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to encrypt outgoing uplink message")
+		return nil, err
+	}
+
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
-	case s.upstreamCh <- up:
+	case s.upstreamCh <- msg:
 		return ttnpb.Empty, nil
 	}
 }
