@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"path"
 
+	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"google.golang.org/grpc/codes"
@@ -58,10 +59,16 @@ func newLoggerForCall(ctx context.Context, logger log.Interface, fullMethodStrin
 		if requestID := md["x-request-id"]; len(requestID) > 0 {
 			logger = logger.WithField("request_id", requestID[0])
 		}
+		if xRealIP := md["x-real-ip"]; len(xRealIP) > 0 {
+			logger = logger.WithField("peer.real_ip", xRealIP[0])
+		}
 	}
-	return log.NewContext(ctx, logger.WithFields(log.Fields(
-		"grpc_service", service,
-		"grpc_method", method,
+
+	return log.NewContext(ctx, logger.WithFields(
+		(&log.F{}).With(grpc_ctxtags.Extract(ctx).Values()),
+	).WithFields(log.Fields(
+		"grpc.service", service,
+		"grpc.method", method,
 	)))
 }
 

@@ -31,7 +31,7 @@ func UnaryClientInterceptor(ctx context.Context, opts ...Option) grpc.UnaryClien
 		startTime := time.Now()
 		err := invoker(newCtx, method, req, reply, cc, opts...)
 		logFields := []interface{}{
-			"duration", time.Since(startTime),
+			"duration", time.Since(startTime).Round(time.Microsecond * 100),
 		}
 		if err != nil {
 			logFields = append(logFields, logFieldsForError(err)...)
@@ -56,7 +56,7 @@ func StreamClientInterceptor(ctx context.Context, opts ...Option) grpc.StreamCli
 		clientStream, err := streamer(newCtx, desc, cc, method, opts...)
 		if err != nil {
 			logFields := []interface{}{
-				"duration", time.Since(startTime),
+				"duration", time.Since(startTime).Round(time.Microsecond * 100),
 			}
 			logFields = append(logFields, logFieldsForError(err)...)
 			level := o.levelFunc(o.codeFunc(err))

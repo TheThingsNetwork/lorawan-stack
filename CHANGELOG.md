@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Log field consistency for HTTP and gRPC request logs.
+
 ### Deprecated
 
 ### Removed

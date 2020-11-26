@@ -55,13 +55,12 @@ func verifySuccess(t *testing.T, e log.Entry) {
 	a.So(e.Level(), should.Equal, log.InfoLevel)
 	a.So(e.Message(), should.Equal, "Request handled")
 	fields := e.Fields().Fields()
-	for _, key := range []string{"method", "url", "remote_addr", "request_id", "status", "duration", "response_size"} {
+	for _, key := range []string{"http.method", "http.path", "peer.address", "request_id", "http.status", "duration"} {
 		a.So(fields, should.ContainKey, key)
 	}
-	a.So(fields["method"], should.Equal, http.MethodGet)
-	a.So(fields["url"], should.Equal, "/")
-	a.So(fields["status"], should.Equal, http.StatusOK)
-	a.So(fields["response_size"], should.Equal, 0)
+	a.So(fields["http.method"], should.Equal, http.MethodGet)
+	a.So(fields["http.path"], should.Equal, "/")
+	a.So(fields["http.status"], should.Equal, http.StatusOK)
 }
 
 func verifyClientError(t *testing.T, e log.Entry) {
@@ -99,7 +98,7 @@ func TestLog(t *testing.T) {
 			validate: func(t *testing.T) {
 				ch.Expect(t, func(t *testing.T, e log.Entry) {
 					verifySuccess(t, e)
-					assertions.New(t).So(e.Fields().Fields()["remote_addr"], should.Equal, "192.0.2.1")
+					assertions.New(t).So(e.Fields().Fields()["peer.address"], should.Equal, "192.0.2.1:1234")
 				})
 			},
 		},
@@ -115,7 +114,7 @@ func TestLog(t *testing.T) {
 			validate: func(t *testing.T) {
 				ch.Expect(t, func(t *testing.T, e log.Entry) {
 					verifySuccess(t, e)
-					assertions.New(t).So(e.Fields().Fields()["remote_addr"], should.Equal, "12.34.56.78")
+					assertions.New(t).So(e.Fields().Fields()["peer.real_ip"], should.Equal, "12.34.56.78")
 				})
 			},
 		},
