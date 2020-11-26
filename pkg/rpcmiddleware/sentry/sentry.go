@@ -79,7 +79,7 @@ func reportError(ctx context.Context, method string, err error) {
 	}
 	for k, v := range grpc_ctxtags.Extract(ctx).Values() {
 		if val := fmt.Sprint(v); len(val) < 64 {
-			errEvent.Tags["tag."+k] = val
+			errEvent.Tags[k] = val
 		}
 	}
 
