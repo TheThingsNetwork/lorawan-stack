@@ -400,7 +400,6 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 }
 
 func (a *Agent) handleDownlink(ctx context.Context, downlinkCh <-chan *packetbroker.RoutedDownlinkMessage) error {
-	logger := log.FromContext(ctx)
 	for {
 		select {
 		case <-ctx.Done():
@@ -417,10 +416,10 @@ func (a *Agent) handleDownlink(ctx context.Context, downlinkCh <-chan *packetbro
 			ctx = log.NewContextWithFields(ctx, log.Fields(
 				"message_id", down.Id,
 				"from_home_network_net_id", homeNetworkNetID,
-				"from_home_network_tenant_id", down.HomeNetworkNetId,
+				"from_home_network_tenant_id", down.HomeNetworkTenantId,
 			))
 			if err := a.handleDownlinkMessage(ctx, down); err != nil {
-				logger.WithError(err).Debug("Failed to handle incoming downlink message")
+				log.FromContext(ctx).WithError(err).Debug("Failed to handle incoming downlink message")
 			}
 		}
 	}
@@ -440,7 +439,7 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 
 	ids, msg, err := fromPBDownlink(ctx, down.Message, receivedAt, a.forwarderConfig)
 	if err != nil {
-		logger.WithError(err).Warn("Failed to convert incoming uplink message")
+		logger.WithError(err).Warn("Failed to convert incoming downlink message")
 		return err
 	}
 
@@ -470,6 +469,7 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 
 	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, ids)
 	if err != nil {
+		logger.WithError(err).Warn("Failed to get Gateway Server peer")
 		return err
 	}
 	res, err := ttnpb.NewNsGsClient(conn).ScheduleDownlink(ctx, msg, a.WithClusterAuth())
@@ -798,6 +798,11 @@ func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientCo
 				logger.WithError(err).Warn("Failed to convert outgoing downlink message")
 				continue
 			}
+			logger := logger.WithFields(log.Fields(
+				"forwarder_net_id", token.ForwarderNetID,
+				"forwarder_tenant_id", token.ForwarderTenantID,
+				"forwarder_id", token.ForwarderID,
+			))
 			req := &packetbroker.PublishDownlinkMessageRequest{
 				HomeNetworkNetId:    a.netID.MarshalNumber(),
 				HomeNetworkTenantId: a.tenantID,
