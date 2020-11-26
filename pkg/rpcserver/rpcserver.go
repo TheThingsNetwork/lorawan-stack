@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"net/textproto"
 	"os"
 	"runtime/debug"
 	"time"
@@ -197,6 +198,22 @@ func New(ctx context.Context, opts ...Option) *Server {
 				URI:  req.RequestURI,
 			}
 			return md.ToMetadata()
+		}),
+		runtime.WithIncomingHeaderMatcher(func(s string) (string, bool) {
+			s = textproto.CanonicalMIMEHeaderKey(s)
+			switch s {
+			case "Forwarded",
+				"X-Request-Id",
+				"X-Forwarded-For",
+				"X-Real-Ip",
+				"X-Forwarded-Host",
+				"X-Forwarded-Proto",
+				"X-Forwarded-Client-Cert",
+				"X-Forwarded-Tls-Client-Cert",
+				"X-Forwarded-Tls-Client-Cert-Info":
+				return s, true
+			}
+			return runtime.DefaultHeaderMatcher(s)
 		}),
 		runtime.WithOutgoingHeaderMatcher(func(s string) (string, bool) {
 			// NOTE: When adding headers, also add them to CORSConfig in ../component/grpc.go.
