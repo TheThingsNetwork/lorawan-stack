@@ -15,24 +15,16 @@
 .group
   display: flex
   flex-direction: column
-  margin-bottom: $cs.s * -1
   flex-wrap: wrap
-  position: relative
-  top: 'calc(%s / 2)' % $cs.s
+  margin-top: $cs.xxs
 
-  +media-query($bp.m)
-    top: 0
-    margin-top: $cs.xs
-
-  .group-radio
-    margin-bottom: $cs.s
-
-    &:not(:last-child)
-      margin-right: $cs.m
+  &:not(.horizontal)
+    .group-radio:not(:last-child)
+      margin-bottom: $cs.xs
 
   &.horizontal
     flex-direction: row
     align-items: center
 
-  &:not(:last-child)
-    margin-bottom: 0
+    .group-radio:not(:last-child)
+      margin-right: $cs.m
