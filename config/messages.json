@@ -6922,7 +6922,7 @@
   },
   "error:pkg/toa:bandwidth": {
     "translations": {
-      "en": "invalid bandwidth"
+      "en": "invalid bandwidth `{bandwidth}`"
     },
     "description": {
       "package": "pkg/toa",
@@ -6931,7 +6931,7 @@
   },
   "error:pkg/toa:coding_rate": {
     "translations": {
-      "en": "invalid coding rate"
+      "en": "invalid coding rate `{coding_rate}`"
     },
     "description": {
       "package": "pkg/toa",
@@ -6940,7 +6940,7 @@
   },
   "error:pkg/toa:frequency": {
     "translations": {
-      "en": "invalid frequency"
+      "en": "invalid frequency `{frequency}`"
     },
     "description": {
       "package": "pkg/toa",
@@ -6949,7 +6949,7 @@
   },
   "error:pkg/toa:spreading_factor": {
     "translations": {
-      "en": "invalid spreading factor"
+      "en": "invalid spreading factor `{spreading_factor}`"
     },
     "description": {
       "package": "pkg/toa",

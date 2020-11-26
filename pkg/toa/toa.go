@@ -37,18 +37,18 @@ func Compute(payloadSize int, settings ttnpb.TxSettings) (d time.Duration, err e
 }
 
 var (
-	errBandwidth       = errors.DefineInvalidArgument("bandwidth", "invalid bandwidth")
-	errSpreadingFactor = errors.DefineInvalidArgument("spreading_factor", "invalid spreading factor")
-	errCodingRate      = errors.DefineInvalidArgument("coding_rate", "invalid coding rate")
-	errFrequency       = errors.DefineInvalidArgument("frequency", "invalid frequency")
+	errBandwidth       = errors.DefineInvalidArgument("bandwidth", "invalid bandwidth `{bandwidth}`")
+	errSpreadingFactor = errors.DefineInvalidArgument("spreading_factor", "invalid spreading factor `{spreading_factor}`")
+	errCodingRate      = errors.DefineInvalidArgument("coding_rate", "invalid coding rate `{coding_rate}`")
+	errFrequency       = errors.DefineInvalidArgument("frequency", "invalid frequency `{frequency}`")
 )
 
 func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandwidth uint32, codingRate string, crc bool) (time.Duration, error) {
 	if spreadingFactor < 5 || spreadingFactor > 12 {
-		return 0, errSpreadingFactor.New()
+		return 0, errSpreadingFactor.WithAttributes("spreading_factor", spreadingFactor)
 	}
 	if bandwidth == 0 {
-		return 0, errBandwidth.New()
+		return 0, errBandwidth.WithAttributes("bandwidth", bandwidth)
 	}
 
 	switch {
@@ -65,7 +65,7 @@ func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandw
 		case "4/8":
 			cr = 4
 		default:
-			return 0, errCodingRate.New()
+			return 0, errCodingRate.WithAttributes("coding_rate", codingRate)
 		}
 		var de float64
 		if bandwidth == 125000 && (spreadingFactor == 11 || spreadingFactor == 12) {
@@ -126,7 +126,7 @@ func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandw
 		return time.Duration(timeOnAir), nil
 
 	default:
-		return 0, errFrequency.New()
+		return 0, errFrequency.WithAttributes("frequency", frequency)
 	}
 }
 
@@ -137,6 +137,6 @@ func computeFSK(payloadSize int, frequency uint64, bitRate uint32, crc bool) (ti
 		return time.Duration(timeOnAir), nil
 
 	default:
-		return 0, errFrequency.New()
+		return 0, errFrequency.WithAttributes("frequency", frequency)
 	}
 }
