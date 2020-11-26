@@ -58,7 +58,6 @@ func init() {
 
 type options struct {
 	contextFillers     []fillcontext.Filler
-	fieldExtractor     grpc_ctxtags.RequestFieldExtractorFunc
 	streamInterceptors []grpc.StreamServerInterceptor
 	unaryInterceptors  []grpc.UnaryServerInterceptor
 	serverOptions      []grpc.ServerOption
@@ -79,13 +78,6 @@ func WithServerOptions(serverOptions ...grpc.ServerOption) Option {
 func WithContextFiller(contextFillers ...fillcontext.Filler) Option {
 	return func(o *options) {
 		o.contextFillers = append(o.contextFillers, contextFillers...)
-	}
-}
-
-// WithFieldExtractor sets a field extractor
-func WithFieldExtractor(fieldExtractor grpc_ctxtags.RequestFieldExtractorFunc) Option {
-	return func(o *options) {
-		o.fieldExtractor = fieldExtractor
 	}
 }
 
@@ -125,7 +117,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	}
 	server := &Server{ctx: ctx}
 	ctxtagsOpts := []grpc_ctxtags.Option{
-		grpc_ctxtags.WithFieldExtractor(options.fieldExtractor),
+		grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor),
 	}
 	recoveryOpts := []grpc_recovery.Option{
 		grpc_recovery.WithRecoveryHandler(func(p interface{}) (err error) {
