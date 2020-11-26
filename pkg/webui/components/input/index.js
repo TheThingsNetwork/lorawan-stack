@@ -50,7 +50,6 @@ class Input extends React.Component {
     disabled: PropTypes.bool,
     error: PropTypes.bool,
     forwardedRef: PropTypes.shape({}),
-    horizontal: PropTypes.bool,
     icon: PropTypes.string,
     intl: PropTypes.shape({
       formatMessage: PropTypes.func,
@@ -93,7 +92,6 @@ class Input extends React.Component {
     value: '',
     warning: false,
     forwardedRef: null,
-    horizontal: true,
   }
 
   state = {
@@ -139,7 +137,6 @@ class Input extends React.Component {
       loading,
       title,
       intl,
-      horizontal,
       code,
       action,
       forwardedRef,
