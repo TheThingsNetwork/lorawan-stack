@@ -50,12 +50,12 @@ func newLoggerForCall(ctx context.Context, logger log.Interface, fullMethodStrin
 	service := path.Dir(fullMethodString)[1:]
 	method := path.Base(fullMethodString)
 	if md, ok := metadata.FromOutgoingContext(ctx); ok {
-		if requestID := md["request-id"]; len(requestID) > 0 {
+		if requestID := md["x-request-id"]; len(requestID) > 0 {
 			logger = logger.WithField("request_id", requestID[0])
 		}
 	}
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		if requestID := md["request-id"]; len(requestID) > 0 {
+		if requestID := md["x-request-id"]; len(requestID) > 0 {
 			logger = logger.WithField("request_id", requestID[0])
 		}
 	}

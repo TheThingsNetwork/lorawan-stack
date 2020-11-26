@@ -18,13 +18,13 @@ import (
 	"context"
 	"crypto/rand"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	ulid "github.com/oklog/ulid/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
-const requestIDKey = "request-id"
+const requestIDKey = "x-request-id"
 
 // RequestIDUnaryServerInterceptor returns a new unary server interceptor that inserts Request IDs if not present.
 func RequestIDUnaryServerInterceptor() grpc.UnaryServerInterceptor {
