@@ -62,6 +62,7 @@ type options struct {
 	streamInterceptors []grpc.StreamServerInterceptor
 	unaryInterceptors  []grpc.UnaryServerInterceptor
 	serverOptions      []grpc.ServerOption
+	trustedProxies     []string
 	logIgnoreMethods   []string
 }
 
@@ -96,6 +97,13 @@ func WithUnaryInterceptors(interceptors ...grpc.UnaryServerInterceptor) Option {
 	}
 }
 
+// WithTrustedProxies adds trusted proxies from which proxy headers are trusted.
+func WithTrustedProxies(cidrs ...string) Option {
+	return func(o *options) {
+		o.trustedProxies = append(o.trustedProxies, cidrs...)
+	}
+}
+
 // WithLogIgnoreMethods sets a list of methods for which no log messages are printed on success.
 func WithLogIgnoreMethods(methods []string) Option {
 	return func(o *options) {
@@ -120,6 +128,8 @@ func New(ctx context.Context, opts ...Option) *Server {
 	ctxtagsOpts := []grpc_ctxtags.Option{
 		grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor),
 	}
+	var proxyHeaders rpcmiddleware.ProxyHeaders
+	proxyHeaders.ParseAndAddTrusted(options.trustedProxies...)
 	recoveryOpts := []grpc_recovery.Option{
 		grpc_recovery.WithRecoveryHandler(func(p interface{}) (err error) {
 			fmt.Fprintln(os.Stderr, p)
@@ -137,6 +147,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		rpcfillcontext.StreamServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
 		rpcmiddleware.RequestIDStreamServerInterceptor(),
+		proxyHeaders.StreamServerInterceptor(),
 		grpc_opentracing.StreamServerInterceptor(),
 		events.StreamServerInterceptor,
 		rpclog.StreamServerInterceptor(ctx, rpclog.WithIgnoreMethods(options.logIgnoreMethods)),
@@ -151,6 +162,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		rpcfillcontext.UnaryServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
 		rpcmiddleware.RequestIDUnaryServerInterceptor(),
+		proxyHeaders.UnaryServerInterceptor(),
 		grpc_opentracing.UnaryServerInterceptor(),
 		events.UnaryServerInterceptor,
 		rpclog.UnaryServerInterceptor(ctx, rpclog.WithIgnoreMethods(options.logIgnoreMethods)),

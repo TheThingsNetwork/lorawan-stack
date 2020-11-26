@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- gRPC middleware to extract proxy headers from trusted proxies. This adds a configuration `grpc.trusted-proxies` that is similar to the existing `http.trusted-proxies` option.
+
 ### Changed
 
 - Log field consistency for HTTP and gRPC request logs.

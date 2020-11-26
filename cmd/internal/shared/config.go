@@ -76,8 +76,9 @@ var DefaultInteropServerConfig = config.InteropServer{
 
 // DefaultGRPCConfig is the default config for GRPC.
 var DefaultGRPCConfig = config.GRPC{
-	Listen:    ":1884",
-	ListenTLS: ":8884",
+	Listen:         ":1884",
+	ListenTLS:      ":8884",
+	TrustedProxies: []string{"127.0.0.0/8", "10.0.0.0/8", "100.64.0.0/10", "172.16.0.0/12", "192.168.0.0/16"},
 }
 
 // DefaultRedisConfig is the default config for Redis.
