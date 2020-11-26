@@ -194,6 +194,13 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 		return err
 	}
 
+	if dryRun, _ := cmd.Flags().GetBool("dry-run"); dryRun {
+		if err = io.Write(os.Stdout, config.OutputFormat, upMsg); err != nil {
+			return err
+		}
+		return nil
+	}
+
 	gs, err := api.Dial(ctx, config.GatewayServerGRPCAddress)
 	if err != nil {
 		return err
@@ -649,5 +656,6 @@ func init() {
 	simulateCommand.AddCommand(simulateDataUplinkCommand)
 
 	simulateCommand.PersistentFlags().String("gateway-api-key", "", "API key used for linking the gateway (optional when using user authentication)")
+	simulateCommand.PersistentFlags().Bool("dry-run", false, "print the message instead of sending it")
 	Root.AddCommand(simulateCommand)
 }
