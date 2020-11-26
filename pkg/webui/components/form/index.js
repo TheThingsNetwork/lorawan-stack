@@ -40,7 +40,6 @@ class InnerForm extends React.PureComponent {
     formError: PropTypes.error,
     formInfo: PropTypes.message,
     handleSubmit: PropTypes.func.isRequired,
-    horizontal: PropTypes.bool,
     isSubmitting: PropTypes.bool.isRequired,
     isValid: PropTypes.bool.isRequired,
   }
@@ -49,7 +48,6 @@ class InnerForm extends React.PureComponent {
     className: undefined,
     formError: '',
     formInfo: '',
-    horizontal: true,
   }
 
   constructor(props) {
@@ -78,15 +76,7 @@ class InnerForm extends React.PureComponent {
   }
 
   render() {
-    const {
-      className,
-      children,
-      formError,
-      formInfo,
-      horizontal,
-      handleSubmit,
-      ...rest
-    } = this.props
+    const { className, children, formError, formInfo, handleSubmit, ...rest } = this.props
 
     return (
       <form className={classnames(style.container, className)} onSubmit={handleSubmit}>
@@ -99,7 +89,6 @@ class InnerForm extends React.PureComponent {
         <FormContext.Provider
           value={{
             ...rest,
-            horizontal,
           }}
         >
           {children}
@@ -111,13 +100,12 @@ class InnerForm extends React.PureComponent {
 
 const formRenderer = ({ children, ...rest }) =>
   function(renderProps) {
-    const { className, horizontal, error, info, disabled } = rest
+    const { className, error, info, disabled } = rest
     const { handleSubmit, ...restFormikProps } = renderProps
 
     return (
       <InnerForm
         className={className}
-        horizontal={horizontal}
         formError={error}
         formInfo={info}
         handleSubmit={handleSubmit}
