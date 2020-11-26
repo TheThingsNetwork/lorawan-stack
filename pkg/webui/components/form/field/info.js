@@ -42,9 +42,9 @@ class InfoField extends React.Component {
 
   render() {
     const { children, className, title, disabled: fieldDisabled } = this.props
-    const { horizontal, disabled: formDisabled } = this.context
+    const { disabled: formDisabled } = this.context
     const disabled = formDisabled || fieldDisabled
-    const cls = classnames(className, style.field, from(style, { horizontal, disabled }))
+    const cls = classnames(className, style.field, from(style, { disabled }))
 
     return (
       <div className={cls}>

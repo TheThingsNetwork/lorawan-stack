@@ -12,36 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-+media-query-min($bp.xxs)
-  .horizontal.field
-    flex-direction: row
-    justify-content: space-between
-    flex-wrap: nowrap
-
-    &.horizontal
-      .label-container, .info-area
-        padding-top: $cs.xxs
-
-    &.required
-      .label::after
-        padding-top: $cs.xxs
-
-    .title
-      font-weight: $fw.normal
-
-    .component-area
-      display: flex
-      flex-grow: 1
-      width: calc(100% - 14rem)
-      flex-direction: column
-
-    .label
-      display: flex
-      width: 14rem
-      font-weight: $fw.normal
-
 .field
-  margin-bottom: $cs.l
+  margin-bottom: $ls.xxs
   display: flex
   flex-wrap: wrap
   width: 100%
@@ -54,22 +26,33 @@
 
   &.required
     .label::after
-      content: '·'
-      display: inline
-      margin-left: $cs.xxs
-      color: $c-active-blue
-      font-weight: 800
+      nudge('down')
+      content: '*'
+      font-size: $fs.l
+      display: inline-block
+      line-height: 1
+      color: $c-error
+
+  &:not(.has-glossary-term)
+    &.required
+      .label::after
+        margin-left: 0.1rem
 
 .label
-  display: flex
+  display: block
   align-items: flex-start
   width:  100%
   flex-shrink: 0
   user-select: none
+  margin-bottom: $cs.xxs
 
-.label-container
-  display: flex
-  align-items: center
+  .title
+    display: inline-block
+
+  .glossary-link
+    nudge('down', 2px)
+    display: inline-block
+    text-decoration: none
 
 .description
   font-weight: $fw.normal
@@ -113,10 +96,6 @@
     vertical-align: text-top
     flex-grow: 0
     flex-shrink: 0
-
-.glossary-link
-  display: block
-  text-decoration: none
 
 .err
   color: $c-error
