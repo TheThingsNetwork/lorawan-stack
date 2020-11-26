@@ -23,8 +23,6 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import toast from '@ttn-lw/components/toast'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import RightsGroup from '@console/components/rights-group'
 
 import Yup from '@ttn-lw/lib/yup'
@@ -158,13 +156,11 @@ export default class CollaboratorForm extends Component {
 
     return (
       <Form
-        horizontal
         error={error}
         onSubmit={this.handleSubmit}
         initialValues={this.computeInitialValues()}
         validationSchema={validationSchema}
       >
-        <Message component="h4" content={sharedMessages.generalInformation} />
         <Form.Field
           name="collaborator_id"
           component={Input}
@@ -178,7 +174,6 @@ export default class CollaboratorForm extends Component {
           name="collaborator_type"
           title={sharedMessages.type}
           component={Radio.Group}
-          horizontal={false}
           disabled={update}
           required
         >

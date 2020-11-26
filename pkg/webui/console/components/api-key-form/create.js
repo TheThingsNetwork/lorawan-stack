@@ -21,8 +21,6 @@ import FormSubmit from '@ttn-lw/components/form/submit'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import Input from '@ttn-lw/components/input'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import ApiKeyModal from '@console/components/api-key-modal'
 import RightsGroup from '@console/components/rights-group'
 
@@ -116,7 +114,6 @@ class CreateForm extends React.Component {
           validationSchema={validationSchema}
           initialValues={initialValues}
         >
-          <Message component="h4" content={sharedMessages.generalInformation} />
           <FormField
             title={sharedMessages.name}
             placeholder={sharedMessages.apiKeyNamePlaceholder}

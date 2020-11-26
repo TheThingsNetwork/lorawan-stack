@@ -47,4 +47,5 @@ export default defineMessages({
   alreadyExistsModalMessage:
     'A Pub/Sub with the ID "{id}" already exists. Do you wish to replace this Pub/Sub?',
   replacePubsub: 'Replace Pub/Sub',
+  useSecureConnection: 'Use secure connection',
 })

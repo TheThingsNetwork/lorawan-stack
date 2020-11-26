@@ -20,9 +20,7 @@ import { defineMessages } from 'react-intl'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Notification from '@ttn-lw/components/notification'
-
-import Message from '@ttn-lw/lib/components/message'
-import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import PageTitle from '@ttn-lw/components/page-title'
 
 import DeviceImporter from '@console/containers/device-importer'
 
@@ -33,8 +31,6 @@ import {
   selectDeviceTemplateFormats,
   selectDeviceTemplateFormatsFetching,
 } from '@console/store/selectors/device-template-formats'
-
-import style from './device-import.styl'
 
 const m = defineMessages({
   noTemplatesTitle: 'No end device templates found',
@@ -64,16 +60,7 @@ export default class DeviceAddBulk extends Component {
       !deviceTemplateFormatsFetching && Object.keys(deviceTemplateFormats).length === 0
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={sharedMessages.importDevices} />
-            <Message
-              className={style.title}
-              component="h2"
-              content={sharedMessages.importDevices}
-            />
-          </Col>
-        </Row>
+        <PageTitle title={sharedMessages.importDevices} />
         <Row>
           <Col lg={8} md={12}>
             {showEmptyWarning && (
