@@ -152,8 +152,9 @@ func New(ctx context.Context, opts ...Option) *Server {
 		events.StreamServerInterceptor,
 		rpclog.StreamServerInterceptor(ctx, rpclog.WithIgnoreMethods(options.logIgnoreMethods)),
 		metrics.StreamServerInterceptor,
-		sentrymiddleware.StreamServerInterceptor(),
 		errors.StreamServerInterceptor(),
+		// NOTE: All middleware that works with lorawan-stack/pkg/errors errors must be placed below.
+		sentrymiddleware.StreamServerInterceptor(),
 		validator.StreamServerInterceptor(),
 		hooks.StreamServerInterceptor(),
 	}
@@ -167,8 +168,9 @@ func New(ctx context.Context, opts ...Option) *Server {
 		events.UnaryServerInterceptor,
 		rpclog.UnaryServerInterceptor(ctx, rpclog.WithIgnoreMethods(options.logIgnoreMethods)),
 		metrics.UnaryServerInterceptor,
-		sentrymiddleware.UnaryServerInterceptor(),
 		errors.UnaryServerInterceptor(),
+		// NOTE: All middleware that works with lorawan-stack/pkg/errors errors must be placed below.
+		sentrymiddleware.UnaryServerInterceptor(),
 		validator.UnaryServerInterceptor(),
 		hooks.UnaryServerInterceptor(),
 	}
