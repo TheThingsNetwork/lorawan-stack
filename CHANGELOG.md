@@ -23,12 +23,16 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+### Security
+
+## [3.10.2] - 2020-11-27
+
+### Fixed
+
 - Uplink frame counter reset handling.
 - Uplink retransmission handling in Network Server.
 - DevAddr generation for NetID Type 3 and 4, according to errata.
 - HTTP header propagation (such as Request ID) to gRPC services.
-
-### Security
 
 ## [3.10.1] - 2020-11-19
 
@@ -1172,7 +1176,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.1...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.2...HEAD
+[3.10.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.1...v3.10.2
 [3.10.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.0...v3.10.1
 [3.10.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.4...v3.10.0
 [3.9.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.3...v3.9.4
