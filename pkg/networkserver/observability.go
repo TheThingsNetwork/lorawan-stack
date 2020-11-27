@@ -27,15 +27,6 @@ import (
 )
 
 var (
-	evtBeginApplicationLink = events.Define(
-		"ns.application.link.begin", "begin application link",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_LINK),
-	)
-	evtEndApplicationLink = events.Define(
-		"ns.application.link.end", "end application link",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_LINK),
-		events.WithErrorDataType(),
-	)
 	evtReceiveDataUplink = events.Define(
 		"ns.up.data.receive", "receive data message",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),

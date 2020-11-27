@@ -23,6 +23,7 @@ import (
 	"testing"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
@@ -71,14 +72,12 @@ var (
 	ErrRejoinRequest              = errRejoinRequest
 	ErrUnsupportedLoRaWANVersion  = errUnsupportedLoRaWANVersion
 
-	EvtBeginApplicationLink        = evtBeginApplicationLink
 	EvtClusterJoinAttempt          = evtClusterJoinAttempt
 	EvtClusterJoinFail             = evtClusterJoinFail
 	EvtClusterJoinSuccess          = evtClusterJoinSuccess
 	EvtCreateEndDevice             = evtCreateEndDevice
 	EvtDropDataUplink              = evtDropDataUplink
 	EvtDropJoinRequest             = evtDropJoinRequest
-	EvtEndApplicationLink          = evtEndApplicationLink
 	EvtForwardDataUplink           = evtForwardDataUplink
 	EvtForwardJoinAccept           = evtForwardJoinAccept
 	EvtInteropJoinAttempt          = evtInteropJoinAttempt
@@ -256,6 +255,12 @@ func NewJSPeer(ctx context.Context, js interface {
 	return test.Must(test.NewGRPCServerPeer(ctx, js, ttnpb.RegisterNsJsServer)).(cluster.Peer)
 }
 
+func NewASPeer(ctx context.Context, as interface {
+	ttnpb.NsAsServer
+}) cluster.Peer {
+	return test.Must(test.NewGRPCServerPeer(ctx, as, ttnpb.RegisterNsAsServer)).(cluster.Peer)
+}
+
 var _ InteropClient = MockInteropClient{}
 
 // MockInteropClient is a mock InteropClient used for testing.
@@ -406,6 +411,38 @@ func MakeNsGsScheduleDownlinkChFunc(reqCh chan<- NsGsScheduleDownlinkRequest) fu
 	}
 }
 
+var _ ttnpb.NsAsServer = &MockNsAsServer{}
+
+type MockNsAsServer struct {
+	HandleUplinkFunc func(context.Context, *ttnpb.NsAsHandleUplinkRequest) error
+}
+
+// ScheduleDownlink calls HandleUplinkFunc if set and panics otherwise.
+func (m MockNsAsServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHandleUplinkRequest) (*pbtypes.Empty, error) {
+	if m.HandleUplinkFunc == nil {
+		panic("HandleUplink called, but not set")
+	}
+	return ttnpb.Empty, m.HandleUplinkFunc(ctx, req)
+}
+
+type NsAsHandleUplinkRequest struct {
+	Context  context.Context
+	Request  *ttnpb.NsAsHandleUplinkRequest
+	Response chan<- error
+}
+
+func MakeNsAsHandleUplinkChFunc(reqCh chan<- NsAsHandleUplinkRequest) func(context.Context, *ttnpb.NsAsHandleUplinkRequest) error {
+	return func(ctx context.Context, req *ttnpb.NsAsHandleUplinkRequest) error {
+		respCh := make(chan error)
+		reqCh <- NsAsHandleUplinkRequest{
+			Context:  ctx,
+			Request:  req,
+			Response: respCh,
+		}
+		return <-respCh
+	}
+}
+
 type InteropClientEnvironment struct {
 	HandleJoinRequest <-chan InteropClientHandleJoinRequestRequest
 }
@@ -433,52 +470,28 @@ func AssertInteropClientHandleJoinRequestRequest(ctx context.Context, reqCh <-ch
 	}
 }
 
-func AssertProcessApplicationUp(ctx context.Context, link ttnpb.AsNs_LinkApplicationClient, assert func(context.Context, *ttnpb.ApplicationUp) bool) bool {
-	test.MustTFromContext(ctx).Helper()
-	return test.RunSubtestFromContext(ctx, test.SubtestConfig{
-		Name: "AsNs.LinkApplication.Recv",
-		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-			t.Helper()
-
-			var asUp *ttnpb.ApplicationUp
-			var err error
-			if !a.So(test.WaitContext(ctx, func() {
-				asUp, err = link.Recv()
-			}), should.BeTrue) {
-				t.Error("Timed out while waiting for application uplink to be sent to Application Server")
-				return
-			}
-			if !a.So(err, should.BeNil) {
-				t.Errorf("Failed to receive Application Server uplink: %s", err)
-				return
-			}
-			if !a.So(assert(ctx, asUp), should.BeTrue) {
-				t.Error("Application uplink assertion failed")
-				return
-			}
-			if !a.So(test.WaitContext(ctx, func() {
-				err = link.Send(ttnpb.Empty)
-			}), should.BeTrue) {
-				t.Error("Timed out while waiting for Network Server to process Application Server response")
-				return
-			}
-			if !a.So(err, should.BeNil) {
-				t.Errorf("Failed to send Application Server uplink response: %s", err)
-				return
-			}
-		},
-	})
-}
-
-func AssertProcessApplicationUps(ctx context.Context, link ttnpb.AsNs_LinkApplicationClient, asserts ...func(context.Context, *ttnpb.ApplicationUp) bool) bool {
-	t, a := test.MustNewTFromContext(ctx)
+func AssertNsAsHandleUplinkRequest(ctx context.Context, reqCh <-chan NsAsHandleUplinkRequest, assert func(ctx, reqCtx context.Context, req *ttnpb.NsAsHandleUplinkRequest) bool, err error) bool {
+	t := test.MustTFromContext(ctx)
 	t.Helper()
-	for _, assert := range asserts {
-		if !a.So(AssertProcessApplicationUp(ctx, link, assert), should.BeTrue) {
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for NsAs.HandleUplink to be called")
+		return false
+
+	case req := <-reqCh:
+		t.Log("NsAs.HandleUplink called")
+		if !assert(ctx, req.Context, req.Request) {
+			return false
+		}
+		select {
+		case req.Response <- err:
+			return true
+
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for NsAs.HandleUplink response to be processed")
 			return false
 		}
 	}
-	return !a.Failed()
 }
 
 func AssertNetworkServerClose(ctx context.Context, ns *NetworkServer) bool {
@@ -580,117 +593,49 @@ func (env TestEnvironment) AssertResetFactoryDefaults(ctx context.Context, req *
 	return dev, err, true
 }
 
-func (env TestEnvironment) AssertLinkApplication(ctx context.Context, appID ttnpb.ApplicationIdentifiers, replaceEvents ...events.Event) (ttnpb.AsNs_LinkApplicationClient, []string, bool) {
-	t, a := test.MustNewTFromContext(ctx)
-	t.Helper()
+func (env TestEnvironment) AssertNsAsHandleUplink(ctx context.Context, appID ttnpb.ApplicationIdentifiers, assert func(context.Context, ...*ttnpb.ApplicationUp) bool, err error) bool {
+	test.MustTFromContext(ctx).Helper()
+	return test.RunSubtestFromContext(ctx, test.SubtestConfig{
+		Name: "NsAs.HandleUplink",
+		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+			t.Helper()
 
-	listRightsCh := make(chan test.ApplicationAccessListRightsRequest)
-	defer func() {
-		close(listRightsCh)
-	}()
+			handleUplinkCh := make(chan NsAsHandleUplinkRequest)
+			defer func() {
+				close(handleUplinkCh)
+			}()
+			if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
+				func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (test.ClusterGetPeerResponse, bool) {
+					_, a := test.MustNewTFromContext(ctx)
+					return test.ClusterGetPeerResponse{
+							Peer: NewASPeer(ctx, &MockNsAsServer{
+								HandleUplinkFunc: MakeNsAsHandleUplinkChFunc(handleUplinkCh),
+							}),
+						}, test.AllTrue(
+							a.So(role, should.Equal, ttnpb.ClusterRole_APPLICATION_SERVER),
+							a.So(ids, should.Resemble, appID),
+						)
+				},
+			), should.BeTrue) {
+				t.Error("Application Server peer look-up assertion failed")
+				return
+			}
+			if !a.So(test.AssertClusterAuthRequest(ctx, env.Cluster.Auth, &grpc.EmptyCallOption{}), should.BeTrue) {
+				t.Error("Cluster.Auth call assertion failed")
+				return
+			}
 
-	var link ttnpb.AsNs_LinkApplicationClient
-	var err error
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		link, err = ttnpb.NewAsNsClient(env.ClientConn).LinkApplication(
-			(rpcmetadata.MD{
-				ID: appID.ApplicationID,
-			}).ToOutgoingContext(ctx),
-			grpc.PerRPCCredentials(rpcmetadata.MD{
-				AuthType:      "Bearer",
-				AuthValue:     "link-application-key",
-				AllowInsecure: true,
-			}),
-		)
-		wg.Done()
-	}()
-
-	var reqCIDs []string
-	if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
-		func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (test.ClusterGetPeerResponse, bool) {
-			_, a := test.MustNewTFromContext(ctx)
-			reqCIDs = events.CorrelationIDsFromContext(reqCtx)
-			return test.ClusterGetPeerResponse{
-					Peer: NewISPeer(ctx, &test.MockApplicationAccessServer{
-						ListRightsFunc: test.MakeApplicationAccessListRightsChFunc(listRightsCh),
-					}),
-				}, test.AllTrue(
-					a.So(reqCIDs, should.NotBeEmpty),
-					a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS),
-					a.So(ids, should.BeNil),
+			if !a.So(AssertNsAsHandleUplinkRequest(ctx, handleUplinkCh, func(ctx, reqCtx context.Context, req *ttnpb.NsAsHandleUplinkRequest) bool {
+				return test.AllTrue(
+					a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
+					assert(ctx, req.ApplicationUps...),
 				)
+			}, err), should.BeTrue) {
+				t.Error("Application uplink assertion failed")
+				return
+			}
 		},
-	), should.BeTrue) {
-		return nil, nil, false
-	}
-
-	if !a.So(test.AssertListRightsRequest(ctx, listRightsCh,
-		func(ctx, reqCtx context.Context, ids ttnpb.Identifiers) bool {
-			_, a := test.MustNewTFromContext(ctx)
-			md := rpcmetadata.FromIncomingContext(reqCtx)
-			cids := events.CorrelationIDsFromContext(reqCtx)
-			return a.So(cids, should.NotResemble, reqCIDs) &&
-				a.So(cids, should.NotBeEmpty) &&
-				a.So(md.AuthType, should.Equal, "Bearer") &&
-				a.So(md.AuthValue, should.Equal, "link-application-key") &&
-				a.So(ids, should.Resemble, &appID)
-		}, ttnpb.RIGHT_APPLICATION_LINK,
-	), should.BeTrue) {
-		return nil, nil, false
-	}
-
-	if !a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, 1+len(replaceEvents), func(evs ...events.Event) bool {
-		return a.So(evs, should.HaveSameElementsEvent, append(
-			[]events.Event{EvtBeginApplicationLink.NewWithIdentifiersAndData(events.ContextWithCorrelationID(test.Context(), reqCIDs...), appID, nil)},
-			replaceEvents...,
-		))
-	}), should.BeTrue) {
-		t.Error("AS link events assertion failed")
-		return nil, nil, false
-	}
-
-	if !a.So(test.WaitContext(ctx, wg.Wait), should.BeTrue) {
-		t.Error("Timed out while waiting for AS link to open")
-		return nil, nil, false
-	}
-	if !a.So(err, should.BeNil) {
-		t.Errorf("Link failed with: %s", err)
-		return nil, nil, false
-	}
-	return link, reqCIDs, true
-}
-
-func (env TestEnvironment) AssertWithApplicationLink(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f func(context.Context, ttnpb.AsNs_LinkApplicationClient) bool, replaceEvents ...events.Event) bool {
-	t, a := test.MustNewTFromContext(ctx)
-	t.Helper()
-
-	ctx, cancel := context.WithCancel(ctx)
-
-	var once sync.Once
-	defer once.Do(cancel)
-
-	link, linkCIDs, ok := env.AssertLinkApplication(ctx, appID, replaceEvents...)
-	if !test.AllTrue(
-		a.So(ok, should.BeTrue),
-		f(ctx, link),
-	) {
-		t.Error("Application link assertion failed")
-		return false
-	}
-	once.Do(cancel)
-	if !a.So(env.Events, should.ReceiveEventResembling,
-		EvtEndApplicationLink.New(
-			events.ContextWithCorrelationID(ctx, linkCIDs...),
-			events.WithIdentifiers(appID),
-			events.WithData(context.Canceled),
-		),
-	) {
-		t.Error("Link end event assertion failed")
-		return false
-	}
-	return !a.Failed()
+	})
 }
 
 type DownlinkPathWithPeerIndex struct {
@@ -1348,9 +1293,11 @@ func (env TestEnvironment) AssertNsJsJoin(ctx context.Context, getPeerAssert fun
 						getPeerAssert(ctx, reqCtx, ids),
 					)
 			}), should.BeTrue) {
+				t.Error("Join Server peer look-up assertion failed")
 				return
 			}
 			if !a.So(test.AssertClusterAuthRequest(ctx, env.Cluster.Auth, &grpc.EmptyCallOption{}), should.BeTrue) {
+				t.Error("Cluster.Auth call assertion failed")
 				return
 			}
 			select {
@@ -1378,7 +1325,6 @@ func (env TestEnvironment) AssertNsJsJoin(ctx context.Context, getPeerAssert fun
 }
 
 type JoinAssertionConfig struct {
-	Link           ttnpb.AsNs_LinkApplicationClient
 	Device         *ttnpb.EndDevice
 	ChannelIndex   uint8
 	DataRateIndex  ttnpb.DataRateIndex
@@ -1590,8 +1536,12 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 			}
 
 			var appUp *ttnpb.ApplicationUp
-			if !a.So(AssertProcessApplicationUp(ctx, conf.Link, func(ctx context.Context, up *ttnpb.ApplicationUp) bool {
+			if !a.So(env.AssertNsAsHandleUplink(ctx, conf.Device.ApplicationIdentifiers, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
+				if !a.So(ups, should.HaveLength, 1) {
+					return false
+				}
+				up := ups[0]
 				recvAt := up.GetJoinAccept().GetReceivedAt()
 				appUp = up
 				return test.AllTrue(
@@ -1609,7 +1559,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 						},
 					}),
 				)
-			}), should.BeTrue) {
+			}, nil), should.BeTrue) {
 				t.Error("Failed to send join-accept to Application Server")
 				return false
 			}
@@ -1623,7 +1573,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 				RemoteIP:       true,
 				UserAgent:      true,
 			}),
-				EvtForwardJoinAccept.NewWithIdentifiersAndData(conf.Link.Context(), idsWithDevAddr, &ttnpb.ApplicationUp{
+				EvtForwardJoinAccept.NewWithIdentifiersAndData(ctx, idsWithDevAddr, &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: idsWithDevAddr,
 					CorrelationIDs:       appUp.CorrelationIDs,
 					Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -1640,7 +1590,6 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 }
 
 type DataUplinkAssertionConfig struct {
-	Link           ttnpb.AsNs_LinkApplicationClient
 	Device         *ttnpb.EndDevice
 	ChannelIndex   uint8
 	DataRateIndex  ttnpb.DataRateIndex
@@ -1726,9 +1675,27 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 			}
 
 			deduplicatedUp := MakeDataUplink(deduplicatedUpConf)
+			if conf.Pending {
+				dev.MACState = dev.PendingMACState
+				dev.MACState.CurrentParameters.Rx1Delay = dev.PendingMACState.PendingJoinRequest.RxDelay
+				dev.MACState.CurrentParameters.Rx1DataRateOffset = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx1DROffset
+				dev.MACState.CurrentParameters.Rx2DataRateIndex = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx2DR
+				dev.MACState.PendingJoinRequest = nil
+				dev.Session = dev.PendingSession
+				dev.PendingMACState = nil
+				dev.PendingSession = nil
+			}
+			dev.MACState.RecentUplinks = AppendRecentUplink(dev.MACState.RecentUplinks, deduplicatedUp, RecentUplinkCount)
+			if conf.FPort == 0 {
+				return
+			}
 			var appUp *ttnpb.ApplicationUp
-			if !a.So(AssertProcessApplicationUp(ctx, conf.Link, func(ctx context.Context, up *ttnpb.ApplicationUp) bool {
+			if !a.So(env.AssertNsAsHandleUplink(ctx, conf.Device.ApplicationIdentifiers, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
+				if !a.So(ups, should.HaveLength, 1) {
+					return false
+				}
+				up := ups[0]
 				recvAt := up.GetUplinkMessage().GetReceivedAt()
 				appUp = up
 				return test.AllTrue(
@@ -1751,7 +1718,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 						},
 					}),
 				)
-			}), should.BeTrue) {
+			}, nil), should.BeTrue) {
 				t.Error("Application Server data uplink forwarding assertion failed")
 				return
 			}
@@ -1766,24 +1733,13 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 				UserAgent:      true,
 			}),
 				EvtForwardDataUplink.New(
-					conf.Link.Context(),
+					ctx,
 					events.WithIdentifiers(dev.EndDeviceIdentifiers),
 					events.WithData(appUp),
 				),
 			) {
 				t.Error("Application Server forwarding event assertion failed")
 			}
-			if conf.Pending {
-				dev.MACState = dev.PendingMACState
-				dev.MACState.CurrentParameters.Rx1Delay = dev.PendingMACState.PendingJoinRequest.RxDelay
-				dev.MACState.CurrentParameters.Rx1DataRateOffset = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx1DROffset
-				dev.MACState.CurrentParameters.Rx2DataRateIndex = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx2DR
-				dev.MACState.PendingJoinRequest = nil
-				dev.Session = dev.PendingSession
-				dev.PendingMACState = nil
-				dev.PendingSession = nil
-			}
-			dev.MACState.RecentUplinks = AppendRecentUplink(dev.MACState.RecentUplinks, deduplicatedUp, RecentUplinkCount)
 		},
 	}), should.BeTrue)
 }
@@ -1984,8 +1940,8 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 		}
 		closeFuncs = append(closeFuncs, func() {
 			select {
-			case <-handleJoinCh:
-				tb.Error("InteropClient.HandleJoin call missed")
+			case req := <-handleJoinCh:
+				tb.Errorf("InteropClient.HandleJoin call missed: %+v", req)
 			default:
 				close(handleJoinCh)
 			}
@@ -1998,24 +1954,25 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 	ctx, cancel := context.WithCancel(ctx)
 	return ns, ctx, env, func() {
 		cancel()
+		ns.Close()
 		for _, f := range closeFuncs {
 			f()
 		}
 		select {
-		case <-authCh:
-			tb.Error("Cluster.Auth call missed")
+		case req := <-authCh:
+			tb.Errorf("Cluster.Auth call missed: %+v", req)
 		default:
 			close(authCh)
 		}
 		select {
-		case <-getPeerCh:
-			tb.Error("Cluster.GetPeer call missed")
+		case req := <-getPeerCh:
+			tb.Errorf("Cluster.GetPeer call missed: %+v", req)
 		default:
 			close(getPeerCh)
 		}
 		select {
-		case <-eventsPublishCh:
-			tb.Error("events.Publish call missed")
+		case req := <-eventsPublishCh:
+			tb.Errorf("events.Publish call missed: %+v", req)
 		default:
 			close(eventsPublishCh)
 		}

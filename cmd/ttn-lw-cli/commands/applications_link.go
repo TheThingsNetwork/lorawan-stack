@@ -24,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -35,7 +34,14 @@ var (
 	selectAllApplicationLinkFlags = util.SelectAllFlagSet("application link")
 )
 
-var errNoApplicationLinkAPIKey = errors.DefineInvalidArgument("no_application_link_api_key", "no application link API key set")
+func deprecatedApplicationLinkFlags() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.String("api-key", "", "")
+	flagSet.Lookup("api-key").Hidden = true
+	flagSet.String("network-server-address", "", "")
+	flagSet.Lookup("network-server-address").Hidden = true
+	return flagSet
+}
 
 var (
 	applicationsLinkCommand = &cobra.Command{
@@ -90,9 +96,6 @@ var (
 			if err := util.SetFields(&link, setApplicationLinkFlags); err != nil {
 				return err
 			}
-			if link.APIKey == "" {
-				return errNoApplicationLinkAPIKey
-			}
 			newPaths, err := parsePayloadFormatterParameterFlags("default-formatters", link.DefaultFormatters, cmd.Flags())
 			if err != nil {
 				return err
@@ -146,6 +149,7 @@ func init() {
 	applicationsLinkSetCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsLinkSetCommand.Flags().AddFlagSet(setApplicationLinkFlags)
 	applicationsLinkSetCommand.Flags().AddFlagSet(payloadFormatterParameterFlags("default-formatters"))
+	applicationsLinkSetCommand.Flags().AddFlagSet(deprecatedApplicationLinkFlags())
 	applicationsLinkCommand.AddCommand(applicationsLinkSetCommand)
 	applicationsLinkDeleteCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsLinkCommand.AddCommand(applicationsLinkDeleteCommand)

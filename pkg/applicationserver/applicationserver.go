@@ -20,12 +20,11 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net"
-	"sync"
-	"sync/atomic"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	iogrpc "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mqtt"
@@ -34,7 +33,7 @@ import (
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/mqtt" // The MQTT integration provider
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
-	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
@@ -46,6 +45,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/cayennelpp"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/javascript"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc"
@@ -60,7 +60,6 @@ type ApplicationServer struct {
 
 	config *Config
 
-	linkMode         LinkMode
 	linkRegistry     LinkRegistry
 	deviceRegistry   DeviceRegistry
 	formatters       payloadFormatters
@@ -69,9 +68,8 @@ type ApplicationServer struct {
 	pubsub           *pubsub.PubSub
 	appPackages      packages.Server
 
-	links              sync.Map
-	linkErrors         sync.Map
-	defaultSubscribers []*io.Subscription
+	clusterDistributor distribution.Distributor
+	localDistributor   distribution.Distributor
 
 	grpc struct {
 		asDevices asEndDeviceRegistryServer
@@ -93,11 +91,6 @@ var errListenFrontend = errors.DefineFailedPrecondition("listen_frontend", "fail
 
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) (as *ApplicationServer, err error) {
-	linkMode, err := conf.GetLinkMode()
-	if err != nil {
-		return nil, err
-	}
-
 	ctx := log.NewContextWithField(c.Context(), "namespace", "applicationserver")
 
 	baseConf := c.GetBaseConfig(ctx)
@@ -120,28 +113,28 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		Component:      c,
 		ctx:            ctx,
 		config:         conf,
-		linkMode:       linkMode,
 		linkRegistry:   conf.Links,
 		deviceRegistry: wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
 		formatters: payloadFormatters(map[ttnpb.PayloadFormatter]messageprocessors.PayloadEncodeDecoder{
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
 		}),
-		interopClient:    interopCl,
-		interopID:        conf.Interop.ID,
-		endDeviceFetcher: conf.EndDeviceFetcher.Fetcher,
+		clusterDistributor: distribution.NewPubSubDistributor(ctx, c, conf.Distribution.Timeout, conf.Distribution.PubSub),
+		localDistributor:   distribution.NewLocalDistributor(ctx, c, conf.Distribution.Timeout),
+		interopClient:      interopCl,
+		interopID:          conf.Interop.ID,
+		endDeviceFetcher:   conf.EndDeviceFetcher.Fetcher,
 	}
 
 	if as.endDeviceFetcher == nil {
 		as.endDeviceFetcher = &NoopEndDeviceFetcher{}
 	}
-	retryIO := io.NewRetryServer(as)
 
 	as.grpc.asDevices = asEndDeviceRegistryServer{
 		AS:       as,
 		kekLabel: conf.DeviceKEKLabel,
 	}
-	as.grpc.appAs = iogrpc.New(retryIO, iogrpc.WithMQTTConfigProvider(as))
+	as.grpc.appAs = iogrpc.New(as, iogrpc.WithMQTTConfigProvider(as))
 
 	ctx, cancel := context.WithCancel(as.Context())
 	defer func() {
@@ -184,7 +177,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 						)
 					}
 					defer lis.Close()
-					return mqtt.Serve(ctx, retryIO, lis, version.Format, endpoint.Protocol())
+					return mqtt.Serve(ctx, as, lis, version.Format, endpoint.Protocol())
 				},
 				Restart: component.TaskRestartOnFailure,
 				Backoff: component.DefaultTaskBackoffConfig,
@@ -196,7 +189,6 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		return nil, err
 	} else if webhooks != nil {
 		as.webhooks = webhooks
-		as.defaultSubscribers = append(as.defaultSubscribers, webhooks.NewSubscription())
 		c.RegisterWeb(webhooks)
 	}
 
@@ -204,33 +196,26 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		return nil, err
 	}
 
-	if as.pubsub, err = conf.PubSub.NewPubSub(c, retryIO); err != nil {
+	if as.pubsub, err = conf.PubSub.NewPubSub(c, as); err != nil {
 		return nil, err
 	}
 
 	if as.appPackages, err = conf.Packages.NewApplicationPackages(ctx, as); err != nil {
 		return nil, err
 	} else if as.appPackages != nil {
-		as.defaultSubscribers = append(as.defaultSubscribers, as.appPackages.NewSubscription())
 		c.RegisterGRPC(as.appPackages)
 	}
 
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsAs", cluster.HookName, c.ClusterAuthUnaryHook())
+
 	c.RegisterGRPC(as)
-	if as.linkMode == LinkAll {
-		c.RegisterTask(&component.TaskConfig{
-			Context: as.Context(),
-			ID:      "link_all",
-			Func:    as.linkAll,
-			Restart: component.TaskRestartOnFailure,
-			Backoff: component.DefaultTaskBackoffConfig,
-		})
-	}
 	return as, nil
 }
 
 // RegisterServices registers services provided by as at s.
 func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsServer(s, as)
+	ttnpb.RegisterNsAsServer(s, as)
 	ttnpb.RegisterAsEndDeviceRegistryServer(s, as.grpc.asDevices)
 	ttnpb.RegisterAppAsServer(s, as.grpc.appAs)
 	if as.webhooks != nil {
@@ -260,50 +245,72 @@ func (as *ApplicationServer) Roles() []ttnpb.ClusterRole {
 }
 
 // Subscribe subscribes an application or integration by its identifiers to the Application Server, and returns a
-// io.Subscription for traffic and control.
-func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
-	if err := rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
-		return nil, err
+// Subscription for traffic and control. If the cluster parameter is true, the subscription receives all of the
+// traffic of the application. Otherwise, only traffic that was processed locally is sent.
+func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers, cluster bool) (*io.Subscription, error) {
+	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:conn:%s", events.NewCorrelationID()))
+	if ids != nil {
+		uid := unique.ID(ctx, ids)
+		ctx = log.NewContextWithField(ctx, "application_uid", uid)
 	}
+	if cluster {
+		return as.clusterDistributor.Subscribe(ctx, protocol, ids)
+	} else {
+		return as.localDistributor.Subscribe(ctx, protocol, ids)
+	}
+}
 
-	uid := unique.ID(ctx, ids)
-	ctx = log.NewContextWithField(
-		events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:conn:%s", events.NewCorrelationID())),
-		"application_uid", uid,
-	)
-
-	link, err := as.getLink(ctx, ids)
+// Publish processes the given upstream message and then publishes it to the application frontends.
+func (as *ApplicationServer) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
+	link, err := as.getLink(ctx, up.ApplicationIdentifiers, []string{
+		"default_formatters",
+		"skip_payload_crypto",
+	})
 	if err != nil {
-		return nil, err
+		return err
 	}
-	sub := io.NewSubscription(ctx, protocol, &ids)
-	select {
-	case <-link.ctx.Done():
-		return nil, link.ctx.Err()
-	case link.subscribeCh <- sub:
+	return as.processUp(ctx, up, link)
+}
+
+func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
+	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
+	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
+	registerReceiveUp(ctx, up)
+
+	now := time.Now().UTC()
+	up.ReceivedAt = &now
+
+	pass, err := as.handleUp(ctx, up, link)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to process upstream message")
+		registerDropUp(ctx, up, err)
+		return nil
 	}
-	go func() {
-		select {
-		case <-link.ctx.Done():
-			// Disconnect the subscription in order to avoid leaking it,
-			// and skip the unsubscribe channel since it will get closed.
-			sub.Disconnect(link.ctx.Err())
-			return
-		case <-sub.Context().Done():
-		}
-		select {
-		case <-link.ctx.Done():
-			return
-		case link.unsubscribeCh <- sub:
-		}
-	}()
-	return sub, nil
+	if !pass {
+		return nil
+	}
+
+	if err := as.publishUp(ctx, up); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to broadcast upstream message")
+		registerDropUp(ctx, up, err)
+		return nil
+	}
+	registerForwardUp(ctx, up)
+
+	return nil
+}
+
+func (as *ApplicationServer) publishUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+	if err := as.localDistributor.Publish(ctx, up); err != nil {
+		return err
+	}
+	return as.clusterDistributor.Publish(ctx, up)
 }
 
 // skipPayloadCrypto indicates whether LoRaWAN FRMPayload encryption and decryption should be skipped.
 // This method returns true if the AppSKey of the given session is wrapped and cannot be unwrapped by the Application
 // Server, and if the end device's skip_payload_crypto_override is true or if the link's skip_payload_crypto is true.
-func (as *ApplicationServer) skipPayloadCrypto(ctx context.Context, link *link, dev *ttnpb.EndDevice, session *ttnpb.Session) bool {
+func (as *ApplicationServer) skipPayloadCrypto(ctx context.Context, link *ttnpb.ApplicationLink, dev *ttnpb.EndDevice, session *ttnpb.Session) bool {
 	if session != nil {
 		if _, err := cryptoutil.UnwrapAES128Key(ctx, session.AppSKey, as.KeyVault); err == nil {
 			return false
@@ -326,12 +333,23 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 		item.CorrelationIDs = append(item.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
 	}
 	logger := log.FromContext(ctx)
-	link, err := as.getLink(ctx, ids.ApplicationIdentifiers)
+	for _, item := range items {
+		registerReceiveDownlink(ctx, ids, item)
+	}
+	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
 	if err != nil {
 		return err
 	}
-	for _, item := range items {
-		registerReceiveDownlink(ctx, ids, item)
+	pc, err := peer.Conn()
+	if err != nil {
+		return err
+	}
+	link, err := as.getLink(ctx, ids.ApplicationIdentifiers, []string{
+		"default_formatters",
+		"skip_payload_crypto",
+	})
+	if err != nil {
+		return err
 	}
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
@@ -390,12 +408,12 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 					encryptedItems = append(encryptedItems, encryptedItem)
 				}
 			}
-			client := ttnpb.NewAsNsClient(link.conn)
+			client := ttnpb.NewAsNsClient(pc)
 			req := &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ids,
 				Downlinks:            encryptedItems,
 			}
-			_, err = op(client, ctx, req, link.callOpts...)
+			_, err = op(client, ctx, req, as.WithClusterAuth())
 			if err != nil {
 				return nil, nil, err
 			}
@@ -408,47 +426,33 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			errorDetails = *ttnpb.ErrorDetailsToProto(ttnErr)
 		}
 		for _, item := range items {
-			msg := &io.ContextualApplicationUp{
-				Context: as.FromRequestContext(ctx),
-				ApplicationUp: &ttnpb.ApplicationUp{
-					EndDeviceIdentifiers: ids,
-					CorrelationIDs:       item.CorrelationIDs,
-					Up: &ttnpb.ApplicationUp_DownlinkFailed{
-						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-							ApplicationDownlink: *item,
-							Error:               errorDetails,
-						},
+			if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: ids,
+				CorrelationIDs:       item.CorrelationIDs,
+				Up: &ttnpb.ApplicationUp_DownlinkFailed{
+					DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+						ApplicationDownlink: *item,
+						Error:               errorDetails,
 					},
 				},
-			}
-			select {
-			case <-link.ctx.Done():
-				return link.ctx.Err()
-			case link.upCh <- msg:
+			}); err != nil {
+				logger.WithError(err).Warn("Failed to send upstream message")
 			}
 			registerDropDownlink(ctx, ids, item, err)
 		}
 		return err
 	}
-	atomic.AddUint64(&link.downlinks, uint64(len(items)))
-	atomic.StoreInt64(&link.lastDownlinkTime, time.Now().UnixNano())
 	for _, item := range items {
-		msg := &io.ContextualApplicationUp{
-			Context: as.FromRequestContext(ctx),
-			ApplicationUp: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: ids,
-				CorrelationIDs:       item.CorrelationIDs,
-				Up: &ttnpb.ApplicationUp_DownlinkQueued{
-					DownlinkQueued: item,
-				},
+		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
+			EndDeviceIdentifiers: ids,
+			CorrelationIDs:       item.CorrelationIDs,
+			Up: &ttnpb.ApplicationUp_DownlinkQueued{
+				DownlinkQueued: item,
 			},
+		}); err != nil {
+			logger.WithError(err).Warn("Failed to send upstream message")
 		}
-		select {
-		case <-link.ctx.Done():
-			return link.ctx.Err()
-		case link.upCh <- msg:
-		}
-		registerForwardDownlink(ctx, ids, item, link.connName)
+		registerForwardDownlink(ctx, ids, item, peer.Name())
 	}
 	return nil
 }
@@ -478,12 +482,19 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	if err != nil {
 		return nil, err
 	}
-	link, err := as.getLink(ctx, ids.ApplicationIdentifiers)
+	link, err := as.getLink(ctx, ids.ApplicationIdentifiers, []string{
+		"default_formatters",
+		"skip_payload_crypto",
+	})
 	if err != nil {
 		return nil, err
 	}
-	client := ttnpb.NewAsNsClient(link.conn)
-	res, err := client.DownlinkQueueList(ctx, &ids, link.callOpts...)
+	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	if err != nil {
+		return nil, err
+	}
+	client := ttnpb.NewAsNsClient(pc)
+	res, err := client.DownlinkQueueList(ctx, &ids, as.WithClusterAuth())
 	if err != nil {
 		return nil, err
 	}
@@ -547,7 +558,7 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 	return ttnpb.KeyEnvelope{}, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEUI)
 }
 
-func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *link) (pass bool, err error) {
+func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) (pass bool, err error) {
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIdentifiers))
 	if up.Simulated {
 		return true, as.handleSimulatedUp(ctx, up, link)
@@ -576,7 +587,7 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 	}
 }
 
-func (as *ApplicationServer) handleSimulatedUp(ctx context.Context, up *ttnpb.ApplicationUp, link *link) error {
+func (as *ApplicationServer) handleSimulatedUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
 	switch p := up.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		return as.handleSimulatedUplink(ctx, up.EndDeviceIdentifiers, p.UplinkMessage, link)
@@ -590,7 +601,7 @@ var errFetchAppSKey = errors.Define("app_s_key", "failed to get AppSKey")
 // handleJoinAccept handles a join-accept message.
 // If the application or device is not configured to skip application crypto, the InvalidatedDownlinks and the AppSKey
 // in the given join-accept message is reset.
-func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *link) error {
+func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *ttnpb.ApplicationLink) error {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"join_eui", ids.JoinEUI,
 		"dev_eui", ids.DevEUI,
@@ -653,13 +664,17 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 }
 
 // resetInvalidDownlinkQueue clears the invalid downlink queue of the provided device and publishes the appropriate events.
-func (as *ApplicationServer) resetInvalidDownlinkQueue(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, link *link) error {
+func (as *ApplicationServer) resetInvalidDownlinkQueue(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
 	logger := log.FromContext(ctx)
-	client := ttnpb.NewAsNsClient(link.conn)
+	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	if err != nil {
+		return err
+	}
+	client := ttnpb.NewAsNsClient(pc)
 	req := &ttnpb.DownlinkQueueRequest{
 		EndDeviceIdentifiers: ids,
 	}
-	_, err := client.DownlinkQueueReplace(ctx, req, link.callOpts...)
+	_, err = client.DownlinkQueueReplace(ctx, req, as.WithClusterAuth())
 	if err != nil {
 		logger.WithError(err).Warn("Failed to clear the downlink queue; any queued items in the Network Server are invalid")
 		events.Publish(evtInvalidQueueDataDown.NewWithIdentifiersAndData(ctx, ids, err))
@@ -674,7 +689,7 @@ type downlinkQueueTransaction func(context.Context, *ttnpb.EndDevice) error
 
 // runDownlinkQueueTransaction runs the provided downlink queue transaction on the device. If the transaction
 // fails, the LastAFCntDown session fields are restored to their previous values and the downlink queue is reset.
-func (as *ApplicationServer) runDownlinkQueueTransaction(ctx context.Context, dev *ttnpb.EndDevice, link *link, t downlinkQueueTransaction) error {
+func (as *ApplicationServer) runDownlinkQueueTransaction(ctx context.Context, dev *ttnpb.EndDevice, link *ttnpb.ApplicationLink, t downlinkQueueTransaction) error {
 	logger := log.FromContext(ctx)
 	pendingSession := dev.PendingSession
 	if pendingSession != nil {
@@ -700,7 +715,7 @@ func (as *ApplicationServer) runDownlinkQueueTransaction(ctx context.Context, de
 			session.LastAFCntDown = oldLastAFCntDown
 		}
 		logger.WithError(err).Warn("Failed to recalculate downlink queue; clear the downlink queue")
-		as.resetInvalidDownlinkQueue(ctx, dev.EndDeviceIdentifiers, link)
+		as.resetInvalidDownlinkQueue(ctx, dev.EndDeviceIdentifiers)
 	}
 	return t(ctx, dev)
 }
@@ -715,7 +730,7 @@ var errUnknownSession = errors.DefineNotFound("unknown_session", "unknown sessio
 // This method mutates the LastAFCntDown of pending session. Downlinks which cannot be decrypted are dropped.
 // This method uses the downlink queue transaction mechanism, so any errors that occur during recomputation will
 // result in an downlink queue reset attempt.
-func (as *ApplicationServer) recalculatePendingDownlinkQueue(ctx context.Context, dev *ttnpb.EndDevice, link *link, previousPendingSession *ttnpb.Session, invalidatedDownlinks []*ttnpb.ApplicationDownlink) error {
+func (as *ApplicationServer) recalculatePendingDownlinkQueue(ctx context.Context, dev *ttnpb.EndDevice, link *ttnpb.ApplicationLink, previousPendingSession *ttnpb.Session, invalidatedDownlinks []*ttnpb.ApplicationDownlink) error {
 	return as.runDownlinkQueueTransaction(ctx, dev, link, func(ctx context.Context, dev *ttnpb.EndDevice) error {
 		var previousPendingQueue, previousQueue []*ttnpb.ApplicationDownlink
 		unmatched := invalidatedDownlinks
@@ -759,11 +774,15 @@ func (as *ApplicationServer) recalculatePendingDownlinkQueue(ctx context.Context
 			return err
 		}
 
-		client := ttnpb.NewAsNsClient(link.conn)
+		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, dev.ApplicationIdentifiers)
+		if err != nil {
+			return err
+		}
+		client := ttnpb.NewAsNsClient(pc)
 		_, err = client.DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
 			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 			Downlinks:            append(previousQueue, newPendingQueue...),
-		}, link.callOpts...)
+		}, as.WithClusterAuth())
 		return err
 	})
 }
@@ -778,7 +797,7 @@ func (as *ApplicationServer) recalculatePendingDownlinkQueue(ctx context.Context
 // The pending downlink queue of the end device is discarded.
 // This method uses the downlink queue transaction mechanism, so any errors that occur during recomputation will
 // result in an downlink queue reset attempt.
-func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *ttnpb.EndDevice, link *link, previousSession *ttnpb.Session, previousDownlinks []*ttnpb.ApplicationDownlink, nextAFCntDown uint32, skipEmptyReplace bool) error {
+func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *ttnpb.EndDevice, link *ttnpb.ApplicationLink, previousSession *ttnpb.Session, previousDownlinks []*ttnpb.ApplicationDownlink, nextAFCntDown uint32, skipEmptyReplace bool) error {
 	return as.runDownlinkQueueTransaction(ctx, dev, link, func(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
 		downlinks, unmatched := ttnpb.PartitionDownlinksBySessionKeyIDEquality(previousSession.SessionKeyID, previousDownlinks...)
 		for _, item := range unmatched {
@@ -799,12 +818,16 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			return nil
 		}
 
-		client := ttnpb.NewAsNsClient(link.conn)
+		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, dev.ApplicationIdentifiers)
+		if err != nil {
+			return err
+		}
+		client := ttnpb.NewAsNsClient(pc)
 		req := &ttnpb.DownlinkQueueRequest{
 			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 			Downlinks:            newQueue,
 		}
-		_, err = client.DownlinkQueueReplace(ctx, req, link.callOpts...)
+		_, err = client.DownlinkQueueReplace(ctx, req, as.WithClusterAuth())
 		return err
 	})
 }
@@ -862,7 +885,7 @@ func (as *ApplicationServer) migrateDownlinkQueue(ctx context.Context, ids ttnpb
 	return newQueue, nil
 }
 
-func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *link) error {
+func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyID)
 	logger := log.FromContext(ctx)
 	dev, err := as.deviceRegistry.Set(ctx, ids,
@@ -918,11 +941,15 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 				// Next AFCntDown 1 is assumed. If this is a LoRaWAN 1.0.x end device and the Network Server sent MAC layer
 				// downlink already, the Network Server will trigger the DownlinkQueueInvalidated event. Therefore, this
 				// recalculation may result in another recalculation.
-				client := ttnpb.NewAsNsClient(link.conn)
-				res, err := client.DownlinkQueueList(ctx, &ids, link.callOpts...)
+				pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+				if err != nil {
+					return nil, nil, err
+				}
+				client := ttnpb.NewAsNsClient(pc)
+				res, err := client.DownlinkQueueList(ctx, &ids, as.WithClusterAuth())
 				if err != nil {
 					logger.WithError(err).Warn("Failed to list downlink queue for recalculation; clear the downlink queue")
-					as.resetInvalidDownlinkQueue(ctx, ids, link)
+					as.resetInvalidDownlinkQueue(ctx, ids)
 				} else {
 					previousQueue, unmatched := ttnpb.PartitionDownlinksBySessionKeyIDEquality(previousSession.SessionKeyID, res.Downlinks...)
 					if err := as.recalculateDownlinkQueue(ctx, dev, link, previousSession, previousQueue, 1, len(unmatched) == 0); err != nil {
@@ -959,7 +986,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	return nil
 }
 
-func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *link) error {
+func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyID)
 	dev, err := as.deviceRegistry.Get(ctx, ids,
 		[]string{
@@ -981,7 +1008,7 @@ func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnp
 	return as.decodeUplink(ctx, dev, uplink, link.DefaultFormatters)
 }
 
-func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *link) (pass bool, err error) {
+func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *ttnpb.ApplicationLink) (pass bool, err error) {
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
@@ -1010,10 +1037,14 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 	return
 }
 
-func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *link) error {
+func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *ttnpb.ApplicationLink) error {
 	logger := log.FromContext(ctx)
-	client := ttnpb.NewAsNsClient(link.conn)
-	res, err := client.DownlinkQueueList(ctx, &ids, link.callOpts...)
+	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	if err != nil {
+		return err
+	}
+	client := ttnpb.NewAsNsClient(pc)
+	res, err := client.DownlinkQueueList(ctx, &ids, as.WithClusterAuth())
 	if err != nil {
 		logger.WithError(err).Warn("Failed to list the downlink queue for inserting nacked downlink message")
 		registerDropDownlink(ctx, ids, msg, err)
@@ -1052,7 +1083,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 
 // decryptDownlinkMessage decrypts the downlink message.
 // If application payload crypto is skipped, this method returns nil.
-func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *link) error {
+func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *ttnpb.ApplicationLink) error {
 	dev, err := as.deviceRegistry.Get(ctx, ids, []string{
 		"formatters",
 		"pending_session",

@@ -223,15 +223,17 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 		ApplicationID: "app-1",
 	}
 	app1 := &ttnpb.ApplicationLink{
-		APIKey:               "secret1",
-		NetworkServerAddress: "host1",
+		SkipPayloadCrypto: &pbtypes.BoolValue{
+			Value: true,
+		},
 	}
 	app2IDs := ttnpb.ApplicationIdentifiers{
 		ApplicationID: "app-2",
 	}
 	app2 := &ttnpb.ApplicationLink{
-		APIKey:               "secret2",
-		NetworkServerAddress: "host2",
+		SkipPayloadCrypto: &pbtypes.BoolValue{
+			Value: false,
+		},
 	}
 
 	for ids, link := range map[ttnpb.ApplicationIdentifiers]*ttnpb.ApplicationLink{

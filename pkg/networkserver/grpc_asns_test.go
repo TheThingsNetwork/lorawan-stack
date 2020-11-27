@@ -22,13 +22,11 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -50,7 +48,6 @@ func TestDownlinkQueueReplace(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		Time           time.Time
-		ContextFunc    func(context.Context) context.Context
 		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) error
 		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 		Request        *ttnpb.DownlinkQueueRequest
@@ -59,63 +56,10 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		SetByIDCalls   uint64
 	}{
 		{
-			Name: "No link rights",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
-							},
-						},
-					},
-				})
-			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-				err := errors.New("SetByIDFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return nil, ctx, err
-			},
-			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceID:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-				},
-				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
-				},
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
-					t.Errorf("Received error: %s", err)
-					return false
-				}
-				return true
-			},
-		},
-
-		{
 			Name: "Non-existing device",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
@@ -164,21 +108,9 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 		{
 			Name: "Valid request/replace/active session/MAC state",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -245,21 +177,9 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 		{
 			Name: "Valid request/replace/Class A/active session",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -336,21 +256,9 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 		{
 			Name: "Valid request/replace/Class A/both sessions",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -445,17 +353,6 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		{
 			Name: "Valid request/replace/Class C/active session",
 			Time: time.Unix(0, 42),
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
@@ -542,21 +439,9 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 		{
 			Name: "Valid request/delete/no active MAC state",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -627,21 +512,9 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 		{
 			Name: "Valid request/delete/Class A",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -717,21 +590,9 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 		{
 			Name: "Valid request/delete/Class C",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -841,7 +702,6 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				)
 				defer stop()
 
-				ns.AddContextFiller(tc.ContextFunc)
 				ns.AddContextFiller(func(ctx context.Context) context.Context {
 					return test.ContextWithTB(ctx, t)
 				})
@@ -881,7 +741,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name           string
-		ContextFunc    func(context.Context) context.Context
 		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) error
 		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 		Request        *ttnpb.DownlinkQueueRequest
@@ -890,63 +749,10 @@ func TestDownlinkQueuePush(t *testing.T) {
 		SetByIDCalls   uint64
 	}{
 		{
-			Name: "No link rights",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
-							},
-						},
-					},
-				})
-			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-				err := errors.New("SetByIDFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return nil, ctx, err
-			},
-			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceID:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-				},
-				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
-				},
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
-					t.Errorf("Received error: %s", err)
-					return false
-				}
-				return true
-			},
-		},
-
-		{
 			Name: "Non-existing device",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
@@ -996,21 +802,9 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 		{
 			Name: "Valid request/push/no MAC state",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -1077,21 +871,9 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 		{
 			Name: "Valid request/push/Class A/active session",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -1168,21 +950,9 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 		{
 			Name: "Valid request/push/Class A/both sessions",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
+				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
+				return errors.New("AddFunc must not be called")
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -1272,17 +1042,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 		{
 			Name: "Invalid request/push/Class C/FCnt too low",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
@@ -1353,17 +1112,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 		{
 			Name: "Invalid request/push/Class C/FCnt lower than NFCntDown",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
@@ -1429,17 +1177,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 		{
 			Name: "Valid request/push/Class C/No session",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
@@ -1531,7 +1268,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 				go LogEvents(t, env.Events)
 
-				ns.AddContextFiller(tc.ContextFunc)
 				ns.AddContextFiller(func(ctx context.Context) context.Context {
 					return test.ContextWithTB(ctx, t)
 				})
@@ -1554,7 +1290,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 func TestDownlinkQueueList(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
-		ContextFunc    func(context.Context) context.Context
 		GetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, context.Context, error)
 		Request        *ttnpb.EndDeviceIdentifiers
 		Downlinks      *ttnpb.ApplicationDownlinks
@@ -1562,49 +1297,7 @@ func TestDownlinkQueueList(t *testing.T) {
 		GetByIDCalls   uint64
 	}{
 		{
-			Name: "No link rights",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
-							},
-						},
-					},
-				})
-			},
-			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
-				err := errors.New("GetByIDFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return nil, ctx, err
-			},
-			Request: &ttnpb.EndDeviceIdentifiers{
-				DeviceID:               "test-dev-id",
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
-					t.Errorf("Received error: %s", err)
-					return false
-				}
-				return true
-			},
-		},
-
-		{
 			Name: "Valid request/empty queues",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
@@ -1632,17 +1325,6 @@ func TestDownlinkQueueList(t *testing.T) {
 
 		{
 			Name: "Valid request/active session queue",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
@@ -1684,17 +1366,6 @@ func TestDownlinkQueueList(t *testing.T) {
 
 		{
 			Name: "Valid request/pending session queue",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
@@ -1738,17 +1409,6 @@ func TestDownlinkQueueList(t *testing.T) {
 
 		{
 			Name: "Valid request/both queues present",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_LINK,
-							},
-						},
-					},
-				})
-			},
 			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
@@ -1829,7 +1489,6 @@ func TestDownlinkQueueList(t *testing.T) {
 
 				go LogEvents(t, env.Events)
 
-				ns.AddContextFiller(tc.ContextFunc)
 				ns.AddContextFiller(func(ctx context.Context) context.Context {
 					return test.ContextWithTB(ctx, t)
 				})

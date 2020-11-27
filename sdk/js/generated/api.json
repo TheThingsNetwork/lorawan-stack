@@ -1128,42 +1128,6 @@
           "extensions": [],
           "fields": [
             {
-              "name": "network_server_address",
-              "description": "The address of the external Network Server where to link to.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nLeave empty when linking to a cluster Network Server.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "string.pattern",
-                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
-                  }
-                ]
-              }
-            },
-            {
-              "name": "api_key",
-              "description": "The API key to use to link the Application Server to Network Server.\nThis API key needs to have RIGHT_APPLICATION_LINK.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "string.min_len",
-                    "value": 1
-                  }
-                ]
-              }
-            },
-            {
               "name": "default_formatters",
               "description": "Default message payload formatters to use when there are no formatters\ndefined on the end device level.",
               "label": "",
@@ -1310,6 +1274,35 @@
               "fullType": "google.protobuf.FieldMask",
               "ismap": false,
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "NsAsHandleUplinkRequest",
+          "longName": "NsAsHandleUplinkRequest",
+          "fullName": "ttn.lorawan.v3.NsAsHandleUplinkRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ups",
+              "description": "",
+              "label": "repeated",
+              "type": "ApplicationUp",
+              "longType": "ApplicationUp",
+              "fullType": "ttn.lorawan.v3.ApplicationUp",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  }
+                ]
+              }
             }
           ]
         },
@@ -1679,6 +1672,26 @@
                   ]
                 }
               }
+            }
+          ]
+        },
+        {
+          "name": "NsAs",
+          "longName": "NsAs",
+          "fullName": "ttn.lorawan.v3.NsAs",
+          "description": "The NsAs service connects a Network Server to an Application Server.",
+          "methods": [
+            {
+              "name": "HandleUplink",
+              "description": "",
+              "requestType": "NsAsHandleUplinkRequest",
+              "requestLongType": "NsAsHandleUplinkRequest",
+              "requestFullType": "ttn.lorawan.v3.NsAsHandleUplinkRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false
             }
           ]
         }
@@ -20910,15 +20923,7 @@
               "longType": "ApplicationDownlink",
               "fullType": "ttn.lorawan.v3.ApplicationDownlink",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "repeated.min_items",
-                    "value": 1
-                  }
-                ]
-              }
+              "defaultValue": ""
             },
             {
               "name": "last_f_cnt_down",
@@ -22543,18 +22548,6 @@
           "fullName": "ttn.lorawan.v3.AsNs",
           "description": "The AsNs service connects an Application Server to a Network Server.",
           "methods": [
-            {
-              "name": "LinkApplication",
-              "description": "",
-              "requestType": "Empty",
-              "requestLongType": ".google.protobuf.Empty",
-              "requestFullType": "google.protobuf.Empty",
-              "requestStreaming": true,
-              "responseType": "ApplicationUp",
-              "responseLongType": "ApplicationUp",
-              "responseFullType": "ttn.lorawan.v3.ApplicationUp",
-              "responseStreaming": true
-            },
             {
               "name": "DownlinkQueueReplace",
               "description": "",

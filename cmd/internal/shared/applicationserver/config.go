@@ -31,7 +31,6 @@ var DefaultWebhookTemplatesConfig = web.TemplatesConfig{
 
 // DefaultApplicationServerConfig is the default configuration for the Application Server.
 var DefaultApplicationServerConfig = applicationserver.Config{
-	LinkMode: "all",
 	MQTT: config.MQTT{
 		Listen:           ":1883",
 		ListenTLS:        ":8883",
@@ -51,5 +50,8 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 			Enable: true,
 			TTL:    5 * time.Minute,
 		},
+	},
+	Distribution: applicationserver.DistributionConfig{
+		Timeout: time.Minute,
 	},
 }

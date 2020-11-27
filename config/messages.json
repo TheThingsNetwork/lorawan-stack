@@ -1376,15 +1376,6 @@
       "file": "applications.go"
     }
   },
-  "error:cmd/ttn-lw-cli/commands:no_application_link_api_key": {
-    "translations": {
-      "en": "no application link API key set"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-cli/commands",
-      "file": "applications_link.go"
-    }
-  },
   "error:cmd/ttn-lw-cli/commands:no_client_id": {
     "translations": {
       "en": "no client ID set"
@@ -1662,6 +1653,42 @@
     "description": {
       "package": "cmd/ttn-lw-stack/commands",
       "file": "start.go"
+    }
+  },
+  "error:pkg/applicationserver/distribution/redis:channel_closed": {
+    "translations": {
+      "en": "channel closed"
+    },
+    "description": {
+      "package": "pkg/applicationserver/distribution/redis",
+      "file": "redis.go"
+    }
+  },
+  "error:pkg/applicationserver/distribution:empty_set": {
+    "translations": {
+      "en": "empty set"
+    },
+    "description": {
+      "package": "pkg/applicationserver/distribution",
+      "file": "subscription_set.go"
+    }
+  },
+  "error:pkg/applicationserver/distribution:missing_identifiers": {
+    "translations": {
+      "en": "subscriptions without identifiers are not supported"
+    },
+    "description": {
+      "package": "pkg/applicationserver/distribution",
+      "file": "pubsub_distributor.go"
+    }
+  },
+  "error:pkg/applicationserver/distribution:set_not_found": {
+    "translations": {
+      "en": "set not found"
+    },
+    "description": {
+      "package": "pkg/applicationserver/distribution",
+      "file": "subscription_map.go"
     }
   },
   "error:pkg/applicationserver/io/grpc:connect": {
@@ -2159,22 +2186,13 @@
       "file": "applicationserver.go"
     }
   },
-  "error:pkg/applicationserver:link": {
+  "error:pkg/applicationserver:linking_not_implemented": {
     "translations": {
-      "en": "link failed"
+      "en": "linking is not implemented"
     },
     "description": {
       "package": "pkg/applicationserver",
-      "file": "linking.go"
-    }
-  },
-  "error:pkg/applicationserver:link_mode": {
-    "translations": {
-      "en": "invalid link mode `{value}`"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "config.go"
+      "file": "grpc.go"
     }
   },
   "error:pkg/applicationserver:listen_frontend": {
@@ -2184,15 +2202,6 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "applicationserver.go"
-    }
-  },
-  "error:pkg/applicationserver:network_server_not_found": {
-    "translations": {
-      "en": "Network Server not found for `{application_uid}`"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "linking.go"
     }
   },
   "error:pkg/applicationserver:no_app_s_key": {
@@ -2220,15 +2229,6 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "payload.go"
-    }
-  },
-  "error:pkg/applicationserver:not_linked": {
-    "translations": {
-      "en": "not linked to `{application_uid}`"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "linking.go"
     }
   },
   "error:pkg/applicationserver:payload_crypto_disabled": {
@@ -7528,7 +7528,7 @@
       "en": "subscribe application"
     },
     "description": {
-      "package": "pkg/applicationserver",
+      "package": "pkg/applicationserver/distribution",
       "file": "observability.go"
     }
   },
@@ -7537,7 +7537,7 @@
       "en": "unsubscribe application"
     },
     "description": {
-      "package": "pkg/applicationserver",
+      "package": "pkg/applicationserver/distribution",
       "file": "observability.go"
     }
   },
@@ -7647,33 +7647,6 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "grpc_deviceregistry.go"
-    }
-  },
-  "event:as.link.fail": {
-    "translations": {
-      "en": "fail link"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "observability.go"
-    }
-  },
-  "event:as.link.start": {
-    "translations": {
-      "en": "start link"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "observability.go"
-    }
-  },
-  "event:as.link.stop": {
-    "translations": {
-      "en": "stop link"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "observability.go"
     }
   },
   "event:as.pubsub.delete": {
@@ -8105,24 +8078,6 @@
     },
     "description": {
       "package": "pkg/joinserver",
-      "file": "observability.go"
-    }
-  },
-  "event:ns.application.link.begin": {
-    "translations": {
-      "en": "begin application link"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "observability.go"
-    }
-  },
-  "event:ns.application.link.end": {
-    "translations": {
-      "en": "end application link"
-    },
-    "description": {
-      "package": "pkg/networkserver",
       "file": "observability.go"
     }
   },

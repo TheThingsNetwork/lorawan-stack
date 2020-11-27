@@ -27,10 +27,12 @@
   - [Message `ApplicationLink`](#ttn.lorawan.v3.ApplicationLink)
   - [Message `ApplicationLinkStats`](#ttn.lorawan.v3.ApplicationLinkStats)
   - [Message `GetApplicationLinkRequest`](#ttn.lorawan.v3.GetApplicationLinkRequest)
+  - [Message `NsAsHandleUplinkRequest`](#ttn.lorawan.v3.NsAsHandleUplinkRequest)
   - [Message `SetApplicationLinkRequest`](#ttn.lorawan.v3.SetApplicationLinkRequest)
   - [Service `AppAs`](#ttn.lorawan.v3.AppAs)
   - [Service `As`](#ttn.lorawan.v3.As)
   - [Service `AsEndDeviceRegistry`](#ttn.lorawan.v3.AsEndDeviceRegistry)
+  - [Service `NsAs`](#ttn.lorawan.v3.NsAs)
 - [File `lorawan-stack/api/applicationserver_integrations_storage.proto`](#lorawan-stack/api/applicationserver_integrations_storage.proto)
   - [Message `GetStoredApplicationUpRequest`](#ttn.lorawan.v3.GetStoredApplicationUpRequest)
   - [Service `ApplicationUpStorage`](#ttn.lorawan.v3.ApplicationUpStorage)
@@ -746,18 +748,9 @@ Application is the message that defines an Application in the network.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `network_server_address` | [`string`](#string) |  | The address of the external Network Server where to link to. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. Leave empty when linking to a cluster Network Server. |
-| `api_key` | [`string`](#string) |  | The API key to use to link the Application Server to Network Server. This API key needs to have RIGHT_APPLICATION_LINK. |
 | `default_formatters` | [`MessagePayloadFormatters`](#ttn.lorawan.v3.MessagePayloadFormatters) |  | Default message payload formatters to use when there are no formatters defined on the end device level. |
 | `tls` | [`bool`](#bool) |  | Enable TLS for linking to the external Network Server. For cluster-local Network Servers, the cluster's TLS setting is used. |
 | `skip_payload_crypto` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Skip decryption of uplink payloads and encryption of downlink payloads. Leave empty for the using the Application Server's default setting. |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `network_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
-| `api_key` | <p>`string.min_len`: `1`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationLinkStats">Message `ApplicationLinkStats`</a>
 
@@ -790,6 +783,18 @@ Link stats as monitored by the Application Server.
 | Field | Validations |
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.NsAsHandleUplinkRequest">Message `NsAsHandleUplinkRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ups` | [`ApplicationUp`](#ttn.lorawan.v3.ApplicationUp) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ups` | <p>`repeated.min_items`: `1`</p> |
 
 ### <a name="ttn.lorawan.v3.SetApplicationLinkRequest">Message `SetApplicationLinkRequest`</a>
 
@@ -867,6 +872,14 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `Set` | `PUT` | `/api/v3/as/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}` | `*` |
 | `Set` | `POST` | `/api/v3/as/applications/{end_device.ids.application_ids.application_id}/devices` | `*` |
 | `Delete` | `DELETE` | `/api/v3/as/applications/{application_ids.application_id}/devices/{device_id}` |  |
+
+### <a name="ttn.lorawan.v3.NsAs">Service `NsAs`</a>
+
+The NsAs service connects a Network Server to an Application Server.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `HandleUplink` | [`NsAsHandleUplinkRequest`](#ttn.lorawan.v3.NsAsHandleUplinkRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
 
 ## <a name="lorawan-stack/api/applicationserver_integrations_storage.proto">File `lorawan-stack/api/applicationserver_integrations_storage.proto`</a>
 
@@ -5124,12 +5137,6 @@ Encodes and decodes uplink messages.
 | `downlinks` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) | repeated |  |
 | `last_f_cnt_down` | [`uint32`](#uint32) |  |  |
 
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `downlinks` | <p>`repeated.min_items`: `1`</p> |
-
 ### <a name="ttn.lorawan.v3.ApplicationJoinAccept">Message `ApplicationJoinAccept`</a>
 
 | Field | Type | Label | Description |
@@ -5486,7 +5493,6 @@ The AsNs service connects an Application Server to a Network Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `LinkApplication` | [`.google.protobuf.Empty`](#google.protobuf.Empty) _stream_ | [`ApplicationUp`](#ttn.lorawan.v3.ApplicationUp) _stream_ |  |
 | `DownlinkQueueReplace` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
 | `DownlinkQueuePush` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
 | `DownlinkQueueList` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`ApplicationDownlinks`](#ttn.lorawan.v3.ApplicationDownlinks) |  |

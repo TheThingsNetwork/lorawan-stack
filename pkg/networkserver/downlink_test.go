@@ -340,12 +340,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		Name                        string
-		CreateDevice                SetDeviceRequest
-		DeviceDiffs                 []DeviceDiffFunc
-		ApplicationUplinkAssertions []func(context.Context, *ttnpb.EndDevice, *ttnpb.ApplicationUp) bool
-		DownlinkAssertion           func(context.Context, TestEnvironment, *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool)
-		ErrorAssertion              func(*testing.T, error) bool
+		Name                       string
+		CreateDevice               SetDeviceRequest
+		DeviceDiffs                []DeviceDiffFunc
+		ApplicationUplinkAssertion func(context.Context, *ttnpb.EndDevice, ...*ttnpb.ApplicationUp) bool
+		DownlinkAssertion          func(context.Context, TestEnvironment, *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool)
+		ErrorAssertion             func(*testing.T, error) bool
 	}{
 		{
 			Name: "no device",
@@ -710,9 +710,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				makeRemoveDownlinksDiff(2),
 			},
-			ApplicationUplinkAssertions: []func(context.Context, *ttnpb.EndDevice, *ttnpb.ApplicationUp) bool{
-				func(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.ApplicationUp) bool {
-					return assertions.New(test.MustTFromContext(ctx)).So(up, should.Resemble, &ttnpb.ApplicationUp{
+			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) bool {
+				_, a := test.MustNewTFromContext(ctx)
+				return a.So(ups, should.HaveLength, 1) &&
+					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 						CorrelationIDs:       LastUplink(dev.MACState.RecentUplinks...).CorrelationIDs,
 						Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
@@ -722,7 +723,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 					})
-				},
 			},
 		},
 
@@ -796,9 +796,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				makeRemoveDownlinksDiff(1),
 			},
-			ApplicationUplinkAssertions: []func(context.Context, *ttnpb.EndDevice, *ttnpb.ApplicationUp) bool{
-				func(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.ApplicationUp) bool {
-					return assertions.New(test.MustTFromContext(ctx)).So(up, should.Resemble, &ttnpb.ApplicationUp{
+			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) bool {
+				_, a := test.MustNewTFromContext(ctx)
+				return a.So(ups, should.HaveLength, 1) &&
+					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 						CorrelationIDs:       append(LastUplink(dev.MACState.RecentUplinks...).CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
@@ -808,7 +809,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 					})
-				},
 			},
 		},
 
@@ -2239,9 +2239,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 				removeMACQueueDiff,
 				makeRemoveDownlinksDiff(1),
 			},
-			ApplicationUplinkAssertions: []func(context.Context, *ttnpb.EndDevice, *ttnpb.ApplicationUp) bool{
-				func(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.ApplicationUp) bool {
-					return assertions.New(test.MustTFromContext(ctx)).So(up, should.Resemble, &ttnpb.ApplicationUp{
+			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) bool {
+				_, a := test.MustNewTFromContext(ctx)
+				return a.So(ups, should.HaveLength, 1) &&
+					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 						CorrelationIDs:       dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
@@ -2251,7 +2252,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 					})
-				},
 			},
 		},
 
@@ -2791,19 +2791,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 						t.FailNow()
 					}
 				}
-
-				a.So(env.AssertWithApplicationLink(ctx, appID, func(ctx context.Context, link ttnpb.AsNs_LinkApplicationClient) bool {
-					return a.So(AssertProcessApplicationUps(ctx, link, func() []func(context.Context, *ttnpb.ApplicationUp) bool {
-						var upAsserts []func(context.Context, *ttnpb.ApplicationUp) bool
-						for _, assert := range tc.ApplicationUplinkAssertions {
-							upAsserts = append(upAsserts, func(ctx context.Context, up *ttnpb.ApplicationUp) bool {
-								_, a := test.MustNewTFromContext(ctx)
-								return a.So(assert(ctx, created, up), should.BeTrue)
-							})
-						}
-						return upAsserts
-					}()...), should.BeTrue)
-				}), should.BeTrue)
+				if tc.ApplicationUplinkAssertion != nil {
+					a.So(env.AssertNsAsHandleUplink(ctx, appID, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+						return tc.ApplicationUplinkAssertion(ctx, created, ups...)
+					}, nil), should.BeTrue)
+				}
 			},
 		})
 	}
