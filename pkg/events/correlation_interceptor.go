@@ -20,17 +20,32 @@ import (
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
+
+const requestIDKey = "x-request-id"
+
+func extractOrGenerateCorrelationID(ctx context.Context, fullMethod string) context.Context {
+	md, _ := metadata.FromIncomingContext(ctx)
+	var id string
+	if xRequestID := md.Get(requestIDKey); len(xRequestID) > 0 {
+		id = xRequestID[len(xRequestID)-1]
+	} else {
+		id = NewCorrelationID()
+	}
+	ctx = ContextWithCorrelationID(ctx, fmt.Sprintf("rpc:%s:%s", fullMethod, id))
+	return ctx
+}
 
 // UnaryServerInterceptor returns a new unary server interceptor that modifies the context to include a correlation ID.
 func UnaryServerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	ctx = ContextWithCorrelationID(ctx, fmt.Sprintf("rpc:%s:%s", info.FullMethod, NewCorrelationID()))
+	ctx = extractOrGenerateCorrelationID(ctx, info.FullMethod)
 	return handler(ctx, req)
 }
 
 // StreamServerInterceptor returns a new streaming server interceptor that that modifies the context.
 func StreamServerInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	wrapped := grpc_middleware.WrapServerStream(stream)
-	wrapped.WrappedContext = ContextWithCorrelationID(stream.Context(), fmt.Sprintf("rpc:%s:%s", info.FullMethod, NewCorrelationID()))
+	wrapped.WrappedContext = extractOrGenerateCorrelationID(stream.Context(), info.FullMethod)
 	return handler(srv, wrapped)
 }

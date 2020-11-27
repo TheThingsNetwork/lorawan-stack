@@ -37,7 +37,7 @@ func UnaryServerInterceptor(ctx context.Context, opts ...Option) grpc.UnaryServe
 			}
 		}
 		logFields := []interface{}{
-			"duration", time.Since(startTime),
+			"duration", time.Since(startTime).Round(time.Microsecond * 100),
 		}
 		if err != nil {
 			logFields = append(logFields, logFieldsForError(err)...)
@@ -66,7 +66,7 @@ func StreamServerInterceptor(ctx context.Context, opts ...Option) grpc.StreamSer
 		startTime := time.Now()
 		err := handler(srv, wrapped)
 		logFields := []interface{}{
-			"duration", time.Since(startTime),
+			"duration", time.Since(startTime).Round(time.Microsecond * 100),
 		}
 		if err != nil {
 			logFields = append(logFields, logFieldsForError(err)...)

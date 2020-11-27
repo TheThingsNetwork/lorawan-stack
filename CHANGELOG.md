@@ -11,7 +11,11 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- gRPC middleware to extract proxy headers from trusted proxies. This adds a configuration `grpc.trusted-proxies` that is similar to the existing `http.trusted-proxies` option.
+
 ### Changed
+
+- Log field consistency for HTTP and gRPC request logs.
 
 ### Deprecated
 
@@ -22,6 +26,7 @@ For details about compatibility between different releases, see the **Commitment
 - Uplink frame counter reset handling.
 - Uplink retransmission handling in Network Server.
 - DevAddr generation for NetID Type 3 and 4, according to errata.
+- HTTP header propagation (such as Request ID) to gRPC services.
 
 ### Security
 
