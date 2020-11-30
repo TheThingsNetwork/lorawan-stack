@@ -2683,6 +2683,28 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return true
 				},
 			},
+			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) bool {
+				return assertions.New(test.MustTFromContext(ctx)).So(ups, should.Resemble, []*ttnpb.ApplicationUp{
+					{
+						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: dev.ApplicationIdentifiers,
+							DeviceID:               dev.DeviceID,
+							DevEUI:                 dev.DevEUI,
+							JoinEUI:                dev.JoinEUI,
+							DevAddr:                &dev.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+						},
+						CorrelationIDs: LastUplink(dev.PendingMACState.RecentUplinks...).CorrelationIDs,
+						Up: &ttnpb.ApplicationUp_JoinAccept{
+							JoinAccept: &ttnpb.ApplicationJoinAccept{
+								AppSKey:              dev.PendingMACState.QueuedJoinAccept.Keys.AppSKey,
+								InvalidatedDownlinks: dev.Session.QueuedApplicationDownlinks,
+								SessionKeyID:         dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
+								ReceivedAt:           LastUplink(dev.PendingMACState.RecentUplinks...).ReceivedAt,
+							},
+						},
+					},
+				})
+			},
 		},
 	} {
 		tc := tc

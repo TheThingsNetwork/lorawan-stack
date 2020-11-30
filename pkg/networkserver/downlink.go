@@ -1645,9 +1645,39 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						}, nil
 					}
 
+					var invalidatedQueue []*ttnpb.ApplicationDownlink
+					if dev.Session != nil {
+						invalidatedQueue = dev.Session.QueuedApplicationDownlinks
+					} else {
+						invalidatedQueue = dev.GetPendingSession().GetQueuedApplicationDownlinks()
+					}
+					queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: dev.ApplicationIdentifiers,
+							DeviceID:               dev.DeviceID,
+							DevEUI:                 dev.DevEUI,
+							JoinEUI:                dev.JoinEUI,
+							DevAddr:                &dev.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+						},
+						CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+						Up: &ttnpb.ApplicationUp_JoinAccept{
+							JoinAccept: &ttnpb.ApplicationJoinAccept{
+								AppSKey:              dev.PendingMACState.QueuedJoinAccept.Keys.AppSKey,
+								InvalidatedDownlinks: invalidatedQueue,
+								SessionKeyID:         dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
+								ReceivedAt:           up.ReceivedAt,
+							},
+						},
+					})
+
 					dev.PendingSession = &ttnpb.Session{
-						DevAddr:     dev.PendingMACState.QueuedJoinAccept.Request.DevAddr,
-						SessionKeys: dev.PendingMACState.QueuedJoinAccept.Keys,
+						DevAddr: dev.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+						SessionKeys: ttnpb.SessionKeys{
+							SessionKeyID: dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
+							FNwkSIntKey:  dev.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey,
+							SNwkSIntKey:  dev.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey,
+							NwkSEncKey:   dev.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey,
+						},
 					}
 					dev.PendingMACState.PendingJoinRequest = &dev.PendingMACState.QueuedJoinAccept.Request
 					dev.PendingMACState.QueuedJoinAccept = nil

@@ -1359,7 +1359,11 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 		CorrelationIDs: conf.CorrelationIDs,
 		MIC:            mic,
 	}
-	var dev *ttnpb.EndDevice
+	var (
+		dev      *ttnpb.EndDevice
+		joinReq  *ttnpb.JoinRequest
+		joinResp *ttnpb.JoinResponse
+	)
 	if !a.So(env.AssertHandleJoinRequest(
 		ctx,
 		upConf,
@@ -1386,8 +1390,6 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 			for _, up := range ups[1:] {
 				deduplicatedUpConf.RxMetadata = append(deduplicatedUpConf.RxMetadata, up.RxMetadata...)
 			}
-			var joinReq *ttnpb.JoinRequest
-			var joinResp *ttnpb.JoinResponse
 			if conf.ClusterResponse != nil {
 				if !a.So(env.AssertNsJsJoin(
 					ctx,
@@ -1501,11 +1503,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					MakeJoinRequest(deduplicatedUpConf),
 				},
 			}
-
-			idsWithDevAddr := conf.Device.EndDeviceIdentifiers
-			idsWithDevAddr.DevAddr = &joinReq.DevAddr
-
-			if !a.So(assertEvents(events.Builders(func() []events.Builder {
+			return a.So(assertEvents(events.Builders(func() []events.Builder {
 				evBuilders := []events.Builder{
 					EvtReceiveJoinRequest,
 				}
@@ -1531,62 +1529,67 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 			}()).New(
 				ctx,
 				events.WithIdentifiers(conf.Device.EndDeviceIdentifiers),
-			)...), should.BeTrue) {
-				return false
-			}
-
-			var appUp *ttnpb.ApplicationUp
-			if !a.So(env.AssertNsAsHandleUplink(ctx, conf.Device.ApplicationIdentifiers, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-				_, a := test.MustNewTFromContext(ctx)
-				if !a.So(ups, should.HaveLength, 1) {
-					return false
-				}
-				up := ups[0]
-				recvAt := up.GetJoinAccept().GetReceivedAt()
-				appUp = up
-				return test.AllTrue(
-					a.So(up.CorrelationIDs, should.HaveSameElementsDeep, append(joinReq.CorrelationIDs, joinResp.CorrelationIDs...)),
-					a.So([]time.Time{start, recvAt, time.Now()}, should.BeChronological),
-					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: idsWithDevAddr,
-						CorrelationIDs:       up.CorrelationIDs,
-						Up: &ttnpb.ApplicationUp_JoinAccept{
-							JoinAccept: &ttnpb.ApplicationJoinAccept{
-								AppSKey:      joinResp.AppSKey,
-								SessionKeyID: joinResp.SessionKeyID,
-								ReceivedAt:   recvAt,
-							},
-						},
-					}),
-				)
-			}, nil), should.BeTrue) {
-				t.Error("Failed to send join-accept to Application Server")
-				return false
-			}
-			return a.So(env.Events, should.ReceiveEventFunc, test.MakeEventEqual(test.EventEqualConfig{
-				Identifiers:    true,
-				Data:           true,
-				Origin:         true,
-				Context:        true,
-				Visibility:     true,
-				Authentication: true,
-				RemoteIP:       true,
-				UserAgent:      true,
-			}),
-				EvtForwardJoinAccept.NewWithIdentifiersAndData(ctx, idsWithDevAddr, &ttnpb.ApplicationUp{
-					EndDeviceIdentifiers: idsWithDevAddr,
-					CorrelationIDs:       appUp.CorrelationIDs,
-					Up: &ttnpb.ApplicationUp_JoinAccept{
-						JoinAccept: ApplicationJoinAcceptWithoutAppSKey(appUp.GetJoinAccept()),
-					},
-				}),
-			)
+			)...), should.BeTrue)
 		},
 		conf.RxMetadatas[1:]...,
 	), should.BeTrue) {
 		return nil, false
 	}
-	return env.AssertScheduleJoinAccept(ctx, dev)
+	dev, ok := env.AssertScheduleJoinAccept(ctx, dev)
+	if !ok {
+		t.Error("Join-accept scheduling assertion failed")
+		return nil, false
+	}
+
+	idsWithDevAddr := conf.Device.EndDeviceIdentifiers
+	idsWithDevAddr.DevAddr = &joinReq.DevAddr
+
+	var appUp *ttnpb.ApplicationUp
+	if !a.So(env.AssertNsAsHandleUplink(ctx, conf.Device.ApplicationIdentifiers, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+		_, a := test.MustNewTFromContext(ctx)
+		if !a.So(ups, should.HaveLength, 1) {
+			return false
+		}
+		up := ups[0]
+		recvAt := up.GetJoinAccept().GetReceivedAt()
+		appUp = up
+		return test.AllTrue(
+			a.So(up.CorrelationIDs, should.HaveSameElementsDeep, append(joinReq.CorrelationIDs, joinResp.CorrelationIDs...)),
+			a.So([]time.Time{start, recvAt, time.Now()}, should.BeChronological),
+			a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: idsWithDevAddr,
+				CorrelationIDs:       up.CorrelationIDs,
+				Up: &ttnpb.ApplicationUp_JoinAccept{
+					JoinAccept: &ttnpb.ApplicationJoinAccept{
+						AppSKey:      joinResp.AppSKey,
+						SessionKeyID: joinResp.SessionKeyID,
+						ReceivedAt:   recvAt,
+					},
+				},
+			}),
+		)
+	}, nil), should.BeTrue) {
+		t.Error("Failed to send join-accept to Application Server")
+		return nil, false
+	}
+	return dev, a.So(env.Events, should.ReceiveEventFunc, test.MakeEventEqual(test.EventEqualConfig{
+		Identifiers:    true,
+		Data:           true,
+		Origin:         true,
+		Context:        true,
+		Visibility:     true,
+		Authentication: true,
+		RemoteIP:       true,
+		UserAgent:      true,
+	}),
+		EvtForwardJoinAccept.NewWithIdentifiersAndData(ctx, idsWithDevAddr, &ttnpb.ApplicationUp{
+			EndDeviceIdentifiers: idsWithDevAddr,
+			CorrelationIDs:       appUp.CorrelationIDs,
+			Up: &ttnpb.ApplicationUp_JoinAccept{
+				JoinAccept: ApplicationJoinAcceptWithoutAppSKey(appUp.GetJoinAccept()),
+			},
+		}),
+	)
 }
 
 type DataUplinkAssertionConfig struct {
