@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Configure application activation settings from the CLI (see `ttn-lw-cli application activation-settings` commands).
+
 ### Changed
 
 ### Deprecated
