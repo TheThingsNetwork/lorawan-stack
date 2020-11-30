@@ -12,7 +12,7 @@ RUN addgroup -g 886 thethings && adduser -u 886 -S -G thethings thethings
 
 RUN apk --update --no-cache add ca-certificates curl
 
-COPY --from=builder /bin/ttn-lw-cli /bin/ttn-lw-cli
+COPY --from=builder /bin/ttn-lw-stack /bin/ttn-lw-stack
 RUN ln -s /bin/ttn-lw-stack /bin/stack
 
 COPY --from=builder /bin/ttn-lw-cli /bin/ttn-lw-cli
