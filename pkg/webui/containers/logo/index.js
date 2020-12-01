@@ -27,13 +27,13 @@ const logo = {
   alt: `${selectApplicationSiteName()} Logo`,
 }
 const hasCustomBranding = selectBrandingRootPath() !== selectAssetsRootPath()
-const secondaryLogo = hasCustomBranding
+const brandLogo = hasCustomBranding
   ? {
       src: `${selectBrandingRootPath()}/logo.svg`,
       alt: 'Logo',
     }
   : undefined
 
-const Logo = props => <LogoComponent logo={logo} secondaryLogo={secondaryLogo} {...props} />
+const Logo = props => <LogoComponent logo={logo} brandLogo={brandLogo} {...props} />
 
 export default Logo
