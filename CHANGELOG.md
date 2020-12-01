@@ -18,6 +18,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Branding (updated TTS Open Source logo, colors, etc).
+
 ### Deprecated
 
 ### Removed
