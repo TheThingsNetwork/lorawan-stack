@@ -23,6 +23,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
+- Fixed an issue with authentication on the `/debug/pprof`, `/healthz` and `/metrics` endpoints.
+
 ## [3.10.2] - 2020-11-27
 
 ### Added
