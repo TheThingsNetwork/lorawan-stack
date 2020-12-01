@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- Fixed an issue with authentication on the `/debug/pprof`, `/healthz` and `/metrics` endpoints.
+
 ## [3.9.4] - 2020-09-23
 
 ### Changed
