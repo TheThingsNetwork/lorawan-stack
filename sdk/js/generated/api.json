@@ -24608,7 +24608,7 @@
           "methods": [
             {
               "name": "PublishDownlink",
-              "description": "PublishDownlink instructs the Packet Broker Agent to publish a downlink message to Packet Broker Router.",
+              "description": "PublishDownlink instructs the Packet Broker Agent to publish a downlink\nmessage to Packet Broker Router.",
               "requestType": "DownlinkMessage",
               "requestLongType": "DownlinkMessage",
               "requestFullType": "ttn.lorawan.v3.DownlinkMessage",
