@@ -419,6 +419,10 @@
       "ns"
     ]
   },
+  "skip_payload_crypto": [
+    "as",
+    "as"
+  ],
   "battery_percentage": [
     "ns",
     "ns"
