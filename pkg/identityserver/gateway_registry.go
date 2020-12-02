@@ -48,12 +48,19 @@ var (
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
+	evtPurgeGateway = events.Define(
+		"gateway.purge", "purge gateway",
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
 )
 
 var (
 	errAdminsCreateGateways       = errors.DefinePermissionDenied("admins_create_gateways", "gateways may only be created by admins, or in organizations")
 	errGatewayEUITaken            = errors.DefineAlreadyExists("gateway_eui_taken", "a gateway with EUI `{gateway_eui}` is already registered as `{gateway_id}`")
 	errGatewaySecretEncryptionKey = errors.DefineNotFound("gateway_secret_encryption_key_not_found", "a gateway secret encryption key with id `{id}` not found")
+	errAdminsPurgeGateways        = errors.DefinePermissionDenied("admins_purge_gateways", "gateways may only be purged by admins")
 )
 
 func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
@@ -398,6 +405,35 @@ func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayI
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
+	if !is.IsAdmin(ctx) {
+		return nil, errAdminsPurgeGateways
+	}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		// delete related API keys before purging the gateway
+		err := store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids)
+		if err != nil {
+			return err
+		}
+		// delete related memberships before purging the gateway
+		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids)
+		if err != nil {
+			return err
+		}
+		// delete related contact info before purging the gateway
+		err = store.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)
+		if err != nil {
+			return err
+		}
+		return store.GetGatewayStore(db).PurgeGateway(ctx, ids)
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtPurgeGateway.NewWithIdentifiersAndData(ctx, ids, nil))
+	return ttnpb.Empty, nil
+}
+
 type gatewayRegistry struct {
 	*IdentityServer
 }
@@ -424,4 +460,8 @@ func (gr *gatewayRegistry) Update(ctx context.Context, req *ttnpb.UpdateGatewayR
 
 func (gr *gatewayRegistry) Delete(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
 	return gr.deleteGateway(ctx, req)
+}
+
+func (gr *gatewayRegistry) Purge(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
+	return gr.purgeGateway(ctx, req)
 }

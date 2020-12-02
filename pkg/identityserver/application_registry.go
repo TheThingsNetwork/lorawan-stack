@@ -47,9 +47,16 @@ var (
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
+	evtPurgeApplication = events.Define(
+		"application.purge", "purge application",
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_INFO),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
 )
 
 var errAdminsCreateApplications = errors.DefinePermissionDenied("admins_create_applications", "applications may only be created by admins, or in organizations")
+var errAdminsPurgeApplications = errors.DefinePermissionDenied("admins_purge_applications", "applications may only be purged by admins")
 
 func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (app *ttnpb.Application, err error) {
 	if err = blacklist.Check(ctx, req.ApplicationID); err != nil {
@@ -253,6 +260,42 @@ func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.Appl
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
+	if !is.IsAdmin(ctx) {
+		return nil, errAdminsPurgeApplications
+	}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		total, err := store.GetEndDeviceStore(db).CountEndDevices(ctx, ids)
+		if err != nil {
+			return err
+		}
+		if total > 0 {
+			return errApplicationHasDevices.WithAttributes("count", int(total))
+		}
+		// delete related API keys before purging the application
+		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids)
+		if err != nil {
+			return err
+		}
+		// delete related memberships before purging the application
+		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids)
+		if err != nil {
+			return err
+		}
+		// delete related contact info before purging the application
+		err = store.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)
+		if err != nil {
+			return err
+		}
+		return store.GetApplicationStore(db).PurgeApplication(ctx, ids)
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtPurgeApplication.NewWithIdentifiersAndData(ctx, ids, nil))
+	return ttnpb.Empty, nil
+}
+
 type applicationRegistry struct {
 	*IdentityServer
 }
@@ -275,4 +318,8 @@ func (ar *applicationRegistry) Update(ctx context.Context, req *ttnpb.UpdateAppl
 
 func (ar *applicationRegistry) Delete(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
 	return ar.deleteApplication(ctx, req)
+}
+
+func (ar *applicationRegistry) Purge(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
+	return ar.purgeApplication(ctx, req)
 }
