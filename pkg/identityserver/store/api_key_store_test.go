@@ -143,5 +143,30 @@ func TestAPIKeyStore(t *testing.T) {
 				a.So(keys, should.HaveLength, 0)
 			})
 		}
+
+		t.Run("Delete entity API keys", func(t *testing.T) {
+			a := assertions.New(t)
+
+			// Create three API keys for entity
+			for i := 0; i < 3; i++ {
+				key := &ttnpb.APIKey{
+					ID:     strings.ToUpper(fmt.Sprintf("KEYID%d", i)),
+					Key:    strings.ToUpper(fmt.Sprintf("KEY%d", i)),
+					Name:   fmt.Sprintf("API key %d", i),
+					Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+				}
+
+				store.CreateAPIKey(ctx, userIDs, key)
+			}
+			err := store.DeleteEntityAPIKeys(ctx, userIDs)
+
+			a.So(err, should.BeNil)
+
+			keys, err := store.FindAPIKeys(ctx, userIDs)
+
+			// Check if all API keys are deleted
+			a.So(err, should.BeNil)
+			a.So(keys, should.HaveLength, 0)
+		})
 	})
 }

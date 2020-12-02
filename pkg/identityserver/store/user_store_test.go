@@ -33,6 +33,7 @@ func TestUserStore(t *testing.T) {
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, &Account{}, &User{}, &Attribute{}, &Picture{})
+		s := newStore(db)
 		store := GetUserStore(db)
 
 		list, err := store.ListAdmins(ctx, &types.FieldMask{Paths: []string{"name"}})
@@ -156,5 +157,39 @@ func TestUserStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
+
+		entity, _ := s.findDeletedEntity(ctx, &ttnpb.UserIdentifiers{UserID: "foo"}, "id")
+
+		err = store.PurgeUser(ctx, &ttnpb.UserIdentifiers{UserID: "foo"})
+
+		a.So(err, should.BeNil)
+
+		var attribute []Attribute
+		s.query(ctx, Attribute{}).Where(&Attribute{
+			EntityID:   entity.PrimaryKey(),
+			EntityType: "user",
+		}).Find(&attribute)
+
+		a.So(attribute, should.HaveLength, 0)
+
+		// Check that user ids are released
+		_, err = store.CreateUser(ctx, &ttnpb.User{
+			UserIdentifiers: ttnpb.UserIdentifiers{UserID: "foo"},
+			Name:            "Foo User",
+			Description:     "The Amazing Foo User",
+			Attributes: map[string]string{
+				"foo": "bar",
+				"bar": "baz",
+				"baz": "qux",
+			},
+			ProfilePicture: &ttnpb.Picture{
+				Embedded: &ttnpb.Picture_Embedded{
+					MimeType: "image/png",
+					Data:     []byte("foobarbaz"),
+				},
+			},
+		})
+
+		a.So(err, should.BeNil)
 	})
 }

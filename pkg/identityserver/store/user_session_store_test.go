@@ -162,5 +162,29 @@ func TestUserSessionStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
+
+		for _, sessionSecret := range []string{
+			"123412341234123412341234",
+			"12341234123412341234123121",
+			"12341234123412341234132143124",
+			"111123124321543453456652532154",
+		} {
+			_, err := store.CreateSession(ctx, &ttnpb.UserSession{
+				UserIdentifiers: userIDs,
+				SessionSecret:   sessionSecret,
+			})
+			a.So(err, should.BeNil)
+		}
+		list, err = store.FindSessions(ctx, &userIDs)
+
+		a.So(err, should.BeNil)
+		a.So(list, should.HaveLength, 4)
+
+		err = store.DeleteAllUserSessions(ctx, &userIDs)
+
+		list, err = store.FindSessions(ctx, &userIDs)
+
+		a.So(err, should.BeNil)
+		a.So(list, should.BeEmpty)
 	})
 }

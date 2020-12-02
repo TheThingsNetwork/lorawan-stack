@@ -140,6 +140,29 @@ func (s *oauthStore) DeleteAuthorization(ctx context.Context, userIDs *ttnpb.Use
 	return err
 }
 
+func (s *oauthStore) DeleteUserAuthorizations(ctx context.Context, userIDs *ttnpb.UserIdentifiers) error {
+	defer trace.StartRegion(ctx, "delete user authorizations").End()
+	user, err := s.findDeletedEntity(ctx, userIDs, "id")
+	if err != nil {
+		return err
+	}
+	err = s.query(ctx, ClientAuthorization{}).Where(ClientAuthorization{
+		UserID: user.PrimaryKey(),
+	}).Delete(&ClientAuthorization{}).Error
+	if err != nil {
+		return err
+	}
+	err = s.query(ctx, AuthorizationCode{}).Where(AuthorizationCode{
+		UserID: user.PrimaryKey(),
+	}).Delete(&AuthorizationCode{}).Error
+	if err != nil {
+		return err
+	}
+	return s.query(ctx, AccessToken{}).Where(AccessToken{
+		UserID: user.PrimaryKey(),
+	}).Delete(&AccessToken{}).Error
+}
+
 func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) error {
 	defer trace.StartRegion(ctx, "create authorization code").End()
 	client, err := s.findEntity(ctx, code.ClientIDs, "id")

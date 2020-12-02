@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -157,4 +157,36 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "delete organization").End()
 	return s.deleteEntity(ctx, id)
+}
+
+func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (err error) {
+	defer trace.StartRegion(ctx, "purge organization").End()
+
+	query := s.query(ctx, Organization{}, withUnscoped(), withOrganizationID(id.GetOrganizationID()))
+	query = selectOrganizationFields(ctx, query, nil)
+	var orgModel organizationWithUID
+	if err = query.First(&orgModel).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return errNotFoundForID(id)
+		}
+		return err
+	}
+	if err := ctx.Err(); err != nil { // Early exit if context canceled
+		return err
+	}
+	if len(orgModel.Attributes) > 0 {
+		if err := s.replaceAttributes(ctx, "organization", orgModel.ID, orgModel.Attributes, nil); err != nil {
+			return err
+		}
+	}
+
+	err = s.purgeEntity(ctx, id)
+	if err != nil {
+		return err
+	}
+	// Purge account after purging organization because it is necessary for organization query
+	return s.query(ctx, Account{}, withUnscoped()).Where(Account{
+		UID:         id.IDString(),
+		AccountType: id.EntityType(),
+	}).Delete(Account{}).Error
 }

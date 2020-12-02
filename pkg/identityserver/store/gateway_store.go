@@ -164,3 +164,29 @@ func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdent
 	defer trace.StartRegion(ctx, "delete gateway").End()
 	return s.deleteEntity(ctx, id)
 }
+
+func (s *gatewayStore) PurgeGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error {
+	defer trace.StartRegion(ctx, "purge gateway").End()
+	query := s.query(ctx, Gateway{}, withUnscoped(), withGatewayID(id.GetGatewayID()))
+	query = selectGatewayFields(ctx, query, nil)
+	var gtwModel Gateway
+	if err := query.First(&gtwModel).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return errNotFoundForID(id)
+		}
+		return err
+	}
+	// delete gateway antennas before purging
+	if len(gtwModel.Antennas) > 0 {
+		if err := s.replaceGatewayAntennas(ctx, gtwModel.ID, gtwModel.Antennas, nil); err != nil {
+			return err
+		}
+	}
+	// delete gateway attributes before purging
+	if len(gtwModel.Attributes) > 0 {
+		if err := s.replaceAttributes(ctx, "gateway", gtwModel.ID, gtwModel.Attributes, nil); err != nil {
+			return err
+		}
+	}
+	return s.purgeEntity(ctx, id)
+}
