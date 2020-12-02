@@ -72,7 +72,7 @@ $ tools/bin/mage dev:initStack
 
 This creates a database, migrates tables and creates a user `admin` with password `admin`.
 
-4. Start an development instance of The Things Stack
+4. Start a development instance of The Things Stack
 
 ```bash
 $ go run ./cmd/ttn-lw-stack -c ./config/stack/ttn-lw-stack.yml start
