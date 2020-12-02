@@ -86,6 +86,7 @@ export default history =>
       applications: createNamedRightsReducer(APPLICATION_SHARED_NAME),
       gateways: createNamedRightsReducer(GATEWAY_SHARED_NAME),
       organizations: createNamedRightsReducer(ORGANIZATION_SHARED_NAME),
+      users: createNamedRightsReducer(USER_SHARED_NAME),
     }),
     events: combineReducers({
       applications: createNamedEventsReducer(APPLICATION_SHARED_NAME),

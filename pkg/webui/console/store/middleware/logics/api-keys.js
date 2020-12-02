@@ -18,9 +18,9 @@ import * as apiKeys from '@console/store/actions/api-keys'
 
 import createRequestLogic from './lib'
 
-const validParentTypes = ['application', 'gateway', 'organization']
+const validParentTypes = ['application', 'gateway', 'organization', 'users']
 
-const parentTypeValidator = function({ action }, allow) {
+const parentTypeValidator = ({ action }, allow) => {
   if (!validParentTypes.includes(action.payload.parentType)) {
     // Do not reject the action but throw an error, as this is an implementation
     // error.
@@ -32,7 +32,7 @@ const parentTypeValidator = function({ action }, allow) {
 const getApiKeysLogic = createRequestLogic({
   type: apiKeys.GET_API_KEYS_LIST,
   validate: parentTypeValidator,
-  async process({ getState, action }) {
+  process: async ({ action }) => {
     const {
       parentType,
       parentId,
@@ -46,7 +46,7 @@ const getApiKeysLogic = createRequestLogic({
 const getApiKeyLogic = createRequestLogic({
   type: apiKeys.GET_API_KEY,
   validate: parentTypeValidator,
-  async process({ action }) {
+  process: async ({ action }) => {
     const { parentType, parentId, keyId } = action.payload
     return api[parentType].apiKeys.get(parentId, keyId)
   },

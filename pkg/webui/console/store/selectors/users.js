@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_USERS_LIST_BASE, GET_USER_BASE } from '@console/store/actions/users'
+import {
+  GET_USERS_LIST_BASE,
+  GET_USER_BASE,
+  GET_USER_RIGHTS_LIST_BASE,
+} from '@console/store/actions/users'
 
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
@@ -20,6 +24,7 @@ import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
 } from './pagination'
+import { createRightsSelector, createPseudoRightsSelector } from './rights'
 
 const ENTITY = 'users'
 
@@ -43,3 +48,9 @@ export const selectUsers = state => selectUsrsIds(state).map(id => selectUserByI
 export const selectUsersTotalCount = state => selectUsrsTotalCount(state)
 export const selectUsersFetching = state => selectUsrsFetching(state)
 export const selectUsersError = state => selectUsrsError(state)
+
+// Rights.
+export const selectUserRights = createRightsSelector(ENTITY)
+export const selectUserPseudoRights = createPseudoRightsSelector(ENTITY)
+export const selectUserRightsError = createErrorSelector(GET_USER_RIGHTS_LIST_BASE)
+export const selectUserRightsFetching = createFetchingSelector(GET_USER_RIGHTS_LIST_BASE)

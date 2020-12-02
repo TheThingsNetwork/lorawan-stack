@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const selectRightsStore = (state, entity) => state.rights[entity]
+import UserApiKeyEdit from './user-api-keys-edit'
+import connect from './connect'
 
-export const createRightsSelector = entity => state => {
-  const store = selectRightsStore(state, entity)
+const ConnectedUserApiKeyEdit = connect(UserApiKeyEdit)
 
-  return store.rights.filter(right => !right.endsWith('_ALL'))
-}
-
-export const createPseudoRightsSelector = entity => state => {
-  const store = selectRightsStore(state, entity)
-
-  return store.rights.filter(right => right.endsWith('_ALL'))
-}
+export { ConnectedUserApiKeyEdit as default, UserApiKeyEdit }

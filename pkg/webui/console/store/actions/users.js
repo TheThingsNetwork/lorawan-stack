@@ -14,6 +14,7 @@
 
 import { createPaginationRequestActions, createPaginationBaseActionType } from './pagination'
 import { createRequestActions } from './lib'
+import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
 
 export const SHARED_NAME = 'USER'
 
@@ -46,3 +47,17 @@ export const [
   { request: DELETE_USER, success: DELETE_USER_SUCCESS, failure: DELETE_USER_FAILURE },
   { request: deleteUser, success: deleteUserSuccess, failure: deleteUserFailure },
 ] = createRequestActions(DELETE_USER_BASE, id => ({ id }))
+
+export const GET_USER_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
+export const [
+  {
+    request: GET_USER_RIGHTS_LIST,
+    success: GET_USER_RIGHTS_LIST_SUCCESS,
+    failure: GET_USER_RIGHTS_LIST_FAILURE,
+  },
+  {
+    request: getUsersRightsList,
+    success: getUsersRightsListSuccess,
+    failure: getUsersRightsListFailure,
+  },
+] = createGetRightsListRequestActions(SHARED_NAME)

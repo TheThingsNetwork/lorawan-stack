@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import Applications from '@console/views/applications'
 import Gateways from '@console/views/gateways'
 import Organizations from '@console/views/organizations'
 import Admin from '@console/views/admin'
+import User from '@console/views/user'
 import FullViewError, { FullViewErrorInner } from '@console/views/error'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -169,6 +170,7 @@ class ConsoleApp extends React.PureComponent {
                         <Route path="/gateways" component={Gateways} />
                         <Route path="/organizations" component={Organizations} />
                         <Route path="/admin" component={Admin} />
+                        <Route path="/user" component={User} />
                         <Route component={GenericNotFound} />
                       </Switch>
                     </div>

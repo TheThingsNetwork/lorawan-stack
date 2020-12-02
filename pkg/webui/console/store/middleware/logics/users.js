@@ -89,4 +89,21 @@ const createUserLogic = createRequestLogic({
   },
 })
 
-export default [getUserLogic, getUsersLogic, updateUserLogic, deleteUserLogic, createUserLogic]
+const getUsersRightsLogic = createRequestLogic({
+  type: users.GET_USER_RIGHTS_LIST,
+  process: async ({ action }) => {
+    const { id } = action.payload
+    const result = await api.rights.users(id)
+
+    return result.rights.sort()
+  },
+})
+
+export default [
+  getUserLogic,
+  getUsersLogic,
+  updateUserLogic,
+  deleteUserLogic,
+  createUserLogic,
+  getUsersRightsLogic,
+]
