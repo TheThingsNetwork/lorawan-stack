@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [3.9.5] - 2020-12-02
+
+### Security
+
+- Fixed an issue with authentication on the `/debug/pprof`, `/healthz` and `/metrics` endpoints.
+
 ## [3.9.4] - 2020-09-23
 
 ### Changed
@@ -1073,7 +1079,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.4...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.5...v3.9
+[3.9.5]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.4...v3.9.5
 [3.9.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.3...v3.9.4
 [3.9.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.1...v3.9.3
 [3.9.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.0...v3.9.1
