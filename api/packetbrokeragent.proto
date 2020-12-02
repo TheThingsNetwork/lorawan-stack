@@ -28,6 +28,7 @@ service GsPba {
 
 // The NsPba service connects a Network Server to a Packet Broker Agent.
 service NsPba {
-  // PublishDownlink instructs the Packet Broker Agent to publish a downlink message to Packet Broker Router.
+  // PublishDownlink instructs the Packet Broker Agent to publish a downlink
+  // message to Packet Broker Router.
   rpc PublishDownlink(DownlinkMessage) returns (google.protobuf.Empty);
 }
