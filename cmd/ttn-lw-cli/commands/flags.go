@@ -68,6 +68,12 @@ func attributesFlags() *pflag.FlagSet {
 	return flagSet
 }
 
+func forceFlags() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.Bool("force", false, "")
+	return flagSet
+}
+
 func mergeKV(attributes map[string]string, kv []string) map[string]string {
 	out := make(map[string]string, len(attributes)+len(kv))
 	for k, v := range attributes {

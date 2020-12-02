@@ -16,6 +16,7 @@
 package commands
 
 import (
+	"bufio"
 	"context"
 	"crypto/tls"
 	"crypto/x509"
@@ -24,6 +25,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -205,6 +207,40 @@ func optionalAuth() error {
 		return err
 	}
 	return nil
+}
+
+func confirmChoice(warnings []string, force bool) bool {
+	if force {
+		return true
+	}
+	if len(warnings) > 0 {
+		for _, warning := range warnings {
+			logger.Warn(warning)
+		}
+	}
+	logger.Warn("Are you sure? Confirm your choice:")
+	for {
+		fmt.Fprint(os.Stderr, "[Y/n]> ")
+		reader := bufio.NewReader(os.Stdin)
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			return false
+		}
+		input = strings.TrimSpace(input)
+		input = strings.ToLower(input)
+		if len(input) > 1 {
+			fmt.Fprintln(os.Stderr, "Please enter Y or n:")
+			continue
+		}
+		if strings.Compare(input, "n") == 0 {
+			return false
+		} else if strings.Compare(input, "y") == 0 {
+			break
+		} else {
+			continue
+		}
+	}
+	return true
 }
 
 func requireAuth() error {

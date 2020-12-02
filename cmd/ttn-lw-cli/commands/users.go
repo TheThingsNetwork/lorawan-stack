@@ -422,6 +422,35 @@ var (
 		}
 		return usrID.EntityIdentifiers(), nil
 	})
+
+	usersPurgeCommand = &cobra.Command{
+		Use:     "purge [user-id]",
+		Aliases: []string{"permanent-delete", "hard-delete"},
+		Short:   "Purge a user",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), args)
+			if usrID == nil {
+				return errNoUserID
+			}
+			force, err := cmd.Flags().GetBool("force")
+			if err != nil {
+				return err
+			}
+			if !confirmChoice(userPurgeWarning, force) {
+				return errNoConfirmation
+			}
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewUserRegistryClient(is).Purge(ctx, usrID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
 )
 
 func init() {
@@ -464,5 +493,8 @@ func init() {
 	usersCommand.AddCommand(usersDeleteCommand)
 	usersContactInfoCommand.PersistentFlags().AddFlagSet(userIDFlags())
 	usersCommand.AddCommand(usersContactInfoCommand)
+	usersPurgeCommand.Flags().AddFlagSet(userIDFlags())
+	usersPurgeCommand.Flags().AddFlagSet(forceFlags())
+	usersCommand.AddCommand(usersPurgeCommand)
 	Root.AddCommand(usersCommand)
 }
