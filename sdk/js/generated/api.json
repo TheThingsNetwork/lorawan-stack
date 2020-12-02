@@ -1102,6 +1102,28 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "Purge",
+              "description": "Purge the application. This will release the application ID for reuse.\nAll end devices must be deleted from the application before it can be deleted.\nThe application owner is responsible for clearing data from any (external) integrations\nthat may store and expose data by application ID",
+              "requestType": "ApplicationIdentifiers",
+              "requestLongType": "ApplicationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/applications/{application_id}/purge"
+                    }
+                  ]
+                }
+              }
             }
           ]
         }
@@ -13077,6 +13099,28 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "Purge",
+              "description": "Purge the gateway. This will release both gateway ID and EUI for reuse.\nThe gateway owner is responsible for clearing data from any (external) integrations\nthat may store and expose data by gateway ID.",
+              "requestType": "GatewayIdentifiers",
+              "requestLongType": "GatewayIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/gateways/{gateway_id}/purge"
+                    }
+                  ]
+                }
+              }
             }
           ]
         }
@@ -24563,6 +24607,28 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "Purge",
+              "description": "Purge the organization. This will release the organization ID for reuse.\nThe user is responsible for clearing data from any (external) integrations\nthat may store and expose data by user or organization ID.",
+              "requestType": "OrganizationIdentifiers",
+              "requestLongType": "OrganizationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/organizations/{organization_id}/purge"
+                    }
+                  ]
+                }
+              }
             }
           ]
         }
@@ -28046,6 +28112,28 @@
                     {
                       "method": "DELETE",
                       "pattern": "/users/{user_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Purge",
+              "description": "Purge the user. This will release the user ID for reuse.\nThe user is responsible for clearing data from any (external) integrations\nthat may store and expose data by user or organization ID.",
+              "requestType": "UserIdentifiers",
+              "requestLongType": "UserIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.UserIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/users/{user_id}/purge"
                     }
                   ]
                 }

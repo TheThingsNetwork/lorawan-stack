@@ -79,6 +79,16 @@ service ApplicationRegistry {
       delete: "/applications/{application_id}"
     };
   };
+
+  // Purge the application. This will release the application ID for reuse.
+  // All end devices must be deleted from the application before it can be deleted.
+  // The application owner is responsible for clearing data from any (external) integrations
+  // that may store and expose data by application ID
+  rpc Purge(ApplicationIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/applications/{application_id}/purge"
+    };
+  };
 }
 
 service ApplicationAccess {

@@ -80,6 +80,15 @@ service UserRegistry {
       delete: "/users/{user_id}"
     };
   };
+
+  // Purge the user. This will release the user ID for reuse.
+  // The user is responsible for clearing data from any (external) integrations
+  // that may store and expose data by user or organization ID.
+  rpc Purge(UserIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/{user_id}/purge"
+    };
+  };
 }
 
 service UserAccess {
