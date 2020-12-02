@@ -11,8 +11,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Configure application activation settings from the CLI (see `ttn-lw-cli application activation-settings` commands).
-
 ### Changed
 
 ### Deprecated
@@ -20,6 +18,14 @@ For details about compatibility between different releases, see the **Commitment
 ### Removed
 
 ### Fixed
+
+### Security
+
+## [3.10.3] - 2020-12-02
+
+### Added
+
+- Configure application activation settings from the CLI (see `ttn-lw-cli application activation-settings` commands).
 
 ### Security
 
@@ -1184,7 +1190,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.2...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.3...v3.10
+[3.10.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.2...v3.10.3
 [3.10.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.1...v3.10.2
 [3.10.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.0...v3.10.1
 [3.10.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.9.4...v3.10.0
