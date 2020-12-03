@@ -21,26 +21,26 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './logo.styl'
 
-const Logo = function({ className, logo, secondaryLogo, vertical }) {
+const Logo = ({ className, logo, brandLogo, vertical }) => {
   const classname = classnames(style.container, className, {
     [style.vertical]: vertical,
-    [style.customBranding]: Boolean(secondaryLogo),
+    [style.customBranding]: Boolean(brandLogo),
   })
 
   return (
     <div className={classname}>
+      {Boolean(brandLogo) && (
+        <div className={style.brandLogo}>
+          <Link to="/" id="brand-logo" className={style.brandLogoContainer}>
+            <img {...brandLogo} />
+          </Link>
+        </div>
+      )}
       <div className={style.logo}>
         <Link className={style.logoContainer} to="/">
           <img {...logo} />
         </Link>
       </div>
-      {Boolean(secondaryLogo) && (
-        <div className={style.secondaryLogo}>
-          <div id="secondary-logo" className={style.secondaryLogoContainer}>
-            <img {...secondaryLogo} />
-          </div>
-        </div>
-      )}
     </div>
   )
 }
@@ -51,15 +51,15 @@ const imgPropType = PropTypes.shape({
 })
 
 Logo.propTypes = {
+  brandLogo: imgPropType,
   className: PropTypes.string,
   logo: imgPropType.isRequired,
-  secondaryLogo: imgPropType,
   vertical: PropTypes.bool,
 }
 
 Logo.defaultProps = {
   className: undefined,
-  secondaryLogo: undefined,
+  brandLogo: undefined,
   vertical: false,
 }
 

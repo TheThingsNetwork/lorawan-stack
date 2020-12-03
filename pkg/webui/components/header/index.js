@@ -30,7 +30,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './header.styl'
 
-const Header = function({
+const Header = ({
   className,
   dropdownItems,
   navigationEntries,
@@ -41,7 +41,7 @@ const Header = function({
   onLogout,
   onSearchRequest,
   ...rest
-}) {
+}) => {
   const isGuest = !Boolean(user)
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)

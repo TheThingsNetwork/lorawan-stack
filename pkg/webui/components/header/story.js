@@ -36,7 +36,7 @@ const singleLogo = <Logo logo={{ src: TtsLogo, alt: 'Logo' }} />
 const doubleLogo = (
   <Logo
     logo={{ src: TtsLogo, alt: 'Logo' }}
-    secondaryLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
+    brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
   />
 )
 
