@@ -228,6 +228,18 @@
           ]
         }
       ]
+    },
+    "Purge": {
+      "file": "lorawan-stack/api/application_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/applications/{application_id}/purge",
+          "parameters": [
+            "application_id"
+          ]
+        }
+      ]
     }
   },
   "AppAs": {
@@ -1992,6 +2004,18 @@
           ]
         }
       ]
+    },
+    "Purge": {
+      "file": "lorawan-stack/api/gateway_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/gateways/{gateway_id}/purge",
+          "parameters": [
+            "gateway_id"
+          ]
+        }
+      ]
     }
   },
   "Gs": {
@@ -3305,6 +3329,18 @@
           ]
         }
       ]
+    },
+    "Purge": {
+      "file": "lorawan-stack/api/organization_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/organizations/{organization_id}/purge",
+          "parameters": [
+            "organization_id"
+          ]
+        }
+      ]
     }
   },
   "GsPba": {
@@ -3786,6 +3822,18 @@
         {
           "method": "delete",
           "pattern": "/users/{user_id}",
+          "parameters": [
+            "user_id"
+          ]
+        }
+      ]
+    },
+    "Purge": {
+      "file": "lorawan-stack/api/user_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/users/{user_id}/purge",
           "parameters": [
             "user_id"
           ]

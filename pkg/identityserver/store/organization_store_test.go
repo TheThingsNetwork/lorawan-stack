@@ -34,6 +34,7 @@ func TestOrganizationStore(t *testing.T) {
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, &Account{}, &Organization{}, &Attribute{})
 		store := GetOrganizationStore(db)
+		s := newStore(db)
 
 		created, err := store.CreateOrganization(ctx, &ttnpb.Organization{
 			OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "foo"},
@@ -128,5 +129,33 @@ func TestOrganizationStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
+
+		entity, _ := s.findDeletedEntity(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}, "id")
+
+		err = store.PurgeOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: "foo"})
+
+		a.So(err, should.BeNil)
+
+		var attribute []Attribute
+		s.query(ctx, Attribute{}).Where(&Attribute{
+			EntityID:   entity.PrimaryKey(),
+			EntityType: "organization",
+		}).Find(&attribute)
+
+		a.So(attribute, should.HaveLength, 0)
+
+		//Check that organization ids are released after purge
+		_, err = store.CreateOrganization(ctx, &ttnpb.Organization{
+			OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "foo"},
+			Name:                    "Foo Organization",
+			Description:             "The Amazing Foo Organization",
+			Attributes: map[string]string{
+				"foo": "bar",
+				"bar": "baz",
+				"baz": "qux",
+			},
+		})
+
+		a.So(err, should.BeNil)
 	})
 }

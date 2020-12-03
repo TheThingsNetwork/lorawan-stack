@@ -725,6 +725,7 @@ Application is the message that defines an Application in the network.
 | `List` | [`ListApplicationsRequest`](#ttn.lorawan.v3.ListApplicationsRequest) | [`Applications`](#ttn.lorawan.v3.Applications) | List applications where the given user or organization is a direct collaborator. If no user or organization is given, this returns the applications the caller has access to. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateApplicationRequest`](#ttn.lorawan.v3.UpdateApplicationRequest) | [`Application`](#ttn.lorawan.v3.Application) | Update the application, changing the fields specified by the field mask to the provided values. |
 | `Delete` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the application. This may not release the application ID for reuse. All end devices must be deleted from the application before it can be deleted. |
+| `Purge` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the application. This will release the application ID for reuse. All end devices must be deleted from the application before it can be deleted. The application owner is responsible for clearing data from any (external) integrations that may store and expose data by application ID |
 
 #### HTTP bindings
 
@@ -738,6 +739,7 @@ Application is the message that defines an Application in the network.
 | `List` | `GET` | `/api/v3/organizations/{collaborator.organization_ids.organization_id}/applications` |  |
 | `Update` | `PUT` | `/api/v3/applications/{application.ids.application_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/applications/{application_id}` |  |
+| `Purge` | `DELETE` | `/api/v3/applications/{application_id}/purge` |  |
 
 ## <a name="lorawan-stack/api/applicationserver.proto">File `lorawan-stack/api/applicationserver.proto`</a>
 
@@ -3197,6 +3199,7 @@ Identifies an end device model with version information.
 | `List` | [`ListGatewaysRequest`](#ttn.lorawan.v3.ListGatewaysRequest) | [`Gateways`](#ttn.lorawan.v3.Gateways) | List gateways where the given user or organization is a direct collaborator. If no user or organization is given, this returns the gateways the caller has access to. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateGatewayRequest`](#ttn.lorawan.v3.UpdateGatewayRequest) | [`Gateway`](#ttn.lorawan.v3.Gateway) | Update the gateway, changing the fields specified by the field mask to the provided values. |
 | `Delete` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the gateway. This may not release the gateway ID for reuse, but it does release the EUI. |
+| `Purge` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the gateway. This will release both gateway ID and EUI for reuse. The gateway owner is responsible for clearing data from any (external) integrations that may store and expose data by gateway ID. |
 
 #### HTTP bindings
 
@@ -3210,6 +3213,7 @@ Identifies an end device model with version information.
 | `List` | `GET` | `/api/v3/organizations/{collaborator.organization_ids.organization_id}/gateways` |  |
 | `Update` | `PUT` | `/api/v3/gateways/{gateway.ids.gateway_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/gateways/{gateway_id}` |  |
+| `Purge` | `DELETE` | `/api/v3/gateways/{gateway_id}/purge` |  |
 
 ## <a name="lorawan-stack/api/gatewayserver.proto">File `lorawan-stack/api/gatewayserver.proto`</a>
 
@@ -5911,6 +5915,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | `List` | [`ListOrganizationsRequest`](#ttn.lorawan.v3.ListOrganizationsRequest) | [`Organizations`](#ttn.lorawan.v3.Organizations) | List organizations where the given user or organization is a direct collaborator. If no user or organization is given, this returns the organizations the caller has access to. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateOrganizationRequest`](#ttn.lorawan.v3.UpdateOrganizationRequest) | [`Organization`](#ttn.lorawan.v3.Organization) | Update the organization, changing the fields specified by the field mask to the provided values. |
 | `Delete` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the organization. This may not release the organization ID for reuse. |
+| `Purge` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the organization. This will release the organization ID for reuse. The user is responsible for clearing data from any (external) integrations that may store and expose data by user or organization ID. |
 
 #### HTTP bindings
 
@@ -5922,6 +5927,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | `List` | `GET` | `/api/v3/users/{collaborator.user_ids.user_id}/organizations` |  |
 | `Update` | `PUT` | `/api/v3/organizations/{organization.ids.organization_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/organizations/{organization_id}` |  |
+| `Purge` | `DELETE` | `/api/v3/organizations/{organization_id}/purge` |  |
 
 ## <a name="lorawan-stack/api/packetbrokeragent.proto">File `lorawan-stack/api/packetbrokeragent.proto`</a>
 
@@ -6718,6 +6724,7 @@ User is the message that defines a user on the network.
 | `CreateTemporaryPassword` | [`CreateTemporaryPasswordRequest`](#ttn.lorawan.v3.CreateTemporaryPasswordRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Create a temporary password that can be used for updating a forgotten password. The generated password is sent to the user's email address. |
 | `UpdatePassword` | [`UpdateUserPasswordRequest`](#ttn.lorawan.v3.UpdateUserPasswordRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Update the password of the user. |
 | `Delete` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the user. This may not release the user ID for reuse. |
+| `Purge` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the user. This will release the user ID for reuse. The user is responsible for clearing data from any (external) integrations that may store and expose data by user or organization ID. |
 
 #### HTTP bindings
 
@@ -6730,6 +6737,7 @@ User is the message that defines a user on the network.
 | `CreateTemporaryPassword` | `POST` | `/api/v3/users/{user_ids.user_id}/temporary_password` |  |
 | `UpdatePassword` | `PUT` | `/api/v3/users/{user_ids.user_id}/password` | `*` |
 | `Delete` | `DELETE` | `/api/v3/users/{user_id}` |  |
+| `Purge` | `DELETE` | `/api/v3/users/{user_id}/purge` |  |
 
 ### <a name="ttn.lorawan.v3.UserSessionRegistry">Service `UserSessionRegistry`</a>
 

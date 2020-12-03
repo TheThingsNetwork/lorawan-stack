@@ -454,3 +454,74 @@ func TestMembershipStore(t *testing.T) {
 		}
 	})
 }
+
+func TestDeleteEntityAndAccountMemberships(t *testing.T) {
+	ctx := test.Context()
+	a := assertions.New(t)
+	WithDB(t, func(t *testing.T, db *gorm.DB) {
+		s := newStore(db)
+		store := GetMembershipStore(db)
+
+		prepareTest(db,
+			&Membership{},
+			&Account{}, &User{}, &Organization{},
+			&Application{},
+		)
+
+		usr := &User{Account: Account{UID: "test-user"}}
+		s.createEntity(ctx, usr)
+		org1 := &Organization{Account: Account{UID: "test-org-1"}}
+		s.createEntity(ctx, org1)
+		org2 := &Organization{Account: Account{UID: "test-org-2"}}
+		s.createEntity(ctx, org2)
+		app := &Application{ApplicationID: "test-app"}
+		s.createEntity(ctx, app)
+		usrIDs := usr.Account.OrganizationOrUserIdentifiers()
+		s.createEntity(ctx, &Membership{
+			AccountID:  usr.Account.ID,
+			EntityID:   org1.ID,
+			EntityType: "organization",
+			Rights:     Rights{Rights: []ttnpb.Right{1, 2, 3, 4}},
+		})
+		s.createEntity(ctx, &Membership{
+			AccountID:  usr.Account.ID,
+			EntityID:   org2.ID,
+			EntityType: "organization",
+			Rights:     Rights{Rights: []ttnpb.Right{5, 6, 7, 8}},
+		})
+
+		s.createEntity(ctx, &Membership{
+			AccountID:  org1.Account.ID,
+			EntityID:   app.ID,
+			EntityType: "application",
+			Rights:     Rights{Rights: []ttnpb.Right{2, 3}},
+		})
+		s.createEntity(ctx, &Membership{
+			AccountID:  org2.Account.ID,
+			EntityID:   app.ID,
+			EntityType: "application",
+			Rights:     Rights{Rights: []ttnpb.Right{6, 7}},
+		})
+
+		err := store.DeleteEntityMembers(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: app.ApplicationID})
+		a.So(err, should.BeNil)
+
+		members, err := store.FindMembers(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: app.ApplicationID})
+		if a.So(err, should.BeNil) {
+			a.So(members, should.BeEmpty)
+		}
+
+		err = store.DeleteAccountMembers(ctx, usrIDs)
+		a.So(err, should.BeNil)
+
+		_, err = store.GetMember(ctx, usrIDs, &ttnpb.OrganizationIdentifiers{OrganizationID: org1.Account.UID})
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
+
+		_, err = store.GetMember(ctx, usrIDs, &ttnpb.OrganizationIdentifiers{OrganizationID: org2.Account.UID})
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
+	})
+}

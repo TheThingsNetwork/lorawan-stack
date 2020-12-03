@@ -65,6 +65,24 @@ func (s *store) findEntity(ctx context.Context, entityID ttnpb.Identifiers, fiel
 	return model, nil
 }
 
+func (s *store) findDeletedEntity(ctx context.Context, entityID ttnpb.Identifiers, fields ...string) (modelInterface, error) {
+	model := modelForID(entityID)
+	query := s.query(ctx, model, withUnscoped(), withID(entityID))
+	if len(fields) == 1 && fields[0] == "id" {
+		fields[0] = s.DB.NewScope(model).TableName() + ".id"
+	}
+	if len(fields) > 0 {
+		query = query.Select(fields)
+	}
+	if err := query.First(model).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, errNotFoundForID(entityID)
+		}
+		return nil, convertError(err)
+	}
+	return model, nil
+}
+
 func (s *store) createEntity(ctx context.Context, model interface{}) error {
 	if model, ok := model.(modelInterface); ok {
 		model.SetContext(ctx)
@@ -84,6 +102,14 @@ func (s *store) deleteEntity(ctx context.Context, entityID ttnpb.Identifiers) er
 		return err
 	}
 	return s.DB.Delete(model).Error
+}
+
+func (s *store) purgeEntity(ctx context.Context, entityID ttnpb.Identifiers) error {
+	model, err := s.findDeletedEntity(ctx, entityID, "id")
+	if err != nil {
+		return err
+	}
+	return s.DB.Unscoped().Delete(model).Error
 }
 
 var (

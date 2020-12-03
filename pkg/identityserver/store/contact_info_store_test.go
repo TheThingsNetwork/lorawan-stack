@@ -32,7 +32,7 @@ func TestContactInfoStore(t *testing.T) {
 	now := cleanTime(time.Now())
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		prepareTest(db, &ContactInfo{}, &Application{})
+		prepareTest(db, &ContactInfo{}, &Application{}, &ContactInfoValidation{})
 
 		appStore := GetApplicationStore(db)
 
@@ -81,6 +81,14 @@ func TestContactInfoStore(t *testing.T) {
 				}
 			}
 		}
+
+		err = s.DeleteEntityContactInfo(ctx, app.ApplicationIdentifiers)
+
+		a.So(err, should.BeNil)
+
+		contactInfo, err = s.GetContactInfo(ctx, app.ApplicationIdentifiers)
+
+		a.So(contactInfo, should.HaveLength, 0)
 	})
 }
 

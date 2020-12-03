@@ -1412,6 +1412,15 @@
       "file": "flags.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:no_confirmation": {
+    "translations": {
+      "en": "action not confirmed"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "applications.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_data": {
     "translations": {
       "en": "no data for `{name}`"
@@ -4490,6 +4499,42 @@
       "file": "organization_registry.go"
     }
   },
+  "error:pkg/identityserver:admins_purge_applications": {
+    "translations": {
+      "en": "applications may only be purged by admins"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
+    }
+  },
+  "error:pkg/identityserver:admins_purge_gateways": {
+    "translations": {
+      "en": "gateways may only be purged by admins"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
+  "error:pkg/identityserver:admins_purge_organizations": {
+    "translations": {
+      "en": "organizations may only be purged by admins"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_registry.go"
+    }
+  },
+  "error:pkg/identityserver:admins_purge_users": {
+    "translations": {
+      "en": "users may only be purged by admins"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
   "error:pkg/identityserver:api_key_not_found": {
     "translations": {
       "en": "API key not found"
@@ -7514,6 +7559,15 @@
       "file": "application_registry.go"
     }
   },
+  "event:application.purge": {
+    "translations": {
+      "en": "purge application"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
+    }
+  },
   "event:application.update": {
     "translations": {
       "en": "update application"
@@ -7922,6 +7976,15 @@
   "event:gateway.delete": {
     "translations": {
       "en": "delete gateway"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
+  "event:gateway.purge": {
+    "translations": {
+      "en": "purge gateway"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -8855,6 +8918,15 @@
       "file": "organization_registry.go"
     }
   },
+  "event:organization.purge": {
+    "translations": {
+      "en": "purge organization"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_registry.go"
+    }
+  },
   "event:organization.update": {
     "translations": {
       "en": "update organization"
@@ -8903,6 +8975,15 @@
   "event:user.delete": {
     "translations": {
       "en": "delete user"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "event:user.purge": {
+    "translations": {
+      "en": "purge user"
     },
     "description": {
       "package": "pkg/identityserver",

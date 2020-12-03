@@ -34,6 +34,7 @@ func TestApplicationStore(t *testing.T) {
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, &Application{}, &Attribute{})
 		store := GetApplicationStore(db)
+		s := newStore(db)
 
 		created, err := store.CreateApplication(ctx, &ttnpb.Application{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
@@ -128,5 +129,26 @@ func TestApplicationStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
+
+		entity, _ := s.findDeletedEntity(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}, "id")
+
+		err = store.PurgeApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: "foo"})
+
+		a.So(err, should.BeNil)
+
+		var attribute []Attribute
+		s.query(ctx, Attribute{}).Where(&Attribute{
+			EntityID:   entity.PrimaryKey(),
+			EntityType: "application",
+		}).Find(&attribute)
+
+		a.So(attribute, should.HaveLength, 0)
+
+		// Check that application ids are released after purge
+		_, err = store.CreateApplication(ctx, &ttnpb.Application{
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
+		})
+
+		a.So(err, should.BeNil)
 	})
 }

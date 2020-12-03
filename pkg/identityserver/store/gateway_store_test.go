@@ -35,6 +35,7 @@ func TestGatewayStore(t *testing.T) {
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, &Gateway{}, &GatewayAntenna{}, &Attribute{})
 		store := GetGatewayStore(db)
+		s := newStore(db)
 
 		eui := &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 		scheduleAnytimeDelay := time.Second
@@ -178,9 +179,18 @@ func TestGatewayStore(t *testing.T) {
 			a.So(updated.Antennas, should.HaveLength, 0)
 		}
 
+		_, _ = store.UpdateGateway(ctx, &ttnpb.Gateway{
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo"},
+			Antennas: []ttnpb.GatewayAntenna{
+				{Gain: 6, Location: ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}, Attributes: map[string]string{"direction": "west"}},
+			},
+		}, &pbtypes.FieldMask{Paths: []string{"antennas"}})
+
 		err = store.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"})
 
 		a.So(err, should.BeNil)
+
+		entity, _ := s.findDeletedEntity(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, "id")
 
 		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, nil)
 
@@ -205,5 +215,36 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.GatewayID, should.Equal, "reuse-foo-eui")
 			a.So(got.EUI, should.Resemble, eui)
 		}
+
+		err = store.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"})
+
+		a.So(err, should.BeNil)
+
+		var attribute []Attribute
+		s.query(ctx, Attribute{}).Where(&Attribute{
+			EntityID:   entity.PrimaryKey(),
+			EntityType: "gateway",
+		}).Find(&attribute)
+
+		var antenna []GatewayAntenna
+		s.query(ctx, GatewayAntenna{}).Where(&GatewayAntenna{
+			GatewayID: entity.PrimaryKey(),
+		}).Find(&antenna)
+
+		a.So(attribute, should.HaveLength, 0)
+
+		err = store.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "reuse-foo-eui"})
+
+		a.So(err, should.BeNil)
+
+		// Check that gateway ids are released after purge
+		got, err = store.CreateGateway(ctx, &ttnpb.Gateway{
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+				GatewayID: "foo",
+				EUI:       eui,
+			},
+		})
+
+		a.So(err, should.BeNil)
 	})
 }

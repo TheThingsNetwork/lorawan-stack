@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -202,4 +202,40 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "delete user").End()
 	return s.deleteEntity(ctx, id)
+}
+
+func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) (err error) {
+	defer trace.StartRegion(ctx, "purge user").End()
+	query := s.query(ctx, User{}, withUnscoped(), withUserID(id.GetUserID()))
+	query = selectUserFields(ctx, query, nil)
+	var userModel userWithUID
+	if err = query.First(&userModel).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return errNotFoundForID(id)
+		}
+		return err
+	}
+	if err := ctx.Err(); err != nil { // Early exit if context canceled
+		return err
+	}
+	if len(userModel.Attributes) > 0 {
+		if err := s.replaceAttributes(ctx, "user", userModel.ID, userModel.Attributes, nil); err != nil {
+			return err
+		}
+	}
+	if userModel.ProfilePicture != nil {
+		if err = s.query(ctx, Picture{}).Delete(userModel.ProfilePicture).Error; err != nil {
+			return err
+		}
+	}
+
+	err = s.purgeEntity(ctx, id)
+	if err != nil {
+		return err
+	}
+	// Purge account after purging user because it is necessary for user query
+	return s.query(ctx, Account{}, withUnscoped()).Where(Account{
+		UID:         id.IDString(),
+		AccountType: id.EntityType(),
+	}).Delete(Account{}).Error
 }

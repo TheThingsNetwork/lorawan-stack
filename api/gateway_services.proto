@@ -83,6 +83,15 @@ service GatewayRegistry {
       delete: "/gateways/{gateway_id}"
     };
   };
+
+  // Purge the gateway. This will release both gateway ID and EUI for reuse.
+  // The gateway owner is responsible for clearing data from any (external) integrations
+  // that may store and expose data by gateway ID.
+  rpc Purge(GatewayIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/gateways/{gateway_id}/purge"
+    };
+  };
 }
 
 service GatewayAccess {
