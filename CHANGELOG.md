@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 - Configure application activation settings from the CLI (see `ttn-lw-cli application activation-settings` commands).
 - User API keys management to the Console.
+- `Purge` RPC and cli command for entity purge (hard-delete) from the database.
+
 
 ### Changed
 
