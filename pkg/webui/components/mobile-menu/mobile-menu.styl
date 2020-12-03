@@ -16,12 +16,6 @@
   display: none
   flex-direction: column
   justify-content: space-between
-  +media-query($bp.m)
-    display: flex
-    height: 'calc(100vh - %s)' % $header-height
-  +media-query($bp.s)
-    height: 'calc(100vh - %s)' % $header-height-mobile
-    top: $header-height-mobile
 
 ul.mobile-dropdown
   border: none
