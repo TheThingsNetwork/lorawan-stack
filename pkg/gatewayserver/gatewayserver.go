@@ -271,7 +271,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	}{
 		{
 			Name:      "basicstation",
-			Formatter: lbslns.NewFormatter(),
+			Formatter: lbslns.NewFormatter(conf.BasicStation.MaxValidRoundTripDelay),
 			listenerConfig: listenerConfig{
 				fallbackFreqPlanID: conf.BasicStation.FallbackFrequencyPlanID,
 				listen:             conf.BasicStation.Listen,

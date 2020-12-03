@@ -431,11 +431,13 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 		"upstream_type", typ,
 	))
 
-	recordTime := func(refTime float64, xTime int64, server time.Time) {
-		sec, nsec := math.Modf(refTime)
-		if sec != 0 {
-			ref := time.Unix(int64(sec), int64(nsec*1e9))
-			conn.RecordRTT(server.Sub(ref), server)
+	recordTime := func(recordRTT bool, refTime float64, xTime int64, server time.Time) {
+		if recordRTT {
+			sec, nsec := math.Modf(refTime)
+			if sec != 0 {
+				ref := time.Unix(int64(sec), int64(nsec*1e9))
+				conn.RecordRTT(server.Sub(ref), server)
+			}
 		}
 		conn.SyncWithGatewayConcentrator(
 			// The concentrator timestamp is the 32 LSB.
@@ -444,6 +446,11 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			// The Basic Station epoch is the 48 LSB.
 			scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFF)*time.Microsecond),
 		)
+	}
+
+	getTimeFromFloat64 := func(timeInFloat float64) time.Time {
+		sec, nsec := math.Modf(timeInFloat)
+		return time.Unix(int64(sec), int64(nsec*1e9))
 	}
 
 	switch typ {
@@ -485,7 +492,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			ID: int32(jreq.UpInfo.XTime >> 48),
 		}
 		session.DataMu.Unlock()
-		recordTime(jreq.RefTime, jreq.UpInfo.XTime, receivedAt)
+		recordTime(false, jreq.RefTime, jreq.UpInfo.XTime, receivedAt)
 
 	case TypeUpstreamUplinkDataFrame:
 		var updf UplinkDataFrame
@@ -512,7 +519,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			ID: int32(updf.UpInfo.XTime >> 48),
 		}
 		session.DataMu.Unlock()
-		recordTime(updf.RefTime, updf.UpInfo.XTime, receivedAt)
+		recordTime(false, updf.RefTime, updf.UpInfo.XTime, receivedAt)
 
 	case TypeUpstreamTxConfirmation:
 		var txConf TxConfirmation
@@ -533,7 +540,14 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			ID: int32(txConf.XTime >> 48),
 		}
 		session.DataMu.Unlock()
-		recordTime(txConf.RefTime, txConf.XTime, receivedAt)
+		recordRTT := true
+		refTime := getTimeFromFloat64(txConf.RefTime)
+		delta := receivedAt.Sub(refTime)
+		if delta > f.maxRoundTripDelay {
+			logger.WithField("delta", delta).Warn("Gateway reported reftime greater than the valid maximum. Skip RTT measurement")
+			recordRTT = false
+		}
+		recordTime(recordRTT, txConf.RefTime, txConf.XTime, receivedAt)
 
 	case TypeUpstreamProprietaryDataFrame, TypeUpstreamRemoteShell, TypeUpstreamTimeSync:
 		logger.WithField("message_type", typ).Debug("Message type not implemented")
