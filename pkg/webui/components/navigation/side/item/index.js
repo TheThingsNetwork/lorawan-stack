@@ -42,6 +42,8 @@ export class SideNavigationItem extends React.PureComponent {
     icon: PropTypes.string,
     /** A flag specifying whether the side navigation item is active or not. */
     isActive: PropTypes.bool,
+    /** A flag specifying whether the linkable item is to be tabbable or not. */
+    isLinkTabbable: PropTypes.bool,
     location: PropTypes.location.isRequired,
     /** The path of the linkable side navigation item. */
     path: PropTypes.string,
@@ -55,6 +57,7 @@ export class SideNavigationItem extends React.PureComponent {
     exact: false,
     icon: undefined,
     isActive: false,
+    isLinkTabbable: undefined,
     depth: 0,
     path: undefined,
   }
@@ -86,7 +89,17 @@ export class SideNavigationItem extends React.PureComponent {
   }
 
   render() {
-    const { className, children, title, depth, icon, path, exact, isActive } = this.props
+    const {
+      className,
+      children,
+      title,
+      depth,
+      icon,
+      path,
+      exact,
+      isActive,
+      isLinkTabbable,
+    } = this.props
     const { isExpanded } = this.state
     const { isMinimized, onLeafItemClick } = this.context
 
@@ -115,6 +128,7 @@ export class SideNavigationItem extends React.PureComponent {
             exact={exact}
             path={path}
             depth={depth}
+            isTabbable={isLinkTabbable === undefined ? true : isLinkTabbable}
           />
         )}
       </li>
@@ -131,30 +145,38 @@ const CollapsableItem = ({
   title,
   icon,
   depth,
-}) => (
-  <Fragment>
-    <button
-      className={classnames(style.button, {
-        [style.buttonActive]: isActive,
-      })}
-      type="button"
-      data-hook="side-nav-item-button"
-      onClick={onClick}
-    >
-      {icon && <Icon icon={icon} className={style.icon} />}
-      <Message content={title} className={style.message} />
-      <Icon
-        icon="keyboard_arrow_down"
-        className={classnames(style.expandIcon, {
-          [style.expandIconOpen]: isExpanded,
+}) => {
+  const childrenWithProps = React.Children.map(children, (child, i) => {
+    return React.cloneElement(child, {
+      isLinkTabbable: isExpanded,
+    })
+  })
+
+  return (
+    <Fragment>
+      <button
+        className={classnames(style.button, {
+          [style.buttonActive]: isActive,
         })}
-      />
-    </button>
-    <SideNavigationList isMinimized={isMinimized} depth={depth + 1} isExpanded={isExpanded}>
-      {children}
-    </SideNavigationList>
-  </Fragment>
-)
+        type="button"
+        data-hook="side-nav-item-button"
+        onClick={onClick}
+      >
+        {icon && <Icon icon={icon} className={style.icon} />}
+        <Message content={title} className={style.message} />
+        <Icon
+          icon="keyboard_arrow_down"
+          className={classnames(style.expandIcon, {
+            [style.expandIconOpen]: isExpanded,
+          })}
+        />
+      </button>
+      <SideNavigationList isMinimized={isMinimized} depth={depth + 1} isExpanded={isExpanded}>
+        {childrenWithProps}
+      </SideNavigationList>
+    </Fragment>
+  )
+}
 
 CollapsableItem.propTypes = {
   children: PropTypes.node,
@@ -173,13 +195,14 @@ CollapsableItem.defaultProps = {
   isMinimized: false,
 }
 
-const LinkItem = ({ onClick, title, icon, exact, path }) => (
+const LinkItem = ({ onClick, title, icon, exact, path, isTabbable }) => (
   <NavigationLink
     onClick={onClick}
     className={style.link}
     activeClassName={style.linkActive}
     exact={exact}
     path={path}
+    tabIndex={isTabbable ? '0' : '-1'}
   >
     {icon && <Icon icon={icon} className={style.icon} />}
     <Message content={title} className={style.message} />
@@ -189,6 +212,7 @@ const LinkItem = ({ onClick, title, icon, exact, path }) => (
 LinkItem.propTypes = {
   exact: PropTypes.bool.isRequired,
   icon: PropTypes.string,
+  isTabbable: PropTypes.bool,
   onClick: PropTypes.func,
   path: PropTypes.string,
   title: PropTypes.message.isRequired,
@@ -196,6 +220,7 @@ LinkItem.propTypes = {
 
 LinkItem.defaultProps = {
   icon: undefined,
+  isTabbable: true,
   path: undefined,
   onClick: () => null,
 }
