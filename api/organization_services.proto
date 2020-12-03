@@ -24,6 +24,8 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// The OrganizationRegistry service, exposed by the Identity Server, is used to manage
+// organization registrations.
 service OrganizationRegistry {
   // Create a new organization. This also sets the given user as
   // first collaborator with all possible rights.
@@ -73,6 +75,8 @@ service OrganizationRegistry {
   };
 }
 
+// The OrganizationAcces service, exposed by the Identity Server, is used to manage
+// API keys and collaborators of organizations.
 service OrganizationAccess {
   // List the rights the caller has on this organization.
   rpc ListRights(OrganizationIdentifiers) returns (Rights) {

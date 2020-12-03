@@ -114,6 +114,8 @@ message GetIsConfigurationResponse {
 }
 
 service Is {
+  // Get the configuration of the Identity Server. The response is typically used
+  // to enable or disable features in a user interface.
   rpc GetConfiguration(GetIsConfigurationRequest) returns (GetIsConfigurationResponse) {
     option (google.api.http) = {
       get: "/is/configuration"
