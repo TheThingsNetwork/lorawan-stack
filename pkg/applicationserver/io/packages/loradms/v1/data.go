@@ -25,11 +25,14 @@ import (
 type packageData struct {
 	token     string
 	serverURL *url.URL
+
+	useTLVEncoding bool
 }
 
 const (
-	tokenField     = "token"
-	serverURLField = "server_url"
+	tokenField          = "token"
+	serverURLField      = "server_url"
+	useTLVEncodingField = "use_tlv_encoding"
 )
 
 func (d *packageData) toStruct() *types.Struct {
@@ -43,6 +46,11 @@ func (d *packageData) toStruct() *types.Struct {
 	st.Fields[serverURLField] = &types.Value{
 		Kind: &types.Value_StringValue{
 			StringValue: d.serverURL.String(),
+		},
+	}
+	st.Fields[useTLVEncodingField] = &types.Value{
+		Kind: &types.Value_BoolValue{
+			BoolValue: d.useTLVEncoding,
 		},
 	}
 	return &st
@@ -63,22 +71,33 @@ func (d *packageData) fromStruct(st *types.Struct) (err error) {
 	if !ok {
 		return errInvalidFieldType.WithAttributes(
 			"field", tokenField,
-			"type", fmt.Sprintf("%T", value),
+			"type", fmt.Sprintf("%T", value.GetKind()),
 		)
 	}
 	d.token = stringValue.StringValue
 	value, ok = fields[serverURLField]
 	if ok {
-		stringValue, ok = value.GetKind().(*types.Value_StringValue)
+		stringValue, ok := value.GetKind().(*types.Value_StringValue)
 		if !ok {
 			return errInvalidFieldType.WithAttributes(
 				"field", serverURLField,
-				"type", fmt.Sprintf("%T", value),
+				"type", fmt.Sprintf("%T", value.GetKind()),
 			)
 		}
 		if d.serverURL, err = url.Parse(stringValue.StringValue); err != nil {
 			return err
 		}
+	}
+	value, ok = fields[useTLVEncodingField]
+	if ok {
+		boolValue, ok := value.GetKind().(*types.Value_BoolValue)
+		if !ok {
+			return errInvalidFieldType.WithAttributes(
+				"field", useTLVEncodingField,
+				"type", fmt.Sprintf("%T", value.GetKind()),
+			)
+		}
+		d.useTLVEncoding = boolValue.BoolValue
 	}
 	return nil
 }
