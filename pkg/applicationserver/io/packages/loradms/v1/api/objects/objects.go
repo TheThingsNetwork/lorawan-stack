@@ -59,6 +59,8 @@ const (
 	GNSSPositionSolutionType PositionSolutionType = iota
 	// WiFiPositionSolutionType is WiFi position solution type.
 	WiFiPositionSolutionType
+	// UnknownPositionSolutionType is used when the position solution type is unknown.
+	UnknownPositionSolutionType
 )
 
 // PositionSolution is the result of a position query.
@@ -69,11 +71,10 @@ type PositionSolution struct {
 }
 
 const (
-	gnssPositionSolutionType = "gnss"
-	wifiPositionSolutionType = "wifi"
+	gnssPositionSolutionType    = "gnss"
+	wifiPositionSolutionType    = "wifi"
+	unknownPositionSolutionType = "unknown"
 )
-
-var errPositionSolutionUnsupported = errors.DefineInvalidArgument("position_solution_unsupported", "position solution `{type}` is unsupported")
 
 // MarshalJSON implements the json.Marshaler interface.
 func (t PositionSolutionType) MarshalJSON() ([]byte, error) {
@@ -84,7 +85,7 @@ func (t PositionSolutionType) MarshalJSON() ([]byte, error) {
 	case WiFiPositionSolutionType:
 		tp = wifiPositionSolutionType
 	default:
-		return nil, errPositionSolutionUnsupported.WithAttributes("type", t)
+		tp = unknownPositionSolutionType
 	}
 	return json.Marshal(tp)
 }
@@ -102,7 +103,7 @@ func (t *PositionSolutionType) UnmarshalJSON(b []byte) error {
 	case wifiPositionSolutionType:
 		*t = WiFiPositionSolutionType
 	default:
-		return errPositionSolutionUnsupported.WithAttributes("type", tp)
+		*t = UnknownPositionSolutionType
 	}
 	return nil
 }
@@ -115,7 +116,7 @@ func (t PositionSolutionType) String() string {
 	case WiFiPositionSolutionType:
 		return wifiPositionSolutionType
 	default:
-		return "unknown"
+		return unknownPositionSolutionType
 	}
 }
 
@@ -224,6 +225,8 @@ const (
 	GNSSUplinkType
 	// WiFiUplinkType is DMS WiFi Message Type.
 	WiFiUplinkType
+	// UnknownUplinkType is used when the uplink type is unknown.
+	UnknownUplinkType
 )
 
 const (
@@ -232,9 +235,8 @@ const (
 	joiningUplinkType = "joining"
 	gnssUplinkType    = "gnss"
 	wifiUplinkType    = "wifi"
+	unknownUplinkType = "unknown"
 )
-
-var errUplinkTypeUnsupported = errors.DefineInvalidArgument("uplink_type_unsupported", "uplink type `{type}` is unsupported")
 
 // MarshalJSON implements the json.Marshaler interface.
 func (t LoRaUplinkType) MarshalJSON() ([]byte, error) {
@@ -251,7 +253,7 @@ func (t LoRaUplinkType) MarshalJSON() ([]byte, error) {
 	case WiFiUplinkType:
 		tp = wifiUplinkType
 	default:
-		return nil, errUplinkTypeUnsupported.WithAttributes("type", t)
+		tp = unknownUplinkType
 	}
 	return json.Marshal(tp)
 }
@@ -275,7 +277,7 @@ func (t *LoRaUplinkType) UnmarshalJSON(b []byte) error {
 	case wifiUplinkType:
 		*t = WiFiUplinkType
 	default:
-		return errUplinkTypeUnsupported.WithAttributes("type", tp)
+		*t = UnknownUplinkType
 	}
 	return nil
 }

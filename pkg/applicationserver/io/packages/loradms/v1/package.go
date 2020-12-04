@@ -222,15 +222,7 @@ func (p *DeviceManagementPackage) parseStreamRecords(ctx context.Context, record
 	if records == nil || !data.GetUseTLVEncoding() {
 		return nil
 	}
-	logger := log.FromContext(ctx)
 	f := func(tag uint8, length uint8, bytes []byte) error {
-		logger := logger.WithFields(log.Fields(
-			"tag", tag,
-			"length", length,
-			"bytes", bytes,
-		))
-		logger.Debug("Record decoded")
-
 		loraUp := &objects.LoRaUplink{
 			Timestamp: originalTimestamp,
 		}
@@ -246,17 +238,14 @@ func (p *DeviceManagementPackage) parseStreamRecords(ctx context.Context, record
 		default:
 			return nil
 		}
-
 		return p.sendUplink(ctx, up, loraUp, data)
 	}
-
 	for _, record := range records {
 		if err := parseTLVPayload(record.Data, f); err != nil {
-			logger.WithError(err).Warn("Failed to parse TLV record")
+			log.FromContext(ctx).WithError(err).Warn("Failed to parse TLV record")
 			continue
 		}
 	}
-
 	return nil
 }
 
