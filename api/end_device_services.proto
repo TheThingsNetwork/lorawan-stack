@@ -23,10 +23,23 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// The EndDeviceRegistry service, exposed by the Identity Server, is used to manage
+// end device registrations.
+//
+// After registering an end device, it also needs to be registered in
+// the NsEndDeviceRegistry that is exposed by the Network Server,
+// the AsEndDeviceRegistry that is exposed by the Application Server,
+// and the JsEndDeviceRegistry that is exposed by the Join Server.
+//
+// Before deleting an end device it first needs to be deleted from the
+// NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
 service EndDeviceRegistry {
   // Create a new end device within an application.
-  // After creating a device in the EndDeviceRegistry (Identity Server), it still
-  // needs to be created in the NsEndDeviceRegistry, AsEndDeviceRegistry and JsEndDeviceRegistry.
+  //
+  // After registering an end device, it also needs to be registered in
+  // the NsEndDeviceRegistry that is exposed by the Network Server,
+  // the AsEndDeviceRegistry that is exposed by the Application Server,
+  // and the JsEndDeviceRegistry that is exposed by the Join Server.
   rpc Create(CreateEndDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       post: "/applications/{end_device.ids.application_ids.application_id}/devices"
@@ -64,8 +77,9 @@ service EndDeviceRegistry {
   };
 
   // Delete the end device with the given IDs.
-  // Before deleting an end device from the EndDeviceRegistry (the Identity Server),
-  // the device needs to be deleted from the JsEndDeviceRegistry, AsEndDeviceRegistry and NsEndDeviceRegistry.
+  //
+  // Before deleting an end device it first needs to be deleted from the
+  // NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
   // This is NOT done automatically.
   rpc Delete(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {

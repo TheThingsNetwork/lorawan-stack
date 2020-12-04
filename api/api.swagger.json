@@ -595,7 +595,8 @@
     },
     "/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
-        "summary": "Delete the end device with the given IDs.\nBefore deleting an end device from the EndDeviceRegistry (the Identity Server),\nthe device needs to be deleted from the JsEndDeviceRegistry, AsEndDeviceRegistry and NsEndDeviceRegistry.\nThis is NOT done automatically.",
+        "summary": "Delete the end device with the given IDs.",
+        "description": "Before deleting an end device it first needs to be deleted from the\nNsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.\nThis is NOT done automatically.",
         "operationId": "EndDeviceRegistry_Delete",
         "responses": {
           "200": {
@@ -749,7 +750,8 @@
     },
     "/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
-        "summary": "Create a new end device within an application.\nAfter creating a device in the EndDeviceRegistry (Identity Server), it still\nneeds to be created in the NsEndDeviceRegistry, AsEndDeviceRegistry and JsEndDeviceRegistry.",
+        "summary": "Create a new end device within an application.",
+        "description": "After registering an end device, it also needs to be registered in\nthe NsEndDeviceRegistry that is exposed by the Network Server,\nthe AsEndDeviceRegistry that is exposed by the Application Server,\nand the JsEndDeviceRegistry that is exposed by the Join Server.",
         "operationId": "EndDeviceRegistry_Create",
         "responses": {
           "200": {
@@ -4409,6 +4411,7 @@
     },
     "/is/configuration": {
       "get": {
+        "summary": "Get the configuration of the Identity Server. The response is typically used\nto enable or disable features in a user interface.",
         "operationId": "Is_GetConfiguration",
         "responses": {
           "200": {
@@ -6070,6 +6073,7 @@
     },
     "/search/applications": {
       "get": {
+        "summary": "Search for applications that match the conditions specified in the request.\nNon-admin users will only match applications that they have rights on.",
         "operationId": "EntityRegistrySearch_SearchApplications",
         "responses": {
           "200": {
@@ -6149,6 +6153,7 @@
     },
     "/search/applications/{application_ids.application_id}/devices": {
       "get": {
+        "summary": "Search for end devices in the given application that match the conditions specified in the request.",
         "operationId": "EndDeviceRegistrySearch_SearchEndDevices",
         "responses": {
           "200": {
@@ -6255,6 +6260,7 @@
     },
     "/search/clients": {
       "get": {
+        "summary": "Search for OAuth clients that match the conditions specified in the request.\nNon-admin users will only match OAuth clients that they have rights on.",
         "operationId": "EntityRegistrySearch_SearchClients",
         "responses": {
           "200": {
@@ -6334,6 +6340,7 @@
     },
     "/search/gateways": {
       "get": {
+        "summary": "Search for gateways that match the conditions specified in the request.\nNon-admin users will only match gateways that they have rights on.",
         "operationId": "EntityRegistrySearch_SearchGateways",
         "responses": {
           "200": {
@@ -6413,6 +6420,7 @@
     },
     "/search/organizations": {
       "get": {
+        "summary": "Search for organizations that match the conditions specified in the request.\nNon-admin users will only match organizations that they have rights on.",
         "operationId": "EntityRegistrySearch_SearchOrganizations",
         "responses": {
           "200": {
@@ -6492,6 +6500,7 @@
     },
     "/search/users": {
       "get": {
+        "summary": "Search for users that match the conditions specified in the request.\nThis is only available to admin users.",
         "operationId": "EntityRegistrySearch_SearchUsers",
         "responses": {
           "200": {
@@ -7409,6 +7418,7 @@
     },
     "/users/{user_ids.user_id}/authorizations": {
       "get": {
+        "summary": "List OAuth clients that are authorized by the user.",
         "operationId": "OAuthAuthorizationRegistry_List",
         "responses": {
           "200": {
@@ -7470,6 +7480,7 @@
     },
     "/users/{user_ids.user_id}/authorizations/{client_ids.client_id}": {
       "delete": {
+        "summary": "Delete (de-authorize) an OAuth client for the user.",
         "operationId": "OAuthAuthorizationRegistry_Delete",
         "responses": {
           "200": {
@@ -7514,6 +7525,7 @@
     },
     "/users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens": {
       "get": {
+        "summary": "List OAuth access tokens issued to the OAuth client on behalf of the user.",
         "operationId": "OAuthAuthorizationRegistry_ListTokens",
         "responses": {
           "200": {
@@ -7581,6 +7593,7 @@
     },
     "/users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens/{id}": {
       "delete": {
+        "summary": "Delete (invalidate) an OAuth access token.",
         "operationId": "OAuthAuthorizationRegistry_DeleteToken",
         "responses": {
           "200": {

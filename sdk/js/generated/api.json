@@ -781,7 +781,7 @@
           "name": "ApplicationAccess",
           "longName": "ApplicationAccess",
           "fullName": "ttn.lorawan.v3.ApplicationAccess",
-          "description": "",
+          "description": "The ApplicationAcces service, exposed by the Identity Server, is used to manage\nAPI keys and collaborators of applications.",
           "methods": [
             {
               "name": "ListRights",
@@ -976,7 +976,7 @@
           "name": "ApplicationRegistry",
           "longName": "ApplicationRegistry",
           "fullName": "ttn.lorawan.v3.ApplicationRegistry",
-          "description": "",
+          "description": "The ApplicationRegistry service, exposed by the Identity Server, is used to manage\napplication registrations.",
           "methods": [
             {
               "name": "Create",
@@ -5903,7 +5903,7 @@
           "name": "ClientAccess",
           "longName": "ClientAccess",
           "fullName": "ttn.lorawan.v3.ClientAccess",
-          "description": "",
+          "description": "The ClientAcces service, exposed by the Identity Server, is used to manage\ncollaborators of OAuth clients.",
           "methods": [
             {
               "name": "ListRights",
@@ -6008,7 +6008,7 @@
           "name": "ClientRegistry",
           "longName": "ClientRegistry",
           "fullName": "ttn.lorawan.v3.ClientRegistry",
-          "description": "",
+          "description": "The ClientRegistry service, exposed by the Identity Server, is used to manage\nOAuth client registrations.",
           "methods": [
             {
               "name": "Create",
@@ -6574,7 +6574,7 @@
           "name": "ContactInfoRegistry",
           "longName": "ContactInfoRegistry",
           "fullName": "ttn.lorawan.v3.ContactInfoRegistry",
-          "description": "",
+          "description": "The ContactInfoRegistry service, exposed by the Identity Server, is used for\nvalidating contact information of registered entities.\n\nThe actual contact information can be managed with the different registry services:\nApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and UserRegistry.",
           "methods": [
             {
               "name": "RequestValidation",
@@ -10136,11 +10136,11 @@
           "name": "EndDeviceRegistry",
           "longName": "EndDeviceRegistry",
           "fullName": "ttn.lorawan.v3.EndDeviceRegistry",
-          "description": "",
+          "description": "The EndDeviceRegistry service, exposed by the Identity Server, is used to manage\nend device registrations.\n\nAfter registering an end device, it also needs to be registered in\nthe NsEndDeviceRegistry that is exposed by the Network Server,\nthe AsEndDeviceRegistry that is exposed by the Application Server,\nand the JsEndDeviceRegistry that is exposed by the Join Server.\n\nBefore deleting an end device it first needs to be deleted from the\nNsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.",
           "methods": [
             {
               "name": "Create",
-              "description": "Create a new end device within an application.\nAfter creating a device in the EndDeviceRegistry (Identity Server), it still\nneeds to be created in the NsEndDeviceRegistry, AsEndDeviceRegistry and JsEndDeviceRegistry.",
+              "description": "Create a new end device within an application.\n\nAfter registering an end device, it also needs to be registered in\nthe NsEndDeviceRegistry that is exposed by the Network Server,\nthe AsEndDeviceRegistry that is exposed by the Application Server,\nand the JsEndDeviceRegistry that is exposed by the Join Server.",
               "requestType": "CreateEndDeviceRequest",
               "requestLongType": "CreateEndDeviceRequest",
               "requestFullType": "ttn.lorawan.v3.CreateEndDeviceRequest",
@@ -10242,7 +10242,7 @@
             },
             {
               "name": "Delete",
-              "description": "Delete the end device with the given IDs.\nBefore deleting an end device from the EndDeviceRegistry (the Identity Server),\nthe device needs to be deleted from the JsEndDeviceRegistry, AsEndDeviceRegistry and NsEndDeviceRegistry.\nThis is NOT done automatically.",
+              "description": "Delete the end device with the given IDs.\n\nBefore deleting an end device it first needs to be deleted from the\nNsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.\nThis is NOT done automatically.",
               "requestType": "EndDeviceIdentifiers",
               "requestLongType": "EndDeviceIdentifiers",
               "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
@@ -12746,7 +12746,7 @@
           "name": "GatewayAccess",
           "longName": "GatewayAccess",
           "fullName": "ttn.lorawan.v3.GatewayAccess",
-          "description": "",
+          "description": "The GatewayAcces service, exposed by the Identity Server, is used to manage\nAPI keys and collaborators of gateways.",
           "methods": [
             {
               "name": "ListRights",
@@ -12961,7 +12961,7 @@
           "name": "GatewayRegistry",
           "longName": "GatewayRegistry",
           "fullName": "ttn.lorawan.v3.GatewayRegistry",
-          "description": "",
+          "description": "The GatewayRegistry service, exposed by the Identity Server, is used to manage\ngateway registrations.",
           "methods": [
             {
               "name": "Create",
@@ -14311,7 +14311,7 @@
           "methods": [
             {
               "name": "GetConfiguration",
-              "description": "",
+              "description": "Get the configuration of the Identity Server. The response is typically used\nto enable or disable features in a user interface.",
               "requestType": "GetIsConfigurationRequest",
               "requestLongType": "GetIsConfigurationRequest",
               "requestFullType": "ttn.lorawan.v3.GetIsConfigurationRequest",
@@ -23437,11 +23437,11 @@
           "name": "OAuthAuthorizationRegistry",
           "longName": "OAuthAuthorizationRegistry",
           "fullName": "ttn.lorawan.v3.OAuthAuthorizationRegistry",
-          "description": "",
+          "description": "The OAuthAuthorizationRegistry service, exposed by the Identity Server,\nis used to manage OAuth client authorizations for users.",
           "methods": [
             {
               "name": "List",
-              "description": "",
+              "description": "List OAuth clients that are authorized by the user.",
               "requestType": "ListOAuthClientAuthorizationsRequest",
               "requestLongType": "ListOAuthClientAuthorizationsRequest",
               "requestFullType": "ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest",
@@ -23463,7 +23463,7 @@
             },
             {
               "name": "ListTokens",
-              "description": "",
+              "description": "List OAuth access tokens issued to the OAuth client on behalf of the user.",
               "requestType": "ListOAuthAccessTokensRequest",
               "requestLongType": "ListOAuthAccessTokensRequest",
               "requestFullType": "ttn.lorawan.v3.ListOAuthAccessTokensRequest",
@@ -23485,7 +23485,7 @@
             },
             {
               "name": "Delete",
-              "description": "",
+              "description": "Delete (de-authorize) an OAuth client for the user.",
               "requestType": "OAuthClientAuthorizationIdentifiers",
               "requestLongType": "OAuthClientAuthorizationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers",
@@ -23507,7 +23507,7 @@
             },
             {
               "name": "DeleteToken",
-              "description": "",
+              "description": "Delete (invalidate) an OAuth access token.",
               "requestType": "OAuthAccessTokenIdentifiers",
               "requestLongType": "OAuthAccessTokenIdentifiers",
               "requestFullType": "ttn.lorawan.v3.OAuthAccessTokenIdentifiers",
@@ -24299,7 +24299,7 @@
           "name": "OrganizationAccess",
           "longName": "OrganizationAccess",
           "fullName": "ttn.lorawan.v3.OrganizationAccess",
-          "description": "",
+          "description": "The OrganizationAcces service, exposed by the Identity Server, is used to manage\nAPI keys and collaborators of organizations.",
           "methods": [
             {
               "name": "ListRights",
@@ -24490,7 +24490,7 @@
           "name": "OrganizationRegistry",
           "longName": "OrganizationRegistry",
           "fullName": "ttn.lorawan.v3.OrganizationRegistry",
-          "description": "",
+          "description": "The OrganizationRegistry service, exposed by the Identity Server, is used to manage\norganization registrations.",
           "methods": [
             {
               "name": "Create",
@@ -26308,7 +26308,7 @@
           "methods": [
             {
               "name": "SearchEndDevices",
-              "description": "",
+              "description": "Search for end devices in the given application that match the conditions specified in the request.",
               "requestType": "SearchEndDevicesRequest",
               "requestLongType": "SearchEndDevicesRequest",
               "requestFullType": "ttn.lorawan.v3.SearchEndDevicesRequest",
@@ -26338,7 +26338,7 @@
           "methods": [
             {
               "name": "SearchApplications",
-              "description": "",
+              "description": "Search for applications that match the conditions specified in the request.\nNon-admin users will only match applications that they have rights on.",
               "requestType": "SearchEntitiesRequest",
               "requestLongType": "SearchEntitiesRequest",
               "requestFullType": "ttn.lorawan.v3.SearchEntitiesRequest",
@@ -26360,7 +26360,7 @@
             },
             {
               "name": "SearchClients",
-              "description": "",
+              "description": "Search for OAuth clients that match the conditions specified in the request.\nNon-admin users will only match OAuth clients that they have rights on.",
               "requestType": "SearchEntitiesRequest",
               "requestLongType": "SearchEntitiesRequest",
               "requestFullType": "ttn.lorawan.v3.SearchEntitiesRequest",
@@ -26382,7 +26382,7 @@
             },
             {
               "name": "SearchGateways",
-              "description": "",
+              "description": "Search for gateways that match the conditions specified in the request.\nNon-admin users will only match gateways that they have rights on.",
               "requestType": "SearchEntitiesRequest",
               "requestLongType": "SearchEntitiesRequest",
               "requestFullType": "ttn.lorawan.v3.SearchEntitiesRequest",
@@ -26404,7 +26404,7 @@
             },
             {
               "name": "SearchOrganizations",
-              "description": "",
+              "description": "Search for organizations that match the conditions specified in the request.\nNon-admin users will only match organizations that they have rights on.",
               "requestType": "SearchEntitiesRequest",
               "requestLongType": "SearchEntitiesRequest",
               "requestFullType": "ttn.lorawan.v3.SearchEntitiesRequest",
@@ -26426,7 +26426,7 @@
             },
             {
               "name": "SearchUsers",
-              "description": "",
+              "description": "Search for users that match the conditions specified in the request.\nThis is only available to admin users.",
               "requestType": "SearchEntitiesRequest",
               "requestLongType": "SearchEntitiesRequest",
               "requestFullType": "ttn.lorawan.v3.SearchEntitiesRequest",
@@ -27763,7 +27763,7 @@
           "name": "UserAccess",
           "longName": "UserAccess",
           "fullName": "ttn.lorawan.v3.UserAccess",
-          "description": "",
+          "description": "The UserAcces service, exposed by the Identity Server, is used to manage\nAPI keys of users.",
           "methods": [
             {
               "name": "ListRights",
@@ -27958,7 +27958,7 @@
           "name": "UserRegistry",
           "longName": "UserRegistry",
           "fullName": "ttn.lorawan.v3.UserRegistry",
-          "description": "",
+          "description": "The UserRegistry service, exposed by the Identity Server, is used to manage\nuser registrations.",
           "methods": [
             {
               "name": "Create",
@@ -28145,7 +28145,7 @@
           "name": "UserSessionRegistry",
           "longName": "UserSessionRegistry",
           "fullName": "ttn.lorawan.v3.UserSessionRegistry",
-          "description": "",
+          "description": "The UserSessionRegistry service, exposed by the Identity Server, is used to manage\n(browser) sessions of the user.",
           "methods": [
             {
               "name": "List",

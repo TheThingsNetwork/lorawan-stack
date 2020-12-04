@@ -58,6 +58,11 @@ message ContactInfoValidation {
   google.protobuf.Timestamp expires_at = 6 [(gogoproto.stdtime) = true];
 }
 
+// The ContactInfoRegistry service, exposed by the Identity Server, is used for
+// validating contact information of registered entities.
+//
+// The actual contact information can be managed with the different registry services:
+// ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and UserRegistry.
 service ContactInfoRegistry {
   // Request validation for the non-validated contact info for the given entity.
   rpc RequestValidation(EntityIdentifiers) returns (ContactInfoValidation) {
