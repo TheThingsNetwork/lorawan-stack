@@ -52,9 +52,38 @@ func (d DeviceUplinkResponses) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// StreamRecord contains the offset and the data of a fully reconstructed stream frame.
+type StreamRecord struct {
+	Offset uint32
+	Data   Hex
+}
+
+// MarshalJSON implements json.Marshaler.
+func (r StreamRecord) MarshalJSON() ([]byte, error) {
+	return json.Marshal([]interface{}{r.Offset, r.Data})
+}
+
+var errInvalidStreamRecord = errors.DefineCorruption("invalid_stream_record", "invalid stream record")
+
+// UnmarshalJSON implements json.Marshaler.
+func (r *StreamRecord) UnmarshalJSON(b []byte) error {
+	raw := make([]json.RawMessage, 0, 2)
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if len(raw) != 2 {
+		return errInvalidStreamRecord.New()
+	}
+	if err := json.Unmarshal(raw[0], &r.Offset); err != nil {
+		return err
+	}
+	return json.Unmarshal(raw[1], &r.Data)
+}
+
 // UplinkResponse contains the state changes and completed items due to an uplink message.
 type UplinkResponse struct {
-	Downlink *LoRaDnlink `json:"dnlink"`
+	Downlink      *LoRaDnlink    `json:"dnlink"`
+	StreamRecords []StreamRecord `json:"stream_records"`
 }
 
 // ExtendedUplinkResponse extends UplinkResponse with the raw JSON payload.

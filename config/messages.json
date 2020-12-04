@@ -1700,6 +1700,15 @@
       "file": "mqtt.go"
     }
   },
+  "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:invalid_stream_record": {
+    "translations": {
+      "en": "invalid stream record"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1/api/objects",
+      "file": "objects.go"
+    }
+  },
   "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:uplink_type_unsupported": {
     "translations": {
       "en": "uplink type `{type}` is unsupported"
