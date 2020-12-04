@@ -27,6 +27,7 @@ import NextButton from './next-button'
 
 const WizardForm = React.forwardRef((props, ref) => {
   const { validationSchema, validationContext, onSubmit, children, initialValues } = props
+
   const context = useWizardContext()
   const { onNextStep, currentStepId, steps, snapshot, onComplete, completeMessage, error } = context
 
@@ -48,6 +49,7 @@ const WizardForm = React.forwardRef((props, ref) => {
     async (values, formikBag) => {
       const castedValues = validationSchema.cast(values, {
         context: validationContext,
+        stripUnknown: true,
       })
 
       if (onSubmit) {
@@ -58,7 +60,7 @@ const WizardForm = React.forwardRef((props, ref) => {
         return onComplete(merge({}, snapshot, castedValues), formikBag)
       }
 
-      onNextStep(castedValues)
+      onNextStep()
     },
     [isLastStep, onComplete, onNextStep, onSubmit, snapshot, validationContext, validationSchema],
   )
@@ -79,7 +81,12 @@ const WizardForm = React.forwardRef((props, ref) => {
           validationContext={validationContext}
           validationSchema={validationSchema}
         />
-        <NextButton isLastStep={isLastStep} completeMessage={completeMessage} />
+        <NextButton
+          isLastStep={isLastStep}
+          completeMessage={completeMessage}
+          validationContext={validationContext}
+          validationSchema={validationSchema}
+        />
       </SubmitBar>
     </Form>
   )

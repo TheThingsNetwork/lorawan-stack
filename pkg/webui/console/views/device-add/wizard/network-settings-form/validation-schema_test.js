@@ -300,6 +300,7 @@ describe('<NetworkSettingsForm /> validation schema', () => {
         lorawan_version: '1.1.0',
         lorawan_phy_version: '1.1.0-a',
         frequency_plan_id: 'test-freq-plan',
+        _device_classes: { class_b: true },
         session: {
           dev_addr: '4'.repeat(8),
           keys: {

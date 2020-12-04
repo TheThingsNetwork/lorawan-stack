@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import crypto from 'crypto'
+
+/** Stack configuration utitlities. */
+
 /**
  * Disables Identity Server in the stack configuration object.
  *
@@ -87,10 +91,15 @@ const disableGatewayServer = config => {
   })
 }
 
+/** General utitlies. */
+
+const generateHexValue = length => crypto.randomBytes(length).toString('hex')
+
 export {
   disableIdentityServer,
   disableNetworkServer,
   disableApplicationServer,
   disableJoinServer,
   disableGatewayServer,
+  generateHexValue,
 }

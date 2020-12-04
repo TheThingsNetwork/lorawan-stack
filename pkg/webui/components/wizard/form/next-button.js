@@ -31,7 +31,7 @@ const m = defineMessages({
 })
 
 const WizardNextButton = props => {
-  const { isLastStep, completeMessage } = props
+  const { isLastStep, completeMessage, validationContext, validationSchema } = props
   const { currentStepId, steps, onStepComplete } = useWizardContext()
   const { disabled, submitForm, isSubmitting, isValidating, values } = useFormContext()
 
@@ -47,9 +47,9 @@ const WizardNextButton = props => {
     : nextStepTitle
 
   const handleClick = React.useCallback(() => {
-    onStepComplete(values)
+    onStepComplete(validationSchema.cast(values, { context: validationContext }))
     submitForm()
-  }, [onStepComplete, submitForm, values])
+  }, [onStepComplete, submitForm, validationContext, validationSchema, values])
 
   return (
     <Button
@@ -69,6 +69,10 @@ const WizardNextButton = props => {
 WizardNextButton.propTypes = {
   completeMessage: PropTypes.message,
   isLastStep: PropTypes.bool.isRequired,
+  validationContext: PropTypes.shape({}).isRequired,
+  validationSchema: PropTypes.shape({
+    cast: PropTypes.func.isRequired,
+  }).isRequired,
 }
 
 WizardNextButton.defaultProps = {

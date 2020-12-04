@@ -69,11 +69,6 @@ export default function mergeDevice(
             }
 
             if (this.isLeaf) {
-              if (typeof e === 'object' && Object.keys(e).length === 0) {
-                // Ignore empty object values.
-                return
-              }
-
               // Write the sub object leaf into the result.
               traverse(result).set([...path, ...this.path], e)
             }
