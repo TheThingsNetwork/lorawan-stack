@@ -1709,6 +1709,15 @@
       "file": "objects.go"
     }
   },
+  "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:position_solution_unsupported": {
+    "translations": {
+      "en": "position solution `{type}` is unsupported"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1/api/objects",
+      "file": "objects.go"
+    }
+  },
   "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:uplink_type_unsupported": {
     "translations": {
       "en": "uplink type `{type}` is unsupported"
@@ -1770,6 +1779,15 @@
     "description": {
       "package": "pkg/applicationserver/io/packages/loradms/v1",
       "file": "package.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/loradms/v1:tlv_record_too_small": {
+    "translations": {
+      "en": "TLV record payload is too small"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1",
+      "file": "tlv_encoding.go"
     }
   },
   "error:pkg/applicationserver/io/packages/loradms/v1:uplink_request_failed": {

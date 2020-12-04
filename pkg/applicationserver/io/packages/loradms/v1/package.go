@@ -163,21 +163,18 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 		return err
 	}
 
-	if records := result.StreamRecords; records != nil && data.GetUseTLVEncoding() {
-		if err := p.parseStreamRecords(ctx, records, up, data); err != nil {
-			return err
-		}
+	if err := p.parseStreamRecords(ctx, result.StreamRecords, up, data); err != nil {
+		return err
 	}
 
 	return nil
 }
 
 func (p *DeviceManagementPackage) sendServiceData(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
-	now := time.Now().UTC()
 	return p.server.SendUp(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: ids,
 		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:           &now,
+		ReceivedAt:           timePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_ServiceData{
 			ServiceData: &ttnpb.ApplicationServiceData{
 				Data:    data,
@@ -202,11 +199,10 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids tt
 	case objects.WiFiPositionSolutionType:
 		source = ttnpb.SOURCE_WIFI_RSSI_GEOLOCATION
 	}
-	now := time.Now().UTC()
 	return p.server.SendUp(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: ids,
 		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:           &now,
+		ReceivedAt:           timePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
 				Service: fmt.Sprintf("%v-%s", packageName, position.Algorithm),
@@ -223,6 +219,9 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids tt
 }
 
 func (p *DeviceManagementPackage) parseStreamRecords(ctx context.Context, records []objects.StreamRecord, up *ttnpb.ApplicationUp, data *packageData) error {
+	if records == nil || !data.GetUseTLVEncoding() {
+		return nil
+	}
 	logger := log.FromContext(ctx)
 	f := func(tag uint8, length uint8, bytes []byte) error {
 		logger := logger.WithFields(log.Fields(
@@ -327,6 +326,10 @@ func float64Ptr(x float64) *float64 {
 }
 
 func hexPtr(x objects.Hex) *objects.Hex {
+	return &x
+}
+
+func timePtr(x time.Time) *time.Time {
 	return &x
 }
 
