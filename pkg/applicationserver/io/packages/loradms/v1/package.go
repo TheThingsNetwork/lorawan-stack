@@ -158,21 +158,61 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 		return err
 	}
 
-	downlink := result.Downlink
-	if downlink == nil {
-		logger.Debug("No downlink to be scheduled from the Device Management Service")
-		return nil
+	if downlink := result.Downlink; downlink != nil {
+		down := &ttnpb.ApplicationDownlink{
+			FPort:      uint32(downlink.Port),
+			FRMPayload: []byte(downlink.Payload),
+		}
+		err = p.server.DownlinkQueuePush(ctx, up.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink{down})
+		if err != nil {
+			logger.WithError(err).Debug("Failed to push downlink to device")
+			return err
+		}
+		logger.Debug("Device Management Service downlink scheduled")
 	}
-	down := &ttnpb.ApplicationDownlink{
-		FPort:      uint32(downlink.Port),
-		FRMPayload: []byte(downlink.Payload),
+
+	if records := result.StreamRecords; records != nil && data.GetUseTLVEncoding() {
+		if err := p.parseStreamRecords(ctx, records, up, data); err != nil {
+			return err
+		}
 	}
-	err = p.server.DownlinkQueuePush(ctx, up.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink{down})
-	if err != nil {
-		logger.WithError(err).Debug("Failed to push downlink to device")
-		return err
+
+	return nil
+}
+
+func (p *DeviceManagementPackage) parseStreamRecords(ctx context.Context, records []objects.StreamRecord, up *ttnpb.ApplicationUp, data *packageData) error {
+	logger := log.FromContext(ctx)
+	f := func(tag uint8, length uint8, bytes []byte) error {
+		logger := logger.WithFields(log.Fields(
+			"tag", tag,
+			"length", length,
+			"bytes", bytes,
+		))
+		logger.Debug("Record decoded")
+
+		loraUp := &objects.LoRaUplink{}
+		switch tag {
+		case 0x05, 0x06, 0x07: // GNSS data
+			payload := objects.Hex(bytes)
+			loraUp.Type = objects.GNSSUplinkType
+			loraUp.Payload = &payload
+		case 0x08: // WiFi data
+			payload := append(objects.Hex{0x01}, bytes...)
+			loraUp.Type = objects.WiFiUplinkType
+			loraUp.Payload = &payload
+		default:
+			return nil
+		}
+
+		return p.sendUplink(ctx, up, loraUp, data)
 	}
-	logger.Debug("Device Management Service downlink scheduled")
+
+	for _, record := range records {
+		if err := parseTLVPayload(record.Data, f); err != nil {
+			logger.WithError(err).Warn("Failed to parse TLV record")
+			continue
+		}
+	}
 
 	return nil
 }
@@ -202,6 +242,9 @@ func (p *DeviceManagementPackage) mergePackageData(def *ttnpb.ApplicationPackage
 		}
 		if data.token != "" {
 			merged.token = data.token
+		}
+		if data.useTLVEncoding != nil {
+			merged.useTLVEncoding = data.useTLVEncoding
 		}
 	}
 	if merged.serverURL == nil {
