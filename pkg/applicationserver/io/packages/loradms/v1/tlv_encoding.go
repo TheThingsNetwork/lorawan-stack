@@ -22,15 +22,14 @@ import (
 var errTLVRecordTooSmall = errors.DefineInvalidArgument("tlv_record_too_small", "TLV record payload is too small")
 
 func parseTLVPayload(record objects.Hex, f func(uint8, uint8, []byte) error) error {
-	if len(record) < 2 {
-		return errTLVRecordTooSmall.New()
-	}
-	index := uint8(0)
-	for int(index) < len(record) {
-		tag := uint8(record[index])
-		length := uint8(record[index+1])
-		bytes := []byte(record[index+2 : index+2+length])
-		index += 2 + length
+	for len(record) >= 2 {
+		tag := uint8(record[0])
+		length := uint8(record[1])
+		if int(length+2) < len(record) {
+			return errTLVRecordTooSmall.New()
+		}
+		bytes := []byte(record[2 : 2+length])
+		record = record[length+2:]
 
 		if err := f(tag, length, bytes); err != nil {
 			return err
