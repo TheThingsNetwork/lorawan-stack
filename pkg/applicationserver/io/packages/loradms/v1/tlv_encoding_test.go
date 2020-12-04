@@ -15,25 +15,30 @@
 package loraclouddevicemanagementv1
 
 import (
+	"fmt"
+	"testing"
+
+	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api/objects"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-var errTLVRecordTooSmall = errors.DefineInvalidArgument("tlv_record_too_small", "TLV record payload is too small")
+func TestTLVEncoding(t *testing.T) {
+	a := assertions.New(t)
 
-func parseTLVPayload(record objects.Hex, f func(uint8, uint8, []byte) error) error {
-	for len(record) >= 2 {
-		tag := uint8(record[0])
-		length := uint8(record[1])
-		if int(length+2) > len(record) {
-			return errTLVRecordTooSmall.New()
-		}
-		bytes := []byte(record[2 : 2+length])
-		record = record[length+2:]
+	a.So(parseTLVPayload(objects.Hex{0xbb, 0xaa}, func(tag uint8, size uint8, data []byte) error {
+		return fmt.Errorf("foo")
+	}), should.NotBeNil)
 
-		if err := f(tag, length, bytes); err != nil {
-			return err
-		}
-	}
-	return nil
+	a.So(parseTLVPayload(objects.Hex{0x01, 0x02, 0xbb, 0xaa}, func(tag uint8, size uint8, data []byte) error {
+		a.So(tag, should.Equal, 0x01)
+		a.So(size, should.Equal, 0x02)
+		a.So(data, should.Resemble, []byte{0xbb, 0xaa})
+		return nil
+	}), should.BeNil)
+
+	a.So(parseTLVPayload(objects.Hex{0xff, 0x02, 0xff}, func(tag uint8, size uint8, data []byte) error {
+		t.Fatal("f shouldn't be called")
+		return nil
+	}), should.NotBeNil)
 }
