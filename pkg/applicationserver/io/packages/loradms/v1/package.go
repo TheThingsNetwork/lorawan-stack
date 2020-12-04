@@ -142,22 +142,6 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 	}
 
 	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loradas:%s", events.NewCorrelationID()))...)
-	now := time.Now().UTC()
-	err = p.server.SendUp(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: up.EndDeviceIdentifiers,
-		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:           &now,
-		Up: &ttnpb.ApplicationUp_ServiceData{
-			ServiceData: &ttnpb.ApplicationServiceData{
-				Data:    resultStruct,
-				Service: packageName,
-			},
-		},
-	})
-	if err != nil {
-		return err
-	}
-
 	if downlink := result.Downlink; downlink != nil {
 		down := &ttnpb.ApplicationDownlink{
 			FPort:      uint32(downlink.Port),
@@ -171,6 +155,14 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 		logger.Debug("Device Management Service downlink scheduled")
 	}
 
+	if err := p.sendServiceData(ctx, up.EndDeviceIdentifiers, resultStruct); err != nil {
+		return err
+	}
+
+	if err := p.sendLocationSolved(ctx, up.EndDeviceIdentifiers, result.Position); err != nil {
+		return err
+	}
+
 	if records := result.StreamRecords; records != nil && data.GetUseTLVEncoding() {
 		if err := p.parseStreamRecords(ctx, records, up, data); err != nil {
 			return err
@@ -178,6 +170,56 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 	}
 
 	return nil
+}
+
+func (p *DeviceManagementPackage) sendServiceData(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
+	now := time.Now().UTC()
+	return p.server.SendUp(ctx, &ttnpb.ApplicationUp{
+		EndDeviceIdentifiers: ids,
+		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+		ReceivedAt:           &now,
+		Up: &ttnpb.ApplicationUp_ServiceData{
+			ServiceData: &ttnpb.ApplicationServiceData{
+				Data:    data,
+				Service: packageName,
+			},
+		},
+	})
+}
+
+func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, position *objects.PositionSolution) error {
+	if position == nil {
+		return nil
+	}
+	if len(position.LLH) != 3 {
+		log.FromContext(ctx).WithField("len", len(position.LLH)).Warn("Invalid LLH length")
+		return nil
+	}
+	source := ttnpb.SOURCE_UNKNOWN
+	switch position.Algorithm {
+	case objects.GNSSPositionSolutionType:
+		source = ttnpb.SOURCE_GPS
+	case objects.WiFiPositionSolutionType:
+		source = ttnpb.SOURCE_WIFI_RSSI_GEOLOCATION
+	}
+	now := time.Now().UTC()
+	return p.server.SendUp(ctx, &ttnpb.ApplicationUp{
+		EndDeviceIdentifiers: ids,
+		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+		ReceivedAt:           &now,
+		Up: &ttnpb.ApplicationUp_LocationSolved{
+			LocationSolved: &ttnpb.ApplicationLocation{
+				Service: fmt.Sprintf("%v-%s", packageName, position.Algorithm),
+				Location: ttnpb.Location{
+					Latitude:  position.LLH[0],
+					Longitude: position.LLH[1],
+					Altitude:  int32(position.LLH[2]),
+					Accuracy:  int32(position.Accuracy),
+					Source:    source,
+				},
+			},
+		},
+	})
 }
 
 func (p *DeviceManagementPackage) parseStreamRecords(ctx context.Context, records []objects.StreamRecord, up *ttnpb.ApplicationUp, data *packageData) error {
