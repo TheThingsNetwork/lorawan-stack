@@ -163,7 +163,7 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 		return err
 	}
 
-	if err := p.parseStreamRecords(ctx, result.StreamRecords, up, data); err != nil {
+	if err := p.parseStreamRecords(ctx, result.StreamRecords, up, data, loraUp.Timestamp); err != nil {
 		return err
 	}
 
@@ -218,7 +218,7 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids tt
 	})
 }
 
-func (p *DeviceManagementPackage) parseStreamRecords(ctx context.Context, records []objects.StreamRecord, up *ttnpb.ApplicationUp, data *packageData) error {
+func (p *DeviceManagementPackage) parseStreamRecords(ctx context.Context, records []objects.StreamRecord, up *ttnpb.ApplicationUp, data *packageData, originalTimestamp *float64) error {
 	if records == nil || !data.GetUseTLVEncoding() {
 		return nil
 	}
@@ -231,7 +231,9 @@ func (p *DeviceManagementPackage) parseStreamRecords(ctx context.Context, record
 		))
 		logger.Debug("Record decoded")
 
-		loraUp := &objects.LoRaUplink{}
+		loraUp := &objects.LoRaUplink{
+			Timestamp: originalTimestamp,
+		}
 		switch tag {
 		case 0x05, 0x06, 0x07: // GNSS data
 			payload := objects.Hex(bytes)
