@@ -148,12 +148,14 @@ type LoRaUplinkType uint8
 const (
 	// UplinkUplinkType is LoRaWAN Message Type.
 	UplinkUplinkType LoRaUplinkType = iota
-	// ModemUplinkType is DAS Protocol Message Type.
+	// ModemUplinkType is DMS Protocol Message Type.
 	ModemUplinkType
 	// JoiningUplinkType is Session Reset Message Type.
 	JoiningUplinkType
-	// GNSSUplinkType is DAS GNSS Message Type.
+	// GNSSUplinkType is DMS GNSS Message Type.
 	GNSSUplinkType
+	// WiFiUplinkType is DMS WiFi Message Type.
+	WiFiUplinkType
 )
 
 const (
@@ -161,6 +163,7 @@ const (
 	modemUplinkType   = "modem"
 	joiningUplinkType = "joining"
 	gnssUplinkType    = "gnss"
+	wifiUplinkType    = "wifi"
 )
 
 var errUplinkTypeUnsupported = errors.DefineInvalidArgument("uplink_type_unsupported", "uplink type `{type}` is unsupported")
@@ -177,6 +180,8 @@ func (t LoRaUplinkType) MarshalJSON() ([]byte, error) {
 		tp = joiningUplinkType
 	case GNSSUplinkType:
 		tp = gnssUplinkType
+	case WiFiUplinkType:
+		tp = wifiUplinkType
 	default:
 		return nil, errUplinkTypeUnsupported.WithAttributes("type", t)
 	}
@@ -199,6 +204,8 @@ func (t *LoRaUplinkType) UnmarshalJSON(b []byte) error {
 		*t = JoiningUplinkType
 	case gnssUplinkType:
 		*t = GNSSUplinkType
+	case wifiUplinkType:
+		*t = WiFiUplinkType
 	default:
 		return errUplinkTypeUnsupported.WithAttributes("type", t)
 	}

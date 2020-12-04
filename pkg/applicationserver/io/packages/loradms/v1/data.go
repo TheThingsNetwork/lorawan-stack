@@ -26,7 +26,7 @@ type packageData struct {
 	token     string
 	serverURL *url.URL
 
-	useTLVEncoding bool
+	useTLVEncoding *bool
 }
 
 const (
@@ -43,17 +43,28 @@ func (d *packageData) toStruct() *types.Struct {
 			StringValue: d.token,
 		},
 	}
-	st.Fields[serverURLField] = &types.Value{
-		Kind: &types.Value_StringValue{
-			StringValue: d.serverURL.String(),
-		},
+	if d.serverURL != nil {
+		st.Fields[serverURLField] = &types.Value{
+			Kind: &types.Value_StringValue{
+				StringValue: d.serverURL.String(),
+			},
+		}
 	}
-	st.Fields[useTLVEncodingField] = &types.Value{
-		Kind: &types.Value_BoolValue{
-			BoolValue: d.useTLVEncoding,
-		},
+	if d.useTLVEncoding != nil {
+		st.Fields[useTLVEncodingField] = &types.Value{
+			Kind: &types.Value_BoolValue{
+				BoolValue: *d.useTLVEncoding,
+			},
+		}
 	}
 	return &st
+}
+
+func (d *packageData) GetUseTLVEncoding() bool {
+	if d == nil || d.useTLVEncoding == nil {
+		return false
+	}
+	return *d.useTLVEncoding
 }
 
 var (
@@ -97,7 +108,7 @@ func (d *packageData) fromStruct(st *types.Struct) (err error) {
 				"type", fmt.Sprintf("%T", value.GetKind()),
 			)
 		}
-		d.useTLVEncoding = boolValue.BoolValue
+		d.useTLVEncoding = &boolValue.BoolValue
 	}
 	return nil
 }
