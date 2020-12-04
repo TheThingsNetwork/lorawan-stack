@@ -70,8 +70,6 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 	})
 }
 
-type upstreamTrafficHandler func(context.Context, *ttnpb.ApplicationUp, *link) (pass bool, err error)
-
 type link struct {
 	// Align for sync/atomic.
 	ups,
@@ -91,7 +89,8 @@ type link struct {
 	connReady chan struct{}
 	callOpts  []grpc.CallOption
 
-	handleUp upstreamTrafficHandler
+	handleUp        func(context.Context, *ttnpb.ApplicationUp, *link) (pass bool, err error)
+	decoupleContext func(context.Context) context.Context
 
 	subscribeCh   chan *io.Subscription
 	unsubscribeCh chan *io.Subscription
@@ -176,6 +175,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		closed:                 make(chan struct{}),
 		connReady:              make(chan struct{}),
 		handleUp:               as.handleUp,
+		decoupleContext:        as.FromRequestContext,
 		subscribeCh:            make(chan *io.Subscription, 1),
 		unsubscribeCh:          make(chan *io.Subscription, 1),
 		upCh:                   make(chan *io.ContextualApplicationUp, linkBufferSize),
@@ -372,7 +372,7 @@ func (l *link) sendUp(ctx context.Context, up *ttnpb.ApplicationUp, ack func() e
 		return nil
 	}
 	ctxUp := &io.ContextualApplicationUp{
-		Context:       ctx,
+		Context:       l.decoupleContext(ctx),
 		ApplicationUp: up,
 	}
 	select {

@@ -26,6 +26,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Simulated uplinks visibility in webhook messages.
+
 ### Security
 
 ## [3.10.3] - 2020-12-02
