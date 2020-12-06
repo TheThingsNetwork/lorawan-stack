@@ -17,6 +17,7 @@ import UplinkMessage from '../previews/uplink-message'
 import ApplicationDownlink from '../previews/application-downlink'
 import ApplicationUplink from '../previews/application-uplink'
 import ApplicationUp from '../previews/application-up'
+import ApplicationLocation from '../previews/application-location'
 import JoinRequest from '../previews/join-request'
 import JoinResponse from '../previews/join-response'
 import GatewayStatus from '../previews/gateway-status'
@@ -97,6 +98,7 @@ export const dataTypeMap = {
   ApplicationDownlink,
   ApplicationUplink,
   ApplicationUp,
+  ApplicationLocation,
   DownlinkMessage,
   UplinkMessage,
   JoinRequest,
