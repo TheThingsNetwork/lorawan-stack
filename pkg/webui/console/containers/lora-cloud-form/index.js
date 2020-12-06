@@ -20,6 +20,7 @@ import LORA_CLOUD_DAS from '@console/constants/lora-cloud-das'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
+import Checkbox from '@ttn-lw/components/checkbox'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import ModalButton from '@ttn-lw/components/button/modal-button'
@@ -41,6 +42,7 @@ import { selectApplicationPackageDefaultAssociation } from '@console/store/selec
 
 const m = defineMessages({
   token: 'Token',
+  lr1110Encoding: 'LR1110 demo encoding',
   setLoRaCloudToken: 'Set LoRa Cloud token',
   deleteToken: 'Delete token',
   deleteWarning: 'Are you sure you want to delete the current token? This action cannot be undone.',
@@ -53,6 +55,7 @@ const validationSchema = Yup.object()
   .shape({
     data: Yup.object().shape({
       token: Yup.string().required(sharedMessages.validateRequired),
+      use_tlv_encoding: Yup.boolean(),
     }),
   })
   .noUnknown()
@@ -110,6 +113,7 @@ const LoRaCloudForm = () => {
         enableReinitialize
       >
         <Form.Field component={Input} title={m.token} name="data.token" required />
+        <Form.Field component={Checkbox} title={m.lr1110Encoding} name="data.use_tlv_encoding" />
         <SubmitBar>
           <Form.Submit component={SubmitButton} message={m.setToken} />
           {Boolean(defaultAssociation) && (

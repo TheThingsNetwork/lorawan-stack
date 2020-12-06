@@ -226,6 +226,7 @@
   "console.containers.gateway-location-form.gateway-location-form.publishLocation": "Publish location",
   "console.containers.gateways-table.index.ownedTabTitle": "Owned gateways",
   "console.containers.lora-cloud-form.index.token": "Token",
+  "console.containers.lora-cloud-form.index.lr1110Encoding": "LR1110 demo encoding",
   "console.containers.lora-cloud-form.index.setLoRaCloudToken": "Set LoRa Cloud token",
   "console.containers.lora-cloud-form.index.deleteToken": "Delete token",
   "console.containers.lora-cloud-form.index.deleteWarning": "Are you sure you want to delete the current token? This action cannot be undone.",
