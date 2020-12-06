@@ -26,23 +26,25 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-const sendOperation = "send"
+const (
+	sendOperation = "send"
+
+	maxResponseSize = (1 << 24)
+)
 
 type baseResponse struct {
 	Result interface{} `json:"result"`
 	Errors []string    `json:"errors"`
 }
 
-var (
-	errAPICallFailed = errors.Define("api_call_failed", "", "")
-	errRequestFailed = errors.DefineUnavailable("request_failed", "request failed")
-)
+var errRequestFailed = errors.Define("request_failed", "request failed")
 
 func parse(result interface{}, res *http.Response) error {
 	defer res.Body.Close()
 	defer io.Copy(ioutil.Discard, res.Body)
+	reader := io.LimitReader(res.Body, maxResponseSize)
 	if res.StatusCode < 200 || res.StatusCode > 299 {
-		body, _ := ioutil.ReadAll(res.Body)
+		body, _ := ioutil.ReadAll(reader)
 		return errRequestFailed.WithDetails(&ttnpb.ErrorDetails{
 			Code:          uint32(res.StatusCode),
 			MessageFormat: string(body),
@@ -51,8 +53,7 @@ func parse(result interface{}, res *http.Response) error {
 	r := &baseResponse{
 		Result: result,
 	}
-	err := json.NewDecoder(res.Body).Decode(r)
-	if err != nil {
+	if err := json.NewDecoder(reader).Decode(r); err != nil {
 		return err
 	}
 	if len(r.Errors) == 0 {
@@ -65,5 +66,5 @@ func parse(result interface{}, res *http.Response) error {
 			MessageFormat: message,
 		})
 	}
-	return errAPICallFailed.WithDetails(details...)
+	return errRequestFailed.WithDetails(details...)
 }

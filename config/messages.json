@@ -1709,15 +1709,6 @@
       "file": "objects.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loradms/v1/api:api_call_failed": {
-    "translations": {
-      "en": ""
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/packages/loradms/v1/api",
-      "file": "messages.go"
-    }
-  },
   "error:pkg/applicationserver/io/packages/loradms/v1/api:request_failed": {
     "translations": {
       "en": "request failed"
