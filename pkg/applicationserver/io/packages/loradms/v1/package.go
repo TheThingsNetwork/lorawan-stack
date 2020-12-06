@@ -110,6 +110,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 }
 
 func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.ApplicationUp, loraUp *objects.LoRaUplink, data *packageData) error {
+	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loradas:%s", events.NewCorrelationID()))...)
 	logger := log.FromContext(ctx)
 	eui := objects.EUI(*up.DevEUI)
 
@@ -141,18 +142,8 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 		return err
 	}
 
-	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loradas:%s", events.NewCorrelationID()))...)
-	if downlink := result.Downlink; downlink != nil {
-		down := &ttnpb.ApplicationDownlink{
-			FPort:      uint32(downlink.Port),
-			FRMPayload: []byte(downlink.Payload),
-		}
-		err = p.server.DownlinkQueuePush(ctx, up.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink{down})
-		if err != nil {
-			logger.WithError(err).Debug("Failed to push downlink to device")
-			return err
-		}
-		logger.Debug("Device Management Service downlink scheduled")
+	if err := p.sendDownlink(ctx, up.EndDeviceIdentifiers, result.Downlink, data); err != nil {
+		return err
 	}
 
 	if err := p.sendServiceData(ctx, up.EndDeviceIdentifiers, resultStruct); err != nil {
@@ -168,6 +159,22 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 	}
 
 	return nil
+}
+
+func (p *DeviceManagementPackage) sendDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, downlink *objects.LoRaDnlink, data *packageData) error {
+	if downlink == nil {
+		return nil
+	}
+	// Downlinks that are the result of a location solving query will erroneously arrive
+	// on FPort 0. If we know that the device uses the TLV encoding, we can translate the
+	// FPort to 150 in order to fix this.
+	if downlink.Port == 0 && data.GetUseTLVEncoding() {
+		downlink.Port = 150
+	}
+	return p.server.DownlinkQueuePush(ctx, ids, []*ttnpb.ApplicationDownlink{{
+		FPort:      uint32(downlink.Port),
+		FRMPayload: []byte(downlink.Payload),
+	}})
 }
 
 func (p *DeviceManagementPackage) sendServiceData(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
