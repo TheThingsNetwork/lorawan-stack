@@ -22,15 +22,11 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/grpc/codes"
 )
 
 const sendOperation = "send"
-
-type apiErrorDetail string
-
-func (s *apiErrorDetail) Reset()        { *s = "" }
-func (s apiErrorDetail) String() string { return string(s) }
-func (apiErrorDetail) ProtoMessage()    {}
 
 type baseResponse struct {
 	Result interface{} `json:"result"`
@@ -39,14 +35,18 @@ type baseResponse struct {
 
 var (
 	errAPICallFailed = errors.Define("api_call_failed", "", "")
-	errRequest       = errors.DefineUnavailable("request", "request failed with status `{code}`")
+	errRequestFailed = errors.DefineUnavailable("request_failed", "request failed")
 )
 
 func parse(result interface{}, res *http.Response) error {
 	defer res.Body.Close()
 	defer io.Copy(ioutil.Discard, res.Body)
 	if res.StatusCode < 200 || res.StatusCode > 299 {
-		return errRequest.WithAttributes("code", res.StatusCode)
+		body, _ := ioutil.ReadAll(res.Body)
+		return errRequestFailed.WithDetails(&ttnpb.ErrorDetails{
+			Code:          uint32(res.StatusCode),
+			MessageFormat: string(body),
+		})
 	}
 	r := &baseResponse{
 		Result: result,
@@ -60,8 +60,10 @@ func parse(result interface{}, res *http.Response) error {
 	}
 	var details []proto.Message
 	for _, message := range r.Errors {
-		ed := apiErrorDetail(message)
-		details = append(details, &ed)
+		details = append(details, &ttnpb.ErrorDetails{
+			Code:          uint32(codes.Unknown),
+			MessageFormat: message,
+		})
 	}
 	return errAPICallFailed.WithDetails(details...)
 }

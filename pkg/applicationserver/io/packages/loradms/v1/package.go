@@ -61,7 +61,7 @@ var (
 )
 
 // HandleUp implements packages.ApplicationPackageHandler.
-func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) error {
+func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) (err error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages/loradms/v1")
 	logger := log.FromContext(ctx)
 
@@ -73,6 +73,12 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 		logger.Debug("Package configured for end device with no device EUI")
 		return nil
 	}
+
+	defer func() {
+		if err != nil {
+			events.Publish(evtPackageFail.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, err))
+		}
+	}()
 
 	data, fPort, err := p.mergePackageData(def, assoc)
 	if err != nil {

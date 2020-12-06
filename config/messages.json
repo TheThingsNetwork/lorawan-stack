@@ -1718,9 +1718,9 @@
       "file": "messages.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loradms/v1/api:request": {
+  "error:pkg/applicationserver/io/packages/loradms/v1/api:request_failed": {
     "translations": {
-      "en": "request failed with status `{code}`"
+      "en": "request failed"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/loradms/v1/api",
@@ -7739,6 +7739,15 @@
       "file": "observability.go"
     }
   },
+  "event:as.packages.loraclouddmsv1.fail": {
+    "translations": {
+      "en": "fail to process upstream message"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1",
+      "file": "observability.go"
+    }
+  },
   "event:as.pubsub.delete": {
     "translations": {
       "en": "delete pub/sub"
@@ -7850,6 +7859,24 @@
   "event:as.up.join.receive": {
     "translations": {
       "en": "receive join-accept message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.location.forward": {
+    "translations": {
+      "en": "forward location solved message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.service.forward": {
+    "translations": {
+      "en": "forward service data message"
     },
     "description": {
       "package": "pkg/applicationserver",
