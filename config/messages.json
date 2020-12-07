@@ -1700,27 +1700,18 @@
       "file": "mqtt.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:uplink_type_unsupported": {
+  "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:invalid_stream_record": {
     "translations": {
-      "en": "uplink type `{type}` is unsupported"
+      "en": "invalid stream record"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/loradms/v1/api/objects",
       "file": "objects.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loradms/v1/api:api_call_failed": {
-    "translations": {
-      "en": ""
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/packages/loradms/v1/api",
-      "file": "messages.go"
-    }
-  },
   "error:pkg/applicationserver/io/packages/loradms/v1/api:request": {
     "translations": {
-      "en": "request failed with status `{code}`"
+      "en": "LoRaCloud DMS request failed"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/loradms/v1/api",
@@ -1761,6 +1752,15 @@
     "description": {
       "package": "pkg/applicationserver/io/packages/loradms/v1",
       "file": "package.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/loradms/v1:tlv_record_too_small": {
+    "translations": {
+      "en": "TLV record payload is too small"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1",
+      "file": "tlv_encoding.go"
     }
   },
   "error:pkg/applicationserver/io/packages/loradms/v1:uplink_request_failed": {
@@ -7730,6 +7730,15 @@
       "file": "observability.go"
     }
   },
+  "event:as.packages.loraclouddmsv1.fail": {
+    "translations": {
+      "en": "fail to process upstream message"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1",
+      "file": "observability.go"
+    }
+  },
   "event:as.pubsub.delete": {
     "translations": {
       "en": "delete pub/sub"
@@ -7841,6 +7850,24 @@
   "event:as.up.join.receive": {
     "translations": {
       "en": "receive join-accept message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.location.forward": {
+    "translations": {
+      "en": "forward location solved message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.service.forward": {
+    "translations": {
+      "en": "forward service data message"
     },
     "description": {
       "package": "pkg/applicationserver",
