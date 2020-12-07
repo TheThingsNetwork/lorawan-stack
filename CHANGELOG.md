@@ -29,6 +29,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Simulated uplinks visibility in webhook messages.
+- Retransmission handling.
 
 ### Security
 
