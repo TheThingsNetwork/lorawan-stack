@@ -94,10 +94,24 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 				return nil, err
 			}
 		} else {
-			log.FromContext(ctx).Warn("No encryption key defined, storing as plaintext")
+			log.FromContext(ctx).Warn("No encryption key defined, storing LBS LNS Secret in plaintext")
 		}
 		req.LBSLNSSecret.Value = value
 		req.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
+	}
+
+	if req.ClaimAuthenticationCode != nil {
+		value := req.ClaimAuthenticationCode.Value
+		if is.config.Gateways.EncryptionKeyID != "" {
+			value, err = is.KeyVault.Encrypt(ctx, req.ClaimAuthenticationCode.Value, is.config.Gateways.EncryptionKeyID)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			log.FromContext(ctx).Warn("No encryption key defined, storing Claim Authentication Code in plaintext")
+		}
+		req.ClaimAuthenticationCode.Value = value
+		req.ClaimAuthenticationCode.KeyID = is.config.Gateways.EncryptionKeyID
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
@@ -161,7 +175,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 		}
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "lbs_lns_secret") {
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "lbs_lns_secret", "claim_authentication_code") {
 		if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS); err != nil {
 			return nil, err
 		}
@@ -192,10 +206,24 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 				return nil, err
 			}
 		} else {
-			log.FromContext(ctx).Warn("No encryption key defined, returning stored value")
+			log.FromContext(ctx).Warn("No encryption key defined, returning stored LBS LNS Secret value")
 		}
 		gtw.LBSLNSSecret.Value = value
 		gtw.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
+	}
+
+	if gtw.ClaimAuthenticationCode != nil {
+		value := gtw.ClaimAuthenticationCode.Value
+		if gtw.ClaimAuthenticationCode.KeyID != "" {
+			value, err = is.KeyVault.Decrypt(ctx, gtw.ClaimAuthenticationCode.Value, gtw.ClaimAuthenticationCode.KeyID)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			log.FromContext(ctx).Warn("No encryption key defined, returning stored Claim Authentication Code value")
+		}
+		gtw.ClaimAuthenticationCode.Value = value
+		gtw.ClaimAuthenticationCode.KeyID = is.config.Gateways.EncryptionKeyID
 	}
 
 	// Backwards compatibility for frequency_plan_id field.
@@ -312,10 +340,29 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 					}
 				} else {
 					logger := log.FromContext(ctx)
-					logger.Warn("No encryption key defined, returning stored value")
+					logger.Warn("No encryption key defined, returning stored LBS LNS Secret value")
 				}
 				gtws.Gateways[i].LBSLNSSecret.Value = value
 				gtws.Gateways[i].LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
+			}
+		}
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "claim_authentication_code") {
+			if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
+				gtws.Gateways[i].ClaimAuthenticationCode = nil
+			} else if gtws.Gateways[i].ClaimAuthenticationCode != nil {
+				value := gtws.Gateways[i].ClaimAuthenticationCode.Value
+				if gtws.Gateways[i].ClaimAuthenticationCode.KeyID != "" {
+					value, err = is.KeyVault.Decrypt(ctx, gtws.Gateways[i].ClaimAuthenticationCode.Value, gtws.Gateways[i].ClaimAuthenticationCode.KeyID)
+					if err != nil {
+						return nil, err
+					}
+				} else {
+					logger := log.FromContext(ctx)
+					logger.Warn("No encryption key defined, returning stored Claim Authentication Code value")
+				}
+				gtws.Gateways[i].ClaimAuthenticationCode.Value = value
+				gtws.Gateways[i].ClaimAuthenticationCode.KeyID = is.config.Gateways.EncryptionKeyID
 			}
 		}
 	}
@@ -363,10 +410,29 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 				}
 			} else {
 				logger := log.FromContext(ctx)
-				logger.Warn("No encryption key defined, storing as plaintext")
+				logger.Warn("No encryption key defined, storing LBS LNS Secret in plaintext")
 			}
 			req.LBSLNSSecret.Value = value
 			req.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
+		}
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "claim_authentication_code") {
+		if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
+			return nil, err
+		} else if req.ClaimAuthenticationCode != nil {
+			value := req.ClaimAuthenticationCode.Value
+			if is.config.Gateways.EncryptionKeyID != "" {
+				value, err = is.KeyVault.Encrypt(ctx, req.ClaimAuthenticationCode.Value, is.config.Gateways.EncryptionKeyID)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				logger := log.FromContext(ctx)
+				logger.Warn("No encryption key defined, storing Claim Authentication Code in plaintext")
+			}
+			req.ClaimAuthenticationCode.Value = value
+			req.ClaimAuthenticationCode.KeyID = is.config.Gateways.EncryptionKeyID
 		}
 	}
 
