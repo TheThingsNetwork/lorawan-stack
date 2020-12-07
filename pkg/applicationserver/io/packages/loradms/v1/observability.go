@@ -15,6 +15,8 @@
 package loraclouddevicemanagementv1
 
 import (
+	"context"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -24,3 +26,7 @@ var evtPackageFail = events.Define(
 	events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	events.WithErrorDataType(),
 )
+
+func registerPackageFail(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, err error) {
+	events.Publish(evtPackageFail.NewWithIdentifiersAndData(ctx, ids, err))
+}

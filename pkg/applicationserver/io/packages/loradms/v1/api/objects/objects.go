@@ -52,6 +52,7 @@ func (d DeviceUplinkResponses) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// PositionSolutionType is the algorithm used by a position solution query.
 type PositionSolutionType uint8
 
 const (
@@ -212,6 +213,7 @@ type LoRaUplink struct {
 	GNSSUse2DSolver         *bool     `json:"gnss_use_2D_solver,omitempty"`
 }
 
+// LoRaUplinkType is the type of a LoRaCloud DMS uplink.
 type LoRaUplinkType uint8
 
 const (

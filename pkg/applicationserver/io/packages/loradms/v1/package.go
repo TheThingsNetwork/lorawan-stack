@@ -76,7 +76,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 
 	defer func() {
 		if err != nil {
-			events.Publish(evtPackageFail.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, err))
+			registerPackageFail(ctx, up.EndDeviceIdentifiers, err)
 		}
 	}()
 
@@ -116,7 +116,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 }
 
 func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.ApplicationUp, loraUp *objects.LoRaUplink, data *packageData) error {
-	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loradas:%s", events.NewCorrelationID()))...)
+	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loraclouddmsv1:%s", events.NewCorrelationID()))...)
 	logger := log.FromContext(ctx)
 	eui := objects.EUI(*up.DevEUI)
 

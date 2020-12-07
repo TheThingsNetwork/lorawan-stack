@@ -17,6 +17,7 @@ For details about compatibility between different releases, see the **Commitment
 - More password validation rules in the user management form in the Console.
 - Support for class B end devices in the Console.
 - MAC settings configuration when creating and editing end devices in the Console.
+- Support for the LR1110 LTV stream protocol.
 
 ### Changed
 

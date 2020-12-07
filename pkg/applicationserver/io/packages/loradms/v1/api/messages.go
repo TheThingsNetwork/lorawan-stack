@@ -37,7 +37,7 @@ type baseResponse struct {
 	Errors []string    `json:"errors"`
 }
 
-var errRequestFailed = errors.Define("request_failed", "request failed")
+var errRequest = errors.Define("request", "LoRaCloud DMS request failed")
 
 func parse(result interface{}, res *http.Response) error {
 	defer res.Body.Close()
@@ -45,7 +45,7 @@ func parse(result interface{}, res *http.Response) error {
 	reader := io.LimitReader(res.Body, maxResponseSize)
 	if res.StatusCode < 200 || res.StatusCode > 299 {
 		body, _ := ioutil.ReadAll(reader)
-		return errRequestFailed.WithDetails(&ttnpb.ErrorDetails{
+		return errRequest.WithDetails(&ttnpb.ErrorDetails{
 			Code:          uint32(res.StatusCode),
 			MessageFormat: string(body),
 		})
@@ -66,5 +66,5 @@ func parse(result interface{}, res *http.Response) error {
 			MessageFormat: message,
 		})
 	}
-	return errRequestFailed.WithDetails(details...)
+	return errRequest.WithDetails(details...)
 }

@@ -1709,9 +1709,9 @@
       "file": "objects.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loradms/v1/api:request_failed": {
+  "error:pkg/applicationserver/io/packages/loradms/v1/api:request": {
     "translations": {
-      "en": "request failed"
+      "en": "LoRaCloud DMS request failed"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/loradms/v1/api",
