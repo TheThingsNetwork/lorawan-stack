@@ -74,10 +74,24 @@ var GatewayVersionFieldPathsTopLevel = []string{
 	"photos",
 	"radios",
 }
+var GatewayClaimAuthenticationCodeFieldPathsNested = []string{
+	"valid_from",
+	"valid_to",
+	"value",
+}
+
+var GatewayClaimAuthenticationCodeFieldPathsTopLevel = []string{
+	"valid_from",
+	"valid_to",
+	"value",
+}
 var GatewayFieldPathsNested = []string{
 	"antennas",
 	"attributes",
 	"auto_update",
+	"claim_authentication_code",
+	"claim_authentication_code.key_id",
+	"claim_authentication_code.value",
 	"contact_info",
 	"created_at",
 	"description",
@@ -111,6 +125,7 @@ var GatewayFieldPathsTopLevel = []string{
 	"antennas",
 	"attributes",
 	"auto_update",
+	"claim_authentication_code",
 	"contact_info",
 	"created_at",
 	"description",
@@ -189,6 +204,9 @@ var CreateGatewayRequestFieldPathsNested = []string{
 	"gateway.antennas",
 	"gateway.attributes",
 	"gateway.auto_update",
+	"gateway.claim_authentication_code",
+	"gateway.claim_authentication_code.key_id",
+	"gateway.claim_authentication_code.value",
 	"gateway.contact_info",
 	"gateway.created_at",
 	"gateway.description",
@@ -228,6 +246,9 @@ var UpdateGatewayRequestFieldPathsNested = []string{
 	"gateway.antennas",
 	"gateway.attributes",
 	"gateway.auto_update",
+	"gateway.claim_authentication_code",
+	"gateway.claim_authentication_code.key_id",
+	"gateway.claim_authentication_code.value",
 	"gateway.contact_info",
 	"gateway.created_at",
 	"gateway.description",

@@ -11032,7 +11032,7 @@
           "name": "Gateway",
           "longName": "Gateway",
           "fullName": "ttn.lorawan.v3.Gateway",
-          "description": "Gateway is the message that defines a gateway on the network.",
+          "description": "Gateway is the message that defines a gateway on the network.\nAll fields of the type `Secret` require RIGHT_GATEWAY_READ_SECRETS for read and RIGHT_GATEWAY_WRITE_SECRETS for update operations.",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
@@ -11329,7 +11329,17 @@
             },
             {
               "name": "lbs_lns_secret",
-              "description": "The LoRa Basics Station LNS secret.\nThis is either an auth token (such as an API Key) or a TLS private certificate.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.\n\nnext: 23",
+              "description": "The LoRa Basics Station LNS secret.\nThis is either an auth token (such as an API Key) or a TLS private certificate.",
+              "label": "",
+              "type": "Secret",
+              "longType": "Secret",
+              "fullType": "ttn.lorawan.v3.Secret",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "claim_authentication_code",
+              "description": "The authentication code for gateway claiming.\n\nnext: 24",
               "label": "",
               "type": "Secret",
               "longType": "Secret",
@@ -11508,6 +11518,55 @@
               "type": "string",
               "longType": "string",
               "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GatewayClaimAuthenticationCode",
+          "longName": "GatewayClaimAuthenticationCode",
+          "fullName": "ttn.lorawan.v3.GatewayClaimAuthenticationCode",
+          "description": "Authentication code for claiming gateways.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            },
+            {
+              "name": "valid_from",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "valid_to",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
               "ismap": false,
               "defaultValue": ""
             }

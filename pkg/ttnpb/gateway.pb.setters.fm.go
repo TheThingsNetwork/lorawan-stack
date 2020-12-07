@@ -285,6 +285,44 @@ func (dst *GatewayVersion) SetFields(src *GatewayVersion, paths ...string) error
 	return nil
 }
 
+func (dst *GatewayClaimAuthenticationCode) SetFields(src *GatewayClaimAuthenticationCode, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				dst.Value = nil
+			}
+		case "valid_from":
+			if len(subs) > 0 {
+				return fmt.Errorf("'valid_from' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ValidFrom = src.ValidFrom
+			} else {
+				dst.ValidFrom = nil
+			}
+		case "valid_to":
+			if len(subs) > 0 {
+				return fmt.Errorf("'valid_to' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ValidTo = src.ValidTo
+			} else {
+				dst.ValidTo = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -532,6 +570,31 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 					dst.LBSLNSSecret = src.LBSLNSSecret
 				} else {
 					dst.LBSLNSSecret = nil
+				}
+			}
+		case "claim_authentication_code":
+			if len(subs) > 0 {
+				var newDst, newSrc *Secret
+				if (src == nil || src.ClaimAuthenticationCode == nil) && dst.ClaimAuthenticationCode == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ClaimAuthenticationCode
+				}
+				if dst.ClaimAuthenticationCode != nil {
+					newDst = dst.ClaimAuthenticationCode
+				} else {
+					newDst = &Secret{}
+					dst.ClaimAuthenticationCode = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ClaimAuthenticationCode = src.ClaimAuthenticationCode
+				} else {
+					dst.ClaimAuthenticationCode = nil
 				}
 			}
 
