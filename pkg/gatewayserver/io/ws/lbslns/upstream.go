@@ -433,11 +433,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 
 	recordTime := func(recordRTT bool, refTime float64, xTime int64, server time.Time) {
 		if recordRTT {
-			sec, nsec := math.Modf(refTime)
-			if sec != 0 {
-				ref := time.Unix(int64(sec), int64(nsec*1e9))
-				conn.RecordRTT(server.Sub(ref), server)
-			}
+			conn.RecordRTT(server.Sub(getTimeFromFloat64(refTime)), server)
 		}
 		conn.SyncWithGatewayConcentrator(
 			// The concentrator timestamp is the 32 LSB.
@@ -446,11 +442,6 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			// The Basic Station epoch is the 48 LSB.
 			scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFF)*time.Microsecond),
 		)
-	}
-
-	getTimeFromFloat64 := func(timeInFloat float64) time.Time {
-		sec, nsec := math.Modf(timeInFloat)
-		return time.Unix(int64(sec), int64(nsec*1e9))
 	}
 
 	switch typ {
@@ -557,4 +548,9 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 
 	}
 	return nil, nil
+}
+
+func getTimeFromFloat64(timeInFloat float64) time.Time {
+	sec, nsec := math.Modf(timeInFloat)
+	return time.Unix(int64(sec), int64(nsec*1e9))
 }
