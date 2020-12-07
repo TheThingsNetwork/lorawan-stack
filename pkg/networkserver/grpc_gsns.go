@@ -246,7 +246,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 				log.FromContext(ctx).Error("Length of marshaled recent uplink payload is too short, skip")
 				return nil, false, nil
 			}
-			if !bytes.Equal(up.RawPayload, recentUpPHYPayload[:len(recentUpPHYPayload)-4]) {
+			if !bytes.Equal(up.RawPayload[:len(up.RawPayload)-4], recentUpPHYPayload[:len(recentUpPHYPayload)-4]) {
 				break
 			}
 			nbTrans++
