@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.10.4] - 2020-12-08
+
+### Added
+
 - Configure application activation settings from the CLI (see `ttn-lw-cli application activation-settings` commands).
 - User API keys management to the Console.
 - `Purge` RPC and cli command for entity purge (hard-delete) from the database.
@@ -23,17 +37,11 @@ For details about compatibility between different releases, see the **Commitment
 
 - Branding (updated TTS Open Source logo, colors, etc).
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Simulated uplinks visibility in webhook messages.
 - Retransmission handling.
 - RTT recording for LBS gateways. The maximum round trip delay for RTT calculation is configurable via `--gs.basic-station.max-valid-round-trip-delay`.
-
-### Security
 
 ## [3.10.3] - 2020-12-02
 
@@ -1204,7 +1212,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.3...v3.10
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.4...v3.10
+[3.10.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.3...v3.10.4
 [3.10.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.2...v3.10.3
 [3.10.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.1...v3.10.2
 [3.10.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.0...v3.10.1
