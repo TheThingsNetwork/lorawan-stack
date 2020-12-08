@@ -31,6 +31,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Simulated uplinks visibility in webhook messages.
 - Retransmission handling.
+- RTT recording for LBS gateways. The maximum round trip delay for RTT calculation is configurable via `--gs.basic-station.max-valid-round-trip-delay`.
 
 ### Security
 

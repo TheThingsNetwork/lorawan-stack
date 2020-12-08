@@ -51,9 +51,10 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 		PublicTLSAddress: fmt.Sprintf("%s:8882", shared.DefaultPublicHost),
 	},
 	BasicStation: gatewayserver.BasicStationConfig{
-		Config:    ws.DefaultConfig,
-		Listen:    ":1887",
-		ListenTLS: ":8887",
+		Config:                 ws.DefaultConfig,
+		MaxValidRoundTripDelay: 10 * time.Second,
+		Listen:                 ":1887",
+		ListenTLS:              ":8887",
 	},
 	UpdateConnectionStatsDebounceTime: 3 * time.Second,
 }
