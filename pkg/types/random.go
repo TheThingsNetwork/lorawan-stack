@@ -65,7 +65,7 @@ func NewPopulatedDevAddr(r randy) *DevAddr {
 func NewPopulatedDevAddrPrefix(r randy) *DevAddrPrefix {
 	var prefix DevAddrPrefix
 	prefix.DevAddr = *NewPopulatedDevAddr(r)
-	prefix.Length = uint8(r.Int63())
+	prefix.Length = uint8(r.Int63() % 33)
 	return &prefix
 }
 
@@ -75,6 +75,14 @@ func NewPopulatedEUI64(r randy) *EUI64 {
 	r8 := randy8(r)
 	copy(eui[:], r8[:])
 	return &eui
+}
+
+// NewPopulatedEUI64Prefix returns a random EUI64Prefix.
+func NewPopulatedEUI64Prefix(r randy) *EUI64Prefix {
+	var prefix EUI64Prefix
+	prefix.EUI64 = *NewPopulatedEUI64(r)
+	prefix.Length = uint8(r.Int63() % 65)
+	return &prefix
 }
 
 // NewPopulatedAES128Key returns a random AES128Key.

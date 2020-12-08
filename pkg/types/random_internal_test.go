@@ -29,5 +29,6 @@ func TestRandom(t *testing.T) {
 	NewPopulatedDevAddr(source)
 	NewPopulatedDevAddrPrefix(source)
 	NewPopulatedEUI64(source)
+	NewPopulatedEUI64Prefix(source)
 	NewPopulatedAES128Key(source)
 }
