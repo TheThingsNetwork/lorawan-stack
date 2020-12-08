@@ -517,7 +517,6 @@ func init() {
 	gatewaysSearchCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysSearchCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysSearchCommand)
-	gatewaysGetCommand.Flags().AddFlagSet(gatewayClaimAuthCodeValidityFlags())
 	gatewaysGetCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysGetCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysGetCommand.Flags().AddFlagSet(selectAllGatewayFlags)

@@ -12,6 +12,9 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Reset functionality in Network Server, which resets session context and MAC state (see `ttn-lw-cli end-devices reset` command). For OTAA all data is wiped and device must rejoin, for ABP session keys, device address and downlink queue are preserved, while MAC state is reset.
+- Store and retrieve Gateway Claim Authentication Code from database.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added column.
+  - This uses the same encryption key set using the `is.gateways.encryption-key-id` configuration option.
 
 ### Changed
 
