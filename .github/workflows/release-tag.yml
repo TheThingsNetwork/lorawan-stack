@@ -27,6 +27,8 @@ jobs:
         registry: ghcr.io
         username: '${{ secrets.GHCR_USERNAME }}'
         password: '${{ secrets.GHCR_PASSWORD }}'
+    - name: Update APT
+      run: sudo apt-get -yq update
     - name: Install Snapcraft
       run: sudo apt-get -yq --no-install-suggests --no-install-recommends install snapcraft
     - name: Login to Snapcraft
