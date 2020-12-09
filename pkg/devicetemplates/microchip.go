@@ -114,6 +114,29 @@ gBTxV4oZ3JTZ3zB6/r9XM0k4E6/5wDAMBgNVHRMBAf8EAjAAMAoGCCqGSM49BAMC
 A0kAMEYCIQDKHgctLnq/zNqfB+1v0KRhDVPvRf6Dimt8aW9WLS0NWAIhAJvUe3uJ
 pkMG4zpov9FCoj4G340idEadm7mVbAd5GOB9
 -----END CERTIFICATE-----`),
+		// Certificate:
+		//     Data:
+		//         Version: 3 (0x2)
+		//         Serial Number:
+		//             76:f6:e3:9a:81:6f:11:00:8e:59:46:1c:58:1e:b7:9c
+		//         Signature Algorithm: ecdsa-with-SHA256
+		//         Issuer: O = Microchip Technology Inc, CN = Log Signer 003
+		//         Validity
+		//             Not Before: Aug 13 16:44:29 2020 GMT
+		//             Not After : Aug 13 16:44:29 2023 GMT
+		//         Subject: O = Microchip Technology Inc, CN = Log Signer 003
+		"hfCsqVY-uQNUJNKS-LKD_ckY-1E": []byte(`-----BEGIN CERTIFICATE-----
+MIIBxjCCAWygAwIBAgIQdvbjmoFvEQCOWUYcWB63nDAKBggqhkjOPQQDAjA8MSEw
+HwYDVQQKDBhNaWNyb2NoaXAgVGVjaG5vbG9neSBJbmMxFzAVBgNVBAMMDkxvZyBT
+aWduZXIgMDAzMB4XDTIwMDgxMzE2NDQyOVoXDTIzMDgxMzE2NDQyOVowPDEhMB8G
+A1UECgwYTWljcm9jaGlwIFRlY2hub2xvZ3kgSW5jMRcwFQYDVQQDDA5Mb2cgU2ln
+bmVyIDAwMzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABOeQbQw3RR+EuMpI1lBD
+mrmtZR5pX3zjnz57x9o6mWudIRgMtXuO7PS5MOGnqztxgrUK7ET69uAjQjC5T4/7
+q2WjUDBOMB0GA1UdDgQWBBSF8KypVj65A1Qk0pL4soP9yRj7UTAfBgNVHSMEGDAW
+gBSF8KypVj65A1Qk0pL4soP9yRj7UTAMBgNVHRMBAf8EAjAAMAoGCCqGSM49BAMC
+A0gAMEUCIQDTFbi2ERBNsK5o1A2t0abtDs78/Kaq/QUcHEnlB+j0oQIgT7jeTSTw
+e3Rzo2emytget6VogOWlMMVDe9+zdUT4rcY=
+-----END CERTIFICATE-----`),
 	},
 }
 
