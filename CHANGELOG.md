@@ -18,6 +18,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Removed
 
 ### Fixed
+- Memory leak in GS scheduler.
 
 ### Security
 
