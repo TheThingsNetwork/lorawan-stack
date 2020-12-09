@@ -18,7 +18,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Removed
 
 ### Fixed
-- Memory leak in GS scheduler.
 
 ### Security
 
@@ -43,6 +42,7 @@ For details about compatibility between different releases, see the **Commitment
 - Simulated uplinks visibility in webhook messages.
 - Retransmission handling.
 - RTT recording for LBS gateways. The maximum round trip delay for RTT calculation is configurable via `--gs.basic-station.max-valid-round-trip-delay`.
+- Memory leak in GS scheduler.
 
 ## [3.10.3] - 2020-12-02
 
