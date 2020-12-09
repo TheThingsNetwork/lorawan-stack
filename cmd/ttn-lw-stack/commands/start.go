@@ -131,6 +131,19 @@ var startCommand = &cobra.Command{
 			}
 		}
 
+		if startDefault {
+			start.IdentityServer = true
+			start.GatewayServer = true
+			start.NetworkServer = true
+			start.ApplicationServer = true
+			start.JoinServer = true
+			start.Console = true
+			start.GatewayConfigurationServer = true
+			start.DeviceTemplateConverter = true
+			start.QRCodeGenerator = true
+			start.PacketBrokerAgent = true
+		}
+
 		logger.Info("Setting up core component")
 
 		var rootRedirect web.Registerer
@@ -170,7 +183,7 @@ var startCommand = &cobra.Command{
 
 		redisConsumerID := redis.Key(host, strconv.Itoa(os.Getpid()))
 
-		if start.IdentityServer || startDefault {
+		if start.IdentityServer {
 			logger.Info("Setting up Identity Server")
 			if config.IS.OAuth.UI.TemplateData.SentryDSN == "" {
 				config.IS.OAuth.UI.TemplateData.SentryDSN = config.Sentry.DSN
@@ -190,7 +203,7 @@ var startCommand = &cobra.Command{
 			}
 		}
 
-		if start.GatewayServer || startDefault {
+		if start.GatewayServer {
 			logger.Info("Setting up Gateway Server")
 			switch config.Cache.Service {
 			case "redis":
@@ -205,7 +218,7 @@ var startCommand = &cobra.Command{
 			_ = gs
 		}
 
-		if start.NetworkServer || startDefault {
+		if start.NetworkServer {
 			redisConsumerGroup := "ns"
 
 			logger.Info("Setting up Network Server")
@@ -250,7 +263,7 @@ var startCommand = &cobra.Command{
 			})
 		}
 
-		if start.ApplicationServer || startDefault {
+		if start.ApplicationServer {
 			logger.Info("Setting up Application Server")
 			config.AS.Links = &asredis.LinkRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("as", "links")),
@@ -281,7 +294,7 @@ var startCommand = &cobra.Command{
 			_ = as
 		}
 
-		if start.JoinServer || startDefault {
+		if start.JoinServer {
 			logger.Info("Setting up Join Server")
 			config.JS.Devices = &jsredis.DeviceRegistry{
 				Redis: NewComponentDeviceRegistryRedis(*config, "js"),
@@ -299,7 +312,7 @@ var startCommand = &cobra.Command{
 			_ = js
 		}
 
-		if start.Console || startDefault {
+		if start.Console {
 			logger.Info("Setting up Console")
 			if config.Console.UI.TemplateData.SentryDSN == "" {
 				config.Console.UI.TemplateData.SentryDSN = config.Sentry.DSN
@@ -317,7 +330,7 @@ var startCommand = &cobra.Command{
 			}
 		}
 
-		if start.GatewayConfigurationServer || startDefault {
+		if start.GatewayConfigurationServer {
 			logger.Info("Setting up Gateway Configuration Server")
 			gcs, err := gatewayconfigurationserver.New(c, &config.GCS)
 			if err != nil {
@@ -326,7 +339,7 @@ var startCommand = &cobra.Command{
 			_ = gcs
 		}
 
-		if start.DeviceTemplateConverter || startDefault {
+		if start.DeviceTemplateConverter {
 			logger.Info("Setting up Device Template Converter")
 			dtc, err := devicetemplateconverter.New(c, &config.DTC)
 			if err != nil {
@@ -335,7 +348,7 @@ var startCommand = &cobra.Command{
 			_ = dtc
 		}
 
-		if start.QRCodeGenerator || startDefault {
+		if start.QRCodeGenerator {
 			logger.Info("Setting up QR Code Generator")
 			qrg, err := qrcodegenerator.New(c, &config.QRG)
 			if err != nil {
@@ -344,7 +357,7 @@ var startCommand = &cobra.Command{
 			_ = qrg
 		}
 
-		if start.PacketBrokerAgent || startDefault {
+		if start.PacketBrokerAgent {
 			logger.Info("Setting up Packet Broker Agent")
 			pba, err := packetbrokeragent.New(c, &config.PBA)
 			if err != nil {
