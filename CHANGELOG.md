@@ -15,6 +15,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Renamed expiremental command `ttn-lw-cli simulate uplink` to `ttn-lw-cli simulate gateway-uplink`.
+
 ### Deprecated
 
 ### Removed

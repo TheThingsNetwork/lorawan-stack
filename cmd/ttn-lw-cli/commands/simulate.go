@@ -507,8 +507,8 @@ var (
 	}
 
 	simulateDataUplinkCommand = &cobra.Command{
-		Use:   "uplink",
-		Short: "Simulate a data uplink (EXPERIMENTAL)",
+		Use:   "gateway-uplink",
+		Short: "Simulate a gateway uplink message (EXPERIMENTAL)",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var uplinkParams simulateMetadataParams
 			if err := util.SetFields(&uplinkParams, simulateUplinkFlags); err != nil {
