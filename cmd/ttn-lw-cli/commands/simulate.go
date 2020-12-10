@@ -142,6 +142,13 @@ var (
 	errApplicationServerDisabled = errors.DefineFailedPrecondition("application_server_disabled", "Application Server is disabled")
 )
 
+func simulateFlags() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.String("gateway-api-key", "", "API key used for linking the gateway (optional when using user authentication)")
+	flagSet.Bool("dry-run", false, "print the message instead of sending it")
+	return flagSet
+}
+
 func simulateDownlinkFlags() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	flagSet.Duration("timeout", 20*time.Second, "how long to wait for downlinks")
@@ -679,6 +686,7 @@ func init() {
 	simulateJoinRequestCommand.Flags().AddFlagSet(simulateUplinkFlags)
 	simulateJoinRequestCommand.Flags().AddFlagSet(simulateDownlinkFlags())
 	simulateJoinRequestCommand.Flags().AddFlagSet(simulateJoinRequestFlags)
+	simulateJoinRequestCommand.Flags().AddFlagSet(simulateFlags())
 
 	simulateCommand.AddCommand(simulateJoinRequestCommand)
 
@@ -687,6 +695,7 @@ func init() {
 	simulateDataUplinkCommand.Flags().AddFlagSet(simulateDownlinkFlags())
 	simulateDataUplinkCommand.Flags().AddFlagSet(simulateDataUplinkFlags)
 	simulateDataUplinkCommand.Flags().AddFlagSet(simulateDataDownlinkFlags())
+	simulateDataUplinkCommand.Flags().AddFlagSet(simulateFlags())
 
 	simulateCommand.AddCommand(simulateDataUplinkCommand)
 
@@ -695,7 +704,5 @@ func init() {
 
 	simulateCommand.AddCommand(simulateApplicationUplinkCommand)
 
-	simulateCommand.PersistentFlags().String("gateway-api-key", "", "API key used for linking the gateway (optional when using user authentication)")
-	simulateCommand.PersistentFlags().Bool("dry-run", false, "print the message instead of sending it")
 	Root.AddCommand(simulateCommand)
 }
