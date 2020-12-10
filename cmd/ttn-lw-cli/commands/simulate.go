@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -135,6 +136,10 @@ var (
 	simulateUplinkFlags      = util.FieldFlags(&simulateMetadataParams{})
 	simulateJoinRequestFlags = util.FieldFlags(&simulateJoinRequestParams{})
 	simulateDataUplinkFlags  = util.FieldFlags(&simulateDataUplinkParams{})
+
+	applicationUplinkFlags = util.FieldFlags(&ttnpb.ApplicationUplink{})
+
+	errApplicationServerDisabled = errors.DefineFailedPrecondition("application_server_disabled", "Application Server is disabled")
 )
 
 func simulateDownlinkFlags() *pflag.FlagSet {
@@ -637,6 +642,35 @@ var (
 			)
 		},
 	}
+	simulateApplicationUplinkCommand = &cobra.Command{
+		Use:   "application-uplink [application-id] [device-id]",
+		Short: "Simulate application uplink message from an end device",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			devID, err := getEndDeviceID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+			if !config.ApplicationServerEnabled {
+				return errApplicationServerDisabled.New()
+			}
+			uplinkMessage := &ttnpb.ApplicationUplink{}
+			up := &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: *devID,
+				Up: &ttnpb.ApplicationUp_UplinkMessage{
+					UplinkMessage: uplinkMessage,
+				},
+			}
+			if err := util.SetFields(uplinkMessage, applicationUplinkFlags); err != nil {
+				return err
+			}
+			cc, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewAppAsClient(cc).SimulateUplink(ctx, up)
+			return err
+		},
+	}
 )
 
 func init() {
@@ -654,6 +688,11 @@ func init() {
 	simulateDataUplinkCommand.Flags().AddFlagSet(simulateDataDownlinkFlags())
 
 	simulateCommand.AddCommand(simulateDataUplinkCommand)
+
+	simulateApplicationUplinkCommand.Flags().AddFlagSet(endDeviceIDFlags())
+	simulateApplicationUplinkCommand.Flags().AddFlagSet(applicationUplinkFlags)
+
+	simulateCommand.AddCommand(simulateApplicationUplinkCommand)
 
 	simulateCommand.PersistentFlags().String("gateway-api-key", "", "API key used for linking the gateway (optional when using user authentication)")
 	simulateCommand.PersistentFlags().Bool("dry-run", false, "print the message instead of sending it")
