@@ -24,6 +24,8 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// The UserRegistry service, exposed by the Identity Server, is used to manage
+// user registrations.
 service UserRegistry {
   // Register a new user. This method may be restricted by network settings.
   rpc Create(CreateUserRequest) returns (User) {
@@ -80,8 +82,19 @@ service UserRegistry {
       delete: "/users/{user_id}"
     };
   };
+
+  // Purge the user. This will release the user ID for reuse.
+  // The user is responsible for clearing data from any (external) integrations
+  // that may store and expose data by user or organization ID.
+  rpc Purge(UserIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/{user_id}/purge"
+    };
+  };
 }
 
+// The UserAcces service, exposed by the Identity Server, is used to manage
+// API keys of users.
 service UserAccess {
   // List the rights the caller has on this user.
   rpc ListRights(UserIdentifiers) returns (Rights) {
@@ -149,6 +162,8 @@ service UserInvitationRegistry {
   };
 }
 
+// The UserSessionRegistry service, exposed by the Identity Server, is used to manage
+// (browser) sessions of the user.
 service UserSessionRegistry {
   // List the active sessions for the given user.
   rpc List(ListUserSessionsRequest) returns (UserSessions) {

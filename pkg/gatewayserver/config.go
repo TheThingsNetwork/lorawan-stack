@@ -32,9 +32,10 @@ type UDPConfig struct {
 // BasicStationConfig defines the LoRa Basics Station configuration of the Gateway Server.
 type BasicStationConfig struct {
 	ws.Config               `name:",squash"`
-	FallbackFrequencyPlanID string `name:"fallback-frequency-plan-id" description:"Fallback frequency plan ID for non-registered gateways"`
-	Listen                  string `name:"listen" description:"Address for the Basic Station frontend to listen on"`
-	ListenTLS               string `name:"listen-tls" description:"Address for the Basic Station frontend to listen on (with TLS)"`
+	MaxValidRoundTripDelay  time.Duration `name:"max-valid-round-trip-delay" description:"Maximum valid round trip delay to qualify for RTT calculations"`
+	FallbackFrequencyPlanID string        `name:"fallback-frequency-plan-id" description:"Fallback frequency plan ID for non-registered gateways"`
+	Listen                  string        `name:"listen" description:"Address for the Basic Station frontend to listen on"`
+	ListenTLS               string        `name:"listen-tls" description:"Address for the Basic Station frontend to listen on (with TLS)"`
 }
 
 // Config represents the Gateway Server configuration.

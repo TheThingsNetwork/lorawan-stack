@@ -84,9 +84,13 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type OAuthAuthorizationRegistryClient interface {
+	// List OAuth clients that are authorized by the user.
 	List(ctx context.Context, in *ListOAuthClientAuthorizationsRequest, opts ...grpc.CallOption) (*OAuthClientAuthorizations, error)
+	// List OAuth access tokens issued to the OAuth client on behalf of the user.
 	ListTokens(ctx context.Context, in *ListOAuthAccessTokensRequest, opts ...grpc.CallOption) (*OAuthAccessTokens, error)
+	// Delete (de-authorize) an OAuth client for the user.
 	Delete(ctx context.Context, in *OAuthClientAuthorizationIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
+	// Delete (invalidate) an OAuth access token.
 	DeleteToken(ctx context.Context, in *OAuthAccessTokenIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
@@ -136,9 +140,13 @@ func (c *oAuthAuthorizationRegistryClient) DeleteToken(ctx context.Context, in *
 
 // OAuthAuthorizationRegistryServer is the server API for OAuthAuthorizationRegistry service.
 type OAuthAuthorizationRegistryServer interface {
+	// List OAuth clients that are authorized by the user.
 	List(context.Context, *ListOAuthClientAuthorizationsRequest) (*OAuthClientAuthorizations, error)
+	// List OAuth access tokens issued to the OAuth client on behalf of the user.
 	ListTokens(context.Context, *ListOAuthAccessTokensRequest) (*OAuthAccessTokens, error)
+	// Delete (de-authorize) an OAuth client for the user.
 	Delete(context.Context, *OAuthClientAuthorizationIdentifiers) (*types.Empty, error)
+	// Delete (invalidate) an OAuth access token.
 	DeleteToken(context.Context, *OAuthAccessTokenIdentifiers) (*types.Empty, error)
 }
 

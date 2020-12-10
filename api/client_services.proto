@@ -24,6 +24,8 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// The ClientRegistry service, exposed by the Identity Server, is used to manage
+// OAuth client registrations.
 service ClientRegistry {
   // Create a new OAuth client. This also sets the given organization or user as
   // first collaborator with all possible rights.
@@ -80,6 +82,8 @@ service ClientRegistry {
   };
 }
 
+// The ClientAcces service, exposed by the Identity Server, is used to manage
+// collaborators of OAuth clients.
 service ClientAccess {
   // List the rights the caller has on this application.
   rpc ListRights(ClientIdentifiers) returns (Rights) {

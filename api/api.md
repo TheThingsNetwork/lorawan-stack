@@ -693,6 +693,9 @@ Application is the message that defines an Application in the network.
 
 ### <a name="ttn.lorawan.v3.ApplicationAccess">Service `ApplicationAccess`</a>
 
+The ApplicationAcces service, exposed by the Identity Server, is used to manage
+API keys and collaborators of applications.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `ListRights` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`Rights`](#ttn.lorawan.v3.Rights) | List the rights the caller has on this application. |
@@ -721,6 +724,9 @@ Application is the message that defines an Application in the network.
 
 ### <a name="ttn.lorawan.v3.ApplicationRegistry">Service `ApplicationRegistry`</a>
 
+The ApplicationRegistry service, exposed by the Identity Server, is used to manage
+application registrations.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Create` | [`CreateApplicationRequest`](#ttn.lorawan.v3.CreateApplicationRequest) | [`Application`](#ttn.lorawan.v3.Application) | Create a new application. This also sets the given organization or user as first collaborator with all possible rights. |
@@ -728,6 +734,7 @@ Application is the message that defines an Application in the network.
 | `List` | [`ListApplicationsRequest`](#ttn.lorawan.v3.ListApplicationsRequest) | [`Applications`](#ttn.lorawan.v3.Applications) | List applications where the given user or organization is a direct collaborator. If no user or organization is given, this returns the applications the caller has access to. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateApplicationRequest`](#ttn.lorawan.v3.UpdateApplicationRequest) | [`Application`](#ttn.lorawan.v3.Application) | Update the application, changing the fields specified by the field mask to the provided values. |
 | `Delete` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the application. This may not release the application ID for reuse. All end devices must be deleted from the application before it can be deleted. |
+| `Purge` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the application. This will release the application ID for reuse. All end devices must be deleted from the application before it can be deleted. The application owner is responsible for clearing data from any (external) integrations that may store and expose data by application ID |
 
 #### HTTP bindings
 
@@ -741,6 +748,7 @@ Application is the message that defines an Application in the network.
 | `List` | `GET` | `/api/v3/organizations/{collaborator.organization_ids.organization_id}/applications` |  |
 | `Update` | `PUT` | `/api/v3/applications/{application.ids.application_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/applications/{application_id}` |  |
+| `Purge` | `DELETE` | `/api/v3/applications/{application_id}/purge` |  |
 
 ## <a name="lorawan-stack/api/applicationserver.proto">File `lorawan-stack/api/applicationserver.proto`</a>
 
@@ -1806,6 +1814,9 @@ The OAuth2 flows an OAuth client can use to get an access token.
 
 ### <a name="ttn.lorawan.v3.ClientAccess">Service `ClientAccess`</a>
 
+The ClientAcces service, exposed by the Identity Server, is used to manage
+collaborators of OAuth clients.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `ListRights` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) | [`Rights`](#ttn.lorawan.v3.Rights) | List the rights the caller has on this application. |
@@ -1825,6 +1836,9 @@ The OAuth2 flows an OAuth client can use to get an access token.
 | `ListCollaborators` | `GET` | `/api/v3/clients/{client_ids.client_id}/collaborators` |  |
 
 ### <a name="ttn.lorawan.v3.ClientRegistry">Service `ClientRegistry`</a>
+
+The ClientRegistry service, exposed by the Identity Server, is used to manage
+OAuth client registrations.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -1943,6 +1957,12 @@ PeerInfo
 | `CONTACT_TYPE_TECHNICAL` | 3 |  |
 
 ### <a name="ttn.lorawan.v3.ContactInfoRegistry">Service `ContactInfoRegistry`</a>
+
+The ContactInfoRegistry service, exposed by the Identity Server, is used for
+validating contact information of registered entities.
+
+The actual contact information can be managed with the different registry services:
+ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and UserRegistry.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -2613,14 +2633,29 @@ Power state of the device.
 
 ### <a name="ttn.lorawan.v3.EndDeviceRegistry">Service `EndDeviceRegistry`</a>
 
+The EndDeviceRegistry service, exposed by the Identity Server, is used to manage
+end device registrations.
+
+After registering an end device, it also needs to be registered in
+the NsEndDeviceRegistry that is exposed by the Network Server,
+the AsEndDeviceRegistry that is exposed by the Application Server,
+and the JsEndDeviceRegistry that is exposed by the Join Server.
+
+Before deleting an end device it first needs to be deleted from the
+NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `Create` | [`CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Create a new end device within an application. After creating a device in the EndDeviceRegistry (Identity Server), it still needs to be created in the NsEndDeviceRegistry, AsEndDeviceRegistry and JsEndDeviceRegistry. |
+| `Create` | [`CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Create a new end device within an application.
+
+After registering an end device, it also needs to be registered in the NsEndDeviceRegistry that is exposed by the Network Server, the AsEndDeviceRegistry that is exposed by the Application Server, and the JsEndDeviceRegistry that is exposed by the Join Server. |
 | `Get` | [`GetEndDeviceRequest`](#ttn.lorawan.v3.GetEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Get the end device with the given identifiers, selecting the fields specified in the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `GetIdentifiersForEUIs` | [`GetEndDeviceIdentifiersForEUIsRequest`](#ttn.lorawan.v3.GetEndDeviceIdentifiersForEUIsRequest) | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | Get the identifiers of the end device that has the given EUIs registered. |
 | `List` | [`ListEndDevicesRequest`](#ttn.lorawan.v3.ListEndDevicesRequest) | [`EndDevices`](#ttn.lorawan.v3.EndDevices) | List end devices in the given application. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateEndDeviceRequest`](#ttn.lorawan.v3.UpdateEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Update the OAuth client, changing the fields specified by the field mask to the provided values. |
-| `Delete` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the end device with the given IDs. Before deleting an end device from the EndDeviceRegistry (the Identity Server), the device needs to be deleted from the JsEndDeviceRegistry, AsEndDeviceRegistry and NsEndDeviceRegistry. This is NOT done automatically. |
+| `Delete` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the end device with the given IDs.
+
+Before deleting an end device it first needs to be deleted from the NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry. This is NOT done automatically. |
 
 #### HTTP bindings
 
@@ -3180,6 +3215,9 @@ Identifies an end device model with version information.
 
 ### <a name="ttn.lorawan.v3.GatewayAccess">Service `GatewayAccess`</a>
 
+The GatewayAcces service, exposed by the Identity Server, is used to manage
+API keys and collaborators of gateways.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `ListRights` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`Rights`](#ttn.lorawan.v3.Rights) | List the rights the caller has on this gateway. |
@@ -3214,6 +3252,9 @@ Identifies an end device model with version information.
 
 ### <a name="ttn.lorawan.v3.GatewayRegistry">Service `GatewayRegistry`</a>
 
+The GatewayRegistry service, exposed by the Identity Server, is used to manage
+gateway registrations.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Create` | [`CreateGatewayRequest`](#ttn.lorawan.v3.CreateGatewayRequest) | [`Gateway`](#ttn.lorawan.v3.Gateway) | Create a new gateway. This also sets the given organization or user as first collaborator with all possible rights. |
@@ -3222,6 +3263,7 @@ Identifies an end device model with version information.
 | `List` | [`ListGatewaysRequest`](#ttn.lorawan.v3.ListGatewaysRequest) | [`Gateways`](#ttn.lorawan.v3.Gateways) | List gateways where the given user or organization is a direct collaborator. If no user or organization is given, this returns the gateways the caller has access to. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateGatewayRequest`](#ttn.lorawan.v3.UpdateGatewayRequest) | [`Gateway`](#ttn.lorawan.v3.Gateway) | Update the gateway, changing the fields specified by the field mask to the provided values. |
 | `Delete` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the gateway. This may not release the gateway ID for reuse, but it does release the EUI. |
+| `Purge` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the gateway. This will release both gateway ID and EUI for reuse. The gateway owner is responsible for clearing data from any (external) integrations that may store and expose data by gateway ID. |
 
 #### HTTP bindings
 
@@ -3235,6 +3277,7 @@ Identifies an end device model with version information.
 | `List` | `GET` | `/api/v3/organizations/{collaborator.organization_ids.organization_id}/gateways` |  |
 | `Update` | `PUT` | `/api/v3/gateways/{gateway.ids.gateway_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/gateways/{gateway_id}` |  |
+| `Purge` | `DELETE` | `/api/v3/gateways/{gateway_id}/purge` |  |
 
 ## <a name="lorawan-stack/api/gatewayserver.proto">File `lorawan-stack/api/gatewayserver.proto`</a>
 
@@ -3543,7 +3586,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `GetConfiguration` | [`GetIsConfigurationRequest`](#ttn.lorawan.v3.GetIsConfigurationRequest) | [`GetIsConfigurationResponse`](#ttn.lorawan.v3.GetIsConfigurationResponse) |  |
+| `GetConfiguration` | [`GetIsConfigurationRequest`](#ttn.lorawan.v3.GetIsConfigurationRequest) | [`GetIsConfigurationResponse`](#ttn.lorawan.v3.GetIsConfigurationResponse) | Get the configuration of the Identity Server. The response is typically used to enable or disable features in a user interface. |
 
 #### HTTP bindings
 
@@ -5683,12 +5726,15 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 ### <a name="ttn.lorawan.v3.OAuthAuthorizationRegistry">Service `OAuthAuthorizationRegistry`</a>
 
+The OAuthAuthorizationRegistry service, exposed by the Identity Server,
+is used to manage OAuth client authorizations for users.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `List` | [`ListOAuthClientAuthorizationsRequest`](#ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest) | [`OAuthClientAuthorizations`](#ttn.lorawan.v3.OAuthClientAuthorizations) |  |
-| `ListTokens` | [`ListOAuthAccessTokensRequest`](#ttn.lorawan.v3.ListOAuthAccessTokensRequest) | [`OAuthAccessTokens`](#ttn.lorawan.v3.OAuthAccessTokens) |  |
-| `Delete` | [`OAuthClientAuthorizationIdentifiers`](#ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
-| `DeleteToken` | [`OAuthAccessTokenIdentifiers`](#ttn.lorawan.v3.OAuthAccessTokenIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+| `List` | [`ListOAuthClientAuthorizationsRequest`](#ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest) | [`OAuthClientAuthorizations`](#ttn.lorawan.v3.OAuthClientAuthorizations) | List OAuth clients that are authorized by the user. |
+| `ListTokens` | [`ListOAuthAccessTokensRequest`](#ttn.lorawan.v3.ListOAuthAccessTokensRequest) | [`OAuthAccessTokens`](#ttn.lorawan.v3.OAuthAccessTokens) | List OAuth access tokens issued to the OAuth client on behalf of the user. |
+| `Delete` | [`OAuthClientAuthorizationIdentifiers`](#ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete (de-authorize) an OAuth client for the user. |
+| `DeleteToken` | [`OAuthAccessTokenIdentifiers`](#ttn.lorawan.v3.OAuthAccessTokenIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete (invalidate) an OAuth access token. |
 
 #### HTTP bindings
 
@@ -5897,6 +5943,9 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 ### <a name="ttn.lorawan.v3.OrganizationAccess">Service `OrganizationAccess`</a>
 
+The OrganizationAcces service, exposed by the Identity Server, is used to manage
+API keys and collaborators of organizations.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `ListRights` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) | [`Rights`](#ttn.lorawan.v3.Rights) | List the rights the caller has on this organization. |
@@ -5924,6 +5973,9 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 ### <a name="ttn.lorawan.v3.OrganizationRegistry">Service `OrganizationRegistry`</a>
 
+The OrganizationRegistry service, exposed by the Identity Server, is used to manage
+organization registrations.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Create` | [`CreateOrganizationRequest`](#ttn.lorawan.v3.CreateOrganizationRequest) | [`Organization`](#ttn.lorawan.v3.Organization) | Create a new organization. This also sets the given user as first collaborator with all possible rights. |
@@ -5931,6 +5983,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | `List` | [`ListOrganizationsRequest`](#ttn.lorawan.v3.ListOrganizationsRequest) | [`Organizations`](#ttn.lorawan.v3.Organizations) | List organizations where the given user or organization is a direct collaborator. If no user or organization is given, this returns the organizations the caller has access to. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateOrganizationRequest`](#ttn.lorawan.v3.UpdateOrganizationRequest) | [`Organization`](#ttn.lorawan.v3.Organization) | Update the organization, changing the fields specified by the field mask to the provided values. |
 | `Delete` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the organization. This may not release the organization ID for reuse. |
+| `Purge` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the organization. This will release the organization ID for reuse. The user is responsible for clearing data from any (external) integrations that may store and expose data by user or organization ID. |
 
 #### HTTP bindings
 
@@ -5942,6 +5995,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | `List` | `GET` | `/api/v3/users/{collaborator.user_ids.user_id}/organizations` |  |
 | `Update` | `PUT` | `/api/v3/organizations/{organization.ids.organization_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/organizations/{organization_id}` |  |
+| `Purge` | `DELETE` | `/api/v3/organizations/{organization_id}/purge` |  |
 
 ## <a name="lorawan-stack/api/packetbrokeragent.proto">File `lorawan-stack/api/packetbrokeragent.proto`</a>
 
@@ -6333,7 +6387,7 @@ This service is not implemented on all deployments.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `SearchEndDevices` | [`SearchEndDevicesRequest`](#ttn.lorawan.v3.SearchEndDevicesRequest) | [`EndDevices`](#ttn.lorawan.v3.EndDevices) |  |
+| `SearchEndDevices` | [`SearchEndDevicesRequest`](#ttn.lorawan.v3.SearchEndDevicesRequest) | [`EndDevices`](#ttn.lorawan.v3.EndDevices) | Search for end devices in the given application that match the conditions specified in the request. |
 
 #### HTTP bindings
 
@@ -6349,11 +6403,11 @@ This service is not implemented on all deployments.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `SearchApplications` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Applications`](#ttn.lorawan.v3.Applications) |  |
-| `SearchClients` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Clients`](#ttn.lorawan.v3.Clients) |  |
-| `SearchGateways` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Gateways`](#ttn.lorawan.v3.Gateways) |  |
-| `SearchOrganizations` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Organizations`](#ttn.lorawan.v3.Organizations) |  |
-| `SearchUsers` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Users`](#ttn.lorawan.v3.Users) |  |
+| `SearchApplications` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Applications`](#ttn.lorawan.v3.Applications) | Search for applications that match the conditions specified in the request. Non-admin users will only match applications that they have rights on. |
+| `SearchClients` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Clients`](#ttn.lorawan.v3.Clients) | Search for OAuth clients that match the conditions specified in the request. Non-admin users will only match OAuth clients that they have rights on. |
+| `SearchGateways` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Gateways`](#ttn.lorawan.v3.Gateways) | Search for gateways that match the conditions specified in the request. Non-admin users will only match gateways that they have rights on. |
+| `SearchOrganizations` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Organizations`](#ttn.lorawan.v3.Organizations) | Search for organizations that match the conditions specified in the request. Non-admin users will only match organizations that they have rights on. |
+| `SearchUsers` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Users`](#ttn.lorawan.v3.Users) | Search for users that match the conditions specified in the request. This is only available to admin users. |
 
 #### HTTP bindings
 
@@ -6693,6 +6747,9 @@ User is the message that defines a user on the network.
 
 ### <a name="ttn.lorawan.v3.UserAccess">Service `UserAccess`</a>
 
+The UserAcces service, exposed by the Identity Server, is used to manage
+API keys of users.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `ListRights` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) | [`Rights`](#ttn.lorawan.v3.Rights) | List the rights the caller has on this user. |
@@ -6729,6 +6786,9 @@ User is the message that defines a user on the network.
 
 ### <a name="ttn.lorawan.v3.UserRegistry">Service `UserRegistry`</a>
 
+The UserRegistry service, exposed by the Identity Server, is used to manage
+user registrations.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Create` | [`CreateUserRequest`](#ttn.lorawan.v3.CreateUserRequest) | [`User`](#ttn.lorawan.v3.User) | Register a new user. This method may be restricted by network settings. |
@@ -6738,6 +6798,7 @@ User is the message that defines a user on the network.
 | `CreateTemporaryPassword` | [`CreateTemporaryPasswordRequest`](#ttn.lorawan.v3.CreateTemporaryPasswordRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Create a temporary password that can be used for updating a forgotten password. The generated password is sent to the user's email address. |
 | `UpdatePassword` | [`UpdateUserPasswordRequest`](#ttn.lorawan.v3.UpdateUserPasswordRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Update the password of the user. |
 | `Delete` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the user. This may not release the user ID for reuse. |
+| `Purge` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the user. This will release the user ID for reuse. The user is responsible for clearing data from any (external) integrations that may store and expose data by user or organization ID. |
 
 #### HTTP bindings
 
@@ -6750,8 +6811,12 @@ User is the message that defines a user on the network.
 | `CreateTemporaryPassword` | `POST` | `/api/v3/users/{user_ids.user_id}/temporary_password` |  |
 | `UpdatePassword` | `PUT` | `/api/v3/users/{user_ids.user_id}/password` | `*` |
 | `Delete` | `DELETE` | `/api/v3/users/{user_id}` |  |
+| `Purge` | `DELETE` | `/api/v3/users/{user_id}/purge` |  |
 
 ### <a name="ttn.lorawan.v3.UserSessionRegistry">Service `UserSessionRegistry`</a>
+
+The UserSessionRegistry service, exposed by the Identity Server, is used to manage
+(browser) sessions of the user.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|

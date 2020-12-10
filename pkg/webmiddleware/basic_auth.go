@@ -34,7 +34,11 @@ type mapAuthenticator struct {
 }
 
 func (a *mapAuthenticator) Authenticate(username, password string) (bool, error) {
-	return subtle.ConstantTimeCompare([]byte(password), []byte(a.usernamesPasswords[username])) == 1, nil
+	validPassword, ok := a.usernamesPasswords[username]
+	if !ok {
+		return false, nil
+	}
+	return subtle.ConstantTimeCompare([]byte(password), []byte(validPassword)) == 1, nil
 }
 
 // AuthUsers authenticates users with the given map[username]password.

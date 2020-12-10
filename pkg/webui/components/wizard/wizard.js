@@ -42,10 +42,11 @@ const reducer = (state, action) => {
         error: undefined,
       }
     case SET_ERROR:
+      const { step = state.currentStepId } = action
       return {
         ...state,
         error: action.error,
-        currentStepId: action.step,
+        currentStepId: step,
       }
     case COMPLETE_STEP:
       const { snapshots: oldSnapshots, currentStepId: oldStepId, steps } = state
@@ -90,24 +91,18 @@ const Wizard = React.forwardRef((props, ref) => {
   const completeStep = React.useCallback(values => {
     dispatch({ type: COMPLETE_STEP, values })
   }, [])
-  const prevStep = React.useCallback(
-    values => {
-      const currentStepIndex = steps.findIndex(({ id }) => id === currentStepId)
-      const prevStep = steps[Math.max(currentStepIndex - 1, FIRST_STEP)] || {}
+  const prevStep = React.useCallback(() => {
+    const currentStepIndex = steps.findIndex(({ id }) => id === currentStepId)
+    const prevStep = steps[Math.max(currentStepIndex - 1, FIRST_STEP)] || {}
 
-      dispatch({ type: GO_TO_STEP, step: prevStep.id || currentStepId, values })
-    },
-    [currentStepId, steps],
-  )
-  const nextStep = React.useCallback(
-    values => {
-      const currentStepIndex = steps.findIndex(({ id }) => id === currentStepId)
-      const nextStep = steps[Math.min(currentStepIndex + 1, steps.length - 1)] || {}
+    dispatch({ type: GO_TO_STEP, step: prevStep.id || currentStepId })
+  }, [currentStepId, steps])
+  const nextStep = React.useCallback(() => {
+    const currentStepIndex = steps.findIndex(({ id }) => id === currentStepId)
+    const nextStep = steps[Math.min(currentStepIndex + 1, steps.length - 1)] || {}
 
-      dispatch({ type: GO_TO_STEP, step: nextStep.id || currentStepId, values })
-    },
-    [currentStepId, steps],
-  )
+    dispatch({ type: GO_TO_STEP, step: nextStep.id || currentStepId })
+  }, [currentStepId, steps])
   const setError = React.useCallback((step, error) => {
     dispatch({ type: SET_ERROR, step, error })
   }, [])

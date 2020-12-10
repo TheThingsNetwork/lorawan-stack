@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"gopkg.in/square/go-jose.v2"
 )
 
@@ -146,14 +147,14 @@ func unwrapUplinkTokens(token []byte) (gateway, forwarder []byte, agent *agentUp
 }
 
 type gatewayUplinkToken struct {
-	GatewayID string `json:"id"`
-	Token     []byte `json:"t"`
+	GatewayUID string `json:"uid"`
+	Token      []byte `json:"t"`
 }
 
-func wrapGatewayUplinkToken(ids ttnpb.GatewayIdentifiers, ulToken []byte, encrypter jose.Encrypter) ([]byte, error) {
+func wrapGatewayUplinkToken(ctx context.Context, ids ttnpb.GatewayIdentifiers, ulToken []byte, encrypter jose.Encrypter) ([]byte, error) {
 	plaintext, err := json.Marshal(gatewayUplinkToken{
-		GatewayID: ids.GatewayID,
-		Token:     ulToken,
+		GatewayUID: unique.ID(ctx, ids),
+		Token:      ulToken,
 	})
 	if err != nil {
 		return nil, err
@@ -169,20 +170,20 @@ func wrapGatewayUplinkToken(ids ttnpb.GatewayIdentifiers, ulToken []byte, encryp
 	return []byte(s), nil
 }
 
-func unwrapGatewayUplinkToken(token, key []byte) (ttnpb.GatewayIdentifiers, []byte, error) {
+func unwrapGatewayUplinkToken(token, key []byte) (string, []byte, error) {
 	obj, err := jose.ParseEncrypted(string(token))
 	if err != nil {
-		return ttnpb.GatewayIdentifiers{}, nil, err
+		return "", nil, err
 	}
 	plaintext, err := obj.Decrypt(key)
 	if err != nil {
-		return ttnpb.GatewayIdentifiers{}, nil, err
+		return "", nil, err
 	}
 	var t gatewayUplinkToken
 	if err := json.Unmarshal(plaintext, &t); err != nil {
-		return ttnpb.GatewayIdentifiers{}, nil, err
+		return "", nil, err
 	}
-	return ttnpb.GatewayIdentifiers{GatewayID: t.GatewayID}, t.Token, nil
+	return t.GatewayUID, t.Token, nil
 }
 
 var (
@@ -194,7 +195,7 @@ var (
 	errWrapGatewayUplinkToken    = errors.DefineAborted("wrap_gateway_uplink_token", "wrap gateway uplink token")
 )
 
-func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, conf ForwarderConfig) (*packetbroker.UplinkMessage, error) {
+func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, tokenEncrypter jose.Encrypter) (*packetbroker.UplinkMessage, error) {
 	msg.Payload = &ttnpb.Message{}
 	if err := lorawan.UnmarshalMessage(msg.RawPayload, msg.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)
@@ -302,7 +303,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, conf Forwa
 			}
 			if len(gatewayUplinkToken) == 0 {
 				var err error
-				gatewayUplinkToken, err = wrapGatewayUplinkToken(md.GatewayIdentifiers, md.UplinkToken, conf.TokenEncrypter)
+				gatewayUplinkToken, err = wrapGatewayUplinkToken(ctx, md.GatewayIdentifiers, md.UplinkToken, tokenEncrypter)
 				if err != nil {
 					return nil, errWrapGatewayUplinkToken.WithCause(err)
 				}
@@ -553,10 +554,10 @@ var (
 	errInvalidRx1Delay          = errors.DefineInvalidArgument("invalid_rx1_delay", "invalid Rx1 delay")
 )
 
-func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, receivedAt time.Time, conf ForwarderConfig) (ttnpb.GatewayIdentifiers, *ttnpb.DownlinkMessage, error) {
-	ids, token, err := unwrapGatewayUplinkToken(msg.GatewayUplinkToken, conf.TokenKey)
+func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, receivedAt time.Time, conf ForwarderConfig) (uid string, res *ttnpb.DownlinkMessage, err error) {
+	uid, token, err := unwrapGatewayUplinkToken(msg.GatewayUplinkToken, conf.TokenKey)
 	if err != nil {
-		return ttnpb.GatewayIdentifiers{}, nil, errUnwrapGatewayUplinkToken.WithCause(err)
+		return "", nil, errUnwrapGatewayUplinkToken.WithCause(err)
 	}
 
 	req := &ttnpb.TxRequest{
@@ -570,15 +571,15 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 	}
 	var ok bool
 	if req.Class, ok = fromPBClass[msg.Class]; !ok {
-		return ttnpb.GatewayIdentifiers{}, nil, errUnknownClass.WithAttributes("class", msg.Class)
+		return "", nil, errUnknownClass.WithAttributes("class", msg.Class)
 	}
 	if req.Priority, ok = fromPBPriority[msg.Priority]; !ok {
-		return ttnpb.GatewayIdentifiers{}, nil, errUnknownPriority.WithAttributes("priority", msg.Priority)
+		return "", nil, errUnknownPriority.WithAttributes("priority", msg.Priority)
 	}
 	if msg.Rx1 != nil {
 		rx1Delay, err := pbtypes.DurationFromProto(msg.Rx1Delay)
 		if err != nil {
-			return ttnpb.GatewayIdentifiers{}, nil, errInvalidRx1Delay.WithCause(err)
+			return "", nil, errInvalidRx1Delay.WithCause(err)
 		}
 		req.Rx1Delay = ttnpb.RxDelay(rx1Delay / time.Second)
 		req.Rx1DataRateIndex = ttnpb.DataRateIndex(msg.Rx1.DataRateIndex)
@@ -596,5 +597,5 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 			Request: req,
 		},
 	}
-	return ids, down, nil
+	return uid, down, nil
 }

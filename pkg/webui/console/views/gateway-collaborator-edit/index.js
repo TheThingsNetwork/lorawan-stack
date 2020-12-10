@@ -49,7 +49,7 @@ import {
 } from '@console/store/selectors/collaborators'
 
 @connect(
-  function(state, props) {
+  (state, props) => {
     const gtwId = selectSelectedGatewayId(state, props)
 
     const { collaboratorId, collaboratorType } = props.match.params
@@ -73,7 +73,7 @@ import {
       error,
     }
   },
-  (dispatch, ownProps) => ({
+  dispatch => ({
     getCollaborator(gtwId, collaboratorId, isUser) {
       dispatch(getCollaborator('gateway', gtwId, collaboratorId, isUser))
     },
@@ -98,7 +98,7 @@ import {
   ({ getGatewayCollaborator }) => getGatewayCollaborator(),
   ({ fetching, collaborator }) => fetching || !Boolean(collaborator),
 )
-@withBreadcrumb('gtws.single.collaborators.edit', function(props) {
+@withBreadcrumb('gtws.single.collaborators.edit', props => {
   const { gtwId, collaboratorId, collaboratorType } = props
 
   return (

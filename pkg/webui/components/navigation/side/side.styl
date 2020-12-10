@@ -78,6 +78,7 @@ $minimize-button-height = 5rem
     width: 100%
 
   &-minimized
+    overflow: visible
     display: flex
     flex-direction: column
     justify-content: space-between
@@ -97,6 +98,12 @@ $minimize-button-height = 5rem
 
         .icon
           margin-right: 0
+
+      .navigation-list
+        overflow: visible
+
+      .drawer
+        overflow: visible
 
 .header
   border-normal(bottom)

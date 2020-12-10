@@ -29,6 +29,10 @@
 
   &-nested > li
     height: 0
+    transition: visibility $ad.m, height $ad.m ease-in-out
+
+  &-nested:not(.list-expanded) > li
+    visibility: hidden
 
   &-expanded > li
     height: 3.1rem

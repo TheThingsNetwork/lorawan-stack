@@ -15,7 +15,6 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
-import { useFormContext } from '@ttn-lw/components/form'
 import Button from '@ttn-lw/components/button'
 import { useWizardContext } from '@ttn-lw/components/wizard'
 
@@ -30,17 +29,8 @@ const m = defineMessages({
 })
 
 const WizardPrevButton = props => {
-  const { isFirstStep, validationSchema, validationContext } = props
+  const { isFirstStep } = props
   const { onPrevStep, currentStepId, steps } = useWizardContext()
-  const { values } = useFormContext()
-
-  const handlePrevStep = React.useCallback(() => {
-    onPrevStep(
-      validationSchema.cast(values, {
-        context: validationContext,
-      }),
-    )
-  }, [onPrevStep, validationContext, validationSchema, values])
 
   if (isFirstStep) {
     return null
@@ -50,7 +40,7 @@ const WizardPrevButton = props => {
   const { title: prevMessage } = steps[currentStepIndex - 1] || { title: m.prev }
 
   return (
-    <Button className={style.button} secondary onClick={handlePrevStep} type="button">
+    <Button className={style.button} secondary onClick={onPrevStep} type="button">
       <Button.Icon icon="keyboard_arrow_left" type="left" />
       <Message className={style.messagePrev} content={prevMessage} />
     </Button>
@@ -59,10 +49,6 @@ const WizardPrevButton = props => {
 
 WizardPrevButton.propTypes = {
   isFirstStep: PropTypes.bool.isRequired,
-  validationContext: PropTypes.shape({}).isRequired,
-  validationSchema: PropTypes.shape({
-    cast: PropTypes.func.isRequired,
-  }).isRequired,
 }
 
 export default WizardPrevButton

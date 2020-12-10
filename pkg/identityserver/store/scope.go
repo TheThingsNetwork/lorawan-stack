@@ -200,3 +200,9 @@ func withID(id ttnpb.Identifiers) func(*gorm.DB) *gorm.DB {
 		panic(fmt.Sprintf("can't find scope for id type %T", id))
 	}
 }
+
+func withUnscoped() func(*gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Unscoped()
+	}
+}

@@ -415,6 +415,35 @@ var (
 		}
 		return gtwID.EntityIdentifiers(), nil
 	})
+	gatewaysPurgeCommand = &cobra.Command{
+		Use:     "purge [gateway-id]",
+		Aliases: []string{"permanent-delete", "hard-delete"},
+		Short:   "Purge a gateway",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+
+			force, err := cmd.Flags().GetBool("force")
+			if err != nil {
+				return err
+			}
+			if !confirmChoice(gatewayPurgeWarning, force) {
+				return errNoConfirmation
+			}
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewGatewayRegistryClient(is).Purge(ctx, gtwID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
 )
 
 func init() {
@@ -455,6 +484,9 @@ func init() {
 	gatewaysCommand.AddCommand(gatewaysConnectionStats)
 	gatewaysContactInfoCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysContactInfoCommand)
+	gatewaysPurgeCommand.Flags().AddFlagSet(gatewayIDFlags())
+	gatewaysPurgeCommand.Flags().AddFlagSet(forceFlags())
+	gatewaysCommand.AddCommand(gatewaysPurgeCommand)
 	Root.AddCommand(gatewaysCommand)
 }
 

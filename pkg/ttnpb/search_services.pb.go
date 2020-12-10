@@ -500,10 +500,20 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EntityRegistrySearchClient interface {
+	// Search for applications that match the conditions specified in the request.
+	// Non-admin users will only match applications that they have rights on.
 	SearchApplications(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Applications, error)
+	// Search for OAuth clients that match the conditions specified in the request.
+	// Non-admin users will only match OAuth clients that they have rights on.
 	SearchClients(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Clients, error)
+	// Search for gateways that match the conditions specified in the request.
+	// Non-admin users will only match gateways that they have rights on.
 	SearchGateways(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Gateways, error)
+	// Search for organizations that match the conditions specified in the request.
+	// Non-admin users will only match organizations that they have rights on.
 	SearchOrganizations(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Organizations, error)
+	// Search for users that match the conditions specified in the request.
+	// This is only available to admin users.
 	SearchUsers(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Users, error)
 }
 
@@ -562,10 +572,20 @@ func (c *entityRegistrySearchClient) SearchUsers(ctx context.Context, in *Search
 
 // EntityRegistrySearchServer is the server API for EntityRegistrySearch service.
 type EntityRegistrySearchServer interface {
+	// Search for applications that match the conditions specified in the request.
+	// Non-admin users will only match applications that they have rights on.
 	SearchApplications(context.Context, *SearchEntitiesRequest) (*Applications, error)
+	// Search for OAuth clients that match the conditions specified in the request.
+	// Non-admin users will only match OAuth clients that they have rights on.
 	SearchClients(context.Context, *SearchEntitiesRequest) (*Clients, error)
+	// Search for gateways that match the conditions specified in the request.
+	// Non-admin users will only match gateways that they have rights on.
 	SearchGateways(context.Context, *SearchEntitiesRequest) (*Gateways, error)
+	// Search for organizations that match the conditions specified in the request.
+	// Non-admin users will only match organizations that they have rights on.
 	SearchOrganizations(context.Context, *SearchEntitiesRequest) (*Organizations, error)
+	// Search for users that match the conditions specified in the request.
+	// This is only available to admin users.
 	SearchUsers(context.Context, *SearchEntitiesRequest) (*Users, error)
 }
 
@@ -716,6 +736,7 @@ var _EntityRegistrySearch_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EndDeviceRegistrySearchClient interface {
+	// Search for end devices in the given application that match the conditions specified in the request.
 	SearchEndDevices(ctx context.Context, in *SearchEndDevicesRequest, opts ...grpc.CallOption) (*EndDevices, error)
 }
 
@@ -738,6 +759,7 @@ func (c *endDeviceRegistrySearchClient) SearchEndDevices(ctx context.Context, in
 
 // EndDeviceRegistrySearchServer is the server API for EndDeviceRegistrySearch service.
 type EndDeviceRegistrySearchServer interface {
+	// Search for end devices in the given application that match the conditions specified in the request.
 	SearchEndDevices(context.Context, *SearchEndDevicesRequest) (*EndDevices, error)
 }
 

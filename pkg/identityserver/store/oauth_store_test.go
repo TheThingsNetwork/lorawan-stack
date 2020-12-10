@@ -252,5 +252,66 @@ func TestOAuthStore(t *testing.T) {
 			}
 			a.So(deleted, should.BeNil)
 		})
+
+		t.Run("Delete user authorizations", func(t *testing.T) {
+			a := assertions.New(t)
+
+			code := "test-authorization-code"
+			redirectURI := "http://test-redirect-url:8080/callback"
+			state := "test-state"
+
+			tokenID := "test-token-id"
+			access := "test-access-token"
+			refresh := "test-refresh-token"
+			prevID := ""
+
+			store.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
+				ClientIDs: *clientIDs,
+				UserIDs:   *userIDs,
+				Rights:    rights,
+			})
+			authorizationList, _ := store.ListAuthorizations(ctx, userIDs)
+
+			a.So(authorizationList, should.HaveLength, 1)
+
+			store.CreateAuthorizationCode(ctx, &ttnpb.OAuthAuthorizationCode{
+				ClientIDs:   *clientIDs,
+				UserIDs:     *userIDs,
+				Rights:      rights,
+				Code:        code,
+				RedirectURI: redirectURI,
+				State:       state,
+			})
+
+			_, err := store.GetAuthorizationCode(ctx, code)
+
+			store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
+				UserIDs:      *userIDs,
+				ClientIDs:    *clientIDs,
+				ID:           tokenID,
+				AccessToken:  access,
+				RefreshToken: refresh,
+				Rights:       rights,
+			}, prevID)
+
+			tokenList, _ := store.ListAccessTokens(ctx, userIDs, clientIDs)
+			a.So(tokenList, should.HaveLength, 1)
+
+			err = store.DeleteUserAuthorizations(ctx, userIDs)
+
+			a.So(err, should.BeNil)
+
+			authorizationList, _ = store.ListAuthorizations(ctx, userIDs)
+
+			a.So(authorizationList, should.HaveLength, 0)
+
+			_, err = store.GetAuthorizationCode(ctx, code)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
+
+			tokenList, _ = store.ListAccessTokens(ctx, userIDs, clientIDs)
+			a.So(tokenList, should.HaveLength, 0)
+		})
 	})
 }

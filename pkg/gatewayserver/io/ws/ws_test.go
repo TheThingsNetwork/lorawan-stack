@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net"
 	"net/http"
 	"testing"
@@ -58,12 +59,14 @@ var (
 
 	testTrafficEndPoint = "/traffic/eui-0101010101010101"
 
-	timeout       = (1 << 5) * test.Delay
+	timeout       = (1 << 7) * test.Delay
 	defaultConfig = Config{
 		WSPingInterval:       (1 << 3) * test.Delay,
 		AllowUnauthenticated: true,
 		UseTrafficTLSAddress: false,
 	}
+
+	maxValidRoundTripDelay = (1 << 4) * test.Delay
 )
 
 func eui64Ptr(eui types.EUI64) *types.EUI64 { return &eui }
@@ -108,7 +111,7 @@ func TestClientTokenAuth(t *testing.T) {
 	} {
 		cfg := defaultConfig
 		cfg.AllowUnauthenticated = ttc.AllowUnauthenticated
-		bsWebServer := New(ctx, gs, lbslns.NewFormatter(), cfg)
+		bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), cfg)
 		lis, err := net.Listen("tcp", serverAddress)
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
@@ -223,7 +226,7 @@ func TestDiscover(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(), defaultConfig)
+	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -460,7 +463,7 @@ func TestVersion(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(), defaultConfig)
+	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -722,7 +725,7 @@ func TestTraffic(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(), defaultConfig)
+	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -1032,6 +1035,19 @@ func TestTraffic(t *testing.T) {
 	}
 }
 
+type testTime struct {
+	Mux, Rx *time.Time
+}
+
+func (t testTime) getRefTime(drift time.Duration) float64 {
+	time.Sleep(1 << 3 * test.Delay)
+	now := time.Now()
+	offset := now.Sub(*t.Rx)
+	refTime := t.Mux.Add(offset)
+	refTime = refTime.Add(-drift)
+	return float64(refTime.UnixNano()) / float64(time.Second)
+}
+
 func TestRTT(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
@@ -1057,7 +1073,7 @@ func TestRTT(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(), defaultConfig)
+	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -1083,13 +1099,20 @@ func TestRTT(t *testing.T) {
 		t.Fatal("Connection timeout")
 	}
 
-	var MuxTime, RxTime float64
+	testTime := testTime{}
+
+	getTimeFromFloat64 := func(timeInFloat float64) *time.Time {
+		sec, nsec := math.Modf(timeInFloat)
+		retTime := time.Unix(int64(sec), int64(nsec*1e9))
+		return &retTime
+	}
+
 	for _, tc := range []struct {
 		Name                   string
 		InputBSUpstream        interface{}
 		InputNetworkDownstream *ttnpb.DownlinkMessage
 		InputDownlinkPath      *ttnpb.DownlinkPath
-		WaitTime               time.Duration
+		GatewayClockDrift      time.Duration
 		ExpectedRTTStatsCount  int
 	}{
 		{
@@ -1152,7 +1175,6 @@ func TestRTT(t *testing.T) {
 				XTime: 1548059982,
 			},
 			ExpectedRTTStatsCount: 1,
-			WaitTime:              1 << 4 * test.Delay,
 		},
 		{
 			Name: "RepeatedTxAck",
@@ -1161,7 +1183,6 @@ func TestRTT(t *testing.T) {
 				XTime: 1548059982,
 			},
 			ExpectedRTTStatsCount: 2,
-			WaitTime:              0,
 		},
 		{
 			Name: "UplinkFrame",
@@ -1185,8 +1206,24 @@ func TestRTT(t *testing.T) {
 					},
 				},
 			},
+			ExpectedRTTStatsCount: 2,
+		},
+		{
+			Name: "TxAckWithSmallClockDrift",
+			InputBSUpstream: lbslns.TxConfirmation{
+				Diid:  1,
+				XTime: 1548059982,
+			},
 			ExpectedRTTStatsCount: 3,
-			WaitTime:              1 << 3 * test.Delay,
+		},
+		{
+			Name: "TxAckWithClockDriftAboveThreshold",
+			InputBSUpstream: lbslns.TxConfirmation{
+				Diid:  1,
+				XTime: 1548059982,
+			},
+			ExpectedRTTStatsCount: 3,
+			GatewayClockDrift:     (1 << 5 * test.Delay),
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -1194,10 +1231,8 @@ func TestRTT(t *testing.T) {
 			if tc.InputBSUpstream != nil {
 				switch v := tc.InputBSUpstream.(type) {
 				case lbslns.TxConfirmation:
-					if MuxTime != 0 {
-						time.Sleep(tc.WaitTime)
-						now := float64(time.Now().UnixNano()) / float64(time.Second)
-						v.RefTime = now - RxTime + MuxTime
+					if testTime.Mux != nil {
+						v.RefTime = testTime.getRefTime(tc.GatewayClockDrift)
 					}
 					req, err := json.Marshal(v)
 					if err != nil {
@@ -1216,10 +1251,8 @@ func TestRTT(t *testing.T) {
 					}
 
 				case lbslns.UplinkDataFrame:
-					if MuxTime != 0 {
-						time.Sleep(tc.WaitTime)
-						now := float64(time.Now().UnixNano()) / float64(time.Second)
-						v.RefTime = now - RxTime + MuxTime
+					if testTime.Mux != nil {
+						v.RefTime = testTime.getRefTime(tc.GatewayClockDrift)
 					}
 					req, err := json.Marshal(v)
 					if err != nil {
@@ -1240,10 +1273,8 @@ func TestRTT(t *testing.T) {
 					}
 
 				case lbslns.JoinRequest:
-					if MuxTime != 0 {
-						time.Sleep(tc.WaitTime)
-						now := float64(time.Now().Unix()) + float64(time.Now().Nanosecond())/(1e9)
-						v.RefTime = now - RxTime + MuxTime
+					if testTime.Mux != nil {
+						v.RefTime = testTime.getRefTime(tc.GatewayClockDrift)
 					}
 					req, err := json.Marshal(v)
 					if err != nil {
@@ -1264,7 +1295,10 @@ func TestRTT(t *testing.T) {
 					}
 				}
 
-				if MuxTime > 0 {
+				if testTime.Mux != nil {
+					// Wait for stats to get updated
+					time.Sleep(1 << 2 * test.Delay)
+
 					// Atleast one downlink is needed for the first muxtime.
 					min, max, median, _, count := gsConn.RTTStats(90, time.Now())
 					if !a.So(count, should.Equal, tc.ExpectedRTTStatsCount) {
@@ -1303,8 +1337,11 @@ func TestRTT(t *testing.T) {
 					if err := json.Unmarshal(res, &msg); err != nil {
 						t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 					}
-					MuxTime = msg.MuxTime
-					RxTime = float64(time.Now().Unix()) + float64(time.Now().Nanosecond())/(1e9)
+					testTime.Mux = getTimeFromFloat64(msg.MuxTime)
+					// Simulate downstream delay
+					time.Sleep(1 << 2 * test.Delay)
+					now := time.Now()
+					testTime.Rx = &now
 				case <-time.After(timeout):
 					t.Fatalf("Read message timeout")
 				}
@@ -1338,7 +1375,7 @@ func TestPingPong(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(), defaultConfig)
+	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()

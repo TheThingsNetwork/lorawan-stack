@@ -24,6 +24,8 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// The ApplicationRegistry service, exposed by the Identity Server, is used to manage
+// application registrations.
 service ApplicationRegistry {
   // Create a new application. This also sets the given organization or user as
   // first collaborator with all possible rights.
@@ -79,8 +81,20 @@ service ApplicationRegistry {
       delete: "/applications/{application_id}"
     };
   };
+
+  // Purge the application. This will release the application ID for reuse.
+  // All end devices must be deleted from the application before it can be deleted.
+  // The application owner is responsible for clearing data from any (external) integrations
+  // that may store and expose data by application ID
+  rpc Purge(ApplicationIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/applications/{application_id}/purge"
+    };
+  };
 }
 
+// The ApplicationAcces service, exposed by the Identity Server, is used to manage
+// API keys and collaborators of applications.
 service ApplicationAccess {
   // List the rights the caller has on this application.
   rpc ListRights(ApplicationIdentifiers) returns (Rights) {

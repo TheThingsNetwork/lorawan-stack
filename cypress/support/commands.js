@@ -163,7 +163,7 @@ Cypress.Commands.add('setApplicationCollaborator', (applicationId, collaboratorI
   })
 })
 
-// Helper function to create a new gateway programmatically
+// Helper function to create a new gateway programmatically.
 Cypress.Commands.add('createGateway', (gateway, userId) => {
   const baseUrl = Cypress.config('baseUrl')
   cy.getAccessToken(accessToken => {
@@ -178,7 +178,7 @@ Cypress.Commands.add('createGateway', (gateway, userId) => {
   })
 })
 
-// Helper function to create a new organization programmatically
+// Helper function to create a new organization programmatically.
 Cypress.Commands.add('createOrganization', (organization, userId) => {
   const baseUrl = Cypress.config('baseUrl')
   cy.getAccessToken(accessToken => {
@@ -191,6 +191,26 @@ Cypress.Commands.add('createOrganization', (organization, userId) => {
       },
     })
   })
+})
+
+// Overwrite the default `type` to make sure that subject is resolved and focused before simulating typing. This is helpful
+// when:
+// 1. The action is forced via the `forced` option for inputs that are visually hidden for styling purposes.
+// 2. The action is performed during minor layout shifts.
+Cypress.Commands.overwrite('type', (originalFn, subject, ...args) => {
+  subject.focus()
+
+  return originalFn(subject, ...args)
+})
+
+// Overwrite the default `click` to make sure that subject is resolved and focused before simulating clicks. This is helpful
+// when:
+// 1. The action is forced via the `forced` option for elements that are visually hidden for styling purposes.
+// 2. The action is performed during minor layout shifts.
+Cypress.Commands.overwrite('click', (originalFn, subject, ...args) => {
+  subject.focus()
+
+  return originalFn(subject, ...args)
 })
 
 // Helper function to quickly seed the database to a fresh state using a

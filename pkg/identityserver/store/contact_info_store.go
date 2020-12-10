@@ -233,3 +233,22 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 
 	return s.query(ctx, ContactInfoValidation{}).Delete(&model).Error
 }
+
+func (s *contactInfoStore) DeleteEntityContactInfo(ctx context.Context, entityID ttnpb.Identifiers) error {
+	defer trace.StartRegion(ctx, "delete entity contact info").End()
+	entity, err := s.findDeletedEntity(ctx, entityID, "id")
+	if err != nil {
+		return err
+	}
+	err = s.query(ctx, ContactInfoValidation{}).Where(ContactInfoValidation{
+		EntityID:   entity.PrimaryKey(),
+		EntityType: entityTypeForID(entityID),
+	}).Delete(&ContactInfoValidation{}).Error
+	if err != nil {
+		return err
+	}
+	return s.query(ctx, ContactInfo{}).Where(&ContactInfo{
+		EntityID:   entity.PrimaryKey(),
+		EntityType: entityTypeForID(entityID),
+	}).Delete(&ContactInfo{}).Error
+}

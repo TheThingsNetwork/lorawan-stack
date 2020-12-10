@@ -74,6 +74,24 @@ class Devices {
       device.formatters = null
     }
 
+    if (paths.includes('mac_settings')) {
+      const { mac_settings = {} } = device
+
+      if (
+        Boolean(mac_settings.ping_slot_periodicity) &&
+        typeof mac_settings.ping_slot_periodicity.value === 'undefined'
+      ) {
+        mac_settings.ping_slot_periodicity.value = 'PING_EVERY_1S'
+      }
+
+      if (
+        Boolean(mac_settings.rx2_data_rate_index) &&
+        typeof mac_settings.rx2_data_rate_index.value === 'undefined'
+      ) {
+        mac_settings.rx2_data_rate_index.value = 0
+      }
+    }
+
     return device
   }
 

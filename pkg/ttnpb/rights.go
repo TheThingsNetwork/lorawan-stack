@@ -161,7 +161,7 @@ func (r rightsByString) Swap(i, j int)      { r.Rights[i], r.Rights[j] = r.Right
 // The original rights list is not mutated.
 func (r *Rights) Sorted() *Rights {
 	if r == nil {
-		return nil
+		return &Rights{}
 	}
 	res := Rights{Rights: make([]Right, len(r.Rights))}
 	copy(res.Rights, r.Rights)
@@ -191,7 +191,7 @@ func (r *Rights) Sub(b *Rights) *Rights {
 // Intersect returns the rights that are contained in both r and b.
 func (r *Rights) Intersect(b *Rights) *Rights {
 	if r == nil {
-		return nil
+		return &Rights{}
 	}
 	res := make([]Right, 0)
 	rs, bs := makeRightsSet(r), makeRightsSet(b)

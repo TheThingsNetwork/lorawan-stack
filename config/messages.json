@@ -1403,6 +1403,15 @@
       "file": "flags.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:no_confirmation": {
+    "translations": {
+      "en": "action not confirmed"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "applications.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_data": {
     "translations": {
       "en": "no data for `{name}`"
@@ -1718,27 +1727,18 @@
       "file": "mqtt.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:uplink_type_unsupported": {
+  "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:invalid_stream_record": {
     "translations": {
-      "en": "uplink type `{type}` is unsupported"
+      "en": "invalid stream record"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/loradms/v1/api/objects",
       "file": "objects.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loradms/v1/api:api_call_failed": {
-    "translations": {
-      "en": ""
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/packages/loradms/v1/api",
-      "file": "messages.go"
-    }
-  },
   "error:pkg/applicationserver/io/packages/loradms/v1/api:request": {
     "translations": {
-      "en": "request failed with status `{code}`"
+      "en": "LoRaCloud DMS request failed"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/loradms/v1/api",
@@ -1779,6 +1779,15 @@
     "description": {
       "package": "pkg/applicationserver/io/packages/loradms/v1",
       "file": "package.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/loradms/v1:tlv_record_too_small": {
+    "translations": {
+      "en": "TLV record payload is too small"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1",
+      "file": "tlv_encoding.go"
     }
   },
   "error:pkg/applicationserver/io/packages/loradms/v1:uplink_request_failed": {
@@ -4490,6 +4499,42 @@
       "file": "organization_registry.go"
     }
   },
+  "error:pkg/identityserver:admins_purge_applications": {
+    "translations": {
+      "en": "applications may only be purged by admins"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
+    }
+  },
+  "error:pkg/identityserver:admins_purge_gateways": {
+    "translations": {
+      "en": "gateways may only be purged by admins"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
+  "error:pkg/identityserver:admins_purge_organizations": {
+    "translations": {
+      "en": "organizations may only be purged by admins"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_registry.go"
+    }
+  },
+  "error:pkg/identityserver:admins_purge_users": {
+    "translations": {
+      "en": "users may only be purged by admins"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
   "error:pkg/identityserver:api_key_not_found": {
     "translations": {
       "en": "API key not found"
@@ -6922,7 +6967,7 @@
   },
   "error:pkg/toa:bandwidth": {
     "translations": {
-      "en": "invalid bandwidth"
+      "en": "invalid bandwidth `{bandwidth}`"
     },
     "description": {
       "package": "pkg/toa",
@@ -6931,7 +6976,7 @@
   },
   "error:pkg/toa:coding_rate": {
     "translations": {
-      "en": "invalid coding rate"
+      "en": "invalid coding rate `{coding_rate}`"
     },
     "description": {
       "package": "pkg/toa",
@@ -6940,7 +6985,7 @@
   },
   "error:pkg/toa:frequency": {
     "translations": {
-      "en": "invalid frequency"
+      "en": "invalid frequency `{frequency}`"
     },
     "description": {
       "package": "pkg/toa",
@@ -6949,7 +6994,7 @@
   },
   "error:pkg/toa:spreading_factor": {
     "translations": {
-      "en": "invalid spreading factor"
+      "en": "invalid spreading factor `{spreading_factor}`"
     },
     "description": {
       "package": "pkg/toa",
@@ -7514,6 +7559,15 @@
       "file": "application_registry.go"
     }
   },
+  "event:application.purge": {
+    "translations": {
+      "en": "purge application"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
+    }
+  },
   "event:application.update": {
     "translations": {
       "en": "update application"
@@ -7649,6 +7703,15 @@
       "file": "grpc_deviceregistry.go"
     }
   },
+  "event:as.packages.loraclouddmsv1.fail": {
+    "translations": {
+      "en": "fail to process upstream message"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1",
+      "file": "observability.go"
+    }
+  },
   "event:as.pubsub.delete": {
     "translations": {
       "en": "delete pub/sub"
@@ -7760,6 +7823,24 @@
   "event:as.up.join.receive": {
     "translations": {
       "en": "receive join-accept message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.location.forward": {
+    "translations": {
+      "en": "forward location solved message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.service.forward": {
+    "translations": {
+      "en": "forward service data message"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -7895,6 +7976,15 @@
   "event:gateway.delete": {
     "translations": {
       "en": "delete gateway"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
+  "event:gateway.purge": {
+    "translations": {
+      "en": "purge gateway"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -8810,6 +8900,15 @@
       "file": "organization_registry.go"
     }
   },
+  "event:organization.purge": {
+    "translations": {
+      "en": "purge organization"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_registry.go"
+    }
+  },
   "event:organization.update": {
     "translations": {
       "en": "update organization"
@@ -8858,6 +8957,15 @@
   "event:user.delete": {
     "translations": {
       "en": "delete user"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "event:user.purge": {
+    "translations": {
+      "en": "purge user"
     },
     "description": {
       "package": "pkg/identityserver",

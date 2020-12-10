@@ -18,6 +18,7 @@ import { storiesOf } from '@storybook/react'
 import TtsLogo from '@assets/static/logo.svg'
 
 import ExampleLogo from './story-logo.svg'
+import ExampleSquareLogo from './story-logo-2.svg'
 
 import Logo from '.'
 
@@ -26,13 +27,26 @@ storiesOf('Logo', module)
   .add('With secondary Logo', () => (
     <Logo
       logo={{ src: TtsLogo, alt: 'Logo' }}
-      secondaryLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
+      brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
     />
   ))
-  .add('With vertical secondary', () => (
+  .add('With square-shape secondary Logo', () => (
+    <Logo
+      logo={{ src: TtsLogo, alt: 'Logo' }}
+      brandLogo={{ src: ExampleSquareLogo, alt: 'Secondary Logo' }}
+    />
+  ))
+  .add('With secondary logo, vertical', () => (
     <Logo
       vertical
       logo={{ src: TtsLogo, alt: 'Logo' }}
-      secondaryLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
+      brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
+    />
+  ))
+  .add('With square-shape secondary logo, vertical', () => (
+    <Logo
+      vertical
+      logo={{ src: TtsLogo, alt: 'Logo' }}
+      brandLogo={{ src: ExampleSquareLogo, alt: 'Secondary Logo' }}
     />
   ))

@@ -52,9 +52,108 @@ func (d DeviceUplinkResponses) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// PositionSolutionType is the algorithm used by a position solution query.
+type PositionSolutionType uint8
+
+const (
+	// GNSSPositionSolutionType is GNSS position solution type.
+	GNSSPositionSolutionType PositionSolutionType = iota
+	// WiFiPositionSolutionType is WiFi position solution type.
+	WiFiPositionSolutionType
+	// UnknownPositionSolutionType is used when the position solution type is unknown.
+	UnknownPositionSolutionType
+)
+
+// PositionSolution is the result of a position query.
+type PositionSolution struct {
+	Algorithm PositionSolutionType `json:"algorithm_type"`
+	LLH       []float64            `json:"llh"`
+	Accuracy  float64              `json:"accuracy"`
+}
+
+const (
+	gnssPositionSolutionType    = "gnss"
+	wifiPositionSolutionType    = "wifi"
+	unknownPositionSolutionType = "unknown"
+)
+
+// MarshalJSON implements the json.Marshaler interface.
+func (t PositionSolutionType) MarshalJSON() ([]byte, error) {
+	var tp string
+	switch t {
+	case GNSSPositionSolutionType:
+		tp = gnssPositionSolutionType
+	case WiFiPositionSolutionType:
+		tp = wifiPositionSolutionType
+	default:
+		tp = unknownPositionSolutionType
+	}
+	return json.Marshal(tp)
+}
+
+// UnmarshalJSON implements the json.Unarmshaler.
+func (t *PositionSolutionType) UnmarshalJSON(b []byte) error {
+	var tp string
+	err := json.Unmarshal(b, &tp)
+	if err != nil {
+		return err
+	}
+	switch tp {
+	case gnssPositionSolutionType:
+		*t = GNSSPositionSolutionType
+	case wifiPositionSolutionType:
+		*t = WiFiPositionSolutionType
+	default:
+		*t = UnknownPositionSolutionType
+	}
+	return nil
+}
+
+// String implements fmt.Stringer.
+func (t PositionSolutionType) String() string {
+	switch t {
+	case GNSSPositionSolutionType:
+		return gnssPositionSolutionType
+	case WiFiPositionSolutionType:
+		return wifiPositionSolutionType
+	default:
+		return unknownPositionSolutionType
+	}
+}
+
+// StreamRecord contains the offset and the data of a fully reconstructed stream frame.
+type StreamRecord struct {
+	Offset uint32
+	Data   Hex
+}
+
+// MarshalJSON implements json.Marshaler.
+func (r StreamRecord) MarshalJSON() ([]byte, error) {
+	return json.Marshal([]interface{}{r.Offset, r.Data})
+}
+
+var errInvalidStreamRecord = errors.DefineCorruption("invalid_stream_record", "invalid stream record")
+
+// UnmarshalJSON implements json.Marshaler.
+func (r *StreamRecord) UnmarshalJSON(b []byte) error {
+	raw := make([]json.RawMessage, 0, 2)
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if len(raw) != 2 {
+		return errInvalidStreamRecord.New()
+	}
+	if err := json.Unmarshal(raw[0], &r.Offset); err != nil {
+		return err
+	}
+	return json.Unmarshal(raw[1], &r.Data)
+}
+
 // UplinkResponse contains the state changes and completed items due to an uplink message.
 type UplinkResponse struct {
-	Downlink *LoRaDnlink `json:"dnlink"`
+	Downlink      *LoRaDnlink       `json:"dnlink"`
+	StreamRecords []StreamRecord    `json:"stream_records"`
+	Position      *PositionSolution `json:"position_solution"`
 }
 
 // ExtendedUplinkResponse extends UplinkResponse with the raw JSON payload.
@@ -114,17 +213,22 @@ type LoRaUplink struct {
 	GNSSUse2DSolver         *bool     `json:"gnss_use_2D_solver,omitempty"`
 }
 
+// LoRaUplinkType is the type of a LoRaCloud DMS uplink.
 type LoRaUplinkType uint8
 
 const (
 	// UplinkUplinkType is LoRaWAN Message Type.
 	UplinkUplinkType LoRaUplinkType = iota
-	// ModemUplinkType is DAS Protocol Message Type.
+	// ModemUplinkType is DMS Protocol Message Type.
 	ModemUplinkType
 	// JoiningUplinkType is Session Reset Message Type.
 	JoiningUplinkType
-	// GNSSUplinkType is DAS GNSS Message Type.
+	// GNSSUplinkType is DMS GNSS Message Type.
 	GNSSUplinkType
+	// WiFiUplinkType is DMS WiFi Message Type.
+	WiFiUplinkType
+	// UnknownUplinkType is used when the uplink type is unknown.
+	UnknownUplinkType
 )
 
 const (
@@ -132,9 +236,9 @@ const (
 	modemUplinkType   = "modem"
 	joiningUplinkType = "joining"
 	gnssUplinkType    = "gnss"
+	wifiUplinkType    = "wifi"
+	unknownUplinkType = "unknown"
 )
-
-var errUplinkTypeUnsupported = errors.DefineInvalidArgument("uplink_type_unsupported", "uplink type `{type}` is unsupported")
 
 // MarshalJSON implements the json.Marshaler interface.
 func (t LoRaUplinkType) MarshalJSON() ([]byte, error) {
@@ -148,8 +252,10 @@ func (t LoRaUplinkType) MarshalJSON() ([]byte, error) {
 		tp = joiningUplinkType
 	case GNSSUplinkType:
 		tp = gnssUplinkType
+	case WiFiUplinkType:
+		tp = wifiUplinkType
 	default:
-		return nil, errUplinkTypeUnsupported.WithAttributes("type", t)
+		tp = unknownUplinkType
 	}
 	return json.Marshal(tp)
 }
@@ -170,8 +276,10 @@ func (t *LoRaUplinkType) UnmarshalJSON(b []byte) error {
 		*t = JoiningUplinkType
 	case gnssUplinkType:
 		*t = GNSSUplinkType
+	case wifiUplinkType:
+		*t = WiFiUplinkType
 	default:
-		return errUplinkTypeUnsupported.WithAttributes("type", t)
+		*t = UnknownUplinkType
 	}
 	return nil
 }

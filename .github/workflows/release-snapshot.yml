@@ -4,29 +4,30 @@ on:
   push:
     branches:
       - 'v3.*'
-    tags:
-      - 'v3.[0-9]+.[0-9]+*'
-      - '!v3.[0-9]+.[0-9]+'
 
 env:
   NODE_ENV: production
 
 jobs:
   release:
-    name: Release
+    name: Snapshot release
     runs-on: ubuntu-18.04
     steps:
     - name: Check out code
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: Login to Docker
-      uses: azure/docker-login@v1
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
       with:
-        username: '${{ secrets.DOCKER_USERNAME  }}'
-        password: '${{ secrets.DOCKER_PASSWORD  }}'
-    - name: Install Snapcraft
-      run: sudo apt-get -yq --no-install-suggests --no-install-recommends install snapcraft
+        username: '${{ secrets.DOCKERHUB_USERNAME }}'
+        password: '${{ secrets.DOCKERHUB_PASSWORD }}'
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: '${{ secrets.GHCR_USERNAME }}'
+        password: '${{ secrets.GHCR_PASSWORD }}'
     - name: Set up Node
       uses: actions/setup-node@v2-beta
       with:
@@ -35,6 +36,7 @@ jobs:
       id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(npx yarn cache dir)"
     - name: Initialize Yarn module cache
+      id: yarn-cache
       uses: actions/cache@v2
       with:
         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -65,13 +67,12 @@ jobs:
         key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
     - name: Make Mage
       run: make tools/bin/mage
-    - name: Auto-completion scripts
-      run: tools/bin/mage cli:autocomplete
     - name: Install JS SDK dependencies
       run: tools/bin/mage jsSDK:deps
     - name: Build JS SDK
       run: tools/bin/mage jsSDK:clean jsSDK:build
     - name: Install JS dependencies
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
       run: tools/bin/mage js:deps
       timeout-minutes: 5
     - name: Build frontend
@@ -83,12 +84,12 @@ jobs:
       run: echo "::set-output name=value::$(cat tools/go.mod | grep 'github.com/goreleaser/goreleaser v' | cut -d ' ' -f 2)"
     - name: Run Goreleaser
       uses: goreleaser/goreleaser-action@v2
-      env:
-        DOCKER_IMAGE: thethingsnetwork/lorawan-stack
-        DOCKER_IMAGE_DEV: thethingsnetwork/lorawan-stack-dev
       with:
         version: ${{ steps.goreleaser_version.outputs.value }}
-        args: release --snapshot
+        args: release --config .goreleaser.snapshot.yml --snapshot
     - name: Push Docker image
       run: |
+        docker tag lorawan-stack-dev:${{ github.sha }} thethingsnetwork/lorawan-stack-dev:${{ github.sha }}
+        docker tag lorawan-stack-dev:${{ github.sha }} ghcr.io/thethingsnetwork/lorawan-stack-dev:${{ github.sha }}
         docker push thethingsnetwork/lorawan-stack-dev:${{ github.sha }}
+        docker push ghcr.io/thethingsnetwork/lorawan-stack-dev:${{ github.sha }}

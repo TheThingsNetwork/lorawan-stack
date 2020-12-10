@@ -22,11 +22,12 @@ import (
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 type nsPbaServer struct {
-	downstreamCh chan *ttnpb.DownlinkMessage
+	downstreamCh chan *downlinkMessage
 }
 
 var errHomeNetworkDisabled = errors.DefineFailedPrecondition("home_network_disabled", "Home Network is disabled")
@@ -47,10 +48,16 @@ func (s *nsPbaServer) PublishDownlink(ctx context.Context, down *ttnpb.DownlinkM
 	)...)
 	down.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
 
+	msg, token, err := toPBDownlink(ctx, down)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to convert outgoing downlink message")
+		return nil, err
+	}
+
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
-	case s.downstreamCh <- down:
+	case s.downstreamCh <- &downlinkMessage{token, msg}:
 		return ttnpb.Empty, nil
 	}
 }

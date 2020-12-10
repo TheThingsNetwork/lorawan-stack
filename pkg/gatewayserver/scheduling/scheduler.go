@@ -220,6 +220,9 @@ func (s *Scheduler) gc(ctx context.Context) error {
 			for _, subBand := range s.subBands {
 				subBand.gc(to)
 			}
+			s.mu.Lock()
+			s.emissions = s.emissions.GreaterThan(to)
+			s.mu.Unlock()
 		}
 	}
 }

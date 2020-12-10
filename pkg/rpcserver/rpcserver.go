@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"net/textproto"
 	"os"
 	"runtime/debug"
 	"time"
@@ -58,10 +59,10 @@ func init() {
 
 type options struct {
 	contextFillers     []fillcontext.Filler
-	fieldExtractor     grpc_ctxtags.RequestFieldExtractorFunc
 	streamInterceptors []grpc.StreamServerInterceptor
 	unaryInterceptors  []grpc.UnaryServerInterceptor
 	serverOptions      []grpc.ServerOption
+	trustedProxies     []string
 	logIgnoreMethods   []string
 }
 
@@ -82,13 +83,6 @@ func WithContextFiller(contextFillers ...fillcontext.Filler) Option {
 	}
 }
 
-// WithFieldExtractor sets a field extractor
-func WithFieldExtractor(fieldExtractor grpc_ctxtags.RequestFieldExtractorFunc) Option {
-	return func(o *options) {
-		o.fieldExtractor = fieldExtractor
-	}
-}
-
 // WithStreamInterceptors adds gRPC stream interceptors
 func WithStreamInterceptors(interceptors ...grpc.StreamServerInterceptor) Option {
 	return func(o *options) {
@@ -100,6 +94,13 @@ func WithStreamInterceptors(interceptors ...grpc.StreamServerInterceptor) Option
 func WithUnaryInterceptors(interceptors ...grpc.UnaryServerInterceptor) Option {
 	return func(o *options) {
 		o.unaryInterceptors = append(o.unaryInterceptors, interceptors...)
+	}
+}
+
+// WithTrustedProxies adds trusted proxies from which proxy headers are trusted.
+func WithTrustedProxies(cidrs ...string) Option {
+	return func(o *options) {
+		o.trustedProxies = append(o.trustedProxies, cidrs...)
 	}
 }
 
@@ -125,8 +126,10 @@ func New(ctx context.Context, opts ...Option) *Server {
 	}
 	server := &Server{ctx: ctx}
 	ctxtagsOpts := []grpc_ctxtags.Option{
-		grpc_ctxtags.WithFieldExtractor(options.fieldExtractor),
+		grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor),
 	}
+	var proxyHeaders rpcmiddleware.ProxyHeaders
+	proxyHeaders.ParseAndAddTrusted(options.trustedProxies...)
 	recoveryOpts := []grpc_recovery.Option{
 		grpc_recovery.WithRecoveryHandler(func(p interface{}) (err error) {
 			fmt.Fprintln(os.Stderr, p)
@@ -144,12 +147,15 @@ func New(ctx context.Context, opts ...Option) *Server {
 		rpcfillcontext.StreamServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
 		rpcmiddleware.RequestIDStreamServerInterceptor(),
+		proxyHeaders.StreamServerInterceptor(),
 		grpc_opentracing.StreamServerInterceptor(),
 		events.StreamServerInterceptor,
 		rpclog.StreamServerInterceptor(ctx, rpclog.WithIgnoreMethods(options.logIgnoreMethods)),
 		metrics.StreamServerInterceptor,
-		sentrymiddleware.StreamServerInterceptor(),
 		errors.StreamServerInterceptor(),
+		// NOTE: All middleware that works with lorawan-stack/pkg/errors errors must be placed below.
+		sentrymiddleware.StreamServerInterceptor(),
+		grpc_recovery.StreamServerInterceptor(recoveryOpts...),
 		validator.StreamServerInterceptor(),
 		hooks.StreamServerInterceptor(),
 	}
@@ -158,12 +164,15 @@ func New(ctx context.Context, opts ...Option) *Server {
 		rpcfillcontext.UnaryServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
 		rpcmiddleware.RequestIDUnaryServerInterceptor(),
+		proxyHeaders.UnaryServerInterceptor(),
 		grpc_opentracing.UnaryServerInterceptor(),
 		events.UnaryServerInterceptor,
 		rpclog.UnaryServerInterceptor(ctx, rpclog.WithIgnoreMethods(options.logIgnoreMethods)),
 		metrics.UnaryServerInterceptor,
-		sentrymiddleware.UnaryServerInterceptor(),
 		errors.UnaryServerInterceptor(),
+		// NOTE: All middleware that works with lorawan-stack/pkg/errors errors must be placed below.
+		sentrymiddleware.UnaryServerInterceptor(),
+		grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
 		validator.UnaryServerInterceptor(),
 		hooks.UnaryServerInterceptor(),
 	}
@@ -182,16 +191,10 @@ func New(ctx context.Context, opts ...Option) *Server {
 			Timeout:           20 * time.Second,
 		}),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
-			append(
-				append(streamInterceptors, options.streamInterceptors...),
-				grpc_recovery.StreamServerInterceptor(recoveryOpts...),
-			)...,
+			append(streamInterceptors, options.streamInterceptors...)...,
 		)),
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			append(
-				append(unaryInterceptors, options.unaryInterceptors...),
-				grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
-			)...,
+			append(unaryInterceptors, options.unaryInterceptors...)...,
 		)),
 	}
 	server.Server = grpc.NewServer(append(baseOptions, options.serverOptions...)...)
@@ -205,6 +208,22 @@ func New(ctx context.Context, opts ...Option) *Server {
 				URI:  req.RequestURI,
 			}
 			return md.ToMetadata()
+		}),
+		runtime.WithIncomingHeaderMatcher(func(s string) (string, bool) {
+			s = textproto.CanonicalMIMEHeaderKey(s)
+			switch s {
+			case "Forwarded",
+				"X-Request-Id",
+				"X-Forwarded-For",
+				"X-Real-Ip",
+				"X-Forwarded-Host",
+				"X-Forwarded-Proto",
+				"X-Forwarded-Client-Cert",
+				"X-Forwarded-Tls-Client-Cert",
+				"X-Forwarded-Tls-Client-Cert-Info":
+				return s, true
+			}
+			return runtime.DefaultHeaderMatcher(s)
 		}),
 		runtime.WithOutgoingHeaderMatcher(func(s string) (string, bool) {
 			// NOTE: When adding headers, also add them to CORSConfig in ../component/grpc.go.

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="45px" height="45px" viewBox="0 0 45 45" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>Artboard</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="logo" transform="translate(0.000000, -1.000000)" fill="#17CF97" fill-rule="nonzero">
+            <path d="M22.5,11.75 C22.5,17.9632 17.4632,23 11.25,23 L0,23 L0,11.75 C0,5.5368 5.0368,0.5 11.25,0.5 C17.4632,0.5 22.5,5.5368 22.5,11.75 Z" id="Path"></path>
+            <path d="M22.5,34.25 C22.5,28.0368 27.5368,23 33.75,23 L45,23 L45,34.25 C45,40.4632 39.963,45.5 33.75,45.5 C27.5368,45.5 22.5,40.4632 22.5,34.25 Z" id="Path"></path>
+            <path d="M0,34.25 C0,40.4632 5.0368,45.5 11.25,45.5 L22.5,45.5 L22.5,34.25 C22.5,28.0368 17.4632,23 11.25,23 C5.0368,23 0,28.0368 0,34.25 Z" id="Path"></path>
+            <path d="M45,11.75 C45,5.5368 39.963,0.5 33.75,0.5 L22.5,0.5 L22.5,11.75 C22.5,17.9632 27.5368,23 33.75,23 C39.963,23 45,17.9632 45,11.75 Z" id="Path"></path>
+        </g>
+    </g>
+</svg>

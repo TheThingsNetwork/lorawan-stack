@@ -244,6 +244,36 @@ var (
 			return nil
 		},
 	}
+
+	organizationsPurgeCommand = &cobra.Command{
+		Use:     "purge [organization-id]",
+		Aliases: []string{"permanent-delete", "hard-delete"},
+		Short:   "Purge an organization",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			orgID := getOrganizationID(cmd.Flags(), args)
+			if orgID == nil {
+				return errNoOrganizationID
+			}
+			force, err := cmd.Flags().GetBool("force")
+			if err != nil {
+				return err
+			}
+			if !confirmChoice(organizationPurgeWarning, force) {
+				return errNoConfirmation
+			}
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewOrganizationRegistryClient(is).Purge(ctx, orgID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+
 	organizationsContactInfoCommand = contactInfoCommands("organization", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		orgID := getOrganizationID(cmd.Flags(), args)
 		if orgID == nil {
@@ -281,5 +311,8 @@ func init() {
 	organizationsCommand.AddCommand(organizationsDeleteCommand)
 	organizationsContactInfoCommand.PersistentFlags().AddFlagSet(organizationIDFlags())
 	organizationsCommand.AddCommand(organizationsContactInfoCommand)
+	organizationsPurgeCommand.Flags().AddFlagSet(organizationIDFlags())
+	organizationsPurgeCommand.Flags().AddFlagSet(forceFlags())
+	organizationsCommand.AddCommand(organizationsPurgeCommand)
 	Root.AddCommand(organizationsCommand)
 }

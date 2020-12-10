@@ -34,6 +34,7 @@ func (c *Component) initGRPC() {
 	c.grpc = rpcserver.New(
 		c.ctx,
 		rpcserver.WithContextFiller(c.FillContext),
+		rpcserver.WithTrustedProxies(c.config.GRPC.TrustedProxies...),
 		rpcserver.WithLogIgnoreMethods(c.config.GRPC.LogIgnoreMethods),
 	)
 }

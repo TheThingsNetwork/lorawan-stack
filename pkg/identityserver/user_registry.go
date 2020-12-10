@@ -57,6 +57,12 @@ var (
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
+	evtPurgeUser = events.Define(
+		"user.purge", "purge user",
+		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
 	evtUpdateUserIncorrectPassword = events.Define(
 		"user.update.incorrect_password", "update user failure: incorrect password",
 		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
@@ -73,6 +79,7 @@ var (
 	errPasswordStrengthUppercase = errors.DefineInvalidArgument("password_strength_uppercase", "need at least `{n}` uppercase letter(s)")
 	errPasswordStrengthDigits    = errors.DefineInvalidArgument("password_strength_digits", "need at least `{n}` digit(s)")
 	errPasswordStrengthSpecial   = errors.DefineInvalidArgument("password_strength_special", "need at least `{n}` special character(s)")
+	errAdminsPurgeUsers          = errors.DefinePermissionDenied("admins_purge_users", "users may only be purged by admins")
 )
 
 func (is *IdentityServer) validatePasswordStrength(ctx context.Context, password string) error {
@@ -619,6 +626,41 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*types.Empty, error) {
+	if !is.IsAdmin(ctx) {
+		return nil, errAdminsPurgeUsers
+	}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		err := store.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)
+		if err != nil {
+			return err
+		}
+		// delete related API keys before purging the user
+		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids)
+		if err != nil {
+			return err
+		}
+		err = store.GetMembershipStore(db).DeleteAccountMembers(ctx, ids.GetOrganizationOrUserIdentifiers())
+		if err != nil {
+			return err
+		}
+		err = store.GetOAuthStore(db).DeleteUserAuthorizations(ctx, ids)
+		if err != nil {
+			return err
+		}
+		err = store.GetUserSessionStore(db).DeleteAllUserSessions(ctx, ids)
+		if err != nil {
+			return err
+		}
+		return store.GetUserStore(db).PurgeUser(ctx, ids)
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtPurgeUser.NewWithIdentifiersAndData(ctx, ids, nil))
+	return ttnpb.Empty, nil
+}
+
 type userRegistry struct {
 	*IdentityServer
 }
@@ -649,4 +691,8 @@ func (ur *userRegistry) CreateTemporaryPassword(ctx context.Context, req *ttnpb.
 
 func (ur *userRegistry) Delete(ctx context.Context, req *ttnpb.UserIdentifiers) (*types.Empty, error) {
 	return ur.deleteUser(ctx, req)
+}
+
+func (ur *userRegistry) Purge(ctx context.Context, req *ttnpb.UserIdentifiers) (*types.Empty, error) {
+	return ur.purgeUser(ctx, req)
 }

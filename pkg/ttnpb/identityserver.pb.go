@@ -1475,6 +1475,8 @@ var _EntityAccess_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type IsClient interface {
+	// Get the configuration of the Identity Server. The response is typically used
+	// to enable or disable features in a user interface.
 	GetConfiguration(ctx context.Context, in *GetIsConfigurationRequest, opts ...grpc.CallOption) (*GetIsConfigurationResponse, error)
 }
 
@@ -1497,6 +1499,8 @@ func (c *isClient) GetConfiguration(ctx context.Context, in *GetIsConfigurationR
 
 // IsServer is the server API for Is service.
 type IsServer interface {
+	// Get the configuration of the Identity Server. The response is typically used
+	// to enable or disable features in a user interface.
 	GetConfiguration(context.Context, *GetIsConfigurationRequest) (*GetIsConfigurationResponse, error)
 }
 

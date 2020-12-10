@@ -15,8 +15,8 @@
 package webmiddleware
 
 import (
-	"net"
 	"net/http"
+	"time"
 
 	"github.com/felixge/httpsnoop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -32,19 +32,15 @@ func Log(logger log.Interface, ignorePathsArray []string) MiddlewareFunc {
 	}
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			remoteAddr, _, err := net.SplitHostPort(r.RemoteAddr)
-			if err != nil {
-				remoteAddr = r.RemoteAddr
-			}
-			if xRealIP := r.Header.Get("X-Real-Ip"); xRealIP != "" {
-				remoteAddr = xRealIP
-			}
 			logFields := log.Fields(
-				"method", r.Method,
-				"url", r.URL.String(),
-				"remote_addr", remoteAddr,
+				"http.method", r.Method,
+				"http.path", r.URL.Path,
+				"peer.address", r.RemoteAddr,
 				"request_id", r.Header.Get(requestIDHeader),
 			)
+			if xRealIP := r.Header.Get("X-Real-Ip"); xRealIP != "" {
+				logFields = logFields.WithField("peer.real_ip", xRealIP)
+			}
 
 			ctx, getError := webhandlers.NewContextWithErrorValue(r.Context())
 			requestLogger := logger
@@ -63,9 +59,8 @@ func Log(logger log.Interface, ignorePathsArray []string) MiddlewareFunc {
 			}
 
 			logFields = logFields.With(map[string]interface{}{
-				"status":        metrics.Code,
-				"duration":      metrics.Duration,
-				"response_size": metrics.Written,
+				"http.status": metrics.Code,
+				"duration":    metrics.Duration.Round(time.Microsecond * 100),
 			})
 			if err := getError(); err != nil {
 				logFields = logFields.WithError(err)

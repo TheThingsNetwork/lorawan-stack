@@ -18,8 +18,9 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"gopkg.in/square/go-jose.v2"
 )
@@ -34,14 +35,14 @@ func WrapUplinkTokens(gateway, forwarder []byte, agent *AgentUplinkToken) ([]byt
 }
 
 func TestWrapGatewayUplinkToken(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 	key := bytes.Repeat([]byte{0x42}, 16)
 	encrypter, err := jose.NewEncrypter(jose.A128GCM, jose.Recipient{Algorithm: jose.A128GCMKW, Key: key}, nil)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	wrappedToken, err := wrapGatewayUplinkToken(ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+	wrappedToken, err := wrapGatewayUplinkToken(ctx, ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 		[]byte{0x1, 0x2, 0x3}, encrypter,
 	)
 	if !a.So(err, should.BeNil) {
@@ -49,10 +50,10 @@ func TestWrapGatewayUplinkToken(t *testing.T) {
 	}
 	t.Logf("Wrapped token: %q", string(wrappedToken))
 
-	ids, gtwToken, err := unwrapGatewayUplinkToken(wrappedToken, key)
+	uid, gtwToken, err := unwrapGatewayUplinkToken(wrappedToken, key)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"})
+	a.So(uid, should.Resemble, unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}))
 	a.So(gtwToken, should.Resemble, []byte{0x1, 0x2, 0x3})
 }

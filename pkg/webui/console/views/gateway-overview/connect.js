@@ -16,13 +16,9 @@ import { connect } from 'react-redux'
 
 import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
 
-const mapStateToProps = state => {
-  const gtwId = selectSelectedGatewayId(state)
-
-  return {
-    gtwId,
-    gateway: selectSelectedGateway(state),
-  }
-}
+const mapStateToProps = state => ({
+  gtwId: selectSelectedGatewayId(state),
+  gateway: selectSelectedGateway(state),
+})
 
 export default GatewayOverview => connect(mapStateToProps)(GatewayOverview)
