@@ -61,7 +61,7 @@ var (
 )
 
 // HandleUp implements packages.ApplicationPackageHandler.
-func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) error {
+func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) (err error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages/loradms/v1")
 	logger := log.FromContext(ctx)
 
@@ -73,6 +73,12 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 		logger.Debug("Package configured for end device with no device EUI")
 		return nil
 	}
+
+	defer func() {
+		if err != nil {
+			registerPackageFail(ctx, up.EndDeviceIdentifiers, err)
+		}
+	}()
 
 	data, fPort, err := p.mergePackageData(def, assoc)
 	if err != nil {
@@ -110,6 +116,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 }
 
 func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.ApplicationUp, loraUp *objects.LoRaUplink, data *packageData) error {
+	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loraclouddmsv1:%s", events.NewCorrelationID()))...)
 	logger := log.FromContext(ctx)
 	eui := objects.EUI(*up.DevEUI)
 
@@ -141,39 +148,117 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 		return err
 	}
 
-	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loradas:%s", events.NewCorrelationID()))...)
-	now := time.Now().UTC()
-	err = p.server.Publish(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: up.EndDeviceIdentifiers,
+	if err := p.sendDownlink(ctx, up.EndDeviceIdentifiers, result.Downlink, data); err != nil {
+		return err
+	}
+
+	if err := p.sendServiceData(ctx, up.EndDeviceIdentifiers, resultStruct); err != nil {
+		return err
+	}
+
+	if err := p.sendLocationSolved(ctx, up.EndDeviceIdentifiers, result.Position); err != nil {
+		return err
+	}
+
+	if err := p.parseStreamRecords(ctx, result.StreamRecords, up, data, loraUp.Timestamp); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *DeviceManagementPackage) sendDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, downlink *objects.LoRaDnlink, data *packageData) error {
+	if downlink == nil {
+		return nil
+	}
+	// Downlinks that are the result of a location solving query will erroneously arrive
+	// on FPort 0. If we know that the device uses the TLV encoding, we can translate the
+	// FPort to 150 in order to fix this.
+	if downlink.Port == 0 && data.GetUseTLVEncoding() {
+		downlink.Port = 150
+	}
+	return p.server.DownlinkQueuePush(ctx, ids, []*ttnpb.ApplicationDownlink{{
+		FPort:      uint32(downlink.Port),
+		FRMPayload: []byte(downlink.Payload),
+	}})
+}
+
+func (p *DeviceManagementPackage) sendServiceData(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
+	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
+		EndDeviceIdentifiers: ids,
 		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:           &now,
+		ReceivedAt:           timePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_ServiceData{
 			ServiceData: &ttnpb.ApplicationServiceData{
-				Data:    resultStruct,
+				Data:    data,
 				Service: packageName,
 			},
 		},
 	})
-	if err != nil {
-		return err
-	}
+}
 
-	downlink := result.Downlink
-	if downlink == nil {
-		logger.Debug("No downlink to be scheduled from the Device Management Service")
+func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, position *objects.PositionSolution) error {
+	if position == nil {
 		return nil
 	}
-	down := &ttnpb.ApplicationDownlink{
-		FPort:      uint32(downlink.Port),
-		FRMPayload: []byte(downlink.Payload),
+	if len(position.LLH) != 3 {
+		log.FromContext(ctx).WithField("len", len(position.LLH)).Warn("Invalid LLH length")
+		return nil
 	}
-	err = p.server.DownlinkQueuePush(ctx, up.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink{down})
-	if err != nil {
-		logger.WithError(err).Debug("Failed to push downlink to device")
-		return err
+	source := ttnpb.SOURCE_UNKNOWN
+	switch position.Algorithm {
+	case objects.GNSSPositionSolutionType:
+		source = ttnpb.SOURCE_GPS
+	case objects.WiFiPositionSolutionType:
+		source = ttnpb.SOURCE_WIFI_RSSI_GEOLOCATION
 	}
-	logger.Debug("Device Management Service downlink scheduled")
+	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
+		EndDeviceIdentifiers: ids,
+		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+		ReceivedAt:           timePtr(time.Now().UTC()),
+		Up: &ttnpb.ApplicationUp_LocationSolved{
+			LocationSolved: &ttnpb.ApplicationLocation{
+				Service: fmt.Sprintf("%v-%s", packageName, position.Algorithm),
+				Location: ttnpb.Location{
+					Latitude:  position.LLH[0],
+					Longitude: position.LLH[1],
+					Altitude:  int32(position.LLH[2]),
+					Accuracy:  int32(position.Accuracy),
+					Source:    source,
+				},
+			},
+		},
+	})
+}
 
+func (p *DeviceManagementPackage) parseStreamRecords(ctx context.Context, records []objects.StreamRecord, up *ttnpb.ApplicationUp, data *packageData, originalTimestamp *float64) error {
+	if records == nil || !data.GetUseTLVEncoding() {
+		return nil
+	}
+	f := func(tag uint8, length uint8, bytes []byte) error {
+		loraUp := &objects.LoRaUplink{
+			Timestamp: originalTimestamp,
+		}
+		switch tag {
+		case 0x05, 0x06, 0x07: // GNSS data
+			payload := objects.Hex(bytes)
+			loraUp.Type = objects.GNSSUplinkType
+			loraUp.Payload = &payload
+		case 0x08: // WiFi data
+			payload := append(objects.Hex{0x01}, bytes...)
+			loraUp.Type = objects.WiFiUplinkType
+			loraUp.Payload = &payload
+		default:
+			return nil
+		}
+		return p.sendUplink(ctx, up, loraUp, data)
+	}
+	for _, record := range records {
+		if err := parseTLVPayload(record.Data, f); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to parse TLV record")
+			continue
+		}
+	}
 	return nil
 }
 
@@ -202,6 +287,9 @@ func (p *DeviceManagementPackage) mergePackageData(def *ttnpb.ApplicationPackage
 		}
 		if data.token != "" {
 			merged.token = data.token
+		}
+		if data.useTLVEncoding != nil {
+			merged.useTLVEncoding = data.useTLVEncoding
 		}
 	}
 	if merged.serverURL == nil {
@@ -242,6 +330,10 @@ func float64Ptr(x float64) *float64 {
 }
 
 func hexPtr(x objects.Hex) *objects.Hex {
+	return &x
+}
+
+func timePtr(x time.Time) *time.Time {
 	return &x
 }
 

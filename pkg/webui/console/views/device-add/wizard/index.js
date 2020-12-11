@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { omit } from 'lodash'
 
 import STACK_COMPONENTS_MAP from '@console/constants/stack-components'
 
@@ -46,6 +47,8 @@ const WIZARD_STEPS_MAP = {
   JOIN: STACK_COMPONENTS_MAP.js,
 }
 
+const excludePaths = ['_device_classes']
+
 const DeviceWizard = props => {
   const {
     configuration,
@@ -67,20 +70,19 @@ const DeviceWizard = props => {
   const handleWizardComplete = React.useCallback(
     async values => {
       try {
-        await createDevice(values)
+        await createDevice(omit(values, excludePaths))
         setCompleted(true)
         return createDeviceSuccess(values)
       } catch (error) {
         const { steps, onError } = wizardRef.current
         const { request_details = {} } = error
 
-        const erroredStep = steps.find(({ id }) => {
-          return id === request_details.stack_component
-        })
+        const { id } =
+          steps.find(({ id }) => {
+            return id === request_details.stack_component
+          }) || {}
 
-        if (typeof erroredStep !== 'undefined') {
-          onError(erroredStep.id, error)
-        }
+        onError(id, error)
       }
     },
     [createDevice, createDeviceSuccess],

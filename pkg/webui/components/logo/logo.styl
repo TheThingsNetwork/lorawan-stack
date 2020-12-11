@@ -15,19 +15,23 @@
 .container
   display: flex
   align-items: center
+  flex: 0 0 auto
 
   img
     height: 100%
     width: 100%
     object-fit: contain
-    object-position: left
 
   .logo-container
     display: flex
     align-items: center
     line-height: 0
-    width: 11rem
     height: 2.3rem
+    padding: $cs.m 0
+
+    img
+      width: 100%
+
     +media-query($bp.s)
       width: 9rem
       height: 2.1rem
@@ -36,60 +40,90 @@
     display: flex
     align-items: center
 
-  .secondary-logo
+  .brand-logo
     display: flex
     align-items: center
+    justify-content: center
     flex-direction: column
+    max-width: 9rem
+
+    +media-query-min($bp.s)
+      height: 3rem
+
+    +media-query($bp.s)
+      height: 2rem
 
     &-container
       display: flex
       align-items: center
+      height: 100%
+      width: 100%
 
   &:not(.vertical)
+    &:not(.custom-branding)
+      .logo-container
+        width: 13rem
+        +media-query($bp.s)
+          width: 12rem
+
     &.custom-branding .logo
       display: flex
       align-items: center
-      padding-right: $ls.xs
+      padding-left: 'calc(%s - .15rem)' % $ls.xs
       +media-query($bp.s)
-        padding-right: $ls.xxs
+        padding-left: $cs.s
 
       .logo-container
+        nudge('down', .15rem)
+        width: 11rem
         +media-query($bp.s)
-          max-width: 7rem
+          width: 8rem
 
-    .secondary-logo
-      border-dark('left')
+    .brand-logo
+      border-dark('right')
       align-items: center
-      padding-left: $ls.xs
+      padding-right: $ls.xs
       +media-query($bp.s)
-        padding-left: $ls.xxs
+        padding-right: $cs.s
 
       &-container
-        width: 9rem
-        height: 1.9rem
         +media-query($bp.s)
-          width: 6rem
-          height: 1.5rem
+          max-width: 6rem
+          height: 2.5rem
+
+          img
+            width: 100%
+
+        img
+          object-position: left
 
   &.vertical
-    max-width: 15rem
+    width: 15rem
     flex-direction: column
     margin-bottom: $ls.s
 
     &.custom-branding .logo
-      border-dark('bottom')
-      padding-bottom: $ls.xs
-      margin-bottom: $ls.xs
+      border-dark('top')
+      padding-top: $ls.xs
+      margin-top: $ls.xs
       height: auto
+      width: 100%
 
       &-container
         width: 100%
         height: auto
 
-    .secondary-logo
+    .brand-logo
       margin-left: auto
       margin-right: auto
+      width: 100%
 
       &-container
         display: block
-        height: 2.2rem
+        max-height: 3rem
+        max-width: 10rem
+        width: 100%
+
+        img
+          object-position: center
+          width: 100%

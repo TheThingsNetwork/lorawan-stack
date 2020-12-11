@@ -40,7 +40,7 @@ const GatewayLocation = () => {
   )
 }
 
-export default withBreadcrumb('gateway.single.data', function(props) {
+export default withBreadcrumb('gateway.single.data', props => {
   const { gtwId } = props
   return <Breadcrumb path={`/gateways/${gtwId}/location`} content={sharedMessages.location} />
 })(

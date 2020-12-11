@@ -57,6 +57,8 @@ type GRPC struct {
 	Listen    string `name:"listen" description:"Address for the TCP gRPC server to listen on"`
 	ListenTLS string `name:"listen-tls" description:"Address for the TLS gRPC server to listen on"`
 
+	TrustedProxies []string `name:"trusted-proxies" description:"CIDRs of trusted reverse proxies"`
+
 	LogIgnoreMethods []string `name:"log-ignore-methods" description:"List of paths for which successful requests will not be logged"`
 }
 

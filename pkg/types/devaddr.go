@@ -120,9 +120,9 @@ func (addr DevAddr) NwkAddr() []byte {
 	case 2:
 		return []byte{addr[1] & 0x0f, addr[2], addr[3]}
 	case 3:
-		return []byte{addr[1] & 0x03, addr[2], addr[3]}
+		return []byte{addr[1] & 0x01, addr[2], addr[3]}
 	case 4:
-		return []byte{addr[2], addr[3]}
+		return []byte{addr[2] & 0x7f, addr[3]}
 	case 5:
 		return []byte{addr[2] & 0x1f, addr[3]}
 	case 6:
@@ -143,9 +143,9 @@ func (addr DevAddr) NwkID() []byte {
 	case 2:
 		return []byte{(addr[0] & 0x1f) >> 4, (addr[0] << 4) | (addr[1] >> 4)}
 	case 3:
-		return []byte{(addr[0] >> 2) & 0x03, (addr[0] << 6) | (addr[1] >> 2)}
+		return []byte{(addr[0] >> 1) & 0x07, (addr[0] << 7) | (addr[1] >> 1)}
 	case 4:
-		return []byte{addr[0] & 0x08, addr[1]}
+		return []byte{((addr[0] & 0x07) << 1) | (addr[1] >> 7), (addr[1] << 1) | (addr[2] >> 7)}
 	case 5:
 		return []byte{((addr[0] & 0x03) << 3) | (addr[1] >> 5), (addr[1] << 3) | (addr[2] >> 5)}
 	case 6:
@@ -166,9 +166,9 @@ func NwkAddrBits(netID NetID) uint {
 	case 2:
 		return 20
 	case 3:
-		return 18
+		return 17
 	case 4:
-		return 16
+		return 15
 	case 5:
 		return 13
 	case 6:
@@ -208,12 +208,14 @@ func NewDevAddr(netID NetID, nwkAddr []byte) (addr DevAddr, err error) {
 		addr[0] |= nwkID[1] >> 4
 		addr[0] |= nwkID[0] << 4
 	case 3:
-		addr[1] |= nwkID[2] << 2
-		addr[0] |= nwkID[2] >> 6
-		addr[0] |= nwkID[1] << 2
+		addr[1] |= nwkID[2] << 1
+		addr[0] |= nwkID[2] >> 7
+		addr[0] |= nwkID[1] << 1
 	case 4:
-		addr[0] |= nwkID[1]
-		addr[1] |= nwkID[2]
+		addr[2] |= nwkID[2] << 7
+		addr[1] |= nwkID[2] >> 1
+		addr[1] |= nwkID[1] << 7
+		addr[0] |= nwkID[1] >> 1
 	case 5:
 		addr[2] |= nwkID[2] << 5
 		addr[1] |= nwkID[2] >> 3

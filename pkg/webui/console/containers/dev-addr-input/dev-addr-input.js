@@ -41,6 +41,7 @@ const DevAddrInput = props => {
     generatedError,
     generatedLoading,
     generatedValue,
+    ...rest
   } = props
 
   const action = {
@@ -81,6 +82,7 @@ const DevAddrInput = props => {
       loading={showLoading}
       disabled={disabled}
       autoFocus={autoFocus}
+      {...rest}
     />
   )
 }

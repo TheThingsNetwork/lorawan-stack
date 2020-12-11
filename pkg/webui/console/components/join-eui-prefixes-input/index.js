@@ -152,6 +152,7 @@ class JoinEUIPrefixesInput extends React.PureComponent {
       error,
       prefixes,
       showPrefixes,
+      ...rest
     } = this.props
     const { prefix } = this.state
 
@@ -209,6 +210,7 @@ class JoinEUIPrefixesInput extends React.PureComponent {
             name: this._getFillButtonName(),
             children: <span className={style.zeroFillButton}>00</span>,
           }}
+          {...rest}
         />
       </div>
     )

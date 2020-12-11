@@ -94,8 +94,11 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EndDeviceRegistryClient interface {
 	// Create a new end device within an application.
-	// After creating a device in the EndDeviceRegistry (Identity Server), it still
-	// needs to be created in the NsEndDeviceRegistry, AsEndDeviceRegistry and JsEndDeviceRegistry.
+	//
+	// After registering an end device, it also needs to be registered in
+	// the NsEndDeviceRegistry that is exposed by the Network Server,
+	// the AsEndDeviceRegistry that is exposed by the Application Server,
+	// and the JsEndDeviceRegistry that is exposed by the Join Server.
 	Create(ctx context.Context, in *CreateEndDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
 	// Get the end device with the given identifiers, selecting the fields specified
 	// in the field mask.
@@ -110,8 +113,9 @@ type EndDeviceRegistryClient interface {
 	// Update the OAuth client, changing the fields specified by the field mask to the provided values.
 	Update(ctx context.Context, in *UpdateEndDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
 	// Delete the end device with the given IDs.
-	// Before deleting an end device from the EndDeviceRegistry (the Identity Server),
-	// the device needs to be deleted from the JsEndDeviceRegistry, AsEndDeviceRegistry and NsEndDeviceRegistry.
+	//
+	// Before deleting an end device it first needs to be deleted from the
+	// NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
 	// This is NOT done automatically.
 	Delete(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
@@ -181,8 +185,11 @@ func (c *endDeviceRegistryClient) Delete(ctx context.Context, in *EndDeviceIdent
 // EndDeviceRegistryServer is the server API for EndDeviceRegistry service.
 type EndDeviceRegistryServer interface {
 	// Create a new end device within an application.
-	// After creating a device in the EndDeviceRegistry (Identity Server), it still
-	// needs to be created in the NsEndDeviceRegistry, AsEndDeviceRegistry and JsEndDeviceRegistry.
+	//
+	// After registering an end device, it also needs to be registered in
+	// the NsEndDeviceRegistry that is exposed by the Network Server,
+	// the AsEndDeviceRegistry that is exposed by the Application Server,
+	// and the JsEndDeviceRegistry that is exposed by the Join Server.
 	Create(context.Context, *CreateEndDeviceRequest) (*EndDevice, error)
 	// Get the end device with the given identifiers, selecting the fields specified
 	// in the field mask.
@@ -197,8 +204,9 @@ type EndDeviceRegistryServer interface {
 	// Update the OAuth client, changing the fields specified by the field mask to the provided values.
 	Update(context.Context, *UpdateEndDeviceRequest) (*EndDevice, error)
 	// Delete the end device with the given IDs.
-	// Before deleting an end device from the EndDeviceRegistry (the Identity Server),
-	// the device needs to be deleted from the JsEndDeviceRegistry, AsEndDeviceRegistry and NsEndDeviceRegistry.
+	//
+	// Before deleting an end device it first needs to be deleted from the
+	// NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
 	// This is NOT done automatically.
 	Delete(context.Context, *EndDeviceIdentifiers) (*types.Empty, error)
 }

@@ -26,6 +26,8 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// The GatewayRegistry service, exposed by the Identity Server, is used to manage
+// gateway registrations.
 service GatewayRegistry {
   // Create a new gateway. This also sets the given organization or user as
   // first collaborator with all possible rights.
@@ -83,8 +85,19 @@ service GatewayRegistry {
       delete: "/gateways/{gateway_id}"
     };
   };
+
+  // Purge the gateway. This will release both gateway ID and EUI for reuse.
+  // The gateway owner is responsible for clearing data from any (external) integrations
+  // that may store and expose data by gateway ID.
+  rpc Purge(GatewayIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/gateways/{gateway_id}/purge"
+    };
+  };
 }
 
+// The GatewayAcces service, exposed by the Identity Server, is used to manage
+// API keys and collaborators of gateways.
 service GatewayAccess {
   // List the rights the caller has on this gateway.
   rpc ListRights(GatewayIdentifiers) returns (Rights) {

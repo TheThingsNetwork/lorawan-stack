@@ -14,9 +14,20 @@
 
 import Marshaler from '../util/marshaler'
 
+import ApiKeys from './api-keys'
+
 class Users {
   constructor(registry) {
     this._api = registry
+
+    this.ApiKeys = new ApiKeys(registry.UserAccess, {
+      parentRoutes: {
+        get: 'user_ids.user_id',
+        list: 'user_ids.user_id',
+        create: 'user_ids.user_id',
+        update: 'user_ids.user_id',
+      },
+    })
   }
 
   _addState(fieldMask, user) {
@@ -97,6 +108,16 @@ class Users {
       user,
     })
     return Marshaler.unwrapUser(response)
+  }
+
+  // Miscellaneous.
+
+  async getRightsById(userId) {
+    const result = await this._api.UserAccess.ListRights({
+      routeParams: { user_id: userId },
+    })
+
+    return Marshaler.unwrapRights(result)
   }
 }
 

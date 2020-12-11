@@ -17,29 +17,147 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { ACTIVATION_MODES, parseLorawanMacVersion } from '@console/lib/device-utils'
 
+const factoryPresetFreqNumericTest = frequencies => {
+  return frequencies.every(freq => {
+    if (typeof freq !== 'undefined') {
+      return !isNaN(parseInt(freq))
+    }
+
+    return true
+  })
+}
+
+const factoryPresetFreqRequiredTest = frequencies => {
+  return frequencies.every(freq => typeof freq !== 'undefined' && freq !== '')
+}
+
 const validationSchema = Yup.object({
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
   lorawan_version: Yup.string().required(sharedMessages.validateRequired),
   lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
-  supports_class_c: Yup.boolean().when(['$activationMode'], (mode, schema) => {
+  supports_class_b: Yup.boolean().when(['_device_classes'], (deviceClasses = {}, schema) => {
+    return schema.transform(() => undefined).default(deviceClasses.class_b || false)
+  }),
+  supports_class_c: Yup.boolean().when(['_device_classes'], (deviceClasses = {}, schema) => {
+    return schema.transform(() => undefined).default(deviceClasses.class_c || false)
+  }),
+  _device_classes: Yup.object({
+    class_b: Yup.boolean(),
+    class_c: Yup.boolean(),
+  }).when(['$activationMode'], (mode, schema) => {
     if (mode === ACTIVATION_MODES.MULTICAST) {
-      return schema.oneOf([true], sharedMessages.validateRequired).default(true)
+      return schema.test(
+        'has-class-checked',
+        sharedMessages.validateRequired,
+        classes => !classes || Object.values(classes).some(supportsClass => Boolean(supportsClass)),
+      )
     }
 
-    return schema.default(false)
+    return schema
   }),
   supports_join: Yup.boolean().default(false),
   multicast: Yup.boolean().default(false),
-  mac_settings: Yup.object().when(['$activationMode'], (mode, schema) => {
-    if (mode === ACTIVATION_MODES.ABP) {
-      return schema.shape({
-        resets_f_cnt: Yup.boolean().default(true),
-        supports_32_bit_f_cnt: Yup.boolean().default(true),
+  mac_settings: Yup.object({
+    rx1_delay: Yup.lazy(delay => {
+      if (!Boolean(delay) || delay.value === undefined || delay.value === '') {
+        return Yup.object().strip()
+      }
+
+      return Yup.object().when('$activationMode', {
+        is: ACTIVATION_MODES.ABP,
+        then: schema =>
+          schema.shape({
+            value: Yup.number()
+              .min(1, Yup.passValues(sharedMessages.validateNumberGte))
+              .max(15, Yup.passValues(sharedMessages.validateNumberLte)),
+          }),
+        otherwise: schema => schema.strip(),
       })
-    }
-    return schema.shape({
-      supports_32_bit_f_cnt: Yup.boolean().default(true),
-    })
+    }),
+    rx1_data_rate_offset: Yup.number().when('$activationMode', {
+      is: ACTIVATION_MODES.ABP,
+      then: schema =>
+        schema
+          .min(0, Yup.passValues(sharedMessages.validateNumberGte))
+          .max(7, Yup.passValues(sharedMessages.validateNumberLte)),
+      otherwise: schema => schema.strip(),
+    }),
+    resets_f_cnt: Yup.boolean().when('$activationMode', {
+      is: ACTIVATION_MODES.ABP,
+      then: schema => schema.default(false),
+      otherwise: schema => schema.strip(),
+    }),
+    rx2_data_rate_index: Yup.lazy(dataRate => {
+      if (!Boolean(dataRate) || dataRate.value === '' || dataRate.value === undefined) {
+        return Yup.object().strip()
+      }
+
+      return Yup.object({
+        value: Yup.number()
+          .min(0, Yup.passValues(sharedMessages.validateNumberGte))
+          .max(15, Yup.passValues(sharedMessages.validateNumberLte)),
+      })
+    }),
+    rx2_frequency: Yup.lazy(frequency => {
+      if (frequency === undefined || frequency === '') {
+        return Yup.number().strip()
+      }
+      return Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
+    }),
+    ping_slot_periodicity: Yup.object().when(
+      ['$isClassB', '$activationMode'],
+      (isClassB, mode, schema) => {
+        if (!isClassB && mode !== ACTIVATION_MODES.MULTICAST) {
+          return schema.strip()
+        }
+
+        if (mode !== ACTIVATION_MODES.MULTICAST) {
+          return Yup.lazy(pingSlot => {
+            if (!pingSlot || !pingSlot.value) {
+              return schema.strip()
+            }
+
+            return schema.shape({
+              value: Yup.string(),
+            })
+          })
+        }
+
+        return schema.shape({
+          value: Yup.string().required(sharedMessages.validateRequired),
+        })
+      },
+    ),
+    ping_slot_frequency: Yup.lazy(value => {
+      if (!Boolean(value)) {
+        return Yup.number().strip()
+      }
+
+      return Yup.number().when('$isClassB', {
+        is: true,
+        then: schema => schema.min(100000, Yup.passValues(sharedMessages.validateNumberGte)),
+        otherwise: schema => schema.strip(),
+      })
+    }),
+    factory_preset_frequencies: Yup.lazy(frequencies => {
+      if (!Boolean(frequencies)) {
+        return Yup.array().strip()
+      }
+
+      return Yup.array()
+        .default([])
+        .test(
+          'is-valid-frequency',
+          sharedMessages.validateFreqNumberic,
+          factoryPresetFreqNumericTest,
+        )
+        .test(
+          'is-empty-frequency',
+          sharedMessages.validateFreqRequired,
+          factoryPresetFreqRequiredTest,
+        )
+    }),
+    supports_32_bit_f_cnt: Yup.boolean().default(true),
   }),
   session: Yup.object().when(
     ['lorawan_version', '$activationMode'],

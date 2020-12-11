@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Fragment } from 'react'
+import React from 'react'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
 import { withRouter } from 'react-router-dom'
 
+import Dropdown from '@ttn-lw/components/dropdown'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -65,6 +66,7 @@ export class SideNavigationItem extends React.PureComponent {
 
   handleExpandCollapsableItem() {
     this.setState({ isExpanded: !this.state.isExpanded })
+    document.activeElement.blur()
   }
 
   componentDidMount() {
@@ -85,8 +87,14 @@ export class SideNavigationItem extends React.PureComponent {
     }
   }
 
+  handleItemClick = event => {
+    if (event && event.target) {
+      event.target.blur()
+    }
+  }
+
   render() {
-    const { className, children, title, depth, icon, path, exact, isActive } = this.props
+    const { className, children, title, depth, icon, path, exact, isActive, location } = this.props
     const { isExpanded } = this.state
     const { isMinimized, onLeafItemClick } = this.context
 
@@ -106,6 +114,8 @@ export class SideNavigationItem extends React.PureComponent {
             isExpanded={isExpanded}
             isMinimized={isMinimized}
             children={children}
+            currentPathName={location.pathname}
+            onDropdownItemsClick={this.handleItemClick}
           />
         ) : (
           <LinkItem
@@ -115,6 +125,7 @@ export class SideNavigationItem extends React.PureComponent {
             exact={exact}
             path={path}
             depth={depth}
+            onDropdownItemsClick={this.handleItemClick}
           />
         )}
       </li>
@@ -127,69 +138,105 @@ const CollapsableItem = ({
   onClick,
   isActive,
   isExpanded,
-  isMinimized,
   title,
   icon,
   depth,
-}) => (
-  <Fragment>
-    <button
-      className={classnames(style.button, {
-        [style.buttonActive]: isActive,
-      })}
-      type="button"
-      data-hook="side-nav-item-button"
-      onClick={onClick}
-    >
-      {icon && <Icon icon={icon} className={style.icon} />}
-      <Message content={title} className={style.message} />
-      <Icon
-        icon="keyboard_arrow_down"
-        className={classnames(style.expandIcon, {
-          [style.expandIconOpen]: isExpanded,
+  currentPathName,
+  onDropdownItemsClick,
+}) => {
+  const subItems = children.map(item => {
+    return {
+      title: item.props.title,
+      path: item.props.path,
+      icon: item.props.icon,
+    }
+  })
+
+  const subItemActive = subItems.some(item => item.path === currentPathName)
+
+  return (
+    <>
+      <button
+        className={classnames(style.button, {
+          [style.buttonActive]: isActive,
+          [style.linkActive]: subItemActive,
         })}
-      />
-    </button>
-    <SideNavigationList isMinimized={isMinimized} depth={depth + 1} isExpanded={isExpanded}>
-      {children}
-    </SideNavigationList>
-  </Fragment>
-)
+        type="button"
+        onClick={onClick}
+      >
+        {icon && <Icon icon={icon} className={style.icon} />}
+        <Message content={title} className={style.message} />
+        <Icon
+          icon="keyboard_arrow_down"
+          className={classnames(style.expandIcon, {
+            [style.expandIconOpen]: isExpanded,
+          })}
+        />
+      </button>
+      <Dropdown className={style.flyOutList} onItemsClick={onDropdownItemsClick}>
+        <Dropdown.HeaderItem title={title.defaultMessage} />
+        {subItems.map(item => (
+          <Dropdown.Item key={item.path} title={item.title} path={item.path} icon={item.icon} />
+        ))}
+      </Dropdown>
+      <SideNavigationList depth={depth + 1} isExpanded={isExpanded} className={style.subItems}>
+        {children}
+      </SideNavigationList>
+    </>
+  )
+}
 
 CollapsableItem.propTypes = {
   children: PropTypes.node,
+  currentPathName: PropTypes.string.isRequired,
   depth: PropTypes.number.isRequired,
   icon: PropTypes.string,
   isActive: PropTypes.bool.isRequired,
   isExpanded: PropTypes.bool.isRequired,
-  isMinimized: PropTypes.bool,
   onClick: PropTypes.func.isRequired,
+  onDropdownItemsClick: PropTypes.func,
   title: PropTypes.message.isRequired,
 }
 
 CollapsableItem.defaultProps = {
   children: undefined,
   icon: undefined,
-  isMinimized: false,
+  onDropdownItemsClick: () => null,
 }
 
-const LinkItem = ({ onClick, title, icon, exact, path }) => (
-  <NavigationLink
-    onClick={onClick}
-    className={style.link}
-    activeClassName={style.linkActive}
-    exact={exact}
-    path={path}
-  >
-    {icon && <Icon icon={icon} className={style.icon} />}
-    <Message content={title} className={style.message} />
-  </NavigationLink>
-)
+const LinkItem = ({ onClick, title, icon, exact, path, onDropdownItemsClick }) => {
+  const handleLinkItemClick = React.useCallback(
+    event => {
+      document.activeElement.blur()
+      onClick(event)
+    },
+    [onClick],
+  )
+
+  return (
+    <>
+      <NavigationLink
+        onClick={handleLinkItemClick}
+        className={style.link}
+        activeClassName={style.linkActive}
+        exact={exact}
+        path={path}
+      >
+        {icon && <Icon icon={icon} className={style.icon} />}
+        <Message content={title} className={style.message} />
+      </NavigationLink>
+      <Dropdown className={style.flyOutList} onItemsClick={onDropdownItemsClick}>
+        <Dropdown.Item title={title} path={path} showActive={false} icon={''} tabIndex="-1" />
+      </Dropdown>
+    </>
+  )
+}
 
 LinkItem.propTypes = {
   exact: PropTypes.bool.isRequired,
   icon: PropTypes.string,
   onClick: PropTypes.func,
+  onDropdownItemsClick: PropTypes.func,
   path: PropTypes.string,
   title: PropTypes.message.isRequired,
 }
@@ -198,6 +245,7 @@ LinkItem.defaultProps = {
   icon: undefined,
   path: undefined,
   onClick: () => null,
+  onDropdownItemsClick: () => null,
 }
 
 export default withRouter(bind(SideNavigationItem))

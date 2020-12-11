@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,11 +47,18 @@ var (
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
+	evtPurgeOrganization = events.Define(
+		"organization.purge", "purge organization",
+		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
 )
 
 var (
 	errNestedOrganizations       = errors.DefineInvalidArgument("nested_organizations", "organizations can not be nested")
 	errAdminsCreateOrganizations = errors.DefinePermissionDenied("admins_create_organizations", "organizations may only be created by admins")
+	errAdminsPurgeOrganizations  = errors.DefinePermissionDenied("admins_purge_organizations", "organizations may only be purged by admins")
 )
 
 func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.CreateOrganizationRequest) (org *ttnpb.Organization, err error) {
@@ -243,6 +250,33 @@ func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.Org
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) purgeOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
+	if !is.IsAdmin(ctx) {
+		return nil, errAdminsPurgeOrganizations
+	}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		err := store.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)
+		if err != nil {
+			return err
+		}
+		// Delete related API keys before purging the organization.
+		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids)
+		if err != nil {
+			return err
+		}
+		err = store.GetMembershipStore(db).DeleteAccountMembers(ctx, ids.GetOrganizationOrUserIdentifiers())
+		if err != nil {
+			return err
+		}
+		return store.GetOrganizationStore(db).PurgeOrganization(ctx, ids)
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtPurgeOrganization.NewWithIdentifiersAndData(ctx, ids, nil))
+	return ttnpb.Empty, nil
+}
+
 type organizationRegistry struct {
 	*IdentityServer
 }
@@ -265,4 +299,8 @@ func (or *organizationRegistry) Update(ctx context.Context, req *ttnpb.UpdateOrg
 
 func (or *organizationRegistry) Delete(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
 	return or.deleteOrganization(ctx, req)
+}
+
+func (or *organizationRegistry) Purge(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
+	return or.purgeOrganization(ctx, req)
 }

@@ -45,7 +45,7 @@ const m = defineMessages({
 
 @withEnv
 @connect(
-  function(state) {
+  state => {
     const userId = selectUserId(state)
 
     return { userId }

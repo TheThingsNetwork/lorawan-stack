@@ -56,7 +56,7 @@ func reportError(ctx context.Context, method string, err error) {
 	errEvent.Tags["grpc.method"] = method
 	errEvent.Tags["grpc.code"] = code.String()
 	if md, ok := metadata.FromOutgoingContext(ctx); ok {
-		if requestID := md["request-id"]; len(requestID) > 0 {
+		if requestID := md["x-request-id"]; len(requestID) > 0 {
 			errEvent.Tags["grpc.request_id"] = requestID[0]
 		}
 		for k, v := range md {
@@ -67,7 +67,7 @@ func reportError(ctx context.Context, method string, err error) {
 		}
 	}
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		if requestID := md["request-id"]; len(requestID) > 0 {
+		if requestID := md["x-request-id"]; len(requestID) > 0 {
 			errEvent.Tags["grpc.request_id"] = requestID[0]
 		}
 		for k, v := range md {
@@ -79,7 +79,7 @@ func reportError(ctx context.Context, method string, err error) {
 	}
 	for k, v := range grpc_ctxtags.Extract(ctx).Values() {
 		if val := fmt.Sprint(v); len(val) < 64 {
-			errEvent.Tags["tag."+k] = val
+			errEvent.Tags[k] = val
 		}
 	}
 

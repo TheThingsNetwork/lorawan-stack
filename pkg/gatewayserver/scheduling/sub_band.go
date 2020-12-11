@@ -76,16 +76,8 @@ func NewSubBand(params SubBandParameters, clock Clock, ceilings DutyCycleCeiling
 
 func (sb *SubBand) gc(to ConcentratorTime) {
 	sb.mu.Lock()
-	expired := 0
-	for _, em := range sb.emissions {
-		if em.Ends() < to {
-			expired++
-		} else {
-			break
-		}
-	}
-	sb.emissions = sb.emissions[expired:]
-	sb.mu.Unlock()
+	defer sb.mu.Unlock()
+	sb.emissions = sb.emissions.GreaterThan(to)
 }
 
 // Comprises returns whether the given frequency falls in the sub-band.

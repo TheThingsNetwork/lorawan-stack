@@ -119,6 +119,7 @@ func (f accessFetcher) ApplicationRights(ctx context.Context, appID ttnpb.Applic
 	if err != nil {
 		return nil, err
 	}
+	ctx = rpcmetadata.WithForwardedRequestID(ctx)
 	rights, err := ttnpb.NewApplicationAccessClient(cc).ListRights(ctx, &appID, callOpt)
 	registerRightsFetch(ctx, "application", rights, err)
 	if err != nil {
@@ -136,6 +137,7 @@ func (f accessFetcher) ClientRights(ctx context.Context, clientID ttnpb.ClientId
 	if err != nil {
 		return nil, err
 	}
+	ctx = rpcmetadata.WithForwardedRequestID(ctx)
 	rights, err := ttnpb.NewClientAccessClient(cc).ListRights(ctx, &clientID, callOpt)
 	registerRightsFetch(ctx, "client", rights, err)
 	if err != nil {
@@ -153,6 +155,7 @@ func (f accessFetcher) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayIde
 	if err != nil {
 		return nil, err
 	}
+	ctx = rpcmetadata.WithForwardedRequestID(ctx)
 	rights, err := ttnpb.NewGatewayAccessClient(cc).ListRights(ctx, &gtwID, callOpt)
 	registerRightsFetch(ctx, "gateway", rights, err)
 	if err != nil {
@@ -170,6 +173,7 @@ func (f accessFetcher) OrganizationRights(ctx context.Context, orgID ttnpb.Organ
 	if err != nil {
 		return nil, err
 	}
+	ctx = rpcmetadata.WithForwardedRequestID(ctx)
 	rights, err := ttnpb.NewOrganizationAccessClient(cc).ListRights(ctx, &orgID, callOpt)
 	registerRightsFetch(ctx, "organization", rights, err)
 	if err != nil {
@@ -187,6 +191,7 @@ func (f accessFetcher) UserRights(ctx context.Context, userID ttnpb.UserIdentifi
 	if err != nil {
 		return nil, err
 	}
+	ctx = rpcmetadata.WithForwardedRequestID(ctx)
 	rights, err := ttnpb.NewUserAccessClient(cc).ListRights(ctx, &userID, callOpt)
 	registerRightsFetch(ctx, "user", rights, err)
 	if err != nil {

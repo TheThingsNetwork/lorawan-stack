@@ -72,7 +72,7 @@ $ tools/bin/mage dev:initStack
 
 This creates a database, migrates tables and creates a user `admin` with password `admin`.
 
-4. Start an development instance of The Things Stack
+4. Start a development instance of The Things Stack
 
 ```bash
 $ go run ./cmd/ttn-lw-stack -c ./config/stack/ttn-lw-stack.yml start
@@ -139,16 +139,22 @@ You can use `go run ./cmd/ttn-lw-stack start` to start The Things Stack.
 
 Most data is stored as base64-encoded protocol buffers. For debugging purposes it is often useful to inspect or update the stored database models - you can use Redis codec tool located at `./pkg/redis/codec` to decode/encode them to/from JSON.
 
-##### Example
+##### Examples
 
-###### Get and decode
-```
-redis-cli get "ttn:v3:ns:devices:uid:test-app:test-dev" | go run ./pkg/redis/codec -type 'ttnpb.EndDevice'
+###### Get and Decode
+
+```bash
+$ redis-cli get "ttn:v3:ns:devices:uid:test-app:test-dev" | go run ./pkg/redis/codec -type 'ttnpb.EndDevice'
 ```
 
-###### Get, decode, modify, encode and set
+###### Get, Decode, Modify, Encode and Set
+
 ```
-redis-cli get "ttn:v3:ns:devices:uid:test-app.test-dev" | go run ./pkg/redis/codec -type 'ttnpb.EndDevice' | jq '.supports_join = false' | go run ./pkg/redis/codec -type 'ttnpb.EndDevice' -encode | redis-cli -x set "ttn:v3:ns:devices:uid:test-app.test-dev"
+$ redis-cli get "ttn:v3:ns:devices:uid:test-app.test-dev" \
+  | go run ./pkg/redis/codec -type 'ttnpb.EndDevice' \
+  | jq '.supports_join = false' \
+  | go run ./pkg/redis/codec -type 'ttnpb.EndDevice' -encode \
+  | redis-cli -x set "ttn:v3:ns:devices:uid:test-app.test-dev"
 ```
 
 ## Project Structure

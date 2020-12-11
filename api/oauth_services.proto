@@ -22,22 +22,28 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// The OAuthAuthorizationRegistry service, exposed by the Identity Server,
+// is used to manage OAuth client authorizations for users.
 service OAuthAuthorizationRegistry {
+  // List OAuth clients that are authorized by the user.
   rpc List(ListOAuthClientAuthorizationsRequest) returns (OAuthClientAuthorizations) {
     option (google.api.http) = {
       get: "/users/{user_ids.user_id}/authorizations"
     };
   }
+  // List OAuth access tokens issued to the OAuth client on behalf of the user.
   rpc ListTokens(ListOAuthAccessTokensRequest) returns (OAuthAccessTokens) {
     option (google.api.http) = {
       get: "/users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens"
     };
   }
+  // Delete (de-authorize) an OAuth client for the user.
   rpc Delete(OAuthClientAuthorizationIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/users/{user_ids.user_id}/authorizations/{client_ids.client_id}"
     };
   }
+  // Delete (invalidate) an OAuth access token.
   rpc DeleteToken(OAuthAccessTokenIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens/{id}"

@@ -98,3 +98,16 @@ func (ems Emissions) Insert(em Emission) Emissions {
 	}
 	return append(ems, em)
 }
+
+// GreaterThan returns a new list of emissions that have not ended relative to the provided time.
+func (ems Emissions) GreaterThan(to ConcentratorTime) Emissions {
+	expired := 0
+	for _, em := range ems {
+		if em.Ends() < to {
+			expired++
+		} else {
+			break
+		}
+	}
+	return append(ems[:0:0], ems[expired:]...)
+}

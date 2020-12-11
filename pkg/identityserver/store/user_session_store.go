@@ -157,3 +157,13 @@ func (s *userSessionStore) DeleteSession(ctx context.Context, userIDs *ttnpb.Use
 	query := s.query(ctx, UserSession{}).Where(UserSession{Model: Model{ID: sessionID}, UserID: user.PrimaryKey()})
 	return query.Delete(&UserSession{}).Error
 }
+
+func (s *userSessionStore) DeleteAllUserSessions(ctx context.Context, userIDs *ttnpb.UserIdentifiers) error {
+	defer trace.StartRegion(ctx, "delete all user sessions").End()
+	user, err := s.findDeletedEntity(ctx, userIDs, "id")
+	if err != nil {
+		return err
+	}
+	query := s.query(ctx, UserSession{}).Where(UserSession{UserID: user.PrimaryKey()})
+	return query.Delete(&UserSession{}).Error
+}

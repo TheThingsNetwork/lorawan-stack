@@ -41,6 +41,7 @@ func applicationIDFlags() *pflag.FlagSet {
 }
 
 var errNoApplicationID = errors.DefineInvalidArgument("no_application_id", "no application ID set")
+var errNoConfirmation = errors.DefineInvalidArgument("no_confirmation", "action not confirmed")
 
 func getApplicationID(flagSet *pflag.FlagSet, args []string) *ttnpb.ApplicationIdentifiers {
 	var applicationID string
@@ -251,6 +252,35 @@ var (
 		}
 		return appID.EntityIdentifiers(), nil
 	})
+	applicationsPurgeCommand = &cobra.Command{
+		Use:     "purge [application-id]",
+		Aliases: []string{"permanent-delete", "hard-delete"},
+		Short:   "Purge an application",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			appID := getApplicationID(cmd.Flags(), args)
+			if appID == nil {
+				return errNoApplicationID
+			}
+
+			force, err := cmd.Flags().GetBool("force")
+			if err != nil {
+				return err
+			}
+			if !confirmChoice(applicationPurgeWarning, force) {
+				return errNoConfirmation
+			}
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewApplicationRegistryClient(is).Purge(ctx, appID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
 )
 
 func init() {
@@ -281,5 +311,8 @@ func init() {
 	applicationsCommand.AddCommand(applicationsDeleteCommand)
 	applicationsContactInfoCommand.PersistentFlags().AddFlagSet(applicationIDFlags())
 	applicationsCommand.AddCommand(applicationsContactInfoCommand)
+	applicationsPurgeCommand.Flags().AddFlagSet(applicationIDFlags())
+	applicationsPurgeCommand.Flags().AddFlagSet(forceFlags())
+	applicationsCommand.AddCommand(applicationsPurgeCommand)
 	Root.AddCommand(applicationsCommand)
 }

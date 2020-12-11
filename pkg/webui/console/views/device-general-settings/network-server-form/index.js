@@ -16,14 +16,15 @@ import React from 'react'
 
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
-import Checkbox from '@ttn-lw/components/checkbox'
 import Input from '@ttn-lw/components/input'
 import Radio from '@ttn-lw/components/radio-button'
 import Select from '@ttn-lw/components/select'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
+import Checkbox from '@ttn-lw/components/checkbox'
 
 import PhyVersionInput from '@console/components/phy-version-input'
+import MacSettingsSection from '@console/components/mac-settings-section'
 
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import DevAddrInput from '@console/containers/dev-addr-input'
@@ -35,11 +36,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import {
   parseLorawanMacVersion,
   ACTIVATION_MODES,
-  FRAME_WIDTH_COUNT,
   LORAWAN_VERSIONS,
   generate16BytesKey,
-  fCntWidthEncode,
-  fCntWidthDecode,
 } from '@console/lib/device-utils'
 
 import messages from '../messages'
@@ -55,6 +53,7 @@ import validationSchema from './validation-schema'
 
 const NetworkServerForm = React.memo(props => {
   const { device, onSubmit, onSubmitSuccess, mayEditKeys, mayReadKeys } = props
+  const { multicast = false, supports_join = false, supports_class_b = false } = device
 
   const isABP = isDeviceABP(device)
   const isMulticast = isDeviceMulticast(device)
@@ -63,12 +62,22 @@ const NetworkServerForm = React.memo(props => {
   const formRef = React.useRef(null)
 
   const [error, setError] = React.useState('')
-  const [resetsFCnt, setResetsFCnt] = React.useState(
-    (isABP && device.mac_settings && device.mac_settings.resets_f_cnt) || false,
-  )
 
   const [lorawanVersion, setLorawanVersion] = React.useState(device.lorawan_version)
   const lwVersion = parseLorawanMacVersion(lorawanVersion)
+
+  const [isClassB, setClassB] = React.useState(supports_class_b)
+  const handleClassBChange = React.useCallback(evt => {
+    const { checked } = evt.target
+
+    setClassB(checked)
+  }, [])
+
+  const initialActivationMode = supports_join
+    ? ACTIVATION_MODES.OTAA
+    : multicast
+    ? ACTIVATION_MODES.MULTICAST
+    : ACTIVATION_MODES.ABP
 
   const validationContext = React.useMemo(
     () => ({
@@ -80,32 +89,33 @@ const NetworkServerForm = React.memo(props => {
     [device, mayEditKeys, mayReadKeys],
   )
 
-  const initialValues = React.useMemo(() => {
-    const { multicast = false, supports_join = false } = device
-
-    let _activation_mode = ACTIVATION_MODES.ABP
-    if (supports_join) {
-      _activation_mode = ACTIVATION_MODES.OTAA
-    } else if (multicast) {
-      _activation_mode = ACTIVATION_MODES.MULTICAST
-    }
-
-    const values = {
-      ...device,
-      _activation_mode,
-    }
-
-    return validationSchema.cast(values, { context: validationContext })
-  }, [device, validationContext])
+  const initialValues = React.useMemo(
+    () =>
+      validationSchema.cast(
+        {
+          ...device,
+          _activation_mode: initialActivationMode,
+          _device_classes: { class_b: device.supports_class_b, class_c: device.supports_class_c },
+        },
+        { context: validationContext },
+      ),
+    [device, initialActivationMode, validationContext],
+  )
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
       const castedValues = validationSchema.cast(values, { context: validationContext })
-      const updatedValues = diff(initialValues, castedValues, ['_activation_mode'])
+      const updatedValues = diff(initialValues, castedValues, [
+        '_activation_mode',
+        'class_b',
+        'class_c',
+        'mac_settings',
+      ])
 
       setError('')
       try {
-        await onSubmit(updatedValues)
+        // Always submit current `mac_settings` values to avoid overwriting nested entries.
+        await onSubmit({ ...updatedValues, mac_settings: castedValues.mac_settings })
         resetForm({ values: castedValues })
         onSubmitSuccess()
       } catch (err) {
@@ -115,12 +125,6 @@ const NetworkServerForm = React.memo(props => {
     },
     [initialValues, onSubmit, onSubmitSuccess, validationContext],
   )
-
-  const handleResetsFCntChange = React.useCallback(evt => {
-    const { checked } = evt.target
-
-    setResetsFCnt(checked)
-  }, [])
 
   const handleVersionChange = React.useCallback(
     version => {
@@ -199,19 +203,17 @@ const NetworkServerForm = React.memo(props => {
       />
       <NsFrequencyPlansSelect name="frequency_plan_id" required />
       <Form.Field
-        title={sharedMessages.supportsClassC}
-        name="supports_class_c"
-        component={Checkbox}
-      />
-      <Form.Field
-        title={sharedMessages.frameCounterWidth}
-        name="mac_settings.supports_32_bit_f_cnt"
-        component={Radio.Group}
-        encode={fCntWidthEncode}
-        decode={fCntWidthDecode}
+        title={sharedMessages.lorawanClassCapabilities}
+        name="_device_classes"
+        component={Checkbox.Group}
+        required={isMulticast}
       >
-        <Radio label={sharedMessages['16Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_16_BIT} />
-        <Radio label={sharedMessages['32Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_32_BIT} />
+        <Checkbox
+          name="class_b"
+          label={sharedMessages.supportsClassB}
+          onChange={handleClassBChange}
+        />
+        <Checkbox name="class_c" label={sharedMessages.supportsClassC} />
       </Form.Field>
       <Form.Field
         title={sharedMessages.activationMode}
@@ -227,15 +229,6 @@ const NetworkServerForm = React.memo(props => {
       </Form.Field>
       {(isABP || isMulticast || isJoinedOTAA) && (
         <>
-          {!isMulticast && !isJoinedOTAA && (
-            <Form.Field
-              title={sharedMessages.resetsFCnt}
-              onChange={handleResetsFCntChange}
-              warning={resetsFCnt ? sharedMessages.resetWarning : undefined}
-              name="mac_settings.resets_f_cnt"
-              component={Checkbox}
-            />
-          )}
           {showResetNotification && <Notification content={messages.keysResetWarning} info small />}
           <DevAddrInput
             title={sharedMessages.devAddr}
@@ -290,6 +283,7 @@ const NetworkServerForm = React.memo(props => {
           )}
         </>
       )}
+      <MacSettingsSection activationMode={initialActivationMode} isClassB={isClassB} />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
       </SubmitBar>
