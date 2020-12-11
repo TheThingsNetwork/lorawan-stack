@@ -65,8 +65,11 @@ type Gateway struct {
 
 	Antennas []GatewayAntenna
 
-	LBSLNSSecret            []byte `gorm:"type:BYTEA;column:lbs_lns_secret"`
-	ClaimAuthenticationCode []byte `gorm:"type:BYTEA;column:claim_authentication_code"`
+	LBSLNSSecret []byte `gorm:"type:BYTEA;column:lbs_lns_secret"`
+
+	ClaimAuthenticationCodeSecret    []byte `gorm:"type:BYTEA"`
+	ClaimAuthenticationCodeValidFrom *time.Time
+	ClaimAuthenticationCodeValidTo   *time.Time
 }
 
 func init() {
@@ -134,14 +137,18 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 		}
 	},
 	claimAuthenticationCodeField: func(pb *ttnpb.Gateway, gtw *Gateway) {
-		blocks := bytes.SplitN(gtw.ClaimAuthenticationCode, secretFieldSeparator, 2)
+		blocks := bytes.SplitN(gtw.ClaimAuthenticationCodeSecret, secretFieldSeparator, 2)
+		var secret *ttnpb.Secret
 		if len(blocks) == 2 {
-			pb.ClaimAuthenticationCode = &ttnpb.Secret{
+			secret = &ttnpb.Secret{
 				KeyID: string(blocks[0]),
 				Value: blocks[1],
 			}
-		} else {
-			pb.ClaimAuthenticationCode = nil
+		}
+		pb.ClaimAuthenticationCode = &ttnpb.GatewayClaimAuthenticationCode{
+			Secret:    secret,
+			ValidFrom: gtw.ClaimAuthenticationCodeValidFrom,
+			ValidTo:   gtw.ClaimAuthenticationCodeValidTo,
 		}
 	},
 }
@@ -205,14 +212,21 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 		}
 	},
 	claimAuthenticationCodeField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		// This allows the setting of individual fields while retaining values of other fields.
 		if pb.ClaimAuthenticationCode != nil {
-			var secretBuffer bytes.Buffer
-			secretBuffer.WriteString(pb.ClaimAuthenticationCode.KeyID)
-			secretBuffer.Write(secretFieldSeparator)
-			secretBuffer.Write(pb.ClaimAuthenticationCode.Value)
-			gtw.ClaimAuthenticationCode = secretBuffer.Bytes()
-		} else {
-			gtw.ClaimAuthenticationCode = nil
+			if pb.ClaimAuthenticationCode.Secret != nil {
+				var secretBuffer bytes.Buffer
+				secretBuffer.WriteString(pb.ClaimAuthenticationCode.Secret.KeyID)
+				secretBuffer.Write(secretFieldSeparator)
+				secretBuffer.Write(pb.ClaimAuthenticationCode.Secret.Value)
+				gtw.ClaimAuthenticationCodeSecret = secretBuffer.Bytes()
+			}
+			if pb.ClaimAuthenticationCode.ValidFrom != nil {
+				gtw.ClaimAuthenticationCodeValidFrom = pb.ClaimAuthenticationCode.ValidFrom
+			}
+			if pb.ClaimAuthenticationCode.ValidTo != nil {
+				gtw.ClaimAuthenticationCodeValidTo = pb.ClaimAuthenticationCode.ValidTo
+			}
 		}
 	},
 }
@@ -237,7 +251,7 @@ var gatewayColumnNames = map[string][]string{
 	attributesField:               {},
 	autoUpdateField:               {autoUpdateField},
 	brandIDField:                  {"brand_id"},
-	claimAuthenticationCodeField:  {claimAuthenticationCodeField},
+	claimAuthenticationCodeField:  {"claim_authentication_code_secret", "claim_authentication_code_valid_from", "claim_authentication_code_valid_to"},
 	contactInfoField:              {},
 	descriptionField:              {descriptionField},
 	downlinkPathConstraintField:   {downlinkPathConstraintField},

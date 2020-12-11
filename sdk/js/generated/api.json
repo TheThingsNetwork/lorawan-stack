@@ -11032,7 +11032,7 @@
           "name": "Gateway",
           "longName": "Gateway",
           "fullName": "ttn.lorawan.v3.Gateway",
-          "description": "Gateway is the message that defines a gateway on the network.\nAll fields of the type `Secret` require RIGHT_GATEWAY_READ_SECRETS for read and RIGHT_GATEWAY_WRITE_SECRETS for update operations.",
+          "description": "Gateway is the message that defines a gateway on the network.",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
@@ -11329,7 +11329,7 @@
             },
             {
               "name": "lbs_lns_secret",
-              "description": "The LoRa Basics Station LNS secret.\nThis is either an auth token (such as an API Key) or a TLS private certificate.",
+              "description": "The LoRa Basics Station LNS secret.\nThis is either an auth token (such as an API Key) or a TLS private certificate.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.",
               "label": "",
               "type": "Secret",
               "longType": "Secret",
@@ -11339,11 +11339,11 @@
             },
             {
               "name": "claim_authentication_code",
-              "description": "The authentication code for gateway claiming.\n\nnext: 24",
+              "description": "The authentication code for gateway claiming.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.\n\nnext: 24",
               "label": "",
-              "type": "Secret",
-              "longType": "Secret",
-              "fullType": "ttn.lorawan.v3.Secret",
+              "type": "GatewayClaimAuthenticationCode",
+              "longType": "GatewayClaimAuthenticationCode",
+              "fullType": "ttn.lorawan.v3.GatewayClaimAuthenticationCode",
               "ismap": false,
               "defaultValue": ""
             }
@@ -11527,28 +11527,20 @@
           "name": "GatewayClaimAuthenticationCode",
           "longName": "GatewayClaimAuthenticationCode",
           "fullName": "ttn.lorawan.v3.GatewayClaimAuthenticationCode",
-          "description": "Authentication code for claiming gateways.",
+          "description": "Authentication code for claiming gateways.\n`valid_from` and `valid_to` are used as UTC timestamps.",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
           "fields": [
             {
-              "name": "value",
+              "name": "secret",
               "description": "",
               "label": "",
-              "type": "bytes",
-              "longType": "bytes",
-              "fullType": "bytes",
+              "type": "Secret",
+              "longType": "Secret",
+              "fullType": "ttn.lorawan.v3.Secret",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "bytes.max_len",
-                    "value": 2048
-                  }
-                ]
-              }
+              "defaultValue": ""
             },
             {
               "name": "valid_from",

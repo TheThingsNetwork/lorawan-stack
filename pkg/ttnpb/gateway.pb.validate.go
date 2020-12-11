@@ -587,12 +587,15 @@ func (m *GatewayClaimAuthenticationCode) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "value":
+		case "secret":
 
-			if len(m.GetValue()) > 2048 {
-				return GatewayClaimAuthenticationCodeValidationError{
-					field:  "value",
-					reason: "value length must be at most 2048 bytes",
+			if v, ok := interface{}(m.GetSecret()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewayClaimAuthenticationCodeValidationError{
+						field:  "secret",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
 				}
 			}
 

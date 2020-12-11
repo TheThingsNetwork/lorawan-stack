@@ -288,14 +288,30 @@ func (dst *GatewayVersion) SetFields(src *GatewayVersion, paths ...string) error
 func (dst *GatewayClaimAuthenticationCode) SetFields(src *GatewayClaimAuthenticationCode, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "value":
+		case "secret":
 			if len(subs) > 0 {
-				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Value = src.Value
+				var newDst, newSrc *Secret
+				if (src == nil || src.Secret == nil) && dst.Secret == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Secret
+				}
+				if dst.Secret != nil {
+					newDst = dst.Secret
+				} else {
+					newDst = &Secret{}
+					dst.Secret = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
 			} else {
-				dst.Value = nil
+				if src != nil {
+					dst.Secret = src.Secret
+				} else {
+					dst.Secret = nil
+				}
 			}
 		case "valid_from":
 			if len(subs) > 0 {
@@ -574,7 +590,7 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 			}
 		case "claim_authentication_code":
 			if len(subs) > 0 {
-				var newDst, newSrc *Secret
+				var newDst, newSrc *GatewayClaimAuthenticationCode
 				if (src == nil || src.ClaimAuthenticationCode == nil) && dst.ClaimAuthenticationCode == nil {
 					continue
 				}
@@ -584,7 +600,7 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 				if dst.ClaimAuthenticationCode != nil {
 					newDst = dst.ClaimAuthenticationCode
 				} else {
-					newDst = &Secret{}
+					newDst = &GatewayClaimAuthenticationCode{}
 					dst.ClaimAuthenticationCode = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {

@@ -2838,7 +2838,6 @@ The Events service serves events from the cluster.
 ### <a name="ttn.lorawan.v3.Gateway">Message `Gateway`</a>
 
 Gateway is the message that defines a gateway on the network.
-All fields of the type `Secret` require RIGHT_GATEWAY_READ_SECRETS for read and RIGHT_GATEWAY_WRITE_SECRETS for update operations.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -2863,8 +2862,8 @@ All fields of the type `Secret` require RIGHT_GATEWAY_READ_SECRETS for read and 
 | `downlink_path_constraint` | [`DownlinkPathConstraint`](#ttn.lorawan.v3.DownlinkPathConstraint) |  |  |
 | `schedule_anytime_delay` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite. |
 | `update_location_from_status` | [`bool`](#bool) |  | Update the location of this gateway from status messages. This only works for gateways connecting with authentication; gateways connected over UDP are not supported. |
-| `lbs_lns_secret` | [`Secret`](#ttn.lorawan.v3.Secret) |  | The LoRa Basics Station LNS secret. This is either an auth token (such as an API Key) or a TLS private certificate. |
-| `claim_authentication_code` | [`Secret`](#ttn.lorawan.v3.Secret) |  | The authentication code for gateway claiming.
+| `lbs_lns_secret` | [`Secret`](#ttn.lorawan.v3.Secret) |  | The LoRa Basics Station LNS secret. This is either an auth token (such as an API Key) or a TLS private certificate. Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value. |
+| `claim_authentication_code` | [`GatewayClaimAuthenticationCode`](#ttn.lorawan.v3.GatewayClaimAuthenticationCode) |  | The authentication code for gateway claiming. Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
 
 next: 24 |
 
@@ -2925,18 +2924,13 @@ GatewayAntenna is the message that defines a gateway antenna.
 ### <a name="ttn.lorawan.v3.GatewayClaimAuthenticationCode">Message `GatewayClaimAuthenticationCode`</a>
 
 Authentication code for claiming gateways.
+`valid_from` and `valid_to` are used as UTC timestamps.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `value` | [`bytes`](#bytes) |  |  |
+| `secret` | [`Secret`](#ttn.lorawan.v3.Secret) |  |  |
 | `valid_from` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `valid_to` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `value` | <p>`bytes.max_len`: `2048`</p> |
 
 ### <a name="ttn.lorawan.v3.GatewayConnectionStats">Message `GatewayConnectionStats`</a>
 

@@ -11375,14 +11375,14 @@
         },
         "lbs_lns_secret": {
           "$ref": "#/definitions/v3Secret",
-          "description": "The LoRa Basics Station LNS secret.\nThis is either an auth token (such as an API Key) or a TLS private certificate."
+          "description": "The LoRa Basics Station LNS secret.\nThis is either an auth token (such as an API Key) or a TLS private certificate.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value."
         },
         "claim_authentication_code": {
-          "$ref": "#/definitions/v3Secret",
-          "description": "The authentication code for gateway claiming."
+          "$ref": "#/definitions/v3GatewayClaimAuthenticationCode",
+          "description": "The authentication code for gateway claiming.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value."
         }
       },
-      "description": "Gateway is the message that defines a gateway on the network.\nAll fields of the type `Secret` require RIGHT_GATEWAY_READ_SECRETS for read and RIGHT_GATEWAY_WRITE_SECRETS for update operations."
+      "description": "Gateway is the message that defines a gateway on the network."
     },
     "v3GatewayAntenna": {
       "type": "object",
@@ -11416,6 +11416,23 @@
           "format": "int64"
         }
       }
+    },
+    "v3GatewayClaimAuthenticationCode": {
+      "type": "object",
+      "properties": {
+        "secret": {
+          "$ref": "#/definitions/v3Secret"
+        },
+        "valid_from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "valid_to": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Authentication code for claiming gateways.\n`valid_from` and `valid_to` are used as UTC timestamps."
     },
     "v3GatewayConnectionStats": {
       "type": "object",

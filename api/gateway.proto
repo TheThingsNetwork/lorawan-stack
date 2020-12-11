@@ -81,16 +81,14 @@ message GatewayVersion {
 }
 
 // Authentication code for claiming gateways.
+// `valid_from` and `valid_to` are used as UTC timestamps.
 message GatewayClaimAuthenticationCode {
-  option (gogoproto.populate) = false;
-
-  bytes value = 1[(validate.rules).bytes = {max_len: 2048}];
+  Secret secret = 1;
   google.protobuf.Timestamp valid_from = 2 [(gogoproto.stdtime) = true];
   google.protobuf.Timestamp valid_to = 3 [(gogoproto.stdtime) = true];
 }
 
 // Gateway is the message that defines a gateway on the network.
-// All fields of the type `Secret` require RIGHT_GATEWAY_READ_SECRETS for read and RIGHT_GATEWAY_WRITE_SECRETS for update operations.
 message Gateway {
   GatewayIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -144,9 +142,11 @@ message Gateway {
   bool update_location_from_status = 21;
   // The LoRa Basics Station LNS secret.
   // This is either an auth token (such as an API Key) or a TLS private certificate.
+  // Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
   Secret lbs_lns_secret = 22 [(gogoproto.customname) = "LBSLNSSecret"];
   // The authentication code for gateway claiming.
-  Secret claim_authentication_code = 23;
+  // Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
+  GatewayClaimAuthenticationCode claim_authentication_code = 23;
   // next: 24
 }
 

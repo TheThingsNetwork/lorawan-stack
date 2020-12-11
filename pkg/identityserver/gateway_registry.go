@@ -101,7 +101,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	}
 
 	if req.ClaimAuthenticationCode != nil {
-		value := req.ClaimAuthenticationCode.Value
+		value := req.ClaimAuthenticationCode
 		if is.config.Gateways.EncryptionKeyID != "" {
 			value, err = is.KeyVault.Encrypt(ctx, req.ClaimAuthenticationCode.Value, is.config.Gateways.EncryptionKeyID)
 			if err != nil {
