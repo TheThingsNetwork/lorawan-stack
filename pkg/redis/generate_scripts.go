@@ -59,7 +59,7 @@ var (
 )`))
 
 func isCommentLine(s string) bool {
-	return strings.HasPrefix(s, "--")
+	return strings.HasPrefix(strings.TrimSpace(s), "--")
 }
 
 func main() {
@@ -122,7 +122,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to format %q: %s", out, err)
 	}
-	if err := ioutil.WriteFile(out, b, 0644); err != nil {
+	if err := ioutil.WriteFile(out, b, 0o644); err != nil {
 		log.Fatalf("Failed to write to %q: %s", out, err)
 	}
 }
