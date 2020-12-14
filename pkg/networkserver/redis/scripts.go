@@ -49,12 +49,12 @@ if gt > 0 then
   table.insert(to_scan, 7)
 end
 if pivot > 0 or gt > 0 then
-  redis.call('copy', KEYS[3], KEYS[9])
+  redis.call('restore', KEYS[9], 0, ARGV[2], redis.call('dump', KEYS[3]))
 end
 if redis.call('sort', KEYS[4], 'by', 'nosort', 'store', KEYS[8]) > 0 then
   redis.call('pexpire', KEYS[9], ARGV[2])
   table.insert(to_scan, 9)
-  redis.call('copy', KEYS[5], KEYS[10])
+  redis.call('restore', KEYS[10], 0, ARGV[2], redis.call('dump', KEYS[5]))
 end
 if #to_scan > 1 then
     return to_scan
