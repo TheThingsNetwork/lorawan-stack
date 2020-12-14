@@ -95,7 +95,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 				return nil, err
 			}
 		} else {
-			log.FromContext(ctx).Warn("No encryption key defined, storing LBS LNS Secret in plaintext")
+			log.FromContext(ctx).Warn("No encryption key defined, store LBS LNS Secret in plaintext")
 		}
 		req.LBSLNSSecret.Value = value
 		req.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
@@ -110,7 +110,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 					return nil, err
 				}
 			} else {
-				log.FromContext(ctx).Warn("No encryption key defined, storing Claim Authentication Code in plaintext")
+				log.FromContext(ctx).Warn("No encryption key defined, store Claim Authentication Code in plaintext")
 			}
 			req.ClaimAuthenticationCode.Secret.Value = value
 			req.ClaimAuthenticationCode.Secret.KeyID = is.config.Gateways.EncryptionKeyID
@@ -211,7 +211,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 				return nil, err
 			}
 		} else {
-			log.FromContext(ctx).Warn("No encryption key defined, returning stored LBS LNS Secret value")
+			log.FromContext(ctx).Warn("No encryption key defined, return stored LBS LNS Secret value")
 		}
 		gtw.LBSLNSSecret.Value = value
 		gtw.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
@@ -225,7 +225,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 				return nil, err
 			}
 		} else {
-			log.FromContext(ctx).Warn("No encryption key defined, returning stored Claim Authentication Code value")
+			log.FromContext(ctx).Warn("No encryption key defined, return stored Claim Authentication Code value")
 		}
 		gtw.ClaimAuthenticationCode.Secret.Value = value
 		gtw.ClaimAuthenticationCode.Secret.KeyID = is.config.Gateways.EncryptionKeyID
@@ -345,7 +345,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 					}
 				} else {
 					logger := log.FromContext(ctx)
-					logger.Warn("No encryption key defined, returning stored LBS LNS Secret value")
+					logger.Warn("No encryption key defined, return stored LBS LNS Secret value")
 				}
 				gtws.Gateways[i].LBSLNSSecret.Value = value
 				gtws.Gateways[i].LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
@@ -364,7 +364,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 					}
 				} else {
 					logger := log.FromContext(ctx)
-					logger.Warn("No encryption key defined, returning stored Claim Authentication Code value")
+					logger.Warn("No encryption key defined, return stored Claim Authentication Code value")
 				}
 				gtws.Gateways[i].ClaimAuthenticationCode.Secret.Value = value
 			}
@@ -414,7 +414,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 				}
 			} else {
 				logger := log.FromContext(ctx)
-				logger.Warn("No encryption key defined, storing LBS LNS Secret in plaintext")
+				logger.Warn("No encryption key defined, store LBS LNS Secret in plaintext")
 			}
 			req.LBSLNSSecret.Value = value
 			req.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
@@ -434,7 +434,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 					}
 				} else {
 					logger := log.FromContext(ctx)
-					logger.Warn("No encryption key defined, storing Claim Authentication Code in plaintext")
+					logger.Warn("No encryption key defined, store Claim Authentication Code in plaintext")
 				}
 				req.ClaimAuthenticationCode.Secret.Value = value
 				req.ClaimAuthenticationCode.Secret.KeyID = is.config.Gateways.EncryptionKeyID
