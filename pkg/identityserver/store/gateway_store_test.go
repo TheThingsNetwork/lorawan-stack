@@ -104,7 +104,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(created.LBSLNSSecret, should.NotBeNil)
 			a.So(created.LBSLNSSecret, should.Resemble, secret)
 			a.So(created.ClaimAuthenticationCode, should.NotBeNil)
-			a.So(created.ClaimAuthenticationCode, should.Resemble, &gtwClaimAuthCode)
+			a.So(created.ClaimAuthenticationCode.Secret, should.Resemble, gtwClaimAuthCode.Secret)
 		}
 
 		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "lbs_lns_secret", "claim_authentication_code"}})
@@ -118,7 +118,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 			a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
 			a.So(got.LBSLNSSecret, should.Resemble, created.LBSLNSSecret)
-			a.So(got.ClaimAuthenticationCode, should.Resemble, created.ClaimAuthenticationCode)
+			a.So(got.ClaimAuthenticationCode.Secret, should.Resemble, created.ClaimAuthenticationCode.Secret)
 		}
 
 		byEUI, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{EUI: &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}}, &pbtypes.FieldMask{Paths: []string{"name"}})
@@ -172,7 +172,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(*updated.ScheduleAnytimeDelay, should.Equal, time.Duration(0))
 			a.So(updated.UpdateLocationFromStatus, should.BeFalse)
 			a.So(updated.LBSLNSSecret, should.Resemble, otherSecret)
-			a.So(updated.ClaimAuthenticationCode, should.Resemble, &otherGtwClaimAuthCode)
+			a.So(updated.ClaimAuthenticationCode.Secret, should.Resemble, otherGtwClaimAuthCode.Secret)
 		}
 
 		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, nil)
@@ -187,7 +187,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 			a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
 			a.So(got.LBSLNSSecret, should.Resemble, otherSecret)
-			a.So(got.ClaimAuthenticationCode, should.Resemble, &otherGtwClaimAuthCode)
+			a.So(got.ClaimAuthenticationCode.Secret, should.Resemble, otherGtwClaimAuthCode.Secret)
 		}
 
 		list, err := store.FindGateways(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})

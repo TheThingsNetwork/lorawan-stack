@@ -4553,6 +4553,15 @@
       "file": "application_registry.go"
     }
   },
+  "error:pkg/identityserver:claim_authentication_code": {
+    "translations": {
+      "en": "invalid claim authentication code"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
   "error:pkg/identityserver:client_update_admin_field": {
     "translations": {
       "en": "only admins can update the `{field}` field"
