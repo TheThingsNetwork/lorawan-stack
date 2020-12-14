@@ -48,7 +48,7 @@ func TestGatewayStore(t *testing.T) {
 			Value: []byte("my other very secret value"),
 		}
 
-		from := time.Now()
+		from := time.Now().UTC()
 		to := from.Add(5 * time.Minute)
 		gtwClaimAuthCode := ttnpb.GatewayClaimAuthenticationCode{
 			ValidFrom: &from,
