@@ -16,7 +16,6 @@ package commands
 
 import (
 	"os"
-	"time"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
@@ -47,53 +46,6 @@ func gatewayIDFlags() *pflag.FlagSet {
 }
 
 var errNoGatewayID = errors.DefineInvalidArgument("no_gateway_id", "no gateway ID set")
-
-func gatewayClaimAuthCodeValidityFlags() *pflag.FlagSet {
-	flagSet := &pflag.FlagSet{}
-	flagSet.String("claim-authentication-code.valid-from", "", "(YYYY-MM-DDTHH:MM:SSZ)")
-	flagSet.String("claim-authentication-code.valid-to", "", "(YYYY-MM-DDTHH:MM:SSZ)")
-	return flagSet
-}
-
-func getgatewayClaimAuthCodeSecret(flagSet *pflag.FlagSet, gateway ttnpb.Gateway) (*ttnpb.Secret, error) {
-	if gateway.ClaimAuthenticationCode == nil {
-		return nil, nil
-	}
-
-	gatewayClaimAuthCode := ttnpb.GatewayClaimAuthenticationCode{
-		Value: gateway.ClaimAuthenticationCode.Value,
-	}
-	validFromString, err := flagSet.GetString("claim-authentication-code.valid-from")
-	if err != nil {
-		return nil, err
-	}
-	if validFromString != "" {
-		validFrom, err := time.Parse(time.RFC3339, validFromString)
-		if err != nil {
-			return nil, err
-		}
-		gatewayClaimAuthCode.ValidFrom = &validFrom
-	}
-	validToString, err := flagSet.GetString("claim-authentication-code.valid-to")
-	if err != nil {
-		return nil, err
-	}
-	if validToString != "" {
-		validTo, err := time.Parse(time.RFC3339, validToString)
-		if err != nil {
-			return nil, err
-		}
-		gatewayClaimAuthCode.ValidTo = &validTo
-	}
-	ret, err := gatewayClaimAuthCode.Marshal()
-	if err != nil {
-		return nil, err
-	}
-
-	return &ttnpb.Secret{
-		Value: ret,
-	}, nil
-}
 
 func getGatewayID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb.GatewayIdentifiers, error) {
 	gatewayID, _ := flagSet.GetString("gateway-id")
@@ -299,11 +251,6 @@ var (
 				return errNoGatewayID
 			}
 
-			gateway.ClaimAuthenticationCode, err = getgatewayClaimAuthCodeSecret(cmd.Flags(), gateway)
-			if err != nil {
-				return err
-			}
-
 			var antenna ttnpb.GatewayAntenna
 			if err = util.SetFields(&antenna, setGatewayAntennaFlags, "antenna"); err != nil {
 				return err
@@ -353,11 +300,6 @@ var (
 			}
 			gateway.Attributes = mergeAttributes(gateway.Attributes, cmd.Flags())
 			gateway.GatewayIdentifiers = *gtwID
-
-			gateway.ClaimAuthenticationCode, err = getgatewayClaimAuthCodeSecret(cmd.Flags(), gateway)
-			if err != nil {
-				return err
-			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -521,7 +463,6 @@ func init() {
 	gatewaysGetCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysGetCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysGetCommand)
-	gatewaysCreateCommand.Flags().AddFlagSet(gatewayClaimAuthCodeValidityFlags())
 	gatewaysCreateCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCreateCommand.Flags().AddFlagSet(collaboratorFlags())
 	gatewaysCreateCommand.Flags().AddFlagSet(setGatewayFlags)
@@ -529,7 +470,6 @@ func init() {
 	gatewaysCreateCommand.Flags().AddFlagSet(attributesFlags())
 	gatewaysCreateCommand.Flags().Bool("defaults", true, "configure gateway with defaults")
 	gatewaysCommand.AddCommand(gatewaysCreateCommand)
-	gatewaysSetCommand.Flags().AddFlagSet(gatewayClaimAuthCodeValidityFlags())
 	gatewaysSetCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysSetCommand.Flags().AddFlagSet(setGatewayFlags)
 	gatewaysSetCommand.Flags().Int("antenna.index", 0, "index of the antenna to update or remove")
