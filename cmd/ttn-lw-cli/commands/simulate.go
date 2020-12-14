@@ -675,6 +675,9 @@ var (
 			if err != nil {
 				return err
 			}
+			if uplinkMessage.ReceivedAt.IsZero() {
+				uplinkMessage.ReceivedAt = time.Now()
+			}
 			_, err = ttnpb.NewAppAsClient(cc).SimulateUplink(ctx, up)
 			return err
 		},
