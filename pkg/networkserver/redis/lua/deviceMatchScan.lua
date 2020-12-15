@@ -12,12 +12,12 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-for old_uid in ARGV do
-  local uid = redis.call('lindex', KEYS[1], 0)
+for _, old_uid in ipairs(ARGV) do
+  local uid = redis.call('lindex', KEYS[1], -1)
   if uid ~= old_uid then
     return uid
   end
-  redis.call('ltrim', KEYS[1], 1, -1)
-  redis.call('hdel', KEYS[2], ARGV[1])
+  redis.call('ltrim', KEYS[1], 0, -2)
+  redis.call('hdel', KEYS[2], old_uid)
 end
-return redis.call('lindex', KEYS[1], 0)
+return redis.call('lindex', KEYS[1], -1)

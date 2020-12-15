@@ -312,9 +312,27 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		default:
 			panic(fmt.Sprintf("invalid index returned by match script with `continue` type: %d", idx))
 		}
-		uid, err := r.Redis.LIndex(ctx, matchUIDKey, 0).Result()
-		for err != redis.Nil {
+		var uid string
+		for {
+			if uid == "" {
+				uid, err = r.Redis.LIndex(ctx, matchUIDKey, -1).Result()
+			} else {
+				uid, err = func() (string, error) {
+					ret, err = deviceMatchScanScript.Run(ctx, r.Redis, []string{matchUIDKey, matchFieldKey}, uid).Result()
+					if err != nil {
+						return "", err
+					}
+					uid, ok := ret.(string)
+					if !ok {
+						panic(fmt.Sprintf("expected match scan script return value to be a string, got %T", ret))
+					}
+					return uid, nil
+				}()
+			}
 			if err != nil {
+				if err == redis.Nil {
+					break
+				}
 				log.FromContext(ctx).WithField("key", matchUIDKey).WithError(err).Error("Failed to scan UID")
 				return ttnredis.ConvertError(err)
 			}
@@ -332,6 +350,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			if err != nil {
 				if err == redis.Nil {
 					// Another client already processed this entry
+					uid = ""
 					continue
 				}
 				log.FromContext(ctx).WithField("key", matchFieldKey).WithError(err).Error("Failed to get device session")
@@ -401,14 +420,6 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 					return ttnredis.ConvertError(err)
 				}
 				return nil
-			}
-
-			ret, err = deviceMatchScanScript.Run(ctx, r.Redis, []string{matchUIDKey, matchFieldKey}, uid).Result()
-			if err == nil {
-				uid, ok = ret.(string)
-				if !ok {
-					panic(fmt.Sprintf("expected match scan script return value to be a string, got %T", ret))
-				}
 			}
 		}
 	}
