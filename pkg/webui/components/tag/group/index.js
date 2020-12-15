@@ -14,6 +14,7 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import bind from 'autobind-decorator'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -78,6 +79,7 @@ class TagGroup extends React.Component {
     window.removeEventListener('resize', this.handleWindowResize)
   }
 
+  @bind
   handleWindowResize() {
     const { tags, tagMaxWidth } = this.props
 
