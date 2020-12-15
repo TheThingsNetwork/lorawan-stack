@@ -103,7 +103,7 @@
     "react-grid-system": "^7.0.3",
     "react-helmet": "^6.1.0",
     "react-hot-loader": "^4.12.11",
-    "react-intl": "^5.4.5",
+    "react-intl": "^5.10.6",
     "react-leaflet": "^2.6.3",
     "react-paginate": "^6.5.0",
     "react-redux": "^7.1.0",
