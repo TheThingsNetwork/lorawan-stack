@@ -49,20 +49,25 @@ if gt > 0 then
   table.insert(to_scan, 7)
 end
 if pivot > 0 or gt > 0 then
-  redis.call('restore', KEYS[9], 0, ARGV[2], redis.call('dump', KEYS[3]))
+  redis.call('restore', KEYS[9], ARGV[2], redis.call('dump', KEYS[3]))
 end
 if redis.call('sort', KEYS[4], 'by', 'nosort', 'store', KEYS[8]) > 0 then
-  redis.call('pexpire', KEYS[9], ARGV[2])
-  table.insert(to_scan, 9)
-  redis.call('restore', KEYS[10], 0, ARGV[2], redis.call('dump', KEYS[5]))
+  redis.call('pexpire', KEYS[8], ARGV[2])
+  table.insert(to_scan, 8)
+  redis.call('restore', KEYS[10], ARGV[2], redis.call('dump', KEYS[5]))
 end
 if #to_scan > 1 then
     return to_scan
 end
 return nil`)
 
-	deviceMatchScanScript = redis.NewScript(`if redis.call('lindex', KEYS[1], 0) == ARGV[1] then
+	deviceMatchScanScript = redis.NewScript(`for old_uid in ARGV do
+  local uid = redis.call('lindex', KEYS[1], 0)
+  if uid ~= old_uid then
+    return uid
+  end
   redis.call('ltrim', KEYS[1], 1, -1)
   redis.call('hdel', KEYS[2], ARGV[1])
-end`)
+end
+return redis.call('lindex', KEYS[1], 0)`)
 )

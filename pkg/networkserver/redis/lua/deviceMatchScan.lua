@@ -12,7 +12,12 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-if redis.call('lindex', KEYS[1], 0) == ARGV[1] then
+for old_uid in ARGV do
+  local uid = redis.call('lindex', KEYS[1], 0)
+  if uid ~= old_uid then
+    return uid
+  end
   redis.call('ltrim', KEYS[1], 1, -1)
   redis.call('hdel', KEYS[2], ARGV[1])
 end
+return redis.call('lindex', KEYS[1], 0)

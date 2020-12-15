@@ -312,12 +312,9 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		default:
 			panic(fmt.Sprintf("invalid index returned by match script with `continue` type: %d", idx))
 		}
-		for {
-			uid, err := r.Redis.LIndex(ctx, matchUIDKey, 0).Result()
+		uid, err := r.Redis.LIndex(ctx, matchUIDKey, 0).Result()
+		for err != redis.Nil {
 			if err != nil {
-				if err == redis.Nil {
-					break
-				}
 				log.FromContext(ctx).WithField("key", matchUIDKey).WithError(err).Error("Failed to scan UID")
 				return ttnredis.ConvertError(err)
 			}
@@ -376,37 +373,42 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			if err != nil {
 				return errNoUplinkMatch.WithCause(err)
 			}
-			if !ok {
-				if err := deviceMatchScanScript.Run(ctx, r.Redis, []string{matchUIDKey, matchFieldKey}, uid).Err(); err != nil {
+			if ok {
+				b, err := marshalMsgpack(uplinkMatchResult{
+					UID:               uid,
+					LoRaWANVersion:    m.LoRaWANVersion,
+					FNwkSIntKey:       m.FNwkSIntKey,
+					LastFCnt:          m.LastFCnt,
+					ResetsFCnt:        m.ResetsFCnt,
+					Supports32BitFCnt: m.Supports32BitFCnt,
+					IsPending:         m.IsPending,
+				})
+				if err != nil {
+					return err
+				}
+				_, err = r.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
+					p.Set(ctx, matchResultKey, b, cacheTTL)
+					p.Del(ctx,
+						matchUIDKeyCurrentLE,
+						matchUIDKeyCurrentGT,
+						matchUIDKeyPending,
+						matchFieldKeyCurrent,
+						matchFieldKeyPending,
+					)
+					return nil
+				})
+				if err != nil {
 					return ttnredis.ConvertError(err)
 				}
-				continue
-			}
-			b, err := marshalMsgpack(uplinkMatchResult{
-				UID:               uid,
-				LoRaWANVersion:    m.LoRaWANVersion,
-				FNwkSIntKey:       m.FNwkSIntKey,
-				LastFCnt:          m.LastFCnt,
-				ResetsFCnt:        m.ResetsFCnt,
-				Supports32BitFCnt: m.Supports32BitFCnt,
-				IsPending:         m.IsPending,
-			})
-			if err != nil {
-				return err
-			}
-			_, err = r.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
-				p.Set(ctx, matchResultKey, b, cacheTTL)
-				p.Del(ctx,
-					matchUIDKeyCurrentLE,
-					matchUIDKeyCurrentGT,
-					matchUIDKeyPending,
-					matchFieldKeyCurrent,
-					matchFieldKeyPending,
-				)
 				return nil
-			})
-			if err != nil {
-				return ttnredis.ConvertError(err)
+			}
+
+			ret, err = deviceMatchScanScript.Run(ctx, r.Redis, []string{matchUIDKey, matchFieldKey}, uid).Result()
+			if err == nil {
+				uid, ok = ret.(string)
+				if !ok {
+					panic(fmt.Sprintf("expected match scan script return value to be a string, got %T", ret))
+				}
 			}
 		}
 	}
