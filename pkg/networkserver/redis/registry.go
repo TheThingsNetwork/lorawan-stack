@@ -454,6 +454,8 @@ func MarshalDevicePendingSession(dev *ttnpb.EndDevice) ([]byte, error) {
 	})
 }
 
+var errInvalidDevice = errors.DefineInvalidArgument("invalid_device", "device is invalid")
+
 // SetByID sets device by appID, devID.
 func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(ctx context.Context, pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
@@ -596,8 +598,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 
 			if updated.Session != nil && updated.MACState == nil ||
 				updated.PendingSession != nil && updated.PendingMACState == nil {
-				// TODO error
-				panic("TODO")
+				return errInvalidDevice.New()
 			}
 
 			storedPendingSession := stored.GetPendingSession()
