@@ -21,7 +21,7 @@ import Tag from '..'
 
 import style from './group.styl'
 
-const measureWidth = function(element) {
+const measureWidth = element => {
   if (!element) {
     return 0
   }
