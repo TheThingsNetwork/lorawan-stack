@@ -721,13 +721,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	const matchTTL = time.Minute
 	if err := ns.devices.RangeByUplinkMatches(ctx, up, matchTTL,
 		func(ctx context.Context, match *UplinkMatch) (bool, error) {
-			if pld.Ack && match.IsPending {
-				// TODO: Perform this optimization in the storage backend.
-				// (https://github.com/TheThingsNetwork/lorawan-stack/issues/3254)
-				log.FromContext(ctx).Debug("Uplink carrying ACK for pending session, skip")
-				return false, nil
-			}
-
 			fNwkSIntKeyEnvelope = match.FNwkSIntKey
 			var err error
 			fNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, fNwkSIntKeyEnvelope, ns.KeyVault)

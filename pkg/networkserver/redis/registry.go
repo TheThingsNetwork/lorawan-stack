@@ -210,22 +210,34 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	matchFieldKeyCurrent := ttnredis.Key(fieldKeyCurrent, "up", payloadHash)
 	matchFieldKeyPending := ttnredis.Key(fieldKeyPending, "up", payloadHash)
 
-	ret, err := deviceMatchScript.Run(ctx, r.Redis, []string{
-		matchResultKey,
+	var matchKeys []string
+	if pld.Ack {
+		matchKeys = []string{
+			matchResultKey,
 
-		addrKeyCurrent,
-		fieldKeyCurrent,
+			addrKeyCurrent,
+			fieldKeyCurrent,
+			matchUIDKeyCurrentLE,
+			matchUIDKeyCurrentGT,
+			matchFieldKeyCurrent,
+		}
+	} else {
+		matchKeys = []string{
+			matchResultKey,
 
-		addrKeyPending,
-		fieldKeyPending,
+			addrKeyCurrent,
+			fieldKeyCurrent,
+			matchUIDKeyCurrentLE,
+			matchUIDKeyCurrentGT,
+			matchFieldKeyCurrent,
 
-		matchUIDKeyCurrentLE,
-		matchUIDKeyCurrentGT,
-		matchUIDKeyPending,
-
-		matchFieldKeyCurrent,
-		matchFieldKeyPending,
-	}, lsb, cacheTTL.Milliseconds()).Result()
+			addrKeyPending,
+			fieldKeyPending,
+			matchUIDKeyPending,
+			matchFieldKeyPending,
+		}
+	}
+	ret, err := deviceMatchScript.Run(ctx, r.Redis, matchKeys, lsb, cacheTTL.Milliseconds()).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return errNoUplinkMatch.New()
@@ -299,13 +311,13 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			isPending     bool
 		)
 		switch idx {
-		case 6:
+		case 4:
 			matchUIDKey = matchUIDKeyCurrentLE
 			matchFieldKey = matchFieldKeyCurrent
-		case 7:
+		case 5:
 			matchUIDKey = matchUIDKeyCurrentGT
 			matchFieldKey = matchFieldKeyCurrent
-		case 8:
+		case 9:
 			matchUIDKey = matchUIDKeyPending
 			matchFieldKey = matchFieldKeyPending
 			isPending = true
@@ -351,6 +363,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				if err == redis.Nil {
 					// Another client already processed this entry
 					uid = ""
+					log.FromContext(ctx).Debug("Another client has already processed this UID")
 					continue
 				}
 				log.FromContext(ctx).WithField("key", matchFieldKey).WithError(err).Error("Failed to get device session")
