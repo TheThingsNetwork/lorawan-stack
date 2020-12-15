@@ -275,7 +275,7 @@ export const getBackendErrorMessageAttributes = error => error.details[0].attrib
  * @param {object} error - The backend error object.
  * @returns {object} Message props of the error object, or generic error object.
  */
-export const toMessageProps = function(error) {
+export const toMessageProps = error => {
   let props
   // Check if it is a error message and transform it to a intl message.
   if (isBackend(error)) {

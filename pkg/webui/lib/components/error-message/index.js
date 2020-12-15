@@ -17,12 +17,18 @@ import React from 'react'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-import { hasCauses, getBackendErrorRootCause, toMessageProps } from '@ttn-lw/lib/errors/utils'
+import {
+  hasCauses,
+  getBackendErrorRootCause,
+  toMessageProps,
+  isBackend,
+} from '@ttn-lw/lib/errors/utils'
 
-const ErrorMessage = function({ content, withRootCause, className, ...rest }) {
+const ErrorMessage = ({ content, withRootCause, className, ...rest }) => {
   const baseProps = {
     className,
     firstToUpper: true,
+    convertBackticks: Boolean(isBackend(content)),
     ...rest,
   }
 
