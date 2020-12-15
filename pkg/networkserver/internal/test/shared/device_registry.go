@@ -16,6 +16,7 @@ package test
 
 import (
 	"context"
+	"reflect"
 	"testing"
 	"time"
 
@@ -40,35 +41,36 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
 
-		expectedSession, expectedMACState, expectedMSB := expectedMatch.Session, expectedMatch.MACState, expectedMatch.Session.LastFCntUp&0xffff0000
+		expectedSession, expectedMACState := expectedMatch.Session, expectedMatch.MACState
 		if expectedMatch.IsPending {
-			expectedSession, expectedMACState, expectedMSB = expectedMatch.PendingSession, expectedMatch.PendingMACState, 0
+			expectedSession, expectedMACState = expectedMatch.PendingSession, expectedMatch.PendingMACState
 		}
 		var matched bool
-		var attempts []UplinkMatch
-		err := reg.RangeByUplinkMatches(ctx, up, CacheTTL, func(storedCtx context.Context, match UplinkMatch) (bool, error) {
+		var attempts []*UplinkMatch
+		err := reg.RangeByUplinkMatches(ctx, up, CacheTTL, func(storedCtx context.Context, match *UplinkMatch) (bool, error) {
 			attempts = append(attempts, match)
+			a.So(matched, should.BeFalse)
 			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-			matched = test.AllTrue(
-				match.ApplicationIdentifiers() == expectedMatch.ApplicationIdentifiers,
-				match.DeviceID() == expectedMatch.DeviceID,
-				match.LoRaWANVersion() == expectedMACState.LoRaWANVersion,
-				match.FNwkSIntKey().Equal(expectedSession.FNwkSIntKey),
-				match.FCnt() == expectedMSB|up.Payload.GetMACPayload().FCnt,
-				match.LastFCnt() == expectedSession.LastFCntUp,
-				match.IsPending() == expectedMatch.IsPending,
-				match.ResetsFCnt() == expectedMatch.GetMACSettings().GetResetsFCnt(),
-			)
+			matched = reflect.DeepEqual(match, &UplinkMatch{
+				ApplicationIdentifiers: expectedMatch.ApplicationIdentifiers,
+				DeviceID:               expectedMatch.DeviceID,
+				LoRaWANVersion:         expectedMACState.LoRaWANVersion,
+				FNwkSIntKey:            expectedSession.FNwkSIntKey,
+				LastFCnt:               expectedSession.LastFCntUp,
+				ResetsFCnt:             expectedMatch.GetMACSettings().GetResetsFCnt(),
+				Supports32BitFCnt:      expectedMatch.GetMACSettings().GetSupports32BitFCnt(),
+				IsPending:              expectedMatch.IsPending,
+			})
 			return matched, nil
 		})
-		if !a.So(len(attempts), should.BeLessThanOrEqualTo, maxAttempts) {
-			t.Errorf("Attempted matches: %s", pretty.Sprint(attempts))
-		}
 		if !a.So(err, should.BeNil) {
 			t.Errorf("Expected nil error, got: %v\n", errors.Stack(err))
 		}
 		if !a.So(matched, should.BeTrue) {
 			t.Errorf("Device did not match after %d attempts", len(attempts))
+		}
+		if !a.So(len(attempts), should.BeLessThanOrEqualTo, maxAttempts) {
+			t.Errorf("Attempted matches: %s", pretty.Sprint(attempts))
 		}
 		return !a.Failed()
 	}
@@ -76,8 +78,8 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
 
-		var attempts []UplinkMatch
-		err := reg.RangeByUplinkMatches(ctx, up, CacheTTL, func(storedCtx context.Context, match UplinkMatch) (bool, error) {
+		var attempts []*UplinkMatch
+		err := reg.RangeByUplinkMatches(ctx, up, CacheTTL, func(storedCtx context.Context, match *UplinkMatch) (bool, error) {
 			attempts = append(attempts, match)
 			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 			return false, nil
