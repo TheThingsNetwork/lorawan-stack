@@ -2863,7 +2863,7 @@ Gateway is the message that defines a gateway on the network.
 | `schedule_anytime_delay` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite. |
 | `update_location_from_status` | [`bool`](#bool) |  | Update the location of this gateway from status messages. This only works for gateways connecting with authentication; gateways connected over UDP are not supported. |
 | `lbs_lns_secret` | [`Secret`](#ttn.lorawan.v3.Secret) |  | The LoRa Basics Station LNS secret. This is either an auth token (such as an API Key) or a TLS private certificate. Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value. |
-| `claim_authentication_code` | [`GatewayClaimAuthenticationCode`](#ttn.lorawan.v3.GatewayClaimAuthenticationCode) |  | The authentication code for gateway claiming. Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
+| `claim_authentication_code` | [`GatewayClaimAuthenticationCode`](#ttn.lorawan.v3.GatewayClaimAuthenticationCode) |  | The authentication code for gateway claiming. Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value. The entire field must be used in RPCs since sub-fields are validated wrt to each other. Direct selection/update of sub-fields only are not allowed. Use the top level field mask `claim_authentication_code` even when updating single fields.
 
 next: 24 |
 
@@ -2924,7 +2924,6 @@ GatewayAntenna is the message that defines a gateway antenna.
 ### <a name="ttn.lorawan.v3.GatewayClaimAuthenticationCode">Message `GatewayClaimAuthenticationCode`</a>
 
 Authentication code for claiming gateways.
-`valid_from` and `valid_to` are used as UTC timestamps.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |

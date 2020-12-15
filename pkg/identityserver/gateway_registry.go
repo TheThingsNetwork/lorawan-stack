@@ -102,7 +102,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	}
 
 	if req.ClaimAuthenticationCode != nil {
-		if err := isClaimAuthenticationCodeValid(*req.ClaimAuthenticationCode); err == nil {
+		if err := validateClaimAuthenticationCode(*req.ClaimAuthenticationCode); err == nil {
 			value := req.ClaimAuthenticationCode.Secret.Value
 			if is.config.Gateways.EncryptionKeyID != "" {
 				value, err = is.KeyVault.Encrypt(ctx, value, is.config.Gateways.EncryptionKeyID)
@@ -425,7 +425,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
 			return nil, err
 		} else if req.ClaimAuthenticationCode != nil {
-			if err := isClaimAuthenticationCodeValid(*req.ClaimAuthenticationCode); err == nil {
+			if err := validateClaimAuthenticationCode(*req.ClaimAuthenticationCode); err == nil {
 				value := req.ClaimAuthenticationCode.Secret.Value
 				if is.config.Gateways.EncryptionKeyID != "" {
 					value, err = is.KeyVault.Encrypt(ctx, value, is.config.Gateways.EncryptionKeyID)
@@ -508,7 +508,7 @@ func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayId
 	return ttnpb.Empty, nil
 }
 
-func isClaimAuthenticationCodeValid(authCode ttnpb.GatewayClaimAuthenticationCode) error {
+func validateClaimAuthenticationCode(authCode ttnpb.GatewayClaimAuthenticationCode) error {
 	if authCode.Secret == nil {
 		return errClaimAuthenticationCode
 	}

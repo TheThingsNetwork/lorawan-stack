@@ -441,7 +441,6 @@ func (m *GatewayVersion) GetClockSource() uint32 {
 }
 
 // Authentication code for claiming gateways.
-// `valid_from` and `valid_to` are used as UTC timestamps.
 type GatewayClaimAuthenticationCode struct {
 	Secret               *Secret    `protobuf:"bytes,1,opt,name=secret,proto3" json:"secret,omitempty"`
 	ValidFrom            *time.Time `protobuf:"bytes,2,opt,name=valid_from,json=validFrom,proto3,stdtime" json:"valid_from,omitempty"`
@@ -553,6 +552,8 @@ type Gateway struct {
 	LBSLNSSecret *Secret `protobuf:"bytes,22,opt,name=lbs_lns_secret,json=lbsLnsSecret,proto3" json:"lbs_lns_secret,omitempty"`
 	// The authentication code for gateway claiming.
 	// Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
+	// The entire field must be used in RPCs since sub-fields are validated wrt to each other. Direct selection/update of sub-fields only are not allowed.
+	// Use the top level field mask `claim_authentication_code` even when updating single fields.
 	ClaimAuthenticationCode *GatewayClaimAuthenticationCode `protobuf:"bytes,23,opt,name=claim_authentication_code,json=claimAuthenticationCode,proto3" json:"claim_authentication_code,omitempty"`
 	XXX_NoUnkeyedLiteral    struct{}                        `json:"-"`
 	XXX_sizecache           int32                           `json:"-"`
