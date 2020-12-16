@@ -13,56 +13,42 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
-import { Redirect } from 'react-router-dom'
-import bind from 'autobind-decorator'
+import { Switch, Route } from 'react-router-dom'
 
-import Button from '@ttn-lw/components/button'
+import Footer from '@ttn-lw/components/footer'
 
-import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
+import { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error/error'
 
-import { logout } from '@account/store/actions/user'
+import Header from '@account/containers/header'
 
-import { selectUser } from '@account/store/selectors/user'
+import Overview from '@account/views/overview'
 
-@connect(
-  state => ({
-    user: selectUser(state),
-  }),
+import style from './landing.styl'
+
+const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
+
+const authRoutes = [
   {
-    logout,
+    path: '/',
+    exact: true,
+    component: Overview,
   },
-)
-export default class Landing extends React.PureComponent {
-  static propTypes = {
-    logout: PropTypes.func.isRequired,
-    user: PropTypes.user,
-  }
+]
 
-  static defaultProps = {
-    user: undefined,
-  }
-
-  @bind
-  handleLogout() {
-    const { logout } = this.props
-
-    logout()
-  }
-
-  render() {
-    const { user } = this.props
-
-    if (!Boolean(user)) {
-      return <Redirect to="/login" />
-    }
-
-    return (
-      <div>
-        You are logged in as {user.ids.user_id}.{' '}
-        <Button message={sharedMessages.logout} onClick={this.handleLogout} />
+const Landing = () => (
+  <div className={style.container}>
+    <Header />
+    <main className={style.main}>
+      <div className={style.stage} id="stage">
+        <Switch>
+          {authRoutes.map(route => (
+            <Route {...route} key={route.path} />
+          ))}
+          <Route component={GenericNotFound} />
+        </Switch>
       </div>
-    )
-  }
-}
+    </main>
+    <Footer />
+  </div>
+)
+export { Landing as default, authRoutes }

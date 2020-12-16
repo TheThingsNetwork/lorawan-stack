@@ -32,8 +32,6 @@ import { selectUser } from '@account/store/selectors/user'
 
 import Front from '../front'
 
-const GenericNotFound = () => <FullViewError error={{ statusCode: 404 }} />
-
 class AccountApp extends React.PureComponent {
   static propTypes = {
     env: PropTypes.env.isRequired,
@@ -68,17 +66,10 @@ class AccountApp extends React.PureComponent {
               titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
               defaultTitle={`${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
             />
-            {Boolean(user) ? (
-              <Switch>
-                <Route path="/" exact component={Landing} />
-                <Route component={GenericNotFound} />
-              </Switch>
-            ) : (
-              <Switch>
-                <Route path="/authorize" component={Authorize} />
-                <Route path="/" component={Front} />
-              </Switch>
-            )}
+            <Switch>
+              <Route path="/" component={Boolean(user) ? Landing : Front} />
+              <Route path="/authorize" component={Authorize} />
+            </Switch>
           </React.Fragment>
         </ErrorView>
       </ConnectedRouter>
