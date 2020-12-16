@@ -68,13 +68,14 @@ export default class Login extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = {
-      error: '',
+      error: undefined,
     }
   }
 
   @bind
   async handleSubmit(values, { setSubmitting }) {
     try {
+      this.setState({ error: undefined })
       await api.account.login(values)
 
       window.location = url(this.props.location)
@@ -95,6 +96,7 @@ export default class Login extends React.PureComponent {
     let info
     const { location } = this.props
     const next = url(location)
+    const query = Query.parse(location.search)
 
     if (location.state && location.state.info) {
       info = location.state.info
@@ -157,7 +159,7 @@ export default class Login extends React.PureComponent {
   }
 }
 
-function url(location, omitQuery = false) {
+const url = (location, omitQuery = false) => {
   const query = Query.parse(location.search)
 
   const next = query.n || appRoot
