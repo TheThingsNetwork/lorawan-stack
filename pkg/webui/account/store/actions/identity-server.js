@@ -12,8 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import init from './init'
-import user from './user'
-import identityServer from './identity-server'
+import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 
-export default [...init, ...user, ...identityServer]
+export const GET_IS_CONFIGURATION_BASE = 'GET_IS_CONFIGURATION'
+export const [
+  {
+    request: GET_IS_CONFIGURATION,
+    success: GET_IS_CONFIGURATION_SUCCESS,
+    failure: GET_IS_CONFIGURATION_FAILURE,
+  },
+  {
+    request: getIsConfiguration,
+    success: getIsConfigurationSuccess,
+    failure: getIsConfigurationFailure,
+  },
+] = createRequestActions(GET_IS_CONFIGURATION_BASE)
