@@ -12,8 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import init from './init'
-import user from './user'
-import identityServer from './identity-server'
+import tts from '@account/api/tts'
 
-export default [...init, ...user, ...identityServer]
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+
+import * as is from '@console/store/actions/identity-server'
+
+const getIsConfigurationLogic = createRequestLogic({
+  type: is.GET_IS_CONFIGURATION,
+  process: async () => {
+    return tts.Is.getConfiguration()
+  },
+})
+
+export default [getIsConfigurationLogic]

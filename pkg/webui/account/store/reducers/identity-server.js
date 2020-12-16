@@ -12,8 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import init from './init'
-import user from './user'
-import identityServer from './identity-server'
+import { handleActions } from 'redux-actions'
 
-export default [...init, ...user, ...identityServer]
+import { GET_IS_CONFIGURATION_SUCCESS } from '@account/store/actions/identity-server'
+
+const defaultState = {
+  configuration: {},
+}
+
+export default handleActions(
+  {
+    [GET_IS_CONFIGURATION_SUCCESS]: (state, { payload }) => ({
+      ...state,
+      configuration: payload.configuration,
+    }),
+  },
+  defaultState,
+)

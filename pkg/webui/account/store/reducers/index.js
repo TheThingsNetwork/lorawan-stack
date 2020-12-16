@@ -17,10 +17,12 @@ import { connectRouter } from 'connected-react-router'
 
 import init from './init'
 import user from './user'
+import is from './identity-server'
 
 export default history =>
   combineReducers({
     init,
     user,
+    is,
     router: connectRouter(history),
   })
