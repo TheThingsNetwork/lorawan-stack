@@ -26,14 +26,18 @@ import UpdatePassword from '@account/views/update-password'
 import FrontNotFound from '@account/views/front-not-found'
 import Validate from '@account/views/validate'
 import Code from '@account/views/code'
+import { authRoutes } from '@account/views/landing'
+
+import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './front.styl'
 
-const FrontView = () => {
+const FrontView = ({ location }) => {
   return (
     <div className={style.container}>
       <section className={style.content}>
-        <Header className={style.header} />
+        <Header />
         <div className={style.main}>
           <Switch>
             <Route path="/login" component={Login} />
@@ -43,6 +47,11 @@ const FrontView = () => {
             <Route path="/validate" component={Validate} />
             <Route path="/code" component={Code} />
             <Redirect exact from="/" to="/login" />
+            {authRoutes.map(({ path, exact }) => (
+              <Route path={path} exact={exact} key={path}>
+                <Redirect to={`/login?n=${selectApplicationRootPath()}${location.pathname}`} />
+              </Route>
+            ))}
             <Route component={FrontNotFound} />
           </Switch>
         </div>
@@ -51,6 +60,10 @@ const FrontView = () => {
       <Footer className={style.footer} />
     </div>
   )
+}
+
+FrontView.propTypes = {
+  location: PropTypes.location.isRequired,
 }
 
 export default FrontView
