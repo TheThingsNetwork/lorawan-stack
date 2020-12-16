@@ -432,8 +432,8 @@ var (
 		Short:   "Simulation commands",
 	}
 	simulateJoinRequestCommand = &cobra.Command{
-		Use:    "join-request",
-		Short:  "Simulate a join request (EXPERIMENTAL)",
+		Use:    "gateway-join-request",
+		Short:  "Simulates a join request from an end device, sent through a simulated gateway connection (EXPERIMENTAL)",
 		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var uplinkParams simulateMetadataParams
@@ -515,7 +515,7 @@ var (
 
 	simulateDataUplinkCommand = &cobra.Command{
 		Use:    "gateway-uplink",
-		Short:  "Simulate a gateway uplink message (EXPERIMENTAL)",
+		Short:  "Simulate an uplink message from an end device, sent through a simulated gateway connection (EXPERIMENTAL)",
 		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var uplinkParams simulateMetadataParams
@@ -652,7 +652,7 @@ var (
 	}
 	simulateApplicationUplinkCommand = &cobra.Command{
 		Use:   "application-uplink [application-id] [device-id]",
-		Short: "Simulate application uplink message from an end device",
+		Short: "Simulate an application-layer uplink message from an end device, sent directly to the Application Server",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			devID, err := getEndDeviceID(cmd.Flags(), args, true)
 			if err != nil {
