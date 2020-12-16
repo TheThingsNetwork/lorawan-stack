@@ -12,31 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Redirect } from 'react-router-dom'
-import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import queryString from 'query-string'
 
-import api from '@account/api'
-
-import Button from '@ttn-lw/components/button'
-import Form from '@ttn-lw/components/form'
-import Input from '@ttn-lw/components/input'
-import SubmitButton from '@ttn-lw/components/submit-button'
-import Checkbox from '@ttn-lw/components/checkbox'
+import Spinner from '@ttn-lw/components/spinner'
 
 import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
+import ChangePasswordForm from '@account/containers/change-password-form'
+
 import style from '@account/views/front/front.styl'
 
-import Yup from '@ttn-lw/lib/yup'
+import useRequest from '@ttn-lw/lib/hooks/use-request'
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { getIsConfiguration } from '@account/store/actions/identity-server'
 
 const m = defineMessages({
   updatePassword: 'Update password',
@@ -49,145 +46,57 @@ const m = defineMessages({
   sessionRevoked: 'Your password was changed and all active sessions were revoked',
 })
 
-const validationSchema = Yup.object().shape({
-  password: Yup.string()
-    .min(8, Yup.passValues(sharedMessages.validateTooShort))
-    .required(sharedMessages.validateRequired),
-  confirm: Yup.string()
-    .oneOf([Yup.ref('password'), null], sharedMessages.validatePasswordMatch)
-    .min(8, Yup.passValues(sharedMessages.validateTooShort))
-    .required(sharedMessages.validateRequired),
-})
-
 const siteName = selectApplicationSiteName()
 
-const initialValues = {
-  password: '',
-  confirm: '',
-  password_changed: false,
-  revoke_all_access: true,
-}
+const UpdatePassword = ({ location }) => {
+  const [fetching, error] = useRequest(getIsConfiguration())
 
-@connect(
-  undefined,
-  {
-    handleCancelUpdate: () => push('/'),
-    handlePasswordChanged: () =>
-      push('/login', {
-        info: m.passwordChanged,
-      }),
-    handleSessionRevoked: () =>
-      push('/login', {
-        info: m.sessionRevoked,
-      }),
-  },
-)
-export default class UpdatePassword extends React.PureComponent {
-  static propTypes = {
-    handleCancelUpdate: PropTypes.func.isRequired,
-    handlePasswordChanged: PropTypes.func.isRequired,
-    handleSessionRevoked: PropTypes.func.isRequired,
-    location: PropTypes.location.isRequired,
+  if (Boolean(error)) {
+    throw error
   }
 
-  state = {
-    error: '',
-    info: '',
-    revoke_all_access: true,
+  const dispatch = useDispatch()
+  const handleSubmitSuccess = useCallback(
+    revokeSession => {
+      dispatch(push('/login', { info: revokeSession ? m.sessionRevoked : m.passwordChanged }))
+    },
+    [dispatch],
+  )
+
+  const { user: userParam, current: currentParam } = queryString.parse(location.search)
+  if (!Boolean(userParam) || !Boolean(currentParam)) {
+    return <Redirect to={{ pathname: '/' }} />
   }
 
-  @bind
-  handleRevokeAllAccess(evt) {
-    this.setState({ revoke_all_access: evt.target.checked })
-  }
-
-  @bind
-  async handleSubmit(values, { resetForm, setSubmitting }) {
-    const { handlePasswordChanged, handleSessionRevoked } = this.props
-    const userParams = queryString.parse(this.props.location.search)
-    const oldPassword = values.old_password ? values.old_password : userParams.current
-    const userId = userParams.user
-
-    try {
-      try {
-        await api.account.me()
-      } catch (error) {
-        handleSessionRevoked()
-        return
-      }
-      await api.users.updatePassword(userId, {
-        user_ids: { user_id: userId },
-        new: values.password,
-        old: oldPassword,
-        revoke_all_access: values.revoke_all_access,
-      })
-
-      handlePasswordChanged()
-    } catch (error) {
-      this.setState({
-        error: error.response.data,
-        info: '',
-      })
-      setSubmitting(false)
-    }
-  }
-
-  render() {
-    const { location, handleCancelUpdate } = this.props
-
-    const { error, info, revoke_all_access } = this.state
-
-    const { user: userParam, current: currentParam } = queryString.parse(location.search)
-    if (!Boolean(userParam) || !Boolean(currentParam)) {
-      return <Redirect to={{ pathname: '/' }} />
-    }
-
+  if (fetching) {
     return (
-      <div className={style.form}>
-        <IntlHelmet title={m.forgotPassword} />
-        <h1 className={style.title}>
-          {siteName}
-          <br />
-          <Message component="strong" content={m.updatePassword} />
-        </h1>
-        <hr className={style.hRule} />
-        <Form
-          onSubmit={this.handleSubmit}
-          initialValues={initialValues}
-          error={error}
-          info={info}
-          validationSchema={validationSchema}
-          horizontal={false}
-        >
-          <Form.Field
-            component={Input}
-            required
-            title={m.newPassword}
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            autoFocus
-          />
-          <Form.Field
-            component={Input}
-            required
-            title={sharedMessages.confirmPassword}
-            name="confirm"
-            type="password"
-            autoComplete="new-password"
-          />
-          <Form.Field
-            onChange={this.handleRevokeAllAccess}
-            warning={revoke_all_access ? m.revokeWarning : undefined}
-            title={m.revokeAccess}
-            name="revoke_all_access"
-            label={m.logoutAllDevices}
-            component={Checkbox}
-          />
-          <Form.Submit component={SubmitButton} message={sharedMessages.changePassword} />
-          <Button naked secondary message={sharedMessages.cancel} onClick={handleCancelUpdate} />
-        </Form>
-      </div>
+      <Spinner center>
+        <Message content={sharedMessages.fetching} />
+      </Spinner>
     )
   }
+
+  return (
+    <div className={style.form}>
+      <IntlHelmet title={m.forgotPassword} />
+      <h1 className={style.title}>
+        {siteName}
+        <br />
+        <Message component="strong" content={m.updatePassword} />
+      </h1>
+      <hr className={style.hRule} />
+      <ChangePasswordForm
+        userId={userParam}
+        old={currentParam}
+        cancelRoute="/login"
+        onSubmitSuccess={handleSubmitSuccess}
+      />
+    </div>
+  )
 }
+
+UpdatePassword.propTypes = {
+  location: PropTypes.location.isRequired,
+}
+
+export default UpdatePassword
