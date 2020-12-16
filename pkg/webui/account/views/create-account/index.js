@@ -123,8 +123,9 @@ export default class CreateAccount extends React.PureComponent {
   }
 
   @bind
-  async handleSubmit(values, { setSubmitting, setErrors }) {
+  async handleSubmit(values, { setSubmitting }) {
     try {
+      this.setState({ error: undefined })
       const { user_id, ...rest } = values
       const { invitation_token = '' } = queryString.parse(location.search)
       const { push } = this.props
@@ -137,11 +138,10 @@ export default class CreateAccount extends React.PureComponent {
         info: getSuccessMessage(result.data.state),
       })
     } catch (error) {
-      this.setState({
-        error: error.response.data,
-      })
-    } finally {
       setSubmitting(false)
+      this.setState({
+        error,
+      })
     }
   }
 
