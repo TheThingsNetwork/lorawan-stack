@@ -80,9 +80,8 @@ const ChangePasswordForm = ({ userId, old, cancelRoute, onSubmitSuccess }) => {
           revoke_all_access: values.revoke_all_access,
         })
 
-        onSubmitSuccess(values.revoke_all_access)
-
         resetForm({ values: validationSchema.cast({}) })
+        onSubmitSuccess(values.revoke_all_access)
       } catch (error) {
         setSubmitting(false)
         setError(error)
