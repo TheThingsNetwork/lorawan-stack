@@ -80,6 +80,13 @@ message GatewayVersion {
   uint32 clock_source = 7;
 }
 
+// Authentication code for claiming gateways.
+message GatewayClaimAuthenticationCode {
+  Secret secret = 1;
+  google.protobuf.Timestamp valid_from = 2 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp valid_to = 3 [(gogoproto.stdtime) = true];
+}
+
 // Gateway is the message that defines a gateway on the network.
 message Gateway {
   GatewayIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
@@ -136,7 +143,12 @@ message Gateway {
   // This is either an auth token (such as an API Key) or a TLS private certificate.
   // Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
   Secret lbs_lns_secret = 22 [(gogoproto.customname) = "LBSLNSSecret"];
-  // next: 23
+  // The authentication code for gateway claiming.
+  // Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
+  // The entire field must be used in RPCs since sub-fields are validated wrt to each other. Direct selection/update of sub-fields only are not allowed.
+  // Use the top level field mask `claim_authentication_code` even when updating single fields.
+  GatewayClaimAuthenticationCode claim_authentication_code = 23;
+  // next: 24
 }
 
 message Gateways {

@@ -11376,6 +11376,10 @@
         "lbs_lns_secret": {
           "$ref": "#/definitions/v3Secret",
           "description": "The LoRa Basics Station LNS secret.\nThis is either an auth token (such as an API Key) or a TLS private certificate.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value."
+        },
+        "claim_authentication_code": {
+          "$ref": "#/definitions/v3GatewayClaimAuthenticationCode",
+          "description": "The authentication code for gateway claiming.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.\nThe entire field must be used in RPCs since sub-fields are validated wrt to each other. Direct selection/update of sub-fields only are not allowed.\nUse the top level field mask `claim_authentication_code` even when updating single fields."
         }
       },
       "description": "Gateway is the message that defines a gateway on the network."
@@ -11412,6 +11416,23 @@
           "format": "int64"
         }
       }
+    },
+    "v3GatewayClaimAuthenticationCode": {
+      "type": "object",
+      "properties": {
+        "secret": {
+          "$ref": "#/definitions/v3Secret"
+        },
+        "valid_from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "valid_to": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Authentication code for claiming gateways."
     },
     "v3GatewayConnectionStats": {
       "type": "object",

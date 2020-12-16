@@ -47,6 +47,26 @@ func TestGatewayStore(t *testing.T) {
 			KeyID: "my-secret-key-id",
 			Value: []byte("my other very secret value"),
 		}
+
+		from := time.Now().UTC()
+		to := from.Add(5 * time.Minute)
+		gtwClaimAuthCode := ttnpb.GatewayClaimAuthenticationCode{
+			ValidFrom: &from,
+			ValidTo:   &to,
+			Secret: &ttnpb.Secret{
+				KeyID: "my-secret-key-id",
+				Value: []byte("my very secret value"),
+			},
+		}
+		otherGtwClaimAuthCode := ttnpb.GatewayClaimAuthenticationCode{
+			ValidFrom: &from,
+			ValidTo:   &to,
+			Secret: &ttnpb.Secret{
+				KeyID: "my-secret-key-id",
+				Value: []byte("my other very secret value"),
+			},
+		}
+
 		created, err := store.CreateGateway(ctx, &ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayID: "foo",
@@ -65,6 +85,7 @@ func TestGatewayStore(t *testing.T) {
 			ScheduleAnytimeDelay:     &scheduleAnytimeDelay,
 			UpdateLocationFromStatus: true,
 			LBSLNSSecret:             secret,
+			ClaimAuthenticationCode:  &gtwClaimAuthCode,
 		})
 
 		a.So(err, should.BeNil)
@@ -82,9 +103,11 @@ func TestGatewayStore(t *testing.T) {
 			a.So(created.UpdateLocationFromStatus, should.BeTrue)
 			a.So(created.LBSLNSSecret, should.NotBeNil)
 			a.So(created.LBSLNSSecret, should.Resemble, secret)
+			a.So(created.ClaimAuthenticationCode, should.NotBeNil)
+			a.So(created.ClaimAuthenticationCode.Secret, should.Resemble, gtwClaimAuthCode.Secret)
 		}
 
-		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "lbs_lns_secret"}})
+		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "lbs_lns_secret", "claim_authentication_code"}})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -95,6 +118,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 			a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
 			a.So(got.LBSLNSSecret, should.Resemble, created.LBSLNSSecret)
+			a.So(got.ClaimAuthenticationCode.Secret, should.Resemble, created.ClaimAuthenticationCode.Secret)
 		}
 
 		byEUI, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{EUI: &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}}, &pbtypes.FieldMask{Paths: []string{"name"}})
@@ -103,6 +127,7 @@ func TestGatewayStore(t *testing.T) {
 		if a.So(byEUI, should.NotBeNil) {
 			a.So(byEUI.GatewayID, should.Equal, got.GatewayID)
 			a.So(byEUI.LBSLNSSecret, should.BeNil)
+			a.So(byEUI.ClaimAuthenticationCode, should.BeNil)
 		}
 
 		_, err = store.UpdateGateway(ctx, &ttnpb.Gateway{
@@ -129,7 +154,8 @@ func TestGatewayStore(t *testing.T) {
 			ScheduleAnytimeDelay:     nil,
 			UpdateLocationFromStatus: false,
 			LBSLNSSecret:             otherSecret,
-		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "antennas", "schedule_anytime_delay", "update_location_from_status", "lbs_lns_secret"}})
+			ClaimAuthenticationCode:  &otherGtwClaimAuthCode,
+		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "antennas", "schedule_anytime_delay", "update_location_from_status", "lbs_lns_secret", "claim_authentication_code"}})
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
@@ -146,6 +172,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(*updated.ScheduleAnytimeDelay, should.Equal, time.Duration(0))
 			a.So(updated.UpdateLocationFromStatus, should.BeFalse)
 			a.So(updated.LBSLNSSecret, should.Resemble, otherSecret)
+			a.So(updated.ClaimAuthenticationCode.Secret, should.Resemble, otherGtwClaimAuthCode.Secret)
 		}
 
 		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, nil)
@@ -160,6 +187,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 			a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
 			a.So(got.LBSLNSSecret, should.Resemble, otherSecret)
+			a.So(got.ClaimAuthenticationCode.Secret, should.Resemble, otherGtwClaimAuthCode.Secret)
 		}
 
 		list, err := store.FindGateways(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})

@@ -22,6 +22,7 @@ const (
 	attributesField                     = "attributes"
 	autoUpdateField                     = "auto_update"
 	brandIDField                        = "version_ids.brand_id"
+	claimAuthenticationCodeField        = "claim_authentication_code"
 	contactInfoField                    = "contact_info"
 	descriptionField                    = "description"
 	downlinkPathConstraintField         = "downlink_path_constraint"

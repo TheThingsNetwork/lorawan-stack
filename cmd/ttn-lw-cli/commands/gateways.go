@@ -33,10 +33,9 @@ var (
 	selectGatewayFlags     = util.FieldMaskFlags(&ttnpb.Gateway{})
 	setGatewayFlags        = util.FieldFlags(&ttnpb.Gateway{})
 	setGatewayAntennaFlags = util.FieldFlags(&ttnpb.GatewayAntenna{}, "antenna")
+	selectAllGatewayFlags  = util.SelectAllFlagSet("gateway")
 
-	selectAllGatewayFlags = util.SelectAllFlagSet("gateway")
-
-	gatewayFlattenPaths = []string{"lbs_lns_secret"}
+	gatewayFlattenPaths = []string{"lbs_lns_secret", "claim_authentication_code"}
 )
 
 func gatewayIDFlags() *pflag.FlagSet {
@@ -294,6 +293,7 @@ var (
 				logger.Warn("No fields selected, won't update anything")
 				return nil
 			}
+
 			var gateway ttnpb.Gateway
 			if err = util.SetFields(&gateway, setGatewayFlags); err != nil {
 				return err

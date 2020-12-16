@@ -57,6 +57,9 @@ func NewPopulator(size int, seed int64) *Populator {
 		if gateway.LBSLNSSecret != nil {
 			gateway.LBSLNSSecret.KeyID = ""
 		}
+		if gateway.ClaimAuthenticationCode != nil && gateway.ClaimAuthenticationCode.Secret != nil {
+			gateway.ClaimAuthenticationCode.Secret.KeyID = ""
+		}
 		p.Gateways = append(p.Gateways, gateway)
 		p.APIKeys[gatewayID] = append(
 			p.APIKeys[gatewayID],
