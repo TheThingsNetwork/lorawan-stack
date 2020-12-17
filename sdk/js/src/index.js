@@ -26,7 +26,7 @@ import EventHandler from './util/events'
 import StackConfiguration from './util/stack-configuration'
 import { STACK_COMPONENTS_MAP, AUTHORIZATION_MODES } from './util/constants'
 
-class TtnLW {
+class TTS {
   constructor({ authorization, stackConfig, connectionType, defaultUserId, axiosConfig }) {
     const stackConfiguration = new StackConfiguration(stackConfig)
 
@@ -54,4 +54,4 @@ class TtnLW {
   }
 }
 
-export { TtnLw as default, STACK_COMPONENTS_MAP, AUTHORIZATION_MODES }
+export { TTS as default, STACK_COMPONENTS_MAP, AUTHORIZATION_MODES }
