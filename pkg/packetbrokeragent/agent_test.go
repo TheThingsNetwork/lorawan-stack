@@ -155,6 +155,7 @@ func TestForwarder(t *testing.T) {
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						DataRateIndex:        5,
 						Frequency:            869525000,
+						CodingRate:           "4/5",
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
 							Teaser: &packetbroker.GatewayMetadataTeaser{
 								Value: &packetbroker.GatewayMetadataTeaser_Terrestrial_{
@@ -260,6 +261,7 @@ func TestForwarder(t *testing.T) {
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						DataRateIndex:        3,
 						Frequency:            868300000,
+						CodingRate:           "4/5",
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
 							Teaser: &packetbroker.GatewayMetadataTeaser{
 								Value: &packetbroker.GatewayMetadataTeaser_Terrestrial_{
@@ -447,6 +449,7 @@ func TestHomeNetwork(t *testing.T) {
 						DataRateIndex:        5,
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						Frequency:            869525000,
+						CodingRate:           "4/5",
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
 							Teaser: &packetbroker.GatewayMetadataTeaser{
 								Value: &packetbroker.GatewayMetadataTeaser_Terrestrial_{
@@ -556,6 +559,7 @@ func TestHomeNetwork(t *testing.T) {
 						},
 						DataRateIndex: 5,
 						Frequency:     869525000,
+						CodingRate:    "4/5",
 					},
 				},
 			},
@@ -572,6 +576,7 @@ func TestHomeNetwork(t *testing.T) {
 						DataRateIndex:        3,
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						Frequency:            869525000,
+						CodingRate:           "4/5",
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
 							Teaser: &packetbroker.GatewayMetadataTeaser{
 								Value: &packetbroker.GatewayMetadataTeaser_Terrestrial_{
@@ -653,6 +658,7 @@ func TestHomeNetwork(t *testing.T) {
 						},
 						DataRateIndex: 3,
 						Frequency:     869525000,
+						CodingRate:    "4/5",
 					},
 				},
 			},

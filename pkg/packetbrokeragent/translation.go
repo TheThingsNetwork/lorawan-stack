@@ -216,7 +216,8 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, tokenEncry
 				Plain: msg.RawPayload,
 			},
 		},
-		Frequency: msg.Settings.Frequency,
+		Frequency:  msg.Settings.Frequency,
+		CodingRate: msg.Settings.CodingRate,
 	}
 
 	var ok bool
@@ -390,6 +391,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 			DataRate:      dataRate,
 			DataRateIndex: ttnpb.DataRateIndex(msg.Message.DataRateIndex),
 			Frequency:     msg.Message.Frequency,
+			CodingRate:    msg.Message.CodingRate,
 		},
 		ReceivedAt:     receivedAt,
 		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
