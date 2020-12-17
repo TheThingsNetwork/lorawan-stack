@@ -19,36 +19,35 @@ import { createBrowserHistory } from 'history'
 import * as Sentry from '@sentry/browser'
 
 import sentryConfig from '@ttn-lw/constants/sentry'
+import createStore from '@account/store'
 
-import WithLocale from './lib/components/with-locale'
-import { EnvProvider } from './lib/components/env'
-import Init from './lib/components/init'
-import env from './lib/env'
-import { selectApplicationRootPath } from './lib/selectors/env'
-import './lib/yup'
-import createStore from './account/store'
+import WithLocale from '@ttn-lw/lib/components/with-locale'
+import Init from '@ttn-lw/lib/components/init'
 
-const appRoot = selectApplicationRootPath()
-const history = createBrowserHistory({ basename: `${appRoot}/` })
+import { selectApplicationRootPath, selectSentryDsnConfig } from '@ttn-lw/lib/selectors/env'
+
+import '@ttn-lw/lib/yup'
+
 // Initialize sentry before creating store
-if (env.sentryDsn) Sentry.init(sentryConfig)
+if (selectSentryDsnConfig()) {
+  Sentry.init(sentryConfig)
+}
+
+const history = createBrowserHistory({ basename: `${selectApplicationRootPath()}/` })
 const store = createStore(history)
-const rootElement = document.getElementById('app')
 
 const render = () => {
   const App = require('./account/views/app').default
 
   DOM.render(
-    <EnvProvider env={env}>
-      <Provider store={store}>
-        <WithLocale>
-          <Init>
-            <App history={history} env={env} />
-          </Init>
-        </WithLocale>
-      </Provider>
-    </EnvProvider>,
-    rootElement,
+    <Provider store={store}>
+      <WithLocale>
+        <Init>
+          <App history={history} />
+        </Init>
+      </WithLocale>
+    </Provider>,
+    document.getElementById('app'),
   )
 }
 
