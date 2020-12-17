@@ -12,27 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createLogic } from 'redux-logic'
+import api from '@account/api'
 
-import api from '../../api'
-import * as user from '../actions/user'
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
-const userLogic = createLogic({
+import * as user from '@account/store/actions/user'
+
+const userLogic = createRequestLogic({
   type: user.LOGOUT,
-  async process({ getState, action }, dispatch, done) {
-    try {
-      try {
-        await api.account.me()
-      } catch (error) {
-        dispatch(user.getUserMeFailure())
-      }
-      await api.account.logout()
-      dispatch(user.logoutSuccess())
-    } catch (error) {
-      dispatch(user.logoutFailure(error))
-    }
-
-    done()
+  process: async () => {
+    await api.account.logout()
+    window.location.reload()
   },
 })
 
