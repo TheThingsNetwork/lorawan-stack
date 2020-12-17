@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { defineMessages } from 'react-intl'
 import queryString from 'query-string'
 
@@ -33,6 +33,7 @@ import { isNotFoundError, createFrontendError } from '@ttn-lw/lib/errors/utils'
 import { selectApplicationSiteName, selectApplicationSiteTitle } from '@ttn-lw/lib/selectors/env'
 
 const m = defineMessages({
+  backToAccount: 'Back to Account',
   contactInfoValidation: 'Contact info validation',
   validateSuccess: 'Validation successful',
   validateFail: 'There was an error and the contact info could not be validated',
@@ -45,70 +46,74 @@ const m = defineMessages({
 const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
 
-export default class Validate extends React.PureComponent {
-  static propTypes = {
-    location: PropTypes.location.isRequired,
-  }
+const Validate = ({ location }) => {
+  const [error, setError] = useState(undefined)
+  const [success, setSuccess] = useState(undefined)
+  const [fetching, setFetching] = useState(true)
 
-  state = {
-    error: undefined,
-    success: undefined,
-    fetching: true,
-  }
+  const handleError = useCallback(error => {
+    setError(error)
+    setFetching(false)
+    setSuccess(undefined)
+  }, [])
 
-  handleError(error) {
-    this.setState({ error, fetching: false, success: undefined })
-  }
+  const handleSuccess = useCallback(() => {
+    setError(undefined)
+    setFetching(false)
+    setSuccess(m.validateSuccess)
+  }, [])
 
-  handleSuccess() {
-    this.setState({ success: m.validateSuccess, fetching: false, error: undefined })
-  }
-
-  async componentDidMount() {
-    const validationData = queryString.parse(this.props.location.search)
-    try {
-      await api.users.validate({
-        token: validationData.token,
-        id: validationData.reference,
-      })
-      this.handleSuccess()
-    } catch (error) {
-      if (isNotFoundError(error)) {
-        this.handleError(createFrontendError(m.tokenNotFoundTitle, m.tokenNotFoundMessage))
-      } else {
-        this.handleError(error)
+  useEffect(() => {
+    const makeRequest = async () => {
+      const validationData = queryString.parse(location.search)
+      try {
+        await api.users.validate({
+          token: validationData.token,
+          id: validationData.reference,
+        })
+        handleSuccess()
+      } catch (error) {
+        if (isNotFoundError(error)) {
+          handleError(createFrontendError(m.tokenNotFoundTitle, m.tokenNotFoundMessage))
+        } else {
+          handleError(error)
+        }
       }
     }
-  }
+    makeRequest()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  render() {
-    const { fetching, error, success } = this.state
-
-    return (
-      <div className={style.form}>
-        <IntlHelmet title={m.contactInfoValidation} />
-        <h1 className={style.title}>
-          {siteName}
-          <br />
-          <Message component="strong" content={m.contactInfoValidation} />
-        </h1>
-        <hr className={style.hRule} />
-        {fetching ? (
-          <Spinner after={0} faded className={style.spinner}>
-            <Message content={m.validatingAccount} />
-          </Spinner>
-        ) : (
-          <>
-            {error && <ErrorNotification small content={error} title={m.validateFail} />}
-            {success && <Notification small success content={success} title={m.validateSuccess} />}
-          </>
-        )}
-        <Button.Link
-          to="/"
-          icon="keyboard_arrow_left"
-          message={{ ...m.backToAccount, values: { siteTitle } }}
-        />
-      </div>
-    )
-  }
+  return (
+    <div className={style.form}>
+      <IntlHelmet title={m.contactInfoValidation} />
+      <h1 className={style.title}>
+        {siteName}
+        <br />
+        <Message component="strong" content={m.contactInfoValidation} />
+      </h1>
+      <hr className={style.hRule} />
+      {fetching ? (
+        <Spinner after={0} faded className={style.spinner}>
+          <Message content={m.validatingAccount} />
+        </Spinner>
+      ) : (
+        <>
+          {error && <ErrorNotification small content={error} title={m.validateFail} />}
+          {success && <Notification small success content={success} title={m.validateSuccess} />}
+        </>
+      )}
+      <Button.Link
+        to="/"
+        icon="keyboard_arrow_left"
+        message={{ ...m.backToAccount, values: { siteTitle } }}
+      />
+    </div>
+  )
 }
+
+Validate.propTypes = {
+  location: PropTypes.location.isRequired,
+}
+
+export default Validate

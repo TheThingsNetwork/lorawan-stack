@@ -37,47 +37,43 @@ const m = defineMessages({
 const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
 
-export default class Code extends React.Component {
-  static propTypes = {
-    location: PropTypes.location.isRequired,
-  }
-  render() {
-    const { location } = this.props
-    const { query } = Query.parseUrl(location.search)
+const Code = ({ location }) => {
+  const { query } = Query.parseUrl(location.search)
 
-    if (!query.code) {
-      return <Redirect to="/" />
-    }
-
-    return (
-      <React.Fragment>
-        <div className={style.form}>
-          <IntlHelmet title={m.createANewAccount} />
-          <h1 className={style.title}>
-            {siteName}
-            <br />
-            <Message content={m.code} component="strong" />
-          </h1>
-          <hr className={style.hRule} />
-          <Message
-            content={m.codeDescription}
-            component="label"
-            className={style.codeDescription}
-          />
-          <SafeInspector
-            data={query.code}
-            initiallyVisible
-            hideable={false}
-            isBytes={false}
-            className={style.code}
-          />
-          <Button.Link
-            to="/"
-            icon="keyboard_arrow_left"
-            message={{ ...m.backToAccount, values: { siteTitle } }}
-          />
-        </div>
-      </React.Fragment>
-    )
+  if (!query.code) {
+    return <Redirect to="/" />
   }
+
+  return (
+    <>
+      <div className={style.form}>
+        <IntlHelmet title={m.createANewAccount} />
+        <h1 className={style.title}>
+          {siteName}
+          <br />
+          <Message content={m.code} component="strong" />
+        </h1>
+        <hr className={style.hRule} />
+        <Message content={m.codeDescription} component="label" className={style.codeDescription} />
+        <SafeInspector
+          data={query.code}
+          initiallyVisible
+          hideable={false}
+          isBytes={false}
+          className={style.code}
+        />
+        <Button.Link
+          to="/"
+          icon="keyboard_arrow_left"
+          message={{ ...m.backToAccount, values: { siteTitle } }}
+        />
+      </div>
+    </>
+  )
 }
+
+Code.propTypes = {
+  location: PropTypes.location.isRequired,
+}
+
+export default Code

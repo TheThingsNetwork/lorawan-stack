@@ -51,4 +51,5 @@ const Landing = () => (
     <Footer />
   </div>
 )
+
 export { Landing as default, authRoutes }

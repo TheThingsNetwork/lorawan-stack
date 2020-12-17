@@ -19,7 +19,6 @@ import Link from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
-import { withEnv } from '@ttn-lw/lib/components/env'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -31,10 +30,13 @@ import {
   isNotFoundError,
 } from '@ttn-lw/lib/errors/utils'
 import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
+import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 
 import style from './full-view.styl'
 
-const FullViewError = function({ error, env }) {
+const appRoot = selectApplicationRootPath()
+
+const FullViewError = ({ error }) => {
   const isUnknown = isUnknownError(error)
   const statusCode = httpStatusCode(error)
   const isNotFound = isNotFoundError(error)
@@ -63,7 +65,7 @@ const FullViewError = function({ error, env }) {
             />
             <ErrorMessage className={style.fullViewErrorSub} content={errorMessageMessage} />
             {isNotFoundError(error) && (
-              <Link.Anchor icon="keyboard_arrow_left" href={env.appRoot} primary>
+              <Link.Anchor icon="keyboard_arrow_left" href={appRoot} primary>
                 <Message content={sharedMessages.backToOverview} />
               </Link.Anchor>
             )}
@@ -75,8 +77,7 @@ const FullViewError = function({ error, env }) {
 }
 
 FullViewError.propTypes = {
-  env: PropTypes.env.isRequired,
   error: PropTypes.error.isRequired,
 }
 
-export default withEnv(FullViewError)
+export default FullViewError
