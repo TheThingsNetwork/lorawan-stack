@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Removed misleading warning message for missing package data when setting up the storage integration package association.
+
 ### Security
 
 ## [3.10.4] - 2020-12-08
