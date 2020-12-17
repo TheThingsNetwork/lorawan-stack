@@ -68,7 +68,8 @@ type Agent struct {
 	dataPlaneAddress string
 	netID            types.NetID
 	tenantID,
-	clusterID string
+	clusterID,
+	homeNetworkClusterID string
 	authentication    []grpc.DialOption
 	forwarderConfig   ForwarderConfig
 	homeNetworkConfig HomeNetworkConfig
@@ -159,18 +160,23 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		return nil, errAuthenticationMode.WithAttributes("mode", mode)
 	}
 
+	homeNetworkClusterID := conf.HomeNetworkClusterID
+	if homeNetworkClusterID == "" {
+		homeNetworkClusterID = conf.ClusterID
+	}
 	a := &Agent{
 		Component: c,
 		ctx:       ctx,
 
-		dataPlaneAddress:  conf.DataPlaneAddress,
-		netID:             conf.NetID,
-		tenantID:          conf.TenantID,
-		clusterID:         conf.ClusterID,
-		authentication:    authentication,
-		forwarderConfig:   conf.Forwarder,
-		homeNetworkConfig: conf.HomeNetwork,
-		devAddrPrefixes:   devAddrPrefixes,
+		dataPlaneAddress:     conf.DataPlaneAddress,
+		netID:                conf.NetID,
+		tenantID:             conf.TenantID,
+		clusterID:            conf.ClusterID,
+		homeNetworkClusterID: homeNetworkClusterID,
+		authentication:       authentication,
+		forwarderConfig:      conf.Forwarder,
+		homeNetworkConfig:    conf.HomeNetwork,
+		devAddrPrefixes:      devAddrPrefixes,
 	}
 	if a.forwarderConfig.Enable {
 		a.upstreamCh = make(chan *packetbroker.UplinkMessage, upstreamBufferSize)
@@ -552,7 +558,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 		"namespace", "packetbrokeragent",
 		"home_network_net_id", a.netID,
 		"home_network_tenant_id", a.tenantID,
-		"home_network_cluster_id", a.clusterID,
+		"home_network_cluster_id", a.homeNetworkClusterID,
 		"group", a.clusterID,
 	))
 	logger := log.FromContext(ctx)
@@ -599,7 +605,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	stream, err := client.Subscribe(ctx, &routingpb.SubscribeHomeNetworkRequest{
 		HomeNetworkNetId:     a.netID.MarshalNumber(),
 		HomeNetworkTenantId:  a.tenantID,
-		HomeNetworkClusterId: a.clusterID,
+		HomeNetworkClusterId: a.homeNetworkClusterID,
 		Filters:              filters,
 		Group:                a.clusterID,
 	})
@@ -727,7 +733,7 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 		"namespace", "packetbrokeragent",
 		"home_network_net_id", a.netID,
 		"home_network_tenant_id", a.tenantID,
-		"home_network_cluster_id", a.clusterID,
+		"home_network_cluster_id", a.homeNetworkClusterID,
 	))
 
 	conn, err := a.dialContext(ctx)
@@ -795,7 +801,7 @@ func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientCo
 			req := &routingpb.PublishDownlinkMessageRequest{
 				HomeNetworkNetId:     a.netID.MarshalNumber(),
 				HomeNetworkTenantId:  a.tenantID,
-				HomeNetworkClusterId: a.clusterID,
+				HomeNetworkClusterId: a.homeNetworkClusterID,
 				ForwarderNetId:       token.ForwarderNetID.MarshalNumber(),
 				ForwarderTenantId:    token.ForwarderTenantID,
 				ForwarderClusterId:   token.ForwarderClusterID,

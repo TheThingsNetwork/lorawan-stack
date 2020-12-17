@@ -22,15 +22,16 @@ import (
 
 // Config configures Packet Broker clients.
 type Config struct {
-	DataPlaneAddress   string               `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
-	NetID              types.NetID          `name:"net-id" description:"LoRa Alliance NetID"`
-	TenantID           string               `name:"tenant-id" description:"Tenant ID within the NetID"`
-	ClusterID          string               `name:"cluster-id" description:"Cluster ID uniquely identifying this cluster within a NetID and tenant"`
-	AuthenticationMode string               `name:"authentication-mode" description:"Authentication mode (tls, oauth2)"`
-	TLS                tlsconfig.ClientAuth `name:"tls" description:"TLS client certificate (DEPRECATED)"`
-	OAuth2             OAuth2Config         `name:"oauth2" description:"OAuth 2.0 configuration"`
-	Forwarder          ForwarderConfig      `name:"forwarder" description:"Forwarder configuration for publishing uplink messages and subscribing to downlink messages"`
-	HomeNetwork        HomeNetworkConfig    `name:"home-network" description:"Home Network configuration for subscribing to uplink and publishing downlink messages"`
+	DataPlaneAddress     string               `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
+	NetID                types.NetID          `name:"net-id" description:"LoRa Alliance NetID"`
+	TenantID             string               `name:"tenant-id" description:"Tenant ID within the NetID"`
+	ClusterID            string               `name:"cluster-id" description:"Cluster ID uniquely identifying the Forwarder in the NetID and Tenant ID"`
+	HomeNetworkClusterID string               `name:"home-network-cluster-id" description:"Home Network Cluster ID, if different from the Cluster ID"`
+	AuthenticationMode   string               `name:"authentication-mode" description:"Authentication mode (tls, oauth2)"`
+	TLS                  tlsconfig.ClientAuth `name:"tls" description:"TLS client certificate (DEPRECATED)"`
+	OAuth2               OAuth2Config         `name:"oauth2" description:"OAuth 2.0 configuration"`
+	Forwarder            ForwarderConfig      `name:"forwarder" description:"Forwarder configuration for publishing uplink messages and subscribing to downlink messages"`
+	HomeNetwork          HomeNetworkConfig    `name:"home-network" description:"Home Network configuration for subscribing to uplink and publishing downlink messages"`
 }
 
 // OAuth2Config defines OAuth 2.0 configuration for authentication.
