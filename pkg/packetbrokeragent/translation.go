@@ -123,9 +123,9 @@ func toPBLocation(loc *ttnpb.Location) *packetbroker.Location {
 }
 
 type agentUplinkToken struct {
-	ForwarderNetID    types.NetID `json:"fnid"`
-	ForwarderID       string      `json:"fid,omitempty"`
-	ForwarderTenantID string      `json:"ftid,omitempty"`
+	ForwarderNetID     types.NetID `json:"fnid"`
+	ForwarderTenantID  string      `json:"ftid,omitempty"`
+	ForwarderClusterID string      `json:"fcid,omitempty"`
 }
 
 type compoundUplinkToken struct {
@@ -373,9 +373,9 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 	if len(msg.Message.GatewayUplinkToken) > 0 || len(msg.Message.ForwarderUplinkToken) > 0 {
 		downlinkPathConstraint = ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE
 		token := &agentUplinkToken{
-			ForwarderNetID:    forwarderNetID,
-			ForwarderID:       msg.ForwarderId,
-			ForwarderTenantID: msg.ForwarderTenantId,
+			ForwarderNetID:     forwarderNetID,
+			ForwarderTenantID:  msg.ForwarderTenantId,
+			ForwarderClusterID: msg.ForwarderClusterId,
 		}
 		var err error
 		uplinkToken, err = wrapUplinkTokens(msg.Message.GatewayUplinkToken, msg.Message.ForwarderUplinkToken, token)
@@ -401,13 +401,14 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 	}
 	if gtwMd := msg.Message.GatewayMetadata; gtwMd != nil {
 		pbMD := &ttnpb.PacketBrokerMetadata{
-			MessageID:           msg.Id,
-			ForwarderNetID:      forwarderNetID,
-			ForwarderTenantID:   msg.ForwarderTenantId,
-			ForwarderID:         msg.ForwarderId,
-			HomeNetworkNetID:    homeNetworkNetID,
-			HomeNetworkTenantID: msg.HomeNetworkTenantId,
-			Hops:                make([]*ttnpb.PacketBrokerRouteHop, 0, len(msg.Hops)),
+			MessageID:            msg.Id,
+			ForwarderNetID:       forwarderNetID,
+			ForwarderTenantID:    msg.ForwarderTenantId,
+			ForwarderClusterID:   msg.ForwarderClusterId,
+			HomeNetworkNetID:     homeNetworkNetID,
+			HomeNetworkTenantID:  msg.HomeNetworkTenantId,
+			HomeNetworkClusterID: msg.HomeNetworkClusterId,
+			Hops:                 make([]*ttnpb.PacketBrokerRouteHop, 0, len(msg.Hops)),
 		}
 		for _, h := range msg.Hops {
 			receivedAt, err := pbtypes.TimestampFromProto(h.ReceivedAt)

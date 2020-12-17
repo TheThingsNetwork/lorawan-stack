@@ -53,7 +53,9 @@ func TestComponent(t *testing.T) {
 
 	c := componenttest.NewComponent(t, &component.Config{})
 
-	test.Must(New(c, &Config{}, testOptions...))
+	test.Must(New(c, &Config{
+		AuthenticationMode: "oauth2",
+	}, testOptions...))
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 
@@ -83,10 +85,11 @@ func TestForwarder(t *testing.T) {
 		Key:       tokenKey,
 	}, nil)).(jose.Encrypter)
 	test.Must(New(c, &Config{
-		DataPlaneAddress: fmt.Sprintf("localhost:%d", addr.(*net.TCPAddr).Port),
-		NetID:            types.NetID{0x0, 0x0, 0x13},
-		TenantID:         "foo-tenant",
-		ClusterID:        "test",
+		DataPlaneAddress:   fmt.Sprintf("localhost:%d", addr.(*net.TCPAddr).Port),
+		NetID:              types.NetID{0x0, 0x0, 0x13},
+		TenantID:           "foo-tenant",
+		ClusterID:          "test",
+		AuthenticationMode: "tls",
 		TLS: tlsconfig.ClientAuth{
 			Source:      "file",
 			Certificate: "testdata/clientcert.pem",
@@ -334,7 +337,7 @@ func TestForwarder(t *testing.T) {
 		dp.ForwarderDown <- &packetbroker.RoutedDownlinkMessage{
 			ForwarderNetId:      0x000013,
 			ForwarderTenantId:   "foo-tenant",
-			ForwarderId:         "test",
+			ForwarderClusterId:  "test",
 			HomeNetworkNetId:    0x000042,
 			HomeNetworkTenantId: "foo-tenant",
 			Id:                  "test",
@@ -404,10 +407,11 @@ func TestHomeNetwork(t *testing.T) {
 
 	ns := test.Must(mock.NewNetworkServer(c)).(*mock.NetworkServer)
 	test.Must(New(c, &Config{
-		DataPlaneAddress: fmt.Sprintf("localhost:%d", addr.(*net.TCPAddr).Port),
-		NetID:            types.NetID{0x0, 0x0, 0x13},
-		TenantID:         "foo-tenant",
-		ClusterID:        "test",
+		DataPlaneAddress:   fmt.Sprintf("localhost:%d", addr.(*net.TCPAddr).Port),
+		NetID:              types.NetID{0x0, 0x0, 0x13},
+		TenantID:           "foo-tenant",
+		ClusterID:          "test",
+		AuthenticationMode: "tls",
 		TLS: tlsconfig.ClientAuth{
 			Source:      "file",
 			Certificate: "testdata/clientcert.pem",
@@ -432,12 +436,13 @@ func TestHomeNetwork(t *testing.T) {
 		}{
 			{
 				RoutedUplinkMessage: &packetbroker.RoutedUplinkMessage{
-					ForwarderNetId:      0x000042,
-					ForwarderId:         "test",
-					ForwarderTenantId:   "foo-tenant",
-					HomeNetworkNetId:    0x000013,
-					HomeNetworkTenantId: "foo-tenant",
-					Id:                  "test",
+					ForwarderNetId:       0x000042,
+					ForwarderClusterId:   "test",
+					ForwarderTenantId:    "foo-tenant",
+					HomeNetworkNetId:     0x000013,
+					HomeNetworkTenantId:  "foo-tenant",
+					HomeNetworkClusterId: "test",
+					Id:                   "test",
 					Message: &packetbroker.UplinkMessage{
 						DataRateIndex:        5,
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
@@ -517,12 +522,13 @@ func TestHomeNetwork(t *testing.T) {
 						{
 							GatewayIdentifiers: cluster.PacketBrokerGatewayID,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
-								MessageID:           "test",
-								ForwarderNetID:      [3]byte{0x0, 0x0, 0x42},
-								ForwarderTenantID:   "foo-tenant",
-								ForwarderID:         "test",
-								HomeNetworkNetID:    [3]byte{0x0, 0x0, 0x13},
-								HomeNetworkTenantID: "foo-tenant",
+								MessageID:            "test",
+								ForwarderNetID:       [3]byte{0x0, 0x0, 0x42},
+								ForwarderTenantID:    "foo-tenant",
+								ForwarderClusterID:   "test",
+								HomeNetworkNetID:     [3]byte{0x0, 0x0, 0x13},
+								HomeNetworkTenantID:  "foo-tenant",
+								HomeNetworkClusterID: "test",
 							},
 							ChannelRSSI: -42,
 							RSSI:        -42,
@@ -533,9 +539,9 @@ func TestHomeNetwork(t *testing.T) {
 								Altitude:  2,
 							},
 							UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &AgentUplinkToken{
-								ForwarderNetID:    [3]byte{0x0, 0x0, 0x42},
-								ForwarderID:       "test",
-								ForwarderTenantID: "foo-tenant",
+								ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
+								ForwarderTenantID:  "foo-tenant",
+								ForwarderClusterID: "test",
 							})).([]byte),
 						},
 					},
@@ -555,12 +561,13 @@ func TestHomeNetwork(t *testing.T) {
 			},
 			{
 				RoutedUplinkMessage: &packetbroker.RoutedUplinkMessage{
-					ForwarderNetId:      0x000042,
-					ForwarderId:         "test",
-					ForwarderTenantId:   "foo-tenant",
-					HomeNetworkNetId:    0x000013,
-					HomeNetworkTenantId: "foo-tenant",
-					Id:                  "test",
+					ForwarderNetId:       0x000042,
+					ForwarderTenantId:    "foo-tenant",
+					ForwarderClusterId:   "test",
+					HomeNetworkNetId:     0x000013,
+					HomeNetworkTenantId:  "foo-tenant",
+					HomeNetworkClusterId: "test",
+					Id:                   "test",
 					Message: &packetbroker.UplinkMessage{
 						DataRateIndex:        3,
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
@@ -617,20 +624,21 @@ func TestHomeNetwork(t *testing.T) {
 						{
 							GatewayIdentifiers: cluster.PacketBrokerGatewayID,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
-								MessageID:           "test",
-								ForwarderNetID:      [3]byte{0x0, 0x0, 0x42},
-								ForwarderTenantID:   "foo-tenant",
-								ForwarderID:         "test",
-								HomeNetworkNetID:    [3]byte{0x0, 0x0, 0x13},
-								HomeNetworkTenantID: "foo-tenant",
+								MessageID:            "test",
+								ForwarderNetID:       [3]byte{0x0, 0x0, 0x42},
+								ForwarderTenantID:    "foo-tenant",
+								ForwarderClusterID:   "test",
+								HomeNetworkNetID:     [3]byte{0x0, 0x0, 0x13},
+								HomeNetworkTenantID:  "foo-tenant",
+								HomeNetworkClusterID: "test",
 							},
 							ChannelRSSI: 4.2,
 							RSSI:        4.2,
 							SNR:         -5.5,
 							UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &AgentUplinkToken{
-								ForwarderNetID:    [3]byte{0x0, 0x0, 0x42},
-								ForwarderID:       "test",
-								ForwarderTenantID: "foo-tenant",
+								ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
+								ForwarderTenantID:  "foo-tenant",
+								ForwarderClusterID: "test",
 							})).([]byte),
 						},
 					},
@@ -684,9 +692,9 @@ func TestHomeNetwork(t *testing.T) {
 						{
 							Path: &ttnpb.DownlinkPath_UplinkToken{
 								UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &AgentUplinkToken{
-									ForwarderNetID:    [3]byte{0x0, 0x0, 0x42},
-									ForwarderID:       "test",
-									ForwarderTenantID: "foo-tenant",
+									ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
+									ForwarderTenantID:  "foo-tenant",
+									ForwarderClusterID: "test",
 								})).([]byte),
 							},
 						},
@@ -713,9 +721,9 @@ func TestHomeNetwork(t *testing.T) {
 		}
 
 		a.So(pbMsg, should.Resemble, &packetbroker.RoutedDownlinkMessage{
-			ForwarderNetId:    0x000042,
-			ForwarderId:       "test",
-			ForwarderTenantId: "foo-tenant",
+			ForwarderNetId:     0x000042,
+			ForwarderClusterId: "test",
+			ForwarderTenantId:  "foo-tenant",
 			Message: &packetbroker.DownlinkMessage{
 				PhyPayload: []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 				Class:      packetbroker.DownlinkMessageClass_CLASS_A,
