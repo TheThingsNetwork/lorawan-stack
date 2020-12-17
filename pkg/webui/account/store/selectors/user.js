@@ -16,14 +16,14 @@ const selectUserStore = state => state.user
 
 export const selectUser = state => selectUserStore(state).user
 
-export const selectUserId = function(state) {
+export const selectUserId = state => {
   const user = selectUser(state)
   const { ids = {} } = user
 
   return ids.user_id
 }
 
-export const selectUserIsAdmin = function(state) {
+export const selectUserIsAdmin = state => {
   const user = selectUser(state)
   return user.isAdmin
 }

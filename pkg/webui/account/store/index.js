@@ -41,7 +41,7 @@ if (env.sentryDsn) {
   ]
 }
 
-export default function(history) {
+export default history => {
   const middleware = applyMiddleware(...middlewares, routerMiddleware(history))
   const store = createStore(createRootReducer(history), composeEnhancers(middleware))
   if (dev && module.hot) {

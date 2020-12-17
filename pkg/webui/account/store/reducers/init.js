@@ -19,7 +19,7 @@ const defaultState = {
   error: undefined,
 }
 
-const init = function(state = defaultState, action) {
+const init = (state = defaultState, action) => {
   switch (action.type) {
     case INITIALIZE:
       return {
