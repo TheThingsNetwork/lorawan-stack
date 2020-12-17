@@ -144,7 +144,7 @@ func TestPubSub(t *testing.T) {
 
 	c := componenttest.NewComponent(t, &component.Config{})
 	io := mock_server.NewServer(c)
-	_, err = pubsub.New(c, io, registry)
+	_, err = pubsub.New(c, io, registry, make(pubsub.ProviderStatuses))
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}

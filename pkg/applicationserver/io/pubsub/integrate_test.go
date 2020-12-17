@@ -92,7 +92,7 @@ func TestIntegrate(t *testing.T) {
 		},
 	})
 	io := mock_server.NewServer(c)
-	srv, err := pubsub.New(c, io, pubsubRegistry)
+	srv, err := pubsub.New(c, io, pubsubRegistry, make(pubsub.ProviderStatuses))
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}

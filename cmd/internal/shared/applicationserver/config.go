@@ -55,4 +55,10 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 	Distribution: applicationserver.DistributionConfig{
 		Timeout: time.Minute,
 	},
+	PubSub: applicationserver.PubSubConfig{
+		Providers: map[string]string{
+			"mqtt": "enabled",
+			"nats": "enabled",
+		},
+	},
 }
