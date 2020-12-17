@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { withRouter, Redirect } from 'react-router-dom'
-import bind from 'autobind-decorator'
+import React, { useState, useCallback } from 'react'
+import { useDispatch } from 'react-redux'
 import { defineMessages } from 'react-intl'
-import { connect } from 'react-redux'
-import { replace, push } from 'connected-react-router'
+import { Redirect } from 'react-router-dom'
+import { push } from 'connected-react-router'
 import queryString from 'query-string'
 
 import api from '@account/api'
@@ -26,7 +25,6 @@ import Button from '@ttn-lw/components/button'
 import Input from '@ttn-lw/components/input'
 import Form from '@ttn-lw/components/form'
 import SubmitButton from '@ttn-lw/components/submit-button'
-import Spinner from '@ttn-lw/components/spinner'
 
 import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -36,10 +34,8 @@ import style from '@account/views/front/front.styl'
 import Yup from '@ttn-lw/lib/yup'
 import { selectApplicationSiteName, selectEnableUserRegistration } from '@ttn-lw/lib/selectors/env'
 import { id as userRegexp } from '@ttn-lw/lib/regexp'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-
-import { selectUser } from '@account/store/selectors/user'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
   registrationApproved: 'You have successfully registered and can login now',
@@ -78,6 +74,7 @@ const initialValues = {
 }
 
 const siteName = selectApplicationSiteName()
+const enableUserRegistration = selectEnableUserRegistration()
 
 const getSuccessMessage = state => {
   switch (state) {
@@ -91,153 +88,114 @@ const getSuccessMessage = state => {
   }
 }
 
-@withRouter
-@connect(
-  state => ({
-    enableUserRegistration: selectEnableUserRegistration(),
-    fetching: state.user.fetching,
-    user: selectUser(state),
-  }),
-  {
-    push,
-    replace,
-  },
-)
-export default class CreateAccount extends React.PureComponent {
-  static propTypes = {
-    enableUserRegistration: PropTypes.bool.isRequired,
-    fetching: PropTypes.bool.isRequired,
-    push: PropTypes.func.isRequired,
-    user: PropTypes.user,
+const CreateAccount = ({ location }) => {
+  const [error, setError] = useState(undefined)
+  const dispatch = useDispatch()
+
+  const handleSubmit = useCallback(
+    async (values, { setSubmitting }) => {
+      try {
+        setError(undefined)
+        const { user_id, ...rest } = values
+        const { invitation_token = '' } = queryString.parse(location.search)
+        const result = await api.users.register({
+          user: { ids: { user_id }, ...rest },
+          invitation_token,
+        })
+
+        dispatch(
+          push(`/login${location.search}`, {
+            info: getSuccessMessage(result.data.state),
+          }),
+        )
+      } catch (error) {
+        setSubmitting(false)
+        setError(error)
+      }
+    },
+    [dispatch, location.search],
+  )
+
+  if (!enableUserRegistration) {
+    return <Redirect to={`/login${location.search}`} />
   }
 
-  static defaultProps = {
-    user: undefined,
-  }
-
-  constructor(props) {
-    super(props)
-    this.state = {
-      error: '',
-    }
-  }
-
-  @bind
-  async handleSubmit(values, { setSubmitting }) {
-    try {
-      this.setState({ error: undefined })
-      const { user_id, ...rest } = values
-      const { invitation_token = '' } = queryString.parse(location.search)
-      const { push } = this.props
-      const result = await api.users.register({
-        user: { ids: { user_id }, ...rest },
-        invitation_token,
-      })
-
-      push(`/login${location.search}`, {
-        info: getSuccessMessage(result.data.state),
-      })
-    } catch (error) {
-      setSubmitting(false)
-      this.setState({
-        error,
-      })
-    }
-  }
-
-  render() {
-    const { error } = this.state
-    const { user, fetching, siteName, enableUserRegistration } = this.props
-
-    if (Boolean(user) || !enableUserRegistration) {
-      return (
-        <Redirect
-          to={{
-            pathname: '/',
-          }}
-        />
-      )
-    }
-
-    if (fetching) {
-      return (
-        <Spinner center>
-          <Message content={sharedMessages.fetching} />
-        </Spinner>
-      )
-    }
-
-    return (
-      <React.Fragment>
-        <div className={style.form}>
-          <IntlHelmet title={m.createANewAccount} />
-          <h1 className={style.title}>
-            {siteName}
-            <br />
-            <Message content={m.createANewAccount} component="strong" />
-          </h1>
-          <hr className={style.hRule} />
-          <Form
-            onSubmit={this.handleSubmit}
-            initialValues={initialValues}
-            error={error}
-            validationSchema={validationSchema}
-            horizontal={false}
-          >
-            <Form.Field
-              component={Input}
-              required
-              title={sharedMessages.userId}
-              name="user_id"
-              autoComplete="username"
-              autoFocus
+  return (
+    <>
+      <div className={style.form}>
+        <IntlHelmet title={m.createANewAccount} />
+        <h1 className={style.title}>
+          {siteName}
+          <br />
+          <Message content={m.createANewAccount} component="strong" />
+        </h1>
+        <hr className={style.hRule} />
+        <Form
+          onSubmit={handleSubmit}
+          initialValues={initialValues}
+          error={error}
+          validationSchema={validationSchema}
+          horizontal={false}
+        >
+          <Form.Field
+            component={Input}
+            required
+            title={sharedMessages.userId}
+            name="user_id"
+            autoComplete="username"
+            autoFocus
+          />
+          <Form.Field
+            title={sharedMessages.name}
+            name="name"
+            component={Input}
+            autoComplete="name"
+          />
+          <Form.Field
+            required
+            title={sharedMessages.email}
+            component={Input}
+            name="primary_email_address"
+            autoComplete="email"
+          />
+          <Form.Field
+            required
+            title={sharedMessages.password}
+            name="password"
+            type="password"
+            component={Input}
+            autoComplete="new-password"
+          />
+          <Form.Field
+            required
+            title={sharedMessages.confirmPassword}
+            name="password_confirm"
+            type="password"
+            autoComplete="new-password"
+            component={Input}
+          />
+          <div className={style.buttons}>
+            <Form.Submit
+              component={SubmitButton}
+              message={m.createAccount}
+              className={style.submitButton}
+              alwaysEnabled
             />
-            <Form.Field
-              title={sharedMessages.name}
-              name="name"
-              component={Input}
-              autoComplete="name"
+            <Button.Link
+              to={`/login${location.search}`}
+              naked
+              secondary
+              message={sharedMessages.login}
             />
-            <Form.Field
-              required
-              title={sharedMessages.email}
-              component={Input}
-              name="primary_email_address"
-              autoComplete="email"
-            />
-            <Form.Field
-              required
-              title={sharedMessages.password}
-              name="password"
-              type="password"
-              component={Input}
-              autoComplete="new-password"
-            />
-            <Form.Field
-              required
-              title={sharedMessages.confirmPassword}
-              name="password_confirm"
-              type="password"
-              autoComplete="new-password"
-              component={Input}
-            />
-            <div className={style.buttons}>
-              <Form.Submit
-                component={SubmitButton}
-                message={m.createAccount}
-                className={style.submitButton}
-                alwaysEnabled
-              />
-              <Button.Link
-                to={`/login${location.search}`}
-                naked
-                secondary
-                message={sharedMessages.login}
-              />
-            </div>
-          </Form>
-        </div>
-      </React.Fragment>
-    )
-  }
+          </div>
+        </Form>
+      </div>
+    </>
+  )
 }
+
+CreateAccount.propTypes = {
+  location: PropTypes.location.isRequired,
+}
+
+export default CreateAccount

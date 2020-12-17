@@ -33,30 +33,28 @@ const m = defineMessages({
 const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
 
-export default class FrontNotFound extends React.Component {
-  render() {
-    return (
-      <React.Fragment>
-        <div className={style.form}>
-          <IntlHelmet title={statusCodeMessages['404']} />
-          <h1 className={style.title}>
-            {siteName}
-            <br />
-            <Message content={statusCodeMessages['404']} component="strong" />
-          </h1>
-          <hr className={style.hRule} />
-          <Message
-            content={errorMessages.genericNotFound}
-            component="p"
-            className={style.errorDescription}
-          />
-          <Button.Link
-            to="/login"
-            icon="keyboard_arrow_left"
-            message={{ ...m.backToAccount, values: { siteTitle } }}
-          />
-        </div>
-      </React.Fragment>
-    )
-  }
-}
+const FrontNotFound = () => (
+  <React.Fragment>
+    <div className={style.form}>
+      <IntlHelmet title={statusCodeMessages['404']} />
+      <h1 className={style.title}>
+        {siteName}
+        <br />
+        <Message content={statusCodeMessages['404']} component="strong" />
+      </h1>
+      <hr className={style.hRule} />
+      <Message
+        content={errorMessages.genericNotFound}
+        component="p"
+        className={style.errorDescription}
+      />
+      <Button.Link
+        to="/login"
+        icon="keyboard_arrow_left"
+        message={{ ...m.backToAccount, values: { siteTitle } }}
+      />
+    </div>
+  </React.Fragment>
+)
+
+export default FrontNotFound

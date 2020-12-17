@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import bind from 'autobind-decorator'
+import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import api from '@account/api'
 
@@ -32,7 +31,6 @@ import style from '@account/views/front/front.styl'
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import { id as userRegexp } from '@ttn-lw/lib/regexp'
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 
@@ -58,81 +56,63 @@ const initialValues = { user_id: '' }
 
 const siteName = selectApplicationSiteName()
 
-@connect(
-  undefined,
-  {
-    handleCancel: () => push('/login'),
-  },
-)
-export default class ForgotPassword extends React.PureComponent {
-  static propTypes = {
-    handleCancel: PropTypes.func.isRequired,
-  }
+const ForgotPassword = () => {
+  const dispatch = useDispatch()
+  const handleCancel = useCallback(() => dispatch(push('/login')), [dispatch])
+  const [error, setError] = useState(undefined)
+  const [info, setInfo] = useState(undefined)
+  const [requested, setRequested] = useState(undefined)
+  const cancelButtonText = requested ? m.goToLogin : sharedMessages.cancel
 
-  state = {
-    error: '',
-    info: '',
-    requested: false,
-  }
-
-  @bind
-  async handleSubmit(values, { setSubmitting }) {
+  const handleSubmit = useCallback(async (values, { resetForm, setSubmitting }) => {
     try {
+      setError(undefined)
+      setInfo(m.passwordRequested)
+      setRequested(true)
       await api.users.resetPassword(values.user_id)
-      this.setState({
-        error: '',
-        info: m.passwordRequested,
-        requested: true,
-      })
+      resetForm({})
     } catch (error) {
-      this.setState({
-        error,
-        info: '',
-      })
-    } finally {
       setSubmitting(false)
+      setError(error)
+      setInfo(undefined)
     }
-  }
+  }, [])
 
-  render() {
-    const { error, info, requested } = this.state
-    const { handleCancel } = this.props
-    const cancelButtonText = requested ? m.goToLogin : sharedMessages.cancel
-
-    return (
-      <div className={style.form}>
-        <IntlHelmet title={m.forgotPassword} />
-        <h1 className={style.title}>
-          {siteName}
-          <br />
-          <Message component="strong" content={m.requestTempPassword} />
-        </h1>
-        <hr className={style.hRule} />
-        <Message content={m.resetPasswordDescription} component="p" className={style.description} />
-        <Form
-          onSubmit={this.handleSubmit}
-          initialValues={initialValues}
-          error={error}
-          info={info}
-          validationSchema={validationSchema}
-          horizontal={false}
-        >
-          <Form.Field
-            title={sharedMessages.userId}
-            name="user_id"
-            component={Input}
-            autoFocus
-            required
-          />
-          <Form.Submit
-            component={SubmitButton}
-            message={m.send}
-            className={style.submitButton}
-            alwaysEnabled
-          />
-          <Button naked secondary message={cancelButtonText} onClick={handleCancel} />
-        </Form>
-      </div>
-    )
-  }
+  return (
+    <div className={style.form}>
+      <IntlHelmet title={m.forgotPassword} />
+      <h1 className={style.title}>
+        {siteName}
+        <br />
+        <Message component="strong" content={m.requestTempPassword} />
+      </h1>
+      <hr className={style.hRule} />
+      <Message content={m.resetPasswordDescription} component="p" className={style.description} />
+      <Form
+        onSubmit={handleSubmit}
+        initialValues={initialValues}
+        error={error}
+        info={info}
+        validationSchema={validationSchema}
+        horizontal={false}
+      >
+        <Form.Field
+          title={sharedMessages.userId}
+          name="user_id"
+          component={Input}
+          autoFocus
+          required
+        />
+        <Form.Submit
+          component={SubmitButton}
+          message={m.send}
+          className={style.submitButton}
+          alwaysEnabled
+        />
+        <Button naked secondary message={cancelButtonText} onClick={handleCancel} />
+      </Form>
+    </div>
+  )
 }
+
+export default ForgotPassword

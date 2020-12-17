@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { hot } from 'react-hot-loader/root'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { ConnectedRouter } from 'connected-react-router'
@@ -27,58 +27,53 @@ import Authorize from '@account/views/authorize'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import dev from '@ttn-lw/lib/dev'
+import {
+  selectApplicationSiteName,
+  selectApplicationSiteTitle,
+  selectPageData,
+} from '@ttn-lw/lib/selectors/env'
 
 import { selectUser } from '@account/store/selectors/user'
 
 import Front from '../front'
 
-class AccountApp extends React.PureComponent {
-  static propTypes = {
-    env: PropTypes.env.isRequired,
-    history: PropTypes.history.isRequired,
-    user: PropTypes.user,
-  }
+const siteName = selectApplicationSiteName()
+const siteTitle = selectApplicationSiteTitle()
+const pageData = selectPageData()
 
-  static defaultProps = {
-    user: undefined,
-  }
+const AccountApp = ({ history }) => {
+  const user = useSelector(selectUser)
 
-  render() {
-    const {
-      env: { siteTitle, pageData, siteName },
-      history,
-      user,
-    } = this.props
-
-    if (pageData && pageData.error) {
-      return (
-        <ConnectedRouter history={history}>
-          <FullViewError error={pageData.error} />
-        </ConnectedRouter>
-      )
-    }
-
+  if (pageData && pageData.error) {
     return (
       <ConnectedRouter history={history}>
-        <ErrorView ErrorComponent={FullViewError}>
-          <React.Fragment>
-            <Helmet
-              titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
-              defaultTitle={`${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
-            />
-            <Switch>
-              <Route path="/" component={Boolean(user) ? Landing : Front} />
-              <Route path="/authorize" component={Authorize} />
-            </Switch>
-          </React.Fragment>
-        </ErrorView>
+        <FullViewError error={pageData.error} />
       </ConnectedRouter>
     )
   }
+
+  return (
+    <ConnectedRouter history={history}>
+      <ErrorView ErrorComponent={FullViewError}>
+        <React.Fragment>
+          <Helmet
+            titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
+            defaultTitle={`${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
+          />
+          <Switch>
+            <Route path="/authorize" component={Authorize} />
+            <Route path="/" component={Boolean(user) ? Landing : Front} />
+          </Switch>
+        </React.Fragment>
+      </ErrorView>
+    </ConnectedRouter>
+  )
+}
+
+AccountApp.propTypes = {
+  history: PropTypes.history.isRequired,
 }
 
 const ExportedApp = dev ? hot(AccountApp) : AccountApp
 
-export default connect(state => ({
-  user: selectUser(state),
-}))(ExportedApp)
+export default ExportedApp

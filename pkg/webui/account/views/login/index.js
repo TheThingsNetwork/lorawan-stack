@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { withRouter } from 'react-router-dom'
-import bind from 'autobind-decorator'
+import React, { useState, useCallback } from 'react'
+import { useLocation } from 'react-router-dom'
 import Query from 'query-string'
 import { defineMessages } from 'react-intl'
 
@@ -30,7 +29,6 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import style from '@account/views/front/front.styl'
 
 import Yup from '@ttn-lw/lib/yup'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import {
   selectApplicationRootPath,
   selectApplicationSiteName,
@@ -61,109 +59,6 @@ const validationSchema = Yup.object().shape({
   password: Yup.string().required(sharedMessages.validateRequired),
 })
 
-@withRouter
-export default class Login extends React.PureComponent {
-  static propTypes = {
-    enableUserRegistration: PropTypes.bool.isRequired,
-    location: PropTypes.location.isRequired,
-  }
-
-  constructor(props) {
-    super(props)
-    this.state = {
-      error: undefined,
-    }
-  }
-
-  @bind
-  async handleSubmit(values, { setSubmitting }) {
-    try {
-      this.setState({ error: undefined })
-      await api.account.login(values)
-
-      window.location = url(this.props.location)
-    } catch (error) {
-      this.setState({
-        error,
-      })
-      setSubmitting(false)
-    }
-  }
-
-  render() {
-    const initialValues = {
-      user_id: '',
-      password: '',
-    }
-
-    let info
-    const { location } = this.props
-    const next = url(location)
-    const query = Query.parse(location.search)
-
-    if (location.state && location.state.info) {
-      info = location.state.info
-    } else if (!next || (next !== appRoot && !Boolean(this.state.error))) {
-      info = m.loginToContinue
-    }
-
-    return (
-      <React.Fragment>
-        <div className={style.form}>
-          <IntlHelmet title={sharedMessages.login} />
-          <h1 className={style.title}>
-            {siteName}
-            <br />
-            <span className={style.subTitle}>{siteTitle}</span>
-          </h1>
-          <hr className={style.hRule} />
-          <Form
-            onSubmit={this.handleSubmit}
-            initialValues={initialValues}
-            error={this.state.error}
-            errorTitle={m.loginFailed}
-            info={info}
-            validationSchema={validationSchema}
-            horizontal={false}
-          >
-            <Form.Field
-              title={sharedMessages.userId}
-              name="user_id"
-              component={Input}
-              autoFocus
-              required
-            />
-            <Form.Field
-              title={sharedMessages.password}
-              component={Input}
-              name="password"
-              type="password"
-              required
-            />
-            <div className={style.buttons}>
-              <Form.Submit
-                component={SubmitButton}
-                message={sharedMessages.login}
-                className={style.submitButton}
-                alwaysEnabled
-              />
-              {enableUserRegistration && (
-                <Button.Link
-                  to={`/register${location.search}`}
-                  secondary
-                  message={m.createAccount}
-                  className={style.registerButton}
-                />
-              )}
-              <Button.Link naked secondary message={m.forgotPassword} to="/forgot-password" />
-            </div>
-          </Form>
-        </div>
-      </React.Fragment>
-    )
-  }
-}
-
 const url = (location, omitQuery = false) => {
   const query = Query.parse(location.search)
 
@@ -175,3 +70,94 @@ const url = (location, omitQuery = false) => {
 
   return next
 }
+
+const Login = () => {
+  const [error, setError] = useState(undefined)
+  const location = useLocation()
+
+  const handleSubmit = useCallback(
+    async (values, { setSubmitting }) => {
+      try {
+        setError(undefined)
+        await api.account.login(values)
+
+        window.location = url(location)
+      } catch (error) {
+        setError(error)
+        setSubmitting(false)
+      }
+    },
+    [location],
+  )
+
+  const initialValues = {
+    user_id: '',
+    password: '',
+  }
+
+  let info
+  const next = url(location)
+
+  if (location.state && location.state.info) {
+    info = location.state.info
+  } else if (!next || (next !== appRoot && !Boolean(error))) {
+    info = m.loginToContinue
+  }
+
+  return (
+    <React.Fragment>
+      <div className={style.form}>
+        <IntlHelmet title={sharedMessages.login} />
+        <h1 className={style.title}>
+          {siteName}
+          <br />
+          <span className={style.subTitle}>{siteTitle}</span>
+        </h1>
+        <hr className={style.hRule} />
+        <Form
+          onSubmit={handleSubmit}
+          initialValues={initialValues}
+          error={error}
+          errorTitle={m.loginFailed}
+          info={info}
+          validationSchema={validationSchema}
+          horizontal={false}
+        >
+          <Form.Field
+            title={sharedMessages.userId}
+            name="user_id"
+            component={Input}
+            autoFocus
+            required
+          />
+          <Form.Field
+            title={sharedMessages.password}
+            component={Input}
+            name="password"
+            type="password"
+            required
+          />
+          <div className={style.buttons}>
+            <Form.Submit
+              component={SubmitButton}
+              message={sharedMessages.login}
+              className={style.submitButton}
+              alwaysEnabled
+            />
+            {enableUserRegistration && (
+              <Button.Link
+                to={`/register${location.search}`}
+                secondary
+                message={m.createAccount}
+                className={style.registerButton}
+              />
+            )}
+            <Button.Link naked secondary message={m.forgotPassword} to="/forgot-password" />
+          </div>
+        </Form>
+      </div>
+    </React.Fragment>
+  )
+}
+
+export default Login
