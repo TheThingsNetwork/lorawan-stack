@@ -14,10 +14,14 @@
 
 /* eslint-disable no-console */
 
-import TTN from '..'
+import TTS from '..'
 
 const token = 'access-token-or-api-key'
-const ttn = new TTN(token, {
+const tts = new TTS({
+  authorization: {
+    mode: 'key',
+    key: token,
+  },
   connectionType: 'http',
   baseURL: 'http://localhost:1885/api/v3',
   defaultUserId: 'testuser',
@@ -34,43 +38,29 @@ const appData = {
 }
 
 async function createApplication() {
-  // Via Applications object.
-  const firstApp = await ttn.Applications.create('testuser', appData)
+  const firstApp = await tts.Applications.create('testuser', appData)
   console.log(firstApp)
-
-  // Via Application class.
-  appData.ids.application_id = `second-app-${hash}`
-  const secondApp = new ttn.Application(appData)
-  await secondApp.save()
-  console.log(secondApp)
 }
 
 async function getApplication() {
-  const firstApp = await ttn.Applications.getById(appName)
+  const firstApp = await tts.Applications.getById(appName)
   console.log(firstApp)
 }
 
 async function listApplications() {
-  const apps = await ttn.Applications.getAll()
+  const apps = await tts.Applications.getAll()
   console.log(apps)
 }
 
 async function updateApplication() {
-  // Via Applications object.
   const patch = { description: 'New description' }
-  const res = await ttn.Applications.updateById(appName, patch)
+  const res = await tts.Applications.updateById(appName, patch)
   console.log(res)
-
-  // Via Application instance.
-  const app = await ttn.Applications.getById(appName)
-  app.description = 'Another description'
-  await app.save()
-  console.log(app)
 }
 
 async function deleteApplication() {
-  await ttn.Applications.deleteById(appName)
-  await ttn.Applications.deleteById(`second-app-${hash}`)
+  await tts.Applications.deleteById(appName)
+  await tts.Applications.deleteById(`second-app-${hash}`)
 }
 
 async function main() {
