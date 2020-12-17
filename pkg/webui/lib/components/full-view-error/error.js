@@ -20,7 +20,6 @@ import Footer from '@ttn-lw/components/footer'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
-import { withEnv } from '@ttn-lw/lib/components/env'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import errorMessages from '@ttn-lw/lib/errors/error-messages'
@@ -33,10 +32,13 @@ import {
 } from '@ttn-lw/lib/errors/utils'
 import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 
 import style from './error.styl'
 
-const FullViewErrorInner = function({ error, env }) {
+const appRoot = selectApplicationRootPath()
+
+const FullViewErrorInner = ({ error }) => {
   const isUnknown = isUnknownError(error)
   const statusCode = httpStatusCode(error)
   const isNotFound = isNotFoundError(error)
@@ -62,7 +64,7 @@ const FullViewErrorInner = function({ error, env }) {
   let action = undefined
   if (isNotFound) {
     action = (
-      <Link.Anchor icon="keyboard_arrow_left" href={env.appRoot} primary>
+      <Link.Anchor icon="keyboard_arrow_left" href={appRoot} primary>
         <Message content={sharedMessages.backToOverview} />
       </Link.Anchor>
     )
@@ -88,14 +90,12 @@ const FullViewErrorInner = function({ error, env }) {
   )
 }
 
-const FullViewErrorInnerWithEnv = withEnv(FullViewErrorInner)
-
-const FullViewError = function({ error, header, onlineStatus, header: Header }) {
+const FullViewError = ({ error, header, onlineStatus }) => {
   return (
     <div className={style.wrapper}>
       {Boolean(header) && header}
       <div className={style.flexWrapper}>
-        <FullViewErrorInnerWithEnv error={error} />
+        <FullViewErrorInner error={error} />
       </div>
       <Footer onlineStatus={onlineStatus} />
     </div>
@@ -103,7 +103,6 @@ const FullViewError = function({ error, header, onlineStatus, header: Header }) 
 }
 
 FullViewErrorInner.propTypes = {
-  env: PropTypes.env,
   error: PropTypes.error.isRequired,
 }
 
@@ -117,8 +116,4 @@ FullViewError.defaultProps = {
   header: undefined,
 }
 
-FullViewErrorInner.defaultProps = {
-  env: undefined,
-}
-
-export { FullViewError, FullViewErrorInnerWithEnv as FullViewErrorInner }
+export { FullViewError, FullViewErrorInner }
