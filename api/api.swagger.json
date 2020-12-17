@@ -12700,9 +12700,9 @@
           "type": "string",
           "description": "Tenant ID managed by the Packet Broker Forwarder Member."
         },
-        "forwarder_id": {
+        "forwarder_cluster_id": {
           "type": "string",
-          "description": "Forwarder identifier issued by the Packet Broker Forwarder Member."
+          "description": "Forwarder Cluster ID of the Packet Broker Forwarder."
         },
         "home_network_net_id": {
           "type": "string",
@@ -12712,6 +12712,10 @@
         "home_network_tenant_id": {
           "type": "string",
           "description": "Tenant ID managed by the Packet Broker Home Network Member.\nThis value is empty if it cannot be determined by the Packet Broker Router."
+        },
+        "home_network_cluster_id": {
+          "type": "string",
+          "description": "Home Network Cluster ID of the Packet Broker Home Network."
         },
         "hops": {
           "type": "array",
