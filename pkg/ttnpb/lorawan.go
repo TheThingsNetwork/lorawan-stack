@@ -762,6 +762,12 @@ func (v MACVersion) UseNwkKey() bool {
 	return v.Compare(MAC_V1_1) >= 0
 }
 
+// UseLegacyMIC reports whether v uses legacy MIC computation algorithm.
+// UseLegacyMIC panics, if v.Validate() returns non-nil error.
+func (v MACVersion) UseLegacyMIC() bool {
+	return v.Compare(MAC_V1_1) < 0
+}
+
 // RequireDevEUIForABP reports whether v requires ABP devices to have a DevEUI associated.
 // RequireDevEUIForABP panics, if v.Validate() returns non-nil error.
 func (v MACVersion) RequireDevEUIForABP() bool {
