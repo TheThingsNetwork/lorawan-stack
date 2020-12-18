@@ -95,6 +95,7 @@
     "leaflet": "^1.5.1",
     "lodash": "^4.17.19",
     "lottie-web": "^5.5.7",
+    "md5": "^2.3.0",
     "prop-types": "^15.6.0",
     "query-string": "^5.0.1",
     "react": "^16.9.0",
