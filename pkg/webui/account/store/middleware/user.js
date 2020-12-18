@@ -12,15 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import axios from 'axios'
+
 import tts from '@account/api/tts'
 
 import api from '@account/api'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+import {
+  isGravatarProfilePicture,
+  getSmallestAvailableProfilePicture,
+} from '@ttn-lw/lib/selectors/profile-picture'
 
 import * as user from '@account/store/actions/user'
 
 import { selectUserId } from '@account/store/selectors/user'
+
+const fixProfilePicture = async result => {
+  if (isGravatarProfilePicture(result.profile_picture)) {
+    const src = getSmallestAvailableProfilePicture(result.profile_picture)
+    try {
+      await axios.get(src)
+    } catch (err) {
+      result.profile_picture = null
+    }
+  }
+}
 
 const logoutLogic = createRequestLogic({
   type: user.LOGOUT,
@@ -40,6 +57,7 @@ const getUserLogic = createRequestLogic({
       'payload' in action && action.payload.id ? action.payload.id : selectUserId(getState())
 
     const result = await tts.Users.getById(userId, selector)
+    await fixProfilePicture(result)
 
     return result
   },
@@ -48,13 +66,25 @@ const getUserLogic = createRequestLogic({
 const updateUserLogic = createRequestLogic({
   type: user.UPDATE_USER,
   process: async ({ action, getState }) => {
-    const userId = selectUserId(getState())
+    const userId =
+      'payload' in action && action.payload.id ? action.payload.id : selectUserId(getState())
     const { patch } = action.payload
 
-    const result = await ttnClient.Users.updateById(userId, patch)
+    const result = await tts.Users.updateById(userId, patch)
+    await fixProfilePicture(result)
 
     return { ...patch, ...result }
   },
 })
 
-export default [logoutLogic, userLogic, updateUserLogic]
+const deleteUserLogic = createRequestLogic({
+  type: user.DELETE_USER,
+  process: async ({ action, getState }) => {
+    const userId =
+      'payload' in action && action.payload.id ? action.payload.id : selectUserId(getState())
+
+    return await tts.Users.deleteById(userId)
+  },
+})
+
+export default [logoutLogic, getUserLogic, updateUserLogic, deleteUserLogic]
