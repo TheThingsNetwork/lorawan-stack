@@ -141,7 +141,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
 		}
 	case "oauth2":
-		insecure := c.AllowInsecureForCredentials()
 		authentication = make([]grpc.DialOption, 2)
 		authentication[0] = grpc.WithPerRPCCredentials(rpcclient.OAuth2(
 			ctx,
@@ -149,9 +148,9 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			conf.OAuth2.ClientID,
 			conf.OAuth2.ClientSecret,
 			[]string{"networks"},
-			insecure,
+			conf.Insecure,
 		))
-		if insecure {
+		if conf.Insecure {
 			authentication[1] = grpc.WithInsecure()
 		} else {
 			authentication[1] = grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil, ""))

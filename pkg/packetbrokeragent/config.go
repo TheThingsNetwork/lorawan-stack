@@ -23,6 +23,7 @@ import (
 // Config configures Packet Broker clients.
 type Config struct {
 	DataPlaneAddress     string               `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
+	Insecure             bool                 `name:"insecure" description:"Connect without using TLS"`
 	NetID                types.NetID          `name:"net-id" description:"LoRa Alliance NetID"`
 	TenantID             string               `name:"tenant-id" description:"Tenant ID within the NetID"`
 	ClusterID            string               `name:"cluster-id" description:"Cluster ID uniquely identifying the Forwarder in the NetID and Tenant ID"`
