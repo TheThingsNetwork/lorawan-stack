@@ -113,6 +113,5 @@ func (s *server) RegisterRoutes(server *web.Server) {
 
 	page := root.Group("")
 	page.GET("/login", webui.Template.Handler, s.redirectToNext)
-	page.GET("/", webui.Template.Handler, s.redirectToLogin)
 	page.GET("/*", webui.Template.Handler)
 }

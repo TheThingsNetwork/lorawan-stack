@@ -138,10 +138,10 @@ func TestAuthentication(t *testing.T) {
 		ExpectedBody     string
 	}{
 		{
-			Method:           "GET",
-			Path:             "/oauth/",
-			ExpectedCode:     http.StatusFound,
-			ExpectedRedirect: "/oauth/login",
+			Method:       "GET",
+			Path:         "/oauth/",
+			ExpectedCode: http.StatusOK,
+			ExpectedBody: "The Things Network Account",
 		},
 		{
 			Method:       "GET",
