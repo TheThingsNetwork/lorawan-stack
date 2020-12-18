@@ -75,4 +75,18 @@ return nil`)
   redis.call('hdel', KEYS[2], old_uid)
 end
 return redis.call('lindex', KEYS[1], -1)`)
+
+	deviceMatchScanGTScript = redis.NewScript(`for _, old_uid in ipairs(ARGV) do
+  local uid = redis.call('lindex', KEYS[1], -1)
+  if uid ~= old_uid then
+    return uid
+  end
+  redis.call('ltrim', KEYS[1], 0, -2)
+  redis.call('hdel', KEYS[2], old_uid)
+end
+local uid = redis.call('lindex', KEYS[1], -1)
+if uid then
+  return { uid, redis.call('hget', KEYS[2], uid) }
+end
+return nil`)
 )

@@ -237,24 +237,19 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			matchFieldKeyPending,
 		}
 	}
-	ret, err := deviceMatchScript.Run(ctx, r.Redis, matchKeys, lsb, cacheTTL.Milliseconds()).Result()
+	vs, err := ttnredis.RunInterfaceSliceScript(ctx, r.Redis, deviceMatchScript, matchKeys, lsb, cacheTTL.Milliseconds()).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return errNoUplinkMatch.New()
 		}
 		return ttnredis.ConvertError(err)
 	}
-
-	vs, ok := ret.([]interface{})
-	if !ok {
-		panic(fmt.Sprintf("expected match script return value to be []interface{}, got %T", ret))
-	}
 	if len(vs) < 1 {
 		panic("empty match script return value")
 	}
 	matchType, ok := vs[0].(string)
 	if !ok {
-		panic(fmt.Sprintf("expected first match script return value element to be a string, got %T", vs[0]))
+		panic(fmt.Sprintf("expected first match script return value element to be a string, got '%v'(%T)", vs[0], vs[0]))
 	}
 	if matchType == "result" {
 		if len(vs) != 2 {
@@ -262,7 +257,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		}
 		s, ok := vs[1].(string)
 		if !ok {
-			panic(fmt.Sprintf("expected second element of match script return value of `result` type to be a string, got %T", vs[1]))
+			panic(fmt.Sprintf("expected second element of match script return value of `result` type to be a string, got '%v'(%T)", vs[1], vs[1]))
 		}
 		ctx := log.NewContextWithField(ctx, "match_key", matchResultKey)
 		res := &uplinkMatchResult{}
@@ -298,6 +293,11 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		return nil
 	}
 
+	const (
+		currentLEIdx = 4
+		currentGTIdx = 5
+		pendingIdx   = 9
+	)
 	for _, v := range vs[1:] {
 		// NOTE(1): Indexes must be consistent with lua/deviceMatch.lua.
 		// NOTE(2): Lua indexing starts from 1.
@@ -308,38 +308,51 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		var (
 			matchUIDKey   string
 			matchFieldKey string
-			isPending     bool
 		)
 		switch idx {
-		case 4:
+		case currentLEIdx:
 			matchUIDKey = matchUIDKeyCurrentLE
 			matchFieldKey = matchFieldKeyCurrent
-		case 5:
+		case currentGTIdx:
 			matchUIDKey = matchUIDKeyCurrentGT
 			matchFieldKey = matchFieldKeyCurrent
-		case 9:
+		case pendingIdx:
 			matchUIDKey = matchUIDKeyPending
 			matchFieldKey = matchFieldKeyPending
-			isPending = true
 		default:
 			panic(fmt.Sprintf("invalid index returned by match script with `continue` type: %d", idx))
 		}
 		var uid string
 		for {
-			if uid == "" {
-				uid, err = r.Redis.LIndex(ctx, matchUIDKey, -1).Result()
-			} else {
-				uid, err = func() (string, error) {
-					ret, err = deviceMatchScanScript.Run(ctx, r.Redis, []string{matchUIDKey, matchFieldKey}, uid).Result()
+			var s string
+			switch {
+			case idx == currentGTIdx:
+				uid, s, err = func() (string, string, error) {
+					var args []interface{}
+					if uid != "" {
+						args = []interface{}{uid}
+					}
+					vs, err := ttnredis.RunInterfaceSliceScript(ctx, r.Redis, deviceMatchScanGTScript, []string{matchUIDKey, matchFieldKey}, args...).Result()
 					if err != nil {
-						return "", err
+						return "", "", err
 					}
-					uid, ok := ret.(string)
+					if len(vs) < 1 {
+						panic("empty match scan script return value")
+					}
+					uid, ok := vs[0].(string)
 					if !ok {
-						panic(fmt.Sprintf("expected match scan script return value to be a string, got %T", ret))
+						panic(fmt.Sprintf("expected first match scan script return value to be a string, got '%v'(%T)", vs[0], vs[0]))
 					}
-					return uid, nil
+					s, ok := vs[1].(string)
+					if !ok {
+						panic(fmt.Sprintf("expected second match scan script return value to be a string, got '%v'(%T)", vs[1], vs[1]))
+					}
+					return uid, s, nil
 				}()
+			case uid == "":
+				uid, err = r.Redis.LIndex(ctx, matchUIDKey, -1).Result()
+			default:
+				uid, err = deviceMatchScanScript.Run(ctx, r.Redis, []string{matchUIDKey, matchFieldKey}, uid).Text()
 			}
 			if err != nil {
 				if err == redis.Nil {
@@ -358,19 +371,21 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				return errDatabaseCorruption.WithCause(err)
 			}
 
-			s, err := r.Redis.HGet(ctx, matchFieldKey, uid).Result()
-			if err != nil {
-				if err == redis.Nil {
-					// Another client already processed this entry
-					uid = ""
-					log.FromContext(ctx).Debug("Another client has already processed this UID")
-					continue
+			if s == "" {
+				s, err = r.Redis.HGet(ctx, matchFieldKey, uid).Result()
+				if err != nil {
+					if err == redis.Nil {
+						// Another client already processed this entry
+						uid = ""
+						log.FromContext(ctx).Debug("Another client has already processed this UID")
+						continue
+					}
+					log.FromContext(ctx).WithField("key", matchFieldKey).WithError(err).Error("Failed to get device session")
+					return ttnredis.ConvertError(err)
 				}
-				log.FromContext(ctx).WithField("key", matchFieldKey).WithError(err).Error("Failed to get device session")
-				return ttnredis.ConvertError(err)
 			}
 			var m *networkserver.UplinkMatch
-			if isPending {
+			if idx == pendingIdx {
 				ses := &uplinkMatchPendingSession{}
 				err = unmarshalMsgpack([]byte(s), ses)
 				if err == nil {
