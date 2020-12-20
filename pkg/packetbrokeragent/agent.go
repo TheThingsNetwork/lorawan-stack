@@ -141,12 +141,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	}
 
 	var authentication []grpc.DialOption
+	tlsConfig, err := c.GetTLSClientConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
 	switch mode := conf.AuthenticationMode; mode {
 	case "tls":
-		tlsConfig, err := c.GetTLSClientConfig(ctx)
-		if err != nil {
-			return nil, err
-		}
 		if conf.TLS.Source == "key-vault" {
 			conf.TLS.KeyVault.KeyVault = c.KeyVault
 		}
@@ -169,7 +169,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		if conf.Insecure {
 			authentication[1] = grpc.WithInsecure()
 		} else {
-			authentication[1] = grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil, ""))
+			authentication[1] = grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig))
 		}
 	default:
 		return nil, errAuthenticationMode.WithAttributes("mode", mode)
