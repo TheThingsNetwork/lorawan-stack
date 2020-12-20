@@ -11,7 +11,12 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Support for sending end device uplinks using the CLI (see `ttn-lw-cli simulate application-uplink` command).
+
 ### Changed
+
+- Renamed experimental command `ttn-lw-cli simulate uplink` to `ttn-lw-cli simulate gateway-uplink`.
+- Renamed experimental command `ttn-lw-cli simulate join-request` to `ttn-lw-cli simulate gateway-join-request`.
 
 ### Deprecated
 

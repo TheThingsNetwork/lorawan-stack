@@ -1214,6 +1214,15 @@
       "file": "gateways.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:application_server_disabled": {
+    "translations": {
+      "en": "Application Server is disabled"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "simulate.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:conflicting_paths": {
     "translations": {
       "en": "conflicting set and unset field mask paths"
