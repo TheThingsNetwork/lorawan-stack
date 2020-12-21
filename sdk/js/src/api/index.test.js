@@ -64,6 +64,7 @@ describe('API class', function() {
   beforeEach(function() {
     api = new Api(
       'http',
+      { mode: 'key', key: 'ABCDEFG' },
       new StackConfiguration({
         is: 'http://localhost:1885',
         as: 'http://localhost:1885',

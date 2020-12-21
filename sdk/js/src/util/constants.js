@@ -28,3 +28,8 @@ export const URI_PREFIX_STACK_COMPONENT_MAP = {
   qrg: 'qrg',
   gcs: 'gcs',
 }
+
+export const AUTHORIZATION_MODES = Object.freeze({
+  KEY: 'key',
+  SESSION: 'session',
+})

@@ -14,7 +14,7 @@
 
 import axios from 'axios'
 
-import TTN, { STACK_COMPONENTS_MAP } from 'ttn-lw'
+import TTS, { STACK_COMPONENTS_MAP, AUTHORIZATION_MODES } from 'ttn-lw'
 
 import toast from '@ttn-lw/components/toast'
 
@@ -59,14 +59,18 @@ instance.interceptors.response.use(
 
 const token = tokenCreator(() => instance.get(`${appRoot}/api/auth/token`))
 
-const ttnClient = new TTN(token, {
+const tts = new TTS({
+  authorization: {
+    mode: AUTHORIZATION_MODES.KEY,
+    key: token,
+  },
   stackConfig: stack,
   connectionType: 'http',
   proxy: false,
 })
 
 // Forward header warnings to the toast message queue.
-ttnClient.subscribe('warning', payload => {
+tts.subscribe('warning', payload => {
   toast({
     title: 'Warning',
     type: toast.types.WARNING,
@@ -114,215 +118,183 @@ export default {
     },
   },
   users: {
-    create: ttnClient.Users.create.bind(ttnClient.Users),
-    get: ttnClient.Users.getById.bind(ttnClient.Users),
-    list: ttnClient.Users.getAll.bind(ttnClient.Users),
-    update: ttnClient.Users.updateById.bind(ttnClient.Users),
-    delete: ttnClient.Users.deleteById.bind(ttnClient.Users),
-    search: ttnClient.Users.search.bind(ttnClient.Users),
-    authInfo: ttnClient.Auth.getAuthInfo.bind(ttnClient.Auth),
+    create: tts.Users.create.bind(tts.Users),
+    get: tts.Users.getById.bind(tts.Users),
+    list: tts.Users.getAll.bind(tts.Users),
+    update: tts.Users.updateById.bind(tts.Users),
+    delete: tts.Users.deleteById.bind(tts.Users),
+    search: tts.Users.search.bind(tts.Users),
+    authInfo: tts.Auth.getAuthInfo.bind(tts.Auth),
     apiKeys: {
-      get: ttnClient.Users.ApiKeys.getById.bind(ttnClient.Users.ApiKeys),
-      list: ttnClient.Users.ApiKeys.getAll.bind(ttnClient.Users.ApiKeys),
-      update: ttnClient.Users.ApiKeys.updateById.bind(ttnClient.Users.ApiKeys),
-      delete: ttnClient.Users.ApiKeys.deleteById.bind(ttnClient.Users.ApiKeys),
-      create: ttnClient.Users.ApiKeys.create.bind(ttnClient.Users.ApiKeys),
+      get: tts.Users.ApiKeys.getById.bind(tts.Users.ApiKeys),
+      list: tts.Users.ApiKeys.getAll.bind(tts.Users.ApiKeys),
+      update: tts.Users.ApiKeys.updateById.bind(tts.Users.ApiKeys),
+      delete: tts.Users.ApiKeys.deleteById.bind(tts.Users.ApiKeys),
+      create: tts.Users.ApiKeys.create.bind(tts.Users.ApiKeys),
     },
   },
   applications: {
-    list: ttnClient.Applications.getAll.bind(ttnClient.Applications),
-    search: ttnClient.Applications.search.bind(ttnClient.Applications),
+    list: tts.Applications.getAll.bind(tts.Applications),
+    search: tts.Applications.search.bind(tts.Applications),
   },
   application: {
-    get: ttnClient.Applications.getById.bind(ttnClient.Applications),
-    delete: ttnClient.Applications.deleteById.bind(ttnClient.Applications),
-    create: ttnClient.Applications.create.bind(ttnClient.Applications),
-    update: ttnClient.Applications.updateById.bind(ttnClient.Applications),
-    eventsSubscribe: ttnClient.Applications.openStream.bind(ttnClient.Applications),
-    getMqttConnectionInfo: ttnClient.Applications.getMqttConnectionInfo.bind(
-      ttnClient.Applications,
-    ),
+    get: tts.Applications.getById.bind(tts.Applications),
+    delete: tts.Applications.deleteById.bind(tts.Applications),
+    create: tts.Applications.create.bind(tts.Applications),
+    update: tts.Applications.updateById.bind(tts.Applications),
+    eventsSubscribe: tts.Applications.openStream.bind(tts.Applications),
+    getMqttConnectionInfo: tts.Applications.getMqttConnectionInfo.bind(tts.Applications),
     apiKeys: {
-      get: ttnClient.Applications.ApiKeys.getById.bind(ttnClient.Applications.ApiKeys),
-      list: ttnClient.Applications.ApiKeys.getAll.bind(ttnClient.Applications.ApiKeys),
-      update: ttnClient.Applications.ApiKeys.updateById.bind(ttnClient.Applications.ApiKeys),
-      delete: ttnClient.Applications.ApiKeys.deleteById.bind(ttnClient.Applications.ApiKeys),
-      create: ttnClient.Applications.ApiKeys.create.bind(ttnClient.Applications.ApiKeys),
+      get: tts.Applications.ApiKeys.getById.bind(tts.Applications.ApiKeys),
+      list: tts.Applications.ApiKeys.getAll.bind(tts.Applications.ApiKeys),
+      update: tts.Applications.ApiKeys.updateById.bind(tts.Applications.ApiKeys),
+      delete: tts.Applications.ApiKeys.deleteById.bind(tts.Applications.ApiKeys),
+      create: tts.Applications.ApiKeys.create.bind(tts.Applications.ApiKeys),
     },
     link: {
-      get: ttnClient.Applications.Link.get.bind(ttnClient.Applications.Link),
-      set: ttnClient.Applications.Link.set.bind(ttnClient.Applications.Link),
-      delete: ttnClient.Applications.Link.delete.bind(ttnClient.Applications.Link),
-      stats: ttnClient.Applications.Link.getStats.bind(ttnClient.Applications.Link),
+      get: tts.Applications.Link.get.bind(tts.Applications.Link),
+      set: tts.Applications.Link.set.bind(tts.Applications.Link),
+      delete: tts.Applications.Link.delete.bind(tts.Applications.Link),
+      stats: tts.Applications.Link.getStats.bind(tts.Applications.Link),
     },
     collaborators: {
-      getOrganization: ttnClient.Applications.Collaborators.getByOrganizationId.bind(
-        ttnClient.Applications.Collaborators,
+      getOrganization: tts.Applications.Collaborators.getByOrganizationId.bind(
+        tts.Applications.Collaborators,
       ),
-      getUser: ttnClient.Applications.Collaborators.getByUserId.bind(
-        ttnClient.Applications.Collaborators,
-      ),
-      list: ttnClient.Applications.Collaborators.getAll.bind(ttnClient.Applications.Collaborators),
-      add: ttnClient.Applications.Collaborators.add.bind(ttnClient.Applications.Collaborators),
-      update: ttnClient.Applications.Collaborators.update.bind(
-        ttnClient.Applications.Collaborators,
-      ),
-      remove: ttnClient.Applications.Collaborators.remove.bind(
-        ttnClient.Applications.Collaborators,
-      ),
+      getUser: tts.Applications.Collaborators.getByUserId.bind(tts.Applications.Collaborators),
+      list: tts.Applications.Collaborators.getAll.bind(tts.Applications.Collaborators),
+      add: tts.Applications.Collaborators.add.bind(tts.Applications.Collaborators),
+      update: tts.Applications.Collaborators.update.bind(tts.Applications.Collaborators),
+      remove: tts.Applications.Collaborators.remove.bind(tts.Applications.Collaborators),
     },
     webhooks: {
-      list: ttnClient.Applications.Webhooks.getAll.bind(ttnClient.Applications.Webhooks),
-      get: ttnClient.Applications.Webhooks.getById.bind(ttnClient.Applications.Webhooks),
-      create: ttnClient.Applications.Webhooks.create.bind(ttnClient.Applications.Webhooks),
-      update: ttnClient.Applications.Webhooks.updateById.bind(ttnClient.Applications.Webhooks),
-      delete: ttnClient.Applications.Webhooks.deleteById.bind(ttnClient.Applications.Webhooks),
-      getFormats: ttnClient.Applications.Webhooks.getFormats.bind(ttnClient.Applications.Webhooks),
-      listTemplates: ttnClient.Applications.Webhooks.listTemplates.bind(
-        ttnClient.Applications.Webhooks,
-      ),
-      getTemplate: ttnClient.Applications.Webhooks.getTemplate.bind(
-        ttnClient.Applications.Webhooks,
-      ),
+      list: tts.Applications.Webhooks.getAll.bind(tts.Applications.Webhooks),
+      get: tts.Applications.Webhooks.getById.bind(tts.Applications.Webhooks),
+      create: tts.Applications.Webhooks.create.bind(tts.Applications.Webhooks),
+      update: tts.Applications.Webhooks.updateById.bind(tts.Applications.Webhooks),
+      delete: tts.Applications.Webhooks.deleteById.bind(tts.Applications.Webhooks),
+      getFormats: tts.Applications.Webhooks.getFormats.bind(tts.Applications.Webhooks),
+      listTemplates: tts.Applications.Webhooks.listTemplates.bind(tts.Applications.Webhooks),
+      getTemplate: tts.Applications.Webhooks.getTemplate.bind(tts.Applications.Webhooks),
     },
     pubsubs: {
-      list: ttnClient.Applications.PubSubs.getAll.bind(ttnClient.Applications.PubSubs),
-      get: ttnClient.Applications.PubSubs.getById.bind(ttnClient.Applications.PubSubs),
-      create: ttnClient.Applications.PubSubs.create.bind(ttnClient.Applications.PubSubs),
-      update: ttnClient.Applications.PubSubs.updateById.bind(ttnClient.Applications.PubSubs),
-      delete: ttnClient.Applications.PubSubs.deleteById.bind(ttnClient.Applications.PubSubs),
-      getFormats: ttnClient.Applications.PubSubs.getFormats.bind(ttnClient.Applications.PubSubs),
+      list: tts.Applications.PubSubs.getAll.bind(tts.Applications.PubSubs),
+      get: tts.Applications.PubSubs.getById.bind(tts.Applications.PubSubs),
+      create: tts.Applications.PubSubs.create.bind(tts.Applications.PubSubs),
+      update: tts.Applications.PubSubs.updateById.bind(tts.Applications.PubSubs),
+      delete: tts.Applications.PubSubs.deleteById.bind(tts.Applications.PubSubs),
+      getFormats: tts.Applications.PubSubs.getFormats.bind(tts.Applications.PubSubs),
     },
     packages: {
-      getDefaultAssociation: ttnClient.Applications.Packages.getDefaultAssociation.bind(
-        ttnClient.Applications.Packages,
+      getDefaultAssociation: tts.Applications.Packages.getDefaultAssociation.bind(
+        tts.Applications.Packages,
       ),
-      setDefaultAssociation: ttnClient.Applications.Packages.setDefaultAssociation.bind(
-        ttnClient.Applications.Packages,
+      setDefaultAssociation: tts.Applications.Packages.setDefaultAssociation.bind(
+        tts.Applications.Packages,
       ),
     },
   },
   devices: {
-    list: ttnClient.Applications.Devices.getAll.bind(ttnClient.Applications.Devices),
-    search: ttnClient.Applications.Devices.search.bind(ttnClient.Applications.Devices),
+    list: tts.Applications.Devices.getAll.bind(tts.Applications.Devices),
+    search: tts.Applications.Devices.search.bind(tts.Applications.Devices),
   },
   device: {
-    get: ttnClient.Applications.Devices.getById.bind(ttnClient.Applications.Devices),
-    create: ttnClient.Applications.Devices.create.bind(ttnClient.Applications.Devices),
-    bulkCreate: ttnClient.Applications.Devices.bulkCreate.bind(ttnClient.Applications.Devices),
-    update: ttnClient.Applications.Devices.updateById.bind(ttnClient.Applications.Devices),
-    eventsSubscribe: ttnClient.Applications.Devices.openStream.bind(ttnClient.Applications.Devices),
-    delete: ttnClient.Applications.Devices.deleteById.bind(ttnClient.Applications.Devices),
-    simulateUplink: ttnClient.Applications.Devices.simulateUplink.bind(
-      ttnClient.Applications.Devices,
-    ),
+    get: tts.Applications.Devices.getById.bind(tts.Applications.Devices),
+    create: tts.Applications.Devices.create.bind(tts.Applications.Devices),
+    bulkCreate: tts.Applications.Devices.bulkCreate.bind(tts.Applications.Devices),
+    update: tts.Applications.Devices.updateById.bind(tts.Applications.Devices),
+    eventsSubscribe: tts.Applications.Devices.openStream.bind(tts.Applications.Devices),
+    delete: tts.Applications.Devices.deleteById.bind(tts.Applications.Devices),
+    simulateUplink: tts.Applications.Devices.simulateUplink.bind(tts.Applications.Devices),
   },
   deviceTemplates: {
-    listFormats: ttnClient.Applications.Devices.listTemplateFormats.bind(
-      ttnClient.Applications.Devices,
-    ),
-    convert: ttnClient.Applications.Devices.convertTemplate.bind(ttnClient.Applications.Devices),
+    listFormats: tts.Applications.Devices.listTemplateFormats.bind(tts.Applications.Devices),
+    convert: tts.Applications.Devices.convertTemplate.bind(tts.Applications.Devices),
   },
   gateways: {
-    list: ttnClient.Gateways.getAll.bind(ttnClient.Gateways),
-    search: ttnClient.Gateways.search.bind(ttnClient.Gateways),
+    list: tts.Gateways.getAll.bind(tts.Gateways),
+    search: tts.Gateways.search.bind(tts.Gateways),
   },
   downlinkQueue: {
-    list: ttnClient.Applications.Devices.DownlinkQueue.list.bind(
-      ttnClient.Applications.Devices.DownlinkQueue,
+    list: tts.Applications.Devices.DownlinkQueue.list.bind(tts.Applications.Devices.DownlinkQueue),
+    replace: tts.Applications.Devices.DownlinkQueue.replace.bind(
+      tts.Applications.Devices.DownlinkQueue,
     ),
-    replace: ttnClient.Applications.Devices.DownlinkQueue.replace.bind(
-      ttnClient.Applications.Devices.DownlinkQueue,
-    ),
-    push: ttnClient.Applications.Devices.DownlinkQueue.push.bind(
-      ttnClient.Applications.Devices.DownlinkQueue,
-    ),
+    push: tts.Applications.Devices.DownlinkQueue.push.bind(tts.Applications.Devices.DownlinkQueue),
   },
   gateway: {
-    get: ttnClient.Gateways.getById.bind(ttnClient.Gateways),
-    getGlobalConf: ttnClient.Gateways.getGlobalConf.bind(ttnClient.Gateways),
-    delete: ttnClient.Gateways.deleteById.bind(ttnClient.Gateways),
-    create: ttnClient.Gateways.create.bind(ttnClient.Gateways),
-    update: ttnClient.Gateways.updateById.bind(ttnClient.Gateways),
-    stats: ttnClient.Gateways.getStatisticsById.bind(ttnClient.Gateways),
-    eventsSubscribe: ttnClient.Gateways.openStream.bind(ttnClient.Gateways),
+    get: tts.Gateways.getById.bind(tts.Gateways),
+    getGlobalConf: tts.Gateways.getGlobalConf.bind(tts.Gateways),
+    delete: tts.Gateways.deleteById.bind(tts.Gateways),
+    create: tts.Gateways.create.bind(tts.Gateways),
+    update: tts.Gateways.updateById.bind(tts.Gateways),
+    stats: tts.Gateways.getStatisticsById.bind(tts.Gateways),
+    eventsSubscribe: tts.Gateways.openStream.bind(tts.Gateways),
     collaborators: {
-      getOrganization: ttnClient.Gateways.Collaborators.getByOrganizationId.bind(
-        ttnClient.Gateways.Collaborators,
+      getOrganization: tts.Gateways.Collaborators.getByOrganizationId.bind(
+        tts.Gateways.Collaborators,
       ),
-      getUser: ttnClient.Gateways.Collaborators.getByUserId.bind(ttnClient.Gateways.Collaborators),
-      list: ttnClient.Gateways.Collaborators.getAll.bind(ttnClient.Gateways.Collaborators),
-      add: ttnClient.Gateways.Collaborators.add.bind(ttnClient.Gateways.Collaborators),
-      update: ttnClient.Gateways.Collaborators.update.bind(ttnClient.Gateways.Collaborators),
-      remove: ttnClient.Gateways.Collaborators.remove.bind(ttnClient.Gateways.Collaborators),
+      getUser: tts.Gateways.Collaborators.getByUserId.bind(tts.Gateways.Collaborators),
+      list: tts.Gateways.Collaborators.getAll.bind(tts.Gateways.Collaborators),
+      add: tts.Gateways.Collaborators.add.bind(tts.Gateways.Collaborators),
+      update: tts.Gateways.Collaborators.update.bind(tts.Gateways.Collaborators),
+      remove: tts.Gateways.Collaborators.remove.bind(tts.Gateways.Collaborators),
     },
     apiKeys: {
-      get: ttnClient.Gateways.ApiKeys.getById.bind(ttnClient.Gateways.ApiKeys),
-      list: ttnClient.Gateways.ApiKeys.getAll.bind(ttnClient.Gateways.ApiKeys),
-      update: ttnClient.Gateways.ApiKeys.updateById.bind(ttnClient.Gateways.ApiKeys),
-      delete: ttnClient.Gateways.ApiKeys.deleteById.bind(ttnClient.Gateways.ApiKeys),
-      create: ttnClient.Gateways.ApiKeys.create.bind(ttnClient.Gateways.ApiKeys),
+      get: tts.Gateways.ApiKeys.getById.bind(tts.Gateways.ApiKeys),
+      list: tts.Gateways.ApiKeys.getAll.bind(tts.Gateways.ApiKeys),
+      update: tts.Gateways.ApiKeys.updateById.bind(tts.Gateways.ApiKeys),
+      delete: tts.Gateways.ApiKeys.deleteById.bind(tts.Gateways.ApiKeys),
+      create: tts.Gateways.ApiKeys.create.bind(tts.Gateways.ApiKeys),
     },
   },
   rights: {
-    applications: ttnClient.Applications.getRightsById.bind(ttnClient.Applications),
-    gateways: ttnClient.Gateways.getRightsById.bind(ttnClient.Gateways),
-    organizations: ttnClient.Organizations.getRightsById.bind(ttnClient.Organizations),
-    users: ttnClient.Users.getRightsById.bind(ttnClient.Users),
+    applications: tts.Applications.getRightsById.bind(tts.Applications),
+    gateways: tts.Gateways.getRightsById.bind(tts.Gateways),
+    organizations: tts.Organizations.getRightsById.bind(tts.Organizations),
+    users: tts.Users.getRightsById.bind(tts.Users),
   },
   configuration: {
-    listNsFrequencyPlans: ttnClient.Configuration.listNsFrequencyPlans.bind(
-      ttnClient.Configuration,
-    ),
-    listGsFrequencyPlans: ttnClient.Configuration.listGsFrequencyPlans.bind(
-      ttnClient.Configuration,
-    ),
+    listNsFrequencyPlans: tts.Configuration.listNsFrequencyPlans.bind(tts.Configuration),
+    listGsFrequencyPlans: tts.Configuration.listGsFrequencyPlans.bind(tts.Configuration),
   },
   js: {
     joinEUIPrefixes: {
-      list: ttnClient.Js.listJoinEUIPrefixes.bind(ttnClient.Js),
+      list: tts.Js.listJoinEUIPrefixes.bind(tts.Js),
     },
   },
   ns: {
-    generateDevAddress: ttnClient.Ns.generateDevAddress.bind(ttnClient.Ns),
+    generateDevAddress: tts.Ns.generateDevAddress.bind(tts.Ns),
   },
   is: {
-    getConfiguration: ttnClient.Is.getConfiguration.bind(ttnClient.Is),
+    getConfiguration: tts.Is.getConfiguration.bind(tts.Is),
   },
   organizations: {
-    list: ttnClient.Organizations.getAll.bind(ttnClient.Organizations),
-    search: ttnClient.Organizations.search.bind(ttnClient.Organizations),
-    create: ttnClient.Organizations.create.bind(ttnClient.Organizations),
+    list: tts.Organizations.getAll.bind(tts.Organizations),
+    search: tts.Organizations.search.bind(tts.Organizations),
+    create: tts.Organizations.create.bind(tts.Organizations),
   },
   organization: {
-    get: ttnClient.Organizations.getById.bind(ttnClient.Organizations),
-    eventsSubscribe: ttnClient.Organizations.openStream.bind(ttnClient.Organizations),
-    delete: ttnClient.Organizations.deleteById.bind(ttnClient.Organizations),
-    update: ttnClient.Organizations.updateById.bind(ttnClient.Organizations),
+    get: tts.Organizations.getById.bind(tts.Organizations),
+    eventsSubscribe: tts.Organizations.openStream.bind(tts.Organizations),
+    delete: tts.Organizations.deleteById.bind(tts.Organizations),
+    update: tts.Organizations.updateById.bind(tts.Organizations),
     apiKeys: {
-      get: ttnClient.Organizations.ApiKeys.getById.bind(ttnClient.Organizations.ApiKeys),
-      list: ttnClient.Organizations.ApiKeys.getAll.bind(ttnClient.Organizations.ApiKeys),
-      update: ttnClient.Organizations.ApiKeys.updateById.bind(ttnClient.Organizations.ApiKeys),
-      delete: ttnClient.Organizations.ApiKeys.deleteById.bind(ttnClient.Organizations.ApiKeys),
-      create: ttnClient.Organizations.ApiKeys.create.bind(ttnClient.Organizations.ApiKeys),
+      get: tts.Organizations.ApiKeys.getById.bind(tts.Organizations.ApiKeys),
+      list: tts.Organizations.ApiKeys.getAll.bind(tts.Organizations.ApiKeys),
+      update: tts.Organizations.ApiKeys.updateById.bind(tts.Organizations.ApiKeys),
+      delete: tts.Organizations.ApiKeys.deleteById.bind(tts.Organizations.ApiKeys),
+      create: tts.Organizations.ApiKeys.create.bind(tts.Organizations.ApiKeys),
     },
     collaborators: {
-      getOrganization: ttnClient.Organizations.Collaborators.getByOrganizationId.bind(
-        ttnClient.Organizations.Collaborators,
+      getOrganization: tts.Organizations.Collaborators.getByOrganizationId.bind(
+        tts.Organizations.Collaborators,
       ),
-      getUser: ttnClient.Organizations.Collaborators.getByUserId.bind(
-        ttnClient.Organizations.Collaborators,
-      ),
-      list: ttnClient.Organizations.Collaborators.getAll.bind(
-        ttnClient.Organizations.Collaborators,
-      ),
-      add: ttnClient.Organizations.Collaborators.add.bind(ttnClient.Organizations.Collaborators),
-      update: ttnClient.Organizations.Collaborators.update.bind(
-        ttnClient.Organizations.Collaborators,
-      ),
-      remove: ttnClient.Organizations.Collaborators.remove.bind(
-        ttnClient.Organizations.Collaborators,
-      ),
+      getUser: tts.Organizations.Collaborators.getByUserId.bind(tts.Organizations.Collaborators),
+      list: tts.Organizations.Collaborators.getAll.bind(tts.Organizations.Collaborators),
+      add: tts.Organizations.Collaborators.add.bind(tts.Organizations.Collaborators),
+      update: tts.Organizations.Collaborators.update.bind(tts.Organizations.Collaborators),
+      remove: tts.Organizations.Collaborators.remove.bind(tts.Organizations.Collaborators),
     },
   },
 }

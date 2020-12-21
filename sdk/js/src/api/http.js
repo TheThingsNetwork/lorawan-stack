@@ -15,8 +15,13 @@
 import axios from 'axios'
 import { cloneDeep, get, isObject } from 'lodash'
 
-import { URI_PREFIX_STACK_COMPONENT_MAP, STACK_COMPONENTS_MAP } from '../util/constants'
+import Token from '../util/token'
 import EventHandler from '../util/events'
+import {
+  URI_PREFIX_STACK_COMPONENT_MAP,
+  STACK_COMPONENTS_MAP,
+  AUTHORIZATION_MODES,
+} from '../util/constants'
 
 import stream from './stream/stream-node'
 
@@ -24,26 +29,37 @@ import stream from './stream/stream-node'
  * Http Class is a connector for the API that uses the HTTP bridge to connect.
  */
 class Http {
-  constructor(token, stackConfig, axiosConfig = {}) {
-    this._stackConfig = stackConfig
-    const headers = axiosConfig.headers || {}
-
-    let Authorization = null
-    if (typeof token === 'string') {
-      Authorization = `Bearer ${token}`
+  constructor(authorization, stackConfig, axiosConfig = {}) {
+    if (typeof authorization !== 'object' || authorization === null) {
+      throw new Error('No authorization settings provided')
+    }
+    let authToken
+    let csrfToken
+    if (authorization.mode === AUTHORIZATION_MODES.KEY) {
+      if (typeof authorization.key !== 'string' && typeof authorization.key !== 'function') {
+        throw new Error('No valid key provided for key authorization')
+      }
+      authToken = new Token(authorization.key).get()
+    } else if (authorization.mode === AUTHORIZATION_MODES.SESSION) {
+      if (typeof authorization.csrfToken !== 'string') {
+        throw new Error('No valid CSRF token provided for session authorization')
+      }
+      csrfToken = authorization.csrfToken
     }
 
+    this._stackConfig = stackConfig
     const stackComponents = stackConfig.availableComponents
-    const instances = stackComponents.reduce(function(acc, curr) {
+    const instances = stackComponents.reduce((acc, curr) => {
       const componentUrl = stackConfig.getComponentUrlByName(curr)
       if (componentUrl) {
         acc[curr] = axios.create({
           baseURL: componentUrl,
           headers: {
-            Authorization,
-            ...headers,
+            ...(typeof authToken === 'string' ? { Authorization: `Bearer ${authToken}` } : {}),
+            ...(Boolean(csrfToken) ? { 'X-CSRF-Token': csrfToken } : {}),
+            ...(axiosConfig.headers || {}),
           },
-          ...axiosConfig,
+          axiosConfig,
         })
       }
 
@@ -56,10 +72,10 @@ class Http {
       // Re-evaluate headers on each request if token is a thunk. This can be
       // useful if the token needs to be refreshed frequently, as the case for
       // access tokens.
-      if (typeof token === 'function') {
+      if (typeof authToken === 'function') {
         this[instance].interceptors.request.use(
-          async function(config) {
-            const tkn = (await token()).access_token
+          async config => {
+            const tkn = (await authToken()).access_token
             config.headers.Authorization = `Bearer ${tkn}`
 
             return config

@@ -15,7 +15,6 @@
 import Applications from './service/applications'
 import Configuration from './service/configuration'
 import Api from './api'
-import Token from './util/token'
 import Gateways from './service/gateways'
 import Js from './service/join-server'
 import Ns from './service/network-server'
@@ -25,15 +24,14 @@ import Users from './service/users'
 import Auth from './service/auth'
 import EventHandler from './util/events'
 import StackConfiguration from './util/stack-configuration'
-import { STACK_COMPONENTS_MAP } from './util/constants'
+import { STACK_COMPONENTS_MAP, AUTHORIZATION_MODES } from './util/constants'
 
-class TtnLw {
-  constructor(token, { stackConfig, connectionType, defaultUserId, axiosConfig }) {
-    const tokenInstance = new Token(token)
+class TTS {
+  constructor({ authorization, stackConfig, connectionType, defaultUserId, axiosConfig }) {
     const stackConfiguration = new StackConfiguration(stackConfig)
 
+    this.api = new Api(connectionType, authorization, stackConfiguration, axiosConfig)
     this.config = arguments.config
-    this.api = new Api(connectionType, stackConfiguration, axiosConfig, tokenInstance.get())
 
     this.Applications = new Applications(this.api, {
       defaultUserId,
@@ -56,4 +54,4 @@ class TtnLw {
   }
 }
 
-export { TtnLw as default, STACK_COMPONENTS_MAP }
+export { TTS as default, STACK_COMPONENTS_MAP, AUTHORIZATION_MODES }
