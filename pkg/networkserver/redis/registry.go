@@ -186,6 +186,8 @@ func FieldKey(addrKey string) string {
 	return ttnredis.Key(addrKey, "fields")
 }
 
+const noUplinkMatchMarker = '-'
+
 var errNoUplinkMatch = errors.DefineNotFound("no_uplink_match", "no device matches uplink")
 
 // RangeByUplinkMatches ranges over devices matching the uplink.
@@ -259,9 +261,13 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		if !ok {
 			panic(fmt.Sprintf("expected second element of match script return value of `result` type to be a string, got '%v'(%T)", vs[1], vs[1]))
 		}
+		if s == string(noUplinkMatchMarker) {
+			return errNoUplinkMatch.New()
+		}
 		ctx := log.NewContextWithField(ctx, "match_key", matchResultKey)
 		res := &uplinkMatchResult{}
 		if err := unmarshalMsgpack([]byte(s), res); err != nil {
+			panic(s)
 			log.FromContext(ctx).WithError(err).Error("Failed to unmarshal match result")
 			return errDatabaseCorruption.WithCause(err)
 		}
@@ -285,9 +291,12 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			return errNoUplinkMatch.WithCause(err)
 		}
 		if !ok {
-			return errNoUplinkMatch
+			if err := r.Redis.Set(ctx, matchResultKey, []byte{noUplinkMatchMarker}, cacheTTL).Err(); err != nil {
+				return ttnredis.ConvertError(err)
+			}
+			return errNoUplinkMatch.New()
 		}
-		if err = r.Redis.Set(ctx, matchResultKey, s, cacheTTL).Err(); err != nil {
+		if err = r.Redis.Expire(ctx, matchResultKey, cacheTTL).Err(); err != nil {
 			return ttnredis.ConvertError(err)
 		}
 		return nil
@@ -456,6 +465,9 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				return nil
 			}
 		}
+	}
+	if err = r.Redis.Set(ctx, matchResultKey, []byte{noUplinkMatchMarker}, cacheTTL).Err(); err != nil {
+		return ttnredis.ConvertError(err)
 	}
 	return errNoUplinkMatch.New()
 }
