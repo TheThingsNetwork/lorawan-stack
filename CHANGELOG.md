@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Support for sending end device uplinks using the CLI (see `ttn-lw-cli simulate application-uplink` command).
+- Clients can now perform custom ADR by modifying ADR parameters in `mac-state.desired-parameters` of the device.
 
 ### Changed
 
