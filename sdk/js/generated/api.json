@@ -11349,11 +11349,39 @@
             },
             {
               "name": "claim_authentication_code",
-              "description": "The authentication code for gateway claiming.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.\nThe entire field must be used in RPCs since sub-fields are validated wrt to each other. Direct selection/update of sub-fields only are not allowed.\nUse the top level field mask `claim_authentication_code` even when updating single fields.\n\nnext: 24",
+              "description": "The authentication code for gateway claiming.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.\nThe entire field must be used in RPCs since sub-fields are validated wrt to each other. Direct selection/update of sub-fields only are not allowed.\nUse the top level field mask `claim_authentication_code` even when updating single fields.",
               "label": "",
               "type": "GatewayClaimAuthenticationCode",
               "longType": "GatewayClaimAuthenticationCode",
               "fullType": "ttn.lorawan.v3.GatewayClaimAuthenticationCode",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "target_cups_uri",
+              "description": "CUPS URI for LoRa Basics Station CUPS redirection.\nThe CUPS Trust field will be automatically fetched from the cert chain presented by the target server.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "target_cups_key",
+              "description": "CUPS Key for LoRa Basics Station CUPS redirection.\nIf redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.\n\nnext: 26",
+              "label": "",
+              "type": "Secret",
+              "longType": "Secret",
+              "fullType": "ttn.lorawan.v3.Secret",
               "ismap": false,
               "defaultValue": ""
             }
@@ -12453,6 +12481,16 @@
               "defaultValue": ""
             }
           ]
+        },
+        {
+          "name": "LBSCUPSCredentials",
+          "longName": "LBSCUPSCredentials",
+          "fullName": "ttn.lorawan.v3.LBSCUPSCredentials",
+          "description": "Credentials for LoRa Basics Station CUPS.",
+          "hasExtensions": false,
+          "hasFields": false,
+          "extensions": [],
+          "fields": []
         },
         {
           "name": "ListGatewayAPIKeysRequest",

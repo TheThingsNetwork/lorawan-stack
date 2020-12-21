@@ -690,6 +690,72 @@ var _ interface {
 	ErrorName() string
 } = GatewayClaimAuthenticationCodeValidationError{}
 
+// ValidateFields checks the field values on LBSCUPSCredentials with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *LBSCUPSCredentials) ValidateFields(paths ...string) error {
+	if len(paths) > 0 {
+		return fmt.Errorf("message LBSCUPSCredentials has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
+// LBSCUPSCredentialsValidationError is the validation error returned by
+// LBSCUPSCredentials.ValidateFields if the designated constraints aren't met.
+type LBSCUPSCredentialsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LBSCUPSCredentialsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LBSCUPSCredentialsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LBSCUPSCredentialsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LBSCUPSCredentialsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LBSCUPSCredentialsValidationError) ErrorName() string {
+	return "LBSCUPSCredentialsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LBSCUPSCredentialsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLBSCUPSCredentials.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LBSCUPSCredentialsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LBSCUPSCredentialsValidationError{}
+
 // ValidateFields checks the field values on Gateway with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
@@ -925,6 +991,27 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "target_cups_uri":
+
+			if !_Gateway_TargetCUPSURI_Pattern.MatchString(m.GetTargetCUPSURI()) {
+				return GatewayValidationError{
+					field:  "target_cups_uri",
+					reason: "value does not match regex pattern \"^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$\"",
+				}
+			}
+
+		case "target_cups_key":
+
+			if v, ok := interface{}(m.GetTargetCUPSKey()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewayValidationError{
+						field:  "target_cups_key",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return GatewayValidationError{
 				field:  name,
@@ -992,6 +1079,8 @@ var _ interface {
 var _Gateway_Attributes_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 var _Gateway_GatewayServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
+
+var _Gateway_TargetCUPSURI_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
 
 // ValidateFields checks the field values on Gateways with the rules defined in
 // the proto definition for this message. If any rules are violated, an error

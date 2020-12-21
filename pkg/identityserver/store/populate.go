@@ -53,13 +53,17 @@ func NewPopulator(size int, seed int64) *Populator {
 		gateway.Description = fmt.Sprintf("Random Gateway %d", i+1)
 		gatewayID := gateway.EntityIdentifiers()
 
-		// This is to prevent the IS trying to use the randomly generated key ID to decrypt the secret.
+		// This is to prevent the IS trying to use the randomly generated key IDs to decrypt the secrets.
 		if gateway.LBSLNSSecret != nil {
 			gateway.LBSLNSSecret.KeyID = ""
 		}
 		if gateway.ClaimAuthenticationCode != nil && gateway.ClaimAuthenticationCode.Secret != nil {
 			gateway.ClaimAuthenticationCode.Secret.KeyID = ""
 		}
+		if gateway.TargetCUPSKey != nil {
+			gateway.TargetCUPSKey.KeyID = ""
+		}
+
 		p.Gateways = append(p.Gateways, gateway)
 		p.APIKeys[gatewayID] = append(
 			p.APIKeys[gatewayID],

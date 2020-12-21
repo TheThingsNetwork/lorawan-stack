@@ -339,6 +339,16 @@ func (dst *GatewayClaimAuthenticationCode) SetFields(src *GatewayClaimAuthentica
 	return nil
 }
 
+func (dst *LBSCUPSCredentials) SetFields(src *LBSCUPSCredentials, paths ...string) error {
+	if len(paths) != 0 {
+		return fmt.Errorf("message LBSCUPSCredentials has no fields, but paths %s were specified", paths)
+	}
+	if src != nil {
+		*dst = *src
+	}
+	return nil
+}
+
 func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -611,6 +621,41 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 					dst.ClaimAuthenticationCode = src.ClaimAuthenticationCode
 				} else {
 					dst.ClaimAuthenticationCode = nil
+				}
+			}
+		case "target_cups_uri":
+			if len(subs) > 0 {
+				return fmt.Errorf("'target_cups_uri' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TargetCUPSURI = src.TargetCUPSURI
+			} else {
+				var zero string
+				dst.TargetCUPSURI = zero
+			}
+		case "target_cups_key":
+			if len(subs) > 0 {
+				var newDst, newSrc *Secret
+				if (src == nil || src.TargetCUPSKey == nil) && dst.TargetCUPSKey == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.TargetCUPSKey
+				}
+				if dst.TargetCUPSKey != nil {
+					newDst = dst.TargetCUPSKey
+				} else {
+					newDst = &Secret{}
+					dst.TargetCUPSKey = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.TargetCUPSKey = src.TargetCUPSKey
+				} else {
+					dst.TargetCUPSKey = nil
 				}
 			}
 

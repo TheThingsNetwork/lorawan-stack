@@ -57,6 +57,8 @@ const (
 	skipAuthorizationField              = "skip_authorization"
 	stateField                          = "state"
 	statusPublicField                   = "status_public"
+	targetCUPSURIField                  = "target_cups_uri"
+	targetCUPSKeyField                  = "target_cups_key"
 	temporaryPasswordCreatedAtField     = "temporary_password_created_at"
 	temporaryPasswordExpiresAtField     = "temporary_password_expires_at"
 	temporaryPasswordField              = "temporary_password"
