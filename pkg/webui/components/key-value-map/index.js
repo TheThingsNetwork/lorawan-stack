@@ -128,6 +128,7 @@ class KeyValueMap extends React.PureComponent {
             message={addMessage}
             onClick={this.addEmptyEntry}
             icon="add"
+            secondary
           />
         </div>
       </div>
