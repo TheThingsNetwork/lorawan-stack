@@ -38,9 +38,8 @@ const m = defineMessages({
   forgotPassword: 'Forgot password',
   passwordRequested:
     'An email with reset instruction was sent to the email address associated with your username. Please check your spam folder as well.',
-  goToLogin: 'Go to login',
   send: 'Send',
-  requestTempPassword: 'Reset password',
+  resetPassword: 'Reset password',
   resetPasswordDescription: 'Please enter your User ID to receive an email with reset instructions',
 })
 
@@ -58,25 +57,30 @@ const siteName = selectApplicationSiteName()
 
 const ForgotPassword = () => {
   const dispatch = useDispatch()
-  const handleCancel = useCallback(() => dispatch(push('/login')), [dispatch])
+  const sendToLogin = useCallback(
+    () =>
+      dispatch(
+        push('/login', {
+          info: m.passwordRequested,
+        }),
+      ),
+    [dispatch],
+  )
   const [error, setError] = useState(undefined)
-  const [info, setInfo] = useState(undefined)
-  const [requested, setRequested] = useState(undefined)
-  const cancelButtonText = requested ? m.goToLogin : sharedMessages.cancel
 
-  const handleSubmit = useCallback(async (values, { resetForm, setSubmitting }) => {
-    try {
-      setError(undefined)
-      setInfo(m.passwordRequested)
-      setRequested(true)
-      await api.users.resetPassword(values.user_id)
-      resetForm({})
-    } catch (error) {
-      setSubmitting(false)
-      setError(error)
-      setInfo(undefined)
-    }
-  }, [])
+  const handleSubmit = useCallback(
+    async (values, { resetForm, setSubmitting }) => {
+      try {
+        setError(undefined)
+        await api.users.resetPassword(values.user_id)
+        sendToLogin()
+      } catch (error) {
+        setSubmitting(false)
+        setError(error)
+      }
+    },
+    [sendToLogin],
+  )
 
   return (
     <div className={style.form}>
@@ -84,7 +88,7 @@ const ForgotPassword = () => {
       <h1 className={style.title}>
         {siteName}
         <br />
-        <Message component="strong" content={m.requestTempPassword} />
+        <Message component="strong" content={m.resetPassword} />
       </h1>
       <hr className={style.hRule} />
       <Message content={m.resetPasswordDescription} component="p" className={style.description} />
@@ -92,9 +96,7 @@ const ForgotPassword = () => {
         onSubmit={handleSubmit}
         initialValues={initialValues}
         error={error}
-        info={info}
         validationSchema={validationSchema}
-        horizontal={false}
       >
         <Form.Field
           title={sharedMessages.userId}
@@ -109,7 +111,7 @@ const ForgotPassword = () => {
           className={style.submitButton}
           alwaysEnabled
         />
-        <Button naked secondary message={cancelButtonText} onClick={handleCancel} />
+        <Button.Link naked secondary message={sharedMessages.cancel} to="/login" />
       </Form>
     </div>
   )
