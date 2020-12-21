@@ -190,7 +190,6 @@ export default class UpdatePassword extends React.PureComponent {
               error={error}
               info={info}
               validationSchema={validationSchema}
-              horizontal={false}
             >
               {oldPasswordField}
               <Form.Field

@@ -24,7 +24,6 @@ import toast from '@ttn-lw/components/toast'
 import Form from '@ttn-lw/components/form'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import Message from '@ttn-lw/lib/components/message'
 
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -34,11 +33,9 @@ import { hexToBase64 } from '@console/lib/bytes'
 
 const m = defineMessages({
   insertMode: 'Insert Mode',
-  insertModeDescription: 'Messages can either replace the downlink queue or append to it',
-  replace: 'Replace',
-  push: 'Push',
-  confirmation: 'Confirmation',
-  confirmed: 'Confirmed',
+  replace: 'Replace downlink queue',
+  push: 'Push to downlink queue (append)',
+  confirmedDownlink: 'Confirmed downlink',
   scheduleDownlink: 'Schedule downlink',
   downlinkSuccess: 'Downlink scheduled',
   payloadDescription: 'The desired payload bytes of the downlink message',
@@ -98,22 +95,11 @@ const DownlinkForm = ({ appId, devId, downlinkQueue }) => {
         initialValues={initialValues}
         validationSchema={validationSchema}
       >
-        <Message component="h4" content={m.scheduleDownlink} />
-        <Form.Field
-          name="_mode"
-          title={m.insertMode}
-          component={RadioButton.Group}
-          description={m.insertModeDescription}
-        >
+        <Form.SubTitle title={m.scheduleDownlink} />
+        <Form.Field name="_mode" title={m.insertMode} component={RadioButton.Group}>
           <RadioButton label={m.replace} value="replace" />
           <RadioButton label={m.push} value="push" />
         </Form.Field>
-        <Form.Field
-          title={m.confirmation}
-          label={m.confirmed}
-          name="confirmed"
-          component={Checkbox}
-        />
         <Form.Field
           title="FPort"
           name="f_port"
@@ -131,6 +117,7 @@ const DownlinkForm = ({ appId, devId, downlinkQueue }) => {
           type="byte"
           unbounded
         />
+        <Form.Field label={m.confirmedDownlink} name="confirmed" component={Checkbox} />
         <SubmitBar>
           <Form.Submit component={SubmitButton} message={m.scheduleDownlink} />
         </SubmitBar>

@@ -181,7 +181,7 @@ export default class PubsubForm extends Component {
     return (
       <>
         <Form.SubTitle title={m.natsConfig} />
-        <Form.Field name="nats.secure" title={sharedMessages.secure} component={Checkbox} />
+        <Form.Field name="nats.secure" title={m.useSecureConnection} component={Checkbox} />
         <Form.Field
           name="nats._use_credentials"
           title={m.useCredentials}
@@ -232,7 +232,7 @@ export default class PubsubForm extends Component {
         <Form.SubTitle title={m.mqttConfig} />
         <Form.Field
           name="mqtt.use_tls"
-          title={sharedMessages.secure}
+          title={m.useSecureConnection}
           component={Checkbox}
           onChange={this.handleMqttUseTlsChange}
         />
@@ -324,7 +324,7 @@ export default class PubsubForm extends Component {
     return (
       <>
         <Form.SubTitle title={sharedMessages.messageTypes} />
-        <PubsubFormatSelector horizontal name="format" required />
+        <PubsubFormatSelector name="format" required />
         <Form.Field
           name="base_topic"
           title={sharedMessages.pubsubBaseTopic}
@@ -454,7 +454,12 @@ export default class PubsubForm extends Component {
           autoFocus
           disabled={update}
         />
-        <Form.Field title={sharedMessages.provider} name="_provider" component={Radio.Group}>
+        <Form.Field
+          horizontal
+          title={sharedMessages.provider}
+          name="_provider"
+          component={Radio.Group}
+        >
           <Radio label="NATS" value={providers.NATS} onChange={this.handleProviderSelect} />
           <Radio label="MQTT" value={providers.MQTT} onChange={this.handleProviderSelect} />
         </Form.Field>

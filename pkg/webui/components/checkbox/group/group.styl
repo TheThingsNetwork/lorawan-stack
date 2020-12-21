@@ -14,14 +14,16 @@
 
 .group
   display: flex
-  flex-direction: row
+  flex-direction: column
   flex-wrap: wrap
 
-  .group-checkbox:not(:last-child)
-    margin-right: $cs.m
+  &:not(.horizontal)
+    .group-checkbox:not(:last-child)
+      margin-bottom: $cs.xs
 
   &.horizontal
-    flex-direction: column
+    flex-direction: row
+    align-items: center
 
     .group-checkbox:not(:last-child)
-      margin-bottom: $cs.s
+      margin-right: $cs.l

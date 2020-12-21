@@ -34,7 +34,7 @@ const WebhookTemplateInfo = ({ webhookTemplate }) => {
   const showDivider = Boolean(info_url) && Boolean(documentation_url)
   return (
     <>
-      <Message className={style.heading} component="h4" content={m.templateInformation} />
+      <Message className={style.heading} component="h3" content={m.templateInformation} />
       <div className={style.templateInfo}>
         <div className={style.logo}>
           <img alt={name} src={logo_url} />

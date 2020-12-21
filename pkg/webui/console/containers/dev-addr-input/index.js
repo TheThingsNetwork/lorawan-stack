@@ -36,7 +36,6 @@ const DevAddrField = props => {
     disabled,
     required,
     autoFocus,
-    horizontal,
     onGenerate,
     generatedValue,
     generatedError,
@@ -53,7 +52,6 @@ const DevAddrField = props => {
       disabled={disabled}
       required={required}
       autoFocus={autoFocus}
-      horizontal={horizontal}
       warning={generatedError ? m.devAddrFetchingFailure : undefined}
       component={DevAddrInput}
       onGenerate={onGenerate}
@@ -72,7 +70,6 @@ DevAddrField.propTypes = {
   generatedError: PropTypes.bool,
   generatedLoading: PropTypes.bool,
   generatedValue: PropTypes.string,
-  horizontal: PropTypes.bool,
   name: PropTypes.string.isRequired,
   onGenerate: PropTypes.func.isRequired,
   placeholder: PropTypes.message,
@@ -87,7 +84,6 @@ DevAddrField.defaultProps = {
   disabled: false,
   required: false,
   autoFocus: false,
-  horizontal: false,
   generatedValue: '',
   generatedError: false,
   generatedLoading: false,

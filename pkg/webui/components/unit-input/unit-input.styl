@@ -13,31 +13,22 @@
 // limitations under the License.
 
 .container
+  input-width-classes()
+  flex-wrap: nowrap
   display: flex
-  justify-content space-between
-  flex-wrap: wrap
 
   .select
-    flex-basis: 100%
+    flex-basis: 30%
+    flex-shrink: 0
+    min-width: 9rem
 
   .number
-    margin-bottom: $cs.xs
-    flex-basis: 100%
-    width: 90%
+    flex-grow: 1
+    padding-right $cs.xxs
+    min-width: 0
+
+  .select + .number
+    flex-basis: auto
 
 .notification
   width: 100%
-
-+media-query-min($bp.s)
-  .container
-    flex-wrap: nowrap
-
-    .select
-      flex-basis: 30%
-      margin-bottom: 0
-
-    .number
-      padding-right $cs.s
-
-    .select + .number
-      flex-basis: 70%

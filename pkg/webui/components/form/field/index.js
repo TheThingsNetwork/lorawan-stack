@@ -77,7 +77,7 @@ class FormField extends React.Component {
     onChange: PropTypes.func,
     readOnly: PropTypes.bool,
     required: PropTypes.bool,
-    title: PropTypes.message.isRequired,
+    title: PropTypes.message,
     warning: PropTypes.message,
   }
 
@@ -93,6 +93,7 @@ class FormField extends React.Component {
     glossaryId: '',
     readOnly: false,
     required: false,
+    title: undefined,
   }
 
   componentDidMount() {
@@ -171,7 +172,7 @@ class FormField extends React.Component {
       glossaryId,
       component: Component,
     } = this.props
-    const { horizontal, disabled: formDisabled } = this.context
+    const { disabled: formDisabled } = this.context
 
     const fieldValue = decode(getIn(this.context.values, name))
     const fieldError = getIn(this.context.errors, name)
@@ -182,6 +183,7 @@ class FormField extends React.Component {
     const hasWarning = Boolean(warning)
     const hasDescription = Boolean(description)
     const hasGlossaryTerm = Boolean(glossaryId)
+    const hasTitle = Boolean(title)
 
     const showError = fieldTouched && hasError
     const showWarning = !hasError && hasWarning
@@ -207,13 +209,22 @@ class FormField extends React.Component {
       <Message className={style.description} content={description} id={describedBy} />
     ) : null
 
+    const glossaryIcon = hasGlossaryTerm ? (
+      <Link.GlossaryLink
+        hideTerm
+        secondary
+        term={glossaryTerm || title}
+        glossaryId={glossaryId}
+        className={style.glossaryLink}
+      />
+    ) : null
+
     const fieldComponentProps = {
       value: fieldValue,
       error: showError,
       warning: showWarning,
       name,
       id: name,
-      horizontal,
       disabled: fieldDisabled,
       onChange: this.handleChange,
       onBlur: this.handleBlur,
@@ -225,37 +236,30 @@ class FormField extends React.Component {
       from(style, {
         error: showError,
         warning: showWarning,
-        horizontal,
         required,
         readOnly,
+        hasGlossaryTerm,
       }),
     )
 
     return (
       <div className={cls} data-needs-focus={showError}>
-        <div className={style.label}>
-          <div className={style.labelContainer}>
+        {hasTitle && (
+          <div className={style.label}>
             <Message
               component="label"
               content={title}
               className={style.title}
               htmlFor={fieldComponentProps.id}
             />
-            {hasGlossaryTerm && (
-              <Link.GlossaryLink
-                hideTerm
-                secondary
-                term={glossaryTerm || title}
-                glossaryId={glossaryId}
-                className={style.glossaryLink}
-              />
-            )}
+            {glossaryIcon}
           </div>
-        </div>
+        )}
         <div className={style.componentArea}>
           <Component
             aria-invalid={showError}
             aria-describedby={describedBy}
+            children={hasTitle ? null : glossaryIcon}
             {...fieldComponentProps}
             {...getPassThroughProps(this.props, FormField.propTypes)}
           />

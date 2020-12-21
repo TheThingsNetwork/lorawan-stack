@@ -26,8 +26,6 @@ import toast from '@ttn-lw/components/toast'
 import LocationMap from '@ttn-lw/components/map'
 import Overlay from '@ttn-lw/components/overlay'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -244,18 +242,17 @@ class LocationForm extends Component {
 
     return (
       <React.Fragment>
-        {!entryExists && <Notification content={m.noLocationSet} info small />}
         <Form
           enableReinitialize
           error={error}
-          horizontal
           validateOnChange
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={this.onSubmit}
           formikRef={this.form}
         >
-          <Message component="h4" content={formTitle} />
+          <Form.SubTitle title={formTitle} />
+          {!entryExists && <Notification content={m.noLocationSet} info small />}
           {children}
           <Overlay
             loading={loading}

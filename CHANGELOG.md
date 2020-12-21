@@ -15,6 +15,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Form field layouts in the Console (field labels are now dispayed above the field).
+- Small structural changes to the custom webhook form in the Console.
+
 - Renamed experimental command `ttn-lw-cli simulate uplink` to `ttn-lw-cli simulate gateway-uplink`.
 - Renamed experimental command `ttn-lw-cli simulate join-request` to `ttn-lw-cli simulate gateway-join-request`.
 

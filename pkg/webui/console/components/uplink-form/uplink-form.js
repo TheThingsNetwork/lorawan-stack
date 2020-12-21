@@ -22,7 +22,6 @@ import toast from '@ttn-lw/components/toast'
 import Form from '@ttn-lw/components/form'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import Message from '@ttn-lw/lib/components/message'
 
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -85,7 +84,7 @@ const UplinkForm = props => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        <Message component="h4" content={m.simulateUplink} />
+        <Form.SubTitle title={m.simulateUplink} />
         <Form.Field
           name="f_port"
           title="FPort"

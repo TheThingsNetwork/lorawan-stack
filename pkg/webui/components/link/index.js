@@ -31,7 +31,7 @@ const m = defineMessages({
   glossaryTitle: 'See "{term}" in the glossary',
 })
 
-const formatTitle = function(content, values, formatter) {
+const formatTitle = (content, values, formatter) => {
   if (typeof content === 'object' && content.id && content.defaultMessage) {
     return formatter(content, values)
   }
@@ -39,7 +39,7 @@ const formatTitle = function(content, values, formatter) {
   return content
 }
 
-const Link = function(props) {
+const Link = props => {
   const {
     className,
     disabled,
@@ -54,6 +54,7 @@ const Link = function(props) {
     onClick,
     secondary,
     primary,
+    tabIndex,
   } = props
 
   const { formatMessage } = useIntl()
@@ -77,6 +78,7 @@ const Link = function(props) {
       to={to}
       target={target}
       onClick={onClick}
+      tabIndex={tabIndex}
     >
       {children}
     </RouterLink>
@@ -93,6 +95,7 @@ Link.propTypes = {
   replace: PropTypes.bool,
   secondary: PropTypes.bool,
   showVisited: PropTypes.bool,
+  tabIndex: PropTypes.string,
   target: PropTypes.string,
   title: PropTypes.message,
   titleValues: PropTypes.shape({}),
@@ -117,12 +120,13 @@ Link.defaultProps = {
   showVisited: false,
   replace: false,
   secondary: false,
+  tabIndex: undefined,
   target: undefined,
   title: undefined,
   titleValues: undefined,
 }
 
-const DocLink = function(props) {
+const DocLink = props => {
   const {
     className,
     name,
@@ -135,6 +139,7 @@ const DocLink = function(props) {
     secondary,
     primary,
     disabled,
+    tabIndex,
     to,
     raw,
     onClick,
@@ -165,6 +170,7 @@ const DocLink = function(props) {
       target="blank"
       name={name}
       onClick={onClick}
+      tabIndex={tabIndex}
     >
       {!raw && <Icon className={style.docIcon} icon="book" />}
       {children}
@@ -212,6 +218,7 @@ const GlossaryLink = ({ glossaryId, term, hideTerm, primary, secondary, classNam
       path={`/reference/glossary#${glossaryId}`}
       title={m.glossaryTitle}
       titleValues={{ term: formatTitle(term, undefined, formatMessage) }}
+      tabIndex="-1"
       raw
     >
       {!hideTerm && <Message content={term} />}{' '}
@@ -238,7 +245,7 @@ GlossaryLink.defaultProps = {
 
 Link.GlossaryLink = GlossaryLink
 
-const AnchorLink = function(props) {
+const AnchorLink = props => {
   const {
     className,
     name,
@@ -297,7 +304,7 @@ AnchorLink.defaultProps = {
 
 Link.Anchor = AnchorLink
 
-const BaseAnchorLink = function({ env, href, ...rest }) {
+const BaseAnchorLink = ({ env, href, ...rest }) => {
   const { appRoot } = env
 
   // Prevent prefixing proper URLs.

@@ -33,6 +33,7 @@ class UnitInput extends React.PureComponent {
     disabled: PropTypes.bool,
     encode: PropTypes.func,
     error: PropTypes.bool,
+    inputWidth: PropTypes.inputWidth,
     name: PropTypes.string.isRequired,
     onBlur: PropTypes.func.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -52,6 +53,7 @@ class UnitInput extends React.PureComponent {
   static defaultProps = {
     className: undefined,
     encode: (duration, unit) => (duration ? `${duration}${unit}` : unit),
+    inputWidth: 'm',
     disabled: false,
     required: false,
     value: undefined,
@@ -80,6 +82,7 @@ class UnitInput extends React.PureComponent {
       required,
       disabled,
       error,
+      inputWidth,
     } = this.props
 
     const selectTimeUnitComponent = (
@@ -91,12 +94,13 @@ class UnitInput extends React.PureComponent {
         onBlur={onBlur}
         value={unit}
         disabled={disabled}
+        inputWidth="full"
       />
     )
 
     return (
       <React.Fragment>
-        <div className={classnames(className, style.container)}>
+        <div className={classnames(className, style.container, style[`input-width-${inputWidth}`])}>
           <Input
             data-test-id={name}
             className={style.number}
@@ -109,6 +113,7 @@ class UnitInput extends React.PureComponent {
             required={required}
             disabled={disabled}
             error={error}
+            inputWidth="full"
           />
           {selectTimeUnitComponent}
         </div>
