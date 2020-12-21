@@ -76,13 +76,15 @@ return nil`)
 end
 return redis.call('lindex', KEYS[1], -1)`)
 
-	deviceMatchScanGTScript = redis.NewScript(`for _, old_uid in ipairs(ARGV) do
+	deviceMatchScanGTScript = redis.NewScript(`local ack = ARGV[1]
+table.remove(ARGV, 1)
+for _, old_uid in ipairs(ARGV) do
   local uid = redis.call('lindex', KEYS[1], -1)
   if uid ~= old_uid then
     local s = redis.call('hget', KEYS[2], uid)
     local m = cmsgpack.unpack(s)
     if not m.Supports32BitFCnt or m.Supports32BitFCnt.value
-      or m.ResetsFCnt and m.ResetsFCnt.value then
+      or ack == 0 and m.ResetsFCnt and m.ResetsFCnt.value then
       return { uid, s }
     end
   end
@@ -94,7 +96,7 @@ while uid do
   local s = redis.call('hget', KEYS[2], uid)
   local m = cmsgpack.unpack(s)
   if not m.Supports32BitFCnt or m.Supports32BitFCnt.value
-    or m.ResetsFCnt and m.ResetsFCnt.value then
+    or ack == 0 and m.ResetsFCnt and m.ResetsFCnt.value then
     return { uid, s }
   end
   redis.call('ltrim', KEYS[1], 0, -2)

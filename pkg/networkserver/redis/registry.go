@@ -328,9 +328,15 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			switch {
 			case idx == currentGTIdx:
 				uid, s, err = func() (string, string, error) {
+					var ackArg uint8
+					if pld.Ack {
+						ackArg = 1
+					}
 					var args []interface{}
 					if uid != "" {
-						args = []interface{}{uid}
+						args = []interface{}{ackArg, uid}
+					} else {
+						args = []interface{}{ackArg}
 					}
 					vs, err := ttnredis.RunInterfaceSliceScript(ctx, r.Redis, deviceMatchScanGTScript, []string{matchUIDKey, matchFieldKey}, args...).Result()
 					if err != nil {
