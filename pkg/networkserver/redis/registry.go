@@ -673,13 +673,14 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 						return false, true, true
 					case !updated.Session.DevAddr.Equal(storedSession.DevAddr):
 						return true, true, true
+					case updated.Session.LastFCntUp != storedSession.LastFCntUp:
+						return false, true, true
 					}
 					storedMACState := stored.GetMACState()
 					storedMACSettings := stored.GetMACSettings()
 					return false, false, storedMACState == nil ||
 						updated.MACState.LoRaWANVersion != storedMACState.LoRaWANVersion ||
 						!updated.Session.FNwkSIntKey.Equal(storedSession.FNwkSIntKey) ||
-						updated.Session.LastFCntUp != storedSession.LastFCntUp ||
 						!updated.MACSettings.GetResetsFCnt().Equal(storedMACSettings.GetResetsFCnt()) ||
 						!updated.MACSettings.GetSupports32BitFCnt().Equal(storedMACSettings.GetSupports32BitFCnt())
 				}()

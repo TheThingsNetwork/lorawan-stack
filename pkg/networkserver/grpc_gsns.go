@@ -355,7 +355,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 					}
 				}
 				if nbTrans < 2 || lastAt.IsZero() {
-					log.FromContext(ctx).Debug("Repeated FCnt value, but frame is not a retransmission, skip")
+					log.FromContext(ctx).Debug("Repeated FCnt value, but frame is not a retransmission")
 					return nil, false, nil
 				}
 				maxDelay := maxRetransmissionDelay(dev.MACState.CurrentParameters.Rx1Delay)
@@ -367,7 +367,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 					"retransmission_number", nbTrans,
 				))
 				if delay > maxDelay {
-					log.FromContext(ctx).Warn("Retransmission delay exceeds maximum, skip")
+					log.FromContext(ctx).Warn("Retransmission delay exceeds maximum")
 					return nil, false, nil
 				}
 
@@ -383,7 +383,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 
 	// NOTE: We assume no dwell time if current value unknown.
 	if dev.MACState.LoRaWANVersion.IgnoreUplinksExceedingLengthLimit() && len(up.RawPayload)-5 > int(dr.MaxMACPayloadSize(dev.MACState.CurrentParameters.UplinkDwellTime.GetValue())) {
-		log.FromContext(ctx).Debug("Uplink length exceeds maximum, skip")
+		log.FromContext(ctx).Debug("Uplink length exceeds maximum")
 		return nil, false, nil
 	}
 
@@ -397,17 +397,17 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			session = dev.PendingSession
 		}
 		if session.NwkSEncKey == nil || len(session.NwkSEncKey.Key) == 0 {
-			log.FromContext(ctx).Warn("Device missing NwkSEncKey in registry, skip")
+			log.FromContext(ctx).Warn("Device missing NwkSEncKey in registry")
 			return nil, false, nil
 		}
 		key, err := cryptoutil.UnwrapAES128Key(ctx, session.NwkSEncKey, ns.KeyVault)
 		if err != nil {
-			log.FromContext(ctx).WithField("kek_label", session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey, skip")
+			log.FromContext(ctx).WithField("kek_label", session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return nil, false, nil
 		}
 		cmdBuf, err = crypto.DecryptUplink(key, pld.DevAddr, cmacFMatchResult.FullFCnt, cmdBuf, len(pld.FOpts) > 0)
 		if err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to decrypt uplink, skip")
+			log.FromContext(ctx).WithError(err).Warn("Failed to decrypt uplink")
 			return nil, false, nil
 		}
 	}
@@ -432,7 +432,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		if ok && !def.InitiatedByDevice {
 			switch matchType {
 			case currentResetMatch, pendingMatch:
-				logger.Debug("Received MAC command answer after MAC state reset, skip")
+				logger.Debug("Received MAC command answer after MAC state reset")
 				return nil, false, nil
 
 			case currentRetransmissionMatch:
@@ -580,7 +580,7 @@ macLoop:
 			dev.EndDeviceIdentifiers.DevAddr = &pld.DevAddr
 			dev.Session = dev.PendingSession
 		} else if dev.PendingSession != nil || dev.PendingMACState != nil || dev.MACState.PendingJoinRequest != nil {
-			logger.Debug("No RekeyInd received for LoRaWAN 1.1+ device, skip")
+			logger.Debug("No RekeyInd received for LoRaWAN 1.1+ device")
 			return nil, false, nil
 		}
 		setPaths = append(setPaths, "ids.dev_addr")
@@ -593,7 +593,7 @@ macLoop:
 
 	chIdx, err := searchUplinkChannel(up.Settings.Frequency, dev.MACState)
 	if err != nil {
-		logger.WithError(err).Debug("Failed to determine channel index of uplink, skip")
+		logger.WithError(err).Debug("Failed to determine channel index of uplink")
 		return nil, false, nil
 	}
 	logger = logger.WithField("device_channel_index", chIdx)
@@ -603,7 +603,7 @@ macLoop:
 	if !dev.MACState.LoRaWANVersion.UseLegacyMIC() {
 		sNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.SNwkSIntKey, ns.KeyVault)
 		if err != nil {
-			logger.WithField("kek_label", dev.Session.SNwkSIntKey.GetKEKLabel()).WithError(err).Warn("Failed to unwrap SNwkSIntKey, skip")
+			logger.WithField("kek_label", dev.Session.SNwkSIntKey.GetKEKLabel()).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
 			return nil, false, nil
 		}
 
@@ -749,7 +749,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 			fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, match.FNwkSIntKey, ns.KeyVault)
 			if err != nil {
-				log.FromContext(ctx).WithError(err).WithField("kek_label", match.FNwkSIntKey.KEKLabel).Warn("Failed to unwrap FNwkSIntKey, skip")
+				log.FromContext(ctx).WithError(err).WithField("kek_label", match.FNwkSIntKey.KEKLabel).Warn("Failed to unwrap FNwkSIntKey")
 				return false, nil
 			}
 			fCnt := FullFCnt(uint16(pld.FCnt), match.LastFCnt, mac.DeviceSupports32BitFCnt(&ttnpb.EndDevice{
