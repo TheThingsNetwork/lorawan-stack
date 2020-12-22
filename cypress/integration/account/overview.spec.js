@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const user = {
+  ids: { user_id: 'test-user' },
+  primary_email_address: 'test-user@example.com',
+  password: 'ABCDefg123!',
+  password_confirm: 'ABCDefg123!',
+}
+
 describe('OAuth overview', () => {
   before(() => {
     cy.dropAndSeedDatabase()
   })
 
   it('displays UI elements in place', () => {
-    const user = {
-      ids: { user_id: 'test-user' },
-      primary_email_address: 'test-user@example.com',
-      password: 'ABCDefg123!',
-      password_confirm: 'ABCDefg123!',
-    }
     cy.createUser(user)
     cy.loginOAuth({ user_id: user.ids.user_id, password: user.password })
     cy.visit(Cypress.config('oauthRootPath'))
@@ -33,6 +34,8 @@ describe('OAuth overview', () => {
   })
 
   it('succeeds when logging out', () => {
+    cy.loginOAuth({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(Cypress.config('oauthRootPath'))
     cy.findByRole('button', { name: 'Logout' }).click()
 
     cy.url().should('include', `${Cypress.config('oauthRootPath')}/login`)

@@ -29,7 +29,6 @@ describe('OAuth login', () => {
         .should('have.attr', 'alt', `${Cypress.config('oauthSiteName')} Logo`)
     })
 
-    cy.findByText('Please login to continue').should('be.visible')
     cy.findByRole('link', { name: 'Create an account' }).should('be.visible')
     cy.findByRole('link', { name: 'Forgot password?' }).should('be.visible')
     cy.findByLabelText('User ID').should('be.visible')
