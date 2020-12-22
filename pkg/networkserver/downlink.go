@@ -219,7 +219,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				mac.EnqueueNewChannelReq,
 				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
 					// NOTE: LinkADRReq must be enqueued after NewChannelReq.
-					st, err := mac.EnqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings, phy)
+					st, err := mac.EnqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, phy)
 					if err != nil {
 						logger.WithError(err).Error("Failed to enqueue LinkADRReq")
 						return mac.EnqueueState{
