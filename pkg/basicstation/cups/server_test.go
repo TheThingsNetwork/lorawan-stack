@@ -176,30 +176,31 @@ func TestServer(t *testing.T) {
 	cupsURI := (&url.URL{Scheme: "https", Host: tlsServerURL.Host}).String()
 	lnsURI := (&url.URL{Scheme: "wss", Host: tlsServerURL.Host}).String()
 
-	mockGateway := func(hasLNSSecret bool) *ttnpb.Gateway {
-		var secret *ttnpb.Secret
-		if hasLNSSecret {
-			secret = &ttnpb.Secret{
-				KeyID: "test-key",
-				Value: []byte("KEYCONTENTS"),
-			}
+	mockGateway := func(hasLNSSecret, redirectCUPS bool) *ttnpb.Gateway {
+		secret := &ttnpb.Secret{
+			KeyID: "test-key",
+			Value: []byte("KEYCONTENTS"),
 		}
-		return &ttnpb.Gateway{
+		gtw := ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayID: "test-gateway",
 				EUI:       &mockGatewayEUI,
 			},
 			Attributes: map[string]string{
-				cupsURIAttribute:           cupsURI,
-				cupsCredentialsIDAttribute: "KEYID",
-				cupsCredentialsAttribute:   "Bearer KEYCONTENTS",
-				cupsStationAttribute:       "2.0.0(minihub/debug) 2018-12-06 09:30:35",
-				cupsModelAttribute:         "minihub",
-				cupsPackageAttribute:       "2.0.0",
+				cupsStationAttribute: "2.0.0(minihub/debug) 2018-12-06 09:30:35",
+				cupsModelAttribute:   "minihub",
+				cupsPackageAttribute: "2.0.0",
 			},
 			GatewayServerAddress: lnsURI,
-			LBSLNSSecret:         secret,
 		}
+		if hasLNSSecret {
+			gtw.LBSLNSSecret = secret
+		}
+		if redirectCUPS {
+			gtw.TargetCUPSURI = cupsURI
+			gtw.TargetCUPSKey = secret
+		}
+		return &gtw
 	}
 
 	e := echo.New()
@@ -216,7 +217,7 @@ func TestServer(t *testing.T) {
 		{
 			Name: "No Auth",
 			StoreSetup: func(c *mockGatewayClient) {
-				c.res.Get = mockGateway(false)
+				c.res.Get = mockGateway(false, false)
 				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
 			},
 			RequestSetup: func(req *http.Request) {
@@ -251,6 +252,11 @@ func TestServer(t *testing.T) {
 						KeyID: "some-key-id",
 						Value: []byte("KEYCONTENTS"),
 					},
+					TargetCUPSKey: &ttnpb.Secret{
+						KeyID: "test-key",
+						Value: []byte("KEYCONTENTS"),
+					},
+					TargetCUPSURI: cupsURI,
 				}
 				c.res.CreateAPIKey = &ttnpb.APIKey{
 					ID:  "KEYID",
@@ -261,6 +267,7 @@ func TestServer(t *testing.T) {
 			Options: []Option{
 				WithRegisterUnknown(&ttnpb.OrganizationOrUserIdentifiers{}, mockAuthFunc),
 				WithDefaultLNSURI(lnsURI),
+				WithAllowCUPSURIUpdate(true),
 			},
 			AssertError: func(err error) bool {
 				return err == nil
@@ -269,10 +276,10 @@ func TestServer(t *testing.T) {
 				var res UpdateInfoResponse
 				err := res.UnmarshalBinary(rec.Body.Bytes())
 				a.So(err, should.BeNil)
-				a.So(res.CUPSURI, should.BeEmpty) // No update.
-				a.So(res.LNSURI, should.Equal, lnsURI)
+				a.So(res.CUPSURI, should.Equal, cupsURI)
+				a.So(res.LNSURI, should.BeEmpty)
 				a.So(res.CUPSCredentials, should.NotBeEmpty)
-				a.So(res.LNSCredentials, should.NotBeEmpty)
+				a.So(res.LNSCredentials, should.BeEmpty)
 				a.So(res.SignatureKeyCRC, should.BeZeroValue)
 				a.So(res.Signature, should.BeEmpty)
 				a.So(res.UpdateData, should.BeEmpty)
@@ -285,10 +292,8 @@ func TestServer(t *testing.T) {
 				if a.So(s.req.Update, should.NotBeNil) {
 					a.So(s.req.Update.GatewayIdentifiers.GatewayID, should.Equal, "eui-58a0cbfffe800019")
 					a.So(s.req.Update.GatewayIdentifiers.EUI, should.Resemble, &mockGatewayEUI)
-					expectedAttributes := mockGateway(false).Attributes
+					expectedAttributes := mockGateway(false, false).Attributes
 					for _, attr := range []string{
-						cupsCredentialsIDAttribute,
-						cupsCredentialsAttribute,
 						cupsStationAttribute,
 						cupsModelAttribute,
 						cupsPackageAttribute,
@@ -301,7 +306,7 @@ func TestServer(t *testing.T) {
 		{
 			Name: "CUPS Not Enabled For Gateway",
 			StoreSetup: func(c *mockGatewayClient) {
-				c.res.Get = mockGateway(false)
+				c.res.Get = mockGateway(false, false)
 				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
 			},
 			Options: []Option{
@@ -314,7 +319,65 @@ func TestServer(t *testing.T) {
 		{
 			Name: "Existing Gateway",
 			StoreSetup: func(c *mockGatewayClient) {
-				c.res.Get = mockGateway(true)
+				c.res.Get = mockGateway(true, false)
+				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+			},
+			Options: []Option{
+				WithAllowCUPSURIUpdate(true),
+			},
+			RequestSetup: func(req *http.Request) {
+				req.Header.Set(echo.HeaderAuthorization, "Bearer KEYCONTENTS")
+			},
+			AssertError: func(err error) bool {
+				return err == nil
+			},
+			AssertResponse: func(a *assertions.Assertion, rec *httptest.ResponseRecorder) {
+				var res UpdateInfoResponse
+				err := res.UnmarshalBinary(rec.Body.Bytes())
+				a.So(err, should.BeNil)
+				a.So(res.CUPSURI, should.BeEmpty)
+				a.So(res.LNSURI, should.Equal, lnsURI)
+				a.So(res.CUPSCredentials, should.BeEmpty)
+				a.So(res.LNSCredentials, should.NotBeEmpty)
+				a.So(res.SignatureKeyCRC, should.BeZeroValue)
+				a.So(res.Signature, should.BeEmpty)
+				a.So(res.UpdateData, should.BeEmpty)
+			},
+			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
+				if a.So(s.req.Update, should.NotBeNil) {
+					a.So(s.req.Update.GatewayIdentifiers.GatewayID, should.Equal, "test-gateway")
+					a.So(s.req.Update.GatewayIdentifiers.EUI, should.Resemble, &mockGatewayEUI)
+					expectedAttributes := mockGateway(true, false).Attributes
+					for _, attr := range []string{
+						cupsStationAttribute,
+						cupsModelAttribute,
+						cupsPackageAttribute,
+					} {
+						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
+					}
+				}
+			},
+		},
+		{
+			Name: "Existing Gateway Without LNS Secret",
+			StoreSetup: func(c *mockGatewayClient) {
+				c.res.Get = mockGateway(false, false)
+				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+			},
+			Options: []Option{
+				WithAllowCUPSURIUpdate(true),
+			},
+			RequestSetup: func(req *http.Request) {
+				req.Header.Set(echo.HeaderAuthorization, "Bearer KEYCONTENTS")
+			},
+			AssertError: func(err error) bool {
+				return errors.IsNotFound(err)
+			},
+		},
+		{
+			Name: "CUPS redirection",
+			StoreSetup: func(c *mockGatewayClient) {
+				c.res.Get = mockGateway(false, true)
 				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
 			},
 			Options: []Option{
@@ -331,9 +394,9 @@ func TestServer(t *testing.T) {
 				err := res.UnmarshalBinary(rec.Body.Bytes())
 				a.So(err, should.BeNil)
 				a.So(res.CUPSURI, should.Equal, cupsURI)
-				a.So(res.LNSURI, should.Equal, lnsURI)
+				a.So(res.LNSURI, should.BeEmpty)
 				a.So(res.CUPSCredentials, should.NotBeEmpty)
-				a.So(res.LNSCredentials, should.NotBeEmpty)
+				a.So(res.LNSCredentials, should.BeEmpty)
 				a.So(res.SignatureKeyCRC, should.BeZeroValue)
 				a.So(res.Signature, should.BeEmpty)
 				a.So(res.UpdateData, should.BeEmpty)
@@ -342,11 +405,8 @@ func TestServer(t *testing.T) {
 				if a.So(s.req.Update, should.NotBeNil) {
 					a.So(s.req.Update.GatewayIdentifiers.GatewayID, should.Equal, "test-gateway")
 					a.So(s.req.Update.GatewayIdentifiers.EUI, should.Resemble, &mockGatewayEUI)
-					expectedAttributes := mockGateway(false).Attributes
+					expectedAttributes := mockGateway(false, true).Attributes
 					for _, attr := range []string{
-						cupsURIAttribute,
-						cupsCredentialsIDAttribute,
-						cupsCredentialsAttribute,
 						cupsStationAttribute,
 						cupsModelAttribute,
 						cupsPackageAttribute,
@@ -354,22 +414,6 @@ func TestServer(t *testing.T) {
 						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
 					}
 				}
-			},
-		},
-		{
-			Name: "Existing Gateway Without LNS Secret",
-			StoreSetup: func(c *mockGatewayClient) {
-				c.res.Get = mockGateway(false)
-				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
-			},
-			Options: []Option{
-				WithAllowCUPSURIUpdate(true),
-			},
-			RequestSetup: func(req *http.Request) {
-				req.Header.Set(echo.HeaderAuthorization, "Bearer KEYCONTENTS")
-			},
-			AssertError: func(err error) bool {
-				return errors.IsNotFound(err)
 			},
 		},
 	} {
