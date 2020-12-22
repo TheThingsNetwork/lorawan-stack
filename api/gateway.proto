@@ -87,11 +87,6 @@ message GatewayClaimAuthenticationCode {
   google.protobuf.Timestamp valid_to = 3 [(gogoproto.stdtime) = true];
 }
 
-// Credentials for LoRa Basics Station CUPS.
-message LBSCUPSCredentials {
-
-}
-
 // Gateway is the message that defines a gateway on the network.
 message Gateway {
   GatewayIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];

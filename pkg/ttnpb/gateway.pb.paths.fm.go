@@ -87,8 +87,6 @@ var GatewayClaimAuthenticationCodeFieldPathsTopLevel = []string{
 	"valid_from",
 	"valid_to",
 }
-var LBSCUPSCredentialsFieldPathsNested []string
-var LBSCUPSCredentialsFieldPathsTopLevel []string
 var GatewayFieldPathsNested = []string{
 	"antennas",
 	"attributes",

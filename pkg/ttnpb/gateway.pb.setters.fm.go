@@ -339,16 +339,6 @@ func (dst *GatewayClaimAuthenticationCode) SetFields(src *GatewayClaimAuthentica
 	return nil
 }
 
-func (dst *LBSCUPSCredentials) SetFields(src *LBSCUPSCredentials, paths ...string) error {
-	if len(paths) != 0 {
-		return fmt.Errorf("message LBSCUPSCredentials has no fields, but paths %s were specified", paths)
-	}
-	if src != nil {
-		*dst = *src
-	}
-	return nil
-}
-
 func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

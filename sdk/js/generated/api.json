@@ -12483,16 +12483,6 @@
           ]
         },
         {
-          "name": "LBSCUPSCredentials",
-          "longName": "LBSCUPSCredentials",
-          "fullName": "ttn.lorawan.v3.LBSCUPSCredentials",
-          "description": "Credentials for LoRa Basics Station CUPS.",
-          "hasExtensions": false,
-          "hasFields": false,
-          "extensions": [],
-          "fields": []
-        },
-        {
           "name": "ListGatewayAPIKeysRequest",
           "longName": "ListGatewayAPIKeysRequest",
           "fullName": "ttn.lorawan.v3.ListGatewayAPIKeysRequest",

@@ -198,7 +198,6 @@
   - [Message `GetGatewayCollaboratorRequest`](#ttn.lorawan.v3.GetGatewayCollaboratorRequest)
   - [Message `GetGatewayIdentifiersForEUIRequest`](#ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest)
   - [Message `GetGatewayRequest`](#ttn.lorawan.v3.GetGatewayRequest)
-  - [Message `LBSCUPSCredentials`](#ttn.lorawan.v3.LBSCUPSCredentials)
   - [Message `ListGatewayAPIKeysRequest`](#ttn.lorawan.v3.ListGatewayAPIKeysRequest)
   - [Message `ListGatewayCollaboratorsRequest`](#ttn.lorawan.v3.ListGatewayCollaboratorsRequest)
   - [Message `ListGatewaysRequest`](#ttn.lorawan.v3.ListGatewaysRequest)
@@ -3134,10 +3133,6 @@ Identifies an end device model with version information.
 | Field | Validations |
 | ----- | ----------- |
 | `gateway_ids` | <p>`message.required`: `true`</p> |
-
-### <a name="ttn.lorawan.v3.LBSCUPSCredentials">Message `LBSCUPSCredentials`</a>
-
-Credentials for LoRa Basics Station CUPS.
 
 ### <a name="ttn.lorawan.v3.ListGatewayAPIKeysRequest">Message `ListGatewayAPIKeysRequest`</a>
 
