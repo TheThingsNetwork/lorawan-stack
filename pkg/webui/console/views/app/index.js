@@ -125,7 +125,7 @@ class ConsoleApp extends React.PureComponent {
         siteTitle,
         pageData,
         siteName,
-        config: { supportLink },
+        config: { supportLink, documentationBaseUrl },
       },
     } = this.props
 
@@ -177,7 +177,12 @@ class ConsoleApp extends React.PureComponent {
                   </div>
                 </WithAuth>
               </main>
-              <Footer className={style.footer} supportLink={supportLink} isOnline={isOnline} />
+              <Footer
+                className={style.footer}
+                supportLink={supportLink}
+                documentationLink={documentationBaseUrl}
+                isOnline={isOnline}
+              />
             </div>
           </ErrorView>
         </ConnectedRouter>
