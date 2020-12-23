@@ -302,14 +302,14 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		return nil
 	}
 
+	// NOTE(1): Indexes must be consistent with lua/deviceMatch.lua.
+	// NOTE(2): Lua indexing starts from 1.
 	const (
 		currentLEIdx = 4
 		currentGTIdx = 5
 		pendingIdx   = 9
 	)
 	for _, v := range vs[1:] {
-		// NOTE(1): Indexes must be consistent with lua/deviceMatch.lua.
-		// NOTE(2): Lua indexing starts from 1.
 		idx, ok := v.(int64)
 		if !ok {
 			panic(fmt.Sprintf("expected match script `continue` type return value to be int64, got '%v'(%T)", v, v))
