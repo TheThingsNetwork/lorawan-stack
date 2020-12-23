@@ -215,6 +215,9 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	pld := up.Payload.GetMACPayload()
 	pendingAppDown := dev.MACState.GetPendingApplicationDownlink()
 
+	// NOTE: Device might have changed session since the CMACF match.
+	// E.g. We could have matched pending session by CMACF and device might
+	// have activated it meanwhile and made that matched session current.
 	type sessionMatchType uint8
 	const (
 		currentOriginalMatch sessionMatchType = iota
@@ -262,6 +265,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			matchType = pendingMatch
 			break
 		}
+		// Key mismatch, attempt to match current session.
 		fallthrough
 
 	// Current session match
@@ -373,7 +377,8 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			}
 			break
 		}
-		fallthrough
+		// Key mismatch
+		return nil, false, nil
 
 	default:
 		return nil, false, nil
