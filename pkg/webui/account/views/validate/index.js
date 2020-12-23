@@ -16,7 +16,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { defineMessages } from 'react-intl'
 import queryString from 'query-string'
 
-import api from '@account/api'
+import tts from '@account/api/tts'
 
 import Spinner from '@ttn-lw/components/spinner'
 import ErrorNotification from '@ttn-lw/components/error-notification'
@@ -67,7 +67,7 @@ const Validate = ({ location }) => {
     const makeRequest = async () => {
       const validationData = queryString.parse(location.search)
       try {
-        await api.users.validate({
+        await tts.ContactInfo.validate({
           token: validationData.token,
           id: validationData.reference,
         })
