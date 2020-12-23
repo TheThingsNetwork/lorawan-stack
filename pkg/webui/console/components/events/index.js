@@ -105,7 +105,11 @@ const Events = React.memo(
         >
           <div className={style.sidebarHeader}>
             <Message content={m.eventDetails} className={style.sidebarTitle} />
-            <button className={style.sidebarCloseButton} onClick={handleEventInfoCloseClick}>
+            <button
+              className={style.sidebarCloseButton}
+              onClick={handleEventInfoCloseClick}
+              tabIndex={focus.visible ? '0' : '-1'}
+            >
               <img src={hamburgerMenuClose} alt="Close event info" />
             </button>
           </div>

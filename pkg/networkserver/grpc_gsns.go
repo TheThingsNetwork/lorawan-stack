@@ -953,11 +953,9 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 			stored = matched.Device
 			paths := ttnpb.AddFields(matched.SetPaths,
-				"mac_state.desired_parameters.adr_data_rate_index",
-				"mac_state.desired_parameters.adr_nb_trans",
-				"mac_state.desired_parameters.adr_tx_power_index",
 				"mac_state.recent_uplinks",
 			)
+<<<<<<< HEAD
 			stored.MACState.RecentUplinks = appendRecentUplink(stored.MACState.RecentUplinks, &ttnpb.UplinkMessage{
 				Payload:            up.Payload,
 				Settings:           up.Settings,
@@ -968,17 +966,38 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				ConsumedAirtime:    up.ConsumedAirtime,
 			}, recentUplinkCount)
 			if !pld.FHDR.ADR {
+=======
+			stored.MACState.RecentUplinks = appendRecentUplink(stored.MACState.RecentUplinks, up, recentUplinkCount)
+			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
+			useADR := mac.DeviceUseADR(stored, ns.defaultMACSettings, matched.phy)
+			if useADR {
+				if !pld.FHDR.ADR {
+					paths = ttnpb.AddFields(paths,
+						"mac_state.current_parameters.adr_data_rate_index",
+						"mac_state.current_parameters.adr_tx_power_index",
+					)
+					stored.MACState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_0
+					stored.MACState.CurrentParameters.ADRTxPowerIndex = 0
+				}
+>>>>>>> v3.10
 				paths = ttnpb.AddFields(paths,
-					"mac_state.current_parameters.adr_data_rate_index",
-					"mac_state.current_parameters.adr_tx_power_index",
+					"mac_state.desired_parameters.adr_data_rate_index",
+					"mac_state.desired_parameters.adr_nb_trans",
+					"mac_state.desired_parameters.adr_tx_power_index",
 				)
-				stored.MACState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_0
-				stored.MACState.CurrentParameters.ADRTxPowerIndex = 0
+				stored.MACState.DesiredParameters.ADRDataRateIndex = stored.MACState.CurrentParameters.ADRDataRateIndex
+				stored.MACState.DesiredParameters.ADRTxPowerIndex = stored.MACState.CurrentParameters.ADRTxPowerIndex
+				stored.MACState.DesiredParameters.ADRNbTrans = stored.MACState.CurrentParameters.ADRNbTrans
 			}
+<<<<<<< HEAD
 			stored.MACState.DesiredParameters.ADRDataRateIndex = stored.MACState.CurrentParameters.ADRDataRateIndex
 			stored.MACState.DesiredParameters.ADRTxPowerIndex = stored.MACState.CurrentParameters.ADRTxPowerIndex
 			stored.MACState.DesiredParameters.ADRNbTrans = stored.MACState.CurrentParameters.ADRNbTrans
 			if !pld.FHDR.ADR || !mac.DeviceUseADR(stored, ns.defaultMACSettings, matched.phy) {
+=======
+			if !pld.FHDR.ADR || !useADR {
+				stored.RecentADRUplinks = nil
+>>>>>>> v3.10
 				return stored, paths, nil
 			}
 			if err := mac.AdaptDataRate(ctx, stored, matched.phy, ns.defaultMACSettings); err != nil {

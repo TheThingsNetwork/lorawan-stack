@@ -25,8 +25,6 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 import UnitInput from '@ttn-lw/components/unit-input'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import { GsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import OwnersSelect from '@console/containers/owners-select'
 
@@ -118,7 +116,7 @@ class GatewayDataForm extends React.Component {
         validationSchema={validationSchema}
         formikRef={formRef}
       >
-        <Message component="h4" content={sharedMessages.generalSettings} />
+        <Form.SubTitle title={sharedMessages.generalSettings} />
         {!update && <OwnersSelect name="owner_id" required autoFocus />}
         <Form.Field
           title={sharedMessages.gatewayID}
@@ -175,7 +173,7 @@ class GatewayDataForm extends React.Component {
           component={KeyValueMap}
           description={sharedMessages.attributeDescription}
         />
-        <Message component="h4" content={sharedMessages.lorawanOptions} />
+        <Form.SubTitle title={sharedMessages.lorawanOptions} />
         <GsFrequencyPlansSelect
           name="frequency_plan_id"
           menuPlacement="top"
@@ -198,6 +196,7 @@ class GatewayDataForm extends React.Component {
           title={sharedMessages.scheduleAnyTimeDelay}
           name="schedule_anytime_delay"
           component={UnitInput}
+          inputWidth="s"
           description={{
             ...sharedMessages.scheduleAnyTimeDescription,
             values: {
@@ -222,7 +221,7 @@ class GatewayDataForm extends React.Component {
           }
           required
         />
-        <Message component="h4" content={sharedMessages.gatewayUpdateOptions} />
+        <Form.SubTitle title={sharedMessages.gatewayUpdateOptions} />
         <Form.Field
           title={sharedMessages.automaticUpdates}
           name="auto_update"

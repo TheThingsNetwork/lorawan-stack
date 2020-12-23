@@ -1207,6 +1207,7 @@
     },
     "/as/applications/{application_ids.application_id}/packages/storage/{type}": {
       "get": {
+        "summary": "Returns a stream of application messages that have been stored in the database.",
         "operationId": "ApplicationUpStorage_GetStoredApplicationUp2",
         "responses": {
           "200": {
@@ -1827,6 +1828,7 @@
     },
     "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/storage/{type}": {
       "get": {
+        "summary": "Returns a stream of application messages that have been stored in the database.",
         "operationId": "ApplicationUpStorage_GetStoredApplicationUp",
         "responses": {
           "200": {

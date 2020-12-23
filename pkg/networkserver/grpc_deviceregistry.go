@@ -443,6 +443,14 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				"frequency_plan_id",
 				"lorawan_phy_version",
 				"mac_settings.use_adr.value",
+				"mac_state.current_parameters.adr_data_rate_index",
+				"mac_state.current_parameters.adr_tx_power_index",
+				"mac_state.desired_parameters.adr_data_rate_index",
+				"mac_state.desired_parameters.adr_tx_power_index",
+				"pending_mac_state.current_parameters.adr_data_rate_index",
+				"pending_mac_state.current_parameters.adr_tx_power_index",
+				"pending_mac_state.desired_parameters.adr_data_rate_index",
+				"pending_mac_state.desired_parameters.adr_tx_power_index",
 			) {
 				if !ttnpb.HasAnyField(sets, "frequency_plan_id") {
 					req.EndDevice.FrequencyPlanID = stored.FrequencyPlanID
@@ -457,6 +465,34 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 				if ttnpb.HasAnyField(sets, "mac_settings.use_adr.value") && req.EndDevice.GetMACSettings().GetUseADR().GetValue() && !phy.EnableADR {
 					return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.use_adr.value")
+				}
+				if req.EndDevice.MACState != nil {
+					if ttnpb.HasAnyField(sets, "mac_state.current_parameters.adr_data_rate_index") && req.EndDevice.MACState.CurrentParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
+						return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_state.current_parameters.adr_data_rate_index")
+					}
+					if ttnpb.HasAnyField(sets, "mac_state.desired_parameters.adr_data_rate_index") && req.EndDevice.MACState.DesiredParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
+						return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_state.desired_parameters.adr_data_rate_index")
+					}
+					if ttnpb.HasAnyField(sets, "mac_state.current_parameters.adr_tx_power_index") && req.EndDevice.MACState.CurrentParameters.ADRTxPowerIndex > uint32(phy.MaxTxPowerIndex()) {
+						return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_state.current_parameters.adr_tx_power_index")
+					}
+					if ttnpb.HasAnyField(sets, "mac_state.desired_parameters.adr_tx_power_index") && req.EndDevice.MACState.DesiredParameters.ADRTxPowerIndex > uint32(phy.MaxTxPowerIndex()) {
+						return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_state.desired_parameters.adr_tx_power_index")
+					}
+				}
+				if req.EndDevice.PendingMACState != nil {
+					if ttnpb.HasAnyField(sets, "pending_mac_state.current_parameters.adr_data_rate_index") && req.EndDevice.PendingMACState.CurrentParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
+						return nil, nil, errInvalidFieldValue.WithAttributes("field", "pending_mac_state.current_parameters.adr_data_rate_index")
+					}
+					if ttnpb.HasAnyField(sets, "pending_mac_state.desired_parameters.adr_data_rate_index") && req.EndDevice.PendingMACState.DesiredParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
+						return nil, nil, errInvalidFieldValue.WithAttributes("field", "pending_mac_state.desired_parameters.adr_data_rate_index")
+					}
+					if ttnpb.HasAnyField(sets, "pending_mac_state.current_parameters.adr_tx_power_index") && req.EndDevice.PendingMACState.CurrentParameters.ADRTxPowerIndex > uint32(phy.MaxTxPowerIndex()) {
+						return nil, nil, errInvalidFieldValue.WithAttributes("field", "pending_mac_state.current_parameters.adr_tx_power_index")
+					}
+					if ttnpb.HasAnyField(sets, "pending_mac_state.desired_parameters.adr_tx_power_index") && req.EndDevice.PendingMACState.DesiredParameters.ADRTxPowerIndex > uint32(phy.MaxTxPowerIndex()) {
+						return nil, nil, errInvalidFieldValue.WithAttributes("field", "pending_mac_state.desired_parameters.adr_tx_power_index")
+					}
 				}
 			}
 			return &req.EndDevice, sets, nil
@@ -523,6 +559,35 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			sets = ttnpb.AddFields(sets,
 				"ids.dev_eui",
 			)
+		}
+
+		if req.EndDevice.MACState != nil {
+			if ttnpb.HasAnyField(sets, "mac_state.current_parameters.adr_data_rate_index") && req.EndDevice.MACState.CurrentParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
+				return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_state.current_parameters.adr_data_rate_index")
+			}
+			if ttnpb.HasAnyField(sets, "mac_state.desired_parameters.adr_data_rate_index") && req.EndDevice.MACState.DesiredParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
+				return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_state.desired_parameters.adr_data_rate_index")
+			}
+			if ttnpb.HasAnyField(sets, "mac_state.current_parameters.adr_tx_power_index") && req.EndDevice.MACState.CurrentParameters.ADRTxPowerIndex > uint32(phy.MaxTxPowerIndex()) {
+				return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_state.current_parameters.adr_tx_power_index")
+			}
+			if ttnpb.HasAnyField(sets, "mac_state.desired_parameters.adr_tx_power_index") && req.EndDevice.MACState.DesiredParameters.ADRTxPowerIndex > uint32(phy.MaxTxPowerIndex()) {
+				return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_state.desired_parameters.adr_tx_power_index")
+			}
+		}
+		if req.EndDevice.PendingMACState != nil {
+			if ttnpb.HasAnyField(sets, "pending_mac_state.current_parameters.adr_data_rate_index") && req.EndDevice.PendingMACState.CurrentParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
+				return nil, nil, errInvalidFieldValue.WithAttributes("field", "pending_mac_state.current_parameters.adr_data_rate_index")
+			}
+			if ttnpb.HasAnyField(sets, "pending_mac_state.desired_parameters.adr_data_rate_index") && req.EndDevice.PendingMACState.DesiredParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
+				return nil, nil, errInvalidFieldValue.WithAttributes("field", "pending_mac_state.desired_parameters.adr_data_rate_index")
+			}
+			if ttnpb.HasAnyField(sets, "pending_mac_state.current_parameters.adr_tx_power_index") && req.EndDevice.PendingMACState.CurrentParameters.ADRTxPowerIndex > uint32(phy.MaxTxPowerIndex()) {
+				return nil, nil, errInvalidFieldValue.WithAttributes("field", "pending_mac_state.current_parameters.adr_tx_power_index")
+			}
+			if ttnpb.HasAnyField(sets, "pending_mac_state.desired_parameters.adr_tx_power_index") && req.EndDevice.PendingMACState.DesiredParameters.ADRTxPowerIndex > uint32(phy.MaxTxPowerIndex()) {
+				return nil, nil, errInvalidFieldValue.WithAttributes("field", "pending_mac_state.desired_parameters.adr_tx_power_index")
+			}
 		}
 
 		if req.EndDevice.SupportsJoin {

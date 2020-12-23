@@ -142,7 +142,6 @@ class PayloadFormattersForm extends React.Component {
           <Form.Field
             required
             component={CodeEditor}
-            horizontal
             name={FIELD_NAMES.JAVASCRIPT}
             title={m.formatterParameter}
             height="10rem"
@@ -153,7 +152,6 @@ class PayloadFormattersForm extends React.Component {
       case TYPES.GRPC:
         return (
           <Form.Field
-            horizontal
             required
             component={Input}
             title={m.formatterParameter}
@@ -186,7 +184,6 @@ class PayloadFormattersForm extends React.Component {
         <Form
           disabled={!linked}
           submitEnabledWhenInvalid
-          horizontal
           onSubmit={this.handleSubmit}
           initialValues={initialValues}
           validationSchema={validationSchema}
@@ -198,6 +195,7 @@ class PayloadFormattersForm extends React.Component {
             component={Radio.Group}
             onChange={this.onTypeChange}
             warning={type === TYPES.DEFAULT ? m.appFormatterWarning : undefined}
+            horizontal
           >
             {allowReset && <Radio label={m.appFormatter} value={TYPES.DEFAULT} />}
             <Radio label={sharedMessages.none} value={TYPES.NONE} />

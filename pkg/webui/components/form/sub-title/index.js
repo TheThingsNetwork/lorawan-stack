@@ -13,15 +13,25 @@
 // limitations under the License.
 
 import React from 'react'
+import classnames from 'classnames'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import style from './sub-title.styl'
+
 const FormSubTitle = React.memo(props => {
   const { className, title } = props
 
-  return <Message className={className} content={title} component="h4" firstToUpper />
+  return (
+    <Message
+      className={classnames(style.title, className)}
+      content={title}
+      component="h3"
+      firstToUpper
+    />
+  )
 })
 
 FormSubTitle.propTypes = {

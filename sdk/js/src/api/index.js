@@ -23,14 +23,14 @@ import Http from './http'
  * in order to expose the same class API for both.
  */
 class Api {
-  constructor(connectionType = 'http', stackConfig, axiosConfig, token) {
+  constructor(connectionType = 'http', authorization, stackConfig, axiosConfig) {
     this.connectionType = connectionType
 
     if (this.connectionType !== 'http') {
       throw new Error('Only http connection type is supported')
     }
 
-    this._connector = new Http(token, stackConfig, axiosConfig)
+    this._connector = new Http(authorization, stackConfig, axiosConfig)
     const connector = this._connector
 
     for (const serviceName of Object.keys(apiDefinition)) {
@@ -41,7 +41,7 @@ class Api {
       for (const rpcName of Object.keys(service)) {
         const rpc = service[rpcName]
 
-        this[serviceName][rpcName] = function({ routeParams = {}, component } = {}, payload) {
+        this[serviceName][rpcName] = ({ routeParams = {}, component } = {}, payload) => {
           const componentType = typeof component
           if (componentType === 'string' && !STACK_COMPONENTS.includes(component)) {
             throw new Error(`Unknown stack component: ${component}`)
@@ -53,7 +53,7 @@ class Api {
           const paramSignature = Object.keys(routeParams)
             .sort()
             .join()
-          const endpoint = rpc.http.find(function(prospect) {
+          const endpoint = rpc.http.find(prospect => {
             return prospect.parameters.sort().join() === paramSignature
           })
 

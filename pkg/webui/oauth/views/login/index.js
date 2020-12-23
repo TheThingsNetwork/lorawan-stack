@@ -135,7 +135,6 @@ export default class OAuth extends React.PureComponent {
               error={this.state.error}
               info={info}
               validationSchema={validationSchema}
-              horizontal={false}
             >
               <Form.Field
                 title={sharedMessages.userId}

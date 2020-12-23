@@ -39,9 +39,9 @@ var _ = time.Kitchen
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type GetStoredApplicationUpRequest struct {
-	// Query upstream messages from all end devices of an application. Cannot be used in conjunction with EndDeviceIdentifiers.
+	// Query upstream messages from all end devices of an application. Cannot be used in conjunction with end_device_ids.
 	ApplicationIDs *ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3" json:"application_ids,omitempty"`
-	// Query upstream messages from a single end device. Cannot be used in conjunction with ApplicationIdentifiers.
+	// Query upstream messages from a single end device. Cannot be used in conjunction with application_ids.
 	EndDeviceIDs *EndDeviceIdentifiers `protobuf:"bytes,2,opt,name=end_device_ids,json=endDeviceIds,proto3" json:"end_device_ids,omitempty"`
 	// Query upstream messages of a specific type. If not set, then all upstream messages are returned.
 	Type string `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
@@ -281,6 +281,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ApplicationUpStorageClient interface {
+	// Returns a stream of application messages that have been stored in the database.
 	GetStoredApplicationUp(ctx context.Context, in *GetStoredApplicationUpRequest, opts ...grpc.CallOption) (ApplicationUpStorage_GetStoredApplicationUpClient, error)
 }
 
@@ -326,6 +327,7 @@ func (x *applicationUpStorageGetStoredApplicationUpClient) Recv() (*ApplicationU
 
 // ApplicationUpStorageServer is the server API for ApplicationUpStorage service.
 type ApplicationUpStorageServer interface {
+	// Returns a stream of application messages that have been stored in the database.
 	GetStoredApplicationUp(*GetStoredApplicationUpRequest, ApplicationUpStorage_GetStoredApplicationUpServer) error
 }
 

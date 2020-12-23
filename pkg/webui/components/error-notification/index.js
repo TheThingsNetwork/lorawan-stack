@@ -20,7 +20,7 @@ import { isBackend, toMessageProps } from '@ttn-lw/lib/errors/utils'
 import { error } from '@ttn-lw/lib/log'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const ErrorNotification = function({ content, ...rest }) {
+const ErrorNotification = ({ content, ...rest }) => {
   const message = toMessageProps(content)
   let details = undefined
 

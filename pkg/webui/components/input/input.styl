@@ -17,8 +17,8 @@
 
 .input-box
   border-input()
+  input-width-classes()
   box-sizing: border-box
-  width: 100%
   background: white
   border-radius: $br.s
   padding: 0
@@ -28,6 +28,7 @@
   overflow-y: hidden
   display: flex
   align-items: center
+
   &:not(.textarea)
     max-height: $default-input-height
 
@@ -76,13 +77,11 @@
   border: 0
   color: inherit
   outline: 0
-  width: 100%
   padding: 0 $cs.xs
   display: inline-block
   flex-grow: 2
   z-index: $zi.slight
   height: $default-input-height
-  min-width: 0
 
   &[type='password']
     letter-spacing: 1px

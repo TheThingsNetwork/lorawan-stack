@@ -26,8 +26,6 @@ import Radio from '@ttn-lw/components/radio-button'
 import Form from '@ttn-lw/components/form'
 import Checkbox from '@ttn-lw/components/checkbox'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -177,12 +175,11 @@ const ConfigurationForm = React.memo(props => {
       onSubmit={onFormSubmit}
       formikRef={formRef}
     >
-      <Message component="h4" content={messages.preparation} />
+      <Form.SubTitle title={messages.preparation} />
       <Form.Field
         title={sharedMessages.activationMode}
         name="_activation_mode"
         component={Radio.Group}
-        horizontal={false}
         disabled={!nsConfig.enabled && !jsConfig.enabled}
         required={nsConfig.enabled || jsConfig.enabled}
         warning={activationModeWarning}

@@ -65,6 +65,8 @@ PropTypes.link = PropTypes.shape({
   hidden: PropTypes.bool,
 })
 
+PropTypes.inputWidth = PropTypes.oneOf(['xxs', 'xs', 's', 'm', 'l', 'full'])
+
 // Entities and entity-related prop-types.
 
 PropTypes.event = PropTypes.shape({
