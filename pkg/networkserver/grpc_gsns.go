@@ -224,6 +224,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	)
 	var matchType sessionMatchType
 	switch {
+	// Pending session match
 	case !pld.Ack &&
 		cmacFMatchResult.IsPending &&
 		dev.PendingSession != nil &&
@@ -263,6 +264,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		}
 		fallthrough
 
+	// Current session match
 	case dev.Session != nil &&
 		dev.MACState != nil &&
 		pld.DevAddr.Equal(dev.Session.DevAddr) &&
@@ -297,7 +299,9 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 
 				matchType = currentResetMatch
 
-			case cmacFMatchResult.FullFCnt > dev.Session.LastFCntUp:
+			case cmacFMatchResult.FullFCnt > dev.Session.LastFCntUp,
+				dev.Session.LastFCntUp == 0 && dev.SupportsJoin && len(dev.MACState.RecentUplinks) == 1,
+				dev.Session.LastFCntUp == 0 && !dev.SupportsJoin && len(dev.MACState.RecentUplinks) == 0:
 				ctx = log.NewContextWithField(ctx, "f_cnt_reset", false)
 
 				fCntGap := cmacFMatchResult.FullFCnt - dev.Session.LastFCntUp
@@ -309,12 +313,6 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 					return nil, false, nil
 				}
 
-				matchType = currentOriginalMatch
-
-			case dev.Session.LastFCntUp == 0 && dev.SupportsJoin && len(dev.MACState.RecentUplinks) == 1,
-				dev.Session.LastFCntUp == 0 && !dev.SupportsJoin && len(dev.MACState.RecentUplinks) == 0:
-
-				ctx = log.NewContextWithField(ctx, "f_cnt_reset", false)
 				matchType = currentOriginalMatch
 
 			default: // cmacFMatchResult.FullFCnt == dev.Session.LastFCntUp
