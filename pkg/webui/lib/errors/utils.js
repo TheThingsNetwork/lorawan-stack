@@ -100,6 +100,8 @@ export const httpStatusCode = error => {
     statusCode = error.statusCode
   } else if (Boolean(error.statusCode)) {
     statusCode = error.statusCode
+  } else if (Boolean(error.response) && Boolean(error.response.status)) {
+    statusCode = error.response.status
   }
 
   return Boolean(statusCode) ? parseInt(statusCode) : undefined
