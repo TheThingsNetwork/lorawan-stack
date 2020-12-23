@@ -25,8 +25,6 @@ import EntityTitleSection from '@console/components/entity-title-section'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import ApplicationStatus from './status'
-
 const { Content } = EntityTitleSection
 
 const ApplicationTitleSection = props => {
@@ -43,10 +41,6 @@ const ApplicationTitleSection = props => {
     mayViewCollaborators,
     mayViewApiKeys,
     mayViewDevices,
-    mayViewLink,
-    linked,
-    linkStats,
-    lastSeen,
   } = props
 
   return (
@@ -63,9 +57,6 @@ const ApplicationTitleSection = props => {
           </Spinner>
         ) : (
           <>
-            {mayViewLink && (
-              <ApplicationStatus linkStats={linkStats} linked={linked} lastSeen={lastSeen} />
-            )}
             {mayViewDevices && (
               <Content.EntityCount
                 icon="devices"
@@ -110,22 +101,15 @@ ApplicationTitleSection.propTypes = {
   devicesErrored: PropTypes.bool.isRequired,
   devicesTotalCount: PropTypes.number,
   fetching: PropTypes.bool.isRequired,
-  lastSeen: PropTypes.string,
-  linkStats: PropTypes.applicationLinkStats,
-  linked: PropTypes.bool,
   mayViewApiKeys: PropTypes.bool.isRequired,
   mayViewCollaborators: PropTypes.bool.isRequired,
   mayViewDevices: PropTypes.bool.isRequired,
-  mayViewLink: PropTypes.bool.isRequired,
 }
 
 ApplicationTitleSection.defaultProps = {
-  linked: undefined,
-  linkStats: undefined,
   apiKeysTotalCount: undefined,
   collaboratorsTotalCount: undefined,
   devicesTotalCount: undefined,
-  lastSeen: undefined,
 }
 
 export default ApplicationTitleSection

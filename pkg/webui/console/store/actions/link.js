@@ -27,10 +27,9 @@ export const [
 export const UPDATE_APP_LINK_SUCCESS = 'UPDATE_APPLICATION_LINK_SUCCESS'
 export const DELETE_APP_LINK_SUCCESS = 'DELETE_APPLICATION_LINK_SUCCESS'
 
-export const updateApplicationLinkSuccess = (link, stats) => ({
+export const updateApplicationLinkSuccess = link => ({
   type: UPDATE_APP_LINK_SUCCESS,
   link,
-  stats,
 })
 
 export const deleteApplicationLinkSuccess = () => ({ type: DELETE_APP_LINK_SUCCESS })

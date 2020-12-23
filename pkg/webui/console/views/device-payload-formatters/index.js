@@ -32,7 +32,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import {
-  selectApplicationIsLinked,
   selectApplicationLink,
   selectApplicationLinkFetching,
   selectSelectedApplicationId,
@@ -47,7 +46,7 @@ const m = defineMessages({
   infoDownlinkText:
     'These payload formatters are executed on downlink messages to this end device and take precedence over application level payload formatters.',
 })
-@connect(function(state) {
+@connect(state => {
   const link = selectApplicationLink(state)
   const fetching = selectApplicationLinkFetching(state)
 
@@ -55,10 +54,9 @@ const m = defineMessages({
     appId: selectSelectedApplicationId(state),
     devId: selectSelectedDeviceId(state),
     fetching: fetching || !link,
-    linked: selectApplicationIsLinked(state),
   }
 })
-@withBreadcrumb('device.single.payload-formatters', function(props) {
+@withBreadcrumb('device.single.payload-formatters', props => {
   const { appId, devId } = props
   return (
     <Breadcrumb

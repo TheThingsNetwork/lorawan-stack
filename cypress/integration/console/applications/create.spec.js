@@ -54,13 +54,6 @@ describe('Application create', () => {
         'Optional application description; can also be used to save notes about the application',
       )
       .and('be.visible')
-    cy.findByLabelText('Linking')
-      .should('be.visible')
-      .should('have.attr', 'value', 'true')
-    cy.findByLabelText('Network Server address').should('be.visible')
-    cy.findDescriptionByLabelText('Network Server address')
-      .should('contain', 'Leave empty to link to the Network Server in the same cluster')
-      .and('be.visible')
     cy.findByRole('button', { name: 'Create application' }).should('be.visible')
   })
 
@@ -116,8 +109,6 @@ describe('Application create', () => {
           'Optional application description; can also be used to save notes about the application',
         )
         .and('be.visible')
-      cy.findByLabelText('Linking').should('not.exist')
-      cy.findByLabelText('Network Server address').should('not.exist')
       cy.findByRole('button', { name: 'Create application' }).should('be.visible')
     })
   })

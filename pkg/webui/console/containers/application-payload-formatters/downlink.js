@@ -35,7 +35,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { updateApplicationLinkSuccess } from '@console/store/actions/link'
 
 import {
-  selectApplicationIsLinked,
   selectApplicationLinkFormatters,
   selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
@@ -47,18 +46,17 @@ const m = defineMessages({
     'These payload formatters are executed on downlink messages to all end devices in this application. Note: end device level payload formatters have precedence.',
 })
 @connect(
-  function(state) {
+  state => {
     const formatters = selectApplicationLinkFormatters(state) || {}
 
     return {
       appId: selectSelectedApplicationId(state),
-      linked: selectApplicationIsLinked(state) || false,
       formatters,
     }
   },
   { updateLinkSuccess: updateApplicationLinkSuccess },
 )
-@withBreadcrumb('apps.single.payload-formatters.downlink', function(props) {
+@withBreadcrumb('apps.single.payload-formatters.downlink', props => {
   const { appId } = props
 
   return (
@@ -72,7 +70,6 @@ class ApplicationPayloadFormatters extends React.PureComponent {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     formatters: PropTypes.formatters.isRequired,
-    linked: PropTypes.bool.isRequired,
     updateLinkSuccess: PropTypes.func.isRequired,
   }
 
@@ -102,19 +99,14 @@ class ApplicationPayloadFormatters extends React.PureComponent {
   }
 
   render() {
-    const { formatters, linked } = this.props
-
-    const applicationFormatterInfo = (
-      <Notification className={style.notification} small info content={m.infoText} />
-    )
+    const { formatters } = this.props
 
     return (
       <React.Fragment>
         <PageTitle title={sharedMessages.payloadFormattersDownlink} />
-        {linked && applicationFormatterInfo}
+        <Notification className={style.notification} small info content={m.infoText} />
         <PayloadFormattersForm
           uplink={false}
-          linked={linked}
           onSubmit={this.onSubmit}
           onSubmitSuccess={this.onSubmitSuccess}
           title={sharedMessages.payloadFormattersDownlink}

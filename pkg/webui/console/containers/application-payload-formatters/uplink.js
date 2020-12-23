@@ -35,7 +35,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { updateApplicationLinkSuccess } from '@console/store/actions/link'
 
 import {
-  selectApplicationIsLinked,
   selectApplicationLinkFormatters,
   selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
@@ -47,18 +46,17 @@ const m = defineMessages({
     'These payload formatters are executed on uplink messages from all end devices in this application. Note: end device level payload formatters have precedence.',
 })
 @connect(
-  function(state) {
+  state => {
     const formatters = selectApplicationLinkFormatters(state) || {}
 
     return {
       appId: selectSelectedApplicationId(state),
-      linked: selectApplicationIsLinked(state) || false,
       formatters,
     }
   },
   { updateLinkSuccess: updateApplicationLinkSuccess },
 )
-@withBreadcrumb('apps.single.payload-formatters.uplink', function(props) {
+@withBreadcrumb('apps.single.payload-formatters.uplink', props => {
   const { appId } = props
 
   return (
@@ -72,7 +70,6 @@ class ApplicationPayloadFormatters extends React.PureComponent {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     formatters: PropTypes.formatters.isRequired,
-    linked: PropTypes.bool.isRequired,
     updateLinkSuccess: PropTypes.func.isRequired,
   }
 
@@ -102,8 +99,7 @@ class ApplicationPayloadFormatters extends React.PureComponent {
   }
 
   render() {
-    const { formatters, linked } = this.props
-
+    const { formatters } = this.props
     const applicationFormatterInfo = (
       <Notification className={style.notification} small info content={m.infoText} />
     )
@@ -111,10 +107,9 @@ class ApplicationPayloadFormatters extends React.PureComponent {
     return (
       <React.Fragment>
         <PageTitle title={sharedMessages.payloadFormattersUplink} />
-        {linked && applicationFormatterInfo}
+        {applicationFormatterInfo}
         <PayloadFormattersForm
           uplink
-          linked={linked}
           onSubmit={this.onSubmit}
           onSubmitSuccess={this.onSubmitSuccess}
           initialType={formatters.up_formatter || PAYLOAD_FORMATTER_TYPES.NONE}

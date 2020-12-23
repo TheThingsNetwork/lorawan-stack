@@ -14,11 +14,9 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Switch, Route, Link, Redirect } from 'react-router-dom'
+import { Switch, Route, Redirect } from 'react-router-dom'
 import { Container, Col, Row } from 'react-grid-system'
-import { defineMessages } from 'react-intl'
 
-import Notification from '@ttn-lw/components/notification'
 import Spinner from '@ttn-lw/components/spinner'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -35,29 +33,18 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { getApplicationLink } from '@console/store/actions/link'
 
 import {
-  selectApplicationIsLinked,
   selectApplicationLink,
   selectApplicationLinkFetching,
   selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
 
-import style from './application-payload-formatters.styl'
-
-const m = defineMessages({
-  warningTitle: 'Linking needed',
-  warningText: 'Please {link}, in order to configure payload formatters',
-  linkApplication: 'Link your application',
-})
-
 @connect(
   state => {
     const link = selectApplicationLink(state)
     const fetching = selectApplicationLinkFetching(state)
-
     return {
       appId: selectSelectedApplicationId(state),
       fetching: fetching || !link,
-      linked: selectApplicationIsLinked(state),
     }
   },
   dispatch => ({
@@ -79,22 +66,19 @@ export default class ApplicationPayloadFormatters extends React.Component {
     appId: PropTypes.string.isRequired,
     fetching: PropTypes.bool.isRequired,
     getLink: PropTypes.func.isRequired,
-    linked: PropTypes.bool.isRequired,
     match: PropTypes.match.isRequired,
   }
 
   componentDidMount() {
     const { appId, getLink } = this.props
 
-    getLink(appId, ['default_formatters', 'api_key', 'network_server_address'])
+    getLink(appId, ['default_formatters'])
   }
 
   render() {
     const {
       match,
       fetching,
-      linked,
-      appId,
       match: { url },
     } = this.props
 
@@ -106,27 +90,10 @@ export default class ApplicationPayloadFormatters extends React.Component {
       )
     }
 
-    const linkWarning = linked ? null : (
-      <Notification
-        className={style.warningNotification}
-        title={m.warningTitle}
-        warning
-        content={m.warningText}
-        messageValues={{
-          link: (
-            <Link key="warnining-link" to={`/applications/${appId}/link`}>
-              <Message content={m.linkApplication} />
-            </Link>
-          ),
-        }}
-      />
-    )
-
     return (
       <Container>
         <Row>
           <Col>
-            {linkWarning}
             <Switch>
               <Redirect exact from={url} to={`${url}/uplink`} />
               <Route path={`${match.url}/uplink`} component={ApplicationUplinkPayloadFormatters} />

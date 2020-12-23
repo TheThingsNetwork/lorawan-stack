@@ -24,9 +24,7 @@ import api from '@console/api'
 import PageTitle from '@ttn-lw/components/page-title'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
-import Checkbox from '@ttn-lw/components/checkbox'
 import SubmitButton from '@ttn-lw/components/submit-button'
-import toast from '@ttn-lw/components/toast'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 
 import OwnersSelect from '@console/containers/owners-select'
@@ -38,8 +36,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getApplicationId } from '@ttn-lw/lib/selectors/id'
 
-import { id as applicationIdRegexp, address } from '@console/lib/regexp'
-import { mayCreateApplications, mayLinkApplication } from '@console/lib/feature-checks'
+import { id as applicationIdRegexp } from '@console/lib/regexp'
+import { mayCreateApplications } from '@console/lib/feature-checks'
 
 import { selectUserId, selectUserRights } from '@console/store/selectors/user'
 
@@ -51,10 +49,6 @@ const m = defineMessages({
   appDescDescription:
     'Optional application description; can also be used to save notes about the application',
   createApplication: 'Create application',
-  linking: 'Linking',
-  linkAutomatically: 'Link new application to Network Server automatically',
-  linkFailure: 'There was an error and the application could not be linked',
-  linkFailureTitle: 'Application link failed',
 })
 
 const validationSchema = Yup.object().shape({
@@ -67,12 +61,7 @@ const validationSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-  link: Yup.boolean(),
   description: Yup.string(),
-  network_server_address: Yup.string().when('link', {
-    is: true,
-    then: schema => schema.matches(address, Yup.passValues(sharedMessages.validateAddressFormat)),
-  }),
 })
 
 @withFeatureRequirement(mayCreateApplications, { redirect: '/applications' })
@@ -88,16 +77,13 @@ const validationSchema = Yup.object().shape({
 export default class Add extends React.Component {
   static propTypes = {
     navigateToApplication: PropTypes.func.isRequired,
-    rights: PropTypes.rights.isRequired,
     userId: PropTypes.string.isRequired,
   }
 
   constructor(props) {
     super(props)
-    const { rights } = this.props
     this.state = {
       error: '',
-      link: mayLinkApplication.check(rights),
     }
   }
 
@@ -121,26 +107,6 @@ export default class Add extends React.Component {
 
       const appId = getApplicationId(result)
 
-      if (values.link) {
-        try {
-          const key = {
-            name: 'Application Server Linking',
-            rights: ['RIGHT_APPLICATION_LINK'],
-          }
-          const { key: api_key } = await api.application.apiKeys.create(appId, key)
-          await api.application.link.set(appId, {
-            api_key,
-            network_server_address: values.network_server_address,
-          })
-        } catch (err) {
-          toast({
-            title: m.linkFailureTitle,
-            message: m.linkFailure,
-            type: toast.types.ERROR,
-          })
-        }
-      }
-
       navigateToApplication(appId)
     } catch (error) {
       setSubmitting(false)
@@ -149,47 +115,14 @@ export default class Add extends React.Component {
     }
   }
 
-  @bind
-  handleLinkChange(event) {
-    this.setState({
-      link: event.target.checked,
-    })
-  }
-
-  get linkingBit() {
-    const { link } = this.state
-
-    return (
-      <React.Fragment>
-        <Form.Field
-          onChange={this.handleLinkChange}
-          title={m.linking}
-          name="link"
-          label={m.linkAutomatically}
-          component={Checkbox}
-        />
-        <Form.Field
-          component={Input}
-          description={sharedMessages.nsEmptyDefault}
-          name="network_server_address"
-          title={sharedMessages.nsAddress}
-          disabled={!link}
-        />
-      </React.Fragment>
-    )
-  }
-
   render() {
     const { error } = this.state
-    const { userId, rights } = this.props
-    const mayLink = mayLinkApplication.check(rights)
+    const { userId } = this.props
 
     const initialValues = {
       application_id: '',
       name: '',
       description: '',
-      link: mayLink,
-      network_server_address: '',
       owner_id: userId,
     }
 
@@ -226,7 +159,6 @@ export default class Add extends React.Component {
                 description={m.appDescDescription}
                 component={Input}
               />
-              {mayLink && this.linkingBit}
               <SubmitBar>
                 <Form.Submit message={m.createApplication} component={SubmitButton} />
               </SubmitBar>

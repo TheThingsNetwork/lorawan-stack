@@ -154,8 +154,6 @@ export default {
     link: {
       get: tts.Applications.Link.get.bind(tts.Applications.Link),
       set: tts.Applications.Link.set.bind(tts.Applications.Link),
-      delete: tts.Applications.Link.delete.bind(tts.Applications.Link),
-      stats: tts.Applications.Link.getStats.bind(tts.Applications.Link),
     },
     collaborators: {
       getOrganization: tts.Applications.Collaborators.getByOrganizationId.bind(
