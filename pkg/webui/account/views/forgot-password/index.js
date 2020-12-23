@@ -17,7 +17,7 @@ import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
 import { useDispatch } from 'react-redux'
 
-import api from '@account/api'
+import tts from '@account/api/tts'
 
 import Button from '@ttn-lw/components/button'
 import Form from '@ttn-lw/components/form'
@@ -72,7 +72,7 @@ const ForgotPassword = () => {
     async (values, { resetForm, setSubmitting }) => {
       try {
         setError(undefined)
-        await api.users.resetPassword(values.user_id)
+        await tts.Users.createTemporaryPassword(values.user_id)
         sendToLogin()
       } catch (error) {
         setSubmitting(false)
