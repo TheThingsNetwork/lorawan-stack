@@ -14,16 +14,10 @@
 
 import axios from 'axios'
 
-import {
-  selectApplicationRootPath,
-  selectStackConfig,
-  selectCSRFToken,
-} from '@ttn-lw/lib/selectors/env'
+import { selectApplicationRootPath, selectCSRFToken } from '@ttn-lw/lib/selectors/env'
 import { isPermissionDeniedError } from '@ttn-lw/lib/errors/utils'
 
 const appRoot = selectApplicationRootPath()
-const stackConfig = selectStackConfig()
-const isBaseUrl = stackConfig.is.base_url
 
 const csrf = selectCSRFToken()
 const instance = axios.create({
@@ -56,10 +50,6 @@ instance.interceptors.response.use(
 )
 
 export default {
-  users: {
-    validate: validationData =>
-      instance.patch(`${isBaseUrl}/contact_info/validation`, validationData),
-  },
   account: {
     login: credentials => instance.post(`${appRoot}/api/auth/login`, credentials),
     logout: () => instance.post(`${appRoot}/api/auth/logout`),
