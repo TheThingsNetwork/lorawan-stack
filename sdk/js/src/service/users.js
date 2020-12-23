@@ -135,6 +135,14 @@ class Users {
       },
     )
   }
+
+  createTemporaryPassword(id) {
+    return this._api.UserRegistry.CreateTemporaryPassword({
+      routeParams: {
+        'user_ids.user_id': id,
+      },
+    })
+  }
 }
 
 export default Users
