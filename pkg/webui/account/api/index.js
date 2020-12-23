@@ -57,7 +57,6 @@ instance.interceptors.response.use(
 
 export default {
   users: {
-    register: userData => instance.post(`${isBaseUrl}/users`, userData),
     resetPassword: user_id => instance.post(`${isBaseUrl}/users/${user_id}/temporary_password`),
     updatePassword: (user_id, passwordData) =>
       instance.put(`${isBaseUrl}/users/${user_id}/password`, passwordData),

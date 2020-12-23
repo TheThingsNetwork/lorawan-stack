@@ -19,7 +19,7 @@ import { Redirect } from 'react-router-dom'
 import { push } from 'connected-react-router'
 import queryString from 'query-string'
 
-import api from '@account/api'
+import tts from '@account/api/tts'
 
 import Button from '@ttn-lw/components/button'
 import Input from '@ttn-lw/components/input'
@@ -98,14 +98,11 @@ const CreateAccount = ({ location }) => {
         setError(undefined)
         const { user_id, ...rest } = values
         const { invitation_token = '' } = queryString.parse(location.search)
-        const result = await api.users.register({
-          user: { ids: { user_id }, ...rest },
-          invitation_token,
-        })
+        const result = await tts.Users.create({ ids: { user_id }, ...rest }, invitation_token)
 
         dispatch(
           push(`/login${location.search}`, {
-            info: getSuccessMessage(result.data.state),
+            info: getSuccessMessage(result.state),
           }),
         )
       } catch (error) {
