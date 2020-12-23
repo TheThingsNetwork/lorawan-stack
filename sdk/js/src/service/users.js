@@ -103,9 +103,10 @@ class Users {
     return Marshaler.unwrapUser(response)
   }
 
-  async create(user) {
+  async create(user, invitationToken) {
     const response = await this._api.UserRegistry.Create(undefined, {
       user,
+      invitation_token: invitationToken,
     })
     return Marshaler.unwrapUser(response)
   }
