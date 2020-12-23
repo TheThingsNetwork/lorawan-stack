@@ -57,8 +57,6 @@ instance.interceptors.response.use(
 
 export default {
   users: {
-    updatePassword: (user_id, passwordData) =>
-      instance.put(`${isBaseUrl}/users/${user_id}/password`, passwordData),
     validate: validationData =>
       instance.patch(`${isBaseUrl}/contact_info/validation`, validationData),
   },
