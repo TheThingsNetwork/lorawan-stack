@@ -43,28 +43,16 @@ instance.interceptors.response.use(
 
 export default {
   users: {
-    async register(userData) {
-      return instance.post(`${isBaseUrl}/users`, userData)
-    },
-    async resetPassword(user_id) {
-      return instance.post(`${isBaseUrl}/users/${user_id}/temporary_password`)
-    },
-    async updatePassword(user_id, passwordData) {
-      return instance.put(`${isBaseUrl}/users/${user_id}/password`, passwordData)
-    },
-    async validate(validationData) {
-      return instance.patch(`${isBaseUrl}/contact_info/validation`, validationData)
-    },
+    register: userData => instance.post(`${isBaseUrl}/users`, userData),
+    resetPassword: user_id => instance.post(`${isBaseUrl}/users/${user_id}/temporary_password`),
+    updatePassword: (user_id, passwordData) =>
+      instance.put(`${isBaseUrl}/users/${user_id}/password`, passwordData),
+    validate: validationData =>
+      instance.patch(`${isBaseUrl}/contact_info/validation`, validationData),
   },
   account: {
-    login(credentials) {
-      return instance.post(`${appRoot}/api/auth/login`, credentials)
-    },
-    logout() {
-      return instance.post(`${appRoot}/api/auth/logout`)
-    },
-    me() {
-      return instance.get(`${appRoot}/api/me`)
-    },
+    login: credentials => instance.post(`${appRoot}/api/auth/login`, credentials),
+    logout: () => instance.post(`${appRoot}/api/auth/logout`),
+    me: () => instance.get(`${appRoot}/api/me`),
   },
 }
