@@ -1,21 +1,19 @@
 # The Things Stack for LoRaWAN JavaScript SDK
 This is the official SDK for the The Things Stack for LoRaWAN.
 
-## Installation
-
-```bash
-$ yarn add ttn
-```
-
 ## Usage
 
 ### Basic Setup
 
 ```javascript
-import TTN from 'ttn'
+import TTS from 'tts'
 
 const token = 'paste-your-token-here'
-const ttn = new TTN(token, {
+const tts = new TTS({
+  authorization: {
+    mode: 'key', // Currently allows 'key' and 'session'.
+    key: token,
+  },
   connectionType: 'http',
   baseURL: 'http://localhost:1885/api/v3',
   defaultUserId: 'testuser',
@@ -34,10 +32,10 @@ const appData = {
 }
 
 // Via Applications object.
-const firstApp = await ttn.Applications.create('testuser', appData)
+const firstApp = await tts.Applications.create('testuser', appData)
 
 // Via Application class.
-const secondApp = new ttn.Application(appData)
+const secondApp = new tts.Application(appData)
 await secondApp.save()
 ```
 

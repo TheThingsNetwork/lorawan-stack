@@ -153,6 +153,7 @@ export default class FileInput extends Component {
           disabled={disabled}
           message={!value ? message : m.changeFile}
           icon="attachment"
+          secondary
         />
         <span className={style.status}>{this.statusMessage}</span>
         <input

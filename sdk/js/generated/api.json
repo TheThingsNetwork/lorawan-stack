@@ -1741,7 +1741,7 @@
           "fields": [
             {
               "name": "application_ids",
-              "description": "Query upstream messages from all end devices of an application. Cannot be used in conjunction with EndDeviceIdentifiers.",
+              "description": "Query upstream messages from all end devices of an application. Cannot be used in conjunction with end_device_ids.",
               "label": "",
               "type": "ApplicationIdentifiers",
               "longType": "ApplicationIdentifiers",
@@ -1751,7 +1751,7 @@
             },
             {
               "name": "end_device_ids",
-              "description": "Query upstream messages from a single end device. Cannot be used in conjunction with ApplicationIdentifiers.",
+              "description": "Query upstream messages from a single end device. Cannot be used in conjunction with application_ids.",
               "label": "",
               "type": "EndDeviceIdentifiers",
               "longType": "EndDeviceIdentifiers",
@@ -1859,11 +1859,11 @@
           "name": "ApplicationUpStorage",
           "longName": "ApplicationUpStorage",
           "fullName": "ttn.lorawan.v3.ApplicationUpStorage",
-          "description": "",
+          "description": "The ApplicationUpStorage service can be used to query stored application upstream messages.",
           "methods": [
             {
               "name": "GetStoredApplicationUp",
-              "description": "",
+              "description": "Returns a stream of application messages that have been stored in the database.",
               "requestType": "GetStoredApplicationUpRequest",
               "requestLongType": "GetStoredApplicationUpRequest",
               "requestFullType": "ttn.lorawan.v3.GetStoredApplicationUpRequest",

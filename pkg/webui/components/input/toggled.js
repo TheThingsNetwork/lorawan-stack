@@ -55,6 +55,7 @@ class Toggled extends Component {
             onChange={this.handleCheckboxChange}
             value={isEnabled}
             id={checkboxId}
+            label={enabledMessage}
           />
         </label>
         {isEnabled && (

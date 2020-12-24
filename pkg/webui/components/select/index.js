@@ -44,6 +44,7 @@ class Select extends React.PureComponent {
     disabled: PropTypes.bool,
     error: PropTypes.bool,
     id: PropTypes.string,
+    inputWidth: PropTypes.inputWidth,
     intl: PropTypes.shape({
       formatMessage: PropTypes.func,
     }).isRequired,
@@ -72,6 +73,7 @@ class Select extends React.PureComponent {
     warning: false,
     value: undefined,
     id: undefined,
+    inputWidth: 'm',
   }
 
   constructor(props) {
@@ -129,6 +131,7 @@ class Select extends React.PureComponent {
     const {
       className,
       options,
+      inputWidth,
       intl,
       value,
       onChange,
@@ -143,7 +146,7 @@ class Select extends React.PureComponent {
     } = this.props
 
     const formatMessage = (label, values) => (intl ? intl.formatMessage(label, values) : label)
-    const cls = classnames(className, style.container, {
+    const cls = classnames(className, style.container, style[`input-width-${inputWidth}`], {
       [style.error]: error,
       [style.warning]: warning,
     })

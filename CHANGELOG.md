@@ -34,6 +34,25 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
+## [3.10.5] - 2020-12-23
+
+### Added
+
+- Support for sending end device uplinks using the CLI (see `ttn-lw-cli simulate application-uplink` command).
+- Clients can now perform custom ADR by modifying ADR parameters in `mac-state.desired-parameters` of the device.
+
+### Changed
+
+- Form field layouts in the Console (field labels are now dispayed above the field).
+- Small structural changes to the custom webhook form in the Console.
+- Renamed experimental command `ttn-lw-cli simulate uplink` to `ttn-lw-cli simulate gateway-uplink`.
+- Renamed experimental command `ttn-lw-cli simulate join-request` to `ttn-lw-cli simulate gateway-join-request`.
+
+### Fixed
+
+- Removed misleading warning message for missing package data when setting up the storage integration package association.
+
+
 ## [3.10.4] - 2020-12-08
 
 ### Added
@@ -1225,8 +1244,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.4...v3.10
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.5...v3.10
+[3.10.5]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.4...v3.10.5
 [3.10.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.3...v3.10.4
 [3.10.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.2...v3.10.3
 [3.10.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.1...v3.10.2

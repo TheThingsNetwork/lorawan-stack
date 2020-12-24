@@ -25,8 +25,6 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import WebhookTemplateInfo from '@console/components/webhook-template-info'
 
 import Yup from '@ttn-lw/lib/yup'
@@ -188,7 +186,7 @@ export default class WebhookTemplateForm extends Component {
           error={error}
           formikRef={this.form}
         >
-          <Message component="h4" content={m.templateSettings} />
+          <Form.SubTitle title={m.templateSettings} />
           <Form.Field
             name="webhook_id"
             title={sharedMessages.webhookId}

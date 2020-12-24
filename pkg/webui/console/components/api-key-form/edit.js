@@ -24,8 +24,6 @@ import FormSubmit from '@ttn-lw/components/form/submit'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import Input from '@ttn-lw/components/input'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import RightsGroup from '@console/components/rights-group'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -169,7 +167,6 @@ class EditForm extends React.Component {
         onSubmitSuccess={this.handleEditSuccess}
         onSubmitFailure={onEditFailure}
       >
-        <Message component="h4" content={sharedMessages.generalInformation} />
         <FormField
           title={sharedMessages.keyId}
           name="id"

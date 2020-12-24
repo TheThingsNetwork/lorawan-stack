@@ -221,7 +221,6 @@ const NetworkServerForm = React.memo(props => {
         required
         name="_activation_mode"
         component={Radio.Group}
-        horizontal={false}
       >
         <Radio label={sharedMessages.otaa} value={ACTIVATION_MODES.OTAA} />
         <Radio label={sharedMessages.abp} value={ACTIVATION_MODES.ABP} />

@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -135,7 +136,18 @@ var (
 	simulateUplinkFlags      = util.FieldFlags(&simulateMetadataParams{})
 	simulateJoinRequestFlags = util.FieldFlags(&simulateJoinRequestParams{})
 	simulateDataUplinkFlags  = util.FieldFlags(&simulateDataUplinkParams{})
+
+	applicationUplinkFlags = util.FieldFlags(&ttnpb.ApplicationUplink{})
+
+	errApplicationServerDisabled = errors.DefineFailedPrecondition("application_server_disabled", "Application Server is disabled")
 )
+
+func simulateFlags() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.String("gateway-api-key", "", "API key used for linking the gateway (optional when using user authentication)")
+	flagSet.Bool("dry-run", false, "print the message instead of sending it")
+	return flagSet
+}
 
 func simulateDownlinkFlags() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
@@ -417,12 +429,12 @@ var (
 	simulateCommand = &cobra.Command{
 		Use:     "simulate",
 		Aliases: []string{"sim"},
-		Short:   "Simulation commands (EXPERIMENTAL)",
-		Hidden:  true,
+		Short:   "Simulation commands",
 	}
 	simulateJoinRequestCommand = &cobra.Command{
-		Use:   "join-request",
-		Short: "Simulate a join request (EXPERIMENTAL)",
+		Use:    "gateway-join-request",
+		Short:  "Simulates a join request from an end device, sent through a simulated gateway connection (EXPERIMENTAL)",
+		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var uplinkParams simulateMetadataParams
 			if err := util.SetFields(&uplinkParams, simulateUplinkFlags); err != nil {
@@ -502,8 +514,9 @@ var (
 	}
 
 	simulateDataUplinkCommand = &cobra.Command{
-		Use:   "uplink",
-		Short: "Simulate a data uplink (EXPERIMENTAL)",
+		Use:    "gateway-uplink",
+		Short:  "Simulate an uplink message from an end device, sent through a simulated gateway connection (EXPERIMENTAL)",
+		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var uplinkParams simulateMetadataParams
 			if err := util.SetFields(&uplinkParams, simulateUplinkFlags); err != nil {
@@ -637,6 +650,38 @@ var (
 			)
 		},
 	}
+	simulateApplicationUplinkCommand = &cobra.Command{
+		Use:   "application-uplink [application-id] [device-id]",
+		Short: "Simulate an application-layer uplink message from an end device, sent directly to the Application Server",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			devID, err := getEndDeviceID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+			if !config.ApplicationServerEnabled {
+				return errApplicationServerDisabled.New()
+			}
+			uplinkMessage := &ttnpb.ApplicationUplink{}
+			up := &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: *devID,
+				Up: &ttnpb.ApplicationUp_UplinkMessage{
+					UplinkMessage: uplinkMessage,
+				},
+			}
+			if err := util.SetFields(uplinkMessage, applicationUplinkFlags); err != nil {
+				return err
+			}
+			cc, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			if uplinkMessage.ReceivedAt.IsZero() {
+				uplinkMessage.ReceivedAt = time.Now()
+			}
+			_, err = ttnpb.NewAppAsClient(cc).SimulateUplink(ctx, up)
+			return err
+		},
+	}
 )
 
 func init() {
@@ -644,6 +689,7 @@ func init() {
 	simulateJoinRequestCommand.Flags().AddFlagSet(simulateUplinkFlags)
 	simulateJoinRequestCommand.Flags().AddFlagSet(simulateDownlinkFlags())
 	simulateJoinRequestCommand.Flags().AddFlagSet(simulateJoinRequestFlags)
+	simulateJoinRequestCommand.Flags().AddFlagSet(simulateFlags())
 
 	simulateCommand.AddCommand(simulateJoinRequestCommand)
 
@@ -652,10 +698,14 @@ func init() {
 	simulateDataUplinkCommand.Flags().AddFlagSet(simulateDownlinkFlags())
 	simulateDataUplinkCommand.Flags().AddFlagSet(simulateDataUplinkFlags)
 	simulateDataUplinkCommand.Flags().AddFlagSet(simulateDataDownlinkFlags())
+	simulateDataUplinkCommand.Flags().AddFlagSet(simulateFlags())
 
 	simulateCommand.AddCommand(simulateDataUplinkCommand)
 
-	simulateCommand.PersistentFlags().String("gateway-api-key", "", "API key used for linking the gateway (optional when using user authentication)")
-	simulateCommand.PersistentFlags().Bool("dry-run", false, "print the message instead of sending it")
+	simulateApplicationUplinkCommand.Flags().AddFlagSet(endDeviceIDFlags())
+	simulateApplicationUplinkCommand.Flags().AddFlagSet(applicationUplinkFlags)
+
+	simulateCommand.AddCommand(simulateApplicationUplinkCommand)
+
 	Root.AddCommand(simulateCommand)
 }

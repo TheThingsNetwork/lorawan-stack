@@ -41,7 +41,8 @@ const m = defineMessages({
   createDevices: 'Create end devices',
   selectAFile: 'Please select a template file',
   fileInfoPlaceholder: 'Please select a template format',
-  claimAuthCode: 'Set claim authentication code',
+  claiming: 'Claiming',
+  setClaimAuthCode: 'Set claim authentication code',
   targetedComponents: 'Targeted components',
 })
 
@@ -130,7 +131,7 @@ export default class DeviceBulkCreateForm extends Component {
         submitEnabledWhenInvalid
         initialValues={initialValues}
       >
-        <Message component="h4" content={m.fileImport} />
+        <Form.SubTitle title={m.fileImport} />
         <DeviceTemplateFormatSelect onChange={this.handleSelectChange} name="format_id" required />
         <Form.InfoField disabled={!formatSelected} title={m.formatInfo}>
           {formatDescription ? formatDescription : <Message content={m.fileInfoPlaceholder} />}
@@ -149,8 +150,7 @@ export default class DeviceBulkCreateForm extends Component {
           component={Checkbox.Group}
           name="components"
           title={m.targetedComponents}
-          required
-          horizontal={false}
+          horizontal
           disabled={!formatSelected}
         >
           {components.map(component => (
@@ -164,7 +164,8 @@ export default class DeviceBulkCreateForm extends Component {
         </Form.Field>
         <Form.Field
           disabled={!formatSelected || !jsSelected}
-          title={m.claimAuthCode}
+          title={m.claiming}
+          label={m.setClaimAuthCode}
           component={Checkbox}
           name="set_claim_auth_code"
         />

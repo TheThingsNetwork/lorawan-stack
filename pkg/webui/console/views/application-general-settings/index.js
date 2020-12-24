@@ -31,8 +31,6 @@ import toast from '@ttn-lw/components/toast'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 import Require from '@console/lib/components/require'
 
@@ -182,12 +180,10 @@ export default class ApplicationGeneralSettings extends React.Component {
           <Col lg={8} md={12}>
             <Form
               error={error}
-              horizontal
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
               validationSchema={validationSchema}
             >
-              <Message component="h4" content={m.basics} />
               <Form.Field
                 title={sharedMessages.appId}
                 name="ids.application_id"

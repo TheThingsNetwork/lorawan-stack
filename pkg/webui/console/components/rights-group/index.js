@@ -274,7 +274,6 @@ class RightsGroup extends React.Component {
         />
         <Checkbox.Group
           className={style.group}
-          horizontal
           name={name}
           value={rightsValues}
           onChange={this.handleChange}

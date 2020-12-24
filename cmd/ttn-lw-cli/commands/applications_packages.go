@@ -38,6 +38,10 @@ var (
 
 	selectAllApplicationPackageAssociationsFlags        = util.SelectAllFlagSet("application package association")
 	selectAllApplicationPackageDefaultAssociationsFlags = util.SelectAllFlagSet("application package default association")
+
+	packageNeedsData = map[string]struct{}{
+		"lora-cloud-device-management-v1": {},
+	}
 )
 
 func applicationPackageAssociationIDFlags() *pflag.FlagSet {
@@ -258,7 +262,9 @@ var (
 
 			reader, err := getDataReader("data", cmd.Flags())
 			if err != nil {
-				logger.WithError(err).Warn("Package data not available")
+				if _, needsData := packageNeedsData[association.PackageName]; needsData {
+					logger.WithError(err).Warn("Package data not available")
+				}
 			} else {
 				var st types.Struct
 				err := jsonpb.TTN().NewDecoder(reader).Decode(&st)
@@ -401,7 +407,9 @@ var (
 
 			reader, err := getDataReader("data", cmd.Flags())
 			if err != nil {
-				logger.WithError(err).Warn("Package data not available")
+				if _, needsData := packageNeedsData[association.PackageName]; needsData {
+					logger.WithError(err).Warn("Package data not available")
+				}
 			} else {
 				var st types.Struct
 				err := jsonpb.TTN().NewDecoder(reader).Decode(&st)

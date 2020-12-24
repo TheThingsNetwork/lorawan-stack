@@ -25,8 +25,6 @@ import KeyValueMap from '@ttn-lw/components/key-value-map'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import WebhookTemplateInfo from '@console/components/webhook-template-info'
 
 import WebhookFormatSelector from '@console/containers/webhook-formats-select'
@@ -49,7 +47,7 @@ const m = defineMessages({
   deleteWebhook: 'Delete Webhook',
   modalWarning:
     'Are you sure you want to delete webhook "{webhookId}"? Deleting a webhook cannot be undone.',
-  headers: 'Headers',
+  additionalHeaders: 'Additional headers',
   headersKeyPlaceholder: 'Authorization',
   headersValuePlaceholder: 'Bearer my-auth-token',
   headersAdd: 'Add header entry',
@@ -58,6 +56,8 @@ const m = defineMessages({
   downlinkAPIKeyDesc:
     'The API key will be provided to the endpoint using the "X-Downlink-Apikey" header',
   templateInformation: 'Template information',
+  enabledMessages: 'Enabled messages',
+  endpointSettings: 'Endpoint settings',
 })
 
 const headerCheck = headers =>
@@ -211,7 +211,7 @@ export default class WebhookForm extends Component {
           error={error}
           formikRef={this.form}
         >
-          <Message component="h4" content={sharedMessages.generalSettings} />
+          <Form.SubTitle title={sharedMessages.generalSettings} />
           <Form.Field
             name="webhook_id"
             title={sharedMessages.webhookId}
@@ -221,23 +221,8 @@ export default class WebhookForm extends Component {
             autoFocus
             disabled={update}
           />
-          <Form.Field
-            name="headers"
-            title={m.headers}
-            keyPlaceholder={m.headersKeyPlaceholder}
-            valuePlaceholder={m.headersValuePlaceholder}
-            addMessage={m.headersAdd}
-            component={KeyValueMap}
-          />
-          <Form.Field
-            name="downlink_api_key"
-            title={m.downlinkAPIKey}
-            component={Input}
-            description={m.downlinkAPIKeyDesc}
-            code
-          />
-          <Message component="h4" content={sharedMessages.messageTypes} />
-          <WebhookFormatSelector horizontal name="format" required />
+          <WebhookFormatSelector name="format" required />
+          <Form.SubTitle title={m.endpointSettings} />
           <Form.Field
             name="base_url"
             title={sharedMessages.webhookBaseUrl}
@@ -246,6 +231,22 @@ export default class WebhookForm extends Component {
             autoComplete="url"
             required
           />
+          <Form.Field
+            name="downlink_api_key"
+            title={m.downlinkAPIKey}
+            component={Input}
+            description={m.downlinkAPIKeyDesc}
+            code
+          />
+          <Form.Field
+            name="headers"
+            title={m.additionalHeaders}
+            keyPlaceholder={m.headersKeyPlaceholder}
+            valuePlaceholder={m.headersValuePlaceholder}
+            addMessage={m.headersAdd}
+            component={KeyValueMap}
+          />
+          <Form.SubTitle title={m.enabledMessages} />
           <Notification info content={m.messageInfo} small />
           <Form.Field
             name="uplink_message"

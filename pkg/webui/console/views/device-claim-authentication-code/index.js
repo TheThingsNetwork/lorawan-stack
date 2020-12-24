@@ -149,7 +149,6 @@ const DeviceClaimAuthenticationCode = props => {
         <Col lg={8} md={12}>
           {!entryExists && <Notification content={m.noCodeSet} info small />}
           <Form
-            horizontal
             validateOnChange
             enableReinitialize
             error={error}

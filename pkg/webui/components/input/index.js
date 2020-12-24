@@ -50,8 +50,8 @@ class Input extends React.Component {
     disabled: PropTypes.bool,
     error: PropTypes.bool,
     forwardedRef: PropTypes.shape({}),
-    horizontal: PropTypes.bool,
     icon: PropTypes.string,
+    inputWidth: PropTypes.inputWidth,
     intl: PropTypes.shape({
       formatMessage: PropTypes.func,
     }).isRequired,
@@ -78,6 +78,7 @@ class Input extends React.Component {
     component: 'input',
     disabled: false,
     error: false,
+    inputWidth: 'm',
     icon: undefined,
     label: undefined,
     loading: false,
@@ -93,7 +94,6 @@ class Input extends React.Component {
     value: '',
     warning: false,
     forwardedRef: null,
-    horizontal: true,
   }
 
   state = {
@@ -138,8 +138,8 @@ class Input extends React.Component {
       component,
       loading,
       title,
+      inputWidth,
       intl,
-      horizontal,
       code,
       action,
       forwardedRef,
@@ -169,7 +169,7 @@ class Input extends React.Component {
     const v = valid && (Component.validate ? Component.validate(value, this.props) : true)
     const hasAction = Boolean(action)
 
-    const inputCls = classnames(style.inputBox, {
+    const inputCls = classnames(style.inputBox, style[`input-width-${inputWidth}`], {
       [style.focus]: focus,
       [style.error]: error,
       [style.readOnly]: readOnly,

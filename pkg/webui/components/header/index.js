@@ -76,7 +76,7 @@ const Header = ({
             >
               {dropdownItems}
             </ProfileDropdown>
-            <button onClick={handleMobileMenuClick} className={style.mobileMenu}>
+            <button onClick={handleMobileMenuClick} className={style.mobileMenuButton}>
               <Icon className={style.preloadIcons} icon="." />
               <div className={style.hamburger}>
                 <img src={hamburgerGraphic} alt="Open Mobile Menu" />
@@ -86,7 +86,12 @@ const Header = ({
         )}
       </div>
       {mobileMenuOpen && (
-        <MobileMenu onItemsClick={handleMobileMenuItemsClick} onLogout={onLogout} user={user}>
+        <MobileMenu
+          className={style.mobileMenu}
+          onItemsClick={handleMobileMenuItemsClick}
+          onLogout={onLogout}
+          user={user}
+        >
           {mobileDropdownItems}
         </MobileMenu>
       )}
