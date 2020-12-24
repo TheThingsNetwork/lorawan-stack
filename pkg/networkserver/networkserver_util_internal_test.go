@@ -1962,20 +1962,20 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 			f()
 		}
 		select {
-		case req := <-authCh:
-			tb.Errorf("Cluster.Auth call missed: %+v", req)
+		case <-authCh:
+			tb.Error("Cluster.Auth call missed")
 		default:
 			close(authCh)
 		}
 		select {
 		case req := <-getPeerCh:
-			tb.Errorf("Cluster.GetPeer call missed: %+v", req)
+			tb.Errorf("Cluster.GetPeer call missed: (role: %+v, identifiers: %+v)", req.Role, req.Identifiers)
 		default:
 			close(getPeerCh)
 		}
 		select {
 		case req := <-eventsPublishCh:
-			tb.Errorf("events.Publish call missed: %+v", req)
+			tb.Errorf("events.Publish call missed: %+v", req.Event)
 		default:
 			close(eventsPublishCh)
 		}
