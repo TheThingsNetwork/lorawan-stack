@@ -16,32 +16,34 @@ package commands
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 
-	"github.com/spf13/cobra"
-	nsredis "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
-	"go.thethings.network/lorawan-stack/v3/pkg/redis"
+	"github.com/go-redis/redis/v8"
 )
 
-func rangeRedisKeysIteration(ctx context.Context, cl *redis.Client, cursor uint64, scanKey string, f func(k string) bool) (uint64, error) {
-	ks, cursor, err := cl.Scan(ctx, cursor, scanKey, 1).Result()
+func rangeScanIteration(cmd *redis.ScanCmd, f func(...string) (bool, error)) (uint64, error) {
+	ks, cursor, err := cmd.Result()
 	if err != nil {
 		return 0, err
 	}
-	for _, k := range ks {
-		if !f(k) {
-			return 0, nil
-		}
+	ok, err := f(ks...)
+	if err != nil {
+		return 0, err
+	}
+	if !ok {
+		return 0, nil
 	}
 	return cursor, nil
 }
 
-func rangeRedisKeys(ctx context.Context, cl *redis.Client, scanKey string, f func(k string) bool) error {
-	cursor, err := rangeRedisKeysIteration(ctx, cl, 0, scanKey, f)
+func rangeScan(scan func(uint64) *redis.ScanCmd, f func(...string) (bool, error)) error {
+	cursor, err := rangeScanIteration(scan(0), f)
 	if err != nil {
 		return err
 	}
 	for cursor > 0 {
-		cursor, err = rangeRedisKeysIteration(ctx, cl, cursor, scanKey, f)
+		cursor, err = rangeScanIteration(scan(cursor), f)
 		if err != nil {
 			return err
 		}
@@ -49,64 +51,57 @@ func rangeRedisKeys(ctx context.Context, cl *redis.Client, scanKey string, f fun
 	return nil
 }
 
-var (
-	nsDBCommand = &cobra.Command{
-		Use:   "ns-db",
-		Short: "Manage Network Server database",
+func rangeStrings(f func(string) (bool, error), ss ...string) (bool, error) {
+	for _, s := range ss {
+		ok, err := f(s)
+		if err != nil {
+			return false, err
+		}
+		if !ok {
+			return false, nil
+		}
 	}
-	nsDBPruneCommand = &cobra.Command{
-		Use:   "prune",
-		Short: "Remove unused Network Server data",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if config.Redis.IsZero() {
-				panic("Only redis is supported by this command")
+	return true, nil
+}
+
+func rangeStringsBindFunc(f func(string) (bool, error)) func(ss ...string) (bool, error) {
+	return func(ss ...string) (bool, error) {
+		return rangeStrings(f, ss...)
+	}
+}
+
+func rangeRedisKeys(ctx context.Context, r redis.Cmdable, match string, count int64, f func(k string) (bool, error)) error {
+	return rangeScan(func(cursor uint64) *redis.ScanCmd {
+		return r.Scan(ctx, cursor, match, count)
+	}, rangeStringsBindFunc(f))
+}
+
+func rangeRedisSet(ctx context.Context, r redis.Cmdable, scanKey, match string, count int64, f func(v string) (bool, error)) error {
+	return rangeScan(func(cursor uint64) *redis.ScanCmd {
+		return r.SScan(ctx, scanKey, cursor, match, count)
+	}, rangeStringsBindFunc(f))
+}
+
+func rangeRedisZSet(ctx context.Context, r redis.Cmdable, scanKey, match string, count int64, f func(k string, v float64) (bool, error)) error {
+	return rangeScan(func(cursor uint64) *redis.ScanCmd {
+		return r.ZScan(ctx, scanKey, cursor, match, count)
+	}, func(ss ...string) (bool, error) {
+		if n := len(ss); n%2 != 0 {
+			panic(fmt.Sprintf("ZSCAN return value length is not even: %d", n))
+		}
+		for i := 0; i < len(ss); i += 2 {
+			v, err := strconv.ParseFloat(ss[i+1], 64)
+			if err != nil {
+				panic(fmt.Sprintf("failed to parse element score as float64: %s", err))
 			}
-
-			logger.Info("Connecting to Redis database...")
-			cl := NewNetworkServerApplicationUplinkQueueRedis(*config)
-			var deleted uint64
-			defer func() { logger.Debugf("%d processed stream entries deleted", deleted) }()
-			return rangeRedisKeys(ctx, cl, nsredis.ApplicationUplinkQueueUIDGenericUplinkKey(cl, "*"), func(k string) bool {
-				gs, err := cl.XInfoGroups(ctx, k).Result()
-				if err != nil {
-					logger.WithError(err).Errorf("Failed to query groups of stream %q", k)
-					return true
-				}
-				for _, g := range gs {
-					if g.Name != "ns" {
-						logger.Errorf("Unexpected consumer group with name %q found for stream %q", g.Name, k)
-						continue
-					}
-					last := "-"
-					for {
-						msgs, err := cl.XRangeN(ctx, k, last, g.LastDeliveredID, 1).Result()
-						if err != nil {
-							logger.WithError(err).Errorf("Failed to XRANGE over stream %q", k)
-							return true
-						}
-						if len(msgs) == 0 {
-							return true
-						}
-						var ids []string
-						for _, msg := range msgs {
-							ids = append(ids, msg.ID)
-							last = msg.ID
-						}
-						_, err = cl.XDel(ctx, k, ids...).Result()
-						if err != nil {
-							logger.WithError(err).Errorf("Failed to XDEL from stream %q, continue to next stream", k)
-							return true
-						}
-						deleted += uint64(len(ids))
-					}
-				}
-				return true
-			})
-		},
-	}
-)
-
-func init() {
-	Root.AddCommand(nsDBCommand)
-	nsDBCommand.AddCommand(nsDBPruneCommand)
+			ok, err := f(ss[i], v)
+			if err != nil {
+				return false, err
+			}
+			if !ok {
+				return false, nil
+			}
+		}
+		return true, nil
+	})
 }

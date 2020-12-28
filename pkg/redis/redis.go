@@ -377,6 +377,26 @@ func ListProtos(ctx context.Context, r redis.Cmdable, k string) ProtosCmd {
 	}
 }
 
+type InterfaceSliceCmd struct {
+	*redis.Cmd
+}
+
+func (cmd InterfaceSliceCmd) Result() ([]interface{}, error) {
+	v, err := cmd.Cmd.Result()
+	if err != nil {
+		return nil, err
+	}
+	vs, ok := v.([]interface{})
+	if !ok {
+		return nil, errDecode.New()
+	}
+	return vs, nil
+}
+
+func RunInterfaceSliceScript(ctx context.Context, r Scripter, s *redis.Script, keys []string, args ...interface{}) *InterfaceSliceCmd {
+	return &InterfaceSliceCmd{s.Run(ctx, r, keys, args...)}
+}
+
 const (
 	payloadKey = "payload"
 	replaceKey = "replace"
@@ -459,13 +479,9 @@ func popTask(ctx context.Context, r redis.Cmdable, group, id string, maxLen int6
 		waitingStream = WaitingTaskKey(k)
 	)
 	for {
-		res, err := popTaskScript.Run(ctx, r, []string{readyStream, inputStream, waitingStream}, group, id, time.Now().UnixNano(), maxLen).Result()
+		vs, err := RunInterfaceSliceScript(ctx, r, popTaskScript, []string{readyStream, inputStream, waitingStream}, group, id, time.Now().UnixNano(), maxLen).Result()
 		if err != nil && err != redis.Nil {
 			return ConvertError(err)
-		}
-		vs, ok := res.([]interface{})
-		if !ok {
-			panic(fmt.Sprintf("invalid type of result returned by Redis task pop script: %T", res))
 		}
 		typ, ok := vs[0].(string)
 		if !ok {

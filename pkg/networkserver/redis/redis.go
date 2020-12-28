@@ -29,12 +29,12 @@ type keyer interface {
 	Key(ks ...string) string
 }
 
-func deviceUIDKey(r keyer, uid string) string {
+func UIDKey(r keyer, uid string) string {
 	return r.Key("uid", uid)
 }
 
-func deviceUIDLastInvalidationKey(r keyer, uid string) string {
-	return ttnredis.Key(deviceUIDKey(r, uid), "last-invalidation")
+func uidLastInvalidationKey(r keyer, uid string) string {
+	return ttnredis.Key(UIDKey(r, uid), "last-invalidation")
 }
 
 var keyEncoding = base64.RawStdEncoding

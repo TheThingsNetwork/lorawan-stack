@@ -23,7 +23,7 @@ import (
 )
 
 var (
-	CacheTTL           = (1 << 5) * test.Delay
+	CacheTTL           = (1 << 6) * test.Delay
 	DefaultMACSettings = DefaultConfig.DefaultMACSettings.Parse()
 )
 

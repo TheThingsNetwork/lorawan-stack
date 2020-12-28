@@ -362,17 +362,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
-						LastNFCntDown: 0x24,
-						SessionKeys:   *sessionKeys,
-					},
 				},
 				Paths: []string{
 					"frequency_plan_id",
 					"ids",
 					"lorawan_phy_version",
-					"session",
 				},
 			},
 		},
@@ -2561,7 +2555,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "join-accept/windows open/RX1,RX2 available/no active MAC state/EU868",
+			Name: "join-accept/windows open/RX1,RX2 available/active session/EU868",
 			CreateDevice: SetDeviceRequest{
 				EndDevice: &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -2621,12 +2615,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 					},
+					MACState:     MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B),
 					SupportsJoin: true,
 				},
 				Paths: []string{
 					"frequency_plan_id",
 					"ids",
 					"lorawan_phy_version",
+					"mac_state",
 					"pending_mac_state",
 					"session",
 					"supports_join",

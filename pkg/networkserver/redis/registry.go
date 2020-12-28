@@ -17,12 +17,10 @@ package redis
 import (
 	"bytes"
 	"context"
-	"encoding"
 	"fmt"
 	"io"
 	"math/rand"
 	"runtime/trace"
-	"strconv"
 	"sync"
 	"time"
 
@@ -34,7 +32,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -46,14 +43,6 @@ var (
 	errInvalidIdentifiers   = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
 	errReadOnlyField        = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
-)
-
-const (
-	fieldKey = "fields"
-
-	shortFCntKey = "16bit"
-	longFCntKey  = "32bit"
-	pendingKey   = "pending"
 )
 
 // DeviceRegistry is an implementation of networkserver.DeviceRegistry.
@@ -76,8 +65,42 @@ func (r *DeviceRegistry) Init(ctx context.Context) error {
 	return nil
 }
 
+// marshalMsgpack is adaptation of msgpack.Marshal (https://github.com/vmihailenco/msgpack/blob/8b121f7d2c8eac21ab98ef6443d272f355b88999/encode.go#L58-L74).
+func marshalMsgpack(v interface{}) ([]byte, error) {
+	enc := msgpack.GetEncoder()
+
+	var buf bytes.Buffer
+	enc.Reset(&buf)
+	enc.UseCompactFloats(true)
+	enc.UseCompactInts(true)
+	enc.UseCustomStructTag("json")
+
+	err := enc.Encode(v)
+	b := buf.Bytes()
+
+	msgpack.PutEncoder(enc)
+
+	if err != nil {
+		return nil, err
+	}
+	return b, err
+}
+
+// unmarshalMsgpack is adaptation of msgpack.Unmarshal (https://github.com/vmihailenco/msgpack/blob/8b121f7d2c8eac21ab98ef6443d272f355b88999/decode.go#L54-L63).
+func unmarshalMsgpack(b []byte, v interface{}) error {
+	dec := msgpack.GetDecoder()
+
+	dec.ResetBytes(b)
+	dec.UseCustomStructTag("json")
+	err := dec.Decode(v)
+
+	msgpack.PutDecoder(dec)
+
+	return err
+}
+
 func (r *DeviceRegistry) uidKey(uid string) string {
-	return deviceUIDKey(r.Redis, uid)
+	return UIDKey(r.Redis, uid)
 }
 
 func (r *DeviceRegistry) addrKey(addr types.DevAddr) string {
@@ -86,13 +109,6 @@ func (r *DeviceRegistry) addrKey(addr types.DevAddr) string {
 
 func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 	return r.Redis.Key("eui", joinEUI.String(), devEUI.String())
-}
-
-func deviceSupports32BitFCnt(pb *ttnpb.EndDevice) bool {
-	if pb.GetMACSettings().GetSupports32BitFCnt() != nil {
-		return pb.MACSettings.Supports32BitFCnt.Value
-	}
-	return true
 }
 
 // GetByID gets device by appID, devID.
@@ -135,637 +151,323 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 	return pb, ctx, nil
 }
 
-type uplinkMatch struct {
-	appID                   ttnpb.ApplicationIdentifiers
-	devID                   string
-	loRaWANVersion          ttnpb.MACVersion
-	fNwkSIntKeyKey          *types.AES128Key
-	fNwkSIntKeyKEKLabel     string
-	fNwkSIntKeyEncryptedKey []byte
-	resetsFCnt              *bool
-
-	fCnt      uint32
-	lastFCnt  uint32
-	isPending bool
+type uplinkMatchSession struct {
+	LoRaWANVersion    ttnpb.MACVersion
+	FNwkSIntKey       *ttnpb.KeyEnvelope
+	LastFCnt          uint32             `json:",omitempty"`
+	ResetsFCnt        *pbtypes.BoolValue `json:",omitempty"`
+	Supports32BitFCnt *pbtypes.BoolValue `json:",omitempty"`
 }
 
-func (m uplinkMatch) ApplicationIdentifiers() ttnpb.ApplicationIdentifiers {
-	return m.appID
+type uplinkMatchPendingSession struct {
+	LoRaWANVersion ttnpb.MACVersion
+	FNwkSIntKey    *ttnpb.KeyEnvelope
 }
 
-func (m uplinkMatch) DeviceID() string {
-	return m.devID
+type uplinkMatchResult struct {
+	UID               string
+	LoRaWANVersion    ttnpb.MACVersion
+	FNwkSIntKey       *ttnpb.KeyEnvelope
+	LastFCnt          uint32             `json:",omitempty"`
+	IsPending         bool               `json:",omitempty"`
+	ResetsFCnt        *pbtypes.BoolValue `json:",omitempty"`
+	Supports32BitFCnt *pbtypes.BoolValue `json:",omitempty"`
 }
 
-func (m uplinkMatch) LoRaWANVersion() ttnpb.MACVersion {
-	return m.loRaWANVersion
+func CurrentAddrKey(addrKey string) string {
+	return ttnredis.Key(addrKey, "current")
 }
 
-func (m uplinkMatch) FNwkSIntKey() *ttnpb.KeyEnvelope {
-	return &ttnpb.KeyEnvelope{
-		Key:          m.fNwkSIntKeyKey,
-		KEKLabel:     m.fNwkSIntKeyKEKLabel,
-		EncryptedKey: m.fNwkSIntKeyEncryptedKey,
-	}
+func PendingAddrKey(addrKey string) string {
+	return ttnredis.Key(addrKey, "pending")
 }
 
-func (m uplinkMatch) FCnt() uint32 {
-	return m.fCnt
+func FieldKey(addrKey string) string {
+	return ttnredis.Key(addrKey, "fields")
 }
 
-func (m uplinkMatch) LastFCnt() uint32 {
-	return m.lastFCnt
-}
-
-func (m uplinkMatch) ResetsFCnt() *pbtypes.BoolValue {
-	if m.resetsFCnt == nil {
-		return nil
-	}
-	return &pbtypes.BoolValue{
-		Value: *m.resetsFCnt,
-	}
-}
-
-func (m uplinkMatch) IsPending() bool {
-	return m.isPending
-}
-
-type matchKeySet struct {
-	ShortFCntLE string
-	LongFCntLE  string
-	Pending     string
-	LongFCntGT  string
-	ShortFCntGT string
-	Legacy      string
-}
-
-func boolPtr(v bool) *bool {
-	return &v
-}
-
-func encodeBool(v bool) uint8 {
-	if v {
-		return 1
-	}
-	return 0
-}
-
-var errInvalidFormat = errors.DefineInvalidArgument("invalid_format", "invalid value format")
-
-func decodeString(v interface{}) (string, error) {
-	s, ok := v.(string)
-	if !ok {
-		return "", errInvalidFormat.New()
-	}
-	return s, nil
-}
-
-func decodeBool(v interface{}) (bool, error) {
-	s, err := decodeString(v)
-	if err != nil {
-		return false, err
-	}
-	switch s {
-	case "0":
-		return false, nil
-	case "1":
-		return true, nil
-	default:
-		return false, errInvalidFormat.New()
-	}
-}
-
-func decodeBytes(v interface{}) ([]byte, error) {
-	s, err := decodeString(v)
-	if err != nil {
-		return nil, err
-	}
-	return []byte(s), nil
-}
-
-func decodeBinary(src interface{}, dst encoding.BinaryUnmarshaler) error {
-	b, err := decodeBytes(src)
-	if err != nil {
-		return err
-	}
-	if err = dst.UnmarshalBinary(b); err != nil {
-		return err
-	}
-	return nil
-}
-
-func decodeMACVersion(v interface{}) (ttnpb.MACVersion, error) {
-	var ver ttnpb.MACVersion
-	if err := decodeBinary(v, &ver); err != nil {
-		return -1, err
-	}
-	if err := ver.Validate(); err != nil {
-		return -1, err
-	}
-	return ver, nil
-}
-
-func decodeAES128Key(v interface{}) (*types.AES128Key, error) {
-	key := &types.AES128Key{}
-	if err := decodeBinary(v, key); err != nil {
-		return nil, err
-	}
-	return key, nil
-}
-
-var errMissingField = errors.DefineCorruption("missing_field_value", "missing field `{field}` value")
-
-func getUplinkMatch(ctx context.Context, r redis.Cmdable, inputKeys, processingKeys matchKeySet, appID ttnpb.ApplicationIdentifiers, devID string, devAddr types.DevAddr, lsb uint16, matchKey, uidKey string) ([]*uplinkMatch, error) {
-	var isPending bool
-	switch matchKey {
-	case inputKeys.ShortFCntLE, processingKeys.ShortFCntLE,
-		inputKeys.ShortFCntGT, processingKeys.ShortFCntGT,
-		inputKeys.LongFCntLE, processingKeys.LongFCntLE,
-		inputKeys.LongFCntGT, processingKeys.LongFCntGT:
-	case inputKeys.Pending, processingKeys.Pending:
-		// NOTE: While the legacy key may point to a pending session, we can safely ignore that
-		// and let device rejoin and perform migration to new format.
-		isPending = true
-	case inputKeys.Legacy, processingKeys.Legacy:
-		pb := &ttnpb.EndDevice{}
-		if err := ttnredis.GetProto(ctx, r, uidKey).ScanProto(pb); err != nil {
-			return nil, err
-		}
-		ms := make([]*uplinkMatch, 0, 2)
-		if pb.GetMACState() != nil &&
-			pb.GetSession() != nil &&
-			pb.Session.DevAddr.Equal(devAddr) &&
-			pb.Session.FNwkSIntKey != nil {
-			var resetsFCnt *bool
-			if pb.GetMACSettings().GetResetsFCnt() != nil {
-				resetsFCnt = &pb.MACSettings.ResetsFCnt.Value
-			}
-			if pb.ApplicationIdentifiers != appID || pb.DeviceID != devID {
-				return nil, errDatabaseCorruption.WithCause(errInvalidIdentifiers.New())
-			}
-			if err := pb.MACState.LoRaWANVersion.Validate(); err != nil {
-				return nil, errDatabaseCorruption.WithCause(err)
-			}
-			ms = append(ms, &uplinkMatch{
-				appID:                   appID,
-				devID:                   devID,
-				loRaWANVersion:          pb.MACState.LoRaWANVersion,
-				fNwkSIntKeyKey:          pb.Session.FNwkSIntKey.Key,
-				fNwkSIntKeyKEKLabel:     pb.Session.FNwkSIntKey.KEKLabel,
-				fNwkSIntKeyEncryptedKey: pb.Session.FNwkSIntKey.EncryptedKey,
-				resetsFCnt:              resetsFCnt,
-				fCnt:                    FullFCnt(lsb, pb.Session.LastFCntUp, deviceSupports32BitFCnt(pb)),
-				lastFCnt:                pb.Session.LastFCntUp,
-			})
-		}
-		if pb.GetPendingMACState() != nil &&
-			pb.GetPendingSession() != nil &&
-			pb.PendingSession.DevAddr.Equal(devAddr) &&
-			pb.PendingSession.FNwkSIntKey != nil {
-			if err := pb.PendingMACState.LoRaWANVersion.Validate(); err != nil {
-				return nil, errDatabaseCorruption.WithCause(err)
-			}
-			ms = append(ms, &uplinkMatch{
-				appID:                   appID,
-				devID:                   devID,
-				loRaWANVersion:          pb.PendingMACState.LoRaWANVersion,
-				fNwkSIntKeyKey:          pb.PendingSession.FNwkSIntKey.Key,
-				fNwkSIntKeyKEKLabel:     pb.PendingSession.FNwkSIntKey.KEKLabel,
-				fNwkSIntKeyEncryptedKey: pb.PendingSession.FNwkSIntKey.EncryptedKey,
-				fCnt:                    uint32(lsb),
-				isPending:               true,
-			})
-		}
-		return ms, nil
-	default:
-		panic(fmt.Sprintf("invalid match key specified `%s`", matchKey))
-	}
-
-	var fields []string
-	if isPending {
-		fields = []string{
-			"pending_mac_state.lorawan_version",
-			"pending_session.keys.f_nwk_s_int_key.encrypted_key",
-			"pending_session.keys.f_nwk_s_int_key.kek_label",
-			"pending_session.keys.f_nwk_s_int_key.key",
-		}
-	} else {
-		fields = []string{
-			"mac_settings.resets_f_cnt",
-			"mac_state.lorawan_version",
-			"session.keys.f_nwk_s_int_key.encrypted_key",
-			"session.keys.f_nwk_s_int_key.kek_label",
-			"session.keys.f_nwk_s_int_key.key",
-			"session.last_f_cnt_up",
-		}
-	}
-
-	vs, err := r.HMGet(ctx, ttnredis.Key(uidKey, fieldKey), fields...).Result()
-	if err != nil {
-		return nil, ttnredis.ConvertError(err)
-	}
-	if len(vs) != len(fields) {
-		panic("invalid Redis answer field count")
-	}
-	m := &uplinkMatch{
-		appID:     appID,
-		devID:     devID,
-		fCnt:      uint32(lsb),
-		isPending: isPending,
-	}
-	for i, v := range vs {
-		if v == nil {
-			switch name := fields[i]; name {
-			case "pending_mac_state.lorawan_version", "mac_state.lorawan_version":
-				log.FromContext(ctx).WithField("field", name).Error("Device is missing required field")
-				return nil, errDatabaseCorruption.WithCause(errMissingField.WithAttributes("field", name).New())
-			}
-			continue
-		}
-		if isPending {
-			switch fields[i] {
-			case "pending_mac_state.lorawan_version":
-				v, err := decodeMACVersion(v)
-				if err != nil {
-					return nil, errDatabaseCorruption.WithCause(err)
-				}
-				m.loRaWANVersion = v
-			case "pending_session.keys.f_nwk_s_int_key.encrypted_key":
-				v, err := decodeBytes(v)
-				if err != nil {
-					return nil, errDatabaseCorruption.WithCause(err)
-				}
-				m.fNwkSIntKeyEncryptedKey = v
-			case "pending_session.keys.f_nwk_s_int_key.kek_label":
-				v, err := decodeString(v)
-				if err != nil {
-					return nil, errDatabaseCorruption.WithCause(err)
-				}
-				m.fNwkSIntKeyKEKLabel = v
-			case "pending_session.keys.f_nwk_s_int_key.key":
-				v, err := decodeAES128Key(v)
-				if err != nil {
-					return nil, errDatabaseCorruption.WithCause(err)
-				}
-				m.fNwkSIntKeyKey = v
-			default:
-				panic(fmt.Sprintf("unknown field received from Redis: `%s`", fields[i]))
-			}
-		} else {
-			switch fields[i] {
-			case "mac_settings.resets_f_cnt":
-				v, err := decodeBool(v)
-				if err != nil {
-					return nil, errDatabaseCorruption.WithCause(err)
-				}
-				m.resetsFCnt = &v
-			case "mac_state.lorawan_version":
-				v, err := decodeMACVersion(v)
-				if err != nil {
-					return nil, errDatabaseCorruption.WithCause(err)
-				}
-				m.loRaWANVersion = v
-			case "session.keys.f_nwk_s_int_key.encrypted_key":
-				v, err := decodeBytes(v)
-				if err != nil {
-					return nil, errDatabaseCorruption.WithCause(err)
-				}
-				m.fNwkSIntKeyEncryptedKey = v
-			case "session.keys.f_nwk_s_int_key.kek_label":
-				v, err := decodeString(v)
-				if err != nil {
-					return nil, errDatabaseCorruption.WithCause(err)
-				}
-				m.fNwkSIntKeyKEKLabel = v
-			case "session.keys.f_nwk_s_int_key.key":
-				v, err := decodeAES128Key(v)
-				if err != nil {
-					return nil, errDatabaseCorruption.WithCause(err)
-				}
-				m.fNwkSIntKeyKey = v
-			case "session.last_f_cnt_up":
-				s, err := decodeString(v)
-				if err != nil {
-					return nil, errDatabaseCorruption.WithCause(err)
-				}
-				n, err := strconv.ParseUint(s, 10, 32)
-				if err != nil {
-					return nil, errDatabaseCorruption.WithCause(errInvalidFormat.WithCause(err))
-				}
-				m.lastFCnt = uint32(n)
-				m.fCnt = FullFCnt(lsb, m.lastFCnt, func() bool {
-					switch matchKey {
-					case inputKeys.ShortFCntLE, processingKeys.ShortFCntLE,
-						inputKeys.ShortFCntGT, processingKeys.ShortFCntGT:
-						return false
-					case inputKeys.LongFCntLE, processingKeys.LongFCntLE,
-						inputKeys.LongFCntGT, processingKeys.LongFCntGT:
-						return true
-					default:
-						panic(fmt.Sprintf("invalid match key specified: `%s`", matchKey))
-					}
-				}())
-
-			default:
-				panic(fmt.Sprintf("unknown field received from Redis: `%s`", fields[i]))
-			}
-		}
-	}
-	return []*uplinkMatch{m}, nil
-}
+const noUplinkMatchMarker = '-'
 
 var errNoUplinkMatch = errors.DefineNotFound("no_uplink_match", "no device matches uplink")
 
 // RangeByUplinkMatches ranges over devices matching the uplink.
-func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, cacheTTL time.Duration, f func(context.Context, networkserver.UplinkMatch) (bool, error)) error {
+func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, cacheTTL time.Duration, f func(context.Context, *networkserver.UplinkMatch) (bool, error)) error {
 	defer trace.StartRegion(ctx, "range end devices by dev_addr").End()
-	if cacheTTL < time.Millisecond {
-		// TODO: Remove once https://github.com/TheThingsNetwork/lorawan-stack/issues/2698 is closed.
-		cacheTTL = time.Millisecond
-	}
-	pld := up.Payload.GetMACPayload()
-	addrKey := r.addrKey(pld.DevAddr)
 
-	addrKeys := struct {
-		ShortFCnt string
-		LongFCnt  string
-		Pending   string
-		Legacy    string
-	}{
-		ShortFCnt: ttnredis.Key(addrKey, shortFCntKey),
-		LongFCnt:  ttnredis.Key(addrKey, longFCntKey),
-		Pending:   ttnredis.Key(addrKey, pendingKey),
-		Legacy:    addrKey,
-	}
+	pld := up.Payload.GetMACPayload()
+	lsb := uint16(pld.FCnt)
+
+	addrKey := r.addrKey(pld.DevAddr)
+	addrKeyCurrent := CurrentAddrKey(addrKey)
+	addrKeyPending := PendingAddrKey(addrKey)
+	fieldKeyCurrent := FieldKey(addrKeyCurrent)
+	fieldKeyPending := FieldKey(addrKeyPending)
 
 	payloadHash := uplinkPayloadHash(up.RawPayload)
 
-	matchKeys := struct {
-		Match      string
-		Input      matchKeySet
-		Processing matchKeySet
-	}{
-		Match: ttnredis.Key(addrKey, "match", payloadHash),
-		Input: matchKeySet{
-			ShortFCntLE: ttnredis.Key(addrKeys.ShortFCnt, payloadHash, "le"),
-			LongFCntLE:  ttnredis.Key(addrKeys.LongFCnt, payloadHash, "le"),
-			Pending:     ttnredis.Key(addrKeys.Pending, payloadHash),
-			LongFCntGT:  ttnredis.Key(addrKeys.LongFCnt, payloadHash, "gt"),
-			ShortFCntGT: ttnredis.Key(addrKeys.ShortFCnt, payloadHash, "gt"),
-			Legacy:      ttnredis.Key(addrKeys.Legacy, payloadHash),
-		},
+	matchResultKey := ttnredis.Key(addrKey, "up", payloadHash, "result")
+	matchUIDKeyCurrentLE := ttnredis.Key(addrKeyCurrent, "up", payloadHash, "le")
+	matchUIDKeyCurrentGT := ttnredis.Key(addrKeyCurrent, "up", payloadHash, "gt")
+	matchUIDKeyPending := ttnredis.Key(addrKeyPending, "up", payloadHash)
+	matchFieldKeyCurrent := ttnredis.Key(fieldKeyCurrent, "up", payloadHash)
+	matchFieldKeyPending := ttnredis.Key(fieldKeyPending, "up", payloadHash)
+
+	var matchKeys []string
+	if pld.Ack {
+		matchKeys = []string{
+			matchResultKey,
+
+			addrKeyCurrent,
+			fieldKeyCurrent,
+			matchUIDKeyCurrentLE,
+			matchUIDKeyCurrentGT,
+			matchFieldKeyCurrent,
+		}
+	} else {
+		matchKeys = []string{
+			matchResultKey,
+
+			addrKeyCurrent,
+			fieldKeyCurrent,
+			matchUIDKeyCurrentLE,
+			matchUIDKeyCurrentGT,
+			matchFieldKeyCurrent,
+
+			addrKeyPending,
+			fieldKeyPending,
+			matchUIDKeyPending,
+			matchFieldKeyPending,
+		}
 	}
-	matchKeys.Processing = matchKeySet{
-		ShortFCntLE: ttnredis.Key(matchKeys.Input.ShortFCntLE, "processing"),
-		LongFCntLE:  ttnredis.Key(matchKeys.Input.LongFCntLE, "processing"),
-		Pending:     ttnredis.Key(matchKeys.Input.Pending, "processing"),
-		LongFCntGT:  ttnredis.Key(matchKeys.Input.LongFCntGT, "processing"),
-		ShortFCntGT: ttnredis.Key(matchKeys.Input.ShortFCntGT, "processing"),
-		Legacy:      ttnredis.Key(matchKeys.Input.Legacy, "processing"),
-	}
-
-	type MatchResult struct {
-		Key string
-		UID string
-	}
-	lsb := uint16(pld.FCnt)
-	v, err := deviceMatchScript.Run(ctx, r.Redis, []string{
-		matchKeys.Match,
-
-		addrKeys.ShortFCnt,
-		addrKeys.LongFCnt,
-		addrKeys.Pending,
-		addrKeys.Legacy,
-
-		matchKeys.Input.ShortFCntLE,
-		matchKeys.Processing.ShortFCntLE,
-
-		matchKeys.Input.LongFCntLE,
-		matchKeys.Processing.LongFCntLE,
-
-		matchKeys.Input.Pending,
-		matchKeys.Processing.Pending,
-
-		matchKeys.Input.LongFCntGT,
-		matchKeys.Processing.LongFCntGT,
-
-		matchKeys.Input.ShortFCntGT,
-		matchKeys.Processing.ShortFCntGT,
-
-		matchKeys.Input.Legacy,
-		matchKeys.Processing.Legacy,
-	}, lsb, cacheTTL.Milliseconds()).Result()
+	vs, err := ttnredis.RunInterfaceSliceScript(ctx, r.Redis, deviceMatchScript, matchKeys, lsb, cacheTTL.Milliseconds()).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return errNoUplinkMatch.New()
 		}
 		return ttnredis.ConvertError(err)
 	}
-	// NOTE(1): Indexes must be consistent with lua/deviceMatch.lua.
-	// NOTE(2): Lua indexing starts from 1.
-	var scanKeys []string
-	switch v := v.(type) {
-	case []interface{}:
-		keyIndexes := make([]uint8, 0, len(v))
-		for _, iface := range v {
-			idx, ok := iface.(int64)
-			if !ok {
-				panic(fmt.Sprintf("failed to process match script return value '%v' as index", iface))
-			}
-			keyIndexes = append(keyIndexes, uint8(idx))
+	if len(vs) < 1 {
+		panic("empty match script return value")
+	}
+	matchType, ok := vs[0].(string)
+	if !ok {
+		panic(fmt.Sprintf("expected first match script return value element to be a string, got '%v'(%T)", vs[0], vs[0]))
+	}
+	if matchType == "result" {
+		if len(vs) != 2 {
+			panic(fmt.Sprintf("expected match script return value of `result` type to contain 2 elements, got %d", len(vs)))
 		}
-		scanKeys = make([]string, 0, 12)
-		for i := 0; i < len(keyIndexes); i++ {
-			switch keyIndexes[i] {
-			case 6:
-				scanKeys = append(scanKeys, matchKeys.Input.ShortFCntLE, matchKeys.Processing.ShortFCntLE)
-			case 7:
-				scanKeys = append(scanKeys, matchKeys.Processing.ShortFCntLE)
-				continue
-
-			case 8:
-				scanKeys = append(scanKeys, matchKeys.Input.LongFCntLE, matchKeys.Processing.LongFCntLE)
-			case 9:
-				scanKeys = append(scanKeys, matchKeys.Processing.LongFCntLE)
-				continue
-
-			case 10:
-				scanKeys = append(scanKeys, matchKeys.Input.Pending, matchKeys.Processing.Pending)
-			case 11:
-				scanKeys = append(scanKeys, matchKeys.Processing.Pending)
-				continue
-
-			case 12:
-				scanKeys = append(scanKeys, matchKeys.Input.LongFCntGT, matchKeys.Processing.LongFCntGT)
-			case 13:
-				scanKeys = append(scanKeys, matchKeys.Processing.LongFCntGT)
-				continue
-
-			case 14:
-				scanKeys = append(scanKeys, matchKeys.Input.ShortFCntGT, matchKeys.Processing.ShortFCntGT)
-			case 15:
-				scanKeys = append(scanKeys, matchKeys.Processing.ShortFCntGT)
-				continue
-
-			case 16:
-				scanKeys = append(scanKeys, matchKeys.Input.Legacy, matchKeys.Processing.Legacy)
-			case 17:
-				scanKeys = append(scanKeys, matchKeys.Processing.Legacy)
-				continue
-
-			default:
-				panic(fmt.Sprintf("invalid index returned by match script: %d", keyIndexes[i]))
-			}
-			if len(keyIndexes) > i+1 && keyIndexes[i+1] == keyIndexes[i]+1 {
-				// Next key is "processing" key, which is already added above - skip
-				i++
-			}
+		s, ok := vs[1].(string)
+		if !ok {
+			panic(fmt.Sprintf("expected second element of match script return value of `result` type to be a string, got '%v'(%T)", vs[1], vs[1]))
 		}
-
-	case string:
-		res := &MatchResult{}
-		if err := msgpack.Unmarshal([]byte(v), res); err != nil {
-			return err
+		if s == string(noUplinkMatchMarker) {
+			return errNoUplinkMatch.New()
 		}
-
-		ids, err := unique.ToDeviceID(res.UID)
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Failed to parse match uid value recorded")
+		ctx := log.NewContextWithField(ctx, "match_key", matchResultKey)
+		res := &uplinkMatchResult{}
+		if err := unmarshalMsgpack([]byte(s), res); err != nil {
+			panic(s)
+			log.FromContext(ctx).WithError(err).Error("Failed to unmarshal match result")
 			return errDatabaseCorruption.WithCause(err)
 		}
-		ctx := log.NewContextWithField(ctx, "device_uid", res.UID)
-		ms, err := getUplinkMatch(ctx, r.Redis, matchKeys.Input, matchKeys.Processing, ids.ApplicationIdentifiers, ids.DeviceID, pld.DevAddr, lsb, res.Key, r.uidKey(res.UID))
+		ctx = log.NewContextWithField(ctx, "device_uid", res.UID)
+		ids, err := unique.ToDeviceID(res.UID)
 		if err != nil {
-			return err
+			log.FromContext(ctx).WithError(err).Error("Failed to parse match result UID as device identifiers")
+			return errDatabaseCorruption.WithCause(err)
 		}
-		for _, m := range ms {
+		ok, err = f(ctx, &networkserver.UplinkMatch{
+			ApplicationIdentifiers: ids.ApplicationIdentifiers,
+			DeviceID:               ids.DeviceID,
+			LoRaWANVersion:         res.LoRaWANVersion,
+			FNwkSIntKey:            res.FNwkSIntKey,
+			LastFCnt:               res.LastFCnt,
+			IsPending:              res.IsPending,
+			ResetsFCnt:             res.ResetsFCnt,
+			Supports32BitFCnt:      res.Supports32BitFCnt,
+		})
+		if err != nil {
+			return errNoUplinkMatch.WithCause(err)
+		}
+		if !ok {
+			if err := r.Redis.Set(ctx, matchResultKey, []byte{noUplinkMatchMarker}, cacheTTL).Err(); err != nil {
+				return ttnredis.ConvertError(err)
+			}
+			return errNoUplinkMatch.New()
+		}
+		if err = r.Redis.Expire(ctx, matchResultKey, cacheTTL).Err(); err != nil {
+			return ttnredis.ConvertError(err)
+		}
+		return nil
+	}
+
+	// NOTE(1): Indexes must be consistent with lua/deviceMatch.lua.
+	// NOTE(2): Lua indexing starts from 1.
+	const (
+		currentLEIdx = 4
+		currentGTIdx = 5
+		pendingIdx   = 9
+	)
+	for _, v := range vs[1:] {
+		idx, ok := v.(int64)
+		if !ok {
+			panic(fmt.Sprintf("expected match script `continue` type return value to be int64, got '%v'(%T)", v, v))
+		}
+		var (
+			matchUIDKey   string
+			matchFieldKey string
+		)
+		switch idx {
+		case currentLEIdx:
+			matchUIDKey = matchUIDKeyCurrentLE
+			matchFieldKey = matchFieldKeyCurrent
+		case currentGTIdx:
+			matchUIDKey = matchUIDKeyCurrentGT
+			matchFieldKey = matchFieldKeyCurrent
+		case pendingIdx:
+			matchUIDKey = matchUIDKeyPending
+			matchFieldKey = matchFieldKeyPending
+		default:
+			panic(fmt.Sprintf("invalid index returned by match script with `continue` type: %d", idx))
+		}
+		var uid string
+		for {
+			var s string
+			switch {
+			case idx == currentGTIdx:
+				uid, s, err = func() (string, string, error) {
+					var ackArg uint8
+					if pld.Ack {
+						ackArg = 1
+					}
+					var args []interface{}
+					if uid != "" {
+						args = []interface{}{ackArg, uid}
+					} else {
+						args = []interface{}{ackArg}
+					}
+					vs, err := ttnredis.RunInterfaceSliceScript(ctx, r.Redis, deviceMatchScanGTScript, []string{matchUIDKey, matchFieldKey}, args...).Result()
+					if err != nil {
+						return "", "", err
+					}
+					if len(vs) < 1 {
+						panic("empty match scan script return value")
+					}
+					uid, ok := vs[0].(string)
+					if !ok {
+						panic(fmt.Sprintf("expected first match scan script return value to be a string, got '%v'(%T)", vs[0], vs[0]))
+					}
+					s, ok := vs[1].(string)
+					if !ok {
+						panic(fmt.Sprintf("expected second match scan script return value to be a string, got '%v'(%T)", vs[1], vs[1]))
+					}
+					return uid, s, nil
+				}()
+			case uid == "":
+				uid, err = r.Redis.LIndex(ctx, matchUIDKey, -1).Result()
+			default:
+				uid, err = deviceMatchScanScript.Run(ctx, r.Redis, []string{matchUIDKey, matchFieldKey}, uid).Text()
+			}
+			if err != nil {
+				if err == redis.Nil {
+					break
+				}
+				log.FromContext(ctx).WithField("key", matchUIDKey).WithError(err).Error("Failed to scan UID")
+				return ttnredis.ConvertError(err)
+			}
+			ctx := log.NewContextWithFields(ctx, log.Fields(
+				"device_uid", uid,
+				"match_key", matchUIDKey,
+			))
+			ids, err := unique.ToDeviceID(uid)
+			if err != nil {
+				log.FromContext(ctx).WithError(err).Error("Failed to parse UID as device identifiers")
+				return errDatabaseCorruption.WithCause(err)
+			}
+
+			if s == "" {
+				s, err = r.Redis.HGet(ctx, matchFieldKey, uid).Result()
+				if err != nil {
+					if err == redis.Nil {
+						// Another client already processed this entry
+						uid = ""
+						log.FromContext(ctx).Debug("Another client has already processed this UID")
+						continue
+					}
+					log.FromContext(ctx).WithField("key", matchFieldKey).WithError(err).Error("Failed to get device session")
+					return ttnredis.ConvertError(err)
+				}
+			}
+			var m *networkserver.UplinkMatch
+			if idx == pendingIdx {
+				ses := &uplinkMatchPendingSession{}
+				err = unmarshalMsgpack([]byte(s), ses)
+				if err == nil {
+					m = &networkserver.UplinkMatch{
+						ApplicationIdentifiers: ids.ApplicationIdentifiers,
+						DeviceID:               ids.DeviceID,
+						LoRaWANVersion:         ses.LoRaWANVersion,
+						FNwkSIntKey:            ses.FNwkSIntKey,
+						IsPending:              true,
+					}
+				}
+			} else {
+				ses := &uplinkMatchSession{}
+				err = unmarshalMsgpack([]byte(s), ses)
+				if err == nil {
+					m = &networkserver.UplinkMatch{
+						ApplicationIdentifiers: ids.ApplicationIdentifiers,
+						DeviceID:               ids.DeviceID,
+						LoRaWANVersion:         ses.LoRaWANVersion,
+						FNwkSIntKey:            ses.FNwkSIntKey,
+						LastFCnt:               ses.LastFCnt,
+						ResetsFCnt:             ses.ResetsFCnt,
+						Supports32BitFCnt:      ses.Supports32BitFCnt,
+					}
+				}
+			}
+			if err != nil {
+				log.FromContext(ctx).WithError(err).Error("Failed to unmarshal device session")
+				return err
+			}
 			ok, err := f(ctx, m)
 			if err != nil {
 				return errNoUplinkMatch.WithCause(err)
 			}
 			if ok {
+				b, err := marshalMsgpack(uplinkMatchResult{
+					UID:               uid,
+					LoRaWANVersion:    m.LoRaWANVersion,
+					FNwkSIntKey:       m.FNwkSIntKey,
+					LastFCnt:          m.LastFCnt,
+					ResetsFCnt:        m.ResetsFCnt,
+					Supports32BitFCnt: m.Supports32BitFCnt,
+					IsPending:         m.IsPending,
+				})
+				if err != nil {
+					return err
+				}
+				_, err = r.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
+					p.Set(ctx, matchResultKey, b, cacheTTL)
+					p.Del(ctx,
+						matchUIDKeyCurrentLE,
+						matchUIDKeyCurrentGT,
+						matchUIDKeyPending,
+						matchFieldKeyCurrent,
+						matchFieldKeyPending,
+					)
+					return nil
+				})
+				if err != nil {
+					return ttnredis.ConvertError(err)
+				}
 				return nil
 			}
 		}
-		return errNoUplinkMatch.New()
-
-	default:
-		log.FromContext(ctx).WithField("value", v).WithError(err).Error("Failed to process matching result")
-		return errDatabaseCorruption.New()
 	}
-
-	args := make([]interface{}, 1, 2)
-	args[0] = cacheTTL.Milliseconds()
-	for len(scanKeys) > 0 {
-		v, err := deviceMatchScanScript.Run(ctx, r.Redis, scanKeys, args...).Result()
-		if err != nil && err != redis.Nil {
-			log.FromContext(ctx).WithFields(log.Fields(
-				"scan_keys", scanKeys,
-				"args", args,
-			)).WithError(err).Error("Failed to run device match scan script")
-			return ttnredis.ConvertError(err)
-		}
-		if err == redis.Nil {
-			return errNoUplinkMatch.New()
-		}
-		vs, ok := v.([]interface{})
-		if !ok || len(vs) != 2 || vs[0] == nil {
-			log.FromContext(ctx).WithField("value", v).Error("Invalid value returned by device match scan script")
-			return errDatabaseCorruption.New()
-		}
-		i, ok := vs[0].(int64)
-		switch {
-		case !ok:
-			log.FromContext(ctx).WithField("index", vs[0]).Error("Invalid index returned by device match scan script")
-			return errDatabaseCorruption.New()
-		case i < 1, int64(len(scanKeys)) < i:
-			log.FromContext(ctx).WithFields(log.Fields(
-				"index", i,
-				"scan_key_count", len(scanKeys),
-			)).Error("Invalid index returned by device match scan script")
-			return errDatabaseCorruption.New()
-		case i > 1:
-			scanKeys = scanKeys[i-1:]
-		}
-
-		vsUID := vs[1]
-		if vsUID == nil {
-			return errDatabaseCorruption.New()
-		}
-		uid, err := decodeString(vsUID)
-		if err != nil {
-			log.FromContext(ctx).WithError(err).
-				Error("Failed to parse UID returned by device match scan script as a string")
-			return errDatabaseCorruption.WithCause(err)
-		}
-		ctx := log.NewContextWithField(ctx, "device_uid", uid)
-		ok, err = func() (ok bool, err error) {
-			defer func() {
-				if err != nil || ok {
-					return
-				}
-				switch scanKeys[0] {
-				case matchKeys.Processing.ShortFCntLE,
-					matchKeys.Processing.LongFCntLE,
-					matchKeys.Processing.Pending,
-					matchKeys.Processing.LongFCntGT,
-					matchKeys.Processing.ShortFCntGT,
-					matchKeys.Processing.Legacy:
-					// If the UID is from processing set, we don't need to remove it
-					args = args[:1]
-				default:
-					if len(args) > 1 {
-						args[1] = uid
-					} else {
-						args = append(args, uid)
-					}
-				}
-			}()
-
-			ids, err := unique.ToDeviceID(uid)
-			if err != nil {
-				log.FromContext(ctx).WithError(err).
-					Error("Failed to parse UID returned by device match scan script as device identifiers")
-				return false, errDatabaseCorruption.WithCause(err)
-			}
-			ms, err := getUplinkMatch(ctx, r.Redis, matchKeys.Input, matchKeys.Processing, ids.ApplicationIdentifiers, ids.DeviceID, pld.DevAddr, lsb, scanKeys[0], r.uidKey(uid))
-			if err != nil {
-				log.FromContext(ctx).WithError(err).
-					Error("Failed to get uplink matches")
-				return false, err
-			}
-			for _, m := range ms {
-				ok, err := f(ctx, m)
-				if err != nil {
-					return false, errNoUplinkMatch.WithCause(err)
-				}
-				if ok {
-					b, err := msgpack.Marshal(MatchResult{
-						Key: scanKeys[0],
-						UID: uid,
-					})
-					if err != nil {
-						return false, err
-					}
-					_, err = r.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
-						p.Set(ctx, matchKeys.Match, string(b), cacheTTL)
-						p.Del(ctx, scanKeys...)
-						return nil
-					})
-					if err != nil {
-						return false, ttnredis.ConvertError(err)
-					}
-					return true, nil
-				}
-			}
-			return false, nil
-		}()
-		if err != nil {
-			return err
-		}
-		if ok {
-			return nil
-		}
+	if err = r.Redis.Set(ctx, matchResultKey, []byte{noUplinkMatchMarker}, cacheTTL).Err(); err != nil {
+		return ttnredis.ConvertError(err)
 	}
 	return errNoUplinkMatch.New()
 }
@@ -777,21 +479,28 @@ func equalEUI64(x, y *types.EUI64) bool {
 	return x.Equal(*y)
 }
 
-func removeLegacyDevAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string) {
-	r.SRem(ctx, addrKey, uid)
+func removeAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string) (*redis.IntCmd, *redis.IntCmd) {
+	return r.ZRem(ctx, addrKey, uid), r.HDel(ctx, FieldKey(addrKey), uid)
 }
 
-func removeCurrentDevAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string, supports32Bit bool) {
-	if !supports32Bit {
-		r.ZRem(ctx, ttnredis.Key(addrKey, shortFCntKey), uid)
-	} else {
-		r.ZRem(ctx, ttnredis.Key(addrKey, longFCntKey), uid)
-	}
+func MarshalDeviceCurrentSession(dev *ttnpb.EndDevice) ([]byte, error) {
+	return marshalMsgpack(uplinkMatchSession{
+		LoRaWANVersion:    dev.GetMACState().GetLoRaWANVersion(),
+		FNwkSIntKey:       dev.GetSession().GetFNwkSIntKey(),
+		LastFCnt:          dev.GetSession().GetLastFCntUp(),
+		ResetsFCnt:        dev.GetMACSettings().GetResetsFCnt(),
+		Supports32BitFCnt: dev.GetMACSettings().GetSupports32BitFCnt(),
+	})
 }
 
-func removePendingDevAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string) {
-	r.SRem(ctx, ttnredis.Key(addrKey, pendingKey), uid)
+func MarshalDevicePendingSession(dev *ttnpb.EndDevice) ([]byte, error) {
+	return marshalMsgpack(uplinkMatchSession{
+		LoRaWANVersion: dev.GetPendingMACState().GetLoRaWANVersion(),
+		FNwkSIntKey:    dev.GetPendingSession().GetFNwkSIntKey(),
+	})
 }
+
+var errInvalidDevice = errors.DefineInvalidArgument("invalid_device", "device is invalid")
 
 // SetByID sets device by appID, devID.
 func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(ctx context.Context, pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
@@ -858,17 +567,15 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		_, err = tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
 			if pb == nil && len(sets) == 0 {
 				p.Del(ctx, uk)
-				p.Del(ctx, deviceUIDLastInvalidationKey(r.Redis, uid))
+				p.Del(ctx, uidLastInvalidationKey(r.Redis, uid))
 				if stored.JoinEUI != nil && stored.DevEUI != nil {
 					p.Del(ctx, r.euiKey(*stored.JoinEUI, *stored.DevEUI))
 				}
 				if stored.PendingSession != nil {
-					removeLegacyDevAddrMapping(ctx, p, r.addrKey(stored.PendingSession.DevAddr), uid)
-					removePendingDevAddrMapping(ctx, p, r.addrKey(stored.PendingSession.DevAddr), uid)
+					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(stored.PendingSession.DevAddr)), uid)
 				}
 				if stored.Session != nil {
-					removeLegacyDevAddrMapping(ctx, p, r.addrKey(stored.Session.DevAddr), uid)
-					removeCurrentDevAddrMapping(ctx, p, r.addrKey(stored.Session.DevAddr), uid, deviceSupports32BitFCnt(stored))
+					removeAddrMapping(ctx, p, CurrentAddrKey(r.addrKey(stored.Session.DevAddr)), uid)
 				}
 				return nil
 			}
@@ -935,123 +642,81 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				updated.CreatedAt = updated.UpdatedAt
 			}
 
-			var delFields []string
-			var setFields []interface{}
-			forceFieldWrite := r.CompatibilityVersion.Compare(semver.Version{Major: 3, Minor: 10}) < 0
-
-			// NOTE: The following sequence of switches use concept of "container" - a container is the pointer type "containing" the field value we're interested in.
-
-			switch storedCont, updatedCont := stored.GetMACSettings().GetResetsFCnt(), updated.MACSettings.GetResetsFCnt(); {
-			case storedCont == nil && updatedCont == nil:
-			case updatedCont == nil:
-				delFields = append(delFields, "mac_settings.resets_f_cnt")
-			case storedCont == nil, storedCont.Value != updatedCont.Value, forceFieldWrite:
-				setFields = append(setFields, "mac_settings.resets_f_cnt", encodeBool(updatedCont.Value))
+			if updated.Session != nil && updated.MACState == nil ||
+				updated.PendingSession != nil && updated.PendingMACState == nil {
+				return errInvalidDevice.New()
 			}
 
-			switch storedCont, updatedCont := stored.GetMACState(), updated.MACState; {
-			case storedCont == nil && updatedCont == nil:
-			case updatedCont == nil:
-				delFields = append(delFields, "mac_state.lorawan_version")
-			case storedCont == nil, storedCont.LoRaWANVersion != updatedCont.LoRaWANVersion, forceFieldWrite:
-				setFields = append(setFields, "mac_state.lorawan_version", updatedCont.LoRaWANVersion)
-			}
-
-			switch storedCont, updatedCont := stored.GetPendingMACState(), updated.PendingMACState; {
-			case storedCont == nil && updatedCont == nil:
-			case updatedCont == nil:
-				delFields = append(delFields, "pending_mac_state.lorawan_version")
-			case storedCont == nil, storedCont.LoRaWANVersion != updatedCont.LoRaWANVersion, forceFieldWrite:
-				setFields = append(setFields, "pending_mac_state.lorawan_version", updatedCont.LoRaWANVersion)
-			}
-
-			switch storedCont, updatedCont := stored.GetPendingSession().GetSessionKeys().GetFNwkSIntKey(), updated.GetPendingSession().GetSessionKeys().GetFNwkSIntKey(); {
-			case storedCont == nil && updatedCont == nil:
-			case updatedCont == nil:
-				delFields = append(delFields, "pending_session.keys.f_nwk_s_int_key.kek_label")
-				delFields = append(delFields, "pending_session.keys.f_nwk_s_int_key.encrypted_key")
-			case storedCont == nil, !bytes.Equal(storedCont.EncryptedKey, updatedCont.EncryptedKey), forceFieldWrite:
-				setFields = append(setFields, "pending_session.keys.f_nwk_s_int_key.encrypted_key", updatedCont.EncryptedKey)
-				fallthrough
-			case storedCont == nil, storedCont.KEKLabel != updatedCont.KEKLabel, forceFieldWrite:
-				setFields = append(setFields, "pending_session.keys.f_nwk_s_int_key.kek_label", updatedCont.KEKLabel)
-			}
-			switch storedCont, updatedCont := stored.GetPendingSession().GetSessionKeys().GetFNwkSIntKey().GetKey(), updated.GetPendingSession().GetSessionKeys().GetFNwkSIntKey().GetKey(); {
-			case storedCont == nil && updatedCont == nil:
-			case updatedCont == nil:
-				delFields = append(delFields, "pending_session.keys.f_nwk_s_int_key.key")
-			case storedCont == nil, !storedCont.Equal(*updatedCont), forceFieldWrite:
-				setFields = append(setFields, "pending_session.keys.f_nwk_s_int_key.key", *updatedCont)
-			}
-
-			switch storedCont, updatedCont := stored.GetSession().GetSessionKeys().GetFNwkSIntKey(), updated.GetSession().GetSessionKeys().GetFNwkSIntKey(); {
-			case storedCont == nil && updatedCont == nil:
-			case updatedCont == nil:
-				delFields = append(delFields, "session.keys.f_nwk_s_int_key.kek_label")
-				delFields = append(delFields, "session.keys.f_nwk_s_int_key.encrypted_key")
-			case storedCont == nil, !bytes.Equal(storedCont.EncryptedKey, updatedCont.EncryptedKey), forceFieldWrite:
-				setFields = append(setFields, "session.keys.f_nwk_s_int_key.encrypted_key", updatedCont.EncryptedKey)
-				fallthrough
-			case storedCont == nil, storedCont.KEKLabel != updatedCont.KEKLabel, forceFieldWrite:
-				setFields = append(setFields, "session.keys.f_nwk_s_int_key.kek_label", updatedCont.KEKLabel)
-			}
-			switch storedCont, updatedCont := stored.GetSession().GetSessionKeys().GetFNwkSIntKey().GetKey(), updated.GetSession().GetSessionKeys().GetFNwkSIntKey().GetKey(); {
-			case storedCont == nil && updatedCont == nil:
-			case updatedCont == nil:
-				delFields = append(delFields, "session.keys.f_nwk_s_int_key.key")
-			case storedCont == nil, !storedCont.Equal(*updatedCont):
-				setFields = append(setFields, "session.keys.f_nwk_s_int_key.key", *updatedCont)
-			}
-
-			switch storedCont, updatedCont := stored.GetSession(), updated.GetSession(); {
-			case storedCont == nil && updatedCont == nil:
-			case updatedCont == nil:
-				delFields = append(delFields, "session.last_f_cnt_up")
-			case storedCont == nil, storedCont.LastFCntUp != updatedCont.LastFCntUp, forceFieldWrite:
-				setFields = append(setFields, "session.last_f_cnt_up", updatedCont.LastFCntUp)
-			}
-
-			fk := ttnredis.Key(uk, fieldKey)
-			if len(delFields) > 0 {
-				p.HDel(ctx, fk, delFields...)
-			}
-			if len(setFields) > 0 {
-				p.HSet(ctx, fk, setFields...)
-			}
-
-			storedSupports32BitFCnt := deviceSupports32BitFCnt(stored)
-			updatedSupports32BitFCnt := deviceSupports32BitFCnt(updated)
-
-			if stored.GetPendingSession() == nil || updated.GetPendingSession() == nil ||
-				!updated.PendingSession.DevAddr.Equal(stored.PendingSession.DevAddr) {
-				if stored.GetPendingSession() != nil {
-					removeLegacyDevAddrMapping(ctx, p, r.addrKey(stored.PendingSession.DevAddr), uid)
-					removePendingDevAddrMapping(ctx, p, r.addrKey(stored.PendingSession.DevAddr), uid)
+			storedPendingSession := stored.GetPendingSession()
+			if updated.PendingSession != nil || storedPendingSession != nil {
+				removeStored, setAddr, setFields := func() (bool, bool, bool) {
+					switch {
+					case updated.PendingSession == nil:
+						return true, false, false
+					case storedPendingSession == nil:
+						return false, true, true
+					case !updated.PendingSession.DevAddr.Equal(storedPendingSession.DevAddr):
+						return true, true, true
+					}
+					storedPendingMACState := stored.GetPendingMACState()
+					return false, false, storedPendingMACState == nil ||
+						updated.PendingMACState.LoRaWANVersion != storedPendingMACState.LoRaWANVersion ||
+						!updated.PendingSession.FNwkSIntKey.Equal(storedPendingSession.FNwkSIntKey)
+				}()
+				if removeStored {
+					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(storedPendingSession.DevAddr)), uid)
 				}
-
-				if updated.GetPendingSession() != nil {
-					p.SAdd(ctx, ttnredis.Key(r.addrKey(updated.PendingSession.DevAddr), pendingKey), uid)
-				}
-			}
-
-			if stored.GetSession() == nil || updated.GetSession() == nil ||
-				!updated.Session.DevAddr.Equal(stored.Session.DevAddr) ||
-				storedSupports32BitFCnt != updatedSupports32BitFCnt {
-				if stored.GetSession() != nil {
-					removeLegacyDevAddrMapping(ctx, p, r.addrKey(stored.Session.DevAddr), uid)
-					removeCurrentDevAddrMapping(ctx, p, r.addrKey(stored.Session.DevAddr), uid, storedSupports32BitFCnt)
-				}
-
-				if updated.GetSession() != nil {
-					z := &redis.Z{
-						Score:  float64(updated.Session.LastFCntUp),
+				if setAddr {
+					p.ZAdd(ctx, PendingAddrKey(r.addrKey(updated.PendingSession.DevAddr)), &redis.Z{
+						Score:  float64(time.Now().UnixNano()),
 						Member: uid,
+					})
+				}
+				if setFields {
+					b, err := MarshalDevicePendingSession(updated)
+					if err != nil {
+						return err
 					}
-					if !updatedSupports32BitFCnt {
-						p.ZAdd(ctx, ttnredis.Key(r.addrKey(updated.Session.DevAddr), shortFCntKey), z)
-					} else {
-						p.ZAdd(ctx, ttnredis.Key(r.addrKey(updated.Session.DevAddr), longFCntKey), z)
+					p.HSet(ctx, FieldKey(PendingAddrKey(r.addrKey(updated.PendingSession.DevAddr))), uid, b)
+				}
+			}
+
+			storedSession := stored.GetSession()
+			if updated.Session != nil || storedSession != nil {
+				removeStored, setAddr, setFields := func() (bool, bool, bool) {
+					switch {
+					case updated.Session == nil:
+						return true, false, false
+					case storedSession == nil:
+						return false, true, true
+					case !updated.Session.DevAddr.Equal(storedSession.DevAddr):
+						return true, true, true
+					case updated.Session.LastFCntUp != storedSession.LastFCntUp:
+						return false, true, true
 					}
+					storedMACState := stored.GetMACState()
+					storedMACSettings := stored.GetMACSettings()
+					return false, false, storedMACState == nil ||
+						updated.MACState.LoRaWANVersion != storedMACState.LoRaWANVersion ||
+						!updated.Session.FNwkSIntKey.Equal(storedSession.FNwkSIntKey) ||
+						!updated.MACSettings.GetResetsFCnt().Equal(storedMACSettings.GetResetsFCnt()) ||
+						!updated.MACSettings.GetSupports32BitFCnt().Equal(storedMACSettings.GetSupports32BitFCnt())
+				}()
+				if removeStored {
+					removeAddrMapping(ctx, p, CurrentAddrKey(r.addrKey(storedSession.DevAddr)), uid)
+				}
+				if setAddr {
+					p.ZAdd(ctx, CurrentAddrKey(r.addrKey(updated.Session.DevAddr)), &redis.Z{
+						Score:  float64(updated.Session.LastFCntUp & 0xffff),
+						Member: uid,
+					})
+				}
+				if setFields {
+					b, err := MarshalDeviceCurrentSession(updated)
+					if err != nil {
+						return err
+					}
+					p.HSet(ctx, FieldKey(CurrentAddrKey(r.addrKey(updated.Session.DevAddr))), uid, b)
 				}
 			}
 

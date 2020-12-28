@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/blang/semver"
+	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
@@ -31,8 +32,7 @@ func (v MType) MarshalText() ([]byte, error) {
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *MType) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := MType_value[s]; ok {
+	if i, ok := MType_value[string(b)]; ok {
 		*v = MType(i)
 		return nil
 	}
@@ -59,8 +59,7 @@ func (v Major) MarshalText() ([]byte, error) {
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *Major) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := Major_value[s]; ok {
+	if i, ok := Major_value[string(b)]; ok {
 		*v = Major(i)
 		return nil
 	}
@@ -93,6 +92,14 @@ func (v MACVersion) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
+// EncodeMsgpack implements msgpack.CustomEncoder interface.
+func (v MACVersion) EncodeMsgpack(enc *msgpack.Encoder) error {
+	if v > 255 {
+		panic(fmt.Errorf("MACVersion enum exceeds 255"))
+	}
+	return enc.EncodeUint8(uint8(v))
+}
+
 // UnmarshalBinary implements encoding.BinaryMarshaler interface.
 func (v *MACVersion) UnmarshalBinary(b []byte) error {
 	if len(b) != 1 {
@@ -115,7 +122,17 @@ func (v *MACVersion) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("MACVersion")(string(b))
+	return errCouldNotParse("MACVersion")(s)
+}
+
+// DecodeMsgpack implements msgpack.CustomDecoder interface.
+func (v *MACVersion) DecodeMsgpack(dec *msgpack.Decoder) error {
+	i, err := dec.DecodeInt32()
+	if err != nil {
+		return err
+	}
+	*v = MACVersion(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -149,7 +166,7 @@ func (v *PHYVersion) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("PHYVersion")(string(b))
+	return errCouldNotParse("PHYVersion")(s)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -206,8 +223,7 @@ func (v *DataRateIndex) UnmarshalJSON(b []byte) error {
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *RejoinType) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := RejoinType_value[s]; ok {
+	if i, ok := RejoinType_value[string(b)]; ok {
 		*v = RejoinType(i)
 		return nil
 	}
@@ -229,8 +245,7 @@ func (v *RejoinType) UnmarshalJSON(b []byte) error {
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *CFListType) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := CFListType_value[s]; ok {
+	if i, ok := CFListType_value[string(b)]; ok {
 		*v = CFListType(i)
 		return nil
 	}
@@ -268,7 +283,7 @@ func (v *Class) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("Class")(string(b))
+	return errCouldNotParse("Class")(s)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -291,8 +306,7 @@ func (v TxSchedulePriority) MarshalText() ([]byte, error) {
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *TxSchedulePriority) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := TxSchedulePriority_value[s]; ok {
+	if i, ok := TxSchedulePriority_value[string(b)]; ok {
 		*v = TxSchedulePriority(i)
 		return nil
 	}
@@ -330,7 +344,7 @@ func (v *MACCommandIdentifier) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("MACCommandIdentifier")(string(b))
+	return errCouldNotParse("MACCommandIdentifier")(s)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -359,7 +373,7 @@ func (v *AggregatedDutyCycle) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("AggregatedDutyCycle")(string(b))
+	return errCouldNotParse("AggregatedDutyCycle")(s)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -393,7 +407,7 @@ func (v *PingSlotPeriod) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("PingSlotPeriod")(string(b))
+	return errCouldNotParse("PingSlotPeriod")(s)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -422,7 +436,7 @@ func (v *RejoinCountExponent) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("RejoinCountExponent")(string(b))
+	return errCouldNotParse("RejoinCountExponent")(s)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -451,7 +465,7 @@ func (v *RejoinTimeExponent) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("RejoinTimeExponent")(string(b))
+	return errCouldNotParse("RejoinTimeExponent")(s)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -480,7 +494,7 @@ func (v *RejoinPeriodExponent) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("RejoinPeriodExponent")(string(b))
+	return errCouldNotParse("RejoinPeriodExponent")(s)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -514,7 +528,7 @@ func (v *DeviceEIRP) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("DeviceEIRP")(string(b))
+	return errCouldNotParse("DeviceEIRP")(s)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -543,7 +557,7 @@ func (v *ADRAckLimitExponent) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("ADRAckLimitExponent")(string(b))
+	return errCouldNotParse("ADRAckLimitExponent")(s)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -572,7 +586,7 @@ func (v *ADRAckDelayExponent) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("ADRAckDelayExponent")(string(b))
+	return errCouldNotParse("ADRAckDelayExponent")(s)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -601,7 +615,7 @@ func (v *RxDelay) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("RxDelay")(string(b))
+	return errCouldNotParse("RxDelay")(s)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -648,7 +662,7 @@ func (v *Minor) UnmarshalText(b []byte) error {
 			return nil
 		}
 	}
-	return errCouldNotParse("Minor")(string(b))
+	return errCouldNotParse("Minor")(s)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -760,6 +774,12 @@ func (v MACVersion) IncrementDevNonce() bool {
 // UseNwkKey panics, if v.Validate() returns non-nil error.
 func (v MACVersion) UseNwkKey() bool {
 	return v.Compare(MAC_V1_1) >= 0
+}
+
+// UseLegacyMIC reports whether v uses legacy MIC computation algorithm.
+// UseLegacyMIC panics, if v.Validate() returns non-nil error.
+func (v MACVersion) UseLegacyMIC() bool {
+	return v.Compare(MAC_V1_1) < 0
 }
 
 // RequireDevEUIForABP reports whether v requires ABP devices to have a DevEUI associated.

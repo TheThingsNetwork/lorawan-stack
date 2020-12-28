@@ -5813,18 +5813,18 @@
       "file": "registry.go"
     }
   },
-  "error:pkg/networkserver/redis:invalid_fieldmask": {
+  "error:pkg/networkserver/redis:invalid_device": {
     "translations": {
-      "en": "invalid fieldmask"
+      "en": "device is invalid"
     },
     "description": {
       "package": "pkg/networkserver/redis",
       "file": "registry.go"
     }
   },
-  "error:pkg/networkserver/redis:invalid_format": {
+  "error:pkg/networkserver/redis:invalid_fieldmask": {
     "translations": {
-      "en": "invalid value format"
+      "en": "invalid fieldmask"
     },
     "description": {
       "package": "pkg/networkserver/redis",
@@ -5847,15 +5847,6 @@
     "description": {
       "package": "pkg/networkserver/redis",
       "file": "application_uplink_queue.go"
-    }
-  },
-  "error:pkg/networkserver/redis:missing_field_value": {
-    "translations": {
-      "en": "missing field `{field}` value"
-    },
-    "description": {
-      "package": "pkg/networkserver/redis",
-      "file": "registry.go"
     }
   },
   "error:pkg/networkserver/redis:missing_payload": {

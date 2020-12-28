@@ -26,22 +26,22 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
-type UplinkMatch interface {
-	ApplicationIdentifiers() ttnpb.ApplicationIdentifiers
-	DeviceID() string
-	LoRaWANVersion() ttnpb.MACVersion
-	FNwkSIntKey() *ttnpb.KeyEnvelope
-	FCnt() uint32
-	LastFCnt() uint32
-	IsPending() bool
-	ResetsFCnt() *pbtypes.BoolValue
+type UplinkMatch struct {
+	ApplicationIdentifiers ttnpb.ApplicationIdentifiers
+	DeviceID               string
+	LoRaWANVersion         ttnpb.MACVersion
+	FNwkSIntKey            *ttnpb.KeyEnvelope
+	LastFCnt               uint32
+	ResetsFCnt             *pbtypes.BoolValue
+	Supports32BitFCnt      *pbtypes.BoolValue
+	IsPending              bool
 }
 
 // DeviceRegistry is a registry, containing devices.
 type DeviceRegistry interface {
 	GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, context.Context, error)
 	GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
-	RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, cacheTTL time.Duration, f func(context.Context, UplinkMatch) (bool, error)) error
+	RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, cacheTTL time.Duration, f func(context.Context, *UplinkMatch) (bool, error)) error
 	SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 }
 

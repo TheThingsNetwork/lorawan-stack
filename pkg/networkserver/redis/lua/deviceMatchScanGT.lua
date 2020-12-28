@@ -12,12 +12,32 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+local ack = ARGV[1]
+table.remove(ARGV, 1)
 for _, old_uid in ipairs(ARGV) do
   local uid = redis.call('lindex', KEYS[1], -1)
   if uid ~= old_uid then
-    return uid
+    local s = redis.call('hget', KEYS[2], uid)
+    local m = cmsgpack.unpack(s)
+    if not m.Supports32BitFCnt or m.Supports32BitFCnt.value
+      or ack == 0 and m.ResetsFCnt and m.ResetsFCnt.value then
+      return { uid, s }
+    end
   end
   redis.call('ltrim', KEYS[1], 0, -2)
-  redis.call('hdel', KEYS[2], old_uid)
+  redis.call('hdel', KEYS[2], uid)
 end
-return redis.call('lindex', KEYS[1], -1)
+
+local uid = redis.call('lindex', KEYS[1], -1)
+while uid do
+  local s = redis.call('hget', KEYS[2], uid)
+  local m = cmsgpack.unpack(s)
+  if not m.Supports32BitFCnt or m.Supports32BitFCnt.value
+    or ack == 0 and m.ResetsFCnt and m.ResetsFCnt.value then
+    return { uid, s }
+  end
+  redis.call('ltrim', KEYS[1], 0, -2)
+  redis.call('hdel', KEYS[2], uid)
+  uid = redis.call('lindex', KEYS[1], -1)
+end
+return nil
