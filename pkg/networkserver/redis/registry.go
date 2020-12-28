@@ -267,7 +267,6 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		ctx := log.NewContextWithField(ctx, "match_key", matchResultKey)
 		res := &uplinkMatchResult{}
 		if err := unmarshalMsgpack([]byte(s), res); err != nil {
-			panic(s)
 			log.FromContext(ctx).WithError(err).Error("Failed to unmarshal match result")
 			return errDatabaseCorruption.WithCause(err)
 		}
