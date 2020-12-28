@@ -72,7 +72,11 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	token, err := oc.oauth(c).Exchange(ctx, code)
+	conf, err := oc.oauth(c)
+	if err != nil {
+		return err
+	}
+	token, err := conf.Exchange(ctx, code)
 	if err != nil {
 		var retrieveError *oauth2.RetrieveError
 		if stderrors.As(err, &retrieveError) {

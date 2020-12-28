@@ -23,7 +23,7 @@ import (
 type Option func(*OAuthClient)
 
 // OAuth2ConfigProvider provides an OAuth2 client config based on the context.
-type OAuth2ConfigProvider func(echo.Context) *oauth2.Config
+type OAuth2ConfigProvider func(echo.Context) (*oauth2.Config, error)
 
 // WithOAuth2ConfigProvider overrides the default OAuth2 configuration provider.
 func WithOAuth2ConfigProvider(provider OAuth2ConfigProvider) Option {
