@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Configuration option `is.admin-rights.all` to grant admins all rights, including `_KEYS` and `_ALL`.
+- `ttn-lw-stack` CLI command for creating an API Key with full rights on a user.
 
 ### Changed
 
