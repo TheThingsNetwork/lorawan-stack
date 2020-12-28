@@ -58,17 +58,18 @@ type Config struct {
 
 // DefaultConfig contains the default config for the ttn-lw-stack binary.
 var DefaultConfig = Config{
-	ServiceBase:  shared.DefaultServiceBase,
-	IS:           shared_identityserver.DefaultIdentityServerConfig,
-	GS:           shared_gatewayserver.DefaultGatewayServerConfig,
-	NS:           shared_networkserver.DefaultNetworkServerConfig,
-	AS:           shared_applicationserver.DefaultApplicationServerConfig,
-	JS:           shared_joinserver.DefaultJoinServerConfig,
-	Console:      shared_console.DefaultConsoleConfig,
-	GCS:          shared_gatewayconfigurationserver.DefaultGatewayConfigurationServerConfig,
-	DTC:          shared_devicetemplateconverter.DefaultDeviceTemplateConverterConfig,
-	QRG:          shared_qrcodegenerator.DefaultQRCodeGeneratorConfig,
-	PBA:          shared_packetbrokeragent.DefaultPacketBrokerAgentConfig,
+	ServiceBase: shared.DefaultServiceBase,
+	IS:          shared_identityserver.DefaultIdentityServerConfig,
+	GS:          shared_gatewayserver.DefaultGatewayServerConfig,
+	NS:          shared_networkserver.DefaultNetworkServerConfig,
+	AS:          shared_applicationserver.DefaultApplicationServerConfig,
+	JS:          shared_joinserver.DefaultJoinServerConfig,
+	Console:     shared_console.DefaultConsoleConfig,
+	GCS:         shared_gatewayconfigurationserver.DefaultGatewayConfigurationServerConfig,
+	DTC:         shared_devicetemplateconverter.DefaultDeviceTemplateConverterConfig,
+	QRG:         shared_qrcodegenerator.DefaultQRCodeGeneratorConfig,
+	PBA:         shared_packetbrokeragent.DefaultPacketBrokerAgentConfig,
+
 	OutputFormat: "json",
 }
 
