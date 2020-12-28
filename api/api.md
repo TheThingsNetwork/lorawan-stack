@@ -904,6 +904,7 @@ The NsAs service connects a Network Server to an Application Server.
 | `before` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Query upstream messages before this timestamp only. |
 | `f_port` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Query uplinks on a specific FPort only. |
 | `order` | [`string`](#string) |  | Order results. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the upstream message fields that should be returned. See the API reference for allowed field names for each type of upstream message. |
 
 #### Field Rules
 

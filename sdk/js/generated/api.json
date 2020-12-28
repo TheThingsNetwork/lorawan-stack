@@ -1850,6 +1850,16 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "field_mask",
+              "description": "The names of the upstream message fields that should be returned. See the API reference\nfor allowed field names for each type of upstream message.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         }

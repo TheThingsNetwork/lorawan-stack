@@ -122,6 +122,14 @@ func isStopType(t reflect.Type, maskOnly bool) bool {
 			"Struct":
 			return true
 		}
+	case "go.thethings.network/lorawan-stack/v3/pkg/ttnpb":
+		switch t.Name() {
+		case
+			// ErrorDetails is a recursive type, stop parsing to prevent infinite recursion.
+			"ErrorDetails":
+			return true
+		default:
+		}
 	}
 	return false
 }
@@ -384,6 +392,18 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 func fieldMaskFlags(prefix []string, t reflect.Type, maskOnly bool) *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	props := proto.GetProperties(t)
+	for _, oneofProp := range props.OneofTypes {
+		if oneofProp.Prop.Tag == 0 {
+			continue
+		}
+		t := oneofProp.Type
+		if t.Kind() == reflect.Ptr {
+			t = t.Elem()
+		}
+
+		path := append(prefix, props.Prop[oneofProp.Field].OrigName)
+		flagSet.AddFlagSet(fieldMaskFlags(path, t, maskOnly))
+	}
 	for _, prop := range props.Prop {
 		if prop.Tag == 0 {
 			continue
