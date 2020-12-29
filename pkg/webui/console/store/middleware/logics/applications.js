@@ -24,7 +24,7 @@ import createEventsConnectLogics from './events'
 
 const getApplicationLogic = createRequestLogic({
   type: applications.GET_APP,
-  async process({ action }, dispatch) {
+  process: async ({ action }, dispatch) => {
     const {
       payload: { id },
       meta: { selector },
@@ -37,7 +37,7 @@ const getApplicationLogic = createRequestLogic({
 
 const updateApplicationLogic = createRequestLogic({
   type: applications.UPDATE_APP,
-  async process({ action }) {
+  process: async ({ action }) => {
     const { id, patch } = action.payload
 
     const result = await api.application.update(id, patch)
@@ -48,7 +48,7 @@ const updateApplicationLogic = createRequestLogic({
 
 const deleteApplicationLogic = createRequestLogic({
   type: applications.DELETE_APP,
-  async process({ action }) {
+  process: async ({ action }) => {
     const { id } = action.payload
 
     await api.application.delete(id)
@@ -60,7 +60,7 @@ const deleteApplicationLogic = createRequestLogic({
 const getApplicationsLogic = createRequestLogic({
   type: applications.GET_APPS_LIST,
   latest: true,
-  async process({ action }) {
+  process: async ({ action }) => {
     const {
       params: { page, limit, query, order },
     } = action.payload
@@ -84,7 +84,7 @@ const getApplicationsLogic = createRequestLogic({
 
 const getApplicationDeviceCountLogic = createRequestLogic({
   type: applications.GET_APP_DEV_COUNT,
-  async process({ action }) {
+  process: async ({ action }) => {
     const { id: appId } = action.payload
     const data = await api.devices.list(appId, { limit: 1 })
 
@@ -94,7 +94,7 @@ const getApplicationDeviceCountLogic = createRequestLogic({
 
 const getApplicationsRightsLogic = createRequestLogic({
   type: applications.GET_APPS_RIGHTS_LIST,
-  async process({ action }) {
+  process: async ({ action }) => {
     const { id } = action.payload
     const result = await api.rights.applications(id)
     return result.rights.sort()
@@ -103,30 +103,28 @@ const getApplicationsRightsLogic = createRequestLogic({
 
 const getApplicationLinkLogic = createRequestLogic({
   type: link.GET_APP_LINK,
-  async process({ action }, dispatch, done) {
+  process: async ({ action }, dispatch, done) => {
     const {
       payload: { id },
       meta: { selector = [] } = {},
     } = action
 
     let linkResult
-    let statsResult
     try {
       linkResult = await api.application.link.get(id, selector)
-      statsResult = await api.application.link.stats(id)
 
-      return { link: linkResult, stats: statsResult, linked: true }
+      return { link: linkResult }
     } catch (error) {
       // Ignore 404 error. It means that the application is not linked, but the response can
       // still hold link data that we have to display to the user.
       if (isNotFoundError(error) && typeof linkResult !== 'undefined') {
-        return { link: linkResult, stats: statsResult, linked: false }
+        return { link: linkResult }
       }
 
       // Ignore 409 error. It means that the application link cannot be established, but
       // the response can still hold link data that we have to displat to the user.
       if (isConflictError(error) && typeof linkResult !== 'undefined') {
-        return { link: linkResult, stats: statsResult, linked: false }
+        return { link: linkResult }
       }
 
       throw error

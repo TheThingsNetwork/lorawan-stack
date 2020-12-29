@@ -20,8 +20,6 @@ import {
 } from '@console/store/actions/applications'
 import { GET_APP_LINK_BASE } from '@console/store/actions/link'
 
-import { selectDeviceDerivedStore } from '@console/store/selectors/devices'
-
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
@@ -84,50 +82,10 @@ export const selectApplicationRightsFetching = createFetchingSelector(GET_APPS_R
 // Link.
 const selectLinkStore = state => state.link
 export const selectApplicationLink = state => selectLinkStore(state).link
-export const selectApplicationLinkIndicator = state => selectLinkStore(state).linked
-export const selectApplicationLinkStats = state => selectLinkStore(state).stats
 export const selectApplicationLinkFetching = createFetchingSelector(GET_APP_LINK_BASE)
 export const selectApplicationLinkError = createErrorSelector(GET_APP_LINK_BASE)
-export const selectApplicationLinkFormatters = function(state) {
+export const selectApplicationLinkFormatters = state => {
   const link = selectApplicationLink(state) || {}
 
   return link.default_formatters
-}
-export const selectApplicationIsLinked = function(state) {
-  const linkStore = selectLinkStore(state)
-  const link = selectApplicationLink(state) || {}
-  const error = selectApplicationLinkError(state)
-  const stats = selectApplicationLinkStats(state)
-
-  const hasBase = Boolean(link.api_key)
-  const hasError = Boolean(error)
-  const isLinked = linkStore.linked
-  const hasStats = Boolean(stats)
-
-  return hasBase && !hasError && isLinked && hasStats
-}
-
-// Composite.
-export const selectApplicationLastSeen = state => {
-  const deviceDerived = selectDeviceDerivedStore(state)
-  const linkStats = selectApplicationLinkStats(state)
-  const appId = selectSelectedApplicationId(state)
-  const {
-    last_up_received_at: lastUplinkSeenAt = null,
-    last_downlink_forwarded_at: lastDownlinkSeenAt = null,
-  } = linkStats || {}
-
-  let lastSeen =
-    Boolean(lastUplinkSeenAt) || Boolean(lastDownlinkSeenAt)
-      ? Math.max(new Date(lastUplinkSeenAt), new Date(lastDownlinkSeenAt))
-      : new Date(null)
-
-  for (const device in deviceDerived) {
-    const derived = deviceDerived[device]
-    if (device.startsWith(appId) && derived.lastSeen) {
-      lastSeen = Math.max(new Date(derived.lastSeen), lastSeen)
-    }
-  }
-
-  return lastSeen > new Date(null) ? new Date(lastSeen).toISOString() : undefined
 }

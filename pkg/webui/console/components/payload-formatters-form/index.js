@@ -128,12 +128,6 @@ class PayloadFormattersForm extends React.Component {
   }
 
   get formatter() {
-    const { linked } = this.props
-
-    if (!linked) {
-      return null
-    }
-
     const { type } = this.state
 
     switch (type) {
@@ -168,7 +162,7 @@ class PayloadFormattersForm extends React.Component {
   }
 
   render() {
-    const { initialType, initialParameter, linked, uplink, allowReset } = this.props
+    const { initialType, initialParameter, uplink, allowReset } = this.props
     const { error, type } = this.state
 
     const initialValues = {
@@ -182,7 +176,6 @@ class PayloadFormattersForm extends React.Component {
     return (
       <div>
         <Form
-          disabled={!linked}
           submitEnabledWhenInvalid
           onSubmit={this.handleSubmit}
           initialValues={initialValues}
@@ -218,7 +211,6 @@ PayloadFormattersForm.propTypes = {
   allowReset: PropTypes.bool,
   initialParameter: PropTypes.string,
   initialType: PropTypes.oneOf(Object.values(TYPES)).isRequired,
-  linked: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
