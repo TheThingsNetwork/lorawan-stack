@@ -13,8 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { FormattedMessage } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 import classnames from 'classnames'
+import reactStringReplace from 'react-string-replace'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -37,7 +38,7 @@ const renderContent = (content, component, props) => {
   return content
 }
 
-const Message = function({
+const Message = ({
   content,
   values = {},
   component,
@@ -47,8 +48,9 @@ const Message = function({
   firstToLower,
   capitalize,
   className,
+  convertBackticks,
   ...rest
-}) {
+}) => {
   const cls = classnames(className, {
     [style.lowercase]: lowercase,
     [style.uppercase]: uppercase,
@@ -56,6 +58,8 @@ const Message = function({
     [style.firstToLower]: firstToLower,
     [style.capitalize]: capitalize,
   })
+
+  const { formatMessage } = useIntl()
 
   if (cls) {
     rest.className = cls
@@ -68,6 +72,17 @@ const Message = function({
 
   if (typeof content === 'string' || typeof content === 'number') {
     return renderContent(content, component, rest)
+  }
+
+  if (convertBackticks) {
+    const contentWithMarkdown = formatMessage(content, vals)
+    return renderContent(
+      reactStringReplace(contentWithMarkdown, /`([^`[]+)`/g, (match, i) => (
+        <code key={i}>{match}</code>
+      )),
+      component,
+      rest,
+    )
   }
 
   return (
@@ -95,6 +110,10 @@ Message.propTypes = {
    * passed through without any modifications.
    */
   content: PropTypes.message.isRequired,
+  /**
+   * Flag specifying whether the the backticks should be converted to `<code/>` tag.
+   */
+  convertBackticks: PropTypes.bool,
   /** Flag specifying whether the first letter of the message should be
    * transformed to lowercase.
    */
@@ -122,6 +141,7 @@ Message.defaultProps = {
   capitalize: false,
   className: undefined,
   component: undefined,
+  convertBackticks: false,
   firstToLower: false,
   firstToUpper: false,
   lowercase: false,

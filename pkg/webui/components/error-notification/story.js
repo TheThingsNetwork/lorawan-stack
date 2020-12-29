@@ -42,11 +42,28 @@ const exampleError = {
   ],
 }
 
+const testErrorWithMarkup = {
+  code: 2,
+  message: 'error:pkg/assets:http (HTTP error: `` is not a valid ID.',
+  details: [
+    {
+      '@type': 'type.googleapis.com/ttn.lorawan.v3.ErrorDetails',
+      namespace: 'pkg/assets',
+      name: 'http',
+      message_format: 'HTTP error: {message}',
+      attributes: {
+        message: '`12345` is not a valid ID.',
+      },
+    },
+  ],
+}
+
 storiesOf('Notification/ErrorNotification', module).add('Error', () => (
   <div>
     <ErrorNotification title="example message title" content={m.problem} />
     <ErrorNotification content={m.problem} />
     <ErrorNotification title={m.lengthyProblem} content={exampleError} small />
     <ErrorNotification content={exampleError} small />
+    <ErrorNotification title="example of error with markup" content={testErrorWithMarkup} />
   </div>
 ))
