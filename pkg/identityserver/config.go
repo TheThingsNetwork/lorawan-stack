@@ -71,6 +71,9 @@ type Config struct {
 		CreateGateways      bool `name:"create-gateways" description:"Allow non-admin users to create gateways in their user account"`
 		CreateOrganizations bool `name:"create-organizations" description:"Allow non-admin users to create organizations in their user account"`
 	} `name:"user-rights"`
+	AdminRights struct {
+		All bool `name:"all" description:"Grant all rights to admins, including _KEYS and _ALL"`
+	} `name:"admin-rights"`
 	Email struct {
 		email.Config `name:",squash"`
 		SendGrid     sendgrid.Config      `name:"sendgrid"`

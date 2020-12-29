@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Configuration option `is.admin-rights.all` to grant admins all rights, including `_KEYS` and `_ALL`.
+
 ### Changed
 
 ### Deprecated
