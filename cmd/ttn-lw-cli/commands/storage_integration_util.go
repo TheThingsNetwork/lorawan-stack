@@ -20,8 +20,11 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
+
+var applicationUpFlags = util.FieldMaskFlags(&ttnpb.ApplicationUp{})
 
 func getStoredUpFlags() *pflag.FlagSet {
 	flags := &pflag.FlagSet{}
@@ -33,6 +36,8 @@ func getStoredUpFlags() *pflag.FlagSet {
 	flags.Uint32("limit", 0, "limit number of upstream messages to fetch")
 	flags.AddFlagSet(timestampFlags("after", "query upstream messages after specified timestamp"))
 	flags.AddFlagSet(timestampFlags("before", "query upstream messages before specified timestamp"))
+
+	flags.AddFlagSet(applicationUpFlags)
 
 	types := make([]string, 0, len(ttnpb.StoredApplicationUpTypes))
 	for k := range ttnpb.StoredApplicationUpTypes {
@@ -64,6 +69,7 @@ func getStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpRequ
 			Value: fport,
 		}
 	}
+	req.FieldMask.Paths = ttnpb.AllowedFields(util.SelectFieldMask(flags, applicationUpFlags), ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUp"])
 
 	if flags.Changed("limit") {
 		limit, _ := flags.GetUint32("limit")

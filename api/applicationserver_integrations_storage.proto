@@ -17,6 +17,7 @@ syntax = "proto3";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "lorawan-stack/api/identifiers.proto";
@@ -60,6 +61,10 @@ message GetStoredApplicationUpRequest {
   string order = 8 [(validate.rules).string = {
     in: [ "", "-received_at", "received_at" ]
   }];
+
+  // The names of the upstream message fields that should be returned. See the API reference
+  // for allowed field names for each type of upstream message.
+  google.protobuf.FieldMask field_mask = 9 [(gogoproto.nullable) = false];
 }
 
 // The ApplicationUpStorage service can be used to query stored application upstream messages.

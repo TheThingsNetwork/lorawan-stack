@@ -140,6 +140,18 @@ func (m *GetStoredApplicationUpRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "field_mask":
+
+			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetStoredApplicationUpRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return GetStoredApplicationUpRequestValidationError{
 				field:  name,

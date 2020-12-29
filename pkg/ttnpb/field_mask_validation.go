@@ -899,6 +899,9 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 	"/ttn.lorawan.v3.UserRegistry/List":                omitFields(UserFieldPathsNested, "password", "temporary_password"),
 	"/ttn.lorawan.v3.UserRegistry/Update":              omitFields(UserFieldPathsNested, "password", "password_updated_at"),
 	"/ttn.lorawan.v3.EntityRegistrySearch/SearchUsers": omitFields(UserFieldPathsNested, "password", "temporary_password"),
+
+	// Storage Integration:
+	"/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUp": applicationUpFieldMaskPaths(),
 }
 
 func omitFields(fields []string, fieldsToOmit ...string) []string {
@@ -913,4 +916,19 @@ nextField:
 		out = append(out, field)
 	}
 	return out
+}
+
+func applicationUpFieldMaskPaths() []string {
+	paths := ApplicationUpFieldPathsNested
+	paths = append(paths, FieldsWithPrefix("up.uplink_message", ApplicationUplinkFieldPathsNested...)...)
+	paths = append(paths, FieldsWithPrefix("up.join_accept", ApplicationJoinAcceptFieldPathsNested...)...)
+	paths = append(paths, FieldsWithPrefix("up.downlink_ack", ApplicationDownlinkFieldPathsNested...)...)
+	paths = append(paths, FieldsWithPrefix("up.downlink_nack", ApplicationDownlinkFieldPathsNested...)...)
+	paths = append(paths, FieldsWithPrefix("up.downlink_sent", ApplicationDownlinkFieldPathsNested...)...)
+	paths = append(paths, FieldsWithPrefix("up.downlink_failed", ApplicationDownlinkFieldPathsNested...)...)
+	paths = append(paths, FieldsWithPrefix("up.downlink_queued", ApplicationDownlinkFieldPathsNested...)...)
+	paths = append(paths, FieldsWithPrefix("up.downlink_queue_invalidated", ApplicationInvalidatedDownlinksFieldPathsNested...)...)
+	paths = append(paths, FieldsWithPrefix("up.location_solved", ApplicationLocationFieldPathsNested...)...)
+	paths = append(paths, FieldsWithPrefix("up.service_data", ApplicationServiceDataFieldPathsNested...)...)
+	return paths
 }
