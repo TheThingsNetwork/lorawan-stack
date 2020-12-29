@@ -14,10 +14,18 @@
 
 package emails
 
+import "time"
+
 // Invitation is the email that is sent when a user is invited to the network.
 type Invitation struct {
 	Data
 	InvitationToken string
+	TTL             time.Duration
+}
+
+// FormatTTL formats the TTL.
+func (i Invitation) FormatTTL() string {
+	return formatTTL(i.TTL)
 }
 
 // TemplateName returns the name of the template to use for this email.
@@ -36,6 +44,11 @@ You can use this token for the "--invitation-token" flag when creating a user fr
 If you wish to register using web interface, follow the link below:
 
 {{ .Network.IdentityServerURL }}/register?invitation_token={{ .InvitationToken }}
+
+{{- if .TTL }}
+
+These invitation links expire {{ .FormatTTL }}.
+{{ end -}}
 `
 
 // DefaultTemplates returns the default templates for this email.
