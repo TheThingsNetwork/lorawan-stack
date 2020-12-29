@@ -53,6 +53,7 @@ type Config struct {
 	DTC              devicetemplateconverter.Config    `name:"dtc"`
 	QRG              qrcodegenerator.Config            `name:"qrg"`
 	PBA              packetbrokeragent.Config          `name:"pba"`
+	OutputFormat     string                            `name:"output-format" yaml:"output-format" description:"Output format"`
 }
 
 // DefaultConfig contains the default config for the ttn-lw-stack binary.
@@ -68,6 +69,8 @@ var DefaultConfig = Config{
 	DTC:         shared_devicetemplateconverter.DefaultDeviceTemplateConverterConfig,
 	QRG:         shared_qrcodegenerator.DefaultQRCodeGeneratorConfig,
 	PBA:         shared_packetbrokeragent.DefaultPacketBrokerAgentConfig,
+
+	OutputFormat: "json",
 }
 
 func init() {
