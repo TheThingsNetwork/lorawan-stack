@@ -35,16 +35,26 @@ var (
 // HandleCallback is a handler that takes the auth code and exchanges it for the
 // access token.
 func (oc *OAuthClient) HandleCallback(c echo.Context) error {
-	if e := c.QueryParam("error"); e != "" {
-		return errRefused.WithAttributes("reason", c.QueryParam("error_description"))
+	response := &struct {
+		Error            string `form:"error" query:"error"`
+		ErrorDescription string `form:"error_description" query:"error_description"`
+		State            string `form:"state" query:"state"`
+		Code             string `form:"code" query:"code"`
+	}{}
+	if err := c.Bind(response); err != nil {
+		return err
 	}
 
-	state := c.QueryParam("state")
+	if response.Error != "" {
+		return errRefused.WithAttributes("reason", response.ErrorDescription)
+	}
+
+	state := response.State
 	if state == "" {
 		return errNoStateParam.New()
 	}
 
-	code := c.QueryParam("code")
+	code := response.Code
 	if code == "" {
 		return errNoCodeParam.New()
 	}
