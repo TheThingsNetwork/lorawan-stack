@@ -41,5 +41,5 @@ func (oc *OAuthClient) HandleLogin(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.Redirect(http.StatusFound, conf.AuthCodeURL(state.Secret))
+	return c.Redirect(http.StatusFound, conf.AuthCodeURL(state.Secret, oc.authCodeURLOpts...))
 }

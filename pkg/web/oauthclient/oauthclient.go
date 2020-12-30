@@ -29,12 +29,13 @@ import (
 
 // OAuthClient is the OAuth client component.
 type OAuthClient struct {
-	component *component.Component
-	rootURL   string
-	config    Config
-	oauth     OAuth2ConfigProvider
-	nextKey   string
-	callback  Callback
+	component       *component.Component
+	rootURL         string
+	config          Config
+	oauth           OAuth2ConfigProvider
+	nextKey         string
+	callback        Callback
+	authCodeURLOpts []oauth2.AuthCodeOption
 }
 
 var errNoOAuthConfig = errors.DefineInvalidArgument("no_oauth_config", "no OAuth configuration found for the OAuth client")

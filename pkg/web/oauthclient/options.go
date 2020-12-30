@@ -50,3 +50,11 @@ func WithCallback(cb Callback) Option {
 		o.callback = cb
 	}
 }
+
+// WithAuthCodeURLOptions changes the OAuth2 authorization URL options provided to the
+// oauth2 package.
+func WithAuthCodeURLOptions(opts ...oauth2.AuthCodeOption) Option {
+	return func(o *OAuthClient) {
+		o.authCodeURLOpts = opts
+	}
+}
