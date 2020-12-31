@@ -46,7 +46,7 @@ import { notify, EVENTS } from './shared'
  * @returns {object} The stream subscription object with the `on` function for
  * attaching listeners and the `close` function to close the stream.
  */
-export default async function(payload, url) {
+export default async (payload, url) => {
   let listeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, [curr]: null }), {})
   const token = new Token().get()
 
@@ -70,11 +70,11 @@ export default async function(payload, url) {
     },
   })
     .then(response => response.data)
-    .then(function(stream) {
+    .then(stream => {
       reader = stream
       notify(listeners[EVENTS.START])
 
-      stream.on('data', function(data) {
+      stream.on('data', data => {
         const parsed = data.toString('utf8')
         buffer += parsed
         const lines = buffer.split(/\n\n/)
@@ -83,11 +83,11 @@ export default async function(payload, url) {
           notify(listeners[EVENTS.CHUNK], JSON.parse(line).result)
         }
       })
-      stream.on('end', function() {
+      stream.on('end', () => {
         notify(listeners[EVENTS.CLOSE])
         listeners = null
       })
-      stream.on('error', function(error) {
+      stream.on('error', error => {
         notify(listeners[EVENTS.ERROR], error)
         listeners = null
       })
@@ -105,7 +105,7 @@ export default async function(payload, url) {
 
       return this
     },
-    close() {
+    close: () => {
       if (reader) {
         reader.cancel()
       }
