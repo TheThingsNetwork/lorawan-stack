@@ -22,7 +22,11 @@
     .icon
       color: $c-info
 
-  &:not(.online)
+  &.checking
+    .icon
+      color: $c-warning
+
+  &.offline
     .icon
       color: $c-error
 

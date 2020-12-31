@@ -16,6 +16,8 @@ import React, { useEffect, useRef } from 'react'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
+import ONLINE_STATUS from '@ttn-lw/constants/online-status'
+
 import toast from '@ttn-lw/components/toast'
 import Icon from '@ttn-lw/components/icon'
 
@@ -44,8 +46,12 @@ const handleMessage = (message, type) => {
   })
 }
 
-const OfflineStatus = ({ showOfflineOnly, showWarnings, isOnline }) => {
+const OfflineStatus = ({ showOfflineOnly, showWarnings, onlineStatus }) => {
   const initialUpdate = useRef(true)
+  const isOnline = onlineStatus === ONLINE_STATUS.ONLINE
+  const isOffline = onlineStatus === ONLINE_STATUS.OFFLINE
+  const isChecking = onlineStatus === ONLINE_STATUS.CHECKING
+
   useEffect(() => {
     if (initialUpdate.current) {
       initialUpdate.current = false
@@ -53,25 +59,37 @@ const OfflineStatus = ({ showOfflineOnly, showWarnings, isOnline }) => {
     }
     if (showWarnings && isOnline) {
       handleMessage(m.online, toast.types.INFO)
-    } else if (showWarnings && !isOnline) {
+    } else if (showWarnings && isOffline) {
       handleMessage(m.offline, toast.types.ERROR)
     }
-  }, [showWarnings, isOnline])
+  }, [showWarnings, isOnline, isOffline])
 
   if (showOfflineOnly && isOnline) {
     return null
   }
 
+  const icon = isOnline ? 'info' : isChecking ? 'warning' : 'error'
+  const message = isOnline
+    ? sharedMessages.online
+    : isChecking
+    ? sharedMessages.connectionIssues
+    : sharedMessages.offline
+  const cls = classnames(style.status, {
+    [style.online]: isOnline,
+    [style.offline]: isOffline,
+    [style.checking]: isChecking,
+  })
+
   return (
-    <span className={classnames(style.status, { [style.online]: isOnline })}>
-      <Icon className={style.icon} icon={isOnline ? 'info' : 'error'} />
-      <Message content={isOnline ? sharedMessages.online : sharedMessages.offline} />
+    <span className={cls}>
+      <Icon className={style.icon} icon={icon} />
+      <Message content={message} />
     </span>
   )
 }
 
 OfflineStatus.propTypes = {
-  isOnline: PropTypes.bool.isRequired,
+  onlineStatus: PropTypes.onlineStatus.isRequired,
   showOfflineOnly: PropTypes.bool,
   showWarnings: PropTypes.bool,
 }
