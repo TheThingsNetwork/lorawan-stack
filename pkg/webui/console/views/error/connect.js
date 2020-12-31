@@ -14,9 +14,9 @@
 
 import { connect } from 'react-redux'
 
-import { selectConnectionStatus } from '@console/store/selectors/status'
+import { selectOnlineStatus } from '@console/store/selectors/status'
 
 export default ErrorView =>
   connect(state => ({
-    isOnline: selectConnectionStatus(state),
+    onlineStatus: selectOnlineStatus(state),
   }))(ErrorView)
