@@ -13,10 +13,14 @@
 // limitations under the License.
 
 import React from 'react'
+import { connect } from 'react-redux'
 
 import Spinner from '@ttn-lw/components/spinner'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { selectIsOnlineStatus } from '@console/store/selectors/status'
 
 import Message from './message'
 
@@ -42,7 +46,11 @@ const withRequest = (
   mapPropsToFetching = ({ fetching } = {}) => fetching,
   mapPropsToError = ({ error } = {}) => error,
 ) => Component =>
+  @connect(state => ({ isOnline: selectIsOnlineStatus(state) }))
   class WithRequest extends React.Component {
+    static propTypes = {
+      isOnline: PropTypes.bool.isRequired,
+    }
     constructor(props) {
       super(props)
       // Avoid render of old content by setting an initial fetching state if
@@ -69,6 +77,11 @@ const withRequest = (
       // Check for errors only after component mounts and makes the request.
       if (Boolean(error) && prevError !== error) {
         throw error
+      }
+
+      // Redo the request if the application went online again.
+      if (!prevProps.isOnline && this.props.isOnline) {
+        mapPropsToRequest(this.props)
       }
     }
 
