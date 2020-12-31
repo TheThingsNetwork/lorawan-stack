@@ -190,6 +190,23 @@ export const isTranslated = error =>
   isBackend(error) || isFrontend(error) || (typeof error === 'object' && error.id)
 
 /**
+ * Returns whether `error` is a 'network error' as JavaScript TypeError.
+ *
+ * @param {object} error - The error to be tested.
+ * @returns {boolean} `true` if `error` is a network error, `false` otherwise.
+ */
+export const isNetworkError = error =>
+  error instanceof Error && error.message.toLowerCase() === 'network error'
+
+/**
+ * Returns whether `error` is a 'ECONNABORTED' error as returned from axios.
+ *
+ * @param {object} error - The error to be tested.
+ * @returns {boolean} `true` if `error` is a timeout error, `false` otherwise.
+ */
+export const isTimeoutError = error => error.code === 'ECONNABORTED'
+
+/**
  * Returns the id of the error, used as message id.
  *
  * @param {object} error - The backend error object.
