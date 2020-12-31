@@ -17,14 +17,7 @@ import { createLogic } from 'redux-logic'
 import CONNECTION_STATUS from '@console/constants/connection-status'
 
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
-import { isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
-
-import {
-  createEventsStatusSelector,
-  createEventsInterruptedSelector,
-  createInterruptedStreamsSelector,
-} from '@console/store/selectors/events'
-import { selectConnectionStatus } from '@console/store/selectors/status'
+import { isUnauthenticatedError, isNetworkError, isTimeoutError } from '@ttn-lw/lib/errors/utils'
 
 import {
   createStartEventsStreamActionType,
@@ -40,8 +33,15 @@ import {
   startEventsStreamSuccess,
   eventStreamClosed,
   startEventsStream,
-} from '../../actions/events'
-import { SET_CONNECTION_STATUS } from '../../actions/status'
+} from '@console/store/actions/events'
+import { SET_CONNECTION_STATUS, setStatusChecking } from '@console/store/actions/status'
+
+import {
+  createEventsStatusSelector,
+  createEventsInterruptedSelector,
+  createInterruptedStreamsSelector,
+} from '@console/store/selectors/events'
+import { selectIsOnlineStatus } from '@console/store/selectors/status'
 
 /**
  * Creates `redux-logic` logic from processing entity events.
@@ -52,7 +52,7 @@ import { SET_CONNECTION_STATUS } from '../../actions/status'
  * Should accept a list of entity ids.
  * @returns {object} - The `redux-logic` (decorated) logic.
  */
-const createEventsConnectLogics = function(reducerName, entityName, onEventsStart) {
+const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
   const START_EVENTS = createStartEventsStreamActionType(reducerName)
   const START_EVENTS_SUCCESS = createStartEventsStreamSuccessActionType(reducerName)
   const START_EVENTS_FAILURE = createStartEventsStreamFailureActionType(reducerName)
@@ -80,7 +80,7 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
       processOptions: {
         dispatchMultiple: true,
       },
-      validate({ getState, action = {} }, allow, reject) {
+      validate: ({ getState, action = {} }, allow, reject) => {
         if (!action.id) {
           reject()
           return
@@ -90,7 +90,7 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
 
         // Only proceed if not already connected and online.
         const state = getState()
-        const isOnline = selectConnectionStatus(state)
+        const isOnline = selectIsOnlineStatus(state)
         const status = selectEntityEventsStatus(state, id)
         const connected = status === CONNECTION_STATUS.CONNECTED
         const connecting = status === CONNECTION_STATUS.CONNECTING
@@ -101,7 +101,7 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
 
         allow(action)
       },
-      async process({ getState, action }, dispatch) {
+      process: async ({ getState, action }, dispatch) => {
         const { id } = action
 
         try {
@@ -124,7 +124,7 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
     }),
     createLogic({
       type: [STOP_EVENTS, START_EVENTS_FAILURE],
-      validate({ getState, action = {} }, allow, reject) {
+      validate: ({ getState, action = {} }, allow, reject) => {
         if (!action.id) {
           reject()
           return
@@ -143,9 +143,23 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
 
         allow(action)
       },
-      process(_, __, done) {
+      process: ({ action }, dispatch, done) => {
         if (channel) {
-          channel.close()
+          try {
+            channel.close()
+          } catch (error) {
+            if (isNetworkError(error) || isTimeoutError(action.payload)) {
+              // Set the connection status to `checking` to trigger connection checks
+              // and detect possible offline state.
+              dispatch(setStatusChecking())
+
+              // In case of a network error, the connection could not be closed
+              // since the network connection is disrupted. We can regard this
+              // as equivalent to a closed connection.
+              return done()
+            }
+            throw error
+          }
         }
         done()
       },
@@ -154,7 +168,7 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
       type: [GET_EVENT_MESSAGE_FAILURE, EVENT_STREAM_CLOSED],
       cancelType: [START_EVENTS_SUCCESS, GET_EVENT_MESSAGE_SUCCESS, STOP_EVENTS],
       warnTimeout: 0,
-      validate({ getState, action = {} }, allow, reject) {
+      validate: ({ getState, action = {} }, allow, reject) => {
         if (!action.id) {
           reject()
           return
@@ -172,8 +186,8 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
 
         allow(action)
       },
-      process({ getState, action }, dispatch, done) {
-        const isOnline = selectConnectionStatus(getState())
+      process: ({ getState, action }, dispatch, done) => {
+        const isOnline = selectIsOnlineStatus(getState())
 
         // If the app is not offline, try to reconnect periodically.
         if (isOnline) {
@@ -184,7 +198,7 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
             const status = selectEntityEventsStatus(state, id)
             const disconnected = status === CONNECTION_STATUS.DISCONNECTED
             const interrupted = selectEntityEventsInterrupted(state, id)
-            const isOnline = selectConnectionStatus(state)
+            const isOnline = selectIsOnlineStatus(state)
             if (disconnected && interrupted && isOnline) {
               dispatch(startEvents(id))
             } else {
@@ -199,7 +213,7 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
     }),
     createLogic({
       type: SET_CONNECTION_STATUS,
-      process({ getState, action }, dispatch, done) {
+      process: ({ getState, action }, dispatch, done) => {
         const isOnline = action.payload.isOnline
 
         if (isOnline) {

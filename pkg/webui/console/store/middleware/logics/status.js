@@ -22,29 +22,32 @@ import { isNetworkError, isTimeoutError } from '@ttn-lw/lib/errors/utils'
 
 import * as status from '@console/store/actions/status'
 
-import { selectIsOnlineStatus, selectIsOfflineStatus } from '@console/store/selectors/status'
+import { selectIsOfflineStatus } from '@console/store/selectors/status'
 
 const isRoot = selectIsConfig().base_url
 
-let interval = 5000
-const connectionCheck = dispatch => async () => {
+const initialInterval = 5000
+let interval = initialInterval
+const connectionCheck = (dispatch, done) => () => {
   dispatch(status.attemptReconnect())
+  done()
 }
 
 let periodicCheck
 
 const connectionManagementLogic = createLogic({
   type: status.SET_CONNECTION_STATUS,
-  process: async ({ action, getState }, dispatch, done) => {
+  process: async ({ action }, dispatch, done) => {
     if (action.payload.onlineStatus === ONLINE_STATUS.CHECKING) {
       try {
+        // Make a simple GET request to the auth_info endpoint.
         await axios.get(`${isRoot}/auth_info`, { timeout: 5000 })
-        dispatch(status.setOnlineStatus(ONLINE_STATUS.ONLINE))
+        dispatch(status.setStatusOnline())
       } catch (error) {
-        // If also a simple GET to the auth_info endpoint fails with a
-        // network error, we can be sufficiently sure of having gone offline.
+        // If this one fails with a network error, we can be sufficiently
+        // sure of having gone offline.
         if (isNetworkError(error) || isTimeoutError(error)) {
-          dispatch(status.setOnlineStatus(ONLINE_STATUS.OFFLINE))
+          dispatch(status.setStatusOnline(false))
         }
       }
     }
@@ -61,7 +64,7 @@ const connectionManagementLogic = createLogic({
 const connectionCheckLogic = createLogic({
   type: status.ATTEMPT_RECONNECT,
   // Additionally to periodic reconnects, freshly incoming request actions will
-  // also trigger reconnection attempts, which is why this acction is throttled
+  // also trigger reconnection attempts, which is why this action is throttled
   // to 5 seconds.
   throttle: 5000,
   validate: ({ action, getState }, allow, reject) => {
@@ -73,11 +76,12 @@ const connectionCheckLogic = createLogic({
     }
     reject()
   },
-  process: async ({ action, getState }, dispatch, done) => {
+  process: async (_, dispatch, done) => {
     try {
       await axios.get(`${isRoot}/auth_info`, { timeout: 4500 })
-      dispatch(status.setOnlineStatus(ONLINE_STATUS.ONLINE))
+      dispatch(status.setStatusOnline())
       dispatch(status.attemptReconnectSuccess())
+      interval = initialInterval
     } catch (error) {
       dispatch(status.attemptReconnectFailure())
     }
@@ -88,11 +92,12 @@ const connectionCheckLogic = createLogic({
 
 const connectionCheckFailLogic = createLogic({
   type: status.ATTEMPT_RECONNECT_FAILURE,
-  warnTimeout: 0,
-  process: (_, dispatch) => {
+  cancelType: status.ATTEMPT_RECONNECT_SUCCESS,
+  warnTimeout: 65000,
+  process: (_, dispatch, done) => {
+    // Use increasing intervals, capped at 1min to prevent request spamming.
     interval = Math.min(interval * 1.5, 60000)
-    console.log(interval)
-    periodicCheck = setTimeout(connectionCheck(dispatch), interval)
+    periodicCheck = setTimeout(connectionCheck(dispatch, done), interval)
   },
 })
 
