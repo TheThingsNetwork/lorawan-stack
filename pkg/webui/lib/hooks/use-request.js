@@ -12,37 +12,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useState, useEffect, useRef } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { attachPromise } from '@console/store/actions/lib'
+
+import { selectIsOnlineStatus } from '@console/store/selectors/status'
 
 const useRequest = requestAction => {
   const dispatch = useDispatch()
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState('')
   const [result, setResult] = useState()
+  const isOnline = useSelector(selectIsOnlineStatus)
+  const prevIsOnlineRef = useRef()
   useEffect(() => {
-    const promise = dispatch(attachPromise(requestAction))
-      .then(() => {
-        setResult(result)
-        setFetching(false)
-      })
-      .catch(error => {
-        setError(error)
-        setFetching(false)
-      })
+    prevIsOnlineRef.current = isOnline
+  })
+  const prevIsOnline = prevIsOnlineRef.current
 
-    return () => {
-      // Cancel the promise on unmount (if still pending).
-      promise.cancel()
+  useEffect(() => {
+    if (prevIsOnline === undefined || (prevIsOnline === false && isOnline)) {
+      // Make the request initially and additionally when the online state
+      // has changed to `online`.
+      const promise = dispatch(attachPromise(requestAction))
+        .then(() => {
+          setResult(result)
+          setFetching(false)
+        })
+        .catch(error => {
+          setError(error)
+          setFetching(false)
+        })
+
+      return () => {
+        // Cancel the promise on unmount (if still pending).
+        promise.cancel()
+      }
     }
 
-    // Disabling deps check because in this case we want the effect hook to
-    // run only once on component mount. See also:
-    // https://github.com/facebook/create-react-app/issues/6880
+    // We use the `isOnline` prop as dependency here since we want the effect
+    // to trigger only initially and when the online state changed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isOnline])
 
   return [fetching, error, result]
 }
