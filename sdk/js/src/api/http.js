@@ -53,13 +53,13 @@ class Http {
       const componentUrl = stackConfig.getComponentUrlByName(curr)
       if (componentUrl) {
         acc[curr] = axios.create({
+          ...axiosConfig,
           baseURL: componentUrl,
           headers: {
             ...(typeof authToken === 'string' ? { Authorization: `Bearer ${authToken}` } : {}),
             ...(Boolean(csrfToken) ? { 'X-CSRF-Token': csrfToken } : {}),
             ...(axiosConfig.headers || {}),
           },
-          axiosConfig,
         })
       }
 
