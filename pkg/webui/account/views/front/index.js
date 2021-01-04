@@ -15,6 +15,8 @@
 import React from 'react'
 import { Switch, Route, Redirect } from 'react-router'
 
+import authRoutes from '@account/constants/auth-routes'
+
 import Footer from '@ttn-lw/components/footer'
 
 import Header from '@account/containers/header'
@@ -26,7 +28,6 @@ import UpdatePassword from '@account/views/update-password'
 import FrontNotFound from '@account/views/front-not-found'
 import Validate from '@account/views/validate'
 import Code from '@account/views/code'
-import { authRoutes } from '@account/views/landing'
 
 import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'

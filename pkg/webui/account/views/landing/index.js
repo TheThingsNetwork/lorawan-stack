@@ -15,25 +15,17 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
+import authRoutes from '@account/constants/auth-routes'
+
 import Footer from '@ttn-lw/components/footer'
 
 import { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error/error'
 
 import Header from '@account/containers/header'
 
-import Overview from '@account/views/overview'
-
 import style from './landing.styl'
 
 const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
-
-const authRoutes = [
-  {
-    path: '/',
-    exact: true,
-    component: Overview,
-  },
-]
 
 const Landing = () => (
   <div className={style.container}>
@@ -52,4 +44,4 @@ const Landing = () => (
   </div>
 )
 
-export { Landing as default, authRoutes }
+export default Landing
