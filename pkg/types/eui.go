@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
+	"math"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
@@ -162,7 +162,11 @@ func (prefix *EUI64Prefix) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	prefix.Length = uint8(length)
+
+	if length > 0 && length <= math.MaxInt32 {
+		prefix.Length = uint8(length)
+		return nil
+	}
 	return nil
 }
 
