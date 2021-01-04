@@ -30,6 +30,7 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 
 import { attachPromise } from '@console/store/actions/lib'
 import {
@@ -38,7 +39,10 @@ import {
 } from '@console/store/actions/application-packages'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
-import { selectApplicationPackageDefaultAssociation } from '@console/store/selectors/application-packages'
+import {
+  selectApplicationPackageDefaultAssociation,
+  selectApplicationPackagesError,
+} from '@console/store/selectors/application-packages'
 
 const m = defineMessages({
   token: 'Token',
@@ -73,6 +77,7 @@ const LoRaCloudForm = () => {
 
   const dispatch = useDispatch()
   const defaultAssociation = useSelector(selectApplicationPackageDefaultAssociation)
+  const packageError = useSelector(selectApplicationPackagesError)
   const initialValues = validationSchema.cast(defaultAssociation || defaultValues)
 
   const handleSubmit = useCallback(
@@ -100,6 +105,10 @@ const LoRaCloudForm = () => {
   const handleDelete = useCallback(async () => await handleSubmit({ data: { token: '' } }), [
     handleSubmit,
   ])
+
+  if (packageError && !isNotFoundError(packageError)) {
+    throw error
+  }
 
   return (
     <RequireRequest
