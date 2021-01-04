@@ -615,7 +615,11 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 			message = formatted
 		case *packetbroker.RoutingFilter_Mac:
 			messageType = "mac"
-			message = msg.Mac.DevAddrPrefixes
+			formatted := make([]string, 0, len(msg.Mac.DevAddrPrefixes))
+			for _, prefix := range msg.Mac.DevAddrPrefixes {
+				formatted = append(formatted, fmt.Sprintf("DevAddr: %08X/%d", prefix.Value, prefix.Length))
+			}
+			message = formatted
 		}
 		if messageType != "" {
 			logger = logger.WithFields(log.Fields(
