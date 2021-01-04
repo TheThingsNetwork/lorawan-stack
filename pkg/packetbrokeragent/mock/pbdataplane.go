@@ -69,7 +69,10 @@ type routerForwarderServer struct {
 
 func (s *routerForwarderServer) Publish(ctx context.Context, req *routingpb.PublishUplinkMessageRequest) (*routingpb.PublishUplinkMessageResponse, error) {
 	s.upCh <- &packetbroker.RoutedUplinkMessage{
-		Message: req.Message,
+		ForwarderNetId:     req.ForwarderNetId,
+		ForwarderTenantId:  req.ForwarderTenantId,
+		ForwarderClusterId: req.ForwarderClusterId,
+		Message:            req.Message,
 	}
 	return &routingpb.PublishUplinkMessageResponse{
 		Id: "test",
@@ -97,10 +100,13 @@ type routerHomeNetworkServer struct {
 
 func (s *routerHomeNetworkServer) Publish(ctx context.Context, req *routingpb.PublishDownlinkMessageRequest) (*routingpb.PublishDownlinkMessageResponse, error) {
 	down := &packetbroker.RoutedDownlinkMessage{
-		ForwarderNetId:     req.ForwarderNetId,
-		ForwarderTenantId:  req.ForwarderTenantId,
-		ForwarderClusterId: req.ForwarderClusterId,
-		Message:            req.Message,
+		ForwarderNetId:       req.ForwarderNetId,
+		ForwarderTenantId:    req.ForwarderTenantId,
+		ForwarderClusterId:   req.ForwarderClusterId,
+		HomeNetworkNetId:     req.HomeNetworkNetId,
+		HomeNetworkTenantId:  req.HomeNetworkTenantId,
+		HomeNetworkClusterId: req.HomeNetworkClusterId,
+		Message:              req.Message,
 	}
 	select {
 	case <-ctx.Done():

@@ -151,6 +151,9 @@ func TestForwarder(t *testing.T) {
 					BandID: "EU_863_870",
 				},
 				RoutedUplinkMessage: &packetbroker.RoutedUplinkMessage{
+					ForwarderNetId:     0x000013,
+					ForwarderTenantId:  "foo-tenant",
+					ForwarderClusterId: "test",
 					Message: &packetbroker.UplinkMessage{
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						DataRateIndex:        5,
@@ -257,6 +260,9 @@ func TestForwarder(t *testing.T) {
 					BandID: "EU_863_870",
 				},
 				RoutedUplinkMessage: &packetbroker.RoutedUplinkMessage{
+					ForwarderNetId:     0x000013,
+					ForwarderTenantId:  "foo-tenant",
+					ForwarderClusterId: "test",
 					Message: &packetbroker.UplinkMessage{
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						DataRateIndex:        3,
@@ -727,9 +733,12 @@ func TestHomeNetwork(t *testing.T) {
 		}
 
 		a.So(pbMsg, should.Resemble, &packetbroker.RoutedDownlinkMessage{
-			ForwarderNetId:     0x000042,
-			ForwarderClusterId: "test",
-			ForwarderTenantId:  "foo-tenant",
+			ForwarderNetId:       0x000042,
+			ForwarderClusterId:   "test",
+			ForwarderTenantId:    "foo-tenant",
+			HomeNetworkNetId:     0x000013,
+			HomeNetworkTenantId:  "foo-tenant",
+			HomeNetworkClusterId: "test",
 			Message: &packetbroker.DownlinkMessage{
 				PhyPayload: []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 				Class:      packetbroker.DownlinkMessageClass_CLASS_A,
