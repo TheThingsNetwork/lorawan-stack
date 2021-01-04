@@ -33,6 +33,7 @@ import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { id as userRegexp } from '@ttn-lw/lib/regexp'
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
   forgotPassword: 'Forgot password',
@@ -55,17 +56,8 @@ const initialValues = { user_id: '' }
 
 const siteName = selectApplicationSiteName()
 
-const ForgotPassword = () => {
+const ForgotPassword = ({ location }) => {
   const dispatch = useDispatch()
-  const sendToLogin = useCallback(
-    () =>
-      dispatch(
-        push('/login', {
-          info: m.passwordRequested,
-        }),
-      ),
-    [dispatch],
-  )
   const [error, setError] = useState(undefined)
 
   const handleSubmit = useCallback(
@@ -73,13 +65,17 @@ const ForgotPassword = () => {
       try {
         setError(undefined)
         await tts.Users.createTemporaryPassword(values.user_id)
-        sendToLogin()
+        dispatch(
+          push(`/login${location.search}`, {
+            info: m.passwordRequested,
+          }),
+        )
       } catch (error) {
         setSubmitting(false)
         setError(error)
       }
     },
-    [sendToLogin],
+    [dispatch, location],
   )
 
   return (
@@ -105,16 +101,20 @@ const ForgotPassword = () => {
           autoFocus
           required
         />
-        <Form.Submit
-          component={SubmitButton}
-          message={m.send}
-          className={style.submitButton}
-          alwaysEnabled
+        <Form.Submit component={SubmitButton} message={m.send} className={style.submitButton} />
+        <Button.Link
+          naked
+          secondary
+          message={sharedMessages.cancel}
+          to={`/login${location.search}`}
         />
-        <Button.Link naked secondary message={sharedMessages.cancel} to="/login" />
       </Form>
     </div>
   )
+}
+
+ForgotPassword.propTypes = {
+  location: PropTypes.location.isRequired,
 }
 
 export default ForgotPassword

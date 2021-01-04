@@ -105,58 +105,55 @@ const Login = () => {
   }
 
   return (
-    <React.Fragment>
-      <div className={style.form}>
-        <IntlHelmet title={sharedMessages.login} />
-        <h1 className={style.title}>
-          {siteName}
-          <br />
-          <span className={style.subTitle}>{siteTitle}</span>
-        </h1>
-        <hr className={style.hRule} />
-        <Form
-          onSubmit={handleSubmit}
-          initialValues={initialValues}
-          error={error}
-          errorTitle={m.loginFailed}
-          info={info}
-          validationSchema={validationSchema}
-          horizontal={false}
-        >
-          <Form.Field
-            title={sharedMessages.userId}
-            name="user_id"
-            component={Input}
-            autoFocus
-            required
+    <div className={style.form}>
+      <IntlHelmet title={sharedMessages.login} />
+      <h1 className={style.title}>
+        {siteName}
+        <br />
+        <span className={style.subTitle}>{siteTitle}</span>
+      </h1>
+      <hr className={style.hRule} />
+      <Form
+        onSubmit={handleSubmit}
+        initialValues={initialValues}
+        error={error}
+        errorTitle={m.loginFailed}
+        info={info}
+        validationSchema={validationSchema}
+        horizontal={false}
+      >
+        <Form.Field
+          title={sharedMessages.userId}
+          name="user_id"
+          component={Input}
+          autoFocus
+          required
+        />
+        <Form.Field
+          title={sharedMessages.password}
+          component={Input}
+          name="password"
+          type="password"
+          required
+        />
+        <div className={style.buttons}>
+          <Form.Submit
+            component={SubmitButton}
+            message={sharedMessages.login}
+            className={style.submitButton}
           />
-          <Form.Field
-            title={sharedMessages.password}
-            component={Input}
-            name="password"
-            type="password"
-            required
+          {enableUserRegistration && (
+            <Button.Link to={`/register${location.search}`} secondary message={m.createAccount} />
+          )}
+          <Button.Link
+            naked
+            secondary
+            message={m.forgotPassword}
+            to={`/forgot-password${location.search}`}
           />
-          <div className={style.buttons}>
-            <Form.Submit
-              component={SubmitButton}
-              message={sharedMessages.login}
-              className={style.submitButton}
-              alwaysEnabled
-            />
-            {enableUserRegistration && (
-              <Button.Link
-                to={`/register${location.search}`}
-                secondary
-                message={m.createAccount}
-                className={style.registerButton}
-              />
-            )}
-            <Button.Link naked secondary message={m.forgotPassword} to="/forgot-password" />
-          </div>
-        </Form>
-      </div>
-    </React.Fragment>
+        </div>
+      </Form>
+    </div>
   )
 }
 
