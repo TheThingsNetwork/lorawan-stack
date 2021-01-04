@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useState, useCallback } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { Redirect } from 'react-router-dom'
 import { push } from 'connected-react-router'
@@ -25,6 +25,7 @@ import Button from '@ttn-lw/components/button'
 import Input from '@ttn-lw/components/input'
 import Form from '@ttn-lw/components/form'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import Spinner from '@ttn-lw/components/spinner'
 
 import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -36,6 +37,12 @@ import { selectApplicationSiteName, selectEnableUserRegistration } from '@ttn-lw
 import { id as userRegexp } from '@ttn-lw/lib/regexp'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import createPasswordValidationSchema from '@ttn-lw/lib/create-password-validation-schema'
+import useRequest from '@ttn-lw/lib/hooks/use-request'
+
+import { getIsConfiguration } from '@account/store/actions/identity-server'
+
+import { selectPasswordRequirements } from '@account/store/selectors/identity-server'
 
 const m = defineMessages({
   registrationApproved: 'You have successfully registered and can login now',
@@ -45,7 +52,7 @@ const m = defineMessages({
     'You have successfully sent the registration request. You will receive a confirmation once the account has been approved.',
 })
 
-const validationSchema = Yup.object().shape({
+const baseValidationSchema = Yup.object().shape({
   user_id: Yup.string()
     .min(3, Yup.passValues(sharedMessages.validateTooShort))
     .max(36, Yup.passValues(sharedMessages.validateTooLong))
@@ -54,14 +61,8 @@ const validationSchema = Yup.object().shape({
   name: Yup.string()
     .min(3, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
-  password: Yup.string()
-    .min(8, Yup.passValues(sharedMessages.validateTooShort))
-    .required(sharedMessages.validateRequired),
   primary_email_address: Yup.string()
     .email(sharedMessages.validateEmail)
-    .required(sharedMessages.validateRequired),
-  password_confirm: Yup.string()
-    .oneOf([Yup.ref('password'), null], sharedMessages.validatePasswordMatch)
     .required(sharedMessages.validateRequired),
 })
 
@@ -70,7 +71,7 @@ const initialValues = {
   name: '',
   primary_email_address: '',
   password: '',
-  password_confirm: '',
+  confirmPassword: '',
 }
 
 const siteName = selectApplicationSiteName()
@@ -89,7 +90,13 @@ const getSuccessMessage = state => {
 }
 
 const CreateAccount = ({ location }) => {
+  const [fetching, isConfigError] = useRequest(getIsConfiguration())
+  if (Boolean(isConfigError)) {
+    throw isConfigError
+  }
+
   const [error, setError] = useState(undefined)
+  const passwordRequirements = useSelector(selectPasswordRequirements)
   const dispatch = useDispatch()
 
   const handleSubmit = useCallback(
@@ -116,6 +123,18 @@ const CreateAccount = ({ location }) => {
   if (!enableUserRegistration) {
     return <Redirect to={`/login${location.search}`} />
   }
+
+  if (fetching) {
+    return (
+      <Spinner center>
+        <Message content={sharedMessages.fetching} />
+      </Spinner>
+    )
+  }
+
+  const validationSchema = baseValidationSchema.concat(
+    createPasswordValidationSchema(passwordRequirements),
+  )
 
   return (
     <>
@@ -166,7 +185,7 @@ const CreateAccount = ({ location }) => {
           <Form.Field
             required
             title={sharedMessages.confirmPassword}
-            name="password_confirm"
+            name="confirmPassword"
             type="password"
             autoComplete="new-password"
             component={Input}
@@ -176,7 +195,6 @@ const CreateAccount = ({ location }) => {
               component={SubmitButton}
               message={m.createAccount}
               className={style.submitButton}
-              alwaysEnabled
             />
             <Button.Link
               to={`/login${location.search}`}
