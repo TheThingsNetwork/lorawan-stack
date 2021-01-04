@@ -6533,6 +6533,15 @@
       "file": "server.go"
     }
   },
+  "error:pkg/packetbrokeragent:authentication_mode": {
+    "translations": {
+      "en": "invalid authentication mode `{mode}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "agent.go"
+    }
+  },
   "error:pkg/packetbrokeragent:decode_payload": {
     "translations": {
       "en": "decode LoRaWAN payload"
@@ -6864,6 +6873,24 @@
     "description": {
       "package": "pkg/redis",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/rpcclient:fetch_oauth2_token": {
+    "translations": {
+      "en": "fetch OAuth 2.0 token"
+    },
+    "description": {
+      "package": "pkg/rpcclient",
+      "file": "oauth2_client.go"
+    }
+  },
+  "error:pkg/rpcclient:invalid_oauth2_token": {
+    "translations": {
+      "en": "invalid OAuth 2.0 token"
+    },
+    "description": {
+      "package": "pkg/rpcclient",
+      "file": "oauth2_client.go"
     }
   },
   "error:pkg/rpcmetadata:unauthenticated": {

@@ -357,12 +357,14 @@ func (m *PacketBrokerMetadata) ValidateFields(paths ...string) error {
 			// no validation rules for ForwarderNetID
 		case "forwarder_tenant_id":
 			// no validation rules for ForwarderTenantID
-		case "forwarder_id":
-			// no validation rules for ForwarderID
+		case "forwarder_cluster_id":
+			// no validation rules for ForwarderClusterID
 		case "home_network_net_id":
 			// no validation rules for HomeNetworkNetID
 		case "home_network_tenant_id":
 			// no validation rules for HomeNetworkTenantID
+		case "home_network_cluster_id":
+			// no validation rules for HomeNetworkClusterID
 		case "hops":
 
 			for idx, item := range m.GetHops() {

@@ -22127,8 +22127,8 @@
               "defaultValue": ""
             },
             {
-              "name": "forwarder_id",
-              "description": "Forwarder identifier issued by the Packet Broker Forwarder Member.",
+              "name": "forwarder_cluster_id",
+              "description": "Forwarder Cluster ID of the Packet Broker Forwarder.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -22149,6 +22149,16 @@
             {
               "name": "home_network_tenant_id",
               "description": "Tenant ID managed by the Packet Broker Home Network Member.\nThis value is empty if it cannot be determined by the Packet Broker Router.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "home_network_cluster_id",
+              "description": "Home Network Cluster ID of the Packet Broker Home Network.",
               "label": "",
               "type": "string",
               "longType": "string",

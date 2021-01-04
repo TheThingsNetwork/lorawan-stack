@@ -16,7 +16,12 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Packet Broker API version to `v3.2.0-tts` and routing API to `v1.0.2-tts`.
+
 ### Deprecated
+
+- Packet Broker mutual TLS authentication: use OAuth 2.0 client credentials instead; set `pba.authentication-mode` to `oauth2` and configure `pba.oauth2`.
+- Packet Broker forwarder blacklist setting `pba.home-network.blacklist-forwarder` has become ineffective.
 
 ### Removed
 
@@ -41,7 +46,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Removed misleading warning message for missing package data when setting up the storage integration package association.
-
 
 ## [3.10.4] - 2020-12-08
 

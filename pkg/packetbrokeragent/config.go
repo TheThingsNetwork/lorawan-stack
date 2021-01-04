@@ -22,13 +22,24 @@ import (
 
 // Config configures Packet Broker clients.
 type Config struct {
-	DataPlaneAddress string               `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
-	NetID            types.NetID          `name:"net-id" description:"LoRa Alliance NetID"`
-	TenantID         string               `name:"tenant-id" description:"Tenant ID within the NetID"`
-	ClusterID        string               `name:"cluster-id" description:"Cluster ID uniquely identifying this cluster within a NetID and tenant"`
-	TLS              tlsconfig.ClientAuth `name:"tls"`
-	Forwarder        ForwarderConfig      `name:"forwarder" description:"Forwarder configuration for publishing uplink messages and subscribing to downlink messages"`
-	HomeNetwork      HomeNetworkConfig    `name:"home-network" description:"Home Network configuration for subscribing to uplink and publishing downlink messages"`
+	DataPlaneAddress     string               `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
+	Insecure             bool                 `name:"insecure" description:"Connect without using TLS"`
+	NetID                types.NetID          `name:"net-id" description:"LoRa Alliance NetID"`
+	TenantID             string               `name:"tenant-id" description:"Tenant ID within the NetID"`
+	ClusterID            string               `name:"cluster-id" description:"Cluster ID uniquely identifying the Forwarder in the NetID and Tenant ID"`
+	HomeNetworkClusterID string               `name:"home-network-cluster-id" description:"Home Network Cluster ID, if different from the Cluster ID"`
+	AuthenticationMode   string               `name:"authentication-mode" description:"Authentication mode (tls, oauth2)"`
+	TLS                  tlsconfig.ClientAuth `name:"tls" description:"TLS client certificate (DEPRECATED)"`
+	OAuth2               OAuth2Config         `name:"oauth2" description:"OAuth 2.0 configuration"`
+	Forwarder            ForwarderConfig      `name:"forwarder" description:"Forwarder configuration for publishing uplink messages and subscribing to downlink messages"`
+	HomeNetwork          HomeNetworkConfig    `name:"home-network" description:"Home Network configuration for subscribing to uplink and publishing downlink messages"`
+}
+
+// OAuth2Config defines OAuth 2.0 configuration for authentication.
+type OAuth2Config struct {
+	ClientID     string `name:"client-id" description:"API key ID used as client ID"`
+	ClientSecret string `name:"client-secret" description:"Secret API key value used as client secret"`
+	TokenURL     string `name:"token-url" description:"Token URL"`
 }
 
 // ForwarderConfig defines configuration of the Forwarder role.
@@ -44,7 +55,7 @@ type HomeNetworkConfig struct {
 	Enable             bool                  `name:"enable" description:"Enable Home Network role"`
 	DevAddrPrefixes    []types.DevAddrPrefix `name:"dev-addr-prefixes" description:"DevAddr prefixes to subscribe to"`
 	WorkerPool         WorkerPoolConfig      `name:"worker-pool" description:"Workers pool configuration"`
-	BlacklistForwarder bool                  `name:"blacklist-forwarder" description:"Blacklist traffic from Forwarder to avoid traffic loops"`
+	BlacklistForwarder bool                  `name:"blacklist-forwarder" description:"Blacklist traffic from Forwarder to avoid traffic loops (DEPRECATED)"`
 }
 
 // WorkerPoolConfig contains the worker pool configuration for a Packet Broker role.
