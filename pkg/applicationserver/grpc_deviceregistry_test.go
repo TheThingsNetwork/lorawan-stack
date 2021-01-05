@@ -25,10 +25,12 @@ import (
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -88,6 +90,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 		t.Helper()
 		return assertions.New(t).So(errors.IsNotFound(err), should.BeTrue)
 	}
+
+	_, nsAddr := startMockNS(test.Context(), func(md rpcmetadata.MD) bool { return true })
 
 	for _, tc := range []struct {
 		Name            string
@@ -301,10 +305,25 @@ func TestDeviceRegistryGet(t *testing.T) {
 							Provider: "static",
 							Static:   registeredKEKs,
 						},
+						Cluster: cluster.Config{
+							NetworkServer: nsAddr,
+						},
+						GRPC: config.GRPC{
+							AllowInsecureForCredentials: true,
+						},
 					},
 				}),
 				&Config{
-					LinkMode: "explicit",
+					LinkMode: "all",
+					Links: &MockLinkRegistry{
+						GetFunc: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
+							return &ttnpb.ApplicationLink{}, nil
+						},
+						RangeFunc: func(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
+							f(ctx, registeredDevice.ApplicationIdentifiers, &ttnpb.ApplicationLink{})
+							return nil
+						},
+					},
 					Devices: &MockDeviceRegistry{
 						GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 							atomic.AddUint64(&getCalls, 1)
@@ -324,6 +343,9 @@ func TestDeviceRegistryGet(t *testing.T) {
 			})
 			componenttest.StartComponent(t, as.Component)
 			defer as.Close()
+
+			mustHavePeer(test.Context(), as.Component, ttnpb.ClusterRole_NETWORK_SERVER)
+			time.Sleep(2 * Timeout)
 
 			ctx := as.FillContext(test.Context())
 			req := deepcopy.Copy(tc.DeviceRequest).(*ttnpb.GetEndDeviceRequest)
