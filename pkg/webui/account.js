@@ -15,16 +15,15 @@
 import React from 'react'
 import DOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { createBrowserHistory } from 'history'
 import * as Sentry from '@sentry/browser'
 
 import sentryConfig from '@ttn-lw/constants/sentry'
-import createStore from '@account/store'
+import store, { history } from '@account/store'
 
 import WithLocale from '@ttn-lw/lib/components/with-locale'
 import Init from '@ttn-lw/lib/components/init'
 
-import { selectApplicationRootPath, selectSentryDsnConfig } from '@ttn-lw/lib/selectors/env'
+import { selectSentryDsnConfig } from '@ttn-lw/lib/selectors/env'
 
 import '@ttn-lw/lib/yup'
 
@@ -32,9 +31,6 @@ import '@ttn-lw/lib/yup'
 if (selectSentryDsnConfig()) {
   Sentry.init(sentryConfig)
 }
-
-const history = createBrowserHistory({ basename: `${selectApplicationRootPath()}/` })
-const store = createStore(history)
 
 const render = () => {
   const App = require('./account/views/app').default

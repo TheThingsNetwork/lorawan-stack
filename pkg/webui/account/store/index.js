@@ -17,8 +17,11 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import { createLogicMiddleware } from 'redux-logic'
 import { routerMiddleware } from 'connected-react-router'
 import createSentryMiddleware from 'redux-sentry-middleware'
+import { createBrowserHistory } from 'history'
 
 import sensitiveFields from '@ttn-lw/constants/sensitive-data'
+
+import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 
 import omitDeep from '@ttn-lw/lib/omit'
 import dev from '@ttn-lw/lib/dev'
@@ -41,14 +44,14 @@ if (env.sentryDsn) {
   ]
 }
 
-export default history => {
-  const middleware = applyMiddleware(...middlewares, routerMiddleware(history))
-  const store = createStore(createRootReducer(history), composeEnhancers(middleware))
-  if (dev && module.hot) {
-    module.hot.accept('./reducers', () => {
-      store.replaceReducer(createRootReducer(history))
-    })
-  }
+export const history = createBrowserHistory({ basename: `${selectApplicationRootPath()}/` })
 
-  return store
+const middleware = applyMiddleware(...middlewares, routerMiddleware(history))
+const store = createStore(createRootReducer(history), composeEnhancers(middleware))
+if (dev && module.hot) {
+  module.hot.accept('./reducers', () => {
+    store.replaceReducer(createRootReducer(history))
+  })
 }
+
+export default store
