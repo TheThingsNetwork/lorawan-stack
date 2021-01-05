@@ -261,7 +261,11 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			// Normal user.
 			if user.Admin {
 				res.IsAdmin = true
-				res.UniversalRights = ttnpb.AllAdminRights.Implied().Intersect(userRights)
+				if is.configFromContext(ctx).AdminRights.All {
+					res.UniversalRights = ttnpb.AllRights.Implied().Intersect(userRights)
+				} else {
+					res.UniversalRights = ttnpb.AllAdminRights.Implied().Intersect(userRights)
+				}
 			}
 		case ttnpb.STATE_REJECTED:
 			// Go to profile page, delete account.

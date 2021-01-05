@@ -98,7 +98,7 @@ func (oc *OAuthClient) configFromContext(ctx context.Context) *Config {
 	return &oc.config
 }
 
-func (oc *OAuthClient) defaultOAuth(c echo.Context) *oauth2.Config {
+func (oc *OAuthClient) defaultOAuth(c echo.Context) (*oauth2.Config, error) {
 	config := oc.configFromContext(c.Request().Context())
 
 	authorizeURL := config.AuthorizeURL
@@ -120,5 +120,5 @@ func (oc *OAuthClient) defaultOAuth(c echo.Context) *oauth2.Config {
 			AuthURL:   authorizeURL,
 			AuthStyle: oauth2.AuthStyleInParams,
 		},
-	}
+	}, nil
 }

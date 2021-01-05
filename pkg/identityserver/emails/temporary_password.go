@@ -14,10 +14,18 @@
 
 package emails
 
+import "time"
+
 // TemporaryPassword is the email that is sent when users request a temporary password.
 type TemporaryPassword struct {
 	Data
 	TemporaryPassword string
+	TTL               time.Duration
+}
+
+// FormatTTL formats the TTL.
+func (t TemporaryPassword) FormatTTL() string {
+	return formatTTL(t.TTL)
 }
 
 // TemplateName returns the name of the template to use for this email.
@@ -36,6 +44,11 @@ Temporary Password: {{.TemporaryPassword}}
 If you wish to change the password using web interface, follow the link below:
 
 {{ .Network.IdentityServerURL }}/update-password?user={{ .User.ID }}&current={{ .TemporaryPassword }}
+
+{{- if .TTL }}
+
+This temporary password expires {{ .FormatTTL }}.
+{{ end -}}
 `
 
 // DefaultTemplates returns the default templates for this email.

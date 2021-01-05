@@ -94,7 +94,11 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	if dev.GetPendingSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
 		"pending_session.keys.app_s_key.key",
 	) {
-		if !dev.SkipPayloadCryptoOverride.GetValue() {
+		link, err := r.AS.getLink(ctx, req.ApplicationIdentifiers)
+		if err != nil {
+			return nil, err
+		}
+		if !r.AS.skipPayloadCrypto(ctx, link, dev, dev.PendingSession) {
 			sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, dev.PendingSession.SessionKeys, "pending_session.keys", req.FieldMask.Paths...)
 			if err != nil {
 				return nil, err
@@ -105,7 +109,11 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	if dev.GetSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
 		"session.keys.app_s_key.key",
 	) {
-		if !dev.SkipPayloadCryptoOverride.GetValue() {
+		link, err := r.AS.getLink(ctx, req.ApplicationIdentifiers)
+		if err != nil {
+			return nil, err
+		}
+		if !r.AS.skipPayloadCrypto(ctx, link, dev, dev.Session) {
 			sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, dev.Session.SessionKeys, "session.keys", req.FieldMask.Paths...)
 			if err != nil {
 				return nil, err

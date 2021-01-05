@@ -337,15 +337,15 @@ func (dst *PacketBrokerMetadata) SetFields(src *PacketBrokerMetadata, paths ...s
 				var zero string
 				dst.ForwarderTenantID = zero
 			}
-		case "forwarder_id":
+		case "forwarder_cluster_id":
 			if len(subs) > 0 {
-				return fmt.Errorf("'forwarder_id' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'forwarder_cluster_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ForwarderID = src.ForwarderID
+				dst.ForwarderClusterID = src.ForwarderClusterID
 			} else {
 				var zero string
-				dst.ForwarderID = zero
+				dst.ForwarderClusterID = zero
 			}
 		case "home_network_net_id":
 			if len(subs) > 0 {
@@ -366,6 +366,16 @@ func (dst *PacketBrokerMetadata) SetFields(src *PacketBrokerMetadata, paths ...s
 			} else {
 				var zero string
 				dst.HomeNetworkTenantID = zero
+			}
+		case "home_network_cluster_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'home_network_cluster_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.HomeNetworkClusterID = src.HomeNetworkClusterID
+			} else {
+				var zero string
+				dst.HomeNetworkClusterID = zero
 			}
 		case "hops":
 			if len(subs) > 0 {

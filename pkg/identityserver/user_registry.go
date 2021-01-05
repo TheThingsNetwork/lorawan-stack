@@ -578,6 +578,8 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		return nil, err
 	}
 	now := time.Now()
+	ttl := time.Hour
+	expires := now.Add(ttl)
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		usr, err := store.GetUserStore(db).GetUser(ctx, &req.UserIdentifiers, temporaryPasswordFieldMask)
 		if err != nil {
@@ -587,7 +589,6 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 			return errTemporaryPasswordStillValid.New()
 		}
 		usr.TemporaryPassword = hashedTemporaryPassword
-		expires := now.Add(time.Hour)
 		usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = &now, &expires
 		usr, err = store.GetUserStore(db).UpdateUser(ctx, usr, updateTemporaryPasswordFieldMask)
 		return err
@@ -604,6 +605,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		return &emails.TemporaryPassword{
 			Data:              data,
 			TemporaryPassword: temporaryPassword,
+			TTL:               ttl,
 		}
 	})
 	if err != nil {

@@ -35,6 +35,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/dop251/goja v0.0.0-20200824171909-536f9d946569
+	github.com/dustin/go-humanize v1.0.0
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200918111050-ba85050a1f23
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/felixge/httpsnoop v1.0.1
@@ -95,7 +96,8 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/vmihailenco/msgpack/v5 v5.0.0-beta.1
 	go.opencensus.io v0.22.3
-	go.packetbroker.org/api/v3 v3.0.0
+	go.packetbroker.org/api/routing v1.0.3-tts
+	go.packetbroker.org/api/v3 v3.2.1-tts
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2
 	gocloud.dev v0.20.0
 	gocloud.dev/pubsub/natspubsub v0.19.0

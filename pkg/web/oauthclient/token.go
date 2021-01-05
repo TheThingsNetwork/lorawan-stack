@@ -43,7 +43,11 @@ func (oc *OAuthClient) freshToken(c echo.Context) (*oauth2.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	freshToken, err := oc.oauth(c).TokenSource(ctx, token).Token()
+	conf, err := oc.oauth(c)
+	if err != nil {
+		return nil, err
+	}
+	freshToken, err := conf.TokenSource(ctx, token).Token()
 	if err != nil {
 		var retrieveError *oauth2.RetrieveError
 		if stderrors.As(err, &retrieveError) {

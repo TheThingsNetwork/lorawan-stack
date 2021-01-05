@@ -20,6 +20,10 @@ import (
 
 // DefaultPacketBrokerAgentConfig is the default configuration for the Packet Broker Agent.
 var DefaultPacketBrokerAgentConfig = packetbrokeragent.Config{
+	AuthenticationMode: "tls",
+	OAuth2: packetbrokeragent.OAuth2Config{
+		TokenURL: "https://iam.packetbroker.org/token",
+	},
 	HomeNetwork: packetbrokeragent.HomeNetworkConfig{
 		WorkerPool: packetbrokeragent.WorkerPoolConfig{
 			Limit: 4096,
