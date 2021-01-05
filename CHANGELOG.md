@@ -12,11 +12,13 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Configuration option `is.admin-rights.all` to grant admins all rights, including `_KEYS` and `_ALL`.
+- Configuration option `is.user-registration.contact-info-validation.token-ttl` to customize the validity of contact information validation tokens.
 - `ttn-lw-stack` CLI command for creating an API Key with full rights on a user.
 
 ### Changed
 
 - Packet Broker API version to `v3.2.0-tts` and routing API to `v1.0.2-tts`.
+- Emails with temporary tokens now also show when these tokens expire. Custom email templates can use `{{ .TTL }}` and `{{ .FormatTTL }}` to render the expiry durations.
 
 ### Deprecated
 

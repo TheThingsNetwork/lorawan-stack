@@ -45,8 +45,8 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 		return nil, err
 	}
 	now := time.Now()
-	emailValidationsTTL := 48 * time.Hour
-	emailValidationsExpireAt := now.Add(emailValidationsTTL)
+	ttl := is.configFromContext(ctx).UserRegistration.ContactInfoValidation.TokenTTL
+	expires := now.Add(ttl)
 	emailValidations := make(map[string]*ttnpb.ContactInfoValidation)
 	for _, info := range contactInfo {
 		if info.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && info.ValidatedAt == nil {
@@ -61,7 +61,7 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 					Token:     key,
 					Entity:    ids,
 					CreatedAt: &now,
-					ExpiresAt: &emailValidationsExpireAt,
+					ExpiresAt: &expires,
 				}
 				emailValidations[info.Value] = validation
 			}
@@ -95,7 +95,7 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 					Data:  data,
 					ID:    validation.ID,
 					Token: validation.Token,
-					TTL:   emailValidationsTTL,
+					TTL:   ttl,
 				}
 			})
 			if err != nil {
