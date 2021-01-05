@@ -78,7 +78,7 @@ type Agent struct {
 	netID            types.NetID
 	clusterID,
 	homeNetworkClusterID string
-	authentication    []grpc.DialOption
+	dialOptions       func(context.Context) ([]grpc.DialOption, error)
 	forwarderConfig   ForwarderConfig
 	homeNetworkConfig HomeNetworkConfig
 	devAddrPrefixes   []types.DevAddrPrefix
@@ -140,36 +140,45 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		}
 	}
 
-	var authentication []grpc.DialOption
-	tlsConfig, err := c.GetTLSClientConfig(ctx)
-	if err != nil {
-		return nil, err
-	}
+	var dialOptions func(context.Context) ([]grpc.DialOption, error)
 	switch mode := conf.AuthenticationMode; mode {
 	case "tls":
-		if conf.TLS.Source == "key-vault" {
-			conf.TLS.KeyVault.KeyVault = c.KeyVault
-		}
-		if err = conf.TLS.ApplyTo(tlsConfig); err != nil {
-			return nil, err
-		}
-		authentication = []grpc.DialOption{
-			grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
+		dialOptions = func(ctx context.Context) ([]grpc.DialOption, error) {
+			tlsConfig, err := c.GetTLSClientConfig(ctx)
+			if err != nil {
+				return nil, err
+			}
+			if conf.TLS.Source == "key-vault" {
+				conf.TLS.KeyVault.KeyVault = c.KeyVault
+			}
+			if err = conf.TLS.ApplyTo(tlsConfig); err != nil {
+				return nil, err
+			}
+			return []grpc.DialOption{
+				grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
+			}, nil
 		}
 	case "oauth2":
-		authentication = make([]grpc.DialOption, 2)
-		authentication[0] = grpc.WithPerRPCCredentials(rpcclient.OAuth2(
-			ctx,
-			conf.OAuth2.TokenURL,
-			conf.OAuth2.ClientID,
-			conf.OAuth2.ClientSecret,
-			[]string{"networks"},
-			conf.Insecure,
-		))
-		if conf.Insecure {
-			authentication[1] = grpc.WithInsecure()
-		} else {
-			authentication[1] = grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig))
+		dialOptions = func(ctx context.Context) ([]grpc.DialOption, error) {
+			tlsConfig, err := c.GetTLSClientConfig(ctx)
+			if err != nil {
+				return nil, err
+			}
+			res := make([]grpc.DialOption, 2)
+			res[0] = grpc.WithPerRPCCredentials(rpcclient.OAuth2(
+				ctx,
+				conf.OAuth2.TokenURL,
+				conf.OAuth2.ClientID,
+				conf.OAuth2.ClientSecret,
+				[]string{"networks"},
+				conf.Insecure,
+			))
+			if conf.Insecure {
+				res[1] = grpc.WithInsecure()
+			} else {
+				res[1] = grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig))
+			}
+			return res, nil
 		}
 	default:
 		return nil, errAuthenticationMode.WithAttributes("mode", mode)
@@ -187,7 +196,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		netID:                conf.NetID,
 		clusterID:            conf.ClusterID,
 		homeNetworkClusterID: homeNetworkClusterID,
-		authentication:       authentication,
+		dialOptions:          dialOptions,
 		forwarderConfig:      conf.Forwarder,
 		homeNetworkConfig:    conf.HomeNetwork,
 		devAddrPrefixes:      devAddrPrefixes,
@@ -285,10 +294,14 @@ func (a *Agent) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 }
 
 func (a *Agent) dialContext(ctx context.Context) (*grpc.ClientConn, error) {
+	dialOpts, err := a.dialOptions(ctx)
+	if err != nil {
+		return nil, err
+	}
 	defaultOpts := rpcclient.DefaultDialOptions(ctx)
-	opts := make([]grpc.DialOption, 0, len(defaultOpts)+len(a.authentication)+2)
+	opts := make([]grpc.DialOption, 0, len(defaultOpts)+len(dialOpts)+2)
 	opts = append(opts, defaultOpts...)
-	opts = append(opts, a.authentication...)
+	opts = append(opts, dialOpts...)
 	opts = append(opts,
 		grpc.WithBlock(),
 		grpc.FailOnNonTempDialError(true),
