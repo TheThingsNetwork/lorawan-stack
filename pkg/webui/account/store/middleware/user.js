@@ -12,13 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import tts from '@account/api/tts'
+
 import api from '@account/api'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as user from '@account/store/actions/user'
 
-const userLogic = createRequestLogic({
+import { selectUserId } from '@account/store/selectors/user'
+
+const logoutLogic = createRequestLogic({
   type: user.LOGOUT,
   process: async () => {
     await api.account.logout()
@@ -26,4 +30,19 @@ const userLogic = createRequestLogic({
   },
 })
 
-export default userLogic
+const getUserLogic = createRequestLogic({
+  type: user.GET_USER,
+  process: async ({ action, getState }) => {
+    const {
+      meta: { selector },
+    } = action
+    const userId =
+      'payload' in action && action.payload.id ? action.payload.id : selectUserId(getState())
+
+    const result = await tts.Users.getById(userId, selector)
+
+    return result
+  },
+})
+
+export default [logoutLogic, getUserLogic]

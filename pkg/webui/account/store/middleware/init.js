@@ -14,35 +14,49 @@
 
 import { createLogic } from 'redux-logic'
 
+import store from '@account/store'
+
 import api from '@account/api'
+
+import { isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import * as init from '@account/store/actions/init'
 import * as user from '@account/store/actions/user'
 
 const accountAppInitLogic = createLogic({
   type: init.INITIALIZE,
-  async process({ getState, action }, dispatch, done) {
-    dispatch(user.getUserMe())
-
+  process: async ({ getState, action }, dispatch, done) => {
     try {
+      const meResult = await api.account.me()
       try {
-        const result = await api.account.me()
-
-        dispatch(user.getUserMeSuccess(result.data.user))
+        // Using `store.dispatch` since redux logic's dispatch won't return
+        // the (promisified) action result like regular dispatch does.
+        await store.dispatch(
+          attachPromise(
+            user.getUser(meResult.data.user.ids.user_id, [
+              'profile_picture',
+              'name',
+              'description',
+              'primary_email_address',
+            ]),
+          ),
+        )
       } catch (error) {
-        const userError = error.data ? error.data : error
-        dispatch(user.getUserMeFailure(userError))
+        // An error here means that the user is logged out. This does not
+        // need to be handled or result in the initialization to fail.
       }
-
-      dispatch(init.initializeSuccess())
-
-      // eslint-disable-next-line no-console
-      console.log('Account app initialization successful!')
     } catch (error) {
-      const initError = error.data ? error.data : error
-      dispatch(init.initializeFailure(initError))
+      if (!isUnauthenticatedError(error)) {
+        const initError = error.data ? error.data : error
+        dispatch(init.initializeFailure(initError))
+        return done()
+      }
     }
 
+    // eslint-disable-next-line no-console
+    console.log('Account app initialization successful!')
+    dispatch(init.initializeSuccess())
     done()
   },
 })
