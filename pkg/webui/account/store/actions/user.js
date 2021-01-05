@@ -14,11 +14,11 @@
 
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 
-export const GET_USER_ME_BASE = 'GET_USER_ME'
+export const GET_USER_BASE = 'GET_USER'
 export const [
-  { request: GET_USER_ME, success: GET_USER_ME_SUCCESS, failure: GET_USER_ME_FAILURE },
-  { request: getUserMe, success: getUserMeSuccess, failure: getUserMeFailure },
-] = createRequestActions(GET_USER_ME_BASE)
+  { request: GET_USER, success: GET_USER_SUCCESS, failure: GET_USER_FAILURE },
+  { request: getUser, success: getUserSuccess, failure: getUserFailure },
+] = createRequestActions(GET_USER_BASE, id => ({ id }), (id, selector) => ({ selector }))
 
 export const LOGOUT_BASE = 'LOGOUT'
 export const [
