@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import {
-  GET_USER_ME,
-  GET_USER_ME_SUCCESS,
-  GET_USER_ME_FAILURE,
+  GET_USER,
+  GET_USER_SUCCESS,
+  GET_USER_FAILURE,
   LOGOUT,
   LOGOUT_FAILURE,
 } from '@account/store/actions/user'
@@ -28,21 +28,21 @@ const defaultState = {
 
 const user = (state = defaultState, { type, payload }) => {
   switch (type) {
-    case GET_USER_ME:
+    case GET_USER:
       return {
         ...state,
         fetching: true,
         user: undefined,
         error: false,
       }
-    case GET_USER_ME_SUCCESS:
+    case GET_USER_SUCCESS:
       return {
         ...state,
         fetching: false,
         user: payload,
         error: false,
       }
-    case GET_USER_ME_FAILURE:
+    case GET_USER_FAILURE:
       return {
         ...state,
         fetching: false,
