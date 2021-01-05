@@ -4445,6 +4445,15 @@
       "file": "store.go"
     }
   },
+  "error:pkg/identityserver/store:validation_already_exists": {
+    "translations": {
+      "en": "contact info validation already exists"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "contact_info_store.go"
+    }
+  },
   "error:pkg/identityserver/store:validation_token": {
     "translations": {
       "en": "validation token not found"
@@ -4670,6 +4679,15 @@
       "file": "invitation_registry.go"
     }
   },
+  "error:pkg/identityserver:no_validation_needed": {
+    "translations": {
+      "en": "no validation needed for this contact info"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "contact_info_registry.go"
+    }
+  },
   "error:pkg/identityserver:oauth_client_rejected": {
     "translations": {
       "en": "OAuth client was rejected"
@@ -4866,6 +4884,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:validations_already_sent": {
+    "translations": {
+      "en": "validations for this contact info already sent"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "contact_info_registry.go"
     }
   },
   "error:pkg/interop:activation": {

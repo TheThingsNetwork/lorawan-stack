@@ -21,6 +21,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
@@ -126,6 +127,18 @@ func TestContactInfoValidation(t *testing.T) {
 		})
 
 		a.So(err, should.BeNil)
+
+		_, err = s.CreateValidation(ctx, &ttnpb.ContactInfoValidation{
+			ID:          "validation-id",
+			Token:       "other-token",
+			Entity:      usr.EntityIdentifiers(),
+			ContactInfo: info,
+			ExpiresAt:   &expiresAt,
+		})
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsAlreadyExists(err), should.BeTrue)
+		}
 
 		err = s.Validate(ctx, &ttnpb.ContactInfoValidation{
 			ID:    "validation-id",
