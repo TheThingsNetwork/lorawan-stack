@@ -94,7 +94,9 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	if dev.GetPendingSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
 		"pending_session.keys.app_s_key.key",
 	) {
-		link, err := r.AS.getLink(ctx, req.ApplicationIdentifiers)
+		link, err := r.AS.getLink(ctx, req.ApplicationIdentifiers, []string{
+			"skip_payload_crypto",
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -109,7 +111,9 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	if dev.GetSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
 		"session.keys.app_s_key.key",
 	) {
-		link, err := r.AS.getLink(ctx, req.ApplicationIdentifiers)
+		link, err := r.AS.getLink(ctx, req.ApplicationIdentifiers, []string{
+			"skip_payload_crypto",
+		})
 		if err != nil {
 			return nil, err
 		}
