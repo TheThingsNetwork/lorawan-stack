@@ -26,7 +26,7 @@ import Details from './details'
 
 import style from './notification.styl'
 
-const Notification = function({
+const Notification = ({
   content,
   className,
   title,
@@ -41,7 +41,7 @@ const Notification = function({
   actionMessage,
   buttonIcon,
   'data-test-id': dataTestId,
-}) {
+}) => {
   const classname = classnames(style.notification, className, {
     [style.error]: error,
     [style.warning]: warning,
@@ -65,7 +65,7 @@ const Notification = function({
         <div className={style.content}>
           {title && <Message className={style.title} content={title} component="h4" />}
           <div>
-            <Message content={content} values={messageValues} />
+            <Message content={content} values={messageValues} convertBackticks={Boolean(error)} />
             {action && (
               <Button
                 secondary

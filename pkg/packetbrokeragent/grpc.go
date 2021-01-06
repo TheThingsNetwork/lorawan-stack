@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,22 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// BRAND COLORS
-// ======
+package packetbrokeragent
 
-// ## General
+import "context"
 
-$c-active-blue = #3D73FF
-$c-active-blue-hover = #1E5DFF
-$c-active-blue-active = #0047FF
-$c-icon-fill = #686868
-$c-subtle-fill = #AAA
-$c-backdrop = #F3F3F3
-$c-backdrop-lighter = #FAFAFA
-$c-text-backdrop = #ECECEC
-
-// ## Text
-
-$tc-active = #3D73FF
-$tc-active-hover = $c-active-blue-hover
-$tc-error = #EA0000
+type contextDecoupler interface {
+	FromRequestContext(context.Context) context.Context
+}

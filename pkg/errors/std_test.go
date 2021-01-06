@@ -23,7 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func TestStandardLibrarayErrors(t *testing.T) {
+func TestStandardLibraryErrors(t *testing.T) {
 	a := assertions.New(t)
 
 	var (

@@ -19,6 +19,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 
+	routingpb "go.packetbroker.org/api/routing"
 	packetbroker "go.packetbroker.org/api/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -49,11 +50,11 @@ func NewPBDataPlane(cert tls.Certificate, clientCAs *x509.CertPool) *PBDataPlane
 		HomeNetworkDown: make(chan *packetbroker.RoutedDownlinkMessage),
 		HomeNetworkUp:   make(chan *packetbroker.RoutedUplinkMessage),
 	}
-	packetbroker.RegisterRouterForwarderDataServer(dp.Server, &routerForwarderServer{
+	routingpb.RegisterForwarderDataServer(dp.Server, &routerForwarderServer{
 		upCh:   dp.ForwarderUp,
 		downCh: dp.ForwarderDown,
 	})
-	packetbroker.RegisterRouterHomeNetworkDataServer(dp.Server, &routerHomeNetworkServer{
+	routingpb.RegisterHomeNetworkDataServer(dp.Server, &routerHomeNetworkServer{
 		downCh: dp.HomeNetworkDown,
 		upCh:   dp.HomeNetworkUp,
 	})
@@ -61,20 +62,24 @@ func NewPBDataPlane(cert tls.Certificate, clientCAs *x509.CertPool) *PBDataPlane
 }
 
 type routerForwarderServer struct {
+	routingpb.UnimplementedForwarderDataServer
 	upCh   chan *packetbroker.RoutedUplinkMessage
 	downCh chan *packetbroker.RoutedDownlinkMessage
 }
 
-func (s *routerForwarderServer) Publish(ctx context.Context, req *packetbroker.PublishUplinkMessageRequest) (*packetbroker.PublishUplinkMessageResponse, error) {
+func (s *routerForwarderServer) Publish(ctx context.Context, req *routingpb.PublishUplinkMessageRequest) (*routingpb.PublishUplinkMessageResponse, error) {
 	s.upCh <- &packetbroker.RoutedUplinkMessage{
-		Message: req.Message,
+		ForwarderNetId:     req.ForwarderNetId,
+		ForwarderTenantId:  req.ForwarderTenantId,
+		ForwarderClusterId: req.ForwarderClusterId,
+		Message:            req.Message,
 	}
-	return &packetbroker.PublishUplinkMessageResponse{
+	return &routingpb.PublishUplinkMessageResponse{
 		Id: "test",
 	}, nil
 }
 
-func (s *routerForwarderServer) Subscribe(req *packetbroker.SubscribeForwarderRequest, res packetbroker.RouterForwarderData_SubscribeServer) error {
+func (s *routerForwarderServer) Subscribe(req *routingpb.SubscribeForwarderRequest, res routingpb.ForwarderData_SubscribeServer) error {
 	for {
 		select {
 		case <-res.Context().Done():
@@ -88,28 +93,32 @@ func (s *routerForwarderServer) Subscribe(req *packetbroker.SubscribeForwarderRe
 }
 
 type routerHomeNetworkServer struct {
+	routingpb.UnimplementedHomeNetworkDataServer
 	downCh chan *packetbroker.RoutedDownlinkMessage
 	upCh   chan *packetbroker.RoutedUplinkMessage
 }
 
-func (s *routerHomeNetworkServer) Publish(ctx context.Context, req *packetbroker.PublishDownlinkMessageRequest) (*packetbroker.PublishDownlinkMessageResponse, error) {
+func (s *routerHomeNetworkServer) Publish(ctx context.Context, req *routingpb.PublishDownlinkMessageRequest) (*routingpb.PublishDownlinkMessageResponse, error) {
 	down := &packetbroker.RoutedDownlinkMessage{
-		ForwarderNetId:    req.ForwarderNetId,
-		ForwarderId:       req.ForwarderId,
-		ForwarderTenantId: req.ForwarderTenantId,
-		Message:           req.Message,
+		ForwarderNetId:       req.ForwarderNetId,
+		ForwarderTenantId:    req.ForwarderTenantId,
+		ForwarderClusterId:   req.ForwarderClusterId,
+		HomeNetworkNetId:     req.HomeNetworkNetId,
+		HomeNetworkTenantId:  req.HomeNetworkTenantId,
+		HomeNetworkClusterId: req.HomeNetworkClusterId,
+		Message:              req.Message,
 	}
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	case s.downCh <- down:
 	}
-	return &packetbroker.PublishDownlinkMessageResponse{
+	return &routingpb.PublishDownlinkMessageResponse{
 		Id: "test",
 	}, nil
 }
 
-func (s *routerHomeNetworkServer) Subscribe(req *packetbroker.SubscribeHomeNetworkRequest, res packetbroker.RouterHomeNetworkData_SubscribeServer) error {
+func (s *routerHomeNetworkServer) Subscribe(req *routingpb.SubscribeHomeNetworkRequest, res routingpb.HomeNetworkData_SubscribeServer) error {
 	for {
 		select {
 		case <-res.Context().Done():

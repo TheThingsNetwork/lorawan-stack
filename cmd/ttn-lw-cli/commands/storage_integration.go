@@ -20,8 +20,8 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
-	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 

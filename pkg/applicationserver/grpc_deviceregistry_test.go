@@ -304,6 +304,11 @@ func TestDeviceRegistryGet(t *testing.T) {
 					},
 				}),
 				&Config{
+					Links: &MockLinkRegistry{
+						GetFunc: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
+							return nil, errNotFound
+						},
+					},
 					Devices: &MockDeviceRegistry{
 						GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 							atomic.AddUint64(&getCalls, 1)

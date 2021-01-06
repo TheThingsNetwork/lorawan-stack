@@ -37,7 +37,8 @@ type Config struct {
 			TokenTTL time.Duration `name:"token-ttl" description:"TTL of user invitation tokens"`
 		} `name:"invitation"`
 		ContactInfoValidation struct {
-			Required bool `name:"required" description:"Require contact info validation for new users"`
+			Required bool          `name:"required" description:"Require contact info validation for new users"`
+			TokenTTL time.Duration `name:"token-ttl" description:"TTL of contact info validation tokens"`
 		} `name:"contact-info-validation"`
 		AdminApproval struct {
 			Required bool `name:"required" description:"Require admin approval for new users"`
@@ -71,6 +72,9 @@ type Config struct {
 		CreateGateways      bool `name:"create-gateways" description:"Allow non-admin users to create gateways in their user account"`
 		CreateOrganizations bool `name:"create-organizations" description:"Allow non-admin users to create organizations in their user account"`
 	} `name:"user-rights"`
+	AdminRights struct {
+		All bool `name:"all" description:"Grant all rights to admins, including _KEYS and _ALL"`
+	} `name:"admin-rights"`
 	Email struct {
 		email.Config `name:",squash"`
 		SendGrid     sendgrid.Config      `name:"sendgrid"`

@@ -35,7 +35,8 @@ type messageEncrypter interface {
 type gsPbaServer struct {
 	tokenEncrypter   jose.Encrypter
 	messageEncrypter messageEncrypter
-	upstreamCh       chan *packetbroker.UplinkMessage
+	contextDecoupler contextDecoupler
+	upstreamCh       chan *uplinkMessage
 }
 
 var errForwarderDisabled = errors.DefineFailedPrecondition("forwarder_disabled", "Forwarder is disabled")
@@ -66,10 +67,14 @@ func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplink
 		return nil, err
 	}
 
+	ctxMsg := &uplinkMessage{
+		Context:       s.contextDecoupler.FromRequestContext(ctx),
+		UplinkMessage: msg,
+	}
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
-	case s.upstreamCh <- msg:
+	case s.upstreamCh <- ctxMsg:
 		return ttnpb.Empty, nil
 	}
 }

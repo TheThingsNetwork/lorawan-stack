@@ -65,7 +65,7 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 	if err = rights.RequireUser(ctx, req.UserIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
-	key, token, err := generateAPIKey(ctx, req.Name, req.Rights...)
+	key, token, err := GenerateAPIKey(ctx, req.Name, req.Rights...)
 	if err != nil {
 		return nil, err
 	}

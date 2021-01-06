@@ -23,10 +23,10 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	routingpb "go.packetbroker.org/api/routing"
 	packetbroker "go.packetbroker.org/api/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
-	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -53,7 +53,16 @@ const (
 // TenantContextFiller fills the parent context based on the tenant ID.
 type TenantContextFiller func(parent context.Context, tenantID string) (context.Context, error)
 
+// TenantExtractor extracts the tenant ID from the context.
+type TenantExtractor func(context context.Context) string
+
+type uplinkMessage struct {
+	context.Context
+	*packetbroker.UplinkMessage
+}
+
 type downlinkMessage struct {
+	context.Context
 	*agentUplinkToken
 	*packetbroker.DownlinkMessage
 }
@@ -67,16 +76,17 @@ type Agent struct {
 
 	dataPlaneAddress string
 	netID            types.NetID
-	tenantID,
-	clusterID string
-	tlsConfig         tlsconfig.ClientAuth
+	clusterID,
+	homeNetworkClusterID string
+	dialOptions       func(context.Context) ([]grpc.DialOption, error)
 	forwarderConfig   ForwarderConfig
 	homeNetworkConfig HomeNetworkConfig
 	devAddrPrefixes   []types.DevAddrPrefix
 
 	tenantContextFillers []TenantContextFiller
+	tenantExtractor      TenantExtractor
 
-	upstreamCh   chan *packetbroker.UplinkMessage
+	upstreamCh   chan *uplinkMessage
 	downstreamCh chan *downlinkMessage
 
 	grpc struct {
@@ -96,9 +106,17 @@ func WithTenantContextFiller(filler TenantContextFiller) Option {
 	}
 }
 
+// WithTenantExtractor returns an Option that configures the Agent to use the given tenant extractor.
+func WithTenantExtractor(extractor TenantExtractor) Option {
+	return func(a *Agent) {
+		a.tenantExtractor = extractor
+	}
+}
+
 var (
-	errNetID    = errors.DefineFailedPrecondition("net_id", "invalid NetID `{net_id}`")
-	errTokenKey = errors.DefineFailedPrecondition("token_key", "invalid token key", "length")
+	errNetID              = errors.DefineFailedPrecondition("net_id", "invalid NetID `{net_id}`")
+	errAuthenticationMode = errors.DefineFailedPrecondition("authentication_mode", "invalid authentication mode `{mode}`")
+	errTokenKey           = errors.DefineFailedPrecondition("token_key", "invalid token key", "length")
 )
 
 // New returns a new Packet Broker Agent.
@@ -122,21 +140,72 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		}
 	}
 
+	var dialOptions func(context.Context) ([]grpc.DialOption, error)
+	switch mode := conf.AuthenticationMode; mode {
+	case "tls":
+		dialOptions = func(ctx context.Context) ([]grpc.DialOption, error) {
+			tlsConfig, err := c.GetTLSClientConfig(ctx)
+			if err != nil {
+				return nil, err
+			}
+			if conf.TLS.Source == "key-vault" {
+				conf.TLS.KeyVault.KeyVault = c.KeyVault
+			}
+			if err = conf.TLS.ApplyTo(tlsConfig); err != nil {
+				return nil, err
+			}
+			return []grpc.DialOption{
+				grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
+			}, nil
+		}
+	case "oauth2":
+		dialOptions = func(ctx context.Context) ([]grpc.DialOption, error) {
+			tlsConfig, err := c.GetTLSClientConfig(ctx)
+			if err != nil {
+				return nil, err
+			}
+			res := make([]grpc.DialOption, 2)
+			res[0] = grpc.WithPerRPCCredentials(rpcclient.OAuth2(
+				ctx,
+				conf.OAuth2.TokenURL,
+				conf.OAuth2.ClientID,
+				conf.OAuth2.ClientSecret,
+				[]string{"networks"},
+				conf.Insecure,
+			))
+			if conf.Insecure {
+				res[1] = grpc.WithInsecure()
+			} else {
+				res[1] = grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig))
+			}
+			return res, nil
+		}
+	default:
+		return nil, errAuthenticationMode.WithAttributes("mode", mode)
+	}
+
+	homeNetworkClusterID := conf.HomeNetworkClusterID
+	if homeNetworkClusterID == "" {
+		homeNetworkClusterID = conf.ClusterID
+	}
 	a := &Agent{
 		Component: c,
 		ctx:       ctx,
 
-		dataPlaneAddress:  conf.DataPlaneAddress,
-		netID:             conf.NetID,
-		tenantID:          conf.TenantID,
-		clusterID:         conf.ClusterID,
-		tlsConfig:         conf.TLS,
-		forwarderConfig:   conf.Forwarder,
-		homeNetworkConfig: conf.HomeNetwork,
-		devAddrPrefixes:   devAddrPrefixes,
+		dataPlaneAddress:     conf.DataPlaneAddress,
+		netID:                conf.NetID,
+		clusterID:            conf.ClusterID,
+		homeNetworkClusterID: homeNetworkClusterID,
+		dialOptions:          dialOptions,
+		forwarderConfig:      conf.Forwarder,
+		homeNetworkConfig:    conf.HomeNetwork,
+		devAddrPrefixes:      devAddrPrefixes,
+		tenantExtractor: func(_ context.Context) string {
+			return conf.TenantID
+		},
 	}
 	if a.forwarderConfig.Enable {
-		a.upstreamCh = make(chan *packetbroker.UplinkMessage, upstreamBufferSize)
+		a.upstreamCh = make(chan *uplinkMessage, upstreamBufferSize)
 		if len(a.forwarderConfig.TokenKey) == 0 {
 			a.forwarderConfig.TokenKey = random.Bytes(16)
 			logger.WithField("token_key", hex.EncodeToString(a.forwarderConfig.TokenKey)).Warn("No token key configured, generated a random one")
@@ -166,11 +235,13 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		a.downstreamCh = make(chan *downlinkMessage, downstreamBufferSize)
 	}
 	a.grpc.nsPba = &nsPbaServer{
-		downstreamCh: a.downstreamCh,
+		contextDecoupler: a,
+		downstreamCh:     a.downstreamCh,
 	}
 	a.grpc.gsPba = &gsPbaServer{
 		tokenEncrypter:   a.forwarderConfig.TokenEncrypter,
 		messageEncrypter: a,
+		contextDecoupler: a,
 		upstreamCh:       a.upstreamCh,
 	}
 	for _, opt := range opts {
@@ -222,23 +293,20 @@ func (a *Agent) RegisterServices(s *grpc.Server) {
 func (a *Agent) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 }
 
-func (a *Agent) dialContext(ctx context.Context, config tlsconfig.ClientAuth, target string) (*grpc.ClientConn, error) {
-	tlsConfig, err := a.GetTLSClientConfig(ctx)
+func (a *Agent) dialContext(ctx context.Context) (*grpc.ClientConn, error) {
+	dialOpts, err := a.dialOptions(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if config.Source == "key-vault" {
-		config.KeyVault.KeyVault = a.KeyVault
-	}
-	if err = config.ApplyTo(tlsConfig); err != nil {
-		return nil, err
-	}
-	opts := append(rpcclient.DefaultDialOptions(ctx),
-		grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
+	defaultOpts := rpcclient.DefaultDialOptions(ctx)
+	opts := make([]grpc.DialOption, 0, len(defaultOpts)+len(dialOpts)+2)
+	opts = append(opts, defaultOpts...)
+	opts = append(opts, dialOpts...)
+	opts = append(opts,
 		grpc.WithBlock(),
 		grpc.FailOnNonTempDialError(true),
 	)
-	return grpc.DialContext(ctx, target, opts...)
+	return grpc.DialContext(ctx, a.dataPlaneAddress, opts...)
 }
 
 const (
@@ -252,11 +320,10 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "packetbrokeragent",
 		"forwarder_net_id", a.netID,
-		"forwarder_id", a.clusterID,
-		"forwarder_tenant_id", a.tenantID,
+		"forwarder_cluster_id", a.clusterID,
 	))
 
-	conn, err := a.dialContext(ctx, a.tlsConfig, a.dataPlaneAddress)
+	conn, err := a.dialContext(ctx)
 	if err != nil {
 		return err
 	}
@@ -266,7 +333,7 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 	logger := log.FromContext(ctx)
 	logger.Info("Connected as Forwarder")
 
-	uplinkCh := make(chan *packetbroker.UplinkMessage)
+	uplinkCh := make(chan *uplinkMessage)
 	defer close(uplinkCh)
 
 	wg := &sync.WaitGroup{}
@@ -302,21 +369,26 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 	}
 }
 
-func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn, uplinkCh <-chan *packetbroker.UplinkMessage) error {
-	logger := log.FromContext(ctx)
-	client := packetbroker.NewRouterForwarderDataClient(conn)
+func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn, uplinkCh <-chan *uplinkMessage) error {
+	client := routingpb.NewForwarderDataClient(conn)
 	for {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-time.After(workerIdleTimeout):
 			return nil
-		case msg := <-uplinkCh:
-			req := &packetbroker.PublishUplinkMessageRequest{
-				ForwarderNetId:    a.netID.MarshalNumber(),
-				ForwarderId:       a.clusterID,
-				ForwarderTenantId: a.tenantID,
-				Message:           msg,
+		case up := <-uplinkCh:
+			tenantID := a.tenantExtractor(up.Context)
+			msg := up.UplinkMessage
+			ctx := log.NewContextWithFields(ctx, log.Fields(
+				"forwarder_tenant_id", tenantID,
+			))
+			logger := log.FromContext(ctx)
+			req := &routingpb.PublishUplinkMessageRequest{
+				ForwarderNetId:     a.netID.MarshalNumber(),
+				ForwarderTenantId:  tenantID,
+				ForwarderClusterId: a.clusterID,
+				Message:            msg,
 			}
 			ctx, cancel := context.WithTimeout(ctx, publishMessageTimeout)
 			res, err := client.Publish(ctx, req)
@@ -331,27 +403,28 @@ func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn
 }
 
 func (a *Agent) subscribeDownlink(ctx context.Context) error {
+	tenantID := a.tenantExtractor(ctx)
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "packetbrokeragent",
 		"forwarder_net_id", a.netID,
-		"forwarder_id", a.clusterID,
-		"forwarder_tenant_id", a.tenantID,
+		"forwarder_tenant_id", tenantID,
+		"forwarder_cluster_id", a.clusterID,
 		"group", a.clusterID,
 	))
 
-	conn, err := a.dialContext(ctx, a.tlsConfig, a.dataPlaneAddress)
+	conn, err := a.dialContext(ctx)
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:conn:down:%s", events.NewCorrelationID()))
 
-	client := packetbroker.NewRouterForwarderDataClient(conn)
-	stream, err := client.Subscribe(ctx, &packetbroker.SubscribeForwarderRequest{
-		ForwarderNetId:    a.netID.MarshalNumber(),
-		ForwarderId:       a.clusterID,
-		ForwarderTenantId: a.tenantID,
-		Group:             a.clusterID,
+	client := routingpb.NewForwarderDataClient(conn)
+	stream, err := client.Subscribe(ctx, &routingpb.SubscribeForwarderRequest{
+		ForwarderNetId:     a.netID.MarshalNumber(),
+		ForwarderTenantId:  tenantID,
+		ForwarderClusterId: a.clusterID,
+		Group:              a.clusterID,
 	})
 	if err != nil {
 		return err
@@ -415,6 +488,7 @@ func (a *Agent) handleDownlink(ctx context.Context, downlinkCh <-chan *packetbro
 				"message_id", down.Id,
 				"from_home_network_net_id", homeNetworkNetID,
 				"from_home_network_tenant_id", down.HomeNetworkTenantId,
+				"from_home_network_cluster_id", down.HomeNetworkClusterId,
 			))
 			if err := a.handleDownlinkMessage(ctx, down); err != nil {
 				log.FromContext(ctx).WithError(err).Debug("Failed to handle incoming downlink message")
@@ -496,7 +570,7 @@ func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
 			Length: uint32(p.Length),
 		}
 	}
-	filters := []*packetbroker.RoutingFilter{
+	return []*packetbroker.RoutingFilter{
 		// Subscribe to MAC payload based on DevAddrPrefixes.
 		{
 			Message: &packetbroker.RoutingFilter_Mac{
@@ -514,36 +588,20 @@ func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
 			},
 		},
 	}
-	if a.forwarderConfig.Enable && a.homeNetworkConfig.BlacklistForwarder {
-		// Blacklist Forwarder to avoid looping traffic via Packet Broker.
-		forwardersBlacklist := &packetbroker.RoutingFilter_ForwarderBlacklist{
-			ForwarderBlacklist: &packetbroker.ForwarderIdentifiers{
-				List: []*packetbroker.ForwarderIdentifier{
-					{
-						NetId:       a.netID.MarshalNumber(),
-						ForwarderId: a.clusterID,
-					},
-				},
-			},
-		}
-		for _, f := range filters {
-			f.Forwarders = forwardersBlacklist
-		}
-	}
-
-	return filters
 }
 
 func (a *Agent) subscribeUplink(ctx context.Context) error {
+	tenantID := a.tenantExtractor(ctx)
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "packetbrokeragent",
 		"home_network_net_id", a.netID,
-		"home_network_tenant_id", a.tenantID,
+		"home_network_tenant_id", tenantID,
+		"home_network_cluster_id", a.homeNetworkClusterID,
 		"group", a.clusterID,
 	))
 	logger := log.FromContext(ctx)
 
-	conn, err := a.dialContext(ctx, a.tlsConfig, a.dataPlaneAddress)
+	conn, err := a.dialContext(ctx)
 	if err != nil {
 		return err
 	}
@@ -553,32 +611,6 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	filters := a.getSubscriptionFilters()
 	for i, f := range filters {
 		logger := logger
-		var (
-			forwardersType string
-			forwarderIDs   []*packetbroker.ForwarderIdentifier
-		)
-		switch fwd := f.Forwarders.(type) {
-		case *packetbroker.RoutingFilter_ForwarderBlacklist:
-			forwardersType = "blacklist"
-			forwarderIDs = fwd.ForwarderBlacklist.List
-		case *packetbroker.RoutingFilter_ForwarderWhitelist:
-			forwardersType = "whitelist"
-			forwarderIDs = fwd.ForwarderWhitelist.List
-		}
-		if forwarderIDs != nil {
-			formatted := make([]string, 0, len(forwarderIDs))
-			for _, fwd := range forwarderIDs {
-				if fwd.ForwarderId != "" {
-					formatted = append(formatted, fmt.Sprintf("%s/%s", packetbroker.NetID(fwd.NetId), fwd.ForwarderId))
-				} else {
-					formatted = append(formatted, fmt.Sprintf("%s", packetbroker.NetID(fwd.NetId)))
-				}
-			}
-			logger = logger.WithFields(log.Fields(
-				"forwarders_type", forwardersType,
-				"forwarders", formatted,
-			))
-		}
 		if f.GatewayMetadata != nil {
 			logger = logger.WithField("gateway_metadata", f.GatewayMetadata.Value)
 		}
@@ -596,7 +628,11 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 			message = formatted
 		case *packetbroker.RoutingFilter_Mac:
 			messageType = "mac"
-			message = msg.Mac.DevAddrPrefixes
+			formatted := make([]string, 0, len(msg.Mac.DevAddrPrefixes))
+			for _, prefix := range msg.Mac.DevAddrPrefixes {
+				formatted = append(formatted, fmt.Sprintf("DevAddr: %08X/%d", prefix.Value, prefix.Length))
+			}
+			message = formatted
 		}
 		if messageType != "" {
 			logger = logger.WithFields(log.Fields(
@@ -607,12 +643,13 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 		logger.WithField("i", i).Debug("Configured filter")
 	}
 
-	client := packetbroker.NewRouterHomeNetworkDataClient(conn)
-	stream, err := client.Subscribe(ctx, &packetbroker.SubscribeHomeNetworkRequest{
-		HomeNetworkNetId:    a.netID.MarshalNumber(),
-		HomeNetworkTenantId: a.tenantID,
-		Filters:             filters,
-		Group:               a.clusterID,
+	client := routingpb.NewHomeNetworkDataClient(conn)
+	stream, err := client.Subscribe(ctx, &routingpb.SubscribeHomeNetworkRequest{
+		HomeNetworkNetId:     a.netID.MarshalNumber(),
+		HomeNetworkTenantId:  tenantID,
+		HomeNetworkClusterId: a.homeNetworkClusterID,
+		Filters:              filters,
+		Group:                a.clusterID,
 	})
 	if err != nil {
 		return err
@@ -675,8 +712,8 @@ func (a *Agent) handleUplink(ctx context.Context, uplinkCh <-chan *packetbroker.
 			ctx = log.NewContextWithFields(ctx, log.Fields(
 				"message_id", up.Id,
 				"from_forwarder_net_id", forwarderNetID,
-				"from_forwarder_id", up.ForwarderId,
 				"from_forwarder_tenant_id", up.ForwarderTenantId,
+				"from_forwarder_cluster_id", up.ForwarderClusterId,
 			))
 			if err := a.handleUplinkMessage(ctx, up); err != nil {
 				logger.WithError(err).Debug("Failed to handle incoming uplink message")
@@ -737,10 +774,10 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "packetbrokeragent",
 		"home_network_net_id", a.netID,
-		"home_network_tenant_id", a.tenantID,
+		"home_network_cluster_id", a.homeNetworkClusterID,
 	))
 
-	conn, err := a.dialContext(ctx, a.tlsConfig, a.dataPlaneAddress)
+	conn, err := a.dialContext(ctx)
 	if err != nil {
 		return err
 	}
@@ -787,8 +824,7 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 }
 
 func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientConn, downlinkCh <-chan *downlinkMessage) error {
-	logger := log.FromContext(ctx)
-	client := packetbroker.NewRouterHomeNetworkDataClient(conn)
+	client := routingpb.NewHomeNetworkDataClient(conn)
 	for {
 		select {
 		case <-ctx.Done():
@@ -796,19 +832,23 @@ func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientCo
 		case <-time.After(workerIdleTimeout):
 			return nil
 		case down := <-downlinkCh:
+			tenantID := a.tenantExtractor(down.Context)
 			msg, token := down.DownlinkMessage, down.agentUplinkToken
-			logger := logger.WithFields(log.Fields(
+			ctx := log.NewContextWithFields(ctx, log.Fields(
 				"forwarder_net_id", token.ForwarderNetID,
 				"forwarder_tenant_id", token.ForwarderTenantID,
-				"forwarder_id", token.ForwarderID,
+				"forwarder_cluster_id", token.ForwarderClusterID,
+				"home_network_tenant_id", tenantID,
 			))
-			req := &packetbroker.PublishDownlinkMessageRequest{
-				HomeNetworkNetId:    a.netID.MarshalNumber(),
-				HomeNetworkTenantId: a.tenantID,
-				ForwarderNetId:      token.ForwarderNetID.MarshalNumber(),
-				ForwarderTenantId:   token.ForwarderTenantID,
-				ForwarderId:         token.ForwarderID,
-				Message:             msg,
+			logger := log.FromContext(ctx)
+			req := &routingpb.PublishDownlinkMessageRequest{
+				HomeNetworkNetId:     a.netID.MarshalNumber(),
+				HomeNetworkTenantId:  tenantID,
+				HomeNetworkClusterId: a.homeNetworkClusterID,
+				ForwarderNetId:       token.ForwarderNetID.MarshalNumber(),
+				ForwarderTenantId:    token.ForwarderTenantID,
+				ForwarderClusterId:   token.ForwarderClusterID,
+				Message:              msg,
 			}
 			ctx, cancel := context.WithTimeout(ctx, publishMessageTimeout)
 			res, err := client.Publish(ctx, req)

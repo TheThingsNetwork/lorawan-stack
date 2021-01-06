@@ -27,7 +27,8 @@ import (
 )
 
 type nsPbaServer struct {
-	downstreamCh chan *downlinkMessage
+	contextDecoupler contextDecoupler
+	downstreamCh     chan *downlinkMessage
 }
 
 var errHomeNetworkDisabled = errors.DefineFailedPrecondition("home_network_disabled", "Home Network is disabled")
@@ -54,10 +55,15 @@ func (s *nsPbaServer) PublishDownlink(ctx context.Context, down *ttnpb.DownlinkM
 		return nil, err
 	}
 
+	ctxMsg := &downlinkMessage{
+		Context:          s.contextDecoupler.FromRequestContext(ctx),
+		agentUplinkToken: token,
+		DownlinkMessage:  msg,
+	}
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
-	case s.downstreamCh <- &downlinkMessage{token, msg}:
+	case s.downstreamCh <- ctxMsg:
 		return ttnpb.Empty, nil
 	}
 }
