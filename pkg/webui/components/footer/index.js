@@ -23,15 +23,15 @@ import OfflineStatus from '@ttn-lw/components/offline-status'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './footer.styl'
 
 const m = defineMessages({
   footer: "You are the network. Let's build this thing together.",
-  getSupport: 'Get support',
 })
 
-const Footer = function({ className, links, supportLink, isOnline }) {
+const Footer = ({ className, documentationLink, links, supportLink, isOnline }) => {
   return (
     <footer className={classnames(className, style.footer)}>
       <div>
@@ -50,9 +50,14 @@ const Footer = function({ className, links, supportLink, isOnline }) {
         ))}
         <OfflineStatus isOnline={isOnline} showOfflineOnly showWarnings />
         <span className={style.version}>v{process.env.VERSION}</span>
+        {documentationLink && (
+          <Link.Anchor className={style.documentation} secondary href={documentationLink} external>
+            <Message content={sharedMessages.documentation} />
+          </Link.Anchor>
+        )}
         {supportLink && (
           <Button.AnchorLink
-            message={m.getSupport}
+            message={sharedMessages.getSupport}
             icon="contact_support"
             href={supportLink}
             target="_blank"
@@ -67,6 +72,8 @@ const Footer = function({ className, links, supportLink, isOnline }) {
 Footer.propTypes = {
   /** The classname to be applied to the footer. */
   className: PropTypes.string,
+  /** Optional link for documentation docs. */
+  documentationLink: PropTypes.string,
   /** A flag specifying whether the application is connected to the internet. */
   isOnline: PropTypes.bool.isRequired,
   /**
@@ -87,6 +94,7 @@ Footer.propTypes = {
 
 Footer.defaultProps = {
   className: undefined,
+  documentationLink: undefined,
   links: [],
   supportLink: undefined,
 }
