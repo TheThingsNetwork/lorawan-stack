@@ -16,6 +16,7 @@ package ttnpb
 
 import (
 	"context"
+	"fmt"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -24,6 +25,18 @@ import (
 // IsZero returns true if all identifiers have zero-values.
 func (ids ApplicationIdentifiers) IsZero() bool {
 	return ids.ApplicationID == ""
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ApplicationIdentifiers) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "application_id":
+		return v.ApplicationID == ""
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
 }
 
 // IsZero returns true if all identifiers have zero-values.
@@ -38,6 +51,28 @@ func (ids EndDeviceIdentifiers) IsZero() bool {
 		(ids.DevAddr == nil || ids.DevAddr.IsZero()) &&
 		(ids.DevEUI == nil || ids.DevEUI.IsZero()) &&
 		ids.JoinEUI == nil
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *EndDeviceIdentifiers) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "application_ids":
+		return v.ApplicationIdentifiers == ApplicationIdentifiers{}
+	case "application_ids.application_id":
+		return v.ApplicationIdentifiers.FieldIsZero("application_id")
+	case "dev_addr":
+		return v.DevAddr == nil
+	case "dev_eui":
+		return v.DevEUI == nil
+	case "device_id":
+		return v.DeviceID == ""
+	case "join_eui":
+		return v.JoinEUI == nil
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
 }
 
 // IsZero returns true if all identifiers have zero-values.

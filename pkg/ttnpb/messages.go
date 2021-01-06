@@ -16,6 +16,7 @@ package ttnpb
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -52,6 +53,72 @@ func (v *PayloadFormatter) UnmarshalJSON(b []byte) error {
 	}
 	*v = PayloadFormatter(i)
 	return nil
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *MessagePayloadFormatters) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "down_formatter":
+		return v.DownFormatter == 0
+	case "down_formatter_parameter":
+		return v.DownFormatterParameter == ""
+	case "up_formatter":
+		return v.UpFormatter == 0
+	case "up_formatter_parameter":
+		return v.UpFormatterParameter == ""
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ApplicationDownlink_ClassBC) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "absolute_time":
+		return v.AbsoluteTime == nil
+	case "gateways":
+		return v.Gateways == nil
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ApplicationDownlink) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "class_b_c":
+		return v.ClassBC == nil
+	case "class_b_c.absolute_time":
+		return v.ClassBC.FieldIsZero("absolute_time")
+	case "class_b_c.gateways":
+		return v.ClassBC.FieldIsZero("gateways")
+	case "confirmed":
+		return !v.Confirmed
+	case "correlation_ids":
+		return v.CorrelationIDs == nil
+	case "decoded_payload":
+		return v.DecodedPayload == nil
+	case "decoded_payload_warnings":
+		return v.DecodedPayloadWarnings == nil
+	case "f_cnt":
+		return v.FCnt == 0
+	case "f_port":
+		return v.FPort == 0
+	case "frm_payload":
+		return v.FRMPayload == nil
+	case "priority":
+		return v.Priority == 0
+	case "session_key_id":
+		return v.SessionKeyID == nil
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
