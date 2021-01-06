@@ -164,6 +164,8 @@ export default defineMessages({
   fNwkSIntKeyDescription: 'Forwarding network session integrity key',
   frameCounterWidth: 'Frame counter width',
   frequencyPlan: 'Frequency plan',
+  frequencyPlanWarning:
+    'Without choosing a frequency plan, packets from the gateway will not be correctly processed',
   gateway: 'Gateway',
   gatewayDescDescription:
     'Optional gateway description; can also be used to save notes about the gateway',

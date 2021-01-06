@@ -39,7 +39,7 @@ const validationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-  frequency_plan_id: Yup.string(),
+  frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
   gateway_server_address: Yup.string().matches(
     addressRegexp,
     Yup.passValues(sharedMessages.validateAddressFormat),
