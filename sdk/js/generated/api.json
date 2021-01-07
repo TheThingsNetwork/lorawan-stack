@@ -11369,8 +11369,8 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "string.pattern",
-                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                    "name": "string.uri",
+                    "value": true
                   }
                 ]
               }

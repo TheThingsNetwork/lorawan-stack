@@ -927,10 +927,16 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "target_cups_uri":
 
-			if !_Gateway_TargetCUPSURI_Pattern.MatchString(m.GetTargetCUPSURI()) {
+			if uri, err := url.Parse(m.GetTargetCUPSURI()); err != nil {
 				return GatewayValidationError{
 					field:  "target_cups_uri",
-					reason: "value does not match regex pattern \"^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$\"",
+					reason: "value must be a valid URI",
+					cause:  err,
+				}
+			} else if !uri.IsAbs() {
+				return GatewayValidationError{
+					field:  "target_cups_uri",
+					reason: "value must be absolute",
 				}
 			}
 
@@ -1013,8 +1019,6 @@ var _ interface {
 var _Gateway_Attributes_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 var _Gateway_GatewayServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
-
-var _Gateway_TargetCUPSURI_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
 
 // ValidateFields checks the field values on Gateways with the rules defined in
 // the proto definition for this message. If any rules are violated, an error

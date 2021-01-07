@@ -150,7 +150,7 @@ message Gateway {
   GatewayClaimAuthenticationCode claim_authentication_code = 23;
   // CUPS URI for LoRa Basics Station CUPS redirection.
   // The CUPS Trust field will be automatically fetched from the cert chain presented by the target server.
-  string target_cups_uri = 24 [(gogoproto.customname) = "TargetCUPSURI", (validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
+  string target_cups_uri = 24 [(gogoproto.customname) = "TargetCUPSURI", (validate.rules).string.uri = true];
   // CUPS Key for LoRa Basics Station CUPS redirection.
   // If redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance.
   // Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.

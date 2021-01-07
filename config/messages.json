@@ -2627,6 +2627,15 @@
       "file": "server.go"
     }
   },
+  "error:pkg/basicstation/cups:server_trust": {
+    "translations": {
+      "en": "failed to fetch server trust for address `{address}`"
+    },
+    "description": {
+      "package": "pkg/basicstation/cups",
+      "file": "update_info.go"
+    }
+  },
   "error:pkg/basicstation/cups:target_cups_credentials_not_found": {
     "translations": {
       "en": "Target CUPS credentials not found for gateway `{gateway_uid}`"

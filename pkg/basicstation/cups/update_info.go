@@ -54,6 +54,7 @@ var (
 	errInvalidCUPSURI        = errors.DefineInvalidArgument("invalid_cups_uri", "Invalid CUPS URI `{uri}`")
 	errTargetCUPSCredentials = errors.DefineNotFound("target_cups_credentials_not_found", "Target CUPS credentials not found for gateway `{gateway_uid}`")
 	errLNSCredentials        = errors.DefineNotFound("lns_credentials_not_found", "LNS credentials not found for gateway `{gateway_uid}`")
+	errServerTrust           = errors.Define("server_trust", "failed to fetch server trust for address `{address}`")
 )
 
 func getAuthHeader(ctx context.Context) string {
@@ -198,7 +199,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 				md = metadata.Join(ctxMd, md)
 			}
 			ctx = metadata.NewIncomingContext(ctx, md)
-			// This ensures that the newly registered gateway will make a CUPS request to the `gtw.TargetCUPSURI`.
+			// This makes the server return the target CUPS URI and credentials to the gateway.
 			req.CUPSURI = ""
 		} else {
 			return err
@@ -242,14 +243,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	}
 
 	res := UpdateInfoResponse{}
-
-	_, host, port, err := parseAddress("https", req.CUPSURI)
-	if err != nil {
-		return errInvalidCUPSURI.WithAttributes("uri", req.CUPSURI)
-	}
-	cupsAddress := fmt.Sprintf("%s:%s", host, port)
-
-	if s.allowCUPSURIUpdate && gtw.TargetCUPSURI != "" && gtw.TargetCUPSURI != cupsAddress {
+	if s.allowCUPSURIUpdate && gtw.TargetCUPSURI != "" && gtw.TargetCUPSURI != req.CUPSURI {
 		if gtw.TargetCUPSKey.Value == nil {
 			return errTargetCUPSCredentials.New()
 		}
@@ -257,10 +251,9 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		logger.Debug("Configure CUPS")
 		res.CUPSURI = gtw.TargetCUPSURI
 
-		logger.Debug("Get trusted certificate for CUPS")
 		cupsTrust, err := s.getTrust(gtw.TargetCUPSURI)
 		if err != nil {
-			return err
+			return errServerTrust.WithCause(err).WithAttributes("address", gtw.TargetCUPSURI)
 		}
 		cupsCredentials, err := TokenCredentials(cupsTrust, string(gtw.TargetCUPSKey.Value))
 		if err != nil {
@@ -269,9 +262,24 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		if crc32.ChecksumIEEE(cupsCredentials) != req.CUPSCredentialsCRC {
 			res.CUPSCredentials = cupsCredentials
 		}
+	} else if gtw.TargetCUPSKey != nil && gtw.TargetCUPSKey.Value != nil {
+		// Check if CUPS Key needs to be rotated.
+		cupsTrust, err := s.getTrust(req.CUPSURI)
+		if err != nil {
+			return errServerTrust.WithCause(err).WithAttributes("address", req.CUPSURI)
+		}
+		cupsCredentials, err := TokenCredentials(cupsTrust, string(gtw.TargetCUPSKey.Value))
+		if err != nil {
+			return err
+		}
+		if crc32.ChecksumIEEE(cupsCredentials) != req.CUPSCredentialsCRC {
+			logger.Debug("Update CUPS Credentials")
+			res.CUPSCredentials = cupsCredentials
+			res.CUPSURI = req.CUPSURI
+		}
 	} else {
 		logger := logger.WithField("lns_uri", gtw.GatewayServerAddress)
-		logger.Debug("No CUPS redirection set. Configure LNS")
+		logger.Debug("Configure LNS")
 		if gtw.LBSLNSSecret == nil {
 			return errLNSCredentials.WithAttributes("gateway_uid", gtw.GatewayID)
 		}
@@ -292,10 +300,9 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 			res.LNSURI = fmt.Sprintf("%s://%s", scheme, address)
 		}
 
-		logger.Debug("Getting trusted certificate for LNS...")
 		lnsTrust, err := s.getTrust(gtw.GatewayServerAddress)
 		if err != nil {
-			return err
+			return errServerTrust.WithCause(err).WithAttributes("address", gtw.GatewayServerAddress)
 		}
 		lnsCredentials, err := TokenCredentials(lnsTrust, string(gtw.LBSLNSSecret.Value))
 		if err != nil {
