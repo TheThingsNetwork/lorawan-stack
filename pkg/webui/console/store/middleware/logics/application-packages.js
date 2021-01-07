@@ -19,6 +19,7 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import {
   GET_APP_PKG_DEFAULT_ASSOC,
   SET_APP_PKG_DEFAULT_ASSOC,
+  DELETE_APP_PKG_DEFAULT_ASSOC,
 } from '@console/store/actions/application-packages'
 
 const getApplicationPackagesDefaultAssociationLogic = createRequestLogic({
@@ -39,7 +40,18 @@ const setApplicationPackagesDefaultAssociationLogic = createRequestLogic({
   },
 })
 
+const deleteApplicationPackagesDefaultAssociationLogic = createRequestLogic({
+  type: DELETE_APP_PKG_DEFAULT_ASSOC,
+  process: async ({ action }) => {
+    const { appId, fPort } = action.payload
+    await api.application.packages.deleteDefaultAssociation(appId, fPort)
+
+    return { fPort }
+  },
+})
+
 export default [
   getApplicationPackagesDefaultAssociationLogic,
   setApplicationPackagesDefaultAssociationLogic,
+  deleteApplicationPackagesDefaultAssociationLogic,
 ]
