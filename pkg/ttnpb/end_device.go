@@ -1378,6 +1378,9 @@ func (m *UpdateEndDeviceRequest) ValidateContext(context.Context) error {
 
 // FieldIsZero returns whether path p is zero.
 func (m *UpdateEndDeviceRequest) FieldIsZero(p string) bool {
+	if m == nil {
+		return true
+	}
 	return m.EndDevice.FieldIsZero(p)
 }
 
@@ -1394,5 +1397,8 @@ func (m *SetEndDeviceRequest) ValidateContext(context.Context) error {
 
 // FieldIsZero returns whether path p is zero.
 func (m *SetEndDeviceRequest) FieldIsZero(p string) bool {
+	if m == nil {
+		return true
+	}
 	return m.EndDevice.FieldIsZero(p)
 }
