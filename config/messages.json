@@ -6965,6 +6965,15 @@
       "file": "validator.go"
     }
   },
+  "error:pkg/rpcmiddleware/validator:non_zero_path": {
+    "translations": {
+      "en": "path '{path}' is not zero"
+    },
+    "description": {
+      "package": "pkg/rpcmiddleware/validator",
+      "file": "validator.go"
+    }
+  },
   "error:pkg/rpcserver:rpc_recovered": {
     "translations": {
       "en": "Internal Server Error"
