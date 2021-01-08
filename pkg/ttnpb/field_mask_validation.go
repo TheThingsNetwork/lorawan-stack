@@ -925,7 +925,7 @@ func applicationUpFieldMaskPaths() []string {
 	paths = append(paths, FieldsWithPrefix("up.downlink_ack", ApplicationDownlinkFieldPathsNested...)...)
 	paths = append(paths, FieldsWithPrefix("up.downlink_nack", ApplicationDownlinkFieldPathsNested...)...)
 	paths = append(paths, FieldsWithPrefix("up.downlink_sent", ApplicationDownlinkFieldPathsNested...)...)
-	paths = append(paths, FieldsWithPrefix("up.downlink_failed", ApplicationDownlinkFieldPathsNested...)...)
+	paths = append(paths, FieldsWithPrefix("up.downlink_failed", ApplicationDownlinkFailedFieldPathsNested...)...)
 	paths = append(paths, FieldsWithPrefix("up.downlink_queued", ApplicationDownlinkFieldPathsNested...)...)
 	paths = append(paths, FieldsWithPrefix("up.downlink_queue_invalidated", ApplicationInvalidatedDownlinksFieldPathsNested...)...)
 	paths = append(paths, FieldsWithPrefix("up.location_solved", ApplicationLocationFieldPathsNested...)...)
