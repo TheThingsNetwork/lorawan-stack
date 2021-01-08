@@ -645,9 +645,9 @@ macLoop:
 				{
 					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 					Up: &ttnpb.ApplicationUp_DownlinkAck{
-						DownlinkAck: dev.MACState.PendingApplicationDownlink,
+						DownlinkAck: pendingAppDown,
 					},
-					CorrelationIDs: append(dev.MACState.PendingApplicationDownlink.CorrelationIDs, up.CorrelationIDs...),
+					CorrelationIDs: append(pendingAppDown.CorrelationIDs, up.CorrelationIDs...),
 				},
 			}
 		} else {
@@ -655,13 +655,15 @@ macLoop:
 				{
 					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 					Up: &ttnpb.ApplicationUp_DownlinkNack{
-						DownlinkNack: dev.MACState.PendingApplicationDownlink,
+						DownlinkNack: pendingAppDown,
 					},
-					CorrelationIDs: append(dev.MACState.PendingApplicationDownlink.CorrelationIDs, up.CorrelationIDs...),
+					CorrelationIDs: append(pendingAppDown.CorrelationIDs, up.CorrelationIDs...),
 				},
 			}
 		}
-		dev.MACState.PendingApplicationDownlink = nil
+		if dev.MACState != nil {
+			dev.MACState.PendingApplicationDownlink = nil
+		}
 	}
 	return &matchResult{
 		cmacFMatchingResult:      cmacFMatchResult,
