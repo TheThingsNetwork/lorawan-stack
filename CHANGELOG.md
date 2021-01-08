@@ -24,6 +24,7 @@ For details about compatibility between different releases, see the **Commitment
 - Improved Network Server matching performance.
 - Network Server matching mapping in the database.
   - This requires a database migration (`ttn-lw-stack ns-db migrate`).
+- Sending a non-empty implicitly specified field disallowed field will now cause RPCs to fail. E.g. if RPC supports paths `A` and `A.B`, sending value with `A.C` non-empty and field mask `A` would result in an error.
 
 ### Deprecated
 
