@@ -213,7 +213,7 @@ var (
 				return errNoApplicationID
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectEndDeviceListFlags)
-			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.EndDeviceRegistry/List"])
+			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.EndDeviceRegistry/List"].Allowed)
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
