@@ -293,53 +293,6 @@ func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig) 
 	}
 }
 
-// DeviceRepositoryConfig defines the source of the device repository.
-type DeviceRepositoryConfig struct {
-	ConfigSource string            `name:"config-source" description:"Source of the device repository (static, directory, url, blob)"`
-	Static       map[string][]byte `name:"-"`
-	Directory    string            `name:"directory" description:"OS filesystem directory, which contains device repository"`
-	URL          string            `name:"url" description:"URL, which contains device repository"`
-	Blob         BlobPathConfig    `name:"blob"`
-}
-
-// Fetcher returns a fetch.Interface based on the configuration.
-// If no configuration source is set, this method returns nil, nil.
-func (c DeviceRepositoryConfig) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
-	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
-	if c.ConfigSource == "" {
-		switch {
-		case c.Static != nil:
-			c.ConfigSource = "static"
-		case c.Directory != "":
-			if stat, err := os.Stat(c.Directory); err == nil && stat.IsDir() {
-				c.ConfigSource = "directory"
-				break
-			}
-			fallthrough
-		case c.URL != "":
-			c.ConfigSource = "url"
-		case !c.Blob.IsZero():
-			c.ConfigSource = "blob"
-		}
-	}
-	switch c.ConfigSource {
-	case "static":
-		return fetch.NewMemFetcher(c.Static), nil
-	case "directory":
-		return fetch.FromFilesystem(c.Directory), nil
-	case "url":
-		return fetch.FromHTTP(c.URL, true)
-	case "blob":
-		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
-		if err != nil {
-			return nil, err
-		}
-		return fetch.FromBucket(ctx, b, c.Blob.Path), nil
-	default:
-		return nil, nil
-	}
-}
-
 // InteropClient represents the client-side interoperability through LoRaWAN Backend Interfaces configuration.
 type InteropClient struct {
 	ConfigSource string         `name:"config-source" description:"Source of the interoperability client configuration (directory, url, blob)"`

@@ -14,12 +14,21 @@
 
 package devicerepository
 
-import "go.thethings.network/lorawan-stack/v3/pkg/devicerepository"
+import (
+	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository"
+	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store/bleve"
+)
 
 // DefaultDeviceRepositoryConfig is the default configuration for the Device Repository.
 var DefaultDeviceRepositoryConfig = devicerepository.Config{
 	ConfigSource: "url",
-	URL:          "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-devices/master",
+	URL:          "https://github.com/TheThingsNetwork/lorawan-devices/archive",
+
+	Store: devicerepository.StoreConfig{
+		Bleve: bleve.Config{
+			SearchPaths: []string{"device-repository", "/srv/ttn-lorawan/device-repository"},
+		},
+	},
 
 	AssetsBaseURL: "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-devices/master",
 }

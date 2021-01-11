@@ -19,6 +19,9 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store/bleve"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 )
 
 // Config represents the DeviceRepository configuration.
@@ -37,6 +40,8 @@ type Config struct {
 // StoreConfig represents configuration for the Device Repository store.
 type StoreConfig struct {
 	Store store.Store `name:"-"`
+
+	Bleve bleve.Config `name:"bleve"`
 }
 
 // NewStore creates a new Store for end devices.
@@ -44,5 +49,35 @@ func (c Config) NewStore(ctx context.Context, blobConf config.BlobConfig) (store
 	if c.Store.Store != nil {
 		return c.Store.Store, nil
 	}
-	return &store.NoopStore{}, nil
+
+	return c.Store.Bleve.NewStore(ctx)
+}
+
+var errNoFetcherConfig = errors.DefineInvalidArgument("no_fetcher_config", "no fetcher configured for the Device Repository")
+
+// Initialize sets up the Device Repository.
+func (c Config) Initialize(ctx context.Context, blobConf config.BlobConfig, overwrite bool) error {
+	var fetcher fetch.Interface
+	switch c.ConfigSource {
+	case "static":
+		fetcher = fetch.NewMemFetcher(c.Static)
+	case "directory":
+		fetcher = fetch.FromFilesystem(c.Directory)
+	case "url":
+		var err error
+		fetcher, err = fetch.FromHTTP(c.URL, false)
+		if err != nil {
+			return err
+		}
+	case "blob":
+		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
+		if err != nil {
+			return err
+		}
+		fetcher = fetch.FromBucket(ctx, b, c.Blob.Path)
+	default:
+		return errNoFetcherConfig.New()
+	}
+
+	return c.Store.Bleve.Initialize(ctx, fetcher, overwrite)
 }

@@ -1,0 +1,6 @@
+supportsClassB: false
+supportsClassC: true
+macVersion: 1.0.2
+regionalParametersVersion: RP001-1.0.2-RevB
+supportsJoin: true
+classCTimeout: 64

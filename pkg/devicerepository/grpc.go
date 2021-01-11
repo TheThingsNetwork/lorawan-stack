@@ -29,6 +29,8 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+const defaultLimit = 1000
+
 // withDefaultModelFields appends default ttnpb.EndDeviceModel fields.
 func withDefaultModelFields(paths []string) []string {
 	return ttnpb.AddFields(paths, "brand_id", "model_id")
@@ -65,7 +67,7 @@ func (dr *DeviceRepository) ListBrands(ctx context.Context, req *ttnpb.ListEndDe
 	if err := rights.RequireApplication(ctx, req.ApplicationIDs, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
-	if req.Limit == 0 {
+	if req.Limit > defaultLimit || req.Limit == 0 {
 		req.Limit = defaultLimit
 	}
 	response, err := dr.store.GetBrands(store.GetBrandsRequest{
@@ -117,7 +119,7 @@ func (dr *DeviceRepository) ListModels(ctx context.Context, req *ttnpb.ListEndDe
 	if err := rights.RequireApplication(ctx, req.ApplicationIDs, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
-	if req.Limit == 0 {
+	if req.Limit > defaultLimit || req.Limit == 0 {
 		req.Limit = defaultLimit
 	}
 	response, err := dr.store.GetModels(store.GetModelsRequest{
