@@ -16,6 +16,7 @@ import { disableApplicationServer } from '../../../support/utils'
 
 describe('Application create', () => {
   let user
+  const applicationId = 'test-application'
 
   before(() => {
     cy.dropAndSeedDatabase()
@@ -69,6 +70,22 @@ describe('Application create', () => {
       .should('contain.text', 'Application ID is required')
       .and('be.visible')
     cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/applications/add`)
+  })
+
+  it('successfully adds application', () => {
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/applications/add`)
+    cy.findByLabelText('Application ID').type(applicationId)
+
+    cy.findByRole('button', { name: 'Create application' })
+      .should('be.visible')
+      .click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/applications/${applicationId}`,
+    )
   })
 
   describe('when has no Application Server in the local cluster', () => {
