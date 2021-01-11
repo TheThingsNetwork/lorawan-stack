@@ -39,7 +39,7 @@ func (Git) installHook(name string) (err error) {
 	return ioutil.WriteFile(
 		filepath.Join(".git", "hooks", name),
 		[]byte(fmt.Sprintf(
-			`STDIN="$(</dev/stdin)" ARGS="$@" make git.%s`,
+			`STDIN="$(cat /dev/stdin)" ARGS="$@" make git.%s`,
 			name,
 		)),
 		0o755,
