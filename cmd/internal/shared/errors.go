@@ -29,4 +29,5 @@ var (
 	ErrInitializeDeviceTemplateConverter    = errors.Define("initialize_device_template_converter", "could not initialize Device Template Converter")
 	ErrInitializeQRCodeGenerator            = errors.Define("initialize_qr_code_generator", "could not initialize QR Code Generator")
 	ErrInitializePacketBrokerAgent          = errors.Define("initialize_packet_broker_agent", "could not initialize Packet Broker Agent")
+	ErrInitializeDeviceRepository           = errors.Define("initialize_device_repository", "could not initialize Device Repository")
 )

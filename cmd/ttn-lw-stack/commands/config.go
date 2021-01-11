@@ -19,6 +19,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
 	shared_applicationserver "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/applicationserver"
 	shared_console "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/console"
+	shared_devicerepository "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/devicerepository"
 	shared_devicetemplateconverter "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/devicetemplateconverter"
 	shared_gatewayconfigurationserver "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/gatewayconfigurationserver"
 	shared_gatewayserver "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/gatewayserver"
@@ -30,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
 	conf "go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/console"
+	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
@@ -53,22 +55,24 @@ type Config struct {
 	DTC              devicetemplateconverter.Config    `name:"dtc"`
 	QRG              qrcodegenerator.Config            `name:"qrg"`
 	PBA              packetbrokeragent.Config          `name:"pba"`
+	DeviceRepository devicerepository.Config           `name:"device-repository"`
 	OutputFormat     string                            `name:"output-format" yaml:"output-format" description:"Output format"`
 }
 
 // DefaultConfig contains the default config for the ttn-lw-stack binary.
 var DefaultConfig = Config{
-	ServiceBase: shared.DefaultServiceBase,
-	IS:          shared_identityserver.DefaultIdentityServerConfig,
-	GS:          shared_gatewayserver.DefaultGatewayServerConfig,
-	NS:          shared_networkserver.DefaultNetworkServerConfig,
-	AS:          shared_applicationserver.DefaultApplicationServerConfig,
-	JS:          shared_joinserver.DefaultJoinServerConfig,
-	Console:     shared_console.DefaultConsoleConfig,
-	GCS:         shared_gatewayconfigurationserver.DefaultGatewayConfigurationServerConfig,
-	DTC:         shared_devicetemplateconverter.DefaultDeviceTemplateConverterConfig,
-	QRG:         shared_qrcodegenerator.DefaultQRCodeGeneratorConfig,
-	PBA:         shared_packetbrokeragent.DefaultPacketBrokerAgentConfig,
+	ServiceBase:      shared.DefaultServiceBase,
+	IS:               shared_identityserver.DefaultIdentityServerConfig,
+	GS:               shared_gatewayserver.DefaultGatewayServerConfig,
+	NS:               shared_networkserver.DefaultNetworkServerConfig,
+	AS:               shared_applicationserver.DefaultApplicationServerConfig,
+	JS:               shared_joinserver.DefaultJoinServerConfig,
+	Console:          shared_console.DefaultConsoleConfig,
+	GCS:              shared_gatewayconfigurationserver.DefaultGatewayConfigurationServerConfig,
+	DTC:              shared_devicetemplateconverter.DefaultDeviceTemplateConverterConfig,
+	QRG:              shared_qrcodegenerator.DefaultQRCodeGeneratorConfig,
+	PBA:              shared_packetbrokeragent.DefaultPacketBrokerAgentConfig,
+	DeviceRepository: shared_devicerepository.DefaultDeviceRepositoryConfig,
 
 	OutputFormat: "json",
 }

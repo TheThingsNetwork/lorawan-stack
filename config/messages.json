@@ -1124,6 +1124,15 @@
       "file": "errors.go"
     }
   },
+  "error:cmd/internal/shared:initialize_device_repository": {
+    "translations": {
+      "en": "could not initialize Device Repository"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
   "error:cmd/internal/shared:initialize_device_template_converter": {
     "translations": {
       "en": "could not initialize Device Template Converter"
@@ -3030,6 +3039,33 @@
     "description": {
       "package": "pkg/crypto",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/devicerepository/store:not_found": {
+    "translations": {
+      "en": "not found"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store",
+      "file": "noop.go"
+    }
+  },
+  "error:pkg/devicerepository:brand_not_found": {
+    "translations": {
+      "en": "brand `{brand_id}` not found"
+    },
+    "description": {
+      "package": "pkg/devicerepository",
+      "file": "grpc.go"
+    }
+  },
+  "error:pkg/devicerepository:model_not_found": {
+    "translations": {
+      "en": "model `{brand_id}/{model_id}` not found"
+    },
+    "description": {
+      "package": "pkg/devicerepository",
+      "file": "grpc.go"
     }
   },
   "error:pkg/devicetemplateconverter:converter": {
