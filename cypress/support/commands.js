@@ -142,6 +142,21 @@ Cypress.Commands.add('createApiKey', (entity, entityId, apiKey, cb = noop) => {
   })
 })
 
+// Helper function to create a new collaborator programmatically
+Cypress.Commands.add('createCollaborator', (entity, entityId, collaborator) => {
+  const baseUrl = Cypress.config('baseUrl')
+  cy.getAccessToken(accessToken => {
+    cy.request({
+      method: 'PUT',
+      url: `${baseUrl}/api/v3/${entity}/${entityId}/collaborators`,
+      body: collaborator,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+  })
+})
+
 // Helper function to set an application collaborator programmatically.
 Cypress.Commands.add('setApplicationCollaborator', (applicationId, collaboratorId, rights) => {
   const baseUrl = Cypress.config('baseUrl')
