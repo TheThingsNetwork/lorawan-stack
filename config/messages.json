@@ -6967,7 +6967,7 @@
   },
   "error:pkg/rpcmiddleware/validator:non_zero_path": {
     "translations": {
-      "en": "path '{path}' is not zero"
+      "en": "path `{path}` is not zero"
     },
     "description": {
       "package": "pkg/rpcmiddleware/validator",
