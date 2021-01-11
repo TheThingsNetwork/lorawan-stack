@@ -29,8 +29,8 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import style from './offline.styl'
 
 const m = defineMessages({
-  offline: 'The application went offline',
-  online: 'The application is back online',
+  offline: 'The Console went offline',
+  online: 'The Console is back online',
 })
 
 const handleMessage = (message, type) => {
