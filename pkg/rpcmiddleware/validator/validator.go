@@ -32,14 +32,14 @@ import (
 )
 
 var (
-	allowedFieldMaskPaths    = make(map[string]map[string]struct{})
-	disallowedFieldMaskPaths = make(map[string][]string)
+	allowedFieldMaskPaths = make(map[string]map[string]struct{})
+	isZeroFieldMaskPaths  = make(map[string][]string)
 )
 
 // RegisterAllowedFieldMaskPaths registers the allowed field mask paths for an
 // RPC. Note that all allowed paths and sub-paths must be registered.
 // This function is not safe for concurrent use.
-func RegisterAllowedFieldMaskPaths(rpcFullMethod string, allPaths []string, allowedPaths ...string) {
+func RegisterAllowedFieldMaskPaths(rpcFullMethod string, set bool, allPaths []string, allowedPaths ...string) {
 	if !sort.StringsAreSorted(allPaths) {
 		panic(fmt.Sprintf("paths for RPC '%s' are not sorted alphabetically: %v", rpcFullMethod, allPaths))
 	}
@@ -53,17 +53,20 @@ func RegisterAllowedFieldMaskPaths(rpcFullMethod string, allPaths []string, allo
 	for _, p := range allowedPaths {
 		allowed[p] = struct{}{}
 	}
-	disallowed := make([]string, 0, len(allPaths)-len(allowed))
+	allowedFieldMaskPaths[rpcFullMethod] = allowed
+
+	if !set {
+		return
+	}
+	isZeroPaths := make([]string, 0, len(allPaths)-len(allowed))
 	for _, p := range allPaths {
 		_, ok := allowed[p]
 		if ok {
 			continue
 		}
-		disallowed = append(disallowed, p)
+		isZeroPaths = append(isZeroPaths, p)
 	}
-
-	allowedFieldMaskPaths[rpcFullMethod] = allowed
-	disallowedFieldMaskPaths[rpcFullMethod] = disallowed
+	isZeroFieldMaskPaths[rpcFullMethod] = isZeroPaths
 }
 
 var errForbiddenFieldMaskPaths = errors.DefineInvalidArgument("field_mask_paths", "forbidden path(s) in field mask", "forbidden_paths")
@@ -103,33 +106,35 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 			return errForbiddenFieldMaskPaths.WithAttributes("forbidden_paths", forbiddenPaths)
 		}
 
-		disallowedPaths := disallowedFieldMaskPaths[fullMethod]
-		var isZero func(string) bool
-		for _, p := range paths {
-			prefix := p + "."
-			i := sort.Search(len(disallowedPaths), func(i int) bool {
-				return strings.HasPrefix(disallowedPaths[i], prefix)
-			})
-			if i == len(disallowedPaths) || !strings.HasPrefix(disallowedPaths[i], prefix) {
-				continue
-			}
-			tail := disallowedPaths[i+1:]
-			for _, sp := range disallowedPaths[i : i+1+sort.Search(len(tail), func(j int) bool {
-				return !strings.HasPrefix(tail[j], prefix)
-			})] {
-				if isZero == nil {
-					if v, ok := msg.(interface {
-						FieldIsZero(string) bool
-					}); ok {
-						isZero = v.FieldIsZero
-					} else {
-						// TODO: Use reflection to validate a subfield by path
-						break
-					}
+		isZeroPaths, ok := isZeroFieldMaskPaths[fullMethod]
+		if ok && len(isZeroPaths) > 0 {
+			var isZero func(string) bool
+		outer:
+			for _, p := range paths {
+				prefix := p + "."
+				i := sort.Search(len(isZeroPaths), func(i int) bool {
+					return strings.HasPrefix(isZeroPaths[i], prefix)
+				})
+				if i == len(isZeroPaths) || !strings.HasPrefix(isZeroPaths[i], prefix) {
+					continue
 				}
-				if !isZero(sp) {
-					region.End()
-					return errNonZeroPath.WithAttributes("path", sp)
+				tail := isZeroPaths[i+1:]
+				for _, sp := range isZeroPaths[i : i+1+sort.Search(len(tail), func(j int) bool {
+					return !strings.HasPrefix(tail[j], prefix)
+				})] {
+					if isZero == nil {
+						if v, ok := msg.(interface {
+							FieldIsZero(string) bool
+						}); ok {
+							isZero = v.FieldIsZero
+						} else {
+							break outer
+						}
+					}
+					if !isZero(sp) {
+						region.End()
+						return errNonZeroPath.WithAttributes("path", sp)
+					}
 				}
 			}
 		}

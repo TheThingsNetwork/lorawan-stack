@@ -53,7 +53,7 @@ import (
 func init() {
 	grpc.EnableTracing = false
 	for rpc, paths := range ttnpb.RPCFieldMaskPaths {
-		validator.RegisterAllowedFieldMaskPaths(rpc, paths.All, paths.Allowed...)
+		validator.RegisterAllowedFieldMaskPaths(rpc, paths.Set, paths.All, paths.Allowed...)
 	}
 }
 

@@ -92,7 +92,7 @@ func TestUnaryServerInterceptor(t *testing.T) {
 
 	testErr := errors.New("test")
 
-	RegisterAllowedFieldMaskPaths("/ttn.lorawan.v3.Test/Unary", []string{
+	RegisterAllowedFieldMaskPaths("/ttn.lorawan.v3.Test/Unary", true, []string{
 		"foo",
 		"foo.a",
 		"foo.a.a",
@@ -223,7 +223,7 @@ func TestStreamServerInterceptor(t *testing.T) {
 
 	testErr := errors.New("test")
 
-	RegisterAllowedFieldMaskPaths("/ttn.lorawan.v3.Test/Stream", []string{
+	RegisterAllowedFieldMaskPaths("/ttn.lorawan.v3.Test/Stream", true, []string{
 		"foo",
 		"foo.a",
 		"foo.a.a",
