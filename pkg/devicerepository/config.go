@@ -25,10 +25,10 @@ import (
 type Config struct {
 	Store StoreConfig `name:"store"`
 
-	ConfigSource string                `name:"config-source" description:"Source of the device repository (static, directory, url, blob)"`
+	ConfigSource string                `name:"config-source" description:"Source of the Device Repository (static, directory, url, blob)"`
 	Static       map[string][]byte     `name:"-"`
-	Directory    string                `name:"directory" description:"OS filesystem directory, which contains device repository package"`
-	URL          string                `name:"url" description:"URL, which contains device repository package"`
+	Directory    string                `name:"directory" description:"OS filesystem directory, which contains Device Repository package"`
+	URL          string                `name:"url" description:"URL, which contains Device Repository package"`
 	Blob         config.BlobPathConfig `name:"blob"`
 
 	AssetsBaseURL string `name:"assets-base-url" description:"The base URL for assets"`
