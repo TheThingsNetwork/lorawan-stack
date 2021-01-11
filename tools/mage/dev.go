@@ -228,6 +228,9 @@ func (Dev) InitStack() error {
 	if err := runGo("./cmd/ttn-lw-stack", "is-db", "init"); err != nil {
 		return err
 	}
+	if err := runGo("./cmd/ttn-lw-stack", "dr-db", "init"); err != nil {
+		return err
+	}
 	if err := runGo("./cmd/ttn-lw-stack", "is-db", "create-admin-user",
 		"--id", "admin",
 		"--email", "admin@localhost",
