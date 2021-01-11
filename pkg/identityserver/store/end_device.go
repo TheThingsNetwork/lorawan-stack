@@ -40,6 +40,7 @@ type EndDevice struct {
 	ModelID         string `gorm:"type:VARCHAR"`
 	HardwareVersion string `gorm:"type:VARCHAR"`
 	FirmwareVersion string `gorm:"type:VARCHAR"`
+	BandID          string `gorm:"type:VARCHAR"`
 
 	NetworkServerAddress     string `gorm:"type:VARCHAR"`
 	ApplicationServerAddress string `gorm:"type:VARCHAR"`
@@ -77,6 +78,7 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 			ModelID:         dev.ModelID,
 			HardwareVersion: dev.HardwareVersion,
 			FirmwareVersion: dev.FirmwareVersion,
+			BandID:          dev.BandID,
 		}
 	},
 	brandIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
@@ -90,6 +92,9 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 	},
 	firmwareVersionField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		mustEndDeviceVersionIDs(pb).FirmwareVersion = dev.FirmwareVersion
+	},
+	bandIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		mustEndDeviceVersionIDs(pb).BandID = dev.BandID
 	},
 	networkServerAddressField:     func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.NetworkServerAddress = dev.NetworkServerAddress },
 	applicationServerAddressField: func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.ApplicationServerAddress = dev.ApplicationServerAddress },
@@ -119,6 +124,7 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 		dev.ModelID = pb.GetVersionIDs().GetModelID()
 		dev.HardwareVersion = pb.GetVersionIDs().GetHardwareVersion()
 		dev.FirmwareVersion = pb.GetVersionIDs().GetFirmwareVersion()
+		dev.BandID = pb.GetVersionIDs().GetBandID()
 	},
 	brandIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.BrandID = pb.GetVersionIDs().GetBrandID() },
 	modelIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ModelID = pb.GetVersionIDs().GetModelID() },
@@ -128,6 +134,7 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 	firmwareVersionField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.FirmwareVersion = pb.GetVersionIDs().GetFirmwareVersion()
 	},
+	bandIDField:                   func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.BandID = pb.GetVersionIDs().GetBandID() },
 	networkServerAddressField:     func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.NetworkServerAddress = pb.NetworkServerAddress },
 	applicationServerAddressField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ApplicationServerAddress = pb.ApplicationServerAddress },
 	joinServerAddressField:        func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.JoinServerAddress = pb.JoinServerAddress },
@@ -164,9 +171,10 @@ var deviceColumnNames = map[string][]string{
 	attributesField:               {},
 	nameField:                     {nameField},
 	descriptionField:              {descriptionField},
-	versionIDsField:               {"brand_id", "model_id", "hardware_version", "firmware_version"},
+	versionIDsField:               {"brand_id", "model_id", "hardware_version", "firmware_version", "band_id"},
 	brandIDField:                  {"brand_id"},
 	modelIDField:                  {"model_id"},
+	bandIDField:                   {"band_id"},
 	hardwareVersionField:          {"hardware_version"},
 	firmwareVersionField:          {"firmware_version"},
 	networkServerAddressField:     {networkServerAddressField},

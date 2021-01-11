@@ -21,6 +21,7 @@ const (
 	applicationServerAddressField       = "application_server_address"
 	attributesField                     = "attributes"
 	autoUpdateField                     = "auto_update"
+	bandIDField                         = "version_ids.band_id"
 	brandIDField                        = "version_ids.brand_id"
 	claimAuthenticationCodeField        = "claim_authentication_code"
 	contactInfoField                    = "contact_info"
