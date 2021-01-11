@@ -711,6 +711,12 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 
 	// Storage Integration:
 	"/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUp": {All: ApplicationUpFieldPathsNested, Allowed: applicationUpFieldMaskPaths()},
+
+	// Device Repository:
+	"/ttn.lorawan.v3.DeviceRepository/GetBrand":   {All: EndDeviceBrandFieldPathsNested, Allowed: EndDeviceBrandFieldPathsNested},
+	"/ttn.lorawan.v3.DeviceRepository/ListBrands": {All: EndDeviceBrandFieldPathsNested, Allowed: EndDeviceBrandFieldPathsNested},
+	"/ttn.lorawan.v3.DeviceRepository/GetModel":   {All: EndDeviceModelFieldPathsNested, Allowed: EndDeviceModelFieldPathsNested},
+	"/ttn.lorawan.v3.DeviceRepository/ListModels": {All: EndDeviceModelFieldPathsNested, Allowed: EndDeviceModelFieldPathsNested},
 }
 
 func omitFields(fields []string, fieldsToOmit ...string) []string {

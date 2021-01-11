@@ -92,31 +92,8 @@ var MACParametersFieldPathsTopLevel = []string{
 	"rx2_frequency",
 	"uplink_dwell_time",
 }
-var EndDeviceBrandFieldPathsNested = []string{
-	"id",
-	"logos",
-	"name",
-	"url",
-}
-
-var EndDeviceBrandFieldPathsTopLevel = []string{
-	"id",
-	"logos",
-	"name",
-	"url",
-}
-var EndDeviceModelFieldPathsNested = []string{
-	"brand_id",
-	"id",
-	"name",
-}
-
-var EndDeviceModelFieldPathsTopLevel = []string{
-	"brand_id",
-	"id",
-	"name",
-}
 var EndDeviceVersionIdentifiersFieldPathsNested = []string{
+	"band_id",
 	"brand_id",
 	"firmware_version",
 	"hardware_version",
@@ -124,6 +101,7 @@ var EndDeviceVersionIdentifiersFieldPathsNested = []string{
 }
 
 var EndDeviceVersionIdentifiersFieldPathsTopLevel = []string{
+	"band_id",
 	"brand_id",
 	"firmware_version",
 	"hardware_version",
@@ -177,6 +155,7 @@ var EndDeviceVersionFieldPathsNested = []string{
 	"default_mac_settings.use_adr",
 	"frequency_plan_id",
 	"ids",
+	"ids.band_id",
 	"ids.brand_id",
 	"ids.firmware_version",
 	"ids.hardware_version",
@@ -860,6 +839,7 @@ var EndDeviceFieldPathsNested = []string{
 	"updated_at",
 	"used_dev_nonces",
 	"version_ids",
+	"version_ids.band_id",
 	"version_ids.brand_id",
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
@@ -1342,6 +1322,7 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.updated_at",
 	"end_device.used_dev_nonces",
 	"end_device.version_ids",
+	"end_device.version_ids.band_id",
 	"end_device.version_ids.brand_id",
 	"end_device.version_ids.firmware_version",
 	"end_device.version_ids.hardware_version",
@@ -1769,6 +1750,7 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.updated_at",
 	"end_device.used_dev_nonces",
 	"end_device.version_ids",
+	"end_device.version_ids.band_id",
 	"end_device.version_ids.brand_id",
 	"end_device.version_ids.firmware_version",
 	"end_device.version_ids.hardware_version",
@@ -2238,6 +2220,7 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"end_device.updated_at",
 	"end_device.used_dev_nonces",
 	"end_device.version_ids",
+	"end_device.version_ids.band_id",
 	"end_device.version_ids.brand_id",
 	"end_device.version_ids.firmware_version",
 	"end_device.version_ids.hardware_version",
@@ -2682,6 +2665,7 @@ var EndDeviceTemplateFieldPathsNested = []string{
 	"end_device.updated_at",
 	"end_device.used_dev_nonces",
 	"end_device.version_ids",
+	"end_device.version_ids.band_id",
 	"end_device.version_ids.brand_id",
 	"end_device.version_ids.firmware_version",
 	"end_device.version_ids.hardware_version",

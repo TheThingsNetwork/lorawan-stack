@@ -4,6 +4,7 @@ package ttnpb
 
 var EncodeDownlinkMessageRequestFieldPathsNested = []string{
 	"end_device_version_ids",
+	"end_device_version_ids.band_id",
 	"end_device_version_ids.brand_id",
 	"end_device_version_ids.firmware_version",
 	"end_device_version_ids.hardware_version",
@@ -41,6 +42,7 @@ var EncodeDownlinkMessageRequestFieldPathsTopLevel = []string{
 }
 var DecodeUplinkMessageRequestFieldPathsNested = []string{
 	"end_device_version_ids",
+	"end_device_version_ids.band_id",
 	"end_device_version_ids.brand_id",
 	"end_device_version_ids.firmware_version",
 	"end_device_version_ids.hardware_version",
@@ -100,6 +102,7 @@ var DecodeUplinkMessageRequestFieldPathsTopLevel = []string{
 }
 var DecodeDownlinkMessageRequestFieldPathsNested = []string{
 	"end_device_version_ids",
+	"end_device_version_ids.band_id",
 	"end_device_version_ids.brand_id",
 	"end_device_version_ids.firmware_version",
 	"end_device_version_ids.hardware_version",
