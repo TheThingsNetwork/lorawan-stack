@@ -306,16 +306,6 @@ func (dst *EndDeviceModel) SetFields(src *EndDeviceModel, paths ...string) error
 					dst.Photos = nil
 				}
 			}
-		case "video":
-			if len(subs) > 0 {
-				return fmt.Errorf("'video' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Video = src.Video
-			} else {
-				var zero string
-				dst.Video = zero
-			}
 		case "videos":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceModel_Videos

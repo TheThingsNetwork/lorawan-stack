@@ -2155,7 +2155,6 @@ and allows clients to claim end devices.
 | `key_provisioning` | [`KeyProvisioning`](#ttn.lorawan.v3.KeyProvisioning) | repeated | Supported key provisioning methods. |
 | `key_security` | [`KeySecurity`](#ttn.lorawan.v3.KeySecurity) |  | Device key security. |
 | `photos` | [`EndDeviceModel.Photos`](#ttn.lorawan.v3.EndDeviceModel.Photos) |  | Device photos. |
-| `video` | [`string`](#string) |  | Device video. |
 | `videos` | [`EndDeviceModel.Videos`](#ttn.lorawan.v3.EndDeviceModel.Videos) |  | Device videos. |
 | `product_url` | [`string`](#string) |  | Device information page URL. |
 | `datasheet_url` | [`string`](#string) |  | Device datasheet URL. |

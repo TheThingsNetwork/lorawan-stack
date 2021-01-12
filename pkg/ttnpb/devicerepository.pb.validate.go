@@ -255,8 +255,6 @@ func (m *EndDeviceModel) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "video":
-			// no validation rules for Video
 		case "videos":
 
 			if v, ok := interface{}(m.GetVideos()).(interface{ ValidateFields(...string) error }); ok {

@@ -11966,10 +11966,6 @@
           "$ref": "#/definitions/EndDeviceModelPhotos",
           "description": "Device photos."
         },
-        "video": {
-          "type": "string",
-          "description": "Device video."
-        },
         "videos": {
           "$ref": "#/definitions/EndDeviceModelVideos",
           "description": "Device videos."

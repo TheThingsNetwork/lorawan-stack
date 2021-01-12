@@ -59,7 +59,6 @@ var EndDeviceModelFieldPathsNested = []string{
 	"product_url",
 	"resellers",
 	"sensors",
-	"video",
 	"videos",
 	"videos.main",
 	"videos.other",
@@ -86,7 +85,6 @@ var EndDeviceModelFieldPathsTopLevel = []string{
 	"product_url",
 	"resellers",
 	"sensors",
-	"video",
 	"videos",
 	"weight",
 }

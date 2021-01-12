@@ -7502,16 +7502,6 @@
               "defaultValue": ""
             },
             {
-              "name": "video",
-              "description": "Device video.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
               "name": "videos",
               "description": "Device videos.",
               "label": "",
