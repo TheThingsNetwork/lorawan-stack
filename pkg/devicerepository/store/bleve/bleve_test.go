@@ -182,14 +182,6 @@ func TestBleve(t *testing.T) {
 				result: brandsResponse("foo-vendor", "full-vendor"),
 			},
 			{
-				name: "SearchByRegion",
-				request: store.GetBrandsRequest{
-					Search: "EU_433",
-					Paths:  []string{"brand_id"},
-				},
-				result: brandsResponse("foo-vendor"),
-			},
-			{
 				name: "SearchByPartNumber",
 				request: store.GetBrandsRequest{
 					Search: "P4RTN0",
@@ -348,14 +340,6 @@ func TestBleve(t *testing.T) {
 					Paths:   []string{"model_id"},
 				},
 				result: modelsResponse("dev2", "full-device"),
-			},
-			{
-				name: "SearchByRegion",
-				request: store.GetModelsRequest{
-					Search: "EU_433",
-					Paths:  []string{"model_id"},
-				},
-				result: modelsResponse("dev2"),
 			},
 			{
 				name: "SearchByPartNumber",

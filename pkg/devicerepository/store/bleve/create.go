@@ -32,30 +32,31 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-type indexableBrand struct {
-	BrandPB  string // *ttnpb.EndDeviceBrand marshaled into JSON string
-	ModelsPB string // []*ttnpb.EndDeviceModel marshaled into JSON string
+const (
+	indexPath         = "index.bleve"
+	brandDocumentType = "brand"
+	modelDocumentType = "model"
+)
 
-	// Stored in separate fields to support ordering search results
-	BrandID   string
-	BrandName string
+type indexableBrand struct {
+	Brand  *ttnpb.EndDeviceBrand
+	Models []*ttnpb.EndDeviceModel
+
+	BrandJSON          string // *ttnpb.EndDeviceBrand marshaled into string
+	BrandID, BrandName string // stored separately to support queries
+
+	Type string // Index document type, always brandDocumentType
 }
 
 type indexableModel struct {
-	BrandPB string // *ttnpb.EndDeviceBrand marshaled into JSON string
-	ModelPB string // *ttnpb.EndDeviceModel marshaled into JSON string
+	Brand *ttnpb.EndDeviceBrand
+	Model *ttnpb.EndDeviceModel
 
-	// Stored in separate fields to support ordering search results
-	BrandID   string
-	BrandName string
-	ModelID   string
-	ModelName string
+	ModelJSON        string // *ttnpb.EndDeviceModel marshaled into string.
+	BrandID, ModelID string // stored separately to support queries.
+
+	Type string // Index document type, always modelDocumentType
 }
-
-const (
-	brandsIndexPath = "brandsIndex.bleve"
-	modelsIndexPath = "modelsIndex.bleve"
-)
 
 func newIndex(path string, overwrite bool, keywords ...string) (bleve.Index, error) {
 	mapping := bleve.NewIndexMapping()
@@ -112,16 +113,11 @@ func (c Config) Initialize(ctx context.Context, fetcher fetch.Interface, overwri
 		return err
 	}
 	s := remote.NewRemoteStore(fetch.FromFilesystem(wd))
-	brandsIndex, err := newIndex(path.Join(wd, brandsIndexPath), overwrite, "BrandID")
+	index, err := newIndex(path.Join(wd, indexPath), overwrite, "BrandID", "ModelID", "Type")
 	if err != nil {
 		return err
 	}
-	defer brandsIndex.Close()
-	modelsIndex, err := newIndex(path.Join(wd, modelsIndexPath), overwrite, "BrandID", "ModelID")
-	if err != nil {
-		return err
-	}
-	defer modelsIndex.Close()
+	defer index.Close()
 
 	brands, err := s.GetBrands(store.GetBrandsRequest{
 		Paths: ttnpb.EndDeviceBrandFieldPathsNested,
@@ -130,8 +126,7 @@ func (c Config) Initialize(ctx context.Context, fetcher fetch.Interface, overwri
 		return err
 	}
 
-	brandsBatch := brandsIndex.NewBatch()
-	modelsBatch := modelsIndex.NewBatch()
+	batch := index.NewBatch()
 	for _, brand := range brands.Brands {
 		models, err := s.GetModels(store.GetModelsRequest{
 			Paths:   ttnpb.EndDeviceModelFieldPathsNested,
@@ -145,45 +140,36 @@ func (c Config) Initialize(ctx context.Context, fetcher fetch.Interface, overwri
 				return err
 			}
 		}
-		brandPB, err := jsonpb.TTN().Marshal(brand)
+		brandJSON, err := jsonpb.TTN().Marshal(brand)
 		if err != nil {
 			return err
 		}
-		modelsPB, err := jsonpb.TTN().Marshal(models.Models)
-		if err != nil {
-			return err
-		}
-		if err := brandsBatch.Index(brand.BrandID, indexableBrand{
-			BrandPB:   string(brandPB),
-			ModelsPB:  string(modelsPB),
+		if err := batch.Index(brand.BrandID, indexableBrand{
+			Type:      brandDocumentType,
+			BrandJSON: string(brandJSON),
+			Brand:     brand,
+			Models:    models.Models,
 			BrandID:   brand.BrandID,
 			BrandName: brand.Name,
 		}); err != nil {
 			return err
 		}
 		for _, model := range models.Models {
-			modelPB, err := jsonpb.TTN().Marshal(model)
+			modelJSON, err := jsonpb.TTN().Marshal(model)
 			if err != nil {
 				return err
 			}
-			if err := modelsBatch.Index(fmt.Sprintf("%s/%s", brand.BrandID, model.ModelID), indexableModel{
-				BrandPB:   string(brandPB),
-				ModelPB:   string(modelPB),
-				BrandID:   brand.BrandID,
-				BrandName: brand.Name,
+			if err := batch.Index(fmt.Sprintf("%s:%s", model.BrandID, model.ModelID), indexableModel{
+				Type:      modelDocumentType,
+				ModelJSON: string(modelJSON),
+				Brand:     brand,
+				Model:     model,
+				BrandID:   model.BrandID,
 				ModelID:   model.ModelID,
-				ModelName: model.Name,
 			}); err != nil {
 				return err
 			}
 		}
 	}
-	if err := brandsIndex.Batch(brandsBatch); err != nil {
-		return err
-	}
-	if err := modelsIndex.Batch(modelsBatch); err != nil {
-		return err
-	}
-
-	return nil
+	return index.Batch(batch)
 }

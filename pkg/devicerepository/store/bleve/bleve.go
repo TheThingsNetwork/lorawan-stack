@@ -36,9 +36,7 @@ type bleveStore struct {
 	ctx context.Context
 
 	store store.Store
-
-	brandsIndex bleve.Index
-	modelsIndex bleve.Index
+	index bleve.Index
 }
 
 // NewStore returns a new Device Repository store with indexing capabilities (using bleve).
@@ -54,13 +52,7 @@ func (c Config) NewStore(ctx context.Context) (store.Store, error) {
 
 	ctx, cancel := context.WithTimeout(s.ctx, defaultTimeout)
 	defer cancel()
-	s.brandsIndex, err = openIndex(ctx, path.Join(wd, brandsIndexPath))
-	if err != nil {
-		return nil, err
-	}
-	ctx, cancel = context.WithTimeout(s.ctx, defaultTimeout)
-	defer cancel()
-	s.modelsIndex, err = openIndex(ctx, path.Join(wd, modelsIndexPath))
+	s.index, err = openIndex(ctx, path.Join(wd, indexPath))
 	if err != nil {
 		return nil, err
 	}

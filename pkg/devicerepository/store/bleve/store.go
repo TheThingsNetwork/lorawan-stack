@@ -29,9 +29,10 @@ var (
 
 // GetBrands lists available end device vendors.
 func (s *bleveStore) GetBrands(req store.GetBrandsRequest) (*store.GetBrandsResponse, error) {
-	queries := []query.Query{
-		bleve.NewMatchAllQuery(),
-	}
+	documentTypeQuery := bleve.NewTermQuery(brandDocumentType)
+	documentTypeQuery.SetField("Type")
+	queries := []query.Query{documentTypeQuery}
+
 	if q := req.Search; q != "" {
 		queries = append(queries, bleve.NewQueryStringQuery(q))
 	}
@@ -50,7 +51,7 @@ func (s *bleveStore) GetBrands(req store.GetBrandsRequest) (*store.GetBrandsResp
 	}
 	searchRequest.From = int((req.Page - 1) * req.Limit)
 
-	searchRequest.Fields = []string{"BrandPB"}
+	searchRequest.Fields = []string{"BrandJSON"}
 	switch req.OrderBy {
 	case "brand_id":
 		searchRequest.SortBy([]string{"BrandID"})
@@ -62,7 +63,7 @@ func (s *bleveStore) GetBrands(req store.GetBrandsRequest) (*store.GetBrandsResp
 		searchRequest.SortBy([]string{"-BrandName"})
 	}
 
-	result, err := s.brandsIndex.Search(searchRequest)
+	result, err := s.index.Search(searchRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -93,9 +94,10 @@ func (s *bleveStore) GetBrands(req store.GetBrandsRequest) (*store.GetBrandsResp
 
 // GetModels lists available end device definitions.
 func (s *bleveStore) GetModels(req store.GetModelsRequest) (*store.GetModelsResponse, error) {
-	queries := []query.Query{
-		bleve.NewMatchAllQuery(),
-	}
+	documentTypeQuery := bleve.NewTermQuery(modelDocumentType)
+	documentTypeQuery.SetField("Type")
+	queries := []query.Query{documentTypeQuery}
+
 	if q := req.Search; q != "" {
 		queries = append(queries, bleve.NewQueryStringQuery(q))
 	}
@@ -118,7 +120,8 @@ func (s *bleveStore) GetModels(req store.GetModelsRequest) (*store.GetModelsResp
 		req.Page = 1
 	}
 	searchRequest.From = int((req.Page - 1) * req.Limit)
-	searchRequest.Fields = []string{"ModelPB"}
+	searchRequest.Fields = []string{"ModelJSON"}
+
 	switch req.OrderBy {
 	case "brand_id":
 		searchRequest.SortBy([]string{"BrandID"})
@@ -130,7 +133,7 @@ func (s *bleveStore) GetModels(req store.GetModelsRequest) (*store.GetModelsResp
 		searchRequest.SortBy([]string{"-ModelID"})
 	}
 
-	result, err := s.modelsIndex.Search(searchRequest)
+	result, err := s.index.Search(searchRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -181,11 +184,5 @@ func (s *bleveStore) GetDownlinkEncoder(ids *ttnpb.EndDeviceVersionIdentifiers) 
 
 // Close closes the store.
 func (s *bleveStore) Close() error {
-	if err := s.brandsIndex.Close(); err != nil {
-		return err
-	}
-	if err := s.modelsIndex.Close(); err != nil {
-		return err
-	}
-	return nil
+	return s.index.Close()
 }
