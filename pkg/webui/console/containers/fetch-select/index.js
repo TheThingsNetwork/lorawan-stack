@@ -35,11 +35,12 @@ export default function({
   defaultTitle,
   optionsFormatter = formatOptions,
   defaultDescription,
+  additionalOptions = [],
 }) {
   @storeConnect(
     function(state) {
       return {
-        options: optionsFormatter(optionsSelector(state)),
+        options: [...additionalOptions, ...optionsFormatter(optionsSelector(state))],
         error: errorSelector(state),
         fetching: fetchingSelector(state),
       }
@@ -50,6 +51,7 @@ export default function({
     static propTypes = {
       ...fieldPropTypes,
       ...Select.propTypes,
+      defaultWarning: PropTypes.message,
       description: PropTypes.message,
       fetchOptions: PropTypes.func.isRequired,
       menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
@@ -67,7 +69,8 @@ export default function({
       onChange: () => null,
       options: [],
       title: defaultTitle,
-      warning: defaultWarning,
+      warning: undefined,
+      defaultWarning,
     }
 
     componentDidMount() {
@@ -84,14 +87,14 @@ export default function({
     }
 
     render() {
-      const { error, fetching, warning, ...rest } = this.props
+      const { error, fetching, warning, defaultWarning, ...rest } = this.props
 
       return (
         <Field
           {...rest}
           component={Select}
           isLoading={fetching}
-          warning={Boolean(error) ? warning : undefined}
+          warning={Boolean(error) ? defaultWarning : warning}
           onChange={this.handleChange}
         />
       )

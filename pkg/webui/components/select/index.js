@@ -107,7 +107,7 @@ class Select extends React.PureComponent {
       await this.setState({ value })
     }
 
-    onChange(value)
+    onChange(value, true)
   }
 
   @bind

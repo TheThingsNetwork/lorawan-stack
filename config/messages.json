@@ -2015,6 +2015,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/applicationserver/io/web:decode_body": {
+    "translations": {
+      "en": "decode body"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "webhooks.go"
+    }
+  },
   "error:pkg/applicationserver/io/web:fetch": {
     "translations": {
       "en": "fetching failed"
@@ -2045,6 +2054,15 @@
   "error:pkg/applicationserver/io/web:queue_full": {
     "translations": {
       "en": "the queue is full"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "webhooks.go"
+    }
+  },
+  "error:pkg/applicationserver/io/web:read_body": {
+    "translations": {
+      "en": "read body"
     },
     "description": {
       "package": "pkg/applicationserver/io/web",

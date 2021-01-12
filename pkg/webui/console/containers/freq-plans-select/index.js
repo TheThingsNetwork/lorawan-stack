@@ -29,6 +29,7 @@ const m = defineMessages({
   title: 'Frequency plan',
   warning: 'Frequency plans unavailable',
   description: 'The frequency plan used by the end device',
+  none: 'Do not set a frequency plan',
 })
 
 const formatOptions = plans => plans.map(plan => ({ value: plan.id, label: plan.name }))
@@ -43,6 +44,7 @@ const CreateFrequencyPlansSelector = source =>
     defaultTitle: m.title,
     optionsFormatter: formatOptions,
     defaultDescription: m.description,
+    additionalOptions: source === 'gs' ? [{ value: 'no-frequency-plan', label: m.none }] : [],
   })
 
 export const GsFrequencyPlansSelect = CreateFrequencyPlansSelector('gs')
