@@ -201,7 +201,8 @@ func (g Git) prePush(stdin string, args ...string) error {
 		fmt.Println("Running pre-push hook")
 	}
 	if stdin == "" {
-		return errors.New("standard input is empty")
+		fmt.Println("Standard input is empty, skip pre-push hook")
+		return nil
 	}
 	var (
 		ref  string
