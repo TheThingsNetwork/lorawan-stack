@@ -14,6 +14,7 @@
 
 import originalPropTypes from 'prop-types'
 
+import ONLINE_STATUS from '@ttn-lw/constants/online-status'
 import { components } from '@ttn-lw/constants/components'
 
 const PropTypes = { ...originalPropTypes }
@@ -66,6 +67,8 @@ PropTypes.link = PropTypes.shape({
 })
 
 PropTypes.inputWidth = PropTypes.oneOf(['xxs', 'xs', 's', 'm', 'l', 'full'])
+
+PropTypes.onlineStatus = PropTypes.oneOf(Object.values(ONLINE_STATUS))
 
 // Entities and entity-related prop-types.
 

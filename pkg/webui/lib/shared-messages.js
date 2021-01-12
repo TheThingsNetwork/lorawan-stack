@@ -105,6 +105,7 @@ export default defineMessages({
   confirmPassword: 'Confirm password',
   connected: 'Connected',
   connecting: 'Connecting',
+  connectionIssues: 'Connection issues',
   createApiKey: 'Create API key',
   created: 'Created',
   createdAt: 'Created at',

@@ -43,7 +43,7 @@ import FullViewError, { FullViewErrorInner } from '@console/views/error'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import dev from '@ttn-lw/lib/dev'
 
-import { setConnectionStatus } from '@console/store/actions/status'
+import { setStatusOnline } from '@console/store/actions/status'
 
 import {
   selectUser,
@@ -52,7 +52,7 @@ import {
   selectUserRights,
   selectUserIsAdmin,
 } from '@console/store/selectors/user'
-import { selectConnectionStatus } from '@console/store/selectors/status'
+import { selectOnlineStatus } from '@console/store/selectors/status'
 
 import style from './app.styl'
 
@@ -66,10 +66,10 @@ const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
     error: selectUserError(state),
     rights: selectUserRights(state),
     isAdmin: selectUserIsAdmin(state),
-    isOnline: selectConnectionStatus(state),
+    onlineStatus: selectOnlineStatus(state),
   }),
   {
-    setConnectionStatus,
+    setStatusOnline,
   },
 )
 @(Component => (dev ? hot(Component) : Component))
@@ -83,9 +83,9 @@ class ConsoleApp extends React.PureComponent {
       replace: PropTypes.func,
     }).isRequired,
     isAdmin: PropTypes.bool,
-    isOnline: PropTypes.bool.isRequired,
+    onlineStatus: PropTypes.onlineStatus.isRequired,
     rights: PropTypes.rights,
-    setConnectionStatus: PropTypes.func.isRequired,
+    setStatusOnline: PropTypes.func.isRequired,
     user: PropTypes.user,
   }
   static defaultProps = {
@@ -97,9 +97,9 @@ class ConsoleApp extends React.PureComponent {
 
   @bind
   handleConnectionStatusChange({ type }) {
-    const { setConnectionStatus } = this.props
+    const { setStatusOnline } = this.props
 
-    setConnectionStatus(type === 'online')
+    setStatusOnline(type === 'online')
   }
 
   componentDidMount() {
@@ -119,7 +119,7 @@ class ConsoleApp extends React.PureComponent {
       error,
       rights,
       isAdmin,
-      isOnline,
+      onlineStatus,
       history,
       env: {
         siteTitle,
@@ -177,7 +177,11 @@ class ConsoleApp extends React.PureComponent {
                   </div>
                 </WithAuth>
               </main>
-              <Footer className={style.footer} supportLink={supportLink} isOnline={isOnline} />
+              <Footer
+                className={style.footer}
+                supportLink={supportLink}
+                onlineStatus={onlineStatus}
+              />
             </div>
           </ErrorView>
         </ConnectedRouter>

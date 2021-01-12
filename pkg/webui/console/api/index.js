@@ -67,6 +67,9 @@ const tts = new TTS({
   stackConfig: stack,
   connectionType: 'http',
   proxy: false,
+  axiosConfig: {
+    timeout: 10000,
+  },
 })
 
 // Forward header warnings to the toast message queue.

@@ -12,11 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { connect } from 'react-redux'
-
-import { selectOnlineStatus } from '@console/store/selectors/status'
-
-export default ErrorView =>
-  connect(state => ({
-    onlineStatus: selectOnlineStatus(state),
-  }))(ErrorView)
+export default Object.freeze({
+  ONLINE: 'online',
+  OFFLINE: 'offline',
+  CHECKING: 'checking',
+})

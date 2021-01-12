@@ -23,6 +23,7 @@ import OfflineStatus from '@ttn-lw/components/offline-status'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './footer.styl'
 
@@ -31,44 +32,40 @@ const m = defineMessages({
   getSupport: 'Get support',
 })
 
-const Footer = function({ className, links, supportLink, isOnline }) {
-  return (
-    <footer className={classnames(className, style.footer)}>
-      <div>
-        <span className={style.claim}>
-          <Message content={m.footer} /> –{' '}
-        </span>
-        <Link.Anchor secondary className={style.link} href="https://www.thethingsnetwork.org">
-          The Things Network
+const Footer = ({ className, links, supportLink, onlineStatus }) => (
+  <footer className={classnames(className, style.footer)}>
+    <div>
+      <span className={style.claim}>
+        <Message content={m.footer} /> –{' '}
+      </span>
+      <Link.Anchor secondary className={style.link} href="https://www.thethingsnetwork.org">
+        The Things Network
+      </Link.Anchor>
+    </div>
+    <div className={style.right}>
+      {links.map((item, key) => (
+        <Link.Anchor secondary key={key} className={style.link} href={item.link}>
+          <Message content={item.title} />
         </Link.Anchor>
-      </div>
-      <div className={style.right}>
-        {links.map((item, key) => (
-          <Link.Anchor secondary key={key} className={style.link} href={item.link}>
-            <Message content={item.title} />
-          </Link.Anchor>
-        ))}
-        <OfflineStatus isOnline={isOnline} showOfflineOnly showWarnings />
-        <span className={style.version}>v{process.env.VERSION}</span>
-        {supportLink && (
-          <Button.AnchorLink
-            message={m.getSupport}
-            icon="contact_support"
-            href={supportLink}
-            target="_blank"
-            secondary
-          />
-        )}
-      </div>
-    </footer>
-  )
-}
+      ))}
+      <OfflineStatus onlineStatus={onlineStatus} showOfflineOnly showWarnings />
+      <span className={style.version}>v{process.env.VERSION}</span>
+      {supportLink && (
+        <Button.AnchorLink
+          message={sharedMessages.getSupport}
+          icon="contact_support"
+          href={supportLink}
+          target="_blank"
+          secondary
+        />
+      )}
+    </div>
+  </footer>
+)
 
 Footer.propTypes = {
   /** The classname to be applied to the footer. */
   className: PropTypes.string,
-  /** A flag specifying whether the application is connected to the internet. */
-  isOnline: PropTypes.bool.isRequired,
   /**
    * A list of links to be displayed in the footer component.
    *
@@ -81,6 +78,8 @@ Footer.propTypes = {
       link: PropTypes.string.isRequired,
     }),
   ),
+  /** A flag specifying whether the application is connected to the internet. */
+  onlineStatus: PropTypes.onlineStatus.isRequired,
   /** Optional link for a support button. */
   supportLink: PropTypes.string,
 }

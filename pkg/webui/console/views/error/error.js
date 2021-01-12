@@ -92,14 +92,14 @@ const FullViewErrorInner = ({ error, env }) => {
 
 const FullViewErrorInnerWithEnv = withEnv(FullViewErrorInner)
 
-const FullViewError = ({ error, isOnline }) => {
+const FullViewError = ({ error, onlineStatus }) => {
   return (
     <div className={style.wrapper}>
       <Header className={style.header} anchored />
       <div className={style.flexWrapper}>
         <FullViewErrorInnerWithEnv error={error} />
       </div>
-      <Footer isOnline={isOnline} />
+      <Footer onlineStatus={onlineStatus} />
     </div>
   )
 }
@@ -111,7 +111,7 @@ FullViewErrorInner.propTypes = {
 
 FullViewError.propTypes = {
   error: PropTypes.error.isRequired,
-  isOnline: PropTypes.bool.isRequired,
+  onlineStatus: PropTypes.onlineStatus.isRequired,
 }
 
 FullViewErrorInner.defaultProps = {

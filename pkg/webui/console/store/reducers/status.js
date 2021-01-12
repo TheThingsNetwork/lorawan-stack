@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import ONLINE_STATUS from '@ttn-lw/constants/online-status'
+
 import { SET_CONNECTION_STATUS } from '@console/store/actions/status'
 
 const defaultState = {
-  isOnline: true,
+  onlineStatus: ONLINE_STATUS.ONLINE,
 }
 
-const status = function(state = defaultState, { type, payload }) {
+const status = (state = defaultState, { type, payload }) => {
   switch (type) {
     case SET_CONNECTION_STATUS:
       return {
         ...state,
-        isOnline: payload.isOnline,
+        onlineStatus: payload.onlineStatus,
       }
     default:
       return state

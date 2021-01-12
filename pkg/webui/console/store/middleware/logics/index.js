@@ -27,8 +27,10 @@ import webhooks from './webhooks'
 import pubsubs from './pubsubs'
 import applicationPackages from './application-packages'
 import is from './identity-server'
+import status from './status'
 
 export default [
+  ...status,
   ...user,
   ...users,
   ...init,

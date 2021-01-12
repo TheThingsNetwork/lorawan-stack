@@ -14,6 +14,7 @@
 
 import { createLogic } from 'redux-logic'
 import * as Sentry from '@sentry/browser'
+import { defineMessages } from 'react-intl'
 
 import { error } from '@ttn-lw/lib/log'
 import {
@@ -21,20 +22,33 @@ import {
   isInvalidArgumentError,
   getBackendErrorId,
   isUnknown,
+  isNetworkError,
+  isTimeoutError,
+  createFrontendError,
 } from '@ttn-lw/lib/errors/utils'
 
 import { clear as clearAccessToken } from '@console/lib/access-token'
 
-const getResultActionFromType = function(typeString, status) {
-  if (typeString instanceof Array) {
-    if (typeString.length === 1) {
-      return typeString[0].replace('REQUEST', status)
-    }
+import {
+  setStatusChecking,
+  ATTEMPT_RECONNECT,
+  attemptReconnect,
+} from '@console/store/actions/status'
+import { getResultActionFromType } from '@console/store/actions/lib'
 
-    return undefined
-  }
-  return typeString.replace('REQUEST', status)
-}
+import { selectIsCheckingStatus, selectIsOnlineStatus } from '@console/store/selectors/status'
+
+const m = defineMessages({
+  applicationIsOfflineTitle: 'The application is offline',
+  applicationIsOfflineMessage:
+    'The action cannot be performed because the application is currently offline or has connection issues. Please check your internet connection and try again.',
+})
+
+const offlineError = createFrontendError(
+  m.applicationIsOfflineTitle,
+  m.applicationIsOfflineMessage,
+  'request_denied_application_is_offline',
+)
 
 /**
  * Logic creator for request logics, it will handle promise resolution, as well
@@ -45,11 +59,11 @@ const getResultActionFromType = function(typeString, status) {
  * @param {(string|Function)} failType - The fail action type or action creator.
  * @returns {object} The `redux-logic` (decorated) logic.
  */
-const createRequestLogic = function(
+const createRequestLogic = (
   options,
   successType = getResultActionFromType(options.type, 'SUCCESS'),
   failType = getResultActionFromType(options.type, 'FAILURE'),
-) {
+) => {
   if (!successType || !failType) {
     throw new Error('Could not derive result actions from provided options')
   }
@@ -66,8 +80,27 @@ const createRequestLogic = function(
 
   return createLogic({
     ...options,
-    async process(deps, dispatch, done) {
-      const promiseAttached = deps.action.meta && deps.action.meta._attachPromise
+    process: async (deps, dispatch, done) => {
+      const { action, getState } = deps
+      const promiseAttached = action.meta && action.meta._attachPromise
+
+      if (!selectIsOnlineStatus(getState())) {
+        // If the application is currently (deemed) offline, skip making the
+        // (ill-fated) request and handle the request as failed.
+        if (promiseAttached) {
+          const {
+            meta: { _reject },
+          } = action
+          _reject(offlineError)
+        }
+
+        dispatch(failAction(offlineError))
+
+        // Additionally issue a reconnect attempt immediately.
+        dispatch(attemptReconnect())
+
+        return done()
+      }
 
       try {
         const res = await options.process(deps, dispatch)
@@ -79,41 +112,47 @@ const createRequestLogic = function(
         if (promiseAttached) {
           const {
             meta: { _resolve },
-          } = deps.action
+          } = action
           _resolve(res)
         }
       } catch (e) {
         error(e) // Log the error if in development mode.
-
         if (isUnauthenticatedError(e)) {
           // If there was an unauthenticated error, the access token is not
           // valid and we can delete it. Reloading will then initiate the auth
           // flow.
           clearAccessToken()
           window.location.reload()
-        } else {
-          // Otherwise, dispatch the fail action and report it to Sentry.
-          if (isInvalidArgumentError(e)) {
-            Sentry.withScope(scope => {
-              scope.setExtras(e)
-              const fingerprint = getBackendErrorId(e)
-              scope.setFingerprint(fingerprint)
-              Sentry.captureException(new Error(fingerprint))
-            })
-          } else if (isUnknown(e)) {
-            Sentry.withScope(scope => {
-              scope.setExtras(e)
-              Sentry.captureException(e)
-            })
+        } else if (isNetworkError(e) || isTimeoutError(e)) {
+          // If there was a network error, it could mean that the network
+          // connection is currently interrupted. Setting the online state to
+          // `checking` will trigger respective connection management logics.
+          if (!selectIsCheckingStatus(getState()) && action.type !== ATTEMPT_RECONNECT) {
+            // We only need to set the status and trigger the connection checks
+            // if the online status was `online` previously.
+            dispatch(setStatusChecking())
           }
-          dispatch(failAction(e))
+        } else if (isInvalidArgumentError(e)) {
+          // Any other errors are logged to Sentry.
+          Sentry.withScope(scope => {
+            scope.setExtras(e)
+            const fingerprint = getBackendErrorId(e)
+            scope.setFingerprint(fingerprint)
+            Sentry.captureException(new Error(fingerprint))
+          })
+        } else if (isUnknown(e)) {
+          Sentry.withScope(scope => {
+            scope.setExtras(e)
+            Sentry.captureException(e)
+          })
         }
 
-        // If we have a promise attached, reject it.
+        // Dispatch the failure action and reject the promise, if attached.
+        dispatch(failAction(e))
         if (promiseAttached) {
           const {
             meta: { _reject },
-          } = deps.action
+          } = action
           _reject(e)
         }
       }
