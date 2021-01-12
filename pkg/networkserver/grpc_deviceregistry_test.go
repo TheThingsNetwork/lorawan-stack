@@ -1964,7 +1964,6 @@ func TestDeviceRegistryReset(t *testing.T) {
 				Paths: []string{
 					"battery_percentage",
 					"session.last_f_cnt_up",
-					"session.queued_application_downlinks",
 				},
 				RequiredRights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_DEVICES_READ,
