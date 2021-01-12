@@ -342,7 +342,11 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	return req, nil
 }
 
-var errWebhookNotFound = errors.DefineNotFound("webhook_not_found", "webhook not found")
+var (
+	errWebhookNotFound = errors.DefineNotFound("webhook_not_found", "webhook not found")
+	errReadBody        = errors.DefineCanceled("read_body", "read body")
+	errDecodeBody      = errors.DefineInvalidArgument("decode_body", "decode body")
+)
 
 func (w *webhooks) handleDown(op func(io.Server, context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
@@ -371,12 +375,12 @@ func (w *webhooks) handleDown(op func(io.Server, context.Context, ttnpb.EndDevic
 		}
 		body, err := ioutil.ReadAll(req.Body)
 		if err != nil {
-			webhandlers.Error(res, req, err)
+			webhandlers.Error(res, req, errReadBody.WithCause(err))
 			return
 		}
 		items, err := format.ToDownlinks(body)
 		if err != nil {
-			webhandlers.Error(res, req, err)
+			webhandlers.Error(res, req, errDecodeBody.WithCause(err))
 			return
 		}
 		logger.Debug("Perform downlink queue operation")
