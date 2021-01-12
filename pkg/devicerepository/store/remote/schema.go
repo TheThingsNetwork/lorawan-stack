@@ -125,7 +125,6 @@ type EndDeviceModel struct {
 		Main  string   `yaml:"main"`
 		Other []string `yaml:"other"`
 	} `yaml:"photos"`
-	Video  string `yaml:"video"`
 	Videos *struct {
 		Main  string   `yaml:"main"`
 		Other []string `yaml:"other"`
@@ -169,7 +168,6 @@ func (d EndDeviceModel) ToPB(brandID, modelID string, paths ...string) (*ttnpb.E
 		ProductURL:       d.ProductURL,
 		DatasheetURL:     d.DatasheetURL,
 		AdditionalRadios: d.AdditionalRadios,
-		Video:            d.Video,
 	}
 
 	if hwVersions := d.HardwareVersions; hwVersions != nil {

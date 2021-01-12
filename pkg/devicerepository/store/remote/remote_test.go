@@ -298,7 +298,6 @@ func TestRemoteStore(t *testing.T) {
 					Main:  "a.jpg",
 					Other: []string{"b.jpg", "c.jpg"},
 				},
-				Video: "a.mp4",
 				Videos: &ttnpb.EndDeviceModel_Videos{
 					Main:  "a.mp4",
 					Other: []string{"b.mp4", "https://youtube.com/watch?v=c.mp4"},
