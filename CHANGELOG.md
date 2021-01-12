@@ -12,19 +12,17 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Reset functionality in Network Server, which resets session context and MAC state (see `ttn-lw-cli end-devices reset` command). For OTAA all data is wiped and device must rejoin, for ABP session keys, device address and downlink queue are preserved, while MAC state is reset.
-- Pub/Sub providers may now be disabled, or marked for deprecation via `--as.pubsub.providers`.
 - Store and retrieve Gateway Claim Authentication Code from database.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added column.
   - This uses the same encryption key set using the `is.gateways.encryption-key-id` configuration option.
 - Improved handling of connection issues in the Console, as well as automatic reconnects.
 - Helpful details for synthetic meta events in the data view of the Console.
+- Support field mask paths in Storage Integration API requests.
 
 ### Changed
 
 - Network Server does not store `recent_uplinks`, `recent_adr_uplinks` and `recent_downlinks` anymore.
 - Improved Network Server downlink task performance.
-- Authorized Application Registry is changed to Authorized Entity Registry.
-  - This requires a database schema migration (`ttn-lw-stack dcs-db migrate`) to migrate existing claims to the new registry.
 - Improved Network Server matching performance.
 - Network Server matching mapping in the database.
   - This requires a database migration (`ttn-lw-stack ns-db migrate`).
@@ -39,8 +37,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- Uplink frame counter reset handling.
-- Uplink retransmission handling in Network Server.
 - Network Server DevStatusReq scheduling conditions in relation to frame counter value.
 
 ### Security
@@ -62,7 +58,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Removed misleading warning message for missing package data when setting up the storage integration package association.
-
 
 ## [3.10.4] - 2020-12-08
 
@@ -92,7 +87,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Configure application activation settings from the CLI (see `ttn-lw-cli application activation-settings` commands).
-- CLI support for federated authentication provider deletion (`ttn-lw-stack is-db delete-auth-provider`).
 
 ### Security
 
@@ -113,7 +107,6 @@ For details about compatibility between different releases, see the **Commitment
 - Uplink frame counter reset handling.
 - Uplink retransmission handling in Network Server.
 - DevAddr generation for NetID Type 3 and 4, according to errata.
-- Packet Broker downlink in multi-tenant clusters.
 - HTTP header propagation (such as Request ID) to gRPC services.
 
 ## [3.10.1] - 2020-11-19
@@ -159,15 +152,8 @@ For details about compatibility between different releases, see the **Commitment
 - Storage Integration API.
 - CLI support for Storage Integration (see `ttn-lw-cli end-devices storage` and `ttn-lw-cli applications storage` commands).
 - Network Server does not retry rejected `NewChannelReq` data rate ranges or rejected `DLChannelReq` frequencies anymore.
-- Federated Authentication capabilities using [OpenID Connect](https://openid.net/connect/).
-  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added and modified columns.
-- Store and retrieve billing identifiers from database.
-  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added column.
 - Functionality to allow admin users to list all organizations in the Console.
-- Storage Integration.
-  - This requires additional configuration and initialization of the database schema (`ttn-lw-stack storage-db init`). A PostgreSQL-compatible database is required, and it is highly recommended to setup a separate database instance; avoid re-using the IS database.
 - Downlink count for end devices in the Console.
-- Support for Tabs Hubs gateways.
 - Support for Application Activation Settings in the Join Server to configure Application Server KEK, ID and Home NetID.
 - Downlink queue invalidated message sent upstream by Application Server to support applications to re-encrypt the downlink queue when Application Server skips FRMPayload crypto.
 - Navigation to errored step in the end device wizard in the Console.
@@ -178,11 +164,10 @@ For details about compatibility between different releases, see the **Commitment
 - Decoded downlink payloads are now published as part of downlink attempt events.
 - Decoded downlink payloads are stored now by Network Server.
 - Raw downlink PHY payloads are not stored anymore by Network Server.
-- Move documentation to [lorawan-stack-docs](https://github.com/TheThingsedustries/lorawan-stack-docs).
+- Move documentation to [lorawan-stack-docs](https://github.com/TheThingsIndustries/lorawan-stack-docs).
 - Improve LinkADRReq scheduling condition computation and, as a consequence, downlink task efficiency.
 - CUPS Server only accepts The Things Stack API Key for token auth.
 - Improve MQTT Pub/Sub task restart conditions and error propagation.
-- AWS IoT MQTT client ID that now contains some random entropy.
 - Pausing event streams is not saving up arriving events during the pause anymore.
 - Gateway server can now update the gateway location only if the gateway is authenticated.
 - Right to manage links on Application Server is now `RIGHT_APPLICATION_SETTINGS_BASIC`.
@@ -206,7 +191,6 @@ For details about compatibility between different releases, see the **Commitment
 - Coding rate for LoRa 2.4 GHz: it's now `4/8LI`.
 - End device import in the Console crashing in Firefox.
 - Creation of multicast end devices in the Console.
-- Propagation of `cluster.tls-server-name` when using `cluster.discovery-mode=DNS`.
 - Overwriting values in the end device wizard in the Console.
 - Redirect loops when logging out of the Console if the Console OAuth client had no logout redirect URI(s) set.
 - Event selection not working properly when the event stream is paused in the Console.
@@ -217,8 +201,6 @@ For details about compatibility between different releases, see the **Commitment
 
 - Detail view of events in the Console moved to the side.
 - Display the full event object when expanded in the Console (used to be `event.data` only).
-- Tenant Billing Server no longer suspends tenants while their subscription is `past_due`. Instead, the tenant state is changed to `flagged`.
-- Cached Tenant information is now used during Identity Server unavailability.
 
 ### Fixed
 
@@ -258,8 +240,6 @@ For details about compatibility between different releases, see the **Commitment
 - CLI login issues when OAuth Server Address explicitly includes the `:443` HTTPS port.
 - Documentation link for LoRa Cloud Device & Application Services in the Lora Cloud integration view in the Console.
 - Webhooks and Pub/Subs forms in the Console will now let users choose whether they want to overwrite an existing record when the ID already exists (as opposed to overwriting by default).
-- Tenant Billing Server suspending unmanaged tenants.
-- Reconnection issue to AWS IoT MQTT when the session expired (default after 15 minutes).
 - Pub/Sub integrations not backing off on internal connection failures.
 - Network Server ping slot-related field validation.
 - Memory usage of Network Server application uplink queues.
@@ -270,7 +250,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- AWS IoT Integration.
 - LoRaCloud DAS integration page in the Console.
 - User Agent metadata on published events (when available).
 - Option to override server name used in TLS handshake with cluster peers (`cluster.tls-server-name`).
@@ -297,14 +276,10 @@ For details about compatibility between different releases, see the **Commitment
   - This changes the `AuthInfo` API response.
 - Skipping payload crypto on application-level via application link's `skip_payload_crypto` field.
 - Authentication method, ID and Remote IP in events metadata.
-- Tenant Billing Server automatic metric pulls. Defaults to one every hour.
 - Service data messages published by integrations. Can be consumed using the bundled MQTT server, Webhooks or Pub/Sub integrations.
 - Application package application-wide associations support.
 - LoRaCloud DAS application package server URL overrides support.
 - Key vault caching mechanism (see `--key-vault.cache.size` and `--key-vault.cache.ttl` options).
-- Support for Redis read replicas, reducing the load on the read-write Redis master.
-- Payload formatter documentation.
-- CLI support for setting message payload formatters from a local file. (see `--formatters.down-formatter-parameter-local-file` and `--formatters.up-formatter-parameter-local-file` options).
 - Generic encryption/decryption to KeyVault.
 - Option to ignore log messages for selected gRPC method on success (see `grpc.log-ignore-methods` option).
 - CLI auto-completion support (automatically enabled for installable packages, also see `ttn-lw-cli complete` command).
@@ -313,7 +288,6 @@ For details about compatibility between different releases, see the **Commitment
 - Admins now receive emails about requested user accounts that need approval.
 - Support for synchronizing gateway clocks via uplink tokens. UDP gateways may not connect to the same Gateway Server instance.
 - Consistent command aliases for CLI commands.
-- AWS Marketplace deployment guide.
 - Laird gateway documentation.
 - Option to allow unauthenticated Basic Station connections. Unset `gs.basic-station.allow-unauthenticated` to enforce auth check for production clusters. Please note that unauthenticated connections in existing connections will not be allowed unless this is set.
 - Option to require TLS on connections to Redis servers (see `redis.tls.require` and related options).
@@ -382,7 +356,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Option to reset end device payload formatters in the Console.
-- Sentry reporting to device claiming frontend.
 - Service discovery using DNS SRV records for external Application Server linking.
 - Functionality to set end device attributes in the Console.
 - Event description tooltip to events in the Console.
@@ -393,19 +366,16 @@ For details about compatibility between different releases, see the **Commitment
 - LORIX One gateway documentation.
 - Display own user name instead of ID in Console if possible.
 - Option to hide rarely used fields in the Join Settings step (end device wizard) in the Console.
-- Detailed errors in Device Claiming Server.
 
 ### Changed
 
 - JSON uplink message doc edited for clarity.
-- Defer events subscriptions until there is actual interest for events.
 - The CLI snap version uses the `$SNAP_USER_COMMON` directory for config by default, so that it is preserved between revisions.
 - Defer events subscriptions until there is actual interest for events.
 - End device creation form with wizard in the Console.
 
 ### Removed
 
-- Tenant Billing Server default reporting addresses.
 - Requirement to specify `frequency_plan_id` when creating gateways in the Console.
 
 ### Fixed
@@ -419,7 +389,6 @@ For details about compatibility between different releases, see the **Commitment
 - End device events stream restart in the Console.
 - CLI was unable to read input from pipes.
 - Timezones issue in claim authentication code form, causing time to reverse on submission.
-- Join Server address in device claiming from one tenant to another.
 - Errors during submit of the join settings for end devices in the Console.
 
 ## [3.8.4] - 2020-06-12
@@ -506,7 +475,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- Missing target ns and as in parameters in device claiming sdk claim request
 - Handling of device unsetting the ADR bit in uplink, after ADR has been started.
 - Invalid `oauth-server-address` in CLI config generated by `use` command when config file is already present.
 - Network Server now properly handles FPort 0 data uplinks carrying FOpts.
@@ -525,7 +493,6 @@ For details about compatibility between different releases, see the **Commitment
 - Unset fields via CLI on Join Server, i.e. `--unset root-keys.nwk-key`.
 - Reconnecting UDP gateways that were disconnected by a new gateway connection.
 - ADR in US915-like bands.
-- Apply missing context to Network Server Application Server APIConfig in Device Claiming Server.
 
 ## [3.7.2] - 2020-04-22
 
@@ -731,7 +698,6 @@ For details about compatibility between different releases, see the **Commitment
 - Responsive side navigation (inside entity views) to the Console.
 - Overall responsiveness of the Console.
 - Support for configuring Redis connection pool sizes with `redis.pool-size` options.
-- Packet Broker Agent to subscribe to uplink traffic from and publish uplink traffic to Packet Broker. See `pba` configuration section.
 
 ### Fixed
 
@@ -761,7 +727,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
-- Gateway connection stats are stored in Redis (see `--gs.update-connection-stats-debounce-time` option)
 - `resets_join_nonces` now applies to pre-1.1 devices as well as 1.1+ devices.
 - Empty (`0x0000000000000000`) JoinEUIs are now allowed.
 
@@ -792,14 +757,10 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- Fix documentation for connecting and subscribing to the builtin Application Server MQTT server of The Things Enterprise Stack.
 - Fix selection of pseudo wildcard rights being possible (leading to crash) in the Console even when such right cannot be granted.
 - Fix loading spinner being stuck infinitely in gateway / application / organization overview when some rights aren't granted to the collaborator.
 - Fix deadlock of application add form in the Console when the submit results in an error.
 - Fix ttn-lw-cli sometimes refusing to update Gateway EUI.
-- Fix data uplink deduplication when a message is received by several tenants.
-
-### Security
 
 ## [3.4.1] - 2019-12-30
 
@@ -832,7 +793,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Fix the PubSub integration edit page in the Console.
-- Fix logout action in device claiming frontend.
 - Fix updating and setting of webhook headers in the Console.
 - Fix DevNonce checks for LoRaWAN 1.0.3.
 
@@ -842,7 +802,6 @@ For details about compatibility between different releases, see the **Commitment
 
 - Support for selecting gateways when queueing downlinks via CLI (see `class-b-c.gateways` option).
 - Options `is.oauth.ui.branding-base-url` and `console.ui.branding-base-url` that can be used to customize the branding (logos) of the web UI.
-- Extended branding config for branding text and cluster id, to be displayed in the webui headers.
 - Email templates can now also be loaded from blob buckets.
 - Support for pagination in search APIs.
 - Search is now also available to non-admin users.
@@ -866,7 +825,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Security
 
 - Keep session keys separate by `JoinEUI` to avoid conditions where session keys are retrieved only by `DevEUI` and the session key identifier. This breaks retrieving session keys of devices that have been activated on a deployment running a previous version. Since the Application Server instances are currently in-cluster, there is no need for an Application Server to retrieve the `AppSKey` from the Join Server, making this breaking change ineffective.
-- Check tenant where the end device is registered in Network Server and Join Server.
 
 ## [3.3.1] - 2019-11-26
 
