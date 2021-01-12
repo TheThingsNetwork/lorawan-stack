@@ -116,3 +116,7 @@ func (oc *OAuthClient) defaultCallback(c echo.Context, _ *oauth2.Token, next str
 	config := oc.configFromContext(c.Request().Context())
 	return c.Redirect(http.StatusFound, config.RootURL+next)
 }
+
+func (oc *OAuthClient) defaultAuthCodeURLOptions(echo.Context) ([]oauth2.AuthCodeOption, error) {
+	return nil, nil
+}

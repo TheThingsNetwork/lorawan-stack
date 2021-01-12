@@ -35,7 +35,7 @@ type OAuthClient struct {
 	oauth           OAuth2ConfigProvider
 	nextKey         string
 	callback        Callback
-	authCodeURLOpts []oauth2.AuthCodeOption
+	authCodeURLOpts OAuth2AuthCodeURLOptionsProvider
 }
 
 var errNoOAuthConfig = errors.DefineInvalidArgument("no_oauth_config", "no OAuth configuration found for the OAuth client")
@@ -77,6 +77,7 @@ func New(c *component.Component, config Config, opts ...Option) (*OAuthClient, e
 	}
 	oc.callback = oc.defaultCallback
 	oc.oauth = oc.defaultOAuth
+	oc.authCodeURLOpts = oc.defaultAuthCodeURLOptions
 
 	for _, opt := range opts {
 		opt(oc)
