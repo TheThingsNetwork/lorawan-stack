@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 - Network Server matching mapping in the database.
   - This requires a database migration (`ttn-lw-stack ns-db migrate`).
 - Sending a non-empty implicitly specified field disallowed field will now cause RPCs to fail. E.g. if RPC supports paths `A` and `A.B`, sending value with `A.C` non-empty and field mask `A` would result in an error.
+- JavaScript entrypoints changed from `oauth.css` and `oauth.js` to `account.css` and `account.css`. Note: For deployments using custom frontend bundles (e.g. via `--is.oauth.ui.js-file`), the filenames have to be updated accordingly as well.
 
 ### Deprecated
 
