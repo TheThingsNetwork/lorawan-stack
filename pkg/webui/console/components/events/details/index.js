@@ -23,6 +23,7 @@ import { getEventId } from '../utils'
 import messages from '../messages'
 
 import RawEventDetails from './raw'
+import SyntheticEventDetails from './synthetic'
 
 import style from './details.styl'
 
@@ -39,9 +40,12 @@ const EventDetails = ({ className, children, event }) => {
 
   return (
     <div className={classnames(className, style.details)}>
-      {event.isSynthetic && <Notification content={messages.syntheticEvent} info small />}
       {!hasChildren ? (
-        <RawEventDetails className={style.codeEditor} details={event} id={getEventId(event)} />
+        event.isSynthetic ? (
+          <SyntheticEventDetails event={event} id={getEventId(event)} />
+        ) : (
+          <RawEventDetails className={style.codeEditor} details={event} id={getEventId(event)} />
+        )
       ) : (
         children
       )}

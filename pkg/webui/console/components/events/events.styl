@@ -133,6 +133,9 @@ $event-container-height = 40px
     background-color: lighten($tc-warning, 55)
     .cell-time
       color: $tc-warning
+    .cell-type::before
+      content: "Console:"
+      margin-right: $cs.xs
 
   &:not(.widget)
     cursor: pointer

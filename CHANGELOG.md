@@ -17,6 +17,7 @@ For details about compatibility between different releases, see the **Commitment
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added column.
   - This uses the same encryption key set using the `is.gateways.encryption-key-id` configuration option.
 - Improved handling of connection issues in the Console, as well as automatic reconnects.
+- Helpful details for synthetic meta events in the data view of the Console.
 
 ### Changed
 
