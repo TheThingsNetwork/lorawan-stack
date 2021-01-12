@@ -20,16 +20,22 @@ import (
 	"time"
 
 	"github.com/blevesearch/bleve"
+	"github.com/bluele/gcache"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store/remote"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
-// defaultTimeout is the timeout when trying to open the index. This is to avoid
-// blocking on the index open call, which hangs indefinitely if the index is
-// already in use by a different process.
-var defaultTimeout = 5 * time.Second
+const (
+	// defaultTimeout is the timeout when trying to open the index. This is to avoid
+	// blocking on the index open call, which hangs indefinitely if the index is
+	// already in use by a different process.
+	defaultTimeout = 5 * time.Second
+
+	// cacheSize is the size of the cache for brands and models.
+	cacheSize = 1024
+)
 
 // bleveStore wraps a store.Store adding support for searching/sorting results using a bleve index.
 type bleveStore struct {
@@ -37,6 +43,7 @@ type bleveStore struct {
 
 	store store.Store
 	index bleve.Index
+	cache gcache.Cache
 }
 
 // NewStore returns a new Device Repository store with indexing capabilities (using bleve).
@@ -48,6 +55,8 @@ func (c Config) NewStore(ctx context.Context) (store.Store, error) {
 	s := &bleveStore{
 		ctx:   ctx,
 		store: remote.NewRemoteStore(fetch.FromFilesystem(wd)),
+
+		cache: gcache.New(cacheSize).LFU().Build(),
 	}
 
 	ctx, cancel := context.WithTimeout(s.ctx, defaultTimeout)
