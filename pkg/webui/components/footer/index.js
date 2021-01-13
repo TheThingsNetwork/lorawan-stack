@@ -29,10 +29,9 @@ import style from './footer.styl'
 
 const m = defineMessages({
   footer: "You are the network. Let's build this thing together.",
-  getSupport: 'Get support',
 })
 
-const Footer = ({ className, links, supportLink, onlineStatus }) => (
+const Footer = ({ className, documentationLink, links, supportLink, onlineStatus }) => (
   <footer className={classnames(className, style.footer)}>
     <div>
       <span className={style.claim}>
@@ -50,6 +49,11 @@ const Footer = ({ className, links, supportLink, onlineStatus }) => (
       ))}
       <OfflineStatus onlineStatus={onlineStatus} showOfflineOnly showWarnings />
       <span className={style.version}>v{process.env.VERSION}</span>
+      {documentationLink && (
+        <Link.Anchor className={style.documentation} secondary href={documentationLink} external>
+          <Message content={sharedMessages.documentation} />
+        </Link.Anchor>
+      )}
       {supportLink && (
         <Button.AnchorLink
           message={sharedMessages.getSupport}
@@ -66,6 +70,8 @@ const Footer = ({ className, links, supportLink, onlineStatus }) => (
 Footer.propTypes = {
   /** The classname to be applied to the footer. */
   className: PropTypes.string,
+  /** Optional link for documentation docs. */
+  documentationLink: PropTypes.string,
   /**
    * A list of links to be displayed in the footer component.
    *
@@ -86,6 +92,7 @@ Footer.propTypes = {
 
 Footer.defaultProps = {
   className: undefined,
+  documentationLink: undefined,
   links: [],
   supportLink: undefined,
 }

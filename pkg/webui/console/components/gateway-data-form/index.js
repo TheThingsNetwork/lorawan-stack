@@ -14,9 +14,10 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import glossaryId from '@console/constants/glossary-ids'
 
+import glossaryId from '@console/constants/glossary-ids'
 import delay from '@console/constants/delays'
+import frequencyPlans from '@console/constants/frequency-plans'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -24,6 +25,8 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import UnitInput from '@ttn-lw/components/unit-input'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import { GsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import OwnersSelect from '@console/containers/owners-select'
@@ -35,20 +38,19 @@ import { unit as unitRegexp, emptyDuration as emptyDurationRegexp } from '@conso
 
 import validationSchema from './validation-schema'
 
+const isEmptyFrequencyPlan = value => value === frequencyPlans.EMPTY_FREQ_PLAN
+
 class GatewayDataForm extends React.Component {
   static propTypes = {
     /** The SubmitBar content. */
     children: PropTypes.node.isRequired,
     error: PropTypes.error,
-    /** React reference to be passed to the form. */
-    formRef: PropTypes.shape({}),
     initialValues: PropTypes.gateway,
     onSubmit: PropTypes.func.isRequired,
     update: PropTypes.bool,
   }
 
   static defaultProps = {
-    formRef: undefined,
     update: false,
     error: '',
     initialValues: validationSchema.cast({}),
@@ -59,6 +61,8 @@ class GatewayDataForm extends React.Component {
 
     this.state = {
       shouldDisplayWarning: this.isNotValidDuration(props.initialValues.schedule_anytime_delay),
+      showFrequencyPlanWarning:
+        isEmptyFrequencyPlan(props.initialValues.frequency_plan_id) && props.update,
     }
   }
 
@@ -68,9 +72,19 @@ class GatewayDataForm extends React.Component {
   }
 
   @bind
+  handleFrequencyPlanChange(freqPlan) {
+    this.setState({ showFrequencyPlanWarning: isEmptyFrequencyPlan(freqPlan.value) })
+  }
+
+  @bind
   onSubmit(values, helpers) {
     const { onSubmit } = this.props
-    const castedValues = validationSchema.cast(values)
+
+    const castedValues = validationSchema.cast(
+      isEmptyFrequencyPlan(values.frequency_plan_id)
+        ? { ...values, frequency_plan_id: '' }
+        : values,
+    )
 
     onSubmit(castedValues, helpers)
   }
@@ -105,8 +119,8 @@ class GatewayDataForm extends React.Component {
   }
 
   render() {
-    const { update, error, initialValues, formRef, children } = this.props
-    const { shouldDisplayWarning } = this.state
+    const { update, error, initialValues, children } = this.props
+    const { shouldDisplayWarning, showFrequencyPlanWarning } = this.state
 
     return (
       <Form
@@ -114,7 +128,6 @@ class GatewayDataForm extends React.Component {
         onSubmit={this.onSubmit}
         initialValues={initialValues}
         validationSchema={validationSchema}
-        formikRef={formRef}
       >
         <Form.SubTitle title={sharedMessages.generalSettings} />
         {!update && <OwnersSelect name="owner_id" required autoFocus />}
@@ -173,11 +186,13 @@ class GatewayDataForm extends React.Component {
           component={KeyValueMap}
           description={sharedMessages.attributeDescription}
         />
-        <Form.SubTitle title={sharedMessages.lorawanOptions} />
+        <Message component="h4" content={sharedMessages.lorawanOptions} />
         <GsFrequencyPlansSelect
           name="frequency_plan_id"
           menuPlacement="top"
+          onChange={this.handleFrequencyPlanChange}
           glossaryId={glossaryId.FREQUENCY_PLAN}
+          warning={showFrequencyPlanWarning ? sharedMessages.frequencyPlanWarning : undefined}
         />
         <Form.Field
           title={sharedMessages.gatewayScheduleDownlinkLate}
