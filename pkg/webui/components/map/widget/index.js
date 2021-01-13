@@ -53,17 +53,21 @@ export default class MapWidget extends React.Component {
         ? [markers[0].position.latitude, markers[0].position.longitude]
         : undefined
 
-    return markers.length > 0 ? (
-      <LocationMap
-        id={id}
-        mapCenter={mapCenter}
-        markers={markers}
-        leafletConfig={leafletConfig}
-        widget
-      />
-    ) : (
-      <div className={style.mapDisabled}>
-        <Message component="span" content={sharedMessages.noLocation} />
+    return (
+      <div data-test-id="map-widget">
+        {markers.length > 0 ? (
+          <LocationMap
+            id={id}
+            mapCenter={mapCenter}
+            markers={markers}
+            leafletConfig={leafletConfig}
+            widget
+          />
+        ) : (
+          <div className={style.mapDisabled}>
+            <Message component="span" content={sharedMessages.noLocation} />
+          </div>
+        )}
       </div>
     )
   }
