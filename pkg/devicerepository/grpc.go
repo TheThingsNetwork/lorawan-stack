@@ -33,7 +33,7 @@ func withDefaultModelFields(paths []string) []string {
 	return ttnpb.AddFields(paths, "brand_id", "model_id")
 }
 
-// withDefaultBrandFields appends default ttnpb.EndDeviceBrand paths.
+// withDefaultBrandFields appends default ttnpb.EndDeviceBrand fields.
 func withDefaultBrandFields(paths []string) []string {
 	return ttnpb.AddFields(paths, "brand_id")
 }
