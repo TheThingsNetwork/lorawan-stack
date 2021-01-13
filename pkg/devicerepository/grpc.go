@@ -45,6 +45,18 @@ func (dr *DeviceRepository) assetURL(brandID, path string) string {
 	return strings.TrimRight(dr.config.AssetsBaseURL, "/") + "/vendor/" + brandID + "/" + path
 }
 
+// ensureBaseAssetURLs prepends the BaseAssetURL to model assets.
+func (dr *DeviceRepository) ensureBaseAssetURLs(models []*ttnpb.EndDeviceModel) {
+	for _, model := range models {
+		if photos := model.Photos; photos != nil {
+			photos.Main = dr.assetURL(model.BrandID, photos.Main)
+			for idx, photo := range photos.Other {
+				photos.Other[idx] = dr.assetURL(model.BrandID, photo)
+			}
+		}
+	}
+}
+
 const defaultLimit = 1000
 
 // ListBrands implements the ttnpb.DeviceRepositoryServer interface.
@@ -118,16 +130,7 @@ func (dr *DeviceRepository) ListModels(ctx context.Context, req *ttnpb.ListEndDe
 	if err != nil {
 		return nil, err
 	}
-
-	for _, model := range response.Models {
-		if photos := model.Photos; photos != nil {
-			photos.Main = dr.assetURL(model.BrandID, photos.Main)
-			for idx, photo := range photos.Other {
-				photos.Other[idx] = dr.assetURL(model.BrandID, photo)
-			}
-		}
-	}
-
+	dr.ensureBaseAssetURLs(response.Models)
 	grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatUint(uint64(response.Total), 10)))
 	return &ttnpb.ListEndDeviceModelsResponse{
 		Models: response.Models,
