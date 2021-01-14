@@ -35,6 +35,15 @@ const loginConsole = defineSmokeTest('succeeds registering and logging into the 
     .should('be.visible')
     .should('contain', 'You have successfully registered and can login now')
 
+  // Check for the validation email (via the stack logs).
+  cy.task(
+    'findInStackLog',
+    `Your email address will be used as contact for user "${user.user_id}"`,
+  ).then(validationUri => {
+    // eslint-disable-next-line jest/valid-expect, no-unused-expressions
+    expect(validationUri).to.not.be.empty
+  })
+
   // Login.
   // TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/2923
   cy.visit(Cypress.config('consoleRootPath'))
@@ -66,6 +75,15 @@ const loginOAuth = defineSmokeTest('succeeds registering and logging into the Ac
   cy.findByTestId('notification')
     .should('be.visible')
     .should('contain', 'You have successfully registered and can login now')
+
+  // Check for the validation email (via the stack logs).
+  cy.task(
+    'findInStackLog',
+    `Your email address will be used as contact for user "${user.user_id}"`,
+  ).then(validationUri => {
+    // eslint-disable-next-line jest/valid-expect, no-unused-expressions
+    expect(validationUri).to.not.be.empty
+  })
 
   cy.findByLabelText('User ID').type(user.user_id)
   cy.findByLabelText('Password').type(`${user.password}`)
