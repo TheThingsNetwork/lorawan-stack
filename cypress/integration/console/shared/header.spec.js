@@ -40,7 +40,7 @@ describe('Header', () => {
 
       logout(user.ids.user_id)
 
-      cy.location('pathname').should('eq', `${Cypress.config('oauthRootPath')}/login`)
+      cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/login`)
     })
 
     it('obtains a new CSRF token and succeeds when CSRF token not present', () => {
@@ -52,7 +52,7 @@ describe('Header', () => {
       }
       const baseUrl = Cypress.config('baseUrl')
       const consoleRootPath = Cypress.config('consoleRootPath')
-      const oauthRootPath = Cypress.config('oauthRootPath')
+      const accountAppRootPath = Cypress.config('accountAppRootPath')
       cy.server()
       cy.route({
         method: 'POST',
@@ -69,7 +69,7 @@ describe('Header', () => {
 
       logout(user.ids.user_id)
 
-      cy.location('pathname').should('eq', `${oauthRootPath}/login`)
+      cy.location('pathname').should('eq', `${accountAppRootPath}/login`)
     })
   })
 })

@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('OAuth login', () => {
+describe('Account App login', () => {
   before(() => {
     cy.dropAndSeedDatabase()
   })
 
   it('displays UI elements in place', () => {
-    cy.visit(Cypress.config('oauthRootPath'))
+    cy.visit(Cypress.config('accountAppRootPath'))
 
     cy.get('header').within(() => {
       cy.findByRole('link')
-        .should('have.attr', 'href', `${Cypress.config('oauthRootPath')}/`)
+        .should('have.attr', 'href', `${Cypress.config('accountAppRootPath')}/`)
         .findByRole('img')
         .should('be.visible')
-        .should('have.attr', 'src', `${Cypress.config('oauthAssetsRootPath')}/account.svg`)
-        .should('have.attr', 'alt', `${Cypress.config('oauthSiteName')} Logo`)
+        .should('have.attr', 'src', `${Cypress.config('accountAppAssetsRootPath')}/account.svg`)
+        .should('have.attr', 'alt', `${Cypress.config('accountAppSiteName')} Logo`)
     })
 
     cy.findByRole('link', { name: 'Create an account' }).should('be.visible')
@@ -36,7 +36,7 @@ describe('OAuth login', () => {
   })
 
   it('validates before submitting an empty form', () => {
-    cy.visit(Cypress.config('oauthRootPath'))
+    cy.visit(Cypress.config('accountAppRootPath'))
 
     cy.findByRole('button', { name: 'Login' }).click()
 
@@ -47,7 +47,7 @@ describe('OAuth login', () => {
       .should('contain.text', 'Password is required')
       .and('be.visible')
 
-    cy.location('pathname').should('eq', `${Cypress.config('oauthRootPath')}/login`)
+    cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/login`)
   })
 
   it('succeeds logging in when using valid credentials', () => {
@@ -58,18 +58,18 @@ describe('OAuth login', () => {
       password_confirm: 'ABCDefg123!',
     }
     cy.createUser(user)
-    cy.visit(Cypress.config('oauthRootPath'))
+    cy.visit(Cypress.config('accountAppRootPath'))
 
     cy.findByLabelText('User ID').type(user.ids.user_id)
     cy.findByLabelText('Password').type(`${user.password}{enter}`)
 
-    cy.location('pathname').should('eq', `${Cypress.config('oauthRootPath')}/`)
+    cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/`)
     cy.findByTestId('full-error-view').should('not.exist')
   })
 
   it('displays an error when using invalid credentials', () => {
     const user = { user_id: 'userwrong', password: 'userWr0ng!' }
-    cy.visit(Cypress.config('oauthRootPath'))
+    cy.visit(Cypress.config('accountAppRootPath'))
 
     cy.findByLabelText('User ID').type(user.user_id)
     cy.findByLabelText('Password').type(`${user.password}{enter}`)
@@ -77,6 +77,6 @@ describe('OAuth login', () => {
     cy.findByTestId('error-notification')
       .should('be.visible')
       .contains('incorrect password or user ID')
-    cy.location('pathname').should('eq', `${Cypress.config('oauthRootPath')}/login`)
+    cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/login`)
   })
 })

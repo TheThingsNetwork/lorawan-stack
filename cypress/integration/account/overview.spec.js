@@ -19,25 +19,25 @@ const user = {
   password_confirm: 'ABCDefg123!',
 }
 
-describe('OAuth overview', () => {
+describe('Account App overview', () => {
   before(() => {
     cy.dropAndSeedDatabase()
   })
 
   it('displays UI elements in place', () => {
     cy.createUser(user)
-    cy.loginOAuth({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(Cypress.config('oauthRootPath'))
+    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(Cypress.config('accountAppRootPath'))
 
     cy.findByText(`You are logged in as ${user.ids.user_id}.`).should('be.visible')
     cy.findByRole('button', { name: 'Logout' }).should('be.visible')
   })
 
   it('succeeds when logging out', () => {
-    cy.loginOAuth({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(Cypress.config('oauthRootPath'))
+    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(Cypress.config('accountAppRootPath'))
     cy.findByRole('button', { name: 'Logout' }).click()
 
-    cy.url().should('include', `${Cypress.config('oauthRootPath')}/login`)
+    cy.url().should('include', `${Cypress.config('accountAppRootPath')}/login`)
   })
 })

@@ -35,7 +35,7 @@ const authorizeConsole = defineSmokeTest(
     cy.findByLabelText('Password').type(`${user.password}{enter}`)
 
     // Authorize.
-    cy.location('pathname').should('contain', `${Cypress.config('oauthRootPath')}/authorize`)
+    cy.location('pathname').should('contain', `${Cypress.config('accountAppRootPath')}/authorize`)
     cy.findByRole('button', { name: /Authorize Console/ }).click()
 
     // Check Console landing view.
@@ -45,7 +45,7 @@ const authorizeConsole = defineSmokeTest(
 )
 
 const abortAuthorization = defineSmokeTest(
-  'succeeds manually aborting OAuth client authorization',
+  'succeeds manually aborting Account App client authorization',
   () => {
     const user = {
       ids: { user_id: 'authorize-test-user' },
@@ -65,7 +65,7 @@ const abortAuthorization = defineSmokeTest(
     cy.findByLabelText('Password').type(`${user.password}{enter}`)
 
     // Deny authorization.
-    cy.location('pathname').should('contain', `${Cypress.config('oauthRootPath')}/authorize`)
+    cy.location('pathname').should('contain', `${Cypress.config('accountAppRootPath')}/authorize`)
     cy.findByRole('button', { name: /Cancel/ }).click()
 
     // Check Console error.

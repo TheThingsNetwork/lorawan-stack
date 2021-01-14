@@ -18,7 +18,7 @@ describe('Account App forgot password', () => {
   })
 
   it('displays UI elements in place', () => {
-    cy.visit(`${Cypress.config('oauthRootPath')}/forgot-password`)
+    cy.visit(`${Cypress.config('accountAppRootPath')}/forgot-password`)
     cy.findByText('Reset password').should('be.visible')
     cy.findByLabelText('User ID').should('be.visible')
     cy.findByRole('button', { name: 'Send' }).should('be.visible')
@@ -40,12 +40,12 @@ describe('Account App forgot password', () => {
       password_confirm: 'ABCDefg123!',
     }
     cy.createUser(user)
-    cy.visit(`${Cypress.config('oauthRootPath')}/forgot-password`)
+    cy.visit(`${Cypress.config('accountAppRootPath')}/forgot-password`)
     cy.findByLabelText('User ID').type(user.ids.user_id)
     cy.findByRole('button', { name: 'Send' }).click()
     cy.findByTestId('notification')
       .should('be.visible')
       .should('contain', 'reset instruction')
-    cy.location('pathname').should('include', `${Cypress.config('oauthRootPath')}/login`)
+    cy.location('pathname').should('include', `${Cypress.config('accountAppRootPath')}/login`)
   })
 })

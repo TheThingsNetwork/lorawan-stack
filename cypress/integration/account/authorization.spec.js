@@ -29,7 +29,7 @@ describe('Account App authorization view', () => {
     cy.visitConsoleAuthorizationScreen({ user_id: user.ids.user_id, password: user.password })
 
     // Check authorization screen.
-    cy.location('pathname').should('contain', `${Cypress.config('oauthRootPath')}/authorize`)
+    cy.location('pathname').should('contain', `${Cypress.config('accountAppRootPath')}/authorize`)
     cy.findByTestId('full-error-view').should('not.exist')
     cy.findByText('Request for permission').should('be.visible')
     cy.findByText('Console').should('be.visible')

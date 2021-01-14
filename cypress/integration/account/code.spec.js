@@ -20,7 +20,7 @@ describe('Account App code view', () => {
   it('displays UI elements in place', () => {
     const code = '12345code'
 
-    cy.visit(`${Cypress.config('oauthRootPath')}/code?code=${code}`)
+    cy.visit(`${Cypress.config('accountAppRootPath')}/code?code=${code}`)
     cy.findByText('Authorization code').should('be.visible')
     cy.findByText('Your authorization code is:').should('be.visible')
     cy.findByText(code)
@@ -28,7 +28,7 @@ describe('Account App code view', () => {
   })
 
   it('redirects back if no code is supplied', () => {
-    cy.visit(`${Cypress.config('oauthRootPath')}/code`)
-    cy.location('pathname').should('eq', `${Cypress.config('oauthRootPath')}/login`)
+    cy.visit(`${Cypress.config('accountAppRootPath')}/code`)
+    cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/login`)
   })
 })

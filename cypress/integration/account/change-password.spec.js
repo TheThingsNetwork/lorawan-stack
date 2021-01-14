@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('OAuth change password', () => {
+describe('Account App change password (logged in)', () => {
   before(() => {
     cy.dropAndSeedDatabase()
   })
 
   it('displays UI elements in place', () => {
     const user = { user_id: 'admin', password: 'admin' }
-    cy.loginOAuth(user)
-    cy.visit(`${Cypress.config('oauthRootPath')}/update-password`)
+    cy.loginAccountApp(user)
+    cy.visit(`${Cypress.config('accountAppRootPath')}/update-password`)
 
     cy.findByText('Change password', { selector: 'h1' }).should('be.visible')
     cy.findByLabelText('Old password').should('be.visible')
@@ -44,8 +44,8 @@ describe('OAuth change password', () => {
       password_confirm: 'ABCDefg123!',
     }
     cy.createUser(user)
-    cy.loginOAuth({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('oauthRootPath')}/update-password`)
+    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('accountAppRootPath')}/update-password`)
     cy.findByRole('button', { name: 'Change password' }).click()
 
     cy.findErrorByLabelText('New password')
@@ -55,7 +55,7 @@ describe('OAuth change password', () => {
       .should('contain.text', 'Confirm password is required')
       .and('be.visible')
 
-    cy.location('pathname').should('eq', `${Cypress.config('oauthRootPath')}/update-password`)
+    cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/update-password`)
   }).skip()
 
   it('succeeds changing password when revoking access', () => {
@@ -67,8 +67,8 @@ describe('OAuth change password', () => {
       password_confirm: 'ABCDefg123!',
     }
     cy.createUser(user)
-    cy.loginOAuth({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('oauthRootPath')}/update-password`)
+    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('accountAppRootPath')}/update-password`)
 
     cy.findByLabelText('Old password').type(user.password)
     cy.findByLabelText('New password').type(newPassword)
@@ -77,7 +77,7 @@ describe('OAuth change password', () => {
     cy.findByTestId('notification')
       .should('be.visible')
       .should('contain', 'Password changed')
-    cy.location('pathname').should('include', `${Cypress.config('oauthRootPath')}/login`)
+    cy.location('pathname').should('include', `${Cypress.config('accountAppRootPath')}/login`)
   }).skip()
 
   it('succeeds changing password without revoking access', () => {
@@ -89,8 +89,8 @@ describe('OAuth change password', () => {
       password_confirm: 'ABCDefg123!',
     }
     cy.createUser(user)
-    cy.loginOAuth({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('oauthRootPath')}/update-password`)
+    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('accountAppRootPath')}/update-password`)
 
     cy.findByLabelText('Old password').type(user.password)
     cy.findByLabelText('New password').type(newPassword)
@@ -101,7 +101,7 @@ describe('OAuth change password', () => {
     cy.findByTestId('notification')
       .should('be.visible')
       .should('contain', 'Password changed')
-    cy.location('pathname').should('include', `${Cypress.config('oauthRootPath')}/login`)
+    cy.location('pathname').should('include', `${Cypress.config('accountAppRootPath')}/login`)
   }).skip()
 })
 
@@ -151,7 +151,7 @@ describe('Account App change password (via forgot password)', () => {
       .should('contain.text', 'Confirm new password is required')
       .and('be.visible')
 
-    cy.location('pathname').should('eq', `${Cypress.config('oauthRootPath')}/update-password`)
+    cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/update-password`)
   })
 
   it('succeeds changing password when revoking access', () => {
@@ -165,6 +165,6 @@ describe('Account App change password (via forgot password)', () => {
     cy.findByTestId('notification')
       .should('be.visible')
       .should('contain', 'password was changed')
-    cy.location('pathname').should('include', `${Cypress.config('oauthRootPath')}/login`)
+    cy.location('pathname').should('include', `${Cypress.config('accountAppRootPath')}/login`)
   })
 })

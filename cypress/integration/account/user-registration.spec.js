@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('OAuth user registration', () => {
+describe('Account App user registration', () => {
   beforeEach(() => {
     cy.dropAndSeedDatabase()
-    cy.visit(`${Cypress.config('oauthRootPath')}/register`)
+    cy.visit(`${Cypress.config('accountAppRootPath')}/register`)
   })
 
   it('displays UI elements in place', () => {
-    cy.findByText(Cypress.config('oauthSiteName'), {
+    cy.findByText(Cypress.config('accountAppSiteName'), {
       selector: 'h1',
     }).should('be.visible')
     cy.findByText('Create a new account').should('be.visible')
@@ -33,7 +33,7 @@ describe('OAuth user registration', () => {
   })
 
   it('validates before submitting an empty form', () => {
-    cy.visit(`${Cypress.config('oauthRootPath')}/register`)
+    cy.visit(`${Cypress.config('accountAppRootPath')}/register`)
     cy.findByRole('button', { name: 'Create account' }).click()
 
     cy.findErrorByLabelText('User ID')
@@ -51,7 +51,7 @@ describe('OAuth user registration', () => {
       .should('contain.text', 'Confirm password is required')
       .and('be.visible')
 
-    cy.location('pathname').should('eq', `${Cypress.config('oauthRootPath')}/register`)
+    cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/register`)
   })
 
   it('succeeds when using valid user data for `approved` users', () => {
@@ -64,6 +64,6 @@ describe('OAuth user registration', () => {
     cy.findByTestId('notification')
       .should('be.visible')
       .should('contain', 'You have successfully registered and can login now')
-    cy.location('pathname').should('include', `${Cypress.config('oauthRootPath')}/login`)
+    cy.location('pathname').should('include', `${Cypress.config('accountAppRootPath')}/login`)
   })
 })

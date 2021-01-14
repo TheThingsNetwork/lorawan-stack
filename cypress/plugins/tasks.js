@@ -57,12 +57,12 @@ const stackConfigTask = (_, config) => {
     config.consoleAssetsRootPath = yml.console.ui['assets-base-url']
     config.consoleRootPath = new URL(yml.console.ui['canonical-url']).pathname
 
-    // OAuth.
-    config.oauthSiteName = yml.is.oauth.ui['site-name']
-    config.oauthSubTitle = yml.is.oauth.ui['sub-title']
-    config.oauthTitle = yml.is.oauth.ui.title
-    config.oauthRootPath = new URL(yml.is.oauth.ui['canonical-url']).pathname
-    config.oauthAssetsRootPath = yml.is.oauth.ui['assets-base-url']
+    // Account App.
+    config.accountAppSiteName = yml.is.oauth.ui['site-name']
+    config.accountAppSubTitle = yml.is.oauth.ui['sub-title']
+    config.accountAppTitle = yml.is.oauth.ui.title
+    config.accountAppRootPath = new URL(yml.is.oauth.ui['canonical-url']).pathname
+    config.accountAppAssetsRootPath = yml.is.oauth.ui['assets-base-url']
   } catch (err) {
     throw err
   }

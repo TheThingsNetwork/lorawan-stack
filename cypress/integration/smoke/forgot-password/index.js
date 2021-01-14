@@ -29,9 +29,12 @@ const forgotPasswordFlow = defineSmokeTest('succeeds creating application', () =
   cy.createUser(user)
 
   // Start the flow at the login screen and navigate to the forgot password view.
-  cy.visit(`${Cypress.config('oauthRootPath')}`)
+  cy.visit(`${Cypress.config('accountAppRootPath')}`)
   cy.findByRole('link', { name: 'Forgot password?' }).click()
-  cy.location('pathname').should('include', `${Cypress.config('oauthRootPath')}/forgot-password`)
+  cy.location('pathname').should(
+    'include',
+    `${Cypress.config('accountAppRootPath')}/forgot-password`,
+  )
 
   // Type in own username and hit `Send`.
   cy.findByLabelText('User ID').type(user.ids.user_id)
@@ -39,7 +42,7 @@ const forgotPasswordFlow = defineSmokeTest('succeeds creating application', () =
   cy.findByTestId('notification')
     .should('be.visible')
     .should('contain', 'reset instruction')
-  cy.location('pathname').should('include', `${Cypress.config('oauthRootPath')}/login`)
+  cy.location('pathname').should('include', `${Cypress.config('accountAppRootPath')}/login`)
 
   // Retrieve password token link from email (via stack logs).
   cy.task('findInStackLog', updatePasswordLinkRegExp).then(temporaryPasswordLink => {
@@ -52,12 +55,12 @@ const forgotPasswordFlow = defineSmokeTest('succeeds creating application', () =
     cy.findByTestId('notification')
       .should('be.visible')
       .should('contain', 'Password changed')
-    cy.location('pathname').should('include', `${Cypress.config('oauthRootPath')}/login`)
+    cy.location('pathname').should('include', `${Cypress.config('accountAppRootPath')}/login`)
 
     // Verify new credentials by logging in.
     cy.findByLabelText('User ID').type(user.ids.user_id)
     cy.findByLabelText('Password').type(`${newPassword}{enter}`)
-    cy.location('pathname').should('eq', `${Cypress.config('oauthRootPath')}/`)
+    cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/`)
     cy.findByTestId('full-error-view').should('not.exist')
   })
 })
