@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- The inability to see individual end devices in the Console due to field mask errors.
+
 ### Security
 
 ## [3.10.6] - 2021-01-12
