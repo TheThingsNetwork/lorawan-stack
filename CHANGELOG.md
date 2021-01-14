@@ -19,9 +19,13 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- The inability to see individual end devices in the Console due to field mask errors.
-
 ### Security
+
+## [3.10.7] - 2021-01-14
+
+### Fixed
+
+- The inability to see individual end devices in the Console due to field mask errors.
 
 ## [3.10.6] - 2021-01-12
 
@@ -1254,7 +1258,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.6...v3.10
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.7...v3.10
+[3.10.7]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.6...v3.10.7
 [3.10.6]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.5...v3.10.6
 [3.10.5]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.4...v3.10.5
 [3.10.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.3...v3.10.4
