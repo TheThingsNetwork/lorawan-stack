@@ -58,6 +58,7 @@
 /pkg/identityserver @htdvisser @bafonins @kschiffer
 /pkg/email @htdvisser @bafonins @kschiffer
 /pkg/oauth @htdvisser @bafonins @kschiffer
+/pkg/account @htdvisser @bafonins @kschiffer
 /pkg/web/oauthclient @htdvisser @bafonins @kschiffer
 
 /pkg/gatewayserver @johanstokking @KrishnaIyer @adriansmares
