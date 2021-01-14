@@ -50,3 +50,15 @@ func WithCallback(cb Callback) Option {
 		o.callback = cb
 	}
 }
+
+// OAuth2AuthCodeURLOptionsProvider provides OAuth2 authorization URL options
+// based on the context.
+type OAuth2AuthCodeURLOptionsProvider func(echo.Context) ([]oauth2.AuthCodeOption, error)
+
+// WithAuthCodeURLOptions changes the OAuth2 authorization URL options provided to the
+// oauth2 package.
+func WithAuthCodeURLOptions(provider OAuth2AuthCodeURLOptionsProvider) Option {
+	return func(o *OAuthClient) {
+		o.authCodeURLOpts = provider
+	}
+}
