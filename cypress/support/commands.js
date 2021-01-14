@@ -79,6 +79,38 @@ Cypress.Commands.add('loginConsole', credentials => {
   })
 })
 
+// Helper function to visit the authorization URI for the Console.
+Cypress.Commands.add('visitConsoleAuthorizationScreen', credentials => {
+  const baseUrl = Cypress.config('baseUrl')
+  const oauthRootPath = Cypress.config('oauthRootPath')
+  const consoleRootPath = Cypress.config('consoleRootPath')
+
+  cy.task('execSql', `UPDATE clients SET skip_authorization=false WHERE client_id='console';`)
+  // Obtain csrf token.
+  cy.request({
+    method: 'GET',
+    url: `${baseUrl}${oauthRootPath}/login`,
+  }).then(({ headers }) => {
+    // Login to OAuth provider.
+    cy.request({
+      method: 'POST',
+      url: `${baseUrl}${oauthRootPath}/api/auth/login`,
+      body: { user_id: credentials.user_id, password: credentials.password },
+      headers: {
+        'X-CSRF-Token': headers['x-csrf-token'],
+      },
+    })
+
+    // Do OAuth round trip.
+    cy.request({
+      method: 'GET',
+      url: `${baseUrl}${consoleRootPath}/login/ttn-stack?next=/`,
+    }).then(({ allRequestResponses }) => {
+      cy.visit(allRequestResponses[allRequestResponses.length - 1]['Request URL'])
+    })
+  })
+})
+
 // Helper function to obtain the currently active access token.
 Cypress.Commands.add('getAccessToken', callback => {
   const tokenString = window.localStorage.getItem(`accessToken-${stringToHash('/console')}`)
