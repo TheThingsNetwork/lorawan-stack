@@ -29,8 +29,6 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const defaultLimit = 1000
-
 // withDefaultModelFields appends default ttnpb.EndDeviceModel fields.
 func withDefaultModelFields(paths []string) []string {
 	return ttnpb.AddFields(paths, "brand_id", "model_id")
