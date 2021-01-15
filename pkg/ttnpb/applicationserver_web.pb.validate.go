@@ -905,7 +905,14 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 		case "template_fields":
 			// no validation rules for TemplateFields
 		case "downlink_api_key":
-			// no validation rules for DownlinkAPIKey
+
+			if utf8.RuneCountInString(m.GetDownlinkAPIKey()) > 64 {
+				return ApplicationWebhookValidationError{
+					field:  "downlink_api_key",
+					reason: "value length must be at most 64 runes",
+				}
+			}
+
 		case "uplink_message":
 
 			if v, ok := interface{}(m.GetUplinkMessage()).(interface{ ValidateFields(...string) error }); ok {
@@ -1810,7 +1817,14 @@ func (m *ApplicationWebhookTemplate_Message) ValidateFields(paths ...string) err
 		_ = subs
 		switch name {
 		case "path":
-			// no validation rules for Path
+
+			if utf8.RuneCountInString(m.GetPath()) > 64 {
+				return ApplicationWebhookTemplate_MessageValidationError{
+					field:  "path",
+					reason: "value length must be at most 64 runes",
+				}
+			}
+
 		default:
 			return ApplicationWebhookTemplate_MessageValidationError{
 				field:  name,
@@ -1894,7 +1908,14 @@ func (m *ApplicationWebhook_Message) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "path":
-			// no validation rules for Path
+
+			if utf8.RuneCountInString(m.GetPath()) > 64 {
+				return ApplicationWebhook_MessageValidationError{
+					field:  "path",
+					reason: "value length must be at most 64 runes",
+				}
+			}
+
 		default:
 			return ApplicationWebhook_MessageValidationError{
 				field:  name,

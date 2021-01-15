@@ -49,8 +49,8 @@ message GatewayModel {
 message GatewayVersionIdentifiers {
   string brand_id = 1 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
   string model_id = 2 [(gogoproto.customname) = "ModelID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
-  string hardware_version = 3;
-  string firmware_version = 4;
+  string hardware_version = 3 [(validate.rules).string.max_len = 32];
+  string firmware_version = 4 [(validate.rules).string.max_len = 32];
 }
 
 message GatewayRadio {
@@ -117,7 +117,7 @@ message Gateway {
   // Custom certificate authorities may be configured out-of-band.
   string gateway_server_address = 9 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
   bool auto_update = 10;
-  string update_channel = 11;
+  string update_channel = 11 [(validate.rules).string.max_len = 128];
 
   // Frequency plan ID of the gateway.
   // This equals the first element of the frequency_plan_ids field.

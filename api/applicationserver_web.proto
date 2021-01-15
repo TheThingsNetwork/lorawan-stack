@@ -71,7 +71,7 @@ message ApplicationWebhookTemplate {
 
   message Message {
     // Path to append to the base URL. Can contain template fields, in RFC 6570 format.
-    string path = 1;
+    string path = 1 [(validate.rules).string.max_len = 64];
   }
   Message uplink_message = 11;
   Message join_accept = 12;
@@ -111,11 +111,11 @@ message ApplicationWebhook {
 
   // The API key to be used for downlink queue operations.
   // The field is provided for convenience reasons, and can contain API keys with additional rights (albeit this is discouraged).
-  string downlink_api_key = 17 [(gogoproto.customname) = "DownlinkAPIKey"];
+  string downlink_api_key = 17 [(gogoproto.customname) = "DownlinkAPIKey", (validate.rules).string.max_len = 64];
 
   message Message {
     // Path to append to the base URL.
-    string path = 1;
+    string path = 1 [(validate.rules).string.max_len = 64];
   }
   Message uplink_message = 7;
   Message join_accept = 8;

@@ -4102,7 +4102,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
             },
             {
               "name": "uplink_message",
@@ -4254,7 +4262,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
             }
           ]
         },
@@ -4729,7 +4745,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
             }
           ]
         },
@@ -5428,7 +5452,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 128
+                  }
+                ]
+              }
             },
             {
               "name": "redirect_uris",
@@ -6532,7 +6564,15 @@
               "longType": "ContactType",
               "fullType": "ttn.lorawan.v3.ContactType",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "contact_method",
@@ -6542,7 +6582,15 @@
               "longType": "ContactMethod",
               "fullType": "ttn.lorawan.v3.ContactMethod",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "value",
@@ -6552,7 +6600,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 256
+                  }
+                ]
+              }
             },
             {
               "name": "public",
@@ -6593,7 +6649,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
             },
             {
               "name": "token",
@@ -6603,7 +6667,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
             },
             {
               "name": "entity",
@@ -6755,6 +6827,10 @@
                   {
                     "name": "string.min_len",
                     "value": 1
+                  },
+                  {
+                    "name": "string.max_len",
+                    "value": 128
                   }
                 ]
               }
@@ -8530,7 +8606,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 32
+                  }
+                ]
+              }
             },
             {
               "name": "firmware_version",
@@ -8540,7 +8624,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 32
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11372,7 +11464,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 128
+                  }
+                ]
+              }
             },
             {
               "name": "frequency_plan_id",
@@ -12514,7 +12614,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 32
+                  }
+                ]
+              }
             },
             {
               "name": "firmware_version",
@@ -12524,7 +12632,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 32
+                  }
+                ]
+              }
             }
           ]
         },
@@ -25126,7 +25242,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 32
+                  }
+                ]
+              }
             },
             {
               "name": "data",
@@ -26372,7 +26496,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "name_contains",
@@ -26382,7 +26514,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "description_contains",
@@ -26392,7 +26532,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "attributes_contain",
@@ -26432,7 +26580,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 16
+                  }
+                ]
+              }
             },
             {
               "name": "join_eui_contains",
@@ -26442,7 +26598,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 16
+                  }
+                ]
+              }
             },
             {
               "name": "dev_addr_contains",
@@ -26452,7 +26616,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 8
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -26552,7 +26724,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "name_contains",
@@ -26562,7 +26742,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "description_contains",
@@ -26572,7 +26760,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "attributes_contain",
@@ -27618,7 +27814,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "old",
@@ -27628,7 +27832,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "revoke_all_access",
@@ -27848,7 +28060,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "password_updated_at",
@@ -27906,7 +28126,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "temporary_password_created_at",

@@ -287,9 +287,23 @@ func (m *GatewayVersionIdentifiers) ValidateFields(paths ...string) error {
 			}
 
 		case "hardware_version":
-			// no validation rules for HardwareVersion
+
+			if utf8.RuneCountInString(m.GetHardwareVersion()) > 32 {
+				return GatewayVersionIdentifiersValidationError{
+					field:  "hardware_version",
+					reason: "value length must be at most 32 runes",
+				}
+			}
+
 		case "firmware_version":
-			// no validation rules for FirmwareVersion
+
+			if utf8.RuneCountInString(m.GetFirmwareVersion()) > 32 {
+				return GatewayVersionIdentifiersValidationError{
+					field:  "firmware_version",
+					reason: "value length must be at most 32 runes",
+				}
+			}
+
 		default:
 			return GatewayVersionIdentifiersValidationError{
 				field:  name,
@@ -842,7 +856,14 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 		case "auto_update":
 			// no validation rules for AutoUpdate
 		case "update_channel":
-			// no validation rules for UpdateChannel
+
+			if utf8.RuneCountInString(m.GetUpdateChannel()) > 128 {
+				return GatewayValidationError{
+					field:  "update_channel",
+					reason: "value length must be at most 128 runes",
+				}
+			}
+
 		case "frequency_plan_id":
 
 			if utf8.RuneCountInString(m.GetFrequencyPlanID()) > 64 {

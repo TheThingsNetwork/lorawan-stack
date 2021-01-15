@@ -164,7 +164,14 @@ func (m *Client) ValidateFields(paths ...string) error {
 			}
 
 		case "secret":
-			// no validation rules for Secret
+
+			if utf8.RuneCountInString(m.GetSecret()) > 128 {
+				return ClientValidationError{
+					field:  "secret",
+					reason: "value length must be at most 128 runes",
+				}
+			}
+
 		case "redirect_uris":
 
 			if len(m.GetRedirectURIs()) > 10 {

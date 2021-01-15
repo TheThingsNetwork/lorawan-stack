@@ -23,7 +23,7 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 message Picture {
   message Embedded {
     // MIME type of the picture.
-    string mime_type = 1;
+    string mime_type = 1 [(validate.rules).string.max_len = 32];
     // Picture data. A data URI can be constructed as follows:
     // `data:<mime_type>;base64,<data>`.
     bytes data = 2;

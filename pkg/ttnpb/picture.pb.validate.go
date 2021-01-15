@@ -159,7 +159,14 @@ func (m *Picture_Embedded) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "mime_type":
-			// no validation rules for MimeType
+
+			if utf8.RuneCountInString(m.GetMimeType()) > 32 {
+				return Picture_EmbeddedValidationError{
+					field:  "mime_type",
+					reason: "value length must be at most 32 runes",
+				}
+			}
+
 		case "data":
 			// no validation rules for Data
 		default:

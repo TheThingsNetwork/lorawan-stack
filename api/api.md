@@ -1427,6 +1427,7 @@ The NATS provider settings.
 | `ids` | <p>`message.required`: `true`</p> |
 | `base_url` | <p>`string.uri`: `true`</p> |
 | `format` | <p>`string.max_len`: `20`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `downlink_api_key` | <p>`string.max_len`: `64`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhook.HeadersEntry">Message `ApplicationWebhook.HeadersEntry`</a>
 
@@ -1440,6 +1441,12 @@ The NATS provider settings.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `path` | [`string`](#string) |  | Path to append to the base URL. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `path` | <p>`string.max_len`: `64`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhook.TemplateFieldsEntry">Message `ApplicationWebhook.TemplateFieldsEntry`</a>
 
@@ -1526,6 +1533,12 @@ The NATS provider settings.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `path` | [`string`](#string) |  | Path to append to the base URL. Can contain template fields, in RFC 6570 format. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `path` | <p>`string.max_len`: `64`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhookTemplateField">Message `ApplicationWebhookTemplateField`</a>
 
@@ -1690,6 +1703,7 @@ An OAuth client on the network.
 | `description` | <p>`string.max_len`: `2000`</p> |
 | `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 | `contact_info` | <p>`repeated.max_items`: `10`</p> |
+| `secret` | <p>`string.max_len`: `128`</p> |
 | `redirect_uris` | <p>`repeated.max_items`: `10`</p><p>`repeated.items.string.max_len`: `128`</p> |
 | `logout_redirect_uris` | <p>`repeated.max_items`: `10`</p><p>`repeated.items.string.max_len`: `128`</p> |
 | `state` | <p>`enum.defined_only`: `true`</p> |
@@ -1937,6 +1951,14 @@ PeerInfo
 | `public` | [`bool`](#bool) |  |  |
 | `validated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `contact_type` | <p>`enum.defined_only`: `true`</p> |
+| `contact_method` | <p>`enum.defined_only`: `true`</p> |
+| `value` | <p>`string.max_len`: `256`</p> |
+
 ### <a name="ttn.lorawan.v3.ContactInfoValidation">Message `ContactInfoValidation`</a>
 
 | Field | Type | Label | Description |
@@ -1947,6 +1969,13 @@ PeerInfo
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated |  |
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `id` | <p>`string.max_len`: `64`</p> |
+| `token` | <p>`string.max_len`: `64`</p> |
 
 ### <a name="ttn.lorawan.v3.ContactMethod">Enum `ContactMethod`</a>
 
@@ -1999,7 +2028,7 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | Field | Validations |
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
-| `api_key` | <p>`string.min_len`: `1`</p> |
+| `api_key` | <p>`string.min_len`: `1`</p><p>`string.max_len`: `128`</p> |
 
 ### <a name="ttn.lorawan.v3.ClaimEndDeviceRequest">Message `ClaimEndDeviceRequest`</a>
 
@@ -2320,6 +2349,8 @@ Identifies an end device model with version information.
 | ----- | ----------- |
 | `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `model_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `hardware_version` | <p>`string.max_len`: `32`</p> |
+| `firmware_version` | <p>`string.max_len`: `32`</p> |
 
 ### <a name="ttn.lorawan.v3.EndDevices">Message `EndDevices`</a>
 
@@ -2906,6 +2937,7 @@ next: 26 |
 | `contact_info` | <p>`repeated.max_items`: `10`</p> |
 | `version_ids` | <p>`message.required`: `true`</p> |
 | `gateway_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
+| `update_channel` | <p>`string.max_len`: `128`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
 | `frequency_plan_ids` | <p>`repeated.max_items`: `8`</p><p>`repeated.items.string.max_len`: `64`</p> |
 | `antennas` | <p>`repeated.max_items`: `8`</p> |
@@ -3108,6 +3140,8 @@ Identifies an end device model with version information.
 | ----- | ----------- |
 | `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `model_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `hardware_version` | <p>`string.max_len`: `32`</p> |
+| `firmware_version` | <p>`string.max_len`: `32`</p> |
 
 ### <a name="ttn.lorawan.v3.Gateways">Message `Gateways`</a>
 
@@ -6084,6 +6118,12 @@ The NsPba service connects a Network Server to a Packet Broker Agent.
 | `mime_type` | [`string`](#string) |  | MIME type of the picture. |
 | `data` | [`bytes`](#bytes) |  | Picture data. A data URI can be constructed as follows: `data:<mime_type>;base64,<data>`. |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `mime_type` | <p>`string.max_len`: `32`</p> |
+
 ### <a name="ttn.lorawan.v3.Picture.SizesEntry">Message `Picture.SizesEntry`</a>
 
 | Field | Type | Label | Description |
@@ -6387,7 +6427,13 @@ Right is the enum that defines all the different rights to do something in the n
 | Field | Validations |
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
+| `id_contains` | <p>`string.max_len`: `50`</p> |
+| `name_contains` | <p>`string.max_len`: `50`</p> |
+| `description_contains` | <p>`string.max_len`: `50`</p> |
 | `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
+| `dev_eui_contains` | <p>`string.max_len`: `16`</p> |
+| `join_eui_contains` | <p>`string.max_len`: `16`</p> |
+| `dev_addr_contains` | <p>`string.max_len`: `8`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchEndDevicesRequest.AttributesContainEntry">Message `SearchEndDevicesRequest.AttributesContainEntry`</a>
@@ -6416,6 +6462,9 @@ This message is used for finding entities in the EntityRegistrySearch service.
 
 | Field | Validations |
 | ----- | ----------- |
+| `id_contains` | <p>`string.max_len`: `50`</p> |
+| `name_contains` | <p>`string.max_len`: `50`</p> |
+| `description_contains` | <p>`string.max_len`: `50`</p> |
 | `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
@@ -6689,6 +6738,8 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | Field | Validations |
 | ----- | ----------- |
 | `user_ids` | <p>`message.required`: `true`</p> |
+| `new` | <p>`string.max_len`: `1000`</p> |
+| `old` | <p>`string.max_len`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.UpdateUserRequest">Message `UpdateUserRequest`</a>
 
@@ -6738,7 +6789,9 @@ User is the message that defines a user on the network.
 | `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 | `contact_info` | <p>`repeated.max_items`: `10`</p> |
 | `primary_email_address` | <p>`string.email`: `true`</p> |
+| `password` | <p>`string.max_len`: `1000`</p> |
 | `state` | <p>`enum.defined_only`: `true`</p> |
+| `temporary_password` | <p>`string.max_len`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.User.AttributesEntry">Message `User.AttributesEntry`</a>
 

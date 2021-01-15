@@ -696,9 +696,23 @@ func (m *EndDeviceVersionIdentifiers) ValidateFields(paths ...string) error {
 			}
 
 		case "hardware_version":
-			// no validation rules for HardwareVersion
+
+			if utf8.RuneCountInString(m.GetHardwareVersion()) > 32 {
+				return EndDeviceVersionIdentifiersValidationError{
+					field:  "hardware_version",
+					reason: "value length must be at most 32 runes",
+				}
+			}
+
 		case "firmware_version":
-			// no validation rules for FirmwareVersion
+
+			if utf8.RuneCountInString(m.GetFirmwareVersion()) > 32 {
+				return EndDeviceVersionIdentifiersValidationError{
+					field:  "firmware_version",
+					reason: "value length must be at most 32 runes",
+				}
+			}
+
 		default:
 			return EndDeviceVersionIdentifiersValidationError{
 				field:  name,

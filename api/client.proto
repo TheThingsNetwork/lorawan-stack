@@ -61,7 +61,7 @@ message Client {
   repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
 
   // The client secret is only visible to collaborators of the client.
-  string secret = 8;
+  string secret = 8 [(validate.rules).string.max_len = 128];
   // The allowed redirect URIs against which authorization requests are checked.
   // If the authorization request does not pass a redirect URI, the first one
   // from this list is taken.
