@@ -63,11 +63,11 @@ message ApplicationPubSub {
 
     bool use_tls = 7 [(gogoproto.customname) = "UseTLS"];
     // The server Root CA certificate. PEM formatted.
-    bytes tls_ca = 8 [(gogoproto.customname) = "TLSCA"];
+    bytes tls_ca = 8 [(gogoproto.customname) = "TLSCA", (validate.rules).bytes.max_len = 8192];
     // The client certificate. PEM formatted.
-    bytes tls_client_cert = 9 [(gogoproto.customname) = "TLSClientCert"];
+    bytes tls_client_cert = 9 [(gogoproto.customname) = "TLSClientCert", (validate.rules).bytes.max_len = 8192];
     // The client private key. PEM formatted.
-    bytes tls_client_key = 10 [(gogoproto.customname) = "TLSClientKey"];
+    bytes tls_client_key = 10 [(gogoproto.customname) = "TLSClientKey", (validate.rules).bytes.max_len = 8192];
 
     // HTTP headers to use on MQTT-over-Websocket connections.
     map<string,string> headers = 11;

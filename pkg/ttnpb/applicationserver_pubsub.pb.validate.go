@@ -1161,11 +1161,32 @@ func (m *ApplicationPubSub_MQTTProvider) ValidateFields(paths ...string) error {
 		case "use_tls":
 			// no validation rules for UseTLS
 		case "tls_ca":
-			// no validation rules for TLSCA
+
+			if len(m.GetTLSCA()) > 8192 {
+				return ApplicationPubSub_MQTTProviderValidationError{
+					field:  "tls_ca",
+					reason: "value length must be at most 8192 bytes",
+				}
+			}
+
 		case "tls_client_cert":
-			// no validation rules for TLSClientCert
+
+			if len(m.GetTLSClientCert()) > 8192 {
+				return ApplicationPubSub_MQTTProviderValidationError{
+					field:  "tls_client_cert",
+					reason: "value length must be at most 8192 bytes",
+				}
+			}
+
 		case "tls_client_key":
-			// no validation rules for TLSClientKey
+
+			if len(m.GetTLSClientKey()) > 8192 {
+				return ApplicationPubSub_MQTTProviderValidationError{
+					field:  "tls_client_key",
+					reason: "value length must be at most 8192 bytes",
+				}
+			}
+
 		case "headers":
 			// no validation rules for Headers
 		default:

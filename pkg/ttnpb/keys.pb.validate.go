@@ -62,7 +62,14 @@ func (m *KeyEnvelope) ValidateFields(paths ...string) error {
 			}
 
 		case "encrypted_key":
-			// no validation rules for EncryptedKey
+
+			if len(m.GetEncryptedKey()) > 1024 {
+				return KeyEnvelopeValidationError{
+					field:  "encrypted_key",
+					reason: "value length must be at most 1024 bytes",
+				}
+			}
+
 		default:
 			return KeyEnvelopeValidationError{
 				field:  name,

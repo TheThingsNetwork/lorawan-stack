@@ -372,7 +372,14 @@ func (m *CryptoServicePayloadRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "payload":
-			// no validation rules for Payload
+
+			if len(m.GetPayload()) > 256 {
+				return CryptoServicePayloadRequestValidationError{
+					field:  "payload",
+					reason: "value length must be at most 256 bytes",
+				}
+			}
+
 		case "provisioner_id":
 
 			if utf8.RuneCountInString(m.GetProvisionerID()) > 36 {

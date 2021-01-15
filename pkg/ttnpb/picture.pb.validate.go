@@ -168,7 +168,14 @@ func (m *Picture_Embedded) ValidateFields(paths ...string) error {
 			}
 
 		case "data":
-			// no validation rules for Data
+
+			if len(m.GetData()) > 8388608 {
+				return Picture_EmbeddedValidationError{
+					field:  "data",
+					reason: "value length must be at most 8388608 bytes",
+				}
+			}
+
 		default:
 			return Picture_EmbeddedValidationError{
 				field:  name,

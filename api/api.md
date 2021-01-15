@@ -1259,6 +1259,9 @@ The MQTT provider settings.
 | `client_id` | <p>`string.max_len`: `23`</p> |
 | `username` | <p>`string.max_len`: `100`</p> |
 | `password` | <p>`string.max_len`: `100`</p> |
+| `tls_ca` | <p>`bytes.max_len`: `8192`</p> |
+| `tls_client_cert` | <p>`bytes.max_len`: `8192`</p> |
+| `tls_client_key` | <p>`bytes.max_len`: `8192`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.HeadersEntry">Message `ApplicationPubSub.MQTTProvider.HeadersEntry`</a>
 
@@ -3762,6 +3765,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
 | `lorawan_version` | <p>`enum.defined_only`: `true`</p> |
+| `payload` | <p>`bytes.max_len`: `256`</p> |
 | `provisioner_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
 
 ### <a name="ttn.lorawan.v3.CryptoServicePayloadResponse">Message `CryptoServicePayloadResponse`</a>
@@ -4026,6 +4030,7 @@ The NsJs service connects a Network Server to a Join Server.
 | Field | Validations |
 | ----- | ----------- |
 | `kek_label` | <p>`string.max_len`: `2048`</p> |
+| `encrypted_key` | <p>`bytes.max_len`: `1024`</p> |
 
 ### <a name="ttn.lorawan.v3.RootKeys">Message `RootKeys`</a>
 
@@ -6123,6 +6128,7 @@ The NsPba service connects a Network Server to a Packet Broker Agent.
 | Field | Validations |
 | ----- | ----------- |
 | `mime_type` | <p>`string.max_len`: `32`</p> |
+| `data` | <p>`bytes.max_len`: `8388608`</p> |
 
 ### <a name="ttn.lorawan.v3.Picture.SizesEntry">Message `Picture.SizesEntry`</a>
 

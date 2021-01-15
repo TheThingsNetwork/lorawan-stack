@@ -26,7 +26,7 @@ message Picture {
     string mime_type = 1 [(validate.rules).string.max_len = 32];
     // Picture data. A data URI can be constructed as follows:
     // `data:<mime_type>;base64,<data>`.
-    bytes data = 2;
+    bytes data = 2 [(validate.rules).bytes.max_len = 8388608];
   }
 
   // Embedded picture.

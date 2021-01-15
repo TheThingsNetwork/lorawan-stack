@@ -3474,7 +3474,15 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 8192
+                  }
+                ]
+              }
             },
             {
               "name": "tls_client_cert",
@@ -3484,7 +3492,15 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 8192
+                  }
+                ]
+              }
             },
             {
               "name": "tls_client_key",
@@ -3494,7 +3510,15 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 8192
+                  }
+                ]
+              }
             },
             {
               "name": "headers",
@@ -15181,7 +15205,15 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 256
+                  }
+                ]
+              }
             },
             {
               "name": "provisioner_id",
@@ -16326,7 +16358,15 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 1024
+                  }
+                ]
+              }
             }
           ]
         },
@@ -25260,7 +25300,15 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 8388608
+                  }
+                ]
+              }
             }
           ]
         },
