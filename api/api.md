@@ -519,6 +519,7 @@ Application is the message that defines an Application in the network.
 | `name` | <p>`string.max_len`: `50`</p> |
 | `description` | <p>`string.max_len`: `2000`</p> |
 | `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
+| `contact_info` | <p>`repeated.max_items`: `10`</p> |
 
 ### <a name="ttn.lorawan.v3.Application.AttributesEntry">Message `Application.AttributesEntry`</a>
 
@@ -1688,6 +1689,9 @@ An OAuth client on the network.
 | `name` | <p>`string.max_len`: `50`</p> |
 | `description` | <p>`string.max_len`: `2000`</p> |
 | `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
+| `contact_info` | <p>`repeated.max_items`: `10`</p> |
+| `redirect_uris` | <p>`repeated.max_items`: `10`</p><p>`repeated.items.string.max_len`: `128`</p> |
+| `logout_redirect_uris` | <p>`repeated.max_items`: `10`</p><p>`repeated.items.string.max_len`: `128`</p> |
 | `state` | <p>`enum.defined_only`: `true`</p> |
 | `grants` | <p>`repeated.items.enum.defined_only`: `true`</p> |
 | `rights` | <p>`repeated.items.enum.defined_only`: `true`</p> |
@@ -2296,6 +2300,7 @@ Template for creating end devices.
 | `lorawan_version` | <p>`enum.defined_only`: `true`</p> |
 | `lorawan_phy_version` | <p>`enum.defined_only`: `true`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
+| `photos` | <p>`repeated.max_items`: `10`</p> |
 | `default_formatters` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.EndDeviceVersionIdentifiers">Message `EndDeviceVersionIdentifiers`</a>
@@ -2468,6 +2473,7 @@ This is used internally by the Network Server.
 | `beacon_frequency` | <p>`uint64.gte`: `100000`</p> |
 | `rx1_data_rate_offset` | <p>`uint32.lte`: `7`</p> |
 | `rx2_frequency` | <p>`uint64.gte`: `100000`</p> |
+| `factory_preset_frequencies` | <p>`repeated.max_items`: `96`</p> |
 | `desired_rx2_frequency` | <p>`uint64.gte`: `100000`</p> |
 | `desired_ping_slot_frequency` | <p>`uint64.gte`: `100000`</p> |
 | `desired_beacon_frequency` | <p>`uint64.gte`: `100000`</p> |
@@ -2897,10 +2903,12 @@ next: 26 |
 | `name` | <p>`string.max_len`: `50`</p> |
 | `description` | <p>`string.max_len`: `2000`</p> |
 | `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
+| `contact_info` | <p>`repeated.max_items`: `10`</p> |
 | `version_ids` | <p>`message.required`: `true`</p> |
 | `gateway_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
 | `frequency_plan_ids` | <p>`repeated.max_items`: `8`</p><p>`repeated.items.string.max_len`: `64`</p> |
+| `antennas` | <p>`repeated.max_items`: `8`</p> |
 | `downlink_path_constraint` | <p>`enum.defined_only`: `true`</p> |
 | `target_cups_uri` | <p>`string.uri`: `true`</p> |
 
@@ -3048,6 +3056,8 @@ Connection stats as monitored by the Gateway Server.
 | ----- | ----------- |
 | `time` | <p>`timestamp.required`: `true`</p> |
 | `versions` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `32`</p> |
+| `antenna_locations` | <p>`repeated.max_items`: `8`</p> |
+| `ip` | <p>`repeated.max_items`: `10`</p><p>`repeated.items.string.ip`: `true`</p> |
 | `metrics` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.GatewayStatus.MetricsEntry">Message `GatewayStatus.MetricsEntry`</a>
@@ -5920,6 +5930,7 @@ is used to manage OAuth client authorizations for users.
 | `name` | <p>`string.max_len`: `50`</p> |
 | `description` | <p>`string.max_len`: `2000`</p> |
 | `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
+| `contact_info` | <p>`repeated.max_items`: `10`</p> |
 
 ### <a name="ttn.lorawan.v3.Organization.AttributesEntry">Message `Organization.AttributesEntry`</a>
 
@@ -6725,6 +6736,7 @@ User is the message that defines a user on the network.
 | `name` | <p>`string.max_len`: `50`</p> |
 | `description` | <p>`string.max_len`: `2000`</p> |
 | `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
+| `contact_info` | <p>`repeated.max_items`: `10`</p> |
 | `primary_email_address` | <p>`string.email`: `true`</p> |
 | `state` | <p>`enum.defined_only`: `true`</p> |
 

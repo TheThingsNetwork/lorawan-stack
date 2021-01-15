@@ -826,6 +826,13 @@ func (m *EndDeviceVersion) ValidateFields(paths ...string) error {
 
 		case "photos":
 
+			if len(m.GetPhotos()) > 10 {
+				return EndDeviceVersionValidationError{
+					field:  "photos",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
+
 		case "supports_class_b":
 			// no validation rules for SupportsClassB
 		case "supports_class_c":
@@ -1066,6 +1073,13 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 			}
 
 		case "factory_preset_frequencies":
+
+			if len(m.GetFactoryPresetFrequencies()) > 96 {
+				return MACSettingsValidationError{
+					field:  "factory_preset_frequencies",
+					reason: "value must contain no more than 96 item(s)",
+				}
+			}
 
 		case "max_duty_cycle":
 

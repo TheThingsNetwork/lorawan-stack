@@ -47,7 +47,7 @@ message User {
   ];
 
   // Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user.
-  repeated ContactInfo contact_info = 7;
+  repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
 
   // Primary email address that can be used for logging in.
   // This address is not public, use contact_info for that.

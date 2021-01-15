@@ -796,6 +796,13 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "contact_info":
 
+			if len(m.GetContactInfo()) > 10 {
+				return GatewayValidationError{
+					field:  "contact_info",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
+
 			for idx, item := range m.GetContactInfo() {
 				_, _ = idx, item
 
@@ -867,6 +874,13 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 			}
 
 		case "antennas":
+
+			if len(m.Antennas) > 8 {
+				return GatewayValidationError{
+					field:  "antennas",
+					reason: "value must contain no more than 8 item(s)",
+				}
+			}
 
 			for idx, item := range m.Antennas {
 				_, _ = idx, item
@@ -2601,6 +2615,13 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 
 		case "antenna_locations":
 
+			if len(m.GetAntennaLocations()) > 8 {
+				return GatewayStatusValidationError{
+					field:  "antenna_locations",
+					reason: "value must contain no more than 8 item(s)",
+				}
+			}
+
 			for idx, item := range m.GetAntennaLocations() {
 				_, _ = idx, item
 
@@ -2617,6 +2638,25 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 			}
 
 		case "ip":
+
+			if len(m.GetIP()) > 10 {
+				return GatewayStatusValidationError{
+					field:  "ip",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
+
+			for idx, item := range m.GetIP() {
+				_, _ = idx, item
+
+				if ip := net.ParseIP(item); ip == nil {
+					return GatewayStatusValidationError{
+						field:  fmt.Sprintf("ip[%v]", idx),
+						reason: "value must be a valid IP address",
+					}
+				}
+
+			}
 
 		case "metrics":
 

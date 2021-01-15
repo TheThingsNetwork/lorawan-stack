@@ -58,18 +58,30 @@ message Client {
   ];
 
   // Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application.
-  repeated ContactInfo contact_info = 7;
+  repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
 
   // The client secret is only visible to collaborators of the client.
   string secret = 8;
   // The allowed redirect URIs against which authorization requests are checked.
   // If the authorization request does not pass a redirect URI, the first one
   // from this list is taken.
-  repeated string redirect_uris = 9 [(gogoproto.customname) = "RedirectURIs"];
+  repeated string redirect_uris = 9 [
+    (gogoproto.customname) = "RedirectURIs",
+    (validate.rules).repeated = {
+      max_items: 10,
+      items: { string: { max_len: 128 } }
+    }
+  ];
   // The allowed logout redirect URIs against which client initiated logout
   // requests are checked. If the authorization request does not pass a redirect
   // URI, the first one from this list is taken.
-  repeated string logout_redirect_uris = 15 [(gogoproto.customname) = "LogoutRedirectURIs"];
+  repeated string logout_redirect_uris = 15 [
+    (gogoproto.customname) = "LogoutRedirectURIs",
+    (validate.rules).repeated = {
+      max_items: 10,
+      items: { string: { max_len: 128 } }
+    }
+  ];
   // The reviewing state of the client.
   // This field can only be modified by admins.
   State state = 10 [(validate.rules).enum.defined_only = true];

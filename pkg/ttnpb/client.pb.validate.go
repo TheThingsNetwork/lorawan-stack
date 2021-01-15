@@ -141,6 +141,13 @@ func (m *Client) ValidateFields(paths ...string) error {
 
 		case "contact_info":
 
+			if len(m.GetContactInfo()) > 10 {
+				return ClientValidationError{
+					field:  "contact_info",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
+
 			for idx, item := range m.GetContactInfo() {
 				_, _ = idx, item
 
@@ -160,7 +167,45 @@ func (m *Client) ValidateFields(paths ...string) error {
 			// no validation rules for Secret
 		case "redirect_uris":
 
+			if len(m.GetRedirectURIs()) > 10 {
+				return ClientValidationError{
+					field:  "redirect_uris",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
+
+			for idx, item := range m.GetRedirectURIs() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 128 {
+					return ClientValidationError{
+						field:  fmt.Sprintf("redirect_uris[%v]", idx),
+						reason: "value length must be at most 128 runes",
+					}
+				}
+
+			}
+
 		case "logout_redirect_uris":
+
+			if len(m.GetLogoutRedirectURIs()) > 10 {
+				return ClientValidationError{
+					field:  "logout_redirect_uris",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
+
+			for idx, item := range m.GetLogoutRedirectURIs() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 128 {
+					return ClientValidationError{
+						field:  fmt.Sprintf("logout_redirect_uris[%v]", idx),
+						reason: "value length must be at most 128 runes",
+					}
+				}
+
+			}
 
 		case "state":
 

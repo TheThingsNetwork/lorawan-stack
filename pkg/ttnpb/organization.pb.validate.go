@@ -141,6 +141,13 @@ func (m *Organization) ValidateFields(paths ...string) error {
 
 		case "contact_info":
 
+			if len(m.GetContactInfo()) > 10 {
+				return OrganizationValidationError{
+					field:  "contact_info",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
+
 			for idx, item := range m.GetContactInfo() {
 				_, _ = idx, item
 

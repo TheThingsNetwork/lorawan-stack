@@ -145,7 +145,15 @@
               "longType": "ContactInfo",
               "fullType": "ttn.lorawan.v3.ContactInfo",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  }
+                ]
+              }
             }
           ]
         },
@@ -5402,7 +5410,15 @@
               "longType": "ContactInfo",
               "fullType": "ttn.lorawan.v3.ContactInfo",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  }
+                ]
+              }
             },
             {
               "name": "secret",
@@ -5422,7 +5438,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 128
+                  }
+                ]
+              }
             },
             {
               "name": "logout_redirect_uris",
@@ -5432,7 +5460,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 128
+                  }
+                ]
+              }
             },
             {
               "name": "state",
@@ -8329,7 +8369,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  }
+                ]
+              }
             },
             {
               "name": "supports_class_b",
@@ -9280,7 +9328,15 @@
               "longType": "uint64",
               "fullType": "uint64",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 96
+                  }
+                ]
+              }
             },
             {
               "name": "max_duty_cycle",
@@ -11252,7 +11308,15 @@
               "longType": "ContactInfo",
               "fullType": "ttn.lorawan.v3.ContactInfo",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  }
+                ]
+              }
             },
             {
               "name": "version_ids",
@@ -11358,7 +11422,15 @@
               "longType": "GatewayAntenna",
               "fullType": "ttn.lorawan.v3.GatewayAntenna",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 8
+                  }
+                ]
+              }
             },
             {
               "name": "status_public",
@@ -12190,7 +12262,15 @@
               "longType": "Location",
               "fullType": "ttn.lorawan.v3.Location",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 8
+                  }
+                ]
+              }
             },
             {
               "name": "ip",
@@ -12200,7 +12280,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  },
+                  {
+                    "name": "repeated.items.string.ip",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "metrics",
@@ -24362,7 +24454,15 @@
               "longType": "ContactInfo",
               "fullType": "ttn.lorawan.v3.ContactInfo",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  }
+                ]
+              }
             }
           ]
         },
@@ -27702,7 +27802,15 @@
               "longType": "ContactInfo",
               "fullType": "ttn.lorawan.v3.ContactInfo",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  }
+                ]
+              }
             },
             {
               "name": "primary_email_address",

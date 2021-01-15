@@ -165,7 +165,7 @@ message EndDeviceVersion {
   string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
 
   // Photos contains file names of device photos.
-  repeated string photos = 5;
+  repeated string photos = 5 [(validate.rules).repeated.max_items = 10];
 
   // Whether the device supports class B.
   bool supports_class_b = 6;
@@ -221,7 +221,7 @@ message MACSettings {
   google.protobuf.UInt64Value rx2_frequency = 9 [(validate.rules).uint64.gte = 100000];
   // List of factory-preset frequencies.
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
-  repeated uint64 factory_preset_frequencies = 10;
+  repeated uint64 factory_preset_frequencies = 10 [(validate.rules).repeated.max_items = 96];
 
   // Maximum uplink duty cycle (of all channels).
   AggregatedDutyCycleValue max_duty_cycle = 11;

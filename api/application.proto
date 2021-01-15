@@ -45,7 +45,7 @@ message Application {
   ];
 
   // Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.
-  repeated ContactInfo contact_info = 7;
+  repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
 }
 
 message Applications {

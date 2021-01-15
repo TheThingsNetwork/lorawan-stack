@@ -44,7 +44,7 @@ message Organization {
   ];
 
   // Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization.
-  repeated ContactInfo contact_info = 7;
+  repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
 }
 
 message Organizations {
