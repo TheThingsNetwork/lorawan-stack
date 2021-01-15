@@ -158,15 +158,9 @@ func (dr *DeviceRepository) GetModel(ctx context.Context, req *ttnpb.GetEndDevic
 	if len(response.Models) == 0 {
 		return nil, errModelNotFound.WithAttributes("brand_id", req.BrandID, "model_id", req.ModelID)
 	}
-	model := response.Models[0]
-	if photos := model.Photos; photos != nil {
-		photos.Main = dr.assetURL(model.BrandID, photos.Main)
-		for idx, photo := range photos.Other {
-			photos.Other[idx] = dr.assetURL(model.BrandID, photo)
-		}
-	}
+	dr.ensureBaseAssetURLs(response.Models)
 
-	return model, nil
+	return response.Models[0], nil
 }
 
 // GetTemplate implements the ttnpb.DeviceRepositoryServer interface.
