@@ -73,6 +73,12 @@ const sqlTask = (on, _) => {
     execSql: sql => {
       return client.query(sql)
     },
+    dropAndSeedDatabase: () => {
+      const sqlDump = fs.readFileSync('.cache/sqldump.sql')
+      return client.query(
+        `DROP DATABASE ttn_lorawan_dev; CREATE DATABASE ttn_lorawan_dev; ${sqlDump}`,
+      )
+    },
   })
 }
 

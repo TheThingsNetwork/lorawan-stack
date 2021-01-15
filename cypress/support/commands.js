@@ -278,9 +278,7 @@ Cypress.Commands.overwrite('click', (originalFn, subject, ...args) => {
 // Helper function to quickly seed the database to a fresh state using a
 // previously generated sql dump.
 Cypress.Commands.add('dropAndSeedDatabase', () => {
-  cy.exec('tools/bin/mage dev:sqlRestore dev:redisFlush')
-    .its('code')
-    .should('eq', 0)
+  return cy.task('dropAndSeedDatabase')
 })
 
 // Helper function to augment the stack configuration object. See support/utils.js for utility
