@@ -76,6 +76,7 @@ type Agent struct {
 
 	dataPlaneAddress string
 	netID            types.NetID
+	subscriptionTenantID,
 	clusterID,
 	homeNetworkClusterID string
 	dialOptions       func(context.Context) ([]grpc.DialOption, error)
@@ -106,7 +107,8 @@ func WithTenantContextFiller(filler TenantContextFiller) Option {
 	}
 }
 
-// WithTenantExtractor returns an Option that configures the Agent to use the given tenant extractor.
+// WithTenantExtractor returns an Option that configures the Agent to use the given tenant extractor for publishing
+// messages. The Config's TenantID is always used in subscriptions.
 func WithTenantExtractor(extractor TenantExtractor) Option {
 	return func(a *Agent) {
 		a.tenantExtractor = extractor
@@ -194,6 +196,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 
 		dataPlaneAddress:     conf.DataPlaneAddress,
 		netID:                conf.NetID,
+		subscriptionTenantID: conf.TenantID,
 		clusterID:            conf.ClusterID,
 		homeNetworkClusterID: homeNetworkClusterID,
 		dialOptions:          dialOptions,
@@ -403,11 +406,10 @@ func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn
 }
 
 func (a *Agent) subscribeDownlink(ctx context.Context) error {
-	tenantID := a.tenantExtractor(ctx)
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "packetbrokeragent",
 		"forwarder_net_id", a.netID,
-		"forwarder_tenant_id", tenantID,
+		"forwarder_tenant_id", a.subscriptionTenantID,
 		"forwarder_cluster_id", a.clusterID,
 		"group", a.clusterID,
 	))
@@ -422,7 +424,7 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 	client := routingpb.NewForwarderDataClient(conn)
 	stream, err := client.Subscribe(ctx, &routingpb.SubscribeForwarderRequest{
 		ForwarderNetId:     a.netID.MarshalNumber(),
-		ForwarderTenantId:  tenantID,
+		ForwarderTenantId:  a.subscriptionTenantID,
 		ForwarderClusterId: a.clusterID,
 		Group:              a.clusterID,
 	})
@@ -591,11 +593,10 @@ func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
 }
 
 func (a *Agent) subscribeUplink(ctx context.Context) error {
-	tenantID := a.tenantExtractor(ctx)
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "packetbrokeragent",
 		"home_network_net_id", a.netID,
-		"home_network_tenant_id", tenantID,
+		"home_network_tenant_id", a.subscriptionTenantID,
 		"home_network_cluster_id", a.homeNetworkClusterID,
 		"group", a.clusterID,
 	))
@@ -646,7 +647,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	client := routingpb.NewHomeNetworkDataClient(conn)
 	stream, err := client.Subscribe(ctx, &routingpb.SubscribeHomeNetworkRequest{
 		HomeNetworkNetId:     a.netID.MarshalNumber(),
-		HomeNetworkTenantId:  tenantID,
+		HomeNetworkTenantId:  a.subscriptionTenantID,
 		HomeNetworkClusterId: a.homeNetworkClusterID,
 		Filters:              filters,
 		Group:                a.clusterID,
