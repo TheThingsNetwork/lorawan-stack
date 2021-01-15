@@ -58,6 +58,13 @@ func (m *SearchEntitiesRequest) ValidateFields(paths ...string) error {
 			// no validation rules for DescriptionContains
 		case "attributes_contain":
 
+			if len(m.GetAttributesContain()) > 10 {
+				return SearchEntitiesRequestValidationError{
+					field:  "attributes_contain",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
+
 			for key, val := range m.GetAttributesContain() {
 				_ = val
 
@@ -75,7 +82,13 @@ func (m *SearchEntitiesRequest) ValidateFields(paths ...string) error {
 					}
 				}
 
-				// no validation rules for AttributesContain[key]
+				if utf8.RuneCountInString(val) > 50 {
+					return SearchEntitiesRequestValidationError{
+						field:  fmt.Sprintf("attributes_contain[%v]", key),
+						reason: "value length must be at most 50 runes",
+					}
+				}
+
 			}
 
 		case "field_mask":
@@ -206,6 +219,13 @@ func (m *SearchEndDevicesRequest) ValidateFields(paths ...string) error {
 			// no validation rules for DescriptionContains
 		case "attributes_contain":
 
+			if len(m.GetAttributesContain()) > 10 {
+				return SearchEndDevicesRequestValidationError{
+					field:  "attributes_contain",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
+
 			for key, val := range m.GetAttributesContain() {
 				_ = val
 
@@ -223,7 +243,13 @@ func (m *SearchEndDevicesRequest) ValidateFields(paths ...string) error {
 					}
 				}
 
-				// no validation rules for AttributesContain[key]
+				if utf8.RuneCountInString(val) > 50 {
+					return SearchEndDevicesRequestValidationError{
+						field:  fmt.Sprintf("attributes_contain[%v]", key),
+						reason: "value length must be at most 50 runes",
+					}
+				}
+
 			}
 
 		case "dev_eui_contains":

@@ -518,7 +518,7 @@ Application is the message that defines an Application in the network.
 | `ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
 | `description` | <p>`string.max_len`: `2000`</p> |
-| `attributes` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 
 ### <a name="ttn.lorawan.v3.Application.AttributesEntry">Message `Application.AttributesEntry`</a>
 
@@ -1687,7 +1687,7 @@ An OAuth client on the network.
 | `ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
 | `description` | <p>`string.max_len`: `2000`</p> |
-| `attributes` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 | `state` | <p>`enum.defined_only`: `true`</p> |
 | `grants` | <p>`repeated.items.enum.defined_only`: `true`</p> |
 | `rights` | <p>`repeated.items.enum.defined_only`: `true`</p> |
@@ -2148,7 +2148,7 @@ SDKs are responsible for combining (if desired) the three.
 | `ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
 | `description` | <p>`string.max_len`: `2000`</p> |
-| `attributes` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 | `service_profile_id` | <p>`string.max_len`: `64`</p> |
 | `network_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 | `network_server_kek_label` | <p>`string.max_len`: `2048`</p> |
@@ -2896,7 +2896,7 @@ next: 26 |
 | `ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
 | `description` | <p>`string.max_len`: `2000`</p> |
-| `attributes` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 | `version_ids` | <p>`message.required`: `true`</p> |
 | `gateway_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
@@ -2926,7 +2926,7 @@ GatewayAntenna is the message that defines a gateway antenna.
 | Field | Validations |
 | ----- | ----------- |
 | `location` | <p>`message.required`: `true`</p> |
-| `attributes` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 
 ### <a name="ttn.lorawan.v3.GatewayAntenna.AttributesEntry">Message `GatewayAntenna.AttributesEntry`</a>
 
@@ -3047,8 +3047,8 @@ Connection stats as monitored by the Gateway Server.
 | Field | Validations |
 | ----- | ----------- |
 | `time` | <p>`timestamp.required`: `true`</p> |
-| `versions` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p> |
-| `metrics` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p> |
+| `versions` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `32`</p> |
+| `metrics` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.GatewayStatus.MetricsEntry">Message `GatewayStatus.MetricsEntry`</a>
 
@@ -5244,7 +5244,7 @@ Encodes and decodes uplink messages.
 | Field | Validations |
 | ----- | ----------- |
 | `location` | <p>`message.required`: `true`</p> |
-| `attributes` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationLocation.AttributesEntry">Message `ApplicationLocation.AttributesEntry`</a>
 
@@ -5919,7 +5919,7 @@ is used to manage OAuth client authorizations for users.
 | `ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
 | `description` | <p>`string.max_len`: `2000`</p> |
-| `attributes` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 
 ### <a name="ttn.lorawan.v3.Organization.AttributesEntry">Message `Organization.AttributesEntry`</a>
 
@@ -6376,7 +6376,7 @@ Right is the enum that defines all the different rights to do something in the n
 | Field | Validations |
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
-| `attributes_contain` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchEndDevicesRequest.AttributesContainEntry">Message `SearchEndDevicesRequest.AttributesContainEntry`</a>
@@ -6405,7 +6405,7 @@ This message is used for finding entities in the EntityRegistrySearch service.
 
 | Field | Validations |
 | ----- | ----------- |
-| `attributes_contain` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchEntitiesRequest.AttributesContainEntry">Message `SearchEntitiesRequest.AttributesContainEntry`</a>
@@ -6724,7 +6724,7 @@ User is the message that defines a user on the network.
 | `ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
 | `description` | <p>`string.max_len`: `2000`</p> |
-| `attributes` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 | `primary_email_address` | <p>`string.email`: `true`</p> |
 | `state` | <p>`enum.defined_only`: `true`</p> |
 

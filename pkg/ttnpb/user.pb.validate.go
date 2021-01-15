@@ -105,6 +105,13 @@ func (m *User) ValidateFields(paths ...string) error {
 
 		case "attributes":
 
+			if len(m.GetAttributes()) > 10 {
+				return UserValidationError{
+					field:  "attributes",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
+
 			for key, val := range m.GetAttributes() {
 				_ = val
 
@@ -122,7 +129,13 @@ func (m *User) ValidateFields(paths ...string) error {
 					}
 				}
 
-				// no validation rules for Attributes[key]
+				if utf8.RuneCountInString(val) > 200 {
+					return UserValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value length must be at most 200 runes",
+					}
+				}
+
 			}
 
 		case "contact_info":

@@ -761,6 +761,13 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "attributes":
 
+			if len(m.GetAttributes()) > 10 {
+				return GatewayValidationError{
+					field:  "attributes",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
+
 			for key, val := range m.GetAttributes() {
 				_ = val
 
@@ -778,7 +785,13 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 					}
 				}
 
-				// no validation rules for Attributes[key]
+				if utf8.RuneCountInString(val) > 200 {
+					return GatewayValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value length must be at most 200 runes",
+					}
+				}
+
 			}
 
 		case "contact_info":
@@ -2423,6 +2436,13 @@ func (m *GatewayAntenna) ValidateFields(paths ...string) error {
 
 		case "attributes":
 
+			if len(m.GetAttributes()) > 10 {
+				return GatewayAntennaValidationError{
+					field:  "attributes",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
+
 			for key, val := range m.GetAttributes() {
 				_ = val
 
@@ -2440,7 +2460,13 @@ func (m *GatewayAntenna) ValidateFields(paths ...string) error {
 					}
 				}
 
-				// no validation rules for Attributes[key]
+				if utf8.RuneCountInString(val) > 200 {
+					return GatewayAntennaValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value length must be at most 200 runes",
+					}
+				}
+
 			}
 
 		default:
@@ -2540,6 +2566,13 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 
 		case "versions":
 
+			if len(m.GetVersions()) > 10 {
+				return GatewayStatusValidationError{
+					field:  "versions",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
+
 			for key, val := range m.GetVersions() {
 				_ = val
 
@@ -2557,7 +2590,13 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 					}
 				}
 
-				// no validation rules for Versions[key]
+				if utf8.RuneCountInString(val) > 32 {
+					return GatewayStatusValidationError{
+						field:  fmt.Sprintf("versions[%v]", key),
+						reason: "value length must be at most 32 runes",
+					}
+				}
+
 			}
 
 		case "antenna_locations":
@@ -2580,6 +2619,13 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 		case "ip":
 
 		case "metrics":
+
+			if len(m.GetMetrics()) > 10 {
+				return GatewayStatusValidationError{
+					field:  "metrics",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
 
 			for key, val := range m.GetMetrics() {
 				_ = val
