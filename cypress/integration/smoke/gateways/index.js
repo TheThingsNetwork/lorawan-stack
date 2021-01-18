@@ -13,5 +13,6 @@
 // limitations under the License.
 
 import deleteTests from './delete'
+import createTests from './create'
 
-export default [...deleteTests]
+export default [...deleteTests, ...createTests]
