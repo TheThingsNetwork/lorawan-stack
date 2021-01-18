@@ -484,6 +484,7 @@
   "lib.shared-messages.attributeKeyValidateTooShort": "Attribute keys must have at least 3 characters and contain no special characters",
   "lib.shared-messages.attributes": "Attributes",
   "lib.shared-messages.attributesValidateRequired": "All attribute entry values are required. Please remove empty entries.",
+  "lib.shared-messages.attributesValidateTooMany": "{field} must be 10 items or fewer",
   "lib.shared-messages.automaticUpdates": "Automatic updates",
   "lib.shared-messages.autoUpdateDescription": "Gateway can be updated automatically",
   "lib.shared-messages.backToOverview": "Back to overview",

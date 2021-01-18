@@ -484,6 +484,7 @@
   "lib.shared-messages.attributeKeyValidateTooShort": "Xxxxxxxxx xxxx xxxx xxxx xx xxxxx x xxxxxxxxxx xxx xxxxxxx xx xxxxxxx xxxxxxxxxx",
   "lib.shared-messages.attributes": "Xxxxxxxxxx",
   "lib.shared-messages.attributesValidateRequired": "Xxx xxxxxxxxx xxxxx xxxxxx xxx xxxxxxxx. Xxxxxx xxxxxx xxxxx xxxxxxx.",
+  "lib.shared-messages.attributesValidateTooMany": "{field} xxxx xx xx xxxxx xx xxxxx",
   "lib.shared-messages.automaticUpdates": "Xxxxxxxxx xxxxxxx",
   "lib.shared-messages.autoUpdateDescription": "Xxxxxxx xxx xx xxxxxxx xxxxxxxxxxxxx",
   "lib.shared-messages.backToOverview": "Xxxx xx xxxxxxxx",
