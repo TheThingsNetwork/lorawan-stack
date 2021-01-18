@@ -136,7 +136,8 @@ func (k JsSDK) Definitions() error {
 	ok, err := target.Path(
 		filepath.Join("sdk", "js", "generated", "api-definition.json"),
 		filepath.Join("sdk", "js", "generated", "api.json"),
-		filepath.Join("sdk", "js", "generated", "allowed-field-mask-paths.json"))
+		filepath.Join("sdk", "js", "generated", "allowed-field-mask-paths.json"),
+	)
 	if err != nil {
 		return targetError(err)
 	}
@@ -162,7 +163,9 @@ func (k JsSDK) DefinitionsClean(context.Context) error {
 func (k JsSDK) AllowedFieldMaskPaths() error {
 	ok, err := target.Path(
 		filepath.Join("sdk", "js", "generated", "allowed-field-mask-paths.json"),
-		filepath.Join("pkg", "ttnpb", "field_mask_validation.go"))
+		filepath.Join("pkg", "ttnpb", "field_mask_validation.go"),
+		filepath.Join("tools", "generate_allowed_field_mask_paths.go"),
+	)
 	if err != nil {
 		return targetError(err)
 	}
@@ -176,7 +179,8 @@ func (k JsSDK) AllowedFieldMaskPaths() error {
 func (k JsSDK) DeviceFieldMasks() error {
 	ok, err := target.Path(
 		filepath.Join("sdk", "js", "generated", "device-entity-map.json"),
-		filepath.Join("sdk", "js", "generated", "device-field-masks.json"))
+		filepath.Join("sdk", "js", "generated", "device-field-masks.json"),
+	)
 	if err != nil {
 		return targetError(err)
 	}

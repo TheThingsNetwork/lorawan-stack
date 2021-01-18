@@ -116,7 +116,7 @@ var (
 					paths = append(paths, strings.Replace(flag.Name, "-", "_", -1))
 				})
 			}
-			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.ApplicationWebhookRegistry/Get"])
+			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.ApplicationWebhookRegistry/Get"].Allowed)
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
@@ -149,7 +149,7 @@ var (
 					paths = append(paths, strings.Replace(flag.Name, "-", "_", -1))
 				})
 			}
-			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.ApplicationWebhookRegistry/List"])
+			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.ApplicationWebhookRegistry/List"].Allowed)
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {

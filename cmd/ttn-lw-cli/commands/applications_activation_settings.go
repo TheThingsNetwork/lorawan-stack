@@ -54,7 +54,7 @@ var (
 					paths = append(paths, strings.Replace(flag.Name, "-", "_", -1))
 				})
 			}
-			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Get"])
+			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Get"].Allowed)
 
 			js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
 			if err != nil {

@@ -30,13 +30,18 @@ func main() {
 		messagesFile = os.Args[1]
 	}
 
-	data, err := json.MarshalIndent(ttnpb.AllowedFieldMaskPathsForRPC, "", "  ")
+	data, err := json.MarshalIndent(func() map[string][]string {
+		ret := make(map[string][]string, len(ttnpb.RPCFieldMaskPaths))
+		for rpc, v := range ttnpb.RPCFieldMaskPaths {
+			ret[rpc] = v.Allowed
+		}
+		return ret
+	}(), "", "  ")
 	if err != nil {
 		panic(err)
 	}
 
-	err = ioutil.WriteFile(messagesFile, data, 0644)
-	if err != nil {
+	if err = ioutil.WriteFile(messagesFile, data, 0o644); err != nil {
 		panic(err)
 	}
 }

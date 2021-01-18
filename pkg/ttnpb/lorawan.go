@@ -23,7 +23,18 @@ import (
 	"github.com/blang/semver"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
+
+func init() {
+	for i := range PHYVersion_name {
+		PHYVersion_value[PHYVersion(i).String()] = i
+	}
+	PHYVersion_value["1.0"] = int32(PHY_V1_0)           // 1.0 is the official version number
+	PHYVersion_value["1.0.2"] = int32(PHY_V1_0_2_REV_A) // Revisions were added from 1.0.2-b
+	PHYVersion_value["1.1-a"] = int32(PHY_V1_1_REV_A)   // 1.1 is the official version number
+	PHYVersion_value["1.1-b"] = int32(PHY_V1_1_REV_B)   // 1.1 is the official version number
+}
 
 // MarshalText implements encoding.TextMarshaler interface.
 func (v MType) MarshalText() ([]byte, error) {
@@ -833,16 +844,6 @@ func (v PHYVersion) Compare(o PHYVersion) int {
 	)
 }
 
-func init() {
-	for i := range PHYVersion_name {
-		PHYVersion_value[PHYVersion(i).String()] = i
-	}
-	PHYVersion_value["1.0"] = int32(PHY_V1_0)           // 1.0 is the official version number
-	PHYVersion_value["1.0.2"] = int32(PHY_V1_0_2_REV_A) // Revisions were added from 1.0.2-b
-	PHYVersion_value["1.1-a"] = int32(PHY_V1_1_REV_A)   // 1.1 is the official version number
-	PHYVersion_value["1.1-b"] = int32(PHY_V1_1_REV_B)   // 1.1 is the official version number
-}
-
 // String implements fmt.Stringer.
 func (v DataRateIndex) String() string {
 	return strconv.Itoa(int(v))
@@ -867,4 +868,306 @@ func (v FSKDataRate) DataRate() DataRate {
 			FSK: &v,
 		},
 	}
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *CFList) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "ch_masks":
+		return v.ChMasks == nil
+	case "freq":
+		return v.Freq == nil
+	case "type":
+		return v.Type == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *DLSettings) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "opt_neg":
+		return !v.OptNeg
+	case "rx1_dr_offset":
+		return v.Rx1DROffset == 0
+	case "rx2_dr":
+		return v.Rx2DR == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *MHDR) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "m_type":
+		return v.MType == 0
+	case "major":
+		return v.Major == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *JoinAcceptPayload) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "cf_list":
+		return v.CFList == nil
+	case "cf_list.ch_masks":
+		return v.CFList.FieldIsZero("ch_masks")
+	case "cf_list.freq":
+		return v.CFList.FieldIsZero("freq")
+	case "cf_list.type":
+		return v.CFList.FieldIsZero("type")
+	case "dev_addr":
+		return v.DevAddr == types.DevAddr{}
+	case "dl_settings":
+		return v.DLSettings == DLSettings{}
+	case "dl_settings.opt_neg":
+		return v.DLSettings.FieldIsZero("opt_neg")
+	case "dl_settings.rx1_dr_offset":
+		return v.DLSettings.FieldIsZero("rx1_dr_offset")
+	case "dl_settings.rx2_dr":
+		return v.DLSettings.FieldIsZero("rx2_dr")
+	case "encrypted":
+		return v.Encrypted == nil
+	case "join_nonce":
+		return v.JoinNonce == types.JoinNonce{}
+	case "net_id":
+		return v.NetID == types.NetID{}
+	case "rx_delay":
+		return v.RxDelay == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *JoinRequestPayload) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "dev_eui":
+		return v.DevEUI == types.EUI64{}
+	case "dev_nonce":
+		return v.DevNonce == types.DevNonce{}
+	case "join_eui":
+		return v.JoinEUI == types.EUI64{}
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *FCtrl) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "ack":
+		return !v.Ack
+	case "adr":
+		return !v.ADR
+	case "adr_ack_req":
+		return !v.ADRAckReq
+	case "class_b":
+		return !v.ClassB
+	case "f_pending":
+		return !v.FPending
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *FHDR) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "dev_addr":
+		return v.DevAddr == types.DevAddr{}
+	case "f_cnt":
+		return v.FCnt == 0
+	case "f_ctrl":
+		return v.FCtrl == FCtrl{}
+	case "f_ctrl.ack":
+		return v.FCtrl.FieldIsZero("ack")
+	case "f_ctrl.adr":
+		return v.FCtrl.FieldIsZero("adr")
+	case "f_ctrl.adr_ack_req":
+		return v.FCtrl.FieldIsZero("adr_ack_req")
+	case "f_ctrl.class_b":
+		return v.FCtrl.FieldIsZero("class_b")
+	case "f_ctrl.f_pending":
+		return v.FCtrl.FieldIsZero("f_pending")
+	case "f_opts":
+		return v.FOpts == nil
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *MACPayload) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "decoded_payload":
+		return v.DecodedPayload == nil
+	case "f_hdr":
+		return fieldsAreZero(&v.FHDR, FHDRFieldPathsTopLevel...)
+	case "f_hdr.dev_addr":
+		return v.FHDR.FieldIsZero("dev_addr")
+	case "f_hdr.f_cnt":
+		return v.FHDR.FieldIsZero("f_cnt")
+	case "f_hdr.f_ctrl":
+		return v.FHDR.FieldIsZero("f_ctrl")
+	case "f_hdr.f_ctrl.ack":
+		return v.FHDR.FieldIsZero("f_ctrl.ack")
+	case "f_hdr.f_ctrl.adr":
+		return v.FHDR.FieldIsZero("f_ctrl.adr")
+	case "f_hdr.f_ctrl.adr_ack_req":
+		return v.FHDR.FieldIsZero("f_ctrl.adr_ack_req")
+	case "f_hdr.f_ctrl.class_b":
+		return v.FHDR.FieldIsZero("f_ctrl.class_b")
+	case "f_hdr.f_ctrl.f_pending":
+		return v.FHDR.FieldIsZero("f_ctrl.f_pending")
+	case "f_hdr.f_opts":
+		return v.FHDR.FieldIsZero("f_opts")
+	case "f_port":
+		return v.FPort == 0
+	case "frm_payload":
+		return v.FRMPayload == nil
+	case "full_f_cnt":
+		return v.FullFCnt == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *RejoinRequestPayload) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "dev_eui":
+		return v.DevEUI == types.EUI64{}
+	case "join_eui":
+		return v.JoinEUI == types.EUI64{}
+	case "net_id":
+		return v.NetID == types.NetID{}
+	case "rejoin_cnt":
+		return v.RejoinCnt == 0
+	case "rejoin_type":
+		return v.RejoinType == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *Message) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "Payload":
+		return v.Payload == nil
+	case "Payload.join_accept_payload":
+		return v.GetJoinAcceptPayload() == nil
+	case "Payload.join_accept_payload.cf_list":
+		return v.GetJoinAcceptPayload().FieldIsZero("cf_list")
+	case "Payload.join_accept_payload.cf_list.ch_masks":
+		return v.GetJoinAcceptPayload().FieldIsZero("cf_list.ch_masks")
+	case "Payload.join_accept_payload.cf_list.freq":
+		return v.GetJoinAcceptPayload().FieldIsZero("cf_list.freq")
+	case "Payload.join_accept_payload.cf_list.type":
+		return v.GetJoinAcceptPayload().FieldIsZero("cf_list.type")
+	case "Payload.join_accept_payload.dev_addr":
+		return v.GetJoinAcceptPayload().FieldIsZero("dev_addr")
+	case "Payload.join_accept_payload.dl_settings":
+		return v.GetJoinAcceptPayload().FieldIsZero("dl_settings")
+	case "Payload.join_accept_payload.dl_settings.opt_neg":
+		return v.GetJoinAcceptPayload().FieldIsZero("dl_settings.opt_neg")
+	case "Payload.join_accept_payload.dl_settings.rx1_dr_offset":
+		return v.GetJoinAcceptPayload().FieldIsZero("dl_settings.rx1_dr_offset")
+	case "Payload.join_accept_payload.dl_settings.rx2_dr":
+		return v.GetJoinAcceptPayload().FieldIsZero("dl_settings.rx2_dr")
+	case "Payload.join_accept_payload.encrypted":
+		return v.GetJoinAcceptPayload().FieldIsZero("encrypted")
+	case "Payload.join_accept_payload.join_nonce":
+		return v.GetJoinAcceptPayload().FieldIsZero("join_nonce")
+	case "Payload.join_accept_payload.net_id":
+		return v.GetJoinAcceptPayload().FieldIsZero("net_id")
+	case "Payload.join_accept_payload.rx_delay":
+		return v.GetJoinAcceptPayload().FieldIsZero("rx_delay")
+	case "Payload.join_request_payload":
+		return v.GetJoinRequestPayload() == nil
+	case "Payload.join_request_payload.dev_eui":
+		return v.GetJoinRequestPayload().FieldIsZero("dev_eui")
+	case "Payload.join_request_payload.dev_nonce":
+		return v.GetJoinRequestPayload().FieldIsZero("dev_nonce")
+	case "Payload.join_request_payload.join_eui":
+		return v.GetJoinRequestPayload().FieldIsZero("join_eui")
+	case "Payload.mac_payload":
+		return v.GetMACPayload() == nil
+	case "Payload.mac_payload.decoded_payload":
+		return v.GetMACPayload().FieldIsZero("decoded_payload")
+	case "Payload.mac_payload.f_hdr":
+		return v.GetMACPayload().FieldIsZero("f_hdr")
+	case "Payload.mac_payload.f_hdr.dev_addr":
+		return v.GetMACPayload().FieldIsZero("f_hdr.dev_addr")
+	case "Payload.mac_payload.f_hdr.f_cnt":
+		return v.GetMACPayload().FieldIsZero("f_hdr.f_cnt")
+	case "Payload.mac_payload.f_hdr.f_ctrl":
+		return v.GetMACPayload().FieldIsZero("f_hdr.f_ctrl")
+	case "Payload.mac_payload.f_hdr.f_ctrl.ack":
+		return v.GetMACPayload().FieldIsZero("f_hdr.f_ctrl.ack")
+	case "Payload.mac_payload.f_hdr.f_ctrl.adr":
+		return v.GetMACPayload().FieldIsZero("f_hdr.f_ctrl.adr")
+	case "Payload.mac_payload.f_hdr.f_ctrl.adr_ack_req":
+		return v.GetMACPayload().FieldIsZero("f_hdr.f_ctrl.adr_ack_req")
+	case "Payload.mac_payload.f_hdr.f_ctrl.class_b":
+		return v.GetMACPayload().FieldIsZero("f_hdr.f_ctrl.class_b")
+	case "Payload.mac_payload.f_hdr.f_ctrl.f_pending":
+		return v.GetMACPayload().FieldIsZero("f_hdr.f_ctrl.f_pending")
+	case "Payload.mac_payload.f_hdr.f_opts":
+		return v.GetMACPayload().FieldIsZero("f_hdr.f_opts")
+	case "Payload.mac_payload.f_port":
+		return v.GetMACPayload().FieldIsZero("f_port")
+	case "Payload.mac_payload.frm_payload":
+		return v.GetMACPayload().FieldIsZero("frm_payload")
+	case "Payload.mac_payload.full_f_cnt":
+		return v.GetMACPayload().FieldIsZero("full_f_cnt")
+	case "Payload.rejoin_request_payload":
+		return v.GetRejoinRequestPayload() == nil
+	case "Payload.rejoin_request_payload.dev_eui":
+		return v.GetRejoinRequestPayload().FieldIsZero("dev_eui")
+	case "Payload.rejoin_request_payload.join_eui":
+		return v.GetRejoinRequestPayload().FieldIsZero("join_eui")
+	case "Payload.rejoin_request_payload.net_id":
+		return v.GetRejoinRequestPayload().FieldIsZero("net_id")
+	case "Payload.rejoin_request_payload.rejoin_cnt":
+		return v.GetRejoinRequestPayload().FieldIsZero("rejoin_cnt")
+	case "Payload.rejoin_request_payload.rejoin_type":
+		return v.GetRejoinRequestPayload().FieldIsZero("rejoin_type")
+	case "m_hdr":
+		return v.MHDR == MHDR{}
+	case "m_hdr.m_type":
+		return v.MHDR.FieldIsZero("m_type")
+	case "m_hdr.major":
+		return v.MHDR.FieldIsZero("major")
+	case "mic":
+		return v.MIC == nil
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
 }

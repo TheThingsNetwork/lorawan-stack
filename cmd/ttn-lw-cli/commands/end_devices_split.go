@@ -26,14 +26,14 @@ import (
 )
 
 var (
-	getEndDeviceFromIS = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.EndDeviceRegistry/Get"]
-	getEndDeviceFromNS = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.NsEndDeviceRegistry/Get"]
-	getEndDeviceFromAS = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.AsEndDeviceRegistry/Get"]
-	getEndDeviceFromJS = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.JsEndDeviceRegistry/Get"]
-	setEndDeviceToIS   = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.EndDeviceRegistry/Update"]
-	setEndDeviceToNS   = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.NsEndDeviceRegistry/Set"]
-	setEndDeviceToAS   = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.AsEndDeviceRegistry/Set"]
-	setEndDeviceToJS   = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.JsEndDeviceRegistry/Set"]
+	getEndDeviceFromIS = ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.EndDeviceRegistry/Get"].Allowed
+	getEndDeviceFromNS = ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.NsEndDeviceRegistry/Get"].Allowed
+	getEndDeviceFromAS = ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.AsEndDeviceRegistry/Get"].Allowed
+	getEndDeviceFromJS = ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.JsEndDeviceRegistry/Get"].Allowed
+	setEndDeviceToIS   = ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.EndDeviceRegistry/Update"].Allowed
+	setEndDeviceToNS   = ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.NsEndDeviceRegistry/Set"].Allowed
+	setEndDeviceToAS   = ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.AsEndDeviceRegistry/Set"].Allowed
+	setEndDeviceToJS   = ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.JsEndDeviceRegistry/Set"].Allowed
 )
 
 func nonImplicitPaths(paths ...string) []string {

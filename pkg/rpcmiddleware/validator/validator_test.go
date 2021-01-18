@@ -16,6 +16,7 @@ package validator_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/gogo/protobuf/types"
@@ -62,11 +63,22 @@ func (m *msgWithValidateContext) ValidateContext(ctx context.Context) error {
 type msgWithFieldMask struct {
 	testSubject
 	fieldMask types.FieldMask
+
+	fieldIsZero       map[string]bool
+	fieldIsZeroCalled bool
 }
 
 func (m *msgWithFieldMask) GetFieldMask() types.FieldMask { return m.fieldMask }
 
 func (m *msgWithFieldMask) ValidateFields(...string) error { return nil }
+
+func (m *msgWithFieldMask) FieldIsZero(s string) bool {
+	v, ok := m.fieldIsZero[s]
+	if !ok {
+		panic(fmt.Sprintf("FieldIsZero called with unexpected field: '%s'", s))
+	}
+	return v
+}
 
 func handler(ctx context.Context, req interface{}) (interface{}, error) {
 	res := req.(interface{ getResult() *testSubject }).getResult()
@@ -80,7 +92,17 @@ func TestUnaryServerInterceptor(t *testing.T) {
 
 	testErr := errors.New("test")
 
-	RegisterAllowedFieldMaskPaths("/ttn.lorawan.v3.Test/Unary", "foo")
+	RegisterAllowedFieldMaskPaths("/ttn.lorawan.v3.Test/Unary", true, []string{
+		"foo",
+		"foo.a",
+		"foo.a.a",
+		"foo.a.b",
+		"foo.b",
+	},
+		"foo",
+		"foo.a",
+		"foo.a.b",
+	)
 
 	info := &grpc.UnaryServerInfo{FullMethod: "/ttn.lorawan.v3.Test/Unary"}
 
@@ -97,7 +119,7 @@ func TestUnaryServerInterceptor(t *testing.T) {
 		a.So(res.(*testSubject).handlerCalled, should.BeTrue)
 	}
 
-	res, err = intercept(ctx, &msgWithValidate{testSubject{
+	_, err = intercept(ctx, &msgWithValidate{testSubject{
 		err: testErr,
 	}}, info, handler)
 	if a.So(err, should.BeError) {
@@ -111,20 +133,71 @@ func TestUnaryServerInterceptor(t *testing.T) {
 		a.So(res.(*testSubject).ctx, should.Equal, ctx)
 	}
 
-	res, err = intercept(ctx, &msgWithValidateContext{testSubject{
+	_, err = intercept(ctx, &msgWithValidateContext{testSubject{
 		err: testErr,
 	}}, info, handler)
 	if a.So(err, should.BeError) {
 		a.So(err, should.Resemble, &testErr)
 	}
 
-	res, err = intercept(ctx, &msgWithFieldMask{
-		fieldMask: types.FieldMask{Paths: []string{"foo"}},
+	_, err = intercept(ctx, &msgWithFieldMask{
+		fieldMask: types.FieldMask{Paths: []string{
+			"foo",
+		}},
+		fieldIsZero: map[string]bool{
+			"foo.a.a": true,
+			"foo.b":   true,
+		},
 	}, info, handler)
 	a.So(err, should.BeNil)
 
-	res, err = intercept(ctx, &msgWithFieldMask{
-		fieldMask: types.FieldMask{Paths: []string{"bar"}},
+	_, err = intercept(ctx, &msgWithFieldMask{
+		fieldMask: types.FieldMask{Paths: []string{
+			"foo.a",
+		}},
+		fieldIsZero: map[string]bool{
+			"foo.a.a": true,
+		},
+	}, info, handler)
+	a.So(err, should.BeNil)
+
+	_, err = intercept(ctx, &msgWithFieldMask{
+		fieldMask: types.FieldMask{Paths: []string{
+			"foo.a.b",
+		}},
+	}, info, handler)
+	a.So(err, should.BeNil)
+
+	_, err = intercept(ctx, &msgWithFieldMask{
+		fieldMask: types.FieldMask{Paths: []string{
+			"foo",
+		}},
+		fieldIsZero: map[string]bool{
+			"foo.a.a": false,
+			"foo.b":   true,
+		},
+	}, info, handler)
+	if a.So(err, should.BeError) {
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	}
+
+	_, err = intercept(ctx, &msgWithFieldMask{
+		fieldMask: types.FieldMask{Paths: []string{
+			"foo",
+		}},
+		fieldIsZero: map[string]bool{
+			"foo.a.a": false,
+			"foo.b":   true,
+		},
+	}, info, handler)
+	if a.So(err, should.BeError) {
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	}
+
+	_, err = intercept(ctx, &msgWithFieldMask{
+		fieldMask: types.FieldMask{Paths: []string{
+			"bar",
+		}},
 	}, info, handler)
 	if a.So(err, should.BeError) {
 		a.So(errors.IsInvalidArgument(err), should.BeTrue)
@@ -150,14 +223,23 @@ func TestStreamServerInterceptor(t *testing.T) {
 
 	testErr := errors.New("test")
 
-	RegisterAllowedFieldMaskPaths("/ttn.lorawan.v3.Test/Stream", "foo")
+	RegisterAllowedFieldMaskPaths("/ttn.lorawan.v3.Test/Stream", true, []string{
+		"foo",
+		"foo.a",
+		"foo.a.a",
+		"foo.a.b",
+		"foo.b",
+	},
+		"foo",
+		"foo.a",
+		"foo.a.b",
+	)
 
 	info := &grpc.StreamServerInfo{FullMethod: "/ttn.lorawan.v3.Test/Stream"}
 
 	intercept := StreamServerInterceptor()
 
 	err := intercept(nil, &ss{ctx: ctx}, info, func(_ interface{}, stream grpc.ServerStream) error {
-
 		var subject interface{ getResult() *testSubject }
 
 		subject = &testSubject{}
@@ -194,13 +276,68 @@ func TestStreamServerInterceptor(t *testing.T) {
 		}
 
 		subject = &msgWithFieldMask{
-			fieldMask: types.FieldMask{Paths: []string{"foo"}},
+			fieldMask: types.FieldMask{Paths: []string{
+				"foo",
+			}},
+			fieldIsZero: map[string]bool{
+				"foo.a.a": true,
+				"foo.b":   true,
+			},
 		}
 		err = stream.RecvMsg(subject)
 		a.So(err, should.BeNil)
 
 		subject = &msgWithFieldMask{
-			fieldMask: types.FieldMask{Paths: []string{"bar"}},
+			fieldMask: types.FieldMask{Paths: []string{
+				"foo.a",
+			}},
+			fieldIsZero: map[string]bool{
+				"foo.a.a": true,
+			},
+		}
+		err = stream.RecvMsg(subject)
+		a.So(err, should.BeNil)
+
+		subject = &msgWithFieldMask{
+			fieldMask: types.FieldMask{Paths: []string{
+				"foo.a.b",
+			}},
+		}
+		err = stream.RecvMsg(subject)
+		a.So(err, should.BeNil)
+
+		subject = &msgWithFieldMask{
+			fieldMask: types.FieldMask{Paths: []string{
+				"foo",
+			}},
+			fieldIsZero: map[string]bool{
+				"foo.a.a": false,
+				"foo.b":   true,
+			},
+		}
+		err = stream.RecvMsg(subject)
+		if a.So(err, should.BeError) {
+			a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		}
+
+		subject = &msgWithFieldMask{
+			fieldMask: types.FieldMask{Paths: []string{
+				"foo",
+			}},
+			fieldIsZero: map[string]bool{
+				"foo.a.a": false,
+				"foo.b":   true,
+			},
+		}
+		err = stream.RecvMsg(subject)
+		if a.So(err, should.BeError) {
+			a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		}
+
+		subject = &msgWithFieldMask{
+			fieldMask: types.FieldMask{Paths: []string{
+				"bar",
+			}},
 		}
 		err = stream.RecvMsg(subject)
 		if a.So(err, should.BeError) {

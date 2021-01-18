@@ -20,7 +20,10 @@ package validator
 
 import (
 	"context"
+	"fmt"
 	"runtime/trace"
+	"sort"
+	"strings"
 
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -28,16 +31,42 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-var allowedFieldMaskPaths = make(map[string]map[string]struct{})
+var (
+	allowedFieldMaskPaths = make(map[string]map[string]struct{})
+	isZeroFieldMaskPaths  = make(map[string][]string)
+)
 
 // RegisterAllowedFieldMaskPaths registers the allowed field mask paths for an
 // RPC. Note that all allowed paths and sub-paths must be registered.
 // This function is not safe for concurrent use.
-func RegisterAllowedFieldMaskPaths(rpcFullMethod string, allowedPaths ...string) {
-	allowedFieldMaskPaths[rpcFullMethod] = make(map[string]struct{})
-	for _, allowedPath := range allowedPaths {
-		allowedFieldMaskPaths[rpcFullMethod][allowedPath] = struct{}{}
+func RegisterAllowedFieldMaskPaths(rpcFullMethod string, set bool, allPaths []string, allowedPaths ...string) {
+	if !sort.StringsAreSorted(allPaths) {
+		panic(fmt.Sprintf("paths for RPC '%s' are not sorted alphabetically: %v", rpcFullMethod, allPaths))
 	}
+	for _, p := range allowedPaths {
+		if i := sort.SearchStrings(allPaths, p); i == len(allPaths) || allPaths[i] != p {
+			panic(fmt.Sprintf("path '%s' is allowed for RPC '%s', but not present in all paths: %v", p, rpcFullMethod, allPaths))
+		}
+	}
+
+	allowed := make(map[string]struct{}, len(allowedPaths))
+	for _, p := range allowedPaths {
+		allowed[p] = struct{}{}
+	}
+	allowedFieldMaskPaths[rpcFullMethod] = allowed
+
+	if !set {
+		return
+	}
+	isZeroPaths := make([]string, 0, len(allPaths)-len(allowed))
+	for _, p := range allPaths {
+		_, ok := allowed[p]
+		if ok {
+			continue
+		}
+		isZeroPaths = append(isZeroPaths, p)
+	}
+	isZeroFieldMaskPaths[rpcFullMethod] = isZeroPaths
 }
 
 var errForbiddenFieldMaskPaths = errors.DefineInvalidArgument("field_mask_paths", "forbidden path(s) in field mask", "forbidden_paths")
@@ -60,16 +89,54 @@ func convertError(err error) error {
 	return grpc.Errorf(codes.InvalidArgument, err.Error())
 }
 
-var errNoValidator = errors.DefineUnimplemented("no_validator", "validator not defined")
+var (
+	errNoValidator = errors.DefineUnimplemented("no_validator", "validator not defined")
+	errNonZeroPath = errors.DefineInvalidArgument("non_zero_path", "path `{path}` is not zero")
+)
 
 func validateMessage(ctx context.Context, fullMethod string, msg interface{}) error {
 	if v, ok := msg.(interface {
 		GetFieldMask() types.FieldMask
 	}); ok {
 		region := trace.StartRegion(ctx, "validate field mask")
-		if forbiddenPaths := forbiddenPaths(v.GetFieldMask().Paths, allowedFieldMaskPaths[fullMethod]); len(forbiddenPaths) > 0 {
+
+		paths := v.GetFieldMask().Paths
+		if forbiddenPaths := forbiddenPaths(paths, allowedFieldMaskPaths[fullMethod]); len(forbiddenPaths) > 0 {
 			region.End()
 			return errForbiddenFieldMaskPaths.WithAttributes("forbidden_paths", forbiddenPaths)
+		}
+
+		isZeroPaths, ok := isZeroFieldMaskPaths[fullMethod]
+		if ok && len(isZeroPaths) > 0 {
+			var isZero func(string) bool
+		outer:
+			for _, p := range paths {
+				prefix := p + "."
+				i := sort.Search(len(isZeroPaths), func(i int) bool {
+					return strings.HasPrefix(isZeroPaths[i], prefix)
+				})
+				if i == len(isZeroPaths) || !strings.HasPrefix(isZeroPaths[i], prefix) {
+					continue
+				}
+				tail := isZeroPaths[i+1:]
+				for _, sp := range isZeroPaths[i : i+1+sort.Search(len(tail), func(j int) bool {
+					return !strings.HasPrefix(tail[j], prefix)
+				})] {
+					if isZero == nil {
+						if v, ok := msg.(interface {
+							FieldIsZero(string) bool
+						}); ok {
+							isZero = v.FieldIsZero
+						} else {
+							break outer
+						}
+					}
+					if !isZero(sp) {
+						region.End()
+						return errNonZeroPath.WithAttributes("path", sp)
+					}
+				}
+			}
 		}
 		region.End()
 	}
