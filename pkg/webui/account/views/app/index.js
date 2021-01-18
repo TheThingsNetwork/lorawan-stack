@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import { hot } from 'react-hot-loader/root'
-import { useSelector } from 'react-redux'
-import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import React, { useEffect } from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { ConnectedRouter } from 'connected-react-router'
 import { Helmet } from 'react-helmet'
@@ -22,7 +22,7 @@ import { Helmet } from 'react-helmet'
 import { ToastContainer } from '@ttn-lw/components/toast'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
-import { FullViewError } from '@ttn-lw/lib/components/full-view-error/error'
+import FullViewError from '@ttn-lw/lib/components/full-view-error'
 
 import Landing from '@account/views/landing'
 import Authorize from '@account/views/authorize'
@@ -34,6 +34,7 @@ import {
   selectApplicationSiteTitle,
   selectPageData,
 } from '@ttn-lw/lib/selectors/env'
+import { setStatusOnline } from '@ttn-lw/lib/store/actions/status'
 
 import { selectUser } from '@account/store/selectors/user'
 
@@ -45,6 +46,21 @@ const pageData = selectPageData()
 
 const AccountApp = ({ history }) => {
   const user = useSelector(selectUser)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    const handleConnectionStatusChange = ({ type }) => {
+      dispatch(setStatusOnline(type === 'online'))
+    }
+
+    window.addEventListener('online', handleConnectionStatusChange)
+    window.addEventListener('offline', handleConnectionStatusChange)
+
+    return () => {
+      window.removeEventListener('online', handleConnectionStatusChange)
+      window.removeEventListener('offline', handleConnectionStatusChange)
+    }
+  }, [dispatch])
 
   if (pageData && pageData.error) {
     return (
