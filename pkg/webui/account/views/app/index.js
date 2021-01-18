@@ -19,6 +19,8 @@ import { Switch, Route } from 'react-router-dom'
 import { ConnectedRouter } from 'connected-react-router'
 import { Helmet } from 'react-helmet'
 
+import { ToastContainer } from '@ttn-lw/components/toast'
+
 import ErrorView from '@ttn-lw/lib/components/error-view'
 import { FullViewError } from '@ttn-lw/lib/components/full-view-error/error'
 
@@ -53,20 +55,23 @@ const AccountApp = ({ history }) => {
   }
 
   return (
-    <ConnectedRouter history={history}>
-      <ErrorView ErrorComponent={FullViewError}>
-        <React.Fragment>
-          <Helmet
-            titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
-            defaultTitle={`${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
-          />
-          <Switch>
-            <Route path="/authorize" component={Authorize} />
-            <Route path="/" component={Boolean(user) ? Landing : Front} />
-          </Switch>
-        </React.Fragment>
-      </ErrorView>
-    </ConnectedRouter>
+    <>
+      <ToastContainer />
+      <ConnectedRouter history={history}>
+        <ErrorView ErrorComponent={FullViewError}>
+          <React.Fragment>
+            <Helmet
+              titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
+              defaultTitle={`${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
+            />
+            <Switch>
+              <Route path="/authorize" component={Authorize} />
+              <Route path="/" component={Boolean(user) ? Landing : Front} />
+            </Switch>
+          </React.Fragment>
+        </ErrorView>
+      </ConnectedRouter>
+    </>
   )
 }
 
