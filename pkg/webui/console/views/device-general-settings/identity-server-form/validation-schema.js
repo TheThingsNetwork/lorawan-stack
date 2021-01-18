@@ -105,6 +105,7 @@ const validationSchema = Yup.object()
       },
     ),
     attributes: Yup.array()
+      .max(10, Yup.passValues(sharedMessages.attributesValidateTooMany))
       .test(
         'has no empty string values',
         sharedMessages.attributesValidateRequired,

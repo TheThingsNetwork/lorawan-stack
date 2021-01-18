@@ -37,9 +37,11 @@ const validationSchema = Yup.object().shape({
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   update_channel: Yup.string()
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
-    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
+    .max(128, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-  frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
+  frequency_plan_id: Yup.string()
+    .max(64, Yup.passValues(sharedMessages.validateTooLong))
+    .required(sharedMessages.validateRequired),
   gateway_server_address: Yup.string().matches(
     addressRegexp,
     Yup.passValues(sharedMessages.validateAddressFormat),
@@ -54,6 +56,7 @@ const validationSchema = Yup.object().shape({
     Yup.passValues(sharedMessages.validateDelayFormat),
   ),
   attributes: Yup.array()
+    .max(10, Yup.passValues(sharedMessages.attributesValidateTooMany))
     .test(
       'has no empty string values',
       sharedMessages.attributesValidateRequired,

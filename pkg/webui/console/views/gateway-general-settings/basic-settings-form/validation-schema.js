@@ -43,6 +43,7 @@ const validationSchema = Yup.object().shape({
   update_location_from_status: Yup.boolean().default(false),
   auto_update: Yup.boolean().default(false),
   attributes: Yup.array()
+    .max(10, Yup.passValues(sharedMessages.attributesValidateTooMany))
     .test(
       'has no empty string values',
       sharedMessages.attributesValidateRequired,
