@@ -19,17 +19,20 @@ import { defineMessages, useIntl } from 'react-intl'
 
 import Icon from '@ttn-lw/components/icon'
 
-import { withEnv } from '@ttn-lw/lib/components/env'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { url as urlPattern } from '@ttn-lw/lib/regexp'
+import { selectDocumentationUrlConfig, selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 
 import style from './link.styl'
 
 const m = defineMessages({
   glossaryTitle: 'See "{term}" in the glossary',
 })
+
+const appRoot = selectApplicationRootPath()
+const docBaseUrl = selectDocumentationUrlConfig()
 
 const formatTitle = (content, values, formatter) => {
   if (typeof content === 'object' && content.id && content.defaultMessage) {
@@ -143,9 +146,6 @@ const DocLink = props => {
     to,
     raw,
     onClick,
-    env: {
-      config: { documentationBaseUrl },
-    },
   } = props
 
   const { formatMessage } = useIntl()
@@ -157,7 +157,7 @@ const DocLink = props => {
   if (disabled) {
     return <span className={classnames(classNames, style.disabled)}>{children}</span>
   }
-  const link = documentationBaseUrl.concat(path)
+  const link = docBaseUrl.concat(path)
   const formattedTitle = formatTitle(title, titleValues, formatMessage)
 
   return (
@@ -181,7 +181,6 @@ const DocLink = props => {
 
 DocLink.propTypes = {
   ...Link.propTypes,
-  env: PropTypes.env.isRequired,
   name: PropTypes.string,
   path: PropTypes.string.isRequired,
   raw: PropTypes.bool,
@@ -206,7 +205,7 @@ DocLink.defaultProps = {
   raw: false,
 }
 
-Link.DocLink = withEnv(DocLink)
+Link.DocLink = DocLink
 
 const GlossaryLink = ({ glossaryId, term, hideTerm, primary, secondary, className }) => {
   const { formatMessage } = useIntl()
@@ -304,9 +303,7 @@ AnchorLink.defaultProps = {
 
 Link.Anchor = AnchorLink
 
-const BaseAnchorLink = ({ env, href, ...rest }) => {
-  const { appRoot } = env
-
+const BaseAnchorLink = ({ href, ...rest }) => {
   // Prevent prefixing proper URLs.
   const path = href.match(urlPattern) ? href : appRoot + href
 
@@ -316,6 +313,6 @@ const BaseAnchorLink = ({ env, href, ...rest }) => {
 BaseAnchorLink.propTypes = AnchorLink.propTypes
 BaseAnchorLink.defaultProps = AnchorLink.defaultProps
 
-Link.BaseAnchor = withEnv(BaseAnchorLink)
+Link.BaseAnchor = BaseAnchorLink
 
 export default Link
