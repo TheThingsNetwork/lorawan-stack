@@ -19,8 +19,7 @@ import Spinner from '@ttn-lw/components/spinner'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-
-import { selectIsOnlineStatus } from '@console/store/selectors/status'
+import { selectIsOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 
 import Message from './message'
 

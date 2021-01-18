@@ -19,10 +19,8 @@ import ONLINE_STATUS from '@ttn-lw/constants/online-status'
 
 import { selectIsConfig } from '@ttn-lw/lib/selectors/env'
 import { isNetworkError, isTimeoutError } from '@ttn-lw/lib/errors/utils'
-
-import * as status from '@console/store/actions/status'
-
-import { selectIsOfflineStatus } from '@console/store/selectors/status'
+import * as status from '@ttn-lw/lib/store/actions/status'
+import { selectIsOfflineStatus } from '@ttn-lw/lib/store/selectors/status'
 
 const isRoot = selectIsConfig().base_url
 

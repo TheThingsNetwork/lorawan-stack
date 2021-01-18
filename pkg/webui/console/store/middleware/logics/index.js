@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import status from '@ttn-lw/lib/store/logics/status'
+
 import user from './user'
 import users from './users'
 import init from './init'
@@ -27,7 +29,6 @@ import webhooks from './webhooks'
 import pubsubs from './pubsubs'
 import applicationPackages from './application-packages'
 import is from './identity-server'
-import status from './status'
 
 export default [
   ...status,
