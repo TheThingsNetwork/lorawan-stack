@@ -65,9 +65,19 @@ func local(evt Event) *event {
 				CorrelationIDs: evt.CorrelationIDs(),
 				Origin:         evt.Origin(),
 				Visibility:     evt.Visibility(),
+				UserAgent:      evt.UserAgent(),
+				RemoteIP:       evt.RemoteIP(),
 			},
 			data:   evt.Data(),
 			caller: evt.Caller(),
+		}
+		authentication := &ttnpb.Event_Authentication{
+			Type:      evt.AuthType(),
+			TokenType: evt.AuthTokenType(),
+			TokenID:   evt.AuthTokenID(),
+		}
+		if authentication.TokenID != "" || authentication.TokenType != "" || authentication.Type != "" {
+			localEvent.innerEvent.Authentication = authentication
 		}
 	}
 	return localEvent
@@ -139,26 +149,9 @@ func (e event) Caller() string                          { return e.caller }
 func (e event) Visibility() *ttnpb.Rights               { return e.innerEvent.Visibility }
 func (e event) UserAgent() string                       { return e.innerEvent.UserAgent }
 func (e event) RemoteIP() string                        { return e.innerEvent.RemoteIP }
-func (e event) AuthType() string {
-	if e.innerEvent.Authentication == nil {
-		return ""
-	}
-	return e.innerEvent.Authentication.Type
-}
-
-func (e event) AuthTokenType() string {
-	if e.innerEvent.Authentication == nil {
-		return ""
-	}
-	return e.innerEvent.Authentication.TokenType
-}
-
-func (e event) AuthTokenID() string {
-	if e.innerEvent.Authentication == nil {
-		return ""
-	}
-	return e.innerEvent.Authentication.TokenID
-}
+func (e event) AuthType() string                        { return e.innerEvent.GetAuthentication().GetType() }
+func (e event) AuthTokenType() string                   { return e.innerEvent.GetAuthentication().GetTokenType() }
+func (e event) AuthTokenID() string                     { return e.innerEvent.GetAuthentication().GetTokenID() }
 
 var hostname string
 
@@ -253,6 +246,9 @@ func FromProto(pb *ttnpb.Event) (Event, error) {
 			CorrelationIDs: pb.CorrelationIDs,
 			Origin:         pb.Origin,
 			Visibility:     pb.Visibility,
+			Authentication: pb.Authentication,
+			RemoteIP:       pb.RemoteIP,
+			UserAgent:      pb.UserAgent,
 		},
 	}, nil
 }
