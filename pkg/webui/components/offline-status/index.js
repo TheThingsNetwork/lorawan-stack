@@ -25,12 +25,15 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectApplicationSiteTitle } from '@ttn-lw/lib/selectors/env'
 
 import style from './offline.styl'
 
+const siteTitle = selectApplicationSiteTitle()
+
 const m = defineMessages({
-  offline: 'The Console went offline',
-  online: 'The Console is back online',
+  offline: '{applicationName} went offline',
+  online: '{applicationName} is back online',
 })
 
 const handleMessage = (message, type) => {
@@ -41,7 +44,7 @@ const handleMessage = (message, type) => {
   }
 
   toast({
-    message,
+    message: { ...message, values: { applicationName: siteTitle } },
     type,
   })
 }

@@ -34,15 +34,18 @@ import {
 } from '@ttn-lw/lib/store/actions/status'
 import { getResultActionFromType } from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectIsCheckingStatus, selectIsOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
+import { selectApplicationSiteTitle } from '@ttn-lw/lib/selectors/env'
+
+const siteTitle = selectApplicationSiteTitle()
 
 const m = defineMessages({
-  applicationIsOfflineTitle: 'The application is offline',
+  applicationIsOfflineTitle: '{applicationName} is offline',
   applicationIsOfflineMessage:
-    'The action cannot be performed because the application is currently offline or has connection issues. Please check your internet connection and try again.',
+    'The action cannot be performed because your host machine is currently offline or has connection issues. Please check your internet connection and try again.',
 })
 
 const offlineError = createFrontendError(
-  m.applicationIsOfflineTitle,
+  { ...m.applicationIsOfflineTitle, values: { applicationName: siteTitle } },
   m.applicationIsOfflineMessage,
   'request_denied_application_is_offline',
 )
