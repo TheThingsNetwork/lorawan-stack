@@ -17,7 +17,7 @@ import { Switch, Route } from 'react-router-dom'
 
 import authRoutes from '@account/constants/auth-routes'
 
-import Footer from '@ttn-lw/components/footer'
+import Footer from '@ttn-lw/containers/footer'
 
 import { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error/error'
 

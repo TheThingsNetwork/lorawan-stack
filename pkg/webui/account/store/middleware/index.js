@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import status from '@ttn-lw/lib/store/logics/status'
+
 import init from './init'
 import user from './user'
 import identityServer from './identity-server'
 
-export default [...init, ...user, ...identityServer]
+export default [...status, ...init, ...user, ...identityServer]

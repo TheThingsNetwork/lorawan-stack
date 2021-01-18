@@ -17,7 +17,7 @@ import { Switch, Route, Redirect } from 'react-router'
 
 import authRoutes from '@account/constants/auth-routes'
 
-import Footer from '@ttn-lw/components/footer'
+import Footer from '@ttn-lw/containers/footer'
 
 import Header from '@account/containers/header'
 

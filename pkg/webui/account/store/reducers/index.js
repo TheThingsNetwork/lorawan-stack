@@ -15,6 +15,8 @@
 import { combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
 
+import status from '@ttn-lw/lib/store/reducers/status'
+
 import init from './init'
 import user from './user'
 import is from './identity-server'
@@ -24,5 +26,6 @@ export default history =>
     init,
     user,
     is,
+    status,
     router: connectRouter(history),
   })
