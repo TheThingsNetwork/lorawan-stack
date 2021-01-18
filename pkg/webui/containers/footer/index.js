@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { connect } from 'react-redux'
+import React from 'react'
+import { useSelector } from 'react-redux'
+
+import FooterComponent from '@ttn-lw/components/footer'
 
 import { selectOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 
-export default ErrorView =>
-  connect(state => ({
-    onlineStatus: selectOnlineStatus(state),
-  }))(ErrorView)
+const Footer = props => {
+  const onlineStatus = useSelector(selectOnlineStatus)
+
+  return <FooterComponent onlineStatus={onlineStatus} {...props} />
+}
+
+const { onlineStatus, ...propTypes } = FooterComponent.propTypes
+
+Footer.propTypes = propTypes
+
+Footer.defaultProps = {
+  ...FooterComponent.defaultProps,
+}
+
+export default Footer

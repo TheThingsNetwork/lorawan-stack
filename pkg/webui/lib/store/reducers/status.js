@@ -14,7 +14,7 @@
 
 import ONLINE_STATUS from '@ttn-lw/constants/online-status'
 
-import { SET_CONNECTION_STATUS } from '@console/store/actions/status'
+import { SET_CONNECTION_STATUS } from '@ttn-lw/lib/store/actions/status'
 
 const defaultState = {
   onlineStatus: ONLINE_STATUS.ONLINE,

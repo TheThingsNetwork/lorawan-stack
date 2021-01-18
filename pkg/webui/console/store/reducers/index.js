@@ -27,6 +27,7 @@ import {
 import { createNamedPaginationReducer } from '@ttn-lw/lib/store/reducers/pagination'
 import fetching from '@ttn-lw/lib/store/reducers/ui/fetching'
 import error from '@ttn-lw/lib/store/reducers/ui/error'
+import status from '@ttn-lw/lib/store/reducers/status'
 
 import { SHARED_NAME as APPLICATION_SHARED_NAME } from '@console/store/actions/applications'
 import { SHARED_NAME as GATEWAY_SHARED_NAME } from '@console/store/actions/gateways'
@@ -39,7 +40,6 @@ import { SHARED_NAME as COLLABORATORS_SHARED_NAME } from '@console/store/actions
 import user from './user'
 import users from './users'
 import init from './init'
-import status from './status'
 import applications from './applications'
 import devices from './devices'
 import gateways from './gateways'

@@ -27,15 +27,13 @@ import {
   createFrontendError,
 } from '@ttn-lw/lib/errors/utils'
 import { clear as clearAccessToken } from '@ttn-lw/lib/access-token'
-
 import {
   setStatusChecking,
   ATTEMPT_RECONNECT,
   attemptReconnect,
-} from '@console/store/actions/status'
+} from '@ttn-lw/lib/store/actions/status'
 import { getResultActionFromType } from '@ttn-lw/lib/store/actions/attach-promise'
-
-import { selectIsCheckingStatus, selectIsOnlineStatus } from '@console/store/selectors/status'
+import { selectIsCheckingStatus, selectIsOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 
 const m = defineMessages({
   applicationIsOfflineTitle: 'The application is offline',

@@ -21,8 +21,9 @@ import classnames from 'classnames'
 import bind from 'autobind-decorator'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
-import Footer from '@ttn-lw/components/footer'
 import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
+
+import Footer from '@ttn-lw/containers/footer'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import { withEnv } from '@ttn-lw/lib/components/env'
@@ -42,8 +43,7 @@ import User from '@console/views/user'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import dev from '@ttn-lw/lib/dev'
-
-import { setStatusOnline } from '@console/store/actions/status'
+import { setStatusOnline } from '@ttn-lw/lib/store/actions/status'
 
 import {
   selectUser,
@@ -52,7 +52,6 @@ import {
   selectUserRights,
   selectUserIsAdmin,
 } from '@console/store/selectors/user'
-import { selectOnlineStatus } from '@console/store/selectors/status'
 
 import style from './app.styl'
 
@@ -66,7 +65,6 @@ const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
     error: selectUserError(state),
     rights: selectUserRights(state),
     isAdmin: selectUserIsAdmin(state),
-    onlineStatus: selectOnlineStatus(state),
   }),
   {
     setStatusOnline,
@@ -83,7 +81,6 @@ class ConsoleApp extends React.PureComponent {
       replace: PropTypes.func,
     }).isRequired,
     isAdmin: PropTypes.bool,
-    onlineStatus: PropTypes.onlineStatus.isRequired,
     rights: PropTypes.rights,
     setStatusOnline: PropTypes.func.isRequired,
     user: PropTypes.user,
@@ -119,7 +116,6 @@ class ConsoleApp extends React.PureComponent {
       error,
       rights,
       isAdmin,
-      onlineStatus,
       history,
       env: {
         siteTitle,
@@ -183,7 +179,6 @@ class ConsoleApp extends React.PureComponent {
                 className={style.footer}
                 supportLink={supportLink}
                 documentationLink={documentationBaseUrl}
-                onlineStatus={onlineStatus}
               />
             </div>
           </ErrorView>
