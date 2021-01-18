@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import registrationTests from './registration'
-import applicationTests from './applications'
-import featureToggleTests from './feature-toggles'
-import gatewayTests from './gateways'
-import organizationTests from './organizations'
+import createTests from './create'
 
-export default [
-  ...registrationTests,
-  ...applicationTests,
-  ...featureToggleTests,
-  ...gatewayTests,
-  ...organizationTests,
-]
+export default [...createTests]
