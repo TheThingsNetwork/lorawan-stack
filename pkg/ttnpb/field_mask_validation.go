@@ -48,6 +48,7 @@ var isEndDeviceReadFieldPaths = []string{
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
 	"version_ids.model_id",
+	"version_ids.band_id",
 	"picture",
 }
 
@@ -68,6 +69,7 @@ var isEndDeviceWriteFieldPaths = []string{
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
 	"version_ids.model_id",
+	"version_ids.band_id",
 	"picture",
 }
 
@@ -338,6 +340,7 @@ var nsEndDeviceReadFieldPaths = [...]string{
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
 	"version_ids.model_id",
+	"version_ids.band_id",
 }
 
 type RPCFieldMaskPathValue struct {
@@ -428,6 +431,7 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"version_ids.firmware_version",
 			"version_ids.hardware_version",
 			"version_ids.model_id",
+			"version_ids.band_id",
 		},
 	},
 	"/ttn.lorawan.v3.AsEndDeviceRegistry/Set": {
@@ -456,6 +460,7 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"version_ids.firmware_version",
 			"version_ids.hardware_version",
 			"version_ids.model_id",
+			"version_ids.band_id",
 		},
 		Set: true,
 	},
@@ -654,6 +659,7 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"version_ids.firmware_version",
 			"version_ids.hardware_version",
 			"version_ids.model_id",
+			"version_ids.band_id",
 		},
 		Set: true,
 	},
