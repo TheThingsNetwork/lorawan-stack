@@ -477,6 +477,16 @@ func (dst *IsConfiguration_UserRegistration) SetFields(src *IsConfiguration_User
 					dst.PasswordRequirements = nil
 				}
 			}
+		case "enabled":
+			if len(subs) > 0 {
+				return fmt.Errorf("'enabled' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Enabled = src.Enabled
+			} else {
+				var zero bool
+				dst.Enabled = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

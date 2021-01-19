@@ -134,6 +134,7 @@ func (c emailTemplatesConfig) Fetcher(ctx context.Context, blobConf config.BlobC
 func (c Config) toProto() *ttnpb.IsConfiguration {
 	return &ttnpb.IsConfiguration{
 		UserRegistration: &ttnpb.IsConfiguration_UserRegistration{
+			Enabled: c.UserRegistration.Enabled,
 			Invitation: &ttnpb.IsConfiguration_UserRegistration_Invitation{
 				Required: &types.BoolValue{Value: c.UserRegistration.Invitation.Required},
 				TokenTTL: &c.UserRegistration.Invitation.TokenTTL,
