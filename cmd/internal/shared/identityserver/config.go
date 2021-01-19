@@ -49,6 +49,7 @@ var DefaultIdentityServerConfig = identityserver.Config{
 
 func init() {
 	DefaultIdentityServerConfig.AuthCache.MembershipTTL = 10 * time.Minute
+	DefaultIdentityServerConfig.UserRegistration.Enabled = true
 	DefaultIdentityServerConfig.UserRegistration.Invitation.TokenTTL = 7 * 24 * time.Hour
 	DefaultIdentityServerConfig.UserRegistration.ContactInfoValidation.TokenTTL = 2 * 24 * time.Hour
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinLength = 8

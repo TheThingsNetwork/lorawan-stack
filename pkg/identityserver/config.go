@@ -32,6 +32,7 @@ import (
 type Config struct {
 	DatabaseURI      string `name:"database-uri" description:"Database connection URI"`
 	UserRegistration struct {
+		Enabled    bool `name:"enabled" description:"Enable user registration"`
 		Invitation struct {
 			Required bool          `name:"required" description:"Require invitations for new users"`
 			TokenTTL time.Duration `name:"token-ttl" description:"TTL of user invitation tokens"`

@@ -4895,6 +4895,15 @@
       "file": "entity_access.go"
     }
   },
+  "error:pkg/identityserver:user_registration_disabled": {
+    "translations": {
+      "en": "user registration disabled"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
   "error:pkg/identityserver:user_rejected": {
     "translations": {
       "en": "user account was rejected"

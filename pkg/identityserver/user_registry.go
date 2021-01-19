@@ -72,6 +72,7 @@ var (
 )
 
 var (
+	errUserRegistrationDisabled  = errors.DefineInvalidArgument("user_registration_disabled", "user registration disabled")
 	errInvitationTokenRequired   = errors.DefineInvalidArgument("invitation_token_required", "invitation token required")
 	errInvitationTokenExpired    = errors.DefineInvalidArgument("invitation_token_expired", "invitation token expired")
 	errPasswordStrengthMinLength = errors.DefineInvalidArgument("password_strength_min_length", "need at least `{n}` characters")
@@ -115,11 +116,12 @@ func (is *IdentityServer) validatePasswordStrength(ctx context.Context, password
 
 func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserRequest) (usr *ttnpb.User, err error) {
 	createdByAdmin := is.IsAdmin(ctx)
+	config := is.configFromContext(ctx)
 
 	if err = blacklist.Check(ctx, req.UserID); err != nil {
 		return nil, err
 	}
-	if req.InvitationToken == "" && is.configFromContext(ctx).UserRegistration.Invitation.Required && !createdByAdmin {
+	if req.InvitationToken == "" && config.UserRegistration.Invitation.Required && !createdByAdmin {
 		return nil, errInvitationTokenRequired.New()
 	}
 
@@ -131,9 +133,12 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	}
 
 	if !createdByAdmin {
+		if !config.UserRegistration.Enabled {
+			return nil, errUserRegistrationDisabled.New()
+		}
 		req.User.PrimaryEmailAddressValidatedAt = nil
 		req.User.RequirePasswordUpdate = false
-		if is.configFromContext(ctx).UserRegistration.AdminApproval.Required {
+		if config.UserRegistration.AdminApproval.Required {
 			req.User.State = ttnpb.STATE_REQUESTED
 		} else {
 			req.User.State = ttnpb.STATE_APPROVED

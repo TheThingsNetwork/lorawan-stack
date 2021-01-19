@@ -92,15 +92,45 @@ func TestTemporaryValidPassword(t *testing.T) {
 	})
 }
 
-func TestUsersPermissionNotRequired(t *testing.T) {
+func TestUserCreate(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.UserRegistration.Enabled = false
 		userID := ttnpb.UserIdentifiers{UserID: "test-user-id"}
-
 		reg := ttnpb.NewUserRegistryClient(cc)
+		_, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
+			User: ttnpb.User{
+				UserIdentifiers:     userID,
+				PrimaryEmailAddress: "test-user@example.com",
+				Password:            "test password",
+			},
+		})
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.Resemble(err, errUserRegistrationDisabled), should.BeTrue)
+		}
+	})
 
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.UserRegistration.Invitation.Required = true
+		userID := ttnpb.UserIdentifiers{UserID: "test-user-id"}
+		reg := ttnpb.NewUserRegistryClient(cc)
+		_, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
+			User: ttnpb.User{
+				UserIdentifiers:     userID,
+				PrimaryEmailAddress: "test-user@example.com",
+				Password:            "test password",
+			},
+		})
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.Resemble(err, errInvitationTokenRequired), should.BeTrue)
+		}
+	})
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		userID := ttnpb.UserIdentifiers{UserID: "test-user-id"}
+		reg := ttnpb.NewUserRegistryClient(cc)
 		created, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
 			User: ttnpb.User{
 				UserIdentifiers:     userID,
@@ -108,7 +138,6 @@ func TestUsersPermissionNotRequired(t *testing.T) {
 				Password:            "test password",
 			},
 		})
-
 		a.So(err, should.BeNil)
 		a.So(created, should.NotBeNil)
 	})
