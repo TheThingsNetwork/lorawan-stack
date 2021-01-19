@@ -16,11 +16,21 @@ package email
 
 import (
 	"html/template"
+	"path"
 	"strings"
 )
 
+const documentationBaseURL = "https://www.thethingsindustries.com/docs"
+
 var defaultFuncs = template.FuncMap{
 	"strings": func() stringsFuncs { return stringsFuncs{} },
+	"documentation_url": func(elems ...string) string {
+		p := path.Join(elems...)
+		if !strings.HasPrefix(p, "/") {
+			p = "/" + p
+		}
+		return documentationBaseURL + p
+	},
 }
 
 type stringsFuncs struct{}

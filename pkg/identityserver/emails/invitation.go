@@ -37,18 +37,18 @@ const invitationText = `Hello,
 
 You have been invited to join {{ .Network.Name }}.
 
-Your Invitation Token is: {{ .InvitationToken }}
+You can now go to {{ .Network.IdentityServerURL }}/register?invitation_token={{ .InvitationToken }} to register your user.
 
-You can use this token for the "--invitation-token" flag when creating a user from the command-line interface.
-
-If you wish to register using web interface, follow the link below:
-
-{{ .Network.IdentityServerURL }}/register?invitation_token={{ .InvitationToken }}
+If you prefer to use the command-line interface, you can add "--invitation-token {{ .InvitationToken }}" when running the "ttn-lw-cli users create" command.
 
 {{- if .TTL }}
 
-These invitation links expire {{ .FormatTTL }}.
-{{ end -}}
+Your invitation expires {{ .FormatTTL }}, so register your user before then.
+{{- end }}
+
+After successful registration, you can go to {{ .Network.ConsoleURL }} to start adding devices and gateways.
+
+For more information on how how to get started, please refer to the documentation: {{ documentation_url "/getting-started/" }}.
 `
 
 // DefaultTemplates returns the default templates for this email.
