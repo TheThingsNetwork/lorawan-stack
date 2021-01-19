@@ -208,6 +208,21 @@ Cypress.Commands.add('createOrganization', (organization, userId) => {
   })
 })
 
+// Helper function to create a new end device programmatically.
+Cypress.Commands.add('createEndDevice', (applicationId, endDevice) => {
+  const baseUrl = Cypress.config('baseUrl')
+  cy.getAccessToken(accessToken => {
+    cy.request({
+      method: 'POST',
+      url: `${baseUrl}/api/v3/applications/${applicationId}/devices`,
+      body: endDevice,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+  })
+})
+
 // Overwrite the default `type` to make sure that subject is resolved and focused before simulating typing. This is helpful
 // when:
 // 1. The action is forced via the `forced` option for inputs that are visually hidden for styling purposes.

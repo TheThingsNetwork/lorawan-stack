@@ -311,7 +311,7 @@ class FetchTable extends Component {
     })
 
     return (
-      <div>
+      <div data-test-id={`${entity}-table`}>
         <div className={filtersCls}>
           <div className={style.filtersLeft}>
             {tabs.length > 0 ? (
