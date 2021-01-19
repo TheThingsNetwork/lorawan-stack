@@ -35,7 +35,7 @@ var (
 	setGatewayAntennaFlags = util.FieldFlags(&ttnpb.GatewayAntenna{}, "antenna")
 	selectAllGatewayFlags  = util.SelectAllFlagSet("gateway")
 
-	gatewayFlattenPaths = []string{"lbs_lns_secret", "claim_authentication_code"}
+	gatewayFlattenPaths = []string{"lbs_lns_secret", "claim_authentication_code", "target_cups_key"}
 )
 
 func gatewayIDFlags() *pflag.FlagSet {

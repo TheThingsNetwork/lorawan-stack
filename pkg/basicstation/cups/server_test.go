@@ -438,7 +438,7 @@ func TestServer(t *testing.T) {
 				var res UpdateInfoResponse
 				err := res.UnmarshalBinary(rec.Body.Bytes())
 				a.So(err, should.BeNil)
-				a.So(res.CUPSURI, should.Equal, "https://thethingsnetwork.org:443") //Same as the update-info request.
+				a.So(res.CUPSURI, should.Equal, "") // No update
 				a.So(res.LNSURI, should.BeEmpty)
 				a.So(res.CUPSCredentials, should.NotBeEmpty)
 				a.So(res.LNSCredentials, should.BeEmpty)

@@ -275,7 +275,6 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		if crc32.ChecksumIEEE(cupsCredentials) != req.CUPSCredentialsCRC {
 			logger.Debug("Update CUPS Credentials")
 			res.CUPSCredentials = cupsCredentials
-			res.CUPSURI = req.CUPSURI
 		}
 	} else {
 		logger := logger.WithField("lns_uri", gtw.GatewayServerAddress)
