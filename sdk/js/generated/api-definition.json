@@ -434,7 +434,8 @@
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
-        "version_ids.model_id"
+        "version_ids.model_id",
+        "version_ids.band_id"
       ]
     },
     "Set": {
@@ -481,7 +482,8 @@
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
-        "version_ids.model_id"
+        "version_ids.model_id",
+        "version_ids.band_id"
       ]
     },
     "Delete": {
@@ -2085,6 +2087,7 @@
         "version_ids.firmware_version",
         "version_ids.hardware_version",
         "version_ids.model_id",
+        "version_ids.band_id",
         "picture"
       ]
     },
@@ -2125,6 +2128,7 @@
         "version_ids.firmware_version",
         "version_ids.hardware_version",
         "version_ids.model_id",
+        "version_ids.band_id",
         "picture"
       ]
     },
@@ -2158,6 +2162,7 @@
         "version_ids.firmware_version",
         "version_ids.hardware_version",
         "version_ids.model_id",
+        "version_ids.band_id",
         "picture"
       ]
     },
@@ -3224,7 +3229,8 @@
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
-        "version_ids.model_id"
+        "version_ids.model_id",
+        "version_ids.band_id"
       ]
     },
     "Set": {
@@ -3363,7 +3369,8 @@
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
-        "version_ids.model_id"
+        "version_ids.model_id",
+        "version_ids.band_id"
       ]
     },
     "ResetFactoryDefaults": {
@@ -3645,7 +3652,8 @@
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
-        "version_ids.model_id"
+        "version_ids.model_id",
+        "version_ids.band_id"
       ]
     },
     "Delete": {
@@ -4017,6 +4025,7 @@
         "version_ids.firmware_version",
         "version_ids.hardware_version",
         "version_ids.model_id",
+        "version_ids.band_id",
         "picture"
       ]
     }
