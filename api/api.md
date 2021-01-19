@@ -152,6 +152,7 @@
   - [Message `MACState.DataRateRange`](#ttn.lorawan.v3.MACState.DataRateRange)
   - [Message `MACState.DataRateRanges`](#ttn.lorawan.v3.MACState.DataRateRanges)
   - [Message `MACState.JoinAccept`](#ttn.lorawan.v3.MACState.JoinAccept)
+  - [Message `MACState.JoinRequest`](#ttn.lorawan.v3.MACState.JoinRequest)
   - [Message `MACState.RejectedDataRateRangesEntry`](#ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry)
   - [Message `ResetAndGetEndDeviceRequest`](#ttn.lorawan.v3.ResetAndGetEndDeviceRequest)
   - [Message `Session`](#ttn.lorawan.v3.Session)
@@ -2490,7 +2491,7 @@ This is used internally by the Network Server.
 | `queued_responses` | [`MACCommand`](#ttn.lorawan.v3.MACCommand) | repeated | Queued MAC responses. Regenerated on each uplink. |
 | `pending_requests` | [`MACCommand`](#ttn.lorawan.v3.MACCommand) | repeated | Pending MAC requests(i.e. sent requests, for which no response has been received yet). Regenerated on each downlink. |
 | `queued_join_accept` | [`MACState.JoinAccept`](#ttn.lorawan.v3.MACState.JoinAccept) |  | Queued join-accept. Set each time a (re-)join request accept is received from Join Server and removed each time a downlink is scheduled. |
-| `pending_join_request` | [`JoinRequest`](#ttn.lorawan.v3.JoinRequest) |  | Pending join request. Set each time a join accept is scheduled and removed each time an uplink is received from the device. |
+| `pending_join_request` | [`MACState.JoinRequest`](#ttn.lorawan.v3.MACState.JoinRequest) |  | Pending join request. Set each time a join-accept is scheduled and removed each time an uplink is received from the device. |
 | `rx_windows_available` | [`bool`](#bool) |  | Whether or not Rx windows are expected to be open. Set to true every time an uplink is received. Set to false every time a successful downlink scheduling attempt is made. |
 | `recent_uplinks` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) | repeated | Recent data uplink messages sorted by time. The number of messages stored may depend on configuration. |
 | `recent_downlinks` | [`DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage) | repeated | Recent data downlink messages sorted by time. The number of messages stored may depend on configuration. |
@@ -2545,18 +2546,34 @@ This is used internally by the Network Server.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `payload` | [`bytes`](#bytes) |  | Payload of the join-accept received from Join Server. |
-| `request` | [`JoinRequest`](#ttn.lorawan.v3.JoinRequest) |  | JoinRequest sent to Join Server. |
+| `request` | [`MACState.JoinRequest`](#ttn.lorawan.v3.MACState.JoinRequest) |  |  |
 | `keys` | [`SessionKeys`](#ttn.lorawan.v3.SessionKeys) |  | Network session keys associated with the join. |
 | `correlation_ids` | [`string`](#string) | repeated |  |
+| `dev_addr` | [`bytes`](#bytes) |  |  |
+| `net_id` | [`bytes`](#bytes) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `payload` | <p>`bytes.min_len`: `17`</p><p>`bytes.max_len`: `33`</p> |
-| `request` | <p>`message.required`: `true`</p> |
 | `keys` | <p>`message.required`: `true`</p> |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.MACState.JoinRequest">Message `MACState.JoinRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `downlink_settings` | [`DLSettings`](#ttn.lorawan.v3.DLSettings) |  |  |
+| `rx_delay` | [`RxDelay`](#ttn.lorawan.v3.RxDelay) |  |  |
+| `cf_list` | [`CFList`](#ttn.lorawan.v3.CFList) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `downlink_settings` | <p>`message.required`: `true`</p> |
+| `rx_delay` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry">Message `MACState.RejectedDataRateRangesEntry`</a>
 

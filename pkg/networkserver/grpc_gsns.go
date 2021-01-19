@@ -1097,24 +1097,24 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		log.FromContext(ctx).Error("Reusing the DevAddr used for current session")
 	}
 
-	req := &ttnpb.JoinRequest{
+	cfList := frequencyplans.CFList(*fp, matched.LoRaWANPHYVersion)
+	dlSettings := ttnpb.DLSettings{
+		Rx1DROffset: macState.DesiredParameters.Rx1DataRateOffset,
+		Rx2DR:       macState.DesiredParameters.Rx2DataRateIndex,
+		OptNeg:      matched.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+	}
+	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.EndDeviceIdentifiers, &ttnpb.JoinRequest{
 		Payload:            up.Payload,
-		CFList:             frequencyplans.CFList(*fp, matched.LoRaWANPHYVersion),
+		CFList:             cfList,
 		CorrelationIDs:     events.CorrelationIDsFromContext(ctx),
 		DevAddr:            devAddr,
 		NetID:              ns.netID,
 		RawPayload:         up.RawPayload,
 		RxDelay:            macState.DesiredParameters.Rx1Delay,
 		SelectedMACVersion: matched.LoRaWANVersion, // Assume NS version is always higher than the version of the device
-		DownlinkSettings: ttnpb.DLSettings{
-			Rx1DROffset: macState.DesiredParameters.Rx1DataRateOffset,
-			Rx2DR:       macState.DesiredParameters.Rx2DataRateIndex,
-			OptNeg:      matched.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0,
-		},
-		ConsumedAirtime: up.ConsumedAirtime,
-	}
-
-	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.EndDeviceIdentifiers, req)
+		DownlinkSettings:   dlSettings,
+		ConsumedAirtime:    up.ConsumedAirtime,
+	})
 	queuedEvents = append(queuedEvents, joinEvents...)
 	if err != nil {
 		return err
@@ -1122,7 +1122,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	registerForwardJoinRequest(ctx, up)
 
 	keys := resp.SessionKeys
-	if !req.DownlinkSettings.OptNeg {
+	if !dlSettings.OptNeg {
 		keys.NwkSEncKey = keys.FNwkSIntKey
 		keys.SNwkSIntKey = keys.FNwkSIntKey
 	}
@@ -1130,7 +1130,13 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		CorrelationIDs: resp.CorrelationIDs,
 		Keys:           keys,
 		Payload:        resp.RawPayload,
-		Request:        *req,
+		DevAddr:        devAddr,
+		NetID:          ns.netID,
+		Request: ttnpb.MACState_JoinRequest{
+			RxDelay:          macState.DesiredParameters.Rx1Delay,
+			CFList:           cfList,
+			DownlinkSettings: dlSettings,
+		},
 	}
 	macState.RxWindowsAvailable = true
 	ctx = events.ContextWithCorrelationID(ctx, resp.CorrelationIDs...)
@@ -1144,6 +1150,15 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	case <-ns.deduplicationDone(ctx, up):
 	}
 	ns.mergeMetadata(ctx, up)
+	macState.RecentUplinks = []*ttnpb.UplinkMessage{{
+		Payload:            up.Payload,
+		Settings:           up.Settings,
+		RxMetadata:         up.RxMetadata,
+		ReceivedAt:         up.ReceivedAt,
+		CorrelationIDs:     up.CorrelationIDs,
+		DeviceChannelIndex: up.DeviceChannelIndex,
+		ConsumedAirtime:    up.ConsumedAirtime,
+	}}
 
 	logger := log.FromContext(ctx)
 	stored, storedCtx, err := ns.devices.SetByID(ctx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, matched.EndDeviceIdentifiers.DeviceID,
@@ -1158,15 +1173,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 				logger.Warn("Device deleted during join-request handling, drop")
 				return nil, nil, errOutdatedData.New()
 			}
-			macState.RecentUplinks = []*ttnpb.UplinkMessage{{
-				Payload:            up.Payload,
-				Settings:           up.Settings,
-				RxMetadata:         up.RxMetadata,
-				ReceivedAt:         up.ReceivedAt,
-				CorrelationIDs:     up.CorrelationIDs,
-				DeviceChannelIndex: up.DeviceChannelIndex,
-				ConsumedAirtime:    up.ConsumedAirtime,
-			}}
 			stored.PendingMACState = macState
 			return stored, []string{
 				"pending_mac_state",
@@ -1181,7 +1187,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	ctx = storedCtx
 
 	// TODO: Extract this into a utility function shared with mac.HandleRejoinRequest. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
-	downAt := up.ReceivedAt.Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - req.RxDelay.Duration()/2 - nsScheduleWindow())
+	downAt := up.ReceivedAt.Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - macState.DesiredParameters.Rx1Delay.Duration()/2 - nsScheduleWindow())
 	if earliestAt := timeNow().Add(nsScheduleWindow()); downAt.Before(earliestAt) {
 		downAt = earliestAt
 	}

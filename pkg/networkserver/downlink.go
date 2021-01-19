@@ -1603,9 +1603,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						req.Rx2Frequency = dev.PendingMACState.CurrentParameters.Rx2Frequency
 						req.Rx2DataRateIndex = dev.PendingMACState.CurrentParameters.Rx2DataRateIndex
 					}
-					if len(dev.PendingMACState.QueuedJoinAccept.Payload) < 4 {
-						return nil, nil, errRawPayloadTooShort.New()
-					}
 					down, downEvs, err := ns.scheduleDownlinkByPaths(
 						log.NewContext(ctx, loggerWithTxRequestFields(logger, req, attemptRX1, attemptRX2).WithField("rx1_delay", req.Rx1Delay)),
 						&scheduleRequest{
@@ -1619,8 +1616,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 								},
 								Payload: &ttnpb.Message_JoinAcceptPayload{
 									JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-										NetID:      dev.PendingMACState.QueuedJoinAccept.Request.NetID,
-										DevAddr:    dev.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+										NetID:      dev.PendingMACState.QueuedJoinAccept.NetID,
+										DevAddr:    dev.PendingMACState.QueuedJoinAccept.DevAddr,
 										DLSettings: dev.PendingMACState.QueuedJoinAccept.Request.DownlinkSettings,
 										RxDelay:    dev.PendingMACState.QueuedJoinAccept.Request.RxDelay,
 										CFList:     dev.PendingMACState.QueuedJoinAccept.Request.CFList,
@@ -1657,7 +1654,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							DeviceID:               dev.DeviceID,
 							DevEUI:                 dev.DevEUI,
 							JoinEUI:                dev.JoinEUI,
-							DevAddr:                &dev.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+							DevAddr:                &dev.PendingMACState.QueuedJoinAccept.DevAddr,
 						},
 						CorrelationIDs: events.CorrelationIDsFromContext(ctx),
 						Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -1671,7 +1668,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					})
 
 					dev.PendingSession = &ttnpb.Session{
-						DevAddr: dev.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+						DevAddr: dev.PendingMACState.QueuedJoinAccept.DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
 							FNwkSIntKey:  dev.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey,

@@ -8767,8 +8767,7 @@
           "description": "Payload of the join-accept received from Join Server."
         },
         "request": {
-          "$ref": "#/definitions/v3JoinRequest",
-          "description": "JoinRequest sent to Join Server."
+          "$ref": "#/definitions/v3MACStateJoinRequest"
         },
         "keys": {
           "$ref": "#/definitions/v3SessionKeys",
@@ -8779,6 +8778,14 @@
           "items": {
             "type": "string"
           }
+        },
+        "dev_addr": {
+          "type": "string",
+          "format": "byte"
+        },
+        "net_id": {
+          "type": "string",
+          "format": "byte"
         }
       }
     },
@@ -11775,49 +11782,6 @@
         }
       }
     },
-    "v3JoinRequest": {
-      "type": "object",
-      "properties": {
-        "raw_payload": {
-          "type": "string",
-          "format": "byte"
-        },
-        "payload": {
-          "$ref": "#/definitions/lorawanv3Message"
-        },
-        "dev_addr": {
-          "type": "string",
-          "format": "byte"
-        },
-        "selected_mac_version": {
-          "$ref": "#/definitions/v3MACVersion"
-        },
-        "net_id": {
-          "type": "string",
-          "format": "byte"
-        },
-        "downlink_settings": {
-          "$ref": "#/definitions/v3DLSettings"
-        },
-        "rx_delay": {
-          "$ref": "#/definitions/v3RxDelay"
-        },
-        "cf_list": {
-          "$ref": "#/definitions/v3CFList",
-          "description": "Optional CFList."
-        },
-        "correlation_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "consumed_airtime": {
-          "type": "string",
-          "description": "Consumed airtime for the transmission of the join request. Calculated by Network Server using the RawPayload size and the transmission settings."
-        }
-      }
-    },
     "v3JoinRequestPayload": {
       "type": "object",
       "properties": {
@@ -12388,8 +12352,8 @@
           "description": "Queued join-accept.\nSet each time a (re-)join request accept is received from Join Server and removed each time a downlink is scheduled."
         },
         "pending_join_request": {
-          "$ref": "#/definitions/v3JoinRequest",
-          "description": "Pending join request.\nSet each time a join accept is scheduled and removed each time an uplink is received from the device."
+          "$ref": "#/definitions/v3MACStateJoinRequest",
+          "description": "Pending join request.\nSet each time a join-accept is scheduled and removed each time an uplink is received from the device."
         },
         "rx_windows_available": {
           "type": "boolean",
@@ -12456,6 +12420,20 @@
         }
       },
       "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server."
+    },
+    "v3MACStateJoinRequest": {
+      "type": "object",
+      "properties": {
+        "downlink_settings": {
+          "$ref": "#/definitions/v3DLSettings"
+        },
+        "rx_delay": {
+          "$ref": "#/definitions/v3RxDelay"
+        },
+        "cf_list": {
+          "$ref": "#/definitions/v3CFList"
+        }
+      }
     },
     "v3MACVersion": {
       "type": "string",

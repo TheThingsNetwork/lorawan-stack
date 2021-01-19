@@ -302,6 +302,34 @@ func (v *MACParameters) FieldIsZero(p string) bool {
 }
 
 // FieldIsZero returns whether path p is zero.
+func (v *MACState_JoinRequest) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "cf_list":
+		return v.CFList == nil
+	case "cf_list.ch_masks":
+		return v.CFList.FieldIsZero("ch_masks")
+	case "cf_list.freq":
+		return v.CFList.FieldIsZero("freq")
+	case "cf_list.type":
+		return v.CFList.FieldIsZero("type")
+	case "downlink_settings":
+		return v.DownlinkSettings == DLSettings{}
+	case "downlink_settings.opt_neg":
+		return v.DownlinkSettings.FieldIsZero("opt_neg")
+	case "downlink_settings.rx1_dr_offset":
+		return v.DownlinkSettings.FieldIsZero("rx1_dr_offset")
+	case "downlink_settings.rx2_dr":
+		return v.DownlinkSettings.FieldIsZero("rx2_dr")
+	case "rx_delay":
+		return v.RxDelay == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
 func (v *MACState_JoinAccept) FieldIsZero(p string) bool {
 	if v == nil {
 		return true
@@ -309,6 +337,8 @@ func (v *MACState_JoinAccept) FieldIsZero(p string) bool {
 	switch p {
 	case "correlation_ids":
 		return v.CorrelationIDs == nil
+	case "dev_addr":
+		return v.DevAddr == types.DevAddr{}
 	case "keys":
 		return fieldsAreZero(&v.Keys, SessionKeysFieldPathsTopLevel...)
 	case "keys.app_s_key":
@@ -345,10 +375,12 @@ func (v *MACState_JoinAccept) FieldIsZero(p string) bool {
 		return v.Keys.FieldIsZero("s_nwk_s_int_key.key")
 	case "keys.session_key_id":
 		return v.Keys.FieldIsZero("session_key_id")
+	case "net_id":
+		return v.NetID == types.NetID{}
 	case "payload":
 		return v.Payload == nil
 	case "request":
-		return fieldsAreZero(&v.Request, JoinRequestFieldPathsTopLevel...)
+		return fieldsAreZero(&v.Request, MACState_JoinRequestFieldPathsTopLevel...)
 	case "request.cf_list":
 		return v.Request.FieldIsZero("cf_list")
 	case "request.cf_list.ch_masks":
@@ -357,12 +389,6 @@ func (v *MACState_JoinAccept) FieldIsZero(p string) bool {
 		return v.Request.FieldIsZero("cf_list.freq")
 	case "request.cf_list.type":
 		return v.Request.FieldIsZero("cf_list.type")
-	case "request.consumed_airtime":
-		return v.Request.FieldIsZero("consumed_airtime")
-	case "request.correlation_ids":
-		return v.Request.FieldIsZero("correlation_ids")
-	case "request.dev_addr":
-		return v.Request.FieldIsZero("dev_addr")
 	case "request.downlink_settings":
 		return v.Request.FieldIsZero("downlink_settings")
 	case "request.downlink_settings.opt_neg":
@@ -371,104 +397,8 @@ func (v *MACState_JoinAccept) FieldIsZero(p string) bool {
 		return v.Request.FieldIsZero("downlink_settings.rx1_dr_offset")
 	case "request.downlink_settings.rx2_dr":
 		return v.Request.FieldIsZero("downlink_settings.rx2_dr")
-	case "request.net_id":
-		return v.Request.FieldIsZero("net_id")
-	case "request.payload":
-		return v.Request.FieldIsZero("payload")
-	case "request.payload.Payload":
-		return v.Request.FieldIsZero("payload.Payload")
-	case "request.payload.Payload.join_accept_payload":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload")
-	case "request.payload.Payload.join_accept_payload.cf_list":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload.cf_list")
-	case "request.payload.Payload.join_accept_payload.cf_list.ch_masks":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload.cf_list.ch_masks")
-	case "request.payload.Payload.join_accept_payload.cf_list.freq":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload.cf_list.freq")
-	case "request.payload.Payload.join_accept_payload.cf_list.type":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload.cf_list.type")
-	case "request.payload.Payload.join_accept_payload.dev_addr":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload.dev_addr")
-	case "request.payload.Payload.join_accept_payload.dl_settings":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload.dl_settings")
-	case "request.payload.Payload.join_accept_payload.dl_settings.opt_neg":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload.dl_settings.opt_neg")
-	case "request.payload.Payload.join_accept_payload.dl_settings.rx1_dr_offset":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload.dl_settings.rx1_dr_offset")
-	case "request.payload.Payload.join_accept_payload.dl_settings.rx2_dr":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload.dl_settings.rx2_dr")
-	case "request.payload.Payload.join_accept_payload.encrypted":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload.encrypted")
-	case "request.payload.Payload.join_accept_payload.join_nonce":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload.join_nonce")
-	case "request.payload.Payload.join_accept_payload.net_id":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload.net_id")
-	case "request.payload.Payload.join_accept_payload.rx_delay":
-		return v.Request.FieldIsZero("payload.Payload.join_accept_payload.rx_delay")
-	case "request.payload.Payload.join_request_payload":
-		return v.Request.FieldIsZero("payload.Payload.join_request_payload")
-	case "request.payload.Payload.join_request_payload.dev_eui":
-		return v.Request.FieldIsZero("payload.Payload.join_request_payload.dev_eui")
-	case "request.payload.Payload.join_request_payload.dev_nonce":
-		return v.Request.FieldIsZero("payload.Payload.join_request_payload.dev_nonce")
-	case "request.payload.Payload.join_request_payload.join_eui":
-		return v.Request.FieldIsZero("payload.Payload.join_request_payload.join_eui")
-	case "request.payload.Payload.mac_payload":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload")
-	case "request.payload.Payload.mac_payload.decoded_payload":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.decoded_payload")
-	case "request.payload.Payload.mac_payload.f_hdr":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.f_hdr")
-	case "request.payload.Payload.mac_payload.f_hdr.dev_addr":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.f_hdr.dev_addr")
-	case "request.payload.Payload.mac_payload.f_hdr.f_cnt":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.f_hdr.f_cnt")
-	case "request.payload.Payload.mac_payload.f_hdr.f_ctrl":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.f_hdr.f_ctrl")
-	case "request.payload.Payload.mac_payload.f_hdr.f_ctrl.ack":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.f_hdr.f_ctrl.ack")
-	case "request.payload.Payload.mac_payload.f_hdr.f_ctrl.adr":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.f_hdr.f_ctrl.adr")
-	case "request.payload.Payload.mac_payload.f_hdr.f_ctrl.adr_ack_req":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.f_hdr.f_ctrl.adr_ack_req")
-	case "request.payload.Payload.mac_payload.f_hdr.f_ctrl.class_b":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.f_hdr.f_ctrl.class_b")
-	case "request.payload.Payload.mac_payload.f_hdr.f_ctrl.f_pending":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.f_hdr.f_ctrl.f_pending")
-	case "request.payload.Payload.mac_payload.f_hdr.f_opts":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.f_hdr.f_opts")
-	case "request.payload.Payload.mac_payload.f_port":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.f_port")
-	case "request.payload.Payload.mac_payload.frm_payload":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.frm_payload")
-	case "request.payload.Payload.mac_payload.full_f_cnt":
-		return v.Request.FieldIsZero("payload.Payload.mac_payload.full_f_cnt")
-	case "request.payload.Payload.rejoin_request_payload":
-		return v.Request.FieldIsZero("payload.Payload.rejoin_request_payload")
-	case "request.payload.Payload.rejoin_request_payload.dev_eui":
-		return v.Request.FieldIsZero("payload.Payload.rejoin_request_payload.dev_eui")
-	case "request.payload.Payload.rejoin_request_payload.join_eui":
-		return v.Request.FieldIsZero("payload.Payload.rejoin_request_payload.join_eui")
-	case "request.payload.Payload.rejoin_request_payload.net_id":
-		return v.Request.FieldIsZero("payload.Payload.rejoin_request_payload.net_id")
-	case "request.payload.Payload.rejoin_request_payload.rejoin_cnt":
-		return v.Request.FieldIsZero("payload.Payload.rejoin_request_payload.rejoin_cnt")
-	case "request.payload.Payload.rejoin_request_payload.rejoin_type":
-		return v.Request.FieldIsZero("payload.Payload.rejoin_request_payload.rejoin_type")
-	case "request.payload.m_hdr":
-		return v.Request.FieldIsZero("payload.m_hdr")
-	case "request.payload.m_hdr.m_type":
-		return v.Request.FieldIsZero("payload.m_hdr.m_type")
-	case "request.payload.m_hdr.major":
-		return v.Request.FieldIsZero("payload.m_hdr.major")
-	case "request.payload.mic":
-		return v.Request.FieldIsZero("payload.mic")
-	case "request.raw_payload":
-		return v.Request.FieldIsZero("raw_payload")
 	case "request.rx_delay":
 		return v.Request.FieldIsZero("rx_delay")
-	case "request.selected_mac_version":
-		return v.Request.FieldIsZero("selected_mac_version")
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -755,6 +685,8 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.QueuedJoinAccept == nil
 	case "queued_join_accept.correlation_ids":
 		return v.QueuedJoinAccept.FieldIsZero("correlation_ids")
+	case "queued_join_accept.dev_addr":
+		return v.QueuedJoinAccept.FieldIsZero("dev_addr")
 	case "queued_join_accept.keys":
 		return v.QueuedJoinAccept.FieldIsZero("keys")
 	case "queued_join_accept.keys.app_s_key":
@@ -791,6 +723,8 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.QueuedJoinAccept.FieldIsZero("keys.s_nwk_s_int_key.key")
 	case "queued_join_accept.keys.session_key_id":
 		return v.QueuedJoinAccept.FieldIsZero("keys.session_key_id")
+	case "queued_join_accept.net_id":
+		return v.QueuedJoinAccept.FieldIsZero("net_id")
 	case "queued_join_accept.payload":
 		return v.QueuedJoinAccept.FieldIsZero("payload")
 	case "queued_join_accept.request":
@@ -803,12 +737,6 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.QueuedJoinAccept.FieldIsZero("request.cf_list.freq")
 	case "queued_join_accept.request.cf_list.type":
 		return v.QueuedJoinAccept.FieldIsZero("request.cf_list.type")
-	case "queued_join_accept.request.consumed_airtime":
-		return v.QueuedJoinAccept.FieldIsZero("request.consumed_airtime")
-	case "queued_join_accept.request.correlation_ids":
-		return v.QueuedJoinAccept.FieldIsZero("request.correlation_ids")
-	case "queued_join_accept.request.dev_addr":
-		return v.QueuedJoinAccept.FieldIsZero("request.dev_addr")
 	case "queued_join_accept.request.downlink_settings":
 		return v.QueuedJoinAccept.FieldIsZero("request.downlink_settings")
 	case "queued_join_accept.request.downlink_settings.opt_neg":
@@ -817,104 +745,8 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.QueuedJoinAccept.FieldIsZero("request.downlink_settings.rx1_dr_offset")
 	case "queued_join_accept.request.downlink_settings.rx2_dr":
 		return v.QueuedJoinAccept.FieldIsZero("request.downlink_settings.rx2_dr")
-	case "queued_join_accept.request.net_id":
-		return v.QueuedJoinAccept.FieldIsZero("request.net_id")
-	case "queued_join_accept.request.payload":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload")
-	case "queued_join_accept.request.payload.Payload":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload.cf_list":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload.cf_list")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload.cf_list.ch_masks":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload.cf_list.ch_masks")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload.cf_list.freq":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload.cf_list.freq")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload.cf_list.type":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload.cf_list.type")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload.dev_addr":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload.dev_addr")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload.dl_settings":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload.dl_settings")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload.dl_settings.opt_neg":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload.dl_settings.opt_neg")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload.dl_settings.rx1_dr_offset":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload.dl_settings.rx1_dr_offset")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload.dl_settings.rx2_dr":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload.dl_settings.rx2_dr")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload.encrypted":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload.encrypted")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload.join_nonce":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload.join_nonce")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload.net_id":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload.net_id")
-	case "queued_join_accept.request.payload.Payload.join_accept_payload.rx_delay":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_accept_payload.rx_delay")
-	case "queued_join_accept.request.payload.Payload.join_request_payload":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_request_payload")
-	case "queued_join_accept.request.payload.Payload.join_request_payload.dev_eui":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_request_payload.dev_eui")
-	case "queued_join_accept.request.payload.Payload.join_request_payload.dev_nonce":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_request_payload.dev_nonce")
-	case "queued_join_accept.request.payload.Payload.join_request_payload.join_eui":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.join_request_payload.join_eui")
-	case "queued_join_accept.request.payload.Payload.mac_payload":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload")
-	case "queued_join_accept.request.payload.Payload.mac_payload.decoded_payload":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.decoded_payload")
-	case "queued_join_accept.request.payload.Payload.mac_payload.f_hdr":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.f_hdr")
-	case "queued_join_accept.request.payload.Payload.mac_payload.f_hdr.dev_addr":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.f_hdr.dev_addr")
-	case "queued_join_accept.request.payload.Payload.mac_payload.f_hdr.f_cnt":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.f_hdr.f_cnt")
-	case "queued_join_accept.request.payload.Payload.mac_payload.f_hdr.f_ctrl":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.f_hdr.f_ctrl")
-	case "queued_join_accept.request.payload.Payload.mac_payload.f_hdr.f_ctrl.ack":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.f_hdr.f_ctrl.ack")
-	case "queued_join_accept.request.payload.Payload.mac_payload.f_hdr.f_ctrl.adr":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.f_hdr.f_ctrl.adr")
-	case "queued_join_accept.request.payload.Payload.mac_payload.f_hdr.f_ctrl.adr_ack_req":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.f_hdr.f_ctrl.adr_ack_req")
-	case "queued_join_accept.request.payload.Payload.mac_payload.f_hdr.f_ctrl.class_b":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.f_hdr.f_ctrl.class_b")
-	case "queued_join_accept.request.payload.Payload.mac_payload.f_hdr.f_ctrl.f_pending":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.f_hdr.f_ctrl.f_pending")
-	case "queued_join_accept.request.payload.Payload.mac_payload.f_hdr.f_opts":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.f_hdr.f_opts")
-	case "queued_join_accept.request.payload.Payload.mac_payload.f_port":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.f_port")
-	case "queued_join_accept.request.payload.Payload.mac_payload.frm_payload":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.frm_payload")
-	case "queued_join_accept.request.payload.Payload.mac_payload.full_f_cnt":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.mac_payload.full_f_cnt")
-	case "queued_join_accept.request.payload.Payload.rejoin_request_payload":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.rejoin_request_payload")
-	case "queued_join_accept.request.payload.Payload.rejoin_request_payload.dev_eui":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.rejoin_request_payload.dev_eui")
-	case "queued_join_accept.request.payload.Payload.rejoin_request_payload.join_eui":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.rejoin_request_payload.join_eui")
-	case "queued_join_accept.request.payload.Payload.rejoin_request_payload.net_id":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.rejoin_request_payload.net_id")
-	case "queued_join_accept.request.payload.Payload.rejoin_request_payload.rejoin_cnt":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.rejoin_request_payload.rejoin_cnt")
-	case "queued_join_accept.request.payload.Payload.rejoin_request_payload.rejoin_type":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.Payload.rejoin_request_payload.rejoin_type")
-	case "queued_join_accept.request.payload.m_hdr":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.m_hdr")
-	case "queued_join_accept.request.payload.m_hdr.m_type":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.m_hdr.m_type")
-	case "queued_join_accept.request.payload.m_hdr.major":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.m_hdr.major")
-	case "queued_join_accept.request.payload.mic":
-		return v.QueuedJoinAccept.FieldIsZero("request.payload.mic")
-	case "queued_join_accept.request.raw_payload":
-		return v.QueuedJoinAccept.FieldIsZero("request.raw_payload")
 	case "queued_join_accept.request.rx_delay":
 		return v.QueuedJoinAccept.FieldIsZero("request.rx_delay")
-	case "queued_join_accept.request.selected_mac_version":
-		return v.QueuedJoinAccept.FieldIsZero("request.selected_mac_version")
 	case "queued_responses":
 		return v.QueuedResponses == nil
 	case "recent_downlinks":
