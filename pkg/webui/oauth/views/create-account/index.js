@@ -33,7 +33,7 @@ import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import Yup from '@ttn-lw/lib/yup'
-import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
+import { selectApplicationSiteName, selectEnableUserRegistration } from '@ttn-lw/lib/selectors/env'
 import { id as userRegexp } from '@ttn-lw/lib/regexp'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -90,6 +90,7 @@ const getSuccessMessage = state => {
 @withRouter
 @connect(
   state => ({
+    enableUserRegistration: selectEnableUserRegistration(),
     fetching: state.user.fetching,
     user: state.user.user,
     siteName: selectApplicationSiteName(),
@@ -101,6 +102,7 @@ const getSuccessMessage = state => {
 )
 export default class CreateAccount extends React.PureComponent {
   static propTypes = {
+    enableUserRegistration: PropTypes.bool.isRequired,
     fetching: PropTypes.bool.isRequired,
     location: PropTypes.location.isRequired,
     push: PropTypes.func.isRequired,
@@ -155,23 +157,23 @@ export default class CreateAccount extends React.PureComponent {
 
   render() {
     const { error } = this.state
-    const { user, fetching, siteName } = this.props
+    const { user, fetching, siteName, enableUserRegistration } = this.props
 
-    if (fetching) {
-      return (
-        <Spinner center>
-          <Message content={sharedMessages.fetching} />
-        </Spinner>
-      )
-    }
-
-    if (Boolean(user)) {
+    if (Boolean(user) || !enableUserRegistration) {
       return (
         <Redirect
           to={{
             pathname: '/',
           }}
         />
+      )
+    }
+
+    if (fetching) {
+      return (
+        <Spinner center>
+          <Message content={sharedMessages.fetching} />
+        </Spinner>
       )
     }
 
