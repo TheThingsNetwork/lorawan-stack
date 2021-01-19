@@ -77,11 +77,10 @@ describe('Application create', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/add`)
     cy.findByLabelText('Application ID').type(applicationId)
 
-    cy.findByRole('button', { name: 'Create application' })
-      .should('be.visible')
-      .click()
+    cy.findByRole('button', { name: 'Create application' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('full-error-view').should('not.exist')
     cy.location('pathname').should(
       'eq',
       `${Cypress.config('consoleRootPath')}/applications/${applicationId}`,
