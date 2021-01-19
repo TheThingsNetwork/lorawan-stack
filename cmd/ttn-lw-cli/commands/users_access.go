@@ -77,6 +77,35 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res.APIKeys)
 		},
 	}
+	userAPIKeysGet = &cobra.Command{
+		Use:     "get [user-id] [api-key-id]",
+		Aliases: []string{"info"},
+		Short:   "Get an user API key",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), firstArgs(1, args...))
+			if usrID == nil {
+				return errNoUserID
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewUserAccessClient(is).GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
+				UserIdentifiers: *usrID,
+				KeyID:           id,
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 	userAPIKeysCreate = &cobra.Command{
 		Use:     "create [user-id]",
 		Aliases: []string{"add", "generate", "register"},
@@ -202,6 +231,8 @@ func init() {
 
 	userAPIKeysList.Flags().AddFlagSet(paginationFlags())
 	userAPIKeys.AddCommand(userAPIKeysList)
+	userAPIKeysGet.Flags().String("api-key-id", "", "")
+	userAPIKeys.AddCommand(userAPIKeysGet)
 	userAPIKeysCreate.Flags().String("name", "", "")
 	userAPIKeysCreate.Flags().AddFlagSet(userRightsFlags)
 	userAPIKeys.AddCommand(userAPIKeysCreate)

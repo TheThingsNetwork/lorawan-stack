@@ -77,6 +77,35 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res.Collaborators)
 		},
 	}
+	organizationCollaboratorsGet = &cobra.Command{
+		Use:     "get",
+		Aliases: []string{"info"},
+		Short:   "Get an organization collaborator",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			orgID := getOrganizationID(cmd.Flags(), nil)
+			if orgID == nil {
+				return errNoOrganizationID
+			}
+			collaborator := getCollaborator(cmd.Flags())
+			if collaborator == nil {
+				return errNoCollaborator
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewOrganizationAccessClient(is).GetCollaborator(ctx, &ttnpb.GetOrganizationCollaboratorRequest{
+				OrganizationIdentifiers:       *orgID,
+				OrganizationOrUserIdentifiers: *collaborator,
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 	organizationCollaboratorsSet = &cobra.Command{
 		Use:     "set",
 		Aliases: []string{"update"},
@@ -174,6 +203,35 @@ var (
 			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.APIKeys)
+		},
+	}
+	organizationAPIKeysGet = &cobra.Command{
+		Use:     "get [organization-id] [api-key-id]",
+		Aliases: []string{"info"},
+		Short:   "Get an organization API key",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			orgID := getOrganizationID(cmd.Flags(), firstArgs(1, args...))
+			if orgID == nil {
+				return errNoOrganizationID
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewOrganizationAccessClient(is).GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
+				OrganizationIdentifiers: *orgID,
+				KeyID:                   id,
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	organizationAPIKeysCreate = &cobra.Command{
@@ -301,6 +359,8 @@ func init() {
 
 	organizationCollaboratorsList.Flags().AddFlagSet(paginationFlags())
 	organizationCollaborators.AddCommand(organizationCollaboratorsList)
+	organizationCollaboratorsGet.Flags().AddFlagSet(collaboratorFlags())
+	organizationCollaborators.AddCommand(organizationCollaboratorsGet)
 	organizationCollaboratorsSet.Flags().AddFlagSet(collaboratorFlags())
 	organizationCollaboratorsSet.Flags().AddFlagSet(organizationRightsFlags)
 	organizationCollaborators.AddCommand(organizationCollaboratorsSet)
@@ -311,6 +371,8 @@ func init() {
 
 	organizationAPIKeysList.Flags().AddFlagSet(paginationFlags())
 	organizationAPIKeys.AddCommand(organizationAPIKeysList)
+	organizationAPIKeysGet.Flags().String("api-key-id", "", "")
+	organizationAPIKeys.AddCommand(organizationAPIKeysGet)
 	organizationAPIKeysCreate.Flags().String("name", "", "")
 	organizationAPIKeysCreate.Flags().AddFlagSet(organizationRightsFlags)
 	organizationAPIKeys.AddCommand(organizationAPIKeysCreate)

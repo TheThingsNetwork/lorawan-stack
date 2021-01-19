@@ -77,6 +77,35 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res.Collaborators)
 		},
 	}
+	gatewayCollaboratorsGet = &cobra.Command{
+		Use:     "get",
+		Aliases: []string{"info"},
+		Short:   "Get an gateway collaborator",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			gtwID, err := getGatewayID(cmd.Flags(), nil, true)
+			if err != nil {
+				return err
+			}
+			collaborator := getCollaborator(cmd.Flags())
+			if collaborator == nil {
+				return errNoCollaborator
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewGatewayAccessClient(is).GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
+				GatewayIdentifiers:            *gtwID,
+				OrganizationOrUserIdentifiers: *collaborator,
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 	gatewayCollaboratorsSet = &cobra.Command{
 		Use:     "set",
 		Aliases: []string{"update"},
@@ -174,6 +203,35 @@ var (
 			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.APIKeys)
+		},
+	}
+	gatewayAPIKeysGet = &cobra.Command{
+		Use:     "get [gateway-id] [api-key-id]",
+		Aliases: []string{"info"},
+		Short:   "Get an gateway API key",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			gtwID, err := getGatewayID(cmd.Flags(), firstArgs(1, args...), true)
+			if err != nil {
+				return err
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewGatewayAccessClient(is).GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
+				GatewayIdentifiers: *gtwID,
+				KeyID:              id,
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	gatewayAPIKeysCreate = &cobra.Command{
@@ -296,6 +354,8 @@ func init() {
 
 	gatewayCollaboratorsList.Flags().AddFlagSet(paginationFlags())
 	gatewayCollaborators.AddCommand(gatewayCollaboratorsList)
+	gatewayCollaboratorsGet.Flags().AddFlagSet(collaboratorFlags())
+	gatewayCollaborators.AddCommand(gatewayCollaboratorsGet)
 	gatewayCollaboratorsSet.Flags().AddFlagSet(collaboratorFlags())
 	gatewayCollaboratorsSet.Flags().AddFlagSet(gatewayRightsFlags)
 	gatewayCollaborators.AddCommand(gatewayCollaboratorsSet)
@@ -306,6 +366,8 @@ func init() {
 
 	gatewayAPIKeysList.Flags().AddFlagSet(paginationFlags())
 	gatewayAPIKeys.AddCommand(gatewayAPIKeysList)
+	gatewayAPIKeysGet.Flags().String("api-key-id", "", "")
+	gatewayAPIKeys.AddCommand(gatewayAPIKeysGet)
 	gatewayAPIKeysCreate.Flags().String("name", "", "")
 	gatewayAPIKeysCreate.Flags().AddFlagSet(gatewayRightsFlags)
 	gatewayAPIKeys.AddCommand(gatewayAPIKeysCreate)

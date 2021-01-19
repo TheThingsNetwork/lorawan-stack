@@ -21,6 +21,7 @@ For details about compatibility between different releases, see the **Commitment
 - CUPS redirection.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 - Configuration option (`is.user-registration.enabled`) to enable or disable user registrations.
+- Missing CLI commands for getting single API keys or collaborators for entities.
 
 ### Changed
 
