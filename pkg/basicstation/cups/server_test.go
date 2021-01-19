@@ -307,19 +307,6 @@ func TestServer(t *testing.T) {
 			},
 		},
 		{
-			Name: "CUPS Not Enabled For Gateway",
-			StoreSetup: func(c *mockGatewayClient) {
-				c.res.Get = mockGateway(false, false, false)
-				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
-			},
-			Options: []Option{
-				WithExplicitEnable(true),
-			},
-			AssertError: func(err error) bool {
-				return errors.IsUnauthenticated(err)
-			},
-		},
-		{
 			Name: "Existing Gateway",
 			StoreSetup: func(c *mockGatewayClient) {
 				c.res.Get = mockGateway(true, false, false)

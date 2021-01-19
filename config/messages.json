@@ -2573,15 +2573,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/basicstation/cups:cups_not_enabled": {
-    "translations": {
-      "en": "CUPS is not enabled for gateway `{gateway_uid}`"
-    },
-    "description": {
-      "package": "pkg/basicstation/cups",
-      "file": "update_info.go"
-    }
-  },
   "error:pkg/basicstation/cups:field_length": {
     "translations": {
       "en": "length of `{field}` (`{length}`) exceeds maximum `{maximum}`"

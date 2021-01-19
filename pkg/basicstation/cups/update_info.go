@@ -23,7 +23,6 @@ import (
 	"hash/crc32"
 	"net"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -40,7 +39,6 @@ import (
 )
 
 const (
-	cupsAttribute         = "cups"
 	cupsLastSeenAttribute = "cups-last-seen"
 	cupsStationAttribute  = "cups-station"
 	cupsModelAttribute    = "cups-model"
@@ -49,7 +47,6 @@ const (
 
 var (
 	errUnauthenticated       = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
-	errCUPSNotEnabled        = errors.DefinePermissionDenied("cups_not_enabled", "CUPS is not enabled for gateway `{gateway_uid}`")
 	errInvalidToken          = errors.DefinePermissionDenied("invalid_token", "invalid provisioning token")
 	errInvalidCUPSURI        = errors.DefineInvalidArgument("invalid_cups_uri", "Invalid CUPS URI `{uri}`")
 	errTargetCUPSCredentials = errors.DefineNotFound("target_cups_credentials_not_found", "Target CUPS credentials not found for gateway `{gateway_uid}`")
@@ -138,9 +135,6 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 		return nil, err
 	}
 	logger.WithField("api_key_id", lnsKey.ID).Info("Created gateway API key for LNS")
-	gtw.Attributes = map[string]string{
-		cupsAttribute: "true",
-	}
 	return gtw, nil
 }
 
@@ -234,12 +228,6 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 
 	if gtw.Attributes == nil {
 		gtw.Attributes = make(map[string]string)
-	}
-
-	if s.requireExplicitEnable && gtw.Attributes[cupsAttribute] != "" {
-		if cups, _ := strconv.ParseBool(gtw.Attributes[cupsAttribute]); !cups {
-			return errCUPSNotEnabled.WithAttributes("gateway_uid", uid)
-		}
 	}
 
 	res := UpdateInfoResponse{}
