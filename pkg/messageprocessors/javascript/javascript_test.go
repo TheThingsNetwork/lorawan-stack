@@ -426,6 +426,21 @@ func TestDecodeUplink(t *testing.T) {
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errOutputErrors.WithAttributes("errors", "error 1, error 2"))
 	}
+
+	// Splice input bytes.
+	{
+		script := `
+		function decodeUplink(input) {
+			return {
+				data: {
+					bytes: input.bytes.splice(0, 1),
+				}
+			}
+		}
+		`
+		err := host.DecodeUplink(ctx, ids, nil, message, script)
+		a.So(err, should.BeNil)
+	}
 }
 
 func TestDecodeDownlink(t *testing.T) {
@@ -541,5 +556,20 @@ func TestDecodeDownlink(t *testing.T) {
 		`
 		err := host.DecodeDownlink(ctx, ids, nil, message, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errOutputErrors.WithAttributes("errors", "error 1, error 2"))
+	}
+
+	// Splice input bytes.
+	{
+		script := `
+		function decodeDownlink(input) {
+			return {
+				data: {
+					bytes: input.bytes.splice(0, 1),
+				}
+			}
+		}
+		`
+		err := host.DecodeDownlink(ctx, ids, nil, message, script)
+		a.So(err, should.BeNil)
 	}
 }
