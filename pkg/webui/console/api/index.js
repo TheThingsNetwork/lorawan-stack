@@ -211,6 +211,23 @@ export default {
     listFormats: tts.Applications.Devices.listTemplateFormats.bind(tts.Applications.Devices),
     convert: tts.Applications.Devices.convertTemplate.bind(tts.Applications.Devices),
   },
+  deviceRepository: {
+    listBrands: tts.Applications.Devices.Repository.listBrands.bind(
+      tts.Applications.Devices.Repository,
+    ),
+    getBrand: tts.Applications.Devices.Repository.getBrand.bind(
+      tts.Applications.Devices.Repository,
+    ),
+    listModels: tts.Applications.Devices.Repository.listModels.bind(
+      tts.Applications.Devices.Repository,
+    ),
+    getModel: tts.Applications.Devices.Repository.getModel.bind(
+      tts.Applications.Devices.Repository,
+    ),
+    getTemplate: tts.Applications.Devices.Repository.getTemplate.bind(
+      tts.Applications.Devices.Repository,
+    ),
+  },
   gateways: {
     list: tts.Gateways.getAll.bind(tts.Gateways),
     search: tts.Gateways.search.bind(tts.Gateways),
