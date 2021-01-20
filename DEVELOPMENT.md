@@ -17,13 +17,13 @@ If you are unfamiliar with forking projects on GitHub or cloning them locally, p
 
 ## Getting Started
 
-As most of the tasks will be managed by `make` and `mage` we will first initialize the tooling:
+The first step to get started is to initialize tooling and some dependencies:
 
 ```bash
 $ make init
 ```
 
-You may want to run this commands from time to time.
+You may want to run this commands from time to time to stay up-to-date with changes to tooling and dependencies.
 
 ## Running a development build of The Things Stack
 
@@ -181,6 +181,7 @@ The folder structure of the project looks as follows:
 │   ├── ttn-lw-cli      the command-line-interface for The Things Stack for LoRaWAN
 │   └── ttn-lw-stack    bundles the server binaries that form The Things Stack for LoRaWAN
 ├── config              configuration for our JavaScript SDK and frontend
+├── data                data from external repositories, such as devices, frequency plans and webhook templates
 ├── doc                 detailed documentation on the workings of The Things Stack for LoRaWAN
 ├── pkg                 contains all libraries used in The Things Stack for LoRaWAN
 │   ├── component       contains the base component; all other components extend this component
