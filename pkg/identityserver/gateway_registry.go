@@ -101,6 +101,20 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		req.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
 	}
 
+	if req.TargetCUPSKey != nil {
+		value := req.TargetCUPSKey.Value
+		if is.config.Gateways.EncryptionKeyID != "" {
+			value, err = is.KeyVault.Encrypt(ctx, req.TargetCUPSKey.Value, is.config.Gateways.EncryptionKeyID)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			log.FromContext(ctx).Warn("No encryption key defined, store Target CUPS Key in plaintext")
+		}
+		req.TargetCUPSKey.Value = value
+		req.TargetCUPSKey.KeyID = is.config.Gateways.EncryptionKeyID
+	}
+
 	if req.ClaimAuthenticationCode != nil {
 		if err := validateClaimAuthenticationCode(*req.ClaimAuthenticationCode); err == nil {
 			value := req.ClaimAuthenticationCode.Secret.Value
@@ -180,7 +194,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 		}
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "lbs_lns_secret", "claim_authentication_code") {
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "lbs_lns_secret", "claim_authentication_code", "target_cups_key") {
 		if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS); err != nil {
 			return nil, err
 		}
@@ -234,6 +248,20 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	// Backwards compatibility for frequency_plan_id field.
 	if len(gtw.FrequencyPlanIDs) > 0 {
 		gtw.FrequencyPlanID = gtw.FrequencyPlanIDs[0]
+	}
+
+	if gtw.TargetCUPSKey != nil {
+		value := gtw.TargetCUPSKey.Value
+		if gtw.TargetCUPSKey.KeyID != "" {
+			value, err = is.KeyVault.Decrypt(ctx, gtw.TargetCUPSKey.Value, gtw.TargetCUPSKey.KeyID)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			log.FromContext(ctx).Warn("No encryption key defined, return stored Target CUPS Key value")
+		}
+		gtw.TargetCUPSKey.Value = value
+		gtw.TargetCUPSKey.KeyID = is.config.Gateways.EncryptionKeyID
 	}
 
 	return gtw, nil
@@ -352,6 +380,25 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			}
 		}
 
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "target_cups_key") {
+			if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
+				gtws.Gateways[i].TargetCUPSKey = nil
+			} else if gtws.Gateways[i].TargetCUPSKey != nil {
+				value := gtws.Gateways[i].TargetCUPSKey.Value
+				if gtws.Gateways[i].TargetCUPSKey.KeyID != "" {
+					value, err = is.KeyVault.Decrypt(ctx, gtws.Gateways[i].TargetCUPSKey.Value, gtws.Gateways[i].TargetCUPSKey.KeyID)
+					if err != nil {
+						return nil, err
+					}
+				} else {
+					logger := log.FromContext(ctx)
+					logger.Warn("No encryption key defined, return stored Target CUPS Key Secret value")
+				}
+				gtws.Gateways[i].TargetCUPSKey.Value = value
+				gtws.Gateways[i].TargetCUPSKey.KeyID = is.config.Gateways.EncryptionKeyID
+			}
+		}
+
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "claim_authentication_code") {
 			if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
 				gtws.Gateways[i].ClaimAuthenticationCode = nil
@@ -418,6 +465,25 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 			}
 			req.LBSLNSSecret.Value = value
 			req.LBSLNSSecret.KeyID = is.config.Gateways.EncryptionKeyID
+		}
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "target_cups_key") {
+		if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
+			return nil, err
+		} else if req.TargetCUPSKey != nil {
+			value := req.TargetCUPSKey.Value
+			if is.config.Gateways.EncryptionKeyID != "" {
+				value, err = is.KeyVault.Encrypt(ctx, req.TargetCUPSKey.Value, is.config.Gateways.EncryptionKeyID)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				logger := log.FromContext(ctx)
+				logger.Warn("No encryption key defined, store Target CUPS Key in plaintext")
+			}
+			req.TargetCUPSKey.Value = value
+			req.TargetCUPSKey.KeyID = is.config.Gateways.EncryptionKeyID
 		}
 	}
 

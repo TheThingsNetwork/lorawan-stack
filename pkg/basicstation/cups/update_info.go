@@ -23,7 +23,6 @@ import (
 	"hash/crc32"
 	"net"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -40,21 +39,19 @@ import (
 )
 
 const (
-	cupsAttribute              = "cups"
-	cupsURIAttribute           = "cups-uri"
-	cupsLastSeenAttribute      = "cups-last-seen"
-	cupsCredentialsIDAttribute = "cups-credentials-id"
-	cupsCredentialsAttribute   = "cups-credentials"
-	cupsStationAttribute       = "cups-station"
-	cupsModelAttribute         = "cups-model"
-	cupsPackageAttribute       = "cups-package"
+	cupsLastSeenAttribute = "cups-last-seen"
+	cupsStationAttribute  = "cups-station"
+	cupsModelAttribute    = "cups-model"
+	cupsPackageAttribute  = "cups-package"
 )
 
 var (
-	errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
-	errCUPSNotEnabled  = errors.DefinePermissionDenied("cups_not_enabled", "CUPS is not enabled for gateway `{gateway_uid}`")
-	errInvalidToken    = errors.DefinePermissionDenied("invalid_token", "invalid provisioning token")
-	errLNSCredentials  = errors.DefineNotFound("lns_credentials_not_found", "LNS credentials not found for gateway `{gateway_uid}`")
+	errUnauthenticated       = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
+	errInvalidToken          = errors.DefinePermissionDenied("invalid_token", "invalid provisioning token")
+	errInvalidCUPSURI        = errors.DefineInvalidArgument("invalid_cups_uri", "Invalid CUPS URI `{uri}`")
+	errTargetCUPSCredentials = errors.DefineNotFound("target_cups_credentials_not_found", "Target CUPS credentials not found for gateway `{gateway_uid}`")
+	errLNSCredentials        = errors.DefineNotFound("lns_credentials_not_found", "LNS credentials not found for gateway `{gateway_uid}`")
+	errServerTrust           = errors.Define("server_trust", "failed to fetch server trust for address `{address}`")
 )
 
 func getAuthHeader(ctx context.Context) string {
@@ -66,6 +63,8 @@ func getAuthHeader(ctx context.Context) string {
 	return ""
 }
 
+// registerGateway creates a new gateway for the default owner. It also creates the necessary CUPS and LNS credentials.
+// `TargetCUPSURI` is set in order to make the gateway connect once again to this CUPS but using auth and then receive the LNS credentials.
 func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*ttnpb.Gateway, error) {
 	logger := log.FromContext(ctx)
 	ids := ttnpb.GatewayIdentifiers{
@@ -123,6 +122,10 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 			LBSLNSSecret: &ttnpb.Secret{
 				Value: []byte(lnsKey.Key),
 			},
+			TargetCUPSURI: req.CUPSURI,
+			TargetCUPSKey: &ttnpb.Secret{
+				Value: []byte(cupsKey.Key),
+			},
 		},
 		FieldMask: pbtypes.FieldMask{
 			Paths: []string{"lbs_lns_secret"},
@@ -131,13 +134,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	if err != nil {
 		return nil, err
 	}
-
 	logger.WithField("api_key_id", lnsKey.ID).Info("Created gateway API key for LNS")
-	gtw.Attributes = map[string]string{
-		cupsAttribute:              "true",
-		cupsCredentialsIDAttribute: cupsKey.ID,
-		cupsCredentialsAttribute:   fmt.Sprintf("Bearer %s", cupsKey.Key),
-	}
 	return gtw, nil
 }
 
@@ -149,6 +146,8 @@ var getGatewayMask = pbtypes.FieldMask{Paths: []string{
 	"update_channel",
 	"frequency_plan_id",
 	"lbs_lns_secret",
+	"target_cups_uri",
+	"target_cups_key",
 }}
 
 // UpdateInfo implements the CUPS update-info handler.
@@ -188,12 +187,14 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 			// Use the generated CUPS API Key for authenticating subsequent calls.
 			md := metadata.New(map[string]string{
 				"id":            ids.GatewayID,
-				"authorization": fmt.Sprintf("Bearer %s", gtw.Attributes[cupsCredentialsAttribute]),
+				"authorization": fmt.Sprintf("Bearer %s", string(gtw.TargetCUPSKey.Value)),
 			})
 			if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
 				md = metadata.Join(ctxMd, md)
 			}
 			ctx = metadata.NewIncomingContext(ctx, md)
+			// This makes the server return the target CUPS URI and credentials to the gateway.
+			req.CUPSURI = ""
 		} else {
 			return err
 		}
@@ -201,6 +202,22 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 
 	uid := unique.ID(ctx, ids)
 	logger.WithField("gateway_uid", uid).Debug("Found gateway for EUI")
+
+	var md metadata.MD
+	auth := c.Request().Header.Get(echo.HeaderAuthorization)
+	if auth != "" {
+		if !strings.HasPrefix(auth, "Bearer ") {
+			auth = fmt.Sprintf("Bearer %s", auth)
+		}
+		md = metadata.New(map[string]string{
+			"id":            ids.GatewayID,
+			"authorization": auth,
+		})
+	}
+	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
+		md = metadata.Join(ctxMd, md)
+	}
+	ctx = metadata.NewIncomingContext(ctx, md)
 
 	var gatewayAuth grpc.CallOption
 	if rights.RequireGateway(ctx, *ids,
@@ -229,68 +246,74 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		gtw.Attributes = make(map[string]string)
 	}
 
-	if gtw.LBSLNSSecret == nil {
-		return errLNSCredentials.WithAttributes("gateway_uid", uid)
-	}
-
-	if s.requireExplicitEnable || gtw.Attributes[cupsAttribute] != "" {
-		if cups, _ := strconv.ParseBool(gtw.Attributes[cupsAttribute]); !cups {
-			return errCUPSNotEnabled.WithAttributes("gateway_uid", uid)
-		}
-	}
-
 	res := UpdateInfoResponse{}
-
-	if gtw.Attributes[cupsURIAttribute] == "" {
-		gtw.Attributes[cupsURIAttribute] = req.CUPSURI
-	}
-	if s.allowCUPSURIUpdate && gtw.Attributes[cupsURIAttribute] != req.CUPSURI {
-		res.CUPSURI = gtw.Attributes[cupsURIAttribute]
-	}
-
-	if credentials := gtw.Attributes[cupsCredentialsAttribute]; credentials != "" {
-		logger.WithField("cups_uri", gtw.Attributes[cupsURIAttribute]).Debug("Getting trusted certificate for CUPS...")
-		cupsTrust, err := s.getTrust(gtw.Attributes[cupsURIAttribute])
-		if err != nil {
-			return err
+	if s.allowCUPSURIUpdate && gtw.TargetCUPSURI != "" && gtw.TargetCUPSURI != req.CUPSURI {
+		if gtw.TargetCUPSKey.Value == nil {
+			return errTargetCUPSCredentials.New()
 		}
-		cupsCredentials, err := TokenCredentials(cupsTrust, credentials)
+		logger := logger.WithField("cups_uri", gtw.TargetCUPSURI)
+		logger.Debug("Configure CUPS")
+		res.CUPSURI = gtw.TargetCUPSURI
+
+		cupsTrust, err := s.getTrust(gtw.TargetCUPSURI)
+		if err != nil {
+			return errServerTrust.WithCause(err).WithAttributes("address", gtw.TargetCUPSURI)
+		}
+		cupsCredentials, err := TokenCredentials(cupsTrust, string(gtw.TargetCUPSKey.Value))
 		if err != nil {
 			return err
 		}
 		if crc32.ChecksumIEEE(cupsCredentials) != req.CUPSCredentialsCRC {
 			res.CUPSCredentials = cupsCredentials
 		}
-	}
-
-	if gtw.GatewayServerAddress == "" {
-		if req.LNSURI != "" {
-			gtw.GatewayServerAddress = req.LNSURI
-		} else {
-			gtw.GatewayServerAddress = s.defaultLNSURI
+	} else if gtw.TargetCUPSKey != nil && gtw.TargetCUPSKey.Value != nil {
+		// Check if CUPS Key needs to be rotated.
+		cupsTrust, err := s.getTrust(req.CUPSURI)
+		if err != nil {
+			return errServerTrust.WithCause(err).WithAttributes("address", req.CUPSURI)
 		}
-	}
-	if gtw.GatewayServerAddress != req.LNSURI {
-		scheme, host, port, err := parseAddress("wss", gtw.GatewayServerAddress)
+		cupsCredentials, err := TokenCredentials(cupsTrust, string(gtw.TargetCUPSKey.Value))
 		if err != nil {
 			return err
 		}
-		address := host
-		address = net.JoinHostPort(host, port)
-		res.LNSURI = fmt.Sprintf("%s://%s", scheme, address)
-	}
+		if crc32.ChecksumIEEE(cupsCredentials) != req.CUPSCredentialsCRC {
+			logger.Debug("Update CUPS Credentials")
+			res.CUPSCredentials = cupsCredentials
+		}
+	} else {
+		logger := logger.WithField("lns_uri", gtw.GatewayServerAddress)
+		logger.Debug("Configure LNS")
+		if gtw.LBSLNSSecret == nil {
+			return errLNSCredentials.WithAttributes("gateway_uid", gtw.GatewayID)
+		}
+		if gtw.GatewayServerAddress == "" {
+			if req.LNSURI != "" {
+				gtw.GatewayServerAddress = req.LNSURI
+			} else {
+				gtw.GatewayServerAddress = s.defaultLNSURI
+			}
+		}
+		if gtw.GatewayServerAddress != req.LNSURI {
+			scheme, host, port, err := parseAddress("wss", gtw.GatewayServerAddress)
+			if err != nil {
+				return err
+			}
+			address := host
+			address = net.JoinHostPort(host, port)
+			res.LNSURI = fmt.Sprintf("%s://%s", scheme, address)
+		}
 
-	logger.WithField("lns_uri", gtw.GatewayServerAddress).Debug("Getting trusted certificate for LNS...")
-	lnsTrust, err := s.getTrust(gtw.GatewayServerAddress)
-	if err != nil {
-		return err
-	}
-	lnsCredentials, err := TokenCredentials(lnsTrust, string(gtw.LBSLNSSecret.Value))
-	if err != nil {
-		return err
-	}
-	if crc32.ChecksumIEEE(lnsCredentials) != req.LNSCredentialsCRC {
-		res.LNSCredentials = lnsCredentials
+		lnsTrust, err := s.getTrust(gtw.GatewayServerAddress)
+		if err != nil {
+			return errServerTrust.WithCause(err).WithAttributes("address", gtw.GatewayServerAddress)
+		}
+		lnsCredentials, err := TokenCredentials(lnsTrust, string(gtw.LBSLNSSecret.Value))
+		if err != nil {
+			return err
+		}
+		if crc32.ChecksumIEEE(lnsCredentials) != req.LNSCredentialsCRC {
+			res.LNSCredentials = lnsCredentials
+		}
 	}
 
 	if gtw.AutoUpdate {

@@ -113,14 +113,6 @@ func (s *Server) getAccess(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (
 // Option configures the CUPSServer.
 type Option func(s *Server)
 
-// WithExplicitEnable requires CUPS to be explicitly enabled with a cups attribute
-// in the gateway registry.
-func WithExplicitEnable(enable bool) Option {
-	return func(s *Server) {
-		s.requireExplicitEnable = enable
-	}
-}
-
 // WithRegisterUnknown configures the CUPS server to register gateways if they
 // do not already exist in the registry. The gateways will be registered under the
 // given owner.

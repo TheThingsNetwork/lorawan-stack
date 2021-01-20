@@ -148,7 +148,14 @@ message Gateway {
   // The entire field must be used in RPCs since sub-fields are validated wrt to each other. Direct selection/update of sub-fields only are not allowed.
   // Use the top level field mask `claim_authentication_code` even when updating single fields.
   GatewayClaimAuthenticationCode claim_authentication_code = 23;
-  // next: 24
+  // CUPS URI for LoRa Basics Station CUPS redirection.
+  // The CUPS Trust field will be automatically fetched from the cert chain presented by the target server.
+  string target_cups_uri = 24 [(gogoproto.customname) = "TargetCUPSURI", (validate.rules).string.uri = true];
+  // CUPS Key for LoRa Basics Station CUPS redirection.
+  // If redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance.
+  // Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
+  Secret target_cups_key = 25 [(gogoproto.customname) = "TargetCUPSKey"];
+  // next: 26
 }
 
 message Gateways {

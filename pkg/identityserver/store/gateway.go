@@ -70,6 +70,9 @@ type Gateway struct {
 	ClaimAuthenticationCodeSecret    []byte `gorm:"type:BYTEA"`
 	ClaimAuthenticationCodeValidFrom *time.Time
 	ClaimAuthenticationCodeValidTo   *time.Time
+
+	TargetCUPSURI string `gorm:"type:VARCHAR"`
+	TargetCUPSKey []byte `gorm:"type:BYTEA"`
 }
 
 func init() {
@@ -151,6 +154,18 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 			ValidTo:   gtw.ClaimAuthenticationCodeValidTo,
 		}
 	},
+	targetCUPSURIField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.TargetCUPSURI = gtw.TargetCUPSURI },
+	targetCUPSKeyField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		blocks := bytes.SplitN(gtw.TargetCUPSKey, secretFieldSeparator, 2)
+		if len(blocks) == 2 {
+			pb.TargetCUPSKey = &ttnpb.Secret{
+				KeyID: string(blocks[0]),
+				Value: blocks[1],
+			}
+		} else {
+			pb.TargetCUPSKey = nil
+		}
+	},
 }
 
 // functions to set fields from the gateway proto into the gateway model.
@@ -229,6 +244,18 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 			}
 		}
 	},
+	targetCUPSURIField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.TargetCUPSURI = pb.TargetCUPSURI },
+	targetCUPSKeyField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		if pb.TargetCUPSKey != nil {
+			var secretBuffer bytes.Buffer
+			secretBuffer.WriteString(pb.TargetCUPSKey.KeyID)
+			secretBuffer.Write(secretFieldSeparator)
+			secretBuffer.Write(pb.TargetCUPSKey.Value)
+			gtw.TargetCUPSKey = secretBuffer.Bytes()
+		} else {
+			gtw.TargetCUPSKey = nil
+		}
+	},
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
@@ -267,6 +294,8 @@ var gatewayColumnNames = map[string][]string{
 	scheduleAnytimeDelayField:     {scheduleAnytimeDelayField},
 	scheduleDownlinkLateField:     {scheduleDownlinkLateField},
 	statusPublicField:             {statusPublicField},
+	targetCUPSURIField:            {"target_cups_uri"},
+	targetCUPSKeyField:            {"target_cups_key"},
 	updateChannelField:            {updateChannelField},
 	updateLocationFromStatusField: {updateLocationFromStatusField},
 	versionIDsField:               {"brand_id", "model_id", "hardware_version", "firmware_version"},

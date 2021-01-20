@@ -18,6 +18,8 @@ For details about compatibility between different releases, see the **Commitment
 - Improved handling of connection issues in the Console, as well as automatic reconnects.
 - Helpful details for synthetic meta events in the data view of the Console.
 - Support field mask paths in Storage Integration API requests.
+- CUPS redirection.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 
 ### Changed
 
@@ -35,6 +37,7 @@ For details about compatibility between different releases, see the **Commitment
 - Application Server linking. The Network Server now pushes data to the cluster Application Server instead.
   - Applications which desire to handle payload decryption within their own domains should disable payload decryption at application or device level and decrypt the payload on their own end.
   - While not backwards compatible, the decision to remove linking was heavily motivated by scalability concerns - the previous linking model scales poorly when taking high availability and load balancing concerns into account.
+- The option to disable CUPS per gateway `gcs.basic-station.require-explicit-enable`.
 
 ### Fixed
 

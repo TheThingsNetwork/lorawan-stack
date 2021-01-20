@@ -925,6 +925,33 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "target_cups_uri":
+
+			if uri, err := url.Parse(m.GetTargetCUPSURI()); err != nil {
+				return GatewayValidationError{
+					field:  "target_cups_uri",
+					reason: "value must be a valid URI",
+					cause:  err,
+				}
+			} else if !uri.IsAbs() {
+				return GatewayValidationError{
+					field:  "target_cups_uri",
+					reason: "value must be absolute",
+				}
+			}
+
+		case "target_cups_key":
+
+			if v, ok := interface{}(m.GetTargetCUPSKey()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewayValidationError{
+						field:  "target_cups_key",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return GatewayValidationError{
 				field:  name,

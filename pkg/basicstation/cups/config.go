@@ -25,7 +25,7 @@ import (
 
 // ServerConfig is the configuration of the CUPS server.
 type ServerConfig struct {
-	ExplicitEnable  bool `name:"require-explicit-enable" description:"Require gateways to explicitly enable CUPS"`
+	ExplicitEnable  bool `name:"require-explicit-enable" description:"Require gateways to explicitly enable CUPS. This option is ineffective"`
 	RegisterUnknown struct {
 		Type   string `name:"account-type" description:"Type of account to register unknown gateways to (user|organization)"`
 		ID     string `name:"id" description:"ID of the account to register unknown gateways to"`
@@ -40,7 +40,6 @@ type ServerConfig struct {
 // NewServer returns a new CUPS server from this config on top of the component.
 func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option) *Server {
 	opts := []Option{
-		WithExplicitEnable(conf.ExplicitEnable),
 		WithAllowCUPSURIUpdate(conf.AllowCUPSURIUpdate),
 		WithDefaultLNSURI(conf.Default.LNSURI),
 	}

@@ -311,6 +311,9 @@ func TestGatewaysSecrets(t *testing.T) {
 
 		eui := types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}
 
+		targetCUPSURI := "thethings.example.com"
+		otherTargetCUPSURI := "thenotthings.example.com:1234"
+
 		gatewayID := "foo-with-secrets"
 		gatewayName := "Foo Gateway with Secrets"
 
@@ -370,6 +373,8 @@ func TestGatewaysSecrets(t *testing.T) {
 				Name:                    gatewayNameWithoutEncKey,
 				LBSLNSSecret:            secret,
 				ClaimAuthenticationCode: &gtwClaimAuthCode,
+				TargetCUPSURI:           targetCUPSURI,
+				TargetCUPSKey:           secret,
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),
 		}, creds)
@@ -379,11 +384,12 @@ func TestGatewaysSecrets(t *testing.T) {
 			a.So(createdWithoutEncKey.Name, should.Equal, gatewayNameWithoutEncKey)
 			a.So(createdWithoutEncKey.LBSLNSSecret, should.NotBeNil)
 			a.So(createdWithoutEncKey.ClaimAuthenticationCode, should.NotBeNil)
+			a.So(createdWithoutEncKey.TargetCUPSKey, should.NotBeNil)
 		}
 
 		got, err := reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: createdWithoutEncKey.GatewayIdentifiers,
-			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret", "claim_authentication_code"}},
+			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -396,6 +402,8 @@ func TestGatewaysSecrets(t *testing.T) {
 			a.So(got.ClaimAuthenticationCode, should.NotBeNil)
 			a.So(got.ClaimAuthenticationCode.Secret, should.NotBeNil)
 			a.So(got.ClaimAuthenticationCode.Secret.Value, should.Resemble, gtwClaimAuthCode.Secret.Value)
+			a.So(got.TargetCUPSKey.Value, should.Resemble, secret.Value)
+			a.So(got.TargetCUPSURI, should.Equal, targetCUPSURI)
 		}
 
 		// With Encryption Key
@@ -410,6 +418,8 @@ func TestGatewaysSecrets(t *testing.T) {
 				Name:                    gatewayName,
 				LBSLNSSecret:            secret,
 				ClaimAuthenticationCode: &gtwClaimAuthCode,
+				TargetCUPSURI:           targetCUPSURI,
+				TargetCUPSKey:           secret,
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),
 		}, creds)
@@ -419,11 +429,12 @@ func TestGatewaysSecrets(t *testing.T) {
 			a.So(created.Name, should.Equal, gatewayName)
 			a.So(created.LBSLNSSecret, should.NotBeNil)
 			a.So(created.ClaimAuthenticationCode, should.NotBeNil)
+			a.So(createdWithoutEncKey.TargetCUPSKey, should.NotBeNil)
 		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret", "claim_authentication_code"}},
+			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -436,6 +447,8 @@ func TestGatewaysSecrets(t *testing.T) {
 			a.So(got.ClaimAuthenticationCode, should.NotBeNil)
 			a.So(got.ClaimAuthenticationCode.Secret, should.NotBeNil)
 			a.So(got.ClaimAuthenticationCode.Secret.Value, should.Resemble, gtwClaimAuthCode.Secret.Value)
+			a.So(got.TargetCUPSKey.Value, should.Resemble, secret.Value)
+			a.So(got.TargetCUPSURI, should.Equal, targetCUPSURI)
 		}
 
 		// Check that `claim_authentication_code` can only be updated/retrieved as a whole.
@@ -549,18 +562,23 @@ func TestGatewaysSecrets(t *testing.T) {
 					Value: []byte("my new secret value"),
 				},
 				ClaimAuthenticationCode: &otherGtwClaimAuthCode,
+				TargetCUPSURI:           otherTargetCUPSURI,
+				TargetCUPSKey: &ttnpb.Secret{
+					Value: []byte("my new secret value"),
+				},
 			},
-			FieldMask: ptypes.FieldMask{Paths: []string{"lbs_lns_secret", "claim_authentication_code"}},
+			FieldMask: ptypes.FieldMask{Paths: []string{"lbs_lns_secret", "claim_authentication_code", "target_cups_key", "target_cups_uri"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
 		a.So(updated, should.NotBeNil)
 		a.So(updated.LBSLNSSecret, should.NotBeNil)
 		a.So(updated.ClaimAuthenticationCode, should.NotBeNil)
+		a.So(updated.TargetCUPSKey, should.NotBeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret", "claim_authentication_code"}},
+			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret", "claim_authentication_code", "target_cups_key", "target_cups_uri"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -575,11 +593,16 @@ func TestGatewaysSecrets(t *testing.T) {
 			if a.So(got.ClaimAuthenticationCode, should.NotBeNil) && a.So(got.ClaimAuthenticationCode.Secret, should.NotBeNil) {
 				a.So(got.ClaimAuthenticationCode.Secret.Value, should.Resemble, otherGtwClaimAuthCode.Secret.Value)
 			}
+			if a.So(got.TargetCUPSKey, should.NotBeNil) {
+				a.So(got.TargetCUPSKey.Value, should.Resemble, []byte("my new secret value"))
+			}
+			a.So(got.TargetCUPSURI, should.Equal, otherTargetCUPSURI)
+
 		}
 
 		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{userID.OrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
-				FieldMask:    ptypes.FieldMask{Paths: []string{"lbs_lns_secret", "claim_authentication_code"}},
+				FieldMask:    ptypes.FieldMask{Paths: []string{"lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key"}},
 				Collaborator: collaborator,
 			}, creds)
 			a.So(err, should.BeNil)
@@ -590,6 +613,8 @@ func TestGatewaysSecrets(t *testing.T) {
 						found = true
 						a.So(item.LBSLNSSecret, should.Resemble, got.LBSLNSSecret)
 						a.So(item.ClaimAuthenticationCode, should.Resemble, got.ClaimAuthenticationCode)
+						a.So(item.TargetCUPSKey, should.Resemble, got.TargetCUPSKey)
+						a.So(item.TargetCUPSURI, should.Equal, got.TargetCUPSURI)
 					}
 				}
 				a.So(found, should.BeTrue)
