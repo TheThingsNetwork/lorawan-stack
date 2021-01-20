@@ -49,14 +49,14 @@ func (c Config) NewStore(ctx context.Context, blobConf config.BlobConfig) (store
 	return c.Store.Bleve.NewStore(ctx)
 }
 
-var errFetcherConfig = errors.DefineInvalidArgument("fetcher_config", "only the directory configuration source is supported")
+var errUnknownConfigSource = errors.DefineInvalidArgument("unknown_config_source", "unknown config source `{config_source}`")
 
 // Initialize sets up the Device Repository.
 func (c Config) Initialize(ctx context.Context, blobConf config.BlobConfig, overwrite bool) error {
 	switch c.ConfigSource {
 	case "directory":
 	default:
-		return errFetcherConfig.New()
+		return errUnknownConfigSource.WithAttributes("config_source", c.ConfigSource)
 	}
 
 	return c.Store.Bleve.Initialize(ctx, c.Directory, overwrite)
