@@ -316,6 +316,7 @@ message MACState {
   repeated MACCommand pending_requests = 10;
 
   message JoinRequest {
+    reserved 1,2,3,4,5,9,10; // deprecated JoinRequest fields.
     DLSettings downlink_settings = 6 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
     RxDelay rx_delay = 7 [(validate.rules).enum.defined_only = true];
     CFList cf_list = 8 [(gogoproto.customname) = "CFList"];
