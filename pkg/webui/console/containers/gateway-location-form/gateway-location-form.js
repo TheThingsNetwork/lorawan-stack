@@ -41,29 +41,34 @@ const validationSchema = Yup.object().shape({
   latitude: Yup.number().when('update_location_from_status', {
     is: false,
     then: schema =>
-      schema.test('is-valid-latitude', sharedMessages.validateLat, value =>
-        latitudeRegexp.test(String(value)),
-      ),
+      schema
+        .required(sharedMessages.validateRequired)
+        .test('is-valid-latitude', sharedMessages.validateLatitude, value =>
+          latitudeRegexp.test(String(value)),
+        ),
     otherwise: schema => schema.strip(),
   }),
   longitude: Yup.number().when('update_location_from_status', {
     is: false,
     then: schema =>
-      schema.test('is-valid-longitude', sharedMessages.validateLong, value =>
-        longitudeRegexp.test(String(value)),
-      ),
+      schema
+        .required(sharedMessages.validateRequired)
+        .test('is-valid-longitude', sharedMessages.validateLongitude, value =>
+          longitudeRegexp.test(String(value)),
+        ),
     otherwise: schema => schema.strip(),
   }),
   altitude: Yup.number().when('update_location_from_status', {
     is: false,
-    then: schema => schema.integer(sharedMessages.validateInt32).required(),
+    then: schema =>
+      schema.integer(sharedMessages.validateInt32).required(sharedMessages.validateRequired),
     otherwise: schema => schema.strip(),
   }),
   location_public: Yup.bool(),
   update_location_from_status: Yup.bool(),
 })
 
-const getRegistryLocation = function(antennas) {
+const getRegistryLocation = antennas => {
   let registryLocation
   if (antennas) {
     for (const key of Object.keys(antennas)) {

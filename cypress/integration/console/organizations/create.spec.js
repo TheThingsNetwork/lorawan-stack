@@ -69,6 +69,7 @@ describe('Organization create', () => {
       .click()
 
     cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('full-error-view').should('not.exist')
     cy.location('pathname').should(
       'eq',
       `${Cypress.config('consoleRootPath')}/organizations/${organizationId}`,

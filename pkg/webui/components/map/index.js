@@ -119,7 +119,7 @@ export default class LocationMap extends React.Component {
     } = this.props
     const { zoomLevel } = this.state
     return (
-      <div className={classnames(style.container, className)}>
+      <div className={classnames(style.container, className)} data-test-id="location-map">
         <Map
           ref={mapRef}
           className={classnames(style.map, {
