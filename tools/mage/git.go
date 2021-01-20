@@ -292,3 +292,25 @@ func (Git) Diff() error {
 	}
 	return nil
 }
+
+// UpdateSubmodules updates submodules, and initializes them when necessary.
+func (Git) UpdateSubmodules() error {
+	if mg.Verbose() {
+		fmt.Println("Updating submodules")
+	}
+	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "git", "submodule", "update", "--init")
+	return err
+}
+
+func init() {
+	initDeps = append(initDeps, Git.UpdateSubmodules)
+}
+
+// PullSubmodules pulls in submodule updates.
+func (Git) PullSubmodules() error {
+	if mg.Verbose() {
+		fmt.Println("Updating submodules")
+	}
+	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "git", "submodule", "update", "--init", "--remote")
+	return err
+}
