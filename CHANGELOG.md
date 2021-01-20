@@ -43,6 +43,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Network Server DevStatusReq scheduling conditions in relation to frame counter value.
+- Missing `authentication`, `remote_ip` and `user_agent` fields in events when using event backends other than `internal`.
 
 ### Security
 
