@@ -77,6 +77,35 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res.Collaborators)
 		},
 	}
+	clientCollaboratorsGet = &cobra.Command{
+		Use:     "get",
+		Aliases: []string{"info"},
+		Short:   "Get an client collaborator",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliID := getClientID(cmd.Flags(), nil)
+			if cliID == nil {
+				return errNoClientID
+			}
+			collaborator := getCollaborator(cmd.Flags())
+			if collaborator == nil {
+				return errNoCollaborator
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewClientAccessClient(is).GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
+				ClientIdentifiers:             *cliID,
+				OrganizationOrUserIdentifiers: *collaborator,
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 	clientCollaboratorsSet = &cobra.Command{
 		Use:     "set",
 		Aliases: []string{"update"},
@@ -157,6 +186,8 @@ func init() {
 
 	clientCollaboratorsList.Flags().AddFlagSet(paginationFlags())
 	clientCollaborators.AddCommand(clientCollaboratorsList)
+	clientCollaboratorsGet.Flags().AddFlagSet(collaboratorFlags())
+	clientCollaborators.AddCommand(clientCollaboratorsGet)
 	clientCollaboratorsSet.Flags().AddFlagSet(collaboratorFlags())
 	clientCollaboratorsSet.Flags().AddFlagSet(clientRightsFlags)
 	clientCollaborators.AddCommand(clientCollaboratorsSet)

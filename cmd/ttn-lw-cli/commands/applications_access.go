@@ -90,6 +90,35 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res.Collaborators)
 		},
 	}
+	applicationCollaboratorsGet = &cobra.Command{
+		Use:     "get",
+		Aliases: []string{"info"},
+		Short:   "Get an application collaborator",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			appID := getApplicationID(cmd.Flags(), nil)
+			if appID == nil {
+				return errNoApplicationID
+			}
+			collaborator := getCollaborator(cmd.Flags())
+			if collaborator == nil {
+				return errNoCollaborator
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewApplicationAccessClient(is).GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
+				ApplicationIdentifiers:        *appID,
+				OrganizationOrUserIdentifiers: *collaborator,
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 	applicationCollaboratorsSet = &cobra.Command{
 		Use:     "set",
 		Aliases: []string{"update"},
@@ -187,6 +216,35 @@ var (
 			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.APIKeys)
+		},
+	}
+	applicationAPIKeysGet = &cobra.Command{
+		Use:     "get [application-id] [api-key-id]",
+		Aliases: []string{"info"},
+		Short:   "Get an application API key",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			appID := getApplicationID(cmd.Flags(), firstArgs(1, args...))
+			if appID == nil {
+				return errNoApplicationID
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewApplicationAccessClient(is).GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
+				ApplicationIdentifiers: *appID,
+				KeyID:                  id,
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	applicationAPIKeysCreate = &cobra.Command{
@@ -301,6 +359,8 @@ func init() {
 
 	applicationCollaboratorsList.Flags().AddFlagSet(paginationFlags())
 	applicationCollaborators.AddCommand(applicationCollaboratorsList)
+	applicationCollaboratorsGet.Flags().AddFlagSet(collaboratorFlags())
+	applicationCollaborators.AddCommand(applicationCollaboratorsGet)
 	applicationCollaboratorsSet.Flags().AddFlagSet(collaboratorFlags())
 	applicationCollaboratorsSet.Flags().AddFlagSet(applicationRightsFlags)
 	applicationCollaborators.AddCommand(applicationCollaboratorsSet)
@@ -311,6 +371,8 @@ func init() {
 
 	applicationAPIKeysList.Flags().AddFlagSet(paginationFlags())
 	applicationAPIKeys.AddCommand(applicationAPIKeysList)
+	applicationAPIKeysGet.Flags().String("api-key-id", "", "")
+	applicationAPIKeys.AddCommand(applicationAPIKeysGet)
 	applicationAPIKeysCreate.Flags().String("name", "", "")
 	applicationAPIKeysCreate.Flags().AddFlagSet(applicationRightsFlags)
 	applicationAPIKeys.AddCommand(applicationAPIKeysCreate)
