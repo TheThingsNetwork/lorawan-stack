@@ -49,8 +49,10 @@ func DeviceNeedsDLChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
 	if DeviceNeedsNewChannelReqAtIndex(dev, i) {
 		return desiredCh.DownlinkFrequency != desiredCh.UplinkFrequency
 	}
-	// NOTE: Given the conditional before DeviceNeedsNewChannelReqAtIndex call and since no NewChannelReq is required,
-	// len(dev.MACState.CurrentParameters.Channels) > i && dev.MACState.CurrentParameters.Channels[i] != nil.
+	// NOTE: NewChannelReq may be needed, but parameters could have been rejected before.
+	if i >= len(dev.MACState.CurrentParameters.Channels) || dev.MACState.CurrentParameters.Channels[i] == nil {
+		return false
+	}
 	return desiredCh.DownlinkFrequency != dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency
 }
 
