@@ -841,6 +841,8 @@ func (v *EndDeviceVersionIdentifiers) FieldIsZero(p string) bool {
 		return v.HardwareVersion == ""
 	case "model_id":
 		return v.ModelID == ""
+	case "band_id":
+		return v.BandID == ""
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -1187,6 +1189,8 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.VersionIDs.FieldIsZero("hardware_version")
 	case "version_ids.model_id":
 		return v.VersionIDs.FieldIsZero("model_id")
+	case "version_ids.band_id":
+		return v.VersionIDs.FieldIsZero("band_id")
 	}
 	switch {
 	case strings.HasPrefix(p, "mac_state."):
