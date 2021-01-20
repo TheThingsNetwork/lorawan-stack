@@ -23,14 +23,16 @@ class FormSubmit extends React.Component {
 
   static propTypes = {
     component: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+    disabled: PropTypes.bool,
   }
 
   static defaultProps = {
     component: 'button',
+    disabled: false,
   }
 
   render() {
-    const { component: Component, ...rest } = this.props
+    const { component: Component, disabled, ...rest } = this.props
 
     const submitProps = {
       isValid: this.context.isValid,
@@ -40,7 +42,7 @@ class FormSubmit extends React.Component {
       dirty: this.context.dirty,
       validateForm: this.context.validateForm,
       validateField: this.context.validateField,
-      disabled: this.context.disabled,
+      disabled: this.context.disabled || disabled,
     }
 
     return <Component {...rest} {...submitProps} />
