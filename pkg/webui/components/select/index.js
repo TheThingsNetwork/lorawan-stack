@@ -164,7 +164,7 @@ class Select extends React.PureComponent {
         className={cls}
         inputId={id}
         classNamePrefix="select"
-        value={getValue(translatedOptions, value)}
+        value={getValue(translatedOptions, value) || null}
         options={translatedOptions}
         onChange={this.onChange}
         onBlur={this.onBlur}
