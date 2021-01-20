@@ -50,4 +50,5 @@ dockers:
       - 'lorawan-stack-dev:{{ .FullCommit }}'
     skip_push: true
     extra_files:
+      - data
       - public
