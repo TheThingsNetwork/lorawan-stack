@@ -58,7 +58,7 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 				PendingMACState: &ttnpb.MACState{},
 				MACState: &ttnpb.MACState{
-					PendingJoinRequest: &ttnpb.JoinRequest{},
+					PendingJoinRequest: &ttnpb.MACState_JoinRequest{},
 					QueuedResponses:    []*ttnpb.MACCommand{},
 				},
 			},
@@ -112,7 +112,7 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 				PendingMACState: &ttnpb.MACState{},
 				MACState: &ttnpb.MACState{
-					PendingJoinRequest: &ttnpb.JoinRequest{},
+					PendingJoinRequest: &ttnpb.MACState_JoinRequest{},
 					QueuedResponses:    []*ttnpb.MACCommand{},
 				},
 			},
@@ -203,7 +203,7 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 				PendingMACState: &ttnpb.MACState{},
 				MACState: &ttnpb.MACState{
-					PendingJoinRequest: &ttnpb.JoinRequest{},
+					PendingJoinRequest: &ttnpb.MACState_JoinRequest{},
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
 						{},
