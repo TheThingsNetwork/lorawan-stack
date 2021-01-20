@@ -60,6 +60,7 @@ import organizations from './organizations'
 import js from './join-server'
 import gatewayStatus from './gateway-status'
 import is from './identity-server'
+import deviceRepository from './device-repository'
 
 export default history =>
   combineReducers({
@@ -111,4 +112,5 @@ export default history =>
     js,
     gatewayStatus,
     is,
+    deviceRepository,
   })
