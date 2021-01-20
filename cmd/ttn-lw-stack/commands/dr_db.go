@@ -29,7 +29,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			overwrite, _ := cmd.Flags().GetBool("overwrite")
 
-			return config.DeviceRepository.Initialize(ctx, config.Blob, overwrite)
+			return config.DR.Initialize(ctx, config.Blob, overwrite)
 		},
 	}
 )
