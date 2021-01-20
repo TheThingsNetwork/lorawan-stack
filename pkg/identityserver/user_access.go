@@ -79,7 +79,7 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 	events.Publish(evtCreateUserAPIKey.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
 	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
 		data.SetEntity(req.EntityIdentifiers())
-		return &emails.APIKeyCreated{Data: data, Identifier: key.PrettyName(), Rights: key.Rights}
+		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Error("Could not send API key created notification email")
@@ -172,7 +172,7 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
 	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
 		data.SetEntity(req.EntityIdentifiers())
-		return &emails.APIKeyChanged{Data: data, Identifier: key.PrettyName(), Rights: key.Rights}
+		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Error("Could not send API key update notification email")

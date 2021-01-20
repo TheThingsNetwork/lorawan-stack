@@ -14,13 +14,31 @@
 
 package emails
 
-import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+import (
+	"fmt"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+)
 
 // APIKeyChanged is the email that is sent when users updates an API key
 type APIKeyChanged struct {
 	Data
-	Identifier string
-	Rights     []ttnpb.Right
+	Key    *ttnpb.APIKey
+	Rights []ttnpb.Right
+}
+
+// Identifier returns the pretty name of the API key.
+// The naming of this method is for compatibility reasons.
+func (a APIKeyChanged) Identifier() string {
+	return a.Key.PrettyName()
+}
+
+// ConsoleURL returns the URL to the API key in the Console.
+func (a APIKeyChanged) ConsoleURL() string {
+	if a.Entity.Type == "user" {
+		return fmt.Sprintf("%s/user/api-keys/%s", a.Network.ConsoleURL, a.Key.ID)
+	}
+	return fmt.Sprintf("%s/%ss/%s/api-keys/%s", a.Network.ConsoleURL, a.Entity.Type, a.Entity.ID, a.Key.ID)
 }
 
 // TemplateName returns the name of the template to use for this email.
@@ -33,6 +51,15 @@ const apiKeyChangedText = `Dear {{.User.Name}},
 The API key "{{.Identifier}}" for {{.Entity.Type}} "{{.Entity.ID}}" on {{.Network.Name}} has been updated with the following rights:
 {{range $right := .Rights}} 
 {{$right}} {{end}}
+
+You can go to {{.ConsoleURL}} to view and edit this API key in the Console.
+
+If you prefer to use the command-line interface, you can run the following commands to view or edit this API key:
+
+ttn-lw-cli {{.Entity.Type}}s api-keys get --{{.Entity.Type}}-id {{.Entity.ID}} --api-key-id {{.Key.ID}}
+ttn-lw-cli {{.Entity.Type}}s api-keys set --{{.Entity.Type}}-id {{.Entity.ID}} --api-key-id {{.Key.ID}}
+
+For more information on how to use the command-line interface, please refer to the documentation: {{ documentation_url "/getting-started/cli/" }}.
 `
 
 // DefaultTemplates returns the default templates for this email.

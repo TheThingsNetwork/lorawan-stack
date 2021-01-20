@@ -37,18 +37,18 @@ const temporaryPasswordText = `Dear {{.User.Name}},
 
 A temporary password was requested for your user "{{.User.ID}}" on {{.Network.Name}}.
 
-This temporary password can only be used once, and only to change the password of your account.
+You can now go to {{ .Network.IdentityServerURL }}/update-password?user={{ .User.ID }}&current={{ .TemporaryPassword }} to change your password.
 
-Temporary Password: {{.TemporaryPassword}}
+If you prefer to use the command-line interface, you can run the following command:
 
-If you wish to change the password using web interface, follow the link below:
+ttn-lw-cli users update-password --user-id {{.User.ID}} --old {{ .TemporaryPassword }} (add --revoke-all-access if you want to logout everywhere)
 
-{{ .Network.IdentityServerURL }}/update-password?user={{ .User.ID }}&current={{ .TemporaryPassword }}
+For more information on how to use the command-line interface, please refer to the documentation: {{ documentation_url "/getting-started/cli/" }}.
 
 {{- if .TTL }}
 
-This temporary password expires {{ .FormatTTL }}.
-{{ end -}}
+Your temporary password expires {{ .FormatTTL }}, so change your password before then.
+{{- end }}
 `
 
 // DefaultTemplates returns the default templates for this email.

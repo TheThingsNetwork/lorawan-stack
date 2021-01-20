@@ -14,9 +14,16 @@
 
 package emails
 
+import "fmt"
+
 // UserRequested is the email that is sent to admins when a user requests to join the network.
 type UserRequested struct {
 	Data
+}
+
+// ConsoleURL returns the URL to the user in the Console.
+func (u UserRequested) ConsoleURL() string {
+	return fmt.Sprintf("%s/admin/user-management/%s", u.Network.ConsoleURL, u.Entity.ID)
 }
 
 // TemplateName returns the name of the template to use for this email.
@@ -28,10 +35,13 @@ const userRequestedText = `Dear {{ .User.Name }},
 
 User "{{ .Entity.ID }}" wants to join {{ .Network.Name }}.
 
-You can approve or reject them in the Console or using the Command-line interface.
+You can go to {{ .ConsoleURL }} to view and approve (or reject) the user.
 
-You can read how exactly to do this in the user management guide:
-https://thethingsstack.io/latest/getting-started/user-management/
+If you prefer to use the command-line interface, you can run the following command:
+
+ttn-lw-cli users set {{ .Entity.ID }} --state APPROVED (or --state REJECTED)
+
+For more information on how to use the command-line interface, please refer to the documentation: {{ documentation_url "/getting-started/cli/" }}.
 `
 
 // DefaultTemplates returns the default templates for this email.
