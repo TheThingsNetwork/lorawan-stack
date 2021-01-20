@@ -1051,8 +1051,8 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 							},
 							Payload: &ttnpb.Message_JoinAcceptPayload{
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-									NetID:      dev.PendingMACState.QueuedJoinAccept.Request.NetID,
-									DevAddr:    dev.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+									NetID:      dev.PendingMACState.QueuedJoinAccept.NetID,
+									DevAddr:    dev.PendingMACState.QueuedJoinAccept.DevAddr,
 									DLSettings: dev.PendingMACState.QueuedJoinAccept.Request.DownlinkSettings,
 									RxDelay:    dev.PendingMACState.QueuedJoinAccept.Request.RxDelay,
 									CFList:     dev.PendingMACState.QueuedJoinAccept.Request.CFList,
@@ -1070,7 +1070,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIDs...)),
 			)
 			dev.PendingSession = &ttnpb.Session{
-				DevAddr:     dev.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+				DevAddr:     dev.PendingMACState.QueuedJoinAccept.DevAddr,
 				SessionKeys: dev.PendingMACState.QueuedJoinAccept.Keys,
 			}
 			dev.PendingMACState.PendingJoinRequest = &dev.PendingMACState.QueuedJoinAccept.Request
@@ -1482,7 +1482,13 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 				LoRaWANVersion: defaultLoRaWANVersion,
 				QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
 					Payload: joinResp.RawPayload,
-					Request: *joinReq,
+					DevAddr: joinReq.DevAddr,
+					NetID:   joinReq.NetID,
+					Request: ttnpb.MACState_JoinRequest{
+						DownlinkSettings: joinReq.DownlinkSettings,
+						RxDelay:          joinReq.RxDelay,
+						CFList:           joinReq.CFList,
+					},
 					Keys: func() ttnpb.SessionKeys {
 						keys := ttnpb.SessionKeys{
 							SessionKeyID: joinResp.SessionKeys.SessionKeyID,
