@@ -17,6 +17,7 @@ package bleve
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -29,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -88,31 +90,19 @@ func getWorkingDirectory(paths []string) (string, error) {
 	return filepath.Join(wd, "device-repository"), nil
 }
 
-// packageFileName is the name of the Device Repository package.
-const packageFileName = "master.zip"
-
 // Initialize fetches the Device Repository package file and generates index files.
-func (c Config) Initialize(ctx context.Context, fetcher fetch.Interface, overwrite bool) error {
+func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overwrite bool) error {
 	wd, err := getWorkingDirectory(c.SearchPaths)
 	if err != nil {
 		return err
 	}
 
-	b, err := fetcher.File(packageFileName)
-	if err != nil {
-		return err
-	}
-
-	if err := unarchive(b, wd, func(path string) (string, bool) {
-		path = strings.TrimPrefix(path, "lorawan-devices-master/")
-		if !strings.HasPrefix(path, "vendor/") || (!strings.HasSuffix(path, ".yaml") && !strings.HasSuffix(path, ".js")) {
-			return "", true
-		}
-		return path, false
-	}); err != nil {
+	if err := prepareWorkingDirectory(ctx, wd, lorawanDevicesPath); err != nil {
 		return err
 	}
 	s := remote.NewRemoteStore(fetch.FromFilesystem(wd))
+
+	log.FromContext(ctx).WithField("index", path.Join(wd, indexPath)).Info("Creating index")
 	index, err := newIndex(path.Join(wd, indexPath), overwrite, "BrandID", "ModelID", "Type")
 	if err != nil {
 		return err
@@ -172,4 +162,38 @@ func (c Config) Initialize(ctx context.Context, fetcher fetch.Interface, overwri
 		}
 	}
 	return index.Batch(batch)
+}
+
+// prepareWorkingDirectory copies vendor information from source to the working directory.
+// This is useful because the source directory also contains image assets that we do not want
+// to include in the working directory.
+func prepareWorkingDirectory(ctx context.Context, workingDirectory, lorawanDevicesPath string) error {
+	logger := log.FromContext(ctx)
+	logger.WithFields(log.Fields(
+		"working_directory", workingDirectory,
+		"source", lorawanDevicesPath),
+	).Info("Preparing working directory")
+
+	return filepath.Walk(lorawanDevicesPath, func(fullPath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		file := strings.TrimPrefix(fullPath, lorawanDevicesPath+"/")
+		if !strings.HasPrefix(file, "vendor/") || (!strings.HasSuffix(file, ".yaml") && !strings.HasSuffix(file, ".js")) {
+			return nil
+		}
+		destination := filepath.Join(workingDirectory, file)
+		if err := os.MkdirAll(path.Dir(destination), 0755); err != nil {
+			return err
+		}
+		b, err := ioutil.ReadFile(fullPath)
+		if err != nil {
+			return err
+		}
+		logger.WithField("filename", destination).Debug("Copying file to working directory")
+		return ioutil.WriteFile(destination, b, info.Mode())
+	})
 }

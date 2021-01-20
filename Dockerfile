@@ -12,6 +12,10 @@ RUN rm -rf /srv/ttn-lorawan/lorawan-frequency-plans/.git
 COPY data/lorawan-webhook-templates /srv/ttn-lorawan/lorawan-webhook-templates
 RUN rm -rf /srv/ttn-lorawan/lorawan-webhook-templates/.git
 
+ENV TTN_LW_DEVICE_REPOSITORY_CONFIG_SOURCE="directory" \
+    TTN_LW_DEVICE_REPOSITORY_DIRECTORY="/tmp/lorawan-devices"
+
+COPY data/lorawan-devices /tmp/lorawan-devices
 RUN mkdir -p /srv/ttn-lorawan/device-repository && /bin/ttn-lw-stack dr-db init
 
 FROM alpine:3.12

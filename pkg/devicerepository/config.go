@@ -21,18 +21,14 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store/bleve"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 )
 
 // Config represents the DeviceRepository configuration.
 type Config struct {
 	Store StoreConfig `name:"store"`
 
-	ConfigSource string                `name:"config-source" description:"Source of the Device Repository (static, directory, url, blob)"`
-	Static       map[string][]byte     `name:"-"`
-	Directory    string                `name:"directory" description:"OS filesystem directory, which contains Device Repository package"`
-	URL          string                `name:"url" description:"URL, which contains Device Repository package"`
-	Blob         config.BlobPathConfig `name:"blob"`
+	ConfigSource string `name:"config-source" description:"Source of the Device Repository (directory)"`
+	Directory    string `name:"directory" description:"OS filesystem directory, which contains Device Repository package"`
 
 	AssetsBaseURL string `name:"assets-base-url" description:"The base URL for Device Repository assets"`
 }
@@ -53,31 +49,15 @@ func (c Config) NewStore(ctx context.Context, blobConf config.BlobConfig) (store
 	return c.Store.Bleve.NewStore(ctx)
 }
 
-var errNoFetcherConfig = errors.DefineInvalidArgument("no_fetcher_config", "no fetcher configured for the Device Repository")
+var errFetcherConfig = errors.DefineInvalidArgument("fetcher_config", "only the directory configuration source is supported")
 
 // Initialize sets up the Device Repository.
 func (c Config) Initialize(ctx context.Context, blobConf config.BlobConfig, overwrite bool) error {
-	var fetcher fetch.Interface
 	switch c.ConfigSource {
-	case "static":
-		fetcher = fetch.NewMemFetcher(c.Static)
 	case "directory":
-		fetcher = fetch.FromFilesystem(c.Directory)
-	case "url":
-		var err error
-		fetcher, err = fetch.FromHTTP(c.URL, false)
-		if err != nil {
-			return err
-		}
-	case "blob":
-		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
-		if err != nil {
-			return err
-		}
-		fetcher = fetch.FromBucket(ctx, b, c.Blob.Path)
 	default:
-		return errNoFetcherConfig.New()
+		return errFetcherConfig.New()
 	}
 
-	return c.Store.Bleve.Initialize(ctx, fetcher, overwrite)
+	return c.Store.Bleve.Initialize(ctx, c.Directory, overwrite)
 }

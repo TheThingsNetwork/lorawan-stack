@@ -15,56 +15,9 @@
 package bleve_test
 
 import (
-	"archive/zip"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"strings"
-
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
-
-func archive(sourceDirectory, destinationFile string, filterFunc func(string) (string, bool)) error {
-	f, err := os.Create(destinationFile)
-	if err != nil {
-		return err
-	}
-	z := zip.NewWriter(f)
-	if err := filepath.Walk(sourceDirectory, func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
-			return nil
-		}
-		pathInArchive, skip := filterFunc(path)
-		if skip {
-			return nil
-		}
-		w, err := z.Create(pathInArchive)
-		if err != nil {
-			return err
-		}
-		b, err := ioutil.ReadFile(path)
-		if err != nil {
-			return err
-		}
-		if _, err := w.Write(b); err != nil {
-			return err
-		}
-		return nil
-	}); err != nil {
-		return err
-	}
-
-	return z.Close()
-}
-
-func createDeviceRepositoryArchive(path string) (string, error) {
-	source := filepath.Join("..", "remote", "testdata")
-	destination := filepath.Join(path, "master.zip")
-	return destination, archive(source, destination, func(s string) (string, bool) {
-		return strings.TrimPrefix(s, source+"/"), false
-	})
-}
 
 func brandsResponse(brandIDs ...string) *store.GetBrandsResponse {
 	if brandIDs == nil {

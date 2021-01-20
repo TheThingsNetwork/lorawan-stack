@@ -3131,6 +3131,15 @@
       "file": "grpc.go"
     }
   },
+  "error:pkg/devicerepository:fetcher_config": {
+    "translations": {
+      "en": "only the directory configuration source is supported"
+    },
+    "description": {
+      "package": "pkg/devicerepository",
+      "file": "config.go"
+    }
+  },
   "error:pkg/devicerepository:model_not_found": {
     "translations": {
       "en": "model `{brand_id}/{model_id}` not found"
@@ -3138,15 +3147,6 @@
     "description": {
       "package": "pkg/devicerepository",
       "file": "grpc.go"
-    }
-  },
-  "error:pkg/devicerepository:no_fetcher_config": {
-    "translations": {
-      "en": "no fetcher configured for the Device Repository"
-    },
-    "description": {
-      "package": "pkg/devicerepository",
-      "file": "config.go"
     }
   },
   "error:pkg/devicetemplateconverter:converter": {
