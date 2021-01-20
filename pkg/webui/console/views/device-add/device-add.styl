@@ -12,21 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { connect } from 'react-redux'
-
-import withRequest from '@ttn-lw/lib/components/with-request'
-
-import { getJoinEUIPrefixes } from '@console/store/actions/join-server'
-
-import { selectJoinEUIPrefixesFetching } from '@console/store/selectors/join-server'
-
-const mapStateToProps = state => ({
-  fetching: selectJoinEUIPrefixesFetching(state),
-})
-const mapDispatchToProps = { getPrefixes: getJoinEUIPrefixes }
-
-export default DeviceAdd =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(withRequest(({ getPrefixes }) => getPrefixes(), ({ fetching }) => fetching)(DeviceAdd))
+.tabs
+  margin-top: 0
+  margin-bottom: $ls.s

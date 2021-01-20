@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { ACTIVATION_MODES } from '@console/lib/device-utils'
 
-import m from '../messages'
+import m from '../../messages'
 import {
   getActivationMode,
   getLorawanVersion,
   getApplicationServerAddress,
   getNetworkServerAddress,
   getJoinServerAddress,
-} from '../utils'
+} from '../../utils'
 
 import BasicSettingsForm from './basic-settings-form'
 import NetworkSettingsForm from './network-settings-form'

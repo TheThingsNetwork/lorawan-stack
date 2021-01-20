@@ -15,6 +15,9 @@
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
+  // Shared messages.
+  manualTabTitle: 'Manually',
+  // Manual messages.
   basicTitle: 'Basic settings',
   basicDescription: "End device ID's, Name and Description",
   basicDetails: 'Defines general settings of an end device',
