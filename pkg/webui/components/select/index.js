@@ -150,7 +150,7 @@ class Select extends React.PureComponent {
       [style.error]: error,
       [style.warning]: warning,
     })
-    const translatedOptions = options.map(function(option) {
+    const translatedOptions = options.map(option => {
       const { label, labelValues = {} } = option
       if (typeof label === 'object' && label.id && label.defaultMessage) {
         return { ...option, label: formatMessage(label, labelValues) }
