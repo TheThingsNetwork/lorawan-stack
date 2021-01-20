@@ -203,6 +203,22 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	uid := unique.ID(ctx, ids)
 	logger.WithField("gateway_uid", uid).Debug("Found gateway for EUI")
 
+	var md metadata.MD
+	auth := c.Request().Header.Get(echo.HeaderAuthorization)
+	if auth != "" {
+		if !strings.HasPrefix(auth, "Bearer ") {
+			auth = fmt.Sprintf("Bearer %s", auth)
+		}
+		md = metadata.New(map[string]string{
+			"id":            ids.GatewayID,
+			"authorization": auth,
+		})
+	}
+	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
+		md = metadata.Join(ctxMd, md)
+	}
+	ctx = metadata.NewIncomingContext(ctx, md)
+
 	var gatewayAuth grpc.CallOption
 	if rights.RequireGateway(ctx, *ids,
 		ttnpb.RIGHT_GATEWAY_INFO,
