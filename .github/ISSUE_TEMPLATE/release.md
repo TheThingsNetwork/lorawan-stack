@@ -20,6 +20,13 @@ This is a checklist for releases. This is filled in by both the releaser and the
   $ git checkout -b release/v3.${minor}.${patch}
   ```
 
+- [ ] Update submodules
+  ```bash
+  $ mage git:pullSubmodules
+  $ git add data
+  $ git commit -m "data: Update external repositories" # if any changes.
+  ```
+
 - [ ] Update the `CHANGELOG.md` file
   - [ ] Change the **Unreleased** section to the new version and add date obtained via `date +%Y-%m-%d` (e.g. `## [3.2.1] - 2019-10-11`)
   - [ ] Check if we didn't forget anything important
