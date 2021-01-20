@@ -287,9 +287,23 @@ func (m *GatewayVersionIdentifiers) ValidateFields(paths ...string) error {
 			}
 
 		case "hardware_version":
-			// no validation rules for HardwareVersion
+
+			if utf8.RuneCountInString(m.GetHardwareVersion()) > 32 {
+				return GatewayVersionIdentifiersValidationError{
+					field:  "hardware_version",
+					reason: "value length must be at most 32 runes",
+				}
+			}
+
 		case "firmware_version":
-			// no validation rules for FirmwareVersion
+
+			if utf8.RuneCountInString(m.GetFirmwareVersion()) > 32 {
+				return GatewayVersionIdentifiersValidationError{
+					field:  "firmware_version",
+					reason: "value length must be at most 32 runes",
+				}
+			}
+
 		default:
 			return GatewayVersionIdentifiersValidationError{
 				field:  name,
@@ -761,6 +775,13 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "attributes":
 
+			if len(m.GetAttributes()) > 10 {
+				return GatewayValidationError{
+					field:  "attributes",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
+
 			for key, val := range m.GetAttributes() {
 				_ = val
 
@@ -778,10 +799,23 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 					}
 				}
 
-				// no validation rules for Attributes[key]
+				if utf8.RuneCountInString(val) > 200 {
+					return GatewayValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value length must be at most 200 runes",
+					}
+				}
+
 			}
 
 		case "contact_info":
+
+			if len(m.GetContactInfo()) > 10 {
+				return GatewayValidationError{
+					field:  "contact_info",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
 
 			for idx, item := range m.GetContactInfo() {
 				_, _ = idx, item
@@ -822,7 +856,14 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 		case "auto_update":
 			// no validation rules for AutoUpdate
 		case "update_channel":
-			// no validation rules for UpdateChannel
+
+			if utf8.RuneCountInString(m.GetUpdateChannel()) > 128 {
+				return GatewayValidationError{
+					field:  "update_channel",
+					reason: "value length must be at most 128 runes",
+				}
+			}
+
 		case "frequency_plan_id":
 
 			if utf8.RuneCountInString(m.GetFrequencyPlanID()) > 64 {
@@ -854,6 +895,13 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 			}
 
 		case "antennas":
+
+			if len(m.Antennas) > 8 {
+				return GatewayValidationError{
+					field:  "antennas",
+					reason: "value must contain no more than 8 item(s)",
+				}
+			}
 
 			for idx, item := range m.Antennas {
 				_, _ = idx, item
@@ -2423,6 +2471,13 @@ func (m *GatewayAntenna) ValidateFields(paths ...string) error {
 
 		case "attributes":
 
+			if len(m.GetAttributes()) > 10 {
+				return GatewayAntennaValidationError{
+					field:  "attributes",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
+
 			for key, val := range m.GetAttributes() {
 				_ = val
 
@@ -2440,7 +2495,13 @@ func (m *GatewayAntenna) ValidateFields(paths ...string) error {
 					}
 				}
 
-				// no validation rules for Attributes[key]
+				if utf8.RuneCountInString(val) > 200 {
+					return GatewayAntennaValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value length must be at most 200 runes",
+					}
+				}
+
 			}
 
 		default:
@@ -2540,6 +2601,13 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 
 		case "versions":
 
+			if len(m.GetVersions()) > 10 {
+				return GatewayStatusValidationError{
+					field:  "versions",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
+
 			for key, val := range m.GetVersions() {
 				_ = val
 
@@ -2557,10 +2625,23 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 					}
 				}
 
-				// no validation rules for Versions[key]
+				if utf8.RuneCountInString(val) > 32 {
+					return GatewayStatusValidationError{
+						field:  fmt.Sprintf("versions[%v]", key),
+						reason: "value length must be at most 32 runes",
+					}
+				}
+
 			}
 
 		case "antenna_locations":
+
+			if len(m.GetAntennaLocations()) > 8 {
+				return GatewayStatusValidationError{
+					field:  "antenna_locations",
+					reason: "value must contain no more than 8 item(s)",
+				}
+			}
 
 			for idx, item := range m.GetAntennaLocations() {
 				_, _ = idx, item
@@ -2579,7 +2660,33 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 
 		case "ip":
 
+			if len(m.GetIP()) > 10 {
+				return GatewayStatusValidationError{
+					field:  "ip",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
+
+			for idx, item := range m.GetIP() {
+				_, _ = idx, item
+
+				if ip := net.ParseIP(item); ip == nil {
+					return GatewayStatusValidationError{
+						field:  fmt.Sprintf("ip[%v]", idx),
+						reason: "value must be a valid IP address",
+					}
+				}
+
+			}
+
 		case "metrics":
+
+			if len(m.GetMetrics()) > 10 {
+				return GatewayStatusValidationError{
+					field:  "metrics",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
 
 			for key, val := range m.GetMetrics() {
 				_ = val

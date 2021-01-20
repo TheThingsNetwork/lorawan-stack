@@ -274,10 +274,10 @@ func (m *AuthorizeApplicationRequest) ValidateFields(paths ...string) error {
 
 		case "api_key":
 
-			if utf8.RuneCountInString(m.GetAPIKey()) < 1 {
+			if l := utf8.RuneCountInString(m.GetAPIKey()); l < 1 || l > 128 {
 				return AuthorizeApplicationRequestValidationError{
 					field:  "api_key",
-					reason: "value length must be at least 1 runes",
+					reason: "value length must be between 1 and 128 runes, inclusive",
 				}
 			}
 

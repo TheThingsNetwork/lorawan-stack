@@ -51,11 +51,32 @@ func (m *ContactInfo) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "contact_type":
-			// no validation rules for ContactType
+
+			if _, ok := ContactType_name[int32(m.GetContactType())]; !ok {
+				return ContactInfoValidationError{
+					field:  "contact_type",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "contact_method":
-			// no validation rules for ContactMethod
+
+			if _, ok := ContactMethod_name[int32(m.GetContactMethod())]; !ok {
+				return ContactInfoValidationError{
+					field:  "contact_method",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "value":
-			// no validation rules for Value
+
+			if utf8.RuneCountInString(m.GetValue()) > 256 {
+				return ContactInfoValidationError{
+					field:  "value",
+					reason: "value length must be at most 256 runes",
+				}
+			}
+
 		case "public":
 			// no validation rules for Public
 		case "validated_at":
@@ -150,9 +171,23 @@ func (m *ContactInfoValidation) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "id":
-			// no validation rules for ID
+
+			if utf8.RuneCountInString(m.GetID()) > 64 {
+				return ContactInfoValidationValidationError{
+					field:  "id",
+					reason: "value length must be at most 64 runes",
+				}
+			}
+
 		case "token":
-			// no validation rules for Token
+
+			if utf8.RuneCountInString(m.GetToken()) > 64 {
+				return ContactInfoValidationValidationError{
+					field:  "token",
+					reason: "value length must be at most 64 runes",
+				}
+			}
+
 		case "entity":
 
 			if v, ok := interface{}(m.GetEntity()).(interface{ ValidateFields(...string) error }); ok {

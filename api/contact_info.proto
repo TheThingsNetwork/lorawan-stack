@@ -14,6 +14,7 @@
 
 syntax = "proto3";
 
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
@@ -42,16 +43,19 @@ enum ContactMethod {
 }
 
 message ContactInfo {
-  ContactType contact_type = 1;
-  ContactMethod contact_method = 2;
-  string value = 3;
+  ContactType contact_type = 1 [(validate.rules).enum.defined_only = true];
+  ContactMethod contact_method = 2 [(validate.rules).enum.defined_only = true];
+  string value = 3 [(validate.rules).string.max_len = 256];
   bool public = 4;
   google.protobuf.Timestamp validated_at = 5 [(gogoproto.stdtime) = true];
 }
 
 message ContactInfoValidation {
-  string id = 1 [(gogoproto.customname) = "ID"];
-  string token = 2;
+  string id = 1 [
+    (gogoproto.customname) = "ID",
+    (validate.rules).string.max_len = 64
+  ];
+  string token = 2 [(validate.rules).string.max_len = 64];
   EntityIdentifiers entity = 3;
   repeated ContactInfo contact_info = 4;
   google.protobuf.Timestamp created_at = 5 [(gogoproto.stdtime) = true];

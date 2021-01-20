@@ -73,6 +73,7 @@ export default defineMessages({
   attributes: 'Attributes',
   attributesValidateRequired:
     'All attribute entry values are required. Please remove empty entries.',
+  attributesValidateTooMany: '{field} must be 10 items or fewer',
   automaticUpdates: 'Automatic updates',
   autoUpdateDescription: 'Gateway can be updated automatically',
   backToOverview: 'Back to overview',

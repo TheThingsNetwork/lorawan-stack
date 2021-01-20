@@ -51,12 +51,40 @@ func (m *SearchEntitiesRequest) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "id_contains":
-			// no validation rules for IDContains
+
+			if utf8.RuneCountInString(m.GetIDContains()) > 50 {
+				return SearchEntitiesRequestValidationError{
+					field:  "id_contains",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "name_contains":
-			// no validation rules for NameContains
+
+			if utf8.RuneCountInString(m.GetNameContains()) > 50 {
+				return SearchEntitiesRequestValidationError{
+					field:  "name_contains",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "description_contains":
-			// no validation rules for DescriptionContains
+
+			if utf8.RuneCountInString(m.GetDescriptionContains()) > 50 {
+				return SearchEntitiesRequestValidationError{
+					field:  "description_contains",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "attributes_contain":
+
+			if len(m.GetAttributesContain()) > 10 {
+				return SearchEntitiesRequestValidationError{
+					field:  "attributes_contain",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
 
 			for key, val := range m.GetAttributesContain() {
 				_ = val
@@ -75,7 +103,13 @@ func (m *SearchEntitiesRequest) ValidateFields(paths ...string) error {
 					}
 				}
 
-				// no validation rules for AttributesContain[key]
+				if utf8.RuneCountInString(val) > 50 {
+					return SearchEntitiesRequestValidationError{
+						field:  fmt.Sprintf("attributes_contain[%v]", key),
+						reason: "value length must be at most 50 runes",
+					}
+				}
+
 			}
 
 		case "field_mask":
@@ -199,12 +233,40 @@ func (m *SearchEndDevicesRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "id_contains":
-			// no validation rules for IDContains
+
+			if utf8.RuneCountInString(m.GetIDContains()) > 50 {
+				return SearchEndDevicesRequestValidationError{
+					field:  "id_contains",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "name_contains":
-			// no validation rules for NameContains
+
+			if utf8.RuneCountInString(m.GetNameContains()) > 50 {
+				return SearchEndDevicesRequestValidationError{
+					field:  "name_contains",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "description_contains":
-			// no validation rules for DescriptionContains
+
+			if utf8.RuneCountInString(m.GetDescriptionContains()) > 50 {
+				return SearchEndDevicesRequestValidationError{
+					field:  "description_contains",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "attributes_contain":
+
+			if len(m.GetAttributesContain()) > 10 {
+				return SearchEndDevicesRequestValidationError{
+					field:  "attributes_contain",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
 
 			for key, val := range m.GetAttributesContain() {
 				_ = val
@@ -223,15 +285,42 @@ func (m *SearchEndDevicesRequest) ValidateFields(paths ...string) error {
 					}
 				}
 
-				// no validation rules for AttributesContain[key]
+				if utf8.RuneCountInString(val) > 50 {
+					return SearchEndDevicesRequestValidationError{
+						field:  fmt.Sprintf("attributes_contain[%v]", key),
+						reason: "value length must be at most 50 runes",
+					}
+				}
+
 			}
 
 		case "dev_eui_contains":
-			// no validation rules for DevEUIContains
+
+			if utf8.RuneCountInString(m.GetDevEUIContains()) > 16 {
+				return SearchEndDevicesRequestValidationError{
+					field:  "dev_eui_contains",
+					reason: "value length must be at most 16 runes",
+				}
+			}
+
 		case "join_eui_contains":
-			// no validation rules for JoinEUIContains
+
+			if utf8.RuneCountInString(m.GetJoinEUIContains()) > 16 {
+				return SearchEndDevicesRequestValidationError{
+					field:  "join_eui_contains",
+					reason: "value length must be at most 16 runes",
+				}
+			}
+
 		case "dev_addr_contains":
-			// no validation rules for DevAddrContains
+
+			if utf8.RuneCountInString(m.GetDevAddrContains()) > 8 {
+				return SearchEndDevicesRequestValidationError{
+					field:  "dev_addr_contains",
+					reason: "value length must be at most 8 runes",
+				}
+			}
+
 		case "field_mask":
 
 			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {

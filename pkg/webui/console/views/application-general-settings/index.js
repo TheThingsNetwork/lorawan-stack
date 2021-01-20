@@ -66,6 +66,7 @@ const validationSchema = Yup.object().shape({
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string().max(150, Yup.passValues(sharedMessages.validateTooLong)),
   attributes: Yup.array()
+    .max(10, Yup.passValues(sharedMessages.attributesValidateTooMany))
     .test(
       'has no empty string values',
       sharedMessages.attributesValidateRequired,

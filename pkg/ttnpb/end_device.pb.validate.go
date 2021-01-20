@@ -696,9 +696,23 @@ func (m *EndDeviceVersionIdentifiers) ValidateFields(paths ...string) error {
 			}
 
 		case "hardware_version":
-			// no validation rules for HardwareVersion
+
+			if utf8.RuneCountInString(m.GetHardwareVersion()) > 32 {
+				return EndDeviceVersionIdentifiersValidationError{
+					field:  "hardware_version",
+					reason: "value length must be at most 32 runes",
+				}
+			}
+
 		case "firmware_version":
-			// no validation rules for FirmwareVersion
+
+			if utf8.RuneCountInString(m.GetFirmwareVersion()) > 32 {
+				return EndDeviceVersionIdentifiersValidationError{
+					field:  "firmware_version",
+					reason: "value length must be at most 32 runes",
+				}
+			}
+
 		default:
 			return EndDeviceVersionIdentifiersValidationError{
 				field:  name,
@@ -825,6 +839,13 @@ func (m *EndDeviceVersion) ValidateFields(paths ...string) error {
 			}
 
 		case "photos":
+
+			if len(m.GetPhotos()) > 10 {
+				return EndDeviceVersionValidationError{
+					field:  "photos",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
 
 		case "supports_class_b":
 			// no validation rules for SupportsClassB
@@ -1066,6 +1087,13 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 			}
 
 		case "factory_preset_frequencies":
+
+			if len(m.GetFactoryPresetFrequencies()) > 96 {
+				return MACSettingsValidationError{
+					field:  "factory_preset_frequencies",
+					reason: "value must contain no more than 96 item(s)",
+				}
+			}
 
 		case "max_duty_cycle":
 
@@ -1880,6 +1908,13 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "attributes":
 
+			if len(m.GetAttributes()) > 10 {
+				return EndDeviceValidationError{
+					field:  "attributes",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
+
 			for key, val := range m.GetAttributes() {
 				_ = val
 
@@ -1897,7 +1932,13 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 					}
 				}
 
-				// no validation rules for Attributes[key]
+				if utf8.RuneCountInString(val) > 200 {
+					return EndDeviceValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value length must be at most 200 runes",
+					}
+				}
+
 			}
 
 		case "version_ids":

@@ -105,6 +105,13 @@ func (m *User) ValidateFields(paths ...string) error {
 
 		case "attributes":
 
+			if len(m.GetAttributes()) > 10 {
+				return UserValidationError{
+					field:  "attributes",
+					reason: "value must contain no more than 10 pair(s)",
+				}
+			}
+
 			for key, val := range m.GetAttributes() {
 				_ = val
 
@@ -122,10 +129,23 @@ func (m *User) ValidateFields(paths ...string) error {
 					}
 				}
 
-				// no validation rules for Attributes[key]
+				if utf8.RuneCountInString(val) > 200 {
+					return UserValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value length must be at most 200 runes",
+					}
+				}
+
 			}
 
 		case "contact_info":
+
+			if len(m.GetContactInfo()) > 10 {
+				return UserValidationError{
+					field:  "contact_info",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
 
 			for idx, item := range m.GetContactInfo() {
 				_, _ = idx, item
@@ -165,7 +185,14 @@ func (m *User) ValidateFields(paths ...string) error {
 			}
 
 		case "password":
-			// no validation rules for Password
+
+			if utf8.RuneCountInString(m.GetPassword()) > 1000 {
+				return UserValidationError{
+					field:  "password",
+					reason: "value length must be at most 1000 runes",
+				}
+			}
+
 		case "password_updated_at":
 
 			if v, ok := interface{}(m.GetPasswordUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
@@ -192,7 +219,14 @@ func (m *User) ValidateFields(paths ...string) error {
 		case "admin":
 			// no validation rules for Admin
 		case "temporary_password":
-			// no validation rules for TemporaryPassword
+
+			if utf8.RuneCountInString(m.GetTemporaryPassword()) > 1000 {
+				return UserValidationError{
+					field:  "temporary_password",
+					reason: "value length must be at most 1000 runes",
+				}
+			}
+
 		case "temporary_password_created_at":
 
 			if v, ok := interface{}(m.GetTemporaryPasswordCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
@@ -993,9 +1027,23 @@ func (m *UpdateUserPasswordRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "new":
-			// no validation rules for New
+
+			if utf8.RuneCountInString(m.GetNew()) > 1000 {
+				return UpdateUserPasswordRequestValidationError{
+					field:  "new",
+					reason: "value length must be at most 1000 runes",
+				}
+			}
+
 		case "old":
-			// no validation rules for Old
+
+			if utf8.RuneCountInString(m.GetOld()) > 1000 {
+				return UpdateUserPasswordRequestValidationError{
+					field:  "old",
+					reason: "value length must be at most 1000 runes",
+				}
+			}
+
 		case "revoke_all_access":
 			// no validation rules for RevokeAllAccess
 		default:
