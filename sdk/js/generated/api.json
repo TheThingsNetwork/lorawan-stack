@@ -14557,6 +14557,16 @@
               "fullType": "ttn.lorawan.v3.IsConfiguration.UserRegistration.PasswordRequirements",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "enabled",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

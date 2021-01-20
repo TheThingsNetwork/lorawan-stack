@@ -3613,6 +3613,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `contact_info_validation` | [`IsConfiguration.UserRegistration.ContactInfoValidation`](#ttn.lorawan.v3.IsConfiguration.UserRegistration.ContactInfoValidation) |  |  |
 | `admin_approval` | [`IsConfiguration.UserRegistration.AdminApproval`](#ttn.lorawan.v3.IsConfiguration.UserRegistration.AdminApproval) |  |  |
 | `password_requirements` | [`IsConfiguration.UserRegistration.PasswordRequirements`](#ttn.lorawan.v3.IsConfiguration.UserRegistration.PasswordRequirements) |  |  |
+| `enabled` | [`bool`](#bool) |  |  |
 
 ### <a name="ttn.lorawan.v3.IsConfiguration.UserRegistration.AdminApproval">Message `IsConfiguration.UserRegistration.AdminApproval`</a>
 

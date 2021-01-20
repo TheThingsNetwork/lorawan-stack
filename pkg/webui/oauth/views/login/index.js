@@ -34,7 +34,11 @@ import Message from '@ttn-lw/lib/components/message'
 
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import { selectApplicationRootPath, selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
+import {
+  selectApplicationRootPath,
+  selectApplicationSiteName,
+  selectEnableUserRegistration,
+} from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { id as userRegexp } from '@ttn-lw/lib/regexp'
 
@@ -59,6 +63,7 @@ const validationSchema = Yup.object().shape({
 @connect(
   () => ({
     siteName: selectApplicationSiteName(),
+    enableUserRegistration: selectEnableUserRegistration(),
   }),
   {
     replace,
@@ -66,6 +71,7 @@ const validationSchema = Yup.object().shape({
 )
 export default class OAuth extends React.PureComponent {
   static propTypes = {
+    enableUserRegistration: PropTypes.bool.isRequired,
     location: PropTypes.location.isRequired,
     replace: PropTypes.func.isRequired,
     siteName: PropTypes.string.isRequired,
@@ -115,7 +121,7 @@ export default class OAuth extends React.PureComponent {
     }
 
     const { info } = this.props.location.state || ''
-    const { siteName } = this.props
+    const { siteName, enableUserRegistration } = this.props
 
     return (
       <div className={style.fullHeightCenter}>
@@ -153,7 +159,9 @@ export default class OAuth extends React.PureComponent {
                 required
               />
               <Form.Submit component={SubmitButton} message={sharedMessages.login} />
-              <Button naked message={m.createAccount} onClick={this.navigateToRegister} />
+              {enableUserRegistration && (
+                <Button naked message={m.createAccount} onClick={this.navigateToRegister} />
+              )}
               <Button naked message={m.forgotPassword} onClick={this.navigateToResetPassword} />
             </Form>
           </div>

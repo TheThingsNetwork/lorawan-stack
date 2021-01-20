@@ -8342,6 +8342,9 @@
         },
         "password_requirements": {
           "$ref": "#/definitions/UserRegistrationPasswordRequirements"
+        },
+        "enabled": {
+          "type": "boolean"
         }
       }
     },

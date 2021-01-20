@@ -37,7 +37,11 @@ export default class OAuth extends React.PureComponent {
   static propTypes = {
     logout: PropTypes.func.isRequired,
     redirectToLogin: PropTypes.func.isRequired,
-    user: PropTypes.user.isRequired,
+    user: PropTypes.user,
+  }
+
+  static defaultProps = {
+    user: undefined,
   }
 
   @bind

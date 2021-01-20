@@ -32,6 +32,7 @@ import (
 type Config struct {
 	DatabaseURI      string `name:"database-uri" description:"Database connection URI"`
 	UserRegistration struct {
+		Enabled    bool `name:"enabled" description:"Enable user registration"`
 		Invitation struct {
 			Required bool          `name:"required" description:"Require invitations for new users"`
 			TokenTTL time.Duration `name:"token-ttl" description:"TTL of user invitation tokens"`
@@ -133,6 +134,7 @@ func (c emailTemplatesConfig) Fetcher(ctx context.Context, blobConf config.BlobC
 func (c Config) toProto() *ttnpb.IsConfiguration {
 	return &ttnpb.IsConfiguration{
 		UserRegistration: &ttnpb.IsConfiguration_UserRegistration{
+			Enabled: c.UserRegistration.Enabled,
 			Invitation: &ttnpb.IsConfiguration_UserRegistration_Invitation{
 				Required: &types.BoolValue{Value: c.UserRegistration.Invitation.Required},
 				TokenTTL: &c.UserRegistration.Invitation.TokenTTL,

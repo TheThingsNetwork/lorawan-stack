@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 - Support field mask paths in Storage Integration API requests.
 - CUPS redirection.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+- Configuration option (`is.user-registration.enabled`) to enable or disable user registrations.
 
 ### Changed
 

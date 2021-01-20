@@ -86,6 +86,8 @@ message IsConfiguration {
       google.protobuf.UInt32Value min_special = 5;
     }
     PasswordRequirements password_requirements = 4;
+
+    bool enabled = 5;
   }
   UserRegistration user_registration = 3;
 

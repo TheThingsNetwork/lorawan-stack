@@ -644,6 +644,8 @@ func (m *IsConfiguration_UserRegistration) ValidateFields(paths ...string) error
 				}
 			}
 
+		case "enabled":
+			// no validation rules for Enabled
 		default:
 			return IsConfiguration_UserRegistrationValidationError{
 				field:  name,

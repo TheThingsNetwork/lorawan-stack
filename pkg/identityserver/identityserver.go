@@ -100,6 +100,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	}
 
 	is.config.OAuth.CSRFAuthKey = is.GetBaseConfig(is.Context()).HTTP.Cookie.HashKey
+	is.config.OAuth.UI.FrontendConfig.EnableUserRegistration = is.config.UserRegistration.Enabled
 	is.oauth, err = oauth.NewServer(c, struct {
 		store.UserStore
 		store.UserSessionStore

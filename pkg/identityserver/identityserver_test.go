@@ -315,6 +315,7 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 	conf := &Config{
 		DatabaseURI: dbConnString,
 	}
+	conf.UserRegistration.Enabled = true
 	conf.UserRegistration.PasswordRequirements.MinLength = 10
 	conf.UserRegistration.PasswordRequirements.MaxLength = 1000
 	conf.Email.Templates.Static = map[string][]byte{
