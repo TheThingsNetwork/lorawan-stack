@@ -1306,7 +1306,7 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			}
 		case "pending_join_request":
 			if len(subs) > 0 {
-				var newDst, newSrc *JoinRequest
+				var newDst, newSrc *MACState_JoinRequest
 				if (src == nil || src.PendingJoinRequest == nil) && dst.PendingJoinRequest == nil {
 					continue
 				}
@@ -1316,7 +1316,7 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 				if dst.PendingJoinRequest != nil {
 					newDst = dst.PendingJoinRequest
 				} else {
-					newDst = &JoinRequest{}
+					newDst = &MACState_JoinRequest{}
 					dst.PendingJoinRequest = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
@@ -2623,6 +2623,70 @@ func (dst *MACParameters_Channel) SetFields(src *MACParameters_Channel, paths ..
 	return nil
 }
 
+func (dst *MACState_JoinRequest) SetFields(src *MACState_JoinRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "downlink_settings":
+			if len(subs) > 0 {
+				var newDst, newSrc *DLSettings
+				if src != nil {
+					newSrc = &src.DownlinkSettings
+				}
+				newDst = &dst.DownlinkSettings
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkSettings = src.DownlinkSettings
+				} else {
+					var zero DLSettings
+					dst.DownlinkSettings = zero
+				}
+			}
+		case "rx_delay":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx_delay' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RxDelay = src.RxDelay
+			} else {
+				var zero RxDelay
+				dst.RxDelay = zero
+			}
+		case "cf_list":
+			if len(subs) > 0 {
+				var newDst, newSrc *CFList
+				if (src == nil || src.CFList == nil) && dst.CFList == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.CFList
+				}
+				if dst.CFList != nil {
+					newDst = dst.CFList
+				} else {
+					newDst = &CFList{}
+					dst.CFList = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.CFList = src.CFList
+				} else {
+					dst.CFList = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -2637,7 +2701,7 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 			}
 		case "request":
 			if len(subs) > 0 {
-				var newDst, newSrc *JoinRequest
+				var newDst, newSrc *MACState_JoinRequest
 				if src != nil {
 					newSrc = &src.Request
 				}
@@ -2649,7 +2713,7 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 				if src != nil {
 					dst.Request = src.Request
 				} else {
-					var zero JoinRequest
+					var zero MACState_JoinRequest
 					dst.Request = zero
 				}
 			}
@@ -2679,6 +2743,26 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 				dst.CorrelationIDs = src.CorrelationIDs
 			} else {
 				dst.CorrelationIDs = nil
+			}
+		case "dev_addr":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_addr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevAddr = src.DevAddr
+			} else {
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.DevAddr
+				dst.DevAddr = zero
+			}
+		case "net_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'net_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NetID = src.NetID
+			} else {
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.NetID
+				dst.NetID = zero
 			}
 
 		default:

@@ -9607,11 +9607,11 @@
             },
             {
               "name": "pending_join_request",
-              "description": "Pending join request.\nSet each time a join accept is scheduled and removed each time an uplink is received from the device.",
+              "description": "Pending join request.\nSet each time a join-accept is scheduled and removed each time an uplink is received from the device.",
               "label": "",
               "type": "JoinRequest",
-              "longType": "JoinRequest",
-              "fullType": "ttn.lorawan.v3.JoinRequest",
+              "longType": "MACState.JoinRequest",
+              "fullType": "ttn.lorawan.v3.MACState.JoinRequest",
               "ismap": false,
               "defaultValue": ""
             },
@@ -9858,21 +9858,13 @@
             },
             {
               "name": "request",
-              "description": "JoinRequest sent to Join Server.",
+              "description": "",
               "label": "",
               "type": "JoinRequest",
-              "longType": "JoinRequest",
-              "fullType": "ttn.lorawan.v3.JoinRequest",
+              "longType": "MACState.JoinRequest",
+              "fullType": "ttn.lorawan.v3.MACState.JoinRequest",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
+              "defaultValue": ""
             },
             {
               "name": "keys",
@@ -9909,6 +9901,83 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "dev_addr",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "net_id",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "JoinRequest",
+          "longName": "MACState.JoinRequest",
+          "fullName": "ttn.lorawan.v3.MACState.JoinRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "downlink_settings",
+              "description": "",
+              "label": "",
+              "type": "DLSettings",
+              "longType": "DLSettings",
+              "fullType": "ttn.lorawan.v3.DLSettings",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "rx_delay",
+              "description": "",
+              "label": "",
+              "type": "RxDelay",
+              "longType": "RxDelay",
+              "fullType": "ttn.lorawan.v3.RxDelay",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "cf_list",
+              "description": "",
+              "label": "",
+              "type": "CFList",
+              "longType": "CFList",
+              "fullType": "ttn.lorawan.v3.CFList",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

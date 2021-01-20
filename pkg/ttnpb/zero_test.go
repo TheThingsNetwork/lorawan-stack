@@ -70,6 +70,8 @@ func TestFieldIsZero(t *testing.T) {
 		(*MACSettings)(nil):                 MACSettingsFieldPathsNested,
 		&MACState_JoinAccept{}:              MACState_JoinAcceptFieldPathsNested,
 		(*MACState_JoinAccept)(nil):         MACState_JoinAcceptFieldPathsNested,
+		&MACState_JoinRequest{}:             MACState_JoinRequestFieldPathsNested,
+		(*MACState_JoinRequest)(nil):        MACState_JoinRequestFieldPathsNested,
 		&MACState{}:                         MACStateFieldPathsNested,
 		(*MACState)(nil):                    MACStateFieldPathsNested,
 		&MessagePayloadFormatters{}:         MessagePayloadFormattersFieldPathsNested,
