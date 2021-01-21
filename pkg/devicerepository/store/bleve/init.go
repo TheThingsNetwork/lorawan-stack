@@ -87,7 +87,7 @@ func getWorkingDirectory(paths []string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(wd, "device-repository"), nil
+	return filepath.Join(wd, "device-repository-index"), nil
 }
 
 // Initialize fetches the Device Repository package file and generates index files.

@@ -26,7 +26,7 @@ var DefaultDeviceRepositoryConfig = devicerepository.Config{
 
 	Store: devicerepository.StoreConfig{
 		Bleve: bleve.Config{
-			SearchPaths: []string{"device-repository", "/srv/ttn-lorawan/device-repository"},
+			SearchPaths: []string{"device-repository-index", "/srv/ttn-lorawan/device-repository-index"},
 		},
 	},
 

@@ -13,8 +13,7 @@ COPY data/lorawan-webhook-templates /srv/ttn-lorawan/lorawan-webhook-templates
 RUN rm -rf /srv/ttn-lorawan/lorawan-webhook-templates/.git
 
 COPY data/lorawan-devices /tmp/lorawan-devices
-RUN rm -rf /tmp/lorawan-devices/.git && \
-  mkdir -p /srv/ttn-lorawan/device-repository && \
+RUN mkdir -p /srv/ttn-lorawan/device-repository-index && \
   /bin/ttn-lw-stack dr-db init --dr.config-source=directory --dr.directory="/tmp/lorawan-devices"
 
 FROM alpine:3.12
@@ -33,8 +32,8 @@ COPY public /srv/ttn-lorawan/public
 
 COPY --from=builder /srv/ttn-lorawan/lorawan-frequency-plans /srv/ttn-lorawan/lorawan-frequency-plans
 COPY --from=builder /srv/ttn-lorawan/lorawan-webhook-templates /srv/ttn-lorawan/lorawan-webhook-templates
-COPY --from=builder /srv/ttn-lorawan/device-repository /srv/ttn-lorawan/device-repository
-RUN chown thethings:thethings -R /srv/ttn-lorawan/device-repository
+COPY --from=builder /srv/ttn-lorawan/device-repository-index /srv/ttn-lorawan/device-repository-index
+RUN chown thethings:thethings -R /srv/ttn-lorawan/device-repository-index
 
 EXPOSE 1700/udp 1881 8881 1882 8882 1883 8883 1884 8884 1885 8885 1887 8887
 
