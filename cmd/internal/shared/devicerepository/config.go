@@ -21,8 +21,8 @@ import (
 
 // DefaultDeviceRepositoryConfig is the default configuration for the Device Repository.
 var DefaultDeviceRepositoryConfig = devicerepository.Config{
-	ConfigSource: "directory",
-	Directory:    "data/lorawan-devices",
+	Source:    "directory",
+	Directory: "data/lorawan-devices",
 
 	Store: devicerepository.StoreConfig{
 		Bleve: bleve.Config{

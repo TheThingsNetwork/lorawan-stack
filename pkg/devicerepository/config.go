@@ -27,8 +27,8 @@ import (
 type Config struct {
 	Store StoreConfig `name:"store"`
 
-	ConfigSource string `name:"config-source" description:"Source of the Device Repository (directory)"`
-	Directory    string `name:"directory" description:"OS filesystem directory, which contains Device Repository package"`
+	Source    string `name:"source" description:"Device Repository Source (directory)"`
+	Directory string `name:"directory" description:"OS filesystem directory, which contains the Device Repository"`
 
 	AssetsBaseURL string `name:"assets-base-url" description:"The base URL for Device Repository assets"`
 }
@@ -49,14 +49,14 @@ func (c Config) NewStore(ctx context.Context, blobConf config.BlobConfig) (store
 	return c.Store.Bleve.NewStore(ctx)
 }
 
-var errUnknownConfigSource = errors.DefineInvalidArgument("unknown_config_source", "unknown config source `{config_source}`")
+var errUnknownSource = errors.DefineInvalidArgument("unknown_source", "unknown source `{source}`")
 
 // Initialize sets up the Device Repository.
 func (c Config) Initialize(ctx context.Context, blobConf config.BlobConfig, overwrite bool) error {
-	switch c.ConfigSource {
+	switch c.Source {
 	case "directory":
 	default:
-		return errUnknownConfigSource.WithAttributes("config_source", c.ConfigSource)
+		return errUnknownSource.WithAttributes("source", c.Source)
 	}
 
 	return c.Store.Bleve.Initialize(ctx, c.Directory, overwrite)

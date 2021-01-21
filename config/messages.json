@@ -3140,9 +3140,9 @@
       "file": "grpc.go"
     }
   },
-  "error:pkg/devicerepository:unknown_config_source": {
+  "error:pkg/devicerepository:unknown_source": {
     "translations": {
-      "en": "unknown config source `{config_source}`"
+      "en": "unknown source `{source}`"
     },
     "description": {
       "package": "pkg/devicerepository",
