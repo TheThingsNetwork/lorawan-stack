@@ -33,7 +33,8 @@ type StackConfig struct {
 type FrontendConfig struct {
 	Language               string `json:"language" name:"-"`
 	StackConfig            `json:"stack_config" name:",squash"`
-	EnableUserRegistration bool `json:"enable_user_registration" name:"-"`
+	EnableUserRegistration bool   `json:"enable_user_registration" name:"-"`
+	ConsoleURL             string `json:"console_url" name:"console-url" description:"The URL that points to the root of the Console"`
 }
 
 // Config is the configuration for the OAuth server.

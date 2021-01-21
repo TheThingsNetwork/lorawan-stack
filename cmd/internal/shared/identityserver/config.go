@@ -44,6 +44,7 @@ var DefaultIdentityServerConfig = identityserver.Config{
 				StackConfig: oauth.StackConfig{
 					IS: webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
 				},
+				ConsoleURL: "/console",
 			},
 		},
 	},
