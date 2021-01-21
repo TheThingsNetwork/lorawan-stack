@@ -14,6 +14,7 @@
 
 const user = {
   ids: { user_id: 'test-user' },
+  name: 'Test User',
   primary_email_address: 'test-user@example.com',
   password: 'ABCDefg123!',
   password_confirm: 'ABCDefg123!',
@@ -29,15 +30,37 @@ describe('Account App overview', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
     cy.visit(Cypress.config('accountAppRootPath'))
 
-    cy.findByText(`You are logged in as ${user.ids.user_id}.`).should('be.visible')
-    cy.findByRole('button', { name: 'Logout' }).should('be.visible')
+    cy.findByText(`Welcome, ${user.name}! 👋`).should('be.visible')
+    cy.findByText('You have successfully logged into the Account App', { exact: false }).should(
+      'be.visible',
+    )
+    cy.findByText('you can use the button below to head over to the Console', {
+      exact: false,
+    }).should('be.visible')
+    cy.findByRole('link', { name: 'Go to the Console' }).should('be.visible')
   })
 
   it('succeeds when logging out', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
     cy.visit(Cypress.config('accountAppRootPath'))
-    cy.findByRole('button', { name: 'Logout' }).click()
+    cy.get('header').within(() => {
+      cy.findByTestId('profile-dropdown')
+        .should('contain', user.name)
+        .as('profileDropdown')
+
+      cy.get('@profileDropdown').click()
+      cy.get('@profileDropdown')
+        .findByText('Logout')
+        .click()
+    })
 
     cy.url().should('include', `${Cypress.config('accountAppRootPath')}/login`)
+  })
+
+  it('succeeds linking to the Console', () => {
+    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(Cypress.config('accountAppRootPath'))
+    cy.findByRole('link', { name: 'Go to the Console' }).click()
+    cy.url().should('be', Cypress.config('consoleRootPath'))
   })
 })
