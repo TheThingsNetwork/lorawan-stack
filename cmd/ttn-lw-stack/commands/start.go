@@ -32,6 +32,7 @@ import (
 	asredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/console"
+	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -84,6 +85,7 @@ var startCommand = &cobra.Command{
 			DeviceTemplateConverter    bool
 			QRCodeGenerator            bool
 			PacketBrokerAgent          bool
+			DeviceRepository           bool
 		}
 		startDefault := len(args) == 0
 		for _, arg := range args {
@@ -116,6 +118,8 @@ var startCommand = &cobra.Command{
 				start.QRCodeGenerator = true
 			case "pba":
 				start.PacketBrokerAgent = true
+			case "dr":
+				start.DeviceRepository = true
 			case "all":
 				start.IdentityServer = true
 				start.GatewayServer = true
@@ -127,6 +131,7 @@ var startCommand = &cobra.Command{
 				start.DeviceTemplateConverter = true
 				start.QRCodeGenerator = true
 				start.PacketBrokerAgent = true
+				start.DeviceRepository = true
 			default:
 				return errUnknownComponent.WithAttributes("component", arg)
 			}
@@ -143,6 +148,7 @@ var startCommand = &cobra.Command{
 			start.DeviceTemplateConverter = true
 			start.QRCodeGenerator = true
 			start.PacketBrokerAgent = true
+			start.DeviceRepository = true
 		}
 
 		logger.Info("Setting up core component")
@@ -368,6 +374,20 @@ var startCommand = &cobra.Command{
 				return shared.ErrInitializePacketBrokerAgent.WithCause(err)
 			}
 			_ = pba
+		}
+
+		if start.DeviceRepository {
+			logger.Info("Setting up Device Repository")
+			store, err := config.DR.NewStore(ctx, config.Blob)
+			if err != nil {
+				return shared.ErrInitializeDeviceRepository.WithCause(err)
+			}
+			config.DR.Store.Store = store
+			dr, err := devicerepository.New(c, &config.DR)
+			if err != nil {
+				return shared.ErrInitializeDeviceRepository.WithCause(err)
+			}
+			_ = dr
 		}
 
 		if rootRedirect != nil {

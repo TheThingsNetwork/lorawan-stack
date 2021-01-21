@@ -19,6 +19,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
 	shared_applicationserver "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/applicationserver"
 	shared_console "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/console"
+	shared_devicerepository "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/devicerepository"
 	shared_devicetemplateconverter "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/devicetemplateconverter"
 	shared_gatewayconfigurationserver "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/gatewayconfigurationserver"
 	shared_gatewayserver "go.thethings.network/lorawan-stack/v3/cmd/internal/shared/gatewayserver"
@@ -30,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
 	conf "go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/console"
+	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
@@ -53,6 +55,7 @@ type Config struct {
 	DTC              devicetemplateconverter.Config    `name:"dtc"`
 	QRG              qrcodegenerator.Config            `name:"qrg"`
 	PBA              packetbrokeragent.Config          `name:"pba"`
+	DR               devicerepository.Config           `name:"dr"`
 	OutputFormat     string                            `name:"output-format" yaml:"output-format" description:"Output format"`
 }
 
@@ -69,6 +72,7 @@ var DefaultConfig = Config{
 	DTC:         shared_devicetemplateconverter.DefaultDeviceTemplateConverterConfig,
 	QRG:         shared_qrcodegenerator.DefaultQRCodeGeneratorConfig,
 	PBA:         shared_packetbrokeragent.DefaultPacketBrokerAgentConfig,
+	DR:          shared_devicerepository.DefaultDeviceRepositoryConfig,
 
 	OutputFormat: "json",
 }

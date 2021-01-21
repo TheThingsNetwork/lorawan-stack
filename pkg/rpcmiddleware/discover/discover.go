@@ -63,6 +63,7 @@ var clusterRoleServices = map[ttnpb.ClusterRole]string{
 	ttnpb.ClusterRole_APPLICATION_SERVER:           "as",
 	ttnpb.ClusterRole_JOIN_SERVER:                  "js",
 	ttnpb.ClusterRole_DEVICE_TEMPLATE_CONVERTER:    "dtc",
+	ttnpb.ClusterRole_DEVICE_REPOSITORY:            "dr",
 	ttnpb.ClusterRole_DEVICE_CLAIMING_SERVER:       "dcs",
 	ttnpb.ClusterRole_GATEWAY_CONFIGURATION_SERVER: "gcs",
 	ttnpb.ClusterRole_QR_CODE_GENERATOR:            "qrg",
