@@ -23,6 +23,9 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: true
       - name: Initialize public folder cache
         id: public-cache
         uses: actions/cache@v2
