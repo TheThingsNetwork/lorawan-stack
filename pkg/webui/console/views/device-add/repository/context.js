@@ -12,7 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.tabs
-  border-normal('bottom')
-  margin-top: 0
-  margin-bottom: $ls.s
+import React from 'react'
+
+import log from '@ttn-lw/lib/log'
+
+export const RepositoryContext = React.createContext()
+
+export const useRepositoryContext = () => {
+  const repoCtx = React.useContext(RepositoryContext)
+
+  if (!repoCtx) {
+    log(`Device repository context provider is not found in the react tree`)
+  }
+
+  return repoCtx
+}

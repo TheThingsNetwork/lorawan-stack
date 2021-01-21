@@ -14,6 +14,8 @@
 
 import { ACTIVATION_MODES } from '@console/lib/device-utils'
 
+// End device selectors.
+
 export const getActivationMode = device =>
   device.supports_join === true
     ? ACTIVATION_MODES.OTAA
@@ -28,3 +30,17 @@ export const getLorawanVersion = device => device.lorawan_version || '1.1.0'
 export const getApplicationServerAddress = device => device.application_server_address
 export const getNetworkServerAddress = device => device.network_server_address
 export const getJoinServerAddress = device => device.join_server_address
+
+// End device repository utils.
+
+export const SELECT_OTHER_OPTION = '_other_'
+export const isOtherOption = option => option === SELECT_OTHER_OPTION
+
+/*
+  `hardware_version` is not required when registering an end device in the device repository, so for 
+  certain end device models it can be missing. When this is the case, we still want to allow the users
+  to select such models because `firmware_version` (that might depend on hw version) and `band_id`
+  are required. `SELECT_UNKNOWN_HW_OPTION` option represents such end devices.
+*/
+export const SELECT_UNKNOWN_HW_OPTION = '_unknown_hw_version_'
+export const isUnknownHwVersion = option => option === SELECT_UNKNOWN_HW_OPTION

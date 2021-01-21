@@ -25,6 +25,7 @@ import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import Manual from './manual'
+import Repository from './repository'
 import messages from './messages'
 
 import style from './device-add.styl'
@@ -39,6 +40,7 @@ const DeviceAdd = props => {
 
   const tabs = React.useMemo(
     () => [
+      { title: messages.repositoryTabTitle, link: `${url}/repository`, name: 'repository' },
       { title: messages.manualTabTitle, link: `${url}/manual`, name: 'manual' },
     ],
     [url],
@@ -53,7 +55,8 @@ const DeviceAdd = props => {
         </Col>
       </Row>
       <Switch>
-        <Redirect exact from={url} to={`${url}/manual`} />
+        <Redirect exact from={url} to={`${url}/repository`} />
+        <Route path={`${match.url}/repository`} component={Repository} />
         <Route path={`${match.url}/manual`} component={Manual} />
         <NotFoundRoute />
       </Switch>

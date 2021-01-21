@@ -12,7 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.tabs
-  border-normal('bottom')
-  margin-top: 0
+.configuration-section
+  display: flex
+  justify-content: flex-start
+  flex-direction: row
+
+  .select
+    width: auto
+    padding-right: $cs.s
+
+    &.(:last-child)
+      padding-right: 0
+
+    &-xs
+      flex-basis: $fiw.xs
+    &-s
+      flex-basis: $fiw.s
+
+  +media-query($bp.s)
+    flex-direction: column
+
+    .select
+      padding-right: 0
+
+      &-xs,
+      &-s
+        flex-basis: auto
+
+.h-rule
+  margin-top: $ls.xs
   margin-bottom: $ls.s

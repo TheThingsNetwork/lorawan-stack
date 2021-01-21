@@ -12,7 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.tabs
-  border-normal('bottom')
-  margin-top: 0
-  margin-bottom: $ls.s
+import { connect } from 'react-redux'
+
+import { selectDeviceModelFirmwareVersions } from '@console/store/selectors/device-repository'
+
+const mapStateToProps = (state, props) => {
+  const { brandId, modelId, fwVersion } = props
+  const versions = selectDeviceModelFirmwareVersions(state, brandId, modelId)
+  const version = versions.find(v => v.version === fwVersion) || { profiles: [] }
+
+  return {
+    profiles: Object.keys(version.profiles),
+  }
+}
+
+export default BandSelect => connect(mapStateToProps)(BandSelect)

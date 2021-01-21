@@ -16,6 +16,7 @@ import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
   // Shared messages.
+  repositoryTabTitle: 'From The Things Device Repository',
   manualTabTitle: 'Manually',
   // Manual messages.
   basicTitle: 'Basic settings',
@@ -27,6 +28,10 @@ const messages = defineMessages({
   appDescription: 'Application session key to encrypt/decrypt LoRaWAN payload.',
   joinTitle: 'Join settings',
   joinDescription: 'Root keys, NetID and kek labels.',
+  // Device repository messages.
+  otherOption: 'Other…',
+  typeToSearch: 'Type to search…',
+  unknownHwOption: 'Unknown ver.',
 })
 
 export default messages

@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.tabs
-  border-normal('bottom')
-  margin-top: 0
-  margin-bottom: $ls.s
+import connect from './connect'
+import BrandSelect from './brand-select'
+
+const ConnectedBrandSelect = connect(BrandSelect)
+
+export { ConnectedBrandSelect as default, BrandSelect }
