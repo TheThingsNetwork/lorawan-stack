@@ -2136,6 +2136,12 @@ and allows clients to claim end devices.
 | `email` | [`string`](#string) |  | Contact email address. |
 | `logo` | [`string`](#string) |  | Path to brand logo. |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
 ### <a name="ttn.lorawan.v3.EndDeviceModel">Message `EndDeviceModel`</a>
 
 | Field | Type | Label | Description |
@@ -2161,6 +2167,15 @@ and allows clients to claim end devices.
 | `resellers` | [`EndDeviceModel.Reseller`](#ttn.lorawan.v3.EndDeviceModel.Reseller) | repeated | Reseller URLs. |
 | `compliances` | [`EndDeviceModel.Compliances`](#ttn.lorawan.v3.EndDeviceModel.Compliances) |  | List of standards the device is compliant with. |
 | `additional_radios` | [`string`](#string) | repeated | List of any additional radios included in the device. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `model_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `name` | <p>`string.max_len`: `50`</p> |
+| `description` | <p>`string.max_len`: `2000`</p> |
 
 ### <a name="ttn.lorawan.v3.EndDeviceModel.Battery">Message `EndDeviceModel.Battery`</a>
 
@@ -2270,6 +2285,12 @@ and allows clients to claim end devices.
 | `brand_id` | [`string`](#string) |  | Brand identifier, as defined in the Device Repository. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask paths. |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
 ### <a name="ttn.lorawan.v3.GetEndDeviceModelRequest">Message `GetEndDeviceModelRequest`</a>
 
 | Field | Type | Label | Description |
@@ -2278,6 +2299,13 @@ and allows clients to claim end devices.
 | `brand_id` | [`string`](#string) |  | Brand identifier, as defined in the Device Repository. |
 | `model_id` | [`string`](#string) |  | Model identifier, as defined in the Device Repository. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask paths. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `model_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.GetPayloadFormatterRequest">Message `GetPayloadFormatterRequest`</a>
 
@@ -2310,6 +2338,7 @@ and allows clients to claim end devices.
 | ----- | ----------- |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 | `order_by` | <p>`string.in`: `[ brand_id -brand_id name -name]`</p> |
+| `search` | <p>`string.max_len`: `100`</p> |
 
 ### <a name="ttn.lorawan.v3.ListEndDeviceBrandsResponse">Message `ListEndDeviceBrandsResponse`</a>
 
@@ -2333,8 +2362,10 @@ and allows clients to claim end devices.
 
 | Field | Validations |
 | ----- | ----------- |
+| `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 | `order_by` | <p>`string.in`: `[ brand_id -brand_id model_id -model_id name -name]`</p> |
+| `search` | <p>`string.max_len`: `100`</p> |
 
 ### <a name="ttn.lorawan.v3.ListEndDeviceModelsResponse">Message `ListEndDeviceModelsResponse`</a>
 
