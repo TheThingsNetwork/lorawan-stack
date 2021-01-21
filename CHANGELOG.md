@@ -24,6 +24,9 @@ For details about compatibility between different releases, see the **Commitment
 - Missing CLI commands for getting single API keys or collaborators for entities.
 - New Account App for authentication, authorization and account related functionality.
   - This introduces various UX improvements and new designs around e.g. user login, registration and the "forgot password" flow.
+- Integrate Device Repository.
+- Device Repository component to integrate [Device Repository](https://github.com/TheThingsNetwork/lorawan-devices) with The Things Stack. See the `dr` configuration section.
+  - The Device Repository database is bundled automatically into Docker release images. See the `ttn-lw-stack dr-db init` command to manually fetch the latest changes.
 - Device repository service to the JavaScript SDK.
 
 ### Changed
