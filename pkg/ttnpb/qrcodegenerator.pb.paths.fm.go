@@ -445,6 +445,7 @@ var GenerateEndDeviceQRCodeRequestFieldPathsNested = []string{
 	"end_device.updated_at",
 	"end_device.used_dev_nonces",
 	"end_device.version_ids",
+	"end_device.version_ids.band_id",
 	"end_device.version_ids.brand_id",
 	"end_device.version_ids.firmware_version",
 	"end_device.version_ids.hardware_version",

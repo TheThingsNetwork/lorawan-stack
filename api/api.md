@@ -126,6 +126,34 @@
   - [Message `ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest)
   - [Message `ClaimEndDeviceRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers)
   - [Service `EndDeviceClaimingServer`](#ttn.lorawan.v3.EndDeviceClaimingServer)
+- [File `lorawan-stack/api/devicerepository.proto`](#lorawan-stack/api/devicerepository.proto)
+  - [Message `EndDeviceBrand`](#ttn.lorawan.v3.EndDeviceBrand)
+  - [Message `EndDeviceModel`](#ttn.lorawan.v3.EndDeviceModel)
+  - [Message `EndDeviceModel.Battery`](#ttn.lorawan.v3.EndDeviceModel.Battery)
+  - [Message `EndDeviceModel.Compliances`](#ttn.lorawan.v3.EndDeviceModel.Compliances)
+  - [Message `EndDeviceModel.Compliances.Compliance`](#ttn.lorawan.v3.EndDeviceModel.Compliances.Compliance)
+  - [Message `EndDeviceModel.Dimensions`](#ttn.lorawan.v3.EndDeviceModel.Dimensions)
+  - [Message `EndDeviceModel.FirmwareVersion`](#ttn.lorawan.v3.EndDeviceModel.FirmwareVersion)
+  - [Message `EndDeviceModel.FirmwareVersion.Profile`](#ttn.lorawan.v3.EndDeviceModel.FirmwareVersion.Profile)
+  - [Message `EndDeviceModel.FirmwareVersion.ProfilesEntry`](#ttn.lorawan.v3.EndDeviceModel.FirmwareVersion.ProfilesEntry)
+  - [Message `EndDeviceModel.HardwareVersion`](#ttn.lorawan.v3.EndDeviceModel.HardwareVersion)
+  - [Message `EndDeviceModel.OperatingConditions`](#ttn.lorawan.v3.EndDeviceModel.OperatingConditions)
+  - [Message `EndDeviceModel.OperatingConditions.Limits`](#ttn.lorawan.v3.EndDeviceModel.OperatingConditions.Limits)
+  - [Message `EndDeviceModel.Photos`](#ttn.lorawan.v3.EndDeviceModel.Photos)
+  - [Message `EndDeviceModel.Reseller`](#ttn.lorawan.v3.EndDeviceModel.Reseller)
+  - [Message `EndDeviceModel.Videos`](#ttn.lorawan.v3.EndDeviceModel.Videos)
+  - [Message `GetEndDeviceBrandRequest`](#ttn.lorawan.v3.GetEndDeviceBrandRequest)
+  - [Message `GetEndDeviceModelRequest`](#ttn.lorawan.v3.GetEndDeviceModelRequest)
+  - [Message `GetPayloadFormatterRequest`](#ttn.lorawan.v3.GetPayloadFormatterRequest)
+  - [Message `GetTemplateRequest`](#ttn.lorawan.v3.GetTemplateRequest)
+  - [Message `ListEndDeviceBrandsRequest`](#ttn.lorawan.v3.ListEndDeviceBrandsRequest)
+  - [Message `ListEndDeviceBrandsResponse`](#ttn.lorawan.v3.ListEndDeviceBrandsResponse)
+  - [Message `ListEndDeviceModelsRequest`](#ttn.lorawan.v3.ListEndDeviceModelsRequest)
+  - [Message `ListEndDeviceModelsResponse`](#ttn.lorawan.v3.ListEndDeviceModelsResponse)
+  - [Message `MessagePayloadFormatter`](#ttn.lorawan.v3.MessagePayloadFormatter)
+  - [Enum `KeyProvisioning`](#ttn.lorawan.v3.KeyProvisioning)
+  - [Enum `KeySecurity`](#ttn.lorawan.v3.KeySecurity)
+  - [Service `DeviceRepository`](#ttn.lorawan.v3.DeviceRepository)
 - [File `lorawan-stack/api/end_device.proto`](#lorawan-stack/api/end_device.proto)
   - [Message `ConvertEndDeviceTemplateRequest`](#ttn.lorawan.v3.ConvertEndDeviceTemplateRequest)
   - [Message `CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest)
@@ -133,8 +161,6 @@
   - [Message `EndDevice.AttributesEntry`](#ttn.lorawan.v3.EndDevice.AttributesEntry)
   - [Message `EndDevice.LocationsEntry`](#ttn.lorawan.v3.EndDevice.LocationsEntry)
   - [Message `EndDeviceAuthenticationCode`](#ttn.lorawan.v3.EndDeviceAuthenticationCode)
-  - [Message `EndDeviceBrand`](#ttn.lorawan.v3.EndDeviceBrand)
-  - [Message `EndDeviceModel`](#ttn.lorawan.v3.EndDeviceModel)
   - [Message `EndDeviceTemplate`](#ttn.lorawan.v3.EndDeviceTemplate)
   - [Message `EndDeviceTemplateFormat`](#ttn.lorawan.v3.EndDeviceTemplateFormat)
   - [Message `EndDeviceTemplateFormats`](#ttn.lorawan.v3.EndDeviceTemplateFormats)
@@ -2095,6 +2121,316 @@ and allows clients to claim end devices.
 | `AuthorizeApplication` | `POST` | `/api/v3/edcs/applications/{application_ids.application_id}/authorize` | `*` |
 | `UnauthorizeApplication` | `DELETE` | `/api/v3/edcs/applications/{application_id}/authorize` |  |
 
+## <a name="lorawan-stack/api/devicerepository.proto">File `lorawan-stack/api/devicerepository.proto`</a>
+
+### <a name="ttn.lorawan.v3.EndDeviceBrand">Message `EndDeviceBrand`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `brand_id` | [`string`](#string) |  | Brand identifier, as specified in the Device Repository. |
+| `name` | [`string`](#string) |  | Brand name. |
+| `private_enterprise_number` | [`uint32`](#uint32) |  | Private Enterprise Number (PEN) assigned by IANA. |
+| `organization_unique_identifiers` | [`string`](#string) | repeated | Organization Unique Identifiers (OUI) assigned by IEEE. |
+| `lora_alliance_vendor_id` | [`uint32`](#uint32) |  | VendorID managed by the LoRa Alliance, as defined in TR005. |
+| `website` | [`string`](#string) |  | Brand website URL. |
+| `email` | [`string`](#string) |  | Contact email address. |
+| `logo` | [`string`](#string) |  | Path to brand logo. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel">Message `EndDeviceModel`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `brand_id` | [`string`](#string) |  | Brand identifier, as defined in the Device Repository. |
+| `model_id` | [`string`](#string) |  | Model identifier, as defined in the Device Repository. |
+| `name` | [`string`](#string) |  | Model name, as defined in the Device Repository. |
+| `description` | [`string`](#string) |  | Model description. |
+| `hardware_versions` | [`EndDeviceModel.HardwareVersion`](#ttn.lorawan.v3.EndDeviceModel.HardwareVersion) | repeated | Available hardware versions. |
+| `firmware_versions` | [`EndDeviceModel.FirmwareVersion`](#ttn.lorawan.v3.EndDeviceModel.FirmwareVersion) | repeated | Available firmware versions. |
+| `sensors` | [`string`](#string) | repeated | List of sensors included in the device. |
+| `dimensions` | [`EndDeviceModel.Dimensions`](#ttn.lorawan.v3.EndDeviceModel.Dimensions) |  | Device dimensions. |
+| `weight` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Device weight (gram). |
+| `battery` | [`EndDeviceModel.Battery`](#ttn.lorawan.v3.EndDeviceModel.Battery) |  | Device battery information. |
+| `operating_conditions` | [`EndDeviceModel.OperatingConditions`](#ttn.lorawan.v3.EndDeviceModel.OperatingConditions) |  | Device operating conditions. |
+| `ip_code` | [`string`](#string) |  | Device IP rating code. |
+| `key_provisioning` | [`KeyProvisioning`](#ttn.lorawan.v3.KeyProvisioning) | repeated | Supported key provisioning methods. |
+| `key_security` | [`KeySecurity`](#ttn.lorawan.v3.KeySecurity) |  | Device key security. |
+| `photos` | [`EndDeviceModel.Photos`](#ttn.lorawan.v3.EndDeviceModel.Photos) |  | Device photos. |
+| `videos` | [`EndDeviceModel.Videos`](#ttn.lorawan.v3.EndDeviceModel.Videos) |  | Device videos. |
+| `product_url` | [`string`](#string) |  | Device information page URL. |
+| `datasheet_url` | [`string`](#string) |  | Device datasheet URL. |
+| `resellers` | [`EndDeviceModel.Reseller`](#ttn.lorawan.v3.EndDeviceModel.Reseller) | repeated | Reseller URLs. |
+| `compliances` | [`EndDeviceModel.Compliances`](#ttn.lorawan.v3.EndDeviceModel.Compliances) |  | List of standards the device is compliant with. |
+| `additional_radios` | [`string`](#string) | repeated | List of any additional radios included in the device. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `model_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `name` | <p>`string.max_len`: `50`</p> |
+| `description` | <p>`string.max_len`: `2000`</p> |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel.Battery">Message `EndDeviceModel.Battery`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `replaceable` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Whether the device battery can be replaced. |
+| `type` | [`string`](#string) |  | Battery type. |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel.Compliances">Message `EndDeviceModel.Compliances`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `safety` | [`EndDeviceModel.Compliances.Compliance`](#ttn.lorawan.v3.EndDeviceModel.Compliances.Compliance) | repeated | List of safety standards the device is compliant with. |
+| `radio_equipment` | [`EndDeviceModel.Compliances.Compliance`](#ttn.lorawan.v3.EndDeviceModel.Compliances.Compliance) | repeated | List of radio equipment standards the device is compliant with. |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel.Compliances.Compliance">Message `EndDeviceModel.Compliances.Compliance`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `body` | [`string`](#string) |  |  |
+| `norm` | [`string`](#string) |  |  |
+| `standard` | [`string`](#string) |  |  |
+| `version` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel.Dimensions">Message `EndDeviceModel.Dimensions`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `width` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Device width (mm). |
+| `height` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Device height (mm). |
+| `diameter` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Device diameter (mm). |
+| `length` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Device length (mm). |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel.FirmwareVersion">Message `EndDeviceModel.FirmwareVersion`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `version` | [`string`](#string) |  | Firmware version string. |
+| `numeric` | [`uint32`](#uint32) |  | Numeric firmware revision number. |
+| `supported_hardware_versions` | [`string`](#string) | repeated | Hardware versions supported by this firmware version. |
+| `profiles` | [`EndDeviceModel.FirmwareVersion.ProfilesEntry`](#ttn.lorawan.v3.EndDeviceModel.FirmwareVersion.ProfilesEntry) | repeated | Device profiles for each supported region (band). |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel.FirmwareVersion.Profile">Message `EndDeviceModel.FirmwareVersion.Profile`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `profile_id` | [`string`](#string) |  | Profile identifier, as defined in the Device Repository. |
+| `lorawan_certified` | [`bool`](#bool) |  | Whether the device is LoRaWAN certified. |
+| `codec_id` | [`string`](#string) |  | Payload formatter codec identifier, as defined in the Device Repository. |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel.FirmwareVersion.ProfilesEntry">Message `EndDeviceModel.FirmwareVersion.ProfilesEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`EndDeviceModel.FirmwareVersion.Profile`](#ttn.lorawan.v3.EndDeviceModel.FirmwareVersion.Profile) |  |  |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel.HardwareVersion">Message `EndDeviceModel.HardwareVersion`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `version` | [`string`](#string) |  | Hardware version string. |
+| `numeric` | [`uint32`](#uint32) |  | Numberic hardware revision number. |
+| `part_number` | [`string`](#string) |  | Hardware part number. |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel.OperatingConditions">Message `EndDeviceModel.OperatingConditions`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `temperature` | [`EndDeviceModel.OperatingConditions.Limits`](#ttn.lorawan.v3.EndDeviceModel.OperatingConditions.Limits) |  | Temperature operating conditions (Celsius). |
+| `relative_humidity` | [`EndDeviceModel.OperatingConditions.Limits`](#ttn.lorawan.v3.EndDeviceModel.OperatingConditions.Limits) |  | Relative humidity operating conditions (Fraction, in range [0, 1]). |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel.OperatingConditions.Limits">Message `EndDeviceModel.OperatingConditions.Limits`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `min` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Min value of operating conditions range. |
+| `max` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Max value of operating conditions range. |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel.Photos">Message `EndDeviceModel.Photos`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `main` | [`string`](#string) |  | Main device photo. |
+| `other` | [`string`](#string) | repeated | List of other device photos. |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel.Reseller">Message `EndDeviceModel.Reseller`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [`string`](#string) |  | Reseller name. |
+| `region` | [`string`](#string) | repeated | Reseller regions. |
+| `url` | [`string`](#string) |  | Reseller URL. |
+
+### <a name="ttn.lorawan.v3.EndDeviceModel.Videos">Message `EndDeviceModel.Videos`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `main` | [`string`](#string) |  | Link to main device video. |
+| `other` | [`string`](#string) | repeated | Links to other device videos. |
+
+### <a name="ttn.lorawan.v3.GetEndDeviceBrandRequest">Message `GetEndDeviceBrandRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application identifiers. |
+| `brand_id` | [`string`](#string) |  | Brand identifier, as defined in the Device Repository. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask paths. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.GetEndDeviceModelRequest">Message `GetEndDeviceModelRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application identifiers. |
+| `brand_id` | [`string`](#string) |  | Brand identifier, as defined in the Device Repository. |
+| `model_id` | [`string`](#string) |  | Model identifier, as defined in the Device Repository. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask paths. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `model_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.GetPayloadFormatterRequest">Message `GetPayloadFormatterRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application identifiers. |
+| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version information. |
+
+### <a name="ttn.lorawan.v3.GetTemplateRequest">Message `GetTemplateRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application identifiers. |
+| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version information. |
+
+### <a name="ttn.lorawan.v3.ListEndDeviceBrandsRequest">Message `ListEndDeviceBrandsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application identifiers. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `order_by` | [`string`](#string) |  | Order (for pagination) |
+| `search` | [`string`](#string) |  | Search for brands matching a query string. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask paths. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+| `order_by` | <p>`string.in`: `[ brand_id -brand_id name -name]`</p> |
+| `search` | <p>`string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.ListEndDeviceBrandsResponse">Message `ListEndDeviceBrandsResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `brands` | [`EndDeviceBrand`](#ttn.lorawan.v3.EndDeviceBrand) | repeated |  |
+
+### <a name="ttn.lorawan.v3.ListEndDeviceModelsRequest">Message `ListEndDeviceModelsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application identifiers. |
+| `brand_id` | [`string`](#string) |  | List end devices from a specific brand. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `order_by` | [`string`](#string) |  | Order end devices |
+| `search` | [`string`](#string) |  | List end devices matching a query string. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask paths. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+| `order_by` | <p>`string.in`: `[ brand_id -brand_id model_id -model_id name -name]`</p> |
+| `search` | <p>`string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.ListEndDeviceModelsResponse">Message `ListEndDeviceModelsResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `models` | [`EndDeviceModel`](#ttn.lorawan.v3.EndDeviceModel) | repeated |  |
+
+### <a name="ttn.lorawan.v3.MessagePayloadFormatter">Message `MessagePayloadFormatter`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  | Payload formatter type. |
+| `formatter_parameter` | [`string`](#string) |  | Parameter for the formatter, must be set together. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `formatter` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.KeyProvisioning">Enum `KeyProvisioning`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `KEY_PROVISIONING_UNKNOWN` | 0 | Unknown Key Provisioning. |
+| `KEY_PROVISIONING_CUSTOM` | 1 | Custom Key Provisioning. |
+| `KEY_PROVISIONING_JOIN_SERVER` | 2 | Key Provisioning from the Global Join Server. |
+| `KEY_PROVISIONING_MANIFEST` | 3 | Key Provisioning from Manifest. |
+
+### <a name="ttn.lorawan.v3.KeySecurity">Enum `KeySecurity`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `KEY_SECURITY_UNKNOWN` | 0 | Unknown key security. |
+| `KEY_SECURITY_NONE` | 1 | No key security. |
+| `KEY_SECURITY_READ_PROTECTED` | 2 | Read Protected key security. |
+| `KEY_SECURITY_SECURE_ELEMENT` | 3 | Key security using the Security Element. |
+
+### <a name="ttn.lorawan.v3.DeviceRepository">Service `DeviceRepository`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `ListBrands` | [`ListEndDeviceBrandsRequest`](#ttn.lorawan.v3.ListEndDeviceBrandsRequest) | [`ListEndDeviceBrandsResponse`](#ttn.lorawan.v3.ListEndDeviceBrandsResponse) |  |
+| `GetBrand` | [`GetEndDeviceBrandRequest`](#ttn.lorawan.v3.GetEndDeviceBrandRequest) | [`EndDeviceBrand`](#ttn.lorawan.v3.EndDeviceBrand) |  |
+| `ListModels` | [`ListEndDeviceModelsRequest`](#ttn.lorawan.v3.ListEndDeviceModelsRequest) | [`ListEndDeviceModelsResponse`](#ttn.lorawan.v3.ListEndDeviceModelsResponse) |  |
+| `GetModel` | [`GetEndDeviceModelRequest`](#ttn.lorawan.v3.GetEndDeviceModelRequest) | [`EndDeviceModel`](#ttn.lorawan.v3.EndDeviceModel) |  |
+| `GetTemplate` | [`GetTemplateRequest`](#ttn.lorawan.v3.GetTemplateRequest) | [`EndDeviceTemplate`](#ttn.lorawan.v3.EndDeviceTemplate) |  |
+| `GetUplinkDecoder` | [`GetPayloadFormatterRequest`](#ttn.lorawan.v3.GetPayloadFormatterRequest) | [`MessagePayloadFormatter`](#ttn.lorawan.v3.MessagePayloadFormatter) |  |
+| `GetDownlinkDecoder` | [`GetPayloadFormatterRequest`](#ttn.lorawan.v3.GetPayloadFormatterRequest) | [`MessagePayloadFormatter`](#ttn.lorawan.v3.MessagePayloadFormatter) |  |
+| `GetDownlinkEncoder` | [`GetPayloadFormatterRequest`](#ttn.lorawan.v3.GetPayloadFormatterRequest) | [`MessagePayloadFormatter`](#ttn.lorawan.v3.MessagePayloadFormatter) |  |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `ListBrands` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands` |  |
+| `GetBrand` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{brand_id}` |  |
+| `ListModels` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{brand_id}/models` |  |
+| `ListModels` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/models` |  |
+| `GetModel` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{brand_id}/models/{model_id}` |  |
+| `GetTemplate` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template` |  |
+| `GetUplinkDecoder` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/uplink/decoder` |  |
+| `GetDownlinkDecoder` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder` |  |
+| `GetDownlinkEncoder` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder` |  |
+
 ## <a name="lorawan-stack/api/end_device.proto">File `lorawan-stack/api/end_device.proto`</a>
 
 ### <a name="ttn.lorawan.v3.ConvertEndDeviceTemplateRequest">Message `ConvertEndDeviceTemplateRequest`</a>
@@ -2233,30 +2569,6 @@ Authentication code for end devices.
 | ----- | ----------- |
 | `value` | <p>`string.pattern`: `^[A-Z0-9]{1,32}$`</p> |
 
-### <a name="ttn.lorawan.v3.EndDeviceBrand">Message `EndDeviceBrand`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `id` | [`string`](#string) |  |  |
-| `name` | [`string`](#string) |  |  |
-| `url` | [`string`](#string) |  |  |
-| `logos` | [`string`](#string) | repeated | Logos contains file names of brand logos. |
-
-### <a name="ttn.lorawan.v3.EndDeviceModel">Message `EndDeviceModel`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `brand_id` | [`string`](#string) |  |  |
-| `id` | [`string`](#string) |  |  |
-| `name` | [`string`](#string) |  |  |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
-| `id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
-
 ### <a name="ttn.lorawan.v3.EndDeviceTemplate">Message `EndDeviceTemplate`</a>
 
 | Field | Type | Label | Description |
@@ -2348,6 +2660,7 @@ Identifies an end device model with version information.
 | `model_id` | [`string`](#string) |  |  |
 | `hardware_version` | [`string`](#string) |  |  |
 | `firmware_version` | [`string`](#string) |  |  |
+| `band_id` | [`string`](#string) |  |  |
 
 #### Field Rules
 
@@ -2357,6 +2670,7 @@ Identifies an end device model with version information.
 | `model_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `hardware_version` | <p>`string.max_len`: `32`</p> |
 | `firmware_version` | <p>`string.max_len`: `32`</p> |
+| `band_id` | <p>`string.max_len`: `32`</p> |
 
 ### <a name="ttn.lorawan.v3.EndDevices">Message `EndDevices`</a>
 
@@ -2764,6 +3078,7 @@ Before deleting an end device it first needs to be deleted from the NsEndDeviceR
 | `GATEWAY_CONFIGURATION_SERVER` | 10 |  |
 | `QR_CODE_GENERATOR` | 11 |  |
 | `PACKET_BROKER_AGENT` | 12 |  |
+| `DEVICE_REPOSITORY` | 13 |  |
 
 ### <a name="ttn.lorawan.v3.DownlinkPathConstraint">Enum `DownlinkPathConstraint`</a>
 
