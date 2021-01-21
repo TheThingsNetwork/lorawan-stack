@@ -28,7 +28,6 @@ import (
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	ttstypes "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // DeprecateFlag deprecates a CLI flag.
@@ -523,14 +522,10 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 				switch {
 				case ft.AssignableTo(vt):
 					field.Set(v)
-				case ft.Kind() == reflect.Int32 && vt.Kind() == reflect.String:
-					if reflect.PtrTo(ft).Implements(textUnmarshalerType) {
-						err := field.Addr().Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(v.String()))
-						if err != nil {
-							return err
-						}
-					} else {
-						return fmt.Errorf(`%s does not implement encoding.TextUnmarshaler`, ft.Name())
+				case vt.Kind() == reflect.String && reflect.PtrTo(ft).Implements(textUnmarshalerType):
+					err := field.Addr().Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(v.String()))
+					if err != nil {
+						return err
 					}
 				case ft.PkgPath() == "time":
 					switch {
@@ -685,26 +680,12 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 								},
 							}))
 						}
-					case ft.Elem().PkgPath() == "go.thethings.network/lorawan-stack/v3/pkg/types" &&
-						ft.Elem().Name() == "DevAddrPrefix" && vt.Elem().Kind() == reflect.String:
+					case vt.Elem().Kind() == reflect.String && reflect.PtrTo(ft.Elem()).Implements(textUnmarshalerType):
 						for i := 0; i < v.Len(); i++ {
-							var prefix ttstypes.DevAddrPrefix
-							err := prefix.UnmarshalText([]byte(v.Index(i).String()))
+							err := slice.Index(i).Addr().Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(v.Index(i).String()))
 							if err != nil {
 								return err
 							}
-							slice.Index(i).Set(reflect.ValueOf(prefix))
-						}
-					case ft.Elem().Kind() == reflect.Int32 && vt.Elem().Kind() == reflect.String:
-						if reflect.PtrTo(ft.Elem()).Implements(textUnmarshalerType) {
-							for i := 0; i < v.Len(); i++ {
-								err := slice.Index(i).Addr().Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(v.Index(i).String()))
-								if err != nil {
-									return err
-								}
-							}
-						} else {
-							return fmt.Errorf(`%s does not implement encoding.TextUnmarshaler`, ft.Elem().Name())
 						}
 					default:
 						return fmt.Errorf("%v is not convertible to %v", ft, vt)
