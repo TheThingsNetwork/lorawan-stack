@@ -24,10 +24,10 @@ import Spinner from '@ttn-lw/components/spinner'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import log, { error } from '@ttn-lw/lib/log'
-
-import { withEnv } from './env'
+import { selectLanguageConfig } from '@ttn-lw/lib/selectors/env'
 
 const defaultLocale = process.predefined.DEFAULT_MESSAGES_LOCALE // Note: defined by webpack define plugin.
+const envLocale = selectLanguageConfig()
 const defaultLanguage = defaultLocale.split('-')[0] || 'en'
 const xx = 'xx'
 const dev = '../../dev'
@@ -42,11 +42,9 @@ const dev = '../../dev'
   user: state.user,
   checking: state.user.checking,
 }))
-@withEnv
 export default class UserLocale extends React.PureComponent {
   static propTypes = {
     children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
-    env: PropTypes.env,
     user: PropTypes.shape({
       language: PropTypes.string,
     }),
@@ -54,7 +52,6 @@ export default class UserLocale extends React.PureComponent {
 
   static defaultProps = {
     user: undefined,
-    env: {},
   }
   /** @private */
   promise = null
@@ -75,7 +72,7 @@ export default class UserLocale extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.check({ env: { config: {} }, user: {} }, this.props)
+    this.check({ user: {} }, this.props, true)
 
     if (dev) {
       window.addEventListener('keydown', this.onKeydown)
@@ -84,11 +81,11 @@ export default class UserLocale extends React.PureComponent {
   }
 
   @bind
-  check(prev, props) {
-    const current = (prev.user && prev.user.language) || prev.env.config.language
-    const next = (props.user && props.user.language) || props.env.config.language || defaultLanguage
+  check(prev, props, enforce = false) {
+    const current = (prev.user && prev.user.language) || envLocale
+    const next = (props.user && props.user.language) || envLocale || defaultLanguage
 
-    if (current !== next) {
+    if (enforce || current !== next) {
       this.promise = this.load(next)
     }
   }
@@ -175,11 +172,7 @@ export default class UserLocale extends React.PureComponent {
   }
 
   render() {
-    const {
-      user,
-      children,
-      env: { config },
-    } = this.props
+    const { user, children } = this.props
 
     const { messages, loaded, xx } = this.state
 
@@ -188,7 +181,7 @@ export default class UserLocale extends React.PureComponent {
       return <Spinner center>Loading locale…</Spinner>
     }
 
-    const lang = (user && user.language) || config.language || defaultLanguage
+    const lang = (user && user.language) || envLocale || defaultLanguage
 
     if (dev && xx) {
       messages = {

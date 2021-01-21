@@ -23,7 +23,7 @@ import ErrorView from '@ttn-lw/lib/components/error-view'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-import SubViewError from '@console/views/error/sub-view'
+import SubViewError from '@console/views/sub-view-error'
 import OrganizationApiKeysList from '@console/views/organization-api-keys-list'
 import OrganizationApiKeyAdd from '@console/views/organization-api-key-add'
 import OrganizationApiKeyEdit from '@console/views/organization-api-key-edit'

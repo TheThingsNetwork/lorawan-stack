@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createErrorSelector } from '../error'
+import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
 describe('Error selectors', function() {
   const BASE_ACTION_TYPE = 'BASE_ACTION'

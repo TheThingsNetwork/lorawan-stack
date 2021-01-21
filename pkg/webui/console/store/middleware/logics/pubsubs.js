@@ -14,10 +14,10 @@
 
 import api from '@console/api'
 
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+
 import * as pubsubs from '@console/store/actions/pubsubs'
 import * as pubsubFormats from '@console/store/actions/pubsub-formats'
-
-import createRequestLogic from './lib'
 
 const getPubsubLogic = createRequestLogic({
   type: pubsubs.GET_PUBSUB,

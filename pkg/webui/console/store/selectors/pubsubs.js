@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_PUBSUB_BASE, GET_PUBSUBS_LIST_BASE } from '@console/store/actions/pubsubs'
+import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
+import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
-import { createFetchingSelector } from './fetching'
-import { createErrorSelector } from './error'
+import { GET_PUBSUB_BASE, GET_PUBSUBS_LIST_BASE } from '@console/store/actions/pubsubs'
 
 const selectPubsubStore = state => state.pubsubs
 

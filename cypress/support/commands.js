@@ -16,19 +16,19 @@ import { noop } from 'lodash'
 
 import stringToHash from '../../pkg/webui/lib/string-to-hash'
 
-// Helper function to quickly login to the oauth app programmatically.
-Cypress.Commands.add('loginOAuth', credentials => {
+// Helper function to quickly login to the Account App app programmatically.
+Cypress.Commands.add('loginAccountApp', credentials => {
   const baseUrl = Cypress.config('baseUrl')
-  const oauthRootPath = Cypress.config('oauthRootPath')
+  const accountAppRootPath = Cypress.config('accountAppRootPath')
 
   // Obtain csrf token.
   cy.request({
     method: 'GET',
-    url: `${baseUrl}${oauthRootPath}/login`,
+    url: `${baseUrl}${accountAppRootPath}/login`,
   }).then(({ headers }) => {
     cy.request({
       method: 'POST',
-      url: `${baseUrl}${oauthRootPath}/api/auth/login`,
+      url: `${baseUrl}${accountAppRootPath}/api/auth/login`,
       body: { user_id: credentials.user_id, password: credentials.password },
       headers: {
         'X-CSRF-Token': headers['x-csrf-token'],
@@ -40,25 +40,25 @@ Cypress.Commands.add('loginOAuth', credentials => {
 // Helper function to quickly login to the console programmatically.
 Cypress.Commands.add('loginConsole', credentials => {
   const baseUrl = Cypress.config('baseUrl')
-  const oauthRootPath = Cypress.config('oauthRootPath')
+  const accountAppRootPath = Cypress.config('accountAppRootPath')
   const consoleRootPath = Cypress.config('consoleRootPath')
 
   // Obtain csrf token.
   cy.request({
     method: 'GET',
-    url: `${baseUrl}${oauthRootPath}/login`,
+    url: `${baseUrl}${accountAppRootPath}/login`,
   }).then(({ headers }) => {
-    // Login to OAuth provider.
+    // Login to Account App provider.
     cy.request({
       method: 'POST',
-      url: `${baseUrl}${oauthRootPath}/api/auth/login`,
+      url: `${baseUrl}${accountAppRootPath}/api/auth/login`,
       body: { user_id: credentials.user_id, password: credentials.password },
       headers: {
         'X-CSRF-Token': headers['x-csrf-token'],
       },
     })
 
-    // Do OAuth round trip.
+    // Do Account App round trip.
     cy.request({
       method: 'GET',
       url: `${baseUrl}${consoleRootPath}/login/ttn-stack?next=/`,
@@ -79,6 +79,38 @@ Cypress.Commands.add('loginConsole', credentials => {
   })
 })
 
+// Helper function to visit the authorization URI for the Console.
+Cypress.Commands.add('visitConsoleAuthorizationScreen', credentials => {
+  const baseUrl = Cypress.config('baseUrl')
+  const accountAppRootPath = Cypress.config('accountAppRootPath')
+  const consoleRootPath = Cypress.config('consoleRootPath')
+
+  cy.task('execSql', `UPDATE clients SET skip_authorization=false WHERE client_id='console';`)
+  // Obtain csrf token.
+  cy.request({
+    method: 'GET',
+    url: `${baseUrl}${accountAppRootPath}/login`,
+  }).then(({ headers }) => {
+    // Login to Account App provider.
+    cy.request({
+      method: 'POST',
+      url: `${baseUrl}${accountAppRootPath}/api/auth/login`,
+      body: { user_id: credentials.user_id, password: credentials.password },
+      headers: {
+        'X-CSRF-Token': headers['x-csrf-token'],
+      },
+    })
+
+    // Do Account App round trip.
+    cy.request({
+      method: 'GET',
+      url: `${baseUrl}${consoleRootPath}/login/ttn-stack?next=/`,
+    }).then(({ allRequestResponses }) => {
+      cy.visit(allRequestResponses[allRequestResponses.length - 1]['Request URL'])
+    })
+  })
+})
+
 // Helper function to obtain the currently active access token.
 Cypress.Commands.add('getAccessToken', callback => {
   const tokenString = window.localStorage.getItem(`accessToken-${stringToHash('/console')}`)
@@ -89,12 +121,12 @@ Cypress.Commands.add('getAccessToken', callback => {
 // Helper function to create a new user programmatically.
 Cypress.Commands.add('createUser', user => {
   const baseUrl = Cypress.config('baseUrl')
-  const oauthRootPath = Cypress.config('oauthRootPath')
+  const accountAppRootPath = Cypress.config('accountAppRootPath')
 
   // Obtain csrf token.
   cy.request({
     method: 'GET',
-    url: `${baseUrl}${oauthRootPath}/login`,
+    url: `${baseUrl}${accountAppRootPath}/login`,
   }).then(({ headers }) => {
     // Register user.
     cy.request({
@@ -246,9 +278,7 @@ Cypress.Commands.overwrite('click', (originalFn, subject, ...args) => {
 // Helper function to quickly seed the database to a fresh state using a
 // previously generated sql dump.
 Cypress.Commands.add('dropAndSeedDatabase', () => {
-  cy.exec('tools/bin/mage dev:sqlRestore dev:redisFlush')
-    .its('code')
-    .should('eq', 0)
+  return cy.task('dropAndSeedDatabase')
 })
 
 // Helper function to augment the stack configuration object. See support/utils.js for utility

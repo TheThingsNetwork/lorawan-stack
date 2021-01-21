@@ -1673,6 +1673,51 @@
       "file": "start.go"
     }
   },
+  "error:pkg/account/session:auth_cookie": {
+    "translations": {
+      "en": "could not get auth cookie"
+    },
+    "description": {
+      "package": "pkg/account/session",
+      "file": "session.go"
+    }
+  },
+  "error:pkg/account/session:no_user_id_password_match": {
+    "translations": {
+      "en": "incorrect password or user ID"
+    },
+    "description": {
+      "package": "pkg/account/session",
+      "file": "session.go"
+    }
+  },
+  "error:pkg/account/session:session_expired": {
+    "translations": {
+      "en": "session expired"
+    },
+    "description": {
+      "package": "pkg/account/session",
+      "file": "session.go"
+    }
+  },
+  "error:pkg/account:no_user_id_password_match": {
+    "translations": {
+      "en": "incorrect password or user ID"
+    },
+    "description": {
+      "package": "pkg/account",
+      "file": "user.go"
+    }
+  },
+  "error:pkg/account:not_authenticated": {
+    "translations": {
+      "en": "not authenticated"
+    },
+    "description": {
+      "package": "pkg/account",
+      "file": "middleware.go"
+    }
+  },
   "error:pkg/applicationserver/distribution/redis:channel_closed": {
     "translations": {
       "en": "channel closed"
@@ -6398,15 +6443,6 @@
       "file": "server.go"
     }
   },
-  "error:pkg/oauth:auth_cookie": {
-    "translations": {
-      "en": "could not get auth cookie"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "user.go"
-    }
-  },
   "error:pkg/oauth:client_missing_grant": {
     "translations": {
       "en": "OAuth client does not have {grant} grant"
@@ -6531,33 +6567,6 @@
     "description": {
       "package": "pkg/oauth",
       "file": "storage.go"
-    }
-  },
-  "error:pkg/oauth:no_user_id_password_match": {
-    "translations": {
-      "en": "incorrect password or user ID"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "user.go"
-    }
-  },
-  "error:pkg/oauth:not_authenticated": {
-    "translations": {
-      "en": "not authenticated"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "middleware.go"
-    }
-  },
-  "error:pkg/oauth:session_expired": {
-    "translations": {
-      "en": "session expired"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "user.go"
     }
   },
   "error:pkg/oauth:token": {
@@ -7611,6 +7620,15 @@
     "description": {
       "package": "pkg/webmiddleware",
       "file": "cookie.go"
+    }
+  },
+  "event:account.user.login_failed": {
+    "translations": {
+      "en": "login user failure"
+    },
+    "description": {
+      "package": "pkg/account/session",
+      "file": "observability.go"
     }
   },
   "event:application.api-key.create": {
@@ -8918,6 +8936,24 @@
       "file": "observability.go"
     }
   },
+  "event:oauth.session.terminated": {
+    "translations": {
+      "en": "terminate user session"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "observability.go"
+    }
+  },
+  "event:oauth.token.deleted": {
+    "translations": {
+      "en": "delete access token"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "observability.go"
+    }
+  },
   "event:oauth.token.exchange": {
     "translations": {
       "en": "exchange OAuth access token"
@@ -8932,16 +8968,7 @@
       "en": "login user successful"
     },
     "description": {
-      "package": "pkg/oauth",
-      "file": "observability.go"
-    }
-  },
-  "event:oauth.user.login_failed": {
-    "translations": {
-      "en": "login user failure"
-    },
-    "description": {
-      "package": "pkg/oauth",
+      "package": "pkg/account",
       "file": "observability.go"
     }
   },
@@ -8950,7 +8977,7 @@
       "en": "logout user"
     },
     "description": {
-      "package": "pkg/oauth",
+      "package": "pkg/account",
       "file": "observability.go"
     }
   },

@@ -103,9 +103,10 @@ class Users {
     return Marshaler.unwrapUser(response)
   }
 
-  async create(user) {
+  async create(user, invitationToken) {
     const response = await this._api.UserRegistry.Create(undefined, {
       user,
+      invitation_token: invitationToken,
     })
     return Marshaler.unwrapUser(response)
   }
@@ -118,6 +119,29 @@ class Users {
     })
 
     return Marshaler.unwrapRights(result)
+  }
+
+  updatePasswordById(id, payload) {
+    return this._api.UserRegistry.UpdatePassword(
+      {
+        routeParams: {
+          'user_ids.user_id': id,
+        },
+      },
+      {
+        new: payload.new,
+        old: payload.old,
+        revoke_all_access: payload.revoke_all_access,
+      },
+    )
+  }
+
+  createTemporaryPassword(id) {
+    return this._api.UserRegistry.CreateTemporaryPassword({
+      routeParams: {
+        'user_ids.user_id': id,
+      },
+    })
   }
 }
 

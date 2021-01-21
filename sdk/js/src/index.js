@@ -22,6 +22,7 @@ import Is from './service/identity-server'
 import Organizations from './service/organizations'
 import Users from './service/users'
 import Auth from './service/auth'
+import ContactInfo from './service/contact-info'
 import EventHandler from './util/events'
 import StackConfiguration from './util/stack-configuration'
 import { STACK_COMPONENTS_MAP, AUTHORIZATION_MODES } from './util/constants'
@@ -48,6 +49,7 @@ class TTS {
     this.Organizations = new Organizations(this.api)
     this.Users = new Users(this.api)
     this.Auth = new Auth(this.api.EntityAccess)
+    this.ContactInfo = new ContactInfo(this.api.ContactInfoRegistry)
 
     this.subscribe = EventHandler.subscribe
     this.unsubscribe = EventHandler.unsubscribe

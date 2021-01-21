@@ -22,6 +22,8 @@ For details about compatibility between different releases, see the **Commitment
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 - Configuration option (`is.user-registration.enabled`) to enable or disable user registrations.
 - Missing CLI commands for getting single API keys or collaborators for entities.
+- New Account App for authentication, authorization and account related functionality.
+  - This introduces various UX improvements and new designs around e.g. user login, registration and the "forgot password" flow.
 
 ### Changed
 
@@ -34,6 +36,7 @@ For details about compatibility between different releases, see the **Commitment
 - Improved content of emails sent by the Identity Server.
 - Stricter validation of the maximum length of string fields, binary fields, lists and maps.
 - Frequency plans and webhook templates are now included in Docker images, and used by default, instead of fetching directly from GitHub.
+- JavaScript entrypoints changed from `oauth.css` and `oauth.js` to `account.css` and `account.css`. Note: For deployments using custom frontend bundles (e.g. via `--is.oauth.ui.js-file`), the filenames have to be updated accordingly as well.
 
 ### Deprecated
 
@@ -49,6 +52,7 @@ For details about compatibility between different releases, see the **Commitment
 - Network Server DevStatusReq scheduling conditions in relation to frame counter value.
 - Missing `authentication`, `remote_ip` and `user_agent` fields in events when using event backends other than `internal`.
 - Handling of `DLChannelReq` if dependent `NewChannelReq` was previously rejected.
+- Login after user registration leading to dead-end when originally coming from the Console.
 
 ### Security
 

@@ -18,6 +18,8 @@ import CONNECTION_STATUS from '@console/constants/connection-status'
 
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
 import { isUnauthenticatedError, isNetworkError, isTimeoutError } from '@ttn-lw/lib/errors/utils'
+import { SET_CONNECTION_STATUS, setStatusChecking } from '@ttn-lw/lib/store/actions/status'
+import { selectIsOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 
 import {
   createStartEventsStreamActionType,
@@ -34,14 +36,12 @@ import {
   eventStreamClosed,
   startEventsStream,
 } from '@console/store/actions/events'
-import { SET_CONNECTION_STATUS, setStatusChecking } from '@console/store/actions/status'
 
 import {
   createEventsStatusSelector,
   createEventsInterruptedSelector,
   createInterruptedStreamsSelector,
 } from '@console/store/selectors/events'
-import { selectIsOnlineStatus } from '@console/store/selectors/status'
 
 /**
  * Creates `redux-logic` logic from processing entity events.

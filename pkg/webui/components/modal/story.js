@@ -16,11 +16,16 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
+import LogoSVG from '@assets/static/logo.svg'
+
 import Icon from '@ttn-lw/components/icon'
+import Logo from '@ttn-lw/components/logo'
 
 import style from './story.styl'
 
 import Modal from '.'
+
+const StoryLogo = props => <Logo logo={{ src: LogoSVG, alt: 'Test' }} />
 
 const bottomLine = (
   <div>
@@ -55,7 +60,7 @@ storiesOf('Modal', module)
       bottomLine={bottomLine}
       buttonMessage="Allow"
       approval
-      logo
+      logo={<StoryLogo />}
       inline
     >
       <div className={style.left}>

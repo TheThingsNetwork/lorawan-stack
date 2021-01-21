@@ -12,8 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
+import {
+  createPaginationRequestActions,
+  createPaginationBaseActionType,
+  createPaginationDeleteBaseActionType,
+  createPaginationDeleteActions,
+} from '@ttn-lw/lib/store/actions/pagination'
+
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
-import { createRequestActions } from './lib'
 import {
   startEventsStream,
   createStartEventsStreamActionType,
@@ -32,12 +39,6 @@ import {
   createGetEventMessageSuccessActionType,
   getEventMessageSuccess,
 } from './events'
-import {
-  createPaginationRequestActions,
-  createPaginationBaseActionType,
-  createPaginationDeleteBaseActionType,
-  createPaginationDeleteActions,
-} from './pagination'
 
 export const SHARED_NAME = 'GATEWAY'
 

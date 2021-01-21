@@ -24,11 +24,10 @@ describe('Console login', () => {
     cy.findByLabelText('User ID').type(usr.user_id)
     cy.findByLabelText('Password').type(`${usr.password}{enter}`)
 
-    cy.location('pathname').should('include', Cypress.config('oauthRootPath'))
+    cy.location('pathname').should('include', Cypress.config('accountAppRootPath'))
     cy.findByTestId('error-notification')
       .should('be.visible')
-      .findByText('incorrect password or user ID')
-      .should('be.visible')
+      .contains('incorrect password or user ID')
   })
 
   it('succeeds logging in with valid credentials', () => {

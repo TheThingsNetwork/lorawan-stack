@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
+import {
+  createPaginationByIdRequestActions,
+  createPaginationBaseActionType,
+} from '@ttn-lw/lib/store/actions/pagination'
+
 import {
   startEventsStream,
   createStartEventsStreamActionType,
@@ -28,8 +34,6 @@ import {
   clearEvents,
   createClearEventsActionType,
 } from './events'
-import { createRequestActions } from './lib'
-import { createPaginationByIdRequestActions, createPaginationBaseActionType } from './pagination'
 
 export const SHARED_NAME = 'DEVICE'
 

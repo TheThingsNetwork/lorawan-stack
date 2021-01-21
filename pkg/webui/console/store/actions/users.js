@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createPaginationRequestActions, createPaginationBaseActionType } from './pagination'
-import { createRequestActions } from './lib'
+import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
+import {
+  createPaginationRequestActions,
+  createPaginationBaseActionType,
+} from '@ttn-lw/lib/store/actions/pagination'
+
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
 
 export const SHARED_NAME = 'USER'

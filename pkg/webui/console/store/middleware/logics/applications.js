@@ -15,11 +15,11 @@
 import api from '@console/api'
 
 import { isNotFoundError, isConflictError } from '@ttn-lw/lib/errors/utils'
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as applications from '@console/store/actions/applications'
 import * as link from '@console/store/actions/link'
 
-import createRequestLogic from './lib'
 import createEventsConnectLogics from './events'
 
 const getApplicationLogic = createRequestLogic({

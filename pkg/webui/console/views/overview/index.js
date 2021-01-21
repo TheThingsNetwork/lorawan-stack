@@ -35,6 +35,7 @@ import Animation from '@ttn-lw/lib/components/animation'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 
 import {
   mayViewApplications,
@@ -48,7 +49,6 @@ import { getGatewaysList, GET_GTWS_LIST_BASE } from '@console/store/actions/gate
 
 import { selectApplicationsTotalCount } from '@console/store/selectors/applications'
 import { selectGatewaysTotalCount } from '@console/store/selectors/gateways'
-import { createFetchingSelector } from '@console/store/selectors/fetching'
 import { selectUserNameOrId, selectUserRights } from '@console/store/selectors/user'
 
 import style from './overview.styl'
