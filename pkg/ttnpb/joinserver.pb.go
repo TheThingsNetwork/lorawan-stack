@@ -198,10 +198,15 @@ func (m *AppSKeyResponse) GetAppSKey() KeyEnvelope {
 }
 
 type CryptoServicePayloadRequest struct {
+	// End device identifiers for the cryptographic operation.
 	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
-	LoRaWANVersion       MACVersion    `protobuf:"varint,2,opt,name=lorawan_version,json=lorawanVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"lorawan_version,omitempty"`
-	Payload              []byte        `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
-	ProvisionerID        string        `protobuf:"bytes,4,opt,name=provisioner_id,json=provisionerId,proto3" json:"provisioner_id,omitempty"`
+	// LoRaWAN version to use for the cryptographic operation.
+	LoRaWANVersion MACVersion `protobuf:"varint,2,opt,name=lorawan_version,json=lorawanVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"lorawan_version,omitempty"`
+	// Raw input payload.
+	Payload []byte `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
+	// Provisioner that provisioned the end device.
+	ProvisionerID string `protobuf:"bytes,4,opt,name=provisioner_id,json=provisionerId,proto3" json:"provisioner_id,omitempty"`
+	// Provisioning data for the provisioner.
 	ProvisioningData     *types.Struct `protobuf:"bytes,5,opt,name=provisioning_data,json=provisioningData,proto3" json:"provisioning_data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -268,6 +273,7 @@ func (m *CryptoServicePayloadRequest) GetProvisioningData() *types.Struct {
 }
 
 type CryptoServicePayloadResponse struct {
+	// Raw output payload.
 	Payload              []byte   `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -313,11 +319,14 @@ func (m *CryptoServicePayloadResponse) GetPayload() []byte {
 }
 
 type JoinAcceptMICRequest struct {
+	// Request data for the cryptographic operation.
 	CryptoServicePayloadRequest `protobuf:"bytes,1,opt,name=payload_request,json=payloadRequest,proto3,embedded=payload_request" json:"payload_request"`
-	JoinRequestType             RejoinType                                               `protobuf:"varint,2,opt,name=join_request_type,json=joinRequestType,proto3,enum=ttn.lorawan.v3.RejoinType" json:"join_request_type,omitempty"`
-	DevNonce                    go_thethings_network_lorawan_stack_v3_pkg_types.DevNonce `protobuf:"bytes,3,opt,name=dev_nonce,json=devNonce,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.DevNonce" json:"dev_nonce"`
-	XXX_NoUnkeyedLiteral        struct{}                                                 `json:"-"`
-	XXX_sizecache               int32                                                    `json:"-"`
+	// LoRaWAN rejoin-request type.
+	JoinRequestType RejoinType `protobuf:"varint,2,opt,name=join_request_type,json=joinRequestType,proto3,enum=ttn.lorawan.v3.RejoinType" json:"join_request_type,omitempty"`
+	// LoRaWAN DevNonce.
+	DevNonce             go_thethings_network_lorawan_stack_v3_pkg_types.DevNonce `protobuf:"bytes,3,opt,name=dev_nonce,json=devNonce,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.DevNonce" json:"dev_nonce"`
+	XXX_NoUnkeyedLiteral struct{}                                                 `json:"-"`
+	XXX_sizecache        int32                                                    `json:"-"`
 }
 
 func (m *JoinAcceptMICRequest) Reset()      { *m = JoinAcceptMICRequest{} }
@@ -360,15 +369,23 @@ func (m *JoinAcceptMICRequest) GetJoinRequestType() RejoinType {
 }
 
 type DeriveSessionKeysRequest struct {
+	// End device identifiers to use for key derivation.
+	// The DevAddr must be set in this request. The DevEUI may need to be set, depending on the provisioner.
 	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
-	LoRaWANVersion       MACVersion                                                `protobuf:"varint,2,opt,name=lorawan_version,json=lorawanVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"lorawan_version,omitempty"`
-	JoinNonce            go_thethings_network_lorawan_stack_v3_pkg_types.JoinNonce `protobuf:"bytes,3,opt,name=join_nonce,json=joinNonce,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.JoinNonce" json:"join_nonce"`
-	DevNonce             go_thethings_network_lorawan_stack_v3_pkg_types.DevNonce  `protobuf:"bytes,4,opt,name=dev_nonce,json=devNonce,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.DevNonce" json:"dev_nonce"`
-	NetID                go_thethings_network_lorawan_stack_v3_pkg_types.NetID     `protobuf:"bytes,5,opt,name=net_id,json=netId,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.NetID" json:"net_id"`
-	ProvisionerID        string                                                    `protobuf:"bytes,6,opt,name=provisioner_id,json=provisionerId,proto3" json:"provisioner_id,omitempty"`
-	ProvisioningData     *types.Struct                                             `protobuf:"bytes,7,opt,name=provisioning_data,json=provisioningData,proto3" json:"provisioning_data,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                                                  `json:"-"`
-	XXX_sizecache        int32                                                     `json:"-"`
+	// LoRaWAN key derivation scheme.
+	LoRaWANVersion MACVersion `protobuf:"varint,2,opt,name=lorawan_version,json=lorawanVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"lorawan_version,omitempty"`
+	// LoRaWAN JoinNonce (or AppNonce).
+	JoinNonce go_thethings_network_lorawan_stack_v3_pkg_types.JoinNonce `protobuf:"bytes,3,opt,name=join_nonce,json=joinNonce,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.JoinNonce" json:"join_nonce"`
+	// LoRaWAN DevNonce.
+	DevNonce go_thethings_network_lorawan_stack_v3_pkg_types.DevNonce `protobuf:"bytes,4,opt,name=dev_nonce,json=devNonce,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.DevNonce" json:"dev_nonce"`
+	// LoRaWAN NetID.
+	NetID go_thethings_network_lorawan_stack_v3_pkg_types.NetID `protobuf:"bytes,5,opt,name=net_id,json=netId,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.NetID" json:"net_id"`
+	// Provisioner that provisioned the end device.
+	ProvisionerID string `protobuf:"bytes,6,opt,name=provisioner_id,json=provisionerId,proto3" json:"provisioner_id,omitempty"`
+	// Provisioning data for the provisioner.
+	ProvisioningData     *types.Struct `protobuf:"bytes,7,opt,name=provisioning_data,json=provisioningData,proto3" json:"provisioning_data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
 }
 
 func (m *DeriveSessionKeysRequest) Reset()      { *m = DeriveSessionKeysRequest{} }
@@ -425,8 +442,11 @@ func (m *DeriveSessionKeysRequest) GetProvisioningData() *types.Struct {
 }
 
 type GetRootKeysRequest struct {
+	// End device identifiers to request the root keys for.
 	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
-	ProvisionerID        string        `protobuf:"bytes,2,opt,name=provisioner_id,json=provisionerId,proto3" json:"provisioner_id,omitempty"`
+	// Provisioner that provisioned the end device.
+	ProvisionerID string `protobuf:"bytes,2,opt,name=provisioner_id,json=provisionerId,proto3" json:"provisioner_id,omitempty"`
+	// Provisioning data for the provisioner.
 	ProvisioningData     *types.Struct `protobuf:"bytes,3,opt,name=provisioning_data,json=provisioningData,proto3" json:"provisioning_data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -1845,7 +1865,9 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NsJsClient interface {
+	// Handle a join-request message.
 	HandleJoin(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error)
+	// Request the network session keys for a particular session.
 	GetNwkSKeys(ctx context.Context, in *SessionKeyRequest, opts ...grpc.CallOption) (*NwkSKeysResponse, error)
 }
 
@@ -1877,7 +1899,9 @@ func (c *nsJsClient) GetNwkSKeys(ctx context.Context, in *SessionKeyRequest, opt
 
 // NsJsServer is the server API for NsJs service.
 type NsJsServer interface {
+	// Handle a join-request message.
 	HandleJoin(context.Context, *JoinRequest) (*JoinResponse, error)
+	// Request the network session keys for a particular session.
 	GetNwkSKeys(context.Context, *SessionKeyRequest) (*NwkSKeysResponse, error)
 }
 
@@ -1953,6 +1977,7 @@ var _NsJs_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AsJsClient interface {
+	// Request the application session key for a particular session.
 	GetAppSKey(ctx context.Context, in *SessionKeyRequest, opts ...grpc.CallOption) (*AppSKeyResponse, error)
 }
 
@@ -1975,6 +2000,7 @@ func (c *asJsClient) GetAppSKey(ctx context.Context, in *SessionKeyRequest, opts
 
 // AsJsServer is the server API for AsJs service.
 type AsJsServer interface {
+	// Request the application session key for a particular session.
 	GetAppSKey(context.Context, *SessionKeyRequest) (*AppSKeyResponse, error)
 }
 
@@ -2025,10 +2051,15 @@ var _AsJs_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NetworkCryptoServiceClient interface {
+	// Calculate the join-request message MIC.
 	JoinRequestMIC(ctx context.Context, in *CryptoServicePayloadRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error)
+	// Calculate the join-accept message MIC.
 	JoinAcceptMIC(ctx context.Context, in *JoinAcceptMICRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error)
+	// Encrypt the join-accept payload.
 	EncryptJoinAccept(ctx context.Context, in *CryptoServicePayloadRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error)
+	// Encrypt the rejoin-accept payload.
 	EncryptRejoinAccept(ctx context.Context, in *CryptoServicePayloadRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error)
+	// Derive network session keys (NwkSKey, or FNwkSKey, SNwkSKey and NwkSEncKey)
 	DeriveNwkSKeys(ctx context.Context, in *DeriveSessionKeysRequest, opts ...grpc.CallOption) (*NwkSKeysResponse, error)
 	// Get the NwkKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
 	GetNwkKey(ctx context.Context, in *GetRootKeysRequest, opts ...grpc.CallOption) (*KeyEnvelope, error)
@@ -2098,10 +2129,15 @@ func (c *networkCryptoServiceClient) GetNwkKey(ctx context.Context, in *GetRootK
 
 // NetworkCryptoServiceServer is the server API for NetworkCryptoService service.
 type NetworkCryptoServiceServer interface {
+	// Calculate the join-request message MIC.
 	JoinRequestMIC(context.Context, *CryptoServicePayloadRequest) (*CryptoServicePayloadResponse, error)
+	// Calculate the join-accept message MIC.
 	JoinAcceptMIC(context.Context, *JoinAcceptMICRequest) (*CryptoServicePayloadResponse, error)
+	// Encrypt the join-accept payload.
 	EncryptJoinAccept(context.Context, *CryptoServicePayloadRequest) (*CryptoServicePayloadResponse, error)
+	// Encrypt the rejoin-accept payload.
 	EncryptRejoinAccept(context.Context, *CryptoServicePayloadRequest) (*CryptoServicePayloadResponse, error)
+	// Derive network session keys (NwkSKey, or FNwkSKey, SNwkSKey and NwkSEncKey)
 	DeriveNwkSKeys(context.Context, *DeriveSessionKeysRequest) (*NwkSKeysResponse, error)
 	// Get the NwkKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
 	GetNwkKey(context.Context, *GetRootKeysRequest) (*KeyEnvelope, error)
@@ -2279,6 +2315,7 @@ var _NetworkCryptoService_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ApplicationCryptoServiceClient interface {
+	// Derive the application session key (AppSKey).
 	DeriveAppSKey(ctx context.Context, in *DeriveSessionKeysRequest, opts ...grpc.CallOption) (*AppSKeyResponse, error)
 	// Get the AppKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
 	GetAppKey(ctx context.Context, in *GetRootKeysRequest, opts ...grpc.CallOption) (*KeyEnvelope, error)
@@ -2312,6 +2349,7 @@ func (c *applicationCryptoServiceClient) GetAppKey(ctx context.Context, in *GetR
 
 // ApplicationCryptoServiceServer is the server API for ApplicationCryptoService service.
 type ApplicationCryptoServiceServer interface {
+	// Derive the application session key (AppSKey).
 	DeriveAppSKey(context.Context, *DeriveSessionKeysRequest) (*AppSKeyResponse, error)
 	// Get the AppKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
 	GetAppKey(context.Context, *GetRootKeysRequest) (*KeyEnvelope, error)
@@ -2762,6 +2800,7 @@ var _ApplicationActivationSettingRegistry_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type JsClient interface {
+	// Request the JoinEUI prefixes that are configured for this Join Server.
 	GetJoinEUIPrefixes(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*JoinEUIPrefixes, error)
 }
 
@@ -2784,6 +2823,7 @@ func (c *jsClient) GetJoinEUIPrefixes(ctx context.Context, in *types.Empty, opts
 
 // JsServer is the server API for Js service.
 type JsServer interface {
+	// Request the JoinEUI prefixes that are configured for this Join Server.
 	GetJoinEUIPrefixes(context.Context, *types.Empty) (*JoinEUIPrefixes, error)
 }
 

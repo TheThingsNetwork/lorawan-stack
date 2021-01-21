@@ -99,6 +99,7 @@ func (m *QRCodeFormat) GetFieldMask() types.FieldMask {
 }
 
 type QRCodeFormats struct {
+	// Available formats. The map key is the format identifier.
 	Formats              map[string]*QRCodeFormat `protobuf:"bytes,1,rep,name=formats,proto3" json:"formats,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
 	XXX_sizecache        int32                    `json:"-"`
@@ -144,6 +145,7 @@ func (m *QRCodeFormats) GetFormats() map[string]*QRCodeFormat {
 }
 
 type GetQRCodeFormatRequest struct {
+	// QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service.
 	FormatID             string   `protobuf:"bytes,1,opt,name=format_id,json=formatId,proto3" json:"format_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -189,8 +191,11 @@ func (m *GetQRCodeFormatRequest) GetFormatID() string {
 }
 
 type GenerateEndDeviceQRCodeRequest struct {
-	FormatID             string                                `protobuf:"bytes,1,opt,name=format_id,json=formatId,proto3" json:"format_id,omitempty"`
-	EndDevice            EndDevice                             `protobuf:"bytes,2,opt,name=end_device,json=endDevice,proto3" json:"end_device"`
+	// QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service.
+	FormatID string `protobuf:"bytes,1,opt,name=format_id,json=formatId,proto3" json:"format_id,omitempty"`
+	// End device to use as input to generate the QR code.
+	EndDevice EndDevice `protobuf:"bytes,2,opt,name=end_device,json=endDevice,proto3" json:"end_device"`
+	// If set, the server will render the QR code image according to these settings.
 	Image                *GenerateEndDeviceQRCodeRequest_Image `protobuf:"bytes,3,opt,name=image,proto3" json:"image,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                              `json:"-"`
 	XXX_sizecache        int32                                 `json:"-"`
@@ -250,6 +255,7 @@ func (m *GenerateEndDeviceQRCodeRequest) GetImage() *GenerateEndDeviceQRCodeRequ
 }
 
 type GenerateEndDeviceQRCodeRequest_Image struct {
+	// Requested QR code image dimension in pixels.
 	ImageSize            uint32   `protobuf:"varint,1,opt,name=image_size,json=imageSize,proto3" json:"image_size,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -295,6 +301,7 @@ func (m *GenerateEndDeviceQRCodeRequest_Image) GetImageSize() uint32 {
 }
 
 type GenerateQRCodeResponse struct {
+	// Text representation of the QR code contents.
 	Text string `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
 	// QR code in PNG format, if requested.
 	Image                *Picture `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`

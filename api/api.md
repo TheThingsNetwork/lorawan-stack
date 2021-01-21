@@ -2037,8 +2037,8 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `authenticated_identifiers` | [`ClaimEndDeviceRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers) |  |  |
-| `qr_code` | [`bytes`](#bytes) |  |  |
+| `authenticated_identifiers` | [`ClaimEndDeviceRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers) |  | Authenticated identifiers. |
+| `qr_code` | [`bytes`](#bytes) |  | Raw QR code contents. |
 | `target_application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application identifiers of the target end device. |
 | `target_device_id` | [`string`](#string) |  | End device ID of the target end device. If empty, use the source device ID. |
 | `target_network_server_address` | [`string`](#string) |  | The address of the Network Server where the device will be registered. If set and if the source device is currently registered on a Network Server, settings will be transferred. If not set, the device shall not be registered on a Network Server. |
@@ -2066,9 +2066,9 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `join_eui` | [`bytes`](#bytes) |  |  |
-| `dev_eui` | [`bytes`](#bytes) |  |  |
-| `authentication_code` | [`string`](#string) |  |  |
+| `join_eui` | [`bytes`](#bytes) |  | JoinEUI (or AppEUI) of the device to claim. |
+| `dev_eui` | [`bytes`](#bytes) |  | DevEUI of the device to claim. |
+| `authentication_code` | [`string`](#string) |  | Authentication code to prove ownership. In the LoRa Alliance TR005 specification, this equals the OwnerToken. |
 
 #### Field Rules
 
@@ -2078,11 +2078,14 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 
 ### <a name="ttn.lorawan.v3.EndDeviceClaimingServer">Service `EndDeviceClaimingServer`</a>
 
+The EndDeviceClaimingServer service configures authorization to claim end devices registered in an application,
+and allows clients to claim end devices.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Claim` | [`ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest) | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | Claims the end device by claim authentication code or QR code and transfers the device to the target application. |
-| `AuthorizeApplication` | [`AuthorizeApplicationRequest`](#ttn.lorawan.v3.AuthorizeApplicationRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
-| `UnauthorizeApplication` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+| `AuthorizeApplication` | [`AuthorizeApplicationRequest`](#ttn.lorawan.v3.AuthorizeApplicationRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Authorize the End Device Claiming Server to claim devices registered in the given application. The application identifiers are the source application, where the devices are registered before they are claimed. The API key is used to access the application, find the device, verify the claim request and delete the end device from the source application. |
+| `UnauthorizeApplication` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Unauthorize the End Device Claiming Server to claim devices in the given application. This reverts the authorization given with rpc AuthorizeApplication. |
 
 #### HTTP bindings
 
@@ -3754,11 +3757,11 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
-| `lorawan_version` | [`MACVersion`](#ttn.lorawan.v3.MACVersion) |  |  |
-| `payload` | [`bytes`](#bytes) |  |  |
-| `provisioner_id` | [`string`](#string) |  |  |
-| `provisioning_data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
+| `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers for the cryptographic operation. |
+| `lorawan_version` | [`MACVersion`](#ttn.lorawan.v3.MACVersion) |  | LoRaWAN version to use for the cryptographic operation. |
+| `payload` | [`bytes`](#bytes) |  | Raw input payload. |
+| `provisioner_id` | [`string`](#string) |  | Provisioner that provisioned the end device. |
+| `provisioning_data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Provisioning data for the provisioner. |
 
 #### Field Rules
 
@@ -3773,7 +3776,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `payload` | [`bytes`](#bytes) |  |  |
+| `payload` | [`bytes`](#bytes) |  | Raw output payload. |
 
 ### <a name="ttn.lorawan.v3.DeleteApplicationActivationSettingsRequest">Message `DeleteApplicationActivationSettingsRequest`</a>
 
@@ -3785,13 +3788,13 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
-| `lorawan_version` | [`MACVersion`](#ttn.lorawan.v3.MACVersion) |  |  |
-| `join_nonce` | [`bytes`](#bytes) |  |  |
-| `dev_nonce` | [`bytes`](#bytes) |  |  |
-| `net_id` | [`bytes`](#bytes) |  |  |
-| `provisioner_id` | [`string`](#string) |  |  |
-| `provisioning_data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
+| `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers to use for key derivation. The DevAddr must be set in this request. The DevEUI may need to be set, depending on the provisioner. |
+| `lorawan_version` | [`MACVersion`](#ttn.lorawan.v3.MACVersion) |  | LoRaWAN key derivation scheme. |
+| `join_nonce` | [`bytes`](#bytes) |  | LoRaWAN JoinNonce (or AppNonce). |
+| `dev_nonce` | [`bytes`](#bytes) |  | LoRaWAN DevNonce. |
+| `net_id` | [`bytes`](#bytes) |  | LoRaWAN NetID. |
+| `provisioner_id` | [`string`](#string) |  | Provisioner that provisioned the end device. |
+| `provisioning_data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Provisioning data for the provisioner. |
 
 #### Field Rules
 
@@ -3812,9 +3815,9 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
-| `provisioner_id` | [`string`](#string) |  |  |
-| `provisioning_data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
+| `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers to request the root keys for. |
+| `provisioner_id` | [`string`](#string) |  | Provisioner that provisioned the end device. |
+| `provisioning_data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Provisioning data for the provisioner. |
 
 #### Field Rules
 
@@ -3827,9 +3830,9 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `payload_request` | [`CryptoServicePayloadRequest`](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  |  |
-| `join_request_type` | [`RejoinType`](#ttn.lorawan.v3.RejoinType) |  |  |
-| `dev_nonce` | [`bytes`](#bytes) |  |  |
+| `payload_request` | [`CryptoServicePayloadRequest`](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  | Request data for the cryptographic operation. |
+| `join_request_type` | [`RejoinType`](#ttn.lorawan.v3.RejoinType) |  | LoRaWAN rejoin-request type. |
+| `dev_nonce` | [`bytes`](#bytes) |  | LoRaWAN DevNonce. |
 
 #### Field Rules
 
@@ -3950,7 +3953,7 @@ Service for application layer cryptographic operations.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `DeriveAppSKey` | [`DeriveSessionKeysRequest`](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [`AppSKeyResponse`](#ttn.lorawan.v3.AppSKeyResponse) |  |
+| `DeriveAppSKey` | [`DeriveSessionKeysRequest`](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [`AppSKeyResponse`](#ttn.lorawan.v3.AppSKeyResponse) | Derive the application session key (AppSKey). |
 | `GetAppKey` | [`GetRootKeysRequest`](#ttn.lorawan.v3.GetRootKeysRequest) | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) | Get the AppKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed. |
 
 ### <a name="ttn.lorawan.v3.AsJs">Service `AsJs`</a>
@@ -3959,13 +3962,13 @@ The AsJs service connects an Application Server to a Join Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `GetAppSKey` | [`SessionKeyRequest`](#ttn.lorawan.v3.SessionKeyRequest) | [`AppSKeyResponse`](#ttn.lorawan.v3.AppSKeyResponse) |  |
+| `GetAppSKey` | [`SessionKeyRequest`](#ttn.lorawan.v3.SessionKeyRequest) | [`AppSKeyResponse`](#ttn.lorawan.v3.AppSKeyResponse) | Request the application session key for a particular session. |
 
 ### <a name="ttn.lorawan.v3.Js">Service `Js`</a>
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `GetJoinEUIPrefixes` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`JoinEUIPrefixes`](#ttn.lorawan.v3.JoinEUIPrefixes) |  |
+| `GetJoinEUIPrefixes` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`JoinEUIPrefixes`](#ttn.lorawan.v3.JoinEUIPrefixes) | Request the JoinEUI prefixes that are configured for this Join Server. |
 
 #### HTTP bindings
 
@@ -4000,11 +4003,11 @@ Service for network layer cryptographic operations.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `JoinRequestMIC` | [`CryptoServicePayloadRequest`](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [`CryptoServicePayloadResponse`](#ttn.lorawan.v3.CryptoServicePayloadResponse) |  |
-| `JoinAcceptMIC` | [`JoinAcceptMICRequest`](#ttn.lorawan.v3.JoinAcceptMICRequest) | [`CryptoServicePayloadResponse`](#ttn.lorawan.v3.CryptoServicePayloadResponse) |  |
-| `EncryptJoinAccept` | [`CryptoServicePayloadRequest`](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [`CryptoServicePayloadResponse`](#ttn.lorawan.v3.CryptoServicePayloadResponse) |  |
-| `EncryptRejoinAccept` | [`CryptoServicePayloadRequest`](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [`CryptoServicePayloadResponse`](#ttn.lorawan.v3.CryptoServicePayloadResponse) |  |
-| `DeriveNwkSKeys` | [`DeriveSessionKeysRequest`](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [`NwkSKeysResponse`](#ttn.lorawan.v3.NwkSKeysResponse) |  |
+| `JoinRequestMIC` | [`CryptoServicePayloadRequest`](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [`CryptoServicePayloadResponse`](#ttn.lorawan.v3.CryptoServicePayloadResponse) | Calculate the join-request message MIC. |
+| `JoinAcceptMIC` | [`JoinAcceptMICRequest`](#ttn.lorawan.v3.JoinAcceptMICRequest) | [`CryptoServicePayloadResponse`](#ttn.lorawan.v3.CryptoServicePayloadResponse) | Calculate the join-accept message MIC. |
+| `EncryptJoinAccept` | [`CryptoServicePayloadRequest`](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [`CryptoServicePayloadResponse`](#ttn.lorawan.v3.CryptoServicePayloadResponse) | Encrypt the join-accept payload. |
+| `EncryptRejoinAccept` | [`CryptoServicePayloadRequest`](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [`CryptoServicePayloadResponse`](#ttn.lorawan.v3.CryptoServicePayloadResponse) | Encrypt the rejoin-accept payload. |
+| `DeriveNwkSKeys` | [`DeriveSessionKeysRequest`](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [`NwkSKeysResponse`](#ttn.lorawan.v3.NwkSKeysResponse) | Derive network session keys (NwkSKey, or FNwkSKey, SNwkSKey and NwkSEncKey) |
 | `GetNwkKey` | [`GetRootKeysRequest`](#ttn.lorawan.v3.GetRootKeysRequest) | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) | Get the NwkKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed. |
 
 ### <a name="ttn.lorawan.v3.NsJs">Service `NsJs`</a>
@@ -4013,8 +4016,8 @@ The NsJs service connects a Network Server to a Join Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `HandleJoin` | [`JoinRequest`](#ttn.lorawan.v3.JoinRequest) | [`JoinResponse`](#ttn.lorawan.v3.JoinResponse) |  |
-| `GetNwkSKeys` | [`SessionKeyRequest`](#ttn.lorawan.v3.SessionKeyRequest) | [`NwkSKeysResponse`](#ttn.lorawan.v3.NwkSKeysResponse) |  |
+| `HandleJoin` | [`JoinRequest`](#ttn.lorawan.v3.JoinRequest) | [`JoinResponse`](#ttn.lorawan.v3.JoinResponse) | Handle a join-request message. |
+| `GetNwkSKeys` | [`SessionKeyRequest`](#ttn.lorawan.v3.SessionKeyRequest) | [`NwkSKeysResponse`](#ttn.lorawan.v3.NwkSKeysResponse) | Request the network session keys for a particular session. |
 
 ## <a name="lorawan-stack/api/keys.proto">File `lorawan-stack/api/keys.proto`</a>
 
@@ -6144,9 +6147,9 @@ The NsPba service connects a Network Server to a Packet Broker Agent.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `format_id` | [`string`](#string) |  |  |
-| `end_device` | [`EndDevice`](#ttn.lorawan.v3.EndDevice) |  |  |
-| `image` | [`GenerateEndDeviceQRCodeRequest.Image`](#ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest.Image) |  |  |
+| `format_id` | [`string`](#string) |  | QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service. |
+| `end_device` | [`EndDevice`](#ttn.lorawan.v3.EndDevice) |  | End device to use as input to generate the QR code. |
+| `image` | [`GenerateEndDeviceQRCodeRequest.Image`](#ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest.Image) |  | If set, the server will render the QR code image according to these settings. |
 
 #### Field Rules
 
@@ -6159,7 +6162,7 @@ The NsPba service connects a Network Server to a Packet Broker Agent.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `image_size` | [`uint32`](#uint32) |  |  |
+| `image_size` | [`uint32`](#uint32) |  | Requested QR code image dimension in pixels. |
 
 #### Field Rules
 
@@ -6171,14 +6174,14 @@ The NsPba service connects a Network Server to a Packet Broker Agent.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `text` | [`string`](#string) |  |  |
+| `text` | [`string`](#string) |  | Text representation of the QR code contents. |
 | `image` | [`Picture`](#ttn.lorawan.v3.Picture) |  | QR code in PNG format, if requested. |
 
 ### <a name="ttn.lorawan.v3.GetQRCodeFormatRequest">Message `GetQRCodeFormatRequest`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `format_id` | [`string`](#string) |  |  |
+| `format_id` | [`string`](#string) |  | QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service. |
 
 #### Field Rules
 
@@ -6205,7 +6208,7 @@ The NsPba service connects a Network Server to a Packet Broker Agent.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `formats` | [`QRCodeFormats.FormatsEntry`](#ttn.lorawan.v3.QRCodeFormats.FormatsEntry) | repeated |  |
+| `formats` | [`QRCodeFormats.FormatsEntry`](#ttn.lorawan.v3.QRCodeFormats.FormatsEntry) | repeated | Available formats. The map key is the format identifier. |
 
 #### Field Rules
 

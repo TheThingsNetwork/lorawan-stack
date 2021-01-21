@@ -26,13 +26,19 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 message ClaimEndDeviceRequest {
   message AuthenticatedIdentifiers {
+    // JoinEUI (or AppEUI) of the device to claim.
     bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+    // DevEUI of the device to claim.
     bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
+    // Authentication code to prove ownership.
+    // In the LoRa Alliance TR005 specification, this equals the OwnerToken.
     string authentication_code = 3 [(validate.rules).string.pattern = "^[A-Z0-9]{1,32}$"];
   }
   oneof source_device {
     option (validate.required) = true;
+    // Authenticated identifiers.
     AuthenticatedIdentifiers authenticated_identifiers = 1 [(gogoproto.customname) = "AuthenticatedIdentifiers"];
+    // Raw QR code contents.
     bytes qr_code = 2 [(validate.rules).bytes = {min_len: 0, max_len: 1024}, (gogoproto.customname) = "QRCode"];
   }
 
@@ -71,6 +77,8 @@ message AuthorizeApplicationRequest {
   ];
 }
 
+// The EndDeviceClaimingServer service configures authorization to claim end devices registered in an application,
+// and allows clients to claim end devices.
 service EndDeviceClaimingServer {
   // Claims the end device by claim authentication code or QR code and transfers the device to the target application.
   rpc Claim(ClaimEndDeviceRequest) returns (EndDeviceIdentifiers) {
@@ -80,6 +88,10 @@ service EndDeviceClaimingServer {
     };
   };
 
+  // Authorize the End Device Claiming Server to claim devices registered in the given application. The application
+  // identifiers are the source application, where the devices are registered before they are claimed.
+  // The API key is used to access the application, find the device, verify the claim request and delete the end device
+  // from the source application.
   rpc AuthorizeApplication(AuthorizeApplicationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/edcs/applications/{application_ids.application_id}/authorize",
@@ -87,6 +99,8 @@ service EndDeviceClaimingServer {
     };
   };
 
+  // Unauthorize the End Device Claiming Server to claim devices in the given application.
+  // This reverts the authorization given with rpc AuthorizeApplication.
   rpc UnauthorizeApplication(ApplicationIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/edcs/applications/{application_id}/authorize"
