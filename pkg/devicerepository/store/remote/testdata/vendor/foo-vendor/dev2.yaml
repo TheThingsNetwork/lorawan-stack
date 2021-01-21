@@ -1,0 +1,16 @@
+name: Device 2
+description: My Description 2
+hardwareVersions:
+- version: 2.0
+  numeric: 2
+  partNumber: P4RTN02
+firmwareVersions:
+- version: 1.1
+  hardwareVersions: [2.0]
+  profiles:
+    EU433:
+      codec: foo-codec
+      id: profile2
+      lorawanCertified: true
+sensors:
+- temperature

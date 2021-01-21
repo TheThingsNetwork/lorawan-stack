@@ -1,0 +1,9 @@
+supportsClassB: true
+supportsClassC: false
+macVersion: 1.0.2
+regionalParametersVersion: RP001-1.0.2-RevB
+supportsJoin: true
+classBTimeout: 8
+pingSlotPeriod: 16
+pingSlotDataRateIndex: 3
+pingSlotFrequency: 868.3

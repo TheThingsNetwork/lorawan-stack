@@ -12,23 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package devicerepository
+package commands
 
 import (
-	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository"
-	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store/bleve"
+	"github.com/spf13/cobra"
 )
 
-// DefaultDeviceRepositoryConfig is the default configuration for the Device Repository.
-var DefaultDeviceRepositoryConfig = devicerepository.Config{
-	Source:    "directory",
-	Directory: "data/lorawan-devices",
+var (
+	drDBCommand = &cobra.Command{
+		Use:   "dr-db",
+		Short: "Device Repository commands",
+	}
+	drInitCommand = &cobra.Command{
+		Use:   "init",
+		Short: "Fetch Device Repository files and generate index",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			overwrite, _ := cmd.Flags().GetBool("overwrite")
 
-	Store: devicerepository.StoreConfig{
-		Bleve: bleve.Config{
-			SearchPaths: []string{"lorawan-devices-index", "/srv/ttn-lorawan/lorawan-devices-index"},
+			return config.DR.Initialize(ctx, config.Blob, overwrite)
 		},
-	},
+	}
+)
 
-	AssetsBaseURL: "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-devices/master",
+func init() {
+	Root.AddCommand(drDBCommand)
+
+	drInitCommand.Flags().Bool("overwrite", false, "Overwrite existing index files")
+	drDBCommand.AddCommand(drInitCommand)
 }

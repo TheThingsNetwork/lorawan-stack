@@ -111,6 +111,11 @@ func (s *mockStore) GetDownlinkEncoder(ids *ttnpb.EndDeviceVersionIdentifiers) (
 	return s.downlinkEncoder, s.err
 }
 
+// Close closes the store.
+func (s *mockStore) Close() error {
+	return nil
+}
+
 func TestGRPC(t *testing.T) {
 	ids := &ttnpb.EndDeviceVersionIdentifiers{
 		BrandID:         "brand",

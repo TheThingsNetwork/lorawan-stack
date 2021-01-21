@@ -77,4 +77,6 @@ type Store interface {
 	GetDownlinkDecoder(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error)
 	// GetDownlinkEncoder retrieves the codec for encoding downlink messages.
 	GetDownlinkEncoder(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error)
+	// Close closes the store.
+	Close() error
 }

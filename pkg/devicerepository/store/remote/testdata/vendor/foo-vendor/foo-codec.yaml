@@ -1,0 +1,6 @@
+uplinkDecoder:
+  fileName: a.js
+downlinkDecoder:
+  fileName: b.js
+downlinkEncoder:
+  fileName: c.js
