@@ -182,12 +182,12 @@ message EndDeviceModel {
   string datasheet_url = 18 [(gogoproto.customname) = "DatasheetURL"];
 
   message Reseller {
-      // Reseller name.
-      string name = 1;
-      // Reseller regions.
-      repeated string region = 2;
-      // Reseller URL.
-      string url = 3 [(gogoproto.customname) = "URL"];
+    // Reseller name.
+    string name = 1;
+    // Reseller regions.
+    repeated string region = 2;
+    // Reseller URL.
+    string url = 3 [(gogoproto.customname) = "URL"];
   }
   // Reseller URLs.
   repeated Reseller resellers = 19;
