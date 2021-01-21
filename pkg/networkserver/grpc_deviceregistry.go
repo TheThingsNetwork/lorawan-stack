@@ -20,7 +20,6 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -281,13 +280,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_id") && req.EndDevice.FrequencyPlanID == "" {
 		return nil, errInvalidFieldValue.WithAttributes("field", "frequency_plan_id")
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "version_ids.band_id") {
-		if bandID := req.EndDevice.GetVersionIDs().GetBandID(); bandID != "" {
-			if _, err := band.GetByID(bandID); err != nil {
-				return nil, errInvalidFieldValue.WithAttributes("field", "version_ids.band_id").WithCause(err)
-			}
-		}
-	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "lorawan_phy_version") {
 		if err := req.EndDevice.LoRaWANPHYVersion.Validate(); err != nil {
 			return nil, errInvalidFieldValue.WithAttributes("field", "lorawan_phy_version").WithCause(err)
@@ -413,7 +405,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"mac_settings",
 		"mac_state",
 		"session",
-		"version_ids.band_id",
 	}, req.FieldMask.Paths...) {
 		gets = ttnpb.AddFields(gets,
 			"frequency_plan_id",
@@ -460,7 +451,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				"pending_mac_state.current_parameters.adr_tx_power_index",
 				"pending_mac_state.desired_parameters.adr_data_rate_index",
 				"pending_mac_state.desired_parameters.adr_tx_power_index",
-				"version_ids.band_id",
 			) {
 				if !ttnpb.HasAnyField(sets, "frequency_plan_id") {
 					req.EndDevice.FrequencyPlanID = stored.FrequencyPlanID
@@ -473,12 +463,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 					return nil, nil, err
 				}
 
-				if ttnpb.HasAnyField(sets, "version_ids.band_id") {
-					bandID := req.EndDevice.GetVersionIDs().GetBandID()
-					if bandID != "" && bandID != phy.ID {
-						return nil, nil, errInvalidFieldValue.WithAttributes("field", "version_ids.band_id")
-					}
-				}
 				if ttnpb.HasAnyField(sets, "mac_settings.use_adr.value") && req.EndDevice.GetMACSettings().GetUseADR().GetValue() && !phy.EnableADR {
 					return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.use_adr.value")
 				}
@@ -529,12 +513,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, err
 		}
 
-		if ttnpb.HasAnyField(sets, "version_ids.band_id") {
-			bandID := req.EndDevice.GetVersionIDs().GetBandID()
-			if bandID != "" && bandID != phy.ID {
-				return nil, nil, errInvalidFieldValue.WithAttributes("field", "version_ids.band_id")
-			}
-		}
 		if ttnpb.HasAnyField(sets, "mac_settings.use_adr.value") && req.EndDevice.GetMACSettings().GetUseADR().GetValue() && !phy.EnableADR {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.use_adr.value")
 		}
