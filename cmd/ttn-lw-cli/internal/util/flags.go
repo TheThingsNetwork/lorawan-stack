@@ -28,6 +28,7 @@ import (
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	ttstypes "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // DeprecateFlag deprecates a CLI flag.
@@ -683,6 +684,16 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 									GatewayID: v.Index(i).String(),
 								},
 							}))
+						}
+					case ft.Elem().PkgPath() == "go.thethings.network/lorawan-stack/v3/pkg/types" &&
+						ft.Elem().Name() == "DevAddrPrefix" && vt.Elem().Kind() == reflect.String:
+						for i := 0; i < v.Len(); i++ {
+							var prefix ttstypes.DevAddrPrefix
+							err := prefix.UnmarshalText([]byte(v.Index(i).String()))
+							if err != nil {
+								return err
+							}
+							slice.Index(i).Set(reflect.ValueOf(prefix))
 						}
 					case ft.Elem().Kind() == reflect.Int32 && vt.Elem().Kind() == reflect.String:
 						if reflect.PtrTo(ft.Elem()).Implements(textUnmarshalerType) {
