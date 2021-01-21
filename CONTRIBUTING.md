@@ -69,6 +69,7 @@ The topic is typically a few characters long and should always be present. Accep
 - `ci`: Continuous Integration tooling
 - `cli`: Command-line Interface
 - `console`: The Console component
+- `data`: Data from external repositories
 - `dev`: Development tooling
 - `dtc`: The Device Template Converter component
 - `gcs`: The Gateway Configuration Server component

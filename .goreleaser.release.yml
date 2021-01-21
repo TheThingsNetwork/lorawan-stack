@@ -212,4 +212,5 @@ dockers:
       - 'ghcr.io/thethingsnetwork/lorawan-stack:{{ .Version }}'
     skip_push: auto
     extra_files:
+      - data
       - public

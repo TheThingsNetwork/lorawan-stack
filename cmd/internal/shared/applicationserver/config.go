@@ -26,7 +26,8 @@ import (
 
 // DefaultWebhookTemplatesConfig is the default configuration for the Webhook templates.
 var DefaultWebhookTemplatesConfig = web.TemplatesConfig{
-	URL: "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-webhook-templates/master",
+	Directory: "/srv/ttn-lorawan/lorawan-webhook-templates",
+	URL:       "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-webhook-templates/master",
 }
 
 // DefaultApplicationServerConfig is the default configuration for the Application Server.

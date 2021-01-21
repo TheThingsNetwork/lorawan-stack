@@ -103,7 +103,8 @@ var DefaultBlobConfig = config.BlobConfig{
 
 // DefaultFrequencyPlansConfig is the default config to retrieve frequency plans.
 var DefaultFrequencyPlansConfig = config.FrequencyPlansConfig{
-	URL: "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master",
+	Directory: "/srv/ttn-lorawan/lorawan-frequency-plans",
+	URL:       "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master",
 }
 
 // DefaultDeviceRepositoryConfig is the default config to retrieve device blueprints.

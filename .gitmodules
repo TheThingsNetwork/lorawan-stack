@@ -1,0 +1,9 @@
+[submodule "data/lorawan-devices"]
+	path = data/lorawan-devices
+	url = https://github.com/TheThingsNetwork/lorawan-devices.git
+[submodule "data/lorawan-frequency-plans"]
+	path = data/lorawan-frequency-plans
+	url = https://github.com/TheThingsNetwork/lorawan-frequency-plans.git
+[submodule "data/lorawan-webhook-templates"]
+	path = data/lorawan-webhook-templates
+	url = https://github.com/TheThingsNetwork/lorawan-webhook-templates.git
