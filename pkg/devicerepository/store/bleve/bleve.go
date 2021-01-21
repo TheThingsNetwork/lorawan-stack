@@ -23,6 +23,7 @@ import (
 	"github.com/bluele/gcache"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store/remote"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
@@ -75,6 +76,8 @@ func (c Config) NewStore(ctx context.Context) (store.Store, error) {
 	return s, nil
 }
 
+var errCannotOpenIndex = errors.DefineNotFound("cannot_open_index", "cannot open index")
+
 func openIndex(ctx context.Context, path string) (bleve.Index, error) {
 	var (
 		err   error
@@ -82,13 +85,17 @@ func openIndex(ctx context.Context, path string) (bleve.Index, error) {
 	)
 	done := make(chan struct{}, 1)
 	defer close(done)
+	log.FromContext(ctx).WithField("path", path).Debug("Loading index")
 	go func() {
 		index, err = bleve.Open(path)
 		done <- struct{}{}
 	}()
 	select {
 	case <-done:
-		return index, err
+		if err != nil {
+			return nil, errCannotOpenIndex.WithAttributes("path", path).WithCause(err)
+		}
+		return index, nil
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}

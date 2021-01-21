@@ -3041,6 +3041,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/devicerepository/store/bleve:cannot_open_index": {
+    "translations": {
+      "en": "cannot open index"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/bleve",
+      "file": "bleve.go"
+    }
+  },
   "error:pkg/devicerepository/store/bleve:corrupted_index": {
     "translations": {
       "en": "corrupted index file"
