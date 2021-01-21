@@ -1,0 +1,18 @@
+name: Device 1
+description: My Description
+hardwareVersions:
+- version: 1.0
+  numeric: 1
+  partNumber: P4RTN0
+firmwareVersions:
+- version: 1.0
+  hardwareVersions:
+  - 1.0
+  profiles:
+    EU863-870:
+      id: profile1
+      lorawanCertified: true
+    US902-928:
+      codec: foo-codec
+      id: profile2
+      lorawanCertified: true
