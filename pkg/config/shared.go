@@ -18,6 +18,7 @@ import (
 	"context"
 	"crypto/tls"
 	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -263,7 +264,11 @@ func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig) 
 		case c.Static != nil:
 			c.ConfigSource = "static"
 		case c.Directory != "":
-			c.ConfigSource = "directory"
+			if stat, err := os.Stat(c.Directory); err == nil && stat.IsDir() {
+				c.ConfigSource = "directory"
+				break
+			}
+			fallthrough
 		case c.URL != "":
 			c.ConfigSource = "url"
 		case !c.Blob.IsZero():
@@ -306,7 +311,11 @@ func (c DeviceRepositoryConfig) Fetcher(ctx context.Context, blobConf BlobConfig
 		case c.Static != nil:
 			c.ConfigSource = "static"
 		case c.Directory != "":
-			c.ConfigSource = "directory"
+			if stat, err := os.Stat(c.Directory); err == nil && stat.IsDir() {
+				c.ConfigSource = "directory"
+				break
+			}
+			fallthrough
 		case c.URL != "":
 			c.ConfigSource = "url"
 		case !c.Blob.IsZero():
@@ -359,7 +368,11 @@ func (c InteropClient) Fetcher(ctx context.Context) (fetch.Interface, error) {
 	if c.ConfigSource == "" {
 		switch {
 		case c.Directory != "":
-			c.ConfigSource = "directory"
+			if stat, err := os.Stat(c.Directory); err == nil && stat.IsDir() {
+				c.ConfigSource = "directory"
+				break
+			}
+			fallthrough
 		case c.URL != "":
 			c.ConfigSource = "url"
 		case !c.Blob.IsZero():

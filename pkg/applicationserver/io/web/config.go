@@ -17,6 +17,7 @@ package web
 import (
 	"context"
 	"net/url"
+	"os"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -45,7 +46,11 @@ func (c TemplatesConfig) NewTemplateStore() (TemplateStore, error) {
 	case c.Static != nil:
 		fetcher = fetch.NewMemFetcher(c.Static)
 	case c.Directory != "":
-		fetcher = fetch.FromFilesystem(c.Directory)
+		if stat, err := os.Stat(c.Directory); err == nil && stat.IsDir() {
+			fetcher = fetch.FromFilesystem(c.Directory)
+			break
+		}
+		fallthrough
 	case c.URL != "":
 		var err error
 		fetcher, err = fetch.FromHTTP(c.URL, true)

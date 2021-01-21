@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"github.com/gogo/protobuf/types"
@@ -106,7 +107,11 @@ func (c emailTemplatesConfig) Fetcher(ctx context.Context, blobConf config.BlobC
 		case c.Static != nil:
 			c.Source = "static"
 		case c.Directory != "":
-			c.Source = "directory"
+			if stat, err := os.Stat(c.Directory); err == nil && stat.IsDir() {
+				c.Source = "directory"
+				break
+			}
+			fallthrough
 		case c.URL != "":
 			c.Source = "url"
 		case !c.Blob.IsZero():
