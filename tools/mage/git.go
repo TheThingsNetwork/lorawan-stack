@@ -217,6 +217,10 @@ func (g Git) prePush(stdin string, args ...string) error {
 	if len(args) != 2 {
 		return fmt.Errorf("pre-push hook expected to get 2 arguments, got: %s", args)
 	}
+	if head == "0000000000000000000000000000000000000000" {
+		// Remote branch is being deleted
+		return nil
+	}
 	const ttiMarkerHash = "f3df41ad99f4acdcb2b038da9a15671023bc827c" // Hash of the first proprietary commit.
 	switch err := exec.Command("git", "merge-base", "--is-ancestor", ttiMarkerHash, head).Run().(type) {
 	case nil:
