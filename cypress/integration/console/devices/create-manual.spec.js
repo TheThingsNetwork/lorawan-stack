@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ import {
   ApplicationLayerStep,
 } from './utils'
 
-describe('End device create', () => {
+describe('End device manual create', () => {
   const user = {
-    ids: { user_id: 'create-device-test-user' },
-    primary_email_address: 'create-device-test-user@example.com',
+    ids: { user_id: 'create-manual-test-user' },
+    primary_email_address: 'create-manual-test-user@example.com',
     password: 'ABCDefg123!',
     password_confirm: 'ABCDefg123!',
   }
@@ -48,7 +48,7 @@ describe('End device create', () => {
 
     beforeEach(() => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add`)
+      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add/manual`)
     })
 
     describe('LoRaWAN V1.0', () => {
@@ -391,7 +391,7 @@ describe('End device create', () => {
 
     beforeEach(() => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add`)
+      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add/manual`)
     })
 
     describe('LoRaWAN V1.0.2', () => {
@@ -515,7 +515,7 @@ describe('End device create', () => {
 
     beforeEach(() => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add`)
+      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add/manual`)
     })
 
     describe('LoRaWAN V1.0.4', () => {
