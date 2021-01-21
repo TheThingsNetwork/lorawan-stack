@@ -24,6 +24,7 @@ For details about compatibility between different releases, see the **Commitment
 - Missing CLI commands for getting single API keys or collaborators for entities.
 - New Account App for authentication, authorization and account related functionality.
   - This introduces various UX improvements and new designs around e.g. user login, registration and the "forgot password" flow.
+- Device repository service to the JavaScript SDK.
 
 ### Changed
 

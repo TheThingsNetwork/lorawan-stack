@@ -23,6 +23,7 @@ import deviceEntityMap from '../../../generated/device-entity-map.json'
 import DownlinkQueue from '../downlink-queue'
 import { STACK_COMPONENTS_MAP } from '../../util/constants'
 
+import Repository from './repository'
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
 import mergeDevice from './merge'
 
@@ -42,6 +43,7 @@ class Devices {
     this._stackConfig = stackConfig
 
     this.DownlinkQueue = new DownlinkQueue(api.AppAs, { stackConfig })
+    this.Repository = new Repository(api.DeviceRepository)
   }
 
   _emitDefaults(paths, device) {
