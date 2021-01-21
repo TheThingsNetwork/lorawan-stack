@@ -13,56 +13,65 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
-import { Redirect } from 'react-router-dom'
-import bind from 'autobind-decorator'
+import { useSelector } from 'react-redux'
+import { Container, Col, Row } from 'react-grid-system'
+import { defineMessages } from 'react-intl'
 
+import PageTitle from '@ttn-lw/components/page-title'
 import Button from '@ttn-lw/components/button'
 
-import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
+import Message from '@ttn-lw/lib/components/message'
 
-import { logout } from '@account/store/actions/user'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { selectConsoleUrl } from '@account/lib/selectors/app-config'
 
 import { selectUser } from '@account/store/selectors/user'
 
-@connect(
-  state => ({
-    user: selectUser(state),
-  }),
-  {
-    logout,
-  },
-)
-export default class Overview extends React.PureComponent {
-  static propTypes = {
-    logout: PropTypes.func.isRequired,
-    user: PropTypes.user,
-  }
+import style from './overview.styl'
 
-  static defaultProps = {
-    user: undefined,
-  }
+const m = defineMessages({
+  accountAppInfoTitle: 'Welcome, {userId}! 👋',
+  accountAppInfoMessage: `<p>You have successfully logged into the Account App. The Account App is the official user account management application of The Things Stack. In the near future, you will be able to use this application to</p>
+<ul><li>Manage your user profile settings</li><li>Manage your active sessions</li><li>Manage your OAuth authorizations</li></ul>
+  `,
+  accountAppConsoleInfo:
+    'If you wish to manage your applications, end devices and/or gateways, you can use the button below to head over to the Console.',
+  goToConsole: 'Go to the Console',
+})
 
-  @bind
-  handleLogout() {
-    const { logout } = this.props
+const consoleUrl = selectConsoleUrl()
 
-    logout()
-  }
+const Overview = () => {
+  const {
+    name: userName,
+    ids: { user_id: userId },
+  } = useSelector(selectUser)
 
-  render() {
-    const { user } = this.props
-
-    if (!Boolean(user)) {
-      return <Redirect to="/login" />
-    }
-
-    return (
-      <div>
-        You are logged in as {user.ids.user_id}.{' '}
-        <Button message={sharedMessages.logout} onClick={this.handleLogout} />
-      </div>
-    )
-  }
+  return (
+    <Container>
+      <Row>
+        <Col className={style.top} sm={6}>
+          <PageTitle title={sharedMessages.overview} hideHeading />
+          <Message
+            component="h1"
+            content={m.accountAppInfoTitle}
+            values={{ userId: userName || userId }}
+          />
+          <Message
+            content={m.accountAppInfoMessage}
+            values={{
+              p: msg => <p>{msg}</p>,
+              ul: msg => <ol key="list">{msg}</ol>,
+              li: msg => <li>{msg}</li>,
+            }}
+          />
+          <Message component="p" content={m.accountAppConsoleInfo} />
+          <Button.AnchorLink href={consoleUrl} message={m.goToConsole} />
+        </Col>
+      </Row>
+    </Container>
+  )
 }
+
+export default Overview

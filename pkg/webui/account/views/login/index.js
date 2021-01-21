@@ -32,11 +32,12 @@ import Yup from '@ttn-lw/lib/yup'
 import {
   selectApplicationRootPath,
   selectApplicationSiteName,
-  selectEnableUserRegistration,
   selectApplicationSiteTitle,
 } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { id as userRegexp } from '@ttn-lw/lib/regexp'
+
+import { selectEnableUserRegistration } from '@account/lib/selectors/app-config'
 
 const m = defineMessages({
   createAccount: 'Create an account',
