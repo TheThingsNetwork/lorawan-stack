@@ -378,12 +378,12 @@ var startCommand = &cobra.Command{
 
 		if start.DeviceRepository {
 			logger.Info("Setting up Device Repository")
-			store, err := config.DeviceRepository.NewStore(ctx, config.Blob)
+			store, err := config.DR.NewStore(ctx, config.Blob)
 			if err != nil {
 				return shared.ErrInitializeDeviceRepository.WithCause(err)
 			}
-			config.DeviceRepository.Store.Store = store
-			dr, err := devicerepository.New(c, &config.DeviceRepository)
+			config.DR.Store.Store = store
+			dr, err := devicerepository.New(c, &config.DR)
 			if err != nil {
 				return shared.ErrInitializeDeviceRepository.WithCause(err)
 			}
