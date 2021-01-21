@@ -63,12 +63,13 @@ The subject contains the concerning topic and a concise message in [the imperati
 
 The topic is typically a few characters long and should always be present. Accepted topics are:
 
+- `account`: The Account App including backend and frontend
 - `all`: Changes affecting all code, e.g. primitive types
 - `api`: API, typically protos
 - `as`: The Application Server component
 - `ci`: Continuous Integration tooling
 - `cli`: Command-line Interface
-- `console`: The Console component
+- `console`: The Console component including backend and frontend
 - `data`: Data from external repositories
 - `dev`: Development tooling
 - `dtc`: The Device Template Converter component
@@ -77,7 +78,6 @@ The topic is typically a few characters long and should always be present. Accep
 - `is`: The Identity Server component
 - `js`: The Join Server component
 - `ns`: The Network Server component
-- `oauth`: The OAuth part of the Identity Server or its UI
 - `qrg`: The QR Code Generator component
 - `util`: utilities
 
