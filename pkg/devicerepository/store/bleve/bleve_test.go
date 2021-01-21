@@ -29,12 +29,12 @@ import (
 
 func TestBleve(t *testing.T) {
 	a := assertions.New(t)
-	if err := os.MkdirAll("testdata/lorawan-devices-index", 0755); err != nil {
+	if err := os.MkdirAll("testdata/data/lorawan-devices-index", 0755); err != nil {
 		panic(err)
 	}
-	defer os.RemoveAll("testdata/lorawan-devices-index")
+	defer os.RemoveAll("testdata/data/lorawan-devices-index")
 	c := bleve.Config{
-		SearchPaths: []string{"testdata/lorawan-devices-index"},
+		SearchPaths: []string{"testdata/data/lorawan-devices-index"},
 	}
 	err := c.Initialize(test.Context(), "../remote/testdata", true)
 	if !a.So(err, should.BeNil) {

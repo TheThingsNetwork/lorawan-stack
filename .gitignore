@@ -92,7 +92,7 @@ node_modules/
 /public
 /stories
 /pkg/webui/locales/.backend
-/lorawan-devices-index
+/data/lorawan-devices-index
 
 # Development tooling
 /tools/bin/mage
