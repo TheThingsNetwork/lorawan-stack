@@ -1,0 +1,13 @@
+vendorProfileID: 2
+supportsClassB: false
+supportsClassC: false
+macVersion: 1.1.0
+regionalParametersVersion: RP001-1.1-RevB
+supportsJoin: false
+rx1Delay: 1
+rx1DataRateOffset: 0
+rx2DataRateIndex: 3
+rx2Frequency: 869.525
+factoryPresetFrequencies: [868.1, 868.3, 868.5, 867.1, 867.3, 867.5, 867.7, 867.9]
+maxEIRP: 14
+supports32bitFCnt: true

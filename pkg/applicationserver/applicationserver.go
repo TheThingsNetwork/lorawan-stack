@@ -42,8 +42,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/cayennelpp"
+	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/javascript"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -115,16 +115,17 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		config:         conf,
 		linkRegistry:   conf.Links,
 		deviceRegistry: wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
-		formatters: payloadFormatters(map[ttnpb.PayloadFormatter]messageprocessors.PayloadEncodeDecoder{
+		formatters: payloadFormatters{
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
-		}),
+		},
 		clusterDistributor: distribution.NewPubSubDistributor(ctx, c, conf.Distribution.Timeout, conf.Distribution.PubSub),
 		localDistributor:   distribution.NewLocalDistributor(ctx, c, conf.Distribution.Timeout),
 		interopClient:      interopCl,
 		interopID:          conf.Interop.ID,
 		endDeviceFetcher:   conf.EndDeviceFetcher.Fetcher,
 	}
+	as.formatters[ttnpb.PayloadFormatter_FORMATTER_REPOSITORY] = devicerepository.New(as.formatters, as)
 
 	if as.endDeviceFetcher == nil {
 		as.endDeviceFetcher = &NoopEndDeviceFetcher{}

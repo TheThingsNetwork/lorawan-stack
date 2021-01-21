@@ -84,6 +84,8 @@
 /pkg/qrcode @johanstokking @adriansmares @neoaggelos
 /pkg/qrcodegenerator @johanstokking @adriansmares @neoaggelos
 
+/pkg/devicerepository @johanstokking @neoaggelos
+
 # SDKs
 /sdk/js @bafonins @kschiffer @pgalic96
 

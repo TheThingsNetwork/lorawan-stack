@@ -431,6 +431,7 @@
         "skip_payload_crypto",
         "skip_payload_crypto_override",
         "version_ids",
+        "version_ids.band_id",
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
@@ -478,6 +479,7 @@
         "skip_payload_crypto",
         "skip_payload_crypto_override",
         "version_ids",
+        "version_ids.band_id",
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
@@ -1810,6 +1812,233 @@
       ]
     }
   },
+  "DeviceRepository": {
+    "ListBrands": {
+      "file": "lorawan-stack/api/devicerepository.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/dr/applications/{application_ids.application_id}/brands",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "brand_id",
+        "email",
+        "logo",
+        "lora_alliance_vendor_id",
+        "name",
+        "organization_unique_identifiers",
+        "private_enterprise_number",
+        "website"
+      ]
+    },
+    "GetBrand": {
+      "file": "lorawan-stack/api/devicerepository.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/dr/applications/{application_ids.application_id}/brands/{brand_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "brand_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "brand_id",
+        "email",
+        "logo",
+        "lora_alliance_vendor_id",
+        "name",
+        "organization_unique_identifiers",
+        "private_enterprise_number",
+        "website"
+      ]
+    },
+    "ListModels": {
+      "file": "lorawan-stack/api/devicerepository.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/dr/applications/{application_ids.application_id}/brands/{brand_id}/models",
+          "parameters": [
+            "application_ids.application_id",
+            "brand_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/dr/applications/{application_ids.application_id}/models",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "additional_radios",
+        "battery",
+        "battery.replaceable",
+        "battery.type",
+        "brand_id",
+        "compliances",
+        "compliances.radio_equipment",
+        "compliances.safety",
+        "datasheet_url",
+        "description",
+        "dimensions",
+        "dimensions.diameter",
+        "dimensions.height",
+        "dimensions.length",
+        "dimensions.width",
+        "firmware_versions",
+        "hardware_versions",
+        "ip_code",
+        "key_provisioning",
+        "key_security",
+        "model_id",
+        "name",
+        "operating_conditions",
+        "operating_conditions.relative_humidity",
+        "operating_conditions.relative_humidity.max",
+        "operating_conditions.relative_humidity.min",
+        "operating_conditions.temperature",
+        "operating_conditions.temperature.max",
+        "operating_conditions.temperature.min",
+        "photos",
+        "photos.main",
+        "photos.other",
+        "product_url",
+        "resellers",
+        "sensors",
+        "videos",
+        "videos.main",
+        "videos.other",
+        "weight"
+      ]
+    },
+    "GetModel": {
+      "file": "lorawan-stack/api/devicerepository.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/dr/applications/{application_ids.application_id}/brands/{brand_id}/models/{model_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "brand_id",
+            "model_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "additional_radios",
+        "battery",
+        "battery.replaceable",
+        "battery.type",
+        "brand_id",
+        "compliances",
+        "compliances.radio_equipment",
+        "compliances.safety",
+        "datasheet_url",
+        "description",
+        "dimensions",
+        "dimensions.diameter",
+        "dimensions.height",
+        "dimensions.length",
+        "dimensions.width",
+        "firmware_versions",
+        "hardware_versions",
+        "ip_code",
+        "key_provisioning",
+        "key_security",
+        "model_id",
+        "name",
+        "operating_conditions",
+        "operating_conditions.relative_humidity",
+        "operating_conditions.relative_humidity.max",
+        "operating_conditions.relative_humidity.min",
+        "operating_conditions.temperature",
+        "operating_conditions.temperature.max",
+        "operating_conditions.temperature.min",
+        "photos",
+        "photos.main",
+        "photos.other",
+        "product_url",
+        "resellers",
+        "sensors",
+        "videos",
+        "videos.main",
+        "videos.other",
+        "weight"
+      ]
+    },
+    "GetTemplate": {
+      "file": "lorawan-stack/api/devicerepository.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template",
+          "parameters": [
+            "application_ids.application_id",
+            "version_ids.brand_id",
+            "version_ids.model_id",
+            "version_ids.firmware_version",
+            "version_ids.band_id"
+          ]
+        }
+      ]
+    },
+    "GetUplinkDecoder": {
+      "file": "lorawan-stack/api/devicerepository.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/uplink/decoder",
+          "parameters": [
+            "application_ids.application_id",
+            "version_ids.brand_id",
+            "version_ids.model_id",
+            "version_ids.firmware_version",
+            "version_ids.band_id"
+          ]
+        }
+      ]
+    },
+    "GetDownlinkDecoder": {
+      "file": "lorawan-stack/api/devicerepository.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder",
+          "parameters": [
+            "application_ids.application_id",
+            "version_ids.brand_id",
+            "version_ids.model_id",
+            "version_ids.firmware_version",
+            "version_ids.band_id"
+          ]
+        }
+      ]
+    },
+    "GetDownlinkEncoder": {
+      "file": "lorawan-stack/api/devicerepository.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder",
+          "parameters": [
+            "application_ids.application_id",
+            "version_ids.brand_id",
+            "version_ids.model_id",
+            "version_ids.firmware_version",
+            "version_ids.band_id"
+          ]
+        }
+      ]
+    }
+  },
   "EndDeviceRegistry": {
     "Create": {
       "file": "lorawan-stack/api/end_device_services.proto",
@@ -1854,6 +2083,7 @@
         "service_profile_id",
         "updated_at",
         "version_ids",
+        "version_ids.band_id",
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
@@ -1894,6 +2124,7 @@
         "service_profile_id",
         "updated_at",
         "version_ids",
+        "version_ids.band_id",
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
@@ -1927,6 +2158,7 @@
         "network_server_address",
         "service_profile_id",
         "version_ids",
+        "version_ids.band_id",
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
@@ -2994,6 +3226,7 @@
         "supports_join",
         "updated_at",
         "version_ids",
+        "version_ids.band_id",
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
@@ -3133,6 +3366,7 @@
         "supports_class_c",
         "supports_join",
         "version_ids",
+        "version_ids.band_id",
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
@@ -3415,6 +3649,7 @@
         "supports_join",
         "updated_at",
         "version_ids",
+        "version_ids.band_id",
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
@@ -3786,6 +4021,7 @@
         "service_profile_id",
         "updated_at",
         "version_ids",
+        "version_ids.band_id",
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",

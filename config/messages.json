@@ -1124,6 +1124,15 @@
       "file": "errors.go"
     }
   },
+  "error:cmd/internal/shared:initialize_device_repository": {
+    "translations": {
+      "en": "could not initialize Device Repository"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
   "error:cmd/internal/shared:initialize_device_template_converter": {
     "translations": {
       "en": "could not initialize Device Template Converter"
@@ -3030,6 +3039,123 @@
     "description": {
       "package": "pkg/crypto",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/devicerepository/store/bleve:cannot_open_index": {
+    "translations": {
+      "en": "cannot open index"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/bleve",
+      "file": "bleve.go"
+    }
+  },
+  "error:pkg/devicerepository/store/bleve:corrupted_index": {
+    "translations": {
+      "en": "corrupted index file"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/bleve",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/devicerepository/store/remote:band_not_found": {
+    "translations": {
+      "en": "band `{band_id}` not found"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/remote",
+      "file": "remote.go"
+    }
+  },
+  "error:pkg/devicerepository/store/remote:brand_not_found": {
+    "translations": {
+      "en": "brand `{brand_id}` not found"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/remote",
+      "file": "remote.go"
+    }
+  },
+  "error:pkg/devicerepository/store/remote:firmware_version_not_found": {
+    "translations": {
+      "en": "firmware version `{firmware_version}` for model `{brand_id}/{model_id}` not found"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/remote",
+      "file": "remote.go"
+    }
+  },
+  "error:pkg/devicerepository/store/remote:model_not_found": {
+    "translations": {
+      "en": "model `{brand_id}/{model_id}` not found"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/remote",
+      "file": "remote.go"
+    }
+  },
+  "error:pkg/devicerepository/store/remote:no_codec": {
+    "translations": {
+      "en": "no codec defined for firmware version `{firmware_version}` and band `{band_id}`"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/remote",
+      "file": "remote.go"
+    }
+  },
+  "error:pkg/devicerepository/store/remote:no_profile_for_band": {
+    "translations": {
+      "en": "device does not have a profile for band `{band_id}`"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/remote",
+      "file": "remote.go"
+    }
+  },
+  "error:pkg/devicerepository/store/remote:regional_parameters_version": {
+    "translations": {
+      "en": "unknown Regional Parameters version `{phy_version}`"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/remote",
+      "file": "schema.go"
+    }
+  },
+  "error:pkg/devicerepository/store:not_found": {
+    "translations": {
+      "en": "not found"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store",
+      "file": "noop.go"
+    }
+  },
+  "error:pkg/devicerepository:brand_not_found": {
+    "translations": {
+      "en": "brand `{brand_id}` not found"
+    },
+    "description": {
+      "package": "pkg/devicerepository",
+      "file": "grpc.go"
+    }
+  },
+  "error:pkg/devicerepository:model_not_found": {
+    "translations": {
+      "en": "model `{brand_id}/{model_id}` not found"
+    },
+    "description": {
+      "package": "pkg/devicerepository",
+      "file": "grpc.go"
+    }
+  },
+  "error:pkg/devicerepository:unknown_source": {
+    "translations": {
+      "en": "unknown source `{source}`"
+    },
+    "description": {
+      "package": "pkg/devicerepository",
+      "file": "config.go"
     }
   },
   "error:pkg/devicetemplateconverter:converter": {

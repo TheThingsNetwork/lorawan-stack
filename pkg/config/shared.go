@@ -293,53 +293,6 @@ func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig) 
 	}
 }
 
-// DeviceRepositoryConfig defines the source of the device repository.
-type DeviceRepositoryConfig struct {
-	ConfigSource string            `name:"config-source" description:"Source of the device repository (static, directory, url, blob)"`
-	Static       map[string][]byte `name:"-"`
-	Directory    string            `name:"directory" description:"OS filesystem directory, which contains device repository"`
-	URL          string            `name:"url" description:"URL, which contains device repository"`
-	Blob         BlobPathConfig    `name:"blob"`
-}
-
-// Fetcher returns a fetch.Interface based on the configuration.
-// If no configuration source is set, this method returns nil, nil.
-func (c DeviceRepositoryConfig) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
-	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
-	if c.ConfigSource == "" {
-		switch {
-		case c.Static != nil:
-			c.ConfigSource = "static"
-		case c.Directory != "":
-			if stat, err := os.Stat(c.Directory); err == nil && stat.IsDir() {
-				c.ConfigSource = "directory"
-				break
-			}
-			fallthrough
-		case c.URL != "":
-			c.ConfigSource = "url"
-		case !c.Blob.IsZero():
-			c.ConfigSource = "blob"
-		}
-	}
-	switch c.ConfigSource {
-	case "static":
-		return fetch.NewMemFetcher(c.Static), nil
-	case "directory":
-		return fetch.FromFilesystem(c.Directory), nil
-	case "url":
-		return fetch.FromHTTP(c.URL, true)
-	case "blob":
-		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
-		if err != nil {
-			return nil, err
-		}
-		return fetch.FromBucket(ctx, b, c.Blob.Path), nil
-	default:
-		return nil, nil
-	}
-}
-
 // InteropClient represents the client-side interoperability through LoRaWAN Backend Interfaces configuration.
 type InteropClient struct {
 	ConfigSource string         `name:"config-source" description:"Source of the interoperability client configuration (directory, url, blob)"`
@@ -433,33 +386,26 @@ type InteropServer struct {
 
 // ServiceBase represents base service configuration.
 type ServiceBase struct {
-	Base             `name:",squash"`
-	Cluster          cluster.Config         `name:"cluster"`
-	Cache            Cache                  `name:"cache"`
-	Redis            redis.Config           `name:"redis"`
-	Events           Events                 `name:"events"`
-	GRPC             GRPC                   `name:"grpc"`
-	HTTP             HTTP                   `name:"http"`
-	Interop          InteropServer          `name:"interop"`
-	TLS              tlsconfig.Config       `name:"tls"`
-	Sentry           Sentry                 `name:"sentry"`
-	Blob             BlobConfig             `name:"blob"`
-	FrequencyPlans   FrequencyPlansConfig   `name:"frequency-plans" description:"Source of the frequency plans"`
-	DeviceRepository DeviceRepositoryConfig `name:"device-repository" description:"Source of the device repository"`
-	Rights           Rights                 `name:"rights"`
-	KeyVault         KeyVault               `name:"key-vault"`
+	Base           `name:",squash"`
+	Cluster        cluster.Config       `name:"cluster"`
+	Cache          Cache                `name:"cache"`
+	Redis          redis.Config         `name:"redis"`
+	Events         Events               `name:"events"`
+	GRPC           GRPC                 `name:"grpc"`
+	HTTP           HTTP                 `name:"http"`
+	Interop        InteropServer        `name:"interop"`
+	TLS            tlsconfig.Config     `name:"tls"`
+	Sentry         Sentry               `name:"sentry"`
+	Blob           BlobConfig           `name:"blob"`
+	FrequencyPlans FrequencyPlansConfig `name:"frequency-plans" description:"Source of the frequency plans"`
+	Rights         Rights               `name:"rights"`
+	KeyVault       KeyVault             `name:"key-vault"`
 }
 
 // FrequencyPlansFetcher returns a fetch.Interface based on the frequency plans configuration.
 // If no configuration source is set, this method returns nil, nil.
 func (c ServiceBase) FrequencyPlansFetcher(ctx context.Context) (fetch.Interface, error) {
 	return c.FrequencyPlans.Fetcher(ctx, c.Blob)
-}
-
-// DeviceRepositoryFetcher returns a fetch.Interface based on the device repository configuration.
-// If no configuration source is set, this method returns nil, nil.
-func (c ServiceBase) DeviceRepositoryFetcher(ctx context.Context) (fetch.Interface, error) {
-	return c.DeviceRepository.Fetcher(ctx, c.Blob)
 }
 
 // MQTT contains the listen and public addresses of an MQTT frontend.

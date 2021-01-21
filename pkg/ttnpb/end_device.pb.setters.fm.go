@@ -381,97 +381,6 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 	return nil
 }
 
-func (dst *EndDeviceBrand) SetFields(src *EndDeviceBrand, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "id":
-			if len(subs) > 0 {
-				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.ID = src.ID
-			} else {
-				var zero string
-				dst.ID = zero
-			}
-		case "name":
-			if len(subs) > 0 {
-				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Name = src.Name
-			} else {
-				var zero string
-				dst.Name = zero
-			}
-		case "url":
-			if len(subs) > 0 {
-				return fmt.Errorf("'url' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.URL = src.URL
-			} else {
-				var zero string
-				dst.URL = zero
-			}
-		case "logos":
-			if len(subs) > 0 {
-				return fmt.Errorf("'logos' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Logos = src.Logos
-			} else {
-				dst.Logos = nil
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *EndDeviceModel) SetFields(src *EndDeviceModel, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "brand_id":
-			if len(subs) > 0 {
-				return fmt.Errorf("'brand_id' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.BrandID = src.BrandID
-			} else {
-				var zero string
-				dst.BrandID = zero
-			}
-		case "id":
-			if len(subs) > 0 {
-				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.ID = src.ID
-			} else {
-				var zero string
-				dst.ID = zero
-			}
-		case "name":
-			if len(subs) > 0 {
-				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Name = src.Name
-			} else {
-				var zero string
-				dst.Name = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
 func (dst *EndDeviceVersionIdentifiers) SetFields(src *EndDeviceVersionIdentifiers, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -514,6 +423,16 @@ func (dst *EndDeviceVersionIdentifiers) SetFields(src *EndDeviceVersionIdentifie
 			} else {
 				var zero string
 				dst.FirmwareVersion = zero
+			}
+		case "band_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'band_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BandID = src.BandID
+			} else {
+				var zero string
+				dst.BandID = zero
 			}
 
 		default:

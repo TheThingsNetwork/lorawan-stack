@@ -1,0 +1,16 @@
+vendors:
+- id: foo-vendor
+  name: Foo Vendor
+  vendorID: 42
+- id: full-vendor
+  name: Full Vendor
+  vendorID: 44
+  email: mail@example.com
+  website: example.org
+  pen: 42
+  ouis: ["010203", "030405"]
+  logo: logo.svg
+- id: draft-vendor
+  name: Draft
+  description: Vendor that should not be returned
+  draft: true

@@ -18,20 +18,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
-func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion {
-	out := &EndDeviceVersion{}
-	out.EndDeviceVersionIdentifiers = *NewPopulatedEndDeviceVersionIdentifiers(r, easy)
-	out.Photos = []string{randStringEndDevice(r) + ".jpg", randStringEndDevice(r) + ".jpg"}
-	if r.Intn(10) != 0 {
-		out.DefaultFormatters = *NewPopulatedMessagePayloadFormatters(r, easy)
-	}
-	out.MaxFrequency = uint64(r.Uint32())
-	out.MinFrequency = uint64(r.Uint32()) % out.MaxFrequency
-	out.ResetsJoinNonces = bool(r.Intn(2) == 0)
-	out.DefaultMACSettings = NewPopulatedMACSettings(r, easy)
-	return out
-}
-
 func NewPopulatedMACState(r randyEndDevice, easy bool) *MACState {
 	out := &MACState{}
 	out.DeviceClass = Class([]int32{0, 1, 2}[r.Intn(3)])

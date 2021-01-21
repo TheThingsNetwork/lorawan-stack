@@ -107,9 +107,6 @@ var DefaultFrequencyPlansConfig = config.FrequencyPlansConfig{
 	URL:       "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master",
 }
 
-// DefaultDeviceRepositoryConfig is the default config to retrieve device blueprints.
-var DefaultDeviceRepositoryConfig = config.DeviceRepositoryConfig{}
-
 // DefaultRightsConfig is the default config to fetch rights from the Identity Server.
 var DefaultRightsConfig = config.Rights{
 	TTL: 2 * time.Minute,
@@ -122,19 +119,18 @@ var DefaultKeyVaultConfig = config.KeyVault{
 
 // DefaultServiceBase is the default base config for a service.
 var DefaultServiceBase = config.ServiceBase{
-	Base:             DefaultBaseConfig,
-	Cluster:          DefaultClusterConfig,
-	Redis:            DefaultRedisConfig,
-	Events:           DefaultEventsConfig,
-	GRPC:             DefaultGRPCConfig,
-	HTTP:             DefaultHTTPConfig,
-	Interop:          DefaultInteropServerConfig,
-	TLS:              DefaultTLSConfig,
-	Blob:             DefaultBlobConfig,
-	FrequencyPlans:   DefaultFrequencyPlansConfig,
-	DeviceRepository: DefaultDeviceRepositoryConfig,
-	Rights:           DefaultRightsConfig,
-	KeyVault:         DefaultKeyVaultConfig,
+	Base:           DefaultBaseConfig,
+	Cluster:        DefaultClusterConfig,
+	Redis:          DefaultRedisConfig,
+	Events:         DefaultEventsConfig,
+	GRPC:           DefaultGRPCConfig,
+	HTTP:           DefaultHTTPConfig,
+	Interop:        DefaultInteropServerConfig,
+	TLS:            DefaultTLSConfig,
+	Blob:           DefaultBlobConfig,
+	FrequencyPlans: DefaultFrequencyPlansConfig,
+	Rights:         DefaultRightsConfig,
+	KeyVault:       DefaultKeyVaultConfig,
 }
 
 // DefaultPublicHost is the default public host where The Things Stack is served.

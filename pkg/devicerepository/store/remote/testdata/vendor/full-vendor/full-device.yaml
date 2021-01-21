@@ -1,0 +1,57 @@
+name: Full Device
+description: A description
+hardwareVersions:
+- version: 0.1
+  numeric: 1
+  partNumber: 0A0B
+- version: 0.2
+  numeric: 2
+  partNumber: 0A0C
+firmwareVersions:
+  - version: 1.0
+    hardwareVersions: [0.1, 0.2]
+    profiles:
+      EU863-870: {id: full-profile2}
+      US902-928: {id: full-profile, codec: codec}
+sensors: [temperature, gas]
+dimensions:
+  width: 1
+  height: 2
+  diameter: 3
+  length: 4
+weight: 5
+battery:
+  replaceable: true
+  type: AAA
+operatingConditions:
+  temperature: {min: 1, max: 2}
+  relativeHumidity: {min: 3, max: 4}
+ipCode: IP67
+keyProvisioning: [custom]
+keySecurity: read protected
+photos:
+  main: a.jpg
+  other: [b.jpg, c.jpg]
+videos:
+  main: a.mp4
+  other: [b.mp4, "https://youtube.com/watch?v=c.mp4"]
+productURL: https://product.vendor.io
+datasheetURL: https://production.vendor.io/datasheet.pdf
+resellerURLs:
+- name: Reseller 1
+  region:
+  - European Union
+  url: https://example.com/eu
+- name: Reseller 2
+  region:
+  - United States
+  - Canada
+  url: https://example.com/na
+compliances:
+  safety:
+  - {body: IEC, norm: EN, standard: 62368-1}
+  - {body: IEC, norm: EN, standard: 60950-22}
+  radioEquipment:
+  - {body: ETSI, norm: EN, standard: 301 489-1, version: 2.2.0}
+  - {body: ETSI, norm: EN, standard: 301 489-3, version: 2.1.0}
+additionalRadios: [nfc, wifi]

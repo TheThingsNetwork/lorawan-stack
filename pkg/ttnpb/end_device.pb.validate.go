@@ -444,210 +444,6 @@ var _ interface {
 	ErrorName() string
 } = MACParametersValidationError{}
 
-// ValidateFields checks the field values on EndDeviceBrand with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *EndDeviceBrand) ValidateFields(paths ...string) error {
-	if m == nil {
-		return nil
-	}
-
-	if len(paths) == 0 {
-		paths = EndDeviceBrandFieldPathsNested
-	}
-
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		_ = subs
-		switch name {
-		case "id":
-			// no validation rules for ID
-		case "name":
-			// no validation rules for Name
-		case "url":
-			// no validation rules for URL
-		case "logos":
-
-		default:
-			return EndDeviceBrandValidationError{
-				field:  name,
-				reason: "invalid field path",
-			}
-		}
-	}
-	return nil
-}
-
-// EndDeviceBrandValidationError is the validation error returned by
-// EndDeviceBrand.ValidateFields if the designated constraints aren't met.
-type EndDeviceBrandValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e EndDeviceBrandValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e EndDeviceBrandValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e EndDeviceBrandValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e EndDeviceBrandValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e EndDeviceBrandValidationError) ErrorName() string { return "EndDeviceBrandValidationError" }
-
-// Error satisfies the builtin error interface
-func (e EndDeviceBrandValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sEndDeviceBrand.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = EndDeviceBrandValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = EndDeviceBrandValidationError{}
-
-// ValidateFields checks the field values on EndDeviceModel with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *EndDeviceModel) ValidateFields(paths ...string) error {
-	if m == nil {
-		return nil
-	}
-
-	if len(paths) == 0 {
-		paths = EndDeviceModelFieldPathsNested
-	}
-
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		_ = subs
-		switch name {
-		case "brand_id":
-
-			if utf8.RuneCountInString(m.GetBrandID()) > 36 {
-				return EndDeviceModelValidationError{
-					field:  "brand_id",
-					reason: "value length must be at most 36 runes",
-				}
-			}
-
-			if !_EndDeviceModel_BrandID_Pattern.MatchString(m.GetBrandID()) {
-				return EndDeviceModelValidationError{
-					field:  "brand_id",
-					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
-				}
-			}
-
-		case "id":
-
-			if utf8.RuneCountInString(m.GetID()) > 36 {
-				return EndDeviceModelValidationError{
-					field:  "id",
-					reason: "value length must be at most 36 runes",
-				}
-			}
-
-			if !_EndDeviceModel_ID_Pattern.MatchString(m.GetID()) {
-				return EndDeviceModelValidationError{
-					field:  "id",
-					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
-				}
-			}
-
-		case "name":
-			// no validation rules for Name
-		default:
-			return EndDeviceModelValidationError{
-				field:  name,
-				reason: "invalid field path",
-			}
-		}
-	}
-	return nil
-}
-
-// EndDeviceModelValidationError is the validation error returned by
-// EndDeviceModel.ValidateFields if the designated constraints aren't met.
-type EndDeviceModelValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e EndDeviceModelValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e EndDeviceModelValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e EndDeviceModelValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e EndDeviceModelValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e EndDeviceModelValidationError) ErrorName() string { return "EndDeviceModelValidationError" }
-
-// Error satisfies the builtin error interface
-func (e EndDeviceModelValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sEndDeviceModel.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = EndDeviceModelValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = EndDeviceModelValidationError{}
-
-var _EndDeviceModel_BrandID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
-
-var _EndDeviceModel_ID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
-
 // ValidateFields checks the field values on EndDeviceVersionIdentifiers with
 // the rules defined in the proto definition for this message. If any rules
 // are violated, an error is returned.
@@ -709,6 +505,15 @@ func (m *EndDeviceVersionIdentifiers) ValidateFields(paths ...string) error {
 			if utf8.RuneCountInString(m.GetFirmwareVersion()) > 32 {
 				return EndDeviceVersionIdentifiersValidationError{
 					field:  "firmware_version",
+					reason: "value length must be at most 32 runes",
+				}
+			}
+
+		case "band_id":
+
+			if utf8.RuneCountInString(m.GetBandID()) > 32 {
+				return EndDeviceVersionIdentifiersValidationError{
+					field:  "band_id",
 					reason: "value length must be at most 32 runes",
 				}
 			}

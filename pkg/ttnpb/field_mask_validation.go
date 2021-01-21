@@ -44,6 +44,7 @@ var isEndDeviceReadFieldPaths = []string{
 	"service_profile_id",
 	"updated_at",
 	"version_ids",
+	"version_ids.band_id",
 	"version_ids.brand_id",
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
@@ -64,6 +65,7 @@ var isEndDeviceWriteFieldPaths = []string{
 	"network_server_address",
 	"service_profile_id",
 	"version_ids",
+	"version_ids.band_id",
 	"version_ids.brand_id",
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
@@ -334,6 +336,7 @@ var nsEndDeviceReadFieldPaths = [...]string{
 	"supports_join",
 	"updated_at",
 	"version_ids",
+	"version_ids.band_id",
 	"version_ids.brand_id",
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
@@ -424,6 +427,7 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"skip_payload_crypto",
 			"skip_payload_crypto_override",
 			"version_ids",
+			"version_ids.band_id",
 			"version_ids.brand_id",
 			"version_ids.firmware_version",
 			"version_ids.hardware_version",
@@ -452,6 +456,7 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"skip_payload_crypto",
 			"skip_payload_crypto_override",
 			"version_ids",
+			"version_ids.band_id",
 			"version_ids.brand_id",
 			"version_ids.firmware_version",
 			"version_ids.hardware_version",
@@ -650,6 +655,7 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"supports_class_c",
 			"supports_join",
 			"version_ids",
+			"version_ids.band_id",
 			"version_ids.brand_id",
 			"version_ids.firmware_version",
 			"version_ids.hardware_version",
@@ -711,6 +717,12 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 
 	// Storage Integration:
 	"/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUp": {All: ApplicationUpFieldPathsNested, Allowed: applicationUpFieldMaskPaths()},
+
+	// Device Repository:
+	"/ttn.lorawan.v3.DeviceRepository/GetBrand":   {All: EndDeviceBrandFieldPathsNested, Allowed: EndDeviceBrandFieldPathsNested},
+	"/ttn.lorawan.v3.DeviceRepository/ListBrands": {All: EndDeviceBrandFieldPathsNested, Allowed: EndDeviceBrandFieldPathsNested},
+	"/ttn.lorawan.v3.DeviceRepository/GetModel":   {All: EndDeviceModelFieldPathsNested, Allowed: EndDeviceModelFieldPathsNested},
+	"/ttn.lorawan.v3.DeviceRepository/ListModels": {All: EndDeviceModelFieldPathsNested, Allowed: EndDeviceModelFieldPathsNested},
 }
 
 func omitFields(fields []string, fieldsToOmit ...string) []string {
