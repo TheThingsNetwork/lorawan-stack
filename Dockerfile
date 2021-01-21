@@ -14,7 +14,7 @@ RUN rm -rf /srv/ttn-lorawan/lorawan-webhook-templates/.git
 
 COPY data/lorawan-devices /tmp/lorawan-devices
 RUN mkdir -p /srv/ttn-lorawan/lorawan-devices-index && \
-  /bin/ttn-lw-stack dr-db init --dr.config-source=directory --dr.directory="/tmp/lorawan-devices"
+  /bin/ttn-lw-stack dr-db init --dr.source=directory --dr.directory="/tmp/lorawan-devices"
 
 FROM alpine:3.12
 
