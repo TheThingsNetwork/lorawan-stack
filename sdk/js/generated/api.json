@@ -6872,7 +6872,7 @@
           "fields": [
             {
               "name": "authenticated_identifiers",
-              "description": "",
+              "description": "Authenticated identifiers.",
               "label": "",
               "type": "AuthenticatedIdentifiers",
               "longType": "ClaimEndDeviceRequest.AuthenticatedIdentifiers",
@@ -6882,7 +6882,7 @@
             },
             {
               "name": "qr_code",
-              "description": "",
+              "description": "Raw QR code contents.",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -7065,7 +7065,7 @@
           "fields": [
             {
               "name": "join_eui",
-              "description": "",
+              "description": "JoinEUI (or AppEUI) of the device to claim.",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -7075,7 +7075,7 @@
             },
             {
               "name": "dev_eui",
-              "description": "",
+              "description": "DevEUI of the device to claim.",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -7085,7 +7085,7 @@
             },
             {
               "name": "authentication_code",
-              "description": "",
+              "description": "Authentication code to prove ownership.\nIn the LoRa Alliance TR005 specification, this equals the OwnerToken.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -7109,7 +7109,7 @@
           "name": "EndDeviceClaimingServer",
           "longName": "EndDeviceClaimingServer",
           "fullName": "ttn.lorawan.v3.EndDeviceClaimingServer",
-          "description": "",
+          "description": "The EndDeviceClaimingServer service configures authorization to claim end devices registered in an application,\nand allows clients to claim end devices.",
           "methods": [
             {
               "name": "Claim",
@@ -7136,7 +7136,7 @@
             },
             {
               "name": "AuthorizeApplication",
-              "description": "",
+              "description": "Authorize the End Device Claiming Server to claim devices registered in the given application. The application\nidentifiers are the source application, where the devices are registered before they are claimed.\nThe API key is used to access the application, find the device, verify the claim request and delete the end device\nfrom the source application.",
               "requestType": "AuthorizeApplicationRequest",
               "requestLongType": "AuthorizeApplicationRequest",
               "requestFullType": "ttn.lorawan.v3.AuthorizeApplicationRequest",
@@ -7159,7 +7159,7 @@
             },
             {
               "name": "UnauthorizeApplication",
-              "description": "",
+              "description": "Unauthorize the End Device Claiming Server to claim devices in the given application.\nThis reverts the authorization given with rpc AuthorizeApplication.",
               "requestType": "ApplicationIdentifiers",
               "requestLongType": "ApplicationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
@@ -15173,7 +15173,7 @@
           "fields": [
             {
               "name": "ids",
-              "description": "",
+              "description": "End device identifiers for the cryptographic operation.",
               "label": "",
               "type": "EndDeviceIdentifiers",
               "longType": "EndDeviceIdentifiers",
@@ -15191,7 +15191,7 @@
             },
             {
               "name": "lorawan_version",
-              "description": "",
+              "description": "LoRaWAN version to use for the cryptographic operation.",
               "label": "",
               "type": "MACVersion",
               "longType": "MACVersion",
@@ -15209,7 +15209,7 @@
             },
             {
               "name": "payload",
-              "description": "",
+              "description": "Raw input payload.",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -15227,7 +15227,7 @@
             },
             {
               "name": "provisioner_id",
-              "description": "",
+              "description": "Provisioner that provisioned the end device.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -15249,7 +15249,7 @@
             },
             {
               "name": "provisioning_data",
-              "description": "",
+              "description": "Provisioning data for the provisioner.",
               "label": "",
               "type": "Struct",
               "longType": "google.protobuf.Struct",
@@ -15270,7 +15270,7 @@
           "fields": [
             {
               "name": "payload",
-              "description": "",
+              "description": "Raw output payload.",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -15312,7 +15312,7 @@
           "fields": [
             {
               "name": "ids",
-              "description": "",
+              "description": "End device identifiers to use for key derivation.\nThe DevAddr must be set in this request. The DevEUI may need to be set, depending on the provisioner.",
               "label": "",
               "type": "EndDeviceIdentifiers",
               "longType": "EndDeviceIdentifiers",
@@ -15330,7 +15330,7 @@
             },
             {
               "name": "lorawan_version",
-              "description": "",
+              "description": "LoRaWAN key derivation scheme.",
               "label": "",
               "type": "MACVersion",
               "longType": "MACVersion",
@@ -15348,7 +15348,7 @@
             },
             {
               "name": "join_nonce",
-              "description": "",
+              "description": "LoRaWAN JoinNonce (or AppNonce).",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -15358,7 +15358,7 @@
             },
             {
               "name": "dev_nonce",
-              "description": "",
+              "description": "LoRaWAN DevNonce.",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -15368,7 +15368,7 @@
             },
             {
               "name": "net_id",
-              "description": "",
+              "description": "LoRaWAN NetID.",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -15378,7 +15378,7 @@
             },
             {
               "name": "provisioner_id",
-              "description": "",
+              "description": "Provisioner that provisioned the end device.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -15400,7 +15400,7 @@
             },
             {
               "name": "provisioning_data",
-              "description": "",
+              "description": "Provisioning data for the provisioner.",
               "label": "",
               "type": "Struct",
               "longType": "google.protobuf.Struct",
@@ -15452,7 +15452,7 @@
           "fields": [
             {
               "name": "ids",
-              "description": "",
+              "description": "End device identifiers to request the root keys for.",
               "label": "",
               "type": "EndDeviceIdentifiers",
               "longType": "EndDeviceIdentifiers",
@@ -15470,7 +15470,7 @@
             },
             {
               "name": "provisioner_id",
-              "description": "",
+              "description": "Provisioner that provisioned the end device.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -15492,7 +15492,7 @@
             },
             {
               "name": "provisioning_data",
-              "description": "",
+              "description": "Provisioning data for the provisioner.",
               "label": "",
               "type": "Struct",
               "longType": "google.protobuf.Struct",
@@ -15513,7 +15513,7 @@
           "fields": [
             {
               "name": "payload_request",
-              "description": "",
+              "description": "Request data for the cryptographic operation.",
               "label": "",
               "type": "CryptoServicePayloadRequest",
               "longType": "CryptoServicePayloadRequest",
@@ -15531,7 +15531,7 @@
             },
             {
               "name": "join_request_type",
-              "description": "",
+              "description": "LoRaWAN rejoin-request type.",
               "label": "",
               "type": "RejoinType",
               "longType": "RejoinType",
@@ -15549,7 +15549,7 @@
             },
             {
               "name": "dev_nonce",
-              "description": "",
+              "description": "LoRaWAN DevNonce.",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -16020,7 +16020,7 @@
           "methods": [
             {
               "name": "DeriveAppSKey",
-              "description": "",
+              "description": "Derive the application session key (AppSKey).",
               "requestType": "DeriveSessionKeysRequest",
               "requestLongType": "DeriveSessionKeysRequest",
               "requestFullType": "ttn.lorawan.v3.DeriveSessionKeysRequest",
@@ -16052,7 +16052,7 @@
           "methods": [
             {
               "name": "GetAppSKey",
-              "description": "",
+              "description": "Request the application session key for a particular session.",
               "requestType": "SessionKeyRequest",
               "requestLongType": "SessionKeyRequest",
               "requestFullType": "ttn.lorawan.v3.SessionKeyRequest",
@@ -16072,7 +16072,7 @@
           "methods": [
             {
               "name": "GetJoinEUIPrefixes",
-              "description": "",
+              "description": "Request the JoinEUI prefixes that are configured for this Join Server.",
               "requestType": "Empty",
               "requestLongType": ".google.protobuf.Empty",
               "requestFullType": "google.protobuf.Empty",
@@ -16206,7 +16206,7 @@
           "methods": [
             {
               "name": "JoinRequestMIC",
-              "description": "",
+              "description": "Calculate the join-request message MIC.",
               "requestType": "CryptoServicePayloadRequest",
               "requestLongType": "CryptoServicePayloadRequest",
               "requestFullType": "ttn.lorawan.v3.CryptoServicePayloadRequest",
@@ -16218,7 +16218,7 @@
             },
             {
               "name": "JoinAcceptMIC",
-              "description": "",
+              "description": "Calculate the join-accept message MIC.",
               "requestType": "JoinAcceptMICRequest",
               "requestLongType": "JoinAcceptMICRequest",
               "requestFullType": "ttn.lorawan.v3.JoinAcceptMICRequest",
@@ -16230,7 +16230,7 @@
             },
             {
               "name": "EncryptJoinAccept",
-              "description": "",
+              "description": "Encrypt the join-accept payload.",
               "requestType": "CryptoServicePayloadRequest",
               "requestLongType": "CryptoServicePayloadRequest",
               "requestFullType": "ttn.lorawan.v3.CryptoServicePayloadRequest",
@@ -16242,7 +16242,7 @@
             },
             {
               "name": "EncryptRejoinAccept",
-              "description": "",
+              "description": "Encrypt the rejoin-accept payload.",
               "requestType": "CryptoServicePayloadRequest",
               "requestLongType": "CryptoServicePayloadRequest",
               "requestFullType": "ttn.lorawan.v3.CryptoServicePayloadRequest",
@@ -16254,7 +16254,7 @@
             },
             {
               "name": "DeriveNwkSKeys",
-              "description": "",
+              "description": "Derive network session keys (NwkSKey, or FNwkSKey, SNwkSKey and NwkSEncKey)",
               "requestType": "DeriveSessionKeysRequest",
               "requestLongType": "DeriveSessionKeysRequest",
               "requestFullType": "ttn.lorawan.v3.DeriveSessionKeysRequest",
@@ -16286,7 +16286,7 @@
           "methods": [
             {
               "name": "HandleJoin",
-              "description": "",
+              "description": "Handle a join-request message.",
               "requestType": "JoinRequest",
               "requestLongType": "JoinRequest",
               "requestFullType": "ttn.lorawan.v3.JoinRequest",
@@ -16298,7 +16298,7 @@
             },
             {
               "name": "GetNwkSKeys",
-              "description": "",
+              "description": "Request the network session keys for a particular session.",
               "requestType": "SessionKeyRequest",
               "requestLongType": "SessionKeyRequest",
               "requestFullType": "ttn.lorawan.v3.SessionKeyRequest",
@@ -25378,7 +25378,7 @@
           "fields": [
             {
               "name": "format_id",
-              "description": "",
+              "description": "QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -25400,7 +25400,7 @@
             },
             {
               "name": "end_device",
-              "description": "",
+              "description": "End device to use as input to generate the QR code.",
               "label": "",
               "type": "EndDevice",
               "longType": "EndDevice",
@@ -25418,7 +25418,7 @@
             },
             {
               "name": "image",
-              "description": "",
+              "description": "If set, the server will render the QR code image according to these settings.",
               "label": "",
               "type": "Image",
               "longType": "GenerateEndDeviceQRCodeRequest.Image",
@@ -25439,7 +25439,7 @@
           "fields": [
             {
               "name": "image_size",
-              "description": "",
+              "description": "Requested QR code image dimension in pixels.",
               "label": "",
               "type": "uint32",
               "longType": "uint32",
@@ -25472,7 +25472,7 @@
           "fields": [
             {
               "name": "text",
-              "description": "",
+              "description": "Text representation of the QR code contents.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -25503,7 +25503,7 @@
           "fields": [
             {
               "name": "format_id",
-              "description": "",
+              "description": "QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -25593,7 +25593,7 @@
           "fields": [
             {
               "name": "formats",
-              "description": "",
+              "description": "Available formats. The map key is the format identifier.",
               "label": "repeated",
               "type": "FormatsEntry",
               "longType": "QRCodeFormats.FormatsEntry",

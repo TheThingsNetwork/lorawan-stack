@@ -203,11 +203,15 @@ func (*ClaimEndDeviceRequest) XXX_OneofWrappers() []interface{} {
 }
 
 type ClaimEndDeviceRequest_AuthenticatedIdentifiers struct {
-	JoinEUI              go_thethings_network_lorawan_stack_v3_pkg_types.EUI64 `protobuf:"bytes,1,opt,name=join_eui,json=joinEui,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.EUI64" json:"join_eui"`
-	DevEUI               go_thethings_network_lorawan_stack_v3_pkg_types.EUI64 `protobuf:"bytes,2,opt,name=dev_eui,json=devEui,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.EUI64" json:"dev_eui"`
-	AuthenticationCode   string                                                `protobuf:"bytes,3,opt,name=authentication_code,json=authenticationCode,proto3" json:"authentication_code,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                                              `json:"-"`
-	XXX_sizecache        int32                                                 `json:"-"`
+	// JoinEUI (or AppEUI) of the device to claim.
+	JoinEUI go_thethings_network_lorawan_stack_v3_pkg_types.EUI64 `protobuf:"bytes,1,opt,name=join_eui,json=joinEui,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.EUI64" json:"join_eui"`
+	// DevEUI of the device to claim.
+	DevEUI go_thethings_network_lorawan_stack_v3_pkg_types.EUI64 `protobuf:"bytes,2,opt,name=dev_eui,json=devEui,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.EUI64" json:"dev_eui"`
+	// Authentication code to prove ownership.
+	// In the LoRa Alliance TR005 specification, this equals the OwnerToken.
+	AuthenticationCode   string   `protobuf:"bytes,3,opt,name=authentication_code,json=authenticationCode,proto3" json:"authentication_code,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) Reset() {
@@ -576,7 +580,13 @@ const _ = grpc.SupportPackageIsVersion4
 type EndDeviceClaimingServerClient interface {
 	// Claims the end device by claim authentication code or QR code and transfers the device to the target application.
 	Claim(ctx context.Context, in *ClaimEndDeviceRequest, opts ...grpc.CallOption) (*EndDeviceIdentifiers, error)
+	// Authorize the End Device Claiming Server to claim devices registered in the given application. The application
+	// identifiers are the source application, where the devices are registered before they are claimed.
+	// The API key is used to access the application, find the device, verify the claim request and delete the end device
+	// from the source application.
 	AuthorizeApplication(ctx context.Context, in *AuthorizeApplicationRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	// Unauthorize the End Device Claiming Server to claim devices in the given application.
+	// This reverts the authorization given with rpc AuthorizeApplication.
 	UnauthorizeApplication(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
@@ -619,7 +629,13 @@ func (c *endDeviceClaimingServerClient) UnauthorizeApplication(ctx context.Conte
 type EndDeviceClaimingServerServer interface {
 	// Claims the end device by claim authentication code or QR code and transfers the device to the target application.
 	Claim(context.Context, *ClaimEndDeviceRequest) (*EndDeviceIdentifiers, error)
+	// Authorize the End Device Claiming Server to claim devices registered in the given application. The application
+	// identifiers are the source application, where the devices are registered before they are claimed.
+	// The API key is used to access the application, find the device, verify the claim request and delete the end device
+	// from the source application.
 	AuthorizeApplication(context.Context, *AuthorizeApplicationRequest) (*types.Empty, error)
+	// Unauthorize the End Device Claiming Server to claim devices in the given application.
+	// This reverts the authorization given with rpc AuthorizeApplication.
 	UnauthorizeApplication(context.Context, *ApplicationIdentifiers) (*types.Empty, error)
 }
 

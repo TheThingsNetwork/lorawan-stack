@@ -3327,6 +3327,7 @@
     },
     "/edcs/applications/{application_ids.application_id}/authorize": {
       "post": {
+        "summary": "Authorize the End Device Claiming Server to claim devices registered in the given application. The application\nidentifiers are the source application, where the devices are registered before they are claimed.\nThe API key is used to access the application, find the device, verify the claim request and delete the end device\nfrom the source application.",
         "operationId": "EndDeviceClaimingServer_AuthorizeApplication",
         "responses": {
           "200": {
@@ -3365,6 +3366,7 @@
     },
     "/edcs/applications/{application_id}/authorize": {
       "delete": {
+        "summary": "Unauthorize the End Device Claiming Server to claim devices in the given application.\nThis reverts the authorization given with rpc AuthorizeApplication.",
         "operationId": "EndDeviceClaimingServer_UnauthorizeApplication",
         "responses": {
           "200": {
@@ -4831,6 +4833,7 @@
     },
     "/js/join_eui_prefixes": {
       "get": {
+        "summary": "Request the JoinEUI prefixes that are configured for this Join Server.",
         "operationId": "Js_GetJoinEUIPrefixes",
         "responses": {
           "200": {
@@ -6128,6 +6131,7 @@
         "parameters": [
           {
             "name": "format_id",
+            "description": "QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -8161,14 +8165,17 @@
       "properties": {
         "join_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "JoinEUI (or AppEUI) of the device to claim."
         },
         "dev_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "DevEUI of the device to claim."
         },
         "authentication_code": {
-          "type": "string"
+          "type": "string",
+          "description": "Authentication code to prove ownership.\nIn the LoRa Alliance TR005 specification, this equals the OwnerToken."
         }
       }
     },
@@ -8305,7 +8312,8 @@
       "properties": {
         "image_size": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "description": "Requested QR code image dimension in pixels."
         }
       }
     },
@@ -10189,11 +10197,13 @@
       "type": "object",
       "properties": {
         "authenticated_identifiers": {
-          "$ref": "#/definitions/ClaimEndDeviceRequestAuthenticatedIdentifiers"
+          "$ref": "#/definitions/ClaimEndDeviceRequestAuthenticatedIdentifiers",
+          "description": "Authenticated identifiers."
         },
         "qr_code": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "Raw QR code contents."
         },
         "target_application_ids": {
           "$ref": "#/definitions/v3ApplicationIdentifiers",
@@ -10609,20 +10619,25 @@
       "type": "object",
       "properties": {
         "ids": {
-          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+          "$ref": "#/definitions/v3EndDeviceIdentifiers",
+          "description": "End device identifiers for the cryptographic operation."
         },
         "lorawan_version": {
-          "$ref": "#/definitions/v3MACVersion"
+          "$ref": "#/definitions/v3MACVersion",
+          "description": "LoRaWAN version to use for the cryptographic operation."
         },
         "payload": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "Raw input payload."
         },
         "provisioner_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Provisioner that provisioned the end device."
         },
         "provisioning_data": {
-          "type": "object"
+          "type": "object",
+          "description": "Provisioning data for the provisioner."
         }
       }
     },
@@ -10631,7 +10646,8 @@
       "properties": {
         "payload": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "Raw output payload."
         }
       }
     },
@@ -11657,13 +11673,16 @@
       "type": "object",
       "properties": {
         "format_id": {
-          "type": "string"
+          "type": "string",
+          "description": "QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service."
         },
         "end_device": {
-          "$ref": "#/definitions/v3EndDevice"
+          "$ref": "#/definitions/v3EndDevice",
+          "description": "End device to use as input to generate the QR code."
         },
         "image": {
-          "$ref": "#/definitions/GenerateEndDeviceQRCodeRequestImage"
+          "$ref": "#/definitions/GenerateEndDeviceQRCodeRequestImage",
+          "description": "If set, the server will render the QR code image according to these settings."
         }
       }
     },
@@ -11671,7 +11690,8 @@
       "type": "object",
       "properties": {
         "text": {
-          "type": "string"
+          "type": "string",
+          "description": "Text representation of the QR code contents."
         },
         "image": {
           "$ref": "#/definitions/v3Picture",
@@ -12914,7 +12934,8 @@
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/v3QRCodeFormat"
-          }
+          },
+          "description": "Available formats. The map key is the format identifier."
         }
       }
     },
