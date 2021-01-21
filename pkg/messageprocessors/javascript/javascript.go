@@ -140,6 +140,10 @@ func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers,
 		%s
 
 		function main(input) {
+			input = {
+				bytes: input.bytes.slice(),
+				fPort: input.fPort,
+			}
 			if (typeof decodeUplink === 'function') {
 				return decodeUplink(input);
 			}
@@ -195,6 +199,10 @@ func (h *host) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 		%s
 
 		function main(input) {
+			input = {
+				bytes: input.bytes.slice(),
+				fPort: input.fPort,
+			}
 			return decodeDownlink(input);
 		}
 	`, script)
