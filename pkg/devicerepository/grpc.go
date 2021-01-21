@@ -40,10 +40,10 @@ func withDefaultBrandFields(paths []string) []string {
 }
 
 func (dr *DeviceRepository) assetURL(brandID, path string) string {
-	if path == "" || dr.config.AssetsBaseURL == "" || strings.HasPrefix(dr.config.AssetsBaseURL, path) {
+	if path == "" || dr.config.AssetsBaseURL == "" || strings.HasPrefix(path, dr.config.AssetsBaseURL) {
 		return path
 	}
-	return fmt.Sprintf(strings.TrimRight(dr.config.AssetsBaseURL, "/"), "/vendor/", brandID, "/", path)
+	return fmt.Sprintf("%s/vendor/%s/%s", strings.TrimRight(dr.config.AssetsBaseURL, "/"), brandID, path)
 }
 
 // ensureBaseAssetURLs prepends the BaseAssetURL to model assets.
