@@ -31,7 +31,7 @@ type Config struct {
 	URL          string                `name:"url" description:"URL, which contains Device Repository package"`
 	Blob         config.BlobPathConfig `name:"blob"`
 
-	AssetsBaseURL string `name:"assets-base-url" description:"The base URL for assets"`
+	AssetsBaseURL string `name:"assets-base-url" description:"The base URL for Device Repository assets"`
 }
 
 // StoreConfig represents configuration for the Device Repository store.
