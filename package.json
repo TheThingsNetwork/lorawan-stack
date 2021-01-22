@@ -39,6 +39,7 @@
     "css-hot-loader": "^1.3.9",
     "css-loader": "^2.1.1",
     "cypress": "^4.11.0",
+    "cypress-file-upload": "^5.0.2",
     "eslint": "^6.2.2",
     "eslint-config-prettier": "^6.0.0",
     "eslint-config-ttn": "git+https://github.com/TheThingsNetwork/eslint-config-ttn.git#v1.4.0",
