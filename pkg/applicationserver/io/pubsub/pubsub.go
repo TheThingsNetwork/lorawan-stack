@@ -267,7 +267,10 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	if err != nil {
 		return err
 	}
-	i.conn, err = provider.OpenConnection(ctx, pb)
+	if err := ps.providerStatuses.Enabled(ctx, pb.GetProvider()); err != nil {
+		return err
+	}
+	i.conn, err = provider.OpenConnection(ctx, pb, ps.providerStatuses)
 	if err != nil {
 		return err
 	}

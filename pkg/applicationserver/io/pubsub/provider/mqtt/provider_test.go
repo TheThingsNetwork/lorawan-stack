@@ -31,6 +31,14 @@ import (
 	"gocloud.dev/pubsub"
 )
 
+type allEnabled struct {
+}
+
+// Enabled implements provider.Enabler.
+func (e *allEnabled) Enabled(context.Context, ttnpb.ApplicationPubSub_Provider) error {
+	return nil
+}
+
 func TestOpenConnection(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
@@ -115,7 +123,7 @@ func TestOpenConnection(t *testing.T) {
 
 	// Invalid attributes - no server provided.
 	{
-		conn, err := impl.OpenConnection(ctx, pb)
+		conn, err := impl.OpenConnection(ctx, pb, &allEnabled{})
 		a.So(conn, should.BeNil)
 		a.So(err, should.NotBeNil)
 	}
@@ -197,7 +205,7 @@ func TestOpenConnection(t *testing.T) {
 
 			pb.Provider = utc.provider
 
-			conn, err := impl.OpenConnection(ctx, pb)
+			conn, err := impl.OpenConnection(ctx, pb, &allEnabled{})
 			a.So(conn, should.NotBeNil)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
