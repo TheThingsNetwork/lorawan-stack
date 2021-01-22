@@ -37,6 +37,6 @@ var (
 func init() {
 	Root.AddCommand(drDBCommand)
 
-	drInitCommand.Flags().Bool("overwrite", false, "Overwrite existing index files")
+	drInitCommand.Flags().Bool("overwrite", true, "Overwrite existing index files")
 	drDBCommand.AddCommand(drInitCommand)
 }
