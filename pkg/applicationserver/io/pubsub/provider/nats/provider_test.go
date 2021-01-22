@@ -108,12 +108,16 @@ func TestOpenConnection(t *testing.T) {
 	}
 
 	impl, err := provider.GetProvider(&ttnpb.ApplicationPubSub{
-		Provider: &ttnpb.ApplicationPubSub_NATS{},
+		Provider: &ttnpb.ApplicationPubSub_NATS{
+			NATS: &ttnpb.ApplicationPubSub_NATSProvider{
+				ServerURL: "nats://invalid.local:4222",
+			},
+		},
 	})
 	a.So(impl, should.NotBeNil)
 	a.So(err, should.BeNil)
 
-	// Invalid attributes - no server provided.
+	// Invalid attributes - invalid server.
 	{
 		conn, err := impl.OpenConnection(ctx, pb, &allEnabled{})
 		a.So(conn, should.BeNil)
