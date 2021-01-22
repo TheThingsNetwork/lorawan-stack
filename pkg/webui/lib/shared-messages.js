@@ -268,6 +268,7 @@ export default defineMessages({
   otherCluster: 'Other cluster',
   overview: 'Overview',
   password: 'Password',
+  passwordChanged: 'Password changed',
   pause: 'Pause',
   payload: 'Payload',
   payloadFormatters: 'Payload formatters',

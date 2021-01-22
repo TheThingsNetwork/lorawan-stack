@@ -41,9 +41,6 @@ const m = defineMessages({
   revokeAllAccess: 'Revoke all access',
   revokeAllAccessDescription:
     'Check this option if you also wish to revoke all your currently active sessions',
-  success: 'Password updated',
-  successMessage: 'Your password was updated successfully',
-  updatePassword: 'Update password',
 })
 
 const validationSchemaOldPassword = Yup.object().shape({
@@ -129,13 +126,13 @@ const ChangePasswordForm = ({ userId, old, cancelRoute, onSubmitSuccess }) => {
       />
       {usesTemporaryPw ? (
         <>
-          <Form.Submit component={SubmitButton} message={m.updatePassword} />
+          <Form.Submit component={SubmitButton} message={sharedMessages.changePassword} />
           <Button.Link to={cancelRoute} naked secondary message={sharedMessages.cancel} />
         </>
       ) : (
         <SubmitBar>
           <div>
-            <Form.Submit component={SubmitButton} message={m.updatePassword} />
+            <Form.Submit component={SubmitButton} message={sharedMessages.changePassword} />
           </div>
         </SubmitBar>
       )}
@@ -156,7 +153,7 @@ ChangePasswordForm.defaultProps = {
   onSubmitSuccess: () => {
     toast({
       title: m.success,
-      message: m.successMessage,
+      message: sharedMessages.passwordChanged,
       type: toast.types.SUCCESS,
     })
   },
