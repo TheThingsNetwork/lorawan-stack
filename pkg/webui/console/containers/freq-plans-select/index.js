@@ -34,7 +34,7 @@ const m = defineMessages({
 
 const formatOptions = plans => plans.map(plan => ({ value: plan.id, label: plan.name }))
 
-const CreateFrequencyPlansSelector = source =>
+export const CreateFrequencyPlansSelect = (source, options = {}) =>
   CreateFetchSelect({
     fetchOptions: source === 'ns' ? getNsFrequencyPlans : getGsFrequencyPlans,
     optionsSelector: source === 'ns' ? selectNsFrequencyPlans : selectGsFrequencyPlans,
@@ -45,7 +45,8 @@ const CreateFrequencyPlansSelector = source =>
     optionsFormatter: formatOptions,
     defaultDescription: m.description,
     additionalOptions: source === 'gs' ? [{ value: 'no-frequency-plan', label: m.none }] : [],
+    ...options,
   })
 
-export const GsFrequencyPlansSelect = CreateFrequencyPlansSelector('gs')
-export const NsFrequencyPlansSelect = CreateFrequencyPlansSelector('ns')
+export const GsFrequencyPlansSelect = CreateFrequencyPlansSelect('gs')
+export const NsFrequencyPlansSelect = CreateFrequencyPlansSelect('ns')

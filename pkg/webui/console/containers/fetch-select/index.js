@@ -38,13 +38,11 @@ export default function({
   additionalOptions = [],
 }) {
   @storeConnect(
-    function(state) {
-      return {
-        options: [...additionalOptions, ...optionsFormatter(optionsSelector(state))],
-        error: errorSelector(state),
-        fetching: fetchingSelector(state),
-      }
-    },
+    state => ({
+      options: optionsFormatter(optionsSelector(state)),
+      error: errorSelector(state),
+      fetching: fetchingSelector(state),
+    }),
     { fetchOptions },
   )
   class FetchSelect extends React.PureComponent {

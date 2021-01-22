@@ -58,6 +58,7 @@ class Select extends React.PureComponent {
         label: PropTypes.message,
       }),
     ),
+    placeholder: PropTypes.message,
     value: PropTypes.string,
     warning: PropTypes.bool,
   }
@@ -74,6 +75,7 @@ class Select extends React.PureComponent {
     value: undefined,
     id: undefined,
     inputWidth: 'm',
+    placeholder: undefined,
   }
 
   constructor(props) {
@@ -142,6 +144,7 @@ class Select extends React.PureComponent {
       warning,
       name,
       id,
+      placeholder,
       ...rest
     } = this.props
 
@@ -173,6 +176,7 @@ class Select extends React.PureComponent {
         name={name}
         components={{ Input }}
         aria-describedby={rest['aria-describedby']}
+        placeholder={Boolean(placeholder) ? formatMessage(placeholder) : undefined}
         {...rest}
       />
     )

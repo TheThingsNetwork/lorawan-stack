@@ -29,6 +29,7 @@ import webhooks from './webhooks'
 import pubsubs from './pubsubs'
 import applicationPackages from './application-packages'
 import is from './identity-server'
+import deviceRepository from './device-repository'
 
 export default [
   ...status,
@@ -47,4 +48,5 @@ export default [
   ...pubsubs,
   ...applicationPackages,
   ...is,
+  ...deviceRepository,
 ]
