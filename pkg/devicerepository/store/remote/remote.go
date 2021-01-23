@@ -16,8 +16,8 @@ package remote
 
 import (
 	"bytes"
-	"encoding/json"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
@@ -279,21 +279,23 @@ func (s *remoteStore) getCodec(ids *ttnpb.EndDeviceVersionIdentifiers, chooseCod
 			if len(codec.Examples) > 0 {
 				examples = make([]*ttnpb.MessagePayloadFormatter_Example, 0, len(codec.Examples))
 				for _, e := range codec.Examples {
-					b, err := json.Marshal(e.Output)
-					if err != nil {
-						return nil, err
-					}
 					pb := &ttnpb.MessagePayloadFormatter_Example{
 						Description: e.Description,
 						Input: &ttnpb.MessagePayloadFormatter_Example_Input{
 							FPort:      e.Input.FPort,
 							FRMPayload: e.Input.Bytes,
 						},
-						Output: &ttnpb.MessagePayloadFormatter_Example_Output{},
+						Output: &pbtypes.Struct{},
 					}
-					d := jsonpb.TTN().NewDecoder(bytes.NewBuffer(b))
-					if err := d.Decode(pb.Output); err != nil {
+					b, err := jsonpb.TTN().Marshal(e.Output)
+					if err != nil {
 						return nil, err
+					}
+					if len(b) > 0 {
+						d := jsonpb.TTN().NewDecoder(bytes.NewBuffer(b))
+						if err := d.Decode(pb.Output); err != nil {
+							return nil, err
+						}
 					}
 					examples = append(examples, pb)
 				}

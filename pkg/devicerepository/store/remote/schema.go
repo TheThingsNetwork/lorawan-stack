@@ -450,9 +450,7 @@ type EndDeviceCodecExample struct {
 		FPort uint32 `yaml:"fPort"`
 		Bytes []byte `yaml:"bytes"`
 	} `yaml:"input"`
-	Output struct {
-		Data map[string]interface{} `yaml:"data" json:"data"`
-	} `yaml:"output"`
+	Output map[string]interface{} `yaml:"output"`
 }
 
 // EndDeviceCodecs is the format of the `vendor/<vendor>/<codec-id>.yaml` files.

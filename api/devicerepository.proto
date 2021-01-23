@@ -317,14 +317,10 @@ message MessagePayloadFormatter {
       bytes frm_payload = 2 [(gogoproto.customname) = "FRMPayload"];
     };
     Input input = 2;
-    message Output {
-      google.protobuf.Struct data = 1;
-    };
-    Output output = 3;
+    google.protobuf.Struct output = 3;
   }
   // Examples
   repeated Example examples = 3;
-
 }
 
 service DeviceRepository {

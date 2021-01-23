@@ -170,7 +170,6 @@
   - [Message `MessagePayloadFormatter`](#ttn.lorawan.v3.MessagePayloadFormatter)
   - [Message `MessagePayloadFormatter.Example`](#ttn.lorawan.v3.MessagePayloadFormatter.Example)
   - [Message `MessagePayloadFormatter.Example.Input`](#ttn.lorawan.v3.MessagePayloadFormatter.Example.Input)
-  - [Message `MessagePayloadFormatter.Example.Output`](#ttn.lorawan.v3.MessagePayloadFormatter.Example.Output)
   - [Enum `KeyProvisioning`](#ttn.lorawan.v3.KeyProvisioning)
   - [Enum `KeySecurity`](#ttn.lorawan.v3.KeySecurity)
   - [Service `DeviceRepository`](#ttn.lorawan.v3.DeviceRepository)
@@ -2659,7 +2658,7 @@ and allows clients to claim end devices.
 | ----- | ---- | ----- | ----------- |
 | `description` | [`string`](#string) |  |  |
 | `input` | [`MessagePayloadFormatter.Example.Input`](#ttn.lorawan.v3.MessagePayloadFormatter.Example.Input) |  |  |
-| `output` | [`MessagePayloadFormatter.Example.Output`](#ttn.lorawan.v3.MessagePayloadFormatter.Example.Output) |  |  |
+| `output` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
 
 ### <a name="ttn.lorawan.v3.MessagePayloadFormatter.Example.Input">Message `MessagePayloadFormatter.Example.Input`</a>
 
@@ -2673,12 +2672,6 @@ and allows clients to claim end devices.
 | Field | Validations |
 | ----- | ----------- |
 | `f_port` | <p>`uint32.lte`: `255`</p> |
-
-### <a name="ttn.lorawan.v3.MessagePayloadFormatter.Example.Output">Message `MessagePayloadFormatter.Example.Output`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
 
 ### <a name="ttn.lorawan.v3.KeyProvisioning">Enum `KeyProvisioning`</a>
 

@@ -343,7 +343,6 @@ var MessagePayloadFormatter_ExampleFieldPathsNested = []string{
 	"input.f_port",
 	"input.frm_payload",
 	"output",
-	"output.data",
 }
 
 var MessagePayloadFormatter_ExampleFieldPathsTopLevel = []string{
@@ -359,11 +358,4 @@ var MessagePayloadFormatter_Example_InputFieldPathsNested = []string{
 var MessagePayloadFormatter_Example_InputFieldPathsTopLevel = []string{
 	"f_port",
 	"frm_payload",
-}
-var MessagePayloadFormatter_Example_OutputFieldPathsNested = []string{
-	"data",
-}
-
-var MessagePayloadFormatter_Example_OutputFieldPathsTopLevel = []string{
-	"data",
 }

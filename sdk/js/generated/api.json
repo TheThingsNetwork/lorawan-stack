@@ -9649,9 +9649,9 @@
               "name": "output",
               "description": "",
               "label": "",
-              "type": "Output",
-              "longType": "MessagePayloadFormatter.Example.Output",
-              "fullType": "ttn.lorawan.v3.MessagePayloadFormatter.Example.Output",
+              "type": "Struct",
+              "longType": "google.protobuf.Struct",
+              "fullType": "google.protobuf.Struct",
               "ismap": false,
               "defaultValue": ""
             }
@@ -9691,27 +9691,6 @@
               "type": "bytes",
               "longType": "bytes",
               "fullType": "bytes",
-              "ismap": false,
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "Output",
-          "longName": "MessagePayloadFormatter.Example.Output",
-          "fullName": "ttn.lorawan.v3.MessagePayloadFormatter.Example.Output",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "data",
-              "description": "",
-              "label": "",
-              "type": "Struct",
-              "longType": "google.protobuf.Struct",
-              "fullType": "google.protobuf.Struct",
               "ismap": false,
               "defaultValue": ""
             }
