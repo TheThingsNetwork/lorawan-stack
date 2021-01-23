@@ -197,11 +197,13 @@ var ListEndDeviceModelsResponseFieldPathsTopLevel = []string{
 	"models",
 }
 var MessagePayloadFormatterFieldPathsNested = []string{
+	"examples",
 	"formatter",
 	"formatter_parameter",
 }
 
 var MessagePayloadFormatterFieldPathsTopLevel = []string{
+	"examples",
 	"formatter",
 	"formatter_parameter",
 }
@@ -334,4 +336,34 @@ var EndDeviceModel_Compliances_ComplianceFieldPathsTopLevel = []string{
 	"norm",
 	"standard",
 	"version",
+}
+var MessagePayloadFormatter_ExampleFieldPathsNested = []string{
+	"description",
+	"input",
+	"input.f_port",
+	"input.frm_payload",
+	"output",
+	"output.data",
+}
+
+var MessagePayloadFormatter_ExampleFieldPathsTopLevel = []string{
+	"description",
+	"input",
+	"output",
+}
+var MessagePayloadFormatter_Example_InputFieldPathsNested = []string{
+	"f_port",
+	"frm_payload",
+}
+
+var MessagePayloadFormatter_Example_InputFieldPathsTopLevel = []string{
+	"f_port",
+	"frm_payload",
+}
+var MessagePayloadFormatter_Example_OutputFieldPathsNested = []string{
+	"data",
+}
+
+var MessagePayloadFormatter_Example_OutputFieldPathsTopLevel = []string{
+	"data",
 }

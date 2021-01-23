@@ -9603,6 +9603,117 @@
               "fullType": "string",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "examples",
+              "description": "Examples",
+              "label": "repeated",
+              "type": "Example",
+              "longType": "MessagePayloadFormatter.Example",
+              "fullType": "ttn.lorawan.v3.MessagePayloadFormatter.Example",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Example",
+          "longName": "MessagePayloadFormatter.Example",
+          "fullName": "ttn.lorawan.v3.MessagePayloadFormatter.Example",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "description",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "input",
+              "description": "",
+              "label": "",
+              "type": "Input",
+              "longType": "MessagePayloadFormatter.Example.Input",
+              "fullType": "ttn.lorawan.v3.MessagePayloadFormatter.Example.Input",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "output",
+              "description": "",
+              "label": "",
+              "type": "Output",
+              "longType": "MessagePayloadFormatter.Example.Output",
+              "fullType": "ttn.lorawan.v3.MessagePayloadFormatter.Example.Output",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Input",
+          "longName": "MessagePayloadFormatter.Example.Input",
+          "fullName": "ttn.lorawan.v3.MessagePayloadFormatter.Example.Input",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "f_port",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
+            },
+            {
+              "name": "frm_payload",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Output",
+          "longName": "MessagePayloadFormatter.Example.Output",
+          "fullName": "ttn.lorawan.v3.MessagePayloadFormatter.Example.Output",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "data",
+              "description": "",
+              "label": "",
+              "type": "Struct",
+              "longType": "google.protobuf.Struct",
+              "fullType": "google.protobuf.Struct",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         }

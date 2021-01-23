@@ -15,9 +15,13 @@
 package remote
 
 import (
+	"bytes"
+	"encoding/json"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"gopkg.in/yaml.v2"
 )
@@ -224,7 +228,7 @@ var (
 )
 
 // getCodec retrieves codec information for a specific model and returns.
-func (s *remoteStore) getCodec(ids *ttnpb.EndDeviceVersionIdentifiers, chooseFile func(EndDeviceCodec) string) (*ttnpb.MessagePayloadFormatter, error) {
+func (s *remoteStore) getCodec(ids *ttnpb.EndDeviceVersionIdentifiers, chooseCodec func(EndDeviceCodecs) EndDeviceCodec) (*ttnpb.MessagePayloadFormatter, error) {
 	models, err := s.GetModels(store.GetModelsRequest{
 		BrandID: ids.BrandID,
 		ModelID: ids.ModelID,
@@ -258,22 +262,46 @@ func (s *remoteStore) getCodec(ids *ttnpb.EndDeviceVersionIdentifiers, chooseFil
 			return nil, errNoCodec.WithAttributes("firmware_version", ids.FirmwareVersion, "band_id", ids.BandID)
 		}
 
-		codec := EndDeviceCodec{}
+		codecs := EndDeviceCodecs{}
 		b, err := s.fetcher.File("vendor", ids.BrandID, profileInfo.CodecID+".yaml")
 		if err != nil {
 			return nil, err
 		}
-		if err := yaml.Unmarshal(b, &codec); err != nil {
+		if err := yaml.Unmarshal(b, &codecs); err != nil {
 			return nil, err
 		}
-		if file := chooseFile(codec); file != "" {
-			b, err := s.fetcher.File("vendor", ids.BrandID, file)
+		if codec := chooseCodec(codecs); codec.FileName != "" {
+			b, err := s.fetcher.File("vendor", ids.BrandID, codec.FileName)
 			if err != nil {
 				return nil, err
+			}
+			var examples []*ttnpb.MessagePayloadFormatter_Example
+			if len(codec.Examples) > 0 {
+				examples = make([]*ttnpb.MessagePayloadFormatter_Example, 0, len(codec.Examples))
+				for _, e := range codec.Examples {
+					b, err := json.Marshal(e.Output)
+					if err != nil {
+						return nil, err
+					}
+					pb := &ttnpb.MessagePayloadFormatter_Example{
+						Description: e.Description,
+						Input: &ttnpb.MessagePayloadFormatter_Example_Input{
+							FPort:      e.Input.FPort,
+							FRMPayload: e.Input.Bytes,
+						},
+						Output: &ttnpb.MessagePayloadFormatter_Example_Output{},
+					}
+					d := jsonpb.TTN().NewDecoder(bytes.NewBuffer(b))
+					if err := d.Decode(pb.Output); err != nil {
+						return nil, err
+					}
+					examples = append(examples, pb)
+				}
 			}
 			return &ttnpb.MessagePayloadFormatter{
 				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 				FormatterParameter: string(b),
+				Examples:           examples,
 			}, nil
 		}
 	}
@@ -287,17 +315,17 @@ func (s *remoteStore) getCodec(ids *ttnpb.EndDeviceVersionIdentifiers, chooseFil
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
 func (s *remoteStore) GetUplinkDecoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	return s.getCodec(ids, func(c EndDeviceCodec) string { return c.UplinkDecoder.FileName })
+	return s.getCodec(ids, func(c EndDeviceCodecs) EndDeviceCodec { return c.UplinkDecoder })
 }
 
 // GetDownlinkDecoder retrieves the codec for decoding downlink messages.
 func (s *remoteStore) GetDownlinkDecoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	return s.getCodec(ids, func(c EndDeviceCodec) string { return c.DownlinkDecoder.FileName })
+	return s.getCodec(ids, func(c EndDeviceCodecs) EndDeviceCodec { return c.DownlinkDecoder })
 }
 
 // GetDownlinkEncoder retrieves the codec for encoding downlink messages.
 func (s *remoteStore) GetDownlinkEncoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	return s.getCodec(ids, func(c EndDeviceCodec) string { return c.DownlinkEncoder.FileName })
+	return s.getCodec(ids, func(c EndDeviceCodecs) EndDeviceCodec { return c.DownlinkEncoder })
 }
 
 // Close closes the store.

@@ -17,8 +17,9 @@ syntax = "proto3";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "google/protobuf/wrappers.proto";
 import "google/protobuf/field_mask.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
 import "lorawan-stack/api/end_device.proto";
 import "lorawan-stack/api/messages.proto";
 import "lorawan-stack/api/identifiers.proto";
@@ -308,6 +309,22 @@ message MessagePayloadFormatter {
   PayloadFormatter formatter = 1 [(validate.rules).enum.defined_only = true];
   // Parameter for the formatter, must be set together.
   string formatter_parameter = 2;
+
+  message Example {
+    string description = 1;
+    message Input {
+      uint32 f_port = 1 [(validate.rules).uint32.lte = 255];
+      bytes frm_payload = 2 [(gogoproto.customname) = "FRMPayload"];
+    };
+    Input input = 2;
+    message Output {
+      google.protobuf.Struct data = 1;
+    };
+    Output output = 3;
+  }
+  // Examples
+  repeated Example examples = 3;
+
 }
 
 service DeviceRepository {

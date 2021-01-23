@@ -444,15 +444,25 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 	}, nil
 }
 
-// EndDeviceCodec is the format of the `vendor/<vendor>/<codec-id>.yaml` files.
+type EndDeviceCodecExample struct {
+	Description string `yaml:"description"`
+	Input       struct {
+		FPort uint32 `yaml:"fPort"`
+		Bytes []byte `yaml:"bytes"`
+	} `yaml:"input"`
+	Output struct {
+		Data map[string]interface{} `yaml:"data" json:"data"`
+	} `yaml:"output"`
+}
+
+// EndDeviceCodecs is the format of the `vendor/<vendor>/<codec-id>.yaml` files.
+type EndDeviceCodecs struct {
+	UplinkDecoder   EndDeviceCodec `yaml:"uplinkDecoder"`
+	DownlinkEncoder EndDeviceCodec `yaml:"downlinkEncoder"`
+	DownlinkDecoder EndDeviceCodec `yaml:"downlinkDecoder"`
+}
+
 type EndDeviceCodec struct {
-	UplinkDecoder struct {
-		FileName string `yaml:"fileName"`
-	} `yaml:"uplinkDecoder"`
-	DownlinkEncoder struct {
-		FileName string `yaml:"fileName"`
-	} `yaml:"downlinkEncoder"`
-	DownlinkDecoder struct {
-		FileName string `yaml:"fileName"`
-	} `yaml:"downlinkDecoder"`
+	FileName string                  `yaml:"fileName"`
+	Examples []EndDeviceCodecExample `yaml:"examples"`
 }

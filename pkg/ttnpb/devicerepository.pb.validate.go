@@ -1435,6 +1435,23 @@ func (m *MessagePayloadFormatter) ValidateFields(paths ...string) error {
 
 		case "formatter_parameter":
 			// no validation rules for FormatterParameter
+		case "examples":
+
+			for idx, item := range m.GetExamples() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return MessagePayloadFormatterValidationError{
+							field:  fmt.Sprintf("examples[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
 		default:
 			return MessagePayloadFormatterValidationError{
 				field:  name,
@@ -2683,3 +2700,298 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = EndDeviceModel_Compliances_ComplianceValidationError{}
+
+// ValidateFields checks the field values on MessagePayloadFormatter_Example
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *MessagePayloadFormatter_Example) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MessagePayloadFormatter_ExampleFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "description":
+			// no validation rules for Description
+		case "input":
+
+			if v, ok := interface{}(m.GetInput()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MessagePayloadFormatter_ExampleValidationError{
+						field:  "input",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "output":
+
+			if v, ok := interface{}(m.GetOutput()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MessagePayloadFormatter_ExampleValidationError{
+						field:  "output",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return MessagePayloadFormatter_ExampleValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MessagePayloadFormatter_ExampleValidationError is the validation error
+// returned by MessagePayloadFormatter_Example.ValidateFields if the
+// designated constraints aren't met.
+type MessagePayloadFormatter_ExampleValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MessagePayloadFormatter_ExampleValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MessagePayloadFormatter_ExampleValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MessagePayloadFormatter_ExampleValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MessagePayloadFormatter_ExampleValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MessagePayloadFormatter_ExampleValidationError) ErrorName() string {
+	return "MessagePayloadFormatter_ExampleValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MessagePayloadFormatter_ExampleValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMessagePayloadFormatter_Example.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MessagePayloadFormatter_ExampleValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MessagePayloadFormatter_ExampleValidationError{}
+
+// ValidateFields checks the field values on
+// MessagePayloadFormatter_Example_Input with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *MessagePayloadFormatter_Example_Input) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MessagePayloadFormatter_Example_InputFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "f_port":
+
+			if m.GetFPort() > 255 {
+				return MessagePayloadFormatter_Example_InputValidationError{
+					field:  "f_port",
+					reason: "value must be less than or equal to 255",
+				}
+			}
+
+		case "frm_payload":
+			// no validation rules for FRMPayload
+		default:
+			return MessagePayloadFormatter_Example_InputValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MessagePayloadFormatter_Example_InputValidationError is the validation error
+// returned by MessagePayloadFormatter_Example_Input.ValidateFields if the
+// designated constraints aren't met.
+type MessagePayloadFormatter_Example_InputValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MessagePayloadFormatter_Example_InputValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MessagePayloadFormatter_Example_InputValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MessagePayloadFormatter_Example_InputValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MessagePayloadFormatter_Example_InputValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MessagePayloadFormatter_Example_InputValidationError) ErrorName() string {
+	return "MessagePayloadFormatter_Example_InputValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MessagePayloadFormatter_Example_InputValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMessagePayloadFormatter_Example_Input.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MessagePayloadFormatter_Example_InputValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MessagePayloadFormatter_Example_InputValidationError{}
+
+// ValidateFields checks the field values on
+// MessagePayloadFormatter_Example_Output with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *MessagePayloadFormatter_Example_Output) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MessagePayloadFormatter_Example_OutputFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "data":
+
+			if v, ok := interface{}(m.GetData()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MessagePayloadFormatter_Example_OutputValidationError{
+						field:  "data",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return MessagePayloadFormatter_Example_OutputValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MessagePayloadFormatter_Example_OutputValidationError is the validation
+// error returned by MessagePayloadFormatter_Example_Output.ValidateFields if
+// the designated constraints aren't met.
+type MessagePayloadFormatter_Example_OutputValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MessagePayloadFormatter_Example_OutputValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MessagePayloadFormatter_Example_OutputValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MessagePayloadFormatter_Example_OutputValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MessagePayloadFormatter_Example_OutputValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MessagePayloadFormatter_Example_OutputValidationError) ErrorName() string {
+	return "MessagePayloadFormatter_Example_OutputValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MessagePayloadFormatter_Example_OutputValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMessagePayloadFormatter_Example_Output.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MessagePayloadFormatter_Example_OutputValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MessagePayloadFormatter_Example_OutputValidationError{}

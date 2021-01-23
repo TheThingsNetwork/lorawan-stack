@@ -849,6 +849,15 @@ func (dst *MessagePayloadFormatter) SetFields(src *MessagePayloadFormatter, path
 				var zero string
 				dst.FormatterParameter = zero
 			}
+		case "examples":
+			if len(subs) > 0 {
+				return fmt.Errorf("'examples' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Examples = src.Examples
+			} else {
+				dst.Examples = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -1326,6 +1335,127 @@ func (dst *EndDeviceModel_Compliances_Compliance) SetFields(src *EndDeviceModel_
 			} else {
 				var zero string
 				dst.Version = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MessagePayloadFormatter_Example) SetFields(src *MessagePayloadFormatter_Example, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "description":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Description = src.Description
+			} else {
+				var zero string
+				dst.Description = zero
+			}
+		case "input":
+			if len(subs) > 0 {
+				var newDst, newSrc *MessagePayloadFormatter_Example_Input
+				if (src == nil || src.Input == nil) && dst.Input == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Input
+				}
+				if dst.Input != nil {
+					newDst = dst.Input
+				} else {
+					newDst = &MessagePayloadFormatter_Example_Input{}
+					dst.Input = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Input = src.Input
+				} else {
+					dst.Input = nil
+				}
+			}
+		case "output":
+			if len(subs) > 0 {
+				var newDst, newSrc *MessagePayloadFormatter_Example_Output
+				if (src == nil || src.Output == nil) && dst.Output == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Output
+				}
+				if dst.Output != nil {
+					newDst = dst.Output
+				} else {
+					newDst = &MessagePayloadFormatter_Example_Output{}
+					dst.Output = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Output = src.Output
+				} else {
+					dst.Output = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MessagePayloadFormatter_Example_Input) SetFields(src *MessagePayloadFormatter_Example_Input, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "f_port":
+			if len(subs) > 0 {
+				return fmt.Errorf("'f_port' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FPort = src.FPort
+			} else {
+				var zero uint32
+				dst.FPort = zero
+			}
+		case "frm_payload":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frm_payload' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FRMPayload = src.FRMPayload
+			} else {
+				dst.FRMPayload = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MessagePayloadFormatter_Example_Output) SetFields(src *MessagePayloadFormatter_Example_Output, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "data":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Data = src.Data
+			} else {
+				dst.Data = nil
 			}
 
 		default:

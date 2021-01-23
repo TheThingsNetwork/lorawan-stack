@@ -168,6 +168,9 @@
   - [Message `ListEndDeviceModelsRequest`](#ttn.lorawan.v3.ListEndDeviceModelsRequest)
   - [Message `ListEndDeviceModelsResponse`](#ttn.lorawan.v3.ListEndDeviceModelsResponse)
   - [Message `MessagePayloadFormatter`](#ttn.lorawan.v3.MessagePayloadFormatter)
+  - [Message `MessagePayloadFormatter.Example`](#ttn.lorawan.v3.MessagePayloadFormatter.Example)
+  - [Message `MessagePayloadFormatter.Example.Input`](#ttn.lorawan.v3.MessagePayloadFormatter.Example.Input)
+  - [Message `MessagePayloadFormatter.Example.Output`](#ttn.lorawan.v3.MessagePayloadFormatter.Example.Output)
   - [Enum `KeyProvisioning`](#ttn.lorawan.v3.KeyProvisioning)
   - [Enum `KeySecurity`](#ttn.lorawan.v3.KeySecurity)
   - [Service `DeviceRepository`](#ttn.lorawan.v3.DeviceRepository)
@@ -2642,12 +2645,40 @@ and allows clients to claim end devices.
 | ----- | ---- | ----- | ----------- |
 | `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  | Payload formatter type. |
 | `formatter_parameter` | [`string`](#string) |  | Parameter for the formatter, must be set together. |
+| `examples` | [`MessagePayloadFormatter.Example`](#ttn.lorawan.v3.MessagePayloadFormatter.Example) | repeated | Examples |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `formatter` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.MessagePayloadFormatter.Example">Message `MessagePayloadFormatter.Example`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `description` | [`string`](#string) |  |  |
+| `input` | [`MessagePayloadFormatter.Example.Input`](#ttn.lorawan.v3.MessagePayloadFormatter.Example.Input) |  |  |
+| `output` | [`MessagePayloadFormatter.Example.Output`](#ttn.lorawan.v3.MessagePayloadFormatter.Example.Output) |  |  |
+
+### <a name="ttn.lorawan.v3.MessagePayloadFormatter.Example.Input">Message `MessagePayloadFormatter.Example.Input`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `f_port` | [`uint32`](#uint32) |  |  |
+| `frm_payload` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `f_port` | <p>`uint32.lte`: `255`</p> |
+
+### <a name="ttn.lorawan.v3.MessagePayloadFormatter.Example.Output">Message `MessagePayloadFormatter.Example.Output`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
 
 ### <a name="ttn.lorawan.v3.KeyProvisioning">Enum `KeyProvisioning`</a>
 
