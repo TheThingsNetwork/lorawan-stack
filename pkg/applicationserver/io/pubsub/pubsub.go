@@ -41,16 +41,20 @@ type PubSub struct {
 	registry Registry
 
 	integrations sync.Map
+
+	providerStatuses ProviderStatuses
 }
 
 // New creates a new pusub frontend.
-func New(c *component.Component, server io.Server, registry Registry) (*PubSub, error) {
+func New(c *component.Component, server io.Server, registry Registry, providerStatuses ProviderStatuses) (*PubSub, error) {
 	ctx := log.NewContextWithField(c.Context(), "namespace", "applicationserver/io/pubsub")
 	ps := &PubSub{
 		Component: c,
 		ctx:       ctx,
 		server:    server,
 		registry:  registry,
+
+		providerStatuses: providerStatuses,
 	}
 	ps.RegisterTask(&component.TaskConfig{
 		Context: ctx,
@@ -85,6 +89,11 @@ func (ps *PubSub) startTask(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 				return err
 			} else if err != nil {
 				log.FromContext(ctx).WithError(err).Warn("Pub/Sub not found")
+				return nil
+			}
+
+			if err := ps.providerStatuses.Enabled(ctx, target.Provider); err != nil {
+				log.FromContext(ctx).WithError(err).Debug("Pub/Sub not enabled")
 				return nil
 			}
 
@@ -258,7 +267,10 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	if err != nil {
 		return err
 	}
-	i.conn, err = provider.OpenConnection(ctx, pb)
+	if err := ps.providerStatuses.Enabled(ctx, pb.GetProvider()); err != nil {
+		return err
+	}
+	i.conn, err = provider.OpenConnection(ctx, pb, ps.providerStatuses)
 	if err != nil {
 		return err
 	}

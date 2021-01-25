@@ -97,6 +97,8 @@ type DistributionConfig struct {
 // PubSubConfig contains go-cloud pub/sub configuration of the Application Server.
 type PubSubConfig struct {
 	Registry pubsub.Registry `name:"-"`
+
+	Providers map[string]string `name:"providers" description:"Controls the status of each provider (enabled, disabled, warning)"`
 }
 
 // ApplicationPackagesConfig contains application packages associations configuration.
@@ -147,7 +149,11 @@ func (c PubSubConfig) NewPubSub(comp *component.Component, server io.Server) (*p
 	if c.Registry == nil {
 		return nil, nil
 	}
-	return pubsub.New(comp, server, c.Registry)
+	statuses, err := pubsub.ProviderStatusesFromMap(c.Providers)
+	if err != nil {
+		return nil, err
+	}
+	return pubsub.New(comp, server, c.Registry, statuses)
 }
 
 // NewApplicationPackages returns a new applications packages frontend based on the configuration.

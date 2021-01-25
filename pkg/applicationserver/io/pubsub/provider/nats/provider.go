@@ -39,11 +39,15 @@ func (c *connection) Shutdown(_ context.Context) error {
 }
 
 // OpenConnection implements provider.Provider using the natspubsub package.
-func (impl) OpenConnection(ctx context.Context, target provider.Target) (pc *provider.Connection, err error) {
+func (impl) OpenConnection(ctx context.Context, target provider.Target, enabler provider.Enabler) (pc *provider.Connection, err error) {
 	settings, ok := target.GetProvider().(*ttnpb.ApplicationPubSub_NATS)
 	if !ok {
 		panic("wrong provider type provided to OpenConnection")
 	}
+	if err := enabler.Enabled(ctx, target.GetProvider()); err != nil {
+		return nil, err
+	}
+
 	var conn *nats.Conn
 	if conn, err = nats.Connect(settings.NATS.ServerURL); err != nil {
 		return nil, err

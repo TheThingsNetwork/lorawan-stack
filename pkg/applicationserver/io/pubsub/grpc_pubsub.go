@@ -51,7 +51,14 @@ func (ps *PubSub) Get(ctx context.Context, req *ttnpb.GetApplicationPubSubReques
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	return ps.registry.Get(ctx, req.ApplicationPubSubIdentifiers, appendImplicitPubSubGetPaths(req.FieldMask.Paths...))
+	pubsub, err := ps.registry.Get(ctx, req.ApplicationPubSubIdentifiers, appendImplicitPubSubGetPaths(req.FieldMask.Paths...))
+	if err != nil {
+		return nil, err
+	}
+	if err := ps.providerStatuses.Enabled(ctx, pubsub.Provider); err != nil {
+		return nil, err
+	}
+	return pubsub, nil
 }
 
 // List implements ttnpb.ApplicationPubSubRegistryServer.
@@ -62,6 +69,9 @@ func (ps *PubSub) List(ctx context.Context, req *ttnpb.ListApplicationPubSubsReq
 	pubsubs, err := ps.registry.List(ctx, req.ApplicationIdentifiers, appendImplicitPubSubGetPaths(req.FieldMask.Paths...))
 	if err != nil {
 		return nil, err
+	}
+	for _, pubsub := range pubsubs {
+		_ = ps.providerStatuses.Enabled(ctx, pubsub.Provider)
 	}
 	return &ttnpb.ApplicationPubSubs{
 		Pubsubs: pubsubs,
@@ -75,6 +85,9 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 	); err != nil {
+		return nil, err
+	}
+	if err := ps.providerStatuses.Enabled(ctx, req.Provider); err != nil {
 		return nil, err
 	}
 	// Get all the fields here for starting the integration task.

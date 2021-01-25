@@ -46,10 +46,14 @@ type Target interface {
 	GetProvider() ttnpb.ApplicationPubSub_Provider
 }
 
+// Enabler enables providers.
+type Enabler interface {
+	Enabled(ctx context.Context, provider ttnpb.ApplicationPubSub_Provider) error
+}
+
 // Provider represents a pub/sub service provider.
 type Provider interface {
-	// OpenConnection opens the Connection of a given Target.
-	OpenConnection(ctx context.Context, target Target) (*Connection, error)
+	OpenConnection(ctx context.Context, target Target, enabler Enabler) (*Connection, error)
 }
 
 var (

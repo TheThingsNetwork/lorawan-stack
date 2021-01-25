@@ -2042,6 +2042,42 @@
       "file": "observability.go"
     }
   },
+  "error:pkg/applicationserver/io/pubsub:invalid_provider_status": {
+    "translations": {
+      "en": "invalid provider status `{status}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub",
+      "file": "providers.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub:invalid_provider_type": {
+    "translations": {
+      "en": "invalid provider type `{type}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub",
+      "file": "providers.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub:provider_disabled": {
+    "translations": {
+      "en": "provider `{provider}` is disabled"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub",
+      "file": "providers.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub:unknown_provider": {
+    "translations": {
+      "en": "provider `{provider}` is unknown"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub",
+      "file": "providers.go"
+    }
+  },
   "error:pkg/applicationserver/io/web/redis:invalid_fieldmask": {
     "translations": {
       "en": "invalid fieldmask"

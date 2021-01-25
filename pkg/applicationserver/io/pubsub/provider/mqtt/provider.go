@@ -49,10 +49,13 @@ func (c *connection) Shutdown(_ context.Context) error {
 var errConnectFailed = errors.Define("connect_failed", "connection to MQTT server failed")
 
 // OpenConnection implements provider.Provider using the MQTT driver.
-func (impl) OpenConnection(ctx context.Context, target provider.Target) (pc *provider.Connection, err error) {
+func (impl) OpenConnection(ctx context.Context, target provider.Target, enabler provider.Enabler) (pc *provider.Connection, err error) {
 	provider, ok := target.GetProvider().(*ttnpb.ApplicationPubSub_MQTT)
 	if !ok {
 		panic("wrong provider type provided to OpenConnection")
+	}
+	if err := enabler.Enabled(ctx, target.GetProvider()); err != nil {
+		return nil, err
 	}
 
 	var tlsConfig *tls.Config

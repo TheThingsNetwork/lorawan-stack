@@ -42,6 +42,7 @@ type Impl struct {
 type Connection struct {
 	impl *Impl
 	provider.Target
+	provider.Enabler
 
 	Push    *pubsub.Topic
 	Replace *pubsub.Topic
@@ -98,10 +99,11 @@ func (c *Connection) Shutdown(ctx context.Context) (err error) {
 }
 
 // OpenConnection implements provider.Provider using the mempubsub package.
-func (i *Impl) OpenConnection(ctx context.Context, target provider.Target) (pc *provider.Connection, err error) {
+func (i *Impl) OpenConnection(ctx context.Context, target provider.Target, enabler provider.Enabler) (pc *provider.Connection, err error) {
 	conn := &Connection{
-		impl:   i,
-		Target: target,
+		impl:    i,
+		Target:  target,
+		Enabler: enabler,
 	}
 	pc = &provider.Connection{
 		ProviderConnection: conn,
