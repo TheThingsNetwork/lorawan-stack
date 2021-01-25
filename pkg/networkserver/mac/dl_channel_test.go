@@ -179,6 +179,43 @@ func TestDLChannelReq(t *testing.T) {
 			},
 			RejectedFrequencies: []uint64{130},
 		},
+
+		// https://github.com/TheThingsIndustries/lorawan-stack/issues/2525
+		{
+			CurrentChannels: []*ttnpb.MACParameters_Channel{
+				{
+					UplinkFrequency:   124,
+					DownlinkFrequency: 124,
+				},
+				nil,
+				{
+					UplinkFrequency:   123,
+					DownlinkFrequency: 123,
+				},
+			},
+			DesiredChannels: []*ttnpb.MACParameters_Channel{
+				nil,
+				{
+					UplinkFrequency:   123,
+					DownlinkFrequency: 128,
+				},
+				{
+					UplinkFrequency:   123,
+					DownlinkFrequency: 123,
+				},
+				{
+					UplinkFrequency:   130,
+					DownlinkFrequency: 131,
+				},
+			},
+			Commands: []*ttnpb.MACCommand_DLChannelReq{
+				{
+					ChannelIndex: 1,
+					Frequency:    128,
+				},
+			},
+			RejectedFrequencies: []uint64{130},
+		},
 	} {
 		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
@@ -228,12 +265,17 @@ func TestDLChannelReq(t *testing.T) {
 							needs[int(cmd.ChannelIndex)] = struct{}{}
 						}
 						for i := 0; i <= max+1; i++ {
-							a.So(DeviceNeedsDLChannelReqAtIndex(dev, i), func() func(interface{}, ...interface{}) string {
-								if _, ok := needs[i]; ok {
-									return should.BeTrue
-								}
-								return should.BeFalse
-							}())
+							i := i
+							assert := should.BeFalse
+							if _, ok := needs[i]; ok {
+								assert = should.BeTrue
+							}
+							test.RunSubtestFromContext(ctx, test.SubtestConfig{
+								Name: fmt.Sprintf("idx:%d", i),
+								Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+									a.So(DeviceNeedsDLChannelReqAtIndex(dev, i), assert)
+								},
+							})
 						}
 					},
 				})

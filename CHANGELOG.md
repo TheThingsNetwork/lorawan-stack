@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Handling of `DLChannelReq` if dependent `NewChannelReq` was previously rejected.
+
 ### Security
 
 ## [3.10.7] - 2021-01-14
