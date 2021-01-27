@@ -82,6 +82,14 @@ func (o SessionOptionNamespace) WithSessionKeysOptions(opts ...SessionKeysOption
 	}
 }
 
+func (o SessionOptionNamespace) WithDefaultNwkKeys(macVersion ttnpb.MACVersion) SessionOption {
+	return o.WithSessionKeysOptions(SessionKeysOptions.WithDefaultNwkKeys(macVersion))
+}
+
+func (o SessionOptionNamespace) WithDefaultAppSKey() SessionOption {
+	return o.WithSessionKeysOptions(SessionKeysOptions.WithDefaultAppSKey())
+}
+
 func (o EndDeviceIdentifiersOptionNamespace) WithDefaultJoinEUI() EndDeviceIdentifiersOption {
 	return o.WithJoinEUI(&DefaultJoinEUI)
 }
