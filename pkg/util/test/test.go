@@ -21,7 +21,53 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
+)
+
+const (
+	DefaultApplicationID = "test-app-id"
+	DefaultDeviceID      = "test-dev-id"
+
+	DefaultRootKeyID = "test-root-key-id"
+)
+
+var (
+	ErrInternal = errors.DefineInternal("test_internal", "test error")
+	ErrNotFound = errors.DefineNotFound("test_not_found", "test error")
+
+	DefaultApplicationIdentifiers = ttnpb.ApplicationIdentifiers{
+		ApplicationID: DefaultApplicationID,
+	}
+
+	DefaultJoinEUI = types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	DefaultDevEUI  = types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+
+	DefaultAppKey = types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	DefaultNwkKey = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+
+	DefaultJoinNonce = types.JoinNonce{0x42, 0xff, 0xff}
+	DefaultDevNonce  = types.DevNonce{0x42, 0xff}
+
+	DefaultSessionKeyID = []byte("test-session-key-id")
+
+	DefaultAppSKey     = crypto.DeriveAppSKey(DefaultNwkKey, DefaultJoinNonce, DefaultJoinEUI, DefaultDevNonce)
+	DefaultFNwkSIntKey = crypto.DeriveFNwkSIntKey(DefaultNwkKey, DefaultJoinNonce, DefaultJoinEUI, DefaultDevNonce)
+	DefaultNwkSEncKey  = crypto.DeriveNwkSEncKey(DefaultNwkKey, DefaultJoinNonce, DefaultJoinEUI, DefaultDevNonce)
+	DefaultSNwkSIntKey = crypto.DeriveSNwkSIntKey(DefaultNwkKey, DefaultJoinNonce, DefaultJoinEUI, DefaultDevNonce)
+
+	DefaultNetID   = Must(types.NewNetID(2, []byte{0x00, 0x42, 0xff})).(types.NetID)
+	DefaultDevAddr = Must(types.NewDevAddr(DefaultNetID, []byte{0x00, 0x02, 0xff, 0xff})).(types.DevAddr)
+
+	DefaultLegacyAppSKey = crypto.DeriveLegacyAppSKey(DefaultNwkKey, DefaultJoinNonce, DefaultNetID, DefaultDevNonce)
+	DefaultLegacyNwkSKey = crypto.DeriveLegacyNwkSKey(DefaultNwkKey, DefaultJoinNonce, DefaultNetID, DefaultDevNonce)
+
+	DefaultMACVersion      = ttnpb.MAC_V1_1
+	DefaultPHYVersion      = ttnpb.PHY_V1_1_REV_B
+	DefaultFrequencyPlanID = EUFrequencyPlanID
 )
 
 func NewWithContext(ctx context.Context, tb testing.TB) (*assertions.Assertion, context.Context) {
