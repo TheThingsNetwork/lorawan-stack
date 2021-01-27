@@ -23,9 +23,7 @@ import (
 	"log"
 	"os"
 	"reflect"
-	"strings"
 	"text/template"
-	"unicode"
 
 	_ "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -57,18 +55,6 @@ func main() {
 		ParameterType string
 	}
 	if err := template.Must(template.New("struct").Funcs(template.FuncMap{
-		"unexport": func(s string) string {
-			var i int
-			for i = range s {
-				if unicode.IsLower(rune(s[i])) {
-					break
-				}
-			}
-			if i <= 1 {
-				return strings.ToLower(s[:i]) + s[i:]
-			}
-			return strings.ToLower(s[:i-1]) + s[i-1:]
-		},
 		"typeOf":     reflect.TypeOf,
 		"typeString": typeString,
 		"fields": func(typ reflect.Type) (fs []MethodContext) {
@@ -116,7 +102,7 @@ import (
 {{ with $type := typeOf . -}}
 {{ with $typeString := typeString $type -}}
 {{ with $optionType := printf "%sOption" $type.Name -}}
-{{ with $optionsType := printf "%sOptions" $type.Name | unexport -}}
+{{ with $optionsType := printf "%sOptionNamespace" $type.Name -}}
 type (
 	// {{ $optionType }} transforms {{ $typeString }} and returns it.
 	// Implemetations must be pure functions with no side-effects.

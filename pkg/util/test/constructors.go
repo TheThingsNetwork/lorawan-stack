@@ -49,7 +49,7 @@ var (
 	}
 )
 
-func (o sessionKeysOptions) WithDefaultNwkKeys(macVersion ttnpb.MACVersion) SessionKeysOption {
+func (o SessionKeysOptionNamespace) WithDefaultNwkKeys(macVersion ttnpb.MACVersion) SessionKeysOption {
 	nwkSEncKey := DefaultNwkSEncKey
 	sNwkSIntKey := DefaultSNwkSIntKey
 	if macVersion.Compare(ttnpb.MAC_V1_1) < 0 {
@@ -69,46 +69,58 @@ func (o sessionKeysOptions) WithDefaultNwkKeys(macVersion ttnpb.MACVersion) Sess
 	)
 }
 
-func (o sessionKeysOptions) WithDefaultAppSKey() SessionKeysOption {
+func (o SessionKeysOptionNamespace) WithDefaultAppSKey() SessionKeysOption {
 	return o.WithAppSKey(&ttnpb.KeyEnvelope{
 		Key: &DefaultAppSKey,
 	})
 }
 
-func (o sessionOptions) WithSessionKeysOptions(opts ...SessionKeysOption) SessionOption {
+func (o SessionOptionNamespace) WithSessionKeysOptions(opts ...SessionKeysOption) SessionOption {
 	return func(x ttnpb.Session) ttnpb.Session {
 		x.SessionKeys = SessionKeysOptions.Compose(opts...)(x.SessionKeys)
 		return x
 	}
 }
 
-func (o endDeviceIdentifiersOptions) WithDefaultJoinEUI() EndDeviceIdentifiersOption {
+func (o EndDeviceIdentifiersOptionNamespace) WithDefaultJoinEUI() EndDeviceIdentifiersOption {
 	return o.WithJoinEUI(&DefaultJoinEUI)
 }
 
-func (o endDeviceIdentifiersOptions) WithDefaultDevEUI() EndDeviceIdentifiersOption {
+func (o EndDeviceIdentifiersOptionNamespace) WithDefaultDevEUI() EndDeviceIdentifiersOption {
 	return o.WithDevEUI(&DefaultDevEUI)
 }
 
-func (o endDeviceOptions) WithEndDeviceIdentifiersOptions(opts ...EndDeviceIdentifiersOption) EndDeviceOption {
+func (o EndDeviceOptionNamespace) WithEndDeviceIdentifiersOptions(opts ...EndDeviceIdentifiersOption) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.EndDeviceIdentifiers = EndDeviceIdentifiersOptions.Compose(opts...)(x.EndDeviceIdentifiers)
 		return x
 	}
 }
 
-func (o endDeviceOptions) WithJoinEUI(v *types.EUI64) EndDeviceOption {
+func (o EndDeviceOptionNamespace) WithJoinEUI(v *types.EUI64) EndDeviceOption {
 	return o.WithEndDeviceIdentifiersOptions(EndDeviceIdentifiersOptions.WithJoinEUI(v))
 }
 
-func (o endDeviceOptions) WithDefaultJoinEUI() EndDeviceOption {
+func (o EndDeviceOptionNamespace) WithDefaultJoinEUI() EndDeviceOption {
 	return o.WithEndDeviceIdentifiersOptions(EndDeviceIdentifiersOptions.WithDefaultJoinEUI())
 }
 
-func (o endDeviceOptions) WithDevEUI(v *types.EUI64) EndDeviceOption {
+func (o EndDeviceOptionNamespace) WithDevEUI(v *types.EUI64) EndDeviceOption {
 	return o.WithEndDeviceIdentifiersOptions(EndDeviceIdentifiersOptions.WithDevEUI(v))
 }
 
-func (o endDeviceOptions) WithDefaultDevEUI() EndDeviceOption {
+func (o EndDeviceOptionNamespace) WithDefaultDevEUI() EndDeviceOption {
 	return o.WithEndDeviceIdentifiersOptions(EndDeviceIdentifiersOptions.WithDefaultDevEUI())
+}
+
+func (o EndDeviceOptionNamespace) WithDefaultFrequencyPlanID() EndDeviceOption {
+	return o.WithFrequencyPlanID(DefaultFrequencyPlanID)
+}
+
+func (o EndDeviceOptionNamespace) WithDefaultLoRaWANVersion() EndDeviceOption {
+	return o.WithLoRaWANVersion(DefaultMACVersion)
+}
+
+func (o EndDeviceOptionNamespace) WithDefaultLoRaWANPHYVersion() EndDeviceOption {
+	return o.WithLoRaWANPHYVersion(DefaultPHYVersion)
 }
