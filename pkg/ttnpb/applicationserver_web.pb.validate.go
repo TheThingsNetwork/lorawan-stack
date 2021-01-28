@@ -906,10 +906,10 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 			// no validation rules for TemplateFields
 		case "downlink_api_key":
 
-			if utf8.RuneCountInString(m.GetDownlinkAPIKey()) > 64 {
+			if utf8.RuneCountInString(m.GetDownlinkAPIKey()) > 128 {
 				return ApplicationWebhookValidationError{
 					field:  "downlink_api_key",
-					reason: "value length must be at most 64 runes",
+					reason: "value length must be at most 128 runes",
 				}
 			}
 

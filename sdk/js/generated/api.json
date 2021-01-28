@@ -4131,7 +4131,7 @@
                 "validate.rules": [
                   {
                     "name": "string.max_len",
-                    "value": 64
+                    "value": 128
                   }
                 ]
               }
