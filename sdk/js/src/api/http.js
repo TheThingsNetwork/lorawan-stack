@@ -40,10 +40,10 @@ class Http {
         throw new Error('No valid key provided for key authorization')
       }
       authToken = new Token(authorization.key).get()
-    } else if (authorization.mode === AUTHORIZATION_MODES.SESSION) {
-      if (typeof authorization.csrfToken !== 'string') {
-        throw new Error('No valid CSRF token provided for session authorization')
-      }
+    } else if (
+      authorization.mode === AUTHORIZATION_MODES.SESSION &&
+      typeof authorization.csrfToken === 'string'
+    ) {
       csrfToken = authorization.csrfToken
     }
 
