@@ -1456,7 +1456,7 @@ The NATS provider settings.
 | `ids` | <p>`message.required`: `true`</p> |
 | `base_url` | <p>`string.uri`: `true`</p> |
 | `format` | <p>`string.max_len`: `20`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
-| `downlink_api_key` | <p>`string.max_len`: `64`</p> |
+| `downlink_api_key` | <p>`string.max_len`: `128`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhook.HeadersEntry">Message `ApplicationWebhook.HeadersEntry`</a>
 
