@@ -144,7 +144,7 @@ brews:
   - name: ttn-lw-stack
     ids:
       - stack
-    github:
+    tap:
       owner: TheThingsNetwork
       name: homebrew-lorawan-stack
     commit_author:
@@ -172,7 +172,7 @@ brews:
   - name: ttn-lw-cli
     ids:
       - cli
-    github:
+    tap:
       owner: TheThingsNetwork
       name: homebrew-lorawan-stack
     commit_author:
@@ -210,7 +210,7 @@ dockers:
       - 'thethingsnetwork/lorawan-stack:{{ .Version }}'
       - 'ghcr.io/thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}'
       - 'ghcr.io/thethingsnetwork/lorawan-stack:{{ .Version }}'
-    skip_push: auto
+    skip_push: false
     extra_files:
       - data
       - public
