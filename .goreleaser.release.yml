@@ -144,7 +144,7 @@ brews:
   - name: ttn-lw-stack
     ids:
       - stack
-    github:
+    tap:
       owner: TheThingsNetwork
       name: homebrew-lorawan-stack
     commit_author:
@@ -172,7 +172,7 @@ brews:
   - name: ttn-lw-cli
     ids:
       - cli
-    github:
+    tap:
       owner: TheThingsNetwork
       name: homebrew-lorawan-stack
     commit_author:
