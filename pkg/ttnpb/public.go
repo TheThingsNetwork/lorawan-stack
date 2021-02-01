@@ -33,6 +33,7 @@ var PublicEntityFields = []string{
 	"ids",
 	"created_at",
 	"updated_at",
+	"deleted_at",
 	"contact_info", // Note that this is filtered.
 }
 
