@@ -116,11 +116,12 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewGatewayRegistryClient(is).List(ctx, &ttnpb.ListGatewaysRequest{
-				Collaborator: getCollaborator(cmd.Flags()),
-				FieldMask:    types.FieldMask{Paths: paths},
-				Limit:        limit,
-				Page:         page,
-				Order:        getOrder(cmd.Flags()),
+				Collaborator:   getCollaborator(cmd.Flags()),
+				FieldMask:      types.FieldMask{Paths: paths},
+				Limit:          limit,
+				Page:           page,
+				Order:          getOrder(cmd.Flags()),
+				IncludeDeleted: getIncludeDeleted(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -450,12 +451,14 @@ func init() {
 	gatewaysListFrequencyPlans.Flags().Uint32("base-frequency", 0, "Base frequency in MHz for hardware support (433, 470, 868 or 915)")
 	gatewaysCommand.AddCommand(gatewaysListFrequencyPlans)
 	gatewaysListCommand.Flags().AddFlagSet(collaboratorFlags())
+	gatewaysListCommand.Flags().AddFlagSet(includeDeletedFlags)
 	gatewaysListCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysListCommand.Flags().AddFlagSet(paginationFlags())
 	gatewaysListCommand.Flags().AddFlagSet(orderFlags())
 	gatewaysListCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysListCommand)
 	gatewaysSearchCommand.Flags().AddFlagSet(searchFlags())
+	gatewaysSearchCommand.Flags().AddFlagSet(includeDeletedFlags)
 	gatewaysSearchCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysSearchCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysSearchCommand)

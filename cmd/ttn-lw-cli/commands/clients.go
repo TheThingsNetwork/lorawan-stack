@@ -78,11 +78,12 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewClientRegistryClient(is).List(ctx, &ttnpb.ListClientsRequest{
-				Collaborator: getCollaborator(cmd.Flags()),
-				FieldMask:    types.FieldMask{Paths: paths},
-				Limit:        limit,
-				Page:         page,
-				Order:        getOrder(cmd.Flags()),
+				Collaborator:   getCollaborator(cmd.Flags()),
+				FieldMask:      types.FieldMask{Paths: paths},
+				Limit:          limit,
+				Page:           page,
+				Order:          getOrder(cmd.Flags()),
+				IncludeDeleted: getIncludeDeleted(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -263,12 +264,14 @@ var (
 
 func init() {
 	clientsListCommand.Flags().AddFlagSet(collaboratorFlags())
+	clientsListCommand.Flags().AddFlagSet(includeDeletedFlags)
 	clientsListCommand.Flags().AddFlagSet(selectClientFlags)
 	clientsListCommand.Flags().AddFlagSet(selectAllClientFlags)
 	clientsListCommand.Flags().AddFlagSet(paginationFlags())
 	clientsListCommand.Flags().AddFlagSet(orderFlags())
 	clientsCommand.AddCommand(clientsListCommand)
 	clientsSearchCommand.Flags().AddFlagSet(searchFlags())
+	clientsSearchCommand.Flags().AddFlagSet(includeDeletedFlags)
 	clientsSearchCommand.Flags().AddFlagSet(selectClientFlags)
 	clientsSearchCommand.Flags().AddFlagSet(selectAllClientFlags)
 	clientsCommand.AddCommand(clientsSearchCommand)

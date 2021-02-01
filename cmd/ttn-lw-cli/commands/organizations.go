@@ -78,11 +78,12 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOrganizationRegistryClient(is).List(ctx, &ttnpb.ListOrganizationsRequest{
-				Collaborator: getUserID(cmd.Flags(), nil).GetOrganizationOrUserIdentifiers(),
-				FieldMask:    types.FieldMask{Paths: paths},
-				Limit:        limit,
-				Page:         page,
-				Order:        getOrder(cmd.Flags()),
+				Collaborator:   getUserID(cmd.Flags(), nil).GetOrganizationOrUserIdentifiers(),
+				FieldMask:      types.FieldMask{Paths: paths},
+				Limit:          limit,
+				Page:           page,
+				Order:          getOrder(cmd.Flags()),
+				IncludeDeleted: getIncludeDeleted(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -285,12 +286,14 @@ var (
 
 func init() {
 	organizationsListCommand.Flags().AddFlagSet(collaboratorFlags())
+	organizationsListCommand.Flags().AddFlagSet(includeDeletedFlags)
 	organizationsListCommand.Flags().AddFlagSet(selectOrganizationFlags)
 	organizationsListCommand.Flags().AddFlagSet(selectAllOrganizationFlags)
 	organizationsListCommand.Flags().AddFlagSet(paginationFlags())
 	organizationsListCommand.Flags().AddFlagSet(orderFlags())
 	organizationsCommand.AddCommand(organizationsListCommand)
 	organizationsSearchCommand.Flags().AddFlagSet(searchFlags())
+	organizationsSearchCommand.Flags().AddFlagSet(includeDeletedFlags)
 	organizationsSearchCommand.Flags().AddFlagSet(selectOrganizationFlags)
 	organizationsSearchCommand.Flags().AddFlagSet(selectAllOrganizationFlags)
 	organizationsCommand.AddCommand(organizationsSearchCommand)

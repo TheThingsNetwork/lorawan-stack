@@ -79,11 +79,12 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewApplicationRegistryClient(is).List(ctx, &ttnpb.ListApplicationsRequest{
-				Collaborator: getCollaborator(cmd.Flags()),
-				FieldMask:    types.FieldMask{Paths: paths},
-				Limit:        limit,
-				Page:         page,
-				Order:        getOrder(cmd.Flags()),
+				Collaborator:   getCollaborator(cmd.Flags()),
+				FieldMask:      types.FieldMask{Paths: paths},
+				Limit:          limit,
+				Page:           page,
+				Order:          getOrder(cmd.Flags()),
+				IncludeDeleted: getIncludeDeleted(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -285,12 +286,14 @@ var (
 
 func init() {
 	applicationsListCommand.Flags().AddFlagSet(collaboratorFlags())
+	applicationsListCommand.Flags().AddFlagSet(includeDeletedFlags)
 	applicationsListCommand.Flags().AddFlagSet(selectApplicationFlags)
 	applicationsListCommand.Flags().AddFlagSet(paginationFlags())
 	applicationsListCommand.Flags().AddFlagSet(orderFlags())
 	applicationsListCommand.Flags().AddFlagSet(selectAllApplicationFlags)
 	applicationsCommand.AddCommand(applicationsListCommand)
 	applicationsSearchCommand.Flags().AddFlagSet(searchFlags())
+	applicationsSearchCommand.Flags().AddFlagSet(includeDeletedFlags)
 	applicationsSearchCommand.Flags().AddFlagSet(selectApplicationFlags)
 	applicationsSearchCommand.Flags().AddFlagSet(selectAllApplicationFlags)
 	applicationsCommand.AddCommand(applicationsSearchCommand)
