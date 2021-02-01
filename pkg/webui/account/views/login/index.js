@@ -44,6 +44,7 @@ const m = defineMessages({
   forgotPassword: 'Forgot password?',
   loginToContinue: 'Please login to continue',
   loginFailed: 'Login failed',
+  accountDeleted: 'Account deleted',
 })
 
 const appRoot = selectApplicationRootPath()
@@ -103,6 +104,8 @@ const Login = () => {
     info = location.state.info
   } else if (!next || (next !== appRoot && !Boolean(error))) {
     info = m.loginToContinue
+  } else if ('account-deleted' in Query.parse(location.search)) {
+    info = m.accountDeleted
   }
 
   return (
