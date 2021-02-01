@@ -167,7 +167,7 @@ func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdent
 
 func (s *gatewayStore) PurgeGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error {
 	defer trace.StartRegion(ctx, "purge gateway").End()
-	query := s.query(ctx, Gateway{}, withUnscoped(), withGatewayID(id.GetGatewayID()))
+	query := s.query(ctx, Gateway{}, withSoftDeleted(), withGatewayID(id.GetGatewayID()))
 	query = selectGatewayFields(ctx, query, nil)
 	var gtwModel Gateway
 	if err := query.First(&gtwModel).Error; err != nil {

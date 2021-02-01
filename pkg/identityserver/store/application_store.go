@@ -157,7 +157,7 @@ func (s *applicationStore) DeleteApplication(ctx context.Context, id *ttnpb.Appl
 
 func (s *applicationStore) PurgeApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error {
 	defer trace.StartRegion(ctx, "purge application").End()
-	query := s.query(ctx, Application{}, withUnscoped(), withApplicationID(id.GetApplicationID()))
+	query := s.query(ctx, Application{}, withSoftDeleted(), withApplicationID(id.GetApplicationID()))
 	query = selectApplicationFields(ctx, query, nil)
 	var appModel Application
 	if err := query.First(&appModel).Error; err != nil {

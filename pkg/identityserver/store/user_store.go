@@ -206,7 +206,7 @@ func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) (
 
 func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "purge user").End()
-	query := s.query(ctx, User{}, withUnscoped(), withUserID(id.GetUserID()))
+	query := s.query(ctx, User{}, withSoftDeleted(), withUserID(id.GetUserID()))
 	query = selectUserFields(ctx, query, nil)
 	var userModel userWithUID
 	if err = query.First(&userModel).Error; err != nil {
@@ -234,7 +234,7 @@ func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) (e
 		return err
 	}
 	// Purge account after purging user because it is necessary for user query
-	return s.query(ctx, Account{}, withUnscoped()).Where(Account{
+	return s.query(ctx, Account{}, withSoftDeleted()).Where(Account{
 		UID:         id.IDString(),
 		AccountType: id.EntityType(),
 	}).Delete(Account{}).Error

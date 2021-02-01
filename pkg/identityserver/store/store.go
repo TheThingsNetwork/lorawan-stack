@@ -67,7 +67,7 @@ func (s *store) findEntity(ctx context.Context, entityID ttnpb.Identifiers, fiel
 
 func (s *store) findDeletedEntity(ctx context.Context, entityID ttnpb.Identifiers, fields ...string) (modelInterface, error) {
 	model := modelForID(entityID)
-	query := s.query(ctx, model, withUnscoped(), withID(entityID))
+	query := s.query(ctx, model, withSoftDeleted(), withID(entityID))
 	if len(fields) == 1 && fields[0] == "id" {
 		fields[0] = s.DB.NewScope(model).TableName() + ".id"
 	}

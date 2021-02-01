@@ -283,7 +283,7 @@ func (s *membershipStore) DeleteEntityMembers(ctx context.Context, entityID ttnp
 func (s *membershipStore) DeleteAccountMembers(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete account memberships").End()
 	var account Account
-	err := s.query(ctx, Account{}, withUnscoped()).Where(Account{
+	err := s.query(ctx, Account{}, withSoftDeleted()).Where(Account{
 		UID:         id.IDString(),
 		AccountType: id.EntityType(),
 	}).Find(&account).Error

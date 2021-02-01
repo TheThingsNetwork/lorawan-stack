@@ -162,7 +162,7 @@ func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.Or
 func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "purge organization").End()
 
-	query := s.query(ctx, Organization{}, withUnscoped(), withOrganizationID(id.GetOrganizationID()))
+	query := s.query(ctx, Organization{}, withSoftDeleted(), withOrganizationID(id.GetOrganizationID()))
 	query = selectOrganizationFields(ctx, query, nil)
 	var orgModel organizationWithUID
 	if err = query.First(&orgModel).Error; err != nil {
@@ -185,7 +185,7 @@ func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.Org
 		return err
 	}
 	// Purge account after purging organization because it is necessary for organization query
-	return s.query(ctx, Account{}, withUnscoped()).Where(Account{
+	return s.query(ctx, Account{}, withSoftDeleted()).Where(Account{
 		UID:         id.IDString(),
 		AccountType: id.EntityType(),
 	}).Delete(Account{}).Error
