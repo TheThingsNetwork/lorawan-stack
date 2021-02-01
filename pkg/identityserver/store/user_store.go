@@ -43,13 +43,13 @@ func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fiel
 	}
 	var userColumns []string
 	var notFoundPaths []string
-	userColumns = append(userColumns, "accounts.uid")
+	userColumns = append(userColumns, "users.deleted_at", "accounts.uid")
 	for _, column := range modelColumns {
 		userColumns = append(userColumns, "users."+column)
 	}
 	for _, path := range ttnpb.TopLevelFields(fieldMask.Paths) {
 		switch path {
-		case "ids", "created_at", "updated_at":
+		case "ids", "created_at", "updated_at", "deleted_at":
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")

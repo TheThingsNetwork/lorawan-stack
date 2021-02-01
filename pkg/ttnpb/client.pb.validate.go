@@ -86,6 +86,18 @@ func (m *Client) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "deleted_at":
+
+			if v, ok := interface{}(m.GetDeletedAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ClientValidationError{
+						field:  "deleted_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "name":
 
 			if utf8.RuneCountInString(m.GetName()) > 50 {
@@ -579,6 +591,8 @@ func (m *ListClientsRequest) ValidateFields(paths ...string) error {
 
 		case "page":
 			// no validation rules for Page
+		case "include_deleted":
+			// no validation rules for IncludeDeleted
 		default:
 			return ListClientsRequestValidationError{
 				field:  name,

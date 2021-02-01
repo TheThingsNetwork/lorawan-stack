@@ -45,7 +45,7 @@ func selectApplicationFields(ctx context.Context, query *gorm.DB, fieldMask *typ
 	var notFoundPaths []string
 	for _, path := range ttnpb.TopLevelFields(fieldMask.Paths) {
 		switch path {
-		case "ids", "created_at", "updated_at":
+		case "ids", "created_at", "updated_at", "deleted_at":
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
@@ -60,7 +60,7 @@ func selectApplicationFields(ctx context.Context, query *gorm.DB, fieldMask *typ
 	if len(notFoundPaths) > 0 {
 		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
-	return query.Select(cleanFields(append(append(modelColumns, "application_id"), applicationColumns...)...))
+	return query.Select(cleanFields(append(append(modelColumns, "deleted_at", "application_id"), applicationColumns...)...))
 }
 
 func (s *applicationStore) CreateApplication(ctx context.Context, app *ttnpb.Application) (*ttnpb.Application, error) {

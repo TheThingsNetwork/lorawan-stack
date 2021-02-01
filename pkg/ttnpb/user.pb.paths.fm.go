@@ -7,6 +7,7 @@ var UserFieldPathsNested = []string{
 	"attributes",
 	"contact_info",
 	"created_at",
+	"deleted_at",
 	"description",
 	"ids",
 	"ids.email",
@@ -34,6 +35,7 @@ var UserFieldPathsTopLevel = []string{
 	"attributes",
 	"contact_info",
 	"created_at",
+	"deleted_at",
 	"description",
 	"ids",
 	"name",
@@ -69,6 +71,7 @@ var GetUserRequestFieldPathsTopLevel = []string{
 }
 var ListUsersRequestFieldPathsNested = []string{
 	"field_mask",
+	"include_deleted",
 	"limit",
 	"order",
 	"page",
@@ -76,6 +79,7 @@ var ListUsersRequestFieldPathsNested = []string{
 
 var ListUsersRequestFieldPathsTopLevel = []string{
 	"field_mask",
+	"include_deleted",
 	"limit",
 	"order",
 	"page",
@@ -87,6 +91,7 @@ var CreateUserRequestFieldPathsNested = []string{
 	"user.attributes",
 	"user.contact_info",
 	"user.created_at",
+	"user.deleted_at",
 	"user.description",
 	"user.ids",
 	"user.ids.email",
@@ -120,6 +125,7 @@ var UpdateUserRequestFieldPathsNested = []string{
 	"user.attributes",
 	"user.contact_info",
 	"user.created_at",
+	"user.deleted_at",
 	"user.description",
 	"user.ids",
 	"user.ids.email",

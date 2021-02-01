@@ -44,6 +44,7 @@ message Client {
   ClientIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp deleted_at = 16 [(gogoproto.stdtime) = true];
 
   string name = 4 [(validate.rules).string.max_len = 50];
   string description = 5 [(validate.rules).string.max_len = 2000];
@@ -98,6 +99,8 @@ message Client {
   // Users that previously authorized this client will have to re-authorize the
   // client after rights are added to this list.
   repeated Right rights = 14 [(validate.rules).repeated.items.enum.defined_only = true];
+
+  // next: 17
 }
 
 message Clients {
@@ -126,6 +129,8 @@ message ListClientsRequest {
   uint32 limit = 4 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 5;
+  // Include recently deleted clients.
+  bool include_deleted = 6;
 }
 
 message CreateClientRequest {

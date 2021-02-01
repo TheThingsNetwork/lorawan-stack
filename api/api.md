@@ -538,6 +538,7 @@ Application is the message that defines an Application in the network.
 | `ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `name` | [`string`](#string) |  |  |
 | `description` | [`string`](#string) |  |  |
 | `attributes` | [`Application.AttributesEntry`](#ttn.lorawan.v3.Application.AttributesEntry) | repeated | Key-value attributes for this application. Typically used for organizing applications or for storing integration-specific data. |
@@ -675,6 +676,7 @@ Application is the message that defines an Application in the network.
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `include_deleted` | [`bool`](#bool) |  | Include recently deleted applications. |
 
 #### Field Rules
 
@@ -1756,6 +1758,7 @@ An OAuth client on the network.
 | `ids` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `name` | [`string`](#string) |  |  |
 | `description` | [`string`](#string) |  |  |
 | `attributes` | [`Client.AttributesEntry`](#ttn.lorawan.v3.Client.AttributesEntry) | repeated | Key-value attributes for this client. Typically used for organizing clients or for storing integration-specific data. |
@@ -1863,6 +1866,7 @@ An OAuth client on the network.
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `include_deleted` | [`bool`](#bool) |  | Include recently deleted clients. |
 
 #### Field Rules
 
@@ -3268,6 +3272,7 @@ Gateway is the message that defines a gateway on the network.
 | `ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `name` | [`string`](#string) |  |  |
 | `description` | [`string`](#string) |  |  |
 | `attributes` | [`Gateway.AttributesEntry`](#ttn.lorawan.v3.Gateway.AttributesEntry) | repeated | Key-value attributes for this gateway. Typically used for organizing gateways or for storing integration-specific data. |
@@ -3291,7 +3296,7 @@ Gateway is the message that defines a gateway on the network.
 | `target_cups_uri` | [`string`](#string) |  | CUPS URI for LoRa Basics Station CUPS redirection. The CUPS Trust field will be automatically fetched from the cert chain presented by the target server. |
 | `target_cups_key` | [`Secret`](#ttn.lorawan.v3.Secret) |  | CUPS Key for LoRa Basics Station CUPS redirection. If redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance. Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
 
-next: 26 |
+next: 27 |
 
 #### Field Rules
 
@@ -3601,6 +3606,7 @@ Identifies an end device model with version information.
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `include_deleted` | [`bool`](#bool) |  | Include recently deleted gateways. |
 
 #### Field Rules
 
@@ -6306,6 +6312,7 @@ is used to manage OAuth client authorizations for users.
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `include_deleted` | [`bool`](#bool) |  | Include recently deleted organizations. |
 
 #### Field Rules
 
@@ -6321,6 +6328,7 @@ is used to manage OAuth client authorizations for users.
 | `ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `name` | [`string`](#string) |  |  |
 | `description` | [`string`](#string) |  |  |
 | `attributes` | [`Organization.AttributesEntry`](#ttn.lorawan.v3.Organization.AttributesEntry) | repeated | Key-value attributes for this organization. Typically used for organizing organizations or for storing integration-specific data. |
@@ -6828,6 +6836,7 @@ This message is used for finding entities in the EntityRegistrySearch service.
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `include_deleted` | [`bool`](#bool) |  | Include recently deleted entities. |
 
 #### Field Rules
 
@@ -7061,6 +7070,7 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `include_deleted` | [`bool`](#bool) |  | Include recently deleted users. |
 
 #### Field Rules
 
@@ -7134,6 +7144,7 @@ User is the message that defines a user on the network.
 | `ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `name` | [`string`](#string) |  |  |
 | `description` | [`string`](#string) |  |  |
 | `attributes` | [`User.AttributesEntry`](#ttn.lorawan.v3.User.AttributesEntry) | repeated | Key-value attributes for this users. Typically used for storing integration-specific data. |

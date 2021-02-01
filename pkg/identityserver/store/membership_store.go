@@ -34,11 +34,11 @@ type membershipStore struct {
 }
 
 func (s *membershipStore) queryMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) *gorm.DB {
-	accountQuery := s.query(ctx, Account{}).
+	accountQuery := s.query(WithoutSoftDeleted(ctx), Account{}).
 		Select(`"accounts"."id"`).
 		Where(fmt.Sprintf(`"accounts"."account_type" = '%s' AND "accounts"."uid" = ?`, id.EntityType()), id.IDString()).
 		QueryExpr()
-	organizationQuery := s.query(ctx, Account{}).
+	organizationQuery := s.query(WithoutSoftDeleted(ctx), Account{}).
 		Select(`"accounts"."id"`).
 		Joins(`JOIN "memberships" ON "memberships"."entity_type" = "accounts"."account_type" AND "memberships"."entity_id" = "accounts"."account_id"`).
 		Where(`"memberships"."account_id" = (?)`, accountQuery).
@@ -101,14 +101,14 @@ type IndirectMembership struct {
 
 func (s *membershipStore) FindIndirectMemberships(ctx context.Context, userID *ttnpb.UserIdentifiers, entityID ttnpb.Identifiers) ([]IndirectMembership, error) {
 	defer trace.StartRegion(ctx, fmt.Sprintf("find indirect memberships of user on %s", entityID.EntityType())).End()
-	userQuery := s.query(ctx, Account{}).
+	userQuery := s.query(WithoutSoftDeleted(ctx), Account{}).
 		Select(`"accounts"."id"`).
 		Where(`"accounts"."account_type" = 'user' AND "accounts"."uid" = ?`, userID.IDString()).
 		QueryExpr()
 	entityQuery := s.query(ctx, modelForID(entityID), withID(entityID)).
 		Select(fmt.Sprintf(`"%ss"."id"`, entityID.EntityType())).
 		QueryExpr()
-	query := s.query(ctx, Account{}).
+	query := s.query(WithoutSoftDeleted(ctx), Account{}).
 		Select(`"usr_memberships"."rights" AS "usr_rights", "accounts"."uid" AS "organization_id", "entity_memberships"."rights" AS "entity_rights"`).
 		Joins(`JOIN "memberships" "usr_memberships" ON "usr_memberships"."entity_type" = 'organization' AND "usr_memberships"."entity_id" = "accounts"."account_id"`).
 		Joins(`JOIN "memberships" "entity_memberships" ON "entity_memberships"."account_id" = "accounts"."id"`).

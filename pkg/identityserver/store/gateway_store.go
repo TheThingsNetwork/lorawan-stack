@@ -45,7 +45,7 @@ func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *types.F
 	var notFoundPaths []string
 	for _, path := range ttnpb.TopLevelFields(fieldMask.Paths) {
 		switch path {
-		case "ids", "created_at", "updated_at":
+		case "ids", "created_at", "updated_at", "deleted_at":
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
@@ -62,7 +62,7 @@ func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *types.F
 	if len(notFoundPaths) > 0 {
 		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
-	return query.Select(cleanFields(append(append(modelColumns, "gateway_id", "gateway_eui"), gatewayColumns...)...))
+	return query.Select(cleanFields(append(append(modelColumns, "deleted_at", "gateway_id", "gateway_eui"), gatewayColumns...)...))
 }
 
 func (s *gatewayStore) CreateGateway(ctx context.Context, gtw *ttnpb.Gateway) (*ttnpb.Gateway, error) {

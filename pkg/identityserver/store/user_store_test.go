@@ -158,6 +158,11 @@ func TestUserStore(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
 
+		list, err = store.FindUsers(WithSoftDeleted(ctx, false), nil, nil)
+
+		a.So(err, should.BeNil)
+		a.So(list, should.NotBeEmpty)
+
 		entity, _ := s.findDeletedEntity(ctx, &ttnpb.UserIdentifiers{UserID: "foo"}, "id")
 
 		err = store.PurgeUser(ctx, &ttnpb.UserIdentifiers{UserID: "foo"})

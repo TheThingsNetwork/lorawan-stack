@@ -72,6 +72,16 @@
               "defaultValue": ""
             },
             {
+              "name": "deleted_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "name",
               "description": "",
               "label": "",
@@ -640,6 +650,16 @@
               "type": "uint32",
               "longType": "uint32",
               "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "include_deleted",
+              "description": "Include recently deleted applications.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
             }
@@ -5545,6 +5565,16 @@
               "defaultValue": ""
             },
             {
+              "name": "deleted_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "name",
               "description": "",
               "label": "",
@@ -6088,6 +6118,16 @@
               "type": "uint32",
               "longType": "uint32",
               "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "include_deleted",
+              "description": "Include recently deleted clients.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
             }
@@ -13032,6 +13072,16 @@
               "defaultValue": ""
             },
             {
+              "name": "deleted_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "name",
               "description": "",
               "label": "",
@@ -13355,7 +13405,7 @@
             },
             {
               "name": "target_cups_key",
-              "description": "CUPS Key for LoRa Basics Station CUPS redirection.\nIf redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.\n\nnext: 26",
+              "description": "CUPS Key for LoRa Basics Station CUPS redirection.\nIf redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.\n\nnext: 27",
               "label": "",
               "type": "Secret",
               "longType": "Secret",
@@ -14712,6 +14762,16 @@
               "type": "uint32",
               "longType": "uint32",
               "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "include_deleted",
+              "description": "Include recently deleted gateways.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
             }
@@ -26177,6 +26237,16 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "include_deleted",
+              "description": "Include recently deleted organizations.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -26219,6 +26289,16 @@
             },
             {
               "name": "updated_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "deleted_at",
               "description": "",
               "label": "",
               "type": "Timestamp",
@@ -28586,6 +28666,16 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "include_deleted",
+              "description": "Include recently deleted entities.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -29439,6 +29529,16 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "include_deleted",
+              "description": "Include recently deleted users.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -29671,6 +29771,16 @@
             },
             {
               "name": "updated_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "deleted_at",
               "description": "",
               "label": "",
               "type": "Timestamp",

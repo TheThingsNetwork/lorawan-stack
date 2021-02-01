@@ -50,6 +50,15 @@ func (dst *Organization) SetFields(src *Organization, paths ...string) error {
 				var zero time.Time
 				dst.UpdatedAt = zero
 			}
+		case "deleted_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'deleted_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DeletedAt = src.DeletedAt
+			} else {
+				dst.DeletedAt = nil
+			}
 		case "name":
 			if len(subs) > 0 {
 				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
@@ -222,6 +231,16 @@ func (dst *ListOrganizationsRequest) SetFields(src *ListOrganizationsRequest, pa
 			} else {
 				var zero uint32
 				dst.Page = zero
+			}
+		case "include_deleted":
+			if len(subs) > 0 {
+				return fmt.Errorf("'include_deleted' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.IncludeDeleted = src.IncludeDeleted
+			} else {
+				var zero bool
+				dst.IncludeDeleted = zero
 			}
 
 		default:

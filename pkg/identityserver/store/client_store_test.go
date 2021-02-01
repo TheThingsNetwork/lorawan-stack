@@ -128,5 +128,10 @@ func TestClientStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
+
+		list, err = store.FindClients(WithSoftDeleted(ctx, false), nil, nil)
+
+		a.So(err, should.BeNil)
+		a.So(list, should.NotBeEmpty)
 	})
 }

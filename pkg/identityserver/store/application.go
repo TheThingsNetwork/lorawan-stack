@@ -79,6 +79,7 @@ func (app Application) toPB(pb *ttnpb.Application, fieldMask *types.FieldMask) {
 	pb.ApplicationIdentifiers.ApplicationID = app.ApplicationID
 	pb.CreatedAt = cleanTime(app.CreatedAt)
 	pb.UpdatedAt = cleanTime(app.UpdatedAt)
+	pb.DeletedAt = cleanTimePtr(app.DeletedAt)
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
 		fieldMask = defaultApplicationFieldMask
 	}

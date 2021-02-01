@@ -184,6 +184,9 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 			return nil, err
 		}
 	}
+	if req.IncludeDeleted {
+		ctx = store.WithSoftDeleted(ctx, false)
+	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)

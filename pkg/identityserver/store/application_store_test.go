@@ -130,6 +130,11 @@ func TestApplicationStore(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
 
+		list, err = store.FindApplications(WithSoftDeleted(ctx, false), nil, nil)
+
+		a.So(err, should.BeNil)
+		a.So(list, should.NotBeEmpty)
+
 		entity, _ := s.findDeletedEntity(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}, "id")
 
 		err = store.PurgeApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: "foo"})

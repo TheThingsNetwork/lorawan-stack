@@ -15,6 +15,8 @@
 package store
 
 import (
+	"context"
+	"fmt"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -29,4 +31,42 @@ func withSoftDeleted() func(*gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Unscoped()
 	}
+}
+
+type deletedOptionsKeyType struct{}
+
+var deletedOptionsKey deletedOptionsKeyType
+
+type deletedOptions struct {
+	IncludeDeleted bool
+	OnlyDeleted    bool
+}
+
+func withSoftDeletedIfRequested(ctx context.Context) func(*gorm.DB) *gorm.DB {
+	if opts, ok := ctx.Value(deletedOptionsKey).(*deletedOptions); ok {
+		return func(db *gorm.DB) *gorm.DB {
+			if opts.IncludeDeleted || opts.OnlyDeleted {
+				db = db.Unscoped()
+			}
+			scope := db.NewScope(db.Value)
+			if opts.OnlyDeleted && scope.HasColumn("deleted_at") {
+				db = db.Where(fmt.Sprintf("%s.deleted_at IS NOT NULL", scope.TableName()))
+			}
+			return db
+		}
+	}
+	return func(db *gorm.DB) *gorm.DB { return db }
+}
+
+// WithSoftDeleted returns a context that tells the store to include (only) deleted entities.
+func WithSoftDeleted(ctx context.Context, onlyDeleted bool) context.Context {
+	return context.WithValue(ctx, deletedOptionsKey, &deletedOptions{
+		IncludeDeleted: true,
+		OnlyDeleted:    onlyDeleted,
+	})
+}
+
+// WithoutSoftDeleted returns a context that tells the store not to query for deleted entities.
+func WithoutSoftDeleted(ctx context.Context) context.Context {
+	return context.WithValue(ctx, deletedOptionsKey, &deletedOptions{})
 }

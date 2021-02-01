@@ -246,6 +246,11 @@ func TestGatewayStore(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
 
+		list, err = store.FindGateways(WithSoftDeleted(ctx, false), nil, nil)
+
+		a.So(err, should.BeNil)
+		a.So(list, should.NotBeEmpty)
+
 		got, err = store.CreateGateway(ctx, &ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayID: "reuse-foo-eui",

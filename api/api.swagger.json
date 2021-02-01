@@ -84,6 +84,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted applications.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -2933,6 +2940,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted clients.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -4200,6 +4214,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted gateways.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -5802,6 +5823,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted organizations.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -5882,6 +5910,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted applications.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -6000,6 +6035,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted clients.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -6118,6 +6160,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted gateways.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -6807,6 +6856,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted entities.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -6994,6 +7050,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted entities.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7074,6 +7137,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted entities.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7154,6 +7224,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted entities.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7234,6 +7311,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted entities.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7293,6 +7377,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted users.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7404,6 +7495,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted applications.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7522,6 +7620,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted clients.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7640,6 +7745,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted gateways.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7758,6 +7870,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "include_deleted",
+            "description": "Include recently deleted organizations.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -10112,6 +10231,10 @@
           "type": "string",
           "format": "date-time"
         },
+        "deleted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
         "name": {
           "type": "string"
         },
@@ -11114,6 +11237,10 @@
           "format": "date-time"
         },
         "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deleted_at": {
           "type": "string",
           "format": "date-time"
         },
@@ -12346,6 +12473,10 @@
           "format": "date-time"
         },
         "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deleted_at": {
           "type": "string",
           "format": "date-time"
         },
@@ -13755,6 +13886,10 @@
           "type": "string",
           "format": "date-time"
         },
+        "deleted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
         "name": {
           "type": "string"
         },
@@ -14899,6 +15034,10 @@
           "format": "date-time"
         },
         "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deleted_at": {
           "type": "string",
           "format": "date-time"
         },
