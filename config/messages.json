@@ -1259,6 +1259,15 @@
       "file": "contact_info.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:data_rate": {
+    "translations": {
+      "en": "data rate is invalid"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "simulate.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:data_rate_index": {
     "translations": {
       "en": "Data rate index is invalid"
@@ -1311,6 +1320,15 @@
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
       "file": "use.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:frequency": {
+    "translations": {
+      "en": "frequency is invalid"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "simulate.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:gateway_server_address_mismatch": {
