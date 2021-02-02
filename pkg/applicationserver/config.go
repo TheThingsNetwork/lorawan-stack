@@ -72,6 +72,12 @@ type Config struct {
 	DeviceKEKLabel   string                    `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 }
 
+func (c Config) toProto() *ttnpb.AsConfiguration {
+	return &ttnpb.AsConfiguration{
+		PubSub: c.PubSub.toProto(),
+	}
+}
+
 var (
 	errWebhooksRegistry = errors.DefineInvalidArgument("webhooks_registry", "invalid webhooks registry")
 	errWebhooksTarget   = errors.DefineInvalidArgument("webhooks_target", "invalid webhooks target `{target}`")
@@ -99,6 +105,34 @@ type PubSubConfig struct {
 	Registry pubsub.Registry `name:"-"`
 
 	Providers map[string]string `name:"providers" description:"Controls the status of each provider (enabled, disabled, warning)"`
+}
+
+func (c PubSubConfig) toProto() *ttnpb.AsConfiguration_PubSub {
+	toStatus := func(s string) ttnpb.AsConfiguration_PubSub_ProvidersStatus_Status {
+		switch s {
+		case "enabled":
+			return ttnpb.AsConfiguration_PubSub_ProvidersStatus_ENABLED
+		case "warning":
+			return ttnpb.AsConfiguration_PubSub_ProvidersStatus_WARNING
+		case "disabled":
+			return ttnpb.AsConfiguration_PubSub_ProvidersStatus_DISABLED
+		default:
+			panic("unknown provider status")
+		}
+	}
+	providers := &ttnpb.AsConfiguration_PubSub_ProvidersStatus{}
+	if status, ok := c.Providers["mqtt"]; ok {
+		providers.MQTT = toStatus(status)
+	}
+	if status, ok := c.Providers["nats"]; ok {
+		providers.NATS = toStatus(status)
+	}
+	if status, ok := c.Providers["awsiot"]; ok {
+		providers.AWSIoT = toStatus(status)
+	}
+	return &ttnpb.AsConfiguration_PubSub{
+		Status: providers,
+	}
 }
 
 // ApplicationPackagesConfig contains application packages associations configuration.

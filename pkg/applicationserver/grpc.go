@@ -97,6 +97,17 @@ func (as *ApplicationServer) GetLinkStats(ctx context.Context, ids *ttnpb.Applic
 	return nil, errLinkingNotImplemented.New()
 }
 
+// GetConfiguration implements ttnpb.AsServer.
+func (as *ApplicationServer) GetConfiguration(ctx context.Context, _ *ttnpb.GetAsConfigurationRequest) (*ttnpb.GetAsConfigurationResponse, error) {
+	config, err := as.GetConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.GetAsConfigurationResponse{
+		Configuration: config.toProto(),
+	}, nil
+}
+
 // HandleUplink implements ttnpb.NsAsServer.
 func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHandleUplinkRequest) (*types.Empty, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
