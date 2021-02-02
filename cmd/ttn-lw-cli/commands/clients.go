@@ -253,6 +253,27 @@ var (
 			return nil
 		},
 	}
+	clientsRestoreCommand = &cobra.Command{
+		Use:   "restore [client-id]",
+		Short: "Restore a client",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliID := getClientID(cmd.Flags(), args)
+			if cliID == nil {
+				return errNoClientID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewClientRegistryClient(is).Restore(ctx, cliID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
 	clientsContactInfoCommand = contactInfoCommands("client", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		cliID := getClientID(cmd.Flags(), args)
 		if cliID == nil {
@@ -292,6 +313,8 @@ func init() {
 	clientsCommand.AddCommand(clientsSetCommand)
 	clientsDeleteCommand.Flags().AddFlagSet(clientIDFlags())
 	clientsCommand.AddCommand(clientsDeleteCommand)
+	clientsRestoreCommand.Flags().AddFlagSet(clientIDFlags())
+	clientsCommand.AddCommand(clientsRestoreCommand)
 	clientsContactInfoCommand.PersistentFlags().AddFlagSet(clientIDFlags())
 	clientsCommand.AddCommand(clientsContactInfoCommand)
 	Root.AddCommand(clientsCommand)

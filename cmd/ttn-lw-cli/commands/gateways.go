@@ -369,6 +369,27 @@ var (
 			return nil
 		},
 	}
+	gatewaysRestoreCommand = &cobra.Command{
+		Use:   "restore [gateway-id]",
+		Short: "Restore a gateway",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewGatewayRegistryClient(is).Restore(ctx, gtwID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
 	gatewaysConnectionStats = &cobra.Command{
 		Use:     "get-connection-stats [gateway-id]",
 		Aliases: []string{"connection-stats", "cnx-stats", "stats"},
@@ -483,6 +504,8 @@ func init() {
 	gatewaysCommand.AddCommand(gatewaysSetCommand)
 	gatewaysDeleteCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysDeleteCommand)
+	gatewaysRestoreCommand.Flags().AddFlagSet(gatewayIDFlags())
+	gatewaysCommand.AddCommand(gatewaysRestoreCommand)
 	gatewaysConnectionStats.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysConnectionStats)
 	gatewaysContactInfoCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())

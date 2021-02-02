@@ -416,6 +416,27 @@ var (
 			return nil
 		},
 	}
+	usersRestoreCommand = &cobra.Command{
+		Use:   "restore [user-id]",
+		Short: "Restore a user",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), args)
+			if usrID == nil {
+				return errNoUserID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewUserRegistryClient(is).Restore(ctx, usrID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
 	usersContactInfoCommand = contactInfoCommands("user", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		usrID := getUserID(cmd.Flags(), args)
 		if usrID == nil {
@@ -494,6 +515,8 @@ func init() {
 	usersCommand.AddCommand(usersUpdatePasswordCommand)
 	usersDeleteCommand.Flags().AddFlagSet(userIDFlags())
 	usersCommand.AddCommand(usersDeleteCommand)
+	usersRestoreCommand.Flags().AddFlagSet(userIDFlags())
+	usersCommand.AddCommand(usersRestoreCommand)
 	usersContactInfoCommand.PersistentFlags().AddFlagSet(userIDFlags())
 	usersCommand.AddCommand(usersContactInfoCommand)
 	usersPurgeCommand.Flags().AddFlagSet(userIDFlags())
