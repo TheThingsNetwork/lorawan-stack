@@ -49,6 +49,7 @@ const DeviceTitleSection = props => {
   const showLastSeen = Boolean(lastSeen)
   const showUplinkCount = typeof uplinkFrameCount === 'number'
   const showDownlinkCount = typeof downlinkFrameCount === 'number'
+  const notAvailableElem = <Message content={sharedMessages.notAvailable} />
 
   return (
     <EntityTitleSection
@@ -71,22 +72,18 @@ const DeviceTitleSection = props => {
             ) : (
               <Status status="mediocre" label={m.lastSeenUnavailable} flipped />
             )}
-            {showUplinkCount && (
-              <Content.MessagesCount
-                icon="uplink"
-                value={uplinkFrameCount}
-                tooltipMessage={sharedMessages.uplinkFrameCount}
-                iconClassName={style.messageIcon}
-              />
-            )}
-            {showDownlinkCount && (
-              <Content.MessagesCount
-                icon="downlink"
-                value={downlinkFrameCount}
-                tooltipMessage={sharedMessages.downlinkFrameCount}
-                iconClassName={style.messageIcon}
-              />
-            )}
+            <Content.MessagesCount
+              icon="uplink"
+              value={showUplinkCount ? uplinkFrameCount : notAvailableElem}
+              tooltipMessage={sharedMessages.uplinkFrameCount}
+              iconClassName={showUplinkCount ? style.messageIcon : style.notAvailable}
+            />
+            <Content.MessagesCount
+              icon="downlink"
+              value={showDownlinkCount ? downlinkFrameCount : notAvailableElem}
+              tooltipMessage={sharedMessages.downlinkFrameCount}
+              iconClassName={showUplinkCount ? style.messageIcon : style.notAvailable}
+            />
           </>
         )}
       </Content>
