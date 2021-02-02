@@ -128,11 +128,11 @@ func (as *ApplicationServer) decryptDownlink(ctx context.Context, dev *ttnpb.End
 	if session.GetAppSKey() == nil {
 		return errNoAppSKey.New()
 	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.AppSKey, as.KeyVault)
+	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, session.AppSKey, as.KeyVault)
 	if err != nil {
 		return err
 	}
-	frmPayload, err := crypto.DecryptDownlink(appSKey, dev.Session.DevAddr, downlink.FCnt, downlink.FRMPayload, false)
+	frmPayload, err := crypto.DecryptDownlink(appSKey, session.DevAddr, downlink.FCnt, downlink.FRMPayload, false)
 	if err != nil {
 		return err
 	}
