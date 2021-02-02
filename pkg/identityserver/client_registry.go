@@ -17,6 +17,7 @@ package identityserver
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -48,6 +49,12 @@ var (
 	)
 	evtDeleteClient = events.Define(
 		"client.delete", "delete OAuth client",
+		events.WithVisibility(ttnpb.RIGHT_CLIENT_ALL),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
+	evtRestoreClient = events.Define(
+		"client.restore", "restore OAuth client",
 		events.WithVisibility(ttnpb.RIGHT_CLIENT_ALL),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
@@ -299,6 +306,31 @@ func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIde
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) restoreClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*types.Empty, error) {
+	if err := rights.RequireClient(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_CLIENT_ALL); err != nil {
+		return nil, err
+	}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		cliStore := store.GetClientStore(db)
+		cli, err := cliStore.GetClient(store.WithSoftDeleted(ctx, true), ids, softDeleteFieldMask)
+		if err != nil {
+			return err
+		}
+		if cli.DeletedAt == nil {
+			panic("store.WithSoftDeleted(ctx, true) returned result that is not deleted")
+		}
+		if time.Since(*cli.DeletedAt) > is.configFromContext(ctx).Delete.Restore {
+			return errRestoreWindowExpired.New()
+		}
+		return cliStore.RestoreClient(ctx, ids)
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtRestoreClient.NewWithIdentifiersAndData(ctx, ids, nil))
+	return ttnpb.Empty, nil
+}
+
 type clientRegistry struct {
 	*IdentityServer
 }
@@ -321,4 +353,8 @@ func (cr *clientRegistry) Update(ctx context.Context, req *ttnpb.UpdateClientReq
 
 func (cr *clientRegistry) Delete(ctx context.Context, req *ttnpb.ClientIdentifiers) (*types.Empty, error) {
 	return cr.deleteClient(ctx, req)
+}
+
+func (cr *clientRegistry) Restore(ctx context.Context, req *ttnpb.ClientIdentifiers) (*types.Empty, error) {
+	return cr.restoreClient(ctx, req)
 }

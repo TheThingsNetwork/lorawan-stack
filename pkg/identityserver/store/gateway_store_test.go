@@ -233,7 +233,17 @@ func TestGatewayStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 
-		entity, _ := s.findDeletedEntity(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, "id")
+		err = store.RestoreGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"})
+
+		a.So(err, should.BeNil)
+
+		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, nil)
+
+		a.So(err, should.BeNil)
+
+		err = store.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"})
+
+		a.So(err, should.BeNil)
 
 		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, nil)
 
@@ -263,6 +273,8 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.GatewayID, should.Equal, "reuse-foo-eui")
 			a.So(got.EUI, should.Resemble, eui)
 		}
+
+		entity, _ := s.findDeletedEntity(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, "id")
 
 		err = store.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"})
 

@@ -204,6 +204,11 @@ func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) (
 	return s.deleteEntity(ctx, id)
 }
 
+func (s *userStore) RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) (err error) {
+	defer trace.StartRegion(ctx, "restore user").End()
+	return s.restoreEntity(ctx, id)
+}
+
 func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "purge user").End()
 	query := s.query(ctx, User{}, withSoftDeleted(), withUserID(id.GetUserID()))

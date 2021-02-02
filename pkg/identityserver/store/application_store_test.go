@@ -125,6 +125,18 @@ func TestApplicationStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
+		err = store.RestoreApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: "foo"})
+
+		a.So(err, should.BeNil)
+
+		got, err = store.GetApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}, nil)
+
+		a.So(err, should.BeNil)
+
+		err = store.DeleteApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: "foo"})
+
+		a.So(err, should.BeNil)
+
 		list, err = store.FindApplications(ctx, nil, nil)
 
 		a.So(err, should.BeNil)

@@ -124,6 +124,18 @@ func TestClientStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
+		err = store.RestoreClient(ctx, &ttnpb.ClientIdentifiers{ClientID: "foo"})
+
+		a.So(err, should.BeNil)
+
+		got, err = store.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientID: "foo"}, nil)
+
+		a.So(err, should.BeNil)
+
+		err = store.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientID: "foo"})
+
+		a.So(err, should.BeNil)
+
 		list, err = store.FindClients(ctx, nil, nil)
 
 		a.So(err, should.BeNil)

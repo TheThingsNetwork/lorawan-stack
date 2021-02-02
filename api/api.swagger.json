@@ -724,6 +724,38 @@
         ]
       }
     },
+    "/applications/{application_id}/restore": {
+      "post": {
+        "summary": "Restore a recently deleted application.",
+        "description": "Deployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+        "operationId": "ApplicationRegistry_Restore",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationRegistry"
+        ]
+      }
+    },
     "/applications/{application_id}/rights": {
       "get": {
         "summary": "List the rights the caller has on this application.",
@@ -3254,6 +3286,38 @@
         ]
       }
     },
+    "/clients/{client_id}/restore": {
+      "post": {
+        "summary": "Restore a recently deleted client.",
+        "description": "Deployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+        "operationId": "ClientRegistry_Restore",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ClientRegistry"
+        ]
+      }
+    },
     "/clients/{client_id}/rights": {
       "get": {
         "summary": "List the rights the caller has on this application.",
@@ -4784,6 +4848,38 @@
             "required": false,
             "type": "string",
             "format": "byte"
+          }
+        ],
+        "tags": [
+          "GatewayRegistry"
+        ]
+      }
+    },
+    "/gateways/{gateway_id}/restore": {
+      "post": {
+        "summary": "Restore a recently deleted gateway. This does not restore the EUI,\nas that was released when deleting the gateway.",
+        "description": "Deployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+        "operationId": "GatewayRegistry_Restore",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -6635,6 +6731,39 @@
       "delete": {
         "summary": "Purge the organization. This will release the organization ID for reuse.\nThe user is responsible for clearing data from any (external) integrations\nthat may store and expose data by user or organization ID.",
         "operationId": "OrganizationRegistry_Purge",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrganizationRegistry"
+        ]
+      }
+    },
+    "/organizations/{organization_id}/restore": {
+      "post": {
+        "summary": "Restore a recently deleted organization.",
+        "description": "Deployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+        "operationId": "OrganizationRegistry_Restore",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -8673,6 +8802,39 @@
             "description": "Secondary identifier, which can only be used in specific requests.",
             "in": "query",
             "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserRegistry"
+        ]
+      }
+    },
+    "/users/{user_id}/restore": {
+      "post": {
+        "summary": "Restore a recently deleted user.",
+        "description": "Deployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+        "operationId": "UserRegistry_Restore",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],

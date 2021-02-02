@@ -153,6 +153,18 @@ func TestUserStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
+		err = store.RestoreUser(ctx, &ttnpb.UserIdentifiers{UserID: "foo"})
+
+		a.So(err, should.BeNil)
+
+		got, err = store.GetUser(ctx, &ttnpb.UserIdentifiers{UserID: "foo"}, nil)
+
+		a.So(err, should.BeNil)
+
+		err = store.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserID: "foo"})
+
+		a.So(err, should.BeNil)
+
 		list, err = store.FindUsers(ctx, nil, nil)
 
 		a.So(err, should.BeNil)

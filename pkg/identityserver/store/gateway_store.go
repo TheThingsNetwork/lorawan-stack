@@ -165,6 +165,11 @@ func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdent
 	return s.deleteEntity(ctx, id)
 }
 
+func (s *gatewayStore) RestoreGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error {
+	defer trace.StartRegion(ctx, "restore gateway").End()
+	return s.restoreEntity(ctx, id)
+}
+
 func (s *gatewayStore) PurgeGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error {
 	defer trace.StartRegion(ctx, "purge gateway").End()
 	query := s.query(ctx, Gateway{}, withSoftDeleted(), withGatewayID(id.GetGatewayID()))

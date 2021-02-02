@@ -154,3 +154,8 @@ func (s *clientStore) DeleteClient(ctx context.Context, id *ttnpb.ClientIdentifi
 	defer trace.StartRegion(ctx, "delete client").End()
 	return s.deleteEntity(ctx, id)
 }
+
+func (s *clientStore) RestoreClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error {
+	defer trace.StartRegion(ctx, "restore client").End()
+	return s.restoreEntity(ctx, id)
+}

@@ -125,6 +125,18 @@ func TestOrganizationStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
+		err = store.RestoreOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: "foo"})
+
+		a.So(err, should.BeNil)
+
+		got, err = store.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}, nil)
+
+		a.So(err, should.BeNil)
+
+		err = store.DeleteOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: "foo"})
+
+		a.So(err, should.BeNil)
+
 		list, err = store.FindOrganizations(ctx, nil, nil)
 
 		a.So(err, should.BeNil)

@@ -87,7 +87,38 @@ func (s *store) deleteEntity(ctx context.Context, entityID ttnpb.Identifiers) er
 	if err != nil {
 		return err
 	}
-	return s.DB.Delete(model).Error
+	if err = s.DB.Delete(model).Error; err != nil {
+		return err
+	}
+	switch entityType := entityID.EntityType(); entityType {
+	case "user", "organization":
+		err = s.DB.Where(Account{
+			AccountType: entityType,
+			AccountID:   model.PrimaryKey(),
+		}).Delete(Account{}).Error
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *store) restoreEntity(ctx context.Context, entityID ttnpb.Identifiers) error {
+	model, err := s.findDeletedEntity(ctx, entityID, "id")
+	if err != nil {
+		return err
+	}
+	switch entityType := entityID.EntityType(); entityType {
+	case "user", "organization":
+		err := s.DB.Unscoped().Model(Account{}).Where(Account{
+			AccountType: entityType,
+			AccountID:   model.PrimaryKey(),
+		}).UpdateColumn("deleted_at", gorm.Expr("NULL")).Error
+		if err != nil {
+			return err
+		}
+	}
+	return s.DB.Unscoped().Model(model).UpdateColumn("deleted_at", gorm.Expr("NULL")).Error
 }
 
 func (s *store) purgeEntity(ctx context.Context, entityID ttnpb.Identifiers) error {

@@ -159,6 +159,11 @@ func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.Or
 	return s.deleteEntity(ctx, id)
 }
 
+func (s *organizationStore) RestoreOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (err error) {
+	defer trace.StartRegion(ctx, "restore organization").End()
+	return s.restoreEntity(ctx, id)
+}
+
 func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "purge organization").End()
 

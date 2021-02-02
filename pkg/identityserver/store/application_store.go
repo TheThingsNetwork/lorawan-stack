@@ -155,6 +155,11 @@ func (s *applicationStore) DeleteApplication(ctx context.Context, id *ttnpb.Appl
 	return s.deleteEntity(ctx, id)
 }
 
+func (s *applicationStore) RestoreApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error {
+	defer trace.StartRegion(ctx, "restore application").End()
+	return s.restoreEntity(ctx, id)
+}
+
 func (s *applicationStore) PurgeApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error {
 	defer trace.StartRegion(ctx, "purge application").End()
 	query := s.query(ctx, Application{}, withSoftDeleted(), withApplicationID(id.GetApplicationID()))

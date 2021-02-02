@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"time"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -43,6 +44,12 @@ var (
 	)
 	evtDeleteApplication = events.Define(
 		"application.delete", "delete application",
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_INFO),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
+	evtRestoreApplication = events.Define(
+		"application.restore", "restore application",
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
@@ -263,6 +270,31 @@ func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.Appl
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) restoreApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
+	if err := rights.RequireApplication(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_APPLICATION_DELETE); err != nil {
+		return nil, err
+	}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		appStore := store.GetApplicationStore(db)
+		app, err := appStore.GetApplication(store.WithSoftDeleted(ctx, true), ids, softDeleteFieldMask)
+		if err != nil {
+			return err
+		}
+		if app.DeletedAt == nil {
+			panic("store.WithSoftDeleted(ctx, true) returned result that is not deleted")
+		}
+		if time.Since(*app.DeletedAt) > is.configFromContext(ctx).Delete.Restore {
+			return errRestoreWindowExpired.New()
+		}
+		return appStore.RestoreApplication(ctx, ids)
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtRestoreApplication.NewWithIdentifiersAndData(ctx, ids, nil))
+	return ttnpb.Empty, nil
+}
+
 func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeApplications
@@ -325,4 +357,8 @@ func (ar *applicationRegistry) Delete(ctx context.Context, req *ttnpb.Applicatio
 
 func (ar *applicationRegistry) Purge(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
 	return ar.purgeApplication(ctx, req)
+}
+
+func (ar *applicationRegistry) Restore(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
+	return ar.restoreApplication(ctx, req)
 }

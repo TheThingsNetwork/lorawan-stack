@@ -5057,6 +5057,15 @@
       "file": "picture.go"
     }
   },
+  "error:pkg/identityserver:restore_window_expired": {
+    "translations": {
+      "en": "this entity can no longer be restored"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "identityserver.go"
+    }
+  },
   "error:pkg/identityserver:search_forbidden": {
     "translations": {
       "en": "search is forbidden"
@@ -7919,6 +7928,15 @@
       "file": "application_registry.go"
     }
   },
+  "event:application.restore": {
+    "translations": {
+      "en": "restore application"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
+    }
+  },
   "event:application.update": {
     "translations": {
       "en": "update application"
@@ -8234,6 +8252,15 @@
       "file": "client_registry.go"
     }
   },
+  "event:client.restore": {
+    "translations": {
+      "en": "restore OAuth client"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "client_registry.go"
+    }
+  },
   "event:client.update": {
     "translations": {
       "en": "update OAuth client"
@@ -8336,6 +8363,15 @@
   "event:gateway.purge": {
     "translations": {
       "en": "purge gateway"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
+  "event:gateway.restore": {
+    "translations": {
+      "en": "restore gateway"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -9269,6 +9305,15 @@
       "file": "organization_registry.go"
     }
   },
+  "event:organization.restore": {
+    "translations": {
+      "en": "restore organization"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_registry.go"
+    }
+  },
   "event:organization.update": {
     "translations": {
       "en": "update organization"
@@ -9326,6 +9371,15 @@
   "event:user.purge": {
     "translations": {
       "en": "purge user"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "event:user.restore": {
+    "translations": {
+      "en": "restore user"
     },
     "description": {
       "package": "pkg/identityserver",

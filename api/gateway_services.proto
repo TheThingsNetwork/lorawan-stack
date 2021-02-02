@@ -86,6 +86,17 @@ service GatewayRegistry {
     };
   };
 
+  // Restore a recently deleted gateway. This does not restore the EUI,
+  // as that was released when deleting the gateway.
+  //
+  // Deployment configuration may specify if, and for how long after deletion,
+  // entities can be restored.
+  rpc Restore(GatewayIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/gateways/{gateway_id}/restore"
+    };
+  };
+
   // Purge the gateway. This will release both gateway ID and EUI for reuse.
   // The gateway owner is responsible for clearing data from any (external) integrations
   // that may store and expose data by gateway ID.
