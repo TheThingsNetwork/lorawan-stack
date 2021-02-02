@@ -57,6 +57,7 @@ For details about compatibility between different releases, see the **Commitment
 - Missing `authentication`, `remote_ip` and `user_agent` fields in events when using event backends other than `internal`.
 - Handling of `DLChannelReq` if dependent `NewChannelReq` was previously rejected.
 - Login after user registration leading to dead-end when originally coming from the Console.
+- Frame counter display of end devices on initial page load in the Console.
 
 ### Security
 
