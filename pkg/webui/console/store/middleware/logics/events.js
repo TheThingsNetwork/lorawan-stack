@@ -14,6 +14,7 @@
 
 import { createLogic } from 'redux-logic'
 
+import ONLINE_STATUS from '@ttn-lw/constants/online-status'
 import CONNECTION_STATUS from '@console/constants/connection-status'
 
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
@@ -42,6 +43,7 @@ import {
   createEventsInterruptedSelector,
   createInterruptedStreamsSelector,
 } from '@console/store/selectors/events'
+import { selectDeviceById } from '@console/store/selectors/devices'
 
 /**
  * Creates `redux-logic` logic from processing entity events.
@@ -200,7 +202,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
             const interrupted = selectEntityEventsInterrupted(state, id)
             const isOnline = selectIsOnlineStatus(state)
             if (disconnected && interrupted && isOnline) {
-              dispatch(startEvents(id))
+              dispatch(startEvents(action.id))
             } else {
               clearInterval(reconnector)
               done()
@@ -214,18 +216,28 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
     createLogic({
       type: SET_CONNECTION_STATUS,
       process: ({ getState, action }, dispatch, done) => {
-        const isOnline = action.payload.isOnline
+        const isOnline = action.payload.onlineStatus === ONLINE_STATUS.ONLINE
 
         if (isOnline) {
           const state = getState()
           for (const id in selectInterruptedStreams(state)) {
             const status = selectEntityEventsStatus(state, id)
             const disconnected = status === CONNECTION_STATUS.DISCONNECTED
-
             // If the app reconnected to the internet and there is a pending
             // interrupted stream connection, try to reconnect.
             if (disconnected) {
-              dispatch(dispatch(startEvents(id)))
+              let ids = id
+              // For end devices, it's necessary to retrieve the entity ids object
+              // back from the combined id string.
+              if (entityName === 'devices' && typeof id === 'string') {
+                const selectedDevice = selectDeviceById(state, id)
+                if (!selectedDevice || !selectedDevice.ids) {
+                  continue
+                }
+                ids = selectedDevice.ids
+              }
+
+              dispatch(dispatch(startEvents(ids)))
             }
           }
         }
