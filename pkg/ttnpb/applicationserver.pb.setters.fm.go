@@ -227,6 +227,88 @@ func (dst *ApplicationLinkStats) SetFields(src *ApplicationLinkStats, paths ...s
 	return nil
 }
 
+func (dst *AsConfiguration) SetFields(src *AsConfiguration, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "pubsub":
+			if len(subs) > 0 {
+				var newDst, newSrc *AsConfiguration_PubSub
+				if (src == nil || src.PubSub == nil) && dst.PubSub == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.PubSub
+				}
+				if dst.PubSub != nil {
+					newDst = dst.PubSub
+				} else {
+					newDst = &AsConfiguration_PubSub{}
+					dst.PubSub = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.PubSub = src.PubSub
+				} else {
+					dst.PubSub = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetAsConfigurationRequest) SetFields(src *GetAsConfigurationRequest, paths ...string) error {
+	if len(paths) != 0 {
+		return fmt.Errorf("message GetAsConfigurationRequest has no fields, but paths %s were specified", paths)
+	}
+	if src != nil {
+		*dst = *src
+	}
+	return nil
+}
+
+func (dst *GetAsConfigurationResponse) SetFields(src *GetAsConfigurationResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "configuration":
+			if len(subs) > 0 {
+				var newDst, newSrc *AsConfiguration
+				if (src == nil || src.Configuration == nil) && dst.Configuration == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Configuration
+				}
+				if dst.Configuration != nil {
+					newDst = dst.Configuration
+				} else {
+					newDst = &AsConfiguration{}
+					dst.Configuration = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Configuration = src.Configuration
+				} else {
+					dst.Configuration = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *NsAsHandleUplinkRequest) SetFields(src *NsAsHandleUplinkRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -238,6 +320,83 @@ func (dst *NsAsHandleUplinkRequest) SetFields(src *NsAsHandleUplinkRequest, path
 				dst.ApplicationUps = src.ApplicationUps
 			} else {
 				dst.ApplicationUps = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *AsConfiguration_PubSub) SetFields(src *AsConfiguration_PubSub, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "status":
+			if len(subs) > 0 {
+				var newDst, newSrc *AsConfiguration_PubSub_ProvidersStatus
+				if (src == nil || src.Status == nil) && dst.Status == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Status
+				}
+				if dst.Status != nil {
+					newDst = dst.Status
+				} else {
+					newDst = &AsConfiguration_PubSub_ProvidersStatus{}
+					dst.Status = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Status = src.Status
+				} else {
+					dst.Status = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *AsConfiguration_PubSub_ProvidersStatus) SetFields(src *AsConfiguration_PubSub_ProvidersStatus, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "mqtt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'mqtt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MQTT = src.MQTT
+			} else {
+				var zero AsConfiguration_PubSub_ProvidersStatus_Status
+				dst.MQTT = zero
+			}
+		case "nats":
+			if len(subs) > 0 {
+				return fmt.Errorf("'nats' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NATS = src.NATS
+			} else {
+				var zero AsConfiguration_PubSub_ProvidersStatus_Status
+				dst.NATS = zero
+			}
+		case "aws_iot":
+			if len(subs) > 0 {
+				return fmt.Errorf("'aws_iot' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AWSIoT = src.AWSIoT
+			} else {
+				var zero AsConfiguration_PubSub_ProvidersStatus_Status
+				dst.AWSIoT = zero
 			}
 
 		default:

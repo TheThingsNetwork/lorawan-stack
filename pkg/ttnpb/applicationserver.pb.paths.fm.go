@@ -63,10 +63,56 @@ var ApplicationLinkStatsFieldPathsTopLevel = []string{
 	"network_server_address",
 	"up_count",
 }
+var AsConfigurationFieldPathsNested = []string{
+	"pubsub",
+	"pubsub.status",
+	"pubsub.status.aws_iot",
+	"pubsub.status.mqtt",
+	"pubsub.status.nats",
+}
+
+var AsConfigurationFieldPathsTopLevel = []string{
+	"pubsub",
+}
+var GetAsConfigurationRequestFieldPathsNested []string
+var GetAsConfigurationRequestFieldPathsTopLevel []string
+var GetAsConfigurationResponseFieldPathsNested = []string{
+	"configuration",
+	"configuration.pubsub",
+	"configuration.pubsub.status",
+	"configuration.pubsub.status.aws_iot",
+	"configuration.pubsub.status.mqtt",
+	"configuration.pubsub.status.nats",
+}
+
+var GetAsConfigurationResponseFieldPathsTopLevel = []string{
+	"configuration",
+}
 var NsAsHandleUplinkRequestFieldPathsNested = []string{
 	"application_ups",
 }
 
 var NsAsHandleUplinkRequestFieldPathsTopLevel = []string{
 	"application_ups",
+}
+var AsConfiguration_PubSubFieldPathsNested = []string{
+	"status",
+	"status.aws_iot",
+	"status.mqtt",
+	"status.nats",
+}
+
+var AsConfiguration_PubSubFieldPathsTopLevel = []string{
+	"status",
+}
+var AsConfiguration_PubSub_ProvidersStatusFieldPathsNested = []string{
+	"aws_iot",
+	"mqtt",
+	"nats",
+}
+
+var AsConfiguration_PubSub_ProvidersStatusFieldPathsTopLevel = []string{
+	"aws_iot",
+	"mqtt",
+	"nats",
 }

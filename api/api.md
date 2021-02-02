@@ -26,9 +26,15 @@
 - [File `lorawan-stack/api/applicationserver.proto`](#lorawan-stack/api/applicationserver.proto)
   - [Message `ApplicationLink`](#ttn.lorawan.v3.ApplicationLink)
   - [Message `ApplicationLinkStats`](#ttn.lorawan.v3.ApplicationLinkStats)
+  - [Message `AsConfiguration`](#ttn.lorawan.v3.AsConfiguration)
+  - [Message `AsConfiguration.PubSub`](#ttn.lorawan.v3.AsConfiguration.PubSub)
+  - [Message `AsConfiguration.PubSub.ProvidersStatus`](#ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus)
   - [Message `GetApplicationLinkRequest`](#ttn.lorawan.v3.GetApplicationLinkRequest)
+  - [Message `GetAsConfigurationRequest`](#ttn.lorawan.v3.GetAsConfigurationRequest)
+  - [Message `GetAsConfigurationResponse`](#ttn.lorawan.v3.GetAsConfigurationResponse)
   - [Message `NsAsHandleUplinkRequest`](#ttn.lorawan.v3.NsAsHandleUplinkRequest)
   - [Message `SetApplicationLinkRequest`](#ttn.lorawan.v3.SetApplicationLinkRequest)
+  - [Enum `AsConfiguration.PubSub.ProvidersStatus.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status)
   - [Service `AppAs`](#ttn.lorawan.v3.AppAs)
   - [Service `As`](#ttn.lorawan.v3.As)
   - [Service `AsEndDeviceRegistry`](#ttn.lorawan.v3.AsEndDeviceRegistry)
@@ -808,6 +814,28 @@ Link stats as monitored by the Application Server.
 | ----- | ----------- |
 | `network_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 
+### <a name="ttn.lorawan.v3.AsConfiguration">Message `AsConfiguration`</a>
+
+Application Server configuration.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pubsub` | [`AsConfiguration.PubSub`](#ttn.lorawan.v3.AsConfiguration.PubSub) |  |  |
+
+### <a name="ttn.lorawan.v3.AsConfiguration.PubSub">Message `AsConfiguration.PubSub`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `status` | [`AsConfiguration.PubSub.ProvidersStatus`](#ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus) |  |  |
+
+### <a name="ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus">Message `AsConfiguration.PubSub.ProvidersStatus`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `mqtt` | [`AsConfiguration.PubSub.ProvidersStatus.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status) |  |  |
+| `nats` | [`AsConfiguration.PubSub.ProvidersStatus.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status) |  |  |
+| `aws_iot` | [`AsConfiguration.PubSub.ProvidersStatus.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status) |  |  |
+
 ### <a name="ttn.lorawan.v3.GetApplicationLinkRequest">Message `GetApplicationLinkRequest`</a>
 
 | Field | Type | Label | Description |
@@ -820,6 +848,14 @@ Link stats as monitored by the Application Server.
 | Field | Validations |
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GetAsConfigurationRequest">Message `GetAsConfigurationRequest`</a>
+
+### <a name="ttn.lorawan.v3.GetAsConfigurationResponse">Message `GetAsConfigurationResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `configuration` | [`AsConfiguration`](#ttn.lorawan.v3.AsConfiguration) |  |  |
 
 ### <a name="ttn.lorawan.v3.NsAsHandleUplinkRequest">Message `NsAsHandleUplinkRequest`</a>
 
@@ -847,6 +883,14 @@ Link stats as monitored by the Application Server.
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
 | `link` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status">Enum `AsConfiguration.PubSub.ProvidersStatus.Status`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `ENABLED` | 0 | No restrictions are in place. |
+| `WARNING` | 1 | Warnings are being emitted that the provider will be deprecated in the future. |
+| `DISABLED` | 2 | New integrations cannot be set up, and old ones do not start. |
 
 ### <a name="ttn.lorawan.v3.AppAs">Service `AppAs`</a>
 
@@ -881,6 +925,7 @@ The As service manages the Application Server.
 | `SetLink` | [`SetApplicationLinkRequest`](#ttn.lorawan.v3.SetApplicationLinkRequest) | [`ApplicationLink`](#ttn.lorawan.v3.ApplicationLink) | Set a link configuration from the Application Server a Network Server. This call returns immediately after setting the link configuration; it does not wait for a link to establish. To get link statistics or errors, use GetLinkStats. Note that there can only be one Application Server instance linked to a Network Server for a given application at a time. |
 | `DeleteLink` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the link between the Application Server and Network Server for the specified application. |
 | `GetLinkStats` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`ApplicationLinkStats`](#ttn.lorawan.v3.ApplicationLinkStats) | GetLinkStats returns the link statistics. This call returns a NotFound error code if there is no link for the given application identifiers. This call returns the error code of the link error if linking to a Network Server failed. |
+| `GetConfiguration` | [`GetAsConfigurationRequest`](#ttn.lorawan.v3.GetAsConfigurationRequest) | [`GetAsConfigurationResponse`](#ttn.lorawan.v3.GetAsConfigurationResponse) |  |
 
 #### HTTP bindings
 
@@ -890,6 +935,7 @@ The As service manages the Application Server.
 | `SetLink` | `PUT` | `/api/v3/as/applications/{application_ids.application_id}/link` | `*` |
 | `DeleteLink` | `DELETE` | `/api/v3/as/applications/{application_id}/link` |  |
 | `GetLinkStats` | `GET` | `/api/v3/as/applications/{application_id}/link/stats` |  |
+| `GetConfiguration` | `GET` | `/api/v3/as/configuration` |  |
 
 ### <a name="ttn.lorawan.v3.AsEndDeviceRegistry">Service `AsEndDeviceRegistry`</a>
 

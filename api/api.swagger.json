@@ -2283,6 +2283,28 @@
         ]
       }
     },
+    "/as/configuration": {
+      "get": {
+        "operationId": "As_GetConfiguration",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetAsConfigurationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "As"
+        ]
+      }
+    },
     "/as/pubsub-formats": {
       "get": {
         "operationId": "ApplicationPubSubRegistry_GetFormats",
@@ -8719,6 +8741,14 @@
       },
       "description": "The NATS provider settings."
     },
+    "AsConfigurationPubSub": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/PubSubProvidersStatus"
+        }
+      }
+    },
     "AuthInfoResponseAPIKeyAccess": {
       "type": "object",
       "properties": {
@@ -9610,6 +9640,16 @@
         }
       }
     },
+    "ProvidersStatusStatus": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "WARNING",
+        "DISABLED"
+      ],
+      "default": "ENABLED",
+      "description": " - ENABLED: No restrictions are in place.\n - WARNING: Warnings are being emitted that the provider will be deprecated in the future.\n - DISABLED: New integrations cannot be set up, and old ones do not start."
+    },
     "ProvisionEndDevicesRequestIdentifiersFromData": {
       "type": "object",
       "properties": {
@@ -9645,6 +9685,20 @@
           "type": "string",
           "format": "byte",
           "description": "DevEUI to start issuing from."
+        }
+      }
+    },
+    "PubSubProvidersStatus": {
+      "type": "object",
+      "properties": {
+        "mqtt": {
+          "$ref": "#/definitions/ProvidersStatusStatus"
+        },
+        "nats": {
+          "$ref": "#/definitions/ProvidersStatusStatus"
+        },
+        "aws_iot": {
+          "$ref": "#/definitions/ProvidersStatusStatus"
         }
       }
     },
@@ -10916,6 +10970,15 @@
           }
         }
       }
+    },
+    "v3AsConfiguration": {
+      "type": "object",
+      "properties": {
+        "pubsub": {
+          "$ref": "#/definitions/AsConfigurationPubSub"
+        }
+      },
+      "description": "Application Server configuration."
     },
     "v3AuthInfoResponse": {
       "type": "object",
@@ -12636,6 +12699,14 @@
         "image": {
           "$ref": "#/definitions/v3Picture",
           "description": "QR code in PNG format, if requested."
+        }
+      }
+    },
+    "v3GetAsConfigurationResponse": {
+      "type": "object",
+      "properties": {
+        "configuration": {
+          "$ref": "#/definitions/v3AsConfiguration"
         }
       }
     },

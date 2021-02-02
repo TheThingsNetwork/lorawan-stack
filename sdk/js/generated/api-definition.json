@@ -386,6 +386,16 @@
           ]
         }
       ]
+    },
+    "GetConfiguration": {
+      "file": "lorawan-stack/api/applicationserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/configuration",
+          "parameters": []
+        }
+      ]
     }
   },
   "AsEndDeviceRegistry": {
