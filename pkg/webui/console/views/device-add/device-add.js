@@ -41,7 +41,7 @@ const DeviceAdd = props => {
   const tabs = React.useMemo(
     () => [
       { title: messages.repositoryTabTitle, link: `${url}/repository`, name: 'repository' },
-      { title: messages.manualTabTitle, link: `${url}/manual`, name: 'manual' },
+      { title: messages.manualTabTitle, link: `${url}/manual`, name: 'manual', exact: false },
     ],
     [url],
   )
