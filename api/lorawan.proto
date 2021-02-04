@@ -24,6 +24,7 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// Message represents a LoRaWAN message
 message Message {
   option (gogoproto.populate) = false;
 

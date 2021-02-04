@@ -997,6 +997,7 @@ func (Minor) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19}
 }
 
+// Message represents a LoRaWAN message
 type Message struct {
 	MHDR `protobuf:"bytes,1,opt,name=m_hdr,json=mHdr,proto3,embedded=m_hdr" json:"m_hdr"`
 	MIC  []byte `protobuf:"bytes,2,opt,name=mic,proto3" json:"mic,omitempty"`

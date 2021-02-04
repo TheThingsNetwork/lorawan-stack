@@ -9879,7 +9879,8 @@
         "rejoin_request_payload": {
           "$ref": "#/definitions/v3RejoinRequestPayload"
         }
-      }
+      },
+      "title": "Message represents a LoRaWAN message"
     },
     "protobufAny": {
       "type": "object",
@@ -10639,7 +10640,8 @@
           "type": "boolean",
           "description": "Signals if the message is coming from the Network Server or is simulated."
         }
-      }
+      },
+      "description": "Application uplink message."
     },
     "v3ApplicationUplink": {
       "type": "object",
@@ -12670,7 +12672,8 @@
           "type": "string",
           "format": "byte"
         }
-      }
+      },
+      "description": "Response of GenerateDevAddr."
     },
     "v3GenerateEndDeviceQRCodeRequest": {
       "type": "object",
