@@ -200,6 +200,18 @@ PropTypes.device = PropTypes.shape({
   frequency_plan_id: PropTypes.string,
 })
 
+PropTypes.deviceTemplate = PropTypes.shape({
+  end_device: PropTypes.shape({
+    supports_join: PropTypes.bool,
+    multicast: PropTypes.bool,
+    lorawan_version: PropTypes.string.isRequired,
+    lorawan_phy_version: PropTypes.string.isRequired,
+  }),
+  field_mask: PropTypes.shape({
+    paths: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }).isRequired,
+})
+
 PropTypes.organization = PropTypes.shape({
   ids: PropTypes.shape({
     organization_id: PropTypes.string.isRequired,
