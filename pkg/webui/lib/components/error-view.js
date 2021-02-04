@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
 
 import React from 'react'
 import { withRouter } from 'react-router-dom'
-import * as Sentry from '@sentry/browser'
 
-import { getBackendErrorId, isBackend } from '@ttn-lw/lib/errors/utils'
+import { ingestError } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 @withRouter
@@ -38,18 +37,12 @@ class ErrorView extends React.Component {
     this.unlisten()
   }
 
-  componentDidCatch(error, errorInfo) {
-    Sentry.withScope(scope => {
-      if (isBackend(error)) {
-        scope.setExtras(error)
-        const fingerprint = getBackendErrorId(error)
-        scope.setFingerprint(fingerprint)
-        Sentry.captureException(new Error(fingerprint))
-      }
-      this.setState({
-        hasCaught: true,
-        error,
-      })
+  componentDidCatch(error) {
+    ingestError(error, { ingestedBy: 'ErrorView' })
+
+    this.setState({
+      hasCaught: true,
+      error,
     })
 
     // Clear the error when the route changes (e.g. user clicking a link).

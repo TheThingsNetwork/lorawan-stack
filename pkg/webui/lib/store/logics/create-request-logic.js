@@ -13,18 +13,14 @@
 // limitations under the License.
 
 import { createLogic } from 'redux-logic'
-import * as Sentry from '@sentry/browser'
 import { defineMessages } from 'react-intl'
 
-import { error } from '@ttn-lw/lib/log'
 import {
   isUnauthenticatedError,
-  isInvalidArgumentError,
-  getBackendErrorId,
-  isUnknown,
   isNetworkError,
   isTimeoutError,
   createFrontendError,
+  ingestError,
 } from '@ttn-lw/lib/errors/utils'
 import { clear as clearAccessToken } from '@ttn-lw/lib/access-token'
 import {
@@ -116,8 +112,11 @@ const createRequestLogic = (
           _resolve(res)
         }
       } catch (e) {
-        // Log the error when in development mode
-        error(e)
+        ingestError(
+          e,
+          { ingestedBy: 'createReqestLogic', requestAction: action },
+          { requestAction: action.type },
+        )
 
         if (isUnauthenticatedError(e)) {
           // If there was an unauthenticated error, the access token is not
@@ -134,19 +133,6 @@ const createRequestLogic = (
             // if the online status was `online` previously.
             dispatch(setStatusChecking())
           }
-        } else if (isInvalidArgumentError(e)) {
-          // Any other errors are logged to Sentry.
-          Sentry.withScope(scope => {
-            scope.setExtras(e)
-            const fingerprint = getBackendErrorId(e)
-            scope.setFingerprint(fingerprint)
-            Sentry.captureException(new Error(fingerprint))
-          })
-        } else if (isUnknown(e)) {
-          Sentry.withScope(scope => {
-            scope.setExtras(e)
-            Sentry.captureException(e)
-          })
         }
 
         // Dispatch the failure action and reject the promise, if attached.

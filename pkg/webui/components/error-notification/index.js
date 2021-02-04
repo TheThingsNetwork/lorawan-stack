@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,19 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import Notification from '@ttn-lw/components/notification'
 
-import { isBackend, toMessageProps } from '@ttn-lw/lib/errors/utils'
-import { error } from '@ttn-lw/lib/log'
+import { isBackend, toMessageProps, ingestError } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 const ErrorNotification = ({ content, title, ...rest }) => {
   const message = toMessageProps(content)
   let details = undefined
 
-  error(content) // Log the error if in development mode.
+  useEffect(() => {
+    ingestError(content, { ingestedBy: 'ErrorNotification' })
+  }, [content])
 
   if (isBackend(content)) {
     details = content
