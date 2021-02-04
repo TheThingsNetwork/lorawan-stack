@@ -14,34 +14,46 @@
 
 .container
   display: flex
-  flex-direction: row
+  border: 1px solid $c-divider-dark
+
+  +media-query-min($bp.xs)
+    flex-direction: row
+    max-width: 48rem
+    padding: $cs.m $cs.l $cs.m $cs.m
 
   +media-query($bp.xs)
     flex-direction: column
-
-    .image
-      width: 100%
-      max-width: 100%
-      max-height: 20rem
-      padding-top: $cs.m
-      padding-right: 0
-      margin: 0 auto
+    text-align: center
+    padding: $cs.m
 
 .name
   margin: 0
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
 
 .image
-  max-width: 10rem
-  padding-right: $cs.l
   object-fit: contain
+  align-self: center
+
+  +media-query-min($bp.xs)
+    padding-right: $cs.m
+    width: 10rem
+    max-height: 8.5rem
+
+  +media-query($bp.xs)
+    padding-right: 0
+    margin: 0 auto
+    width: auto
+    margin-bottom: $cs.m
+    max-height: 10rem
 
 .info
   display: flex
   flex-direction: column
-  justify-content: space-around
+  justify-content: flex-start
 
-  &-item
-    color: $tc-subtle-gray
+  &-item:not(:last-child)
     padding-right: $cs.xxs
 
     &:after
@@ -52,3 +64,9 @@
 
       &:after
         display: none
+
+.description
+  text-margin-top($cs.l)
+
+.links
+  margin-top: $cs.m

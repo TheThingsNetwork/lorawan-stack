@@ -68,6 +68,7 @@ const DeviceCard = props => {
     : device.supports_class_b
     ? m.classB
     : m.classA
+  const hasLinks = Boolean(product_url || datasheet_url)
 
   return (
     <div className={style.container}>
@@ -94,23 +95,25 @@ const DeviceCard = props => {
           <Message
             className={style.infoItem}
             content={deviceClassTitleLabel}
-            title={formatMessage(sharedMessages.activationMode)}
+            title={formatMessage(sharedMessages.lorawanClassCapabilities)}
             component="span"
           />
         </div>
-        {description && <p>{description}</p>}
-        <div>
-          {product_url && (
-            <Link.Anchor href={product_url} external>
-              <Message content={m.productWebsite} />
-            </Link.Anchor>
-          )}
-          {datasheet_url && (
-            <Link.Anchor href={datasheet_url} external>
-              <Message content={m.dataSheet} />
-            </Link.Anchor>
-          )}
-        </div>
+        {description && <p className={style.description}>{description}</p>}
+        {hasLinks && (
+          <div className={style.links}>
+            {product_url && (
+              <Link.Anchor href={product_url} external>
+                <Message content={m.productWebsite} />
+              </Link.Anchor>
+            )}
+            {datasheet_url && (
+              <Link.Anchor href={datasheet_url} external>
+                <Message content={m.dataSheet} />
+              </Link.Anchor>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
