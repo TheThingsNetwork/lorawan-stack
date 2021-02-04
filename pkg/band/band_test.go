@@ -18,10 +18,421 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	. "go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
+
+func TestParseChMask(t *testing.T) {
+	a := assertions.New(t)
+	a.So(ParseChMask(0), should.Resemble, map[uint8]bool{})
+	a.So(ParseChMask(42), should.Resemble, map[uint8]bool{})
+	a.So(ParseChMask(0, false), should.Resemble, map[uint8]bool{
+		0: false,
+	})
+	a.So(ParseChMask(253, false, true, true), should.Resemble, map[uint8]bool{
+		253: false,
+		254: true,
+		255: true,
+	})
+	a.So(func() { ParseChMask(253, false, true, true, false) }, should.Panic)
+	a.So(ParseChMask(42, true, true, true, false, false, true), should.Resemble, map[uint8]bool{
+		42: true,
+		43: true,
+		44: true,
+		45: false,
+		46: false,
+		47: true,
+	})
+
+	for _, tc := range []struct {
+		Name           string
+		ParseChMask    func(Mask [16]bool, ChMaskCntl uint8) (map[uint8]bool, error)
+		Mask           [16]bool
+		ChMaskCntl     uint8
+		Expected       map[uint8]bool
+		ErrorAssertion func(t *testing.T, err error) bool
+	}{
+		{
+			Name:        "16 channels/ChMaskCntl=0",
+			ParseChMask: ParseChMask16,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			Expected: ParseChMask(0,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "16 channels/ChMaskCntl=1",
+			ParseChMask: ParseChMask16,
+			ChMaskCntl:  1,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 1))
+			},
+		},
+		{
+			Name:        "16 channels/ChMaskCntl=2",
+			ParseChMask: ParseChMask16,
+			ChMaskCntl:  2,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 2))
+			},
+		},
+		{
+			Name:        "16 channels/ChMaskCntl=3",
+			ParseChMask: ParseChMask16,
+			ChMaskCntl:  3,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 3))
+			},
+		},
+		{
+			Name:        "16 channels/ChMaskCntl=4",
+			ParseChMask: ParseChMask16,
+			ChMaskCntl:  4,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 4))
+			},
+		},
+		{
+			Name:        "16 channels/ChMaskCntl=5",
+			ParseChMask: ParseChMask16,
+			ChMaskCntl:  5,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 5))
+			},
+		},
+		{
+			Name:        "16 channels/ChMaskCntl=6",
+			ParseChMask: ParseChMask16,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 6,
+			Expected: ParseChMask(0,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "16 channels/ChMaskCntl=7",
+			ParseChMask: ParseChMask16,
+			ChMaskCntl:  7,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 7))
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=0",
+			ParseChMask: ParseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			Expected: ParseChMask(0,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=1",
+			ParseChMask: ParseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 1,
+			Expected: ParseChMask(16,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=2",
+			ParseChMask: ParseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 2,
+			Expected: ParseChMask(32,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=3",
+			ParseChMask: ParseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 3,
+			Expected: ParseChMask(48,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=4",
+			ParseChMask: ParseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 4,
+			Expected: ParseChMask(64,
+				true, false, false, true, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=5",
+			ParseChMask: ParseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 5,
+			Expected: ParseChMask(0,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=6",
+			ParseChMask: ParseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 6,
+			Expected: ParseChMask(0,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, false, false, true, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=7",
+			ParseChMask: ParseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 7,
+			Expected: ParseChMask(0,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				true, false, false, true, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=8",
+			ParseChMask: ParseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 8,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 8))
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=0",
+			ParseChMask: ParseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			Expected: ParseChMask(0,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=1",
+			ParseChMask: ParseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 1,
+			Expected: ParseChMask(16,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=2",
+			ParseChMask: ParseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 2,
+			Expected: ParseChMask(32,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=3",
+			ParseChMask: ParseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 3,
+			Expected: ParseChMask(48,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=4",
+			ParseChMask: ParseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 4,
+			Expected: ParseChMask(64,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=5",
+			ParseChMask: ParseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 5,
+			Expected: ParseChMask(80,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=6",
+			ParseChMask: ParseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 6,
+			Expected: ParseChMask(0,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=7",
+			ParseChMask: ParseChMask96,
+			ChMaskCntl:  7,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 7))
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			var mask [16]bool
+			copy(mask[:], tc.Mask[:])
+			res, err := tc.ParseChMask(mask, tc.ChMaskCntl)
+			a.So(mask, should.Equal, tc.Mask)
+			if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				a.So(res, should.Resemble, tc.Expected)
+			}
+		})
+	}
+}
 
 func TestRx1DataRate(t *testing.T) {
 	for _, tc := range []struct {
@@ -87,7 +498,7 @@ func TestRx1DataRate(t *testing.T) {
 		t.Run(tc.bandID, func(t *testing.T) {
 			a := assertions.New(t)
 
-			b, err := band.GetByID(tc.bandID)
+			b, err := GetByID(tc.bandID)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Error when getting band %s: %s", tc.bandID, err)
 			}
@@ -123,7 +534,7 @@ func TestRx1DataRate(t *testing.T) {
 func TestParseChMaskBands(t *testing.T) {
 	a := assertions.New(t)
 
-	for _, b := range band.All {
+	for _, b := range All {
 		if !a.So(b.ParseChMask, should.NotBeNil) {
 			t.Fatalf("Band %s should have a ParseChMask function defined", b.ID)
 		}
@@ -133,7 +544,7 @@ func TestParseChMaskBands(t *testing.T) {
 func TestGenerateChMasksBands(t *testing.T) {
 	a := assertions.New(t)
 
-	for _, b := range band.All {
+	for _, b := range All {
 		if !a.So(b.GenerateChMasks, should.NotBeNil) {
 			t.Fatalf("Band %s should have a GenerateChMasks function defined", b.ID)
 		}
@@ -141,7 +552,7 @@ func TestGenerateChMasksBands(t *testing.T) {
 }
 
 func TestFindSubBand(t *testing.T) {
-	for _, b := range band.All {
+	for _, b := range All {
 		t.Run(b.ID, func(t *testing.T) {
 			a := assertions.New(t)
 			for _, ch := range b.UplinkChannels {
