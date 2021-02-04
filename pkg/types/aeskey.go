@@ -78,8 +78,7 @@ func (key *AES128Key) UnmarshalText(data []byte) error {
 // EncodeMsgpack implements msgpack.CustomEncoder interface.
 func (key AES128Key) EncodeMsgpack(enc *msgpack.Encoder) error {
 	// TODO: Implement
-	panic("unimplemented")
-	return nil
+	return enc.EncodeString(string(key[:]))
 }
 
 // DecodeMsgpack implements msgpack.CustomDecoder interface.

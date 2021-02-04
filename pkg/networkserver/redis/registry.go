@@ -15,7 +15,7 @@
 package redis
 
 import (
-	"bytes"
+	// "bytes"
 	"context"
 	"fmt"
 	"io"
@@ -114,22 +114,88 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 	return pb, ctx, nil
 }
 
-func encodeKeyEnvelope(ke ttnpb.KeyEnvelope, enc *msgpack.Encoder) error {
-	if err := enc.EncodeString("key"); err != nil {
+type uplinkMatchSession struct {
+	FNwkSIntKey       *ttnpb.KeyEnvelope
+	LoRaWANVersion    ttnpb.MACVersion
+	ResetsFCnt        *pbtypes.BoolValue `msgpack:",omitempty"`
+	Supports32BitFCnt *pbtypes.BoolValue `msgpack:",omitempty"`
+	LastFCnt          uint32             `msgpack:",omitempty"`
+}
+
+type uplinkMatchPendingSession struct {
+	FNwkSIntKey    *ttnpb.KeyEnvelope
+	LoRaWANVersion ttnpb.MACVersion
+}
+
+type uplinkMatchResult struct {
+	FNwkSIntKey       *ttnpb.KeyEnvelope
+	LoRaWANVersion    ttnpb.MACVersion
+	LastFCnt          uint32             `msgpack:",omitempty"`
+	IsPending         bool               `msgpack:",omitempty"`
+	ResetsFCnt        *pbtypes.BoolValue `msgpack:",omitempty"`
+	Supports32BitFCnt *pbtypes.BoolValue `msgpack:",omitempty"`
+	UID               string
+}
+
+func encodeKeyEnvelope(enc *msgpack.Encoder, ke *ttnpb.KeyEnvelope) error {
+	switch {
+	case ke.Key != nil:
+		if err := enc.EncodeString("key"); err != nil {
+			return err
+		}
+		if err := ke.Key.EncodeMsgpack(enc); err != nil {
+			return err
+		}
+		fallthrough
+
+	case ke.KEKLabel != "":
+		if err := enc.EncodeString("kek_label"); err != nil {
+			return err
+		}
+		if err := enc.EncodeString(ke.KEKLabel); err != nil {
+			return err
+		}
+		fallthrough
+	
+	case ke.EncryptedKey != nil:
+		if err := enc.EncodeString("encrypted_key"); err != nil {
+			return err
+		}
+		if err := enc.EncodeBytes(ke.EncryptedKey); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func encodeBoolValue(enc *msgpack.Encoder, v *pbtypes.BoolValue) error {
+	if err := enc.EncodeString("value"); err != nil {
 		return err
 	}
-	// TODO: Implement
-	panic("unimplemented")
-	return nil
+	return enc.EncodeBool(v.Value)
 }
 
 // EncodeMsgpack implements msgpack.CustomEncoder interface.
 func (v uplinkMatchResult) EncodeMsgpack(enc *msgpack.Encoder) error {
-	if err := encodeKeyEnvelope(v.FNwkSIntKey, enc); err != nil {
-		return err
+	switch {
+	case v.FNwkSIntKey != nil:
+		if err := enc.EncodeString("f_nwk_s_int_key"); err != nil {
+			return err
+		}
+		if err := encodeKeyEnvelope(enc, v.FNwkSIntKey); err != nil {
+			return err
+		}
+		fallthrough
+	case v.LoRaWANVersion != 0:
+		if err := enc.EncodeString("lorawan_version"); err != nil {
+			return err
+		}
+		if err := v.LoRaWANVersion.EncodeMsgpack(enc); err != nil {
+			return err
+		}
+		// fallthrough
+
 	}
-	// TODO: Implement
-	panic("unimplemented")
 	return nil
 }
 
@@ -138,29 +204,6 @@ func (v *uplinkMatchResult) DecodeMsgpack(dec *msgpack.Decoder) error {
 	// TODO: Implement
 	panic("unimplemented")
 	return nil
-}
-
-type uplinkMatchSession struct {
-	FNwkSIntKey       ttnpb.KeyEnvelope
-	LoRaWANVersion    ttnpb.MACVersion
-	ResetsFCnt        *pbtypes.BoolValue `msgpack:",omitempty"`
-	Supports32BitFCnt *pbtypes.BoolValue `msgpack:",omitempty"`
-	LastFCnt          uint32             `msgpack:",omitempty"`
-}
-
-type uplinkMatchPendingSession struct {
-	FNwkSIntKey    ttnpb.KeyEnvelope
-	LoRaWANVersion ttnpb.MACVersion
-}
-
-type uplinkMatchResult struct {
-	FNwkSIntKey       ttnpb.KeyEnvelope
-	LoRaWANVersion    ttnpb.MACVersion
-	LastFCnt          uint32             `msgpack:",omitempty"`
-	IsPending         bool               `msgpack:",omitempty"`
-	ResetsFCnt        *pbtypes.BoolValue `msgpack:",omitempty"`
-	Supports32BitFCnt *pbtypes.BoolValue `msgpack:",omitempty"`
-	UID               string
 }
 
 func CurrentAddrKey(addrKey string) string {

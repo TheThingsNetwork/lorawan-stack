@@ -25,6 +25,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/vmihailenco/msgpack/v5"
+
+
 )
 
 func TestMsgpackCompatibility(t *testing.T) {
@@ -37,56 +41,100 @@ func TestMsgpackCompatibility(t *testing.T) {
 		}
 	})
 	for _, v := range []interface{}{
-		uplinkMatchSession{},
-		uplinkMatchSession{
-			FNwkSIntKey: &keyEnvelope{
+		// uplinkMatchSession{},
+		// uplinkMatchSession{
+		// 	FNwkSIntKey: &ttnpb.KeyEnvelope{
+		// 		Key: &types.AES128Key{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+		// 	},
+		// },
+		// uplinkMatchSession{
+		// 	LoRaWANVersion: ttnpb.MAC_V1_0_3,
+		// },
+		// uplinkMatchSession{
+		// 	FNwkSIntKey: &ttnpb.KeyEnvelope{
+		// 		Key: &types.AES128Key{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+		// 	},
+		// 	LoRaWANVersion: ttnpb.MAC_V1_0_3,
+		// },
+		// uplinkMatchSession{
+		// 	FNwkSIntKey: &ttnpb.KeyEnvelope{
+		// 		Key: &types.AES128Key{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+		// 	},
+		// 	LoRaWANVersion:    ttnpb.MAC_V1_0_3,
+		// 	Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
+		// },
+		// uplinkMatchSession{
+		// 	FNwkSIntKey: &ttnpb.KeyEnvelope{
+		// 		Key: &types.AES128Key{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+		// 	},
+		// 	LoRaWANVersion: ttnpb.MAC_V1_0_3,
+		// 	ResetsFCnt:     &pbtypes.BoolValue{Value: true},
+		// },
+		// uplinkMatchSession{
+		// 	FNwkSIntKey: &ttnpb.KeyEnvelope{
+		// 		Key: &types.AES128Key{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+		// 	},
+		// 	LoRaWANVersion: ttnpb.MAC_V1_0_3,
+		// 	LastFCnt:       42,
+		// },
+		// uplinkMatchSession{
+		// 	FNwkSIntKey: &ttnpb.KeyEnvelope{
+		// 		Key: &types.AES128Key{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+		// 	},
+		// 	LoRaWANVersion:    ttnpb.MAC_V1_0_3,
+		// 	ResetsFCnt:        &pbtypes.BoolValue{Value: true},
+		// 	Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
+		// 	LastFCnt:          42,
+		// },
+		// uplinkMatchPendingSession{},
+		uplinkMatchResult{},
+		uplinkMatchResult{
+			FNwkSIntKey: &ttnpb.KeyEnvelope{
 				Key: &types.AES128Key{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			},
 		},
-		uplinkMatchSession{
+		uplinkMatchResult{
 			LoRaWANVersion: ttnpb.MAC_V1_0_3,
 		},
-		uplinkMatchSession{
-			FNwkSIntKey: &keyEnvelope{
+		uplinkMatchResult{
+			FNwkSIntKey: &ttnpb.KeyEnvelope{
 				Key: &types.AES128Key{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			},
 			LoRaWANVersion: ttnpb.MAC_V1_0_3,
 		},
-		uplinkMatchSession{
-			FNwkSIntKey: &keyEnvelope{
+		uplinkMatchResult{
+			FNwkSIntKey: &ttnpb.KeyEnvelope{
 				Key: &types.AES128Key{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			},
 			LoRaWANVersion:    ttnpb.MAC_V1_0_3,
-			Supports32BitFCnt: &boolValue{Value: true},
+			Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
 		},
-		uplinkMatchSession{
-			FNwkSIntKey: &keyEnvelope{
+		uplinkMatchResult{
+			FNwkSIntKey: &ttnpb.KeyEnvelope{
 				Key: &types.AES128Key{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			},
 			LoRaWANVersion: ttnpb.MAC_V1_0_3,
-			ResetsFCnt:     &boolValue{Value: true},
+			ResetsFCnt:     &pbtypes.BoolValue{Value: true},
 		},
-		uplinkMatchSession{
-			FNwkSIntKey: &keyEnvelope{
+		uplinkMatchResult{
+			FNwkSIntKey: &ttnpb.KeyEnvelope{
 				Key: &types.AES128Key{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			},
 			LoRaWANVersion: ttnpb.MAC_V1_0_3,
 			LastFCnt:       42,
 		},
-		uplinkMatchSession{
-			FNwkSIntKey: &keyEnvelope{
+		uplinkMatchResult{
+			FNwkSIntKey: &ttnpb.KeyEnvelope{
 				Key: &types.AES128Key{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			},
 			LoRaWANVersion:    ttnpb.MAC_V1_0_3,
-			ResetsFCnt:        &boolValue{Value: true},
-			Supports32BitFCnt: &boolValue{Value: false},
+			ResetsFCnt:        &pbtypes.BoolValue{Value: true},
+			Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
 			LastFCnt:          42,
 		},
-		uplinkMatchPendingSession{},
-		uplinkMatchResult{},
 	} {
 		v := v
-		b := test.Must(marshalMsgpack(v)).([]byte)
+		b := test.Must(msgpack.Marshal(v)).([]byte)
 		test.RunSubtestFromContext(ctx, test.SubtestConfig{
 			Name: fmt.Sprintf("%v %s", v, b),
 			Func: func(ctx context.Context, _ *testing.T, a *assertions.Assertion) {
