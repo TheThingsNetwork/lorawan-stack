@@ -24,7 +24,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/blang/semver"
 	"github.com/go-redis/redis/v8"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/oklog/ulid/v2"
@@ -49,8 +48,6 @@ var (
 type DeviceRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
-	// CompatibilityVersion denotes the lowest possible stack version the registry should be compatible with.
-	CompatibilityVersion semver.Version
 
 	entropyMu *sync.Mutex
 	entropy   io.Reader
@@ -63,40 +60,6 @@ func (r *DeviceRegistry) Init(ctx context.Context) error {
 	r.entropyMu = &sync.Mutex{}
 	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
 	return nil
-}
-
-// marshalMsgpack is adaptation of msgpack.Marshal (https://github.com/vmihailenco/msgpack/blob/8b121f7d2c8eac21ab98ef6443d272f355b88999/encode.go#L58-L74).
-func marshalMsgpack(v interface{}) ([]byte, error) {
-	enc := msgpack.GetEncoder()
-
-	var buf bytes.Buffer
-	enc.Reset(&buf)
-	enc.UseCompactFloats(true)
-	enc.UseCompactInts(true)
-	enc.UseCustomStructTag("json")
-
-	err := enc.Encode(v)
-	b := buf.Bytes()
-
-	msgpack.PutEncoder(enc)
-
-	if err != nil {
-		return nil, err
-	}
-	return b, err
-}
-
-// unmarshalMsgpack is adaptation of msgpack.Unmarshal (https://github.com/vmihailenco/msgpack/blob/8b121f7d2c8eac21ab98ef6443d272f355b88999/decode.go#L54-L63).
-func unmarshalMsgpack(b []byte, v interface{}) error {
-	dec := msgpack.GetDecoder()
-
-	dec.ResetBytes(b)
-	dec.UseCustomStructTag("json")
-	err := dec.Decode(v)
-
-	msgpack.PutDecoder(dec)
-
-	return err
 }
 
 func (r *DeviceRegistry) uidKey(uid string) string {
@@ -151,27 +114,53 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 	return pb, ctx, nil
 }
 
+func encodeKeyEnvelope(ke ttnpb.KeyEnvelope, enc *msgpack.Encoder) error {
+	if err := enc.EncodeString("key"); err != nil {
+		return err
+	}
+	// TODO: Implement
+	panic("unimplemented")
+	return nil
+}
+
+// EncodeMsgpack implements msgpack.CustomEncoder interface.
+func (v uplinkMatchResult) EncodeMsgpack(enc *msgpack.Encoder) error {
+	if err := encodeKeyEnvelope(v.FNwkSIntKey, enc); err != nil {
+		return err
+	}
+	// TODO: Implement
+	panic("unimplemented")
+	return nil
+}
+
+// DecodeMsgpack implements msgpack.CustomDecoder interface.
+func (v *uplinkMatchResult) DecodeMsgpack(dec *msgpack.Decoder) error {
+	// TODO: Implement
+	panic("unimplemented")
+	return nil
+}
+
 type uplinkMatchSession struct {
+	FNwkSIntKey       ttnpb.KeyEnvelope
 	LoRaWANVersion    ttnpb.MACVersion
-	FNwkSIntKey       *ttnpb.KeyEnvelope
-	LastFCnt          uint32             `json:",omitempty"`
-	ResetsFCnt        *pbtypes.BoolValue `json:",omitempty"`
-	Supports32BitFCnt *pbtypes.BoolValue `json:",omitempty"`
+	ResetsFCnt        *pbtypes.BoolValue `msgpack:",omitempty"`
+	Supports32BitFCnt *pbtypes.BoolValue `msgpack:",omitempty"`
+	LastFCnt          uint32             `msgpack:",omitempty"`
 }
 
 type uplinkMatchPendingSession struct {
+	FNwkSIntKey    ttnpb.KeyEnvelope
 	LoRaWANVersion ttnpb.MACVersion
-	FNwkSIntKey    *ttnpb.KeyEnvelope
 }
 
 type uplinkMatchResult struct {
-	UID               string
+	FNwkSIntKey       ttnpb.KeyEnvelope
 	LoRaWANVersion    ttnpb.MACVersion
-	FNwkSIntKey       *ttnpb.KeyEnvelope
-	LastFCnt          uint32             `json:",omitempty"`
-	IsPending         bool               `json:",omitempty"`
-	ResetsFCnt        *pbtypes.BoolValue `json:",omitempty"`
-	Supports32BitFCnt *pbtypes.BoolValue `json:",omitempty"`
+	LastFCnt          uint32             `msgpack:",omitempty"`
+	IsPending         bool               `msgpack:",omitempty"`
+	ResetsFCnt        *pbtypes.BoolValue `msgpack:",omitempty"`
+	Supports32BitFCnt *pbtypes.BoolValue `msgpack:",omitempty"`
+	UID               string
 }
 
 func CurrentAddrKey(addrKey string) string {
@@ -266,7 +255,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		}
 		ctx := log.NewContextWithField(ctx, "match_key", matchResultKey)
 		res := &uplinkMatchResult{}
-		if err := unmarshalMsgpack([]byte(s), res); err != nil {
+		if err := msgpack.Unmarshal([]byte(s), res); err != nil {
 			log.FromContext(ctx).WithError(err).Error("Failed to unmarshal match result")
 			return errDatabaseCorruption.WithCause(err)
 		}
@@ -401,7 +390,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			var m *networkserver.UplinkMatch
 			if idx == pendingIdx {
 				ses := &uplinkMatchPendingSession{}
-				err = unmarshalMsgpack([]byte(s), ses)
+				err = msgpack.Unmarshal([]byte(s), ses)
 				if err == nil {
 					m = &networkserver.UplinkMatch{
 						ApplicationIdentifiers: ids.ApplicationIdentifiers,
@@ -413,7 +402,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				}
 			} else {
 				ses := &uplinkMatchSession{}
-				err = unmarshalMsgpack([]byte(s), ses)
+				err = msgpack.Unmarshal([]byte(s), ses)
 				if err == nil {
 					m = &networkserver.UplinkMatch{
 						ApplicationIdentifiers: ids.ApplicationIdentifiers,
@@ -435,7 +424,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				return errNoUplinkMatch.WithCause(err)
 			}
 			if ok {
-				b, err := marshalMsgpack(uplinkMatchResult{
+				b, err := msgpack.Marshal(uplinkMatchResult{
 					UID:               uid,
 					LoRaWANVersion:    m.LoRaWANVersion,
 					FNwkSIntKey:       m.FNwkSIntKey,
@@ -483,7 +472,7 @@ func removeAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string
 }
 
 func MarshalDeviceCurrentSession(dev *ttnpb.EndDevice) ([]byte, error) {
-	return marshalMsgpack(uplinkMatchSession{
+	return msgpack.Marshal(uplinkMatchSession{
 		LoRaWANVersion:    dev.GetMACState().GetLoRaWANVersion(),
 		FNwkSIntKey:       dev.GetSession().GetFNwkSIntKey(),
 		LastFCnt:          dev.GetSession().GetLastFCntUp(),
@@ -493,7 +482,7 @@ func MarshalDeviceCurrentSession(dev *ttnpb.EndDevice) ([]byte, error) {
 }
 
 func MarshalDevicePendingSession(dev *ttnpb.EndDevice) ([]byte, error) {
-	return marshalMsgpack(uplinkMatchSession{
+	return msgpack.Marshal(uplinkMatchSession{
 		LoRaWANVersion: dev.GetPendingMACState().GetLoRaWANVersion(),
 		FNwkSIntKey:    dev.GetPendingSession().GetFNwkSIntKey(),
 	})
