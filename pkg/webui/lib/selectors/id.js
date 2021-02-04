@@ -14,7 +14,7 @@
 
 import getByPath from '../get-by-path'
 
-export const getApplicationId = function(application = {}) {
+export const getApplicationId = (application = {}) => {
   return (
     getByPath(application, 'application_id') ||
     getByPath(application, 'application_ids.application_id') ||
@@ -22,7 +22,7 @@ export const getApplicationId = function(application = {}) {
   )
 }
 
-export const getDeviceId = function(device = {}) {
+export const getDeviceId = (device = {}) => {
   return (
     getByPath(device, 'device_id') ||
     getByPath(device, 'ids.device_id') ||
@@ -31,7 +31,7 @@ export const getDeviceId = function(device = {}) {
 }
 
 export const combineDeviceIds = (appId, devId) => `${appId}/${devId}`
-export const extractDeviceIdFromCombinedId = function(combinedId) {
+export const extractDeviceIdFromCombinedId = combinedId => {
   if (typeof combinedId === 'string') {
     const parts = combinedId.split('/')
     if (parts.length === 2) {
@@ -40,7 +40,7 @@ export const extractDeviceIdFromCombinedId = function(combinedId) {
   }
   return combinedId
 }
-export const getCombinedDeviceId = function(device = {}) {
+export const getCombinedDeviceId = (device = {}) => {
   const appId =
     getByPath(device, 'ids.application_ids.application_id') ||
     getByPath(device, 'application_ids.application_id') ||
@@ -49,14 +49,14 @@ export const getCombinedDeviceId = function(device = {}) {
   return combineDeviceIds(appId, devId)
 }
 
-export const getCollaboratorId = function(collaborator = {}) {
+export const getCollaboratorId = (collaborator = {}) => {
   return (
     getByPath(collaborator, 'ids.organization_ids.organization_id') ||
     getByPath(collaborator, 'ids.user_ids.user_id')
   )
 }
 
-export const getGatewayId = function(gateway = {}) {
+export const getGatewayId = (gateway = {}) => {
   return (
     getByPath(gateway, 'gateway_id') ||
     getByPath(gateway, 'gateway_ids.gateway_id') ||
@@ -64,11 +64,11 @@ export const getGatewayId = function(gateway = {}) {
   )
 }
 
-export const getApiKeyId = function(key = {}) {
+export const getApiKeyId = (key = {}) => {
   return key.id
 }
 
-export const getOrganizationId = function(organization = {}) {
+export const getOrganizationId = (organization = {}) => {
   return (
     getByPath(organization, 'ids.organization_id') ||
     getByPath(organization, 'organization_ids.organization_id')
@@ -84,7 +84,7 @@ const idSelectors = [
   getOrganizationId,
 ]
 
-export const getEntityId = function(entity) {
+export const getEntityId = entity => {
   let id
   let selectorIndex = 0
   while (!id && selectorIndex < idSelectors.length) {
@@ -95,21 +95,21 @@ export const getEntityId = function(entity) {
   return id
 }
 
-export const getWebhookId = function(webhook = {}) {
+export const getWebhookId = (webhook = {}) => {
   return getByPath(webhook, 'ids.webhook_id')
 }
 
-export const getWebhookTemplateId = function(webhookTemplate = {}) {
+export const getWebhookTemplateId = (webhookTemplate = {}) => {
   return (
     getByPath(webhookTemplate, 'ids.template_id') ||
     getByPath(webhookTemplate, 'template_ids.template_id')
   )
 }
 
-export const getPubsubId = function(pubsub = {}) {
+export const getPubsubId = (pubsub = {}) => {
   return getByPath(pubsub, 'ids.pub_sub_id')
 }
 
-export const getUserId = function(user = {}) {
+export const getUserId = (user = {}) => {
   return getByPath(user, 'ids.user_id')
 }
