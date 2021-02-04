@@ -159,3 +159,23 @@ func (s *clientStore) RestoreClient(ctx context.Context, id *ttnpb.ClientIdentif
 	defer trace.StartRegion(ctx, "restore client").End()
 	return s.restoreEntity(ctx, id)
 }
+
+func (s *clientStore) PurgeClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error {
+	defer trace.StartRegion(ctx, "purge client").End()
+	query := s.query(ctx, Client{}, withSoftDeleted(), withClientID(id.GetClientID()))
+	query = selectClientFields(ctx, query, nil)
+	var cliModel Client
+	if err := query.First(&cliModel).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return errNotFoundForID(id)
+		}
+		return err
+	}
+	// delete client attributes before purging
+	if len(cliModel.Attributes) > 0 {
+		if err := s.replaceAttributes(ctx, "gateway", cliModel.ID, cliModel.Attributes, nil); err != nil {
+			return err
+		}
+	}
+	return s.purgeEntity(ctx, id)
+}

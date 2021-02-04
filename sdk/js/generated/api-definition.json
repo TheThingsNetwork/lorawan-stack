@@ -1778,6 +1778,18 @@
           ]
         }
       ]
+    },
+    "Purge": {
+      "file": "lorawan-stack/api/client_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/clients/{client_id}/purge",
+          "parameters": [
+            "client_id"
+          ]
+        }
+      ]
     }
   },
   "Configuration": {

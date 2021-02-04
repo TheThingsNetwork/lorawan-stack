@@ -59,9 +59,18 @@ var (
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
+	evtPurgeClient = events.Define(
+		"client.purge", "purge client",
+		events.WithVisibility(ttnpb.RIGHT_CLIENT_ALL),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
 )
 
-var errAdminsCreateClients = errors.DefinePermissionDenied("admins_create_clients", "OAuth clients may only be created by admins, or in organizations")
+var (
+	errAdminsCreateClients = errors.DefinePermissionDenied("admins_create_clients", "OAuth clients may only be created by admins, or in organizations")
+	errAdminsPurgeClients  = errors.DefinePermissionDenied("admins_purge_clients", "OAuth clients may only be purged by admins")
+)
 
 func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateClientRequest) (cli *ttnpb.Client, err error) {
 	createdByAdmin := is.IsAdmin(ctx)
@@ -331,6 +340,35 @@ func (is *IdentityServer) restoreClient(ctx context.Context, ids *ttnpb.ClientId
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) purgeClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*types.Empty, error) {
+	if !is.IsAdmin(ctx) {
+		return nil, errAdminsPurgeClients
+	}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		// delete related authorizations before purging the client
+		err := store.GetOAuthStore(db).DeleteClientAuthorizations(ctx, ids)
+		if err != nil {
+			return err
+		}
+		// delete related memberships before purging the client
+		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids)
+		if err != nil {
+			return err
+		}
+		// delete related contact info before purging the client
+		err = store.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)
+		if err != nil {
+			return err
+		}
+		return store.GetClientStore(db).PurgeClient(ctx, ids)
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtPurgeClient.NewWithIdentifiersAndData(ctx, ids, nil))
+	return ttnpb.Empty, nil
+}
+
 type clientRegistry struct {
 	*IdentityServer
 }
@@ -353,6 +391,10 @@ func (cr *clientRegistry) Update(ctx context.Context, req *ttnpb.UpdateClientReq
 
 func (cr *clientRegistry) Delete(ctx context.Context, req *ttnpb.ClientIdentifiers) (*types.Empty, error) {
 	return cr.deleteClient(ctx, req)
+}
+
+func (cr *clientRegistry) Purge(ctx context.Context, req *ttnpb.ClientIdentifiers) (*types.Empty, error) {
+	return cr.purgeClient(ctx, req)
 }
 
 func (cr *clientRegistry) Restore(ctx context.Context, req *ttnpb.ClientIdentifiers) (*types.Empty, error) {

@@ -1956,6 +1956,7 @@ OAuth client registrations.
 | `Restore` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Restore a recently deleted client.
 
 Deployment configuration may specify if, and for how long after deletion, entities can be restored. |
+| `Purge` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the client. This will release the client ID for reuse. |
 
 #### HTTP bindings
 
@@ -1970,6 +1971,7 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 | `Update` | `PUT` | `/api/v3/clients/{client.ids.client_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/clients/{client_id}` |  |
 | `Restore` | `POST` | `/api/v3/clients/{client_id}/restore` |  |
+| `Purge` | `DELETE` | `/api/v3/clients/{client_id}/purge` |  |
 
 ## <a name="lorawan-stack/api/cluster.proto">File `lorawan-stack/api/cluster.proto`</a>
 

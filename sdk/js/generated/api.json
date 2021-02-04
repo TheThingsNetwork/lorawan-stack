@@ -6513,6 +6513,28 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "Purge",
+              "description": "Purge the client. This will release the client ID for reuse.",
+              "requestType": "ClientIdentifiers",
+              "requestLongType": "ClientIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ClientIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/clients/{client_id}/purge"
+                    }
+                  ]
+                }
+              }
             }
           ]
         }

@@ -3286,6 +3286,37 @@
         ]
       }
     },
+    "/clients/{client_id}/purge": {
+      "delete": {
+        "summary": "Purge the client. This will release the client ID for reuse.",
+        "operationId": "ClientRegistry_Purge",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ClientRegistry"
+        ]
+      }
+    },
     "/clients/{client_id}/restore": {
       "post": {
         "summary": "Restore a recently deleted client.",

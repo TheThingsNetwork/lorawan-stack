@@ -214,7 +214,14 @@ func TestClientsCRUD(t *testing.T) {
 		}
 
 		_, err = reg.Delete(ctx, &created.ClientIdentifiers, creds)
+		a.So(err, should.BeNil)
 
+		_, err = reg.Purge(ctx, &created.ClientIdentifiers, creds)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		_, err = reg.Purge(ctx, &created.ClientIdentifiers, userCreds(adminUserIdx))
 		a.So(err, should.BeNil)
 	})
 }

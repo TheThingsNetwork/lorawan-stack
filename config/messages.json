@@ -4787,6 +4787,15 @@
       "file": "application_registry.go"
     }
   },
+  "error:pkg/identityserver:admins_purge_clients": {
+    "translations": {
+      "en": "OAuth clients may only be purged by admins"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "client_registry.go"
+    }
+  },
   "error:pkg/identityserver:admins_purge_gateways": {
     "translations": {
       "en": "gateways may only be purged by admins"
@@ -8246,6 +8255,15 @@
   "event:client.delete": {
     "translations": {
       "en": "delete OAuth client"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "client_registry.go"
+    }
+  },
+  "event:client.purge": {
+    "translations": {
+      "en": "purge client"
     },
     "description": {
       "package": "pkg/identityserver",

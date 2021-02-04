@@ -46,6 +46,7 @@ type ClientStore interface {
 	UpdateClient(ctx context.Context, cli *ttnpb.Client, fieldMask *types.FieldMask) (*ttnpb.Client, error)
 	DeleteClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error
 	RestoreClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error
+	PurgeClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error
 }
 
 // EndDeviceStore interface for storing EndDevices.
@@ -166,6 +167,7 @@ type OAuthStore interface {
 	Authorize(ctx context.Context, req *ttnpb.OAuthClientAuthorization) (authorization *ttnpb.OAuthClientAuthorization, err error)
 	DeleteAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) error
 	DeleteUserAuthorizations(ctx context.Context, userIDs *ttnpb.UserIdentifiers) error
+	DeleteClientAuthorizations(ctx context.Context, clientIDs *ttnpb.ClientIdentifiers) error
 
 	CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) error
 	GetAuthorizationCode(ctx context.Context, code string) (*ttnpb.OAuthAuthorizationCode, error)

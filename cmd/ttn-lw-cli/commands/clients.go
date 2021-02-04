@@ -274,6 +274,35 @@ var (
 			return nil
 		},
 	}
+	clientsPurgeCommand = &cobra.Command{
+		Use:     "purge [client-id]",
+		Aliases: []string{"permanent-delete", "hard-delete"},
+		Short:   "Purge an client",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliID := getClientID(cmd.Flags(), args)
+			if cliID == nil {
+				return errNoClientID
+			}
+
+			force, err := cmd.Flags().GetBool("force")
+			if err != nil {
+				return err
+			}
+			if !confirmChoice(clientPurgeWarning, force) {
+				return errNoConfirmation
+			}
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewClientRegistryClient(is).Purge(ctx, cliID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
 	clientsContactInfoCommand = contactInfoCommands("client", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		cliID := getClientID(cmd.Flags(), args)
 		if cliID == nil {
@@ -317,5 +346,8 @@ func init() {
 	clientsCommand.AddCommand(clientsRestoreCommand)
 	clientsContactInfoCommand.PersistentFlags().AddFlagSet(clientIDFlags())
 	clientsCommand.AddCommand(clientsContactInfoCommand)
+	clientsPurgeCommand.Flags().AddFlagSet(clientIDFlags())
+	clientsPurgeCommand.Flags().AddFlagSet(forceFlags())
+	clientsCommand.AddCommand(clientsPurgeCommand)
 	Root.AddCommand(clientsCommand)
 }
