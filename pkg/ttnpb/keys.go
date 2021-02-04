@@ -15,8 +15,10 @@
 package ttnpb
 
 import (
+	"encoding/hex"
 	"fmt"
 
+	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
@@ -45,6 +47,94 @@ func (v *KeyEnvelope) FieldIsZero(p string) bool {
 		return v.Key == nil
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// EncodeMsgpack implements msgpack.CustomEncoder interface.
+func (v KeyEnvelope) EncodeMsgpack(enc *msgpack.Encoder) error {
+	var n uint8
+	if v.Key != nil {
+		n++
+	}
+	if v.KEKLabel != "" {
+		n++
+	}
+	if len(v.EncryptedKey) > 0 {
+		n++
+	}
+	if err := enc.EncodeMapLen(int(n)); err != nil {
+		return err
+	}
+
+	if v.Key != nil {
+		if err := enc.EncodeString("key"); err != nil {
+			return err
+		}
+		if err := v.Key.EncodeMsgpack(enc); err != nil {
+			return err
+		}
+	}
+	if v.KEKLabel != "" {
+		if err := enc.EncodeString("kek_label"); err != nil {
+			return err
+		}
+		if err := enc.EncodeString(v.KEKLabel); err != nil {
+			return err
+		}
+	}
+	if len(v.EncryptedKey) > 0 {
+		if err := enc.EncodeString("encrypted_key"); err != nil {
+			return err
+		}
+		if err := enc.EncodeString(hex.EncodeToString(v.EncryptedKey)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// DecodeMsgpack implements msgpack.CustomDecoder interface.
+func (v *KeyEnvelope) DecodeMsgpack(dec *msgpack.Decoder) error {
+	n, err := dec.DecodeMapLen()
+	if err != nil {
+		return err
+	}
+	*v = KeyEnvelope{}
+	for i := 0; i < n; i++ {
+		s, err := dec.DecodeString()
+		if err != nil {
+			return err
+		}
+		switch s {
+		case "key":
+			fv := &types.AES128Key{}
+			if err := fv.DecodeMsgpack(dec); err != nil {
+				return err
+			}
+			v.Key = fv
+
+		case "kek_label":
+			fv, err := dec.DecodeString()
+			if err != nil {
+				return err
+			}
+			v.KEKLabel = fv
+
+		case "encrypted_key":
+			s, err := dec.DecodeString()
+			if err != nil {
+				return err
+			}
+			fv, err := hex.DecodeString(s)
+			if err != nil {
+				return err
+			}
+			v.EncryptedKey = fv
+
+		default:
+			return errInvalidField.WithAttributes("field", s)
+		}
+	}
+	return nil
 }
 
 // FieldIsZero returns whether path p is zero.

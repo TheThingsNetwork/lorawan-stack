@@ -77,21 +77,22 @@ func (key *AES128Key) UnmarshalText(data []byte) error {
 
 // EncodeMsgpack implements msgpack.CustomEncoder interface.
 func (key AES128Key) EncodeMsgpack(enc *msgpack.Encoder) error {
-	// TODO: Implement
-	return enc.EncodeString(string(key[:]))
+	return enc.EncodeString(hex.EncodeToString(key[:]))
 }
 
 // DecodeMsgpack implements msgpack.CustomDecoder interface.
 func (key *AES128Key) DecodeMsgpack(dec *msgpack.Decoder) error {
-	b, err := dec.DecodeBytes()
+	s, err := dec.DecodeString()
+	if err != nil {
+		return err
+	}
+	b, err := hex.DecodeString(s)
 	if err != nil {
 		return err
 	}
 	if len(b) != 16 {
-		// TODO: Error
-		panic("unimplemented")
+		return errInvalidLength.New()
 	}
-	*key = [16]byte{}
-	copy(key[:], b)
+	copy(key[:], b[:])
 	return nil
 }

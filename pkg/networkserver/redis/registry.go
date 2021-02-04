@@ -15,7 +15,6 @@
 package redis
 
 import (
-	// "bytes"
 	"context"
 	"fmt"
 	"io"
@@ -116,10 +115,10 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 
 type uplinkMatchSession struct {
 	FNwkSIntKey       *ttnpb.KeyEnvelope
+	ResetsFCnt        *pbtypes.BoolValue
+	Supports32BitFCnt *pbtypes.BoolValue
 	LoRaWANVersion    ttnpb.MACVersion
-	ResetsFCnt        *pbtypes.BoolValue `msgpack:",omitempty"`
-	Supports32BitFCnt *pbtypes.BoolValue `msgpack:",omitempty"`
-	LastFCnt          uint32             `msgpack:",omitempty"`
+	LastFCnt          uint32
 }
 
 type uplinkMatchPendingSession struct {
@@ -129,80 +128,324 @@ type uplinkMatchPendingSession struct {
 
 type uplinkMatchResult struct {
 	FNwkSIntKey       *ttnpb.KeyEnvelope
-	LoRaWANVersion    ttnpb.MACVersion
-	LastFCnt          uint32             `msgpack:",omitempty"`
-	IsPending         bool               `msgpack:",omitempty"`
-	ResetsFCnt        *pbtypes.BoolValue `msgpack:",omitempty"`
-	Supports32BitFCnt *pbtypes.BoolValue `msgpack:",omitempty"`
+	ResetsFCnt        *pbtypes.BoolValue
+	Supports32BitFCnt *pbtypes.BoolValue
 	UID               string
+	LoRaWANVersion    ttnpb.MACVersion
+	LastFCnt          uint32
+	IsPending         bool
 }
 
-func encodeKeyEnvelope(enc *msgpack.Encoder, ke *ttnpb.KeyEnvelope) error {
-	switch {
-	case ke.Key != nil:
-		if err := enc.EncodeString("key"); err != nil {
-			return err
-		}
-		if err := ke.Key.EncodeMsgpack(enc); err != nil {
-			return err
-		}
-		fallthrough
-
-	case ke.KEKLabel != "":
-		if err := enc.EncodeString("kek_label"); err != nil {
-			return err
-		}
-		if err := enc.EncodeString(ke.KEKLabel); err != nil {
-			return err
-		}
-		fallthrough
-	
-	case ke.EncryptedKey != nil:
-		if err := enc.EncodeString("encrypted_key"); err != nil {
-			return err
-		}
-		if err := enc.EncodeBytes(ke.EncryptedKey); err != nil {
+func encodeStruct(enc *msgpack.Encoder, fs ...func(enc *msgpack.Encoder) error) error {
+	if err := enc.EncodeMapLen(len(fs)); err != nil {
+		return err
+	}
+	for _, f := range fs {
+		if err := f(enc); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func encodeBoolValue(enc *msgpack.Encoder, v *pbtypes.BoolValue) error {
-	if err := enc.EncodeString("value"); err != nil {
+func makeEncodeCustomEncoderField(name string, v msgpack.CustomEncoder) func(enc *msgpack.Encoder) error {
+	return func(enc *msgpack.Encoder) error {
+		if err := enc.EncodeString(name); err != nil {
+			return err
+		}
+		return v.EncodeMsgpack(enc)
+	}
+}
+
+func makeEncodeFNwkSIntField(v *ttnpb.KeyEnvelope) func(enc *msgpack.Encoder) error {
+	return makeEncodeCustomEncoderField("f_nwk_s_int_key", v)
+}
+
+func makeEncodeLoRaWANVersionField(v ttnpb.MACVersion) func(enc *msgpack.Encoder) error {
+	return makeEncodeCustomEncoderField("lorawan_version", v)
+}
+
+func makeEncodeBoolValueField(name string, v *pbtypes.BoolValue) func(enc *msgpack.Encoder) error {
+	return func(enc *msgpack.Encoder) error {
+		if err := enc.EncodeString(name); err != nil {
+			return err
+		}
+		if err := enc.EncodeMapLen(1); err != nil {
+			return err
+		}
+		if err := enc.EncodeString("value"); err != nil {
+			return err
+		}
+		return enc.EncodeBool(v.Value)
+	}
+}
+
+func makeEncodeResetsFCntField(v *pbtypes.BoolValue) func(enc *msgpack.Encoder) error {
+	return makeEncodeBoolValueField("resets_f_cnt", v)
+}
+
+func makeEncodeSupports32BitFCntField(v *pbtypes.BoolValue) func(enc *msgpack.Encoder) error {
+	return makeEncodeBoolValueField("supports_32_bit_f_cnt", v)
+}
+
+func makeEncodeLastFCntField(v uint32) func(enc *msgpack.Encoder) error {
+	return func(enc *msgpack.Encoder) error {
+		if err := enc.EncodeString("last_f_cnt"); err != nil {
+			return err
+		}
+		return enc.EncodeUint32(v)
+	}
+}
+
+var errInvalidFieldCount = errors.DefineCorruption("field_count", "invalid field count '{count}'")
+
+func decodeBoolValue(dec *msgpack.Decoder) (*pbtypes.BoolValue, error) {
+	n, err := dec.DecodeMapLen()
+	if err != nil {
+		return nil, err
+	}
+	if n != 1 {
+		return nil, errInvalidFieldCount.WithAttributes("count", n)
+	}
+
+	s, err := dec.DecodeString()
+	if err != nil {
+		return nil, err
+	}
+	if s != "value" {
+		return nil, errInvalidField.WithAttributes("field", s)
+	}
+
+	v, err := dec.DecodeBool()
+	if err != nil {
+		return nil, err
+	}
+	return &pbtypes.BoolValue{
+		Value: v,
+	}, nil
+}
+
+var errInvalidField = errors.DefineInvalidArgument("field", "invalid field `{field}`")
+
+// EncodeMsgpack implements msgpack.CustomEncoder interface.
+func (v uplinkMatchSession) EncodeMsgpack(enc *msgpack.Encoder) error {
+	fs := []func(enc *msgpack.Encoder) error{
+		makeEncodeFNwkSIntField(v.FNwkSIntKey),
+		makeEncodeLoRaWANVersionField(v.LoRaWANVersion),
+	}
+	if v.LastFCnt > 0 {
+		fs = append(fs, makeEncodeLastFCntField(v.LastFCnt))
+	}
+	if v.ResetsFCnt != nil {
+		fs = append(fs, makeEncodeResetsFCntField(v.ResetsFCnt))
+	}
+	if v.Supports32BitFCnt != nil {
+		fs = append(fs, makeEncodeSupports32BitFCntField(v.Supports32BitFCnt))
+	}
+	return encodeStruct(enc, fs...)
+}
+
+// DecodeMsgpack implements msgpack.CustomDecoder interface.
+func (v *uplinkMatchSession) DecodeMsgpack(dec *msgpack.Decoder) error {
+	n, err := dec.DecodeMapLen()
+	if err != nil {
 		return err
 	}
-	return enc.EncodeBool(v.Value)
+	if n > 5 {
+		return errInvalidFieldCount.WithAttributes("count", n)
+	}
+	for i := 0; i < n; i++ {
+		s, err := dec.DecodeString()
+		if err != nil {
+			return err
+		}
+		switch s {
+		case "f_nwk_s_int_key":
+			fv := &ttnpb.KeyEnvelope{}
+			if err := fv.DecodeMsgpack(dec); err != nil {
+				return err
+			}
+			v.FNwkSIntKey = fv
+
+		case "lorawan_version":
+			var fv ttnpb.MACVersion
+			if err := fv.DecodeMsgpack(dec); err != nil {
+				return err
+			}
+			v.LoRaWANVersion = fv
+
+		case "resets_f_cnt":
+			fv, err := decodeBoolValue(dec)
+			if err != nil {
+				return err
+			}
+			v.ResetsFCnt = fv
+
+		case "supports_32_bit_f_cnt":
+			fv, err := decodeBoolValue(dec)
+			if err != nil {
+				return err
+			}
+			v.Supports32BitFCnt = fv
+
+		case "last_f_cnt":
+			fv, err := dec.DecodeUint32()
+			if err != nil {
+				return err
+			}
+			v.LastFCnt = fv
+
+		default:
+			return errInvalidField.WithAttributes("field", s)
+		}
+	}
+	return nil
+}
+
+// EncodeMsgpack implements msgpack.CustomEncoder interface.
+func (v uplinkMatchPendingSession) EncodeMsgpack(enc *msgpack.Encoder) error {
+	return encodeStruct(enc,
+		makeEncodeFNwkSIntField(v.FNwkSIntKey),
+		makeEncodeLoRaWANVersionField(v.LoRaWANVersion),
+	)
+}
+
+// DecodeMsgpack implements msgpack.CustomDecoder interface.
+func (v *uplinkMatchPendingSession) DecodeMsgpack(dec *msgpack.Decoder) error {
+	n, err := dec.DecodeMapLen()
+	if err != nil {
+		return err
+	}
+	if n > 2 {
+		return errInvalidFieldCount.WithAttributes("count", n)
+	}
+	for i := 0; i < n; i++ {
+		s, err := dec.DecodeString()
+		if err != nil {
+			return err
+		}
+		switch s {
+		case "f_nwk_s_int_key":
+			fv := &ttnpb.KeyEnvelope{}
+			if err := fv.DecodeMsgpack(dec); err != nil {
+				return err
+			}
+			v.FNwkSIntKey = fv
+
+		case "lorawan_version":
+			var fv ttnpb.MACVersion
+			if err := fv.DecodeMsgpack(dec); err != nil {
+				return err
+			}
+			v.LoRaWANVersion = fv
+
+		default:
+			return errInvalidField.WithAttributes("field", s)
+		}
+	}
+	return nil
 }
 
 // EncodeMsgpack implements msgpack.CustomEncoder interface.
 func (v uplinkMatchResult) EncodeMsgpack(enc *msgpack.Encoder) error {
-	switch {
-	case v.FNwkSIntKey != nil:
-		if err := enc.EncodeString("f_nwk_s_int_key"); err != nil {
-			return err
-		}
-		if err := encodeKeyEnvelope(enc, v.FNwkSIntKey); err != nil {
-			return err
-		}
-		fallthrough
-	case v.LoRaWANVersion != 0:
-		if err := enc.EncodeString("lorawan_version"); err != nil {
-			return err
-		}
-		if err := v.LoRaWANVersion.EncodeMsgpack(enc); err != nil {
-			return err
-		}
-		// fallthrough
-
+	fs := []func(enc *msgpack.Encoder) error{
+		makeEncodeFNwkSIntField(v.FNwkSIntKey),
+		makeEncodeLoRaWANVersionField(v.LoRaWANVersion),
+		func(enc *msgpack.Encoder) error {
+			if err := enc.EncodeString("uid"); err != nil {
+				return err
+			}
+			return enc.EncodeString(v.UID)
+		},
 	}
-	return nil
+	if v.LastFCnt > 0 {
+		fs = append(fs, makeEncodeLastFCntField(v.LastFCnt))
+	}
+	if v.IsPending {
+		fs = append(fs, func(enc *msgpack.Encoder) error {
+			if err := enc.EncodeString("is_pending"); err != nil {
+				return err
+			}
+			return enc.EncodeBool(v.IsPending)
+		})
+	}
+	if v.ResetsFCnt != nil {
+		fs = append(fs, makeEncodeResetsFCntField(v.ResetsFCnt))
+	}
+	if v.Supports32BitFCnt != nil {
+		fs = append(fs, makeEncodeSupports32BitFCntField(v.Supports32BitFCnt))
+	}
+	return encodeStruct(enc, fs...)
 }
 
 // DecodeMsgpack implements msgpack.CustomDecoder interface.
 func (v *uplinkMatchResult) DecodeMsgpack(dec *msgpack.Decoder) error {
-	// TODO: Implement
-	panic("unimplemented")
+	n, err := dec.DecodeMapLen()
+	if err != nil {
+		return err
+	}
+	if n > 7 {
+		return errInvalidFieldCount.WithAttributes("count", n)
+	}
+	for i := 0; i < n; i++ {
+		s, err := dec.DecodeString()
+		if err != nil {
+			return err
+		}
+		switch s {
+		case "f_nwk_s_int_key":
+			fv := &ttnpb.KeyEnvelope{}
+			if err := fv.DecodeMsgpack(dec); err != nil {
+				return err
+			}
+			v.FNwkSIntKey = fv
+
+		case "lorawan_version":
+			var fv ttnpb.MACVersion
+			if err := fv.DecodeMsgpack(dec); err != nil {
+				return err
+			}
+			v.LoRaWANVersion = fv
+
+		case "resets_f_cnt":
+			fv, err := decodeBoolValue(dec)
+			if err != nil {
+				return err
+			}
+			v.ResetsFCnt = fv
+
+		case "supports_32_bit_f_cnt":
+			fv, err := decodeBoolValue(dec)
+			if err != nil {
+				return err
+			}
+			v.Supports32BitFCnt = fv
+
+		case "last_f_cnt":
+			fv, err := dec.DecodeUint32()
+			if err != nil {
+				return err
+			}
+			v.LastFCnt = fv
+
+		case "uid":
+			fv, err := dec.DecodeString()
+			if err != nil {
+				return err
+			}
+			v.UID = fv
+
+		case "is_pending":
+			fv, err := dec.DecodeBool()
+			if err != nil {
+				return err
+			}
+			v.IsPending = fv
+
+		default:
+			return errInvalidField.WithAttributes("field", s)
+		}
+	}
 	return nil
 }
 
