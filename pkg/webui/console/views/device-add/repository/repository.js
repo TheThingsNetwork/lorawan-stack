@@ -21,6 +21,8 @@ import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import toast from '@ttn-lw/components/toast'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -61,8 +63,9 @@ const m = defineMessages({
   enterDataTitle: '2. Enter registration data',
   enterDataDescription:
     'Please choose an end device first to proceed with entering registration data',
-  register: 'Register end device',
+  submitTitle: 'Register end device',
   createSuccess: 'End device created',
+  register: 'Register from The LoRaWAN Device Repository',
 })
 
 const stateToFormValues = state => ({
@@ -301,4 +304,6 @@ DeviceRepository.defaultProps = {
   supportLink: undefined,
 }
 
-export default DeviceRepository
+export default withBreadcrumb('devices.add.device-repository', props => (
+  <Breadcrumb path={`/applications/${props.appId}/devices/add/repository`} content={m.register} />
+))(DeviceRepository)
