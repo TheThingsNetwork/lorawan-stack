@@ -83,8 +83,8 @@ for _, old_uid in ipairs(ARGV) do
   if uid ~= old_uid then
     local s = redis.call('hget', KEYS[2], uid)
     local m = cmsgpack.unpack(s)
-    if not m.Supports32BitFCnt or m.Supports32BitFCnt.value
-      or ack == 0 and m.ResetsFCnt and m.ResetsFCnt.value then
+    if not m.supports_32_bit_f_cnt or m.supports_32_bit_f_cnt.value
+      or ack == 0 and m.resets_f_cnt and m.resets_f_cnt.value then
       return { uid, s }
     end
   end
@@ -95,8 +95,8 @@ local uid = redis.call('lindex', KEYS[1], -1)
 while uid do
   local s = redis.call('hget', KEYS[2], uid)
   local m = cmsgpack.unpack(s)
-  if not m.Supports32BitFCnt or m.Supports32BitFCnt.value
-    or ack == 0 and m.ResetsFCnt and m.ResetsFCnt.value then
+  if not m.supports_32_bit_f_cnt or m.supports_32_bit_f_cnt.value
+    or ack == 0 and m.resets_f_cnt and m.resets_f_cnt.value then
     return { uid, s }
   end
   redis.call('ltrim', KEYS[1], 0, -2)
