@@ -27,7 +27,7 @@ const m = defineMessages({
   hintMessage:
     'Cannot find your exact end device? <SupportLink>Get help here</SupportLink> and <ManualLink>try manual device registration</ManualLink>.',
   hintNoSupportMessage:
-    'Cannot find your exact end device? Try <ManualLink>try manual device registration</ManualLink>.',
+    'Cannot find your exact end device? <ManualLink>Try manual device registration</ManualLink>.',
 })
 
 const ProgressHint = React.memo(props => {
