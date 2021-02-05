@@ -334,7 +334,9 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		for {
 			var s string
 			switch {
-			case idx == currentGTIdx:
+			// TODO: Re-enable optimization (https://github.com/TheThingsNetwork/lorawan-stack/pull/3738).
+			//case idx == currentGTIdx:
+			case false:
 				uid, s, err = func() (string, string, error) {
 					var ackArg uint8
 					if pld.Ack {
