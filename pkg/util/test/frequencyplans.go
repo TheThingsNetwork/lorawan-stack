@@ -16,6 +16,7 @@ package test
 
 import (
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 )
 
 const (
@@ -399,12 +400,20 @@ rx2-default-data-rate: 0
 max-eirp: 27`
 )
 
-// FrequencyPlansFetcher fetches frequency plans from memory.
-var FrequencyPlansFetcher = fetch.NewMemFetcher(map[string][]byte{
-	"frequency-plans.yml":  []byte(frequencyPlansDescription),
-	"EU_863_870.yml":       []byte(euFrequencyPlan),
-	"KR_920_923.yml":       []byte(krFrequencyPlan),
-	"US_902_928_FSB_2.yml": []byte(usFrequencyPlan),
-	"AS_923_925_AU.yml":    []byte(asAUFrequencyPlan),
-	"EXAMPLE.yml":          []byte(exampleFrequencyPlan),
-})
+var (
+	// FrequencyPlansFetcher fetches frequency plans from memory.
+	FrequencyPlansFetcher = fetch.NewMemFetcher(map[string][]byte{
+		"frequency-plans.yml":  []byte(frequencyPlansDescription),
+		"EU_863_870.yml":       []byte(euFrequencyPlan),
+		"KR_920_923.yml":       []byte(krFrequencyPlan),
+		"US_902_928_FSB_2.yml": []byte(usFrequencyPlan),
+		"AS_923_925_AU.yml":    []byte(asAUFrequencyPlan),
+		"EXAMPLE.yml":          []byte(exampleFrequencyPlan),
+	})
+
+	FrequencyPlanStore = frequencyplans.NewStore(FrequencyPlansFetcher)
+)
+
+func FrequencyPlan(id string) *frequencyplans.FrequencyPlan {
+	return Must(FrequencyPlanStore.GetByID(id)).(*frequencyplans.FrequencyPlan)
+}
