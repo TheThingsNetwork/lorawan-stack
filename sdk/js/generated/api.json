@@ -1156,8 +1156,8 @@
       "enums": [
         {
           "name": "Status",
-          "longName": "AsConfiguration.PubSub.ProvidersStatus.Status",
-          "fullName": "ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status",
+          "longName": "AsConfiguration.PubSub.Providers.Status",
+          "fullName": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status",
           "description": "",
           "values": [
             {
@@ -1331,21 +1331,21 @@
           "extensions": [],
           "fields": [
             {
-              "name": "status",
+              "name": "providers",
               "description": "",
               "label": "",
-              "type": "ProvidersStatus",
-              "longType": "AsConfiguration.PubSub.ProvidersStatus",
-              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus",
+              "type": "Providers",
+              "longType": "AsConfiguration.PubSub.Providers",
+              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers",
               "ismap": false,
               "defaultValue": ""
             }
           ]
         },
         {
-          "name": "ProvidersStatus",
-          "longName": "AsConfiguration.PubSub.ProvidersStatus",
-          "fullName": "ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus",
+          "name": "Providers",
+          "longName": "AsConfiguration.PubSub.Providers",
+          "fullName": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers",
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
@@ -1356,8 +1356,8 @@
               "description": "",
               "label": "",
               "type": "Status",
-              "longType": "AsConfiguration.PubSub.ProvidersStatus.Status",
-              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status",
+              "longType": "AsConfiguration.PubSub.Providers.Status",
+              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status",
               "ismap": false,
               "defaultValue": ""
             },
@@ -1366,8 +1366,8 @@
               "description": "",
               "label": "",
               "type": "Status",
-              "longType": "AsConfiguration.PubSub.ProvidersStatus.Status",
-              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status",
+              "longType": "AsConfiguration.PubSub.Providers.Status",
+              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status",
               "ismap": false,
               "defaultValue": ""
             },
@@ -1376,8 +1376,8 @@
               "description": "",
               "label": "",
               "type": "Status",
-              "longType": "AsConfiguration.PubSub.ProvidersStatus.Status",
-              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status",
+              "longType": "AsConfiguration.PubSub.Providers.Status",
+              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status",
               "ismap": false,
               "defaultValue": ""
             }

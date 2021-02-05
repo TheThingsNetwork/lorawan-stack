@@ -28,13 +28,13 @@
   - [Message `ApplicationLinkStats`](#ttn.lorawan.v3.ApplicationLinkStats)
   - [Message `AsConfiguration`](#ttn.lorawan.v3.AsConfiguration)
   - [Message `AsConfiguration.PubSub`](#ttn.lorawan.v3.AsConfiguration.PubSub)
-  - [Message `AsConfiguration.PubSub.ProvidersStatus`](#ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus)
+  - [Message `AsConfiguration.PubSub.Providers`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers)
   - [Message `GetApplicationLinkRequest`](#ttn.lorawan.v3.GetApplicationLinkRequest)
   - [Message `GetAsConfigurationRequest`](#ttn.lorawan.v3.GetAsConfigurationRequest)
   - [Message `GetAsConfigurationResponse`](#ttn.lorawan.v3.GetAsConfigurationResponse)
   - [Message `NsAsHandleUplinkRequest`](#ttn.lorawan.v3.NsAsHandleUplinkRequest)
   - [Message `SetApplicationLinkRequest`](#ttn.lorawan.v3.SetApplicationLinkRequest)
-  - [Enum `AsConfiguration.PubSub.ProvidersStatus.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status)
+  - [Enum `AsConfiguration.PubSub.Providers.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status)
   - [Service `AppAs`](#ttn.lorawan.v3.AppAs)
   - [Service `As`](#ttn.lorawan.v3.As)
   - [Service `AsEndDeviceRegistry`](#ttn.lorawan.v3.AsEndDeviceRegistry)
@@ -826,15 +826,15 @@ Application Server configuration.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `status` | [`AsConfiguration.PubSub.ProvidersStatus`](#ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus) |  |  |
+| `providers` | [`AsConfiguration.PubSub.Providers`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers) |  |  |
 
-### <a name="ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus">Message `AsConfiguration.PubSub.ProvidersStatus`</a>
+### <a name="ttn.lorawan.v3.AsConfiguration.PubSub.Providers">Message `AsConfiguration.PubSub.Providers`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `mqtt` | [`AsConfiguration.PubSub.ProvidersStatus.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status) |  |  |
-| `nats` | [`AsConfiguration.PubSub.ProvidersStatus.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status) |  |  |
-| `aws_iot` | [`AsConfiguration.PubSub.ProvidersStatus.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status) |  |  |
+| `mqtt` | [`AsConfiguration.PubSub.Providers.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status) |  |  |
+| `nats` | [`AsConfiguration.PubSub.Providers.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status) |  |  |
+| `aws_iot` | [`AsConfiguration.PubSub.Providers.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status) |  |  |
 
 ### <a name="ttn.lorawan.v3.GetApplicationLinkRequest">Message `GetApplicationLinkRequest`</a>
 
@@ -884,7 +884,7 @@ Application Server configuration.
 | `application_ids` | <p>`message.required`: `true`</p> |
 | `link` | <p>`message.required`: `true`</p> |
 
-### <a name="ttn.lorawan.v3.AsConfiguration.PubSub.ProvidersStatus.Status">Enum `AsConfiguration.PubSub.ProvidersStatus.Status`</a>
+### <a name="ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status">Enum `AsConfiguration.PubSub.Providers.Status`</a>
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |

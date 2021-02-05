@@ -332,29 +332,29 @@ func (dst *NsAsHandleUplinkRequest) SetFields(src *NsAsHandleUplinkRequest, path
 func (dst *AsConfiguration_PubSub) SetFields(src *AsConfiguration_PubSub, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "status":
+		case "providers":
 			if len(subs) > 0 {
-				var newDst, newSrc *AsConfiguration_PubSub_ProvidersStatus
-				if (src == nil || src.Status == nil) && dst.Status == nil {
+				var newDst, newSrc *AsConfiguration_PubSub_Providers
+				if (src == nil || src.Providers == nil) && dst.Providers == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.Status
+					newSrc = src.Providers
 				}
-				if dst.Status != nil {
-					newDst = dst.Status
+				if dst.Providers != nil {
+					newDst = dst.Providers
 				} else {
-					newDst = &AsConfiguration_PubSub_ProvidersStatus{}
-					dst.Status = newDst
+					newDst = &AsConfiguration_PubSub_Providers{}
+					dst.Providers = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.Status = src.Status
+					dst.Providers = src.Providers
 				} else {
-					dst.Status = nil
+					dst.Providers = nil
 				}
 			}
 
@@ -365,7 +365,7 @@ func (dst *AsConfiguration_PubSub) SetFields(src *AsConfiguration_PubSub, paths 
 	return nil
 }
 
-func (dst *AsConfiguration_PubSub_ProvidersStatus) SetFields(src *AsConfiguration_PubSub_ProvidersStatus, paths ...string) error {
+func (dst *AsConfiguration_PubSub_Providers) SetFields(src *AsConfiguration_PubSub_Providers, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "mqtt":
@@ -375,7 +375,7 @@ func (dst *AsConfiguration_PubSub_ProvidersStatus) SetFields(src *AsConfiguratio
 			if src != nil {
 				dst.MQTT = src.MQTT
 			} else {
-				var zero AsConfiguration_PubSub_ProvidersStatus_Status
+				var zero AsConfiguration_PubSub_Providers_Status
 				dst.MQTT = zero
 			}
 		case "nats":
@@ -385,7 +385,7 @@ func (dst *AsConfiguration_PubSub_ProvidersStatus) SetFields(src *AsConfiguratio
 			if src != nil {
 				dst.NATS = src.NATS
 			} else {
-				var zero AsConfiguration_PubSub_ProvidersStatus_Status
+				var zero AsConfiguration_PubSub_Providers_Status
 				dst.NATS = zero
 			}
 		case "aws_iot":
@@ -395,7 +395,7 @@ func (dst *AsConfiguration_PubSub_ProvidersStatus) SetFields(src *AsConfiguratio
 			if src != nil {
 				dst.AWSIoT = src.AWSIoT
 			} else {
-				var zero AsConfiguration_PubSub_ProvidersStatus_Status
+				var zero AsConfiguration_PubSub_Providers_Status
 				dst.AWSIoT = zero
 			}
 

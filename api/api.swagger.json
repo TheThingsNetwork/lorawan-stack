@@ -8744,8 +8744,8 @@
     "AsConfigurationPubSub": {
       "type": "object",
       "properties": {
-        "status": {
-          "$ref": "#/definitions/PubSubProvidersStatus"
+        "providers": {
+          "$ref": "#/definitions/PubSubProviders"
         }
       }
     },
@@ -9640,7 +9640,7 @@
         }
       }
     },
-    "ProvidersStatusStatus": {
+    "ProvidersStatus": {
       "type": "string",
       "enum": [
         "ENABLED",
@@ -9688,17 +9688,17 @@
         }
       }
     },
-    "PubSubProvidersStatus": {
+    "PubSubProviders": {
       "type": "object",
       "properties": {
         "mqtt": {
-          "$ref": "#/definitions/ProvidersStatusStatus"
+          "$ref": "#/definitions/ProvidersStatus"
         },
         "nats": {
-          "$ref": "#/definitions/ProvidersStatusStatus"
+          "$ref": "#/definitions/ProvidersStatus"
         },
         "aws_iot": {
-          "$ref": "#/definitions/ProvidersStatusStatus"
+          "$ref": "#/definitions/ProvidersStatus"
         }
       }
     },

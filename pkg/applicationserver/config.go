@@ -108,19 +108,19 @@ type PubSubConfig struct {
 }
 
 func (c PubSubConfig) toProto() *ttnpb.AsConfiguration_PubSub {
-	toStatus := func(s string) ttnpb.AsConfiguration_PubSub_ProvidersStatus_Status {
+	toStatus := func(s string) ttnpb.AsConfiguration_PubSub_Providers_Status {
 		switch s {
 		case "enabled":
-			return ttnpb.AsConfiguration_PubSub_ProvidersStatus_ENABLED
+			return ttnpb.AsConfiguration_PubSub_Providers_ENABLED
 		case "warning":
-			return ttnpb.AsConfiguration_PubSub_ProvidersStatus_WARNING
+			return ttnpb.AsConfiguration_PubSub_Providers_WARNING
 		case "disabled":
-			return ttnpb.AsConfiguration_PubSub_ProvidersStatus_DISABLED
+			return ttnpb.AsConfiguration_PubSub_Providers_DISABLED
 		default:
 			panic("unknown provider status")
 		}
 	}
-	providers := &ttnpb.AsConfiguration_PubSub_ProvidersStatus{}
+	providers := &ttnpb.AsConfiguration_PubSub_Providers{}
 	if status, ok := c.Providers["mqtt"]; ok {
 		providers.MQTT = toStatus(status)
 	}
@@ -131,7 +131,7 @@ func (c PubSubConfig) toProto() *ttnpb.AsConfiguration_PubSub {
 		providers.AWSIoT = toStatus(status)
 	}
 	return &ttnpb.AsConfiguration_PubSub{
-		Status: providers,
+		Providers: providers,
 	}
 }
 

@@ -868,12 +868,12 @@ func (m *AsConfiguration_PubSub) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "status":
+		case "providers":
 
-			if v, ok := interface{}(m.GetStatus()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetProviders()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return AsConfiguration_PubSubValidationError{
-						field:  "status",
+						field:  "providers",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
@@ -946,16 +946,16 @@ var _ interface {
 	ErrorName() string
 } = AsConfiguration_PubSubValidationError{}
 
-// ValidateFields checks the field values on
-// AsConfiguration_PubSub_ProvidersStatus with the rules defined in the proto
-// definition for this message. If any rules are violated, an error is returned.
-func (m *AsConfiguration_PubSub_ProvidersStatus) ValidateFields(paths ...string) error {
+// ValidateFields checks the field values on AsConfiguration_PubSub_Providers
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *AsConfiguration_PubSub_Providers) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = AsConfiguration_PubSub_ProvidersStatusFieldPathsNested
+		paths = AsConfiguration_PubSub_ProvidersFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
@@ -968,7 +968,7 @@ func (m *AsConfiguration_PubSub_ProvidersStatus) ValidateFields(paths ...string)
 		case "aws_iot":
 			// no validation rules for AWSIoT
 		default:
-			return AsConfiguration_PubSub_ProvidersStatusValidationError{
+			return AsConfiguration_PubSub_ProvidersValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -977,10 +977,10 @@ func (m *AsConfiguration_PubSub_ProvidersStatus) ValidateFields(paths ...string)
 	return nil
 }
 
-// AsConfiguration_PubSub_ProvidersStatusValidationError is the validation
-// error returned by AsConfiguration_PubSub_ProvidersStatus.ValidateFields if
-// the designated constraints aren't met.
-type AsConfiguration_PubSub_ProvidersStatusValidationError struct {
+// AsConfiguration_PubSub_ProvidersValidationError is the validation error
+// returned by AsConfiguration_PubSub_Providers.ValidateFields if the
+// designated constraints aren't met.
+type AsConfiguration_PubSub_ProvidersValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -988,24 +988,24 @@ type AsConfiguration_PubSub_ProvidersStatusValidationError struct {
 }
 
 // Field function returns field value.
-func (e AsConfiguration_PubSub_ProvidersStatusValidationError) Field() string { return e.field }
+func (e AsConfiguration_PubSub_ProvidersValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AsConfiguration_PubSub_ProvidersStatusValidationError) Reason() string { return e.reason }
+func (e AsConfiguration_PubSub_ProvidersValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AsConfiguration_PubSub_ProvidersStatusValidationError) Cause() error { return e.cause }
+func (e AsConfiguration_PubSub_ProvidersValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AsConfiguration_PubSub_ProvidersStatusValidationError) Key() bool { return e.key }
+func (e AsConfiguration_PubSub_ProvidersValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AsConfiguration_PubSub_ProvidersStatusValidationError) ErrorName() string {
-	return "AsConfiguration_PubSub_ProvidersStatusValidationError"
+func (e AsConfiguration_PubSub_ProvidersValidationError) ErrorName() string {
+	return "AsConfiguration_PubSub_ProvidersValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e AsConfiguration_PubSub_ProvidersStatusValidationError) Error() string {
+func (e AsConfiguration_PubSub_ProvidersValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1017,14 +1017,14 @@ func (e AsConfiguration_PubSub_ProvidersStatusValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAsConfiguration_PubSub_ProvidersStatus.%s: %s%s",
+		"invalid %sAsConfiguration_PubSub_Providers.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AsConfiguration_PubSub_ProvidersStatusValidationError{}
+var _ error = AsConfiguration_PubSub_ProvidersValidationError{}
 
 var _ interface {
 	Field() string
@@ -1032,4 +1032,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AsConfiguration_PubSub_ProvidersStatusValidationError{}
+} = AsConfiguration_PubSub_ProvidersValidationError{}
