@@ -23,7 +23,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 const m = defineMessages({
   hintTitle: 'Your end device will be added soon!',
   hintMessage:
-    "We're sorry, but your device is not yet part of The Things Device Repository. You can use <ManualLink>manual device registration</ManualLink>, using the information your end device manufacturer provided e.g. in the product's data sheet. Please also refer to hour documentation on <GuideLink>Adding Devices</GuideLink>.",
+    "We're sorry, but your device is not yet part of The LoRaWAN Device Repository. You can use <ManualLink>manual device registration</ManualLink>, using the information your end device manufacturer provided e.g. in the product's data sheet. Please also refer to hour documentation on <GuideLink>Adding Devices</GuideLink>.",
 })
 
 const OtherHint = React.memo(props => {
