@@ -19,7 +19,9 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
+	"github.com/vmihailenco/msgpack/v5"
 	nsredis "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -94,6 +96,12 @@ var (
 			var migrated uint64
 			defer func() { logger.Debugf("%d keys migrated", migrated) }()
 
+			type KeyEnvelope3_11Snapshot struct {
+				Key          []byte `msgpack:"key"`
+				KEKLabel     string `msgpack:"kek_label"`
+				EncryptedKey []byte `msgpack:"encrypted_key"`
+			}
+
 			const (
 				idRegexpStr      = `([a-z0-9](?:[-]?[a-z0-9]){2,}){1,36}?`
 				uidRegexpStr     = idRegexpStr + `\.` + idRegexpStr
@@ -121,6 +129,7 @@ var (
 						logger.WithError(err).Error("Failed to delete key")
 						return true, nil
 					}
+
 				case addrRegexpLegacy.MatchString(k):
 					var devAddr types.DevAddr
 					if err := devAddr.UnmarshalText([]byte(k[len(k)-8:])); err != nil {
@@ -187,6 +196,7 @@ var (
 						logger.WithError(err).Error("Failed to scan legacy DevAddr key")
 						return true, nil
 					}
+
 				case addrRegexp3_10_16Bit.MatchString(k), addrRegexp3_10_32Bit.MatchString(k):
 					currentKey := nsredis.CurrentAddrKey(k[:len(k)-6])
 					fieldKey := nsredis.FieldKey(currentKey)
@@ -229,6 +239,7 @@ var (
 						logger.WithError(err).Error("Failed to scan 3.10 current DevAddr key")
 						return true, nil
 					}
+
 				case addrRegexp3_10_Pending.MatchString(k):
 					typ, err := cl.Type(ctx, k).Result()
 					if err != nil {
@@ -285,13 +296,136 @@ var (
 						logger.WithError(err).Error("Transaction failed")
 						return true, nil
 					}
+
+				case addrRegexp3_11_CurrentFields.MatchString(k):
+					var migratedSubkeys uint64
+					if err := rangeRedisHMap(ctx, cl, k, "*", 1, func(uid string, s string) (bool, error) {
+						logger := logger.WithField("uid", uid)
+						if err := cl.Watch(ctx, func(tx *redis.Tx) error {
+							if err := msgpack.Unmarshal([]byte(s), &nsredis.UplinkMatchSession{}); err == nil {
+								return nil
+							}
+							type BoolValue struct {
+								Value bool `msgpack:"value"`
+							}
+							stored := &struct {
+								FNwkSIntKey       KeyEnvelope3_11Snapshot
+								ResetsFCnt        *BoolValue
+								Supports32BitFCnt *BoolValue
+								LoRaWANVersion    ttnpb.MACVersion
+								LastFCnt          uint32
+							}{}
+							if err := msgpack.Unmarshal([]byte(s), stored); err != nil {
+								logger.WithError(err).Error("Failed to unmarshal legacy current session fields")
+								return err
+							}
+							var key *types.AES128Key
+							if len(stored.FNwkSIntKey.Key) > 0 {
+								key = &types.AES128Key{}
+								copy(key[:], stored.FNwkSIntKey.Key)
+							}
+							var resetsFCnt *pbtypes.BoolValue
+							if stored.ResetsFCnt != nil {
+								resetsFCnt = &pbtypes.BoolValue{
+									Value: stored.ResetsFCnt.Value,
+								}
+							}
+							var supports32BitFCnt *pbtypes.BoolValue
+							if stored.Supports32BitFCnt != nil {
+								supports32BitFCnt = &pbtypes.BoolValue{
+									Value: stored.Supports32BitFCnt.Value,
+								}
+							}
+							b, err := msgpack.Marshal(&nsredis.UplinkMatchSession{
+								FNwkSIntKey: &ttnpb.KeyEnvelope{
+									Key:          key,
+									KEKLabel:     stored.FNwkSIntKey.KEKLabel,
+									EncryptedKey: stored.FNwkSIntKey.EncryptedKey,
+								},
+								ResetsFCnt:        resetsFCnt,
+								Supports32BitFCnt: supports32BitFCnt,
+								LoRaWANVersion:    stored.LoRaWANVersion,
+								LastFCnt:          stored.LastFCnt,
+							})
+							if err != nil {
+								logger.WithError(err).Error("Failed to marshal current session fields")
+								return nil
+							}
+							if err := tx.HSet(ctx, k, uid, string(b)).Err(); err != nil {
+								logger.WithError(err).Error("Failed to set current session fields")
+								return err
+							}
+							migratedSubkeys++
+							return nil
+						}, k); err != nil {
+							logger.WithError(err).Error("Transaction failed")
+						}
+						return true, nil
+					}); err != nil {
+						logger.WithError(err).Error("Failed to scan current session field key")
+						return true, nil
+					}
+					if migratedSubkeys == 0 {
+						return true, nil
+					}
+
+				case addrRegexp3_11_PendingFields.MatchString(k):
+					var migratedSubkeys uint64
+					if err := rangeRedisHMap(ctx, cl, k, "*", 1, func(uid string, s string) (bool, error) {
+						logger := logger.WithField("uid", uid)
+						if err := cl.Watch(ctx, func(tx *redis.Tx) error {
+							if err := msgpack.Unmarshal([]byte(s), &nsredis.UplinkMatchPendingSession{}); err == nil {
+								return nil
+							}
+							stored := &struct {
+								FNwkSIntKey    KeyEnvelope3_11Snapshot
+								LoRaWANVersion ttnpb.MACVersion
+							}{}
+							if err := msgpack.Unmarshal([]byte(s), stored); err != nil {
+								logger.WithError(err).Error("Failed to unmarshal legacy pending session fields")
+								return err
+							}
+							var key *types.AES128Key
+							if len(stored.FNwkSIntKey.Key) > 0 {
+								key = &types.AES128Key{}
+								copy(key[:], stored.FNwkSIntKey.Key)
+							}
+							b, err := msgpack.Marshal(&nsredis.UplinkMatchSession{
+								FNwkSIntKey: &ttnpb.KeyEnvelope{
+									Key:          key,
+									KEKLabel:     stored.FNwkSIntKey.KEKLabel,
+									EncryptedKey: stored.FNwkSIntKey.EncryptedKey,
+								},
+								LoRaWANVersion: stored.LoRaWANVersion,
+							})
+							if err != nil {
+								logger.WithError(err).Error("Failed to marshal pending session fields")
+								return nil
+							}
+							if err := tx.HSet(ctx, k, uid, string(b)).Err(); err != nil {
+								logger.WithError(err).Error("Failed to set pending session fields")
+								return err
+							}
+							migratedSubkeys++
+							return nil
+						}, k); err != nil {
+							logger.WithError(err).Error("Transaction failed")
+						}
+						return true, nil
+					}); err != nil {
+						logger.WithError(err).Error("Failed to scan pending session field key")
+						return true, nil
+					}
+					if migratedSubkeys == 0 {
+						return true, nil
+					}
+
 				case uidRegexp.MatchString(k),
 					euiRegexp.MatchString(k),
-					addrRegexp3_11_Current.MatchString(k),
-					addrRegexp3_11_CurrentFields.MatchString(k),
-					addrRegexp3_11_PendingFields.MatchString(k):
+					addrRegexp3_11_Current.MatchString(k):
 					logger.Debug("Skip valid key")
 					return true, nil
+
 				default:
 					d, err := cl.TTL(ctx, k).Result()
 					if err != nil {
