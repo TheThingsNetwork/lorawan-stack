@@ -20,10 +20,13 @@ import { merge } from 'lodash'
 import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import toast from '@ttn-lw/components/toast'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { REGISTRATION_TYPES } from '../utils'
 
 import { RepositoryContext } from './context'
 import ProgressHint from './hints/progress-hint'
@@ -59,6 +62,7 @@ const m = defineMessages({
   enterDataDescription:
     'Please choose an end device first to proceed with entering registration data',
   register: 'Register end device',
+  createSuccess: 'End device created',
 })
 
 const stateToFormValues = state => ({
@@ -132,12 +136,34 @@ const DeviceRepository = props => {
   const handleSubmit = React.useCallback(
     async values => {
       try {
-        const castedValues = validationSchema.cast(values, { context: validationContext })
+        const { _registration, ...castedValues } = validationSchema.cast(values, {
+          context: validationContext,
+        })
         const { ids } = castedValues
         ids.application_ids = { application_id: appId }
 
         await createDevice(appId, castedValues)
-        createDeviceSuccess(appId, ids.device_id)
+        switch (_registration) {
+          case REGISTRATION_TYPES.MULTIPLE:
+            const { resetForm, values } = formRef.current
+            toast({
+              type: toast.types.SUCCESS,
+              message: m.createSuccess,
+            })
+            resetForm({
+              values: {
+                ...castedValues,
+                ...initialValues,
+                frequency_plan_id: castedValues.frequency_plan_id,
+                version_ids: values.version_ids,
+                _registration: REGISTRATION_TYPES.MULTIPLE,
+              },
+            })
+            break
+          case REGISTRATION_TYPES.SINGLE:
+          default:
+            createDeviceSuccess(appId, ids.device_id)
+        }
       } catch (error) {
         handleSetError(error)
       }

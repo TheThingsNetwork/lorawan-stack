@@ -44,3 +44,8 @@ export const isOtherOption = option => option === SELECT_OTHER_OPTION
 */
 export const SELECT_UNKNOWN_HW_OPTION = '_unknown_hw_version_'
 export const isUnknownHwVersion = option => option === SELECT_UNKNOWN_HW_OPTION
+
+export const REGISTRATION_TYPES = Object.freeze({
+  SINGLE: 'single',
+  MULTIPLE: 'multiple',
+})
