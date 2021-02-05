@@ -64,7 +64,7 @@ const m = defineMessages({
   enterDataDescription:
     'Please choose an end device first to proceed with entering registration data',
   submitTitle: 'Register end device',
-  createSuccess: 'End device created',
+  createSuccess: 'End device registered',
   register: 'Register from The LoRaWAN Device Repository',
 })
 
