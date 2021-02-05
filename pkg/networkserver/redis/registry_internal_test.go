@@ -100,14 +100,14 @@ func TestMsgpackCompatibility(t *testing.T) {
 		LuaExpr string
 	}{
 		{
-			Value: uplinkMatchPendingSession{
+			Value: UplinkMatchPendingSession{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion: test.DefaultMACVersion,
 			},
 			LuaExpr: makeExprWithDefaults(),
 		},
 		{
-			Value: uplinkMatchPendingSession{
+			Value: UplinkMatchPendingSession{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelope,
 				LoRaWANVersion: test.DefaultMACVersion,
 			},
@@ -118,14 +118,14 @@ func TestMsgpackCompatibility(t *testing.T) {
 		},
 
 		{
-			Value: uplinkMatchSession{
+			Value: UplinkMatchSession{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion: test.DefaultMACVersion,
 			},
 			LuaExpr: makeExprWithDefaults(),
 		},
 		{
-			Value: uplinkMatchSession{
+			Value: UplinkMatchSession{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelope,
 				LoRaWANVersion: test.DefaultMACVersion,
 			},
@@ -135,7 +135,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchSession{
+			Value: UplinkMatchSession{
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
 				Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
@@ -145,7 +145,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchSession{
+			Value: UplinkMatchSession{
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
 				Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
@@ -155,7 +155,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchSession{
+			Value: UplinkMatchSession{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion: test.DefaultMACVersion,
 				ResetsFCnt:     &pbtypes.BoolValue{Value: true},
@@ -165,7 +165,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchSession{
+			Value: UplinkMatchSession{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion: test.DefaultMACVersion,
 				ResetsFCnt:     &pbtypes.BoolValue{Value: false},
@@ -175,7 +175,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchSession{
+			Value: UplinkMatchSession{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion: test.DefaultMACVersion,
 				LastFCnt:       42,
@@ -185,7 +185,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchSession{
+			Value: UplinkMatchSession{
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
 				ResetsFCnt:        &pbtypes.BoolValue{Value: true},
@@ -200,7 +200,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 		},
 
 		{
-			Value: uplinkMatchResult{
+			Value: UplinkMatchResult{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion: test.DefaultMACVersion,
 				UID:            "test-uid",
@@ -210,7 +210,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchResult{
+			Value: UplinkMatchResult{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelope,
 				LoRaWANVersion: test.DefaultMACVersion,
 				UID:            "test-uid",
@@ -222,7 +222,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchResult{
+			Value: UplinkMatchResult{
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
 				Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
@@ -234,7 +234,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchResult{
+			Value: UplinkMatchResult{
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
 				Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
@@ -246,7 +246,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchResult{
+			Value: UplinkMatchResult{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion: test.DefaultMACVersion,
 				UID:            "test-uid",
@@ -258,7 +258,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchResult{
+			Value: UplinkMatchResult{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion: test.DefaultMACVersion,
 				UID:            "test-uid",
@@ -270,7 +270,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchResult{
+			Value: UplinkMatchResult{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion: test.DefaultMACVersion,
 				UID:            "test-uid",
@@ -282,7 +282,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchResult{
+			Value: UplinkMatchResult{
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
 				UID:               "test-uid",
@@ -298,7 +298,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 		{
-			Value: uplinkMatchResult{
+			Value: UplinkMatchResult{
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
 				UID:               "test-uid",

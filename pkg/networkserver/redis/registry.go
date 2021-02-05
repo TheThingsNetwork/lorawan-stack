@@ -113,7 +113,7 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 	return pb, ctx, nil
 }
 
-type uplinkMatchSession struct {
+type UplinkMatchSession struct {
 	FNwkSIntKey       *ttnpb.KeyEnvelope
 	ResetsFCnt        *pbtypes.BoolValue
 	Supports32BitFCnt *pbtypes.BoolValue
@@ -121,12 +121,12 @@ type uplinkMatchSession struct {
 	LastFCnt          uint32
 }
 
-type uplinkMatchPendingSession struct {
+type UplinkMatchPendingSession struct {
 	FNwkSIntKey    *ttnpb.KeyEnvelope
 	LoRaWANVersion ttnpb.MACVersion
 }
 
-type uplinkMatchResult struct {
+type UplinkMatchResult struct {
 	FNwkSIntKey       *ttnpb.KeyEnvelope
 	ResetsFCnt        *pbtypes.BoolValue
 	Supports32BitFCnt *pbtypes.BoolValue
@@ -228,7 +228,7 @@ func decodeBoolValue(dec *msgpack.Decoder) (*pbtypes.BoolValue, error) {
 var errInvalidField = errors.DefineInvalidArgument("field", "invalid field `{field}`")
 
 // EncodeMsgpack implements msgpack.CustomEncoder interface.
-func (v uplinkMatchSession) EncodeMsgpack(enc *msgpack.Encoder) error {
+func (v UplinkMatchSession) EncodeMsgpack(enc *msgpack.Encoder) error {
 	fs := []func(enc *msgpack.Encoder) error{
 		makeEncodeFNwkSIntField(v.FNwkSIntKey),
 		makeEncodeLoRaWANVersionField(v.LoRaWANVersion),
@@ -246,7 +246,7 @@ func (v uplinkMatchSession) EncodeMsgpack(enc *msgpack.Encoder) error {
 }
 
 // DecodeMsgpack implements msgpack.CustomDecoder interface.
-func (v *uplinkMatchSession) DecodeMsgpack(dec *msgpack.Decoder) error {
+func (v *UplinkMatchSession) DecodeMsgpack(dec *msgpack.Decoder) error {
 	n, err := dec.DecodeMapLen()
 	if err != nil {
 		return err
@@ -303,7 +303,7 @@ func (v *uplinkMatchSession) DecodeMsgpack(dec *msgpack.Decoder) error {
 }
 
 // EncodeMsgpack implements msgpack.CustomEncoder interface.
-func (v uplinkMatchPendingSession) EncodeMsgpack(enc *msgpack.Encoder) error {
+func (v UplinkMatchPendingSession) EncodeMsgpack(enc *msgpack.Encoder) error {
 	return encodeStruct(enc,
 		makeEncodeFNwkSIntField(v.FNwkSIntKey),
 		makeEncodeLoRaWANVersionField(v.LoRaWANVersion),
@@ -311,7 +311,7 @@ func (v uplinkMatchPendingSession) EncodeMsgpack(enc *msgpack.Encoder) error {
 }
 
 // DecodeMsgpack implements msgpack.CustomDecoder interface.
-func (v *uplinkMatchPendingSession) DecodeMsgpack(dec *msgpack.Decoder) error {
+func (v *UplinkMatchPendingSession) DecodeMsgpack(dec *msgpack.Decoder) error {
 	n, err := dec.DecodeMapLen()
 	if err != nil {
 		return err
@@ -347,7 +347,7 @@ func (v *uplinkMatchPendingSession) DecodeMsgpack(dec *msgpack.Decoder) error {
 }
 
 // EncodeMsgpack implements msgpack.CustomEncoder interface.
-func (v uplinkMatchResult) EncodeMsgpack(enc *msgpack.Encoder) error {
+func (v UplinkMatchResult) EncodeMsgpack(enc *msgpack.Encoder) error {
 	fs := []func(enc *msgpack.Encoder) error{
 		makeEncodeFNwkSIntField(v.FNwkSIntKey),
 		makeEncodeLoRaWANVersionField(v.LoRaWANVersion),
@@ -379,7 +379,7 @@ func (v uplinkMatchResult) EncodeMsgpack(enc *msgpack.Encoder) error {
 }
 
 // DecodeMsgpack implements msgpack.CustomDecoder interface.
-func (v *uplinkMatchResult) DecodeMsgpack(dec *msgpack.Decoder) error {
+func (v *UplinkMatchResult) DecodeMsgpack(dec *msgpack.Decoder) error {
 	n, err := dec.DecodeMapLen()
 	if err != nil {
 		return err
@@ -540,7 +540,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			return errNoUplinkMatch.New()
 		}
 		ctx := log.NewContextWithField(ctx, "match_key", matchResultKey)
-		res := &uplinkMatchResult{}
+		res := &UplinkMatchResult{}
 		if err := msgpack.Unmarshal([]byte(s), res); err != nil {
 			log.FromContext(ctx).WithError(err).Error("Failed to unmarshal match result")
 			return errDatabaseCorruption.WithCause(err)
@@ -675,7 +675,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			}
 			var m *networkserver.UplinkMatch
 			if idx == pendingIdx {
-				ses := &uplinkMatchPendingSession{}
+				ses := &UplinkMatchPendingSession{}
 				err = msgpack.Unmarshal([]byte(s), ses)
 				if err == nil {
 					m = &networkserver.UplinkMatch{
@@ -687,7 +687,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 					}
 				}
 			} else {
-				ses := &uplinkMatchSession{}
+				ses := &UplinkMatchSession{}
 				err = msgpack.Unmarshal([]byte(s), ses)
 				if err == nil {
 					m = &networkserver.UplinkMatch{
@@ -710,7 +710,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				return errNoUplinkMatch.WithCause(err)
 			}
 			if ok {
-				b, err := msgpack.Marshal(uplinkMatchResult{
+				b, err := msgpack.Marshal(UplinkMatchResult{
 					UID:               uid,
 					LoRaWANVersion:    m.LoRaWANVersion,
 					FNwkSIntKey:       m.FNwkSIntKey,
@@ -758,7 +758,7 @@ func removeAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string
 }
 
 func MarshalDeviceCurrentSession(dev *ttnpb.EndDevice) ([]byte, error) {
-	return msgpack.Marshal(uplinkMatchSession{
+	return msgpack.Marshal(UplinkMatchSession{
 		LoRaWANVersion:    dev.GetMACState().GetLoRaWANVersion(),
 		FNwkSIntKey:       dev.GetSession().GetFNwkSIntKey(),
 		LastFCnt:          dev.GetSession().GetLastFCntUp(),
@@ -768,7 +768,7 @@ func MarshalDeviceCurrentSession(dev *ttnpb.EndDevice) ([]byte, error) {
 }
 
 func MarshalDevicePendingSession(dev *ttnpb.EndDevice) ([]byte, error) {
-	return msgpack.Marshal(uplinkMatchSession{
+	return msgpack.Marshal(UplinkMatchSession{
 		LoRaWANVersion: dev.GetPendingMACState().GetLoRaWANVersion(),
 		FNwkSIntKey:    dev.GetPendingSession().GetFNwkSIntKey(),
 	})
