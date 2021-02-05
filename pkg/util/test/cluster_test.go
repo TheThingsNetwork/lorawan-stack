@@ -19,5 +19,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
-var _ cluster.Cluster = MockCluster{}
-var _ cluster.Peer = MockPeer{}
+var (
+	_ cluster.Cluster = MockCluster{}
+	_ cluster.Peer    = MockPeer{}
+)
