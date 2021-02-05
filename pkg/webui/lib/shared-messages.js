@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -355,7 +355,7 @@ export default defineMessages({
   validateApiKey: 'API keys must follow the format "NNSXS.[…].[…]"',
   validateDelayFormat: '{field} must be a positive, whole number',
   validateDigit: '{field} must have at least {digit} {digit, plural, one {digit} other {digits}}',
-  validateEmail: 'An email address must use exactly one "@" and use no special characters',
+  validateEmail: 'An email address must use exactly one "@", one "." and use no special characters',
   validateFreqNumberic: 'All frequency values must be positive integers',
   validateFreqRequired: 'All frequency values are required. Please remove empty entries.',
   validateHexLength: '{field} must be a complete hex value',
