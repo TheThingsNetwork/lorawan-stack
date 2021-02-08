@@ -4,10 +4,10 @@ package ttnpb
 
 var SearchEntitiesRequestFieldPathsNested = []string{
 	"attributes_contain",
+	"deleted",
 	"description_contains",
 	"field_mask",
 	"id_contains",
-	"include_deleted",
 	"limit",
 	"name_contains",
 	"order",
@@ -16,10 +16,10 @@ var SearchEntitiesRequestFieldPathsNested = []string{
 
 var SearchEntitiesRequestFieldPathsTopLevel = []string{
 	"attributes_contain",
+	"deleted",
 	"description_contains",
 	"field_mask",
 	"id_contains",
-	"include_deleted",
 	"limit",
 	"name_contains",
 	"order",

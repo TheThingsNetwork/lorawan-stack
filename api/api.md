@@ -676,7 +676,7 @@ Application is the message that defines an Application in the network.
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
-| `include_deleted` | [`bool`](#bool) |  | Include recently deleted applications. |
+| `deleted` | [`bool`](#bool) |  | Only return recently deleted applications. |
 
 #### Field Rules
 
@@ -1870,7 +1870,7 @@ An OAuth client on the network.
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
-| `include_deleted` | [`bool`](#bool) |  | Include recently deleted clients. |
+| `deleted` | [`bool`](#bool) |  | Only return recently deleted clients. |
 
 #### Field Rules
 
@@ -3616,7 +3616,7 @@ Identifies an end device model with version information.
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
-| `include_deleted` | [`bool`](#bool) |  | Include recently deleted gateways. |
+| `deleted` | [`bool`](#bool) |  | Only return recently deleted gateways. |
 
 #### Field Rules
 
@@ -6326,7 +6326,7 @@ is used to manage OAuth client authorizations for users.
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
-| `include_deleted` | [`bool`](#bool) |  | Include recently deleted organizations. |
+| `deleted` | [`bool`](#bool) |  | Only return recently deleted organizations. |
 
 #### Field Rules
 
@@ -6854,7 +6854,7 @@ This message is used for finding entities in the EntityRegistrySearch service.
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
-| `include_deleted` | [`bool`](#bool) |  | Include recently deleted entities. |
+| `deleted` | [`bool`](#bool) |  | Only return recently deleted entities. |
 
 #### Field Rules
 
@@ -7088,7 +7088,7 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
-| `include_deleted` | [`bool`](#bool) |  | Include recently deleted users. |
+| `deleted` | [`bool`](#bool) |  | Only return recently deleted users. |
 
 #### Field Rules
 

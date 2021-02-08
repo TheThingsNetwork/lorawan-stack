@@ -105,8 +105,8 @@ message ListUsersRequest {
   uint32 limit = 3 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 4;
-  // Include recently deleted users.
-  bool include_deleted = 5;
+  // Only return recently deleted users.
+  bool deleted = 5;
 }
 
 message CreateUserRequest {

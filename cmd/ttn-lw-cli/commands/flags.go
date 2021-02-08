@@ -162,7 +162,7 @@ func getSearchEntitiesRequest(flagSet *pflag.FlagSet) (req *ttnpb.SearchEntities
 		Limit:               limit,
 		Page:                page,
 		Order:               getOrder(flagSet),
-		IncludeDeleted:      getIncludeDeleted(flagSet),
+		Deleted:             getDeleted(flagSet),
 	}, opt, getTotal
 }
 
@@ -329,13 +329,13 @@ func getTimestampFlags(flags *pflag.FlagSet, name string) (*time.Time, error) {
 	return nil, nil
 }
 
-var includeDeletedFlags = func() *pflag.FlagSet {
+var deletedFlags = func() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
-	flagSet.Bool("include-deleted", false, "include recently deleted")
+	flagSet.Bool("deleted", false, "return recently deleted")
 	return flagSet
 }()
 
-func getIncludeDeleted(flagSet *pflag.FlagSet) bool {
-	includeDeleted, _ := flagSet.GetBool("include-deleted")
-	return includeDeleted
+func getDeleted(flagSet *pflag.FlagSet) bool {
+	deleted, _ := flagSet.GetBool("deleted")
+	return deleted
 }

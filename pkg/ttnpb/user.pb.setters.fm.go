@@ -328,15 +328,15 @@ func (dst *ListUsersRequest) SetFields(src *ListUsersRequest, paths ...string) e
 				var zero uint32
 				dst.Page = zero
 			}
-		case "include_deleted":
+		case "deleted":
 			if len(subs) > 0 {
-				return fmt.Errorf("'include_deleted' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'deleted' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.IncludeDeleted = src.IncludeDeleted
+				dst.Deleted = src.Deleted
 			} else {
 				var zero bool
-				dst.IncludeDeleted = zero
+				dst.Deleted = zero
 			}
 
 		default:

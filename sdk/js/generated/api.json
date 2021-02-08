@@ -654,8 +654,8 @@
               "defaultValue": ""
             },
             {
-              "name": "include_deleted",
-              "description": "Include recently deleted applications.",
+              "name": "deleted",
+              "description": "Only return recently deleted applications.",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -6144,8 +6144,8 @@
               "defaultValue": ""
             },
             {
-              "name": "include_deleted",
-              "description": "Include recently deleted clients.",
+              "name": "deleted",
+              "description": "Only return recently deleted clients.",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -14832,8 +14832,8 @@
               "defaultValue": ""
             },
             {
-              "name": "include_deleted",
-              "description": "Include recently deleted gateways.",
+              "name": "deleted",
+              "description": "Only return recently deleted gateways.",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -26327,8 +26327,8 @@
               "defaultValue": ""
             },
             {
-              "name": "include_deleted",
-              "description": "Include recently deleted organizations.",
+              "name": "deleted",
+              "description": "Only return recently deleted organizations.",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -28778,8 +28778,8 @@
               "defaultValue": ""
             },
             {
-              "name": "include_deleted",
-              "description": "Include recently deleted entities.",
+              "name": "deleted",
+              "description": "Only return recently deleted entities.",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -29641,8 +29641,8 @@
               "defaultValue": ""
             },
             {
-              "name": "include_deleted",
-              "description": "Include recently deleted users.",
+              "name": "deleted",
+              "description": "Only return recently deleted users.",
               "label": "",
               "type": "bool",
               "longType": "bool",

@@ -302,8 +302,8 @@ func (is *IdentityServer) listUsers(ctx context.Context, req *ttnpb.ListUsersReq
 	if err = is.RequireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	if req.IncludeDeleted {
-		ctx = store.WithSoftDeleted(ctx, false)
+	if req.Deleted {
+		ctx = store.WithSoftDeleted(ctx, true)
 	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64

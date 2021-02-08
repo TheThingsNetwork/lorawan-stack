@@ -104,11 +104,11 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewUserRegistryClient(is).List(ctx, &ttnpb.ListUsersRequest{
-				FieldMask:      types.FieldMask{Paths: paths},
-				Limit:          limit,
-				Page:           page,
-				Order:          getOrder(cmd.Flags()),
-				IncludeDeleted: getIncludeDeleted(cmd.Flags()),
+				FieldMask: types.FieldMask{Paths: paths},
+				Limit:     limit,
+				Page:      page,
+				Order:     getOrder(cmd.Flags()),
+				Deleted:   getDeleted(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -478,14 +478,14 @@ var (
 func init() {
 	profilePictureFlags.String("profile_picture", "", "upload the profile picture from this file")
 
-	usersListCommand.Flags().AddFlagSet(includeDeletedFlags)
+	usersListCommand.Flags().AddFlagSet(deletedFlags)
 	usersListCommand.Flags().AddFlagSet(selectUserFlags)
 	usersListCommand.Flags().AddFlagSet(selectAllUserFlags)
 	usersListCommand.Flags().AddFlagSet(paginationFlags())
 	usersListCommand.Flags().AddFlagSet(orderFlags())
 	usersCommand.AddCommand(usersListCommand)
 	usersSearchCommand.Flags().AddFlagSet(searchFlags())
-	usersSearchCommand.Flags().AddFlagSet(includeDeletedFlags)
+	usersSearchCommand.Flags().AddFlagSet(deletedFlags)
 	usersSearchCommand.Flags().AddFlagSet(selectUserFlags)
 	usersSearchCommand.Flags().AddFlagSet(selectAllUserFlags)
 	usersCommand.AddCommand(usersSearchCommand)

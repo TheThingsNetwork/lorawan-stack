@@ -192,8 +192,8 @@ var ListGatewaysRequestFieldPathsNested = []string{
 	"collaborator.ids.user_ids",
 	"collaborator.ids.user_ids.email",
 	"collaborator.ids.user_ids.user_id",
+	"deleted",
 	"field_mask",
-	"include_deleted",
 	"limit",
 	"order",
 	"page",
@@ -201,8 +201,8 @@ var ListGatewaysRequestFieldPathsNested = []string{
 
 var ListGatewaysRequestFieldPathsTopLevel = []string{
 	"collaborator",
+	"deleted",
 	"field_mask",
-	"include_deleted",
 	"limit",
 	"order",
 	"page",

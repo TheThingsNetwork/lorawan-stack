@@ -172,7 +172,7 @@ func TestEntitySearch(t *testing.T) {
 					AttributesContain: map[string]string{
 						"test": "foo",
 					},
-					IncludeDeleted: true,
+					Deleted: true,
 				}, entityType)
 
 				a.So(err, should.BeNil)

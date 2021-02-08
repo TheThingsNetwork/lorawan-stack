@@ -85,8 +85,8 @@ func (s *entitySearch) queryMetaFields(ctx context.Context, query *gorm.DB, enti
 func (s *entitySearch) FindEntities(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchEntitiesRequest, entityType string) ([]ttnpb.Identifiers, error) {
 	defer trace.StartRegion(ctx, "find entities").End()
 
-	if req.IncludeDeleted {
-		ctx = WithSoftDeleted(ctx, false)
+	if req.Deleted {
+		ctx = WithSoftDeleted(ctx, true)
 	}
 
 	query := s.query(ctx, modelForEntityType(entityType))

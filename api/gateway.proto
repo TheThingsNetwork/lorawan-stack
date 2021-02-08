@@ -204,8 +204,8 @@ message ListGatewaysRequest {
   uint32 limit = 4 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 5;
-  // Include recently deleted gateways.
-  bool include_deleted = 6;
+  // Only return recently deleted gateways.
+  bool deleted = 6;
 }
 
 message CreateGatewayRequest {

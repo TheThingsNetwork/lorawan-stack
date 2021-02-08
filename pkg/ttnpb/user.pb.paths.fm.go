@@ -70,16 +70,16 @@ var GetUserRequestFieldPathsTopLevel = []string{
 	"user_ids",
 }
 var ListUsersRequestFieldPathsNested = []string{
+	"deleted",
 	"field_mask",
-	"include_deleted",
 	"limit",
 	"order",
 	"page",
 }
 
 var ListUsersRequestFieldPathsTopLevel = []string{
+	"deleted",
 	"field_mask",
-	"include_deleted",
 	"limit",
 	"order",
 	"page",

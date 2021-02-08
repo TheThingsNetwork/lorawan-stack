@@ -61,8 +61,8 @@ message SearchEntitiesRequest {
   uint32 limit = 8 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 9;
-  // Include recently deleted entities.
-  bool include_deleted = 10;
+  // Only return recently deleted entities.
+  bool deleted = 10;
 }
 
 // The EntityRegistrySearch service indexes entities in the various registries
