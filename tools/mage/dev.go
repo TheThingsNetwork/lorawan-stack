@@ -248,6 +248,12 @@ func (Dev) InitStack() error {
 	); err != nil {
 		return err
 	}
+	if err := runGo("./cmd/ttn-lw-stack", "is-db", "create-user-api-key",
+		"--user-id", "admin",
+		"--name", "Admin User API Key",
+	); err != nil {
+		return err
+	}
 	return runGo("./cmd/ttn-lw-stack", "is-db", "create-oauth-client",
 		"--id", "console",
 		"--name", "Console",
