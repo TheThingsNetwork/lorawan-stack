@@ -48,23 +48,17 @@ func TestProcessDownlinkTask(t *testing.T) {
 	appID := ttnpb.ApplicationIdentifiers{ApplicationID: appIDString}
 	const devID = "process-downlink-test-dev-id"
 
-	devAddr := types.DevAddr{0x42, 0xff, 0xff, 0xff}
-
-	fNwkSIntKey := types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	nwkSEncKey := types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	sNwkSIntKey := types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-
 	joinAcceptBytes := append([]byte{0b001_000_00}, bytes.Repeat([]byte{0x42}, 32)...)
 
 	sessionKeys := &ttnpb.SessionKeys{
 		FNwkSIntKey: &ttnpb.KeyEnvelope{
-			Key: &fNwkSIntKey,
+			Key: &test.DefaultFNwkSIntKey,
 		},
 		NwkSEncKey: &ttnpb.KeyEnvelope{
-			Key: &nwkSEncKey,
+			Key: &test.DefaultNwkSEncKey,
 		},
 		SNwkSIntKey: &ttnpb.KeyEnvelope{
-			Key: &sNwkSIntKey,
+			Key: &test.DefaultSNwkSIntKey,
 		},
 		SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 	}
@@ -178,6 +172,16 @@ func TestProcessDownlinkTask(t *testing.T) {
 		}
 	}
 
+	attemptEventEqual := test.MakeEventEqual(test.EventEqualConfig{
+		Identifiers:    true,
+		CorrelationIDs: true,
+		Origin:         true,
+		Context:        true,
+		Visibility:     true,
+		Authentication: true,
+		RemoteIP:       true,
+		UserAgent:      true,
+	})
 	makeAssertReceiveScheduleFailAttemptEvents := func(attempt, fail events.Builder) func(context.Context, TestEnvironment, *ttnpb.DownlinkMessage, ttnpb.EndDeviceIdentifiers, error, uint) bool {
 		return func(ctx context.Context, env TestEnvironment, down *ttnpb.DownlinkMessage, ids ttnpb.EndDeviceIdentifiers, err error, n uint) bool {
 			_, a := test.MustNewTFromContext(ctx)
@@ -185,16 +189,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			evIDOpt := events.WithIdentifiers(ids)
 			for i := uint(0); i < n; i++ {
 				if !test.AllTrue(
-					a.So(env.Events, should.ReceiveEventFunc, test.MakeEventEqual(test.EventEqualConfig{
-						Identifiers:    true,
-						CorrelationIDs: true,
-						Origin:         true,
-						Context:        true,
-						Visibility:     true,
-						Authentication: true,
-						RemoteIP:       true,
-						UserAgent:      true,
-					}),
+					a.So(env.Events, should.ReceiveEventFunc, attemptEventEqual,
 						attempt.With(events.WithData(down)).New(ctx, evIDOpt),
 					),
 					a.So(env.Events, should.ReceiveEventFunc, makeFailEventEqual(t),
@@ -212,16 +207,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIDs...)
 			evIDOpt := events.WithIdentifiers(ids)
 			return test.AllTrue(
-				a.So(env.Events, should.ReceiveEventFunc, test.MakeEventEqual(test.EventEqualConfig{
-					Identifiers:    true,
-					CorrelationIDs: true,
-					Origin:         true,
-					Context:        true,
-					Visibility:     true,
-					Authentication: true,
-					RemoteIP:       true,
-					UserAgent:      true,
-				}),
+				a.So(env.Events, should.ReceiveEventFunc, attemptEventEqual,
 					attempt.With(events.WithData(down)).New(ctx, evIDOpt),
 				),
 				a.So(env.Events, should.ReceiveEventsResembling, events.Builders(append([]events.Builder{
@@ -255,7 +241,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	_, ctx := test.New(t)
 	pingAt, ok := mac.NextPingSlotAt(ctx, &ttnpb.EndDevice{
 		Session: &ttnpb.Session{
-			DevAddr: devAddr,
+			DevAddr: test.DefaultDevAddr,
 		},
 		MACState: &ttnpb.MACState{
 			PingSlotPeriodicity: pingSlotPeriodicity,
@@ -343,7 +329,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		Name                       string
 		CreateDevice               SetDeviceRequest
 		DeviceDiffs                []DeviceDiffFunc
-		ApplicationUplinkAssertion func(context.Context, *ttnpb.EndDevice, ...*ttnpb.ApplicationUp) bool
+		ApplicationUplinkAssertion func(context.Context, *ttnpb.EndDevice, ...*ttnpb.ApplicationUp) ([]events.Event, bool)
 		DownlinkAssertion          func(context.Context, TestEnvironment, *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool)
 		ErrorAssertion             func(*testing.T, error) bool
 	}{
@@ -358,7 +344,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -378,7 +364,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -393,7 +379,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								Matched:       true,
 								Confirmed:     true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								DataRateIndex: customCh.MinDataRateIndex,
 								Frequency:     customCh.UplinkFrequency,
@@ -410,7 +396,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 					},
@@ -432,7 +418,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -450,7 +436,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 					},
@@ -472,7 +458,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -487,7 +473,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								Matched:       true,
 								Confirmed:     true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								DataRateIndex: customCh.MinDataRateIndex,
 								Frequency:     customCh.UplinkFrequency,
@@ -514,7 +500,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -530,7 +516,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								Matched:       true,
 								Confirmed:     true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								DataRateIndex: customCh.MinDataRateIndex,
 								Frequency:     customCh.UplinkFrequency,
@@ -551,7 +537,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 					},
@@ -574,7 +560,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -588,7 +574,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								DataRateIndex: customCh.MinDataRateIndex,
 								Frequency:     customCh.UplinkFrequency,
@@ -610,7 +596,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						StatusTimePeriodicity:  DurationPtr(0),
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 					},
@@ -633,7 +619,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
@@ -647,7 +633,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_0_3,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_0_3_REV_A].DataRates[customCh.MinDataRateIndex].Rate,
 								DataRateIndex: customCh.MinDataRateIndex,
 								Frequency:     customCh.UplinkFrequency,
@@ -669,7 +655,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						StatusTimePeriodicity:  DurationPtr(0),
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -704,9 +690,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				makeRemoveDownlinksDiff(2),
 			},
-			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) bool {
+			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) ([]events.Event, bool) {
 				_, a := test.MustNewTFromContext(ctx)
-				return a.So(ups, should.HaveLength, 1) &&
+				return nil, a.So(ups, should.HaveLength, 1) &&
 					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 						CorrelationIDs:       LastUplink(dev.MACState.RecentUplinks...).CorrelationIDs,
@@ -727,7 +713,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
@@ -741,7 +727,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_0_3,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_0_3_REV_A].DataRates[customCh.MinDataRateIndex].Rate,
 								DataRateIndex: customCh.MinDataRateIndex,
 								Frequency:     customCh.UplinkFrequency,
@@ -763,7 +749,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						StatusTimePeriodicity:  DurationPtr(0),
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -790,9 +776,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				makeRemoveDownlinksDiff(1),
 			},
-			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) bool {
+			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) ([]events.Event, bool) {
 				_, a := test.MustNewTFromContext(ctx)
-				return a.So(ups, should.HaveLength, 1) &&
+				return nil, a.So(ups, should.HaveLength, 1) &&
 					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 						CorrelationIDs:       append(LastUplink(dev.MACState.RecentUplinks...).CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
@@ -813,7 +799,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -836,7 +822,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								DataRateIndex: customCh.MinDataRateIndex,
 								Frequency:     customCh.UplinkFrequency,
@@ -854,7 +840,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -892,7 +878,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+							test.DefaultDevAddr[3], test.DefaultDevAddr[2], test.DefaultDevAddr[1], test.DefaultDevAddr[0],
 							/*** FCtrl ***/
 							0b1_0_0_0_0110,
 							/*** FCnt ***/
@@ -901,8 +887,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/** FOpts **/
 						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
+							test.DefaultNwkSEncKey,
+							test.DefaultDevAddr,
 							0x24,
 							[]byte{
 								/* ResetConf */
@@ -923,8 +909,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
+							test.DefaultSNwkSIntKey,
+							test.DefaultDevAddr,
 							0,
 							0x42,
 							b,
@@ -973,7 +959,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -996,7 +982,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								DataRateIndex: customCh.MinDataRateIndex,
 								Frequency:     customCh.UplinkFrequency,
@@ -1014,7 +1000,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1052,7 +1038,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+							test.DefaultDevAddr[3], test.DefaultDevAddr[2], test.DefaultDevAddr[1], test.DefaultDevAddr[0],
 							/*** FCtrl ***/
 							0b1_0_0_0_0110,
 							/*** FCnt ***/
@@ -1061,8 +1047,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/** FOpts **/
 						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
+							test.DefaultNwkSEncKey,
+							test.DefaultDevAddr,
 							0x24,
 							[]byte{
 								/* ResetConf */
@@ -1083,8 +1069,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
+							test.DefaultSNwkSIntKey,
+							test.DefaultDevAddr,
 							0,
 							0x42,
 							b,
@@ -1143,7 +1129,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -1166,7 +1152,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								DataRateIndex: customCh.MinDataRateIndex,
 								Frequency:     customCh.UplinkFrequency,
@@ -1184,7 +1170,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1222,7 +1208,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+							test.DefaultDevAddr[3], test.DefaultDevAddr[2], test.DefaultDevAddr[1], test.DefaultDevAddr[0],
 							/*** FCtrl ***/
 							0b1_0_0_1_0110,
 							/*** FCnt ***/
@@ -1231,8 +1217,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/** FOpts **/
 						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
+							test.DefaultNwkSEncKey,
+							test.DefaultDevAddr,
 							0x25,
 							[]byte{
 								/* ResetConf */
@@ -1247,8 +1233,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
+							test.DefaultSNwkSIntKey,
+							test.DefaultDevAddr,
 							0,
 							0x25,
 							b,
@@ -1307,7 +1293,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -1330,7 +1316,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[ttnpb.DATA_RATE_6].Rate,
 								DataRateIndex: ttnpb.DATA_RATE_6,
 								Frequency:     customCh.UplinkFrequency,
@@ -1348,7 +1334,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1386,7 +1372,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+							test.DefaultDevAddr[3], test.DefaultDevAddr[2], test.DefaultDevAddr[1], test.DefaultDevAddr[0],
 							/*** FCtrl ***/
 							0b1_0_0_0_0110,
 							/*** FCnt ***/
@@ -1395,8 +1381,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/** FOpts **/
 						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
+							test.DefaultNwkSEncKey,
+							test.DefaultDevAddr,
 							0x24,
 							[]byte{
 								/* ResetConf */
@@ -1417,8 +1403,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
+							test.DefaultSNwkSIntKey,
+							test.DefaultDevAddr,
 							0,
 							0x42,
 							b,
@@ -1474,7 +1460,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -1492,7 +1478,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								Frequency:     customCh.UplinkFrequency,
 								ChannelIndex:  customChIdx,
@@ -1511,7 +1497,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1558,7 +1544,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+							test.DefaultDevAddr[3], test.DefaultDevAddr[2], test.DefaultDevAddr[1], test.DefaultDevAddr[0],
 							/*** FCtrl ***/
 							0b1_0_0_1_0000,
 							/*** FCnt ***/
@@ -1573,8 +1559,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
+							test.DefaultSNwkSIntKey,
+							test.DefaultDevAddr,
 							0,
 							0x42,
 							b,
@@ -1623,7 +1609,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -1649,7 +1635,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								Frequency:     customCh.UplinkFrequency,
 								ChannelIndex:  customChIdx,
@@ -1666,7 +1652,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1705,7 +1691,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+							test.DefaultDevAddr[3], test.DefaultDevAddr[2], test.DefaultDevAddr[1], test.DefaultDevAddr[0],
 							/*** FCtrl ***/
 							0b1_0_0_0_0110,
 							/*** FCnt ***/
@@ -1714,8 +1700,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/** FOpts **/
 						b = append(b, test.Must(crypto.EncryptDownlink(
-							nwkSEncKey,
-							devAddr,
+							test.DefaultNwkSEncKey,
+							test.DefaultDevAddr,
 							0x24,
 							[]byte{
 								/* ResetConf */
@@ -1736,8 +1722,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
+							test.DefaultSNwkSIntKey,
+							test.DefaultDevAddr,
 							0,
 							0x42,
 							b,
@@ -1796,7 +1782,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -1822,7 +1808,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								Frequency:     customCh.UplinkFrequency,
 								ChannelIndex:  customChIdx,
@@ -1839,7 +1825,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1877,7 +1863,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+							test.DefaultDevAddr[3], test.DefaultDevAddr[2], test.DefaultDevAddr[1], test.DefaultDevAddr[0],
 							/*** FCtrl ***/
 							0b1_0_0_0_0000,
 							/*** FCnt ***/
@@ -1892,8 +1878,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
+							test.DefaultSNwkSIntKey,
+							test.DefaultDevAddr,
 							0,
 							0x42,
 							b,
@@ -1942,7 +1928,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:         test.EUFrequencyPlanID,
 					LastDevStatusReceivedAt: TimePtr(now),
@@ -1961,7 +1947,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								Frequency:     customCh.UplinkFrequency,
 								ChannelIndex:  customChIdx,
@@ -1978,7 +1964,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -2020,7 +2006,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+							test.DefaultDevAddr[3], test.DefaultDevAddr[2], test.DefaultDevAddr[1], test.DefaultDevAddr[0],
 							/*** FCtrl ***/
 							0b1_0_0_0_0000,
 							/*** FCnt ***/
@@ -2035,8 +2021,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
+							test.DefaultSNwkSIntKey,
+							test.DefaultDevAddr,
 							0,
 							0x42,
 							b,
@@ -2086,7 +2072,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -2103,7 +2089,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								Frequency:     customCh.UplinkFrequency,
 								ChannelIndex:  customChIdx,
@@ -2119,7 +2105,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -2160,7 +2146,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+							test.DefaultDevAddr[3], test.DefaultDevAddr[2], test.DefaultDevAddr[1], test.DefaultDevAddr[0],
 							/*** FCtrl ***/
 							0b1_0_0_0_0000,
 							/*** FCnt ***/
@@ -2175,8 +2161,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
+							test.DefaultSNwkSIntKey,
+							test.DefaultDevAddr,
 							0,
 							0x42,
 							b,
@@ -2233,9 +2219,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				removeMACQueueDiff,
 				makeRemoveDownlinksDiff(1),
 			},
-			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) bool {
+			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) ([]events.Event, bool) {
 				_, a := test.MustNewTFromContext(ctx)
-				return a.So(ups, should.HaveLength, 1) &&
+				return nil, a.So(ups, should.HaveLength, 1) &&
 					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 						CorrelationIDs:       dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
@@ -2256,7 +2242,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -2273,7 +2259,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								Frequency:     customCh.UplinkFrequency,
 								ChannelIndex:  customChIdx,
@@ -2289,7 +2275,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -2330,7 +2316,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+							test.DefaultDevAddr[3], test.DefaultDevAddr[2], test.DefaultDevAddr[1], test.DefaultDevAddr[0],
 							/*** FCtrl ***/
 							0b1_0_0_0_0000,
 							/*** FCnt ***/
@@ -2345,8 +2331,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
-							sNwkSIntKey,
-							devAddr,
+							test.DefaultSNwkSIntKey,
+							test.DefaultDevAddr,
 							0,
 							0x42,
 							b,
@@ -2406,7 +2392,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -2425,7 +2411,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								Frequency:     customCh.UplinkFrequency,
 								ChannelIndex:  customChIdx,
@@ -2442,7 +2428,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -2478,7 +2464,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
-						DevAddr:                &devAddr,
+						DevAddr:                &test.DefaultDevAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -2497,7 +2483,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DecodePayload: true,
 								Matched:       true,
 								MACVersion:    ttnpb.MAC_V1_1,
-								DevAddr:       devAddr,
+								DevAddr:       test.DefaultDevAddr,
 								DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHY_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 								Frequency:     customCh.UplinkFrequency,
 								ChannelIndex:  customChIdx,
@@ -2514,7 +2500,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -2575,7 +2561,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
 							Keys:    *sessionKeys,
 							Payload: joinAcceptBytes,
-							DevAddr: devAddr,
+							DevAddr: test.DefaultDevAddr,
 						},
 						RxWindowsAvailable: true,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -2598,7 +2584,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       test.DefaultDevAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -2676,27 +2662,51 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return true
 				},
 			},
-			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) bool {
-				return assertions.New(test.MustTFromContext(ctx)).So(ups, should.Resemble, []*ttnpb.ApplicationUp{
+			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) ([]events.Event, bool) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				ids := ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: dev.ApplicationIdentifiers,
+					DeviceID:               dev.DeviceID,
+					DevEUI:                 dev.DevEUI,
+					JoinEUI:                dev.JoinEUI,
+					DevAddr:                &dev.PendingMACState.QueuedJoinAccept.DevAddr,
+				}
+				cids := LastUplink(dev.PendingMACState.RecentUplinks...).CorrelationIDs
+				recvAt := LastUplink(dev.PendingMACState.RecentUplinks...).ReceivedAt
+
+				ok := a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
 					{
-						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: dev.ApplicationIdentifiers,
-							DeviceID:               dev.DeviceID,
-							DevEUI:                 dev.DevEUI,
-							JoinEUI:                dev.JoinEUI,
-							DevAddr:                &dev.PendingMACState.QueuedJoinAccept.DevAddr,
-						},
-						CorrelationIDs: LastUplink(dev.PendingMACState.RecentUplinks...).CorrelationIDs,
+						EndDeviceIdentifiers: ids,
+						CorrelationIDs:       cids,
 						Up: &ttnpb.ApplicationUp_JoinAccept{
 							JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:              dev.PendingMACState.QueuedJoinAccept.Keys.AppSKey,
 								InvalidatedDownlinks: dev.Session.QueuedApplicationDownlinks,
 								SessionKeyID:         dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
-								ReceivedAt:           LastUplink(dev.PendingMACState.RecentUplinks...).ReceivedAt,
+								ReceivedAt:           recvAt,
 							},
 						},
 					},
 				})
+				if !ok {
+					return nil, false
+				}
+				return []events.Event{
+					EvtForwardJoinAccept.With(
+						events.WithIdentifiers(ids),
+						events.WithData(&ttnpb.ApplicationUp{
+							EndDeviceIdentifiers: ids,
+							CorrelationIDs:       cids,
+							Up: &ttnpb.ApplicationUp_JoinAccept{
+								JoinAccept: &ttnpb.ApplicationJoinAccept{
+									InvalidatedDownlinks: dev.Session.QueuedApplicationDownlinks,
+									SessionKeyID:         dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
+									ReceivedAt:           recvAt,
+								},
+							},
+						}),
+					).New(ctx),
+				}, true
 			},
 		},
 	} {
@@ -2807,9 +2817,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}
 				}
 				if tc.ApplicationUplinkAssertion != nil {
+					var evs []events.Event
 					a.So(env.AssertNsAsHandleUplink(ctx, appID, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-						return tc.ApplicationUplinkAssertion(ctx, created, ups...)
+						var ok bool
+						evs, ok = tc.ApplicationUplinkAssertion(ctx, created, ups...)
+						return ok
 					}, nil), should.BeTrue)
+					if len(evs) > 0 {
+						a.So(env.Events, should.ReceiveEventsResembling, evs)
+					}
 				}
 			},
 		})
