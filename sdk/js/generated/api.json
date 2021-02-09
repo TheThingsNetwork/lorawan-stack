@@ -9265,6 +9265,16 @@
               "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "field_mask",
+              "description": "Field mask paths.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -9603,6 +9613,28 @@
               "fullType": "string",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "codec_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$"
+                  }
+                ]
+              }
             },
             {
               "name": "examples",

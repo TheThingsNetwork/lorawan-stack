@@ -2578,6 +2578,7 @@ and allows clients to claim end devices.
 | ----- | ---- | ----- | ----------- |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application identifiers. |
 | `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version information. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask paths. |
 
 ### <a name="ttn.lorawan.v3.GetTemplateRequest">Message `GetTemplateRequest`</a>
 
@@ -2644,6 +2645,7 @@ and allows clients to claim end devices.
 | ----- | ---- | ----- | ----------- |
 | `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  | Payload formatter type. |
 | `formatter_parameter` | [`string`](#string) |  | Parameter for the formatter, must be set together. |
+| `codec_id` | [`string`](#string) |  |  |
 | `examples` | [`MessagePayloadFormatter.Example`](#ttn.lorawan.v3.MessagePayloadFormatter.Example) | repeated | Examples |
 
 #### Field Rules
@@ -2651,6 +2653,7 @@ and allows clients to claim end devices.
 | Field | Validations |
 | ----- | ----------- |
 | `formatter` | <p>`enum.defined_only`: `true`</p> |
+| `codec_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$`</p> |
 
 ### <a name="ttn.lorawan.v3.MessagePayloadFormatter.Example">Message `MessagePayloadFormatter.Example`</a>
 

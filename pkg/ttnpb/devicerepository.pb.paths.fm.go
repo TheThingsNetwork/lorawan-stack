@@ -170,6 +170,7 @@ var GetTemplateRequestFieldPathsTopLevel = []string{
 var GetPayloadFormatterRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
+	"field_mask",
 	"version_ids",
 	"version_ids.band_id",
 	"version_ids.brand_id",
@@ -180,6 +181,7 @@ var GetPayloadFormatterRequestFieldPathsNested = []string{
 
 var GetPayloadFormatterRequestFieldPathsTopLevel = []string{
 	"application_ids",
+	"field_mask",
 	"version_ids",
 }
 var ListEndDeviceBrandsResponseFieldPathsNested = []string{
@@ -197,12 +199,14 @@ var ListEndDeviceModelsResponseFieldPathsTopLevel = []string{
 	"models",
 }
 var MessagePayloadFormatterFieldPathsNested = []string{
+	"codec_id",
 	"examples",
 	"formatter",
 	"formatter_parameter",
 }
 
 var MessagePayloadFormatterFieldPathsTopLevel = []string{
+	"codec_id",
 	"examples",
 	"formatter",
 	"formatter_parameter",

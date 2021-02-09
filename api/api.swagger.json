@@ -3893,6 +3893,17 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -3953,6 +3964,17 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -4013,6 +4035,17 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -15152,6 +15185,9 @@
         "formatter_parameter": {
           "type": "string",
           "description": "Parameter for the formatter, must be set together."
+        },
+        "codec_id": {
+          "type": "string"
         },
         "examples": {
           "type": "array",

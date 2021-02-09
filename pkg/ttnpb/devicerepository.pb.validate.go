@@ -1144,6 +1144,18 @@ func (m *GetPayloadFormatterRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "field_mask":
+
+			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetPayloadFormatterRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return GetPayloadFormatterRequestValidationError{
 				field:  name,
@@ -1435,6 +1447,22 @@ func (m *MessagePayloadFormatter) ValidateFields(paths ...string) error {
 
 		case "formatter_parameter":
 			// no validation rules for FormatterParameter
+		case "codec_id":
+
+			if utf8.RuneCountInString(m.GetCodecID()) > 36 {
+				return MessagePayloadFormatterValidationError{
+					field:  "codec_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_MessagePayloadFormatter_CodecID_Pattern.MatchString(m.GetCodecID()) {
+				return MessagePayloadFormatterValidationError{
+					field:  "codec_id",
+					reason: "value does not match regex pattern \"^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$\"",
+				}
+			}
+
 		case "examples":
 
 			for idx, item := range m.GetExamples() {
@@ -1517,6 +1545,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MessagePayloadFormatterValidationError{}
+
+var _MessagePayloadFormatter_CodecID_Pattern = regexp.MustCompile("^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$")
 
 // ValidateFields checks the field values on EndDeviceModel_HardwareVersion
 // with the rules defined in the proto definition for this message. If any

@@ -778,6 +778,16 @@ func (dst *GetPayloadFormatterRequest) SetFields(src *GetPayloadFormatterRequest
 					dst.VersionIDs = nil
 				}
 			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero types.FieldMask
+				dst.FieldMask = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -848,6 +858,16 @@ func (dst *MessagePayloadFormatter) SetFields(src *MessagePayloadFormatter, path
 			} else {
 				var zero string
 				dst.FormatterParameter = zero
+			}
+		case "codec_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'codec_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CodecID = src.CodecID
+			} else {
+				var zero string
+				dst.CodecID = zero
 			}
 		case "examples":
 			if len(subs) > 0 {
