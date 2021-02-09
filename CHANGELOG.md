@@ -28,6 +28,7 @@ For details about compatibility between different releases, see the **Commitment
 - Device Repository component to integrate [Device Repository](https://github.com/TheThingsNetwork/lorawan-devices) with The Things Stack. See the `dr` configuration section.
   - The Device Repository database is bundled automatically into Docker release images. See the `ttn-lw-stack dr-db init` command to manually fetch the latest changes.
 - Device repository service to the JavaScript SDK.
+- Choosing array representation for end device session keys as well as gateway EUI.
 
 ### Changed
 
