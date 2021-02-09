@@ -172,32 +172,29 @@ func (dr *DeviceRepository) GetTemplate(ctx context.Context, req *ttnpb.GetTempl
 	return dr.store.GetTemplate(req.VersionIDs)
 }
 
-// GetUplinkDecoder implements the ttnpb.DeviceRepositoryServer interface.
-func (dr *DeviceRepository) GetUplinkDecoder(ctx context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadFormatter, error) {
+func getCodec(ctx context.Context, req *ttnpb.GetPayloadFormatterRequest, f func(store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error)) (*ttnpb.MessagePayloadFormatter, error) {
 	if clusterauth.Authorized(ctx) != nil {
 		if err := rights.RequireApplication(ctx, req.ApplicationIDs, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 			return nil, err
 		}
 	}
-	return dr.store.GetUplinkDecoder(req.VersionIDs)
+	return f(store.GetCodecRequest{
+		VersionIDs: req.VersionIDs,
+		Paths:      ttnpb.AddFields(req.FieldMask.Paths, "formatter", "formatter_parameter"),
+	})
+}
+
+// GetUplinkDecoder implements the ttnpb.DeviceRepositoryServer interface.
+func (dr *DeviceRepository) GetUplinkDecoder(ctx context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadFormatter, error) {
+	return getCodec(ctx, req, dr.store.GetUplinkDecoder)
 }
 
 // GetDownlinkDecoder implements the ttnpb.DeviceRepositoryServer interface.
 func (dr *DeviceRepository) GetDownlinkDecoder(ctx context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadFormatter, error) {
-	if clusterauth.Authorized(ctx) != nil {
-		if err := rights.RequireApplication(ctx, req.ApplicationIDs, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
-			return nil, err
-		}
-	}
-	return dr.store.GetDownlinkDecoder(req.VersionIDs)
+	return getCodec(ctx, req, dr.store.GetDownlinkDecoder)
 }
 
 // GetDownlinkEncoder implements the ttnpb.DeviceRepositoryServer interface.
 func (dr *DeviceRepository) GetDownlinkEncoder(ctx context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadFormatter, error) {
-	if clusterauth.Authorized(ctx) != nil {
-		if err := rights.RequireApplication(ctx, req.ApplicationIDs, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
-			return nil, err
-		}
-	}
-	return dr.store.GetDownlinkEncoder(req.VersionIDs)
+	return getCodec(ctx, req, dr.store.GetDownlinkEncoder)
 }

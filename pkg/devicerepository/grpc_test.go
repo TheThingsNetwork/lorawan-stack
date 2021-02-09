@@ -94,20 +94,20 @@ func (s *mockStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.
 }
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
-func (s *mockStore) GetUplinkDecoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	s.lastVersionIDs = ids
+func (s *mockStore) GetUplinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error) {
+	s.lastVersionIDs = req.VersionIDs
 	return s.uplinkDecoder, s.err
 }
 
 // GetDownlinkDecoder retrieves the codec for decoding downlink messages.
-func (s *mockStore) GetDownlinkDecoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	s.lastVersionIDs = ids
+func (s *mockStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error) {
+	s.lastVersionIDs = req.VersionIDs
 	return s.downlinkDecoder, s.err
 }
 
 // GetDownlinkEncoder retrieves the codec for encoding downlink messages.
-func (s *mockStore) GetDownlinkEncoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	s.lastVersionIDs = ids
+func (s *mockStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error) {
+	s.lastVersionIDs = req.VersionIDs
 	return s.downlinkEncoder, s.err
 }
 

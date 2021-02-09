@@ -373,14 +373,14 @@ func TestRemoteStore(t *testing.T) {
 					BandID:          "unknown-band",
 				},
 			} {
-				codec, err := s.GetDownlinkDecoder(&ids)
+				codec, err := s.GetDownlinkDecoder(store.GetCodecRequest{VersionIDs: &ids})
 				a.So(errors.IsNotFound(err), should.BeTrue)
 				a.So(codec, should.Equal, nil)
 			}
 		})
 		for _, tc := range []struct {
 			name  string
-			f     func(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error)
+			f     func(store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error)
 			codec string
 		}{
 			{
@@ -408,7 +408,7 @@ func TestRemoteStore(t *testing.T) {
 					FirmwareVersion: "1.1",
 					BandID:          "EU_433",
 				}
-				codec, err := tc.f(versionIDs)
+				codec, err := tc.f(store.GetCodecRequest{VersionIDs: versionIDs})
 				a.So(err, should.BeNil)
 				a.So(codec, should.Resemble, &ttnpb.MessagePayloadFormatter{
 					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,

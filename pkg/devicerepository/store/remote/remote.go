@@ -228,7 +228,8 @@ var (
 )
 
 // getCodec retrieves codec information for a specific model and returns.
-func (s *remoteStore) getCodec(ids *ttnpb.EndDeviceVersionIdentifiers, chooseCodec func(EndDeviceCodecs) EndDeviceCodec) (*ttnpb.MessagePayloadFormatter, error) {
+func (s *remoteStore) getCodec(req store.GetCodecRequest, chooseCodec func(EndDeviceCodecs) EndDeviceCodec) (*ttnpb.MessagePayloadFormatter, error) {
+	ids := req.VersionIDs
 	models, err := s.GetModels(store.GetModelsRequest{
 		BrandID: ids.BrandID,
 		ModelID: ids.ModelID,
@@ -300,11 +301,17 @@ func (s *remoteStore) getCodec(ids *ttnpb.EndDeviceVersionIdentifiers, chooseCod
 					examples = append(examples, pb)
 				}
 			}
-			return &ttnpb.MessagePayloadFormatter{
+			formatter := &ttnpb.MessagePayloadFormatter{
 				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 				FormatterParameter: string(b),
 				Examples:           examples,
-			}, nil
+				CodecID:            profileInfo.CodecID,
+			}
+			pb := &ttnpb.MessagePayloadFormatter{}
+			if err := pb.SetFields(formatter, ttnpb.AddFields(req.Paths, "formatter", "formatter_parameter")...); err != nil {
+				return nil, err
+			}
+			return pb, nil
 		}
 	}
 
@@ -316,18 +323,18 @@ func (s *remoteStore) getCodec(ids *ttnpb.EndDeviceVersionIdentifiers, chooseCod
 }
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
-func (s *remoteStore) GetUplinkDecoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	return s.getCodec(ids, func(c EndDeviceCodecs) EndDeviceCodec { return c.UplinkDecoder })
+func (s *remoteStore) GetUplinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error) {
+	return s.getCodec(req, func(c EndDeviceCodecs) EndDeviceCodec { return c.UplinkDecoder })
 }
 
 // GetDownlinkDecoder retrieves the codec for decoding downlink messages.
-func (s *remoteStore) GetDownlinkDecoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	return s.getCodec(ids, func(c EndDeviceCodecs) EndDeviceCodec { return c.DownlinkDecoder })
+func (s *remoteStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error) {
+	return s.getCodec(req, func(c EndDeviceCodecs) EndDeviceCodec { return c.DownlinkDecoder })
 }
 
 // GetDownlinkEncoder retrieves the codec for encoding downlink messages.
-func (s *remoteStore) GetDownlinkEncoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	return s.getCodec(ids, func(c EndDeviceCodecs) EndDeviceCodec { return c.DownlinkEncoder })
+func (s *remoteStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error) {
+	return s.getCodec(req, func(c EndDeviceCodecs) EndDeviceCodec { return c.DownlinkEncoder })
 }
 
 // Close closes the store.

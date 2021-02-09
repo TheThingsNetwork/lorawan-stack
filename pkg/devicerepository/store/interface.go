@@ -55,12 +55,10 @@ type GetModelsResponse struct {
 	Models []*ttnpb.EndDeviceModel
 }
 
-// DefinitionIdentifiers is a request to retrieve an end device template for an end device definition.
-type DefinitionIdentifiers struct {
-	BrandID,
-	ModelID,
-	FirmwareVersion,
-	BandID string
+// GetCodecRequest is a request to retrieve the codec of
+type GetCodecRequest struct {
+	VersionIDs *ttnpb.EndDeviceVersionIdentifiers
+	Paths      []string
 }
 
 // Store contains end device definitions.
@@ -72,11 +70,11 @@ type Store interface {
 	// GetTemplate retrieves an end device template for an end device definition.
 	GetTemplate(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.EndDeviceTemplate, error)
 	// GetUplinkDecoder retrieves the codec for decoding uplink messages.
-	GetUplinkDecoder(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error)
+	GetUplinkDecoder(GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error)
 	// GetDownlinkDecoder retrieves the codec for decoding downlink messages.
-	GetDownlinkDecoder(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error)
+	GetDownlinkDecoder(GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error)
 	// GetDownlinkEncoder retrieves the codec for encoding downlink messages.
-	GetDownlinkEncoder(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error)
+	GetDownlinkEncoder(GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error)
 	// Close closes the store.
 	Close() error
 }
