@@ -3,5 +3,6 @@
   "viewportWidth": 1440,
   "defaultCommandTimeout": 10000,
   "ignoreTestFiles": "!*.spec.js",
-  "animationDistanceThreshold": 3
+  "animationDistanceThreshold": 3,
+  "video": false
 }
