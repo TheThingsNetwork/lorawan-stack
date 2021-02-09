@@ -46,7 +46,7 @@ const mergeDerived = (state, id, derived) =>
       })
     : state
 
-const devices = function(state = defaultState, { type, payload, event }) {
+const devices = (state = defaultState, { type, payload, event }) => {
   switch (type) {
     case GET_DEV:
       return {
@@ -57,6 +57,8 @@ const devices = function(state = defaultState, { type, payload, event }) {
     case GET_DEV_SUCCESS:
       const updatedState = { ...state }
       const id = getCombinedDeviceId(payload)
+      const lorawanVersion = getByPath(state.entities, `${id}.lorawan_version`)
+
       const mergedDevice = mergeWith({}, state.entities[id], payload, (_, __, key, ___, source) => {
         // Always set location from the payload.
         if (source === payload && key === 'locations') {
@@ -74,7 +76,7 @@ const devices = function(state = defaultState, { type, payload, event }) {
       }
 
       // Update derived last seen value if possible.
-      const { mac_state } = payload
+      const { mac_state, session } = payload
       const derived = {}
       if (mac_state) {
         const { recent_uplinks } = mac_state
@@ -88,10 +90,23 @@ const devices = function(state = defaultState, { type, payload, event }) {
         }
       }
 
+      // Update uplink and downlink frame counts if possible.
+      if (session) {
+        derived.uplinkFrameCount = session.last_f_cnt_up
+        if (parseLorawanMacVersion(lorawanVersion) < 110) {
+          derived.downlinkFrameCount = session.last_n_f_cnt_down
+        } else {
+          // For 1.1+ end devices there are two frame counters. Currently, we
+          // display only the application counter.
+          // Also, see https://github.com/TheThingsNetwork/lorawan-stack/issues/2740.
+          derived.downlinkFrameCount = session.last_a_f_cnt_down
+        }
+      }
+
       return mergeDerived(updatedState, id, derived)
     case GET_DEVICES_LIST_SUCCESS:
       const entities = payload.entities.reduce(
-        function(acc, dev) {
+        (acc, dev) => {
           const id = getCombinedDeviceId(dev)
 
           acc[id] = dev

@@ -39,7 +39,7 @@ MessagesCount.propTypes = {
   icon: PropTypes.string.isRequired,
   iconClassName: PropTypes.string,
   tooltipMessage: PropTypes.message.isRequired,
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  value: PropTypes.node.isRequired,
 }
 
 MessagesCount.defaultProps = {
