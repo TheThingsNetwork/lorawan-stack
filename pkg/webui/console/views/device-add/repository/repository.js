@@ -142,7 +142,7 @@ const DeviceRepository = props => {
         const { _registration, ...castedValues } = validationSchema.cast(values, {
           context: validationContext,
         })
-        const { ids } = castedValues
+        const { ids, supports_join } = castedValues
         ids.application_ids = { application_id: appId }
 
         await createDevice(appId, castedValues)
@@ -157,6 +157,10 @@ const DeviceRepository = props => {
               values: {
                 ...castedValues,
                 ...initialValues,
+                ids: {
+                  ...initialValues.ids,
+                  join_eui: supports_join ? castedValues.ids.join_eui : undefined,
+                },
                 frequency_plan_id: castedValues.frequency_plan_id,
                 version_ids: values.version_ids,
                 _registration: REGISTRATION_TYPES.MULTIPLE,
@@ -266,7 +270,7 @@ const DeviceRepository = props => {
             )}
             <SubmitBar align="start">
               <Form.Submit
-                message={m.register}
+                message={m.submitTitle}
                 component={SubmitButton}
                 disabled={!showRegistrationForm}
               />

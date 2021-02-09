@@ -78,17 +78,6 @@ const Registration = props => {
       {isOTAA && (
         <>
           <Form.Field
-            title={sharedMessages.devEUI}
-            name="ids.dev_eui"
-            type="byte"
-            min={8}
-            max={8}
-            description={sharedMessages.deviceEUIDescription}
-            required
-            component={Input}
-            glossaryId={glossaryId.DEV_EUI}
-          />
-          <Form.Field
             title={lwVersion < 104 ? sharedMessages.appEUI : sharedMessages.joinEUI}
             component={JoinEUIPRefixesInput}
             name="ids.join_eui"
@@ -99,6 +88,17 @@ const Registration = props => {
             required
             showPrefixes
             glossaryId={lwVersion < 104 ? glossaryId.APP_EUI : glossaryId.JOIN_EUI}
+          />
+          <Form.Field
+            title={sharedMessages.devEUI}
+            name="ids.dev_eui"
+            type="byte"
+            min={8}
+            max={8}
+            description={sharedMessages.deviceEUIDescription}
+            required
+            component={Input}
+            glossaryId={glossaryId.DEV_EUI}
           />
           <Form.Field
             required

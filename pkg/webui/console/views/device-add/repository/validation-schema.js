@@ -55,10 +55,12 @@ const validationSchema = Yup.object({
         return schema.shape({
           device_id: deviceIdSchema,
           dev_eui: devEUISchema.required(sharedMessages.validateRequired),
+          join_eui: Yup.string().strip(),
         })
       }
 
       return schema.shape({
+        join_eui: Yup.string().strip(),
         device_id: deviceIdSchema,
         dev_eui: Yup.lazy(value =>
           !value
