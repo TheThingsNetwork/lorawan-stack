@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	dr_processor "go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -206,6 +207,18 @@ func TestDeviceRepository(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_DEVICE_REPOSITORY)
 
 	p := dr_processor.New(mockProcessor, c)
+
+	t.Run("NilDeviceIdentifiers", func(t *testing.T) {
+		err := p.DecodeDownlink(test.Context(), devID, nil, nil, "")
+		assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
+
+		select {
+		case <-mockProcessor.ch:
+			t.Error("Expected timeout but processor was called instead")
+			t.FailNow()
+		case <-time.After(30 * time.Millisecond):
+		}
+	})
 
 	t.Run("DeviceNotFound", func(t *testing.T) {
 		err := p.DecodeDownlink(test.Context(), devID, idsNotFound, nil, "")
