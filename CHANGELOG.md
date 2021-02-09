@@ -43,6 +43,10 @@ For details about compatibility between different releases, see the **Commitment
   - The Device Repository database is bundled automatically into Docker release images. See the `ttn-lw-stack dr-db init` command to manually fetch the latest changes.
 - Device repository service to the JavaScript SDK.
 - Choosing array representation for end device session keys as well as gateway EUI.
+- Profile settings view to the Account App.
+  - Functionality to change basic profile information, such as name, email address and profile picture.
+  - Functionality to update the account password.
+  - Functionality to delete the account.
 
 ### Changed
 
