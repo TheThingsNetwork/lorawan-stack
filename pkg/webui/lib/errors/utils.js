@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+import * as Sentry from '@sentry/browser'
+
+import { error as errorLog } from '@ttn-lw/lib/log'
 
 import errorMessages from './error-messages'
 import grpcErrToHttpErr from './grpc-error-map'
@@ -209,6 +213,20 @@ export const isNetworkError = error =>
 export const isTimeoutError = error => error.code === 'ECONNABORTED'
 
 /**
+ * Returns whether the error is worth being sent to Sentry.
+ *
+ * @param {object} error - The error to be tested.
+ * @returns {boolean} `true` if `error` should be forwarded to Sentry,
+ * `false` otherwise.
+ */
+export const isSentryWorthy = error =>
+  isUnknown(error) ||
+  isInvalidArgumentError(error) ||
+  isInternalError(error) ||
+  httpStatusCode(error) >= 500 || // Server errors.
+  httpStatusCode(error) === 400 // Bad request.
+
+/**
  * Returns the id of the error, used as message id.
  *
  * @param {object} error - The backend error object.
@@ -327,4 +345,28 @@ export const toMessageProps = error => {
   }
 
   return props
+}
+
+/**
+ * `ingestError` provides a unified error ingestion handler, which manages
+ * forwarding to sentry and other logic that should be applied when errors
+ * occur. The error object is not modified.
+ *
+ * @param {object} error - The error object.
+ * @param {object} extras - Sentry extras to be sent.
+ * @param {object} tags - Sentry tags to be sent.
+ */
+export const ingestError = (error, extras = {}, tags = {}) => {
+  // Log the error when in development mode
+  errorLog(error)
+
+  // Sent to Sentry if necessary.
+  if (isSentryWorthy(error)) {
+    Sentry.withScope(scope => {
+      scope.setExtras({ ...error, ...extras })
+      scope.setTags({ ...tags, frontendOrigin: true })
+      scope.setFingerprint(isBackend(error) ? getBackendErrorId(error) : error)
+      Sentry.captureException(error instanceof Error ? error : new Error(error))
+    })
+  }
 }
