@@ -4953,10 +4953,10 @@ walker@^1.0.7, walker@~1.0.5:
   dependencies:
     makeerror "1.0.x"
 
-web-streams-polyfill@^2.0.3:
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-2.0.6.tgz#76e0504b4f15a6310cfc9e78e27637b648f9741e"
-  integrity sha512-nXOi4fBykO4LzyQhZX3MAGib635KGZBoNTkNXrNIkz0zthEf2QokEWxRb0H632xNLDWtHFb1R6dFGzksjYMSDw==
+web-streams-polyfill@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-3.0.1.tgz#1f836eea307e8f4af15758ee473c7af755eb879e"
+  integrity sha512-M+EmTdszMWINywOZaqpZ6VIEDUmNpRaTOuizF0ZKPjSDC8paMRe/jBBwFv0Yeyn5WYnM5pMqMQa82vpaE+IJRw==
 
 webidl-conversions@^4.0.2:
   version "4.0.2"

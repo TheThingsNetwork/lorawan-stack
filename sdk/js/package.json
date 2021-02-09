@@ -57,6 +57,6 @@
     "proxy-polyfill": "^0.3.0",
     "query-string": "^6.2.0",
     "traverse": "^0.6.6",
-    "web-streams-polyfill": "^2.0.3"
+    "web-streams-polyfill": "^3.0.1"
   }
 }
