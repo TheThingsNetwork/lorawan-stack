@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/bluele/gcache"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -94,7 +95,14 @@ func cacheKey(codec codecType, version *ttnpb.EndDeviceVersionIdentifiers) strin
 	return fmt.Sprintf("%s:%s:%s:%s:%v", version.BrandID, version.ModelID, version.FirmwareVersion, version.BandID, codec)
 }
 
+var (
+	errNoVersionIdentifiers = errors.DefineInvalidArgument("no_version_identifiers", "no version identifiers for device")
+)
+
 func (h *host) retrieve(ctx context.Context, codec codecType, ids ttnpb.ApplicationIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
+	if version == nil {
+		return nil, errNoVersionIdentifiers.New()
+	}
 	key := cacheKey(codec, version)
 	if cachedInterface, err := h.cache.Get(key); err == nil {
 		cached := cachedInterface.(cacheItem)
@@ -141,18 +149,12 @@ func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers,
 	if err != nil {
 		return err
 	}
-	if err != nil {
-		return err
-	}
 	return h.processor.DecodeUplink(ctx, ids, version, message, res.Formatter, res.FormatterParameter)
 }
 
 // DecodeDownlink decodes a downlink message.
 func (h *host) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, parameter string) error {
 	res, err := h.retrieve(ctx, downlinkDecoder, ids.ApplicationIdentifiers, version)
-	if err != nil {
-		return err
-	}
 	if err != nil {
 		return err
 	}

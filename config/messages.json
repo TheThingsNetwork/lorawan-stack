@@ -5975,6 +5975,15 @@
       "file": "cayennelpp.go"
     }
   },
+  "error:pkg/messageprocessors/devicerepository:no_version_identifiers": {
+    "translations": {
+      "en": "no version identifiers for device"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/devicerepository",
+      "file": "devicerepository.go"
+    }
+  },
   "error:pkg/messageprocessors/javascript:input": {
     "translations": {
       "en": "invalid input"
