@@ -114,7 +114,7 @@ export default class GatewayOverview extends React.Component {
           {
             key: sharedMessages.gatewayEUI,
             value: ids.eui,
-            type: 'code',
+            type: 'byte',
             sensitive: false,
           },
           {
