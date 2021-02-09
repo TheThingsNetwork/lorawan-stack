@@ -28,28 +28,37 @@ func UnaryServerInterceptor(ctx context.Context, opts ...Option) grpc.UnaryServe
 	o := evaluateServerOpt(opts)
 	logger := log.FromContext(ctx).WithField("namespace", "grpc")
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		newCtx := newLoggerForCall(ctx, logger, info.FullMethod)
+		onceFields, propagatedFields := logFieldsForCall(ctx, info.FullMethod)
+		logger := logger.WithFields(propagatedFields)
+		newCtx := log.NewContext(ctx, logger)
+
 		startTime := time.Now()
 		resp, err := handler(newCtx, req)
+
 		if err == nil {
 			if _, ok := o.ignoreMethods[info.FullMethod]; ok {
 				return resp, err
 			}
 		}
-		logFields := []interface{}{
-			"duration", time.Since(startTime).Round(time.Microsecond * 100),
-		}
+
+		onceFields = onceFields.WithField(
+			"duration", time.Since(startTime).Round(time.Microsecond*100),
+		)
+
 		if err != nil {
-			logFields = append(logFields, logFieldsForError(err)...)
+			onceFields = onceFields.WithFields(logFieldsForError(err))
 		}
+
 		level := o.levelFunc(grpc.Code(err))
 		if err == context.Canceled {
 			level = log.InfoLevel
 		}
-		entry := log.FromContext(newCtx).WithFields(log.Fields(logFields...))
+
+		entry := logger.WithFields(onceFields)
 		if err != nil {
 			entry = entry.WithError(err)
 		}
+
 		commit(entry, level, "Finished unary call")
 		return resp, err
 	}
@@ -60,25 +69,40 @@ func StreamServerInterceptor(ctx context.Context, opts ...Option) grpc.StreamSer
 	o := evaluateServerOpt(opts)
 	logger := log.FromContext(ctx).WithField("namespace", "grpc")
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-		newCtx := newLoggerForCall(stream.Context(), logger, info.FullMethod)
+		ctx := stream.Context()
+		onceFields, propagatedFields := logFieldsForCall(ctx, info.FullMethod)
+		logger := logger.WithFields(propagatedFields)
+		newCtx := log.NewContext(ctx, logger)
+
 		wrapped := grpc_middleware.WrapServerStream(stream)
 		wrapped.WrappedContext = newCtx
 		startTime := time.Now()
 		err := handler(srv, wrapped)
-		logFields := []interface{}{
-			"duration", time.Since(startTime).Round(time.Microsecond * 100),
+
+		if err == nil {
+			if _, ok := o.ignoreMethods[info.FullMethod]; ok {
+				return err
+			}
 		}
+
+		onceFields = onceFields.WithField(
+			"duration", time.Since(startTime).Round(time.Microsecond*100),
+		)
+
 		if err != nil {
-			logFields = append(logFields, logFieldsForError(err)...)
+			onceFields = onceFields.WithFields(logFieldsForError(err))
 		}
+
 		level := o.levelFunc(grpc.Code(err))
 		if err == context.Canceled {
 			level = log.InfoLevel
 		}
-		entry := log.FromContext(newCtx).WithFields(log.Fields(logFields...))
+
+		entry := logger.WithFields(onceFields)
 		if err != nil {
 			entry = entry.WithError(err)
 		}
+
 		commit(entry, level, "Finished streaming call")
 		return err
 	}
