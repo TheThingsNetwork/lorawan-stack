@@ -57,7 +57,7 @@ jobs:
       - name: Initialize stack environment
         run: tools/bin/mage init
       - name: Run test preparations
-        run: tools/bin/mage dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:sqlDump
+        run: tools/bin/mage -v dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:sqlDump
       - name: Build frontend
         if: steps.public-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage js:build
