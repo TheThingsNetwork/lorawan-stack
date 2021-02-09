@@ -20,6 +20,8 @@ jobs:
   end-to-end:
     name: Frontend based (cypress)
     runs-on: ubuntu-18.04
+    env:
+      TTN_LW_LOG_LEVEL: debug
     steps:
       - name: Check out code
         uses: actions/checkout@v2
