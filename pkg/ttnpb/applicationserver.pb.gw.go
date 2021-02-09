@@ -283,6 +283,24 @@ func local_request_As_GetLinkStats_0(ctx context.Context, marshaler runtime.Mars
 
 }
 
+func request_As_GetConfiguration_0(ctx context.Context, marshaler runtime.Marshaler, client AsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetAsConfigurationRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.GetConfiguration(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_As_GetConfiguration_0(ctx context.Context, marshaler runtime.Marshaler, server AsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetAsConfigurationRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetConfiguration(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_AppAs_DownlinkQueuePush_0(ctx context.Context, marshaler runtime.Marshaler, client AppAsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq DownlinkQueueRequest
 	var metadata runtime.ServerMetadata
@@ -1155,6 +1173,29 @@ func RegisterAsHandlerServer(ctx context.Context, mux *runtime.ServeMux, server 
 
 	})
 
+	mux.Handle("GET", pattern_As_GetConfiguration_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_As_GetConfiguration_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_As_GetConfiguration_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -1501,6 +1542,26 @@ func RegisterAsHandlerClient(ctx context.Context, mux *runtime.ServeMux, client 
 
 	})
 
+	mux.Handle("GET", pattern_As_GetConfiguration_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_As_GetConfiguration_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_As_GetConfiguration_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -1512,6 +1573,8 @@ var (
 	pattern_As_DeleteLink_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"as", "applications", "application_id", "link"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_As_GetLinkStats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"as", "applications", "application_id", "link", "stats"}, "", runtime.AssumeColonVerbOpt(true)))
+
+	pattern_As_GetConfiguration_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"as", "configuration"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -1522,6 +1585,8 @@ var (
 	forward_As_DeleteLink_0 = runtime.ForwardResponseMessage
 
 	forward_As_GetLinkStats_0 = runtime.ForwardResponseMessage
+
+	forward_As_GetConfiguration_0 = runtime.ForwardResponseMessage
 )
 
 // RegisterAppAsHandlerFromEndpoint is same as RegisterAppAsHandler but

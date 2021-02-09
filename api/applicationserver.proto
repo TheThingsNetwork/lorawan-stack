@@ -70,6 +70,37 @@ message ApplicationLinkStats {
   uint64 downlink_count = 6;
 }
 
+// Application Server configuration.
+message AsConfiguration {
+  message PubSub {
+    message Providers {
+      enum Status {
+        // No restrictions are in place.
+        ENABLED = 0;
+        // Warnings are being emitted that the provider will be deprecated in the future.
+        WARNING = 1;
+        // New integrations cannot be set up, and old ones do not start.
+        DISABLED = 2;
+      };
+
+      Status mqtt = 1 [(gogoproto.customname) = "MQTT"];
+      Status nats = 2 [(gogoproto.customname) = "NATS"];
+      Status aws_iot = 3 [(gogoproto.customname) = "AWSIoT"];
+    }
+
+    Providers providers = 1;
+  };
+  PubSub pubsub = 1 [(gogoproto.customname) = "PubSub"];
+}
+
+message GetAsConfigurationRequest {
+
+}
+
+message GetAsConfigurationResponse {
+  AsConfiguration configuration = 1;
+}
+
 // The As service manages the Application Server.
 service As {
   // Get a link configuration from the Application Server to Network Server.
@@ -104,6 +135,12 @@ service As {
   rpc GetLinkStats(ApplicationIdentifiers) returns (ApplicationLinkStats) {
     option (google.api.http) = {
       get: "/as/applications/{application_id}/link/stats"
+    };
+  };
+
+  rpc GetConfiguration(GetAsConfigurationRequest) returns (GetAsConfigurationResponse) {
+    option (google.api.http) = {
+      get: "/as/configuration"
     };
   };
 }

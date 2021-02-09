@@ -496,6 +496,258 @@ var _ interface {
 
 var _ApplicationLinkStats_NetworkServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
 
+// ValidateFields checks the field values on AsConfiguration with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *AsConfiguration) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = AsConfigurationFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "pubsub":
+
+			if v, ok := interface{}(m.GetPubSub()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return AsConfigurationValidationError{
+						field:  "pubsub",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return AsConfigurationValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// AsConfigurationValidationError is the validation error returned by
+// AsConfiguration.ValidateFields if the designated constraints aren't met.
+type AsConfigurationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AsConfigurationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AsConfigurationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AsConfigurationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AsConfigurationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AsConfigurationValidationError) ErrorName() string { return "AsConfigurationValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AsConfigurationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAsConfiguration.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AsConfigurationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AsConfigurationValidationError{}
+
+// ValidateFields checks the field values on GetAsConfigurationRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetAsConfigurationRequest) ValidateFields(paths ...string) error {
+	if len(paths) > 0 {
+		return fmt.Errorf("message GetAsConfigurationRequest has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
+// GetAsConfigurationRequestValidationError is the validation error returned by
+// GetAsConfigurationRequest.ValidateFields if the designated constraints
+// aren't met.
+type GetAsConfigurationRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetAsConfigurationRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetAsConfigurationRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetAsConfigurationRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetAsConfigurationRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetAsConfigurationRequestValidationError) ErrorName() string {
+	return "GetAsConfigurationRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetAsConfigurationRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetAsConfigurationRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetAsConfigurationRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetAsConfigurationRequestValidationError{}
+
+// ValidateFields checks the field values on GetAsConfigurationResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *GetAsConfigurationResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetAsConfigurationResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "configuration":
+
+			if v, ok := interface{}(m.GetConfiguration()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetAsConfigurationResponseValidationError{
+						field:  "configuration",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return GetAsConfigurationResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetAsConfigurationResponseValidationError is the validation error returned
+// by GetAsConfigurationResponse.ValidateFields if the designated constraints
+// aren't met.
+type GetAsConfigurationResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetAsConfigurationResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetAsConfigurationResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetAsConfigurationResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetAsConfigurationResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetAsConfigurationResponseValidationError) ErrorName() string {
+	return "GetAsConfigurationResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetAsConfigurationResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetAsConfigurationResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetAsConfigurationResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetAsConfigurationResponseValidationError{}
+
 // ValidateFields checks the field values on NsAsHandleUplinkRequest with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -600,3 +852,184 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = NsAsHandleUplinkRequestValidationError{}
+
+// ValidateFields checks the field values on AsConfiguration_PubSub with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *AsConfiguration_PubSub) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = AsConfiguration_PubSubFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "providers":
+
+			if v, ok := interface{}(m.GetProviders()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return AsConfiguration_PubSubValidationError{
+						field:  "providers",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return AsConfiguration_PubSubValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// AsConfiguration_PubSubValidationError is the validation error returned by
+// AsConfiguration_PubSub.ValidateFields if the designated constraints aren't met.
+type AsConfiguration_PubSubValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AsConfiguration_PubSubValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AsConfiguration_PubSubValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AsConfiguration_PubSubValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AsConfiguration_PubSubValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AsConfiguration_PubSubValidationError) ErrorName() string {
+	return "AsConfiguration_PubSubValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AsConfiguration_PubSubValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAsConfiguration_PubSub.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AsConfiguration_PubSubValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AsConfiguration_PubSubValidationError{}
+
+// ValidateFields checks the field values on AsConfiguration_PubSub_Providers
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *AsConfiguration_PubSub_Providers) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = AsConfiguration_PubSub_ProvidersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "mqtt":
+			// no validation rules for MQTT
+		case "nats":
+			// no validation rules for NATS
+		case "aws_iot":
+			// no validation rules for AWSIoT
+		default:
+			return AsConfiguration_PubSub_ProvidersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// AsConfiguration_PubSub_ProvidersValidationError is the validation error
+// returned by AsConfiguration_PubSub_Providers.ValidateFields if the
+// designated constraints aren't met.
+type AsConfiguration_PubSub_ProvidersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AsConfiguration_PubSub_ProvidersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AsConfiguration_PubSub_ProvidersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AsConfiguration_PubSub_ProvidersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AsConfiguration_PubSub_ProvidersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AsConfiguration_PubSub_ProvidersValidationError) ErrorName() string {
+	return "AsConfiguration_PubSub_ProvidersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AsConfiguration_PubSub_ProvidersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAsConfiguration_PubSub_Providers.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AsConfiguration_PubSub_ProvidersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AsConfiguration_PubSub_ProvidersValidationError{}

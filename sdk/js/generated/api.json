@@ -1153,7 +1153,31 @@
       "hasExtensions": false,
       "hasMessages": true,
       "hasServices": true,
-      "enums": [],
+      "enums": [
+        {
+          "name": "Status",
+          "longName": "AsConfiguration.PubSub.Providers.Status",
+          "fullName": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status",
+          "description": "",
+          "values": [
+            {
+              "name": "ENABLED",
+              "number": "0",
+              "description": "No restrictions are in place."
+            },
+            {
+              "name": "WARNING",
+              "number": "1",
+              "description": "Warnings are being emitted that the provider will be deprecated in the future."
+            },
+            {
+              "name": "DISABLED",
+              "number": "2",
+              "description": "New integrations cannot be set up, and old ones do not start."
+            }
+          ]
+        }
+      ],
       "extensions": [],
       "messages": [
         {
@@ -1277,6 +1301,89 @@
           ]
         },
         {
+          "name": "AsConfiguration",
+          "longName": "AsConfiguration",
+          "fullName": "ttn.lorawan.v3.AsConfiguration",
+          "description": "Application Server configuration.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pubsub",
+              "description": "",
+              "label": "",
+              "type": "PubSub",
+              "longType": "AsConfiguration.PubSub",
+              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PubSub",
+          "longName": "AsConfiguration.PubSub",
+          "fullName": "ttn.lorawan.v3.AsConfiguration.PubSub",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "providers",
+              "description": "",
+              "label": "",
+              "type": "Providers",
+              "longType": "AsConfiguration.PubSub.Providers",
+              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Providers",
+          "longName": "AsConfiguration.PubSub.Providers",
+          "fullName": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "mqtt",
+              "description": "",
+              "label": "",
+              "type": "Status",
+              "longType": "AsConfiguration.PubSub.Providers.Status",
+              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "nats",
+              "description": "",
+              "label": "",
+              "type": "Status",
+              "longType": "AsConfiguration.PubSub.Providers.Status",
+              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "aws_iot",
+              "description": "",
+              "label": "",
+              "type": "Status",
+              "longType": "AsConfiguration.PubSub.Providers.Status",
+              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "GetApplicationLinkRequest",
           "longName": "GetApplicationLinkRequest",
           "fullName": "ttn.lorawan.v3.GetApplicationLinkRequest",
@@ -1310,6 +1417,37 @@
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
               "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetAsConfigurationRequest",
+          "longName": "GetAsConfigurationRequest",
+          "fullName": "ttn.lorawan.v3.GetAsConfigurationRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "GetAsConfigurationResponse",
+          "longName": "GetAsConfigurationResponse",
+          "fullName": "ttn.lorawan.v3.GetAsConfigurationResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "configuration",
+              "description": "",
+              "label": "",
+              "type": "AsConfiguration",
+              "longType": "AsConfiguration",
+              "fullType": "ttn.lorawan.v3.AsConfiguration",
               "ismap": false,
               "defaultValue": ""
             }
@@ -1626,6 +1764,28 @@
                     {
                       "method": "GET",
                       "pattern": "/as/applications/{application_id}/link/stats"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetConfiguration",
+              "description": "",
+              "requestType": "GetAsConfigurationRequest",
+              "requestLongType": "GetAsConfigurationRequest",
+              "requestFullType": "ttn.lorawan.v3.GetAsConfigurationRequest",
+              "requestStreaming": false,
+              "responseType": "GetAsConfigurationResponse",
+              "responseLongType": "GetAsConfigurationResponse",
+              "responseFullType": "ttn.lorawan.v3.GetAsConfigurationResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/configuration"
                     }
                   ]
                 }
