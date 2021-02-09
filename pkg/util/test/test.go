@@ -22,6 +22,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -54,10 +55,36 @@ var (
 
 	DefaultSessionKeyID = []byte("test-session-key-id")
 
+	DefaultKEK      = types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	DefaultKEKLabel = "test-kek-label"
+
 	DefaultAppSKey     = crypto.DeriveAppSKey(DefaultNwkKey, DefaultJoinNonce, DefaultJoinEUI, DefaultDevNonce)
 	DefaultFNwkSIntKey = crypto.DeriveFNwkSIntKey(DefaultNwkKey, DefaultJoinNonce, DefaultJoinEUI, DefaultDevNonce)
 	DefaultNwkSEncKey  = crypto.DeriveNwkSEncKey(DefaultNwkKey, DefaultJoinNonce, DefaultJoinEUI, DefaultDevNonce)
 	DefaultSNwkSIntKey = crypto.DeriveSNwkSIntKey(DefaultNwkKey, DefaultJoinNonce, DefaultJoinEUI, DefaultDevNonce)
+
+	DefaultAppSKeyEnvelope = &ttnpb.KeyEnvelope{
+		Key: &DefaultAppSKey,
+	}
+	DefaultFNwkSIntKeyEnvelope = &ttnpb.KeyEnvelope{
+		Key: &DefaultFNwkSIntKey,
+	}
+	DefaultNwkSEncKeyEnvelope = &ttnpb.KeyEnvelope{
+		Key: &DefaultNwkSEncKey,
+	}
+	DefaultSNwkSIntKeyEnvelope = &ttnpb.KeyEnvelope{
+		Key: &DefaultSNwkSIntKey,
+	}
+
+	DefaultAppSKeyEnvelopeWrapped     = Must(cryptoutil.WrapAES128KeyWithKEK(Context(), DefaultAppSKey, DefaultKEKLabel, DefaultKEK)).(*ttnpb.KeyEnvelope)
+	DefaultFNwkSIntKeyEnvelopeWrapped = Must(cryptoutil.WrapAES128KeyWithKEK(Context(), DefaultFNwkSIntKey, DefaultKEKLabel, DefaultKEK)).(*ttnpb.KeyEnvelope)
+	DefaultNwkSEncKeyEnvelopeWrapped  = Must(cryptoutil.WrapAES128KeyWithKEK(Context(), DefaultNwkSEncKey, DefaultKEKLabel, DefaultKEK)).(*ttnpb.KeyEnvelope)
+	DefaultSNwkSIntKeyEnvelopeWrapped = Must(cryptoutil.WrapAES128KeyWithKEK(Context(), DefaultSNwkSIntKey, DefaultKEKLabel, DefaultKEK)).(*ttnpb.KeyEnvelope)
+
+	DefaultAppSKeyWrapped     = DefaultAppSKeyEnvelopeWrapped.EncryptedKey
+	DefaultFNwkSIntKeyWrapped = DefaultFNwkSIntKeyEnvelopeWrapped.EncryptedKey
+	DefaultNwkSEncKeyWrapped  = DefaultNwkSEncKeyEnvelopeWrapped.EncryptedKey
+	DefaultSNwkSIntKeyWrapped = DefaultSNwkSIntKeyEnvelopeWrapped.EncryptedKey
 
 	DefaultNetID   = Must(types.NewNetID(2, []byte{0x00, 0x42, 0xff})).(types.NetID)
 	DefaultDevAddr = Must(types.NewDevAddr(DefaultNetID, []byte{0x00, 0x02, 0xff, 0xff})).(types.DevAddr)

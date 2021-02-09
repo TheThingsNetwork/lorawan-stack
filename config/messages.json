@@ -6092,6 +6092,24 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/networkserver/redis:field": {
+    "translations": {
+      "en": "invalid field `{field}`"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/networkserver/redis:field_count": {
+    "translations": {
+      "en": "invalid field count '{count}'"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/networkserver/redis:invalid_device": {
     "translations": {
       "en": "device is invalid"
@@ -7367,6 +7385,15 @@
     },
     "description": {
       "package": "pkg/ttnpb/udp",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/ttnpb:field": {
+    "translations": {
+      "en": "invalid field `{field}`"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
       "file": "errors.go"
     }
   },

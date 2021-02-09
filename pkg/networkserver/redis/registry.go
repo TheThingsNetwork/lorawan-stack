@@ -15,7 +15,6 @@
 package redis
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -24,7 +23,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/blang/semver"
 	"github.com/go-redis/redis/v8"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/oklog/ulid/v2"
@@ -49,8 +47,6 @@ var (
 type DeviceRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
-	// CompatibilityVersion denotes the lowest possible stack version the registry should be compatible with.
-	CompatibilityVersion semver.Version
 
 	entropyMu *sync.Mutex
 	entropy   io.Reader
@@ -63,40 +59,6 @@ func (r *DeviceRegistry) Init(ctx context.Context) error {
 	r.entropyMu = &sync.Mutex{}
 	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
 	return nil
-}
-
-// marshalMsgpack is adaptation of msgpack.Marshal (https://github.com/vmihailenco/msgpack/blob/8b121f7d2c8eac21ab98ef6443d272f355b88999/encode.go#L58-L74).
-func marshalMsgpack(v interface{}) ([]byte, error) {
-	enc := msgpack.GetEncoder()
-
-	var buf bytes.Buffer
-	enc.Reset(&buf)
-	enc.UseCompactFloats(true)
-	enc.UseCompactInts(true)
-	enc.UseCustomStructTag("json")
-
-	err := enc.Encode(v)
-	b := buf.Bytes()
-
-	msgpack.PutEncoder(enc)
-
-	if err != nil {
-		return nil, err
-	}
-	return b, err
-}
-
-// unmarshalMsgpack is adaptation of msgpack.Unmarshal (https://github.com/vmihailenco/msgpack/blob/8b121f7d2c8eac21ab98ef6443d272f355b88999/decode.go#L54-L63).
-func unmarshalMsgpack(b []byte, v interface{}) error {
-	dec := msgpack.GetDecoder()
-
-	dec.ResetBytes(b)
-	dec.UseCustomStructTag("json")
-	err := dec.Decode(v)
-
-	msgpack.PutDecoder(dec)
-
-	return err
 }
 
 func (r *DeviceRegistry) uidKey(uid string) string {
@@ -151,27 +113,340 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 	return pb, ctx, nil
 }
 
-type uplinkMatchSession struct {
-	LoRaWANVersion    ttnpb.MACVersion
+type UplinkMatchSession struct {
 	FNwkSIntKey       *ttnpb.KeyEnvelope
-	LastFCnt          uint32             `json:",omitempty"`
-	ResetsFCnt        *pbtypes.BoolValue `json:",omitempty"`
-	Supports32BitFCnt *pbtypes.BoolValue `json:",omitempty"`
+	ResetsFCnt        *pbtypes.BoolValue
+	Supports32BitFCnt *pbtypes.BoolValue
+	LoRaWANVersion    ttnpb.MACVersion
+	LastFCnt          uint32
 }
 
-type uplinkMatchPendingSession struct {
-	LoRaWANVersion ttnpb.MACVersion
+type UplinkMatchPendingSession struct {
 	FNwkSIntKey    *ttnpb.KeyEnvelope
+	LoRaWANVersion ttnpb.MACVersion
 }
 
-type uplinkMatchResult struct {
+type UplinkMatchResult struct {
+	FNwkSIntKey       *ttnpb.KeyEnvelope
+	ResetsFCnt        *pbtypes.BoolValue
+	Supports32BitFCnt *pbtypes.BoolValue
 	UID               string
 	LoRaWANVersion    ttnpb.MACVersion
-	FNwkSIntKey       *ttnpb.KeyEnvelope
-	LastFCnt          uint32             `json:",omitempty"`
-	IsPending         bool               `json:",omitempty"`
-	ResetsFCnt        *pbtypes.BoolValue `json:",omitempty"`
-	Supports32BitFCnt *pbtypes.BoolValue `json:",omitempty"`
+	LastFCnt          uint32
+	IsPending         bool
+}
+
+func encodeStruct(enc *msgpack.Encoder, fs ...func(enc *msgpack.Encoder) error) error {
+	if err := enc.EncodeMapLen(len(fs)); err != nil {
+		return err
+	}
+	for _, f := range fs {
+		if err := f(enc); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func makeEncodeCustomEncoderField(name string, v msgpack.CustomEncoder) func(enc *msgpack.Encoder) error {
+	return func(enc *msgpack.Encoder) error {
+		if err := enc.EncodeString(name); err != nil {
+			return err
+		}
+		return v.EncodeMsgpack(enc)
+	}
+}
+
+func makeEncodeFNwkSIntField(v *ttnpb.KeyEnvelope) func(enc *msgpack.Encoder) error {
+	return makeEncodeCustomEncoderField("f_nwk_s_int_key", v)
+}
+
+func makeEncodeLoRaWANVersionField(v ttnpb.MACVersion) func(enc *msgpack.Encoder) error {
+	return makeEncodeCustomEncoderField("lorawan_version", v)
+}
+
+func makeEncodeBoolValueField(name string, v *pbtypes.BoolValue) func(enc *msgpack.Encoder) error {
+	return func(enc *msgpack.Encoder) error {
+		if err := enc.EncodeString(name); err != nil {
+			return err
+		}
+		if err := enc.EncodeMapLen(1); err != nil {
+			return err
+		}
+		if err := enc.EncodeString("value"); err != nil {
+			return err
+		}
+		return enc.EncodeBool(v.Value)
+	}
+}
+
+func makeEncodeResetsFCntField(v *pbtypes.BoolValue) func(enc *msgpack.Encoder) error {
+	return makeEncodeBoolValueField("resets_f_cnt", v)
+}
+
+func makeEncodeSupports32BitFCntField(v *pbtypes.BoolValue) func(enc *msgpack.Encoder) error {
+	return makeEncodeBoolValueField("supports_32_bit_f_cnt", v)
+}
+
+func makeEncodeLastFCntField(v uint32) func(enc *msgpack.Encoder) error {
+	return func(enc *msgpack.Encoder) error {
+		if err := enc.EncodeString("last_f_cnt"); err != nil {
+			return err
+		}
+		return enc.EncodeUint32(v)
+	}
+}
+
+var errInvalidFieldCount = errors.DefineCorruption("field_count", "invalid field count '{count}'")
+
+func decodeBoolValue(dec *msgpack.Decoder) (*pbtypes.BoolValue, error) {
+	n, err := dec.DecodeMapLen()
+	if err != nil {
+		return nil, err
+	}
+	if n != 1 {
+		return nil, errInvalidFieldCount.WithAttributes("count", n)
+	}
+
+	s, err := dec.DecodeString()
+	if err != nil {
+		return nil, err
+	}
+	if s != "value" {
+		return nil, errInvalidField.WithAttributes("field", s)
+	}
+
+	v, err := dec.DecodeBool()
+	if err != nil {
+		return nil, err
+	}
+	return &pbtypes.BoolValue{
+		Value: v,
+	}, nil
+}
+
+var errInvalidField = errors.DefineInvalidArgument("field", "invalid field `{field}`")
+
+// EncodeMsgpack implements msgpack.CustomEncoder interface.
+func (v UplinkMatchSession) EncodeMsgpack(enc *msgpack.Encoder) error {
+	fs := []func(enc *msgpack.Encoder) error{
+		makeEncodeFNwkSIntField(v.FNwkSIntKey),
+		makeEncodeLoRaWANVersionField(v.LoRaWANVersion),
+	}
+	if v.LastFCnt > 0 {
+		fs = append(fs, makeEncodeLastFCntField(v.LastFCnt))
+	}
+	if v.ResetsFCnt != nil {
+		fs = append(fs, makeEncodeResetsFCntField(v.ResetsFCnt))
+	}
+	if v.Supports32BitFCnt != nil {
+		fs = append(fs, makeEncodeSupports32BitFCntField(v.Supports32BitFCnt))
+	}
+	return encodeStruct(enc, fs...)
+}
+
+// DecodeMsgpack implements msgpack.CustomDecoder interface.
+func (v *UplinkMatchSession) DecodeMsgpack(dec *msgpack.Decoder) error {
+	n, err := dec.DecodeMapLen()
+	if err != nil {
+		return err
+	}
+	if n > 5 {
+		return errInvalidFieldCount.WithAttributes("count", n)
+	}
+	for i := 0; i < n; i++ {
+		s, err := dec.DecodeString()
+		if err != nil {
+			return err
+		}
+		switch s {
+		case "f_nwk_s_int_key":
+			fv := &ttnpb.KeyEnvelope{}
+			if err := fv.DecodeMsgpack(dec); err != nil {
+				return err
+			}
+			v.FNwkSIntKey = fv
+
+		case "lorawan_version":
+			var fv ttnpb.MACVersion
+			if err := fv.DecodeMsgpack(dec); err != nil {
+				return err
+			}
+			v.LoRaWANVersion = fv
+
+		case "resets_f_cnt":
+			fv, err := decodeBoolValue(dec)
+			if err != nil {
+				return err
+			}
+			v.ResetsFCnt = fv
+
+		case "supports_32_bit_f_cnt":
+			fv, err := decodeBoolValue(dec)
+			if err != nil {
+				return err
+			}
+			v.Supports32BitFCnt = fv
+
+		case "last_f_cnt":
+			fv, err := dec.DecodeUint32()
+			if err != nil {
+				return err
+			}
+			v.LastFCnt = fv
+
+		default:
+			return errInvalidField.WithAttributes("field", s)
+		}
+	}
+	return nil
+}
+
+// EncodeMsgpack implements msgpack.CustomEncoder interface.
+func (v UplinkMatchPendingSession) EncodeMsgpack(enc *msgpack.Encoder) error {
+	return encodeStruct(enc,
+		makeEncodeFNwkSIntField(v.FNwkSIntKey),
+		makeEncodeLoRaWANVersionField(v.LoRaWANVersion),
+	)
+}
+
+// DecodeMsgpack implements msgpack.CustomDecoder interface.
+func (v *UplinkMatchPendingSession) DecodeMsgpack(dec *msgpack.Decoder) error {
+	n, err := dec.DecodeMapLen()
+	if err != nil {
+		return err
+	}
+	if n > 2 {
+		return errInvalidFieldCount.WithAttributes("count", n)
+	}
+	for i := 0; i < n; i++ {
+		s, err := dec.DecodeString()
+		if err != nil {
+			return err
+		}
+		switch s {
+		case "f_nwk_s_int_key":
+			fv := &ttnpb.KeyEnvelope{}
+			if err := fv.DecodeMsgpack(dec); err != nil {
+				return err
+			}
+			v.FNwkSIntKey = fv
+
+		case "lorawan_version":
+			var fv ttnpb.MACVersion
+			if err := fv.DecodeMsgpack(dec); err != nil {
+				return err
+			}
+			v.LoRaWANVersion = fv
+
+		default:
+			return errInvalidField.WithAttributes("field", s)
+		}
+	}
+	return nil
+}
+
+// EncodeMsgpack implements msgpack.CustomEncoder interface.
+func (v UplinkMatchResult) EncodeMsgpack(enc *msgpack.Encoder) error {
+	fs := []func(enc *msgpack.Encoder) error{
+		makeEncodeFNwkSIntField(v.FNwkSIntKey),
+		makeEncodeLoRaWANVersionField(v.LoRaWANVersion),
+		func(enc *msgpack.Encoder) error {
+			if err := enc.EncodeString("uid"); err != nil {
+				return err
+			}
+			return enc.EncodeString(v.UID)
+		},
+	}
+	if v.LastFCnt > 0 {
+		fs = append(fs, makeEncodeLastFCntField(v.LastFCnt))
+	}
+	if v.IsPending {
+		fs = append(fs, func(enc *msgpack.Encoder) error {
+			if err := enc.EncodeString("is_pending"); err != nil {
+				return err
+			}
+			return enc.EncodeBool(v.IsPending)
+		})
+	}
+	if v.ResetsFCnt != nil {
+		fs = append(fs, makeEncodeResetsFCntField(v.ResetsFCnt))
+	}
+	if v.Supports32BitFCnt != nil {
+		fs = append(fs, makeEncodeSupports32BitFCntField(v.Supports32BitFCnt))
+	}
+	return encodeStruct(enc, fs...)
+}
+
+// DecodeMsgpack implements msgpack.CustomDecoder interface.
+func (v *UplinkMatchResult) DecodeMsgpack(dec *msgpack.Decoder) error {
+	n, err := dec.DecodeMapLen()
+	if err != nil {
+		return err
+	}
+	if n > 7 {
+		return errInvalidFieldCount.WithAttributes("count", n)
+	}
+	for i := 0; i < n; i++ {
+		s, err := dec.DecodeString()
+		if err != nil {
+			return err
+		}
+		switch s {
+		case "f_nwk_s_int_key":
+			fv := &ttnpb.KeyEnvelope{}
+			if err := fv.DecodeMsgpack(dec); err != nil {
+				return err
+			}
+			v.FNwkSIntKey = fv
+
+		case "lorawan_version":
+			var fv ttnpb.MACVersion
+			if err := fv.DecodeMsgpack(dec); err != nil {
+				return err
+			}
+			v.LoRaWANVersion = fv
+
+		case "resets_f_cnt":
+			fv, err := decodeBoolValue(dec)
+			if err != nil {
+				return err
+			}
+			v.ResetsFCnt = fv
+
+		case "supports_32_bit_f_cnt":
+			fv, err := decodeBoolValue(dec)
+			if err != nil {
+				return err
+			}
+			v.Supports32BitFCnt = fv
+
+		case "last_f_cnt":
+			fv, err := dec.DecodeUint32()
+			if err != nil {
+				return err
+			}
+			v.LastFCnt = fv
+
+		case "uid":
+			fv, err := dec.DecodeString()
+			if err != nil {
+				return err
+			}
+			v.UID = fv
+
+		case "is_pending":
+			fv, err := dec.DecodeBool()
+			if err != nil {
+				return err
+			}
+			v.IsPending = fv
+
+		default:
+			return errInvalidField.WithAttributes("field", s)
+		}
+	}
+	return nil
 }
 
 func CurrentAddrKey(addrKey string) string {
@@ -265,8 +540,8 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			return errNoUplinkMatch.New()
 		}
 		ctx := log.NewContextWithField(ctx, "match_key", matchResultKey)
-		res := &uplinkMatchResult{}
-		if err := unmarshalMsgpack([]byte(s), res); err != nil {
+		res := &UplinkMatchResult{}
+		if err := msgpack.Unmarshal([]byte(s), res); err != nil {
 			log.FromContext(ctx).WithError(err).Error("Failed to unmarshal match result")
 			return errDatabaseCorruption.WithCause(err)
 		}
@@ -400,8 +675,8 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			}
 			var m *networkserver.UplinkMatch
 			if idx == pendingIdx {
-				ses := &uplinkMatchPendingSession{}
-				err = unmarshalMsgpack([]byte(s), ses)
+				ses := &UplinkMatchPendingSession{}
+				err = msgpack.Unmarshal([]byte(s), ses)
 				if err == nil {
 					m = &networkserver.UplinkMatch{
 						ApplicationIdentifiers: ids.ApplicationIdentifiers,
@@ -412,8 +687,8 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 					}
 				}
 			} else {
-				ses := &uplinkMatchSession{}
-				err = unmarshalMsgpack([]byte(s), ses)
+				ses := &UplinkMatchSession{}
+				err = msgpack.Unmarshal([]byte(s), ses)
 				if err == nil {
 					m = &networkserver.UplinkMatch{
 						ApplicationIdentifiers: ids.ApplicationIdentifiers,
@@ -435,7 +710,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				return errNoUplinkMatch.WithCause(err)
 			}
 			if ok {
-				b, err := marshalMsgpack(uplinkMatchResult{
+				b, err := msgpack.Marshal(UplinkMatchResult{
 					UID:               uid,
 					LoRaWANVersion:    m.LoRaWANVersion,
 					FNwkSIntKey:       m.FNwkSIntKey,
@@ -483,7 +758,7 @@ func removeAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string
 }
 
 func MarshalDeviceCurrentSession(dev *ttnpb.EndDevice) ([]byte, error) {
-	return marshalMsgpack(uplinkMatchSession{
+	return msgpack.Marshal(UplinkMatchSession{
 		LoRaWANVersion:    dev.GetMACState().GetLoRaWANVersion(),
 		FNwkSIntKey:       dev.GetSession().GetFNwkSIntKey(),
 		LastFCnt:          dev.GetSession().GetLastFCntUp(),
@@ -493,7 +768,7 @@ func MarshalDeviceCurrentSession(dev *ttnpb.EndDevice) ([]byte, error) {
 }
 
 func MarshalDevicePendingSession(dev *ttnpb.EndDevice) ([]byte, error) {
-	return marshalMsgpack(uplinkMatchSession{
+	return msgpack.Marshal(UplinkMatchSession{
 		LoRaWANVersion: dev.GetPendingMACState().GetLoRaWANVersion(),
 		FNwkSIntKey:    dev.GetPendingSession().GetFNwkSIntKey(),
 	})

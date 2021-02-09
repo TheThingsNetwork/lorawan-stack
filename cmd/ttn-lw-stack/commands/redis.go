@@ -105,3 +105,23 @@ func rangeRedisZSet(ctx context.Context, r redis.Cmdable, scanKey, match string,
 		return true, nil
 	})
 }
+
+func rangeRedisHMap(ctx context.Context, r redis.Cmdable, scanKey, match string, count int64, f func(k string, v string) (bool, error)) error {
+	return rangeScan(func(cursor uint64) *redis.ScanCmd {
+		return r.HScan(ctx, scanKey, cursor, match, count)
+	}, func(ss ...string) (bool, error) {
+		if n := len(ss); n%2 != 0 {
+			panic(fmt.Sprintf("HSCAN return value length is not even: %d", n))
+		}
+		for i := 0; i < len(ss); i += 2 {
+			ok, err := f(ss[i], ss[i+1])
+			if err != nil {
+				return false, err
+			}
+			if !ok {
+				return false, nil
+			}
+		}
+		return true, nil
+	})
+}

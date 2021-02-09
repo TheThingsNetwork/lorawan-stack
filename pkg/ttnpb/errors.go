@@ -144,6 +144,8 @@ var (
 	errFieldBound         = errors.DefineInvalidArgument("field_bound", "`{field}` should be between `{min}` and `{max}`", valueKey)
 	errMissingIdentifiers = errors.DefineInvalidArgument("missing_identifiers", "missing identifiers")
 	errParse              = errors.DefineInvalidArgument("parse", "could not parse `{value}` into `{field}`", valueKey)
+
+	errInvalidField = errors.DefineInvalidArgument("field", "invalid field `{field}`")
 )
 
 func errExpectedLowerOrEqual(lorawanField string, max interface{}) valueErr {

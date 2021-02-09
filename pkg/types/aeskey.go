@@ -17,6 +17,8 @@ package types
 import (
 	"encoding/hex"
 	"strings"
+
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 // AES128Key is an 128-bit AES key.
@@ -71,4 +73,26 @@ func (key AES128Key) MarshalText() ([]byte, error) { return marshalTextBytes(key
 func (key *AES128Key) UnmarshalText(data []byte) error {
 	*key = [16]byte{}
 	return unmarshalTextBytes(key[:], data)
+}
+
+// EncodeMsgpack implements msgpack.CustomEncoder interface.
+func (key AES128Key) EncodeMsgpack(enc *msgpack.Encoder) error {
+	return enc.EncodeString(hex.EncodeToString(key[:]))
+}
+
+// DecodeMsgpack implements msgpack.CustomDecoder interface.
+func (key *AES128Key) DecodeMsgpack(dec *msgpack.Decoder) error {
+	s, err := dec.DecodeString()
+	if err != nil {
+		return err
+	}
+	b, err := hex.DecodeString(s)
+	if err != nil {
+		return err
+	}
+	if len(b) != 16 {
+		return errInvalidLength.New()
+	}
+	copy(key[:], b[:])
+	return nil
 }
