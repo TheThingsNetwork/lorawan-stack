@@ -49,7 +49,7 @@ func ShouldResemble(actual interface{}, expected ...interface{}) (message string
 		return success
 	}
 
-	diff := pretty.Diff(expected[0], actual)
+	diff := pretty.Diff(actual, expected[0])
 	if len(diff) == 0 {
 		return message
 	}
@@ -59,6 +59,8 @@ func ShouldResemble(actual interface{}, expected ...interface{}) (message string
 	for _, d := range diff {
 		lines = append(lines, fmt.Sprintf("   %s", d))
 	}
+	lines = append(lines, fmt.Sprintf("Actual: %s", pretty.Sprint(actual)))
+	lines = append(lines, fmt.Sprintf("Expected: %s", pretty.Sprint(expected[0])))
 	return strings.Join(append(lines, lastLine(message)), "\n")
 }
 

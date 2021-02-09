@@ -214,7 +214,7 @@ func ShouldReceiveEventsFunc(actual interface{}, expected ...interface{}) string
 	return success
 }
 
-// ShouldReceiveEventsFunc is like ShouldReceiveEventsFunc, but uses same resemblance function as ShouldResembleEvent.
+// ShouldReceiveEventsResembling is like ShouldReceiveEventsFunc, but uses same resemblance function as ShouldResembleEvent.
 func ShouldReceiveEventsResembling(actual interface{}, expected ...interface{}) string {
 	if len(expected) == 0 {
 		return fmt.Sprintf(needAtLeastValues, 1, len(expected))
@@ -225,7 +225,7 @@ func ShouldReceiveEventsResembling(actual interface{}, expected ...interface{}) 
 	}
 	for i, exp := range evs {
 		if s := ShouldReceiveEventResembling(actual, exp); s != success {
-			return fmt.Sprintf("Mismatch in event number %d: %s", i, s)
+			return fmt.Sprintf("Mismatch in event number %d:\n%s", i, s)
 		}
 	}
 	return success

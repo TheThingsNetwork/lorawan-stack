@@ -80,6 +80,7 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error
 					return err
 				}
 				for _, up := range ups {
+					ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
 					switch pld := up.Up.(type) {
 					case *ttnpb.ApplicationUp_UplinkMessage:
 						registerForwardDataUplink(ctx, pld.UplinkMessage)
