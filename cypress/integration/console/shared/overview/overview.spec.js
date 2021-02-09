@@ -91,7 +91,7 @@ describe('Overview', () => {
       cy.findByRole('link', { name: /0 API key/ }).should('be.visible')
 
       cy.findByRole('row', { name: new RegExp(gatewayId) }).should('be.visible')
-      cy.findByText(new RegExp(gateway.ids.eui)).should('be.visible')
+      cy.findByRole('row', { name: new RegExp(gateway.ids.eui) }).should('be.visible')
       cy.findByText(new RegExp(gateway.description)).should('be.visible')
       cy.findByText(new RegExp(gateway.gateway_server_address)).should('be.visible')
       cy.findByText(new RegExp(gateway.frequency_plan_id)).should('be.visible')

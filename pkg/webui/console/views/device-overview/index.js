@@ -182,22 +182,22 @@ class DeviceOverview extends React.Component {
         {
           key: sharedMessages.nwkSKey,
           value: f_nwk_s_int_key.key,
-          type: 'code',
+          type: 'byte',
           sensitive: true,
         },
         {
           key: sharedMessages.sNwkSIKey,
           value: s_nwk_s_int_key.key,
-          type: 'code',
+          type: 'byte',
           sensitive: true,
         },
         {
           key: sharedMessages.nwkSEncKey,
           value: nwk_s_enc_key.key,
-          type: 'code',
+          type: 'byte',
           sensitive: true,
         },
-        { key: sharedMessages.appSKey, value: app_s_key.key, type: 'code', sensitive: true },
+        { key: sharedMessages.appSKey, value: app_s_key.key, type: 'byte', sensitive: true },
       )
     }
 
