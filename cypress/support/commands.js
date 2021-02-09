@@ -270,6 +270,21 @@ Cypress.Commands.add('createPubSub', (applicationId, pubSub) => {
   })
 })
 
+// Helper function to update gateway programmatically.
+Cypress.Commands.add('updateGateway', (gatewayId, gateway) => {
+  const baseUrl = Cypress.config('baseUrl')
+  cy.getAccessToken(accessToken => {
+    cy.request({
+      method: 'PUT',
+      url: `${baseUrl}/api/v3/gateways/${gatewayId}`,
+      body: gateway,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+  })
+})
+
 // Overwrite the default `type` to make sure that subject is resolved and focused before simulating typing. This is helpful
 // when:
 // 1. The action is forced via the `forced` option for inputs that are visually hidden for styling purposes.

@@ -46,12 +46,12 @@ const m = defineMessages({
 
 const validationSchema = Yup.object().shape({
   latitude: Yup.number()
-    .test('is-valid-latitude', sharedMessages.validateLat, value =>
+    .test('is-valid-latitude', sharedMessages.validateLatitude, value =>
       latitudeRegexp.test(String(value)),
     )
     .required(sharedMessages.validateRequired),
   longitude: Yup.number()
-    .test('is-valid-longitude', sharedMessages.validateLong, value =>
+    .test('is-valid-longitude', sharedMessages.validateLongitude, value =>
       longitudeRegexp.test(String(value)),
     )
     .required(sharedMessages.validateRequired),
