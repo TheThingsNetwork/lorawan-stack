@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { merge } from 'lodash'
 
@@ -29,6 +30,7 @@ import ProgressHint from './hints/progress-hint'
 import OtherHint from './hints/other-hint'
 import Registration from './device-registration'
 import Selection from './device-selection'
+import Card from './device-card'
 import reducer, {
   setBrand,
   setModel,
@@ -147,6 +149,7 @@ const DeviceRepository = props => {
   const hasCompleted = hasCompletedSelection(state)
   const showProgressHint = !hasSelectedOther && !hasCompleted
   const showRegistrationForm = !hasSelectedOther && hasCompleted
+  const showDeviceCard = !hasSelectedOther && hasCompleted && Boolean(template)
   const showOtherHint = hasSelectedOther
 
   const stateKey = React.useMemo(
@@ -189,54 +192,59 @@ const DeviceRepository = props => {
 
   return (
     <RepositoryContext.Provider value={state}>
-      <Form
-        formikRef={formRef}
-        onSubmit={handleSubmit}
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        validationContext={validationContext}
-        error={error}
-      >
-        <Form.SubTitle title={m.selectDeviceTitle} />
-        <Selection
-          onBrandChange={handleBrandChange}
-          onModelChange={handleModelChange}
-          onHwVersionChange={handleHwVersionChange}
-          onFwVersionChange={handleFwVersionChange}
-          onBandChange={handleBandChange}
-        />
-        {showProgressHint && (
-          <ProgressHint
-            manualLinkPath={`/applications/${appId}/devices/add/manual`}
-            supportLink={supportLink}
-          />
-        )}
-        {showOtherHint && (
-          <OtherHint
-            manualLinkPath={`/applications/${appId}/devices/add/manual`}
-            manualGuideDocsPath="/devices/adding-devices/"
-          />
-        )}
-        <hr className={style.hRule} />
-        <Form.SubTitle title={m.enterDataTitle} />
-        {showRegistrationForm ? (
-          <Registration
-            template={template}
-            fetching={templateFetching}
-            prefixes={prefixes}
-            mayEditKeys={mayEditKeys}
-          />
-        ) : (
-          <Message content={m.enterDataDescription} component="p" />
-        )}
-        <SubmitBar align="end">
-          <Form.Submit
-            message={m.register}
-            component={SubmitButton}
-            disabled={!showRegistrationForm}
-          />
-        </SubmitBar>
-      </Form>
+      <Row>
+        <Col>
+          <Form
+            formikRef={formRef}
+            onSubmit={handleSubmit}
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            validationContext={validationContext}
+            error={error}
+          >
+            <Form.SubTitle title={m.selectDeviceTitle} />
+            <Selection
+              onBrandChange={handleBrandChange}
+              onModelChange={handleModelChange}
+              onHwVersionChange={handleHwVersionChange}
+              onFwVersionChange={handleFwVersionChange}
+              onBandChange={handleBandChange}
+            />
+            {showProgressHint && (
+              <ProgressHint
+                manualLinkPath={`/applications/${appId}/devices/add/manual`}
+                supportLink={supportLink}
+              />
+            )}
+            {showOtherHint && (
+              <OtherHint
+                manualLinkPath={`/applications/${appId}/devices/add/manual`}
+                manualGuideDocsPath="/devices/adding-devices/"
+              />
+            )}
+            {showDeviceCard && <Card brandId={brand} modelId={model} template={template} />}
+            <hr className={style.hRule} />
+            <Form.SubTitle title={m.enterDataTitle} />
+            {showRegistrationForm ? (
+              <Registration
+                template={template}
+                fetching={templateFetching}
+                prefixes={prefixes}
+                mayEditKeys={mayEditKeys}
+              />
+            ) : (
+              <Message content={m.enterDataDescription} component="p" />
+            )}
+            <SubmitBar align="start">
+              <Form.Submit
+                message={m.register}
+                component={SubmitButton}
+                disabled={!showRegistrationForm}
+              />
+            </SubmitBar>
+          </Form>
+        </Col>
+      </Row>
     </RepositoryContext.Provider>
   )
 }

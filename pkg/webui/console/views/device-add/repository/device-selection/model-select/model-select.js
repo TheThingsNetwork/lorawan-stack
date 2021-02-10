@@ -44,9 +44,13 @@ const ModelSelect = props => {
   React.useEffect(() => {
     listModels(appId, brandId, {}, [
       'name',
+      'description',
       'firmware_versions',
       'hardware_versions',
       'key_provisioning',
+      'photos',
+      'product_url',
+      'datasheet_url',
     ])
   }, [appId, brandId, listModels])
 
