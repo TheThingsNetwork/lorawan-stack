@@ -59,6 +59,7 @@ For details about compatibility between different releases, see the **Commitment
 - Handling of `DLChannelReq` if dependent `NewChannelReq` was previously rejected.
 - Login after user registration leading to dead-end when originally coming from the Console.
 - Frame counter display of end devices on initial page load in the Console.
+- AU915-928 data rate indexes in Regional Parameter specification versions below 1.0.2b.
 
 ### Security
 

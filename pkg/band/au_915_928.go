@@ -167,6 +167,9 @@ func init() {
 			for drIdx := ttnpb.DATA_RATE_0; drIdx <= ttnpb.DATA_RATE_4; drIdx++ {
 				dataRates[drIdx] = b.DataRates[drIdx+2]
 			}
+			for drIdx := ttnpb.DATA_RATE_8; drIdx <= ttnpb.DATA_RATE_13; drIdx++ {
+				dataRates[drIdx] = b.DataRates[drIdx]
+			}
 			b.DataRates = dataRates
 
 			b.UplinkChannels = append(b.UplinkChannels[:0:0], b.UplinkChannels...)
