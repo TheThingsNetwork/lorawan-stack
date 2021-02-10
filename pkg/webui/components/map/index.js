@@ -14,7 +14,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Map, Marker, TileLayer } from 'react-leaflet'
+import { MapContainer, Marker, TileLayer } from 'react-leaflet'
 import classnames from 'classnames'
 import Leaflet from 'leaflet'
 import bind from 'autobind-decorator'
@@ -120,7 +120,7 @@ export default class LocationMap extends React.Component {
     const { zoomLevel } = this.state
     return (
       <div className={classnames(style.container, className)} data-test-id="location-map">
-        <Map
+        <MapContainer
           ref={mapRef}
           className={classnames(style.map, {
             [style.widget]: widget,
@@ -143,7 +143,7 @@ export default class LocationMap extends React.Component {
                 />
               ),
           )}
-        </Map>
+        </MapContainer>
       </div>
     )
   }
