@@ -51,6 +51,11 @@ type simulateMetadataParams struct {
 	DataRateIndex     uint32           `protobuf:"varint,12,opt,name=data_rate_index,proto3" json:"data_rate_index,omitempty"`
 }
 
+var (
+	errDataRate  = errors.DefineInvalidArgument("data_rate", "data rate is invalid")
+	errFrequency = errors.DefineInvalidArgument("frequency", "frequency is invalid")
+)
+
 func (m *simulateMetadataParams) setDefaults() error {
 	if m.Time == nil || m.Time.IsZero() {
 		now := time.Now()
@@ -76,17 +81,23 @@ func (m *simulateMetadataParams) setDefaults() error {
 	if m.Frequency == 0 {
 		m.Frequency = phy.UplinkChannels[int(m.ChannelIndex)].Frequency
 	} else if m.ChannelIndex == 0 {
-		for i, ch := range phy.UplinkChannels {
-			if ch.Frequency == m.Frequency {
-				m.ChannelIndex = uint32(i)
-				break
+		chIdx, err := func() (uint32, error) {
+			for i, ch := range phy.UplinkChannels {
+				if ch.Frequency == m.Frequency {
+					return uint32(i), nil
+				}
 			}
+			return 0, errFrequency.New()
+		}()
+		if err != nil {
+			return err
 		}
+		m.ChannelIndex = chIdx
 	}
 	if m.Bandwidth == 0 || m.SpreadingFactor == 0 {
 		drIdx := ttnpb.DataRateIndex(m.DataRateIndex)
-		if drIdx < phy.UplinkChannels[0].MinDataRate || drIdx > phy.UplinkChannels[0].MaxDataRate {
-			drIdx = phy.UplinkChannels[0].MaxDataRate
+		if drIdx < phy.UplinkChannels[m.ChannelIndex].MinDataRate || drIdx > phy.UplinkChannels[m.ChannelIndex].MaxDataRate {
+			drIdx = phy.UplinkChannels[m.ChannelIndex].MaxDataRate
 		}
 		dr, ok := phy.DataRates[drIdx]
 		if !ok {
@@ -95,12 +106,18 @@ func (m *simulateMetadataParams) setDefaults() error {
 		lora := dr.Rate.GetLoRa()
 		m.SpreadingFactor, m.Bandwidth = lora.SpreadingFactor, lora.Bandwidth
 	} else if m.DataRateIndex == 0 {
-		for i, dr := range phy.DataRates {
-			if lora := dr.Rate.GetLoRa(); lora != nil && lora.SpreadingFactor == m.SpreadingFactor && lora.Bandwidth == m.Bandwidth {
-				m.DataRateIndex = uint32(i)
-				break
+		drIdx, err := func() (uint32, error) {
+			for i, dr := range phy.DataRates {
+				if lora := dr.Rate.GetLoRa(); lora != nil && lora.SpreadingFactor == m.SpreadingFactor && lora.Bandwidth == m.Bandwidth {
+					return uint32(i), nil
+				}
 			}
+			return 0, errDataRate.New()
+		}()
+		if err != nil {
+			return err
 		}
+		m.DataRateIndex = drIdx
 	}
 	return nil
 }
@@ -173,7 +190,9 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 		return err
 	}
 
-	uplinkParams.setDefaults()
+	if err := uplinkParams.setDefaults(); err != nil {
+		return err
+	}
 
 	upMsg := &ttnpb.UplinkMessage{
 		Settings: ttnpb.TxSettings{
@@ -440,7 +459,9 @@ var (
 			if err := util.SetFields(&uplinkParams, simulateUplinkFlags); err != nil {
 				return err
 			}
-			uplinkParams.setDefaults()
+			if err := uplinkParams.setDefaults(); err != nil {
+				return err
+			}
 			var joinParams simulateJoinRequestParams
 			if err := util.SetFields(&joinParams, simulateJoinRequestFlags); err != nil {
 				return err
@@ -522,7 +543,9 @@ var (
 			if err := util.SetFields(&uplinkParams, simulateUplinkFlags); err != nil {
 				return err
 			}
-			uplinkParams.setDefaults()
+			if err := uplinkParams.setDefaults(); err != nil {
+				return err
+			}
 			var dataUplinkParams simulateDataUplinkParams
 			if err := util.SetFields(&dataUplinkParams, simulateDataUplinkFlags); err != nil {
 				return err
