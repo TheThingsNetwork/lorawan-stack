@@ -29,12 +29,12 @@ const combinedStream = async streams => {
   const subscribers = await Promise.all(streams)
 
   return {
-    on(eventName, callback) {
+    on: (eventName, callback) => {
       for (const subscriber of subscribers) {
         subscriber.on(eventName, callback)
       }
     },
-    close() {
+    close: () => {
       for (const subscriber of subscribers) {
         subscriber.close()
       }

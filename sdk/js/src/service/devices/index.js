@@ -551,7 +551,7 @@ class Devices {
 
         return this
       },
-      abort() {
+      abort: () => {
         stopRequested = true
       },
     }

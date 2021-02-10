@@ -28,11 +28,7 @@ import traverse from 'traverse'
  * @param {object} minimum - Paths that will always be merged for all records.
  * @returns {object} The merged device record.
  */
-export default function mergeDevice(
-  parts,
-  base = {},
-  minimum = [['ids'], ['created_at'], ['updated_at']],
-) {
+export default (parts, base = {}, minimum = [['ids'], ['created_at'], ['updated_at']]) => {
   const result = base
 
   // Cycle through all responses.
