@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.11.0] - 2021-02-10
+
+### Added
+
 - Reset functionality in Network Server, which resets session context and MAC state (see `ttn-lw-cli end-devices reset` command). For OTAA all data is wiped and device must rejoin, for ABP session keys, device address and downlink queue are preserved, while MAC state is reset.
 - Store and retrieve Gateway Claim Authentication Code from database.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added column.
@@ -43,8 +57,6 @@ For details about compatibility between different releases, see the **Commitment
 - Frequency plans and webhook templates are now included in Docker images, and used by default, instead of fetching directly from GitHub.
 - JavaScript entrypoints changed from `oauth.css` and `oauth.js` to `account.css` and `account.css`. Note: For deployments using custom frontend bundles (e.g. via `--is.oauth.ui.js-file`), the filenames have to be updated accordingly as well.
 
-### Deprecated
-
 ### Removed
 
 - Application Server linking. The Network Server now pushes data to the cluster Application Server instead.
@@ -60,8 +72,6 @@ For details about compatibility between different releases, see the **Commitment
 - Login after user registration leading to dead-end when originally coming from the Console.
 - Frame counter display of end devices on initial page load in the Console.
 - AU915-928 data rate indexes in Regional Parameter specification versions below 1.0.2b.
-
-### Security
 
 ## [3.10.6] - 2021-01-12
 
@@ -1294,7 +1304,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.6...v3.10
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.0...v3.11
+[3.11.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.6...v3.11.0
 [3.10.6]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.5...v3.10.6
 [3.10.5]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.4...v3.10.5
 [3.10.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.3...v3.10.4
