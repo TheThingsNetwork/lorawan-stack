@@ -40,19 +40,18 @@ const DeviceWizardPrompt = props => {
   })
 
   const handleShouldBlockNavigation = React.useCallback(
-    location => {
-      return shouldBlockNavigation(location)
-    },
+    location => shouldBlockNavigation(location),
     [shouldBlockNavigation],
   )
 
-  const modalProps = React.useMemo(() => {
-    return {
+  const modalProps = React.useMemo(
+    () => ({
       title: m.modalTitle,
       buttonMessage: m.modalApproveText,
       cancelButtonMessage: m.modalCancelText,
-    }
-  }, [])
+    }),
+    [],
+  )
 
   return (
     <Prompt

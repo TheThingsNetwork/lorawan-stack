@@ -26,7 +26,7 @@ const formatOptions = options =>
 
 const { component, ...fieldPropTypes } = Field.propTypes
 
-export default function({
+export default function ({
   optionsSelector,
   errorSelector,
   fetchingSelector,

@@ -57,11 +57,10 @@ export const mapNatsFormValues = nats => {
   }
 }
 
-export const mapMqttFormValues = mqtt => {
-  return merge({}, mqttBlankValues, mqtt, {
+export const mapMqttFormValues = mqtt =>
+  merge({}, mqttBlankValues, mqtt, {
     _use_credentials: Boolean(mqtt.username || mqtt.password),
   })
-}
 
 const mapPubsubMessageTypeToFormValue = messageType =>
   (messageType && { enabled: true, value: messageType.topic }) || { enabled: false, value: '' }

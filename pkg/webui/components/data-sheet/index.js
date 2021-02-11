@@ -95,7 +95,7 @@ DataSheet.propTypes = {
           type: PropTypes.string,
           /** Whether this 'code' or 'byte' item should be hidden by default. */
           sensitive: PropTypes.bool,
-          /** Optional subitems of this item (same shape as item, but no deeper
+          /** Optional subitems of this item (same shape as item, but no deeper.
            * hierarchies). */
           subItems: PropTypes.arrayOf(PropTypes.object),
         }),
@@ -150,7 +150,7 @@ DataSheetRow.propTypes = {
     type: PropTypes.string,
     /** Whether this 'code' or 'byte' item should be hidden by default. */
     sensitive: PropTypes.bool,
-    /** Optional subitems of this item (same shape as item, but no deeper
+    /** Optional subitems of this item (same shape as item, but no deeper.
      * hierarchies). */
     subItems: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,

@@ -77,10 +77,7 @@ const DeviceWizard = props => {
         const { steps, onError } = wizardRef.current
         const { request_details = {} } = error
 
-        const { id } =
-          steps.find(({ id }) => {
-            return id === request_details.stack_component
-          }) || {}
+        const { id } = steps.find(({ id }) => id === request_details.stack_component) || {}
 
         onError(id, error)
       }

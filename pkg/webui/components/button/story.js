@@ -66,7 +66,7 @@ class Example extends React.Component {
       error: true,
     })
     setTimeout(
-      function() {
+      function () {
         this.setState({
           error: false,
         })

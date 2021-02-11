@@ -57,7 +57,7 @@ export default (parts, base = {}, minimum = [['ids'], ['created_at'], ['updated_
             continue
           }
 
-          traverse(val).forEach(function(e) {
+          traverse(val).forEach(function (e) {
             if (Array.isArray(e) && e.length > 0) {
               traverse(result).set(path, val)
 

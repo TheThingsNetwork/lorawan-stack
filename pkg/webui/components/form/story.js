@@ -102,13 +102,8 @@ storiesOf('Form', module)
         validate
         onSubmit={handleSubmit}
         validationSchema={Yup.object().shape({
-          name: Yup.string()
-            .min(5, 'Too Short')
-            .max(25, 'Too Long')
-            .required('Required'),
-          description: Yup.string()
-            .min(5, 'Too Short')
-            .max(50, 'Too Long'),
+          name: Yup.string().min(5, 'Too Short').max(25, 'Too Long').required('Required'),
+          description: Yup.string().min(5, 'Too Short').max(50, 'Too Long'),
           checkboxes: Yup.object().test('checkboxes', 'Cannot be empty', values =>
             Object.values(values).reduce((acc, curr) => acc || curr, false),
           ),

@@ -27,15 +27,15 @@ const validationSchema = Yup.object()
         }
 
         const strippedSchema = Yup.object().strip()
-        const keySchema = Yup.lazy(() => {
-          return mayEditKeys
+        const keySchema = Yup.lazy(() =>
+          mayEditKeys
             ? Yup.object().shape({
                 key: Yup.string()
                   .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
                   .required(sharedMessages.validateRequired),
               })
-            : Yup.object().strip()
-        })
+            : Yup.object().strip(),
+        )
 
         if (parseLorawanMacVersion(version) < 110) {
           return schema.shape({
@@ -59,15 +59,11 @@ const validationSchema = Yup.object()
       then: schema => schema.default(false),
       otherwise: schema => schema.strip(),
     }),
-    application_server_id: Yup.string()
-      .max(100, sharedMessages.validateTooLong)
-      .default(''),
+    application_server_id: Yup.string().max(100, sharedMessages.validateTooLong).default(''),
     application_server_kek_label: Yup.string()
       .max(2048, sharedMessages.validateTooLong)
       .default(''),
-    network_server_kek_label: Yup.string()
-      .max(2048, sharedMessages.validateTooLong)
-      .default(''),
+    network_server_kek_label: Yup.string().max(2048, sharedMessages.validateTooLong).default(''),
   })
   .noUnknown()
 

@@ -26,6 +26,8 @@ import Modal from '..'
  * top of the DOM hierarchy, regardless of its position in the component
  * hierarchy.
  *
+ * @param {object} props - The props of the modal component.
+ * @param {boolean} props.visible - Whether the modal is currently visible.
  * @returns {object} - The modal rendered into a portal.
  */
 const PortalledModal = ({ visible, ...modalProps }) =>

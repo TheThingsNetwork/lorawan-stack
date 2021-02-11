@@ -29,8 +29,8 @@ import Require from './require'
  * rendered.
  * @returns {Function} - An instance of the `withFeatureRequirement` HOC.
  */
-const withFeatureRequirement = (featureCheck, otherwise) => Component => {
-  return class WithFeatureRequirement extends React.Component {
+const withFeatureRequirement = (featureCheck, otherwise) => Component =>
+  class WithFeatureRequirement extends React.Component {
     constructor(props) {
       super(props)
 
@@ -53,6 +53,5 @@ const withFeatureRequirement = (featureCheck, otherwise) => Component => {
       )
     }
   }
-}
 
 export default withFeatureRequirement
