@@ -19,6 +19,8 @@ import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
+import { REGISTRATION_TYPES } from '../utils'
+
 const deviceIdSchema = Yup.string()
   .matches(deviceIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
   .min(2, Yup.passValues(sharedMessages.validateTooShort))
@@ -53,10 +55,12 @@ const validationSchema = Yup.object({
         return schema.shape({
           device_id: deviceIdSchema,
           dev_eui: devEUISchema.required(sharedMessages.validateRequired),
+          join_eui: Yup.string().strip(),
         })
       }
 
       return schema.shape({
+        join_eui: Yup.string().strip(),
         device_id: deviceIdSchema,
         dev_eui: Yup.lazy(value =>
           !value
@@ -171,6 +175,7 @@ const validationSchema = Yup.object({
 
     return schema.default(getHostFromUrl(jsUrl))
   }),
+  _registration: Yup.mixed().oneOf([REGISTRATION_TYPES.SINGLE, REGISTRATION_TYPES.MULTIPLE]),
 })
 
 const initialValues = {
@@ -213,6 +218,7 @@ const initialValues = {
   join_server_address: undefined,
   application_server_address: undefined,
   network_server_address: undefined,
+  _registration: REGISTRATION_TYPES.SINGLE,
 }
 
 export { validationSchema as default, initialValues }
