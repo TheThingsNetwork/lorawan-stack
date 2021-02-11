@@ -3,13 +3,13 @@ updates:
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
-      interval: 'daily'
+      interval: 'monthly'
     commit-message:
       prefix: 'dev'
 
   - package-ecosystem: 'npm'
     directory: '/sdk/js'
     schedule:
-      interval: 'daily'
+      interval: 'monthly'
     commit-message:
       prefix: 'dev'
