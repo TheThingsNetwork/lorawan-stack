@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useRef, useState, useLayoutEffect, useCallback } from 'react'
 import { FixedSizeList as List } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 
@@ -41,6 +41,41 @@ EmptyMessage.propTypes = {
 }
 
 const EventsList = React.memo(({ events, scoped, entityId, onRowClick, activeId }) => {
+  const outerListRef = useRef(undefined)
+  const innerListRef = useRef(undefined)
+  const [scrollOffset, setScrollOffset] = useState(0)
+  const listHeight = 150
+  const minHeight = 0.1
+  const pageOffset = listHeight * 5
+  const maxHeight =
+    (innerListRef.current && innerListRef.current.style.height.replace('px', '')) || listHeight
+
+  const keys = {
+    PageUp: Math.max(minHeight, scrollOffset - pageOffset),
+    PageDown: Math.min(scrollOffset + pageOffset, maxHeight),
+    End: maxHeight,
+    Home: minHeight,
+  }
+
+  const handleKeyDown = useCallback(
+    ({ key }) => {
+      if (keys[key]) {
+        setScrollOffset(keys[key])
+      }
+    },
+    [keys],
+  )
+
+  useLayoutEffect(() => {
+    if (outerListRef.current) {
+      outerListRef.current.scrollTo({
+        left: 0,
+        top: scrollOffset,
+        behavior: 'auto',
+      })
+    }
+  })
+
   if (!events.length) {
     return <EmptyMessage entityId={entityId} />
   }
@@ -48,13 +83,15 @@ const EventsList = React.memo(({ events, scoped, entityId, onRowClick, activeId 
   return (
     <AutoSizer>
       {({ height, width }) => (
-        <ol>
+        <ol onKeyDown={handleKeyDown} tabIndex="0">
           <List
             height={height}
             width={width}
             itemCount={events.length}
             itemSize={40}
             overscanCount={25}
+            outerRef={outerListRef}
+            innerRef={innerListRef}
           >
             {({ index, style }) => {
               const eventId = getEventId(events[index])

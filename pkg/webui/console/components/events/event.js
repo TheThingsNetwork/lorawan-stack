@@ -48,13 +48,29 @@ const Event = React.memo(({ event, scoped, widget, rowStyle, onRowClick, eventId
   const handleRowClick = useCallback(() => {
     onRowClick(eventId)
   }, [eventId, onRowClick])
+
+  const handleRowKeyPress = useCallback(
+    event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        onRowClick(eventId)
+      }
+    },
+    [eventId, onRowClick],
+  )
+
   const eventClasses = classnames(style.event, {
     [style.widget]: widget,
     [style.active]: active,
     [style.synthetic]: event.isSynthetic,
   })
   return (
-    <li className={eventClasses} style={rowStyle} onClick={handleRowClick}>
+    <li
+      className={eventClasses}
+      style={rowStyle}
+      onClick={handleRowClick}
+      tabIndex="0"
+      onKeyPress={handleRowKeyPress}
+    >
       <ErrorBoundary>
         <div className={style.cellTime} title={`${event.time}: ${typeValue}`}>
           <Icon icon={icon} className={style.eventIcon} />
