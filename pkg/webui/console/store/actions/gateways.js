@@ -46,7 +46,11 @@ export const GET_GTW_BASE = 'GET_GATEWAY'
 export const [
   { request: GET_GTW, success: GET_GTW_SUCCESS, failure: GET_GTW_FAILURE },
   { request: getGateway, success: getGatewaySuccess, failure: getGatewayFailure },
-] = createRequestActions(GET_GTW_BASE, id => ({ id }), (id, selector) => ({ selector }))
+] = createRequestActions(
+  GET_GTW_BASE,
+  id => ({ id }),
+  (id, selector) => ({ selector }),
+)
 
 export const UPDATE_GTW_BASE = 'UPDATE_GATEWAY'
 export const [
@@ -106,7 +110,11 @@ export const [
     success: startGatewayStatisticsSuccess,
     failure: startGatewayStatisticsFailure,
   },
-] = createRequestActions(START_GTW_STATS_BASE, id => ({ id }), (id, timeout) => ({ timeout }))
+] = createRequestActions(
+  START_GTW_STATS_BASE,
+  id => ({ id }),
+  (id, timeout) => ({ timeout }),
+)
 
 export const STOP_GTW_STATS = 'STOP_GATEWAY_STATISTICS'
 export const stopGatewayStatistics = () => ({ type: STOP_GTW_STATS })

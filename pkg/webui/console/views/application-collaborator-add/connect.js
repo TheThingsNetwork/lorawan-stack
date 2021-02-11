@@ -49,8 +49,4 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
 })
 
 export default ApplicationCollaboratorAdd =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-    mergeProps,
-  )(ApplicationCollaboratorAdd)
+  connect(mapStateToProps, mapDispatchToProps, mergeProps)(ApplicationCollaboratorAdd)

@@ -53,7 +53,10 @@ storiesOf('Tabs', module)
     })(story)(context),
   )
   .add('Default', () => {
-    const tabs = [{ title: 'All', name: 'all' }, { title: 'Starred', name: 'starred' }]
+    const tabs = [
+      { title: 'All', name: 'all' },
+      { title: 'Starred', name: 'starred' },
+    ]
 
     return <Example tabs={tabs} active={tabs[0].name} />
   })
@@ -66,7 +69,10 @@ storiesOf('Tabs', module)
     return <Example tabs={tabs} active={tabs[0].name} />
   })
   .add('Default (narrow)', () => {
-    const tabs = [{ title: 'All', name: 'all' }, { title: 'Starred', name: 'starred' }]
+    const tabs = [
+      { title: 'All', name: 'all' },
+      { title: 'Starred', name: 'starred' },
+    ]
 
     return <Example tabs={tabs} active={tabs[0].name} narrow />
   })

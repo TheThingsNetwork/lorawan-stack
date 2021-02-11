@@ -54,8 +54,4 @@ const mapDispatchToProps = dispatch => ({
   getRegistrationTemplate: (appId, version) => dispatch(getTemplate(appId, version)),
 })
 
-export default DeviceRepository =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(DeviceRepository)
+export default DeviceRepository => connect(mapStateToProps, mapDispatchToProps)(DeviceRepository)

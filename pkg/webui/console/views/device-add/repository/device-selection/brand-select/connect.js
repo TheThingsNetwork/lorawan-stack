@@ -32,8 +32,4 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = { listBrands }
 
-export default BrandSelect =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(BrandSelect)
+export default BrandSelect => connect(mapStateToProps, mapDispatchToProps)(BrandSelect)

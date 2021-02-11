@@ -128,6 +128,13 @@ func (Js) isProductionMode() bool {
 	}
 }
 
+func (js Js) deps() error {
+	if mg.Verbose() {
+		fmt.Println("Installing JS dependencies")
+	}
+	return runYarn("install", "--no-progress", "--production=false", "--check-files")
+}
+
 // Deps installs the javascript dependencies.
 func (js Js) Deps() error {
 	ok, err := target.Dir(
@@ -151,8 +158,11 @@ func (js Js) Deps() error {
 		if len(files) > 2 ||
 			js.isProductionMode() && len(files) > 1 {
 			// Check if it's only yarn and, in development mode, ttn-lw link installed in `node_modules`.
+			// Additionally, check whether the SDK was installed correctly.
 			// NOTE: There's no link in production mode.
-			return nil
+			if _, err := os.Stat(filepath.Join("node_modules", "ttn-lw", "dist")); !os.IsNotExist(err) {
+				return nil
+			}
 		}
 	}
 
@@ -168,10 +178,7 @@ func (js Js) Deps() error {
 			return fmt.Errorf("failed to link JS SDK: %w", err)
 		}
 	}
-	if mg.Verbose() {
-		fmt.Println("Installing JS dependencies")
-	}
-	return runYarn("install", "--no-progress", "--production=false")
+	return js.deps()
 }
 
 // BuildDll runs the webpack command to build the DLL bundle

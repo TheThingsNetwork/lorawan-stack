@@ -168,6 +168,10 @@ describe('End device repository create', () => {
         cy.findByLabelText('Brand').selectOption('test-brand-otaa')
         cy.findByLabelText('Model').selectOption('test-model2')
 
+        cy.findByRole('button', { name: 'Register end device' })
+          .should('be.visible')
+          .and('not.be.disabled')
+
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
@@ -422,6 +426,10 @@ describe('End device repository create', () => {
         cy.findByLabelText('Brand').selectOption('test-brand-abp')
         cy.findByLabelText('Model').selectOption('test-model1')
         cy.findByLabelText('Profile (Region)').selectOption('EU_863_870')
+
+        cy.findByRole('button', { name: 'Register end device' })
+          .should('be.visible')
+          .and('not.be.disabled')
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
