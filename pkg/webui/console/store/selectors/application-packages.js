@@ -19,7 +19,7 @@ import { GET_APP_PKG_DEFAULT_ASSOC } from '@console/store/actions/application-pa
 
 const selectApplicationPackagesStore = state => state.applicationPackages
 
-export const selectApplicationPackageDefaultAssociation = function(state) {
+export const selectApplicationPackageDefaultAssociation = function (state) {
   const store = selectApplicationPackagesStore(state)
 
   return store.default || {}

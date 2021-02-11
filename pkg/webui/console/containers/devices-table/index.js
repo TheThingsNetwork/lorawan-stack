@@ -96,7 +96,7 @@ const headers = [
 ]
 
 @connect(
-  function(state) {
+  function (state) {
     return {
       appId: selectSelectedApplicationId(state),
       deviceTemplateFormats: selectDeviceTemplateFormats(state),

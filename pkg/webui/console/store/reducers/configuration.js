@@ -22,7 +22,7 @@ const defaultState = {
   gsFrequencyPlans: undefined,
 }
 
-const configuration = function(state = defaultState, { type, payload }) {
+const configuration = function (state = defaultState, { type, payload }) {
   switch (type) {
     case GET_NS_FREQUENCY_PLANS_SUCCESS:
       return {

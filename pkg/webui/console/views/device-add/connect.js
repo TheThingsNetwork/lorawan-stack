@@ -29,4 +29,9 @@ export default DeviceAdd =>
   connect(
     mapStateToProps,
     mapDispatchToProps,
-  )(withRequest(({ getPrefixes }) => getPrefixes(), ({ fetching }) => fetching)(DeviceAdd))
+  )(
+    withRequest(
+      ({ getPrefixes }) => getPrefixes(),
+      ({ fetching }) => fetching,
+    )(DeviceAdd),
+  )

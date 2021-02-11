@@ -23,7 +23,7 @@ import {
 const selectWebhookTemplatesStore = state => state.webhookTemplates
 const selectWebhookTemplatesEntitiesStore = state => selectWebhookTemplatesStore(state).entities
 
-export const selectWebhookTemplateById = function(state, id) {
+export const selectWebhookTemplateById = function (state, id) {
   const entities = selectWebhookTemplatesEntitiesStore(state)
   if (!Boolean(entities)) return undefined
 
@@ -32,7 +32,7 @@ export const selectWebhookTemplateById = function(state, id) {
 export const selectWebhookTemplateError = createErrorSelector(GET_WEBHOOK_TEMPLATE_BASE)
 export const selectWebhookTemplateFetching = createFetchingSelector(GET_WEBHOOK_TEMPLATE_BASE)
 
-export const selectWebhookTemplates = function(state) {
+export const selectWebhookTemplates = function (state) {
   const { entities } = selectWebhookTemplatesStore(state)
 
   if (!Boolean(entities)) return undefined

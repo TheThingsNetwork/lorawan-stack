@@ -16,7 +16,7 @@ import React from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const Section = function({ className, component: Component, children, ...rest }) {
+const Section = function ({ className, component: Component, children, ...rest }) {
   return (
     <Component className={className} {...rest}>
       {React.Children.map(children, row =>

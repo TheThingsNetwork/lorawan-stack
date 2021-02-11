@@ -25,10 +25,10 @@ import { observableDiff, applyChange } from 'deep-diff'
  * @returns {object} - A new object representing the structural differences
  * between `original` and `updated`.
  */
-export default function(original, updated, exclude = []) {
+export default function (original, updated, exclude = []) {
   const result = {}
 
-  observableDiff(original, updated, function(d) {
+  observableDiff(original, updated, function (d) {
     const entry = d.path[d.path.length - 1]
     if (!exclude.includes(entry)) {
       applyChange(result, undefined, d)

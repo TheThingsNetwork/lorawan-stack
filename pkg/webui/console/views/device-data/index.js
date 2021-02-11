@@ -32,7 +32,7 @@ import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/sel
 
 import style from './device-data.styl'
 
-@connect(function(state, props) {
+@connect(function (state, props) {
   const device = selectSelectedDevice(state)
   return {
     device,
@@ -40,7 +40,7 @@ import style from './device-data.styl'
     devIds: device && device.ids,
   }
 })
-@withBreadcrumb('device.single.data', function(props) {
+@withBreadcrumb('device.single.data', function (props) {
   const { devId } = props
   const { appId } = props.match.params
   return (

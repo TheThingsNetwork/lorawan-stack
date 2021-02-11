@@ -280,7 +280,7 @@ class Devices {
     }
 
     const deviceMap = traverse(deviceEntityMap)
-    const paths = traverse(patch).reduce(function(acc) {
+    const paths = traverse(patch).reduce(function (acc) {
       // Only add the top level path for arrays, otherwise paths are generated
       // for each item in the array.
       if (Array.isArray(this.node)) {
@@ -507,7 +507,7 @@ class Devices {
     let finishedCount = 0
     let stopRequested = false
 
-    const runTasks = async function() {
+    const runTasks = async function () {
       for (const device of devices) {
         if (stopRequested) {
           notify(listeners[EVENTS.CLOSE])

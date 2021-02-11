@@ -19,7 +19,7 @@ import { GET_WEBHOOK_FORMATS_BASE } from '@console/store/actions/webhook-formats
 
 const selectWebhookFormatsStore = state => state.webhookFormats
 
-export const selectWebhookFormats = function(state) {
+export const selectWebhookFormats = function (state) {
   const store = selectWebhookFormatsStore(state)
 
   return store.formats || {}

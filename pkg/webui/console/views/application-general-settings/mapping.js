@@ -35,7 +35,7 @@ export const mapAttributesFormValueToAttributes = formValue =>
     )) ||
   null
 
-export const mapFormValuesToApplication = function(values) {
+export const mapFormValuesToApplication = function (values) {
   return {
     name: values.name,
     description: values.description,

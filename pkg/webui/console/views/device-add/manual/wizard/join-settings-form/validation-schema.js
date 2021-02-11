@@ -59,15 +59,11 @@ const validationSchema = Yup.object()
       then: schema => schema.default(false),
       otherwise: schema => schema.strip(),
     }),
-    application_server_id: Yup.string()
-      .max(100, sharedMessages.validateTooLong)
-      .default(''),
+    application_server_id: Yup.string().max(100, sharedMessages.validateTooLong).default(''),
     application_server_kek_label: Yup.string()
       .max(2048, sharedMessages.validateTooLong)
       .default(''),
-    network_server_kek_label: Yup.string()
-      .max(2048, sharedMessages.validateTooLong)
-      .default(''),
+    network_server_kek_label: Yup.string().max(2048, sharedMessages.validateTooLong).default(''),
   })
   .noUnknown()
 

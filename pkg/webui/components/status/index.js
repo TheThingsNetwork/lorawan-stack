@@ -29,7 +29,7 @@ const m = defineMessages({
   unknown: 'unknown',
 })
 
-const Status = function({
+const Status = function ({
   intl,
   className,
   status,

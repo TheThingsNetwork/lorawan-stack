@@ -21,13 +21,13 @@ import diff from '@ttn-lw/lib/diff'
 
 import style from './toast.styl'
 
-const createToast = function() {
+const createToast = function () {
   const queue = []
   let lastMessage = undefined
   let toastId = null
   let firstDispatched = false
 
-  const show = function(toastOptions) {
+  const show = function (toastOptions) {
     const { INFO, SUCCESS, ERROR, WARNING, DEFAULT } = toast.types
     const { title, message, type = DEFAULT, ...rest } = toastOptions
 
@@ -50,7 +50,7 @@ const createToast = function() {
     )
   }
 
-  const next = function() {
+  const next = function () {
     const hasNext = queue.length > 0
 
     if (!hasNext) {
@@ -62,7 +62,7 @@ const createToast = function() {
     }
   }
 
-  const toast = function(options) {
+  const toast = function (options) {
     // Prevent flooding of identical messages (if wished).
     if (
       options.preventConsecutive &&

@@ -35,7 +35,7 @@ import { mayManageUsers } from '@console/lib/feature-checks'
 import UserManagement from './admin-user-management'
 
 @withFeatureRequirement(mayManageUsers, { redirect: '/' })
-@withBreadcrumb('admin.user-management', function() {
+@withBreadcrumb('admin.user-management', function () {
   return <Breadcrumb path={'/admin/user-management'} content={sharedMessages.userManagement} />
 })
 export default class UserManagementRouter extends Component {

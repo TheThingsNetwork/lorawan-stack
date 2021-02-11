@@ -28,7 +28,7 @@ import Yup from '@ttn-lw/lib/yup'
 
 import Form from '.'
 
-const handleSubmit = function(data, { resetForm }) {
+const handleSubmit = function (data, { resetForm }) {
   action('Submit')(data)
   setTimeout(() => resetForm({ values: data }), 1000)
 }
@@ -102,13 +102,8 @@ storiesOf('Form', module)
         validate
         onSubmit={handleSubmit}
         validationSchema={Yup.object().shape({
-          name: Yup.string()
-            .min(5, 'Too Short')
-            .max(25, 'Too Long')
-            .required('Required'),
-          description: Yup.string()
-            .min(5, 'Too Short')
-            .max(50, 'Too Long'),
+          name: Yup.string().min(5, 'Too Short').max(25, 'Too Long').required('Required'),
+          description: Yup.string().min(5, 'Too Short').max(50, 'Too Long'),
           checkboxes: Yup.object().test('checkboxes', 'Cannot be empty', values =>
             Object.values(values).reduce((acc, curr) => acc || curr, false),
           ),

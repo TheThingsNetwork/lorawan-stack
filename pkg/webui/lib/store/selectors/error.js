@@ -32,7 +32,7 @@ const getErrorStoreEntrySelector = (state, baseActionType) =>
  * @returns {object} The error object matching one of the base action types.
  */
 export const createErrorSelector = actions =>
-  function(state) {
+  function (state) {
     if (!Array.isArray(actions)) {
       return getErrorStoreEntrySelector(state, actions)
     }

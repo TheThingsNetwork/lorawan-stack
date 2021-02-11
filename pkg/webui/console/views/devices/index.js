@@ -37,7 +37,7 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 @withFeatureRequirement(mayViewApplicationDevices, {
   redirect: ({ appId }) => `/applications/${appId}`,
 })
-@withBreadcrumb('devices', function({ appId }) {
+@withBreadcrumb('devices', function ({ appId }) {
   return <Breadcrumb path={`/applications/${appId}/devices`} content={sharedMessages.devices} />
 })
 export default class Devices extends React.Component {

@@ -21,7 +21,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './submit-bar.styl'
 
-const SubmitBar = function(props) {
+const SubmitBar = function (props) {
   const { className, children, align } = props
 
   const cls = classnames(className, style.bar, style[`bar-${align}`])

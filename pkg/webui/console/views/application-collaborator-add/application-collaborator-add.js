@@ -25,7 +25,7 @@ import CollaboratorForm from '@console/components/collaborator-form'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-@withBreadcrumb('apps.single.collaborators.add', function(props) {
+@withBreadcrumb('apps.single.collaborators.add', function (props) {
   const appId = props.appId
   return (
     <Breadcrumb path={`/applications/${appId}/collaborators/add`} content={sharedMessages.add} />

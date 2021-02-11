@@ -26,7 +26,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { selectSelectedApplication } from '@console/store/selectors/applications'
 
-@connect(function(state, props) {
+@connect(function (state, props) {
   return {
     application: selectSelectedApplication(state),
   }

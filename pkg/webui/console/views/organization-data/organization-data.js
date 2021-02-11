@@ -32,7 +32,7 @@ const m = defineMessages({
   orgData: 'Organization data',
 })
 
-@withBreadcrumb('orgs.single.data', function(props) {
+@withBreadcrumb('orgs.single.data', function (props) {
   return (
     <Breadcrumb path={`/organizations/${props.orgId}/data`} content={sharedMessages.liveData} />
   )

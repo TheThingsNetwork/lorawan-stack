@@ -30,7 +30,7 @@ import Yup from '@ttn-lw/lib/yup'
 
 import Form from '..'
 
-const handleSubmit = function(data, { resetForm }) {
+const handleSubmit = function (data, { resetForm }) {
   action('Submit')(data)
   setTimeout(() => resetForm({ values: data }), 1000)
 }

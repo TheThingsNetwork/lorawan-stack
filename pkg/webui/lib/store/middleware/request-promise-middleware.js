@@ -22,9 +22,9 @@ import { CancelablePromise } from 'cancelable-promise'
  * @returns {object} The middleware.
  */
 const requestPromiseMiddleware = store => next =>
-  function(action) {
+  function (action) {
     if (action.meta && action.meta._attachPromise) {
-      return new CancelablePromise(function(resolve, reject) {
+      return new CancelablePromise(function (resolve, reject) {
         action.meta = {
           ...action.meta,
           _resolve: resolve,

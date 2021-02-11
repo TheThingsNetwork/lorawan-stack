@@ -19,7 +19,7 @@
  * @returns {object} The stream subscription object with the `on` function for
  * attaching listeners and the `close` function to close the stream.
  */
-const combinedStream = async function(streams) {
+const combinedStream = async function (streams) {
   if (!(streams instanceof Array) || streams.length === 0) {
     throw new Error('Cannot combine streams with invalid stream array.')
   } else if (streams.length === 1) {

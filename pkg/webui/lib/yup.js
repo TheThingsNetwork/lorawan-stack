@@ -28,9 +28,9 @@ class NullableStringSchemaType extends StringSchema {
     const self = this
 
     /* eslint-disable prefer-arrow/prefer-arrow-functions */
-    self.withMutation(function() {
+    self.withMutation(function () {
       self
-        .transform(function(value) {
+        .transform(function (value) {
           if (self.isType(value) && Boolean(value)) {
             return value
           }
@@ -50,7 +50,7 @@ const passValues = message => values => ({
   values,
 })
 
-Yup.addMethod(Yup.string, 'emptyOrLength', function(length, message) {
+Yup.addMethod(Yup.string, 'emptyOrLength', function (length, message) {
   let m = message
   if (typeof message === 'function') {
     m = message({ length })

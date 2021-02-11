@@ -91,7 +91,7 @@ const defaultState = {
   status: CONNECTION_STATUS.DISCONNECTED,
 }
 
-const createNamedEventReducer = function(reducerName = '') {
+const createNamedEventReducer = function (reducerName = '') {
   const START_EVENTS = createStartEventsStreamActionType(reducerName)
   const START_EVENTS_SUCCESS = createStartEventsStreamSuccessActionType(reducerName)
   const START_EVENTS_FAILURE = createStartEventsStreamFailureActionType(reducerName)
@@ -103,7 +103,7 @@ const createNamedEventReducer = function(reducerName = '') {
   const CLEAR_EVENTS = createClearEventsActionType(reducerName)
   const EVENT_STREAM_CLOSED = createEventStreamClosedActionType(reducerName)
 
-  return function(state = defaultState, action) {
+  return function (state = defaultState, action) {
     switch (action.type) {
       case START_EVENTS:
         return {
@@ -176,7 +176,7 @@ const createNamedEventReducer = function(reducerName = '') {
   }
 }
 
-const createNamedEventsReducer = function(reducerName = '') {
+const createNamedEventsReducer = function (reducerName = '') {
   const START_EVENTS = createStartEventsStreamActionType(reducerName)
   const START_EVENTS_SUCCESS = createStartEventsStreamSuccessActionType(reducerName)
   const START_EVENTS_FAILURE = createStartEventsStreamFailureActionType(reducerName)
@@ -189,7 +189,7 @@ const createNamedEventsReducer = function(reducerName = '') {
   const EVENT_STREAM_CLOSED = createEventStreamClosedActionType(reducerName)
   const event = createNamedEventReducer(reducerName)
 
-  return function(state = {}, action) {
+  return function (state = {}, action) {
     if (!action.id) {
       return state
     }

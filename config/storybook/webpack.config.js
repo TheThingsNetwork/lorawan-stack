@@ -22,14 +22,14 @@ const { default: bundleConfig, styleConfig } = require('../webpack.config.babel.
 // List of allowed plugins.
 const allow = [MiniCssExtractPlugin]
 
-module.exports = async function({ config, mode }) {
+module.exports = async function ({ config, mode }) {
   if (mode === 'PRODUCTION') {
     const webpack = require('webpack')
     allow.push(webpack.DllReferencePlugin)
   }
 
   // Filter plugins on allowed type.
-  const filteredPlugins = bundleConfig.plugins.filter(function(plugin) {
+  const filteredPlugins = bundleConfig.plugins.filter(function (plugin) {
     return allow.reduce((ok, klass) => ok || plugin instanceof klass, false)
   })
 

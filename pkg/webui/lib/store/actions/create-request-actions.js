@@ -14,7 +14,7 @@
 
 import { createAction } from 'redux-actions'
 
-export default function(baseType, requestPayloadCreator, requestMetaCreator) {
+export default function (baseType, requestPayloadCreator, requestMetaCreator) {
   const requestType = `${baseType}_REQUEST`
   const successType = `${baseType}_SUCCESS`
   const failureType = `${baseType}_FAILURE`

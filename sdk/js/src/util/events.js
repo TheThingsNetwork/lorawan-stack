@@ -20,7 +20,7 @@ class EventHandler {
     })
 
     this.eventHandlers = {}
-    this.dispatchEvent = function(event, payload) {
+    this.dispatchEvent = function (event, payload) {
       if (this.eventHandlers[event]) {
         for (const handler of this.eventHandlers[event]) {
           handler(payload)
@@ -28,7 +28,7 @@ class EventHandler {
       }
     }.bind(this)
 
-    this.subscribe = function(event, handler) {
+    this.subscribe = function (event, handler) {
       if (!Object.values(this.EVENTS).includes(event)) {
         throw new Error(`Cannot subscribe to unsupported event type "${event}"`)
       }
@@ -38,7 +38,7 @@ class EventHandler {
       }
     }.bind(this)
 
-    this.unsubscribe = function(event) {
+    this.unsubscribe = function (event) {
       if (!Object.values(this.EVENTS).includes(event)) {
         throw new Error(`Cannot unsubscribe from unsupported event type "${event}"`)
       }

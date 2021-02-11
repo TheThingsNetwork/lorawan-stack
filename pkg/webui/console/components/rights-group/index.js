@@ -40,7 +40,7 @@ const m = defineMessages({
   selectIndividualRights: 'Grant individual rights',
 })
 
-const computeProps = function(props) {
+const computeProps = function (props) {
   const { value, pseudoRight: grantablePseudoRight, rights: grantableRights } = props
 
   // Extract the pseudo right from own rights or granted rights.
@@ -227,7 +227,7 @@ class RightsGroup extends React.Component {
     }
 
     // Marshal rights to key/value for checkbox group.
-    const rightsValues = derivedRights.reduce(function(acc, right) {
+    const rightsValues = derivedRights.reduce(function (acc, right) {
       acc[right] = allSelected || individualRightValue.includes(right)
 
       return acc

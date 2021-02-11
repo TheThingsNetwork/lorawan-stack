@@ -36,7 +36,7 @@ import {
 
 export default OrganizationApiKeyEdit =>
   connect(
-    function(state, props) {
+    function (state, props) {
       const { apiKeyId } = props.match.params
 
       const keyFetching = selectApiKeyFetching(state)

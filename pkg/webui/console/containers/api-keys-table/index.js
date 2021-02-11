@@ -32,7 +32,7 @@ const m = defineMessages({
   grantedRights: 'Granted Rights',
 })
 
-const formatRight = function(right) {
+const formatRight = function (right) {
   return right
     .split('_')
     .slice(1)

@@ -35,7 +35,7 @@ const m = defineMessages({
   deleteSuccess: 'Pub/Sub deleted',
 })
 
-@withBreadcrumb('apps.single.integrations.edit', function(props) {
+@withBreadcrumb('apps.single.integrations.edit', function (props) {
   const {
     appId,
     match: {

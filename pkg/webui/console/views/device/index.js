@@ -60,7 +60,7 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 import style from './device.styl'
 
 @connect(
-  function(state, props) {
+  function (state, props) {
     const devId = props.match.params.devId
     const appId = selectSelectedApplicationId(state)
     const device = selectSelectedDevice(state)
@@ -121,7 +121,7 @@ import style from './device.styl'
   },
   ({ fetching, device }) => fetching || !Boolean(device),
 )
-@withBreadcrumb('device.single', function(props) {
+@withBreadcrumb('device.single', function (props) {
   const {
     devId,
     appId,

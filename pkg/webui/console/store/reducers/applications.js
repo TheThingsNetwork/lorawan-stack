@@ -23,7 +23,7 @@ import {
   DELETE_APP_SUCCESS,
 } from '@console/store/actions/applications'
 
-const application = function(state = {}, application) {
+const application = function (state = {}, application) {
   return {
     ...state,
     ...application,
@@ -36,7 +36,7 @@ const defaultState = {
   applicationDeviceCount: undefined,
 }
 
-const applications = function(state = defaultState, { type, payload }) {
+const applications = function (state = defaultState, { type, payload }) {
   switch (type) {
     case GET_APP:
       return {
@@ -45,7 +45,7 @@ const applications = function(state = defaultState, { type, payload }) {
       }
     case GET_APPS_LIST_SUCCESS:
       const entities = payload.entities.reduce(
-        function(acc, app) {
+        function (acc, app) {
           const id = getApplicationId(app)
 
           acc[id] = application(acc[id], app)

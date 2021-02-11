@@ -98,7 +98,7 @@ const validationSchema = Yup.object().shape({
 @withFeatureRequirement(mayEditBasicApplicationInfo, {
   redirect: ({ appId }) => `/applications/${appId}`,
 })
-@withBreadcrumb('apps.single.general-settings', function(props) {
+@withBreadcrumb('apps.single.general-settings', function (props) {
   const { appId } = props
 
   return (

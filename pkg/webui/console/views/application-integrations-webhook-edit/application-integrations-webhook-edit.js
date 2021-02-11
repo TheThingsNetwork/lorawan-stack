@@ -36,7 +36,7 @@ const m = defineMessages({
   deleteSuccess: 'Webhook deleted',
 })
 
-@withBreadcrumb('apps.single.integrations.webhooks.edit', function(props) {
+@withBreadcrumb('apps.single.integrations.webhooks.edit', function (props) {
   const {
     appId,
     match: {

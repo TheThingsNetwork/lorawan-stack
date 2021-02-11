@@ -18,7 +18,7 @@ const defaultState = {
   formats: undefined,
 }
 
-const pubsubs = function(state = defaultState, { type, payload }) {
+const pubsubs = function (state = defaultState, { type, payload }) {
   switch (type) {
     case GET_PUBSUB_FORMATS_SUCCESS:
       return {

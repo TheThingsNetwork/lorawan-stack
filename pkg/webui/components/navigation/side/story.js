@@ -29,7 +29,7 @@ storiesOf('Navigation', module)
       propTables: [SideNavigation],
     })(story)(context),
   )
-  .add('SideNavigation', function() {
+  .add('SideNavigation', function () {
     const header = {
       title: 'test-application',
       icon: 'application',

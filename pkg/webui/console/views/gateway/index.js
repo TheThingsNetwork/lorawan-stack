@@ -61,7 +61,7 @@ import {
 } from '@console/store/selectors/gateways'
 
 @connect(
-  function(state, props) {
+  function (state, props) {
     const gtwId = props.match.params.gtwId
     const gateway = selectSelectedGateway(state)
 
@@ -101,7 +101,7 @@ import {
     ]),
   ({ fetching, gateway }) => fetching || !Boolean(gateway),
 )
-@withBreadcrumb('gateways.single', function(props) {
+@withBreadcrumb('gateways.single', function (props) {
   const {
     gtwId,
     gateway: { name },

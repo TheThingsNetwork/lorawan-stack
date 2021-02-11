@@ -48,7 +48,7 @@ function splitPaths(paths = [], direction, base = {}, components = [IS, NS, AS, 
 
     const definition = '_root' in subtree ? subtree._root[retrieveIndex] : subtree[retrieveIndex]
 
-    const map = function(requestTree, component, path) {
+    const map = function (requestTree, component, path) {
       if (components.includes(component)) {
         result[component] = !result[component] ? [path] : [...result[component], path]
       }
@@ -130,7 +130,7 @@ export async function makeRequests(
 
   // Use a wrapper for the api calls to control the result object and allow
   // ignoring not found errors per component, if wished.
-  const requestWrapper = async function(
+  const requestWrapper = async function (
     call,
     params,
     component,

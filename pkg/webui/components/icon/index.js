@@ -67,7 +67,7 @@ const hardcoded = {
   user_management: 'how_to_reg',
 }
 
-const Icon = function({ icon, className, nudgeUp, nudgeDown, small, large, ...rest }) {
+const Icon = function ({ icon, className, nudgeUp, nudgeDown, small, large, ...rest }) {
   const classname = classnames(style.icon, className, {
     [style.nudgeUp]: nudgeUp,
     [style.nudgeDown]: nudgeDown,

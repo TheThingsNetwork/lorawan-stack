@@ -20,7 +20,7 @@ const createRootReducer = history =>
     router: connectRouter(history),
   })
 
-export default function(history) {
+export default function (history) {
   const middleware = applyMiddleware(routerMiddleware(history))
 
   return createStore(createRootReducer(history), compose(middleware))

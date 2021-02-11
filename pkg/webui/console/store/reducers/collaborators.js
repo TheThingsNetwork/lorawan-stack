@@ -30,7 +30,7 @@ const collaborator = (state = {}, collaborator) => ({
   ...collaborator,
 })
 
-const collaborators = function(state = defaultState, { type, payload }) {
+const collaborators = function (state = defaultState, { type, payload }) {
   switch (type) {
     case GET_COLLABORATOR:
       return {

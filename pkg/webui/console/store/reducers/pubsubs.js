@@ -29,7 +29,7 @@ const defaultState = {
   entities: {},
 }
 
-const pubsubs = function(state = defaultState, { type, payload }) {
+const pubsubs = function (state = defaultState, { type, payload }) {
   switch (type) {
     case GET_PUBSUB:
       return {

@@ -25,10 +25,13 @@ import Tab from './tab'
 
 import style from './tabs.styl'
 
-const Tabs = function({ className, active, tabs, onTabChange, divider, narrow }) {
+const Tabs = function ({ className, active, tabs, onTabChange, divider, narrow }) {
   return (
     <ul className={classnames(className, style.tabs, { [style.divider]: divider })}>
-      {tabs.map(function({ name, disabled, narrow: nrw, link, exact, icon, title, hidden }, index) {
+      {tabs.map(function (
+        { name, disabled, narrow: nrw, link, exact, icon, title, hidden },
+        index,
+      ) {
         return (
           !Boolean(hidden) && (
             <Tab

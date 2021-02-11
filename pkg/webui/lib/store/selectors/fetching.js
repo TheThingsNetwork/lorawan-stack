@@ -32,7 +32,7 @@ const selectFetchingEntry = (state, id) => selectFetchingStore(state)[id] || fal
  * `false` otherwise.
  */
 export const createFetchingSelector = actions =>
-  function(state) {
+  function (state) {
     if (!Array.isArray(actions)) {
       return selectFetchingEntry(state, actions)
     }

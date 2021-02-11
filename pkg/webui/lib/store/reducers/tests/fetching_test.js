@@ -14,39 +14,39 @@
 
 import reducer from '../ui/fetching'
 
-describe('Fetching reducers', function() {
+describe('Fetching reducers', function () {
   const BASE = 'BASE_ACTION'
   const REQUEST = `${BASE}_REQUEST`
   const SUCCESS = `${BASE}_SUCCESS`
   const FAILURE = `${BASE}_FAILURE`
 
-  it('return the initial state', function() {
+  it('return the initial state', function () {
     expect(reducer(undefined, {})).toEqual({})
   })
 
-  describe('when dispatching invalid action type', function() {
-    it('ignore the action', function() {
+  describe('when dispatching invalid action type', function () {
+    it('ignore the action', function () {
       expect(reducer({}, { type: BASE })).toEqual({})
     })
   })
 
-  describe('when dispatching the `request` action', function() {
-    it('set fetching to `true`', function() {
+  describe('when dispatching the `request` action', function () {
+    it('set fetching to `true`', function () {
       expect(reducer({}, { type: REQUEST })).toEqual({
         [BASE]: true,
       })
     })
 
-    describe('when dispatching the `success` action', function() {
-      it('set fetching to `false`', function() {
+    describe('when dispatching the `success` action', function () {
+      it('set fetching to `false`', function () {
         expect(reducer({}, { type: SUCCESS })).toEqual({
           [BASE]: false,
         })
       })
     })
 
-    describe('when dispatching the `failure` action', function() {
-      it('set fetching to `false`', function() {
+    describe('when dispatching the `failure` action', function () {
+      it('set fetching to `false`', function () {
         expect(reducer({}, { type: FAILURE })).toEqual({
           [BASE]: false,
         })

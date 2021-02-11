@@ -14,7 +14,7 @@
 
 import computePrefixes from './compute-prefix'
 
-describe('Compute JoinEUI prefix', function() {
+describe('Compute JoinEUI prefix', function () {
   describe('when computing prefix lengths that round exactly to characters', () => {
     const joinEUI = '1'.repeat(16)
 

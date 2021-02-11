@@ -18,7 +18,7 @@ const defaultState = {
   formats: undefined,
 }
 
-const deviceTemplateFormats = function(state = defaultState, { type, payload }) {
+const deviceTemplateFormats = function (state = defaultState, { type, payload }) {
   switch (type) {
     case GET_DEVICE_TEMPLATE_FORMATS_SUCCESS:
       return {

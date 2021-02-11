@@ -80,7 +80,7 @@ export const selectGatewayRightsFetching = createFetchingSelector(GET_GTWS_RIGHT
 
 // Statistics.
 export const selectGatewayStatisticsConnectError = createErrorSelector(START_GTW_STATS_BASE)
-export const selectGatewayStatisticsUpdateError = function(state) {
+export const selectGatewayStatisticsUpdateError = function (state) {
   const statistics = selectGatewayStatisticsStore(state) || {}
 
   return statistics.error
@@ -91,7 +91,7 @@ export const selectGatewayStatisticsIsFetching = createFetchingSelector([
   START_GTW_STATS_BASE,
   UPDATE_GTW_STATS_BASE,
 ])
-export const selectGatewayStatistics = function(state) {
+export const selectGatewayStatistics = function (state) {
   const statistics = selectGatewayStatisticsStore(state) || {}
 
   return statistics.stats

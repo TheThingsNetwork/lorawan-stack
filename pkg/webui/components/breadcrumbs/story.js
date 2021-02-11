@@ -28,7 +28,7 @@ storiesOf('Breadcrumbs', module)
       propTables: [Breadcrumbs, Breadcrumb],
     })(story)(context),
   )
-  .add('Default', function() {
+  .add('Default', function () {
     const breadcrumbs = [
       <Breadcrumb key="1" path="/applications" content="Applications" />,
       <Breadcrumb key="2" path="/applications/test-app" content="test-app" />,

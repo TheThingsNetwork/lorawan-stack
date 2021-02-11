@@ -59,7 +59,7 @@ const mapHeadersTypeFormValueToWebhookHeadersType = formValue =>
     )) ||
   null
 
-export const mapFormValuesToWebhook = function(values, appId) {
+export const mapFormValuesToWebhook = function (values, appId) {
   return {
     ids: {
       application_ids: {

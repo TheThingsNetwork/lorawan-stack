@@ -38,14 +38,14 @@ const defaultState = {
   statistics: defaultStatisticsState,
 }
 
-const gateway = function(state = {}, gateway) {
+const gateway = function (state = {}, gateway) {
   return {
     ...state,
     ...gateway,
   }
 }
 
-const statistics = function(state = defaultStatisticsState, { type, payload }) {
+const statistics = function (state = defaultStatisticsState, { type, payload }) {
   switch (type) {
     case UPDATE_GTW_STATS_SUCCESS:
       return {
@@ -71,7 +71,7 @@ const statistics = function(state = defaultStatisticsState, { type, payload }) {
   }
 }
 
-const gateways = function(state = defaultState, action) {
+const gateways = function (state = defaultState, action) {
   const { type, payload } = action
 
   switch (type) {
@@ -102,7 +102,7 @@ const gateways = function(state = defaultState, action) {
       }
     case GET_GTWS_LIST_SUCCESS:
       const entities = payload.entities.reduce(
-        function(acc, gtw) {
+        function (acc, gtw) {
           const id = getGatewayId(gtw)
 
           acc[id] = gateway(acc[id], gtw)

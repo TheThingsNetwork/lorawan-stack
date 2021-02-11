@@ -131,7 +131,7 @@ Button.defaultProps = {
   onBlur: undefined,
 }
 
-Button.Link = function(props) {
+Button.Link = function (props) {
   const { disabled, titleMessage } = props
   const buttonClassNames = assembleClassnames(props)
   const { to } = props
@@ -147,7 +147,7 @@ Button.Link = function(props) {
 }
 Button.Link.displayName = 'Button.Link'
 
-Button.AnchorLink = function(props) {
+Button.AnchorLink = function (props) {
   const { target, title, name } = props
   const htmlProps = { target, title, name }
   const buttonClassNames = assembleClassnames(props)

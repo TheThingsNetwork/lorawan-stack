@@ -19,7 +19,7 @@ import { GET_DEVICE_TEMPLATE_FORMATS_BASE } from '@console/store/actions/device-
 
 const selectDeviceTemplateFormatsStore = state => state.deviceTemplateFormats
 
-export const selectDeviceTemplateFormats = function(state) {
+export const selectDeviceTemplateFormats = function (state) {
   const store = selectDeviceTemplateFormatsStore(state)
 
   return store.formats || {}

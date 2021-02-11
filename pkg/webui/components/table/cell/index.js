@@ -21,7 +21,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './cell.styl'
 
-const Cell = function({
+const Cell = function ({
   className,
   component: Component,
   centered,

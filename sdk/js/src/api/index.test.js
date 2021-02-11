@@ -59,9 +59,9 @@ jest.mock('../../generated/api-definition.json', () => ({
   },
 }))
 
-describe('API class', function() {
+describe('API class', function () {
   let api
-  beforeEach(function() {
+  beforeEach(function () {
     api = new Api(
       'http',
       { mode: 'key', key: 'ABCDEFG' },
@@ -75,12 +75,12 @@ describe('API class', function() {
     api._connector.handleRequest = jest.fn()
   })
 
-  it('applies api definitions correctly', function() {
+  it('applies api definitions correctly', function () {
     expect(api.ApplicationRegistry.Create).toBeDefined()
     expect(typeof api.ApplicationRegistry.Create).toBe('function')
   })
 
-  it('applies parameters correctly', function() {
+  it('applies parameters correctly', function () {
     api.ApplicationRegistry.Create(
       { routeParams: { 'collaborator.user_ids.user_id': 'test' } },
       { name: 'test-name' },
@@ -96,13 +96,13 @@ describe('API class', function() {
     )
   })
 
-  it('throws when parameters mismatch', function() {
-    expect(function() {
+  it('throws when parameters mismatch', function () {
+    expect(function () {
       api.ApplicationRegistry.Create({ 'some.other.param': 'test' })
     }).toThrow()
   })
 
-  it('respects the search query', function() {
+  it('respects the search query', function () {
     api.ApplicationRegistry.List(undefined, { limit: 2, page: 1 })
 
     expect(api._connector.handleRequest).toHaveBeenCalledTimes(1)
@@ -115,7 +115,7 @@ describe('API class', function() {
     )
   })
 
-  it('sets stream value to true for streaming endpoints', function() {
+  it('sets stream value to true for streaming endpoints', function () {
     api.ApplicationRegistry.Events()
 
     expect(api._connector.handleRequest).toHaveBeenCalledTimes(1)

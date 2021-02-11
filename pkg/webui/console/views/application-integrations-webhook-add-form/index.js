@@ -62,7 +62,7 @@ const m = defineMessages({
     navigateToList: appId => dispatch(push(`/applications/${appId}/integrations/webhooks`)),
   }),
 )
-@withBreadcrumb('apps.single.integrations.webhooks.various.add', function(props) {
+@withBreadcrumb('apps.single.integrations.webhooks.various.add', function (props) {
   const { appId, templateId, webhookTemplate: { name } = {}, isCustom } = props
   let breadcrumbContent = m.customWebhook
   if (!templateId) {

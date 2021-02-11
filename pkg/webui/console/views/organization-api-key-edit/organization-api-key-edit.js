@@ -24,7 +24,7 @@ import { ApiKeyEditForm } from '@console/components/api-key-form'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-@withBreadcrumb('orgs.single.api-keys.edit', function(props) {
+@withBreadcrumb('orgs.single.api-keys.edit', function (props) {
   const { orgId, keyId } = props
 
   return (

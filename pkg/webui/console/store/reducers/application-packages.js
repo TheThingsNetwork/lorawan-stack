@@ -21,7 +21,7 @@ const defaultState = {
   default: undefined,
 }
 
-const applicationPackages = function(state = defaultState, { type, payload }) {
+const applicationPackages = function (state = defaultState, { type, payload }) {
   switch (type) {
     case GET_APP_PKG_DEFAULT_ASSOC_SUCCESS:
     case SET_APP_PKG_DEFAULT_ASSOC_SUCCESS:

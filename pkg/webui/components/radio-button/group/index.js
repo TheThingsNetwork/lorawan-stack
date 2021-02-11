@@ -26,7 +26,7 @@ function findCheckedRadio(children) {
   let value
   let matched = false
 
-  React.Children.forEach(children, function(radio) {
+  React.Children.forEach(children, function (radio) {
     if (radio && radio.props && !matched && radio.props.checked) {
       value = radio.props.value
       matched = true

@@ -25,7 +25,7 @@ import { ApiKeyCreateForm } from '@console/components/api-key-form'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-@withBreadcrumb('orgs.single.api-keys.add', function(props) {
+@withBreadcrumb('orgs.single.api-keys.add', function (props) {
   const orgId = props.orgId
   return <Breadcrumb path={`/organizations/${orgId}/api-keys/add`} content={sharedMessages.add} />
 })

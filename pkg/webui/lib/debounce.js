@@ -17,7 +17,7 @@ export default function debounce(f, ms) {
   let cancelled = false
   return {
     debouncedFunction(...args) {
-      const onComplete = function() {
+      const onComplete = function () {
         if (!cancelled) {
           f(...args)
         }

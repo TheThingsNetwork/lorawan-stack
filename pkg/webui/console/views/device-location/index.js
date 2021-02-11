@@ -38,7 +38,7 @@ const m = defineMessages({
   setDeviceLocation: 'Set end device location',
 })
 
-const getRegistryLocation = function(locations) {
+const getRegistryLocation = function (locations) {
   let registryLocation
   if (locations) {
     for (const key of Object.keys(locations)) {
@@ -59,7 +59,7 @@ const getRegistryLocation = function(locations) {
   }),
   { updateDevice: attachPromise(updateDevice) },
 )
-@withBreadcrumb('device.single.location', function(props) {
+@withBreadcrumb('device.single.location', function (props) {
   const { devId, appId } = props
   return (
     <Breadcrumb

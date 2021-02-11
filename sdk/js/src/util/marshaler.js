@@ -113,7 +113,7 @@ class Marshaler {
   static fieldMaskFromPatch(patch, whitelist, remaps) {
     let paths = []
 
-    traverse(patch).map(function(x) {
+    traverse(patch).map(function (x) {
       if (this.node instanceof Array) {
         // Add only the top level array path and do not recurse into arrays.
         paths.push(this.path.join('.'))
@@ -127,7 +127,7 @@ class Marshaler {
     // structure (e.g. for oneoffs). Through the remap argument, it can be
     // accounted for that by remapping these paths.
     if (remaps) {
-      paths = paths.map(function(path) {
+      paths = paths.map(function (path) {
         for (const remap of remaps) {
           if (path.startsWith(remap[0])) {
             return path.replace(remap[0], remap[1])

@@ -19,7 +19,7 @@ import { GET_PUBSUB_FORMATS_BASE } from '@console/store/actions/pubsub-formats'
 
 const selectPubsubFormatsStore = state => state.pubsubFormats
 
-export const selectPubsubFormats = function(state) {
+export const selectPubsubFormats = function (state) {
   const store = selectPubsubFormatsStore(state)
 
   return store.formats || {}

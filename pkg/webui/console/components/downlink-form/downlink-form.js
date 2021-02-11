@@ -42,9 +42,7 @@ const m = defineMessages({
 })
 
 const validationSchema = Yup.object({
-  _mode: Yup.string()
-    .oneOf(['replace', 'push'])
-    .required(sharedMessages.validateRequired),
+  _mode: Yup.string().oneOf(['replace', 'push']).required(sharedMessages.validateRequired),
   f_port: Yup.number()
     .min(1, Yup.passValues(sharedMessages.validateNumberGte))
     .max(223, Yup.passValues(sharedMessages.validateNumberLte))

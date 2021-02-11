@@ -45,7 +45,11 @@ export const GET_APP_BASE = 'GET_APPLICATION'
 export const [
   { request: GET_APP, success: GET_APP_SUCCESS, failure: GET_APP_FAILURE },
   { request: getApplication, success: getApplicationSuccess, failure: getApplicationFailure },
-] = createRequestActions(GET_APP_BASE, id => ({ id }), (id, selector) => ({ selector }))
+] = createRequestActions(
+  GET_APP_BASE,
+  id => ({ id }),
+  (id, selector) => ({ selector }),
+)
 
 export const GET_APP_DEV_COUNT_BASE = 'GET_APPLICATION_DEVICE_COUNT'
 export const [

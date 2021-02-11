@@ -54,7 +54,11 @@ export const GET_ORG_BASE = 'GET_ORGANIZATION'
 export const [
   { request: GET_ORG, success: GET_ORG_SUCCESS, failure: GET_ORG_FAILURE },
   { request: getOrganization, success: getOrganizationSuccess, failure: getOrganizationFailure },
-] = createRequestActions(GET_ORG_BASE, id => ({ id }), (id, selector) => ({ selector }))
+] = createRequestActions(
+  GET_ORG_BASE,
+  id => ({ id }),
+  (id, selector) => ({ selector }),
+)
 
 export const CREATE_ORG_BASE = 'CREATE_ORGANIZATION'
 export const [

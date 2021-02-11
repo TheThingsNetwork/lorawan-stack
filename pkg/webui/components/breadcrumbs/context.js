@@ -67,7 +67,7 @@ class BreadcrumbsProvider extends React.Component {
 }
 
 const withBreadcrumb = (id, element) =>
-  function(Component) {
+  function (Component) {
     class BreadcrumbsConsumer extends React.Component {
       static propTypes = {
         add: PropTypes.func.isRequired,

@@ -40,7 +40,7 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
     navigateToList: appId => dispatch(push(`/applications/${appId}/integrations/pubsubs`)),
   }),
 )
-@withBreadcrumb('apps.single.integrations.add', function(props) {
+@withBreadcrumb('apps.single.integrations.add', function (props) {
   const { appId } = props
   return (
     <Breadcrumb path={`/applications/${appId}/integrations/add`} content={sharedMessages.add} />

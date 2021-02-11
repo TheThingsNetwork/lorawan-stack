@@ -30,7 +30,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { mayViewGateways } from '@console/lib/feature-checks'
 
 @withFeatureRequirement(mayViewGateways, { redirect: '/' })
-@withBreadcrumb('gateways', function(props) {
+@withBreadcrumb('gateways', function (props) {
   return <Breadcrumb path="/gateways" content={sharedMessages.gateways} />
 })
 export default class Gateways extends React.Component {

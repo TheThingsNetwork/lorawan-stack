@@ -112,7 +112,7 @@ class InnerForm extends React.PureComponent {
 }
 
 const formRenderer = ({ children, ...rest }) =>
-  function(renderProps) {
+  function (renderProps) {
     const { className, error, errorTitle, info, infoTitle, disabled } = rest
     const { handleSubmit, ...restFormikProps } = renderProps
 

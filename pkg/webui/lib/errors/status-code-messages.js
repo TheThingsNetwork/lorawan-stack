@@ -16,6 +16,8 @@
 
 import { defineMessages } from 'react-intl'
 
+// eslint-disable-next-line capitalized-comments
+// prettier-ignore
 export default defineMessages({
   '4××': 'Client error',
   '400': 'Bad request',

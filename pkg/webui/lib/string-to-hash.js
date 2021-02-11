@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default function(string) {
+export default function (string) {
   let hash = 0
   let chr = 0
   if (string.length === 0) return hash

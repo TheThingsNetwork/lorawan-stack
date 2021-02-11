@@ -36,14 +36,14 @@ export const selectSelectedCollaborator = state =>
   selectCollaboratorById(state, selectSelectedCollaboratorId(state))
 export const selectCollaboratorFetching = createFetchingSelector(GET_COLLABORATOR_BASE)
 export const selectCollaboratorError = createErrorSelector(GET_COLLABORATOR_BASE)
-export const selectUserCollaborator = function(state) {
+export const selectUserCollaborator = function (state) {
   const collaborator = selectSelectedCollaborator(state)
 
   if (collaborator && 'user_ids' in collaborator.ids) {
     return collaborator
   }
 }
-export const selectOrganizationCollaborator = function(state) {
+export const selectOrganizationCollaborator = function (state) {
   const collaborator = selectSelectedCollaborator(state)
 
   if (collaborator && 'organization_ids' in collaborator.ids) {

@@ -29,7 +29,7 @@ const defaultState = {
   entities: {},
 }
 
-const webhooks = function(state = defaultState, { type, payload }) {
+const webhooks = function (state = defaultState, { type, payload }) {
   switch (type) {
     case GET_WEBHOOK:
       return {

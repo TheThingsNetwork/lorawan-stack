@@ -19,7 +19,7 @@
  * @returns {string} 'yyyy-mm-dd' or undefined.
  */
 
-export default function(d) {
+export default function (d) {
   if (Object.prototype.toString.call(d) !== '[object Date]' || isNaN(d.getTime())) {
     return undefined
   }

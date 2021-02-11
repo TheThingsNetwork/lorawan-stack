@@ -107,10 +107,10 @@ class Tabular extends React.Component {
     const paginatedData = this.handlePagination(data)
     const rows =
       paginatedData.length > 0 ? (
-        paginatedData.map(function(row, rowKey) {
+        paginatedData.map(function (row, rowKey) {
           return (
             <Table.Row key={rowKey} id={rowKey} onClick={onRowClick}>
-              {headers.map(function(header, index) {
+              {headers.map(function (header, index) {
                 const value = headers[index].getValue
                   ? headers[index].getValue(row)
                   : getByPath(row, headers[index].name)

@@ -60,7 +60,7 @@ const m = defineMessages({
 @withFeatureRequirement(mayViewMqttConnectionInfo, {
   redirect: ({ appId }) => `/applications/${appId}`,
 })
-@withBreadcrumb('apps.single.integrations.mqtt', function(props) {
+@withBreadcrumb('apps.single.integrations.mqtt', function (props) {
   const { appId } = props
 
   return (

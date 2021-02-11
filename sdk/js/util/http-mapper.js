@@ -60,7 +60,7 @@ function map(files) {
 fs.writeFile(
   `${__dirname}/../generated/api-definition.json`,
   JSON.stringify(map(api.files), null, 2),
-  function(err) {
+  function (err) {
     if (err) {
       return console.error(err)
     }

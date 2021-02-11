@@ -25,7 +25,7 @@ import CollaboratorForm from '@console/components/collaborator-form'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-@withBreadcrumb('orgs.single.collaborators.edit', function(props) {
+@withBreadcrumb('orgs.single.collaborators.edit', function (props) {
   const { orgId, collaboratorId, collaboratorType } = props
 
   return (

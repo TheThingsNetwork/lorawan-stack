@@ -29,11 +29,11 @@ const m = defineMessages({
   noData: 'No data available',
 })
 
-const DataSheet = function({ className, data }) {
+const DataSheet = function ({ className, data }) {
   return (
     <table className={classnames(className, style.table)}>
       <tbody>
-        {data.map(function(group, index) {
+        {data.map(function (group, index) {
           return (
             <React.Fragment key={`${group.header}_${index}`}>
               <tr className={style.groupHeading}>
@@ -42,7 +42,7 @@ const DataSheet = function({ className, data }) {
                 </th>
               </tr>
               {group.items.length > 0 ? (
-                group.items.map(function(item) {
+                group.items.map(function (item) {
                   if (!item) {
                     return null
                   }
@@ -106,7 +106,7 @@ DataSheet.defaultProps = {
   className: undefined,
 }
 
-const DataSheetRow = function({ item, sub }) {
+const DataSheetRow = function ({ item, sub }) {
   const isSafeInspector = item.type === 'byte' || item.type === 'code'
   const rowStyle = classnames({
     [style.sub]: sub,

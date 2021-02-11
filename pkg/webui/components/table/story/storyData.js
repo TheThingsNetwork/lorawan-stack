@@ -98,11 +98,7 @@ export default {
   },
   paginatedExample: {
     headers,
-    rows: rows
-      .concat(rows)
-      .concat(rows)
-      .concat(rows)
-      .concat(rows),
+    rows: rows.concat(rows).concat(rows).concat(rows).concat(rows),
   },
   clickableRowsExample: {
     headers,
@@ -121,7 +117,7 @@ export default {
         centered: true,
       },
     ],
-    rows: rows.map(function(r) {
+    rows: rows.map(function (r) {
       return Object.assign({}, r, {
         options: (
           <div>
@@ -133,7 +129,7 @@ export default {
     }),
   },
   sortableExample: {
-    headers: headers.map(function(header) {
+    headers: headers.map(function (header) {
       if (header.name === 'devices' || header.name === 'appId') {
         return Object.assign({}, header, {
           sortable: true,

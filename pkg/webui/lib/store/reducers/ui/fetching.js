@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const fetching = function(state = {}, action) {
+const fetching = function (state = {}, action) {
   const { type } = action
   const matches = /(.*)_(REQUEST|SUCCESS|FAILURE)/.exec(type)
 

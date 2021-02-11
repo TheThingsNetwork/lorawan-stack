@@ -20,7 +20,7 @@ import Dropdown from '@ttn-lw/components/dropdown'
 
 import ProfileDropdown from '.'
 
-const handleLogout = function() {
+const handleLogout = function () {
   // eslint-disable-next-line no-console
   console.log('Click')
 }
@@ -34,7 +34,7 @@ storiesOf('Profile Dropdown', module)
       propTables: [ProfileDropdown],
     })(story)(context),
   )
-  .add('Default', function() {
+  .add('Default', function () {
     return (
       <div style={{ height: '6rem' }}>
         <ProfileDropdown style={{ marginLeft: '120px' }} userId="johndoe">

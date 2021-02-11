@@ -62,7 +62,7 @@ import m from './messages'
 @withFeatureRequirement(mayEditBasicGatewayInformation, {
   redirect: ({ gtwId }) => `/gateways/${gtwId}`,
 })
-@withBreadcrumb('gateways.single.general-settings', function(props) {
+@withBreadcrumb('gateways.single.general-settings', function (props) {
   const { gtwId } = props
 
   return (

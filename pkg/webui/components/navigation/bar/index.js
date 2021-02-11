@@ -25,7 +25,7 @@ import NavigationLink from '../link'
 
 import style from './bar.styl'
 
-const NavigationBar = function({ className, children }) {
+const NavigationBar = function ({ className, children }) {
   return <nav className={className}>{children}</nav>
 }
 

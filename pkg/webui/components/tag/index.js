@@ -19,7 +19,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './tag.styl'
 
-const Tag = function(props) {
+const Tag = function (props) {
   const { content, className } = props
 
   return <div className={classnames(className, style.tag)}>{content}</div>

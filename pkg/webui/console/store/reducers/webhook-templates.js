@@ -23,7 +23,7 @@ const defaultState = {
   entities: undefined,
 }
 
-const webhookTemplates = function(state = defaultState, { type, payload }) {
+const webhookTemplates = function (state = defaultState, { type, payload }) {
   switch (type) {
     case LIST_WEBHOOK_TEMPLATES_SUCCESS:
       const entities = payload.reduce(

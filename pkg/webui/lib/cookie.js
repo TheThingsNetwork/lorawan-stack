@@ -18,7 +18,7 @@
  * @param {string} key - The key of the entry to extract.
  * @returns {string} The extracted value.
  */
-export default function(key) {
+export default function (key) {
   const matches = document.cookie.match(
     new RegExp(`(?:^|; )${key.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1')}=([^;]*)`),
   )

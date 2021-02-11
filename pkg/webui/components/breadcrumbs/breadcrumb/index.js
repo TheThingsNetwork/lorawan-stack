@@ -23,7 +23,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './breadcrumb.styl'
 
-const Breadcrumb = function({ className, path, content, isLast }) {
+const Breadcrumb = function ({ className, path, content, isLast }) {
   const isRawText = typeof content === 'string' || typeof content === 'number'
   let Component
   let componentProps

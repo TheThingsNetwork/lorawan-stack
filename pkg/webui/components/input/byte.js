@@ -26,7 +26,7 @@ const PLACEHOLDER_CHAR = '·'
 const hex = /[0-9a-f]/i
 
 const masks = {}
-const mask = function(min, max, showPerChar = false) {
+const mask = function (min, max, showPerChar = false) {
   const key = `${min}-${max}`
   if (masks[key]) {
     return masks[key]
@@ -50,11 +50,11 @@ const mask = function(min, max, showPerChar = false) {
   return r
 }
 
-const upper = function(str) {
+const upper = function (str) {
   return str.toUpperCase()
 }
 
-const clean = function(str) {
+const clean = function (str) {
   return str.replace(new RegExp(`[ ${PLACEHOLDER_CHAR}]`, 'g'), '')
 }
 
@@ -138,7 +138,7 @@ export default class ByteInput extends React.Component {
         i = inputElement.value.length
       }
 
-      setTimeout(function() {
+      setTimeout(function () {
         inputElement.focus()
         inputElement.setSelectionRange(i, i)
       }, 0)

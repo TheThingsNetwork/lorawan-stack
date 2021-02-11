@@ -20,11 +20,11 @@ import {
   createPaginationByIdDeleteActions,
 } from '../../actions/pagination'
 
-describe('Pagination reducers', function() {
+describe('Pagination reducers', function () {
   const NAME = 'ENTITY'
   const entityIdSelector = entity => entity.id
 
-  describe('flat', function() {
+  describe('flat', function () {
     const reducer = createNamedPaginationReducer(NAME, entityIdSelector)
     const defaultState = { ids: [], totalCount: undefined }
 
@@ -35,63 +35,66 @@ describe('Pagination reducers', function() {
       failure: failureDelete,
     } = createPaginationDeleteActions(NAME)[1]
 
-    it('return the initial state', function() {
+    it('return the initial state', function () {
       expect(reducer(undefined, { payload: {} })).toEqual(defaultState)
     })
 
-    it('ignore the get `request` action', function() {
+    it('ignore the get `request` action', function () {
       expect(reducer(defaultState, request())).toEqual(defaultState)
     })
 
-    it('ignore the get `failure` action', function() {
+    it('ignore the get `failure` action', function () {
       expect(reducer(defaultState, failure())).toEqual(defaultState)
     })
 
-    it('ignore the delete `request` action', function() {
+    it('ignore the delete `request` action', function () {
       expect(reducer(defaultState, requestDelete('test-id'))).toEqual(defaultState)
     })
 
-    it('ignore the delete `failure` action', function() {
+    it('ignore the delete `failure` action', function () {
       expect(reducer(defaultState, failureDelete())).toEqual(defaultState)
     })
 
-    describe('when receiving the `success` action', function() {
-      const entities = [{ id: '1', name: 'name1' }, { id: '2', name: 'name2' }]
+    describe('when receiving the `success` action', function () {
+      const entities = [
+        { id: '1', name: 'name1' },
+        { id: '2', name: 'name2' },
+      ]
       const totalCount = entities.length
       const action = success({ entities, totalCount })
 
       let newState = null
 
-      beforeAll(function() {
+      beforeAll(function () {
         newState = reducer(defaultState, action)
       })
 
-      it('update the state', function() {
+      it('update the state', function () {
         expect(newState).not.toEqual(defaultState)
       })
 
-      it('store ids only', function() {
+      it('store ids only', function () {
         const { ids } = newState
 
         expect(ids).toEqual(entities.map(e => e.id))
       })
 
-      it('store `totalCount`', function() {
+      it('store `totalCount`', function () {
         const { totalCount: newTotalCount } = newState
 
         expect(newTotalCount).toEqual(totalCount)
       })
 
-      describe('when deleting an entity', function() {
-        beforeAll(function() {
+      describe('when deleting an entity', function () {
+        beforeAll(function () {
           newState = reducer(newState, successDelete({ id: entities[0].id }))
         })
 
-        it('decrease `totalCount`', function() {
+        it('decrease `totalCount`', function () {
           expect(newState.totalCount).toEqual(entities.length - 1)
         })
 
-        it('remove deleted id from `ids`', function() {
+        it('remove deleted id from `ids`', function () {
           expect(newState.ids).toHaveLength(entities.length - 1)
           expect(newState.ids).toEqual(expect.not.arrayContaining(entities))
         })
@@ -99,7 +102,7 @@ describe('Pagination reducers', function() {
     })
   })
 
-  describe('when querying by id', function() {
+  describe('when querying by id', function () {
     const reducer = createNamedPaginationReducerById(NAME, entityIdSelector)
     const defaultState = {}
     const entityId = 'parent-id'
@@ -111,90 +114,93 @@ describe('Pagination reducers', function() {
       failure: failureDelete,
     } = createPaginationByIdDeleteActions(NAME)[1]
 
-    it('return the initial state', function() {
+    it('return the initial state', function () {
       expect(reducer(undefined, { payload: {} })).toEqual(defaultState)
     })
 
-    it('ignore the `request` action', function() {
+    it('ignore the `request` action', function () {
       expect(reducer(defaultState, request(entityId))).toEqual(defaultState)
     })
 
-    it('ignore the `failure` action', function() {
+    it('ignore the `failure` action', function () {
       expect(reducer(defaultState, failure({}))).toEqual(defaultState)
     })
 
-    it('ignore the delete `request` action', function() {
+    it('ignore the delete `request` action', function () {
       expect(reducer(defaultState, requestDelete('test-id', 'target-test-id'))).toEqual(
         defaultState,
       )
     })
 
-    it('ignore the delete `failure` action', function() {
+    it('ignore the delete `failure` action', function () {
       expect(reducer(defaultState, failureDelete('test-id'))).toEqual(defaultState)
     })
 
-    describe('when receiving the `success` action', function() {
-      const entities = [{ id: '1', name: 'name1' }, { id: '2', name: 'name2' }]
+    describe('when receiving the `success` action', function () {
+      const entities = [
+        { id: '1', name: 'name1' },
+        { id: '2', name: 'name2' },
+      ]
       const totalCount = entities.length
       const action = success({ id: entityId, entities, totalCount })
 
       let newState = null
 
-      beforeAll(function() {
+      beforeAll(function () {
         newState = reducer(defaultState, action)
       })
 
-      it('ignore without `id` in the payload', function() {
+      it('ignore without `id` in the payload', function () {
         const updatedState = reducer(defaultState, success({ entities: [], totalCount }))
 
         expect(updatedState).toEqual(defaultState)
       })
 
-      it('update the state', function() {
+      it('update the state', function () {
         expect(newState).not.toEqual(defaultState)
       })
 
-      it('store results per entity id', function() {
+      it('store results per entity id', function () {
         const { [entityId]: results } = newState
 
         expect(results).not.toBeUndefined()
       })
 
-      it('only store ids', function() {
+      it('only store ids', function () {
         const { [entityId]: results } = newState
 
         expect(results.ids).toEqual(entities.map(entityIdSelector))
       })
 
-      it('store `totalCount`', function() {
+      it('store `totalCount`', function () {
         const { [entityId]: results } = newState
 
         expect(results.totalCount).toEqual(totalCount)
       })
 
-      describe('deletes entity', function() {
+      describe('deletes entity', function () {
         let updatedState
 
-        beforeAll(function() {
+        beforeAll(function () {
           updatedState = reducer(
             newState,
             successDelete({ id: entityId, targetId: entities[0].id }),
           )
         })
 
-        it('decrease `totalCount`', function() {
+        it('decrease `totalCount`', function () {
           const { [entityId]: results } = updatedState
           expect(results.totalCount).toEqual(entities.length - 1)
         })
 
-        it('remove deleted id from `ids`', function() {
+        it('remove deleted id from `ids`', function () {
           const { [entityId]: results } = updatedState
           expect(results.ids).toHaveLength(entities.length - 1)
           expect(results.ids).toEqual(expect.not.arrayContaining(entities))
         })
       })
 
-      describe('when receiving the `success` action for another entity', function() {
+      describe('when receiving the `success` action for another entity', function () {
         const otherEntityId = 'other-entity-id'
         const otherEntities = [
           { id: '3', name: 'name3' },
@@ -210,15 +216,15 @@ describe('Pagination reducers', function() {
 
         let otherNewState = null
 
-        beforeAll(function() {
+        beforeAll(function () {
           otherNewState = reducer(newState, action)
         })
 
-        it('update the state', function() {
+        it('update the state', function () {
           expect(otherNewState).not.toEqual(newState)
         })
 
-        it('preserve previous entries', function() {
+        it('preserve previous entries', function () {
           const { [entityId]: results } = otherNewState
 
           expect(results).not.toBeUndefined()
@@ -226,40 +232,40 @@ describe('Pagination reducers', function() {
           expect(results.totalCount).toEqual(totalCount)
         })
 
-        it('store results per entity id', function() {
+        it('store results per entity id', function () {
           const { [otherEntityId]: results } = otherNewState
 
           expect(results).not.toBeUndefined()
         })
 
-        it('only store ids', function() {
+        it('only store ids', function () {
           const { [otherEntityId]: results } = otherNewState
 
           expect(results.ids).toEqual(otherEntities.map(e => e.id))
         })
 
-        it('store `totalCount`', function() {
+        it('store `totalCount`', function () {
           const { [otherEntityId]: results } = otherNewState
 
           expect(results.totalCount).toEqual(otherTotalCount)
         })
 
-        describe('when deleting an entity', function() {
+        describe('when deleting an entity', function () {
           let updatedState
 
-          beforeAll(function() {
+          beforeAll(function () {
             updatedState = reducer(
               otherNewState,
               successDelete({ id: otherEntityId, targetId: otherEntities[0].id }),
             )
           })
 
-          it('decrease `totalCount`', function() {
+          it('decrease `totalCount`', function () {
             const { [entityId]: results } = updatedState
             expect(results.totalCount).toEqual(otherEntities.length - 1)
           })
 
-          it('remove deleted id from `ids`', function() {
+          it('remove deleted id from `ids`', function () {
             const { [entityId]: results } = updatedState
             expect(results.ids).toHaveLength(otherEntities.length - 1)
             expect(results.ids).toEqual(expect.not.arrayContaining(otherEntities))

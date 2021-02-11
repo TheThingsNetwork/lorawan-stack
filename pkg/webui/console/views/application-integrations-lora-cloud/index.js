@@ -102,7 +102,7 @@ const LoRaCloud = () => {
   )
 }
 
-export default withBreadcrumb('apps.single.integrations.lora-cloud', function(props) {
+export default withBreadcrumb('apps.single.integrations.lora-cloud', function (props) {
   const { appId } = props
 
   return (

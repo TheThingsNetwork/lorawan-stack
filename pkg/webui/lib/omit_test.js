@@ -144,49 +144,49 @@ const stateObject = {
   gatewayStatus: {},
 }
 
-describe('Omit utils', function() {
-  describe('when object is empty', function() {
+describe('Omit utils', function () {
+  describe('when object is empty', function () {
     const object = {}
-    it('returns same object', function() {
+    it('returns same object', function () {
       const result = omitDeep(object, ['value'])
 
       expect(result).toStrictEqual(object)
     })
   })
 
-  describe('when array of values is empty', function() {
+  describe('when array of values is empty', function () {
     const values = []
-    it('returns same object', function() {
+    it('returns same object', function () {
       const result = omitDeep(stateObject, values)
 
       expect(result).toStrictEqual(stateObject)
     })
   })
 
-  describe('when object and values are empty', function() {
+  describe('when object and values are empty', function () {
     const object = {}
     const values = []
-    it('returns same object', function() {
+    it('returns same object', function () {
       const result = omitDeep(object, values)
 
       expect(result).toStrictEqual(object)
     })
   })
 
-  describe('when excluding the single top level property', function() {
+  describe('when excluding the single top level property', function () {
     const values = ['gateways']
 
-    it('omits object `gateways` property', function() {
+    it('omits object `gateways` property', function () {
       const result = omitDeep(stateObject, values)
 
       expect(result.gateways).toBeUndefined()
     })
   })
 
-  describe('when excluding multiple top level and nested properties', function() {
+  describe('when excluding multiple top level and nested properties', function () {
     const values = ['apiKeys', 'ids']
 
-    it('omits all occurrences of `apiKeys` and `ids`', function() {
+    it('omits all occurrences of `apiKeys` and `ids`', function () {
       const result = omitDeep(stateObject, values)
 
       expect(result.pagination.gateways.totalCount).toStrictEqual(

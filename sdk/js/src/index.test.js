@@ -52,8 +52,8 @@ const mockDeviceData = {
   },
 }
 
-jest.mock('./api', function() {
-  return jest.fn().mockImplementation(function() {
+jest.mock('./api', function () {
+  return jest.fn().mockImplementation(function () {
     return {
       ApplicationRegistry: {
         Get: jest.fn().mockResolvedValue({ data: mockApplicationData }),
@@ -78,7 +78,7 @@ jest.mock('./api', function() {
   })
 })
 
-describe('SDK class', function() {
+describe('SDK class', function () {
   const token = 'faketoken'
   const tts = new TTS({
     authorization: {
@@ -89,13 +89,13 @@ describe('SDK class', function() {
     stackConfig: { is: 'http://localhost:1885/api/v3' },
   })
 
-  it('instanciates successfully', async function() {
+  it('instanciates successfully', async function () {
     expect(tts).toBeDefined()
     expect(tts).toBeInstanceOf(TTS)
     expect(tts.Applications).toBeInstanceOf(Applications)
   })
 
-  it('retrieves application instance correctly', async function() {
+  it('retrieves application instance correctly', async function () {
     const app = await tts.Applications.getById('test')
     expect(app).toBeDefined()
   })

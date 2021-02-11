@@ -42,7 +42,7 @@ const m = defineMessages({
   deviceTemplateFormats: selectDeviceTemplateFormats(state),
   deviceTemplateFormatsFetching: selectDeviceTemplateFormatsFetching(state),
 }))
-@withBreadcrumb('devices.import', function(props) {
+@withBreadcrumb('devices.import', function (props) {
   const { appId } = props
   return (
     <Breadcrumb path={`/applications/${appId}/devices/import`} content={sharedMessages.import} />

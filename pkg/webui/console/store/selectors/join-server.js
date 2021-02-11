@@ -19,7 +19,7 @@ import { GET_JOIN_EUI_PREFIXES_BASE } from '@console/store/actions/join-server'
 
 const selectJsStore = state => state.js
 
-export const selectJoinEUIPrefixes = function(state) {
+export const selectJoinEUIPrefixes = function (state) {
   const store = selectJsStore(state)
 
   return store.prefixes

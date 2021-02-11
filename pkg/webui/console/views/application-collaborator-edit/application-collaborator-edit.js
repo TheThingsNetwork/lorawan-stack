@@ -34,7 +34,7 @@ const isUser = collaborator => collaborator.ids && 'user_ids' in collaborator.id
   ({ getCollaborator }) => getCollaborator(),
   ({ fetching, collaborator }) => fetching || !Boolean(collaborator),
 )
-@withBreadcrumb('apps.single.collaborators.edit', function(props) {
+@withBreadcrumb('apps.single.collaborators.edit', function (props) {
   const { appId, collaboratorId, collaboratorType } = props
 
   return (

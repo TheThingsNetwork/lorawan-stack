@@ -23,7 +23,7 @@ import {
   DELETE_ORG_SUCCESS,
 } from '@console/store/actions/organizations'
 
-const organization = function(state = {}, organization) {
+const organization = function (state = {}, organization) {
   return {
     ...state,
     ...organization,
@@ -35,7 +35,7 @@ const defaultState = {
   selectedOrganization: null,
 }
 
-const organizations = function(state = defaultState, { type, payload }) {
+const organizations = function (state = defaultState, { type, payload }) {
   switch (type) {
     case GET_ORG:
       return {
@@ -44,7 +44,7 @@ const organizations = function(state = defaultState, { type, payload }) {
       }
     case GET_ORGS_LIST_SUCCESS:
       const entities = payload.entities.reduce(
-        function(acc, org) {
+        function (acc, org) {
           const id = getOrganizationId(org)
 
           acc[id] = organization(acc[id], org)

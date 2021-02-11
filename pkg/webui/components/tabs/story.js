@@ -52,12 +52,15 @@ storiesOf('Tabs', module)
       propTablesExclude: [Example],
     })(story)(context),
   )
-  .add('Default', function() {
-    const tabs = [{ title: 'All', name: 'all' }, { title: 'Starred', name: 'starred' }]
+  .add('Default', function () {
+    const tabs = [
+      { title: 'All', name: 'all' },
+      { title: 'Starred', name: 'starred' },
+    ]
 
     return <Example tabs={tabs} active={tabs[0].name} />
   })
-  .add('Default (disabled)', function() {
+  .add('Default (disabled)', function () {
     const tabs = [
       { title: 'All', name: 'all' },
       { title: 'Starred', name: 'starred', disabled: true },
@@ -65,12 +68,15 @@ storiesOf('Tabs', module)
 
     return <Example tabs={tabs} active={tabs[0].name} />
   })
-  .add('Default (narrow)', function() {
-    const tabs = [{ title: 'All', name: 'all' }, { title: 'Starred', name: 'starred' }]
+  .add('Default (narrow)', function () {
+    const tabs = [
+      { title: 'All', name: 'all' },
+      { title: 'Starred', name: 'starred' },
+    ]
 
     return <Example tabs={tabs} active={tabs[0].name} narrow />
   })
-  .add('With icons', function() {
+  .add('With icons', function () {
     const tabs = [
       { title: 'People', name: 'people', icon: 'organization' },
       { title: 'Data', name: 'data', icon: 'data' },
@@ -78,7 +84,7 @@ storiesOf('Tabs', module)
 
     return <Example tabs={tabs} active={tabs[0].name} narrow />
   })
-  .add('With icons (disabled)', function() {
+  .add('With icons (disabled)', function () {
     const tabs = [
       { title: 'People', name: 'people', icon: 'organization' },
       { title: 'Data', name: 'data', icon: 'data', disabled: true },
@@ -86,7 +92,7 @@ storiesOf('Tabs', module)
 
     return <Example tabs={tabs} active={tabs[0].name} />
   })
-  .add('Link', function() {
+  .add('Link', function () {
     const tabs = [
       { title: 'People', name: 'people', link: '/people' },
       { title: 'Data', name: 'data', link: '/data' },
@@ -94,7 +100,7 @@ storiesOf('Tabs', module)
 
     return <Example tabs={tabs} />
   })
-  .add('Link (disabled)', function() {
+  .add('Link (disabled)', function () {
     const tabs = [
       { title: 'People', name: 'people', link: '/people' },
       { title: 'Data', name: 'data', link: '/data', disabled: true },
@@ -102,7 +108,7 @@ storiesOf('Tabs', module)
 
     return <Example tabs={tabs} />
   })
-  .add('Link (narrow)', function() {
+  .add('Link (narrow)', function () {
     const tabs = [
       { title: 'People', name: 'people', link: '/people' },
       { title: 'Data', name: 'data', link: '/data' },

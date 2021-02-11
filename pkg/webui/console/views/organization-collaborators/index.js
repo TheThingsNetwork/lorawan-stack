@@ -40,7 +40,7 @@ import { selectSelectedOrganizationId } from '@console/store/selectors/organizat
 @withFeatureRequirement(mayViewOrEditOrganizationCollaborators, {
   redirect: ({ orgId }) => `/organizations/${orgId}`,
 })
-@withBreadcrumb('orgs.single.collaborators', function(props) {
+@withBreadcrumb('orgs.single.collaborators', function (props) {
   const { match } = props
   const { orgId } = match.params
 

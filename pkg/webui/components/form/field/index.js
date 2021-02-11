@@ -39,7 +39,7 @@ export function getPassThroughProps(props, excludeProps) {
   return rest
 }
 
-const isValueEmpty = function(value) {
+const isValueEmpty = function (value) {
   if (value === null || value === undefined) {
     return true
   }

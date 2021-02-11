@@ -60,7 +60,7 @@ for (const component in fieldMasks) {
 }
 
 // Rewrite single `_root` entries as plain array leaf.
-traverse(result).forEach(function() {
+traverse(result).forEach(function () {
   if (Object.keys(this.node).length === 1 && this.node._root) {
     this.update(this.node._root)
   }
@@ -69,7 +69,7 @@ traverse(result).forEach(function() {
 fs.writeFile(
   `${__dirname}/../generated/device-entity-map.json`,
   JSON.stringify(result, null, 2),
-  function(err) {
+  function (err) {
     if (err) {
       return console.error(err)
     }
