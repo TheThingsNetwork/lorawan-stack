@@ -48,7 +48,7 @@ const m = defineMessages({
 })
 
 const Registration = props => {
-  const { template, fetching, prefixes, mayEditKeys } = props
+  const { template, fetching, prefixes, mayEditKeys, onIdPrefill } = props
   const state = useRepositoryContext()
   const hasTemplate = Boolean(template)
 
@@ -99,6 +99,7 @@ const Registration = props => {
             required
             component={Input}
             glossaryId={glossaryId.DEV_EUI}
+            onBlur={onIdPrefill}
           />
           <Form.Field
             required
@@ -239,6 +240,7 @@ const Registration = props => {
 Registration.propTypes = {
   fetching: PropTypes.bool,
   mayEditKeys: PropTypes.bool.isRequired,
+  onIdPrefill: PropTypes.func.isRequired,
   prefixes: PropTypes.euiPrefixes.isRequired,
   template: PropTypes.shape({
     end_device: PropTypes.shape({
