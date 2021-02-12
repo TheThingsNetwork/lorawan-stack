@@ -438,6 +438,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			eirp = *sb.MaxEIRP
 		}
 		settings := ttnpb.TxSettings{
+			DataRate:      dr.Rate,
 			DataRateIndex: rx.dataRateIndex,
 			Frequency:     rx.frequency,
 			Downlink: &ttnpb.TxSettings_Downlink{
@@ -448,7 +449,6 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
 			settings.Downlink.TxPower -= c.gateway.Antennas[ids.AntennaIndex].Gain
 		}
-		settings.DataRate = dr.Rate
 		if lora := dr.Rate.GetLoRa(); lora != nil {
 			settings.CodingRate = phy.LoRaCodingRate
 			settings.Downlink.InvertPolarization = true
