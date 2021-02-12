@@ -18,8 +18,10 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"strings"
 
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"google.golang.org/grpc/codes"
@@ -27,49 +29,66 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func logFieldsForError(err error) (fieldsKV []interface{}) {
+func logFieldsForError(err error) *log.F {
+	fields := log.Fields()
 	if ttnErr, ok := errors.From(err); ok {
-		fieldsKV = append(fieldsKV, "grpc_code", codes.Code(ttnErr.Code()))
+		fields = fields.WithField("grpc_code", codes.Code(ttnErr.Code()))
 		if ns := ttnErr.Namespace(); ns != "" {
-			fieldsKV = append(fieldsKV, "error_namespace", ns)
+			fields = fields.WithField("error_namespace", ns)
 		}
 		if name := ttnErr.Name(); name != "" {
-			fieldsKV = append(fieldsKV, "error_name", name)
+			fields = fields.WithField("error_name", name)
 		}
 		if cid := ttnErr.CorrelationID(); cid != "" {
-			fieldsKV = append(fieldsKV, "error_correlation_id", cid)
+			fields = fields.WithField("error_correlation_id", cid)
 		}
 	} else if status, ok := status.FromError(err); ok {
-		fieldsKV = append(fieldsKV,
-			"grpc_code", status.Code(),
-		)
+		fields = fields.WithField("grpc_code", status.Code())
 	}
-	return
+	return fields
 }
 
-func newLoggerForCall(ctx context.Context, logger log.Interface, fullMethodString string) context.Context {
+func logFieldsForCall(ctx context.Context, fullMethodString string) (once, propagated *log.F) {
 	service := path.Dir(fullMethodString)[1:]
 	method := path.Base(fullMethodString)
+
+	once = log.Fields()
+	propagated = log.Fields(
+		"grpc.service", service,
+		"grpc.method", method,
+	)
+
+	if ctxFields := grpc_ctxtags.Extract(ctx).Values(); len(ctxFields) > 0 {
+		once = once.With(ctxFields)
+	}
+
 	if md, ok := metadata.FromOutgoingContext(ctx); ok {
 		if requestID := md["x-request-id"]; len(requestID) > 0 {
-			logger = logger.WithField("request_id", requestID[0])
-		}
-	}
-	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		if requestID := md["x-request-id"]; len(requestID) > 0 {
-			logger = logger.WithField("request_id", requestID[0])
-		}
-		if xRealIP := md["x-real-ip"]; len(xRealIP) > 0 {
-			logger = logger.WithField("peer.real_ip", xRealIP[0])
+			propagated = propagated.WithField("request_id", requestID[0])
 		}
 	}
 
-	return log.NewContext(ctx, logger.WithFields(
-		(&log.F{}).With(grpc_ctxtags.Extract(ctx).Values()),
-	).WithFields(log.Fields(
-		"grpc.service", service,
-		"grpc.method", method,
-	)))
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if requestID := md["x-request-id"]; len(requestID) > 0 {
+			propagated = propagated.WithField("request_id", requestID[0])
+		}
+		if xRealIP := md["x-real-ip"]; len(xRealIP) > 0 {
+			propagated = propagated.WithField("peer.real_ip", xRealIP[0])
+		}
+		if authorization, ok := md["authorization"]; ok && len(authorization) > 0 {
+			parts := strings.SplitN(authorization[len(authorization)-1], " ", 2)
+			if len(parts) == 2 && strings.ToLower(parts[0]) == "bearer" {
+				if tokenType, tokenID, _, err := auth.SplitToken(parts[1]); err == nil {
+					once = once.WithFields(log.Fields(
+						"auth.token_type", tokenType.String(),
+						"auth.token_id", tokenID,
+					))
+				}
+			}
+		}
+	}
+
+	return once, propagated
 }
 
 func commit(i log.Interface, level log.Level, msg string) {
