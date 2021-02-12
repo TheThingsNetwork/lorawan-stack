@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Handling of `DLChannelReq` if dependent `NewChannelReq` was previously rejected.
+- Synchronization in Gateway Server scheduler that caused race conditions in scheduling downlink traffic.
 
 ### Security
 
