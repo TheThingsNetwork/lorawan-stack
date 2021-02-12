@@ -12,7 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.top
-  padding: $ls.xl 0
-  diplay: flex
-  justify-content: center
+import React from 'react'
+import { useSelector } from 'react-redux'
+
+import ProfilePictureComponent from '@ttn-lw/components/profile-picture'
+
+import { selectUserProfilePicture } from '@account/store/selectors/user'
+
+const ProfilePicture = props => {
+  const profilePicture = useSelector(selectUserProfilePicture)
+
+  return <ProfilePictureComponent profilePicture={profilePicture} {...props} />
+}
+
+export default ProfilePicture

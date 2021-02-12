@@ -41,7 +41,7 @@ const Collapse = props => {
 
   const cls = classnames(className, style.section)
   return (
-    <section className={cls}>
+    <section className={cls} data-test-id="collapsible-section">
       <div className={style.header}>
         <div className={style.headerContent}>
           <Message className={style.title} component="h3" content={title} />

@@ -233,7 +233,7 @@ func (Dev) InitStack() error {
 	}
 	if err := runGo("./cmd/ttn-lw-stack", "is-db", "create-admin-user",
 		"--id", "admin",
-		"--email", "admin@localhost",
+		"--email", "admin@example.com",
 		"--password", "admin",
 	); err != nil {
 		return err

@@ -30,6 +30,16 @@ describe('Account App overview', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
     cy.visit(Cypress.config('accountAppRootPath'))
 
+    // Profile card section.
+    cy.findByText(user.name, { selector: 'h3' }).should('be.visible')
+    cy.findByText(user.ids.user_id).should('be.visible')
+    cy.findByAltText('Profile picture')
+      .should('be.visible')
+      .and('have.attr', 'src')
+      .and('match', /missing-profile-picture/)
+    cy.findByRole('link', { name: /Edit profile settings/ }).should('be.visible')
+
+    // Info text section.
     cy.findByText(`Welcome, ${user.name}! 👋`).should('be.visible')
     cy.findByText('You have successfully logged into the Account App', { exact: false }).should(
       'be.visible',

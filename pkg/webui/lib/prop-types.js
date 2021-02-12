@@ -148,6 +148,12 @@ PropTypes.user = PropTypes.shape({
   }).isRequired,
 })
 
+PropTypes.profilePicture = PropTypes.shape({
+  sizes: PropTypes.shape({
+    '0': PropTypes.string,
+  }),
+})
+
 PropTypes.stackComponent = PropTypes.shape({
   enabled: PropTypes.bool.isRequired,
   base_url: PropTypes.string,

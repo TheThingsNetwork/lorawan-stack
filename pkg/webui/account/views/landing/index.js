@@ -19,7 +19,7 @@ import authRoutes from '@account/constants/auth-routes'
 
 import Footer from '@ttn-lw/containers/footer'
 
-import { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error/error'
+import { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error'
 
 import Header from '@account/containers/header'
 

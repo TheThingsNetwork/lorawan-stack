@@ -12,18 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Overview from '@account/views/overview'
-import ProfileSettings from '@account/views/profile-settings'
+.container
+  display: flex
+  justify-content: center
 
-export default [
-  {
-    path: '/',
-    exact: true,
-    component: Overview,
-  },
-  {
-    path: '/profile-settings',
-    exact: true,
-    component: ProfileSettings,
-  },
-]
+  +media-query($bp.s)
+    flex-direction: column
+    align-items: center
+
+.profile-picture
+  +media-query($bp.s)
+    margin-bottom: $cs.l
+
+.panel
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  justify-content: center
+
+  +media-query-min($bp.s)
+    padding-left: $cs.xl
+
+  +media-query($bp.s)
+    align-items: center
+
+.name
+  margin-bottom: $cs.l
+  h3
+    one-liner()
+    display: block
+    margin: 0
+    font-weight: bold
+    font-size: $fs.xl
+
+  +media-query($bp.s)
+    text-align: center
+
+.user-id
+  one-liner()
+  margin-top: $cs.xxs
