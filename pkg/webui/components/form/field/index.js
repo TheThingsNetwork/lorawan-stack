@@ -29,7 +29,7 @@ import FormContext from '../context'
 
 import style from './field.styl'
 
-export function getPassThroughProps(props, excludeProps) {
+export const getPassThroughProps = (props, excludeProps) => {
   const rest = {}
   for (const property of Object.keys(props)) {
     if (!excludeProps[property]) {
@@ -39,7 +39,7 @@ export function getPassThroughProps(props, excludeProps) {
   return rest
 }
 
-const isValueEmpty = function(value) {
+const isValueEmpty = value => {
   if (value === null || value === undefined) {
     return true
   }
