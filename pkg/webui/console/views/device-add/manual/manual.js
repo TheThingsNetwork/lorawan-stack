@@ -65,12 +65,10 @@ const DeviceAddManual = props => {
     [redirectToNextLocation],
   )
 
-  const handleCreateDevice = React.useCallback(
-    device => {
-      return createDevice(appId, device)
-    },
-    [appId, createDevice],
-  )
+  const handleCreateDevice = React.useCallback(device => createDevice(appId, device), [
+    appId,
+    createDevice,
+  ])
 
   const handleCreateDeviceSuccess = React.useCallback(
     device => {

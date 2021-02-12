@@ -50,9 +50,9 @@ import {
   },
 )
 @withRequest(({ getConfiguration }) => getConfiguration(), ({ fetching }) => fetching)
-@withBreadcrumb('admin.user-management.add', () => {
-  return <Breadcrumb path={`/admin/user-management/add`} content={sharedMessages.add} />
-})
+@withBreadcrumb('admin.user-management.add', () => (
+  <Breadcrumb path={`/admin/user-management/add`} content={sharedMessages.add} />
+))
 export default class UserManagementAdd extends Component {
   static propTypes = {
     createUser: PropTypes.func.isRequired,

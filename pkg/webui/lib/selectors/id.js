@@ -14,21 +14,15 @@
 
 import getByPath from '../get-by-path'
 
-export const getApplicationId = (application = {}) => {
-  return (
-    getByPath(application, 'application_id') ||
-    getByPath(application, 'application_ids.application_id') ||
-    getByPath(application, 'ids.application_id')
-  )
-}
+export const getApplicationId = (application = {}) =>
+  getByPath(application, 'application_id') ||
+  getByPath(application, 'application_ids.application_id') ||
+  getByPath(application, 'ids.application_id')
 
-export const getDeviceId = (device = {}) => {
-  return (
-    getByPath(device, 'device_id') ||
-    getByPath(device, 'ids.device_id') ||
-    getByPath(device, 'device_ids.device_id')
-  )
-}
+export const getDeviceId = (device = {}) =>
+  getByPath(device, 'device_id') ||
+  getByPath(device, 'ids.device_id') ||
+  getByPath(device, 'device_ids.device_id')
 
 export const combineDeviceIds = (appId, devId) => `${appId}/${devId}`
 export const extractDeviceIdFromCombinedId = combinedId => {
@@ -49,31 +43,20 @@ export const getCombinedDeviceId = (device = {}) => {
   return combineDeviceIds(appId, devId)
 }
 
-export const getCollaboratorId = (collaborator = {}) => {
-  return (
-    getByPath(collaborator, 'ids.organization_ids.organization_id') ||
-    getByPath(collaborator, 'ids.user_ids.user_id')
-  )
-}
+export const getCollaboratorId = (collaborator = {}) =>
+  getByPath(collaborator, 'ids.organization_ids.organization_id') ||
+  getByPath(collaborator, 'ids.user_ids.user_id')
 
-export const getGatewayId = (gateway = {}) => {
-  return (
-    getByPath(gateway, 'gateway_id') ||
-    getByPath(gateway, 'gateway_ids.gateway_id') ||
-    getByPath(gateway, 'ids.gateway_id')
-  )
-}
+export const getGatewayId = (gateway = {}) =>
+  getByPath(gateway, 'gateway_id') ||
+  getByPath(gateway, 'gateway_ids.gateway_id') ||
+  getByPath(gateway, 'ids.gateway_id')
 
-export const getApiKeyId = (key = {}) => {
-  return key.id
-}
+export const getApiKeyId = (key = {}) => key.id
 
-export const getOrganizationId = (organization = {}) => {
-  return (
-    getByPath(organization, 'ids.organization_id') ||
-    getByPath(organization, 'organization_ids.organization_id')
-  )
-}
+export const getOrganizationId = (organization = {}) =>
+  getByPath(organization, 'ids.organization_id') ||
+  getByPath(organization, 'organization_ids.organization_id')
 
 const idSelectors = [
   getApplicationId,
@@ -95,21 +78,12 @@ export const getEntityId = entity => {
   return id
 }
 
-export const getWebhookId = (webhook = {}) => {
-  return getByPath(webhook, 'ids.webhook_id')
-}
+export const getWebhookId = (webhook = {}) => getByPath(webhook, 'ids.webhook_id')
 
-export const getWebhookTemplateId = (webhookTemplate = {}) => {
-  return (
-    getByPath(webhookTemplate, 'ids.template_id') ||
-    getByPath(webhookTemplate, 'template_ids.template_id')
-  )
-}
+export const getWebhookTemplateId = (webhookTemplate = {}) =>
+  getByPath(webhookTemplate, 'ids.template_id') ||
+  getByPath(webhookTemplate, 'template_ids.template_id')
 
-export const getPubsubId = (pubsub = {}) => {
-  return getByPath(pubsub, 'ids.pub_sub_id')
-}
+export const getPubsubId = (pubsub = {}) => getByPath(pubsub, 'ids.pub_sub_id')
 
-export const getUserId = (user = {}) => {
-  return getByPath(user, 'ids.user_id')
-}
+export const getUserId = (user = {}) => getByPath(user, 'ids.user_id')

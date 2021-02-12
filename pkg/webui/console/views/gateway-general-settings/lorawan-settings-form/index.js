@@ -85,12 +85,13 @@ const LorawanSettingsForm = React.memo(props => {
     setShowFrequencyPlanWarning(isEmptyFrequencyPlan(freqPlan.value))
   }, [])
 
-  const initialValues = React.useMemo(() => {
-    return {
+  const initialValues = React.useMemo(
+    () => ({
       ...validationSchema.cast(gateway),
       frequency_plan_id: gateway.frequency_plan_id || frequencyPlans.EMPTY_FREQ_PLAN,
-    }
-  }, [gateway])
+    }),
+    [gateway],
+  )
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {

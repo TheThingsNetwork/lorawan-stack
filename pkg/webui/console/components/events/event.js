@@ -37,9 +37,7 @@ const Event = React.memo(({ event, scoped, widget, rowStyle, onRowClick, eventId
   const typeValue = event.isSynthetic
     ? intl.formatMessage(eventMessages[`${event.name}:type`])
     : upperFirst(intl.formatMessage({ id: `event:${event.name}` }))
-  const PreviewComponent = useMemo(() => {
-    return getPreviewComponent(event)
-  }, [event])
+  const PreviewComponent = useMemo(() => getPreviewComponent(event), [event])
   const entityId = useMemo(
     () => (!event.isSynthetic && !scoped ? getEntityId(event.identifiers[0]) : undefined),
     [scoped, event.identifiers, event.isSynthetic],

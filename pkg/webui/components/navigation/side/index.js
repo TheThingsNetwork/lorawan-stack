@@ -67,7 +67,7 @@ export class SideNavigation extends Component {
      * screensizes).
      */
     isDrawerOpen: false,
-    /** A flag indicating whether the user has last toggled the sidebar to
+    /** A flag indicating whether the user has last toggled the sidebar to.
      * minimized state. */
     preferMinimized: false,
   }

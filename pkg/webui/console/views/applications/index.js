@@ -30,9 +30,9 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { mayViewApplications } from '@console/lib/feature-checks'
 
 @withFeatureRequirement(mayViewApplications, { redirect: '/' })
-@withBreadcrumb('apps', () => {
-  return <Breadcrumb path="/applications" content={sharedMessages.applications} />
-})
+@withBreadcrumb('apps', () => (
+  <Breadcrumb path="/applications" content={sharedMessages.applications} />
+))
 export default class Applications extends React.Component {
   static propTypes = {
     match: PropTypes.match.isRequired,

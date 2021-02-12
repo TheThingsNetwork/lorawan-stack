@@ -32,12 +32,10 @@ const getLinkSuccess = (state, { payload }) => {
   }
 }
 
-const getLinkFailure = (state, { payload }) => {
-  return {
-    ...state,
-    link: payload.link || {},
-  }
-}
+const getLinkFailure = (state, { payload }) => ({
+  ...state,
+  link: payload.link || {},
+})
 
 const updateLinkSuccess = (state, { link }) => {
   const newLink = { ...state.link, ...link }
@@ -48,12 +46,10 @@ const updateLinkSuccess = (state, { link }) => {
   }
 }
 
-const deleteLinkSuccess = state => {
-  return {
-    ...state,
-    link: {},
-  }
-}
+const deleteLinkSuccess = state => ({
+  ...state,
+  link: {},
+})
 
 const link = (state = defaultProps, action) => {
   switch (action.type) {

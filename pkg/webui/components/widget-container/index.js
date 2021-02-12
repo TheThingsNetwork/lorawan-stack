@@ -23,27 +23,25 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './widget-container.styl'
 
-const WidgetContainer = ({ children, title, toAllUrl, linkMessage, className }) => {
-  return (
-    <aside className={classnames(style.container, className)}>
-      <div className={style.header}>
-        {typeof title === 'object' && 'id' in title ? (
-          <Message content={title} className={style.headerTitle} />
-        ) : (
-          title
-        )}
-        <Link className={style.seeAllLink} secondary to={toAllUrl}>
-          <Message content={linkMessage} /> →
-        </Link>
-      </div>
-      <div className={style.body}>
-        <Link className={style.bodyLink} to={toAllUrl}>
-          {children}
-        </Link>
-      </div>
-    </aside>
-  )
-}
+const WidgetContainer = ({ children, title, toAllUrl, linkMessage, className }) => (
+  <aside className={classnames(style.container, className)}>
+    <div className={style.header}>
+      {typeof title === 'object' && 'id' in title ? (
+        <Message content={title} className={style.headerTitle} />
+      ) : (
+        title
+      )}
+      <Link className={style.seeAllLink} secondary to={toAllUrl}>
+        <Message content={linkMessage} /> →
+      </Link>
+    </div>
+    <div className={style.body}>
+      <Link className={style.bodyLink} to={toAllUrl}>
+        {children}
+      </Link>
+    </div>
+  </aside>
+)
 
 WidgetContainer.propTypes = {
   children: PropTypes.node.isRequired,

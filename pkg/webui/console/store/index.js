@@ -36,9 +36,7 @@ if (env.sentryDsn) {
     createSentryMiddleware(Sentry, {
       actionTransformer: action => omitDeep(action, sensitiveFields),
       stateTransformer: state => omitDeep(state, sensitiveFields),
-      getUserContext: state => {
-        return { user_id: state.user.user.ids.user_id }
-      },
+      getUserContext: state => ({ user_id: state.user.user.ids.user_id }),
     }),
     ...middlewares,
   ]

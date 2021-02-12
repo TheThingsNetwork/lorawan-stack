@@ -17,19 +17,17 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { parseLorawanMacVersion, ACTIVATION_MODES } from '@console/lib/device-utils'
 
-const factoryPresetFreqNumericTest = frequencies => {
-  return frequencies.every(freq => {
+const factoryPresetFreqNumericTest = frequencies =>
+  frequencies.every(freq => {
     if (typeof freq !== 'undefined') {
       return !isNaN(parseInt(freq))
     }
 
     return true
   })
-}
 
-const factoryPresetFreqRequiredTest = frequencies => {
-  return frequencies.every(freq => typeof freq !== 'undefined' && freq !== '')
-}
+const factoryPresetFreqRequiredTest = frequencies =>
+  frequencies.every(freq => typeof freq !== 'undefined' && freq !== '')
 
 const validationSchema = Yup.object()
   .shape({
@@ -121,8 +119,8 @@ const validationSchema = Yup.object()
     ),
     mac_settings: Yup.object().when(
       ['_activation_mode', 'supports_class_b'],
-      (mode, isClassB, schema) => {
-        return schema.shape({
+      (mode, isClassB, schema) =>
+        schema.shape({
           rx1_delay: Yup.lazy(delay => {
             if (
               !Boolean(delay) ||
@@ -213,8 +211,7 @@ const validationSchema = Yup.object()
               )
           }),
           supports_32_bit_f_cnt: Yup.boolean().default(true),
-        })
-      },
+        }),
     ),
   })
   .noUnknown()

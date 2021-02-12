@@ -73,16 +73,16 @@ const validationSchema = Yup.object()
           return schema.strip()
         }
 
-        const keySchema = Yup.lazy(() => {
-          return !externalJs
+        const keySchema = Yup.lazy(() =>
+          !externalJs
             ? Yup.object().shape({
                 key: Yup.string()
                   .emptyOrLength(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
                   .transform(toUndefined)
                   .default(generate16BytesKey),
               })
-            : Yup.object().strip()
-        })
+            : Yup.object().strip(),
+        )
 
         if (externalJs) {
           return schema.shape({

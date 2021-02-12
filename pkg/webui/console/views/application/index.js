@@ -69,15 +69,13 @@ import {
 } from '@console/store/selectors/applications'
 
 @connect(
-  (state, props) => {
-    return {
-      appId: props.match.params.appId,
-      fetching: selectApplicationFetching(state) || selectApplicationRightsFetching(state),
-      application: selectSelectedApplication(state),
-      error: selectApplicationError(state) || selectApplicationRightsError(state),
-      rights: selectApplicationRights(state),
-    }
-  },
+  (state, props) => ({
+    appId: props.match.params.appId,
+    fetching: selectApplicationFetching(state) || selectApplicationRightsFetching(state),
+    application: selectSelectedApplication(state),
+    error: selectApplicationError(state) || selectApplicationRightsError(state),
+    rights: selectApplicationRights(state),
+  }),
   dispatch => ({
     stopStream: id => dispatch(stopApplicationEventsStream(id)),
     loadData: id => {

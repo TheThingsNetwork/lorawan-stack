@@ -29,29 +29,27 @@ import RawEventDetails from './raw'
 
 import style from './details.styl'
 
-const SyntheticEventDetails = ({ event }) => {
-  return (
-    <>
-      <Notification content={messages.syntheticEvent} info small />
-      {eventMessages[`${event.name}:details`] && (
-        <div>
-          <Message
-            component="h3"
-            content={eventMessages[`${event.name}:type`]}
-            className={style.eventType}
-          />
-          <Message
-            component="p"
-            content={eventMessages[`${event.name}:details`]}
-            className={style.eventDescription}
-          />
-        </div>
-      )}
-      <Message component="h4" content={messages.rawEvent} />
-      <RawEventDetails className={style.codeEditor} details={event} id={getEventId(event)} />
-    </>
-  )
-}
+const SyntheticEventDetails = ({ event }) => (
+  <>
+    <Notification content={messages.syntheticEvent} info small />
+    {eventMessages[`${event.name}:details`] && (
+      <div>
+        <Message
+          component="h3"
+          content={eventMessages[`${event.name}:type`]}
+          className={style.eventType}
+        />
+        <Message
+          component="p"
+          content={eventMessages[`${event.name}:details`]}
+          className={style.eventDescription}
+        />
+      </div>
+    )}
+    <Message component="h4" content={messages.rawEvent} />
+    <RawEventDetails className={style.codeEditor} details={event} id={getEventId(event)} />
+  </>
+)
 
 SyntheticEventDetails.propTypes = {
   event: PropTypes.event.isRequired,

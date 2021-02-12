@@ -26,16 +26,16 @@ const validationSchema = Yup.object()
       ['$externalJs', '$lorawanVersion', '$mayEditKeys', '$mayEditkeys'],
       (externalJs, lorawanVersion, mayEditKeys, mayReadKeys, schema) => {
         const strippedSchema = Yup.object().strip()
-        const keySchema = Yup.lazy(value => {
-          return !externalJs && Boolean(value) && Boolean(value.key)
+        const keySchema = Yup.lazy(value =>
+          !externalJs && Boolean(value) && Boolean(value.key)
             ? Yup.object().shape({
                 key: Yup.string().emptyOrLength(
                   16 * 2,
                   Yup.passValues(sharedMessages.validateLength),
                 ), // 16 Byte hex.
               })
-            : Yup.object().strip()
-        })
+            : Yup.object().strip(),
+        )
 
         if (!mayEditKeys && !mayReadKeys) {
           return schema.strip()

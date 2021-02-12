@@ -34,34 +34,32 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './front.styl'
 
-const FrontView = ({ location }) => {
-  return (
-    <div className={style.container}>
-      <section className={style.content}>
-        <Header />
-        <div className={style.main}>
-          <Switch>
-            <Route path="/login" component={Login} />
-            <Route path="/register" component={CreateAccount} />
-            <Route path="/forgot-password" component={ForgotPassword} />
-            <Route path="/update-password" component={UpdatePassword} />
-            <Route path="/validate" component={Validate} />
-            <Route path="/code" component={Code} />
-            <Redirect exact from="/" to="/login" />
-            {authRoutes.map(({ path, exact }) => (
-              <Route path={path} exact={exact} key={path}>
-                <Redirect to={`/login?n=${selectApplicationRootPath()}${location.pathname}`} />
-              </Route>
-            ))}
-            <Route component={FrontNotFound} />
-          </Switch>
-        </div>
-      </section>
-      <section className={style.visual} />
-      <Footer className={style.footer} />
-    </div>
-  )
-}
+const FrontView = ({ location }) => (
+  <div className={style.container}>
+    <section className={style.content}>
+      <Header />
+      <div className={style.main}>
+        <Switch>
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={CreateAccount} />
+          <Route path="/forgot-password" component={ForgotPassword} />
+          <Route path="/update-password" component={UpdatePassword} />
+          <Route path="/validate" component={Validate} />
+          <Route path="/code" component={Code} />
+          <Redirect exact from="/" to="/login" />
+          {authRoutes.map(({ path, exact }) => (
+            <Route path={path} exact={exact} key={path}>
+              <Redirect to={`/login?n=${selectApplicationRootPath()}${location.pathname}`} />
+            </Route>
+          ))}
+          <Route component={FrontNotFound} />
+        </Switch>
+      </div>
+    </section>
+    <section className={style.visual} />
+    <Footer className={style.footer} />
+  </div>
+)
 
 FrontView.propTypes = {
   location: PropTypes.location.isRequired,
