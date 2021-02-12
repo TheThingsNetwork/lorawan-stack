@@ -11,23 +11,13 @@
   "license": "Apache-2.0",
   "private": false,
   "scripts": {
-    "build": "rm -rf dist; babel src -d dist",
-    "build:watch": "rm -rf dist; babel -w src -d dist",
-    "test": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/",
-    "test:watch": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/ --watch",
+    "build": "rm -rf dist; yarn --cwd=\"../..\" babel --config-file=\"./sdk/js/.babelrc\" ./sdk/js/src -d ./sdk/js/dist",
+    "build:watch": "rm -rf dist; yarn --cwd=\"../..\" babel --config-file=\"./sdk/js/.babelrc\" -w ./sdk/js/src -d ./sdk/jsdist",
+    "test": "../../node_modules/.bin/jest",
+    "test:watch": "../../node_modules/.bin/jest --watch",
     "definitions": "node util/http-mapper.js",
-    "fmt": "prettier './src/**/*.js' './util/**/*.js' --write",
-    "lint": "eslint './src/**/**.js' './util/**/*.js' --no-ignore --color"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.7.0",
-    "@babel/core": "^7.7.2",
-    "@babel/plugin-transform-runtime": "^7.6.2",
-    "@babel/plugin-transform-strict-mode": "^7.2.0",
-    "@babel/preset-env": "^7.11.0",
-    "eslint": "^6.2.2",
-    "jest": "^25.2.7",
-    "prettier": "^1.18.2"
+    "fmt": "yarn --cwd=\"../..\" prettier './sdk/js/src/**/*.js' './sdk/js/util/**/*.js' --write",
+    "lint": "yarn --cwd=\"../..\" eslint './sdk/js/src/**/**.js' './sdk/js/util/**/*.js' --no-ignore --color"
   },
   "eslintConfig": {
     "extends": "../../config/eslintrc.yaml",
@@ -48,6 +38,17 @@
           "classes": false
         }
       ]
+    }
+  },
+  "jest": {
+    "setupFiles": [
+      "<rootDir>/../../config/jest/setup.js"
+    ],
+    "testMatch": [
+      "<rootDir>/src/**/*.test.js"
+    ],
+    "transform": {
+      "^.+\\.js$": "babel-jest"
     }
   },
   "prettier": "../../config/.prettierrc.js",
