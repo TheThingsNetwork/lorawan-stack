@@ -54,6 +54,8 @@ func main() {
 		pb = &ttnpb.GatewayConnectionStats{}
 	case "ttnpb.ApplicationActivationSettings":
 		pb = &ttnpb.ApplicationActivationSettings{}
+	case "ttnpb.UplinkToken":
+		pb = &ttnpb.UplinkToken{}
 	default:
 		log.Printf("Unknown type: `%s`", *typ)
 		flag.Usage()
