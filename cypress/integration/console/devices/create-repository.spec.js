@@ -129,16 +129,16 @@ describe('End device repository create', () => {
         cy.findDescriptionByLabelText('Frequency plan')
           .should('contain', 'The frequency plan used by the end device')
           .and('be.visible')
-        cy.findByLabelText('DevEUI').should('be.visible')
-        cy.findDescriptionByLabelText('DevEUI')
-          .should('contain', 'The DevEUI is the unique identifier for this end device')
-          .and('be.visible')
         cy.findByLabelText('AppEUI').should('be.visible')
         cy.findDescriptionByLabelText('AppEUI')
           .should(
             'contain',
             'The AppEUI uniquely identifies the owner of the end device. If no AppEUI is provided by the device manufacturer (usually for development), it can be filled with zeros.',
           )
+          .and('be.visible')
+        cy.findByLabelText('DevEUI').should('be.visible')
+        cy.findDescriptionByLabelText('DevEUI')
+          .should('contain', 'The DevEUI is the unique identifier for this end device')
           .and('be.visible')
         cy.findByLabelText('AppKey').should('be.visible')
         cy.findDescriptionByLabelText('AppKey')
@@ -157,16 +157,39 @@ describe('End device repository create', () => {
       })
 
       it('succeeds registering the things uno', () => {
-        const devId = 'the-things-uno-test'
+        const devEui = generateHexValue(16)
 
         selectUno()
 
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
-        cy.findByLabelText('DevEUI').type(generateHexValue(16))
         cy.findByLabelText('AppEUI').type(generateHexValue(16))
+        cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').type(devId)
+        cy.findByLabelText('End device ID').should('have.value', devEui)
+
+        cy.findByRole('button', { name: 'Register end device' }).click()
+
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${devEui}`,
+        )
+        cy.findByTestId('full-error-view').should('not.exist')
+      })
+
+      it('succeeds registering the things uno with custom ID', () => {
+        const devId = 'uno-custom-id'
+
+        selectUno()
+
+        // End device registration.
+        cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
+        cy.findByLabelText('AppEUI').type(generateHexValue(16))
+        cy.findByLabelText('DevEUI').type(generateHexValue(16))
+        cy.findByLabelText('AppKey').type(generateHexValue(32))
+        cy.findByLabelText('End device ID')
+          .clear()
+          .type(devId)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
@@ -178,28 +201,28 @@ describe('End device repository create', () => {
       })
 
       it('succeeds registering the things node', () => {
-        const devId = 'the-things-node-test'
+        const devEui = generateHexValue(16)
 
         selectNode()
 
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
-        cy.findByLabelText('DevEUI').type(generateHexValue(16))
+        cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppEUI').type(generateHexValue(16))
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').type(devId)
+        cy.findByLabelText('End device ID').should('have.value', devEui)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${devId}`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${devEui}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
 
       it('succeeds registering two the things uno', () => {
-        const devId1 = 'the-things-uno-test-1'
+        const devEui1 = generateHexValue(16)
 
         // End device selection.
         selectUno()
@@ -207,9 +230,9 @@ describe('End device repository create', () => {
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
         cy.findByLabelText('AppEUI').type(generateHexValue(16))
-        cy.findByLabelText('DevEUI').type(generateHexValue(16))
+        cy.findByLabelText('DevEUI').type(devEui1)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').type(devId1)
+        cy.findByLabelText('End device ID').should('have.value', devEui1)
         cy.findByLabelText('Register another end device of this type').check()
 
         cy.findByRole('button', { name: 'Register end device' }).click()
@@ -219,19 +242,19 @@ describe('End device repository create', () => {
           .findByText('End device registered')
           .should('be.visible')
 
-        const devId2 = 'the-things-uno-test-2'
+        const devEui2 = generateHexValue(16)
 
         // End device registration.
-        cy.findByLabelText('DevEUI').type(generateHexValue(16))
+        cy.findByLabelText('DevEUI').type(devEui2)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').type(devId2)
+        cy.findByLabelText('End device ID').should('have.value', devEui2)
         cy.findByLabelText('View registered end device').check()
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${devId2}`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${devEui2}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
