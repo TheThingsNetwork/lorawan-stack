@@ -299,22 +299,55 @@ func TestUsersCRUD(t *testing.T) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		updateTime := time.Now()
-		updatedName := "updated user name"
-
 		updated, err := reg.Update(ctx, &ttnpb.UpdateUserRequest{
 			User: ttnpb.User{
 				UserIdentifiers: user.UserIdentifiers,
-				Name:            updatedName,
+				Name:            "Updated Name",
 			},
-			FieldMask: types.FieldMask{Paths: []string{"name", "created_at", "updated_at"}},
+			FieldMask: types.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
-			a.So(updated.Name, should.Equal, updatedName)
-			a.So(updated.CreatedAt, should.Equal, user.CreatedAt)
-			a.So(updated.UpdatedAt, should.HappenAfter, updateTime)
+			a.So(updated.Name, should.Equal, "Updated Name")
+		}
+
+		updated, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
+			User: ttnpb.User{
+				UserIdentifiers:  user.UserIdentifiers,
+				State:            ttnpb.STATE_FLAGGED,
+				StateDescription: "something is wrong",
+			},
+			FieldMask: types.FieldMask{Paths: []string{"state", "state_description"}},
+		}, userCreds(adminUserIdx))
+
+		a.So(err, should.BeNil)
+		if a.So(updated, should.NotBeNil) {
+			a.So(updated.State, should.Equal, ttnpb.STATE_FLAGGED)
+			a.So(updated.StateDescription, should.Equal, "something is wrong")
+		}
+
+		updated, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
+			User: ttnpb.User{
+				UserIdentifiers: user.UserIdentifiers,
+				State:           ttnpb.STATE_APPROVED,
+			},
+			FieldMask: types.FieldMask{Paths: []string{"state"}},
+		}, userCreds(adminUserIdx))
+
+		a.So(err, should.BeNil)
+		if a.So(updated, should.NotBeNil) {
+			a.So(updated.State, should.Equal, ttnpb.STATE_APPROVED)
+		}
+
+		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
+			UserIdentifiers: user.UserIdentifiers,
+			FieldMask:       types.FieldMask{Paths: []string{"state", "state_description"}},
+		}, creds)
+
+		if a.So(err, should.BeNil) {
+			a.So(got.State, should.Equal, ttnpb.STATE_APPROVED)
+			a.So(got.StateDescription, should.Equal, "")
 		}
 
 		passwordUpdateTime := time.Now()
