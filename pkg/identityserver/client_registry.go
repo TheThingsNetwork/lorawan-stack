@@ -109,6 +109,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 
 	if !createdByAdmin {
 		req.Client.State = ttnpb.STATE_REQUESTED
+		req.Client.StateDescription = "admin approval required"
 		req.Client.SkipAuthorization = false
 		req.Client.Endorsed = false
 	}

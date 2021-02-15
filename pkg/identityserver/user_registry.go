@@ -146,6 +146,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		req.User.RequirePasswordUpdate = false
 		if config.UserRegistration.AdminApproval.Required {
 			req.User.State = ttnpb.STATE_REQUESTED
+			req.User.StateDescription = "admin approval required"
 		} else {
 			req.User.State = ttnpb.STATE_APPROVED
 		}
