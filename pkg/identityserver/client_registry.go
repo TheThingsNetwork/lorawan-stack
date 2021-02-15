@@ -271,6 +271,13 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 		}
 	}
 
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "state_description") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "state_description")
+			req.StateDescription = ""
+		}
+	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		cli, err = store.GetClientStore(db).UpdateClient(ctx, &req.Client, &req.FieldMask)
 		if err != nil {

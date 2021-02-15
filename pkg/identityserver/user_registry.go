@@ -380,6 +380,13 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		cleanContactInfo(req.User.ContactInfo)
 	}
 
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "state_description") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "state_description")
+			req.StateDescription = ""
+		}
+	}
+
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "temporary_password") {
 		hashedTemporaryPassword, err := auth.Hash(ctx, req.User.TemporaryPassword)
 		if err != nil {
