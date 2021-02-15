@@ -371,7 +371,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 			switch path {
 			case "primary_email_address_validated_at",
 				"require_password_update",
-				"state", "admin",
+				"state", "state_description", "admin",
 				"temporary_password", "temporary_password_created_at", "temporary_password_expires_at":
 				return nil, errUpdateUserAdminField.WithAttributes("field", path)
 			}

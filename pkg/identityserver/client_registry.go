@@ -265,7 +265,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	if !updatedByAdmin {
 		for _, path := range req.FieldMask.Paths {
 			switch path {
-			case "state", "skip_authorization", "endorsed", "grants":
+			case "state", "state_description", "skip_authorization", "endorsed", "grants":
 				return nil, errUpdateUserAdminField.WithAttributes("field", path)
 			}
 		}
