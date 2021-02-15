@@ -1770,7 +1770,8 @@ An OAuth client on the network.
 | `secret` | [`string`](#string) |  | The client secret is only visible to collaborators of the client. |
 | `redirect_uris` | [`string`](#string) | repeated | The allowed redirect URIs against which authorization requests are checked. If the authorization request does not pass a redirect URI, the first one from this list is taken. |
 | `logout_redirect_uris` | [`string`](#string) | repeated | The allowed logout redirect URIs against which client initiated logout requests are checked. If the authorization request does not pass a redirect URI, the first one from this list is taken. |
-| `state` | [`State`](#ttn.lorawan.v3.State) |  | The reviewing state of the client. This field can only be modified by admins. |
+| `state` | [`State`](#ttn.lorawan.v3.State) |  | The reviewing state of the client. This field can only be modified by admins. If state_description is not updated when updating state, state_description is cleared. |
+| `state_description` | [`string`](#string) |  | A description for the state field. This field can only be modified by admins, and should typically only be updated when also updating `state`. |
 | `skip_authorization` | [`bool`](#bool) |  | If set, the authorization page will be skipped. This field can only be modified by admins. |
 | `endorsed` | [`bool`](#bool) |  | If set, the authorization page will show endorsement. This field can only be modified by admins. |
 | `grants` | [`GrantType`](#ttn.lorawan.v3.GrantType) | repeated | OAuth flows that can be used for the client to get a token. After a client is created, this field can only be modified by admins. |
@@ -1789,6 +1790,7 @@ An OAuth client on the network.
 | `redirect_uris` | <p>`repeated.max_items`: `10`</p><p>`repeated.items.string.max_len`: `128`</p> |
 | `logout_redirect_uris` | <p>`repeated.max_items`: `10`</p><p>`repeated.items.string.max_len`: `128`</p> |
 | `state` | <p>`enum.defined_only`: `true`</p> |
+| `state_description` | <p>`string.max_len`: `128`</p> |
 | `grants` | <p>`repeated.items.enum.defined_only`: `true`</p> |
 | `rights` | <p>`repeated.items.enum.defined_only`: `true`</p> |
 
@@ -7173,6 +7175,7 @@ User is the message that defines a user on the network.
 | `password_updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `require_password_update` | [`bool`](#bool) |  |  |
 | `state` | [`State`](#ttn.lorawan.v3.State) |  | The reviewing state of the user. This field can only be modified by admins. |
+| `state_description` | [`string`](#string) |  | A description for the state field. This field can only be modified by admins, and should typically only be updated when also updating `state`. |
 | `admin` | [`bool`](#bool) |  | This user is an admin. This field can only be modified by other admins. |
 | `temporary_password` | [`string`](#string) |  | The temporary password can only be used to update a user's password; never returned on API calls. It is not returned on API calls, and can not be updated by updating the User. See the CreateTemporaryPassword method of the UserRegistry service for more information. |
 | `temporary_password_created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
@@ -7191,6 +7194,7 @@ User is the message that defines a user on the network.
 | `primary_email_address` | <p>`string.email`: `true`</p> |
 | `password` | <p>`string.max_len`: `1000`</p> |
 | `state` | <p>`enum.defined_only`: `true`</p> |
+| `state_description` | <p>`string.max_len`: `128`</p> |
 | `temporary_password` | <p>`string.max_len`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.User.AttributesEntry">Message `User.AttributesEntry`</a>

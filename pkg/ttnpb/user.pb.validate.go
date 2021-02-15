@@ -228,6 +228,15 @@ func (m *User) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "state_description":
+
+			if utf8.RuneCountInString(m.GetStateDescription()) > 128 {
+				return UserValidationError{
+					field:  "state_description",
+					reason: "value length must be at most 128 runes",
+				}
+			}
+
 		case "admin":
 			// no validation rules for Admin
 		case "temporary_password":

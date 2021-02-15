@@ -1678,6 +1678,7 @@
         "rights",
         "skip_authorization",
         "state",
+        "state_description",
         "updated_at"
       ]
     },
@@ -1720,6 +1721,7 @@
         "rights",
         "skip_authorization",
         "state",
+        "state_description",
         "updated_at"
       ]
     },
@@ -1752,6 +1754,7 @@
         "secret",
         "skip_authorization",
         "state",
+        "state_description",
         "updated_at"
       ]
     },
@@ -4159,6 +4162,7 @@
         "rights",
         "skip_authorization",
         "state",
+        "state_description",
         "updated_at"
       ]
     },
@@ -4266,6 +4270,7 @@
         "profile_picture.sizes",
         "require_password_update",
         "state",
+        "state_description",
         "temporary_password_created_at",
         "temporary_password_expires_at",
         "updated_at"
@@ -4415,6 +4420,7 @@
         "profile_picture.sizes",
         "require_password_update",
         "state",
+        "state_description",
         "temporary_password_created_at",
         "temporary_password_expires_at",
         "updated_at"
@@ -4450,6 +4456,7 @@
         "profile_picture.sizes",
         "require_password_update",
         "state",
+        "state_description",
         "temporary_password_created_at",
         "temporary_password_expires_at",
         "updated_at"
@@ -4487,6 +4494,7 @@
         "profile_picture.sizes",
         "require_password_update",
         "state",
+        "state_description",
         "temporary_password",
         "temporary_password_created_at",
         "temporary_password_expires_at",

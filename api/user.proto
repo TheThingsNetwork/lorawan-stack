@@ -67,6 +67,10 @@ message User {
   // The reviewing state of the user.
   // This field can only be modified by admins.
   State state = 13 [(validate.rules).enum.defined_only = true];
+  // A description for the state field.
+  // This field can only be modified by admins, and should typically only be updated
+  // when also updating `state`.
+  string state_description = 20 [(validate.rules).string.max_len = 128];
   // This user is an admin.
   // This field can only be modified by other admins.
   bool admin = 14;
@@ -80,7 +84,7 @@ message User {
 
   Picture profile_picture = 18;
 
-  // next: 20
+  // next: 21
 }
 
 message Users {

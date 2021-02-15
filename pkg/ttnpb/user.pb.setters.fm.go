@@ -155,6 +155,16 @@ func (dst *User) SetFields(src *User, paths ...string) error {
 				var zero State
 				dst.State = zero
 			}
+		case "state_description":
+			if len(subs) > 0 {
+				return fmt.Errorf("'state_description' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.StateDescription = src.StateDescription
+			} else {
+				var zero string
+				dst.StateDescription = zero
+			}
 		case "admin":
 			if len(subs) > 0 {
 				return fmt.Errorf("'admin' has no subfields, but %s were specified", subs)
