@@ -57,12 +57,14 @@ class Input extends React.Component {
     }).isRequired,
     label: PropTypes.string,
     loading: PropTypes.bool,
+    max: PropTypes.number,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
     onEnter: PropTypes.func,
     onFocus: PropTypes.func,
     placeholder: PropTypes.message,
     readOnly: PropTypes.bool,
+    showPerChar: PropTypes.bool,
     title: PropTypes.message,
     type: PropTypes.string,
     valid: PropTypes.bool,
@@ -78,16 +80,19 @@ class Input extends React.Component {
     component: 'input',
     disabled: false,
     error: false,
-    inputWidth: 'm',
+    /** Default `inputWidth` value is set programmatically based on input type. */
+    inputWidth: undefined,
     icon: undefined,
     label: undefined,
     loading: false,
+    max: undefined,
     onFocus: () => null,
     onBlur: () => null,
     onChange: () => null,
     onEnter: () => null,
     placeholder: undefined,
     readOnly: false,
+    showPerChar: false,
     title: undefined,
     type: 'text',
     valid: false,
@@ -144,14 +149,22 @@ class Input extends React.Component {
       action,
       forwardedRef,
       autoComplete,
+      showPerChar,
       ...rest
     } = this.props
 
     const { focus } = this.state
+    const inputWidthValue = inputWidth || (type === 'byte' ? undefined : 'm')
 
     let Component = component
+    let inputStyle
     if (type === 'byte') {
       Component = ByteInput
+      const { max } = this.props
+      if (!inputWidthValue && max) {
+        const maxValue = showPerChar ? Math.ceil(max / 2) : max
+        inputStyle = { maxWidth: maxValue === 16 ? '30rem' : `${maxValue * 1.8 + 0.65}rem` }
+      }
     } else if (type === 'textarea') {
       Component = 'textarea'
     }
@@ -169,7 +182,8 @@ class Input extends React.Component {
     const v = valid && (Component.validate ? Component.validate(value, this.props) : true)
     const hasAction = Boolean(action)
 
-    const inputCls = classnames(style.inputBox, style[`input-width-${inputWidth}`], {
+    const inputCls = classnames(style.inputBox, {
+      [style[`input-width-${inputWidthValue}`]]: inputWidthValue,
       [style.focus]: focus,
       [style.error]: error,
       [style.readOnly]: readOnly,
@@ -180,9 +194,14 @@ class Input extends React.Component {
       [style.textarea]: type === 'textarea',
     })
 
+    const passedProps = {
+      ...rest,
+      ...(type === 'byte' ? { showPerChar } : {}),
+    }
+
     return (
       <div className={classnames(className, style.container)}>
-        <div className={inputCls}>
+        <div className={inputCls} style={inputStyle}>
           {icon && <Icon className={style.icon} icon={icon} />}
           <Component
             ref={this.input}
@@ -199,7 +218,7 @@ class Input extends React.Component {
             readOnly={readOnly}
             title={inputTitle}
             autoComplete={autoComplete}
-            {...rest}
+            {...passedProps}
           />
           {v && <Valid show={v} />}
           {loading && <Spinner className={style.spinner} small />}
@@ -245,7 +264,7 @@ class Input extends React.Component {
   }
 }
 
-const Valid = function(props) {
+const Valid = props => {
   const classname = classnames(style.valid, {
     [style.show]: props.show,
   })
