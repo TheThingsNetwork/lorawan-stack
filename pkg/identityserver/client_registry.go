@@ -299,7 +299,11 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
 		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 			data.SetEntity(req.EntityIdentifiers())
-			return &emails.EntityStateChanged{Data: data, State: strings.ToLower(strings.TrimPrefix(cli.State.String(), "STATE_"))}
+			return &emails.EntityStateChanged{
+				Data:             data,
+				State:            strings.ToLower(strings.TrimPrefix(cli.State.String(), "STATE_")),
+				StateDescription: cli.StateDescription,
+			}
 		})
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Error("Could not send state change notification email")
