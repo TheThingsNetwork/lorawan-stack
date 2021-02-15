@@ -19,11 +19,14 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- Handling of `DLChannelReq` if dependent `NewChannelReq` was previously rejected.
+### Security
+
+## [3.10.10] - 2021-02-15
+
+### Fixed
+
 - Synchronization in Gateway Server scheduler that caused race conditions in scheduling downlink traffic.
 - Handling of `DLChannelReq` if dependent `NewChannelReq` was previously rejected.
-
-### Security
 
 ## [3.10.7] - 2021-01-14
 
@@ -1262,7 +1265,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.7...v3.10
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.10...v3.10
+[3.10.10]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.7...v3.10.10
 [3.10.7]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.6...v3.10.7
 [3.10.6]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.5...v3.10.6
 [3.10.5]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.4...v3.10.5
