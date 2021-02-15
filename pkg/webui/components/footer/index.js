@@ -37,7 +37,7 @@ const Footer = ({ className, documentationLink, links, supportLink, onlineStatus
       <span className={style.claim}>
         <Message content={m.footer} /> –{' '}
       </span>
-      <Link.Anchor secondary className={style.link} href="https://www.thethingsnetwork.org">
+      <Link.Anchor secondary className={style.link} href="https://www.thethingsindustries.com/docs">
         The Things Network
       </Link.Anchor>
     </div>
