@@ -27,6 +27,7 @@ const messages = defineMessages({
   metrics: 'Metrics',
   versions: 'Versions',
   snr: 'SNR',
+  rssi: 'RSSI',
   sessionKeyId: 'Session key ID',
   selectedMacVersion: 'Selected MAC version',
   rx1Delay: 'Rx1 Delay',

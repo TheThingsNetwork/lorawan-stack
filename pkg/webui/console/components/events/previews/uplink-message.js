@@ -24,7 +24,7 @@ import DescriptionList from './shared/description-list'
 
 const UplinkMessagePreview = React.memo(({ event }) => {
   const { data } = event
-  let frmPayload, fPort, snr, devAddr, fCnt, joinEui, devEui
+  let frmPayload, fPort, snr, devAddr, fCnt, joinEui, devEui, rssi
 
   if ('payload' in data && 'mac_payload' in data.payload) {
     devAddr = getByPath(data, 'payload.mac_payload.f_hdr.dev_addr')
@@ -40,6 +40,7 @@ const UplinkMessagePreview = React.memo(({ event }) => {
 
   if ('rx_metadata' in data) {
     snr = data.rx_metadata[0].snr
+    rssi = data.rx_metadata[0].rssi
   }
 
   const rawPayload = getByPath(data, 'raw_payload')
@@ -55,6 +56,7 @@ const UplinkMessagePreview = React.memo(({ event }) => {
       <DescriptionList.Byte title={messages.MACPayload} data={frmPayload} convertToHex />
       <DescriptionList.Item title={messages.bandwidth} data={bandwidth} />
       <DescriptionList.Item title={messages.snr} data={snr} />
+      <DescriptionList.Item title={messages.rssi} data={rssi} />
       <DescriptionList.Byte title={messages.rawPayload} data={rawPayload} convertToHex />
     </DescriptionList>
   )

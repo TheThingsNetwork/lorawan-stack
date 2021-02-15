@@ -136,6 +136,7 @@
   "console.components.events.messages.metrics": "Metrics",
   "console.components.events.messages.versions": "Versions",
   "console.components.events.messages.snr": "SNR",
+  "console.components.events.messages.rssi": "RSSI",
   "console.components.events.messages.sessionKeyId": "Session key ID",
   "console.components.events.messages.selectedMacVersion": "Selected MAC version",
   "console.components.events.messages.rx1Delay": "Rx1 Delay",

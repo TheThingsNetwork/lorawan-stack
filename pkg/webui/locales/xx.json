@@ -136,6 +136,7 @@
   "console.components.events.messages.metrics": "Xxxxxxx",
   "console.components.events.messages.versions": "Xxxxxxxx",
   "console.components.events.messages.snr": "XXX",
+  "console.components.events.messages.rssi": "XXXX",
   "console.components.events.messages.sessionKeyId": "Xxxxxxx xxx XX",
   "console.components.events.messages.selectedMacVersion": "Xxxxxxxx XXX xxxxxxx",
   "console.components.events.messages.rx1Delay": "Xxx Xxxxx",
