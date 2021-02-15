@@ -53,7 +53,9 @@ func TestEntityAccess(t *testing.T) {
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(rejectedUserIdx), grpc.Header(&md))
 
 			a.So(err, should.BeNil)
-			a.So(md.Get("warning"), should.Contain, "Restricted rights after account rejection")
+			if warnings := md.Get("warning"); a.So(warnings, should.HaveLength, 1) {
+				a.So(warnings[0], should.ContainSubstring, "Restricted rights after account rejection")
+			}
 			if a.So(authInfo.GetAPIKey(), should.NotBeNil) {
 				rights := ttnpb.RightsFrom(authInfo.GetAPIKey().GetRights()...)
 				a.So(rights.IncludesAll(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_DELETE), should.BeTrue)
@@ -66,7 +68,9 @@ func TestEntityAccess(t *testing.T) {
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(suspendedUserIdx), grpc.Header(&md))
 
 			a.So(err, should.BeNil)
-			a.So(md.Get("warning"), should.Contain, "Restricted rights after account suspension")
+			if warnings := md.Get("warning"); a.So(warnings, should.HaveLength, 1) {
+				a.So(warnings[0], should.ContainSubstring, "Restricted rights after account suspension")
+			}
 			if a.So(authInfo.GetAPIKey(), should.NotBeNil) {
 				rights := ttnpb.RightsFrom(authInfo.GetAPIKey().GetRights()...)
 				a.So(rights.IncludesAll(ttnpb.RIGHT_USER_INFO), should.BeTrue)
