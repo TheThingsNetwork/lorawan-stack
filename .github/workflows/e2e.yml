@@ -20,6 +20,8 @@ jobs:
   end-to-end:
     name: Frontend based (cypress)
     runs-on: ubuntu-18.04
+    env:
+      TTN_LW_LOG_LEVEL: debug
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -57,7 +59,7 @@ jobs:
       - name: Initialize stack environment
         run: tools/bin/mage init
       - name: Run test preparations
-        run: tools/bin/mage dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:sqlDump
+        run: tools/bin/mage -v dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:sqlDump
       - name: Build frontend
         if: steps.public-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage js:build
@@ -69,3 +71,9 @@ jobs:
         with:
           name: logs
           path: .cache/devStack.log
+      - name: Upload screenshots for failed tests
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
