@@ -57,6 +57,7 @@ const (
 	serviceProfileIDField               = "service_profile_id"
 	skipAuthorizationField              = "skip_authorization"
 	stateField                          = "state"
+	stateDescriptionField               = "state_description"
 	statusPublicField                   = "status_public"
 	targetCUPSURIField                  = "target_cups_uri"
 	targetCUPSKeyField                  = "target_cups_key"
