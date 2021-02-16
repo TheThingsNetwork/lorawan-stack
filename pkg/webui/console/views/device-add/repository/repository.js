@@ -125,7 +125,6 @@ const DeviceRepository = props => {
   const validationContext = React.useMemo(
     () => ({
       mayEditKeys,
-      appId,
       asUrl,
       asEnabled,
       jsUrl,
@@ -133,7 +132,7 @@ const DeviceRepository = props => {
       nsUrl,
       nsEnabled,
     }),
-    [appId, asEnabled, asUrl, jsEnabled, jsUrl, mayEditKeys, nsEnabled, nsUrl],
+    [asEnabled, asUrl, jsEnabled, jsUrl, mayEditKeys, nsEnabled, nsUrl],
   )
 
   const handleSubmit = React.useCallback(
