@@ -1565,6 +1565,15 @@
       "file": "end_devices.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:no_receiver_id": {
+    "translations": {
+      "en": "no receiver ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "users.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_template_format_id": {
     "translations": {
       "en": "no template format ID set"
@@ -5145,6 +5154,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "entity_access.go"
+    }
+  },
+  "error:pkg/identityserver:user_single_entity_owner": {
+    "translations": {
+      "en": "deleting user will make the entities orphans: {list}"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
     }
   },
   "error:pkg/identityserver:user_suspended": {
@@ -9326,6 +9344,15 @@
   "event:user.purge": {
     "translations": {
       "en": "purge user"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "event:user.transfer.single_owned_entities": {
+    "translations": {
+      "en": "transfer user single owned entities"
     },
     "description": {
       "package": "pkg/identityserver",

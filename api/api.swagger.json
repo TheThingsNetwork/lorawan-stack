@@ -8484,6 +8484,45 @@
         ]
       }
     },
+    "/users/{user_ids.user_id}/transfer/{receiver_ids.user_id}": {
+      "post": {
+        "summary": "Transfer all rights that the user has on entities to another user.",
+        "operationId": "UserRegistry_TransferUserRights",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "receiver_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserRegistry"
+        ]
+      }
+    },
     "/users/{user_id}": {
       "delete": {
         "summary": "Delete the user. This may not release the user ID for reuse.",

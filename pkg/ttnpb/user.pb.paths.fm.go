@@ -170,6 +170,19 @@ var UpdateUserPasswordRequestFieldPathsTopLevel = []string{
 	"revoke_all_access",
 	"user_ids",
 }
+var TransferUserRightsRequestFieldPathsNested = []string{
+	"receiver_ids",
+	"receiver_ids.email",
+	"receiver_ids.user_id",
+	"user_ids",
+	"user_ids.email",
+	"user_ids.user_id",
+}
+
+var TransferUserRightsRequestFieldPathsTopLevel = []string{
+	"receiver_ids",
+	"user_ids",
+}
 var ListUserAPIKeysRequestFieldPathsNested = []string{
 	"limit",
 	"page",

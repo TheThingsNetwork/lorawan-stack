@@ -1113,6 +1113,112 @@ var _ interface {
 	ErrorName() string
 } = UpdateUserPasswordRequestValidationError{}
 
+// ValidateFields checks the field values on TransferUserRightsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *TransferUserRightsRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = TransferUserRightsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "user_ids":
+
+			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return TransferUserRightsRequestValidationError{
+						field:  "user_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "receiver_ids":
+
+			if v, ok := interface{}(&m.ReceiverIds).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return TransferUserRightsRequestValidationError{
+						field:  "receiver_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return TransferUserRightsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// TransferUserRightsRequestValidationError is the validation error returned by
+// TransferUserRightsRequest.ValidateFields if the designated constraints
+// aren't met.
+type TransferUserRightsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TransferUserRightsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TransferUserRightsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TransferUserRightsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TransferUserRightsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TransferUserRightsRequestValidationError) ErrorName() string {
+	return "TransferUserRightsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TransferUserRightsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTransferUserRightsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TransferUserRightsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TransferUserRightsRequestValidationError{}
+
 // ValidateFields checks the field values on ListUserAPIKeysRequest with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
