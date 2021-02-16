@@ -1574,6 +1574,15 @@
       "file": "users.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:no_sender_id": {
+    "translations": {
+      "en": "no sender ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "users.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_template_format_id": {
     "translations": {
       "en": "no template format ID set"
@@ -5073,6 +5082,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "registry_search.go"
+    }
+  },
+  "error:pkg/identityserver:sender_receiver_equal": {
+    "translations": {
+      "en": "sender_id and receiver_id cannot be equal"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
     }
   },
   "error:pkg/identityserver:temporary_password_expired": {
@@ -9350,9 +9368,9 @@
       "file": "user_registry.go"
     }
   },
-  "event:user.transfer.single_owned_entities": {
+  "event:user.transfer.rights": {
     "translations": {
-      "en": "transfer user single owned entities"
+      "en": "transfer user entity rights to receiver"
     },
     "description": {
       "package": "pkg/identityserver",
