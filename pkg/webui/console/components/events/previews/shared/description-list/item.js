@@ -22,7 +22,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './description-list.styl'
 
 const DescriptionListItem = props => {
-  const { className, children, data, title } = props
+  const { className, children, data, title, highlight } = props
   const content = children || data
 
   if (!Boolean(content)) {
@@ -42,7 +42,7 @@ const DescriptionListItem = props => {
       <dt className={style.term}>
         <Message content={title} />
       </dt>
-      <dd className={style.value}>{content}</dd>
+      <dd className={classnames(style.value, { [style.highlight]: highlight })}>{content}</dd>
     </div>
   )
 }
@@ -51,6 +51,7 @@ DescriptionListItem.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   className: PropTypes.string,
   data: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  highlight: PropTypes.bool,
   title: PropTypes.message,
 }
 
@@ -58,6 +59,7 @@ DescriptionListItem.defaultProps = {
   children: undefined,
   data: undefined,
   className: undefined,
+  highlight: false,
   title: undefined,
 }
 
