@@ -524,3 +524,73 @@ func TestDeleteEntityAndAccountMemberships(t *testing.T) {
 		}
 	})
 }
+
+func TestRightsTransfer(t *testing.T) {
+	ctx := test.Context()
+	a := assertions.New(t)
+	WithDB(t, func(t *testing.T, db *gorm.DB) {
+		s := newStore(db)
+		store := GetMembershipStore(db)
+
+		prepareTest(db,
+			&Membership{},
+			&Account{}, &User{}, &Organization{},
+			&Application{}, &Gateway{},
+		)
+		usr := &User{Account: Account{UID: "test-user-1"}}
+		s.createEntity(ctx, usr)
+		usr2 := &User{
+			Account:             Account{UID: "test-user-2"},
+			PrimaryEmailAddress: "test@test.com",
+		}
+		s.createEntity(ctx, usr2)
+		org := &Organization{Account: Account{UID: "test-org-1"}}
+		s.createEntity(ctx, org)
+		app := &Application{ApplicationID: "test-app"}
+		s.createEntity(ctx, app)
+		gtw := &Gateway{GatewayID: "test-gtw"}
+		s.createEntity(ctx, gtw)
+
+		s.createEntity(ctx, &Membership{
+			AccountID:  usr.Account.ID,
+			EntityID:   org.ID,
+			EntityType: "organization",
+			Rights:     Rights{Rights: []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL}},
+		})
+		s.createEntity(ctx, &Membership{
+			AccountID:  usr.Account.ID,
+			EntityID:   app.ID,
+			EntityType: "application",
+			Rights:     Rights{Rights: []ttnpb.Right{ttnpb.RIGHT_ALL}},
+		})
+		s.createEntity(ctx, &Membership{
+			AccountID:  usr.Account.ID,
+			EntityID:   gtw.ID,
+			EntityType: "gateway",
+			Rights:     Rights{Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS}},
+		})
+		s.createEntity(ctx, &Membership{
+			AccountID:  usr2.Account.ID,
+			EntityID:   gtw.ID,
+			EntityType: "gateway",
+			Rights:     Rights{Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS}},
+		})
+		singleOwnedEntities1, err := store.FindSingleOwnerMemberships(ctx, usr.Account.OrganizationOrUserIdentifiers())
+		if a.So(err, should.BeNil) {
+			a.So(singleOwnedEntities1, should.HaveLength, 2)
+		}
+
+		singleOwnedEntities2, err := store.FindSingleOwnerMemberships(ctx, usr2.Account.OrganizationOrUserIdentifiers())
+		if a.So(err, should.BeNil) {
+			a.So(singleOwnedEntities2, should.HaveLength, 1)
+		}
+		allEntities1, err := store.GetAllMemberships(ctx, usr.Account.OrganizationOrUserIdentifiers())
+		if a.So(err, should.BeNil) {
+			a.So(allEntities1, should.HaveLength, 3)
+		}
+		allEntities2, err := store.GetAllMemberships(ctx, usr2.Account.OrganizationOrUserIdentifiers())
+		if a.So(err, should.BeNil) {
+			a.So(allEntities2, should.HaveLength, 1)
+		}
+	})
+}
