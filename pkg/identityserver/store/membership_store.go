@@ -34,26 +34,38 @@ type membershipStore struct {
 	*store
 }
 
-func (s *membershipStore) identifiersFromMembership(ctx context.Context, entityID string, entityType string) (ttnpb.Identifiers, error) {
-	query := s.query(ctx, modelForEntityType(entityType))
-	switch entityType {
-	case "organization":
-		query = query.
-			Joins(`JOIN "accounts" ON "accounts"."account_type" = 'organization' AND "accounts"."account_id" = "organizations"."id"`).
-			Where(`"accounts"."account_type" = ? AND "accounts"."account_id" = ?`, entityType, entityID).
-			Select(`"accounts"."uid" AS "friendly_id"`)
-	default:
-		query = query.
-			Where(fmt.Sprintf(`"%[1]ss"."id" = ?`, entityType), entityID).
-			Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, entityType))
+type memberEntity struct {
+	EntityID   string
+	EntityType string
+}
+
+func (s *membershipStore) entitiesFromMemberships(ctx context.Context, entities []memberEntity) ([]ttnpb.Identifiers, error) {
+	var entityList []ttnpb.Identifiers
+	for _, entity := range entities {
+		query := s.query(ctx, modelForEntityType(entity.EntityType))
+		switch entity.EntityType {
+		case "organization":
+			query = query.
+				Joins(`JOIN "accounts" ON "accounts"."account_type" = 'organization' AND "accounts"."account_id" = "organizations"."id"`).
+				Where(`"accounts"."account_type" = ? AND "accounts"."account_id" = ?`, entity.EntityType, entity.EntityID).
+				Select(`"accounts"."uid" AS "friendly_id"`)
+		default:
+			query = query.
+				Where(fmt.Sprintf(`"%[1]ss"."id" = ?`, entity.EntityType), entity.EntityID).
+				Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, entity.EntityType))
+		}
+		var res struct {
+			FriendlyID string
+		}
+		if err := query.Scan(&res).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				continue
+			}
+			return nil, err
+		}
+		entityList = append(entityList, buildIdentifiers(entity.EntityType, res.FriendlyID))
 	}
-	var res struct {
-		FriendlyID string
-	}
-	if err := query.Scan(&res).Error; err != nil {
-		return nil, err
-	}
-	return buildIdentifiers(entityType, res.FriendlyID), nil
+	return entityList, nil
 }
 
 func (s *membershipStore) queryMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) *gorm.DB {
@@ -344,23 +356,15 @@ func (s *membershipStore) FindSingleOwnerMemberships(ctx context.Context, id *tt
 			pq.Array([]ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL}),
 			pq.Array([]ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL})).
 		Group(`"memberships"."entity_id","memberships"."entity_type"`).Having(`count(id) = ?`, 1)
-	var res []struct {
-		EntityID   string
-		EntityType string
-	}
+	var res []memberEntity
 	if err := query.Scan(&res).Error; err != nil {
 		return nil, err
 	}
-	entityIdentifiers := make([]ttnpb.Identifiers, len(res))
-	for i, identifiers := range res {
-		entityID, err := s.identifiersFromMembership(ctx, identifiers.EntityID, identifiers.EntityType)
-		if err != nil {
-			return nil, err
-		}
-		entityIdentifiers[i] = entityID
+	entities, err := s.entitiesFromMemberships(ctx, res)
+	if err != nil {
+		return nil, err
 	}
-
-	return entityIdentifiers, nil
+	return entities, nil
 }
 
 func (s *membershipStore) GetAllMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers) ([]ttnpb.Identifiers, error) {
@@ -372,21 +376,13 @@ func (s *membershipStore) GetAllMemberships(ctx context.Context, id *ttnpb.Organ
 	query := s.query(ctx, &Membership{}).
 		Select(`"memberships"."entity_id","memberships"."entity_type"`).
 		Where(`"memberships"."account_id" = (?)`, accountQuery)
-	var res []struct {
-		EntityID   string
-		EntityType string
-	}
+	var res []memberEntity
 	if err := query.Scan(&res).Error; err != nil {
 		return nil, err
 	}
-	entityIdentifiers := make([]ttnpb.Identifiers, len(res))
-	for i, identifiers := range res {
-		entityID, err := s.identifiersFromMembership(ctx, identifiers.EntityID, identifiers.EntityType)
-		if err != nil {
-			return nil, err
-		}
-		entityIdentifiers[i] = entityID
+	entities, err := s.entitiesFromMemberships(ctx, res)
+	if err != nil {
+		return nil, err
 	}
-
-	return entityIdentifiers, nil
+	return entities, nil
 }

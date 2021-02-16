@@ -339,6 +339,14 @@ func TestUsersCRUD(t *testing.T) {
 			a.So(*afterUpdate.PasswordUpdatedAt, should.HappenAfter, passwordUpdateTime)
 		}
 
+		adminUser, _ := population.Users[adminUserIdx], userCreds(adminUserIdx)
+		_, err = reg.TransferUserRights(ctx, &ttnpb.TransferUserRightsRequest{
+			UserIdentifiers: user.UserIdentifiers,
+			ReceiverIds:     adminUser.UserIdentifiers,
+		}, creds)
+
+		a.So(err, should.NotBeNil)
+
 		_, err = reg.Delete(ctx, &user.UserIdentifiers, creds)
 
 		a.So(err, should.BeNil)
@@ -372,22 +380,5 @@ func TestUsersCRUD(t *testing.T) {
 
 		_, err = reg.Purge(ctx, &user.UserIdentifiers, userCreds(adminUserIdx))
 		a.So(err, should.BeNil)
-	})
-}
-
-func TestRightsTransfer(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
-
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		reg := ttnpb.NewUserRegistryClient(cc)
-		user, creds := population.Users[defaultUserIdx], userCreds(defaultUserIdx)
-		adminUser, _ := population.Users[adminUserIdx], userCreds(adminUserIdx)
-		_, err := reg.TransferUserRights(ctx, &ttnpb.TransferUserRightsRequest{
-			UserIdentifiers: user.UserIdentifiers,
-			ReceiverIds:     adminUser.UserIdentifiers,
-		}, creds)
-
-		a.So(err, should.NotBeNil)
 	})
 }
