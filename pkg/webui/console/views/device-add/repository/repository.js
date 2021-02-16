@@ -15,7 +15,7 @@
 import React from 'react'
 import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
-import { merge } from 'lodash'
+import { merge, isEqual } from 'lodash'
 
 import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -193,7 +193,7 @@ const DeviceRepository = props => {
 
   React.useEffect(() => {
     const version = selectVersion(state)
-    const versionChanged = version !== versionRef.current
+    const versionChanged = !isEqual(version, versionRef.current)
     // Reset version values if any have changed during end device selection.
     if (formRef.current && versionChanged) {
       formRef.current.setValues(stateToFormValues(state), false)
