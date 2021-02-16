@@ -644,7 +644,7 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 			}
 			return errEntitiesOrphaned.WithAttributes("list", ids)
 		}
-		err := store.GetUserStore(db).DeleteUser(ctx, ids)
+		err = store.GetUserStore(db).DeleteUser(ctx, ids)
 		if err != nil {
 			return err
 		}
