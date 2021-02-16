@@ -69,6 +69,12 @@ var (
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
+	evtUserRightsTransfer = events.Define(
+		"user.transfer.rights", "transfer user entity rights to receiver",
+		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
 )
 
 var (
@@ -81,6 +87,7 @@ var (
 	errPasswordStrengthDigits    = errors.DefineInvalidArgument("password_strength_digits", "need at least `{n}` digit(s)")
 	errPasswordStrengthSpecial   = errors.DefineInvalidArgument("password_strength_special", "need at least `{n}` special character(s)")
 	errAdminsPurgeUsers          = errors.DefinePermissionDenied("admins_purge_users", "users may only be purged by admins")
+	errSenderReceiverEqual       = errors.DefineInvalidArgument("sender_receiver_equal", "sender_id and receiver_id cannot be equal")
 )
 
 func (is *IdentityServer) validatePasswordStrength(ctx context.Context, password string) error {
@@ -619,11 +626,24 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 	return ttnpb.Empty, nil
 }
 
+var errEntitiesOrphaned = errors.DefineFailedPrecondition("user_single_entity_owner", "deleting user will make the entities orphans: {list}")
+
 func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*types.Empty, error) {
 	if err := rights.RequireUser(ctx, *ids, ttnpb.RIGHT_USER_DELETE); err != nil {
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		orphanedEntities, err := store.GetMembershipStore(db).FindSingleOwnerMemberships(ctx, ids.GetOrganizationOrUserIdentifiers())
+		if err != nil {
+			return err
+		}
+		if len(orphanedEntities) > 0 {
+			ids := make([]string, len(orphanedEntities))
+			for i, entity := range orphanedEntities {
+				ids[i] = entity.IDString()
+			}
+			return errEntitiesOrphaned.WithAttributes("list", ids)
+		}
 		err := store.GetUserStore(db).DeleteUser(ctx, ids)
 		if err != nil {
 			return err
@@ -673,6 +693,66 @@ func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifi
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) transferUserRights(ctx context.Context, req *ttnpb.TransferUserRightsRequest) (*types.Empty, error) {
+	if err := rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_ALL); err != nil {
+		return nil, err
+	}
+	if req.UserIdentifiers.GetUserID() == req.ReceiverIds.GetUserID() {
+		return nil, errSenderReceiverEqual
+	}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		entityList, err := store.GetMembershipStore(db).GetAllMemberships(ctx, req.UserIdentifiers.GetOrganizationOrUserIdentifiers())
+		if err != nil {
+			return err
+		}
+		if len(entityList) > 0 {
+			for _, identifiers := range entityList {
+				// If the sender doesn't have rights to set collaborators on the current entity, skip the entity.
+				if err := rights.RequireEntity(ctx, identifiers.EntityIdentifiers(), ttnpb.AllCollaboratorRights.Rights...); err != nil {
+					continue
+				}
+				// Get current sender rights on the entity.
+				senderRights, err := store.GetMembershipStore(db).GetMember(
+					ctx,
+					req.UserIdentifiers.GetOrganizationOrUserIdentifiers(),
+					identifiers,
+				)
+				if err != nil {
+					return err
+				}
+				// Get current receiver rights on the entity.
+				receiverRights, err := store.GetMembershipStore(db).GetMember(
+					ctx,
+					req.ReceiverIds.GetOrganizationOrUserIdentifiers(),
+					identifiers,
+				)
+				if err != nil && !errors.IsNotFound(err) {
+					return err
+				}
+				// Combine sender and receiver rights on the entity.
+				mergedRights := senderRights.Union(receiverRights).Unique()
+				// Set new rights for the receiver.
+				err = store.GetMembershipStore(db).SetMember(
+					ctx,
+					req.ReceiverIds.GetOrganizationOrUserIdentifiers(),
+					identifiers,
+					mergedRights,
+				)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtUserRightsTransfer.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
+
+	return ttnpb.Empty, nil
+}
+
 type userRegistry struct {
 	*IdentityServer
 }
@@ -707,4 +787,8 @@ func (ur *userRegistry) Delete(ctx context.Context, req *ttnpb.UserIdentifiers) 
 
 func (ur *userRegistry) Purge(ctx context.Context, req *ttnpb.UserIdentifiers) (*types.Empty, error) {
 	return ur.purgeUser(ctx, req)
+}
+
+func (ur *userRegistry) TransferUserRights(ctx context.Context, req *ttnpb.TransferUserRightsRequest) (*types.Empty, error) {
+	return ur.transferUserRights(ctx, req)
 }

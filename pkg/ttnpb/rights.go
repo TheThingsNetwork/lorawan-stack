@@ -65,6 +65,7 @@ var (
 	AllClusterRights      = &Rights{}
 	AllAdminRights        = &Rights{}
 	AllRights             = &Rights{}
+	AllCollaboratorRights = &Rights{}
 )
 
 func init() {
@@ -93,6 +94,9 @@ func init() {
 		if !strings.HasSuffix(k, "_KEYS") && !strings.HasSuffix(k, "_ALL") {
 			AllAdminRights.Rights = append(AllAdminRights.Rights, Right(v))
 		}
+		if strings.Contains(k, "COLLABORATORS") || strings.Contains(k, "MEMBERS") || k == "RIGHT_CLIENT_ALL" {
+			AllCollaboratorRights.Rights = append(AllCollaboratorRights.Rights, Right(v))
+		}
 		AllRights.Rights = append(AllRights.Rights, Right(v))
 	}
 	AllUserRights = AllUserRights.Sorted()
@@ -100,6 +104,7 @@ func init() {
 	AllGatewayRights = AllGatewayRights.Sorted()
 	AllOrganizationRights = AllOrganizationRights.Sorted()
 	AllRights = AllRights.Sorted()
+	AllCollaboratorRights = AllCollaboratorRights.Sorted()
 }
 
 // Implied returns the Right's implied rights.
