@@ -452,7 +452,7 @@ var (
 		},
 	}
 	usersTransferRightsCommand = &cobra.Command{
-		Use:     "transfer-owner-rights [user-id]",
+		Use:     "transfer-rights [user-id] [receiver-id]",
 		Aliases: []string{"transfer", "move", "rights-move"},
 		Short:   "Transfer rights",
 		RunE: func(cmd *cobra.Command, args []string) error {
