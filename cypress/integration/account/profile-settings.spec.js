@@ -38,7 +38,7 @@ describe('Account App profile settings', () => {
 
     cy.findByText('Profile picture').should('be.visible')
     cy.findByLabelText('Use Gravatar')
-      .should('be.visible')
+      .should('exist')
       .and('be.checked')
     cy.findByLabelText('Upload an image')
       .should('exist')
@@ -112,7 +112,11 @@ describe('Account App profile settings', () => {
     cy.findByAltText('Current image')
       .should('be.visible')
       .and('have.attr', 'src')
-      .and('be', `data:image/png;base64,${cy.fixture(imageFile)}`)
+      .then(src => {
+        cy.fixture(imageFile).then(img => {
+          expect(src).to.equal(`data:image/png;base64,${img}`)
+        })
+      })
 
     cy.findByRole('button', { name: 'Save changes' }).click()
     cy.findByTestId('error-notification').should('not.exist')
@@ -175,7 +179,7 @@ describe('Account App profile settings with disabled upload', () => {
       })
 
     cy.findByText('Gravatar image').should('be.visible')
-    cy.findByText('Upload image', { exact: false }).should('not.be.visible')
+    cy.findByText('Upload image', { exact: false }).should('not.exist')
     cy.findByTestId('notification')
       .should('be.visible')
       .findByText(/follow the instructions on the Gravatar website to change your profile picture/)
@@ -212,9 +216,9 @@ describe('Account App profile settings without gravatar', () => {
         cy.findByRole('button', { name: 'Expand' }).click()
       })
 
-    cy.findByText('Gravatar', { exact: false }).should('not.be.visible')
+    cy.findByText('Gravatar', { exact: false }).should('not.exist')
     cy.findByLabelText('Image upload').should('be.visible')
-    cy.findByTestId('notification').should('not.be.visible')
+    cy.findByTestId('notification').should('not.exist')
     cy.findByLabelText('User ID')
       .should('be.visible')
       .and('have.attr', 'value')
@@ -233,9 +237,9 @@ describe('Account App profile settings without gravatar', () => {
 describe('Account App profile settings without gravatar and upload', () => {
   before(() => {
     cy.dropAndSeedDatabase()
-    cy.server()
     cy.augmentIsConfig({ profile_picture: { use_gravatar: false, disable_upload: true } })
   })
+
   it('displays UI elements in place', () => {
     cy.createUser(user)
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
@@ -247,8 +251,8 @@ describe('Account App profile settings without gravatar and upload', () => {
         cy.findByRole('button', { name: 'Expand' }).click()
       })
 
-    cy.findByText('Gravatar', { exact: false }).should('not.be.visible')
-    cy.findByText('Upload image', { exact: false }).should('not.be.visible')
+    cy.findByText('Gravatar', { exact: false }).should('not.exist')
+    cy.findByText('Upload image', { exact: false }).should('not.exist')
     cy.findByTestId('notification')
       .should('be.visible')
       .findByText(/profile picture.*disabled/)

@@ -76,6 +76,8 @@ describe('Collaborators', () => {
       password: collaboratorUser.password,
     })
     cy.createOrganization(organization, collaboratorId)
+    cy.clearLocalStorage()
+    cy.clearCookies()
   })
 
   describe('Application', () => {
@@ -94,11 +96,8 @@ describe('Collaborators', () => {
       cy.clearCookies()
     })
 
-    beforeEach(() => {
-      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-    })
-
     it('succeeds editing organization collaborator', () => {
+      cy.loginConsole({ user_id: userId, password: user.password })
       cy.visit(
         `${Cypress.config(
           'consoleRootPath',
@@ -118,6 +117,7 @@ describe('Collaborators', () => {
     })
 
     it('succeeds deleting organization collaborator', () => {
+      cy.loginConsole({ user_id: userId, password: user.password })
       cy.visit(
         `${Cypress.config(
           'consoleRootPath',
@@ -141,6 +141,7 @@ describe('Collaborators', () => {
     })
 
     it('succeeds editing user collaborator', () => {
+      cy.loginConsole({ user_id: userId, password: user.password })
       cy.visit(
         `${Cypress.config(
           'consoleRootPath',
@@ -160,6 +161,7 @@ describe('Collaborators', () => {
     })
 
     it('succeeds deleting user collaborator', () => {
+      cy.loginConsole({ user_id: userId, password: user.password })
       cy.visit(
         `${Cypress.config(
           'consoleRootPath',
@@ -199,11 +201,8 @@ describe('Collaborators', () => {
       cy.clearCookies()
     })
 
-    beforeEach(() => {
-      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-    })
-
     it('succeeds editing organization collaborator', () => {
+      cy.loginConsole({ user_id: userId, password: user.password })
       cy.visit(
         `${Cypress.config(
           'consoleRootPath',
@@ -223,6 +222,7 @@ describe('Collaborators', () => {
     })
 
     it('succeeds deleting organization collaborator', () => {
+      cy.loginConsole({ user_id: userId, password: user.password })
       cy.visit(
         `${Cypress.config(
           'consoleRootPath',
@@ -246,6 +246,7 @@ describe('Collaborators', () => {
     })
 
     it('succeeds editing user collaborator', () => {
+      cy.loginConsole({ user_id: userId, password: user.password })
       cy.visit(
         `${Cypress.config(
           'consoleRootPath',
@@ -265,6 +266,7 @@ describe('Collaborators', () => {
     })
 
     it('succeeds deleting user collaborator', () => {
+      cy.loginConsole({ user_id: userId, password: user.password })
       cy.visit(
         `${Cypress.config(
           'consoleRootPath',
@@ -302,11 +304,8 @@ describe('Collaborators', () => {
       cy.clearCookies()
     })
 
-    beforeEach(() => {
-      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-    })
-
     it('succeeds editing user collaborator', () => {
+      cy.loginConsole({ user_id: userId, password: user.password })
       cy.visit(
         `${Cypress.config(
           'consoleRootPath',
@@ -326,6 +325,7 @@ describe('Collaborators', () => {
     })
 
     it('succeeds deleting user collaborator', () => {
+      cy.loginConsole({ user_id: userId, password: user.password })
       cy.visit(
         `${Cypress.config(
           'consoleRootPath',

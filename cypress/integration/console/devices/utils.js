@@ -15,25 +15,25 @@
 class ConfigurationStep {
   checkOTAA() {
     cy.findByLabelText('Over the air activation (OTAA)')
-      .should('be.visible')
+      .should('exist')
       .check()
   }
 
   checkABP() {
     cy.findByLabelText('Activation by personalization (ABP)')
-      .should('be.visible')
+      .should('exist')
       .check()
   }
 
   checkMulticast() {
     cy.findByLabelText('Multicast')
-      .should('be.visible')
+      .should('exist')
       .check()
   }
 
   checkNone() {
     cy.findByLabelText('Do not configure activation')
-      .should('be.visible')
+      .should('exist')
       .check()
   }
 
@@ -45,7 +45,7 @@ class ConfigurationStep {
     cy.findByLabelText('Join Server address').then($input => {
       cy.wrap($input).should('not.be.disabled')
       cy.findByLabelText('External Join Server')
-        .should('be.visible')
+        .should('exist')
         .check()
       cy.wrap($input)
         .should('be.disabled')
@@ -143,13 +143,13 @@ class NetworkLayerStep {
 
   checkClassB() {
     cy.findByLabelText('Supports class B')
-      .should('be.visible')
+      .should('exist')
       .check()
   }
 
   checkClassC() {
     cy.findByLabelText('Supports class C')
-      .should('be.visible')
+      .should('exist')
       .check()
   }
 
@@ -190,13 +190,13 @@ class NetworkLayerStep {
 
   check16BitFCnt() {
     cy.findByLabelText('16 bit')
-      .should('be.visible')
+      .should('exist')
       .check()
   }
 
   check32BitFCnt() {
     cy.findByLabelText('32 bit')
-      .should('be.visible')
+      .should('exist')
       .check()
   }
 
@@ -343,7 +343,7 @@ class ApplicationLayerStep {
       .should('contain', 'Skip decryption of uplink payloads and encryption of downlink payloads')
       .should('be.visible')
     cy.findByLabelText('Skip payload encryption and decryption')
-      .should('be.visible')
+      .should('exist')
       .check()
   }
 
