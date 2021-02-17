@@ -453,7 +453,7 @@ var (
 	}
 	usersTransferRightsCommand = &cobra.Command{
 		Use:     "transfer-rights [user-id] [receiver-id]",
-		Aliases: []string{"transfer", "move", "rights-move"},
+		Aliases: []string{"rights-move"},
 		Short:   "Transfer rights",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			senderID, receiverID := getSenderReceiverID(cmd.Flags(), args)
@@ -468,8 +468,8 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewUserRegistryClient(is).TransferUserRights(ctx, &ttnpb.TransferUserRightsRequest{
-				UserIdentifiers: *senderID,
-				ReceiverIds:     *receiverID,
+				SenderIds:   *senderID,
+				ReceiverIds: *receiverID,
 			})
 			if err != nil {
 				return err
