@@ -7086,14 +7086,14 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `sender_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
 | `receiver_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
-| `user_ids` | <p>`message.required`: `true`</p> |
+| `sender_ids` | <p>`message.required`: `true`</p> |
 | `receiver_ids` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.UpdateUserAPIKeyRequest">Message `UpdateUserAPIKeyRequest`</a>
@@ -7300,7 +7300,7 @@ user registrations.
 | `UpdatePassword` | `PUT` | `/api/v3/users/{user_ids.user_id}/password` | `*` |
 | `Delete` | `DELETE` | `/api/v3/users/{user_id}` |  |
 | `Purge` | `DELETE` | `/api/v3/users/{user_id}/purge` |  |
-| `TransferUserRights` | `POST` | `/api/v3/users/{user_ids.user_id}/transfer/{receiver_ids.user_id}` |  |
+| `TransferUserRights` | `POST` | `/api/v3/users/{sender_ids.user_id}/transfer/{receiver_ids.user_id}` |  |
 
 ### <a name="ttn.lorawan.v3.UserSessionRegistry">Service `UserSessionRegistry`</a>
 

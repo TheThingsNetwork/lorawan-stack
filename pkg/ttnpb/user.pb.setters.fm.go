@@ -496,22 +496,22 @@ func (dst *UpdateUserPasswordRequest) SetFields(src *UpdateUserPasswordRequest, 
 func (dst *TransferUserRightsRequest) SetFields(src *TransferUserRightsRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "user_ids":
+		case "sender_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.SenderIds
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.SenderIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.SenderIds = src.SenderIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.SenderIds = zero
 				}
 			}
 		case "receiver_ids":

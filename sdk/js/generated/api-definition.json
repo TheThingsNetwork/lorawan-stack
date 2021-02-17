@@ -4467,9 +4467,9 @@
       "http": [
         {
           "method": "post",
-          "pattern": "/users/{user_ids.user_id}/transfer/{receiver_ids.user_id}",
+          "pattern": "/users/{sender_ids.user_id}/transfer/{receiver_ids.user_id}",
           "parameters": [
-            "user_ids.user_id",
+            "sender_ids.user_id",
             "receiver_ids.user_id"
           ]
         }

@@ -7803,6 +7803,45 @@
         ]
       }
     },
+    "/users/{sender_ids.user_id}/transfer/{receiver_ids.user_id}": {
+      "post": {
+        "summary": "Transfer all rights that the user has on entities to another user.",
+        "operationId": "UserRegistry_TransferUserRights",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "sender_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "receiver_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserRegistry"
+        ]
+      }
+    },
     "/users/{user.ids.user_id}": {
       "put": {
         "summary": "Update the user, changing the fields specified by the field mask to the provided values.\nThis method can not be used to change the password, see the UpdatePassword method for that.",
@@ -8473,45 +8512,6 @@
         "parameters": [
           {
             "name": "user_ids.user_id",
-            "description": "This ID shares namespace with organization IDs.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "UserRegistry"
-        ]
-      }
-    },
-    "/users/{user_ids.user_id}/transfer/{receiver_ids.user_id}": {
-      "post": {
-        "summary": "Transfer all rights that the user has on entities to another user.",
-        "operationId": "UserRegistry_TransferUserRights",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "user_ids.user_id",
-            "description": "This ID shares namespace with organization IDs.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "receiver_ids.user_id",
             "description": "This ID shares namespace with organization IDs.",
             "in": "path",
             "required": true,

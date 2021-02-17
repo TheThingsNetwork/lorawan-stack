@@ -532,7 +532,7 @@ func local_request_UserRegistry_Purge_0(ctx context.Context, marshaler runtime.M
 }
 
 var (
-	filter_UserRegistry_TransferUserRights_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "receiver_ids": 2}, Base: []int{1, 1, 1, 4, 0, 3, 0}, Check: []int{0, 1, 2, 1, 3, 4, 6}}
+	filter_UserRegistry_TransferUserRights_0 = &utilities.DoubleArray{Encoding: map[string]int{"sender_ids": 0, "user_id": 1, "receiver_ids": 2}, Base: []int{1, 1, 1, 4, 0, 3, 0}, Check: []int{0, 1, 2, 1, 3, 4, 6}}
 )
 
 func request_UserRegistry_TransferUserRights_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -546,15 +546,15 @@ func request_UserRegistry_TransferUserRights_0(ctx context.Context, marshaler ru
 		_   = err
 	)
 
-	val, ok = pathParams["user_ids.user_id"]
+	val, ok = pathParams["sender_ids.user_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_ids.user_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "sender_ids.user_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "user_ids.user_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "sender_ids.user_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "sender_ids.user_id", err)
 	}
 
 	val, ok = pathParams["receiver_ids.user_id"]
@@ -591,15 +591,15 @@ func local_request_UserRegistry_TransferUserRights_0(ctx context.Context, marsha
 		_   = err
 	)
 
-	val, ok = pathParams["user_ids.user_id"]
+	val, ok = pathParams["sender_ids.user_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_ids.user_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "sender_ids.user_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "user_ids.user_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "sender_ids.user_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "sender_ids.user_id", err)
 	}
 
 	val, ok = pathParams["receiver_ids.user_id"]
@@ -2008,7 +2008,7 @@ var (
 
 	pattern_UserRegistry_Purge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_id", "purge"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserRegistry_TransferUserRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "transfer", "receiver_ids.user_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_UserRegistry_TransferUserRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "sender_ids.user_id", "transfer", "receiver_ids.user_id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

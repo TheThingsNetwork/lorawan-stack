@@ -1128,12 +1128,12 @@ func (m *TransferUserRightsRequest) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "user_ids":
+		case "sender_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.SenderIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return TransferUserRightsRequestValidationError{
-						field:  "user_ids",
+						field:  "sender_ids",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

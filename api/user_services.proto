@@ -94,7 +94,7 @@ service UserRegistry {
   // Transfer all rights that the user has on entities to another user.
   rpc TransferUserRights(TransferUserRightsRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/users/{user_ids.user_id}/transfer/{receiver_ids.user_id}"
+      post: "/users/{sender_ids.user_id}/transfer/{receiver_ids.user_id}"
     };
   };
 }

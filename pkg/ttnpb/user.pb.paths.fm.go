@@ -174,14 +174,14 @@ var TransferUserRightsRequestFieldPathsNested = []string{
 	"receiver_ids",
 	"receiver_ids.email",
 	"receiver_ids.user_id",
-	"user_ids",
-	"user_ids.email",
-	"user_ids.user_id",
+	"sender_ids",
+	"sender_ids.email",
+	"sender_ids.user_id",
 }
 
 var TransferUserRightsRequestFieldPathsTopLevel = []string{
 	"receiver_ids",
-	"user_ids",
+	"sender_ids",
 }
 var ListUserAPIKeysRequestFieldPathsNested = []string{
 	"limit",
