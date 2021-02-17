@@ -40,36 +40,33 @@ const validationSchema = Yup.object({
     band_id: Yup.string(),
   }),
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
-  ids: Yup.object().when(
-    ['supports_join', 'lorawan_version', '$appId'],
-    (isOTAA, version, appId, schema) => {
-      if (isOTAA) {
-        return schema.shape({
-          device_id: deviceIdSchema,
-          join_eui: joinEUISchema.required(sharedMessages.validateRequired),
-          dev_eui: devEUISchema.required(sharedMessages.validateRequired),
-        })
-      }
-
-      if (parseLorawanMacVersion(version) === 104) {
-        return schema.shape({
-          device_id: deviceIdSchema,
-          dev_eui: devEUISchema.required(sharedMessages.validateRequired),
-          join_eui: Yup.string().strip(),
-        })
-      }
-
+  ids: Yup.object().when(['supports_join', 'lorawan_version'], (isOTAA, version, schema) => {
+    if (isOTAA) {
       return schema.shape({
-        join_eui: Yup.string().strip(),
         device_id: deviceIdSchema,
-        dev_eui: Yup.lazy(value =>
-          !value
-            ? Yup.string().strip()
-            : Yup.string().length(8 * 2, Yup.passValues(sharedMessages.validateLength)),
-        ),
+        join_eui: joinEUISchema.required(sharedMessages.validateRequired),
+        dev_eui: devEUISchema.required(sharedMessages.validateRequired),
       })
-    },
-  ),
+    }
+
+    if (parseLorawanMacVersion(version) === 104) {
+      return schema.shape({
+        device_id: deviceIdSchema,
+        dev_eui: devEUISchema.required(sharedMessages.validateRequired),
+        join_eui: Yup.string().strip(),
+      })
+    }
+
+    return schema.shape({
+      join_eui: Yup.string().strip(),
+      device_id: deviceIdSchema,
+      dev_eui: Yup.lazy(value =>
+        !value
+          ? Yup.string().strip()
+          : Yup.string().length(8 * 2, Yup.passValues(sharedMessages.validateLength)),
+      ),
+    })
+  }),
   root_keys: Yup.object().when(
     ['supports_join', 'lorawan_version', '$mayEditKeys'],
     (isOTAA, version, mayEditKeys, schema) => {

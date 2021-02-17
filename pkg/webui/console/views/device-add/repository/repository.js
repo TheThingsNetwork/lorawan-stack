@@ -15,7 +15,7 @@
 import React from 'react'
 import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
-import { merge } from 'lodash'
+import { merge, isEqual } from 'lodash'
 
 import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -125,7 +125,6 @@ const DeviceRepository = props => {
   const validationContext = React.useMemo(
     () => ({
       mayEditKeys,
-      appId,
       asUrl,
       asEnabled,
       jsUrl,
@@ -133,7 +132,7 @@ const DeviceRepository = props => {
       nsUrl,
       nsEnabled,
     }),
-    [appId, asEnabled, asUrl, jsEnabled, jsUrl, mayEditKeys, nsEnabled, nsUrl],
+    [asEnabled, asUrl, jsEnabled, jsUrl, mayEditKeys, nsEnabled, nsUrl],
   )
 
   const handleSubmit = React.useCallback(
@@ -193,7 +192,7 @@ const DeviceRepository = props => {
 
   React.useEffect(() => {
     const version = selectVersion(state)
-    const versionChanged = version !== versionRef.current
+    const versionChanged = !isEqual(version, versionRef.current)
     // Reset version values if any have changed during end device selection.
     if (formRef.current && versionChanged) {
       formRef.current.setValues(stateToFormValues(state), false)
