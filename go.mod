@@ -46,7 +46,6 @@ require (
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
 	github.com/felixge/httpsnoop v1.0.1
-	github.com/fsnotify/fsnotify v1.4.9
 	github.com/getsentry/sentry-go v0.6.1
 	github.com/go-redis/redis/v8 v8.3.2
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
