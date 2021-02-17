@@ -47,8 +47,8 @@ const applicationFeatureToggles = defineSmokeTest(
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${application.ids.application_id}`)
 
     cy.findByTestId('navigation-sidebar').within(() => {
-      cy.findByText('API Keys', { selector: 'span' }).should('not.be.visible')
-      cy.findByText('Collaborators', { selector: 'span' }).should('be.visible')
+      cy.findByText('API Keys').should('not.be.visible')
+      cy.findByText('Collaborators').should('be.visible')
     })
 
     cy.visit(
