@@ -1043,7 +1043,25 @@ It is also possible to use `go build`, or release snapshots, as described below.
 
 ## Releasing
 
-You can build a release snapshot with `cd tools && go run github.com/goreleaser/goreleaser --snapshot`.
+The Things Stack uses [GoReleaser](https://goreleaser.com/) for releases. If you want to build a release (snapshot), you first need to build GoReleaser:
+
+```bash
+$ pushd tools
+$ go build -o bin/goreleaser github.com/goreleaser/goreleaser
+$ popd
+```
+
+The command for building a release snapshot is:
+
+```bash
+$ tools/bin/goreleaser --snapshot -f .goreleaser.snapshot.yml --rm-dist
+```
+
+The command for building a full release is:
+
+```bash
+$ tools/bin/goreleaser -f .goreleaser.release.yml --rm-dist
+```
 
 > Note: You will at least need to have [`rpm`](http://rpm5.org/) and [`snapcraft`](https://snapcraft.io/) in your `PATH`.
 
