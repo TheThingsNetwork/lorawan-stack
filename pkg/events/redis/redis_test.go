@@ -88,13 +88,13 @@ func TestRedisPubSub(t *testing.T) {
 			pubsub := redis.NewPubSub(ctx, taskStarter, redisConfig())
 			defer pubsub.Close(ctx)
 
+			appID := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
+
 			subCtx, unsubscribe := context.WithCancel(ctx)
 			defer unsubscribe()
-			pubsub.Subscribe(subCtx, "redis.**", nil, handler)
+			pubsub.Subscribe(subCtx, "redis.**", []*ttnpb.EntityIdentifiers{appID.EntityIdentifiers()}, handler)
 
 			time.Sleep(timeout)
-
-			appID := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
 
 			test.RunSubtestFromContext(ctx, test.SubtestConfig{
 				Name:    "publish",

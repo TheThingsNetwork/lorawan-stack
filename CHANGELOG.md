@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Changed the pub/sub channels that the Redis backend of the Events system uses.
+
 ### Deprecated
 
 ### Removed
