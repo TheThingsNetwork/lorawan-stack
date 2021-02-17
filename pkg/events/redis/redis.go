@@ -17,11 +17,12 @@ package redis
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/base64"
 	"strings"
 	"sync"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -85,6 +86,8 @@ type PubSub struct {
 
 var errChannelClosed = errors.DefineAborted("channel_closed", "channel closed")
 
+const encodingPrefix = "v3-event-proto:"
+
 func (ps *PubSub) subscribeTask(ctx context.Context) error {
 	logger := log.FromContext(ctx)
 
@@ -113,9 +116,24 @@ func (ps *PubSub) subscribeTask(ctx context.Context) error {
 			if !ok {
 				return errChannelClosed.New()
 			}
-			evt, err := events.UnmarshalJSON([]byte(msg.Payload))
+			if !strings.HasPrefix(msg.Payload, encodingPrefix) {
+				logger.Warn("Skip decoding event with unexpected encoding")
+				continue
+			}
+
+			bpb, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(msg.Payload, encodingPrefix))
 			if err != nil {
-				logger.WithError(err).Warn("Failed to unmarshal event from JSON")
+				logger.WithError(err).Warn("Failed to decode event payload from base64")
+				continue
+			}
+			var pb ttnpb.Event
+			if err = proto.Unmarshal(bpb, &pb); err != nil {
+				logger.WithError(err).Warn("Failed to unmarshal event from binary protobuf")
+				continue
+			}
+			evt, err := events.FromProto(&pb)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to convert event from protobuf")
 				continue
 			}
 			ps.PubSub.Publish(&patternEvent{Event: evt, pattern: msg.Pattern})
@@ -219,11 +237,17 @@ func (ps *PubSub) Close(ctx context.Context) error {
 // Publish an event to Redis.
 func (ps *PubSub) Publish(evt events.Event) {
 	logger := log.FromContext(ps.ctx)
-	b, err := json.Marshal(evt)
+	pb, err := events.Proto(evt)
 	if err != nil {
-		logger.WithError(err).Warn("Failed to marshal event to JSON")
+		logger.WithError(err).Warn("Failed to convert event to protobuf")
 		return
 	}
+	bpb, err := proto.Marshal(pb)
+	if err != nil {
+		logger.WithError(err).Warn("Failed to marshal event to binary protobuf")
+		return
+	}
+	b := encodingPrefix + base64.StdEncoding.EncodeToString(bpb)
 	if ids := evt.Identifiers(); len(ids) > 0 {
 		for _, id := range ids {
 			if err := ps.client.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), b).Err(); err != nil {
