@@ -66,29 +66,6 @@ var (
 	)
 )
 
-// RequireEntity checks that context contains the required rights for the
-// entity.
-func RequireEntity(ctx context.Context, id *ttnpb.EntityIdentifiers, required ...ttnpb.Right) (err error) {
-	switch ids := id.Identifiers().(type) {
-	case *ttnpb.ApplicationIdentifiers:
-		rights := ttnpb.RightsFrom(required...).Intersect(ttnpb.AllApplicationRights)
-		return RequireApplication(ctx, *ids, rights.Rights...)
-	case *ttnpb.ClientIdentifiers:
-		rights := ttnpb.RightsFrom(required...).Intersect(ttnpb.AllClientRights)
-		return RequireClient(ctx, *ids, rights.Rights...)
-	case *ttnpb.GatewayIdentifiers:
-		rights := ttnpb.RightsFrom(required...).Intersect(ttnpb.AllGatewayRights)
-		return RequireGateway(ctx, *ids, rights.Rights...)
-	case *ttnpb.OrganizationIdentifiers:
-		rights := ttnpb.RightsFrom(required...).Intersect(ttnpb.AllOrganizationRights)
-		return RequireOrganization(ctx, *ids, rights.Rights...)
-	case *ttnpb.UserIdentifiers:
-		rights := ttnpb.RightsFrom(required...).Intersect(ttnpb.AllUserRights)
-		return RequireUser(ctx, *ids, rights.Rights...)
-	}
-	return nil
-}
-
 // RequireApplication checks that context contains the required rights for the
 // given application ID.
 func RequireApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) (err error) {

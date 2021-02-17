@@ -633,18 +633,7 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		orphanedEntities, err := store.GetMembershipStore(db).FindSingleOwnerMemberships(ctx, ids.GetOrganizationOrUserIdentifiers())
-		if err != nil {
-			return err
-		}
-		if len(orphanedEntities) > 0 {
-			ids := make([]string, len(orphanedEntities))
-			for i, entity := range orphanedEntities {
-				ids[i] = entity.IDString()
-			}
-			return errEntitiesOrphaned.WithAttributes("list", ids)
-		}
-		err = store.GetUserStore(db).DeleteUser(ctx, ids)
+		err := store.GetUserStore(db).DeleteUser(ctx, ids)
 		if err != nil {
 			return err
 		}
@@ -694,27 +683,42 @@ func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifi
 }
 
 func (is *IdentityServer) transferUserRights(ctx context.Context, req *ttnpb.TransferUserRightsRequest) (*types.Empty, error) {
-	if err := rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_ALL); err != nil {
+	if err := rights.RequireUser(ctx, req.SenderIds, ttnpb.RIGHT_USER_ALL); err != nil {
 		return nil, err
 	}
-	if req.UserIdentifiers.GetUserID() == req.ReceiverIds.GetUserID() {
+	if req.SenderIds.GetUserID() == req.ReceiverIds.GetUserID() {
 		return nil, errSenderReceiverEqual
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		entityList, err := store.GetMembershipStore(db).GetAllMemberships(ctx, req.UserIdentifiers.GetOrganizationOrUserIdentifiers())
+		entityList, err := store.GetMembershipStore(db).GetAllMemberships(ctx, req.SenderIds.GetOrganizationOrUserIdentifiers())
 		if err != nil {
 			return err
 		}
 		if len(entityList) > 0 {
 			for _, identifiers := range entityList {
 				// If the sender doesn't have rights to set collaborators on the current entity, skip the entity.
-				if err := rights.RequireEntity(ctx, identifiers.EntityIdentifiers(), ttnpb.AllCollaboratorRights.Rights...); err != nil {
-					continue
+				switch ids := identifiers.Identifiers().(type) {
+				case *ttnpb.ApplicationIdentifiers:
+					if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
+						continue
+					}
+				case *ttnpb.ClientIdentifiers:
+					if err := rights.RequireClient(ctx, *ids, ttnpb.RIGHT_CLIENT_ALL); err != nil {
+						continue
+					}
+				case *ttnpb.GatewayIdentifiers:
+					if err := rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+						continue
+					}
+				case *ttnpb.OrganizationIdentifiers:
+					if err := rights.RequireOrganization(ctx, *ids, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
+						continue
+					}
 				}
 				// Get current sender rights on the entity.
 				senderRights, err := store.GetMembershipStore(db).GetMember(
 					ctx,
-					req.UserIdentifiers.GetOrganizationOrUserIdentifiers(),
+					req.SenderIds.GetOrganizationOrUserIdentifiers(),
 					identifiers,
 				)
 				if err != nil {
@@ -748,7 +752,7 @@ func (is *IdentityServer) transferUserRights(ctx context.Context, req *ttnpb.Tra
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUserRightsTransfer.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
+	events.Publish(evtUserRightsTransfer.NewWithIdentifiersAndData(ctx, req.SenderIds, nil))
 
 	return ttnpb.Empty, nil
 }

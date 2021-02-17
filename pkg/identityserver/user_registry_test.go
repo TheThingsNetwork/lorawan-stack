@@ -341,8 +341,8 @@ func TestUsersCRUD(t *testing.T) {
 
 		adminUser, _ := population.Users[adminUserIdx], userCreds(adminUserIdx)
 		_, err = reg.TransferUserRights(ctx, &ttnpb.TransferUserRightsRequest{
-			UserIdentifiers: user.UserIdentifiers,
-			ReceiverIds:     adminUser.UserIdentifiers,
+			SenderIds:   user.UserIdentifiers,
+			ReceiverIds: adminUser.UserIdentifiers,
 		}, creds)
 
 		a.So(err, should.NotBeNil)
