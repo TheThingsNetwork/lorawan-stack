@@ -575,15 +575,6 @@ func TestRightsTransfer(t *testing.T) {
 			EntityType: "gateway",
 			Rights:     Rights{Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS}},
 		})
-		singleOwnedEntities1, err := store.FindSingleOwnerMemberships(ctx, usr.Account.OrganizationOrUserIdentifiers())
-		if a.So(err, should.BeNil) {
-			a.So(singleOwnedEntities1, should.HaveLength, 2)
-		}
-
-		singleOwnedEntities2, err := store.FindSingleOwnerMemberships(ctx, usr2.Account.OrganizationOrUserIdentifiers())
-		if a.So(err, should.BeNil) {
-			a.So(singleOwnedEntities2, should.HaveLength, 1)
-		}
 		allEntities1, err := store.GetAllMemberships(ctx, usr.Account.OrganizationOrUserIdentifiers())
 		if a.So(err, should.BeNil) {
 			a.So(allEntities1, should.HaveLength, 3)

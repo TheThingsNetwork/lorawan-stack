@@ -135,8 +135,6 @@ type MembershipStore interface {
 	DeleteEntityMembers(ctx context.Context, entityID ttnpb.Identifiers) error
 	// Delete all user rights for an entity.
 	DeleteAccountMembers(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers) error
-	// Find all memberships where only the specified user has full rights.
-	FindSingleOwnerMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers) ([]ttnpb.Identifiers, error)
 	// Find all entities user is a member of.
 	GetAllMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers) ([]ttnpb.Identifiers, error)
 }

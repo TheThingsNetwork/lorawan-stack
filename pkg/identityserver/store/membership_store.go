@@ -20,7 +20,6 @@ import (
 	"runtime/trace"
 
 	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -328,43 +327,6 @@ func (s *membershipStore) DeleteAccountMembers(ctx context.Context, id *ttnpb.Or
 	return s.query(ctx, Membership{}).Where(&Membership{
 		AccountID: account.PrimaryKey(),
 	}).Delete(&Membership{}).Error
-}
-
-func (s *membershipStore) FindSingleOwnerMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers) ([]ttnpb.Identifiers, error) {
-	defer trace.StartRegion(ctx, "find single full rights memberships").End()
-	accountQuery := s.query(ctx, Account{}).
-		Select(`"accounts"."id"`).
-		Where(fmt.Sprintf(`"accounts"."account_type" = '%s' AND "accounts"."uid" = ?`, id.EntityType()), id.IDString()).
-		QueryExpr()
-	userMembershipQuery := s.query(ctx, &Membership{}).
-		Select(`"memberships"."entity_id","memberships"."entity_type"`).
-		Where(`"memberships"."account_id" = (?)`, accountQuery).
-		Where(`"memberships"."rights" @> (?) OR "memberships"."rights" @> (?) OR "memberships"."rights" @> (?) OR "memberships"."rights" @> (?) OR "memberships"."rights" @> (?)`,
-			pq.Array([]ttnpb.Right{ttnpb.RIGHT_ALL}),
-			pq.Array([]ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL}),
-			pq.Array([]ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL}),
-			pq.Array([]ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL}),
-			pq.Array([]ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL})).
-		QueryExpr()
-	query := s.query(ctx, &Membership{}).
-		Select(`"memberships"."entity_id", "memberships"."entity_type"`).
-		Where(`("memberships"."entity_id","memberships"."entity_type") IN (?)`, userMembershipQuery).
-		Where(`"memberships"."rights" @> (?) OR "memberships"."rights" @> (?) OR "memberships"."rights" @> (?) OR "memberships"."rights" @> (?) OR "memberships"."rights" @> (?)`,
-			pq.Array([]ttnpb.Right{ttnpb.RIGHT_ALL}),
-			pq.Array([]ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL}),
-			pq.Array([]ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL}),
-			pq.Array([]ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL}),
-			pq.Array([]ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL})).
-		Group(`"memberships"."entity_id","memberships"."entity_type"`).Having(`count(id) = ?`, 1)
-	var res []memberEntity
-	if err := query.Scan(&res).Error; err != nil {
-		return nil, err
-	}
-	entities, err := s.entitiesFromMemberships(ctx, res)
-	if err != nil {
-		return nil, err
-	}
-	return entities, nil
 }
 
 func (s *membershipStore) GetAllMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers) ([]ttnpb.Identifiers, error) {
