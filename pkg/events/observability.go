@@ -25,16 +25,7 @@ var publishes = metrics.NewCounterVec(
 	prometheus.CounterOpts{
 		Subsystem: subsystem,
 		Name:      "publishes_total",
-		Help:      "Number of Publishes",
-	},
-	[]string{"name"},
-)
-
-var subscriptions = metrics.NewGaugeVec(
-	prometheus.GaugeOpts{
-		Subsystem: subsystem,
-		Name:      "subscriptions",
-		Help:      "Number of Subscriptions",
+		Help:      "Number of Publishes to the default events PubSub",
 	},
 	[]string{"name"},
 )
@@ -50,10 +41,9 @@ var channelDropped = metrics.NewCounterVec(
 
 func initMetrics(name string) {
 	publishes.WithLabelValues(name).Add(0)
-	subscriptions.WithLabelValues(name).Add(0)
 	channelDropped.WithLabelValues(name).Add(0)
 }
 
 func init() {
-	metrics.MustRegister(publishes, subscriptions, channelDropped)
+	metrics.MustRegister(publishes, channelDropped)
 }

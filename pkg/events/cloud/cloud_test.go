@@ -37,8 +37,7 @@ func Example() {
 	// Import the desired cloud pub-sub drivers (see godoc.org/gocloud.dev).
 	// In this example we use "gocloud.dev/pubsub/mempubsub".
 
-	// This sends all events received from a Go Cloud pub sub to the default pubsub.
-	cloudPubSub, err := cloud.WrapPubSub(context.TODO(), events.DefaultPubSub(), taskStarter, "mem://events", "mem://events")
+	cloudPubSub, err := cloud.NewPubSub(context.TODO(), taskStarter, "mem://events", "mem://events")
 	if err != nil {
 		// Handle error.
 	}
@@ -69,7 +68,9 @@ func TestCloudPubSub(t *testing.T) {
 
 			defer pubsub.Close(ctx)
 
-			pubsub.Subscribe("cloud.**", handler)
+			subCtx, unsubscribe := context.WithCancel(ctx)
+			defer unsubscribe()
+			pubsub.Subscribe(subCtx, "cloud.**", nil, handler)
 
 			time.Sleep(timeout)
 

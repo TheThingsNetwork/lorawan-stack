@@ -24,12 +24,14 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/events/basic"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// WrapPubSub wraps an existing PubSub and publishes all events received from Redis to that PubSub.
-func WrapPubSub(ctx context.Context, wrapped events.PubSub, taskStarter component.TaskStarter, conf ttnredis.Config) *PubSub {
+// NewPubSub creates a new PubSub that publishes and subscribes to Redis.
+func NewPubSub(ctx context.Context, taskStarter component.TaskStarter, conf ttnredis.Config) *PubSub {
 	ttnRedisClient := ttnredis.New(&conf)
 	eventChannel := ttnRedisClient.Key("events")
 	ctx = log.NewContextWithFields(ctx, log.Fields(
@@ -38,18 +40,13 @@ func WrapPubSub(ctx context.Context, wrapped events.PubSub, taskStarter componen
 	))
 	ctx, cancel := context.WithCancel(ctx)
 	return &PubSub{
-		PubSub:       wrapped,
+		PubSub:       basic.NewPubSub(),
 		taskStarter:  taskStarter,
 		ctx:          ctx,
 		cancel:       cancel,
 		client:       ttnRedisClient.Client,
 		eventChannel: eventChannel,
 	}
-}
-
-// NewPubSub creates a new PubSub that publishes and subscribes to Redis.
-func NewPubSub(ctx context.Context, taskStarter component.TaskStarter, conf ttnredis.Config) *PubSub {
-	return WrapPubSub(ctx, events.NewPubSub(events.DefaultBufferSize), taskStarter, conf)
 }
 
 // PubSub with Redis backend.
@@ -97,7 +94,7 @@ func (ps *PubSub) subscribeTask(ctx context.Context) error {
 }
 
 // Subscribe implements the events.Subscriber interface.
-func (ps *PubSub) Subscribe(name string, hdl events.Handler) error {
+func (ps *PubSub) Subscribe(ctx context.Context, name string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
 	ps.subOnce.Do(func() {
 		ps.taskStarter.StartTask(&component.TaskConfig{
 			Context: ps.ctx,
@@ -107,7 +104,7 @@ func (ps *PubSub) Subscribe(name string, hdl events.Handler) error {
 			Backoff: component.DefaultTaskBackoffConfig,
 		})
 	})
-	return ps.PubSub.Subscribe(name, hdl)
+	return ps.PubSub.Subscribe(ctx, name, ids, hdl)
 }
 
 // Close the Redis publisher.

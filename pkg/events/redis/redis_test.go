@@ -57,10 +57,11 @@ func redisConfig() ttnredis.Config {
 func Example() {
 	// The task starter is used for automatic re-subscription on failure.
 	taskStarter := component.StartTaskFunc(component.DefaultStartTask)
-	// This sends all events received from Redis to the default pubsub.
-	redisPubSub := redis.WrapPubSub(context.TODO(), events.DefaultPubSub(), taskStarter, ttnredis.Config{
+
+	redisPubSub := redis.NewPubSub(context.TODO(), taskStarter, ttnredis.Config{
 		// Config here...
 	})
+
 	// Replace the default pubsub so that we will now publish to Redis.
 	events.SetDefaultPubSub(redisPubSub)
 }
@@ -87,7 +88,10 @@ func TestRedisPubSub(t *testing.T) {
 			pubsub := redis.NewPubSub(ctx, taskStarter, redisConfig())
 			defer pubsub.Close(ctx)
 
-			pubsub.Subscribe("redis.**", handler)
+			subCtx, unsubscribe := context.WithCancel(ctx)
+			defer unsubscribe()
+			pubsub.Subscribe(subCtx, "redis.**", nil, handler)
+
 			time.Sleep(timeout)
 
 			appID := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
