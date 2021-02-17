@@ -31,6 +31,7 @@ message Application {
   ApplicationIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp deleted_at = 8 [(gogoproto.stdtime) = true];
 
   string name = 4 [(validate.rules).string.max_len = 50];
   string description = 5 [(validate.rules).string.max_len = 2000];
@@ -46,6 +47,8 @@ message Application {
 
   // Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.
   repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
+
+  // next: 9
 }
 
 message Applications {
@@ -74,6 +77,8 @@ message ListApplicationsRequest {
   uint32 limit = 4 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 5;
+  // Only return recently deleted applications.
+  bool deleted = 6;
 }
 
 message CreateApplicationRequest {

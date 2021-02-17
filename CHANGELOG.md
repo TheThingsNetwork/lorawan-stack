@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- API and CLI commands for listing, searching for and restoring recently deleted applications, OAuth clients, gateways, organizations and users.
+
 ### Changed
 
 ### Deprecated

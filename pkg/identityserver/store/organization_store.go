@@ -43,13 +43,13 @@ func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask *ty
 	}
 	var organizationColumns []string
 	var notFoundPaths []string
-	organizationColumns = append(organizationColumns, "accounts.uid")
+	organizationColumns = append(organizationColumns, "organizations.deleted_at", "accounts.uid")
 	for _, column := range modelColumns {
 		organizationColumns = append(organizationColumns, "organizations."+column)
 	}
 	for _, path := range ttnpb.TopLevelFields(fieldMask.Paths) {
 		switch path {
-		case "ids", "created_at", "updated_at":
+		case "ids", "created_at", "updated_at", "deleted_at":
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
@@ -159,10 +159,15 @@ func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.Or
 	return s.deleteEntity(ctx, id)
 }
 
+func (s *organizationStore) RestoreOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (err error) {
+	defer trace.StartRegion(ctx, "restore organization").End()
+	return s.restoreEntity(ctx, id)
+}
+
 func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "purge organization").End()
 
-	query := s.query(ctx, Organization{}, withUnscoped(), withOrganizationID(id.GetOrganizationID()))
+	query := s.query(ctx, Organization{}, withSoftDeleted(), withOrganizationID(id.GetOrganizationID()))
 	query = selectOrganizationFields(ctx, query, nil)
 	var orgModel organizationWithUID
 	if err = query.First(&orgModel).Error; err != nil {
@@ -185,7 +190,7 @@ func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.Org
 		return err
 	}
 	// Purge account after purging organization because it is necessary for organization query
-	return s.query(ctx, Account{}, withUnscoped()).Where(Account{
+	return s.query(ctx, Account{}, withSoftDeleted()).Where(Account{
 		UID:         id.IDString(),
 		AccountType: id.EntityType(),
 	}).Delete(Account{}).Error

@@ -83,6 +83,7 @@ var (
 				Limit:        limit,
 				Page:         page,
 				Order:        getOrder(cmd.Flags()),
+				Deleted:      getDeleted(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -244,7 +245,27 @@ var (
 			return nil
 		},
 	}
+	organizationsRestoreCommand = &cobra.Command{
+		Use:   "restore [organization-id]",
+		Short: "Restore an organization",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			orgID := getOrganizationID(cmd.Flags(), args)
+			if orgID == nil {
+				return errNoOrganizationID
+			}
 
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewOrganizationRegistryClient(is).Restore(ctx, orgID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
 	organizationsPurgeCommand = &cobra.Command{
 		Use:     "purge [organization-id]",
 		Aliases: []string{"permanent-delete", "hard-delete"},
@@ -285,12 +306,14 @@ var (
 
 func init() {
 	organizationsListCommand.Flags().AddFlagSet(collaboratorFlags())
+	organizationsListCommand.Flags().AddFlagSet(deletedFlags)
 	organizationsListCommand.Flags().AddFlagSet(selectOrganizationFlags)
 	organizationsListCommand.Flags().AddFlagSet(selectAllOrganizationFlags)
 	organizationsListCommand.Flags().AddFlagSet(paginationFlags())
 	organizationsListCommand.Flags().AddFlagSet(orderFlags())
 	organizationsCommand.AddCommand(organizationsListCommand)
 	organizationsSearchCommand.Flags().AddFlagSet(searchFlags())
+	organizationsSearchCommand.Flags().AddFlagSet(deletedFlags)
 	organizationsSearchCommand.Flags().AddFlagSet(selectOrganizationFlags)
 	organizationsSearchCommand.Flags().AddFlagSet(selectAllOrganizationFlags)
 	organizationsCommand.AddCommand(organizationsSearchCommand)
@@ -309,6 +332,8 @@ func init() {
 	organizationsCommand.AddCommand(organizationsSetCommand)
 	organizationsDeleteCommand.Flags().AddFlagSet(organizationIDFlags())
 	organizationsCommand.AddCommand(organizationsDeleteCommand)
+	organizationsRestoreCommand.Flags().AddFlagSet(organizationIDFlags())
+	organizationsCommand.AddCommand(organizationsRestoreCommand)
 	organizationsContactInfoCommand.PersistentFlags().AddFlagSet(organizationIDFlags())
 	organizationsCommand.AddCommand(organizationsContactInfoCommand)
 	organizationsPurgeCommand.Flags().AddFlagSet(organizationIDFlags())

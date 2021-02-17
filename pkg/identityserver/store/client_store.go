@@ -45,7 +45,7 @@ func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fi
 	var notFoundPaths []string
 	for _, path := range ttnpb.TopLevelFields(fieldMask.Paths) {
 		switch path {
-		case "ids", "created_at", "updated_at":
+		case "ids", "created_at", "updated_at", "deleted_at":
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
@@ -60,7 +60,7 @@ func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fi
 	if len(notFoundPaths) > 0 {
 		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
-	return query.Select(cleanFields(append(append(modelColumns, "client_id"), clientColumns...)...))
+	return query.Select(cleanFields(append(append(modelColumns, "deleted_at", "client_id"), clientColumns...)...))
 }
 
 func (s *clientStore) CreateClient(ctx context.Context, cli *ttnpb.Client) (*ttnpb.Client, error) {
@@ -153,4 +153,29 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 func (s *clientStore) DeleteClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete client").End()
 	return s.deleteEntity(ctx, id)
+}
+
+func (s *clientStore) RestoreClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error {
+	defer trace.StartRegion(ctx, "restore client").End()
+	return s.restoreEntity(ctx, id)
+}
+
+func (s *clientStore) PurgeClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error {
+	defer trace.StartRegion(ctx, "purge client").End()
+	query := s.query(ctx, Client{}, withSoftDeleted(), withClientID(id.GetClientID()))
+	query = selectClientFields(ctx, query, nil)
+	var cliModel Client
+	if err := query.First(&cliModel).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return errNotFoundForID(id)
+		}
+		return err
+	}
+	// delete client attributes before purging
+	if len(cliModel.Attributes) > 0 {
+		if err := s.replaceAttributes(ctx, "gateway", cliModel.ID, cliModel.Attributes, nil); err != nil {
+			return err
+		}
+	}
+	return s.purgeEntity(ctx, id)
 }

@@ -90,6 +90,16 @@ func (dst *SearchEntitiesRequest) SetFields(src *SearchEntitiesRequest, paths ..
 				var zero uint32
 				dst.Page = zero
 			}
+		case "deleted":
+			if len(subs) > 0 {
+				return fmt.Errorf("'deleted' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Deleted = src.Deleted
+			} else {
+				var zero bool
+				dst.Deleted = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

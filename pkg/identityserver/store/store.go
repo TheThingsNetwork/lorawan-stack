@@ -40,7 +40,7 @@ type store struct {
 }
 
 func (s *store) query(ctx context.Context, model interface{}, funcs ...func(*gorm.DB) *gorm.DB) *gorm.DB {
-	query := s.DB.Model(model).Scopes(withContext(ctx))
+	query := s.DB.Model(model).Scopes(withContext(ctx), withSoftDeletedIfRequested(ctx))
 	if len(funcs) > 0 {
 		query = query.Scopes(funcs...)
 	}
@@ -66,21 +66,7 @@ func (s *store) findEntity(ctx context.Context, entityID ttnpb.Identifiers, fiel
 }
 
 func (s *store) findDeletedEntity(ctx context.Context, entityID ttnpb.Identifiers, fields ...string) (modelInterface, error) {
-	model := modelForID(entityID)
-	query := s.query(ctx, model, withUnscoped(), withID(entityID))
-	if len(fields) == 1 && fields[0] == "id" {
-		fields[0] = s.DB.NewScope(model).TableName() + ".id"
-	}
-	if len(fields) > 0 {
-		query = query.Select(fields)
-	}
-	if err := query.First(model).Error; err != nil {
-		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(entityID)
-		}
-		return nil, convertError(err)
-	}
-	return model, nil
+	return s.findEntity(WithSoftDeleted(ctx, false), entityID, fields...)
 }
 
 func (s *store) createEntity(ctx context.Context, model interface{}) error {
@@ -101,7 +87,38 @@ func (s *store) deleteEntity(ctx context.Context, entityID ttnpb.Identifiers) er
 	if err != nil {
 		return err
 	}
-	return s.DB.Delete(model).Error
+	if err = s.DB.Delete(model).Error; err != nil {
+		return err
+	}
+	switch entityType := entityID.EntityType(); entityType {
+	case "user", "organization":
+		err = s.DB.Where(Account{
+			AccountType: entityType,
+			AccountID:   model.PrimaryKey(),
+		}).Delete(Account{}).Error
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *store) restoreEntity(ctx context.Context, entityID ttnpb.Identifiers) error {
+	model, err := s.findDeletedEntity(ctx, entityID, "id")
+	if err != nil {
+		return err
+	}
+	switch entityType := entityID.EntityType(); entityType {
+	case "user", "organization":
+		err := s.DB.Unscoped().Model(Account{}).Where(Account{
+			AccountType: entityType,
+			AccountID:   model.PrimaryKey(),
+		}).UpdateColumn("deleted_at", gorm.Expr("NULL")).Error
+		if err != nil {
+			return err
+		}
+	}
+	return s.DB.Unscoped().Model(model).UpdateColumn("deleted_at", gorm.Expr("NULL")).Error
 }
 
 func (s *store) purgeEntity(ctx context.Context, entityID ttnpb.Identifiers) error {

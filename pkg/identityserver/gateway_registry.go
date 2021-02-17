@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"time"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -44,6 +45,12 @@ var (
 	)
 	evtDeleteGateway = events.Define(
 		"gateway.delete", "delete gateway",
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
+	evtRestoreGateway = events.Define(
+		"gateway.restore", "restore gateway",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
@@ -318,6 +325,9 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			return nil, err
 		}
 	}
+	if req.Deleted {
+		ctx = store.WithSoftDeleted(ctx, true)
+	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -545,6 +555,31 @@ func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayI
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
+	if err := rights.RequireGateway(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_GATEWAY_DELETE); err != nil {
+		return nil, err
+	}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		gtwStore := store.GetGatewayStore(db)
+		gtw, err := gtwStore.GetGateway(store.WithSoftDeleted(ctx, true), ids, softDeleteFieldMask)
+		if err != nil {
+			return err
+		}
+		if gtw.DeletedAt == nil {
+			panic("store.WithSoftDeleted(ctx, true) returned result that is not deleted")
+		}
+		if time.Since(*gtw.DeletedAt) > is.configFromContext(ctx).Delete.Restore {
+			return errRestoreWindowExpired.New()
+		}
+		return gtwStore.RestoreGateway(ctx, ids)
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtRestoreGateway.NewWithIdentifiersAndData(ctx, ids, nil))
+	return ttnpb.Empty, nil
+}
+
 func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeGateways
@@ -612,6 +647,10 @@ func (gr *gatewayRegistry) Update(ctx context.Context, req *ttnpb.UpdateGatewayR
 
 func (gr *gatewayRegistry) Delete(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
 	return gr.deleteGateway(ctx, req)
+}
+
+func (gr *gatewayRegistry) Restore(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
+	return gr.restoreGateway(ctx, req)
 }
 
 func (gr *gatewayRegistry) Purge(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*types.Empty, error) {

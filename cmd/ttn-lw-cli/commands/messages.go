@@ -18,6 +18,9 @@ var (
 	applicationPurgeWarning = []string{
 		"This action will permanently delete the application and all related data (API keys, rights, attributes etc.)",
 	}
+	clientPurgeWarning = []string{
+		"This action will permanently delete the client and all related data (rights, attributes etc.)",
+	}
 	gatewayPurgeWarning = []string{
 		"This action will permanently delete the gateway and all related data (API keys, antennas, attributes etc.)",
 	}

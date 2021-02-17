@@ -33,6 +33,7 @@ message User {
   UserIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp deleted_at = 19 [(gogoproto.stdtime) = true];
 
   string name = 4 [(validate.rules).string.max_len = 50];
   string description = 5 [(validate.rules).string.max_len = 2000];
@@ -78,6 +79,8 @@ message User {
   google.protobuf.Timestamp temporary_password_expires_at = 17 [(gogoproto.stdtime) = true];
 
   Picture profile_picture = 18;
+
+  // next: 20
 }
 
 message Users {
@@ -102,6 +105,8 @@ message ListUsersRequest {
   uint32 limit = 3 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 4;
+  // Only return recently deleted users.
+  bool deleted = 5;
 }
 
 message CreateUserRequest {

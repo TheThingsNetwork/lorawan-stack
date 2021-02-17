@@ -84,6 +84,7 @@ var (
 				Limit:        limit,
 				Page:         page,
 				Order:        getOrder(cmd.Flags()),
+				Deleted:      getDeleted(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -245,6 +246,27 @@ var (
 			return nil
 		},
 	}
+	applicationsRestoreCommand = &cobra.Command{
+		Use:   "restore [application-id]",
+		Short: "Restore an application",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			appID := getApplicationID(cmd.Flags(), args)
+			if appID == nil {
+				return errNoApplicationID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewApplicationRegistryClient(is).Restore(ctx, appID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
 	applicationsContactInfoCommand = contactInfoCommands("application", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		appID := getApplicationID(cmd.Flags(), args)
 		if appID == nil {
@@ -285,12 +307,14 @@ var (
 
 func init() {
 	applicationsListCommand.Flags().AddFlagSet(collaboratorFlags())
+	applicationsListCommand.Flags().AddFlagSet(deletedFlags)
 	applicationsListCommand.Flags().AddFlagSet(selectApplicationFlags)
 	applicationsListCommand.Flags().AddFlagSet(paginationFlags())
 	applicationsListCommand.Flags().AddFlagSet(orderFlags())
 	applicationsListCommand.Flags().AddFlagSet(selectAllApplicationFlags)
 	applicationsCommand.AddCommand(applicationsListCommand)
 	applicationsSearchCommand.Flags().AddFlagSet(searchFlags())
+	applicationsSearchCommand.Flags().AddFlagSet(deletedFlags)
 	applicationsSearchCommand.Flags().AddFlagSet(selectApplicationFlags)
 	applicationsSearchCommand.Flags().AddFlagSet(selectAllApplicationFlags)
 	applicationsCommand.AddCommand(applicationsSearchCommand)
@@ -309,6 +333,8 @@ func init() {
 	applicationsCommand.AddCommand(applicationsSetCommand)
 	applicationsDeleteCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsCommand.AddCommand(applicationsDeleteCommand)
+	applicationsRestoreCommand.Flags().AddFlagSet(applicationIDFlags())
+	applicationsCommand.AddCommand(applicationsRestoreCommand)
 	applicationsContactInfoCommand.PersistentFlags().AddFlagSet(applicationIDFlags())
 	applicationsCommand.AddCommand(applicationsContactInfoCommand)
 	applicationsPurgeCommand.Flags().AddFlagSet(applicationIDFlags())

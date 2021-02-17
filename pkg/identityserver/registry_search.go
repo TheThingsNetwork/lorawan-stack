@@ -51,6 +51,9 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 		return nil, err
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	if req.Deleted {
+		ctx = store.WithSoftDeleted(ctx, true)
+	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -94,6 +97,9 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchEn
 		return nil, err
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	if req.Deleted {
+		ctx = store.WithSoftDeleted(ctx, true)
+	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -143,6 +149,9 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchE
 		}
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, []string{"frequency_plan_id"})
+	if req.Deleted {
+		ctx = store.WithSoftDeleted(ctx, true)
+	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -192,6 +201,9 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 		return nil, err
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	if req.Deleted {
+		ctx = store.WithSoftDeleted(ctx, true)
+	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -238,6 +250,9 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchEnti
 		return nil, errSearchForbidden.New()
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	if req.Deleted {
+		ctx = store.WithSoftDeleted(ctx, true)
+	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)

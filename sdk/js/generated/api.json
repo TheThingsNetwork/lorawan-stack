@@ -72,6 +72,16 @@
               "defaultValue": ""
             },
             {
+              "name": "deleted_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "name",
               "description": "",
               "label": "",
@@ -642,6 +652,16 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "deleted",
+              "description": "Only return recently deleted applications.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -1114,6 +1134,28 @@
                     {
                       "method": "DELETE",
                       "pattern": "/applications/{application_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Restore",
+              "description": "Restore a recently deleted application.\n\nDeployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+              "requestType": "ApplicationIdentifiers",
+              "requestLongType": "ApplicationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/applications/{application_id}/restore"
                     }
                   ]
                 }
@@ -5545,6 +5587,16 @@
               "defaultValue": ""
             },
             {
+              "name": "deleted_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "name",
               "description": "",
               "label": "",
@@ -6090,6 +6142,16 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "deleted",
+              "description": "Only return recently deleted clients.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -6425,6 +6487,50 @@
                     {
                       "method": "DELETE",
                       "pattern": "/clients/{client_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Restore",
+              "description": "Restore a recently deleted client.\n\nDeployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+              "requestType": "ClientIdentifiers",
+              "requestLongType": "ClientIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ClientIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/clients/{client_id}/restore"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Purge",
+              "description": "Purge the client. This will release the client ID for reuse.",
+              "requestType": "ClientIdentifiers",
+              "requestLongType": "ClientIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ClientIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/clients/{client_id}/purge"
                     }
                   ]
                 }
@@ -13032,6 +13138,16 @@
               "defaultValue": ""
             },
             {
+              "name": "deleted_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "name",
               "description": "",
               "label": "",
@@ -13355,7 +13471,7 @@
             },
             {
               "name": "target_cups_key",
-              "description": "CUPS Key for LoRa Basics Station CUPS redirection.\nIf redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.\n\nnext: 26",
+              "description": "CUPS Key for LoRa Basics Station CUPS redirection.\nIf redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.\n\nnext: 27",
               "label": "",
               "type": "Secret",
               "longType": "Secret",
@@ -14714,6 +14830,16 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "deleted",
+              "description": "Only return recently deleted gateways.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -15250,6 +15376,28 @@
                     {
                       "method": "DELETE",
                       "pattern": "/gateways/{gateway_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Restore",
+              "description": "Restore a recently deleted gateway. This does not restore the EUI,\nas that was released when deleting the gateway.\n\nDeployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+              "requestType": "GatewayIdentifiers",
+              "requestLongType": "GatewayIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/gateways/{gateway_id}/restore"
                     }
                   ]
                 }
@@ -26177,6 +26325,16 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "deleted",
+              "description": "Only return recently deleted organizations.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -26219,6 +26377,16 @@
             },
             {
               "name": "updated_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "deleted_at",
               "description": "",
               "label": "",
               "type": "Timestamp",
@@ -26821,6 +26989,28 @@
                     {
                       "method": "DELETE",
                       "pattern": "/organizations/{organization_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Restore",
+              "description": "Restore a recently deleted organization.\n\nDeployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+              "requestType": "OrganizationIdentifiers",
+              "requestLongType": "OrganizationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/organizations/{organization_id}/restore"
                     }
                   ]
                 }
@@ -28586,6 +28776,16 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "deleted",
+              "description": "Only return recently deleted entities.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -29439,6 +29639,16 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "deleted",
+              "description": "Only return recently deleted users.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -29671,6 +29881,16 @@
             },
             {
               "name": "updated_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "deleted_at",
               "description": "",
               "label": "",
               "type": "Timestamp",
@@ -30482,6 +30702,28 @@
                     {
                       "method": "DELETE",
                       "pattern": "/users/{user_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Restore",
+              "description": "Restore a recently deleted user.\n\nDeployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+              "requestType": "UserIdentifiers",
+              "requestLongType": "UserIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.UserIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/users/{user_id}/restore"
                     }
                   ]
                 }

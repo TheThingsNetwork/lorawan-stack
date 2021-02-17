@@ -80,6 +80,7 @@ func (org Organization) toPB(pb *ttnpb.Organization, fieldMask *types.FieldMask)
 	pb.OrganizationIdentifiers.OrganizationID = org.Account.UID
 	pb.CreatedAt = cleanTime(org.CreatedAt)
 	pb.UpdatedAt = cleanTime(org.UpdatedAt)
+	pb.DeletedAt = cleanTimePtr(org.DeletedAt)
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
 		fieldMask = defaultOrganizationFieldMask
 	}

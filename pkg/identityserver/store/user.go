@@ -170,6 +170,7 @@ func (usr User) toPB(pb *ttnpb.User, fieldMask *types.FieldMask) {
 	pb.UserIdentifiers.UserID = usr.Account.UID
 	pb.CreatedAt = cleanTime(usr.CreatedAt)
 	pb.UpdatedAt = cleanTime(usr.UpdatedAt)
+	pb.DeletedAt = cleanTimePtr(usr.DeletedAt)
 	if fieldMask == nil || len(fieldMask.Paths) == 0 {
 		fieldMask = defaultUserFieldMask
 	}

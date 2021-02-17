@@ -83,6 +83,16 @@ service UserRegistry {
     };
   };
 
+  // Restore a recently deleted user.
+  //
+  // Deployment configuration may specify if, and for how long after deletion,
+  // entities can be restored.
+  rpc Restore(UserIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/users/{user_id}/restore"
+    };
+  };
+
   // Purge the user. This will release the user ID for reuse.
   // The user is responsible for clearing data from any (external) integrations
   // that may store and expose data by user or organization ID.

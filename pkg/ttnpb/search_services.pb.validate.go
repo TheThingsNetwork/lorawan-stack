@@ -137,6 +137,8 @@ func (m *SearchEntitiesRequest) ValidateFields(paths ...string) error {
 
 		case "page":
 			// no validation rules for Page
+		case "deleted":
+			// no validation rules for Deleted
 		default:
 			return SearchEntitiesRequestValidationError{
 				field:  name,

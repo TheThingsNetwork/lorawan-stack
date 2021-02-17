@@ -50,6 +50,15 @@ func (dst *Application) SetFields(src *Application, paths ...string) error {
 				var zero time.Time
 				dst.UpdatedAt = zero
 			}
+		case "deleted_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'deleted_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DeletedAt = src.DeletedAt
+			} else {
+				dst.DeletedAt = nil
+			}
 		case "name":
 			if len(subs) > 0 {
 				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
@@ -222,6 +231,16 @@ func (dst *ListApplicationsRequest) SetFields(src *ListApplicationsRequest, path
 			} else {
 				var zero uint32
 				dst.Page = zero
+			}
+		case "deleted":
+			if len(subs) > 0 {
+				return fmt.Errorf("'deleted' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Deleted = src.Deleted
+			} else {
+				var zero bool
+				dst.Deleted = zero
 			}
 
 		default:

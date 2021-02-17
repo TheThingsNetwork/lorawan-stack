@@ -57,8 +57,3 @@ type Model struct {
 func (m Model) PrimaryKey() string { return m.ID }
 
 var modelColumns = []string{"id", "created_at", "updated_at"}
-
-// SoftDelete makes a Delete operation set a DeletedAt instead of actually deleting the model.
-type SoftDelete struct {
-	DeletedAt *time.Time `gorm:"index"`
-}

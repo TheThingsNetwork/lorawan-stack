@@ -34,6 +34,7 @@ func TestClientStore(t *testing.T) {
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, &Client{}, &Attribute{})
 		store := GetClientStore(db)
+		s := newStore(db)
 
 		created, err := store.CreateClient(ctx, &ttnpb.Client{
 			ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "foo"},
@@ -124,9 +125,47 @@ func TestClientStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
+		err = store.RestoreClient(ctx, &ttnpb.ClientIdentifiers{ClientID: "foo"})
+
+		a.So(err, should.BeNil)
+
+		got, err = store.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientID: "foo"}, nil)
+
+		a.So(err, should.BeNil)
+
+		err = store.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientID: "foo"})
+
+		a.So(err, should.BeNil)
+
 		list, err = store.FindClients(ctx, nil, nil)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
+
+		list, err = store.FindClients(WithSoftDeleted(ctx, false), nil, nil)
+
+		a.So(err, should.BeNil)
+		a.So(list, should.NotBeEmpty)
+
+		entity, _ := s.findDeletedEntity(ctx, &ttnpb.ClientIdentifiers{ClientID: "foo"}, "id")
+
+		err = store.PurgeClient(ctx, &ttnpb.ClientIdentifiers{ClientID: "foo"})
+
+		a.So(err, should.BeNil)
+
+		var attribute []Attribute
+		s.query(ctx, Attribute{}).Where(&Attribute{
+			EntityID:   entity.PrimaryKey(),
+			EntityType: "client",
+		}).Find(&attribute)
+
+		a.So(attribute, should.HaveLength, 0)
+
+		// Check that client ids are released after purge
+		_, err = store.CreateClient(ctx, &ttnpb.Client{
+			ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "foo"},
+		})
+
+		a.So(err, should.BeNil)
 	})
 }

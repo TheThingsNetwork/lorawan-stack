@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"time"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -43,6 +44,12 @@ var (
 	)
 	evtDeleteOrganization = events.Define(
 		"organization.delete", "delete organization",
+		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
+	evtRestoreOrganization = events.Define(
+		"organization.restore", "restore organization",
 		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
@@ -160,6 +167,9 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	} else if orgIDs := req.Collaborator.GetOrganizationIDs(); orgIDs != nil {
 		return nil, errNestedOrganizations.New()
 	}
+	if req.Deleted {
+		ctx = store.WithSoftDeleted(ctx, true)
+	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -250,6 +260,31 @@ func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.Org
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) restoreOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
+	if err := rights.RequireOrganization(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_ORGANIZATION_DELETE); err != nil {
+		return nil, err
+	}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		orgStore := store.GetOrganizationStore(db)
+		org, err := orgStore.GetOrganization(store.WithSoftDeleted(ctx, true), ids, softDeleteFieldMask)
+		if err != nil {
+			return err
+		}
+		if org.DeletedAt == nil {
+			panic("store.WithSoftDeleted(ctx, true) returned result that is not deleted")
+		}
+		if time.Since(*org.DeletedAt) > is.configFromContext(ctx).Delete.Restore {
+			return errRestoreWindowExpired.New()
+		}
+		return orgStore.RestoreOrganization(ctx, ids)
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtRestoreOrganization.NewWithIdentifiersAndData(ctx, ids, nil))
+	return ttnpb.Empty, nil
+}
+
 func (is *IdentityServer) purgeOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeOrganizations
@@ -299,6 +334,10 @@ func (or *organizationRegistry) Update(ctx context.Context, req *ttnpb.UpdateOrg
 
 func (or *organizationRegistry) Delete(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
 	return or.deleteOrganization(ctx, req)
+}
+
+func (or *organizationRegistry) Restore(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
+	return or.restoreOrganization(ctx, req)
 }
 
 func (or *organizationRegistry) Purge(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {

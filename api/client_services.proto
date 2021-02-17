@@ -80,6 +80,23 @@ service ClientRegistry {
       delete: "/clients/{client_id}"
     };
   };
+
+  // Restore a recently deleted client.
+  //
+  // Deployment configuration may specify if, and for how long after deletion,
+  // entities can be restored.
+  rpc Restore(ClientIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/clients/{client_id}/restore"
+    };
+  };
+
+  // Purge the client. This will release the client ID for reuse.
+  rpc Purge(ClientIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/clients/{client_id}/purge"
+    };
+  };
 }
 
 // The ClientAcces service, exposed by the Identity Server, is used to manage

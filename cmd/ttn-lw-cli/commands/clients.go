@@ -83,6 +83,7 @@ var (
 				Limit:        limit,
 				Page:         page,
 				Order:        getOrder(cmd.Flags()),
+				Deleted:      getDeleted(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -252,6 +253,56 @@ var (
 			return nil
 		},
 	}
+	clientsRestoreCommand = &cobra.Command{
+		Use:   "restore [client-id]",
+		Short: "Restore a client",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliID := getClientID(cmd.Flags(), args)
+			if cliID == nil {
+				return errNoClientID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewClientRegistryClient(is).Restore(ctx, cliID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+	clientsPurgeCommand = &cobra.Command{
+		Use:     "purge [client-id]",
+		Aliases: []string{"permanent-delete", "hard-delete"},
+		Short:   "Purge an client",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliID := getClientID(cmd.Flags(), args)
+			if cliID == nil {
+				return errNoClientID
+			}
+
+			force, err := cmd.Flags().GetBool("force")
+			if err != nil {
+				return err
+			}
+			if !confirmChoice(clientPurgeWarning, force) {
+				return errNoConfirmation
+			}
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewClientRegistryClient(is).Purge(ctx, cliID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
 	clientsContactInfoCommand = contactInfoCommands("client", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		cliID := getClientID(cmd.Flags(), args)
 		if cliID == nil {
@@ -263,12 +314,14 @@ var (
 
 func init() {
 	clientsListCommand.Flags().AddFlagSet(collaboratorFlags())
+	clientsListCommand.Flags().AddFlagSet(deletedFlags)
 	clientsListCommand.Flags().AddFlagSet(selectClientFlags)
 	clientsListCommand.Flags().AddFlagSet(selectAllClientFlags)
 	clientsListCommand.Flags().AddFlagSet(paginationFlags())
 	clientsListCommand.Flags().AddFlagSet(orderFlags())
 	clientsCommand.AddCommand(clientsListCommand)
 	clientsSearchCommand.Flags().AddFlagSet(searchFlags())
+	clientsSearchCommand.Flags().AddFlagSet(deletedFlags)
 	clientsSearchCommand.Flags().AddFlagSet(selectClientFlags)
 	clientsSearchCommand.Flags().AddFlagSet(selectAllClientFlags)
 	clientsCommand.AddCommand(clientsSearchCommand)
@@ -289,7 +342,12 @@ func init() {
 	clientsCommand.AddCommand(clientsSetCommand)
 	clientsDeleteCommand.Flags().AddFlagSet(clientIDFlags())
 	clientsCommand.AddCommand(clientsDeleteCommand)
+	clientsRestoreCommand.Flags().AddFlagSet(clientIDFlags())
+	clientsCommand.AddCommand(clientsRestoreCommand)
 	clientsContactInfoCommand.PersistentFlags().AddFlagSet(clientIDFlags())
 	clientsCommand.AddCommand(clientsContactInfoCommand)
+	clientsPurgeCommand.Flags().AddFlagSet(clientIDFlags())
+	clientsPurgeCommand.Flags().AddFlagSet(forceFlags())
+	clientsCommand.AddCommand(clientsPurgeCommand)
 	Root.AddCommand(clientsCommand)
 }

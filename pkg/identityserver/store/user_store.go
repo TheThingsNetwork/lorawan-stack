@@ -43,13 +43,13 @@ func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fiel
 	}
 	var userColumns []string
 	var notFoundPaths []string
-	userColumns = append(userColumns, "accounts.uid")
+	userColumns = append(userColumns, "users.deleted_at", "accounts.uid")
 	for _, column := range modelColumns {
 		userColumns = append(userColumns, "users."+column)
 	}
 	for _, path := range ttnpb.TopLevelFields(fieldMask.Paths) {
 		switch path {
-		case "ids", "created_at", "updated_at":
+		case "ids", "created_at", "updated_at", "deleted_at":
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
@@ -204,9 +204,14 @@ func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) (
 	return s.deleteEntity(ctx, id)
 }
 
+func (s *userStore) RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) (err error) {
+	defer trace.StartRegion(ctx, "restore user").End()
+	return s.restoreEntity(ctx, id)
+}
+
 func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "purge user").End()
-	query := s.query(ctx, User{}, withUnscoped(), withUserID(id.GetUserID()))
+	query := s.query(ctx, User{}, withSoftDeleted(), withUserID(id.GetUserID()))
 	query = selectUserFields(ctx, query, nil)
 	var userModel userWithUID
 	if err = query.First(&userModel).Error; err != nil {
@@ -234,7 +239,7 @@ func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) (e
 		return err
 	}
 	// Purge account after purging user because it is necessary for user query
-	return s.query(ctx, Account{}, withUnscoped()).Where(Account{
+	return s.query(ctx, Account{}, withSoftDeleted()).Where(Account{
 		UID:         id.IDString(),
 		AccountType: id.EntityType(),
 	}).Delete(Account{}).Error

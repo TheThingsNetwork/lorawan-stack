@@ -84,6 +84,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted applications.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -690,6 +697,38 @@
       "delete": {
         "summary": "Purge the application. This will release the application ID for reuse.\nAll end devices must be deleted from the application before it can be deleted.\nThe application owner is responsible for clearing data from any (external) integrations\nthat may store and expose data by application ID",
         "operationId": "ApplicationRegistry_Purge",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationRegistry"
+        ]
+      }
+    },
+    "/applications/{application_id}/restore": {
+      "post": {
+        "summary": "Restore a recently deleted application.",
+        "description": "Deployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+        "operationId": "ApplicationRegistry_Restore",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2933,6 +2972,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted clients.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -3213,6 +3259,69 @@
       "delete": {
         "summary": "Delete the OAuth client. This may not release the client ID for reuse.",
         "operationId": "ClientRegistry_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ClientRegistry"
+        ]
+      }
+    },
+    "/clients/{client_id}/purge": {
+      "delete": {
+        "summary": "Purge the client. This will release the client ID for reuse.",
+        "operationId": "ClientRegistry_Purge",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ClientRegistry"
+        ]
+      }
+    },
+    "/clients/{client_id}/restore": {
+      "post": {
+        "summary": "Restore a recently deleted client.",
+        "description": "Deployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+        "operationId": "ClientRegistry_Restore",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4200,6 +4309,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted gateways.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -4763,6 +4879,38 @@
             "required": false,
             "type": "string",
             "format": "byte"
+          }
+        ],
+        "tags": [
+          "GatewayRegistry"
+        ]
+      }
+    },
+    "/gateways/{gateway_id}/restore": {
+      "post": {
+        "summary": "Restore a recently deleted gateway. This does not restore the EUI,\nas that was released when deleting the gateway.",
+        "description": "Deployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+        "operationId": "GatewayRegistry_Restore",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -5802,6 +5950,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted organizations.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -5882,6 +6037,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted applications.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -6000,6 +6162,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted clients.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -6118,6 +6287,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted gateways.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -6614,6 +6790,39 @@
         ]
       }
     },
+    "/organizations/{organization_id}/restore": {
+      "post": {
+        "summary": "Restore a recently deleted organization.",
+        "description": "Deployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+        "operationId": "OrganizationRegistry_Restore",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrganizationRegistry"
+        ]
+      }
+    },
     "/organizations/{organization_id}/rights": {
       "get": {
         "summary": "List the rights the caller has on this organization.",
@@ -6807,6 +7016,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted entities.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -6994,6 +7210,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted entities.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7074,6 +7297,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted entities.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7154,6 +7384,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted entities.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7234,6 +7471,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted entities.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7293,6 +7537,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted users.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7404,6 +7655,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted applications.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7522,6 +7780,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted clients.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7640,6 +7905,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted gateways.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7758,6 +8030,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted organizations.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -8554,6 +8833,39 @@
             "description": "Secondary identifier, which can only be used in specific requests.",
             "in": "query",
             "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserRegistry"
+        ]
+      }
+    },
+    "/users/{user_id}/restore": {
+      "post": {
+        "summary": "Restore a recently deleted user.",
+        "description": "Deployment configuration may specify if, and for how long after deletion,\nentities can be restored.",
+        "operationId": "UserRegistry_Restore",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],
@@ -10112,6 +10424,10 @@
           "type": "string",
           "format": "date-time"
         },
+        "deleted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
         "name": {
           "type": "string"
         },
@@ -11114,6 +11430,10 @@
           "format": "date-time"
         },
         "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deleted_at": {
           "type": "string",
           "format": "date-time"
         },
@@ -12346,6 +12666,10 @@
           "format": "date-time"
         },
         "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deleted_at": {
           "type": "string",
           "format": "date-time"
         },
@@ -13755,6 +14079,10 @@
           "type": "string",
           "format": "date-time"
         },
+        "deleted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
         "name": {
           "type": "string"
         },
@@ -14899,6 +15227,10 @@
           "format": "date-time"
         },
         "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deleted_at": {
           "type": "string",
           "format": "date-time"
         },

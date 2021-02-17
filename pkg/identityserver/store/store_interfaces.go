@@ -31,6 +31,7 @@ type ApplicationStore interface {
 	GetApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Application, error)
 	UpdateApplication(ctx context.Context, app *ttnpb.Application, fieldMask *types.FieldMask) (*ttnpb.Application, error)
 	DeleteApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error
+	RestoreApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error
 	PurgeApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error
 }
 
@@ -44,6 +45,8 @@ type ClientStore interface {
 	GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Client, error)
 	UpdateClient(ctx context.Context, cli *ttnpb.Client, fieldMask *types.FieldMask) (*ttnpb.Client, error)
 	DeleteClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error
+	RestoreClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error
+	PurgeClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error
 }
 
 // EndDeviceStore interface for storing EndDevices.
@@ -70,6 +73,7 @@ type GatewayStore interface {
 	GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Gateway, error)
 	UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fieldMask *types.FieldMask) (*ttnpb.Gateway, error)
 	DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error
+	RestoreGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error
 	PurgeGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error
 }
 
@@ -83,6 +87,7 @@ type OrganizationStore interface {
 	GetOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Organization, error)
 	UpdateOrganization(ctx context.Context, org *ttnpb.Organization, fieldMask *types.FieldMask) (*ttnpb.Organization, error)
 	DeleteOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) error
+	RestoreOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) error
 	PurgeOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) error
 }
 
@@ -97,6 +102,7 @@ type UserStore interface {
 	GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask *types.FieldMask) (*ttnpb.User, error)
 	UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *types.FieldMask) (*ttnpb.User, error)
 	DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) error
+	RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) error
 	PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) error
 }
 
@@ -161,6 +167,7 @@ type OAuthStore interface {
 	Authorize(ctx context.Context, req *ttnpb.OAuthClientAuthorization) (authorization *ttnpb.OAuthClientAuthorization, err error)
 	DeleteAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) error
 	DeleteUserAuthorizations(ctx context.Context, userIDs *ttnpb.UserIdentifiers) error
+	DeleteClientAuthorizations(ctx context.Context, clientIDs *ttnpb.ClientIdentifiers) error
 
 	CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) error
 	GetAuthorizationCode(ctx context.Context, code string) (*ttnpb.OAuthAuthorizationCode, error)

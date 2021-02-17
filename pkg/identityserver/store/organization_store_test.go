@@ -125,10 +125,27 @@ func TestOrganizationStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
+		err = store.RestoreOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: "foo"})
+
+		a.So(err, should.BeNil)
+
+		got, err = store.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}, nil)
+
+		a.So(err, should.BeNil)
+
+		err = store.DeleteOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: "foo"})
+
+		a.So(err, should.BeNil)
+
 		list, err = store.FindOrganizations(ctx, nil, nil)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
+
+		list, err = store.FindOrganizations(WithSoftDeleted(ctx, false), nil, nil)
+
+		a.So(err, should.BeNil)
+		a.So(list, should.NotBeEmpty)
 
 		entity, _ := s.findDeletedEntity(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}, "id")
 
@@ -144,7 +161,7 @@ func TestOrganizationStore(t *testing.T) {
 
 		a.So(attribute, should.HaveLength, 0)
 
-		//Check that organization ids are released after purge
+		// Check that organization ids are released after purge
 		_, err = store.CreateOrganization(ctx, &ttnpb.Organization{
 			OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "foo"},
 			Name:                    "Foo Organization",

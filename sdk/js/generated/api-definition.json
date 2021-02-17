@@ -153,6 +153,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "ids",
         "ids.application_id",
@@ -187,6 +188,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "ids",
         "ids.application_id",
@@ -210,6 +212,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "ids",
         "ids.application_id",
@@ -223,6 +226,18 @@
         {
           "method": "delete",
           "pattern": "/applications/{application_id}",
+          "parameters": [
+            "application_id"
+          ]
+        }
+      ]
+    },
+    "Restore": {
+      "file": "lorawan-stack/api/application_services.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/applications/{application_id}/restore",
           "parameters": [
             "application_id"
           ]
@@ -1651,6 +1666,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "endorsed",
         "grants",
@@ -1692,6 +1708,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "endorsed",
         "grants",
@@ -1722,6 +1739,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "endorsed",
         "grants",
@@ -1743,6 +1761,30 @@
         {
           "method": "delete",
           "pattern": "/clients/{client_id}",
+          "parameters": [
+            "client_id"
+          ]
+        }
+      ]
+    },
+    "Restore": {
+      "file": "lorawan-stack/api/client_services.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/clients/{client_id}/restore",
+          "parameters": [
+            "client_id"
+          ]
+        }
+      ]
+    },
+    "Purge": {
+      "file": "lorawan-stack/api/client_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/clients/{client_id}/purge",
           "parameters": [
             "client_id"
           ]
@@ -2396,6 +2438,7 @@
         "claim_authentication_code.valid_to",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "downlink_path_constraint",
         "enforce_duty_cycle",
@@ -2466,6 +2509,7 @@
         "claim_authentication_code.valid_to",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "downlink_path_constraint",
         "enforce_duty_cycle",
@@ -2521,6 +2565,7 @@
         "claim_authentication_code.valid_to",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "downlink_path_constraint",
         "enforce_duty_cycle",
@@ -2558,6 +2603,18 @@
         {
           "method": "delete",
           "pattern": "/gateways/{gateway_id}",
+          "parameters": [
+            "gateway_id"
+          ]
+        }
+      ]
+    },
+    "Restore": {
+      "file": "lorawan-stack/api/gateway_services.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/gateways/{gateway_id}/restore",
           "parameters": [
             "gateway_id"
           ]
@@ -3872,6 +3929,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "ids",
         "ids.organization_id",
@@ -3899,6 +3957,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "ids",
         "ids.organization_id",
@@ -3922,6 +3981,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "ids",
         "ids.organization_id",
@@ -3935,6 +3995,18 @@
         {
           "method": "delete",
           "pattern": "/organizations/{organization_id}",
+          "parameters": [
+            "organization_id"
+          ]
+        }
+      ]
+    },
+    "Restore": {
+      "file": "lorawan-stack/api/organization_services.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/organizations/{organization_id}/restore",
           "parameters": [
             "organization_id"
           ]
@@ -4054,6 +4126,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "ids",
         "ids.application_id",
@@ -4074,6 +4147,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "endorsed",
         "grants",
@@ -4109,6 +4183,7 @@
         "claim_authentication_code.valid_to",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "downlink_path_constraint",
         "enforce_duty_cycle",
@@ -4153,6 +4228,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "ids",
         "ids.organization_id",
@@ -4174,6 +4250,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "ids",
         "ids.email",
@@ -4322,6 +4399,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "ids",
         "ids.email",
@@ -4356,6 +4434,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "ids",
         "ids.email",
@@ -4393,6 +4472,7 @@
         "attributes",
         "contact_info",
         "created_at",
+        "deleted_at",
         "description",
         "ids",
         "ids.email",
@@ -4444,6 +4524,18 @@
         {
           "method": "delete",
           "pattern": "/users/{user_id}",
+          "parameters": [
+            "user_id"
+          ]
+        }
+      ]
+    },
+    "Restore": {
+      "file": "lorawan-stack/api/user_services.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/users/{user_id}/restore",
           "parameters": [
             "user_id"
           ]

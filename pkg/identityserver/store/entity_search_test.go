@@ -145,6 +145,41 @@ func TestEntitySearch(t *testing.T) {
 			})
 		}
 
+		store.deleteEntity(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: fmt.Sprintf("the-foo-app")})
+		store.deleteEntity(ctx, &ttnpb.ClientIdentifiers{ClientID: fmt.Sprintf("the-foo-cli")})
+		store.deleteEntity(ctx, &ttnpb.GatewayIdentifiers{GatewayID: fmt.Sprintf("the-foo-gtw")})
+		store.deleteEntity(ctx, &ttnpb.UserIdentifiers{UserID: fmt.Sprintf("the-foo-usr")})
+		store.deleteEntity(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: fmt.Sprintf("the-foo-org")})
+
+		for _, entityType := range []string{"application", "client", "gateway", "user", "organization"} {
+			t.Run("deleted "+entityType, func(t *testing.T) {
+				ids, err := s.FindEntities(ctx, nil, &ttnpb.SearchEntitiesRequest{
+					IDContains:          "foo",
+					NameContains:        "foo",
+					DescriptionContains: "foo",
+					AttributesContain: map[string]string{
+						"test": "foo",
+					},
+				}, entityType)
+
+				a.So(err, should.BeNil)
+				a.So(ids, should.HaveLength, 0)
+
+				ids, err = s.FindEntities(ctx, nil, &ttnpb.SearchEntitiesRequest{
+					IDContains:          "foo",
+					NameContains:        "foo",
+					DescriptionContains: "foo",
+					AttributesContain: map[string]string{
+						"test": "foo",
+					},
+					Deleted: true,
+				}, entityType)
+
+				a.So(err, should.BeNil)
+				a.So(ids, should.HaveLength, 1)
+			})
+		}
+
 		t.Run("end_device", func(t *testing.T) {
 			ids, err := s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "the-foo-app"},

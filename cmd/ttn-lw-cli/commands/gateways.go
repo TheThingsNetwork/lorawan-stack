@@ -121,6 +121,7 @@ var (
 				Limit:        limit,
 				Page:         page,
 				Order:        getOrder(cmd.Flags()),
+				Deleted:      getDeleted(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -368,6 +369,27 @@ var (
 			return nil
 		},
 	}
+	gatewaysRestoreCommand = &cobra.Command{
+		Use:   "restore [gateway-id]",
+		Short: "Restore a gateway",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewGatewayRegistryClient(is).Restore(ctx, gtwID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
 	gatewaysConnectionStats = &cobra.Command{
 		Use:     "get-connection-stats [gateway-id]",
 		Aliases: []string{"connection-stats", "cnx-stats", "stats"},
@@ -450,12 +472,14 @@ func init() {
 	gatewaysListFrequencyPlans.Flags().Uint32("base-frequency", 0, "Base frequency in MHz for hardware support (433, 470, 868 or 915)")
 	gatewaysCommand.AddCommand(gatewaysListFrequencyPlans)
 	gatewaysListCommand.Flags().AddFlagSet(collaboratorFlags())
+	gatewaysListCommand.Flags().AddFlagSet(deletedFlags)
 	gatewaysListCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysListCommand.Flags().AddFlagSet(paginationFlags())
 	gatewaysListCommand.Flags().AddFlagSet(orderFlags())
 	gatewaysListCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysListCommand)
 	gatewaysSearchCommand.Flags().AddFlagSet(searchFlags())
+	gatewaysSearchCommand.Flags().AddFlagSet(deletedFlags)
 	gatewaysSearchCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysSearchCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysSearchCommand)
@@ -480,6 +504,8 @@ func init() {
 	gatewaysCommand.AddCommand(gatewaysSetCommand)
 	gatewaysDeleteCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysDeleteCommand)
+	gatewaysRestoreCommand.Flags().AddFlagSet(gatewayIDFlags())
+	gatewaysCommand.AddCommand(gatewaysRestoreCommand)
 	gatewaysConnectionStats.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysConnectionStats)
 	gatewaysContactInfoCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())

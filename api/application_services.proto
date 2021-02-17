@@ -82,6 +82,16 @@ service ApplicationRegistry {
     };
   };
 
+  // Restore a recently deleted application.
+  //
+  // Deployment configuration may specify if, and for how long after deletion,
+  // entities can be restored.
+  rpc Restore(ApplicationIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/applications/{application_id}/restore"
+    };
+  };
+
   // Purge the application. This will release the application ID for reuse.
   // All end devices must be deleted from the application before it can be deleted.
   // The application owner is responsible for clearing data from any (external) integrations

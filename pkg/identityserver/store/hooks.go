@@ -16,22 +16,6 @@ package store
 
 import "github.com/jinzhu/gorm"
 
-// AfterDelete deletes the Account of an Organization after it is deleted.
-func (org *Organization) AfterDelete(db *gorm.DB) error {
-	return db.Where(Account{
-		AccountType: "organization",
-		AccountID:   org.PrimaryKey(),
-	}).Delete(Account{}).Error
-}
-
-// AfterDelete deletes the Account of a User after it is deleted.
-func (usr *User) AfterDelete(db *gorm.DB) error {
-	return db.Where(Account{
-		AccountType: "user",
-		AccountID:   usr.PrimaryKey(),
-	}).Delete(Account{}).Error
-}
-
 // AfterDelete releases the EUI of a Gateway after it is deleted.
 func (gtw *Gateway) AfterDelete(db *gorm.DB) error {
 	return db.Unscoped().Model(gtw).UpdateColumn("gateway_eui", nil).Error

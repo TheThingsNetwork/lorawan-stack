@@ -17,6 +17,7 @@ package identityserver
 import (
 	"context"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres database driver.
@@ -226,3 +227,7 @@ func (is *IdentityServer) getMembershipStore(ctx context.Context, db *gorm.DB) s
 	}
 	return s
 }
+
+var softDeleteFieldMask = &types.FieldMask{Paths: []string{"deleted_at"}}
+
+var errRestoreWindowExpired = errors.DefineFailedPrecondition("restore_window_expired", "this entity can no longer be restored")

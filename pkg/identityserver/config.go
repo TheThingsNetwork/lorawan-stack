@@ -86,6 +86,9 @@ type Config struct {
 	Gateways struct {
 		EncryptionKeyID string `name:"encryption-key-id" description:"ID of the key used to encrypt gateway secrets at rest"`
 	} `name:"gateways"`
+	Delete struct {
+		Restore time.Duration `name:"restore" description:"How long after soft-deletion an entity can be restored"`
+	} `name:"delete"`
 }
 
 type emailTemplatesConfig struct {

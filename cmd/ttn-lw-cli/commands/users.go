@@ -108,6 +108,7 @@ var (
 				Limit:     limit,
 				Page:      page,
 				Order:     getOrder(cmd.Flags()),
+				Deleted:   getDeleted(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -415,6 +416,27 @@ var (
 			return nil
 		},
 	}
+	usersRestoreCommand = &cobra.Command{
+		Use:   "restore [user-id]",
+		Short: "Restore a user",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), args)
+			if usrID == nil {
+				return errNoUserID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewUserRegistryClient(is).Restore(ctx, usrID)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
 	usersContactInfoCommand = contactInfoCommands("user", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		usrID := getUserID(cmd.Flags(), args)
 		if usrID == nil {
@@ -456,14 +478,16 @@ var (
 func init() {
 	profilePictureFlags.String("profile_picture", "", "upload the profile picture from this file")
 
+	usersListCommand.Flags().AddFlagSet(deletedFlags)
 	usersListCommand.Flags().AddFlagSet(selectUserFlags)
 	usersListCommand.Flags().AddFlagSet(selectAllUserFlags)
 	usersListCommand.Flags().AddFlagSet(paginationFlags())
 	usersListCommand.Flags().AddFlagSet(orderFlags())
 	usersCommand.AddCommand(usersListCommand)
 	usersSearchCommand.Flags().AddFlagSet(searchFlags())
-	usersSearchCommand.Flags().AddFlagSet(selectAllUserFlags)
+	usersSearchCommand.Flags().AddFlagSet(deletedFlags)
 	usersSearchCommand.Flags().AddFlagSet(selectUserFlags)
+	usersSearchCommand.Flags().AddFlagSet(selectAllUserFlags)
 	usersCommand.AddCommand(usersSearchCommand)
 	usersGetCommand.Flags().AddFlagSet(userIDFlags())
 	usersGetCommand.Flags().AddFlagSet(selectUserFlags)
@@ -491,6 +515,8 @@ func init() {
 	usersCommand.AddCommand(usersUpdatePasswordCommand)
 	usersDeleteCommand.Flags().AddFlagSet(userIDFlags())
 	usersCommand.AddCommand(usersDeleteCommand)
+	usersRestoreCommand.Flags().AddFlagSet(userIDFlags())
+	usersCommand.AddCommand(usersRestoreCommand)
 	usersContactInfoCommand.PersistentFlags().AddFlagSet(userIDFlags())
 	usersCommand.AddCommand(usersContactInfoCommand)
 	usersPurgeCommand.Flags().AddFlagSet(userIDFlags())

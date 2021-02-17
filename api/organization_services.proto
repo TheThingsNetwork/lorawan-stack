@@ -74,6 +74,16 @@ service OrganizationRegistry {
     };
   };
 
+  // Restore a recently deleted organization.
+  //
+  // Deployment configuration may specify if, and for how long after deletion,
+  // entities can be restored.
+  rpc Restore(OrganizationIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/organizations/{organization_id}/restore"
+    };
+  };
+
   // Purge the organization. This will release the organization ID for reuse.
   // The user is responsible for clearing data from any (external) integrations
   // that may store and expose data by user or organization ID.

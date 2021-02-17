@@ -57,6 +57,12 @@ var (
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
+	evtRestoreUser = events.Define(
+		"user.restore", "restore user",
+		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
 	evtPurgeUser = events.Define(
 		"user.purge", "purge user",
 		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
@@ -295,6 +301,9 @@ func (is *IdentityServer) listUsers(ctx context.Context, req *ttnpb.ListUsersReq
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	if err = is.RequireAdmin(ctx); err != nil {
 		return nil, err
+	}
+	if req.Deleted {
+		ctx = store.WithSoftDeleted(ctx, true)
 	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
@@ -633,6 +642,31 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*types.Empty, error) {
+	if err := rights.RequireUser(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_USER_DELETE); err != nil {
+		return nil, err
+	}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		usrStore := store.GetUserStore(db)
+		usr, err := usrStore.GetUser(store.WithSoftDeleted(ctx, true), ids, softDeleteFieldMask)
+		if err != nil {
+			return err
+		}
+		if usr.DeletedAt == nil {
+			panic("store.WithSoftDeleted(ctx, true) returned result that is not deleted")
+		}
+		if time.Since(*usr.DeletedAt) > is.configFromContext(ctx).Delete.Restore {
+			return errRestoreWindowExpired.New()
+		}
+		return usrStore.RestoreUser(ctx, ids)
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtRestoreUser.NewWithIdentifiersAndData(ctx, ids, nil))
+	return ttnpb.Empty, nil
+}
+
 func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*types.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeUsers
@@ -698,6 +732,10 @@ func (ur *userRegistry) CreateTemporaryPassword(ctx context.Context, req *ttnpb.
 
 func (ur *userRegistry) Delete(ctx context.Context, req *ttnpb.UserIdentifiers) (*types.Empty, error) {
 	return ur.deleteUser(ctx, req)
+}
+
+func (ur *userRegistry) Restore(ctx context.Context, req *ttnpb.UserIdentifiers) (*types.Empty, error) {
+	return ur.restoreUser(ctx, req)
 }
 
 func (ur *userRegistry) Purge(ctx context.Context, req *ttnpb.UserIdentifiers) (*types.Empty, error) {
