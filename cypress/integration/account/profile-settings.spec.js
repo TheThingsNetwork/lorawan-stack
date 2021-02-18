@@ -125,7 +125,7 @@ describe('Account App profile settings', () => {
     cy.findByAltText('Current image')
       .should('be.visible')
       .and('have.attr', 'src')
-      .and('match', /^\/assets\/blob\/profile_pictures\/profile-settings-test-user\..*\.png/)
+      .and('match', /^\/assets\/blob\/profile_pictures\/profile-settings-test-user.*\.png/)
   })
 
   it('succeeds deleting the account', () => {
