@@ -38,7 +38,7 @@ func timePtr(t time.Time) *time.Time { return &t }
 func TestStatusRaw(t *testing.T) {
 	a := assertions.New(t)
 
-	raw := []byte(`{"stat":{"rxfw":0,"hal":"5.1.0","fpga":2,"dsp":31,"lpps":2,"lmnw":3,"lmst":1,"lmok":3,"temp":30,"lati":52.34223,"long":5.29685,"txnb":0,"dwnb":0,"alti":66,"rxok":0,"boot":"2017-06-07 09:40:42 GMT","time":"2017-06-08 09:40:42 GMT","rxnb":0,"ackr":0.0}}`)
+	raw := []byte(`{"stat":{"rxfw":0,"hal":"5.1.0","fpga":2,"dsp":31,"lpps":2,"lmnw":3,"lmst":1,"lmok":3,"temp":30.5,"lati":52.34223,"long":5.29685,"txnb":0,"dwnb":0,"alti":66,"rxok":0,"boot":"2017-06-07 09:40:42 GMT","time":"2017-06-08 09:40:42 GMT","rxnb":0,"ackr":0.0}}`)
 	var statusData udp.Data
 	err := json.Unmarshal(raw, &statusData)
 	a.So(err, should.BeNil)
@@ -72,7 +72,7 @@ func TestStatusRaw(t *testing.T) {
 	a.So(status.Metrics["rxok"], should.AlmostEqual, 0)
 	a.So(status.Metrics["rxnb"], should.AlmostEqual, 0)
 	a.So(status.Metrics["ackr"], should.AlmostEqual, 0)
-	a.So(status.Metrics["temp"], should.AlmostEqual, 30)
+	a.So(status.Metrics["temp"], should.AlmostEqual, 30.5)
 	a.So(status.Metrics["lpps"], should.AlmostEqual, 2)
 	a.So(status.Metrics["lmnw"], should.AlmostEqual, 3)
 	a.So(status.Metrics["lmst"], should.AlmostEqual, 1)
