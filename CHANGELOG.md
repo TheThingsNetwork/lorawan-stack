@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- `temp` field of the UDP stats message is now type `float32` (pointer).
+
 ### Deprecated
 
 ### Removed

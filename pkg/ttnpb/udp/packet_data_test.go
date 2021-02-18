@@ -36,7 +36,8 @@ func TestStatusPacket(t *testing.T) {
 		   "rxfw":0,
 		   "ackr":0.0,
 		   "dwnb":0,
-		   "txnb":0
+		   "txnb":0,
+		   "temp":-23.5
 		}
 	 }`
 	var d Data
@@ -49,6 +50,8 @@ func TestStatusPacket(t *testing.T) {
 	a.So(d, should.NotBeNil)
 	a.So(d.Stat, should.NotBeNil)
 	a.So(*d.Stat.Alti, should.Equal, 66)
+	a.So(*d.Stat.Temp, should.Equal, -23.5)
+	a.So(d.Stat.RxNb, should.Equal, 0)
 	a.So(d.Stat.RxNb, should.Equal, 0)
 	a.So(d.Stat.RxOk, should.Equal, 0)
 	a.So(d.Stat.RxFW, should.Equal, 0)
