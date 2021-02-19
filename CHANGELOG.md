@@ -15,6 +15,7 @@ For details about compatibility between different releases, see the **Commitment
 - End device ID generation based on DevEUI in The LoRaWAN Device Repository creation form in the Console.
 - `remote_ip` and `user_agent` metadata on OAuth events.
 - `created_at` and `updated_at` fields to API Keys.
+- Telemetry for Packet Broker Agent.
 
 ### Changed
 
