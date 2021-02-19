@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -63,12 +64,34 @@ func runGoFrom(dir string, args ...string) error {
 	return execGoFrom(dir, os.Stdout, os.Stderr, "run", args...)
 }
 
+func writeToFile(filename string, value []byte) error {
+	return ioutil.WriteFile(filename, value, 0644)
+}
+
 func outputGo(cmd string, args ...string) (string, error) {
 	var buf bytes.Buffer
 	if err := execGo(&buf, os.Stderr, cmd, args...); err != nil {
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+func outputJSONGo(cmd string, args ...string) ([]byte, error) {
+	var buf bytes.Buffer
+	if err := execGo(&buf, os.Stderr, cmd, args...); err != nil {
+		return nil, err
+	}
+	raw := buf.String()
+	jsonStartIdx := strings.Index(raw, "{")
+	if jsonStartIdx == -1 {
+		return nil, fmt.Errorf("No JSON found in output")
+	}
+	start := raw[jsonStartIdx:]
+	jsonEndIdx := strings.Index(start, "}")
+	if jsonEndIdx == -1 {
+		return nil, fmt.Errorf("No JSON found in output")
+	}
+	return []byte(start[:jsonEndIdx+1]), nil
 }
 
 func runGoTool(args ...string) error {
