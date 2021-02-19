@@ -11,8 +11,8 @@
   "license": "Apache-2.0",
   "private": false,
   "scripts": {
-    "build": "rm -rf dist; yarn --cwd=\"../..\" babel --config-file=\"./sdk/js/.babelrc\" ./sdk/js/src -d ./sdk/js/dist",
-    "build:watch": "rm -rf dist; yarn --cwd=\"../..\" babel --config-file=\"./sdk/js/.babelrc\" -w ./sdk/js/src -d ./sdk/jsdist",
+    "build": "rm -rf dist; yarn --cwd=\"../..\" babel --config-file=\"./sdk/js/babel.config.json\" ./sdk/js/src -d ./sdk/js/dist",
+    "build:watch": "rm -rf dist; yarn --cwd=\"../..\" babel --config-file=\"./sdk/js/babel.config.json\" -w ./sdk/js/src -d ./sdk/jsdist",
     "test": "../../node_modules/.bin/jest",
     "test:watch": "../../node_modules/.bin/jest --watch",
     "definitions": "node util/http-mapper.js",

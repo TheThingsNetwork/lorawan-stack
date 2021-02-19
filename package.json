@@ -130,7 +130,7 @@
     "cypress": "4.11.0"
   },
   "babel": {
-    "extends": "./config/.babelrc"
+    "extends": "./config/babel.config.json"
   },
   "jest": {
     "setupFiles": [
