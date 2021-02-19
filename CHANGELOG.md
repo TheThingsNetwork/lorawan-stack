@@ -39,6 +39,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Synchronization in Gateway Server scheduler that caused race conditions in scheduling downlink traffic.
+- Ocassional race condition in uplink matching with replicated Network Server instances.
 
 ## [3.11.0] - 2021-02-10
 

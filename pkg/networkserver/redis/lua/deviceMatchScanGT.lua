@@ -16,6 +16,9 @@ local ack = ARGV[1]
 table.remove(ARGV, 1)
 for _, old_uid in ipairs(ARGV) do
   local uid = redis.call('lindex', KEYS[1], -1)
+  if not uid then
+    return nil
+  end
   if uid ~= old_uid then
     local s = redis.call('hget', KEYS[2], uid)
     local m = cmsgpack.unpack(s)

@@ -528,18 +528,11 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	if !ok {
 		panic(fmt.Sprintf("expected first match script return value element to be a string, got '%v'(%T)", vs[0], vs[0]))
 	}
-	if matchType == "result" {
-		if len(vs) != 2 {
-			panic(fmt.Sprintf("expected match script return value of `result` type to contain 2 elements, got %d", len(vs)))
-		}
-		s, ok := vs[1].(string)
-		if !ok {
-			panic(fmt.Sprintf("expected second element of match script return value of `result` type to be a string, got '%v'(%T)", vs[1], vs[1]))
-		}
+	processResult := func(ctx context.Context, s string) error {
 		if s == string(noUplinkMatchMarker) {
 			return errNoUplinkMatch.New()
 		}
-		ctx := log.NewContextWithField(ctx, "match_key", matchResultKey)
+		ctx = log.NewContextWithField(ctx, "match_key", matchResultKey)
 		res := &UplinkMatchResult{}
 		if err := msgpack.Unmarshal([]byte(s), res); err != nil {
 			log.FromContext(ctx).WithError(err).Error("Failed to unmarshal match result")
@@ -574,6 +567,16 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			return ttnredis.ConvertError(err)
 		}
 		return nil
+	}
+	if matchType == "result" {
+		if len(vs) != 2 {
+			panic(fmt.Sprintf("expected match script return value of `result` type to contain 2 elements, got %d", len(vs)))
+		}
+		s, ok := vs[1].(string)
+		if !ok {
+			panic(fmt.Sprintf("expected second element of match script return value of `result` type to be a string, got '%v'(%T)", vs[1], vs[1]))
+		}
+		return processResult(ctx, s)
 	}
 
 	// NOTE(1): Indexes must be consistent with lua/deviceMatch.lua.
@@ -740,8 +743,20 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			}
 		}
 	}
-	if err = r.Redis.Set(ctx, matchResultKey, []byte{noUplinkMatchMarker}, cacheTTL).Err(); err != nil {
+	ok, err = r.Redis.SetNX(ctx, matchResultKey, []byte{noUplinkMatchMarker}, cacheTTL).Result()
+	if err != nil {
 		return ttnredis.ConvertError(err)
+	}
+	if !ok {
+		// Another instance set the result, while this goroutine was busy with processing.
+		// Ideally, this should be done via a Lua script to avoid (highely unlikely) race conditions.
+		// TODO: Redis 6.2.0 introduces `GET` argument to `SET`, which can be used above instead.
+		// https://github.com/TheThingsNetwork/lorawan-stack/issues/3592
+		s, err := r.Redis.Get(ctx, matchResultKey).Result()
+		if err != nil {
+			return ttnredis.ConvertError(err)
+		}
+		return processResult(ctx, s)
 	}
 	return errNoUplinkMatch.New()
 }
