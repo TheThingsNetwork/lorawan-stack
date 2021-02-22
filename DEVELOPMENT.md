@@ -71,6 +71,7 @@ $ tools/bin/mage dev:initStack
 ```
 
 This creates a database, migrates tables and creates a user `admin` with password `admin`.
+- An API Key for the admin user with `RIGHTS_ALL` is also created and stored in `.env/admin_api_key.txt`.
 
 4. Start a development instance of The Things Stack
 
