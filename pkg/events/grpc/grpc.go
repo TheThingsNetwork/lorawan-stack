@@ -19,8 +19,6 @@ package grpc
 import (
 	"context"
 	"os"
-	"runtime"
-	"sync"
 	"time"
 
 	grpc_runtime "github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -28,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights/rightsutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -38,60 +37,16 @@ const workersPerCPU = 2
 
 // NewEventsServer returns a new EventsServer on the given PubSub.
 func NewEventsServer(ctx context.Context, pubsub events.PubSub) *EventsServer {
-	srv := &EventsServer{
+	return &EventsServer{
 		ctx:    ctx,
 		pubsub: pubsub,
-		events: make(events.Channel, 256),
-		filter: events.NewIdentifierFilter(),
 	}
-	srv.handler = events.ContextHandler(ctx, srv.events)
-
-	go func() {
-		<-srv.ctx.Done()
-		close(srv.events)
-	}()
-
-	for i := 0; i < runtime.NumCPU()*workersPerCPU; i++ {
-		go func() {
-			for evt := range srv.events {
-				proto, err := events.Proto(evt)
-				if err != nil {
-					return
-				}
-				srv.filter.Notify(marshaledEvent{
-					Event: evt,
-					proto: proto,
-				})
-			}
-		}()
-	}
-
-	return srv
-}
-
-type marshaledEvent struct {
-	events.Event
-	proto *ttnpb.Event
 }
 
 // EventsServer streams events from a PubSub over gRPC.
 type EventsServer struct {
-	ctx     context.Context
-	pubsub  events.PubSub
-	subOnce sync.Once
-	events  events.Channel
-	handler events.Handler
-	filter  events.IdentifierFilter
-}
-
-func (srv *EventsServer) subscribe() {
-	srv.subOnce.Do(func() {
-		srv.pubsub.Subscribe("**", srv.handler)
-		go func() {
-			<-srv.ctx.Done()
-			srv.pubsub.Unsubscribe("**", srv.handler)
-		}()
-	})
+	ctx    context.Context
+	pubsub events.PubSub
 }
 
 var errNoIdentifiers = errors.DefineInvalidArgument("no_identifiers", "no identifiers")
@@ -107,12 +62,11 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		return err
 	}
 
-	srv.subscribe()
-
 	ch := make(events.Channel, 8)
 	handler := events.ContextHandler(ctx, ch)
-	srv.filter.Subscribe(ctx, req, handler)
-	defer srv.filter.Unsubscribe(ctx, req, handler)
+	if err := srv.pubsub.Subscribe(ctx, "", req.Identifiers, handler); err != nil {
+		return err
+	}
 
 	if req.Tail > 0 || req.After != nil {
 		warning.Add(ctx, "Historical events not implemented")
@@ -144,13 +98,18 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		case evt := <-ch:
 			isVisible, err := rightsutil.EventIsVisible(ctx, evt)
 			if err != nil {
-				return err
+				log.FromContext(ctx).WithError(err).Warn("Failed to check event visibility")
+				continue
 			}
 			if !isVisible {
 				continue
 			}
-			marshaled := evt.(marshaledEvent)
-			if err := stream.Send(marshaled.proto); err != nil {
+			proto, err := events.Proto(evt)
+			if err != nil {
+				log.FromContext(ctx).WithError(err).Warn("Failed to convert event to proto")
+				continue
+			}
+			if err := stream.Send(proto); err != nil {
 				return err
 			}
 		}

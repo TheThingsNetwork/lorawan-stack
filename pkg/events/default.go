@@ -14,7 +14,21 @@
 
 package events
 
-var defaultPubSub = NewPubSub(DefaultBufferSize)
+import (
+	"context"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+)
+
+type noopPubSub struct{}
+
+func (noopPubSub) Publish(Event) {}
+
+func (noopPubSub) Subscribe(context.Context, string, []*ttnpb.EntityIdentifiers, Handler) error {
+	return nil
+}
+
+var defaultPubSub PubSub = &noopPubSub{}
 
 // SetDefaultPubSub sets pubsub used by the package to ps.
 func SetDefaultPubSub(ps PubSub) {
@@ -26,21 +40,15 @@ func DefaultPubSub() PubSub {
 	return defaultPubSub
 }
 
-// Subscribe adds an event handler to the default event pubsub.
-// The name can be a glob in order to catch multiple event types.
-// The handler must be non-blocking.
-func Subscribe(name string, hdl Handler) error {
-	return defaultPubSub.Subscribe(name, hdl)
-}
-
-// Unsubscribe removes an event handler from the default event pubsub.
-func Unsubscribe(name string, hdl Handler) {
-	defaultPubSub.Unsubscribe(name, hdl)
+// Subscribe subscribes on the default PubSub.
+func Subscribe(ctx context.Context, name string, ids []*ttnpb.EntityIdentifiers, hdl Handler) error {
+	return defaultPubSub.Subscribe(ctx, name, ids, hdl)
 }
 
 // Publish emits events on the default event pubsub.
 func Publish(evts ...Event) {
 	for _, evt := range evts {
 		defaultPubSub.Publish(local(evt).withCaller())
+		publishes.WithLabelValues(evt.Name()).Inc()
 	}
 }

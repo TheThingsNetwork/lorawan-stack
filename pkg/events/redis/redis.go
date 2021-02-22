@@ -17,67 +17,97 @@ package redis
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/base64"
+	"strings"
 	"sync"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/events/basic"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
-
-// WrapPubSub wraps an existing PubSub and publishes all events received from Redis to that PubSub.
-func WrapPubSub(ctx context.Context, wrapped events.PubSub, taskStarter component.TaskStarter, conf ttnredis.Config) *PubSub {
-	ttnRedisClient := ttnredis.New(&conf)
-	eventChannel := ttnRedisClient.Key("events")
-	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"namespace", "events/redis",
-		"channel", eventChannel,
-	))
-	ctx, cancel := context.WithCancel(ctx)
-	return &PubSub{
-		PubSub:       wrapped,
-		taskStarter:  taskStarter,
-		ctx:          ctx,
-		cancel:       cancel,
-		client:       ttnRedisClient.Client,
-		eventChannel: eventChannel,
-	}
-}
 
 // NewPubSub creates a new PubSub that publishes and subscribes to Redis.
 func NewPubSub(ctx context.Context, taskStarter component.TaskStarter, conf ttnredis.Config) *PubSub {
-	return WrapPubSub(ctx, events.NewPubSub(events.DefaultBufferSize), taskStarter, conf)
+	ttnRedisClient := ttnredis.New(&conf)
+	eventChannel := func(ctx context.Context, name string, ids *ttnpb.EntityIdentifiers) string {
+		if name == "" {
+			name = "*"
+		}
+		if ids == nil {
+			return ttnRedisClient.Key("events", "*", "*", name)
+		}
+		return ttnRedisClient.Key("events", ids.EntityType(), unique.ID(ctx, ids), name)
+	}
+	ctx = log.NewContextWithFields(ctx, log.Fields(
+		"namespace", "events/redis",
+	))
+	ctx, cancel := context.WithCancel(ctx)
+	ps := &PubSub{
+		PubSub:        basic.NewPubSub(),
+		ctx:           ctx,
+		cancel:        cancel,
+		client:        ttnRedisClient.Client,
+		eventChannel:  eventChannel,
+		subscriptions: make(map[string]int),
+	}
+	ps.sub = ps.client.Subscribe(ctx)
+	taskStarter.StartTask(&component.TaskConfig{
+		Context: ps.ctx,
+		ID:      "events_redis_subscribe",
+		Func:    ps.subscribeTask,
+		Restart: component.TaskRestartOnFailure,
+		Backoff: component.DefaultTaskBackoffConfig,
+	})
+	return ps
 }
 
 // PubSub with Redis backend.
 type PubSub struct {
-	events.PubSub
+	*basic.PubSub
 
-	taskStarter  component.TaskStarter
-	ctx          context.Context
-	cancel       context.CancelFunc
-	eventChannel string
-	client       *redis.Client
-	subOnce      sync.Once
+	eventChannel func(ctx context.Context, name string, ids *ttnpb.EntityIdentifiers) string
+
+	ctx    context.Context
+	cancel context.CancelFunc
+	client *redis.Client
+
+	subOnce       sync.Once
+	mu            sync.RWMutex
+	sub           *redis.PubSub
+	subscriptions map[string]int
 }
 
 var errChannelClosed = errors.DefineAborted("channel_closed", "channel closed")
 
+const encodingPrefix = "v3-event-proto:"
+
 func (ps *PubSub) subscribeTask(ctx context.Context) error {
 	logger := log.FromContext(ctx)
-	sub := ps.client.Subscribe(ctx, ps.eventChannel)
-	logger.Info("Subscribed")
+
+	ps.mu.Lock()
+	ps.sub = ps.client.Subscribe(ctx)
+	patterns := make([]string, 0, len(ps.subscriptions))
+	for pattern := range ps.subscriptions {
+		patterns = append(patterns, pattern)
+	}
+	logger.WithField("patterns", patterns).Debug("Subscribe to Redis channels")
+	ps.sub.PSubscribe(ctx, patterns...)
+	ps.mu.Unlock()
+
 	defer func() {
-		if err := sub.Close(); err != nil {
+		if err := ps.sub.Close(); err != nil {
 			logger.WithError(err).Warn("Failed to close Redis subscription")
-		} else {
-			logger.Info("Unsubscribed")
 		}
 	}()
-	ch := sub.Channel()
+
+	ch := ps.sub.Channel()
 	for {
 		select {
 		case <-ctx.Done():
@@ -86,28 +116,108 @@ func (ps *PubSub) subscribeTask(ctx context.Context) error {
 			if !ok {
 				return errChannelClosed.New()
 			}
-			evt, err := events.UnmarshalJSON([]byte(msg.Payload))
-			if err != nil {
-				logger.WithError(err).Warn("Failed to unmarshal event from JSON")
+			if !strings.HasPrefix(msg.Payload, encodingPrefix) {
+				logger.Warn("Skip decoding event with unexpected encoding")
 				continue
 			}
-			ps.PubSub.Publish(evt)
+
+			bpb, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(msg.Payload, encodingPrefix))
+			if err != nil {
+				logger.WithError(err).Warn("Failed to decode event payload from base64")
+				continue
+			}
+			var pb ttnpb.Event
+			if err = proto.Unmarshal(bpb, &pb); err != nil {
+				logger.WithError(err).Warn("Failed to unmarshal event from binary protobuf")
+				continue
+			}
+			evt, err := events.FromProto(&pb)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to convert event from protobuf")
+				continue
+			}
+			ps.PubSub.Publish(&patternEvent{Event: evt, pattern: msg.Pattern})
 		}
 	}
 }
 
+type patternEvent struct {
+	events.Event
+	pattern string
+}
+
+func (ps *PubSub) eventChannelPatterns(ctx context.Context, name string, ids []*ttnpb.EntityIdentifiers) []string {
+	if name == "" {
+		name = "*"
+	} else {
+		name = strings.Replace(name, "**", "*", -1)
+	}
+
+	if len(ids) == 0 {
+		ids = []*ttnpb.EntityIdentifiers{nil}
+	}
+
+	var patterns []string
+	for _, id := range ids {
+		patterns = append(patterns, ps.eventChannel(ctx, name, id))
+		if appID := id.GetApplicationIDs(); appID != nil {
+			pattern := ps.eventChannel(ctx, name, ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: *appID,
+				DeviceID:               "*",
+			}.EntityIdentifiers())
+			patterns = append(patterns, pattern)
+		}
+	}
+
+	return patterns
+}
+
 // Subscribe implements the events.Subscriber interface.
-func (ps *PubSub) Subscribe(name string, hdl events.Handler) error {
-	ps.subOnce.Do(func() {
-		ps.taskStarter.StartTask(&component.TaskConfig{
-			Context: ps.ctx,
-			ID:      "events_redis_subscribe",
-			Func:    ps.subscribeTask,
-			Restart: component.TaskRestartOnFailure,
-			Backoff: component.DefaultTaskBackoffConfig,
-		})
-	})
-	return ps.PubSub.Subscribe(name, hdl)
+func (ps *PubSub) Subscribe(ctx context.Context, name string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
+	ps.mu.Lock()
+	defer ps.mu.Unlock()
+
+	sub := &subscription{
+		name:     name,
+		ids:      ids,
+		patterns: ps.eventChannelPatterns(ctx, name, ids),
+		hdl:      hdl,
+	}
+
+	ps.PubSub.AddSubscription(sub)
+
+	for _, pattern := range sub.patterns {
+		if ps.subscriptions[pattern] == 0 {
+			err := ps.sub.PSubscribe(ps.ctx, pattern)
+			if err != nil {
+				return err
+			}
+		}
+		ps.subscriptions[pattern]++
+	}
+
+	go func() {
+		<-ctx.Done()
+
+		ps.PubSub.RemoveSubscription(sub)
+
+		ps.mu.Lock()
+		defer ps.mu.Unlock()
+
+		for _, pattern := range sub.patterns {
+			ps.subscriptions[pattern]--
+			if ps.subscriptions[pattern] == 0 {
+				log.FromContext(ctx).WithField("pattern", pattern).Debug("Unsubscribe from Redis channels")
+				err := ps.sub.PUnsubscribe(ps.ctx, pattern)
+				if err != nil {
+					log.FromContext(ps.ctx).WithField("pattern", pattern).WithError(err).Warn("Could not unsubscribe")
+				}
+				delete(ps.subscriptions, pattern)
+			}
+		}
+	}()
+
+	return nil
 }
 
 // Close the Redis publisher.
@@ -127,12 +237,26 @@ func (ps *PubSub) Close(ctx context.Context) error {
 // Publish an event to Redis.
 func (ps *PubSub) Publish(evt events.Event) {
 	logger := log.FromContext(ps.ctx)
-	b, err := json.Marshal(evt)
+	pb, err := events.Proto(evt)
 	if err != nil {
-		logger.WithError(err).Warn("Failed to marshal event to JSON")
+		logger.WithError(err).Warn("Failed to convert event to protobuf")
 		return
 	}
-	if err := ps.client.Publish(ps.ctx, ps.eventChannel, b).Err(); err != nil {
-		logger.WithError(err).Warn("Failed to publish event")
+	bpb, err := proto.Marshal(pb)
+	if err != nil {
+		logger.WithError(err).Warn("Failed to marshal event to binary protobuf")
+		return
+	}
+	b := encodingPrefix + base64.StdEncoding.EncodeToString(bpb)
+	if ids := evt.Identifiers(); len(ids) > 0 {
+		for _, id := range ids {
+			if err := ps.client.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), b).Err(); err != nil {
+				logger.WithError(err).Warn("Failed to publish event")
+			}
+		}
+	} else {
+		if err := ps.client.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), b).Err(); err != nil {
+			logger.WithError(err).Warn("Failed to publish event")
+		}
 	}
 }

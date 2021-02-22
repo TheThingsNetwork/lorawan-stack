@@ -24,6 +24,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/events/basic"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -78,64 +79,6 @@ func TestNew(t *testing.T) {
 	ctx = metadata.NewIncomingContext(ctx, metadata.Pairs("grpcgateway-user-agent", "agent-from-grpcgateway-header/0.2"))
 	evt = events.New(ctx, "test.evt", "test event", events.WithAuthFromContext(), events.WithClientInfoFromContext())
 	a.So(evt.UserAgent(), should.Equal, "agent-from-grpcgateway-header/0.2")
-
-}
-
-func TestEvents(t *testing.T) {
-	a := assertions.New(t)
-
-	events.IncludeCaller = true
-
-	var totalEvents int
-	newTotal := make(chan int)
-	allEvents := events.HandlerFunc(func(e events.Event) {
-		t.Logf("Received event %v", e)
-		a.So(e.Time().IsZero(), should.BeFalse)
-		a.So(e.Context(), should.NotBeNil)
-		totalEvents++
-		newTotal <- totalEvents
-	})
-
-	eventCh := make(chan events.Event)
-	handler := events.HandlerFunc(func(e events.Event) {
-		eventCh <- e
-	})
-
-	pubsub := events.NewPubSub(events.DefaultBufferSize)
-
-	pubsub.Subscribe("**", allEvents)
-
-	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
-
-	pubsub.Publish(events.New(ctx, "test.evt0", "test event 0"))
-	a.So(<-newTotal, should.Equal, 1)
-	a.So(eventCh, should.HaveLength, 0)
-
-	pubsub.Subscribe("test.*", handler)
-	pubsub.Subscribe("test.*", handler) // second time should not matter
-
-	evt := events.New(ctx, "test.evt1", "test event 1")
-	a.So(evt.CorrelationIDs(), should.Contain, t.Name())
-
-	wrapped := wrappedEvent{Event: evt}
-	pubsub.Publish(wrapped)
-	a.So(<-newTotal, should.Equal, 2)
-
-	received := <-eventCh
-	a.So(received.Context(), should.Equal, evt.Context())
-	a.So(received.Name(), should.Equal, evt.Name())
-	a.So(received.Time(), should.Equal, evt.Time())
-	a.So(received.Identifiers(), should.Equal, evt.Identifiers())
-	a.So(received.Data(), should.Equal, evt.Data())
-	a.So(received.CorrelationIDs(), should.Resemble, evt.CorrelationIDs())
-	a.So(received.Origin(), should.Equal, evt.Origin())
-	a.So(received.Visibility(), should.Resemble, evt.Visibility())
-
-	pubsub.Unsubscribe("test.*", handler)
-
-	pubsub.Publish(events.New(ctx, "test.evt2", "test event 2"))
-	a.So(<-newTotal, should.Equal, 3)
-	a.So(eventCh, should.HaveLength, 0)
 }
 
 func TestUnmarshalJSON(t *testing.T) {
@@ -171,14 +114,17 @@ func TestUnmarshalJSON(t *testing.T) {
 }
 
 func Example() {
+	// The context typically comes from the request or something.
+	ctx := test.Context()
+
 	// This is required for unit test to pass.
-	defer test.SetDefaultEventsPubSub(events.NewPubSub(10))()
+	defer test.SetDefaultEventsPubSub(basic.NewPubSub())()
 
 	// The WaitGroup is only for synchronizing the unit test
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	events.Subscribe("ns.**", events.HandlerFunc(func(e events.Event) {
+	events.Subscribe(ctx, "ns.**", nil, events.HandlerFunc(func(e events.Event) {
 		fmt.Printf("Received event %s\n", e.Name())
 
 		wg.Done() // only for synchronizing the unit test
@@ -195,7 +141,6 @@ func Example() {
 
 	// These variables come from the request or you got them from the db or something.
 	var (
-		ctx      = test.Context()
 		dev      ttnpb.EndDevice
 		requests []ttnpb.MACCommand_LinkADRReq
 	)

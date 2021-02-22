@@ -61,6 +61,10 @@ func (d *definition) New(ctx context.Context, opts ...Option) Event {
 	return d.With(defaultOptions...).New(ctx, opts...)
 }
 
+type CombinedIdentifiers interface {
+	CombinedIdentifiers() *ttnpb.CombinedIdentifiers
+}
+
 func (d *definition) NewWithIdentifiersAndData(ctx context.Context, ids CombinedIdentifiers, data interface{}) Event {
 	return d.With(defaultOptions...).NewWithIdentifiersAndData(ctx, ids, data)
 }
@@ -78,7 +82,7 @@ func All() Builders {
 		name    string
 		builder Builder
 	}
-	var sorted = make([]*definition, 0, len(definitions))
+	sorted := make([]*definition, 0, len(definitions))
 	for name, builder := range definitions {
 		sorted = append(sorted, &definition{name: name, builder: builder})
 	}

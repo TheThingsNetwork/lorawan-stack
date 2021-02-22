@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,12 @@ package cloud_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/cloud"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/events/internal/eventstest"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	_ "gocloud.dev/pubsub/mempubsub"
@@ -37,8 +35,7 @@ func Example() {
 	// Import the desired cloud pub-sub drivers (see godoc.org/gocloud.dev).
 	// In this example we use "gocloud.dev/pubsub/mempubsub".
 
-	// This sends all events received from a Go Cloud pub sub to the default pubsub.
-	cloudPubSub, err := cloud.WrapPubSub(context.TODO(), events.DefaultPubSub(), taskStarter, "mem://events", "mem://events")
+	cloudPubSub, err := cloud.NewPubSub(context.TODO(), taskStarter, "mem://events", "mem://events")
 	if err != nil {
 		// Handle error.
 	}
@@ -50,88 +47,31 @@ func Example() {
 var timeout = (1 << 10) * test.Delay
 
 func TestCloudPubSub(t *testing.T) {
-	test.RunTest(t, test.TestConfig{
-		Timeout: 4 * timeout,
-		Func: func(ctx context.Context, a *assertions.Assertion) {
-			events.IncludeCaller = true
+	events.IncludeCaller = true
 
-			eventCh := make(chan events.Event)
-			handler := events.HandlerFunc(func(e events.Event) {
-				t.Logf("Received event %v", e)
-				a.So(e.Time().IsZero(), should.BeFalse)
-				a.So(e.Context(), should.NotBeNil)
-				eventCh <- e
-			})
+	taskStarter := component.StartTaskFunc(component.DefaultStartTask)
 
-			taskStarter := component.StartTaskFunc(component.DefaultStartTask)
-			pubsub, err := cloud.NewPubSub(ctx, taskStarter, "mem://events_test", "mem://events_test")
+	test.RunSubtest(t, test.SubtestConfig{
+		Name:    "json",
+		Timeout: 10 * timeout,
+		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+			pubsub, err := cloud.NewPubSub(ctx, taskStarter, "mem://json_events_test", "mem://json_events_test")
 			a.So(err, should.BeNil)
-
 			defer pubsub.Close(ctx)
+			cloud.SetContentType(pubsub, "application/json")
+			eventstest.TestBackend(ctx, t, a, pubsub)
+		},
+	})
 
-			pubsub.Subscribe("cloud.**", handler)
-
-			time.Sleep(timeout)
-
-			ctx = events.ContextWithCorrelationID(ctx, t.Name())
-
-			eui := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
-			devAddr := types.DevAddr{1, 2, 3, 4}
-			appID := ttnpb.ApplicationIdentifiers{
-				ApplicationID: "test-app",
-			}
-			devID := ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: appID,
-				DeviceID:               "test-dev",
-				DevEUI:                 &eui,
-				JoinEUI:                &eui,
-				DevAddr:                &devAddr,
-			}
-			gtwID := ttnpb.GatewayIdentifiers{
-				GatewayID: "test-gtw",
-				EUI:       &eui,
-			}
-
-			test.RunSubtestFromContext(ctx, test.SubtestConfig{
-				Name:    "publish_json",
-				Timeout: timeout,
-				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-					cloud.SetContentType(pubsub, "application/json")
-
-					pubsub.Publish(events.New(ctx, "cloud.test.evt0", "cloud test event 0", events.WithIdentifiers(appID)))
-					select {
-					case e := <-eventCh:
-						a.So(e.Name(), should.Equal, "cloud.test.evt0")
-						if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 1) {
-							a.So(e.Identifiers()[0].GetApplicationIDs(), should.Resemble, &appID)
-						}
-					case <-ctx.Done():
-						t.Error("Did not receive expected event")
-						t.FailNow()
-					}
-				},
-			})
-
-			test.RunSubtestFromContext(ctx, test.SubtestConfig{
-				Name:    "publish_pb",
-				Timeout: timeout,
-				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-					cloud.SetContentType(pubsub, "application/protobuf")
-
-					pubsub.Publish(events.New(ctx, "cloud.test.evt1", "cloud test event 1", events.WithIdentifiers(&devID, &gtwID)))
-					select {
-					case e := <-eventCh:
-						a.So(e.Name(), should.Equal, "cloud.test.evt1")
-						if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 2) {
-							a.So(e.Identifiers()[0].GetDeviceIDs(), should.Resemble, &devID)
-							a.So(e.Identifiers()[1].GetGatewayIDs(), should.Resemble, &gtwID)
-						}
-					case <-ctx.Done():
-						t.Error("Did not receive expected event")
-						t.FailNow()
-					}
-				},
-			})
+	test.RunSubtest(t, test.SubtestConfig{
+		Name:    "protobuf",
+		Timeout: 10 * timeout,
+		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+			pubsub, err := cloud.NewPubSub(ctx, taskStarter, "mem://protobuf_events_test", "mem://protobuf_events_test")
+			a.So(err, should.BeNil)
+			defer pubsub.Close(ctx)
+			cloud.SetContentType(pubsub, "application/protobuf")
+			eventstest.TestBackend(ctx, t, a, pubsub)
 		},
 	})
 }

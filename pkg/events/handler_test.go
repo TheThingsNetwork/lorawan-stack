@@ -27,23 +27,32 @@ import (
 )
 
 func ExampleHandlerFunc() {
+	// The context typically comes from the request or something.
+	ctx := test.Context()
+
 	handler := events.HandlerFunc(func(e events.Event) {
 		fmt.Printf("Received event %v\n", e)
 	})
 
-	events.Subscribe("example", handler)
+	subCtx, unsubscribe := context.WithCancel(ctx)
+	events.Subscribe(subCtx, "example", nil, handler)
 
 	// From this moment on, "example" events will be delivered to the handler func.
 
-	events.Unsubscribe("example", handler)
+	// We want to unsubscribe when this function returns.
+	defer unsubscribe()
 
-	// Note that in-transit events may still be delivered after Unsubscribe returns.
+	// Note that in-transit events may still be delivered after unsubscribe returns.
 }
 
 func ExampleChannel() {
+	// The context typically comes from the request or something.
+	ctx := test.Context()
+
 	eventChan := make(events.Channel, 2)
 
-	events.Subscribe("example", eventChan)
+	subCtx, unsubscribe := context.WithCancel(ctx)
+	events.Subscribe(subCtx, "example", nil, eventChan)
 
 	// From this moment on, "example" events will be delivered to the channel.
 	// As soon as the channel is full, events will be dropped, so it's probably a
@@ -55,8 +64,8 @@ func ExampleChannel() {
 		}
 	}()
 
-	// Later:
-	events.Unsubscribe("example", eventChan)
+	// We want to unsubscribe when this function returns.
+	defer unsubscribe()
 
 	// Note that in-transit events may still be delivered after Unsubscribe returns.
 	// This means that you can't immediately close the channel after unsubscribing.
@@ -91,7 +100,9 @@ func ExampleContextHandler() {
 	eventChan := make(events.Channel, 2)
 	handler := events.ContextHandler(ctx, eventChan)
 
-	events.Subscribe("example", handler)
+	events.Subscribe(ctx, "example", nil, handler)
+
+	// We automatically unsubscribe when he context gets canceled.
 
 	// From this moment on, "example" events will be delivered to the channel.
 	// As soon as the channel is full, events will be dropped, so it's probably a
@@ -101,9 +112,6 @@ func ExampleContextHandler() {
 		for {
 			select {
 			case <-ctx.Done():
-				// Don't forget to unsubscribe:
-				events.Unsubscribe("example", handler)
-
 				// The ContextHandler will make sure that no events are delivered after
 				// the context is canceled, so it is now safe to close the channel:
 				close(eventChan)
