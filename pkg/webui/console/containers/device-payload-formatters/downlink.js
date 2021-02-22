@@ -39,7 +39,7 @@ import {
 } from '@console/store/selectors/devices'
 
 @connect(
-  function(state) {
+  state => {
     const formatters = selectSelectedDeviceFormatters(state)
 
     return {
@@ -50,7 +50,7 @@ import {
   },
   { updateDevice: attachPromise(updateDevice) },
 )
-@withBreadcrumb('device.single.payload-formatters.downlink', function(props) {
+@withBreadcrumb('device.single.payload-formatters.downlink', props => {
   const { appId, devId } = props
 
   return (
@@ -84,7 +84,7 @@ class DevicePayloadFormatters extends React.PureComponent {
 
     const formatters = { ...(initialFormatters || {}) }
 
-    await updateDevice(appId, devId, {
+    return updateDevice(appId, devId, {
       formatters: {
         down_formatter: values.type,
         down_formatter_parameter: values.parameter,
@@ -92,7 +92,11 @@ class DevicePayloadFormatters extends React.PureComponent {
         up_formatter_parameter: formatters.up_formatter_parameter,
       },
     })
+  }
 
+  @bind
+  async onSubmitSuccess() {
+    const { devId } = this.props
     toast({
       title: devId,
       message: sharedMessages.payloadFormattersUpdateSuccess,

@@ -59,7 +59,7 @@ describe('Gateway location', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
   })
 
-  it('successfully edits latitude, longitude, altitude', () => {
+  it('succeeds editing latitude, longitude, altitude', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/location`)
     cy.findByLabelText('Latitude').type(coordinates.latitude)
     cy.findByLabelText('Longitude').type(coordinates.longitude)
@@ -74,7 +74,7 @@ describe('Gateway location', () => {
       .should('be.visible')
   })
 
-  it('successfully edits latitude and longitude based map widget location change', () => {
+  it('succeeds editing latitude and longitude based map widget location change', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/location`)
     cy.findByTestId('location-map').should('be.visible')
     cy.findByTestId('location-map').click(30, 30)
@@ -92,7 +92,7 @@ describe('Gateway location', () => {
       .should('be.visible')
   })
 
-  it('successfully deletes location entry', () => {
+  it('succeeds deleting location entry', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/location`)
     cy.findByRole('button', { name: /Remove location entry/ }).click()
 

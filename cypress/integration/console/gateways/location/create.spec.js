@@ -103,7 +103,7 @@ describe('Gateway location create', () => {
     cy.findByRole('button', { name: /Remove location entry/ }).should('be.disabled')
   })
 
-  it('successfully saves location', () => {
+  it('succeeds saving location', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/location`)
     cy.findByLabelText('Latitude').type(coordinates.latitude)
     cy.findByLabelText('Longitude').type(coordinates.longitude)

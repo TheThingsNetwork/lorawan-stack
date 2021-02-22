@@ -57,7 +57,7 @@ describe('Organization create', () => {
     cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/organizations/add`)
   })
 
-  it('successfully adds organization', () => {
+  it('succeeds adding organization', () => {
     cy.findByLabelText('Organization ID').type(organizationId)
 
     cy.findByRole('button', { name: 'Create organization' })
