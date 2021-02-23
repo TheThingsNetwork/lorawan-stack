@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -238,7 +238,10 @@ func (c *Component) AddContextFiller(f fillcontext.Filler) {
 // FromRequestContext returns a derived context from the component context with key values from the request context.
 // This can be used to decouple the lifetime from the request context while keeping security information.
 func (c *Component) FromRequestContext(ctx context.Context) context.Context {
-	return c.ctx
+	return &crossContext{
+		valueCtx:  ctx,
+		cancelCtx: c.ctx,
+	}
 }
 
 // Start starts the component.
