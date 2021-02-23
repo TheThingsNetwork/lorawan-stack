@@ -136,6 +136,7 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 var (
 	errInvalidPayload = errors.DefineCorruption("invalid_payload", "invalid payload")
 	errMissingPayload = errors.DefineDataLoss("missing_payload", "missing payload")
+	errLimitTooLow    = errors.DefineInvalidArgument("limit_too_low", "limit too low")
 )
 
 func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.ApplicationIdentifiers, networkserver.ApplicationUplinkQueueRangeFunc) (time.Time, error)) error {
@@ -182,11 +183,15 @@ func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context
 		}
 
 		t, err := f(ctx, appID, func(limit int, g func(...*ttnpb.ApplicationUp) error) (bool, error) {
+			if limit < 6 {
+				return false, errLimitTooLow.New()
+			}
+			xCount := limit / 6
 			rets, err := q.redis.XReadGroup(ctx, &redis.XReadGroupArgs{
 				Group:    q.group,
 				Consumer: q.id,
 				Streams:  []string{joinAcceptUpStream, joinAcceptUpStream, invalidationUpStream, invalidationUpStream, genericUpStream, genericUpStream, "0", ">", "0", ">", "0", ">"},
-				Count:    int64(limit),
+				Count:    int64(xCount),
 				Block:    -1, // do not block
 			}).Result()
 			if err != nil {
@@ -256,12 +261,18 @@ func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context
 			if err = g(ups...); err != nil {
 				return false, err
 			}
-			for streamID, ids := range msgIDs {
-				// NOTE: Both calls below copy contents of ids internally.
-				p.XAck(ctx, streamID, q.group, ids...)
-				p.XDel(ctx, streamID, ids...)
+			_, err = q.redis.Pipelined(ctx, func(pp redis.Pipeliner) error {
+				for streamID, ids := range msgIDs {
+					// NOTE: Both calls below copy contents of ids internally.
+					pp.XAck(ctx, streamID, q.group, ids...)
+					pp.XDel(ctx, streamID, ids...)
+				}
+				return nil
+			})
+			if err != nil {
+				return false, err
 			}
-			return msgCount < limit, nil
+			return msgCount < xCount, nil
 		})
 		if err != nil || t.IsZero() {
 			return err
