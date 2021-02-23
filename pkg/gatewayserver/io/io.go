@@ -62,6 +62,8 @@ type Server interface {
 	ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
 	// UnclaimDownlink releases the claim of the downlink path for the given gateway.
 	UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
+	// FromRequestContext decouples the lifetime of the provided context from the values found in the context.
+	FromRequestContext(ctx context.Context) context.Context
 }
 
 // Connection is a connection to a gateway managed by a frontend.

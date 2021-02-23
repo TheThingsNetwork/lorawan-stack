@@ -62,3 +62,7 @@ func (srv mockServer) ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdenti
 func (srv mockServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
 	return nil
 }
+
+func (srv mockServer) FromRequestContext(ctx context.Context) context.Context {
+	return ctx
+}

@@ -32,6 +32,7 @@ type Cluster interface {
 	WithClusterAuth() grpc.CallOption
 	ClaimIDs(ctx context.Context, ids ttnpb.Identifiers) error
 	UnclaimIDs(ctx context.Context, ids ttnpb.Identifiers) error
+	FromRequestContext(ctx context.Context) context.Context
 }
 
 // Handler is the upstream handler.
@@ -73,6 +74,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 	}
 	logger.Info("Downlink path claimed")
 	defer func() {
+		ctx := h.cluster.FromRequestContext(ctx)
 		if err := h.cluster.UnclaimIDs(ctx, ids); err != nil {
 			logger.WithError(err).Error("Failed to unclaim downlink path")
 			return
