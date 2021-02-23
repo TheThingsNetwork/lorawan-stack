@@ -579,7 +579,7 @@ macLoop:
 		dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 	}
 
-	if cmacFMatchResult.IsPending {
+	if matchType == pendingMatch {
 		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			dev.EndDeviceIdentifiers.DevAddr = &pld.DevAddr
 			dev.Session = dev.PendingSession
