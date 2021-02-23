@@ -31,6 +31,7 @@ For details about compatibility between different releases, see the **Commitment
 - Conflict error when registering an end device via the wizard in the Console.
 - Pagination in the `List` and `ListTokens` RPCs of the `OAuthAuthorizationRegistry`.
 - Event name on user login.
+- Application uplink queue handling in Network Server.
 
 ### Security
 
