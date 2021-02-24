@@ -14,74 +14,8 @@ This is a checklist for releases. This is filled in by both the releaser and the
 
 #### Preparation
 
-- [ ] Create a `release/v3.${minor}.${patch}` branch off the `v3.${minor}` branch.
-  ```bash
-  $ git checkout v3.${minor}
-  $ git checkout -b release/v3.${minor}.${patch}
-  ```
-
-- [ ] Update submodules
-  ```bash
-  $ mage git:pullSubmodules
-  $ git add data
-  $ git commit -m "data: Update external repositories" # if any changes.
-  ```
-
-- [ ] Update the `CHANGELOG.md` file
-  - [ ] Change the **Unreleased** section to the new version and add date obtained via `date +%Y-%m-%d` (e.g. `## [3.2.1] - 2019-10-11`)
-  - [ ] Check if we didn't forget anything important
-  - [ ] Remove empty subsections
-  - [ ] Update the list of links in the bottom of the file
-  - [ ] Add new **Unreleased** section:
-    ```md
-    ## [Unreleased]
-
-    ### Added
-
-    ### Changed
-
-    ### Deprecated
-
-    ### Removed
-
-    ### Fixed
-
-    ### Security
-    ```
-
-- [ ] Once complete, you can add the file to staging
-  ```bash
-  $ git add CHANGELOG.md
-  ```
-
-
-- [ ] If releasing a new minor version, update the `SECURITY.md` file and stage it for commit.
-  ```bash
-  $ git add SECURITY.md
-  ```
-
-- [ ] Bump version
-  - [ ] Run the necessary `mage` bump commands based on the type of release
-    ```bash
-    $ tools/bin/mage version:bumpMajor   # bumps a major version (from 3.4.5 -> 4.0.0).
-    $ tools/bin/mage version:bumpMinor   # bumps a minor version (from 3.4.5 -> 3.5.0).
-    $ tools/bin/mage version:bumpPatch   # bumps a patch version (from 3.4.5 -> 3.4.6).
-    $ tools/bin/mage version:bumpRC      # bumps a release candidate version (from 3.4.5-rc1 -> 3.4.5-rc2).
-    $ tools/bin/mage version:bumpRelease # bumps a pre-release to a release version (from 3.4.5-rc1 -> 3.4.5).
-    # These bumps can be combined (i.e. `version:bumpMinor version:bumpRC` bumps 3.4.5 -> 3.5.0-rc1).
-    ```
-
-  - [ ] Write the version files
-    ```bash
-    $ tools/bin/mage version:files
-    ```
-
-  - [ ] Commit the version bump
-    ```bash
-    $ tools/bin/mage version:commitBump
-    ```
-
-- [ ] Create a pull request targeting `v3.${minor}`.
+- [ ] Run `tools/bin/prepare_release minor` or `tools/bin/prepare_release patch`.
+- [ ] Follow the instructions.
 
 #### Check 1 (for reviewers)
 

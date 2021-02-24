@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+
+set -e
+
+case "$1" in
+minor|Minor ) bump="Minor" ;;
+patch|Patch ) bump="Patch" ;;
+* ) echo "Missing release type [minor|patch]" ;;
+esac
+mage_bump="version:bump$bump"
+
+case "$2" in
+rc|candidate ) mage_bump_rc="version:bumpRC" ;;
+* ) mage_bump_rc="" ;;
+esac
+
+mage=${mage:-tools/bin/mage}
+origin=${origin:-origin}
+
+current_version=$($mage version:current)
+minor_branch=$($mage $mage_bump version:majorMinor)
+release_tag=$($mage $mage_bump $mage_bump_rc version:current)
+release_date=$(date +%Y-%m-%d)
+release_branch=release/$release_tag
+
+echo "Current Version: $current_version"
+echo "$bump bump branch $minor_branch to $release_tag"
+
+read -p "Confirm (y/n)? " choice
+case "$choice" in
+y|Y|yes ) ;;
+* ) echo "Too bad. Try again."; exit 1;;
+esac
+
+if [[ -z "$mage_bump_rc" ]]; then
+    echo "Please check CHANGELOG.md for correctness and completeness."
+    echo "- Compare https://github.com/TheThingsNetwork/lorawan-stack/compare/${current_version}...${minor_branch}#files_bucket"
+    echo "- Make sure that anything related to API, config and database is present in the CHANGELOG."
+    echo "- Make sure that there are no changes outside the Unreleased section."
+
+    read -p "Does that look good (y/n)? " choice
+    case "$choice" in
+    y|Y|yes ) ;;
+    * ) echo "Too bad. Please fix that and try again."; exit 1;;
+    esac
+fi
+
+echo "Checking out $minor_branch"
+git checkout $minor_branch
+
+echo "Pulling latest changes"
+git pull
+
+echo "Checking out $release_branch"
+git checkout -b $release_branch
+
+echo "Pulling latest changes for submodules"
+mage git:pullSubmodules
+
+if [[ ! -z "$(git diff --name-only data)" ]]; then
+  echo "Committing changes for updated submodules"
+  git add data
+  git commit -m "data: Update external repositories"
+fi
+
+if [[ -z "$mage_bump_rc" ]]; then
+    echo "Updating CHANGELOG.md"
+    cat > tools/update_changelog.keys <<EOF
+:set textwidth=0
+:%s/### Added\n\n#/#/g
+:%s/### Changed\n\n#/#/g
+:%s/### Deprecated\n\n#/#/g
+:%s/### Removed\n\n#/#/g
+:%s/### Fixed\n\n#/#/g
+:%s/### Security\n\n#/#/g
+/## \[Unreleased\]
+o
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [${release_tag#"v"}] - ${release_date}
+/\[unreleased\]
+lcw${release_tag#"v"}/\.\.\.
+/v
+c\$${release_tag}O[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/${release_tag}...${minor_branch}
+:wq
+EOF
+    vim -s tools/update_changelog.keys CHANGELOG.md
+    git add CHANGELOG.md
+fi
+
+echo "Generating version files"
+$mage $mage_bump $mage_bump_rc version:files
+
+echo "Committing version bump"
+$mage $mage_bump $mage_bump_rc version:commitBump
+
+echo "Pushing ${release_branch} to ${origin}"
+read -p "Confirm (y/n)? " choice
+case "$choice" in
+y|Y|yes ) ;;
+* ) echo "Nope. Please push it yourself."; exit 1;;
+esac
+
+git push -u $origin ${release_branch}:${release_branch}
+
+echo "Creating pull request for ${release_tag} release"
+read -p "Confirm (y/n)? " choice
+case "$choice" in
+y|Y|yes ) ;;
+* ) echo "Nope. Please create a pull request yourself."; exit 1;;
+esac
+
+gh pr create \
+    --draft \
+    --base "${minor_branch}" \
+    --head "${release_branch}"
+    --title "Release ${release_tag}" \
+    --body "This pull request prepares the ${release_tag} release." \
+    --assign "@me" \
+    --label "release" \
+    --web
