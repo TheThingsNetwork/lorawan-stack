@@ -1134,6 +1134,7 @@ func (m *ApplicationServiceData) GetData() *types.Struct {
 	return nil
 }
 
+// Application uplink message.
 type ApplicationUp struct {
 	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=end_device_ids,json=endDeviceIds,proto3,embedded=end_device_ids" json:"end_device_ids"`
 	CorrelationIDs       []string `protobuf:"bytes,2,rep,name=correlation_ids,json=correlationIds,proto3" json:"correlation_ids,omitempty"`

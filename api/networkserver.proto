@@ -25,10 +25,12 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// Response of GenerateDevAddr.
 message GenerateDevAddrResponse {
   bytes dev_addr = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
 }
 
+// The Ns service manages the Network Server.
 service Ns {
   // GenerateDevAddr requests a device address assignment from the Network Server.
   rpc GenerateDevAddr(google.protobuf.Empty) returns (GenerateDevAddrResponse) {
@@ -40,13 +42,20 @@ service Ns {
 
 // The AsNs service connects an Application Server to a Network Server.
 service AsNs {
+  // Replace the entire downlink queue with the specified messages.
+  // This can also be used to empty the queue by specifying no messages.
+  // Note that this will trigger an immediate downlink if a downlink slot is available.
   rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty);
+  // Push downlink messages to the end of the downlink queue.
+  // Note that this will trigger an immediate downlink if a downlink slot is available.
   rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty);
+  // List the items currently in the downlink queue.
   rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
 }
 
 // The GsNs service connects a Gateway Server to a Network Server.
 service GsNs {
+  // Handle a LoRaWAN uplink message.
   rpc HandleUplink(UplinkMessage) returns (google.protobuf.Empty);
 }
 

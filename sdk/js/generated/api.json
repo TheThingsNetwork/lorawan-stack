@@ -1457,7 +1457,7 @@
           "name": "NsAsHandleUplinkRequest",
           "longName": "NsAsHandleUplinkRequest",
           "fullName": "ttn.lorawan.v3.NsAsHandleUplinkRequest",
-          "description": "",
+          "description": "Container for multiple Application uplink messages.",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
@@ -1881,7 +1881,7 @@
           "methods": [
             {
               "name": "HandleUplink",
-              "description": "",
+              "description": "Handle Application uplink messages.",
               "requestType": "NsAsHandleUplinkRequest",
               "requestLongType": "NsAsHandleUplinkRequest",
               "requestFullType": "ttn.lorawan.v3.NsAsHandleUplinkRequest",
@@ -21850,7 +21850,7 @@
           "name": "Message",
           "longName": "Message",
           "fullName": "ttn.lorawan.v3.Message",
-          "description": "",
+          "description": "Message represents a LoRaWAN message",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
@@ -23334,7 +23334,7 @@
           "name": "ApplicationUp",
           "longName": "ApplicationUp",
           "fullName": "ttn.lorawan.v3.ApplicationUp",
-          "description": "",
+          "description": "Application uplink message.",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
@@ -24734,7 +24734,7 @@
           "name": "GenerateDevAddrResponse",
           "longName": "GenerateDevAddrResponse",
           "fullName": "ttn.lorawan.v3.GenerateDevAddrResponse",
-          "description": "",
+          "description": "Response of GenerateDevAddr.",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
@@ -24761,7 +24761,7 @@
           "methods": [
             {
               "name": "DownlinkQueueReplace",
-              "description": "",
+              "description": "Replace the entire downlink queue with the specified messages.\nThis can also be used to empty the queue by specifying no messages.\nNote that this will trigger an immediate downlink if a downlink slot is available.",
               "requestType": "DownlinkQueueRequest",
               "requestLongType": "DownlinkQueueRequest",
               "requestFullType": "ttn.lorawan.v3.DownlinkQueueRequest",
@@ -24773,7 +24773,7 @@
             },
             {
               "name": "DownlinkQueuePush",
-              "description": "",
+              "description": "Push downlink messages to the end of the downlink queue.\nNote that this will trigger an immediate downlink if a downlink slot is available.",
               "requestType": "DownlinkQueueRequest",
               "requestLongType": "DownlinkQueueRequest",
               "requestFullType": "ttn.lorawan.v3.DownlinkQueueRequest",
@@ -24785,7 +24785,7 @@
             },
             {
               "name": "DownlinkQueueList",
-              "description": "",
+              "description": "List the items currently in the downlink queue.",
               "requestType": "EndDeviceIdentifiers",
               "requestLongType": "EndDeviceIdentifiers",
               "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
@@ -24805,7 +24805,7 @@
           "methods": [
             {
               "name": "HandleUplink",
-              "description": "",
+              "description": "Handle a LoRaWAN uplink message.",
               "requestType": "UplinkMessage",
               "requestLongType": "UplinkMessage",
               "requestFullType": "ttn.lorawan.v3.UplinkMessage",
@@ -24821,7 +24821,7 @@
           "name": "Ns",
           "longName": "Ns",
           "fullName": "ttn.lorawan.v3.Ns",
-          "description": "",
+          "description": "The Ns service manages the Network Server.",
           "methods": [
             {
               "name": "GenerateDevAddr",
