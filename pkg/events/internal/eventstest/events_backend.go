@@ -22,7 +22,6 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -121,15 +120,18 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 	time.Sleep(timeout)
 
 	if a.So(ch0, should.HaveLength, 2) {
-		checkEvt0(<-ch0)
-		checkEvt1(<-ch0)
+		evt := <-ch0
+		if evt.Name() == "test.some.evt0" { // Events may arrive out-of-order.
+			checkEvt0(evt)
+			checkEvt1(<-ch0)
+		} else {
+			checkEvt1(evt)
+			checkEvt0(<-ch0)
+		}
 	}
 
 	if a.So(ch1, should.HaveLength, 1) {
 		checkEvt1(<-ch1)
-	} else {
-		log.Errorf("ch1: %#v", <-ch1)
-		log.Errorf("ch1: %#v", <-ch1)
 	}
 
 	if a.So(ch2, should.HaveLength, 1) {
