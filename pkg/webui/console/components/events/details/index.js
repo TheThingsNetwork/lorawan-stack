@@ -16,6 +16,9 @@ import React from 'react'
 import classnames from 'classnames'
 
 import Notification from '@ttn-lw/components/notification'
+import Link from '@ttn-lw/components/link'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -29,6 +32,11 @@ import style from './details.styl'
 
 const EventDetails = ({ className, children, event }) => {
   const hasChildren = Boolean(children)
+  const dataFormatsDocumentationLink = (
+    <Link.DocLink secondary path="/docs/reference/data-formats/" title={messages.dataFormats}>
+      <Message content={messages.dataFormats} />
+    </Link.DocLink>
+  )
 
   if (!Boolean(event)) {
     return (
@@ -49,6 +57,10 @@ const EventDetails = ({ className, children, event }) => {
       ) : (
         children
       )}
+      <Message
+        content={messages.dataFormatsInformation}
+        values={{ dataFormatsDocumentationLink }}
+      />
     </div>
   )
 }
