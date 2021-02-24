@@ -109,6 +109,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 
 	if !createdByAdmin {
 		req.Client.State = ttnpb.STATE_REQUESTED
+		req.Client.StateDescription = "admin approval required"
 		req.Client.SkipAuthorization = false
 		req.Client.Endorsed = false
 	}
@@ -265,9 +266,16 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	if !updatedByAdmin {
 		for _, path := range req.FieldMask.Paths {
 			switch path {
-			case "state", "skip_authorization", "endorsed", "grants":
+			case "state", "state_description", "skip_authorization", "endorsed", "grants":
 				return nil, errUpdateUserAdminField.WithAttributes("field", path)
 			}
+		}
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "state_description") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "state_description")
+			req.StateDescription = ""
 		}
 	}
 
@@ -292,7 +300,11 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
 		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 			data.SetEntity(req.EntityIdentifiers())
-			return &emails.EntityStateChanged{Data: data, State: strings.ToLower(strings.TrimPrefix(cli.State.String(), "STATE_"))}
+			return &emails.EntityStateChanged{
+				Data:             data,
+				State:            strings.ToLower(strings.TrimPrefix(cli.State.String(), "STATE_")),
+				StateDescription: cli.StateDescription,
+			}
 		})
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Error("Could not send state change notification email")

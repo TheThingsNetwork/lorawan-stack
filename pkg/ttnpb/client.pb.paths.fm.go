@@ -19,6 +19,7 @@ var ClientFieldPathsNested = []string{
 	"secret",
 	"skip_authorization",
 	"state",
+	"state_description",
 	"updated_at",
 }
 
@@ -38,6 +39,7 @@ var ClientFieldPathsTopLevel = []string{
 	"secret",
 	"skip_authorization",
 	"state",
+	"state_description",
 	"updated_at",
 }
 var ClientsFieldPathsNested = []string{
@@ -98,6 +100,7 @@ var CreateClientRequestFieldPathsNested = []string{
 	"client.secret",
 	"client.skip_authorization",
 	"client.state",
+	"client.state_description",
 	"client.updated_at",
 	"collaborator",
 	"collaborator.ids",
@@ -130,6 +133,7 @@ var UpdateClientRequestFieldPathsNested = []string{
 	"client.secret",
 	"client.skip_authorization",
 	"client.state",
+	"client.state_description",
 	"client.updated_at",
 	"field_mask",
 }

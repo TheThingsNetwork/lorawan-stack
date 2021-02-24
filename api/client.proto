@@ -85,7 +85,12 @@ message Client {
   ];
   // The reviewing state of the client.
   // This field can only be modified by admins.
+  // If state_description is not updated when updating state, state_description is cleared.
   State state = 10 [(validate.rules).enum.defined_only = true];
+  // A description for the state field.
+  // This field can only be modified by admins, and should typically only be updated
+  // when also updating `state`.
+  string state_description = 17 [(validate.rules).string.max_len = 128];
   // If set, the authorization page will be skipped.
   // This field can only be modified by admins.
   bool skip_authorization = 11;
@@ -100,7 +105,7 @@ message Client {
   // client after rights are added to this list.
   repeated Right rights = 14 [(validate.rules).repeated.items.enum.defined_only = true];
 
-  // next: 17
+  // next: 18
 }
 
 message Clients {

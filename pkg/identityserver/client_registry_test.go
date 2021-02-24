@@ -194,6 +194,44 @@ func TestClientsCRUD(t *testing.T) {
 			a.So(updated.Name, should.Equal, "Updated Name")
 		}
 
+		updated, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
+			Client: ttnpb.Client{
+				ClientIdentifiers: created.ClientIdentifiers,
+				State:             ttnpb.STATE_FLAGGED,
+				StateDescription:  "something is wrong",
+			},
+			FieldMask: types.FieldMask{Paths: []string{"state", "state_description"}},
+		}, userCreds(adminUserIdx))
+
+		a.So(err, should.BeNil)
+		if a.So(updated, should.NotBeNil) {
+			a.So(updated.State, should.Equal, ttnpb.STATE_FLAGGED)
+			a.So(updated.StateDescription, should.Equal, "something is wrong")
+		}
+
+		updated, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
+			Client: ttnpb.Client{
+				ClientIdentifiers: created.ClientIdentifiers,
+				State:             ttnpb.STATE_APPROVED,
+			},
+			FieldMask: types.FieldMask{Paths: []string{"state"}},
+		}, userCreds(adminUserIdx))
+
+		a.So(err, should.BeNil)
+		if a.So(updated, should.NotBeNil) {
+			a.So(updated.State, should.Equal, ttnpb.STATE_APPROVED)
+		}
+
+		got, err = reg.Get(ctx, &ttnpb.GetClientRequest{
+			ClientIdentifiers: created.ClientIdentifiers,
+			FieldMask:         types.FieldMask{Paths: []string{"state", "state_description"}},
+		}, creds)
+
+		if a.So(err, should.BeNil) {
+			a.So(got.State, should.Equal, ttnpb.STATE_APPROVED)
+			a.So(got.StateDescription, should.Equal, "")
+		}
+
 		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, userID.OrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListClientsRequest{
 				FieldMask:    types.FieldMask{Paths: []string{"name"}},
@@ -206,7 +244,7 @@ func TestClientsCRUD(t *testing.T) {
 				for _, item := range list.Clients {
 					if item.ClientIdentifiers == created.ClientIdentifiers {
 						found = true
-						a.So(item.Name, should.Equal, updated.Name)
+						a.So(item.Name, should.Equal, "Updated Name")
 					}
 				}
 				a.So(found, should.BeTrue)

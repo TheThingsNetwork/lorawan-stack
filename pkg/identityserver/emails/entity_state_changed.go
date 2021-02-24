@@ -17,7 +17,8 @@ package emails
 // EntityStateChanged is the email that is sent when the state of an entity was changed.
 type EntityStateChanged struct {
 	Data
-	State string
+	State            string
+	StateDescription string
 }
 
 // TemplateName returns the name of the template to use for this email.
@@ -28,6 +29,12 @@ const entityStateChangedSubject = `Your {{.Entity.Type}} {{.Entity.ID}} is now {
 const entityStateChangedText = `Dear {{ .User.Name }},
 
 Your {{ .Entity.Type }} "{{ .Entity.ID }}" on {{ .Network.Name }} is now {{ .State }}.
+
+{{- with .StateDescription }}
+
+> {{ . }}
+
+{{- end }}
 `
 
 // DefaultTemplates returns the default templates for this email.

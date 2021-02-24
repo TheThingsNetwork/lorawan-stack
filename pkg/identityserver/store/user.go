@@ -44,7 +44,8 @@ type User struct {
 	PasswordUpdatedAt     time.Time `gorm:"not null"`
 	RequirePasswordUpdate bool      `gorm:"not null"`
 
-	State int `gorm:"not null"`
+	State            int    `gorm:"not null"`
+	StateDescription string `gorm:"type:VARCHAR"`
 
 	Admin bool `gorm:"not null"`
 
@@ -76,6 +77,7 @@ var userPBSetters = map[string]func(*ttnpb.User, *User){
 	},
 	requirePasswordUpdateField: func(pb *ttnpb.User, usr *User) { pb.RequirePasswordUpdate = usr.RequirePasswordUpdate },
 	stateField:                 func(pb *ttnpb.User, usr *User) { pb.State = ttnpb.State(usr.State) },
+	stateDescriptionField:      func(pb *ttnpb.User, usr *User) { pb.StateDescription = usr.StateDescription },
 	adminField:                 func(pb *ttnpb.User, usr *User) { pb.Admin = usr.Admin },
 	temporaryPasswordField: func(pb *ttnpb.User, usr *User) {
 		pb.TemporaryPassword = usr.TemporaryPassword
@@ -116,6 +118,7 @@ var userModelSetters = map[string]func(*User, *ttnpb.User){
 	},
 	requirePasswordUpdateField: func(usr *User, pb *ttnpb.User) { usr.RequirePasswordUpdate = pb.RequirePasswordUpdate },
 	stateField:                 func(usr *User, pb *ttnpb.User) { usr.State = int(pb.State) },
+	stateDescriptionField:      func(usr *User, pb *ttnpb.User) { usr.StateDescription = pb.StateDescription },
 	adminField:                 func(usr *User, pb *ttnpb.User) { usr.Admin = pb.Admin },
 	temporaryPasswordField: func(usr *User, pb *ttnpb.User) {
 		usr.TemporaryPassword = pb.TemporaryPassword
@@ -160,6 +163,7 @@ var userColumnNames = map[string][]string{
 	passwordUpdatedAtField:              {passwordUpdatedAtField},
 	requirePasswordUpdateField:          {requirePasswordUpdateField},
 	stateField:                          {stateField},
+	stateDescriptionField:               {stateDescriptionField},
 	adminField:                          {adminField},
 	temporaryPasswordField:              {temporaryPasswordField},
 	temporaryPasswordCreatedAtField:     {temporaryPasswordCreatedAtField},

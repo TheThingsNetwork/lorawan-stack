@@ -235,6 +235,15 @@ func (m *Client) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "state_description":
+
+			if utf8.RuneCountInString(m.GetStateDescription()) > 128 {
+				return ClientValidationError{
+					field:  "state_description",
+					reason: "value length must be at most 128 runes",
+				}
+			}
+
 		case "skip_authorization":
 			// no validation rules for SkipAuthorization
 		case "endorsed":

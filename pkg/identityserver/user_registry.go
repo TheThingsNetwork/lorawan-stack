@@ -146,6 +146,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		req.User.RequirePasswordUpdate = false
 		if config.UserRegistration.AdminApproval.Required {
 			req.User.State = ttnpb.STATE_REQUESTED
+			req.User.StateDescription = "admin approval required"
 		} else {
 			req.User.State = ttnpb.STATE_APPROVED
 		}
@@ -371,13 +372,20 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 			switch path {
 			case "primary_email_address_validated_at",
 				"require_password_update",
-				"state", "admin",
+				"state", "state_description", "admin",
 				"temporary_password", "temporary_password_created_at", "temporary_password_expires_at":
 				return nil, errUpdateUserAdminField.WithAttributes("field", path)
 			}
 		}
 		req.PrimaryEmailAddressValidatedAt = nil
 		cleanContactInfo(req.User.ContactInfo)
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "state_description") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "state_description")
+			req.StateDescription = ""
+		}
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "temporary_password") {
@@ -458,7 +466,11 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
 		err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
 			data.SetEntity(req.EntityIdentifiers())
-			return &emails.EntityStateChanged{Data: data, State: strings.ToLower(strings.TrimPrefix(usr.State.String(), "STATE_"))}
+			return &emails.EntityStateChanged{
+				Data:             data,
+				State:            strings.ToLower(strings.TrimPrefix(usr.State.String(), "STATE_")),
+				StateDescription: usr.StateDescription,
+			}
 		})
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Error("Could not send state change notification email")

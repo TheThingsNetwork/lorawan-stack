@@ -327,6 +327,7 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 	conf.UserRights.CreateClients = true
 	conf.UserRights.CreateGateways = true
 	conf.UserRights.CreateOrganizations = true
+	conf.AdminRights.All = true
 	is, err := New(c, conf)
 	if err != nil {
 		t.Fatal(err)
