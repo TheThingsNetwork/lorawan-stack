@@ -54,6 +54,17 @@ func (Version) Current() error {
 	return nil
 }
 
+// MajorMinor returns the current major.minor version.
+func (Version) MajorMinor() error {
+	mg.Deps(Version.getCurrent)
+	version, err := semver.Parse(strings.TrimPrefix(currentVersion, "v"))
+	if err != nil {
+		return err
+	}
+	fmt.Printf("v%d.%d\n", version.Major, version.Minor)
+	return nil
+}
+
 const (
 	goVersionFilePath = "pkg/version/ttn.go"
 )
