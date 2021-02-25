@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Pagination flags for the `users oauth authorizations list` and `users oauth access-tokens list` CLI commands.
+
 ### Changed
 
 - `temp` field of the UDP stats message is now type `float32` (pointer).
@@ -24,6 +26,7 @@ For details about compatibility between different releases, see the **Commitment
 - Ocassional race condition in uplink matching with replicated Network Server instances.
 - Ocassional race condition when matching pending sessions.
 - Conflict error when registering an end device via the wizard in the Console.
+- Pagination in the `List` and `ListTokens` RPCs of the `OAuthAuthorizationRegistry`.
 
 ### Security
 
