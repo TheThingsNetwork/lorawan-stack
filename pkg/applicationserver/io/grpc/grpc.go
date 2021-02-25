@@ -37,8 +37,20 @@ type optionFunc func(*impl)
 
 func (f optionFunc) apply(i *impl) { f(i) }
 
+// EndDeviceFetcher retrieves end device information from identifiers.
+type EndDeviceFetcher interface {
+	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error)
+}
+
+type noopFetcher struct{}
+
+func (f *noopFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
+	return &ttnpb.EndDevice{EndDeviceIdentifiers: ids}, nil
+}
+
 type impl struct {
 	server             io.Server
+	fetcher            EndDeviceFetcher
 	mqttConfigProvider config.MQTTConfigProvider
 }
 
@@ -49,9 +61,16 @@ func WithMQTTConfigProvider(provider config.MQTTConfigProvider) Option {
 	})
 }
 
+// WithEndDeviceFetcher sets the EndDeviceFetcher that will be used by the gRPC frontend.
+func WithEndDeviceFetcher(f EndDeviceFetcher) Option {
+	return optionFunc(func(i *impl) {
+		i.fetcher = f
+	})
+}
+
 // New returns a new gRPC frontend.
 func New(server io.Server, opts ...Option) ttnpb.AppAsServer {
-	i := &impl{server: server}
+	i := &impl{server: server, fetcher: &noopFetcher{}}
 	for _, opt := range opts {
 		opt.apply(i)
 	}
@@ -155,6 +174,13 @@ func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pb
 		return nil, err
 	}
 	up.Simulated = true
+	dev, err := s.fetcher.Get(ctx, up.EndDeviceIdentifiers, "ids")
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Debug("Failed to fetch end device identifiers")
+	} else {
+		up.EndDeviceIdentifiers = dev.EndDeviceIdentifiers
+	}
+
 	if err := s.server.Publish(ctx, up); err != nil {
 		return nil, err
 	}
