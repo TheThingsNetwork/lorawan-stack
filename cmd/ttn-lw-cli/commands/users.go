@@ -16,6 +16,7 @@ package commands
 
 import (
 	"os"
+	"reflect"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/howeyc/gopass"
@@ -89,6 +90,7 @@ var searchUsersFlags = func() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	flagSet.AddFlagSet(searchFlags)
 	// NOTE: These flags need to be named with underscores, not dashes!
+	util.AddField(flagSet, "state", reflect.TypeOf([]ttnpb.State{}), false)
 	return flagSet
 }()
 

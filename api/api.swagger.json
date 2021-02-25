@@ -7178,6 +7178,24 @@
             "type": "string"
           },
           {
+            "name": "state",
+            "description": "Find OAuth clients where the state is any of these states.\n\n - STATE_REQUESTED: Denotes that the entity has been requested and is pending review by an admin.\n - STATE_APPROVED: Denotes that the entity has been reviewed and approved by an admin.\n - STATE_REJECTED: Denotes that the entity has been reviewed and rejected by an admin.\n - STATE_FLAGGED: Denotes that the entity has been flagged and is pending review by an admin.\n - STATE_SUSPENDED: Denotes that the entity has been reviewed and suspended by an admin.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "STATE_REQUESTED",
+                "STATE_APPROVED",
+                "STATE_REJECTED",
+                "STATE_FLAGGED",
+                "STATE_SUSPENDED"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
             "name": "field_mask.paths",
             "description": "The set of field mask paths.",
             "in": "query",
@@ -7444,6 +7462,24 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "state",
+            "description": "Find users where the state is any of these states.\n\n - STATE_REQUESTED: Denotes that the entity has been requested and is pending review by an admin.\n - STATE_APPROVED: Denotes that the entity has been reviewed and approved by an admin.\n - STATE_REJECTED: Denotes that the entity has been reviewed and rejected by an admin.\n - STATE_FLAGGED: Denotes that the entity has been flagged and is pending review by an admin.\n - STATE_SUSPENDED: Denotes that the entity has been reviewed and suspended by an admin.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "STATE_REQUESTED",
+                "STATE_APPROVED",
+                "STATE_REJECTED",
+                "STATE_FLAGGED",
+                "STATE_SUSPENDED"
+              ]
+            },
+            "collectionFormat": "multi"
           },
           {
             "name": "field_mask.paths",

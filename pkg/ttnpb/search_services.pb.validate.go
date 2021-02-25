@@ -285,6 +285,31 @@ func (m *SearchClientsRequest) ValidateFields(paths ...string) error {
 
 			}
 
+		case "state":
+
+			_SearchClientsRequest_State_Unique := make(map[State]struct{}, len(m.GetState()))
+
+			for idx, item := range m.GetState() {
+				_, _ = idx, item
+
+				if _, exists := _SearchClientsRequest_State_Unique[item]; exists {
+					return SearchClientsRequestValidationError{
+						field:  fmt.Sprintf("state[%v]", idx),
+						reason: "repeated value must contain unique items",
+					}
+				} else {
+					_SearchClientsRequest_State_Unique[item] = struct{}{}
+				}
+
+				if _, ok := State_name[int32(item)]; !ok {
+					return SearchClientsRequestValidationError{
+						field:  fmt.Sprintf("state[%v]", idx),
+						reason: "value must be one of the defined enum values",
+					}
+				}
+
+			}
+
 		case "field_mask":
 
 			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
@@ -806,6 +831,31 @@ func (m *SearchUsersRequest) ValidateFields(paths ...string) error {
 					return SearchUsersRequestValidationError{
 						field:  fmt.Sprintf("attributes_contain[%v]", key),
 						reason: "value length must be at most 50 runes",
+					}
+				}
+
+			}
+
+		case "state":
+
+			_SearchUsersRequest_State_Unique := make(map[State]struct{}, len(m.GetState()))
+
+			for idx, item := range m.GetState() {
+				_, _ = idx, item
+
+				if _, exists := _SearchUsersRequest_State_Unique[item]; exists {
+					return SearchUsersRequestValidationError{
+						field:  fmt.Sprintf("state[%v]", idx),
+						reason: "repeated value must contain unique items",
+					}
+				} else {
+					_SearchUsersRequest_State_Unique[item] = struct{}{}
+				}
+
+				if _, ok := State_name[int32(item)]; !ok {
+					return SearchUsersRequestValidationError{
+						field:  fmt.Sprintf("state[%v]", idx),
+						reason: "value must be one of the defined enum values",
 					}
 				}
 

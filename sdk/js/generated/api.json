@@ -28686,6 +28686,28 @@
               }
             },
             {
+              "name": "state",
+              "description": "Find OAuth clients where the state is any of these states.",
+              "label": "repeated",
+              "type": "State",
+              "longType": "State",
+              "fullType": "ttn.lorawan.v3.State",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
               "name": "field_mask",
               "description": "",
               "label": "",
@@ -29497,6 +29519,28 @@
                   {
                     "name": "map.values.string.max_len",
                     "value": 50
+                  }
+                ]
+              }
+            },
+            {
+              "name": "state",
+              "description": "Find users where the state is any of these states.",
+              "label": "repeated",
+              "type": "State",
+              "longType": "State",
+              "fullType": "ttn.lorawan.v3.State",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
                   }
                 ]
               }

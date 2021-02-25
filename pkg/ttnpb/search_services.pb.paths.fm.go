@@ -35,6 +35,7 @@ var SearchClientsRequestFieldPathsNested = []string{
 	"name_contains",
 	"order",
 	"page",
+	"state",
 }
 
 var SearchClientsRequestFieldPathsTopLevel = []string{
@@ -47,6 +48,7 @@ var SearchClientsRequestFieldPathsTopLevel = []string{
 	"name_contains",
 	"order",
 	"page",
+	"state",
 }
 var SearchGatewaysRequestFieldPathsNested = []string{
 	"attributes_contain",
@@ -106,6 +108,7 @@ var SearchUsersRequestFieldPathsNested = []string{
 	"name_contains",
 	"order",
 	"page",
+	"state",
 }
 
 var SearchUsersRequestFieldPathsTopLevel = []string{
@@ -118,6 +121,7 @@ var SearchUsersRequestFieldPathsTopLevel = []string{
 	"name_contains",
 	"order",
 	"page",
+	"state",
 }
 var SearchEndDevicesRequestFieldPathsNested = []string{
 	"application_ids",

@@ -6855,6 +6855,7 @@ This message is used for finding OAuth clients in the EntityRegistrySearch servi
 | `name_contains` | [`string`](#string) |  | Find OAuth clients where the name contains this substring. |
 | `description_contains` | [`string`](#string) |  | Find OAuth clients where the description contains this substring. |
 | `attributes_contain` | [`SearchClientsRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchClientsRequest.AttributesContainEntry) | repeated | Find OAuth clients where the given attributes contain these substrings. |
+| `state` | [`State`](#ttn.lorawan.v3.State) | repeated | Find OAuth clients where the state is any of these states. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
@@ -6869,6 +6870,7 @@ This message is used for finding OAuth clients in the EntityRegistrySearch servi
 | `name_contains` | <p>`string.max_len`: `50`</p> |
 | `description_contains` | <p>`string.max_len`: `50`</p> |
 | `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
+| `state` | <p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchClientsRequest.AttributesContainEntry">Message `SearchClientsRequest.AttributesContainEntry`</a>
@@ -6994,6 +6996,7 @@ This message is used for finding users in the EntityRegistrySearch service.
 | `name_contains` | [`string`](#string) |  | Find users where the name contains this substring. |
 | `description_contains` | [`string`](#string) |  | Find users where the description contains this substring. |
 | `attributes_contain` | [`SearchUsersRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchUsersRequest.AttributesContainEntry) | repeated | Find users where the given attributes contain these substrings. |
+| `state` | [`State`](#ttn.lorawan.v3.State) | repeated | Find users where the state is any of these states. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
@@ -7008,6 +7011,7 @@ This message is used for finding users in the EntityRegistrySearch service.
 | `name_contains` | <p>`string.max_len`: `50`</p> |
 | `description_contains` | <p>`string.max_len`: `50`</p> |
 | `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
+| `state` | <p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchUsersRequest.AttributesContainEntry">Message `SearchUsersRequest.AttributesContainEntry`</a>

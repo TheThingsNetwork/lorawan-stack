@@ -150,6 +150,15 @@ func (dst *SearchClientsRequest) SetFields(src *SearchClientsRequest, paths ...s
 			} else {
 				dst.AttributesContain = nil
 			}
+		case "state":
+			if len(subs) > 0 {
+				return fmt.Errorf("'state' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.State = src.State
+			} else {
+				dst.State = nil
+			}
 		case "field_mask":
 			if len(subs) > 0 {
 				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
@@ -459,6 +468,15 @@ func (dst *SearchUsersRequest) SetFields(src *SearchUsersRequest, paths ...strin
 				dst.AttributesContain = src.AttributesContain
 			} else {
 				dst.AttributesContain = nil
+			}
+		case "state":
+			if len(subs) > 0 {
+				return fmt.Errorf("'state' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.State = src.State
+			} else {
+				dst.State = nil
 			}
 		case "field_mask":
 			if len(subs) > 0 {

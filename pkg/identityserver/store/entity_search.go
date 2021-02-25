@@ -150,6 +150,13 @@ func (s *entitySearch) FindClients(ctx context.Context, member *ttnpb.Organizati
 	query = query.Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, client))
 	query = s.queryMembership(ctx, query, client, member)
 	query = s.queryMetaFields(ctx, query, client, req)
+	if len(req.State) > 0 {
+		stateNumbers := make([]int, len(req.State))
+		for i, state := range req.State {
+			stateNumbers[i] = int(state)
+		}
+		query = query.Where(fmt.Sprintf(`"%[1]ss"."state" IN (?)`, client), stateNumbers)
+	}
 	results, err := s.runPaginatedQuery(ctx, query, client)
 	if err != nil {
 		return nil, err
@@ -223,6 +230,13 @@ func (s *entitySearch) FindUsers(ctx context.Context, member *ttnpb.Organization
 		Select(`"accounts"."uid" AS "friendly_id"`)
 	query = s.queryMembership(ctx, query, user, member)
 	query = s.queryMetaFields(ctx, query, user, req)
+	if len(req.State) > 0 {
+		stateNumbers := make([]int, len(req.State))
+		for i, state := range req.State {
+			stateNumbers[i] = int(state)
+		}
+		query = query.Where(fmt.Sprintf(`"%[1]ss"."state" IN (?)`, user), stateNumbers)
+	}
 	results, err := s.runPaginatedQuery(ctx, query, user)
 	if err != nil {
 		return nil, err

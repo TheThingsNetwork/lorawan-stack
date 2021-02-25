@@ -21,6 +21,7 @@ import "google/protobuf/field_mask.proto";
 import "lorawan-stack/api/application.proto";
 import "lorawan-stack/api/client.proto";
 import "lorawan-stack/api/end_device.proto";
+import "lorawan-stack/api/enums.proto";
 import "lorawan-stack/api/gateway.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/organization.proto";
@@ -50,7 +51,7 @@ message SearchApplicationsRequest {
     }
   ];
 
-  reserved 5; // TODO: Add filter for approval state (admin only).
+  reserved 5; // Reserved for EUI or state filter.
 
   google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
 
@@ -85,7 +86,13 @@ message SearchClientsRequest {
     }
   ];
 
-  reserved 5; // TODO: Add filter for approval state (admin only).
+  // Find OAuth clients where the state is any of these states.
+  repeated State state = 5 [
+    (validate.rules).repeated = {
+      unique: true,
+      items: { enum: { defined_only: true } }
+    }
+  ];
 
   google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
 
@@ -159,7 +166,7 @@ message SearchOrganizationsRequest {
     }
   ];
 
-  reserved 5; // TODO: Add filter for approval state (admin only).
+  reserved 5; // Reserved for state filter.
 
   google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
 
@@ -194,7 +201,13 @@ message SearchUsersRequest {
     }
   ];
 
-  reserved 5; // TODO: Add filter for approval state (admin only).
+  // Find users where the state is any of these states.
+  repeated State state = 5 [
+    (validate.rules).repeated = {
+      unique: true,
+      items: { enum: { defined_only: true } }
+    }
+  ];
 
   google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
 
