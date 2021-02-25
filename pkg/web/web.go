@@ -169,9 +169,11 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 	root.Use(
 		mux.MiddlewareFunc(webmiddleware.Recover()),
 		mux.MiddlewareFunc(webmiddleware.FillContext(options.contextFillers...)),
+		mux.MiddlewareFunc(webmiddleware.Peer()),
 		mux.MiddlewareFunc(webmiddleware.RequestURL()),
 		mux.MiddlewareFunc(webmiddleware.RequestID()),
 		mux.MiddlewareFunc(webmiddleware.ProxyHeaders(proxyConfiguration)),
+		mux.MiddlewareFunc(webmiddleware.Metadata("X-Forwarded-For", "User-Agent")),
 		mux.MiddlewareFunc(webmiddleware.MaxBody(1<<24)), // 16 MB.
 		mux.MiddlewareFunc(webmiddleware.SecurityHeaders()),
 		mux.MiddlewareFunc(webmiddleware.Log(logger, options.logIgnorePaths)),
