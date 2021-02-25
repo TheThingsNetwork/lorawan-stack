@@ -94,7 +94,7 @@ func (s *server) CreateUserSession(c echo.Context, userIDs ttnpb.UserIdentifiers
 	if err != nil {
 		return err
 	}
-	events.Publish(evtUserLogout.NewWithIdentifiersAndData(ctx, userIDs, nil))
+	events.Publish(evtUserLogin.NewWithIdentifiersAndData(ctx, userIDs, nil))
 	return s.session.UpdateAuthCookie(c, func(cookie *auth.CookieShape) error {
 		cookie.UserID = session.UserIdentifiers.UserID
 		cookie.SessionID = session.SessionID

@@ -28,6 +28,7 @@ For details about compatibility between different releases, see the **Commitment
 - Ocassional race condition when matching pending sessions.
 - Conflict error when registering an end device via the wizard in the Console.
 - Pagination in the `List` and `ListTokens` RPCs of the `OAuthAuthorizationRegistry`.
+- Event name on user login.
 
 ### Security
 
