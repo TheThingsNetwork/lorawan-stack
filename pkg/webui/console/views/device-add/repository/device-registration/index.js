@@ -21,6 +21,7 @@ import Spinner from '@ttn-lw/components/spinner'
 import Input from '@ttn-lw/components/input'
 import Form from '@ttn-lw/components/form'
 import Overlay from '@ttn-lw/components/overlay'
+import Radio from '@ttn-lw/components/radio-button'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -35,11 +36,15 @@ import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-
 
 import { useRepositoryContext } from '../context'
 import { selectBand } from '../reducer'
+import { REGISTRATION_TYPES } from '../../utils'
 
 import FreqPlansSelect from './freq-plans-select'
 
 const m = defineMessages({
   fetching: 'Fetching template…',
+  afterRegistration: 'After registration',
+  singleRegistration: 'View registered end device',
+  multipleRegistration: 'Register another end device of this type',
 })
 
 const Registration = props => {
@@ -73,17 +78,6 @@ const Registration = props => {
       {isOTAA && (
         <>
           <Form.Field
-            title={sharedMessages.devEUI}
-            name="ids.dev_eui"
-            type="byte"
-            min={8}
-            max={8}
-            description={sharedMessages.deviceEUIDescription}
-            required
-            component={Input}
-            glossaryId={glossaryId.DEV_EUI}
-          />
-          <Form.Field
             title={lwVersion < 104 ? sharedMessages.appEUI : sharedMessages.joinEUI}
             component={JoinEUIPRefixesInput}
             name="ids.join_eui"
@@ -94,6 +88,17 @@ const Registration = props => {
             required
             showPrefixes
             glossaryId={lwVersion < 104 ? glossaryId.APP_EUI : glossaryId.JOIN_EUI}
+          />
+          <Form.Field
+            title={sharedMessages.devEUI}
+            name="ids.dev_eui"
+            type="byte"
+            min={8}
+            max={8}
+            description={sharedMessages.deviceEUIDescription}
+            required
+            component={Input}
+            glossaryId={glossaryId.DEV_EUI}
           />
           <Form.Field
             required
@@ -223,6 +228,10 @@ const Registration = props => {
         placeholder={sharedMessages.deviceIdPlaceholder}
         component={Input}
       />
+      <Form.Field title={m.afterRegistration} name="_registration" component={Radio.Group}>
+        <Radio label={m.singleRegistration} value={REGISTRATION_TYPES.SINGLE} />
+        <Radio label={m.multipleRegistration} value={REGISTRATION_TYPES.MULTIPLE} />
+      </Form.Field>
     </Overlay>
   )
 }

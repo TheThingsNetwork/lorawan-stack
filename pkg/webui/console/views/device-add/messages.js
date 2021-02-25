@@ -16,7 +16,7 @@ import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
   // Shared messages.
-  repositoryTabTitle: 'From The Things Device Repository',
+  repositoryTabTitle: 'From The LoRaWAN Device Repository',
   manualTabTitle: 'Manually',
   // Manual messages.
   basicTitle: 'Basic settings',

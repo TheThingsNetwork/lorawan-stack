@@ -7,7 +7,7 @@ with the exception that this project **does not** follow Semantic Versioning.
 
 For details about compatibility between different releases, see the **Commitments and Releases** section of our README.
 
-## [Unreleased]
+## [Upcoming] (v3.12)
 
 ### Added
 
@@ -26,7 +26,45 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+## [Unreleased]
+
+### Added
+
+- Pagination flags for the `users oauth authorizations list` and `users oauth access-tokens list` CLI commands.
+
+### Changed
+
+- `temp` field of the UDP stats message is now type `float32` (pointer).
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+- Ocassional race condition in uplink matching with replicated Network Server instances.
+- Ocassional race condition when matching pending sessions.
+- Conflict error when registering an end device via the wizard in the Console.
+- Pagination in the `List` and `ListTokens` RPCs of the `OAuthAuthorizationRegistry`.
+
 ### Security
+
+## [3.11.1] - 2021-02-18
+
+### Added
+
+- Profile settings view to the Account App.
+  - Functionality to change basic profile information, such as name, email address and profile picture.
+  - Functionality to update the account password.
+  - Functionality to delete the account.
+
+### Changed
+
+- Improved logging.
+
+### Fixed
+
+- Synchronization in Gateway Server scheduler that caused race conditions in scheduling downlink traffic.
 
 ## [3.11.0] - 2021-02-10
 
@@ -1311,7 +1349,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.0...v3.11
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.1...v3.11
+[3.11.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.0...v3.11.1
 [3.11.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.6...v3.11.0
 [3.10.6]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.5...v3.10.6
 [3.10.5]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.4...v3.10.5

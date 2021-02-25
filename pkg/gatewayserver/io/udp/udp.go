@@ -334,6 +334,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 	}
 	logger.Info("Downlink path claimed")
 	defer func() {
+		ctx := s.server.FromRequestContext(ctx)
 		if err := s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers); err != nil {
 			logger.WithError(err).Error("Failed to unclaim downlink path")
 			return

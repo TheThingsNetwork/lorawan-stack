@@ -15,15 +15,20 @@
 import React from 'react'
 import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
-import { merge } from 'lodash'
+import { merge, isEqual } from 'lodash'
 
 import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import toast from '@ttn-lw/components/toast'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { REGISTRATION_TYPES } from '../utils'
 
 import { RepositoryContext } from './context'
 import ProgressHint from './hints/progress-hint'
@@ -58,7 +63,9 @@ const m = defineMessages({
   enterDataTitle: '2. Enter registration data',
   enterDataDescription:
     'Please choose an end device first to proceed with entering registration data',
-  register: 'Register end device',
+  submitTitle: 'Register end device',
+  createSuccess: 'End device registered',
+  register: 'Register from The LoRaWAN Device Repository',
 })
 
 const stateToFormValues = state => ({
@@ -118,7 +125,6 @@ const DeviceRepository = props => {
   const validationContext = React.useMemo(
     () => ({
       mayEditKeys,
-      appId,
       asUrl,
       asEnabled,
       jsUrl,
@@ -126,18 +132,44 @@ const DeviceRepository = props => {
       nsUrl,
       nsEnabled,
     }),
-    [appId, asEnabled, asUrl, jsEnabled, jsUrl, mayEditKeys, nsEnabled, nsUrl],
+    [asEnabled, asUrl, jsEnabled, jsUrl, mayEditKeys, nsEnabled, nsUrl],
   )
 
   const handleSubmit = React.useCallback(
     async values => {
       try {
-        const castedValues = validationSchema.cast(values, { context: validationContext })
-        const { ids } = castedValues
+        const { _registration, ...castedValues } = validationSchema.cast(values, {
+          context: validationContext,
+        })
+        const { ids, supports_join } = castedValues
         ids.application_ids = { application_id: appId }
 
         await createDevice(appId, castedValues)
-        createDeviceSuccess(appId, ids.device_id)
+        switch (_registration) {
+          case REGISTRATION_TYPES.MULTIPLE:
+            const { resetForm, values } = formRef.current
+            toast({
+              type: toast.types.SUCCESS,
+              message: m.createSuccess,
+            })
+            resetForm({
+              values: {
+                ...castedValues,
+                ...initialValues,
+                ids: {
+                  ...initialValues.ids,
+                  join_eui: supports_join ? castedValues.ids.join_eui : undefined,
+                },
+                frequency_plan_id: castedValues.frequency_plan_id,
+                version_ids: values.version_ids,
+                _registration: REGISTRATION_TYPES.MULTIPLE,
+              },
+            })
+            break
+          case REGISTRATION_TYPES.SINGLE:
+          default:
+            createDeviceSuccess(appId, ids.device_id)
+        }
       } catch (error) {
         handleSetError(error)
       }
@@ -160,7 +192,7 @@ const DeviceRepository = props => {
 
   React.useEffect(() => {
     const version = selectVersion(state)
-    const versionChanged = version !== versionRef.current
+    const versionChanged = !isEqual(version, versionRef.current)
     // Reset version values if any have changed during end device selection.
     if (formRef.current && versionChanged) {
       formRef.current.setValues(stateToFormValues(state), false)
@@ -237,7 +269,7 @@ const DeviceRepository = props => {
             )}
             <SubmitBar align="start">
               <Form.Submit
-                message={m.register}
+                message={m.submitTitle}
                 component={SubmitButton}
                 disabled={!showRegistrationForm}
               />
@@ -275,4 +307,6 @@ DeviceRepository.defaultProps = {
   supportLink: undefined,
 }
 
-export default DeviceRepository
+export default withBreadcrumb('devices.add.device-repository', props => (
+  <Breadcrumb path={`/applications/${props.appId}/devices/add/repository`} content={m.register} />
+))(DeviceRepository)

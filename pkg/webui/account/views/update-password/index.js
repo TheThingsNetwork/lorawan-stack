@@ -36,13 +36,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getIsConfiguration } from '@account/store/actions/identity-server'
 
 const m = defineMessages({
-  updatePassword: 'Update password',
-  newPassword: 'New password',
-  oldPassword: 'Old password',
-  passwordChanged: 'Password changed',
-  revokeAccess: 'Revoke access',
-  logoutAllDevices: 'Sign out from all devices',
-  revokeWarning: 'This will revoke access from all signed in devices',
   sessionRevoked: 'Your password was changed and all active sessions were revoked',
 })
 
@@ -58,7 +51,9 @@ const UpdatePassword = ({ location }) => {
   const dispatch = useDispatch()
   const handleSubmitSuccess = useCallback(
     revokeSession => {
-      dispatch(push('/login', { info: revokeSession ? m.sessionRevoked : m.passwordChanged }))
+      dispatch(
+        push('/login', { info: revokeSession ? m.sessionRevoked : sharedMessages.passwordChanged }),
+      )
     },
     [dispatch],
   )
@@ -82,7 +77,7 @@ const UpdatePassword = ({ location }) => {
       <h1 className={style.title}>
         {siteName}
         <br />
-        <Message component="strong" content={m.updatePassword} />
+        <Message component="strong" content={sharedMessages.changePassword} />
       </h1>
       <hr className={style.hRule} />
       <ChangePasswordForm

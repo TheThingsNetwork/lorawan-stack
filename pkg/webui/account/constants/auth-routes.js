@@ -13,11 +13,17 @@
 // limitations under the License.
 
 import Overview from '@account/views/overview'
+import ProfileSettings from '@account/views/profile-settings'
 
 export default [
   {
     path: '/',
     exact: true,
     component: Overview,
+  },
+  {
+    path: '/profile-settings',
+    exact: true,
+    component: ProfileSettings,
   },
 ]

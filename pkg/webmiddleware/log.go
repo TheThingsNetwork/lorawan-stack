@@ -16,9 +16,11 @@ package webmiddleware
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/felixge/httpsnoop"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
@@ -62,6 +64,17 @@ func Log(logger log.Interface, ignorePathsArray []string) MiddlewareFunc {
 				"http.status": metrics.Code,
 				"duration":    metrics.Duration.Round(time.Microsecond * 100),
 			})
+			if authorization := r.Header.Get("Authorization"); authorization != "" {
+				parts := strings.SplitN(authorization, " ", 2)
+				if len(parts) == 2 && strings.ToLower(parts[0]) == "bearer" {
+					if tokenType, tokenID, _, err := auth.SplitToken(parts[1]); err == nil {
+						logFields = logFields.WithFields(log.Fields(
+							"auth.token_type", tokenType.String(),
+							"auth.token_id", tokenID,
+						))
+					}
+				}
+			}
 			if err := getError(); err != nil {
 				logFields = logFields.WithError(err)
 			}

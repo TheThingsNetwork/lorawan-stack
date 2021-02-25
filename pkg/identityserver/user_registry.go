@@ -645,7 +645,12 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		return store.GetUserStore(db).DeleteUser(ctx, ids)
+		err := store.GetUserStore(db).DeleteUser(ctx, ids)
+		if err != nil {
+			return err
+		}
+		// Also delete the the user's sessions to enforce logouts.
+		return store.GetUserSessionStore(db).DeleteAllUserSessions(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

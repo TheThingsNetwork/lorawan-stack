@@ -148,5 +148,5 @@ DeviceAddManual.defaultProps = {
 }
 
 export default withBreadcrumb('devices.add.manually', props => (
-  <Breadcrumb path={`/applications/${props.appId}/devices/add`} content={m.register} />
+  <Breadcrumb path={`/applications/${props.appId}/devices/add/manual`} content={m.register} />
 ))(DeviceAddManual)

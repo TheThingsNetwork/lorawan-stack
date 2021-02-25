@@ -15,6 +15,7 @@
 import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
+import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
@@ -34,29 +35,38 @@ const m = defineMessages({
   remove: 'Remove',
 })
 
-const dataTransform = function(content) {
-  return content.replace(/^.*;base64,/, '')
-}
+const defaultDataTransform = content => content.replace(/^.*;base64,/, '')
 
 export default class FileInput extends Component {
   static propTypes = {
-    accept: PropTypes.string,
+    accept: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+    changeMessage: PropTypes.message,
+    /** `dataTransform` is a marshaler used to transform the raw field value into
+     * a value matching the field schema. */
     dataTransform: PropTypes.func,
     disabled: PropTypes.bool,
+    id: PropTypes.string.isRequired,
+    image: PropTypes.bool,
+    imageClassName: PropTypes.string,
     maxSize: PropTypes.number,
+    mayRemove: PropTypes.bool,
     message: PropTypes.message,
     name: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
     providedMessage: PropTypes.message,
-    value: PropTypes.string,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})]),
   }
 
   static defaultProps = {
     accept: undefined,
+    dataTransform: defaultDataTransform,
     disabled: false,
+    image: false,
+    imageClassName: undefined,
+    maxSize: 10 * 1024 * 1024, // 10 MB
+    mayRemove: true,
     message: m.selectAFile,
-    dataTransform,
-    maxSize: 10 * 1024 * 1024, // Equals 10 MB.
+    changeMessage: m.changeFile,
     providedMessage: m.fileProvided,
     value: undefined,
   }
@@ -67,6 +77,7 @@ export default class FileInput extends Component {
     this.reader = new FileReader()
     this.reader.onload = this.handleFileRead
     this.fileInputRef = React.createRef()
+    this.imageRef = React.createRef()
 
     this.state = {
       filename: '',
@@ -75,8 +86,12 @@ export default class FileInput extends Component {
 
   @bind
   handleFileRead(event) {
-    const { onChange, dataTransform } = this.props
+    const { onChange, dataTransform, image } = this.props
     const { result: content } = event.target
+
+    if (image && Boolean(this.imageRef.current)) {
+      this.imageRef.current.style.display = 'block'
+    }
 
     const data = dataTransform(content)
     onChange(data, true)
@@ -102,14 +117,19 @@ export default class FileInput extends Component {
 
   @bind
   handleRemoveClick() {
-    const { onChange } = this.props
+    const { onChange, dataTransform } = this.props
 
+    this.fileInputRef.current.value = null
     this.setState({ filename: '', error: undefined })
-    onChange('', true)
+    onChange(dataTransform(''), true)
+  }
+
+  handleImageError(error) {
+    error.target.style.display = 'none'
   }
 
   get statusMessage() {
-    const { value, providedMessage } = this.props
+    const { value, providedMessage, mayRemove } = this.props
     const { filename, error } = this.state
     const hasInitialValue = value && !filename
     const hasError = Boolean(error)
@@ -125,14 +145,17 @@ export default class FileInput extends Component {
       return (
         <React.Fragment>
           {hasInitialValue ? <Message content={providedMessage} /> : filename}
-          <Button
-            className={style.removeButton}
-            message={m.remove}
-            onClick={this.handleRemoveClick}
-            icon="delete"
-            secondary
-            naked
-          />
+          {mayRemove && (
+            <Button
+              className={style.removeButton}
+              message={m.remove}
+              onClick={this.handleRemoveClick}
+              type="button"
+              icon="delete"
+              danger
+              naked
+            />
+          )}
         </React.Fragment>
       )
     }
@@ -141,17 +164,35 @@ export default class FileInput extends Component {
   }
 
   render() {
-    const { message, name, accept, value, disabled } = this.props
-    const id = `file_input_${name}`
+    const {
+      message,
+      changeMessage,
+      name,
+      id,
+      accept,
+      value,
+      disabled,
+      image,
+      imageClassName,
+    } = this.props
 
     return (
       <div className={style.container}>
+        {image && Boolean(value) && (
+          <img
+            className={classnames(style.image, imageClassName)}
+            alt="Current image"
+            src={value}
+            onError={this.handleImageError}
+            ref={this.imageRef}
+          />
+        )}
         <Button
           type="button"
           aria-controls="fileupload"
           onClick={this.handleChooseClick}
           disabled={disabled}
-          message={!value ? message : m.changeFile}
+          message={!value ? message : changeMessage}
           icon="attachment"
           secondary
         />

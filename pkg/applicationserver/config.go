@@ -199,8 +199,7 @@ func (c ApplicationPackagesConfig) NewApplicationPackages(ctx context.Context, s
 	handlers := make(map[string]packages.ApplicationPackageHandler)
 
 	// Initialize LoRa Cloud Device Management v1 package handler
-	loradmsHandler := loraclouddevicemanagementv1.New(server, c.Registry)
-	handlers[loradmsHandler.Package().Name] = loradmsHandler
+	handlers[loraclouddevicemanagementv1.PackageName] = loraclouddevicemanagementv1.New(server, c.Registry)
 
 	return packages.New(ctx, server, c.Registry, handlers)
 }

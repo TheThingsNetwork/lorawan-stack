@@ -19,6 +19,8 @@ import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
+import { REGISTRATION_TYPES } from '../utils'
+
 const deviceIdSchema = Yup.string()
   .matches(deviceIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
   .min(2, Yup.passValues(sharedMessages.validateTooShort))
@@ -38,34 +40,33 @@ const validationSchema = Yup.object({
     band_id: Yup.string(),
   }),
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
-  ids: Yup.object().when(
-    ['supports_join', 'lorawan_version', '$appId'],
-    (isOTAA, version, appId, schema) => {
-      if (isOTAA) {
-        return schema.shape({
-          device_id: deviceIdSchema,
-          join_eui: joinEUISchema.required(sharedMessages.validateRequired),
-          dev_eui: devEUISchema.required(sharedMessages.validateRequired),
-        })
-      }
-
-      if (parseLorawanMacVersion(version) === 104) {
-        return schema.shape({
-          device_id: deviceIdSchema,
-          dev_eui: devEUISchema.required(sharedMessages.validateRequired),
-        })
-      }
-
+  ids: Yup.object().when(['supports_join', 'lorawan_version'], (isOTAA, version, schema) => {
+    if (isOTAA) {
       return schema.shape({
         device_id: deviceIdSchema,
-        dev_eui: Yup.lazy(value =>
-          !value
-            ? Yup.string().strip()
-            : Yup.string().length(8 * 2, Yup.passValues(sharedMessages.validateLength)),
-        ),
+        join_eui: joinEUISchema.required(sharedMessages.validateRequired),
+        dev_eui: devEUISchema.required(sharedMessages.validateRequired),
       })
-    },
-  ),
+    }
+
+    if (parseLorawanMacVersion(version) === 104) {
+      return schema.shape({
+        device_id: deviceIdSchema,
+        dev_eui: devEUISchema.required(sharedMessages.validateRequired),
+        join_eui: Yup.string().strip(),
+      })
+    }
+
+    return schema.shape({
+      join_eui: Yup.string().strip(),
+      device_id: deviceIdSchema,
+      dev_eui: Yup.lazy(value =>
+        !value
+          ? Yup.string().strip()
+          : Yup.string().length(8 * 2, Yup.passValues(sharedMessages.validateLength)),
+      ),
+    })
+  }),
   root_keys: Yup.object().when(
     ['supports_join', 'lorawan_version', '$mayEditKeys'],
     (isOTAA, version, mayEditKeys, schema) => {
@@ -171,6 +172,7 @@ const validationSchema = Yup.object({
 
     return schema.default(getHostFromUrl(jsUrl))
   }),
+  _registration: Yup.mixed().oneOf([REGISTRATION_TYPES.SINGLE, REGISTRATION_TYPES.MULTIPLE]),
 })
 
 const initialValues = {
@@ -213,6 +215,7 @@ const initialValues = {
   join_server_address: undefined,
   application_server_address: undefined,
   network_server_address: undefined,
+  _registration: REGISTRATION_TYPES.SINGLE,
 }
 
 export { validationSchema as default, initialValues }

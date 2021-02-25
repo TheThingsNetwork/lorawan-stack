@@ -28,4 +28,8 @@ export const selectUserIsAdmin = state => {
   return user.isAdmin
 }
 
+export const selectUserName = state => selectUser(state).name
+
+export const selectUserProfilePicture = state => selectUser(state).profile_picture
+
 export const selectUserRights = state => selectUserStore(state).rights

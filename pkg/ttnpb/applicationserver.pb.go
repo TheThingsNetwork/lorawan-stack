@@ -551,6 +551,7 @@ func (m *GetAsConfigurationResponse) GetConfiguration() *AsConfiguration {
 	return nil
 }
 
+// Container for multiple Application uplink messages.
 type NsAsHandleUplinkRequest struct {
 	ApplicationUps       []*ApplicationUp `protobuf:"bytes,1,rep,name=application_ups,json=applicationUps,proto3" json:"application_ups,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
@@ -1285,6 +1286,7 @@ var _As_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NsAsClient interface {
+	// Handle Application uplink messages.
 	HandleUplink(ctx context.Context, in *NsAsHandleUplinkRequest, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
@@ -1307,6 +1309,7 @@ func (c *nsAsClient) HandleUplink(ctx context.Context, in *NsAsHandleUplinkReque
 
 // NsAsServer is the server API for NsAs service.
 type NsAsServer interface {
+	// Handle Application uplink messages.
 	HandleUplink(context.Context, *NsAsHandleUplinkRequest) (*types.Empty, error)
 }
 

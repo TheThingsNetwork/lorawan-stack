@@ -16,7 +16,7 @@ import {
   GET_USER,
   GET_USER_SUCCESS,
   GET_USER_FAILURE,
-  LOGOUT,
+  UPDATE_USER_SUCCESS,
   LOGOUT_FAILURE,
 } from '@account/store/actions/user'
 
@@ -38,7 +38,6 @@ const user = (state = defaultState, { type, payload }) => {
     case GET_USER_SUCCESS:
       return {
         ...state,
-        fetching: false,
         user: payload,
         error: false,
       }
@@ -49,11 +48,13 @@ const user = (state = defaultState, { type, payload }) => {
         user: undefined,
         error: payload,
       }
-    case LOGOUT:
+    case UPDATE_USER_SUCCESS:
       return {
         ...state,
-        fetching: true,
-        error: false,
+        user: {
+          ...state.user,
+          ...payload,
+        },
       }
     case LOGOUT_FAILURE:
       return {

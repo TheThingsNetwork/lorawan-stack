@@ -33,7 +33,7 @@ const m = defineMessages({
 const WizardNextButton = props => {
   const { isLastStep, completeMessage, validationContext, validationSchema } = props
   const { currentStepId, steps, onStepComplete } = useWizardContext()
-  const { disabled, submitForm, isSubmitting, isValidating, values } = useFormContext()
+  const { disabled, isSubmitting, isValidating, values } = useFormContext()
 
   const stepIndex = steps.findIndex(({ id }) => id === currentStepId)
   const { title: nextStepTitle } = steps[Math.min(stepIndex + 1, steps.length - 1)] || {
@@ -48,8 +48,7 @@ const WizardNextButton = props => {
 
   const handleClick = React.useCallback(() => {
     onStepComplete(validationSchema.cast(values, { context: validationContext }))
-    submitForm()
-  }, [onStepComplete, submitForm, validationContext, validationSchema, values])
+  }, [onStepComplete, validationContext, validationSchema, values])
 
   return (
     <Button
