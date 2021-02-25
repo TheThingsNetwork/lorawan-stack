@@ -487,10 +487,18 @@
   - [Message `Rights`](#ttn.lorawan.v3.Rights)
   - [Enum `Right`](#ttn.lorawan.v3.Right)
 - [File `lorawan-stack/api/search_services.proto`](#lorawan-stack/api/search_services.proto)
+  - [Message `SearchApplicationsRequest`](#ttn.lorawan.v3.SearchApplicationsRequest)
+  - [Message `SearchApplicationsRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchApplicationsRequest.AttributesContainEntry)
+  - [Message `SearchClientsRequest`](#ttn.lorawan.v3.SearchClientsRequest)
+  - [Message `SearchClientsRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchClientsRequest.AttributesContainEntry)
   - [Message `SearchEndDevicesRequest`](#ttn.lorawan.v3.SearchEndDevicesRequest)
   - [Message `SearchEndDevicesRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchEndDevicesRequest.AttributesContainEntry)
-  - [Message `SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest)
-  - [Message `SearchEntitiesRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchEntitiesRequest.AttributesContainEntry)
+  - [Message `SearchGatewaysRequest`](#ttn.lorawan.v3.SearchGatewaysRequest)
+  - [Message `SearchGatewaysRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchGatewaysRequest.AttributesContainEntry)
+  - [Message `SearchOrganizationsRequest`](#ttn.lorawan.v3.SearchOrganizationsRequest)
+  - [Message `SearchOrganizationsRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchOrganizationsRequest.AttributesContainEntry)
+  - [Message `SearchUsersRequest`](#ttn.lorawan.v3.SearchUsersRequest)
+  - [Message `SearchUsersRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchUsersRequest.AttributesContainEntry)
   - [Service `EndDeviceRegistrySearch`](#ttn.lorawan.v3.EndDeviceRegistrySearch)
   - [Service `EntityRegistrySearch`](#ttn.lorawan.v3.EntityRegistrySearch)
 - [File `lorawan-stack/api/secrets.proto`](#lorawan-stack/api/secrets.proto)
@@ -6804,6 +6812,72 @@ Right is the enum that defines all the different rights to do something in the n
 
 ## <a name="lorawan-stack/api/search_services.proto">File `lorawan-stack/api/search_services.proto`</a>
 
+### <a name="ttn.lorawan.v3.SearchApplicationsRequest">Message `SearchApplicationsRequest`</a>
+
+This message is used for finding applications in the EntityRegistrySearch service.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id_contains` | [`string`](#string) |  | Find applications where the ID contains this substring. |
+| `name_contains` | [`string`](#string) |  | Find applications where the name contains this substring. |
+| `description_contains` | [`string`](#string) |  | Find applications where the description contains this substring. |
+| `attributes_contain` | [`SearchApplicationsRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchApplicationsRequest.AttributesContainEntry) | repeated | Find applications where the given attributes contain these substrings. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `deleted` | [`bool`](#bool) |  | Only return recently deleted applications. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `id_contains` | <p>`string.max_len`: `50`</p> |
+| `name_contains` | <p>`string.max_len`: `50`</p> |
+| `description_contains` | <p>`string.max_len`: `50`</p> |
+| `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.SearchApplicationsRequest.AttributesContainEntry">Message `SearchApplicationsRequest.AttributesContainEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.SearchClientsRequest">Message `SearchClientsRequest`</a>
+
+This message is used for finding OAuth clients in the EntityRegistrySearch service.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id_contains` | [`string`](#string) |  | Find OAuth clients where the ID contains this substring. |
+| `name_contains` | [`string`](#string) |  | Find OAuth clients where the name contains this substring. |
+| `description_contains` | [`string`](#string) |  | Find OAuth clients where the description contains this substring. |
+| `attributes_contain` | [`SearchClientsRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchClientsRequest.AttributesContainEntry) | repeated | Find OAuth clients where the given attributes contain these substrings. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `deleted` | [`bool`](#bool) |  | Only return recently deleted OAuth clients. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `id_contains` | <p>`string.max_len`: `50`</p> |
+| `name_contains` | <p>`string.max_len`: `50`</p> |
+| `description_contains` | <p>`string.max_len`: `50`</p> |
+| `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.SearchClientsRequest.AttributesContainEntry">Message `SearchClientsRequest.AttributesContainEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`string`](#string) |  |  |
+
 ### <a name="ttn.lorawan.v3.SearchEndDevicesRequest">Message `SearchEndDevicesRequest`</a>
 
 | Field | Type | Label | Description |
@@ -6842,21 +6916,21 @@ Right is the enum that defines all the different rights to do something in the n
 | `key` | [`string`](#string) |  |  |
 | `value` | [`string`](#string) |  |  |
 
-### <a name="ttn.lorawan.v3.SearchEntitiesRequest">Message `SearchEntitiesRequest`</a>
+### <a name="ttn.lorawan.v3.SearchGatewaysRequest">Message `SearchGatewaysRequest`</a>
 
-This message is used for finding entities in the EntityRegistrySearch service.
+This message is used for finding gateways in the EntityRegistrySearch service.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `id_contains` | [`string`](#string) |  | Find entities where the ID contains this substring. |
-| `name_contains` | [`string`](#string) |  | Find entities where the name contains this substring. |
-| `description_contains` | [`string`](#string) |  | Find entities where the description contains this substring. |
-| `attributes_contain` | [`SearchEntitiesRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchEntitiesRequest.AttributesContainEntry) | repeated | Find entities where the given attributes contain these substrings. |
+| `id_contains` | [`string`](#string) |  | Find gateways where the ID contains this substring. |
+| `name_contains` | [`string`](#string) |  | Find gateways where the name contains this substring. |
+| `description_contains` | [`string`](#string) |  | Find gateways where the description contains this substring. |
+| `attributes_contain` | [`SearchGatewaysRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchGatewaysRequest.AttributesContainEntry) | repeated | Find gateways where the given attributes contain these substrings. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
-| `deleted` | [`bool`](#bool) |  | Only return recently deleted entities. |
+| `deleted` | [`bool`](#bool) |  | Only return recently deleted gateways. |
 
 #### Field Rules
 
@@ -6868,7 +6942,73 @@ This message is used for finding entities in the EntityRegistrySearch service.
 | `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
-### <a name="ttn.lorawan.v3.SearchEntitiesRequest.AttributesContainEntry">Message `SearchEntitiesRequest.AttributesContainEntry`</a>
+### <a name="ttn.lorawan.v3.SearchGatewaysRequest.AttributesContainEntry">Message `SearchGatewaysRequest.AttributesContainEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.SearchOrganizationsRequest">Message `SearchOrganizationsRequest`</a>
+
+This message is used for finding organizations in the EntityRegistrySearch service.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id_contains` | [`string`](#string) |  | Find organizations where the ID contains this substring. |
+| `name_contains` | [`string`](#string) |  | Find organizations where the name contains this substring. |
+| `description_contains` | [`string`](#string) |  | Find organizations where the description contains this substring. |
+| `attributes_contain` | [`SearchOrganizationsRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchOrganizationsRequest.AttributesContainEntry) | repeated | Find organizations where the given attributes contain these substrings. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `deleted` | [`bool`](#bool) |  | Only return recently deleted organizations. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `id_contains` | <p>`string.max_len`: `50`</p> |
+| `name_contains` | <p>`string.max_len`: `50`</p> |
+| `description_contains` | <p>`string.max_len`: `50`</p> |
+| `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.SearchOrganizationsRequest.AttributesContainEntry">Message `SearchOrganizationsRequest.AttributesContainEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.SearchUsersRequest">Message `SearchUsersRequest`</a>
+
+This message is used for finding users in the EntityRegistrySearch service.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id_contains` | [`string`](#string) |  | Find users where the ID contains this substring. |
+| `name_contains` | [`string`](#string) |  | Find users where the name contains this substring. |
+| `description_contains` | [`string`](#string) |  | Find users where the description contains this substring. |
+| `attributes_contain` | [`SearchUsersRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchUsersRequest.AttributesContainEntry) | repeated | Find users where the given attributes contain these substrings. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `deleted` | [`bool`](#bool) |  | Only return recently deleted users. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `id_contains` | <p>`string.max_len`: `50`</p> |
+| `name_contains` | <p>`string.max_len`: `50`</p> |
+| `description_contains` | <p>`string.max_len`: `50`</p> |
+| `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.SearchUsersRequest.AttributesContainEntry">Message `SearchUsersRequest.AttributesContainEntry`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -6899,11 +7039,11 @@ This service is not implemented on all deployments.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `SearchApplications` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Applications`](#ttn.lorawan.v3.Applications) | Search for applications that match the conditions specified in the request. Non-admin users will only match applications that they have rights on. |
-| `SearchClients` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Clients`](#ttn.lorawan.v3.Clients) | Search for OAuth clients that match the conditions specified in the request. Non-admin users will only match OAuth clients that they have rights on. |
-| `SearchGateways` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Gateways`](#ttn.lorawan.v3.Gateways) | Search for gateways that match the conditions specified in the request. Non-admin users will only match gateways that they have rights on. |
-| `SearchOrganizations` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Organizations`](#ttn.lorawan.v3.Organizations) | Search for organizations that match the conditions specified in the request. Non-admin users will only match organizations that they have rights on. |
-| `SearchUsers` | [`SearchEntitiesRequest`](#ttn.lorawan.v3.SearchEntitiesRequest) | [`Users`](#ttn.lorawan.v3.Users) | Search for users that match the conditions specified in the request. This is only available to admin users. |
+| `SearchApplications` | [`SearchApplicationsRequest`](#ttn.lorawan.v3.SearchApplicationsRequest) | [`Applications`](#ttn.lorawan.v3.Applications) | Search for applications that match the conditions specified in the request. Non-admin users will only match applications that they have rights on. |
+| `SearchClients` | [`SearchClientsRequest`](#ttn.lorawan.v3.SearchClientsRequest) | [`Clients`](#ttn.lorawan.v3.Clients) | Search for OAuth clients that match the conditions specified in the request. Non-admin users will only match OAuth clients that they have rights on. |
+| `SearchGateways` | [`SearchGatewaysRequest`](#ttn.lorawan.v3.SearchGatewaysRequest) | [`Gateways`](#ttn.lorawan.v3.Gateways) | Search for gateways that match the conditions specified in the request. Non-admin users will only match gateways that they have rights on. |
+| `SearchOrganizations` | [`SearchOrganizationsRequest`](#ttn.lorawan.v3.SearchOrganizationsRequest) | [`Organizations`](#ttn.lorawan.v3.Organizations) | Search for organizations that match the conditions specified in the request. Non-admin users will only match organizations that they have rights on. |
+| `SearchUsers` | [`SearchUsersRequest`](#ttn.lorawan.v3.SearchUsersRequest) | [`Users`](#ttn.lorawan.v3.Users) | Search for users that match the conditions specified in the request. This is only available to admin users. |
 
 #### HTTP bindings
 

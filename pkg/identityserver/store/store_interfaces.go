@@ -190,8 +190,12 @@ type InvitationStore interface {
 
 // EntitySearch interface for searching entities.
 type EntitySearch interface {
-	FindEntities(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchEntitiesRequest, entityType string) ([]ttnpb.Identifiers, error)
+	FindApplications(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchApplicationsRequest) ([]*ttnpb.ApplicationIdentifiers, error)
+	FindClients(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchClientsRequest) ([]*ttnpb.ClientIdentifiers, error)
 	FindEndDevices(ctx context.Context, req *ttnpb.SearchEndDevicesRequest) ([]*ttnpb.EndDeviceIdentifiers, error)
+	FindGateways(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchGatewaysRequest) ([]*ttnpb.GatewayIdentifiers, error)
+	FindOrganizations(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchOrganizationsRequest) ([]*ttnpb.OrganizationIdentifiers, error)
+	FindUsers(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchUsersRequest) ([]*ttnpb.UserIdentifiers, error)
 }
 
 // ContactInfoStore interface for contact info validation.

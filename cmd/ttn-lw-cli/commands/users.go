@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -84,6 +85,13 @@ func printPasswordRequirements(msg *ttnpb.IsConfiguration_UserRegistration_Passw
 
 var errPasswordMismatch = errors.DefineInvalidArgument("password_mismatch", "password did not match")
 
+var searchUsersFlags = func() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.AddFlagSet(searchFlags)
+	// NOTE: These flags need to be named with underscores, not dashes!
+	return flagSet
+}()
+
 var (
 	usersCommand = &cobra.Command{
 		Use:     "users",
@@ -125,8 +133,17 @@ var (
 			paths := util.SelectFieldMask(cmd.Flags(), selectUserFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.EntityRegistrySearch/SearchUsers"].Allowed)
 
-			req, opt, getTotal := getSearchEntitiesRequest(cmd.Flags())
+			req := &ttnpb.SearchUsersRequest{}
+			if err := util.SetFields(req, searchUsersFlags); err != nil {
+				return err
+			}
+			var (
+				opt      grpc.CallOption
+				getTotal func() uint64
+			)
+			req.Limit, req.Page, opt, getTotal = withPagination(cmd.Flags())
 			req.FieldMask.Paths = paths
+			req.Deleted = getDeleted(cmd.Flags())
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -484,7 +501,7 @@ func init() {
 	usersListCommand.Flags().AddFlagSet(paginationFlags())
 	usersListCommand.Flags().AddFlagSet(orderFlags())
 	usersCommand.AddCommand(usersListCommand)
-	usersSearchCommand.Flags().AddFlagSet(searchFlags())
+	usersSearchCommand.Flags().AddFlagSet(searchUsersFlags)
 	usersSearchCommand.Flags().AddFlagSet(deletedFlags)
 	usersSearchCommand.Flags().AddFlagSet(selectUserFlags)
 	usersSearchCommand.Flags().AddFlagSet(selectAllUserFlags)

@@ -6964,21 +6964,21 @@
         "parameters": [
           {
             "name": "id_contains",
-            "description": "Find entities where the ID contains this substring.",
+            "description": "Find applications where the ID contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "name_contains",
-            "description": "Find entities where the name contains this substring.",
+            "description": "Find applications where the name contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "description_contains",
-            "description": "Find entities where the description contains this substring.",
+            "description": "Find applications where the description contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7019,7 +7019,7 @@
           },
           {
             "name": "deleted",
-            "description": "Only return recently deleted entities.",
+            "description": "Only return recently deleted applications.",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -7158,21 +7158,21 @@
         "parameters": [
           {
             "name": "id_contains",
-            "description": "Find entities where the ID contains this substring.",
+            "description": "Find OAuth clients where the ID contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "name_contains",
-            "description": "Find entities where the name contains this substring.",
+            "description": "Find OAuth clients where the name contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "description_contains",
-            "description": "Find entities where the description contains this substring.",
+            "description": "Find OAuth clients where the description contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7213,7 +7213,7 @@
           },
           {
             "name": "deleted",
-            "description": "Only return recently deleted entities.",
+            "description": "Only return recently deleted OAuth clients.",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -7245,21 +7245,21 @@
         "parameters": [
           {
             "name": "id_contains",
-            "description": "Find entities where the ID contains this substring.",
+            "description": "Find gateways where the ID contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "name_contains",
-            "description": "Find entities where the name contains this substring.",
+            "description": "Find gateways where the name contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "description_contains",
-            "description": "Find entities where the description contains this substring.",
+            "description": "Find gateways where the description contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7300,7 +7300,7 @@
           },
           {
             "name": "deleted",
-            "description": "Only return recently deleted entities.",
+            "description": "Only return recently deleted gateways.",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -7332,21 +7332,21 @@
         "parameters": [
           {
             "name": "id_contains",
-            "description": "Find entities where the ID contains this substring.",
+            "description": "Find organizations where the ID contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "name_contains",
-            "description": "Find entities where the name contains this substring.",
+            "description": "Find organizations where the name contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "description_contains",
-            "description": "Find entities where the description contains this substring.",
+            "description": "Find organizations where the description contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7387,7 +7387,7 @@
           },
           {
             "name": "deleted",
-            "description": "Only return recently deleted entities.",
+            "description": "Only return recently deleted organizations.",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -7419,21 +7419,21 @@
         "parameters": [
           {
             "name": "id_contains",
-            "description": "Find entities where the ID contains this substring.",
+            "description": "Find users where the ID contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "name_contains",
-            "description": "Find entities where the name contains this substring.",
+            "description": "Find users where the name contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "description_contains",
-            "description": "Find entities where the description contains this substring.",
+            "description": "Find users where the description contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7474,7 +7474,7 @@
           },
           {
             "name": "deleted",
-            "description": "Only return recently deleted entities.",
+            "description": "Only return recently deleted users.",
             "in": "query",
             "required": false,
             "type": "boolean"

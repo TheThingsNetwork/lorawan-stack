@@ -38,7 +38,7 @@ var (
 )
 
 func request_EntityRegistrySearch_SearchApplications_0(ctx context.Context, marshaler runtime.Marshaler, client EntityRegistrySearchClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SearchEntitiesRequest
+	var protoReq SearchApplicationsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -54,7 +54,7 @@ func request_EntityRegistrySearch_SearchApplications_0(ctx context.Context, mars
 }
 
 func local_request_EntityRegistrySearch_SearchApplications_0(ctx context.Context, marshaler runtime.Marshaler, server EntityRegistrySearchServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SearchEntitiesRequest
+	var protoReq SearchApplicationsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -74,7 +74,7 @@ var (
 )
 
 func request_EntityRegistrySearch_SearchClients_0(ctx context.Context, marshaler runtime.Marshaler, client EntityRegistrySearchClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SearchEntitiesRequest
+	var protoReq SearchClientsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -90,7 +90,7 @@ func request_EntityRegistrySearch_SearchClients_0(ctx context.Context, marshaler
 }
 
 func local_request_EntityRegistrySearch_SearchClients_0(ctx context.Context, marshaler runtime.Marshaler, server EntityRegistrySearchServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SearchEntitiesRequest
+	var protoReq SearchClientsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -110,7 +110,7 @@ var (
 )
 
 func request_EntityRegistrySearch_SearchGateways_0(ctx context.Context, marshaler runtime.Marshaler, client EntityRegistrySearchClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SearchEntitiesRequest
+	var protoReq SearchGatewaysRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -126,7 +126,7 @@ func request_EntityRegistrySearch_SearchGateways_0(ctx context.Context, marshale
 }
 
 func local_request_EntityRegistrySearch_SearchGateways_0(ctx context.Context, marshaler runtime.Marshaler, server EntityRegistrySearchServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SearchEntitiesRequest
+	var protoReq SearchGatewaysRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -146,7 +146,7 @@ var (
 )
 
 func request_EntityRegistrySearch_SearchOrganizations_0(ctx context.Context, marshaler runtime.Marshaler, client EntityRegistrySearchClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SearchEntitiesRequest
+	var protoReq SearchOrganizationsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -162,7 +162,7 @@ func request_EntityRegistrySearch_SearchOrganizations_0(ctx context.Context, mar
 }
 
 func local_request_EntityRegistrySearch_SearchOrganizations_0(ctx context.Context, marshaler runtime.Marshaler, server EntityRegistrySearchServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SearchEntitiesRequest
+	var protoReq SearchOrganizationsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -182,7 +182,7 @@ var (
 )
 
 func request_EntityRegistrySearch_SearchUsers_0(ctx context.Context, marshaler runtime.Marshaler, client EntityRegistrySearchClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SearchEntitiesRequest
+	var protoReq SearchUsersRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -198,7 +198,7 @@ func request_EntityRegistrySearch_SearchUsers_0(ctx context.Context, marshaler r
 }
 
 func local_request_EntityRegistrySearch_SearchUsers_0(ctx context.Context, marshaler runtime.Marshaler, server EntityRegistrySearchServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SearchEntitiesRequest
+	var protoReq SearchUsersRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {

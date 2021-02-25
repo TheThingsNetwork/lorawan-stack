@@ -45,7 +45,7 @@ func (rs *registrySearch) memberForSearch(ctx context.Context) (*ttnpb.Organizat
 	return nil, errSearchForbidden.New()
 }
 
-func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Applications, error) {
+func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.SearchApplicationsRequest) (*ttnpb.Applications, error) {
 	member, err := rs.memberForSearch(ctx)
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 	}()
 	res := &ttnpb.Applications{}
 	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, member, req, "application")
+		entityIDs, err := store.GetEntitySearch(db).FindApplications(ctx, member, req)
 		if err != nil {
 			return err
 		}
@@ -78,7 +78,7 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 		if len(ids) == 0 {
 			return nil
 		}
-		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in FindEntities).
+		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindApplications).
 		res.Applications, err = store.GetApplicationStore(db).FindApplications(ctx, ids, &req.FieldMask)
 		if err != nil {
 			return err
@@ -91,7 +91,7 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 	return res, nil
 }
 
-func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Clients, error) {
+func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchClientsRequest) (*ttnpb.Clients, error) {
 	member, err := rs.memberForSearch(ctx)
 	if err != nil {
 		return nil, err
@@ -110,7 +110,7 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchEn
 	}()
 	res := &ttnpb.Clients{}
 	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, member, req, "client")
+		entityIDs, err := store.GetEntitySearch(db).FindClients(ctx, member, req)
 		if err != nil {
 			return err
 		}
@@ -124,7 +124,7 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchEn
 		if len(ids) == 0 {
 			return nil
 		}
-		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in FindEntities).
+		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindClients).
 		res.Clients, err = store.GetClientStore(db).FindClients(ctx, ids, &req.FieldMask)
 		if err != nil {
 			return err
@@ -137,7 +137,7 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchEn
 	return res, nil
 }
 
-func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Gateways, error) {
+func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchGatewaysRequest) (*ttnpb.Gateways, error) {
 	member, err := rs.memberForSearch(ctx)
 	if err != nil {
 		return nil, err
@@ -162,7 +162,7 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchE
 	}()
 	res := &ttnpb.Gateways{}
 	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, member, req, "gateway")
+		entityIDs, err := store.GetEntitySearch(db).FindGateways(ctx, member, req)
 		if err != nil {
 			return err
 		}
@@ -176,7 +176,7 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchE
 		if len(ids) == 0 {
 			return nil
 		}
-		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in FindEntities).
+		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindGateways).
 		res.Gateways, err = store.GetGatewayStore(db).FindGateways(ctx, ids, &req.FieldMask)
 		if err != nil {
 			return err
@@ -195,7 +195,7 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchE
 	return res, nil
 }
 
-func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Organizations, error) {
+func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.SearchOrganizationsRequest) (*ttnpb.Organizations, error) {
 	member, err := rs.memberForSearch(ctx)
 	if err != nil {
 		return nil, err
@@ -214,7 +214,7 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 	}()
 	res := &ttnpb.Organizations{}
 	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, member, req, "organization")
+		entityIDs, err := store.GetEntitySearch(db).FindOrganizations(ctx, member, req)
 		if err != nil {
 			return err
 		}
@@ -228,7 +228,7 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 		if len(ids) == 0 {
 			return nil
 		}
-		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in FindEntities).
+		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindOrganizations).
 		res.Organizations, err = store.GetOrganizationStore(db).FindOrganizations(ctx, ids, &req.FieldMask)
 		if err != nil {
 			return err
@@ -241,7 +241,7 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 	return res, nil
 }
 
-func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Users, error) {
+func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUsersRequest) (*ttnpb.Users, error) {
 	member, err := rs.memberForSearch(ctx)
 	if err != nil {
 		return nil, err
@@ -263,7 +263,7 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchEnti
 	}()
 	res := &ttnpb.Users{}
 	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, nil, req, "user")
+		entityIDs, err := store.GetEntitySearch(db).FindUsers(ctx, nil, req)
 		if err != nil {
 			return err
 		}
@@ -277,7 +277,7 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchEnti
 		if len(ids) == 0 {
 			return nil
 		}
-		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in FindEntities).
+		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindUsers).
 		res.Users, err = store.GetUserStore(db).FindUsers(ctx, ids, &req.FieldMask)
 		if err != nil {
 			return err
@@ -313,7 +313,7 @@ func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.Searc
 		if len(ids) == 0 {
 			return nil
 		}
-		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in FindEndDevices).
+		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindEndDevices).
 		res.EndDevices, err = store.GetEndDeviceStore(db).FindEndDevices(ctx, ids, &req.FieldMask)
 		if err != nil {
 			return err
