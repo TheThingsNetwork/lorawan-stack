@@ -42,9 +42,9 @@ type EndDeviceFetcher interface {
 	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error)
 }
 
-type noopFetcher struct{}
+type defaultFetcher struct{}
 
-func (f *noopFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
+func (f *defaultFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
 	return &ttnpb.EndDevice{EndDeviceIdentifiers: ids}, nil
 }
 
@@ -70,7 +70,7 @@ func WithEndDeviceFetcher(f EndDeviceFetcher) Option {
 
 // New returns a new gRPC frontend.
 func New(server io.Server, opts ...Option) ttnpb.AppAsServer {
-	i := &impl{server: server, fetcher: &noopFetcher{}}
+	i := &impl{server: server, fetcher: &defaultFetcher{}}
 	for _, opt := range opts {
 		opt.apply(i)
 	}
