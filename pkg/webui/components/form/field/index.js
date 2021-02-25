@@ -110,7 +110,7 @@ class FormField extends React.Component {
 
   extractValue(value) {
     let newValue = value
-    if (typeof value === 'object' && 'target' in value) {
+    if (typeof value === 'object' && value !== null && 'target' in value) {
       const target = value.target
       if ('type' in target && target.type === 'checkbox') {
         newValue = target.checked
@@ -127,14 +127,18 @@ class FormField extends React.Component {
     const { name, onChange, encode } = this.props
     const { setFieldValue, setFieldTouched } = this.context
 
-    // Check if the value is react's synthetic event.
-    const isSyntheticEvent = typeof value === 'object' && 'target' in value
     const newValue = encode(this.extractValue(value))
+    let isSyntheticEvent = false
 
-    // TODO: Remove `await` and event persist when https://github.com/jaredpalmer/formik/issues/2457
-    // is resolved.
-    if (typeof value !== 'undefined' && typeof value.persist === 'function') {
-      value.persist()
+    if (typeof value === 'object' && value !== null) {
+      // Check if the value is react's synthetic event.
+      isSyntheticEvent = 'target' in value
+
+      // TODO: Remove `await` and event persist when https://github.com/jaredpalmer/formik/issues/2457
+      // is resolved.
+      if (typeof value.persist === 'function') {
+        value.persist()
+      }
     }
 
     await setFieldValue(name, newValue)

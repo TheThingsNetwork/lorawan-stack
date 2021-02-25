@@ -14,27 +14,43 @@
 
 import * as cache from './cache'
 
-export default retrieveToken => async () => {
-  const storedToken = cache.get('accessToken')
-  let token
+export default fetchToken => {
+  let tokenPromise
+  let finishedRetrieval = true
 
-  if (!storedToken || Date.parse(storedToken.expiry) < Date.now()) {
-    // If we don't have a token stored or it's expired, we want to retrieve it.
-
-    // Remove stored, invalid token.
-    clear()
-
-    // Retrieve new token and store it.
-    const response = await retrieveToken()
-    token = response.data
+  const retrieveToken = async () => {
+    const response = await fetchToken()
+    const token = response.data
     cache.set('accessToken', token)
+    finishedRetrieval = true
+
     return token
   }
 
-  // If we have a stored token and its valid, we want to use it.
-  return storedToken
+  return () => {
+    const token = cache.get('accessToken')
+
+    if (!token || Date.parse(token.expiry) < Date.now()) {
+      // If we don't have a token stored or it's expired, we want to retrieve it.
+
+      // Prevent issuing more than one request at a time.
+      if (finishedRetrieval) {
+        finishedRetrieval = false
+
+        // Remove stored, invalid token.
+        clear()
+
+        // Retrieve new token and store it.
+        tokenPromise = retrieveToken()
+      }
+      return tokenPromise
+    }
+
+    // If we have a stored token and its valid, we want to use it.
+    return token
+  }
 }
 
-export function clear() {
+export const clear = () => {
   cache.remove('accessToken')
 }

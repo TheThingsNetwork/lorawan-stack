@@ -104,9 +104,13 @@ func (s *Session) Get(c echo.Context) (*ttnpb.UserSession, error) {
 		cookie.SessionID,
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			s.RemoveAuthCookie(c)
+		}
 		return nil, err
 	}
 	if session.ExpiresAt != nil && session.ExpiresAt.Before(time.Now()) {
+		s.RemoveAuthCookie(c)
 		return nil, errSessionExpired.New()
 	}
 	c.Set(userSessionKey, session)

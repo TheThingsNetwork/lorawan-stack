@@ -312,7 +312,7 @@ func (as *ApplicationServer) publishUp(ctx context.Context, up *ttnpb.Applicatio
 // This method returns true if the AppSKey of the given session is wrapped and cannot be unwrapped by the Application
 // Server, and if the end device's skip_payload_crypto_override is true or if the link's skip_payload_crypto is true.
 func (as *ApplicationServer) skipPayloadCrypto(ctx context.Context, link *ttnpb.ApplicationLink, dev *ttnpb.EndDevice, session *ttnpb.Session) bool {
-	if session != nil {
+	if session != nil && session.AppSKey != nil {
 		if _, err := cryptoutil.UnwrapAES128Key(ctx, session.AppSKey, as.KeyVault); err == nil {
 			return false
 		}

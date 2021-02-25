@@ -35,7 +35,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-const packageName = "lora-cloud-device-management-v1"
+// PackageName defines the package name.
+const PackageName = "lora-cloud-device-management-v1"
 
 // DeviceManagementPackage is the LoRa Cloud Device Management application package.
 //
@@ -191,7 +192,7 @@ func (p *DeviceManagementPackage) sendServiceData(ctx context.Context, ids ttnpb
 		Up: &ttnpb.ApplicationUp_ServiceData{
 			ServiceData: &ttnpb.ApplicationServiceData{
 				Data:    data,
-				Service: packageName,
+				Service: PackageName,
 			},
 		},
 	})
@@ -218,7 +219,7 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids tt
 		ReceivedAt:           timePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
-				Service: fmt.Sprintf("%v-%s", packageName, position.Algorithm),
+				Service: fmt.Sprintf("%v-%s", PackageName, position.Algorithm),
 				Location: ttnpb.Location{
 					Latitude:  position.LLH[0],
 					Longitude: position.LLH[1],
@@ -301,7 +302,7 @@ func (p *DeviceManagementPackage) mergePackageData(def *ttnpb.ApplicationPackage
 // Package implements packages.ApplicationPackageHandler.
 func (p *DeviceManagementPackage) Package() *ttnpb.ApplicationPackage {
 	return &ttnpb.ApplicationPackage{
-		Name:         packageName,
+		Name:         PackageName,
 		DefaultFPort: 199,
 	}
 }

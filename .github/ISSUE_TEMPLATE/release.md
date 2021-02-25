@@ -14,6 +14,8 @@ This is a checklist for releases. This is filled in by both the releaser and the
 
 #### Preparation
 
+- [ ] Create a [documentation release issue](https://github.com/TheThingsIndustries/lorawan-stack-docs/issues/new?title=Release+v3.x.x&labels=release&template=release.md).
+
 - [ ] Create a `release/v3.${minor}.${patch}` branch off the `v3.${minor}` branch.
   ```bash
   $ git checkout v3.${minor}
@@ -118,3 +120,4 @@ This is a checklist for releases. This is filled in by both the releaser and the
 
 - [ ] The new release contains only the intended commits. This can be checked using `https://github.com/TheThingsNetwork/lorawan-stack/compare/v<previous-version>...v<current-version>`
 - [ ] The Docker latest tag is up to date.
+- [ ] The [documentation site](https://www.thethingsindustries.com/docs/) has been updated.

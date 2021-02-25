@@ -35,6 +35,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// Response of GenerateDevAddr.
 type GenerateDevAddrResponse struct {
 	DevAddr              *go_thethings_network_lorawan_stack_v3_pkg_types.DevAddr `protobuf:"bytes,1,opt,name=dev_addr,json=devAddr,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr" json:"dev_addr,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                                                 `json:"-"`
@@ -251,8 +252,14 @@ var _Ns_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AsNsClient interface {
+	// Replace the entire downlink queue with the specified messages.
+	// This can also be used to empty the queue by specifying no messages.
+	// Note that this will trigger an immediate downlink if a downlink slot is available.
 	DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	// Push downlink messages to the end of the downlink queue.
+	// Note that this will trigger an immediate downlink if a downlink slot is available.
 	DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	// List the items currently in the downlink queue.
 	DownlinkQueueList(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*ApplicationDownlinks, error)
 }
 
@@ -293,8 +300,14 @@ func (c *asNsClient) DownlinkQueueList(ctx context.Context, in *EndDeviceIdentif
 
 // AsNsServer is the server API for AsNs service.
 type AsNsServer interface {
+	// Replace the entire downlink queue with the specified messages.
+	// This can also be used to empty the queue by specifying no messages.
+	// Note that this will trigger an immediate downlink if a downlink slot is available.
 	DownlinkQueueReplace(context.Context, *DownlinkQueueRequest) (*types.Empty, error)
+	// Push downlink messages to the end of the downlink queue.
+	// Note that this will trigger an immediate downlink if a downlink slot is available.
 	DownlinkQueuePush(context.Context, *DownlinkQueueRequest) (*types.Empty, error)
+	// List the items currently in the downlink queue.
 	DownlinkQueueList(context.Context, *EndDeviceIdentifiers) (*ApplicationDownlinks, error)
 }
 
@@ -395,6 +408,7 @@ var _AsNs_serviceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type GsNsClient interface {
+	// Handle a LoRaWAN uplink message.
 	HandleUplink(ctx context.Context, in *UplinkMessage, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
@@ -417,6 +431,7 @@ func (c *gsNsClient) HandleUplink(ctx context.Context, in *UplinkMessage, opts .
 
 // GsNsServer is the server API for GsNs service.
 type GsNsServer interface {
+	// Handle a LoRaWAN uplink message.
 	HandleUplink(context.Context, *UplinkMessage) (*types.Empty, error)
 }
 

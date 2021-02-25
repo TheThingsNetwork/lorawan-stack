@@ -17,7 +17,7 @@ import { defineSmokeTest } from '../utils'
 // eslint-disable-next-line no-useless-escape
 const updatePasswordLinkRegExp = `http:\\/\\/localhost:\\d{4}\\/[a-zA-Z0-9-_]+\\/update-password\\?.+&current=[A-Z0-9]+`
 
-const forgotPasswordFlow = defineSmokeTest('succeeds creating application', () => {
+const forgotPasswordFlow = defineSmokeTest('forgot password flow succeeds', () => {
   const user = {
     ids: { user_id: 'test-user-id1' },
     primary_email_address: 'test-user1@example.com',

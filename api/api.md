@@ -865,6 +865,8 @@ Application Server configuration.
 
 ### <a name="ttn.lorawan.v3.NsAsHandleUplinkRequest">Message `NsAsHandleUplinkRequest`</a>
 
+Container for multiple Application uplink messages.
+
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `application_ups` | [`ApplicationUp`](#ttn.lorawan.v3.ApplicationUp) | repeated |  |
@@ -968,7 +970,7 @@ The NsAs service connects a Network Server to an Application Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `HandleUplink` | [`NsAsHandleUplinkRequest`](#ttn.lorawan.v3.NsAsHandleUplinkRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+| `HandleUplink` | [`NsAsHandleUplinkRequest`](#ttn.lorawan.v3.NsAsHandleUplinkRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Handle Application uplink messages. |
 
 ## <a name="lorawan-stack/api/applicationserver_integrations_storage.proto">File `lorawan-stack/api/applicationserver_integrations_storage.proto`</a>
 
@@ -5069,6 +5071,8 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 ### <a name="ttn.lorawan.v3.Message">Message `Message`</a>
 
+Message represents a LoRaWAN message
+
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `m_hdr` | [`MHDR`](#ttn.lorawan.v3.MHDR) |  |  |
@@ -5698,6 +5702,8 @@ Encodes and decodes uplink messages.
 
 ### <a name="ttn.lorawan.v3.ApplicationUp">Message `ApplicationUp`</a>
 
+Application uplink message.
+
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
@@ -5998,6 +6004,8 @@ The connection information of an MQTT frontend.
 
 ### <a name="ttn.lorawan.v3.GenerateDevAddrResponse">Message `GenerateDevAddrResponse`</a>
 
+Response of GenerateDevAddr.
+
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `dev_addr` | [`bytes`](#bytes) |  |  |
@@ -6008,9 +6016,9 @@ The AsNs service connects an Application Server to a Network Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `DownlinkQueueReplace` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
-| `DownlinkQueuePush` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
-| `DownlinkQueueList` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`ApplicationDownlinks`](#ttn.lorawan.v3.ApplicationDownlinks) |  |
+| `DownlinkQueueReplace` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Replace the entire downlink queue with the specified messages. This can also be used to empty the queue by specifying no messages. Note that this will trigger an immediate downlink if a downlink slot is available. |
+| `DownlinkQueuePush` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Push downlink messages to the end of the downlink queue. Note that this will trigger an immediate downlink if a downlink slot is available. |
+| `DownlinkQueueList` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`ApplicationDownlinks`](#ttn.lorawan.v3.ApplicationDownlinks) | List the items currently in the downlink queue. |
 
 ### <a name="ttn.lorawan.v3.GsNs">Service `GsNs`</a>
 
@@ -6018,9 +6026,11 @@ The GsNs service connects a Gateway Server to a Network Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `HandleUplink` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+| `HandleUplink` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Handle a LoRaWAN uplink message. |
 
 ### <a name="ttn.lorawan.v3.Ns">Service `Ns`</a>
+
+The Ns service manages the Network Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|

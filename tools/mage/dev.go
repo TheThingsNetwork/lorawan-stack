@@ -16,6 +16,7 @@ package ttnmage
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -25,6 +26,7 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // Dev namespace.
@@ -64,6 +66,7 @@ var (
 	redisDatabase         = "redis"
 	devDatabases          = []string{sqlDatabase, redisDatabase}
 	devDataDir            = ".env/data"
+	devDir                = ".env"
 	devDatabaseName       = "ttn_lorawan_dev"
 	devDockerComposeFlags = []string{"-p", "lorawan-stack-dev"}
 	databaseURI           = fmt.Sprintf("postgresql://root@localhost:26257/%s?sslmode=disable", devDatabaseName)
@@ -233,7 +236,7 @@ func (Dev) InitStack() error {
 	}
 	if err := runGo("./cmd/ttn-lw-stack", "is-db", "create-admin-user",
 		"--id", "admin",
-		"--email", "admin@localhost",
+		"--email", "admin@example.com",
 		"--password", "admin",
 	); err != nil {
 		return err
@@ -246,6 +249,22 @@ func (Dev) InitStack() error {
 		"--redirect-uri", "local-callback",
 		"--redirect-uri", "code",
 	); err != nil {
+		return err
+	}
+	var key ttnpb.APIKey
+	var jsonVal []byte
+	var err error
+	if jsonVal, err = outputJSONGo("run", "./cmd/ttn-lw-stack", "is-db", "create-user-api-key",
+		"--user-id", "admin",
+		"--name", "Admin User API Key",
+	); err != nil {
+		return err
+	}
+	if err := json.Unmarshal(jsonVal, &key); err != nil {
+		return err
+	}
+
+	if err := writeToFile(filepath.Join(devDir, "admin_api_key.txt"), []byte(key.Key)); err != nil {
 		return err
 	}
 	return runGo("./cmd/ttn-lw-stack", "is-db", "create-oauth-client",

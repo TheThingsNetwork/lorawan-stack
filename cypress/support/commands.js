@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { noop } from 'lodash'
+import 'cypress-file-upload'
+
+import { noop, merge } from 'lodash'
 
 import stringToHash from '../../pkg/webui/lib/string-to-hash'
 
@@ -324,6 +326,20 @@ Cypress.Commands.add('augmentStackConfig', fns => {
       value: () => {
         fnArray.forEach(fn => fn(win.__ttn_config__))
       },
+    })
+  })
+})
+
+// Helper function to augment the configuration that is returned from the IS.
+// Note: `cy.server()` needs to run before this command.
+Cypress.Commands.add('augmentIsConfig', config => {
+  const baseUrl = Cypress.config('baseUrl')
+  cy.request({
+    method: 'GET',
+    url: `${baseUrl}/api/v3/is/configuration`,
+  }).then(({ body }) => {
+    cy.route('GET', `${baseUrl}/api/v3/is/configuration`, {
+      configuration: merge({}, body.configuration, config),
     })
   })
 })

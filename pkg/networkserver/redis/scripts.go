@@ -12,8 +12,8 @@ var (
 	//
 	// KEYS[2] 	- sorted set of uids of devices matching current session DevAddr sorted ascending by LSB of LastFCntUp
 	// KEYS[3] 	- hash containing msgpack-encoded sessions for devices matching current session DevAddr keyed by uid
-	// KEYS[4] 	- sorted list of uids of devices matching with current session LastFCntUp LSB being lower than or equal to current
-	// KEYS[5] 	- sorted list of uids of devices matching with current session LastFCntUp LSB being greater than current
+	// KEYS[4] 	- sorted list of uids of devices matching with current session LastFCntUp LSB being lower than or equal to uplink LSB
+	// KEYS[5] 	- sorted list of uids of devices matching with current session LastFCntUp LSB being greater than uplink LSB
 	// KEYS[6]  - copy of KEYS[3]
 	//
 	// KEYS[7] 	- sorted set of uids of devices matching pending session DevAddr sorted ascending by creation time
@@ -68,6 +68,9 @@ return nil`)
 
 	deviceMatchScanScript = redis.NewScript(`for _, old_uid in ipairs(ARGV) do
   local uid = redis.call('lindex', KEYS[1], -1)
+  if not uid then
+    return nil
+  end
   if uid ~= old_uid then
     return uid
   end
@@ -80,6 +83,9 @@ return redis.call('lindex', KEYS[1], -1)`)
 table.remove(ARGV, 1)
 for _, old_uid in ipairs(ARGV) do
   local uid = redis.call('lindex', KEYS[1], -1)
+  if not uid then
+    return nil
+  end
   if uid ~= old_uid then
     local s = redis.call('hget', KEYS[2], uid)
     local m = cmsgpack.unpack(s)

@@ -100,7 +100,18 @@ class Users {
         field_mask: Marshaler.fieldMask(mask),
       },
     )
-    return Marshaler.unwrapUser(response)
+
+    const result = Marshaler.unwrapUser(response)
+
+    // Get new profile picture value if a new picture was uploaded, deleted, or
+    // the primary email address was changed (in case of Gravar usage).
+    if (mask.includes('profile_picture') || mask.includes('primary_email_address')) {
+      const user = await this.getById(id, ['profile_picture'])
+      const result = Marshaler.unwrapUser(response)
+      result.profile_picture = user.profile_picture
+    }
+
+    return result
   }
 
   async create(user, invitationToken) {

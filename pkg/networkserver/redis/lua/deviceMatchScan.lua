@@ -14,6 +14,9 @@
 
 for _, old_uid in ipairs(ARGV) do
   local uid = redis.call('lindex', KEYS[1], -1)
+  if not uid then
+    return nil
+  end
   if uid ~= old_uid then
     return uid
   end

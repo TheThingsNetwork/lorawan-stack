@@ -283,8 +283,8 @@ type Options struct {
 func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, error) {
 	defer trace.StartRegion(ctx, "schedule transmission").End()
 
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if opts.UplinkToken != nil {
 		s.syncWithUplinkToken(opts.UplinkToken)
 	}
@@ -360,8 +360,8 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, err
 func (s *Scheduler) ScheduleAnytime(ctx context.Context, opts Options) (Emission, error) {
 	defer trace.StartRegion(ctx, "schedule transmission at any time").End()
 
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if opts.UplinkToken != nil {
 		s.syncWithUplinkToken(opts.UplinkToken)
 	}
