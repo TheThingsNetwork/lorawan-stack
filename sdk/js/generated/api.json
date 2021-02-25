@@ -28034,6 +28034,26 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "created_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "updated_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

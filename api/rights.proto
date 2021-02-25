@@ -18,6 +18,7 @@ package ttn.lorawan.v3;
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/identifiers.proto";
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
@@ -180,6 +181,9 @@ message APIKey {
 
   // Rights that are granted to this API key.
   repeated Right rights = 4 [(validate.rules).repeated.items.enum.defined_only = true];
+
+  google.protobuf.Timestamp created_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 message APIKeys {

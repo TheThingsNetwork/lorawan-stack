@@ -308,7 +308,7 @@ func (p *Populator) populateAPIKeys(ctx context.Context, db *gorm.DB) (err error
 			hashedKey, _ := auth.Hash(ctx, generatedKey)
 			apiKey.ID = generatedID
 			apiKey.Key = hashedKey
-			if err = GetAPIKeyStore(db).CreateAPIKey(ctx, entityID, apiKey); err != nil {
+			if _, err = GetAPIKeyStore(db).CreateAPIKey(ctx, entityID, apiKey); err != nil {
 				return err
 			}
 			apiKey.Key = token

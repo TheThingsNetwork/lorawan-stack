@@ -10046,6 +10046,14 @@
             "$ref": "#/definitions/v3Right"
           },
           "description": "Rights that are granted to this API key."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

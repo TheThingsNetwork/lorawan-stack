@@ -136,10 +136,12 @@ var CreateOrganizationAPIKeyRequestFieldPathsTopLevel = []string{
 }
 var UpdateOrganizationAPIKeyRequestFieldPathsNested = []string{
 	"api_key",
+	"api_key.created_at",
 	"api_key.id",
 	"api_key.key",
 	"api_key.name",
 	"api_key.rights",
+	"api_key.updated_at",
 	"organization_ids",
 	"organization_ids.organization_id",
 }
