@@ -192,13 +192,24 @@ const DeviceRepository = props => {
   )
 
   const handleIdPrefill = React.useCallback(() => {
-    if (formRef.current) {
-      const { values, errors, setFieldValue } = formRef.current
+    if (formRef && formRef.current) {
+      const { values, setFieldValue } = formRef.current
 
       // Do not overwrite a value that the user has already set.
       if (values.ids.device_id === initialValues.ids.device_id) {
-        const generatedId = generateDeviceId(values, errors)
+        const generatedId = generateDeviceId(values)
         setFieldValue('ids.device_id', generatedId)
+      }
+    }
+  }, [])
+  const handleIdTextSelect = React.useCallback(idInputRef => {
+    if (idInputRef && idInputRef.current) {
+      const { values } = formRef.current
+      const { setSelectionRange } = idInputRef.current
+
+      const generatedId = generateDeviceId(values)
+      if (generatedId.length > 0 && generatedId === values.ids.device_id) {
+        setSelectionRange.call(idInputRef.current, 0, generatedId.length)
       }
     }
   }, [])
@@ -290,6 +301,7 @@ const DeviceRepository = props => {
                 prefixes={prefixes}
                 mayEditKeys={mayEditKeys}
                 onIdPrefill={handleIdPrefill}
+                onIdSelect={handleIdTextSelect}
               />
             ) : (
               <Message content={m.enterDataDescription} component="p" />
