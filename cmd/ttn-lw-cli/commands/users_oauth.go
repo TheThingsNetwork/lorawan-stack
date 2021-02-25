@@ -202,6 +202,7 @@ var (
 
 func init() {
 	oauthAuthorizationsListCommand.Flags().AddFlagSet(userIDFlags())
+	oauthAuthorizationsListCommand.Flags().AddFlagSet(paginationFlags())
 	oauthAuthorizationsCommand.AddCommand(oauthAuthorizationsListCommand)
 	oauthAuthorizationsDeleteCommand.Flags().AddFlagSet(userIDFlags())
 	oauthAuthorizationsDeleteCommand.Flags().AddFlagSet(clientIDFlags())
@@ -209,6 +210,7 @@ func init() {
 	oauthCommand.AddCommand(oauthAuthorizationsCommand)
 	oauthAccessTokensListCommand.Flags().AddFlagSet(userIDFlags())
 	oauthAccessTokensListCommand.Flags().AddFlagSet(clientIDFlags())
+	oauthAccessTokensListCommand.Flags().AddFlagSet(paginationFlags())
 	oauthAccessTokensCommand.AddCommand(oauthAccessTokensListCommand)
 	oauthAccessTokensDeleteCommand.Flags().AddFlagSet(userIDFlags())
 	oauthAccessTokensDeleteCommand.Flags().AddFlagSet(clientIDFlags())
