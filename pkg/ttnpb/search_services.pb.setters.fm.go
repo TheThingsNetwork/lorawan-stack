@@ -250,6 +250,16 @@ func (dst *SearchGatewaysRequest) SetFields(src *SearchGatewaysRequest, paths ..
 			} else {
 				dst.AttributesContain = nil
 			}
+		case "eui_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'eui_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EUIContains = src.EUIContains
+			} else {
+				var zero string
+				dst.EUIContains = zero
+			}
 		case "field_mask":
 			if len(subs) > 0 {
 				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)

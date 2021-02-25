@@ -81,6 +81,7 @@ var searchGatewaysFlags = func() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	flagSet.AddFlagSet(searchFlags)
 	// NOTE: These flags need to be named with underscores, not dashes!
+	flagSet.String("eui_contains", "", "")
 	return flagSet
 }()
 

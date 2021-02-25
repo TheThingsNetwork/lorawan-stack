@@ -457,6 +457,15 @@ func (m *SearchGatewaysRequest) ValidateFields(paths ...string) error {
 
 			}
 
+		case "eui_contains":
+
+			if utf8.RuneCountInString(m.GetEUIContains()) > 16 {
+				return SearchGatewaysRequestValidationError{
+					field:  "eui_contains",
+					reason: "value length must be at most 16 runes",
+				}
+			}
+
 		case "field_mask":
 
 			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {

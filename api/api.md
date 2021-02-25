@@ -6926,6 +6926,7 @@ This message is used for finding gateways in the EntityRegistrySearch service.
 | `name_contains` | [`string`](#string) |  | Find gateways where the name contains this substring. |
 | `description_contains` | [`string`](#string) |  | Find gateways where the description contains this substring. |
 | `attributes_contain` | [`SearchGatewaysRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchGatewaysRequest.AttributesContainEntry) | repeated | Find gateways where the given attributes contain these substrings. |
+| `eui_contains` | [`string`](#string) |  | Find gateways where the (hexadecimal) EUI contains this substring. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
@@ -6940,6 +6941,7 @@ This message is used for finding gateways in the EntityRegistrySearch service.
 | `name_contains` | <p>`string.max_len`: `50`</p> |
 | `description_contains` | <p>`string.max_len`: `50`</p> |
 | `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
+| `eui_contains` | <p>`string.max_len`: `16`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchGatewaysRequest.AttributesContainEntry">Message `SearchGatewaysRequest.AttributesContainEntry`</a>

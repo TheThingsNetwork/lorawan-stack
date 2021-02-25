@@ -120,7 +120,11 @@ message SearchGatewaysRequest {
     }
   ];
 
-  reserved 5; // TODO: Add filter for approval state (admin only).
+  // Find gateways where the (hexadecimal) EUI contains this substring.
+  string eui_contains = 5 [
+    (gogoproto.customname) = "EUIContains",
+    (validate.rules).string.max_len = 16
+  ];
 
   google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
 

@@ -7265,6 +7265,13 @@
             "type": "string"
           },
           {
+            "name": "eui_contains",
+            "description": "Find gateways where the (hexadecimal) EUI contains this substring.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "field_mask.paths",
             "description": "The set of field mask paths.",
             "in": "query",

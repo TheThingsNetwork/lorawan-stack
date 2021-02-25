@@ -172,6 +172,9 @@ func (s *entitySearch) FindGateways(ctx context.Context, member *ttnpb.Organizat
 	query = query.Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, gateway))
 	query = s.queryMembership(ctx, query, gateway, member)
 	query = s.queryMetaFields(ctx, query, gateway, req)
+	if v := req.EUIContains; v != "" {
+		query = query.Where(fmt.Sprintf(`"%[1]ss"."gateway_eui" ILIKE ?`, gateway), fmt.Sprintf("%%%s%%", v))
+	}
 	results, err := s.runPaginatedQuery(ctx, query, gateway)
 	if err != nil {
 		return nil, err

@@ -29116,6 +29116,24 @@
               }
             },
             {
+              "name": "eui_contains",
+              "description": "Find gateways where the (hexadecimal) EUI contains this substring.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 16
+                  }
+                ]
+              }
+            },
+            {
               "name": "field_mask",
               "description": "",
               "label": "",
