@@ -29,11 +29,12 @@ import (
 type ApplicationUplinkQueue struct {
 	applicationQueue *ttnredis.TaskQueue
 
-	redis  *ttnredis.Client
-	maxLen int64
-	group  string
-	id     string
-	key    string
+	redis   *ttnredis.Client
+	maxLen  int64
+	group   string
+	id      string
+	key     string
+	minIdle time.Duration
 }
 
 const (
@@ -41,7 +42,7 @@ const (
 )
 
 // NewApplicationUplinkQueue returns new application uplink queue.
-func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group, id string) *ApplicationUplinkQueue {
+func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group, id string, minIdle time.Duration) *ApplicationUplinkQueue {
 	return &ApplicationUplinkQueue{
 		applicationQueue: &ttnredis.TaskQueue{
 			Redis:  cl,
@@ -50,11 +51,12 @@ func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group, id stri
 			ID:     id,
 			Key:    cl.Key("application"),
 		},
-		redis:  cl,
-		maxLen: maxLen,
-		group:  group,
-		id:     id,
-		key:    cl.Key("application-uplink"),
+		redis:   cl,
+		maxLen:  maxLen,
+		group:   group,
+		id:      id,
+		key:     cl.Key("application-uplink"),
+		minIdle: minIdle,
 	}
 }
 
@@ -139,7 +141,7 @@ var (
 	errLimitTooLow    = errors.DefineInvalidArgument("limit_too_low", "limit too low")
 )
 
-func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.ApplicationIdentifiers, networkserver.ApplicationUplinkQueueRangeFunc) (time.Time, error)) error {
+func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.ApplicationIdentifiers, networkserver.ApplicationUplinkQueueDrainFunc) (time.Time, error)) error {
 	return q.applicationQueue.Pop(ctx, nil, func(p redis.Pipeliner, uid string, _ time.Time) error {
 		appID, err := unique.ToApplicationID(uid)
 		if err != nil {
@@ -149,9 +151,6 @@ func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context
 		if err != nil {
 			return err
 		}
-		var invalidationFCnts map[string]uint64
-		var ups []*ttnpb.ApplicationUp
-		msgIDs := make(map[string][]string, 3)
 		joinAcceptUpStream := q.uidJoinAcceptKey(uid)
 		invalidationUpStream := q.uidInvalidationKey(uid)
 		genericUpStream := q.uidGenericUplinkKey(uid)
@@ -161,9 +160,10 @@ func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context
 			invalidationUpStream,
 			genericUpStream,
 		}
-		cmds, err := q.redis.Pipelined(ctx, func(p redis.Pipeliner) error {
+
+		cmds, err := q.redis.Pipelined(ctx, func(pp redis.Pipeliner) error {
 			for _, stream := range streams {
-				p.XGroupCreateMkStream(ctx, stream, q.group, "0")
+				pp.XGroupCreateMkStream(ctx, stream, q.group, "0")
 			}
 			return nil
 		})
@@ -182,71 +182,36 @@ func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context
 			return ttnredis.ConvertError(initErr)
 		}
 
-		t, err := f(ctx, appID, func(limit int, g func(...*ttnpb.ApplicationUp) error) (bool, error) {
-			if limit < 6 {
-				return false, errLimitTooLow.New()
-			}
-			xCount := limit / 6
-			rets, err := q.redis.XReadGroup(ctx, &redis.XReadGroupArgs{
-				Group:    q.group,
-				Consumer: q.id,
-				Streams:  []string{joinAcceptUpStream, joinAcceptUpStream, invalidationUpStream, invalidationUpStream, genericUpStream, genericUpStream, "0", ">", "0", ">", "0", ">"},
-				Count:    int64(xCount),
-				Block:    -1, // do not block
-			}).Result()
-			if err != nil {
-				return false, ttnredis.ConvertError(err)
-			}
+		t, err := f(ctx, appID, func(limit int, g func(...*ttnpb.ApplicationUp) error) error {
+			var invalidationFCnts map[string]uint64
+			ups := make([]*ttnpb.ApplicationUp, 0, limit)
 
-			// Clear and/or pre-allocate data structures for reuse.
-			var msgCount int
-			for _, ret := range rets {
-				n := len(ret.Messages)
-				if n == 0 {
-					continue
-				}
-				ss, ok := msgIDs[ret.Stream]
-				if !ok || cap(ss) < n {
-					msgIDs[ret.Stream] = make([]string, 0, n)
-				} else {
-					msgIDs[ret.Stream] = ss[:0]
-				}
-				msgCount += n
-			}
-			if msgCount == 0 {
-				return true, nil
-			}
-			if cap(ups) < msgCount {
-				ups = make([]*ttnpb.ApplicationUp, 0, msgCount)
-			} else {
+			processMessages := func(stream string, msgs ...redis.XMessage) error {
 				ups = ups[:0]
-			}
-
-			for _, ret := range rets {
-				for _, msg := range ret.Messages {
+				for _, msg := range msgs {
 					v, ok := msg.Values[payloadKey]
 					if !ok {
-						return false, errMissingPayload.New()
+						return errMissingPayload.New()
 					}
 					s, ok := v.(string)
 					if !ok {
-						return false, errInvalidPayload.New()
+						return errInvalidPayload.New()
 					}
 					up := &ttnpb.ApplicationUp{}
 					if err = ttnredis.UnmarshalProto(s, up); err != nil {
-						return false, err
+						return err
 					}
 					var skip bool
-					if ret.Stream == invalidationUpStream {
+					if stream == invalidationUpStream {
 						devUID := unique.ID(ctx, up.EndDeviceIdentifiers)
 						lastFCnt, ok := invalidationFCnts[devUID]
 						if !ok {
 							lastFCnt, err = q.redis.Get(ctx, uidLastInvalidationKey(q.redis, devUID)).Uint64()
 							if err != nil {
-								return false, ttnredis.ConvertError(err)
+								return ttnredis.ConvertError(err)
 							}
 							if invalidationFCnts == nil {
-								invalidationFCnts = make(map[string]uint64, len(rets))
+								invalidationFCnts = make(map[string]uint64, len(msgs))
 							}
 							invalidationFCnts[devUID] = lastFCnt
 						}
@@ -255,24 +220,10 @@ func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context
 					if !skip {
 						ups = append(ups, up)
 					}
-					msgIDs[ret.Stream] = append(msgIDs[ret.Stream], msg.ID)
 				}
+				return g(ups...)
 			}
-			if err = g(ups...); err != nil {
-				return false, err
-			}
-			_, err = q.redis.Pipelined(ctx, func(pp redis.Pipeliner) error {
-				for streamID, ids := range msgIDs {
-					// NOTE: Both calls below copy contents of ids internally.
-					pp.XAck(ctx, streamID, q.group, ids...)
-					pp.XDel(ctx, streamID, ids...)
-				}
-				return nil
-			})
-			if err != nil {
-				return false, err
-			}
-			return msgCount < xCount, nil
+			return ttnredis.RangeStreams(ctx, q.redis, q.group, q.id, int64(limit), q.minIdle, processMessages, streams[:]...)
 		})
 		if err != nil || t.IsZero() {
 			return err
