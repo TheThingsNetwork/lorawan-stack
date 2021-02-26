@@ -272,9 +272,9 @@ var (
 		},
 	}
 	organizationAPIKeysUpdate = &cobra.Command{
-		Use:     "update [organization-id] [api-key-id]",
-		Aliases: []string{"set"},
-		Short:   "Update an organization API key",
+		Use:     "set [organization-id] [api-key-id]",
+		Aliases: []string{"update"},
+		Short:   "Set properties of an organization API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), firstArgs(1, args...))
 			if orgID == nil {
