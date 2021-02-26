@@ -13,6 +13,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Pagination flags for the `users oauth authorizations list` and `users oauth access-tokens list` CLI commands.
 - End device ID generation based on DevEUI in The LoRaWAN Device Repository creation form in the Console.
+- `remote_ip` and `user_agent` metadata on OAuth events.
 
 ### Changed
 
@@ -28,6 +29,7 @@ For details about compatibility between different releases, see the **Commitment
 - Ocassional race condition when matching pending sessions.
 - Conflict error when registering an end device via the wizard in the Console.
 - Pagination in the `List` and `ListTokens` RPCs of the `OAuthAuthorizationRegistry`.
+- Event name on user login.
 
 ### Security
 

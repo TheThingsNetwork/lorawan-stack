@@ -9184,7 +9184,7 @@
       "en": "login user successful"
     },
     "description": {
-      "package": "pkg/account",
+      "package": "pkg/oauth",
       "file": "observability.go"
     }
   },
@@ -9193,7 +9193,7 @@
       "en": "logout user"
     },
     "description": {
-      "package": "pkg/account",
+      "package": "pkg/oauth",
       "file": "observability.go"
     }
   },

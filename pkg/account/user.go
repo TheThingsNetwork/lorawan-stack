@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -94,7 +95,7 @@ func (s *server) CreateUserSession(c echo.Context, userIDs ttnpb.UserIdentifiers
 	if err != nil {
 		return err
 	}
-	events.Publish(evtUserLogout.NewWithIdentifiersAndData(ctx, userIDs, nil))
+	events.Publish(oauth.EvtUserLogin.NewWithIdentifiersAndData(ctx, userIDs, nil))
 	return s.session.UpdateAuthCookie(c, func(cookie *auth.CookieShape) error {
 		cookie.UserID = session.UserIdentifiers.UserID
 		cookie.SessionID = session.SessionID
@@ -109,7 +110,7 @@ func (s *server) Logout(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	events.Publish(evtUserLogout.NewWithIdentifiersAndData(ctx, session.UserIdentifiers, nil))
+	events.Publish(oauth.EvtUserLogout.NewWithIdentifiersAndData(ctx, session.UserIdentifiers, nil))
 	if err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionID); err != nil {
 		return err
 	}
