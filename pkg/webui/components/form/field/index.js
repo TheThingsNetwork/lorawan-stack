@@ -29,7 +29,7 @@ import FormContext from '../context'
 
 import style from './field.styl'
 
-export function getPassThroughProps(props, excludeProps) {
+export const getPassThroughProps = (props, excludeProps) => {
   const rest = {}
   for (const property of Object.keys(props)) {
     if (!excludeProps[property]) {
@@ -39,7 +39,7 @@ export function getPassThroughProps(props, excludeProps) {
   return rest
 }
 
-const isValueEmpty = function(value) {
+const isValueEmpty = value => {
   if (value === null || value === undefined) {
     return true
   }
@@ -74,6 +74,7 @@ class FormField extends React.Component {
     glossaryId: PropTypes.string,
     glossaryTerm: PropTypes.message,
     name: PropTypes.string.isRequired,
+    onBlur: PropTypes.func,
     onChange: PropTypes.func,
     readOnly: PropTypes.bool,
     required: PropTypes.bool,
@@ -87,6 +88,7 @@ class FormField extends React.Component {
     encode: value => value,
     decode: value => value,
     onChange: () => null,
+    onBlur: () => null,
     warning: '',
     description: '',
     glossaryTerm: '',
@@ -152,13 +154,15 @@ class FormField extends React.Component {
 
   @bind
   handleBlur(event) {
-    const { name } = this.props
+    const { name, onBlur } = this.props
     const { validateOnBlur, setFieldTouched } = this.context
 
     if (validateOnBlur) {
       const value = this.extractValue(event)
       setFieldTouched(name, !isValueEmpty(value))
     }
+
+    onBlur(event)
   }
 
   render() {

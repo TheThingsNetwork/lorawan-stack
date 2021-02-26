@@ -29,6 +29,20 @@ import Generate from './generate'
 
 import style from './input.styl'
 
+/**
+ * Merges multiple refs.
+ *
+ * @param {Array<object>} refs - A list of refs to be merged.
+ * @returns {Function} - The ref callback with the DOM element that is assigned to every ref in `refs`.
+ */
+const mergeRefs = refs => val => {
+  refs.forEach(ref => {
+    if (typeof ref === 'object') {
+      ref.current = val
+    }
+  })
+}
+
 class Input extends React.Component {
   static propTypes = {
     action: PropTypes.shape({
@@ -49,8 +63,9 @@ class Input extends React.Component {
     component: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     disabled: PropTypes.bool,
     error: PropTypes.bool,
-    forwardedRef: PropTypes.shape({}),
+    forwardedRef: PropTypes.shape({ current: PropTypes.shape({}) }),
     icon: PropTypes.string,
+    inputRef: PropTypes.shape({ current: PropTypes.shape({}) }),
     inputWidth: PropTypes.inputWidth,
     intl: PropTypes.shape({
       formatMessage: PropTypes.func,
@@ -98,6 +113,7 @@ class Input extends React.Component {
     valid: false,
     value: '',
     warning: false,
+    inputRef: null,
     forwardedRef: null,
   }
 
@@ -105,7 +121,7 @@ class Input extends React.Component {
     focus: false,
   }
 
-  input = React.createRef()
+  input = React.createRef(null)
 
   focus() {
     if (this.input.current) {
@@ -147,9 +163,10 @@ class Input extends React.Component {
       intl,
       code,
       action,
-      forwardedRef,
       autoComplete,
       showPerChar,
+      forwardedRef,
+      inputRef,
       ...rest
     } = this.props
 
@@ -197,6 +214,7 @@ class Input extends React.Component {
     const passedProps = {
       ...rest,
       ...(type === 'byte' ? { showPerChar } : {}),
+      ref: inputRef ? mergeRefs([this.input, inputRef]) : this.input,
     }
 
     return (
@@ -204,7 +222,6 @@ class Input extends React.Component {
         <div className={inputCls} style={inputStyle}>
           {icon && <Icon className={style.icon} icon={icon} />}
           <Component
-            ref={this.input}
             key="i"
             className={style.input}
             type={type}

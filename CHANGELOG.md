@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Pagination flags for the `users oauth authorizations list` and `users oauth access-tokens list` CLI commands.
+- End device ID generation based on DevEUI in The LoRaWAN Device Repository creation form in the Console.
 
 ### Changed
 

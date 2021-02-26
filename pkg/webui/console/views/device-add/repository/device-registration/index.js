@@ -48,9 +48,14 @@ const m = defineMessages({
 })
 
 const Registration = props => {
-  const { template, fetching, prefixes, mayEditKeys } = props
+  const { template, fetching, prefixes, mayEditKeys, onIdPrefill, onIdSelect } = props
   const state = useRepositoryContext()
   const hasTemplate = Boolean(template)
+  const idInputRef = React.useRef(null)
+
+  const handleIdFocus = React.useCallback(() => {
+    onIdSelect(idInputRef)
+  }, [idInputRef, onIdSelect])
 
   if (!hasTemplate || (fetching && !hasTemplate)) {
     return (
@@ -99,6 +104,7 @@ const Registration = props => {
             required
             component={Input}
             glossaryId={glossaryId.DEV_EUI}
+            onBlur={onIdPrefill}
           />
           <Form.Field
             required
@@ -227,6 +233,8 @@ const Registration = props => {
         name="ids.device_id"
         placeholder={sharedMessages.deviceIdPlaceholder}
         component={Input}
+        onFocus={handleIdFocus}
+        inputRef={idInputRef}
       />
       <Form.Field title={m.afterRegistration} name="_registration" component={Radio.Group}>
         <Radio label={m.singleRegistration} value={REGISTRATION_TYPES.SINGLE} />
@@ -239,6 +247,8 @@ const Registration = props => {
 Registration.propTypes = {
   fetching: PropTypes.bool,
   mayEditKeys: PropTypes.bool.isRequired,
+  onIdPrefill: PropTypes.func.isRequired,
+  onIdSelect: PropTypes.func.isRequired,
   prefixes: PropTypes.euiPrefixes.isRequired,
   template: PropTypes.shape({
     end_device: PropTypes.shape({
