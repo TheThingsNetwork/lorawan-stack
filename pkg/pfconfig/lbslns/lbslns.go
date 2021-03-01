@@ -112,6 +112,9 @@ func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan
 	conf.NoDwellTime = !isProd
 
 	for _, fp := range fps {
+		if len(fp.Radios) == 0 {
+			continue
+		}
 		sx1301Conf, err := shared.BuildSX1301Config(fp)
 		// These fields are not defined in the v1.5 ref design https://doc.sm.tc/station/gw_v1.5.html#rfconf-object and would cause a parsing error.
 		sx1301Conf.Radios[0].TxFreqMin = 0
