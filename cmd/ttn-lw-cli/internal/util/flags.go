@@ -285,7 +285,7 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 				values = append(values, value)
 			}
 			sort.Strings(values)
-			fs.String(name, "", strings.Join(values, "|"))
+			fs.String(name, "", fmt.Sprintf("allowed values %s", strings.Join(values, ", ")))
 			return
 
 		case "Picture":
@@ -294,7 +294,7 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 		}
 		if t.Kind() == reflect.Int32 {
 			if values := enumValues(t); values != nil {
-				fs.String(name, "", strings.Join(values, "|"))
+				fs.String(name, "", fmt.Sprintf("allowed values: %s", strings.Join(values, ", ")))
 				return
 			}
 		}
@@ -352,7 +352,7 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			return
 		case reflect.Int32:
 			if values := enumValues(el); values != nil {
-				fs.StringSlice(name, nil, strings.Join(values, "|"))
+				fs.StringSlice(name, nil, fmt.Sprintf("allowed values: %s", strings.Join(values, ", ")))
 				return
 			}
 			fs.IntSlice(name, nil, "")
@@ -500,9 +500,7 @@ func SetFields(dst interface{}, flags *pflag.FlagSet, prefix ...string) error {
 	return nil
 }
 
-var (
-	textUnmarshalerType = reflect.TypeOf((*encoding.TextUnmarshaler)(nil)).Elem()
-)
+var textUnmarshalerType = reflect.TypeOf((*encoding.TextUnmarshaler)(nil)).Elem()
 
 func setField(rv reflect.Value, path []string, v reflect.Value) error {
 	rt := rv.Type()
