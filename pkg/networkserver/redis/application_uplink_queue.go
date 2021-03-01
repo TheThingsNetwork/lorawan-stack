@@ -138,7 +138,6 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 var (
 	errInvalidPayload = errors.DefineCorruption("invalid_payload", "invalid payload")
 	errMissingPayload = errors.DefineDataLoss("missing_payload", "missing payload")
-	errLimitTooLow    = errors.DefineInvalidArgument("limit_too_low", "limit too low")
 )
 
 func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.ApplicationIdentifiers, networkserver.ApplicationUplinkQueueDrainFunc) (time.Time, error)) error {

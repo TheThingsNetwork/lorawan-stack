@@ -6173,15 +6173,6 @@
       "file": "application_uplink_queue.go"
     }
   },
-  "error:pkg/networkserver/redis:limit_too_low": {
-    "translations": {
-      "en": "limit too low"
-    },
-    "description": {
-      "package": "pkg/networkserver/redis",
-      "file": "application_uplink_queue.go"
-    }
-  },
   "error:pkg/networkserver/redis:missing_payload": {
     "translations": {
       "en": "missing payload"
