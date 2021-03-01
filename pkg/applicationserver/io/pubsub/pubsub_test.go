@@ -265,6 +265,7 @@ func TestPubSub(t *testing.T) {
 								},
 							},
 							LastFCntDown: 42,
+							SessionKeyID: []byte{0x22},
 						},
 					},
 				},

@@ -1029,27 +1029,52 @@ func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnp
 func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *ttnpb.ApplicationLink) (pass bool, err error) {
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
+			"formatters",
+			"pending_session",
 			"session",
 			"skip_payload_crypto_override",
+			"version_ids",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
-			if dev.Session == nil {
+
+			// Older Network Server versions may not send the session key ID of the invalidated queue.
+			// For such cases, we attempt to determine the session key ID based on the session information.
+			var sessionKeyID []byte
+			switch {
+			case len(invalid.SessionKeyID) > 0:
+				sessionKeyID = invalid.SessionKeyID
+			case len(invalid.Downlinks) > 0 && len(invalid.Downlinks[0].SessionKeyID) > 0:
+				sessionKeyID = invalid.Downlinks[0].SessionKeyID
+			case dev.Session != nil && len(dev.Session.SessionKeyID) > 0:
+				sessionKeyID = dev.Session.SessionKeyID
+			case dev.PendingSession != nil && len(dev.PendingSession.SessionKeyID) > 0:
+				sessionKeyID = dev.PendingSession.SessionKeyID
+			default:
 				return nil, nil, errNoDeviceSession.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
+
+			// The downlink queue invalidation may act as a session confirmation. As such, we
+			// attempt to switch the current end device session in such cases.
+			// TODO: Remove this once the session switch uplink type has been implemented.
+			mask, err := as.matchSession(ctx, ids, dev, link, sessionKeyID)
+			if err != nil {
+				return nil, nil, err
+			}
+
 			if as.skipPayloadCrypto(ctx, link, dev, dev.Session) {
 				// When skipping application payload crypto, the upstream application is responsible for recalculating the
 				// downlink queue. No error is returned here to pass the downlink queue invalidation message upstream.
 				pass = true
 				dev.Session.LastAFCntDown = invalid.LastFCntDown
-				return dev, []string{"session.last_a_f_cnt_down"}, nil
+				return dev, append(mask, "session.last_a_f_cnt_down"), nil
 			}
 			if err := as.recalculateDownlinkQueue(ctx, dev, link, dev.Session, invalid.Downlinks, invalid.LastFCntDown+1, true); err != nil {
 				return nil, nil, err
 			}
-			return dev, []string{"session"}, nil
+			return dev, append(mask, "session"), nil
 		},
 	)
 	return
