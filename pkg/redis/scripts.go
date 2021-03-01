@@ -57,4 +57,22 @@ if #xs > 0 then
   ret[#ret+1] = xs[1][1]
 end
 return ret`)
+
+	xAutoClaimScript = redis.NewScript(`local xps = redis.call('xpending', KEYS[1], ARGV[1], ARGV[4], '+', ARGV[5])
+if not xps then
+  return nil
+end
+local ids = {}
+for _, xp in ipairs(xps) do
+  if xp[3] >= tonumber(ARGV[3]) then
+    ids[#ids+1] = xp[1]
+  end
+end
+if #ids == 0 then
+  return nil
+end
+return {
+  ids[#ids],
+  redis.call('xclaim', KEYS[1], ARGV[1], ARGV[2], ARGV[3], unpack(ids)),
+}`)
 )
