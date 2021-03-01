@@ -30,6 +30,7 @@ For details about compatibility between different releases, see the **Commitment
 - Conflict error when registering an end device via the wizard in the Console.
 - Pagination in the `List` and `ListTokens` RPCs of the `OAuthAuthorizationRegistry`.
 - Event name on user login.
+- Retrying downlink messages with absolute time on other gateways when one downlink path reports a scheduling conflict.
 
 ### Security
 
