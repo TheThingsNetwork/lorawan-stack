@@ -424,11 +424,30 @@ var ApplicationDownlinkFailedFieldPathsTopLevel = []string{
 var ApplicationInvalidatedDownlinksFieldPathsNested = []string{
 	"downlinks",
 	"last_f_cnt_down",
+	"session_key_id",
 }
 
 var ApplicationInvalidatedDownlinksFieldPathsTopLevel = []string{
 	"downlinks",
 	"last_f_cnt_down",
+	"session_key_id",
+}
+var DownlinkQueueOperationErrorDetailsFieldPathsNested = []string{
+	"dev_addr",
+	"min_f_cnt_down",
+	"pending_dev_addr",
+	"pending_min_f_cnt_down",
+	"pending_session_key_id",
+	"session_key_id",
+}
+
+var DownlinkQueueOperationErrorDetailsFieldPathsTopLevel = []string{
+	"dev_addr",
+	"min_f_cnt_down",
+	"pending_dev_addr",
+	"pending_min_f_cnt_down",
+	"pending_session_key_id",
+	"session_key_id",
 }
 var ApplicationServiceDataFieldPathsNested = []string{
 	"data",
@@ -508,6 +527,7 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.downlink_queue_invalidated",
 	"up.downlink_queue_invalidated.downlinks",
 	"up.downlink_queue_invalidated.last_f_cnt_down",
+	"up.downlink_queue_invalidated.session_key_id",
 	"up.downlink_queued",
 	"up.downlink_queued.class_b_c",
 	"up.downlink_queued.class_b_c.absolute_time",

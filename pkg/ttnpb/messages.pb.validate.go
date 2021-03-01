@@ -1467,6 +1467,15 @@ func (m *ApplicationInvalidatedDownlinks) ValidateFields(paths ...string) error 
 
 		case "last_f_cnt_down":
 			// no validation rules for LastFCntDown
+		case "session_key_id":
+
+			if len(m.GetSessionKeyID()) > 2048 {
+				return ApplicationInvalidatedDownlinksValidationError{
+					field:  "session_key_id",
+					reason: "value length must be at most 2048 bytes",
+				}
+			}
+
 		default:
 			return ApplicationInvalidatedDownlinksValidationError{
 				field:  name,
@@ -1533,6 +1542,114 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationInvalidatedDownlinksValidationError{}
+
+// ValidateFields checks the field values on DownlinkQueueOperationErrorDetails
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *DownlinkQueueOperationErrorDetails) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = DownlinkQueueOperationErrorDetailsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "dev_addr":
+			// no validation rules for DevAddr
+		case "session_key_id":
+
+			if len(m.GetSessionKeyID()) > 2048 {
+				return DownlinkQueueOperationErrorDetailsValidationError{
+					field:  "session_key_id",
+					reason: "value length must be at most 2048 bytes",
+				}
+			}
+
+		case "min_f_cnt_down":
+			// no validation rules for MinFCntDown
+		case "pending_dev_addr":
+			// no validation rules for PendingDevAddr
+		case "pending_session_key_id":
+
+			if len(m.GetPendingSessionKeyID()) > 2048 {
+				return DownlinkQueueOperationErrorDetailsValidationError{
+					field:  "pending_session_key_id",
+					reason: "value length must be at most 2048 bytes",
+				}
+			}
+
+		case "pending_min_f_cnt_down":
+			// no validation rules for PendingMinFCntDown
+		default:
+			return DownlinkQueueOperationErrorDetailsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// DownlinkQueueOperationErrorDetailsValidationError is the validation error
+// returned by DownlinkQueueOperationErrorDetails.ValidateFields if the
+// designated constraints aren't met.
+type DownlinkQueueOperationErrorDetailsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DownlinkQueueOperationErrorDetailsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DownlinkQueueOperationErrorDetailsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DownlinkQueueOperationErrorDetailsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DownlinkQueueOperationErrorDetailsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DownlinkQueueOperationErrorDetailsValidationError) ErrorName() string {
+	return "DownlinkQueueOperationErrorDetailsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DownlinkQueueOperationErrorDetailsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDownlinkQueueOperationErrorDetails.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DownlinkQueueOperationErrorDetailsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DownlinkQueueOperationErrorDetailsValidationError{}
 
 // ValidateFields checks the field values on ApplicationServiceData with the
 // rules defined in the proto definition for this message. If any rules are

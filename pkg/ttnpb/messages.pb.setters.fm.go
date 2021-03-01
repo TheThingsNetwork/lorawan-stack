@@ -858,6 +858,82 @@ func (dst *ApplicationInvalidatedDownlinks) SetFields(src *ApplicationInvalidate
 				var zero uint32
 				dst.LastFCntDown = zero
 			}
+		case "session_key_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SessionKeyID = src.SessionKeyID
+			} else {
+				dst.SessionKeyID = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *DownlinkQueueOperationErrorDetails) SetFields(src *DownlinkQueueOperationErrorDetails, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "dev_addr":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_addr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevAddr = src.DevAddr
+			} else {
+				dst.DevAddr = nil
+			}
+		case "session_key_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SessionKeyID = src.SessionKeyID
+			} else {
+				dst.SessionKeyID = nil
+			}
+		case "min_f_cnt_down":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_f_cnt_down' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinFCntDown = src.MinFCntDown
+			} else {
+				var zero uint32
+				dst.MinFCntDown = zero
+			}
+		case "pending_dev_addr":
+			if len(subs) > 0 {
+				return fmt.Errorf("'pending_dev_addr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PendingDevAddr = src.PendingDevAddr
+			} else {
+				dst.PendingDevAddr = nil
+			}
+		case "pending_session_key_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'pending_session_key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PendingSessionKeyID = src.PendingSessionKeyID
+			} else {
+				dst.PendingSessionKeyID = nil
+			}
+		case "pending_min_f_cnt_down":
+			if len(subs) > 0 {
+				return fmt.Errorf("'pending_min_f_cnt_down' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PendingMinFCntDown = src.PendingMinFCntDown
+			} else {
+				var zero uint32
+				dst.PendingMinFCntDown = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
