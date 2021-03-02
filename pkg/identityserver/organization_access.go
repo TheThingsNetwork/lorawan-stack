@@ -89,8 +89,9 @@ func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttn
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		return store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.OrganizationIdentifiers, key)
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.OrganizationIdentifiers, key)
+		return err
 	})
 	if err != nil {
 		return nil, err

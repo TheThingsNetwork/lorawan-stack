@@ -209,10 +209,12 @@ var CreateUserAPIKeyRequestFieldPathsTopLevel = []string{
 }
 var UpdateUserAPIKeyRequestFieldPathsNested = []string{
 	"api_key",
+	"api_key.created_at",
 	"api_key.id",
 	"api_key.key",
 	"api_key.name",
 	"api_key.rights",
+	"api_key.updated_at",
 	"user_ids",
 	"user_ids.email",
 	"user_ids.user_id",

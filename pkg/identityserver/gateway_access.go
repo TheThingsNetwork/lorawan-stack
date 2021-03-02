@@ -89,8 +89,9 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		return store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GatewayIdentifiers, key)
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GatewayIdentifiers, key)
+		return err
 	})
 	if err != nil {
 		return nil, err

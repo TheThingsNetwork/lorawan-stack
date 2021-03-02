@@ -346,10 +346,12 @@ var CreateGatewayAPIKeyRequestFieldPathsTopLevel = []string{
 }
 var UpdateGatewayAPIKeyRequestFieldPathsNested = []string{
 	"api_key",
+	"api_key.created_at",
 	"api_key.id",
 	"api_key.key",
 	"api_key.name",
 	"api_key.rights",
+	"api_key.updated_at",
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
