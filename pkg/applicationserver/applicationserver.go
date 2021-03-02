@@ -47,6 +47,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/javascript"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc"
 )
@@ -328,6 +329,76 @@ var (
 	errNoDeviceSession = errors.DefineFailedPrecondition("no_device_session", "no device session; check device activation")
 )
 
+// buildSessionsFromError attempts to rebuild the end device session and pending session based on the error
+// details found in the provided error. This may mutate the session, pending session and device address.
+// If the sessions cannot be rebuilt from the provided error, the error itself is returned.
+func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *ttnpb.EndDevice, err error) ([]string, error) {
+	reconstructSession := func(sessionKeyID []byte, devAddr *types.DevAddr, minFCntDown uint32) (*ttnpb.Session, error) {
+		appSKey, err := as.fetchAppSKey(ctx, dev.EndDeviceIdentifiers, sessionKeyID)
+		if err != nil {
+			return nil, errFetchAppSKey.WithCause(err)
+		}
+		return &ttnpb.Session{
+			DevAddr: *devAddr,
+			SessionKeys: ttnpb.SessionKeys{
+				SessionKeyID: sessionKeyID,
+				AppSKey:      &appSKey,
+			},
+			LastAFCntDown: minFCntDown,
+			StartedAt:     time.Now().UTC(),
+		}, nil
+	}
+
+	ttnErr, ok := err.(errors.ErrorDetails)
+	if !ok {
+		return nil, err
+	}
+	details := ttnErr.Details()
+	if len(details) == 0 {
+		return nil, err
+	}
+	var diagnostics *ttnpb.DownlinkQueueOperationErrorDetails
+	for _, detail := range details {
+		diagnostics, ok = detail.(*ttnpb.DownlinkQueueOperationErrorDetails)
+		if ok {
+			break
+		}
+	}
+	if diagnostics == nil {
+		return nil, err
+	}
+
+	var mask []string
+	if len(diagnostics.SessionKeyID) > 0 {
+		session, err := reconstructSession(diagnostics.SessionKeyID, diagnostics.DevAddr, diagnostics.MinFCntDown)
+		if err != nil {
+			return nil, err
+		}
+		dev.Session = session
+		dev.DevAddr = &session.DevAddr
+
+	} else {
+		dev.Session = nil
+		dev.DevAddr = nil
+	}
+	mask = append(mask, "session", "ids.dev_addr")
+
+	if len(diagnostics.PendingSessionKeyID) > 0 {
+		session, err := reconstructSession(diagnostics.PendingSessionKeyID, diagnostics.PendingDevAddr, diagnostics.PendingMinFCntDown)
+		if err != nil {
+			return nil, err
+		}
+		dev.PendingSession = session
+	} else {
+		dev.PendingSession = nil
+	}
+	mask = append(mask, "pending_session")
+
+	return mask, nil
+}
+
+const maxDownlinkQueueOperationAttempts = 50
+
 func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error)) error {
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:downlink:%s", events.NewCorrelationID()))
 	for _, item := range items {
@@ -361,64 +432,80 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			"version_ids",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-			var mask []string
-			if dev == nil {
-				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
-			}
-			sessions := make([]*ttnpb.Session, 0, 2)
-			if dev.Session != nil {
-				sessions = append(sessions, dev.Session)
-				mask = append(mask, "session.last_a_f_cnt_down")
-			}
-			if dev.PendingSession != nil {
-				// Downlink can be encrypted with the pending session while the device first joined but not confirmed the
-				// session by sending an uplink.
-				sessions = append(sessions, dev.PendingSession)
-				mask = append(mask, "pending_session.last_a_f_cnt_down")
-			}
-			if len(sessions) == 0 {
-				return nil, nil, errNoDeviceSession.New()
-			}
-			var encryptedItems []*ttnpb.ApplicationDownlink
-			for _, session := range sessions {
-				skipPayloadCrypto := as.skipPayloadCrypto(ctx, link, dev, session)
-				for _, item := range items {
-					fCnt := session.LastAFCntDown + 1
-					if skipPayloadCrypto {
-						fCnt = item.FCnt
-					}
-					encryptedItem := &ttnpb.ApplicationDownlink{
-						SessionKeyID:   session.SessionKeyID,
-						FPort:          item.FPort,
-						FCnt:           fCnt,
-						FRMPayload:     item.FRMPayload,
-						DecodedPayload: item.DecodedPayload,
-						Confirmed:      item.Confirmed,
-						ClassBC:        item.ClassBC,
-						Priority:       item.Priority,
-						CorrelationIDs: item.CorrelationIDs,
-					}
-					if !skipPayloadCrypto {
-						if err := as.encodeAndEncryptDownlink(ctx, dev, session, encryptedItem, link.DefaultFormatters); err != nil {
-							logger.WithError(err).Warn("Encoding and encryption of downlink message failed; drop item")
-							return nil, nil, err
-						}
-					}
-					encryptedItem.DecodedPayload = nil
-					session.LastAFCntDown = encryptedItem.FCnt
-					encryptedItems = append(encryptedItems, encryptedItem)
+			attempt := 0
+		operationAttempt:
+			for {
+				ctx := log.NewContextWithField(ctx, "attempt", attempt)
+				var mask []string
+				if dev == nil {
+					return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 				}
+				sessions := make([]*ttnpb.Session, 0, 2)
+				if dev.Session != nil {
+					sessions = append(sessions, dev.Session)
+					mask = append(mask, "session.last_a_f_cnt_down")
+				}
+				if dev.PendingSession != nil {
+					// Downlink can be encrypted with the pending session while the device first joined but not confirmed the
+					// session by sending an uplink.
+					sessions = append(sessions, dev.PendingSession)
+					mask = append(mask, "pending_session.last_a_f_cnt_down")
+				}
+				if len(sessions) == 0 {
+					return nil, nil, errNoDeviceSession.New()
+				}
+				var encryptedItems []*ttnpb.ApplicationDownlink
+				for _, session := range sessions {
+					skipPayloadCrypto := as.skipPayloadCrypto(ctx, link, dev, session)
+					for _, item := range items {
+						fCnt := session.LastAFCntDown + 1
+						if skipPayloadCrypto {
+							fCnt = item.FCnt
+						}
+						encryptedItem := &ttnpb.ApplicationDownlink{
+							SessionKeyID:   session.SessionKeyID,
+							FPort:          item.FPort,
+							FCnt:           fCnt,
+							FRMPayload:     item.FRMPayload,
+							DecodedPayload: item.DecodedPayload,
+							Confirmed:      item.Confirmed,
+							ClassBC:        item.ClassBC,
+							Priority:       item.Priority,
+							CorrelationIDs: item.CorrelationIDs,
+						}
+						if !skipPayloadCrypto {
+							if err := as.encodeAndEncryptDownlink(ctx, dev, session, encryptedItem, link.DefaultFormatters); err != nil {
+								logger.WithError(err).Warn("Encoding and encryption of downlink message failed; drop item")
+								return nil, nil, err
+							}
+						}
+						encryptedItem.DecodedPayload = nil
+						session.LastAFCntDown = encryptedItem.FCnt
+						encryptedItems = append(encryptedItems, encryptedItem)
+					}
+				}
+				client := ttnpb.NewAsNsClient(pc)
+				req := &ttnpb.DownlinkQueueRequest{
+					EndDeviceIdentifiers: ids,
+					Downlinks:            encryptedItems,
+				}
+				_, err = op(client, ctx, req, as.WithClusterAuth())
+				if err != nil {
+					if attempt >= maxDownlinkQueueOperationAttempts {
+						return nil, nil, err
+					}
+
+					rebuildMask, err := as.buildSessionsFromError(ctx, dev, err)
+					if err != nil {
+						return nil, nil, err
+					}
+					mask = append(mask, rebuildMask...)
+					attempt++
+
+					continue operationAttempt
+				}
+				return dev, mask, nil
 			}
-			client := ttnpb.NewAsNsClient(pc)
-			req := &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
-				Downlinks:            encryptedItems,
-			}
-			_, err = op(client, ctx, req, as.WithClusterAuth())
-			if err != nil {
-				return nil, nil, err
-			}
-			return dev, mask, nil
 		},
 	)
 	if err != nil {
@@ -533,6 +620,7 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 	req := &ttnpb.SessionKeyRequest{
 		SessionKeyID: sessionKeyID,
 		DevEUI:       *ids.DevEUI,
+		JoinEUI:      *ids.JoinEUI,
 	}
 	if js, err := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, ids); err == nil {
 		cc, err := js.Conn()

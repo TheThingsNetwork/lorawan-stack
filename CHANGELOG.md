@@ -33,6 +33,7 @@ For details about compatibility between different releases, see the **Commitment
 - Pagination in the `List` and `ListTokens` RPCs of the `OAuthAuthorizationRegistry`.
 - Event name on user login.
 - Application uplink queue handling in Network Server.
+- Application Server session desynchronization with the Network Server. The Application Server will now attempt to synchronize the end device session view on downlink queue operational errors. This fixes the `f_cnt_too_low` and `unknown_session` errors reported on downlink queue push and replace.
 
 ### Security
 
