@@ -64,7 +64,7 @@
     "nib": "^1.1.2",
     "pg": "^8.5.1",
     "prettier": "^1.18.2",
-    "react-test-renderer": "^16.0.0",
+    "react-test-renderer": "^16.13.0",
     "snapshot-diff": "^0.5.1",
     "stylint": "^2.0.0",
     "stylus": "^0.54.5",
