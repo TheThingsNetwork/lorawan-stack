@@ -1695,9 +1695,6 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 				dev.PendingSession = nil
 			}
 			dev.MACState.RecentUplinks = AppendRecentUplink(dev.MACState.RecentUplinks, deduplicatedUp, RecentUplinkCount)
-			if conf.FPort == 0 {
-				return
-			}
 			var appUp *ttnpb.ApplicationUp
 			if !a.So(env.AssertNsAsHandleUplink(ctx, conf.Device.ApplicationIdentifiers, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
