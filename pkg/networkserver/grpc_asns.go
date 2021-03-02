@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -29,7 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
@@ -107,7 +105,10 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error
 	})
 }
 
-func computeMinFCnt(session *ttnpb.Session, macState *ttnpb.MACState) (uint32, error) {
+func minAFCntDown(session *ttnpb.Session, macState *ttnpb.MACState) (uint32, error) {
+	if session == nil || macState == nil {
+		return 0, nil
+	}
 	var minFCnt uint32
 	if macState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 	outer:
@@ -145,76 +146,9 @@ func computeMinFCnt(session *ttnpb.Session, macState *ttnpb.MACState) (uint32, e
 	return minFCnt, nil
 }
 
-type sessionDiagnostics struct {
-	DevAddr      types.DevAddr
-	SessionKeyID []byte
-	MinFCntDown  uint32
-}
-
-func computeSessionDiagnostic(session *ttnpb.Session, macState *ttnpb.MACState) (*sessionDiagnostics, error) {
-	if session == nil || macState == nil {
-		return nil, nil
-	}
-	minFCnt, err := computeMinFCnt(session, macState)
-	if err != nil {
-		return nil, err
-	}
-	return &sessionDiagnostics{
-		DevAddr:      session.DevAddr,
-		SessionKeyID: session.SessionKeyID,
-		MinFCntDown:  minFCnt,
-	}, nil
-}
-
-type sessionsDiagnostics struct {
-	Session        *sessionDiagnostics
-	PendingSession *sessionDiagnostics
-}
-
-func (d sessionsDiagnostics) toErrorDetails() proto.Message {
-	details := &ttnpb.DownlinkQueueOperationErrorDetails{}
-	if dd := d.Session; dd != nil {
-		details.DevAddr = &dd.DevAddr
-		details.SessionKeyID = dd.SessionKeyID[:]
-		details.MinFCntDown = dd.MinFCntDown
-	}
-	if dd := d.PendingSession; dd != nil {
-		details.PendingDevAddr = &dd.DevAddr
-		details.PendingSessionKeyID = dd.SessionKeyID[:]
-		details.PendingMinFCntDown = dd.MinFCntDown
-	}
-	return details
-}
-
-func (d sessionsDiagnostics) minFCnt(session *ttnpb.Session) uint32 {
-	switch {
-	case d.Session != nil && bytes.Equal(session.SessionKeyID, d.Session.SessionKeyID):
-		return d.Session.MinFCntDown
-	case d.PendingSession != nil && bytes.Equal(session.SessionKeyID, d.PendingSession.SessionKeyID):
-		return d.PendingSession.MinFCntDown
-	default:
-		panic("unknown session")
-	}
-}
-
-func computeSessionDiagnostics(dev *ttnpb.EndDevice) (*sessionsDiagnostics, error) {
-	session, err := computeSessionDiagnostic(dev.Session, dev.MACState)
-	if err != nil {
-		return nil, err
-	}
-	pendingSession, err := computeSessionDiagnostic(dev.PendingSession, dev.PendingMACState)
-	if err != nil {
-		return nil, err
-	}
-	return &sessionsDiagnostics{
-		Session:        session,
-		PendingSession: pendingSession,
-	}, nil
-}
-
 // matchApplicationDownlinks validates downs and adds them to session.QueuedApplicationDownlinks.
 // matchApplicationDownlinks returns downs, nil if session == nil.
-func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState, multicast bool, maxDownLen uint16, diagnostics *sessionsDiagnostics, downs ...*ttnpb.ApplicationDownlink) (unmatched []*ttnpb.ApplicationDownlink, err error) {
+func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState, multicast bool, maxDownLen uint16, minFCnt uint32, makeQueueOperationErrorDetails func() *ttnpb.DownlinkQueueOperationErrorDetails, downs ...*ttnpb.ApplicationDownlink) (unmatched []*ttnpb.ApplicationDownlink, err error) {
 	if session == nil {
 		return downs, nil
 	}
@@ -226,17 +160,16 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 		return unmatched, errUnknownMACState.New()
 	}
 
-	minFCnt := diagnostics.minFCnt(session)
 	for _, down := range downs {
 		switch {
 		case len(down.FRMPayload) > int(maxDownLen):
 			return unmatched, errApplicationDownlinkTooLong.WithAttributes("length", len(down.FRMPayload), "max", maxDownLen)
 
 		case down.FCnt < minFCnt:
-			return unmatched, errFCntTooLow.WithAttributes("f_cnt", down.FCnt, "min_f_cnt", minFCnt).WithDetails(diagnostics.toErrorDetails())
+			return unmatched, errFCntTooLow.WithAttributes("f_cnt", down.FCnt, "min_f_cnt", minFCnt).WithDetails(makeQueueOperationErrorDetails())
 
 		case !bytes.Equal(down.SessionKeyID, session.SessionKeyID):
-			return unmatched, errUnknownSession.WithDetails(diagnostics.toErrorDetails())
+			return unmatched, errUnknownSession.WithDetails(makeQueueOperationErrorDetails())
 
 		case multicast && down.Confirmed:
 			return unmatched, errConfirmedMulticastDownlink.New()
@@ -282,16 +215,35 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 		maxDownLen -= 8
 	}
 
-	diagnostics, err := computeSessionDiagnostics(dev)
+	minCurrentFCntDown, err := minAFCntDown(dev.Session, dev.MACState)
+	if err != nil {
+		return err
+	}
+	minPendingFCntDown, err := minAFCntDown(dev.PendingSession, dev.PendingMACState)
 	if err != nil {
 		return err
 	}
 
-	unmatched, err := matchApplicationDownlinks(dev.Session, dev.MACState, dev.Multicast, maxDownLen, diagnostics, downs...)
+	makeDownlinkQueueOperationErrorDetails := func() *ttnpb.DownlinkQueueOperationErrorDetails {
+		d := &ttnpb.DownlinkQueueOperationErrorDetails{}
+		if dev.Session != nil {
+			d.DevAddr = &dev.Session.DevAddr
+			d.SessionKeyID = dev.Session.SessionKeyID
+			d.MinFCntDown = minCurrentFCntDown
+		}
+		if dev.PendingSession != nil {
+			d.PendingDevAddr = &dev.PendingSession.DevAddr
+			d.PendingSessionKeyID = dev.PendingSession.SessionKeyID
+			d.PendingMinFCntDown = minPendingFCntDown
+		}
+		return d
+	}
+
+	unmatched, err := matchApplicationDownlinks(dev.Session, dev.MACState, dev.Multicast, maxDownLen, minCurrentFCntDown, makeDownlinkQueueOperationErrorDetails, downs...)
 	if err != nil {
 		return err
 	}
-	unmatched, err = matchApplicationDownlinks(dev.PendingSession, dev.PendingMACState, dev.Multicast, maxDownLen, diagnostics, unmatched...)
+	unmatched, err = matchApplicationDownlinks(dev.PendingSession, dev.PendingMACState, dev.Multicast, maxDownLen, minPendingFCntDown, makeDownlinkQueueOperationErrorDetails, unmatched...)
 	if err != nil {
 		return err
 	}
