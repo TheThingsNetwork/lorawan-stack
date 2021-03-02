@@ -25,7 +25,6 @@ import (
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"google.golang.org/grpc"
 )
 
 func firstArgs(i int, args ...string) []string {
@@ -137,63 +136,17 @@ func getAPIKeyID(flagSet *pflag.FlagSet, args []string, i int) string {
 	return apiKeyID
 }
 
-func searchFlags() *pflag.FlagSet {
+var searchFlags = func() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
-	flagSet.String("id-contains", "", "")
-	flagSet.String("name-contains", "", "")
-	flagSet.String("description-contains", "", "")
-	flagSet.StringToString("attributes-contain", nil, "(key=value)")
+	// NOTE: These flags need to be named with underscores, not dashes!
+	flagSet.String("id_contains", "", "")
+	flagSet.String("name_contains", "", "")
+	flagSet.String("description_contains", "", "")
+	flagSet.StringToString("attributes_contain", nil, "(key=value)")
 	flagSet.AddFlagSet(paginationFlags())
 	flagSet.AddFlagSet(orderFlags())
 	return flagSet
-}
-
-func getSearchEntitiesRequest(flagSet *pflag.FlagSet) (req *ttnpb.SearchEntitiesRequest, opt grpc.CallOption, getTotal func() uint64) {
-	idContains, _ := flagSet.GetString("id-contains")
-	nameContains, _ := flagSet.GetString("name-contains")
-	descriptionContains, _ := flagSet.GetString("description-contains")
-	attributesContain, _ := flagSet.GetStringToString("attributes-contain")
-	limit, page, opt, getTotal := withPagination(flagSet)
-	return &ttnpb.SearchEntitiesRequest{
-		IDContains:          idContains,
-		NameContains:        nameContains,
-		DescriptionContains: descriptionContains,
-		AttributesContain:   attributesContain,
-		Limit:               limit,
-		Page:                page,
-		Order:               getOrder(flagSet),
-		Deleted:             getDeleted(flagSet),
-	}, opt, getTotal
-}
-
-func searchEndDevicesFlags() *pflag.FlagSet {
-	flagSet := &pflag.FlagSet{}
-	flagSet.String("dev-eui-contains", "", "")
-	flagSet.String("join-eui-contains", "", "")
-	flagSet.String("dev-addr-contains", "", "")
-	flagSet.Lookup("dev-addr-contains").Hidden = true // Part of the API but not actually supported.
-	flagSet.AddFlagSet(searchFlags())
-	return flagSet
-}
-
-func getSearchEndDevicesRequest(flagSet *pflag.FlagSet) (req *ttnpb.SearchEndDevicesRequest, opt grpc.CallOption, getTotal func() uint64) {
-	baseReq, opt, getTotal := getSearchEntitiesRequest(flagSet)
-	devEUIContains, _ := flagSet.GetString("dev-eui-contains")
-	joinEUIContains, _ := flagSet.GetString("join-eui-contains")
-	devAddrContains, _ := flagSet.GetString("dev-addr-contains")
-	return &ttnpb.SearchEndDevicesRequest{
-		IDContains:          baseReq.IDContains,
-		NameContains:        baseReq.NameContains,
-		DescriptionContains: baseReq.DescriptionContains,
-		AttributesContain:   baseReq.AttributesContain,
-		DevEUIContains:      devEUIContains,
-		JoinEUIContains:     joinEUIContains,
-		DevAddrContains:     devAddrContains,
-		Limit:               baseReq.Limit,
-		Page:                baseReq.Page,
-		Order:               baseReq.Order,
-	}, opt, getTotal
-}
+}()
 
 var errNoIDs = errors.DefineInvalidArgument("no_ids", "no IDs set")
 

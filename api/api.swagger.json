@@ -6964,21 +6964,21 @@
         "parameters": [
           {
             "name": "id_contains",
-            "description": "Find entities where the ID contains this substring.",
+            "description": "Find applications where the ID contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "name_contains",
-            "description": "Find entities where the name contains this substring.",
+            "description": "Find applications where the name contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "description_contains",
-            "description": "Find entities where the description contains this substring.",
+            "description": "Find applications where the description contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7019,7 +7019,7 @@
           },
           {
             "name": "deleted",
-            "description": "Only return recently deleted entities.",
+            "description": "Only return recently deleted applications.",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -7158,24 +7158,42 @@
         "parameters": [
           {
             "name": "id_contains",
-            "description": "Find entities where the ID contains this substring.",
+            "description": "Find OAuth clients where the ID contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "name_contains",
-            "description": "Find entities where the name contains this substring.",
+            "description": "Find OAuth clients where the name contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "description_contains",
-            "description": "Find entities where the description contains this substring.",
+            "description": "Find OAuth clients where the description contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "state",
+            "description": "Find OAuth clients where the state is any of these states.\n\n - STATE_REQUESTED: Denotes that the entity has been requested and is pending review by an admin.\n - STATE_APPROVED: Denotes that the entity has been reviewed and approved by an admin.\n - STATE_REJECTED: Denotes that the entity has been reviewed and rejected by an admin.\n - STATE_FLAGGED: Denotes that the entity has been flagged and is pending review by an admin.\n - STATE_SUSPENDED: Denotes that the entity has been reviewed and suspended by an admin.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "STATE_REQUESTED",
+                "STATE_APPROVED",
+                "STATE_REJECTED",
+                "STATE_FLAGGED",
+                "STATE_SUSPENDED"
+              ]
+            },
+            "collectionFormat": "multi"
           },
           {
             "name": "field_mask.paths",
@@ -7213,7 +7231,7 @@
           },
           {
             "name": "deleted",
-            "description": "Only return recently deleted entities.",
+            "description": "Only return recently deleted OAuth clients.",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -7245,21 +7263,28 @@
         "parameters": [
           {
             "name": "id_contains",
-            "description": "Find entities where the ID contains this substring.",
+            "description": "Find gateways where the ID contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "name_contains",
-            "description": "Find entities where the name contains this substring.",
+            "description": "Find gateways where the name contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "description_contains",
-            "description": "Find entities where the description contains this substring.",
+            "description": "Find gateways where the description contains this substring.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "eui_contains",
+            "description": "Find gateways where the (hexadecimal) EUI contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7300,7 +7325,7 @@
           },
           {
             "name": "deleted",
-            "description": "Only return recently deleted entities.",
+            "description": "Only return recently deleted gateways.",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -7332,21 +7357,21 @@
         "parameters": [
           {
             "name": "id_contains",
-            "description": "Find entities where the ID contains this substring.",
+            "description": "Find organizations where the ID contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "name_contains",
-            "description": "Find entities where the name contains this substring.",
+            "description": "Find organizations where the name contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "description_contains",
-            "description": "Find entities where the description contains this substring.",
+            "description": "Find organizations where the description contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7387,7 +7412,7 @@
           },
           {
             "name": "deleted",
-            "description": "Only return recently deleted entities.",
+            "description": "Only return recently deleted organizations.",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -7419,24 +7444,42 @@
         "parameters": [
           {
             "name": "id_contains",
-            "description": "Find entities where the ID contains this substring.",
+            "description": "Find users where the ID contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "name_contains",
-            "description": "Find entities where the name contains this substring.",
+            "description": "Find users where the name contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "description_contains",
-            "description": "Find entities where the description contains this substring.",
+            "description": "Find users where the description contains this substring.",
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "state",
+            "description": "Find users where the state is any of these states.\n\n - STATE_REQUESTED: Denotes that the entity has been requested and is pending review by an admin.\n - STATE_APPROVED: Denotes that the entity has been reviewed and approved by an admin.\n - STATE_REJECTED: Denotes that the entity has been reviewed and rejected by an admin.\n - STATE_FLAGGED: Denotes that the entity has been flagged and is pending review by an admin.\n - STATE_SUSPENDED: Denotes that the entity has been reviewed and suspended by an admin.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "STATE_REQUESTED",
+                "STATE_APPROVED",
+                "STATE_REJECTED",
+                "STATE_FLAGGED",
+                "STATE_SUSPENDED"
+              ]
+            },
+            "collectionFormat": "multi"
           },
           {
             "name": "field_mask.paths",
@@ -7474,7 +7517,7 @@
           },
           {
             "name": "deleted",
-            "description": "Only return recently deleted entities.",
+            "description": "Only return recently deleted users.",
             "in": "query",
             "required": false,
             "type": "boolean"

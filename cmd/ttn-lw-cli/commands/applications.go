@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -58,6 +59,13 @@ func getApplicationID(flagSet *pflag.FlagSet, args []string) *ttnpb.ApplicationI
 	}
 	return &ttnpb.ApplicationIdentifiers{ApplicationID: applicationID}
 }
+
+var searchApplicationsFlags = func() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.AddFlagSet(searchFlags)
+	// NOTE: These flags need to be named with underscores, not dashes!
+	return flagSet
+}()
 
 var (
 	applicationsCommand = &cobra.Command{
@@ -101,8 +109,17 @@ var (
 			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.EntityRegistrySearch/SearchApplications"].Allowed)
 
-			req, opt, getTotal := getSearchEntitiesRequest(cmd.Flags())
+			req := &ttnpb.SearchApplicationsRequest{}
+			if err := util.SetFields(req, searchApplicationsFlags); err != nil {
+				return err
+			}
+			var (
+				opt      grpc.CallOption
+				getTotal func() uint64
+			)
+			req.Limit, req.Page, opt, getTotal = withPagination(cmd.Flags())
 			req.FieldMask.Paths = paths
+			req.Deleted = getDeleted(cmd.Flags())
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -313,7 +330,7 @@ func init() {
 	applicationsListCommand.Flags().AddFlagSet(orderFlags())
 	applicationsListCommand.Flags().AddFlagSet(selectAllApplicationFlags)
 	applicationsCommand.AddCommand(applicationsListCommand)
-	applicationsSearchCommand.Flags().AddFlagSet(searchFlags())
+	applicationsSearchCommand.Flags().AddFlagSet(searchApplicationsFlags)
 	applicationsSearchCommand.Flags().AddFlagSet(deletedFlags)
 	applicationsSearchCommand.Flags().AddFlagSet(selectApplicationFlags)
 	applicationsSearchCommand.Flags().AddFlagSet(selectAllApplicationFlags)

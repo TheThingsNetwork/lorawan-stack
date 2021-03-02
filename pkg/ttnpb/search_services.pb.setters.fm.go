@@ -8,7 +8,7 @@ import (
 	types "github.com/gogo/protobuf/types"
 )
 
-func (dst *SearchEntitiesRequest) SetFields(src *SearchEntitiesRequest, paths ...string) error {
+func (dst *SearchApplicationsRequest) SetFields(src *SearchApplicationsRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "id_contains":
@@ -49,6 +49,434 @@ func (dst *SearchEntitiesRequest) SetFields(src *SearchEntitiesRequest, paths ..
 				dst.AttributesContain = src.AttributesContain
 			} else {
 				dst.AttributesContain = nil
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero types.FieldMask
+				dst.FieldMask = zero
+			}
+		case "order":
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+		case "deleted":
+			if len(subs) > 0 {
+				return fmt.Errorf("'deleted' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Deleted = src.Deleted
+			} else {
+				var zero bool
+				dst.Deleted = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *SearchClientsRequest) SetFields(src *SearchClientsRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "id_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.IDContains = src.IDContains
+			} else {
+				var zero string
+				dst.IDContains = zero
+			}
+		case "name_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NameContains = src.NameContains
+			} else {
+				var zero string
+				dst.NameContains = zero
+			}
+		case "description_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DescriptionContains = src.DescriptionContains
+			} else {
+				var zero string
+				dst.DescriptionContains = zero
+			}
+		case "attributes_contain":
+			if len(subs) > 0 {
+				return fmt.Errorf("'attributes_contain' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AttributesContain = src.AttributesContain
+			} else {
+				dst.AttributesContain = nil
+			}
+		case "state":
+			if len(subs) > 0 {
+				return fmt.Errorf("'state' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.State = src.State
+			} else {
+				dst.State = nil
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero types.FieldMask
+				dst.FieldMask = zero
+			}
+		case "order":
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+		case "deleted":
+			if len(subs) > 0 {
+				return fmt.Errorf("'deleted' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Deleted = src.Deleted
+			} else {
+				var zero bool
+				dst.Deleted = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *SearchGatewaysRequest) SetFields(src *SearchGatewaysRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "id_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.IDContains = src.IDContains
+			} else {
+				var zero string
+				dst.IDContains = zero
+			}
+		case "name_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NameContains = src.NameContains
+			} else {
+				var zero string
+				dst.NameContains = zero
+			}
+		case "description_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DescriptionContains = src.DescriptionContains
+			} else {
+				var zero string
+				dst.DescriptionContains = zero
+			}
+		case "attributes_contain":
+			if len(subs) > 0 {
+				return fmt.Errorf("'attributes_contain' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AttributesContain = src.AttributesContain
+			} else {
+				dst.AttributesContain = nil
+			}
+		case "eui_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'eui_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EUIContains = src.EUIContains
+			} else {
+				var zero string
+				dst.EUIContains = zero
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero types.FieldMask
+				dst.FieldMask = zero
+			}
+		case "order":
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+		case "deleted":
+			if len(subs) > 0 {
+				return fmt.Errorf("'deleted' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Deleted = src.Deleted
+			} else {
+				var zero bool
+				dst.Deleted = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *SearchOrganizationsRequest) SetFields(src *SearchOrganizationsRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "id_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.IDContains = src.IDContains
+			} else {
+				var zero string
+				dst.IDContains = zero
+			}
+		case "name_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NameContains = src.NameContains
+			} else {
+				var zero string
+				dst.NameContains = zero
+			}
+		case "description_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DescriptionContains = src.DescriptionContains
+			} else {
+				var zero string
+				dst.DescriptionContains = zero
+			}
+		case "attributes_contain":
+			if len(subs) > 0 {
+				return fmt.Errorf("'attributes_contain' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AttributesContain = src.AttributesContain
+			} else {
+				dst.AttributesContain = nil
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero types.FieldMask
+				dst.FieldMask = zero
+			}
+		case "order":
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+		case "deleted":
+			if len(subs) > 0 {
+				return fmt.Errorf("'deleted' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Deleted = src.Deleted
+			} else {
+				var zero bool
+				dst.Deleted = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *SearchUsersRequest) SetFields(src *SearchUsersRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "id_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.IDContains = src.IDContains
+			} else {
+				var zero string
+				dst.IDContains = zero
+			}
+		case "name_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NameContains = src.NameContains
+			} else {
+				var zero string
+				dst.NameContains = zero
+			}
+		case "description_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DescriptionContains = src.DescriptionContains
+			} else {
+				var zero string
+				dst.DescriptionContains = zero
+			}
+		case "attributes_contain":
+			if len(subs) > 0 {
+				return fmt.Errorf("'attributes_contain' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AttributesContain = src.AttributesContain
+			} else {
+				dst.AttributesContain = nil
+			}
+		case "state":
+			if len(subs) > 0 {
+				return fmt.Errorf("'state' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.State = src.State
+			} else {
+				dst.State = nil
 			}
 		case "field_mask":
 			if len(subs) > 0 {

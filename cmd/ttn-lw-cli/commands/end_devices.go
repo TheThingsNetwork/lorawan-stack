@@ -36,6 +36,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -171,6 +172,17 @@ var (
 	errNetworkServerDisabled = errors.DefineFailedPrecondition("network_server_disabled", "Network Server is disabled")
 )
 
+var searchEndDevicesFlags = func() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.AddFlagSet(searchFlags)
+	// NOTE: These flags need to be named with underscores, not dashes!
+	flagSet.String("dev_eui_contains", "", "")
+	flagSet.String("join_eui_contains", "", "")
+	flagSet.String("dev_addr_contains", "", "")
+	flagSet.Lookup("dev_addr_contains").Hidden = true // Part of the API but not actually supported.
+	return flagSet
+}()
+
 var (
 	endDevicesCommand = &cobra.Command{
 		Use:     "end-devices",
@@ -247,7 +259,15 @@ var (
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectEndDeviceListFlags)
 
-			req, opt, getTotal := getSearchEndDevicesRequest(cmd.Flags())
+			req := &ttnpb.SearchEndDevicesRequest{}
+			if err := util.SetFields(req, searchEndDevicesFlags); err != nil {
+				return err
+			}
+			var (
+				opt      grpc.CallOption
+				getTotal func() uint64
+			)
+			req.Limit, req.Page, opt, getTotal = withPagination(cmd.Flags())
 			req.ApplicationIdentifiers = *appID
 			req.FieldMask.Paths = paths
 
@@ -1214,7 +1234,7 @@ func init() {
 	endDevicesListCommand.Flags().AddFlagSet(orderFlags())
 	endDevicesCommand.AddCommand(endDevicesListCommand)
 	endDevicesSearchCommand.Flags().AddFlagSet(applicationIDFlags())
-	endDevicesSearchCommand.Flags().AddFlagSet(searchEndDevicesFlags())
+	endDevicesSearchCommand.Flags().AddFlagSet(searchEndDevicesFlags)
 	endDevicesSearchCommand.Flags().AddFlagSet(selectApplicationFlags)
 	endDevicesSearchCommand.Flags().AddFlagSet(selectAllEndDeviceFlags)
 	endDevicesCommand.AddCommand(endDevicesSearchCommand)

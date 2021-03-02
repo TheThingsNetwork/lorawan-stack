@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -75,6 +76,14 @@ func getGatewayID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb
 	}
 	return ids, nil
 }
+
+var searchGatewaysFlags = func() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.AddFlagSet(searchFlags)
+	// NOTE: These flags need to be named with underscores, not dashes!
+	flagSet.String("eui_contains", "", "")
+	return flagSet
+}()
 
 var (
 	gatewaysCommand = &cobra.Command{
@@ -138,8 +147,17 @@ var (
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.EntityRegistrySearch/SearchGateways"].Allowed)
 
-			req, opt, getTotal := getSearchEntitiesRequest(cmd.Flags())
+			req := &ttnpb.SearchGatewaysRequest{}
+			if err := util.SetFields(req, searchGatewaysFlags); err != nil {
+				return err
+			}
+			var (
+				opt      grpc.CallOption
+				getTotal func() uint64
+			)
+			req.Limit, req.Page, opt, getTotal = withPagination(cmd.Flags())
 			req.FieldMask.Paths = paths
+			req.Deleted = getDeleted(cmd.Flags())
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -478,7 +496,7 @@ func init() {
 	gatewaysListCommand.Flags().AddFlagSet(orderFlags())
 	gatewaysListCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysListCommand)
-	gatewaysSearchCommand.Flags().AddFlagSet(searchFlags())
+	gatewaysSearchCommand.Flags().AddFlagSet(searchGatewaysFlags)
 	gatewaysSearchCommand.Flags().AddFlagSet(deletedFlags)
 	gatewaysSearchCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysSearchCommand.Flags().AddFlagSet(selectAllGatewayFlags)

@@ -14,6 +14,8 @@ For details about compatibility between different releases, see the **Commitment
 - API and CLI commands for listing, searching for and restoring recently deleted applications, OAuth clients, gateways, organizations and users.
 - State Description fields for adding context to the (rejected, flagged, suspended) state of Users and OAuth clients.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+- Searching for gateways by EUI.
+- Searching for users and OAuth clients by state.
 
 ### Changed
 

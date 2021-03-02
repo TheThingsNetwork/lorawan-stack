@@ -21,6 +21,7 @@ import "google/protobuf/field_mask.proto";
 import "lorawan-stack/api/application.proto";
 import "lorawan-stack/api/client.proto";
 import "lorawan-stack/api/end_device.proto";
+import "lorawan-stack/api/enums.proto";
 import "lorawan-stack/api/gateway.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/organization.proto";
@@ -30,18 +31,18 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
-// This message is used for finding entities in the EntityRegistrySearch service.
-message SearchEntitiesRequest {
-  // Find entities where the ID contains this substring.
+// This message is used for finding applications in the EntityRegistrySearch service.
+message SearchApplicationsRequest {
+  // Find applications where the ID contains this substring.
   string id_contains = 1 [
     (gogoproto.customname) = "IDContains",
     (validate.rules).string.max_len = 50
   ];
-  // Find entities where the name contains this substring.
+  // Find applications where the name contains this substring.
   string name_contains = 2 [(validate.rules).string.max_len = 50];
-  // Find entities where the description contains this substring.
+  // Find applications where the description contains this substring.
   string description_contains = 3 [(validate.rules).string.max_len = 50];
-  // Find entities where the given attributes contain these substrings.
+  // Find applications where the given attributes contain these substrings.
   map<string,string> attributes_contain = 4 [
     (validate.rules).map = {
       max_pairs: 10,
@@ -50,7 +51,7 @@ message SearchEntitiesRequest {
     }
   ];
 
-  reserved 5; // TODO: Add filter for approval state (admin only).
+  reserved 5; // Reserved for EUI or state filter.
 
   google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
 
@@ -61,7 +62,163 @@ message SearchEntitiesRequest {
   uint32 limit = 8 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 9;
-  // Only return recently deleted entities.
+  // Only return recently deleted applications.
+  bool deleted = 10;
+}
+
+// This message is used for finding OAuth clients in the EntityRegistrySearch service.
+message SearchClientsRequest {
+  // Find OAuth clients where the ID contains this substring.
+  string id_contains = 1 [
+    (gogoproto.customname) = "IDContains",
+    (validate.rules).string.max_len = 50
+  ];
+  // Find OAuth clients where the name contains this substring.
+  string name_contains = 2 [(validate.rules).string.max_len = 50];
+  // Find OAuth clients where the description contains this substring.
+  string description_contains = 3 [(validate.rules).string.max_len = 50];
+  // Find OAuth clients where the given attributes contain these substrings.
+  map<string,string> attributes_contain = 4 [
+    (validate.rules).map = {
+      max_pairs: 10,
+      keys: { string: { pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36 } },
+      values: { string: { max_len: 50 } }
+    }
+  ];
+
+  // Find OAuth clients where the state is any of these states.
+  repeated State state = 5 [
+    (validate.rules).repeated = {
+      unique: true,
+      items: { enum: { defined_only: true } }
+    }
+  ];
+
+  google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
+
+  // Order the results by this field path (must be present in the field mask).
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 7;
+  // Limit the number of results per page.
+  uint32 limit = 8 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 9;
+  // Only return recently deleted OAuth clients.
+  bool deleted = 10;
+}
+
+// This message is used for finding gateways in the EntityRegistrySearch service.
+message SearchGatewaysRequest {
+  // Find gateways where the ID contains this substring.
+  string id_contains = 1 [
+    (gogoproto.customname) = "IDContains",
+    (validate.rules).string.max_len = 50
+  ];
+  // Find gateways where the name contains this substring.
+  string name_contains = 2 [(validate.rules).string.max_len = 50];
+  // Find gateways where the description contains this substring.
+  string description_contains = 3 [(validate.rules).string.max_len = 50];
+  // Find gateways where the given attributes contain these substrings.
+  map<string,string> attributes_contain = 4 [
+    (validate.rules).map = {
+      max_pairs: 10,
+      keys: { string: { pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36 } },
+      values: { string: { max_len: 50 } }
+    }
+  ];
+
+  // Find gateways where the (hexadecimal) EUI contains this substring.
+  string eui_contains = 5 [
+    (gogoproto.customname) = "EUIContains",
+    (validate.rules).string.max_len = 16
+  ];
+
+  google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
+
+  // Order the results by this field path (must be present in the field mask).
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 7;
+  // Limit the number of results per page.
+  uint32 limit = 8 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 9;
+  // Only return recently deleted gateways.
+  bool deleted = 10;
+}
+
+// This message is used for finding organizations in the EntityRegistrySearch service.
+message SearchOrganizationsRequest {
+  // Find organizations where the ID contains this substring.
+  string id_contains = 1 [
+    (gogoproto.customname) = "IDContains",
+    (validate.rules).string.max_len = 50
+  ];
+  // Find organizations where the name contains this substring.
+  string name_contains = 2 [(validate.rules).string.max_len = 50];
+  // Find organizations where the description contains this substring.
+  string description_contains = 3 [(validate.rules).string.max_len = 50];
+  // Find organizations where the given attributes contain these substrings.
+  map<string,string> attributes_contain = 4 [
+    (validate.rules).map = {
+      max_pairs: 10,
+      keys: { string: { pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36 } },
+      values: { string: { max_len: 50 } }
+    }
+  ];
+
+  reserved 5; // Reserved for state filter.
+
+  google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
+
+  // Order the results by this field path (must be present in the field mask).
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 7;
+  // Limit the number of results per page.
+  uint32 limit = 8 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 9;
+  // Only return recently deleted organizations.
+  bool deleted = 10;
+}
+
+// This message is used for finding users in the EntityRegistrySearch service.
+message SearchUsersRequest {
+  // Find users where the ID contains this substring.
+  string id_contains = 1 [
+    (gogoproto.customname) = "IDContains",
+    (validate.rules).string.max_len = 50
+  ];
+  // Find users where the name contains this substring.
+  string name_contains = 2 [(validate.rules).string.max_len = 50];
+  // Find users where the description contains this substring.
+  string description_contains = 3 [(validate.rules).string.max_len = 50];
+  // Find users where the given attributes contain these substrings.
+  map<string,string> attributes_contain = 4 [
+    (validate.rules).map = {
+      max_pairs: 10,
+      keys: { string: { pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36 } },
+      values: { string: { max_len: 50 } }
+    }
+  ];
+
+  // Find users where the state is any of these states.
+  repeated State state = 5 [
+    (validate.rules).repeated = {
+      unique: true,
+      items: { enum: { defined_only: true } }
+    }
+  ];
+
+  google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
+
+  // Order the results by this field path (must be present in the field mask).
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 7;
+  // Limit the number of results per page.
+  uint32 limit = 8 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 9;
+  // Only return recently deleted users.
   bool deleted = 10;
 }
 
@@ -71,7 +228,7 @@ message SearchEntitiesRequest {
 service EntityRegistrySearch {
   // Search for applications that match the conditions specified in the request.
   // Non-admin users will only match applications that they have rights on.
-  rpc SearchApplications(SearchEntitiesRequest) returns (Applications) {
+  rpc SearchApplications(SearchApplicationsRequest) returns (Applications) {
     option (google.api.http) = {
       get: "/search/applications"
     };
@@ -79,7 +236,7 @@ service EntityRegistrySearch {
 
   // Search for OAuth clients that match the conditions specified in the request.
   // Non-admin users will only match OAuth clients that they have rights on.
-  rpc SearchClients(SearchEntitiesRequest) returns (Clients) {
+  rpc SearchClients(SearchClientsRequest) returns (Clients) {
     option (google.api.http) = {
       get: "/search/clients"
     };
@@ -87,7 +244,7 @@ service EntityRegistrySearch {
 
   // Search for gateways that match the conditions specified in the request.
   // Non-admin users will only match gateways that they have rights on.
-  rpc SearchGateways(SearchEntitiesRequest) returns (Gateways) {
+  rpc SearchGateways(SearchGatewaysRequest) returns (Gateways) {
     option (google.api.http) = {
       get: "/search/gateways"
     };
@@ -95,7 +252,7 @@ service EntityRegistrySearch {
 
   // Search for organizations that match the conditions specified in the request.
   // Non-admin users will only match organizations that they have rights on.
-  rpc SearchOrganizations(SearchEntitiesRequest) returns (Organizations) {
+  rpc SearchOrganizations(SearchOrganizationsRequest) returns (Organizations) {
     option (google.api.http) = {
       get: "/search/organizations"
     };
@@ -103,7 +260,7 @@ service EntityRegistrySearch {
 
   // Search for users that match the conditions specified in the request.
   // This is only available to admin users.
-  rpc SearchUsers(SearchEntitiesRequest) returns (Users) {
+  rpc SearchUsers(SearchUsersRequest) returns (Users) {
     option (google.api.http) = {
       get: "/search/users"
     };

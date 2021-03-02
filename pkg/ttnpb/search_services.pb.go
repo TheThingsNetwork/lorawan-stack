@@ -36,15 +36,15 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// This message is used for finding entities in the EntityRegistrySearch service.
-type SearchEntitiesRequest struct {
-	// Find entities where the ID contains this substring.
+// This message is used for finding applications in the EntityRegistrySearch service.
+type SearchApplicationsRequest struct {
+	// Find applications where the ID contains this substring.
 	IDContains string `protobuf:"bytes,1,opt,name=id_contains,json=idContains,proto3" json:"id_contains,omitempty"`
-	// Find entities where the name contains this substring.
+	// Find applications where the name contains this substring.
 	NameContains string `protobuf:"bytes,2,opt,name=name_contains,json=nameContains,proto3" json:"name_contains,omitempty"`
-	// Find entities where the description contains this substring.
+	// Find applications where the description contains this substring.
 	DescriptionContains string `protobuf:"bytes,3,opt,name=description_contains,json=descriptionContains,proto3" json:"description_contains,omitempty"`
-	// Find entities where the given attributes contain these substrings.
+	// Find applications where the given attributes contain these substrings.
 	AttributesContain map[string]string `protobuf:"bytes,4,rep,name=attributes_contain,json=attributesContain,proto3" json:"attributes_contain,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	FieldMask         types.FieldMask   `protobuf:"bytes,6,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
 	// Order the results by this field path (must be present in the field mask).
@@ -54,23 +54,23 @@ type SearchEntitiesRequest struct {
 	Limit uint32 `protobuf:"varint,8,opt,name=limit,proto3" json:"limit,omitempty"`
 	// Page number for pagination. 0 is interpreted as 1.
 	Page uint32 `protobuf:"varint,9,opt,name=page,proto3" json:"page,omitempty"`
-	// Only return recently deleted entities.
+	// Only return recently deleted applications.
 	Deleted              bool     `protobuf:"varint,10,opt,name=deleted,proto3" json:"deleted,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *SearchEntitiesRequest) Reset()      { *m = SearchEntitiesRequest{} }
-func (*SearchEntitiesRequest) ProtoMessage() {}
-func (*SearchEntitiesRequest) Descriptor() ([]byte, []int) {
+func (m *SearchApplicationsRequest) Reset()      { *m = SearchApplicationsRequest{} }
+func (*SearchApplicationsRequest) ProtoMessage() {}
+func (*SearchApplicationsRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_584ecc2845ae2dc1, []int{0}
 }
-func (m *SearchEntitiesRequest) XXX_Unmarshal(b []byte) error {
+func (m *SearchApplicationsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *SearchEntitiesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SearchApplicationsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_SearchEntitiesRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SearchApplicationsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -80,75 +80,578 @@ func (m *SearchEntitiesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *SearchEntitiesRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SearchEntitiesRequest.Merge(m, src)
+func (m *SearchApplicationsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SearchApplicationsRequest.Merge(m, src)
 }
-func (m *SearchEntitiesRequest) XXX_Size() int {
+func (m *SearchApplicationsRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *SearchEntitiesRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_SearchEntitiesRequest.DiscardUnknown(m)
+func (m *SearchApplicationsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_SearchApplicationsRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SearchEntitiesRequest proto.InternalMessageInfo
+var xxx_messageInfo_SearchApplicationsRequest proto.InternalMessageInfo
 
-func (m *SearchEntitiesRequest) GetIDContains() string {
+func (m *SearchApplicationsRequest) GetIDContains() string {
 	if m != nil {
 		return m.IDContains
 	}
 	return ""
 }
 
-func (m *SearchEntitiesRequest) GetNameContains() string {
+func (m *SearchApplicationsRequest) GetNameContains() string {
 	if m != nil {
 		return m.NameContains
 	}
 	return ""
 }
 
-func (m *SearchEntitiesRequest) GetDescriptionContains() string {
+func (m *SearchApplicationsRequest) GetDescriptionContains() string {
 	if m != nil {
 		return m.DescriptionContains
 	}
 	return ""
 }
 
-func (m *SearchEntitiesRequest) GetAttributesContain() map[string]string {
+func (m *SearchApplicationsRequest) GetAttributesContain() map[string]string {
 	if m != nil {
 		return m.AttributesContain
 	}
 	return nil
 }
 
-func (m *SearchEntitiesRequest) GetFieldMask() types.FieldMask {
+func (m *SearchApplicationsRequest) GetFieldMask() types.FieldMask {
 	if m != nil {
 		return m.FieldMask
 	}
 	return types.FieldMask{}
 }
 
-func (m *SearchEntitiesRequest) GetOrder() string {
+func (m *SearchApplicationsRequest) GetOrder() string {
 	if m != nil {
 		return m.Order
 	}
 	return ""
 }
 
-func (m *SearchEntitiesRequest) GetLimit() uint32 {
+func (m *SearchApplicationsRequest) GetLimit() uint32 {
 	if m != nil {
 		return m.Limit
 	}
 	return 0
 }
 
-func (m *SearchEntitiesRequest) GetPage() uint32 {
+func (m *SearchApplicationsRequest) GetPage() uint32 {
 	if m != nil {
 		return m.Page
 	}
 	return 0
 }
 
-func (m *SearchEntitiesRequest) GetDeleted() bool {
+func (m *SearchApplicationsRequest) GetDeleted() bool {
+	if m != nil {
+		return m.Deleted
+	}
+	return false
+}
+
+// This message is used for finding OAuth clients in the EntityRegistrySearch service.
+type SearchClientsRequest struct {
+	// Find OAuth clients where the ID contains this substring.
+	IDContains string `protobuf:"bytes,1,opt,name=id_contains,json=idContains,proto3" json:"id_contains,omitempty"`
+	// Find OAuth clients where the name contains this substring.
+	NameContains string `protobuf:"bytes,2,opt,name=name_contains,json=nameContains,proto3" json:"name_contains,omitempty"`
+	// Find OAuth clients where the description contains this substring.
+	DescriptionContains string `protobuf:"bytes,3,opt,name=description_contains,json=descriptionContains,proto3" json:"description_contains,omitempty"`
+	// Find OAuth clients where the given attributes contain these substrings.
+	AttributesContain map[string]string `protobuf:"bytes,4,rep,name=attributes_contain,json=attributesContain,proto3" json:"attributes_contain,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Find OAuth clients where the state is any of these states.
+	State     []State         `protobuf:"varint,5,rep,packed,name=state,proto3,enum=ttn.lorawan.v3.State" json:"state,omitempty"`
+	FieldMask types.FieldMask `protobuf:"bytes,6,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
+	// Order the results by this field path (must be present in the field mask).
+	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+	Order string `protobuf:"bytes,7,opt,name=order,proto3" json:"order,omitempty"`
+	// Limit the number of results per page.
+	Limit uint32 `protobuf:"varint,8,opt,name=limit,proto3" json:"limit,omitempty"`
+	// Page number for pagination. 0 is interpreted as 1.
+	Page uint32 `protobuf:"varint,9,opt,name=page,proto3" json:"page,omitempty"`
+	// Only return recently deleted OAuth clients.
+	Deleted              bool     `protobuf:"varint,10,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SearchClientsRequest) Reset()      { *m = SearchClientsRequest{} }
+func (*SearchClientsRequest) ProtoMessage() {}
+func (*SearchClientsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_584ecc2845ae2dc1, []int{1}
+}
+func (m *SearchClientsRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *SearchClientsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_SearchClientsRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *SearchClientsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SearchClientsRequest.Merge(m, src)
+}
+func (m *SearchClientsRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *SearchClientsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_SearchClientsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SearchClientsRequest proto.InternalMessageInfo
+
+func (m *SearchClientsRequest) GetIDContains() string {
+	if m != nil {
+		return m.IDContains
+	}
+	return ""
+}
+
+func (m *SearchClientsRequest) GetNameContains() string {
+	if m != nil {
+		return m.NameContains
+	}
+	return ""
+}
+
+func (m *SearchClientsRequest) GetDescriptionContains() string {
+	if m != nil {
+		return m.DescriptionContains
+	}
+	return ""
+}
+
+func (m *SearchClientsRequest) GetAttributesContain() map[string]string {
+	if m != nil {
+		return m.AttributesContain
+	}
+	return nil
+}
+
+func (m *SearchClientsRequest) GetState() []State {
+	if m != nil {
+		return m.State
+	}
+	return nil
+}
+
+func (m *SearchClientsRequest) GetFieldMask() types.FieldMask {
+	if m != nil {
+		return m.FieldMask
+	}
+	return types.FieldMask{}
+}
+
+func (m *SearchClientsRequest) GetOrder() string {
+	if m != nil {
+		return m.Order
+	}
+	return ""
+}
+
+func (m *SearchClientsRequest) GetLimit() uint32 {
+	if m != nil {
+		return m.Limit
+	}
+	return 0
+}
+
+func (m *SearchClientsRequest) GetPage() uint32 {
+	if m != nil {
+		return m.Page
+	}
+	return 0
+}
+
+func (m *SearchClientsRequest) GetDeleted() bool {
+	if m != nil {
+		return m.Deleted
+	}
+	return false
+}
+
+// This message is used for finding gateways in the EntityRegistrySearch service.
+type SearchGatewaysRequest struct {
+	// Find gateways where the ID contains this substring.
+	IDContains string `protobuf:"bytes,1,opt,name=id_contains,json=idContains,proto3" json:"id_contains,omitempty"`
+	// Find gateways where the name contains this substring.
+	NameContains string `protobuf:"bytes,2,opt,name=name_contains,json=nameContains,proto3" json:"name_contains,omitempty"`
+	// Find gateways where the description contains this substring.
+	DescriptionContains string `protobuf:"bytes,3,opt,name=description_contains,json=descriptionContains,proto3" json:"description_contains,omitempty"`
+	// Find gateways where the given attributes contain these substrings.
+	AttributesContain map[string]string `protobuf:"bytes,4,rep,name=attributes_contain,json=attributesContain,proto3" json:"attributes_contain,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Find gateways where the (hexadecimal) EUI contains this substring.
+	EUIContains string          `protobuf:"bytes,5,opt,name=eui_contains,json=euiContains,proto3" json:"eui_contains,omitempty"`
+	FieldMask   types.FieldMask `protobuf:"bytes,6,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
+	// Order the results by this field path (must be present in the field mask).
+	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+	Order string `protobuf:"bytes,7,opt,name=order,proto3" json:"order,omitempty"`
+	// Limit the number of results per page.
+	Limit uint32 `protobuf:"varint,8,opt,name=limit,proto3" json:"limit,omitempty"`
+	// Page number for pagination. 0 is interpreted as 1.
+	Page uint32 `protobuf:"varint,9,opt,name=page,proto3" json:"page,omitempty"`
+	// Only return recently deleted gateways.
+	Deleted              bool     `protobuf:"varint,10,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SearchGatewaysRequest) Reset()      { *m = SearchGatewaysRequest{} }
+func (*SearchGatewaysRequest) ProtoMessage() {}
+func (*SearchGatewaysRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_584ecc2845ae2dc1, []int{2}
+}
+func (m *SearchGatewaysRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *SearchGatewaysRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_SearchGatewaysRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *SearchGatewaysRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SearchGatewaysRequest.Merge(m, src)
+}
+func (m *SearchGatewaysRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *SearchGatewaysRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_SearchGatewaysRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SearchGatewaysRequest proto.InternalMessageInfo
+
+func (m *SearchGatewaysRequest) GetIDContains() string {
+	if m != nil {
+		return m.IDContains
+	}
+	return ""
+}
+
+func (m *SearchGatewaysRequest) GetNameContains() string {
+	if m != nil {
+		return m.NameContains
+	}
+	return ""
+}
+
+func (m *SearchGatewaysRequest) GetDescriptionContains() string {
+	if m != nil {
+		return m.DescriptionContains
+	}
+	return ""
+}
+
+func (m *SearchGatewaysRequest) GetAttributesContain() map[string]string {
+	if m != nil {
+		return m.AttributesContain
+	}
+	return nil
+}
+
+func (m *SearchGatewaysRequest) GetEUIContains() string {
+	if m != nil {
+		return m.EUIContains
+	}
+	return ""
+}
+
+func (m *SearchGatewaysRequest) GetFieldMask() types.FieldMask {
+	if m != nil {
+		return m.FieldMask
+	}
+	return types.FieldMask{}
+}
+
+func (m *SearchGatewaysRequest) GetOrder() string {
+	if m != nil {
+		return m.Order
+	}
+	return ""
+}
+
+func (m *SearchGatewaysRequest) GetLimit() uint32 {
+	if m != nil {
+		return m.Limit
+	}
+	return 0
+}
+
+func (m *SearchGatewaysRequest) GetPage() uint32 {
+	if m != nil {
+		return m.Page
+	}
+	return 0
+}
+
+func (m *SearchGatewaysRequest) GetDeleted() bool {
+	if m != nil {
+		return m.Deleted
+	}
+	return false
+}
+
+// This message is used for finding organizations in the EntityRegistrySearch service.
+type SearchOrganizationsRequest struct {
+	// Find organizations where the ID contains this substring.
+	IDContains string `protobuf:"bytes,1,opt,name=id_contains,json=idContains,proto3" json:"id_contains,omitempty"`
+	// Find organizations where the name contains this substring.
+	NameContains string `protobuf:"bytes,2,opt,name=name_contains,json=nameContains,proto3" json:"name_contains,omitempty"`
+	// Find organizations where the description contains this substring.
+	DescriptionContains string `protobuf:"bytes,3,opt,name=description_contains,json=descriptionContains,proto3" json:"description_contains,omitempty"`
+	// Find organizations where the given attributes contain these substrings.
+	AttributesContain map[string]string `protobuf:"bytes,4,rep,name=attributes_contain,json=attributesContain,proto3" json:"attributes_contain,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	FieldMask         types.FieldMask   `protobuf:"bytes,6,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
+	// Order the results by this field path (must be present in the field mask).
+	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+	Order string `protobuf:"bytes,7,opt,name=order,proto3" json:"order,omitempty"`
+	// Limit the number of results per page.
+	Limit uint32 `protobuf:"varint,8,opt,name=limit,proto3" json:"limit,omitempty"`
+	// Page number for pagination. 0 is interpreted as 1.
+	Page uint32 `protobuf:"varint,9,opt,name=page,proto3" json:"page,omitempty"`
+	// Only return recently deleted organizations.
+	Deleted              bool     `protobuf:"varint,10,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SearchOrganizationsRequest) Reset()      { *m = SearchOrganizationsRequest{} }
+func (*SearchOrganizationsRequest) ProtoMessage() {}
+func (*SearchOrganizationsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_584ecc2845ae2dc1, []int{3}
+}
+func (m *SearchOrganizationsRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *SearchOrganizationsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_SearchOrganizationsRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *SearchOrganizationsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SearchOrganizationsRequest.Merge(m, src)
+}
+func (m *SearchOrganizationsRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *SearchOrganizationsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_SearchOrganizationsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SearchOrganizationsRequest proto.InternalMessageInfo
+
+func (m *SearchOrganizationsRequest) GetIDContains() string {
+	if m != nil {
+		return m.IDContains
+	}
+	return ""
+}
+
+func (m *SearchOrganizationsRequest) GetNameContains() string {
+	if m != nil {
+		return m.NameContains
+	}
+	return ""
+}
+
+func (m *SearchOrganizationsRequest) GetDescriptionContains() string {
+	if m != nil {
+		return m.DescriptionContains
+	}
+	return ""
+}
+
+func (m *SearchOrganizationsRequest) GetAttributesContain() map[string]string {
+	if m != nil {
+		return m.AttributesContain
+	}
+	return nil
+}
+
+func (m *SearchOrganizationsRequest) GetFieldMask() types.FieldMask {
+	if m != nil {
+		return m.FieldMask
+	}
+	return types.FieldMask{}
+}
+
+func (m *SearchOrganizationsRequest) GetOrder() string {
+	if m != nil {
+		return m.Order
+	}
+	return ""
+}
+
+func (m *SearchOrganizationsRequest) GetLimit() uint32 {
+	if m != nil {
+		return m.Limit
+	}
+	return 0
+}
+
+func (m *SearchOrganizationsRequest) GetPage() uint32 {
+	if m != nil {
+		return m.Page
+	}
+	return 0
+}
+
+func (m *SearchOrganizationsRequest) GetDeleted() bool {
+	if m != nil {
+		return m.Deleted
+	}
+	return false
+}
+
+// This message is used for finding users in the EntityRegistrySearch service.
+type SearchUsersRequest struct {
+	// Find users where the ID contains this substring.
+	IDContains string `protobuf:"bytes,1,opt,name=id_contains,json=idContains,proto3" json:"id_contains,omitempty"`
+	// Find users where the name contains this substring.
+	NameContains string `protobuf:"bytes,2,opt,name=name_contains,json=nameContains,proto3" json:"name_contains,omitempty"`
+	// Find users where the description contains this substring.
+	DescriptionContains string `protobuf:"bytes,3,opt,name=description_contains,json=descriptionContains,proto3" json:"description_contains,omitempty"`
+	// Find users where the given attributes contain these substrings.
+	AttributesContain map[string]string `protobuf:"bytes,4,rep,name=attributes_contain,json=attributesContain,proto3" json:"attributes_contain,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Find users where the state is any of these states.
+	State     []State         `protobuf:"varint,5,rep,packed,name=state,proto3,enum=ttn.lorawan.v3.State" json:"state,omitempty"`
+	FieldMask types.FieldMask `protobuf:"bytes,6,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
+	// Order the results by this field path (must be present in the field mask).
+	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+	Order string `protobuf:"bytes,7,opt,name=order,proto3" json:"order,omitempty"`
+	// Limit the number of results per page.
+	Limit uint32 `protobuf:"varint,8,opt,name=limit,proto3" json:"limit,omitempty"`
+	// Page number for pagination. 0 is interpreted as 1.
+	Page uint32 `protobuf:"varint,9,opt,name=page,proto3" json:"page,omitempty"`
+	// Only return recently deleted users.
+	Deleted              bool     `protobuf:"varint,10,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SearchUsersRequest) Reset()      { *m = SearchUsersRequest{} }
+func (*SearchUsersRequest) ProtoMessage() {}
+func (*SearchUsersRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_584ecc2845ae2dc1, []int{4}
+}
+func (m *SearchUsersRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *SearchUsersRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_SearchUsersRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *SearchUsersRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SearchUsersRequest.Merge(m, src)
+}
+func (m *SearchUsersRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *SearchUsersRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_SearchUsersRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SearchUsersRequest proto.InternalMessageInfo
+
+func (m *SearchUsersRequest) GetIDContains() string {
+	if m != nil {
+		return m.IDContains
+	}
+	return ""
+}
+
+func (m *SearchUsersRequest) GetNameContains() string {
+	if m != nil {
+		return m.NameContains
+	}
+	return ""
+}
+
+func (m *SearchUsersRequest) GetDescriptionContains() string {
+	if m != nil {
+		return m.DescriptionContains
+	}
+	return ""
+}
+
+func (m *SearchUsersRequest) GetAttributesContain() map[string]string {
+	if m != nil {
+		return m.AttributesContain
+	}
+	return nil
+}
+
+func (m *SearchUsersRequest) GetState() []State {
+	if m != nil {
+		return m.State
+	}
+	return nil
+}
+
+func (m *SearchUsersRequest) GetFieldMask() types.FieldMask {
+	if m != nil {
+		return m.FieldMask
+	}
+	return types.FieldMask{}
+}
+
+func (m *SearchUsersRequest) GetOrder() string {
+	if m != nil {
+		return m.Order
+	}
+	return ""
+}
+
+func (m *SearchUsersRequest) GetLimit() uint32 {
+	if m != nil {
+		return m.Limit
+	}
+	return 0
+}
+
+func (m *SearchUsersRequest) GetPage() uint32 {
+	if m != nil {
+		return m.Page
+	}
+	return 0
+}
+
+func (m *SearchUsersRequest) GetDeleted() bool {
 	if m != nil {
 		return m.Deleted
 	}
@@ -186,7 +689,7 @@ type SearchEndDevicesRequest struct {
 func (m *SearchEndDevicesRequest) Reset()      { *m = SearchEndDevicesRequest{} }
 func (*SearchEndDevicesRequest) ProtoMessage() {}
 func (*SearchEndDevicesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_584ecc2845ae2dc1, []int{1}
+	return fileDescriptor_584ecc2845ae2dc1, []int{5}
 }
 func (m *SearchEndDevicesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -293,10 +796,26 @@ func (m *SearchEndDevicesRequest) GetPage() uint32 {
 }
 
 func init() {
-	proto.RegisterType((*SearchEntitiesRequest)(nil), "ttn.lorawan.v3.SearchEntitiesRequest")
-	golang_proto.RegisterType((*SearchEntitiesRequest)(nil), "ttn.lorawan.v3.SearchEntitiesRequest")
-	proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.SearchEntitiesRequest.AttributesContainEntry")
-	golang_proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.SearchEntitiesRequest.AttributesContainEntry")
+	proto.RegisterType((*SearchApplicationsRequest)(nil), "ttn.lorawan.v3.SearchApplicationsRequest")
+	golang_proto.RegisterType((*SearchApplicationsRequest)(nil), "ttn.lorawan.v3.SearchApplicationsRequest")
+	proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.SearchApplicationsRequest.AttributesContainEntry")
+	golang_proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.SearchApplicationsRequest.AttributesContainEntry")
+	proto.RegisterType((*SearchClientsRequest)(nil), "ttn.lorawan.v3.SearchClientsRequest")
+	golang_proto.RegisterType((*SearchClientsRequest)(nil), "ttn.lorawan.v3.SearchClientsRequest")
+	proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.SearchClientsRequest.AttributesContainEntry")
+	golang_proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.SearchClientsRequest.AttributesContainEntry")
+	proto.RegisterType((*SearchGatewaysRequest)(nil), "ttn.lorawan.v3.SearchGatewaysRequest")
+	golang_proto.RegisterType((*SearchGatewaysRequest)(nil), "ttn.lorawan.v3.SearchGatewaysRequest")
+	proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.SearchGatewaysRequest.AttributesContainEntry")
+	golang_proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.SearchGatewaysRequest.AttributesContainEntry")
+	proto.RegisterType((*SearchOrganizationsRequest)(nil), "ttn.lorawan.v3.SearchOrganizationsRequest")
+	golang_proto.RegisterType((*SearchOrganizationsRequest)(nil), "ttn.lorawan.v3.SearchOrganizationsRequest")
+	proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.SearchOrganizationsRequest.AttributesContainEntry")
+	golang_proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.SearchOrganizationsRequest.AttributesContainEntry")
+	proto.RegisterType((*SearchUsersRequest)(nil), "ttn.lorawan.v3.SearchUsersRequest")
+	golang_proto.RegisterType((*SearchUsersRequest)(nil), "ttn.lorawan.v3.SearchUsersRequest")
+	proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.SearchUsersRequest.AttributesContainEntry")
+	golang_proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.SearchUsersRequest.AttributesContainEntry")
 	proto.RegisterType((*SearchEndDevicesRequest)(nil), "ttn.lorawan.v3.SearchEndDevicesRequest")
 	golang_proto.RegisterType((*SearchEndDevicesRequest)(nil), "ttn.lorawan.v3.SearchEndDevicesRequest")
 	proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.SearchEndDevicesRequest.AttributesContainEntry")
@@ -311,89 +830,101 @@ func init() {
 }
 
 var fileDescriptor_584ecc2845ae2dc1 = []byte{
-	// 1152 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0x4d, 0x6c, 0x1b, 0x45,
-	0x14, 0xde, 0x71, 0xec, 0xc4, 0x19, 0x37, 0x89, 0x3b, 0x4d, 0x9a, 0xc5, 0x4a, 0x27, 0x96, 0x09,
-	0xd4, 0x54, 0xf5, 0x1a, 0x5c, 0x84, 0xa0, 0x02, 0xa2, 0x38, 0x49, 0x51, 0x2a, 0x21, 0xa4, 0x45,
-	0xbd, 0x50, 0x15, 0x6b, 0xec, 0x9d, 0x6c, 0x06, 0x3b, 0xbb, 0x66, 0x77, 0xec, 0xe0, 0x54, 0x95,
-	0x2a, 0x4e, 0x15, 0x27, 0x24, 0x2e, 0x88, 0x03, 0x02, 0x21, 0xa4, 0x1e, 0x7b, 0xac, 0x38, 0xf5,
-	0x84, 0x72, 0x42, 0x91, 0xb8, 0xf4, 0x14, 0xd5, 0x6b, 0x0e, 0x11, 0xa7, 0x1e, 0xab, 0x9c, 0xd0,
-	0xce, 0xee, 0x7a, 0xed, 0x75, 0x5a, 0x59, 0x05, 0x6e, 0x33, 0xfb, 0xbe, 0xf7, 0xbd, 0x9f, 0xfd,
-	0xde, 0xcc, 0xc0, 0x8b, 0x0d, 0xd3, 0x22, 0x7b, 0xc4, 0x28, 0xd8, 0x9c, 0xd4, 0xea, 0x45, 0xd2,
-	0x64, 0x45, 0x9b, 0x12, 0xab, 0xb6, 0x53, 0xb1, 0xa9, 0xd5, 0x66, 0x35, 0x6a, 0x2b, 0x4d, 0xcb,
-	0xe4, 0x26, 0x9a, 0xe5, 0xdc, 0x50, 0x7c, 0xb0, 0xd2, 0xbe, 0x92, 0x59, 0xd3, 0x19, 0xdf, 0x69,
-	0x55, 0x95, 0x9a, 0xb9, 0x5b, 0xa4, 0x46, 0xdb, 0xec, 0x34, 0x2d, 0xf3, 0xab, 0x4e, 0x51, 0x80,
-	0x6b, 0x05, 0x9d, 0x1a, 0x85, 0x36, 0x69, 0x30, 0x8d, 0x70, 0x5a, 0x1c, 0x59, 0x78, 0x94, 0x99,
-	0xc2, 0x00, 0x85, 0x6e, 0xea, 0xa6, 0xe7, 0x5c, 0x6d, 0x6d, 0x8b, 0x9d, 0xd8, 0x88, 0x95, 0x0f,
-	0x5f, 0xd2, 0x4d, 0x53, 0x6f, 0x50, 0x91, 0x23, 0x31, 0x0c, 0x93, 0x13, 0xce, 0x4c, 0xc3, 0xcf,
-	0x2f, 0x93, 0xf5, 0xad, 0x7d, 0x8e, 0x6d, 0x46, 0x1b, 0x5a, 0x65, 0x97, 0xd8, 0x75, 0x1f, 0xf1,
-	0xea, 0x68, 0xa9, 0xa4, 0xd9, 0x6c, 0xb0, 0x9a, 0xe0, 0xf1, 0x41, 0x78, 0x14, 0x54, 0x6b, 0x30,
-	0x6a, 0x70, 0xdf, 0x9e, 0x1b, 0xb5, 0x53, 0x43, 0xab, 0x68, 0xd4, 0xed, 0x95, 0x8f, 0x59, 0x1e,
-	0xc5, 0xe8, 0x84, 0xd3, 0x3d, 0xd2, 0x79, 0x7e, 0x26, 0x4c, 0xa3, 0x06, 0x67, 0xdb, 0x8c, 0x5a,
-	0x41, 0x41, 0x2b, 0xa3, 0x20, 0xd3, 0xd2, 0x89, 0xc1, 0xf6, 0x07, 0xf3, 0x5d, 0x1a, 0x45, 0xb5,
-	0x6c, 0x6a, 0x79, 0xd6, 0xdc, 0x1f, 0x71, 0xb8, 0xf0, 0xa9, 0xf8, 0x9d, 0x9b, 0x06, 0x67, 0x9c,
-	0x51, 0x5b, 0xa5, 0x5f, 0xb6, 0xa8, 0xcd, 0xd1, 0x3b, 0x30, 0xc5, 0xb4, 0x4a, 0xcd, 0x34, 0x38,
-	0x61, 0x86, 0x2d, 0x83, 0x2c, 0xc8, 0x4f, 0x97, 0x17, 0x4e, 0xca, 0x71, 0x2b, 0x26, 0x97, 0x9c,
-	0xa3, 0x65, 0xb8, 0xb5, 0xb1, 0xee, 0x1b, 0x55, 0xc8, 0xb4, 0x60, 0x8d, 0x2e, 0xc3, 0x19, 0x83,
-	0xec, 0xd2, 0xd0, 0x33, 0x26, 0x3c, 0xa7, 0x7c, 0x4f, 0xf5, 0x8c, 0x6b, 0xed, 0xa3, 0xaf, 0xc2,
-	0x79, 0x8d, 0xda, 0x35, 0x8b, 0x35, 0xdd, 0x94, 0x43, 0xa7, 0x89, 0x61, 0xa7, 0x73, 0x03, 0xa0,
-	0xbe, 0xef, 0xcf, 0x00, 0x22, 0xc2, 0xb9, 0xc5, 0xaa, 0x2d, 0x4e, 0xed, 0xc0, 0x57, 0x8e, 0x67,
-	0x27, 0xf2, 0xa9, 0xd2, 0xfb, 0xca, 0xb0, 0x1c, 0x95, 0x53, 0xab, 0x54, 0xd6, 0xfa, 0xfe, 0x3e,
-	0xed, 0xa6, 0xc1, 0xad, 0x4e, 0xf9, 0xed, 0x93, 0xf2, 0x5b, 0x3f, 0x00, 0x25, 0x0d, 0x73, 0x2b,
-	0x56, 0x4e, 0x5e, 0x29, 0xe1, 0xcf, 0x6f, 0x92, 0xc2, 0xfe, 0x9b, 0x85, 0xf7, 0x6e, 0xe5, 0x57,
-	0xaf, 0xde, 0x2c, 0xdc, 0x5a, 0x0d, 0xb6, 0x6f, 0xdc, 0x2e, 0x5d, 0xbe, 0xb3, 0x72, 0xc9, 0xcb,
-	0xf2, 0x2c, 0x89, 0xb2, 0xa1, 0x55, 0x08, 0x43, 0x99, 0xc9, 0x93, 0x59, 0x90, 0x4f, 0x95, 0x32,
-	0x8a, 0xa7, 0x44, 0x25, 0x50, 0xa2, 0x72, 0xcd, 0x85, 0x7c, 0x4c, 0xec, 0x7a, 0x39, 0x7e, 0x70,
-	0xb4, 0x2c, 0xa9, 0xd3, 0xdb, 0xc1, 0x07, 0x34, 0x0f, 0x13, 0xa6, 0xa5, 0x51, 0x4b, 0x9e, 0x72,
-	0x3b, 0xa2, 0x7a, 0x1b, 0x84, 0x61, 0xa2, 0xc1, 0x76, 0x19, 0x97, 0x93, 0x59, 0x90, 0x9f, 0x29,
-	0x27, 0x4f, 0xca, 0x89, 0x4b, 0x13, 0xf2, 0xf1, 0x94, 0xea, 0x7d, 0x46, 0x08, 0xc6, 0x9b, 0x44,
-	0xa7, 0xf2, 0xb4, 0x6b, 0x56, 0xc5, 0x1a, 0xc9, 0x70, 0x4a, 0xa3, 0x0d, 0xca, 0xa9, 0x26, 0xc3,
-	0x2c, 0xc8, 0x27, 0xd5, 0x60, 0x9b, 0xd9, 0x80, 0xe7, 0x4f, 0xef, 0x03, 0x4a, 0xc3, 0x89, 0x3a,
-	0xed, 0x78, 0x3f, 0x5f, 0x75, 0x97, 0x6e, 0x3e, 0x6d, 0xd2, 0x68, 0x51, 0xef, 0xb7, 0xaa, 0xde,
-	0xe6, 0x6a, 0xec, 0x5d, 0x70, 0x3d, 0x9e, 0x4c, 0xa4, 0x27, 0x73, 0x7f, 0x4f, 0xc2, 0xc5, 0xa0,
-	0xd5, 0xda, 0x86, 0x10, 0x7d, 0x5f, 0x52, 0x04, 0xce, 0x0d, 0xcc, 0x53, 0x85, 0x69, 0x9e, 0xac,
-	0x52, 0xa5, 0xd7, 0xa3, 0x3f, 0x6b, 0x2d, 0x84, 0x6d, 0x85, 0xba, 0x2f, 0xa7, 0x4f, 0xca, 0x89,
-	0x6f, 0x40, 0x2c, 0x0d, 0xdc, 0x2e, 0x1d, 0x1e, 0x2d, 0x03, 0x75, 0x96, 0x0c, 0x22, 0xed, 0xa8,
-	0x6a, 0x63, 0x2f, 0xad, 0xda, 0x89, 0x97, 0x51, 0x6d, 0x7c, 0x0c, 0xd5, 0xfe, 0x72, 0xba, 0x6a,
-	0x13, 0x42, 0xb5, 0x1f, 0x3e, 0x4f, 0xb5, 0x91, 0x56, 0xfe, 0xef, 0xba, 0x5d, 0x87, 0x69, 0x8d,
-	0xb6, 0x2b, 0xb4, 0xc5, 0xc2, 0xea, 0x26, 0x45, 0x75, 0xaf, 0x78, 0xd5, 0xa5, 0x9d, 0xa3, 0xe5,
-	0xd9, 0x0d, 0xda, 0xde, 0xbc, 0xb1, 0xd5, 0x6f, 0xe8, 0xac, 0x46, 0xdb, 0x9b, 0x2d, 0xd6, 0x2f,
-	0xf5, 0x1a, 0x3c, 0xfb, 0x85, 0xc9, 0x8c, 0x61, 0x16, 0xa1, 0xe3, 0x72, 0x26, 0x64, 0x99, 0xbb,
-	0x6e, 0x32, 0x63, 0x90, 0x66, 0xce, 0x75, 0x8a, 0xf0, 0xb8, 0xc9, 0x10, 0x4d, 0xb3, 0x42, 0x9e,
-	0xe4, 0x20, 0x4f, 0xd2, 0xe5, 0xd9, 0xa0, 0xed, 0x35, 0x4d, 0xb3, 0x42, 0x1e, 0x6d, 0xf8, 0x43,
-	0x64, 0x18, 0xa7, 0xff, 0xc5, 0x30, 0xc2, 0x53, 0x87, 0x31, 0xf5, 0xe2, 0x61, 0x3c, 0x13, 0x0e,
-	0xe3, 0x7f, 0x33, 0x72, 0xa5, 0xdf, 0xe3, 0x70, 0x5e, 0x9c, 0x68, 0x1d, 0x95, 0xea, 0xcc, 0xe6,
-	0x56, 0xc7, 0xd3, 0x0b, 0xda, 0x83, 0xc8, 0x5b, 0x0d, 0x0c, 0x92, 0x8d, 0x5e, 0x1b, 0xeb, 0x4c,
-	0xcc, 0x2c, 0xbd, 0x60, 0x1a, 0xed, 0xdc, 0xd2, 0xd7, 0x7f, 0xfe, 0xf5, 0x5d, 0xec, 0x3c, 0x9a,
-	0xf7, 0x9f, 0x01, 0x83, 0x57, 0xa4, 0x8d, 0x76, 0xe0, 0x8c, 0x47, 0xba, 0x2e, 0xee, 0xc4, 0xb1,
-	0x63, 0x2e, 0x46, 0x61, 0xbe, 0x7f, 0x6e, 0x51, 0x84, 0x3b, 0x8b, 0xe6, 0x82, 0x70, 0x35, 0x9f,
-	0xb8, 0x0e, 0x67, 0x3d, 0xaa, 0x8f, 0xbc, 0x9b, 0x73, 0xec, 0x50, 0x72, 0x14, 0x16, 0x10, 0xe4,
-	0x64, 0x11, 0x0b, 0xa1, 0x74, 0x10, 0x4b, 0x0f, 0xa8, 0xf7, 0xe1, 0x39, 0x8f, 0xec, 0x93, 0x81,
-	0x0b, 0x76, 0xec, 0x88, 0x17, 0xa2, 0xb0, 0x21, 0x96, 0xdc, 0x05, 0x11, 0x76, 0x11, 0x2d, 0x04,
-	0x61, 0xcd, 0xa1, 0x20, 0x55, 0x98, 0xf2, 0x68, 0x6f, 0xd8, 0xd4, 0x1a, 0x3b, 0xe6, 0x42, 0x14,
-	0x26, 0xbc, 0x73, 0x0b, 0x22, 0xd6, 0x1c, 0x9a, 0x09, 0x62, 0xb9, 0x6f, 0x01, 0xbb, 0xf4, 0x1b,
-	0x80, 0x8b, 0xfd, 0x43, 0x26, 0xa2, 0xa5, 0x1f, 0x01, 0x4c, 0x47, 0x8f, 0x21, 0x74, 0x71, 0xcc,
-	0x83, 0x2a, 0x93, 0x89, 0x02, 0x43, 0x48, 0x6e, 0x53, 0x24, 0xb3, 0x8a, 0x3e, 0x38, 0x4d, 0x4a,
-	0xc5, 0xdb, 0x91, 0xbb, 0x42, 0x19, 0xde, 0xdf, 0x29, 0x7a, 0x4f, 0x2a, 0xbb, 0xfc, 0x2b, 0x38,
-	0xe8, 0x62, 0x70, 0xd8, 0xc5, 0xe0, 0x71, 0x17, 0x4b, 0x4f, 0xba, 0x58, 0x3a, 0xee, 0x62, 0xe9,
-	0x69, 0x17, 0x4b, 0xcf, 0xba, 0x18, 0xdc, 0x75, 0x30, 0xb8, 0xe7, 0x60, 0xe9, 0xbe, 0x83, 0xc1,
-	0x03, 0x07, 0x4b, 0x0f, 0x1d, 0x2c, 0x3d, 0x72, 0xb0, 0x74, 0xe0, 0x60, 0x70, 0xe8, 0x60, 0xf0,
-	0xd8, 0xc1, 0xd2, 0x13, 0x07, 0x83, 0x63, 0x07, 0x4b, 0x4f, 0x1d, 0x0c, 0x9e, 0x39, 0x58, 0xba,
-	0xdb, 0xc3, 0xd2, 0xbd, 0x1e, 0x06, 0xdf, 0xf6, 0xb0, 0xf4, 0x7d, 0x0f, 0x83, 0x9f, 0x7a, 0x58,
-	0xba, 0xdf, 0xc3, 0xd2, 0x83, 0x1e, 0x06, 0x0f, 0x7b, 0x18, 0x3c, 0xea, 0x61, 0xf0, 0x59, 0x51,
-	0x37, 0x15, 0xbe, 0x43, 0xf9, 0x0e, 0x33, 0x74, 0x5b, 0x31, 0x28, 0xdf, 0x33, 0xad, 0x7a, 0x71,
-	0xf8, 0xb5, 0xd5, 0xbe, 0x52, 0x6c, 0xd6, 0xf5, 0x22, 0xe7, 0x46, 0xb3, 0x5a, 0x9d, 0x14, 0x47,
-	0xcc, 0x95, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff, 0x5c, 0x28, 0x22, 0x4a, 0x52, 0x0b, 0x00, 0x00,
+	// 1339 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x58, 0x4b, 0x6c, 0x13, 0xc7,
+	0x1b, 0xdf, 0x49, 0xec, 0x3c, 0xc6, 0x79, 0x98, 0x21, 0x21, 0xcb, 0x2a, 0x4c, 0xa2, 0xfd, 0xe7,
+	0x5f, 0x0c, 0xc2, 0xeb, 0xd6, 0x54, 0x55, 0xa1, 0xb4, 0x69, 0x4c, 0x42, 0x05, 0x52, 0x55, 0x69,
+	0x2b, 0x2e, 0x45, 0xd4, 0x9a, 0x78, 0x27, 0x9b, 0xa9, 0x9d, 0x5d, 0x77, 0x77, 0x6c, 0x6a, 0x10,
+	0x2a, 0xa2, 0x3d, 0xa0, 0x9e, 0xaa, 0xf6, 0x52, 0xf5, 0x80, 0xa8, 0x2a, 0x2a, 0x8e, 0x1c, 0x51,
+	0x4f, 0x1c, 0x91, 0x7a, 0x41, 0xaa, 0x54, 0x71, 0x8a, 0xf0, 0xba, 0x07, 0xd4, 0x13, 0x47, 0x94,
+	0x53, 0xb5, 0x2f, 0x7b, 0xbd, 0x36, 0x69, 0x44, 0x41, 0x6a, 0x04, 0xb7, 0x99, 0xfd, 0x7e, 0xdf,
+	0x73, 0x7e, 0x33, 0xdf, 0xcc, 0xc2, 0x83, 0x15, 0xd3, 0x22, 0x17, 0x88, 0x91, 0xb5, 0x39, 0x29,
+	0x95, 0x73, 0xa4, 0xca, 0x72, 0x36, 0x25, 0x56, 0x69, 0xbd, 0x68, 0x53, 0xab, 0xce, 0x4a, 0xd4,
+	0x56, 0xaa, 0x96, 0xc9, 0x4d, 0x34, 0xc1, 0xb9, 0xa1, 0x04, 0x60, 0xa5, 0x7e, 0x54, 0x5a, 0xd2,
+	0x19, 0x5f, 0xaf, 0xad, 0x2a, 0x25, 0x73, 0x23, 0x47, 0x8d, 0xba, 0xd9, 0xa8, 0x5a, 0xe6, 0x17,
+	0x8d, 0x9c, 0x07, 0x2e, 0x65, 0x75, 0x6a, 0x64, 0xeb, 0xa4, 0xc2, 0x34, 0xc2, 0x69, 0xae, 0x67,
+	0xe0, 0x9b, 0x94, 0xb2, 0x11, 0x13, 0xba, 0xa9, 0x9b, 0xbe, 0xf2, 0x6a, 0x6d, 0xcd, 0x9b, 0x79,
+	0x13, 0x6f, 0x14, 0xc0, 0x67, 0x75, 0xd3, 0xd4, 0x2b, 0xd4, 0x8b, 0x91, 0x18, 0x86, 0xc9, 0x09,
+	0x67, 0xa6, 0x11, 0xc4, 0x27, 0xcd, 0x07, 0xd2, 0xb6, 0x8d, 0x35, 0x46, 0x2b, 0x5a, 0x71, 0x83,
+	0xd8, 0xe5, 0x00, 0xf1, 0xbf, 0xde, 0x54, 0x49, 0xb5, 0x5a, 0x61, 0x25, 0xcf, 0x4e, 0x00, 0xc2,
+	0xbd, 0xa0, 0x52, 0x85, 0x51, 0x83, 0x07, 0x72, 0xb9, 0x57, 0x4e, 0x0d, 0xad, 0xa8, 0x51, 0xb7,
+	0x56, 0x01, 0xe6, 0x40, 0x3f, 0x4c, 0x6d, 0x23, 0x8c, 0x74, 0xae, 0x57, 0xac, 0x13, 0x4e, 0x2f,
+	0x90, 0xc6, 0xd3, 0x03, 0x65, 0x1a, 0x35, 0x38, 0x5b, 0x63, 0xd4, 0x0a, 0xad, 0x2c, 0xf4, 0x82,
+	0x4c, 0x4b, 0x27, 0x06, 0xbb, 0x18, 0x4d, 0x67, 0xb6, 0x17, 0x55, 0xb3, 0xa9, 0xe5, 0x4b, 0xe5,
+	0x3f, 0x12, 0x70, 0xff, 0xc7, 0xde, 0x6a, 0x2f, 0x75, 0x0a, 0x61, 0xab, 0xf4, 0xf3, 0x1a, 0xb5,
+	0x39, 0x7a, 0x0b, 0xa6, 0x98, 0x56, 0x2c, 0x99, 0x06, 0x27, 0xcc, 0xb0, 0x45, 0x30, 0x0f, 0x32,
+	0xa3, 0x85, 0xe9, 0xad, 0x42, 0xc2, 0x1a, 0x10, 0xf3, 0xce, 0xe6, 0x1c, 0x3c, 0xbd, 0x7c, 0x32,
+	0x10, 0xaa, 0x90, 0x69, 0xe1, 0x18, 0x1d, 0x81, 0xe3, 0x06, 0xd9, 0xa0, 0x1d, 0xcd, 0x01, 0x4f,
+	0x73, 0x38, 0xd0, 0x54, 0xc7, 0x5c, 0x69, 0x1b, 0x7d, 0x1c, 0x4e, 0x69, 0xd4, 0x2e, 0x59, 0xac,
+	0xea, 0x3a, 0xef, 0x28, 0x0d, 0x76, 0x2b, 0xed, 0x8d, 0x80, 0xda, 0xba, 0x37, 0x01, 0x44, 0x84,
+	0x73, 0x8b, 0xad, 0xd6, 0x38, 0xb5, 0x43, 0x5d, 0x31, 0x31, 0x3f, 0x98, 0x49, 0xe5, 0xdf, 0x57,
+	0xba, 0x19, 0xab, 0x3c, 0x35, 0x53, 0x65, 0xa9, 0x6d, 0x23, 0x30, 0xbd, 0x62, 0x70, 0xab, 0x51,
+	0x78, 0x73, 0xab, 0xf0, 0xc6, 0x8f, 0x40, 0x49, 0x43, 0x79, 0xc1, 0x92, 0xc5, 0x85, 0x3c, 0xfe,
+	0xf4, 0x1c, 0xc9, 0x5e, 0x7c, 0x3d, 0x7b, 0xec, 0x7c, 0x66, 0xf1, 0xf8, 0xb9, 0xec, 0xf9, 0xc5,
+	0x70, 0x7a, 0xe8, 0x52, 0xfe, 0xc8, 0xe5, 0x85, 0xc3, 0x7e, 0xa4, 0x7b, 0x48, 0xdc, 0x1a, 0x5a,
+	0x84, 0xb0, 0xc3, 0x46, 0x71, 0x68, 0x1e, 0x64, 0x52, 0x79, 0x49, 0xf1, 0x09, 0xab, 0x84, 0x84,
+	0x55, 0x4e, 0xb9, 0x90, 0x0f, 0x89, 0x5d, 0x2e, 0x24, 0xee, 0x6d, 0xce, 0x09, 0xea, 0xe8, 0x5a,
+	0xf8, 0x01, 0x4d, 0xc1, 0xa4, 0x69, 0x69, 0xd4, 0x12, 0x87, 0xdd, 0xaa, 0xa8, 0xfe, 0x04, 0x61,
+	0x98, 0xac, 0xb0, 0x0d, 0xc6, 0xc5, 0x91, 0x79, 0x90, 0x19, 0x2f, 0x8c, 0x6c, 0x15, 0x92, 0x87,
+	0x07, 0xc5, 0x47, 0xc3, 0xaa, 0xff, 0x19, 0x21, 0x98, 0xa8, 0x12, 0x9d, 0x8a, 0xa3, 0xae, 0x58,
+	0xf5, 0xc6, 0x48, 0x84, 0xc3, 0x1a, 0xad, 0x50, 0x4e, 0x35, 0x11, 0xce, 0x83, 0xcc, 0x88, 0x1a,
+	0x4e, 0xa5, 0x65, 0xb8, 0xaf, 0x7f, 0x1d, 0x50, 0x1a, 0x0e, 0x96, 0x69, 0xc3, 0x27, 0x80, 0xea,
+	0x0e, 0xdd, 0x78, 0xea, 0xa4, 0x52, 0xa3, 0xfe, 0xd2, 0xaa, 0xfe, 0xe4, 0xf8, 0xc0, 0xdb, 0xe0,
+	0x4c, 0x62, 0x24, 0x99, 0x1e, 0x92, 0xbf, 0x4e, 0xc2, 0x29, 0xbf, 0xdc, 0x27, 0xbd, 0xcd, 0xb3,
+	0x8b, 0x38, 0x75, 0x63, 0x3b, 0x4e, 0xbd, 0xd3, 0x9f, 0x53, 0xdd, 0x49, 0xbe, 0x70, 0x3a, 0x9d,
+	0x80, 0x49, 0x9b, 0x13, 0x4e, 0xc5, 0xe4, 0xfc, 0x60, 0x66, 0x22, 0x3f, 0xdd, 0x13, 0x94, 0x2b,
+	0x2c, 0x4c, 0x6e, 0x15, 0xc6, 0xbe, 0x03, 0xa3, 0x22, 0x90, 0x93, 0x57, 0xc1, 0x40, 0x1a, 0xa8,
+	0xbe, 0xd2, 0x4b, 0x44, 0x46, 0xf9, 0xab, 0x24, 0x9c, 0xf6, 0x57, 0xe8, 0x03, 0xff, 0x80, 0xdd,
+	0x45, 0x3c, 0xfc, 0x69, 0x3b, 0x1e, 0x9e, 0xe8, 0xcf, 0xc3, 0x58, 0x96, 0x2f, 0x9c, 0x88, 0xc7,
+	0xe0, 0x18, 0xad, 0xb1, 0x4e, 0x5e, 0x49, 0x2f, 0xaf, 0x7d, 0x7e, 0x5e, 0x69, 0x67, 0x73, 0x2e,
+	0xb5, 0x72, 0xf6, 0x74, 0xbb, 0x8e, 0x29, 0x5a, 0x63, 0xed, 0xf4, 0x5e, 0x22, 0x16, 0x3e, 0x48,
+	0x40, 0xc9, 0x5f, 0x9f, 0x8f, 0x22, 0x0d, 0x7a, 0x17, 0x51, 0xf1, 0x97, 0xed, 0xa8, 0xb8, 0xd4,
+	0x9f, 0x8a, 0xfd, 0x52, 0x7d, 0xd5, 0x67, 0x9f, 0x77, 0x9f, 0xbd, 0x92, 0x84, 0xc8, 0xaf, 0xf7,
+	0x59, 0x9b, 0x5a, 0xbb, 0x88, 0x52, 0xd7, 0xb7, 0xa3, 0xd4, 0xb1, 0xfe, 0x94, 0x8a, 0xa6, 0xf8,
+	0xaa, 0xc7, 0xfe, 0x57, 0x4e, 0xb7, 0xbf, 0x86, 0xe0, 0x8c, 0xbf, 0x3e, 0x2b, 0x86, 0xb6, 0xec,
+	0x3d, 0x83, 0xda, 0x3c, 0x24, 0x70, 0x32, 0xf2, 0xc2, 0x2a, 0x32, 0xcd, 0xe7, 0x62, 0x2a, 0xff,
+	0x5a, 0xbc, 0x9c, 0x91, 0x5b, 0xf9, 0xe9, 0xce, 0x53, 0xa7, 0x90, 0xde, 0x2a, 0x24, 0xbf, 0x71,
+	0x0b, 0xeb, 0xd6, 0xe7, 0xfe, 0xe6, 0x1c, 0x50, 0x27, 0x48, 0x14, 0x69, 0xc7, 0xa9, 0x3e, 0xf0,
+	0xcc, 0x54, 0x1f, 0x7c, 0x16, 0xaa, 0x27, 0x76, 0x40, 0xf5, 0x9f, 0xfb, 0x53, 0x3d, 0xe9, 0x51,
+	0xfd, 0xbd, 0xfe, 0x54, 0xef, 0x29, 0xe5, 0x0b, 0xe7, 0xfb, 0x49, 0x98, 0xd6, 0x68, 0xbd, 0xd8,
+	0xd5, 0xce, 0x87, 0xbc, 0xec, 0xf6, 0x77, 0xda, 0xf9, 0xc4, 0x32, 0xad, 0x47, 0x3b, 0xfa, 0x84,
+	0x46, 0xeb, 0x2b, 0x91, 0xa6, 0x7e, 0x0a, 0xee, 0xf9, 0xcc, 0x64, 0x46, 0xb7, 0x15, 0x8f, 0xc1,
+	0x05, 0xa9, 0x63, 0x65, 0xf2, 0x8c, 0xc9, 0x8c, 0xa8, 0x99, 0x49, 0x57, 0x29, 0x66, 0xc7, 0x0d,
+	0x86, 0x68, 0x9a, 0xd5, 0xb1, 0x33, 0x12, 0xb5, 0x33, 0xe2, 0xda, 0x59, 0xa6, 0xf5, 0x25, 0x4d,
+	0xb3, 0x3a, 0x76, 0xb4, 0xee, 0x0f, 0xb1, 0x6d, 0x38, 0xfa, 0x2f, 0xb6, 0x21, 0xec, 0xbb, 0x0d,
+	0x53, 0xdb, 0x6f, 0xc3, 0xb1, 0xce, 0x36, 0x7c, 0x3e, 0x9b, 0x2d, 0xff, 0x5b, 0x02, 0x4e, 0xad,
+	0x18, 0x9c, 0xf1, 0x86, 0x4a, 0x75, 0x66, 0x73, 0xab, 0xe1, 0xf3, 0x05, 0x5d, 0x0a, 0xfb, 0x40,
+	0xf4, 0x79, 0x8b, 0x0e, 0xed, 0xf8, 0x09, 0x2c, 0xcd, 0x6e, 0xb3, 0x23, 0x6d, 0x79, 0xf6, 0xea,
+	0xef, 0x7f, 0x7e, 0x3f, 0xb0, 0x0f, 0x4d, 0x05, 0x3f, 0x87, 0xa2, 0x3f, 0x4e, 0x6c, 0xa4, 0xc3,
+	0xf1, 0xae, 0x77, 0x10, 0x5a, 0xd8, 0xc9, 0x33, 0x49, 0x9a, 0x89, 0xa3, 0x02, 0xb9, 0x3c, 0xe3,
+	0x79, 0xdb, 0x83, 0x26, 0x43, 0x6f, 0xa5, 0xc0, 0x6e, 0x19, 0x4e, 0x74, 0x5f, 0x74, 0xd1, 0xff,
+	0x77, 0x74, 0x11, 0x96, 0xc4, 0x38, 0x2c, 0x04, 0xc8, 0xa2, 0xe7, 0x0b, 0xa1, 0x74, 0xe8, 0x4b,
+	0x0f, 0x4d, 0x7f, 0x09, 0xf7, 0xf6, 0xb9, 0xca, 0xa0, 0xc3, 0x3b, 0xbf, 0xef, 0x48, 0x07, 0xe2,
+	0xd8, 0x2e, 0x94, 0x7c, 0xc0, 0xf3, 0x3d, 0x83, 0xa6, 0x43, 0xdf, 0x66, 0x97, 0xa7, 0x22, 0x4c,
+	0x45, 0x1a, 0x1f, 0x92, 0xff, 0xb9, 0x2b, 0x4a, 0x3d, 0x6d, 0xca, 0x93, 0xca, 0xd3, 0x9e, 0xa3,
+	0x49, 0x34, 0x1e, 0x3a, 0xaa, 0xb9, 0x9f, 0xf3, 0xbf, 0x02, 0x38, 0xd3, 0x3e, 0x69, 0x62, 0x84,
+	0xba, 0x0e, 0x60, 0x3a, 0x7e, 0x16, 0xa1, 0x83, 0x3b, 0x3c, 0xad, 0x24, 0x29, 0x0e, 0xec, 0x40,
+	0xe4, 0x15, 0x2f, 0x98, 0x45, 0xf4, 0x6e, 0x3f, 0x2e, 0xe5, 0x2e, 0xc5, 0x1a, 0x86, 0xd2, 0x3d,
+	0xbf, 0x9c, 0xf3, 0xff, 0xb4, 0xd9, 0x85, 0x9b, 0xe0, 0x5e, 0x13, 0x83, 0xfb, 0x4d, 0x0c, 0x1e,
+	0x34, 0xb1, 0xf0, 0xb0, 0x89, 0x85, 0x47, 0x4d, 0x2c, 0x3c, 0x6e, 0x62, 0xe1, 0x49, 0x13, 0x83,
+	0x2b, 0x0e, 0x06, 0xd7, 0x1c, 0x2c, 0xdc, 0x72, 0x30, 0xb8, 0xed, 0x60, 0xe1, 0x8e, 0x83, 0x85,
+	0xbb, 0x0e, 0x16, 0xee, 0x39, 0x18, 0xdc, 0x77, 0x30, 0x78, 0xe0, 0x60, 0xe1, 0xa1, 0x83, 0xc1,
+	0x23, 0x07, 0x0b, 0x8f, 0x1d, 0x0c, 0x9e, 0x38, 0x58, 0xb8, 0xd2, 0xc2, 0xc2, 0xb5, 0x16, 0x06,
+	0xdf, 0xb6, 0xb0, 0xf0, 0x43, 0x0b, 0x83, 0x1b, 0x2d, 0x2c, 0xdc, 0x6a, 0x61, 0xe1, 0x76, 0x0b,
+	0x83, 0x3b, 0x2d, 0x0c, 0xee, 0xb6, 0x30, 0xf8, 0x24, 0xa7, 0x9b, 0x0a, 0x5f, 0xa7, 0x7c, 0x9d,
+	0x19, 0xba, 0xad, 0x18, 0x94, 0x5f, 0x30, 0xad, 0x72, 0xae, 0xfb, 0x2f, 0x5b, 0xfd, 0x68, 0xae,
+	0x5a, 0xd6, 0x73, 0x9c, 0x1b, 0xd5, 0xd5, 0xd5, 0x21, 0xef, 0x9c, 0x39, 0xfa, 0x77, 0x00, 0x00,
+	0x00, 0xff, 0xff, 0x6b, 0xae, 0xcf, 0x4f, 0x69, 0x15, 0x00, 0x00,
 }
 
-func (this *SearchEntitiesRequest) Equal(that interface{}) bool {
+func (this *SearchApplicationsRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*SearchEntitiesRequest)
+	that1, ok := that.(*SearchApplicationsRequest)
 	if !ok {
-		that2, ok := that.(SearchEntitiesRequest)
+		that2, ok := that.(SearchApplicationsRequest)
 		if ok {
 			that1 = &that2
 		} else {
@@ -419,6 +950,237 @@ func (this *SearchEntitiesRequest) Equal(that interface{}) bool {
 	}
 	for i := range this.AttributesContain {
 		if this.AttributesContain[i] != that1.AttributesContain[i] {
+			return false
+		}
+	}
+	if !this.FieldMask.Equal(&that1.FieldMask) {
+		return false
+	}
+	if this.Order != that1.Order {
+		return false
+	}
+	if this.Limit != that1.Limit {
+		return false
+	}
+	if this.Page != that1.Page {
+		return false
+	}
+	if this.Deleted != that1.Deleted {
+		return false
+	}
+	return true
+}
+func (this *SearchClientsRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*SearchClientsRequest)
+	if !ok {
+		that2, ok := that.(SearchClientsRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.IDContains != that1.IDContains {
+		return false
+	}
+	if this.NameContains != that1.NameContains {
+		return false
+	}
+	if this.DescriptionContains != that1.DescriptionContains {
+		return false
+	}
+	if len(this.AttributesContain) != len(that1.AttributesContain) {
+		return false
+	}
+	for i := range this.AttributesContain {
+		if this.AttributesContain[i] != that1.AttributesContain[i] {
+			return false
+		}
+	}
+	if len(this.State) != len(that1.State) {
+		return false
+	}
+	for i := range this.State {
+		if this.State[i] != that1.State[i] {
+			return false
+		}
+	}
+	if !this.FieldMask.Equal(&that1.FieldMask) {
+		return false
+	}
+	if this.Order != that1.Order {
+		return false
+	}
+	if this.Limit != that1.Limit {
+		return false
+	}
+	if this.Page != that1.Page {
+		return false
+	}
+	if this.Deleted != that1.Deleted {
+		return false
+	}
+	return true
+}
+func (this *SearchGatewaysRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*SearchGatewaysRequest)
+	if !ok {
+		that2, ok := that.(SearchGatewaysRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.IDContains != that1.IDContains {
+		return false
+	}
+	if this.NameContains != that1.NameContains {
+		return false
+	}
+	if this.DescriptionContains != that1.DescriptionContains {
+		return false
+	}
+	if len(this.AttributesContain) != len(that1.AttributesContain) {
+		return false
+	}
+	for i := range this.AttributesContain {
+		if this.AttributesContain[i] != that1.AttributesContain[i] {
+			return false
+		}
+	}
+	if this.EUIContains != that1.EUIContains {
+		return false
+	}
+	if !this.FieldMask.Equal(&that1.FieldMask) {
+		return false
+	}
+	if this.Order != that1.Order {
+		return false
+	}
+	if this.Limit != that1.Limit {
+		return false
+	}
+	if this.Page != that1.Page {
+		return false
+	}
+	if this.Deleted != that1.Deleted {
+		return false
+	}
+	return true
+}
+func (this *SearchOrganizationsRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*SearchOrganizationsRequest)
+	if !ok {
+		that2, ok := that.(SearchOrganizationsRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.IDContains != that1.IDContains {
+		return false
+	}
+	if this.NameContains != that1.NameContains {
+		return false
+	}
+	if this.DescriptionContains != that1.DescriptionContains {
+		return false
+	}
+	if len(this.AttributesContain) != len(that1.AttributesContain) {
+		return false
+	}
+	for i := range this.AttributesContain {
+		if this.AttributesContain[i] != that1.AttributesContain[i] {
+			return false
+		}
+	}
+	if !this.FieldMask.Equal(&that1.FieldMask) {
+		return false
+	}
+	if this.Order != that1.Order {
+		return false
+	}
+	if this.Limit != that1.Limit {
+		return false
+	}
+	if this.Page != that1.Page {
+		return false
+	}
+	if this.Deleted != that1.Deleted {
+		return false
+	}
+	return true
+}
+func (this *SearchUsersRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*SearchUsersRequest)
+	if !ok {
+		that2, ok := that.(SearchUsersRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.IDContains != that1.IDContains {
+		return false
+	}
+	if this.NameContains != that1.NameContains {
+		return false
+	}
+	if this.DescriptionContains != that1.DescriptionContains {
+		return false
+	}
+	if len(this.AttributesContain) != len(that1.AttributesContain) {
+		return false
+	}
+	for i := range this.AttributesContain {
+		if this.AttributesContain[i] != that1.AttributesContain[i] {
+			return false
+		}
+	}
+	if len(this.State) != len(that1.State) {
+		return false
+	}
+	for i := range this.State {
+		if this.State[i] != that1.State[i] {
 			return false
 		}
 	}
@@ -516,19 +1278,19 @@ const _ = grpc.SupportPackageIsVersion4
 type EntityRegistrySearchClient interface {
 	// Search for applications that match the conditions specified in the request.
 	// Non-admin users will only match applications that they have rights on.
-	SearchApplications(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Applications, error)
+	SearchApplications(ctx context.Context, in *SearchApplicationsRequest, opts ...grpc.CallOption) (*Applications, error)
 	// Search for OAuth clients that match the conditions specified in the request.
 	// Non-admin users will only match OAuth clients that they have rights on.
-	SearchClients(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Clients, error)
+	SearchClients(ctx context.Context, in *SearchClientsRequest, opts ...grpc.CallOption) (*Clients, error)
 	// Search for gateways that match the conditions specified in the request.
 	// Non-admin users will only match gateways that they have rights on.
-	SearchGateways(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Gateways, error)
+	SearchGateways(ctx context.Context, in *SearchGatewaysRequest, opts ...grpc.CallOption) (*Gateways, error)
 	// Search for organizations that match the conditions specified in the request.
 	// Non-admin users will only match organizations that they have rights on.
-	SearchOrganizations(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Organizations, error)
+	SearchOrganizations(ctx context.Context, in *SearchOrganizationsRequest, opts ...grpc.CallOption) (*Organizations, error)
 	// Search for users that match the conditions specified in the request.
 	// This is only available to admin users.
-	SearchUsers(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Users, error)
+	SearchUsers(ctx context.Context, in *SearchUsersRequest, opts ...grpc.CallOption) (*Users, error)
 }
 
 type entityRegistrySearchClient struct {
@@ -539,7 +1301,7 @@ func NewEntityRegistrySearchClient(cc *grpc.ClientConn) EntityRegistrySearchClie
 	return &entityRegistrySearchClient{cc}
 }
 
-func (c *entityRegistrySearchClient) SearchApplications(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Applications, error) {
+func (c *entityRegistrySearchClient) SearchApplications(ctx context.Context, in *SearchApplicationsRequest, opts ...grpc.CallOption) (*Applications, error) {
 	out := new(Applications)
 	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.EntityRegistrySearch/SearchApplications", in, out, opts...)
 	if err != nil {
@@ -548,7 +1310,7 @@ func (c *entityRegistrySearchClient) SearchApplications(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *entityRegistrySearchClient) SearchClients(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Clients, error) {
+func (c *entityRegistrySearchClient) SearchClients(ctx context.Context, in *SearchClientsRequest, opts ...grpc.CallOption) (*Clients, error) {
 	out := new(Clients)
 	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.EntityRegistrySearch/SearchClients", in, out, opts...)
 	if err != nil {
@@ -557,7 +1319,7 @@ func (c *entityRegistrySearchClient) SearchClients(ctx context.Context, in *Sear
 	return out, nil
 }
 
-func (c *entityRegistrySearchClient) SearchGateways(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Gateways, error) {
+func (c *entityRegistrySearchClient) SearchGateways(ctx context.Context, in *SearchGatewaysRequest, opts ...grpc.CallOption) (*Gateways, error) {
 	out := new(Gateways)
 	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.EntityRegistrySearch/SearchGateways", in, out, opts...)
 	if err != nil {
@@ -566,7 +1328,7 @@ func (c *entityRegistrySearchClient) SearchGateways(ctx context.Context, in *Sea
 	return out, nil
 }
 
-func (c *entityRegistrySearchClient) SearchOrganizations(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Organizations, error) {
+func (c *entityRegistrySearchClient) SearchOrganizations(ctx context.Context, in *SearchOrganizationsRequest, opts ...grpc.CallOption) (*Organizations, error) {
 	out := new(Organizations)
 	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.EntityRegistrySearch/SearchOrganizations", in, out, opts...)
 	if err != nil {
@@ -575,7 +1337,7 @@ func (c *entityRegistrySearchClient) SearchOrganizations(ctx context.Context, in
 	return out, nil
 }
 
-func (c *entityRegistrySearchClient) SearchUsers(ctx context.Context, in *SearchEntitiesRequest, opts ...grpc.CallOption) (*Users, error) {
+func (c *entityRegistrySearchClient) SearchUsers(ctx context.Context, in *SearchUsersRequest, opts ...grpc.CallOption) (*Users, error) {
 	out := new(Users)
 	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.EntityRegistrySearch/SearchUsers", in, out, opts...)
 	if err != nil {
@@ -588,38 +1350,38 @@ func (c *entityRegistrySearchClient) SearchUsers(ctx context.Context, in *Search
 type EntityRegistrySearchServer interface {
 	// Search for applications that match the conditions specified in the request.
 	// Non-admin users will only match applications that they have rights on.
-	SearchApplications(context.Context, *SearchEntitiesRequest) (*Applications, error)
+	SearchApplications(context.Context, *SearchApplicationsRequest) (*Applications, error)
 	// Search for OAuth clients that match the conditions specified in the request.
 	// Non-admin users will only match OAuth clients that they have rights on.
-	SearchClients(context.Context, *SearchEntitiesRequest) (*Clients, error)
+	SearchClients(context.Context, *SearchClientsRequest) (*Clients, error)
 	// Search for gateways that match the conditions specified in the request.
 	// Non-admin users will only match gateways that they have rights on.
-	SearchGateways(context.Context, *SearchEntitiesRequest) (*Gateways, error)
+	SearchGateways(context.Context, *SearchGatewaysRequest) (*Gateways, error)
 	// Search for organizations that match the conditions specified in the request.
 	// Non-admin users will only match organizations that they have rights on.
-	SearchOrganizations(context.Context, *SearchEntitiesRequest) (*Organizations, error)
+	SearchOrganizations(context.Context, *SearchOrganizationsRequest) (*Organizations, error)
 	// Search for users that match the conditions specified in the request.
 	// This is only available to admin users.
-	SearchUsers(context.Context, *SearchEntitiesRequest) (*Users, error)
+	SearchUsers(context.Context, *SearchUsersRequest) (*Users, error)
 }
 
 // UnimplementedEntityRegistrySearchServer can be embedded to have forward compatible implementations.
 type UnimplementedEntityRegistrySearchServer struct {
 }
 
-func (*UnimplementedEntityRegistrySearchServer) SearchApplications(ctx context.Context, req *SearchEntitiesRequest) (*Applications, error) {
+func (*UnimplementedEntityRegistrySearchServer) SearchApplications(ctx context.Context, req *SearchApplicationsRequest) (*Applications, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchApplications not implemented")
 }
-func (*UnimplementedEntityRegistrySearchServer) SearchClients(ctx context.Context, req *SearchEntitiesRequest) (*Clients, error) {
+func (*UnimplementedEntityRegistrySearchServer) SearchClients(ctx context.Context, req *SearchClientsRequest) (*Clients, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchClients not implemented")
 }
-func (*UnimplementedEntityRegistrySearchServer) SearchGateways(ctx context.Context, req *SearchEntitiesRequest) (*Gateways, error) {
+func (*UnimplementedEntityRegistrySearchServer) SearchGateways(ctx context.Context, req *SearchGatewaysRequest) (*Gateways, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchGateways not implemented")
 }
-func (*UnimplementedEntityRegistrySearchServer) SearchOrganizations(ctx context.Context, req *SearchEntitiesRequest) (*Organizations, error) {
+func (*UnimplementedEntityRegistrySearchServer) SearchOrganizations(ctx context.Context, req *SearchOrganizationsRequest) (*Organizations, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchOrganizations not implemented")
 }
-func (*UnimplementedEntityRegistrySearchServer) SearchUsers(ctx context.Context, req *SearchEntitiesRequest) (*Users, error) {
+func (*UnimplementedEntityRegistrySearchServer) SearchUsers(ctx context.Context, req *SearchUsersRequest) (*Users, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchUsers not implemented")
 }
 
@@ -628,7 +1390,7 @@ func RegisterEntityRegistrySearchServer(s *grpc.Server, srv EntityRegistrySearch
 }
 
 func _EntityRegistrySearch_SearchApplications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SearchEntitiesRequest)
+	in := new(SearchApplicationsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -640,13 +1402,13 @@ func _EntityRegistrySearch_SearchApplications_Handler(srv interface{}, ctx conte
 		FullMethod: "/ttn.lorawan.v3.EntityRegistrySearch/SearchApplications",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EntityRegistrySearchServer).SearchApplications(ctx, req.(*SearchEntitiesRequest))
+		return srv.(EntityRegistrySearchServer).SearchApplications(ctx, req.(*SearchApplicationsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _EntityRegistrySearch_SearchClients_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SearchEntitiesRequest)
+	in := new(SearchClientsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -658,13 +1420,13 @@ func _EntityRegistrySearch_SearchClients_Handler(srv interface{}, ctx context.Co
 		FullMethod: "/ttn.lorawan.v3.EntityRegistrySearch/SearchClients",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EntityRegistrySearchServer).SearchClients(ctx, req.(*SearchEntitiesRequest))
+		return srv.(EntityRegistrySearchServer).SearchClients(ctx, req.(*SearchClientsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _EntityRegistrySearch_SearchGateways_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SearchEntitiesRequest)
+	in := new(SearchGatewaysRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -676,13 +1438,13 @@ func _EntityRegistrySearch_SearchGateways_Handler(srv interface{}, ctx context.C
 		FullMethod: "/ttn.lorawan.v3.EntityRegistrySearch/SearchGateways",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EntityRegistrySearchServer).SearchGateways(ctx, req.(*SearchEntitiesRequest))
+		return srv.(EntityRegistrySearchServer).SearchGateways(ctx, req.(*SearchGatewaysRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _EntityRegistrySearch_SearchOrganizations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SearchEntitiesRequest)
+	in := new(SearchOrganizationsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -694,13 +1456,13 @@ func _EntityRegistrySearch_SearchOrganizations_Handler(srv interface{}, ctx cont
 		FullMethod: "/ttn.lorawan.v3.EntityRegistrySearch/SearchOrganizations",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EntityRegistrySearchServer).SearchOrganizations(ctx, req.(*SearchEntitiesRequest))
+		return srv.(EntityRegistrySearchServer).SearchOrganizations(ctx, req.(*SearchOrganizationsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _EntityRegistrySearch_SearchUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SearchEntitiesRequest)
+	in := new(SearchUsersRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -712,7 +1474,7 @@ func _EntityRegistrySearch_SearchUsers_Handler(srv interface{}, ctx context.Cont
 		FullMethod: "/ttn.lorawan.v3.EntityRegistrySearch/SearchUsers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EntityRegistrySearchServer).SearchUsers(ctx, req.(*SearchEntitiesRequest))
+		return srv.(EntityRegistrySearchServer).SearchUsers(ctx, req.(*SearchUsersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -820,7 +1582,7 @@ var _EndDeviceRegistrySearch_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/search_services.proto",
 }
 
-func (m *SearchEntitiesRequest) Marshal() (dAtA []byte, err error) {
+func (m *SearchApplicationsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -830,12 +1592,12 @@ func (m *SearchEntitiesRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *SearchEntitiesRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *SearchApplicationsRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *SearchEntitiesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *SearchApplicationsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -877,6 +1639,449 @@ func (m *SearchEntitiesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x32
+	if len(m.AttributesContain) > 0 {
+		for k := range m.AttributesContain {
+			v := m.AttributesContain[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintSearchServices(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintSearchServices(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintSearchServices(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.DescriptionContains) > 0 {
+		i -= len(m.DescriptionContains)
+		copy(dAtA[i:], m.DescriptionContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.DescriptionContains)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.NameContains) > 0 {
+		i -= len(m.NameContains)
+		copy(dAtA[i:], m.NameContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.NameContains)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.IDContains) > 0 {
+		i -= len(m.IDContains)
+		copy(dAtA[i:], m.IDContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.IDContains)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *SearchClientsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SearchClientsRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SearchClientsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Deleted {
+		i--
+		if m.Deleted {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x50
+	}
+	if m.Page != 0 {
+		i = encodeVarintSearchServices(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x48
+	}
+	if m.Limit != 0 {
+		i = encodeVarintSearchServices(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x40
+	}
+	if len(m.Order) > 0 {
+		i -= len(m.Order)
+		copy(dAtA[i:], m.Order)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.Order)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintSearchServices(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x32
+	if len(m.State) > 0 {
+		dAtA4 := make([]byte, len(m.State)*10)
+		var j3 int
+		for _, num := range m.State {
+			for num >= 1<<7 {
+				dAtA4[j3] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j3++
+			}
+			dAtA4[j3] = uint8(num)
+			j3++
+		}
+		i -= j3
+		copy(dAtA[i:], dAtA4[:j3])
+		i = encodeVarintSearchServices(dAtA, i, uint64(j3))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.AttributesContain) > 0 {
+		for k := range m.AttributesContain {
+			v := m.AttributesContain[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintSearchServices(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintSearchServices(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintSearchServices(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.DescriptionContains) > 0 {
+		i -= len(m.DescriptionContains)
+		copy(dAtA[i:], m.DescriptionContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.DescriptionContains)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.NameContains) > 0 {
+		i -= len(m.NameContains)
+		copy(dAtA[i:], m.NameContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.NameContains)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.IDContains) > 0 {
+		i -= len(m.IDContains)
+		copy(dAtA[i:], m.IDContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.IDContains)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *SearchGatewaysRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SearchGatewaysRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SearchGatewaysRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Deleted {
+		i--
+		if m.Deleted {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x50
+	}
+	if m.Page != 0 {
+		i = encodeVarintSearchServices(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x48
+	}
+	if m.Limit != 0 {
+		i = encodeVarintSearchServices(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x40
+	}
+	if len(m.Order) > 0 {
+		i -= len(m.Order)
+		copy(dAtA[i:], m.Order)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.Order)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintSearchServices(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x32
+	if len(m.EUIContains) > 0 {
+		i -= len(m.EUIContains)
+		copy(dAtA[i:], m.EUIContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.EUIContains)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.AttributesContain) > 0 {
+		for k := range m.AttributesContain {
+			v := m.AttributesContain[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintSearchServices(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintSearchServices(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintSearchServices(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.DescriptionContains) > 0 {
+		i -= len(m.DescriptionContains)
+		copy(dAtA[i:], m.DescriptionContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.DescriptionContains)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.NameContains) > 0 {
+		i -= len(m.NameContains)
+		copy(dAtA[i:], m.NameContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.NameContains)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.IDContains) > 0 {
+		i -= len(m.IDContains)
+		copy(dAtA[i:], m.IDContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.IDContains)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *SearchOrganizationsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SearchOrganizationsRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SearchOrganizationsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Deleted {
+		i--
+		if m.Deleted {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x50
+	}
+	if m.Page != 0 {
+		i = encodeVarintSearchServices(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x48
+	}
+	if m.Limit != 0 {
+		i = encodeVarintSearchServices(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x40
+	}
+	if len(m.Order) > 0 {
+		i -= len(m.Order)
+		copy(dAtA[i:], m.Order)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.Order)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintSearchServices(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x32
+	if len(m.AttributesContain) > 0 {
+		for k := range m.AttributesContain {
+			v := m.AttributesContain[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintSearchServices(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintSearchServices(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintSearchServices(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.DescriptionContains) > 0 {
+		i -= len(m.DescriptionContains)
+		copy(dAtA[i:], m.DescriptionContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.DescriptionContains)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.NameContains) > 0 {
+		i -= len(m.NameContains)
+		copy(dAtA[i:], m.NameContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.NameContains)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.IDContains) > 0 {
+		i -= len(m.IDContains)
+		copy(dAtA[i:], m.IDContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.IDContains)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *SearchUsersRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SearchUsersRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SearchUsersRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Deleted {
+		i--
+		if m.Deleted {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x50
+	}
+	if m.Page != 0 {
+		i = encodeVarintSearchServices(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x48
+	}
+	if m.Limit != 0 {
+		i = encodeVarintSearchServices(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x40
+	}
+	if len(m.Order) > 0 {
+		i -= len(m.Order)
+		copy(dAtA[i:], m.Order)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.Order)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintSearchServices(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x32
+	if len(m.State) > 0 {
+		dAtA9 := make([]byte, len(m.State)*10)
+		var j8 int
+		for _, num := range m.State {
+			for num >= 1<<7 {
+				dAtA9[j8] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j8++
+			}
+			dAtA9[j8] = uint8(num)
+			j8++
+		}
+		i -= j8
+		copy(dAtA[i:], dAtA9[:j8])
+		i = encodeVarintSearchServices(dAtA, i, uint64(j8))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if len(m.AttributesContain) > 0 {
 		for k := range m.AttributesContain {
 			v := m.AttributesContain[k]
@@ -1052,8 +2257,8 @@ func encodeVarintSearchServices(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func NewPopulatedSearchEntitiesRequest(r randySearchServices, easy bool) *SearchEntitiesRequest {
-	this := &SearchEntitiesRequest{}
+func NewPopulatedSearchApplicationsRequest(r randySearchServices, easy bool) *SearchApplicationsRequest {
+	this := &SearchApplicationsRequest{}
 	this.IDContains = randStringSearchServices(r)
 	this.NameContains = randStringSearchServices(r)
 	this.DescriptionContains = randStringSearchServices(r)
@@ -1075,25 +2280,128 @@ func NewPopulatedSearchEntitiesRequest(r randySearchServices, easy bool) *Search
 	return this
 }
 
-func NewPopulatedSearchEndDevicesRequest(r randySearchServices, easy bool) *SearchEndDevicesRequest {
-	this := &SearchEndDevicesRequest{}
-	v3 := NewPopulatedApplicationIdentifiers(r, easy)
-	this.ApplicationIdentifiers = *v3
+func NewPopulatedSearchClientsRequest(r randySearchServices, easy bool) *SearchClientsRequest {
+	this := &SearchClientsRequest{}
 	this.IDContains = randStringSearchServices(r)
 	this.NameContains = randStringSearchServices(r)
 	this.DescriptionContains = randStringSearchServices(r)
 	if r.Intn(5) != 0 {
-		v4 := r.Intn(10)
+		v3 := r.Intn(10)
 		this.AttributesContain = make(map[string]string)
-		for i := 0; i < v4; i++ {
+		for i := 0; i < v3; i++ {
+			this.AttributesContain[randStringSearchServices(r)] = randStringSearchServices(r)
+		}
+	}
+	v4 := r.Intn(10)
+	this.State = make([]State, v4)
+	for i := 0; i < v4; i++ {
+		this.State[i] = State([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
+	}
+	v5 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v5
+	this.Order = randStringSearchServices(r)
+	this.Limit = r.Uint32()
+	this.Page = r.Uint32()
+	this.Deleted = bool(r.Intn(2) == 0)
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedSearchGatewaysRequest(r randySearchServices, easy bool) *SearchGatewaysRequest {
+	this := &SearchGatewaysRequest{}
+	this.IDContains = randStringSearchServices(r)
+	this.NameContains = randStringSearchServices(r)
+	this.DescriptionContains = randStringSearchServices(r)
+	if r.Intn(5) != 0 {
+		v6 := r.Intn(10)
+		this.AttributesContain = make(map[string]string)
+		for i := 0; i < v6; i++ {
+			this.AttributesContain[randStringSearchServices(r)] = randStringSearchServices(r)
+		}
+	}
+	this.EUIContains = randStringSearchServices(r)
+	v7 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v7
+	this.Order = randStringSearchServices(r)
+	this.Limit = r.Uint32()
+	this.Page = r.Uint32()
+	this.Deleted = bool(r.Intn(2) == 0)
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedSearchOrganizationsRequest(r randySearchServices, easy bool) *SearchOrganizationsRequest {
+	this := &SearchOrganizationsRequest{}
+	this.IDContains = randStringSearchServices(r)
+	this.NameContains = randStringSearchServices(r)
+	this.DescriptionContains = randStringSearchServices(r)
+	if r.Intn(5) != 0 {
+		v8 := r.Intn(10)
+		this.AttributesContain = make(map[string]string)
+		for i := 0; i < v8; i++ {
+			this.AttributesContain[randStringSearchServices(r)] = randStringSearchServices(r)
+		}
+	}
+	v9 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v9
+	this.Order = randStringSearchServices(r)
+	this.Limit = r.Uint32()
+	this.Page = r.Uint32()
+	this.Deleted = bool(r.Intn(2) == 0)
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedSearchUsersRequest(r randySearchServices, easy bool) *SearchUsersRequest {
+	this := &SearchUsersRequest{}
+	this.IDContains = randStringSearchServices(r)
+	this.NameContains = randStringSearchServices(r)
+	this.DescriptionContains = randStringSearchServices(r)
+	if r.Intn(5) != 0 {
+		v10 := r.Intn(10)
+		this.AttributesContain = make(map[string]string)
+		for i := 0; i < v10; i++ {
+			this.AttributesContain[randStringSearchServices(r)] = randStringSearchServices(r)
+		}
+	}
+	v11 := r.Intn(10)
+	this.State = make([]State, v11)
+	for i := 0; i < v11; i++ {
+		this.State[i] = State([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
+	}
+	v12 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v12
+	this.Order = randStringSearchServices(r)
+	this.Limit = r.Uint32()
+	this.Page = r.Uint32()
+	this.Deleted = bool(r.Intn(2) == 0)
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedSearchEndDevicesRequest(r randySearchServices, easy bool) *SearchEndDevicesRequest {
+	this := &SearchEndDevicesRequest{}
+	v13 := NewPopulatedApplicationIdentifiers(r, easy)
+	this.ApplicationIdentifiers = *v13
+	this.IDContains = randStringSearchServices(r)
+	this.NameContains = randStringSearchServices(r)
+	this.DescriptionContains = randStringSearchServices(r)
+	if r.Intn(5) != 0 {
+		v14 := r.Intn(10)
+		this.AttributesContain = make(map[string]string)
+		for i := 0; i < v14; i++ {
 			this.AttributesContain[randStringSearchServices(r)] = randStringSearchServices(r)
 		}
 	}
 	this.DevEUIContains = randStringSearchServices(r)
 	this.JoinEUIContains = randStringSearchServices(r)
 	this.DevAddrContains = randStringSearchServices(r)
-	v5 := types.NewPopulatedFieldMask(r, easy)
-	this.FieldMask = *v5
+	v15 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v15
 	this.Order = randStringSearchServices(r)
 	this.Limit = r.Uint32()
 	this.Page = r.Uint32()
@@ -1121,9 +2429,9 @@ func randUTF8RuneSearchServices(r randySearchServices) rune {
 	return rune(ru + 61)
 }
 func randStringSearchServices(r randySearchServices) string {
-	v6 := r.Intn(100)
-	tmps := make([]rune, v6)
-	for i := 0; i < v6; i++ {
+	v16 := r.Intn(100)
+	tmps := make([]rune, v16)
+	for i := 0; i < v16; i++ {
 		tmps[i] = randUTF8RuneSearchServices(r)
 	}
 	return string(tmps)
@@ -1145,11 +2453,11 @@ func randFieldSearchServices(dAtA []byte, r randySearchServices, fieldNumber int
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateSearchServices(dAtA, uint64(key))
-		v7 := r.Int63()
+		v17 := r.Int63()
 		if r.Intn(2) == 0 {
-			v7 *= -1
+			v17 *= -1
 		}
-		dAtA = encodeVarintPopulateSearchServices(dAtA, uint64(v7))
+		dAtA = encodeVarintPopulateSearchServices(dAtA, uint64(v17))
 	case 1:
 		dAtA = encodeVarintPopulateSearchServices(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -1174,7 +2482,7 @@ func encodeVarintPopulateSearchServices(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
-func (m *SearchEntitiesRequest) Size() (n int) {
+func (m *SearchApplicationsRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1199,6 +2507,200 @@ func (m *SearchEntitiesRequest) Size() (n int) {
 			mapEntrySize := 1 + len(k) + sovSearchServices(uint64(len(k))) + 1 + len(v) + sovSearchServices(uint64(len(v)))
 			n += mapEntrySize + 1 + sovSearchServices(uint64(mapEntrySize))
 		}
+	}
+	l = m.FieldMask.Size()
+	n += 1 + l + sovSearchServices(uint64(l))
+	l = len(m.Order)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	if m.Limit != 0 {
+		n += 1 + sovSearchServices(uint64(m.Limit))
+	}
+	if m.Page != 0 {
+		n += 1 + sovSearchServices(uint64(m.Page))
+	}
+	if m.Deleted {
+		n += 2
+	}
+	return n
+}
+
+func (m *SearchClientsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.IDContains)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	l = len(m.NameContains)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	l = len(m.DescriptionContains)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	if len(m.AttributesContain) > 0 {
+		for k, v := range m.AttributesContain {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovSearchServices(uint64(len(k))) + 1 + len(v) + sovSearchServices(uint64(len(v)))
+			n += mapEntrySize + 1 + sovSearchServices(uint64(mapEntrySize))
+		}
+	}
+	if len(m.State) > 0 {
+		l = 0
+		for _, e := range m.State {
+			l += sovSearchServices(uint64(e))
+		}
+		n += 1 + sovSearchServices(uint64(l)) + l
+	}
+	l = m.FieldMask.Size()
+	n += 1 + l + sovSearchServices(uint64(l))
+	l = len(m.Order)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	if m.Limit != 0 {
+		n += 1 + sovSearchServices(uint64(m.Limit))
+	}
+	if m.Page != 0 {
+		n += 1 + sovSearchServices(uint64(m.Page))
+	}
+	if m.Deleted {
+		n += 2
+	}
+	return n
+}
+
+func (m *SearchGatewaysRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.IDContains)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	l = len(m.NameContains)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	l = len(m.DescriptionContains)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	if len(m.AttributesContain) > 0 {
+		for k, v := range m.AttributesContain {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovSearchServices(uint64(len(k))) + 1 + len(v) + sovSearchServices(uint64(len(v)))
+			n += mapEntrySize + 1 + sovSearchServices(uint64(mapEntrySize))
+		}
+	}
+	l = len(m.EUIContains)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	l = m.FieldMask.Size()
+	n += 1 + l + sovSearchServices(uint64(l))
+	l = len(m.Order)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	if m.Limit != 0 {
+		n += 1 + sovSearchServices(uint64(m.Limit))
+	}
+	if m.Page != 0 {
+		n += 1 + sovSearchServices(uint64(m.Page))
+	}
+	if m.Deleted {
+		n += 2
+	}
+	return n
+}
+
+func (m *SearchOrganizationsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.IDContains)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	l = len(m.NameContains)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	l = len(m.DescriptionContains)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	if len(m.AttributesContain) > 0 {
+		for k, v := range m.AttributesContain {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovSearchServices(uint64(len(k))) + 1 + len(v) + sovSearchServices(uint64(len(v)))
+			n += mapEntrySize + 1 + sovSearchServices(uint64(mapEntrySize))
+		}
+	}
+	l = m.FieldMask.Size()
+	n += 1 + l + sovSearchServices(uint64(l))
+	l = len(m.Order)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	if m.Limit != 0 {
+		n += 1 + sovSearchServices(uint64(m.Limit))
+	}
+	if m.Page != 0 {
+		n += 1 + sovSearchServices(uint64(m.Page))
+	}
+	if m.Deleted {
+		n += 2
+	}
+	return n
+}
+
+func (m *SearchUsersRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.IDContains)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	l = len(m.NameContains)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	l = len(m.DescriptionContains)
+	if l > 0 {
+		n += 1 + l + sovSearchServices(uint64(l))
+	}
+	if len(m.AttributesContain) > 0 {
+		for k, v := range m.AttributesContain {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovSearchServices(uint64(len(k))) + 1 + len(v) + sovSearchServices(uint64(len(v)))
+			n += mapEntrySize + 1 + sovSearchServices(uint64(mapEntrySize))
+		}
+	}
+	if len(m.State) > 0 {
+		l = 0
+		for _, e := range m.State {
+			l += sovSearchServices(uint64(e))
+		}
+		n += 1 + sovSearchServices(uint64(l)) + l
 	}
 	l = m.FieldMask.Size()
 	n += 1 + l + sovSearchServices(uint64(l))
@@ -1279,7 +2781,7 @@ func sovSearchServices(x uint64) (n int) {
 func sozSearchServices(x uint64) (n int) {
 	return sovSearchServices((x << 1) ^ uint64((int64(x) >> 63)))
 }
-func (this *SearchEntitiesRequest) String() string {
+func (this *SearchApplicationsRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
@@ -1293,11 +2795,126 @@ func (this *SearchEntitiesRequest) String() string {
 		mapStringForAttributesContain += fmt.Sprintf("%v: %v,", k, this.AttributesContain[k])
 	}
 	mapStringForAttributesContain += "}"
-	s := strings.Join([]string{`&SearchEntitiesRequest{`,
+	s := strings.Join([]string{`&SearchApplicationsRequest{`,
 		`IDContains:` + fmt.Sprintf("%v", this.IDContains) + `,`,
 		`NameContains:` + fmt.Sprintf("%v", this.NameContains) + `,`,
 		`DescriptionContains:` + fmt.Sprintf("%v", this.DescriptionContains) + `,`,
 		`AttributesContain:` + mapStringForAttributesContain + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
+		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
+		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
+		`Deleted:` + fmt.Sprintf("%v", this.Deleted) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *SearchClientsRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	keysForAttributesContain := make([]string, 0, len(this.AttributesContain))
+	for k := range this.AttributesContain {
+		keysForAttributesContain = append(keysForAttributesContain, k)
+	}
+	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributesContain)
+	mapStringForAttributesContain := "map[string]string{"
+	for _, k := range keysForAttributesContain {
+		mapStringForAttributesContain += fmt.Sprintf("%v: %v,", k, this.AttributesContain[k])
+	}
+	mapStringForAttributesContain += "}"
+	s := strings.Join([]string{`&SearchClientsRequest{`,
+		`IDContains:` + fmt.Sprintf("%v", this.IDContains) + `,`,
+		`NameContains:` + fmt.Sprintf("%v", this.NameContains) + `,`,
+		`DescriptionContains:` + fmt.Sprintf("%v", this.DescriptionContains) + `,`,
+		`AttributesContain:` + mapStringForAttributesContain + `,`,
+		`State:` + fmt.Sprintf("%v", this.State) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
+		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
+		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
+		`Deleted:` + fmt.Sprintf("%v", this.Deleted) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *SearchGatewaysRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	keysForAttributesContain := make([]string, 0, len(this.AttributesContain))
+	for k := range this.AttributesContain {
+		keysForAttributesContain = append(keysForAttributesContain, k)
+	}
+	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributesContain)
+	mapStringForAttributesContain := "map[string]string{"
+	for _, k := range keysForAttributesContain {
+		mapStringForAttributesContain += fmt.Sprintf("%v: %v,", k, this.AttributesContain[k])
+	}
+	mapStringForAttributesContain += "}"
+	s := strings.Join([]string{`&SearchGatewaysRequest{`,
+		`IDContains:` + fmt.Sprintf("%v", this.IDContains) + `,`,
+		`NameContains:` + fmt.Sprintf("%v", this.NameContains) + `,`,
+		`DescriptionContains:` + fmt.Sprintf("%v", this.DescriptionContains) + `,`,
+		`AttributesContain:` + mapStringForAttributesContain + `,`,
+		`EUIContains:` + fmt.Sprintf("%v", this.EUIContains) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
+		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
+		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
+		`Deleted:` + fmt.Sprintf("%v", this.Deleted) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *SearchOrganizationsRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	keysForAttributesContain := make([]string, 0, len(this.AttributesContain))
+	for k := range this.AttributesContain {
+		keysForAttributesContain = append(keysForAttributesContain, k)
+	}
+	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributesContain)
+	mapStringForAttributesContain := "map[string]string{"
+	for _, k := range keysForAttributesContain {
+		mapStringForAttributesContain += fmt.Sprintf("%v: %v,", k, this.AttributesContain[k])
+	}
+	mapStringForAttributesContain += "}"
+	s := strings.Join([]string{`&SearchOrganizationsRequest{`,
+		`IDContains:` + fmt.Sprintf("%v", this.IDContains) + `,`,
+		`NameContains:` + fmt.Sprintf("%v", this.NameContains) + `,`,
+		`DescriptionContains:` + fmt.Sprintf("%v", this.DescriptionContains) + `,`,
+		`AttributesContain:` + mapStringForAttributesContain + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
+		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
+		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
+		`Deleted:` + fmt.Sprintf("%v", this.Deleted) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *SearchUsersRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	keysForAttributesContain := make([]string, 0, len(this.AttributesContain))
+	for k := range this.AttributesContain {
+		keysForAttributesContain = append(keysForAttributesContain, k)
+	}
+	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributesContain)
+	mapStringForAttributesContain := "map[string]string{"
+	for _, k := range keysForAttributesContain {
+		mapStringForAttributesContain += fmt.Sprintf("%v: %v,", k, this.AttributesContain[k])
+	}
+	mapStringForAttributesContain += "}"
+	s := strings.Join([]string{`&SearchUsersRequest{`,
+		`IDContains:` + fmt.Sprintf("%v", this.IDContains) + `,`,
+		`NameContains:` + fmt.Sprintf("%v", this.NameContains) + `,`,
+		`DescriptionContains:` + fmt.Sprintf("%v", this.DescriptionContains) + `,`,
+		`AttributesContain:` + mapStringForAttributesContain + `,`,
+		`State:` + fmt.Sprintf("%v", this.State) + `,`,
 		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
@@ -1346,7 +2963,7 @@ func valueToStringSearchServices(v interface{}) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
 }
-func (m *SearchEntitiesRequest) Unmarshal(dAtA []byte) error {
+func (m *SearchApplicationsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1369,10 +2986,10 @@ func (m *SearchEntitiesRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: SearchEntitiesRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: SearchApplicationsRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SearchEntitiesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: SearchApplicationsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1598,6 +3215,1772 @@ func (m *SearchEntitiesRequest) Unmarshal(dAtA []byte) error {
 			}
 			m.AttributesContain[mapkey] = mapvalue
 			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Order", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Order = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Limit", wireType)
+			}
+			m.Limit = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Limit |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Page", wireType)
+			}
+			m.Page = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Page |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Deleted", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Deleted = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipSearchServices(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SearchClientsRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowSearchServices
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SearchClientsRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SearchClientsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IDContains", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.IDContains = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NameContains", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NameContains = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DescriptionContains", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DescriptionContains = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AttributesContain", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AttributesContain == nil {
+				m.AttributesContain = make(map[string]string)
+			}
+			var mapkey string
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowSearchServices
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowSearchServices
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowSearchServices
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipSearchServices(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if skippy < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.AttributesContain[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 5:
+			if wireType == 0 {
+				var v State
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowSearchServices
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= State(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.State = append(m.State, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowSearchServices
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthSearchServices
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthSearchServices
+				}
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.State) == 0 {
+					m.State = make([]State, 0, elementCount)
+				}
+				for iNdEx < postIndex {
+					var v State
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowSearchServices
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= State(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.State = append(m.State, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
+			}
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Order", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Order = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Limit", wireType)
+			}
+			m.Limit = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Limit |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Page", wireType)
+			}
+			m.Page = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Page |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Deleted", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Deleted = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipSearchServices(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SearchGatewaysRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowSearchServices
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SearchGatewaysRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SearchGatewaysRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IDContains", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.IDContains = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NameContains", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NameContains = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DescriptionContains", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DescriptionContains = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AttributesContain", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AttributesContain == nil {
+				m.AttributesContain = make(map[string]string)
+			}
+			var mapkey string
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowSearchServices
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowSearchServices
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowSearchServices
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipSearchServices(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if skippy < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.AttributesContain[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EUIContains", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.EUIContains = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Order", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Order = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Limit", wireType)
+			}
+			m.Limit = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Limit |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Page", wireType)
+			}
+			m.Page = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Page |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Deleted", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Deleted = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipSearchServices(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SearchOrganizationsRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowSearchServices
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SearchOrganizationsRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SearchOrganizationsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IDContains", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.IDContains = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NameContains", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NameContains = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DescriptionContains", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DescriptionContains = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AttributesContain", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AttributesContain == nil {
+				m.AttributesContain = make(map[string]string)
+			}
+			var mapkey string
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowSearchServices
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowSearchServices
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowSearchServices
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipSearchServices(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if skippy < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.AttributesContain[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Order", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Order = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Limit", wireType)
+			}
+			m.Limit = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Limit |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Page", wireType)
+			}
+			m.Page = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Page |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Deleted", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Deleted = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipSearchServices(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SearchUsersRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowSearchServices
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SearchUsersRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SearchUsersRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IDContains", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.IDContains = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NameContains", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NameContains = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DescriptionContains", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DescriptionContains = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AttributesContain", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSearchServices
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSearchServices
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AttributesContain == nil {
+				m.AttributesContain = make(map[string]string)
+			}
+			var mapkey string
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowSearchServices
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowSearchServices
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowSearchServices
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipSearchServices(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if skippy < 0 {
+						return ErrInvalidLengthSearchServices
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.AttributesContain[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 5:
+			if wireType == 0 {
+				var v State
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowSearchServices
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= State(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.State = append(m.State, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowSearchServices
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthSearchServices
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthSearchServices
+				}
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.State) == 0 {
+					m.State = make([]State, 0, elementCount)
+				}
+				for iNdEx < postIndex {
+					var v State
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowSearchServices
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= State(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.State = append(m.State, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
+			}
 		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)

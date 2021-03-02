@@ -215,7 +215,8 @@ func unwrapLoRaWANEnumType(typeName string) string {
 	return fmt.Sprintf("ttn.lorawan.v3.%s", strings.TrimSuffix(strings.TrimPrefix(typeName, ""), "Value"))
 }
 
-func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
+// AddField adds a field to the flag set.
+func AddField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 	if maskOnly {
 		if t.Kind() == reflect.Struct && !isAtomicType(t, maskOnly) {
 			fs.Bool(name, false, fmt.Sprintf("select the %s field and all allowed sub-fields", name))
@@ -427,7 +428,7 @@ func fieldMaskFlags(prefix []string, t reflect.Type, maskOnly bool) *pflag.FlagS
 		if isStopType(t, maskOnly) {
 			continue
 		}
-		addField(flagSet, name, fieldType, maskOnly)
+		AddField(flagSet, name, fieldType, maskOnly)
 		if fieldType.Kind() == reflect.Struct && !isAtomicType(fieldType, maskOnly) {
 			flagSet.AddFlagSet(fieldMaskFlags(path, fieldType, maskOnly))
 		}
@@ -500,9 +501,7 @@ func SetFields(dst interface{}, flags *pflag.FlagSet, prefix ...string) error {
 	return nil
 }
 
-var (
-	textUnmarshalerType = reflect.TypeOf((*encoding.TextUnmarshaler)(nil)).Elem()
-)
+var textUnmarshalerType = reflect.TypeOf((*encoding.TextUnmarshaler)(nil)).Elem()
 
 func setField(rv reflect.Value, path []string, v reflect.Value) error {
 	rt := rv.Type()
