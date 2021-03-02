@@ -373,6 +373,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 						DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 							Downlinks:    invalid,
 							LastFCntDown: dev.Session.LastNFCntDown,
+							SessionKeyID: dev.Session.SessionKeyID,
 						},
 					},
 				})
@@ -518,6 +519,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 					Downlinks:    dev.Session.QueuedApplicationDownlinks,
 					LastFCntDown: pld.FullFCnt,
+					SessionKeyID: dev.Session.SessionKeyID,
 				},
 			},
 		})

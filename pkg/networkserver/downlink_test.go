@@ -700,6 +700,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 								LastFCntDown: dev.Session.LastNFCntDown,
 								Downlinks:    dev.Session.QueuedApplicationDownlinks,
+								SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 							},
 						},
 					})
