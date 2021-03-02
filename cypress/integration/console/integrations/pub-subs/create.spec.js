@@ -130,11 +130,12 @@ describe('Application Pub/Sub create', () => {
         cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
         cy.get('#uplink_message_checkbox').check()
         cy.findByLabelText('Uplink message').type(pubSub.uplinkSubTopic)
+
         cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs`,
         )
       })
     })
@@ -194,7 +195,7 @@ describe('Application Pub/Sub create', () => {
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs`,
         )
       })
     })
@@ -289,11 +290,12 @@ describe('Application Pub/Sub create', () => {
         cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
         cy.get('#uplink_message_checkbox').check()
         cy.findByLabelText('Uplink message').type(pubSub.uplinkSubTopic)
+
         cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs`,
         )
       })
     })
@@ -338,11 +340,12 @@ describe('Application Pub/Sub create', () => {
         cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
         cy.get('#uplink_message_checkbox').check()
         cy.findByLabelText('Uplink message').type(pubSub.uplinkSubTopic)
+
         cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs`,
         )
       })
     })

@@ -69,7 +69,7 @@ describe('Collaborators', () => {
     })
 
     beforeEach(() => {
-      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+      cy.loginConsole({ user_id: userId, password: user.password })
       cy.visit(
         `${Cypress.config('consoleRootPath')}/applications/${applicationId}/collaborators/add`,
       )
@@ -144,7 +144,7 @@ describe('Collaborators', () => {
     })
 
     beforeEach(() => {
-      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+      cy.loginConsole({ user_id: userId, password: user.password })
       cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/collaborators/add`)
     })
 
@@ -215,7 +215,7 @@ describe('Collaborators', () => {
     })
 
     beforeEach(() => {
-      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+      cy.loginConsole({ user_id: userId, password: user.password })
       cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${testOrgId}/collaborators/add`)
     })
 

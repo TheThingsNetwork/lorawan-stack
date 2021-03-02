@@ -74,82 +74,29 @@ const Registration = props => {
 
   return (
     <Overlay visible={fetching} loading={fetching} spinnerMessage={m.fetching}>
-      <FreqPlansSelect
-        required
-        glossaryId={glossaryId.FREQUENCY_PLAN}
-        name="frequency_plan_id"
-        bandId={band}
-      />
-      {isOTAA && (
-        <>
-          <Form.Field
-            title={lwVersion < 104 ? sharedMessages.appEUI : sharedMessages.joinEUI}
-            component={JoinEUIPRefixesInput}
-            name="ids.join_eui"
-            description={
-              lwVersion < 104 ? sharedMessages.appEUIDescription : sharedMessages.joinEUIDescription
-            }
-            prefixes={prefixes}
-            required
-            showPrefixes
-            glossaryId={lwVersion < 104 ? glossaryId.APP_EUI : glossaryId.JOIN_EUI}
-          />
-          <Form.Field
-            title={sharedMessages.devEUI}
-            name="ids.dev_eui"
-            type="byte"
-            min={8}
-            max={8}
-            description={sharedMessages.deviceEUIDescription}
-            required
-            component={Input}
-            glossaryId={glossaryId.DEV_EUI}
-            onBlur={onIdPrefill}
-          />
-          <Form.Field
-            required
-            title={sharedMessages.appKey}
-            name="root_keys.app_key.key"
-            type="byte"
-            min={16}
-            max={16}
-            description={
-              lwVersion >= 110
-                ? sharedMessages.appKeyNewDescription
-                : sharedMessages.appKeyDescription
-            }
-            component={Input.Generate}
-            disabled={!mayEditKeys}
-            mayGenerateValue={mayEditKeys}
-            onGenerateValue={generate16BytesKey}
-            glossaryId={glossaryId.APP_KEY}
-          />
-          {lwVersion >= 110 && (
+      <div data-test-id="device-registration">
+        <FreqPlansSelect
+          required
+          glossaryId={glossaryId.FREQUENCY_PLAN}
+          name="frequency_plan_id"
+          bandId={band}
+        />
+        {isOTAA && (
+          <>
             <Form.Field
+              title={lwVersion < 104 ? sharedMessages.appEUI : sharedMessages.joinEUI}
+              component={JoinEUIPRefixesInput}
+              name="ids.join_eui"
+              description={
+                lwVersion < 104
+                  ? sharedMessages.appEUIDescription
+                  : sharedMessages.joinEUIDescription
+              }
+              prefixes={prefixes}
               required
-              title={sharedMessages.nwkKey}
-              name="root_keys.nwk_key.key"
-              type="byte"
-              min={16}
-              max={16}
-              description={sharedMessages.nwkKeyDescription}
-              component={Input.Generate}
-              disabled={!mayEditKeys}
-              mayGenerateValue={mayEditKeys}
-              onGenerateValue={generate16BytesKey}
+              showPrefixes
+              glossaryId={lwVersion < 104 ? glossaryId.APP_EUI : glossaryId.JOIN_EUI}
             />
-          )}
-        </>
-      )}
-      {!isOTAA && (
-        <>
-          <DevAddrInput
-            title={sharedMessages.devAddr}
-            name="session.dev_addr"
-            description={sharedMessages.deviceAddrDescription}
-            required
-          />
-          {lwVersion === 104 && (
             <Form.Field
               title={sharedMessages.devEUI}
               name="ids.dev_eui"
@@ -160,86 +107,143 @@ const Registration = props => {
               required
               component={Input}
               glossaryId={glossaryId.DEV_EUI}
+              onBlur={onIdPrefill}
             />
-          )}
-          <Form.Field
-            required={mayEditKeys}
-            title={sharedMessages.appSKey}
-            name="session.keys.app_s_key.key"
-            type="byte"
-            min={16}
-            max={16}
-            description={sharedMessages.appSKeyDescription}
-            component={Input.Generate}
-            mayGenerateValue={mayEditKeys}
-            onGenerateValue={generate16BytesKey}
-          />
-          <Form.Field
-            mayGenerateValue
-            title={lwVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
-            name="session.keys.f_nwk_s_int_key.key"
-            type="byte"
-            min={16}
-            max={16}
-            required
-            description={
-              lwVersion >= 110
-                ? sharedMessages.fNwkSIntKeyDescription
-                : sharedMessages.nwkSKeyDescription
-            }
-            component={Input.Generate}
-            onGenerateValue={generate16BytesKey}
-            glossaryId={
-              lwVersion >= 110
-                ? glossaryId.NETWORK_SESSION_KEY
-                : glossaryId.FORWARDING_NETWORK_SESSION_INTEGRITY_KEY
-            }
-          />
-          {lwVersion >= 110 && (
+            <Form.Field
+              required
+              title={sharedMessages.appKey}
+              name="root_keys.app_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              description={
+                lwVersion >= 110
+                  ? sharedMessages.appKeyNewDescription
+                  : sharedMessages.appKeyDescription
+              }
+              component={Input.Generate}
+              disabled={!mayEditKeys}
+              mayGenerateValue={mayEditKeys}
+              onGenerateValue={generate16BytesKey}
+              glossaryId={glossaryId.APP_KEY}
+            />
+            {lwVersion >= 110 && (
+              <Form.Field
+                required
+                title={sharedMessages.nwkKey}
+                name="root_keys.nwk_key.key"
+                type="byte"
+                min={16}
+                max={16}
+                description={sharedMessages.nwkKeyDescription}
+                component={Input.Generate}
+                disabled={!mayEditKeys}
+                mayGenerateValue={mayEditKeys}
+                onGenerateValue={generate16BytesKey}
+              />
+            )}
+          </>
+        )}
+        {!isOTAA && (
+          <>
+            <DevAddrInput
+              title={sharedMessages.devAddr}
+              name="session.dev_addr"
+              description={sharedMessages.deviceAddrDescription}
+              required
+            />
+            {lwVersion === 104 && (
+              <Form.Field
+                title={sharedMessages.devEUI}
+                name="ids.dev_eui"
+                type="byte"
+                min={8}
+                max={8}
+                description={sharedMessages.deviceEUIDescription}
+                required
+                component={Input}
+                glossaryId={glossaryId.DEV_EUI}
+              />
+            )}
+            <Form.Field
+              required={mayEditKeys}
+              title={sharedMessages.appSKey}
+              name="session.keys.app_s_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              description={sharedMessages.appSKeyDescription}
+              component={Input.Generate}
+              mayGenerateValue={mayEditKeys}
+              onGenerateValue={generate16BytesKey}
+            />
             <Form.Field
               mayGenerateValue
-              title={sharedMessages.sNwkSIKey}
-              name="session.keys.s_nwk_s_int_key.key"
+              title={lwVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
+              name="session.keys.f_nwk_s_int_key.key"
               type="byte"
               min={16}
               max={16}
               required
-              description={sharedMessages.sNwkSIKeyDescription}
+              description={
+                lwVersion >= 110
+                  ? sharedMessages.fNwkSIntKeyDescription
+                  : sharedMessages.nwkSKeyDescription
+              }
               component={Input.Generate}
               onGenerateValue={generate16BytesKey}
-              glossaryId={glossaryId.SERVING_NETWORK_SESSION_INTEGRITY_KEY}
+              glossaryId={
+                lwVersion >= 110
+                  ? glossaryId.NETWORK_SESSION_KEY
+                  : glossaryId.FORWARDING_NETWORK_SESSION_INTEGRITY_KEY
+              }
             />
-          )}
-          {lwVersion >= 110 && (
-            <Form.Field
-              mayGenerateValue
-              title={sharedMessages.nwkSEncKey}
-              name="session.keys.nwk_s_enc_key.key"
-              type="byte"
-              min={16}
-              max={16}
-              required
-              description={sharedMessages.nwkSEncKeyDescription}
-              component={Input.Generate}
-              onGenerateValue={generate16BytesKey}
-              glossaryId={glossaryId.NETWORK_SESSION_ENCRYPTION_KEY}
-            />
-          )}
-        </>
-      )}
-      <Form.Field
-        required
-        title={sharedMessages.devID}
-        name="ids.device_id"
-        placeholder={sharedMessages.deviceIdPlaceholder}
-        component={Input}
-        onFocus={handleIdFocus}
-        inputRef={idInputRef}
-      />
-      <Form.Field title={m.afterRegistration} name="_registration" component={Radio.Group}>
-        <Radio label={m.singleRegistration} value={REGISTRATION_TYPES.SINGLE} />
-        <Radio label={m.multipleRegistration} value={REGISTRATION_TYPES.MULTIPLE} />
-      </Form.Field>
+            {lwVersion >= 110 && (
+              <Form.Field
+                mayGenerateValue
+                title={sharedMessages.sNwkSIKey}
+                name="session.keys.s_nwk_s_int_key.key"
+                type="byte"
+                min={16}
+                max={16}
+                required
+                description={sharedMessages.sNwkSIKeyDescription}
+                component={Input.Generate}
+                onGenerateValue={generate16BytesKey}
+                glossaryId={glossaryId.SERVING_NETWORK_SESSION_INTEGRITY_KEY}
+              />
+            )}
+            {lwVersion >= 110 && (
+              <Form.Field
+                mayGenerateValue
+                title={sharedMessages.nwkSEncKey}
+                name="session.keys.nwk_s_enc_key.key"
+                type="byte"
+                min={16}
+                max={16}
+                required
+                description={sharedMessages.nwkSEncKeyDescription}
+                component={Input.Generate}
+                onGenerateValue={generate16BytesKey}
+                glossaryId={glossaryId.NETWORK_SESSION_ENCRYPTION_KEY}
+              />
+            )}
+          </>
+        )}
+        <Form.Field
+          required
+          title={sharedMessages.devID}
+          name="ids.device_id"
+          placeholder={sharedMessages.deviceIdPlaceholder}
+          component={Input}
+          onFocus={handleIdFocus}
+          inputRef={idInputRef}
+        />
+        <Form.Field title={m.afterRegistration} name="_registration" component={Radio.Group}>
+          <Radio label={m.singleRegistration} value={REGISTRATION_TYPES.SINGLE} />
+          <Radio label={m.multipleRegistration} value={REGISTRATION_TYPES.MULTIPLE} />
+        </Form.Field>
+      </div>
     </Overlay>
   )
 }

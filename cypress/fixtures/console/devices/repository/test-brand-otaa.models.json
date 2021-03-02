@@ -1,0 +1,92 @@
+{
+  "models": [
+    {
+      "brand_id": "test-brand-otaa",
+      "model_id": "test-model1",
+      "name": "Incomplete OTAA model",
+      "description": "This model is missing `supported_hardware_versions` entry. It should not be possible to register an end device based on this model.",
+      "hardware_versions": [{ "version": "1.0" }],
+      "firmware_versions": [
+        {
+          "version": "1.0",
+          "profiles": {
+            "EU_863_870": {
+              "profile_id": "test-brand-otaa-model1-868",
+              "lorawan_certified": true,
+              "codec_id": "test-brand-otaa-model1-codec"
+            },
+            "US_902_928": {
+              "profile_id": "test-brand-otaa-model1-915",
+              "lorawan_certified": true,
+              "codec_id": "test-brand-otaa-model1-codec"
+            }
+          }
+        }
+      ],
+      "key_provisioning": ["custom"]
+    },
+    {
+      "brand_id": "test-brand-otaa",
+      "model_id": "test-model2",
+      "name": "Test brand OTAA model 2",
+      "description": "This model has only a single value for each version entry (`hardware_version`, `firmware_version` and `profile`). It should be possible to register an end device based on this model.",
+      "hardware_versions": [{ "version": "1.0" }],
+      "firmware_versions": [
+        {
+          "version": "1.0",
+          "supported_hardware_versions": ["1.0"],
+          "profiles": {
+            "EU_863_870": {
+              "profile_id": "test-brand-otaa-model2-868",
+              "lorawan_certified": true,
+              "codec_id": "test-brand-otaa-model2-codec"
+            }
+          }
+        }
+      ],
+      "key_provisioning": ["custom"]
+    },
+    {
+      "brand_id": "test-brand-otaa",
+      "model_id": "test-model3",
+      "name": "Test brand OTAA device",
+      "description": "This model has several values for region, hardware and firmware versions. It should not be possible to register an end device based on this model.",
+      "hardware_versions": [{ "version": "1.0" }, { "version": "2.0" }, { "version": "3.0" }],
+      "firmware_versions": [
+        {
+          "version": "1.0",
+          "supported_hardware_versions": ["1.0"],
+          "profiles": {
+            "EU_863_870": {
+              "profile_id": "test-brand-otaa-model3-868",
+              "lorawan_certified": true,
+              "codec_id": "test-brand-otaa-model3-codec"
+            },
+            "US_902_928": {
+              "profile_id": "test-brand-otaa-model3-928",
+              "lorawan_certified": true,
+              "codec_id": "test-brand-otaa-model3-codec"
+            }
+          }
+        },
+        {
+          "version": "1.0.1",
+          "supported_hardware_versions": ["2.0", "3.0"],
+          "profiles": {
+            "EU_863_870": {
+              "profile_id": "test-brand-otaa-model3-868",
+              "lorawan_certified": true,
+              "codec_id": "test-brand-otaa-model3-codec"
+            },
+            "US_902_928": {
+              "profile_id": "test-brand-otaa-model3-928",
+              "lorawan_certified": true,
+              "codec_id": "test-brand-otaa-model3-codec"
+            }
+          }
+        }
+      ],
+      "key_provisioning": ["custom"]
+    }
+  ]
+}
