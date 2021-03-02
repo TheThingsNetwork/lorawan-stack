@@ -2312,6 +2312,48 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 	return nil
 }
 
+func (dst *FrequencyValue) SetFields(src *FrequencyValue, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				var zero uint64
+				dst.Value = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *DataRateOffsetValue) SetFields(src *DataRateOffsetValue, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				var zero uint32
+				dst.Value = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *DataRateIndexValue) SetFields(src *DataRateIndexValue, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

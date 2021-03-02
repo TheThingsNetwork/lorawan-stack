@@ -768,6 +768,12 @@ enum Minor {
   MINOR_RFU_15 = 15;
 }
 
+message FrequencyValue {
+  uint64 value = 1 [(validate.rules).uint64.gte = 100000];
+}
+message DataRateOffsetValue {
+  uint32 value = 1 [(validate.rules).uint32.lte = 7];
+}
 message DataRateIndexValue {
   DataRateIndex value = 1 [(validate.rules).enum.defined_only = true];
 }

@@ -165,6 +165,87 @@ var _ interface {
 	ErrorName() string
 } = SessionValidationError{}
 
+// ValidateFields checks the field values on BoolValue with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *BoolValue) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BoolValueFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+			// no validation rules for Value
+		default:
+			return BoolValueValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BoolValueValidationError is the validation error returned by
+// BoolValue.ValidateFields if the designated constraints aren't met.
+type BoolValueValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BoolValueValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BoolValueValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BoolValueValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BoolValueValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BoolValueValidationError) ErrorName() string { return "BoolValueValidationError" }
+
+// Error satisfies the builtin error interface
+func (e BoolValueValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBoolValue.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BoolValueValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BoolValueValidationError{}
+
 // ValidateFields checks the field values on MACParameters with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -805,28 +886,26 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 
 		case "ping_slot_frequency":
 
-			if wrapper := m.GetPingSlotFrequency(); wrapper != nil {
-
-				if wrapper.GetValue() < 100000 {
+			if v, ok := interface{}(m.GetPingSlotFrequency()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
 						field:  "ping_slot_frequency",
-						reason: "value must be greater than or equal to 100000",
+						reason: "embedded message failed validation",
+						cause:  err,
 					}
 				}
-
 			}
 
 		case "beacon_frequency":
 
-			if wrapper := m.GetBeaconFrequency(); wrapper != nil {
-
-				if wrapper.GetValue() < 100000 {
+			if v, ok := interface{}(m.GetBeaconFrequency()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
 						field:  "beacon_frequency",
-						reason: "value must be greater than or equal to 100000",
+						reason: "embedded message failed validation",
+						cause:  err,
 					}
 				}
-
 			}
 
 		case "class_c_timeout":
@@ -855,15 +934,14 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 
 		case "rx1_data_rate_offset":
 
-			if wrapper := m.GetRx1DataRateOffset(); wrapper != nil {
-
-				if wrapper.GetValue() > 7 {
+			if v, ok := interface{}(m.GetRx1DataRateOffset()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
 						field:  "rx1_data_rate_offset",
-						reason: "value must be less than or equal to 7",
+						reason: "embedded message failed validation",
+						cause:  err,
 					}
 				}
-
 			}
 
 		case "rx2_data_rate_index":
@@ -880,15 +958,14 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 
 		case "rx2_frequency":
 
-			if wrapper := m.GetRx2Frequency(); wrapper != nil {
-
-				if wrapper.GetValue() < 100000 {
+			if v, ok := interface{}(m.GetRx2Frequency()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
 						field:  "rx2_frequency",
-						reason: "value must be greater than or equal to 100000",
+						reason: "embedded message failed validation",
+						cause:  err,
 					}
 				}
-
 			}
 
 		case "factory_preset_frequencies":
@@ -1022,15 +1099,14 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 
 		case "desired_rx2_frequency":
 
-			if wrapper := m.GetDesiredRx2Frequency(); wrapper != nil {
-
-				if wrapper.GetValue() < 100000 {
+			if v, ok := interface{}(m.GetDesiredRx2Frequency()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
 						field:  "desired_rx2_frequency",
-						reason: "value must be greater than or equal to 100000",
+						reason: "embedded message failed validation",
+						cause:  err,
 					}
 				}
-
 			}
 
 		case "desired_max_duty_cycle":
@@ -1083,28 +1159,26 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 
 		case "desired_ping_slot_frequency":
 
-			if wrapper := m.GetDesiredPingSlotFrequency(); wrapper != nil {
-
-				if wrapper.GetValue() < 100000 {
+			if v, ok := interface{}(m.GetDesiredPingSlotFrequency()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
 						field:  "desired_ping_slot_frequency",
-						reason: "value must be greater than or equal to 100000",
+						reason: "embedded message failed validation",
+						cause:  err,
 					}
 				}
-
 			}
 
 		case "desired_beacon_frequency":
 
-			if wrapper := m.GetDesiredBeaconFrequency(); wrapper != nil {
-
-				if wrapper.GetValue() < 100000 {
+			if v, ok := interface{}(m.GetDesiredBeaconFrequency()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
 						field:  "desired_beacon_frequency",
-						reason: "value must be greater than or equal to 100000",
+						reason: "embedded message failed validation",
+						cause:  err,
 					}
 				}
-
 			}
 
 		default:

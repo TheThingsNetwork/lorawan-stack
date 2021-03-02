@@ -167,6 +167,7 @@
   - [Enum `KeySecurity`](#ttn.lorawan.v3.KeySecurity)
   - [Service `DeviceRepository`](#ttn.lorawan.v3.DeviceRepository)
 - [File `lorawan-stack/api/end_device.proto`](#lorawan-stack/api/end_device.proto)
+  - [Message `BoolValue`](#ttn.lorawan.v3.BoolValue)
   - [Message `ConvertEndDeviceTemplateRequest`](#ttn.lorawan.v3.ConvertEndDeviceTemplateRequest)
   - [Message `CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest)
   - [Message `EndDevice`](#ttn.lorawan.v3.EndDevice)
@@ -323,10 +324,12 @@
   - [Message `DLSettings`](#ttn.lorawan.v3.DLSettings)
   - [Message `DataRate`](#ttn.lorawan.v3.DataRate)
   - [Message `DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue)
+  - [Message `DataRateOffsetValue`](#ttn.lorawan.v3.DataRateOffsetValue)
   - [Message `DownlinkPath`](#ttn.lorawan.v3.DownlinkPath)
   - [Message `FCtrl`](#ttn.lorawan.v3.FCtrl)
   - [Message `FHDR`](#ttn.lorawan.v3.FHDR)
   - [Message `FSKDataRate`](#ttn.lorawan.v3.FSKDataRate)
+  - [Message `FrequencyValue`](#ttn.lorawan.v3.FrequencyValue)
   - [Message `GatewayAntennaIdentifiers`](#ttn.lorawan.v3.GatewayAntennaIdentifiers)
   - [Message `JoinAcceptPayload`](#ttn.lorawan.v3.JoinAcceptPayload)
   - [Message `JoinRequestPayload`](#ttn.lorawan.v3.JoinRequestPayload)
@@ -2591,6 +2594,12 @@ and allows clients to claim end devices.
 
 ## <a name="lorawan-stack/api/end_device.proto">File `lorawan-stack/api/end_device.proto`</a>
 
+### <a name="ttn.lorawan.v3.BoolValue">Message `BoolValue`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `value` | [`bool`](#bool) |  |  |
+
 ### <a name="ttn.lorawan.v3.ConvertEndDeviceTemplateRequest">Message `ConvertEndDeviceTemplateRequest`</a>
 
 | Field | Type | Label | Description |
@@ -2898,8 +2907,8 @@ This is used internally by the Network Server.
 | `ping_slot_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | Data rate index of the class B ping slot. This field is deprecated, use ping_slot_data_rate_index_value instead. |
 | `beacon_frequency` | [`uint64`](#uint64) |  | Frequency of the class B beacon (Hz). |
 | `channels` | [`MACParameters.Channel`](#ttn.lorawan.v3.MACParameters.Channel) | repeated | Configured uplink channels and optionally Rx1 frequency. |
-| `uplink_dwell_time` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Whether uplink dwell time is set (400ms). If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it). |
-| `downlink_dwell_time` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Whether downlink dwell time is set (400ms). If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it). |
+| `uplink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether uplink dwell time is set (400ms). If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it). |
+| `downlink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether downlink dwell time is set (400ms). If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it). |
 | `adr_ack_limit_exponent` | [`ADRAckLimitExponentValue`](#ttn.lorawan.v3.ADRAckLimitExponentValue) |  | ADR: number of messages to wait before setting ADRAckReq. |
 | `adr_ack_delay_exponent` | [`ADRAckDelayExponentValue`](#ttn.lorawan.v3.ADRAckDelayExponentValue) |  | ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate. |
 | `ping_slot_data_rate_index_value` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | Data rate index of the class B ping slot. |
@@ -2948,44 +2957,37 @@ This is used internally by the Network Server.
 | `class_b_timeout` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Maximum delay for the device to answer a MAC request or a confirmed downlink frame. If unset, the default value from Network Server configuration will be used. |
 | `ping_slot_periodicity` | [`PingSlotPeriodValue`](#ttn.lorawan.v3.PingSlotPeriodValue) |  | Periodicity of the class B ping slot. If unset, the default value from Network Server configuration will be used. |
 | `ping_slot_data_rate_index` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | Data rate index of the class B ping slot. If unset, the default value from Network Server configuration will be used. |
-| `ping_slot_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | Frequency of the class B ping slot (Hz). If unset, the default value from Network Server configuration will be used. |
-| `beacon_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | Frequency of the class B beacon (Hz). If unset, the default value from Network Server configuration will be used. |
+| `ping_slot_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | Frequency of the class B ping slot (Hz). If unset, the default value from Network Server configuration will be used. |
+| `beacon_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | Frequency of the class B beacon (Hz). If unset, the default value from Network Server configuration will be used. |
 | `class_c_timeout` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Maximum delay for the device to answer a MAC request or a confirmed downlink frame. If unset, the default value from Network Server configuration will be used. |
 | `rx1_delay` | [`RxDelayValue`](#ttn.lorawan.v3.RxDelayValue) |  | Class A Rx1 delay. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
-| `rx1_data_rate_offset` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Rx1 data rate offset. If unset, the default value from Network Server configuration will be used. |
+| `rx1_data_rate_offset` | [`DataRateOffsetValue`](#ttn.lorawan.v3.DataRateOffsetValue) |  | Rx1 data rate offset. If unset, the default value from Network Server configuration will be used. |
 | `rx2_data_rate_index` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | Data rate index for Rx2. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
-| `rx2_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | Frequency for Rx2 (Hz). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| `rx2_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | Frequency for Rx2 (Hz). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `factory_preset_frequencies` | [`uint64`](#uint64) | repeated | List of factory-preset frequencies. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `max_duty_cycle` | [`AggregatedDutyCycleValue`](#ttn.lorawan.v3.AggregatedDutyCycleValue) |  | Maximum uplink duty cycle (of all channels). |
-| `supports_32_bit_f_cnt` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Whether the device supports 32-bit frame counters. If unset, the default value from Network Server configuration will be used. |
-| `use_adr` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Whether the Network Server should use ADR for the device. If unset, the default value from Network Server configuration will be used. |
+| `supports_32_bit_f_cnt` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether the device supports 32-bit frame counters. If unset, the default value from Network Server configuration will be used. |
+| `use_adr` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether the Network Server should use ADR for the device. If unset, the default value from Network Server configuration will be used. |
 | `adr_margin` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | The ADR margin tells the network server how much margin it should add in ADR requests. A bigger margin is less efficient, but gives a better chance of successful reception. If unset, the default value from Network Server configuration will be used. |
-| `resets_f_cnt` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Whether the device resets the frame counters (not LoRaWAN compliant). If unset, the default value from Network Server configuration will be used. |
+| `resets_f_cnt` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether the device resets the frame counters (not LoRaWAN compliant). If unset, the default value from Network Server configuration will be used. |
 | `status_time_periodicity` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | The interval after which a DevStatusReq MACCommand shall be sent. If unset, the default value from Network Server configuration will be used. |
 | `status_count_periodicity` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Number of uplink messages after which a DevStatusReq MACCommand shall be sent. If unset, the default value from Network Server configuration will be used. |
 | `desired_rx1_delay` | [`RxDelayValue`](#ttn.lorawan.v3.RxDelayValue) |  | The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
-| `desired_rx1_data_rate_offset` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from Network Server configuration will be used. |
+| `desired_rx1_data_rate_offset` | [`DataRateOffsetValue`](#ttn.lorawan.v3.DataRateOffsetValue) |  | The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from Network Server configuration will be used. |
 | `desired_rx2_data_rate_index` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
-| `desired_rx2_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | The Rx2 frequency index Network Server should configure device to use via MAC commands. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
+| `desired_rx2_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | The Rx2 frequency index Network Server should configure device to use via MAC commands. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
 | `desired_max_duty_cycle` | [`AggregatedDutyCycleValue`](#ttn.lorawan.v3.AggregatedDutyCycleValue) |  | The maximum uplink duty cycle (of all channels) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
 | `desired_adr_ack_limit_exponent` | [`ADRAckLimitExponentValue`](#ttn.lorawan.v3.ADRAckLimitExponentValue) |  | The ADR ACK limit Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `desired_adr_ack_delay_exponent` | [`ADRAckDelayExponentValue`](#ttn.lorawan.v3.ADRAckDelayExponentValue) |  | The ADR ACK delay Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `desired_ping_slot_data_rate_index` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | The data rate index of the class B ping slot Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
-| `desired_ping_slot_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
-| `desired_beacon_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
+| `desired_ping_slot_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| `desired_beacon_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
-| `ping_slot_frequency` | <p>`uint64.gte`: `100000`</p> |
-| `beacon_frequency` | <p>`uint64.gte`: `100000`</p> |
-| `rx1_data_rate_offset` | <p>`uint32.lte`: `7`</p> |
-| `rx2_frequency` | <p>`uint64.gte`: `100000`</p> |
 | `factory_preset_frequencies` | <p>`repeated.max_items`: `96`</p> |
-| `desired_rx2_frequency` | <p>`uint64.gte`: `100000`</p> |
-| `desired_ping_slot_frequency` | <p>`uint64.gte`: `100000`</p> |
-| `desired_beacon_frequency` | <p>`uint64.gte`: `100000`</p> |
 
 ### <a name="ttn.lorawan.v3.MACState">Message `MACState`</a>
 
@@ -4637,6 +4639,18 @@ Only the components for which the keys were meant, will have the key-encryption-
 | ----- | ----------- |
 | `value` | <p>`enum.defined_only`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.DataRateOffsetValue">Message `DataRateOffsetValue`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `value` | [`uint32`](#uint32) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `value` | <p>`uint32.lte`: `7`</p> |
+
 ### <a name="ttn.lorawan.v3.DownlinkPath">Message `DownlinkPath`</a>
 
 | Field | Type | Label | Description |
@@ -4676,6 +4690,18 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `bit_rate` | [`uint32`](#uint32) |  | Bit rate (bps). |
+
+### <a name="ttn.lorawan.v3.FrequencyValue">Message `FrequencyValue`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `value` | [`uint64`](#uint64) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `value` | <p>`uint64.gte`: `100000`</p> |
 
 ### <a name="ttn.lorawan.v3.GatewayAntennaIdentifiers">Message `GatewayAntennaIdentifiers`</a>
 

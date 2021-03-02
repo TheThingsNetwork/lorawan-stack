@@ -2637,6 +2637,184 @@ var _MACCommand_CID_NotInLookup = map[MACCommandIdentifier]struct{}{
 	0: {},
 }
 
+// ValidateFields checks the field values on FrequencyValue with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *FrequencyValue) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = FrequencyValueFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+
+			if m.GetValue() < 100000 {
+				return FrequencyValueValidationError{
+					field:  "value",
+					reason: "value must be greater than or equal to 100000",
+				}
+			}
+
+		default:
+			return FrequencyValueValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// FrequencyValueValidationError is the validation error returned by
+// FrequencyValue.ValidateFields if the designated constraints aren't met.
+type FrequencyValueValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FrequencyValueValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FrequencyValueValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FrequencyValueValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FrequencyValueValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FrequencyValueValidationError) ErrorName() string { return "FrequencyValueValidationError" }
+
+// Error satisfies the builtin error interface
+func (e FrequencyValueValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFrequencyValue.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FrequencyValueValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FrequencyValueValidationError{}
+
+// ValidateFields checks the field values on DataRateOffsetValue with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DataRateOffsetValue) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = DataRateOffsetValueFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+
+			if m.GetValue() > 7 {
+				return DataRateOffsetValueValidationError{
+					field:  "value",
+					reason: "value must be less than or equal to 7",
+				}
+			}
+
+		default:
+			return DataRateOffsetValueValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// DataRateOffsetValueValidationError is the validation error returned by
+// DataRateOffsetValue.ValidateFields if the designated constraints aren't met.
+type DataRateOffsetValueValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DataRateOffsetValueValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DataRateOffsetValueValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DataRateOffsetValueValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DataRateOffsetValueValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DataRateOffsetValueValidationError) ErrorName() string {
+	return "DataRateOffsetValueValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DataRateOffsetValueValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDataRateOffsetValue.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DataRateOffsetValueValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DataRateOffsetValueValidationError{}
+
 // ValidateFields checks the field values on DataRateIndexValue with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

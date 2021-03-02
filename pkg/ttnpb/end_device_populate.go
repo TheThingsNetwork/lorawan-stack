@@ -66,10 +66,10 @@ func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 	out := &MACParameters{}
 	out.MaxEIRP = r.Float32()
 	if r.Intn(2) == 0 {
-		out.UplinkDwellTime = pbtypes.NewPopulatedBoolValue(r, easy)
+		out.UplinkDwellTime = &BoolValue{Value: r.Uint32()%2 == 0}
 	}
 	if r.Intn(2) == 0 {
-		out.DownlinkDwellTime = pbtypes.NewPopulatedBoolValue(r, easy)
+		out.DownlinkDwellTime = &BoolValue{Value: r.Uint32()%2 == 0}
 	}
 	out.ADRDataRateIndex = NewPopulatedDataRateIndex(r, easy)
 	out.ADRTxPowerIndex = r.Uint32() % 16
