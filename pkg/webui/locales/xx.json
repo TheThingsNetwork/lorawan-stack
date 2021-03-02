@@ -144,6 +144,8 @@
   "console.components.events.messages.rawEvent": "Xxx xxxxx",
   "console.components.events.messages.errorOverviewEntry": "Xxxxx xxx xx xxxxx xxx xxx xxxxx xxxxxx xx xxxxxxxxx. Xxx xxx xxxxx xxx xx xxxxxx xx xxxxxxxx xxxx xxx.",
   "console.components.events.messages.dataPreview": "Xxxx xxxxxxx",
+  "console.components.events.messages.dataFormats": "Xxxx Xxxxxxx",
+  "console.components.events.messages.dataFormatsInformation": "Xxx xxxx xxxxxxxxxxx xx xxxxx xxxxxxx xxxxx, xxxxxx xxx xxx {dataFormatsDocumentationLink} xxxxxxxxxxxxx.",
   "console.components.events.messages.seeAllActivity": "Xxx xxx xxxxxxxx",
   "console.components.events.messages.syntheticEvent": "Xxxx: Xxxx xxxx xxxxx xxx xxx xxxxxxxxx xxxx xxx xxxxxxx xxx xxx xxxxxxxxx xxxxxxxxxxxxx xx xxx Xxxxxxx. Xx xx xxx xxxxxxx xx xxx xxx xxxxxx xx xxxxxxx xxxxxxxx.",
   "console.components.events.messages.eventsTruncated": "Xxx xxxxxx xxxx xxxx xxxxxxxxx xx xxxx xxxxxx. Xxx xxxxxxx xxxxx xxxxx xxx xxxxxx xx {limit}.",
