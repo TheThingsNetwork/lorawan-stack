@@ -46,18 +46,20 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		}
 	}
 
-	type popFuncReq struct {
-		Context                context.Context
-		ApplicationIdentifiers ttnpb.ApplicationIdentifiers
-		Func                   ApplicationUplinkQueueRangeFunc
-		Response               chan<- TaskPopFuncResponse
-	}
-	pop := func(ctx context.Context, reqCh chan<- popFuncReq, errCh chan<- error) bool {
-		t := test.MustTFromContext(ctx)
+	assertDrainApplication := func(ctx context.Context, withError bool, expected ...*ttnpb.ApplicationUp) bool {
+		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
 
+		type popFuncReq struct {
+			Context                context.Context
+			ApplicationIdentifiers ttnpb.ApplicationIdentifiers
+			Func                   ApplicationUplinkQueueDrainFunc
+			Response               chan<- TaskPopFuncResponse
+		}
+		reqCh := make(chan popFuncReq, 1)
+		errCh := make(chan error, 1)
 		go func() {
-			errCh <- q.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueRangeFunc) (time.Time, error) {
+			errCh <- q.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueDrainFunc) (time.Time, error) {
 				respCh := make(chan TaskPopFuncResponse, 1)
 				reqCh <- popFuncReq{
 					Context:                ctx,
@@ -69,22 +71,17 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 				return resp.Time, resp.Error
 			})
 		}()
-		return true
-	}
-	assertPopUplinks := func(ctx context.Context, popReqCh <-chan popFuncReq, popErrCh <-chan error, expected ...*ttnpb.ApplicationUp) bool {
-		t, a := test.MustNewTFromContext(ctx)
-		t.Helper()
 
 		select {
 		case <-ctx.Done():
 			t.Error("Timed out while waiting for Pop callback to be called")
 			return false
 
-		case err := <-popErrCh:
+		case err := <-errCh:
 			t.Errorf("Received unexpected Pop error: %v", err)
 			return false
 
-		case req := <-popReqCh:
+		case req := <-reqCh:
 			if !test.AllTrue(
 				a.So(req.Context, should.HaveParentContextOrEqual, ctx),
 				a.So(req.ApplicationIdentifiers, should.Resemble, expected[0].ApplicationIdentifiers),
@@ -92,20 +89,25 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 				t.Error("Pop callback assertion failed")
 				return false
 			}
-			var called bool
-			ok, err := req.Func(len(expected)+1, func(ups ...*ttnpb.ApplicationUp) error {
-				a.So(called, should.BeFalse)
-				a.So(ups, should.Resemble, expected)
-				called = true
+
+			if withError {
+				if !a.So(req.Func(2, func(ups ...*ttnpb.ApplicationUp) error {
+					a.So(ups, should.NotBeEmpty)
+					return test.ErrInternal
+				}), should.HaveSameErrorDefinitionAs, test.ErrInternal) {
+					return false
+				}
+			}
+
+			var collected []*ttnpb.ApplicationUp
+			if !a.So(req.Func(2, func(ups ...*ttnpb.ApplicationUp) error {
+				a.So(ups, should.NotBeEmpty)
+				collected = append(collected, ups...)
 				return nil
-			})
-			if !test.AllTrue(
-				a.So(called, should.BeTrue),
-				a.So(ok, should.BeTrue),
-				a.So(err, should.BeNil),
-			) {
+			}), should.BeNil) {
 				return false
 			}
+			a.So(collected, should.Resemble, expected)
 			close(req.Response)
 
 			select {
@@ -113,7 +115,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 				t.Error("Timed out while waiting for Pop to return")
 				return false
 
-			case err := <-popErrCh:
+			case err := <-errCh:
 				return a.So(err, should.BeNil)
 			}
 		}
@@ -126,15 +128,16 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 	appID2 := ttnpb.ApplicationIdentifiers{
 		ApplicationID: "application-uplink-queue-app-2",
 	}
-	pbs := [...]*ttnpb.ApplicationUp{
+
+	invalidations := [...]*ttnpb.ApplicationUp{
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
-				DeviceID:               "test-dev",
+				DeviceID:               "test-dev2",
 			},
-			CorrelationIDs: []string{"correlation-id-1", "correlation-id-2"},
-			Up: &ttnpb.ApplicationUp_DownlinkFailed{
-				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{},
+			CorrelationIDs: []string{"invalidations[0]"},
+			Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+				DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{},
 			},
 		},
 		{
@@ -142,27 +145,41 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 				ApplicationIdentifiers: appID1,
 				DeviceID:               "test-dev2",
 			},
-			CorrelationIDs: []string{"correlation-id-3", "correlation-id-4"},
-			Up: &ttnpb.ApplicationUp_LocationSolved{
-				LocationSolved: &ttnpb.ApplicationLocation{},
+			CorrelationIDs: []string{"invalidations[1]"},
+			Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+				DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{},
 			},
 		},
+	}
+	joinAccepts := [...]*ttnpb.ApplicationUp{
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: appID2,
+				ApplicationIdentifiers: appID1,
 				DeviceID:               "test-dev",
 			},
-			CorrelationIDs: []string{"correlation-id-5", "correlation-id-6"},
-			Up: &ttnpb.ApplicationUp_LocationSolved{
-				LocationSolved: &ttnpb.ApplicationLocation{},
+			CorrelationIDs: []string{"joinAccepts[0]"},
+			Up: &ttnpb.ApplicationUp_JoinAccept{
+				JoinAccept: &ttnpb.ApplicationJoinAccept{},
 			},
 		},
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: appID2,
+				ApplicationIdentifiers: appID1,
 				DeviceID:               "test-dev2",
 			},
-			CorrelationIDs: []string{"correlation-id-7", "correlation-id-8"},
+			CorrelationIDs: []string{"joinAccepts[1]"},
+			Up: &ttnpb.ApplicationUp_JoinAccept{
+				JoinAccept: &ttnpb.ApplicationJoinAccept{},
+			},
+		},
+	}
+	genericApp1Ups := [...]*ttnpb.ApplicationUp{
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID1,
+				DeviceID:               "test-dev",
+			},
+			CorrelationIDs: []string{"genericApp1Ups[0]"},
 			Up: &ttnpb.ApplicationUp_DownlinkFailed{
 				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{},
 			},
@@ -172,7 +189,27 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 				ApplicationIdentifiers: appID1,
 				DeviceID:               "test-dev",
 			},
-			CorrelationIDs: []string{"correlation-id-9", "correlation-id-10"},
+			CorrelationIDs: []string{"genericApp1Ups[1]"},
+			Up: &ttnpb.ApplicationUp_LocationSolved{
+				LocationSolved: &ttnpb.ApplicationLocation{},
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID1,
+				DeviceID:               "test-dev2",
+			},
+			CorrelationIDs: []string{"genericApp1Ups[2]"},
+			Up: &ttnpb.ApplicationUp_DownlinkFailed{
+				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{},
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID1,
+				DeviceID:               "test-dev",
+			},
+			CorrelationIDs: []string{"genericApp1Ups[3]"},
 			Up: &ttnpb.ApplicationUp_DownlinkAck{
 				DownlinkAck: &ttnpb.ApplicationDownlink{},
 			},
@@ -180,34 +217,81 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
-				DeviceID:               "test-dev",
+				DeviceID:               "test-dev2",
 			},
-			CorrelationIDs: []string{"correlation-id-11", "correlation-id-12"},
-			Up: &ttnpb.ApplicationUp_ServiceData{
-				ServiceData: &ttnpb.ApplicationServiceData{},
+			CorrelationIDs: []string{"genericApp1Ups[4]"},
+			Up: &ttnpb.ApplicationUp_DownlinkAck{
+				DownlinkAck: &ttnpb.ApplicationDownlink{},
 			},
 		},
 	}
 
-	popReqCh := make(chan popFuncReq, 1)
-	popErrCh := make(chan error, 1)
+	genericApp2Ups := [...]*ttnpb.ApplicationUp{
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID2,
+				DeviceID:               "test-dev2",
+			},
+			CorrelationIDs: []string{"genericApp2Ups[0]"},
+			Up: &ttnpb.ApplicationUp_LocationSolved{
+				LocationSolved: &ttnpb.ApplicationLocation{},
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID2,
+				DeviceID:               "test-dev",
+			},
+			CorrelationIDs: []string{"genericApp2Ups[1]"},
+			Up: &ttnpb.ApplicationUp_DownlinkFailed{
+				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{},
+			},
+		},
+	}
+
 	_, a := test.MustNewTFromContext(ctx)
 	switch {
-	case !pop(ctx, popReqCh, popErrCh),
-		!a.So(assertAdd(ctx, pbs[0]), should.BeTrue),
-		!a.So(assertPopUplinks(ctx, popReqCh, popErrCh, pbs[0]), should.BeTrue),
-		!pop(ctx, popReqCh, popErrCh),
-		!a.So(assertAdd(ctx, pbs[1]), should.BeTrue),
-		!a.So(assertAdd(ctx, pbs[2]), should.BeTrue),
-		!a.So(assertPopUplinks(ctx, popReqCh, popErrCh, pbs[1]), should.BeTrue),
-		!pop(ctx, popReqCh, popErrCh),
-		!a.So(assertPopUplinks(ctx, popReqCh, popErrCh, pbs[2]), should.BeTrue),
-		!a.So(assertAdd(ctx, pbs[3]), should.BeTrue),
-		!a.So(assertAdd(ctx, pbs[4], pbs[5]), should.BeTrue),
-		!pop(ctx, popReqCh, popErrCh),
-		!a.So(assertPopUplinks(ctx, popReqCh, popErrCh, pbs[3]), should.BeTrue),
-		!pop(ctx, popReqCh, popErrCh),
-		!a.So(assertPopUplinks(ctx, popReqCh, popErrCh, pbs[4], pbs[5]), should.BeTrue):
+	case
+		!a.So(assertAdd(ctx,
+			genericApp1Ups[0],
+		), should.BeTrue),
+		!a.So(assertDrainApplication(ctx, false,
+			genericApp1Ups[0],
+		), should.BeTrue),
+
+		!a.So(assertAdd(ctx,
+			genericApp2Ups[0],
+		), should.BeTrue),
+		!a.So(assertAdd(ctx,
+			genericApp1Ups[1],
+			genericApp2Ups[1],
+		), should.BeTrue),
+		!a.So(assertDrainApplication(ctx, true,
+			genericApp2Ups[0],
+			genericApp2Ups[1],
+		), should.BeTrue),
+
+		!a.So(assertAdd(ctx,
+			genericApp1Ups[2],
+			invalidations[0],
+			genericApp1Ups[3],
+			invalidations[1],
+			joinAccepts[0],
+		), should.BeTrue),
+		!a.So(assertAdd(ctx,
+			genericApp1Ups[4],
+			joinAccepts[1],
+		), should.BeTrue),
+		!a.So(assertDrainApplication(ctx, false,
+			joinAccepts[0],
+			joinAccepts[1],
+			invalidations[0],
+			invalidations[1],
+			genericApp1Ups[1],
+			genericApp1Ups[2],
+			genericApp1Ups[3],
+			genericApp1Ups[4],
+		), should.BeTrue):
 	}
 }
 
@@ -228,7 +312,7 @@ func HandleApplicationUplinkQueueTest(t *testing.T, q ApplicationUplinkQueue) {
 				t.Skip("Skipping 2nd run")
 			}
 			test.RunSubtestFromContext(ctx, test.SubtestConfig{
-				Name: "2st run",
+				Name: "2nd run",
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 					handleApplicationUplinkQueueTest(ctx, q)
 				},

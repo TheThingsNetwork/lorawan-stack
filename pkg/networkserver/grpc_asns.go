@@ -31,7 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
-type ApplicationUplinkQueueRangeFunc func(limit int, f func(...*ttnpb.ApplicationUp) error) (bool, error)
+type ApplicationUplinkQueueDrainFunc func(limit int, f func(...*ttnpb.ApplicationUp) error) error
 
 type ApplicationUplinkQueue interface {
 	// Add adds application uplinks ups to queue.
@@ -42,7 +42,7 @@ type ApplicationUplinkQueue interface {
 	// if such is available, otherwise it blocks until it is.
 	// Context passed to f must be derived from ctx.
 	// Implementations must respect ctx.Done() value on best-effort basis.
-	Pop(ctx context.Context, f func(context.Context, ttnpb.ApplicationIdentifiers, ApplicationUplinkQueueRangeFunc) (time.Time, error)) error
+	Pop(ctx context.Context, f func(context.Context, ttnpb.ApplicationIdentifiers, ApplicationUplinkQueueDrainFunc) (time.Time, error)) error
 }
 
 func applicationJoinAcceptWithoutAppSKey(pld *ttnpb.ApplicationJoinAccept) *ttnpb.ApplicationJoinAccept {
@@ -60,7 +60,7 @@ const (
 )
 
 func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error {
-	return ns.applicationUplinks.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueRangeFunc) (time.Time, error) {
+	return ns.applicationUplinks.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, drain ApplicationUplinkQueueDrainFunc) (time.Time, error) {
 		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, appID)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")
@@ -68,41 +68,38 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error
 		}
 
 		cl := ttnpb.NewNsAsClient(conn)
-		for ok := false; !ok; {
-			var sendErr bool
-			ok, err = f(applicationUplinkLimit, func(ups ...*ttnpb.ApplicationUp) error {
-				_, err := cl.HandleUplink(ctx, &ttnpb.NsAsHandleUplinkRequest{
-					ApplicationUps: ups,
-				}, ns.WithClusterAuth())
-				if err != nil {
-					sendErr = true
-					log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks to Application Server")
-					return err
-				}
-				for _, up := range ups {
-					ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
-					switch pld := up.Up.(type) {
-					case *ttnpb.ApplicationUp_UplinkMessage:
-						registerForwardDataUplink(ctx, pld.UplinkMessage)
-						events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, up))
-					case *ttnpb.ApplicationUp_JoinAccept:
-						events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: up.EndDeviceIdentifiers,
-							CorrelationIDs:       up.CorrelationIDs,
-							Up: &ttnpb.ApplicationUp_JoinAccept{
-								JoinAccept: applicationJoinAcceptWithoutAppSKey(pld.JoinAccept),
-							},
-						}))
-					}
-				}
-				return nil
-			})
+		var sendErr bool
+		if err = drain(applicationUplinkLimit, func(ups ...*ttnpb.ApplicationUp) error {
+			_, err := cl.HandleUplink(ctx, &ttnpb.NsAsHandleUplinkRequest{
+				ApplicationUps: ups,
+			}, ns.WithClusterAuth())
 			if err != nil {
-				if !sendErr {
-					log.FromContext(ctx).WithError(err).Error("Failed to pop application uplinks")
-				}
-				return time.Now().Add(applicationUplinkTaskRetryInterval), nil
+				sendErr = true
+				log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks to Application Server")
+				return err
 			}
+			for _, up := range ups {
+				ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
+				switch pld := up.Up.(type) {
+				case *ttnpb.ApplicationUp_UplinkMessage:
+					registerForwardDataUplink(ctx, pld.UplinkMessage)
+					events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, up))
+				case *ttnpb.ApplicationUp_JoinAccept:
+					events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: up.EndDeviceIdentifiers,
+						CorrelationIDs:       up.CorrelationIDs,
+						Up: &ttnpb.ApplicationUp_JoinAccept{
+							JoinAccept: applicationJoinAcceptWithoutAppSKey(pld.JoinAccept),
+						},
+					}))
+				}
+			}
+			return nil
+		}); err != nil {
+			if !sendErr {
+				log.FromContext(ctx).WithError(err).Error("Failed to drain application uplinks")
+			}
+			return time.Now().Add(applicationUplinkTaskRetryInterval), nil
 		}
 		return time.Time{}, nil
 	})
