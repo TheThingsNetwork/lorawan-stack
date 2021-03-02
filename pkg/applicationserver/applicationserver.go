@@ -706,17 +706,9 @@ func (as *ApplicationServer) runDownlinkQueueTransaction(ctx context.Context, de
 		return errPayloadCryptoDisabled.New()
 	}
 	ctx = log.NewContext(ctx, logger)
-	oldPendingLastAFCntDown := pendingSession.GetLastAFCntDown()
-	oldLastAFCntDown := session.GetLastAFCntDown()
 	if err := t(ctx, dev); err != nil {
 		// If something fails, clear the downlink queue as an empty downlink queue is better than a downlink queue
 		// with items that are encrypted with the wrong AppSKey.
-		if pendingSession != nil {
-			pendingSession.LastAFCntDown = oldPendingLastAFCntDown
-		}
-		if session != nil {
-			session.LastAFCntDown = oldLastAFCntDown
-		}
 		logger.WithError(err).Warn("Failed to recalculate downlink queue; clear the downlink queue")
 		as.resetInvalidDownlinkQueue(ctx, dev.EndDeviceIdentifiers)
 	}
@@ -1029,11 +1021,9 @@ func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnp
 func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *ttnpb.ApplicationLink) (pass bool, err error) {
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
-			"formatters",
 			"pending_session",
 			"session",
 			"skip_payload_crypto_override",
-			"version_ids",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
@@ -1058,7 +1048,6 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 
 			// The downlink queue invalidation may act as a session confirmation. As such, we
 			// attempt to switch the current end device session in such cases.
-			// TODO: Remove this once the session switch uplink type has been implemented.
 			mask, err := as.matchSession(ctx, ids, dev, link, sessionKeyID)
 			if err != nil {
 				return nil, nil, err
@@ -1094,6 +1083,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 	} else {
 		_, err := as.deviceRegistry.Set(ctx, ids,
 			[]string{
+				"pending_session",
 				"session",
 				"skip_payload_crypto_override",
 			},
@@ -1101,15 +1091,21 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 				if dev == nil {
 					return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 				}
-				if dev.Session == nil {
-					return nil, nil, errNoDeviceSession.WithAttributes("device_uid", unique.ID(ctx, ids))
+				mask, err := as.matchSession(ctx, ids, dev, link, msg.SessionKeyID)
+				if err != nil {
+					return nil, nil, err
+				}
+				if as.skipPayloadCrypto(ctx, link, dev, dev.Session) {
+					// When skipping application payload crypto, the upstream application is responsible for recalculating the
+					// downlink queue. No error is returned here to pass the downlink nack message upstream.
+					return dev, mask, nil
 				}
 				queue, _ := ttnpb.PartitionDownlinksBySessionKeyIDEquality(dev.Session.SessionKeyID, res.Downlinks...)
 				queue = append([]*ttnpb.ApplicationDownlink{msg}, queue...)
 				if err := as.recalculateDownlinkQueue(ctx, dev, link, dev.Session, queue, msg.FCnt+1, false); err != nil {
 					return nil, nil, err
 				}
-				return dev, []string{"session"}, nil
+				return dev, append(mask, "session"), nil
 			},
 		)
 		if err != nil {
