@@ -1,0 +1,21 @@
+name: Triage New Issues
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  triage:
+    name: Triage New Issues
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add "new" label
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['new']
+            })
