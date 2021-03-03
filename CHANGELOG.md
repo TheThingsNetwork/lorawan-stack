@@ -16,6 +16,7 @@ For details about compatibility between different releases, see the **Commitment
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 - Searching for gateways by EUI.
 - Searching for users and OAuth clients by state.
+- Gateway Server forwards Tx Acknowlegdment packets to the Network Server for scheduled downlinks. These can be used by the Network Server to forward `downlink_ack` upstream messages to the Application Server.
 
 ### Changed
 
