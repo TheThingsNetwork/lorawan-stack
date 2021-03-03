@@ -2190,10 +2190,7 @@ type ContextualEndDevice struct {
 }
 
 func MustCreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, context.Context) {
-	dev, ctx, err := CreateDevice(ctx, r, dev, ttnpb.ExcludeFields(ttnpb.EndDeviceFieldPathsTopLevel,
-		"created_at",
-		"updated_at",
-	)...)
+	dev, ctx, err := CreateDevice(ctx, r, dev, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.NsEndDeviceRegistry/Set"].Allowed...)
 	test.Must(nil, err)
 	return dev, ctx
 }
