@@ -602,10 +602,10 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 
 		case "f_port":
 
-			if val := m.GetFPort(); val < 1 || val > 255 {
+			if m.GetFPort() > 255 {
 				return ApplicationUplinkValidationError{
 					field:  "f_port",
-					reason: "value must be inside range [1, 255]",
+					reason: "value must be less than or equal to 255",
 				}
 			}
 
