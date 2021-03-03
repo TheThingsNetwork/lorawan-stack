@@ -374,7 +374,7 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 		paths = append(paths, "mac_settings.ping_slot_data_rate_index")
 	}
 	if p.PingSlotFrequency > 0 {
-		dev.MACSettings.PingSlotFrequency = &pbtypes.UInt64Value{
+		dev.MACSettings.PingSlotFrequency = &ttnpb.FrequencyValue{
 			Value: uint64(p.PingSlotFrequency * 100000),
 		}
 		paths = append(paths, "mac_settings.ping_slot_frequency")
@@ -392,7 +392,7 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 		paths = append(paths, "mac_settings.rx1_delay")
 	}
 	if v := p.Rx1DataRateOffset; v != nil {
-		dev.MACSettings.Rx1DataRateOffset = &pbtypes.UInt32Value{
+		dev.MACSettings.Rx1DataRateOffset = &ttnpb.DataRateOffsetValue{
 			Value: *v,
 		}
 		paths = append(paths, "mac_settings.rx1_data_rate_offset")
@@ -404,13 +404,13 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 		paths = append(paths, "mac_settings.rx2_data_rate_index")
 	}
 	if p.Rx2Frequency > 0 {
-		dev.MACSettings.Rx2Frequency = &pbtypes.UInt64Value{
+		dev.MACSettings.Rx2Frequency = &ttnpb.FrequencyValue{
 			Value: uint64(p.Rx2Frequency * 100000),
 		}
 		paths = append(paths, "mac_settings.rx2_frequency")
 	}
 	if p.Supports32BitFCnt {
-		dev.MACSettings.Supports32BitFCnt = &pbtypes.BoolValue{
+		dev.MACSettings.Supports32BitFCnt = &ttnpb.BoolValue{
 			Value: true,
 		}
 		paths = append(paths, "mac_settings.supports_32_bit_f_cnt")
