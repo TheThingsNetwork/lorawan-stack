@@ -26,7 +26,8 @@ import (
 
 // NS is a mock NS for GS tests.
 type NS struct {
-	upCh chan *ttnpb.UplinkMessage
+	upCh    chan *ttnpb.UplinkMessage
+	txAckCh chan *ttnpb.GatewayTxAcknowledgment
 }
 
 // StartNS starts the mock NS.
@@ -50,7 +51,18 @@ func (ns *NS) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*type
 	return &types.Empty{}, nil
 }
 
+// ReportTxAcknowledgment implements ttnpb.GsNsServer
+func (ns *NS) ReportTxAcknowledgment(ctx context.Context, msg *ttnpb.GatewayTxAcknowledgment) (*types.Empty, error) {
+	ns.txAckCh <- msg
+	return &types.Empty{}, nil
+}
+
 // Up returns the upstream channel.
 func (ns *NS) Up() <-chan *ttnpb.UplinkMessage {
 	return ns.upCh
+}
+
+// TxAck returns the TxAck channel.
+func (ns *NS) TxAck() <-chan *ttnpb.GatewayTxAcknowledgment {
+	return ns.txAckCh
 }

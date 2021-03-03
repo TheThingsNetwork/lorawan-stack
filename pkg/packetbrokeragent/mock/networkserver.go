@@ -28,6 +28,7 @@ import (
 type NetworkServer struct {
 	*component.Component
 	Uplink chan *ttnpb.UplinkMessage
+	TxAck  chan *ttnpb.GatewayTxAcknowledgment
 }
 
 // NewNetworkServer returns a new NetworkServer.
@@ -65,6 +66,15 @@ func (ns *NetworkServer) Publish(ctx context.Context, down *ttnpb.DownlinkMessag
 func (ns *NetworkServer) HandleUplink(ctx context.Context, req *ttnpb.UplinkMessage) (*pbtypes.Empty, error) {
 	select {
 	case ns.Uplink <- req:
+	default:
+	}
+	return ttnpb.Empty, nil
+}
+
+// ReportTxAcknowledgment implements ttnpb.GsNsServer.
+func (ns *NetworkServer) ReportTxAcknowledgment(_ context.Context, req *ttnpb.GatewayTxAcknowledgment) (*pbtypes.Empty, error) {
+	select {
+	case ns.TxAck <- req:
 	default:
 	}
 	return ttnpb.Empty, nil

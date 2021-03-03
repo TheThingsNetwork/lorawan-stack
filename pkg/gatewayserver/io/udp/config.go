@@ -32,11 +32,11 @@ type Config struct {
 	// PacketBuffer defines how many packets are buffered to handlers before it overflows.
 	PacketBuffer int `name:"packet-buffer" description:"Buffer size of unhandled packets"`
 	// DownlinkPathExpires defines for how long a downlink path is valid. A downlink path is renewed on each pull data and
-	// TX acknowledgement packet.
+	// Tx acknowledgment packet.
 	// Gateways typically pull data every 5 seconds.
 	DownlinkPathExpires time.Duration `name:"downlink-path-expires" description:"Time after which a downlink path to a gateway expires"`
-	// ConnectionExpires defines for how long a connection remains valid while no pull data, push data or TX
-	// acknowledgement is received.
+	// ConnectionExpires defines for how long a connection remains valid while no pull data, push data or Tx
+	// acknowledgment is received.
 	ConnectionExpires time.Duration `name:"connection-expires" description:"Time after which a connection of a gateway expires"`
 	// ScheduleLateTime defines the time in advance to the actual transmission the downlink message should be scheduled to
 	// the gateway.

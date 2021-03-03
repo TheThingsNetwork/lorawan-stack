@@ -21,6 +21,7 @@ import (
 	"net"
 	"os"
 	"runtime/debug"
+	"time"
 
 	"github.com/TheThingsIndustries/mystique/pkg/auth"
 	mqttlog "github.com/TheThingsIndustries/mystique/pkg/log"
@@ -93,6 +94,7 @@ type connection struct {
 	mqtt    mqttnet.Conn
 	session session.Session
 	io      *io.Connection
+	tokens  io.DownlinkTokens
 }
 
 func (*connection) Protocol() string            { return "mqtt" }
@@ -148,6 +150,9 @@ func (c *connection) setup(ctx context.Context) (err error) {
 			case <-ctx.Done():
 				return
 			case down := <-c.io.Down():
+				token := c.tokens.Next(down, time.Now())
+				down.CorrelationIDs = append(down.CorrelationIDs, c.tokens.FormatCorrelationID(token))
+
 				buf, err := c.format.FromDownlink(down, c.io.Gateway().GatewayIdentifiers)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
@@ -318,6 +323,11 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal Tx acknowledgment message")
 			return
+		}
+		if token, ok := c.tokens.ParseTokenFromCorrelationIDs(ack.GetCorrelationIDs()); ok {
+			if down, _, ok := c.tokens.Get(token, time.Now()); ok {
+				ack.DownlinkMessage = down
+			}
 		}
 		if err := c.io.HandleTxAck(ack); err != nil {
 			logger.WithError(err).Warn("Failed to handle Tx acknowledgment message")

@@ -122,7 +122,7 @@ func TestFlow(t *testing.T) {
 		select {
 		case <-conn.TxAck():
 		case <-time.After(timeout):
-			t.Fatalf("Expected Tx acknowledgement time-out")
+			t.Fatalf("Expected Tx acknowledgment time-out")
 		}
 	}
 

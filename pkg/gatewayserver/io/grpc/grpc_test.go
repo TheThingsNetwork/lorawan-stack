@@ -374,9 +374,11 @@ func TestTraffic(t *testing.T) {
 
 	t.Run("Downstream", func(t *testing.T) {
 		for i, tc := range []struct {
-			Path           *ttnpb.DownlinkPath
-			Message        *ttnpb.DownlinkMessage
-			ErrorAssertion func(error) bool
+			Path                *ttnpb.DownlinkPath
+			Message             *ttnpb.DownlinkMessage
+			ErrorAssertion      func(error) bool
+			SendTxAck           bool
+			TxAckErrorAssertion func(error) bool
 		}{
 			{
 				Path: &ttnpb.DownlinkPath{
@@ -404,6 +406,7 @@ func TestTraffic(t *testing.T) {
 						},
 					},
 				},
+				SendTxAck: true,
 			},
 			{
 				Path: &ttnpb.DownlinkPath{
@@ -459,9 +462,11 @@ func TestTraffic(t *testing.T) {
 				if err != nil && (tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue)) {
 					t.Fatalf("Unexpected error: %v", err)
 				}
+				var cids []string
 				select {
 				case down := <-downCh:
 					if tc.ErrorAssertion == nil {
+						cids = down.DownlinkMessage.CorrelationIDs
 						a.So(down.DownlinkMessage, should.Resemble, tc.Message)
 					} else {
 						t.Fatalf("Unexpected message: %v", down.DownlinkMessage)
@@ -469,6 +474,32 @@ func TestTraffic(t *testing.T) {
 				case <-time.After(timeout):
 					if tc.ErrorAssertion == nil {
 						t.Fatal("Receive expected downlink timeout")
+					}
+				}
+
+				if tc.ErrorAssertion != nil || !tc.SendTxAck {
+					return
+				}
+				select {
+				case upCh <- &ttnpb.GatewayUp{
+					TxAcknowledgment: &ttnpb.TxAcknowledgment{
+						CorrelationIDs: cids,
+						Result:         ttnpb.TxAcknowledgment_SUCCESS,
+					},
+				}:
+				case <-time.After(timeout):
+					if tc.TxAckErrorAssertion == nil {
+						t.Fatal("Receive unexpected timeout while sending Tx acknowledgment")
+					}
+				}
+
+				select {
+				case ack := <-conn.TxAck():
+					a.So(ack.DownlinkMessage, should.Resemble, tc.Message)
+					a.So(ack.Result, should.Equal, ttnpb.TxAcknowledgment_SUCCESS)
+				case <-time.After(timeout):
+					if tc.TxAckErrorAssertion == nil {
+						t.Fatal("Timeout waiting for Tx acknowledgment")
 					}
 				}
 			})

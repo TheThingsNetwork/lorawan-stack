@@ -144,7 +144,7 @@ func (s *srv) handlePackets() {
 			switch packet.PacketType {
 			case encoding.PullData, encoding.PushData:
 				if err := s.writeAckFor(packet); err != nil {
-					logger.WithError(err).Warn("Failed to write acknowledgement")
+					logger.WithError(err).Warn("Failed to write acknowledgment")
 				}
 			}
 
@@ -281,7 +281,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 	case encoding.TxAck:
 		atomic.StoreInt64(&state.lastSeenPull, now.UnixNano())
 		if atomic.CompareAndSwapUint32(&state.receivedTxAck, 0, 1) {
-			logger.Debug("Received Tx acknowledgement, JIT queue supported")
+			logger.Debug("Received Tx acknowledgment, JIT queue supported")
 		}
 		var msg *ttnpb.GatewayUp
 		if packet.Data.TxPacketAck != nil {
@@ -299,12 +299,13 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 			}
 		}
 		var rtt *time.Duration
-		if cids, delta, ok := state.tokens.Get(uint16(packet.Token[0])<<8|uint16(packet.Token[1]), packet.ReceivedAt); ok {
-			msg.TxAcknowledgment.CorrelationIDs = cids
+		if downlink, delta, ok := state.tokens.Get(uint16(packet.Token[0])<<8|uint16(packet.Token[1]), packet.ReceivedAt); ok {
+			msg.TxAcknowledgment.DownlinkMessage = downlink
+			msg.TxAcknowledgment.CorrelationIDs = downlink.CorrelationIDs
 			rtt = &delta
 		}
 		if err := state.io.HandleTxAck(msg.TxAcknowledgment); err != nil {
-			logger.WithError(err).Warn("Failed to handle Tx acknowledgement")
+			logger.WithError(err).Warn("Failed to handle Tx acknowledgment")
 		}
 		if rtt != nil {
 			state.io.RecordRTT(*rtt, packet.ReceivedAt)
@@ -368,7 +369,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 			}
 			write := func() {
 				logger.Debug("Write downlink message")
-				token := state.tokens.Next(down.CorrelationIDs, time.Now())
+				token := state.tokens.Next(down, time.Now())
 				packet.Token = [2]byte{byte(token >> 8), byte(token)}
 				if err := s.write(packet); err != nil {
 					logger.WithError(err).Warn("Failed to write downlink message")

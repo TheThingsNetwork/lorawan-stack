@@ -283,7 +283,7 @@ func TestTraffic(t *testing.T) {
 					}
 				}
 
-				// Put unique token, write and expect acknowledgement.
+				// Put unique token, write and expect acknowledgment.
 				token := [2]byte{0x00, byte(i)}
 				if len(buf) >= 4 {
 					copy(buf[1:], token[:])
@@ -389,7 +389,7 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 				ScheduleDownlinkLate: false,
-				ScheduledLate:        true, // Because Tx acknowledgement is not received.
+				ScheduledLate:        true, // Because Tx acknowledgment is not received.
 				SendTxAck:            false,
 			},
 			{
@@ -423,7 +423,7 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 				ScheduleDownlinkLate: true,
-				ScheduledLate:        true, // Because Tx acknowledgement is not received.
+				ScheduledLate:        true, // Because Tx acknowledgment is not received.
 				SendTxAck:            true, // From now on, immediate scheduling takes priority over scheduling late preference.
 			},
 			{
@@ -468,7 +468,7 @@ func TestTraffic(t *testing.T) {
 					t.FailNow()
 				}
 
-				// Put unique token, write and expect acknowledgement.
+				// Put unique token, write and expect acknowledgment.
 				token := [2]byte{0x00, byte(i)}
 				copy(buf[1:], token[:])
 				_, err = udpConn.Write(buf)
@@ -573,13 +573,13 @@ func TestTraffic(t *testing.T) {
 		packet := generateTxAck(eui3, encoding.TxErrNone)
 		buf, err := packet.MarshalBinary()
 		if !a.So(err, should.BeNil) {
-			t.Fatalf("Failed to marshal Tx acknowledgement: %v", err)
+			t.Fatalf("Failed to marshal Tx acknowledgment: %v", err)
 		}
 		token := [2]byte{0x00, 0xae}
 		copy(buf[1:], token[:])
 		_, err = udpConn.Write(buf)
 		if !a.So(err, should.BeNil) {
-			t.Fatalf("Failed to write Tx acknowledgement: %v", err)
+			t.Fatalf("Failed to write Tx acknowledgment: %v", err)
 		}
 
 		conn := expectConnection(t, gs, connections, eui3, true)
