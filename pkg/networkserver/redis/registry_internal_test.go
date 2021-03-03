@@ -23,7 +23,6 @@ import (
 	"testing"
 
 	"github.com/go-redis/redis/v8"
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"github.com/vmihailenco/msgpack/v5"
@@ -138,7 +137,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			Value: UplinkMatchSession{
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
-				Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
+				Supports32BitFCnt: &ttnpb.BoolValue{Value: false},
 			},
 			LuaExpr: makeExprWithDefaults(
 				makeSupports32BitFCntExpr(false),
@@ -148,7 +147,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			Value: UplinkMatchSession{
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
-				Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
+				Supports32BitFCnt: &ttnpb.BoolValue{Value: true},
 			},
 			LuaExpr: makeExprWithDefaults(
 				makeSupports32BitFCntExpr(true),
@@ -158,7 +157,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			Value: UplinkMatchSession{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion: test.DefaultMACVersion,
-				ResetsFCnt:     &pbtypes.BoolValue{Value: true},
+				ResetsFCnt:     &ttnpb.BoolValue{Value: true},
 			},
 			LuaExpr: makeExprWithDefaults(
 				makeResetsFCntExpr(true),
@@ -168,7 +167,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			Value: UplinkMatchSession{
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion: test.DefaultMACVersion,
-				ResetsFCnt:     &pbtypes.BoolValue{Value: false},
+				ResetsFCnt:     &ttnpb.BoolValue{Value: false},
 			},
 			LuaExpr: makeExprWithDefaults(
 				makeResetsFCntExpr(false),
@@ -188,8 +187,8 @@ func TestMsgpackCompatibility(t *testing.T) {
 			Value: UplinkMatchSession{
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
-				ResetsFCnt:        &pbtypes.BoolValue{Value: true},
-				Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
+				ResetsFCnt:        &ttnpb.BoolValue{Value: true},
+				Supports32BitFCnt: &ttnpb.BoolValue{Value: false},
 				LastFCnt:          42,
 			},
 			LuaExpr: makeExprWithDefaults(
@@ -225,7 +224,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			Value: UplinkMatchResult{
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
-				Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
+				Supports32BitFCnt: &ttnpb.BoolValue{Value: false},
 				UID:               "test-uid",
 			},
 			LuaExpr: makeExprWithDefaults(
@@ -237,7 +236,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 			Value: UplinkMatchResult{
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
-				Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
+				Supports32BitFCnt: &ttnpb.BoolValue{Value: true},
 				UID:               "test-uid",
 			},
 			LuaExpr: makeExprWithDefaults(
@@ -250,7 +249,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion: test.DefaultMACVersion,
 				UID:            "test-uid",
-				ResetsFCnt:     &pbtypes.BoolValue{Value: true},
+				ResetsFCnt:     &ttnpb.BoolValue{Value: true},
 			},
 			LuaExpr: makeExprWithDefaults(
 				makeUIDExpr("test-uid"),
@@ -262,7 +261,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion: test.DefaultMACVersion,
 				UID:            "test-uid",
-				ResetsFCnt:     &pbtypes.BoolValue{Value: false},
+				ResetsFCnt:     &ttnpb.BoolValue{Value: false},
 			},
 			LuaExpr: makeExprWithDefaults(
 				makeUIDExpr("test-uid"),
@@ -286,8 +285,8 @@ func TestMsgpackCompatibility(t *testing.T) {
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
 				UID:               "test-uid",
-				ResetsFCnt:        &pbtypes.BoolValue{Value: true},
-				Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
+				ResetsFCnt:        &ttnpb.BoolValue{Value: true},
+				Supports32BitFCnt: &ttnpb.BoolValue{Value: false},
 				LastFCnt:          42,
 			},
 			LuaExpr: makeExprWithDefaults(
@@ -302,8 +301,8 @@ func TestMsgpackCompatibility(t *testing.T) {
 				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
 				LoRaWANVersion:    test.DefaultMACVersion,
 				UID:               "test-uid",
-				ResetsFCnt:        &pbtypes.BoolValue{Value: true},
-				Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
+				ResetsFCnt:        &ttnpb.BoolValue{Value: true},
+				Supports32BitFCnt: &ttnpb.BoolValue{Value: false},
 				LastFCnt:          42,
 				IsPending:         true,
 			},

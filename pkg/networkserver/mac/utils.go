@@ -285,18 +285,18 @@ func DeviceDesiredADRAckDelayExponent(dev *ttnpb.EndDevice, phy *band.Band, defa
 	}
 }
 
-func DeviceDefaultRX1DataRateOffset(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint32 {
+func DeviceDefaultRX1DataRateOffset(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) ttnpb.DataRateOffset {
 	switch {
 	case dev.GetMACSettings().GetRx1DataRateOffset() != nil:
 		return dev.MACSettings.Rx1DataRateOffset.Value
 	case defaults.Rx1DataRateOffset != nil:
 		return defaults.Rx1DataRateOffset.Value
 	default:
-		return 0
+		return ttnpb.DataRateOffset_DATA_RATE_OFFSET_0
 	}
 }
 
-func DeviceDesiredRX1DataRateOffset(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint32 {
+func DeviceDesiredRX1DataRateOffset(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings)  ttnpb.DataRateOffset {
 	switch {
 	case dev.GetMACSettings().GetDesiredRx1DataRateOffset() != nil:
 		return dev.MACSettings.DesiredRx1DataRateOffset.Value

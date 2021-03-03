@@ -305,10 +305,10 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 
 		case "rx1_data_rate_offset":
 
-			if m.GetRx1DataRateOffset() > 7 {
+			if _, ok := DataRateOffset_name[int32(m.GetRx1DataRateOffset())]; !ok {
 				return MACParametersValidationError{
 					field:  "rx1_data_rate_offset",
-					reason: "value must be less than or equal to 7",
+					reason: "value must be one of the defined enum values",
 				}
 			}
 

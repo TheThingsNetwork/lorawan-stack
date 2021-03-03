@@ -69,7 +69,7 @@ func NewPopulatedMACCommand_LinkADRReq(r randyLorawan, easy bool) *MACCommand_Li
 func NewPopulatedMACCommand_RxParamSetupReq(r randyLorawan, easy bool) *MACCommand_RxParamSetupReq {
 	out := &MACCommand_RxParamSetupReq{}
 	out.Rx2DataRateIndex = NewPopulatedDataRateIndex(r, easy)
-	out.Rx1DataRateOffset = r.Uint32() % 8
+	out.Rx1DataRateOffset = DataRateOffset(r.Uint32() % 8)
 	out.Rx2Frequency = NewPopulatedFrequency(r, easy)
 	return out
 }
@@ -362,7 +362,7 @@ func NewPopulatedMessage_JoinRequestPayload(r randyLorawan) *Message_JoinRequest
 
 func NewPopulatedDLSettings(r randyLorawan, easy bool) *DLSettings {
 	out := &DLSettings{}
-	out.Rx1DROffset = uint32(r.Intn(8))
+	out.Rx1DROffset = DataRateOffset(r.Uint32() % 8)
 	out.Rx2DR = NewPopulatedDataRateIndex(r, easy)
 	return out
 }

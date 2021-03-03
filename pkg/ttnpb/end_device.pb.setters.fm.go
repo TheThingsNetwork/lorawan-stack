@@ -209,7 +209,7 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			if src != nil {
 				dst.Rx1DataRateOffset = src.Rx1DataRateOffset
 			} else {
-				var zero uint32
+				var zero DataRateOffset
 				dst.Rx1DataRateOffset = zero
 			}
 		case "rx2_data_rate_index":

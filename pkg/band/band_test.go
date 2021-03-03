@@ -439,60 +439,60 @@ func TestRx1DataRate(t *testing.T) {
 		bandID string
 
 		validIndexes []ttnpb.DataRateIndex
-		validOffsets []uint32
+		validOffsets []ttnpb.DataRateOffset
 
 		invalidIndexes []ttnpb.DataRateIndex
-		invalidOffsets []uint32
+		invalidOffsets []ttnpb.DataRateOffset
 	}{
 		{
 			bandID:       "AU_915_928",
 			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6}, invalidIndexes: []ttnpb.DataRateIndex{7, 8, 9, 10, 11, 12, 13, 14, 15},
-			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []ttnpb.DataRateOffset{0, 1, 2, 3, 4, 5}, invalidOffsets: []ttnpb.DataRateOffset{6, 7},
 		},
 		{
 			bandID:       "AS_923",
 			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
-			validOffsets: []uint32{0, 1, 2, 3, 4, 5, 6, 7}, invalidOffsets: []uint32{8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []ttnpb.DataRateOffset{0, 1, 2, 3, 4, 5, 6, 7},
 		},
 		{
 			bandID:       "CN_470_510",
 			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5}, invalidIndexes: []ttnpb.DataRateIndex{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
-			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []ttnpb.DataRateOffset{0, 1, 2, 3, 4, 5}, invalidOffsets: []ttnpb.DataRateOffset{6, 7},
 		},
 		{
 			bandID:       "CN_779_787",
 			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6, 7}, invalidIndexes: []ttnpb.DataRateIndex{8, 9, 10, 11, 12, 13, 14, 15},
-			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []ttnpb.DataRateOffset{0, 1, 2, 3, 4, 5}, invalidOffsets: []ttnpb.DataRateOffset{6, 7},
 		},
 		{
 			bandID:       "EU_433",
 			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6, 7}, invalidIndexes: []ttnpb.DataRateIndex{8, 9, 10, 11, 12, 13, 14, 15},
-			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []ttnpb.DataRateOffset{0, 1, 2, 3, 4, 5}, invalidOffsets: []ttnpb.DataRateOffset{6, 7},
 		},
 		{
 			bandID:       "EU_863_870",
 			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6, 7}, invalidIndexes: []ttnpb.DataRateIndex{8, 9, 10, 11, 12, 13, 14, 15},
-			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []ttnpb.DataRateOffset{0, 1, 2, 3, 4, 5}, invalidOffsets: []ttnpb.DataRateOffset{6, 7},
 		},
 		{
 			bandID:       "IN_865_867",
 			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
-			validOffsets: []uint32{0, 1, 2, 3, 4, 5, 6, 7}, invalidOffsets: []uint32{8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []ttnpb.DataRateOffset{0, 1, 2, 3, 4, 5, 6, 7},
 		},
 		{
 			bandID:       "KR_920_923",
 			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5}, invalidIndexes: []ttnpb.DataRateIndex{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
-			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []ttnpb.DataRateOffset{0, 1, 2, 3, 4, 5}, invalidOffsets: []ttnpb.DataRateOffset{6, 7},
 		},
 		{
 			bandID:       "RU_864_870",
 			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6, 7}, invalidIndexes: []ttnpb.DataRateIndex{8, 9, 10, 11, 12, 13, 14, 15},
-			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []ttnpb.DataRateOffset{0, 1, 2, 3, 4, 5}, invalidOffsets: []ttnpb.DataRateOffset{6, 7},
 		},
 		{
 			bandID:       "US_902_928",
 			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4}, invalidIndexes: []ttnpb.DataRateIndex{5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
-			validOffsets: []uint32{0, 1, 2, 3}, invalidOffsets: []uint32{4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []ttnpb.DataRateOffset{0, 1, 2, 3}, invalidOffsets: []ttnpb.DataRateOffset{4, 5, 6, 7},
 		},
 	} {
 		t.Run(tc.bandID, func(t *testing.T) {

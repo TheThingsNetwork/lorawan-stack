@@ -951,10 +951,10 @@ func (m *DLSettings) ValidateFields(paths ...string) error {
 		switch name {
 		case "rx1_dr_offset":
 
-			if m.GetRx1DROffset() > 7 {
+			if _, ok := DataRateOffset_name[int32(m.GetRx1DROffset())]; !ok {
 				return DLSettingsValidationError{
 					field:  "rx1_dr_offset",
-					reason: "value must be less than or equal to 7",
+					reason: "value must be one of the defined enum values",
 				}
 			}
 
@@ -2742,10 +2742,10 @@ func (m *DataRateOffsetValue) ValidateFields(paths ...string) error {
 		switch name {
 		case "value":
 
-			if m.GetValue() > 7 {
+			if _, ok := DataRateOffset_name[int32(m.GetValue())]; !ok {
 				return DataRateOffsetValueValidationError{
 					field:  "value",
-					reason: "value must be less than or equal to 7",
+					reason: "value must be one of the defined enum values",
 				}
 			}
 
@@ -4073,10 +4073,10 @@ func (m *MACCommand_RxParamSetupReq) ValidateFields(paths ...string) error {
 
 		case "rx1_data_rate_offset":
 
-			if m.GetRx1DataRateOffset() > 7 {
+			if _, ok := DataRateOffset_name[int32(m.GetRx1DataRateOffset())]; !ok {
 				return MACCommand_RxParamSetupReqValidationError{
 					field:  "rx1_data_rate_offset",
-					reason: "value must be less than or equal to 7",
+					reason: "value must be one of the defined enum values",
 				}
 			}
 

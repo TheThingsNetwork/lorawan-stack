@@ -10004,8 +10004,7 @@
           "$ref": "#/definitions/v3DataRateIndex"
         },
         "rx1_data_rate_offset": {
-          "type": "integer",
-          "format": "int64"
+          "$ref": "#/definitions/v3DataRateOffset"
         },
         "rx2_frequency": {
           "type": "string",
@@ -12026,8 +12025,7 @@
       "type": "object",
       "properties": {
         "rx1_dr_offset": {
-          "type": "integer",
-          "format": "int64"
+          "$ref": "#/definitions/v3DataRateOffset"
         },
         "rx2_dr": {
           "$ref": "#/definitions/v3DataRateIndex"
@@ -12079,12 +12077,25 @@
         }
       }
     },
+    "v3DataRateOffset": {
+      "type": "string",
+      "enum": [
+        "DATA_RATE_OFFSET_0",
+        "DATA_RATE_OFFSET_1",
+        "DATA_RATE_OFFSET_2",
+        "DATA_RATE_OFFSET_3",
+        "DATA_RATE_OFFSET_4",
+        "DATA_RATE_OFFSET_5",
+        "DATA_RATE_OFFSET_6",
+        "DATA_RATE_OFFSET_7"
+      ],
+      "default": "DATA_RATE_OFFSET_0"
+    },
     "v3DataRateOffsetValue": {
       "type": "object",
       "properties": {
         "value": {
-          "type": "integer",
-          "format": "int64"
+          "$ref": "#/definitions/v3DataRateOffset"
         }
       }
     },
@@ -13759,8 +13770,7 @@
           "description": "Rx1 delay (Rx2 delay is Rx1 delay + 1 second)."
         },
         "rx1_data_rate_offset": {
-          "type": "integer",
-          "format": "int64",
+          "$ref": "#/definitions/v3DataRateOffset",
           "description": "Data rate offset for Rx1."
         },
         "rx2_data_rate_index": {

@@ -232,6 +232,45 @@ func (v *DataRateIndex) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// MarshalText implements encoding.TextMarshaler interface.
+func (v DataRateOffset) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v DataRateOffset) MarshalJSON() ([]byte, error) {
+	return v.MarshalText()
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *DataRateOffset) UnmarshalText(b []byte) error {
+	s := string(b)
+	if i, ok := DataRateOffset_value[s]; ok {
+		*v = DataRateOffset(i)
+		return nil
+	}
+	if !strings.HasPrefix(s, "DATA_RATE_OFFSET") {
+		if i, ok := DataRateOffset_value["DATA_RATE_OFFSET"+s]; ok {
+			*v = DataRateOffset(i)
+			return nil
+		}
+	}
+	return errCouldNotParse("DataRateOffset")(string(b))
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *DataRateOffset) UnmarshalJSON(b []byte) error {
+	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
+		return v.UnmarshalText(b[1 : len(b)-1])
+	}
+	i, err := strconv.Atoi(string(b))
+	if err != nil {
+		return errCouldNotParse("DataRateOffset")(string(b)).WithCause(err)
+	}
+	*v = DataRateOffset(i)
+	return nil
+}
+
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *RejoinType) UnmarshalText(b []byte) error {
 	if i, ok := RejoinType_value[string(b)]; ok {
@@ -846,6 +885,11 @@ func (v PHYVersion) Compare(o PHYVersion) int {
 
 // String implements fmt.Stringer.
 func (v DataRateIndex) String() string {
+	return strconv.Itoa(int(v))
+}
+
+// String implements fmt.Stringer.
+func (v DataRateOffset) String() string {
 	return strconv.Itoa(int(v))
 }
 

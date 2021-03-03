@@ -192,7 +192,7 @@ type NsJsJoinRequestConfig struct {
 	DevAddr            types.DevAddr
 	SelectedMACVersion ttnpb.MACVersion
 	NetID              types.NetID
-	RX1DataRateOffset  uint32
+	RX1DataRateOffset  ttnpb.DataRateOffset
 	RX2DataRateIndex   ttnpb.DataRateIndex
 	RXDelay            ttnpb.RxDelay
 	FrequencyPlanID    string

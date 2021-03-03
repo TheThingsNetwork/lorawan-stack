@@ -287,7 +287,7 @@ var DefaultMACCommands = MACCommandSpec{
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_RX_PARAM_SETUP, "RxParamSetupReq", 4, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_RxParamSetupReq_{
 				RxParamSetupReq: &ttnpb.MACCommand_RxParamSetupReq{
-					Rx1DataRateOffset: uint32((b[0] >> 4) & 0x7),
+					Rx1DataRateOffset: ttnpb.DataRateOffset(uint32((b[0] >> 4) & 0x7)),
 					Rx2DataRateIndex:  ttnpb.DataRateIndex(b[0] & 0xf),
 					Rx2Frequency:      parseUint64(b[1:4]) * phy.FreqMultiplier,
 				},

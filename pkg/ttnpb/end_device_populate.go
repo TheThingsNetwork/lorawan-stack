@@ -82,7 +82,7 @@ func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 		out.Channels[i] = NewPopulatedMACParameters_Channel(r, easy)
 	}
 	out.Rx1Delay = RxDelay(r.Uint32() % 16)
-	out.Rx1DataRateOffset = r.Uint32() % 6
+	out.Rx1DataRateOffset = DataRateOffset(r.Uint32() % 8)
 	out.Rx2DataRateIndex = NewPopulatedDataRateIndex(r, easy)
 	out.Rx2Frequency = NewPopulatedFrequency(r, easy)
 	out.RejoinTimePeriodicity = RejoinTimeExponent([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])

@@ -81,7 +81,7 @@ message MACParameters {
   // Rx1 delay (Rx2 delay is Rx1 delay + 1 second).
   RxDelay rx1_delay = 9 [(validate.rules).enum.defined_only = true];
   // Data rate offset for Rx1.
-  uint32 rx1_data_rate_offset = 10 [(validate.rules).uint32.lte = 7];
+  DataRateOffset rx1_data_rate_offset = 10 [(validate.rules).enum.defined_only = true];
   // Data rate index for Rx2.
   DataRateIndex rx2_data_rate_index = 11 [(validate.rules).enum.defined_only = true];
   // Frequency for Rx2 (Hz).

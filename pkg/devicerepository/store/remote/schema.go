@@ -305,21 +305,21 @@ type EndDeviceProfile struct {
 	ClassBTimeout   uint32 `yaml:"classBTimeout"`
 	PingSlotPeriod  uint32 `yaml:"pingSlotPeriod"`
 
-	PingSlotDataRateIndex     *ttnpb.DataRateIndex `yaml:"pingSlotDataRateIndex"`
-	PingSlotFrequency         float64              `yaml:"pingSlotFrequency"`
-	SupportsClassC            bool                 `yaml:"supportsClassC"`
-	ClassCTimeout             uint32               `yaml:"classCTimeout"`
-	MACVersion                ttnpb.MACVersion     `yaml:"macVersion"`
-	RegionalParametersVersion string               `yaml:"regionalParametersVersion"`
-	SupportsJoin              bool                 `yaml:"supportsJoin"`
-	Rx1Delay                  *ttnpb.RxDelay       `yaml:"rx1Delay"`
-	Rx1DataRateOffset         *uint32              `yaml:"rx1DataRateOffset"`
-	Rx2DataRateIndex          *ttnpb.DataRateIndex `yaml:"rx2DataRateIndex"`
-	Rx2Frequency              float64              `yaml:"rx2Frequency"`
-	FactoryPresetFrequencies  []float64            `yaml:"factoryPresetFrequencies"`
-	MaxEIRP                   float32              `yaml:"maxEIRP"`
-	MaxDutyCycle              float64              `yaml:"maxDutyCycle"`
-	Supports32BitFCnt         bool                 `yaml:"supports32bitFCnt"`
+	PingSlotDataRateIndex     *ttnpb.DataRateIndex  `yaml:"pingSlotDataRateIndex"`
+	PingSlotFrequency         float64               `yaml:"pingSlotFrequency"`
+	SupportsClassC            bool                  `yaml:"supportsClassC"`
+	ClassCTimeout             uint32                `yaml:"classCTimeout"`
+	MACVersion                ttnpb.MACVersion      `yaml:"macVersion"`
+	RegionalParametersVersion string                `yaml:"regionalParametersVersion"`
+	SupportsJoin              bool                  `yaml:"supportsJoin"`
+	Rx1Delay                  *ttnpb.RxDelay        `yaml:"rx1Delay"`
+	Rx1DataRateOffset         *ttnpb.DataRateOffset `yaml:"rx1DataRateOffset"`
+	Rx2DataRateIndex          *ttnpb.DataRateIndex  `yaml:"rx2DataRateIndex"`
+	Rx2Frequency              float64               `yaml:"rx2Frequency"`
+	FactoryPresetFrequencies  []float64             `yaml:"factoryPresetFrequencies"`
+	MaxEIRP                   float32               `yaml:"maxEIRP"`
+	MaxDutyCycle              float64               `yaml:"maxDutyCycle"`
+	Supports32BitFCnt         bool                  `yaml:"supports32bitFCnt"`
 }
 
 var errRegionalParametersVersion = errors.DefineNotFound("regional_parameters_version", "unknown Regional Parameters version `{phy_version}`")

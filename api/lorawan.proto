@@ -112,6 +112,19 @@ enum DataRateIndex {
   DATA_RATE_15 = 15;
 }
 
+enum DataRateOffset {
+  option (gogoproto.enum_stringer) = false;
+
+  DATA_RATE_OFFSET_0 = 0;
+  DATA_RATE_OFFSET_1 = 1;
+  DATA_RATE_OFFSET_2 = 2;
+  DATA_RATE_OFFSET_3 = 3;
+  DATA_RATE_OFFSET_4 = 4;
+  DATA_RATE_OFFSET_5 = 5;
+  DATA_RATE_OFFSET_6 = 6;
+  DATA_RATE_OFFSET_7 = 7;
+}
+
 message MHDR {
   MType m_type = 1 [(validate.rules).enum.defined_only = true];
   Major major = 2 [(validate.rules).enum.defined_only = true];
@@ -184,7 +197,7 @@ message JoinAcceptPayload {
 message DLSettings {
   option (gogoproto.populate) = false;
 
-  uint32 rx1_dr_offset = 1 [(gogoproto.customname) = "Rx1DROffset", (validate.rules).uint32.lte = 7];
+  DataRateOffset rx1_dr_offset = 1 [(gogoproto.customname) = "Rx1DROffset", (validate.rules).enum.defined_only = true];
   DataRateIndex rx2_dr = 2 [(gogoproto.customname) = "Rx2DR", (validate.rules).enum.defined_only = true];
   // OptNeg is set if Network Server implements LoRaWAN 1.1 or greater.
   bool opt_neg = 3 [(gogoproto.customname) = "OptNeg"];
@@ -454,7 +467,7 @@ message MACCommand {
     option (gogoproto.populate) = false;
 
     DataRateIndex rx2_data_rate_index = 1 [(validate.rules).enum.defined_only = true];
-    uint32 rx1_data_rate_offset = 2 [(validate.rules).uint32.lte = 7];
+    DataRateOffset rx1_data_rate_offset = 2 [(validate.rules).enum.defined_only = true];
     uint64 rx2_frequency = 3 [(validate.rules).uint64.gte = 100000]; // Rx2 frequency (Hz).
   }
   message RxParamSetupAns {
@@ -772,7 +785,7 @@ message FrequencyValue {
   uint64 value = 1 [(validate.rules).uint64.gte = 100000];
 }
 message DataRateOffsetValue {
-  uint32 value = 1 [(validate.rules).uint32.lte = 7];
+  DataRateOffset value = 1 [(validate.rules).enum.defined_only = true];
 }
 message DataRateIndexValue {
   DataRateIndex value = 1 [(validate.rules).enum.defined_only = true];

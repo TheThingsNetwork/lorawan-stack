@@ -207,7 +207,7 @@ func UnmarshalDLSettings(b []byte, msg *ttnpb.DLSettings) error {
 	}
 	v := uint32(b[0])
 	msg.OptNeg = (v >> 7) != 0
-	msg.Rx1DROffset = (v >> 4) & 0x7
+	msg.Rx1DROffset = ttnpb.DataRateOffset((v >> 4) & 0x7)
 	msg.Rx2DR = ttnpb.DataRateIndex(v & 0xf)
 	return nil
 }

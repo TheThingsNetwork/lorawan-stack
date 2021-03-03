@@ -632,7 +632,7 @@ func (dst *DLSettings) SetFields(src *DLSettings, paths ...string) error {
 			if src != nil {
 				dst.Rx1DROffset = src.Rx1DROffset
 			} else {
-				var zero uint32
+				var zero DataRateOffset
 				dst.Rx1DROffset = zero
 			}
 		case "rx2_dr":
@@ -2343,7 +2343,7 @@ func (dst *DataRateOffsetValue) SetFields(src *DataRateOffsetValue, paths ...str
 			if src != nil {
 				dst.Value = src.Value
 			} else {
-				var zero uint32
+				var zero DataRateOffset
 				dst.Value = zero
 			}
 
@@ -2736,7 +2736,7 @@ func (dst *MACCommand_RxParamSetupReq) SetFields(src *MACCommand_RxParamSetupReq
 			if src != nil {
 				dst.Rx1DataRateOffset = src.Rx1DataRateOffset
 			} else {
-				var zero uint32
+				var zero DataRateOffset
 				dst.Rx1DataRateOffset = zero
 			}
 		case "rx2_frequency":

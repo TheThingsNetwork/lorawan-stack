@@ -381,6 +381,7 @@
   - [Enum `CFListType`](#ttn.lorawan.v3.CFListType)
   - [Enum `Class`](#ttn.lorawan.v3.Class)
   - [Enum `DataRateIndex`](#ttn.lorawan.v3.DataRateIndex)
+  - [Enum `DataRateOffset`](#ttn.lorawan.v3.DataRateOffset)
   - [Enum `DeviceEIRP`](#ttn.lorawan.v3.DeviceEIRP)
   - [Enum `MACCommandIdentifier`](#ttn.lorawan.v3.MACCommandIdentifier)
   - [Enum `MACVersion`](#ttn.lorawan.v3.MACVersion)
@@ -2897,7 +2898,7 @@ This is used internally by the Network Server.
 | `adr_ack_limit` | [`uint32`](#uint32) |  | ADR: number of messages to wait before setting ADRAckReq. This field is deprecated, use adr_ack_limit_exponent instead. |
 | `adr_ack_delay` | [`uint32`](#uint32) |  | ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate. This field is deprecated, use adr_ack_delay_exponent instead. |
 | `rx1_delay` | [`RxDelay`](#ttn.lorawan.v3.RxDelay) |  | Rx1 delay (Rx2 delay is Rx1 delay + 1 second). |
-| `rx1_data_rate_offset` | [`uint32`](#uint32) |  | Data rate offset for Rx1. |
+| `rx1_data_rate_offset` | [`DataRateOffset`](#ttn.lorawan.v3.DataRateOffset) |  | Data rate offset for Rx1. |
 | `rx2_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | Data rate index for Rx2. |
 | `rx2_frequency` | [`uint64`](#uint64) |  | Frequency for Rx2 (Hz). |
 | `max_duty_cycle` | [`AggregatedDutyCycle`](#ttn.lorawan.v3.AggregatedDutyCycle) |  | Maximum uplink duty cycle (of all channels). |
@@ -2921,7 +2922,7 @@ This is used internally by the Network Server.
 | `adr_tx_power_index` | <p>`uint32.lte`: `15`</p> |
 | `adr_nb_trans` | <p>`uint32.lte`: `15`</p> |
 | `rx1_delay` | <p>`enum.defined_only`: `true`</p> |
-| `rx1_data_rate_offset` | <p>`uint32.lte`: `7`</p> |
+| `rx1_data_rate_offset` | <p>`enum.defined_only`: `true`</p> |
 | `rx2_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
 | `rx2_frequency` | <p>`uint64.gte`: `100000`</p> |
 | `max_duty_cycle` | <p>`enum.defined_only`: `true`</p> |
@@ -4609,7 +4610,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `rx1_dr_offset` | [`uint32`](#uint32) |  |  |
+| `rx1_dr_offset` | [`DataRateOffset`](#ttn.lorawan.v3.DataRateOffset) |  |  |
 | `rx2_dr` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
 | `opt_neg` | [`bool`](#bool) |  | OptNeg is set if Network Server implements LoRaWAN 1.1 or greater. |
 
@@ -4617,7 +4618,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Validations |
 | ----- | ----------- |
-| `rx1_dr_offset` | <p>`uint32.lte`: `7`</p> |
+| `rx1_dr_offset` | <p>`enum.defined_only`: `true`</p> |
 | `rx2_dr` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.DataRate">Message `DataRate`</a>
@@ -4643,13 +4644,13 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `value` | [`uint32`](#uint32) |  |  |
+| `value` | [`DataRateOffset`](#ttn.lorawan.v3.DataRateOffset) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
-| `value` | <p>`uint32.lte`: `7`</p> |
+| `value` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.DownlinkPath">Message `DownlinkPath`</a>
 
@@ -5121,7 +5122,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `rx2_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
-| `rx1_data_rate_offset` | [`uint32`](#uint32) |  |  |
+| `rx1_data_rate_offset` | [`DataRateOffset`](#ttn.lorawan.v3.DataRateOffset) |  |  |
 | `rx2_frequency` | [`uint64`](#uint64) |  | Rx2 frequency (Hz). |
 
 #### Field Rules
@@ -5129,7 +5130,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Validations |
 | ----- | ----------- |
 | `rx2_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
-| `rx1_data_rate_offset` | <p>`uint32.lte`: `7`</p> |
+| `rx1_data_rate_offset` | <p>`enum.defined_only`: `true`</p> |
 | `rx2_frequency` | <p>`uint64.gte`: `100000`</p> |
 
 ### <a name="ttn.lorawan.v3.MACCommand.RxTimingSetupReq">Message `MACCommand.RxTimingSetupReq`</a>
@@ -5427,6 +5428,19 @@ Transmission settings for downlink.
 | `DATA_RATE_13` | 13 |  |
 | `DATA_RATE_14` | 14 |  |
 | `DATA_RATE_15` | 15 |  |
+
+### <a name="ttn.lorawan.v3.DataRateOffset">Enum `DataRateOffset`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `DATA_RATE_OFFSET_0` | 0 |  |
+| `DATA_RATE_OFFSET_1` | 1 |  |
+| `DATA_RATE_OFFSET_2` | 2 |  |
+| `DATA_RATE_OFFSET_3` | 3 |  |
+| `DATA_RATE_OFFSET_4` | 4 |  |
+| `DATA_RATE_OFFSET_5` | 5 |  |
+| `DATA_RATE_OFFSET_6` | 6 |  |
+| `DATA_RATE_OFFSET_7` | 7 |  |
 
 ### <a name="ttn.lorawan.v3.DeviceEIRP">Enum `DeviceEIRP`</a>
 

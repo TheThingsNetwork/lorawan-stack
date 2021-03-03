@@ -190,7 +190,7 @@ type Band struct {
 	// Rx1Channel computes the Rx1 channel index.
 	Rx1Channel func(uint8) (uint8, error)
 	// Rx1DataRate computes the Rx1 data rate index.
-	Rx1DataRate func(ttnpb.DataRateIndex, uint32, bool) (ttnpb.DataRateIndex, error)
+	Rx1DataRate func(ttnpb.DataRateIndex, ttnpb.DataRateOffset, bool) (ttnpb.DataRateIndex, error)
 
 	// GenerateChMasks generates a mapping ChMaskCntl -> ChMask.
 	// Length of desiredChs must be equal to length of currentChs.
