@@ -60,7 +60,7 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 import style from './device.styl'
 
 @connect(
-  function(state, props) {
+  (state, props) => {
     const devId = props.match.params.devId
     const appId = selectSelectedApplicationId(state)
     const device = selectSelectedDevice(state)
@@ -114,6 +114,7 @@ import style from './device.styl'
 
     if (mayReadKeys) {
       selector.push('session')
+      selector.push('pending_session')
       selector.push('root_keys')
     }
 
@@ -121,7 +122,7 @@ import style from './device.styl'
   },
   ({ fetching, device }) => fetching || !Boolean(device),
 )
-@withBreadcrumb('device.single', function(props) {
+@withBreadcrumb('device.single', props => {
   const {
     devId,
     appId,
