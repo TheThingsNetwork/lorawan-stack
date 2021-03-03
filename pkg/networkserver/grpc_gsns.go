@@ -1274,3 +1274,9 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	logger.Debug("Unmatched MType")
 	return ttnpb.Empty, nil
 }
+
+// ReportTxAcknowledgment is called by the Gateway Server when a tx acknowledgment arrives.
+func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, up *ttnpb.GatewayTxAcknowledgment) (_ *pbtypes.Empty, err error) {
+	// TODO: Send ApplicationDownlinkSent event from Tx acknowledgment (https://github.com/TheThingsNetwork/lorawan-stack/issues/56)
+	return ttnpb.Empty, nil
+}
