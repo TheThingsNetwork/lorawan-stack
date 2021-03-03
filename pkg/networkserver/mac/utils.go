@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"math"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -228,18 +227,18 @@ func DeviceDesiredMaxEIRP(dev *ttnpb.EndDevice, phy *band.Band, fp *frequencypla
 	}
 }
 
-func DeviceDesiredUplinkDwellTime(fp *frequencyplans.FrequencyPlan) *pbtypes.BoolValue {
+func DeviceDesiredUplinkDwellTime(fp *frequencyplans.FrequencyPlan) *ttnpb.BoolValue {
 	if fp.DwellTime.Uplinks == nil {
 		return nil
 	}
-	return &pbtypes.BoolValue{Value: *fp.DwellTime.Uplinks}
+	return &ttnpb.BoolValue{Value: *fp.DwellTime.Uplinks}
 }
 
-func DeviceDesiredDownlinkDwellTime(fp *frequencyplans.FrequencyPlan) *pbtypes.BoolValue {
+func DeviceDesiredDownlinkDwellTime(fp *frequencyplans.FrequencyPlan) *ttnpb.BoolValue {
 	if fp.DwellTime.Downlinks == nil {
 		return nil
 	}
-	return &pbtypes.BoolValue{Value: *fp.DwellTime.Downlinks}
+	return &ttnpb.BoolValue{Value: *fp.DwellTime.Downlinks}
 }
 
 func DeviceDefaultRX1Delay(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) ttnpb.RxDelay {

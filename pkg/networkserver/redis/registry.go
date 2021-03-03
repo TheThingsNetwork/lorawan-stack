@@ -23,7 +23,6 @@ import (
 	"sync"
 
 	"github.com/go-redis/redis/v8"
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/oklog/ulid/v2"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -115,8 +114,8 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 
 type UplinkMatchSession struct {
 	FNwkSIntKey       *ttnpb.KeyEnvelope
-	ResetsFCnt        *pbtypes.BoolValue
-	Supports32BitFCnt *pbtypes.BoolValue
+	ResetsFCnt        *ttnpb.BoolValue
+	Supports32BitFCnt *ttnpb.BoolValue
 	LoRaWANVersion    ttnpb.MACVersion
 	LastFCnt          uint32
 }
@@ -128,8 +127,8 @@ type UplinkMatchPendingSession struct {
 
 type UplinkMatchResult struct {
 	FNwkSIntKey       *ttnpb.KeyEnvelope
-	ResetsFCnt        *pbtypes.BoolValue
-	Supports32BitFCnt *pbtypes.BoolValue
+	ResetsFCnt        *ttnpb.BoolValue
+	Supports32BitFCnt *ttnpb.BoolValue
 	UID               string
 	LoRaWANVersion    ttnpb.MACVersion
 	LastFCnt          uint32
@@ -165,7 +164,7 @@ func makeEncodeLoRaWANVersionField(v ttnpb.MACVersion) func(enc *msgpack.Encoder
 	return makeEncodeCustomEncoderField("lorawan_version", v)
 }
 
-func makeEncodeBoolValueField(name string, v *pbtypes.BoolValue) func(enc *msgpack.Encoder) error {
+func makeEncodeBoolValueField(name string, v *ttnpb.BoolValue) func(enc *msgpack.Encoder) error {
 	return func(enc *msgpack.Encoder) error {
 		if err := enc.EncodeString(name); err != nil {
 			return err
@@ -180,11 +179,11 @@ func makeEncodeBoolValueField(name string, v *pbtypes.BoolValue) func(enc *msgpa
 	}
 }
 
-func makeEncodeResetsFCntField(v *pbtypes.BoolValue) func(enc *msgpack.Encoder) error {
+func makeEncodeResetsFCntField(v *ttnpb.BoolValue) func(enc *msgpack.Encoder) error {
 	return makeEncodeBoolValueField("resets_f_cnt", v)
 }
 
-func makeEncodeSupports32BitFCntField(v *pbtypes.BoolValue) func(enc *msgpack.Encoder) error {
+func makeEncodeSupports32BitFCntField(v *ttnpb.BoolValue) func(enc *msgpack.Encoder) error {
 	return makeEncodeBoolValueField("supports_32_bit_f_cnt", v)
 }
 
@@ -199,7 +198,7 @@ func makeEncodeLastFCntField(v uint32) func(enc *msgpack.Encoder) error {
 
 var errInvalidFieldCount = errors.DefineCorruption("field_count", "invalid field count '{count}'")
 
-func decodeBoolValue(dec *msgpack.Decoder) (*pbtypes.BoolValue, error) {
+func decodeBoolValue(dec *msgpack.Decoder) (*ttnpb.BoolValue, error) {
 	n, err := dec.DecodeMapLen()
 	if err != nil {
 		return nil, err
@@ -220,7 +219,7 @@ func decodeBoolValue(dec *msgpack.Decoder) (*pbtypes.BoolValue, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &pbtypes.BoolValue{
+	return &ttnpb.BoolValue{
 		Value: v,
 	}, nil
 }
