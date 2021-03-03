@@ -85,9 +85,12 @@ func BuildLorad(gtw *ttnpb.Gateway, fps *frequencyplans.Store) (*LoradConfig, er
 	if err != nil {
 		return nil, err
 	}
-	sx1301Conf, err := shared.BuildSX1301Config(fp)
-	if err != nil {
-		return nil, err
+	sx1301Conf := &shared.SX1301Config{}
+	if len(fp.Radios) != 0 {
+		sx1301Conf, err = shared.BuildSX1301Config(fp)
+		if err != nil {
+			return nil, err
+		}
 	}
 	var gatewayConf LoradGatewayConf
 	if len(gtw.Antennas) > 0 {

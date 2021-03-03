@@ -34,6 +34,7 @@ For details about compatibility between different releases, see the **Commitment
 - Event name on user login.
 - Application uplink queue handling in Network Server.
 - Application Server session desynchronization with the Network Server. The Application Server will now attempt to synchronize the end device session view on downlink queue operational errors. This fixes the `f_cnt_too_low` and `unknown_session` errors reported on downlink queue push and replace.
+- Panic while generating SX1301 config for frequency plans without radio configuration.
 
 ### Security
 
