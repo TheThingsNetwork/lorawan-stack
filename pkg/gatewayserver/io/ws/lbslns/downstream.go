@@ -66,7 +66,7 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.Downli
 	settings := down.GetScheduled()
 	dnmsg.Pdu = hex.EncodeToString(down.GetRawPayload())
 	dnmsg.RCtx = int64(settings.Downlink.AntennaIndex)
-	dnmsg.Diid = int64(f.tokens.Next(down.CorrelationIDs, dlTime))
+	dnmsg.Diid = int64(f.tokens.Next(&down, dlTime))
 
 	// Chosen fixed values.
 	dnmsg.Priority = 25

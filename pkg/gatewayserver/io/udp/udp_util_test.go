@@ -110,20 +110,20 @@ func expectAck(t *testing.T, conn net.Conn, expect bool, packetType encoding.Pac
 		if !expect {
 			return
 		}
-		t.Fatal("Failed to read acknowledgement")
+		t.Fatal("Failed to read acknowledgment")
 	}
 	var ack encoding.Packet
 	if err := ack.UnmarshalBinary(buf[0:n]); err != nil {
-		t.Fatal("Failed to unmarshal acknowledgement")
+		t.Fatal("Failed to unmarshal acknowledgment")
 	}
 	if ack.PacketType != packetType {
 		t.Fatalf("Packet type %v is not %v", ack.PacketType, packetType)
 	}
 	if !bytes.Equal(ack.Token[:], token[:]) {
-		t.Fatal("Received acknowledgement with unexpected token")
+		t.Fatal("Received acknowledgment with unexpected token")
 	}
 	if !expect {
-		t.Fatal("Should not have received acknowledgement for this token")
+		t.Fatal("Should not have received acknowledgment for this token")
 	}
 }
 

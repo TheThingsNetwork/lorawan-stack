@@ -927,8 +927,21 @@ func TestTraffic(t *testing.T) {
 				XTime: 1548059982,
 			},
 			ExpectedNetworkUpstream: ttnpb.TxAcknowledgment{
-				CorrelationIDs: []string{"correlation1", "correlation2"},
+				DownlinkMessage: &ttnpb.DownlinkMessage{
+					RawPayload: []byte("Ymxhamthc25kJ3M=="),
+					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+						DeviceID: "testdevice",
+						DevEUI:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+					},
+					Settings: &ttnpb.DownlinkMessage_Scheduled{
+						Scheduled: &ttnpb.TxSettings{
+							// Will only test that `Scheduled` field is set, not individual values.
+						},
+					},
+					CorrelationIDs: []string{"correlation1", "correlation2"},
+				},
 				Result:         ttnpb.TxAcknowledgment_SUCCESS,
+				CorrelationIDs: []string{"correlation1", "correlation2"},
 			},
 		},
 		{
@@ -938,8 +951,21 @@ func TestTraffic(t *testing.T) {
 				XTime: 1548059982,
 			},
 			ExpectedNetworkUpstream: ttnpb.TxAcknowledgment{
-				CorrelationIDs: []string{"correlation1", "correlation2"},
+				DownlinkMessage: &ttnpb.DownlinkMessage{
+					RawPayload: []byte("Ymxhamthc25kJ3M=="),
+					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+						DeviceID: "testdevice",
+						DevEUI:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+					},
+					Settings: &ttnpb.DownlinkMessage_Scheduled{
+						Scheduled: &ttnpb.TxSettings{
+							// Will only test that `Scheduled` field is set, not individual values.
+						},
+					},
+					CorrelationIDs: []string{"correlation1", "correlation2"},
+				},
 				Result:         ttnpb.TxAcknowledgment_SUCCESS,
+				CorrelationIDs: []string{"correlation1", "correlation2"},
 			},
 		},
 		{
@@ -965,7 +991,14 @@ func TestTraffic(t *testing.T) {
 					}
 					select {
 					case ack := <-gsConn.TxAck():
-						if !a.So(*ack, should.Resemble, tc.ExpectedNetworkUpstream) {
+						expected := tc.ExpectedNetworkUpstream.(ttnpb.TxAcknowledgment)
+						if expected.DownlinkMessage.GetScheduled() != nil {
+							if !a.So(ack.DownlinkMessage.GetScheduled(), should.NotBeNil) {
+								t.Fatalf("Invalid downlink message settings: %v", ack.DownlinkMessage.Settings)
+							}
+							ack.DownlinkMessage.Settings = expected.DownlinkMessage.Settings
+						}
+						if !a.So(*ack, should.Resemble, expected) {
 							t.Fatalf("Invalid TxAck: %v", ack)
 						}
 					case <-time.After(timeout):
@@ -1244,7 +1277,7 @@ func TestRTT(t *testing.T) {
 					select {
 					case ack := <-gsConn.TxAck():
 						if ack.Result != ttnpb.TxAcknowledgment_SUCCESS {
-							t.Fatalf("Tx Acknowledgement failed")
+							t.Fatalf("Tx acknowledgment failed")
 						}
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")

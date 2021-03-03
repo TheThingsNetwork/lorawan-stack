@@ -34,4 +34,6 @@ type Handler interface {
 	HandleUplink(context.Context, ttnpb.GatewayIdentifiers, ttnpb.EndDeviceIdentifiers, *ttnpb.GatewayUplinkMessage) error
 	// HandleStatus handles ttnpb.GatewayStatus.
 	HandleStatus(context.Context, ttnpb.GatewayIdentifiers, *ttnpb.GatewayStatus) error
+	// HandleTxAck handles ttnpb.TxAcknowledgment.
+	HandleTxAck(context.Context, ttnpb.GatewayIdentifiers, *ttnpb.TxAcknowledgment) error
 }

@@ -58,6 +58,8 @@ type impl struct {
 	server               io.Server
 	mqttConfigProvider   config.MQTTConfigProvider
 	mqttv2ConfigProvider config.MQTTConfigProvider
+
+	tokens io.DownlinkTokens
 }
 
 // New returns a new gRPC frontend.
@@ -132,9 +134,14 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 					logger.WithError(err).Warn("Failed to handle status message")
 				}
 			}
-			if msg.TxAcknowledgment != nil {
-				if err := conn.HandleTxAck(msg.TxAcknowledgment); err != nil {
-					logger.WithError(err).Warn("Failed to handle Tx acknowledgement")
+			if ack := msg.TxAcknowledgment; ack != nil {
+				if token, ok := s.tokens.ParseTokenFromCorrelationIDs(ack.GetCorrelationIDs()); ok {
+					if down, _, ok := s.tokens.Get(token, time.Now()); ok {
+						ack.DownlinkMessage = down
+					}
+				}
+				if err := conn.HandleTxAck(ack); err != nil {
+					logger.WithError(err).Warn("Failed to handle Tx acknowledgment")
 				}
 			}
 		}
@@ -145,6 +152,8 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 		case <-conn.Context().Done():
 			return conn.Context().Err()
 		case down := <-conn.Down():
+			token := s.tokens.Next(down, time.Now())
+			down.CorrelationIDs = append(down.CorrelationIDs, s.tokens.FormatCorrelationID(token))
 			msg := &ttnpb.GatewayDown{
 				DownlinkMessage: down,
 			}

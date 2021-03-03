@@ -36,7 +36,7 @@ message GatewayUp {
   repeated UplinkMessage uplink_messages = 1;
   // Gateway status produced by the gateway.
   GatewayStatus gateway_status = 2;
-  // A transmission acknowledgement or error.
+  // A Tx acknowledgment or error.
   TxAcknowledgment tx_acknowledgment = 3;
 }
 

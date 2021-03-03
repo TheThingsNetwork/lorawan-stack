@@ -14974,10 +14974,15 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Correlation IDs for the downlink message.\nSet automatically by the UDP and LBS frontends.\nFor gRPC and the MQTT v3 frontends, the correlation IDs must match the ones of the downlink message the Tx acknowledgment message refers to."
         },
         "result": {
           "$ref": "#/definitions/TxAcknowledgmentResult"
+        },
+        "downlink_message": {
+          "$ref": "#/definitions/v3DownlinkMessage",
+          "description": "The acknowledged downlink message. Set by the Gateway Server."
         }
       }
     },

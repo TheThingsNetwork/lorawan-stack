@@ -234,11 +234,11 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 		switch classA.Uplink.Payload.MHDR.MType {
 		case ttnpb.MType_UNCONFIRMED_UP:
 			if classA.Uplink.Payload.GetMACPayload().FCtrl.ADRAckReq {
-				logger.Debug("Acknowledgement required for ADRAckReq")
+				logger.Debug("Acknowledgment required for ADRAckReq")
 				needsAck = dev.MACState.LastDownlinkAt == nil || dev.MACState.LastDownlinkAt.Before(classA.Uplink.ReceivedAt)
 			}
 		case ttnpb.MType_CONFIRMED_UP:
-			logger.Debug("Acknowledgement required for confirmed uplink")
+			logger.Debug("Acknowledgment required for confirmed uplink")
 			needsAck = dev.MACState.LastDownlinkAt == nil || dev.MACState.LastDownlinkAt.Before(classA.Uplink.ReceivedAt)
 		}
 		rx2 := classA.RX2()

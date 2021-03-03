@@ -83,3 +83,8 @@ func (h *Handler) HandleUplink(ctx context.Context, _ ttnpb.GatewayIdentifiers, 
 func (h *Handler) HandleStatus(context.Context, ttnpb.GatewayIdentifiers, *ttnpb.GatewayStatus) error {
 	return nil
 }
+
+// HandleTxAck implements upstream.Handler.
+func (h *Handler) HandleTxAck(context.Context, ttnpb.GatewayIdentifiers, *ttnpb.TxAcknowledgment) error {
+	return nil
+}

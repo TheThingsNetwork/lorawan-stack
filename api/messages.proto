@@ -145,6 +145,9 @@ message DownlinkMessage {
 }
 
 message TxAcknowledgment {
+  // Correlation IDs for the downlink message.
+  // Set automatically by the UDP and LBS frontends.
+  // For gRPC and the MQTT v3 frontends, the correlation IDs must match the ones of the downlink message the Tx acknowledgment message refers to.
   repeated string correlation_ids = 1 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
 
   enum Result {
@@ -159,6 +162,14 @@ message TxAcknowledgment {
     GPS_UNLOCKED = 8;
   }
   Result result = 2 [(validate.rules).enum.defined_only = true];
+
+  // The acknowledged downlink message. Set by the Gateway Server.
+  DownlinkMessage downlink_message = 3;
+}
+
+message GatewayTxAcknowledgment {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.customname) = "GatewayIDs"];
+  TxAcknowledgment tx_ack = 2;
 }
 
 message GatewayUplinkMessage {

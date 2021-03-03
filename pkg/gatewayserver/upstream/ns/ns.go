@@ -101,3 +101,16 @@ func (h *Handler) HandleUplink(ctx context.Context, _ ttnpb.GatewayIdentifiers, 
 func (h *Handler) HandleStatus(context.Context, ttnpb.GatewayIdentifiers, *ttnpb.GatewayStatus) error {
 	return nil
 }
+
+// HandleTxAck implements upstream.Handler.
+func (h *Handler) HandleTxAck(ctx context.Context, ids ttnpb.GatewayIdentifiers, msg *ttnpb.TxAcknowledgment) error {
+	nsConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	if err != nil {
+		return errNetworkServerNotFound.WithCause(err)
+	}
+	_, err = ttnpb.NewGsNsClient(nsConn).ReportTxAcknowledgment(ctx, &ttnpb.GatewayTxAcknowledgment{
+		TxAck:      msg,
+		GatewayIDs: &ids,
+	}, h.cluster.WithClusterAuth())
+	return err
+}
