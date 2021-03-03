@@ -135,7 +135,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		AS:       as,
 		kekLabel: conf.DeviceKEKLabel,
 	}
-	as.grpc.appAs = iogrpc.New(as, iogrpc.WithMQTTConfigProvider(as))
+	as.grpc.appAs = iogrpc.New(as, iogrpc.WithMQTTConfigProvider(as), iogrpc.WithEndDeviceFetcher(as.endDeviceFetcher))
 
 	ctx, cancel := context.WithCancel(as.Context())
 	defer func() {
