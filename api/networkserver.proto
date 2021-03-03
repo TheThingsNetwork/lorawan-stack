@@ -55,8 +55,10 @@ service AsNs {
 
 // The GsNs service connects a Gateway Server to a Network Server.
 service GsNs {
-  // Handle a LoRaWAN uplink message.
+  // Called by the Gateway Server when an uplink message arrives.
   rpc HandleUplink(UplinkMessage) returns (google.protobuf.Empty);
+  // Called by the Gateway Server when a Tx acknowledgment arrives.
+  rpc ReportTxAcknowledgment(GatewayTxAcknowledgment) returns (google.protobuf.Empty);
 }
 
 // The NsEndDeviceRegistry service allows clients to manage their end devices on the Network Server.

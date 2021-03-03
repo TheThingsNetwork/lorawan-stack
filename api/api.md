@@ -406,6 +406,7 @@
   - [Message `ApplicationUplink.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplink.LocationsEntry)
   - [Message `DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage)
   - [Message `DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest)
+  - [Message `GatewayTxAcknowledgment`](#ttn.lorawan.v3.GatewayTxAcknowledgment)
   - [Message `GatewayUplinkMessage`](#ttn.lorawan.v3.GatewayUplinkMessage)
   - [Message `MessagePayloadFormatters`](#ttn.lorawan.v3.MessagePayloadFormatters)
   - [Message `TxAcknowledgment`](#ttn.lorawan.v3.TxAcknowledgment)
@@ -3775,7 +3776,7 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 | ----- | ---- | ----- | ----------- |
 | `uplink_messages` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) | repeated | Uplink messages received by the gateway. |
 | `gateway_status` | [`GatewayStatus`](#ttn.lorawan.v3.GatewayStatus) |  | Gateway status produced by the gateway. |
-| `tx_acknowledgment` | [`TxAcknowledgment`](#ttn.lorawan.v3.TxAcknowledgment) |  | A transmission acknowledgement or error. |
+| `tx_acknowledgment` | [`TxAcknowledgment`](#ttn.lorawan.v3.TxAcknowledgment) |  | A Tx acknowledgment or error. |
 
 ### <a name="ttn.lorawan.v3.ScheduleDownlinkErrorDetails">Message `ScheduleDownlinkErrorDetails`</a>
 
@@ -5803,6 +5804,13 @@ Downlink message from the network to the end device
 | ----- | ----------- |
 | `downlinks` | <p>`repeated.max_items`: `100000`</p> |
 
+### <a name="ttn.lorawan.v3.GatewayTxAcknowledgment">Message `GatewayTxAcknowledgment`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `tx_ack` | [`TxAcknowledgment`](#ttn.lorawan.v3.TxAcknowledgment) |  |  |
+
 ### <a name="ttn.lorawan.v3.GatewayUplinkMessage">Message `GatewayUplinkMessage`</a>
 
 | Field | Type | Label | Description |
@@ -5836,8 +5844,9 @@ Downlink message from the network to the end device
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `correlation_ids` | [`string`](#string) | repeated |  |
+| `correlation_ids` | [`string`](#string) | repeated | Correlation IDs for the downlink message. Set automatically by the UDP and LBS frontends. For gRPC and the MQTT v3 frontends, the correlation IDs must match the ones of the downlink message the Tx acknowledgment message refers to. |
 | `result` | [`TxAcknowledgment.Result`](#ttn.lorawan.v3.TxAcknowledgment.Result) |  |  |
+| `downlink_message` | [`DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage) |  | The acknowledged downlink message. Set by the Gateway Server. |
 
 #### Field Rules
 
@@ -6034,7 +6043,8 @@ The GsNs service connects a Gateway Server to a Network Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `HandleUplink` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Handle a LoRaWAN uplink message. |
+| `HandleUplink` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Called by the Gateway Server when an uplink message arrives. |
+| `ReportTxAcknowledgment` | [`GatewayTxAcknowledgment`](#ttn.lorawan.v3.GatewayTxAcknowledgment) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Called by the Gateway Server when a Tx acknowledgment arrives. |
 
 ### <a name="ttn.lorawan.v3.Ns">Service `Ns`</a>
 

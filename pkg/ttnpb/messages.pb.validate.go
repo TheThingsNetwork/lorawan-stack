@@ -410,6 +410,18 @@ func (m *TxAcknowledgment) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "downlink_message":
+
+			if v, ok := interface{}(m.GetDownlinkMessage()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return TxAcknowledgmentValidationError{
+						field:  "downlink_message",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return TxAcknowledgmentValidationError{
 				field:  name,
@@ -473,6 +485,111 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TxAcknowledgmentValidationError{}
+
+// ValidateFields checks the field values on GatewayTxAcknowledgment with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GatewayTxAcknowledgment) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GatewayTxAcknowledgmentFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway_ids":
+
+			if v, ok := interface{}(m.GetGatewayIDs()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewayTxAcknowledgmentValidationError{
+						field:  "gateway_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "tx_ack":
+
+			if v, ok := interface{}(m.GetTxAck()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewayTxAcknowledgmentValidationError{
+						field:  "tx_ack",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return GatewayTxAcknowledgmentValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GatewayTxAcknowledgmentValidationError is the validation error returned by
+// GatewayTxAcknowledgment.ValidateFields if the designated constraints aren't met.
+type GatewayTxAcknowledgmentValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GatewayTxAcknowledgmentValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GatewayTxAcknowledgmentValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GatewayTxAcknowledgmentValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GatewayTxAcknowledgmentValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GatewayTxAcknowledgmentValidationError) ErrorName() string {
+	return "GatewayTxAcknowledgmentValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GatewayTxAcknowledgmentValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGatewayTxAcknowledgment.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GatewayTxAcknowledgmentValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GatewayTxAcknowledgmentValidationError{}
 
 // ValidateFields checks the field values on GatewayUplinkMessage with the
 // rules defined in the proto definition for this message. If any rules are

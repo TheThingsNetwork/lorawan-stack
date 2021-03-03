@@ -3006,6 +3006,10 @@
     "HandleUplink": {
       "file": "lorawan-stack/api/networkserver.proto",
       "http": []
+    },
+    "ReportTxAcknowledgment": {
+      "file": "lorawan-stack/api/networkserver.proto",
+      "http": []
     }
   },
   "Ns": {
