@@ -928,7 +928,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	if err := ns.updateDataDownlinkTask(ctx, stored, time.Time{}); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to update downlink task queue after data uplink")
 	}
-	if !matched.IsRetransmission && pld.FPort != 0 {
+	if !matched.IsRetransmission {
 		queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: stored.EndDeviceIdentifiers,
 			CorrelationIDs:       up.CorrelationIDs,

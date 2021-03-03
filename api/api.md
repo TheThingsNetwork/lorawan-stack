@@ -405,6 +405,7 @@
   - [Message `ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink)
   - [Message `ApplicationUplink.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplink.LocationsEntry)
   - [Message `DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage)
+  - [Message `DownlinkQueueOperationErrorDetails`](#ttn.lorawan.v3.DownlinkQueueOperationErrorDetails)
   - [Message `DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest)
   - [Message `GatewayUplinkMessage`](#ttn.lorawan.v3.GatewayUplinkMessage)
   - [Message `MessagePayloadFormatters`](#ttn.lorawan.v3.MessagePayloadFormatters)
@@ -5632,6 +5633,13 @@ Encodes and decodes uplink messages.
 | ----- | ---- | ----- | ----------- |
 | `downlinks` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) | repeated |  |
 | `last_f_cnt_down` | [`uint32`](#uint32) |  |  |
+| `session_key_id` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationJoinAccept">Message `ApplicationJoinAccept`</a>
 
@@ -5759,6 +5767,24 @@ Downlink message from the network to the end device
 | Field | Validations |
 | ----- | ----------- |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.DownlinkQueueOperationErrorDetails">Message `DownlinkQueueOperationErrorDetails`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `dev_addr` | [`bytes`](#bytes) |  |  |
+| `session_key_id` | [`bytes`](#bytes) |  |  |
+| `min_f_cnt_down` | [`uint32`](#uint32) |  |  |
+| `pending_dev_addr` | [`bytes`](#bytes) |  |  |
+| `pending_session_key_id` | [`bytes`](#bytes) |  |  |
+| `pending_min_f_cnt_down` | [`uint32`](#uint32) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
+| `pending_session_key_id` | <p>`bytes.max_len`: `2048`</p> |
 
 ### <a name="ttn.lorawan.v3.DownlinkQueueRequest">Message `DownlinkQueueRequest`</a>
 

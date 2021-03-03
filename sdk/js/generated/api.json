@@ -23127,6 +23127,24 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "session_key_id",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
             }
           ]
         },
@@ -23797,6 +23815,93 @@
                   }
                 ]
               }
+            }
+          ]
+        },
+        {
+          "name": "DownlinkQueueOperationErrorDetails",
+          "longName": "DownlinkQueueOperationErrorDetails",
+          "fullName": "ttn.lorawan.v3.DownlinkQueueOperationErrorDetails",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "dev_addr",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "session_key_id",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            },
+            {
+              "name": "min_f_cnt_down",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "pending_dev_addr",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "pending_session_key_id",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            },
+            {
+              "name": "pending_min_f_cnt_down",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
