@@ -275,6 +275,7 @@ func (as *ApplicationServer) Publish(ctx context.Context, up *ttnpb.ApplicationU
 }
 
 func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
+	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIdentifiers))
 	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
 	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
 	registerReceiveUp(ctx, up)
@@ -648,7 +649,6 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 }
 
 func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) (pass bool, err error) {
-	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIdentifiers))
 	if up.Simulated {
 		return true, as.handleSimulatedUp(ctx, up, link)
 	}
