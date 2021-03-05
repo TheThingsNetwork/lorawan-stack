@@ -25,6 +25,7 @@ import Message from '@ttn-lw/lib/components/message'
 import ProfileCard from '@account/containers/profile-card'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import { selectConsoleUrl } from '@account/lib/selectors/app-config'
 
 import { selectUser } from '@account/store/selectors/user'
