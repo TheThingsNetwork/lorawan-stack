@@ -71,7 +71,7 @@ const headers = [
     name: 'status',
     width: 18,
     displayName: sharedMessages.status,
-    render(status) {
+    render: status => {
       let indicator = 'unknown'
       let label = sharedMessages.unknown
 

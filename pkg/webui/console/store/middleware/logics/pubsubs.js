@@ -21,7 +21,7 @@ import * as pubsubFormats from '@console/store/actions/pubsub-formats'
 
 const getPubsubLogic = createRequestLogic({
   type: pubsubs.GET_PUBSUB,
-  async process({ action }) {
+  process: async ({ action }) => {
     const {
       payload: { appId, pubsubId },
       meta: { selector },
@@ -32,7 +32,7 @@ const getPubsubLogic = createRequestLogic({
 
 const getPubsubsLogic = createRequestLogic({
   type: pubsubs.GET_PUBSUBS_LIST,
-  async process({ action }) {
+  process: async ({ action }) => {
     const { appId } = action.payload
     const res = await api.application.pubsubs.list(appId)
     return { entities: res.pubsubs, totalCount: res.totalCount }
@@ -41,7 +41,7 @@ const getPubsubsLogic = createRequestLogic({
 
 const updatePubsubsLogic = createRequestLogic({
   type: pubsubs.UPDATE_PUBSUB,
-  async process({ action }) {
+  process: async ({ action }) => {
     const { appId, pubsubId, patch } = action.payload
 
     return api.application.pubsubs.update(appId, pubsubId, patch)
@@ -50,7 +50,7 @@ const updatePubsubsLogic = createRequestLogic({
 
 const getPubsubFormatsLogic = createRequestLogic({
   type: pubsubFormats.GET_PUBSUB_FORMATS,
-  async process() {
+  process: async () => {
     const { formats } = await api.application.pubsubs.getFormats()
     return formats
   },

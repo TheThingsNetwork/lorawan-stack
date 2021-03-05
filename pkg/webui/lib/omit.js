@@ -26,9 +26,9 @@
  * @param {object|Array} value - Multinested object or array.
  * @param {string[]} key - Array of properties / keys to exclude from `value`.
  * @param {string[]} regexp - Regular expression for excluding properties from `value`.
- * @returns {object|Array} The new object/array without specified properties/keys.
+ * @returns {object|Array} The ininew object/array without specified properties/keys.
  */
-export default function omitDeep(value, key, regexp = /(?!)/) {
+const omitDeep = (value, key, regexp = /(?!)/) => {
   if (Array.isArray(value)) {
     return value.map(i => omitDeep(i, key))
   } else if (typeof value === 'object' && value !== null) {
@@ -39,3 +39,5 @@ export default function omitDeep(value, key, regexp = /(?!)/) {
   }
   return value
 }
+
+export default omitDeep

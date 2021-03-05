@@ -83,10 +83,10 @@ tts.subscribe('warning', payload => {
 
 export default {
   console: {
-    token() {
+    token: () => {
       return instance.get(`${appRoot}/api/auth/token`)
     },
-    async logout() {
+    logout: async () => {
       const headers = token => ({
         headers: { 'X-CSRF-Token': token },
       })
@@ -115,7 +115,7 @@ export default {
     },
   },
   clients: {
-    get(client_id) {
+    get: client_id => {
       return instance.get(`${isBaseUrl}/is/clients/${client_id}`)
     },
   },

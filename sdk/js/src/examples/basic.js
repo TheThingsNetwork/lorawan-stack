@@ -37,33 +37,33 @@ const appData = {
   description: `Some description ${hash}`,
 }
 
-async function createApplication() {
+const createApplication = async () => {
   const firstApp = await tts.Applications.create('testuser', appData)
   console.log(firstApp)
 }
 
-async function getApplication() {
+const getApplication = async () => {
   const firstApp = await tts.Applications.getById(appName)
   console.log(firstApp)
 }
 
-async function listApplications() {
+const listApplications = async () => {
   const apps = await tts.Applications.getAll()
   console.log(apps)
 }
 
-async function updateApplication() {
+const updateApplication = async () => {
   const patch = { description: 'New description' }
   const res = await tts.Applications.updateById(appName, patch)
   console.log(res)
 }
 
-async function deleteApplication() {
+const deleteApplication = async () => {
   await tts.Applications.deleteById(appName)
   await tts.Applications.deleteById(`second-app-${hash}`)
 }
 
-async function main() {
+const main = async () => {
   try {
     await createApplication()
     await getApplication()

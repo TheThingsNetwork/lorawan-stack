@@ -22,7 +22,7 @@ import * as webhookTemplates from '@console/store/actions/webhook-templates'
 
 const getWebhookLogic = createRequestLogic({
   type: webhooks.GET_WEBHOOK,
-  async process({ action }) {
+  process: async ({ action }) => {
     const {
       payload: { appId, webhookId },
       meta: { selector },
@@ -33,7 +33,7 @@ const getWebhookLogic = createRequestLogic({
 
 const getWebhooksLogic = createRequestLogic({
   type: webhooks.GET_WEBHOOKS_LIST,
-  async process({ action }) {
+  process: async ({ action }) => {
     const {
       payload: { appId },
       meta: { selector },
@@ -45,7 +45,7 @@ const getWebhooksLogic = createRequestLogic({
 
 const updateWebhookLogic = createRequestLogic({
   type: webhooks.UPDATE_WEBHOOK,
-  async process({ action }) {
+  process: async ({ action }) => {
     const { appId, webhookId, patch } = action.payload
 
     return api.application.webhooks.update(appId, webhookId, patch)
@@ -54,7 +54,7 @@ const updateWebhookLogic = createRequestLogic({
 
 const getWebhookFormatsLogic = createRequestLogic({
   type: webhookFormats.GET_WEBHOOK_FORMATS,
-  async process() {
+  process: async () => {
     const { formats } = await api.application.webhooks.getFormats()
     return formats
   },
@@ -62,7 +62,7 @@ const getWebhookFormatsLogic = createRequestLogic({
 
 const getWebhookTemplateLogic = createRequestLogic({
   type: webhookTemplates.GET_WEBHOOK_TEMPLATE,
-  async process({ action }) {
+  process: async ({ action }) => {
     const { id } = action.payload
     const { selector } = action.meta
     const template = await api.application.webhooks.getTemplate(id, selector)
@@ -73,7 +73,7 @@ const getWebhookTemplateLogic = createRequestLogic({
 
 const getWebhookTemplatesLogic = createRequestLogic({
   type: webhookTemplates.LIST_WEBHOOK_TEMPLATES,
-  async process({ action }) {
+  process: async ({ action }) => {
     const { selector } = action.meta
     const { templates } = await api.application.webhooks.listTemplates(selector)
 

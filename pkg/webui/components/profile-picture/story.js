@@ -33,7 +33,7 @@ storiesOf('Profile Picture', module)
       propTables: [ProfilePicture],
     })(story)(context),
   )
-  .add('Default', function() {
+  .add('Default', () => {
     return (
       <div style={{ height: '8rem' }}>
         <ProfilePicture profilePicture={pp} />

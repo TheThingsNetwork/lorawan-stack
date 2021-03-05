@@ -32,7 +32,7 @@ import withConnectionReactor from './gateway-connection-reactor'
 
 export default GatewayConnection =>
   connect(
-    function(state, ownProps) {
+    (state, ownProps) => {
       return {
         statistics: selectGatewayStatistics(state, ownProps),
         error: selectGatewayStatisticsError(state, ownProps),

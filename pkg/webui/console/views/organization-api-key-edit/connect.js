@@ -36,7 +36,7 @@ import {
 
 export default OrganizationApiKeyEdit =>
   connect(
-    function(state, props) {
+    (state, props) => {
       const { apiKeyId } = props.match.params
 
       const keyFetching = selectApiKeyFetching(state)
@@ -55,7 +55,7 @@ export default OrganizationApiKeyEdit =>
       }
     },
     dispatch => ({
-      getApiKey(orgId, keyId) {
+      getApiKey: (orgId, keyId) => {
         dispatch(getApiKey('organization', orgId, keyId))
       },
       deleteOrganizationApiKeySuccess: orgId =>

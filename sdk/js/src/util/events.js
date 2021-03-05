@@ -20,15 +20,15 @@ class EventHandler {
     })
 
     this.eventHandlers = {}
-    this.dispatchEvent = function(event, payload) {
+    this.dispatchEvent = (event, payload) => {
       if (this.eventHandlers[event]) {
         for (const handler of this.eventHandlers[event]) {
           handler(payload)
         }
       }
-    }.bind(this)
+    }
 
-    this.subscribe = function(event, handler) {
+    this.subscribe = (event, handler) => {
       if (!Object.values(this.EVENTS).includes(event)) {
         throw new Error(`Cannot subscribe to unsupported event type "${event}"`)
       }
@@ -36,16 +36,16 @@ class EventHandler {
         ...this.eventHandlers,
         [event]: this.eventHandlers[event] ? [...this.eventHandlers[event], handler] : [handler],
       }
-    }.bind(this)
+    }
 
-    this.unsubscribe = function(event) {
+    this.unsubscribe = event => {
       if (!Object.values(this.EVENTS).includes(event)) {
         throw new Error(`Cannot unsubscribe from unsupported event type "${event}"`)
       }
       if (this.eventHandlers[event]) {
         delete this.eventHandlers[event]
       }
-    }.bind(this)
+    }
   }
 }
 

@@ -22,7 +22,7 @@ import * as init from '@console/store/actions/init'
 
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
-  async process(_, dispatch) {
+  process: async (_, dispatch) => {
     dispatch(user.getUserRights())
 
     let info, rights

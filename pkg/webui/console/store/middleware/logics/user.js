@@ -32,7 +32,7 @@ const logoutSequence = async () => {
 export default [
   createRequestLogic({
     type: user.LOGOUT,
-    async process() {
+    process: async () => {
       try {
         await logoutSequence()
       } catch (err) {

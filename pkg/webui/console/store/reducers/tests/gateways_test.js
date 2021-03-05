@@ -28,106 +28,106 @@ import {
   deleteGatewayFailure,
 } from '../../actions/gateways'
 
-describe('Gateways reducer', function() {
+describe('Gateways reducer', () => {
   const defaultState = {
     entities: {},
     selectedGateway: null,
     statistics: {},
   }
 
-  it('returns the initial state', function() {
+  it('returns the initial state', () => {
     expect(reducer(undefined, { type: '@@TEST_INIT', payload: {} })).toEqual(defaultState)
   })
 
-  it('ignores `getGatewayFailure` action', function() {
+  it('ignores `getGatewayFailure` action', () => {
     expect(reducer(defaultState, getGatewayFailure({ status: 404 }))).toEqual(defaultState)
   })
 
-  it('ignores `updateGatewayFailure` action', function() {
+  it('ignores `updateGatewayFailure` action', () => {
     expect(reducer(defaultState, updateGatewayFailure({ status: 404 }))).toEqual(defaultState)
   })
 
-  it('ignores `getGatewaysListFailure` action', function() {
+  it('ignores `getGatewaysListFailure` action', () => {
     expect(reducer(defaultState, getGatewaysListFailure({ status: 404 }))).toEqual(defaultState)
   })
 
-  it('ignores `updateGateway` action', function() {
+  it('ignores `updateGateway` action', () => {
     expect(reducer(defaultState, updateGateway('test-id', {}))).toEqual(defaultState)
   })
 
-  it('ignores `deleteGatewayFailure` action', function() {
+  it('ignores `deleteGatewayFailure` action', () => {
     expect(reducer(defaultState, deleteGatewayFailure({ status: 404 }))).toEqual(defaultState)
   })
 
-  it('ignores `deleteGateway` action', function() {
+  it('ignores `deleteGateway` action', () => {
     expect(reducer(defaultState, deleteGateway('test-id'))).toEqual(defaultState)
   })
 
-  describe('when requesting a single gateway', function() {
+  describe('when requesting a single gateway', () => {
     const testGatewayId = 'tesrt-gtw-id'
     const testGateway = { ids: { gateway_id: testGatewayId }, name: 'test-gtw-name' }
     let newState
 
-    beforeAll(function() {
+    beforeAll(() => {
       newState = reducer(defaultState, getGateway(testGatewayId))
     })
 
-    it('sets `selectedGateway` on `getGateway` action', function() {
+    it('sets `selectedGateway` on `getGateway` action', () => {
       expect(newState.selectedGateway).toEqual(testGatewayId)
     })
 
-    it('updates `entities` on `getGateway` action', function() {
+    it('updates `entities` on `getGateway` action', () => {
       expect(newState.entities).toEqual(defaultState.entities)
     })
 
-    describe('when it receives the gateway', function() {
-      beforeAll(function() {
+    describe('when it receives the gateway', () => {
+      beforeAll(() => {
         newState = reducer(newState, getGatewaySuccess(testGateway))
       })
 
-      it('does not change `selectedGateway` on `getGatewaySuccess` action', function() {
+      it('does not change `selectedGateway` on `getGatewaySuccess` action', () => {
         expect(newState.selectedGateway).toEqual(testGatewayId)
       })
 
-      it('adds new gateway to `entities` on `getGatewaySuccess` action', function() {
+      it('adds new gateway to `entities` on `getGatewaySuccess` action', () => {
         expect(Object.keys(newState.entities)).toHaveLength(1)
         expect(newState.entities[testGatewayId]).toEqual(testGateway)
       })
 
-      describe('when it updates the gateway', function() {
+      describe('when it updates the gateway', () => {
         const updatedTestGateway = { ids: { gateway_id: testGatewayId }, name: 'updated-test-gtw' }
         let updatedState
 
-        beforeAll(function() {
+        beforeAll(() => {
           updatedState = reducer(newState, updateGatewaySuccess(updatedTestGateway))
         })
 
-        it('does not change `selectedGateway` on `updateGatewaySuccess` action', function() {
+        it('does not change `selectedGateway` on `updateGatewaySuccess` action', () => {
           expect(updatedState.selectedGateway).toEqual(testGatewayId)
         })
 
-        it('updates the gateway in `entities` on `updateGatewaySuccess` action', function() {
+        it('updates the gateway in `entities` on `updateGatewaySuccess` action', () => {
           expect(updatedState.entities[testGatewayId].name).toEqual(updatedTestGateway.name)
         })
       })
 
-      describe('when deleting the gateway', function() {
+      describe('when deleting the gateway', () => {
         let updatedState
 
-        beforeAll(function() {
+        beforeAll(() => {
           updatedState = reducer(newState, deleteGatewaySuccess({ id: testGatewayId }))
         })
 
-        it('removes `selectedGateway` on `deleteGatewaySuccess` action', function() {
+        it('removes `selectedGateway` on `deleteGatewaySuccess` action', () => {
           expect(updatedState.selectedGateway).toBeNull()
         })
 
-        it('removes gateway in `entities` on `deleteGatewaySuccess` action', function() {
+        it('removes gateway in `entities` on `deleteGatewaySuccess` action', () => {
           expect(updatedState.entities[testGatewayId]).toBeUndefined()
         })
       })
 
-      describe('when requesting another gateway', function() {
+      describe('when requesting another gateway', () => {
         const otherTestGatewayId = 'another-test-gtw-id'
         const otherTestGateway = {
           ids: { gateway_id: otherTestGatewayId },
@@ -135,54 +135,54 @@ describe('Gateways reducer', function() {
         }
         let updatedState
 
-        beforeAll(function() {
+        beforeAll(() => {
           updatedState = reducer(newState, getGateway(otherTestGatewayId))
         })
 
-        it('sets `selectedGateway` on `getGateway` action', function() {
+        it('sets `selectedGateway` on `getGateway` action', () => {
           expect(updatedState.selectedGateway).toEqual(otherTestGatewayId)
         })
 
-        it('does not update `entities` on `getGateway` action', function() {
+        it('does not update `entities` on `getGateway` action', () => {
           expect(Object.keys(updatedState.entities)).toHaveLength(1)
           expect(updatedState.entities[testGatewayId]).toEqual(testGateway)
         })
 
-        describe('when receiving the gateway', function() {
-          beforeAll(function() {
+        describe('when receiving the gateway', () => {
+          beforeAll(() => {
             updatedState = reducer(updatedState, getGatewaySuccess(otherTestGateway))
           })
 
-          it('does not change `selectedGateway` on `getGatewaySuccess` action', function() {
+          it('does not change `selectedGateway` on `getGatewaySuccess` action', () => {
             expect(updatedState.selectedGateway).toEqual(otherTestGatewayId)
           })
 
-          it('keeps previously received gateway in `entities`', function() {
+          it('keeps previously received gateway in `entities`', () => {
             expect(updatedState.entities[testGatewayId]).toEqual(testGateway)
           })
 
-          it('adds new gateway to `entities` on `getGatewaySuccess`', function() {
+          it('adds new gateway to `entities` on `getGatewaySuccess`', () => {
             expect(Object.keys(updatedState.entities)).toHaveLength(2)
             expect(updatedState.entities[otherTestGatewayId]).toEqual(otherTestGateway)
           })
         })
       })
 
-      describe('requesting a list of gateways', function() {
-        beforeAll(function() {
+      describe('requesting a list of gateways', () => {
+        beforeAll(() => {
           newState = reducer(newState, getGatewaysList({}))
         })
 
-        it('does not change `selectedGateway` on `getGatewaysList` action', function() {
+        it('does not change `selectedGateway` on `getGatewaysList` action', () => {
           expect(newState.selectedGateway).toEqual(testGatewayId)
         })
 
-        it('does not change `entities` on `getGatewaysList` action', function() {
+        it('does not change `entities` on `getGatewaysList` action', () => {
           expect(Object.keys(newState.entities)).toHaveLength(1)
           expect(newState.entities[testGatewayId]).toEqual(testGateway)
         })
 
-        describe('receiving the list of gateways', function() {
+        describe('receiving the list of gateways', () => {
           const entities = [
             { ids: { gateway_id: 'test-gtw-1' }, name: 'test-gtw-1' },
             { ids: { gateway_id: 'test-gtw-2' }, name: 'test-gtw-2' },
@@ -190,15 +190,15 @@ describe('Gateways reducer', function() {
           ]
           const totalCount = entities.length
 
-          beforeAll(function() {
+          beforeAll(() => {
             newState = reducer(newState, getGatewaysListSuccess({ entities, totalCount }))
           })
 
-          it('does not remove previously received gateway on `getGatewaysListSuccess` action', function() {
+          it('does not remove previously received gateway on `getGatewaysListSuccess` action', () => {
             expect(newState.entities[testGatewayId]).toEqual(testGateway)
           })
 
-          it('adds new gateways to `entities` on `getGatewaysListSuccess`', function() {
+          it('adds new gateways to `entities` on `getGatewaysListSuccess`', () => {
             expect(Object.keys(newState.entities)).toHaveLength(4)
             for (const gtw of entities) {
               expect(newState.entities[gtw.ids.gateway_id]).toEqual(gtw)

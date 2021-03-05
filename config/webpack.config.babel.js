@@ -59,6 +59,47 @@ const modules = [path.resolve(context, 'node_modules')]
 
 const r = SUPPORT_LOCALES.split(',').map(l => new RegExp(l.trim()))
 
+const filterLocales = (context, request, callback) => {
+  if (context.endsWith('node_modules/intl/locale-data/jsonp')) {
+    const supported = r.reduce((acc, locale) => {
+      return acc || locale.test(request)
+    }, false)
+
+    if (!supported) {
+      return callback(null, `commonjs ${request}`)
+    }
+  }
+  callback()
+}
+
+// Env selects and merges the environments for the passed object based on
+// `NODE_ENV`, which can have the all, development and production keys.
+const env = (obj = {}) => {
+  if (!obj) {
+    return obj
+  }
+
+  const all = obj.all
+  const dev = obj.development
+  const prod = obj.production
+
+  if (Array.isArray(all) || Array.isArray(dev) || Array.isArray(prod)) {
+    return [...(all || []), ...(production ? prod || [] : dev || [])]
+  }
+
+  if (
+    (dev !== undefined && typeof dev !== 'object') ||
+    (prod !== undefined && typeof prod !== 'object')
+  ) {
+    return production ? prod : dev
+  }
+
+  return {
+    ...(all || {}),
+    ...(production ? prod || {} : dev || {}),
+  }
+}
+
 // Export the style config for usage in the storybook config.
 export const styleConfig = {
   test: /\.(styl|css)$/,
@@ -265,45 +306,4 @@ export default {
       }),
     ],
   }),
-}
-
-function filterLocales(context, request, callback) {
-  if (context.endsWith('node_modules/intl/locale-data/jsonp')) {
-    const supported = r.reduce(function(acc, locale) {
-      return acc || locale.test(request)
-    }, false)
-
-    if (!supported) {
-      return callback(null, `commonjs ${request}`)
-    }
-  }
-  callback()
-}
-
-// Env selects and merges the environments for the passed object based on
-// `NODE_ENV`, which can have the all, development and production keys.
-function env(obj = {}) {
-  if (!obj) {
-    return obj
-  }
-
-  const all = obj.all
-  const dev = obj.development
-  const prod = obj.production
-
-  if (Array.isArray(all) || Array.isArray(dev) || Array.isArray(prod)) {
-    return [...(all || []), ...(production ? prod || [] : dev || [])]
-  }
-
-  if (
-    (dev !== undefined && typeof dev !== 'object') ||
-    (prod !== undefined && typeof prod !== 'object')
-  ) {
-    return production ? prod : dev
-  }
-
-  return {
-    ...(all || {}),
-    ...(production ? prod || {} : dev || {}),
-  }
 }

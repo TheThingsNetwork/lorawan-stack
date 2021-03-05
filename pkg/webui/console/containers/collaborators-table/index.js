@@ -48,7 +48,7 @@ export default class CollaboratorsTable extends Component {
       {
         name: 'ids',
         displayName: m.id,
-        render(ids) {
+        render: ids => {
           const isUser = 'user_ids' in ids
           const collaboratorId = getCollaboratorId({ ids })
           if (isUser && collaboratorId === props.currentUserId) {
@@ -65,7 +65,7 @@ export default class CollaboratorsTable extends Component {
       {
         name: 'ids',
         displayName: sharedMessages.type,
-        render(ids) {
+        render: ids => {
           const isUser = 'user_ids' in ids
           const icon = isUser ? 'user' : 'organization'
 
@@ -80,7 +80,7 @@ export default class CollaboratorsTable extends Component {
       {
         name: 'rights',
         displayName: sharedMessages.rights,
-        render(rights) {
+        render: rights => {
           for (let i = 0; i < rights.length; i++) {
             if (rights[i].includes('_ALL')) {
               return <Message content={sharedMessages.all} />

@@ -21,7 +21,7 @@ export default (className, id = 'app') => {
     for (const cls of classNamesList) {
       containerClasses.add(cls)
     }
-    return function cleanup() {
+    return () => {
       for (const cls of classNamesList) {
         containerClasses.remove(cls)
       }

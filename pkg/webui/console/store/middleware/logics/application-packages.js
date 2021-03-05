@@ -23,7 +23,7 @@ import {
 
 const getApplicationPackagesDefaultAssociationLogic = createRequestLogic({
   type: GET_APP_PKG_DEFAULT_ASSOC,
-  process({ action }) {
+  process: ({ action }) => {
     const { appId, fPort } = action.payload
     const { selector } = action.meta
     return api.application.packages.getDefaultAssociation(appId, fPort, selector)
@@ -32,7 +32,7 @@ const getApplicationPackagesDefaultAssociationLogic = createRequestLogic({
 
 const setApplicationPackagesDefaultAssociationLogic = createRequestLogic({
   type: SET_APP_PKG_DEFAULT_ASSOC,
-  process({ action }) {
+  process: ({ action }) => {
     const { appId, fPort, data } = action.payload
     const { selector } = action.meta
     return api.application.packages.setDefaultAssociation(appId, fPort, data, selector)

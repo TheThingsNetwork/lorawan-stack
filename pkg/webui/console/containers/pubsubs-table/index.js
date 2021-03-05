@@ -44,7 +44,7 @@ const headers = [
     width: 40,
   },
   {
-    getValue(row) {
+    getValue: row => {
       if (row.nats) {
         const res = row.nats.server_url.match(natsUrlRegexp)
         return res ? res[8] : ''
@@ -62,7 +62,7 @@ const headers = [
     width: 9,
   },
   {
-    getValue(row) {
+    getValue: row => {
       if (row.nats) {
         return 'NATS'
       } else if (row.mqtt) {
