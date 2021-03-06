@@ -71,6 +71,7 @@ const Header = ({
               className={style.profileDropdown}
               userName={user.name || user.ids.user_id}
               data-test-id="profile-dropdown"
+              profilePicture={user.profile_picture}
             >
               {dropdownItems}
             </ProfileDropdown>

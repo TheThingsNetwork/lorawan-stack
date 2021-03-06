@@ -78,12 +78,14 @@ describe('Account App profile settings', () => {
       .type(userUpdate.primary_email_address)
 
     // Check if the profile picture (preview) was updated properly.
-    cy.findByAltText('Profile picture')
-      .should('be.visible')
-      .and('have.attr', 'src')
-      // `jane.doe@example.com` has no gravatar image associated, so the `src`
-      // is expected to be the src of the missing profile picture placeholder.
-      .and('match', /missing-profile-picture/)
+    cy.get('form').within(() => {
+      cy.findByAltText('Profile picture')
+        .should('be.visible')
+        .and('have.attr', 'src')
+        // `jane.doe@example.com` has no gravatar image associated, so the `src`
+        // is expected to be the src of the missing profile picture placeholder.
+        .and('match', /missing-profile-picture/)
+    })
 
     cy.findByRole('button', { name: 'Save changes' }).click()
     cy.findByTestId('error-notification').should('not.exist')

@@ -18,6 +18,7 @@ import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown'
+import ProfilePicture from '@ttn-lw/components/profile-picture'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -64,7 +65,7 @@ export default class ProfileDropdown extends React.PureComponent {
   }
 
   render() {
-    const { userName, className, children, ...rest } = this.props
+    const { userName, className, children, profilePicture, ...rest } = this.props
 
     return (
       <div
@@ -76,6 +77,7 @@ export default class ProfileDropdown extends React.PureComponent {
         role="button"
         {...rest}
       >
+        <ProfilePicture profilePicture={profilePicture} className={styles.profilePicture} />
         <span className={styles.id}>{userName}</span>
         <Icon
           className={styles.dropdownIcon}
@@ -94,10 +96,13 @@ ProfileDropdown.propTypes = {
    */
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
+  /** The profile picture of the current user. */
+  profilePicture: PropTypes.profilePicture,
   /** The name/id of the current user. */
   userName: PropTypes.string.isRequired,
 }
 
 ProfileDropdown.defaultProps = {
   className: undefined,
+  profilePicture: undefined,
 }

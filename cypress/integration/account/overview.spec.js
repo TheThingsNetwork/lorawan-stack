@@ -33,10 +33,14 @@ describe('Account App overview', () => {
     // Profile card section.
     cy.findByText(user.name, { selector: 'h3' }).should('be.visible')
     cy.findByText(user.ids.user_id).should('be.visible')
-    cy.findByAltText('Profile picture')
-      .should('be.visible')
-      .and('have.attr', 'src')
-      .and('match', /missing-profile-picture/)
+
+    cy.findByTestId('profile-card').within(() => {
+      cy.findByAltText('Profile picture')
+        .should('be.visible')
+        .and('have.attr', 'src')
+        .and('match', /missing-profile-picture/)
+    })
+
     cy.findByRole('link', { name: /Edit profile settings/ }).should('be.visible')
 
     // Info text section.
