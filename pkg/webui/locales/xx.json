@@ -125,6 +125,7 @@
   "console.components.downlink-form.downlink-form.scheduleDownlink": "Xxxxxxxx xxxxxxxx",
   "console.components.downlink-form.downlink-form.downlinkSuccess": "Xxxxxxxx xxxxxxxxx",
   "console.components.downlink-form.downlink-form.payloadDescription": "Xxx xxxxxxx xxxxxxx xxxxx xx xxx xxxxxxxx xxxxxxx",
+  "console.components.downlink-form.downlink-form.invalidSessionWarning": "Xxxxxxxxx xxx xxxx xx xxxxxxxxx xxx xxx xxxxxxx xxxx x xxxxx xxxxxxx. Xxxxxx xxxx xxxx xxxx xxx xxxxxx xx xxxxxxxx xxxxxxxxx xx xxx xxxxxxx.",
   "console.components.events.messages.payload": "Xxxxxxx",
   "console.components.events.messages.MACPayload": "XXX xxxxxxx",
   "console.components.events.messages.devAddr": "XxxXxxx",

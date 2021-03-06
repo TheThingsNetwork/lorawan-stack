@@ -125,6 +125,7 @@
   "console.components.downlink-form.downlink-form.scheduleDownlink": "Schedule downlink",
   "console.components.downlink-form.downlink-form.downlinkSuccess": "Downlink scheduled",
   "console.components.downlink-form.downlink-form.payloadDescription": "The desired payload bytes of the downlink message",
+  "console.components.downlink-form.downlink-form.invalidSessionWarning": "Downlinks can only be scheduled for end devices with a valid session. Please make sure your end device is properly connected to the network.",
   "console.components.events.messages.payload": "Payload",
   "console.components.events.messages.MACPayload": "MAC payload",
   "console.components.events.messages.devAddr": "DevAddr",

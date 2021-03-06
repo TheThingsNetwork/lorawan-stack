@@ -15,6 +15,7 @@
 import React, { useState, useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 
+import Notification from '@ttn-lw/components/notification'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import RadioButton from '@ttn-lw/components/radio-button'
 import Checkbox from '@ttn-lw/components/checkbox'
@@ -39,6 +40,8 @@ const m = defineMessages({
   scheduleDownlink: 'Schedule downlink',
   downlinkSuccess: 'Downlink scheduled',
   payloadDescription: 'The desired payload bytes of the downlink message',
+  invalidSessionWarning:
+    'Downlinks can only be scheduled for end devices with a valid session. Please make sure your end device is properly connected to the network.',
 })
 
 const validationSchema = Yup.object({
@@ -57,7 +60,7 @@ const validationSchema = Yup.object({
   ),
 })
 
-const DownlinkForm = ({ appId, devId, downlinkQueue }) => {
+const DownlinkForm = ({ appId, devId, device, downlinkQueue }) => {
   const [error, setError] = useState('')
   const handleSubmit = useCallback(
     async (vals, { setSubmitting, resetForm }) => {
@@ -86,14 +89,18 @@ const DownlinkForm = ({ appId, devId, downlinkQueue }) => {
     frm_payload: '',
   }
 
+  const validSession = device.session || device.pending_session
+
   return (
     <>
+      {!validSession && <Notification content={m.invalidSessionWarning} warning small />}
       <IntlHelmet title={m.scheduleDownlink} />
       <Form
         error={error}
         onSubmit={handleSubmit}
         initialValues={initialValues}
         validationSchema={validationSchema}
+        disabled={!validSession}
       >
         <Form.SubTitle title={m.scheduleDownlink} />
         <Form.Field name="_mode" title={m.insertMode} component={RadioButton.Group}>
@@ -129,6 +136,7 @@ const DownlinkForm = ({ appId, devId, downlinkQueue }) => {
 DownlinkForm.propTypes = {
   appId: PropTypes.string.isRequired,
   devId: PropTypes.string.isRequired,
+  device: PropTypes.device.isRequired,
   downlinkQueue: PropTypes.shape({
     list: PropTypes.func.isRequired,
     push: PropTypes.func.isRequired,
