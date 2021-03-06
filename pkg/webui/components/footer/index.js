@@ -61,6 +61,7 @@ const Footer = ({ className, documentationLink, links, supportLink, onlineStatus
           href={supportLink}
           target="_blank"
           secondary
+          responsiveLabel
         />
       )}
     </div>

@@ -28,7 +28,7 @@ import ButtonIcon from './button-icon'
 
 import style from './button.styl'
 
-function assembleClassnames({
+const assembleClassnames = ({
   message,
   danger,
   warning,
@@ -42,7 +42,8 @@ function assembleClassnames({
   error,
   raw,
   disabled,
-}) {
+  responsiveLabel,
+}) => {
   if (unstyled) {
     return className
   }
@@ -58,6 +59,7 @@ function assembleClassnames({
     [style.large]: large,
     [style.raw]: raw,
     [style.disabled]: disabled,
+    [style.responsiveLabel]: responsiveLabel,
   })
 }
 
@@ -69,7 +71,7 @@ const buttonChildren = props => {
   ) : (
     <>
       {icon ? <ButtonIcon icon={icon} type="left" /> : null}
-      {message ? <Message content={message} /> : null}
+      {message ? <Message content={message} className={style.linkButtonMessage} /> : null}
     </>
   )
 
@@ -131,7 +133,7 @@ Button.defaultProps = {
   onBlur: undefined,
 }
 
-Button.Link = function(props) {
+Button.Link = props => {
   const { disabled, titleMessage } = props
   const buttonClassNames = assembleClassnames(props)
   const { to } = props
@@ -147,7 +149,7 @@ Button.Link = function(props) {
 }
 Button.Link.displayName = 'Button.Link'
 
-Button.AnchorLink = function(props) {
+Button.AnchorLink = props => {
   const { target, title, name } = props
   const htmlProps = { target, title, name }
   const buttonClassNames = assembleClassnames(props)
@@ -227,6 +229,8 @@ const commonPropTypes = {
   autoFocus: PropTypes.bool,
   /** A message to be evaluated and passed to the <button /> element. */
   title: PropTypes.message,
+  /** A flag specifying whether the button `message` should be responsive. */
+  responsiveLabel: PropTypes.bool,
 }
 
 buttonChildren.propTypes = {
