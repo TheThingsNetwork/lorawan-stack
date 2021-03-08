@@ -18,7 +18,6 @@ import (
 	"context"
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -62,8 +61,8 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 			Suffix: "current(EIRP:26,downlink:true,uplink:false),desired(EIRP:26,downlink:nil,uplink:nil)",
 			CurrentParameters: ttnpb.MACParameters{
 				MaxEIRP:           26,
-				DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-				UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
+				DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
+				UplinkDwellTime:   &ttnpb.BoolValue{Value: false},
 			},
 			DesiredParameters: ttnpb.MACParameters{
 				MaxEIRP: 26,
@@ -76,8 +75,8 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 			},
 			DesiredParameters: ttnpb.MACParameters{
 				MaxEIRP:           26,
-				DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-				UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+				DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
+				UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
 			},
 			Needs: true,
 		},
@@ -88,8 +87,8 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 			},
 			DesiredParameters: ttnpb.MACParameters{
 				MaxEIRP:           26,
-				DownlinkDwellTime: &pbtypes.BoolValue{Value: false},
-				UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
+				DownlinkDwellTime: &ttnpb.BoolValue{Value: false},
+				UplinkDwellTime:   &ttnpb.BoolValue{Value: false},
 			},
 			Needs: true,
 		},
@@ -97,12 +96,12 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 			Suffix: "current(EIRP:26,downlink:true,uplink:nil),desired(EIRP:26,downlink:false,uplink:false)",
 			CurrentParameters: ttnpb.MACParameters{
 				MaxEIRP:           26,
-				DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
+				DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 			},
 			DesiredParameters: ttnpb.MACParameters{
 				MaxEIRP:           26,
-				DownlinkDwellTime: &pbtypes.BoolValue{Value: false},
-				UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
+				DownlinkDwellTime: &ttnpb.BoolValue{Value: false},
+				UplinkDwellTime:   &ttnpb.BoolValue{Value: false},
 			},
 			Needs: true,
 		},
@@ -110,13 +109,13 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 			Suffix: "current(EIRP:24,downlink:true,uplink:false),desired(EIRP:26,downlink:true,uplink:false)",
 			CurrentParameters: ttnpb.MACParameters{
 				MaxEIRP:           24,
-				DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-				UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
+				DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
+				UplinkDwellTime:   &ttnpb.BoolValue{Value: false},
 			},
 			DesiredParameters: ttnpb.MACParameters{
 				MaxEIRP:           26,
-				DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-				UplinkDwellTime:   &pbtypes.BoolValue{Value: false},
+				DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
+				UplinkDwellTime:   &ttnpb.BoolValue{Value: false},
 			},
 			Needs: true,
 		},
@@ -178,8 +177,8 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 					DesiredParameters: ttnpb.MACParameters{
 						MaxEIRP:           26,
-						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
+						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
 					},
 				},
 			},
@@ -191,8 +190,8 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 					DesiredParameters: ttnpb.MACParameters{
 						MaxEIRP:           26,
-						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
+						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
 					},
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_TxParamSetupReq{
@@ -260,8 +259,8 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 					DesiredParameters: ttnpb.MACParameters{
 						MaxEIRP:           26,
-						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
+						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
 					},
 				},
 			},
@@ -273,8 +272,8 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 					DesiredParameters: ttnpb.MACParameters{
 						MaxEIRP:           26,
-						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
+						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
 					},
 				},
 			},
@@ -295,8 +294,8 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 					DesiredParameters: ttnpb.MACParameters{
 						MaxEIRP:           26,
-						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
+						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
 					},
 				},
 			},
@@ -308,8 +307,8 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 					DesiredParameters: ttnpb.MACParameters{
 						MaxEIRP:           26,
-						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
+						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
 					},
 				},
 			},
@@ -373,8 +372,8 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP:           26,
-						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
-						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
+						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
 					},
 					PendingRequests: []*ttnpb.MACCommand{},
 				},

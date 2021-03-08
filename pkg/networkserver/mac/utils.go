@@ -296,7 +296,7 @@ func DeviceDefaultRX1DataRateOffset(dev *ttnpb.EndDevice, defaults ttnpb.MACSett
 	}
 }
 
-func DeviceDesiredRX1DataRateOffset(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings)  ttnpb.DataRateOffset {
+func DeviceDesiredRX1DataRateOffset(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) ttnpb.DataRateOffset {
 	switch {
 	case dev.GetMACSettings().GetDesiredRx1DataRateOffset() != nil:
 		return dev.MACSettings.DesiredRx1DataRateOffset.Value
