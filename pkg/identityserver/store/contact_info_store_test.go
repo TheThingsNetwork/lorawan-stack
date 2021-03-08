@@ -153,5 +153,14 @@ func TestContactInfoValidation(t *testing.T) {
 		if a.So(info, should.HaveLength, 1) {
 			a.So(info[0].ValidatedAt, should.NotBeNil)
 		}
+
+		err = s.Validate(ctx, &ttnpb.ContactInfoValidation{
+			ID:    "validation-id",
+			Token: "validation-token",
+		})
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsAlreadyExists(err), should.BeTrue)
+		}
 	})
 }

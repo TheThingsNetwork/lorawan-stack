@@ -200,6 +200,7 @@ func (s *contactInfoStore) CreateValidation(ctx context.Context, validation *ttn
 
 var (
 	errValidationTokenNotFound = errors.DefineNotFound("validation_token", "validation token not found")
+	errValidationTokenUsed     = errors.DefineAlreadyExists("validation_token_used", "validation token already used")
 	errValidationTokenExpired  = errors.DefineNotFound("validation_token_expired", "validation token expired")
 )
 
@@ -217,6 +218,10 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 			return errValidationTokenNotFound.New()
 		}
 		return err
+	}
+
+	if model.Used {
+		return errValidationTokenUsed.New()
 	}
 
 	if model.ExpiresAt.Before(time.Now()) {
@@ -248,7 +253,18 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 		}
 	}
 
-	return s.query(ctx, ContactInfoValidation{}).Delete(&model).Error
+	err = s.query(ctx, ContactInfoValidation{}).Where(ContactInfoValidation{
+		Reference: validation.ID,
+		Token:     validation.Token,
+	}).Update(ContactInfoValidation{
+		ExpiresAt: now,
+		Used:      true,
+	}).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *contactInfoStore) DeleteEntityContactInfo(ctx context.Context, entityID ttnpb.Identifiers) error {
