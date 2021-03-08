@@ -58,7 +58,7 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 	if config.AddrChangeBlock > 0 {
 		firewall = NewMemoryFirewall(ctx, config.AddrChangeBlock)
 	}
-	if config.RateLimiting.Enable == true {
+	if config.RateLimiting.Enable {
 		firewall = NewRateLimitingFirewall(firewall, config.RateLimiting.Messages, config.RateLimiting.Threshold)
 	}
 	s := &srv{
