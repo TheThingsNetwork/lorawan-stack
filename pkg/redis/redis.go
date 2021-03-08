@@ -813,3 +813,167 @@ func LockedWatch(ctx context.Context, r WatchCmdable, k, id string, expiration t
 	}
 	return nil
 }
+
+// XAutoClaim provides a Lua implementation of `XAUTOCLAIM` command introduced in Redis 6.2.0.
+func XAutoClaim(ctx context.Context, r Scripter, stream, group, id string, minIdle time.Duration, start string, count int64) ([]redis.XMessage, string, error) {
+	var (
+		vs  []interface{}
+		err error
+	)
+	vs, err = RunInterfaceSliceScript(ctx, r, xAutoClaimScript, []string{stream}, group, id, minIdle.Milliseconds(), start, count).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return nil, "", nil
+		}
+		return nil, "", ConvertError(err)
+	}
+
+	lastID, ok := vs[0].(string)
+	if !ok {
+		panic(fmt.Sprintf("invalid type of entry at index %d of result returned by Redis xautoclaim script: %T", 0, vs[0]))
+	}
+
+	xis, ok := vs[1].([]interface{})
+	if !ok {
+		panic(fmt.Sprintf("invalid type of entry at index %d of result returned by Redis xautoclaim script: %T", 1, vs[1]))
+	}
+	if len(xis) == 0 {
+		return nil, "", nil
+	}
+
+	xs := make([]redis.XMessage, 0, len(xis))
+	for i, xi := range xis {
+		xvs, ok := xi.([]interface{})
+		if !ok {
+			panic(fmt.Sprintf("invalid type of xmessage at index %d of result returned by Redis xautoclaim script: %T", i, xi))
+		}
+
+		id, ok := xvs[0].(string)
+		if !ok {
+			panic(fmt.Sprintf("invalid type of ID field of xmessage at index %d of result returned by Redis xautoclaim script: %T", i, xvs[0]))
+		}
+
+		ss, ok := xvs[1].([]interface{})
+		if !ok {
+			panic(fmt.Sprintf("invalid type of value field of xmessage at index %d of result returned by Redis xautoclaim script: %T", i, xvs[1]))
+		}
+		if n := len(ss); n%2 != 0 {
+			panic(fmt.Sprintf("invalid length of value field of xmessage at index %d of result returned by Redis xautoclaim script: %d", i, n))
+		}
+		values := make(map[string]interface{}, len(ss))
+		for j := 0; j < len(ss); j += 2 {
+			k, ok := ss[j].(string)
+			if !ok {
+				panic(fmt.Sprintf("invalid type of key field value field of xmessage at index %d of result returned by Redis xautoclaim script: %T", i, ss[0]))
+			}
+			values[k] = ss[j+1]
+		}
+		xs = append(xs, redis.XMessage{
+			ID:     id,
+			Values: values,
+		})
+	}
+	return xs, lastID, nil
+}
+
+// RangeStreams sequentially iterates over all non-acknowledged messages in streams calling f with at most count messages.
+// RangeStreams assumes that within its lifetime it is the only consumer within group group using ID id.
+// RangeStreams iterates over all pending messages, which have been idle for at least minIdle milliseconds first.
+func RangeStreams(ctx context.Context, r redis.Cmdable, group, id string, count int64, minIdle time.Duration, f func(string, ...redis.XMessage) error, streams ...string) error {
+	var ack func(context.Context, string, ...redis.XMessage) error
+	{
+		ids := make([]string, 0, int(count))
+		ack = func(ctx context.Context, stream string, msgs ...redis.XMessage) error {
+			ids = ids[:0]
+			for _, msg := range msgs {
+				ids = append(ids, msg.ID)
+			}
+			_, err := r.Pipelined(ctx, func(p redis.Pipeliner) error {
+				// NOTE: Both calls below copy contents of ids internally.
+				p.XAck(ctx, stream, group, ids...)
+				p.XDel(ctx, stream, ids...)
+				return nil
+			})
+			return err
+		}
+	}
+
+	for _, stream := range streams {
+		for start := "-"; ; {
+			msgs, lastID, err := XAutoClaim(ctx, r, stream, group, id, minIdle, start, count)
+			if err != nil {
+				return err
+			}
+			if len(msgs) == 0 {
+				break
+			}
+			if err := f(stream, msgs...); err != nil {
+				return err
+			}
+			if err := ack(ctx, stream, msgs...); err != nil {
+				return err
+			}
+			start = lastID
+		}
+	}
+
+	streamCount := len(streams)
+	streamsArg := make([]string, 2*streamCount)
+	idsArg := make([]string, 2*streamCount)
+	for i, stream := range streams {
+		j := i * 2
+		streamsArg[j], streamsArg[j+1], idsArg[j], idsArg[j+1] = stream, stream, "0", ">"
+	}
+
+	drainedOld := make(map[string]struct{}, streamCount)
+outer:
+	for {
+		rets, err := r.XReadGroup(ctx, &redis.XReadGroupArgs{
+			Group:    group,
+			Consumer: id,
+			Streams:  append(streamsArg, idsArg...),
+			Count:    count,
+			Block:    -1, // do not block
+		}).Result()
+		if err != nil {
+			if err == redis.Nil {
+				return nil
+			}
+			return ConvertError(err)
+		}
+
+		for i, ret := range rets {
+			if idsArg[i] == "0" && len(ret.Messages) < int(count) {
+				drainedOld[ret.Stream] = struct{}{}
+			}
+			if len(ret.Messages) == 0 {
+				if i == len(rets)-1 {
+					return nil
+				}
+				continue
+			}
+
+			if err := f(ret.Stream, ret.Messages...); err != nil {
+				return err
+			}
+			if err := ack(ctx, ret.Stream, ret.Messages...); err != nil {
+				return err
+			}
+			if len(ret.Messages) == int(count) {
+				continue outer
+			}
+		}
+
+		streamsArg = streamsArg[:0]
+		idsArg = idsArg[:0]
+		for _, stream := range streams {
+			_, ok := drainedOld[stream]
+			if !ok {
+				streamsArg = append(streamsArg, stream)
+				idsArg = append(idsArg, "0")
+			}
+			streamsArg = append(streamsArg, stream)
+			idsArg = append(idsArg, ">")
+		}
+	}
+}

@@ -181,7 +181,7 @@ message GatewayUplinkMessage {
 message ApplicationUplink {
   // Join Server issued identifier for the session keys used by this uplink.
   bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
-  uint32 f_port = 2 [(validate.rules).uint32 = {gte: 1, lte: 255, not_in: [224]}];
+  uint32 f_port = 2 [(validate.rules).uint32 = {lte: 255, not_in: [224]}];
   uint32 f_cnt = 3;
 
   // The frame payload of the uplink message.
@@ -311,6 +311,17 @@ message ApplicationDownlinkFailed {
 message ApplicationInvalidatedDownlinks {
   repeated ApplicationDownlink downlinks = 1;
   uint32 last_f_cnt_down = 2;
+  bytes session_key_id = 3 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
+}
+
+message DownlinkQueueOperationErrorDetails {
+  bytes dev_addr = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
+  bytes session_key_id = 2 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
+  uint32 min_f_cnt_down = 3;
+
+  bytes pending_dev_addr = 4 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
+  bytes pending_session_key_id = 5 [(gogoproto.customname) = "PendingSessionKeyID", (validate.rules).bytes.max_len = 2048];
+  uint32 pending_min_f_cnt_down = 6;
 }
 
 message ApplicationServiceData {

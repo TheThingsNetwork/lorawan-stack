@@ -123,8 +123,23 @@ func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifi
 				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 				ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 				ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+				ttnpb.RIGHT_APPLICATION_TRAFFIC_UP_WRITE,
 			)
 		}
 	}
 	return
+}
+
+type mockFetcher struct {
+	calledWithPaths      []string
+	calledWithIdentifers ttnpb.EndDeviceIdentifiers
+
+	dev *ttnpb.EndDevice
+	err error
+}
+
+func (f *mockFetcher) Get(_ context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
+	f.calledWithPaths = fieldMaskPaths
+	f.calledWithIdentifers = ids
+	return f.dev, f.err
 }

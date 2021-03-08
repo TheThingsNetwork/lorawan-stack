@@ -56,7 +56,7 @@ var (
 			if err != nil {
 				return err
 			}
-			err = apiKeyStore.CreateAPIKey(ctx, usr, key)
+			key, err = apiKeyStore.CreateAPIKey(ctx, usr, key)
 			if err != nil {
 				return err
 			}

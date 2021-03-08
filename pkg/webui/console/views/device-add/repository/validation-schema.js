@@ -218,4 +218,4 @@ const initialValues = {
   _registration: REGISTRATION_TYPES.SINGLE,
 }
 
-export { validationSchema as default, initialValues }
+export { validationSchema as default, initialValues, devEUISchema }

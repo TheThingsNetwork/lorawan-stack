@@ -28,6 +28,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -157,24 +158,30 @@ func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry
 		target:    target,
 		downlinks: downlinks,
 	}
-	sub, err := server.Subscribe(ctx, "webhook", nil, false)
+	sub, err := server.Subscribe(ctx, "webhooks", nil, false)
 	if err != nil {
 		return nil, err
 	}
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-sub.Context().Done():
-				return
-			case msg := <-sub.Up():
-				if err := w.handleUp(msg.Context, msg.ApplicationUp); err != nil {
-					log.FromContext(ctx).WithError(err).Warn("Failed to handle message")
+	server.StartTask(&component.TaskConfig{
+		Context: ctx,
+		ID:      "run_webhooks",
+		Func: func(ctx context.Context) error {
+			for {
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				case <-sub.Context().Done():
+					return sub.Context().Err()
+				case up := <-sub.Up():
+					if err := w.handleUp(up.Context, up.ApplicationUp); err != nil {
+						log.FromContext(up.Context).WithError(err).Warn("Failed to handle message")
+					}
 				}
 			}
-		}
-	}()
+		},
+		Restart: component.TaskRestartOnFailure,
+		Backoff: component.DefaultTaskBackoffConfig,
+	})
 	return w, nil
 }
 

@@ -399,6 +399,9 @@ func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn
 				logger.WithError(err).Warn("Failed to publish uplink message")
 			} else {
 				logger.WithField("message_id", res.Id).Debug("Published uplink message")
+				pbaMetrics.uplinkForwarded.WithLabelValues(ctx,
+					a.netID.String(), tenantID, a.clusterID,
+				).Inc()
 			}
 			cancel()
 		}
@@ -545,6 +548,15 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 		)
 	}
 	logger = logger.WithFields(log.Fields(pairs...))
+
+	var homeNetworkNetID types.NetID
+	homeNetworkNetID.UnmarshalNumber(down.HomeNetworkNetId)
+	var forwarderNetID types.NetID
+	forwarderNetID.UnmarshalNumber(down.ForwarderNetId)
+	pbaMetrics.downlinkReceived.WithLabelValues(ctx,
+		homeNetworkNetID.String(), down.HomeNetworkTenantId, down.HomeNetworkClusterId,
+		forwarderNetID.String(), down.ForwarderTenantId, down.ForwarderClusterId,
+	).Inc()
 
 	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, ids)
 	if err != nil {
@@ -763,6 +775,16 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 			return err
 		}
 	}
+
+	var forwarderNetID types.NetID
+	forwarderNetID.UnmarshalNumber(up.ForwarderNetId)
+	var homeNetworkNetID types.NetID
+	homeNetworkNetID.UnmarshalNumber(up.HomeNetworkNetId)
+	pbaMetrics.uplinkReceived.WithLabelValues(ctx,
+		forwarderNetID.String(), up.ForwarderTenantId, up.ForwarderClusterId,
+		homeNetworkNetID.String(), up.HomeNetworkTenantId, up.HomeNetworkClusterId,
+	).Inc()
+
 	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
 	if err != nil {
 		return err
@@ -857,6 +879,10 @@ func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientCo
 				logger.WithError(err).Warn("Failed to publish downlink message")
 			} else {
 				logger.WithField("message_id", res.Id).Debug("Published downlink message")
+				pbaMetrics.downlinkForwarded.WithLabelValues(ctx,
+					a.netID.String(), tenantID, a.homeNetworkClusterID,
+					token.ForwarderNetID.String(), token.ForwarderTenantID, token.ForwarderClusterID,
+				).Inc()
 			}
 			cancel()
 		}

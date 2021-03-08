@@ -54,7 +54,7 @@ import reducer, {
   hasAnySelectedOther,
   hasCompletedSelection,
 } from './reducer'
-import validationSchema, { initialValues } from './validation-schema'
+import validationSchema, { initialValues, devEUISchema } from './validation-schema'
 
 import style from './repository.styl'
 
@@ -67,6 +67,19 @@ const m = defineMessages({
   createSuccess: 'End device registered',
   register: 'Register from The LoRaWAN Device Repository',
 })
+
+const generateDeviceId = (device = {}) => {
+  const { ids: idsValues = {} } = device
+
+  try {
+    devEUISchema.validateSync(idsValues.dev_eui)
+    return idsValues.dev_eui.toLowerCase()
+  } catch (e) {
+    // We dont want to use invalid `dev_eui` as `device_id`.
+  }
+
+  return initialValues.ids.device_id || ''
+}
 
 const stateToFormValues = state => ({
   ...initialValues,
@@ -153,6 +166,7 @@ const DeviceRepository = props => {
               message: m.createSuccess,
             })
             resetForm({
+              errors: {},
               values: {
                 ...castedValues,
                 ...initialValues,
@@ -176,6 +190,29 @@ const DeviceRepository = props => {
     },
     [appId, createDevice, createDeviceSuccess, handleSetError, validationContext],
   )
+
+  const handleIdPrefill = React.useCallback(() => {
+    if (formRef && formRef.current) {
+      const { values, setFieldValue } = formRef.current
+
+      // Do not overwrite a value that the user has already set.
+      if (values.ids.device_id === initialValues.ids.device_id) {
+        const generatedId = generateDeviceId(values)
+        setFieldValue('ids.device_id', generatedId)
+      }
+    }
+  }, [])
+  const handleIdTextSelect = React.useCallback(idInputRef => {
+    if (idInputRef && idInputRef.current) {
+      const { values } = formRef.current
+      const { setSelectionRange } = idInputRef.current
+
+      const generatedId = generateDeviceId(values)
+      if (generatedId.length > 0 && generatedId === values.ids.device_id) {
+        setSelectionRange.call(idInputRef.current, 0, generatedId.length)
+      }
+    }
+  }, [])
 
   const hasSelectedOther = hasAnySelectedOther(state)
   const hasCompleted = hasCompletedSelection(state)
@@ -263,6 +300,8 @@ const DeviceRepository = props => {
                 fetching={templateFetching}
                 prefixes={prefixes}
                 mayEditKeys={mayEditKeys}
+                onIdPrefill={handleIdPrefill}
+                onIdSelect={handleIdTextSelect}
               />
             ) : (
               <Message content={m.enterDataDescription} component="p" />

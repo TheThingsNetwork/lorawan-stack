@@ -236,7 +236,7 @@ var startCommand = &cobra.Command{
 			}
 			applicationUplinkQueue := nsredis.NewApplicationUplinkQueue(
 				NewNetworkServerApplicationUplinkQueueRedis(*config),
-				int64(applicationUplinkQueueSize), redisConsumerGroup, redisConsumerID,
+				int64(applicationUplinkQueueSize), redisConsumerGroup, redisConsumerID, time.Minute,
 			)
 			if err := applicationUplinkQueue.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)

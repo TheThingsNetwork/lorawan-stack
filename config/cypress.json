@@ -4,5 +4,9 @@
   "defaultCommandTimeout": 10000,
   "ignoreTestFiles": "!*.spec.js",
   "animationDistanceThreshold": 3,
-  "video": false
+  "video": false,
+  "retries": {
+    "runMode": 1,
+    "openMode": 0
+  }
 }

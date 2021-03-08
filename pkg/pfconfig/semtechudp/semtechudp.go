@@ -58,12 +58,13 @@ func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error)
 	if err != nil {
 		return nil, err
 	}
-	sx1301Config, err := shared.BuildSX1301Config(frequencyPlan)
-	if err != nil {
-		return nil, err
+	if len(frequencyPlan.Radios) != 0 {
+		sx1301Config, err := shared.BuildSX1301Config(frequencyPlan)
+		if err != nil {
+			return nil, err
+		}
+		c.SX1301Conf = *sx1301Config
 	}
-
-	c.SX1301Conf = *sx1301Config
 
 	return &c, nil
 }

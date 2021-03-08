@@ -144,6 +144,8 @@
   "console.components.events.messages.rawEvent": "Raw event",
   "console.components.events.messages.errorOverviewEntry": "There was an error and the event cannot be displayed. The raw event can by viewed by clicking this row.",
   "console.components.events.messages.dataPreview": "Data preview",
+  "console.components.events.messages.dataFormats": "Data Formats",
+  "console.components.events.messages.dataFormatsInformation": "For more information on event message types, please see our {dataFormatsDocumentationLink} documentation.",
   "console.components.events.messages.seeAllActivity": "See all activity",
   "console.components.events.messages.syntheticEvent": "Note: This meta event did not originate from the network but was generated automatically by the Console. It is not related to any end device or gateway activity.",
   "console.components.events.messages.eventsTruncated": "Old events have been truncated to save memory. The current event limit per stream is {limit}.",

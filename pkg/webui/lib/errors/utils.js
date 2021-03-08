@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import * as Sentry from '@sentry/browser'
+import { isPlainObject } from 'lodash'
 
 import { error as errorLog } from '@ttn-lw/lib/log'
 
@@ -220,11 +221,37 @@ export const isTimeoutError = error => error.code === 'ECONNABORTED'
  * `false` otherwise.
  */
 export const isSentryWorthy = error =>
-  isUnknown(error) ||
+  (isUnknown(error) && httpStatusCode(error) === undefined) ||
   isInvalidArgumentError(error) ||
   isInternalError(error) ||
   httpStatusCode(error) >= 500 || // Server errors.
   httpStatusCode(error) === 400 // Bad request.
+
+/**
+ * Returns an appropriate error title that can be used for Sentry.
+ *
+ * @param {object} error - The error object.
+ * @returns {string} The Sentry error title.
+ */
+export const getSentryErrorTitle = error => {
+  if (typeof error !== 'object') {
+    return `invalid error type: ${error}`
+  }
+
+  if (isBackend(error)) {
+    return error.message
+  } else if (isFrontend(error)) {
+    return error.errorTitle.defaultMessage
+  } else if ('message' in error) {
+    return error.message
+  } else if ('code' in error) {
+    return error.code
+  } else if ('statusCode' in error) {
+    return `status code: ${error.statusCode}`
+  }
+
+  return 'untitled or empty error'
+}
 
 /**
  * Returns the id of the error, used as message id.
@@ -349,7 +376,7 @@ export const toMessageProps = error => {
 
 /**
  * `ingestError` provides a unified error ingestion handler, which manages
- * forwarding to sentry and other logic that should be applied when errors
+ * forwarding to Sentry and other logic that should be applied when errors
  * occur. The error object is not modified.
  *
  * @param {object} error - The error object.
@@ -360,13 +387,19 @@ export const ingestError = (error, extras = {}, tags = {}) => {
   // Log the error when in development mode
   errorLog(error)
 
-  // Sent to Sentry if necessary.
+  // Send to Sentry if necessary.
   if (isSentryWorthy(error)) {
     Sentry.withScope(scope => {
-      scope.setExtras({ ...error, ...extras })
       scope.setTags({ ...tags, frontendOrigin: true })
       scope.setFingerprint(isBackend(error) ? getBackendErrorId(error) : error)
-      Sentry.captureException(error instanceof Error ? error : new Error(error))
+      if (isPlainObject(error)) {
+        scope.setExtras({ ...error, ...extras })
+      } else {
+        scope.setExtras({ error, ...extras })
+      }
+      Sentry.captureException(
+        error instanceof Error ? error : new Error(getSentryErrorTitle(error)),
+      )
     })
   }
 }

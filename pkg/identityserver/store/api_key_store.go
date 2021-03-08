@@ -32,11 +32,11 @@ type apiKeyStore struct {
 	*store
 }
 
-func (s *apiKeyStore) CreateAPIKey(ctx context.Context, entityID ttnpb.Identifiers, key *ttnpb.APIKey) error {
+func (s *apiKeyStore) CreateAPIKey(ctx context.Context, entityID ttnpb.Identifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error) {
 	defer trace.StartRegion(ctx, "create api key").End()
 	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	model := &APIKey{
 		APIKeyID:   key.ID,
@@ -46,7 +46,10 @@ func (s *apiKeyStore) CreateAPIKey(ctx context.Context, entityID ttnpb.Identifie
 		EntityID:   entity.PrimaryKey(),
 		EntityType: entityTypeForID(entityID),
 	}
-	return s.createEntity(ctx, model)
+	if err = s.createEntity(ctx, model); err != nil {
+		return nil, err
+	}
+	return model.toPB(), nil
 }
 
 func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID ttnpb.Identifiers) ([]*ttnpb.APIKey, error) {

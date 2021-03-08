@@ -29,11 +29,10 @@ describe('Organization create', () => {
 
   beforeEach(() => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/organizations/add`)
   })
 
   it('displays UI elements in place', () => {
-    cy.visit(`${Cypress.config('consoleRootPath')}/organizations/add`)
-
     cy.findByText('Add organization', { selector: 'h1' }).should('be.visible')
     cy.findByLabelText('Organization ID').should('be.visible')
     cy.findByLabelText('Name').should('be.visible')
@@ -48,8 +47,6 @@ describe('Organization create', () => {
   })
 
   it('validates before submitting an empty form', () => {
-    cy.visit(`${Cypress.config('consoleRootPath')}/organizations/add`)
-
     cy.findByRole('button', { name: 'Create organization' })
       .should('be.visible')
       .click()
@@ -61,7 +58,6 @@ describe('Organization create', () => {
   })
 
   it('successfully adds organization', () => {
-    cy.visit(`${Cypress.config('consoleRootPath')}/organizations/add`)
     cy.findByLabelText('Organization ID').type(organizationId)
 
     cy.findByRole('button', { name: 'Create organization' })

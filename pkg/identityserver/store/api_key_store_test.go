@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/smartystreets/assertions"
@@ -88,22 +89,30 @@ func TestAPIKeyStore(t *testing.T) {
 					Rights: tt.Rights,
 				}
 
-				err := store.CreateAPIKey(ctx, tt.Identifiers, key)
+				created, err := store.CreateAPIKey(ctx, tt.Identifiers, key)
 
 				a.So(err, should.BeNil)
+				if a.So(created, should.NotBeNil) {
+					a.So(created.ID, should.Equal, key.ID)
+					a.So(created.Key, should.Equal, key.Key)
+					a.So(created.Name, should.Equal, key.Name)
+					a.So(created.Rights, should.Resemble, key.Rights)
+					a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+					a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+				}
 
 				keys, err := store.FindAPIKeys(ctx, tt.Identifiers)
 
 				a.So(err, should.BeNil)
 				if a.So(keys, should.HaveLength, 1) {
-					a.So(keys[0], should.Resemble, key)
+					a.So(keys[0], should.Resemble, created)
 				}
 
 				ids, got, err := store.GetAPIKey(ctx, key.ID)
 
 				a.So(err, should.BeNil)
 				a.So(ids, should.Resemble, tt.Identifiers)
-				a.So(got, should.Resemble, key)
+				a.So(got, should.Resemble, created)
 
 				updated, err := store.UpdateAPIKey(ctx, tt.Identifiers, &ttnpb.APIKey{
 					ID:     strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),

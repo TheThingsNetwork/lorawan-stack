@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -403,4 +404,121 @@ func TestMQTTConfig(t *testing.T) {
 		PublicAddress:    "example.com:1883",
 		PublicTLSAddress: "example.com:8883",
 	})
+}
+
+func TestSimulateUplink(t *testing.T) {
+	a := assertions.New(t)
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+
+	is, isAddr := startMockIS(ctx)
+	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: cluster.Config{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+
+	registeredDeviceID := ttnpb.EndDeviceIdentifiers{
+		DeviceID:               "dev1",
+		ApplicationIdentifiers: registeredApplicationID,
+		DevEUI:                 &types.EUI64{0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01},
+	}
+
+	as := mock.NewServer(c)
+	f := &mockFetcher{}
+	srv := New(as, WithEndDeviceFetcher(f))
+	c.RegisterGRPC(&mockRegisterer{ctx, srv})
+	componenttest.StartComponent(t, c)
+	defer c.Close()
+
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
+
+	client := ttnpb.NewAppAsClient(c.LoopbackConn())
+	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+		AuthType:      "Bearer",
+		AuthValue:     registeredApplicationKey,
+		AllowInsecure: true,
+	})
+
+	upCh := make(chan erroredApplicationUp, 1)
+	streamCtx := test.Context()
+	stream, err := client.Subscribe(streamCtx, &registeredApplicationID, creds)
+	if err != nil {
+		t.Fatalf("Failed to subscribe: %s\n", err)
+	}
+	go func() {
+		for streamCtx.Done() == nil {
+			up, err := stream.Recv()
+			upCh <- erroredApplicationUp{up, err}
+		}
+	}()
+
+	<-as.Subscriptions()
+	for _, tc := range []struct {
+		name              string
+		up                *ttnpb.ApplicationUp
+		setup             func(f *mockFetcher)
+		expectIdentifiers ttnpb.EndDeviceIdentifiers
+	}{
+		{
+			name: "Fetch",
+			up: &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               registeredDeviceID.DeviceID,
+					ApplicationIdentifiers: registeredApplicationID,
+				},
+			},
+			setup: func(f *mockFetcher) {
+				f.dev = &ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDeviceID,
+				}
+				f.err = nil
+			},
+			expectIdentifiers: registeredDeviceID,
+		},
+		{
+			name: "FetchError",
+			up: &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               registeredDeviceID.DeviceID,
+					ApplicationIdentifiers: registeredApplicationID,
+				},
+			},
+			setup: func(f *mockFetcher) {
+				f.dev = nil
+				f.err = fmt.Errorf("mock error")
+			},
+			expectIdentifiers: ttnpb.EndDeviceIdentifiers{
+				DeviceID:               registeredDeviceID.DeviceID,
+				ApplicationIdentifiers: registeredApplicationID,
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup(f)
+
+			_, err = client.SimulateUplink(ctx, tc.up, creds)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			select {
+			case up := <-upCh:
+				if err := up.error; err != nil {
+					t.Fatalf("Received unexpected error: %s\n", err)
+				}
+				a.So(f.calledWithIdentifers, should.Resemble, tc.up.EndDeviceIdentifiers)
+				a.So(f.calledWithPaths, should.Resemble, []string{"ids"})
+				a.So(up.EndDeviceIdentifiers, should.Resemble, tc.expectIdentifiers)
+			case <-time.After(timeout):
+				t.Fatal("Timed out waiting for simulated uplink")
+			}
+		})
+	}
 }

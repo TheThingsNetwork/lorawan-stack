@@ -34,13 +34,12 @@ describe('Organization general settings', () => {
 
   beforeEach(() => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-  })
-
-  it('successfully edit organization name and description', () => {
     cy.visit(
       `${Cypress.config('consoleRootPath')}/organizations/${organizationId}/general-settings`,
     )
+  })
 
+  it('successfully edit organization name and description', () => {
     cy.findByLabelText('Name').type('test-name')
     cy.findByLabelText('Description').type('test-description')
 
@@ -54,9 +53,6 @@ describe('Organization general settings', () => {
   })
 
   it('successfully delete organization', () => {
-    cy.visit(
-      `${Cypress.config('consoleRootPath')}/organizations/${organizationId}/general-settings`,
-    )
     cy.findByRole('button', { name: /Delete organization/ }).click()
 
     cy.findByTestId('modal-window')

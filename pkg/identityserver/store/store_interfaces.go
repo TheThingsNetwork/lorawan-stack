@@ -147,7 +147,7 @@ type MembershipStore interface {
 // clients, gateways, organizations or users).
 type APIKeyStore interface {
 	// Create a new API key for the given entity.
-	CreateAPIKey(ctx context.Context, entityID ttnpb.Identifiers, key *ttnpb.APIKey) error
+	CreateAPIKey(ctx context.Context, entityID ttnpb.Identifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error)
 	// Find API keys of the given entity.
 	FindAPIKeys(ctx context.Context, entityID ttnpb.Identifiers) ([]*ttnpb.APIKey, error)
 	// Get an API key by its ID.

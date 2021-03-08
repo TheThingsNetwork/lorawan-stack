@@ -373,6 +373,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 						DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 							Downlinks:    invalid,
 							LastFCntDown: dev.Session.LastNFCntDown,
+							SessionKeyID: dev.Session.SessionKeyID,
 						},
 					},
 				})
@@ -518,6 +519,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 					Downlinks:    dev.Session.QueuedApplicationDownlinks,
 					LastFCntDown: pld.FullFCnt,
+					SessionKeyID: dev.Session.SessionKeyID,
 				},
 			},
 		})
@@ -721,11 +723,16 @@ func allErrors(p func(error) bool, errs ...error) bool {
 }
 
 func nonRetryableAbsoluteTimeGatewayError(err error) bool {
-	return errors.IsAborted(err) || errors.IsResourceExhausted(err) || errors.IsFailedPrecondition(err)
+	return errors.IsAborted(err) || // e.g. no absolute gateway time or no time sync with the server.
+		errors.IsResourceExhausted(err) || // e.g. time-on-air does not fit with duty-cycle already used.
+		errors.IsFailedPrecondition(err) || // e.g. no downlink allowed, invalid frequency, too late for transmission.
+		errors.IsAlreadyExists(err) // e.g. a downlink has already been scheduled on the given time.
 }
 
 func nonRetryableFixedPathGatewayError(err error) bool {
-	return errors.IsNotFound(err) || errors.IsDataLoss(err) || errors.IsFailedPrecondition(err)
+	return errors.IsNotFound(err) || // e.g. gateway is not connected.
+		errors.IsDataLoss(err) || // e.g. invalid uplink token.
+		errors.IsFailedPrecondition(err) // e.g. no downlink allowed, invalid frequency, too late for transmission.
 }
 
 type scheduleRequest struct {

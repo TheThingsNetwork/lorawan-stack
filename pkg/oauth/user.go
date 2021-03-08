@@ -60,6 +60,7 @@ func (s *server) ClientLogout(c echo.Context) error {
 		if err != nil && !errors.IsNotFound(err) {
 			return err
 		}
+		events.Publish(EvtUserLogout.NewWithIdentifiersAndData(ctx, at.UserIDs, nil))
 		redirectParam := c.QueryParam("post_logout_redirect_uri")
 		if redirectParam == "" {
 			if len(client.LogoutRedirectURIs) != 0 {
