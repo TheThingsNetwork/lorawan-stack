@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Default value of `gs.udp.addr-change-block` is now 0, which disables the IP firewall for UDP traffic. Deployments that need to enforce the IP check should set a value greater than 0. Note that the new default value makes UDP connections less secure.
+
 ### Deprecated
 
 ### Removed
