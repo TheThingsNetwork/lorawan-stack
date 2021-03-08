@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- `sentry.environment` configuration option to set the `environment` tag on Sentry reports.
+
 ### Changed
 
 ### Deprecated

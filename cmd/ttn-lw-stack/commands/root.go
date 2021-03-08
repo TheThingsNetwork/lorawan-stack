@@ -76,8 +76,9 @@ var (
 
 			if config.Sentry.DSN != "" {
 				opts := sentry.ClientOptions{
-					Dsn:     config.Sentry.DSN,
-					Release: pkgversion.String(),
+					Dsn:         config.Sentry.DSN,
+					Release:     pkgversion.String(),
+					Environment: config.Sentry.Environment,
 				}
 				if hostname, err := os.Hostname(); err == nil {
 					opts.ServerName = hostname
